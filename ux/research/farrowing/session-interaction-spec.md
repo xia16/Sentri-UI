@@ -108,8 +108,15 @@ The pen header census counts living animals only; Born lives in the record. (Ope
   restores. The line stays visible as a retracted event. (Open q 4.)
 
 ### The sow who never finishes
-Finish is always human — no auto-final. An Active sow with no records for >24 h surfaces
-on the escalation strip as a prompt, never a state change. (Open q 5.)
+Finish is always human — no auto-final, and (owner ruling) **no staleness tracking
+either**: no threshold, no escalation prompt. Absence of records makes no claim — the
+same law that makes the interval chip fade instead of lie. An abandoned Active sow simply
+stays Active, and her row already carries the story as a plain fact (`started · yesterday
+· L.M`) that any hand walking the room reads without machinery. Closure discipline, if a
+farm wants it, is a console report over the stamps — never barn chrome. Both farrowing
+models remain first-class: supervised farrowing is standard modern practice on intensive
+farms (induction into staffed hours, attendants raising born-alive survival), and
+unattended free farrow is equally real where labor is short.
 
 ## 5 · Open questions before design resumes
 
@@ -120,7 +127,7 @@ on the escalation strip as a prompt, never a state change. (Open q 5.)
 3. Post-final discovery of an *extra live* piglet routes through the count drawer's doors,
    not the session sheet — ok?
 4. Wrong-death correction = visible retract event (never deletion) — ok?
-5. Active sow, no records >24 h → escalation strip prompt; Finish stays human — ok, and is
-   24 h the right threshold?
+5. ~~Active-sow staleness prompt~~ — resolved: no tracking, no prompt; the row's stamp is
+   the only signal. Finish stays human.
 6. Numpad `recount` allowed on dead-cause cells too, or steppers only for causes (a big
    typed number on a cause is almost always an error)?
