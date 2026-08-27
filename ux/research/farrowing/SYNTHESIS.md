@@ -176,3 +176,61 @@ which case they escalate to the strip / check-in and nothing silently expires.
 C4 (stillborn/mummified split timing), C5 (sow-death session close state), D1 (fostered
 piglet's ladder in the receiver crate), D2 (overdue-treatment clinical ceiling), D3
 (refusal rendering), E1 (two hands, one room).
+
+---
+
+## 7 · Owner answers — second round (2026-08-27)
+
+**1 · Tags: no range management.** The system never owns or allocates tag numbers — the
+farm buys tags, the numbers are whatever is on the hardware, and duplicate purchases are
+the farm's own problem. Design consequence: the conveyor's "next number" is a pure typing
+convenience, not a managed range — after the hand enters/scans the first tag of a
+sequential strip, the next field *suggests* +1, editable, scan always overrides; if a
+farm's tags are not sequential the suggestion is simply wrong once and the hand types.
+Duplicate tags warn amber inline but never block (downgraded from the identity brief's
+"refuse": policing purchases is not our job).
+
+**2 · Notching.** All workflows supported: notch-first, notch-never, notch-only. Notch is
+an optional identity field on the same conveyor; for notch-only farms the notch IS the
+identity, so lookup-by-notch must exist wherever lookup-by-tag does.
+
+**3 · Due window: hardcoded, no config.** Industry rule encoded as pure frontend logic:
+gestation averages 114 days (the "3 months, 3 weeks, 3 days" rule; normal spread roughly
+111–117). Encoding: **expected = first service + 114 d**; the row runs forecast register
+before day 114, prints nothing during the normal window (zero rule), and flags
+**overdue from day 116** (due + 2) — the point at which industry practice says examine
+or induce.
+
+**4 · Unexplained count = compliance anomaly.** Confirmed working model: "just set count"
+commits and tallies as an anomaly for compliance; at the moment of setting, the hand may
+do nothing, add a note, or take the death door. The anomaly count is a console/compliance
+surface, not barn chrome.
+
+**5 · Late-death dating: relative words, not date ranges.** Interval honesty stays in the
+data, but the UI never asks a hand to pick a date range. The death sheet offers relative
+chips: **Today (default) · Yesterday · Not sure** — "Not sure" silently carries the
+interval since the last count (the system knows it; the hand is never asked). Display
+prints words ("died today", "between Jul 12 and today"), never a picker. To be drawn in
+the design round; flagged as a UX-quality gate.
+
+**6 · Stillborn vs mummified: keep both, never force.** Owner asked the analytics value —
+it is real and they diagnose different problems: stillborn rate points at farrowing
+management (long labors, big litters, sow condition, supervision), mummified rate is an
+infectious-disease early warning (mid-gestation infection — PPV/PRRS class), one of the
+cheapest herd-health signals a farm has. And mummies are visually unmistakable, so the
+classification costs nothing when actually seen. Ruling: one **dead** tally is always
+enough live; the split is an optional cleanup-time refinement (✎, stamped); an unsplit
+record stays "dead · unclassified" and analytics degrades gracefully.
+
+**7 · Fosters ride the crate schedule.** Confirmed. The reminder is the quiet row note
+(`incl. 3 fostered · 2d older`) — a standing fact line, not a notification.
+
+**8 · Overdue stays overdue.** No conversion in v1; late work back-fills.
+
+**9 · Sync: live when online, last-record-wins offline.** Compatible with the ledger
+model: marks are append-only events stamped who·when, so offline collision on the same
+crate resolves as the same treatment marked twice — harmless, deduped as same litter ·
+same treatment · same day. Last-write-wins only ever bites on scalar edits (a count set
+twice offline), where the later stamp standing is the correct outcome anyway.
+
+**All owner questions are now closed.** The suite is ready for the design round.
