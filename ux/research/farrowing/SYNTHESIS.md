@@ -303,3 +303,20 @@ night would turn the whole room amber. Ruling: the chip lives only while records
 amber past ~60 m (the husbandry check-her band); gone past ~90 m rather than stale —
 absence makes no claim, so the room fades to calm overnight and the chip returns with the
 next tally. Never a threshold config, never a notification, never asked-for times.
+
+---
+
+## 11 · Owner round six: two modes, and the disappearing dead (2026-08-27)
+
+**During and after farrowing are two modes of one sheet.** During: every class an editable
+− n + stepper (the owner chose visible steppers), the two truths derived above. After
+Finish: the birth record renders as read lines and the only action is Report death —
+amending the birth record is the deliberate stamped exception. "Farrowed overnight"
+phrasing cut as extra; the context line is just the found time.
+
+**Minus asks the one question.** The owner's scenario: piglets die mid-session, the hand
+discards the bodies, and a plain decrement makes the numbers not add up for the next
+person. Ruling: + is always free; − on an alive class opens the one decision — miscount
+(Born drops) or died › (moves to a cause; Born stands, Alive drops). − on a cause cell is
+always a miscount. The Born/Alive-now split (round five) plus this rule closes the
+disappearing-death hole: the story always sums for whoever walks in next.
