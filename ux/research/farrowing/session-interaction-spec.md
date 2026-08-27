@@ -29,10 +29,10 @@ births; a last-write-wins "set healthy = 5" would eat one).
 | `birth(class)` | + on an alive class (healthy / weak / deformed) | +1 | +1 | +1 |
 | `birth_dead(class)` | + on stillborn / mummified | +1 | — | — |
 | `dead_found(unknown)` | + on Unknown (a body whose timing can't be told) | +1 | — | — |
-| `miscount(class)` | − → "miscount" | −1 | per class | per class |
-| `death(cause, when)` | − on an alive class → "died ›", or Report death (09b) | — | — | −1 |
+| `miscount(class)` | Readjust mode: − or set | −1 | per class | per class |
+| `death(cause, when)` | Died › (during) or Report death (09b, after) | — | — | −1 |
 | `death_amend / retract` | ✎ on a death line in the record | — | — | +1 if retracted |
-| `recount(class, n)` | tap the count, type on numpad | sets | sets | derives |
+| `recount(class, n)` | numpad: up-only in tally, absolute in Readjust | sets | sets | derives |
 | `foster_out / in (n)` | Pairing | — | — | ∓n |
 | `count_assert(n)` | count drawer (09e) | — | — | routes via doors |
 | `final()` | Finish farrowing | locks | locks | — |
@@ -43,15 +43,27 @@ is no "alive, unclassified". Dead classes ARE causes, and each implies its birth
 crushed ⇒ born alive (then died); stillborn / mummified ⇒ born dead; unknown ⇒ born, status
 unknown. The hand records what the eye sees; the routing derives.
 
-**The two paths to a dead piglet, disambiguated by path, not by question:**
-- **+ on a dead class** = a body not previously counted (the morning pile). Born +1.
-- **− on an alive class → died ›** = a counted piglet is gone. Born stands, Alive −1.
+**Three gestures, three meanings — no questions anywhere (owner ruling):**
+- **+ on a class** = a birth (alive classes) or a newly found body (dead classes). The
+  only gesture on the default sheet. If a pig is born, it is — there is no − beside it.
+- **Died ›** = a counted piglet is gone. The only path to a death, always. Born stands,
+  Alive −1, cause follows.
+- **Readjust** = an explicit button that enters correction mode. Only there do the
+  classes show − (and the numpad set): every change in Readjust is a `miscount` /
+  reclassification correction, logged as such. Deaths cannot be recorded in Readjust —
+  the mode says so in one line and points at Died. Leaving the mode returns the calm
+  tally sheet.
 
-**Minus always asks.** − on an alive class always offers exactly two words: `miscount`
-(the birth never happened) or `died ›` (cause follows). No timing heuristics, no silent
-guessing — predictable beats clever. A miscount that cancels a + from the same visit nets
-to nothing in the trail; − on a dead-class cell is always a miscount (a body can't die
-twice).
+The earlier "minus asks miscount-or-died" question dies with the minus: the three paths
+carry the three meanings, and a hand can no longer casually decrement a birth fact —
+correcting one is a deliberate act you enter a mode to do. Residual risk (a hand using
+Readjust to hide a death) is accepted: entering a correction mode to record a death is
+more friction than the Died door beside it, and a Readjust decrement visibly drops Born
+in front of them.
+
+**Typing counts.** In the default sheet, tapping a count opens the numpad but only counts
+*up* — typing 12 over 4 records 8 births (the morning-pile case); typing down is refused
+with a one-line pointer to Readjust. Inside Readjust the numpad sets absolutely.
 
 ## 3 · Invariants — always true, for anyone, at any time
 
@@ -69,12 +81,13 @@ twice).
 ### During the tally (attended)
 - Birth: + healthy (or weak/deformed). Born and Alive tick.
 - Born dead: + stillborn. Born ticks, Alive doesn't.
-- Counted piglet dies, body tossed in the bucket: − healthy → `died ›` → crushed.
-  Born 10 stands, Alive 5, crushed 2. **Removal of the body is physical, not digital** —
+- Counted piglet dies, body tossed in the bucket: `Died ›` → crushed. Born 10 stands,
+  Alive 5, crushed 2. **Removal of the body is physical, not digital** —
   the death event already told the story; carcass disposal is out of scope in v1.
-- Mis-tap: − → miscount. Two taps, trail stays clean (same-visit net).
-- Numpad: tap the count, type 12 — a `recount` assertion (absolute). Concurrent recounts:
-  the later stamp wins, deltas after it apply on top.
+- Mis-tap: Readjust → −. Two taps, deliberate; a same-visit correction nets to nothing in the trail.
+- Numpad: tap the count, type 12 — records the difference as births (up-only in the
+  default sheet). Absolute sets exist only inside Readjust; concurrent sets, later stamp
+  wins, deltas after it apply on top.
 
 ### The morning after (unattended)
 One pass, one surface: alive classes for the living, dead-class taps for the pile —
@@ -122,12 +135,12 @@ unattended free farrow is equally real where labor is short.
 
 1. Row grammar "line 1 = now, line 2 = record" — confirm, incl. the Done row dropping
    "Final · 11 live" for "5 alive / born 10 · final …".
-2. − always asks (two-word choice, predictable) vs silent timed undo for an immediate
-   re-tap — spec chose always-ask; confirm.
+2. ~~Minus asks~~ — resolved by the owner's Readjust ruling: no − on the default sheet
+   at all; corrections are a deliberate mode, deaths are the Died door, the question dies.
 3. Post-final discovery of an *extra live* piglet routes through the count drawer's doors,
    not the session sheet — ok?
 4. Wrong-death correction = visible retract event (never deletion) — ok?
 5. ~~Active-sow staleness prompt~~ — resolved: no tracking, no prompt; the row's stamp is
    the only signal. Finish stays human.
-6. Numpad `recount` allowed on dead-cause cells too, or steppers only for causes (a big
-   typed number on a cause is almost always an error)?
+6. Inside Readjust, may dead-cause cells be typed absolutely too, or − only (a big typed
+   number on a cause is almost always an error)?
