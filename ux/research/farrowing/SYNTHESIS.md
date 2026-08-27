@@ -128,3 +128,51 @@ sow due            farrowing            litter record         day-age cohorts   
    the other hand marks it) enough, or do they need explicit claiming?
 2. Who may End task early on sweeps — any hand or lead only? ("Supervisor's stop" implies
    a role gate that rubs against "nothing is ever disabled".)
+
+---
+
+## 6 · Owner answers — first round (2026-08-27)
+
+**A1/A2 · Tags and enrichment data.** Both visual and RFID tags must be supported (per
+farm, possibly mixed). Birth weight and similar enrichment fields are **optional by
+philosophy**: the farm enters what it wants, at its own accord — give them the space and
+the freedom. Design consequence: the identity conveyor must be complete with zero weight
+entries; no enrichment field ever gates a confirm; scan and manual entry are peers.
+
+**B1/B3 · Compliance = provenance, not sign-off.** The owner trusts the per-entry trail
+over any end ceremony: falsifying records is much harder when every single data entry
+would have to be planned and faked, each stamped who · when. So: no per-run sign-off;
+entry-time stamping stands; the frozen task sheet + the stamps are the audit. This also
+argues against any hard gate that pressures a hand to enter fake data to get past it —
+a blocked path is a falsification incentive (see closure ruling below).
+
+**C1 · Marking piglet deaths (question restated in plain terms and answered).** The
+question was: when a piglet dies, does the hand expect to just tap minus on the birth
+counter, or make an explicit "died" mark? Owner: hands must be able to mark piglets dead
+**easily**, both during farrowing and after — not all piglets make it. Ruling: an explicit
+death mark sits right on the session sheet beside the counters (one tap, count follows);
+minus on a counter remains "I miscounted". While the farrowing task is open, death is
+marked in the task; after it closes, in check-in. Both write the same ledger event.
+
+**D-display · Fostering visibility.** Fostered counts (given and received) and the
+original birth count belong on the sow detail page — present but secondary, not
+immediately obvious in the pen view. Whether that information earns its place at all is
+a design-time call; flag it for the render round, default to quiet.
+
+**E2 + closure · Ending batch farrowing.** End task here means "done with farrowing in
+this batch". Anyone may close it. Sows that died or aborted leave the batch via their own
+verbs, so the remainder at close time is only sows that genuinely have not farrowed.
+Owner left open: warn explicitly vs hard-block until all have farrowed. Recommendation
+(pending owner confirmation): **warn + doors, never hard-block** — there is always a
+legitimate laggard (a sow that was never actually in pig has not farrowed, is not dead,
+and is not aborted; she needs a disposition verb, not a birth record). A hard block would
+pressure exactly the fake entries the provenance principle (B above) is designed to
+prevent. So the close surface lists the unfarrowed remainder as visible choices —
+disposition doors per sow (not-in-pig · abort · move to next batch) or close anyway, in
+which case they escalate to the strip / check-in and nothing silently expires.
+
+**Still open after this round:** A3 (tag-range ownership), A4 (notch timing), A5
+(due-window tolerance), C2 (unexplained count at weaning close), C3 (late-death dating),
+C4 (stillborn/mummified split timing), C5 (sow-death session close state), D1 (fostered
+piglet's ladder in the receiver crate), D2 (overdue-treatment clinical ceiling), D3
+(refusal rendering), E1 (two hands, one room).
