@@ -617,12 +617,12 @@
 </div>
 
 <!-- ============ 09a session ============ -->
-<h2>09a · The session drawer — three candidates</h2>
-<p style="max-width:80ch">The first session sheet covered the whole phone. These are three compact rebuilds of the same drawer — same contract (five classes expressible, every tap commits, Save keeps her Active, Finish closes the litter, <span class="mono">Piglet died ›</span> routes to 09b, the trail one tap away), three different bets on where the class detail lives. The room list stays visible behind all three.</p>
-<div style="display:flex;gap:34px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px">
-<div><!-- ============ V1 · TWO COUNTERS + TALLY CHIPS ============ -->
-<div class="vlabel">V1 · Two counters + tally chips</div>
-<div class="phone" style="display:flex;flex-direction:column;height:800px;background:var(--well)">
+<h2>09a · The session drawer</h2>
+<p style="max-width:80ch">The drawer, converged after two review rounds. Every class is directly enterable — its own cell, its own visible <span class="mono">+</span> — in two labeled columns whose totals derive the headline. The sheet runs ~430px on a 760px phone; the room list stays readable behind it. What the rejected candidates taught: filled chips read as a wall (V1), a tile with no <span class="mono">+</span> does not read as input (V2), and hiding the classes behind a link hides the actual work (V3).</p>
+<div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
+<div>
+<div class="vlabel">The session drawer · tap the row body</div>
+<div class="phone" style="display:flex;flex-direction:column;height:830px;background:var(--well)">
   <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
   <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
   <div class="list" style="opacity:.45">
@@ -634,115 +634,37 @@
   <div style="flex:1"></div>
   <div class="fs">
     <div class="grab"></div>
-    <div class="sh2" style="padding-bottom:10px"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">started 6h · parity 3</span></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 2px"><span style="font-family:var(--mono);font-size:22px;font-weight:700;line-height:1">8 live · 3 dead</span><span class="b b-amber">last 45m</span></div>
-    <div class="ctr" style="border-top:none;padding:2px 0"><span class="lbl" style="font-size:16px;font-weight:700">Live</span><span class="b">−</span><span class="n" style="font-size:32px;width:56px">8</span><span class="b plus">+</span></div>
-    <div style="display:flex;gap:8px;padding:2px 0"><span class="pchip cur" style="flex:1">Healthy <span class="c">·6</span></span><span class="pchip cur">Weak <span class="c">·1</span></span><span class="pchip cur">Deformed <span class="c">·1</span></span></div>
-    <div class="ctr" style="border-top:none;padding:8px 0 2px"><span class="lbl" style="font-size:16px;font-weight:700">Dead</span><span class="b">−</span><span class="n" style="font-size:32px;width:56px">3</span><span class="b plus">+</span></div>
-    <div style="display:flex;gap:8px;padding:2px 0"><span class="pchip cur">Stillborn <span class="c">·2</span></span><span class="pchip cur">Mummified <span class="c">·1</span></span></div>
-    <div style="display:flex;align-items:center;gap:10px;margin-top:8px;border-top:1px solid var(--hair);padding:10px 2px 0">
-      <span style="font-family:var(--mono);font-size:11px;color:var(--ink2)">+1 deformed · 08:56 · G.H</span>
-      <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink)">Trail · 8 <span class="chev">›</span></span>
-      <span style="margin-left:auto;font-size:12.5px;font-weight:700">Piglet died <span class="chev">›</span></span>
+    <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">started 6h · parity 3</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 2px 12px"><span style="font-family:var(--mono);font-size:21px;font-weight:700">8 live · 3 dead</span><span class="b b-amber">last 45m</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 10px">
+      <span class="fk" style="margin:0">Live · 8</span>
+      <span class="fk" style="margin:0">Dead · 3</span>
+      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--hair2);border-radius:12px;padding:6px 6px 6px 12px;background:var(--card)"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Healthy</span><span style="font-family:var(--mono);font-size:18px;font-weight:700">6</span><span style="width:44px;height:44px;border-radius:10px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--hair2);border-radius:12px;padding:6px 6px 6px 12px;background:var(--card)"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Stillborn</span><span style="font-family:var(--mono);font-size:18px;font-weight:700">2</span><span style="width:40px;height:40px;border-radius:10px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--hair2);border-radius:12px;padding:6px 6px 6px 12px;background:var(--card)"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Weak</span><span style="font-family:var(--mono);font-size:18px;font-weight:700">1</span><span style="width:40px;height:40px;border-radius:10px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--hair2);border-radius:12px;padding:6px 6px 6px 12px;background:var(--card)"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Mummified</span><span style="font-family:var(--mono);font-size:18px;font-weight:700">1</span><span style="width:40px;height:40px;border-radius:10px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--hair2);border-radius:12px;padding:6px 6px 6px 12px;background:var(--card)"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Deformed</span><span style="font-family:var(--mono);font-size:18px;font-weight:700">1</span><span style="width:40px;height:40px;border-radius:10px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--red);border-radius:12px;padding:6px 12px;background:var(--card)"><span style="font-size:13px;font-weight:700;color:var(--red)">Died after birth</span><span class="chev" style="color:var(--red)">›</span></div>
     </div>
-    <div class="shbar" style="margin-top:14px"><button class="cta sec">Save</button><button class="cta" style="flex:1">Finish farrowing</button></div>
-    <div class="aud">tap a chip tallies its class · plain + is unclassified — legal · long-press a chip for its stepper</div>
-  </div>
-</div>
-<div class="why" style="width:390px;font-size:12.5px;color:var(--ink2);margin-top:12px;line-height:1.5"><b style="color:var(--ink)">Two counters are the sheet; the classes are tallies under them.</b> Live and Dead stand as two large calm rows with no hairline between them, and the five classes render in the 09b death-drawer chip grammar — tap <span style="font-family:var(--mono)">Healthy ·6</span> tallies one and both the counter and the headline re-derive; long-press a chip opens its stepper; the plain <b style="color:var(--ink)">+</b> on a counter is an unclassified tally, legal at 2am. One tap: any birth, classified or not. One click away: the full trail (<span style="font-family:var(--mono)">Trail · 8 ›</span>, latest stamped line kept inline) and the 09b death drawer (<span style="font-family:var(--mono)">Piglet died ›</span>), sharing one compact link-row. Two hairlines total on the sheet, and the open sheet runs ≈415px — the list stays readable behind it.</div></div>
-<div><div class="vlabel">V2 · THE TALLY PAD</div>
-<div class="phone" style="display:flex;flex-direction:column;height:760px">
-    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
-    <div style="flex:1;min-height:0;overflow:hidden;opacity:.45;display:flex;flex-direction:column">
-      <div class="appbar" style="padding-bottom:10px"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Farrowing</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last record <b style="color:var(--ink2);font-weight:600">08:56</b> · G. Hansen</div></div></div>
-      <div class="lensrow"><div class="lens"><button>Awaiting <span class="n">9</span></button><button class="on">Active <span class="n">2</span></button><button>Done <span class="n">8</span></button><button>All <span class="n">19</span></button></div></div>
-      <div class="list">
-        <div class="pcard"><div class="pen"><span class="code">B1</span><span class="agg">1 sow</span></div>
-        <div class="row"><span class="tag">000418</span><div class="st"><span class="l1">8 live · 3 dead <span class="b b-amber">last 45m</span></span><span class="l2">started 6h · parity 3</span></div><div class="rail"><span class="word s-green">ACTIVE</span><span class="chev">›</span></div></div></div>
-        <div class="pcard"><div class="pen"><span class="code">B2</span><span class="agg">1 sow</span></div>
-        <div class="row"><span class="tag">000392</span><div class="st"><span class="l1">Started · no record yet</span><span class="l2">marked 23:10 · L.M · parity 5</span></div><div class="rail"><span class="word s-green">ACTIVE</span><span class="chev">›</span></div></div></div>
-      </div>
-    </div>
-    <div class="fs" style="box-shadow:0 -12px 34px rgba(28,30,25,.13)">
-      <div class="grab"></div>
-      <div class="sh2" style="padding:0 2px 10px"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">started 6h · parity 3</span></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 2px 6px"><span style="font-family:var(--mono);font-size:22px;font-weight:700">8 live · 3 dead</span><span class="b b-amber">last 45m</span></div>
-      <div class="pk" style="padding:0;background:transparent;border:none;border-radius:0;margin-top:4px">
-        <div class="grid" style="grid-template-columns:repeat(3,1fr);grid-auto-rows:52px">
-          <div class="cell" style="grid-column:1/3;grid-row:1/3;height:auto;background:var(--well);border-color:transparent;gap:5px">
-            <span class="pc" style="font-size:34px;line-height:1">6</span><span class="n" style="font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink)">Healthy</span>
-          </div>
-          <div class="cell" style="height:auto;background:var(--well);border-color:transparent;gap:2px"><span class="pc" style="font-size:18px;line-height:1">1</span><span class="n" style="font-family:var(--sans);font-size:11px;font-weight:600">Weak</span></div>
-          <div class="cell" style="height:auto;background:var(--well);border-color:transparent;gap:2px"><span class="pc" style="font-size:18px;line-height:1">1</span><span class="n" style="font-family:var(--sans);font-size:11px;font-weight:600">Deformed</span></div>
-          <div class="cell" style="height:auto;gap:2px"><span class="pc" style="font-size:18px;line-height:1">2</span><span class="n" style="font-family:var(--sans);font-size:11px;font-weight:600">Stillborn</span></div>
-          <div class="cell" style="height:auto;gap:2px"><span class="pc" style="font-size:18px;line-height:1">1</span><span class="n" style="font-family:var(--sans);font-size:11px;font-weight:600">Mummified</span></div>
-          <div class="cell" style="height:auto;gap:3px;border:1.5px solid var(--red);background:transparent"><span class="pc" style="font-size:14px;color:var(--red)">Died ›</span><span class="n" style="font-family:var(--sans);font-size:10.5px;font-weight:600;color:var(--red)">after birth</span></div>
-        </div>
-      </div>
-      <div class="rowlink" style="border-top:none;padding:11px 2px 8px"><span style="font-size:13.5px;font-weight:700;flex:0 0 auto">Trail · 8</span><span style="font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-left:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">+1 deformed · 08:56 · G.H</span><span class="chev" style="margin-left:auto">›</span></div>
-      <div class="shbar" style="margin-top:6px"><button class="cta sec">Save</button><button class="cta" style="flex:1">Finish farrowing</button></div>
-      <div class="aud">every tap tallies +1, committed · long-press a tile for the − stepper (unclassified lives there) · save keeps her active</div>
-    </div>
-</div>
-<div class="why" style="width:390px;font-size:12.5px;color:var(--ink2);margin-top:12px;line-height:1.5"><b style="color:var(--ink)">The sheet is a keypad, not a form.</b> Rows and their hairlines are gone: six tap tiles on the pk-cell grid, filled = live, outlined = dead, and Healthy is the double-width double-height hero the wet glove hits without looking — one tap is +1 on any class, committed as it lands. Long-press opens the minus/stepper (Unclassified rides there), <span class="mono">Died ›</span> is the sixth slot routing to the 09b death drawer, and the trail collapses to one link-line with the latest stamp inline — all one click away, never inline. The headline <span class="mono">8 live · 3 dead</span> still derives from the tiles; sheet content lands at ~430px on the 760px phone, the Active list readable behind it.</div></div>
-<div><!-- V3 · MINIMAL FIRST, CLASSIFY ONE TAP AWAY -->
-<div class="vlabel">V3 · Minimal first, classify one tap away</div>
-<div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--well)">
-  <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
-  <div style="opacity:.45;pointer-events:none">
-    <div class="appbar" style="padding-bottom:10px"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Farrowing</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last record <b style="color:var(--ink2);font-weight:600">08:56</b> · G. Hansen</div></div></div>
-    <div class="lensrow"><div class="lens"><button>Awaiting <span class="n">9</span></button><button class="on">Active <span class="n">2</span></button><button>Done <span class="n">8</span></button><button>All <span class="n">19</span></button></div></div>
-    <div class="list">
-      <div class="pcard"><div class="pen"><span class="code">B1</span><span class="agg">1 sow</span></div>
-      <div class="row"><span class="tag">000418</span><div class="st"><span class="l1">8 live · 3 dead <span class="b b-amber">last 45m</span></span><span class="l2">started 6h · parity 3</span></div><div class="rail"><span class="word s-green">ACTIVE</span><span class="chev">›</span></div></div></div>
-      <div class="pcard"><div class="pen"><span class="code">B2</span><span class="agg">1 sow</span></div>
-      <div class="row"><span class="tag">000392</span><div class="st"><span class="l1">Started · no record yet</span><span class="l2">marked 23:10 · L.M · parity 5</span></div><div class="rail"><span class="word s-green">ACTIVE</span><span class="chev">›</span></div></div></div>
-    </div>
-  </div>
-  <div style="flex:1"></div>
-  <div class="fs">
-    <div class="grab"></div>
-    <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">started 6h · parity 3</span><span class="b b-amber" style="margin-left:10px">last 45m</span></div>
-    <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:10px;padding:14px 0 4px">
-      <div class="ctr" style="border-top:none;padding:0">
-        <span class="n" style="width:auto;font-size:27px;text-align:left">8</span>
-        <span class="lbl" style="flex:0 0 auto;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)">live</span>
-        <span class="b plus" style="flex:1;height:60px;font-size:24px;border-radius:12px">+</span>
-      </div>
-      <div class="ctr" style="border-top:none;padding:0">
-        <span class="n" style="width:auto;font-size:27px;text-align:left">3</span>
-        <span class="lbl" style="flex:0 0 auto;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)">dead</span>
-        <span class="b" style="flex:1;height:60px;font-size:22px;border-radius:12px">+</span>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:18px;padding:13px 2px 0;border-top:1px solid var(--hair);margin-top:12px;font-size:13px;font-weight:700">
-      <span>Classify · 2 unclassified <span style="color:var(--hair2)">›</span></span>
-      <span>Piglet died <span style="color:var(--hair2)">›</span></span>
-      <span style="margin-left:auto">Trail · 8 <span style="color:var(--hair2)">›</span></span>
-    </div>
-    <div style="font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em;padding:7px 2px 0">latest · +1 live · 08:56 · G.H</div>
+    <div style="display:flex;align-items:center;gap:10px;padding:11px 2px 2px;border-top:1px solid var(--hair);margin-top:12px"><span style="font-size:13px;font-weight:700;white-space:nowrap">Trail · 8 ›</span><span style="font-family:var(--mono);font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">+1 deformed · 08:56 · G.H</span></div>
     <div class="shbar"><button class="cta sec">Save</button><button class="cta" style="flex:1">Finish farrowing</button></div>
-    <div class="aud">every + commits unclassified · the 2am hand taps, the morning hand classifies</div>
+    <div class="aud">every + tallies its class, committed · long-press a cell for − and the stepper · a plain birth at 2am: + on the group label — unclassified, legal</div>
   </div>
 </div>
-<div class="why" style="width:390px;font-size:12.5px;color:var(--ink2);margin-top:12px;line-height:1.5"><b style="color:var(--ink)">The bet: classification is cleanup work, not birth work.</b> The open sheet is only what a wet glove needs at 2am — the derived headline split into its two tallies, a big Live + and a Dead +, each tap committing an unclassified birth to the ledger. Everything else is one tap away on a single quiet link line: <b style="color:var(--ink)">Classify · 2 unclassified ›</b> opens stage two — the V1-style class breakdown (Healthy hero + · Weak · Deformed / Stillborn · Mummified, full ± correction) where the morning hand re-buckets the night's taps and the link count drains to zero; <b style="color:var(--ink)">Piglet died ›</b> routes to the 09b drawer; <b style="color:var(--ink)">Trail · 8 ›</b> unfolds the stamped receipt, collapsed here to its latest line. One hairline total, no chips but the escalated interval, and the sheet lands at ~310px — the Active list stays readable behind it.</div></div>
 </div>
-<h3 style="margin-top:26px">The trade</h3>
-<table class="stab" style="max-width:1000px"><thead><tr><th style="width:16%"></th><th>V1 · counters + chips</th><th>V2 · tally pad</th><th>V3 · minimal first</th></tr></thead><tbody>
-<tr><td>Open height</td><td>~415px</td><td>~430px</td><td>~310px</td></tr>
-<tr><td>Class count entry</td><td>one tap on its chip, always visible</td><td>one tap on its tile, always visible</td><td>one tap away behind <span class="mono">Classify ›</span></td></tr>
-<tr><td>2am unclassified</td><td>+ on the counter</td><td>long-press surface</td><td>the default — every + is unclassified</td></tr>
-<tr><td>Strength</td><td>keeps the counter grammar the rest of the product uses</td><td>biggest glove targets, zero rules, fastest attended tracking</td><td>smallest sheet, honest to the 2am hand</td></tr>
-<tr><td>Risk</td><td>chips row can crowd at 5 classes</td><td>a tile pad is a new component register</td><td>classification becomes debt that must drain in the morning</td></tr>
-</tbody></table>
-<h3 style="margin-top:26px">Shared rules — all three</h3>
-<table class="stab" style="max-width:1000px"><thead><tr><th style="width:26%">Rule</th><th>Why</th></tr></thead><tbody>
-<tr><td>Headline derives</td><td><span class="mono">8 live · 3 dead</span> is entered nowhere — it is the class sum plus unclassified tallies.</td></tr>
-<tr><td>Counters are facts, verbs are events</td><td>− corrects a miscount; a piglet that dies after birth is <span class="mono">Piglet died ›</span> (09b) — live-born stays a birth fact.</td></tr>
-<tr><td>Save vs Finish</td><td>Save closes the sheet and keeps her Active — the checkpoint the hand expects; every tap already committed, so Save gates nothing. Finish farrowing crosses her to Done.</td></tr>
-<tr><td>Both models</td><td>Attended: the sheet is the interval tracker (<span class="mono">LAST 45M</span> runs off asserted times only). Next-morning batch entry: the same sheet, counts entered in one visit, the trail records one stamped visit — no birth times pretended, no jargon chip.</td></tr>
-<tr><td>Trail</td><td>Latest stamped line inline; the full receipt behind <span class="mono">Trail · 8 ›</span>, every line ✎ forever.</td></tr>
-</tbody></table>
+<div style="flex:1;min-width:340px;max-width:520px">
+  <h3 style="margin-top:6px">Rules</h3>
+  <table class="stab"><thead><tr><th style="width:28%">Rule</th><th>Why</th></tr></thead><tbody>
+    <tr><td>One cell per class</td><td>Healthy · Weak · Deformed under <span class="mono">LIVE · 8</span>, Stillborn · Mummified under <span class="mono">DEAD · 3</span>. Tap <span class="mono">+</span> tallies that class, committed as it lands. Healthy&#39;s <span class="mono">+</span> is the largest — ~85% of taps. Long-press a cell for − and its stepper.</td></tr>
+    <tr><td>Headline derives</td><td><span class="mono">8 live · 3 dead</span> is the column sums plus unclassified tallies — entered nowhere.</td></tr>
+    <tr><td>Unclassified</td><td>A <span class="mono">+</span> on the group label is a plain birth — legal at 2am, refined at cleanup with ✎. The morning batch entry uses the same cells, counts entered in one visit; the trail records one stamped visit and no birth times are pretended.</td></tr>
+    <tr><td>Died after birth</td><td>The sixth cell routes to the death drawer (09b) — the ledger, never these counters. − stays a miscount correction.</td></tr>
+    <tr><td>Sub-actions one tap away</td><td>The trail collapses to its latest stamped line + <span class="mono">Trail · 8 ›</span>; the full receipt, every line ✎, sits behind it.</td></tr>
+    <tr><td>Save vs Finish</td><td>Save closes the sheet and keeps her Active — the checkpoint the hand expects; every tap already committed, so Save gates nothing. Finish farrowing crosses her to Done (motion B).</td></tr>
+    <tr><td>Both models</td><td>Attended: the sheet is the interval tracker — <span class="mono">last 45m</span> runs off asserted times only. Unattended free farrow: the hand returns, opens the same sheet, and enters the litter cell by cell in one visit.</td></tr>
+  </tbody></table>
+</div>
+</div>
 
 <!-- ============ 09b death ============ -->
 <h2>09b · Piglet death — one tap, dated in words</h2>
