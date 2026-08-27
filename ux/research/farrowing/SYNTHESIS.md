@@ -239,3 +239,22 @@ same treatment · same day. Last-write-wins only ever bites on scalar edits (a c
 twice offline), where the later stamp standing is the correct outcome anyway.
 
 **All owner questions are now closed.** The suite is ready for the design round.
+
+---
+
+## 8 · Owner review of the first design render (2026-08-27)
+
+1. **Two farrowing models, both first-class.** Attended: one-by-one entry, the sheet is an
+   interval tracker between births. Unattended: free farrow — the hand returns ~a day later
+   and enters the litter as one batch. Nothing in the UI may assume real-time entry, and
+   batch entry must feel designed, not degenerate.
+2. **ACTIVE is green.** In-progress rail words unify with the act-now color (s-green);
+   applied corpus-wide (screens.html, components.html, farrowing.html).
+3. **Live classifications restored** from the old product: 健仔 Healthy · 弱仔 Weak ·
+   畸形 Deformed (live = sum) alongside 死胎 Stillborn · 木乃伊 Mummified — counts per class,
+   not single-select chips (3 dead must split as stillborn 2 · mummified 1). Unclassified
+   entries stay legal, refined with ✎. Supersedes §7.6's two-counter reading.
+4. **Save returns to the session sheet.** Save closes the sheet and keeps her Active — the
+   explicit "done here for now" checkpoint the hand expects mid-farrowing. Finish farrowing
+   remains the litter-closing act. Every entry still commits per tap; Save gates nothing.
+5. **The session sheet ruled below standard** — rebuilt in a per-frame optimization round.
