@@ -1,0 +1,243 @@
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F7F6F2;--card:#FFF;--well:#EFEEE8;--ink:#1C1E19;--ink2:#51544B;--ink3:#8B8E83;--hair:#E7E6DF;--hair2:#D8D7CE;--red:#C2402E;--amber:#96660D;--amber-fill:#D99A21;--amber-wash:#F8F0DC;--green:#3B8A50;--green-wash:#EAF2EC;--mono:'IBM Plex Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:40px 48px 90px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.015em;margin:18px 0 10px}
+h2{font-size:21px;font-weight:800;margin:44px 0 14px;padding-top:28px;border-top:1px solid var(--ink)}
+h3{font-size:15px;font-weight:700;margin:20px 0 8px}
+p{max-width:72ch;color:var(--ink2);margin-bottom:10px}
+.anno{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+.mono{font-family:var(--mono);font-size:12.5px}
+.cut{color:var(--red);font-weight:700}.keep{color:var(--green);font-weight:700}.merge{color:var(--amber);font-weight:700}
+pre.flow{font-family:var(--mono);font-size:12px;line-height:1.7;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:12px 0;color:var(--ink)}
+.note{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px 16px;margin:12px 0;font-size:13.5px;color:var(--ink2);max-width:none}
+</style>
+
+<div class="wrap">
+
+<h1>Piglet processing · 仔猪处理</h1>
+<p>The heaviest task in production — an age-day treatment schedule (1/2/3/5/7 日龄), eight treatment
+types, per-day checklists with a submit ceremony, a per-piglet identity sub-record, and a four-dialog
+count-reconciliation flow — re-expressed as one list, one bulk sheet, and one litter record in which
+every mark commits itself. The honest split survives everything else: <b>litter-level treatments are
+bulk; per-piglet data entry is never bulk.</b></p>
+<span class="anno">figma 634:16579 · 27 frames inventoried (21 in-progress · 6 task-ended) + 5 designer annotations</span>
+
+<h2>1 · Production inventory</h2>
+<p>Two clusters on the canvas: 任务进行中 (task in progress) and 任务已结束 (task ended — a full
+read-only fork of every screen). Magenta/red annotations are captured in-line.</p>
+
+<h3>Room screens (in progress)</h3>
+<table>
+<thead><tr><th style="width:20%">Screen · node</th><th style="width:40%">What it shows</th><th>Data on it</th></tr></thead>
+<tbody>
+<tr><td>Pig-list tab（猪只List）<br><span class="mono">634:16707</span></td><td>Header + 2 tabs (仔猪处理 · 任务详情). Unit-progress card: barn 1 · day 1/3 · processed/pending <span class="mono">100/200 栏</span> · 50%. Search (ear tag / ear notch) · funnel · list/grid toggle. Info banner "200 pens · mark each pen's items". Pen-grouped litter rows; pens with no task still listed（A4 无仔猪处理任务）. Floating scan FAB.</td><td>Row = sow tag · status（下次处理：3天后 clock ／ 需处理 green play ／ 已完成所有处理 ✓）· treatment icon strip · meta <span class="mono">20 头仔猪 | 日龄 3 天</span> · arrow. <b>Annotations:</b> icons for a treatment appear on the day it is due (1815:5163); done = grey with corner ✓, due today = green, not-yet = other colour (871:12487).</td></tr>
+<tr><td>Pen-grid tab（栏位Grid）<br><span class="mono">634:17948</span></td><td>Same header; card per pen.</td><td>Card = pen chip · age（7.5 天日龄）· status（距下次处理 3 天 / 待处理 / 已完成所有处理）· icon strip (8+ icons incl. Kg, tag, notch) · litter tag. Single-pig vs multi-pig card templates.</td></tr>
+<tr><td>Task-detail tab（任务详情）<br><span class="mono">634:17024</span></td><td>Total progress (5 units · day 1/3 · 100/200 pens) · KPI card · configuration table · SOP link · status legend（状态说明, 3 entries）· red 结束任务 button.</td><td>KPI: 仔猪处理准时率 <span class="mono">90%（目标 ≥90%）</span>. Config: the 8 treatments each with an age-day — 滴鼻 drops · 剪牙 teeth · 补铁 iron · 阉割 castrate · 断尾 tail · 耳缺/耳标/体重 tag/notch/weigh · 断脐带 cord · 保健 health.</td></tr>
+<tr><td>Filter（筛选）<br><span class="mono">827:12672</span></td><td>Full-screen filter.</td><td>状态: 全部/需处理/倒计时中/已完成 · today's due items: 8 treatment chips · 日龄: 1/2/3/4/6/7/≥8 (note: differs from the 1/2/3/5/7 schedule) · row A/B/…（marked "栏位Grid has no row filter"）· Reset/Confirm.</td></tr>
+</tbody></table>
+
+<h3>The litter record (the core)</h3>
+<table>
+<thead><tr><th style="width:20%">Screen · node</th><th style="width:40%">What it shows</th><th>Data on it</th></tr></thead>
+<tbody>
+<tr><td>Processing checklist<br><span class="mono">993:13532</span></td><td>Litter page. Header: pen chip A1 · sow tag · sow vitals（母猪，650日龄，3胎）. Tabs 仔猪处理 | 仔猪信息. <b>Five age-day accordions</b>: 1日龄 done-collapsed · 2日龄 done · 3日龄 needs-completion, default expanded, with planned date（计划 2025/05/03 处理）· 5日龄 not-started-collapsed · 7日龄. Footer <span class="mono">[⋯][提交结果]</span>.</td><td>Item states shown: checkbox unchecked / checked / done-grey with recorded-by + timestamp（顾大华 2025/07/08 23:00）on every completed item. 耳标/耳缺/体重 is a chevron sub-form with 已填写/未填写 states, labelled <b>“提交后不可再查看”（submitted → cannot be viewed again）</b>. Day-5 items labelled <b>“可提前填”（future days pre-fillable）</b>. <b>Annotation 971:15884:</b> submit → success toast → back to the barn list; the task is console-configured and <b>not mandatory — can be ended without completing</b>.</td></tr>
+<tr><td>Litter info tab（仔猪信息）<br><span class="mono">1630:7820</span></td><td>Same page, second tab.</td><td>仔猪日龄 2 天 (derived) · 仔猪数量 <span class="mono">20 头（含 3 头寄养）</span> → count-confirm flow · 出生整窝体重 无 → weight sheet, amber warning "fill litter total weight or growth-efficiency calculations suffer".</td></tr>
+<tr><td>No-task state<br><span class="mono">2495:5505</span></td><td>Same page for a pen with no processing task.</td><td>Empty state 无仔猪处理任务.</td></tr>
+<tr><td>More-actions sheet（更多操作）<br><span class="mono">1567:20878</span></td><td>From the [⋯] button.</td><td>寄养仔猪 foster · 上报死亡 report death · 数量异常 count anomaly · 母猪流产 sow abortion (leftover from another stage).</td></tr>
+</tbody></table>
+
+<h3>Tag / notch / weigh sub-record & piglet list</h3>
+<table>
+<thead><tr><th style="width:20%">Screen · node</th><th style="width:40%">What it shows</th><th>Data on it</th></tr></thead>
+<tbody>
+<tr><td>Entry form, initial<br><span class="mono">1000:5357</span></td><td>耳标/耳缺/体重 page: litter block, then 有身份仔猪 identity section with three add methods: 扫描耳标 scan tag · 选择耳缺 pick notch · 手动添加 manual. Submit disabled until content.</td><td>仔猪总体重 kg (litter total at this age-day, amber warning if empty) · 公猪数量/母猪数量 steppers (boar/gilt counts). Foster warning: "pen received fostered pigs without identity — added identity info may be inaccurate".</td></tr>
+<tr><td>Entry form, editing<br><span class="mono">635:3533</span></td><td>Same with rows; red invalid-row state; submit counts heads（提交（9 头仔猪））.</td><td>Per-piglet row = 耳标号 ear-tag · 耳缺号 ear-notch (picker) · 性别 sex · 体重 kg · delete. Any subset of the litter may get rows (9 of 20).</td></tr>
+<tr><td>Piglet list, empty<br><span class="mono">963:14499</span></td><td>仔猪列表 viewer before identity entry.</td><td>共 20 头仔猪 · "identity not yet filled".</td></tr>
+<tr><td>Piglet list, filled<br><span class="mono">971:15924</span></td><td>Read-only table of identity rows.</td><td>Columns tag · notch · sex · weight; "-" for gaps; red banner <b>“3 头仔猪未补充身份，请及时补录”</b>; footer 仔猪总体重（3日龄）<span class="mono">19.5kg</span>.</td></tr>
+<tr><td>Birth-litter-weight sheet<br><span class="mono">963:14753</span></td><td>Bottom sheet from 仔猪信息.</td><td>出生整窝体重 kg input · cancel/confirm.</td></tr>
+</tbody></table>
+
+<h3>Count reconciliation & end task</h3>
+<table>
+<thead><tr><th style="width:20%">Screen · node</th><th style="width:40%">What it shows</th><th>Data on it</th></tr></thead>
+<tbody>
+<tr><td>Count confirm ×3<br><span class="mono">1135:7641 · 971:15991 · 971:16140</span></td><td>仔猪数量确认 dialog in three variants: match (20 vs 20) · under-report (18 vs 20 → “将自动移除 2 头仔猪” auto-remove) · over-report (22 vs 20 → auto-add).</td><td>上报数量 reported vs 系统记录数量 system count. On mismatch: red note "reported count prevails" · mandatory-ish reason textarea（数量不符原因）· “确认无误，继续提交” checkbox gates submit.</td></tr>
+<tr><td>补录仔猪 supplement<br><span class="mono">1159:6421</span></td><td>Dialog from 数量异常.</td><td>Reported vs system + “确认更新系统记录数量” checkbox → updates the system count.</td></tr>
+<tr><td>End-task dialogs (old)<br><span class="mono">928:5219</span></td><td>Three annotated variants: target not reached（“100 个栏位未完成…没有完成的处理后期将无法补充” — cannot backfill later）· target reached · cannot end.</td><td>Blocking rule: <b>farrowing task of the batch must end first</b>.</td></tr>
+<tr><td>End-task pages (new) ×3<br><span class="mono">4763:4382 · 4763:4323 · 4763:4311</span></td><td>Full consequences page: status card (amber 100/200 · 50% or green 200/200) · 执行详情 "continue following the batch" totals · acknowledge checkbox（我已知晓）gates the red button. Third frame repeats the farrowing-block dialog.</td><td>Processed pens n（+ piglet head total 1,231）· unprocessed pens n（+ heads）· sows 100 · grand total 2,562 头.</td></tr>
+</tbody></table>
+
+<h3>Task-ended fork（任务已结束）</h3>
+<table>
+<thead><tr><th style="width:20%">Screen · node</th><th style="width:40%">What it shows</th><th>Data on it</th></tr></thead>
+<tbody>
+<tr><td>Ended pig list<br><span class="mono">5913:9932</span></td><td>Read-only review list. Segmented 全部完成(80) / 部分完成(0) / 未完成(0) · location chip（1区-母猪车间-1单元）· completion summary + stacked bar.</td><td>Row = pen chip · litter tag · recorded-by · date. <b>Annotation 5913:10060:</b> the 未完成 row style = row without attribution stamp.</td></tr>
+<tr><td>Ended task detail<br><span class="mono">5752:7186</span></td><td>Same detail tab with 已结束 badge, final 190/200 (95%), KPI 90%, config, SOP. No end button.</td><td>—</td></tr>
+<tr><td>Ended filter<br><span class="mono">5752:7145</span></td><td>Different filter for review.</td><td>最后一次处理日期 last-processing date picker · completed-items chips · unit chips.</td></tr>
+<tr><td>Ended litter record ×3<br><span class="mono">5788:6097 · 5791:5779 · 5791:5843</span></td><td>Read-only litter detail: day accordions with ✓ done and <b>! not-done</b> markers per item, attributions kept; info tab without edit affordances; piglet list without the supplement banner.</td><td>Same fields, frozen. Note: the piglet identity table <i>is</i> viewable after end — production's “提交后不可再查看” applies to re-opening the entry form, not the data.</td></tr>
+</tbody></table>
+
+<div class="note"><b>Designer's own open note (2519:9347):</b> "when piglet processing and postpartum check
+run at the same time, do the two tasks need a jump-to-the-other-task entry point?" — carried to §7.</div>
+
+<h2>2 · Requirements distilled</h2>
+
+<h3>Data captured (field level)</h3>
+<table>
+<thead><tr><th style="width:34%">Field</th><th style="width:22%">Type</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Treatment done — per litter × age-day × treatment</td><td>bool + recorded-by + timestamp</td><td>7 bulk treatments: drops 滴鼻 · teeth 剪牙 · iron 补铁 · castrate 阉割 · tail 断尾 · cord 断脐带 · health 保健. The mark is the record; no payload.</td></tr>
+<tr><td>Litter total weight at the weigh age-day（仔猪总体重）</td><td>decimal kg</td><td>Whole-litter crate weigh; feeds growth-efficiency KPIs. Distinct from summed per-piglet weights (only a subset gets rows).</td></tr>
+<tr><td>Litter sex counts（公猪数量 / 母猪数量）</td><td>int + int</td><td>Captured at the weigh day.</td></tr>
+<tr><td>Per-piglet identity row</td><td>tag no (scan/manual) · notch no (picker) · sex enum · weight kg</td><td>Tag <i>or</i> notch may identify; any subset of the litter; never bulk.</td></tr>
+<tr><td>Birth whole-litter weight（出生整窝体重）</td><td>decimal kg</td><td>Backfill of a farrowing-time datum when missing.</td></tr>
+<tr><td>Observed litter count（上报仔猪数量）</td><td>int</td><td>Head-count verification against system count.</td></tr>
+<tr><td>Count-mismatch reason（数量不符原因）+ confirmation</td><td>text + bool</td><td>Reported count prevails; system auto-adds/removes heads.</td></tr>
+<tr><td>Litter events from the record: foster 寄养 · death 上报死亡 · count anomaly 数量异常</td><td>event records</td><td>Entry points only in this section; the flows live with the litter, not the task.</td></tr>
+<tr><td>End task acknowledgement</td><td>bool + actor</td><td>“Cannot backfill later” consequences accepted.</td></tr>
+</tbody></table>
+
+<h3>Derived by the system — never asked</h3>
+<table>
+<thead><tr><th style="width:34%">Value</th><th>From</th></tr></thead>
+<tbody>
+<tr><td>Piglet age-day（日龄）· planned date per scheduled day（计划 X 处理）· countdown（下次处理：3天后）</td><td>farrow date + configured schedule</td></tr>
+<tr><td>Litter status: upcoming / due today / all done — and per-treatment remaining set</td><td>schedule minus recorded marks</td></tr>
+<tr><td>Pen / unit / task progress（100/200 栏）· completion classes 全部完成/部分完成/未完成</td><td>litter statuses</td></tr>
+<tr><td>On-time rate 准时率 90%</td><td>marks dated on/before their planned day</td></tr>
+<tr><td>System litter count · foster inclusion（含 3 头寄养）· unidentified-piglet count（3 头未补充身份）</td><td>farrowing + foster + death + identity records</td></tr>
+<tr><td>End-task consequence totals (pens · heads · sows)</td><td>batch records</td></tr>
+</tbody></table>
+
+<h3>Configuration (console, not the farmer)</h3>
+<table>
+<thead><tr><th style="width:34%">Item</th><th>Production evidence</th></tr></thead>
+<tbody>
+<tr><td>The schedule: which of the 8 treatments at which age-day</td><td>任务配置 table; icons appear on their due day</td></tr>
+<tr><td>KPI target（准时率 ≥90%）</td><td>detail tab</td></tr>
+<tr><td>Task mandatory flag（非必须完成）</td><td>annotation 971:15884</td></tr>
+<tr><td>SOP document</td><td>detail tab link</td></tr>
+<tr><td>Dependency: end farrowing before ending piglet processing</td><td>cannot-end dialog</td></tr>
+</tbody></table>
+
+<h2>3 · Subtraction analysis</h2>
+<table>
+<thead><tr><th style="width:26%">Production element</th><th style="width:10%">Verdict</th><th>Justification</th></tr></thead>
+<tbody>
+<tr><td>Five age-day accordions + 提交结果 submit + success toast</td><td><span class="cut">CUT</span></td><td>The checklist is a form pretending to be a room. Our law: actions commit themselves; no Save/Submit on any screen. Each treatment mark commits on tap; the "day" is a derived grouping, shown as a schedule strip with stamps, not five collapsible forms.</td></tr>
+<tr><td>Treatment icon strip on rows + 3-colour icon semantics + corner-check badges</td><td><span class="cut">CUT</span></td><td>Micro-icon states in glove distance are unreadable, and the legend needed an annotation to explain itself. The row's memory line lists <i>what is left</i> in words（<span class="mono">teeth · tail · castrate · tag/weigh</span>）— done is simply absent; history lives in the record (01b, already rendered).</td></tr>
+<tr><td>Dual pig-List / pen-Grid views</td><td><span class="cut">CUT</span></td><td>The grid is the list re-drawn as cards, same taps. Pen picker (02) + peek (02c — already renders the per-litter remaining-treatments strip) + dock cover spatial navigation; grid never acts.</td></tr>
+<tr><td>状态说明 status legend</td><td><span class="cut">CUT</span></td><td>A legend that explains status words is the words failing. <span class="mono">day 3 · due</span> / <span class="mono">next in 2d</span> / <span class="mono">All done</span> say it themselves (01b grammar).</td></tr>
+<tr><td>Info banner（共 200 栏 · 请标记…）</td><td><span class="cut">CUT</span></td><td>Restates the header count and the task's name. The header cell already carries 100/200 pens.</td></tr>
+<tr><td>Filter: 状态 dimension · 排 dimension</td><td><span class="cut">CUT</span></td><td>状态 <i>is</i> the lens (Due today / Done / All); 排 is Go-to-pen. Both already subtracted in 01c, which keeps the two real extras: treatments-due-today + day-age.</td></tr>
+<tr><td>倒计时中 as a filter state</td><td><span class="merge">MERGE</span></td><td>"Counting down" = not due yet = the All lens minus Due today; the day-age filter covers any finer slice.</td></tr>
+<tr><td>Per-item recorded-by + timestamp lines</td><td><span class="keep">KEEP</span></td><td>Attribution is a law. Rendered as stamps on done items/rows（<span class="mono">Jul 8 23:00 · G.D</span>）, not as avatar rows doubling every item's height.</td></tr>
+<tr><td>Future-day pre-fill（可提前填）</td><td><span class="keep">KEEP</span></td><td>Real barn need (do day-5 work while hands are on the litter). In a self-committing model it needs zero UI: marking a treatment before its day just records it, dated; the schedule strip shows the early stamp.</td></tr>
+<tr><td>“提交后不可再查看” on tag/notch/weigh</td><td><span class="cut">CUT</span></td><td>Contradicted by production's own ended-state piglet list, which shows the data read-only. The rule is an entry-form artefact. Ours: data always viewable (piglet table), corrections via ✎, audited (04 "Edit a done row").</td></tr>
+<tr><td>Sub-form states 已填写/未填写 on the checklist item</td><td><span class="merge">MERGE</span></td><td>Becomes the tag/weigh line's own memory: <span class="mono">tag/weigh · 9 of 20</span> — a count, not a state word pair.</td></tr>
+<tr><td>Count-confirm dialog ×3 + 补录仔猪 dialog</td><td><span class="merge">MERGE</span></td><td>Four dialogs, two entry points, one job: reconcile observed vs system count. One inline step in the litter record: count row shows system number; tap → adjust → if different, reason + confirm, system reconciles. Same fields, one surface.</td></tr>
+<tr><td>公猪/母猪数量 steppers + per-piglet sex</td><td><span class="merge">MERGE</span></td><td>Sex counts derive from identity rows when the litter is fully rowed; steppers only asked when it isn't. Never ask twice for the same fact.</td></tr>
+<tr><td>出生整窝体重 backfill prompt</td><td><span class="keep">KEEP</span></td><td>Farrowing-owned datum, but the amber backfill line in the litter record is the last realistic chance to get it. One line, only when missing.</td></tr>
+<tr><td>仔猪信息 tab as a second tab</td><td><span class="merge">MERGE</span></td><td>Three facts (age · count · birth weight) don't earn a tab; they are the litter record's header block. Age is derived and already in the row.</td></tr>
+<tr><td>更多操作: foster · death · count anomaly</td><td>MOVE</td><td>Litter lifecycle events, not processing marks — stay one ⋯ behind the litter record header, shared with weaning's litter record. 数量异常 folds into the count row (above).</td></tr>
+<tr><td>母猪流产 in the more-sheet</td><td><span class="cut">CUT</span></td><td>An abortion entry on a farrowed litter's processing record is a copy-paste leftover from the pregnancy stage.</td></tr>
+<tr><td>Scan FAB + search by tag/notch</td><td><span class="merge">MERGE</span></td><td>Into the dock (01): Go to pen · Scan ear tag · search. Delta: scanning a <i>piglet's</i> tag resolves to its litter.</td></tr>
+<tr><td>End-task pages: consequences + acknowledge + farrowing block</td><td><span class="keep">KEEP</span></td><td>The one legitimate ceremony — it destroys the ability to backfill. Lives behind the task detail sheet (03), never on a room screen. Consequence totals derived.</td></tr>
+<tr><td>Task-ended fork: separate list/detail/filter/record screens ×6</td><td><span class="merge">MERGE</span></td><td>Not new screens — the same list (Done lens · read-only rows · ✎ off), same litter record (marks frozen, ! on gaps), same detail sheet (已结束 badge). The 全部/部分/未完成 segmentation is the lens plus a partial flag; last-processing-date filter joins 01c for ended tasks.</td></tr>
+<tr><td>On-time KPI（准时率）</td><td><span class="keep">KEEP</span></td><td>Already the unit KPI in our rendered header (01: 90% on time · ≥90%).</td></tr>
+<tr><td>Pens without a task listed（A4 无任务）+ no-task litter state</td><td><span class="keep">KEEP</span></td><td>Physical completeness — the All lens shows them dimmed; the empty record state dies with the tabs.</td></tr>
+</tbody></table>
+
+<h2>4 · Optimized flow</h2>
+<p>Anchor citations in parentheses; everything cited is already rendered in
+<span class="mono">ux/task-screens.html</span>. Only the deltas after the flow are new design.</p>
+
+<pre class="flow">
+Piglet processing · Unit 7                                    (01 · rendered slide)
+│  header: last record 08:40 · G.H → 90% on time ≥90 | 100/200 pens · day 3 window
+│  lens: Due today 60 · Done 100 · All 200   funnel → treatments due · day-age (01c · rendered)
+│
+├─ pen-grouped litter rows                                     (01b · rendered grammar)
+│    [box] 000221 · 12 piglets · day 3
+│           memory: teeth · tail · castrate · tag/weigh   ← only what is LEFT
+│    done row: All done · 9 piglets · ✎                   ← stamps, edit audited (04)
+│
+├─ BULK — litter-level treatments only
+│    tick boxes / scan → bar: ✕ 2 selected · Mark treatments…      (01 selecting · rendered)
+│    → bulk-treatments sheet: day's treatments as checkboxes;       (04 · rendered)
+│      already-done greyed with stamp (done Jul 6 · G.H)
+│      [Mark done · 2 litters] — commits, bar clears, rows move lens
+│
+├─ TAP ROW — the litter record (T3)                            (03/04 litter record)
+│    header: A1 · 000221 · sow 650d · parity 3 · [⋯]           (04 sh2 header)
+│    ① schedule strip: d1 ✓ · d3 ● today · d5 · d7            → DELTA 1
+│       today's remaining treatments as self-committing checks
+│       early marks allowed = pre-fill, recorded with date
+│    ② tag/weigh line: tag/notch/weigh · 9 of 20 →             (04 tag/weigh pad)
+│       per-piglet pad: tag · notch · sex · weight · Next piglet   → DELTA 2
+│       running list = the piglet table, always viewable
+│    ③ litter facts: count 20 (incl. 3 fostered) → verify      → DELTA 3
+│       total weight today __ kg · birth weight missing → fill  → DELTA 3
+│    ⋯ overflow: foster · report death                          → DELTA 4
+│
+├─ scan a PIGLET tag → resolves to its litter (selection or record)  (04b · scan=select)
+├─ pen picker / peek: remaining-treatments strip per litter     (02 · 02b · 02c rendered)
+│
+└─ task detail sheet                                            (03 · rendered slide)
+     progress · 90% on time · config: d1 cord,drops · d3 teeth,tail,iron,castrate
+     · d5 tag/notch/weigh · d7 health · SOP · End task
+     └ End task → consequences page: n pens unfinished · cannot backfill
+        · blocked while farrowing open · acknowledge → confirm   → DELTA 5
+     after end: same list, Done/All read-only · litter record frozen, ! on gaps
+</pre>
+
+<h3>Deltas — the only new design this task needs</h3>
+<table>
+<thead><tr><th style="width:22%">Delta</th><th>Spec</th></tr></thead>
+<tbody>
+<tr><td>1 · Schedule strip on the litter record</td><td>Replaces five accordions: one row of day dots（<span class="mono">d1 ✓ · d3 ● · d5 · d7</span>）, today auto-focused. Tapping a past/future day reveals its stamps / pre-fillable checks. Derived from config; planned dates computed, never typed.</td></tr>
+<tr><td>2 · Pad fields</td><td>The rendered pad (tag · weight, auto-increment, scan override) gains <b>notch</b> as an alternative identity (picker) and a <b>sex</b> toggle per piglet. Running list = the read-only piglet table; unidentified count rides the line（9 of 20）. Foster-source litters show the one amber inaccuracy note.</td></tr>
+<tr><td>3 · Litter facts block</td><td>Count row: system number shown; tap → observed count; mismatch → reason + confirm, auto-reconcile (merges production's 4 dialogs). Total-litter-weight input at the weigh day. Birth-weight amber backfill line only while missing.</td></tr>
+<tr><td>4 · Litter overflow ⋯</td><td>Foster and report-death entries on the litter record header — shared component with weaning's litter record.</td></tr>
+<tr><td>5 · End-task consequences page</td><td>Behind 03's End task: unfinished-pen count + head totals (derived), "cannot backfill" statement, farrowing-dependency block, acknowledge checkbox → red confirm. Non-mandatory flag (console) only changes the copy, not the ceremony.</td></tr>
+</tbody></table>
+
+<h2>5 · Data-capture map</h2>
+<table>
+<thead><tr><th style="width:30%">Field</th><th style="width:34%">Where in the new flow</th><th>Production origin</th></tr></thead>
+<tbody>
+<tr><td>Treatment done (×7, per litter × day)</td><td>Bulk-treatments sheet (04) or litter-record check — same mark</td><td>Checklist checkboxes + 提交结果（993:13532）</td></tr>
+<tr><td>Recorded-by · timestamp per mark</td><td>Automatic on commit; stamps on done items/rows</td><td>Attribution lines（993:13532）</td></tr>
+<tr><td>Per-piglet tag no</td><td>Pad — scan / auto-increment / manual (04)</td><td>扫描耳标·手动添加（1000:5357 · 635:3533）</td></tr>
+<tr><td>Per-piglet notch no</td><td>Pad — notch picker (delta 2)</td><td>选择耳缺（1000:5357）</td></tr>
+<tr><td>Per-piglet sex</td><td>Pad — toggle (delta 2)</td><td>性别 column（635:3533）</td></tr>
+<tr><td>Per-piglet weight</td><td>Pad — number pad, Next piglet (04)</td><td>体重 column（635:3533）</td></tr>
+<tr><td>Litter sex counts</td><td>Litter facts — asked only while rows incomplete (merge)</td><td>公猪/母猪数量 steppers（1000:5357）</td></tr>
+<tr><td>Litter total weight at weigh day</td><td>Litter facts block (delta 3)</td><td>仔猪总体重（1000:5357）</td></tr>
+<tr><td>Birth whole-litter weight</td><td>Amber backfill line while missing (delta 3)</td><td>出生整窝体重 sheet（963:14753 · 1630:7820）</td></tr>
+<tr><td>Observed count · mismatch reason · confirmation</td><td>Count row → verify step (delta 3)</td><td>仔猪数量确认 ×3 + 补录（1135:7641 · 971:15991 · 971:16140 · 1159:6421）</td></tr>
+<tr><td>Foster · death events</td><td>Litter overflow ⋯ (delta 4)</td><td>更多操作（1567:20878）</td></tr>
+<tr><td>End acknowledgement</td><td>Consequences page behind 03 (delta 5)</td><td>结束任务 pages（4763:4382/4323/4311 · 928:5219）</td></tr>
+</tbody></table>
+
+<h2>6 · Open questions</h2>
+<table>
+<thead><tr><th style="width:36%">Question</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td>1 · Is “提交后不可再查看” a compliance rule or a form artefact?</td><td>We replace it with always-viewable data + audited corrections. If a real rule (e.g. anti-tamper on identity records), corrections need a permission gate instead.</td></tr>
+<tr><td>2 · Non-mandatory task: do unfinished litters stay amber-overdue until task end, or expire quietly at weaning?</td><td>Decides whether the Due lens can ever be noise on farms that skip treatments by design.</td></tr>
+<tr><td>3 · Count mismatch: production auto-adds/removes heads with only a free-text reason — should a removal require picking a cause (death vs count error) so mortality stats stay honest?</td><td>Auto-removed piglets silently bypass the death-reporting flow that exists one button away.</td></tr>
+<tr><td>4 · Cross-task jump (designer's own note): postpartum check and piglet processing hit the same pen in the same days — one combined walk, or a jump link between the two records?</td><td>Two visits to every pen vs one; touches the task model, not this screen set.</td></tr>
+<tr><td>5 · Day-age filter lists 1/2/3/4/6/7/≥8 while the schedule is 1/2/3/5/7 — are filter values config-driven or fixed?</td><td>A fixed list will drift from any farm's console schedule; we assume config-driven.</td></tr>
+<tr><td>6 · Fostered-in piglets without identity: allow identity rows flagged inaccurate (production's warning) or block until origin is resolved?</td><td>Determines whether the pad needs a per-row foster flag.</td></tr>
+</tbody></table>
+
+<p class="anno" style="margin-top:40px">ux/tasks/piglet-processing.html · anchors: ux/task-screens.html (01 · 01b · 01c · 02 · 02b · 02c · 03 · 04 · 04b) · ux/unified-task-list.md</p>
+
+</div>

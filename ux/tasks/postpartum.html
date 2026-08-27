@@ -1,0 +1,191 @@
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F7F6F2;--card:#FFF;--well:#EFEEE8;--ink:#1C1E19;--ink2:#51544B;--ink3:#8B8E83;--hair:#E7E6DF;--hair2:#D8D7CE;--red:#C2402E;--amber:#96660D;--amber-fill:#D99A21;--amber-wash:#F8F0DC;--green:#3B8A50;--green-wash:#EAF2EC;--mono:'IBM Plex Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:40px 48px 90px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.015em;margin:18px 0 10px}
+h2{font-size:21px;font-weight:800;margin:44px 0 14px;padding-top:28px;border-top:1px solid var(--ink)}
+h3{font-size:15px;font-weight:700;margin:20px 0 8px}
+p{max-width:72ch;color:var(--ink2);margin-bottom:10px}
+.anno{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+.mono{font-family:var(--mono);font-size:12.5px}
+.cut{color:var(--red);font-weight:700}.keep{color:var(--green);font-weight:700}.merge{color:var(--amber);font-weight:700}
+pre.flow{font-family:var(--mono);font-size:12px;line-height:1.7;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:12px 0;color:var(--ink)}
+.note{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px 16px;margin:12px 0;font-size:13.5px;color:var(--ink2);max-width:none}
+</style>
+
+<div class="wrap">
+
+<h1>Postpartum check · 母猪产后检查</h1>
+<p>One assessment per farrowed sow inside a 3-day window: the farmer grades nine health facts with segmented taps, abnormal answers become disease/symptom records automatically, and the only real design delta from our system is rendering the full form — everything around it (list, grid, legends, ended-state family) is already covered by the anchor components.</p>
+<div class="anno">figma node 634:17344 · fileKey psrxDa9LRWLdTL9XMZmWdc · 13 screens/states inventoried (9 task-in-progress 任务进行中 · 4 task-ended 任务已结束) · 3 designer annotations</div>
+
+<h2>1 · Production inventory</h2>
+<p>The section is two labelled clusters: <b>任务进行中</b> (in progress) and <b>任务已结束</b> (ended) — the ended cluster is a near-clone of the working screens with records frozen read-only.</p>
+<table>
+<thead><tr><th style="width:22%">Screen / state</th><th style="width:34%">What it shows</th><th>Data on it</th></tr></thead>
+<tbody>
+<tr><td class="mono">634:17472 · Pig-list tab<br>猪只List</td><td>Header ← 母猪产后检查; segmented top-tabs 母猪产后检查 | 任务详情 (task detail). Section 单元进度 (unit progress) card, then 猪只列表 (pig list): search by ear tag 耳标号, funnel, list/grid toggle, intro card, pen-grouped rows, scan FAB.</td><td>Progress card: barn (1舍), badge 第 1/3 天 (day 1 of 3), bar, 已检查 / 已分娩 (checked / farrowed) <span class="mono">100 / 200 头 · 50%</span>. Intro card: “共 200 头猪 · 请对产后母猪进行检查与评估” (200 pigs, please check &amp; assess). Rows under pen A1, three states: <span class="mono">000001 ⏱ 预计检查：5 天后</span> (expected check in 5d, light arrow) · <span class="mono">▶ 需检查</span> (needs check, filled green arrow) · <span class="mono">✓ 已完成</span> (done, pencil).</td></tr>
+<tr><td class="mono">634:17984 · Pen-grid tab<br>栏位Grid</td><td>Same header/progress; grid toggle active. Cards per pen (and a 单猪 single-pig / 多猪 multi-pig card pair with vitals icon).</td><td>Card = pen code (A1) or 单猪/多猪 label · status word 未检查 (amber) / 已检查 (green) or “Farrowed 5d ago” · tag or head-count (<span class="mono">000002 / 200 pigs</span>).</td></tr>
+<tr><td class="mono">634:17662 · Task-detail tab<br>任务详情</td><td>总任务进度 (whole-task progress), KPI card, 任务配置 (config), SOP link, 状态说明 (status legend, 4 entries), red-outline 结束任务 (End task) button, scan FAB.</td><td>Progress: 共 5 个单元 (5 units) · 第 1/3 天 · 100/200 · 50%. KPI: 产后合格率 (postpartum pass rate) <span class="mono">90% (目标 ≥ 90%)</span>. Config: 产后母猪检查开始时间 = 分娩后第 1 天 (check starts day 1 after farrowing). Legend: ⏱ 建议产后检查：x 天后 (suggested check in x d) · ⏱ <b>需复查：x 天后</b> (recheck needed in x d — the recheck rule) · ▶ 待产后检查 (check date arrived) · ✓ 已完成产后检查.</td></tr>
+<tr><td class="mono">827:12767 · Filter sheet<br>筛选 (working)</td><td>Filter for the working list.</td><td>检查状态: 全部/未检查/已检查 · 分娩时间 (farrowing time): 全部/1天前/2天前/3天前/4天前/≥5天前 · 排 (aisle row): 全部/A–G/⌄ — label carries designer note “栏位Grid 没有排的筛选” (grid view has no row filter) · 重置/确认.</td></tr>
+<tr><td class="mono">1000:15683 · Assessment form, initial<br>母猪产后检查-初始态</td><td><b>The full form.</b> Sow strip + 体况评分 (BCS) + section 产后检查项目 (check items) with hint “健康状态异常将会作为疾病/症状展示，请酌情填写” (abnormal states will be shown as disease/symptom records) + notes + cull + submit bar.</td><td>Strip: <span class="mono">A1 · 000001 · 母猪，650日龄，3胎</span> (sow, age 650d, parity 3). BCS segmented <b>1分–5分 over a yellow→green→red gradient</b> labelled 消瘦 thin / 标准 standard / 肥胖 obese. Items: 乳房炎 mastitis 无/轻度/中度/重度 · 乳汁产能 milk 差/中/佳 · 分泌物 discharge 正常/异常 · 采食情况 feeding 正常/进食减少/拒食 · 活动能力 mobility 正常/瘸/不愿意动 · 背膘 backfat 薄/适中/厚 · 其他观察 free text. 淘汰建议 cull: 不建议淘汰/建议淘汰. Bar: [⋯] + 提交结果 (submit, disabled while empty).</td></tr>
+<tr><td class="mono">1000:15941 · Assessment form, filled<br>母猪产后检查-编辑态</td><td>Same form with selections; submit enabled.</td><td>Choosing 建议淘汰 reveals a conditional text field 请填写建议淘汰原因 (cull reason). Oddity: mastitis renders only 轻度/中度/重度 (无 missing) and BCS shows no selection while submit is enabled.</td></tr>
+<tr><td class="mono">4347:4469 · End task, target missed<br>结束任务</td><td>End-task confirmation page, amber.</td><td>⊗ 未达到任务目标 · <span class="mono">100/200 (50%)</span> amber bar. 执行详情: ✓ 继续跟随批次 (sows keep following the batch): 已检查母猪 100 头 · 未检查母猪 100 头. Footer: checkbox 我已知晓，确认结束任务 (acknowledge) gating 取消/结束任务.</td></tr>
+<tr><td class="mono">4347:4416 · End task, target met</td><td>Same page, green.</td><td>✓ 已达到任务目标 · <span class="mono">200/200 (100%)</span> · details list · same acknowledge-gated footer.</td></tr>
+<tr><td class="mono">952:5522 · End blocked dialog</td><td>Magenta note “⬇ 不可结束任务” (cannot end). Modal.</td><td>“当前批次的分娩任务尚未结束，无法结束母猪产后检查任务。请优先结束分娩任务。” — postpartum cannot end while the batch’s <b>farrowing task is still open</b>; end farrowing first. Single 确认.</td></tr>
+<tr><td class="mono">5913:10062 · Ended pig list</td><td>Ended-task list (template titled 查情 — stale label, content is this task). Tabs 猪只列表/任务详情, search 耳标号/耳缺号 (ear tag/notch), funnel.</td><td>Lens order flips: <span class="mono">已检查（80）| 未检查（1）</span>. Location chip 1 区 - 母猪车间 - 1 单元 (area-workshop-unit). Count card 已检查 100 / 未检查 1 + bar. Rows: <span class="mono">A1 123456 Gianni_J | 02/02 20:00 ›</span> (attribution per record); unchecked row bare — magenta note “未检查的样式” (the unchecked style). Magenta connector: row → check-detail screen.</td></tr>
+<tr><td class="mono">5752:7532 · Ended task detail</td><td>Task-detail tab after end.</td><td>已结束 badge · 共 5 个单元 · <span class="mono">190/200 (95%)</span> · 产后合格率 90% (≥90%) · config + SOP. No legend, no End button.</td></tr>
+<tr><td class="mono">5752:7489 · Ended filter<br>筛选（默认状态）</td><td>Audit-flavoured filter, different fields from the working one.</td><td>最后一次处理日期 (last handled date, date picker) · 淘汰建议: 全部/建议淘汰/不建议淘汰 · <b>异常项目 (abnormal item): 全部/乳房炎/乳汁产能/分泌物/采食情况/活动能力/背膘</b> · 单元: 全部/1–4 单元.</td></tr>
+<tr><td class="mono">5788:6353 · Check detail, read-only<br>母猪产后检查详情</td><td>A completed assessment displayed on the form layout, no submit bar.</td><td>Same nine fields with the recorded value highlighted white and the rest greyed; notes and cull reason render as paragraphs. Magenta note: “‘轻度’是选中状态，‘中度、重度’是禁止点击状态” (mild = selected style, moderate/severe = disabled style).</td></tr>
+<tr><td class="mono">4335:4219 · red swatch</td><td>Bare red rectangle under the blocked dialog — cluster marker, no content.</td><td>—</td></tr>
+</tbody>
+</table>
+<div class="note"><b>Designer-annotation findings:</b> ① read-only detail uses selected-vs-disabled segment styling (magenta note on 5788:6353); ② ended list must show a distinct bare “unchecked” row style (note on 5913:10062); ③ the working filter’s 排 row-filter deliberately doesn’t exist in grid view (note inside 827:12767); ④ the blocked-end dialog is annotated 不可结束任务 — the farrowing-task dependency is a hard rule, not copy.</div>
+
+<h2>2 · Requirements distilled</h2>
+<h3>Data captured (field-level)</h3>
+<table>
+<thead><tr><th style="width:26%">Field</th><th style="width:30%">Type / values</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Body condition 体况评分</td><td>enum 1–5</td><td>Gradient legend 消瘦 thin / 标准 standard / 肥胖 obese is display aid, not data.</td></tr>
+<tr><td>Mastitis 乳房炎</td><td>enum: none 无 / mild 轻度 / moderate 中度 / severe 重度</td><td>4 levels on the blank form; filled states drop 无 (inconsistency → open Q3).</td></tr>
+<tr><td>Milk production 乳汁产能</td><td>enum: poor 差 / medium 中 / good 佳</td><td></td></tr>
+<tr><td>Discharge 分泌物</td><td>enum: normal 正常 / abnormal 异常</td><td></td></tr>
+<tr><td>Feeding 采食情况</td><td>enum: normal 正常 / reduced 进食减少 / refusing 拒食</td><td></td></tr>
+<tr><td>Mobility 活动能力</td><td>enum: normal 正常 / lame 瘸 / won’t move 不愿意动</td><td></td></tr>
+<tr><td>Backfat 背膘</td><td>enum: thin 薄 / moderate 适中 / thick 厚</td><td>Categorical judgment — production never asks for mm.</td></tr>
+<tr><td>Other observations 其他观察</td><td>free text, optional</td><td></td></tr>
+<tr><td>Cull recommendation 淘汰建议</td><td>bool: no 不建议 / recommend 建议</td><td>“Recommend” reveals conditional free-text reason 淘汰原因.</td></tr>
+</tbody>
+</table>
+<h3>Derived by system (never asked)</h3>
+<table>
+<tbody>
+<tr><td>Check due date</td><td>farrowing date + configured start day (分娩后第 1 天) → row states 预计检查 in-N-days / 需检查 / 已完成.</td></tr>
+<tr><td>Recheck date</td><td>需复查：x 天后 — a recheck row re-spawns after (trigger + interval unspecified in production → open Q1).</td></tr>
+<tr><td>Disease/symptom record</td><td>any abnormal answer “将会作为疾病/症状展示” — auto-created from the assessment, no second entry.</td></tr>
+<tr><td>Progress &amp; day count</td><td>已检查/已分娩 n/N, %, 第 n/3 天 — denominator is the <i>farrowed</i> count and grows live.</td></tr>
+<tr><td>Pass rate 产后合格率</td><td>vs target ≥ 90% — pass definition unspecified (open Q2).</td></tr>
+<tr><td>Attribution</td><td>recorder + timestamp per record (Gianni_J · 02/02 20:00).</td></tr>
+<tr><td>End-task gate</td><td>blocked while the batch’s farrowing task is open; on early end, checked and unchecked sows 继续跟随批次 (keep following the batch).</td></tr>
+</tbody>
+</table>
+<h3>Configuration</h3>
+<table>
+<tbody>
+<tr><td>Check start</td><td>days after farrowing (production: day 1)</td></tr>
+<tr><td>Task window</td><td>3 days (第 n/3 天)</td></tr>
+<tr><td>KPI target</td><td>pass rate ≥ 90%</td></tr>
+<tr><td>Recheck interval</td><td>x days (surfaced in legend, value configurable)</td></tr>
+<tr><td>SOP document</td><td>linked per task</td></tr>
+</tbody>
+</table>
+
+<h2>3 · Subtraction analysis</h2>
+<table>
+<thead><tr><th style="width:30%">Production element</th><th style="width:10%">Verdict</th><th>Justification</th></tr></thead>
+<tbody>
+<tr><td>Top tabs 母猪产后检查 | 任务详情 + 单元进度 card + 猪只列表 section headers</td><td><span class="cut">CUT</span></td><td>Our header already fuses them: title + last activity → Unit KPI | Task overview cells (01); the whole-task view is the task-detail sheet behind the strip (03). One screen, no tab switch.</td></tr>
+<tr><td>Status legend 状态说明 (4 entries)</td><td><span class="cut">CUT</span></td><td>It explains what good status words say themselves. Row words carry it: <span class="mono">Farrowed · 2 days ago</span>, rail <span class="mono">CHECK / IN 3D / ✎</span>, <span class="mono">Recheck · due today</span> (01b, 02b).</td></tr>
+<tr><td>Pen-grid tab 栏位Grid + 单猪/多猪 cards</td><td><span class="cut">CUT</span></td><td>Navigation-only duplication of list facts (未检查/已检查 per pen). Pen picker (02) + status matrix chips (02b <span class="mono">late/check/checked/due 2d</span>) + peek (02c) cover pen-level orientation; grid never acts anyway.</td></tr>
+<tr><td>Intro card “共 200 头猪 · 请对产后母猪进行检查与评估”</td><td><span class="cut">CUT</span></td><td>Instructional noise; the count already sits in the overview cell and lens counts.</td></tr>
+<tr><td>Ended-task screen family (own list 5913:10062, own detail 5752:7532, own filter 5752:7489)</td><td><span class="merge">MERGE</span></td><td>Same list component, ended state: lens defaults to Checked, rows keep stamps (<span class="mono">BCS 3 · milk ok · 09:00 G.H</span>), End button gone. The annotated “unchecked style” is just our dim row without a rail verb. No second component.</td></tr>
+<tr><td>Ended-filter audit dims: 异常项目 · 淘汰建议 · 最后一次处理日期</td><td>MOVE</td><td>Real requirements, wrong owner: cull-rec and abnormal-item become task extras in the one filter sheet (01c); “last handled date” is reporting, not a pen-walk dimension.</td></tr>
+<tr><td>Working filter: status / farrowing-time / aisle 排</td><td><span class="merge">MERGE</span></td><td>Status is the lens — never also a filter. Farrowing-time chips (1天前…≥5天前) and location keep as filter dimensions in 01c.</td></tr>
+<tr><td>Search by ear tag + scan FAB</td><td><span class="merge">MERGE</span></td><td>Dock already holds Go to pen · Scan ear tag · search (01); on a no-box task, scan opens the sow’s sheet directly.</td></tr>
+<tr><td>Full assessment form (9 fields, gradient BCS, conditional cull reason)</td><td><span class="keep">KEEP</span></td><td>This is the task. Every field survives — see §5 deltas; the abnormal→symptom hint line survives as a factual one-liner.</td></tr>
+<tr><td>Recheck state 需复查：x 天后</td><td><span class="keep">KEEP</span></td><td>Becomes a first-class row state (<span class="mono">Recheck · due today</span> + reason chip), not a legend entry.</td></tr>
+<tr><td>Submit bar [⋯] + 提交结果 on the form</td><td><span class="merge">MERGE</span></td><td>One <span class="mono">Save check</span> commits (04); the ⋯ overflow dies — the form has no second action worth a menu.</td></tr>
+<tr><td>End-task pages ×2 (met / missed) + acknowledge checkbox</td><td><span class="merge">MERGE</span></td><td>One End-task confirm inside the task-detail sheet (03): met/missed is one line of stats + carry-over statement; the checkbox is ceremony — the explicit stats-bearing confirm is the acknowledgement.</td></tr>
+<tr><td>Blocked-end dialog (farrowing task open)</td><td><span class="merge">MERGE</span></td><td>Rule stays, dead-end modal goes: End task renders disabled with the reason inline (“farrowing still open — end it first”).</td></tr>
+<tr><td>Read-only check detail 母猪产后检查详情</td><td><span class="merge">MERGE</span></td><td>Same assessment sheet opened from a done row’s ✎, values pre-filled with audit line; selected-vs-disabled styling per designer note. Editing writes an audited correction (04 edit law) — production’s view-only freeze loses nothing.</td></tr>
+<tr><td>Progress denominator 已检查/已分娩</td><td><span class="keep">KEEP</span></td><td>Honest live denominator; overview cell shows <span class="mono">100/200 checked</span> exactly as production computes it.</td></tr>
+</tbody>
+</table>
+
+<h2>4 · Optimized flow</h2>
+<pre class="flow">
+Postpartum check · Unit 7                      ← one screen, list at rest (01)
+├ header  Postpartum check · last 09:00 G.H
+│         [ 90% pass · ≥90 ]  [ 100/200 checked · day 1 of 3 ]   ← Unit KPI | overview
+├ lens    [ Unchecked 40 ] [ Checked 60 ] [ All 100 ]  + funnel  (01 · 01c)
+├ list    PEN B1 ─────────────── 1 sow                            (01b rows, rail task)
+│           000418  Farrowed · 2 days ago            CHECK ›
+│           000421  Recheck · due today  [mastitis]  CHECK ›     ← Δ recheck row
+│           000392  Farrowed · 1 day ago              IN 3D ›     (dim, upcoming)
+│           000406  Checked · ok
+│                   BCS 3 · milk ok · 09:00 G.H          ✎       (stamp trail)
+└ dock    [ Go to pen B1 ]  [ Scan ear tag ]  [ 🔍 ]              (01 dock; scan → her sheet)
+
+tap row ──→ assessment sheet (04 · Row → assessment form)
+             B1 · 000418 · farrowed 2d · 11 born · parity 3       (sheet header anatomy)
+             BCS        1  2  [3]  4  5     ── gradient: thin·standard·obese   Δ
+             Mastitis   [none] mild  moderate  severe                          Δ
+             Milk       poor  [medium]  good                                   Δ
+             Discharge  [normal]  abnormal                                     Δ
+             Feeding    [normal]  reduced  refusing
+             Mobility   [normal]  lame  won’t move                             Δ
+             Backfat    thin  [moderate]  thick                                Δ
+             Note       ⌨ optional
+             Cull       [no]  recommend ──→ reason field appears               Δ
+             [ Save check ]        ← commits itself; no Submit round (law)
+             └─ any abnormal → symptom record spawns + recheck row in x d
+                sheet confirms in one line: “abnormal → recorded as symptom”
+
+pen exhausted → next pen’s rows already on screen · rounds ambient (law)
+
+task strip ──→ task detail sheet (03)
+             progress · KPI 90% pass · config (starts day 1 after farrow ·
+             window 3d) · SOP › · End task
+             End task → inline stats (met/missed · n unchecked keep following
+             the batch) → Confirm; disabled with reason while the batch’s
+             farrowing task is open                                            Δ
+</pre>
+<h3>Deltas (the only new design)</h3>
+<table>
+<tbody>
+<tr><td style="width:30%">Full-form fidelity</td><td>The rendered compact sheet (04 “Postpartum assessment”) shows BCS/mastitis/feeding/cull and footnotes the rest — the real sheet renders all nine fields exactly as §2 types them: mastitis gains the 4th level (none), milk 3-grade, discharge binary, mobility 3-state, backfat 3-state, note, and the BCS gradient strip with thin/standard/obese anchors.</td></tr>
+<tr><td>Conditional cull reason</td><td>Reason text field appears only when Cull = recommend (production 编辑态 behaviour).</td></tr>
+<tr><td>Recheck row state</td><td><span class="mono">Recheck · due today/in Nd</span> + one chip naming the flagged item; descends from the prior record so it carries a stamp trail (01b).</td></tr>
+<tr><td>Abnormal → symptom spawn</td><td>One-line factual confirmation on save; the symptom record is created by the system, never re-entered.</td></tr>
+<tr><td>End-task dependency</td><td>End task disabled-with-reason while the batch’s farrowing task is open; on early end the carry-over fact (“n unchecked keep following the batch”) is stated in the confirm.</td></tr>
+<tr><td>Filter extras (01c)</td><td>Task-specific chips: farrowed 1d/2d/3d/4d/≥5d · abnormal item · cull recommended.</td></tr>
+</tbody>
+</table>
+
+<h2>5 · Data-capture map</h2>
+<table>
+<thead><tr><th style="width:26%">Field</th><th style="width:36%">Where in new flow</th><th>Production origin</th></tr></thead>
+<tbody>
+<tr><td>BCS 1–5</td><td>assessment sheet (04), segmented + gradient</td><td>1000:15683 体况评分</td></tr>
+<tr><td>Mastitis none/mild/moderate/severe</td><td>assessment sheet (04)</td><td>1000:15683 乳房炎</td></tr>
+<tr><td>Milk poor/medium/good</td><td>assessment sheet (04)</td><td>1000:15683 乳汁产能</td></tr>
+<tr><td>Discharge normal/abnormal</td><td>assessment sheet (04)</td><td>1000:15683 分泌物</td></tr>
+<tr><td>Feeding normal/reduced/refusing</td><td>assessment sheet (04)</td><td>1000:15683 采食情况</td></tr>
+<tr><td>Mobility normal/lame/won’t move</td><td>assessment sheet (04)</td><td>1000:15683 活动能力</td></tr>
+<tr><td>Backfat thin/moderate/thick</td><td>assessment sheet (04)</td><td>1000:15683 背膘</td></tr>
+<tr><td>Note (other observations)</td><td>assessment sheet (04), optional text</td><td>1000:15683 其他观察</td></tr>
+<tr><td>Cull recommendation + reason</td><td>assessment sheet (04), reason conditional</td><td>1000:15941 淘汰建议 + 原因</td></tr>
+<tr><td>Corrections</td><td>done row ✎ → same sheet, audited (04 edit law)</td><td>5788:6353 read-only detail (upgraded to audited edit)</td></tr>
+<tr><td><i>Derived:</i> due/recheck dates, day n/3, checked/farrowed, pass rate, attribution, symptom records</td><td>row states · header cells · stamps — never asked</td><td>634:17662 legend + progress · form hint line</td></tr>
+</tbody>
+</table>
+
+<h2>6 · Open questions</h2>
+<table>
+<tbody>
+<tr><td style="width:4%">1</td><td><b>Recheck trigger + interval.</b> Production shows the state (需复查：x 天后) but never says which results schedule it — any abnormal item? only some (e.g. mastitis ≥ moderate)? — and whether x is per-farm config.</td></tr>
+<tr><td>2</td><td><b>Pass definition for 产后合格率.</b> Zero abnormal items? BCS within 2–4? Excludes cull-recommended? The KPI is on every screen but the formula is nowhere.</td></tr>
+<tr><td>3</td><td><b>Mastitis taxonomy.</b> Blank form has 无/轻度/中度/重度; filled and read-only states render only three (无 missing). Confirm 4 values, with 无 as an explicit recorded answer (it should be — “not asked” ≠ “none”).</td></tr>
+<tr><td>4</td><td><b>Required fields.</b> 编辑态 shows submit enabled with BCS unselected. Are all nine answers mandatory per check, or is partial save legal? Is cull reason mandatory when recommending?</td></tr>
+<tr><td>5</td><td><b>Early-end carry-over.</b> 继续跟随批次: do unchecked sows re-enter the next round/batch task, or is the miss permanent in compliance? Numbers on 4347:4469 don’t add up (100+100→100), so the intended assertion needs stating.</td></tr>
+<tr><td>6</td><td><b>Ended-task audit filters.</b> Abnormal-item / cull-rec / last-handled-date slicing — keep on the phone’s ended view, or is that a reporting-surface job?</td></tr>
+</tbody>
+</table>
+
+</div>

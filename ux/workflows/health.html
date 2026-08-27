@@ -1,0 +1,395 @@
+<!-- HEALTH workflows · review-deck fragment · styles come from check-in.html's stylesheet -->
+
+<!-- ================= WF · ADD CONDITION ================= -->
+<section class="wf" id="wf-condition" data-title="Add condition">
+  <div class="wfhead">
+    <h2>Add condition</h2>
+    <span class="anno">one catalogue, one drawer · production 5 screens → ours 2</span>
+  </div>
+  <div class="caro">
+
+    <div class="slide">
+      <div class="vlabel">1 · SELECT — TWO PIGS, THE VERB SHEET RISES</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">last checked yesterday · L.M</div></div></div>
+        <div style="opacity:.32">
+          <div class="list">
+            <div class="pcard">
+              <div class="pen"><input type="checkbox" checked><span class="code">C3</span><span class="cnt">13 pigs</span></div>
+              <div class="row"><div class="cb on"></div><span class="tag">001488</span><div class="st"><span class="l1">Quiet</span><span class="l2">230d</span></div><div class="rail"></div></div>
+              <div class="row"><div class="cb on"></div><span class="tag">001512</span><div class="st"><span class="l1"><span class="dot a"></span>Scours · day 2</span><span class="l2">226d</span></div><div class="rail"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="psheet">
+          <div class="grab"></div>
+          <div class="phd"><span class="x">✕</span><span class="cnt">2 selected</span><span class="up">C3</span></div>
+          <div class="strip"><div class="sk">Health</div>
+            <div class="tiles">
+              <div class="tile"><span class="ti" style="background:var(--ink);color:#fff">+</span><span class="tl">Condition</span></div>
+              <div class="tile"><span class="ti">⚕</span><span class="tl">Treatment</span></div>
+              <div class="tile"><span class="ti">▲</span><span class="tl">Triage</span></div>
+              <div class="tile"><span class="ti">✓</span><span class="tl">Resolve</span></div>
+              <div class="tile dth"><span class="ti">⊗</span><span class="tl">Death</span></div>
+            </div>
+          </div>
+          <div class="strip"><div class="sk">Routine</div>
+            <div class="tiles">
+              <div class="tile"><span class="ti">⚖</span><span class="tl">Weigh</span></div>
+              <div class="tile"><span class="ti">⇄</span><span class="tl">Transfer</span></div>
+              <div class="tile"><span class="ti">≡</span><span class="tl">Note</span></div>
+            </div>
+          </div>
+          <div class="vna">7 not available for growers<span class="chv">›</span></div>
+        </div>
+      </div>
+      <div class="why"><b>The entrance is the one everything uses.</b> Tick two rows, the verb sheet rises; Condition is a tile under HEALTH — no 子功能-健康 drawer, no per-screen shortcut. Blocked verbs are omitted, not greyed, and one line accounts for them. Production strip absent for growers: a missing strip is a reading, not a gap.</div>
+    </div>
+
+    <div class="slide">
+      <div class="vlabel">2 · THE DRAWER — THE WHOLE FLOW IS ONE SHEET</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--well)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+        <div style="flex:1"></div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="tag">2 pigs</span><span class="vit">selected · pen C3 · view ›</span></div>
+          <div class="fpick">Conditions <span class="req">*</span><span class="v">Scours</span><span class="chv">›</span></div>
+          <div class="flbl">Triage</div>
+          <div class="opt on"><span class="rad"></span>Monitor<span class="hint">watch</span></div>
+          <div class="opt"><span class="rad"></span>Treat in place<span class="hint">→ treat list</span></div>
+          <div class="opt"><span class="rad"></span>Hospital pen<span class="hint">→ move list</span></div>
+          <div class="flbl">Photos · up to 12</div>
+          <div class="fphoto"><div class="th"></div><div class="add">+</div></div>
+          <div class="shbar"><button class="cta" style="flex:1">Record · 2 pigs</button></div>
+          <div class="aud">scours already open on 1 · its day count keeps</div>
+        </div>
+      </div>
+      <div class="why"><b>Four production screens collapse into one drawer.</b> Picker step, 二次确认 review card, the read-only roster and the 操作成功 toast are gone — the drawer is the review, the primary self-describes, and view › filters the live list (which can still deselect, fixing production's read-only roster). <b>Changed:</b> ONE Conditions field replaces the 疾病/症状 tab pair and the earlier two-field spec — a farmer records what she sees; disease-vs-symptom is taxonomy the catalogue carries silently. Triage rides inline preset Monitor (no null level exists); the distribution card is cut from Add — these are new cases. <b>Fixed:</b> the triage label read "the mark the case opens with" — spec voice inside the phone; it now reads Triage and the options' hints carry the consequences. The Conditions field reads back the pick by name (Scours), not a count — same self-describing value as Drug.</div>
+    </div>
+
+    <div class="slide">
+      <div class="vlabel">3 · THE CATALOGUE — ONE LIST, CLASSIFIED SILENTLY</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--well)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Add condition</div></div></div>
+        <div style="flex:1"></div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="tag">Conditions</span><span class="vit">1 selected</span><span class="mr">✕</span></div>
+          <div class="fpick"><span class="v ph">⌕ Search 68 conditions</span></div>
+          <div class="flbl">General</div>
+          <div class="chk"><span class="cb"></span>Fever<span class="who">ⓘ</span></div>
+          <div class="chk"><span class="cb"></span>Off feed<span class="who">ⓘ</span></div>
+          <div class="flbl">Gut</div>
+          <div class="chk on"><span class="cb"></span>Scours<span class="who">open on 1 of 2 · ⓘ</span></div>
+          <div class="chk"><span class="cb"></span>Swine dysentery<span class="who">ⓘ</span></div>
+          <div class="flbl">Legs</div>
+          <div class="chk"><span class="cb"></span>Lameness — injury<span class="who">ⓘ</span></div>
+          <div class="chk"><span class="cb"></span>Lameness — chronic<span class="who">ⓘ</span></div>
+          <div class="flbl">Belly</div>
+          <div class="chk"><span class="cb"></span>Umbilical hernia<span class="who">ⓘ</span></div>
+          <div class="aud">already open on 1 · a tick adds no second case</div>
+        </div>
+      </div>
+      <div class="why"><b>The catalogue classifies, never the farmer.</b> One flat list under body-system groups, search always, ⓘ per row; each entry carries its class, so Fever writes a case with a day count and a hernia writes a characteristic on her page — no toggle, no tabs. The per-item count answers "already carrying" before the tick: commit is idempotent for the carrier. <b>Changed:</b> the two-tab split, the cross-tab counter (已选择 1 种疾病，1 项症状) and its unlabeled mixed chips all die with the one-catalogue model; ambiguous entries split in the catalogue (injury vs chronic lameness) instead of asking the farmer. <b>Fixed:</b> the hernia row printed <i>characteristic</i> and its group was headed <i>Standing</i> — the taxonomy this very slide promises to keep silent. The class lives in ⓘ, the group is a body word (Belly), and the footnote states a consequence (a tick adds no second case) instead of the sheet's mechanics.</div>
+    </div>
+
+    <div class="slide">
+      <div class="vlabel">4 · COMMITTED — THE LIST IS THE RECEIPT</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">check-in · in progress</div></div></div>
+        <div class="list" style="flex:1">
+          <div class="pcard">
+            <div class="pen"><input type="checkbox"><span class="code">C3</span><span class="cnt">13 pigs</span></div>
+            <div class="row"><div class="cb"></div><span class="tag">001488</span><div class="st"><span class="l1"><span class="dot a"></span>Scours · today</span><span class="l2">230d</span></div><div class="rail"></div></div>
+            <div class="row"><div class="cb"></div><span class="tag">001512</span><div class="st"><span class="l1"><span class="dot a"></span>Scours · day 2</span><span class="l2">226d</span></div><div class="rail"></div></div>
+            <div class="row tail" style="justify-content:center"><span class="l1">⌄ 11 more</span></div>
+          </div>
+          <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">D4</span><span class="cnt">38 pigs</span></div></div>
+        </div>
+      </div>
+      <div class="why"><b>No toast, no result screen — the rows are the receipt.</b> 001488 opens at today with the amber dot (Monitor preset: dot, no trail = watching). 001512 already carried scours: no duplicate case, day 2 keeps aging — the drawer's footnote stated the subtraction before commit. Selection cleared, scroll kept: the walk never loses its place.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= WF · RESOLVE ================= -->
+<section class="wf" id="wf-resolve" data-title="Resolve · recover or strike">
+  <div class="wfhead">
+    <h2>Resolve · recover or strike</h2>
+    <span class="anno">pig-major verdicts · production 4 screens + dialog → ours 1 page</span>
+  </div>
+  <div class="caro">
+
+    <div class="slide">
+      <div class="vlabel">1 · N=1 — HER DRAWER</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--well)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+        <div style="flex:1"></div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">C3</span><span class="tag">001503</span><span class="vit">232d · 2 open</span></div>
+          <div class="chk on"><span class="cb"></span>Fever · day 6<span class="who">treated 3d</span><span style="font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.02em;color:var(--ink);border:1px solid var(--hair2);border-radius:7px;padding:6px 8px;margin-left:10px;white-space:nowrap">✕ wrong</span></div>
+          <div class="chk"><span class="cb"></span>Scours · day 2<span class="who">—</span><span style="font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.02em;color:var(--ink);border:1px solid var(--hair2);border-radius:7px;padding:6px 8px;margin-left:10px;white-space:nowrap">✕ wrong</span></div>
+          <div class="shbar"><button class="cta" style="flex:1">Recover 1</button></div>
+          <div class="aud">closing fever ends its treatment · scours stays open</div>
+        </div>
+      </div>
+      <div class="why"><b>One pig is a judgment sheet, so it is a drawer.</b> Her open cases as verdict lines: the big left tick is Recover (康复, the outcome — the walk's normal act), the small right ✕ is Strike (移除, the correction). The trail shows what closing stops. Characteristics never appear — a hernia ends by correction on her record, not here. <b>Changed:</b> production had no per-pig view at all; N=1 gets the same line grammar the bulk page repeats. <b>Fixed:</b> the strike target was a nameless ✕ set in hairline grey — invisible and unteachable; it is an ink chip that wears its meaning, <span style="font-family:var(--mono)">✕ wrong</span>, so the row needs no footnote to explain itself.</div>
+    </div>
+
+    <div class="slide">
+      <div class="vlabel">2 · N&gt;1 — THE VERDICT PAGE, FRESH</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="padding-bottom:6px"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Resolve</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">12 pigs · selected · view ›</div></div></div>
+        <div class="list" style="flex:1">
+          <div class="pcard"><div class="pen"><input type="checkbox"><span class="code" style="background:transparent;padding:4px 0">Recover all</span><span class="cnt">· 9 open conditions</span></div></div>
+          <div class="pcard">
+            <div class="pen"><input type="checkbox"><span class="code">C3</span><span class="cnt">· 4 conditions</span></div>
+            <div class="row"><div class="cb"></div><span class="tag">001479</span><div class="st"><span class="l1"><span class="dot a"></span>Lame · day 4</span><span class="l2">treated 2d</span></div><div class="rail"><span class="tw">✕ wrong</span></div></div>
+            <div class="row"><div class="cb"></div><span class="tag">001503</span><div class="st"><span class="l1"><span class="dot r"></span>Fever · day 6</span><span class="l2">treated 3d</span></div><div class="rail"><span class="tw">✕ wrong</span></div></div>
+            <div class="row"><div class="cb"></div><span class="tag"></span><div class="st"><span class="l1"><span class="dot a"></span>Scours · day 2</span><span class="l2">same pig</span></div><div class="rail"><span class="tw">✕ wrong</span></div></div>
+            <div class="row"><div class="cb"></div><span class="tag">000287</span><div class="st"><span class="l1"><span class="dot a"></span>Fever · day 1</span><span class="l2">—</span></div><div class="rail"><span class="tw">✕ wrong</span></div></div>
+          </div>
+          <div class="pcard">
+            <div class="pen"><input type="checkbox"><span class="code">D4</span><span class="cnt">· group</span></div>
+            <div class="row"><div class="cb"></div><span class="tag">38 pigs</span><div class="st"><span class="l1">Scours ×12</span><span class="l2">no tags</span></div><div class="rail"><span class="tw">✕ wrong</span></div></div>
+            <div class="row tail" style="justify-content:center"><span class="l1">⌄ pen D6 · 4 more</span></div>
+          </div>
+        </div>
+        <div class="bar"><button class="cta" style="flex:1;height:52px;opacity:.35">Recover 0</button></div>
+        <div class="aud" style="padding-bottom:14px">3 of the 12 · nothing open · not listed</div>
+      </div>
+      <div class="why"><b>The owner's ask: a detail screen of all pigs selected.</b> One line per pig × open condition, pen-grouped, in the row grammar the walker already reads; the tag prints once per pig. The master row and the pen headers are recover-all shortcuts (production's own three-level hierarchy). The primary is disabled at zero verdicts; the zero rule keeps the 3 nothing-open pigs off the page and the footnote keeps the subtraction honest. <b>Changed:</b> production was condition-major (猪流感 × 10) with no per-pig granularity — inverted here; its condition-major shortcuts are cut as redundant. <b>Fixed:</b> the pen headers were captioned as recover-all shortcuts but drew no tick — they carry one now; every strike chip is named; the group row's <i>verdict by count</i> token was spec voice — cut, the stepper that appears on tick says it instead; the footnote counts the unlisted in plain words.</div>
+    </div>
+
+    <div class="slide">
+      <div class="vlabel">3 · VERDICTS IN PLACE — ONE COMMIT, BOTH VERBS</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="padding-bottom:6px"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Resolve</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">12 pigs · selected · view ›</div></div></div>
+        <div class="list" style="flex:1">
+          <div class="pcard"><div class="pen"><input type="checkbox"><span class="code" style="background:transparent;padding:4px 0">Recover all</span><span class="cnt">· 9 open conditions</span></div></div>
+          <div class="pcard">
+            <div class="pen"><input type="checkbox"><span class="code">C3</span><span class="cnt">· 4 conditions</span></div>
+            <div class="row"><div class="cb on"></div><span class="tag">001479</span><div class="st"><span class="l1"><span class="dot a"></span>Lame · day 4</span><span class="l2">treated 2d</span></div><div class="rail"><span class="tw">✕ wrong</span></div></div>
+            <div class="row"><div class="cb on"></div><span class="tag">001503</span><div class="st"><span class="l1"><span class="dot r"></span>Fever · day 6</span><span class="l2">treated 3d</span></div><div class="rail"><span class="tw">✕ wrong</span></div></div>
+            <div class="row"><div class="cb"></div><span class="tag"></span><div class="st"><span class="l1"><span class="dot a"></span>Scours · day 2</span><span class="l2">same pig · stays open</span></div><div class="rail"><span class="tw">✕ wrong</span></div></div>
+            <div class="row"><div class="cb"></div><span class="tag" style="color:var(--ink3);text-decoration:line-through">000287</span><div class="st"><span class="l1" style="color:var(--ink3);text-decoration:line-through">Fever · day 1</span><span class="l2">struck · wrong entry</span></div><div class="rail"><span class="tw">↺ undo</span></div></div>
+          </div>
+          <div class="pcard">
+            <div class="pen"><input type="checkbox" checked><span class="code">D4</span><span class="cnt">· group</span></div>
+            <div class="row"><div class="cb on"></div><span class="tag">38 pigs</span><div class="st"><span class="l1">Scours ×12</span><span class="l2">recover 5 of 12</span></div><div class="rail"><span class="tw" style="letter-spacing:.12em">−&nbsp;5&nbsp;+</span><span class="tw">✕ wrong</span></div></div>
+          </div>
+          <div style="padding:0 4px"><div class="fcond"><div class="ct">1 struck · why? (optional)</div><div class="fnote" style="min-height:44px">wrong pig ticked</div></div></div>
+        </div>
+        <div class="bar"><button class="cta" style="flex:1;height:52px">Recover 7 · strike 1</button></div>
+        <div class="aud" style="padding-bottom:14px">3 of the 12 · nothing open · not listed</div>
+      </div>
+      <div class="why"><b>The target asymmetry is the verb distinction.</b> Outcome is cheap and central, correction deliberate and peripheral — so one screen carries both verbs without a mode, and one commit carries mixed verdicts (production's own rule, minus its tick→tag→submit machine, its 更新标记 dialog and its leave guard). The struck row renders struck-through with ↺ to undo; the group line recovers by count, stepper-lowered to 5. <b>Changed:</b> strike is plain human-error correction — the reason survives as this inline note, and no KPI language appears anywhere; audit keeps the record, the barn just fixes the mistake. <b>Fixed:</b> the group's count adjust was a buried tap (<i>tap to adjust</i> — tutorial text); it is an inline stepper on the row, holding data the way a Picker does. The struck row teaches in farmer words (<span style="font-family:var(--mono)">struck · wrong entry</span>) and undo wears its word.</div>
+    </div>
+
+    <div class="slide">
+      <div class="vlabel">4 · COMMITTED — WHAT REMAINS IS WHAT PRINTS</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">check-in · in progress</div></div></div>
+        <div class="list" style="flex:1">
+          <div class="pcard">
+            <div class="pen"><input type="checkbox"><span class="code">C3</span><span class="cnt">13 pigs</span></div>
+            <div class="row"><div class="cb"></div><span class="tag">001503</span><div class="st"><span class="l1"><span class="dot a"></span>Scours · day 2</span><span class="l2">232d</span></div><div class="rail"></div></div>
+            <div class="row tail" style="justify-content:center"><span class="l1">⌄ 12 more</span></div>
+          </div>
+          <div class="pcard">
+            <div class="pen"><input type="checkbox"><span class="code">D4</span><span class="cnt">38 pigs</span></div>
+            <div class="row"><div class="cb"></div><span class="tag">38 pigs</span><div class="st"><span class="l1">Scours ×7</span><span class="l2">no tags · 2 under treatment</span></div><div class="rail"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="why"><b>Recovery prints as silence.</b> 001479's lame case and 001503's fever are closed, so their lines vanish (the zero rule — nothing says "recovered"); her scours, left unticked, stays and keeps aging. The group ledger re-aggregated ×12 → ×7. Struck 000287 prints nothing anywhere: audit keeps it, history lines do not. No toast — the shorter list is the receipt.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= WF · TRIAGE ================= -->
+<section class="wf" id="wf-triage" data-title="Triage">
+  <div class="wfhead">
+    <h2>Triage</h2>
+    <span class="anno">one field, no gate · production 3 screens → ours 1 drawer</span>
+  </div>
+  <div class="caro">
+
+    <div class="slide">
+      <div class="vlabel">1 · BULK — ONE CHOICE, SIX PIGS</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--well)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+        <div style="flex:1"></div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="tag">Triage</span><span class="vit">6 pigs · selected · view ›</span></div>
+          <div class="flbl" style="margin-top:12px">now marked · hospital 2 · treat 1</div>
+          <div class="opt on"><span class="rad"></span>Hospital pen<span class="hint">→ move list</span></div>
+          <div class="opt"><span class="rad"></span>Treat in place<span class="hint">→ treat list</span></div>
+          <div class="opt"><span class="rad"></span>Monitor<span class="hint">watch</span></div>
+          <div class="shbar"><button class="cta" style="flex:1">Mark 6 · hospital pen</button></div>
+          <div class="aud">replaces the 3 standing marks · dots update in place</div>
+        </div>
+      </div>
+      <div class="why"><b>One field, so a drawer, and the primary says everything.</b> Production's 4-level page + confirm dialog (确认将 12 头猪只…吗?) compress to Choice(3) with consequence hints: 紧急治疗 → Hospital pen, 优先干预 → Treat in place, 常规观察 → Monitor. 健康 is cut — healthy is the absence of a case, written by Resolve — and euthanize is the Cull verb. The <span style="font-family:var(--mono)">now marked</span> line prints only when the selection already carries marks — exactly when one level for all six would silently destroy someone's judgment. <b>Fixed:</b> the footnote said <i>overwrites</i> — computer voice; it says replaces.</div>
+    </div>
+
+    <div class="slide">
+      <div class="vlabel">2 · STANDALONE — NO CASE REQUIRED</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--well)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+        <div style="flex:1"></div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">D4</span><span class="tag">001812</span><span class="vit">34d · nothing open</span></div>
+          <div class="opt on"><span class="rad"></span>Hospital pen<span class="hint">→ move list</span></div>
+          <div class="opt"><span class="rad"></span>Treat in place<span class="hint">→ treat list</span></div>
+          <div class="opt"><span class="rad"></span>Monitor<span class="hint">watch</span></div>
+          <div class="shbar"><button class="cta" style="flex:1">Mark 1 · hospital pen</button></div>
+          <div class="aud">her row will read marked · hospital</div>
+        </div>
+      </div>
+      <div class="why"><b>Changed: the gate is cut — triage stands alone.</b> The earlier model tied every dot to an open case and hid the tile otherwise; the owner called that incoherent, and it was: "this pig needs the hospital pen" is a complete judgment before anyone names a condition. The mark is now its own record. No <span style="font-family:var(--mono)">now marked</span> line here — she carries none, and the zero rule holds. Naming what is wrong stays one tap away in Add condition, which still carries triage inline for the one-act path. <b>Fixed:</b> the footnote recited the law (<i>the mark is the record</i> — spec voice); it now states what commit leaves behind: her row will read <span style="font-family:var(--mono)">marked · hospital</span>.</div>
+    </div>
+
+    <div class="slide">
+      <div class="vlabel">3 · HOW THE MARK PRINTS — DOT · TRAIL · COUNT</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">check-in · in progress</div></div></div>
+        <div class="list" style="flex:1">
+          <div class="pcard">
+            <div class="pen"><input type="checkbox"><span class="code">C3</span><span class="cnt">13 pigs</span></div>
+            <div class="row"><div class="cb"></div><span class="tag">001479</span><div class="st"><span class="l1"><span class="dot a"></span>Lame · day 4</span><span class="l2">233d</span></div><div class="rail"></div></div>
+            <div class="row"><div class="cb"></div><span class="tag">001503</span><div class="st"><span class="l1"><span class="dot r"></span>Fever · day 6</span><span class="l2">232d · treated 3d</span></div><div class="rail"></div></div>
+          </div>
+          <div class="pcard">
+            <div class="pen"><input type="checkbox"><span class="code">D4</span><span class="cnt">38 pigs</span></div>
+            <div class="row"><div class="cb"></div><span class="tag">001812</span><div class="st"><span class="l1"><span class="dot r"></span>Marked · hospital</span><span class="l2">34d</span></div><div class="rail"></div></div>
+            <div class="row"><div class="cb"></div><span class="tag">38 pigs</span><div class="st"><span class="l1">2 under treatment</span><span class="l2">no tags · hospital ×3</span></div><div class="rail"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="why"><b>The dot is the mark; the missing trail is the gap.</b> 001479: dot, no trail — flagged, nobody has acted. 001503: dot with a past-tense trail — acted on, still watched. <b>Changed:</b> a standalone mark with no case prints as its own line-1 fact, <span style="font-family:var(--mono)">Marked · hospital</span> — new row grammar the old case-gated model could not need. Group marks land on counts (<span style="font-family:var(--mono)">hospital ×3</span>); the move list carries 3 heads · pen D4. Execution needs no screen of its own: filter to marked, select, act.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= WF · TREATMENT ================= -->
+<section class="wf" id="wf-treatment" data-title="Treatment">
+  <div class="wfhead">
+    <h2>Treatment</h2>
+    <span class="anno">6 fields, dose per pig · production 5 screens → ours 2</span>
+  </div>
+  <div class="caro">
+
+    <div class="slide">
+      <div class="vlabel">1 · THE MARKED SET — FILTER, SELECT, TREAT</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">last checked yesterday · L.M</div></div></div>
+        <div style="opacity:.32">
+          <div class="filbar"><span class="fk">Filter</span><span class="fchip">marked · 6</span><span class="fx">✕</span></div>
+          <div class="list">
+            <div class="pcard">
+              <div class="pen"><input type="checkbox" checked><span class="code">C3</span><span class="cnt">4 of 13</span></div>
+              <div class="row"><div class="cb on"></div><span class="tag">001479</span><div class="st"><span class="l1"><span class="dot a"></span>Lame · day 4</span><span class="l2">233d</span></div><div class="rail"></div></div>
+              <div class="row"><div class="cb on"></div><span class="tag">001503</span><div class="st"><span class="l1"><span class="dot r"></span>Fever · day 6</span><span class="l2">232d · treated 3d</span></div><div class="rail"></div></div>
+              <div class="row"><div class="cb on"></div><span class="tag">001512</span><div class="st"><span class="l1"><span class="dot a"></span>Scours · day 2</span><span class="l2">226d</span></div><div class="rail"></div></div>
+            </div>
+            <div class="pcard">
+              <div class="pen"><input type="checkbox" checked><span class="code">D4</span><span class="cnt">2 of 38</span></div>
+              <div class="row"><div class="cb on"></div><span class="tag">001812</span><div class="st"><span class="l1"><span class="dot r"></span>Marked · hospital</span><span class="l2">34d</span></div><div class="rail"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="psheet">
+          <div class="grab"></div>
+          <div class="phd"><span class="x">✕</span><span class="cnt">6 selected</span><span class="up">2 pens</span></div>
+          <div class="strip"><div class="sk">Health</div>
+            <div class="tiles">
+              <div class="tile"><span class="ti">+</span><span class="tl">Condition</span></div>
+              <div class="tile"><span class="ti" style="background:var(--ink);color:#fff">⚕</span><span class="tl">Treatment</span></div>
+              <div class="tile"><span class="ti">▲</span><span class="tl">Triage</span></div>
+              <div class="tile"><span class="ti">✓</span><span class="tl">Resolve</span></div>
+              <div class="tile dth"><span class="ti">⊗</span><span class="tl">Death</span></div>
+            </div>
+          </div>
+          <div class="vna">7 not available for this selection<span class="chv">›</span></div>
+        </div>
+      </div>
+      <div class="why"><b>The mark made a set; the existing machinery drains it.</b> Filter to marked, tick all six, Treatment — no dedicated execution screen anywhere. This is the whole point of triage being a mark: the treat list and the move list are just filters over the walk's own rows.</div>
+    </div>
+
+    <div class="slide">
+      <div class="vlabel">2 · THE PAGE — SIX FIELDS, DOSE PER PIG</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="padding-bottom:6px"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Treatment</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">6 pigs · selected · view ›</div></div></div>
+        <div style="padding:6px 16px;flex:1">
+          <div class="fpick">Drug <span class="req">*</span><span class="v">Cephalosporin</span><span class="chv">›</span></div>
+          <div class="fpick">Brand · form<span class="v ph">Select</span><span class="chv">›</span></div>
+          <div class="fpick">Method <span class="req">*</span><span class="v">Intramuscular</span><span class="chv">›</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-end;margin-top:4px">
+            <div style="flex:1"><div class="flbl">Dose · per pig <span class="req">*</span></div><div class="fmeas"><b>3</b><span>&nbsp;</span></div></div>
+            <div style="flex:1"><div class="flbl">Unit <span class="req">*</span></div><div class="fpick" style="margin-top:8px">ml<span class="chv">›</span></div></div>
+          </div>
+          <div style="height:10px"></div>
+          <div class="fpick">Treating for<span class="v">Fever · Scours</span><span class="chv">›</span></div>
+        </div>
+        <div class="bar"><button class="cta" style="flex:1;height:52px">Record for 6 pigs</button></div>
+        <div class="aud" style="padding-bottom:14px">3 ml each · 18 ml for the 6</div>
+      </div>
+      <div class="why"><b>Seven fields was the page rule's founding case — kept, minus one.</b> Drug, brand, method and the dose+unit pair (the one sanctioned pair) survive verbatim from production, requiredness intact; the confirm screen and toast die. <b>Changed:</b> the two target pickers (目标疾病 / 目标症状) collapse into one Target condition field — the one-catalogue model again. <b>Changed:</b> dose is per pig, one field (production was free text with no unit); the total is a commit footnote, never a field. With nothing open on the selection, the target field is absent, not empty — a target-less treatment on healthy pigs is legal prophylaxis. No date field: recorded-at is the record, and the treated-trail derives from it. <b>Fixed:</b> <i>Target condition</i> was form-designer language — the field asks what a vet asks: <span style="font-family:var(--mono)">Treating for</span>, and it reads back the names, not a count. The footnote keeps the dose arithmetic only; the where-records-land consequence moved to the picker, where the fractions already say who carries what.</div>
+    </div>
+
+    <div class="slide">
+      <div class="vlabel">3 · TARGETS — THE UNION, WITH FRACTIONS</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--well)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Treatment</div></div></div>
+        <div style="flex:1"></div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="tag">Treating for</span><span class="vit">2 selected</span><span class="mr">✕</span></div>
+          <div class="chk"><span class="cb"></span>All<span class="who">3 conditions</span></div>
+          <div class="chk on"><span class="cb"></span>Fever<span class="who">4 of 6 have it · ⓘ</span></div>
+          <div class="chk on"><span class="cb"></span>Scours<span class="who">2 of 6 have it · ⓘ</span></div>
+          <div class="chk"><span class="cb"></span>Lameness — injury<span class="who">1 of 6 has it · ⓘ</span></div>
+          <div class="aud">all 6 get the drug · fever records only on its 4</div>
+        </div>
+      </div>
+      <div class="why"><b>Scoped to what the six actually carry — as a union, with the subtraction visible.</b> Production's × n chips become fractions: fever · 4 of 6 says before the tick that the drug event goes to all six but the fever link attaches only to its four — no pig gets a case link she doesn't have. Intersection was wrong (empty the moment the selection is heterogeneous). <b>Changed:</b> one list instead of two scoped drawers; production's empty-state screen (暂无记录症状) dies with the absent-field rule. <b>Fixed:</b> the footnote said <i>union</i> and narrated the sheet's mechanics (<i>ticks commit · ✕ closes</i>); the rows now say who has what in plain words (<span style="font-family:var(--mono)">4 of 6 have it</span>) and the footnote states the one consequence that matters before commit — all 6 get the drug, the condition goes on record only where it's carried.</div>
+    </div>
+
+    <div class="slide">
+      <div class="vlabel">4 · NEXT WALK — THE TRAIL REPLACES THE PENDING DOT</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">last checked yesterday · G.H</div></div></div>
+        <div class="list" style="flex:1">
+          <div class="pcard">
+            <div class="pen"><input type="checkbox"><span class="code">C3</span><span class="cnt">13 pigs</span></div>
+            <div class="row"><div class="cb"></div><span class="tag">001479</span><div class="st"><span class="l1"><span class="dot a"></span>Lame · day 5</span><span class="l2">233d · treated 1d</span></div><div class="rail"></div></div>
+            <div class="row"><div class="cb"></div><span class="tag">001503</span><div class="st"><span class="l1"><span class="dot r"></span>Fever · day 7 <span class="b b-amber">40.6°</span></span><span class="l2">232d · treated 1d</span></div><div class="rail"></div></div>
+          </div>
+          <div class="pcard">
+            <div class="pen"><input type="checkbox"><span class="code">D4</span><span class="cnt">38 pigs</span></div>
+            <div class="row"><div class="cb"></div><span class="tag">001812</span><div class="st"><span class="l1"><span class="dot r"></span>Marked · hospital</span><span class="l2">34d · treated 1d</span></div><div class="rail"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="why"><b>Treat discharges the mark.</b> Yesterday these rows read dot-only — flagged, nobody acted. Today the trail says treated 1d: the treat-in-place marks are executed, their pending state gone, while each case keeps aging on its own. 001503 is the product's most valuable row — day 7 of a fever, day 1 of the new drug, read without counting. 001812's red dot stands: a hospital mark is discharged by the move, not the drug, and the move list still carries him.</div>
+    </div>
+
+  </div>
+</section>

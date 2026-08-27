@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentri — Unified Task Screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* synthesized VI — Panel structure · Ledger temperature · Board discipline */
+    --ground:#F7F6F2;          /* one-step-warm neutral, never clinical */
+    --card:#FFFFFF;
+    --well:#EFEEE8;            /* recessed surfaces */
+    --ink:#1C1E19;
+    --ink2:#51544B;
+    --ink3:#8B8E83;
+    --hair:#E7E6DF;
+    --hair2:#D8D7CE;
+    /* status — the only color allowed on a screen */
+    --red:#C2402E;      --red-wash:#F9EAE7;
+    --amber:#96660D;    --amber-fill:#D99A21; --amber-wash:#F8F0DC;
+    --blue:#3E56C4;     --blue-wash:#EBEFF9;
+    --green:#3B8A50;    --green-wash:#EAF2EC;
+    --gray:#7C7F76;     --gray-wash:#F0F0EB;
+    --sans:'Plus Jakarta Sans',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 48px}
+  .mono{font-family:var(--mono)}
+  .anno{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3)}
+
+  header.page{display:flex;justify-content:space-between;padding:26px 0;border-bottom:1px solid var(--hair2)}
+  h1{font-size:44px;font-weight:800;letter-spacing:-.015em;line-height:1.1;margin:64px 0 20px}
+  .lede{font-size:17px;color:var(--ink2);max-width:64ch;margin-bottom:40px}
+  .tokens{display:flex;gap:24px;align-items:center;padding:18px 0 56px;flex-wrap:wrap}
+  .sw{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--ink2)}
+  .sw i{width:22px;height:22px;border-radius:5px;display:inline-block;border:1px solid rgba(0,0,0,.06)}
+
+  section.screen{display:grid;grid-template-columns:430px 1fr;gap:64px;padding:64px 0;border-top:1px solid var(--ink)}
+  .sec-label{grid-column:1/-1;display:flex;justify-content:space-between;margin-bottom:8px}
+  h2{font-size:24px;font-weight:800}
+  .notes{padding-top:8px}
+  .note{padding:14px 0;border-top:1px solid var(--hair)}
+  .note:first-child{border-top:none}
+  .note b{display:block;font-size:15px;margin-bottom:3px}
+  .note p{font-size:13.5px;color:var(--ink2);max-width:52ch}
+  .note .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--ink3);text-transform:uppercase}
+
+  /* ============ phone ============ */
+  .phone{width:390px;background:var(--ground);border:1px solid var(--hair2);border-radius:34px;overflow:hidden;box-shadow:0 8px 32px rgba(28,30,25,.10);position:relative}
+  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:12px 22px 6px;font-family:var(--mono);font-size:12px;font-weight:600}
+  .appbar{display:flex;align-items:center;gap:12px;padding:10px 16px 12px}
+  .appbar .back{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--ink)}
+  .appbar .ttl{font-size:17px;font-weight:700}
+  .appbar .sub{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .appbar>div:nth-child(2){min-width:0;flex:1}
+  .appbar .det{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--ink2);border:1px solid var(--hair2);border-radius:9px;padding:8px 12px}
+
+  /* legacy card styles (unused by base screens) */
+  .round{margin:2px 16px 12px;background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:14px 16px}
+  .round .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .round .big{font-family:var(--mono);font-weight:700;font-size:26px;letter-spacing:-.01em}
+  .round .big small{font-size:13px;font-weight:500;color:var(--ink3);letter-spacing:0}
+  .gauge{display:flex;gap:2.5px;margin:10px 0 8px}
+  .gauge i{height:7px;flex:1;border-radius:2px;background:var(--well)}
+  .gauge i.f-green{background:var(--green)}
+  .gauge i.f-blue{background:var(--blue)}
+  .round .att{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+
+  /* state lens */
+  .lensrow{display:flex;align-items:center;gap:8px;margin:8px 12px 10px}
+  .lensrow .lens{flex:1;margin:0}
+  .lensfil{flex:0 0 auto;width:44px;height:44px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--ink);position:relative}
+  .lensfil.on{border-color:var(--ink);color:var(--ink)}
+  .lensfil .fc{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .lens{display:flex;background:var(--well);border-radius:11px;padding:3px;margin:8px 16px 10px}
+  .lens button{flex:0 1 auto;min-width:0;border:0;background:transparent;font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink2);padding:9px 12px;border-radius:9px;display:flex;gap:5px;justify-content:center;align-items:center;white-space:nowrap}
+  .lens{justify-content:space-between}
+  .lens button .n{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink3)}
+  .lens button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(28,30,25,.08)}
+  .lens button.on .n{color:var(--ink2)}
+
+  /* pen strip */
+  .penstrip{display:flex;gap:6px;padding:2px 16px 12px;align-items:center;overflow:hidden}
+  .pchip{flex:0 0 auto;height:40px;min-width:56px;padding:0 10px;border-radius:9px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;gap:5px;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink2)}
+  .pchip .c{color:var(--ink);font-weight:700}
+  .pchip.cur{background:var(--ink);border-color:var(--ink);color:#fff}
+  .pchip.cur .c{color:#fff}
+  .pchip.clear{color:var(--ink3)}
+  .pchip .dot{width:6px;height:6px;border-radius:2px;background:var(--amber-fill)}
+  .pchip .ok{color:var(--green);font-size:11px}
+  .pgrid{flex:0 0 auto;width:40px;height:40px;border-radius:9px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:15px}
+
+  /* list */
+  .list{background:transparent;border-top:none;padding:8px 12px 14px;display:flex;flex-direction:column;gap:10px}
+  .pcard{background:var(--card);border:1px solid var(--hair);border-radius:14px;overflow:hidden}
+  .pcard .row:first-of-type{border-top:1px solid var(--hair)}
+  .pen{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--card)}
+  .pen .code{font-family:var(--mono);font-size:12px;font-weight:700;background:var(--well);border-radius:8px;padding:4px 9px}
+  .pen .agg{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+  .pen .agg.ok{color:var(--green)}
+  .pen input{width:18px;height:18px;accent-color:var(--ink)}
+  .row{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 16px;border-top:1px solid var(--hair)}
+  .row:first-of-type{border-top:none}
+  .row .cb{width:22px;height:22px;border:1.5px solid var(--hair2);border-radius:6px;flex:0 0 auto}
+  .row .cb.on{background:var(--ink);border-color:var(--ink);position:relative}
+  .row .cb.on::after{content:"✓";color:#fff;font-size:13px;position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .row .tag{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.02em;flex:0 0 62px}
+  .row .st{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+  .row .st .l1{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:6px}
+  .row .st .l2{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .rail{margin-left:auto;text-align:right;flex:0 0 auto;display:flex;align-items:center;gap:10px}
+  .row .word{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+  .row .chev{color:var(--hair2);font-size:16px}
+  .row .tw{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.02em;color:var(--ink);border:1px solid var(--hair2);border-radius:7px;padding:6px 8px;white-space:nowrap}
+  .row .tw.done{color:var(--ink3);border-color:var(--hair)}
+  .row.dim .l1{color:var(--ink2);font-weight:500}
+  .row.done{background:var(--card)}
+  .s-red{color:var(--red)} .s-amber{color:var(--amber)} .s-blue{color:var(--ink2)} .s-green{color:var(--green)} .s-gray{color:var(--gray)}
+  .b{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.06em;padding:2.5px 7px;border-radius:5px;text-transform:uppercase}
+  .b-amber{background:var(--amber-wash);color:var(--amber)}
+  .b-red{background:var(--red-wash);color:var(--red)}
+  .b-gray{background:var(--gray-wash);color:var(--gray)}
+  .edit{width:34px;height:34px;border:1px solid var(--hair);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:13px}
+
+  /* bottom bars */
+  .bar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--hair);padding:12px 16px 22px;display:flex;gap:10px;align-items:center}
+  .cta{flex:1;height:54px;border-radius:12px;background:var(--ink);color:#fff;font-family:var(--sans);font-size:15.5px;font-weight:700;border:0;display:flex;align-items:center;justify-content:center}
+  .cta.sec{background:var(--card);color:var(--ink);border:1.5px solid var(--ink);flex:0 0 auto;padding:0 20px}
+  .selinfo{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;white-space:nowrap}
+  .selinfo .x{width:30px;height:30px;border-radius:8px;border:1px solid var(--hair2);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:13px}
+  .barnote{position:absolute;left:0;right:0;bottom:100%;padding:8px 16px;background:transparent}
+
+  .divider-note{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);padding:8px 16px;background:var(--ground)}
+
+  /* screen variations (branch sections — base screens above stay untouched) */
+  .vlabel{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin:26px 0 10px}
+  .hd2{background:var(--ground);border-bottom:1px solid var(--hair)}
+  .readout{display:flex;align-items:flex-end;gap:20px;padding:6px 18px 18px}
+  .readout .m .n{font-family:var(--mono);font-weight:700;font-size:34px;line-height:.95;letter-spacing:-.02em;color:var(--ink)}
+  .readout .m .l{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--ink3);margin-top:7px;text-transform:uppercase}
+  .readout .vr{width:1px;align-self:stretch;background:var(--hair2)}
+  .readout .ctx{margin-left:auto;text-align:right}
+  .readout .ctx .a{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;line-height:1.7}
+  .readout .endr{display:inline-block;margin-top:7px;font-size:12px;font-weight:700;color:var(--ink2);border:1px solid var(--hair2);border-radius:8px;padding:5px 10px;white-space:nowrap}
+  /* bottom bar · NAV state (dock) */
+  .dock{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--hair);padding:10px 16px 18px}
+  .row.scanned{background:var(--green-wash)}
+  .row .scanb{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--green);text-transform:uppercase}
+  .dock .penstrip{padding:0 0 8px}
+  .dockrow{display:flex;align-items:center;gap:8px}
+  .dockrow .tool{flex:0 0 auto}
+  .dockrow .penstrip{flex:1;min-width:0;padding:0;overflow:hidden;mask-image:linear-gradient(90deg,#000 88%,transparent)}
+
+  .tool{width:48px;height:48px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--ink)}
+  .tool.scan{background:var(--ink);border-color:var(--ink);color:#fff}
+  .pchip{height:48px}
+  .dh{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  /* unit block */
+  .unit{padding:12px 16px 4px;border-top:1px solid var(--hair);margin-top:2px}
+  .unit .un{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.1}
+  .unit .ul{font-size:12px;color:var(--ink3);margin-top:3px}
+  .unit .ul b{color:var(--ink2);font-weight:600}
+  /* task-level context strip — display only */
+  .taskctx{display:flex;align-items:center;gap:12px;margin:0 16px 12px;padding:9px 12px;background:var(--well);border-radius:10px}
+  .taskctx .tl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);flex:0 0 auto}
+  .taskctx .tc{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);white-space:nowrap}
+  .taskctx .tc b{color:var(--ink);font-weight:700}
+  .taskctx .tcv{color:var(--ink3);font-size:15px;line-height:1;margin-left:2px}
+
+  /* header variations 01-H */
+  .hA .capsule{margin:0 16px 8px;height:30px;border-radius:15px;background:var(--well);display:flex;align-items:center;gap:10px;padding:0 12px 0 14px}
+  .hA .capsule .gauge{margin:0;flex:1}
+  .hA .capsule .gauge i{height:5px}
+  .hA .capsule .t{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink2);white-space:nowrap}
+  .hA .capsule .t b{color:var(--ink)}
+  .hA .big{padding:2px 16px 0}
+  .hA .big .u{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  .hA .big .tsk{font-size:13px;color:var(--ink2);margin-top:4px}
+  .hA .big .tsk b{color:var(--ink);font-weight:700}
+  .hB .unitsel{margin:4px 16px 8px;height:52px;border:1px solid var(--hair2);border-radius:12px;background:var(--card);display:flex;align-items:center;padding:0 12px 0 14px;gap:10px}
+  .hB .unitsel .u{font-size:17px;font-weight:800;letter-spacing:-.01em}
+  .hB .unitsel .m{font-size:12px;color:var(--ink3);margin-left:2px}
+  .hB .unitsel .dd{margin-left:auto;font-size:14px;color:var(--ink2)}
+  .hB .tline{display:flex;align-items:center;gap:10px;margin:0 16px 8px;padding:0 2px}
+  .hB .tline .gauge{margin:0;flex:1}
+  .hB .tline .gauge i{height:5px}
+  .hB .tline .t{font-family:var(--mono);font-size:10.5px;color:var(--ink2);white-space:nowrap}
+  .hB .tline .t b{color:var(--ink)}
+  .ttl2{padding:0 16px}
+  .ttl2 .u{font-size:22px;font-weight:800;letter-spacing:-.015em}
+  .ttl2 .u span{color:var(--ink3);font-weight:600}
+  .ctxbar{margin:12px 12px 8px;border:1px solid var(--hair);border-radius:12px;background:var(--card);display:grid;grid-template-columns:1fr 1fr}
+  .ctxbar>div{padding:11px 14px 12px;display:grid;grid-template-rows:auto auto auto;row-gap:6px;align-content:start}
+  .ctxbar .numwrap{display:flex;flex-direction:column;gap:5px}
+  .ctxbar>div+div{border-left:1px solid var(--hair)}
+  .ctxbar .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .ctxbar .num{display:flex;align-items:baseline;gap:4px;line-height:1}
+  .ctxbar .num b{font-family:var(--mono);font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+  .ctxbar .num span{font-family:var(--mono);font-size:12px;color:var(--ink2);white-space:nowrap}
+  .ctxbar .sub{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink3);align-self:end}
+  .ctxbar .gauge{margin:0}
+  .ctxbar .kspace{height:7px}
+  .ctxbar .num.under b{color:var(--amber)}
+  .ctxbar .gauge i{height:5px}
+  /* go-to-pen chip (dock idle state) */
+  .goto{flex:0 0 auto;height:48px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);color:var(--ink);display:flex;align-items:center;gap:7px;padding:0 12px}
+  .goto .gi{font-size:17px;line-height:1}
+  .goto .gp{font-family:var(--mono);font-size:12.5px;font-weight:700}
+  .scanbtn{flex:1;min-width:0;height:48px;border-radius:11px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;gap:9px;font-size:14.5px;font-weight:700}
+  .scanbtn .si{font-size:17px;line-height:1}
+  .narrow{flex:0 0 auto;display:flex;gap:6px}
+  .tool.fil{position:relative}
+  .tool.fil .fc{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .filline{display:flex;align-items:center;gap:6px;padding:0 18px 10px;font-size:12px;color:var(--ink3)}
+  .filline b{color:var(--ink2);font-weight:600}
+  .filline .clr{margin-left:auto;font-weight:700;color:var(--ink);font-size:12px}
+  .filbar{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--well);border-top:1px solid var(--hair);font-size:12.5px;color:var(--ink2)}
+  .filbar .fk{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .filbar .fchip{background:var(--card);border:1px solid var(--hair2);border-radius:7px;padding:3px 8px;font-weight:600;color:var(--ink)}
+  .filbar .fx{margin-left:auto;font-weight:700;color:var(--ink2)}
+  /* pen selector (dock idle state) */
+  .pensel{flex:1;min-width:0;display:flex;align-items:center;gap:6px}
+  .pensel .arr{width:48px;height:48px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--ink);flex:0 0 auto}
+  .pensel .cur{flex:1;min-width:0;height:48px;border-radius:11px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 10px}
+  .pensel .cur .pc{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:.04em;white-space:nowrap;flex:0 0 auto}
+  .pensel .cur .pl{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .pensel .cur .dd{margin-left:auto;color:rgba(255,255,255,.7);font-size:12px;flex:0 0 auto}
+  /* pen picker sheet */
+  .pk{background:var(--card);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid var(--hair);padding:0 16px 20px}
+  .pk .seg{display:flex;background:var(--well);border-radius:12px;padding:3px;margin:8px 0 14px}
+  .pk .seg span{flex:1;height:48px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--ink2);border-radius:10px}
+  .pk .seg span.on{background:var(--ink);color:#fff}
+  .pk .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .pk .cell{height:58px;border-radius:12px;border:1px solid var(--hair2);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .pk .cell .pc{font-family:var(--mono);font-size:14px;font-weight:700}
+  .pk .cell .n{font-family:var(--mono);font-size:10.5px;color:var(--ink2)}
+  .pk .cell.clear{color:var(--ink3)} .pk .cell.clear .n{color:var(--green)}
+  .pk .cell.cur{background:var(--ink);border-color:var(--ink);color:#fff} .pk .cell.cur .n{color:rgba(255,255,255,.7)}
+  .pk .cell{position:relative}
+  .pk .cell.sig::after{content:"";position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:2px;background:var(--amber-fill)}
+  /* grid variations carousel */
+  .caro{display:flex;gap:24px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 4px 18px;-webkit-overflow-scrolling:touch}
+  .caro::-webkit-scrollbar{height:6px} .caro::-webkit-scrollbar-thumb{background:var(--hair2);border-radius:3px}
+  .slide{flex:0 0 auto;width:390px;scroll-snap-align:start}
+  .slide .vlabel{margin:0 0 10px}
+  .slide .why{font-size:12.5px;color:var(--ink2);margin-top:12px;max-width:390px;line-height:1.5}
+  .slide .why b{color:var(--ink)}
+  .caro-hint{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:-4px 0 12px}
+  .pg{display:grid;grid-template-columns:28px repeat(4,1fr);gap:8px;align-items:stretch}
+  .pg .col{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink3);text-align:center;padding-bottom:2px}
+  .pg .rown{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink3);display:flex;align-items:center;justify-content:center}
+  .pg .cell{min-height:64px;border-radius:12px;border:1px solid var(--hair2);background:var(--card);padding:8px 7px 7px;min-width:0;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+  .pg .cell .pc{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.02em}
+  .pg .cell .n{font-family:var(--mono);font-size:10.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+  .pg.tall .cell{min-height:78px;justify-content:flex-start;gap:3px}
+  .pg.tall .cell .n{overflow:visible}
+  .pg.tall .cell .tag{margin-top:auto}
+  .pg .cell .n.g{color:var(--green)} .pg .cell .n.a{color:var(--amber)} .pg .cell .n.b{color:var(--blue)} .pg .cell .n.r{color:var(--red)}
+  .pg .cell.clear .pc{color:var(--ink3)}
+  .pg .cell.cur{background:var(--ink);border-color:var(--ink)} .pg .cell.cur .pc,.pg .cell.cur .n,.pg .cell.cur .tag{color:#fff}
+  .pg .cell.empty{border-style:dashed;background:transparent} .pg .cell.empty .pc,.pg .cell.empty .n{color:var(--hair2)}
+  .pg .cell .dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:2px}
+  .pg .cell .dot.a{background:var(--amber-fill)} .pg .cell .dot.r{background:var(--red)} .pg .cell .dot.g{background:var(--green)} .pg .cell .dot.b{background:var(--blue)}
+  .pg .cell.tint-a{background:var(--amber-wash);border-color:#E9D9B0} .pg .cell.tint-r{background:var(--red-wash);border-color:#EBC5BE} .pg .cell.tint-b{background:var(--blue-wash);border-color:#C9D2EF}
+  .pg .cell .bar{height:4px;border-radius:2px;background:var(--well);overflow:hidden;margin-top:4px}
+  .pg .cell .bar i{display:block;height:100%;background:var(--green)}
+  .pg .cell.cur .bar{background:rgba(255,255,255,.2)} .pg .cell.cur .bar i{background:#fff}
+  .pg .cell .tag{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.02em}
+  .legend2{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);text-align:center;padding-top:12px}
+  /* unified pen picker — chip cell */
+  .upk{display:grid;grid-template-columns:22px repeat(4,1fr);gap:8px 8px;overflow-x:auto}
+  .upk .col{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink3);text-align:center;padding-bottom:4px;letter-spacing:.06em}
+  .upk .rown{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink3);display:flex;align-items:center;justify-content:center}
+  .uc{height:68px;border-radius:12px;border:1px solid var(--hair);background:var(--card);position:relative;min-width:0;padding:10px 8px 9px 10px;display:flex;flex-direction:column;justify-content:space-between}
+  .uc .pc{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.02em;color:var(--ink);line-height:1;display:flex;align-items:center;justify-content:space-between}
+  .uc .pc .tick{color:var(--green);font-size:12px;font-weight:800}
+  .uc.cur{border-color:var(--ink);border-width:1.5px}
+  .uc.dim{background:var(--well);border-color:var(--hair)} .uc.dim .pc{color:var(--ink3)}
+  .uc.empty{border-style:dashed;background:transparent} .uc.empty .pc{color:var(--hair2)}
+  .uc .ch{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 6px;border-radius:5px;line-height:1.2;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .uc .ch .x{flex:0 0 auto}
+  .uc .ch.ca{background:var(--amber-wash);color:var(--amber)}
+  .uc .ch.cr{background:var(--red-wash);color:var(--red)}
+  .uc .ch.cn{background:var(--well);color:var(--ink2)}
+  .uc .ch.cgr{background:var(--green-wash);color:var(--green)}
+  .uc .ch.cg{background:var(--gray-wash);color:var(--ink3)}
+  .uc .ch .x{font-weight:600;opacity:.9}
+  .uc .qt{font-family:var(--mono);font-size:10px;color:var(--ink3);line-height:1;letter-spacing:-.01em;white-space:nowrap;overflow:visible;width:100%;display:block}
+  .uc .wd,.uc .ln,.uc .ct,.uc .mk,.uc .ok,.uc .qm{display:none}
+  .pk.tall{max-height:75%}
+  /* row anatomy */
+  .rowdemo{position:relative;width:430px;margin:34px auto 44px}
+  .rowdemo .row{border:1.5px solid var(--hair2);border-radius:14px;background:var(--card)}
+  .rowdemo .lbl{position:absolute;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);white-space:nowrap}
+  /* peek popover */
+  .peek{position:absolute;left:16px;right:16px;bottom:118px;background:var(--card);border:1px solid var(--hair2);border-radius:14px;box-shadow:0 12px 32px rgba(28,30,25,.16);padding:14px 16px 12px;z-index:3}
+  .peek::after{content:"";position:absolute;left:50%;bottom:-7px;width:12px;height:12px;background:var(--card);border-right:1px solid var(--hair2);border-bottom:1px solid var(--hair2);transform:translateX(-50%) rotate(45deg)}
+  .peek .ph{display:flex;align-items:baseline;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--hair)}
+  .peek .ph .pc{font-family:var(--mono);font-size:13px;font-weight:700}
+  .peek .ph .ps{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+  .peek .grp{padding:11px 0;border-top:1px solid var(--hair)}
+  .peek .ph + .grp{border-top:none}
+  .peek .ph + .pr{padding-top:11px}
+  .peek .pr{display:flex;align-items:center;gap:10px;font-size:12.5px;min-height:20px}
+  .peek .pr + .pr{border-top:1px solid var(--hair);padding-top:11px;margin-top:11px}
+  .peek .pr .tag{font-family:var(--mono);font-size:12px;font-weight:600;flex:0 0 58px}
+  .peek .pr .st{flex:1;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .peek .pr .st.dim{color:var(--ink3)}
+  .peek .pr .ch{display:inline-flex;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px}
+  .peek .pr .ch.ca{background:var(--amber-wash);color:var(--amber)} .peek .pr .ch.cr{background:var(--red-wash);color:var(--red)} .peek .pr .ch.cgr{background:var(--green-wash);color:var(--green)}
+  .peek .pr .ok{color:var(--green);font-weight:800;font-size:12px}
+  .peek .pr .word{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;flex:0 0 auto}
+  .peek .pf{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);text-align:center;padding-top:12px;margin-top:11px;border-top:1px solid var(--hair)}
+  .peek .trt{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em;padding:6px 0 0 68px}
+  .peek .trt span{font-family:var(--mono);font-size:10px;letter-spacing:.02em;padding:3px 8px;border-radius:5px;border:1px solid var(--hair2);color:var(--ink3)}
+  .peek .trt span.due{background:var(--amber-wash);border-color:transparent;color:var(--amber);font-weight:600}
+  .uc.pressed{border-color:var(--ink);background:var(--well)}
+  /* anatomy / status table */
+  .anat{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+  .anat .big{width:200px;height:120px;border-radius:18px;border:1.5px solid var(--hair2);background:var(--card);position:relative;margin:30px auto 40px;left:0}
+  .anat .big .pc{position:absolute;left:18px;top:14px;font-family:var(--mono);font-size:22px;font-weight:700}
+  .anat .big .mk{position:absolute;right:18px;top:18px;width:16px;height:16px;border-radius:4px;background:var(--amber-fill)}
+  .anat .big .ct{position:absolute;right:18px;bottom:12px;font-family:var(--mono);font-size:26px;font-weight:700;line-height:1}
+  .anat .lbl{position:absolute;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+  .stab{width:100%;border-collapse:collapse;font-size:13px}
+  .stab th,.stab td{padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top;text-align:left}
+  .stab thead th{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+  .stab td:first-child{font-weight:700;white-space:nowrap}
+  .stab .sw{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:6px}
+  .stab .sw.r{background:var(--red)} .stab .sw.a{background:var(--amber-fill)} .stab .sw.b{background:var(--blue)}
+  .stab .ok{color:var(--green);font-weight:800;margin-right:4px}
+  .stab .em{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--well);border:1px solid var(--hair);vertical-align:-1px;margin-right:6px}
+  .stab .mono{font-size:12px}
+  /* task detail sheet */
+  .sheet{background:var(--card);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid var(--hair);flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .grab{width:36px;height:4px;border-radius:2px;background:var(--hair2);margin:10px auto 6px}
+  .sh{display:flex;align-items:baseline;justify-content:space-between;padding:6px 20px 14px}
+  .sh .t{font-size:17px;font-weight:700}
+  .sh .x{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);white-space:nowrap;flex:0 0 auto;margin-left:12px}
+  .sh .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sec{padding:12px 20px 14px;border-top:1px solid var(--hair)}
+  .sec .k{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:block}
+  .kv{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;font-size:13.5px}
+  .kv .v{font-family:var(--mono);font-size:12.5px;color:var(--ink);font-weight:600}
+  .kv .lbl{color:var(--ink2)}
+  .kpi{display:flex;align-items:baseline;gap:8px}
+  .kpi .n{font-family:var(--mono);font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1}
+  .kpi .u{font-size:13px;color:var(--ink2)}
+  .kpi .tgt{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink3);text-transform:uppercase}
+  .legend{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px}
+  .legend .sq{width:8px;height:8px;border-radius:2px;flex:0 0 auto}
+  .legend .w{font-weight:600;flex:0 0 130px}
+  .legend .d{color:var(--ink2);font-size:12.5px}
+  .rowlink{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--hair);font-size:14px;font-weight:600}
+  .rowlink .chev{color:var(--hair2)}
+  .endtask{margin:auto 16px 20px;height:52px;border-radius:12px;border:1.5px solid var(--red);color:var(--red);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;background:var(--card)}
+  /* record sheet — shell anatomy + field kit */
+  .shelldemo{position:relative;width:390px;margin:44px auto 56px}
+  .shelldemo .sheetbox{background:var(--card);border:1.5px solid var(--hair2);border-radius:18px;padding:10px 16px 16px}
+  .shelldemo .grab{width:36px;height:4px;border-radius:2px;background:var(--hair2);margin:2px auto 10px}
+  .shelldemo .fake{height:14px;border-radius:4px;background:var(--well);margin:10px 0}
+  .shelldemo .fake.s{width:60%}
+  .shelldemo .lbl{position:absolute;width:150px;text-align:right;left:-166px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);line-height:1.4}
+  .kit{display:grid;grid-template-columns:1fr 1fr;gap:24px 32px;margin:18px 0 8px}
+  .kitcard{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:15px 17px}
+  .kitcard .kn{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .kitcard .kd{font-size:12.5px;color:var(--ink2);margin:2px 0 12px}
+  .kitcard .krule{font-size:12px;color:var(--ink3);margin-top:13px;padding-top:10px;border-top:1px solid var(--hair)}
+  .kitcard.newk{border-color:var(--hair2);box-shadow:inset 3px 0 0 var(--green)}
+  .fpick{display:flex;align-items:center;min-height:52px;border:1px solid var(--hair2);border-radius:12px;padding:0 14px;font-size:14px;font-weight:600;margin-top:8px}
+  .fpick .v{margin-left:auto;font-family:var(--mono);font-size:12.5px;color:var(--ink);font-weight:600}
+  .fpick .v.ph{color:var(--ink3);font-weight:500}
+  .fpick .chv{color:var(--hair2);font-size:16px;margin-left:8px}
+  .fnote{border:1px solid var(--hair2);border-radius:12px;padding:12px 14px;min-height:74px;font-size:13.5px;color:var(--ink3);margin-top:8px}
+  .fphoto{display:flex;gap:8px;margin-top:8px}
+  .fphoto .th{width:54px;height:54px;border-radius:10px;background:var(--well);border:1px solid var(--hair)}
+  .fphoto .add{width:54px;height:54px;border-radius:10px;border:1.5px dashed var(--hair2);display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:20px}
+  .fmeas{display:flex;align-items:baseline;gap:7px;border:1.5px solid var(--ink);border-radius:12px;padding:11px 14px;margin-top:8px}
+  .fmeas b{font-family:var(--mono);font-size:22px;font-weight:700}
+  .fmeas span{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+  .fcond{margin-top:10px;padding-left:13px;border-left:2px solid var(--amber-fill)}
+  .fcond .ct{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+  .req{color:var(--red);font-weight:700}
+  /* interaction sheets */
+  .sh2{display:flex;align-items:center;gap:10px;padding:2px 2px 12px;border-bottom:1px solid var(--hair)}
+  .sh2 .tag{font-family:var(--mono);font-size:16px;font-weight:700}
+  .sh2 .pc{font-family:var(--mono);font-size:11px;font-weight:700;background:var(--well);border-radius:6px;padding:3px 8px}
+  .sh2 .vit{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em}
+  .opt{display:flex;align-items:center;gap:12px;min-height:52px;border:1px solid var(--hair2);border-radius:12px;padding:0 14px;margin-top:10px;font-size:14.5px;font-weight:600}
+  .opt .rad{width:20px;height:20px;border-radius:10px;border:1.5px solid var(--hair2);flex:0 0 auto}
+  .opt.on{border-color:var(--ink);border-width:1.5px}
+  .opt.on .rad{border-color:var(--ink);background:radial-gradient(circle at center,var(--ink) 0 6px,transparent 7px)}
+  .opt .hint{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.06em}
+  .shbar{display:flex;gap:10px;margin-top:16px}
+  .shbar .cta.sec{flex:0 0 auto;padding:0 18px}
+  .aud{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:center;padding-top:10px}
+  /* timeline (breeding) */
+  .tl{padding:6px 0 2px}
+  .tl .ev{display:flex;gap:12px;padding:9px 0;align-items:flex-start}
+  .tl .dot{width:10px;height:10px;border-radius:3px;margin-top:4px;flex:0 0 auto;background:var(--well);border:1px solid var(--hair2)}
+  .tl .ev.done .dot{background:var(--green);border-color:var(--green)}
+  .tl .ev.cur .dot{background:var(--card);border:2.5px solid var(--ink)}
+  .tl .ev .t{font-size:13.5px;font-weight:600}
+  .tl .ev .m{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-top:2px}
+  .tl .ev.dim .t{color:var(--ink3);font-weight:500}
+  /* counters (farrowing) */
+  .ctr{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--hair)}
+  .ctr:first-of-type{border-top:none}
+  .ctr .lbl{font-size:13.5px;font-weight:600;flex:1}
+  .ctr .n{font-family:var(--mono);font-size:20px;font-weight:700;width:40px;text-align:center}
+  .ctr .b{width:44px;height:44px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--ink);text-transform:none;letter-spacing:0;padding:0}
+  .ctr .b.plus{background:var(--ink);border-color:var(--ink);color:#fff}
+  /* segmented scale (postpartum) */
+  .fseg{display:flex;background:var(--well);border-radius:10px;padding:3px;margin-top:8px}
+  .fseg span{flex:1;height:40px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--ink2);border-radius:8px}
+  .fseg span.on{background:var(--ink);color:#fff}
+  .flbl{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-top:14px}
+  /* numpad (tag/weigh) */
+  .padwrap{display:flex;gap:12px;margin-top:12px}
+  .pv{min-width:0}
+  .pv{flex:1}
+  .pv .cur{border:1.5px solid var(--ink);border-radius:12px;padding:10px 12px}
+  .pv .cur .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .pv .cur .v{font-family:var(--mono);font-size:22px;font-weight:700;margin-top:2px}
+  .pv .prev{font-family:var(--mono);font-size:10.5px;color:var(--ink3);padding:8px 2px 0;line-height:1.8}
+  .pad{display:grid;grid-template-columns:repeat(3,50px);gap:8px;flex:0 0 auto}
+  .pad span{height:48px;border:1px solid var(--hair2);border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:600}
+  /* checklist (treatments) */
+  .chk{display:flex;align-items:center;gap:12px;min-height:50px;border-top:1px solid var(--hair);font-size:14px;font-weight:600}
+  .chk:first-of-type{border-top:none}
+  .chk .cb{width:22px;height:22px;border:1.5px solid var(--hair2);border-radius:6px}
+  .chk.on .cb{background:var(--ink);border-color:var(--ink);position:relative}
+  .chk.on .cb::after{content:"✓";color:#fff;font-size:13px;position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .chk .who{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink3)}
+  /* filter sheet */
+  .fs{background:var(--card);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid var(--hair);padding:0 16px 18px}
+  .fs .fgrp{padding:14px 0 6px;border-top:1px solid var(--hair)}
+  .fs .fgrp:first-of-type{border-top:none}
+  .fs .fk{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;display:block}
+  .fs .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .fs .chips span{height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--hair2);background:var(--card);display:inline-flex;align-items:center;font-size:13px;font-weight:600;color:var(--ink2)}
+  .fs .chips span.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .fs .fbar{display:flex;gap:10px;margin-top:16px}
+  .fs .fbar .cta.sec{flex:0 0 auto;padding:0 22px}
+  /* collapsible prose */
+  details.more{margin:8px 0 22px;max-width:74ch}
+  details.more>summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);border:1px solid var(--hair2);border-radius:8px;padding:7px 12px;background:var(--card)}
+  details.more>summary::-webkit-details-marker{display:none}
+  details.more>summary::before{content:"+";font-weight:700;color:var(--ink3)}
+  details.more[open]>summary::before{content:"–"}
+  details.more>*:not(summary){margin-top:14px}
+  details.more.wide{max-width:none}
+  table.cfg{table-layout:fixed}
+  table.cfg th:nth-child(1){width:11%} table.cfg th:nth-child(2){width:11%} table.cfg th:nth-child(3){width:11%} table.cfg th:nth-child(4){width:12%} table.cfg th:nth-child(5){width:20%} table.cfg th:nth-child(6){width:11%} table.cfg th:nth-child(7){width:6%}
+  /* variation table */
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--hair);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+  td:first-child{font-weight:700;width:22%}
+  footer{padding:36px 0 72px;color:var(--ink3);font-size:13px}
+  .pgk{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);padding:15px 16px 5px}
+  .pline{display:flex;align-items:baseline;gap:10px;padding:5px 16px;font-size:13.5px}
+  .pline .pl{font-weight:600}
+  .pline .pr{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.03em;white-space:nowrap}
+  .sheet .pgk,.fs .pgk{padding:14px 0 6px}
+  .sheet .pline,.fs .pline{padding:5px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="page">
+  <span class="anno">Sentri · Design system · screens</span>
+  <span class="anno">Synthesis: Panel structure · Ledger temperature · Board discipline</span>
+</header>
+
+<h1>Screens</h1>
+<p class="lede">Every task, every state, rendered. Each one is a configuration of the components in the companion document.</p>
+
+<div class="note" style="max-width:76ch;margin-bottom:24px"><b>Two documents.</b> This is <b>screens</b> — configured instances of the system. Its companion <span class="mono">components.html</span> holds the components and laws they are built from. Section numbers are shared across both files.</div>
+<div class="tokens">
+  <span class="sw"><i style="background:#F7F6F2"></i>ground F7F6F2</span>
+  <span class="sw"><i style="background:#1C1E19"></i>ink 1C1E19</span>
+  <span class="sw"><i style="background:#C2402E"></i>overdue</span>
+  <span class="sw"><i style="background:#D99A21"></i>due·signs</span>
+  <span class="sw"><i style="background:#3E56C4"></i>in&nbsp;progress</span>
+  <span class="sw"><i style="background:#3B8A50"></i>done·positive</span>
+  <span class="sw"><i style="background:#7C7F76"></i>upcoming</span>
+  <span class="sw" style="margin-left:12px">Plus Jakarta Sans · IBM Plex Mono</span>
+</div>
+
+<!-- ================= SCREEN 01 · TASK LISTS — ALL TASKS ================= -->
+<section class="screen" style="display:block">
+  <div class="sec-label" style="margin-bottom:6px">
+    <h2>01 · Task lists — every task through one list</h2>
+    <span class="anno">Header · lens · pen-grouped rows · dock — configured, never forked · swipe →</span>
+  </div>
+  <details class="more"><summary>How this section works</summary>
+  <p style="max-width:74ch;font-size:14px;color:var(--ink2);margin-bottom:22px">All eight production tasks rendered through the same list. What varies is only configuration: the unit KPI in the header, the lens partition, the row&#39;s status vocabulary and optional memory line, and whether rows carry a checkbox (only when the mark is stateless and the bar can express it). Weaning and piglet processing are pen-level — the row is the litter, keyed under its pen and sow. Piglet processing splits its two kinds of work honestly: <b>treatments</b> (iron, drops, teeth, tail, castration — done to a whole litter, no data captured) appear in the memory line as <i>what is left</i> only — done ones are history and live in the record — and are bulk-markable from the bar; <b>tag / notch / weigh</b> is per-piglet data entry, so it is reached by tapping the row: the litter record holds both the treatment checkboxes and the per-piglet tag/weigh page, as production does — never a bar action, never a second row button. Time-boxed tasks (heat 3 d, return-heat 7 d, pregnancy 3 d) show <span class="mono">day n of N</span> under the task overview — the whole-task fact that changes how fast a hand moves. Return-heat is a <b>watch</b> task — the cohort never shrinks and returning is the unwanted outcome — so its progress <i>is</i> days: <span class="mono">3 / 7 days</span> with a seven-segment day gauge, and <span class="mono">2 returned</span> as a side fact, mirroring production&#39;s day dots. Nothing else was invented.</p>
+  </details>
+
+  <div class="caro-hint">← swipe · nine screens →</div>
+  <div class="caro">
+    <div class="slide"><div class="vlabel">Heat check</div>
+<div class="phone" style="display:flex;flex-direction:column;height:860px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2"><div class="u">Heat check</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">07:31</b> · G. Hansen</div></div></div>
+    <div class="ctxbar"><div><span class="k">Unit 4</span><div class="numwrap"><div class="num under"><b>70</b><span>% heat rate</span></div><div class="kspace"></div></div><span class="sub">target ≥ 90%</span></div><div><span class="k">Task overview ›</span><div class="numwrap"><div class="num"><b>62</b><span>/ 100 in heat</span></div><div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><span class="sub">day 2 of 3</span></div></div>
+    <div class="lensrow"><div class="lens"><button class="on">Not in heat <span class="n">38</span></button><button class="">In heat <span class="n">8</span></button><button class="">All <span class="n">46</span></button></div><div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">A2</span><span class="agg">4 of 6 left</span></div>
+      <div class="row"><div class="cb"></div><span class="tag">000254</span><div class="st"><span class="l1">Due · today <span class="b b-amber">signs</span></span><span class="l2">signs 10h · G.H</span></div><div class="rail"></div></div>
+      <div class="row"><div class="cb"></div><span class="tag">000268</span><div class="st"><span class="l1">Due · today</span><span class="l2">weaned 4d</span></div><div class="rail"></div></div>
+      <div class="row dim"><div class="cb"></div><span class="tag">000231</span><div class="st"><span class="l1">Expected · in 5 days</span><span class="l2">weaned 1d</span></div><div class="rail"></div></div>
+      <div class="row"><div class="cb"></div><span class="tag">000275</span><div class="st"><span class="l1">No data</span><span class="l2">weaned 6d</span></div><div class="rail"></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">A3</span><span class="agg">2 of 5 left</span></div>
+      <div class="row"><div class="cb"></div><span class="tag">000302</span><div class="st"><span class="l1">Due · today</span><span class="l2">weaned 4d</span></div><div class="rail"></div></div></div>
+      </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">A2</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+</div>
+    </div>
+    <div class="slide"><div class="vlabel">Return-heat check</div>
+<div class="phone" style="display:flex;flex-direction:column;height:860px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2"><div class="u">Return-heat check</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">07:52</b> · G. Hansen</div></div></div>
+    <div class="ctxbar"><div><span class="k">Unit 4</span><div class="numwrap"><div class="num"><b>5</b><span>% return rate</span></div><div class="kspace"></div></div><span class="sub">target ≤ 5%</span></div><div><span class="k">Task overview ›</span><div class="numwrap"><div class="num"><b>3</b><span>/ 7 days</span></div><div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i></div></div><span class="sub">2 returned</span></div></div>
+    <div class="lensrow"><div class="lens"><button class="on">No return <span class="n">38</span></button><button class="">Returned <span class="n">8</span></button><button class="">All <span class="n">46</span></button></div><div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">A2</span><span class="agg">4 of 6 left</span></div>
+      <div class="row"><div class="cb"></div><span class="tag">000254</span><div class="st"><span class="l1">In window · day 20 <span class="b b-amber">signs</span></span><span class="l2">signs 10h · G.H</span></div><div class="rail"></div></div>
+      <div class="row"><div class="cb"></div><span class="tag">000268</span><div class="st"><span class="l1">In window · day 21</span><span class="l2">2 matings · JY001</span></div><div class="rail"></div></div>
+      <div class="row dim"><div class="cb"></div><span class="tag">000231</span><div class="st"><span class="l1">Expected · window in 5 days</span><span class="l2">2 matings · JY001</span></div><div class="rail"></div></div>
+      <div class="row"><div class="cb"></div><span class="tag">000275</span><div class="st"><span class="l1">No data</span><span class="l2">1 mating · JY001</span></div><div class="rail"></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">A3</span><span class="agg">2 of 5 left</span></div>
+      <div class="row"><div class="cb"></div><span class="tag">000302</span><div class="st"><span class="l1">In window · day 21</span><span class="l2">2 matings · JY001</span></div><div class="rail"></div></div></div>
+      </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">A2</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+</div>
+    </div>
+    <div class="slide"><div class="vlabel">Pregnancy check</div>
+<div class="phone" style="display:flex;flex-direction:column;height:860px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2"><div class="u">Pregnancy check</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">08:10</b> · G. Hansen</div></div></div>
+    <div class="ctxbar"><div><span class="k">Unit 6</span><div class="numwrap"><div class="num"><b>95</b><span>% pregnant</span></div><div class="kspace"></div></div><span class="sub">target ≥ 90%</span></div><div><span class="k">Task overview ›</span><div class="numwrap"><div class="num"><b>100</b><span>/ 200 checked</span></div><div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><span class="sub">day 1 of 3</span></div></div>
+    <div class="lensrow"><div class="lens"><button class="on">Unchecked <span class="n">100</span></button><button class="">Checked <span class="n">100</span></button><button class="">All <span class="n">200</span></button></div><div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">A1</span><span class="agg">26 of 52 left</span></div>
+      <div class="row"><div class="cb"></div><span class="tag">000268</span><div class="st"><span class="l1">Mated · 28 days ago</span><span class="l2">1st check</span></div><div class="rail"></div></div>
+      <div class="row"><div class="cb"></div><span class="tag">000231</span><div class="st"><span class="l1">Recheck · due today</span><span class="l2">unclear Jul 5 · G.H</span></div><div class="rail"></div></div>
+      <div class="row dim done"><span class="tag">000318</span><div class="st"><span class="l1">Pregnant · Jul 8</span><span class="l2">1st check · G.H</span></div><div class="rail"><div class="edit">✎</div></div></div>
+      <div class="row dim done"><span class="tag">000325</span><div class="st"><span class="l1">Not pregnant · Jul 8</span><span class="l2">1st check · G.H</span></div><div class="rail"><div class="edit">✎</div></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">A2</span><span class="agg">20 of 50 left</span></div>
+      <div class="row"><div class="cb"></div><span class="tag">000340</span><div class="st"><span class="l1">Mated · 25 days ago</span><span class="l2">1st check</span></div><div class="rail"></div></div></div>
+      </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">A1</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+</div>
+    </div>
+    <div class="slide"><div class="vlabel">Breeding</div>
+<div class="phone" style="display:flex;flex-direction:column;height:860px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2"><div class="u">Breeding</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last mating <b style="color:var(--ink2);font-weight:600">07:14</b> · G. Hansen</div></div></div>
+    <div class="ctxbar"><div><span class="k">Unit 4</span><div class="num"><b>1</b><span>h heat → mating</span></div><span class="sub">target ≤ 12 h</span></div><div><span class="k">Task overview ›</span><div class="num"><b>32</b><span>mated</span></div><span class="sub">14 to mate · queue</span></div></div>
+    <div class="lensrow"><div class="lens"><button class="on">Open <span class="n">14</span></button><button class="">Done <span class="n">32</span></button><button class="">All <span class="n">46</span></button></div><div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">A1</span><span class="agg">3 of 6 open</span></div>
+      <div class="row"><span class="tag">000268</span><div class="st"><span class="l1">Mating 2</span><span class="l2">last 2d</span></div><div class="rail"><span class="word s-green">READY</span><span class="chev">›</span></div></div>
+      <div class="row"><span class="tag">000254</span><div class="st"><span class="l1">Mating 2 <span class="b b-amber">last 5h</span></span><span class="l2">in heat 6h</span></div><div class="rail"><span class="word s-green">READY</span><span class="chev">›</span></div></div>
+      <div class="row"><span class="tag">000287</span><div class="st"><span class="l1">Mating 2</span><span class="l2">next 9h</span></div><div class="rail"><span class="word s-gray">WAIT</span><span class="chev">›</span></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">A2</span><span class="agg">5 of 8 open</span></div>
+      <div class="row"><span class="tag">000311</span><div class="st"><span class="l1">Mating 1</span><span class="l2">in heat 1h</span></div><div class="rail"><span class="word s-green">READY</span><span class="chev">›</span></div></div>
+      <div class="row dim done"><span class="tag">000243</span><div class="st"><span class="l1">Done · 2 matings</span><span class="l2">JY001 · 07:14 · G.H</span></div><div class="rail"><div class="edit">✎</div></div></div></div>
+      </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">A1</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+</div>
+    </div>
+    <div class="slide"><div class="vlabel">Farrowing</div>
+<div class="phone" style="display:flex;flex-direction:column;height:860px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2"><div class="u">Farrowing</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last record <b style="color:var(--ink2);font-weight:600">23:00</b> · G. Hansen</div></div></div>
+    <div class="ctxbar"><div><span class="k">Unit 7</span><div class="num under"><b>10</b><span>live / litter</span></div><span class="sub">target 12</span></div><div><span class="k">Task overview ›</span><div class="num"><b>2</b><span>farrowing</span></div><span class="sub">9 awaiting · queue</span></div></div>
+    <div class="lensrow"><div class="lens"><button class="">Awaiting <span class="n">9</span></button><button class="on">Active <span class="n">2</span></button><button class="">Done <span class="n">8</span></button><button class="">All <span class="n">19</span></button></div><div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">B1</span><span class="agg">1 farrowing</span></div>
+      <div class="row"><span class="tag">000418</span><div class="st"><span class="l1">8 piglets <span class="b b-amber">last 45m</span></span><span class="l2">started 6h · parity 3</span></div><div class="rail"><span class="word s-blue">ACTIVE</span><span class="chev">›</span></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">B2</span><span class="agg">1 farrowing</span></div>
+      <div class="row"><span class="tag">000392</span><div class="st"><span class="l1">3 piglets</span><span class="l2">started 1h · last 12m</span></div><div class="rail"><span class="word s-blue">ACTIVE</span><span class="chev">›</span></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">B3</span><span class="agg">done</span></div>
+      <div class="row dim done"><span class="tag">000406</span><div class="st"><span class="l1">Done · 11 piglets</span><span class="l2">final 05:58 · G.H</span></div><div class="rail"><div class="edit">✎</div></div></div></div>
+      </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">B1</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+</div>
+    </div>
+    <div class="slide"><div class="vlabel">Postpartum check</div>
+<div class="phone" style="display:flex;flex-direction:column;height:860px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2"><div class="u">Postpartum check</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">09:00</b> · G. Hansen</div></div></div>
+    <div class="ctxbar"><div><span class="k">Unit 7</span><div class="numwrap"><div class="num"><b>90</b><span>% pass</span></div><div class="kspace"></div></div><span class="sub">target ≥ 90%</span></div><div><span class="k">Task overview ›</span><div class="numwrap"><div class="num"><b>100</b><span>/ 200 checked</span></div><div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><span class="sub">day 1 of 3</span></div></div>
+    <div class="lensrow"><div class="lens"><button class="on">Unchecked <span class="n">40</span></button><button class="">Checked <span class="n">60</span></button><button class="">All <span class="n">100</span></button></div><div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">B1</span><span class="agg">1 sow</span></div>
+      <div class="row"><span class="tag">000418</span><div class="st"><span class="l1">Farrowed · 2 days ago</span><span class="l2">parity 3 · 11 born</span></div><div class="rail"><span class="word s-green">CHECK</span><span class="chev">›</span></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">B2</span><span class="agg">1 sow</span></div>
+      <div class="row"><span class="tag">000392</span><div class="st"><span class="l1">Farrowed · 1 day ago</span><span class="l2">parity 2 · 9 born</span></div><div class="rail"><span class="word s-gray">IN 3D</span><span class="chev">›</span></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">B3</span><span class="agg">done</span></div>
+      <div class="row dim done"><span class="tag">000406</span><div class="st"><span class="l1">Checked · ok</span><span class="l2">BCS 3 · milk ok · 09:00 G.H</span></div><div class="rail"><div class="edit">✎</div></div></div></div>
+      </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">B1</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+</div>
+    </div>
+    <div class="slide"><div class="vlabel">Weaning check</div>
+<div class="phone" style="display:flex;flex-direction:column;height:860px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2"><div class="u">Weaning check</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">10:20</b> · G. Hansen</div></div></div>
+    <div class="ctxbar"><div><span class="k">Unit 7</span><div class="numwrap"><div class="num"><b>10</b><span>kg avg wean</span></div><div class="kspace"></div></div><span class="sub">target by day-age</span></div><div><span class="k">Task overview ›</span><div class="numwrap"><div class="num"><b>100</b><span>/ 200 pens</span></div><div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><span class="sub">day 3 window</span></div></div>
+    <div class="lensrow"><div class="lens"><button class="on">Unchecked <span class="n">100</span></button><button class="">Checked <span class="n">100</span></button><button class="">All <span class="n">200</span></button></div><div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">B1</span><span class="agg">1 litter</span></div>
+      <div class="row"><span class="tag">000418</span><div class="st"><span class="l1">20 piglets · day 21</span><span class="l2">parity 3</span></div><div class="rail"><span class="word s-green">CHECK</span><span class="chev">›</span></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">B2</span><span class="agg">1 litter</span></div>
+      <div class="row"><span class="tag">000392</span><div class="st"><span class="l1">18 piglets · day 21</span><span class="l2">parity 2</span></div><div class="rail"><span class="word s-green">CHECK</span><span class="chev">›</span></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">B3</span><span class="agg">done</span></div>
+      <div class="row dim done"><span class="tag">000406</span><div class="st"><span class="l1">Checked · 5 kept</span><span class="l2">20 head · 8.9 kg · 10:20 G.H</span></div><div class="rail"><div class="edit">✎</div></div></div></div>
+      </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">B1</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+</div>
+    </div>
+    <div class="slide"><div class="vlabel">Piglet processing</div>
+<div class="phone" style="display:flex;flex-direction:column;height:860px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2"><div class="u">Piglet processing</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last record <b style="color:var(--ink2);font-weight:600">08:40</b> · G. Hansen</div></div></div>
+    <div class="ctxbar"><div><span class="k">Unit 7</span><div class="numwrap"><div class="num"><b>90</b><span>% on time</span></div><div class="kspace"></div></div><span class="sub">target ≥ 90%</span></div><div><span class="k">Task overview ›</span><div class="numwrap"><div class="num"><b>100</b><span>/ 200 pens</span></div><div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><span class="sub">day 3 window</span></div></div>
+    <div class="lensrow"><div class="lens"><button class="on">Due today <span class="n">60</span></button><button class="">Done <span class="n">100</span></button><button class="">All <span class="n">200</span></button></div><div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">B1</span><span class="agg">3 litters</span></div>
+      <div class="row"><div class="cb"></div><span class="tag">000221</span><div class="st"><span class="l1">12 piglets · day 3</span><span class="l2">teeth · tail · castrate · tag/weigh</span></div><div class="rail"></div></div>
+      <div class="row"><div class="cb"></div><span class="tag">000228</span><div class="st"><span class="l1">11 piglets · day 3</span><span class="l2">tail · castrate</span></div><div class="rail"></div></div>
+      <div class="row dim done"><span class="tag">000234</span><div class="st"><span class="l1">All done · 9 piglets</span></div><div class="rail"><div class="edit">✎</div></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">B2</span><span class="agg">2 litters</span></div>
+      <div class="row"><div class="cb"></div><span class="tag">000240</span><div class="st"><span class="l1">10 piglets · day 5</span><span class="l2">drops · tag/weigh</span></div><div class="rail"></div></div></div>
+      </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">B1</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+</div>
+    </div>
+    <div class="slide"><div class="vlabel">Piglet processing · selecting</div>
+<div class="phone" style="display:flex;flex-direction:column;height:860px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2"><div class="u">Piglet processing</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last record <b style="color:var(--ink2);font-weight:600">08:40</b> · G. Hansen</div></div></div>
+    <div class="ctxbar"><div><span class="k">Unit 7</span><div class="numwrap"><div class="num"><b>90</b><span>% on time</span></div><div class="kspace"></div></div><span class="sub">target ≥ 90%</span></div><div><span class="k">Task overview ›</span><div class="numwrap"><div class="num"><b>100</b><span>/ 200 pens</span></div><div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><span class="sub">day 3 window</span></div></div>
+    <div class="lensrow"><div class="lens"><button class="on">Due today <span class="n">60</span></button><button class="">Done <span class="n">100</span></button><button class="">All <span class="n">200</span></button></div><div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">B1</span><span class="agg">3 litters</span></div>
+      <div class="row"><div class="cb on"></div><span class="tag">000221</span><div class="st"><span class="l1">12 piglets · day 3</span><span class="l2">teeth · tail · castrate · tag/weigh</span></div><div class="rail"></div></div>
+      <div class="row"><div class="cb on"></div><span class="tag">000228</span><div class="st"><span class="l1">11 piglets · day 3</span><span class="l2">tail · castrate</span></div><div class="rail"></div></div>
+      <div class="row dim done"><span class="tag">000234</span><div class="st"><span class="l1">All done · 9 piglets</span></div><div class="rail"><div class="edit">✎</div></div></div></div>
+      </div>
+    <div class="bar"><div class="selinfo"><span class="x">✕</span> 2 selected</div><button class="cta" style=flex:1>Mark treatments…</button></div>
+</div>
+    </div>
+  </div>
+  <details class="more wide"><summary>Configuration per task</summary>
+    <table class="cfg"><thead><tr><th>Task</th><th>Unit KPI</th><th>Overview</th><th>Lens</th><th>Row · line 1</th><th>Line 2</th><th>Box</th><th>Bar on select</th></tr></thead><tbody>
+    <tr><td>Heat check</td><td>70% heat rate · ≥90</td><td>62/100 in heat</td><td>Not in heat / In heat / All</td><td>Due · today / in N days · No data [SIGNS flag]</td><td>weaned Nd · signs trail</td><td>yes · rail empty</td><td>Signs · Mark in heat</td></tr>
+    <tr><td>Return-heat</td><td>5% return · ≤5</td><td>3/7 days · 2 returned (watch: progress = days)</td><td>No return / Returned / All</td><td>In window · day N / Window · in N days [SIGNS flag]</td><td>N matings · batch · signs trail</td><td>yes · rail empty</td><td>Signs · Mark returned</td></tr>
+    <tr><td>Pregnancy</td><td>95% pregnant · ≥90</td><td>100/200 checked · day n of 3</td><td>Unchecked / Checked / All (+ outcome sub-lens)</td><td>Mated · N days ago / Recheck · due today / Pregnant / Not pregnant</td><td>nth check · unclear trail</td><td>yes · rail empty (✎ on done)</td><td>Pregnant · Not pregnant · Unclear — bulk on all three outcomes is a product decision (confirmed): the checker reads several sows in a row and marks them together</td></tr>
+    <tr><td>Breeding</td><td>1h heat→mating · ≤12h</td><td>32 mated · 14 to mate</td><td>Open / Mated / All</td><td>Mating n [interval] · Done · N matings — rail READY / WAIT / ✎</td><td>last Nd · next Nh · in heat Nh / stamps on done</td><td>no</td><td>—</td></tr>
+    <tr><td>Farrowing</td><td>10 live/litter · 12</td><td>2 farrowing · 9 awaiting</td><td>Awaiting / Active / Done / All</td><td>N piglets [LAST Nm] · Due today · Done · N piglets</td><td>started Nh · last Nm · parity / stamps on done</td><td>no</td><td>—</td></tr>
+    <tr><td>Postpartum</td><td>90% pass · ≥90</td><td>100/200 checked · day n of 3</td><td>Unchecked / Checked / All</td><td>Farrowed N days ago · Checked · ok — rail CHECK / IN Nd / ✎</td><td>parity · N born / BCS · milk · who</td><td>no</td><td>—</td></tr>
+    <tr><td>Weaning</td><td>10 kg avg</td><td>100/200 pens · day window</td><td>Unchecked / Checked / All</td><td>N piglets · day N · Checked · N kept — rail CHECK / ✎</td><td>parity / N head · kg · who</td><td>no</td><td>—</td></tr>
+    <tr><td>Piglet proc.</td><td>90% on time · ≥90</td><td>100/200 pens · day window</td><td>Due today / Done / All</td><td>N piglets · day N · All done</td><td>remaining treatments incl. tag/weigh</td><td>yes (litter) · rail empty</td><td>Mark treatments… — tag/weigh is never a bar action; tap the row to open the litter record, where treatment checkboxes and the per-piglet tag/weigh page both live</td></tr>
+  </tbody></table>
+  </details>
+</section>
+
+<!-- ================= SCREEN 03 · TASK DETAIL SHEET ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>03 · Task detail — the sheet behind the strip, every task</h2>
+    <span class="anno">Tap the task overview cell · everything that failed the pen test lives here · swipe →</span>
+  </div>
+
+  <div class="caro-hint">← swipe · eight tasks →</div>
+  <div class="caro">
+    <div class="slide"><div class="vlabel">Heat check</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:860px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Heat check</div></div></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sh"><span class="t">Heat check</span><span class="x">Batch wk 32 · day 2 of 7</span></div>
+        <div class="sec" style="border-top:none;padding-top:0">
+          <div class="pgk">Progress · whole task</div>
+          <div class="kpi"><span class="n" style="color:var(--green)">62</span><span class="u">/ 100 in heat</span><span class="tgt">3 units · target 100</span></div>
+          <div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="pline" style="padding-top:10px"><span class="pl">Unit 4 · Unit 5 · Unit 6</span><span class="pr">8 · 31 · 23</span></div>
+        </div>
+        <div class="sec">
+          <div class="pgk">KPI</div>
+<div class="kpi"><span class="n">70</span><span class="u">% heat rate</span><span class="tgt">target ≥ 90%</span></div>        </div>
+        <div class="sec">
+          <div class="pgk">Configuration</div>
+<div class="pline"><span class="pl">Checks per day</span><span class="pr">2 · 08:00 · 16:00</span></div><div class="pline"><span class="pl">Task window</span><span class="pr">7 d · Jul 5 – Jul 11</span></div>        </div>
+        <div class="rowlink">SOP · Heat check <span class="chev">›</span></div>
+        <div class="endtask">End task</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Return-heat check</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:860px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Return-heat check</div></div></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sh"><span class="t">Return-heat check</span><span class="x">Batch wk 32 · day 3 of 7</span></div>
+        <div class="sec" style="border-top:none;padding-top:0">
+          <div class="pgk">Progress · whole task</div>
+          <div class="kpi"><span class="n" style="color:var(--green)">3</span><span class="u">/ 7 days</span><span class="tgt">2 units</span></div>
+          <div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i></div>
+          <div class="pline" style="padding-top:10px"><span class="pl">Returned · Unit 4 · Unit 6</span><span class="pr">1 · 1</span></div>
+        </div>
+        <div class="sec">
+          <div class="pgk">KPI</div>
+<div class="kpi"><span class="n">5</span><span class="u">% return rate</span><span class="tgt">target ≤ 5%</span></div>        </div>
+        <div class="sec">
+          <div class="pgk">Configuration</div>
+<div class="pline"><span class="pl">Starts</span><span class="pr">day 18 after mating</span></div><div class="pline"><span class="pl">Checks per day</span><span class="pr">2 · 08:00 · 12:00</span></div><div class="pline"><span class="pl">Task window</span><span class="pr">7 d · Jul 1 – Jul 7</span></div>        </div>
+        <div class="rowlink">SOP · Return-heat check <span class="chev">›</span></div>
+        <div class="endtask">End task</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Pregnancy check</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:860px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Pregnancy check</div></div></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sh"><span class="t">Pregnancy check</span><span class="x">Batch wk 32 · day 1 of 3</span></div>
+        <div class="sec" style="border-top:none;padding-top:0">
+          <div class="pgk">Progress · whole task</div>
+          <div class="kpi"><span class="n" style="color:var(--green)">100</span><span class="u">/ 200 checked</span><span class="tgt">2 units</span></div>
+          <div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="pline" style="padding-top:10px"><span class="pl">Unit 6 · Unit 7</span><span class="pr">60 · 40</span></div>
+        </div>
+        <div class="sec">
+          <div class="pgk">KPI</div>
+<div class="kpi"><span class="n">95</span><span class="u">% pregnant</span><span class="tgt">target ≥ 90%</span></div>        </div>
+        <div class="sec">
+          <div class="pgk">Configuration</div>
+<div class="pline"><span class="pl">This sweep</span><span class="pr">2nd check · day 20 after mating</span></div><div class="pline"><span class="pl">Task window</span><span class="pr">3 d · Jul 8 – Jul 10</span></div>        </div>
+        <div class="rowlink">SOP · Pregnancy check <span class="chev">›</span></div>
+        <div class="endtask">End task</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Breeding</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:860px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Breeding</div></div></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sh"><span class="t">Breeding</span><span class="x">Batch wk 32 · queue</span></div>
+        <div class="sec" style="border-top:none;padding-top:0">
+          <div class="pgk">Progress · whole task</div>
+          <div class="kpi"><span class="n" style="color:var(--green)">32</span><span class="u">mated</span><span class="tgt">14 open · 2 units</span></div>
+          
+          <div class="pline" style="padding-top:10px"><span class="pl">Unit 4 · Unit 5</span><span class="pr">20 · 12</span></div>
+        </div>
+        <div class="sec">
+          <div class="pgk">KPI</div>
+<div class="kpi"><span class="n">1</span><span class="u">h heat → mating</span><span class="tgt">target ≤ 12 h</span></div>        </div>
+        <div class="sec">
+          <div class="pgk">Configuration</div>
+<div class="pline"><span class="pl">Matings per sow</span><span class="pr">2</span></div><div class="pline"><span class="pl">Mating interval</span><span class="pr">24 h</span></div><div class="pline"><span class="pl">Task window</span><span class="pr">7 d · Jul 5 – Jul 11</span></div>        </div>
+        <div class="rowlink">SOP · Breeding <span class="chev">›</span></div>
+        <div class="aud" style="padding:14px 0 4px;white-space:normal">closes itself · record by record · no end action</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Farrowing</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:860px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sh"><span class="t">Farrowing</span><span class="x">Unit 7 · standing</span></div>
+        <div class="sec" style="border-top:none;padding-top:0">
+          <div class="pgk">Progress · whole task</div>
+          <div class="kpi"><span class="n" style="color:var(--green)">2</span><span class="u">farrowing</span><span class="tgt">9 awaiting · 8 done</span></div>
+          
+          <div class="pline" style="padding-top:10px"><span class="pl">Awaiting · Active · Done</span><span class="pr">9 · 2 · 8</span></div>
+        </div>
+        <div class="sec">
+          <div class="pgk">KPI</div>
+<div class="kpi"><span class="n">10</span><span class="u">live / litter</span><span class="tgt">target 12</span></div>        </div>
+        <div class="sec">
+          <div class="pgk">Configuration</div>
+<div class="pline"><span class="pl">Due</span><span class="pr">day 115 after mating</span></div><div class="pline"><span class="pl">Watch</span><span class="pr">interval alert · 30 min</span></div>        </div>
+        <div class="rowlink">SOP · Farrowing <span class="chev">›</span></div>
+        <div class="aud" style="padding:14px 0 4px;white-space:normal">closes itself · record by record · no end action</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Postpartum check</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:860px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Postpartum check</div></div></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sh"><span class="t">Postpartum check</span><span class="x">Unit 7 · day 1 of 3</span></div>
+        <div class="sec" style="border-top:none;padding-top:0">
+          <div class="pgk">Progress · whole task</div>
+          <div class="kpi"><span class="n" style="color:var(--green)">100</span><span class="u">/ 200 checked</span><span class="tgt">1 unit</span></div>
+          <div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="pline" style="padding-top:10px"><span class="pl">Unit 7</span><span class="pr">100</span></div>
+        </div>
+        <div class="sec">
+          <div class="pgk">KPI</div>
+<div class="kpi"><span class="n">90</span><span class="u">% pass</span><span class="tgt">target ≥ 90%</span></div>        </div>
+        <div class="sec">
+          <div class="pgk">Configuration</div>
+<div class="pline"><span class="pl">Starts</span><span class="pr">1 day after farrowing</span></div><div class="pline"><span class="pl">Task window</span><span class="pr">3 d · Jul 9 – Jul 11</span></div>        </div>
+        <div class="rowlink">SOP · Postpartum check <span class="chev">›</span></div>
+        <div class="endtask">End task</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Weaning check</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:860px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Weaning check</div></div></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sh"><span class="t">Weaning check</span><span class="x">Unit 7 · day window</span></div>
+        <div class="sec" style="border-top:none;padding-top:0">
+          <div class="pgk">Progress · whole task</div>
+          <div class="kpi"><span class="n" style="color:var(--green)">100</span><span class="u">/ 200 pens</span><span class="tgt">1 unit</span></div>
+          <div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="pline" style="padding-top:10px"><span class="pl">Unit 7</span><span class="pr">100</span></div>
+        </div>
+        <div class="sec">
+          <div class="pgk">KPI</div>
+<div class="kpi"><span class="n">10</span><span class="u">kg avg wean</span><span class="tgt">by day-age</span></div><div class="kpi"><span class="n">90</span><span class="u">% survival</span><span class="tgt">target ≥ 90%</span></div>        </div>
+        <div class="sec">
+          <div class="pgk">Configuration</div>
+<div class="pline"><span class="pl">Starts</span><span class="pr">weaning day · day 21</span></div><div class="pline"><span class="pl">Records</span><span class="pr">litter + sow status</span></div>        </div>
+        <div class="rowlink">SOP · Weaning check <span class="chev">›</span></div>
+        <div class="endtask">End task</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Piglet processing</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:860px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Piglet processing</div></div></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sh"><span class="t">Piglet processing</span><span class="x">Unit 7 · day 3 window</span></div>
+        <div class="sec" style="border-top:none;padding-top:0">
+          <div class="pgk">Progress · whole task</div>
+          <div class="kpi"><span class="n" style="color:var(--green)">100</span><span class="u">/ 200 pens</span><span class="tgt">1 unit</span></div>
+          <div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="pline" style="padding-top:10px"><span class="pl">Unit 7</span><span class="pr">100</span></div>
+        </div>
+        <div class="sec">
+          <div class="pgk">KPI</div>
+<div class="kpi"><span class="n">90</span><span class="u">% on time</span><span class="tgt">target ≥ 90%</span></div>        </div>
+        <div class="sec">
+          <div class="pgk">Configuration</div>
+<div class="pline"><span class="pl">Day 1</span><span class="pr">cord · drops</span></div><div class="pline"><span class="pl">Day 3</span><span class="pr">teeth · tail · iron · castrate</span></div><div class="pline"><span class="pl">Day 5</span><span class="pr">tag / notch / weigh</span></div><div class="pline"><span class="pl">Day 7</span><span class="pr">health</span></div>        </div>
+        <div class="rowlink">SOP · Piglet processing <span class="chev">›</span></div>
+        <div class="endtask">End task</div>
+      </div>
+    </div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="note"><div class="pgk">The filter</div><b>One question decides the strip vs the sheet</b>
+      <p><i>Does this change what a hand does at the pen right now?</i> Only whole-task progress
+      passes — so only that is on the room screen. KPI, configuration, SOP, status legend and
+      End task all fail it, and all live here, one tap away. The sheet exists so nothing has to
+      leak upward.</p></div>
+    <div class="note"><div class="pgk">Structure</div><b>Production's 任务详情, compressed</b>
+      <p>Same sections as production, in the same order — progress, KPI, configuration, SOP,
+      end — as a bottom sheet over the room: the worker never leaves the pen list. Production&#39;s
+      状态说明 legend is retired — the rows&#39; status words and 01b&#39;s grammar made it dead weight.
+      Numbers are mono and large; labels quiet; SOP is a link. The per-unit split is the one
+      addition, because it is how Unit B knows Unit A is done. Configuration is the task&#39;s own
+      shape: cadence and window for sweeps, sequence rules for breeding, the treatment schedule
+      by day-age for piglets.</p></div>
+    <div class="note"><div class="pgk">End task</div><b>Where completion actually lives</b>
+      <p>Bordered red, at the bottom of the sheet — reachable, never accidental, and one level
+      above any room. Sweep tasks show it always; standing tasks (heat check) show it as the
+      supervisor's stop; event tasks (breeding, farrowing) never show it — they close themselves
+      record by record.</p></div>
+    <div class="note"><div class="pgk">Copy</div><b>Names the batch, not "task"</b>
+      <p>Header reads "Batch wk 32 · day 1 of 7". "Task" was a system word; the batch is what
+      the farmer calls it. The room strip drops the word too — "62 / 100 in heat · 3 rooms" is
+      unambiguous once the destination is this sheet.</p></div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 04b · INTERACTIONS ================= -->
+<section class="screen" style="display:block">
+  <div class="sec-label" style="margin-bottom:6px">
+    <h2>04b · Interactions — the events, as configurations</h2>
+    <span class="anno">Low-fi plan · what each hand-action looks like · to be rendered after agreement</span>
+  </div>
+  <details class="more"><summary>About this section</summary>
+  <p style="max-width:74ch;font-size:14px;color:var(--ink2);margin-bottom:18px">Section 01 shows the lists at rest. This section is what happens when a hand touches them. Each interaction below is one screen state; the plan lists them per interaction with the surface it lives on and what it commits. Nothing here invents a new control — every state is the list, the bar, a sheet, or a record page.</p>
+  </details>
+
+  <details class="more wide"><summary>The interaction plan</summary>
+    <table style="margin-bottom:8px"><thead><tr><th style="width:18%">Interaction</th><th style="width:20%">Trigger</th><th>What the screen shows</th><th style="width:22%">Commits</th><th style="width:14%">Tasks</th></tr></thead><tbody>
+    <tr><td>Select → bulk mark</td><td>tick a box (or scan)</td><td>dock → action bar: <span class="mono">✕ n selected · [outcome] · [outcome]</span>; rows stay in place; on tap the marked rows move lens, bar clears, dock returns</td><td>the mark, per selected row</td><td>heat · return · pregnancy · piglet (treatments)</td></tr>
+    <tr><td>Scan into selection</td><td>Scan ear tag</td><td>list jumps to the sow&#39;s pen (header pinned), her box ticks, brief <span class="mono">scanned</span> mark, action bar rises — identical to a tapped box (04b)</td><td>nothing until an action is tapped</td><td>all box tasks; no-box tasks open the sow&#39;s sheet</td></tr>
+    <tr><td>Row → outcome sheet</td><td>tap row body</td><td>bottom sheet: sow header (tag · pen · vitals) · outcome radios with the task&#39;s status vocabulary · note · <span class="mono">Confirm</span> and <span class="mono">Confirm &amp; next</span> (advances to the next row needing a hand in this pen)</td><td>one outcome for one sow</td><td>heat · return · pregnancy · postpartum</td></tr>
+    <tr><td>Row → sequence record</td><td>tap row body</td><td>sheet: sow header · mating timeline (1 of 2 done, last …) · semen batch pick · interval warning if any · <span class="mono">Confirm mating</span></td><td>one mating with batch</td><td>breeding</td></tr>
+    <tr><td>Row → live record</td><td>tap row body</td><td>page: sow header · counters (live / weak / deformed / stillborn / mummified) with steppers · interval since last · <span class="mono">Save</span> (keeps farrowing open) · <span class="mono">Finish farrowing</span></td><td>increments; final closes</td><td>farrowing</td></tr>
+    <tr><td>Row → assessment form</td><td>tap row body</td><td>page: sow header · segmented scales (BCS 1–5) · toggles (mastitis, milk, discharge, feeding, mobility) · backfat · notes · cull recommendation · <span class="mono">Save</span></td><td>one assessment</td><td>postpartum · weaning (sow half)</td></tr>
+    <tr><td>Row → litter record</td><td>tap row body</td><td>page: litter header · count · sex split · kept · avg weight · <span class="mono">Save</span></td><td>one litter record</td><td>weaning</td></tr>
+    <tr><td>Row → tag / weigh</td><td>tap <span class="mono">⚖ tag</span></td><td>page: piglet-by-piglet entry — tag number · notch · weight, number pad, <span class="mono">Next piglet</span> · running list · <span class="mono">Done</span></td><td>per-piglet records</td><td>piglet processing</td></tr>
+    <tr><td>Bulk treatments</td><td>action bar → <span class="mono">Mark treatments…</span></td><td>sheet listing the day&#39;s treatments with checkboxes; applies to every selected litter</td><td>treatments per litter</td><td>piglet processing</td></tr>
+    <tr><td>Filter</td><td>funnel</td><td>sheet: time dimension chips + task extras; on confirm the lens counts shrink and one grey line states the filter (01c)</td><td>view only</td><td>all</td></tr>
+    <tr><td>Edit a done row</td><td>tap ✎</td><td>the same sheet/page, pre-filled, with an audit line (who · when); <span class="mono">Save</span> writes a correction</td><td>correction, audited</td><td>all</td></tr>
+  </tbody></table>
+  </details>
+  <div class="caro-hint">← swipe · nine interactions →</div>
+  <div class="caro">
+    <div class="slide"><div class="vlabel">Bulk mark — tap checkboxes → bar rises</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:880px">
+      <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2"><div class="u">Heat check</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">07:31</b> · G. Hansen</div></div></div>
+      <div class="lensrow"><div class="lens"><button class="on">Not in heat <span class="n">38</span></button><button>In heat <span class="n">8</span></button><button>All <span class="n">46</span></button></div><div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div></div>
+      <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">A2</span><span class="agg">4 of 6 left</span></div>
+      <div class="row"><div class="cb on"></div><span class="tag">000254</span><div class="st"><span class="l1">Due · today <span class="b b-amber">signs</span></span><span class="l2">signs 10h · G.H</span></div><div class="rail"></div></div>
+      <div class="row"><div class="cb on"></div><span class="tag">000268</span><div class="st"><span class="l1">Due · today</span><span class="l2">weaned 4d</span></div><div class="rail"></div></div>
+      <div class="row dim"><div class="cb"></div><span class="tag">000231</span><div class="st"><span class="l1">Expected · in 5 days</span><span class="l2">weaned 1d</span></div><div class="rail"></div></div></div>
+      </div>
+      <div class="bar"><div class="selinfo"><span class="x">✕</span> 2 selected</div><button class="cta sec">Signs</button><button class="cta" style="flex:1">Mark in heat</button></div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Outcome sheet — tap the row body (not the box)</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:740px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Heat check</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs">
+        <div class="grab"></div>
+        <div class="sh2"><span class="pc">A2</span><span class="tag">000254</span><span class="vit">parity 3 · 650d</span></div>
+        <div class="opt"><span class="rad"></span>Heat signs<span class="hint">watch · stays</span></div>
+        <div class="opt on"><span class="rad"></span>In heat<span class="hint">→ breeding</span></div>
+        <div class="shbar"><button class="cta sec">Confirm</button><button class="cta" style="flex:1">Confirm & next</button></div>
+        <div class="aud">next: 000268 · same pen</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Breeding sequence — tap the row body</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:740px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Breeding</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs">
+        <div class="grab"></div>
+        <div class="sh2"><span class="pc">A1</span><span class="tag">000268</span><span class="vit">parity 3 · in heat 1h</span></div>
+        <div class="tl">
+          <div class="ev done"><span class="dot"></span><div><div class="t">Mating 1</div><div class="m">Jul 7 · JY001 · G.H</div></div></div>
+          <div class="ev cur"><span class="dot"></span><div><div class="t">Mating 2 · now</div><div class="m">batch <b style="color:var(--ink)">JY001</b> · change ›</div></div></div>
+          <div class="ev dim"><span class="dot"></span><div><div class="t">Mating 3</div><div class="m">if return</div></div></div>
+        </div>
+        <div class="shbar"><button class="cta" style="flex:1">Confirm mating 2</button></div>
+        <div class="aud">commits on confirm · edits audited</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Farrowing live record — tap the row body</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:880px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs">
+        <div class="grab"></div>
+        <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">started 6h · parity 3</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 2px 4px"><span style="font-family:var(--mono);font-size:22px;font-weight:700">8 <span style="font-size:12px;color:var(--ink3);font-weight:500">piglets</span></span><span class="b b-amber">last 45m</span></div>
+        <div class="ctr"><span class="lbl">Live</span><span class="b">−</span><span class="n">7</span><span class="b plus">+</span></div>
+        <div class="ctr"><span class="lbl">Weak</span><span class="b">−</span><span class="n">1</span><span class="b plus">+</span></div>
+        <div class="ctr"><span class="lbl">Deformed</span><span class="b">−</span><span class="n">0</span><span class="b plus">+</span></div>
+        <div class="ctr"><span class="lbl">Stillborn</span><span class="b">−</span><span class="n">0</span><span class="b plus">+</span></div>
+        <div class="ctr"><span class="lbl">Mummified</span><span class="b">−</span><span class="n">0</span><span class="b plus">+</span></div>
+        <div class="shbar"><button class="cta sec">Finish farrowing</button><button class="cta" style="flex:1">Save</button></div>
+        <div class="aud">save keeps her active · finish closes the litter</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Postpartum assessment — tap the row body</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:880px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Postpartum</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs">
+        <div class="grab"></div>
+        <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">farrowed 2d · 11 born</span></div>
+        <div class="flbl">Body condition</div><div class="fseg"><span>1</span><span>2</span><span class="on">3</span><span>4</span><span>5</span></div>
+        <div class="flbl">Mastitis</div><div class="fseg"><span class="on">None</span><span>Mild</span><span>Severe</span></div>
+        <div class="flbl">Feeding</div><div class="fseg"><span class="on">Normal</span><span>Reduced</span><span>Refusing</span></div>
+        <div class="flbl">Cull recommendation</div><div class="fseg"><span class="on">No</span><span>Recommend</span></div>
+        <div class="shbar"><button class="cta" style="flex:1">Save check</button></div>
+        <div class="aud">full form: milk · discharge · mobility · backfat · notes</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Weaning litter record — tap the row body</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:850px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Weaning</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs">
+        <div class="grab"></div>
+        <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">litter · day 21</span></div>
+        <div class="ctr"><span class="lbl">Piglets weaned</span><span class="b">−</span><span class="n">20</span><span class="b plus">+</span></div>
+        <div class="ctr"><span class="lbl">Kept for breeding</span><span class="b">−</span><span class="n">5</span><span class="b plus">+</span></div>
+        <div class="flbl">Average weight</div><div style="display:flex;align-items:baseline;gap:6px;border:1.5px solid var(--ink);border-radius:12px;padding:10px 14px;margin-top:8px"><span style="font-family:var(--mono);font-size:22px;font-weight:700">8.9</span><span style="font-family:var(--mono);font-size:12px;color:var(--ink3)">kg</span></div>
+        <div class="shbar"><button class="cta" style="flex:1">Save weaning</button></div>
+        <div class="aud">sow status form follows · same sheet</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Tag / weigh — from inside the litter record</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:880px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Piglet processing</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs">
+        <div class="grab"></div>
+        <div class="sh2"><span class="pc">B1</span><span class="tag">000221</span><span class="vit">litter · 12 piglets · day 3</span></div>
+        <div class="padwrap">
+          <div class="pv"><div class="cur"><div class="k">Piglet 5 of 12 · tag</div><div class="v">001238</div><div class="k" style="margin-top:8px">Weight</div><div class="v">1.42 <span style="font-size:12px;color:var(--ink3)">kg</span></div></div>
+          <div class="prev">001237 · 1.51 kg<br>001236 · 1.38 kg<br>001235 · 1.44 kg</div></div>
+          <div class="pad"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>·</span><span>0</span><span>⌫</span></div>
+        </div>
+        <div class="shbar"><button class="cta sec">Done</button><button class="cta" style="flex:1">Next piglet</button></div>
+        <div class="aud">tag auto-increments · scan overrides</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Bulk treatments — action bar → Mark treatments…</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:850px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Piglet processing</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs">
+        <div class="grab"></div>
+        <div class="sh2"><span class="pc">B1</span><span class="tag">2 litters</span><span class="vit">000221 · 000228 · day 3</span></div>
+        <div class="chk on"><span class="cb"></span>Teeth clipping<span class="who"></span></div>
+        <div class="chk on"><span class="cb"></span>Tail docking<span class="who"></span></div>
+        <div class="chk"><span class="cb"></span>Castration<span class="who"></span></div>
+        <div class="chk"><span class="cb"></span>Iron<span class="who">done Jul 6 · G.H</span></div>
+        <div class="chk"><span class="cb"></span>Nasal drops<span class="who">done Jul 6 · G.H</span></div>
+        <div class="shbar"><button class="cta" style="flex:1">Mark done · 2 litters</button></div>
+        <div class="aud">applies to every selected litter · tag/weigh is per piglet, in the litter record</div>
+      </div>
+    </div>
+    </div>
+    <div class="slide"><div class="vlabel">Edit a done row — tap ✎ · audited</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:740px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Edit a done row</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs">
+        <div class="grab"></div>
+        <div class="sh2"><span class="pc">A1</span><span class="tag">000318</span><span class="vit">checked Jul 8 · G.H</span></div>
+        <div class="opt on"><span class="rad"></span>Pregnant</div>
+        <div class="opt"><span class="rad"></span>Not pregnant</div>
+        <div class="opt"><span class="rad"></span>Unclear<span class="hint">recheck in 3d</span></div>
+        <div class="shbar"><button class="cta" style="flex:1">Save correction</button></div>
+        <div class="aud">recorded Jul 8 08:10 · G. Hansen — corrections are audited</div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ================= SCREEN 04c · INTERACTION · SCAN ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>04c · Interaction — scan into selection</h2>
+    <span class="anno">Scan is a selector · same action bar · no new screen</span>
+  </div>
+
+  <div class="phone" style="display:flex;flex-direction:column;height:820px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0">
+      <div class="back">←</div>
+      <div class="ttl2"><div class="u">Heat check</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">07:31</b> · G. Hansen</div></div>
+    </div>
+    <div class="ctxbar">
+      <div><span class="k">Unit 4</span><div class="numwrap"><div class="num under"><b>70</b><span>% heat rate</span></div><div class="kspace"></div></div><span class="sub">target ≥ 90%</span></div>
+      <div><span class="k">Task overview ›</span><div class="numwrap"><div class="num"><b>62</b><span>/ 100 in heat</span></div><div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><span class="sub">day 2 of 3</span></div>
+    </div>
+    <div class="lensrow">
+    <div class="lens">
+      <button class="on">Not in heat <span class="n">38</span></button>
+      <button>In heat <span class="n">8</span></button>
+      <button>All <span class="n">46</span></button>
+    </div>
+      <div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div>
+    </div>
+
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">A5</span><span class="agg">1 of 4 left</span></div>
+      <div class="row scanned"><div class="cb on"></div><span class="tag">000319</span><div class="st"><span class="l1">Due · today <span class="scanb">· scanned</span></span><span class="l2">weaned 4d</span></div><div class="rail"></div></div>
+      <div class="row dim"><div class="cb"></div><span class="tag">000322</span><div class="st"><span class="l1">Expected · in 2 days</span><span class="l2">weaned 2d</span></div><div class="rail"></div></div>
+      <div class="row dim"><div class="cb"></div><span class="tag">000327</span><div class="st"><span class="l1">Expected · in 6 days</span><span class="l2">weaned 1d</span></div><div class="rail"></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">A6</span><span class="agg">3 of 5 left</span></div>
+      <div class="row"><div class="cb"></div><span class="tag">000340</span><div class="st"><span class="l1">Due · today</span><span class="l2">weaned 5d</span></div><div class="rail"></div></div></div>
+      </div>
+
+    <div class="bar">
+      <div class="selinfo"><span class="x">✕</span> 1 selected</div>
+      <button class="cta sec">Signs</button>
+      <button class="cta" style="flex:1">Mark in heat</button>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">Scan = select</span><b>Three ways to say which pig, one way to say what</b>
+      <p>Checkbox, scan and search all do the same thing: put a sow into the selection. Scanning
+      000319 scrolls her pen into view, ticks her box, tints the row for a moment with a small
+      "scanned" mark, and the dock swaps to the action bar — identical to a tapped box. Scan the
+      next sow and the count grows; tap an action and the marks commit, bar clears, dock returns.</p></div>
+    <div class="note"><span class="k">Why not a scan screen</span><b>The list stays the surface</b>
+      <p>A dedicated "scanned pig" page would be a fourth way to mark, with its own buttons and
+      states. Landing in the list instead means the farmer sees the sow in her pen context, her
+      neighbours, and the same two buttons they already know. Scan-scan-scan-Mark is a loop
+      that never leaves the screen.</p></div>
+    <div class="note"><span class="k">Dock rebuilt</span><b>48px everywhere; scan is the biggest thing</b>
+      <p>The footer text labels were 10px mono — unusable in gloves. Now the dock is one row:
+      pen chips scroll on the left, search and scan are 48px chips pinned right, scan filled ink
+      because it is the action farmers reach for most. Grid dropped — chips + scan + search
+      cover navigation; a pen-map returns only if a room's shape ever demands it.</p></div>
+    <div class="note"><span class="k">Tasks without checkboxes</span><b>Scan opens the record</b>
+      <p>Breeding and farrowing have no bulk marks, so there scan skips selection and opens the
+      sow's sheet directly — the only action that exists for her. Same tool, same place in the
+      dock, resolves to whatever the task's one action is.</p></div>
+  </div>
+</section>
+
+<footer>
+  <span class="mono">ux/screens.html · companion to ux/components.html · model in ux/product-model.html · VI decks in vi-proposals/ untouched</span>
+</footer>
+
+</div>
+</body>
+</html>

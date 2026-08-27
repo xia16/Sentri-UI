@@ -1,0 +1,231 @@
+<!-- MEASURES · Weigh / Backfat / Temperature — review-deck fragment.
+     Spec: ux/ops/measures.md (+ SYNTHESIS.md). Anchors: check-in.html stylesheet & phone construction,
+     components.html §04 field kit · §04d conveyor · §05 entry. Deviations marked "Changed:". -->
+
+<section class="wf" id="wf-weigh" data-title="Weigh">
+  <div class="wfhead"><h2>Weigh</h2><span class="anno">The selection is the mode switch · seven weight surfaces become two</span></div>
+  <div class="caro">
+
+    <div class="slide"><div class="vlabel">1 of 4 · N = 1 — the plain drawer</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:620px;background:var(--well)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div></div></div>
+        <div style="flex:1"></div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">A2</span><span class="tag">000254</span><span class="vit">parity 3 · last 176 kg</span></div>
+          <div class="flbl">Weight <span class="req">*</span></div>
+          <div class="fmeas"><b>182</b><span>kg</span></div>
+          <div class="shbar"><button class="cta" style="flex:1">Record 182 kg</button></div>
+        </div>
+      </div>
+      <div class="why"><b>N=1 degenerates to the plain 04 drawer over the dimmed walk.</b> One Measure — mono, large, unit always shown, numpad on tap — and the vitals slot carries her last recorded weight as the sanity anchor. Record commits on the spot: no draft, no toast, the drawer simply drops. Selection type decided this shape; no control asked.<br><b>Fixed:</b> the primary states what it writes — <i>Record 182 kg</i> — and the spec note under the button is gone; the drawer stands without a caption.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">2 of 4 · N = 5 — the conveyor page</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:800px">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="padding-bottom:6px"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Weigh</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">3 of 5 · A2</div></div></div>
+        <div style="padding:6px 16px;flex:1">
+          <div class="sh2" style="border-bottom:none;padding-bottom:4px"><span class="pc">A2</span><span class="tag">000271</span><span class="vit">parity 2 · last 168 kg</span></div>
+          <div class="flbl">Weight <span class="req">*</span></div>
+          <div class="fmeas" style="border-width:2px"><b>171.5</b><span>kg</span></div>
+          <div style="margin-top:18px">
+            <div class="pline hist"><span class="pl">000254</span><span class="pr"><b style="color:var(--ink)">182</b> kg ✓</span></div>
+            <div class="pline hist"><span class="pl">000268</span><span class="pr"><b style="color:var(--ink)">176</b> kg ✓</span></div>
+            <div class="pline"><span class="pl" style="font-weight:700">000271</span><span class="pr">now</span></div>
+            <div class="pline hist"><span class="pl">000275 · 000283</span><span class="pr">next</span></div>
+          </div>
+        </div>
+        <div class="bar"><button class="cta sec" style="height:52px">Skip</button><button class="cta" style="flex:1;height:52px">Record 171.5 kg</button></div>
+        <div class="aud" style="padding-bottom:14px">skip records nothing · leaving loses nothing</div>
+      </div>
+      <div class="why"><b>One sheet, five subjects, no batch submit.</b> The subject header advances per pig, vitals carrying her last weight; the running list is the receipt, one line per committed pig — tapping a line re-opens her as an edit, never a second record. Skip advances without recording and skipped pigs are re-offered once at the end; leaving early keeps every confirmed record, because nothing was ever a draft. The last confirm ends the run and returns to the walk.<br><b>Changed:</b> the header counts subject position (3 of 5) and the next-hint lives in the running list — the 04d chassis drawing&#39;s grammar, over the spec sketch&#39;s confirmed-count header and footnote hint.<br><b>Fixed:</b> the primary states the value it writes — <i>Record 171.5 kg</i>, not Confirm &amp; next — and the footnote keeps only the two facts a gloved hand needs: skip records nothing, leaving loses nothing.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">3 of 4 · group row — the sample drawer · kg × head</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:720px;background:var(--well)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+        <div style="flex:1"></div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">D4</span><span class="tag">42 pigs</span><span class="vit">no tags · batch 18</span></div>
+          <div class="flbl">Weight on scale <span class="req">*</span></div>
+          <div class="fmeas"><b>144</b><span>kg</span></div>
+          <div class="ctr" style="border-top:none;margin-top:12px"><span class="lbl">Head on scale <span class="req">*</span></span><span class="b">−</span><span class="n">6</span><span class="b plus">+</span></div>
+          <div class="flbl" style="margin-top:6px">Loads</div>
+          <div class="pline hist" style="padding:4px 2px"><span class="pl">96 kg × 4 head</span><span class="pr">✓</span></div>
+          <div class="pline" style="padding:4px 2px"><span class="pl">+ 144 kg × 6 head</span><span class="pr">on the scale</span></div>
+          <div class="pline" style="padding:4px 2px"><span class="pl" style="font-weight:700">= 240 kg · 10 head</span><span class="pr"><b style="color:var(--ink)">avg 24.0 kg</b></span></div>
+          <div class="shbar"><button class="cta sec">Next load</button><button class="cta" style="flex:1;font-size:13.5px;white-space:nowrap">Record 24.0 kg avg · 10 head</button></div>
+        </div>
+      </div>
+      <div class="why"><b>Total vs sample was never a mode — it is a value of n.</b> Two fields: what the scale read and how many head stood on it. Next load banks the pair for crate-by-crate weighing; Record commits one record about the population — {Σ kg, n, avg, headcount at record, who, when}. Weighing the whole pen is the case n = headcount, so no toggle survives. And n is mandatory because this drawer closes the feed PRD&#39;s spot-check: recalibration needs a per-head average, and a bare total over a possibly stale count would corrupt it silently.<br><b>Changed:</b> the pair fields always hold the current load and the footnote derives live — the spec sketch drew totals in the fields; recording what actually stood on the scale keeps the fields honest.<br><b>Fixed:</b> the arithmetic is written where the eye does it — ✓ load, + the load on the scale, = total and average — the primary states the record it makes (<i>Record 24.0 kg avg · 10 head</i>), and Add load became <i>Next load</i>: a physical act, and nothing is written until Record.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">4 of 4 · post-commit — the pen sheet&#39;s body line</div>
+      <div class="phone" style="height:700px;background:var(--card)">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">Pen D4</div><div class="sub">42 pigs · no tags · batch 18</div></div></div>
+        <div class="pgk">Count</div>
+        <div class="pline"><span class="pl">42 head</span><span class="pr">set jul 14 · G.H</span></div>
+        <div class="pline hist"><span class="pl">was 44 · 1 death · 1 moved</span><span class="pr">since jul 14</span></div>
+        <div class="pgk">Body</div>
+        <div class="pline"><span class="pl">Avg weight</span><span class="pr"><b style="color:var(--ink)">24.0 kg</b> · 10 of 42 head · today · G.H</span></div>
+        <div class="pline hist"><span class="pl">loads · 96 kg × 4 · 144 kg × 6</span><span class="pr">240 kg total</span></div>
+        <div class="pgk">Feed</div>
+        <div class="pline"><span class="pl">Ad-lib · Grower 1</span><span class="pr">since jul 10</span></div>
+        <div class="pline hist"><span class="pl">Spot-check · was due</span><span class="pr" style="color:var(--green)">closed today ✓</span></div>
+        <div class="pgk" style="border-top:8px solid var(--well);margin-top:10px">History <span style="float:right;text-transform:none;letter-spacing:0;font-size:11px">all ›</span></div>
+        <div class="pline hist"><span class="pl">Sample weigh · 240 kg · 10 head</span><span class="pr">today · G.H</span></div>
+        <div class="pline hist"><span class="pl">Treatment · 2 head · scours</span><span class="pr">jul 22 · G.H</span></div>
+      </div>
+      <div class="why"><b>No result screen — the pen sheet already updated in place.</b> The record renders as a fact line in the 06h grammar under a BODY key, beside the count trail that names this population; for untagged head the count is the identity, so the two sit together. The walk never lost its place, and there was no toast to dismiss.<br><b>Changed:</b> the Feed block closes the spot-check inline — spot_check_due is the Review-Inbox item this drawer exists to close (spec open question 1, assumed and made visible).<br><b>Fixed:</b> stats notation left the phone — <i>n 10 of 42</i> and <i>Σ 240 kg</i> now read <i>10 of 42 head</i> and <i>240 kg total</i>.</div>
+    </div>
+
+  </div>
+</section>
+
+<section class="wf" id="wf-backfat" data-title="Backfat">
+  <div class="wfhead"><h2>Backfat</h2><span class="anno">Two production frames fold into one conditional sheet · the payload stays single-subject</span></div>
+  <div class="caro">
+
+    <div class="slide"><div class="vlabel">1 of 4 · N = 1 — by eye · the default</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:700px;background:var(--well)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div></div></div>
+        <div style="flex:1"></div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">A2</span><span class="tag">000254</span><span class="vit">parity 3 · 650d</span></div>
+          <div class="opt"><span class="rad"></span>Measure mm</div>
+          <div class="opt on"><span class="rad"></span>By eye<span class="hint">thin · ok · fat</span></div>
+          <div class="fcond">
+            <div class="fseg" style="margin-top:0"><span>Thin</span><span class="on">OK</span><span>Fat</span></div>
+          </div>
+          <div class="shbar"><button class="cta" style="flex:1">Record OK</button></div>
+        </div>
+      </div>
+      <div class="why"><b>Production split 定性/定量 across two frames; the conditional rule folds them.</b> A Choice of method, and the dependent field appears inline beneath its trigger, marked with the amber rule — never a second step, never a second screen. The default survives the fold: by eye preselected, thin · ok · fat as a three-segment Scale.<br><b>Fixed:</b> the reveal&#39;s spec label (<i>↳ revealed by the choice above</i>) is gone — the amber rule alone joins the field to its choice; the methods wear farmer names (<i>Measure mm</i> / <i>By eye</i>) and the primary states the outcome (<i>Record OK</i>).</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">2 of 4 · N = 1 — measured · the other branch</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:700px;background:var(--well)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div></div></div>
+        <div style="flex:1"></div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">A2</span><span class="tag">000254</span><span class="vit">parity 3 · 650d</span></div>
+          <div class="opt on"><span class="rad"></span>Measure mm</div>
+          <div class="opt"><span class="rad"></span>By eye<span class="hint">thin · ok · fat</span></div>
+          <div class="fcond">
+            <div class="fmeas" style="margin-top:0"><b>17</b><span>mm</span></div>
+          </div>
+          <div class="shbar"><button class="cta" style="flex:1">Record 17 mm</button></div>
+        </div>
+      </div>
+      <div class="why"><b>Same sheet, other branch.</b> Choosing Measured swaps the reveal to a millimetre Measure — two visible fields either way, so the drawer never grows past a glance judgment. The composition table already wrote the event this way: Choice(qualitative / quantitative) → Scale <i>or</i> Measure. Two production frames, one component, nothing left to arbitrate.<br><b>Fixed:</b> same subtraction as the eye branch — no spec label inside the phone, plain method names, and the primary states the reading (<i>Record 17 mm</i>).</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">3 of 4 · N = 6 — the conveyor · method sticky</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:820px">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="padding-bottom:6px"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Backfat</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">3 of 6 · B1</div></div></div>
+        <div style="padding:6px 16px;flex:1">
+          <div class="sh2" style="border-bottom:none;padding-bottom:4px"><span class="pc">B1</span><span class="tag">000318</span><span class="vit">parity 4 · last 15 mm</span></div>
+          <div class="opt on"><span class="rad"></span>Measure mm</div>
+          <div class="opt"><span class="rad"></span>By eye<span class="hint">thin · ok · fat</span></div>
+          <div class="fcond">
+            <div class="fmeas" style="margin-top:0;border-width:2px"><b>18</b><span>mm</span></div>
+          </div>
+          <div style="margin-top:14px">
+            <div class="pline hist"><span class="pl">000311</span><span class="pr"><b style="color:var(--ink)">16</b> mm ✓</span></div>
+            <div class="pline hist"><span class="pl">000305</span><span class="pr"><b style="color:var(--ink)">19</b> mm ✓</span></div>
+            <div class="pline"><span class="pl" style="font-weight:700">000318</span><span class="pr">now</span></div>
+            <div class="pline hist"><span class="pl">000322 · 000330 · 000335</span><span class="pr">next</span></div>
+          </div>
+        </div>
+        <div class="bar"><button class="cta sec" style="height:52px">Skip</button><button class="cta" style="flex:1;height:52px">Record 18 mm</button></div>
+        <div class="aud" style="padding-bottom:14px">skip records nothing · leaving loses nothing</div>
+      </div>
+      <div class="why"><b>只可单只记录 constrains the payload, not the workflow.</b> One reading belongs to one animal, and the conveyor honours that: N single-subject sheets run in sequence, each with its own header, its own value, its own commit — what is removed is only the forced round-trip through selection between pigs. The method choice rides the run sticky — the hand carries a caliper or it does not — pre-filled from pig 1, changeable on any pig; the reveal keeps the sheet at two visible fields.<br><b>Fixed:</b> method names plain (<i>Measure mm</i> / <i>By eye</i>), the primary states the reading (<i>Record 18 mm</i>), and the footnote states consequences only — skip records nothing, leaving loses nothing.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">4 of 4 · post-commit — her page&#39;s body key</div>
+      <div class="phone" style="height:620px;background:var(--card)">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">000318</div><div class="sub">B1 · parity 4 · 1120d · ♀</div></div></div>
+        <div class="pgk">Health</div>
+        <div class="pline"><span class="pl">Healthy</span><span class="pr">no open cases</span></div>
+        <div class="pgk">Body</div>
+        <div class="pline"><span class="pl">Backfat · 18 mm</span><span class="pr">today · G.H</span></div>
+        <div class="pline hist"><span class="pl">Backfat · 15 mm</span><span class="pr">jun 30 · L.M</span></div>
+        <div class="pline hist"><span class="pl">Weight · 182 kg</span><span class="pr">jul 12 · G.H</span></div>
+        <div class="pgk">Cycle</div>
+        <div class="pline"><span class="pl">Mated · 25 days ago</span><span class="pr">JY001</span></div>
+      </div>
+      <div class="why"><b>The reading lands where readings live.</b> Her page&#39;s BODY key carries the new line with its trail, above the history it extends; the walk row stays quiet, because an unescalated measurement is cut to the inside (06d) and backfat has no threshold — it never chips.<br><b>Changed:</b> the post-commit surface is her page&#39;s fact line, not a walk-row token — 06d bars unescalated measurements from the row. Whether a measured mm also offers the matching feed band stays open (spec q5); at MVP it is a bare reading.</div>
+    </div>
+
+  </div>
+</section>
+
+<section class="wf" id="wf-temp" data-title="Temperature">
+  <div class="wfhead"><h2>Temperature</h2><span class="anno">One measure · the consequence is a chip on her row, never a new case</span></div>
+  <div class="caro">
+
+    <div class="slide"><div class="vlabel">1 of 3 · N = 1 — one measure</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:620px;background:var(--well)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+        <div style="flex:1"></div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">C3</span><span class="tag">001503</span><span class="vit">gilt · 232d</span></div>
+          <div class="flbl">Temperature <span class="req">*</span></div>
+          <div class="fmeas"><b>40.6</b><span>°C</span></div>
+          <div class="shbar"><button class="cta" style="flex:1">Record 40.6 °C</button></div>
+          <div class="aud">over 40.0 °C flags her row</div>
+        </div>
+      </div>
+      <div class="why"><b>Body temperature on the animal verb; ambient on the check-in sheet.</b> Production&#39;s drawer tile said 温度 while its screen said 体温 — one word, two subjects, two homes, never one screen (the unit&#39;s reading already lives on 06g). The threshold is config, not design: temp_escalation_c, farm-level, keyed by stage class — sow and piglet norms differ — and this sheet consumes only escalated, yes or no.<br><b>Fixed:</b> the primary states the reading (<i>Record 40.6 °C</i>) and the footnote states the consequence a farmer sees — over 40.0 °C flags her row; the config machinery stays out here in the caption.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">2 of 3 · N = 7 — the conveyor · same anatomy</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:800px">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="padding-bottom:6px"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Temperature</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">4 of 7 · C3</div></div></div>
+        <div style="padding:6px 16px;flex:1">
+          <div class="sh2" style="border-bottom:none;padding-bottom:4px"><span class="pc">C3</span><span class="tag">001512</span><span class="vit">gilt · 230d</span></div>
+          <div class="flbl">Temperature <span class="req">*</span></div>
+          <div class="fmeas" style="border-width:2px"><b>38.9</b><span>°C</span></div>
+          <div style="margin-top:18px">
+            <div class="pline hist"><span class="pl">001479</span><span class="pr"><b style="color:var(--ink)">38.6</b> °C ✓</span></div>
+            <div class="pline hist"><span class="pl">001496</span><span class="pr"><b style="color:var(--ink)">40.4</b> °C ✓</span></div>
+            <div class="pline hist"><span class="pl">001503</span><span class="pr"><b style="color:var(--ink)">40.6</b> °C ✓</span></div>
+            <div class="pline"><span class="pl" style="font-weight:700">001512</span><span class="pr">now</span></div>
+            <div class="pline hist"><span class="pl">001517 · 001523 · 001531</span><span class="pr">next</span></div>
+          </div>
+        </div>
+        <div class="bar"><button class="cta sec" style="height:52px">Skip</button><button class="cta" style="flex:1;height:52px">Record 38.9 °C</button></div>
+        <div class="aud" style="padding-bottom:14px">skip records nothing · leaving loses nothing</div>
+      </div>
+      <div class="why"><b>Anatomy identical to Weigh&#39;s run, °C in the Measure.</b> Same chassis, same laws: per-confirm commit, skip without recording, leaving keeps them, receipt lines re-open as edits. Two readings came back over threshold and the run does not flinch — the walk keeps its rhythm.<br><b>Changed:</b> the receipt stays neutral on escalated values — escalation is the row&#39;s business; the run just records.<br><b>Fixed:</b> the primary states the reading (<i>Record 38.9 °C</i>); the footnote states only what skip and leaving do.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">3 of 3 · post-commit — the chip on her row</div>
+      <div class="phone" style="height:560px">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="padding-bottom:10px"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Unit 6</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">yesterday</b> · L.M</div></div></div>
+        <div class="list">
+          <div class="pcard">
+            <div class="pen"><input type="checkbox"><span class="code">C3</span><span class="cnt">13 pigs</span></div>
+            <div class="row"><div class="cb"></div><span class="tag">001479</span><div class="st"><span class="l1"><span class="dot a"></span>Lame day 2</span><span class="l2">gilt · 233d · treated 1d</span></div><div class="rail"></div></div>
+            <div class="row"><div class="cb"></div><span class="tag">001496</span><div class="st"><span class="l1">Quiet <span class="b b-amber">40.4°</span></span><span class="l2">gilt · 229d</span></div><div class="rail"></div></div>
+            <div class="row"><div class="cb"></div><span class="tag">001503</span><div class="st"><span class="l1"><span class="dot r"></span>Fever day 4 <span class="b b-amber">40.6°</span></span><span class="l2">gilt · 232d · treated 3d</span></div><div class="rail"></div></div>
+            <div class="row tail" style="justify-content:center"><span class="l1">⌄ 10 more</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="why"><b>The consequence is the chip.</b> An escalated reading prints on the row whether or not a case is open: 001503 is the most valuable row in the product — day 4 of a fever, day 3 of a drug, still 40.6 — and 001496 chips with no case at all, because a reading is data and a case is a person&#39;s declaration; the reading never creates one. Where a row could carry two chips, the instruction wins (06d). 001479&#39;s 38.6 stays cut to the inside — the zero rule — and the pen opens itself because a chip is something to see. An inline Add-condition offer on an over-threshold confirm stays open (spec q4); chip-only as specced.</div>
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,164 @@
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>The Check-in</title>
+<style>
+:root{--ground:#F7F6F2;--card:#FFF;--well:#EFEEE8;--ink:#1C1E19;--ink2:#51544B;--ink3:#8B8E83;--hair:#E7E6DF;--hair2:#D8D7CE;--red:#C2402E;--amber:#96660D;--amber-fill:#D99A21;--amber-wash:#F8F0DC;--green:#3B8A50;--green-wash:#EAF2EC;--mono:'IBM Plex Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:40px 48px 90px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.015em;margin:18px 0 10px}
+h2{font-size:21px;font-weight:800;margin:44px 0 14px;padding-top:28px;border-top:1px solid var(--ink)}
+h3{font-size:15px;font-weight:700;margin:22px 0 8px}
+p{max-width:74ch;color:var(--ink2);margin-bottom:10px}
+p b,td b,li b{color:var(--ink)}
+.lede{font-size:17px;color:var(--ink2);max-width:74ch;margin-bottom:20px}
+.anno{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:14px 0}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+td:first-child{font-weight:600}
+.mono{font-family:var(--mono);font-size:12.5px}
+.zh{font-family:var(--mono);font-size:12.5px}
+.cut{color:var(--red);font-weight:700}.keep{color:var(--green);font-weight:700}.merge{color:var(--amber);font-weight:700}
+pre.flow{font-family:var(--mono);font-size:12px;line-height:1.75;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:14px 0;color:var(--ink)}
+.note{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:15px 17px;margin:14px 0;font-size:13.5px;color:var(--ink2);max-width:none}
+.note b{color:var(--ink)}
+.q{background:var(--card);border:1px solid var(--hair2);border-left:3px solid var(--amber-fill);border-radius:10px;padding:14px 16px;margin:12px 0;font-size:13.5px;color:var(--ink2);max-width:none}
+.q b{color:var(--ink)}
+ul{margin:8px 0 12px 20px;max-width:74ch;color:var(--ink2);font-size:14px}
+li{margin-bottom:5px}
+.src{font-family:var(--mono);font-size:11px;color:var(--ink3)}
+.big{font-size:19px;font-weight:700;color:var(--ink);max-width:70ch;line-height:1.45;margin:6px 0 14px}
+</style>
+<div class="wrap">
+<span class="anno">Sentri · check-in · basis for discussion</span>
+<h1>The check-in</h1>
+<p class="lede">What a farm hand does on a routine walk, what the screen must show them, and where two features we have never designed — pen count and feed — actually live.</p>
+<div class="note" style="border-left:3px solid var(--red)"><b>Superseded in part.</b> This is the research consolidation. Three of its recommendations were overruled in review and the current design lives in <span class="mono">ux/check-in.html</span> §06: there is <b>no persistable unallocated head</b> (every pig has a placement, and a pen carries one count from one source of truth); there is <b>no <span class="mono">SHORT</span> chip</b> (the system cannot know an animal is missing — only a person can say so); and <b>feed is not a task</b> (the farm hand feeds while walking, so the walk carries the number). Read the findings here; read the design there.</div>
+<p class="anno">Synthesis of three explorations · <span class="mono">feed-mobile.md</span> (Feed PRD v2.1, ~1.45MB) · <span class="mono">pen-count.md</span> (巡检 calibration, Figma re-pulled) · <span class="mono">row-content.md</span> (whole corpus, 8 task PRDs + 6 inspection parts)</p>
+
+<h2>1 · The one claim</h2>
+<p class="big">Every scheduled task in Sentri watches a sow&#39;s reproductive cycle. The check-in is the only surface that watches anything else — and &ldquo;anything else&rdquo; is most of the herd, most of the time.</p>
+<p>All eight tasks are sow-cycle or litter cohorts, scoped by batch. A grower on day 68, a nursery pen, a gestating sow at day 87, a boar — no task will ever list them. Their entire visibility in the product is the check-in.</p>
+<p>That decides the design problem. It is not what to put on a row. It is <b>what to keep off</b>, because a unit is 220 rows and the eight that matter have to be visible without reading the other 212.</p>
+
+<h2>2 · What the tasks already own — and therefore what is noise</h2>
+<p>The ownership test: if a scheduled task surfaces a fact and drives the farmer to it, that fact is noise on a walk. The farmer will meet it in the task.</p>
+<table><thead><tr><th style="width:32%">Owned by a task — noise on the walk</th><th>Orphaned — the check-in&#39;s payload</th></tr></thead><tbody>
+<tr><td>Due dates · windows · intervals · readiness verdicts · task chips · semen batch · mating count · <span class="mono">weaned 4d</span> · parity as a task input · BCS · born counts · remaining treatments</td><td>Production status <b>+ days in it</b> · open conditions <b>+ how long open</b> · triage level · under treatment <b>+ for how long</b> · batch membership · the identity gap · pen count mismatch · litter attrition between farrowing and weaning · grower day-age · device faults · <b>every fact about every pig that is not a breeding sow or a nursing litter</b></td></tr>
+</tbody></table>
+
+<h3>Three findings behind that split</h3>
+<div class="note"><b>The postpartum window is a three-day keyhole onto a two-year animal.</b> <span class="zh">采食情况</span> and <span class="zh">活动能力</span> — <i>is she eating, is she walking</i> — are asked once, on days 1–3 after farrowing, and never again. Off feed at gestation day 60, or anywhere in a nursery, is asked by nothing and planned by nothing. Production&#39;s own bridge rescues it: <span class="zh">健康状态异常将会作为疾病/症状展示</span> — an abnormal answer becomes a condition, and conditions render on rows. So the mechanism exists; only the occasion is missing, and the occasion is the walk.</div>
+<div class="note"><b><span class="mono">no batch</span> is the orphan-detector.</b> Annotation <span class="mono">850:2000</span> redefines batch membership as <i>&ldquo;does this pig&#39;s batch still have any task outstanding&rdquo;</i>. So one token on line 2 means, literally: <b>nothing else in this product will ever show you this pig.</b> It is the cheapest and most valuable token available.</div>
+<div class="note"><b>The count mismatch is computed and then hidden.</b> Production&#39;s calibration wizard evaluates <span class="mono">Σ(batch) = un-identified</span> at commit — proof of inconsistency without anyone counting — then structurally cannot show it, because commit is blocked while it is true. See §4.</div>
+
+<h2>3 · Two registers, and we have only ever designed one</h2>
+<p>Everything in <span class="mono">components.html</span> §05 is pig-scoped. Both features named here are pen-scoped, and the pen header is currently doing nothing but repeating a number.</p>
+<pre class="flow">┌──────────────────────────────────────────┐
+│  ←  Unit 6                          [⋯]  │
+│     ✓ checked 09:41 · G. Hansen          │   the unit — one assertion (05)
+│ ──────────────────────────────────────── │
+│  ☐  C1    42 pigs           ▌1 SHORT▐    │   THE PEN LANE   ← new
+│           counted jul 22 · G.H           │   count · feed · equipment
+│ ──────────────────────────────────────── │
+│  ☐  000254  Fever day 4      ▌URGENT▐    │   THE PIG LANE
+│             parity 3 · 20₁ · treated 3d  │   health · status · batch
+│  ☐  000268  Pregnant · day 87            │
+│             parity 3 · 20₁               │
+└──────────────────────────────────────────┘</pre>
+<p><b>The pen lane carries exactly what is true of the pen and false of any pig in it.</b> Nothing crosses: equipment never appears on a pig row, a pig&#39;s condition never rolls onto the pen row except as a count. Production already separates these lanes — we are extending a slot it built, not inventing one.</p>
+<div class="note"><b>Production built the pen row&#39;s attention slot for feed and shipped it empty.</b> <span class="zh">需操作</span> (&ldquo;needs action&rdquo;) is the module&#39;s one attention word, and annotation <span class="mono">658:3113</span> defines it exclusively as <span class="zh">饲喂站需加料/减料</span> — the feed station needs feed added or reduced — immediately followed by <span class="zh">❌ 本期不做饲喂站功能</span>. The only red badge a pen card carries today is the device-fault count. The channel exists, its intended occupant is feed, and it is vacant.</div>
+
+<h2>4 · The pen lane · count</h2>
+<p>Production has <b>no discovery mechanism for a wrong count</b>. The entry point is a ~24px unlabelled green glyph beside a grey section header; <span class="zh">猪只列表（5）</span> is the system&#39;s belief printed with the same visual weight as a measured fact — no expected-vs-observed, no last-counted stamp, no delta. The flow is 100% farmer-initiated, from the memory of having already counted by hand.</p>
+
+<h3>The hinge decision — can a pen persist unallocated head?</h3>
+<p>The commit predicate is an arithmetic identity that production treats as a gate:</p>
+<pre class="flow">pen total  =  identified  +  Σ(batch allocations)
+     T     =      I       +        B                 提交 enabled iff  B = U  exactly
+                                                     floor:  T ≥ I</pre>
+<p>It blocks purely because production refuses to store a residual. Let the residual persist and one decision does two things:</p>
+<ul>
+<li><b>The submit button dies.</b> The invariant stops being a predicate to satisfy and becomes an identity in which <span class="mono">unallocated</span> is simply the remainder. We need this anyway — no submit button exists in the product.</li>
+<li><b>The pen row gets the only truthful count signal available.</b> A pen whose allocations no longer sum to its un-identified total is demonstrably inconsistent, with no one counting anything.</li>
+</ul>
+<p>Production contradicts itself on this: row type <span class="zh">无ID，无批次</span> (<span class="mono">654:1885</span>) says a batch-less un-identified head is a legal row, while <span class="zh">无身份猪只已全部补充批次</span> says it is illegal at commit.</p><div class="note" style="border-left:3px solid var(--red)"><b>Overruled.</b> Every pig must have a placement, so nothing floats and the residual cannot persist. The submit button still dies — the flow becomes a pen-scoped sheet whose steppers commit on change — but the pen row gains no count signal from it. <b>One number, one source of truth:</b> for identified animals it is derived from their placements and cannot disagree with anything; for un-identified head it is whatever the last count set. A wrong count is a wrong number until someone counts, not a state to surface.</div>
+
+<h3>What replaces the wizard</h3>
+<p>One pen-scoped sheet, reached from selection like every other verb, where every stepper commits on change and the total and the allocations are two views of one identity. The two things Step 1 did that were real — <i>a pig that is here</i>, <i>a pig that is not</i> — are the existing Transfer and Report-missing events, performed on the walk before the sheet is ever opened. Cut: the two-step wizard, <span class="zh">提交</span>, the confirmation dialog, the <span class="zh">更改前/更改后</span> twin cards, the duplicate list inside the modal, the second scan entry point, the success toast, and the green &ldquo;nothing is wrong&rdquo; banner.</p>
+<div class="note"><b>Calibration only ever absorbs silent events.</b> Transfer, death, fostering and weaning all keep the count correct on their own. What calibration reconciles is what happened without a record — a pig that died unseen, a pig moved without one, a miscount at entry. That is why it needs a <b>reason</b>, which no production screen captures although <span class="mono">product-model</span> §4 says the event has one.</div>
+
+<h2>5 · The pen lane · feed</h2>
+<p>Read-mostly, as intended — but the PRD constrains the card harder than expected.</p>
+<table><thead><tr><th style="width:22%">Constraint</th><th>Consequence for the card</th></tr></thead><tbody>
+<tr><td>The ration exists for about half the herd</td><td>Curve-fed breeding stages (gestation, lactation, wean-to-service, boar) resolve a real <span class="mono">kg/head/day</span>. Ad-lib growth stages (grower, finisher) <b>never</b> do, and the PRD twice forbids showing the internal rate to a farm hand (§9.3, B.5). Nursery&#39;s modality is left literally unresolved. <b>Two different cards</b>: a number, or formula + switch timing + drift.</td></tr>
+<tr><td>It is a live value, not a setting</td><td><span class="mono">effective_day</span> advances daily and week anchors are linearly interpolated (§7.4, §10). The number on the card moved since yesterday.</td></tr>
+<tr><td>Provenance must be visible (§5)</td><td>Four states must be distinguishable: <span class="mono">derived</span> · <span class="mono">system_fallback</span> (a generic curve, a console data gap, nobody&#39;s decision, self-healing) · <span class="mono">nutritionist_locked</span> · and <b>awaiting-confirmation</b>, where during a review window the farmer is deliberately shown a <i>recomputed</i> number rather than the nutritionist&#39;s (§13.2). <b>No farmhand-facing copy exists for any of them.</b></td></tr>
+<tr><td>Farm hands adjust by preset only</td><td>§6 grants three verbs: log events, apply individual-override presets, act on Review Inbox items. Free numeric entry is never granted. Adjustments <b>commit immediately</b> — no approval gate — which fits our no-submit posture exactly.</td></tr>
+<tr><td>Nothing is scheduled at MVP</td><td>No push notifications; the Review Inbox is &ldquo;visibility on login&rdquo; only (§13.1). Only two item types route to a farm hand: <span class="mono">spot_check_due</span> and stockout confirms.</td></tr>
+</tbody></table>
+<p><b>Per head or pen total?</b> The PRD names no pen-total display anywhere; the curve is per-head. But a farm hand feeding a pen acts on a total, and a total is <span class="mono">head_count × curve</span> — which makes the count load-bearing and visible. Showing both is the argument for the two features being one screen.</p>
+
+<h2>6 · The join — feed is what makes the count expensive</h2>
+<p class="big">The feed system&#39;s most load-bearing input is a number nobody maintains.</p>
+<p><span class="mono">head_count</span> is a bare <span class="mono">int</span> (§9.7) with no derivation rule — and the PRD contrasts it explicitly with <span class="mono">entered_stage_on</span>, which it says is derived from the event log and <i>&ldquo;never independently maintained&rdquo;</i>. §12.3 goes further and needs headcount <b>per day across a period</b>: a timeline, not a current value.</p>
+<p>Our product can close that gap. We already have an event catalogue in which death, transfer, fostering, farrowing and sale all move a count. That makes the count <b>derivable</b>, and it turns calibration from <i>&ldquo;edit the number&rdquo;</i> into <i>&ldquo;the derived count and the observed count disagree — resolve it&rdquo;</i>, which is a supersession, and we already have that law.</p>
+<p>Before this, count calibration was hygiene with no visible payoff, which is why production could bury it behind an unlabelled glyph and nobody complained. Attached to a feed number it has one.</p>
+
+<h2>7 · The pig lane · the row</h2>
+<h3>The rules</h3>
+<table><thead><tr><th style="width:16%">Slot</th><th>Rule</th></tr></thead><tbody>
+<tr><td>Line 1 · words</td><td>Two-slot precedence. <b>If an open condition exists</b> → the condition and its day: <span class="mono">Fever day 3</span>, <span class="mono">Off feed day 1</span>. Multiple → the most severe, then <span class="mono">+2 more</span>, never a truncating comma-list (production&#39;s <span class="zh">发烧，感冒，四肢肿胀，食…</span> is the one thing on its row that fails outright at glove distance). <b>Otherwise</b> → production status + elapsed: <span class="mono">Pregnant · day 87</span>, <span class="mono">Growing · day 68</span>.</td></tr>
+<tr><td>Line 2 · tokens</td><td><span class="mono">[standing: parity N | Nd age | N piglets] · [batch code | no batch] · [open trail: treated Nd · G.H]</span></td></tr>
+<tr><td>Chip · one</td><td>Triage moved to a <b>coloured dot</b> on line 1 (colour carries rank, words carry identity), which frees the chip for an escalated measurement (<span class="mono">40.6°</span>) · an escalated measurement (<span class="mono">40.6°</span>) · and on <b>pen rows only</b>, <span class="mono">N FAULTS</span>. <span class="zh">常规观察</span> / monitor is not a chip — it stays a grey token.</td></tr>
+<tr><td>Rail · empty</td><td>Unit mode has no verdict to render. 220 chevrons would be 220 units of noise for one bit.</td></tr>
+</tbody></table>
+<div class="note"><b>The zero rule — the mechanism the whole screen depends on.</b> <i>A token that says &ldquo;nothing is wrong&rdquo; is not printed.</i> Generalised from production&#39;s own <span class="zh">显示疾病症状，没有就不显示</span>. So <span class="mono">4 lost</span> appears only above zero, <span class="mono">no tags</span> only when true, <span class="mono">treated 3d</span> only while a treatment is open. This is what keeps 212 rows quiet so the other eight are visible.</div>
+
+<h3>The rows</h3>
+<pre class="flow">GESTATING SOW
+  normal    ☐ 000254   Pregnant · day 87
+                       parity 3 · 20₁
+
+  off feed  ☐ 000254   Off feed day 2              ▌PRIORITY▐
+                       parity 3 · 20₁ · G.H
+
+  not       ☐ 000254   Fever day 4                  ▌URGENT▐
+  improving             parity 3 · 20₁ · treated 3d · G.H
+            ↑ day 4 of a fever, day 3 of a drug. The drug is not working,
+              and nothing else in Sentri will ever say so.
+
+  fell out  ☐ 000254   Mated · 46 days ago
+                       parity 3 · no batch
+            ↑ should have been checked at day 20 and farrowed near 114.
+              Two tokens, one lost sow.
+
+PEN ROW
+  normal    ☐ C1       42 pigs · 51.6 kg
+                       26₁ · day 68
+
+  feed      ☐ C2       38 pigs · 47.6 kg
+  stepped              ↑0.4 from 47.2 · 2 overrides
+
+  kit       ☐ C1       42 pigs                     ▌2 FAULTS▐
+                       feeder · water · jul 20 · G.H</pre>
+
+<h2>8 · Blocked on data we do not capture</h2>
+<div class="q"><b>Treatment has no timestamp.</b> That blocks <span class="mono">treated 3d</span> — the single highest-value token in the proposal, the one that turns &ldquo;she is sick&rdquo; into &ldquo;the drug is not working.&rdquo; It is also the <b>smallest high-value data change available to us</b>: one field.</div>
+<div class="q"><b>Withdrawal period does not exist anywhere</b> in either production file. A treated pig has no shipping hold, so the app cannot warn anyone.</div>
+<div class="q"><b>Health recheck does not exist.</b> Conditions are opened and resolved; nothing schedules a look in between. This is why the walk has to carry it.</div>
+<div class="q"><b>The PRD has no location tier above Pen.</b> Zero occurrences of unit, room, house or site (§9.8). Our entire product is unit-scoped. Also: Pen↔Batch is modelled 1:1, no Silo↔Pen link exists, and there is no offline or sync story at all despite the design assuming capture inside barns.</div>
+
+<h2>9 · Decisions this needs</h2>
+<table><thead><tr><th style="width:30%">Decision</th><th>Why it blocks</th></tr></thead><tbody>
+<tr><td><s>Is <span class="mono">unallocated</span> persistable?</s></td><td><b>Settled — no.</b> Every pig has a placement. One count, one source of truth, no discrepancy state.</td></tr>
+<tr><td>Feeding method — farm setting or pen setting?</td><td>It decides the shape of every feed line: a group-fed pen shows a total to pour, an individually-fed pen shows only overrides, an ad-lib pen shows formula and switch timing. ESF in gestation and troughs in nursery on one site is plausible.</td></tr><tr><td>Is delivery recorded?</td><td>Nothing in either file captures it. Without it there is no variance, and &ldquo;feed adjustment needed&rdquo; can only mean the requirement changed, never that the pen is not getting it. Proposal: <b>record the deviation, not the compliance</b>.</td></tr>
+<tr><td>Does count correction capture a reason?</td><td><span class="mono">product-model</span> §4 says it does; no production screen collects one. Shrinkage accounting needs it. Fixed list or free text?</td></tr>
+
+<tr><td>Do we add a treatment timestamp?</td><td>One field, and it unlocks the row that justifies the whole walk.</td></tr>
+<tr><td>Is the rail really empty in unit mode?</td><td>Deliberate reading of §01b, not a certainty. If the pig page is reached by tapping the row, no chevron is needed — but nothing then advertises that the row is tappable.</td></tr>
+<tr><td><s>Does the check-in need an attention partition?</s></td><td><b>Settled.</b> Attention filters — <span class="mono">All · Attention · Feed</span> — plus collapsed pens that open themselves when they have something to show. Safe only because scan reaches any pig whether or not its row is rendered.</td></tr><tr><td>Does an ignored mark escalate?</td><td>A pig marked <span class="mono">treat in place</span> eight days ago and never treated — does her amber dot go red? Escalating means the system second-guesses a human&#39;s severity call; not escalating means day 8 looks like day 1.</td></tr><tr><td>Does <span class="mono">Monitor</span> need a recheck date?</td><td>It is the one triage level that is not a pending instruction. Without a date it is indistinguishable from a condition nobody has looked at — the exact ambiguity the walk exists to resolve.</td></tr>
+</tbody></table>
+
+<p class="anno" style="margin-top:40px">ux/checkin/check-in.html · sources: feed-mobile.md · pen-count.md · row-content.md · anchors: components.html 01b · 02b · 02c · 05 · product-model.html §4</p>
+</div>

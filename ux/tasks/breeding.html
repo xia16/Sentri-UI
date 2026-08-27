@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentri task doc — Breeding 配种</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F7F6F2;--card:#FFF;--well:#EFEEE8;--ink:#1C1E19;--ink2:#51544B;--ink3:#8B8E83;--hair:#E7E6DF;--hair2:#D8D7CE;--red:#C2402E;--amber:#96660D;--amber-fill:#D99A21;--amber-wash:#F8F0DC;--green:#3B8A50;--green-wash:#EAF2EC;--mono:'IBM Plex Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:40px 48px 90px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.015em;margin:18px 0 10px}
+h2{font-size:21px;font-weight:800;margin:44px 0 14px;padding-top:28px;border-top:1px solid var(--ink)}
+h3{font-size:15px;font-weight:700;margin:20px 0 8px}
+p{max-width:72ch;color:var(--ink2);margin-bottom:10px}
+.anno{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+.mono{font-family:var(--mono);font-size:12.5px}
+.cut{color:var(--red);font-weight:700}.keep{color:var(--green);font-weight:700}.merge{color:var(--amber);font-weight:700}
+pre.flow{font-family:var(--mono);font-size:12px;line-height:1.7;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:12px 0;color:var(--ink)}
+.note{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px 16px;margin:12px 0;font-size:13.5px;color:var(--ink2);max-width:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Breeding · 配种</h1>
+<p style="max-width:78ch">Event-driven, per-sow sequence task: each in-heat sow must receive N configured matings at a configured
+interval, each mating stamped with a semen batch (or boar), operator and time. Production spends 27 frames
+mostly on navigation, duplicate confirmation and an archive clone; the record itself is one timeline sheet
+our system already renders. The genuine deltas are the semen picker's rules, the extra-mating entry, the
+scan-guard branches, and what happens to un-mated sows when the batch's breeding phase closes.</p>
+<div class="anno">figma 501:2230 · psrxDa9LRWLdTL9XMZmWdc · 27 frames inventoried → 21 distinct screens/sheets/dialogs (6 are duplicate states)</div>
+
+<h2>1 · Production inventory</h2>
+<p>Every distinct screen, sheet and dialog in the section, with the data it carries. Magenta designer notes are
+folded in as requirements (verbatim-translated in the last column where they bind).</p>
+<table>
+<thead><tr><th style="width:24%">Screen / sheet (node)</th><th style="width:38%">What it shows</th><th>Data on it · designer-note requirements</th></tr></thead>
+<tbody>
+<tr><td>Pig-list tab · active task (<span class="mono">501:2450</span> Tab：配种)</td><td>Tabs 配种 | 任务详情. Unit-progress card: task icon, house, day 2/3, metric <b>reached-mating-count / in-heat sows</b> 100/200 (50%), bar. Search 耳标号/耳缺号 (ear tag / ear notch), filter, list/grid toggle. Info banner "200 pigs · tap to record breeding info". Pen-grouped rows: tag · state · mating-no · arrow.</td><td>Row states: <span class="mono">23:59 距配种·第1次</span> (countdown to Nth mating), <span class="mono">可配种·已配种:1次</span> (breedable now, filled arrow), <span class="mono">已完成·共2次</span> (done, N total). Note <span class="mono">1815:5081</span>: "第x次 = which mating is to be completed this time". Note <span class="mono">907:12115</span>: sow completing breeding moves to the pregnancy-check task and leaves this list.</td></tr>
+<tr><td>Pen-grid tab (<span class="mono">634:12250</span> 栏位Grid)</td><td>Same header; cards per pen. Single-pig card: countdown/state + mating-no + tag. Multi-pig card: <span class="mono">可配种 5头 / 1头未发情 / 20头</span>.</td><td>Note <span class="mono">5664:7808</span>: statuses 未配种·已配种·未发情; multi-pig display priority not-mated &gt; mated; not-in-heat count always on line 2. Grid has no row (排) filter.</td></tr>
+<tr><td>Task-detail tab (<span class="mono">501:3203</span>)</td><td>Overall progress (5 units, day 1/3, 100/200 50%); two KPI cards; config block; SOP link; status legend; red End task button.</td><td>KPIs: <b>multiparous (经产)</b> avg heat→mating 1 h (target ≤ 12 h); <b>gilt (后备)</b> same. Config: task duration 7 d (01/01–01/07), matings per sow 2, mating interval 24 h. Legend explains 距配种 / 可配种 / 已完成.</td></tr>
+<tr><td>Filter sheet (<span class="mono">827:2715</span>)</td><td>Groups: breeding status (全部/可配种/倒计时中/已完成) · mating count (0/1/2/3/&gt;3) · physical row 排 (A–G…).</td><td>View-only filtering. Note: grid view has no 排 group.</td></tr>
+<tr><td>Sequence drawer · default (<span class="mono">871:2549</span>; duplicated as search result A <span class="mono">5590:18012</span> and <span class="mono">5614:14559</span>)</td><td>Bottom sheet "配种": pen chip A1 · tag · vitals (sow, 650 d age, parity 3). Timeline: ● 1st mating (current) → ○ 已发情 in-heat (operator + timestamp). Footer: checkbox "confirm using [选择精液] to complete 1st mating", ⋯ more, disabled Submit.</td><td>Note <span class="mono">1401:7755</span>: checkbox unchecked by default. ⋯ routes to End task; timeline shows the heat record with attribution.</td></tr>
+<tr><td>Select-semen page (<span class="mono">1361:13007</span>)</td><td>Search 精液号 + QR-scan icon; radio list of batches (JY001…); Confirm.</td><td>Note <span class="mono">1401:7756</span>: picker holds semen no. <b>or boar no. (公猪号)</b>; QR scan opens camera; list = the console breeding plan; single-select, searchable, editable; changing batch at mating k (001→002) makes 002 the default for mating k and all later ones, still editable.</td></tr>
+<tr><td>Sequence drawer · nth mating + interval banner (<span class="mono">886:13007</span>; banner set <span class="mono">1649:21122</span>)</td><td>Same sheet at 2nd mating: amber banner "配种间隔：5小时（过长）" dismissible; timeline 3rd (future) / ● 2nd / 1st (JY001, attributed) / in-heat; footer checkbox pre-set with last batch JY001; Submit enabled.</td><td>Note <span class="mono">1722:14617</span>: interval ≤ console config → 正常 (normal, plain banner); &gt; config → 过长 (too long, amber). Display logic same as farrowing. Magenta: on submit toast "success" then return to the house breeding page.</td></tr>
+<tr><td>Sequence drawer · extra mating entry (<span class="mono">886:13090</span> 额外配种)</td><td>Sow with all configured matings done: timeline 2nd (JY002) / 1st (JY001) / in-heat, all attributed; single green button <b>添加第3次配种 Add 3rd mating</b>.</td><td>The extra-mating branch: beyond configured N the CTA swaps from confirm to add-one-more; repeatable (&gt;3 exists in filter).</td></tr>
+<tr><td>Sequence drawer · extra mating current (<span class="mono">886:13243</span>)</td><td>After tapping add: ● 3rd mating current, checkbox unchecked, default batch chip shown, Submit disabled until checked.</td><td>Same record shape as any mating; numbering continues (3rd, 4th…).</td></tr>
+<tr><td>End-task page · two states (<span class="mono">952:4376</span> target met · <span class="mono">952:4439</span> not met)</td><td>Result card: 已达到/未达到任务目标 with metric 200/200 (100%) or 100/200 (50%). Execution details: reached production state — continue with batch (mated 1× / 2× / ≥3× counts); not reached — <b>removed from batch</b> (un-mated count). Footer: numeric field "confirm, removing [N] pigs from batch" (required) · Cancel · End task.</td><td>Ending the breeding phase removes un-mated sows from the batch; the count must be typed to confirm. Counts by mating-count are derived.</td></tr>
+<tr><td>End-task blocked dialog (<span class="mono">928:5208</span> 结束任务失败)</td><td>"The current batch's heat-check task has not ended; cannot end breeding. End heat check first." Confirm.</td><td>Dependency rule: heat check must close before breeding closes (no new in-heat sows can appear).</td></tr>
+<tr><td>Pen pig list (<span class="mono">5589:14558</span> 某栏位猪只列表)</td><td>Page titled A1 (from grid card / navigation): search + filter; every pig in the pen with mixed vocabularies — breeding states (countdown / 可配种 / 已完成) and heat states (预计发情 5天后 · 已到预计发情期 · 预计发情：- · 有发情迹象 10小时前).</td><td>Notes <span class="mono">5589:17847/17880</span>: in-heat pigs sort above, not-in-heat pigs below. Tapping a not-in-heat pig raises the not-in-heat guard.</td></tr>
+<tr><td>Not-in-heat guard (<span class="mono">5589:17881</span> = search result B <span class="mono">5590:18062</span>)</td><td>Dialog 猪只未发情: "AA00001 is not marked in heat; confirm heat status before breeding." Cancel · <b>确认发情并配种 Confirm in-heat &amp; breed</b>.</td><td>Back-fills the heat record (operator + timestamp) and opens the sequence drawer — heat check bypass with explicit confirm.</td></tr>
+<tr><td>Search guard · not in unit (C <span class="mono">5589:17906</span> in-heat · D <span class="mono">5590:18074</span> not-in-heat)</td><td>Search sheet: amber notice 不在本单元 (not in this unit); pig card: tag › · class (production sow) · heat/production state · age-days; amber location line 请确认位置 (confirm location) with edit; buttons 仅确认位置 (location only) · 确认位置并配种 (location &amp; breed).</td><td>Requirement <span class="mono">5589:17553</span>: must locate first, then breed; D additionally chains the not-in-heat guard. Buttons disabled until location entered.</td></tr>
+<tr><td>Search guard · not in batch (E <span class="mono">5590:18121</span>; F <span class="mono">5614:14736</span> adds not-in-unit)</td><td>Same sheet; amber notice "not in this batch — current batch: 批次1"; location shown (1区-母猪车间-1单元-A1) or 请确认位置; buttons Cancel · <b>加入到批次并配种 Join batch &amp; breed</b>.</td><td>Note <span class="mono">5616:14850</span>: join button disabled until location confirmed. E/F then chain the not-in-heat guard. Six search outcomes A–F enumerated in <span class="mono">5589:17553</span> (2026-1-20).</td></tr>
+<tr><td>Batch-change verification (<span class="mono">5616:14785</span> = <span class="mono">5616:14851</span> 批次变更)</td><td>Dialog: "move 000001 from 批次1 to 批次2?" — requires typing the <b>last 4 digits of the pig ID</b>; Confirm disabled until typed.</td><td>Deliberate high-friction second confirm for batch reassignment.</td></tr>
+<tr><td>Ended · pig-list tab (<span class="mono">5913:5952</span>)</td><td>Read-only archive: segments 已配种(80) | 未配种(10); unit header; mated/un-mated totals + bar; rows pen chip · tag · recorder · datetime · ›.</td><td>Notes <span class="mono">5913:6204/6207</span>: distinct mated/un-mated row styles. Row → breeding detail.</td></tr>
+<tr><td>Ended · task-detail tab (<span class="mono">5752:5048</span>)</td><td>Same as active detail with 已结束 badge, final metric 190/200 (95%), parity KPIs, config, SOP. No End button, no legend.</td><td>Archive of the task record.</td></tr>
+<tr><td>Ended · filter (<span class="mono">5752:5433</span>)</td><td>Last-mating-date picker + unit chips (1–4单元).</td><td>Archive-only dimensions.</td></tr>
+<tr><td>Breeding detail · read-only (<span class="mono">5752:5592</span> 配种详情)</td><td>Sheet: pen chip · tag · vitals; timeline 2nd (JY002) / 1st (JY001) / in-heat, each attributed. No actions.</td><td>Identical anatomy to the sequence drawer minus the footer.</td></tr>
+</tbody>
+</table>
+
+<h2>2 · Requirements distilled</h2>
+
+<h3>Data captured (farmer input — field level)</h3>
+<table>
+<thead><tr><th style="width:30%">Field</th><th style="width:22%">Type</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><span class="mono">mating.sequence_no</span></td><td>int 1…N, extras &gt;N</td><td>Never typed — the system proposes "the mating to complete this time"; farmer only confirms.</td></tr>
+<tr><td><span class="mono">mating.semen_batch / boar_id</span></td><td>single-select FK</td><td>Source = console breeding plan; searchable; QR scan of the dose label; default = batch of previous mating; a change forward-fills defaults for all later matings of that sow.</td></tr>
+<tr><td><span class="mono">mating.operator · timestamp</span></td><td>auto</td><td>Stamped at commit; every timeline event attributed.</td></tr>
+<tr><td><span class="mono">heat.backfill</span></td><td>event (confirm)</td><td>"Confirm in-heat &amp; breed" writes an in-heat record for a sow the heat check missed — explicit dialog, never silent.</td></tr>
+<tr><td><span class="mono">pig.location</span></td><td>pen assignment</td><td>Captured when a scanned/searched pig is not where the system thinks; "location only" or "location &amp; breed".</td></tr>
+<tr><td><span class="mono">pig.batch</span></td><td>batch reassignment</td><td>Join current batch (out-of-batch sow bred anyway); production verifies by typing pig-ID last 4.</td></tr>
+<tr><td><span class="mono">extra mating</span></td><td>event (add)</td><td>"Add (N+1)th mating" beyond configured count; then the same mating record.</td></tr>
+<tr><td><span class="mono">phase close confirm</span></td><td>confirm (+ typed count in production)</td><td>Closing the batch's breeding phase removes un-mated sows from the batch. The removal list is fully derivable; only the confirmation is human.</td></tr>
+</tbody>
+</table>
+
+<h3>Derived by the system (never asked)</h3>
+<table>
+<thead><tr><th style="width:38%">Derived fact</th><th>From</th></tr></thead>
+<tbody>
+<tr><td>Next-mating countdown (距配种 hh:mm) · READY (可配种) · Done (已完成)</td><td>last event timestamp + configured interval + configured count</td></tr>
+<tr><td>Actual interval per mating + normal/too-long flag (过长)</td><td>timestamps vs console interval; same display logic as farrowing</td></tr>
+<tr><td>Which mating is next ("第x次")</td><td>count of committed matings + config</td></tr>
+<tr><td>Progress: sows at configured count / in-heat sows; day n of window; per-unit split</td><td>records + batch roster</td></tr>
+<tr><td>Avg heat→mating interval, split multiparous (经产) / gilt (后备), vs target ≤ 12 h</td><td>heat + first-mating timestamps, parity</td></tr>
+<tr><td>Default semen batch per mating (forward-fill)</td><td>previous mating's batch</td></tr>
+<tr><td>Mated-by-count splits (1× / 2× / ≥3×) and un-mated list at close</td><td>records</td></tr>
+<tr><td>Sow leaves breeding → appears in pregnancy check; return-heat rebreeds re-enter</td><td>completion event; task spawn rules</td></tr>
+</tbody>
+</table>
+
+<h3>Configuration (console, not the phone)</h3>
+<table>
+<thead><tr><th style="width:38%">Setting</th><th>Production value in mocks</th></tr></thead>
+<tbody>
+<tr><td>Task window (任务时长)</td><td>7 d (also 3 d in list mocks) — per batch</td></tr>
+<tr><td>Matings per sow (配种次数)</td><td>2</td></tr>
+<tr><td>Mating interval (配种间隔时长) — drives countdown, READY, and too-long flag</td><td>24 h</td></tr>
+<tr><td>Semen / boar plan (the picker's list)</td><td>console breeding plan per batch</td></tr>
+<tr><td>Heat→mating KPI target</td><td>≤ 12 h</td></tr>
+<tr><td>SOP document</td><td>linked from task detail</td></tr>
+</tbody>
+</table>
+
+<h2>3 · Subtraction analysis</h2>
+<table>
+<thead><tr><th style="width:30%">Production element</th><th style="width:10%">Verdict</th><th>Justification</th></tr></thead>
+<tbody>
+<tr><td>Pen-grid tab + per-pen pig list page + grid status-priority logic + list/grid toggle + 排 row filter</td><td><span class="cut">CUT</span></td><td>An entire parallel navigation universe (4 surfaces + a priority algorithm) that exists only to reach a pig. Our pen picker (02), peek (02c) and dock Go-to-pen/scan/search (04b) already answer "which pen needs me / what is this pig". The grid's aggregation ("可配种 5头 · 1头未发情") survives as the picker's one chip per cell (02b vocabulary).</td></tr>
+<tr><td>Confirmation checkbox + 选择精液 chip + separate 提交结果 button</td><td><span class="merge">MERGE</span></td><td>Three controls to say one thing. One button carries the whole assertion: <span class="mono">Confirm mating 2 · JY001</span> (04). Batch chip on the current timeline row opens the picker; the button text always names batch + sequence, so nothing is confirmed blind.</td></tr>
+<tr><td>Success toast + "return to house page" choreography</td><td><span class="cut">CUT</span></td><td>Actions commit themselves; the row's stamp (<span class="mono">JY001 · 07:14 · G.H</span>) is the receipt (01b).</td></tr>
+<tr><td>Status legend (状态说明) on task detail</td><td><span class="cut">CUT</span></td><td>Legend explains countdown/ready/done. Status words on rows say it: <span class="mono">WAIT · next 9h</span> / <span class="mono">READY</span> / <span class="mono">Done · 2 matings</span>. Anchor already retired legends (03).</td></tr>
+<tr><td>Interval banner 正常 (normal) state</td><td><span class="cut">CUT</span></td><td>Confirming an in-range mating needs no banner. Only the exception speaks: over-limit escalates to the row chip <span class="mono">LAST 26H</span> (01b) and one amber line in the sheet.</td></tr>
+<tr><td>Interval banner 过长 (too long)</td><td><span class="keep">KEEP</span></td><td>Real biology (missed AM/PM window). Inline, factual, dismissible — already the anchor's warning grammar.</td></tr>
+<tr><td>Unit-progress card + info banner ("200 pigs · please tap…")</td><td><span class="merge">MERGE</span></td><td>Card content becomes the header cells (unit KPI | task overview, 01); the instructional banner dies — the screen's rows are the instruction.</td></tr>
+<tr><td>Filter group breeding-status (可配种/倒计时中/已完成)</td><td><span class="cut">CUT</span></td><td>Duplicate of the lens (Open · Done · All) plus rail words. Filter keeps only what the lens can't say: mating count 0/1/2/3/&gt;3 (01c already reserves this group).</td></tr>
+<tr><td>Sequence drawer (timeline + attribution + vitals header)</td><td><span class="keep">KEEP</span></td><td>This is the task. Our sequence sheet (04) is the same anatomy: sow header · timeline with heat origin · confirm. Read-only 配种详情 = the same sheet minus footer — one component, two modes.</td></tr>
+<tr><td>Select-semen page</td><td><span class="keep">KEEP</span></td><td>As a picker sheet over the sequence sheet, not a page. Its rules are the delta: console-plan source, search, QR scan, forward-fill default (Δ1).</td></tr>
+<tr><td>额外配种 extra-mating button-swap</td><td><span class="keep">KEEP</span></td><td>Genuine branch. On a done sow's sheet the timeline grows a ghost row <span class="mono">+ Add mating 3</span> (Δ2); numbering just continues. List row stays <span class="mono">Done</span> — no new state invented.</td></tr>
+<tr><td>Six search-result branches (A–F) as separate screens</td><td><span class="merge">MERGE</span></td><td>A = the normal sheet. B–F are one guard sheet with 0–2 stacked notices (not in unit / not in batch) and the not-in-heat dialog chained last (Δ3). Same pig card, same location line, buttons composed from the same three verbs (confirm location · join batch · breed).</td></tr>
+<tr><td>Not-in-heat guard "confirm in-heat &amp; breed"</td><td><span class="keep">KEEP</span></td><td>It back-fills a missed heat record with attribution — a data-integrity gate, one tap, never silent. The pen list's not-in-heat rows route through it.</td></tr>
+<tr><td>Batch-change typed verification (pig-ID last 4)</td><td><span class="merge">MERGE</span></td><td>Keep the second confirm, replace typing with the scanner already in the farmer's hand: scan the ear tag to verify (typing stays as fallback). Same assurance, no gloved keyboard.</td></tr>
+<tr><td>End-task page (2 states) + typed removal count</td><td>MOVE</td><td>Closing the breeding phase is a batch act, not a pen act — it moves to the console/manager surface (law: event tasks carry no End action on the room screens; they close record by record, 03). The execution-details split (1×/2×/≥3×/un-mated) is fully derived; typing "200" re-enters a number the system just displayed — a single confirm on the derived list suffices.</td></tr>
+<tr><td>End-task blocked dialog (heat check must end first)</td><td><span class="keep">KEEP</span></td><td>As a rule, not a screen: the console close action is disabled with the reason inline until the batch's heat check is closed.</td></tr>
+<tr><td>Ended module: pig-list tab (已配种/未配种 segments) + ended filter + ended task-detail</td><td><span class="merge">MERGE</span></td><td>A read-only clone of the live screens. Our list already has Done/All lenses, stamps, and the task-detail sheet; an ended task is the same screens frozen (✎ becomes view), plus history filters (last-mating date · unit) in the standard filter sheet. No second module.</td></tr>
+<tr><td>Parity-split KPI (经产/后备 heat→mating)</td><td><span class="keep">KEEP</span></td><td>Derived; lives in the task-detail sheet's KPI section (03) as two lines. Room header keeps the single blended KPI.</td></tr>
+<tr><td>Search by ear notch (耳缺号) · sow vitals in sheet header (age-days · parity)</td><td><span class="keep">KEEP</span></td><td>Already in our search field and sh2 vitals slot (04).</td></tr>
+<tr><td>Countdown state 距配种 hh:mm on every waiting row</td><td><span class="merge">MERGE</span></td><td>Kept as data, demoted as noise: WAIT rows dim with <span class="mono">next 9h</span> token (01b). A ticking clock per row shouts; the walk needs only "not yet / now / done".</td></tr>
+</tbody>
+</table>
+
+<h2>4 · Optimized flow</h2>
+<pre class="flow">
+BREEDING · the farmer's walk                         anchor cited per step
+──────────────────────────────────────────────────────────────────────────
+open task ─▶ BREEDING LIST (01 · rail task, no boxes)
+   header   Breeding · last mating 07:14 · G.H
+            [ Unit 4 · 1h heat→mating · ≤12h | 32 mated · 14 to mate ]
+   lens     Open 14 · Done 32 · All 46   (+ funnel: mating count 0/1/2/3/&gt;3 — 01c)
+   rows     000268  Mating 2              last 2d          READY ›
+   (01b)    000254  Mating 2 [LAST 26H]   in heat 6h       READY ›
+            000287  Mating 2              next 9h          WAIT      (dim)
+            000243  Done · 2 matings      JY001·07:14·G.H  ✎
+   dock     Go to pen · Scan ear tag · search                    (04b)
+      │
+      │  tap READY row · or scan tag (scan opens the sheet directly — 04b)
+      ▼
+SEQUENCE SHEET (04 · one component: act / view / audit-edit)
+   A1 000268 · sow · 650d · parity 3 · in heat 1h
+   ⚠ 26h since mating 1 · limit 24h            ← only when over config
+   ● Mating 2 · now      batch JY001 ▸         ← Δ1 semen picker
+   ○ Mating 1 · done     Jul 7 · JY001 · G.H
+   ○ In heat             Jul 7 23:00 · G.H
+   [ Confirm mating 2 · JY001 ]                commits · stamp on row · no toast
+      │
+      ├─ done sow reopened:  + Add mating 3            (Δ2 · 额外配种)
+      │                       └▶ same sheet, ● Mating 3 · now
+      │
+      └─ batch chip ▸ SEMEN PICKER (Δ1, sheet over sheet)
+            search 精液号/公猪号 · QR scan · list = console plan
+            picked once → default forward for this sow's later matings
+      │
+scan/search resolves off the happy path ─▶ GUARD SHEET (Δ3, one sheet)
+   notices (0–2):  ⚠ not in this unit   ⚠ not in batch (current: 批次1)
+   pig card: tag › · class · state · age  ·  location line (edit)
+   actions:  [Confirm location] [Location &amp; breed] [Join batch &amp; breed*]
+             *second confirm: scan tag to verify (type last-4 fallback)
+   not-in-heat pig, any path ─▶ dialog: "not marked in heat"
+             [Confirm in-heat &amp; breed]  → writes heat record → sheet
+      │
+      ▼
+sow reaches configured N ─▶ row flips Done · sequence feeds pregnancy check
+task end (03 task-detail sheet): no End action — closes record by record;
+   batch breeding-phase close = console act (Δ4): derived split shown
+   (mated 1×/2×/≥3× stay · un-mated leave batch), one confirm,
+   blocked until the batch's heat check is closed
+</pre>
+
+<h3>Deltas — the only new design work</h3>
+<div class="note"><b>Δ1 · Semen picker rules.</b> The picker sheet itself is standard; the rules are task-specific:
+list sourced from the console breeding plan (semen batches or boar IDs); search + QR scan of the dose label;
+default = previous mating's batch; changing at mating k forward-fills the default for k+1…; always editable.
+The confirm button always names the batch, so the default is visible at the moment of commit.</div>
+<div class="note"><b>Δ2 · Extra-mating entry.</b> A done sow's sheet grows one ghost timeline row
+<span class="mono">+ Add mating N+1</span>. No new screen, no new list state; numbering and interval logic continue.</div>
+<div class="note"><b>Δ3 · Guard sheet.</b> One sheet composes production's B–F: up to two factual notices
+(not in unit · not in batch), the pig card, a location line, and actions built from three verbs
+(confirm location / join batch / breed). The not-in-heat dialog chains last and back-fills the heat record
+with attribution. Batch-join verification = scan the ear tag (type last-4 fallback).</div>
+<div class="note"><b>Δ4 · Phase close (console).</b> Breeding keeps no End button on the phone. The console's
+batch view shows the derived close preview — sows at target, mated-but-short, un-mated (will leave the batch) —
+one confirm, disabled with inline reason until heat check is closed. The typed head-count is gone; the system
+already knows the number.</div>
+
+<h2>5 · Data-capture map</h2>
+<table>
+<thead><tr><th style="width:28%">Field</th><th style="width:34%">Where in the new flow</th><th>Production origin</th></tr></thead>
+<tbody>
+<tr><td>Mating event (seq no · timestamp · operator)</td><td>Sequence sheet · Confirm button (04)</td><td>Drawer checkbox + 提交结果 (871:2549, 886:13007)</td></tr>
+<tr><td>Semen batch / boar ID per mating</td><td>Batch chip on current timeline row → picker (Δ1)</td><td>选择精液 page (1361:13007) + note 1401:7756</td></tr>
+<tr><td>Interval too-long acknowledgement</td><td>Amber line in sheet + row chip <span class="mono">LAST 26H</span>; dismiss = scroll on</td><td>Banner 配种间隔（过长） (886:13007, 1649:21122)</td></tr>
+<tr><td>Extra mating (&gt;N)</td><td>Ghost row + Add mating N+1 (Δ2)</td><td>额外配种 button swap (886:13090 → 886:13243)</td></tr>
+<tr><td>Heat back-fill (missed by heat check)</td><td>Guard dialog Confirm in-heat &amp; breed (Δ3)</td><td>猪只未发情 dialog (5589:17881 / B)</td></tr>
+<tr><td>Location correction</td><td>Guard sheet location line + Location / Location &amp; breed (Δ3)</td><td>Search sheets C/D/F (5589:17906, 5590:18074, 5614:14736)</td></tr>
+<tr><td>Batch join / change (+ verification)</td><td>Guard sheet Join batch &amp; breed → scan-to-verify (Δ3)</td><td>E/F sheets + 批次变更 typed last-4 (5616:14785)</td></tr>
+<tr><td>Phase close · un-mated leave batch</td><td>Console batch close, derived list + one confirm (Δ4)</td><td>结束任务 page + typed count (952:4376/4439) + blocked dialog (928:5208)</td></tr>
+<tr><td>Record corrections</td><td>Done row ✎ → same sheet, audited (04 edit law)</td><td>Ended 配种详情 read-only (5752:5592) — production had view, not edit</td></tr>
+<tr><td>History query (last-mating date · unit)</td><td>Standard filter sheet on the ended task's list (01c)</td><td>Ended filter (5752:5433)</td></tr>
+</tbody>
+</table>
+
+<h2>6 · Open questions</h2>
+<table>
+<thead><tr><th style="width:44%">Question</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td>Heat → 1st mating: production shows a countdown on the 1st mating too (<span class="mono">23:59 距配种 · 第1次</span>). Is that the same 24 h interval config, a separate heat-to-first-service delay (AM/PM rule), or a mock artefact?</td><td>Decides whether a freshly marked in-heat sow is READY immediately or WAITs; changes the first thing the breeder sees after heat check.</td></tr>
+<tr><td>Does READY expire? Production has no "late/overdue" state for a due mating — only the after-the-fact 过长 flag once recorded.</td><td>An expiring window (heat ends ~40–60 h) would let the list escalate <span class="mono">READY → LATE</span> and drive the walk; today nothing nags until the record is made.</td></tr>
+<tr><td>Batch-join verification: is scan-to-verify acceptable in place of typing the pig-ID last 4 (typing kept as fallback)?</td><td>The typed check is the only gloved-keyboard moment left in the flow.</td></tr>
+<tr><td>Where does phase close live — console only, or also a supervisor path on the phone (task-detail sheet)? Law says event tasks show no End action on room screens.</td><td>Someone must trigger the un-mated-sows-leave-batch cleanup and see the blocked-by-heat-check reason.</td></tr>
+<tr><td>Natural mating farms: is 公猪号 (boar ID) a separate list/mode from the semen plan, and does a boar mating carry different fields (no dose QR)?</td><td>The picker note says "semen no. / boar no." but only semen mocks exist.</td></tr>
+<tr><td>Extra matings: any cap or approval beyond the configured count (filter suggests &gt;3 happens)?</td><td>Cost control on semen doses vs. field reality.</td></tr>
+</tbody>
+</table>
+
+<p class="anno" style="margin-top:40px">sources · figma section 501:2230 (27 frames, all read) · anchors: ux/task-screens.html 01/01b/01c/02/02b/02c/03/04/04b · ux/unified-task-list.md §1–2</p>
+</div>
+</body>
+</html>

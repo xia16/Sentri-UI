@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentri VI — Three Directions, One Decision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Fraunces:opsz,wght@9..144,560;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAFAF8; --ink:#191B1E; --ink2:#4A4E54; --ink3:#787D84;
+    --hair:#E2E2DE; --hair2:#CDCDC8;
+    --red:#C2402E; --amber:#96660D; --amber-fill:#D99A21; --blue:#3E56C4; --green:#3B8A50; --gray:#79828A;
+    --ledger-paper:#F6F4EC; --ledger-olive:#47551F; --ledger-ink:#20241C;
+    --panel-ground:#F5F7F8; --panel-teal:#0E7C8A; --panel-ink:#171B1E;
+    --board-paper:#FBFBFA; --board-ink:#17191C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:'Barlow',sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 48px}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .anno{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+  header.top{display:flex;justify-content:space-between;padding:28px 0;border-bottom:1px solid var(--hair)}
+  h1{font-family:'Barlow',sans-serif;font-weight:700;font-size:56px;line-height:1.05;letter-spacing:-.01em;margin:72px 0 28px;max-width:15ch}
+  .lede{font-size:18px;color:var(--ink2);max-width:62ch;margin-bottom:64px}
+  .rule{border:none;border-top:1px solid var(--ink);margin:56px 0 0}
+  section{padding:56px 0 72px}
+  .sec-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:36px}
+  h2{font-size:28px;font-weight:700}
+  h3{font-size:18px;font-weight:700;margin-bottom:8px}
+  p{max-width:66ch}
+
+  /* candidates */
+  .cands{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--hair2)}
+  .cand{padding:0;border-right:1px solid var(--hair2);display:flex;flex-direction:column}
+  .cand:last-child{border-right:none}
+  .cand .num{padding:14px 20px 0}
+  .cand .hero{height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  .cand-body{padding:20px;border-top:1px solid var(--hair)}
+  .cand-body .thesis{font-size:14px;color:var(--ink2);margin:6px 0 16px;max-width:none}
+  .pv{list-style:none;font-size:13.5px;color:var(--ink2)}
+  .pv li{padding:7px 0;border-top:1px solid var(--hair)}
+  .pv li b{color:var(--ink)}
+  .pv .lbl{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;margin-bottom:6px}
+  .lbl.good{color:var(--green)} .lbl.bad{color:var(--red)}
+
+  /* mini signature mocks */
+  .sig{width:100%;max-width:300px;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  /* ledger hero */
+  .hero-ledger{background:var(--ledger-paper)}
+  .hero-ledger .wordmark{font-family:'Fraunces',serif;font-weight:600;font-size:34px;color:var(--ledger-ink)}
+  .hero-ledger .wordmark i{font-style:normal;color:var(--ledger-olive)}
+  .sig-ledger{background:#FFFEFA;border:1px solid #E5E1D2;padding:12px 14px;font-size:13px}
+  .sig-ledger .row{display:flex;align-items:baseline;gap:10px}
+  .sig-ledger .tag{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--ledger-ink)}
+  .sig-ledger .struck{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9A9682;text-decoration:line-through}
+  .sig-ledger .chip{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#B23B26;background:#F7E5E0;border-radius:3px;padding:2px 6px;margin-left:auto}
+  /* panel hero */
+  .hero-panel{background:var(--panel-ground)}
+  .hero-panel .wordmark{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:36px;letter-spacing:.04em;color:var(--panel-ink)}
+  .sig-panel{background:#fff;border:1px solid #DDE3E6;padding:12px 14px}
+  .sig-panel .schem{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+  .sig-panel .cell{border:1px solid #C6CDD2;border-radius:4px;padding:6px 8px;background:#fff}
+  .sig-panel .cell .r{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#667079}
+  .sig-panel .cell .n{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:var(--panel-ink)}
+  .sig-panel .cell.alert{border:2px solid #C2402E;background:#FBEFED}
+  .sig-panel .cell.due{border-color:#E89C0E;background:#FBF4E3}
+  /* board hero */
+  .hero-board{background:var(--board-paper)}
+  .hero-board .wordmark{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:30px;letter-spacing:.06em;color:var(--board-ink)}
+  .sig-board{background:#fff;border:1px solid #E4E4E1;font-size:12.5px}
+  .sig-board .brow{display:flex;align-items:center;gap:8px;padding:9px 12px;border-top:1px solid #EEEEEB}
+  .sig-board .brow:first-child{border-top:none}
+  .sig-board .loc{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px}
+  .sig-board .st{margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:10.5px;letter-spacing:.06em}
+
+  /* scoring table */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;vertical-align:top;padding:14px 16px;border-bottom:1px solid var(--hair)}
+  thead th{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+  td.axis{width:26%}
+  td.axis b{display:block;font-size:14.5px}
+  td.axis span{font-size:12.5px;color:var(--ink3)}
+  .pips{font-size:13px;letter-spacing:2px;display:block;margin-bottom:4px}
+  td .note{font-size:12.5px;color:var(--ink2);display:block;max-width:28ch}
+  .win{background:#F2F5EF}
+
+  /* synthesis */
+  .synth{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid var(--hair2)}
+  .synth>div{padding:24px;border-right:1px solid var(--hair2)}
+  .synth>div:last-child{border-right:none}
+  .synth h4{font-size:15px;font-weight:700;margin:2px 0 14px}
+  .synth h4 em{font-style:normal;color:var(--ink3);font-weight:500}
+  .take,.rej{list-style:none;font-size:13.5px}
+  .take li,.rej li{padding:8px 0 8px 22px;border-top:1px solid var(--hair);position:relative}
+  .take li::before{content:"＋";position:absolute;left:0;top:8px;color:var(--green);font-weight:700}
+  .rej li::before{content:"—";position:absolute;left:0;top:8px;color:var(--red);font-weight:700}
+  .rej{margin-top:10px}
+
+  .verdict-box{border:2px solid var(--ink);padding:32px;margin-top:48px}
+  .verdict-box p{max-width:none;font-size:16.5px}
+  .verdict-box .anno{margin-bottom:14px;display:block}
+  footer{padding:40px 0 80px;color:var(--ink3);font-size:13px;border-top:1px solid var(--hair);margin-top:40px}
+  a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <span class="anno">Sentri · Visual Identity · Direction Review</span>
+  <span class="anno">Ashfield Farm data · 2026.08</span>
+</header>
+
+<h1>Three directions. One decision.</h1>
+<p class="lede">Three complete brand worlds were built to the same fidelity — same product, same
+fictional farm, same three screens (Today, Pregnancy check, Farrowing record), same five-status
+vocabulary. The comparison is therefore about identity, not effort. This sheet scores them against
+the barn brief — gloves, sunlight, 200-sow lists, workers who navigate by <b>where</b>, not what —
+and specifies what a final synthesis should absorb and reject from each.</p>
+
+<hr class="rule">
+
+<section>
+  <div class="sec-head">
+    <h2>The candidates</h2>
+    <span class="anno">Built · QC'd · same spec</span>
+  </div>
+
+  <div class="cands">
+    <div class="cand">
+      <div class="num anno">01 · sentri-vi-ledger.html</div>
+      <div class="hero hero-ledger">
+        <div class="wordmark">Sentri<i>.</i></div>
+        <div class="sig sig-ledger">
+          <div class="row"><span class="tag">000325</span>
+            <span class="struck">DUE JUL 6</span>
+            <span style="font-size:11.5px;color:#474C3D">done Jul 8</span>
+            <span class="chip">+2D LATE</span></div>
+        </div>
+      </div>
+      <div class="cand-body">
+        <h3>Field Ledger</h3>
+        <p class="thesis">The record book. Warm paper, ink, olive; Fraunces + Plus Jakarta Sans +
+        Plex Mono. Signature: the <b>delta row</b> — struck schedule, colored actual. "Everything
+        on the record."</p>
+        <ul class="pv">
+          <li><span class="lbl good">Proved</span><b>Delta row is a trust feature</b> — lateness recorded, not scolded; ledger tables beat cards at 200-row density; warm paper kills glare-shimmer; near-free migration (keeps 2 of 3 shipped fonts + olive/amber).</li>
+          <li><span class="lbl bad">Strains</span>Fraunces is deck candy at phone scale; warm paper narrows amber's headroom on the one load-bearing status; brand olive and status green are neighbors (colour-blind risk).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cand">
+      <div class="num anno">02 · sentri-vi-panel.html</div>
+      <div class="hero hero-panel">
+        <div class="wordmark">SENTRI</div>
+        <div class="sig sig-panel">
+          <div class="schem">
+            <div class="cell due"><div class="r">R1</div><div class="n">46</div></div>
+            <div class="cell alert"><div class="r">R2</div><div class="n">200</div></div>
+            <div class="cell"><div class="r">R3</div><div class="n">470</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cand-body">
+        <h3>Panel</h3>
+        <p class="thesis">The instrument cluster. Cool housing, white faces, gauge teal;
+        Barlow Condensed + Barlow + Plex Mono, every numeral mono. Signature: the <b>barn
+        schematic</b> — the floor plan is the home screen. "Equipment you operate."</p>
+        <ul class="pv">
+          <li><span class="lbl good">Proved</span><b>The schematic makes location-first literal</b> — a problem has an address you can walk to; exception-first survives 2,140-sow density; teal is ownable in a Deere-green category and never trades jobs with status.</li>
+          <li><span class="lbl bad">Strains</span>Schematic needs a designed collapse for multi-building sites; instrument coolness is cold at husbandry moments (stillbirth counter); condensed caps + mono can read as a warning poster.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cand">
+      <div class="num anno">03 · sentri-vi-board.html</div>
+      <div class="hero hero-board">
+        <div class="wordmark">SENTRI</div>
+        <div class="sig sig-board">
+          <div class="brow"><span class="loc">R1</span><span>Heat check</span><span class="st" style="color:#9A6700">DUE NOW</span></div>
+          <div class="brow"><span class="loc">R2</span><span>Re-checks · 6</span><span class="st" style="color:#C42D21">OVERDUE</span></div>
+          <div class="brow"><span class="loc">R3</span><span>Farrowing watch</span><span class="st" style="color:#1259C3">ACTIVE</span></div>
+        </div>
+      </div>
+      <div class="cand-body">
+        <h3>Board</h3>
+        <p class="thesis">The departure board. Near-white, ink, mono-forward; Barlow Semi Condensed
+        + JetBrains Mono. Signature: the <b>status rail</b> — one aligned column of colored words,
+        the only color on screen. "The schedule you read."</p>
+        <ul class="pv">
+          <li><span class="lbl good">Proved</span><b>Arm's-length triage works</b> — the whole color budget spent at the decision point; density native (200 sows = one 50px row ×200); "color = status, nothing else" is an enforceable review rule.</li>
+          <li><span class="lbl bad">Strains</span>Runs cold — administrative register; the rail is anglophone (status-word length breaks in translation — relevant for a bilingual future); near-white + ink + mono is the dev-tool default, thin ownability alone.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <h2>Scoring</h2>
+    <span class="anno">■ = point · 5 max · scored against the barn brief</span>
+  </div>
+  <table>
+    <thead><tr>
+      <th style="width:26%">Axis</th><th>01 Ledger</th><th>02 Panel</th><th>03 Board</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td class="axis"><b>Glove &amp; sunlight legibility</b><span>wet screen, glare, 48px+ targets</span></td>
+        <td><span class="pips">■■■■□</span><span class="note">Warm paper is easy on glare; serif moments cost a little contrast</span></td>
+        <td class="win"><span class="pips">■■■■■</span><span class="note">Highest contrast discipline; big mono numerals; 48/56 enforced</span></td>
+        <td class="win"><span class="pips">■■■■■</span><span class="note">Ink on near-white is the ceiling; condensed forms stay legible small</span></td>
+      </tr>
+      <tr>
+        <td class="axis"><b>Sub-second status read</b><span>does the screen answer "does anything need me?" instantly</span></td>
+        <td><span class="pips">■■■■□</span><span class="note">Errata strip + status chips read fast; more prose on screen to skip</span></td>
+        <td class="win"><span class="pips">■■■■■</span><span class="note">Exception-first is the layout law; colored rooms on the schematic</span></td>
+        <td class="win"><span class="pips">■■■■■</span><span class="note">The rail is the pattern's whole argument — one downward glance</span></td>
+      </tr>
+      <tr>
+        <td class="axis"><b>Density tolerance</b><span>200-sow lists, 4 sections, no fatigue</span></td>
+        <td><span class="pips">■■■■□</span><span class="note">Ledger tables handle it; struck-through gets fussy on late-heavy rooms</span></td>
+        <td><span class="pips">■■■■□</span><span class="note">List grammar strong; schematic must collapse gracefully at scale</span></td>
+        <td class="win"><span class="pips">■■■■■</span><span class="note">Born for it — smallest component surface, repetition without fatigue</span></td>
+      </tr>
+      <tr>
+        <td class="axis"><b>Low-literacy support</b><span>meaning carried by position, color, number — not sentences</span></td>
+        <td><span class="pips">■■■□□</span><span class="note">Leans on words and editorial phrasing</span></td>
+        <td class="win"><span class="pips">■■■■■</span><span class="note">Spatial schematic + counts: you see <i>where</i> without reading anything</span></td>
+        <td><span class="pips">■■□□□</span><span class="note">The rail is made of <i>words</i> — its core gesture requires reading English</span></td>
+      </tr>
+      <tr>
+        <td class="axis"><b>Farmer register</b><span>trustworthy, calm, human — not clinical, not bureaucratic</span></td>
+        <td class="win"><span class="pips">■■■■■</span><span class="note">Warmth is the direction's thesis; husbandry moments land right</span></td>
+        <td><span class="pips">■■■□□</span><span class="note">Confident but cold where animals are born and lost</span></td>
+        <td><span class="pips">■■■□□</span><span class="note">Administrative; terminal energy needs voice to warm it</span></td>
+      </tr>
+      <tr>
+        <td class="axis"><b>Ownability</b><span>recognizable with the logo covered, in an ag category of Deere green</span></td>
+        <td><span class="pips">■■■■□</span><span class="note">Delta row + olive paper is distinct; serif warmth is crowded territory</span></td>
+        <td class="win"><span class="pips">■■■■■</span><span class="note">Schematic + gauge teal + all-numerals-mono: three ownable moves</span></td>
+        <td><span class="pips">■■■□□</span><span class="note">Rail is ownable as a rule, but the look is the dev-tool default</span></td>
+      </tr>
+      <tr>
+        <td class="axis"><b>Migration cost</b><span>from shipped DS (olive/amber, Jakarta + Plex Mono) and Codex base</span></td>
+        <td class="win"><span class="pips">■■■■■</span><span class="note">Keeps most tokens; additive (Fraunces, delta pattern)</span></td>
+        <td><span class="pips">■■■□□</span><span class="note">New display face, cool neutrals, schematic component</span></td>
+        <td><span class="pips">■■■□□</span><span class="note">New mono-first type system; radius/row sweep</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="sec-head">
+    <h2>The synthesis</h2>
+    <span class="anno">What the final absorbs · what it rejects</span>
+  </div>
+  <div class="synth">
+    <div>
+      <h4>From 01 · Ledger <em>— the soul</em></h4>
+      <ul class="take">
+        <li>The <b>delta row</b> — struck schedule, colored actual — promoted to system-wide law; slippage is recorded, never scolded</li>
+        <li>The warm-leaning ground: not cream, but neutrals tinted one step toward paper so the app never turns clinical</li>
+        <li>Continuity: Plus Jakarta Sans (text) + IBM Plex Mono (all IDs and numerals) survive from the shipped DS</li>
+        <li>The register voice — calm foreman, numbers attached, no scolding</li>
+      </ul>
+      <ul class="rej">
+        <li>Fraunces — a third family a phone screen can't afford</li>
+        <li>Full warm-cream ground — costs amber its headroom</li>
+      </ul>
+    </div>
+    <div>
+      <h4>From 02 · Panel <em>— the machine</em></h4>
+      <ul class="take">
+        <li>The <b>barn schematic</b> as the signature home gesture — location-first drawn literally, tap a room to enter it</li>
+        <li>Exception-first layout law: red may only occupy the first slot; a quiet farm shows an almost colorless screen</li>
+        <li>All numerals mono &amp; tabular — counts, tags, times — cheap to build, hard to copy</li>
+        <li>Gauge-segmented progress in the task's status hue</li>
+      </ul>
+      <ul class="rej">
+        <li>Full condensed-caps voice — warning-poster risk in a husbandry app</li>
+        <li>Cool clinical housing as the default ground</li>
+      </ul>
+    </div>
+    <div>
+      <h4>From 03 · Board <em>— the spine</em></h4>
+      <ul class="take">
+        <li>The <b>status rail</b>: rightmost column is sacred — status word + timestamp, nothing else may cross it, aligned on every screen</li>
+        <li>The color law, stated as a rule of the brand: <b>color may mean status; color may not mean anything else</b></li>
+        <li>The package-tracking spine for lifecycle timelines (farrowing intervals, sow history): past filled, present colored, next hollow</li>
+        <li>Row grammar: one row = tag · state · rail, 50px, repeated without variation</li>
+      </ul>
+      <ul class="rej">
+        <li>Words-only status (fails low-literacy — rail words get a fixed status glyph + color, so shape carries meaning too)</li>
+        <li>Total mono — data is mono, sentences are not</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict-box">
+    <span class="anno">Recommendation</span>
+    <p><b>Panel wins the brief; Ledger wins the heart; Board wins the spine.</b> Scored against
+    the barn — gloves, glare, 200 sows, workers who read position and color before words — Panel
+    is the strongest single direction and the only one whose signature (the schematic) is also the
+    product's core argument: location first. The recommended final is <b>Panel's structure with
+    Ledger's temperature and Board's discipline</b>: schematic home + exception-first law +
+    mono numerals, on a one-step-warm neutral ground with the shipped Jakarta/Plex-Mono pair,
+    governed by Board's color law and status rail, with Ledger's delta row as the system-wide
+    record gesture. Gauge teal vs. shipped olive as the single brand hue is the one open identity
+    question this sheet does not decide — it deserves a two-swatch test on the synthesized screens.</p>
+  </div>
+</section>
+
+<footer>
+  <span class="mono">sentri-vi-ledger.html · sentri-vi-panel.html · sentri-vi-board.html — open side by side. Same farm, same day, same sows.</span>
+</footer>
+
+</div>
+</body>
+</html>

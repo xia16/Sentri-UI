@@ -1,0 +1,568 @@
+<!-- PEN workflows · review fragment · anchors: check-in.html 06/06b/06g/06h · components.html 04/04d/05/07 · spec: ux/ops/pen-ops.md -->
+
+<!-- ================= WF 1 · REPORT FAULT ================= -->
+<section class="wf" id="wf-fault" data-title="Report fault">
+  <div class="wfhead"><h2>Report fault</h2><span class="anno">a fault names a device in this pen · production 5 screens → ours 1 drawer</span></div>
+  <div class="caro">
+
+    <div class="slide"><div class="vlabel">Entry — tick C3 · the verb sheet, PEN strip leading</div>
+      <div class="phone" style="height:760px;background:var(--ground)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">Last checked yesterday · L.M</div></div></div>
+        <div style="opacity:.32">
+          <div class="list" style="padding:8px 12px">
+            <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">C1</span><span class="cnt">14 pigs</span><span class="fslot"><b>18.2</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+            <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">C2</span><span class="cnt">12 pigs</span><span class="fslot"><span class="fr">47.2 →</span><b>47.6</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+            <div class="pcard"><div class="pen"><input type="checkbox" checked><span class="code">C3</span><span class="cnt">13 pigs</span><span class="fslot"><b>49.8</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+            <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">D4</span><span class="cnt">42 pigs</span><span class="fslot"><span class="fr">ad-lib</span></span><span class="cv2">⌄</span></div></div>
+          </div>
+        </div>
+        <div class="psheet">
+          <div class="grab"></div>
+          <div class="phd"><span class="x">✕</span><span class="cnt">PEN C3 · 13 pigs</span><span class="up">view ›</span></div>
+          <div class="strip"><div class="sk">Pen</div>
+            <div class="tiles">
+              <div class="tile"><span class="ti">⚒</span><span class="tl">Fault</span></div>
+              <div class="tile"><span class="ti">#</span><span class="tl">Count</span></div>
+              <div class="tile"><span class="ti">≡</span><span class="tl">Note</span></div>
+            </div>
+          </div>
+          <div class="strip"><div class="sk">Health — 13 pigs</div>
+            <div class="tiles">
+              <div class="tile"><span class="ti">+</span><span class="tl">Condition</span></div>
+              <div class="tile"><span class="ti">⚕</span><span class="tl">Treatment</span></div>
+              <div class="tile"><span class="ti">▲</span><span class="tl">Triage</span></div>
+              <div class="tile dth"><span class="ti">⊗</span><span class="tl">Death</span></div>
+            </div>
+          </div>
+          <div class="strip"><div class="sk">Routine — 13 pigs</div>
+            <div class="tiles">
+              <div class="tile"><span class="ti">⚖</span><span class="tl">Weigh</span></div>
+              <div class="tile"><span class="ti">↕</span><span class="tl">Backfat</span></div>
+              <div class="tile"><span class="ti">⇄</span><span class="tl">Transfer</span></div>
+              <div class="tile"><span class="ti">⌗</span><span class="tl">Tag</span></div>
+            </div>
+          </div>
+          <div class="vna">heat and 5 more · drag for all<span class="chv">›</span></div>
+        </div>
+      </div>
+      <div class="why"><b>One door, and the verb declares its subject.</b> Ticking the pen contributes the pen and its pigs, so the sheet reads <span class="mono">PEN</span> · <span class="mono">HEALTH — 13 PIGS</span> (05) — no verb is ambiguous, <span class="mono">Fault</span> is only ever about the pen. Fault is <b>Single</b>: with two pens ticked it drops to the not-available line, omitted, never greyed — production&#39;s all-greyed drawer (<span class="zh">功能禁用态</span> 854:3491) is the pattern this replaces. Feed is not a verb here; a feed change is the consequence of a case, never a direct act (§06b).</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">The drawer — device · description · photos</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:780px;background:var(--ground)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">Last checked yesterday · L.M</div></div></div>
+        <div style="flex:1;overflow:hidden;opacity:.32">
+          <div class="list" style="padding:8px 12px">
+            <div class="pcard"><div class="pen"><input type="checkbox" checked><span class="code">C3</span><span class="cnt">13 pigs</span><span class="fslot"><b>49.8</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+            <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">D4</span><span class="cnt">42 pigs</span><span class="fslot"><span class="fr">ad-lib</span></span><span class="cv2">⌄</span></div></div>
+          </div>
+        </div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">C3</span><span class="tag">Report fault</span><span class="vit">13 pigs · unit 6</span></div>
+          <div class="fpick">Device <span class="req">*</span><span class="v">Drinking station</span><span class="chv">›</span></div>
+          <div class="flbl">Description <span class="req">*</span></div>
+          <div class="fnote" style="color:var(--ink)">float valve stuck — water overflowing at the trough end</div>
+          <div class="flbl">Photos</div>
+          <div class="fphoto"><div class="th"></div><div class="th"></div><div class="add">+</div></div>
+          <div class="shbar"><button class="cta" style="flex:1">Report fault</button></div>
+          <div class="aud">saves to C3 · G. Hansen · 09:41</div>
+        </div>
+      </div>
+      <div class="why"><b>Three fields, one act.</b> The pen&#39;s device list lives inside the Picker — production&#39;s list screen (580:2242) dies as a door, its data stays; a handful of devices needs no search bar and no filter sheet. Each picker row carries the device&#39;s status, and a typed device already <span class="zh">故障</span> is not blocked: choosing it opens its existing fault record — <span class="zh">不可重复上报故障</span> kept as a redirect, not a dead-end error. Photos are an ADD (production captures none anywhere): a fault is a claim about a physical object a <i>different person</i> repairs later. What stays out: severity, category, assignee, due date — nothing in production consumes them, and their omission is a subtraction worth keeping. <span class="mono">Fixed:</span> the closing line said <span class="mono">writes C3</span> — spec grammar; it now says <span class="mono">saves to C3</span>. Same stamp, plain words.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">Other — the name reveals beneath its trigger</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:820px;background:var(--ground)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">Last checked yesterday · L.M</div></div></div>
+        <div style="flex:1;overflow:hidden;opacity:.32">
+          <div class="list" style="padding:8px 12px">
+            <div class="pcard"><div class="pen"><input type="checkbox" checked><span class="code">C3</span><span class="cnt">13 pigs</span><span class="fslot"><b>49.8</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+          </div>
+        </div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">C3</span><span class="tag">Report fault</span><span class="vit">13 pigs · unit 6</span></div>
+          <div class="fpick">Device <span class="req">*</span><span class="v">Other</span><span class="chv">›</span></div>
+          <div class="fcond"><div class="ct">Device name <span class="req">*</span></div>
+            <div class="fpick" style="margin-top:0">Fan, south wall</div>
+          </div>
+          <div class="flbl">Description <span class="req">*</span></div>
+          <div class="fnote" style="color:var(--ink)">guard bent, blade catching on start-up</div>
+          <div class="flbl">Photos</div>
+          <div class="fphoto"><div class="th"></div><div class="add">+</div></div>
+          <div class="shbar"><button class="cta" style="flex:1">Report fault</button></div>
+          <div class="aud">saves to C3 · G. Hansen · 09:41</div>
+        </div>
+      </div>
+      <div class="why"><b>The conditional rule (04), not a second drawer.</b> Production&#39;s <span class="zh">其他</span> variant is the same sheet +188px with <span class="zh">设备名称 *</span> added (1574:4029) — here the field reveals inline beneath its trigger, amber rule, never a second step. Description stays required for every type: the newer sheet (1574:3988) outranks the stale <span class="zh">不需要填写备注</span> annotation. Free-text naming is also the known wound — production filed the same fan as <span class="zh">风扇 / 栏位门 / 空调</span> — so <span class="mono">Other</span> may repeat-report, and promoting recurring names to registered devices is console scope (OQ3). <span class="mono">Fixed:</span> the reveal captioned itself <span class="mono">↳ revealed by Other</span> — mechanics narrated inside the phone. The field now carries only its name; the amber rule is the reveal.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">After — the wrench counts, nothing toasts</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:720px">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="padding-bottom:10px"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Unit 6</div><div style="font-size:12px;color:var(--ink3);margin-top:2px;white-space:nowrap">Last checked <b style="color:var(--ink2);font-weight:600">yesterday</b> · L.M</div></div><span class="hbtn">Check-in</span></div>
+        <div class="list" style="flex:1">
+          <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">C1</span><span class="cnt">14 pigs</span><span class="fslot"><b>18.2</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+          <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">C2</span><span class="cnt">12 pigs</span><span class="fslot"><span class="fr">47.2 →</span><b>47.6</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+          <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">C3</span><span class="cnt">13 pigs</span><span class="fslot"><b>49.8</b><span class="un">kg</span><span class="wr"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>1</span></span><span class="cv2">⌄</span></div></div>
+          <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">D4</span><span class="cnt">42 pigs</span><span class="fslot"><span class="fr">ad-lib</span></span><span class="cv2">⌄</span></div></div>
+          <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">D5</span><span class="cnt">40 pigs</span><span class="fslot"><b>12.9</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+        </div>
+        <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">C1</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+      </div>
+      <div class="why"><b>The row updates where it sits.</b> <span class="mono">⚒1</span> is production&#39;s own signal given the strip&#39;s scale — device names, reporter and time live on the pen sheet, whose FAULTS row quotes the description and whose history gains <span class="mono">Fault · reported · today · G.H</span>. The <span class="zh">操作成功</span> toast (591:4283) is cut: the wrench and the row are the feedback, and the walk returns to the same scroll position with the selection cleared.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= WF 2 · RESOLVE FAULT ================= -->
+<section class="wf" id="wf-resolve-fault" data-title="Resolve fault">
+  <div class="wfhead"><h2>Resolve fault</h2><span class="anno">the record acts · production 0 screens → ours 1 record</span></div>
+  <div class="caro">
+
+    <div class="slide"><div class="vlabel">The door — the pen sheet&#39;s FAULTS row</div>
+      <div class="phone" style="height:720px;background:var(--card)">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">Pen C3</div><div class="sub">13 pigs · batch 20 · unit 6</div></div></div>
+        <div class="pgk">Feed</div>
+        <div class="pline"><span class="pl">Today</span><span class="pr"><b style="color:var(--ink)">49.8 kg</b></span></div>
+        <div class="pline"><span class="pl">Grower 1</span><span class="pr">3.8 kg/head × 13</span></div>
+        <div class="pline"><span class="pl">Source</span><span class="pr" style="color:var(--green)">feed plan ✓</span></div>
+        <div class="pgk">Faults</div>
+        <div class="pline"><span class="pl">Drinking station · open</span><span class="pr">jul 20 · G.H ›</span></div>
+        <div class="pline hist"><span class="pl">&ldquo;float valve stuck — water overflowing&rdquo;</span><span class="pr"></span></div>
+        <div class="pgk" style="border-top:8px solid var(--well);margin-top:10px">History <span style="float:right;text-transform:none;letter-spacing:0;font-size:11px">all ›</span></div>
+        <div class="pline hist"><span class="pl">Fault · reported · drinking station</span><span class="pr">jul 20 · G.H</span></div>
+        <div class="pline hist"><span class="pl">Feed step · curve day 24→25</span><span class="pr">jul 19</span></div>
+      </div>
+      <div class="why"><b>Not on the verb sheet — the page reads, records act (07).</b> The fault line chevrons into the fault&#39;s own record, where Resolve lives. Three doors reach it: this row, the unit sheet&#39;s <span class="mono">Equipment — 2 faults ›</span> (06g), and the report picker&#39;s redirect on an already-faulted device. Production has no screen for this at all — the green button sits disabled in both list frames and the flow exists only as an annotation (<span class="zh">解决故障时，需要一条一条的解决</span>, 928:2008); its read-only <span class="zh">异常详情</span> sheets (225:4803 / 1392:2929) carry no action buttons. <span class="mono">Fixed:</span> <span class="mono">Provenance · derived ✓</span> was engineer&#39;s language on the farmer&#39;s page — the line now reads <span class="mono">Source · feed plan ✓</span>.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">The record — production&#39;s detail plus the act it was missing</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--card)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div style="flex:1;overflow:hidden;opacity:.35">
+          <div class="appbar"><div class="back">←</div><div><div class="ttl">Pen C3</div><div class="sub">13 pigs · batch 20 · unit 6</div></div></div>
+          <div class="pgk">Feed</div>
+          <div class="pline"><span class="pl">Today</span><span class="pr"><b style="color:var(--ink)">49.8 kg</b></span></div>
+          <div class="pgk">Faults</div>
+          <div class="pline"><span class="pl">Drinking station · open</span><span class="pr">jul 20 · G.H ›</span></div>
+        </div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">C3</span><span class="tag">Fault · Drinking station</span><span class="vit">reported jul 20 · G.H</span></div>
+          <div style="font-size:14.5px;font-weight:600;margin-top:14px">&ldquo;float valve stuck — water overflowing at the trough end&rdquo;</div>
+          <div class="fphoto"><div class="th"></div><div class="th"></div></div>
+          <div class="flbl">Resolution note</div>
+          <div class="fnote">What was done — optional</div>
+          <div class="shbar"><button class="cta" style="flex:1">Resolve</button></div>
+          <div class="aud">resolved by you · now</div>
+        </div>
+      </div>
+      <div class="why"><b>Payload beyond the note: nothing.</b> <span class="mono">resolved-by</span> and <span class="mono">resolved-at</span> stamp automatically, the same grammar as every stamp; the read block is exactly the fields production&#39;s detail already showed, plus the photos from the report. One record at a time survives on the merits, not on deference: typed devices hold at most one open fault (the dedupe rule makes bulk moot), and <span class="zh">其他</span> records name <i>different physical objects</i> in free text — one shared resolution payload would be a lie. Until a device registry exists, same-device bulk resolve is unprovable (OQ3). Resolution data is an ADD: production captured none. <span class="mono">Fixed:</span> the stamp line read <span class="mono">stamps resolved · G.H · 09:41</span> — spec voice; it now reads <span class="mono">resolved by you · now</span>, the consequence as the farmer meets it.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">After — the promise the empty section keeps</div>
+      <div class="phone" style="height:720px;background:var(--card)">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">Pen C3</div><div class="sub">13 pigs · batch 20 · unit 6</div></div></div>
+        <div class="pgk">Feed</div>
+        <div class="pline"><span class="pl">Today</span><span class="pr"><b style="color:var(--ink)">49.8 kg</b></span></div>
+        <div class="pline"><span class="pl">Grower 1</span><span class="pr">3.8 kg/head × 13</span></div>
+        <div class="pgk">Faults</div>
+        <div class="pline"><span class="pl">— none open</span><span class="pr"></span></div>
+        <div class="pgk" style="border-top:8px solid var(--well);margin-top:10px">History <span style="float:right;text-transform:none;letter-spacing:0;font-size:11px">all ›</span></div>
+        <div class="pline hist"><span class="pl">Fault resolved · drinking station</span><span class="pr">aug 25 · G.H</span></div>
+        <div class="pline hist"><span class="pl">Fault · reported · drinking station</span><span class="pr">jul 20 · G.H</span></div>
+      </div>
+      <div class="why"><b>The one legal empty state.</b> The wrench&#39;s absence promised this section, so it prints <span class="mono">— none open</span> instead of vanishing — good news, not a gap (§06h:941). The wrench leaves the card the moment Resolve commits; history holds both ends of the fault&#39;s life with the resolution note on the record. No toast, no green banner — the record updated where it sat.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= WF 3 · SET COUNT ================= -->
+<section class="wf" id="wf-count" data-title="Set count">
+  <div class="wfhead"><h2>Set count</h2><span class="anno">one number, one source of truth · production 14 screens → ours 1 drawer</span></div>
+  <div class="caro">
+
+    <div class="slide"><div class="vlabel">One batch — one number, drawn twice</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:700px;background:var(--ground)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">Last checked yesterday · L.M</div></div></div>
+        <div style="flex:1;overflow:hidden;opacity:.32">
+          <div class="list" style="padding:8px 12px">
+            <div class="pcard"><div class="pen"><input type="checkbox" checked><span class="code">D5</span><span class="cnt">40 pigs</span><span class="fslot"><b>12.9</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+            <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">D6</span><span class="cnt">40 pigs</span><span class="fslot"><span class="fr">ad-lib</span></span><span class="cv2">⌄</span></div></div>
+          </div>
+        </div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">D5</span><span class="tag">Set count</span><span class="vit">40 head · 3 tagged</span></div>
+          <div class="ctr"><span class="lbl">Head in pen</span><span class="b">−</span><span class="n">40</span><span class="b plus">+</span></div>
+          <div style="font-size:11px;color:var(--ink3);padding:2px 2px 8px">can&#39;t go below the 3 tagged pigs</div>
+          <div class="flbl">By batch · 37 untagged</div>
+          <div class="ctr"><span class="lbl">line 1 · batch 18</span><span class="b">−</span><span class="n">37</span><span class="b plus">+</span></div>
+          <div class="aud" style="padding-top:16px">each tap saves · close when done</div>
+        </div>
+      </div>
+      <div class="why"><b>T = I + Σ(batch), live, by construction.</b> Untagged pens only — on a fully-identified pen the count derives from placements and the verb sits in the not-available line. With one batch row the two steppers are one control — the row is T minus the identified floor, and moving either moves both — so no state can exist in which the identity fails — which removes <span class="zh">提交</span>, the balance banners and both blocked states (1797:1721 / 1799:1985) in one move. The floor is production&#39;s own rule kept verbatim: the total&#39;s − disables at T&thinsp;=&thinsp;3 (658:3316), each batch row&#39;s − at 0. <span class="mono">Fixed:</span> the floor line read <span class="mono">↳ identified 3 · derives — the floor</span> — three spec words a glove can&#39;t parse; it now says <span class="mono">can&#39;t go below the 3 tagged pigs</span>. The header claimed <span class="mono">no tags</span> while the floor counted 3 — now <span class="mono">3 tagged</span>. And the closing line trades <span class="mono">commits</span>/<span class="mono">seals</span> for <span class="mono">each tap saves · close when done</span>.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">Two batches — the rows take the steppers</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:740px;background:var(--ground)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">Last checked yesterday · L.M</div></div></div>
+        <div style="flex:1;overflow:hidden;opacity:.32">
+          <div class="list" style="padding:8px 12px">
+            <div class="pcard"><div class="pen"><input type="checkbox" checked><span class="code">D5</span><span class="cnt">40 pigs</span><span class="fslot"><b>12.9</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+          </div>
+        </div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">D5</span><span class="tag">Set count</span><span class="vit">40 head · 3 tagged</span></div>
+          <div class="ctr"><span class="lbl">Head in pen</span><span style="font-size:11px;color:var(--ink3)">adds up</span><span class="n" style="width:auto;padding:0 2px">= 40</span></div>
+          <div style="font-size:11px;color:var(--ink3);padding:2px 2px 8px">can&#39;t go below the 3 tagged pigs</div>
+          <div class="flbl">By batch · 37 untagged</div>
+          <div class="ctr"><span class="lbl">line 1 · batch 18</span><span class="b">−</span><span class="n">25</span><span class="b plus">+</span></div>
+          <div class="ctr"><span class="lbl">line 1 · batch 20</span><span class="b">−</span><span class="n">12</span><span class="b plus">+</span></div>
+          <div class="fpick">+ Add batch<span class="chv">›</span></div>
+          <div class="aud" style="padding-top:16px">each tap saves · close when done</div>
+        </div>
+      </div>
+      <div class="why"><b>A delta must name its batch.</b> So at N&gt;1 the rows carry the steppers and the total prints as the derived sum — production instead let the total float free and built the whole failure-state apparatus to police what derivation makes impossible. <span class="mono">+ Add batch</span> keeps production&#39;s picker (559:1824) line-scoped with already-allocated batches pinned and greyed; its <span class="zh">确认</span> is cut — ticking commits the row at 0 head. Row <span class="mono">✕</span> appears only at 0 (amended from <span class="zh">删除批次无需二次确认</span>, 907:4986): with no unallocated state, steppering to 0 first <i>is</i> the confirmation, and a 0-row drops on close. <span class="mono">Fixed:</span> the total wore a <span class="mono">DERIVED</span> badge — a state token asking to be parsed. It now prints <span class="mono">= 40</span> beside the plain words <span class="mono">adds up</span>: still self-describing (a bare number would read as editable), no vocabulary required.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">Down 2 — the reason list follows the sign</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:860px;background:var(--ground)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">Last checked yesterday · L.M</div></div></div>
+        <div style="flex:1;overflow:hidden;opacity:.32">
+          <div class="list" style="padding:8px 12px">
+            <div class="pcard"><div class="pen"><input type="checkbox" checked><span class="code">D5</span><span class="cnt">40 pigs</span><span class="fslot"><b>12.9</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+          </div>
+        </div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">D5</span><span class="tag">Set count</span><span class="vit">40 head · 3 tagged</span></div>
+          <div class="ctr"><span class="lbl">Head in pen</span><span style="font-size:11px;color:var(--ink3)">adds up</span><span class="n" style="width:auto;padding:0 2px">= 38</span></div>
+          <div style="font-size:11px;color:var(--ink3);padding:2px 2px 8px">can&#39;t go below the 3 tagged pigs</div>
+          <div class="flbl">By batch · 35 untagged</div>
+          <div class="ctr"><span class="lbl">line 1 · batch 18</span><span class="b">−</span><span class="n">23</span><span class="b plus">+</span></div>
+          <div class="ctr"><span class="lbl">line 1 · batch 20</span><span class="b">−</span><span class="n">12</span><span class="b plus">+</span></div>
+          <div class="flbl">Why 2 fewer?</div>
+          <div class="opt on"><span class="rad"></span>Died unrecorded</div>
+          <div class="opt"><span class="rad"></span>Moved unrecorded</div>
+          <div class="opt"><span class="rad"></span>Miscount</div>
+          <div class="opt"><span class="rad"></span>Other</div>
+          <div class="aud" style="padding-top:16px">closing records 40 → 38 · G.H · 09:41</div>
+        </div>
+      </div>
+      <div class="why"><b>ADD — direction-filtered, optional.</b> Production captures no reason, date or author anywhere; <span class="mono">product-model</span> §4 expects the event to carry one. The block appears once the session&#39;s net Δ ≠ 0 and the delta&#39;s <b>sign filters the list</b> — four options, inside the Choice law (2–4); the naive five-item union would breach it. Optional at MVP: the steppers have already committed, so a required reason would reintroduce a gate — holding the event open until a reason lands is a submit button wearing a hat (OQ1). <span class="mono">Fixed:</span> <span class="mono">REASON — DOWN 2 SINCE OPENING</span> is now the question it was asking: <span class="mono">Why 2 fewer?</span> The old → new pair moved whole into the closing line — <span class="mono">closing records 40 → 38</span>.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">Up — the mirror list · Other reveals its note</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:860px;background:var(--ground)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">Last checked yesterday · L.M</div></div></div>
+        <div style="flex:1;overflow:hidden;opacity:.32">
+          <div class="list" style="padding:8px 12px">
+            <div class="pcard"><div class="pen"><input type="checkbox" checked><span class="code">D4</span><span class="cnt">42 pigs</span><span class="fslot"><span class="fr">ad-lib</span></span><span class="cv2">⌄</span></div></div>
+          </div>
+        </div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="pc">D4</span><span class="tag">Set count</span><span class="vit">42 head · no tags</span></div>
+          <div class="ctr"><span class="lbl">Head in pen</span><span class="b">−</span><span class="n">43</span><span class="b plus">+</span></div>
+          <div class="flbl">By batch · 43 untagged</div>
+          <div class="ctr"><span class="lbl">line 1 · batch 18</span><span class="b">−</span><span class="n">43</span><span class="b plus">+</span></div>
+          <div class="flbl">Why 1 more?</div>
+          <div class="opt"><span class="rad"></span>Born unrecorded</div>
+          <div class="opt"><span class="rad"></span>Moved unrecorded</div>
+          <div class="opt"><span class="rad"></span>Miscount</div>
+          <div class="opt on"><span class="rad"></span>Other</div>
+          <div class="fcond"><div class="ct">Note <span class="req">*</span></div>
+            <div class="fnote" style="margin-top:0;min-height:52px;color:var(--ink)">the runt from the corridor pen, never placed</div>
+          </div>
+          <div class="aud" style="padding-top:16px">closing records 42 → 43 · G.H · 09:41</div>
+        </div>
+      </div>
+      <div class="why"><b>Derive everything — nobody is asked which direction.</b> The count went up, so the list flips to <span class="mono">Born unrecorded · Moved unrecorded</span>; the steppers already said which way. <span class="mono">Other</span> reveals <span class="mono">Note *</span> inline beneath its trigger — the conditional rule, same shape as Abortion&#39;s. And the zero rule holds inside the sheet: D4 has no identified head, so the floor line simply does not print — a mixed pen edits only its un-identified remainder. <span class="mono">Fixed:</span> heading to <span class="mono">Why 1 more?</span>; the note&#39;s <span class="mono">↳ revealed by Other</span> caption gone the same way as the fault&#39;s.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">After — the seal is a history event</div>
+      <div class="phone" style="height:720px;background:var(--card)">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">Pen D5</div><div class="sub">38 pigs · 3 tagged · batch 18</div></div></div>
+        <div class="pgk">Count</div>
+        <div class="pline"><span class="pl">38 head</span><span class="pr">set today · G.H</span></div>
+        <div class="pgk">Health</div>
+        <div class="pline"><span class="pl">2 under treatment</span><span class="pr">scours · jul 22</span></div>
+        <div class="pgk">Feed</div>
+        <div class="pline"><span class="pl">Today</span><span class="pr"><b style="color:var(--ink)">12.9 kg</b></span></div>
+        <div class="pgk" style="border-top:8px solid var(--well);margin-top:10px">History <span style="float:right;text-transform:none;letter-spacing:0;font-size:11px">all ›</span></div>
+        <div class="pline hist"><span class="pl">Count set · 40 → 38 · died ×2</span><span class="pr">today · G.H</span></div>
+        <div class="pline hist"><span class="pl">Treatment · 2 head · scours</span><span class="pr">jul 22 · G.H</span></div>
+      </div>
+      <div class="why"><b>No banner, no green ✓, no discrepancy state — anywhere (§06b:661).</b> The strip census re-reads <span class="mono">38 pigs</span>; the sheet is the trail — who set it, from what. The open drawer was one session, and closing it sealed <b>one</b> event carrying the old → new pair and the reason as payload: production&#39;s <span class="zh">数量更新</span> dialog (570:1729) was this sentence presented as a decision; here it is simply the record. <span class="mono">Fixed:</span> the header read <span class="mono">no tags</span> on the pen whose floor is its 3 tagged pigs — now <span class="mono">3 tagged</span>.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= WF 4 · SWITCH FEED ================= -->
+<section class="wf" id="wf-switch" data-title="Feed · pen">
+  <div class="wfhead"><h2>Feed · the pen</h2><span class="anno">one verb — see the feed · adjust the pen · switch the formula — production had 0 screens</span></div>
+  <div class="caro">
+
+    <div class="slide"><div class="vlabel">1 · ENTRY — THE FEED TILE ON THE PEN</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--ground)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+      <div style="opacity:.32;padding:0 12px">
+        <div class="pcard"><div class="pen"><input type="checkbox" checked><span class="code">D6</span><span class="cnt">· 40 pigs</span><span class="fslot"><span class="fr">Nursery 2 →</span><b>Grower 1</b></span><span class="cv2">⌄</span></div></div>
+      </div>
+      <div class="psheet">
+        <div class="grab"></div>
+        <div class="phd"><span class="x">✕</span><span class="cnt">PEN D6 · 40 pigs</span><span class="up">view ›</span></div>
+        <div class="strip"><div class="sk">Pen</div>
+          <div class="tiles">
+            <div class="tile"><span class="ti"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><span class="tl">Fault</span></div>
+            <div class="tile"><span class="ti">#</span><span class="tl">Count</span></div>
+            <div class="tile"><span class="ti">≡</span><span class="tl">Note</span></div>
+            <div class="tile"><span class="ti"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M9 6c0-1.5 1.3-2.5 3-2.5S15 4.5 15 6"/></svg></span><span class="tl">Feed</span></div>
+          </div>
+        </div>
+        <div class="strip"><div class="sk">Health — 40 pigs</div>
+          <div class="tiles">
+            <div class="tile"><span class="ti">+</span><span class="tl">Condition</span></div>
+            <div class="tile"><span class="ti">⚕</span><span class="tl">Treatment</span></div>
+            <div class="tile"><span class="ti">▲</span><span class="tl">Triage</span></div>
+            <div class="tile dth"><span class="ti">⊗</span><span class="tl">Death</span></div>
+          </div>
+        </div>
+        <div class="strip"><div class="sk">Routine — 40 pigs</div>
+          <div class="tiles">
+            <div class="tile"><span class="ti">⚖</span><span class="tl">Weigh</span></div>
+            <div class="tile"><span class="ti">⇄</span><span class="tl">Transfer</span></div>
+          </div>
+        </div>
+        <div class="vna">5 more need tagged pigs<span class="chv">›</span></div>
+      </div>
+    </div>
+    <div class="why"><b>One verb for everything feed.</b> The bare <span class="mono">Switch</span> arrow said a mechanism, not a job. <span class="mono">Feed</span> opens the pen&#39;s feed sheet — see it, adjust it, switch it — one door for the three things a hand ever does about feed at a pen. <b>Fixed:</b> the Switch tile (a gated arrow that appeared only on due days) is replaced by the always-present Feed tile; the due-day switch is pre-filled inside.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">2 · THE FEED SHEET — SEE · ADJUST · SWITCH</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs"><div class="grab"></div>
+        <div class="sh2"><span class="pc">C2</span><span class="tag">Feed</span><span class="vit">12 pigs · gestation</span></div>
+        <div class="pline" style="padding:8px 0 2px"><span class="pl">Today</span><span class="pr"><b style="color:var(--ink)">47.6 kg</b> · Gestation 1</span></div>
+        <div class="flbl">Adjust the pen</div>
+        <div class="ctr"><span class="lbl">Change</span><span class="b">−</span><span class="n">+5%</span><span class="b plus">+</span></div>
+        <div class="pline hist" style="padding:2px 0 6px"><span class="pl">tomorrow</span><span class="pr">47.6 → 50.0 kg</span></div>
+        <div class="fpick">Switch formula<span class="v ph">Gestation 1 ›</span></div>
+        <div class="shbar"><button class="cta" style="flex:1">Set feed +5% · 50.0 kg</button></div>
+        <div class="aud">saves to C2 · G. Hansen · 09:41</div>
+      </div>
+    </div>
+    <div class="why"><b>Current first, then the two acts.</b> The sheet opens on what the pen gets today. The stepper moves in 5% steps and the preview line prints the consequence before the tap (<span class="mono">47.6 → 50.0 kg</span>); the formula row opens the picker only if switching is the job. <b>Changed:</b> pen-level % adjust now exists as a direct act — the owner&#39;s call, superseding &ldquo;adjustments only via cases&rdquo;; the feed model&#39;s pen scope carries it. Bulk marks (<span class="mono">Thin</span>/<span class="mono">Fat</span>) remain the per-pig path.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">3 · DUE DAY — THE SWITCH IS PRE-FILLED</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs"><div class="grab"></div>
+        <div class="sh2"><span class="pc">D6</span><span class="tag">Feed</span><span class="vit">40 pigs · ad-lib</span></div>
+        <div class="pline" style="padding:8px 0 2px"><span class="pl">In the feeder</span><span class="pr">Nursery 2</span></div>
+        <div class="fpick" style="border-color:var(--ink);border-width:1.5px">Switch formula<span class="v">→ Grower 1 · due today</span></div>
+        <div class="pline hist" style="padding:6px 0 2px"><span class="pl">When</span><span class="pr">today 09:41 · set earlier if needed</span></div>
+        <div class="shbar"><button class="cta" style="flex:1">Switch to Grower 1</button></div>
+        <div class="aud">saves to D6 · G. Hansen · 09:41</div>
+      </div>
+    </div>
+    <div class="why"><b>The due day fills the sheet in.</b> No % adjust on an ad-lib pen — there is no ration to move, so the block is absent, not disabled. The switch row arrives pre-filled with the scheduled transition; one tap confirms, and the time can be set earlier if the feeder was changed before the phone came out.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">4 · THE UNIT DOOR — THE WHOLE BATCH AT ONCE</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs"><div class="grab"></div>
+        <div class="sh2"><span class="tag">Switch feed</span><span class="vit">batch 18 · 3 pens</span></div>
+        <div class="pline" style="padding:8px 0 2px"><span class="pl">D4 · D5 · D6</span><span class="pr">85 pigs</span></div>
+        <div class="fpick" style="border-color:var(--ink);border-width:1.5px">Switch formula<span class="v">Nursery 2 → Grower 1</span></div>
+        <div class="shbar"><button class="cta" style="flex:1">Switch 3 pens to Grower 1</button></div>
+        <div class="aud">one record per pen · G. Hansen · 09:41</div>
+      </div>
+    </div>
+    <div class="why"><b>From the unit sheet, the batch is the subject.</b> <span class="mono">Switch feed · batch 18 · due ›</span> opens this — the same sheet, three pens at once, one confirm. Per-pen remains possible from any pen&#39;s Feed tile.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">5 · AFTER — VALUES, NOT TRANSITIONS</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:760px">
+      <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Unit 6</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">today 09:41</b> · G.H</div></div></div>
+      <div class="list" style="flex:1">
+        <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">C2</span><span class="cnt">· 12 pigs</span><span class="fslot"><span class="fr">47.6 →</span><b>50.0</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+        <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">D4</span><span class="cnt">· 42 pigs</span><span class="fslot"><span class="fr">ad-lib</span></span><span class="cv2">⌄</span></div></div>
+        <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">D6</span><span class="cnt">· 40 pigs</span><span class="fslot"><span class="fr">ad-lib</span></span><span class="cv2">⌄</span></div></div>
+      </div>
+      <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">C2</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+    </div>
+    <div class="why"><b>The list is the receipt.</b> C2&#39;s adjustment shows as tomorrow&#39;s transition (<span class="mono">47.6 → 50.0 kg</span>); the switched pens read the plain word again. The history lines (<span class="mono">Feed +5% · C2</span>, <span class="mono">Formula switch · D6</span>) live on each pen sheet.</div>
+    </div>
+  </div>
+</section>
+
+<section class="wf" id="wf-feed-pig" data-title="Adjust feed · one pig">
+  <div class="wfhead"><h2>Adjust feed · one pig</h2><span class="anno">N=1 only — bulk feed is the pen&#39;s door; bulk per-pig plans come from Thin / Fat marks</span></div>
+  <div class="caro">
+
+    <div class="slide"><div class="vlabel">1 · ENTRY — THE TILE EXISTS ONLY AT N=1</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--ground)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div></div></div>
+      <div style="opacity:.32;padding:0 12px">
+        <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">A2</span><span class="cnt">· 12 pigs</span><span class="fslot"><b>47.6</b><span class="un">kg</span></span><span class="cv2">⌄</span></div>
+        <div class="row"><div class="cb on"></div><span class="tag">000287</span><div class="st"><span class="l1"><span class="dot a"></span>Thin · day 12</span><span class="l2">parity 5 · feed +10%</span></div><div class="rail"></div></div></div>
+      </div>
+      <div class="psheet">
+        <div class="grab"></div>
+        <div class="phd"><span class="x">✕</span><span class="cnt">000287</span><span class="up">A2 · parity 5</span></div>
+        <div class="strip"><div class="sk">Health</div>
+          <div class="tiles">
+            <div class="tile"><span class="ti">+</span><span class="tl">Condition</span></div>
+            <div class="tile"><span class="ti">⚕</span><span class="tl">Treatment</span></div>
+            <div class="tile"><span class="ti">▲</span><span class="tl">Triage</span></div>
+            <div class="tile dth"><span class="ti">⊗</span><span class="tl">Death</span></div>
+          </div>
+        </div>
+        <div class="strip"><div class="sk">Routine</div>
+          <div class="tiles">
+            <div class="tile"><span class="ti">⚖</span><span class="tl">Weigh</span></div>
+            <div class="tile"><span class="ti">↕</span><span class="tl">Backfat</span></div>
+            <div class="tile"><span class="ti"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M9 6c0-1.5 1.3-2.5 3-2.5S15 4.5 15 6"/></svg></span><span class="tl">Feed</span></div>
+            <div class="tile"><span class="ti">⇄</span><span class="tl">Transfer</span></div>
+            <div class="tile"><span class="ti">≡</span><span class="tl">Note</span></div>
+          </div>
+        </div>
+        <div class="vna">3 not available while bred<span class="chv">›</span></div>
+      </div>
+    </div>
+    <div class="why"><b>Her tile, only when she is alone.</b> At N=1 the Routine strip carries <span class="mono">Feed</span>. Tick five sows and it is gone — a shared percentage across different animals is the pen&#39;s job, and per-pig plans in bulk come from marking <span class="mono">Thin</span> or <span class="mono">Fat</span>, each carrying her banded plan. <b>Changed:</b> a direct per-pig adjust now exists beside the case-driven path — the case is the reason, the tile is the shortcut.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">2 · HER FEED SHEET</div>
+    <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs"><div class="grab"></div>
+        <div class="sh2"><span class="pc">A2</span><span class="tag">000287</span><span class="vit">parity 5 · thin day 12</span></div>
+        <div class="pline" style="padding:8px 0 2px"><span class="pl">Her feed now</span><span class="pr"><b style="color:var(--ink)">+10%</b> · since aug 13</span></div>
+        <div class="flbl">Adjust</div>
+        <div class="ctr"><span class="lbl">Change</span><span class="b">−</span><span class="n">+15%</span><span class="b plus">+</span></div>
+        <div class="pline hist" style="padding:2px 0 6px"><span class="pl">tomorrow</span><span class="pr">3.8 → 4.4 kg/day</span></div>
+        <div class="shbar"><button class="cta sec">Back to standard</button><button class="cta" style="flex:1">Set +15%</button></div>
+        <div class="aud">rides her thin case · ends when it recovers</div>
+      </div>
+    </div>
+    <div class="why"><b>Current plan first, one stepper, consequence before the tap.</b> The trough pen absorbs her change into its total (the pen strip moves tomorrow); a station pen feeds it to her directly — same sheet, executor decides. <span class="mono">Back to standard</span> is the second action, so ending a plan is never hunting for zero. When she has an open <span class="mono">Thin</span> case the plan rides it and ends with recovery; adjusted with no case, the plan stands alone and her row reads <span class="mono">feed +15%</span>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WF 5 · PEN NOTE ================= -->
+<section class="wf" id="wf-pen-note" data-title="Pen note">
+  <div class="wfhead"><h2>Pen note</h2><span class="anno">an event, not an overwrite · production 0 screens → ours 1 drawer</span></div>
+  <div class="caro">
+
+    <div class="slide"><div class="vlabel">Two pens ticked — Bulk survives, Single drops</div>
+      <div class="phone" style="height:760px;background:var(--ground)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">Last checked yesterday · L.M</div></div></div>
+        <div style="opacity:.32">
+          <div class="list" style="padding:8px 12px">
+            <div class="pcard"><div class="pen"><input type="checkbox" checked><span class="code">C1</span><span class="cnt">14 pigs</span><span class="fslot"><b>18.2</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+            <div class="pcard"><div class="pen"><input type="checkbox" checked><span class="code">C2</span><span class="cnt">12 pigs</span><span class="fslot"><span class="fr">47.2 →</span><b>47.6</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+          </div>
+        </div>
+        <div class="psheet">
+          <div class="grab"></div>
+          <div class="phd"><span class="x">✕</span><span class="cnt">2 pens · 26 pigs</span><span class="up">view ›</span></div>
+          <div class="strip"><div class="sk">Pen — 2 pens</div>
+            <div class="tiles">
+              <div class="tile"><span class="ti">≡</span><span class="tl">Note</span></div>
+            </div>
+          </div>
+          <div class="strip"><div class="sk">Health — 26 pigs</div>
+            <div class="tiles">
+              <div class="tile"><span class="ti">+</span><span class="tl">Condition</span></div>
+              <div class="tile"><span class="ti">⚕</span><span class="tl">Treatment</span></div>
+              <div class="tile"><span class="ti">▲</span><span class="tl">Triage</span></div>
+              <div class="tile dth"><span class="ti">⊗</span><span class="tl">Death</span></div>
+            </div>
+          </div>
+          <div class="strip"><div class="sk">Routine — 26 pigs</div>
+            <div class="tiles">
+              <div class="tile"><span class="ti">⚖</span><span class="tl">Weigh</span></div>
+              <div class="tile"><span class="ti">↕</span><span class="tl">Backfat</span></div>
+              <div class="tile"><span class="ti">⇄</span><span class="tl">Transfer</span></div>
+              <div class="tile"><span class="ti">⌗</span><span class="tl">Tag</span></div>
+            </div>
+          </div>
+          <div class="strip"><div class="sk">Production — 26 pigs</div>
+            <div class="pills"><div class="pill">Heat</div></div>
+          </div>
+          <div class="vna">Fault and Count need one pen<span class="chv">›</span></div>
+        </div>
+      </div>
+      <div class="why"><b>Arity is the event&#39;s, not the screen&#39;s.</b> Note is <b>Bulk</b> — one payload to N ticked pens — so it alone survives the pair; Fault and Count are Single and drop to the not-available line, omitted, never greyed (§05:934). The pig strips still scope to all 26: mixed selections are legal, pen verbs to the ticked pens, pig verbs to every ticked pig, each strip label carrying its subject and count. <span class="mono">Changed:</span> the PEN label gains its scope (<span class="mono">— 2 pens</span>) once N&gt;1 — the pig strips already do, and an unscoped label beside them would be the odd one out. <span class="mono">Fixed:</span> <span class="mono">2 not available at 2 pens</span> made the reader do arithmetic against a second number — the line now names the casualties: <span class="mono">Fault and Count need one pen</span>.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">The drawer — the note is the event</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:700px;background:var(--ground)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">Last checked yesterday · L.M</div></div></div>
+        <div style="flex:1;overflow:hidden;opacity:.32">
+          <div class="list" style="padding:8px 12px">
+            <div class="pcard"><div class="pen"><input type="checkbox" checked><span class="code">C1</span><span class="cnt">14 pigs</span><span class="fslot"><b>18.2</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+            <div class="pcard"><div class="pen"><input type="checkbox" checked><span class="code">C2</span><span class="cnt">12 pigs</span><span class="fslot"><span class="fr">47.2 →</span><b>47.6</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+          </div>
+        </div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="tag">Pen note</span><span class="vit">2 pens · C1 · C2</span></div>
+          <div class="flbl">Note <span class="req">*</span></div>
+          <div class="fnote" style="color:var(--ink)">gate latch sticky on the south door</div>
+          <div class="flbl">Photos</div>
+          <div class="fphoto"><div class="th"></div><div class="add">+</div></div>
+          <div class="shbar"><button class="cta" style="flex:1">Note 2 pens</button></div>
+          <div class="aud">saves to C1 and C2 · G. Hansen · 09:41</div>
+        </div>
+      </div>
+      <div class="why"><b>The event is the text — an empty note is nothing, so the one field gates.</b> An append-only event with a stamp, where production&#39;s nearest thing is the shared <b>unit</b> note overwritten in place (<span class="zh">上次修改：张华</span>, 107:1694) — the last writer erased the trail. Photos ride as evidence, ≤12, never gating — the same argument as the fault&#39;s, straight from the kit (§04:652). <span class="mono">Fixed:</span> <span class="mono">writes C1 · C2</span> → <span class="mono">saves to C1 and C2</span>.</div>
+    </div>
+
+    <div class="slide"><div class="vlabel">After — history, and only history</div>
+      <div class="phone" style="height:720px;background:var(--card)">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">Pen C1</div><div class="sub">14 pigs · batch G-24 · unit 6</div></div></div>
+        <div class="pgk">Feed</div>
+        <div class="pline"><span class="pl">Today</span><span class="pr"><b style="color:var(--ink)">18.2 kg</b></span></div>
+        <div class="pline"><span class="pl">Developer 1</span><span class="pr">1.3 kg/head × 14</span></div>
+        <div class="pline"><span class="pl">Source</span><span class="pr" style="color:var(--green)">feed plan ✓</span></div>
+        <div class="pgk" style="border-top:8px solid var(--well);margin-top:10px">History <span style="float:right;text-transform:none;letter-spacing:0;font-size:11px">all ›</span></div>
+        <div class="pline hist"><span class="pl">Note · &ldquo;gate latch sticky&rdquo;</span><span class="pr">today · G.H</span></div>
+        <div class="pline hist"><span class="pl">Feed step · curve day 67→68</span><span class="pr">today</span></div>
+        <div class="pline hist"><span class="pl">Weighed · avg 48.2 kg</span><span class="pr">jul 30 · G.H</span></div>
+      </div>
+      <div class="why"><b>Exactly one place.</b> The note surfaces in the pen sheet&#39;s HISTORY tail and nowhere else — the strip carries derived counts and the feed slot only, deliberately (§06b:647): a note is for the reader who opens the pen, not a token the route must carry. Quoted, stamped, append-only; the unit note remains a separate field on the check-in sheet (06g). <span class="mono">Fixed:</span> <span class="mono">Provenance · derived ✓</span> → <span class="mono">Source · feed plan ✓</span> here too.</div>
+    </div>
+
+  </div>
+</section>

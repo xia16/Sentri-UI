@@ -1,0 +1,238 @@
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F7F6F2;--card:#FFF;--well:#EFEEE8;--ink:#1C1E19;--ink2:#51544B;--ink3:#8B8E83;--hair:#E7E6DF;--hair2:#D8D7CE;--red:#C2402E;--amber:#96660D;--amber-fill:#D99A21;--amber-wash:#F8F0DC;--green:#3B8A50;--green-wash:#EAF2EC;--mono:'IBM Plex Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:40px 48px 90px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.015em;margin:18px 0 10px}
+h2{font-size:21px;font-weight:800;margin:44px 0 14px;padding-top:28px;border-top:1px solid var(--ink)}
+h3{font-size:15px;font-weight:700;margin:20px 0 8px}
+p{max-width:72ch;color:var(--ink2);margin-bottom:10px}
+.anno{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+.mono{font-family:var(--mono);font-size:12.5px}
+.cut{color:var(--red);font-weight:700}.keep{color:var(--green);font-weight:700}.merge{color:var(--amber);font-weight:700}
+pre.flow{font-family:var(--mono);font-size:12px;line-height:1.7;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:12px 0;color:var(--ink)}
+.note{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px 16px;margin:12px 0;font-size:13.5px;color:var(--ink2);max-width:none}
+</style>
+
+<div class="wrap">
+
+<h1>Pregnancy check · 孕检</h1>
+<p>A three-outcome sweep — pregnant / not pregnant / unclear — where every outcome is a routing
+decision the system already knows how to make: pregnant follows the batch to farrowing, unclear
+schedules its own recheck, not-pregnant leaves the batch for rebreeding. Production spends five
+screens and two confirmations narrating those consequences; the optimized task states each
+consequence once, at the moment of the mark, and everything else is derived.</p>
+<div class="anno">figma 634:14225 · 14 screens / sheets / dialogs · 2 lifecycle modules (task in progress · task ended) · 5 designer annotations</div>
+
+<h2>1 · Production inventory</h2>
+<p>Every distinct frame in the section, left to right. Magenta/red designer notes are folded in —
+they are requirements.</p>
+
+<table>
+<thead><tr><th style="width:21%">Screen / sheet</th><th style="width:36%">What it shows</th><th>Data on it</th></tr></thead>
+<tbody>
+<tr><td>Pig-list tab 孕检（猪只List）<span class="mono">634:14376</span></td>
+<td>Header ← 孕检 · segmented tabs 孕检｜任务详情 · <b>Unit progress</b> card with last-check attribution · pig list with search + funnel + list/grid toggle · count card ("200 pigs — mark pregnancy status") · pen-grouped rows (A1…) · sticky <b>提交结果 Submit results</b> · floating ear-tag scan.</td>
+<td>Last check: 顾大华 2025/07/08 23:00 · barn 1舍 · pill 第1/3天 (day 1 of 3) · 已孕检/需孕检 100/200 · 50%. Row = green mono tag + state + one trailing action. Six row states: 🕐 建议孕检：5天后 (suggested, in 5 d, view-arrow) · ▶ 需孕检 (due, act-arrow) · ？3天后需复查 (recheck in 3 d — label <i>replaces</i> "unclear", pencil) · ⚠ 不确定妊娠 (unclear, act-arrow once recheck is due) · ⊖ 未妊娠 (red, pencil) · ✓ 已妊娠 (dim, pencil).</td></tr>
+<tr><td>Pen-grid tab 孕检（栏位Grid）<span class="mono">634:17876</span></td>
+<td>Same header/progress; list becomes pen cards. A state-catalog strip overflows the frame (spec swatches).</td>
+<td>Cell = pen chip (单猪 single-pig / 多猪 multi-pig / A1 / A99) + dominant state, with head-count in multi-pig pens (不确定妊娠 5头 · 需孕检 5头 · 未孕检 5头) + tag or total ("200 pigs"). Sticky Submit persists. Annotation: the grid has <b>no</b> row (排) filter.</td></tr>
+<tr><td>Task-detail tab 任务详情 <span class="mono">634:14959</span></td>
+<td>Whole-task progress · KPI · configuration · SOP · a six-entry status legend · red <b>结束任务 End task</b> button · floating scan.</td>
+<td>共5个单元 (5 units) · same 100/200 · 妊娠率 95% (目标 ≥ 90%) · config: 第2次孕检 starts 配种后第20天 (day 20 after mating) · SOP file link (placeholder) · legend re-explains all six row states, incl. <b>未妊娠 → 将被移出批次</b> (leaves the batch).</td></tr>
+<tr><td>Filter 筛选 <span class="mono">827:12474</span></td>
+<td>Full-screen filter, three dimensions, Reset / Confirm.</td>
+<td>孕检状态: 全部·未孕检·不确定妊娠·未妊娠·已妊娠 · 配种时间: 全部·≥2天前·昨天·今天·明天·≥2天后 — annotation: <i>selectable days = the days actually present in the list</i> · 排 row: 全部·A–G·⌄.</td></tr>
+<tr><td>Outcome sheet, default 孕检-默认状态 <span class="mono">886:12710</span></td>
+<td>Bottom sheet over the list: sow header, three radio cards each with a one-line explainer, footer [⋯] + 确认 (disabled until a pick).</td>
+<td>A1 · 000001 · 母猪，650日龄，3胎 (sow · 650 d old · parity 3). Radios: ⊖ 未妊娠 "result: not pregnant" · ？结果不明确 "cannot determine" · ✓ 已妊娠 "result: pregnant". Annotation: for every task except farrowing &amp; piglet processing the [⋯] drawer holds <b>添加标记 add marker</b> and <b>母猪死亡 sow death</b>.</td></tr>
+<tr><td>Outcome sheet, picked 编辑状态 <span class="mono">886:12748</span></td>
+<td>未妊娠 selected (red fill), Confirm enabled.</td>
+<td>Annotation: on confirm — success toast, return to the barn's task page (text says 查情 page; copied note, intent = back to this barn's list).</td></tr>
+<tr><td>Outcome sheet, recorded 修改状态 <span class="mono">886:12786</span></td>
+<td>Sheet re-opened on a recorded sow: radios dimmed/locked showing the stored outcome; single button <b>修改状态 Modify status</b> unlocks editing.</td>
+<td>Stored outcome displayed read-only; edit is a two-step gate.</td></tr>
+<tr><td>Recheck dialog 选择复查时间 <span class="mono">1999:16306</span></td>
+<td>Modal forced by picking 结果不明确: "cannot determine 「sow ID」's status — specify a recheck time".</td>
+<td>Stepper [− 0 +] <b>天后复查</b> (recheck after N days, default 0) · 确认. Annotation: after marking unclear the days-until-recheck <b>must</b> be entered.</td></tr>
+<tr><td>Submit page 提交结果 <span class="mono">1979:16248</span></td>
+<td>Full page reached from the sticky Submit: location + outcome tallies, each row drills into its list · 取消 / 确认提交.</td>
+<td>1区 - 后备1舍 (zone 1 · gilt barn 1) · ✓ 已妊娠 100头 — 将保留在批次内 (stays in batch) · ⚠ 不确定妊娠 100头 — stays in batch · ⊖ 未妊娠 100头 — 将从批次中移出 (removed from batch).</td></tr>
+<tr><td>End task, target met 结束任务 <span class="mono">952:3031</span></td>
+<td>Confirmation page: goal banner + execution detail + typed-count safety gate.</td>
+<td>✓ 已达到任务目标 200/200 (100%) · detail: <i>reached production status, follows batch</i> = 已妊娠 100 + 妊娠情况待确认 100 = 200头; <i>not reached, removed from batch</i> = 未妊娠 100头 · footer: "confirm — removing [200] pigs from batch" — the count is a required input · 取消 / 结束任务.</td></tr>
+<tr><td>End task, target missed <span class="mono">952:4045</span></td>
+<td>Same page, amber variant.</td>
+<td>⚠ 未达到任务目标 100/200 (50%); identical detail + typed-count gate.</td></tr>
+<tr><td>Ended · pig list <span class="mono">5913:9495</span></td>
+<td>Read-only result browser in a newer visual style (underline tabs). Title reads 查情 — a copied-frame slip; contents are pregnancy outcomes.</td>
+<td>Search 耳标号/<b>耳缺号</b> (ear tag / ear notch) + funnel · outcome segments 已妊娠(80)·结果不明确(0)·未妊娠(0) · unit cards 1区-母猪车间-1单元 with a four-way stacked bar 已妊娠/结果不明确/未妊娠/未孕检 (100/1/1/1) · rows: pen chip · tag · recorder · timestamp (Gianni_J · 02/02 20:00). Annotation: row without recorder/time = the <i>not-checked</i> style.</td></tr>
+<tr><td>Ended · task detail <span class="mono">5752:6342</span></td>
+<td>Detail tab after closure.</td>
+<td>已结束 pill · 已孕检/需孕检 190/200 (95%) · 妊娠率 95% (≥90%) · config shows <b>both</b> rounds: 第1次孕检 配种后第10天 · 第2次孕检 配种后第20天 · SOP · no End button.</td></tr>
+<tr><td>Ended · filter <span class="mono">5752:6300</span></td>
+<td>Filter for the result browser.</td>
+<td>最后一次孕检日期 (last-check date picker) · 单元 unit 全部/1–4 · Reset / Confirm.</td></tr>
+<tr><td>Section annotation <span class="mono">907:12119</span></td>
+<td>Sticky note at section top.</td>
+<td>"Sows marked 已妊娠 join the 分娩 (farrowing) task — and <b>remain</b> in the 孕检 task list."</td></tr>
+</tbody>
+</table>
+
+<h2>2 · Requirements distilled</h2>
+
+<h3>Data captured (the farmer's hand)</h3>
+<table>
+<thead><tr><th style="width:28%">Field</th><th style="width:22%">Type</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Pregnancy outcome</td><td>enum: pregnant · not pregnant · unclear</td><td>One per sow per check round. The only mandatory capture in the task.</td></tr>
+<tr><td>Recheck interval (unclear only)</td><td>days, integer</td><td>Production forces manual entry per sow (dialog, default 0). Should be a configured default the hand can override, not a blocking question.</td></tr>
+<tr><td>Animal identity</td><td>ear tag scan / search</td><td>Ended browser also searches by 耳缺号 ear notch — a second identity key.</td></tr>
+<tr><td>Marker / flag (⋯ drawer)</td><td>tag + optional note</td><td>Ad-hoc observation while standing at the sow. Not pregnancy data; task-adjacent capture.</td></tr>
+<tr><td>Sow death (⋯ drawer)</td><td>event record</td><td>Same drawer. Removes the sow from every open task.</td></tr>
+</tbody>
+</table>
+
+<h3>Derived by the system (never asked)</h3>
+<table>
+<tbody>
+<tr><td>Check schedule per sow</td><td>mating date (breeding records) + round config → "suggested in 5 d" / "due" — production's 建议孕检/需孕检 pre-states.</td></tr>
+<tr><td>Which round this is</td><td>1st check / 2nd check from config days 10 / 20 — the row's <span class="mono">1st check</span> token.</td></tr>
+<tr><td>Recheck due date</td><td>unclear mark date + interval → row resurfaces as <span class="mono">Recheck · due today</span>.</td></tr>
+<tr><td>Day n of N window · progress</td><td>100/200 checked, per unit and whole-task; 50%.</td></tr>
+<tr><td>Pregnancy rate vs target</td><td>95% vs ≥90% — pure arithmetic on outcomes.</td></tr>
+<tr><td>Batch routing</td><td>pregnant → follows batch into farrowing task (stays visible here) · not pregnant → leaves batch, enters rebreed flow · unclear → stays pending recheck. Production writes these sentences on four different screens; they are one rule.</td></tr>
+<tr><td>Attribution</td><td>recorder + timestamp on every record and on the header's "last checked".</td></tr>
+</tbody>
+</table>
+
+<h3>Configuration (set once, per farm)</h3>
+<table>
+<tbody>
+<tr><td>1st check start</td><td>day 10 after mating (production ended-state config)</td></tr>
+<tr><td>2nd check start</td><td>day 20 after mating (already in our detail sheet, 03)</td></tr>
+<tr><td>Task window</td><td>3 days per sweep (第1/3天)</td></tr>
+<tr><td>Recheck default</td><td>3 days (production's row copy says "recheck in 3 d"; its dialog still asks every time — make it config)</td></tr>
+<tr><td>Pregnancy-rate target</td><td>≥ 90%</td></tr>
+<tr><td>SOP document</td><td>file link on the detail sheet</td></tr>
+</tbody>
+</table>
+
+<h2>3 · Subtraction analysis</h2>
+<table>
+<thead><tr><th style="width:26%">Production element</th><th style="width:10%">Verdict</th><th>Justification</th></tr></thead>
+<tbody>
+<tr><td>Sticky 提交结果 + submit page + 确认提交</td><td><span class="cut">CUT</span></td><td>Actions commit themselves; there is no round-submit in our grammar. The page's one real content — consequence tallies per outcome — moves into the End-task summary on the detail sheet (03). Pregnancy day 1-of-3 has no unmarked-assertion问题: unchecked simply carries to the next day.</td></tr>
+<tr><td>栏位 Grid tab (pen cards)</td><td><span class="cut">CUT</span></td><td>Duplicate navigation. Pen picker (02) + status matrix chips (02b: <span class="mono">2 late · 5 check · checked · due 3d</span>) + peek (02c) already answer "which pens still need me" — and the picker never acts, which the grid also never did.</td></tr>
+<tr><td>选择复查时间 dialog (stepper from 0)</td><td><span class="cut">CUT</span></td><td>A blocking modal that asks the farmer to invent a number the farm already standardized. Default = config (3 d), shown as a hint on the Unclear radio; tap the hint to override. Field survives, dialog dies (delta D1).</td></tr>
+<tr><td>状态说明 six-entry legend</td><td><span class="cut">CUT</span></td><td>A legend that explains icons is an admission the words failed. Our facts say the thing itself: <span class="mono">Mated · 28 days ago</span>, <span class="mono">Recheck · due today</span>, <span class="mono">Not pregnant · Jul 8</span> (01b). The one load-bearing sentence — "not pregnant leaves the batch" — moves to the mark moment (D2).</td></tr>
+<tr><td>修改状态 locked-sheet gate</td><td><span class="cut">CUT</span></td><td>Two taps to start an edit. Done rows carry ✎ → the same sheet opens pre-filled with an audit line; Save writes a correction (04). One step, still audited.</td></tr>
+<tr><td>End-task typed-count gate ("removing [200] pigs")</td><td><span class="cut">CUT</span></td><td>Typing a number the screen just told you is ritual, not comprehension. End task (detail sheet, 03) states the three consequence rows and confirms plainly.</td></tr>
+<tr><td>建议孕检 vs 需孕检 two pre-states</td><td><span class="merge">MERGE</span></td><td>Same fact at two ages. Row fact = <span class="mono">Mated · N days ago</span>; not-yet-due rows are dimmed <span class="mono">Due · in 5 d</span> (01/01b). The lens already separates the working pile.</td></tr>
+<tr><td>单元进度 card + 总任务进度 card</td><td><span class="merge">MERGE</span></td><td>Identical numbers on two tabs. One header: Unit KPI (95% pregnant · ≥90) | Task overview (100/200 checked · day 1 of 3) with drill-down (01). Last-check attribution rides the title, as production already does.</td></tr>
+<tr><td>Filter dimensions 孕检状态 + 排</td><td><span class="cut">CUT</span></td><td>Status is the lens (+ outcome sub-lens on Checked); row is Go to pen. Both cuts are already law (01c).</td></tr>
+<tr><td>Filter dimension 配种时间</td><td><span class="keep">KEEP</span></td><td>The one time dimension (01c), single-select; options = only the days present in the list (production annotation — keep that honesty).</td></tr>
+<tr><td>Three-radio outcome sheet + vitals header</td><td><span class="keep">KEEP</span></td><td>This is exactly the 04 outcome sheet: pen chip · tag · <span class="mono">parity 3 · 650d</span> · radios · Confirm &amp; next. Explainer lines become consequence hints (D2) instead of restating the label.</td></tr>
+<tr><td>Row states incl. amber 不确定/复查, red 未妊娠, dim 已妊娠</td><td><span class="keep">KEEP</span></td><td>Production's temporal grammar is right and maps 1:1 onto ours (01b): unclear is a record, so its trail (<span class="mono">unclear Jul 5 · G.H</span>) stamps the open recheck row.</td></tr>
+<tr><td>⋯ drawer: 添加标记 · 母猪死亡</td><td><span class="keep">KEEP</span></td><td>Real capture with nowhere else to live. New to our system — added to the outcome sheet footer as the sheet's ⋯ (D3), per the designer note "all tasks except farrowing &amp; piglet processing".</td></tr>
+<tr><td>已妊娠 stays in list after joining farrowing</td><td><span class="keep">KEEP</span></td><td>Annotation 907:12119. Our Checked pile holds her with her outcome; the farrowing task picks her up independently. No extra UI.</td></tr>
+<tr><td>Ended read-only browser (outcome segments · unit bars · recorder rows)</td><td>MOVE</td><td>Result review is history, not a task screen. The detail sheet's record trail (03) carries it: outcome segments and the per-unit four-way stacked bar are the two visuals worth keeping. Search by ear notch comes along (D5).</td></tr>
+<tr><td>Ended filter (last-check date · unit)</td><td>MOVE</td><td>Follows the browser into history. Unit chips collapse into the existing unit drill-down.</td></tr>
+<tr><td>Floating QR scan button</td><td><span class="merge">MERGE</span></td><td>The dock already holds Scan ear tag (01) — one scan affordance, not two.</td></tr>
+<tr><td>Success toast + return to list</td><td><span class="keep">KEEP</span></td><td>Ambient commit is our default: mark lands, row moves lens, walk continues.</td></tr>
+</tbody>
+</table>
+
+<h2>4 · Optimized flow</h2>
+<pre class="flow">
+OPEN  Pregnancy check · Unit 6                              → task list (01)
+      header: [95% pregnant · ≥90] | [100/200 checked · day 1 of 3]
+      last checked 08:10 · G.H
+      lens: [Unchecked 100] [Checked 100] [All 200] (+funnel) → lens row (01/01c)
+      Checked sub-lens: pregnant · unclear · not pregnant     → sub-lens (01)
+
+WALK  PEN A1 ── 26 of 52 left                               → pen rows (01b)
+      □ 000268  Mated · 28 days ago        · 1st check
+      □ 000231  Recheck · due today        · unclear Jul 5 · G.H
+      ▢ 000340  Due · in 5 d (dim)         · 2nd check Jul 13
+        000318  Pregnant · Jul 8 ✎         · 1st check · G.H
+
+MARK  several sows read in a row:
+      tick boxes → bar: ✕ 3 selected                        → bulk bar (04)
+      [ Unclear ] [ Not pregnant ] [ Pregnant ]
+      one sow, or the odd case:
+      tap row → outcome sheet                               → outcome sheet (04)
+        A1 · 000268 · parity 3 · 650d
+        ◉ Pregnant      → follows batch · farrowing
+        ○ Unclear       → recheck in 3 d ▸ (tap to change)   ← D1
+        ○ Not pregnant  → leaves batch · rebreed             ← D2
+        [⋯ marker · death]  [Confirm]  [Confirm & next]      ← D3
+      scan ear tag → her box ticks, bar rises               → scan (04b)
+
+LOOP  mark commits itself: toast, row moves lens, pen agg
+      counts down, header ticks 101/200. No submit anywhere.
+      unclear resurfaces on its recheck day; day 2 and 3 of
+      the window show the shrinking Unchecked pile.
+
+PENS  Go to pen → picker; chips: 2 late · 5 check · checked → picker (02/02b)
+      long-press a pen → peek inside → release              → peek (02c)
+
+END   task detail sheet: progress · 95% vs target ·
+      config (1st check d10 · 2nd check d20 · recheck 3 d) ·
+      SOP · End task                                        → detail sheet (03)
+        End task summary:                                    ← D4
+          pregnant 100     → follows batch (farrowing)
+          unclear  100     → recheck scheduled
+          not pregnant 100 → left batch · rebreed
+        [Cancel] [End task]
+      after: task reads as record — outcome segments ·
+      per-unit stacked bars · rows w/ recorder · search
+      by ear tag or ear notch                               → history (03) · D5
+</pre>
+
+<h3>Deltas (all that actually needed design)</h3>
+<table>
+<tbody>
+<tr><td class="mono">D1</td><td><b>Recheck as a default, not a question.</b> Unclear radio carries <span class="mono">→ recheck in 3 d</span> from config; tapping the hint opens a small stepper for the exception. Kills the mandatory dialog while keeping the per-sow override production wanted.</td></tr>
+<tr><td class="mono">D2</td><td><b>Consequence hints on the radios.</b> <span class="mono">→ follows batch · farrowing / → recheck in 3 d / → leaves batch · rebreed</span>. This is where the submit page, the legend, and the end-task detail all collapse to — said once, at the decision.</td></tr>
+<tr><td class="mono">D3</td><td><b>Sheet ⋯ drawer: Add marker · Record death.</b> New system-wide affordance (every task except farrowing and piglet processing, per the designer note).</td></tr>
+<tr><td class="mono">D4</td><td><b>End-task summary rows.</b> The detail sheet's End task (03) gains the three consequence tallies — production's 执行详情, minus the typed-count ritual.</td></tr>
+<tr><td class="mono">D5</td><td><b>Ear notch (耳缺号) as an alternate search key</b> in dock search and history — production's ended browser already treats it as an identity.</td></tr>
+</tbody>
+</table>
+
+<h2>5 · Data-capture map</h2>
+<table>
+<thead><tr><th style="width:26%">Field</th><th style="width:37%">Where in the new flow</th><th>Production origin</th></tr></thead>
+<tbody>
+<tr><td>Outcome (3-enum)</td><td>Bulk bar (04) or outcome-sheet radio (04)</td><td>Sheet radios 886:12710; grid/list state colors</td></tr>
+<tr><td>Recheck interval (unclear)</td><td>Default from config on the Unclear hint; tap to override (D1)</td><td>选择复查时间 dialog 1999:16306</td></tr>
+<tr><td>Recheck due date</td><td>Derived → row fact <span class="mono">Recheck · due today</span></td><td>Row 3天后需复查 / 不确定妊娠 states</td></tr>
+<tr><td>Animal identity</td><td>Row tap · dock scan (04b) · dock search incl. ear notch (D5)</td><td>Floating QR scan; ended search 耳标号/耳缺号</td></tr>
+<tr><td>Sow vitals (parity · age)</td><td>Outcome-sheet header, read-only (04)</td><td>Sheet header 母猪·650日龄·3胎</td></tr>
+<tr><td>Marker / flag</td><td>Sheet ⋯ drawer (D3)</td><td>[⋯] 添加标记 annotation</td></tr>
+<tr><td>Sow death</td><td>Sheet ⋯ drawer (D3)</td><td>[⋯] 母猪死亡 annotation</td></tr>
+<tr><td>Attribution (who · when)</td><td>Automatic; header "last checked", row stamps, history rows</td><td>最近孕检 line; ended rows Gianni_J · 02/02 20:00</td></tr>
+<tr><td>Batch routing</td><td>Derived; stated as radio hint (D2) + End-task tally (D4)</td><td>Submit page 保留/移出批次; end-task 执行详情; legend; note 907:12119</td></tr>
+<tr><td>Round config (d10 · d20 · window 3d · recheck 3d · target ≥90%)</td><td>Detail sheet Configuration (03)</td><td>任务配置 both modules; day pill; rate card</td></tr>
+<tr><td>Pregnancy rate</td><td>Derived → header Unit KPI (01)</td><td>妊娠率 card</td></tr>
+<tr><td>SOP</td><td>Detail sheet rowlink (03)</td><td>SOP card</td></tr>
+</tbody>
+</table>
+
+<h2>6 · Open questions</h2>
+<table>
+<tbody>
+<tr><td class="mono">Q1</td><td><b>When does batch removal commit?</b> Production defers it to submit/end-task; our marks commit themselves. Does "not pregnant" move the sow out of the batch (and into rebreed) at mark time, or does the herd move wait for End task while the record commits immediately? Mark-time is our default — confirm the herd-management side tolerates immediate moves with ✎-corrections.</td></tr>
+<tr><td class="mono">Q2</td><td><b>Who owns a recheck that falls outside the 3-day window?</b> Unclear +3 d can land after the sweep ends. Does she surface in the next scheduled check task, or keep a standing recheck row that survives End task? (End task currently reports her as "follows batch, pending".)</td></tr>
+<tr><td class="mono">Q3</td><td><b>Recheck default value and override.</b> Is 3 d the farm standard (production's own row copy suggests yes)? And is a per-sow override needed at all, or is D1's stepper dead weight we can drop later?</td></tr>
+<tr><td class="mono">Q4</td><td><b>Number of check rounds.</b> Config shows 1st (d10) and 2nd (d20). Fixed at two, or N configurable rounds — and does a sow confirmed pregnant in the 1st round still appear in the 2nd?</td></tr>
+<tr><td class="mono">Q5</td><td><b>Ear notch as first-class ID.</b> Production searches by it only in the ended browser. Do farms actually key on notch in daily work (gilts before tagging?) — if yes it belongs in dock search everywhere, not just here.</td></tr>
+</tbody>
+</table>
+
+</div>

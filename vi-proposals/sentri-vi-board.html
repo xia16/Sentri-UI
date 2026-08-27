@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sentri — Brand Direction 03 · Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ————— foundations ————— */
+:root {
+  --paper:    #FBFBFA;            /* ground — near-white, fractionally warm */
+  --paper-2:  #F1F1EF;            /* recessed panels */
+  --ink:      #17191C;            /* text, primary actions */
+  --ink-2:    #4B4F54;            /* secondary text */
+  --ink-3:    #6D7277;            /* annotation floor — 4.9:1 on paper */
+  --line:     rgba(23,25,28,0.15);
+  --line-soft:rgba(23,25,28,0.07);
+  --line-hard:rgba(23,25,28,0.32);
+
+  /* the rail — the only color on any screen */
+  --red:      #C42D21;  --red-wash:   #FAEAE7;
+  --amber:    #9A6700;  --amber-wash: #F9F0D9;
+  --blue:     #1259C3;  --blue-wash:  #E9F0FA;
+  --green:    #1A7A3C;  --green-wash: #E8F2EA;
+  --gray:     #6D7277;  --gray-wash:  #F0F0EF;
+
+  --redline:  #B0443C;  /* deck construction annotations only — not a brand color */
+
+  --grot: "Barlow Semi Condensed", "Arial Narrow", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; margin: 0; }
+button { font: inherit; appearance: none; background: none; border: none; padding: 0; color: inherit; cursor: pointer; border-radius: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--grot); font-size: 16px; line-height: 1.6;
+  background: var(--paper); color: var(--ink);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+::selection { background: var(--ink); color: var(--paper); }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 48px; }
+@media (max-width: 720px) { .wrap { padding: 0 22px; } }
+
+/* mono annotation voice — the deck's connective tissue */
+.ann {
+  font-family: var(--mono); font-size: 10.5px; font-weight: 500;
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-3);
+}
+.ann .tick { color: var(--amber); }
+.redline { color: var(--redline); }
+
+/* status words — the rail voice, used in deck and screens alike */
+.st { font-family: var(--mono); font-weight: 700; font-size: 10px; letter-spacing: 0.11em; text-transform: uppercase; white-space: nowrap; }
+.st.red { color: var(--red); }   .st.amber { color: var(--amber); }
+.st.blue { color: var(--blue); } .st.green { color: var(--green); }
+.st.gray { color: var(--gray); }
+
+/* chapter chrome */
+section.chapter { padding: 96px 0 30px; }
+.ch-head { display: flex; align-items: baseline; gap: 18px; border-top: 2px solid var(--ink); padding-top: 14px; margin-bottom: 44px; }
+.ch-head .no { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; font-weight: 600; }
+.ch-head h2 { font-family: var(--grot); font-size: 27px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; line-height: 1.1; }
+.ch-head .ann { margin-left: auto; }
+@media (max-width: 720px) { .ch-head .ann { display: none; } }
+
+p.lede { font-size: 20px; line-height: 1.55; max-width: 60ch; font-weight: 500; }
+p.body-text { max-width: 64ch; color: var(--ink-2); margin-top: 14px; font-size: 15.5px; }
+.mono-em { font-family: var(--mono); font-size: 0.88em; font-weight: 600; }
+
+/* ————— 00 · cover ————— */
+.cover { min-height: 92vh; display: flex; flex-direction: column; border-bottom: 2px solid var(--ink); }
+.cover-top { display: flex; justify-content: space-between; padding-top: 28px; }
+.cover-mid { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 70px 0; }
+.cover h1 { font-family: var(--grot); font-size: clamp(72px, 10vw, 128px); font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; line-height: 0.95; margin-top: 38px; }
+.cover .tagline { font-family: var(--mono); font-size: clamp(14px, 1.6vw, 17px); color: var(--ink-2); margin-top: 26px; letter-spacing: 0.04em; }
+.cover .tagline .st { font-size: inherit; }
+.cover-bottom { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 26px; gap: 20px; flex-wrap: wrap; }
+.cover-bottom .toc { display: flex; gap: 22px; flex-wrap: wrap; }
+.cover-bottom a { color: var(--ink-3); text-decoration: none; }
+.cover-bottom a:hover { color: var(--ink); }
+
+/* board strip on the cover — the thesis, demonstrated before it's argued */
+.cover-board { border-top: 1px solid var(--line-hard); margin-top: 44px; max-width: 640px; }
+.cover-board .cbr { display: grid; grid-template-columns: 52px 1fr auto; gap: 14px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line-soft); font-family: var(--mono); font-size: 12px; }
+.cover-board .cbr .l { color: var(--ink); font-weight: 600; }
+.cover-board .cbr .t { color: var(--ink-2); letter-spacing: 0.02em; }
+
+/* ————— 01 · idea ————— */
+.idea-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 72px; align-items: start; }
+@media (max-width: 900px) { .idea-grid { grid-template-columns: 1fr; gap: 40px; } }
+.manifesto { font-size: 26px; line-height: 1.45; font-weight: 500; letter-spacing: 0.002em; }
+.manifesto .hl { color: var(--amber); }
+.idea-aside { border-left: 1px solid var(--line); padding-left: 28px; }
+.idea-aside .row { padding: 14px 0; border-bottom: 1px solid var(--line-soft); }
+.idea-aside .row:last-child { border-bottom: none; }
+.idea-aside b { display: block; font-size: 15px; font-weight: 600; }
+.idea-aside span { font-size: 14px; color: var(--ink-2); line-height: 1.5; display: block; margin-top: 2px; }
+
+/* ————— 02 · mark ————— */
+.mark-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+@media (max-width: 900px) { .mark-grid { grid-template-columns: 1fr; } }
+.plate { background: var(--paper-2); border: 1px solid var(--line); padding: 56px 40px; display: flex; align-items: center; justify-content: center; min-height: 300px; position: relative; }
+.plate.white { background: #fff; }
+.plate-label { position: absolute; top: 12px; left: 14px; }
+.mark-notes { font-size: 14.5px; color: var(--ink-2); max-width: 56ch; }
+.mark-notes p + p { margin-top: 12px; }
+.lockups { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); border-right: none; margin-top: 56px; }
+.lockups > div { border-right: 1px solid var(--line); padding: 34px 20px 26px; text-align: center; position: relative; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+@media (max-width: 720px) { .lockups { grid-template-columns: 1fr; border-right: 1px solid var(--line); } .lockups > div { border-right: none; border-bottom: 1px solid var(--line); } }
+.wordmark { font-family: var(--mono); font-weight: 700; letter-spacing: 0.09em; line-height: 1; }
+
+/* ————— 03 · type ————— */
+.type-rows { border-top: 1px solid var(--line); }
+.type-row { display: grid; grid-template-columns: 240px 1fr; gap: 36px; padding: 30px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+@media (max-width: 820px) { .type-row { grid-template-columns: 1fr; gap: 10px; } }
+.type-meta { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; }
+.type-meta b { display: block; color: var(--ink); font-weight: 600; font-size: 14px; }
+.spec-display { font-family: var(--grot); font-size: 52px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; line-height: 1.05; }
+.spec-ui { font-size: 16.5px; max-width: 58ch; }
+.spec-ui b { font-weight: 600; }
+.spec-mono { font-family: var(--mono); font-size: 13px; line-height: 1.85; color: var(--ink-2); }
+.spec-num { font-family: var(--mono); font-size: 66px; font-weight: 800; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; line-height: 1; }
+.spec-num sub { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); vertical-align: baseline; margin-left: 12px; }
+.num-strip { display: flex; gap: 56px; flex-wrap: wrap; align-items: baseline; }
+
+/* ————— 04 · color ————— */
+.palette { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-right: none; }
+@media (max-width: 820px) { .palette { grid-template-columns: 1fr 1fr; } }
+.chipc { border-right: 1px solid var(--line); }
+.chipc .well { height: 110px; }
+.chipc .meta { padding: 12px 14px 16px; border-top: 1px solid var(--line); }
+.chipc .meta b { font-size: 13.5px; font-weight: 600; display: block; }
+.chipc .meta span { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); display: block; margin-top: 3px; letter-spacing: 0.02em; }
+.ratio { display: flex; height: 14px; margin-top: 36px; border: 1px solid var(--line); }
+.ratio div { height: 100%; }
+.ratio-labels { display: flex; margin-top: 8px; }
+.ratio-labels .ann { white-space: nowrap; }
+
+.status-table { border: 1px solid var(--line); margin-top: 36px; }
+.status-row { display: grid; grid-template-columns: 130px 1fr 200px 110px; gap: 18px; align-items: center; padding: 13px 18px; border-bottom: 1px solid var(--line-soft); font-size: 14px; }
+.status-row:last-child { border-bottom: none; }
+.status-row .use { color: var(--ink-2); font-size: 13.5px; }
+.status-row .hex { font-family: var(--mono); font-size: 11px; color: var(--ink-3); letter-spacing: 0.03em; }
+.status-row .cr { font-family: var(--mono); font-size: 11px; color: var(--ink-3); text-align: right; letter-spacing: 0.05em; }
+@media (max-width: 820px) { .status-row { grid-template-columns: 110px 1fr; } .status-row .hex, .status-row .cr { display: none; } }
+
+.sun-note { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; margin-top: 44px; align-items: start; }
+@media (max-width: 900px) { .sun-note { grid-template-columns: 1fr; } }
+.sun-demo { border: 1px solid var(--line); background: #fff; padding: 22px 24px; }
+.sun-demo .srow { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--line-soft); }
+.sun-demo .srow:last-child { border-bottom: none; }
+.sun-demo .srow span:first-child { font-size: 15px; font-weight: 500; }
+
+/* ————— phone frames ————— */
+.screen-grid { display: grid; grid-template-columns: 390px 1fr; gap: 64px; align-items: start; }
+@media (max-width: 900px) { .screen-grid { grid-template-columns: 1fr; } }
+.phone {
+  width: 390px; max-width: 100%; background: var(--paper);
+  border: 1px solid var(--line-hard); border-radius: 28px; overflow: hidden;
+  box-shadow: 0 1px 0 rgba(23,25,28,0.04), 0 36px 72px -48px rgba(23,25,28,0.45);
+}
+.p-status { display: flex; justify-content: space-between; align-items: center; padding: 12px 22px 6px; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
+.p-status .sig { letter-spacing: -0.02em; }
+.screen-notes .row { padding: 14px 0; border-bottom: 1px solid var(--line-soft); }
+.screen-notes .row:last-child { border-bottom: none; }
+.screen-notes b { display: block; font-size: 15px; font-weight: 600; }
+.screen-notes span { font-size: 14px; color: var(--ink-2); line-height: 1.5; display: block; margin-top: 2px; }
+.screen-notes { border-left: 1px solid var(--line); padding-left: 28px; }
+
+/* app chrome — shared row grammar */
+.a-head { padding: 10px 20px 0; }
+.a-farm { display: flex; justify-content: space-between; align-items: baseline; }
+.a-date { display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; }
+.a-date h3 { font-family: var(--grot); font-size: 27px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; line-height: 1; }
+.a-date .ann { font-size: 10px; }
+
+.exc { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; margin: 14px 16px 0; padding: 12px 14px; background: var(--red-wash); border-left: 3px solid var(--red); min-height: 48px; }
+.exc .n { font-family: var(--mono); font-size: 19px; font-weight: 800; color: var(--red); line-height: 1; }
+.exc .t b { display: block; font-size: 14.5px; font-weight: 600; line-height: 1.25; }
+.exc .t span { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; color: var(--red); font-weight: 600; text-transform: uppercase; }
+.exc .go { font-family: var(--mono); font-size: 14px; color: var(--red); font-weight: 700; }
+
+.sec-head { display: flex; align-items: baseline; gap: 10px; padding: 18px 20px 4px; }
+.sec-head .rule { flex: 1; height: 1px; background: var(--line-soft); align-self: center; }
+.brow { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; padding: 0 20px; min-height: 58px; border-bottom: 1px solid var(--line-soft); }
+.brow .loc { font-family: var(--mono); font-size: 14px; font-weight: 700; letter-spacing: 0.02em; }
+.brow .task b { display: block; font-size: 15.5px; font-weight: 600; line-height: 1.2; letter-spacing: 0.005em; }
+.brow .task span { display: block; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.07em; color: var(--ink-3); margin-top: 3px; text-transform: uppercase; }
+.brow .rail { text-align: right; }
+.brow .rail .tm { display: block; font-family: var(--mono); font-size: 9.5px; color: var(--ink-3); letter-spacing: 0.05em; margin-top: 3px; }
+.brow.sub { min-height: 48px; background: transparent; }
+.brow.sub .task b { font-size: 14px; font-weight: 500; }
+s { text-decoration: line-through; text-decoration-thickness: 1px; color: var(--ink-3); font-weight: 500; }
+
+.syncbar { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-top: 1px solid var(--line-soft); }
+.tabbar { display: flex; border-top: 1px solid var(--line); background: #fff; }
+.tabbar > div { flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-family: var(--mono); font-size: 8.5px; font-weight: 600; letter-spacing: 0.12em; color: var(--ink-3); }
+.tabbar > div.on { color: var(--ink); box-shadow: inset 0 2px 0 var(--ink); }
+.tabbar svg { display: block; }
+
+/* pregnancy list */
+.p-top { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; padding: 8px 12px 0; }
+.p-top .back { font-family: var(--mono); font-size: 18px; text-align: center; }
+.p-top h4 { text-align: center; font-family: var(--grot); font-size: 17px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.p-loc { text-align: center; margin-top: 2px; }
+.prog { margin: 14px 16px 0; border: 1px solid var(--line); background: #fff; padding: 14px 16px 16px; }
+.prog-top { display: flex; justify-content: space-between; align-items: baseline; }
+.prog-top .big { font-family: var(--mono); font-size: 27px; font-weight: 800; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.prog-top .big small { font-size: 15px; font-weight: 600; color: var(--ink-3); }
+.prog-bar { height: 6px; background: var(--paper-2); margin-top: 12px; position: relative; }
+.prog-bar i { position: absolute; inset: 0 50% 0 0; background: var(--blue); }
+.prog-meta { display: flex; justify-content: space-between; margin-top: 9px; }
+.searchrow { display: grid; grid-template-columns: 1fr 48px; gap: 8px; margin: 12px 16px 0; }
+.searchrow .field { min-height: 48px; border: 1px solid var(--line); background: #fff; display: flex; align-items: center; gap: 9px; padding: 0 14px; color: var(--ink-3); font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; }
+.searchrow .fbtn { min-height: 48px; border: 1px solid var(--line); background: #fff; display: flex; align-items: center; justify-content: center; }
+.pen-head { display: flex; align-items: baseline; gap: 10px; padding: 18px 20px 6px; }
+.pen-head .pen { font-family: var(--mono); font-size: 13px; font-weight: 800; letter-spacing: 0.06em; }
+.pen-head .rule { flex: 1; height: 1px; background: var(--line-soft); align-self: center; }
+.prow { display: grid; grid-template-columns: 78px 1fr auto; gap: 12px; align-items: center; padding: 0 20px; min-height: 50px; border-bottom: 1px solid var(--line-soft); }
+.prow .tag { font-family: var(--mono); font-size: 13px; font-weight: 600; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.prow .state { font-size: 13.5px; color: var(--ink-2); line-height: 1.3; }
+.prow .state .d { font-family: var(--mono); font-size: 10px; letter-spacing: 0.03em; }
+.cta-dock { padding: 12px 16px 14px; border-top: 1px solid var(--line); background: #fff; display: flex; gap: 10px; }
+.cta { flex: 1; min-height: 56px; background: var(--ink); color: var(--paper); font-family: var(--grot); font-size: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; }
+.cta.sq { flex: 0 0 56px; background: #fff; color: var(--ink); border: 1px solid var(--line-hard); font-size: 20px; letter-spacing: 0; }
+
+/* farrowing sheet */
+.dim { background: rgba(23,25,28,0.5); padding: 84px 0 0; }
+.sheet { background: var(--paper); border-radius: 20px 20px 0 0; border-top: 1px solid var(--line-hard); }
+.sheet-head { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; padding: 16px 12px 0; }
+.sheet-head h4 { text-align: center; font-family: var(--grot); font-size: 17px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.sheet-head .x { text-align: center; font-family: var(--mono); font-size: 16px; color: var(--ink-2); }
+.sow-line { display: flex; align-items: center; gap: 12px; padding: 14px 20px 12px; border-bottom: 1px solid var(--line); }
+.sow-line .pen { font-family: var(--mono); font-size: 13px; font-weight: 800; background: var(--paper-2); border: 1px solid var(--line); padding: 6px 10px; }
+.sow-line .tag { font-family: var(--mono); font-size: 17px; font-weight: 700; letter-spacing: 0.02em; }
+.sow-line .meta { margin-left: auto; text-align: right; }
+.warn { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; margin: 14px 16px 0; padding: 12px 14px; background: var(--amber-wash); border-left: 3px solid var(--amber); min-height: 48px; }
+.warn .n { font-family: var(--mono); font-size: 17px; font-weight: 800; color: var(--amber); line-height: 1; }
+.warn .t b { display: block; font-size: 14px; font-weight: 600; line-height: 1.25; }
+.warn .t span { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; color: var(--amber); font-weight: 700; text-transform: uppercase; }
+.counters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 16px 0; }
+.counter { border: 1px solid var(--line); background: #fff; padding: 12px 14px 14px; }
+.counter .n { font-family: var(--mono); font-size: 40px; font-weight: 800; line-height: 1; margin-top: 8px; font-variant-numeric: tabular-nums; }
+.counter .n small { font-size: 13px; font-weight: 600; color: var(--ink-3); letter-spacing: 0.08em; }
+.counter .btns { display: flex; gap: 8px; margin-top: 12px; }
+.counter .btns button { flex: 1; min-height: 48px; border: 1px solid var(--line-hard); background: var(--paper); font-family: var(--mono); font-size: 18px; font-weight: 700; }
+.counter .btns button.plus { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.timeline { margin: 16px 20px 4px; }
+.tl-row { display: grid; grid-template-columns: 16px 1fr auto; gap: 12px; align-items: baseline; padding: 7px 0; position: relative; }
+.tl-row::before { content: ""; position: absolute; left: 7px; top: -8px; bottom: -8px; width: 1px; background: var(--line); }
+.tl-row:first-child::before { top: 14px; } .tl-row:last-child::before { bottom: 22px; }
+.tl-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ink-3); justify-self: center; position: relative; z-index: 1; align-self: center; }
+.tl-dot.now { background: var(--amber); box-shadow: 0 0 0 3px var(--amber-wash); }
+.tl-dot.next { background: var(--paper); border: 1.5px solid var(--ink-3); }
+.tl-row .e { font-size: 13.5px; color: var(--ink-2); }
+.tl-row .e b { color: var(--ink); font-weight: 600; }
+.rec-line { padding: 10px 20px 2px; text-align: right; }
+
+/* ————— 08 · density ————— */
+.dens-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 64px; align-items: start; }
+@media (max-width: 900px) { .dens-grid { grid-template-columns: 1fr; } }
+.anatomy { border: 1px solid var(--line); background: #fff; position: relative; }
+.anatomy .brow { border-bottom: 1px solid var(--line-soft); }
+.dim-label { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.08em; color: var(--redline); font-weight: 600; }
+.rule-list { border-top: 1px solid var(--line); margin-top: 8px; }
+.rule-list .r { display: grid; grid-template-columns: 30px 1fr; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--line-soft); font-size: 14.5px; align-items: baseline; }
+.rule-list .r .k { font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--ink-3); }
+.rule-list .r b { font-weight: 600; }
+.rule-list .r span { color: var(--ink-2); }
+.touch-diag { display: flex; gap: 22px; align-items: flex-end; margin-top: 26px; flex-wrap: wrap; }
+.touch-diag .cell { text-align: center; }
+.touch-diag .bx { border: 1px dashed var(--redline); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-family: var(--mono); font-size: 9px; color: var(--redline); }
+
+/* ————— 09 · voice ————— */
+.voice-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; border: 1px solid var(--line); }
+@media (max-width: 820px) { .voice-grid { grid-template-columns: 1fr; } }
+.voice-cell { padding: 24px 28px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.voice-cell:nth-child(2n) { border-right: none; }
+.voice-cell:nth-child(n+5) { border-bottom: none; }
+@media (max-width: 820px) { .voice-cell { border-right: none !important; border-bottom: 1px solid var(--line) !important; } .voice-cell:last-child { border-bottom: none !important; } }
+.voice-cell .str { font-size: 16.5px; font-weight: 500; line-height: 1.45; margin-top: 9px; }
+.voice-cell .str .mono-em { font-size: 0.85em; }
+
+/* ————— 10 · verdict ————— */
+.verdict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); }
+@media (max-width: 820px) { .verdict-grid { grid-template-columns: 1fr; } }
+.verdict-col { padding: 26px 30px 30px; }
+.verdict-col:first-child { border-right: 1px solid var(--line); }
+@media (max-width: 820px) { .verdict-col:first-child { border-right: none; border-bottom: 1px solid var(--line); } }
+.verdict-col ul { list-style: none; margin-top: 16px; }
+.verdict-col li { padding: 12px 0 12px 26px; border-bottom: 1px solid var(--line-soft); position: relative; font-size: 14.5px; line-height: 1.55; color: var(--ink-2); }
+.verdict-col li:last-child { border-bottom: none; }
+.verdict-col li::before { font-family: var(--mono); font-size: 11px; font-weight: 700; position: absolute; left: 0; top: 14px; }
+.verdict-col.pro li::before { content: "▸"; color: var(--green); }
+.verdict-col.con li::before { content: "▸"; color: var(--red); }
+.verdict-col li b { color: var(--ink); font-weight: 600; }
+
+footer.book-end { border-top: 2px solid var(--ink); margin-top: 110px; padding: 26px 0 60px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+
+.applied-caption { margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<!-- ======================= 00 · COVER ======================= -->
+<div class="wrap">
+  <header class="cover">
+    <div class="cover-top">
+      <span class="ann">Sentri · Brand direction <span class="tick">03</span></span>
+      <span class="ann">2026.08 · For internal review</span>
+    </div>
+    <div class="cover-mid">
+      <svg width="112" height="116" viewBox="0 0 96 104" role="img" aria-label="Sentri mark — three rows, one status cell lit">
+        <rect x="0" y="8"  width="60" height="16" fill="var(--ink)"/><rect x="80" y="8"  width="16" height="16" fill="var(--amber)"/>
+        <rect x="0" y="44" width="60" height="16" fill="var(--ink)"/><rect x="80" y="44" width="16" height="16" fill="var(--ink)"/>
+        <rect x="0" y="80" width="60" height="16" fill="var(--ink)"/><rect x="80" y="80" width="16" height="16" fill="var(--ink)"/>
+      </svg>
+      <h1>Board</h1>
+      <p class="tagline">GROUND STAYS QUIET · ROWS HOLD THE FACTS · <span class="st amber" style="font-size:inherit;">THE RAIL HOLDS THE SIGNAL</span></p>
+      <div class="cover-board">
+        <div class="cbr"><span class="l">R1</span><span class="t">HEAT CHECK · 46 SOWS</span><span class="st amber">DUE NOW</span></div>
+        <div class="cbr"><span class="l">R2</span><span class="t">PREGNANCY CHECK · 100/200</span><span class="st blue">IN PROGRESS</span></div>
+        <div class="cbr"><span class="l">R2</span><span class="t">RE-CHECKS · 6 SOWS · <s>JUL 6</s> +2D</span><span class="st red">OVERDUE</span></div>
+        <div class="cbr"><span class="l">R3</span><span class="t">FARROWING WATCH · 12 ACTIVE</span><span class="st red">1 ALERT</span></div>
+        <div class="cbr" style="border-bottom:none;"><span class="l">N—</span><span class="t">NOTHING DUE · NEXT SAT JUL 10</span><span class="st gray">UPCOMING</span></div>
+      </div>
+    </div>
+    <div class="cover-bottom">
+      <div class="toc ann">
+        <a href="#idea">01 Idea</a><a href="#mark">02 Mark</a><a href="#type">03 Type</a><a href="#color">04 Color</a><a href="#today">05 Today</a><a href="#check">06 Preg check</a><a href="#farrow">07 Farrowing</a><a href="#density">08 Density</a><a href="#voice">09 Voice</a><a href="#verdict">10 Verdict</a>
+      </div>
+      <span class="ann">Ashfield Farm · Thu Jul 8 · G. Hansen</span>
+    </div>
+  </header>
+</div>
+
+<!-- ======================= 01 · IDEA ======================= -->
+<div class="wrap">
+  <section class="chapter" id="idea">
+    <div class="ch-head"><span class="no">01</span><h2>The idea</h2><span class="ann">The departure board</span></div>
+    <div class="idea-grid">
+      <div>
+        <p class="manifesto">A farm day is a schedule. Two hundred sows to check, forty-six to breed, twelve farrowing — and one worker deciding, every few minutes, <span class="hl">what needs me next</span>. Sentri is the board that schedule is read from.</p>
+        <p class="body-text">A departure board earns trust by discipline, not decoration: every flight in its row, every row in the same columns, and one column — status — allowed to shout. Sentri borrows the discipline and leaves the airport behind. Near-white ground, ink facts, mono numerals. Location, task, count, time — all achromatic. Then a single right-aligned rail of colored words, lined up across every row, readable with wet gloves at arm's length in sunlight.</p>
+        <p class="body-text">When everything on screen is a row, two hundred animals is not a design problem — it is just more board. And when color can only ever mean status, a worker never has to ask whether a splash of green is a brand flourish or a fact. It is always a fact.</p>
+      </div>
+      <aside class="idea-aside">
+        <div class="row"><b>One glance, one column</b><span>All color on the screen lives in the status rail. Triage is a single vertical eye movement down the right edge — never a hunt across the surface.</span></div>
+        <div class="row"><b>Everything in its cell</b><span>Mono-forward type gives every ID, count and time a fixed-width cell. Alignment does the work hierarchy usually begs decoration to do.</span></div>
+        <div class="row"><b>The delta is the story</b><span>Scheduled is struck through in ink; actual is colored with the gap — <s>JUL 6</s> <span class="st red" style="font-size:10px;">+2D</span>. The board doesn't editorialize; it shows drift.</span></div>
+      </aside>
+    </div>
+  </section>
+
+<!-- ======================= 02 · MARK ======================= -->
+  <section class="chapter" id="mark">
+    <div class="ch-head"><span class="no">02</span><h2>The mark</h2><span class="ann">Three rows · one cell lit</span></div>
+    <div class="mark-grid">
+      <div class="plate white">
+        <span class="plate-label ann">Primary · construction on 4-unit grid</span>
+        <svg width="300" height="270" viewBox="0 0 150 135" role="img" aria-label="Sentri mark construction">
+          <!-- grid -->
+          <g stroke="rgba(23,25,28,0.08)" stroke-width="0.5">
+            <line x1="27" y1="10" x2="27" y2="125"/><line x1="47" y1="10" x2="47" y2="125"/><line x1="67" y1="10" x2="67" y2="125"/>
+            <line x1="87" y1="10" x2="87" y2="125"/><line x1="107" y1="10" x2="107" y2="125"/><line x1="123" y1="10" x2="123" y2="125"/>
+            <line x1="20" y1="20" x2="130" y2="20"/><line x1="20" y1="56" x2="130" y2="56"/><line x1="20" y1="92" x2="130" y2="92"/>
+            <line x1="20" y1="36" x2="130" y2="36"/><line x1="20" y1="72" x2="130" y2="72"/><line x1="20" y1="108" x2="130" y2="108"/>
+          </g>
+          <!-- mark -->
+          <rect x="27" y="20" width="60" height="16" fill="var(--ink)"/><rect x="107" y="20" width="16" height="16" fill="var(--amber)"/>
+          <rect x="27" y="56" width="60" height="16" fill="var(--ink)"/><rect x="107" y="56" width="16" height="16" fill="var(--ink)"/>
+          <rect x="27" y="92" width="60" height="16" fill="var(--ink)"/><rect x="107" y="92" width="16" height="16" fill="var(--ink)"/>
+          <!-- redlines -->
+          <g stroke="var(--redline)" stroke-width="0.6">
+            <line x1="27" y1="12" x2="87" y2="12"/><line x1="107" y1="12" x2="123" y2="12"/>
+            <line x1="90" y1="20" x2="90" y2="36" transform="translate(40,0)"/>
+          </g>
+          <g font-family="JetBrains Mono, monospace" font-size="5.2" fill="var(--redline)" letter-spacing="0.4">
+            <text x="42" y="9">15u ROW</text><text x="104" y="9">4u CELL</text>
+            <text x="27" y="122">GAP 5u · CELL = ROW HEIGHT · RAIL FLUSH RIGHT</text>
+          </g>
+        </svg>
+      </div>
+      <div class="mark-notes">
+        <p>Three rows of work; one cell of signal. The long bars are the board — the facts, in ink, always the same length, always aligned. The rail column sits flush right, one square per row, and exactly one square carries color: the row that needs you. It is the whole identity in six rectangles — <strong>the ground stays quiet, the rail speaks.</strong></p>
+        <p>The lit cell is amber by default — <em>due now</em>, the load-bearing state of a working day. In live surfaces the mark may light red on an active alert and green when the day is clear; it never lights two cells at once. Print and favicon use amber, always.</p>
+        <p>The wordmark is set in JetBrains Mono at 700 — six characters, six equal cells, one em advance each. The name itself obeys the grid. No container, no gradient, no rounding: the mark survives lamination, ear-tag printers, and 1-bit barn displays without redrawing.</p>
+        <p>Below 24 px the mark recuts to two rows so the lit cell stays a legible square — small sizes get their own cut, not a shrink.</p>
+      </div>
+    </div>
+    <div class="lockups" style="margin-top:28px; border-bottom:none;">
+      <div>
+        <span class="plate-label ann">48 px</span>
+        <svg width="48" height="52" viewBox="0 0 96 104"><rect x="0" y="8" width="60" height="16" fill="var(--ink)"/><rect x="80" y="8" width="16" height="16" fill="var(--amber)"/><rect x="0" y="44" width="60" height="16" fill="var(--ink)"/><rect x="80" y="44" width="16" height="16" fill="var(--ink)"/><rect x="0" y="80" width="60" height="16" fill="var(--ink)"/><rect x="80" y="80" width="16" height="16" fill="var(--ink)"/></svg>
+      </div>
+      <div>
+        <span class="plate-label ann">24 px · two-row cut</span>
+        <svg width="24" height="24" viewBox="0 0 96 96"><rect x="0" y="8" width="56" height="28" fill="var(--ink)"/><rect x="68" y="8" width="28" height="28" fill="var(--amber)"/><rect x="0" y="60" width="56" height="28" fill="var(--ink)"/><rect x="68" y="60" width="28" height="28" fill="var(--ink)"/></svg>
+      </div>
+      <div>
+        <span class="plate-label ann">16 px · favicon</span>
+        <svg width="16" height="16" viewBox="0 0 96 96"><rect x="0" y="8" width="56" height="28" fill="var(--ink)"/><rect x="68" y="8" width="28" height="28" fill="var(--amber)"/><rect x="0" y="60" width="56" height="28" fill="var(--ink)"/><rect x="68" y="60" width="28" height="28" fill="var(--ink)"/></svg>
+      </div>
+    </div>
+    <div class="lockups">
+      <div>
+        <span class="plate-label ann">Horizontal lockup</span>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <svg width="30" height="33" viewBox="0 0 96 104"><rect x="0" y="8" width="60" height="16" fill="var(--ink)"/><rect x="80" y="8" width="16" height="16" fill="var(--amber)"/><rect x="0" y="44" width="60" height="16" fill="var(--ink)"/><rect x="80" y="44" width="16" height="16" fill="var(--ink)"/><rect x="0" y="80" width="60" height="16" fill="var(--ink)"/><rect x="80" y="80" width="16" height="16" fill="var(--ink)"/></svg>
+          <span class="wordmark" style="font-size:26px;">SENTRI</span>
+        </div>
+      </div>
+      <div>
+        <span class="plate-label ann">Wordmark alone</span>
+        <span class="wordmark" style="font-size:26px;">SENTRI</span>
+      </div>
+      <div style="background: var(--ink);">
+        <span class="plate-label ann" style="color: rgba(251,251,250,0.45);">On ink · rail unchanged</span>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <svg width="30" height="33" viewBox="0 0 96 104"><rect x="0" y="8" width="60" height="16" fill="#FBFBFA"/><rect x="80" y="8" width="16" height="16" fill="#E0A61B"/><rect x="0" y="44" width="60" height="16" fill="#FBFBFA"/><rect x="80" y="44" width="16" height="16" fill="#FBFBFA"/><rect x="0" y="80" width="60" height="16" fill="#FBFBFA"/><rect x="80" y="80" width="16" height="16" fill="#FBFBFA"/></svg>
+          <span class="wordmark" style="font-size:26px; color:#FBFBFA;">SENTRI</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- ======================= 03 · TYPE ======================= -->
+  <section class="chapter" id="type">
+    <div class="ch-head"><span class="no">03</span><h2>Typography</h2><span class="ann">Barlow Semi Condensed · JetBrains Mono</span></div>
+    <p class="body-text" style="margin-bottom:8px;">Two faces, strict jobs. Barlow Semi Condensed is signage lineage — cut from American highway lettering — compact enough to survive a 390 px row with five facts in it. JetBrains Mono is the board voice: every digit, ID, time and status word lives in a fixed-width cell, so columns align by construction, not by eye.</p>
+    <div class="type-rows">
+      <div class="type-row">
+        <div class="type-meta"><b>Display — Barlow Semi Condensed</b>600–700, uppercase, +3–6% tracking. Screen titles, section names, CTAs. Signage voice: short, loud, never long-form.</div>
+        <div class="spec-display">Read the board.<br>Work the row.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Text — Barlow Semi Condensed</b>400–600, sentence case, 13.5–16 px. Task names, states, notes. Condensed width buys a whole column of data on a phone.</div>
+        <div class="spec-ui">Check every sow in the pen, then submit the pen as one record. <b>Uncertain results become re-checks automatically</b> — nothing waits on your memory.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Data — JetBrains Mono</b>500–800, tabular by design. IDs, counts, times, pen codes, deltas, the status rail. If it can be compared down a column, it is mono.</div>
+        <div class="spec-mono">PEN A1 · 000318 · CHECKED 23:00 · G. HANSEN<br>GESTATION R2 · 100/200 HD · DAY 1 OF 3 · <s>JUL 6</s> +2D</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Numerals in anger</b>Counts are the product. Big numbers set in mono ExtraBold — same face at 10 px and 66 px, so a count is recognizably a count at every size.</div>
+        <div class="num-strip">
+          <span class="spec-num">200<sub>head to check</sub></span>
+          <span class="spec-num">23:00<sub>last record</sub></span>
+          <span class="spec-num" style="font-weight:600;">000418<sub>ear tag</sub></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- ======================= 04 · COLOR & STATUS ======================= -->
+  <section class="chapter" id="color">
+    <div class="ch-head"><span class="no">04</span><h2>Color &amp; status</h2><span class="ann">Achromatic ground · five working colors</span></div>
+    <div class="palette">
+      <div class="chipc"><div class="well" style="background:var(--paper); border-bottom:0;"></div><div class="meta"><b>Paper</b><span>#FBFBFA</span><span>ground — every surface</span></div></div>
+      <div class="chipc"><div class="well" style="background:var(--paper-2);"></div><div class="meta"><b>Paper II</b><span>#F1F1EF</span><span>recessed panels, bars</span></div></div>
+      <div class="chipc"><div class="well" style="background:var(--ink);"></div><div class="meta"><b>Ink</b><span>#17191C</span><span>text, primary actions</span></div></div>
+      <div class="chipc"><div class="well" style="background:var(--ink-3);"></div><div class="meta"><b>Ink 60</b><span>#6D7277</span><span>metadata, annotations</span></div></div>
+    </div>
+    <div class="ratio">
+      <div style="flex:84; background:var(--paper); border-right:1px solid var(--line);"></div>
+      <div style="flex:12; background:var(--ink);"></div>
+      <div style="flex:1.4; background:var(--amber);"></div>
+      <div style="flex:1; background:var(--red);"></div>
+      <div style="flex:0.9; background:var(--blue);"></div>
+      <div style="flex:0.7; background:var(--green);"></div>
+    </div>
+    <div class="ratio-labels"><span class="ann" style="flex:84;">Usage · paper 84</span><span class="ann" style="flex:12;">ink 12</span><span class="ann" style="flex:4;">rail 4</span></div>
+
+    <div class="status-table">
+      <div class="status-row"><span class="st red">OVERDUE</span><span class="use">Past its window. Also carries alerts and attention flags — anything that must not wait.</span><span class="hex">#C42D21 · wash #FAEAE7</span><span class="cr">5.3:1 AA</span></div>
+      <div class="status-row"><span class="st amber">DUE NOW</span><span class="use">In its window today. Load-bearing — amber is never decorative, never a highlight.</span><span class="hex">#9A6700 · wash #F9F0D9</span><span class="cr">4.9:1 AA</span></div>
+      <div class="status-row"><span class="st blue">IN PROGRESS</span><span class="use">Someone is working it now. Progress fills are this blue and nothing else.</span><span class="hex">#1259C3 · wash #E9F0FA</span><span class="cr">6.1:1 AA</span></div>
+      <div class="status-row"><span class="st green">DONE</span><span class="use">Recorded. A fact, not a reward — green never appears on a button.</span><span class="hex">#1A7A3C · wash #E8F2EA</span><span class="cr">5.0:1 AA</span></div>
+      <div class="status-row"><span class="st gray">UPCOMING</span><span class="use">Not yet due. Quiet by design; the future never competes with the present.</span><span class="hex">#6D7277 · wash #F0F0EF</span><span class="cr">4.9:1 AA</span></div>
+    </div>
+
+    <div class="sun-note">
+      <div>
+        <p class="lede" style="font-size:18px;">Status must survive sunlight.</p>
+        <p class="body-text">Glare compresses contrast and kills subtle color first. Three defenses: every rail color holds ≥ 4.5:1 against paper, so the word survives even when the hue washes out; status is always a <strong>word</strong>, never only a dot, so a worker who cannot resolve color at arm's length can still read the row; and rail words are bold mono caps — thick strokes at small sizes, the same weight glare-tested signage uses. Washes (#FAEAE7 and family) are backgrounds for strips only and never the sole carrier of meaning.</p>
+      </div>
+      <div class="sun-demo">
+        <span class="ann">The rail, at arm's length</span>
+        <div class="srow"><span>Re-checks · 6 sows</span><span class="st red">OVERDUE</span></div>
+        <div class="srow"><span>Heat check · 46 sows</span><span class="st amber">DUE NOW</span></div>
+        <div class="srow"><span>Pregnancy check · 100/200</span><span class="st blue">IN PROGRESS</span></div>
+        <div class="srow"><span>Pen A1 · submitted</span><span class="st green">DONE</span></div>
+        <div class="srow"><span>Weigh-in · Sat Jul 10</span><span class="st gray">UPCOMING</span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ======================= 05 · TODAY ======================= -->
+<div class="wrap">
+  <section class="chapter" id="today">
+    <div class="ch-head"><span class="no">05</span><h2>Screen — Today</h2><span class="ann">The key screen · the board itself</span></div>
+    <div class="screen-grid">
+      <div class="phone">
+        <div class="p-status"><span>9:41</span><span class="sig">●●●○ ᯤ</span></div>
+        <div class="a-head">
+          <div class="a-farm"><span class="ann">Ashfield Farm · 2,140 sows</span><span class="ann">G. Hansen</span></div>
+          <div class="a-date"><h3>Thu Jul 8</h3><span class="ann">3 tasks · 4 sections</span></div>
+        </div>
+
+        <div class="exc">
+          <span class="n">6</span>
+          <div class="t"><span>Overdue</span><b>Pregnancy re-checks — oldest +2d</b></div>
+          <span class="go">→</span>
+        </div>
+
+        <div class="sec-head"><span class="ann" style="color:var(--ink); font-weight:700;">Breeding</span><span class="rule"></span><span class="ann">210 hd</span></div>
+        <div class="brow">
+          <span class="loc">R1</span>
+          <div class="task"><b>Heat check</b><span>46 sows · with boar pass</span></div>
+          <div class="rail"><span class="st amber">DUE NOW</span><span class="tm">07:30</span></div>
+        </div>
+
+        <div class="sec-head"><span class="ann" style="color:var(--ink); font-weight:700;">Gestation</span><span class="rule"></span><span class="ann">980 hd</span></div>
+        <div class="brow">
+          <span class="loc">R2</span>
+          <div class="task"><b>Pregnancy check</b><span>100/200 hd · day 1 of 3</span></div>
+          <div class="rail"><span class="st blue">IN PROGRESS</span><span class="tm">SINCE 07:10</span></div>
+        </div>
+        <div class="brow sub">
+          <span class="loc" style="color:var(--ink-3);">R2</span>
+          <div class="task"><b>Re-checks · 6 sows</b><span><s>due jul 6</s> · oldest +2d</span></div>
+          <div class="rail"><span class="st red">OVERDUE</span><span class="tm">+2D</span></div>
+        </div>
+
+        <div class="sec-head"><span class="ann" style="color:var(--ink); font-weight:700;">Farrowing</span><span class="rule"></span><span class="ann">96 hd</span></div>
+        <div class="brow">
+          <span class="loc">R3</span>
+          <div class="task"><b>Farrowing watch</b><span>12 active · 000418 long interval</span></div>
+          <div class="rail"><span class="st red">1 ALERT</span><span class="tm">SINCE 21:12</span></div>
+        </div>
+
+        <div class="sec-head"><span class="ann" style="color:var(--ink); font-weight:700;">Nursery</span><span class="rule"></span><span class="ann">854 hd</span></div>
+        <div class="brow" style="border-bottom:none;">
+          <span class="loc" style="color:var(--ink-3);">—</span>
+          <div class="task"><b style="color:var(--ink-2); font-weight:500;">Nothing due today</b><span>Next · weigh-in · sat jul 10</span></div>
+          <div class="rail"><span class="st gray">UPCOMING</span><span class="tm">SAT</span></div>
+        </div>
+
+        <div class="syncbar"><span class="ann">⟳ Sync pending · 3 records · working offline</span></div>
+        <div class="tabbar">
+          <div class="on"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h10"/></svg>TODAY</div>
+          <div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>LOCATIONS</div>
+          <div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>RECORD</div>
+          <div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>MORE</div>
+        </div>
+      </div>
+      <aside class="screen-notes">
+        <div class="row"><b>Location-first, board-shaped</b><span>Sections are the group rules; rooms are the rows. A row is <span class="mono-em">location · task · count · time · STATUS</span> — the same five columns on every screen in the product.</span></div>
+        <div class="row"><b>The rail</b><span>Every status word right-aligned to the same edge. Triage is one downward glance: red, amber, blue, red, gray. Nothing elsewhere on the screen is allowed to be colored, so nothing competes.</span></div>
+        <div class="row"><b>Exceptions ride above the board</b><span>The 6 overdue re-checks get the only red strip, pinned above the schedule with the count set large. One tap lands inside Gestation R2 with the six pre-filtered.</span></div>
+        <div class="row"><b>Sync is a fact, not a mood</b><span>Offline is normal in a barn. Pending records are announced in the annotation voice, in gray — a count, not an alarm.</span></div>
+        <div class="row"><b>Delta on the board</b><span>The re-check row shows the Flighty pattern at schedule level: <span class="mono-em"><s>DUE JUL 6</s> +2D</span> — struck plan, colored actual.</span></div>
+      </aside>
+    </div>
+  </section>
+
+<!-- ======================= 06 · PREGNANCY CHECK ======================= -->
+  <section class="chapter" id="check">
+    <div class="ch-head"><span class="no">06</span><h2>Screen — Pregnancy check</h2><span class="ann">Density test · pattern ×200</span></div>
+    <div class="screen-grid">
+      <div class="phone">
+        <div class="p-status"><span>9:41</span><span class="sig">●●●○ ᯤ</span></div>
+        <div class="p-top"><span class="back">‹</span><h4>Pregnancy check</h4><span></span></div>
+        <div class="p-loc"><span class="ann">Gestation · Room 2</span></div>
+
+        <div class="prog">
+          <div class="prog-top">
+            <span class="big">100<small> / 200</small></span>
+            <span class="st blue">IN PROGRESS</span>
+          </div>
+          <div class="prog-bar"><i></i></div>
+          <div class="prog-meta"><span class="ann">Day 1 of 3</span><span class="ann">Last · G. Hansen · 23:00</span></div>
+        </div>
+
+        <div class="searchrow">
+          <div class="field"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>EAR TAG №</div>
+          <div class="fbtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"/></svg></div>
+        </div>
+
+        <div class="pen-head"><span class="pen">PEN A1</span><span class="rule"></span><span class="ann">50 hd · 21 checked</span></div>
+        <div class="prow"><span class="tag">000231</span><span class="state">Recheck in 3 days · uncertain</span><span class="st gray">UPCOMING</span></div>
+        <div class="prow"><span class="tag">000268</span><span class="state">Needs check</span><span class="st amber">DUE NOW</span></div>
+        <div class="prow"><span class="tag">000302</span><span class="state">Not pregnant → flagged for rebreed</span><span class="st red">ATTENTION</span></div>
+        <div class="prow"><span class="tag">000318</span><span class="state">Pregnant, confirmed <span class="d"><s>due jul 8</s> · done jul 8</span></span><span class="st green">DONE</span></div>
+
+        <div class="pen-head"><span class="pen">PEN A2</span><span class="rule"></span><span class="ann">50 hd · 26 checked</span></div>
+        <div class="prow"><span class="tag">000254</span><span class="state">Re-check <span class="d"><s>due jul 6</s> · +2d late</span></span><span class="st red">OVERDUE</span></div>
+        <div class="prow"><span class="tag">000339</span><span class="state">Pregnant, confirmed <span class="d">done jul 8</span></span><span class="st green">DONE</span></div>
+        <div class="prow"><span class="tag">000341</span><span class="state">Needs check</span><span class="st amber">DUE NOW</span></div>
+        <div class="prow"><span class="tag">000347</span><span class="state">Recheck in 5 days · uncertain</span><span class="st gray">UPCOMING</span></div>
+
+        <div class="pen-head"><span class="pen">PEN A3</span><span class="rule"></span><span class="ann">50 hd · 30 checked</span></div>
+        <div class="prow"><span class="tag">000356</span><span class="state">Needs check</span><span class="st amber">DUE NOW</span></div>
+        <div class="prow"><span class="tag">000362</span><span class="state">Not pregnant → flagged for rebreed</span><span class="st red">ATTENTION</span></div>
+
+        <div class="pen-head" style="opacity:0.45;"><span class="pen">PEN A4</span><span class="rule"></span><span class="ann">50 hd · 23 checked</span></div>
+        <div class="prow" style="opacity:0.45; border-bottom:none;"><span class="tag">000375</span><span class="state">Re-check <span class="d"><s>due jul 7</s> · +1d late</span></span><span class="st red">OVERDUE</span></div>
+
+        <div class="cta-dock"><div class="cta">Submit results</div></div>
+      </div>
+      <aside class="screen-notes">
+        <div class="row"><b>Unit progress in the board voice</b><span><span class="mono-em">100 / 200</span> in ExtraBold mono; day counter and last-record line in annotation gray; the fill bar is blue because the task is in progress — the bar color is the status color, not a brand color.</span></div>
+        <div class="row"><b>Pens are the group rules</b><span>Location-first inside the room: <span class="mono-em">PEN A1</span> rules the list; ear tags only ever appear inside a pen. Headers carry the running count per pen.</span></div>
+        <div class="row"><b>A row is 50 px and complete</b><span>Tag cell (fixed 78 px, mono), state (condensed text), rail. Two hundred sows is this pattern ×200 — no cards, no new components, scroll position is the only state.</span></div>
+        <div class="row"><b>Delta at animal level</b><span><span class="mono-em"><s>DUE JUL 8</s> · DONE JUL 8</span> on time, <span class="mono-em"><s>DUE JUL 6</s> · +2D LATE</span> when drifted. Struck ink for the plan, colored word for the fact.</span></div>
+        <div class="row"><b>One CTA, ink</b><span>“Submit results” is 56 px and achromatic. Green is reserved for the fact of being recorded; a button asking for work is never dressed as work already done.</span></div>
+      </aside>
+    </div>
+  </section>
+
+<!-- ======================= 07 · FARROWING RECORD ======================= -->
+  <section class="chapter" id="farrow">
+    <div class="ch-head"><span class="no">07</span><h2>Screen — Farrowing record</h2><span class="ann">Action test · counters &amp; the big CTA</span></div>
+    <div class="screen-grid">
+      <div class="phone">
+        <div class="dim">
+          <div class="sheet">
+            <div class="sheet-head"><span></span><h4>Farrowing</h4><span class="x">✕</span></div>
+            <div class="p-loc"><span class="ann">Farrowing · Room 3</span></div>
+            <div class="sow-line">
+              <span class="pen">B2</span>
+              <span class="tag">000418</span>
+              <div class="meta"><span class="ann">Parity 3 · 650 days</span></div>
+            </div>
+
+            <div class="warn">
+              <span class="n">45<span style="font-size:11px;"> MIN</span></span>
+              <div class="t"><span>Long interval</span><b>Since last piglet — check the sow</b></div>
+              <span class="st amber">DUE NOW</span>
+            </div>
+
+            <div class="counters">
+              <div class="counter">
+                <span class="ann">Live</span>
+                <div class="n">8<small> HD</small></div>
+                <div class="btns"><button>−</button><button class="plus">+</button></div>
+              </div>
+              <div class="counter">
+                <span class="ann">Stillborn · mummified</span>
+                <div class="n">0<small> HD</small></div>
+                <div class="btns"><button>−</button><button class="plus">+</button></div>
+              </div>
+            </div>
+
+            <div class="timeline">
+              <div class="tl-row"><span class="tl-dot"></span><span class="e">Piglet 7 · live</span><span class="ann">21:58</span></div>
+              <div class="tl-row"><span class="tl-dot"></span><span class="e">Piglet 8 · live</span><span class="ann">22:15</span></div>
+              <div class="tl-row"><span class="tl-dot now"></span><span class="e"><b>Now · 45 min since last</b></span><span class="ann" style="color:var(--amber);">23:00</span></div>
+              <div class="tl-row"><span class="tl-dot next"></span><span class="e" style="color:var(--ink-3);">Piglet 9 · expected</span><span class="ann">—</span></div>
+            </div>
+
+            <div class="rec-line"><span class="ann">Recorded · G. Hansen · 23:00</span></div>
+            <div class="cta-dock"><div class="cta sq">···</div><div class="cta">Record birth</div></div>
+          </div>
+        </div>
+      </div>
+      <aside class="screen-notes">
+        <div class="row"><b>The sheet keeps the grammar</b><span>Even an action surface opens with a board line: pen chip <span class="mono-em">B2</span>, tag <span class="mono-em">000418</span>, facts in annotation gray. Location before animal, always.</span></div>
+        <div class="row"><b>The warning is a row, not a modal</b><span>45 minutes since the last piglet is amber — due attention, not yet an emergency. The count is set large, the rail word says <span class="mono-em">DUE NOW</span>, and the sheet stays usable underneath it.</span></div>
+        <div class="row"><b>Counters built for gloves</b><span>The two facts that matter — 8 live, 0 stillborn — in 40 px mono over 48 px stepper keys. Increment is the primary gesture, so <span class="mono-em">+</span> is ink-solid; decrement is the correction, drawn quiet.</span></div>
+        <div class="row"><b>Package-tracking spine</b><span>Past piglets are filled neutral dots, the present is the single amber node, the expected next is hollow. The sow's night reads like a shipment: what happened, where we are, what's next.</span></div>
+        <div class="row"><b>56 px to commit</b><span>“Record birth” is the one ink block; the overflow <span class="mono-em">···</span> is a 56 px square beside it. Signed in the annotation voice: <span class="mono-em">RECORDED · G. HANSEN · 23:00</span>.</span></div>
+      </aside>
+    </div>
+  </section>
+
+<!-- ======================= 08 · DENSITY RULES ======================= -->
+  <section class="chapter" id="density">
+    <div class="ch-head"><span class="no">08</span><h2>Density rules</h2><span class="ann">The board's building code</span></div>
+    <div class="dens-grid">
+      <div>
+        <span class="ann">Row anatomy · dimensions in px</span>
+        <div class="anatomy" style="margin-top:12px;">
+          <div style="display:flex; justify-content:space-between; padding: 6px 20px 0;"><span class="dim-label">← 20 PAD</span><span class="dim-label">RAIL FLUSH RIGHT →</span></div>
+          <div class="brow" style="min-height:58px;">
+            <span class="loc">R2</span>
+            <div class="task"><b>Pregnancy check</b><span>100/200 hd · day 1 of 3</span></div>
+            <div class="rail"><span class="st blue">IN PROGRESS</span><span class="tm">SINCE 07:10</span></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding: 4px 20px 6px;"><span class="dim-label">BOARD ROW 58 · LIST ROW 50 · HAIRLINE 1</span><span class="dim-label">LOC CELL 40</span></div>
+          <div class="prow" style="min-height:50px;"><span class="tag">000318</span><span class="state">Pregnant, confirmed</span><span class="st green">DONE</span></div>
+          <div style="display:flex; justify-content:space-between; padding: 4px 20px 8px; border-top:1px solid var(--line-soft);"><span class="dim-label">TAG CELL 78 · GAP 12 · BASE GRID 4</span><span class="dim-label">RAIL = MONO 700 · 10/0.11EM</span></div>
+        </div>
+        <div class="touch-diag">
+          <div class="cell"><div class="bx" style="width:50px; height:50px;">50</div><div class="ann" style="margin-top:8px;">List row — full-width tap</div></div>
+          <div class="cell"><div class="bx" style="width:58px; height:58px;">58</div><div class="ann" style="margin-top:8px;">Board row</div></div>
+          <div class="cell"><div class="bx" style="width:120px; height:56px;">56</div><div class="ann" style="margin-top:8px;">Primary CTA — 56 min</div></div>
+          <div class="cell"><div class="bx" style="width:48px; height:48px; border-style:solid;">48</div><div class="ann" style="margin-top:8px;">Absolute floor — gloves</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="rule-list">
+          <div class="r"><span class="k">D-1</span><div><b>Hierarchy stops at two visible levels.</b> <span>Section → room on Today; pen → animal in a task. Deeper structure is navigation, never indentation.</span></div></div>
+          <div class="r"><span class="k">D-2</span><div><b>Rows, rules, and one panel style.</b> <span>Hairline-separated rows on paper; at most one bordered panel (progress, counter) per screen region. No nested cards, no shadows inside screens.</span></div></div>
+          <div class="r"><span class="k">D-3</span><div><b>Color may mean status. Color may not mean anything else.</b> <span>Not brand, not selection, not emphasis, not delight. CTAs are ink; links are ink underlined; the mark's lit cell is itself a status.</span></div></div>
+          <div class="r"><span class="k">D-4</span><div><b>The rail is sacred space.</b> <span>The rightmost 96 px of any row belongs to the status word and its timestamp. Nothing else may occupy or cross it — chevrons and actions live on the row body.</span></div></div>
+          <div class="r"><span class="k">D-5</span><div><b>Spacing rhythm is 4.</b> <span>All paddings and gaps are multiples of 4 px; row heights land on 50/58 so five to seven rows fill a phone screen above the dock.</span></div></div>
+          <div class="r"><span class="k">D-6</span><div><b>Density scales by repetition, not compression.</b> <span>Two hundred rows use the same 50 px row as twelve. When space runs out, group headers collapse — type never shrinks below 13 px.</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- ======================= 09 · VOICE ======================= -->
+  <section class="chapter" id="voice">
+    <div class="ch-head"><span class="no">09</span><h2>Voice</h2><span class="ann">Calm · imperative · counted</span></div>
+    <p class="body-text" style="margin-bottom:24px;">The board speaks like a schedule: short declaratives, counts before adjectives, next action always named. Never jargon, never cheer, never blame. If a sentence survives being read once, wet, at arm's length — it ships.</p>
+    <div class="voice-grid">
+      <div class="voice-cell"><span class="ann">Empty state</span><div class="str">Nothing due in Nursery. Next task — weigh-in, Sat Jul 10.</div></div>
+      <div class="voice-cell"><span class="ann">Error</span><div class="str">Couldn't save <span class="mono-em">000418</span>. Kept on this phone — it will retry when signal returns.</div></div>
+      <div class="voice-cell"><span class="ann">Sync</span><div class="str">Working offline. 3 records waiting to sync.</div></div>
+      <div class="voice-cell"><span class="ann">Confirm</span><div class="str"><span class="mono-em">000318</span> recorded — pregnant, confirmed.</div></div>
+      <div class="voice-cell"><span class="ann">Overdue nudge</span><div class="str">6 re-checks overdue in Gestation Room 2. Oldest is 2 days past.</div></div>
+      <div class="voice-cell"><span class="ann">Done</span><div class="str">Room 2 done for today — 100 of 200 checked, day 1 of 3.</div></div>
+    </div>
+  </section>
+
+<!-- ======================= 10 · VERDICT ======================= -->
+  <section class="chapter" id="verdict">
+    <div class="ch-head"><span class="no">10</span><h2>Verdict</h2><span class="ann">What it proves · where it strains</span></div>
+    <div class="verdict-grid">
+      <div class="verdict-col pro">
+        <span class="ann" style="color:var(--green);">Proves</span>
+        <ul>
+          <li><b>Arm's-length triage genuinely works.</b> One aligned rail, five words, the entire color budget spent at the decision point. Bold mono caps on near-white is the highest-contrast pattern of the three directions — the one most likely to survive glare, gloves and a cracked screen protector.</li>
+          <li><b>Density is native, not negotiated.</b> 200 sows is the 50 px row ×200; the tabular grammar needs zero new components between a 5-row day and a 500-row audit. This is the direction with the smallest design-system surface to build and maintain.</li>
+          <li><b>The delta pattern inherits for free.</b> Struck schedule + colored actual reads inside any mono cell — board level (<s>DUE JUL 6</s> +2D) and animal level (due Jul 8 · done Jul 8) use one convention, no bespoke widget.</li>
+          <li><b>The color law is enforceable.</b> "Color = status, nothing else" is a rule a team can actually police in review — unlike "use the brand color tastefully." Amber stays load-bearing because nothing else is allowed to be amber.</li>
+        </ul>
+      </div>
+      <div class="verdict-col con">
+        <span class="ann" style="color:var(--red);">Strains</span>
+        <ul>
+          <li><b>It runs cold.</b> Achromatic ink and mono read administrative — closer to a terminal than a place someone spends ten hours a day. Warmth has to come entirely from voice and motion, which a static deck cannot prove.</li>
+          <li><b>The rail is anglophone.</b> "IN PROGRESS" is 11 characters; its Chinese equivalent is 3, its German one 14. Word-shaped status means localization changes the rail's width and its at-a-distance silhouette — the signature degrades in translation unless status vocabulary is engineered per locale.</li>
+          <li><b>Action surfaces strain the grammar.</b> Farrowing's counters, steppers and big CTA aren't rows; chapter 07 had to borrow a card-and-button language the board doesn't natively supply. Every future form screen will pull against the system the same way.</li>
+          <li><b>Ownability rests on one gesture.</b> Near-white + ink + mono is the default aesthetic of 2020s dev tools; strip the rail and the mark, and little says Sentri. The identity is distinctive in use but thin in isolation — merch, signage and the app-store tile will have to work hard.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="book-end">
+    <span class="ann">Sentri · Brand direction 03 — Board · 2026.08</span>
+    <span class="ann">Compare against: 01 Field Ledger · 02 Panel</span>
+  </footer>
+</div>
+
+</body>
+</html>

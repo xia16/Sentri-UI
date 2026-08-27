@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pig actions — entry points, bulk, scanning</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F7F6F2;--card:#FFF;--well:#EFEEE8;--ink:#1C1E19;--ink2:#51544B;--ink3:#8B8E83;--hair:#E7E6DF;--hair2:#D8D7CE;--red:#C2402E;--amber:#96660D;--amber-fill:#D99A21;--amber-wash:#F8F0DC;--green:#3B8A50;--green-wash:#EAF2EC;--mono:'IBM Plex Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:40px 48px 90px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.015em;margin:18px 0 10px}
+h2{font-size:21px;font-weight:800;margin:44px 0 14px;padding-top:28px;border-top:1px solid var(--ink)}
+h3{font-size:15px;font-weight:700;margin:20px 0 8px}
+p{max-width:72ch;color:var(--ink2);margin-bottom:10px}
+.anno{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+.mono{font-family:var(--mono);font-size:12.5px}
+.cut{color:var(--red);font-weight:700}.keep{color:var(--green);font-weight:700}.merge{color:var(--amber);font-weight:700}
+pre.flow{font-family:var(--mono);font-size:12px;line-height:1.7;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:12px 0;color:var(--ink)}
+.note{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px 16px;margin:12px 0;font-size:13.5px;color:var(--ink2);max-width:none}
+.law{background:var(--card);border:1.5px solid var(--ink);border-radius:12px;padding:16px 18px;margin:14px 0;max-width:none}
+.law b{display:block;font-size:15.5px;color:var(--ink);margin-bottom:4px}
+.ok{color:var(--green);font-weight:700}.no{color:var(--ink3)}.never{color:var(--red);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Pig actions — entry points, bulk, scanning</h1>
+<p>Everything a farmer does to a pig that is <i>not</i> the task in hand. This doc settles three
+things at the system level: <b>where these actions are launched from</b>, <b>which of them work on
+more than one pig</b>, and <b>what scanning does on each surface</b>. The inside of each form is
+deliberately out of scope — those pages come later; what has to be right now is that a farmer
+always knows where to reach for them.</p>
+<p class="anno">figma 2490:4892 更多操作 · 74 renders · cross-referenced against the seven task docs and 1649:20977 · 1876:15130 · 5636:4563</p>
+
+<div class="note"><b>Two findings that shape the model.</b><br>
+1 · <b>There is no 日常巡检 flow in the file</b> — the string appears zero times. What exists is
+<span class="mono">猪只列表</span> (2512:9216): a house-scoped, health-oriented pig list with a
+batch bar and its own ⋯, filed as a context screen under a deferred module. That list <i>is</i>
+the ad-hoc surface; it was never named one.<br>
+2 · <b>更多操作 is not one menu.</b> 7 rows in 分娩/仔猪处理, 4 rows in 查情 (1876:15130), gated
+<i>by task stage</i> (rule at 1649:20977). That is precisely why <span class="mono">母猪流产</span>
+appears in piglet processing, where it cannot apply.</div>
+
+<h2>1 · Production inventory</h2>
+<p>Seven actions, after Mark is cut (§2). Fields are recorded here as the requirements source;
+the forms themselves are later work.</p>
+<table>
+<thead><tr><th style="width:14%">Action</th><th style="width:9%">中文</th><th>What production captures</th><th style="width:20%">Effect</th></tr></thead>
+<tbody>
+<tr><td><b>Treatment</b></td><td class="mono">治疗</td><td>Drug <span class="mono">*</span> · brand/dosage form · method <span class="mono">*</span> · dose <span class="mono">*</span> · unit <span class="mono">*</span> · target disease · target symptom</td><td>No confirmation. Two designs (single-pig form; 2-step batch) split by task stage.</td></tr>
+<tr><td><b>Health record</b></td><td class="mono">健康管理</td><td>—</td><td>Hand-off to the pig's health page (2583:19749). No screens here.</td></tr>
+<tr><td><b>Report abortion</b></td><td class="mono">流产</td><td>Cause <span class="mono">*</span> (6 chips) · remarks, required only when "Other" (2572:19676)</td><td>Stated on screen: <span class="mono">流产猪只将从当前批次中移除</span> — she leaves the batch.</td></tr>
+<tr><td><b>Foster piglets</b></td><td class="mono">寄养</td><td>Direction · counterpart sow · piglets (count <i>or</i> itemised) · optional identity supplement (tag · notch · sex · weight)</td><td>12 screens. Origin −N / destination +N, with two sync warnings.</td></tr>
+<tr><td><b>Count check</b></td><td class="mono">数量异常</td><td>System count (read-only) · actual ± · reason <span class="mono">*</span></td><td>Module marked <span class="mono">（暂时不做）</span> — deferred by production.</td></tr>
+<tr><td><b>Report death</b></td><td class="mono">上报死亡</td><td>Pigs (multi) → causes (disease + symptom pickers) → per-pig cause + photos</td><td>Cause optional behind a warning dialog.</td></tr>
+<tr><td><b>Transfer</b></td><td class="mono">转舍 / 转移</td><td>Zone › workshop › room › pen, origin→destination readback</td><td><b>No design in the 更多操作 section</b>; three names across three places.</td></tr>
+</tbody>
+</table>
+
+<h3>The sprawl being replaced</h3>
+<p>Six surfaces, two menu vocabularies, three entry points for the (now cut) Mark action, three
+names for Transfer, and two destinations referenced but designed nowhere
+(<span class="mono">健康管理</span>, <span class="mono">批量编辑病例</span>). Nothing in production
+tells a farmer which surface holds which action.</p>
+
+<h2>2 · Decisions taken</h2>
+<table>
+<thead><tr><th style="width:24%">Decision</th><th>Consequence</th></tr></thead>
+<tbody>
+<tr><td><b>Mark is cut entirely</b> <span class="cut">CUT</span></td><td>The action, its sheet, its three entry points, the red dot on rows and pen cells, the <span class="mono">已被标记</span> row line, and the "flagged" filter chip all go. Its only schema was one optional free-text note whose real uses — "she looks unwell", "her tag is damaged" — are a health record and a data-quality issue respectively. <b>Accepted loss:</b> production's free-note capability disappears; if a note with no clinical meaning proves necessary, it returns as a field on the health record, not as its own action.</td></tr>
+<tr><td><b>Abortion stays gated</b></td><td>Disabled when the sow is not bred, with the reason shown. No "record anyway" override — an abortion with no mating on file is a data problem to fix upstream, and an active-looking row that then argues with you is worse than a quiet one.</td></tr>
+<tr><td><b>Count check keeps its toolbox row</b></td><td>But it <b>lands in the litter record's count-verify step</b> rather than being a second standalone form. Rationale below.</td></tr>
+<tr><td>Per-task menu variants <span class="cut">CUT</span></td><td>One set, gated on the pig (§5), so nothing can leak into a task where it cannot apply.</td></tr>
+<tr><td>Two Treatment designs <span class="merge">MERGE</span></td><td>One form; "batch" is the same form over a selection made beforehand, so production's step-1 picker disappears.</td></tr>
+<tr><td>Four fostering step-1 screens <span class="merge">MERGE</span></td><td>One counterpart-picker parameterised by direction and scope.</td></tr>
+<tr><td>猪只列表's private batch bar <span class="merge">MERGE</span></td><td>Its three actions are the same actions in bulk; batch belongs to a list with a selection (§4).</td></tr>
+</tbody>
+</table>
+
+<div class="note"><b>Why Count check lands in the litter record.</b> Death, abortion, transfer and
+fostering are <i>events in an animal's life</i>. A count mismatch is not an event — it is a
+<i>correction to a record</i> that already exists (the litter's head count). If the toolbox owned
+its own count form, two different screens could change the same number and they would eventually
+disagree. So the toolbox row stays — noticing a mismatch while walking is exactly an ad-hoc
+moment — but it opens the litter record's count-verify step. One implementation, two doors.</div>
+
+<h2>3 · Entry points — the whole map</h2>
+
+<div class="law"><b>The subject decides the surface.</b>
+One pig → her sheet. Several pigs → the list's selection bar. No pig yet → the toolbox. A farmer
+never has to remember <i>which</i> menu holds an action; he only has to know how many pigs he is
+talking about.</div>
+
+<table>
+<thead><tr><th style="width:20%">Surface</th><th style="width:22%">Reached from</th><th style="width:12%">Subject</th><th>Offers</th></tr></thead>
+<tbody>
+<tr><td><b>Pig sheet ⋯</b><br><span class="anno">canonical</span></td><td>Tap any row — in a task list or in check-in</td><td>One pig</td><td>The full action set, in fixed order, unavailable rows disabled with a reason</td></tr>
+<tr><td><b>Record page ⋯</b></td><td>Inside a farrowing / litter record</td><td>One pig or litter</td><td>The same menu — not a variant</td></tr>
+<tr><td><b>Selection bar</b></td><td>Tick pigs in the check-in list</td><td>N pigs</td><td>Only the bulk-capable actions (§4); the rest are absent, not disabled — they were never offered for a group</td></tr>
+<tr><td><b>Toolbox</b></td><td>Home, with no pig and no task in mind</td><td>None yet</td><td>Opens the check-in list scoped to a house; everything after that is the two rows above</td></tr>
+<tr><td><b>Scan</b></td><td>Dock, or any picker inside a flow</td><td>Resolves one pig</td><td>Not a menu — an identity resolver whose effect depends on the surface (§5)</td></tr>
+</tbody>
+</table>
+
+<p><b>Deleted:</b> the task list's own ⋯ (its target was ambiguous — this list? this pen? which
+pig?), the 查情-only 4-row variant, and the check-in list's private batch vocabulary.</p>
+
+<pre class="flow">                        ┌─────────────── TOOLBOX ────────────────┐
+                        │  no pig in hand → check-in list, house  │
+                        └────────────────────┬───────────────────┘
+                                             ▼
+   TASK LIST ──────────────────────────  CHECK-IN LIST  ──── tick ──►  SELECTION BAR
+   (heat, breeding, …)                   (no task, health)             bulk actions only
+        │                                      │
+        │ tap a row                            │ tap a row
+        ▼                                      ▼
+   ╔══════════════════════ PIG SHEET ══════════════════════╗
+   ║  task content (outcome / record / form)               ║
+   ║  [⋯ More] ──► the one action set, gated on the pig    ║
+   ╚═══════════════════════════════════════════════════════╝
+        │
+        │ record pages (farrowing, litter) carry the same ⋯
+        ▼
+   same menu, same order, same gates</pre>
+
+<h2>4 · Individual vs bulk</h2>
+<p>Three patterns, decided by what the payload is — not by which screen you happen to be on.</p>
+
+<table>
+<thead><tr><th style="width:16%">Action</th><th style="width:10%">Bulk?</th><th style="width:20%">Pattern</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td><b>Treatment</b></td><td class="ok">Yes</td><td>Shared payload</td><td>One drug, dose and method applied to N pigs — the form is filled once. A whole pen treated for the same thing is the normal case, and production already built 批量治疗.</td></tr>
+<tr><td><b>Transfer</b></td><td class="ok">Yes</td><td>Shared payload</td><td>One destination for N pigs. Moving a group is the normal case (production: 批量转舍).</td></tr>
+<tr><td><b>Health record</b></td><td class="ok">Yes</td><td>Hand-off</td><td>Production's 批量编辑病例. The health module owns what happens next.</td></tr>
+<tr><td><b>Report death</b></td><td class="ok">Yes</td><td>Per-subject payload</td><td>N pigs selected together, but each carries its own cause and photos — the flow ends in a per-pig list. Bulk selection, individual detail.</td></tr>
+<tr><td><b>Report abortion</b></td><td class="never">No</td><td>—</td><td>Each abortion has its own cause, and each removes that sow from her batch. A bulk version would apply one reason to several animals and quietly restructure a batch.</td></tr>
+<tr><td><b>Foster piglets</b></td><td class="never">No</td><td>—</td><td>The subject is a <i>pair</i> of sows; the multiplicity lives in the piglets moved, not in the pigs acted on. Selecting several sows has no meaning.</td></tr>
+<tr><td><b>Count check</b></td><td class="never">No</td><td>—</td><td>Corrects one litter's record.</td></tr>
+</tbody>
+</table>
+
+<div class="law"><b>Bulk is offered by absence, not by disabling.</b>
+On the selection bar the individual-only actions simply do not appear. Disabled rows are for
+things that could apply to <i>this pig</i> but do not yet (§5); an action that is never a group
+action is not a gap in the menu, it is not part of that menu at all.</div>
+
+<div class="note"><b>Bulk never crosses the batch.</b> A selection may span pens and rooms — a
+farmer treating a row of sick pigs does not care about pen walls. But Report death and Transfer
+both change where an animal belongs, so the confirmation step always restates the selection
+grouped by pen, and any pig whose state would block the action is listed separately rather than
+silently skipped.</div>
+
+<h2>5 · Scanning</h2>
+<p>Scan is the identity resolver, not an action. It answers "which pig", and what happens next
+belongs to the surface you are on.</p>
+
+<table>
+<thead><tr><th style="width:24%">Surface</th><th style="width:30%">Scan does</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Task list (dock)</td><td>Jumps to her row, pen header pinned, and ticks her — or opens her sheet in tasks that have no checkbox</td><td>Already designed (task-screens 04b). Unchanged here.</td></tr>
+<tr><td>Check-in list</td><td>Adds her to the selection</td><td>Scope is <b>not</b> changed — production states this for death: scanning does not switch the selected house.</td></tr>
+<tr><td>Picker inside a flow<br><span class="anno">death · foster</span></td><td>Adds her to the selection</td><td>Same rule; the flow's own scope stands.</td></tr>
+<tr><td>Identity field in a form</td><td>Fills the tag</td><td>Foster's identity supplement, piglet tag/weigh.</td></tr>
+<tr><td>Fallback: ear notch</td><td>Manual picker — two tappable ear diagrams (2952:34476)</td><td>For pigs with no electronic tag; error state when the notch is unknown.</td></tr>
+</tbody>
+</table>
+
+<div class="law"><b>Three scanning rules.</b>
+<span style="display:block;margin-top:6px">1 · <b>Scan never changes scope.</b> Not the house, not the lens, not the filter. It resolves a pig inside what you are already looking at, and says so if she is outside it.</span>
+<span style="display:block">2 · <b>Scan is additive.</b> It adds to a selection; it never replaces one. Scanning ten pigs in a row is the fast path for bulk treatment.</span>
+<span style="display:block">3 · <b>Every scan reports what it resolved</b> — a toast naming the tag (production: <span class="mono">000001 猪只已添加</span>). A scan that changes nothing visible is a scan the farmer cannot trust.</span></div>
+
+<p>Because scanning is additive and scope-preserving, it is also the answer to bulk selection with
+gloves: rather than hunting checkboxes, a farmer scans each pig he treats and then opens the
+action once. Scan and the selection bar are the same mechanism seen from two ends.</p>
+
+<h2>6 · Availability — derived from the pig, not the task</h2>
+<p>The set is identical everywhere; only these gates differ, and they read the animal's own state.
+Production gates by task stage instead, which is a proxy — and the reason 流产 leaks into piglet
+processing.</p>
+<table>
+<thead><tr><th style="width:18%">Action</th><th style="width:36%">Available when</th><th>Disabled reason</th></tr></thead>
+<tbody>
+<tr><td>Treatment</td><td class="ok">always</td><td>—</td></tr>
+<tr><td>Health record</td><td class="ok">always</td><td>—</td></tr>
+<tr><td>Report abortion</td><td>bred or pregnant, not yet farrowed</td><td class="no">"not bred" · "already farrowed"</td></tr>
+<tr><td>Foster piglets</td><td>has a live litter (farrowed, pre-wean)</td><td class="no">"no litter"</td></tr>
+<tr><td>Count check</td><td>litter with a recorded count <i>(deferred)</i></td><td class="no">"no litter"</td></tr>
+<tr><td>Transfer</td><td>located — unlocated pigs offer <b>Locate</b> in its place</td><td class="no">—</td></tr>
+<tr><td>Report death</td><td class="ok">always</td><td>—</td></tr>
+</tbody>
+</table>
+<p>Checked against production's stage rule (1649:20977): the two agree everywhere the stage rule
+was right, and the state rule is also right where it was wrong. 查情 shows a short menu because a
+sow being heat-checked has no litter and is not bred — which the gate derives on its own, with no
+per-task configuration to maintain.</p>
+
+<h2>7 · Check-in — the ad-hoc list</h2>
+<p>Production's <span class="mono">猪只列表</span> is already the right shape: house-scoped,
+searchable by tag <i>or</i> notch, pen groups with group checkboxes, health line per row, scan.
+Three changes make it part of the system:</p>
+<table>
+<thead><tr><th style="width:32%">Change</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>It is the task list component, minus the task</td><td>No lens (no task state to partition), no task overview cell. Same pen grouping, dock, pen picker, peek.</td></tr>
+<tr><td>Health is the row's subject, not a decoration</td><td>Task rows state the task's answer and nothing else — so health leaves them. Here health <i>is</i> the reason the screen exists, so it is line 1.</td></tr>
+<tr><td>Selection bar = the bulk-capable actions</td><td>Treatment · Transfer · Report death, plus the health hand-off. Same forms as the sheet, N subjects.</td></tr>
+</tbody>
+</table>
+<p>This is the surface for the case that started this: a worker walking with no task in hand, who
+sees a symptom or an abortion and records it. Tapping a row gives him the same sheet and the same
+⋯ he would get inside any production task — which is the entire point.</p>
+
+<h2>8 · What this adds to our system</h2>
+<table>
+<thead><tr><th style="width:24%">Delta</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td>The ⋯ menu</td><td>New component — our system has no overflow affordance today. Sheet, grouped by subject, fixed order, disabled-with-reason.</td></tr>
+<tr><td>Selection bar, second mode</td><td>In check-in the bar carries toolbox actions instead of task marks. The bar itself already exists.</td></tr>
+<tr><td>Check-in list variant</td><td>Task list minus lens, health as line 1.</td></tr>
+<tr><td>Ear notch as identity</td><td>Search accepts tag <i>or</i> notch; notch picker as scan fallback. Three task docs flagged this gap independently.</td></tr>
+<tr><td>Scan, extended</td><td>Same component, now also the picker inside death and foster flows, with the three rules above.</td></tr>
+<tr><td>Seven action destinations</td><td>Forms and flows are later work; only their entry, subject and gate are settled here.</td></tr>
+</tbody>
+</table>
+
+<h2>9 · Open questions</h2>
+<p><b>1 · Treatment vs Health record.</b> Production has both, with no stated boundary. Proposal:
+Treatment records an intervention; Health record opens the case and the health module owns
+diagnosis. Confirm.</p>
+<p><b>2 · Death cause optional.</b> Production allows submitting with no cause behind a warning
+dialog. Mortality is a KPI on the task detail sheet — confirm whether an unknown cause is
+acceptable indefinitely, or must be resolved later from the console.</p>
+<p><b>3 · Transfer's missing design.</b> The action exists in the 查情 menu and the pig-list batch
+bar but has no screens in the 更多操作 section; the 3-screen sub-flow in 查情 is the only
+reference. Confirm it is the intended design before we build on it.</p>
+<p><b>4 · Toolbox contents beyond pigs.</b> Production's 工具箱 carries a red to-do for a
+death-record event list. If the toolbox is also where <i>records</i> are browsed (not just
+started), that is a second job for the same surface and worth naming now.</p>
+
+</div>
+</body>
+</html>

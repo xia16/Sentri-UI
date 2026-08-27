@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentri — Unified Task Screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* synthesized VI — Panel structure · Ledger temperature · Board discipline */
+    --ground:#F7F6F2;          /* one-step-warm neutral, never clinical */
+    --card:#FFFFFF;
+    --well:#EFEEE8;            /* recessed surfaces */
+    --ink:#1C1E19;
+    --ink2:#51544B;
+    --ink3:#8B8E83;
+    --hair:#E7E6DF;
+    --hair2:#D8D7CE;
+    /* status — the only color allowed on a screen */
+    --red:#C2402E;      --red-wash:#F9EAE7;
+    --amber:#96660D;    --amber-fill:#D99A21; --amber-wash:#F8F0DC;
+    --blue:#3E56C4;     --blue-wash:#EBEFF9;
+    --green:#3B8A50;    --green-wash:#EAF2EC;
+    --gray:#7C7F76;     --gray-wash:#F0F0EB;
+    --sans:'Plus Jakarta Sans',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 48px}
+  .mono{font-family:var(--mono)}
+  .anno{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3)}
+
+  header.page{display:flex;justify-content:space-between;padding:26px 0;border-bottom:1px solid var(--hair2)}
+  h1{font-size:44px;font-weight:800;letter-spacing:-.015em;line-height:1.1;margin:64px 0 20px}
+  .lede{font-size:17px;color:var(--ink2);max-width:64ch;margin-bottom:40px}
+  .tokens{display:flex;gap:24px;align-items:center;padding:18px 0 56px;flex-wrap:wrap}
+  .sw{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--ink2)}
+  .sw i{width:22px;height:22px;border-radius:5px;display:inline-block;border:1px solid rgba(0,0,0,.06)}
+
+  section.screen{display:grid;grid-template-columns:430px 1fr;gap:64px;padding:64px 0;border-top:1px solid var(--ink)}
+  .sec-label{grid-column:1/-1;display:flex;justify-content:space-between;margin-bottom:8px}
+  h2{font-size:24px;font-weight:800}
+  .notes{padding-top:8px}
+  .note{padding:14px 0;border-top:1px solid var(--hair)}
+  .note:first-child{border-top:none}
+  .note b{display:block;font-size:15px;margin-bottom:3px}
+  .note p{font-size:13.5px;color:var(--ink2);max-width:52ch}
+  .note .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--ink3);text-transform:uppercase}
+
+  /* ============ phone ============ */
+  .phone{width:390px;background:var(--ground);border:1px solid var(--hair2);border-radius:34px;overflow:hidden;box-shadow:0 8px 32px rgba(28,30,25,.10);position:relative}
+  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:12px 22px 6px;font-family:var(--mono);font-size:12px;font-weight:600}
+  .appbar{display:flex;align-items:center;gap:12px;padding:10px 16px 12px}
+  .appbar .back{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--ink)}
+  .appbar .ttl{font-size:17px;font-weight:700}
+  .appbar .sub{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .appbar>div:nth-child(2){min-width:0;flex:1}
+  .appbar .det{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--ink2);border:1px solid var(--hair2);border-radius:9px;padding:8px 12px}
+
+  /* legacy card styles (unused by base screens) */
+  .round{margin:2px 16px 12px;background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:14px 16px}
+  .round .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .round .big{font-family:var(--mono);font-weight:700;font-size:26px;letter-spacing:-.01em}
+  .round .big small{font-size:13px;font-weight:500;color:var(--ink3);letter-spacing:0}
+  .gauge{display:flex;gap:2.5px;margin:10px 0 8px}
+  .gauge i{height:7px;flex:1;border-radius:2px;background:var(--well)}
+  .gauge i.f-green{background:var(--green)}
+  .gauge i.f-blue{background:var(--blue)}
+  .round .att{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+
+  /* state lens */
+  .lens{display:flex;background:var(--well);border-radius:11px;padding:3px;margin:8px 16px 10px}
+  .lens button{flex:1;border:0;background:transparent;font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink2);padding:9px 4px;border-radius:9px;display:flex;gap:5px;justify-content:center;align-items:center}
+  .lens button .n{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink3)}
+  .lens button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(28,30,25,.08)}
+  .lens button.on .n{color:var(--ink2)}
+
+  /* pen strip */
+  .penstrip{display:flex;gap:6px;padding:2px 16px 12px;align-items:center;overflow:hidden}
+  .pchip{flex:0 0 auto;height:40px;min-width:56px;padding:0 10px;border-radius:9px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;gap:5px;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink2)}
+  .pchip .c{color:var(--ink);font-weight:700}
+  .pchip.cur{background:var(--ink);border-color:var(--ink);color:#fff}
+  .pchip.cur .c{color:#fff}
+  .pchip.clear{color:var(--ink3)}
+  .pchip .dot{width:6px;height:6px;border-radius:2px;background:var(--amber-fill)}
+  .pchip .ok{color:var(--green);font-size:11px}
+  .pgrid{flex:0 0 auto;width:40px;height:40px;border-radius:9px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:15px}
+
+  /* list */
+  .list{background:var(--card);border-top:1px solid var(--hair)}
+  .pen{display:flex;align-items:center;gap:8px;padding:10px 16px 8px;background:var(--well)}
+  .pen .code{font-family:var(--mono);font-size:12.5px;font-weight:700}
+  .pen .agg{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+  .pen .agg.ok{color:var(--green)}
+  .pen input{width:18px;height:18px;accent-color:var(--ink)}
+  .row{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 16px;border-top:1px solid var(--hair)}
+  .row:first-of-type{border-top:none}
+  .row .cb{width:22px;height:22px;border:1.5px solid var(--hair2);border-radius:6px;flex:0 0 auto}
+  .row .cb.on{background:var(--ink);border-color:var(--ink);position:relative}
+  .row .cb.on::after{content:"✓";color:#fff;font-size:13px;position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .row .tag{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.02em;flex:0 0 62px}
+  .row .st{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+  .row .st .l1{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:6px}
+  .row .st .l2{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em}
+  .row .rail{margin-left:auto;text-align:right;flex:0 0 auto;display:flex;align-items:center;gap:10px}
+  .row .word{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+  .row .chev{color:var(--hair2);font-size:16px}
+  .row.dim .l1,.row.dim .tag{color:var(--ink3);font-weight:500}
+  .row.done{background:var(--card)}
+  .s-red{color:var(--red)} .s-amber{color:var(--amber)} .s-blue{color:var(--blue)} .s-green{color:var(--green)} .s-gray{color:var(--gray)}
+  .b{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.06em;padding:2.5px 7px;border-radius:5px;text-transform:uppercase}
+  .b-amber{background:var(--amber-wash);color:var(--amber)}
+  .b-red{background:var(--red-wash);color:var(--red)}
+  .b-gray{background:var(--gray-wash);color:var(--gray)}
+  .edit{width:34px;height:34px;border:1px solid var(--hair);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:13px}
+
+  /* bottom bars */
+  .bar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--hair);padding:12px 16px 22px;display:flex;gap:10px;align-items:center}
+  .cta{flex:1;height:54px;border-radius:12px;background:var(--ink);color:#fff;font-family:var(--sans);font-size:15.5px;font-weight:700;border:0;display:flex;align-items:center;justify-content:center}
+  .cta.sec{background:var(--card);color:var(--ink);border:1.5px solid var(--ink);flex:0 0 auto;padding:0 20px}
+  .selinfo{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700}
+  .selinfo .x{width:30px;height:30px;border-radius:8px;border:1px solid var(--hair2);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:13px}
+  .barnote{position:absolute;left:0;right:0;bottom:100%;padding:8px 16px;background:transparent}
+
+  .divider-note{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);padding:8px 16px;background:var(--ground)}
+
+  /* screen variations (branch sections — base screens above stay untouched) */
+  .vlabel{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin:26px 0 10px}
+  .row.stripd{border-left:4px solid transparent;padding-left:12px}
+  .row.stripd.st-amber{border-left-color:var(--amber-fill)}
+  .row.stripd.st-green{border-left-color:var(--green)}
+  .row.stripd.st-gray{border-left-color:var(--hair2)}
+  .hd2{background:var(--ground);border-bottom:1px solid var(--hair)}
+  .readout{display:flex;align-items:flex-end;gap:20px;padding:6px 18px 18px}
+  .readout .m .n{font-family:var(--mono);font-weight:700;font-size:34px;line-height:.95;letter-spacing:-.02em;color:var(--ink)}
+  .readout .m .l{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--ink3);margin-top:7px;text-transform:uppercase}
+  .readout .vr{width:1px;align-self:stretch;background:var(--hair2)}
+  .readout .ctx{margin-left:auto;text-align:right}
+  .readout .ctx .a{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;line-height:1.7}
+  .readout .endr{display:inline-block;margin-top:7px;font-size:12px;font-weight:700;color:var(--ink2);border:1px solid var(--hair2);border-radius:8px;padding:5px 10px;white-space:nowrap}
+  /* bottom bar · NAV state (dock) */
+  .dock{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--hair);padding:10px 16px 18px}
+  .row.scanned{background:var(--green-wash)}
+  .row .scanb{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--green);text-transform:uppercase}
+  .dock .penstrip{padding:0 0 8px}
+  .dockrow{display:flex;align-items:center;gap:8px}
+  .dockrow .penstrip{flex:1;min-width:0;padding:0;overflow:hidden;mask-image:linear-gradient(90deg,#000 88%,transparent)}
+  .tools{flex:0 0 auto;display:flex;gap:6px;padding-left:8px;border-left:1px solid var(--hair)}
+  .tool{width:48px;height:48px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--ink)}
+  .tool.scan{background:var(--ink);border-color:var(--ink);color:#fff}
+  .pchip{height:48px}
+  .dh{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  /* unit block */
+  .unit{padding:12px 16px 4px;border-top:1px solid var(--hair);margin-top:2px}
+  .unit .un{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.1}
+  .unit .ul{font-size:12px;color:var(--ink3);margin-top:3px}
+  .unit .ul b{color:var(--ink2);font-weight:600}
+  /* task-level context strip — display only */
+  .taskctx{display:flex;align-items:center;gap:12px;margin:0 16px 12px;padding:9px 12px;background:var(--well);border-radius:10px}
+  .taskctx .tl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);flex:0 0 auto}
+  .taskctx .tc{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);white-space:nowrap}
+  .taskctx .tc b{color:var(--ink);font-weight:700}
+  .taskctx .tcv{color:var(--ink3);font-size:15px;line-height:1;margin-left:2px}
+
+  /* header variations 01-H */
+  .hA .capsule{margin:0 16px 8px;height:30px;border-radius:15px;background:var(--well);display:flex;align-items:center;gap:10px;padding:0 12px 0 14px}
+  .hA .capsule .gauge{margin:0;flex:1}
+  .hA .capsule .gauge i{height:5px}
+  .hA .capsule .t{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink2);white-space:nowrap}
+  .hA .capsule .t b{color:var(--ink)}
+  .hA .big{padding:2px 16px 0}
+  .hA .big .u{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  .hA .big .tsk{font-size:13px;color:var(--ink2);margin-top:4px}
+  .hA .big .tsk b{color:var(--ink);font-weight:700}
+  .hB .unitsel{margin:4px 16px 8px;height:52px;border:1px solid var(--hair2);border-radius:12px;background:var(--card);display:flex;align-items:center;padding:0 12px 0 14px;gap:10px}
+  .hB .unitsel .u{font-size:17px;font-weight:800;letter-spacing:-.01em}
+  .hB .unitsel .m{font-size:12px;color:var(--ink3);margin-left:2px}
+  .hB .unitsel .dd{margin-left:auto;font-size:14px;color:var(--ink2)}
+  .hB .tline{display:flex;align-items:center;gap:10px;margin:0 16px 8px;padding:0 2px}
+  .hB .tline .gauge{margin:0;flex:1}
+  .hB .tline .gauge i{height:5px}
+  .hB .tline .t{font-family:var(--mono);font-size:10.5px;color:var(--ink2);white-space:nowrap}
+  .hB .tline .t b{color:var(--ink)}
+  .hC .ttl2{padding:0 16px}
+  .hC .ttl2 .u{font-size:22px;font-weight:800;letter-spacing:-.015em}
+  .hC .ttl2 .u span{color:var(--ink3);font-weight:600}
+  .hC .ctxbar{margin:12px 16px 8px;border:1px solid var(--hair);border-radius:12px;background:var(--card);display:grid;grid-template-columns:1fr 1fr}
+  .hC .ctxbar>div{padding:11px 14px 12px;display:grid;grid-template-rows:auto auto auto;row-gap:6px;align-content:start}
+  .hC .ctxbar>div+div{border-left:1px solid var(--hair)}
+  .hC .ctxbar .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .hC .ctxbar .num{display:flex;align-items:baseline;gap:4px;line-height:1}
+  .hC .ctxbar .num b{font-family:var(--mono);font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+  .hC .ctxbar .num span{font-family:var(--mono);font-size:12px;color:var(--ink2)}
+  .hC .ctxbar .sub{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink3);align-self:end}
+  .hC .ctxbar .gauge{margin:0;align-self:center}
+  .hC .ctxbar .gauge i{height:5px}
+  /* pen selector (dock idle state) */
+  .pensel{flex:1;min-width:0;display:flex;align-items:center;gap:6px}
+  .pensel .arr{width:48px;height:48px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--ink);flex:0 0 auto}
+  .pensel .cur{flex:1;min-width:0;height:48px;border-radius:11px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 10px}
+  .pensel .cur .pc{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:.04em;white-space:nowrap;flex:0 0 auto}
+  .pensel .cur .pl{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  /* pen picker sheet */
+  .pk{background:var(--card);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid var(--hair);padding:0 16px 20px}
+  .pk .seg{display:flex;background:var(--well);border-radius:12px;padding:3px;margin:8px 0 14px}
+  .pk .seg span{flex:1;height:48px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--ink2);border-radius:10px}
+  .pk .seg span.on{background:var(--ink);color:#fff}
+  .pk .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .pk .cell{height:58px;border-radius:12px;border:1px solid var(--hair2);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .pk .cell .pc{font-family:var(--mono);font-size:14px;font-weight:700}
+  .pk .cell .n{font-family:var(--mono);font-size:10.5px;color:var(--ink2)}
+  .pk .cell.clear{color:var(--ink3)} .pk .cell.clear .n{color:var(--green)}
+  .pk .cell.cur{background:var(--ink);border-color:var(--ink);color:#fff} .pk .cell.cur .n{color:rgba(255,255,255,.7)}
+  /* task detail sheet */
+  .sheet{background:var(--card);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid var(--hair);flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .grab{width:36px;height:4px;border-radius:2px;background:var(--hair2);margin:10px auto 6px}
+  .sh{display:flex;align-items:baseline;justify-content:space-between;padding:6px 20px 14px}
+  .sh .t{font-size:17px;font-weight:700}
+  .sh .x{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+  .sec{padding:12px 20px 14px;border-top:1px solid var(--hair)}
+  .sec .k{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:block}
+  .kv{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;font-size:13.5px}
+  .kv .v{font-family:var(--mono);font-size:12.5px;color:var(--ink);font-weight:600}
+  .kv .lbl{color:var(--ink2)}
+  .kpi{display:flex;align-items:baseline;gap:8px}
+  .kpi .n{font-family:var(--mono);font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1}
+  .kpi .u{font-size:13px;color:var(--ink2)}
+  .kpi .tgt{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink3);text-transform:uppercase}
+  .legend{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px}
+  .legend .sq{width:8px;height:8px;border-radius:2px;flex:0 0 auto}
+  .legend .w{font-weight:600;flex:0 0 130px}
+  .legend .d{color:var(--ink2);font-size:12.5px}
+  .rowlink{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--hair);font-size:14px;font-weight:600}
+  .rowlink .chev{color:var(--hair2)}
+  .endtask{margin:auto 16px 20px;height:52px;border-radius:12px;border:1.5px solid var(--red);color:var(--red);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;background:var(--card)}
+  /* variation table */
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--hair);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+  td:first-child{font-weight:700;width:22%}
+  footer{padding:36px 0 72px;color:var(--ink3);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="page">
+  <span class="anno">Sentri · Unified task screens · working render</span>
+  <span class="anno">Synthesis: Panel structure · Ledger temperature · Board discipline</span>
+</header>
+
+<h1>One list, three tasks.</h1>
+<p class="lede">The unified task list rendered through the synthesized VI, across the three most
+different tasks it must serve: a sweep with bulk marking (heat check), a per-sow sequence with
+payload actions (breeding), and long-running records with live alerts (farrowing). Statuses are
+the production set only, refined in copy. Color appears exactly where a status is stated —
+nowhere else. All numerals are mono. Nothing is saved, submitted or completed on a room screen — actions commit themselves.</p>
+
+<div class="tokens">
+  <span class="sw"><i style="background:#F7F6F2"></i>ground F7F6F2</span>
+  <span class="sw"><i style="background:#1C1E19"></i>ink 1C1E19</span>
+  <span class="sw"><i style="background:#C2402E"></i>overdue</span>
+  <span class="sw"><i style="background:#D99A21"></i>due·signs</span>
+  <span class="sw"><i style="background:#3E56C4"></i>in&nbsp;progress</span>
+  <span class="sw"><i style="background:#3B8A50"></i>done·positive</span>
+  <span class="sw"><i style="background:#7C7F76"></i>upcoming</span>
+  <span class="sw" style="margin-left:12px">Plus Jakarta Sans · IBM Plex Mono</span>
+</div>
+
+<!-- ================= SCREEN 01 · HEAT CHECK ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>01 · Heat check — the sweep</h2>
+    <span class="anno">Standing task · individual judgment · bulk mark</span>
+  </div>
+
+  <div class="phone" style="display:flex;flex-direction:column;height:820px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar">
+      <div class="back">←</div>
+      <div><div class="ttl">Heat check</div></div>
+    </div>
+
+    <!-- task-level context strip: display only, one line -->
+    <div class="taskctx">
+      <span class="tl">Task</span>
+      <div class="gauge" style="margin:0;flex:1"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <span class="tc"><b>62</b> / 100 in heat · 3 rooms</span><span class="tcv">›</span>
+    </div>
+    <div class="unit">
+      <div class="un">Unit 4</div>
+      <div class="ul">Last checked <b>07:31</b> · G. Hansen</div>
+    </div>
+
+    <div class="lens">
+      <button class="on">Not in heat <span class="n">38</span></button>
+      <button>In heat <span class="n">8</span></button>
+      <button>All <span class="n">46</span></button>
+    </div>
+
+    <div class="list" style="flex:1">
+      <div class="pen"><span class="code">PEN A2</span><span class="agg">4 of 6 left</span></div>
+      <div class="row">
+        <div class="cb"></div>
+        <span class="tag">000254</span>
+        <div class="st"><span class="l1">Heat signs <span class="b b-amber">10h ago</span></span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+      <div class="row">
+        <div class="cb"></div>
+        <span class="tag">000268</span>
+        <div class="st"><span class="l1">In expected window</span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+      <div class="row dim">
+        <div class="cb"></div>
+        <span class="tag">000231</span>
+        <div class="st"><span class="l1">Expected in 5d</span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+      <div class="row dim">
+        <div class="cb"></div>
+        <span class="tag">000275</span>
+        <div class="st"><span class="l1">No data <span class="b b-gray">?</span></span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+      <div class="pen"><span class="code">PEN A3</span><span class="agg">2 of 5 left</span></div>
+      <div class="row">
+        <div class="cb"></div>
+        <span class="tag">000302</span>
+        <div class="st"><span class="l1">In expected window</span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+    </div>
+
+    <!-- bottom bar · NAV state -->
+    <div class="dock">
+      <div class="dockrow">
+        <div class="pensel"><div class="arr">‹</div><div class="cur"><span class="pc">A2</span><span class="pl">4 left</span></div><div class="arr">›</div></div>
+        <div class="tools"><div class="tool">⌕</div><div class="tool scan">▣</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">Task context</span><b>One line, display only, above the room</b>
+      <p>The strip under the app bar is the whole task, not this room: 62 / 100 in heat across
+      3 rooms, gauge toward the batch target. It exists so a worker in Unit B sees Unit A push
+      the task over the line — awareness without notification. Tapping it opens the task detail
+      sheet (05); the strip is the only door to it, so no Details button. It never carries
+      frequency or KPIs — those don't change what a hand does at this pen.</p></div>
+    <div class="note"><span class="k">Room status</span><b>The lens is the room's progress</b>
+      <p>Scope stacks top-down: the title and strip are the task; a hairline; then the unit —
+      its name set large like a room sign, "Last checked 07:31 · G. Hansen" as a plain sentence
+      (verb stated, never a bare timestamp), and the lens as the unit's status. Task → unit →
+      pens → pigs, never interleaved. No section names anywhere in the header — "Breeding" is a
+      task, not an address.</p></div>
+    <div class="note"><span class="k">Bottom bar</span><b>Two states, one bar: navigate or act</b>
+      <p>Idle, the bar is navigation: ‹ › walk pen to pen, the wide current-pen button says
+      where you are and opens the pen picker (04b) for a leap, then search and scan. Select
+      anything and the same bar becomes the mark-as actions; clear the selection and
+      navigation returns at the same pen.</p></div>
+    <div class="note"><span class="k">Inside a pen</span><b>Sticky header, collapse the rest</b>
+      <p>Pen headers stick while their rows scroll; arriving at a pen (arrow or picker) lands at
+      its top with other pens collapsed, so 16 rows are the only thing under the thumb. A
+      specific sow inside a pen is what search and scan are for — no third navigator; the row
+      rail (04) is the stall-room variant of this same dock, not an addition.</p></div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 01b · HEAT CHECK SELECTING ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>01b · Heat check — selection active</h2>
+    <span class="anno">Same screen · bar switches to actions</span>
+  </div>
+
+  <div class="phone" style="display:flex;flex-direction:column;height:820px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar">
+      <div class="back">←</div>
+      <div><div class="ttl">Heat check</div></div>
+    </div>
+    <div class="taskctx">
+      <span class="tl">Task</span>
+      <div class="gauge" style="margin:0;flex:1"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <span class="tc"><b>62</b> / 100 in heat · 3 rooms</span><span class="tcv">›</span>
+    </div>
+    <div class="unit">
+      <div class="un">Unit 4</div>
+      <div class="ul">Last checked <b>07:31</b> · G. Hansen</div>
+    </div>
+    <div class="lens">
+      <button class="on">Not in heat <span class="n">38</span></button>
+      <button>In heat <span class="n">8</span></button>
+      <button>All <span class="n">46</span></button>
+    </div>
+
+    <div class="list" style="flex:1">
+      <div class="pen"><span class="code">PEN A2</span><span class="agg">4 of 6 left</span></div>
+      <div class="row">
+        <div class="cb on"></div>
+        <span class="tag">000254</span>
+        <div class="st"><span class="l1">Heat signs <span class="b b-amber">10h ago</span></span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+      <div class="row">
+        <div class="cb on"></div>
+        <span class="tag">000268</span>
+        <div class="st"><span class="l1">In expected window</span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+      <div class="row dim">
+        <div class="cb"></div>
+        <span class="tag">000231</span>
+        <div class="st"><span class="l1">Expected in 5d</span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+      <div class="row dim">
+        <div class="cb"></div>
+        <span class="tag">000275</span>
+        <div class="st"><span class="l1">No data <span class="b b-gray">?</span></span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+    </div>
+
+    <!-- bottom bar · ACTION state -->
+    <div class="bar">
+      <div class="selinfo"><span class="x">✕</span> 2 selected</div>
+      <button class="cta sec">Signs</button>
+      <button class="cta" style="flex:1">Mark in heat</button>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">No mode</span><b>Selection is always available</b>
+      <p>Being in the task is the selection context: boxes are permanently visible, there is no
+      "Select" button and no long-press. Ticking the first box swaps the bar from navigation to
+      actions; ✕ (or unticking the last box) swaps it back.</p></div>
+    <div class="note"><span class="k">Actions</span><b>The bar speaks the task's statuses</b>
+      <p>Heat check has exactly two markable outcomes, so both fit as buttons — primary is the
+      one that advances the work. A task with more outcomes than fit would show a single
+      "Mark as…" opening one action sheet. Never a new status, never a custom control.</p></div>
+    <div class="note"><span class="k">After marking</span><b>Marked sows change lens, instantly</b>
+      <p>On confirm the sows move to "In heat" and every count updates — list, lens, pen chips,
+      task strip — from the same derived numbers. Undo is an edit from the "In heat" lens, any
+      time. Nothing is pending, nothing is saved later: the mark is the record.</p></div>
+    <div class="note"><span class="k">No save, no submit, no complete</span><b>Three buttons that do not exist here</b>
+      <p>Every action commits itself, so Save would imply the opposite. Submit was a round — a
+      concept the product does not have. Complete belongs to the task, one level up; rooms are
+      never completed. The bottom edge holds navigation or actions, nothing else.</p></div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 01c · HEAT CHECK · SCANNED ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>01c · Heat check — scanned into selection</h2>
+    <span class="anno">Scan is a selector · same action bar · no new screen</span>
+  </div>
+
+  <div class="phone" style="display:flex;flex-direction:column;height:820px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar">
+      <div class="back">←</div>
+      <div><div class="ttl">Heat check</div></div>
+    </div>
+    <div class="taskctx">
+      <span class="tl">Task</span>
+      <div class="gauge" style="margin:0;flex:1"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <span class="tc"><b>62</b> / 100 in heat · 3 rooms</span><span class="tcv">›</span>
+    </div>
+    <div class="unit">
+      <div class="un">Unit 4</div>
+      <div class="ul">Last checked <b>07:31</b> · G. Hansen</div>
+    </div>
+    <div class="lens">
+      <button class="on">Not in heat <span class="n">38</span></button>
+      <button>In heat <span class="n">8</span></button>
+      <button>All <span class="n">46</span></button>
+    </div>
+
+    <div class="list" style="flex:1">
+      <div class="pen"><span class="code">PEN A5</span><span class="agg">1 of 4 left</span></div>
+      <div class="row scanned">
+        <div class="cb on"></div>
+        <span class="tag">000319</span>
+        <div class="st"><span class="l1">In expected window <span class="scanb">· scanned</span></span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+      <div class="row dim">
+        <div class="cb"></div>
+        <span class="tag">000322</span>
+        <div class="st"><span class="l1">Expected in 2d</span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+      <div class="row dim">
+        <div class="cb"></div>
+        <span class="tag">000327</span>
+        <div class="st"><span class="l1">Expected in 6d</span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+      <div class="pen"><span class="code">PEN A6</span><span class="agg">3 of 5 left</span></div>
+      <div class="row">
+        <div class="cb"></div>
+        <span class="tag">000340</span>
+        <div class="st"><span class="l1">In expected window</span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+    </div>
+
+    <div class="bar">
+      <div class="selinfo"><span class="x">✕</span> 1 selected</div>
+      <button class="cta sec">Signs</button>
+      <button class="cta" style="flex:1">Mark in heat</button>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">Scan = select</span><b>Three ways to say which pig, one way to say what</b>
+      <p>Checkbox, scan and search all do the same thing: put a sow into the selection. Scanning
+      000319 scrolls her pen into view, ticks her box, tints the row for a moment with a small
+      "scanned" mark, and the dock swaps to the action bar — identical to a tapped box. Scan the
+      next sow and the count grows; tap an action and the marks commit, bar clears, dock returns.</p></div>
+    <div class="note"><span class="k">Why not a scan screen</span><b>The list stays the surface</b>
+      <p>A dedicated "scanned pig" page would be a fourth way to mark, with its own buttons and
+      states. Landing in the list instead means the farmer sees the sow in her pen context, her
+      neighbours, and the same two buttons they already know. Scan-scan-scan-Mark is a loop
+      that never leaves the screen.</p></div>
+    <div class="note"><span class="k">Dock rebuilt</span><b>48px everywhere; scan is the biggest thing</b>
+      <p>The footer text labels were 10px mono — unusable in gloves. Now the dock is one row:
+      pen chips scroll on the left, search and scan are 48px chips pinned right, scan filled ink
+      because it is the action farmers reach for most. Grid dropped — chips + scan + search
+      cover navigation; a pen-map returns only if a room's shape ever demands it.</p></div>
+    <div class="note"><span class="k">Tasks without checkboxes</span><b>Scan opens the record</b>
+      <p>Breeding and farrowing have no bulk marks, so there scan skips selection and opens the
+      sow's sheet directly — the only action that exists for her. Same tool, same place in the
+      dock, resolves to whatever the task's one action is.</p></div>
+  </div>
+</section>
+
+<!-- ================= 01-H · HEADER VARIATIONS (branch — base 01 untouched) ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>01-H · Header — three hierarchies</h2>
+    <span class="anno">Each commits to one answer to "what is this screen?"</span>
+  </div>
+
+  <div>
+    <div class="vlabel">A · The unit is the page — task as subtitle, progress as a capsule</div>
+    <div class="phone hA">
+      <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="capsule"><div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="t"><b>62</b>/100 in heat · task ›</span></div>
+      <div class="appbar" style="padding-bottom:4px">
+        <div class="back">←</div>
+        <div class="big"><div class="u">Unit 4</div><div class="tsk"><b>Heat check</b> · last checked 07:31 · G. Hansen</div></div>
+      </div>
+      <div class="lens">
+        <button class="on">Not in heat <span class="n">38</span></button>
+        <button>In heat <span class="n">8</span></button>
+        <button>All <span class="n">46</span></button>
+      </div>
+      <div class="list">
+        <div class="pen"><span class="code">PEN A2</span><span class="agg">4 of 6 left</span></div>
+        <div class="row"><div class="cb"></div><span class="tag">000254</span><div class="st"><span class="l1">Heat signs <span class="b b-amber">10h ago</span></span></div><div class="rail"><span class="chev">›</span></div></div>
+        <div class="row"><div class="cb"></div><span class="tag">000268</span><div class="st"><span class="l1">In expected window</span></div><div class="rail"><span class="chev">›</span></div></div>
+      </div>
+    </div>
+
+    <div class="vlabel">B · The task is the page — unit is a selector you can switch</div>
+    <div class="phone hB">
+      <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar">
+        <div class="back">←</div>
+        <div><div class="ttl">Heat check</div></div>
+      </div>
+      <div class="unitsel"><span class="u">Unit 4</span><span class="m">· last checked 07:31 · G.H</span><span class="dd">⌄</span></div>
+      <div class="tline"><div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="t"><b>62</b> / 100 in heat · whole task ›</span></div>
+      <div class="lens">
+        <button class="on">Not in heat <span class="n">38</span></button>
+        <button>In heat <span class="n">8</span></button>
+        <button>All <span class="n">46</span></button>
+      </div>
+      <div class="list">
+        <div class="pen"><span class="code">PEN A2</span><span class="agg">4 of 6 left</span></div>
+        <div class="row"><div class="cb"></div><span class="tag">000254</span><div class="st"><span class="l1">Heat signs <span class="b b-amber">10h ago</span></span></div><div class="rail"><span class="chev">›</span></div></div>
+        <div class="row"><div class="cb"></div><span class="tag">000268</span><div class="st"><span class="l1">In expected window</span></div><div class="rail"><span class="chev">›</span></div></div>
+      </div>
+    </div>
+
+    <div class="vlabel">C · Task title + last checked · then unit | task side by side</div>
+    <div class="phone hC">
+      <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="padding-bottom:0">
+        <div class="back">←</div>
+        <div class="ttl2"><div class="u">Heat check</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">07:31</b> · G. Hansen</div></div>
+      </div>
+      <div class="ctxbar">
+        <div><span class="k">Unit 4</span><div class="num"><b>70</b><span>% heat rate</span></div><span class="sub">target ≥ 90%</span></div>
+        <div><span class="k">Task overview ›</span><div class="num"><b>62</b><span>/ 100 in heat</span></div><div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+      </div>
+      <div class="lens">
+        <button class="on">Not in heat <span class="n">38</span></button>
+        <button>In heat <span class="n">8</span></button>
+        <button>All <span class="n">46</span></button>
+      </div>
+      <div class="list">
+        <div class="pen"><span class="code">PEN A2</span><span class="agg">4 of 6 left</span></div>
+        <div class="row"><div class="cb"></div><span class="tag">000254</span><div class="st"><span class="l1">Heat signs <span class="b b-amber">10h ago</span></span></div><div class="rail"><span class="chev">›</span></div></div>
+        <div class="row"><div class="cb"></div><span class="tag">000268</span><div class="st"><span class="l1">In expected window</span></div><div class="rail"><span class="chev">›</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">Why it failed</span><b>Three things, one weight</b>
+      <p>Title, strip and unit block were stacked at near-equal visual rank; the eye had no
+      first stop. Each version below picks a single answer to "what is this screen?" and demotes
+      everything else — hierarchy is the decision of what to make small.</p></div>
+    <div class="note"><span class="k">A · Unit-first</span><b>The room sign</b>
+      <p>Unit 4 is the page: 28px, top-left, unmistakable — this is where you stand. Task name
+      and last-checked demote to one subtitle sentence. Task progress lives in a slim capsule
+      above the title, peripheral, always there. Best when workers think "I'm in Unit 4 doing
+      heat check". Cost: task identity is small.</p></div>
+    <div class="note"><span class="k">B · Task-first, switchable unit</span><b>The tool with a room dial</b>
+      <p>Heat check is the page; Unit 4 is a real control (tap ⌄ to switch units without leaving
+      the task) carrying its own last-checked; task progress is one thin line above the lens.
+      Best when a worker sweeps several units in one task session. Cost: three rows above the
+      lens again — but each is a different kind of thing (title / control / meter).</p></div>
+    <div class="note"><span class="k">C · One bar</span><b>Task title, then unit | task</b>
+      <p>Title row is the task: Heat check, with "Last checked 07:31 · G. Hansen" under it.
+      The bar holds two scopes side by side — <b>Unit 4</b> left carrying the unit's
+      one headline KPI (70% heat rate, target ≥ 90% as a mono suffix; the in-heat count stays
+      in the lens so nothing repeats), <b>Task overview ›</b> right (62 / 100 in heat, task
+      gauge, chevron to the sheet). Unit first because it is where you stand; "overview" names
+      the right cell as a door.</p></div>
+    <div class="note"><span class="k">KPI rule</span><b>One per task, unit-scoped, target beside it</b>
+      <p>Each task has a single number a worker legitimately tracks — heat rate, pregnancy
+      rate, live per litter, on-time %, avg wean weight — and it lives here, in the unit cell.
+      Never a second KPI; the rest is the sheet. Ink by default; the number turns amber only
+      when off-target, so the status color law still holds.</p></div>
+    <div class="note"><span class="k">My read</span><b>C for density, A for clarity</b>
+      <p>C is the cleanest structure — every scope has a place and nothing repeats. A is the
+      most legible at arm's length. B earns its keep only if switching units in-place is a real
+      behaviour. If you want one: C, with A's larger unit type.</p></div>
+  </div>
+</section>
+
+<!-- ================= 01-V · HEAT CHECK VARIATIONS (branch — base 01/01b untouched) ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>01-V · Heat check — variations</h2>
+    <span class="anno">Branches to compare · consolidate later · base stays</span>
+  </div>
+
+  <div>
+    <div class="vlabel">V1 · Status edge strip — weight without noise</div>
+    <div class="phone">
+      <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar">
+        <div class="back">←</div>
+        <div><div class="ttl">Heat check</div></div>
+        </div>
+      <div class="lens">
+        <button class="on">Not in heat <span class="n">38</span></button>
+        <button>In heat <span class="n">8</span></button>
+        <button>All <span class="n">46</span></button>
+      </div>
+      <div class="list">
+        <div class="pen"><span class="code">PEN A2</span><span class="agg">4 of 6 left</span></div>
+        <div class="row stripd st-amber">
+          <div class="cb"></div>
+          <span class="tag">000254</span>
+          <div class="st"><span class="l1" style="color:var(--amber)">Heat signs <span class="b b-amber">10h ago</span></span></div>
+          <div class="rail"><span class="chev">›</span></div>
+        </div>
+        <div class="row stripd st-green">
+          <div class="cb"></div>
+          <span class="tag">000268</span>
+          <div class="st"><span class="l1">In expected window</span></div>
+          <div class="rail"><span class="chev">›</span></div>
+        </div>
+        <div class="row stripd dim">
+          <div class="cb"></div>
+          <span class="tag">000231</span>
+          <div class="st"><span class="l1">Expected in 5d</span></div>
+          <div class="rail"><span class="chev">›</span></div>
+        </div>
+        <div class="row stripd st-gray dim">
+          <div class="cb"></div>
+          <span class="tag">000275</span>
+          <div class="st"><span class="l1">No data <span class="b b-gray">?</span></span></div>
+          <div class="rail"><span class="chev">›</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vlabel">V2 · Task context as a full-bleed header, not a strip</div>
+    <div class="phone">
+      <div class="hd2">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar">
+          <div class="back">←</div>
+          <div><div class="ttl">Heat check</div></div>
+            </div>
+        <div class="readout">
+          <div class="m"><div class="n"><span style="color:var(--green)">62</span><span style="color:var(--ink3);font-size:20px;font-weight:500"> / 100</span></div><div class="l">In heat · whole task</div></div>
+          <div class="ctx"><div class="a">3 rooms · target met<br>at 100</div></div>
+        </div>
+        <div class="gauge" style="margin:0 18px 14px"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="lens" style="margin-top:12px">
+        <button class="on">Not in heat <span class="n">38</span></button>
+        <button>In heat <span class="n">8</span></button>
+        <button>All <span class="n">46</span></button>
+      </div>
+      <div class="list">
+        <div class="pen"><span class="code">PEN A2</span><span class="agg">4 of 6 left</span></div>
+        <div class="row">
+          <div class="cb"></div>
+          <span class="tag">000254</span>
+          <div class="st"><span class="l1">Heat signs <span class="b b-amber">10h ago</span></span></div>
+          <div class="rail"><span class="chev">›</span></div>
+        </div>
+        <div class="row">
+          <div class="cb"></div>
+          <span class="tag">000268</span>
+          <div class="st"><span class="l1">In expected window</span></div>
+          <div class="rail"><span class="chev">›</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">Why V1</span><b>Signs deserves more than a badge</b>
+      <p>Heat signs is the pre-state of the event this whole task exists to catch — the amber
+      time badge alone gives it the same visual rank as "no data." The 4px edge strip (from the
+      巡检 v1 design) weights the row at the periphery: scannable down the left edge like the
+      READY rail is down the right, without adding a single word. State word tints amber only
+      on strip rows — color still means status, nothing else.</p></div>
+    <div class="note"><span class="k">Strip semantics</span><b>Edge = "this row wants eyes"</b>
+      <p>Amber strip: signs. Green strip: in window (actionable today). No strip: upcoming —
+      quiet rows stay quiet. Gray strip: no data. If every row had a strip the edge would mean
+      nothing; upcoming staying bare is what makes the amber loud.</p></div>
+    <div class="note"><span class="k">Why V2</span><b>Task context with presence</b>
+      <p>The same one fact as the base strip — 62 / 100 for the whole task — but as a full-bleed
+      header in the VI (warm ground, hairline, no card, no dark surface): a big mono metric and
+      the gauge. More presence for the number that tells Unit B it can ease off; costs ~40px
+      of list. Base vs V2 is a surface decision only — identical content.</p></div>
+    <div class="note"><span class="k">Branch workflow</span><b>Base is never edited in place</b>
+      <p>01/01b stay canonical. Variations live in V-sections beside their base; when one wins,
+      the file is snapshotted to <span class="mono">ux/archive/task-screens-vN.html</span>, the
+      winner merges into the base section, and the branch section is removed. Every iteration
+      stays on disk. The 巡检 v1 reference file is read-only — nothing there was touched.</p></div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 02 · BREEDING ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>02 · Breeding — the sequence</h2>
+    <span class="anno">Event-driven · payload actions · commit per record</span>
+  </div>
+
+  <div class="phone" style="display:flex;flex-direction:column;height:860px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar">
+      <div class="back">←</div>
+      <div><div class="ttl">Breeding</div></div>
+    </div>
+    <div class="taskctx">
+      <span class="tl">Task</span>
+      <span class="tc" style="flex:1"><b>32</b> mated · <b>14</b> to mate · 2 rooms</span><span class="tcv">›</span>
+    </div>
+    <div class="unit">
+      <div class="un">Unit 4</div>
+      <div class="ul">Last mating <b>07:14</b> · G. Hansen</div>
+    </div>
+
+    <div class="lens">
+      <button class="on">To mate <span class="n">14</span></button>
+      <button>Done <span class="n">32</span></button>
+      <button>All <span class="n">46</span></button>
+    </div>
+
+    <div class="list" style="flex:1">
+      <div class="pen"><span class="code">PEN A1</span><span class="agg">3 of 6 open</span></div>
+      <div class="row">
+        <span class="tag">000268</span>
+        <div class="st">
+          <span class="l1">Mating 2 · ready</span>
+          <span class="l2">1 of 2 · last Jul 7</span>
+        </div>
+        <div class="rail"><span class="word s-green">READY</span><span class="chev">›</span></div>
+      </div>
+      <div class="row">
+        <span class="tag">000254</span>
+        <div class="st">
+          <span class="l1">Mating 2 · ready <span class="b b-amber">interval 5h</span></span>
+          <span class="l2">1 of 2 · last 02:10</span>
+        </div>
+        <div class="rail"><span class="word s-green">READY</span><span class="chev">›</span></div>
+      </div>
+      <div class="row dim">
+        <span class="tag">000287</span>
+        <div class="st">
+          <span class="l1">Mating 2 in 9h</span>
+          <span class="l2">1 of 2 · last 22:40</span>
+        </div>
+        <div class="rail"><span class="word s-gray">WAIT</span><span class="chev">›</span></div>
+      </div>
+
+      <div class="pen"><span class="code">PEN A2</span><span class="agg">5 of 8 open</span></div>
+      <div class="row">
+        <span class="tag">000311</span>
+        <div class="st">
+          <span class="l1">Mating 1 · ready</span>
+          <span class="l2">0 of 2 · in heat 06:55</span>
+        </div>
+        <div class="rail"><span class="word s-green">READY</span><span class="chev">›</span></div>
+      </div>
+      <div class="row done dim">
+        <span class="tag">000243</span>
+        <div class="st">
+          <span class="l1">Done · 2 matings</span>
+          <span class="l2">2 of 2 · JY001 · 07:14</span>
+        </div>
+        <div class="rail"><div class="edit">✎</div></div>
+      </div>
+    </div>
+
+    <div class="dock">
+      <div class="dockrow">
+        <div class="pensel"><div class="arr">‹</div><div class="cur"><span class="pc">A1</span><span class="pl">3 open</span></div><div class="arr">›</div></div>
+        <div class="tools"><div class="tool">⌕</div><div class="tool scan">▣</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">Variation rule</span><b>No checkbox when the action carries payload</b>
+      <p>Confirming a mating records a semen batch and a sequence position — that cannot be a
+      bulk mark, so rows have no boxes; the row opens the mating sheet (timeline, batch confirm,
+      interval warning). The rule is mechanical: checkbox iff the bar can fully express the mark.</p></div>
+    <div class="note"><span class="k">Rail</span><b>READY / WAIT is the whole triage</b>
+      <p>The sequence status ("Mating 2 · ready", "Mating 2 in 9h") reads left; the rail carries
+      the one-word verdict, Board-style, aligned down the screen. Countdown rows are dimmed —
+      visible, not actionable. The 5h interval warning rides the row as an amber badge, stated
+      as a measurement, exactly like the production sheet does.</p></div>
+    <div class="note"><span class="k">Bottom bar</span><b>Navigation only — there is nothing to bulk</b>
+      <p>Each mating commits in its own sheet, so the bar never has an action state here; it is
+      the nav dock permanently: pen chips, search, scan, grid. Scan matters most on this task —
+      doses in hand, the sow in front of you, one tap to her sheet. The task strip above is
+      queue-shaped: mated / to mate, no gauge, because the goalpost moves.</p></div>
+    <div class="note"><span class="k">Second line</span><b>One memory-line grammar</b>
+      <p>Fixed format on every row: <span class="mono">n of N · last &lt;time&gt;</span> (or
+      <span class="mono">in heat &lt;time&gt;</span> before mating 1; batch replaces "last" once
+      done). Same fields, same order — and because every breeding row carries the line, all rows
+      on the screen are the same height. A screen either uses the memory line everywhere or not
+      at all.</p></div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 03 · FARROWING ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>03 · Farrowing — the watch</h2>
+    <span class="anno">Long-running records · live alerts · unlocated pinned</span>
+  </div>
+
+  <div class="phone" style="display:flex;flex-direction:column;height:860px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar">
+      <div class="back">←</div>
+      <div><div class="ttl">Farrowing</div></div>
+    </div>
+    <div class="taskctx">
+      <span class="tl">Task</span>
+      <span class="tc" style="flex:1"><b>2</b> farrowing · <b>9</b> awaiting · 1 room</span><span class="tcv">›</span>
+    </div>
+    <div class="unit">
+      <div class="un">Unit 7 · Farrowing</div>
+      <div class="ul">Last record <b>23:00</b> · G. Hansen</div>
+    </div>
+
+    <div class="lens">
+      <button>Awaiting <span class="n">9</span></button>
+      <button class="on">Farrowing <span class="n">2</span></button>
+      <button>Done <span class="n">8</span></button>
+      <button>All <span class="n">19</span></button>
+    </div>
+
+    <div class="list" style="flex:1">
+      <div class="pen"><span class="code">UNLOCATED</span><span class="agg">1 sow</span></div>
+      <div class="row">
+        <span class="tag">000377</span>
+        <div class="st">
+          <span class="l1">Due today</span>
+          <span class="l2">no pen assigned</span>
+        </div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+
+      <div class="pen"><span class="code">PEN B1</span><span class="agg">1 farrowing</span></div>
+      <div class="row">
+        <span class="tag">000418</span>
+        <div class="st">
+          <span class="l1">8 piglets <span class="b b-amber">45 min since last</span></span>
+          <span class="l2">started 21:12 · parity 3</span>
+        </div>
+        <div class="rail"><span class="word s-blue">ACTIVE</span><span class="chev">›</span></div>
+      </div>
+
+      <div class="pen"><span class="code">PEN B2</span><span class="agg">1 farrowing</span></div>
+      <div class="row">
+        <span class="tag">000392</span>
+        <div class="st">
+          <span class="l1">3 piglets so far</span>
+          <span class="l2">started 08:44 · last 09:21</span>
+        </div>
+        <div class="rail"><span class="word s-blue">ACTIVE</span><span class="chev">›</span></div>
+      </div>
+
+      <div class="pen"><span class="code">PEN B3</span><span class="agg">done</span></div>
+      <div class="row done dim">
+        <span class="tag">000406</span>
+        <div class="st">
+          <span class="l1">Done · 11 piglets</span>
+          <span class="l2">final 05:58 · G.H</span>
+        </div>
+        <div class="rail"><div class="edit">✎</div></div>
+      </div>
+    </div>
+
+    <div class="dock">
+      <div class="dockrow">
+        <div class="pensel"><div class="arr">‹</div><div class="cur"><span class="pc">B1</span><span class="pl">1 active</span></div><div class="arr">›</div></div>
+        <div class="tools"><div class="tool">⌕</div><div class="tool scan">▣</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">Lens</span><b>Four states, still one grammar</b>
+      <p>Farrowing partitions into Awaiting / Farrowing / Done — the production statuses grouped,
+      nothing invented. "Farrowing" is the default lens when anything is active: the watch list.
+      Awaiting holds the due/overdue/no-data rows in the same anatomy.</p></div>
+    <div class="note"><span class="k">Live rows</span><b>The row is the monitor</b>
+      <p>An active sow's row carries the running count and the interval measurement — the amber
+      badge is the same "45 min since last piglet" the record sheet shows, surfaced where the
+      worker glances. Tapping opens the incremental record (steppers, continue/final), which
+      spans sessions; no checkboxes on stateful records.</p></div>
+    <div class="note"><span class="k">Unlocated</span><b>A plain group, first in order</b>
+      <p>The 未定位 group from production is kept at the top so those sows are seen — but it is
+      not a concern state: gray header, normal rows, the sow's own status unchanged. "No pen
+      assigned" is the whole story; nothing is added to it.</p></div>
+    <div class="note"><span class="k">No bar</span><b>Nothing to submit at room level</b>
+      <p>Each farrowing commits in its own record ("final" closes it). The screen ends with the
+      list — an empty bar would be furniture.</p></div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 04 · BIG ROOM ROW RAIL ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>04 · Stall rooms — the dock grows a rail</h2>
+    <span class="anno">Same dock · rows A–D × 100 stalls · one extra strip</span>
+  </div>
+
+  <div class="phone" style="display:flex;flex-direction:column;height:880px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar">
+      <div class="back">←</div>
+      <div><div class="ttl">Heat check</div></div>
+    </div>
+    <div class="taskctx">
+      <span class="tl">Task</span>
+      <div class="gauge" style="margin:0;flex:1"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <span class="tc"><b>62</b> / 100 in heat · 3 rooms</span><span class="tcv">›</span>
+    </div>
+    <div class="unit">
+      <div class="un">Unit 2 · Gestation stalls</div>
+      <div class="ul">Last checked <b>08:05</b> · G. Hansen</div>
+    </div>
+
+    <div class="lens">
+      <button class="on">Not in heat <span class="n">312</span></button>
+      <button>In heat <span class="n">21</span></button>
+      <button>All <span class="n">400</span></button>
+    </div>
+
+    <div class="list" style="flex:1">
+      <div class="pen"><span class="code">ROW C</span><span class="agg">12 of 100 left</span></div>
+      <div class="row dim">
+        <div class="cb"></div>
+        <span class="tag">C65 <span style="color:var(--ink3);font-weight:500">000198</span></span>
+        <div class="st"><span class="l1">Expected in 4d</span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+      <div class="row">
+        <div class="cb"></div>
+        <span class="tag">C66 <span style="color:var(--ink3);font-weight:500">000205</span></span>
+        <div class="st"><span class="l1">In expected window</span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+      <div class="row">
+        <div class="cb"></div>
+        <span class="tag">C67 <span style="color:var(--ink3);font-weight:500">000254</span></span>
+        <div class="st"><span class="l1">Heat signs <span class="b b-amber">6h ago</span></span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+      <div class="row dim">
+        <div class="cb"></div>
+        <span class="tag">C68 <span style="color:var(--ink3);font-weight:500">000261</span></span>
+        <div class="st"><span class="l1">No data <span class="b b-gray">?</span></span></div>
+        <div class="rail"><span class="chev">›</span></div>
+      </div>
+    </div>
+
+    <!-- bottom bar · NAV state, stall-room variant -->
+    <div class="dock">
+      <div class="dockrow" style="margin-bottom:8px">
+        <div class="pensel"><div class="arr">‹</div><div class="cur"><span class="pc">C·67</span><span class="pl">row 12 left</span></div><div class="arr">›</div></div>
+        <div class="tools"><div class="tool">⌕</div><div class="tool scan">▣</div></div>
+      </div>
+      <div style="position:relative;height:40px;background:var(--ground);border:1px solid var(--hair2);border-radius:10px;display:flex;align-items:center;padding:0 14px">
+        <div style="position:relative;flex:1;height:14px">
+          <div style="position:absolute;left:0;right:0;top:6px;height:2px;background:var(--hair2)"></div>
+          <i style="position:absolute;left:8%;top:3px;width:3px;height:8px;background:var(--amber-fill);border-radius:1px"></i>
+          <i style="position:absolute;left:11%;top:3px;width:3px;height:8px;background:var(--amber-fill);border-radius:1px"></i>
+          <i style="position:absolute;left:34%;top:3px;width:3px;height:8px;background:var(--amber-fill);border-radius:1px"></i>
+          <i style="position:absolute;left:36%;top:3px;width:3px;height:8px;background:var(--amber-fill);border-radius:1px"></i>
+          <i style="position:absolute;left:39%;top:3px;width:3px;height:8px;background:var(--amber-fill);border-radius:1px"></i>
+          <i style="position:absolute;left:64%;top:3px;width:3px;height:8px;background:var(--amber-fill);border-radius:1px"></i>
+          <i style="position:absolute;left:67%;top:3px;width:3px;height:8px;background:var(--amber-fill);border-radius:1px"></i>
+          <i style="position:absolute;left:88%;top:3px;width:3px;height:8px;background:var(--amber-fill);border-radius:1px"></i>
+          <div style="position:absolute;left:65%;top:-4px;width:22px;height:22px;background:var(--ink);border-radius:7px;transform:translateX(-50%)"></div>
+          <div style="position:absolute;left:65%;top:-42px;transform:translateX(-50%);background:var(--ink);color:#fff;font-family:var(--mono);font-size:13px;font-weight:700;padding:5px 10px;border-radius:8px">C·67</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">Same dock</span><b>The bar is the same; the room shape adds one strip</b>
+      <p>Pen rooms get chips. Stall rooms — 4 rows × 100 single-sow stalls — get chips for the
+      row letter plus a rail for the stall number. Nothing else on the screen changes; the dock
+      is one component that renders by room shape, and it still swaps to the action state the
+      moment something is selected.</p></div>
+    <div class="note"><span class="k">Two axes</span><b>Letter picks the row, rail picks the stall</b>
+      <p>Gestation rooms are rows of single-sow stalls — the "one pig, one pen" case. Letter
+      chips (A–D) switch rows; the rail below represents stalls 1–100. Drag the thumb — the
+      mono bubble reads C·67 as it moves — or tap anywhere on the rail to jump straight there.
+      Reaching C67 from A1 is two gestures, no scrolling through B.</p></div>
+    <div class="note"><span class="k">The rail is a map</span><b>Amber ticks show where work is</b>
+      <p>Ticks mark stalls still holding work in the current lens; clusters read as "two groups
+      mid-row, one near the end." The rail answers both "where am I" and "where next" — the
+      same derived numbers as the chips and pen headers, drawn spatially.</p></div>
+    <div class="note"><span class="k">Stall rows</span><b>Stall leads, tag follows</b>
+      <p>In stall rooms the location is the row's first mono cell (C67), the ear tag dimmed
+      beside it — location-first even at the row level, because the worker stands at stalls,
+      not at tags. Group headers aggregate the row letter. Same anatomy otherwise.</p></div>
+    <div class="note"><span class="k">Custom, simply</span><b>No native components</b>
+      <p>Chips, a bar, ticks, a thumb — all ordinary elements with a drag handler; 44px touch
+      height throughout. The small-room chip strip and this rail are the same slot: a room
+      renders one or the other by its shape.</p></div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 04b · PEN PICKER ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>04b · Pen picker — leap in two taps</h2>
+    <span class="anno">Tap the current pen · row letter · pen number · no scrolling</span>
+  </div>
+
+  <div class="phone" style="display:flex;flex-direction:column;height:820px;background:var(--well)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45">
+      <div class="back">←</div>
+      <div><div class="ttl">Heat check</div></div>
+    </div>
+    <div style="flex:1"></div>
+    <div class="pk">
+      <div class="grab"></div>
+      <div class="sh" style="padding:4px 4px 6px"><span class="t">Go to pen</span><span class="x">Room 1 · 24 pens</span></div>
+      <div class="seg"><span class="on">A</span><span>B</span><span>C</span></div>
+      <div class="grid">
+        <div class="cell clear"><span class="pc">A1</span><span class="n">✓</span></div>
+        <div class="cell cur"><span class="pc">A2</span><span class="n">4 left</span></div>
+        <div class="cell"><span class="pc">A3</span><span class="n">2 left</span></div>
+        <div class="cell clear"><span class="pc">A4</span><span class="n">✓</span></div>
+        <div class="cell"><span class="pc">A5</span><span class="n">1 left</span></div>
+        <div class="cell"><span class="pc">A6</span><span class="n">3 left</span></div>
+        <div class="cell"><span class="pc">A7</span><span class="n">2 left</span></div>
+        <div class="cell clear"><span class="pc">A8</span><span class="n">✓</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">Two gestures</span><b>Walk with arrows, leap with the picker</b>
+      <p>In the barn you either move to the next pen or jump to a specific one. The dock now
+      serves exactly those two: ‹ › step along the physical route with zero aiming, and the wide
+      current-pen button — PEN A2 · 4 of 6 left, always telling you where you are — opens this
+      picker for the leap. The scrolling chip strip tried to do both and did neither well.</p></div>
+    <div class="note"><span class="k">The picker</span><b>Row letter, then pen number</b>
+      <p>Big segmented letters for the row (A B C), then a grid of that row's pens — 58px cells,
+      8px gaps, mono pen code with its remaining count or ✓. Two taps from anywhere to anywhere;
+      no scrolling for a 24-pen room, one short scroll for the largest. Stall rooms use the same
+      sheet with the rail (04) as the number step.</p></div>
+    <div class="note"><span class="k">Mis-taps</span><b>Reversible by construction</b>
+      <p>Arrows move one pen and the header names where you landed — a wrong tap is undone by
+      the opposite arrow. Picker cells are glove-sized and separated; a wrong pen is a fresh
+      picker tap away. Nothing in navigation commits anything.</p></div>
+    <div class="note"><span class="k">Dock, final shape</span><b>‹ · current pen · › · ⌕ · ▣</b>
+      <p>Five things, all 48px, one row, every task. Selection swaps the whole row for the
+      action bar; clearing brings it back at the same pen.</p></div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 05 · TASK DETAIL SHEET ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>05 · Task detail — the sheet behind the strip</h2>
+    <span class="anno">Tap the task strip · everything that failed the pen test lives here</span>
+  </div>
+
+  <div class="phone" style="display:flex;flex-direction:column;height:860px;background:var(--well)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45">
+      <div class="back">←</div>
+      <div><div class="ttl">Heat check</div></div>
+    </div>
+
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="sh"><span class="t">Heat check · task</span><span class="x">Batch wk 32 · day 1 of 7</span></div>
+
+      <div class="sec" style="border-top:none;padding-top:0">
+        <span class="k">Progress · whole task</span>
+        <div class="kpi"><span class="n" style="color:var(--green)">62</span><span class="u">/ 100 in heat</span><span class="tgt">3 rooms · target 100</span></div>
+        <div class="gauge" style="margin:10px 0 0"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="kv" style="padding-top:10px"><span class="lbl">Room 1 · Room 2 · Room 3</span><span class="v">8 · 31 · 23</span></div>
+      </div>
+
+      <div class="sec">
+        <span class="k">KPI</span>
+        <div class="kpi"><span class="n">70</span><span class="u">% heat rate</span><span class="tgt">target ≥ 90%</span></div>
+      </div>
+
+      <div class="sec">
+        <span class="k">Configuration</span>
+        <div class="kv"><span class="lbl">Checks per day</span><span class="v">2 · 08:00 · 16:00</span></div>
+        <div class="kv"><span class="lbl">Task window</span><span class="v">7 d · Jul 5 – Jul 11</span></div>
+      </div>
+
+      <div class="rowlink">SOP · Heat detection <span class="chev">›</span></div>
+      <div class="rowlink">Status legend <span class="chev">›</span></div>
+
+      <div class="endtask">End task</div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">The filter</span><b>One question decides the strip vs the sheet</b>
+      <p><i>Does this change what a hand does at the pen right now?</i> Only whole-task progress
+      passes — so only that is on the room screen. KPI, configuration, SOP, status legend and
+      End task all fail it, and all live here, one tap away. The sheet exists so nothing has to
+      leak upward.</p></div>
+    <div class="note"><span class="k">Structure</span><b>Production's 任务详情, compressed</b>
+      <p>Same sections as production, in the same order — progress, KPI, configuration, SOP,
+      legend, end — but as a bottom sheet over the room, not a sibling tab: the worker never
+      leaves the pen list. Numbers are mono and large; labels are quiet; SOP and legend are
+      links, not inlined blocks. Per-room split (8 · 31 · 23) is the one addition, because it is
+      how Unit B knows Unit A is done.</p></div>
+    <div class="note"><span class="k">End task</span><b>Where completion actually lives</b>
+      <p>Bordered red, at the bottom of the sheet — reachable, never accidental, and one level
+      above any room. Sweep tasks show it always; standing tasks (heat check) show it as the
+      supervisor's stop; event tasks (breeding, farrowing) never show it — they close themselves
+      record by record.</p></div>
+    <div class="note"><span class="k">Copy</span><b>Names the batch, not "task"</b>
+      <p>Header reads "Batch wk 32 · day 1 of 7". "Task" was a system word; the batch is what
+      the farmer calls it. The room strip drops the word too — "62 / 100 in heat · 3 rooms" is
+      unambiguous once the destination is this sheet.</p></div>
+  </div>
+</section>
+
+<!-- ================= VARIATION TABLE ================= -->
+<section class="screen" style="display:block">
+  <div class="sec-label" style="margin-bottom:20px">
+    <h2>What varies · what never varies</h2>
+    <span class="anno">The consistency contract</span>
+  </div>
+  <table>
+    <thead><tr><th>Element</th><th>Heat check</th><th>Breeding</th><th>Farrowing</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td>Task strip</td><td>Target-shaped: 62 / 100 + gauge</td><td>Queue-shaped: mated / to mate, no gauge</td><td>Queue-shaped: farrowing / awaiting</td><td>One line, whole-task scope, tap → task detail sheet (05). Gauge only when the denominator is fixed; a moving goalpost never gets a percent. Never frequency, never KPIs — those live in the sheet</td></tr>
+      <tr><td>State lens</td><td>Not in heat / In heat / All</td><td>To mate / Done / All</td><td>Awaiting / Farrowing / Done / All</td><td>The lens IS the room's progress: the task's pig-state partition, mono counts. Nothing above it repeats its numbers</td></tr>
+      <tr><td>Header stack</td><td colspan="3">Task title → task strip → hairline → Unit name (large) → "Last checked/mating/record &lt;time&gt; · name" → lens</td><td>Scope descends top-down and never interleaves. Location is the farm's own address (Unit 4), never a section name. Activity always states its verb</td></tr>
+      <tr><td>Checkboxes</td><td>Yes — mark is stateless</td><td>No — payload (batch, sequence)</td><td>No — stateful record</td><td>Checkbox iff the bar can fully express the mark</td></tr>
+      <tr><td>Bottom bar · idle</td><td colspan="3">Nav dock, one 48px row: ‹ · current pen (tap → picker) · › · ⌕ search · ▣ scan; stall rooms add the row rail beneath</td><td>Walk with arrows, leap with the picker; same dock in every task; every target ≥ 48px</td></tr>
+      <tr><td>Scan</td><td>Selects the sow → action bar</td><td>Opens her mating sheet</td><td>Opens her record</td><td>Scan, search and checkbox are three ways to say which pig; the task's one action decides what happens next</td></tr>
+      <tr><td>Bottom bar · selecting</td><td>✕ n selected · Signs · Mark in heat</td><td>— (never)</td><td>— (never)</td><td>The dock swaps to the task's mark-as actions while a selection exists, and back when it clears</td></tr>
+      <tr><td>Save · Submit · Complete</td><td colspan="3">None</td><td>Every action commits itself; rooms are never completed — completion belongs to the task, one level up</td></tr>
+      <tr><td>Row height</td><td>One line, all rows</td><td>Two lines, all rows</td><td>Two lines, all rows</td><td>One template per screen — never mixed heights</td></tr>
+      <tr><td>Second line</td><td>Rarely</td><td>Sequence memory · n of N · last time</td><td>Live measurements</td><td>Optional mono slot, same position, one grammar</td></tr>
+      <tr><td>Pen header</td><td colspan="3">Derived counts only — "4 of 6 left", "done"; sticky while its rows scroll</td><td>Status lives at the action's level; pens aggregate</td></tr>
+      <tr><td>Row anatomy</td><td colspan="3">[box] · tag · status(+badge) · rail word · ›/✎</td><td>One anatomy; slots may be empty, never rearranged</td></tr>
+      <tr><td>Statuses</td><td colspan="3">Production set only, refined copy, 5 hues</td><td>No invented statuses, no suggested next steps</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer>
+  <span class="mono">ux/task-screens.html · companion to ux/unified-task-list.md · VI decks in vi-proposals/ untouched</span>
+</footer>
+
+</div>
+</body>
+</html>

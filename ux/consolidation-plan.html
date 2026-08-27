@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consolidation — archetypes, doors, consequences</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F7F6F2;--card:#FFF;--well:#EFEEE8;--ink:#1C1E19;--ink2:#51544B;--ink3:#8B8E83;--hair:#E7E6DF;--hair2:#D8D7CE;--red:#C2402E;--amber:#96660D;--amber-fill:#D99A21;--amber-wash:#F8F0DC;--green:#3B8A50;--green-wash:#EAF2EC;--blue:#3E56C4;--blue-wash:#EBEFF9;--mono:'IBM Plex Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:40px 48px 90px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.02em;margin:18px 0 12px}
+h2{font-size:21px;font-weight:800;margin:46px 0 14px;padding-top:28px;border-top:1px solid var(--ink)}
+h3{font-size:15.5px;font-weight:700;margin:24px 0 8px}
+p{max-width:74ch;color:var(--ink2);margin-bottom:11px}
+.lede{font-size:16.5px;max-width:72ch}
+.anno{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--hair);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+.mono{font-family:var(--mono);font-size:12px}
+.zh{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.core{color:var(--green);font-weight:700}.atyp{color:var(--red);font-weight:700}
+pre.flow{font-family:var(--mono);font-size:12px;line-height:1.75;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:20px 22px;overflow-x:auto;margin:14px 0;color:var(--ink)}
+.note{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px 16px;margin:12px 0;font-size:13.5px;color:var(--ink2);max-width:none}
+.law{background:var(--card);border:1.5px solid var(--ink);border-radius:12px;padding:17px 19px;margin:16px 0;max-width:none}
+.law b{display:block;font-size:16px;color:var(--ink);margin-bottom:5px}
+.ans{background:var(--green-wash);border-left:3px solid var(--green);padding:11px 15px;margin:9px 0;font-size:13.5px;max-width:none}
+.q{background:var(--amber-wash);border-left:3px solid var(--amber-fill);padding:11px 15px;margin:9px 0;font-size:13.5px;max-width:none}
+.dom{background:var(--blue-wash);border-left:3px solid var(--blue);padding:11px 15px;margin:9px 0;font-size:13.5px;max-width:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Consolidating at the node</h1>
+<p class="lede">We have gone bottom-up: ~290 production screens, every action, every requirement.
+This is the consolidation — what to standardise, what is genuinely atypical, and what to design
+next. It deliberately does not go inside individual features.</p>
+<p class="anno">answers the open decisions · proposes the method · classifies all 22 events</p>
+
+<h2>1 · The approach</h2>
+<p>Now that the capability map is complete, the mistake would be to design 22 features. The right
+move is to find how few <b>interaction shapes</b> those 22 events actually take, design those, and
+treat each feature as a configuration. Three matrices get us there — and the third is the one
+nobody has written yet.</p>
+
+<table>
+<thead><tr><th style="width:7%"></th><th style="width:24%">Matrix</th><th style="width:33%">Answers</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td><b>1</b></td><td><b>Event × archetype</b></td><td>"What do we actually have to design?"</td><td>Done below — <b>15 of 22 are one component</b></td></tr>
+<tr><td><b>2</b></td><td><b>Event × door</b></td><td>"Which entry points reach it, and what differs by door?"</td><td>Done below — one form, doors differ only in pre-fill and return</td></tr>
+<tr><td><b>3</b></td><td><b>Event × consequence</b></td><td>"What does it do to her state, her batch, and the tasks watching her — and what happens when it contradicts an earlier record?"</td><td>Started below — <b>the real remaining work</b></td></tr>
+</tbody>
+</table>
+
+<div class="law"><b>The UI question is nearly solved. The semantic question is not.</b>
+"Where is the button" is answered by the product model (subject decides surface). What is <i>not</i>
+answered is what an event does downstream — and your back-door case is exactly this: a pig
+recorded pregnant during 孕检, found not-pregnant during an inspection. Two records, one animal,
+opposite facts. Nothing in either production file handles that. It is the highest-value thing to
+settle at this node, because it decides data model, not pixels.</div>
+
+<h2>2 · Matrix 1 — event × archetype</h2>
+<p>Classified by <i>interaction shape</i>, not by domain meaning. The result: one core component
+covers two thirds of the product.</p>
+
+<div class="law"><b>The Record Sheet — 15 of 22 events</b>
+A sheet with a subject header and 0..N fields drawn from a fixed kit: radio group · multi-select
+picker · stepper · number+unit · segmented scale · text · entity picker · photo grid. Zero fields
+is a confirm; one radio is a choice; several fields is a form. These are not different components,
+they are the same sheet with different field lists — and every one of them commits itself, per our
+existing law.</div>
+
+<table>
+<thead><tr><th style="width:16%">Archetype</th><th style="width:8%">Count</th><th style="width:34%">Events</th><th>Why it is this shape</th></tr></thead>
+<tbody>
+<tr><td class="core"><b>Record Sheet</b></td><td class="core">15</td><td>Heat · Mating · Pregnancy result · Return to heat · Abortion · Triage · Treatment · Add condition · Resolve condition · Weight · Backfat · Temperature · Transfer · 留种 mark/unmark · Missing · Fault report</td><td>Subject + fields + commit. Differences are field lists and defaults, nothing structural.</td></tr>
+<tr><td class="atyp"><b>Session counter</b></td><td class="atyp">1</td><td>Farrowing</td><td>Reopened over hours, accumulates counts, has a "final" that closes it, and an interval clock that escalates while open.</td></tr>
+<tr><td class="atyp"><b>Wizard</b></td><td class="atyp">1</td><td>Assign identity</td><td>Ordered steps with skippable middles; appears inline as a precondition inside other events.</td></tr>
+<tr><td class="atyp"><b>Pairing</b></td><td class="atyp">1</td><td>Fostering</td><td>Two subjects, a payload that belongs to neither, and a delta shown on both sides.</td></tr>
+<tr><td class="atyp"><b>Reconciliation</b></td><td class="atyp">1</td><td>Count correction / pen calibration</td><td>System's number vs observed number, resolved by a balance equation over allocations.</td></tr>
+<tr><td class="atyp"><b>Fan-out</b></td><td class="atyp">1</td><td>Death</td><td>One selection, a per-animal payload, with batch helpers to fill many at once.</td></tr>
+<tr><td class="core"><b>Composite</b></td><td class="core">2</td><td>Weaning · Piglet processing</td><td>Not new shapes — a Record Sheet whose sections are themselves sheets (litter + sow; treatments + per-piglet identity). Design the section pattern once.</td></tr>
+</tbody>
+</table>
+
+<p><b>So the design work is:</b> one Record Sheet with its field kit, one section pattern for
+composites, and <b>five bespoke flows</b>. Not 22 features.</p>
+
+<h2>3 · Matrix 2 — event × door</h2>
+<p>Every event is reachable from more than one place. The rule that keeps this from multiplying:
+<b>the door changes the pre-fill and the return, never the form.</b></p>
+
+<table>
+<thead><tr><th style="width:22%">Door</th><th style="width:26%">Pre-fills</th><th>Returns to</th></tr></thead>
+<tbody>
+<tr><td><b>Task row</b> (in-task)</td><td>The animal; the task's own event is the sheet's main content</td><td>The task list, row updated, lens counts moved</td></tr>
+<tr><td><b>Task row ⋯</b> (in-task, off-task event)</td><td>The animal only</td><td>The task list, unchanged — the task did not ask this question</td></tr>
+<tr><td><b>Unit list row ⋯</b> (inspection)</td><td>The animal only</td><td>The unit list</td></tr>
+<tr><td><b>Selection bar</b> (either mode)</td><td>The selection (bulk-capable events only)</td><td>The list, selection cleared</td></tr>
+<tr><td><b>Inline precondition</b></td><td>The blocking animal + the reason it blocked</td><td>Back into the interrupted event, now unblocked</td></tr>
+<tr><td><b>Scan</b></td><td>The scanned animal</td><td>Whatever surface invoked it</td></tr>
+</tbody>
+</table>
+
+<div class="note"><b>Shared vs task-owned — the distinction you asked for.</b> Every event is
+<i>shared</i>; none belong to a task. What differs is whether the task <b>asked</b> for it:
+<span style="display:block;margin-top:6px">• <b>The task's own event</b> — the sheet you get by tapping the row. Recording it advances the task.</span>
+<span style="display:block">• <b>Any other event</b> — reached through ⋯ on the same sheet. Recorded against the animal; the task is unaffected unless it happens to be watching that event too.</span>
+<span style="display:block;margin-top:6px">Marking a pig dead or diseased mid-task is not a special case — it is the second row of the same menu she would show during an inspection.</span></div>
+
+<h2>4 · Matrix 3 — consequence, and the back-door problem</h2>
+<p>This is the unfinished work. Each event moves the sow along a state machine, may change her
+batch membership, and may contradict something already recorded.</p>
+
+<pre class="flow">空怀/后备 ──heat──► 发情 ──mating──► 已配种 ──pregnancy:+──► 已妊娠 ──farrowing──► 哺乳 ──weaning──► 空怀
+   ▲                                    │                    │                                      │
+   └──── return to heat ────────────────┘                    │                                      │
+   └──── pregnancy: not pregnant ────────────────────────────┘                                      │
+   └──── abortion ───────────────────────────────────────────┘                                      │
+   └───────────────────────────────────────────────────────────────────────────────────────────────┘</pre>
+
+<table>
+<thead><tr><th style="width:18%">Event</th><th style="width:16%">State →</th><th style="width:22%">Batch effect</th><th>Task effect</th></tr></thead>
+<tbody>
+<tr><td>Heat</td><td>发情</td><td>optional join</td><td>Advances heat check; may spawn breeding</td></tr>
+<tr><td>Mating</td><td>已配种</td><td>requires batch (backfill if absent)</td><td>Advances breeding sequence</td></tr>
+<tr><td>Pregnancy · pregnant</td><td>已妊娠</td><td>stays</td><td>Advances pregnancy check</td></tr>
+<tr><td>Pregnancy · not pregnant</td><td>空怀</td><td><b>leaves batch</b></td><td>Advances pregnancy check; re-enters breeding population</td></tr>
+<tr><td>Pregnancy · unclear</td><td>unchanged</td><td>stays</td><td>Schedules a recheck</td></tr>
+<tr><td>Return to heat</td><td>发情 / 空怀</td><td><b>leaves batch</b></td><td>Advances return-heat; re-enters breeding</td></tr>
+<tr><td>Abortion</td><td>空怀</td><td><b>leaves batch</b></td><td>Removes her from downstream tasks</td></tr>
+<tr><td>Farrowing</td><td>哺乳</td><td>stays</td><td>Advances farrowing; opens postpartum + piglet processing</td></tr>
+<tr><td>Weaning</td><td>空怀</td><td><b>leaves batch</b></td><td>Closes litter tasks; re-enters breeding</td></tr>
+<tr><td>Death · Missing</td><td>terminal</td><td>leaves everything</td><td>Removed from every task cohort</td></tr>
+<tr><td>Transfer</td><td>unchanged</td><td>unchanged</td><td>Moves her between unit lists; health records move or copy</td></tr>
+<tr><td>Foster</td><td>unchanged</td><td>unchanged</td><td>Litter counts change on both sows; piglet tasks re-derive</td></tr>
+</tbody>
+</table>
+
+<div class="law"><b>Supersession — the back-door rule</b>
+When a new event contradicts an earlier one about the same fact, <b>the later observation wins and
+the earlier record is superseded, never deleted.</b> The animal's state, batch membership and task
+progress all re-derive from the current truth; the superseded record stays in her history with its
+original attribution, marked as such.
+<span style="display:block;margin-top:8px">Your case — recorded pregnant in 孕检, found not
+pregnant during a walk — becomes: record the not-pregnant event, she leaves the batch, the
+pregnancy task's counts re-derive, and her history shows both records. No dialog asks the farmer
+to reconcile anything; he just records what he sees.</span>
+<span style="display:block;margin-top:8px">This is also what <b>移除 vs 康复</b> is really about, and
+your definition confirms it: <b>移除 = supersession</b> ("that was never true, I mis-tapped") and
+<b>康复 = a new event</b> ("it was true, it is now resolved"). One clears the record, the other
+closes it. They should not share a screen.</span></div>
+
+<h2>5 · Your decisions, recorded</h2>
+
+<div class="ans"><b>3 · Weight.</b> Two variants during piglet processing (litter total, and
+individual once identity exists); individual capture once pigs are bigger. So the model is not a
+free toggle — it is <b>determined by life stage and identity</b>: no identity → group total only;
+identity → individual. Production's mode switch disappears.</div>
+
+<div class="ans"><b>4 · 移除 vs 康复.</b> 移除 = a mis-entry correction; 康复 = clinical recovery.
+Different semantics, different history, and — per §4 — different mechanisms. Splitting them.</div>
+
+<div class="ans"><b>6 · Fostering.</b> Piglets moved from their birth dam to another sow for
+production reasons (litter size vs functional teats, weak piglets needing a better dam, evening up
+litters). Confirms the <b>Pairing</b> archetype: one donor sow, one receiving sow, N piglets — so
+"bulk" in production's annotation means N <i>piglets</i>, not N sows. Question 6 closed.</div>
+
+<div class="ans"><b>7 · Equipment.</b> Kept in the model as a <b>second subject</b> alongside pigs,
+so the UI consolidation reserves room for it: a device list scoped to pen/unit, a fault as a
+Record Sheet, and a resolution event. We do not design it now, but nothing we build should assume
+"the list is always pigs."</div>
+
+<div class="ans"><b>8 · Toolbox.</b> Exists, out of scope. Record browsing lives there.</div>
+
+<h2>6 · The check-in — my recommendation</h2>
+<p>Your instinct is right that a heavy checklist across many units becomes hostile. The way out is
+to ask what a sign-off actually adds once events commit themselves.</p>
+
+<div class="law"><b>Only assert what cannot be derived.</b>
+Events prove a worker was in a unit and what he found. What they cannot prove is the null case —
+<i>"I walked it and there was nothing to report."</i> That is the only thing a sign-off adds, so
+that is all it should say.</div>
+
+<table>
+<thead><tr><th style="width:26%">Proposal</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td><b>One tap, no form</b></td><td><span class="mono">Check unit</span> stamps unit · person · time. It records alongside what was found: <span class="mono">inspected · 3 findings</span> or <span class="mono">inspected · nothing to report</span>.</td></tr>
+<tr><td><b>Available from the unit list</b></td><td>So a worker sweeping eight quiet units taps eight times without entering each — the "annoying at scale" failure mode disappears.</td></tr>
+<tr><td><b>Checklist is per-farm configuration, default empty</b></td><td>Farms with audit requirements can add 2–5 items (water, feed, temperature, mortality removed, biosecurity). Empty config = one tap. Never more than one screen.</td></tr>
+<tr><td><b>Environment + biosecurity readings become their own event</b></td><td>They are measurements of a unit, not a certification of the pigs. Recording them is optional and independent — which is what production already does, minus the false claim that all pens and devices were checked.</td></tr>
+<tr><td><b>No coverage assertion</b></td><td>We never claim "all pens checked" — production claims it and validates nothing. "Last checked" is a claim by a named person at a time, which is honest and audit-usable.</td></tr>
+</tbody>
+</table>
+
+<h2>7 · Health triage — domain grounding</h2>
+<p>Production's four levels (<span class="zh">紧急治疗 · 优先干预 · 常规观察 · 健康</span>) are
+severity adjectives with placeholder descriptions. In commercial swine practice the triage
+decision a stockperson makes at the pen is not "how bad is this" but <b>what do I do with her
+now</b> — the widely-taught framing is <b>treat / move / euthanize</b>, and timely euthanasia of
+poor-prognosis animals is a welfare-audit item in most assurance schemes.</p>
+
+<div class="dom"><b>What production is missing.</b> Two of the three real decisions have no level:
+<b>move to a hospital pen</b> (standard infrastructure — sick pigs are pulled from the group) and
+<b>euthanize</b> (the decision most sensitive to delay, and the one auditors examine). A scale that
+cannot express them will be worked around on paper.</div>
+
+<p>Proposed levels — each names an action, so the level <i>does</i> something rather than colouring a row:</p>
+<table>
+<thead><tr><th style="width:18%">Level</th><th style="width:30%">Means</th><th>Implies</th></tr></thead>
+<tbody>
+<tr><td><b>Euthanize</b></td><td>Poor prognosis; welfare requires it be prompt</td><td>Death event with reason; escalates to a supervisor per farm policy</td></tr>
+<tr><td><b>Hospital pen</b></td><td>Needs isolation or intensive care</td><td>Offers a <b>Transfer</b> to the unit's hospital pen — triage and move in one act</td></tr>
+<tr><td><b>Treat in place</b></td><td>Intervention needed; stays with her group</td><td>Offers a <b>Treatment</b> event</td></tr>
+<tr><td><b>Monitor</b></td><td>Mild or ambiguous signs</td><td>Sets a recheck window; she appears in the next check-in's attention list</td></tr>
+<tr><td><i>(no level)</i></td><td>Healthy</td><td>Healthy is the absence of a case, not a triage level — this drops production's fourth tile</td></tr>
+</tbody>
+</table>
+<p class="anno">grounded in standard swine welfare practice (treat–move–euthanize decision framing, hospital-pen management, timely-euthanasia audit criteria) — validate the exact wording and escalation policy with your veterinarian before it ships</p>
+
+<h2>8 · What to design next, in order</h2>
+<table>
+<thead><tr><th style="width:6%"></th><th style="width:28%">Piece</th><th>Why this order</th></tr></thead>
+<tbody>
+<tr><td><b>1</b></td><td><b>The Record Sheet + field kit</b></td><td>Unlocks 15 events at once. Nothing else can be finalised before the field vocabulary exists.</td></tr>
+<tr><td><b>2</b></td><td><b>The ⋯ event menu, with the full catalogue</b></td><td>Already specified; needs the 22-event set and the state gates rather than seven rows.</td></tr>
+<tr><td><b>3</b></td><td><b>Unit mode for the list</b></td><td>The check-in surface. Small delta on a built component — but it carries the identity model.</td></tr>
+<tr><td><b>4</b></td><td><b>The identity model</b></td><td>Un-identified groups, count selection, the assign-identity wizard. Blocks 留种, fostering, piglet processing.</td></tr>
+<tr><td><b>5</b></td><td><b>The five atypical flows</b></td><td>Session counter · Pairing · Reconciliation · Fan-out · Wizard. Each genuinely bespoke; each now well understood.</td></tr>
+<tr><td><b>6</b></td><td><b>Today</b></td><td>The scheduling surface. Cheap once tasks, units and escalations are all derived.</td></tr>
+</tbody>
+</table>
+
+<div class="note"><b>Deliberately not now:</b> the inside of individual features (field-by-field
+forms), equipment screens, the toolbox, reports/console. All are accounted for in the model so none
+will force a redesign when they arrive.</div>
+
+</div>
+</body>
+</html>

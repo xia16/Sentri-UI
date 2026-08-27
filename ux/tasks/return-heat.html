@@ -1,0 +1,182 @@
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F7F6F2;--card:#FFF;--well:#EFEEE8;--ink:#1C1E19;--ink2:#51544B;--ink3:#8B8E83;--hair:#E7E6DF;--hair2:#D8D7CE;--red:#C2402E;--amber:#96660D;--amber-fill:#D99A21;--amber-wash:#F8F0DC;--green:#3B8A50;--green-wash:#EAF2EC;--mono:'IBM Plex Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:40px 48px 90px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.015em;margin:18px 0 10px}
+h2{font-size:21px;font-weight:800;margin:44px 0 14px;padding-top:28px;border-top:1px solid var(--ink)}
+h3{font-size:15px;font-weight:700;margin:20px 0 8px}
+p{max-width:72ch;color:var(--ink2);margin-bottom:10px}
+.anno{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+.mono{font-family:var(--mono);font-size:12.5px}
+.cut{color:var(--red);font-weight:700}.keep{color:var(--green);font-weight:700}.merge{color:var(--amber);font-weight:700}
+pre.flow{font-family:var(--mono);font-size:12px;line-height:1.7;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:12px 0;color:var(--ink)}
+.note{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px 16px;margin:12px 0;font-size:13.5px;color:var(--ink2);max-width:none}
+</style>
+
+<div class="wrap">
+
+<h1>Return-heat check · 返情检查</h1>
+<p><b>Thesis:</b> production spends 13 screens, an 8-word status vocabulary with a legend (three entries of which the designers left as <span class="mono">XXXX</span>), a two-step submit ceremony and a parallel grid view to collect exactly <b>two facts per sow</b>: <i>shows signs of return</i> and <i>has returned</i>. Everything else — expected-return dates, day windows, day dots, rates, batch consequences — is derived. Our list already renders this task; the genuine deltas are the batch-consequence surface and the signs carry-over rule.</p>
+<div class="anno">figma 634:12485 「返情检查」 · 13 screens (10 in-progress + 3 ended) · 4 floating designer annotations · 1 floating component state</div>
+
+<h2>1 · Production inventory</h2>
+<p>Two labeled groups on the canvas: 任务进行中 (task in progress) and 任务已结束 (task ended). Magenta text = designer annotations, quoted verbatim below.</p>
+<table>
+<thead><tr><th style="width:23%">Screen (node)</th><th style="width:32%">What it shows</th><th>Data on it / rules encoded</th></tr></thead>
+<tbody>
+<tr><td>1 · Pig list tab <span class="mono">634:12617</span><br><span class="mono">Tab：返情检查（猪只List）</span></td><td>The working list. Header 返情检查, tabs 返情检查 | 任务详情. 单元进度 card → pen-grouped rows → sticky 提交结果 (Submit results) + scan FAB.</td><td>Last-check attribution (顾大华 2025/07/08 23:00); unit 1舍; badge 第1/3天; 返情检查天数 5 day-dots (1 green); 已返情 2头; link 已返情猪只列表; search 耳标号/<b>耳缺号</b> (ear tag / <b>ear notch</b>); funnel; list/grid toggle; "共200头猪 · 请标记已返情或有返情迹象的猪只". Two example pen groups annotated <b>未提交过结果</b> (no result submitted yet) and <b>提交过结果</b> (result submitted). Row states seen: 返情期：5天后 · 进入返情期间 (grey) · 预计返情：今天 / 5天前 (grey) / <span style="color:#d0299a">- 获取不到状态</span> · 返情窗口：5天后 · 返情监测期内 (green play) · 有返情迹象：10小时前 (amber) · 已返情 (red ⊖). Trailing: arrow (act) vs pencil (edit). Floating annotation under the frame: <b>"每提交一次结果，刷新一次KPI"</b> — each submit refreshes the KPI once.</td></tr>
+<tr><td>2 · Pen grid tab <span class="mono">634:17840</span><br><span class="mono">Tab：返情检查（栏位Grid）</span></td><td>Same header/progress; pigs replaced by pen cards. Card-state board beside the phone.</td><td>Pen card = pen no. + aggregate + head count. States: 单猪 (single-pig): 预计返情 5天后 / 5天前 (grey) / – / 有返情迹象 10小时前 / 已返情; 多猪 (multi-pig): 全部返情 · 已返情5头 · 有返情迹象 · 预计返情5天后 · 200头未返情 annotated <b>"这是全部拿不到状态"</b> (this is all-statuses-unavailable). Single-pig card carries an amber heart icon (signs).</td></tr>
+<tr><td>3 · Task detail tab <span class="mono">634:13337</span></td><td>总任务进度 · 返情率 · 任务配置 · SOP · 状态说明 (status legend) · 结束任务 button.</td><td>共5个单元; 第1/3天; 6 pie-dots; 已返情/全部 100/200头; returned-pigs link; 返情率 5% (目标 ≤5%); config 第1次返情检查: 开始时间 = <b>发情后第18天</b> (day 18 after mating), 任务时长 <b>7天</b> (01/01–01/07), 每日次数 <b>2次</b>, 时间 <b>08:00，12:00</b> — "只显示当次的" (only current pass shown). <b>Legend of 7 states</b>: 预计返情 (computed from mating time) · 有返情迹象 ("marked this or last check, unstable") · 进入返情期间 <span class="mono">XXXX</span> · 返情窗口 <span class="mono">XXXX</span> · 返情监测期内 <span class="mono">XXXX</span> · 预计返情：- (date unavailable) · 已返情 — "本次被标记为已返情。<b>提交结果后，会被移出批次</b>" (after submit, moved out of batch).</td></tr>
+<tr><td>4 · Filter <span class="mono">827:12388</span></td><td>Full-screen filter, in-progress state.</td><td>返情状态: 全部/未检查/有迹象/已返情 · 预计返情时间: 全部/≥2天前/昨天/今天/明天/≥2天后 · 排 (row): 全部/A–G/▾ with caveat "栏位Grid 没有排的筛选" (grid view has no row filter) · 重置/确认.</td></tr>
+<tr><td>5 · Mark sheet, default <span class="mono">886:12500</span><br><span class="mono">返情检查-默认状态</span></td><td>Bottom sheet on row tap.</td><td>Header: pen A1 · tag 000001 · <b>母猪，650日龄，3胎</b> (sow · age-days · parity). Exactly <b>two radio options</b>: 有返情迹象 ("有返情迹象，但是还没有返情") · 已返情 ("母猪已返情"). No "no return" option — unmarked is the negative. Footer: [⋯] more · 确认.</td></tr>
+<tr><td>6 · Mark sheet, selected <span class="mono">886:12538</span></td><td>Signs option selected (amber). Floating red variant card <span class="mono">1649:20934</span> = 已返情 selected state.</td><td>Annotation: <b>"toast提示操作成功 返回至：本舍 查情 页面"</b> — on confirm: success toast, navigate back to this barn's check page.</td></tr>
+<tr><td>7 · Mark sheet, locked <span class="mono">886:12576</span><br><span class="mono">返情检查-修改状态</span></td><td>Post-submit state of the same sheet.</td><td>Both options disabled — labels literally read "有返情迹象<b>（这是禁用状态）</b>" / "已返情（这是禁用状态）"; prior choice shown selected; button becomes <b>修改状态</b> (Modify status) to unlock. Two-step edit.</td></tr>
+<tr><td>8 · Submit confirm <span class="mono">814:3311</span><br><span class="mono">提交结果</span></td><td>Full-screen submit summary before certifying.</td><td>Location 1区-后备1舍. Three groups, each with count + chevron to a list and a <b>consequence line</b>: ✓ 未返情 100头 "将保留在批次内" (stays in batch) · ★ 有迹象 100头 "将保留在批次内" · ⊗ 已返情 100头 <b>"将从批次中移出"</b> (removed from batch). 取消 / 确认提交.</td></tr>
+<tr><td>9 · End task, goal met <span class="mono">952:4609</span></td><td>结束任务 confirm, green variant.</td><td>已达到任务目标; day-dots all green (7); 已返情/未返情 ⓘ 2/200 (1%). 执行详情: ✓ "达到生产状态，继续跟随批次" = 未返情母猪 100 + 有迹象母猪 100 = 200头 · ⊗ "未达到生产状态，已从批次中移出" = 已返情母猪 100头. Checkbox <b>"我已知晓，确认结束任务"</b> gates the button.</td></tr>
+<tr><td>10 · End task, goal missed <span class="mono">952:4672</span></td><td>Amber variant of 9.</td><td>未达到任务目标; day-dots 2 green + 3 amber (missed days); 10/200 (5%) amber; same execution details and checkbox.</td></tr>
+<tr><td>11 · Ended · pig list <span class="mono">5913:9251</span></td><td>Read-only record browser after task end. (Nav title reads 查情 — reused template.)</td><td>Search 耳标号/耳缺号 + funnel; <b>outcome tabs</b> 未返情(80) | 有返情迹象(0) | 已返情(0); unit chip 1区-母猪车间-1单元; per-unit summary card 未返情100 · 有返情迹象1 · 已返情1 · 未检查1 + stacked bar (an English twin of the card exists: Not in Return / Suspected Return / Returned / Not Checked); rows = pen · tag · recorder · timestamp. Row A25 shows <b>未配种</b> (never bred) instead of attribution — annotated <b>"未配种的样式"</b> (the not-bred style).</td></tr>
+<tr><td>12 · Ended · task detail <span class="mono">5752:5687</span></td><td>Detail tab after end.</td><td>Badge 已结束; 7 green dots; 已返情/未返情 10/200; returned list link; 返情率 5% (目标≤5%); 任务配置 now shows <b>both</b> 第1次返情检查 and <b>第2次返情检查</b> (each: start day 18 after mating · 7天 · 2次/日 · 08:00,12:00 — placeholder data identical); SOP.</td></tr>
+<tr><td>13 · Ended · filter <span class="mono">5752:5645</span></td><td>Filter for the record browser.</td><td>最后一次检查日期 (last-check date picker) · 单元 全部/1–4单元 · 重置/确认.</td></tr>
+</tbody>
+</table>
+<div class="note"><b>Placeholder incoherence worth noting:</b> the list tab badge says 第1/3天 with 5 dots, config says 7 days, end screens show 7 and 5 dots. N is config-driven; nothing in the section pins it. Also screens 11's nav title (查情) and its English-labeled twin card show the "ended" trio is a half-adapted shared template, not a designed surface.</div>
+
+<h2>2 · Requirements distilled</h2>
+<h3>Data captured (the farmer's hand)</h3>
+<table>
+<thead><tr><th style="width:30%">Field</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Signs of return · 有返情迹象</td><td>flag (per sow, per check)</td><td>Repeatable across checks; "unstable" observation, sow stays in batch. Auto: recorder + timestamp.</td></tr>
+<tr><td>Returned · 已返情</td><td>terminal mark (per sow)</td><td>The one consequential fact: sow is not pregnant → leaves batch, rebreed. Auto: recorder + timestamp.</td></tr>
+<tr><td>Correction of either mark</td><td>edit, audited</td><td>Production: 修改状态 unlock → re-pick. Requirement is edit-with-audit, not the two-step lock.</td></tr>
+<tr><td>Round certification</td><td>assertion (per pen / per round)</td><td>Production: one 提交结果 per unit; unmarked ⇒ 未返情. The data requirement: an explicit "rest seen, no return" assertion so negatives are claims, not silence.</td></tr>
+</tbody>
+</table>
+<p style="margin-top:6px">That is the entire capture surface. No numbers, no text, no photos. (The sheet's [⋯] menu contents are unspecified in this section.)</p>
+<h3>Derived by system (never asked)</h3>
+<table>
+<tbody>
+<tr><td>Per-sow expected return date 预计返情 = her mating date + config start-day (18). Day counts ("day 20", "in 5 days"), window entry/exit, 返情窗口/返情期间/监测期内 phrasing — all one derived number dressed eight ways.</td></tr>
+<tr><td>Day gauge (day n of N), per-day check count, missed days (amber dots).</td></tr>
+<tr><td>Group counts: not-returned / signs / returned / unchecked; per-unit and per-pen aggregates; grid card states.</td></tr>
+<tr><td>Return rate % vs target; KPI refresh (production: on submit — annotation "每提交一次结果，刷新一次KPI"; ours: live).</td></tr>
+<tr><td>Batch consequence: returned → 移出批次 → rebreed cohort (spawn rule); not-returned + signs → carry with batch to pregnancy check.</td></tr>
+<tr><td>No-data state 获取不到状态 (missing mating record ⇒ no expected date); 未配种 exclusion (sow in room, never bred ⇒ not in cohort).</td></tr>
+</tbody>
+</table>
+<h3>Configuration (per farm / per task)</h3>
+<table>
+<tbody>
+<tr><td>Start: day <b>18</b> after mating · window <b>7</b> days · checks/day <b>2</b> at <b>08:00, 12:00</b> · target return rate ≤ <b>5%</b> · SOP document · <b>pass number</b> (第1次/第2次返情检查 — production supports a second configured pass per batch).</td></tr>
+</tbody>
+</table>
+
+<h2>3 · Subtraction analysis</h2>
+<table>
+<thead><tr><th style="width:28%">Production element</th><th style="width:10%">Verdict</th><th>Justification</th></tr></thead>
+<tbody>
+<tr><td>8-string row status vocabulary (返情期/进入返情期间/返情窗口/预计返情×3/监测期内/…)</td><td><span class="cut">CUT</span></td><td>Eight phrasings of one derived date. Our grammar (01b) says it in two: <span class="mono">In window · day 20</span> / <span class="mono">Window · in 5 days</span>, plus honest <span class="mono">No data</span>. Three of production's states were so unclear the legend entries are literally <span class="mono">XXXX</span>.</td></tr>
+<tr><td>状态说明 status legend on task detail</td><td><span class="cut">CUT</span></td><td>A legend is the tax a bad vocabulary pays. Fix the words (above) and it has nothing to explain. The one load-bearing sentence in it — returned ⇒ moved out of batch — moves to where the act happens (row stamp + end-task summary).</td></tr>
+<tr><td>提交结果 button + submit-confirm screen (8) + KPI-only-on-submit rule</td><td><span class="cut">CUT</span></td><td>Room screens carry no Save/Submit (law). Marks commit themselves; KPI is live; unmarked sows simply stay in their state — no negative is ever asserted, silently or explicitly (per-pen confirms were considered and rejected: pens aggregate, they do not attest). The consequence lines (stays / leaves batch) are kept but stated inline — see deltas.</td></tr>
+<tr><td>Pen-grid tab + 10 card states + its filter caveat</td><td><span class="cut">CUT</span></td><td>Navigation-only surface. Pen picker (02) + status-chip matrix (02b: <span class="mono">2 signs › 3 due · returned · due 4d</span>) + peek (02c) already cover "which pen needs me" without a second stateful view. Grid never acts (law).</td></tr>
+<tr><td>Two-radio mark sheet (5/6)</td><td><span class="keep">KEEP</span></td><td>Correct and already ours: outcome sheet (04, "Row → outcome sheet"). Signs and Returned are also bar actions on the box row (01: <span class="mono">Signs · Mark returned</span>) — the sheet is for the deliberate single case; bulk is for the sweep. No "no return" option — matches no-per-sow-negatives law.</td></tr>
+<tr><td>Sheet header vitals 母猪·650日龄·3胎</td><td><span class="keep">KEEP</span></td><td>Pin the generic "vitals" of our sheet header to: sow · age-days · parity. Display-only, from master data.</td></tr>
+<tr><td>修改状态 disabled-then-unlock edit (7)</td><td><span class="cut">CUT</span></td><td>Two taps to start an edit. Our done rows carry ✎ → same sheet pre-filled with audit line (04 "Edit a done row"). Lock ceremony gone, auditability kept.</td></tr>
+<tr><td>单元进度 card + 总任务进度 card + 返情率 card + 已返情猪只列表 link (duplicated across both tabs)</td><td><span class="merge">MERGE</span></td><td>One ctxbar: Unit KPI cell (5% return rate · target ≤5%) | Task overview cell (3/7 days · day gauge · 2 returned) — already rendered (01). Returned-pigs list = the Returned lens; deep stats live in the task detail sheet (03).</td></tr>
+<tr><td>Day-dots progress</td><td><span class="keep">KEEP</span></td><td>Right instinct — return-heat is a watch task, progress <i>is</i> days. Ours: seven-segment day gauge, green done / amber missed (01, 03).</td></tr>
+<tr><td>End-task screens (9/10) with goal state + consequence summary</td><td><span class="merge">MERGE</span></td><td>One End task confirm inside the task detail sheet (03). Keep: goal met/missed, day gauge with missed days, returned/total vs target, and the two consequence groups (stay with batch / moved out). The "我已知晓" checkbox is ceremony — the summary <i>is</i> the acknowledgment; one clearly-worded destructive button suffices.</td></tr>
+<tr><td>Ended trio (11/12/13): outcome-tab list, per-unit twin cards, last-check-date filter</td><td><span class="cut">CUT</span></td><td>A third rendering of the same records on a half-adapted template (wrong nav title, bilingual twin cards). After end, the task detail sheet keeps config + KPIs + day history; records live on sow cards and batch reports. No dedicated browsing UI for a finished sweep.</td></tr>
+<tr><td>Filter (4): status × expected-time × row</td><td><span class="merge">MERGE</span></td><td>Status dimension = the lens (No return / Returned / All + SIGNS chip). Keep in funnel (01c): 预计返情时间 buckets (the one time dimension) and location (row). Grid-filter caveat dies with the grid.</td></tr>
+<tr><td>未配种 not-bred style; 获取不到状态 no-data state</td><td><span class="keep">KEEP</span></td><td>Honest states. Not-bred sows appear dimmed in the All lens with lifecycle state (01 All-lens rule); no-data rows say <span class="mono">No data</span> and are fixable via the mating record, never hidden.</td></tr>
+<tr><td>Search by 耳标号/耳缺号 · scan FAB</td><td><span class="keep">KEEP</span></td><td>Dock: Go to pen · Scan ear tag · search (law). Add ear-notch as a search key — see data map.</td></tr>
+<tr><td>Toast + "返回至本舍页面" after confirm</td><td><span class="cut">CUT</span></td><td>No navigation bounce. Sheet closes, row moves lens with stamp, walk continues; Confirm &amp; next conveys to the next flagged sow (04).</td></tr>
+<tr><td>第1次/第2次返情检查 config passes</td><td><span class="keep">KEEP</span></td><td>Config, not UI: a batch may run a second watch pass. Each pass is simply another instance of this task; detail sheet names the pass.</td></tr>
+</tbody>
+</table>
+
+<h2>4 · Optimized flow — the farmer's walk</h2>
+<pre class="flow">
+Task list entry: "Return-heat check · Unit 4 · day 3/7 · 2 returned"
+│
+▼  return-heat list ································· (01, rendered)
+   header  Return-heat check · last checked 07:52 · G.H
+   ctxbar  [Unit 4 · 5% return rate · target ≤5%] [3/7 days ▮▮▮▯▯▯▯ · 2 returned]
+   lens    [No return 38] [Returned 8] [All 46]  (+ funnel: 预计返情时间 · row) (01c)
+   rows    [□] 000254  In window · day 20  SIGNS   signs 10h · G.H
+           [□] 000268  In window · day 21          2 matings · JY001
+           [□] 000231  Window · in 5 days (dim)    2 matings · JY001
+           [□] 000275  No data                     1 mating · JY001
+   dock    [Go to pen A2] [Scan ear tag] [search: tag · ear notch]
+│
+├─ sweep, the common case: tick boxes / scan ─────── (04 bulk mark, 04b scan)
+│    bar rises: ✕ 3 selected · [Signs] · [Mark returned]
+│    tap → marks commit, rows move lens with stamp, bar clears
+│
+├─ single deliberate case: tap row ───────────────── (04 outcome sheet)
+│    sheet: 000254 · A2 · sow · 650 d · parity 3
+│    (•) Signs of return   ( ) Returned          [note]
+│    [Confirm] [Confirm & next]  → next flagged sow, same pen
+│
+├─ returned committed ────────────────────────────── (spawn rule, unified §2)
+│    row → Returned lens, stamp: Returned · Jul 8 · G.H ✎
+│    stamp line 2: out of batch · rebreed queued          ◄ delta 1
+│    sow leaves cohort; appears in heat-check/breeding cohort
+│
+├─ pen clear: header count reaches 0 ────────────── (derived, no assertion)
+│    unmarked sows stay "no return" — the absence of a mark is the record
+│    day slot certifies when its round's pens are confirmed; gauge ticks   ◄ delta 2
+│
+└─ task overview › task detail sheet ─────────────── (03, rendered)
+     Batch wk 32 · day 3/7 · gauge · Returned Unit 4 · Unit 6: 1 · 1
+     KPI 5% return rate · target ≤5%
+     Config: starts day 18 after mating · 2/day 08:00·12:00 · 7 d · pass 1 of 2
+     SOP › · End task
+       └─ End task confirm (in-sheet) ◄ delta 3
+            goal met/missed · gauge (amber = missed days) · 2/200 (1%) vs ≤5%
+            stays with batch: no return 190 + signs 8   → pregnancy check
+            moved out of batch: returned 2              → rebreed
+            [Cancel] [End task]
+</pre>
+<h3>Deltas (all that needed design)</h3>
+<table>
+<tbody>
+<tr><td style="width:8%"><b>1</b></td><td>Returned-row stamp carries its consequence: <span class="mono">out of batch · rebreed queued</span>. Production buried this sentence in a legend and a submit screen; it belongs on the record trail the moment the mark commits (undo window applies, marks commit themselves).</td></tr>
+<tr><td><b>2</b></td><td>Watch-task round semantics: a <i>day</i> segment certifies when that day's configured rounds (2×) have their pens confirmed. Signs flags persist across checks until the window closes or the sow returns; at window end unreturned signs-sows simply stay with the batch, flag rides their trail into pregnancy check.</td></tr>
+<tr><td><b>3</b></td><td>End-task confirm for return-heat gains the two-group consequence summary (stays with batch → pregnancy check / moved out → rebreed) — the only task-specific content in an otherwise standard end-task sheet (sweep task ⇒ End task lives in detail sheet only).</td></tr>
+</tbody>
+</table>
+
+<h2>5 · Data-capture map</h2>
+<table>
+<thead><tr><th style="width:26%">Field</th><th style="width:37%">Where in new flow</th><th>Production origin</th></tr></thead>
+<tbody>
+<tr><td>Signs of return (flag + auto who/when)</td><td>Bar action <span class="mono">Signs</span> (bulk/scan) · outcome sheet radio</td><td>Sheet 886:12500 option 1; row state 有返情迹象：x小时前</td></tr>
+<tr><td>Returned (mark + auto who/when)</td><td>Bar action <span class="mono">Mark returned</span> · outcome sheet radio; stamp with consequence</td><td>Sheet option 2 已返情; legend + submit screen 814:3311 "移出批次"</td></tr>
+<tr><td>Optional note</td><td>Outcome sheet note field</td><td>— (absent in production; our sheet standard)</td></tr>
+<tr><td>Negative outcome (未返情)</td><td>Never asserted — derived at window close from the absence of a return mark; check activity is the compliance record</td><td>Implicit unmarked-⇒-未返情 at 提交结果 (814:3311)</td></tr>
+<tr><td>Correction</td><td>✎ on done row → same sheet, audit line</td><td>修改状态 flow 886:12576</td></tr>
+<tr><td>Ear-notch identity 耳缺号</td><td>Dock search accepts tag <i>or</i> notch; scan unchanged</td><td>Search placeholder, screens 1/11 — <b>new to our spec</b></td></tr>
+<tr><td>Pass number (1st/2nd return check)</td><td>Task instance config, named in detail sheet ("pass 1 of 2")</td><td>第1/2次返情检查 blocks, 5752:5687 — <b>new to our spec</b></td></tr>
+<tr><td>Sow vitals at mark (age-days · parity)</td><td>Outcome sheet header (display-only)</td><td>母猪，650日龄，3胎 header 886:12500</td></tr>
+<tr><td>Config: start d18 · 7 d · 2/day+times · target ≤5% · SOP</td><td>Task detail sheet (03) config block</td><td>任务配置 634:13337 / 5752:5687</td></tr>
+</tbody>
+</table>
+
+<h2>6 · Open questions</h2>
+<table>
+<tbody>
+<tr><td style="width:6%">1</td><td><b>Second pass reality.</b> 第2次返情检查 exists in config with placeholder-identical values (both "day 18"). Do farms actually run a second watch (e.g. day 39–45, second cycle), and is it a separate task instance on the shrunken batch?</td></tr>
+<tr><td>2</td><td><b>When does "returned" bite?</b> Production removes the sow from batch only at 提交结果. We commit at mark time with undo. Is instant batch removal (rebreed queueing) acceptable, or must removal wait for a round boundary for compliance reasons?</td></tr>
+<tr><td>3</td><td><b>Day certification with 2 checks/day.</b> What makes a day green — both rounds confirmed, either one, or presence by the configured times? (Production's amber dots imply missed days are tracked; the rule is nowhere stated.)</td></tr>
+<tr><td>4</td><td><b>Signs at window end.</b> A sow flagged signs on day 7 but never returned: does she carry to pregnancy check silently, or should the flag force an early/priority pregnancy check (production's "unstable" wording hints at this)?</td></tr>
+<tr><td>5</td><td><b>Sheet [⋯] menu.</b> Contents unspecified in this section (sow card? health report?). Confirm scope before assuming.</td></tr>
+<tr><td>6</td><td><b>Task length N.</b> Badge says 1/3天, config says 7天, dots show 5. Confirm N is purely config-driven and what the default is (18+7 ⇒ day 18–24 window).</td></tr>
+</tbody>
+</table>
+
+</div>

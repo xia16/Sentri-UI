@@ -1,0 +1,201 @@
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F7F6F2;--card:#FFF;--well:#EFEEE8;--ink:#1C1E19;--ink2:#51544B;--ink3:#8B8E83;--hair:#E7E6DF;--hair2:#D8D7CE;--red:#C2402E;--amber:#96660D;--amber-fill:#D99A21;--amber-wash:#F8F0DC;--green:#3B8A50;--green-wash:#EAF2EC;--mono:'IBM Plex Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:40px 48px 90px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.015em;margin:18px 0 10px}
+h2{font-size:21px;font-weight:800;margin:44px 0 14px;padding-top:28px;border-top:1px solid var(--ink)}
+h3{font-size:15px;font-weight:700;margin:20px 0 8px}
+p{max-width:72ch;color:var(--ink2);margin-bottom:10px}
+.anno{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+.mono{font-family:var(--mono);font-size:12.5px}
+.cut{color:var(--red);font-weight:700}.keep{color:var(--green);font-weight:700}.merge{color:var(--amber);font-weight:700}
+pre.flow{font-family:var(--mono);font-size:12px;line-height:1.7;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:12px 0;color:var(--ink)}
+.note{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px 16px;margin:12px 0;font-size:13.5px;color:var(--ink2);max-width:none}
+</style>
+
+<div class="wrap">
+
+<h1>Heat check · 查情</h1>
+<p>The daily sweep that finds sows in heat. Production spends 35 frames on a binary judgment
+plus a round certificate; the optimized flow is our unified list with a two-option outcome
+sheet — everything else is navigation, legend, or accounting the system derives itself.</p>
+<span class="anno">figma 139:13192 · psrxDa9LRWLdTL9XMZmWdc · 35 frames read (31 distinct screens/sheets/dialogs; 4 are sheet-header variants of one component) · two modules: 任务进行中 in-progress · 任务已结束 ended · plus 转移单头猪 transfer sub-flow (2026.1.23)</span>
+
+<h2>1 · Production inventory</h2>
+
+<h3>Module A — task in progress (任务进行中)</h3>
+<table>
+<thead><tr><th style="width:24%">Screen / sheet</th><th style="width:38%">What it shows</th><th>Data on it</th></tr></thead>
+<tbody>
+<tr><td>Tab: pig List (查情·猪只List) <span class="mono">431:11646</span></td><td>Unit progress card + target list. Search, funnel, List/Grid toggle. Pen group header carries a "never submitted results" (未提交过结果) badge. Sticky <b>Submit results</b> bar, floating scan button.</td><td>Last check: person + timestamp. Day 2/3. Cumulative in-heat / target 100/200 (50%) + bar. Link: in-heat pig roster. Count card "200 pigs — mark those in heat or showing signs". Rows: ear tag · status word · trailing act (light arrow = view, filled green = act now, pencil = done-editable). Statuses: expected heat in 5 d / window reached (已到预计发情期) / expected heat "–" (status unavailable — 拿不到发情状态) / signs 10 h ago / in heat. Red dot on tag = flagged; amber triangle = health badge.</td></tr>
+<tr><td>Tab: pen Grid (栏位Grid) <span class="mono">501:14234</span></td><td>Same header; pens as cards.</td><td>Per pen: code, one aggregated statement (all in heat / in heat ×5 / signs 10 h / expected 5 d / 200 not in heat / empty 空), head-count or single tag, red dot = pen holds flagged pigs. Annotation: whole-pen "status unavailable" case shown honestly.</td></tr>
+<tr><td>Pen drawer (栏位-多猪) <span class="mono">1152:4996</span></td><td>Tap a Grid card → bottom sheet listing that pen's pigs, identical rows to the List. Note: "all other tasks reference this page."</td><td>Same row data as List.</td></tr>
+<tr><td>Tab: task detail (任务详情) <span class="mono">441:12014</span></td><td>Whole-task progress, KPI, configuration, SOP link, 5-item status legend, red <b>End task</b> button.</td><td>5 units. Day 1/3. 100/200 (50%). Heat-rate KPI 70% (target 90%). Config: duration 7 d (01/01–01/07) · checks/day 2 · times 08:00, 12:00. SOP document. Legend defines the five row statuses (incl. "expected date computed from last heat or weaning"; "in heat → moves to Breeding after submit").</td></tr>
+<tr><td>Filter (筛选) <span class="mono">501:14396 · 827:2616</span></td><td>Sheet, collapsed and expanded states.</td><td>Heat status (all/unchecked/not-in-heat/signs/in-heat) · expected-heat time (all/≥2 d ago/yesterday/today/tomorrow/≥2 d later) · pen row A–G (multi-select, expandable). Annotations: Grid drops the row dimension; rounded corner = single-select, square = multi; a row with no candidates is hidden from options.</td></tr>
+<tr><td>Heat sheet (查情) <span class="mono">506:2534 · 634:12201 · 814:3184</span></td><td>The outcome sheet: default, selected, and committed (locked) states. Footer: bookmark toggle · ⋯ more · Confirm. Committed state disables both radios; a <b>Modify status</b> button re-arms them.</td><td>Header: pen chip · tag · vitals (sow · 650 d age · parity 3). Two radios: <b>signs of heat</b> (有发情迹象 — "signs but not yet in heat") · <b>in heat</b> (已发情).</td></tr>
+<tr><td>Sheet-header variants <span class="mono">1630:8858…8919</span></td><td>4 states of the header block.</td><td>Optional line 1: health — triage level + disease + symptoms ("urgent treatment: cold, persistent fever"), one line, ellipsis, chevron → pig detail. Optional line 2: flag — note text or "已被标记" (marked) when note empty, chevron → mark dialog. Red dot appears on the row/pen chip when flagged.</td></tr>
+<tr><td>Mark dialogs (添加标记 / 取消标记) <span class="mono">1094:4868</span></td><td>Add-mark dialog, unmark confirm, mark viewer.</td><td>Note textarea "color, shape, reason (optional)"; empty note submits value "marked". Unmark asks "cancel the mark on sow 000001?".</td></tr>
+<tr><td>More actions (更多操作) <span class="mono">1876:15130</span></td><td>Sheet behind ⋯.</td><td>Add mark · transfer room (转舍) · report death (上报死亡) · health management (健康管理).</td></tr>
+<tr><td>Submit results (提交结果) <span class="mono">716:13670</span></td><td>Per-room certification page reached from the sticky bar.</td><td>Location (1区-后备1舍). Counts: in heat 100 ("will transfer to Breeding task") · signs 100 · unchecked 100 ("all unchecked pigs default to <b>not in heat</b>"). Cancel / confirm; toast then back to the room's heat page.</td></tr>
+<tr><td>Submit rosters ×3 <span class="mono">814:3128 · 3221 · 3266</span></td><td>Drill-down from each count.</td><td>Pen-grouped tag lists: tag · status word · timestamp (unchecked rows have no timestamp). Search + filter.</td></tr>
+<tr><td>In-heat roster, all rooms (已发情猪只列表·全部舍) <span class="mono">1229:14451</span> + filter <span class="mono">1080:5450</span> + calendar <span class="mono">916:3273</span></td><td>Task-level roster reached from the progress card; own filter.</td><td>Room tabs (配怀 1–4) · pen-grouped tag · in-heat · timestamp. Filter: heat date (calendar — days with no heat greyed, unselectable) + pen row.</td></tr>
+<tr><td>End task (结束任务) <span class="mono">952:4145 · 4208 · 4266</span></td><td>Two outcome states + a no-removal variant.</td><td>Target met 190/200 · rate 95% (≥90) vs not met 100/200 · 50%. Execution detail: <b>reached production state, stays with batch</b> (in-heat 100) vs <b>not reached, removed from batch</b> (not-in-heat 100 + unchecked 100 = 200). Arm-the-button: type the removal head-count; when nothing to remove: checkbox "I understand, confirm end". After: home, focused on this room's tab.</td></tr>
+<tr><td>Interaction legend (交互说明) <span class="mono">1086:7929</span></td><td>Designer spec for the row.</td><td>Row body → task-action drawer; tag → pig detail. Hearts = health triage tier (hidden when healthy). Crosshair = flagged (hidden when not). Status text wraps to 2 lines. Filled green arrow = act now, recommended; pencil = can act, not recommended. Scan button opens the task drawer directly; exists on all tasks.</td></tr>
+</tbody>
+</table>
+
+<h3>Module B — transfer single pig (转移单头猪 · 2026.1.23)</h3>
+<table>
+<thead><tr><th style="width:24%">Screen</th><th style="width:38%">What it shows</th><th>Data on it</th></tr></thead>
+<tbody>
+<tr><td>More actions v2 <span class="mono">5636:4563</span></td><td>转舍 renamed 转移 (transfer).</td><td>Same four entries.</td></tr>
+<tr><td>Select location (选择位置) <span class="mono">5654:4582 · 4638 · 4613</span></td><td>Step 1: zone → workshop → room cascade (radio). Step 2: pen wheel.</td><td>Zones 1–5区 · workshops (后备/母猪车间) · rooms (1舍/2舍); crumb "1区-后备车间-1舍"; wheels: pen row A–G × pen number 1–3; "choose another unit" back path.</td></tr>
+<tr><td>Confirm (二次确认) <span class="mono">5638:4601</span></td><td>Transfer confirmation dialog.</td><td>"Transfer pig 000001?" origin → destination as full location paths.</td></tr>
+</tbody>
+</table>
+
+<h3>Module C — task ended (任务已结束)</h3>
+<table>
+<thead><tr><th style="width:24%">Screen</th><th style="width:38%">What it shows</th><th>Data on it</th></tr></thead>
+<tbody>
+<tr><td>Tab: pig list <span class="mono">5913:5368</span></td><td>Read-only archive. Primary tabs fixed to top; secondary status chips scroll horizontally.</td><td>Chips: in heat (80) · signs (10) · unchecked (20). Unit cards (1区-母猪车间-1单元): three counts + stacked bar; rows: pen chip · tag · recorded-by · timestamp.</td></tr>
+<tr><td>Tab: task detail <span class="mono">5913:5570</span></td><td>Ended summary.</td><td>Badge 已结束 · 190/200 (95%) · KPI 95% (target 90) · same config + SOP. No legend, no end button.</td></tr>
+<tr><td>Filter <span class="mono">5788:5497</span> + calendar <span class="mono">5913:5863</span></td><td>Archive filter.</td><td>Last-check date (calendar; days without this task greyed) + unit (1–4单元; same-named units merged in options, results list both full paths).</td></tr>
+</tbody>
+</table>
+
+<div class="note"><b>Designer-annotation findings (requirements, not decoration):</b> in-heat sows transfer to the Breeding task and leave heat check (907:12113) · red dot appears when a mark is added (1630:9119) · flag without note displays "已被标记" (2312:5341) · disease line chevron → pig detail, mark line chevron → mark dialog (1647:19653) · List filters = status+time+row, Grid filters = status+time; rounded = single-select, square = multi (886:12299) · calendar greys days with no data (916/5913) · after submit: toast, return to room; after end: home at room tab (920:2815, 928:5191) · pen drawer is the template for all tasks (1152:4996) · primary tabs pinned, secondary tabs scroll (5913:10192/10194) · same-named units merge in filter options (5919:7914).</div>
+
+<h2>2 · Requirements distilled</h2>
+
+<h3>Data captured (the farmer's hand)</h3>
+<table>
+<thead><tr><th style="width:30%">Field</th><th style="width:22%">Type</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Heat judgment, per sow per round</td><td>enum { signs · in-heat }</td><td>The task's one real capture. Absence of a mark = "not seen in heat" (semantics of absence are a product decision — §7). Timestamp + recorder attach automatically.</td></tr>
+<tr><td>Judgment correction</td><td>same enum, re-stated</td><td>Production locks the sheet then re-arms via "Modify status"; requirement is only: committed records are editable with audit.</td></tr>
+<tr><td>Needs-attention flag</td><td>boolean + note (text, optional)</td><td>"Color, shape, reason." Empty note stores "marked". Un-flag needs a confirm. Drives the red dot.</td></tr>
+<tr><td>Transfer destination (single pig)</td><td>location path (zone › workshop › room › pen)</td><td>Lifecycle side-record reachable from the sheet's More menu.</td></tr>
+<tr><td>Death report / health record</td><td>handoff</td><td>Entries only — the capture lives in those modules.</td></tr>
+<tr><td>End-task acknowledgement</td><td>confirm (+ removal count in production)</td><td>Certifies the batch consequence: non-reached sows leave the batch.</td></tr>
+</tbody>
+</table>
+
+<h3>Derived by the system (never asked)</h3>
+<p class="mono" style="max-width:none">expected-heat date (last heat / weaning + cycle) → "Due · today / in N days / No data" · day n of N · cumulative in-heat vs target · heat-rate % vs target · per-pen aggregation + counts · red dots (flag present) · health line (triage + disease + symptom, from health module) · rosters by outcome, per room / unit / pen · unchecked count · stays-with-batch vs removed-from-batch tallies at end · who/when stamps · in-heat → Breeding cohort handoff · calendar day availability · "row with no candidates" hidden from filter options</p>
+
+<h3>Configuration (set once, per farm/batch)</h3>
+<p class="mono" style="max-width:none">task window (7 d) · checks per day (2) · check times (08:00 · 12:00) · target in-heat count (200) · heat-rate target (≥90%) · SOP document · batch rule: end-task removes non-reached sows</p>
+
+<h2>3 · Subtraction analysis</h2>
+<table>
+<thead><tr><th style="width:26%">Production element</th><th style="width:9%">Verdict</th><th>Justification</th></tr></thead>
+<tbody>
+<tr><td>Submit-results page + its 3 drill rosters (4 screens)</td><td><span class="cut">CUT</span></td><td>A whole certification ceremony for counts the header already shows. Our law: actions commit themselves, rounds are ambient, nothing is submitted on a room screen. The counts are the lens counts; the rosters are the "In heat" lens and the task overview (03). The one real assertion it carried — "unchecked defaults to not-in-heat" — is simply dropped: unmarked sows keep their state, and no negative is ever asserted, silently or per pen (pen headers aggregate, they do not attest). Check activity is the compliance record; see §7 Q1.</td></tr>
+<tr><td>Pen Grid tab + pen drawer</td><td><span class="cut">CUT</span></td><td>A second rendering of the same list one tap deeper. Navigation is the dock: Go to pen → pen picker (02), long-press peek (02c) shows inside without acting. The Grid's aggregated pen statement survives as the picker cell's one chip (02b); the red dot survives on the cell.</td></tr>
+<tr><td>Status legend (状态说明) + instruction card ("please mark…")</td><td><span class="cut">CUT</span></td><td>A legend that explains icons is a status vocabulary that failed. Our words carry it: <span class="mono">Due · today</span>, <span class="mono">Due · in 5 days</span>, <span class="mono">No data</span>, <span class="mono">SIGNS</span> chip, <span class="mono">In heat · 07:31</span> (01b). The "in heat → breeding" fact rides the outcome sheet as the option's consequence hint (<span class="mono">→ breeding</span>, 04).</td></tr>
+<tr><td>Ended-task module (2 tabs + filter + calendar)</td><td>MOVE</td><td>Four screens of read-only archive. Same data, derived; belongs to reports/history, not a barn surface. The ended detail sheet's numbers are the task detail sheet (03) frozen.</td></tr>
+<tr><td>Task-level in-heat roster + room tabs + heat-date filter + calendar</td><td>MOVE</td><td>Record trail, not a walk surface. Lives behind the task overview cell (03) as a drill; per-room slicing is the room lens itself.</td></tr>
+<tr><td>List/Grid toggle control</td><td><span class="cut">CUT</span></td><td>With the Grid gone the toggle goes; the picker is the spatial view.</td></tr>
+<tr><td>Filter: heat-status dimension</td><td><span class="cut">CUT</span></td><td>That is the lens (Not in heat / In heat / All) — always visible, never buried in a sheet (01c).</td></tr>
+<tr><td>Filter: pen-row dimension</td><td><span class="cut">CUT</span></td><td>That is Go to pen (02). Expected-heat time stays as the one time dimension (01c), incl. the hide-empty-options rule.</td></tr>
+<tr><td>"Never submitted" pen badge (未提交过结果)</td><td><span class="merge">MERGE</span></td><td>Pen header already states <span class="mono">4 of 6 left</span> / confirmed; a second submission flag restates it.</td></tr>
+<tr><td>Committed-sheet lock + "Modify status" re-arm</td><td><span class="cut">CUT</span></td><td>An extra state machine to protect a two-option record. Done rows show ✎ and re-open the same sheet pre-filled, audited (04 edit). One mechanism, all tasks.</td></tr>
+<tr><td>Heat sheet (signs / in-heat radios)</td><td><span class="keep">KEEP</span></td><td>Is exactly our outcome sheet (04): radio cards with consequence hints, Confirm &amp; next conveyor. Bulk path: row checkboxes → bar <span class="mono">[Signs] [Mark in heat]</span> — production's per-sow sheet at 2×/day × 200 sows was the pain point.</td></tr>
+<tr><td>Needs-attention flag + note + red dot</td><td><span class="keep">KEEP</span></td><td>True capture we lacked. Becomes delta D2: flag toggle on the outcome sheet, note optional, <span class="mono">⚑</span> token in the row's metadata line (chip law: chips are for escalated/flagged observations — SIGNS already owns the chip here, so the flag rides line 2 + the picker cell dot).</td></tr>
+<tr><td>Health line + triage hearts</td><td><span class="keep">KEEP</span></td><td>Display-only from the health module: heart token on the row meta, one health line in the sheet header → pig detail. Delta D1.</td></tr>
+<tr><td>More menu (mark · transfer · death · health)</td><td><span class="keep">KEEP</span></td><td>Lifecycle ops belong behind ⋯ on the outcome sheet — present in every task, designed once. Delta D3.</td></tr>
+<tr><td>Transfer wizard (3 screens + confirm)</td><td><span class="merge">MERGE</span></td><td>Cascade + wheel + confirm collapse into one sheet: location path picker + pen, confirm inline showing origin → destination. Keep the origin/destination readback — it is the error-catcher.</td></tr>
+<tr><td>End-task screens (met / not-met / no-removal)</td><td><span class="merge">MERGE</span></td><td>One flow in the task detail sheet (03 already has End task). Outcome card + stays/removed accounting KEEP — it is the batch consequence. Two different arming mechanics (type the count vs checkbox) become one explicit confirm; retyping a number with gloves is friction theater (§7 Q2).</td></tr>
+<tr><td>Search by ear tag / ear notch</td><td><span class="keep">KEEP</span></td><td>Dock search accepts both keys. Delta D5.</td></tr>
+<tr><td>"Status unavailable" rows/pens (拿不到状态)</td><td><span class="keep">KEEP</span></td><td>Honest <span class="mono">No data</span> state already in our row grammar (01b).</td></tr>
+<tr><td>Scan button</td><td><span class="keep">KEEP</span></td><td>Scan-into-selection, no new screen (04b).</td></tr>
+<tr><td>Toast + return conventions</td><td><span class="keep">KEEP</span></td><td>Ambient confirmations, not screens.</td></tr>
+</tbody>
+</table>
+
+<h2>4 · Optimized flow</h2>
+<pre class="flow">
+OPEN Heat check
+  header: Unit KPI 70% heat rate · target ≥90        → 01 header (unchanged)
+          Task overview 62/100 in heat · day 2 of 3
+  lens:   [ Not in heat 38 ] [ In heat 8 ] [ All 46 ] (+ funnel: expected-heat time)
+                                                     → 01 lens · 01c filter
+
+WALK, pen by pen (rows pen-grouped, physical order)  → 01 list
+  row = [box] tag · Due·today [SIGNS] · weaned 4d · signs 10h · G.H
+        (+ ⚑ flag token, + ♥ health token — D1 D2)   → 01b row grammar
+  ├─ standing heat, obvious ×n:  tick boxes
+  │     bar rises: [✕ 2 selected] [Signs] [Mark in heat]
+  │     → marks commit, rows move lens, bar clears   → 04 bulk mark
+  ├─ needs a look: tap row body
+  │     outcome sheet: A2 · 000254 · parity 3 · 650d
+  │       (health line → pig detail · flag line → note)   D1 D2
+  │       ( ) Heat signs   watch · stays
+  │       (•) In heat      → breeding
+  │       [⚑] [⋯ More] [Confirm] [Confirm & next]    → 04 outcome sheet
+  │     ⋯ More: flag+note · transfer · death · health     D2 D3
+  ├─ sow at the trough, tag unreadable in the row:
+  │     Scan ear tag → her box ticks, bar rises      → 04b scan
+  ├─ rest of pen quiet: pen header → "rest not in heat"
+  │     pen count reaches 0 — derived, no assertion; unmarked sows keep their state
+  └─ next pen: dock Go to pen (cells carry the pen's
+        one statement + flag dot)                    → 02 picker · 02b · 02c peek
+
+NO submit. Records committed as made; round is ambient.
+  done row: In heat · 07:31 · G.H  ✎ (edit, audited) → 04 edit
+
+TASK LEVEL: tap Task overview cell                   → 03 detail sheet
+  progress whole task · per-unit split · KPI · config
+  (checks/day 2 · 08:00/16:00 · window 7d) · SOP ›
+  in-heat roster (record trail w/ stamps) lives here as a drill
+  END TASK (day N or target met):
+    reached state → stays with batch      100
+    not reached  → removed from batch     200
+    [Confirm end — removes 200 from batch]           → D4 (one confirm)
+    → home, focused on this room
+</pre>
+
+<h3>Deltas — the only new design this task needs</h3>
+<table>
+<thead><tr><th style="width:8%">#</th><th style="width:32%">Delta</th><th>Spec</th></tr></thead>
+<tbody>
+<tr><td>D1</td><td>Health surfacing on row + sheet</td><td>Heart token in row metadata when triage ≠ healthy; one-line health fact (triage + disease + symptom, ellipsised) in the sheet header, chevron → pig detail. Display only — captured by the health module.</td></tr>
+<tr><td>D2</td><td>Needs-attention flag</td><td>Toggle on the outcome sheet footer; optional note ("color, shape, reason"); empty note stores "marked". Row meta gains <span class="mono">⚑</span> token; picker cell gains the dot; un-flag confirms. All tasks inherit it.</td></tr>
+<tr><td>D3</td><td>⋯ More lifecycle menu</td><td>Flag · Transfer · Report death · Health — on every outcome sheet. Transfer = one sheet: location cascade + pen wheel + inline origin → destination confirm.</td></tr>
+<tr><td>D4</td><td>End-task batch accounting</td><td>In the 03 detail sheet flow: outcome card (met/not-met vs targets) + stays/removed tallies + one explicit confirm naming the consequence. Replaces typed-count and checkbox variants.</td></tr>
+<tr><td>D5</td><td>Search keys</td><td>Dock search matches ear tag and ear notch (耳缺号).</td></tr>
+</tbody>
+</table>
+
+<h2>5 · Data-capture map</h2>
+<table>
+<thead><tr><th style="width:28%">Field</th><th style="width:34%">Where in the new flow</th><th>Production origin</th></tr></thead>
+<tbody>
+<tr><td>signs-of-heat mark</td><td>bar action [Signs] on selection · outcome-sheet radio</td><td>heat sheet radio 有发情迹象 (506:2534)</td></tr>
+<tr><td>in-heat mark</td><td>bar action [Mark in heat] · outcome-sheet radio (hint: → breeding)</td><td>heat sheet radio 已发情; transfer rule from legend + 907:12113</td></tr>
+<tr><td>"nothing to report" for a pen</td><td>Never asserted — derived from the absence of marks + recorded check activity</td><td>submit page's silent "unchecked → not in heat" default (716:13670)</td></tr>
+<tr><td>judgment correction</td><td>✎ on done row → same sheet pre-filled, audit line</td><td>modify-status state (814:3184)</td></tr>
+<tr><td>flag + note</td><td>⚑ toggle + note field on outcome sheet (D2)</td><td>添加标记/取消标记 dialogs (1094:4868)</td></tr>
+<tr><td>transfer destination</td><td>⋯ More → transfer sheet (D3)</td><td>选择位置 wizard + 二次确认 (5654:*, 5638:4601)</td></tr>
+<tr><td>death / health records</td><td>⋯ More → handoff to those modules</td><td>更多操作 entries (1876:15130)</td></tr>
+<tr><td>end-task acknowledgement</td><td>03 detail sheet → End task confirm (D4)</td><td>结束任务 typed count / checkbox (952:*)</td></tr>
+<tr><td>timestamp · recorder</td><td>automatic on every commit; shown as stamps</td><td>attribution lines throughout</td></tr>
+</tbody>
+</table>
+
+<h2>6 · Open questions</h2>
+<p style="max-width:none">
+<b>1 · Unchecked semantics.</b> Production bulk-defaults every unchecked sow to "not in heat" at submit. Our model asserts nothing: unmarked sows keep their state, and recorded check activity is the compliance evidence. Confirm that this evidence model satisfies the compliance requirement — no per-pen or per-sow negative confirmations exist by design.<br>
+<b>2 · End-task guard.</b> Removing 200 sows from a batch is destructive; production arms the button by making the worker retype the count. Keep a typed guard, or is one explicit confirm naming the consequence enough with gloves on?<br>
+<b>3 · Breeding handoff timing.</b> Production moves in-heat sows to Breeding "after submit". With ambient rounds there is no submit — does the sow join Breeding the moment she is marked (and leave this cohort immediately), or at round close?<br>
+<b>4 · Archive surface.</b> Ended-task module: fold into farm reports, or does the barn phone need per-task history at all?<br>
+<b>5 · Transfer scope.</b> The 2026.1.23 flow is single-pig only. Is bulk transfer (whole pen after weaning) a real need, or does single-pig cover the heat-check context?
+</p>
+
+</div>

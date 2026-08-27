@@ -1,0 +1,18 @@
+:root{
+--sp-05:2px;
+--sp-1:4px;
+--sp-2:8px;
+--sp-3:12px;
+--sp-4:16px;
+--sp-5:20px;
+--sp-6:24px;
+--sp-8:32px;
+--sp-10:40px;
+--sp-12:48px;
+/* Glove-friendly touch sizing */
+--touch-min:48px;
+--control-h-sm:36px;
+--control-h:48px;
+--control-h-lg:56px;
+--screen-pad:16px;
+}

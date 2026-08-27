@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentri — one product model</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F7F6F2;--card:#FFF;--well:#EFEEE8;--ink:#1C1E19;--ink2:#51544B;--ink3:#8B8E83;--hair:#E7E6DF;--hair2:#D8D7CE;--red:#C2402E;--amber:#96660D;--amber-fill:#D99A21;--amber-wash:#F8F0DC;--green:#3B8A50;--green-wash:#EAF2EC;--blue:#3E56C4;--mono:'IBM Plex Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:40px 48px 90px}
+h1{font-size:36px;font-weight:800;letter-spacing:-.02em;margin:18px 0 12px}
+h2{font-size:22px;font-weight:800;margin:48px 0 14px;padding-top:30px;border-top:1px solid var(--ink)}
+h3{font-size:15.5px;font-weight:700;margin:24px 0 8px}
+p{max-width:74ch;color:var(--ink2);margin-bottom:11px}
+.lede{font-size:17px;max-width:70ch}
+.anno{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--hair);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+.mono{font-family:var(--mono);font-size:12px}
+.zh{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.one{color:var(--ink);font-weight:700}.many{color:var(--green);font-weight:700}.mix{color:var(--blue);font-weight:700}
+pre.flow{font-family:var(--mono);font-size:12px;line-height:1.75;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:20px 22px;overflow-x:auto;margin:14px 0;color:var(--ink)}
+.note{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px 16px;margin:12px 0;font-size:13.5px;color:var(--ink2);max-width:none}
+.law{background:var(--card);border:1.5px solid var(--ink);border-radius:12px;padding:17px 19px;margin:16px 0;max-width:none}
+.law b{display:block;font-size:16px;color:var(--ink);margin-bottom:5px}
+.q{background:var(--amber-wash);border-left:3px solid var(--amber-fill);padding:11px 15px;margin:9px 0;font-size:13.5px;max-width:none}
+.new{background:var(--green-wash);border-left:3px solid var(--green);padding:11px 15px;margin:9px 0;font-size:13.5px;max-width:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>One product model</h1>
+<p class="lede">Reconciling the two production surfaces — 生产任务 (scheduled tasks) and 巡检
+(inspection) — into a single coherent product, on the design system we have already built.</p>
+<p class="anno">synthesis of: components.html + screens.html · 7 task docs · pig-actions.html · inspection PRD + 6 parts · ~290 production screens</p>
+
+<h2>1 · The problem we actually have</h2>
+<p>Two production files describe two apps that overlap heavily and agree on almost nothing:</p>
+<table>
+<thead><tr><th style="width:20%"></th><th style="width:38%">生产任务 — tasks</th><th>巡检 — inspection</th></tr></thead>
+<tbody>
+<tr><td>Trigger</td><td>Scheduled: batch, cohort, window, target</td><td>Recency: "last inspected 3 days ago"</td></tr>
+<tr><td>Scope</td><td>One task, across units</td><td>One unit, all subjects</td></tr>
+<tr><td>Subject</td><td>The task's cohort</td><td>Any pig in the unit — including pigs with no identity</td></tr>
+<tr><td>Ad-hoc actions</td><td><span class="zh">更多操作</span> — 7 rows, gated by task stage</td><td>Three sub-menus (生产 · 健康 · 记录) — 17 tiles, gated by selection eligibility</td></tr>
+<tr><td>Also has</td><td>Per-task lists, filters, grids, submit ceremonies, ended-task clones</td><td>Equipment inspection, pen-count calibration, environment + biosecurity readings</td></tr>
+</tbody>
+</table>
+
+<p><b>Seven actions are specified twice</b> — fostering, death reporting, treatment, transfer,
+health management, weaning and farrowing — with different flows, different bulk rules, different
+gating. Neither file references the other. Production's own consequence of this shows up as an
+instruction to the farmer: after fostering,
+<span class="zh">请在寄养后同步转出与接收栏位的任务进度</span> — <i>"please manually sync the task
+progress of both pens."</i> The system asks a human to reconcile its two halves.</p>
+
+<h2>2 · The claim that unifies them</h2>
+
+<div class="law"><b>Tasks do not own records. They observe events.</b>
+An <b>event</b> is something that happened to an animal — she came into heat, she aborted, she
+weighs 182 kg, she died. A <b>task</b> is a question the system asks about a cohort — "which of
+these 200 sows are in heat?" — with a window, a target and a progress reading.
+<span style="display:block;margin-top:8px">The same event can be discovered while doing scheduled
+work or while walking a unit. So the event is the record; the task is a <i>view</i> over the events
+it expects. Record a farrowing during a check-in and the farrowing task advances by
+construction — because the task was only ever counting farrowing events for its cohort.</span></div>
+
+<p>This single move dissolves the largest problems in both files:</p>
+<table>
+<thead><tr><th style="width:34%">Production problem</th><th>Why it disappears</th></tr></thead>
+<tbody>
+<tr><td>"Manually sync both pens' task progress" after fostering</td><td>Nothing to sync. The foster event changed both litters; every task counting those litters re-derives.</td></tr>
+<tr><td>分娩 and 断奶 exist as both a task and an inspection tile, with different forms</td><td>One event, one form. Two doors into it.</td></tr>
+<tr><td>Submit ceremonies that "certify" a round</td><td>Events are the record; a task's progress is derived, never asserted.</td></tr>
+<tr><td>Ended-task clone modules (a second read-only app per task)</td><td>Events persist independently of the task that observed them; history is the event log.</td></tr>
+<tr><td>Two ad-hoc menus with different contents</td><td>One event catalogue, surfaced identically everywhere.</td></tr>
+</tbody>
+</table>
+
+<h2>3 · Two surfaces, and nothing else</h2>
+
+<pre class="flow">   TODAY                     what needs me right now
+     │                       tasks with work · units not checked today · alerts
+     │
+     ├── task ──────────┐
+     │                  ▼
+     └── unit ──────►  THE LIST            one component, two modes
+                        │                  task mode: cohort · lens · task marks
+                        │                  unit mode: everyone · no lens · event actions
+                        │
+                        └── tick · tap · scan ──►  SELECTION   1..N pigs
+                                                    │
+                                                    └──►  THE VERB SHEET
+                                                          one catalogue, gated by the pigs</pre>
+
+<table>
+<thead><tr><th style="width:14%">Surface</th><th style="width:26%">Answers</th><th>Contents</th></tr></thead>
+<tbody>
+<tr><td><b>Today</b></td><td>"What needs me?"</td><td>Tasks with outstanding work, units not checked today, escalations (overdue, interval alerts, sick pigs). The only scheduling surface.</td></tr>
+<tr><td><b>The list</b><br><span class="anno">task mode</span></td><td>"Which of these need my judgment?"</td><td>Cohort-scoped. Lens = the task's pig-state partition. Selection bar = the task's marks. Everything already built in <span class="mono">components.html</span> · <span class="mono">screens.html</span>.</td></tr>
+<tr><td><b>The list</b><br><span class="anno">unit mode</span></td><td>"What is in this unit?"</td><td>Unit-scoped, every pig including un-identified groups, health as the row subject. No lens (no single question to partition by). Selection raises the verb sheet directly — nothing is promoted, because a walkthrough has no verb of its own. This is 巡检's worksheet and 生产任务's <span class="zh">猪只列表</span>, which were the same screen all along.</td></tr>
+<tr><td><b>Selection</b><br><span class="anno">not a screen</span></td><td>"These ones."</td><td>Ticking, tapping or scanning names 1..N pigs and raises the verb sheet — one catalogue, gated by the pigs, verbs only. It is the same sheet at N=1 and N=20, which is why <b>there is no separate pig-detail surface</b>: an earlier draft organised one pig by domain and was cut, because the farmer already knows the verb before opening the app. A pig <i>page</i> for reading her history remains possible and is deferred. See <span class="mono">components.html</span> 05.</td></tr>
+</tbody>
+</table>
+
+<div class="note"><b>The two list modes differ in exactly three ways</b> — scope (cohort vs unit),
+lens (present vs absent), and whether the bar promotes anything (a task names its verb, a walkthrough does not). Row
+anatomy, pen grouping, the dock, the pen picker, peek, search and scan are identical. It is one
+component with a mode flag, not two screens.</div>
+
+<h2>4 · The event catalogue</h2>
+<p>Every recordable thing in both files, deduplicated, grouped by subject. This replaces
+生产任务's <span class="zh">更多操作</span> (7 rows) and 巡检's three sub-menus (17 tiles).</p>
+
+<table>
+<thead><tr><th style="width:15%">Subject</th><th style="width:17%">Event</th><th style="width:9%">Arity</th><th style="width:31%">Captures</th><th>Both files?</th></tr></thead>
+<tbody>
+<tr><td rowspan="7"><b>Cycle</b><br><span class="anno">the sow's reproductive life</span></td>
+    <td>Heat</td><td class="many">Bulk</td><td>timestamp; optional batch join</td><td>巡检 tile · task mark</td></tr>
+<tr><td>Mating</td><td class="one">Single</td><td>semen batch / boar, sequence position, time</td><td>task (配种) · 巡检 backfill</td></tr>
+<tr><td>Pregnancy result</td><td class="many">Bulk</td><td>pregnant / not / unclear; recheck interval</td><td>task (孕检) · 巡检 意外妊娠</td></tr>
+<tr><td>Return to heat</td><td class="many">Bulk</td><td>acknowledgement — removes from batch</td><td>task (返情) · 巡检 发情 branch</td></tr>
+<tr><td>Abortion</td><td class="one">Single</td><td>cause (6 options), remarks if "other"</td><td><b>both</b>, different forms</td></tr>
+<tr><td>Farrowing</td><td class="one">Single</td><td>5 litter counts, last-birth time, final flag</td><td><b>both</b>, different forms</td></tr>
+<tr><td>Weaning</td><td class="mix">Conveyor</td><td>litter counts + weights + sex split + 留种; sow assessment</td><td><b>both</b>, different forms</td></tr>
+<tr><td rowspan="4"><b>Piglets</b><br><span class="anno">the subject is the piglets — a litter is a selection, not a thing you act on</span></td>
+    <td>Foster out / in</td><td class="one">Single</td><td>counterpart sow, piglet count or IDs, optional identities</td><td><b>both</b>, near-identical</td></tr>
+<tr><td>Piglet treatments</td><td class="many">Bulk</td><td>the age-day&#39;s treatments, ticked per litter</td><td>task only</td></tr>
+<tr><td>Piglet tag / weigh</td><td class="mix">Conveyor</td><td>per piglet: ear tag*, notch, sex, weight</td><td>task only · its own screen</td></tr>
+<tr><td>Count correction</td><td class="one">Single</td><td>system count vs observed, reason, allocations</td><td>巡检 calibration · 生产任务 数量异常 (deferred)</td></tr>
+<tr><td rowspan="5"><b>Health</b></td>
+    <td>Add condition</td><td class="many">Bulk</td><td>diseases + symptoms, photos, optional triage</td><td>巡检 · task hand-off</td></tr>
+<tr><td>Resolve condition</td><td class="many">Bulk</td><td>per-condition verdict, optional reason</td><td>巡检 only</td></tr>
+<tr><td>Triage level</td><td class="many">Bulk</td><td>one of 4 levels</td><td>巡检 only</td></tr>
+<tr><td>Treatment</td><td class="many">Bulk</td><td>drug*, method*, dose*, unit*, brand, target disease / symptom</td><td><b>both</b>, different designs</td></tr>
+<tr><td>Death</td><td class="mix">Conveyor</td><td>per pig: cause (disease + symptom), photos</td><td><b>both</b>, near-identical</td></tr>
+<tr><td rowspan="3"><b>Measure</b></td>
+    <td>Weight</td><td class="mix">Conveyor</td><td>kg — group vs individual model unresolved (§8)</td><td>巡检 only</td></tr>
+<tr><td>Backfat</td><td class="mix">Conveyor</td><td>qualitative (薄/适中/厚) or mm</td><td>巡检 only</td></tr>
+<tr><td>Temperature</td><td class="mix">Conveyor</td><td>°C</td><td>巡检 only</td></tr>
+<tr><td rowspan="4"><b>Identity<br>&amp; place</b></td>
+    <td>Transfer</td><td class="many">Bulk</td><td>destination pen; health records move or copy</td><td><b>both</b>, 生产任务 has no design</td></tr>
+<tr><td>Assign identity</td><td class="mix">Conveyor</td><td>ear tag*, sex*, notch, parents</td><td>巡检 wizard · task sub-form</td></tr>
+<tr><td>Mark / unmark 留种</td><td class="many">Bulk</td><td>none (requires identity first)</td><td>巡检 only</td></tr>
+<tr><td>Report missing</td><td class="many">Bulk</td><td>nothing beyond the selection</td><td>巡检 only</td></tr>
+<tr><td><b>Equipment</b><br><span class="anno">not a pig</span></td>
+    <td>Fault report / resolve</td><td class="one">Single</td><td>description*, device name* when type = other</td><td>巡检 only</td></tr>
+</tbody>
+</table>
+
+<p><span class="many">Bulk</span> one payload written to N records · <span class="mix">Conveyor</span> N payloads, one per subject, via <span class="mono">Confirm &amp; next</span> · <span class="one">Single</span> meaningless for more than one subject — absent from the batch sheet rather than greyed. Arity is a property of the event, not of a screen: ask whether the payload is the same for every subject. It decides the grouping of the Actions sheet — see <span class="mono">components.html</span> 05.</p>
+
+<h2>5 · Four laws</h2>
+
+<div class="law"><b>Law 1 · The subject decides the surface.</b>
+One pig → her sheet's ⋯. Several pigs → the list's selection bar. No pig yet → Today, or a unit.
+A farmer never has to remember <i>which</i> menu holds an action; only how many animals he is
+talking about. This replaces production's six entry surfaces and two menu vocabularies.</div>
+
+<div class="law"><b>Law 2 · The payload decides bulk.</b>
+Production wrote this rule twice and never generalised it. Generalised:
+<span style="display:block;margin-top:6px">• <b>Per-animal payload</b> → single only. Every reproductive event (its own timestamp and batch consequence) and every measurement (its own value).</span>
+<span style="display:block">• <b>Shared payload</b> → bulk. Treatment, triage, condition, transfer, 留种, missing — one form, N animals.</span>
+<span style="display:block">• <b>Shared selection, per-animal payload</b> → bulk selection, individual detail. Death is the only one: pick the animals together, give each its own cause.</span>
+<span style="display:block;margin-top:6px">Derivable, so no per-action configuration table has to be maintained — and it agrees with both of production's written lists.</span></div>
+
+<div class="law"><b>Law 3 · The animal's state decides availability — never the surface.</b>
+Production gates by task stage (生产任务) or by selection eligibility (巡检). Both are proxies.
+Gate on the animal: <i>is she bred?</i> <i>does she have a live litter?</i> <i>is she identified?</i>
+<i>is she located?</i> Then the same catalogue appears everywhere, unavailable rows disabled with a
+reason, and nothing can leak into a context where it cannot apply — which is why
+<span class="zh">流产</span> currently appears in piglet processing.
+<span style="display:block;margin-top:6px"><b>Partial eligibility must be visible.</b> Production runs the
+op on the eligible subset and silently drops the rest. Instead: list the blocked animals with the
+reason, and let the farmer proceed with the remainder deliberately.</span></div>
+
+<div class="law"><b>Law 4 · One record, two doors.</b>
+An event captured during a check-in and the same event captured during a task are the same
+record, the same form, the same validation. The only difference is the pre-fill and where you
+return to. No duplicate flows, no reconciliation step, no "sync progress manually".</div>
+
+<h2>6 · Identity — the concern we had not handled</h2>
+<p>Our design so far assumed every pig has an ear tag. The inspection file proves otherwise:
+un-identified pigs exist in numbers, and nearly every behaviour forks on it. This is the largest
+addition to the system.</p>
+<table>
+<thead><tr><th style="width:22%">Where</th><th>Behaviour required</th></tr></thead>
+<tbody>
+<tr><td>Row selection</td><td>An un-identified row represents <i>N head</i>, not one animal. Ticking it must ask <b>how many</b> — production's inline <span class="mono">✕ [− n +] ✓</span> stepper — and the row reads <span class="zh">已选 n/N</span>. Whole-pen selection forbids the quantity (it means "all").</td></tr>
+<tr><td>Search</td><td>Accepts ear tag <b>or</b> ear notch. Three task docs flagged this independently.</td></tr>
+<tr><td>Scan</td><td>NFC ear tag, with the notch picker (two tappable ear diagrams) as the manual fallback.</td></tr>
+<tr><td>Preconditions</td><td>留种 requires identity — <span class="zh">系统强制要求在标记为育种之前进行打耳标</span> — plus sex. Blocked rows must offer <b>Assign identity</b> inline rather than failing.</td></tr>
+<tr><td>Transfer</td><td>All-identified → one-tap. Contains un-identified → the longer path where pen-level health records are marked <b>move</b> or <b>copy</b>.</td></tr>
+<tr><td>Fostering</td><td>No identities → count stepper. Any identities → itemised list. Identity supplement only when the receiving pen has already done tag/notch/weight.</td></tr>
+</tbody>
+</table>
+<div class="new"><b>Assign identity is one event, reachable from anywhere it is a precondition.</b>
+Ear tag* and sex* are the only required fields; notch and parents are optional (parents derived
+when known, searched or scanned when not). It appears inline in 留种, in piglet processing, in
+fostering, and from the pig's ⋯ — always the same three steps.</div>
+
+<h2>7 · What this changes in the system we have built</h2>
+<table>
+<thead><tr><th style="width:26%">Component</th><th style="width:12%">Status</th><th>Change</th></tr></thead>
+<tbody>
+<tr><td>List · row grammar · lens · filter · pen picker · peek · dock</td><td><b>Unchanged</b></td><td>Everything in <span class="mono">components.html</span> 01b–02c stands. The inspection file validated the pen-grouped, scan-first, selection-bar model.</td></tr>
+<tr><td>Task detail sheet (03)</td><td>Extend</td><td>Progress becomes explicitly <i>derived from events</i>. Add cross-task close dependencies found in the task docs.</td></tr>
+<tr><td>Interaction sheets (04)</td><td>Extend</td><td>The nine rendered interactions become the event forms; add the events that exist only in 巡检 (measurements, triage, condition resolve, missing, 留种).</td></tr>
+<tr><td><b>List · unit mode</b></td><td><b>New</b></td><td>Same component, no lens, health as row subject; selection raises the verb sheet and nothing is promoted. Replaces 巡检's worksheet and 生产任务's 猪只列表.</td></tr>
+<tr><td><b>The verb sheet</b></td><td><b>New</b></td><td>Specified in <span class="mono">components.html</span> 05: selection names the subject, the sheet holds the verbs, gated by the pigs. Carries the full catalogue of §4 rather than production&#39;s seven rows — and replaces the pig-detail drawer an earlier draft proposed.</td></tr>
+<tr><td><b>Identity model</b></td><td><b>New</b></td><td>Un-identified groups, count selection, notch search, the assign-identity event (§6).</td></tr>
+<tr><td><b>Equipment</b></td><td><b>New</b></td><td>A second subject alongside pigs: device list per pen/unit, fault event, resolution. Deliberately outside the pig event model.</td></tr>
+<tr><td><b>The check-in</b></td><td><b>New</b></td><td>A stamp of unit · person · time in the unit header, asserting only that a named person covered it and found nothing further. Not a submission — everything positive was written during the walk — and not a verdict on the pigs. Unit-level environment and biosecurity readings sit beside it, optional. See <span class="mono">components.html</span> 05.</td></tr>
+<tr><td>Today</td><td><b>New</b></td><td>The only scheduling surface: task work, stale units, escalations.</td></tr>
+</tbody>
+</table>
+
+<h2>8 · Open decisions</h2>
+<p>Real product questions surfaced by the reconciliation, in the order they block work.</p>
+
+<div class="q"><b>1 · Does a check-in have a completion state at all?</b>
+<span style="color:var(--green);font-weight:700">Settled.</span> Production's
+<span class="zh">提交巡检</span> asserts <span class="zh">所有栏位与设备已检查完毕</span> but nothing
+validates it, and it is offered from a single-pen drill-down. It is not a submission: every
+condition, treatment and mark was written the moment it was recorded, so there is nothing left to
+send. What remains unclaimed is the <b>negative</b> — that a named person covered the unit and found
+nothing further — and that is the one fact the system cannot derive. So the act survives, but as a
+<b>stamp of unit · person · time in the unit header</b>, not a button at the door:
+<span class="mono">checked 09:41 · G. Hansen</span>. Repeatable, never a coverage claim.
+<b>No submit button exists anywhere in the product.</b> Environment readings are their own small
+event beside it. See <span class="mono">components.html</span> 05.</div>
+
+<div class="q"><b>2 · What makes an animal ineligible for an event?</b> Production shows the
+partial-eligibility dialog but never defines eligibility. We need the actual per-event
+preconditions (§4 gives the obvious ones; the rest need the domain).</div>
+
+<div class="q"><b>3 · Weight: group or individual?</b> Two incompatible models in the file, plus a
+third unplaced variant, plus an annotation saying weight is single-pig-only while six frames show
+a group model. This is a data-model question, not a UI one.</div>
+
+<div class="q"><b>4 · What distinguishes 移除 from 康复?</b> Remove vs recovered share one screen
+and one submit in production, with nothing stating the difference. They are probably "this was
+never true" vs "this is no longer true" — which matters for health history.</div>
+
+<div class="q"><b>5 · The four triage levels have no semantics.</b> Every description in the file is
+placeholder text. Needs a veterinary definition before it can drive anything.</div>
+
+<div class="q"><b>6 · Is fostering bulk?</b> 巡检 lists it bulk-capable; the flow picks one
+counterpart sow. Most likely "N" means N piglets moved, not N sows acted on — confirm.</div>
+
+<div class="q"><b>7 · Equipment scope.</b> Fault resolution has a button and no screen anywhere;
+feed stations are fully designed but marked <span class="zh">本期不开发</span>. Decide whether
+equipment ships with the first release or is a later subject.</div>
+
+<div class="q"><b>8 · Where do records get browsed?</b> Both files gesture at a toolbox holding
+lists (death records, missing pigs) without designing them. If events are first-class, an event
+log per animal and per unit is the natural home — and it replaces the ended-task clone modules.</div>
+
+</div>
+</body>
+</html>

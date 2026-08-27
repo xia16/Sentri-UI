@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>巡检 Inspection — requirements</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F7F6F2;--card:#FFF;--well:#EFEEE8;--ink:#1C1E19;--ink2:#51544B;--ink3:#8B8E83;--hair:#E7E6DF;--hair2:#D8D7CE;--red:#C2402E;--amber:#96660D;--amber-fill:#D99A21;--amber-wash:#F8F0DC;--green:#3B8A50;--green-wash:#EAF2EC;--mono:'IBM Plex Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1060px;margin:0 auto;padding:40px 48px 90px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.015em;margin:18px 0 10px}
+h2{font-size:21px;font-weight:800;margin:44px 0 14px;padding-top:28px;border-top:1px solid var(--ink)}
+h3{font-size:15px;font-weight:700;margin:22px 0 8px}
+p{max-width:74ch;color:var(--ink2);margin-bottom:10px}
+.anno{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--hair);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+.mono{font-family:var(--mono);font-size:12px}
+.one{color:var(--ink);font-weight:700}.many{color:var(--green);font-weight:700}.gap{color:var(--red);font-weight:700}
+pre.flow{font-family:var(--mono);font-size:12px;line-height:1.7;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:12px 0;color:var(--ink)}
+.note{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px 16px;margin:12px 0;font-size:13.5px;color:var(--ink2);max-width:none}
+.law{background:var(--card);border:1.5px solid var(--ink);border-radius:12px;padding:16px 18px;margin:14px 0;max-width:none}
+.law b{display:block;font-size:15.5px;color:var(--ink);margin-bottom:4px}
+.q{background:var(--amber-wash);border-left:3px solid var(--amber-fill);padding:10px 14px;margin:8px 0;font-size:13.5px;max-width:none}
+.zh{font-family:var(--mono);font-size:12px;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>巡检 — Inspection</h1>
+<p class="anno">requirements extracted from figma · file 4GZGPBauEOWQQjnRrzoUgF · section 60:408 · ~150 screens across 6 clusters · basis for redesign, not a redesign</p>
+
+<p>This is the second production surface, separate from 生产任务 (production tasks) and in its own
+Figma file. Where a task is a scheduled sweep with a cohort and a target, an inspection is an
+<b>unscheduled walk of one unit</b> during which a worker can act on any pig — change her
+reproductive status, record a measurement, open a health case, move her, report her dead — and
+inspect the unit's equipment. Nearly every ad-hoc action in the product lives here.</p>
+
+<div class="law"><b>What an inspection is</b>
+A per-unit walkthrough driven by <b>recency, not scheduling</b>. There is no work order, assignee
+or due date anywhere in the file. The worker taps 巡检 on home, sees every house stamped
+<span class="zh">上次巡检：1 分钟前，张强 … 365 天前，张华强</span>, picks one, and lands on a single
+scrolling worksheet listing every pen with its feed stations and pigs. Ticking rows arms a bottom
+bar of three sub-menus — <b>生产 · 健康 · 记录</b> — which is where all ad-hoc actions live.
+Closing out is one act, <span class="zh">提交巡检</span>, which asserts
+<span class="zh">所有栏位与设备已检查完毕</span> and then optionally collects unit-level
+environment and biosecurity readings.</div>
+
+<h2>1 · Module map</h2>
+<table>
+<thead><tr><th style="width:8%">Part</th><th style="width:20%">Cluster</th><th style="width:9%">Screens</th><th>Contains</th></tr></thead>
+<tbody>
+<tr><td class="mono">part-a</td><td><b>Patrol shell</b></td><td>24</td><td>Home (workshop / unit), unit picker, the worksheet in <b>List and Grid</b>, pen drill-down, row selection, the pen-count calibration wizard (Step 1 / Step 2), unit note, 提交巡检</td></tr>
+<tr><td class="mono">part-b</td><td><b>Equipment</b></td><td>8</td><td>Device list (pen / unit scope), filter, fault reporting split by 其他 vs typed device, anomaly detail</td></tr>
+<tr><td class="mono">part-c1</td><td><b>Production status</b></td><td>35</td><td><span class="zh">子功能-生产</span>: 发情 · 意外妊娠 · 流产 · 分娩 · 断奶 · 标记/移除留种, plus 加入批次 and the batch/line pickers</td></tr>
+<tr><td class="mono">part-c2</td><td><b>Weaning &amp; 留种</b></td><td>22</td><td>断奶检查 (litter + sow), 标记/移除留种, the 3-step identity wizard (耳缺 → 父母 → 耳标/性别)</td></tr>
+<tr><td class="mono">part-d</td><td><b>Health</b></td><td>30</td><td><span class="zh">子功能-健康</span>: add/remove disease &amp; symptom, 健康分诊等级, 治疗, 上报死亡</td></tr>
+<tr><td class="mono">part-e</td><td><b>Records</b></td><td>33</td><td><span class="zh">子功能-记录</span>: 体重 · 背膘 · 温度 · 转移 · 寄养 · 上报失踪</td></tr>
+</tbody>
+</table>
+<p>Full screen-by-screen detail — every control, field, placeholder and annotation quoted — is in
+the six markdown files beside this one. This document is the synthesis.</p>
+
+<h2>2 · The action catalogue</h2>
+<p>Everything a worker can do from an inspection. <span class="one">1</span> = one pig only,
+<span class="many">N</span> = one or many, <span class="gap">✗</span> = designed nowhere.</p>
+
+<h3>生产 — production status (6 menu tiles)</h3>
+<table>
+<thead><tr><th style="width:16%">Action</th><th style="width:6%">Subject</th><th style="width:32%">Data captured</th><th>Effect on state</th></tr></thead>
+<tbody>
+<tr><td><span class="zh">发情</span> in heat</td><td class="one">1</td><td>none (implicit timestamp); optionally 生产线 + 批次</td><td>Five branches by batch state: record-only · mark in heat (查情 task → 配种) · confirm 返情 (<b>removes from batch</b>) · record with no batch (expires after 48 h) · join batch</td></tr>
+<tr><td><span class="zh">意外妊娠</span> unexpected pregnancy</td><td class="one">1</td><td>none; optionally 生产线 + 批次</td><td>Records pregnancy. Tile <b>disabled if already in a batch</b></td></tr>
+<tr><td><span class="zh">流产</span> abortion</td><td class="one">1</td><td>acknowledgement checkbox</td><td><b>Removes from batch</b>; 生产状态 → 空怀/后备</td></tr>
+<tr><td><span class="zh">分娩</span> farrowing</td><td class="one">1</td><td>5 litter counts + 最近产仔时间 + last-litter flag</td><td>Starts or feeds the batch's 分娩 task. <b>Blocked without a batch</b> — <span class="zh">不属于批次不可记录分娩</span></td></tr>
+<tr><td><span class="zh">断奶</span> weaning</td><td class="one">1</td><td>Litter: 健仔/弱仔/畸形 counts, auto total, 仔猪总体重, optional individual weights, 公猪/母猪 counts, 留种 selection. Sow: 体况评分 1–5, 乳房炎, 乳汁产能, 分泌物, 采食情况, 活动能力, 背膘, 其他观察, 淘汰建议</td><td><b>Removes from batch</b>; 生产状态 → 空怀. Early weaning gated by a mandatory acknowledgement</td></tr>
+<tr><td><span class="zh">标记/移除留种</span> mark / unmark breeding stock</td><td class="many">N</td><td>For pigs lacking identity: 耳缺号, 母亲/父亲, <b>耳标号*</b>, <b>性别*</b></td><td>Sets or clears the 留种 flag on the eligible subset</td></tr>
+<tr><td><span class="zh">加入批次</span> join batch</td><td class="one">1</td><td>生产线, 批次, <b>配种时间*</b>, 配种公猪</td><td>Joins the batch and <b>backfills the mating record</b> — the only place mating data is captured</td></tr>
+</tbody>
+</table>
+
+<h3>健康 — health (5 menu tiles)</h3>
+<table>
+<thead><tr><th style="width:16%">Action</th><th style="width:6%">Subject</th><th style="width:32%">Data captured</th><th>Effect on state</th></tr></thead>
+<tbody>
+<tr><td><span class="zh">添加疾病/症状</span> add disease / symptom</td><td class="many">N</td><td>disease set + symptom set (cross-tab), optional triage override, up to 12 photos</td><td>Attaches conditions to every selected pig</td></tr>
+<tr><td><span class="zh">移除疾病/症状</span> remove / recover</td><td class="many">N</td><td>per-condition verdict 移除 or 康复; optional <span class="zh">更新标记原因</span></td><td>Clears or resolves the condition on every selected pig carrying it</td></tr>
+<tr><td><span class="zh">调整分诊等级</span> adjust triage</td><td class="many">N</td><td>one of 4 levels</td><td>Sets 健康分诊等级</td></tr>
+<tr><td><span class="zh">治疗</span> treatment</td><td class="many">N</td><td><b>药物*</b>, 品牌（剂型）, <b>治疗方式*</b>, <b>剂量*</b>, <b>剂量单位*</b>, 目标疾病, 目标症状</td><td>Logs a treatment event, optionally linked to conditions the selected pigs already carry</td></tr>
+<tr><td><span class="zh">上报死亡</span> report death</td><td class="many">N</td><td><b>per pig</b>: 死亡原因 (diseases + symptoms), 附件照片</td><td>Marks pigs dead. <b>Cause is optional</b> — warning only</td></tr>
+</tbody>
+</table>
+
+<h3>记录 — records (6 menu tiles)</h3>
+<table>
+<thead><tr><th style="width:16%">Action</th><th style="width:6%">Subject</th><th style="width:32%">Data captured</th><th>Effect on state</th></tr></thead>
+<tbody>
+<tr><td><span class="zh">体重</span> weight</td><td class="one">1</td><td><b>体重*</b> (kg) — but multi-pig 总体重 / 个体体重 models also exist (§6)</td><td>One weight reading</td></tr>
+<tr><td><span class="zh">背膘</span> backfat</td><td class="one">1</td><td><b>背膘评估方式*</b> (定性/定量) + <b>背膘测量值*</b> (薄/适中/厚) or <b>背膘厚度*</b> (mm)</td><td>One backfat reading</td></tr>
+<tr><td><span class="zh">温度</span> temperature</td><td class="one">1</td><td><b>体温*</b> (°C)</td><td>One temperature reading</td></tr>
+<tr><td><span class="zh">转移</span> transfer</td><td class="many">N</td><td>destination 区/车间/舍/单元/栏位; per-record <b>移动 / 复制</b> marks on pen-level diseases, symptoms and treatments</td><td>Pigs move; health records optionally move or copy</td></tr>
+<tr><td><span class="zh">寄养</span> fostering</td><td class="many">N</td><td>direction (转出/接收), counterpart sow, piglet count <b>or</b> piglet IDs, optional 耳标号/耳缺/性别/体重</td><td>Litter counts adjust on both sows (−n / +n); pen task progress must be re-synced manually</td></tr>
+<tr><td><span class="zh">上报失踪</span> report missing</td><td class="many">N</td><td><b>nothing beyond the selection</b></td><td>Pigs move to 工具箱 → 失踪列表</td></tr>
+</tbody>
+</table>
+
+<h3>设备 — equipment</h3>
+<table>
+<thead><tr><th style="width:16%">Action</th><th style="width:6%">Subject</th><th style="width:32%">Data captured</th><th>Effect on state</th></tr></thead>
+<tbody>
+<tr><td><span class="zh">上报故障</span> report fault</td><td class="many">N</td><td><b>描述*</b>; plus <b>设备名称*</b> when type = 其他. No severity, code, photo or assignee</td><td>Device → 故障; fault count increments</td></tr>
+<tr><td><span class="zh">解决故障</span> resolve fault</td><td class="gap">✗</td><td>—</td><td>Button exists; <b>no screen anywhere in the file</b></td></tr>
+<tr><td><span class="zh">异常详情</span> anomaly detail</td><td class="one">1</td><td>read-only: device, description, 上报人, 上报时间</td><td>—</td></tr>
+</tbody>
+</table>
+
+<h3>Shell — the worksheet itself</h3>
+<table>
+<thead><tr><th style="width:16%">Action</th><th style="width:6%">Subject</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Select pig / pen / unit</td><td class="many">N</td><td>3-state header checkbox; pen checkbox takes the whole pen; per-pig checkbox behaves differently for un-identified pigs (§4)</td></tr>
+<tr><td>Pen-count calibration</td><td class="one">pen</td><td>Two-step wizard: Step 1 reconciles which pigs are present (scan / manual add / report missing); Step 2 balances the count against batch allocations (§5)</td></tr>
+<tr><td>Unit note</td><td class="one">unit</td><td>Free text shared by all users, stamped <span class="zh">上次修改</span></td></tr>
+<tr><td><span class="zh">提交巡检</span> submit inspection</td><td class="one">unit</td><td>Asserts full pen + device coverage; then <b>optional</b> environment + biosecurity readings</td></tr>
+</tbody>
+</table>
+
+<h2>3 · Bulk vs single — production's own rule</h2>
+<p>Two designer annotations state the taxonomy explicitly. Together they cover every sub-function:</p>
+<div class="note"><span class="zh">853:2119 — 发情、意外妊娠、流产、分娩、断奶：只能作用于 单头猪，选择多头猪时，此按钮禁用 / 标记留种、移除留种标记：可作用于 单头猪或多头猪</span><br>
+<i>Heat, unexpected pregnancy, abortion, farrowing, weaning act on a single pig only; multi-select disables the button. Mark / unmark breeding stock works on one or many.</i></div>
+<div class="note"><span class="zh">654:2366 — 体重、背膘、温度：只能作用于 单头猪，选择多头猪时，此按钮禁用 / 转移、寄养、上报失踪：可作用于 单头猪或多头猪</span><br>
+<i>Weight, backfat, temperature act on a single pig only. Transfer, fostering and report-missing work on one or many.</i></div>
+<table>
+<thead><tr><th style="width:26%">Single-pig only</th><th style="width:26%">Bulk-capable</th><th>Why (inferred — production never says)</th></tr></thead>
+<tbody>
+<tr><td>发情 · 意外妊娠 · 流产 · 分娩 · 断奶</td><td>标记留种 · 移除留种</td><td>Each reproductive event carries its own timestamp, batch consequence and per-animal payload; the 留种 flag carries none</td></tr>
+<tr><td>体重 · 背膘 · 温度</td><td>转移 · 寄养 · 上报失踪</td><td>A measurement is a per-animal value; a move shares one destination</td></tr>
+<tr><td>—</td><td>All 5 health actions</td><td>Conditions, triage and treatment share one payload across a selection; death alone keeps a per-pig payload</td></tr>
+</tbody>
+</table>
+
+<div class="law"><b>Partial eligibility — the rule that matters most</b>
+When a bulk selection contains pigs that cannot perform the action, production lets it through:
+<span class="zh">选中的 {N} 头猪只中，仅有 {M} 头猪只可执行此操作，确认…吗？</span> — confirm is enabled, the
+operation runs on the M eligible pigs and <b>silently drops N−M</b>. There is no list of which
+pigs, no reason, no de-select affordance and no partial-result screen. <b>What makes a pig
+ineligible is never stated anywhere in the file.</b> <span class="anno">654:2397 · 654:2292 · 654:2367</span></div>
+
+<h2>4 · Identity is the hinge</h2>
+<p>The single most structural fact in the module: pigs may exist <b>without an identity</b>, and
+almost every behaviour forks on it.</p>
+<table>
+<thead><tr><th style="width:26%">Where</th><th>Behaviour</th></tr></thead>
+<tbody>
+<tr><td>Row selection</td><td>Checking an identified pig just ticks it. Checking an <b>un-identified</b> row opens an inline <span class="mono">✕ [− n +] ✓</span> quantity editor — you must state how many head you mean, and the chip becomes <span class="zh">已选 n/N</span>. <span class="zh">勾选整个栏位时，无需且不可填写无 ID 猪只数量</span> — whole-pen selection makes the quantity <b>forbidden</b>, not merely unnecessary</td></tr>
+<tr><td>Grid view</td><td>Has only pen-level checkboxes — so an un-identified population <b>can never be partially selected from Grid</b></td></tr>
+<tr><td>留种 marking</td><td>Requires identity: <span class="zh">系统强制要求在标记为育种之前进行打耳标</span> + sex mandatory. Pigs lacking it are listed with a <span class="zh">补充身份 ›</span> link and submit is blocked</td></tr>
+<tr><td>Transfer</td><td>All-identified selection → one-tap dialog. Selection containing un-identified pigs → the long page where pen-level health records must be marked 移动 or 复制</td></tr>
+<tr><td>Fostering</td><td>Piglets with no identity → count stepper. Any identity → itemised list. Identity supplement step appears only when the receiving pen has already done ear-tag/notch/weight</td></tr>
+</tbody>
+</table>
+
+<h3>The identity wizard</h3>
+<pre class="flow">补充身份 / 修改身份   (title depends on entry point — 1606:3276)
+
+  1  耳缺信息    耳缺号                     optional · skippable
+  2  系谱信息    母亲 / 父亲                derived when known; otherwise global
+                                            search or scan (1606:3277) · skippable
+  3  耳标信息    耳标号 *  ·  性别 *        the only required fields</pre>
+
+<h2>5 · Batch membership gates production</h2>
+<p>Every production action reads the sow's batch state, and the branches differ per action.
+An annotation corrects the test: it is not membership but <b>whether the batch still has any of
+查情 / 配种 / 分娩 / 断奶 pending</b> <span class="anno">850:2000</span>.</p>
+<table>
+<thead><tr><th style="width:18%">Action</th><th style="width:24%">Batch requirement</th><th>Consequence</th></tr></thead>
+<tbody>
+<tr><td>分娩</td><td><b>Mandatory</b></td><td>Blocked outright: <span class="zh">不属于批次不可记录分娩</span>; litter steppers disabled until a batch is chosen</td></tr>
+<tr><td>意外妊娠</td><td><b>Must NOT be in one</b></td><td>Tile disabled if she is already in a batch</td></tr>
+<tr><td>发情</td><td>Optional</td><td>Can join a batch, or record only. Confirming 返情 removes her</td></tr>
+<tr><td>流产 · 断奶</td><td>Optional</td><td>If in a batch, <b>removes her</b> — behind a mandatory acknowledgement checkbox</td></tr>
+</tbody>
+</table>
+<p>The three near-identical <span class="zh">选择批次</span> pickers are not duplicates: each
+applies a different eligibility filter (e.g. 发情 wants <span class="zh">配种任务进行中或尚未开始</span>;
+分娩 wants <span class="zh">配种任务已完成并且分娩任务未完成</span>). 选择生产线 exists because batch
+search is line-scoped.</p>
+
+<h2>6 · Requirements risks — contradictions and gaps</h2>
+<p>Everything here is a genuine ambiguity in the source, not a design opinion. Each needs an
+answer before the redesign can commit.</p>
+
+<div class="q"><b>1 · Weight has two incompatible models.</b> One set of frames has a required
+<span class="zh">体重记录方式</span> switch (总体重 | 个体体重); a later set drops the switch entirely;
+a third unplaced frame renders it as radio buttons. Nothing arbitrates. Worse, the annotation says
+weight is single-pig-only while six of seven weight frames show <span class="zh">已选 10 头猪</span>
+with a group-weight model.</div>
+
+<div class="q"><b>2 · Ineligibility is undefined.</b> The partial-eligibility dialog exists, but no
+screen or annotation states what makes a pig ineligible for an operation.</div>
+
+<div class="q"><b>3 · 移除 vs 康复 have no stated difference.</b> They share one screen, one submit and
+one confirmation; nothing says what distinguishes "remove" from "recovered" as data.</div>
+
+<div class="q"><b>4 · Health triage levels have no semantics.</b> Four levels exist
+(紧急治疗 · 优先干预 · 常规观察 · 健康) but <b>every</b> description is the placeholder
+<span class="zh">这里是健康分诊等级的描述</span>.</div>
+
+<div class="q"><b>5 · Fault resolution does not exist.</b> A 解决故障 button is drawn and enabled;
+no flow, screen or annotation defines it. Both list variants also name their action bar
+<span class="zh">废弃</span> (deprecated) while it is the only way to reach fault reporting.</div>
+
+<div class="q"><b>6 · Equipment annotations contradict the current form.</b> An annotation says typed
+devices need no description and that tapping report-fault <i>is</i> the report; the current sheet
+requires a description. Node ids suggest the annotation is stale — nothing marks it so.</div>
+
+<div class="q"><b>7 · 提交巡检 asserts what nothing validates.</b> It claims all pens and devices are
+checked, is offered even from a single-pen drill-down, and gates only optional readings.</div>
+
+<div class="q"><b>8 · The feed-station section is fully designed but marked out of scope</b>
+(<span class="zh">❌ 本期不开发</span>), while <span class="zh">需操作</span> — a filter chip and the
+only status line on Grid cards — is defined solely in feed-station terms.</div>
+
+<div class="q"><b>9 · Location hierarchy depth is unsettled</b> — 区/车间/舍/单元/栏位 appears at three
+different depths inside the transfer flow alone.</div>
+
+<div class="q"><b>10 · Fostering is listed as bulk-capable</b> in the annotation, but the flow picks
+one counterpart sow. Whether "N" means N piglets or N sows is unstated — and it conflicts with the
+individual-only treatment fostering gets in the 生产任务 file.</div>
+
+<h2>7 · How this relates to 生产任务</h2>
+<table>
+<thead><tr><th style="width:22%"></th><th style="width:39%">生产任务 (tasks)</th><th>巡检 (inspection)</th></tr></thead>
+<tbody>
+<tr><td>Trigger</td><td>Scheduled — batch, cohort, target, window</td><td>Recency — "last inspected 3 days ago"</td></tr>
+<tr><td>Scope</td><td>One task across units</td><td>One unit, all tasks and none</td></tr>
+<tr><td>Subject</td><td>The task's cohort</td><td>Any pig in the unit, identified or not</td></tr>
+<tr><td>Ad-hoc actions</td><td><span class="zh">更多操作</span> ⋯ menu — 7 rows, gated by task stage</td><td>Three sub-menus (生产 · 健康 · 记录) — 17 tiles, gated by selection eligibility</td></tr>
+<tr><td>Overlap</td><td colspan="2">Fostering, death reporting, treatment, transfer and health management appear in <b>both files with different designs</b>. Weaning and farrowing exist as both a scheduled task and an inspection action.</td></tr>
+</tbody>
+</table>
+<p>This overlap is the central integration question for the redesign: the same seven actions are
+specified twice, with different flows, different bulk rules and different gating. The inspection
+file's rules are more complete (it states its bulk taxonomy in writing); the task file's flows are
+more detailed.</p>
+
+<h2>8 · Detail files</h2>
+<table>
+<thead><tr><th style="width:16%">File</th><th>Contents</th></tr></thead>
+<tbody>
+<tr><td class="mono">part-a.md</td><td>Patrol shell — 24 screens, ~20 gutter annotations, the row-selection spec and the Step 1 / Step 2 balance equation in full</td></tr>
+<tr><td class="mono">part-b.md</td><td>Equipment — 8 screens, 14 ambiguities</td></tr>
+<tr><td class="mono">part-c1.md</td><td>Production status — 35 nodes, all five 发情 branches, batch picker eligibility filters</td></tr>
+<tr><td class="mono">part-c2.md</td><td>Weaning &amp; 留种 — 22 screens, the written 工作原理 spec, identity wizard, partial-eligibility dialogs</td></tr>
+<tr><td class="mono">part-d.md</td><td>Health — 30 screens, triage palette, treatment field table, death flow</td></tr>
+<tr><td class="mono">part-e.md</td><td>Records — 33 nodes, both weight models, transfer ID fork, fostering variants</td></tr>
+</tbody>
+</table>
+
+</div>
+</body>
+</html>

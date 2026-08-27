@@ -1,0 +1,29 @@
+:root{
+--font-display:'Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;
+--font-body:'Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;
+--font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',monospace;
+--fs-caption:12px;
+--fs-label:13px;
+--fs-body:15px;
+--fs-body-lg:17px;
+--fs-title:18px;
+--fs-heading:24px;
+--fs-display:32px;
+--fs-count:40px;
+--lh-tight:1.15; /* @kind other */
+--lh-snug:1.3; /* @kind other */
+--lh-body:1.5; /* @kind other */
+--fw-regular:400; /* @kind other */
+--fw-medium:500; /* @kind other */
+--fw-semibold:600; /* @kind other */
+--fw-bold:700; /* @kind other */
+--fw-extrabold:800; /* @kind other */
+--ls-label:.06em; /* uppercase section labels */
+--text-count:var(--fw-extrabold) var(--fs-count)/1 var(--font-display);
+--text-heading:var(--fw-extrabold) var(--fs-heading)/var(--lh-tight) var(--font-display);
+--text-title:var(--fw-bold) var(--fs-title)/var(--lh-snug) var(--font-display);
+--text-body:var(--fw-regular) var(--fs-body)/var(--lh-body) var(--font-body);
+--text-label:var(--fw-semibold) var(--fs-label)/1.2 var(--font-body);
+--text-caption:var(--fw-regular) var(--fs-caption)/1.35 var(--font-body);
+--text-id:var(--fw-medium) var(--fs-body)/1.2 var(--font-mono); /* animal / pen identifiers */
+}

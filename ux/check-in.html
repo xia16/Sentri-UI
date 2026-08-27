@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentri — Unified Task Screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* synthesized VI — Panel structure · Ledger temperature · Board discipline */
+    --ground:#F7F6F2;          /* one-step-warm neutral, never clinical */
+    --card:#FFFFFF;
+    --well:#EFEEE8;            /* recessed surfaces */
+    --ink:#1C1E19;
+    --ink2:#51544B;
+    --ink3:#8B8E83;
+    --hair:#E7E6DF;
+    --hair2:#D8D7CE;
+    /* status — the only color allowed on a screen */
+    --red:#C2402E;      --red-wash:#F9EAE7;
+    --amber:#96660D;    --amber-fill:#D99A21; --amber-wash:#F8F0DC;
+    --blue:#3E56C4;     --blue-wash:#EBEFF9;
+    --green:#3B8A50;    --green-wash:#EAF2EC;
+    --gray:#7C7F76;     --gray-wash:#F0F0EB;
+    --sans:'Plus Jakarta Sans',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 48px}
+  .mono{font-family:var(--mono)}
+  .anno{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3)}
+
+  header.page{display:flex;justify-content:space-between;padding:26px 0;border-bottom:1px solid var(--hair2)}
+  h1{font-size:44px;font-weight:800;letter-spacing:-.015em;line-height:1.1;margin:64px 0 20px}
+  .lede{font-size:17px;color:var(--ink2);max-width:64ch;margin-bottom:40px}
+  .tokens{display:flex;gap:24px;align-items:center;padding:18px 0 56px;flex-wrap:wrap}
+  .sw{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--ink2)}
+  .sw i{width:22px;height:22px;border-radius:5px;display:inline-block;border:1px solid rgba(0,0,0,.06)}
+
+  section.screen{display:grid;grid-template-columns:430px 1fr;gap:64px;padding:64px 0;border-top:1px solid var(--ink)}
+  .sec-label{grid-column:1/-1;display:flex;justify-content:space-between;margin-bottom:8px}
+  h2{font-size:24px;font-weight:800}
+  .notes{padding-top:8px}
+  .note{padding:14px 0;border-top:1px solid var(--hair)}
+  .note:first-child{border-top:none}
+  .note b{display:block;font-size:15px;margin-bottom:3px}
+  .note p{font-size:13.5px;color:var(--ink2);max-width:52ch}
+  .note .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--ink3);text-transform:uppercase}
+
+  /* ============ phone ============ */
+  .phone{width:390px;background:var(--ground);border:1px solid var(--hair2);border-radius:34px;overflow:hidden;box-shadow:0 8px 32px rgba(28,30,25,.10);position:relative}
+  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:12px 22px 6px;font-family:var(--mono);font-size:12px;font-weight:600}
+  .appbar{display:flex;align-items:center;gap:12px;padding:10px 16px 12px}
+  .appbar .back{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--ink)}
+  .appbar .ttl{font-size:17px;font-weight:700}
+  .appbar .sub{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .appbar>div:nth-child(2){min-width:0;flex:1}
+  .appbar .det{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--ink2);border:1px solid var(--hair2);border-radius:9px;padding:8px 12px}
+
+  /* legacy card styles (unused by base screens) */
+  .round{margin:2px 16px 12px;background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:14px 16px}
+  .round .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .round .big{font-family:var(--mono);font-weight:700;font-size:26px;letter-spacing:-.01em}
+  .round .big small{font-size:13px;font-weight:500;color:var(--ink3);letter-spacing:0}
+  .gauge{display:flex;gap:2.5px;margin:10px 0 8px}
+  .gauge i{height:7px;flex:1;border-radius:2px;background:var(--well)}
+  .gauge i.f-green{background:var(--green)}
+  .gauge i.f-blue{background:var(--blue)}
+  .round .att{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+
+  /* state lens */
+  .lensrow{display:flex;align-items:center;gap:8px;margin:8px 12px 10px}
+  .lensrow .lens{flex:1;margin:0}
+  .lensfil{flex:0 0 auto;width:44px;height:44px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--ink);position:relative}
+  .lensfil.on{border-color:var(--ink);color:var(--ink)}
+  .lensfil .fc{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .lens{display:flex;background:var(--well);border-radius:11px;padding:3px;margin:8px 16px 10px}
+  .lens button{flex:0 1 auto;min-width:0;border:0;background:transparent;font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink2);padding:9px 12px;border-radius:9px;display:flex;gap:5px;justify-content:center;align-items:center;white-space:nowrap}
+  .lens{justify-content:space-between}
+  .lens button .n{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink3)}
+  .lens button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(28,30,25,.08)}
+  .lens button.on .n{color:var(--ink2)}
+
+  /* pen strip */
+  .penstrip{display:flex;gap:6px;padding:2px 16px 12px;align-items:center;overflow:hidden}
+  .pchip{flex:0 0 auto;height:40px;min-width:56px;padding:0 10px;border-radius:9px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;gap:5px;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink2)}
+  .pchip .c{color:var(--ink);font-weight:700}
+  .pchip.cur{background:var(--ink);border-color:var(--ink);color:#fff}
+  .pchip.cur .c{color:#fff}
+  .pchip.clear{color:var(--ink3)}
+  .pchip .dot{width:6px;height:6px;border-radius:2px;background:var(--amber-fill)}
+  .pchip .ok{color:var(--green);font-size:11px}
+  .pgrid{flex:0 0 auto;width:40px;height:40px;border-radius:9px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:15px}
+
+  /* list */
+  .list{background:transparent;border-top:none;padding:8px 12px 14px;display:flex;flex-direction:column;gap:10px}
+  .pen{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--card)}
+  .pen .code{font-family:var(--mono);font-size:12px;font-weight:700;background:var(--well);border-radius:8px;padding:4px 9px}
+  .pen .agg{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+  .pen .agg.ok{color:var(--green)}
+  .pen input{width:18px;height:18px;accent-color:var(--ink)}
+  .row{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 16px;border-top:1px solid var(--hair)}
+  .row:first-of-type{border-top:none}
+  .row .cb{width:22px;height:22px;border:1.5px solid var(--hair2);border-radius:6px;flex:0 0 auto}
+  .row .cb.on{background:var(--ink);border-color:var(--ink);position:relative}
+  .row .cb.on::after{content:"✓";color:#fff;font-size:13px;position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .row .tag{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.02em;flex:0 0 62px}
+  .row .st{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+  .row .st .l1{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:6px}
+  .row .st .l2{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .rail{margin-left:auto;text-align:right;flex:0 0 auto;display:flex;align-items:center;gap:10px}
+  .row .word{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+  .row .chev{color:var(--hair2);font-size:16px}
+  .row .tw{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.02em;color:var(--ink);border:1px solid var(--hair2);border-radius:7px;padding:6px 8px;white-space:nowrap}
+  .row .tw.done{color:var(--ink3);border-color:var(--hair)}
+  .row.dim .l1{color:var(--ink2);font-weight:500}
+  .row.done{background:var(--card)}
+  .s-red{color:var(--red)} .s-amber{color:var(--amber)} .s-blue{color:var(--ink2)} .s-green{color:var(--green)} .s-gray{color:var(--gray)}
+  .b{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.06em;padding:2.5px 7px;border-radius:5px;text-transform:uppercase}
+  .b-amber{background:var(--amber-wash);color:var(--amber)}
+  .b-red{background:var(--red-wash);color:var(--red)}
+  .b-gray{background:var(--gray-wash);color:var(--gray)}
+  .edit{width:34px;height:34px;border:1px solid var(--hair);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:13px}
+
+  /* bottom bars */
+  .bar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--hair);padding:12px 16px 22px;display:flex;gap:10px;align-items:center}
+  .cta{flex:1;height:54px;border-radius:12px;background:var(--ink);color:#fff;font-family:var(--sans);font-size:15.5px;font-weight:700;border:0;display:flex;align-items:center;justify-content:center}
+  .cta.sec{background:var(--card);color:var(--ink);border:1.5px solid var(--ink);flex:0 0 auto;padding:0 20px}
+  .selinfo{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;white-space:nowrap}
+  .selinfo .x{width:30px;height:30px;border-radius:8px;border:1px solid var(--hair2);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:13px}
+  .barnote{position:absolute;left:0;right:0;bottom:100%;padding:8px 16px;background:transparent}
+
+  .divider-note{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);padding:8px 16px;background:var(--ground)}
+
+  /* screen variations (branch sections — base screens above stay untouched) */
+  .vlabel{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin:26px 0 10px}
+  .hd2{background:var(--ground);border-bottom:1px solid var(--hair)}
+  .readout{display:flex;align-items:flex-end;gap:20px;padding:6px 18px 18px}
+  .readout .m .n{font-family:var(--mono);font-weight:700;font-size:34px;line-height:.95;letter-spacing:-.02em;color:var(--ink)}
+  .readout .m .l{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--ink3);margin-top:7px;text-transform:uppercase}
+  .readout .vr{width:1px;align-self:stretch;background:var(--hair2)}
+  .readout .ctx{margin-left:auto;text-align:right}
+  .readout .ctx .a{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;line-height:1.7}
+  .readout .endr{display:inline-block;margin-top:7px;font-size:12px;font-weight:700;color:var(--ink2);border:1px solid var(--hair2);border-radius:8px;padding:5px 10px;white-space:nowrap}
+  /* bottom bar · NAV state (dock) */
+  .dock{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--hair);padding:10px 16px 18px}
+  .row.scanned{background:var(--green-wash)}
+  .row .scanb{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--green);text-transform:uppercase}
+  .dock .penstrip{padding:0 0 8px}
+  .dockrow{display:flex;align-items:center;gap:8px}
+  .dockrow .tool{flex:0 0 auto}
+  .dockrow .penstrip{flex:1;min-width:0;padding:0;overflow:hidden;mask-image:linear-gradient(90deg,#000 88%,transparent)}
+
+  .tool{width:48px;height:48px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--ink)}
+  .tool.scan{background:var(--ink);border-color:var(--ink);color:#fff}
+  .pchip{height:48px}
+  .dh{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  /* unit block */
+  .unit{padding:12px 16px 4px;border-top:1px solid var(--hair);margin-top:2px}
+  .unit .un{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.1}
+  .unit .ul{font-size:12px;color:var(--ink3);margin-top:3px}
+  .unit .ul b{color:var(--ink2);font-weight:600}
+  /* task-level context strip — display only */
+  .taskctx{display:flex;align-items:center;gap:12px;margin:0 16px 12px;padding:9px 12px;background:var(--well);border-radius:10px}
+  .taskctx .tl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);flex:0 0 auto}
+  .taskctx .tc{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);white-space:nowrap}
+  .taskctx .tc b{color:var(--ink);font-weight:700}
+  .taskctx .tcv{color:var(--ink3);font-size:15px;line-height:1;margin-left:2px}
+
+  /* header variations 01-H */
+  .hA .capsule{margin:0 16px 8px;height:30px;border-radius:15px;background:var(--well);display:flex;align-items:center;gap:10px;padding:0 12px 0 14px}
+  .hA .capsule .gauge{margin:0;flex:1}
+  .hA .capsule .gauge i{height:5px}
+  .hA .capsule .t{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink2);white-space:nowrap}
+  .hA .capsule .t b{color:var(--ink)}
+  .hA .big{padding:2px 16px 0}
+  .hA .big .u{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  .hA .big .tsk{font-size:13px;color:var(--ink2);margin-top:4px}
+  .hA .big .tsk b{color:var(--ink);font-weight:700}
+  .hB .unitsel{margin:4px 16px 8px;height:52px;border:1px solid var(--hair2);border-radius:12px;background:var(--card);display:flex;align-items:center;padding:0 12px 0 14px;gap:10px}
+  .hB .unitsel .u{font-size:17px;font-weight:800;letter-spacing:-.01em}
+  .hB .unitsel .m{font-size:12px;color:var(--ink3);margin-left:2px}
+  .hB .unitsel .dd{margin-left:auto;font-size:14px;color:var(--ink2)}
+  .hB .tline{display:flex;align-items:center;gap:10px;margin:0 16px 8px;padding:0 2px}
+  .hB .tline .gauge{margin:0;flex:1}
+  .hB .tline .gauge i{height:5px}
+  .hB .tline .t{font-family:var(--mono);font-size:10.5px;color:var(--ink2);white-space:nowrap}
+  .hB .tline .t b{color:var(--ink)}
+  .ttl2{padding:0 16px}
+  .ttl2 .u{font-size:22px;font-weight:800;letter-spacing:-.015em}
+  .ttl2 .u span{color:var(--ink3);font-weight:600}
+  .ctxbar{margin:12px 12px 8px;border:1px solid var(--hair);border-radius:12px;background:var(--card);display:grid;grid-template-columns:1fr 1fr}
+  .ctxbar>div{padding:11px 14px 12px;display:grid;grid-template-rows:auto auto auto;row-gap:6px;align-content:start}
+  .ctxbar .numwrap{display:flex;flex-direction:column;gap:5px}
+  .ctxbar>div+div{border-left:1px solid var(--hair)}
+  .ctxbar .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .ctxbar .num{display:flex;align-items:baseline;gap:4px;line-height:1}
+  .ctxbar .num b{font-family:var(--mono);font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+  .ctxbar .num span{font-family:var(--mono);font-size:12px;color:var(--ink2);white-space:nowrap}
+  .ctxbar .sub{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink3);align-self:end}
+  .ctxbar .gauge{margin:0}
+  .ctxbar .kspace{height:7px}
+  .ctxbar .num.under b{color:var(--amber)}
+  .ctxbar .gauge i{height:5px}
+  /* go-to-pen chip (dock idle state) */
+  .goto{flex:0 0 auto;height:48px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);color:var(--ink);display:flex;align-items:center;gap:7px;padding:0 12px}
+  .goto .gi{font-size:17px;line-height:1}
+  .goto .gp{font-family:var(--mono);font-size:12.5px;font-weight:700}
+  .scanbtn{flex:1;min-width:0;height:48px;border-radius:11px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;gap:9px;font-size:14.5px;font-weight:700}
+  .scanbtn .si{font-size:17px;line-height:1}
+  .narrow{flex:0 0 auto;display:flex;gap:6px}
+  .tool.fil{position:relative}
+  .tool.fil .fc{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .filline{display:flex;align-items:center;gap:6px;padding:0 18px 10px;font-size:12px;color:var(--ink3)}
+  .filline b{color:var(--ink2);font-weight:600}
+  .filline .clr{margin-left:auto;font-weight:700;color:var(--ink);font-size:12px}
+  .filbar{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--well);border-top:1px solid var(--hair);font-size:12.5px;color:var(--ink2)}
+  .filbar .fk{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .filbar .fchip{background:var(--card);border:1px solid var(--hair2);border-radius:7px;padding:3px 8px;font-weight:600;color:var(--ink)}
+  .filbar .fx{margin-left:auto;font-weight:700;color:var(--ink2)}
+  /* pen selector (dock idle state) */
+  .pensel{flex:1;min-width:0;display:flex;align-items:center;gap:6px}
+  .pensel .arr{width:48px;height:48px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--ink);flex:0 0 auto}
+  .pensel .cur{flex:1;min-width:0;height:48px;border-radius:11px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 10px}
+  .pensel .cur .pc{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:.04em;white-space:nowrap;flex:0 0 auto}
+  .pensel .cur .pl{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .pensel .cur .dd{margin-left:auto;color:rgba(255,255,255,.7);font-size:12px;flex:0 0 auto}
+  /* pen picker sheet */
+  .pk{background:var(--card);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid var(--hair);padding:0 16px 20px}
+  .pk .seg{display:flex;background:var(--well);border-radius:12px;padding:3px;margin:8px 0 14px}
+  .pk .seg span{flex:1;height:48px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--ink2);border-radius:10px}
+  .pk .seg span.on{background:var(--ink);color:#fff}
+  .pk .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .pk .cell{height:58px;border-radius:12px;border:1px solid var(--hair2);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .pk .cell .pc{font-family:var(--mono);font-size:14px;font-weight:700}
+  .pk .cell .n{font-family:var(--mono);font-size:10.5px;color:var(--ink2)}
+  .pk .cell.clear{color:var(--ink3)} .pk .cell.clear .n{color:var(--green)}
+  .pk .cell.cur{background:var(--ink);border-color:var(--ink);color:#fff} .pk .cell.cur .n{color:rgba(255,255,255,.7)}
+  .pk .cell{position:relative}
+  .pk .cell.sig::after{content:"";position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:2px;background:var(--amber-fill)}
+  /* grid variations carousel */
+  .caro{display:flex;gap:24px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 4px 18px;-webkit-overflow-scrolling:touch}
+  .caro::-webkit-scrollbar{height:6px} .caro::-webkit-scrollbar-thumb{background:var(--hair2);border-radius:3px}
+  .slide{flex:0 0 auto;width:390px;scroll-snap-align:start}
+  .slide .vlabel{margin:0 0 10px}
+  .slide .why{font-size:12.5px;color:var(--ink2);margin-top:12px;max-width:390px;line-height:1.5}
+  .slide .why b{color:var(--ink)}
+  .caro-hint{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:-4px 0 12px}
+  .pg{display:grid;grid-template-columns:28px repeat(4,1fr);gap:8px;align-items:stretch}
+  .pg .col{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink3);text-align:center;padding-bottom:2px}
+  .pg .rown{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink3);display:flex;align-items:center;justify-content:center}
+  .pg .cell{min-height:64px;border-radius:12px;border:1px solid var(--hair2);background:var(--card);padding:8px 7px 7px;min-width:0;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+  .pg .cell .pc{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.02em}
+  .pg .cell .n{font-family:var(--mono);font-size:10.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+  .pg.tall .cell{min-height:78px;justify-content:flex-start;gap:3px}
+  .pg.tall .cell .n{overflow:visible}
+  .pg.tall .cell .tag{margin-top:auto}
+  .pg .cell .n.g{color:var(--green)} .pg .cell .n.a{color:var(--amber)} .pg .cell .n.b{color:var(--blue)} .pg .cell .n.r{color:var(--red)}
+  .pg .cell.clear .pc{color:var(--ink3)}
+  .pg .cell.cur{background:var(--ink);border-color:var(--ink)} .pg .cell.cur .pc,.pg .cell.cur .n,.pg .cell.cur .tag{color:#fff}
+  .pg .cell.empty{border-style:dashed;background:transparent} .pg .cell.empty .pc,.pg .cell.empty .n{color:var(--hair2)}
+  .pg .cell .dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:2px}
+  .pg .cell .dot.a{background:var(--amber-fill)} .pg .cell .dot.r{background:var(--red)} .pg .cell .dot.g{background:var(--green)} .pg .cell .dot.b{background:var(--blue)}
+  .pg .cell.tint-a{background:var(--amber-wash);border-color:#E9D9B0} .pg .cell.tint-r{background:var(--red-wash);border-color:#EBC5BE} .pg .cell.tint-b{background:var(--blue-wash);border-color:#C9D2EF}
+  .pg .cell .bar{height:4px;border-radius:2px;background:var(--well);overflow:hidden;margin-top:4px}
+  .pg .cell .bar i{display:block;height:100%;background:var(--green)}
+  .pg .cell.cur .bar{background:rgba(255,255,255,.2)} .pg .cell.cur .bar i{background:#fff}
+  .pg .cell .tag{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.02em}
+  .legend2{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);text-align:center;padding-top:12px}
+  /* unified pen picker — chip cell */
+  .upk{display:grid;grid-template-columns:22px repeat(4,1fr);gap:8px 8px;overflow-x:auto}
+  .upk .col{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink3);text-align:center;padding-bottom:4px;letter-spacing:.06em}
+  .upk .rown{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink3);display:flex;align-items:center;justify-content:center}
+  .uc{height:68px;border-radius:12px;border:1px solid var(--hair);background:var(--card);position:relative;min-width:0;padding:10px 8px 9px 10px;display:flex;flex-direction:column;justify-content:space-between}
+  .uc .pc{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.02em;color:var(--ink);line-height:1;display:flex;align-items:center;justify-content:space-between}
+  .uc .pc .tick{color:var(--green);font-size:12px;font-weight:800}
+  .uc.cur{border-color:var(--ink);border-width:1.5px}
+  .uc.dim{background:var(--well);border-color:var(--hair)} .uc.dim .pc{color:var(--ink3)}
+  .uc.empty{border-style:dashed;background:transparent} .uc.empty .pc{color:var(--hair2)}
+  .uc .ch{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 6px;border-radius:5px;line-height:1.2;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .uc .ch .x{flex:0 0 auto}
+  .uc .ch.ca{background:var(--amber-wash);color:var(--amber)}
+  .uc .ch.cr{background:var(--red-wash);color:var(--red)}
+  .uc .ch.cn{background:var(--well);color:var(--ink2)}
+  .uc .ch.cgr{background:var(--green-wash);color:var(--green)}
+  .uc .ch.cg{background:var(--gray-wash);color:var(--ink3)}
+  .uc .ch .x{font-weight:600;opacity:.9}
+  .uc .qt{font-family:var(--mono);font-size:10px;color:var(--ink3);line-height:1;letter-spacing:-.01em;white-space:nowrap;overflow:visible;width:100%;display:block}
+  .uc .wd,.uc .ln,.uc .ct,.uc .mk,.uc .ok,.uc .qm{display:none}
+  .pk.tall{max-height:75%}
+  /* row anatomy */
+  .rowdemo{position:relative;width:430px;margin:34px auto 44px}
+  .rowdemo .row{border:1.5px solid var(--hair2);border-radius:14px;background:var(--card)}
+  .rowdemo .lbl{position:absolute;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);white-space:nowrap}
+  /* peek popover */
+  .peek{position:absolute;left:16px;right:16px;bottom:118px;background:var(--card);border:1px solid var(--hair2);border-radius:14px;box-shadow:0 12px 32px rgba(28,30,25,.16);padding:14px 16px 12px;z-index:3}
+  .peek::after{content:"";position:absolute;left:50%;bottom:-7px;width:12px;height:12px;background:var(--card);border-right:1px solid var(--hair2);border-bottom:1px solid var(--hair2);transform:translateX(-50%) rotate(45deg)}
+  .peek .ph{display:flex;align-items:baseline;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--hair)}
+  .peek .ph .pc{font-family:var(--mono);font-size:13px;font-weight:700}
+  .peek .ph .ps{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+  .peek .grp{padding:11px 0;border-top:1px solid var(--hair)}
+  .peek .ph + .grp{border-top:none}
+  .peek .ph + .pr{padding-top:11px}
+  .peek .pr{display:flex;align-items:center;gap:10px;font-size:12.5px;min-height:20px}
+  .peek .pr + .pr{border-top:1px solid var(--hair);padding-top:11px;margin-top:11px}
+  .peek .pr .tag{font-family:var(--mono);font-size:12px;font-weight:600;flex:0 0 58px}
+  .peek .pr .st{flex:1;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .peek .pr .st.dim{color:var(--ink3)}
+  .peek .pr .ch{display:inline-flex;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px}
+  .peek .pr .ch.ca{background:var(--amber-wash);color:var(--amber)} .peek .pr .ch.cr{background:var(--red-wash);color:var(--red)} .peek .pr .ch.cgr{background:var(--green-wash);color:var(--green)}
+  .peek .pr .ok{color:var(--green);font-weight:800;font-size:12px}
+  .peek .pr .word{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;flex:0 0 auto}
+  .peek .pf{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);text-align:center;padding-top:12px;margin-top:11px;border-top:1px solid var(--hair)}
+  .peek .trt{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em;padding:6px 0 0 68px}
+  .peek .trt span{font-family:var(--mono);font-size:10px;letter-spacing:.02em;padding:3px 8px;border-radius:5px;border:1px solid var(--hair2);color:var(--ink3)}
+  .peek .trt span.due{background:var(--amber-wash);border-color:transparent;color:var(--amber);font-weight:600}
+  .uc.pressed{border-color:var(--ink);background:var(--well)}
+  /* anatomy / status table */
+  .anat{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+  .anat .big{width:200px;height:120px;border-radius:18px;border:1.5px solid var(--hair2);background:var(--card);position:relative;margin:30px auto 40px;left:0}
+  .anat .big .pc{position:absolute;left:18px;top:14px;font-family:var(--mono);font-size:22px;font-weight:700}
+  .anat .big .mk{position:absolute;right:18px;top:18px;width:16px;height:16px;border-radius:4px;background:var(--amber-fill)}
+  .anat .big .ct{position:absolute;right:18px;bottom:12px;font-family:var(--mono);font-size:26px;font-weight:700;line-height:1}
+  .anat .lbl{position:absolute;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+  .stab{width:100%;border-collapse:collapse;font-size:13px}
+  .stab th,.stab td{padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top;text-align:left}
+  .stab thead th{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+  .stab td:first-child{font-weight:700;white-space:nowrap}
+  .stab .sw{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:6px}
+  .stab .sw.r{background:var(--red)} .stab .sw.a{background:var(--amber-fill)} .stab .sw.b{background:var(--blue)}
+  .stab .ok{color:var(--green);font-weight:800;margin-right:4px}
+  .stab .em{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--well);border:1px solid var(--hair);vertical-align:-1px;margin-right:6px}
+  .stab .mono{font-size:12px}
+  /* task detail sheet */
+  .sheet{background:var(--card);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid var(--hair);flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .grab{width:36px;height:4px;border-radius:2px;background:var(--hair2);margin:10px auto 6px}
+  .sh{display:flex;align-items:baseline;justify-content:space-between;padding:6px 20px 14px}
+  .sh .t{font-size:17px;font-weight:700}
+  .sh .x{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);white-space:nowrap;flex:0 0 auto;margin-left:12px}
+  .sh .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sec{padding:12px 20px 14px;border-top:1px solid var(--hair)}
+  .sec .k{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:block}
+  .kv{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;font-size:13.5px}
+  .kv .v{font-family:var(--mono);font-size:12.5px;color:var(--ink);font-weight:600}
+  .kv .lbl{color:var(--ink2)}
+  .kpi{display:flex;align-items:baseline;gap:8px}
+  .kpi .n{font-family:var(--mono);font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1}
+  .kpi .u{font-size:13px;color:var(--ink2)}
+  .kpi .tgt{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink3);text-transform:uppercase}
+  .legend{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px}
+  .legend .sq{width:8px;height:8px;border-radius:2px;flex:0 0 auto}
+  .legend .w{font-weight:600;flex:0 0 130px}
+  .legend .d{color:var(--ink2);font-size:12.5px}
+  .rowlink{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--hair);font-size:14px;font-weight:600}
+  .rowlink .chev{color:var(--hair2)}
+  .endtask{margin:auto 16px 20px;height:52px;border-radius:12px;border:1.5px solid var(--red);color:var(--red);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;background:var(--card)}
+  /* record sheet — shell anatomy + field kit */
+  .shelldemo{position:relative;width:390px;margin:44px auto 56px}
+  .shelldemo .sheetbox{background:var(--card);border:1.5px solid var(--hair2);border-radius:18px;padding:10px 16px 16px}
+  .shelldemo .grab{width:36px;height:4px;border-radius:2px;background:var(--hair2);margin:2px auto 10px}
+  .shelldemo .fake{height:14px;border-radius:4px;background:var(--well);margin:10px 0}
+  .shelldemo .fake.s{width:60%}
+  .shelldemo .lbl{position:absolute;width:150px;text-align:right;left:-166px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);line-height:1.4}
+  .kit{display:grid;grid-template-columns:1fr 1fr;gap:24px 32px;margin:18px 0 8px}
+  .kitcard{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:15px 17px}
+  .kitcard .kn{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .kitcard .kd{font-size:12.5px;color:var(--ink2);margin:2px 0 12px}
+  .kitcard .krule{font-size:12px;color:var(--ink3);margin-top:13px;padding-top:10px;border-top:1px solid var(--hair)}
+  .kitcard.newk{border-color:var(--hair2);box-shadow:inset 3px 0 0 var(--green)}
+  .fpick{display:flex;align-items:center;min-height:52px;border:1px solid var(--hair2);border-radius:12px;padding:0 14px;font-size:14px;font-weight:600;margin-top:8px}
+  .fpick .v{margin-left:auto;font-family:var(--mono);font-size:12.5px;color:var(--ink);font-weight:600}
+  .fpick .v.ph{color:var(--ink3);font-weight:500}
+  .fpick .chv{color:var(--hair2);font-size:16px;margin-left:8px}
+  .fnote{border:1px solid var(--hair2);border-radius:12px;padding:12px 14px;min-height:74px;font-size:13.5px;color:var(--ink3);margin-top:8px}
+  .fphoto{display:flex;gap:8px;margin-top:8px}
+  .fphoto .th{width:54px;height:54px;border-radius:10px;background:var(--well);border:1px solid var(--hair)}
+  .fphoto .add{width:54px;height:54px;border-radius:10px;border:1.5px dashed var(--hair2);display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:20px}
+  .fmeas{display:flex;align-items:baseline;gap:7px;border:1.5px solid var(--ink);border-radius:12px;padding:11px 14px;margin-top:8px}
+  .fmeas b{font-family:var(--mono);font-size:22px;font-weight:700}
+  .fmeas span{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+  .fcond{margin-top:10px;padding-left:13px;border-left:2px solid var(--amber-fill)}
+  .fcond .ct{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+  .req{color:var(--red);font-weight:700}
+  /* interaction sheets */
+  .sh2{display:flex;align-items:center;gap:10px;padding:2px 2px 12px;border-bottom:1px solid var(--hair)}
+  .sh2 .tag{font-family:var(--mono);font-size:16px;font-weight:700}
+  .sh2 .pc{font-family:var(--mono);font-size:11px;font-weight:700;background:var(--well);border-radius:6px;padding:3px 8px}
+  .sh2 .bk{font-size:17px;color:var(--ink2);margin-right:-2px}
+  .sh2 .mr{flex:0 0 auto;width:38px;height:34px;margin-left:12px;border:1px solid var(--hair2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--ink);letter-spacing:.06em}
+  .sh2 .vit{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em}
+  .opt{display:flex;align-items:center;gap:12px;min-height:52px;border:1px solid var(--hair2);border-radius:12px;padding:0 14px;margin-top:10px;font-size:14.5px;font-weight:600}
+  .opt .rad{width:20px;height:20px;border-radius:10px;border:1.5px solid var(--hair2);flex:0 0 auto}
+  .opt.on{border-color:var(--ink);border-width:1.5px}
+  .opt.on .rad{border-color:var(--ink);background:radial-gradient(circle at center,var(--ink) 0 6px,transparent 7px)}
+  .opt .hint{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.06em}
+  .shbar{display:flex;gap:10px;margin-top:16px}
+  .shbar .cta.sec{flex:0 0 auto;padding:0 18px}
+  .aud{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:center;padding-top:10px}
+  /* timeline (breeding) */
+  .tl{padding:6px 0 2px}
+  .tl .ev{display:flex;gap:12px;padding:9px 0;align-items:flex-start}
+  .tl .dot{width:10px;height:10px;border-radius:3px;margin-top:4px;flex:0 0 auto;background:var(--well);border:1px solid var(--hair2)}
+  .tl .ev.done .dot{background:var(--green);border-color:var(--green)}
+  .tl .ev.cur .dot{background:var(--card);border:2.5px solid var(--ink)}
+  .tl .ev .t{font-size:13.5px;font-weight:600}
+  .tl .ev .m{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-top:2px}
+  .tl .ev.dim .t{color:var(--ink3);font-weight:500}
+  /* counters (farrowing) */
+  .ctr{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--hair)}
+  .ctr:first-of-type{border-top:none}
+  .ctr .lbl{font-size:13.5px;font-weight:600;flex:1}
+  .ctr .n{font-family:var(--mono);font-size:20px;font-weight:700;width:40px;text-align:center}
+  .ctr .b{width:44px;height:44px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--ink);text-transform:none;letter-spacing:0;padding:0}
+  .ctr .b.plus{background:var(--ink);border-color:var(--ink);color:#fff}
+  /* segmented scale (postpartum) */
+  .fseg{display:flex;background:var(--well);border-radius:10px;padding:3px;margin-top:8px}
+  .fseg span{flex:1;height:40px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--ink2);border-radius:8px}
+  .fseg span.on{background:var(--ink);color:#fff}
+  .flbl{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-top:14px}
+  /* numpad (tag/weigh) */
+  .padwrap{display:flex;gap:12px;margin-top:12px}
+  .pv{min-width:0}
+  .pv{flex:1}
+  .pv .cur{border:1.5px solid var(--ink);border-radius:12px;padding:10px 12px}
+  .pv .cur .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .pv .cur .v{font-family:var(--mono);font-size:22px;font-weight:700;margin-top:2px}
+  .pv .prev{font-family:var(--mono);font-size:10.5px;color:var(--ink3);padding:8px 2px 0;line-height:1.8}
+  .pad{display:grid;grid-template-columns:repeat(3,50px);gap:8px;flex:0 0 auto}
+  .pad span{height:48px;border:1px solid var(--hair2);border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:600}
+  /* checklist (treatments) */
+  .chk{display:flex;align-items:center;gap:12px;min-height:50px;border-top:1px solid var(--hair);font-size:14px;font-weight:600}
+  .chk:first-of-type{border-top:none}
+  .chk .cb{width:22px;height:22px;border:1.5px solid var(--hair2);border-radius:6px}
+  .chk.on .cb{background:var(--ink);border-color:var(--ink);position:relative}
+  .chk.on .cb::after{content:"✓";color:#fff;font-size:13px;position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .chk .who{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink3)}
+  /* filter sheet */
+  .fs{background:var(--card);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid var(--hair);padding:0 16px 18px}
+  .fs .fgrp{padding:14px 0 6px;border-top:1px solid var(--hair)}
+  .fs .fgrp:first-of-type{border-top:none}
+  .fs .fk{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;display:block}
+  .fs .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .fs .chips span{height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--hair2);background:var(--card);display:inline-flex;align-items:center;font-size:13px;font-weight:600;color:var(--ink2)}
+  .fs .chips span.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .fs .fbar{display:flex;gap:10px;margin-top:16px}
+  .fs .fbar .cta.sec{flex:0 0 auto;padding:0 22px}
+  /* collapsible prose */
+  details.more{margin:8px 0 22px;max-width:74ch}
+  details.more>summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);border:1px solid var(--hair2);border-radius:8px;padding:7px 12px;background:var(--card)}
+  details.more>summary::-webkit-details-marker{display:none}
+  details.more>summary::before{content:"+";font-weight:700;color:var(--ink3)}
+  details.more[open]>summary::before{content:"–"}
+  details.more>*:not(summary){margin-top:14px}
+  details.more.wide{max-width:none}
+  table.cfg{table-layout:fixed}
+  table.cfg th:nth-child(1){width:11%} table.cfg th:nth-child(2){width:11%} table.cfg th:nth-child(3){width:11%} table.cfg th:nth-child(4){width:12%} table.cfg th:nth-child(5){width:20%} table.cfg th:nth-child(6){width:11%} table.cfg th:nth-child(7){width:6%}
+  /* variation table */
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--hair);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+  td:first-child{font-weight:700;width:22%}
+  footer{padding:36px 0 72px;color:var(--ink3);font-size:13px}
+  /* 05 · the pig, and many pigs */
+  .doors{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:18px 0 6px}
+  .door{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:15px 17px;display:flex;flex-direction:column}
+  .door .dk{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .door .dn{font-size:15.5px;font-weight:700;margin:3px 0 10px}
+  .door .dg{font-family:var(--mono);font-size:11px;color:var(--ink2);background:var(--well);border-radius:8px;padding:9px 11px;margin-bottom:11px;letter-spacing:.02em}
+  .door .dd{font-size:12.5px;color:var(--ink2);margin-top:auto}
+  .door .dd b{color:var(--ink)}
+  .prow:first-of-type{border-top:none}
+  .arity{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0 4px}
+  .arity .ac{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:15px 17px}
+  .arity .ac .an{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);font-weight:700}
+  .arity .ac .ad{font-size:12.5px;color:var(--ink2);margin:5px 0 10px}
+  .arity .ac .al{font-family:var(--mono);font-size:11px;color:var(--ink3);line-height:1.75;border-top:1px solid var(--hair);padding-top:10px}
+  .psheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-top-left-radius:20px;border-top-right-radius:20px;box-shadow:0 -12px 34px rgba(28,30,25,.13);border-top:1px solid var(--hair)}
+  .psheet .grab{margin:9px auto 5px}
+  .phd{display:flex;align-items:center;gap:10px;padding:0 16px 11px;border-bottom:1px solid var(--ink)}
+  .phd .x{width:30px;height:30px;border-radius:8px;border:1px solid var(--hair2);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:13px;flex:0 0 auto}
+  .phd .cnt{font-size:13.5px;font-weight:700}
+  .phd .up{margin-left:auto;color:var(--ink3);font-size:14px}
+  .strip{padding:2px 14px 12px}
+  .strip .sk{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);padding:12px 2px 9px}
+  .tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .tile{min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px}
+  .tile .ti{width:100%;height:44px;border-radius:12px;background:var(--well);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--ink);line-height:1}
+  .tile.dth .ti{background:transparent;border:1.5px solid var(--red);color:var(--red)}
+  .tile.dth .tl{color:var(--red)}
+  .tile .tl{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
+  .vna{display:flex;align-items:center;padding:0 16px 16px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+  .vna b{font-weight:600;color:var(--ink3)}
+  .vna .chv{margin-left:auto;font-size:13px;color:var(--hair2)}
+  .pills{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .pill{min-height:48px;display:flex;align-items:center;padding:0 14px;border-radius:12px;background:var(--well);font-size:13.5px;font-weight:600;line-height:1.2}
+  .pill:only-child,.pill:nth-child(odd):last-child{grid-column:1/-1}
+  .pill .pt{margin-left:auto;padding-left:8px;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);white-space:nowrap}
+  .ckwrap{padding:0 16px 12px}
+  .ckin{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase}
+  .ckin.due{color:var(--amber)}
+  .ckin.done{color:var(--green)}
+  .ckin .act{margin-left:auto;font-family:var(--sans);font-size:12px;font-weight:700;text-transform:none;letter-spacing:0;border:1.5px solid var(--ink);color:var(--ink);border-radius:9px;padding:7px 12px}
+  .pgk{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);padding:15px 16px 5px}
+  .pline{display:flex;align-items:baseline;gap:10px;padding:5px 16px;font-size:13.5px}
+  .pline .pl{font-weight:600}
+  .pline .pr{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.03em;white-space:nowrap}
+  .pline.hist .pl{font-weight:500;color:var(--ink2)}
+  .barpair{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:6px;max-width:824px}
+  .barstrip{width:390px;background:var(--card);border:1px solid var(--hair2);border-radius:16px;overflow:hidden}
+</style>
+<style>
+  /* 06 · check-in */
+  .dot{width:9px;height:9px;border-radius:5px;flex:0 0 auto;display:inline-block;margin-right:2px}
+  .dot.r{background:var(--red)} .dot.a{background:var(--amber-fill)}
+  .list .pen + .pen,.strip2 .pen + .pen{border-top:1px solid var(--hair2)}
+  .pen .cnt{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--ink3);letter-spacing:.04em}
+  .pen .fslot{margin-left:auto;display:flex;align-items:baseline;gap:5px;font-family:var(--mono);letter-spacing:.04em}
+  .pen .fslot b{font-size:11px;font-weight:600;color:var(--ink2)}
+  .pen .fslot .fr{font-size:10.5px;font-weight:500;color:var(--ink3)}
+  .pen .fslot .un{font-size:9.5px;color:var(--ink3)}
+  .pen .fslot .wr{display:inline-flex;align-items:center;gap:3px;color:var(--red);font-size:10.5px;font-weight:700;margin-left:5px;align-self:center}
+  .pen .cv2{color:var(--ink3);font-size:12px;margin-left:10px}
+  .pen input{width:16px;height:16px;accent-color:var(--ink);opacity:.75}
+  .hright{margin-left:auto;text-align:right;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+  .hright .tot{font-family:var(--mono);font-size:11px;color:var(--ink2);letter-spacing:.02em}
+  .hstamp{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;border:1.5px solid var(--ink);border-radius:9px;padding:7px 10px;color:var(--ink);font-weight:700}
+  .hstamp.due{border-color:var(--amber-fill);color:var(--amber)}
+  .hstamp.done{border:none;padding:0;color:var(--green)}
+  .hbtn{margin-left:auto;font-size:12.5px;font-weight:700;border:1.5px solid var(--ink);border-radius:9px;padding:8px 12px;white-space:nowrap}
+  .subst{color:var(--amber)} .subst.ok{color:var(--green)}
+  .row.tail{min-height:42px}
+  .row.tail .l1{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.06em;color:var(--ink2)}
+  .pcard{background:var(--card);border:1px solid var(--hair);border-radius:14px;overflow:hidden}
+  .pcard .pen input{width:22px;height:22px;opacity:1;border-radius:6px}
+  .pcard .row{border-top:1px solid var(--hair)}
+  .pcard .row.tail{min-height:46px}
+  .bcards{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 12px 12px;scroll-padding-left:12px;-webkit-overflow-scrolling:touch}
+  .bcards::-webkit-scrollbar{display:none}
+  .bcard{flex:0 0 262px;scroll-snap-align:start;border:1px solid var(--hair);border-radius:12px;background:var(--card);padding:11px 14px 12px}
+  .bcard .bk{display:flex;align-items:baseline;justify-content:space-between}
+  .bcard .bk .bn{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:700}
+  .bcard .bk .bd{font-family:var(--mono);font-size:10.5px;color:var(--ink2)}
+  .bcard .bp{font-size:14px;font-weight:700;margin-top:6px;letter-spacing:-.01em}
+  .bcard .bp span{font-weight:600;color:var(--ink2)}
+  .bcard .bf{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-top:5px}
+  .bcard .bf b{font-weight:700;color:var(--ink);font-size:11.5px}
+  .lgd{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin:10px 0 4px}
+  .lgd i{display:inline-block;width:10px;height:10px;border-radius:5px;margin-right:7px;vertical-align:0}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
+  .strip2{width:390px;background:var(--card);border:1px solid var(--hair2);border-radius:16px;overflow:hidden}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+
+<header class="page">
+  <span class="anno">Sentri · Design system · check-in</span>
+  <span class="anno">Companion to components.html · screens.html</span>
+</header>
+
+<h1>The check-in</h1>
+<p class="lede">The walk. One unit, pen by pen — deliver the feed, look at the animals, mark what needs doing. The only surface that watches what nothing is scheduled to watch.</p>
+
+<div class="note" style="max-width:76ch;margin-bottom:24px"><b>Three documents.</b> <span class="mono">components.html</span> holds the parts and the laws, <span class="mono">screens.html</span> the task instances, and this one the check-in. Section numbers are shared across all three, so a reference like <span class="mono">(01b)</span> or <span class="mono">(05)</span> resolves wherever it lives. Nothing here is a new component — the row, the chip, the lens row, the dock, the verb sheet and the pen picker are the ones already built, configured for a walk.</div>
+
+<!-- ================= SCREEN 06 · THE CHECK-IN SCREEN ================= -->
+<section class="screen" style="display:block">
+  <div class="sec-label" style="margin-bottom:6px">
+    <h2>06 · The screen</h2>
+    <span class="anno">Strips are places · cards are animals · the right edge is the route</span>
+  </div>
+  <details class="more"><summary>What a check-in is, and why it is not a task</summary>
+  <p style="max-width:74ch">All eight production tasks are sow-cycle or litter cohorts, scoped by batch. A grower on day 68, a nursery pen, a gestating sow at day 87, a boar — <b>no task will ever list them</b>, and their entire visibility in the product is this screen. That decides the design problem: it is not what to put on a row, it is what to keep off, because a unit is 220 animals and the eight that matter must be visible without reading the other 212.</p>
+  <p style="max-width:74ch">The walk braids two jobs that look opposite. <b>A routine instruction that applies to every pen</b> — deliver this much here — and <b>an exception report that applies to almost none</b>. The strip carries the route; the cards carry the exceptions.</p>
+  </details>
+
+  <div class="two" style="margin-top:24px">
+    <div>
+      <div class="vlabel">Unit 6 · the All view</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:940px">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="padding-bottom:10px"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Unit 6</div><div style="font-size:12px;color:var(--ink3);margin-top:2px;white-space:nowrap">Last checked <b style="color:var(--ink2);font-weight:600">yesterday</b> · L.M</div></div><span class="hbtn">Check-in</span></div>
+        <div class="bcards">
+          <div class="bcard"><div class="bk"><span class="bn">Batch G-24</span><span class="bd">day 68</span></div><div class="bp">37 gilts <span>· 3 pens</span></div><div class="bf">Developer 1 · <b>1.3</b> kg/head</div></div>
+          <div class="bcard"><div class="bk"><span class="bn">Batch 18</span><span class="bd">day 34</span></div><div class="bp">85 weaners <span>· 3 pens</span></div><div class="bf">ad-lib · Grower 1</div></div>
+          <div class="bcard"><div class="bk"><span class="bn">No batch</span><span class="bd">2</span></div><div class="bp">2 gilts <span>· 251d · 258d</span></div><div class="bf">composition ›</div></div>
+        </div>
+        <div class="lensrow"><div class="lens"><button class="on">All <span class="n">124</span></button><button>Health <span class="n">6</span></button><button>Feed <span class="n">3</span></button></div><div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div></div>
+        <div class="list" style="flex:1">
+          <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">C1</span><span class="cnt">14 pigs</span><span class="fslot"><b>18.2</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+          <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">C2</span><span class="cnt">12 pigs</span><span class="fslot"><span class="fr">47.2 →</span><b>47.6</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+          <div class="pcard">
+            <div class="pen"><input type="checkbox"><span class="code">C3</span><span class="cnt">13 pigs</span><span class="fslot"><b>49.8</b><span class="un">kg</span><span class="wr"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>2</span></span><span class="cv2">⌃</span></div>
+            <div class="row"><div class="cb"></div><span class="tag">001479</span><div class="st"><span class="l1"><span class="dot a"></span>Lame day 2</span><span class="l2">233d</span></div><div class="rail"></div></div>
+            <div class="row"><div class="cb"></div><span class="tag">001503</span><div class="st"><span class="l1"><span class="dot r"></span>Fever day 4 <span class="b b-amber">40.6°</span></span><span class="l2">232d · treated 3d</span></div><div class="rail"></div></div>
+            <div class="row tail" style="justify-content:center"><span class="l1"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>11 more</span></div>
+          </div>
+          <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">D4</span><span class="cnt">42 pigs</span><span class="fslot"><span class="fr">ad-lib</span></span><span class="cv2">⌄</span></div></div>
+          <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">D6</span><span class="cnt">40 pigs</span><span class="fslot"><span class="fr">Nursery 2 →</span><b>Grower 1</b></span><span class="cv2">⌄</span></div></div>
+          <div class="pcard"><div class="pen"><input type="checkbox"><span class="code">D5</span><span class="cnt">3 pigs</span><span class="fslot"><b>12.9</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+        </div>
+        <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">C1</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-top:34px">What is on this screen</h3>
+      <table class="stab"><thead><tr><th style="width:26%">Register</th><th>Carries</th></tr></thead><tbody>
+        <tr><td>Unit header</td><td>Task mode&#39;s exact header grammar: title, then <span class="mono">Last checked yesterday 16:02 · L. Meyer</span> — last activity, not census (the All segment already counts). The <span class="mono">Check-in</span> button right opens the unit sheet (06g); after finishing, the sub-line reads <span class="mono">✓ Checked 09:41 · G. Hansen</span> in green, the button goes, and tapping the line reopens the sheet. There is no ⋯ and no designations: a unit is what it holds, and what it holds is on the cards</td></tr>
+        <tr><td><b>Batch cards</b></td><td>One card per cohort, swiped, the next peeking. Identity · population · feed. <b>Tap a card to scope the list to that batch</b> — composes with the segments (<span class="mono">batch 20 + Health</span> = its cases). The <span class="mono">No batch</span> card is always last; its tap opens the composition sheet, where parity depth lives</td></tr>
+        <tr><td>Filters</td><td><span class="mono">All · Health · Feed</span> segments plus the funnel (01c) for the rest — marked sets, <span class="mono">no batch</span>, untagged. Attention filters, <b>not a lens</b>: they do not partition the herd by biological state, so the lens law (01b) is not in play</td></tr>
+        <tr><td><b>Pen card</b></td><td>Header row: chip code · census · the feed slot · a fault icon — one line, glove-size tick (22px). Its pigs are rows inside the card; the tail completes them. Nothing else may enter the header</td></tr>
+        <tr><td><b>Pig card</b></td><td>Open cases with their day, the triage dot, one standing token, the open trail. Never equipment</td></tr>
+        <tr><td>Dock</td><td>Identical to task mode — <span class="mono">Go to pen · Scan ear tag · search</span></td></tr>
+      </tbody></table>
+      <div class="note"><b>A pen is a card; its animals are rows inside it.</b> Containment does the separating — the old UI had this right. The pen&#39;s header row carries a <b>chip code</b> (well-tinted, like the record sheet&#39;s pen chip), the census, and the quiet right slot; pigs are two-line rows within. Ground shows between cards, which is where the breathing room comes from — the full-bleed banding was the noise.</div>
+      <div class="note"><b>The right edge is the route.</b> Every feed amount is right-aligned in one column — the same slot task mode gives <span class="mono">4 OF 6 LEFT</span> — so a farm hand with a cart reads today&#39;s numbers straight down. The far-right token is <i>always today&#39;s value</i>.</div>
+      <div class="note"><b>A pen has three states, and the tail row is the door between them.</b> Quiet → one line. Something to see → it opens itself showing only those rows, ending in a centred <span class="mono">⌄ 11 more</span> control. The tail (or the chevron) → the full pen, every animal, physical order; the chevron again → collapsed. The strip&#39;s body is not the door between states — it opens the pen sheet. A 20-pen unit stays ~25 lines, and &ldquo;let me look at all of them&rdquo; is always one tap. Collapsing is safe only because scan reaches any pig whether or not its row is rendered (04c · 05) — we hide rows, never pigs.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 06b · THE PEN STRIP ================= -->
+<section class="screen" style="display:block">
+  <div class="sec-label" style="margin-bottom:6px">
+    <h2>06b · The pen card</h2>
+    <span class="anno">A card per pen · chip code · the quiet right slot · rows within</span>
+  </div>
+  <div class="anat" style="margin-top:22px">
+    <div>
+      <div class="rowdemo">
+        <div class="pcard" style="width:390px"><div class="pen"><input type="checkbox"><span class="code">C2</span><span class="cnt">· 12 pigs</span><span class="fslot"><span class="fr">47.2 →</span><b>47.6</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+        <span class="lbl" style="left:0;top:-22px">tick · acts</span>
+        <span class="lbl" style="left:90px;top:-22px">code chip</span>
+        <span class="lbl" style="right:0;top:-22px">← the feed slot</span>
+        <span class="lbl" style="left:0;bottom:-20px">census · with its noun</span>
+        <span class="lbl" style="right:0;bottom:-20px">expand ↑ · body opens the pen sheet</span>
+      </div>
+      <details class="more"><summary>Three rules of the strip</summary>
+      <div style="font-size:13px;color:var(--ink2);display:grid;gap:10px">
+        <div><b>The header is one line, and the card is the pen.</b> A 22px tick, the chip code, the census, the quiet right slot — no second line, no sentence text; anything that would need one lives on the pen sheet. Rows and the tail sit inside the card, and ground separates the cards. <b>Three zones, one law: left edge acts, body reads, right edge discloses.</b> The tick (left 56px) selects the pen and its pigs — the verb sheet rises with a <span class="mono">PEN</span> strip leading (05). The body opens <b>the pen sheet</b> — the pen&#39;s story: today&#39;s feed derived, faults, count trail, history — mirroring the pig row&#39;s tap-to-read. The chevron (right 56px) expands and collapses; auto-opened pens show their news plus the <span class="mono">⌄ n more</span> tail, which completes them.</div>
+        <div><b>Every slot token is self-describing.</b> A number carries its unit (<span class="mono">47.6 kg</span>), a census its noun (<span class="mono">14 pigs</span>), a formula its <i>name</i> (<span class="mono">Grower 1</span>, never a code letter), a mode its word (<span class="mono">ad-lib</span>, <span class="mono">station-fed</span>). Formula names are farm-configured, so the constraint runs upstream: <b>the barn never abbreviates a name; the console enforces a short display name at authoring</b> (~14 characters) — the same pattern as the lens copy budget, with the cut made where someone can choose the words rather than where a glove has to read them. This is the same contract task mode&#39;s aggregate already keeps — <span class="mono">4 of 6 left</span> explains itself — so the strip is one component with one grammar in both modes.</div>
+        <div><b>The feed slot holds a value, or a transition into today&#39;s value.</b> Quiet: <span class="mono">18.2 kg</span>. Stepped: <span class="mono">47.2 → 47.6</span> — from what was poured yesterday to what is poured today, self-contained, in the direction of the action. Ad-lib pens show the word <span class="mono">ad-lib</span>, and <span class="mono">Nursery 2 → Grower 1</span> on the day a formula switches; individually-fed pens show nothing, because the station pours, not the hand. Only steps speak — daily drift never prints.</div>
+        <div><b>Faults are an icon.</b> A wrench and a count, production&#39;s own signal given the strip&#39;s scale. Device names, reporter and times live inside the pen. Deliberately absent from the strip: designations (<span class="mono">hospital</span> is emergent — the red dots inside are the fact), affirmative batch, override counts, initials.</div>
+        <div><b>The pen&#39;s own verbs are four.</b> <span class="mono">Report fault</span> (Single — a fault names a device in this pen) · <span class="mono">Set count</span> (Single, untagged pens only) · <span class="mono">Pen note</span> (Bulk) · <span class="mono">Feed</span> — one door for everything feed: see today&#39;s, adjust the pen by %, switch the formula (pre-filled on due days; Bulk across a batch&#39;s pens from the unit sheet). <b>Feed levels:</b> the pen adjusts as a whole; a single pig adjusts from her own verb sheet (N=1 only); bulk per-pig plans come from marking <span class="mono">Thin</span> / <span class="mono">Fat</span>, each carrying her banded plan. A shared percentage across different ticked animals is deliberately impossible — that is the pen&#39;s job.</div>
+      </div>
+      </details>
+    </div>
+    <div>
+      <table class="stab"><thead><tr><th>Pen</th><th>Strip reads</th><th>Why</th></tr></thead><tbody>
+        <tr><td>Quiet, group-fed</td><td><span class="mono">PEN C1 · 14 pigs · 18.2 kg ⌄</span></td><td>the route: count and today&#39;s pour</td></tr>
+        <tr><td>Feed stepped</td><td><span class="mono">PEN C2 · 12 pigs · 47.2 → 47.6 kg ⌄</span></td><td>re-dial the feeder; far right is still today</td></tr>
+        <tr><td>Faults open</td><td><span class="mono">PEN C3 · 13 pigs · 49.8 kg ⚒2 ⌃</span></td><td>the one exception icon the strip may carry</td></tr>
+        <tr><td>Ad-lib</td><td><span class="mono">PEN D4 · 42 pigs · ad-lib ⌄</span></td><td>the word answers &ldquo;why is there no number&rdquo;</td></tr>
+        <tr><td>Ad-lib, switch day</td><td><span class="mono">PEN D6 · 40 pigs · Nursery 2 → Grower 1 ⌄</span></td><td>same transition grammar, formula instead of kg</td></tr>
+        <tr><td>Individually fed</td><td><span class="mono">PEN B1 · 18 sows · station-fed ⌄</span></td><td>the station pours; the word says so</td></tr>
+      </tbody></table>
+      <p style="font-size:12.5px;color:var(--ink2);margin-top:14px">Count is one number with one source of truth: derived from placements for identified animals, set by the last count for un-identified head. No second number, no staleness token, no discrepancy state.</p>
+    </div>
+  </div>
+  <h3 style="margin-top:30px">A pen ticked — one sheet, both subjects</h3>
+  <div class="two">
+    <div>
+      <div class="vlabel">✕ PEN C3 · 13 pigs</div>
+      <div class="phone" style="height:760px;background:var(--ground)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.4"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+        <div class="psheet">
+          <div class="grab"></div>
+          <div class="phd"><span class="x">✕</span><span class="cnt">PEN C3 · 13 pigs</span><span class="up">view ›</span></div>
+          <div class="strip"><div class="sk">Pen</div>
+            <div class="tiles">
+              <div class="tile"><span class="ti">⚒</span><span class="tl">Fault</span></div>
+              <div class="tile"><span class="ti">#</span><span class="tl">Count</span></div>
+              <div class="tile"><span class="ti">≡</span><span class="tl">Note</span></div>
+            </div>
+          </div>
+          <div class="strip"><div class="sk">Health — 13 pigs</div>
+            <div class="tiles">
+              <div class="tile"><span class="ti">+</span><span class="tl">Condition</span></div>
+              <div class="tile"><span class="ti">⚕</span><span class="tl">Treatment</span></div>
+              <div class="tile"><span class="ti">▲</span><span class="tl">Triage</span></div>
+              <div class="tile dth"><span class="ti">⊗</span><span class="tl">Death</span></div>
+            </div>
+          </div>
+          <div class="strip"><div class="sk">Routine — 13 pigs</div>
+            <div class="tiles">
+              <div class="tile"><span class="ti">⚖</span><span class="tl">Weigh</span></div>
+              <div class="tile"><span class="ti">↕</span><span class="tl">Backfat</span></div>
+              <div class="tile"><span class="ti">⇄</span><span class="tl">Transfer</span></div>
+              <div class="tile"><span class="ti">⌗</span><span class="tl">Tag</span></div>
+            </div>
+          </div>
+          <div class="vna">heat and 5 more · drag for all<span class="chv">›</span></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="note" style="margin-top:34px"><b>No verb is ambiguous, so the selection never asks what you meant.</b> <span class="mono">Condition</span> is only ever about animals; <span class="mono">Fault</span> only ever about the pen. One sheet carries both, each strip labelled with its subject and count — which is what no bar label could say.</div>
+      <div class="note"><b>Ticking a pen contributes the pen and its pigs.</b> &ldquo;Pen-level add condition&rdquo; is one gesture: tick C3, then <span class="mono">Condition</span> under <span class="mono">HEALTH — 13 PIGS</span>. Mixed selections are legal — <span class="mono">2 pens · 29 pigs</span> — pen verbs scoping to the ticked pens, pig verbs to every ticked pig. With two pens ticked, <span class="mono">Fault</span> and <span class="mono">Count</span> drop to the not-available line (Single); <span class="mono">Note</span> stays.</div>
+      <div class="note"><b>Bulk body-condition marks replace pen feed adjustment.</b> Select the sows — stalled or group-housed alike — mark <span class="mono">Thin</span> or <span class="mono">Fat</span>, and each carries her banded plan; a trough pen&#39;s total re-sums on its own, an ESF station applies it per sow. Same gesture, executor decides the rest. This is also exactly the farm hand&#39;s permission envelope in the feed PRD (§6: individual-override presets only).</div>
+      <div class="note"><b>Review before a big write.</b> <span class="mono">view ›</span> in the sheet header filters the list to the selected rows — same screen, no new surface — and the record sheet&#39;s own subject header (<span class="mono">13 pigs · selected</span>) restates the scope at commit time (04).</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 06c · FEED ================= -->
+<section class="screen" style="display:block">
+  <div class="sec-label" style="margin-bottom:6px">
+    <h2>06c · Feed</h2>
+    <span class="anno">One slot · a value, or a transition into today&#39;s value</span>
+  </div>
+  <details class="more"><summary>Why feed lives on the strip and not in a task</summary>
+  <p style="max-width:74ch">Feed is not scheduled work with its own list — the farm hand feeds while walking, so the walk carries the number. That makes every pen&#39;s amount routine rather than exceptional: it sits in the strip&#39;s right slot as the route, never in a chip. The value moves daily (<span class="mono">effective_day</span> advances, week anchors interpolate) but nobody re-dials a feeder for thirty grams — so the slot reports <b>steps, not drift</b>, as a transition: <span class="mono">47.2 → 47.6</span>. The rejected forms: <span class="mono">47.6 ↑0.4</span> puts the delta far-right and breaks the route column; a bare arrow loses the magnitude a feeder is re-dialled by.</p>
+  <p style="max-width:74ch"><b>Record the exception, not the compliance.</b> Delivering the prescribed amount is the default and needs no act. Only a deviation is recorded — less because the trough was still full, more because it was cleaned out. The useful half of variance data, without a tap on a normal day.</p>
+  <p style="max-width:74ch"><b>Individual adjustments resolve into the pen.</b> A sow on +10% in a trough-fed pen cannot be fed separately — she eats with everyone — so her adjustment is already inside the pen&#39;s total. The strip does not say so; the farm hand pours one number. <span class="mono">Thin</span> is a case on her line 1; the plan is its treatment. If the walker must do it — a top-dressed scoop, a pre-farrow withhold — it is an amber chip with the amount (<span class="mono">+0.4 kg</span> · <span class="mono">no feed</span>) and the pen opens itself; if it happens anyway (the station, or the pen total already contains it) it is a grey note (<span class="mono">feed +10%</span>). The Feed filter is simply the subset with feed news; the pen sheet holds the full derivation.</p>
+  </details>
+  <div class="caro-hint">← swipe · group-fed · ad-lib · individually fed →</div>
+  <div class="caro">
+    <div class="slide"><div class="vlabel">Curve-fed · group-fed — value, then transition</div>
+      <div class="strip2"><div class="pen"><input type="checkbox"><span class="code">C1</span><span class="cnt">· 14 pigs</span><span class="fslot"><b>18.2</b><span class="un">kg</span></span><span class="cv2">⌄</span></div>
+      <div class="pen"><input type="checkbox"><span class="code">C2</span><span class="cnt">· 12 pigs</span><span class="fslot"><span class="fr">47.2 →</span><b>47.6</b><span class="un">kg</span></span><span class="cv2">⌄</span></div></div>
+      <div class="why"><b>The pen total is the instruction.</b> The system sums curve, stage and any individual adjustments; the farm hand delivers one number. When it moved since yesterday the slot shows the movement — from what they know to what they do.</div>
+    </div>
+    <div class="slide"><div class="vlabel">Ad-lib — the word, then the switch</div>
+      <div class="strip2"><div class="pen"><input type="checkbox"><span class="code">D4</span><span class="cnt">· 42 pigs</span><span class="fslot"><span class="fr">ad-lib</span></span><span class="cv2">⌄</span></div>
+      <div class="pen"><input type="checkbox"><span class="code">D6</span><span class="cnt">· 40 pigs</span><span class="fslot"><span class="fr">Nursery 2 →</span><b>Grower 1</b></span><span class="cv2">⌄</span></div></div>
+      <div class="why"><b>There is no ration and we must not invent one.</b> Growth stages never resolve a kg/day figure and the feed PRD twice forbids showing the internal phase rate to a farm hand. The quiet word <span class="mono">ad-lib</span> answers &ldquo;why is there no number&rdquo; without becoming one; the one event that exists — a formula switch, on its day — uses the transition grammar with the formula&#39;s <i>name</i>.</div>
+    </div>
+    <div class="slide"><div class="vlabel">Individually fed — the station pours</div>
+      <div class="strip2"><div class="pen"><input type="checkbox"><span class="code">B1</span><span class="cnt">· 18 sows</span><span class="fslot"><span class="fr">station-fed</span></span><span class="cv2">⌄</span></div></div>
+      <div class="why"><b>Nothing to deliver, and the strip says why.</b> An ESF station applies each sow&#39;s ration itself, adjustments included. Overrides are standing facts read inside the pen or under the Feed filter — never an alarm.</div>
+    </div>
+  </div>
+  <div class="note" style="max-width:76ch"><b>Stage-mixed pens have no defined answer.</b> Gilts and sows in one pen means two curves; the feed model has only a <i>sex</i>-mixing rule, which resolves to the more demanding class and quietly over-feeds the rest. Because we derive the count from placement events we do know each animal&#39;s stage, so summing per animal into a pen total is exact — but it is a claim the feed model does not support. Flagged, not assumed.</div>
+</section>
+
+<!-- ================= SCREEN 06d · THE PIG ROW ================= -->
+<section class="screen" style="display:block">
+  <div class="sec-label" style="margin-bottom:6px">
+    <h2>06d · The pig row</h2>
+    <span class="anno">Two tokens on line 2, and everything else is one tap in</span>
+  </div>
+  <details class="more"><summary>The creme-de-la-creme rule</summary>
+  <p style="max-width:74ch">The bar for the row is: <b>does it change what the walker does at walking speed.</b> The case and its day, the dot, an escalated measurement, one standing token, and the open trail all pass — the trail because <span class="mono">treated 3d</span> is what decides tap-in versus walk-on. Cut to the inside: <b>initials</b> (audit, not judgment), <b>affirmative batch</b> (the zero rule — a token that says &ldquo;normal&rdquo; is not printed; only <span class="mono">no batch</span> appears, because it means nothing else in the product will ever show this pig), full histories, characteristics, and every unescalated measurement.</p>
+  <p style="max-width:74ch"><b>Line 2 is at most: <span class="mono">standing · no batch · trail</span></b> — fixed order, missing slots collapse, never reorder. The standing token is exactly one: age for a gilt, parity for a sow, head count for a litter. The trail slot holds only what has been <b>done</b>, in past tense (<span class="mono">treated 3d</span>) — pending is the dot itself, and a dot with no done-trail is the unexecuted mark. An active feed plan prints as its mechanism (<span class="mono">feed +10%</span>) beneath the <span class="mono">Thin</span> case it treats. <span class="mono">no batch</span> prints only when no task is watching her: a weaned sow inside the service window is a station, not an orphan.</p>
+  </details>
+  <div class="caro-hint">← swipe · quiet · a case · a mark · a drug not working · between batches · fell out · no identity · individual feed →</div>
+  <div class="caro">
+    <div class="slide"><div class="vlabel">Quiet — the 212</div>
+      <div class="strip2"><div class="row"><div class="cb"></div><span class="tag">000254</span><div class="st"><span class="l1">Pregnant · day 87</span><span class="l2">parity 3</span></div><div class="rail"></div></div></div>
+      <div class="why"><b>The zero rule.</b> Her state, how long she has held it, and the one token that frames her. No batch printed — she has one, which is normal, which is silence.</div>
+    </div>
+    <div class="slide"><div class="vlabel">A case — the condition supersedes the cycle</div>
+      <div class="strip2"><div class="row"><div class="cb"></div><span class="tag">001503</span><div class="st"><span class="l1"><span class="dot a"></span>Off feed day 2</span><span class="l2">parity 3</span></div><div class="rail"></div></div></div>
+      <div class="why"><b>No task asks whether a day-87 gestating sow is eating.</b> Production asks it once, on days 1–3 after farrowing, and never again in a 140-day cycle. The dot is the declared urgency; the day count is the case&#39;s age.</div>
+    </div>
+    <div class="slide"><div class="vlabel">A mark nobody executed</div>
+      <div class="strip2"><div class="row"><div class="cb"></div><span class="tag">001479</span><div class="st"><span class="l1"><span class="dot a"></span>Lame day 4</span><span class="l2">parity 3</span></div><div class="rail"></div></div></div>
+      <div class="why"><b>The dot is the mark; the missing token is the gap.</b> An orange dot with no <span class="mono">treated</span> beside it reads: someone flagged her, nobody has acted. The moment the drug is given the trail flips to <span class="mono">treated 1d</span> — so pending needs no token of its own, and <span class="mono">Lame day 4</span> keeps aging by itself. The zero rule, applied to interventions.</div>
+    </div>
+    <div class="slide"><div class="vlabel">A drug that is not working</div>
+      <div class="strip2"><div class="row"><div class="cb"></div><span class="tag">001503</span><div class="st"><span class="l1"><span class="dot r"></span>Fever day 4 <span class="b b-amber">40.6°</span></span><span class="l2">parity 1 · treated 3d</span></div><div class="rail"></div></div></div>
+      <div class="why"><b>The most valuable row in the product.</b> Day 4 of a fever, day 3 of a drug. Read without counting, without tapping. <b>Blocked</b> — treatment carries no timestamp today, which makes it the smallest high-value data change available to us.</div>
+    </div>
+    <div class="slide"><div class="vlabel">Between batches — weaned, then slipped</div>
+      <div class="strip2"><div class="row"><div class="cb"></div><span class="tag">000254</span><div class="st"><span class="l1">Weaned · 4 days ago</span><span class="l2">parity 3</span></div><div class="rail"></div></div>
+      <div class="row"><div class="cb"></div><span class="tag">000254</span><div class="st"><span class="l1">Weaned · 25 days ago</span><span class="l2">parity 3 · no batch</span></div><div class="rail"></div></div></div>
+      <div class="why"><b>Between batches is a station, not an anomaly.</b> A just-weaned sow prints nothing extra — heat check is already watching her, so she is not orphaned and the zero rule holds. <span class="mono">no batch</span> appears only when her elapsed exceeds the farm&#39;s wean-to-service window and nothing has claimed her — derived from config, never a new status. Line 1&#39;s own day count does the escalating.</div>
+    </div>
+    <div class="slide"><div class="vlabel">Fell out of every task</div>
+      <div class="strip2"><div class="row"><div class="cb"></div><span class="tag">000254</span><div class="st"><span class="l1">Mated · 46 days ago</span><span class="l2">parity 3 · no batch</span></div><div class="rail"></div></div></div>
+      <div class="why"><b>Two tokens, one lost sow.</b> She should have been checked at day 20 and farrowed near 114. <span class="mono">no batch</span> means no task holds her — the one place batch prints, because here it is the anomaly.</div>
+    </div>
+    <div class="slide"><div class="vlabel">No identity — the group row is the subject</div>
+      <div class="strip2"><div class="row"><div class="cb"></div><span class="tag">001812</span><div class="st"><span class="l1"><span class="dot a"></span>Scours day 1</span><span class="l2">34d</span></div><div class="rail"></div></div>
+      <div class="row"><div class="cb"></div><span class="tag">38 pigs</span><div class="st"><span class="l1">2 under treatment</span><span class="l2">no tags · in jul 14</span></div><div class="rail"></div></div></div>
+      <div class="why"><b>The un-identified population of a pen is one row, and it is selectable.</b> Ticking it asks <i>how many</i> — a stepper, production&#39;s own rule (<span class="zh">勾选单条数据时，若为无ID猪只，需立即填写无ID猪只数量</span>) — and the bulk act applies to that count. Scan cannot reach them, so count is how they are named; <span class="mono">Assign identity</span> (Conveyor) is the way out of the state, and <span class="mono">no tags</span> prints because here it is the anomaly worth seeing.</div>
+    </div>
+    <div class="slide"><div class="vlabel">Individual feed — the plan is the case&#39;s treatment</div>
+      <div class="strip2"><div class="row"><div class="cb"></div><span class="tag">000287</span><div class="st"><span class="l1"><span class="dot a"></span>Thin · day 12</span><span class="l2">parity 5 · feed +10%</span></div><div class="rail"></div></div>
+      <div class="row"><div class="cb"></div><span class="tag">000291</span><div class="st"><span class="l1"><span class="dot a"></span>Thin · day 12 <span class="b b-amber">+0.4 kg</span></span><span class="l2">parity 5</span></div><div class="rail"></div></div>
+      <div class="row"><div class="cb"></div><span class="tag">000305</span><div class="st"><span class="l1">Due to farrow · in 1 day <span class="b b-amber">no feed</span></span><span class="l2">parity 2</span></div><div class="rail"></div></div></div>
+      <div class="why"><b>Thin is a case, like lame</b> — observed, managed, recovers — so it lives on line 1 with its day, and the feed plan is its treatment, printed where treatments print. The rule in plain words: <b>if the walker must do it, it is a chip with the amount; if it happens anyway, it is a grey note.</b> The pen total already contains 000287&#39;s +10%, so hers is a note; 000291&#39;s extra scoop is the walker&#39;s own act, so it is a chip — and the pen opens itself, because an instruction inside is something to see. The withhold is not a case at all: an instruction from her cycle stage, chip only. And when one row could carry two chips — a fever at <span class="mono">40.6°</span> and a scoop to give — <b>the instruction wins</b>: one chip, and the work beats the reading.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 06e · TRIAGE ================= -->
+<section class="screen" style="display:block">
+  <div class="sec-label" style="margin-bottom:6px">
+    <h2>06e · Triage — a mark, not an act</h2>
+    <span class="anno">Colour carries rank · words carry identity</span>
+  </div>
+  <details class="more"><summary>Why this is the one place colour may replace a word</summary>
+  <p style="max-width:74ch">An earlier attempt to colour-code statuses failed because those statuses are <b>categorical</b> — in heat, mated, returned — and a categorical colour needs a legend, which was the complexity we cut. Triage is <b>ordinal</b>. Red › amber › none reads as more-urgent-to-less without anyone being taught it, so the dot needs no legend and no word.</p>
+  <p style="max-width:74ch"><b>Two solid dots — red above orange — and what that costs.</b> A ring variant was tried for colour-vision safety and read as a third state, which is worse than the risk it hedged; solid pairs won. The dot is never the sole carrier — the case and its day are always words, an urgent pig usually also carries a chip, and the Attention filter sorts red first — but red against orange alone is a known colour-vision weakness. If barn testing shows confusion, the fallback is size, not shape. Strip text sits at body-ink contrast, never the light annotation grey: the strip is an instruction surface, not a caption.</p>
+  <p style="max-width:74ch">And it frees the chip. Triage and an escalated measurement previously competed for one slot, so a sow who was both urgent and running 40.6° could only say one of them.</p>
+  </details>
+  <div class="two" style="margin-top:22px">
+    <div>
+      <table class="stab"><thead><tr><th style="width:12%">Dot</th><th style="width:26%">Level</th><th>Means · offers</th></tr></thead><tbody>
+        <tr><td><span class="dot r"></span></td><td><b>Hospital pen</b></td><td>Needs isolation or intensive care. <b>A mark, processed later</b> — it does not move her now. Marked pigs form a filterable set that someone drains in bulk</td></tr>
+        <tr><td><span class="dot a"></span></td><td><b>Treat in place</b></td><td>Treatable where she stands. Also a mark — the farm hand may not be carrying the drug. Someone treats later, from the same set</td></tr>
+        <tr><td>—</td><td><b>Monitor</b></td><td>Watch, do not treat yet. The case stays orange — the dot marks an open case, not the ask — and the distinction lives in the work lists, never in a third glyph</td></tr>
+        <tr><td>—</td><td><span style="color:var(--ink3)"><s>Euthanize</s></span></td><td>Not a level. You do not triage an animal as <i>euthanize</i> and leave her there — it is a decision pending execution, which is the existing <b>Cull recommendation</b> verb</td></tr>
+        <tr><td>—</td><td><span style="color:var(--ink3)"><s><span class="zh">健康</span> healthy</s></span></td><td>Not a level. Healthy is the absence of a case</td></tr>
+      </tbody></table>
+    </div>
+    <div>
+      <div class="vlabel">A mark, then its execution</div>
+      <div class="strip2" style="margin-bottom:14px">
+        <div class="row"><div class="cb"></div><span class="tag">001479</span><div class="st"><span class="l1"><span class="dot a"></span>Lame day 2</span><span class="l2">parity 3</span></div></div>
+        <div class="row"><div class="cb"></div><span class="tag">001479</span><div class="st"><span class="l1"><span class="dot a"></span>Lame day 4</span><span class="l2">parity 3 · treated 2d</span></div></div>
+      </div>
+      <div class="note"><b>Execution needs no new screen.</b> A mark creates a filterable set and the existing model drains it: filter to marked → select the six → Treatment, one payload for all of them (05, arity Bulk). Hospital pen populates a move list someone runs as a bulk Transfer. Triage never performs the act itself.</div>
+      <div class="note"><b>Marked outranks derived.</b> Attention is what the system worked out — fever day 4, drug day 3, nobody marked anything. A mark is what a person declared, and it prints as the dot — red for hospital or urgent, orange otherwise — with the trail flipping to past tense when executed. Both sit in the same filter; a mark ranks above a derivation because someone put their name to it.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 06f · CASES AND CHARACTERISTICS ================= -->
+<section class="screen" style="display:block">
+  <div class="sec-label" style="margin-bottom:6px">
+    <h2>06f · Cases and characteristics</h2>
+    <span class="anno">An abnormality is not a condition</span>
+  </div>
+  <p style="max-width:74ch;margin-top:10px">A hernia, a blind eye, a missing ear do not open and close. They just are, like parity or sex. Treating one as a condition is what produces <span class="mono">Hernia day 340</span> on a row — noise pretending to be news.</p>
+  <div class="two" style="margin-top:18px">
+    <div>
+      <table class="stab"><thead><tr><th style="width:24%"></th><th>Characteristic</th><th>Case</th></tr></thead><tbody>
+        <tr><td>Examples</td><td><span class="mono">hernia · blind eye · missing ear · poor conformation</span></td><td><span class="mono">fever · scours · off feed · acute lameness</span></td></tr>
+        <tr><td>Day count</td><td>No — it has no start worth counting</td><td>Yes, and the count is the point</td></tr>
+        <tr><td>Triage · treat</td><td>No</td><td>Yes</td></tr>
+        <tr><td>Ends by</td><td>Correction, if recorded wrongly</td><td>Recovery, or the animal leaves</td></tr>
+        <tr><td>On the row</td><td><b>Never line 1.</b> Her page, and a grey line-2 token only where it changes handling</td><td>Line 1, with its dot</td></tr>
+      </tbody></table>
+      <div class="note"><b>The catalogue classifies, not the farmer.</b> Each disease and symptom entry carries its class, so recording a hernia produces a characteristic and recording a fever produces a case with nobody choosing — the derive-everything law (01b). For genuinely ambiguous ones, <b>split the catalogue entry</b> rather than add a toggle: injury-lameness and chronic-lameness are two things a farmer picks between at the moment they actually know the answer.</div>
+    </div>
+    <div>
+      <div class="vlabel">Her page — where characteristics live</div>
+      <div class="strip2">
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">000311</div><div class="sub">B4 · parity 5 · 1120d · ♀</div></div><div class="det">⋯</div></div>
+        <div class="pgk">Health</div>
+        <div class="pline"><span class="pl">Healthy</span><span class="pr">no open cases</span></div>
+        <div class="pline hist"><span class="pl">Umbilical hernia</span><span class="pr">recorded mar 04 · L.M</span></div>
+        <div class="pline hist"><span class="pl">Left ear notch missing</span><span class="pr">recorded mar 04 · L.M</span></div>
+        <div class="pgk">Cycle</div>
+        <div class="pline"><span class="pl">Farrowed · 10 days ago</span><span class="pr">11 born · 10 live</span></div>
+      </div>
+      <div class="note"><b>A characteristic can spawn a case.</b> A hernia that ruptures, a chronic bad leg that goes acute — that is a new case referencing the standing characteristic, not a change of state on it. Both records stay honest.</div>
+      <div class="note"><b>A long-running case is still a case.</b> What makes something a case is its catalogue class plus the fact that someone is managing it — never elapsed time. Otherwise a fever nobody treated for three weeks would quietly reclassify itself into a fact of life, which is the exact failure the walk exists to catch.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 06g · FINISHING ================= -->
+<section class="screen" style="display:block">
+  <div class="sec-label" style="margin-bottom:6px">
+    <h2>06g · The check-in sheet</h2>
+    <span class="anno">The stamp can carry readings · every field optional · one tap is still valid</span>
+  </div>
+  <div class="two" style="margin-top:22px">
+    <div>
+      <div class="vlabel">Check-in — the 04 shell, all fields optional</div>
+      <div class="phone" style="display:flex;flex-direction:column;height:660px;background:var(--well)">
+        <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+        <div style="flex:1"></div>
+        <div class="fs"><div class="grab"></div>
+          <div class="sh2"><span class="tag">Check-in</span><span class="vit">unit 6 · 84 pigs</span></div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1"><div class="flbl">Temperature</div><div class="fmeas"><b>22.4</b><span>°C</span></div></div>
+            <div style="flex:1"><div class="flbl">Humidity</div><div class="fmeas"><b>61</b><span>%</span></div></div>
+          </div>
+          <div class="flbl">Unit note</div><div class="fnote">Anything the rows above do not carry</div>
+          <div class="fpick">Switch feed<span class="v">batch 18 · due</span><span class="chv">›</span></div>
+          <div class="fpick">Equipment<span class="v">2 faults</span><span class="chv">›</span></div>
+          <div class="shbar"><button class="cta" style="flex:1">Check-in</button></div>
+          <div class="aud">stamps unit · person · time — every field optional</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="note" style="margin-top:34px"><b>The act can carry the readings, so they stop needing a door.</b> Production collects 环境数据 on its submit screen; we collect the same two measures on the finish sheet — the one moment the farm hand is already saying &ldquo;I am done here.&rdquo; Unit note rides along. All of it is optional: <b>skipping every field and tapping Check-in is a complete, valid check-in</b> — the assertion was never the readings, it is the covered-and-nothing-further stamp.</div>
+      <div class="note"><b>Not a submission.</b> Every condition, treatment and mark was written the moment it was recorded; nothing on this sheet gates or bundles them. The sheet exists because the stamp and the readings share a moment, not because anything needs collecting.</div>
+      <div class="note"><b>Unit-wide acts live here too.</b> <span class="mono">Switch feed</span> runs the transition across every pen of a batch in one act — pre-filled when due, a formula picker when ad hoc — because a switch is Bulk and the unit sheet is where the whole unit is the subject. Per-pen remains possible from any strip.</div>
+      <div class="note"><b>The ⋯ is gone — this sheet is the unit&#39;s own.</b> Totals and the stamp live in the header&#39;s right column; the stamp is the door. Opened mid-walk, the sheet records a note, a reading, or opens the unit-wide equipment list <i>without</i> finishing — <span class="mono">Check-in</span> is simply its commit. One surface fewer, and nothing the ⋯ held is homeless.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCREEN 06h · THE PEN SHEET ================= -->
+<section class="screen" style="display:block">
+  <div class="sec-label" style="margin-bottom:6px">
+    <h2>06h · The pen sheet</h2>
+    <span class="anno">The strip instructs · the sheet explains — a detail page (07)</span>
+  </div>
+  <details class="more"><summary>What it is, and how it is reached</summary>
+  <p style="max-width:74ch">The pen&#39;s story: why today&#39;s number is what it is, what is broken, who set the count, what happened here. An instance of <b>the detail page (07)</b> — read-only, keyed sections, history tail. Reached by <b>tapping the strip&#39;s body</b> (left edge acts, body reads, right edge discloses); the wrench and the feed slot land anchored on their sections. Deliberately absent: the pigs list (expansion is that), verb tiles (tick → verb sheet), batch composition (the cards own it).</p>
+  </details>
+  <div class="caro-hint">← swipe · curve-fed · ad-lib · un-identified →</div>
+  <div class="caro">
+    <div class="slide"><div class="vlabel">Curve-fed — the derivation and the provenance</div>
+      <div class="phone" style="height:720px;background:var(--card)">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">Pen C2</div><div class="sub">12 pigs · batch 20 · unit 4</div></div></div>
+        <div class="pgk">Feed</div>
+        <div class="pline"><span class="pl">Today</span><span class="pr"><b style="color:var(--ink)">47.6 kg</b> · ↑0.4 from 47.2</span></div>
+        <div class="pline"><span class="pl">Gestation 1</span><span class="pr">3.8 kg/head × 12</span></div>
+        <div class="pline hist"><span class="pl">000287 · thin · feed +10%</span><span class="pr">jul 18 · G.H</span></div>
+        <div class="pline hist"><span class="pl">000291 · +0.4 kg by hand</span><span class="pr">jul 21 · G.H</span></div>
+        <div class="pline"><span class="pl">Provenance</span><span class="pr" style="color:var(--green)">derived ✓</span></div>
+        <div class="pgk">Faults</div>
+        <div class="pline"><span class="pl">Feeder FD-102 · open</span><span class="pr">jul 20 · G.H ›</span></div>
+        <div class="pline hist"><span class="pl">&ldquo;chain jammed at hopper end&rdquo;</span><span class="pr"></span></div>
+        <div class="pgk" style="border-top:8px solid var(--well);margin-top:10px">History <span style="float:right;text-transform:none;letter-spacing:0;font-size:11px">all ›</span></div>
+        <div class="pline hist"><span class="pl">2 sows in · from B2</span><span class="pr">jul 28 · G.H</span></div>
+        <div class="pline hist"><span class="pl">Feed step · curve day 24→25</span><span class="pr">today</span></div>
+        <div class="pline hist"><span class="pl">Feeder fault · reported</span><span class="pr">jul 20 · G.H</span></div>
+      </div>
+      <div class="why"><b>The FEED block is everything the strip&#39;s number hides.</b> Formula × per-head × count, then the named exceptions, then provenance — <span class="mono">derived ✓</span>, or amber <span class="mono">generic fallback — data gap on console</span>, or <span class="mono">awaiting nutritionist confirmation</span>. The fault line chevrons into the fault&#39;s own record, where Resolve lives — the page reads, records act.</div>
+    </div>
+    <div class="slide"><div class="vlabel">Ad-lib — the countdown&#39;s home</div>
+      <div class="phone" style="height:720px;background:var(--card)">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">Pen D4</div><div class="sub">42 pigs · batch 18 · unit 6</div></div></div>
+        <div class="pgk">Feed</div>
+        <div class="pline"><span class="pl">Ad-lib</span><span class="pr">feeder always full</span></div>
+        <div class="pline"><span class="pl">Grower 1</span><span class="pr">since jul 10</span></div>
+        <div class="pline"><span class="pl">Switches to Finisher 1</span><span class="pr">in 4 days</span></div>
+        <div class="pgk">Faults</div>
+        <div class="pline"><span class="pl">— none open</span><span class="pr"></span></div>
+        <div class="pgk" style="border-top:8px solid var(--well);margin-top:10px">History <span style="float:right;text-transform:none;letter-spacing:0;font-size:11px">all ›</span></div>
+        <div class="pline hist"><span class="pl">Formula switch · Nursery 2 → Grower 1</span><span class="pr">jul 10 · G.H</span></div>
+        <div class="pline hist"><span class="pl">Filled · 42 head from nursery 9</span><span class="pr">jul 02 · L.M</span></div>
+      </div>
+      <div class="why"><b>No ration, and the sheet says why.</b> The upcoming switch lives here until its due day — then it moves to the strip as the transition, and confirming it writes the history line variance anchors on. <span class="mono">— none open</span> is the one place an empty state prints: a section already promised by the wrench&#39;s absence would otherwise read as missing, not as good news.</div>
+    </div>
+    <div class="slide"><div class="vlabel">Un-identified — the count&#39;s trail</div>
+      <div class="phone" style="height:720px;background:var(--card)">
+        <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+        <div class="appbar"><div class="back">←</div><div><div class="ttl">Pen D5</div><div class="sub">38 pigs · no tags · batch 18</div></div></div>
+        <div class="pgk">Count</div>
+        <div class="pline"><span class="pl">38 head</span><span class="pr">set jul 14 · G.H</span></div>
+        <div class="pline hist"><span class="pl">was 40 · 1 death · 1 moved</span><span class="pr">since jul 14</span></div>
+        <div class="pgk">Health</div>
+        <div class="pline"><span class="pl">2 under treatment</span><span class="pr">scours · jul 22</span></div>
+        <div class="pgk">Feed</div>
+        <div class="pline"><span class="pl">Today</span><span class="pr"><b style="color:var(--ink)">12.9 kg</b></span></div>
+        <div class="pgk" style="border-top:8px solid var(--well);margin-top:10px">History <span style="float:right;text-transform:none;letter-spacing:0;font-size:11px">all ›</span></div>
+        <div class="pline hist"><span class="pl">Count set · 40 → 38</span><span class="pr">jul 14 · G.H</span></div>
+        <div class="pline hist"><span class="pl">Treatment · 2 head · scours</span><span class="pr">jul 22 · G.H</span></div>
+      </div>
+      <div class="why"><b>For untagged head, the count is the identity — so its trail lives here.</b> One number on the strip; who set it, from what, and what has moved it since, on the sheet. Group health renders as counts against the population, exactly as the group row records it.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTRACT ================= -->
+<section class="screen" style="display:block">
+  <div class="sec-label" style="margin-bottom:6px">
+    <h2>Check-in · task mode — what differs</h2>
+    <span class="anno">One component, a mode flag</span>
+  </div>
+  <table class="stab" style="margin-top:12px"><thead><tr><th style="width:20%">Element</th><th style="width:32%">Task mode</th><th style="width:32%">Check-in</th><th>Rule</th></tr></thead><tbody>
+    <tr><td>Scope</td><td>A cohort, scoped by batch</td><td>Every animal in the unit, plus the pens themselves</td><td>The check-in is the fuller surface, not the lesser one</td></tr>
+    <tr><td>Segmented row</td><td><b>Lens</b> — the task&#39;s pig-state partition, negative first, never a verb</td><td><b>Attention filters</b> — All · Attention · Feed</td><td>Same component; the lens law binds only the lens, because only it claims to sort animals by state</td></tr>
+    <tr><td>Pens</td><td>The same cards, <b>open by default</b>; the current card&#39;s header <b>docks</b> while its rows scroll — pinning full-width, corners squared, released by the next card</td><td>The same cards, <b>collapsed by default</b>; one with something to see opens itself, ending in the <span class="mono">⌄ n more</span> tail</td><td><b>One carded construction everywhere.</b> Modes differ only in default expansion and what the right slot aggregates — never in anatomy. Collapsing is safe only because scan reaches any pig whether or not its row is rendered</td></tr>
+    <tr><td>Pen row</td><td>Derived task counts — <span class="mono">4 of 6 left</span></td><td>A one-line strip: code · count · the feed slot (a value, or <span class="mono">47.2 → 47.6</span>) · a fault icon</td><td>The strip is the task pen header with a different aggregate; anything needing a second line lives inside the pen</td></tr>
+    <tr><td>Selection bar</td><td>The task&#39;s marks promoted, plus <span class="mono">⋯</span></td><td>Nothing promoted — the verb sheet rises directly</td><td>Promotion is legitimate only where the surface names its verb (05)</td></tr>
+    <tr><td>Rail</td><td>Verdict word + <span class="mono">›</span> on rail tasks; empty on box tasks</td><td>Empty on pig rows; the chevron on pen rows</td><td>A pen has something to expand; a pig does not</td></tr>
+    <tr><td>Completion</td><td>None — rooms are never completed</td><td><b>The check-in stamp</b> — <span class="mono">Check-in</span> raises a sheet of optional readings; one tap through it is still valid</td><td>Not a submission: everything positive was written during the walk. The only unclaimed fact is the negative</td></tr>
+    <tr><td>Dock</td><td colspan="2"><span class="mono">⊞ Go to pen · Scan ear tag · ⌕</span> — identical</td><td>Shared outright, in both modes</td></tr>
+  </tbody></table>
+</section>
+
+<div class="foot">
+  <span class="mono">ux/check-in.html · companion to ux/components.html · ux/screens.html · research in ux/checkin/ · VI decks in vi-proposals/ untouched</span>
+</div>
+</div>
+</body></html>

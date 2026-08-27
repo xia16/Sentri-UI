@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sentri — VI Direction 02 · Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ————— foundations ————— */
+:root {
+  /* ground — cool near-neutral, the powder-coated housing */
+  --ground:   #F5F7F8;   /* deck + screen ground */
+  --panel:    #FFFFFF;   /* raised instrument faces */
+  --well:     #ECEFF1;   /* recessed wells, empty gauge track */
+  --ink:      #171B1E;   /* cool black */
+  --ink-2:    #454D53;   /* secondary text */
+  --ink-3:    #667079;   /* annotation floor */
+  --hairline: rgba(23,27,30,0.13);
+  --hairline-soft: rgba(23,27,30,0.07);
+  --wall:     #C7CDD1;   /* schematic walls */
+
+  /* THE signal — industrial gauge teal. Chrome, focus, "you are here". Never a status. */
+  --signal:       #0E7C8A;
+  --signal-deep:  #0A5560;   /* teal as text on light ground, ≥7:1 */
+  --signal-wash:  rgba(14,124,138,0.08);
+
+  /* 5-status system — meaning lives here and only here */
+  --st-red:        #C2402E;  /* overdue */
+  --st-red-wash:   #FBEAE7;
+  --st-amber:      #8F6400;  /* due now — text weight */
+  --st-amber-fill: #E89C0E;  /* due now — fills, dots */
+  --st-amber-wash: #FBF2DE;
+  --st-blue:       #3E56C4;  /* in progress — pushed toward indigo, 45° off signal */
+  --st-blue-wash:  #EBEEFA;
+  --st-green:      #3B8A50;  /* done / recorded */
+  --st-green-wash: #EAF4EC;
+  --st-gray:       #79828A;  /* upcoming / not yet due */
+  --st-gray-wash:  #EFF1F3;
+
+  --disp: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --sans: "Barlow", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; margin: 0; }
+button { font: inherit; appearance: none; background: none; border: none; padding: 0; color: inherit; cursor: pointer; border-radius: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans); font-size: 16px; line-height: 1.6;
+  background: var(--ground); color: var(--ink);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+::selection { background: var(--signal); color: #fff; }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 48px; }
+@media (max-width: 720px) { .wrap { padding: 0 22px; } }
+
+/* display voice — condensed caps, the stenciled equipment label */
+.disp { font-family: var(--disp); font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; }
+
+/* mono annotation voice */
+.ann {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-3);
+}
+.ann .t { color: var(--signal-deep); }
+
+/* numerals — every number in the system is mono. no exceptions. */
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* chapter chrome */
+section.chapter { padding: 96px 0 30px; }
+.ch-head { display: flex; align-items: center; gap: 16px; border-top: 2px solid var(--ink); padding-top: 14px; margin-bottom: 44px; }
+.ch-head .no { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; background: var(--signal); color: #fff; padding: 4px 9px; flex-shrink: 0; }
+.ch-head h2 { font-family: var(--disp); font-weight: 600; text-transform: uppercase; letter-spacing: 0.025em; font-size: 34px; line-height: 1.02; }
+.ch-head .ann { margin-left: auto; white-space: nowrap; }
+@media (max-width: 720px) { .ch-head .ann { display: none; } }
+
+p.lede { font-size: 19px; line-height: 1.55; max-width: 60ch; font-weight: 500; letter-spacing: -0.004em; }
+p.body-text { max-width: 64ch; color: var(--ink-2); margin-top: 14px; font-size: 15.5px; }
+
+/* ————— cover ————— */
+.cover-bleed {
+  position: relative; border-bottom: 2px solid var(--ink);
+  background-image:
+    linear-gradient(to right, rgba(23,27,30,0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(23,27,30,0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+.cover { min-height: 92vh; display: flex; flex-direction: column; }
+.cover-top { display: flex; justify-content: space-between; gap: 18px; padding-top: 28px; }
+.cover-mid { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 70px 0; }
+.cover h1 { font-family: var(--disp); font-weight: 700; text-transform: uppercase; font-size: clamp(64px, 10vw, 118px); letter-spacing: 0.015em; line-height: 0.92; margin-top: 40px; }
+.cover .tagline { font-size: clamp(17px, 2vw, 21px); color: var(--ink-2); margin-top: 20px; font-weight: 400; }
+.t-band { display: inline-block; background: var(--signal); color: #fff; font-family: var(--mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; padding: 7px 13px; margin-top: 32px; }
+.cover-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; padding-bottom: 26px; }
+.cover-bottom .toc { display: flex; gap: 22px; flex-wrap: wrap; }
+.cover-bottom a { color: var(--ink-3); text-decoration: none; }
+.cover-bottom a:hover { color: var(--signal-deep); }
+
+/* ————— 01 idea ————— */
+.idea-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 72px; align-items: start; }
+@media (max-width: 900px) { .idea-grid { grid-template-columns: 1fr; gap: 40px; } }
+.manifesto { font-size: 25px; line-height: 1.46; font-weight: 400; letter-spacing: -0.008em; }
+.manifesto .t { color: var(--signal-deep); font-weight: 500; }
+.idea-aside { border-left: 2px solid var(--ink); padding-left: 28px; }
+.idea-aside .row { padding: 14px 0; border-bottom: 1px solid var(--hairline-soft); }
+.idea-aside .row:last-child { border-bottom: none; }
+.idea-aside b { display: block; font-size: 14px; font-weight: 600; }
+.idea-aside span { font-size: 13.5px; color: var(--ink-3); line-height: 1.5; display: block; margin-top: 2px; }
+
+/* ————— 02 mark ————— */
+.mark-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+@media (max-width: 900px) { .mark-grid { grid-template-columns: 1fr; } }
+.plate { background: var(--panel); border: 1px solid var(--hairline); padding: 56px 40px; display: flex; align-items: center; justify-content: center; min-height: 300px; position: relative; }
+.plate-label { position: absolute; top: 12px; left: 14px; white-space: nowrap; }
+.mark-notes { font-size: 14px; color: var(--ink-2); max-width: 56ch; }
+.mark-notes p + p { margin-top: 12px; }
+.lockups { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--hairline); border-right: none; margin-top: 28px; background: var(--panel); }
+.lockups > div { border-right: 1px solid var(--hairline); padding: 34px 20px 26px; text-align: center; position: relative; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+@media (max-width: 720px) { .lockups { grid-template-columns: 1fr; border-right: 1px solid var(--hairline); } .lockups > div { border-right: none; border-bottom: 1px solid var(--hairline); } .lockups > div:last-child { border-bottom: none; } }
+.wordmark { font-family: var(--disp); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; line-height: 1; }
+
+/* ————— 03 type ————— */
+.type-rows { border-top: 1px solid var(--hairline); }
+.type-row { display: grid; grid-template-columns: 240px 1fr; gap: 36px; padding: 30px 0; border-bottom: 1px solid var(--hairline); align-items: baseline; }
+@media (max-width: 820px) { .type-row { grid-template-columns: 1fr; gap: 10px; } }
+.type-meta { font-size: 13px; color: var(--ink-3); line-height: 1.55; }
+.type-meta b { display: block; color: var(--ink); font-weight: 600; font-size: 13.5px; }
+.spec-display { font-family: var(--disp); font-weight: 600; text-transform: uppercase; font-size: 52px; letter-spacing: 0.02em; line-height: 1.0; }
+.spec-ui { font-size: 16px; max-width: 58ch; }
+.spec-ui b { font-weight: 600; }
+.spec-mono { font-family: var(--mono); font-size: 13px; line-height: 1.8; color: var(--ink-2); }
+.spec-num { font-family: var(--mono); font-weight: 600; font-size: 58px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.spec-num sub { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); vertical-align: baseline; margin-left: 10px; }
+
+/* ————— 04 color ————— */
+.palette { display: grid; grid-template-columns: repeat(5, 1fr); border: 1px solid var(--hairline); border-right: none; background: var(--panel); }
+@media (max-width: 820px) { .palette { grid-template-columns: 1fr 1fr; } }
+.chipc { border-right: 1px solid var(--hairline); }
+.chipc .well-swatch { height: 120px; }
+.chipc .meta { padding: 12px 14px 16px; border-top: 1px solid var(--hairline); }
+.chipc .meta b { font-size: 13.5px; font-weight: 600; display: block; }
+.chipc .meta span { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); display: block; margin-top: 3px; }
+.ratio { display: flex; height: 14px; margin-top: 36px; border: 1px solid var(--hairline); }
+.ratio-labels { display: flex; margin-top: 8px; }
+.status-table { border: 1px solid var(--hairline); margin-top: 36px; background: var(--panel); }
+.status-row { display: grid; grid-template-columns: 150px 1fr 130px 190px; gap: 14px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--hairline-soft); font-size: 13.5px; }
+.status-row:last-child { border-bottom: none; }
+.status-row .sw { display: flex; align-items: center; gap: 9px; font-weight: 600; }
+.status-row .sw i { width: 10px; height: 10px; flex-shrink: 0; }
+.status-row .hex { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.status-row .demo { justify-self: end; }
+@media (max-width: 820px) { .status-row { grid-template-columns: 1fr 1fr; } .status-row .demo { justify-self: start; } }
+.stchip { font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; white-space: nowrap; }
+
+/* ————— phone frame ————— */
+.phone-row { display: grid; grid-template-columns: 390px 1fr; gap: 64px; align-items: start; }
+@media (max-width: 900px) { .phone-row { grid-template-columns: 1fr; } }
+.phone {
+  width: 390px; max-width: 100%; flex-shrink: 0;
+  border: 1px solid rgba(23,27,30,0.25); border-radius: 30px; overflow: hidden;
+  background: var(--ground); box-shadow: 6px 6px 0 -3px var(--ink);
+}
+.statusbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 24px 8px; font-family: var(--mono); font-size: 13px; font-weight: 600; }
+.statusbar svg { display: block; }
+.phone-notes { font-size: 14px; color: var(--ink-2); }
+.phone-notes .note { padding: 13px 0; border-bottom: 1px solid var(--hairline-soft); display: grid; grid-template-columns: 26px 1fr; gap: 12px; }
+.phone-notes .note:first-child { border-top: 2px solid var(--ink); }
+.phone-notes .note i { font-style: normal; font-family: var(--mono); font-size: 10.5px; font-weight: 600; color: var(--signal-deep); letter-spacing: 0.08em; padding-top: 2px; }
+.phone-notes .note b { font-weight: 600; display: block; font-size: 13.5px; }
+.phone-notes .note span { display: block; color: var(--ink-3); font-size: 13px; line-height: 1.55; margin-top: 2px; }
+
+/* ————— shared app chrome ————— */
+.app-h { padding: 6px 16px 12px; display: flex; align-items: center; gap: 12px; }
+.app-h .farm { font-family: var(--disp); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; font-size: 22px; line-height: 1; }
+.app-h .date { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 3px; }
+.sync-chip { margin-left: auto; display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: 0.06em; color: var(--ink-2); border: 1px solid var(--hairline); background: var(--panel); padding: 6px 9px; border-radius: 3px; }
+.sync-chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--st-amber-fill); }
+.mono-id { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* exception strip */
+.exc { margin: 0 12px 10px; background: var(--st-red-wash); border: 1px solid rgba(194,64,46,0.35); border-left: 3px solid var(--st-red); border-radius: 4px; padding: 11px 12px; display: flex; align-items: center; gap: 10px; min-height: 48px; }
+.exc .n { font-family: var(--mono); font-weight: 600; font-size: 18px; color: var(--st-red); line-height: 1; }
+.exc .tx { font-size: 12.5px; font-weight: 600; line-height: 1.3; }
+.exc .tx span { display: block; font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--ink-2); letter-spacing: 0.04em; margin-top: 2px; }
+.exc .go { margin-left: auto; font-family: var(--mono); font-size: 10.5px; font-weight: 600; color: var(--st-red); letter-spacing: 0.08em; white-space: nowrap; }
+
+/* schematic */
+.schem { margin: 0 12px; background: var(--panel); border: 1px solid var(--hairline); border-radius: 4px; padding: 12px 12px 10px; }
+.schem-h { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.schem-h b { font-family: var(--disp); font-weight: 600; text-transform: uppercase; font-size: 13px; letter-spacing: 0.08em; }
+.schem-h span { margin-left: auto; font-family: var(--mono); font-size: 9.5px; color: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; }
+.sections { display: grid; grid-template-columns: 1fr 1.5fr; gap: 8px; }
+.sect { border: 1.5px solid var(--wall); border-radius: 3px; padding: 7px 7px 7px; }
+.sect .nm { font-family: var(--mono); font-size: 8.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 6px; display: flex; justify-content: space-between; }
+.rooms { display: grid; gap: 5px; }
+.room { border: 1px solid var(--hairline); border-radius: 2px; background: var(--ground); min-height: 44px; padding: 5px 7px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+.room .rn { font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 0.05em; color: var(--ink-2); }
+.room .rc { font-family: var(--mono); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1; }
+.room .rc small { font-family: var(--mono); font-size: 8.5px; font-weight: 500; color: var(--ink-3); }
+.room.alert { background: var(--st-red-wash); border: 1.5px solid var(--st-red); }
+.room.due { background: var(--st-amber-wash); border: 1.5px solid var(--st-amber-fill); }
+.room.active { background: var(--st-blue-wash); border: 1.5px solid var(--st-blue); }
+.badge { position: absolute; top: -7px; right: -6px; min-width: 16px; height: 16px; border-radius: 8px; background: var(--st-red); color: #fff; font-family: var(--mono); font-size: 9.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
+.badge.amber { background: var(--st-amber-fill); }
+.schem-legend { display: flex; gap: 12px; margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--hairline-soft); flex-wrap: wrap; }
+.schem-legend span { font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); display: flex; align-items: center; gap: 5px; }
+.schem-legend i { width: 8px; height: 8px; border-radius: 1px; }
+
+/* gauge — segmented progress */
+.gauge { position: relative; height: 10px; border-radius: 2px; overflow: hidden; background: var(--well); }
+.gauge .fill { position: absolute; inset: 0 auto 0 0; }
+.gauge .segs { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 8px, var(--panel) 8px 10px); }
+
+/* task cards on Today */
+.tasks { padding: 12px 12px 8px; display: flex; flex-direction: column; gap: 8px; }
+.tcard { background: var(--panel); border: 1px solid var(--hairline); border-radius: 4px; padding: 12px 14px; min-height: 56px; }
+.tcard .r1 { display: flex; align-items: baseline; gap: 8px; }
+.tcard .tname { font-weight: 600; font-size: 14.5px; letter-spacing: -0.004em; }
+.tcard .loc { font-family: var(--mono); font-size: 10px; color: var(--ink-2); letter-spacing: 0.05em; margin-top: 2px; }
+.tcard .r2 { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.tcard .gauge { flex: 1; }
+.tcard .gnum { font-family: var(--mono); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tcard .gnum small { font-weight: 400; color: var(--ink-3); }
+
+/* tab bar */
+.tabbar { display: flex; border-top: 1px solid var(--hairline); background: var(--panel); padding: 8px 0 18px; }
+.tabbar > div { flex: 1; min-height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.tabbar > div.on { color: var(--signal-deep); }
+.tabbar svg { display: block; }
+
+/* list screen */
+.subh { display: flex; align-items: center; gap: 12px; padding: 6px 16px 10px; }
+.subh .back { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; margin-left: -8px; }
+.subh .ttl { font-family: var(--disp); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 19px; }
+.subh .day { margin-left: auto; font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: var(--ink-2); border: 1px solid var(--hairline); background: var(--panel); padding: 5px 8px; border-radius: 3px; }
+.unit-head { margin: 0 12px 10px; background: var(--panel); border: 1px solid var(--hairline); border-radius: 4px; padding: 13px 14px 12px; }
+.unit-head .l1 { display: flex; align-items: baseline; }
+.unit-head .uloc { font-family: var(--mono); font-size: 10.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--signal-deep); }
+.unit-head .last { margin-left: auto; font-family: var(--mono); font-size: 9.5px; color: var(--ink-3); letter-spacing: 0.03em; }
+.unit-head .l2 { display: flex; align-items: flex-end; gap: 14px; margin-top: 8px; }
+.unit-head .big { font-family: var(--mono); font-weight: 600; font-size: 30px; line-height: 0.95; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.unit-head .big small { font-size: 15px; color: var(--ink-3); font-weight: 500; }
+.unit-head .cap { font-family: var(--mono); font-size: 9.5px; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
+.unit-head .gauge { margin-top: 10px; height: 12px; }
+.pengroup { margin: 0 12px 8px; background: var(--panel); border: 1px solid var(--hairline); border-radius: 4px; overflow: hidden; }
+.pen-h { display: flex; align-items: center; gap: 8px; padding: 9px 14px; background: var(--well); border-bottom: 1px solid var(--hairline); min-height: 40px; }
+.pen-h .pc { font-family: var(--mono); font-weight: 600; font-size: 13px; }
+.pen-h .pm { font-family: var(--mono); font-size: 9.5px; color: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; margin-left: auto; }
+.prow { display: flex; align-items: center; gap: 10px; padding: 0 14px; min-height: 52px; border-bottom: 1px solid var(--hairline-soft); }
+.prow:last-child { border-bottom: none; }
+.prow .dot { width: 9px; height: 9px; border-radius: 1.5px; flex-shrink: 0; }
+.prow .id { font-family: var(--mono); font-weight: 600; font-size: 14px; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.prow .st { font-size: 12.5px; color: var(--ink-2); line-height: 1.3; }
+.prow .st b { font-weight: 600; color: var(--ink); }
+.prow .st .delta { font-family: var(--mono); font-size: 10px; letter-spacing: 0.02em; }
+.prow .act { margin-left: auto; width: 34px; height: 34px; border-radius: 3px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--hairline); }
+.prow .act.solid { background: var(--signal); border-color: var(--signal); }
+.prow.done .id, .prow.done .st { color: var(--st-gray); }
+.prow.done .st b { color: var(--st-gray); }
+.morepens { margin: 0 12px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.penstub { background: var(--panel); border: 1px solid var(--hairline); border-radius: 4px; min-height: 48px; padding: 9px 14px; display: flex; align-items: center; gap: 8px; }
+.penstub .pc { font-family: var(--mono); font-weight: 600; font-size: 13px; }
+.penstub .pm { margin-left: auto; font-family: var(--mono); font-size: 9.5px; color: var(--ink-3); }
+.cta-dock { padding: 10px 12px 20px; background: linear-gradient(to bottom, rgba(245,247,248,0), var(--ground) 40%); }
+.cta { display: flex; align-items: center; justify-content: center; min-height: 56px; background: var(--signal); color: #fff; border-radius: 5px; font-weight: 600; font-size: 16px; letter-spacing: 0.01em; }
+.cta .n { font-family: var(--mono); font-size: 12px; font-weight: 500; opacity: 0.85; margin-left: 10px; }
+
+/* farrowing sheet */
+.sheet-scrim { background: rgba(23,27,30,0.5); padding-top: 130px; }
+.sheet { background: var(--ground); border-radius: 18px 18px 0 0; overflow: hidden; }
+.sheet-grab { width: 36px; height: 4px; border-radius: 2px; background: var(--wall); margin: 8px auto 0; }
+.sheet-h { display: flex; align-items: center; padding: 8px 16px 10px; }
+.sheet-h .ttl { font-family: var(--disp); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 18px; }
+.sheet-h .x { margin-left: auto; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; }
+.sow-id { display: flex; align-items: center; gap: 10px; margin: 0 12px 10px; background: var(--panel); border: 1px solid var(--hairline); border-radius: 4px; padding: 11px 12px; }
+.sow-id .pen { font-family: var(--mono); font-weight: 600; font-size: 13px; background: var(--well); border: 1px solid var(--hairline); border-radius: 3px; padding: 4px 8px; }
+.sow-id .tag { font-family: var(--mono); font-weight: 600; font-size: 17px; letter-spacing: 0.03em; }
+.sow-id .meta { margin-left: auto; font-family: var(--mono); font-size: 9.5px; color: var(--ink-2); letter-spacing: 0.04em; text-transform: uppercase; text-align: right; line-height: 1.5; }
+.warnband { margin: 0 12px 10px; background: var(--st-amber-wash); border: 1px solid rgba(232,156,14,0.5); border-left: 3px solid var(--st-amber-fill); border-radius: 4px; padding: 10px 12px; display: flex; align-items: center; gap: 9px; min-height: 48px; }
+.warnband .wt { font-size: 12.5px; font-weight: 600; color: var(--st-amber); }
+.warnband .wm { display: block; font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--ink-2); margin-top: 1px; letter-spacing: 0.03em; }
+.counters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 12px; }
+.counter { background: var(--panel); border: 1px solid var(--hairline); border-radius: 4px; padding: 12px 12px 10px; }
+.counter .lb { font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.counter .vrow { display: flex; align-items: center; margin-top: 8px; gap: 6px; }
+.counter .v { font-family: var(--mono); font-weight: 600; font-size: 40px; line-height: 0.9; font-variant-numeric: tabular-nums; }
+.counter .v small { font-size: 12px; font-weight: 500; color: var(--ink-3); margin-left: 3px; }
+.counter .step { margin-left: auto; display: flex; gap: 5px; }
+.counter .step button { width: 40px; height: 40px; border: 1px solid var(--hairline); border-radius: 4px; background: var(--ground); font-family: var(--mono); font-size: 18px; font-weight: 600; color: var(--ink-2); display: flex; align-items: center; justify-content: center; }
+.counter .step button.plus { background: var(--signal-wash); border-color: rgba(14,124,138,0.4); color: var(--signal-deep); }
+.rec-by { margin: 10px 16px 0; text-align: right; font-family: var(--mono); font-size: 9.5px; color: var(--ink-3); letter-spacing: 0.04em; }
+.sheet-acts { display: flex; gap: 8px; padding: 12px 12px 20px; }
+.btn-more { width: 56px; height: 56px; flex-shrink: 0; border: 1px solid var(--hairline); border-radius: 5px; background: var(--panel); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; letter-spacing: 0.1em; color: var(--ink-2); }
+.sheet-acts .cta { flex: 1; }
+
+/* ————— 08 density ————— */
+.dens-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+@media (max-width: 900px) { .dens-grid { grid-template-columns: 1fr; } }
+.rulecard { background: var(--panel); border: 1px solid var(--hairline); }
+.rulecard .rc-h { padding: 12px 16px; border-bottom: 1px solid var(--hairline); }
+.rulecard .rc-b { padding: 18px 16px 20px; }
+.dim { position: relative; }
+.dimlab { font-family: var(--mono); font-size: 9.5px; font-weight: 600; letter-spacing: 0.08em; color: var(--signal-deep); }
+.hier { border-left: 2px solid var(--ink); }
+.hier > div { padding: 8px 0 8px 18px; font-size: 13.5px; position: relative; }
+.hier > div::before { content: ""; position: absolute; left: -5px; top: 15px; width: 8px; height: 8px; background: var(--panel); border: 1.5px solid var(--ink-2); }
+.hier > div b { font-weight: 600; }
+.hier > div span { color: var(--ink-3); font-size: 12.5px; display: block; }
+.hier > div.stop::before { background: var(--st-red); border-color: var(--st-red); }
+.colorlaw { margin-top: 26px; border: 1px solid var(--hairline); background: var(--panel); }
+.colorlaw > div { display: grid; grid-template-columns: 130px 1fr; gap: 14px; padding: 11px 16px; border-bottom: 1px solid var(--hairline-soft); font-size: 13.5px; align-items: baseline; }
+.colorlaw > div:last-child { border-bottom: none; }
+.colorlaw .who { font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; }
+
+/* ————— 09 voice ————— */
+.voice-grid { display: grid; grid-template-columns: repeat(2, 1fr); border: 1px solid var(--hairline); background: var(--panel); }
+@media (max-width: 820px) { .voice-grid { grid-template-columns: 1fr; } }
+.voice-cell { padding: 24px 28px; border-right: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); }
+.voice-cell:nth-child(2n) { border-right: none; }
+.voice-cell:nth-child(n+5) { border-bottom: none; }
+@media (max-width: 820px) { .voice-cell { border-right: none !important; border-bottom: 1px solid var(--hairline) !important; } .voice-cell:last-child { border-bottom: none !important; } }
+.voice-cell .ctx { font-family: var(--mono); font-size: 9.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.voice-cell .say { font-size: 16px; font-weight: 500; margin-top: 8px; line-height: 1.45; }
+.voice-cell .why { font-size: 12.5px; color: var(--ink-3); margin-top: 8px; line-height: 1.55; }
+
+/* ————— 10 verdict ————— */
+.verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--hairline); background: var(--panel); }
+@media (max-width: 820px) { .verdict { grid-template-columns: 1fr; } }
+.verdict > div { padding: 28px 32px 32px; }
+.verdict > div:first-child { border-right: 1px solid var(--hairline); }
+@media (max-width: 820px) { .verdict > div:first-child { border-right: none; border-bottom: 1px solid var(--hairline); } }
+.verdict h3 { font-family: var(--disp); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 19px; }
+.verdict ul { list-style: none; margin-top: 16px; padding: 0; }
+.verdict li { padding: 11px 0 11px 24px; border-bottom: 1px solid var(--hairline-soft); font-size: 14px; line-height: 1.55; color: var(--ink-2); position: relative; }
+.verdict li:last-child { border-bottom: none; }
+.verdict li b { color: var(--ink); font-weight: 600; }
+.verdict li::before { content: ""; position: absolute; left: 2px; top: 18px; width: 9px; height: 9px; }
+.verdict .pro li::before { background: var(--signal); }
+.verdict .con li::before { background: none; border: 1.5px solid var(--st-red); }
+
+footer.book-end { border-top: 2px solid var(--ink); margin-top: 110px; padding: 26px 0 60px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<!-- ======================= 00 · COVER ======================= -->
+<header class="cover-bleed">
+  <div class="wrap cover">
+    <div class="cover-top">
+      <span class="ann">Sentri · VI direction <span class="t">02</span></span>
+      <span class="ann">2026.08 · For internal &amp; investor review</span>
+    </div>
+    <div class="cover-mid">
+      <!-- the mark: room / pens / the one that needs you -->
+      <svg width="116" height="116" viewBox="0 0 100 100" role="img" aria-label="Sentri mark — the pen grid">
+        <rect x="4" y="4" width="92" height="92" fill="none" stroke="var(--ink)" stroke-width="8"/>
+        <rect x="20" y="20" width="26" height="26" fill="none" stroke="var(--ink)" stroke-width="6"/>
+        <rect x="54" y="20" width="26" height="26" fill="none" stroke="var(--ink)" stroke-width="6"/>
+        <rect x="20" y="54" width="26" height="26" fill="none" stroke="var(--ink)" stroke-width="6"/>
+        <rect x="54" y="54" width="26" height="26" fill="var(--signal)"/>
+      </svg>
+      <h1>Panel</h1>
+      <p class="tagline">Equipment you operate. Not an app you browse.</p>
+      <div class="t-band">The barn, on one instrument</div>
+    </div>
+    <div class="cover-bottom">
+      <div class="toc ann">
+        <a href="#idea">01 Idea</a><a href="#mark">02 Mark</a><a href="#type">03 Type</a><a href="#color">04 Color</a><a href="#today">05 Today</a><a href="#check">06 Pregnancy check</a><a href="#farrow">07 Farrowing</a><a href="#density">08 Density</a><a href="#voice">09 Voice</a><a href="#verdict">10 Verdict</a>
+      </div>
+      <span class="ann">Ashfield Farm · 2,140 sows</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ======================= 01 · IDEA ======================= -->
+  <section class="chapter" id="idea">
+    <div class="ch-head"><span class="no">01</span><h2>The idea</h2><span class="ann">Concept · The instrument cluster</span></div>
+    <div class="idea-grid">
+      <div>
+        <p class="manifesto">A farrowing barn is not a place you browse software. Gloves, glare, ammonia, two hundred sows and a worker who reads a screen the way a driver reads a dashboard — in half a second, mid-motion, for exactly one thing: <span class="t">does anything need me right now?</span> Sentri answers like an instrument cluster answers. Exceptions pinned to the top in status color. Everything running normally stays quiet gray. Big mono numerals you can read at arm's length, gauge bars segmented like a fuel readout, and a schematic of the barn itself — because on a farm, the address of a problem is a room, not a list index.</p>
+        <p class="body-text">The reference lineage is the tractor dashboard, the ward monitor, the flight instrument: machines that people trust with animals and lives precisely because they never decorate. Translated to a sunlit light UI — cool near-neutral housing, white instrument faces, one engineered teal for the controls you operate.</p>
+      </div>
+      <aside class="idea-aside">
+        <div class="row"><b>Exception-first, always</b><span>The top of every screen belongs to what is wrong or due. The 6 overdue re-checks outrank 2,134 sows that are fine. Quiet is the default state of a healthy barn — and of this UI.</span></div>
+        <div class="row"><b>The barn is the interface</b><span>Location-first drawn literally: a room/pen schematic with live counts is the home surface. Workers think "Gestation, Room 2, pen A3" — the software finally does too.</span></div>
+        <div class="row"><b>Numbers are instruments</b><span>Every numeral in the product is mono and tabular — counts, ear tags, timestamps. A count you glance at twice a minute deserves the fixed pitch of an odometer.</span></div>
+        <div class="row"><b>One signal, five statuses</b><span>Gauge teal marks controls and "you are here". Meaning — overdue, due, in progress, done, upcoming — belongs exclusively to the five status hues. The two never trade jobs.</span></div>
+      </aside>
+    </div>
+  </section>
+
+<!-- ======================= 02 · MARK ======================= -->
+  <section class="chapter" id="mark">
+    <div class="ch-head"><span class="no">02</span><h2>The mark</h2><span class="ann">The pen grid · 100 × 100</span></div>
+    <div class="mark-grid">
+      <div class="plate">
+        <span class="plate-label ann">Primary · on housing</span>
+        <svg width="150" height="150" viewBox="0 0 100 100" role="img" aria-label="Sentri pen-grid mark">
+          <rect x="4" y="4" width="92" height="92" fill="none" stroke="var(--ink)" stroke-width="8"/>
+          <rect x="20" y="20" width="26" height="26" fill="none" stroke="var(--ink)" stroke-width="6"/>
+          <rect x="54" y="20" width="26" height="26" fill="none" stroke="var(--ink)" stroke-width="6"/>
+          <rect x="20" y="54" width="26" height="26" fill="none" stroke="var(--ink)" stroke-width="6"/>
+          <rect x="54" y="54" width="26" height="26" fill="var(--signal)"/>
+        </svg>
+      </div>
+      <div class="mark-notes">
+        <p>A room, its pens, and the one that needs you. The outer square is the barn wall; inside, four pens drawn as an equipment schematic; one pen filled solid teal — <strong>the sentry's answer</strong>. It is the product's whole argument in one glyph: hundreds of animals, one location that matters right now, and you can see which.</p>
+        <p>Construction is strict: 100-unit grid, 8-unit outer wall, 6-unit pen walls, pens on a 34-unit module. No curves anywhere — the mark is fabricated, not drawn. It reads correctly rotated, embossed on a plastic housing, stenciled on a barn door, or punched into an ear-tag applicator.</p>
+        <p>Below 24 px the interior simplifies to the <strong>small cut</strong>: wall plus a single filled quadrant. The filled pen never changes position in any one deployment — like a power lamp, it means the same thing every time you look at it. The wordmark is Barlow Condensed 700, all caps, tracked +6% — the stenciled label on the equipment, not a logotype with a personality of its own.</p>
+      </div>
+    </div>
+    <div class="lockups" style="border-bottom: none;">
+      <div>
+        <span class="plate-label ann">64 px</span>
+        <svg width="64" height="64" viewBox="0 0 100 100"><rect x="4" y="4" width="92" height="92" fill="none" stroke="var(--ink)" stroke-width="8"/><rect x="20" y="20" width="26" height="26" fill="none" stroke="var(--ink)" stroke-width="6"/><rect x="54" y="20" width="26" height="26" fill="none" stroke="var(--ink)" stroke-width="6"/><rect x="20" y="54" width="26" height="26" fill="none" stroke="var(--ink)" stroke-width="6"/><rect x="54" y="54" width="26" height="26" fill="var(--signal)"/></svg>
+      </div>
+      <div>
+        <span class="plate-label ann">32 px</span>
+        <svg width="32" height="32" viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90" fill="none" stroke="var(--ink)" stroke-width="10"/><rect x="22" y="22" width="25" height="25" fill="none" stroke="var(--ink)" stroke-width="8"/><rect x="53" y="22" width="25" height="25" fill="none" stroke="var(--ink)" stroke-width="8"/><rect x="22" y="53" width="25" height="25" fill="none" stroke="var(--ink)" stroke-width="8"/><rect x="53" y="53" width="25" height="25" fill="var(--signal)"/></svg>
+      </div>
+      <div>
+        <span class="plate-label ann">16 px · small cut — quadrant only</span>
+        <svg width="16" height="16" viewBox="0 0 100 100"><rect x="7" y="7" width="86" height="86" fill="none" stroke="var(--ink)" stroke-width="14"/><rect x="50" y="50" width="34" height="34" fill="var(--signal)"/></svg>
+      </div>
+    </div>
+    <div class="lockups">
+      <div>
+        <span class="plate-label ann">Horizontal lockup</span>
+        <div style="display:flex; align-items:center; gap:13px;">
+          <svg width="30" height="30" viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90" fill="none" stroke="var(--ink)" stroke-width="10"/><rect x="22" y="22" width="25" height="25" fill="none" stroke="var(--ink)" stroke-width="8"/><rect x="53" y="22" width="25" height="25" fill="none" stroke="var(--ink)" stroke-width="8"/><rect x="22" y="53" width="25" height="25" fill="none" stroke="var(--ink)" stroke-width="8"/><rect x="53" y="53" width="25" height="25" fill="var(--signal)"/></svg>
+          <span class="wordmark" style="font-size:30px;">Sentri</span>
+        </div>
+      </div>
+      <div>
+        <span class="plate-label ann">Wordmark alone</span>
+        <span class="wordmark" style="font-size:30px;">Sentri</span>
+      </div>
+      <div style="background: var(--ink);">
+        <span class="plate-label ann" style="color: rgba(255,255,255,0.55);">On ink · signal brightens</span>
+        <div style="display:flex; align-items:center; gap:13px;">
+          <svg width="30" height="30" viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90" fill="none" stroke="#F5F7F8" stroke-width="10"/><rect x="22" y="22" width="25" height="25" fill="none" stroke="#F5F7F8" stroke-width="8"/><rect x="53" y="22" width="25" height="25" fill="none" stroke="#F5F7F8" stroke-width="8"/><rect x="22" y="53" width="25" height="25" fill="none" stroke="#F5F7F8" stroke-width="8"/><rect x="53" y="53" width="25" height="25" fill="#35B0BF"/></svg>
+          <span class="wordmark" style="font-size:30px; color:#F5F7F8;">Sentri</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- ======================= 03 · TYPE ======================= -->
+  <section class="chapter" id="type">
+    <div class="ch-head"><span class="no">03</span><h2>Typography</h2><span class="ann">Barlow Condensed · Barlow · IBM Plex Mono</span></div>
+    <div class="type-rows">
+      <div class="type-row">
+        <div class="type-meta"><b>Display — Barlow Condensed</b>Screen titles, section names, the wordmark. 600–700, all caps, tracked +2–6%. Barlow's letterforms descend from California highway and equipment signage — mechanical authority is in its DNA, not applied as styling.</div>
+        <div class="spec-display">Gestation · Room 2 needs you</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Text — Barlow</b>All interface and body text, 12.5–16px, weights 400–600. Same superfamily as the display face: one industrial voice at two widths, zero font-pairing cleverness. Wide apertures and open counters hold up on wet, scratched glass.</div>
+        <div class="spec-ui">Check each sow and record the result. Sows already confirmed stay gray — <b>only the ones that need a decision carry color</b>. Results save on the device first and sync when the barn has signal.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Data — IBM Plex Mono</b>The rule that makes this direction: <b>every numeral in the product is mono.</b> Ear tags, pen codes, counts, times, deltas. Plex Mono's engineering lineage reads as calibration, and fixed pitch makes columns of tags scannable like a serial-number plate.</div>
+        <div class="spec-mono">GESTATION · ROOM 2 · PEN A3 · 000418 · PARITY 3 · 650 D<br>LAST CHECK G. HANSEN 23:00 · SYNC PENDING 3 RECORDS</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Numerals in anger</b>The hero count is an odometer: Plex Mono 600, tabular by construction, unit in small caps beside it. It never animates, never gets an icon, never shares its line with prose. At arm's length in sunlight, this is the whole screen.</div>
+        <div>
+          <span class="spec-num">100<span style="color:var(--ink-3);">/</span>200<sub>sows checked · day 1 of 3</sub></span>
+          <div class="spec-mono" style="margin-top:14px;">000231 &nbsp;&nbsp;000268 &nbsp;&nbsp;000302 &nbsp;&nbsp;000318 &nbsp;&nbsp;— tags align like a serial plate</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- ======================= 04 · COLOR & STATUS ======================= -->
+  <section class="chapter" id="color">
+    <div class="ch-head"><span class="no">04</span><h2>Color &amp; status</h2><span class="ann">Housing · faces · one signal · five meanings</span></div>
+    <div class="palette">
+      <div class="chipc"><div class="well-swatch" style="background: var(--ground); border-bottom:1px solid var(--hairline-soft);"></div><div class="meta"><b>Housing</b><span>#F5F7F8</span><span>ground — powder-coat gray</span></div></div>
+      <div class="chipc"><div class="well-swatch" style="background: var(--panel); border-bottom:1px solid var(--hairline-soft);"></div><div class="meta"><b>Face</b><span>#FFFFFF</span><span>raised instrument surfaces</span></div></div>
+      <div class="chipc"><div class="well-swatch" style="background: var(--ink);"></div><div class="meta"><b>Ink</b><span>#171B1E</span><span>text, rules, walls</span></div></div>
+      <div class="chipc"><div class="well-swatch" style="background: var(--signal);"></div><div class="meta"><b>Gauge teal</b><span>#0E7C8A</span><span>THE signal — controls, focus</span></div></div>
+      <div class="chipc"><div class="well-swatch" style="background: var(--well);"></div><div class="meta"><b>Well</b><span>#ECEFF1</span><span>recessed tracks, empty gauge</span></div></div>
+    </div>
+    <div class="ratio">
+      <div style="flex: 78; background: var(--ground); border-right: 1px solid var(--hairline);"></div>
+      <div style="flex: 12; background: var(--ink);"></div>
+      <div style="flex: 5; background: var(--signal);"></div>
+      <div style="flex: 5; display:flex;"><i style="flex:1; background: var(--st-red);"></i><i style="flex:1; background: var(--st-amber-fill);"></i><i style="flex:1; background: var(--st-blue);"></i><i style="flex:1; background: var(--st-green);"></i><i style="flex:1; background: var(--st-gray);"></i></div>
+    </div>
+    <div class="ratio-labels"><span class="ann" style="flex:78;">Usage · housing 78</span><span class="ann" style="flex:12;">ink 12</span><span class="ann" style="flex:10;">teal 5 · status 5</span></div>
+
+    <div class="status-table">
+      <div class="status-row">
+        <div class="sw"><i style="background: var(--st-red);"></i>Overdue</div>
+        <div style="color: var(--ink-2); font-size:13px;">Missed the window. Pinned to the exception strip; never scrolls away.</div>
+        <div class="hex">#C2402E · H 12°</div>
+        <div class="demo"><span class="stchip" style="color:var(--st-red); background:var(--st-red-wash); border:1px solid rgba(194,64,46,0.4);">6 overdue · Room 2</span></div>
+      </div>
+      <div class="status-row">
+        <div class="sw"><i style="background: var(--st-amber-fill);"></i>Due now</div>
+        <div style="color: var(--ink-2); font-size:13px;">Load-bearing amber. Appears only when a task is actionable this shift — never as decoration.</div>
+        <div class="hex">#E89C0E · H 40°</div>
+        <div class="demo"><span class="stchip" style="color:var(--st-amber); background:var(--st-amber-wash); border:1px solid rgba(232,156,14,0.55);">Due now · 46 sows</span></div>
+      </div>
+      <div class="status-row">
+        <div class="sw"><i style="background: var(--st-blue);"></i>In progress</div>
+        <div style="color: var(--ink-2); font-size:13px;">A task someone is actively working. Indigo-leaning, held 45° away from gauge teal.</div>
+        <div class="hex">#3E56C4 · H 230°</div>
+        <div class="demo"><span class="stchip" style="color:var(--st-blue); background:var(--st-blue-wash); border:1px solid rgba(62,86,196,0.4);">Day 1 of 3 · 100/200</span></div>
+      </div>
+      <div class="status-row">
+        <div class="sw"><i style="background: var(--st-green);"></i>Done / recorded</div>
+        <div style="color: var(--ink-2); font-size:13px;">On the record. Rows go quiet — green mark, gray text, no further attention requested.</div>
+        <div class="hex">#3B8A50 · H 133°</div>
+        <div class="demo"><span class="stchip" style="color:var(--st-green); background:var(--st-green-wash); border:1px solid rgba(59,138,80,0.4);">Confirmed · Jul 8</span></div>
+      </div>
+      <div class="status-row">
+        <div class="sw"><i style="background: var(--st-gray);"></i>Upcoming</div>
+        <div style="color: var(--ink-2); font-size:13px;">Not yet due. The healthy majority of any barn — and therefore the quietest thing on screen.</div>
+        <div class="hex">#79828A · neutral</div>
+        <div class="demo"><span class="stchip" style="color:var(--st-gray); background:var(--st-gray-wash); border:1px solid var(--hairline);">Recheck in 3 days</span></div>
+      </div>
+    </div>
+
+    <p class="body-text" style="margin-top:22px;"><strong>Why gauge teal, and why it is ownable.</strong> Safety-equipment orange was auditioned first and rejected on physics: amber is load-bearing in this system, and in direct sun a scratched screen collapses orange and amber into one hue — the brand would dilute the most important status. Teal at #0E7C8A is the instrument-panel alternative: the hue of coolant lines, surgical drape, and oscilloscope traces — equipment, not marketing. In the livestock-software category, which is wall-to-wall John Deere green and enterprise blue, a high-chroma industrial teal is unclaimed. And it is engineered to keep its distance from meaning: 45° from status blue (which is pushed to indigo), 90° from status green, opposite the warm alarm hues — with white text holding 4.9:1 on the solid.</p>
+    <p class="body-text"><strong>Status must survive sunlight.</strong> Every status exists in three redundant channels — hue, a text label, and position (exceptions top, done bottom). Text-weight variants (#C2402E, #8F6400, #3E56C4, #3B8A50) all clear 4.5:1 on white; washes are backgrounds only, never the sole carrier. A colorblind worker in glare loses nothing but tint.</p>
+  </section>
+</div>
+
+<!-- ======================= 05 · TODAY ======================= -->
+<div class="wrap">
+  <section class="chapter" id="today">
+    <div class="ch-head"><span class="no">05</span><h2>Screen — Today</h2><span class="ann">The cluster · barn schematic · exception strip</span></div>
+    <div class="phone-row">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><svg width="46" height="12" viewBox="0 0 46 12" fill="var(--ink)"><rect x="0" y="7" width="3" height="5" rx="0.8"/><rect x="4.5" y="5" width="3" height="7" rx="0.8"/><rect x="9" y="3" width="3" height="9" rx="0.8"/><rect x="13.5" y="1" width="3" height="11" rx="0.8"/><path d="M22 5.5a7 7 0 0 1 9 0l-1.5 1.8a4.7 4.7 0 0 0-6 0zM24.6 8.4a3.2 3.2 0 0 1 3.8 0L26.5 10.6z"/><rect x="34" y="2.5" width="10" height="7" rx="1.6" fill="none" stroke="var(--ink)"/><rect x="35.2" y="3.7" width="6" height="4.6" rx="0.8"/><rect x="44.6" y="4.6" width="1.4" height="2.8" rx="0.7"/></svg></div>
+        <div class="app-h">
+          <svg width="30" height="30" viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90" fill="none" stroke="var(--ink)" stroke-width="10"/><rect x="22" y="22" width="25" height="25" fill="none" stroke="var(--ink)" stroke-width="8"/><rect x="53" y="22" width="25" height="25" fill="none" stroke="var(--ink)" stroke-width="8"/><rect x="22" y="53" width="25" height="25" fill="none" stroke="var(--ink)" stroke-width="8"/><rect x="53" y="53" width="25" height="25" fill="var(--signal)"/></svg>
+          <div><div class="farm">Ashfield Farm</div><div class="date">Thu Jul 8 · 2,140 sows · G. Hansen</div></div>
+          <div class="sync-chip"><i></i>SYNC 3</div>
+        </div>
+
+        <div class="exc">
+          <span class="n">6</span>
+          <div class="tx">Overdue pregnancy re-checks<span>GESTATION · ROOM 2 · OLDEST +2D</span></div>
+          <span class="go">RESOLVE →</span>
+        </div>
+
+        <div class="schem">
+          <div class="schem-h"><b>Barn schematic</b><span>live · 07:12</span></div>
+          <div class="sections">
+            <div class="sect">
+              <div class="nm"><span>Breeding</span><span>46</span></div>
+              <div class="rooms" style="grid-template-columns: 1fr;">
+                <div class="room due"><span class="rn">R1</span><span class="rc">46 <small>DUE</small></span><span class="badge amber">!</span></div>
+                <div class="room"><span class="rn">R2</span><span class="rc">—</span></div>
+              </div>
+            </div>
+            <div class="sect">
+              <div class="nm"><span>Gestation</span><span>1,088</span></div>
+              <div class="rooms" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div class="room"><span class="rn">R1</span><span class="rc">418</span></div>
+                <div class="room alert"><span class="rn">R2</span><span class="rc">200</span><span class="badge">6</span></div>
+                <div class="room"><span class="rn">R3</span><span class="rc">470</span></div>
+              </div>
+            </div>
+            <div class="sect">
+              <div class="nm"><span>Farrowing</span><span>312</span></div>
+              <div class="rooms" style="grid-template-columns: 1fr;">
+                <div class="room"><span class="rn">R1</span><span class="rc">104</span></div>
+                <div class="room"><span class="rn">R2</span><span class="rc">102</span></div>
+                <div class="room alert"><span class="rn">R3</span><span class="rc">12 <small>ACTIVE</small></span><span class="badge">1</span></div>
+              </div>
+            </div>
+            <div class="sect">
+              <div class="nm"><span>Nursery</span><span>694</span></div>
+              <div class="rooms" style="grid-template-columns: 1fr 1fr;">
+                <div class="room"><span class="rn">R1</span><span class="rc">352</span></div>
+                <div class="room"><span class="rn">R2</span><span class="rc">342</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="schem-legend">
+            <span><i style="background: var(--st-red);"></i>Alert</span>
+            <span><i style="background: var(--st-amber-fill);"></i>Due now</span>
+            <span><i style="background: var(--ground); border:1px solid var(--hairline);"></i>Quiet</span>
+          </div>
+        </div>
+
+        <div class="tasks">
+          <div class="ann" style="font-size: 9.5px; padding: 2px 2px 0;">Today · 3 tasks</div>
+          <div class="tcard">
+            <div class="r1"><span class="tname">Pregnancy check</span><span class="stchip" style="color:var(--st-blue); background:var(--st-blue-wash); margin-left:auto;">Day 1/3</span></div>
+            <div class="loc">GESTATION · ROOM 2 · 200 SOWS</div>
+            <div class="r2">
+              <div class="gauge"><div class="fill" style="width:50%; background: var(--st-blue);"></div><div class="segs"></div></div>
+              <span class="gnum">100<small>/200</small></span>
+            </div>
+          </div>
+          <div class="tcard" style="border-left: 3px solid var(--st-amber-fill);">
+            <div class="r1"><span class="tname">Heat check</span><span class="stchip" style="color:var(--st-amber); background:var(--st-amber-wash); margin-left:auto;">Due now</span></div>
+            <div class="loc">BREEDING · ROOM 1 · 46 SOWS</div>
+            <div class="r2">
+              <div class="gauge"><div class="fill" style="width:0%; background: var(--st-amber-fill);"></div><div class="segs"></div></div>
+              <span class="gnum">0<small>/46</small></span>
+            </div>
+          </div>
+          <div class="tcard" style="border-left: 3px solid var(--st-red);">
+            <div class="r1"><span class="tname">Farrowing watch</span><span class="stchip" style="color:var(--st-red); background:var(--st-red-wash); margin-left:auto;">1 alert</span></div>
+            <div class="loc">FARROWING · ROOM 3 · 12 SOWS ACTIVE</div>
+            <div class="r2">
+              <div class="gauge"><div class="fill" style="width:33%; background: var(--st-red);"></div><div class="segs"></div></div>
+              <span class="gnum">12 <small>ACTIVE</small></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabbar">
+          <div class="on"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18"/><path d="M12 3v18M3 12h18"/></svg>Barn</div>
+          <div><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Tasks</div>
+          <div><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>History</div>
+          <div><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6.5 8-6.5s8 2.5 8 6.5"/></svg>Hansen</div>
+        </div>
+      </div>
+
+      <aside class="phone-notes">
+        <div class="note"><i>A</i><div><b>Exception strip — the top is earned</b><span>Only red may occupy the first slot. If nothing is overdue, the strip does not exist and the schematic rises. The 6 outranks 2,134 quiet sows.</span></div></div>
+        <div class="note"><i>B</i><div><b>The barn schematic — signature gesture</b><span>Four sections drawn as a floor plan, rooms as cells with live mono counts. Status colors the room, not an abstract card: the problem has an address you can walk to. Tapping a room opens it.</span></div></div>
+        <div class="note"><i>C</i><div><b>Gauge bars, segmented</b><span>Progress reads like a fuel gauge: recessed well, 8px segments, filled in the task's status hue. Segments make 50% legible at a glance without reading the numeral.</span></div></div>
+        <div class="note"><i>D</i><div><b>Sync as an instrument light</b><span>"SYNC 3" — three records waiting for signal. Amber dot because it needs eventual attention, mono numeral because it is a count. Never a modal, never a toast.</span></div></div>
+        <div class="note"><i>E</i><div><b>Teal appears exactly twice</b><span>The mark and the active tab. On the home screen the brand stands aside — status owns the color budget where animals are concerned.</span></div></div>
+      </aside>
+    </div>
+  </section>
+
+<!-- ======================= 06 · PREGNANCY CHECK ======================= -->
+  <section class="chapter" id="check">
+    <div class="ch-head"><span class="no">06</span><h2>Screen — Pregnancy check</h2><span class="ann">Unit gauge · pen-grouped list · 200-row pattern</span></div>
+    <div class="phone-row">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><svg width="46" height="12" viewBox="0 0 46 12" fill="var(--ink)"><rect x="0" y="7" width="3" height="5" rx="0.8"/><rect x="4.5" y="5" width="3" height="7" rx="0.8"/><rect x="9" y="3" width="3" height="9" rx="0.8"/><rect x="13.5" y="1" width="3" height="11" rx="0.8"/><path d="M22 5.5a7 7 0 0 1 9 0l-1.5 1.8a4.7 4.7 0 0 0-6 0zM24.6 8.4a3.2 3.2 0 0 1 3.8 0L26.5 10.6z"/><rect x="34" y="2.5" width="10" height="7" rx="1.6" fill="none" stroke="var(--ink)"/><rect x="35.2" y="3.7" width="6" height="4.6" rx="0.8"/><rect x="44.6" y="4.6" width="1.4" height="2.8" rx="0.7"/></svg></div>
+        <div class="subh">
+          <span class="back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.4"><path d="M15 4l-8 8 8 8"/></svg></span>
+          <span class="ttl">Pregnancy check</span>
+          <span class="day">DAY 1/3</span>
+        </div>
+
+        <div class="unit-head">
+          <div class="l1"><span class="uloc">Gestation · Room 2</span><span class="last">LAST: G. HANSEN 23:00</span></div>
+          <div class="l2">
+            <div>
+              <div class="big">100<small>/200</small></div>
+              <div class="cap">Sows checked</div>
+            </div>
+            <div style="margin-left:auto; text-align:right;">
+              <div class="big" style="font-size:20px; color: var(--st-red);">6</div>
+              <div class="cap" style="color: var(--st-red);">Overdue</div>
+            </div>
+          </div>
+          <div class="gauge"><div class="fill" style="width:50%; background: var(--st-blue);"></div><div class="segs"></div></div>
+          <div style="display:flex; justify-content:space-between; margin-top:5px;"><span class="ann" style="font-size:8.5px;">0</span><span class="ann" style="font-size:8.5px;">Pens A1–A4 · 200</span></div>
+        </div>
+
+        <div class="pengroup">
+          <div class="pen-h"><span class="pc">PEN A1</span><span class="pm">12 OF 50 LEFT</span></div>
+          <div class="prow">
+            <span class="dot" style="background: var(--st-red);"></span>
+            <span class="id">000225</span>
+            <span class="st"><b>Re-check overdue</b> <span class="delta" style="color:var(--st-red);">+2D LATE</span></span>
+            <span class="act solid"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6"><path d="M9 4l8 8-8 8"/></svg></span>
+          </div>
+          <div class="prow">
+            <span class="dot" style="background: var(--st-gray-wash); border:1.5px solid var(--st-gray);"></span>
+            <span class="id">000231</span>
+            <span class="st">Recheck in <b>3 days</b> · uncertain</span>
+            <span class="act"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="2.2"><path d="M4 20l4-1L19 8l-3-3L5 16z"/></svg></span>
+          </div>
+          <div class="prow">
+            <span class="dot" style="background: var(--st-amber-fill);"></span>
+            <span class="id">000268</span>
+            <span class="st"><b>Needs check</b> · due today</span>
+            <span class="act solid"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6"><path d="M9 4l8 8-8 8"/></svg></span>
+          </div>
+          <div class="prow">
+            <span class="dot" style="background: var(--st-red);"></span>
+            <span class="id">000302</span>
+            <span class="st"><b>Not pregnant</b> → flagged for rebreed</span>
+            <span class="act"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="2.2"><path d="M4 20l4-1L19 8l-3-3L5 16z"/></svg></span>
+          </div>
+          <div class="prow done">
+            <span class="dot" style="background: var(--st-green);"></span>
+            <span class="id">000318</span>
+            <span class="st"><b>Pregnant, confirmed</b> · <span class="delta">DUE JUL 8 · DONE JUL 8</span></span>
+            <span class="act"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--st-green)" stroke-width="2.6"><path d="M5 12l5 5 9-10"/></svg></span>
+          </div>
+        </div>
+
+        <div class="pengroup">
+          <div class="pen-h"><span class="pc">PEN A2</span><span class="pm">31 OF 50 LEFT</span></div>
+          <div class="prow">
+            <span class="dot" style="background: var(--st-amber-fill);"></span>
+            <span class="id">000334</span>
+            <span class="st"><b>Needs check</b> · due today</span>
+            <span class="act solid"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6"><path d="M9 4l8 8-8 8"/></svg></span>
+          </div>
+          <div class="prow">
+            <span class="dot" style="background: var(--st-amber-fill);"></span>
+            <span class="id">000341</span>
+            <span class="st"><b>Needs check</b> · uncertain last scan</span>
+            <span class="act solid"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6"><path d="M9 4l8 8-8 8"/></svg></span>
+          </div>
+          <div class="prow done">
+            <span class="dot" style="background: var(--st-green);"></span>
+            <span class="id">000356</span>
+            <span class="st"><b>Pregnant, confirmed</b> · <span class="delta">DUE JUL 6 · DONE JUL 8 · +2D</span></span>
+            <span class="act"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--st-green)" stroke-width="2.6"><path d="M5 12l5 5 9-10"/></svg></span>
+          </div>
+        </div>
+
+        <div class="morepens">
+          <div class="penstub"><span class="pc">PEN A3</span><span class="pm">50 · 22 LEFT</span></div>
+          <div class="penstub"><span class="pc">PEN A4</span><span class="pm">50 · 35 LEFT</span></div>
+        </div>
+
+        <div class="cta-dock"><div class="cta">Submit results<span class="n">100 RECORDED</span></div></div>
+      </div>
+
+      <aside class="phone-notes">
+        <div class="note"><i>A</i><div><b>Unit gauge header</b><span>The odometer: 100/200 in mono 600, day 1 of 3, last recorder, and the overdue count in red beside it. The segmented bar fills in status blue — this task is in progress, so the gauge says so.</span></div></div>
+        <div class="note"><i>B</i><div><b>Pens are the group, never the row</b><span>PEN A1's header is a recessed well with its own remaining count. Animal rows exist only inside a pen. Scrolling 200 sows means passing 4 pen walls — the list has architecture, like the barn.</span></div></div>
+        <div class="note"><i>C</i><div><b>One row, one status, one verb</b><span>Status dot (square — gauge language), mono tag, plain-language state, and a single action. Rows needing work get a solid teal chevron; recorded rows collapse to gray with a green check. Density holds at 52px for 200 rows.</span></div></div>
+        <div class="note"><i>D</i><div><b>The delta is data, not judgment</b><span>DUE JUL 6 · DONE JUL 8 · +2D — schedule and actual, mono, letterspaced. Late is a measurement; red is reserved for late-and-still-open.</span></div></div>
+        <div class="note"><i>E</i><div><b>Submit carries its evidence</b><span>The 56px CTA states what it commits: "100 recorded". A worker never submits a number they haven't seen.</span></div></div>
+      </aside>
+    </div>
+  </section>
+
+<!-- ======================= 07 · FARROWING ======================= -->
+  <section class="chapter" id="farrow">
+    <div class="ch-head"><span class="no">07</span><h2>Screen — Farrowing record</h2><span class="ann">Bottom sheet · counters · the 45-minute lamp</span></div>
+    <div class="phone-row">
+      <div class="phone" style="background: var(--ink);">
+        <div class="sheet-scrim">
+          <div class="sheet">
+            <div class="sheet-grab"></div>
+            <div class="sheet-h">
+              <span class="ttl">Farrowing</span>
+              <span class="x"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="2.4"><path d="M5 5l14 14M19 5L5 19"/></svg></span>
+            </div>
+            <div class="sow-id">
+              <span class="pen">B2</span>
+              <span class="tag">000418</span>
+              <span class="meta">SOW · PARITY 3<br>650 DAYS</span>
+            </div>
+            <div class="warnband">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--st-amber)" stroke-width="2.2"><path d="M12 3L2 20h20z"/><path d="M12 10v4M12 17v.5"/></svg>
+              <div><span class="wt">45 min since last piglet</span><span class="wm">CHECK THE SOW · TYPICAL INTERVAL 15–20 MIN</span></div>
+              <span style="margin-left:auto;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg></span>
+            </div>
+            <div class="counters">
+              <div class="counter">
+                <div class="lb">Live born</div>
+                <div class="vrow">
+                  <span class="v">8<small>HD</small></span>
+                  <span class="step"><button>−</button><button class="plus">+</button></span>
+                </div>
+              </div>
+              <div class="counter">
+                <div class="lb">Stillborn &amp; mummified</div>
+                <div class="vrow">
+                  <span class="v" style="color: var(--ink-3);">0<small>HD</small></span>
+                  <span class="step"><button>−</button><button class="plus">+</button></span>
+                </div>
+              </div>
+            </div>
+            <div class="rec-by">RECORDED BY G. HANSEN · 23:00</div>
+            <div class="sheet-acts">
+              <button class="btn-more">···</button>
+              <div class="cta">Record birth</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="phone-notes">
+        <div class="note"><i>A</i><div><b>Location before animal, even here</b><span>The identity plate reads pen first: B2, then 000418, then the sow's vitals in the annotation voice. The same left-to-right order as every list row — the grammar never changes.</span></div></div>
+        <div class="note"><i>B</i><div><b>The warning is an amber lamp</b><span>"45 min since last piglet" is due-now amber, not red: it demands a look, not a mourning. It states the norm (15–20 min) so the number carries its own context. Dismissible — the worker at the pen outranks the software.</span></div></div>
+        <div class="note"><i>C</i><div><b>Counters built for gloves</b><span>40px steppers, 40px mono numerals, one tap per piglet. The plus is teal — it is the control you operate — while the count itself stays ink. Zero renders gray: nothing sad has happened yet, so no color says otherwise.</span></div></div>
+        <div class="note"><i>D</i><div><b>Attribution above the action</b><span>RECORDED BY G. HANSEN · 23:00 sits directly over the CTA: the record and its author commit together. Registry thinking inside instrument skin.</span></div></div>
+        <div class="note"><i>E</i><div><b>56px "Record birth", 56px "···"</b><span>Primary and overflow are both full glove targets. The sheet keeps the barn visible behind the scrim — you record without leaving the room.</span></div></div>
+      </aside>
+    </div>
+  </section>
+
+<!-- ======================= 08 · DENSITY ======================= -->
+  <section class="chapter" id="density">
+    <div class="ch-head"><span class="no">08</span><h2>Density rules</h2><span class="ann">Row anatomy · rhythm · what color may mean</span></div>
+    <div class="dens-grid">
+      <div>
+        <div class="rulecard">
+          <div class="rc-h"><span class="ann">Row anatomy · animal row</span></div>
+          <div class="rc-b">
+            <div class="dim" style="border: 1px dashed rgba(14,124,138,0.5); border-radius: 3px;">
+              <div class="prow" style="border-bottom:none; min-height:52px;">
+                <span class="dot" style="background: var(--st-amber-fill);"></span>
+                <span class="id">000268</span>
+                <span class="st"><b>Needs check</b> · due today</span>
+                <span class="act solid"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6"><path d="M9 4l8 8-8 8"/></svg></span>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:8px;">
+              <span class="dimlab">52PX ROW · 9PX DOT · 14PX MONO TAG</span>
+              <span class="dimlab">FULL ROW = TAP TARGET</span>
+            </div>
+            <div style="margin-top:22px; display:flex; align-items:flex-end; gap:10px;">
+              <div style="width:48px; height:48px; border:1px dashed rgba(14,124,138,0.6); display:flex; align-items:center; justify-content:center;" class="dimlab">48</div>
+              <div style="width:56px; height:56px; background:var(--signal); color:#fff; display:flex; align-items:center; justify-content:center; border-radius:4px; font-family:var(--mono); font-size:10px; font-weight:600;">56</div>
+              <span class="dimlab" style="padding-bottom:4px;">MIN TARGET 48 · PRIMARY CTA 56 · GLOVES</span>
+            </div>
+            <div style="margin-top:22px;">
+              <span class="ann" style="font-size:9.5px;">Spacing rhythm — 4px base</span>
+              <div style="display:flex; gap:4px; margin-top:8px; align-items:flex-end;">
+                <div style="width:4px; height:12px; background:var(--signal);"></div>
+                <div style="width:8px; height:18px; background:var(--signal);"></div>
+                <div style="width:12px; height:24px; background:var(--signal);"></div>
+                <div style="width:16px; height:32px; background:var(--signal);"></div>
+                <div style="width:24px; height:44px; background:var(--signal);"></div>
+                <span class="dimlab" style="padding-left:8px; padding-bottom:2px;">4 · 8 · 12 · 16 · 24 — NOTHING ELSE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="rulecard">
+          <div class="rc-h"><span class="ann">Hierarchy · three levels on screen, never four</span></div>
+          <div class="rc-b">
+            <div class="hier">
+              <div><b>Section</b><span>GESTATION — condensed caps, the screen title</span></div>
+              <div><b>Room / unit</b><span>ROOM 2 — the working container, owns the gauge</span></div>
+              <div><b>Pen group</b><span>PEN A1 — recessed well header with remaining count</span></div>
+              <div class="stop"><b>Animal row</b><span>000268 — exists only inside a pen; a fourth nesting level is forbidden. Deeper = navigate, not indent.</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="colorlaw">
+          <div><span class="who" style="color: var(--st-red);">Status hues</span><span>May mean overdue / due / in progress / done / upcoming. Nothing else. Never decorative, never a chart palette.</span></div>
+          <div><span class="who" style="color: var(--signal-deep);">Gauge teal</span><span>May mean "a control you can operate" or "where you are". Never a status, never a state of an animal.</span></div>
+          <div><span class="who">Ink &amp; gray</span><span>Everything true but not urgent — which is almost everything. The healthy barn is achromatic.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- ======================= 09 · VOICE ======================= -->
+  <section class="chapter" id="voice">
+    <div class="ch-head"><span class="no">09</span><h2>Voice</h2><span class="ann">Calm · imperative · numbers attached</span></div>
+    <p class="body-text" style="margin-top:-20px; margin-bottom:28px;">The panel speaks like a good foreman: short, present tense, a number in every sentence that matters, and no feelings about the data. Never jargon ("gestational confirmation event"), never cheer ("Great job!"), never blame.</p>
+    <div class="voice-grid">
+      <div class="voice-cell"><div class="ctx">Empty state · no exceptions</div><div class="say">All quiet. 2,140 sows, nothing due before 14:00.</div><div class="why">Quiet is a reading, not an absence — the panel reports zero with the same precision as six.</div></div>
+      <div class="voice-cell"><div class="ctx">Error · record failed</div><div class="say">Didn't save. Your entry is kept on this phone — try again where there's signal.</div><div class="why">Blame the network, keep the data, tell them where it lives. No red unless the animal is affected.</div></div>
+      <div class="voice-cell"><div class="ctx">Sync</div><div class="say">3 records waiting to sync. They'll go when signal returns.</div><div class="why">A count and a promise. Sync is logistics, not drama — amber dot, no modal.</div></div>
+      <div class="voice-cell"><div class="ctx">Confirm · destructive-ish</div><div class="say">Mark 000302 not pregnant? She moves to the rebreed list for Room 1.</div><div class="why">States the consequence as a location change — because in this product, that's what consequences are.</div></div>
+      <div class="voice-cell"><div class="ctx">Overdue nudge</div><div class="say">6 re-checks overdue in Room 2. Oldest is 2 days late.</div><div class="why">Count, place, worst case. Imperative comes from the number, not from an exclamation mark.</div></div>
+      <div class="voice-cell"><div class="ctx">Done</div><div class="say">Room 2 recorded: 100 of 200 checked. 100 remain for day 2.</div><div class="why">Completion is a ledger line, not a celebration. The next shift's number is already on the panel.</div></div>
+    </div>
+  </section>
+
+<!-- ======================= 10 · VERDICT ======================= -->
+  <section class="chapter" id="verdict">
+    <div class="ch-head"><span class="no">10</span><h2>Verdict</h2><span class="ann">Honest · feeds the compare sheet</span></div>
+    <div class="verdict">
+      <div class="pro">
+        <h3>What Panel proves</h3>
+        <ul>
+          <li><b>The barn schematic is the argument no other direction can make.</b> Location-first stops being a claim in a spec and becomes the literal home screen — the 6 overdue re-checks have a room you can point to and walk to.</li>
+          <li><b>Exception-first survives density.</b> With 2,140 sows on one farm, the strip-plus-quiet-gray economy keeps the screen honest: color spend tracks urgency exactly, and a healthy barn genuinely looks calm.</li>
+          <li><b>The all-numerals-mono rule is cheap to build and hard to copy.</b> One CSS-level decision produces the entire instrument feel — tags, counts, gauges align into a single machined texture across every screen.</li>
+          <li><b>Gauge teal is defensibly ownable.</b> It is absent from the ag-software category, engineered away from all five status hues, and it earns its keep by marking only controls — the brand never competes with an animal's status.</li>
+        </ul>
+      </div>
+      <div class="con">
+        <h3>Where it strains</h3>
+        <ul>
+          <li><b>The schematic must scale or it lies.</b> Ashfield's 4 sections and 10 rooms fit in 210px; a 12-building integrator site will not. The gesture needs a designed collapse (section chips → room grid) before this identity is credible beyond mid-size farms.</li>
+          <li><b>Cold at the moments that are not mechanical.</b> A stillbirth counter rendered as odometer digits is honest but heartless; the instrument metaphor has no register for the parts of farrowing that are animal husbandry, not machinery.</li>
+          <li><b>Condensed caps flirt with shouting.</b> Barlow Condensed headers plus mono labels put a lot of uppercase on small screens; one weight slip and the panel reads as a warning poster. The system depends on discipline the DS file must enforce.</li>
+          <li><b>Teal's contrast ceiling is real.</b> At #0E7C8A white text passes but never soars; disabled and pressed states need the deep variant, and on amber-washed surfaces teal controls need a bordered treatment. More state-styling rules than Ledger's ink-on-paper.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="book-end">
+    <span class="ann">Sentri · VI direction 02 — Panel · 2026.08</span>
+    <span class="ann">Companions: 01 — Field Ledger · 03 — Board</span>
+    <span class="ann">Next: token spec · component library · room-detail screen</span>
+  </footer>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sentri — Direction 01 · Field Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* ground */
+  --paper:    #F6F4EC;   /* deck + app ground — warm paper */
+  --paper-2:  #EFEBDF;   /* recessed plates */
+  --card:     #FFFEFA;   /* record card white */
+  --ink:      #20241C;   /* warm ink */
+  --ink-2:    #474C3D;   /* secondary text */
+  --ink-3:    #6C705C;   /* annotation floor */
+  --hairline:   rgba(32,36,28,0.16);
+  --hairline-2: rgba(32,36,28,0.08);
+  /* brand */
+  --olive:      #47551F;
+  --olive-deep: #333E12;
+  --olive-wash: rgba(71,85,31,0.08);
+  --olive-bright: #A9BA6C; /* on dark olive only */
+  /* status — the five meanings */
+  --red:       #B23B26;  /* overdue / attention */
+  --red-wash:  #F5E3DE;
+  --amber:     #96660D;  /* due now — text tone */
+  --amber-fill:#D99A21;  /* due now — dot / bar */
+  --amber-wash:#F7EDD5;
+  --blue:      #3D648C;  /* in progress */
+  --blue-fill: #4A76A0;
+  --blue-wash: #E5EAEE;
+  --green:     #3E7C4B;  /* done / recorded */
+  --green-wash:#E3EDE2;
+  --gray:      #83867A;  /* upcoming — dot only, text uses ink-3 */
+  --track:     #E8E5D8;
+
+  --disp: "Fraunces", Georgia, serif;
+  --sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; margin: 0; }
+button { font: inherit; appearance: none; background: none; border: none; padding: 0; color: inherit; cursor: pointer; white-space: nowrap; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans); font-size: 16px; line-height: 1.62;
+  background: var(--paper); color: var(--ink);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+::selection { background: var(--olive); color: #fff; }
+s { text-decoration-thickness: 1.5px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 48px; }
+@media (max-width: 720px) { .wrap { padding: 0 22px; } }
+
+.ann { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-3); }
+.ann .ol { color: var(--olive); }
+.redline { color: var(--red); }
+
+section.chapter { padding: 96px 0 30px; }
+.ch-head { display: flex; align-items: center; gap: 16px; border-top: 3px solid var(--ink); padding-top: 13px; margin-bottom: 44px; }
+.ch-head .no { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; background: var(--ink); color: var(--paper); padding: 3px 8px; font-weight: 500; }
+.ch-head h2 { font-family: var(--disp); font-optical-sizing: auto; font-size: 27px; font-weight: 600; letter-spacing: -0.005em; line-height: 1.1; }
+.ch-head .ann { margin-left: auto; text-align: right; }
+@media (max-width: 720px) { .ch-head .ann { display: none; } }
+
+p.lede { font-size: 19px; line-height: 1.6; max-width: 58ch; }
+p.body-text { max-width: 64ch; color: var(--ink-2); margin-top: 13px; font-size: 14.5px; }
+p.body-text b, p.body-text strong { color: var(--ink); }
+.serif-pull { font-family: var(--disp); font-style: italic; font-weight: 400; font-size: 27px; line-height: 1.4; letter-spacing: -0.005em; max-width: 40ch; }
+
+/* ——— cover ——— */
+.cover { min-height: 92vh; display: flex; flex-direction: column; border-bottom: 3px solid var(--ink); }
+.cover-top { display: flex; justify-content: space-between; padding-top: 28px; gap: 14px; flex-wrap: wrap; }
+.cover-mid { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 64px 0; }
+.cover h1 { font-family: var(--disp); font-size: clamp(56px, 8.4vw, 100px); font-weight: 600; letter-spacing: -0.015em; line-height: 0.98; margin-top: 34px; }
+.cover h1 .stop { color: var(--olive); }
+.cover .tagline { font-family: var(--disp); font-style: italic; font-weight: 400; font-size: clamp(19px, 2.2vw, 25px); color: var(--ink-2); margin-top: 20px; }
+.cover-bottom { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 24px; gap: 14px; flex-wrap: wrap; }
+.cover-bottom .toc { display: flex; gap: 20px; flex-wrap: wrap; }
+.cover-bottom a { color: var(--ink-3); text-decoration: none; }
+.cover-bottom a:hover { color: var(--ink); }
+
+/* ——— principles ——— */
+.prin { display: grid; grid-template-columns: 1fr 1fr 1fr; border: 1px solid var(--hairline); margin-top: 36px; background: var(--card); }
+@media (max-width: 880px) { .prin { grid-template-columns: 1fr; } }
+.prin > div { padding: 20px 22px 22px; border-right: 1px solid var(--hairline); }
+.prin > div:last-child { border-right: none; }
+@media (max-width: 880px) { .prin > div { border-right: none; border-bottom: 1px solid var(--hairline); } .prin > div:last-child { border-bottom: none; } }
+.prin b { font-family: var(--disp); font-weight: 600; font-size: 16.5px; display: block; }
+.prin p { font-size: 13.5px; color: var(--ink-2); margin-top: 7px; line-height: 1.55; }
+.delta-demo { border: 1px solid var(--hairline); background: var(--card); margin-top: 26px; }
+.delta-demo .dd-hd { padding: 10px 18px; border-bottom: 1px solid var(--hairline); background: var(--paper-2); }
+.dd-row { display: flex; align-items: baseline; gap: 14px; padding: 13px 18px; border-bottom: 1px solid var(--hairline-2); font-family: var(--mono); font-size: 13px; }
+.dd-row:last-child { border-bottom: none; }
+.dd-row .id { color: var(--olive); font-weight: 600; }
+.dd-row .sch { color: var(--ink-3); }
+.dd-row .sch s { text-decoration-color: rgba(32,36,28,0.5); }
+
+/* ——— chips ——— */
+.chip { display: inline-block; font-family: var(--mono); font-size: 9.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 2.5px 7px; border-radius: 3px; border: 1px solid; white-space: nowrap; }
+.chip.late { color: var(--red); border-color: rgba(178,59,38,0.4); background: var(--red-wash); }
+.chip.onday { color: var(--green); border-color: rgba(62,124,75,0.4); background: var(--green-wash); }
+.chip.due { color: var(--amber); border-color: rgba(150,102,13,0.4); background: var(--amber-wash); }
+.chip.prog { color: var(--blue); border-color: rgba(61,100,140,0.4); background: var(--blue-wash); }
+.chip.up { color: var(--ink-3); border-color: var(--hairline); background: transparent; }
+
+/* ——— plates & mark ——— */
+.mark-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 52px; align-items: start; }
+@media (max-width: 900px) { .mark-grid { grid-template-columns: 1fr; } }
+.plate { background: var(--paper-2); border: 1px solid var(--hairline); padding: 54px 40px; display: flex; align-items: center; justify-content: center; min-height: 280px; position: relative; }
+.plate-label { position: absolute; top: 11px; left: 13px; }
+.mark-notes { font-size: 14px; color: var(--ink-2); max-width: 56ch; }
+.mark-notes p + p { margin-top: 12px; }
+.mark-notes b { color: var(--ink); }
+.lockups { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--hairline); background: var(--card); }
+.lockups > div { border-right: 1px solid var(--hairline); padding: 34px 18px 26px; text-align: center; position: relative; min-height: 132px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.lockups > div:last-child { border-right: none; }
+@media (max-width: 720px) { .lockups { grid-template-columns: 1fr; } .lockups > div { border-right: none; border-bottom: 1px solid var(--hairline); } .lockups > div:last-child { border-bottom: none; } }
+.wordmark { font-family: var(--disp); font-weight: 600; letter-spacing: -0.01em; line-height: 1; }
+.wordmark .stop { color: var(--olive); }
+.sizes-row { display: flex; align-items: flex-end; gap: 40px; justify-content: center; flex-wrap: wrap; }
+.sizes-row > div { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+/* ——— type ——— */
+.type-rows { border-top: 1px solid var(--hairline); }
+.type-row { display: grid; grid-template-columns: 240px 1fr; gap: 36px; padding: 28px 0; border-bottom: 1px solid var(--hairline); align-items: baseline; }
+@media (max-width: 820px) { .type-row { grid-template-columns: 1fr; gap: 10px; } }
+.type-meta { font-size: 13px; color: var(--ink-3); line-height: 1.55; }
+.type-meta b { display: block; color: var(--ink); font-weight: 600; font-size: 13.5px; }
+.type-meta .kept { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--green); text-transform: uppercase; }
+.type-meta .new { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--olive); text-transform: uppercase; }
+.spec-disp { font-family: var(--disp); font-size: 46px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.08; }
+.spec-ui { font-size: 16px; max-width: 58ch; }
+.spec-mono { font-family: var(--mono); font-size: 13px; line-height: 1.8; color: var(--ink-2); }
+.spec-num { display: flex; align-items: baseline; gap: 34px; flex-wrap: wrap; }
+.spec-num .big { font-family: var(--disp); font-size: 64px; font-weight: 560; letter-spacing: -0.01em; line-height: 1; }
+.spec-num .big small { font-size: 30px; color: var(--ink-3); font-weight: 400; }
+.spec-num .lab { font-family: var(--mono); font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-3); display: block; margin-top: 8px; }
+.spec-num .mid { font-family: var(--mono); font-size: 34px; font-weight: 500; letter-spacing: 0.01em; }
+.spec-num .mid.id { color: var(--olive); }
+
+/* ——— color ——— */
+.palette { display: grid; grid-template-columns: repeat(6, 1fr); border: 1px solid var(--hairline); background: var(--card); }
+@media (max-width: 880px) { .palette { grid-template-columns: repeat(3, 1fr); } }
+.pchip { border-right: 1px solid var(--hairline); }
+.pchip:last-child { border-right: none; }
+@media (max-width: 880px) { .pchip:nth-child(3) { border-right: none; } .pchip:nth-child(-n+3) { border-bottom: 1px solid var(--hairline); } }
+.pchip .well { height: 110px; }
+.pchip .meta { padding: 10px 12px 14px; border-top: 1px solid var(--hairline); }
+.pchip .meta b { font-size: 13px; font-weight: 600; display: block; }
+.pchip .meta span { font-family: var(--mono); font-size: 10px; color: var(--ink-3); display: block; margin-top: 3px; letter-spacing: 0.02em; }
+.ratio { display: flex; height: 13px; margin-top: 34px; border: 1px solid var(--hairline); }
+.ratio-labels { display: flex; margin-top: 8px; }
+.status-table { border: 1px solid var(--hairline); margin-top: 34px; background: var(--card); }
+.status-row { display: grid; grid-template-columns: 130px 1fr auto auto; gap: 18px; align-items: center; padding: 12px 18px; border-bottom: 1px solid var(--hairline-2); font-size: 13.5px; }
+.status-row:last-child { border-bottom: none; }
+@media (max-width: 720px) { .status-row { grid-template-columns: 110px 1fr; } .status-row .ann { display: none; } }
+.status-row .sw { display: flex; align-items: center; gap: 9px; font-weight: 600; }
+.status-row i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
+.sun { display: grid; grid-template-columns: 1fr 1fr; gap: 52px; margin-top: 40px; align-items: start; }
+@media (max-width: 900px) { .sun { grid-template-columns: 1fr; } }
+.sun-card { background: var(--card); border: 1px solid var(--hairline); padding: 20px 22px; }
+.sun-line { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--hairline-2); font-size: 14px; font-weight: 600; }
+.sun-line:last-child { border-bottom: none; }
+.sun-line .ann { font-size: 10px; }
+
+/* ——— phone frames ——— */
+.screen-grid { display: grid; grid-template-columns: 1fr 390px; gap: 56px; align-items: start; }
+.screen-grid.flip { grid-template-columns: 390px 1fr; }
+@media (max-width: 900px) { .screen-grid, .screen-grid.flip { grid-template-columns: 1fr; } .screen-grid.flip .side-notes { order: 2; } }
+.side-notes { position: sticky; top: 40px; }
+.callouts { margin-top: 26px; border-top: 1px solid var(--hairline); }
+.co { display: grid; grid-template-columns: 26px 1fr; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--hairline-2); font-size: 13px; color: var(--ink-2); line-height: 1.55; }
+.co .n { font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--paper); background: var(--ink); width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin-top: 2px; }
+.co b { color: var(--ink); }
+.phone { width: 390px; max-width: 100%; background: #FBF9F2; border: 1.5px solid rgba(32,36,28,0.55); border-radius: 34px; overflow: hidden; box-shadow: 9px 9px 0 -2px rgba(32,36,28,0.09); font-size: 14px; }
+.statusbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 24px 6px; font-family: var(--mono); font-size: 12.5px; font-weight: 600; }
+.statusbar svg { display: block; }
+
+/* ——— app UI ——— */
+.app-head { padding: 10px 20px 0; }
+.app-head h3 { font-family: var(--disp); font-size: 25px; font-weight: 600; letter-spacing: -0.005em; line-height: 1.1; }
+.app-head .sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.11em; text-transform: uppercase; color: var(--ink-3); margin-top: 5px; }
+.sync-strip { display: flex; align-items: center; gap: 8px; margin: 12px 20px 0; padding: 8px 12px; border: 1px dashed var(--hairline); border-radius: 8px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.04em; color: var(--ink-3); }
+.exc-strip { display: flex; align-items: center; gap: 10px; margin: 10px 20px 0; padding: 12px 14px; background: var(--red-wash); border: 1px solid rgba(178,59,38,0.3); border-left: 3px solid var(--red); border-radius: 8px; min-height: 48px; }
+.exc-strip .t { font-size: 13.5px; font-weight: 700; color: var(--red); line-height: 1.3; }
+.exc-strip .m { font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; color: var(--ink-2); margin-top: 2px; }
+.exc-strip .go { margin-left: auto; font-size: 13px; font-weight: 700; color: var(--red); }
+.day-rule { display: flex; align-items: center; gap: 12px; margin: 22px 20px 8px; }
+.day-rule .rule { flex: 1; height: 1px; background: var(--hairline); }
+.tcard { background: var(--card); border: 1px solid var(--hairline); border-radius: 10px; margin: 10px 20px 0; padding: 14px 16px 15px; }
+.tcard .loc { font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.tcard .row1 { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+.tcard .row1 b { font-size: 16.5px; font-weight: 700; letter-spacing: -0.01em; }
+.tcard .row1 .chip { margin-left: auto; }
+.tcard .meta { font-size: 12.5px; color: var(--ink-2); margin-top: 3px; }
+.tcard .meta .warn { color: var(--red); font-weight: 700; }
+.bar { height: 6px; background: var(--track); border-radius: 3px; margin-top: 10px; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 3px; }
+.tcard .barmeta { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; color: var(--ink-3); margin-top: 6px; }
+.sect-table { background: var(--card); border: 1px solid var(--hairline); border-radius: 10px; margin: 10px 20px 0; overflow: hidden; }
+.sect-row { display: grid; grid-template-columns: 1fr auto 20px; gap: 10px; align-items: center; min-height: 56px; padding: 8px 16px; border-bottom: 1px solid var(--hairline-2); }
+.sect-row:last-child { border-bottom: none; }
+.sect-row .nm { font-size: 14.5px; font-weight: 700; }
+.sect-row .sm { font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; color: var(--ink-3); margin-top: 1px; }
+.sect-row .st { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+.sect-row .st i { width: 7px; height: 7px; border-radius: 2px; }
+.chev { color: var(--ink-3); font-size: 16px; text-align: right; }
+.tabbar { display: flex; border-top: 1px solid var(--hairline); margin-top: 20px; background: var(--card); padding: 6px 8px 18px; }
+.tabbar > div { flex: 1; min-height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10px; font-weight: 600; color: var(--ink-3); }
+.tabbar > div.on { color: var(--olive); }
+.tabbar svg { display: block; }
+
+/* pregnancy check screen */
+.nav-row { display: flex; align-items: center; gap: 12px; padding: 8px 20px 0; }
+.nav-row .back { width: 48px; height: 48px; margin-left: -14px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.nav-row h3 { font-family: var(--disp); font-size: 20px; font-weight: 600; }
+.nav-row .sub { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; color: var(--ink-3); text-transform: uppercase; }
+.segs { display: flex; background: var(--paper-2); border-radius: 10px; margin: 12px 20px 0; padding: 3px; }
+.segs > div { flex: 1; text-align: center; min-height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 13.5px; font-weight: 600; color: var(--ink-3); }
+.segs .on { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(32,36,28,0.1); }
+.prog-card { background: var(--card); border: 1px solid var(--hairline); border-radius: 10px; margin: 14px 20px 0; padding: 15px 16px; }
+.prog-card .top { display: flex; align-items: baseline; gap: 10px; }
+.prog-card .top b { font-size: 15px; font-weight: 700; }
+.prog-card .top .chip { margin-left: auto; }
+.prog-card .big { font-family: var(--disp); font-size: 38px; font-weight: 560; letter-spacing: -0.01em; line-height: 1; margin-top: 10px; }
+.prog-card .big small { font-size: 19px; color: var(--ink-3); font-weight: 400; }
+.prog-card .big .pct { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--blue); margin-left: 8px; letter-spacing: 0.04em; }
+.searchrow { display: flex; gap: 8px; margin: 14px 20px 0; }
+.searchrow .field { flex: 1; display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 14px; background: var(--card); border: 1px solid var(--hairline); border-radius: 10px; color: var(--ink-3); font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; }
+.searchrow .fbtn { width: 48px; min-height: 48px; display: flex; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--hairline); border-radius: 10px; color: var(--ink-2); }
+.pen-group { background: var(--card); border: 1px solid var(--hairline); border-radius: 10px; margin: 12px 20px 0; overflow: hidden; }
+.pen-hd { display: flex; align-items: baseline; gap: 10px; padding: 10px 16px; background: var(--paper-2); border-bottom: 1px solid var(--hairline); }
+.pen-hd .pc { font-family: var(--mono); font-size: 12.5px; font-weight: 600; letter-spacing: 0.08em; }
+.pen-hd .ct { margin-left: auto; font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; color: var(--ink-3); }
+.prow { display: grid; grid-template-columns: 66px 1fr 48px; gap: 10px; align-items: center; min-height: 56px; padding: 8px 10px 8px 16px; border-bottom: 1px solid var(--hairline-2); }
+.prow:last-child { border-bottom: none; }
+.prow .id { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--olive); letter-spacing: 0.02em; }
+.prow .stat { font-size: 13px; font-weight: 600; line-height: 1.3; }
+.prow .stat.up { color: var(--ink-3); font-weight: 500; }
+.prow .stat.due { color: var(--amber); }
+.prow .stat.att { color: var(--red); }
+.prow .stat.done { color: var(--green); }
+.prow .delta { font-family: var(--mono); font-size: 10px; letter-spacing: 0.02em; color: var(--ink-3); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.prow .delta s { text-decoration-color: rgba(32,36,28,0.45); }
+.prow .act { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; }
+.prow .act .go { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; }
+.prow .act .go.amberb { background: var(--amber-fill); }
+.prow .act .go.redb { background: var(--red); }
+.prow .act .edit { color: var(--ink-3); }
+.pen-fold { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px 16px; background: var(--card); border: 1px solid var(--hairline); border-radius: 10px; margin: 12px 20px 0; }
+.pen-fold .pc { font-family: var(--mono); font-size: 12.5px; font-weight: 600; letter-spacing: 0.08em; }
+.pen-fold .ct { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--ink-3); letter-spacing: 0.05em; }
+.cta-dock { padding: 14px 20px 22px; border-top: 1px solid var(--hairline); background: var(--card); margin-top: 16px; }
+.cta { display: flex; align-items: center; justify-content: center; min-height: 56px; background: var(--olive); color: #F6F4EC; border-radius: 12px; font-size: 16px; font-weight: 700; letter-spacing: 0.01em; width: 100%; }
+.cta-note { text-align: center; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.08em; color: var(--ink-3); margin-top: 8px; text-transform: uppercase; }
+
+/* farrowing sheet */
+.dim { background: #6E7065; padding: 46px 20px 0; position: relative; }
+.dim .ghost { background: rgba(255,254,250,0.16); border-radius: 10px; height: 52px; margin-bottom: 10px; }
+.sheet { background: #FBF9F2; border-radius: 20px 20px 0 0; margin-top: 26px; box-shadow: 0 -4px 24px rgba(32,36,28,0.25); position: relative; }
+.sheet .grab { width: 40px; height: 4px; border-radius: 2px; background: var(--hairline); margin: 8px auto 0; }
+.sheet-hd { display: flex; align-items: center; padding: 8px 20px 0; }
+.sheet-hd h3 { font-family: var(--disp); font-size: 21px; font-weight: 600; flex: 1; text-align: center; margin-left: 48px; }
+.sheet-hd .x { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--ink-2); }
+.sow-row { display: flex; align-items: center; gap: 12px; padding: 8px 20px 14px; border-bottom: 1px solid var(--hairline); }
+.sow-row .pen { font-family: var(--mono); font-size: 14px; font-weight: 600; background: var(--paper-2); border: 1px solid var(--hairline); border-radius: 8px; padding: 8px 12px; }
+.sow-row .tag { font-family: var(--mono); font-size: 21px; font-weight: 600; color: var(--olive); letter-spacing: 0.02em; }
+.sow-row .facts { margin-left: auto; font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; color: var(--ink-3); text-transform: uppercase; text-align: right; line-height: 1.6; }
+.sheet-sec { display: flex; align-items: center; padding: 14px 20px 0; }
+.sheet-sec b { font-size: 15.5px; font-weight: 700; }
+.sheet-sec a { margin-left: auto; font-size: 13.5px; font-weight: 700; color: var(--olive); text-decoration: none; }
+.warn-banner { display: flex; align-items: center; gap: 10px; margin: 12px 20px 0; padding: 12px 14px; background: var(--amber-wash); border: 1px solid rgba(150,102,13,0.3); border-left: 3px solid var(--amber-fill); border-radius: 8px; min-height: 48px; }
+.warn-banner .t { font-size: 13.5px; font-weight: 700; color: var(--amber); }
+.warn-banner .m { font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; color: var(--ink-2); margin-top: 1px; }
+.warn-banner .x { margin-left: auto; color: var(--amber); font-size: 15px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; }
+.counters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 20px 0; }
+.counter { background: var(--card); border: 1px solid var(--hairline); border-radius: 12px; padding: 12px 12px 10px; text-align: center; }
+.counter .lab { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.counter .num { font-family: var(--disp); font-size: 44px; font-weight: 560; line-height: 1.05; margin-top: 4px; }
+.counter .num small { font-size: 15px; font-family: var(--sans); font-weight: 600; color: var(--ink-3); margin-left: 3px; }
+.steppers { display: flex; gap: 8px; margin-top: 8px; }
+.steppers button { flex: 1; min-height: 48px; border: 1.5px solid var(--hairline); border-radius: 10px; font-size: 20px; font-weight: 600; color: var(--ink-2); background: var(--paper); }
+.steppers button.plus { border-color: var(--olive); color: var(--olive); background: var(--olive-wash); }
+.rec-by { text-align: right; font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; color: var(--ink-3); margin: 12px 20px 0; text-transform: uppercase; }
+.sheet-acts { display: flex; gap: 10px; padding: 12px 20px 24px; border-top: 1px solid var(--hairline); margin-top: 12px; background: var(--card); border-radius: 0; }
+.sheet-acts .more { width: 56px; min-height: 56px; border: 1.5px solid var(--hairline); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; letter-spacing: 0.1em; color: var(--ink-2); flex-shrink: 0; }
+.sheet-acts .cta { flex: 1; }
+
+/* ——— density ——— */
+.dens-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--hairline); background: var(--card); }
+@media (max-width: 880px) { .dens-grid { grid-template-columns: 1fr; } }
+.dens { padding: 22px 24px 26px; border-right: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); }
+.dens:nth-child(2n) { border-right: none; }
+.dens:nth-child(n+3) { border-bottom: none; }
+@media (max-width: 880px) { .dens { border-right: none !important; border-bottom: 1px solid var(--hairline) !important; } .dens:last-child { border-bottom: none !important; } }
+.dens h4 { font-family: var(--disp); font-weight: 600; font-size: 16.5px; }
+.dens p { font-size: 13px; color: var(--ink-2); margin-top: 6px; line-height: 1.55; max-width: 52ch; }
+.dens .demo { margin-top: 16px; background: var(--paper-2); border: 1px solid var(--hairline-2); padding: 16px; }
+.hier { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.hier b { background: var(--ink); color: var(--paper); padding: 3px 9px; border-radius: 3px; font-weight: 500; }
+.hier span { color: var(--ink-3); }
+.space-scale { display: flex; align-items: flex-end; gap: 14px; }
+.space-scale > div { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.space-scale i { display: block; background: var(--olive); width: 22px; }
+.space-scale em { font-family: var(--mono); font-style: normal; font-size: 9.5px; color: var(--ink-3); }
+
+/* ——— voice ——— */
+.voice-grid { display: grid; grid-template-columns: repeat(2, 1fr); border: 1px solid var(--hairline); background: var(--card); }
+@media (max-width: 820px) { .voice-grid { grid-template-columns: 1fr; } }
+.voice-cell { padding: 22px 26px 24px; border-right: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); }
+.voice-cell:nth-child(2n) { border-right: none; }
+.voice-cell:nth-child(n+5) { border-bottom: none; }
+@media (max-width: 820px) { .voice-cell { border-right: none !important; border-bottom: 1px solid var(--hairline) !important; } .voice-cell:last-child { border-bottom: none !important; } }
+.voice-cell .cx { margin-bottom: 9px; display: block; }
+.voice-cell blockquote { font-size: 15.5px; font-weight: 600; line-height: 1.5; letter-spacing: -0.005em; }
+.voice-cell blockquote .m { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--ink-2); }
+.voice-cell p { font-size: 12.5px; color: var(--ink-3); margin-top: 8px; line-height: 1.55; }
+
+/* ——— verdict ——— */
+.verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--hairline); background: var(--card); margin-top: 30px; }
+@media (max-width: 820px) { .verdict { grid-template-columns: 1fr; } }
+.verdict > div { padding: 22px 26px 26px; }
+.verdict > div:first-child { border-right: 1px solid var(--hairline); }
+@media (max-width: 820px) { .verdict > div:first-child { border-right: none; border-bottom: 1px solid var(--hairline); } }
+.verdict h4 { font-family: var(--disp); font-weight: 600; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+.verdict ul { list-style: none; padding: 0; margin: 14px 0 0; }
+.verdict li { padding: 10px 0 10px 22px; position: relative; font-size: 14px; line-height: 1.55; color: var(--ink-2); border-bottom: 1px solid var(--hairline-2); }
+.verdict li:last-child { border-bottom: none; }
+.verdict li b { color: var(--ink); }
+.verdict .pro li::before { content: "→"; position: absolute; left: 0; color: var(--olive); font-weight: 700; }
+.verdict .con li::before { content: "✕"; position: absolute; left: 0; color: var(--red); font-weight: 700; }
+
+footer.book-end { border-top: 3px solid var(--ink); margin-top: 104px; padding: 24px 0 60px; display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="wrap">
+  <header class="cover">
+    <div class="cover-top">
+      <span class="ann">Sentri · <span class="ol">Direction 01 of 03</span> — Field Ledger</span>
+      <span class="ann">2026.08 · Identity proposal · Ashfield pilot data</span>
+    </div>
+    <div class="cover-mid">
+      <svg width="132" height="102" viewBox="0 0 96 72" role="img" aria-label="Sentri mark — the sign-off">
+        <line x1="0" y1="56" x2="62" y2="56" stroke="#20241C" stroke-width="9"/>
+        <path d="M34 41 L52 62 L94 9" fill="none" stroke="#47551F" stroke-width="10" stroke-linecap="square"/>
+      </svg>
+      <h1>Field Ledger<span class="stop">.</span></h1>
+      <p class="tagline">The barn already keeps a book. Sentri is that book, kept honestly.</p>
+    </div>
+    <div class="cover-bottom">
+      <div class="toc ann">
+        <a href="#idea">01 Idea</a><a href="#mark">02 Mark</a><a href="#type">03 Type</a><a href="#color">04 Color</a><a href="#today">05 Today</a><a href="#check">06 Check</a><a href="#farrow">07 Farrowing</a><a href="#density">08 Density</a><a href="#voice">09 Voice</a><a href="#verdict">10 Verdict</a>
+      </div>
+      <span class="ann">Ashfield Farm · 2,140 sows · Thu Jul 8</span>
+    </div>
+  </header>
+</div>
+
+<div class="wrap">
+<!-- ============ 01 · IDEA ============ -->
+  <section class="chapter" id="idea">
+    <div class="ch-head"><span class="no">01</span><h2>The idea</h2><span class="ann">The record book, carried into the barn</span></div>
+    <p class="serif-pull">A farm runs on promises: this sow will be checked on this day, this litter counted before this hour. Field Ledger treats every promise as a line in a book — scheduled, done, signed, and if late, <em>said so</em>.</p>
+    <p class="body-text">Farm software usually pretends work happens on time. It doesn't. The pregnancy re-check slips two days; the farrowing entry lands at 23:00. This direction's whole personality comes from refusing to hide that: the <strong>delta row</strong> — scheduled date struck through, actual date beside it, the difference printed as a colored chip — is the signature gesture, and the registry look (warm paper, ink text, hairline ledger rules, deep olive as the working color) exists to make that honesty feel calm instead of accusatory. It is the trustworthy evolution of Sentri's shipped system, not a rebrand from zero.</p>
+    <div class="prin">
+      <div><b>Everything on the record.</b><p>Every action becomes a dated, signed line: <em>"200 of 200 checked · G. Hansen · 23:00."</em> No vapor states. If it isn't written, it didn't happen; if it is written, it is never rewritten.</p></div>
+      <div><b>The schedule is a promise.</b><p>Scheduled and actual always appear together. Lateness is a first-class fact with its own typography — never a shame state, never hidden in a detail view.</p></div>
+      <div><b>Calm paper, loud status.</b><p>One warm ground, ink text, editorial hairlines. Color appears only when it means one of five things. Amber is load-bearing — reserved for "due now," never decorative.</p></div>
+    </div>
+    <div class="delta-demo">
+      <div class="dd-hd ann">The signature gesture — the delta row</div>
+      <div class="dd-row"><span class="id">000318</span><span class="sch">due Jul 8</span><span>· done Jul 8</span><span class="chip onday">On day</span></div>
+      <div class="dd-row"><span class="id">000325</span><span class="sch"><s>due Jul 6</s></span><span>· done Jul 8</span><span class="chip late">+2d late</span></div>
+      <div class="dd-row"><span class="id">000268</span><span class="sch">due Jul 8</span><span>· not yet</span><span class="chip due">Due now</span></div>
+    </div>
+  </section>
+
+<!-- ============ 02 · MARK ============ -->
+  <section class="chapter" id="mark">
+    <div class="ch-head"><span class="no">02</span><h2>The mark</h2><span class="ann">The sign-off · rule + check + full stop</span></div>
+    <div class="mark-grid">
+      <div class="plate">
+        <span class="plate-label ann">Primary lockup</span>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:26px;">
+          <svg width="112" height="86" viewBox="0 0 96 72" role="img" aria-label="Sentri symbol">
+            <line x1="0" y1="56" x2="62" y2="56" stroke="#20241C" stroke-width="9"/>
+            <path d="M34 41 L52 62 L94 9" fill="none" stroke="#47551F" stroke-width="10" stroke-linecap="square"/>
+          </svg>
+          <span class="wordmark" style="font-size:44px;">Sentri<span class="stop">.</span></span>
+        </div>
+      </div>
+      <div class="mark-notes">
+        <p>Two strokes from the ledger itself. The <b>rule</b> is the ruled line of the book — the row where the entry belongs. The <b>check</b> is the auditor's tick: it plants below the rule and strikes up past the margin, the physical gesture of signing a row off. Ink does the ruling; olive does the deciding — the same division of labor the product uses, where the ground stays quiet and the brand color only ever marks an action.</p>
+        <p>The wordmark is <b>Fraunces semibold</b>, and it always ends in an <b>olive full stop</b> — the record closes every line it opens. That period is the mark's smallest ambassador: it reappears at the end of confirmations in-product ("Written to the room record<span style="color:var(--olive); font-weight:700;">.</span>").</p>
+        <p>Construction: the symbol sits on a 96×72 grid; rule weight 9, check weight 10, both square-capped like a nib. The check's apex hits the cap height of the wordmark. Clearspace = one rule-length ÷ 4. Below 24px the rule drops and the check thickens — the small cut is a redraw, never a shrink.</p>
+      </div>
+    </div>
+    <div class="lockups" style="margin-top: 28px;">
+      <div>
+        <span class="plate-label ann">Construction · 96×72 grid</span>
+        <svg width="150" height="116" viewBox="-8 -10 112 92">
+          <g stroke="rgba(32,36,28,0.18)" stroke-width="0.5">
+            <line x1="0" y1="0" x2="96" y2="0"/><line x1="0" y1="24" x2="96" y2="24"/><line x1="0" y1="48" x2="96" y2="48"/><line x1="0" y1="72" x2="96" y2="72"/>
+            <line x1="0" y1="0" x2="0" y2="72"/><line x1="32" y1="0" x2="32" y2="72"/><line x1="64" y1="0" x2="64" y2="72"/><line x1="96" y1="0" x2="96" y2="72"/>
+          </g>
+          <line x1="0" y1="56" x2="62" y2="56" stroke="#20241C" stroke-width="9"/>
+          <path d="M34 41 L52 62 L94 9" fill="none" stroke="#47551F" stroke-width="10" stroke-linecap="square"/>
+          <g font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#B23B26" letter-spacing="0.5">
+            <text x="-6" y="59">9</text><text x="80" y="-3">10</text>
+          </g>
+          <line x1="94" y1="2" x2="94" y2="-6" stroke="#B23B26" stroke-width="0.6"/>
+          <line x1="52" y1="66" x2="52" y2="80" stroke="#B23B26" stroke-width="0.6"/>
+          <text x="46" y="87" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#B23B26">x=52</text>
+        </svg>
+      </div>
+      <div>
+        <span class="plate-label ann">Small sizes · 48 / 32 / 24 / 16</span>
+        <div class="sizes-row">
+          <div><svg width="48" height="36" viewBox="0 0 96 72"><line x1="0" y1="56" x2="62" y2="56" stroke="#20241C" stroke-width="9"/><path d="M34 41 L52 62 L94 9" fill="none" stroke="#47551F" stroke-width="10" stroke-linecap="square"/></svg><span class="ann" style="font-size:9px;">48</span></div>
+          <div><svg width="32" height="24" viewBox="0 0 96 72"><line x1="0" y1="56" x2="62" y2="56" stroke="#20241C" stroke-width="11"/><path d="M34 41 L52 62 L94 9" fill="none" stroke="#47551F" stroke-width="12" stroke-linecap="square"/></svg><span class="ann" style="font-size:9px;">32</span></div>
+          <div><svg width="24" height="18" viewBox="0 0 96 72"><path d="M28 38 L52 64 L94 8" fill="none" stroke="#47551F" stroke-width="16" stroke-linecap="square"/></svg><span class="ann" style="font-size:9px;">24 · favicon</span></div>
+          <div><svg width="16" height="12" viewBox="0 0 96 72"><path d="M26 36 L52 66 L94 8" fill="none" stroke="#47551F" stroke-width="20" stroke-linecap="square"/></svg><span class="ann" style="font-size:9px;">16</span></div>
+        </div>
+      </div>
+      <div style="background: var(--olive-deep);">
+        <span class="plate-label ann" style="color: rgba(246,244,236,0.6);">On olive · stamp</span>
+        <div style="display:flex; align-items:center; gap:13px;">
+          <svg width="38" height="29" viewBox="0 0 96 72"><line x1="0" y1="56" x2="62" y2="56" stroke="#F6F4EC" stroke-width="9"/><path d="M34 41 L52 62 L94 9" fill="none" stroke="#A9BA6C" stroke-width="10" stroke-linecap="square"/></svg>
+          <span class="wordmark" style="font-size:27px; color: #F6F4EC;">Sentri<span style="color:#A9BA6C;">.</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- ============ 03 · TYPE ============ -->
+  <section class="chapter" id="type">
+    <div class="ch-head"><span class="no">03</span><h2>Typography</h2><span class="ann">Fraunces · Plus Jakarta Sans · IBM Plex Mono</span></div>
+    <p class="body-text" style="margin-top:0;">Two of three faces are <strong>kept from the shipped Sentri system</strong> — Plus Jakarta Sans and IBM Plex Mono already live on the farm's phones, so migration costs nothing and muscle memory survives. The upgrade is one addition: <strong>Fraunces</strong>, a free serif with real registry blood, for display only. It gives the book its voice without ever touching a 13px table row.</p>
+    <div class="type-rows">
+      <div class="type-row">
+        <div class="type-meta"><span class="new">Added</span><b>Display — Fraunces</b>Screen titles, section names, celebrated counts. Weight 560–600, optical size auto, never below 20px, never in a data row. The cover of the book, not its pages.</div>
+        <div class="spec-disp">Written down, or it didn't happen.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><span class="kept">Kept</span><b>Text — Plus Jakarta Sans</b>All UI and body text, 12.5–16.5px. Humanist, tall x-height, honest bold — survives glare and gloves. Kept precisely because it is already shipped.</div>
+        <div class="spec-ui">Room 2 holds <b style="font-weight:700;">200 sows across pens A1–A4</b>. Mark each sow's pregnancy status; anything uncertain gets a re-check scheduled for you. Six re-checks are past due — start there.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><span class="kept">Kept</span><b>Record — IBM Plex Mono</b>Every ear tag, pen code, timestamp, count and delta. 9.5–13px, tracked up when uppercase. The rule: <em>if it identifies or measures, it is mono.</em></div>
+        <div class="spec-mono">PEN A1 · SOW 000318 · DUE JUL 8 · DONE JUL 8 · ON DAY<br>RECORDED BY G. HANSEN · 2026-07-08 · 23:00 · SYNC PENDING ×3</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Numerals in anger</b>Celebrated counts get Fraunces once per screen. Working numbers stay mono and tabular so columns of 200 rows rank-align.</div>
+        <div class="spec-num">
+          <span><span class="big">100<small> / 200</small></span><span class="lab">checked · gestation room 2</span></span>
+          <span><span class="mid">23:00</span><span class="lab">tabular time</span></span>
+          <span><span class="mid id">000418</span><span class="lab">mono ear tag</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- ============ 04 · COLOR ============ -->
+  <section class="chapter" id="color">
+    <div class="ch-head"><span class="no">04</span><h2>Color &amp; status</h2><span class="ann">Warm paper · ink · olive · five meanings</span></div>
+    <div class="palette">
+      <div class="pchip"><div class="well" style="background:#F6F4EC;"></div><div class="meta"><b>Paper</b><span>#F6F4EC</span><span>ground — warm, matte</span></div></div>
+      <div class="pchip"><div class="well" style="background:#EFEBDF;"></div><div class="meta"><b>Recess</b><span>#EFEBDF</span><span>pen headers, plates</span></div></div>
+      <div class="pchip"><div class="well" style="background:#FFFEFA;"></div><div class="meta"><b>Record white</b><span>#FFFEFA</span><span>cards — the page itself</span></div></div>
+      <div class="pchip"><div class="well" style="background:#20241C;"></div><div class="meta"><b>Ink</b><span>#20241C</span><span>text, rules, chapter bars</span></div></div>
+      <div class="pchip"><div class="well" style="background:#47551F;"></div><div class="meta"><b>Olive</b><span>#47551F</span><span>brand — actions, IDs, the stop</span></div></div>
+      <div class="pchip"><div class="well" style="background:#333E12;"></div><div class="meta"><b>Deep olive</b><span>#333E12</span><span>pressed states, stamp ground</span></div></div>
+    </div>
+    <div class="ratio">
+      <div style="flex: 78; background: var(--paper); border-right: 1px solid var(--hairline);"></div>
+      <div style="flex: 12; background: var(--ink);"></div>
+      <div style="flex: 6; background: var(--olive);"></div>
+      <div style="flex: 4; background: var(--amber-fill);"></div>
+    </div>
+    <div class="ratio-labels"><span class="ann" style="flex:78;">Usage · paper 78</span><span class="ann" style="flex:12;">ink 12</span><span class="ann" style="flex:10;">olive 6 · status 4</span></div>
+
+    <div class="status-table">
+      <div class="status-row"><span class="sw"><i style="background:var(--red);"></i>Overdue</span><span style="color:var(--ink-2);">Past its promised day. Red is an exception, never a theme.</span><span class="ann">#B23B26</span><span class="chip late">+2d late</span></div>
+      <div class="status-row"><span class="sw"><i style="background:var(--amber-fill);"></i>Due now</span><span style="color:var(--ink-2);">Load-bearing amber — reserved for "act today," nothing else. Kept from the shipped DS.</span><span class="ann">#96660D / #D99A21</span><span class="chip due">Due now</span></div>
+      <div class="status-row"><span class="sw"><i style="background:var(--blue-fill);"></i>In progress</span><span style="color:var(--ink-2);">Work underway — progress bars, day counters, live tasks.</span><span class="ann">#3D648C</span><span class="chip prog">Day 1 of 3</span></div>
+      <div class="status-row"><span class="sw"><i style="background:var(--green);"></i>Done</span><span style="color:var(--ink-2);">Recorded and signed. Deliberately greener and lighter than brand olive — done is a status, olive is a hand.</span><span class="ann">#3E7C4B</span><span class="chip onday">On day</span></div>
+      <div class="status-row"><span class="sw"><i style="background:var(--gray);"></i>Upcoming</span><span style="color:var(--ink-2);">Not yet due. Carries no color voice — a gray dot, ink-3 text, nothing louder.</span><span class="ann">#83867A dot</span><span class="chip up">Jul 11</span></div>
+    </div>
+
+    <div class="sun">
+      <div>
+        <p class="lede" style="font-size:17px;">Status must survive sunlight.</p>
+        <p class="body-text">Every status ships as a pair: a <strong>fill tone</strong> for dots and bars, and a darker <strong>text tone</strong> that clears 4.5:1 on record white — checked against the worst screen on the farm, at noon, through a wet glove. Two laws on top: <strong>never color alone</strong> (every status prints its word — "Due now", "+2d late" — beside its hue), and the brand may not moonlight: olive marks actions and IDs, and if a surface is olive, it is a button.</p>
+      </div>
+      <div class="sun-card">
+        <span class="ann" style="display:block; margin-bottom:6px;">Text tones on #FFFEFA · contrast floor</span>
+        <div class="sun-line"><span style="color:var(--red);">Overdue — flagged for rebreed</span><span class="ann">#B23B26 · 5.9:1</span></div>
+        <div class="sun-line"><span style="color:var(--amber);">Due now — needs check</span><span class="ann">#96660D · 4.7:1</span></div>
+        <div class="sun-line"><span style="color:var(--blue);">In progress — day 1 of 3</span><span class="ann">#3D648C · 6.0:1</span></div>
+        <div class="sun-line"><span style="color:var(--green);">Done — pregnant, confirmed</span><span class="ann">#3E7C4B · 5.0:1</span></div>
+        <div class="sun-line"><span style="color:var(--ink-3);">Upcoming — recheck Jul 11</span><span class="ann">#6C705C · 4.9:1</span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 05 · TODAY ============ -->
+<div class="wrap">
+  <section class="chapter" id="today">
+    <div class="ch-head"><span class="no">05</span><h2>Screen — Today</h2><span class="ann">The key screen · location-first · Ashfield Farm</span></div>
+    <div class="screen-grid">
+      <div class="side-notes">
+        <p class="lede">The front page of today's book.</p>
+        <p class="body-text">Location is the container everywhere: the worker reads <em>section → room</em>, never a flat task pile. Exceptions are printed at the top of the page like an errata slip — the six overdue re-checks outrank everything, including the brand.</p>
+        <div class="callouts">
+          <div class="co"><span class="n">1</span><span><b>Errata first.</b> The overdue strip is the only red on the screen, carries its location (Gestation · Room 2), and sits above all tasks. Red earns its rarity.</span></div>
+          <div class="co"><span class="n">2</span><span><b>Location-first cards.</b> Every task card leads with its mono location line — the task name is second. Workers navigate by where, not what.</span></div>
+          <div class="co"><span class="n">3</span><span><b>The ledger table.</b> Sections render as ruled rows with mono counts — the whole farm on one page, hairlines doing the organizing, zero decoration.</span></div>
+          <div class="co"><span class="n">4</span><span><b>Sync as a fact, not a fear.</b> Three held records are stated in the record voice — dashed border, mono, calm. Nothing is lost; it says so.</span></div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><svg width="46" height="11" viewBox="0 0 46 11" fill="#20241C"><rect x="0" y="6" width="2.5" height="5" rx="0.8"/><rect x="4" y="4" width="2.5" height="7" rx="0.8"/><rect x="8" y="2" width="2.5" height="9" rx="0.8"/><rect x="12" y="0" width="2.5" height="11" rx="0.8"/><path d="M19 5.5 Q23.5 1.5 28 5.5 M20.8 7.4 Q23.5 5 26.2 7.4 M22.7 9.2 Q23.5 8.4 24.3 9.2" stroke="#20241C" stroke-width="1.4" fill="none" stroke-linecap="round"/><rect x="32" y="1.5" width="11" height="8" rx="2" fill="none" stroke="#20241C"/><rect x="34" y="3.5" width="6" height="4" rx="0.8"/><rect x="43.8" y="4" width="1.6" height="3" rx="0.8"/></svg></div>
+        <div class="app-head">
+          <h3>Ashfield Farm<span style="color:var(--olive);">.</span></h3>
+          <div class="sub">Thu Jul 8 · G. Hansen · 2,140 sows</div>
+        </div>
+        <div class="sync-strip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v5h-5"/></svg>3 RECORDS WAITING TO SYNC · NOTHING IS LOST</div>
+        <div class="exc-strip">
+          <div><div class="t">6 overdue re-checks</div><div class="m">GESTATION · ROOM 2 · OLDEST +2D</div></div>
+          <span class="go">Open →</span>
+        </div>
+        <div class="day-rule"><span class="ann">Today · 3 tasks</span><span class="rule"></span></div>
+        <div class="tcard">
+          <div class="loc">Gestation · Room 2</div>
+          <div class="row1"><b>Pregnancy check</b><span class="chip prog">Day 1 of 3</span></div>
+          <div class="meta">200 sows · pens A1–A4</div>
+          <div class="bar"><i style="width:50%; background:var(--blue-fill);"></i></div>
+          <div class="barmeta"><span>100 / 200 CHECKED</span><span>50%</span></div>
+        </div>
+        <div class="tcard">
+          <div class="loc">Breeding · Room 1</div>
+          <div class="row1"><b>Heat check</b><span class="chip due">Due now</span></div>
+          <div class="meta">46 sows · due Jul 8 · not started</div>
+        </div>
+        <div class="tcard">
+          <div class="loc">Farrowing · Room 3</div>
+          <div class="row1"><b>Farrowing watch</b><span class="chip late">1 alert</span></div>
+          <div class="meta">12 sows active · <span class="warn">000418 · 45 min since last piglet</span></div>
+        </div>
+        <div class="day-rule"><span class="ann">Sections</span><span class="rule"></span></div>
+        <div class="sect-table">
+          <div class="sect-row"><div><div class="nm">Breeding</div><div class="sm">3 ROOMS · 486 SOWS</div></div><span class="st" style="color:var(--amber);"><i style="background:var(--amber-fill);"></i>1 due</span><span class="chev">›</span></div>
+          <div class="sect-row"><div><div class="nm">Gestation</div><div class="sm">4 ROOMS · 1,204 SOWS</div></div><span class="st" style="color:var(--red);"><i style="background:var(--red);"></i>6 overdue</span><span class="chev">›</span></div>
+          <div class="sect-row"><div><div class="nm">Farrowing</div><div class="sm">3 ROOMS · 232 SOWS</div></div><span class="st" style="color:var(--red);"><i style="background:var(--red);"></i>1 alert</span><span class="chev">›</span></div>
+          <div class="sect-row"><div><div class="nm">Nursery</div><div class="sm">2 ROOMS · 218 SOWS</div></div><span class="st" style="color:var(--ink-3);"><i style="background:var(--gray);"></i>Quiet</span><span class="chev">›</span></div>
+        </div>
+        <div class="tabbar">
+          <div class="on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Today</div>
+          <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Sections</div>
+          <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5z"/><path d="M9 8l2.5 2.5L16 6"/></svg>Record</div>
+          <div><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>More</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 06 · PREGNANCY CHECK ============ -->
+<div class="wrap">
+  <section class="chapter" id="check">
+    <div class="ch-head"><span class="no">06</span><h2>Screen — Pregnancy check</h2><span class="ann">Density test · 200 rows · pens A1–A4</span></div>
+    <div class="screen-grid flip">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><svg width="46" height="11" viewBox="0 0 46 11" fill="#20241C"><rect x="0" y="6" width="2.5" height="5" rx="0.8"/><rect x="4" y="4" width="2.5" height="7" rx="0.8"/><rect x="8" y="2" width="2.5" height="9" rx="0.8"/><rect x="12" y="0" width="2.5" height="11" rx="0.8"/><path d="M19 5.5 Q23.5 1.5 28 5.5 M20.8 7.4 Q23.5 5 26.2 7.4 M22.7 9.2 Q23.5 8.4 24.3 9.2" stroke="#20241C" stroke-width="1.4" fill="none" stroke-linecap="round"/><rect x="32" y="1.5" width="11" height="8" rx="2" fill="none" stroke="#20241C"/><rect x="34" y="3.5" width="6" height="4" rx="0.8"/><rect x="43.8" y="4" width="1.6" height="3" rx="0.8"/></svg></div>
+        <div class="nav-row">
+          <span class="back">←</span>
+          <div><h3>Pregnancy check</h3><div class="sub">Gestation · Room 2 · pens A1–A4</div></div>
+        </div>
+        <div class="segs"><div class="on">Check</div><div>Task details</div></div>
+        <div class="prog-card">
+          <div class="top"><b>Unit progress</b><span class="chip prog">Day 1 of 3</span></div>
+          <div class="big">100<small> / 200</small><span class="pct">50%</span></div>
+          <div class="bar"><i style="width:50%; background:var(--blue-fill);"></i></div>
+          <div class="barmeta"><span>LAST CHECK · G. HANSEN · JUL 8 · 23:00</span></div>
+        </div>
+        <div class="searchrow">
+          <div class="field"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="10.5" cy="10.5" r="7"/><path d="M16 16l5.5 5.5"/></svg>EAR TAG №</div>
+          <div class="fbtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18M7 12h10M10 19h4"/></svg></div>
+          <div class="fbtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></div>
+        </div>
+        <div class="pen-group">
+          <div class="pen-hd"><span class="pc">PEN A1</span><span class="ct">26 / 52 RECORDED</span></div>
+          <div class="prow">
+            <span class="id">000231</span>
+            <div><div class="stat up">Recheck in 3 days — uncertain</div><div class="delta">DUE JUL 11<span class="chip up">Upcoming</span></div></div>
+            <span class="act"><span class="chev">›</span></span>
+          </div>
+          <div class="prow">
+            <span class="id">000268</span>
+            <div><div class="stat due">Needs check</div><div class="delta">DUE JUL 8 · NOT YET<span class="chip due">Due now</span></div></div>
+            <span class="act"><span class="go amberb"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+          </div>
+          <div class="prow">
+            <span class="id">000302</span>
+            <div><div class="stat att">Not pregnant → flagged for rebreed</div><div class="delta">CHECKED JUL 8 · TO BREEDING LIST<span class="chip late">Attention</span></div></div>
+            <span class="act"><span class="go redb"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+          </div>
+          <div class="prow">
+            <span class="id">000318</span>
+            <div><div class="stat done">Pregnant, confirmed</div><div class="delta">DUE JUL 8 · DONE JUL 8<span class="chip onday">On day</span></div></div>
+            <span class="act"><span class="edit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></span></span>
+          </div>
+          <div class="prow">
+            <span class="id">000325</span>
+            <div><div class="stat done">Pregnant, confirmed</div><div class="delta"><s>DUE JUL 6</s> · DONE JUL 8<span class="chip late">+2d late</span></div></div>
+            <span class="act"><span class="edit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></span></span>
+          </div>
+        </div>
+        <div class="pen-group">
+          <div class="pen-hd"><span class="pc">PEN A2</span><span class="ct">31 / 48 RECORDED</span></div>
+          <div class="prow">
+            <span class="id">000341</span>
+            <div><div class="stat due">Needs check</div><div class="delta">DUE JUL 8 · NOT YET<span class="chip due">Due now</span></div></div>
+            <span class="act"><span class="go amberb"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+          </div>
+          <div class="prow">
+            <span class="id">000356</span>
+            <div><div class="stat done">Pregnant, confirmed</div><div class="delta">DUE JUL 8 · DONE JUL 8<span class="chip onday">On day</span></div></div>
+            <span class="act"><span class="edit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></span></span>
+          </div>
+        </div>
+        <div class="pen-fold"><span class="pc">PEN A3</span><span class="ct">22 / 52 RECORDED · ›</span></div>
+        <div class="pen-fold"><span class="pc">PEN A4</span><span class="ct">21 / 48 RECORDED · ›</span></div>
+        <div class="cta-dock">
+          <div class="cta">Submit results</div>
+          <div class="cta-note">Writes 100 records · signed G. Hansen</div>
+        </div>
+      </div>
+      <div class="side-notes">
+        <p class="lede">Two hundred sows, one ruled book.</p>
+        <p class="body-text">The density answer is the ledger table itself: pen groups are the only containers, rows are 56px with hairline separators, and each row is a fixed three-column grid — mono ID, status line with its delta, one 48px action. The pattern repeats without fatigue because nothing in it decorates.</p>
+        <div class="callouts">
+          <div class="co"><span class="n">1</span><span><b>Pen as chapter.</b> Recessed paper headers (<span class="ann" style="font-size:10px;">PEN A1 · 26/52</span>) break 200 rows into countable chapters; distant pens collapse to their tallies.</span></div>
+          <div class="co"><span class="n">2</span><span><b>The delta row in anger.</b> <code style="font-family:var(--mono); font-size:11.5px;">000325</code>: schedule struck through, actual beside it, "+2d late" chip. Lateness recorded, not scolded — and never hidden.</span></div>
+          <div class="co"><span class="n">3</span><span><b>Action = urgency.</b> Only rows that need a hand get a filled button — amber for due, red for attention. Done rows demote to a quiet edit glyph.</span></div>
+          <div class="co"><span class="n">4</span><span><b>The signed CTA.</b> Submit states what it writes and who signs it. The button is the stamp.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 07 · FARROWING ============ -->
+<div class="wrap">
+  <section class="chapter" id="farrow">
+    <div class="ch-head"><span class="no">07</span><h2>Screen — Farrowing record</h2><span class="ann">Action test · sow 000418 · pen B2</span></div>
+    <div class="screen-grid">
+      <div class="side-notes">
+        <p class="lede">The page you write with your thumb.</p>
+        <p class="body-text">A birth is recorded standing in the pen, one-handed, at 23:00. The sheet keeps the ledger's anatomy — identity line ruled off at the top, counts as big Fraunces numerals, the signature line at the bottom — but every control is sized for a glove: steppers 48px, the primary action 56px.</p>
+        <div class="callouts">
+          <div class="co"><span class="n">1</span><span><b>Identity is a ruled line.</b> Pen chip <code style="font-family:var(--mono); font-size:11.5px;">B2</code> before ear tag <code style="font-family:var(--mono); font-size:11.5px;">000418</code> — location first, even at the scale of one sow. Facts right-aligned, mono, uppercase.</span></div>
+          <div class="co"><span class="n">2</span><span><b>Amber means "look now."</b> The 45-minute interval warning is the screen's only amber. It states the measurement, not an emotion.</span></div>
+          <div class="co"><span class="n">3</span><span><b>Counters, not forms.</b> Live and stillborn are stepped, never typed. The plus button borrows olive because it is the working hand.</span></div>
+          <div class="co"><span class="n">4</span><span><b>Signed before submitted.</b> "G. Hansen · 23:00" already sits above the CTA — the record shows its author while it is being written.</span></div>
+        </div>
+      </div>
+      <div class="phone" style="background:#6E7065;">
+        <div class="dim">
+          <div class="statusbar" style="color:rgba(255,254,250,0.85); position:absolute; top:0; left:0; right:0; padding:14px 24px 0;"><span>9:41</span><svg width="46" height="11" viewBox="0 0 46 11" fill="rgba(255,254,250,0.85)"><rect x="0" y="6" width="2.5" height="5" rx="0.8"/><rect x="4" y="4" width="2.5" height="7" rx="0.8"/><rect x="8" y="2" width="2.5" height="9" rx="0.8"/><rect x="12" y="0" width="2.5" height="11" rx="0.8"/><path d="M19 5.5 Q23.5 1.5 28 5.5 M20.8 7.4 Q23.5 5 26.2 7.4 M22.7 9.2 Q23.5 8.4 24.3 9.2" stroke="rgba(255,254,250,0.85)" stroke-width="1.4" fill="none" stroke-linecap="round"/><rect x="32" y="1.5" width="11" height="8" rx="2" fill="none" stroke="rgba(255,254,250,0.85)"/><rect x="34" y="3.5" width="6" height="4" rx="0.8"/><rect x="43.8" y="4" width="1.6" height="3" rx="0.8"/></svg></div>
+          <div class="ghost"></div>
+          <div class="ghost" style="opacity:0.6;"></div>
+          <div class="sheet">
+            <div class="grab"></div>
+            <div class="sheet-hd"><h3>Farrowing</h3><span class="x">✕</span></div>
+            <div class="sow-row">
+              <span class="pen">B2</span>
+              <span class="tag">000418</span>
+              <span class="facts">SOW · 650 DAYS<br>PARITY 3</span>
+            </div>
+            <div class="sheet-sec"><b>Piglet count</b><a>Farrowing details ›</a></div>
+            <div class="warn-banner">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.2"><path d="M12 3 L22 20 H2 Z" stroke-linejoin="round"/><path d="M12 10v4M12 17h.01"/></svg>
+              <div><div class="t">45 min since last piglet</div><div class="m">LAST BIRTH 22:15 · CHECK THE SOW</div></div>
+              <span class="x">✕</span>
+            </div>
+            <div class="counters">
+              <div class="counter">
+                <div class="lab">Live born</div>
+                <div class="num">8<small>head</small></div>
+                <div class="steppers"><button>−</button><button class="plus">+</button></div>
+              </div>
+              <div class="counter">
+                <div class="lab">Stillborn + mummified</div>
+                <div class="num">0<small>head</small></div>
+                <div class="steppers"><button>−</button><button class="plus">+</button></div>
+              </div>
+            </div>
+            <div class="rec-by">Recorded by G. Hansen · Jul 8 · 23:00</div>
+            <div class="sheet-acts">
+              <span class="more">···</span>
+              <div class="cta">Record birth</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+<!-- ============ 08 · DENSITY ============ -->
+  <section class="chapter" id="density">
+    <div class="ch-head"><span class="no">08</span><h2>Density rules</h2><span class="ann">The grammar of a full page</span></div>
+    <div class="dens-grid">
+      <div class="dens">
+        <h4>Row anatomy — 56 over 48.</h4>
+        <p>List rows are 56px tall; the touch zone inside is never under 48px, primary CTAs never under 56px. Three columns, fixed: 66px mono ID · flexible status · 48px action. Nothing else may enter a row.</p>
+        <div class="demo" style="padding:0; overflow-x:auto;">
+          <svg width="100%" height="120" viewBox="0 0 460 120">
+            <rect x="20" y="20" width="420" height="56" fill="#FFFEFA" stroke="rgba(32,36,28,0.16)"/>
+            <rect x="20" y="24" width="420" height="48" fill="rgba(71,85,31,0.07)"/>
+            <text x="36" y="53" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600" fill="#47551F">000268</text>
+            <text x="120" y="49" font-family="Plus Jakarta Sans, sans-serif" font-size="12.5" font-weight="600" fill="#96660D">Needs check</text>
+            <text x="120" y="64" font-family="IBM Plex Mono, monospace" font-size="9" fill="#6C705C" letter-spacing="0.5">DUE JUL 8 · NOT YET</text>
+            <circle cx="404" cy="48" r="17" fill="#D99A21"/>
+            <path d="M397 48h13M405 43l5 5-5 5" stroke="#fff" stroke-width="2.4" fill="none"/>
+            <g font-family="IBM Plex Mono, monospace" font-size="8.5" fill="#B23B26" letter-spacing="0.5">
+              <line x1="452" y1="20" x2="452" y2="76" stroke="#B23B26" stroke-width="0.7"/>
+              <text x="450" y="14" text-anchor="end">ROW 56</text>
+              <line x1="8" y1="24" x2="8" y2="72" stroke="#B23B26" stroke-width="0.7"/>
+              <text x="4" y="14">TOUCH ≥48</text>
+              <line x1="387" y1="94" x2="421" y2="94" stroke="#B23B26" stroke-width="0.7"/>
+              <text x="404" y="107" text-anchor="middle">ACTION 48</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div class="dens">
+        <h4>Spacing — one rhythm, six steps.</h4>
+        <p>4 · 8 · 12 · 16 · 20 · 24. Inside a card nothing exceeds 16; between cards, 10–12; between page sections, a day-rule and 22. The page stays dense because whitespace is spent between meanings, not inside them.</p>
+        <div class="demo">
+          <div class="space-scale">
+            <div><i style="height:4px;"></i><em>4</em></div>
+            <div><i style="height:8px;"></i><em>8</em></div>
+            <div><i style="height:12px;"></i><em>12</em></div>
+            <div><i style="height:16px;"></i><em>16</em></div>
+            <div><i style="height:20px;"></i><em>20</em></div>
+            <div><i style="height:24px;"></i><em>24</em></div>
+            <div style="margin-left:16px;"><span class="ann" style="font-size:9.5px;">HAIRLINES DO THE REST</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="dens">
+        <h4>Hierarchy stops at the barn.</h4>
+        <p>Four levels, ever: section → room → pen → sow. A screen may show at most three of them; the fourth is a navigation, not a nesting. No cards inside cards — a pen group is a ruled table, not a stack of tiles.</p>
+        <div class="demo">
+          <div class="hier"><b>SECTION</b><span>›</span><b>ROOM</b><span>›</span><b>PEN</b><span>›</span><b style="background:var(--olive);">SOW 000418</b><span style="margin-left:6px;">· DEPTH ≤ 4 · SHOWN ≤ 3</span></div>
+        </div>
+      </div>
+      <div class="dens">
+        <h4>What color may mean.</h4>
+        <p>Five statuses own the five hues — nothing else is colored. Olive is not a status: it marks actions, IDs and the full stop. Amber is spent only on "due now." A screen with no urgency is a screen with almost no color, and that is the point.</p>
+        <div class="demo" style="gap:8px; display:flex; flex-wrap:wrap; align-items:center;">
+          <span class="chip late">Overdue</span><span class="chip due">Due now</span><span class="chip prog">In progress</span><span class="chip onday">Done</span><span class="chip up">Upcoming</span>
+          <span class="ann" style="font-size:9.5px; margin-left:6px;">+ OLIVE = A HAND, NEVER A STATE</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- ============ 09 · VOICE ============ -->
+  <section class="chapter" id="voice">
+    <div class="ch-head"><span class="no">09</span><h2>Voice</h2><span class="ann">Calm · imperative · counted · signed</span></div>
+    <p class="body-text" style="margin-top:0;">The register of a good herdsman's notebook: short imperative sentences, numbers before adjectives, no jargon, no exclamation marks. Bad news is stated with the same posture as good news — and everything that happened gets a name and a time.</p>
+    <div class="voice-grid">
+      <div class="voice-cell"><span class="ann cx">Empty state</span><blockquote>No checks due in this room. <span class="m">NEXT · 14 DUE FRI JUL 9</span></blockquote><p>An empty page still reports the next entry. Quiet is information.</p></div>
+      <div class="voice-cell"><span class="ann cx">Error</span><blockquote>Couldn't save 000268. It's kept on this phone — try again on signal.</blockquote><p>Say what is safe before what went wrong. Never blame the glove.</p></div>
+      <div class="voice-cell"><span class="ann cx">Sync</span><blockquote>3 records waiting to sync. <span class="m">NOTHING IS LOST</span></blockquote><p>Sync is a ledger fact, not a spinner. State the count, promise the custody.</p></div>
+      <div class="voice-cell"><span class="ann cx">Confirm</span><blockquote>000318 — pregnant, confirmed. Written to the room record<span style="color:var(--olive);">.</span></blockquote><p>The olive full stop closes every confirmation. The mark, working.</p></div>
+      <div class="voice-cell"><span class="ann cx">Overdue nudge</span><blockquote>6 re-checks in Room 2 are past due. <span class="m">OLDEST · +2D</span></blockquote><p>The nudge is a count and an age. No "please", no red prose — the chip carries the heat.</p></div>
+      <div class="voice-cell"><span class="ann cx">Done</span><blockquote>Room 2 done — 200 of 200 checked. <span class="m">SIGNED G. HANSEN · 23:00</span></blockquote><p>Completion is a signature, not a celebration. The record is the reward.</p></div>
+    </div>
+  </section>
+
+<!-- ============ 10 · VERDICT ============ -->
+  <section class="chapter" id="verdict">
+    <div class="ch-head"><span class="no">10</span><h2>Verdict</h2><span class="ann">What it proves · where it strains</span></div>
+    <p class="serif-pull">Field Ledger bets that trust is Sentri's product — that a farm will forgive density long before it forgives a lie about lateness.</p>
+    <div class="verdict">
+      <div class="pro">
+        <h4><span style="color:var(--olive);">→</span> Proves</h4>
+        <ul>
+          <li><b>The delta row earns its signature status.</b> Scheduled-struck-through beside actual, chip carrying the difference, reads correctly in one glance at arm's length — and it turns the app's dirtiest secret (slippage) into its most trustworthy feature.</li>
+          <li><b>The ledger table absorbs density better than cards ever did.</b> 56px ruled rows in pen chapters scale to 200 sows with zero added chrome; the reference UI's card-per-row approach does not.</li>
+          <li><b>Continuity is nearly free.</b> Jakarta and Plex Mono are kept, olive and amber-for-due are retuned rather than replaced — this could roll out as a theme update, not a retraining event.</li>
+          <li><b>Warm paper survives the barn.</b> The matte ground kills glare-shimmer that pure white suffers in sunlight, and it makes the five status hues read warmer-but-separated rather than fluorescent.</li>
+        </ul>
+      </div>
+      <div class="con">
+        <h4><span style="color:var(--red);">✕</span> Strains</h4>
+        <ul>
+          <li><b>Fraunces is deck candy at phone scale.</b> Below ~20px it smears on cheap wet screens, so the serif survives only in titles and celebrated counts — a thin footprint for a third font family; the direction must prove it's worth the 60KB.</li>
+          <li><b>Warm paper narrows amber's headroom.</b> #D99A21 on #F6F4EC is the palette's tightest pairing; the dark text-tone rescue works, but "due now" — the load-bearing status — has the least margin of the five, in the worst lighting.</li>
+          <li><b>Brand olive and status green are neighbors.</b> Separation leans on darkness and role (olive = buttons, green = words), which holds — until a deutan-vision worker meets a small dot with no word beside it. The "never color alone" law is a mitigation, not a cure.</li>
+          <li><b>Struck-through mono at 10px is fussy.</b> On a late-heavy room the delta chips multiply and the register look tips toward clutter; the pattern needs a "collapse deltas when >30% late" rule the deck asserts but hasn't tested.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="book-end">
+    <span class="ann">Sentri · Direction 01 — Field Ledger · 2026.08 · compare with 02 Panel · 03 Board</span>
+    <span class="ann">Ashfield Farm data · Fraunces + Plus Jakarta Sans + IBM Plex Mono</span>
+  </footer>
+</div>
+
+</body>
+</html>

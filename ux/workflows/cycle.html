@@ -1,0 +1,451 @@
+<!-- ============================================================
+     CYCLE AD-HOC · review fragment
+     sections: wf-heat · wf-pregnancy · wf-return · wf-abortion
+     spec: ux/ops/cycle-adhoc.md · laws: components.html 04/04d/05 · row grammar: check-in.html 06d
+     rendered under check-in.html's stylesheet (superset of components')
+     ============================================================ -->
+
+<!-- ================= WF 1 · HEAT · AD-HOC ================= -->
+<section class="wf" id="wf-heat" data-title="Heat · ad-hoc">
+<div class="wfhead"><h2>Heat · ad-hoc</h2><span class="anno">gilt found standing on the walk — production had 6 screens (4 sheets · full-page picker · toast) · ours is 2</span></div>
+<div class="caro">
+
+  <div class="slide"><div class="vlabel">1 · Entry — the verb sheet</div>
+  <div class="phone" style="height:760px;background:var(--ground)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div><div class="sub">Last checked yesterday · L.M</div></div></div>
+    <div style="opacity:.32">
+      <div class="list" style="padding:8px 12px"><div class="pcard"><div class="pen"><span class="code">C2</span><span class="agg">14 pigs</span></div>
+        <div class="row"><span class="cb on"></span><span class="tag">001482</span><div class="st"><span class="l1">Standing heat</span><span class="l2">gilt · 232d · 118kg</span></div></div>
+        <div class="row"><span class="cb"></span><span class="tag">001496</span><div class="st"><span class="l1">Quiet</span><span class="l2">gilt · 229d</span></div></div>
+      </div></div>
+    </div>
+    <div class="psheet">
+      <div class="grab"></div>
+      <div class="phd"><span class="x">✕</span><span class="cnt">001482</span><span class="up">C2 · gilt · 232d</span></div>
+      <div class="strip"><div class="sk">Health</div>
+        <div class="tiles">
+          <div class="tile"><span class="ti">+</span><span class="tl">Condition</span></div>
+          <div class="tile"><span class="ti">⚕</span><span class="tl">Treatment</span></div>
+          <div class="tile"><span class="ti">▲</span><span class="tl">Triage</span></div>
+          <div class="tile dth"><span class="ti">⊗</span><span class="tl">Death</span></div>
+        </div>
+      </div>
+      <div class="strip"><div class="sk">Routine</div>
+        <div class="tiles">
+          <div class="tile"><span class="ti">⚖</span><span class="tl">Weigh</span></div>
+          <div class="tile"><span class="ti">↕</span><span class="tl">Backfat</span></div>
+          <div class="tile"><span class="ti">⇄</span><span class="tl">Transfer</span></div>
+          <div class="tile"><span class="ti">⌗</span><span class="tl">Tag</span></div>
+          <div class="tile"><span class="ti">≡</span><span class="tl">Note</span></div>
+        </div>
+      </div>
+      <div class="strip"><div class="sk">Production</div>
+        <div class="pills"><div class="pill" style="background:var(--ink);color:#fff">Heat</div><div class="pill">Pregnancy result</div></div>
+      </div>
+      <div class="vna">3 not available for a gilt<span class="chv">›</span></div>
+    </div>
+  </div>
+  <div class="why"><b>The farmer decided before opening the app.</b> Ticking the gilt raises the one catalogue, gated by her state, and <span class="mono">Heat</span> is the same record the 查情 task marks — whether she joins a batch is a field inside it, never a second entry here. Blocked verbs are omitted, not greyed; one line accounts for them. Heat is Bulk: two gilts ticked raise this same sheet at N=2, and one shared join is how a service batch forms.<br><b>Changed:</b> the components §05 gilt specimen shows <span class="mono">Heat</span> alone and counts 4 away; the spec's gating table follows production <span class="mono">420:2128</span> and admits Pregnancy result for a breeding-age gilt (open Q2 — components erratum pending).</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">2 · The drawer — in heat · just record or join</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:680px;background:var(--well)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+    <div style="flex:1"></div>
+    <div class="fs"><div class="grab"></div>
+      <div class="sh2"><span class="pc">C2</span><span class="tag">001482</span><span class="vit">gilt · 232d · 118kg</span></div>
+      <div class="opt"><span class="rad"></span>Heat signs<span class="hint">watch · stays</span></div>
+      <div class="opt on"><span class="rad"></span>In heat</div>
+      <div class="fcond"><div class="ct">not in a batch</div>
+        <div class="opt on" style="margin-top:0"><span class="rad"></span>Just record<span class="hint">expires in 48 h</span></div>
+        <div class="opt"><span class="rad"></span>Join a batch<span style="margin-left:auto;color:var(--hair2);font-size:16px">›</span></div>
+      </div>
+      <div class="shbar"><button class="cta" style="flex:1">Record in heat</button></div>
+      <div class="aud">commits itself · the walk keeps its place</div>
+    </div>
+  </div>
+  <div class="why"><b>Production's four heat sheets compress to one visible decision.</b> <span class="mono">Heat signs</span> is the observation — watch, stays. <span class="mono">In heat</span> commits the state, and because nothing watches her the one question that follows appears as two options: <span class="mono">Just record</span> — pre-selected, so the primary still commits in one tap — or <span class="mono">Join a batch</span>, which opens the picker. Record-only <i>is</i> production's 仅记录发情, so the gated 提交 stays dead; the 48-hour fact (「该猪只发情状态会持续48小时。」) rides the record option as its hint — unclaimed, the mark expires.<br><b>Fixed:</b> the join was an empty Picker under a <span class="mono">revealed·…</span> caption with an <span class="mono">empty = record only</span> footnote — a decision buried in a data control, and it read as an unfinished form. A decision renders as a visible choice; the Picker now only ever holds the chosen batch.</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">3 · Sub-sheet — join batch · tap commits</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:640px;background:var(--well)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+    <div style="flex:1"></div>
+    <div class="fs"><div class="grab"></div>
+      <div class="sh2"><span class="tag">Join batch</span><span class="mr" style="margin-left:auto;width:auto;padding:0 10px;font-size:12.5px;font-weight:700">Line 1 ⌄</span></div>
+      <div class="fpick" style="color:var(--ink3);font-weight:500">⌕&nbsp;&nbsp;Batch no.</div>
+      <div class="opt"><span class="rad"></span>Batch 20<span class="hint">◐ breeding · running</span></div>
+      <div class="opt"><span class="rad"></span>Batch 21<span class="hint">breeding · in 2 d</span></div>
+      <div class="opt"><span class="rad"></span>Batch 22<span class="hint">breeding · in 3 d</span></div>
+      <div class="aud">tap joins and returns · only batches not done breeding</div>
+    </div>
+  </div>
+  <div class="why"><b>Tap a row and you are back on the drawer — there is no confirm button anywhere on this sheet.</b> One picker component serves every join in the product. The 选择生产线 wheel is a scope chip in the header (search is line-scoped: 「只能搜到所选的生产线里的批次」 — tap for an inline single-select, no 取消/确认); what the list holds prints once as the footnote, in farm words; rows keep production's own timing grammar. Re-tapping the chosen batch option on the drawer re-opens this picker to change (<span class="mono">575:2001</span>).<br><b>Changed:</b> rows show <b>breeding</b> timing, not 孕检 — a heat join targets a batch at or before its breeding task (spec picker table, <span class="mono">479:2165</span>); 孕检 timing belongs to the pregnancy picker.<br><b>Fixed:</b> the footnote recited the rule (<span class="mono">breeding not started or running only</span>) — it now states the fact of the list: <span class="mono">only batches not done breeding</span>.</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">4 · The drawer — join chosen · commit never gated</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:680px;background:var(--well)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 6</div></div></div>
+    <div style="flex:1"></div>
+    <div class="fs"><div class="grab"></div>
+      <div class="sh2"><span class="pc">C2</span><span class="tag">001482</span><span class="vit">gilt · 232d · 118kg</span></div>
+      <div class="opt"><span class="rad"></span>Heat signs<span class="hint">watch · stays</span></div>
+      <div class="opt on"><span class="rad"></span>In heat</div>
+      <div class="fcond"><div class="ct">not in a batch</div>
+        <div class="opt" style="margin-top:0"><span class="rad"></span>Just record</div>
+        <div class="opt on"><span class="rad"></span>Join batch 20<span class="hint">breeding in 3 d</span><span style="color:var(--hair2);font-size:16px">›</span></div>
+      </div>
+      <div class="shbar"><button class="cta" style="flex:1">Record in heat · join batch 20</button></div>
+      <div class="aud">commits itself · the walk keeps its place</div>
+    </div>
+  </div>
+  <div class="why"><b>The chosen option reads the join back — and the commit was never waiting on it.</b> Production disabled 提交 until a batch was picked; here record-only is legal and pre-selected, so nothing gates. The consequence is derived, not chosen: <span class="mono">breeding in 3 d</span> rides the option as its hint (「加入批次后，可跟随批次执行配种任务。」), the chevron re-opens the picker, and the primary names both effects. When she <i>is</i> watched the whole block never appears and the In-heat option carries the derived hint instead — <span class="mono">→ breeding</span> for a running heat check (「当前进行中的查情任务转移至配种」), <span class="mono">batch plan unchanged · admin notified</span> when her batch has not started — production's two info-card sheets, each compressed to one line.<br><b>Fixed:</b> the filled Picker's <span class="mono">re-tap to change</span> footnote explained a mechanic — gone; the selected option shows the batch and the primary reads <span class="mono">Record in heat · join batch 20</span>, so the button says everything the commit does.</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">5 · Post-commit — the row is the receipt</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:760px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Unit 6</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">yesterday</b> · L.M</div></div><span class="hbtn">Check-in</span></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">C2</span><span class="agg">14 pigs</span></div>
+        <div class="row"><div class="cb"></div><span class="tag">001482</span><div class="st"><span class="l1">In heat · just now</span><span class="l2">gilt · 232d</span></div><div class="rail"></div></div>
+        <div class="row"><div class="cb"></div><span class="tag">001496</span><div class="st"><span class="l1">Quiet</span><span class="l2">gilt · 229d</span></div><div class="rail"></div></div>
+      </div>
+      <div class="pcard"><div class="pen"><span class="code">C4</span><span class="agg">8 pigs</span></div>
+        <div class="row"><div class="cb"></div><span class="tag">000254</span><div class="st"><span class="l1">In heat · just now</span><span class="l2">parity 3 · no batch</span></div><div class="rail"></div></div>
+        <div class="row"><div class="cb"></div><span class="tag">000260</span><div class="st"><span class="l1">Weaned · 6 days ago</span><span class="l2">parity 2</span></div><div class="rail"></div></div>
+      </div>
+    </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">C2</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+  </div>
+  <div class="why"><b>No toast, no navigation — the row updates where it sits and the selection clears.</b> The joined gilt prints no batch token: having one is normal, and a gilt never printed <span class="mono">no batch</span> anyway (pre-batch by definition — the zero rule). Her join shows where it matters: she now sits in batch 20's breeding list. The slipped sow in C4 marked record-only <b>keeps</b> her <span class="mono">no batch</span> — a heat mark claims nothing; only a join or a batch task removes the token, and its vanishing is the join's one visible effect. At 48 h unclaimed a record-only mark lapses back to Quiet; the event stays on her page trail.</div>
+  </div>
+
+</div>
+</section>
+
+<!-- ================= WF 2 · PREGNANCY RESULT ================= -->
+<section class="wf" id="wf-pregnancy" data-title="Pregnancy result">
+<div class="wfhead"><h2>Pregnancy result</h2><span class="anno">意外妊娠 folded in — production had 4 screens and 2 gated buttons · ours is one drawer + one sub-sheet, zero toasts</span></div>
+<div class="caro">
+
+  <div class="slide"><div class="vlabel">1 · Entry — the verb sheet</div>
+  <div class="phone" style="height:760px;background:var(--ground)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div><div class="sub">Last checked 08:05 · G.H</div></div></div>
+    <div style="opacity:.32">
+      <div class="list" style="padding:8px 12px"><div class="pcard"><div class="pen"><span class="code">A4</span><span class="agg">12 pigs</span></div>
+        <div class="row"><span class="cb on"></span><span class="tag">000287</span><div class="st"><span class="l1">Weaned · 25 days ago</span><span class="l2">parity 2 · no batch</span></div></div>
+        <div class="row"><span class="cb"></span><span class="tag">000291</span><div class="st"><span class="l1">Weaned · 4 days ago</span><span class="l2">parity 5</span></div></div>
+      </div></div>
+    </div>
+    <div class="psheet">
+      <div class="grab"></div>
+      <div class="phd"><span class="x">✕</span><span class="cnt">000287</span><span class="up">A4 · parity 2</span></div>
+      <div class="strip"><div class="sk">Health</div>
+        <div class="tiles">
+          <div class="tile"><span class="ti">+</span><span class="tl">Condition</span></div>
+          <div class="tile"><span class="ti">⚕</span><span class="tl">Treatment</span></div>
+          <div class="tile"><span class="ti">▲</span><span class="tl">Triage</span></div>
+          <div class="tile dth"><span class="ti">⊗</span><span class="tl">Death</span></div>
+        </div>
+      </div>
+      <div class="strip"><div class="sk">Routine</div>
+        <div class="tiles">
+          <div class="tile"><span class="ti">⚖</span><span class="tl">Weigh</span></div>
+          <div class="tile"><span class="ti">↕</span><span class="tl">Backfat</span></div>
+          <div class="tile"><span class="ti">⇄</span><span class="tl">Transfer</span></div>
+          <div class="tile"><span class="ti">≡</span><span class="tl">Note</span></div>
+        </div>
+      </div>
+      <div class="strip"><div class="sk">Production</div>
+        <div class="pills"><div class="pill">Heat</div><div class="pill" style="background:var(--ink);color:#fff">Pregnancy result</div></div>
+      </div>
+      <div class="vna">2 not available · not bred<span class="chv">›</span></div>
+    </div>
+  </div>
+  <div class="why"><b>意外妊娠 is not a verb — it is Pregnancy result reached ad hoc.</b> The farmer who found this slipped sow pregnant taps the same Choice(3) record the 孕检 task writes: one record, two doors, and the other outcomes stay available because it is one form. Production disabled the tile for in-batch pigs (「属于批次 → "意外妊娠"按钮禁用」, <span class="mono">420:2159</span>); that gate dies structurally — the verb stays for any eligible female, and the join field simply never appears for a watched sow. Arity Bulk: N sows, one payload.</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">2 · The drawer — pregnant · just record or join</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:720px;background:var(--well)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div></div></div>
+    <div style="flex:1"></div>
+    <div class="fs"><div class="grab"></div>
+      <div class="sh2"><span class="pc">A4</span><span class="tag">000287</span><span class="vit">parity 2 · 890d</span></div>
+      <div class="opt on"><span class="rad"></span>Pregnant</div>
+      <div class="fcond"><div class="ct">not in a batch</div>
+        <div class="opt on" style="margin-top:0"><span class="rad"></span>Just record<span class="hint">nothing will watch her</span></div>
+        <div class="opt"><span class="rad"></span>Join a batch<span style="margin-left:auto;color:var(--hair2);font-size:16px">›</span></div>
+      </div>
+      <div class="opt"><span class="rad"></span>Not pregnant</div>
+      <div class="opt"><span class="rad"></span>Unclear<span class="hint">recheck in 3 d ▸</span></div>
+      <div class="shbar"><button class="cta" style="flex:1">Record pregnant</button></div>
+      <div class="aud">commits itself · the walk keeps its place</div>
+    </div>
+  </div>
+  <div class="why"><b>Production's segmented fork survives as two honest options — not a gated form, not a hidden field.</b> <span class="mono">Pregnant</span> asks the one question that follows, and only because nothing watches her — the <span class="mono">850:2000</span> test, not batch membership. <span class="mono">Just record</span> <i>is</i> 仅记录妊娠, pre-selected so the primary commits in one tap; the ⚠「该猪只将不会自动加入到任何批次。」 warning is its hint and, after commit, a standing row token — a persistent fact instead of a dismissed sentence. Commit is never blocked; the miscopied card title 「查情任务外标记发情」 dies with the sheet. For a watched sow the whole block never appears and the options carry the D2 hints instead: <span class="mono">follows batch · farrowing</span> / <span class="mono">leaves batch · rebreed</span>.<br><b>Fixed:</b> same failure as Heat's drawer — an empty Picker plus an <span class="mono">empty = record only</span> footnote stood in for the decision. The decision is now two visible options, and the primary states the outcome it commits: <span class="mono">Record pregnant</span>.</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">3 · Sub-sheet — join batch · 孕检 timing</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:640px;background:var(--well)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div></div></div>
+    <div style="flex:1"></div>
+    <div class="fs"><div class="grab"></div>
+      <div class="sh2"><span class="tag">Join batch</span><span class="mr" style="margin-left:auto;width:auto;padding:0 10px;font-size:12.5px;font-weight:700">Line 1 ⌄</span></div>
+      <div class="fpick" style="color:var(--ink3);font-weight:500">⌕&nbsp;&nbsp;Batch no.</div>
+      <div class="opt"><span class="rad"></span>Batch 20<span class="hint">◐ preg check · running</span></div>
+      <div class="opt"><span class="rad"></span>Batch 21<span class="hint">preg check · in 2 d</span></div>
+      <div class="opt"><span class="rad"></span>Batch 22<span class="hint">preg check · in 3 d</span></div>
+      <div class="aud">tap joins and returns · only batches bred · not farrowed</div>
+    </div>
+  </div>
+  <div class="why"><b>Production built this sheet three times, plus a wheel and a toast — this is all of it.</b> The same component as Heat's join, parameterized by the filter: 「仅可选择配种任务已完成并且分娩任务未完成的批次。」 (the 「为完成」 typo in 2 of 3 frames corrected — ambiguity 1), rows in 孕检 timing, the line as a scope chip, tap commits and dismisses. The chosen batch's timing rides back onto the drawer as the join option's hint, so she knows when the batch will next touch this sow before committing.<br><b>Fixed:</b> the footnote recited the filter (<span class="mono">breeding done · farrowing not yet complete</span>) — it now states the fact of the list in farm words: <span class="mono">only batches bred · not farrowed</span>.</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">4 · The drawer — unclear · a default, not a dialog</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:700px;background:var(--well)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div></div></div>
+    <div style="flex:1"></div>
+    <div class="fs"><div class="grab"></div>
+      <div class="sh2"><span class="pc">A4</span><span class="tag">000287</span><span class="vit">parity 2 · 890d</span></div>
+      <div class="opt"><span class="rad"></span>Pregnant</div>
+      <div class="opt"><span class="rad"></span>Not pregnant</div>
+      <div class="opt on"><span class="rad"></span>Unclear</div>
+      <div class="fcond">
+        <div class="ctr"><span class="lbl">Recheck in</span><span class="b">−</span><span class="n">3</span><span class="b plus">+</span><span style="font-family:var(--mono);font-size:12px;color:var(--ink3)">days</span></div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:var(--ink3);margin-top:5px">back on the list in 3 d</div>
+      </div>
+      <div class="shbar"><button class="cta" style="flex:1">Record unclear · recheck in 3 d</button></div>
+      <div class="aud">commits itself · the walk keeps its place</div>
+    </div>
+  </div>
+  <div class="why"><b>Unclear carries its default; the stepper is for the exception.</b> Recheck pre-set to 3 d from task config (pregnancy-check D1) — no mandatory dialog, and the reveal is the only field the choice adds, so the event stays a drawer. No choice on this sheet reveals more than one field, so it is a conditional, never a composite. Open: which config supplies the default when the ad-hoc door fires for a sow in no batch (Q5).<br><b>Fixed:</b> the block's <span class="mono">revealed by unclear</span> caption and <span class="mono">default from config</span> footnote were spec grammar inside the phone — the block now just appears, the footnote keeps only the consequence (<span class="mono">back on the list in 3 d</span>), and the primary says the whole outcome: <span class="mono">Record unclear · recheck in 3 d</span>.</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">5 · Post-commit — the warning became a token</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:760px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Unit 4</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">08:05</b> · G.H</div></div><span class="hbtn">Check-in</span></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">A4</span><span class="agg">12 pigs</span></div>
+        <div class="row"><div class="cb"></div><span class="tag">000287</span><div class="st"><span class="l1">Pregnant</span><span class="l2">parity 2 · no batch</span></div><div class="rail"></div></div>
+        <div class="row"><div class="cb"></div><span class="tag">000291</span><div class="st"><span class="l1">Pregnant</span><span class="l2">parity 5</span></div><div class="rail"></div></div>
+        <div class="row"><div class="cb"></div><span class="tag">000305</span><div class="st"><span class="l1">Recheck · in 3 d</span><span class="l2">parity 3 · unclear now · G.H</span></div><div class="rail"></div></div>
+        <div class="row"><div class="cb"></div><span class="tag">000298</span><div class="st"><span class="l1">Weaned · 3 days ago</span><span class="l2">parity 1</span></div><div class="rail"></div></div>
+      </div>
+    </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">A4</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+  </div>
+  <div class="why"><b>Record-only prints <span class="mono">no batch</span> immediately — nothing is watching her, and §06d prints the token exactly then.</b> No day count on line 1: there is no mating date to derive one from (Q7 — production captured nothing either). The joined sow (000291) is batch-silent; her join shows as her appearance in batch 20's 孕检 stream at the timing the picker row promised. Unclear resurfaces on its recheck day with the trail on line 2. A watched sow marked Not pregnant would leave her batch into the rebreed watch — <span class="mono">no batch</span> only if that window lapses unclaimed.</div>
+  </div>
+
+</div>
+</section>
+
+<!-- ================= WF 3 · RETURN TO HEAT ================= -->
+<section class="wf" id="wf-return" data-title="Return to heat">
+<div class="wfhead"><h2>Return to heat</h2><span class="anno">production gated the mark behind a segmented control and an ack checkbox · ours is two radios in one drawer</span></div>
+<div class="caro">
+
+  <div class="slide"><div class="vlabel">1 · Entry — the verb sheet</div>
+  <div class="phone" style="height:760px;background:var(--ground)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div><div class="sub">Last checked 08:05 · G.H</div></div></div>
+    <div style="opacity:.32">
+      <div class="list" style="padding:8px 12px"><div class="pcard"><div class="pen"><span class="code">A2</span><span class="agg">12 pigs</span></div>
+        <div class="row"><span class="cb on"></span><span class="tag">000254</span><div class="st"><span class="l1">Mated · 25 days ago</span><span class="l2">parity 3 · JY001</span></div></div>
+        <div class="row"><span class="cb"></span><span class="tag">000268</span><div class="st"><span class="l1">Mated · 25 days ago</span><span class="l2">parity 3 · JY001</span></div></div>
+      </div></div>
+    </div>
+    <div class="psheet">
+      <div class="grab"></div>
+      <div class="phd"><span class="x">✕</span><span class="cnt">000254</span><span class="up">A2 · parity 3</span></div>
+      <div class="strip"><div class="sk">Health</div>
+        <div class="tiles">
+          <div class="tile"><span class="ti">+</span><span class="tl">Condition</span></div>
+          <div class="tile"><span class="ti">⚕</span><span class="tl">Treatment</span></div>
+          <div class="tile"><span class="ti">▲</span><span class="tl">Triage</span></div>
+          <div class="tile dth"><span class="ti">⊗</span><span class="tl">Death</span></div>
+        </div>
+      </div>
+      <div class="strip"><div class="sk">Routine</div>
+        <div class="tiles">
+          <div class="tile"><span class="ti">⚖</span><span class="tl">Weigh</span></div>
+          <div class="tile"><span class="ti">↕</span><span class="tl">Backfat</span></div>
+          <div class="tile"><span class="ti">⇄</span><span class="tl">Transfer</span></div>
+          <div class="tile"><span class="ti">≡</span><span class="tl">Note</span></div>
+        </div>
+      </div>
+      <div class="strip"><div class="sk">Production</div>
+        <div class="pills">
+          <div class="pill">Pregnancy result</div>
+          <div class="pill" style="background:var(--ink);color:#fff">Returned to heat</div>
+          <div class="pill">Abortion</div>
+        </div>
+      </div>
+      <div class="vna">3 not available while bred<span class="chv">›</span></div>
+    </div>
+  </div>
+  <div class="why"><b>On a bred sow the observation <i>is</i> a return — so Heat is omitted and Returned to heat owns it.</b> Production reached this as its third 发情 sheet, keyed on her state; here the gate reads the animal and the verb wears its true name. Same record as the 返情检查 task mark: one form, two doors, different pre-fill.</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">2 · The drawer — two radios, no negative</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:640px;background:var(--well)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div></div></div>
+    <div style="flex:1"></div>
+    <div class="fs"><div class="grab"></div>
+      <div class="sh2"><span class="pc">A2</span><span class="tag">000254</span><span class="vit">parity 3 · 650d</span></div>
+      <div class="opt"><span class="rad"></span>Signs of return<span class="hint">watch · stays in batch</span></div>
+      <div class="opt on"><span class="rad"></span>Returned<span class="hint">→ out of batch · rebreed</span></div>
+      <div class="shbar"><button class="cta" style="flex:1">Record return</button></div>
+      <div class="aud">commits itself · the walk keeps its place</div>
+    </div>
+  </div>
+  <div class="why"><b>The consequence sits on the option, at the moment of decision.</b> Production's 仅记录发情 maps to <span class="mono">Signs of return</span> (「有返情迹象，但是还没有返情」 — an observation, no consequence), its 确认返情 to <span class="mono">Returned</span>. The 「我已知晓，并确认该猪只将从当前批次中移出。」 checkbox that gated 提交 is subtracted: the hint says what it said, the commit is deliberate, the mark is audited and undoable — return-heat already ruled the sibling checkbox "ceremony". (Q4 rides on the product-wide undo window existing.) No third radio: unmarked is the record of no return.</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">3 · Post-commit — verified: no `no batch`</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:760px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Unit 4</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">08:05</b> · G.H</div></div><span class="hbtn">Check-in</span></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">A2</span><span class="agg">12 pigs</span></div>
+        <div class="row"><div class="cb"></div><span class="tag">000254</span><div class="st"><span class="l1">Returned · just now</span><span class="l2">parity 3 · out of batch</span></div><div class="rail"></div></div>
+        <div class="row"><div class="cb"></div><span class="tag">000268</span><div class="st"><span class="l1">Mated · 25 days ago <span class="b b-amber">signs</span></span><span class="l2">parity 3 · signs now · G.H</span></div><div class="rail"></div></div>
+        <div class="row"><div class="cb"></div><span class="tag">000275</span><div class="st"><span class="l1">Mated · 25 days ago</span><span class="l2">parity 2 · JY001</span></div><div class="rail"></div></div>
+      </div>
+    </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">A2</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+  </div>
+  <div class="why"><b>She left batch 20, and her row does not read <span class="mono">no batch</span> — verified against §06d.</b> The stamp carries its consequence (<span class="mono">out of batch · rebreed</span> — return-heat Δ1, its "queued" trimmed to the line-2 copy budget), but the rebreed service window now watches her, and a watched station is not an orphan; the token prints only if that window lapses with nothing claiming her. <span class="mono">Signs</span> changes nothing: amber chip on line 1, trail on line 2, stays in batch — the flag rides her trail into the pregnancy check.</div>
+  </div>
+
+</div>
+</section>
+
+<!-- ================= WF 4 · ABORTION ================= -->
+<section class="wf" id="wf-abortion" data-title="Abortion">
+<div class="wfhead"><h2>Abortion</h2><span class="anno">production had two ack-gated variants that captured nothing · ours is one drawer that captures the cause</span></div>
+<div class="caro">
+
+  <div class="slide"><div class="vlabel">1 · Entry — the verb sheet · single only</div>
+  <div class="phone" style="height:760px;background:var(--ground)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div><div class="sub">Last checked 08:05 · G.H</div></div></div>
+    <div style="opacity:.32">
+      <div class="list" style="padding:8px 12px"><div class="pcard"><div class="pen"><span class="code">A6</span><span class="agg">10 pigs</span></div>
+        <div class="row"><span class="cb on"></span><span class="tag">000311</span><div class="st"><span class="l1">Pregnant · day 34</span><span class="l2">parity 3</span></div></div>
+        <div class="row"><span class="cb"></span><span class="tag">000318</span><div class="st"><span class="l1">Pregnant · day 41</span><span class="l2">parity 2</span></div></div>
+      </div></div>
+    </div>
+    <div class="psheet">
+      <div class="grab"></div>
+      <div class="phd"><span class="x">✕</span><span class="cnt">000311</span><span class="up">A6 · parity 3</span></div>
+      <div class="strip"><div class="sk">Health</div>
+        <div class="tiles">
+          <div class="tile"><span class="ti">+</span><span class="tl">Condition</span></div>
+          <div class="tile"><span class="ti">⚕</span><span class="tl">Treatment</span></div>
+          <div class="tile"><span class="ti">▲</span><span class="tl">Triage</span></div>
+          <div class="tile dth"><span class="ti">⊗</span><span class="tl">Death</span></div>
+        </div>
+      </div>
+      <div class="strip"><div class="sk">Routine</div>
+        <div class="tiles">
+          <div class="tile"><span class="ti">⚖</span><span class="tl">Weigh</span></div>
+          <div class="tile"><span class="ti">↕</span><span class="tl">Backfat</span></div>
+          <div class="tile"><span class="ti">⇄</span><span class="tl">Transfer</span></div>
+          <div class="tile"><span class="ti">≡</span><span class="tl">Note</span></div>
+        </div>
+      </div>
+      <div class="strip"><div class="sk">Production</div>
+        <div class="pills">
+          <div class="pill">Pregnancy result</div>
+          <div class="pill">Returned to heat</div>
+          <div class="pill" style="background:var(--ink);color:#fff">Abortion</div>
+        </div>
+      </div>
+      <div class="vna">3 not available while pregnant<span class="chv">›</span></div>
+    </div>
+  </div>
+  <div class="why"><b>Single, and structurally so.</b> Each abortion has its own cause and restructures a batch, so the verb names exactly one sow. At N&gt;1 it is not greyed — it is absent from the sheet, and the not-available line counts it with its reason: <span class="mono">abortion — one at a time</span>, beside any state-blocked verbs (<span class="mono">not bred</span> · <span class="mono">already farrowed</span>). Gated to bred-or-pregnant, not yet farrowed (pig-actions decisions stand).</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">2 · The drawer — cause required · consequence derived</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:620px;background:var(--well)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div></div></div>
+    <div style="flex:1"></div>
+    <div class="fs"><div class="grab"></div>
+      <div class="sh2"><span class="pc">A6</span><span class="tag">000311</span><span class="vit">pregnant · day 34 · parity 3</span></div>
+      <div class="fpick">Cause <span class="req">*</span><span class="v ph">Select</span><span class="chv">›</span></div>
+      <div class="shbar"><button class="cta" style="flex:1">Record abortion</button></div>
+      <div class="aud">out of batch 20 · marked empty</div>
+    </div>
+  </div>
+  <div class="why"><b>One drawer replaces two variants — and finally captures something.</b> Production's 巡检 pair recorded no date, no cause, no count; the task side's cause schema is the survivor: one record, two doors. Cause is a Picker because six causes break the Choice ≤ 4 law (SYNTHESIS resolution, not taste). The membership branch is a derived footnote, never a fork: in a batch it reads <span class="mono">out of batch 20 · marked empty</span> (「该猪只移出当前批次。」「生产状态更新为"空怀/后备"。」), loose it reads <span class="mono">marked empty</span>. Both 「我已知晓」 checkboxes die by the same reasoning as Return's — hint at the decision, deliberate commit, undo. Status target named <span class="mono">empty</span> (空怀) once, for the footnote and the row (Q10).<br><b>Fixed:</b> the footnote said <span class="mono">status → empty</span> — system grammar; it now reads <span class="mono">marked empty</span>, the farm word doing the same work.</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">3 · Sub-sheet — cause · six rows, tap commits</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:720px;background:var(--well)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div></div></div>
+    <div style="flex:1"></div>
+    <div class="fs"><div class="grab"></div>
+      <div class="sh2"><span class="tag">Cause</span><span class="vit">000311 · abortion</span></div>
+      <div class="opt"><span class="rad"></span>Disease</div>
+      <div class="opt"><span class="rad"></span>Injury</div>
+      <div class="opt"><span class="rad"></span>Heat stress</div>
+      <div class="opt"><span class="rad"></span>Poor nutrition</div>
+      <div class="opt"><span class="rad"></span>Stress · handling</div>
+      <div class="opt"><span class="rad"></span>Other<span class="hint">note required</span></div>
+      <div class="aud">tap selects and returns</div>
+    </div>
+  </div>
+  <div class="why"><b>The picker sub-sheet at its smallest: a fixed set, one tap, no confirm.</b> <span class="mono">Other</span> warns on the row that it will require the note, so the reveal is never a surprise.<br><b>Changed:</b> the six cause labels are placeholders — they are enumerated only in production node <span class="mono">2572:19676</span> (open Q1); pull them before build.<br><b>Changed:</b> no search row — the kit's Picker prescribes search for entity lists; a six-row catalogue does not earn one.</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">4 · The drawer — other · the canonical conditional</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:700px;background:var(--well)">
+    <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Unit 4</div></div></div>
+    <div style="flex:1"></div>
+    <div class="fs"><div class="grab"></div>
+      <div class="sh2"><span class="pc">A6</span><span class="tag">000311</span><span class="vit">pregnant · day 34 · parity 3</span></div>
+      <div class="fpick">Cause <span class="req">*</span><span class="v">Other</span><span class="chv">›</span></div>
+      <div class="fcond"><div class="ct">note required</div>
+        <div class="fnote">Describe what was seen</div>
+      </div>
+      <div class="shbar"><button class="cta" style="flex:1">Record abortion</button></div>
+      <div class="aud">out of batch 20 · marked empty</div>
+    </div>
+  </div>
+  <div class="why"><b>The canonical conditional, by name.</b> Components 04 cites abortion's Note-when-Other as the pattern's own example: the dependent field appears inline beneath its trigger, amber-ruled, required — never a second step, never a second screen. Re-tap the Cause field to change it; picking any non-Other cause folds the note away.<br><b>Fixed:</b> the block's caption said <span class="mono">required · cause is other</span> — rule grammar; it now reads <span class="mono">note required</span>, the same fact in plain words.</div>
+  </div>
+
+  <div class="slide"><div class="vlabel">5 · Post-commit — what leaves with her</div>
+  <div class="phone" style="display:flex;flex-direction:column;height:760px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2" style="padding:0"><div class="u">Unit 4</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last checked <b style="color:var(--ink2);font-weight:600">08:05</b> · G.H</div></div><span class="hbtn">Check-in</span></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">A6</span><span class="agg">10 pigs</span></div>
+        <div class="row"><div class="cb"></div><span class="tag">000311</span><div class="st"><span class="l1">Empty · day 0</span><span class="l2">parity 3 · aborted now · G.H</span></div><div class="rail"></div></div>
+        <div class="row"><div class="cb"></div><span class="tag">000318</span><div class="st"><span class="l1">Pregnant · day 41</span><span class="l2">parity 2</span></div><div class="rail"></div></div>
+        <div class="row"><div class="cb"></div><span class="tag">000324</span><div class="st"><span class="l1">Pregnant · day 29</span><span class="l2">parity 4</span></div><div class="rail"></div></div>
+      </div>
+    </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">A6</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+  </div>
+  <div class="why"><b>What leaves with her:</b> batch 20 — she is gone from its 孕检 and 分娩 streams the moment the drawer commits (「流产猪只将从当前批次中移除」); her pregnancy state; her farrowing forecast. What stays: the abortion, its cause, and the batch exit on her page trail, and the row reads <span class="mono">Empty · day 0</span> with the stamp on line 2. The rebreed watch claims her before <span class="mono">no batch</span> ever prints — same rule as Return's exit.</div>
+  </div>
+
+</div>
+</section>

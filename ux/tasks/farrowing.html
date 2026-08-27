@@ -1,0 +1,206 @@
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F7F6F2;--card:#FFF;--well:#EFEEE8;--ink:#1C1E19;--ink2:#51544B;--ink3:#8B8E83;--hair:#E7E6DF;--hair2:#D8D7CE;--red:#C2402E;--amber:#96660D;--amber-fill:#D99A21;--amber-wash:#F8F0DC;--green:#3B8A50;--green-wash:#EAF2EC;--mono:'IBM Plex Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:40px 48px 90px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.015em;margin:18px 0 10px}
+h2{font-size:21px;font-weight:800;margin:44px 0 14px;padding-top:28px;border-top:1px solid var(--ink)}
+h3{font-size:15px;font-weight:700;margin:20px 0 8px}
+p{max-width:72ch;color:var(--ink2);margin-bottom:10px}
+.anno{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+.mono{font-family:var(--mono);font-size:12.5px}
+.cut{color:var(--red);font-weight:700}.keep{color:var(--green);font-weight:700}.merge{color:var(--amber);font-weight:700}
+pre.flow{font-family:var(--mono);font-size:12px;line-height:1.7;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:12px 0;color:var(--ink)}
+.note{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px 16px;margin:12px 0;font-size:13.5px;color:var(--ink2);max-width:none}
+</style>
+
+<div class="wrap">
+
+<h1>Farrowing · 分娩</h1>
+<p><b>Thesis:</b> farrowing is one live, multi-session record — five counters, an interval clock, and a “continue vs final” decision. Production wraps that record in three tabs, a grid, a legend, an end-of-task ceremony and a read-only archive module; our list + live-record sheet already carry everything except the interval engine’s exact rules, the birth-time field, and the sow-card side actions (foster · death · abortion · mark).</p>
+<div class="anno">figma 634:15559 (psrxDa9LRWLdTL9XMZmWdc) · 19 screens (14 in-progress + 5 task-ended) · 9 designer annotations · 6 adjacent piglet-processing screens noted, out of scope</div>
+
+<h2>1 · Production inventory</h2>
+<p>Section has two modules: <b>任务进行中</b> (task in progress, 14 screens) and <b>任务已结束</b> (task ended — read-only archive, 5 screens). Annotations in magenta/red are requirements; captured below.</p>
+
+<table>
+<thead><tr><th style="width:24%">Screen (node)</th><th style="width:36%">What it shows</th><th>Data on it</th></tr></thead>
+<tbody>
+<tr><td>Pig-list tab 猪只List <span class="mono">634:15678</span></td><td>Task header card (分娩 · barn 1 · day 1/3 · progress bar 已分娩/待分娩 100/200 · 50%), search by ear tag, funnel, list/grid toggle, info card “200 pigs · please record farrowing data”, pen groups <b>未定位 (unlocated) first</b>, then A1…</td><td>Row = tag · state icon+label · trailing arrow/pencil. States: due in 10 d (clock) · due today (green play) · awaiting “–” <b>获取不到状态 status unavailable</b> · 1 d past due (amber) · farrowing, 10 piglets (half-moon) · done, 10 piglets (faded ✓, pencil). Red dot + amber triangle on tag = marked sow. Floating scan button.</td></tr>
+<tr><td>Pen-grid tab 栏位Grid <span class="mono">634:17912</span></td><td>Same header; cards per pen, single-pig and multi-pig variants</td><td>Card = pen · state · tag/count. Multi-pig pen cards aggregate: <span class="mono">超出间隔 30 分钟 · 5头</span> (interval exceeded), <span class="mono">分娩中 5 头</span>, 全部完成. Note grid says 30 min where the sheet says 45.</td></tr>
+<tr><td>Task-detail tab <span class="mono">634:16120</span></td><td>Overall progress (5 units), KPI, config, SOP link, status legend, red End-task button</td><td>KPI <b>窝均活仔 avg live born / litter: 10 (target 12)</b>. Config: 分娩开始时间 = mating + N days. Legend re-explains the 6 row states.</td></tr>
+<tr><td>Filter <span class="mono">1119:5052</span></td><td>Filter sheet (mis-titled 孕检状态)</td><td>Status: all / not started / farrowing / farrowed / not farrowed. <b>Interval: all / 5 min / ≥30 min</b>. Row A–G (annotation: grid view has no row filter). Reset · Confirm.</td></tr>
+<tr><td>Sow sheet, not farrowed <span class="mono">1530:17548</span></td><td>Bottom sheet: pen chip A1 · tag · “sow, 650 d old, parity 3”</td><td>“本次分娩无记录 no records yet”. Footer [···] + [记录分娩 Record farrowing].</td></tr>
+<tr><td>Sow sheet, farrowing <span class="mono">1530:17571</span></td><td>Same header + live totals + interval banner + attribution</td><td><b>⚠ 产仔间隔过长：45分钟前</b> (birth interval too long, dismissible ✕) · 当前活仔 8 · 死胎及木乃伊 0 · link 分娩详情 › · recorded-by 顾大华 2025/07/08 23:00.</td></tr>
+<tr><td>Sow sheet, finished <span class="mono">1530:17612</span></td><td>Same, terminal</td><td>当前活仔 12 <b>(2 头寄养 — 2 fostered)</b> · 死胎及木乃伊 1 · button disabled “分娩已结束”.</td></tr>
+<tr><td>More actions 更多操作 <span class="mono">1560:21065</span></td><td>Drawer off [···]</td><td>添加标记 add mark (→ 取消标记 after marking) · <b>寄养仔猪 foster piglets</b> · 上报死亡 report death · 数量异常 count anomaly · <b>母猪流产 sow abortion</b>. Gate (annotation 1567:21399): before farrowing no foster out/in, foster + count-anomaly + death buttons hidden.</td></tr>
+<tr><td>Record farrowing, default <span class="mono">1168:6912</span></td><td>Full page 记录分娩</td><td>Totals strip (0/0). <b>记录出生仔猪* — five steppers: 健仔 healthy · 弱仔 weak · 畸形 deformed · 死胎 stillborn · 木乃伊 mummified</b> (this session’s increment). 其他: 最近产仔时间 ≈ [N] 分钟前 (last birth ~N min ago, optional). Toggle 本次是最后一次分娩吗: <b>还将继续分娩 will continue (default, cannot deselect) | 最后一次分娩 final</b>. Cancel · Submit (disabled until valid).</td></tr>
+<tr><td>Record farrowing, edit <span class="mono">1562:21103</span></td><td>Same, filled</td><td>Totals 12 (2 fostered)/1 cumulative; stepper 健仔 5 = increment; 10 min ago. Annotation 1624:7664: submitting with only the final-toggle switched (no counts) is allowed; last-birth time optional.</td></tr>
+<tr><td>Farrowing detail 分娩详情 <span class="mono">5788:5234</span></td><td>Per-sow page, two cards</td><td><b>分娩记录 session log</b>: rows live/dead · operator · timestamp (3/0 张华强 00:10 · 5/1 00:05 · 1/0 Gianni 23:55). <b>分娩统计 cumulative stats</b> by the 5 categories (9/0/0/1/0).</td></tr>
+<tr><td>End task, target not met <span class="mono">2782:19590</span></td><td>Confirmation page, amber</td><td>已分娩/需分娩 100/200 (50%). Execution detail: farrowed sows 100 → <b>stay with batch, 200 live piglets follow</b>; un-farrowed 100 → <b>removed from batch</b>. Must type the removal count to confirm. Cancel · End task.</td></tr>
+<tr><td>End task, target met <span class="mono">952:5089</span></td><td>Same, green 200/200</td><td>Only the “stays with batch” block; checkbox 我已知晓 to enable End task.</td></tr>
+<tr><td>End task blocked <span class="mono">1124:6679</span></td><td>Dialog</td><td>“3 sows still farrowing — cannot end the task.” Annotation: cannot end while any sow is mid-farrowing.</td></tr>
+<tr><td colspan="3" style="background:var(--well);font-weight:700">任务已结束 module (read-only archive)</td></tr>
+<tr><td>Ended pig list <span class="mono">5913:9690</span></td><td>Header mis-titled 查情; tabs 猪只列表 | 任务详情; segmented 已分娩(80) | 未分娩(0)</td><td>Location breadcrumb 1区-母猪车间-1单元; progress 已分娩 100 · 未分娩 1; rows: pen · tag · recorder · date › (farrowed) / pen · tag · 未分娩 no chevron (annotation 5913:9912 “un-farrowed style”). Row variant 1649:20677 shows absolute date 预产期 09/20.</td></tr>
+<tr><td>Ended task detail <span class="mono">5752:6804</span></td><td>已结束 badge, final metrics, config, SOP</td><td>(Frame carries copy-pasted 孕检 content — pattern: final progress + KPI vs target + config snapshot.)</td></tr>
+<tr><td>Ended filter <span class="mono">5752:6759</span></td><td>Filter for archive</td><td>分娩开始日期 date picker + unit chips (全部/1–4单元).</td></tr>
+<tr><td>Ended sow sheet <span class="mono">5752:7035</span></td><td>分娩详情 sheet, read-only</td><td>Totals 12 (2 fostered)/1 · attribution · link › — no action buttons.</td></tr>
+<tr><td>Ended detail page <span class="mono">5788:5337</span></td><td>Duplicate of 分娩详情</td><td>Same session log + stats.</td></tr>
+</tbody>
+</table>
+
+<h3>Designer annotations (requirements)</h3>
+<table>
+<thead><tr><th style="width:22%">Node</th><th>Rule</th></tr></thead>
+<tbody>
+<tr><td><span class="mono">1567:21848 + 1647:19828</span></td><td><b>Interval escalation:</b> ≥45 min → amber banner; ≥60 min → red banner; ✓ normal state shows e.g. “5 min (normal)”. Banner dismissible (✕); if last-birth time never filled, no banner at all.</td></tr>
+<tr><td><span class="mono">1647:19868</span></td><td><b>Re-arm:</b> after dismissal the backend keeps counting; on reaching the <i>next</i> band the banner reappears (closed at 5 min → reappears amber at 45). Interval engine runs only for sessions where 最近产仔时间 was filled; a later record without it stops computation.</td></tr>
+<tr><td><span class="mono">1649:20693</span></td><td>When the sheet shows an amber/red interval banner, <b>the pig list row shows the same icon</b>.</td></tr>
+<tr><td><span class="mono">1624:7664</span></td><td>Record page: “will continue” is the default and cannot be deselected; submit allowed with only the final-toggle switched; last-birth time optional.</td></tr>
+<tr><td><span class="mono">2437:4884</span></td><td><b>Piglet ledger:</b> increases = own birth · fostered in (source sow known) · unknown; decreases = death · fostered out (<b>receiving sow mandatory</b>) · missing.</td></tr>
+<tr><td><span class="mono">1567:21399</span></td><td>Before farrowing: no foster out or in, foster/count-anomaly/death buttons hidden. After marking, button reads 取消标记.</td></tr>
+<tr><td><span class="mono">910:12121</span></td><td>Ending a sow’s farrowing enrolls her in <b>piglet-processing and postpartum-check</b> tasks; she <i>also still appears in the pregnancy-check task</i> (production quirk).</td></tr>
+<tr><td><span class="mono">1124:6679 note</span></td><td>Task cannot be ended while any sow is 分娩中.</td></tr>
+<tr><td><span class="mono">5913:9912</span></td><td>Archive list: distinct muted style for never-farrowed sows.</td></tr>
+</tbody>
+</table>
+<div class="note"><b>Not in production anywhere in this section:</b> assistance / intervention fields (manual extraction, oxytocin dose), birth-weight, sow temperature. Cross-fostering is present only as the 寄养仔猪 action + “(2 头寄养)” totals; its full flow, and the count-anomaly / death-report forms, live in the 仔猪处理 section (6 overlapping frames screenshotted and attributed there — out of scope here).</div>
+
+<h2>2 · Requirements distilled</h2>
+
+<h3>Data captured (field level)</h3>
+<table>
+<thead><tr><th style="width:30%">Field</th><th style="width:22%">Type</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Healthy born 健仔 (session)</td><td>int ≥0, stepper</td><td rowspan="5">One record = one session’s <b>increment</b>; a sow accumulates N records. At least one stepper &gt;0 <i>or</i> the final toggle switched, else submit disabled.</td></tr>
+<tr><td>Weak born 弱仔 (session)</td><td>int ≥0, stepper</td></tr>
+<tr><td>Deformed 畸形 (session)</td><td>int ≥0, stepper</td></tr>
+<tr><td>Stillborn 死胎 (session)</td><td>int ≥0, stepper</td></tr>
+<tr><td>Mummified 木乃伊 (session)</td><td>int ≥0, stepper</td></tr>
+<tr><td>Last birth time 最近产仔时间</td><td>int minutes-ago, optional</td><td>Approximate; seeds/feeds the interval engine. Absent → engine silent for that stretch.</td></tr>
+<tr><td>Continue vs final</td><td>enum: continue (default) | final</td><td>Final closes the litter → spawns piglet-processing + postpartum enrollment.</td></tr>
+<tr><td>Interval-banner dismissal</td><td>event</td><td>Suppresses current band only; re-arms at next band.</td></tr>
+<tr><td>Foster out / in 寄养</td><td>count + counterpart sow (out: receiver <b>required</b>; in: source or “unknown”)</td><td>Post-farrow only. Shown as “(N fostered)” inside live total.</td></tr>
+<tr><td>Piglet death 上报死亡</td><td>count + cause</td><td>Post-farrow only; flow shared with piglet task.</td></tr>
+<tr><td>Count anomaly 数量异常</td><td>reported count + reason text</td><td>Reconciliation vs system count; flow owned by piglet task.</td></tr>
+<tr><td>Sow abortion 母猪流产</td><td>event</td><td>Exits her from farrowing.</td></tr>
+<tr><td>Sow mark 添加/取消标记</td><td>boolean flag</td><td>Shows as dot/triangle on the row tag.</td></tr>
+<tr><td>Recorded-by · timestamp</td><td>auto</td><td>Every record; never typed.</td></tr>
+</tbody>
+</table>
+
+<h3>Derived by system (never asked)</h3>
+<p class="mono" style="max-width:none">live total = 健+弱+畸 · dead total = 死胎+木乃伊 · cumulative per category · fostered net · due date = mating + gestation-offset · days-to/past due · birth interval (from last-birth time, then rolling) · interval band (normal/amber/red) · farrowing state (awaiting → active → done) · progress 已分娩/待分娩 · day n/N · 窝均活仔 avg live/litter vs target · session log · archive views</p>
+
+<h3>Configuration (console, not the phone)</h3>
+<p class="mono" style="max-width:none">gestation offset (配种后第 N 天 — production sample “150”, biology says ~114) · interval bands 45/60 min (grid says 30 — unify) · interval filter chips (5 / ≥30 min) · task window days (第1/3天) · KPI target (12 live/litter) · SOP document · batch-follow rules on close</p>
+
+<h2>3 · Subtraction analysis</h2>
+<table>
+<thead><tr><th style="width:30%">Production element</th><th style="width:12%">Verdict</th><th>Justification</th></tr></thead>
+<tbody>
+<tr><td>Pig-list tab (pen-grouped rows, unlocated group, honest “status unavailable”)</td><td><span class="keep">KEEP</span></td><td>Is our farrowing list (01) verbatim: pen groups, 未定位 pinned, “no due date” shown honestly, scan in dock.</td></tr>
+<tr><td>Pen-grid tab 栏位Grid</td><td><span class="cut">CUT</span></td><td>Second rendering of the same facts. Pen picker (02) + status matrix (02b) already answer “which pen needs me” — <span class="mono">45m › due</span> chips, ✓ + <span class="mono">11 born</span> for done. Grid never acts anyway (law).</td></tr>
+<tr><td>Task-detail tab: progress + KPI + config + SOP</td><td><span class="keep">KEEP</span></td><td>= task detail sheet (03): 2 farrowing · 9 awaiting · 8 done, KPI 10 live/litter target 12, config Due/Watch, SOP row.</td></tr>
+<tr><td>Status legend 状态说明 (6 entries)</td><td><span class="cut">CUT</span></td><td>A legend that explains what good status words would say. Row grammar (01b) makes the words self-evident: <span class="mono">Due 3d · Due today · late 1d · 8 piglets · Done · 11 piglets</span>.</td></tr>
+<tr><td>Info card “200 pigs · please record data”</td><td><span class="cut">CUT</span></td><td>Restates the header count and the task’s name. Zero information.</td></tr>
+<tr><td>Filter: status group</td><td><span class="cut">CUT</span></td><td>That is the lens (Awaiting · Farrowing · Done · All), always visible (01c).</td></tr>
+<tr><td>Filter: row A–G</td><td><span class="cut">CUT</span></td><td>That is Go to pen (02).</td></tr>
+<tr><td>Filter: interval 5 / ≥30 min</td><td><span class="keep">KEEP</span></td><td>Farrowing-only extra, already reserved in 01c. Thresholds become config.</td></tr>
+<tr><td>Sow sheet (not-farrowed / farrowing / finished) + [记录分娩]</td><td><span class="merge">MERGE</span></td><td>An intermediate stop whose only job is one button. Row tap goes straight to the live record (04); the sheet’s totals, banner and attribution move into the record page header. One hop, not two.</td></tr>
+<tr><td>Record page: 5 steppers · last-birth time · continue/final toggle</td><td><span class="keep">KEEP</span></td><td>The task’s heart; matches our live record (04). Toggle+submit collapses to two buttons: <span class="mono">Save</span> (= continue) · <span class="mono">Finish farrowing</span> (= final) — one decision, zero extra control.</td></tr>
+<tr><td>Interval banner + escalation + re-arm + row mirror</td><td><span class="keep">KEEP</span></td><td>The one true farrowing alert. Inline and factual, never modal — exactly our warning law. Bands (45/60) unified in config; row chip <span class="mono">LAST 45M</span> already in 01b.</td></tr>
+<tr><td>分娩详情 page (session log + cumulative stats)</td><td><span class="merge">MERGE</span></td><td>Keep the data, kill the page: the log is the record trail inside the record page (stamps law); cumulative stats are the totals strip. Production shows the same numbers on 3 surfaces.</td></tr>
+<tr><td>More-actions drawer (foster · death · anomaly · abortion · mark) + gates</td><td><span class="keep">KEEP</span></td><td>Real captured data with real state gates. Lives as overflow on the record page; pre-farrow shows only Mark · Abortion (annotation 1567:21399).</td></tr>
+<tr><td>End-task pages ×2 + typed-count confirm + blocked dialog</td><td><span class="cut">CUT</span> <span style="font-weight:400">(semantics MOVE)</span></td><td>Event tasks never show End task (law; 03 note “closes itself · record by record · no end action”). The real content — un-farrowed sows leave the batch, farrowed sows’ piglets follow it — is a supervisor decision: console, not a pen-side ceremony. The mid-farrowing block becomes unnecessary.</td></tr>
+<tr><td>任务已结束 module (5 read-only screens)</td><td><span class="cut">CUT</span></td><td>An entire parallel app for looking backwards. Done rows already carry stamps (<span class="mono">final 05:58 · G.H ✎</span>); the record page stays openable read-only forever; farm-level history is reports/console. Farmers in pens don’t browse archives.</td></tr>
+<tr><td>Grid “30 min” vs banner “45 min” vs filter “≥30”</td><td><span class="merge">MERGE</span></td><td>One interval config, two bands; every surface reads the same numbers.</td></tr>
+<tr><td>Sow vitals in sheet header (age 650 d · parity 3)</td><td><span class="keep">KEEP</span></td><td>= our sheet header anatomy (pen chip · tag · vitals) and row line 2 <span class="mono">parity 3</span>.</td></tr>
+</tbody>
+</table>
+
+<h2>4 · Optimized flow</h2>
+<pre class="flow">FARROWING — Unit 7 · the farmer’s walk
+
+1  open task ─────────────→ farrowing list (01)
+   header: Farrowing · last record 23:00 · G.H
+           [ 10 live/litter · target 12 | 2 farrowing · 9 awaiting ]     (01 header)
+   lens:   [ Awaiting 9 ] [ Farrowing 2 ] [ Done 8 ] [ All 19 ]  + funnel (01c: interval chips)
+   rows (01b, rail task — tap acts):
+     PEN B1  000418  8 piglets [LAST 45M]   started 6h · last 12m · parity 3   ACTIVE ›
+     PEN B4  000431  Due · today                     parity 2                  DUE ›
+     PEN B6  000512  Late · 1d                       parity 5                  LATE ›
+     PEN B7  000399  Due · no date                   parity 1                  ›        ← honest gap
+     未定位   000276  Due · 3d                        parity 2                  ›        ← pinned in All
+     PEN B3  000406  Done · 11 piglets               final 05:58 · G.H         ✎
+   interval chip on the row mirrors the sheet banner (amber ≥45m · red ≥60m)
+
+2  tap row ───────────────→ live record page (04 · farrowing live record)
+   header: [B1] 000418 · parity 3 · 650 d                                  (04 sheet header)
+   totals: 8 born · 0 dead   (2 fostered)                                  derived strip
+   banner: ⚠ last birth 45 min ago            ✕ dismiss → re-arms at 60   Δ1
+   steppers (this session): Live · Weak · Deformed · Stillborn · Mummified (04)
+   last birth ≈ [ 10 ] min ago (optional)                                  Δ2
+   trail: 3/0 00:10 张华强 · 5/1 00:05 · 1/0 23:55                          Δ3 (stamps law)
+   [ Finish farrowing ]  [ Save ]                                          (04: save=continue, finish=final)
+   commits itself — no other submit; who+when stamped automatically
+
+3  side actions ──────────→ overflow [···] on the record page              Δ4
+   pre-farrow:   Mark · Abortion
+   post-farrow:  + Foster (out needs receiver; in needs source/unknown)
+                 + Report death · Count check      (flows owned by piglet task)
+
+4  scan ear tag (dock) ───→ opens that sow’s record page directly          (04b: no-box task)
+5  finish last sow ───────→ task closes itself (03: no End action)
+   final → sow enrolls in piglet-processing + postpartum automatically
+   un-farrowed at window end → console decision (batch removal), not a pen screen
+6  yesterday’s question ──→ Done lens, stamps; farm history = reports      (01, not an archive app)</pre>
+
+<h3>Deltas — the only farrowing-specific design</h3>
+<table>
+<thead><tr><th style="width:26%">Delta</th><th>Spec</th></tr></thead>
+<tbody>
+<tr><td>Δ1 Interval engine</td><td>Bands: ≥45 min amber, ≥60 min red (config). Banner on record page; same chip on the list row. Dismiss kills the current band only; engine keeps counting and re-raises at the next band. No last-birth time on the latest record → engine silent. Never modal.</td></tr>
+<tr><td>Δ2 Last-birth time</td><td>One optional field: “last birth ≈ N min ago”. The only manual time in the task; everything else derives from record timestamps.</td></tr>
+<tr><td>Δ3 Session trail in-page</td><td>The record page lists prior sessions (<span class="mono">live/dead · who · when</span>) under the steppers — replaces the separate 分娩详情 page and the archive sheet; read-only after final.</td></tr>
+<tr><td>Δ4 Record-page overflow</td><td>[···] with state gates: pre-farrow Mark · Abortion; from first record + Foster · Report death · Count check. Foster-out requires receiver sow; foster-in source sow or “unknown”. These write the piglet ledger that explains “(N fostered)”.</td></tr>
+<tr><td>Δ5 Self-close semantics</td><td>Event task: no End button anywhere on the phone. Sow leaves the list by <b>final</b> or <b>abortion</b>; window-end disposal of never-farrowed sows (batch removal + typed-count confirm) moves to console.</td></tr>
+</tbody>
+</table>
+
+<h2>5 · Data-capture map</h2>
+<table>
+<thead><tr><th style="width:28%">Field</th><th style="width:34%">Where in new flow</th><th>Production origin</th></tr></thead>
+<tbody>
+<tr><td>healthy · weak · deformed · stillborn · mummified (per session)</td><td>Live-record steppers (04)</td><td>记录分娩 · 记录出生仔猪* <span class="mono">1168:6912</span></td></tr>
+<tr><td>last birth ≈ min ago (optional)</td><td>Live-record “other” field (Δ2)</td><td>最近产仔时间 <span class="mono">1168:6912</span> + rules <span class="mono">1624:7664 / 1647:19868</span></td></tr>
+<tr><td>continue | final</td><td>Save vs Finish farrowing (04)</td><td>还将继续分娩 / 最后一次分娩 toggle</td></tr>
+<tr><td>interval dismissal</td><td>Banner ✕ (Δ1)</td><td>清除图标 <span class="mono">1567:21848</span></td></tr>
+<tr><td>foster out / in: count, counterpart sow, unknown-source</td><td>Overflow → Foster (Δ4)</td><td>寄养仔猪 <span class="mono">1560:21065</span> · ledger <span class="mono">2437:4884</span> · “(2 头寄养)” totals</td></tr>
+<tr><td>piglet death: count, cause</td><td>Overflow → Report death (Δ4; form owned by piglet task)</td><td>上报死亡 <span class="mono">1560:21065</span></td></tr>
+<tr><td>count anomaly: reported count, reason</td><td>Overflow → Count check (Δ4; form owned by piglet task)</td><td>数量异常 <span class="mono">1560:21065</span> (forms in 仔猪处理 section)</td></tr>
+<tr><td>sow abortion</td><td>Overflow → Abortion (Δ4)</td><td>母猪流产 <span class="mono">1560:21065</span></td></tr>
+<tr><td>sow mark flag</td><td>Overflow → Mark / Unmark (Δ4); dot on row tag</td><td>添加标记/取消标记 <span class="mono">1560:21065 / 1647:19767</span></td></tr>
+<tr><td>recorded-by · timestamp</td><td>Automatic stamp on every record (01b stamps)</td><td>顾大华 2025/07/08 23:00 · 分娩记录 columns</td></tr>
+<tr><td>batch disposal of un-farrowed sows (+ typed confirm)</td><td>Console (Δ5) — relocated, not dropped</td><td>结束任务 <span class="mono">2782:19590 / 952:5089</span></td></tr>
+</tbody>
+</table>
+
+<h2>6 · Open questions</h2>
+<table>
+<thead><tr><th style="width:34%">Question</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td>1 · Who closes the window on never-farrowed sows?</td><td>Production makes the phone user remove them from the batch with a typed count. If that moves to console (Δ5), define who and when — and whether abortion is the only pen-side exit.</td></tr>
+<tr><td>2 · Farrowed sow still listed in pregnancy-check (annotation 910:12121)</td><td>Bug or intent? If intent, the preg-check task carries dead weight; our derivation rules would auto-remove her.</td></tr>
+<tr><td>3 · Interval thresholds — 30 or 45/60?</td><td>Production shows 30 (grid, filter) and 45/60 (banner). One config, but the default values need an owner.</td></tr>
+<tr><td>4 · Capture assistance / oxytocin?</td><td>Production captures neither. If the farm wants intervention data (manual extraction, oxytocin dose — standard in farrowing management), it is a new field on the record page, not a redesign.</td></tr>
+<tr><td>5 · 未定位 sows — record in place or locate first?</td><td>Already open in the unified spec (§4.5); farrowing makes it acute: a sow farrowing “nowhere” still needs her litter recorded.</td></tr>
+<tr><td>6 · Weak/deformed piglets — do they need follow-up flags?</td><td>Production counts them then forgets them. If weak counts should seed piglet-treatment attention, that is a spawn rule to confirm.</td></tr>
+</tbody>
+</table>
+
+</div>

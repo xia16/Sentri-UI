@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sentri — Today, the front page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* synthesized VI — Panel structure · Ledger temperature · Board discipline */
+    --ground:#F7F6F2;
+    --card:#FFFFFF;
+    --well:#EFEEE8;
+    --ink:#1C1E19;
+    --ink2:#51544B;
+    --ink3:#8B8E83;
+    --hair:#E7E6DF;
+    --hair2:#D8D7CE;
+    --red:#C2402E;      --red-wash:#F9EAE7;
+    --amber:#96660D;    --amber-fill:#D99A21; --amber-wash:#F8F0DC;
+    --blue:#3E56C4;     --blue-wash:#EBEFF9;
+    --green:#3B8A50;    --green-wash:#EAF2EC;
+    --gray:#7C7F76;     --gray-wash:#F0F0EB;
+    --sans:'Plus Jakarta Sans',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 48px}
+  .mono{font-family:var(--mono);font-size:12.5px}
+  .anno{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3)}
+
+  header.page{display:flex;justify-content:space-between;padding:26px 0;border-bottom:1px solid var(--hair2)}
+  h1{font-size:44px;font-weight:800;letter-spacing:-.015em;line-height:1.1;margin:64px 0 20px}
+  .lede{font-size:17px;color:var(--ink2);max-width:64ch;margin-bottom:40px}
+  .tokens{display:flex;gap:24px;align-items:center;padding:18px 0 56px;flex-wrap:wrap}
+  .sw{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--ink2)}
+  .sw i{width:22px;height:22px;border-radius:5px;display:inline-block;border:1px solid rgba(0,0,0,.06)}
+
+  section.screen{display:grid;grid-template-columns:430px 1fr;gap:64px;padding:64px 0;border-top:1px solid var(--ink)}
+  .sec-label{grid-column:1/-1;display:flex;justify-content:space-between;margin-bottom:8px}
+  h2{font-size:24px;font-weight:800}
+  h3{font-size:15px;font-weight:700;margin:20px 0 8px}
+  .notes{padding-top:8px}
+  .note{padding:14px 0;border-top:1px solid var(--hair);font-size:13.5px;color:var(--ink2)}
+  .note:first-child{border-top:none}
+  .note b{font-size:15px;color:var(--ink)}
+  table.stab{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  .stab th,.stab td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top;color:var(--ink2)}
+  .stab td b{color:var(--ink)}
+  .stab thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+  .adopt{color:var(--green);font-weight:700}.reject{color:var(--red);font-weight:700}.kept{color:var(--ink);font-weight:700}.moved{color:var(--amber);font-weight:700}
+
+  /* ============ phone ============ */
+  .phone{width:390px;background:var(--ground);border:1px solid var(--hair2);border-radius:34px;overflow:hidden;box-shadow:0 8px 32px rgba(28,30,25,.10);position:relative}
+  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:12px 22px 6px;font-family:var(--mono);font-size:12px;font-weight:600}
+  .appbar{display:flex;align-items:center;gap:12px;padding:12px 18px 12px}
+  .appbar .back{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--ink);margin-left:-8px}
+  .appbar .u{font-size:25px;font-weight:800;letter-spacing:-.015em;line-height:1.05;display:flex;align-items:center;gap:7px}
+  .appbar .u .dd{font-size:13px;color:var(--ink3)}
+  .appbar .sub{font-size:12px;color:var(--ink3);margin-top:3px;white-space:nowrap}
+  .appbar .sub b{color:var(--ink2);font-weight:600}
+  .syncpill{margin-left:auto;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink2);border:1px solid var(--hair2);border-radius:9px;padding:7px 10px;white-space:nowrap;background:var(--card)}
+  .syncpill.ok{color:var(--green);border-color:var(--hair)}
+  .hbtn{font-size:13px;font-weight:700;color:var(--ink);border:1.5px solid var(--ink);border-radius:10px;padding:9px 14px;white-space:nowrap;background:var(--card)}
+
+  /* scope rail — Overview + one chip per unit */
+  .scope{display:flex;gap:6px;padding:2px 16px 12px;overflow:hidden;mask-image:linear-gradient(90deg,#000 92%,transparent)}
+  .chip{flex:0 0 auto;min-height:46px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);padding:6px 13px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
+  .chip b{font-size:12.5px;font-weight:700;line-height:1.2}
+  .chip small{font-family:var(--mono);font-size:9px;letter-spacing:.05em;color:var(--ink3);text-transform:uppercase;margin-top:1px}
+  .chip small.fl{color:var(--amber)}
+  .chip.cur{background:var(--ink);border-color:var(--ink)}
+  .chip.cur b{color:#fff}
+  .chip.cur small{color:rgba(255,255,255,.65)}
+
+  /* escalation strip — the only red register */
+  .strip{margin:0 16px 14px;background:var(--card);border:1px solid var(--hair);border-left:3px solid var(--red);border-radius:12px;overflow:hidden}
+  .strip .srow{display:flex;align-items:center;gap:12px;min-height:54px;padding:9px 14px;border-top:1px solid var(--hair)}
+  .strip .srow:first-child{border-top:none}
+  .strip .st{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+  .strip .sl1{font-size:13.5px;font-weight:600;white-space:nowrap}
+  .strip .sl2{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .strip .word{margin-left:auto;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+
+  /* ============ the task card — planning surfaces only ============ */
+  .feed{padding:0 16px 16px;display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
+  .divider-note{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:2px 2px 0}
+  .tcard{background:var(--card);border:1px solid var(--hair);border-radius:18px;padding:18px 18px 16px;box-shadow:0 1px 2px rgba(28,30,25,.04)}
+  .tcard .hd{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .tcard .name{font-size:17.5px;font-weight:800;letter-spacing:-.012em;line-height:1.2;white-space:nowrap}
+  .tcard .ctx{font-size:12.5px;color:var(--ink3);margin-top:4px}
+  .tcard .ctx b{color:var(--ink2);font-weight:600}
+  /* status pill — the card's one colored element, contained */
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;letter-spacing:.01em;padding:5px 11px;border-radius:999px;flex:0 0 auto;white-space:nowrap}
+  .pill.red{background:var(--red-wash);color:var(--red)}
+  .pill.amber{background:var(--amber-wash);color:var(--amber)}
+  .pill.blue{background:var(--blue-wash);color:var(--blue)}
+  .pill.green{background:var(--green-wash);color:var(--green)}
+  .pill.gray{background:var(--gray-wash);color:var(--gray)}
+  /* the instrument row — one focal numeral per card */
+  .tcard .inst{display:flex;align-items:baseline;gap:7px;margin-top:15px;min-width:0}
+  .tcard .inst .verb{font-size:15px;font-weight:800}
+  .tcard .inst .big{font-family:var(--mono);font-size:27px;font-weight:700;letter-spacing:-.02em;line-height:1}
+  .tcard .inst .un{font-size:12.5px;color:var(--ink3)}
+  .tcard .inst .sec{margin-left:auto;font-size:11.5px;color:var(--ink3);white-space:nowrap}
+  .tcard .bar{display:flex;height:5px;border-radius:3px;background:var(--well);overflow:hidden;margin:12px 0 0}
+  .tcard .bar i{display:block;height:100%}
+  .tcard .bar i.ov{background:var(--red)}
+  .tcard .days{display:flex;gap:3px;margin:12px 0 0}
+  .tcard .days i{height:5px;flex:1;border-radius:2px;background:var(--well)}
+  .tcard .days i.f{background:var(--green)}
+  .tcard.done{padding:15px 18px 13px}
+  .tcard.done .name{font-size:15px}
+  .tcard.done .inst{margin-top:9px}
+  .tcard.done .inst .big{font-size:19px}
+  .tcard.dim{background:transparent;box-shadow:none}
+  .tcard.dim .name{color:var(--ink2);font-weight:700}
+  /* buckets — reason-to-act rows, count first, each a pre-lensed door */
+  .buckets{margin-top:8px}
+  .bk{display:flex;align-items:center;gap:12px;padding:10px 2px;border-top:1px solid var(--hair)}
+  .bk .n{font-family:var(--mono);font-weight:700;font-size:13.5px;min-width:22px;text-align:right;flex:0 0 auto}
+  .bk .lb{font-size:12.5px;color:var(--ink2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bk .cv{margin-left:auto;color:var(--hair2);font-size:14px}
+  .s-red{color:var(--red)} .s-amber{color:var(--amber)} .s-blue{color:var(--blue)} .s-green{color:var(--green)} .s-gray{color:var(--gray)}
+
+  /* unit-scope overview card */
+  .ovcard{background:var(--card);border:1px solid var(--hair);border-radius:16px;padding:16px;box-shadow:0 1px 2px rgba(28,30,25,.04)}
+  .ovcard .top{display:flex;align-items:flex-start;gap:12px}
+  .ovcard .big{font-family:var(--mono);font-weight:700;font-size:30px;letter-spacing:-.01em;line-height:1}
+  .ovcard .big small{font-size:13px;font-weight:500;color:var(--ink3);letter-spacing:0}
+  .ovcard .meta{font-size:12.5px;color:var(--ink2);margin-top:7px}
+  .ovcard .meta .mono{font-size:11px}
+  .ovcard .actions{margin-left:auto;display:flex;gap:8px}
+  .vbtn{font-size:13px;font-weight:700;color:var(--ink);border:1px solid var(--hair2);border-radius:10px;padding:9px 13px;background:var(--card);white-space:nowrap}
+  .ovcard .attn{display:flex;gap:7px;margin-top:14px;padding-top:13px;border-top:1px solid var(--hair);align-items:center;flex-wrap:wrap}
+  .b{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.06em;padding:3.5px 8px;border-radius:6px;text-transform:uppercase}
+  .b-red{background:var(--red-wash);color:var(--red)}
+  .b-amber{background:var(--amber-wash);color:var(--amber)}
+  .b-gray{background:var(--gray-wash);color:var(--gray)}
+  .b-green{background:var(--green-wash);color:var(--green)}
+
+  /* route rows (an execution-adjacent list — rows, not cards) */
+  .ucard{background:var(--card);border:1px solid var(--hair);border-radius:14px;overflow:hidden}
+  .rrow{display:flex;align-items:center;gap:12px;min-height:60px;padding:10px 14px;border-top:1px solid var(--hair)}
+  .rrow:first-child{border-top:none}
+  .rrow .idx{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--ink3);flex:0 0 12px;text-align:center}
+  .rrow .code{font-family:var(--mono);font-size:13px;font-weight:700;background:var(--well);border-radius:9px;padding:6px 11px;flex:0 0 auto}
+  .rrow .st{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+  .rrow .l1{font-size:13.5px;font-weight:600;white-space:nowrap;display:flex;gap:7px;align-items:center}
+  .rrow .l2{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rrow .cnt{margin-left:auto;text-align:right;flex:0 0 auto}
+  .rrow .cnt b{font-family:var(--mono);font-size:19px;font-weight:700;letter-spacing:-.01em;display:block;line-height:1}
+  .rrow .cnt small{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+  .rrow .cv{color:var(--hair2);font-size:16px;flex:0 0 auto}
+  .rrow.done .l1{color:var(--ink3);font-weight:500}
+
+  /* plan progress card */
+  .plancard{background:var(--card);border:1px solid var(--hair);border-radius:16px;padding:16px;box-shadow:0 1px 2px rgba(28,30,25,.04)}
+  .plancard .top{display:flex;justify-content:space-between;align-items:baseline}
+  .plancard .big{font-family:var(--mono);font-weight:700;font-size:30px;letter-spacing:-.01em}
+  .plancard .big small{font-size:13px;font-weight:500;color:var(--ink3)}
+  .plancard .bar{height:6px;border-radius:3px;background:var(--well);overflow:hidden;margin:13px 0 8px}
+  .plancard .bar i{display:block;height:100%;border-radius:3px;background:var(--blue)}
+  .plancard .att{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+
+  /* dock */
+  .dock{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--hair);padding:10px 16px 18px;margin-top:auto}
+  .dockrow{display:flex;align-items:center;gap:8px}
+  .goto{flex:0 0 auto;height:48px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;gap:7px;padding:0 13px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink)}
+  .scanbtn{flex:1;height:48px;border-radius:11px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:700}
+  .tool{width:48px;height:48px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--ink);flex:0 0 auto}
+
+  /* quiet-state extras */
+  .allclear{padding:22px 16px 16px;text-align:center}
+  .allclear .mk{width:44px;height:44px;border-radius:22px;background:var(--green-wash);color:var(--green);display:inline-flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px}
+  .allclear .h{font-size:16px;font-weight:800}
+  .allclear .s{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.05em;margin-top:4px}
+
+  pre.flow{font-family:var(--mono);font-size:12px;line-height:1.7;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:12px 0;color:var(--ink)}
+  footer{padding:48px 0 80px;border-top:1px solid var(--hair2);margin-top:64px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="page">
+  <div>
+    <div style="font-weight:800;font-size:15px">Sentri — Unified Task Screens</div>
+    <div class="anno" style="margin-top:3px">Sentri · Design system · ops — Today</div>
+  </div>
+  <div class="anno" style="text-align:right">Companion to components.html · screens.html · check-in.html<br>reconciles wireframe 02 · owner rulings aug 25</div>
+</header>
+
+<h1>Today — the front page</h1>
+<p class="lede">The only scheduling surface, scoped to a section, with one scope rail: <b>Overview</b> — the day's tasks — or any single unit, the same surface narrowed to that unit's own overview. A <b>task is one question over one batch</b>; two pregnancy batches are two tasks, and a room they share costs one walk because tasks <b>transition inside the unit</b>. And one law is new here, learned the hard way: <b>planning surfaces are cards; execution surfaces are rows.</b> The pig list compresses two hundred animals into row grammar because density is its job. Today holds four decisions — each gets a card with room to breathe, one primary fact, and nothing borrowed from the list.</p>
+
+<div class="tokens">
+  <span class="sw"><i style="background:var(--red)"></i>overdue</span>
+  <span class="sw"><i style="background:var(--amber-fill)"></i>due now</span>
+  <span class="sw"><i style="background:var(--blue)"></i>in progress</span>
+  <span class="sw"><i style="background:var(--green)"></i>done</span>
+  <span class="sw"><i style="background:var(--gray)"></i>upcoming</span>
+  <span class="anno" style="margin-left:8px">color may mean status · color may not mean anything else</span>
+</div>
+
+<!-- ================= 08 · THE SCREEN — OVERVIEW SCOPE ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>08 · The screen — Overview</h2>
+    <span class="anno">cards, not rows · one primary fact per card · a task is one batch</span>
+  </div>
+
+  <div>
+    <div class="phone" style="display:flex;flex-direction:column;height:990px">
+      <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar">
+        <div><div class="u">Gestation <span class="dd">▾</span></div><div class="sub">Today · Thu Jul 8 · <b>G. Hansen</b></div></div>
+        <span class="syncpill" style="margin-left:auto">⌁ 3</span>
+      </div>
+
+      <div class="scope">
+        <div class="chip cur"><b>Overview</b><small>4 tasks</small></div>
+        <div class="chip"><b>G1</b><small>preg 14</small></div>
+        <div class="chip"><b>G2</b><small>✓ clear</small></div>
+        <div class="chip"><b>G3</b><small>preg 54</small></div>
+        <div class="chip"><b>G4</b><small class="fl">2 flagged</small></div>
+        <div class="chip"><b>G5</b><small>✓ clear</small></div>
+        <div class="chip"><b>G6</b><small>watch</small></div>
+        <div class="chip"><b>G7</b><small class="fl">6 overdue</small></div>
+      </div>
+
+      <div class="strip">
+        <div class="srow">
+          <div class="st"><span class="sl1">Re-checks overdue · 6 sows</span><span class="sl2">G7 · pregnancy check B22 · oldest +2d</span></div>
+          <span class="word s-red">▲ OVERDUE</span>
+        </div>
+        <div class="srow">
+          <div class="st"><span class="sl1">Euthanasia pending review</span><span class="sl2">G12 · flagged 06:50 · L.M</span></div>
+          <span class="word s-red">▲ OVERDUE</span>
+        </div>
+      </div>
+
+      <div class="feed">
+        <div class="divider-note">Today · 4 tasks · 1 done</div>
+
+        <div class="tcard">
+          <div class="hd"><span class="name">Pregnancy check</span><span class="pill blue">◐ In progress</span></div>
+          <div class="ctx"><b>Batch 22</b> · sweep day 1 of 3 · 4 units</div>
+          <div class="inst"><span class="big">100</span><span class="un">of 200 checked</span><span class="sec">6 overdue in G7</span></div>
+          <div class="bar"><i style="width:47%;background:var(--blue)"></i><i class="ov" style="width:3%"></i></div>
+        </div>
+
+        <div class="tcard">
+          <div class="hd"><span class="name">Pregnancy check</span><span class="pill amber">● Due now</span></div>
+          <div class="ctx"><b>Batch 21</b> · first check · 4 units</div>
+          <div class="inst"><span class="big">180</span><span class="un">to check</span><span class="sec">window ends sat</span></div>
+          <div class="bar"></div>
+        </div>
+
+        <div class="tcard dim">
+          <div class="hd"><span class="name">Return-heat watch</span><span class="pill gray">○ Watch</span></div>
+          <div class="ctx"><b>Batch 23</b> · 42 sows · 2 units</div>
+          <div class="inst"><span class="big">3</span><span class="un">of 7 days</span><span class="sec">2 returned</span></div>
+          <div class="days"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i><i></i></div>
+        </div>
+
+        <div class="tcard done">
+          <div class="hd"><span class="name">Vaccination</span><span class="pill green">✓ Done</span></div>
+          <div class="inst"><span class="big">64</span><span class="un">of 64 given · PRRS protocol</span><span class="sec">08:40 · G.H</span></div>
+        </div>
+      </div>
+
+      <div class="dock"><div class="dockrow">
+        <div class="goto"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Unit</div>
+        <div class="scanbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg>Scan ear tag</div>
+        <div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div>
+    <h3 style="margin-top:34px">The card, and why it is not a row</h3>
+    <div class="note"><b>Planning surfaces are cards; execution surfaces are rows.</b> Row grammar (01b) exists so two hundred animals survive one screen — 13px type, two lines, everything abbreviated. Today is the opposite problem: four decisions that deserve deliberation. So the task gets a card: a 17px name, its batch spelled out in words, a full-width progress mark, and one fact pair. The pig list's density tricks — tag columns, token lines, packed rails — are banned here. The two surfaces should not look like siblings, because they are not: one is read standing still, the other mid-walk.</div>
+    <div class="note"><b>One instrument per card.</b> The focal point is a single 27px numeral read as a phrase — <b>100</b> of 200 checked · <b>180</b> to check · day <b>3</b> of 7 — with one quiet secondary fact opposite it (window ends sat · 2 returned · attribution). Mono is spent only on the numeral; every word around it is sans. Anything that doesn't change what the worker does next was cut: no work-group breakdowns, no pen counts, no percentages, no batch chips-in-boxes — the batch is just words.</div>
+    <div class="note"><b>Status is a pill, and it is the card's only colored element.</b> Soft wash, colored text, glyph inside — <span class="pill amber" style="font-size:9.5px;padding:3px 9px">● Due now</span> — so color is contained instead of shouting from naked letterspaced caps. The bar repeats the same hue once. The overdue count leaves the text entirely: it rides the bar as a thin red segment, and the strip above says it in words. One card, one hue, said twice quietly — the strip is the only place on the screen allowed to shout, which is the exception-first law drawn as typography.</div>
+    <div class="note"><b>Cards shrink as they cool.</b> A done task drops its bar and compresses; a watch task dims its ground and shows day segments instead of a bar. The eye lands on the biggest, brightest card — which is always the one that needs a decision.</div>
+
+    <h3>What else is on this screen</h3>
+    <table class="stab"><thead><tr><th style="width:26%">Register</th><th>Carries</th></tr></thead><tbody>
+      <tr><td>Header</td><td>The section; ▾ switches for float workers and managers. The sync pill is ambient — <span class="mono">⌁ 3</span> queuing, <span class="mono s-green">✓</span> clear</td></tr>
+      <tr><td>Scope rail</td><td><span class="mono">Overview</span> first, then every unit in fixed farm order, each chip carrying its loudest fact. Picking a chip re-scopes this surface (08c)</td></tr>
+      <tr><td>The strip</td><td>Escalations — the only red words on screen; absent when quiet (08e)</td></tr>
+      <tr><td>Task cards</td><td>One per <b>task × batch</b>. Tap → the route (08d) when it spans units, its list directly when it doesn't</td></tr>
+      <tr><td>Dock</td><td><span class="mono">Unit · Scan ear tag · search</span> — scan is the fastest ad-hoc entry in the product (04c · 05)</td></tr>
+    </tbody></table>
+  </div>
+</section>
+
+<!-- ================= 08c · UNIT SCOPE ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>08c · The screen — a unit</h2>
+    <span class="anno">same surface, narrower question · the unit's overview · tasks transition without leaving</span>
+  </div>
+
+  <div>
+    <div class="phone" style="display:flex;flex-direction:column;height:1290px">
+      <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar">
+        <div><div class="u">Gestation <span class="dd">▾</span></div><div class="sub">Today · Thu Jul 8 · <b>G. Hansen</b></div></div>
+        <span class="syncpill" style="margin-left:auto">⌁ 3</span>
+      </div>
+
+      <div class="scope">
+        <div class="chip"><b>Overview</b><small>4 tasks</small></div>
+        <div class="chip"><b>G1</b><small>preg 14</small></div>
+        <div class="chip"><b>G2</b><small>✓ clear</small></div>
+        <div class="chip"><b>G3</b><small>preg 54</small></div>
+        <div class="chip cur"><b>G4</b><small class="fl">2 flagged</small></div>
+        <div class="chip"><b>G5</b><small>✓ clear</small></div>
+        <div class="chip"><b>G6</b><small>watch</small></div>
+        <div class="chip"><b>G7</b><small class="fl">6 overdue</small></div>
+      </div>
+
+      <div class="feed">
+        <div class="ovcard">
+          <div class="top">
+            <span class="big">52<small> sows</small></span>
+            <div class="actions"><span class="vbtn">Pigs ›</span><span class="hbtn">Check-in</span></div>
+          </div>
+          <div class="meta">4 pens · Batch 21 <span class="mono">40</span> · Batch 22 <span class="mono">12</span></div>
+          <div class="meta" style="margin-top:2px;color:var(--ink3)">Last checked yesterday · L. Meyer</div>
+          <div class="attn">
+            <span class="b b-amber">3 TREATMENTS</span>
+            <span class="b b-gray">WEIGH · SPOT-CHECK</span>
+          </div>
+        </div>
+
+        <div class="divider-note">Today in G4 · 4 tasks</div>
+
+        <div class="tcard">
+          <div class="hd"><span class="name">Pregnancy check</span><span class="pill amber">● Due now</span></div>
+          <div class="ctx"><b>Batch 21</b> · first check · starts today</div>
+          <div class="inst"><span class="verb">Check</span><span class="big">40</span><span class="un">sows</span></div>
+          <div class="buckets">
+            <div class="bk"><span class="n">40</span><span class="lb">Reached day 25 after mating</span><span class="cv">›</span></div>
+          </div>
+        </div>
+
+        <div class="tcard">
+          <div class="hd"><span class="name">Pregnancy check</span><span class="pill amber">● Due now</span></div>
+          <div class="ctx"><b>Batch 22</b> · sweep day 1 of 3 · 188 elsewhere</div>
+          <div class="inst"><span class="verb">Check</span><span class="big">12</span><span class="un">sows</span></div>
+          <div class="buckets">
+            <div class="bk"><span class="n">8</span><span class="lb">First check due</span><span class="cv">›</span></div>
+            <div class="bk"><span class="n">4</span><span class="lb">Re-check · unclear jul 5</span><span class="cv">›</span></div>
+          </div>
+        </div>
+
+        <div class="tcard">
+          <div class="hd"><span class="name">Treatments</span><span class="pill amber">● Due now</span></div>
+          <div class="ctx">Open cases in this unit</div>
+          <div class="inst"><span class="verb">Treat</span><span class="big">3</span><span class="un">pigs</span></div>
+          <div class="buckets">
+            <div class="bk"><span class="n">2</span><span class="lb">Fever follow-up · day 2</span><span class="cv">›</span></div>
+            <div class="bk"><span class="n">1</span><span class="lb">Lame · new yesterday</span><span class="cv">›</span></div>
+          </div>
+        </div>
+
+        <div class="tcard dim">
+          <div class="hd"><span class="name">Weigh · spot check</span><span class="pill gray">○ Open</span></div>
+          <div class="ctx">Feed calibration · any pen</div>
+          <div class="inst"><span class="verb">Weigh</span><span class="big">10</span><span class="un">head</span><span class="sec">closes review inbox</span></div>
+        </div>
+      </div>
+
+      <div class="dock"><div class="dockrow">
+        <div class="goto"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>A1</div>
+        <div class="scanbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg>Scan ear tag</div>
+        <div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div>
+    <h3 style="margin-top:34px">What unit scope is</h3>
+    <table class="stab"><thead><tr><th style="width:28%">Register</th><th>Carries</th></tr></thead><tbody>
+      <tr><td><b>The unit's overview</b></td><td>The census large, its batch composition in words, last-checked with a name. Two doors: <span class="mono">Pigs ›</span> — the unit list, every animal, verb sheet behind any selection (06) — and <span class="mono">Check-in</span>, the stamp (entrance, not a task, never gated). The attention chips are the pooled care work</td></tr>
+      <tr><td><b>Its task cards</b></td><td>The card gains its <b>breakdown</b> in unit scope: the imperative with the count as the loud row (<b>Check · 40</b>), then the reasons-to-act beneath it — <span class="mono">first check due · 8</span>, <span class="mono">re-check · 4</span>. Every row is a door: the card body opens the task's list here; a reason row opens it with that lens already set. Two pregnancy batches are two cards here too</td></tr>
+      <tr><td>Strip</td><td>Unit-scoped: only this unit's escalations; G4 has none, so none renders</td></tr>
+      <tr><td>Dock</td><td>Unchanged — <span class="mono">pen · scan · search</span>. Scope never moves the doors</td></tr>
+    </tbody></table>
+
+    <div class="note"><b>The transition is the point.</b> Finish a task's work here and its list's end state offers the next open task in this unit — <span class="mono">Next · Pregnancy check B22 · 12 here</span>. The phone swaps the question; the worker never leaves the room. Two batch tasks sharing a room cost one walk because the merge happens by <i>being in the unit</i>, never by blending lists. Order: due → open, worst first; a per-farm sequence is an open question.</div>
+    <div class="note"><b>The breakdown is the lens, surfaced — and it is the fix for the metadata problem.</b> An earlier draft wrote <span class="mono">40 here to check</span> as a small fact line — a statement about the world. The live UI's unit cards (08i) state the same number as an <i>execution overview</i>: the action, its count, and why now, bucketed — reached the window, showing signs, re-check due. Those buckets are exactly the list's lens partition (01b), so the card invents no taxonomy: it surfaces the lens counts as tappable reasons. Action first, evidence under it, metadata gone.</div>
+    <div class="note"><b>Round tasks rest between rounds instead of playing done.</b> From the live UI's finest detail: after the AM heat round, the card neither disappears nor shouts ✓ — it rests, holding the two facts a worker plans by:
+      <span style="display:block;max-width:340px;margin-top:10px" class="mono">
+      </span>
+      <span style="display:block;background:var(--card);border:1px solid var(--hair);border-radius:18px;padding:16px 18px;max-width:360px;margin-top:10px">
+        <span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:800;color:var(--ink)">Heat check</span><span class="pill green">✓ AM round</span></span>
+        <span style="display:block;font-size:12.5px;color:var(--ink3);margin-top:3px">46 of 46 · 09:12 · G.H</span>
+        <span style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--hair);padding-top:11px;margin-top:13px"><span style="font-weight:800;font-size:13px;color:var(--ink)">Next round · 14:30</span><span style="font-size:11.5px;color:var(--ink3)">in 4 h 48 m</span></span>
+      </span>
+    </div>
+    <div class="note"><b>Care work becomes cards only here.</b> Treatments and measures never reach Overview — they pool where the animals are and surface as this unit's cards and chips, executed task-at-a-time like everything else.</div>
+    <div class="note"><b>Never a merged multi-task pig list.</b> The pig list behind <span class="mono">Pigs ›</span> is the ad-hoc surface — selection → verb sheet, any event recordable, watching tasks advance by construction. A lens partitions by one question; bulk marks are only safe when the whole selection answers it.</div>
+  </div>
+</section>
+
+<!-- ================= 08d · THE ROUTE ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>08d · The route — behind a task card</h2>
+    <span class="anno">one batch · its units · walk order · no completion ceremony</span>
+  </div>
+
+  <div>
+    <div class="phone" style="display:flex;flex-direction:column;height:640px">
+      <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar">
+        <div class="back">←</div>
+        <div><div class="u" style="font-size:21px">Pregnancy check</div><div class="sub"><b>Batch 21</b> · first check · mated Jun 10–12</div></div>
+      </div>
+
+      <div class="feed" style="padding-top:2px">
+        <div class="plancard">
+          <div class="top"><span class="big">180<small> to check</small></span><span class="att">DAY 1 OF 3</span></div>
+          <div class="bar"><i style="width:0%"></i></div>
+          <div class="att">4 units · window ends sat jul 10</div>
+        </div>
+
+        <div class="divider-note">Walk order</div>
+        <div class="ucard">
+          <div class="rrow">
+            <span class="idx">1</span><span class="code">G3</span>
+            <div class="st"><span class="l1">Pens A1–A4 <span class="b b-amber">NEXT</span></span></div>
+            <div class="cnt"><b>54</b><small>due</small></div><span class="cv">›</span>
+          </div>
+          <div class="rrow">
+            <span class="idx">2</span><span class="code">G4</span>
+            <div class="st"><span class="l1">Pens A1–A3</span><span class="l2">B22 also due here</span></div>
+            <div class="cnt"><b>40</b><small>due</small></div><span class="cv">›</span>
+          </div>
+          <div class="rrow">
+            <span class="idx">3</span><span class="code">G6</span>
+            <div class="st"><span class="l1">Pens B1–B2</span></div>
+            <div class="cnt"><b>34</b><small>due</small></div><span class="cv">›</span>
+          </div>
+          <div class="rrow">
+            <span class="idx">4</span><span class="code">G7</span>
+            <div class="st"><span class="l1">Pens B1–B4</span></div>
+            <div class="cnt"><b>52</b><small>due</small></div><span class="cv">›</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dock"><div class="dockrow">
+        <div class="goto"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>G3</div>
+        <div class="scanbtn">Start in G3 · 54 due</div>
+        <div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div>
+    <h3 style="margin-top:34px">Laws of the route</h3>
+    <div class="note"><b>One decision per row: which room next.</b> The route strips itself to the walk — room, its pens, its count. The count is the right edge's big numeral (a route ranks by how much, so the number outranks a status word here); the one annotation allowed is co-located work, stated as a fact: <span class="mono">B22 also due here</span>. Everything else — group panels, per-room progress bars, status previews — was cut.</div>
+    <div class="note"><b>The rhythm: route → room → next.</b> Enter a room; its list is the unit-scoped task list (01). When it runs dry the end state offers <span class="mono">Next unit · G4</span> — or <span class="mono">Next task here</span> first if this room holds more work (08c). Sweep or stay: both offers, one tap, at every room's end.</div>
+    <div class="note"><b>No "Close unit round", no "Review &amp; complete".</b> Rooms close themselves when their work set is empty; the task is ✓ when its window closes. Wireframe 02's three-screen ceremony certified what the event model derives — consolidation dissolved it.</div>
+    <div class="note"><b>Single-unit tasks skip this screen</b> — the card opens its list directly. The route exists only where there is a route.</div>
+  </div>
+</section>
+
+<!-- ================= 08e · THE STRIP ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>08e · The strip</h2>
+    <span class="anno">exception-first · red may only occupy the first slot · absent when quiet</span>
+  </div>
+
+  <div>
+    <div style="width:390px">
+      <div class="strip" style="margin:0 0 10px">
+        <div class="srow">
+          <div class="st"><span class="sl1">Re-checks overdue · 6 sows</span><span class="sl2">G7 · pregnancy check B22 · oldest +2d</span></div>
+          <span class="word s-red">▲ OVERDUE</span>
+        </div>
+        <div class="srow">
+          <div class="st"><span class="sl1"><span class="mono" style="font-size:13px;font-weight:600">000418</span> · no piglet 45 min</span><span class="sl2">F3 · B2 · farrowing active · 8 live</span></div>
+          <span class="word s-red">▲ OVERDUE</span>
+        </div>
+        <div class="srow">
+          <div class="st"><span class="sl1">Euthanasia pending review</span><span class="sl2">G12 · flagged 06:50 · L.M</span></div>
+          <span class="word s-red">▲ OVERDUE</span>
+        </div>
+      </div>
+      <div class="anno" style="margin-top:10px">Scoped with the rail: Overview shows the section's fires, a unit chip only its own · at most ~4 rows, then "▲ 7 need attention ›"</div>
+    </div>
+  </div>
+
+  <div>
+    <h3 style="margin-top:34px">What qualifies</h3>
+    <table class="stab"><thead><tr><th style="width:32%">Source</th><th>Escalation</th><th style="width:28%">Tap opens</th></tr></thead><tbody>
+      <tr><td>Scheduled work</td><td>A window closed with work outstanding — overdue re-checks, a missed round, a batch past its last day</td><td>The task's list, lens on the overdue set</td></tr>
+      <tr><td>Interval clocks</td><td>An open session past its alarm — <span class="mono">45 min</span> since last piglet, a mating interval too long</td><td>The session</td></tr>
+      <tr><td>Health</td><td>A triage decision awaiting authority — euthanasia per policy, a hospital-pen transfer undone</td><td>The case, on her sheet</td></tr>
+    </tbody></table>
+    <div class="note"><b>Line 1 is the fact; line 2 is the address; the rail is always ▲ OVERDUE.</b> A derived view, not an inbox: rows leave when the fact resolves, never by dismissal. When empty, the register does not render. The strip alone keeps row grammar — an exception is triage, and triage reads like a list.</div>
+  </div>
+</section>
+
+<!-- ================= 08f · THE QUIET STATE ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>08f · The quiet state</h2>
+    <span class="anno">the proof of the law · an almost colorless screen · tomorrow previews gray</span>
+  </div>
+
+  <div>
+    <div class="phone" style="display:flex;flex-direction:column;height:880px">
+      <div class="statusbar"><span>17:30</span><span>●●●○</span></div>
+      <div class="appbar">
+        <div><div class="u">Gestation <span class="dd">▾</span></div><div class="sub">Today · Thu Jul 8 · <b>G. Hansen</b></div></div>
+        <span class="syncpill ok" style="margin-left:auto">✓ synced</span>
+      </div>
+
+      <div class="scope">
+        <div class="chip cur"><b>Overview</b><small>all done</small></div>
+        <div class="chip"><b>G1</b><small>✓ clear</small></div>
+        <div class="chip"><b>G2</b><small>✓ clear</small></div>
+        <div class="chip"><b>G3</b><small>✓ clear</small></div>
+        <div class="chip"><b>G4</b><small>✓ clear</small></div>
+        <div class="chip"><b>G5</b><small>✓ clear</small></div>
+        <div class="chip"><b>G6</b><small>✓ clear</small></div>
+        <div class="chip"><b>G7</b><small>✓ clear</small></div>
+      </div>
+
+      <div class="allclear">
+        <div class="mk">✓</div>
+        <div class="h">Nothing needs you</div>
+        <div class="s">4 of 4 tasks · 16 of 16 units checked · 214 records</div>
+      </div>
+
+      <div class="feed" style="gap:10px">
+        <div class="divider-note">Today · done</div>
+        <div class="tcard done">
+          <div class="hd"><span class="name">Pregnancy check</span><span class="pill green">✓ Done</span></div>
+          <div class="inst"><span class="big">200</span><span class="un">of 200 · Batch 22 · day 1</span><span class="sec">14:20 · G.H</span></div>
+        </div>
+        <div class="tcard done">
+          <div class="hd"><span class="name">Pregnancy check</span><span class="pill green">✓ Done</span></div>
+          <div class="inst"><span class="big">180</span><span class="un">of 180 · Batch 21</span><span class="sec">16:05 · G.H</span></div>
+        </div>
+        <div class="tcard dim done">
+          <div class="hd"><span class="name">Return-heat watch</span><span class="pill gray">○ Watch</span></div>
+          <div class="inst"><span class="big">3</span><span class="un">of 7 days · Batch 23</span><span class="sec">2 returned</span></div>
+        </div>
+
+        <div class="divider-note">Tomorrow · Fri Jul 9</div>
+        <div class="tcard dim done">
+          <div class="hd"><span class="name">Pregnancy check · day 2</span><span class="pill gray">○ Upcoming</span></div>
+          <div class="ctx"><b>Batch 22</b> · 100 remaining · 2 units</div>
+        </div>
+        <div class="tcard dim done">
+          <div class="hd"><span class="name">Re-checks</span><span class="pill gray">○ Upcoming</span></div>
+          <div class="ctx"><b>Batch 19</b> · 4 sows · unclear jul 6</div>
+        </div>
+      </div>
+
+      <div class="dock"><div class="dockrow">
+        <div class="goto"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Unit</div>
+        <div class="scanbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg>Scan ear tag</div>
+        <div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><b>Done cards compress and keep their attribution.</b> The register ends the day as the record of it; a multi-day sweep returns tomorrow as day 2 — no ceremony marked it, the window did.</div>
+    <div class="note"><b>Chips go quiet; tomorrow previews gray, un-tappable.</b> The last person out reads what the first person in will face.</div>
+    <div class="note"><b>The dock never leaves.</b> A sow found lame at 17:30 is scanned from here; the quiet state quiets the registers, never the doors.</div>
+  </div>
+</section>
+
+<!-- ================= 08g · DOORS ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>08g · Doors — where every tap lands</h2>
+    <span class="anno">today schedules · the route sweeps · the unit transitions · the sheet records</span>
+  </div>
+
+  <div>
+    <pre class="flow">TODAY · the section
+ │
+ ├─ scope rail ─────► Overview ⇄ any unit
+ │                    same surface, re-scoped
+ │
+ ├─ strip row ──────► the exact filtered view
+ │
+ ├─ task card ──────► THE ROUTE (08d) · its units
+ │   (Overview)        route row / Start
+ │                      └► task list (01) · that unit
+ │                          room dry →
+ │                          [ Next task here ] or
+ │                          [ Next unit · G4 ]
+ │                    (single-unit task → its list)
+ │
+ ├─ task card ──────► task list (01) · this unit
+ │   (unit scope)      done → [ Next task here ›]
+ │
+ ├─ unit scope card ─► Pigs › (06) · Check-in stamp
+ │
+ ├─ dock · Unit ────► unit picker (02 grammar)
+ ├─ dock · Scan ────► pig sheet + verbs (04c · 05)
+ └─ dock · search ──► find pig / pen / task</pre>
+    <div class="anno" style="margin-top:14px;width:390px">One next-hop gesture, two directions: the route hops rooms within a task; unit scope hops tasks within a room. At every room's end, both offers are one tap.</div>
+  </div>
+
+  <div>
+    <h3 style="margin-top:34px">The philosophy, stated once</h3>
+    <table class="stab"><thead><tr><th style="width:34%">Principle</th><th>Where it lands</th></tr></thead><tbody>
+      <tr><td><b>The overview is the task view</b></td><td>One card per task × batch — the day's plan, one primary fact each, readable without a tap</td></tr>
+      <tr><td><b>One surface, two scopes</b></td><td>The scope rail toggles Overview ⇄ unit; scope changes the question, never the grammar. <i>Filtering changes the scope, not ownership</i></td></tr>
+      <tr><td><b>Cards plan; rows execute</b></td><td>Today deliberates in cards; the lists behind it compress in rows. The two densities never mix on one surface — the strip's triage rows are the single exception</td></tr>
+      <tr><td><b>Sweep or enter — the worker chooses</b></td><td>Equipment in hand → task card → its route. Standing in a room → its chip → the unit's overview, tasks taken one at a time</td></tr>
+      <tr><td><b>Ad-hoc has an entrance, not a menu</b></td><td>Unit scope's <span class="mono">Pigs ›</span> and <span class="mono">Check-in</span>, and the dock's scan. Today itself never records anything</td></tr>
+    </tbody></table>
+    <div class="note"><b>What Today is not.</b> Not a dashboard (herd stats belong to a farm surface with the toolbox). Not an inbox. Not a report. A work order that happens to be calm.</div>
+  </div>
+</section>
+
+<!-- ================= 08h · WIREFRAME 02, RECONCILED ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>08h · Wireframe 02, reconciled</h2>
+    <span class="anno">app/page.tsx · "plan by task. work by place." · verdicts incl. product-owner rulings of aug 25</span>
+  </div>
+
+  <div>
+    <h3 style="margin-top:34px">Verdicts</h3>
+    <table class="stab"><thead><tr><th style="width:36%">Wireframe 02 element</th><th style="width:16%">Verdict</th><th>Why</th></tr></thead><tbody>
+      <tr><td>Unit scope chips re-scoping the home</td><td><span class="adopt">ADOPTED</span></td><td><b>Owner ruling.</b> One surface, two scopes; chips carry each unit's loudest fact</td></tr>
+      <tr><td>Task rows as full cards (name, chips, progress, big count)</td><td><span class="adopt">ADOPTED</span></td><td><b>Owner ruling.</b> Both demos card their tasks; an early draft compressed them into pig-list rows — wrong density for a planning surface. Cards plan; rows execute</td></tr>
+      <tr><td>Unit-scoped overview card (population · batches · checked · attention)</td><td><span class="adopt">ADOPTED</span></td><td>The unit's high-level reading, with the two entrances on the card</td></tr>
+      <tr><td>Task route screen with recommended next</td><td><span class="adopt">ADOPTED</span></td><td>As 08d, one batch, its units; skipped for single-unit tasks</td></tr>
+      <tr><td>Work groups merged into one task row</td><td><span class="reject">REJECTED</span></td><td><b>Owner ruling.</b> A task is one question over one batch — separate batches are separate tasks; a merged row blends two clocks</td></tr>
+      <tr><td>Route merging all groups per room</td><td><span class="moved">REPLACED</span></td><td>The shared-room case is handled by <b>task transitions inside the unit</b> (08c); the route states co-located work as a fact only</td></tr>
+      <tr><td>Bounded vs window progress kinds</td><td><span class="kept">KEPT</span></td><td>Already the screens.html 01 grammar — the card draws a bar or day segments accordingly</td></tr>
+      <tr><td>Guided mode's sticky payload</td><td><span class="kept">KEPT</span></td><td>Already the conveyor's sticky-method law (ops/measures.md 2c)</td></tr>
+      <tr><td>Section scope · check-in with no due date</td><td><span class="kept">KEPT</span></td><td>Both designs agree</td></tr>
+      <tr><td>Section herd-stats card + production-stage rail</td><td><span class="moved">MOVED</span></td><td>Herd reading → the farm/records surface with the toolbox</td></tr>
+      <tr><td>"Close unit round" · "Review &amp; complete" · acknowledgment</td><td><span class="reject">REJECTED</span></td><td>Certification of the derivable; consolidation dissolved ceremonies — windows close themselves</td></tr>
+      <tr><td>Check-in completion gated on items resolved</td><td><span class="reject">REJECTED</span></td><td>The stamp asserts only the null case; never earned through a checklist</td></tr>
+      <tr><td>Flag badges as the only exception surface</td><td><span class="reject">REJECTED</span></td><td>Chips carry their unit's loudest fact, but red words live only in the strip</td></tr>
+      <tr><td>Bottom nav (Work · Farm · Animals · More)</td><td><span class="moved">MOVED</span></td><td>Animals = the dock's scan/search; Farm = the future toolbox surface</td></tr>
+      <tr><td>Rapid mode: choose outcome once, tap pigs</td><td><span class="moved">MOVED</span></td><td>A room-screen decision for screens.html (verb-first vs selection-first T1)</td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="notes">
+    <h3 style="margin-top:34px">Open questions</h3>
+    <table class="stab"><thead><tr><th style="width:6%">#</th><th>Question</th></tr></thead><tbody>
+      <tr><td>1</td><td><b>Chip fact vocabulary</b> — the precedence of a unit chip's loudest fact (<span class="mono">6 overdue</span> › task count › <span class="mono">✓ clear</span>), and whether check-in state belongs on the chip</td></tr>
+      <tr><td>2</td><td><b>Task-transition order inside a unit</b> — due → open, worst first assumed; a per-farm sequence (marks before treatments)?</td></tr>
+      <tr><td>3</td><td><b>Batch naming</b> — <span class="mono">Batch 22</span> vs cohort language ("Jun 30 wean group") on the card's context line</td></tr>
+      <tr><td>4</td><td><b>Route reorder</b> — can a worker skip a room and return; does <span class="mono">Start</span> re-aim?</td></tr>
+      <tr><td>5</td><td><b>Section switcher scope</b> — who gets the ▾; stacked strips for managers or one section at a time</td></tr>
+      <tr><td>6</td><td><b>Round boundaries</b> — AM/PM windows vs min-gap (unified-task-list §4.2)</td></tr>
+      <tr><td>7</td><td><b>Verb-first fast entry</b> — decide in screens.html</td></tr>
+      <tr><td>8</td><td><b>Farm surface</b> — where herd stats and the toolbox live; reserved, not designed</td></tr>
+    </tbody></table>
+  </div>
+</section>
+
+<!-- ================= 08i · THE LIVE UI, MINED ================= -->
+<section class="screen">
+  <div class="sec-label">
+    <h2>08i · The live UI, mined</h2>
+    <span class="anno">figma 生产任务 · node 5473:7001 · reference, not target · what its cards know</span>
+  </div>
+
+  <div>
+    <h3 style="margin-top:34px">The overview-level card — one template, ten tasks</h3>
+    <p style="font-size:13.5px;color:var(--ink2);max-width:52ch;margin-bottom:8px">Icon · task name · <span class="mono">生产线 line | 批次 batch</span> · day chip <span class="mono">第n/N天</span> (amber past its window: <span class="mono s-amber">第4/3天</span>) · one metric pair with a big numeral and a progress bar · <span class="mono">结束任务</span> End-task button at target or overrun · grayed <span class="mono">已结束</span> ended state.</p>
+    <table class="stab"><thead><tr><th style="width:34%">Task</th><th>Metric pair (done / target)</th></tr></thead><tbody>
+      <tr><td>查情 Heat check</td><td>累计发情 / 目标发情 — cumulative in-heat / target in-heat</td></tr>
+      <tr><td>配种 Breeding</td><td>已达配种次数 / 发情母猪 — reached service count / in-heat sows · <b>segmented bar per service</b></td></tr>
+      <tr><td>返情 Return check</td><td><b>two tiles</b>: 返情检查天数 day-dots + 已返情 / 未返情 returned / not</td></tr>
+      <tr><td>孕检 Pregnancy</td><td>已检查 / 需检查 — checked / to check (头)</td></tr>
+      <tr><td>分娩 Farrowing</td><td>已分娩 / 需分娩 — farrowed / to farrow (头)</td></tr>
+      <tr><td>仔猪处理 Piglet proc.</td><td>已处理 / 需处理 (栏 — pens)</td></tr>
+      <tr><td>产后检查 Postpartum</td><td>已检查 / 需检查 (头)</td></tr>
+      <tr><td>断奶检查 Weaning</td><td>已检查 / 需检查 (栏)</td></tr>
+      <tr><td>结束保育 / 结束育肥 Exit checks</td><td>已检查 / 需检查 (栏)</td></tr>
+    </tbody></table>
+
+    <h3>The unit-level card — the 执行概览 execution overview</h3>
+    <p style="font-size:13.5px;color:var(--ink2);max-width:52ch;margin-bottom:8px">Same header plus the unit's head count; then a panel of <b>reason-to-act rows with counts</b>, a big green <span class="mono">执行任务</span> Execute button, and — between rounds — an interim panel with last-check attribution and a <b>countdown to the next round</b>.</p>
+    <table class="stab"><thead><tr><th style="width:30%">Task</th><th>Execution-overview rows</th></tr></thead><tbody>
+      <tr><td>查情 Heat</td><td>需查情 to check <b>100</b> · 已到预计发情期 reached expected window <b>10</b> · 有发情迹象 showing signs <b>10</b>. Resting: 阶段性概览 + 上次查情 last check (person · time) + 距下次查情 next round in <b>23 h 59 m</b></td></tr>
+      <tr><td>配种 Breeding</td><td>Per-service rows 第1次 / 第2次 / ≥第3次, each <span class="mono">n / 20头</span>, column toggled 可配 / 未到期 (eligible / not yet) vs 已配种 (done)</td></tr>
+      <tr><td>返情 Return</td><td>已到预计返情期 reached window <b>10</b> · 有返情迹象 signs <b>10</b></td></tr>
+      <tr><td>孕检 Pregnancy</td><td>需检查 to check <b>100</b> · 达到配种后第5天孕检 reached day-5 post-mating <b>10</b></td></tr>
+      <tr><td>分娩 Farrowing</td><td>预计今天分娩 expected today <b>10</b> · 超出预产期 past due <b>10</b> · 正在分娩 farrowing now <b>10</b> · <span class="s-amber">⚠ 产仔间隔超过45分钟 interval &gt;45 min <b>2</b></span></td></tr>
+      <tr><td>仔猪处理 Piglet proc.</td><td><b>Per-treatment pen counts</b>: 滴鼻 drops <b>10栏</b> · 剪牙 teeth <b>10栏</b> · 补铁 iron <b>10栏</b></td></tr>
+      <tr><td>产后检查 Postpartum</td><td>达到分娩后第5天检查 reached day-5 post-farrow <b>10</b></td></tr>
+    </tbody></table>
+    <p class="anno" style="margin-top:6px">Home extras: 存栏 herd tile (99,999头) · 巡检 checked-units tile (20/40) · section selector · 总览/单元 scope tabs · scan FAB · 首页/工具 tab bar</p>
+  </div>
+
+  <div class="notes">
+    <h3 style="margin-top:34px">Verdicts — what this design takes and leaves</h3>
+    <table class="stab"><thead><tr><th style="width:40%">Live-UI element</th><th style="width:15%">Verdict</th><th>Why</th></tr></thead><tbody>
+      <tr><td>Execution overview: reason-to-act buckets with counts</td><td><span class="adopt">ADOPTED</span></td><td>The action-based answer to "what do I do here". Our version derives the buckets from the list's lens partition (01b) — same counts, no new taxonomy, every row a pre-lensed door</td></tr>
+      <tr><td>Between-rounds resting state with next-round countdown + last attribution</td><td><span class="adopt">ADOPTED</span></td><td>Planning fact, not celebration — replaces a bare ✓ for round tasks (08c specimen)</td></tr>
+      <tr><td>Per-treatment / per-service breakdowns (piglet proc., breeding)</td><td><span class="adopt">ADOPTED</span></td><td>The bucket vocabulary per task — carried into the matrix below</td></tr>
+      <tr><td>Day chip turns amber past window (第4/3天)</td><td><span class="kept">KEPT</span></td><td>Ours is the rail word + strip; overrun is OVERDUE, no second grammar</td></tr>
+      <tr><td>Cumulative-vs-target metric on overview cards</td><td><span class="kept">KEPT</span></td><td>Our bar + fact pair; targets stay derived, never asserted</td></tr>
+      <tr><td>Interval alert as a row inside the card (⚠ 45 min)</td><td><span class="moved">MOVED</span></td><td>Escalations have one register — the strip. A card bucket may count it; only the strip may shout it</td></tr>
+      <tr><td>结束任务 End-task button</td><td><span class="reject">REJECTED</span></td><td>The ceremony again — windows close themselves (08d)</td></tr>
+      <tr><td>执行任务 Execute button per card</td><td><span class="reject">REJECTED</span></td><td>The card is the button — a second full-width CTA per card is noise ×4</td></tr>
+      <tr><td>存栏 herd tile · 生产线 identity</td><td><span class="moved">MOVED</span></td><td>Herd census → farm surface; the section header already carries place</td></tr>
+      <tr><td>巡检 checked-units tile (20/40)</td><td><span class="kept">KEPT</span></td><td>Ours lives on the unit chips (✓ clear) and the check-in stamps — same fact, no tile</td></tr>
+    </tbody></table>
+
+    <h3>The bucket matrix — what our unit cards show</h3>
+    <table class="stab"><thead><tr><th style="width:30%">Task</th><th>Loud row</th><th>Reason rows (= lens counts)</th></tr></thead><tbody>
+      <tr><td>Heat check</td><td>Check · n</td><td>reached expected window · showing signs</td></tr>
+      <tr><td>Mating</td><td>Mate · n</td><td>1st service · repeat service · waiting interval</td></tr>
+      <tr><td>Return-heat</td><td>Watch · n</td><td>in return window · showing signs</td></tr>
+      <tr><td>Pregnancy check</td><td>Check · n</td><td>first check due · re-check due</td></tr>
+      <tr><td>Farrowing</td><td>Attend · n</td><td>expected today · past due · farrowing now</td></tr>
+      <tr><td>Postpartum</td><td>Check · n</td><td>reached day-N post-farrow</td></tr>
+      <tr><td>Weaning</td><td>Wean · n pens</td><td>reached weaning age</td></tr>
+      <tr><td>Piglet processing</td><td>Process · n pens</td><td>per treatment: iron · teeth · tail · tag/weigh</td></tr>
+      <tr><td>Treatments (care)</td><td>Treat · n</td><td>per case reason: follow-up day N · new</td></tr>
+    </tbody></table>
+    <div class="note"><b>Rules of the breakdown.</b> At most three reason rows — beyond three, the tail folds into the list's funnel (01c). Overview cards never carry buckets (they aggregate units; the route is their breakdown). A bucket may count an escalated fact, but red words stay in the strip. Every count derives; every row is a lens door.</div>
+  </div>
+</section>
+
+<footer>
+  <span class="anno">Sentri · ops — Today · section 08 · companion to components.html (01–05 · 07) · screens.html (01 · 03 · 04) · check-in.html (06) · reconciles wireframe 02 · owner rulings aug 25</span>
+</footer>
+
+</div>
+</body>
+</html>

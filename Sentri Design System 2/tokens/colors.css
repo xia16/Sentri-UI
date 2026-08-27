@@ -1,0 +1,77 @@
+:root{
+/* Base palette — cool paper neutrals */
+--paper:#fcfcfb;
+--neutral-50:#f5f6f3;
+--neutral-100:#edeeea;
+--neutral-200:#e1e3dd;
+--neutral-300:#c8cbc3;
+--neutral-400:#a0a49b;
+--neutral-500:#70746b;
+--neutral-600:#494c45;
+--neutral-900:#171916;
+/* Green — brand */
+--olive-900:#0d3f2a;
+--olive-800:#15603f;
+--olive-700:#1b7a50;
+--olive-600:#219260;
+--olive-200:#bce5cd;
+--olive-100:#dcf2e4;
+--olive-50:#edf9f1;
+/* Amber — high-vis attention */
+--amber-800:#8a5c00;
+--amber-600:#d18a10;
+--amber-500:#f5a524;
+--amber-100:#fdeecd;
+--amber-50:#fef7e6;
+/* Red — overdue / danger */
+--red-700:#b02a30;
+--red-600:#dc3d43;
+--red-100:#fadcdd;
+--red-50:#fdeeee;
+/* Green — complete / success */
+--green-700:#1e7a48;
+--green-600:#27995a;
+--green-100:#d7f0e0;
+--green-50:#eaf8f0;
+/* Blue — upcoming / informational */
+--blue-700:#2d5cae;
+--blue-600:#3f74d3;
+--blue-100:#dde9fb;
+--blue-50:#eef4fd;
+/* Semantic aliases */
+--bg-app:var(--neutral-50);
+--surface-card:#ffffff;
+--surface-sunken:var(--neutral-100);
+--surface-brand:var(--olive-800);
+--ink-1:var(--neutral-900);
+--ink-2:var(--neutral-600);
+--ink-3:var(--neutral-500);
+--ink-disabled:var(--neutral-400);
+--ink-on-brand:#ffffff;
+--ink-on-amber:var(--neutral-900);
+--line-1:var(--neutral-200);
+--line-2:var(--neutral-100);
+--brand:var(--olive-800);
+--brand-strong:var(--olive-900);
+--brand-tint:var(--olive-50);
+--brand-tint-line:var(--olive-200);
+/* Work-status system */
+--status-overdue:var(--red-600);
+--status-overdue-ink:#ffffff;
+--status-overdue-bg:var(--red-50);
+--status-overdue-text:var(--red-700);
+--status-due:var(--amber-500);
+--status-due-ink:var(--neutral-900);
+--status-due-bg:var(--amber-50);
+--status-due-text:var(--amber-800);
+--status-upcoming:var(--blue-600);
+--status-upcoming-bg:var(--blue-50);
+--status-upcoming-text:var(--blue-700);
+--status-done:var(--green-600);
+--status-done-bg:var(--green-50);
+--status-done-text:var(--green-700);
+--status-blocked:var(--neutral-500);
+--status-blocked-bg:var(--neutral-100);
+--status-blocked-text:var(--neutral-600);
+--focus:var(--olive-700);
+}
