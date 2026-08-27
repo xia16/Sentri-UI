@@ -218,9 +218,14 @@ it is real and they diagnose different problems: stillborn rate points at farrow
 management (long labors, big litters, sow condition, supervision), mummified rate is an
 infectious-disease early warning (mid-gestation infection — PPV/PRRS class), one of the
 cheapest herd-health signals a farm has. And mummies are visually unmistakable, so the
-classification costs nothing when actually seen. Ruling: one **dead** tally is always
-enough live; the split is an optional cleanup-time refinement (✎, stamped); an unsplit
-record stays "dead · unclassified" and analytics degrades gracefully.
+classification costs nothing when actually seen. Ruling (owner-corrected): no new
+structure — this is the **existing death grammar**: the session sheet tallies **Dead** as
+the leading mark, and stillborn/mummified is the *optional cause slot* on that record,
+exactly as cause is optional in the Report death drawer. Filled on the spot when obvious,
+skipped when not, refined later with ✎; an unclassified record stays "dead" and analytics
+degrades gracefully. The earlier "Live + Stillborn counters top, others below" arrangement
+in the session brief is superseded: the counters are **Live + Dead**, class rides the
+record as optional cause.
 
 **7 · Fosters ride the crate schedule.** Confirmed. The reminder is the quiet row note
 (`incl. 3 fostered · 2d older`) — a standing fact line, not a notification.
