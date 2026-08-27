@@ -569,6 +569,9 @@
 .pen input{width:18px;height:18px;accent-color:var(--ink)}
 .row.tail{min-height:42px}
 .row.tail .l1{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.06em;color:var(--ink2)}
+.phaserow{display:flex;align-items:center;gap:12px;width:390px}
+.phaserow .phase{flex:1;min-width:0}
+.replay{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--ink);background:var(--card);border:1.5px solid var(--ink);border-radius:9px;padding:7px 12px;cursor:pointer;flex:0 0 auto}
 </style>
 </head><body><div class="wrap" style="max-width:1360px">
 <header class="page"><span class="anno">Sentri · task-execution motion</span><span class="anno">three destinies · one bulk rule</span></header>
@@ -597,7 +600,7 @@
       </div>
       <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">A1</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
     </div>
-    <div class="phase" id="a-ph"></div>
+    <div class="phaserow"><div class="phase" id="a-ph"></div><button class="replay" onclick="runA()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.3"/><path d="M3 4v5h5"/></svg>Replay</button></div>
     <div class="why" style="width:390px"><b>Marked unclear → she becomes the recheck row, and stays.</b> Flip + wash, counts unchanged, no departure ever — the working pile still owns her. Same motion for: heat <span class="mono">signs</span> (chip appears), mating 1 of 2 (<span class="mono">WAIT</span>), a farrowing save, partial piglet treatments, and every check-in ad-hoc mark.</div>
   </div>
 
@@ -622,7 +625,7 @@
       <div class="dock" id="b-dock" style="display:none"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">A1</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
       <div class="mbar" id="b-bar"><span style="font-size:13px;font-weight:700">✕ 3 selected</span><button class="cta sec" style="height:40px;font-size:13px">Not pregnant</button><button class="cta" style="height:40px;flex:1;font-size:13px">Pregnant</button></div>
     </div>
-    <div class="phase" id="b-ph"></div>
+    <div class="phaserow"><div class="phase" id="b-ph"></div><button class="replay" onclick="runB()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.3"/><path d="M3 4v5h5"/></svg>Replay</button></div>
     <div class="why" style="width:390px"><b>The bulk rule: one motion, one reflow.</b> The bar clears first and the dock returns (selection is over), all three settle in the same frame with one shared wash, counts tick by 3 at once — lens, task overview, everywhere. Then one simultaneous group collapse. <b>Never staggered</b>: a stagger is the list churning N times under a hand that may already be working the next pen. They land atop Checked together, selection order preserved.</div>
   </div>
 
@@ -649,7 +652,7 @@
       </div>
       <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">C1</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
     </div>
-    <div class="phase" id="c-ph"></div>
+    <div class="phaserow"><div class="phase" id="c-ph"></div><button class="replay" onclick="runC()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.3"/><path d="M3 4v5h5"/></svg>Replay</button></div>
     <div class="why" style="width:390px"><b>Death, transfer out, missing, abortion — she exits every lens.</b> Same mechanics as a cross, but the receipt is different: there is no other lens to point at, so <b>the pen census ticks down</b> (<span class="mono">13 → 12 pigs</span>), the All and Health counts follow, and her page carries the terminal band. The settle moment shows the terminal state (<span class="mono">Died · 09:41</span>) long enough to read before the collapse.</div>
   </div>
 </div>
@@ -718,17 +721,23 @@ onIdle(2000) or onScrolledPast:
 <p style="max-width:74ch;font-size:13.5px"><b>Hybrid-shell notes.</b> Everything above is compositor-friendly CSS on <span class="mono">grid-template-rows · opacity · transform · background</span> — no JS animation loops, no native APIs. Do not animate siblings&#39; positions manually; the grid collapse moves them. The count tick may be a 120 ms <span class="mono">translateY</span> digit swap; plain replacement is acceptable.</p>
 </div>
 <script>
-const Q=s=>document.querySelectorAll(s), $=id=>document.getElementById(id);
-function loopA(){
+const Q=q=>document.querySelectorAll(q), $=id=>document.getElementById(id);
+// each demo plays ONCE and rests at its end state; the Replay button runs it again
+const pend={a:[],b:[],c:[]};
+function later(k,fn,ms){ pend[k].push(setTimeout(fn,ms)); }
+function reset(k){ pend[k].forEach(clearTimeout); pend[k]=[]; }
+
+function runA(){
+  reset('a');
   const r=$('a-r');
   $('a-l1').textContent='Mated · 24 days ago'; $('a-l2').textContent='1st check';
   $('a-cb').style.display=''; r.classList.remove('wash'); $('a-ph').textContent='tap = mark her unclear …';
-  setTimeout(()=>{ $('a-l1').textContent='Recheck · in 3 days'; $('a-l2').textContent='unclear today · G.H';
+  later('a',()=>{ $('a-l1').textContent='Recheck · in 3 days'; $('a-l2').textContent='unclear today · G.H';
     r.classList.add('wash'); $('a-ph').textContent='advance — flip + wash · she stays'; },1400);
-  setTimeout(()=>{ $('a-ph').textContent='no departure · the wash was the motion'; },3000);
-  setTimeout(loopA,5200);
+  later('a',()=>{ $('a-ph').textContent='no departure · the wash was the motion'; },3000);
 }
-function loopB(){
+function runB(){
+  reset('b');
   $('b-bar').style.display=''; $('b-bar').classList.remove('gone'); $('b-dock').style.display='none';
   Q('.b-w').forEach(w=>w.classList.remove('depart'));
   Q('.b-r').forEach(r=>r.classList.remove('wash'));
@@ -736,32 +745,31 @@ function loopB(){
   Q('.b-rail').forEach(x=>x.innerHTML='');
   Q('.b-l1').forEach((l,i)=>l.textContent=['Mated · 28 days ago','Mated · 25 days ago','Mated · 25 days ago'][i]);
   $('b-open').textContent='100'; $('b-done').textContent='100'; $('b-ov').textContent='100'; $('b-ph').textContent='3 selected · tap Pregnant …';
-  setTimeout(()=>{ $('b-bar').classList.add('gone');
+  later('b',()=>{ $('b-bar').classList.add('gone');
     Q('.b-cb').forEach(c=>c.style.display='none');
     Q('.b-l1').forEach(l=>l.textContent='Pregnant · today');
     Q('.b-rail').forEach(x=>x.innerHTML='<span class="tw done">✎</span>');
     Q('.b-r').forEach(r=>r.classList.add('wash'));
     $('b-open').textContent='97'; $('b-done').textContent='103'; $('b-ov').textContent='103';
     $('b-ph').textContent='bar clears · dock returns · counts tick by 3'; },1400);
-  setTimeout(()=>{ $('b-dock').style.display=''; $('b-bar').style.display='none'; },1650);
-  setTimeout(()=>{ $('b-ph').textContent='hold — hand still in the list'; },2800);
-  setTimeout(()=>{ Q('.b-w').forEach(w=>w.classList.add('depart'));
+  later('b',()=>{ $('b-dock').style.display=''; $('b-bar').style.display='none'; },1650);
+  later('b',()=>{ $('b-ph').textContent='hold — hand still in the list'; },2800);
+  later('b',()=>{ Q('.b-w').forEach(w=>w.classList.add('depart'));
     $('b-ph').textContent='one group collapse → atop Checked'; },4200);
-  setTimeout(loopB,6400);
 }
-function loopC(){
+function runC(){
+  reset('c');
   $('c-w').classList.remove('depart'); $('c-r').classList.remove('wash');
   $('c-cb').style.display='';
   $('c-l1').innerHTML='<span class="dot r"></span>Fever day 4 <span class="b b-amber">40.6°</span>'; $('c-l2').textContent='232d · treated 3d';
   $('c-agg').textContent='13 pigs'; $('c-all').textContent='124'; $('c-h').textContent='6'; $('c-trt').textContent='2';
   $('c-ph').textContent='her death is reported …';
-  setTimeout(()=>{ $('c-cb').style.display='none';
+  later('c',()=>{ $('c-cb').style.display='none';
     $('c-l1').textContent='Died · 09:41'; $('c-l2').textContent='cause recorded · G.H';
     $('c-r').classList.add('wash'); $('c-ph').textContent='terminal state readable · census 13 → 12'; $('c-agg').textContent='12 pigs';
     $('c-all').textContent='123'; $('c-h').textContent='5'; $('c-trt').textContent='1'; },1400);
-  setTimeout(()=>{ $('c-w').classList.add('depart'); $('c-ph').textContent='exit — no lens to find her in'; },3600);
-  setTimeout(loopC,5800);
+  later('c',()=>{ $('c-w').classList.add('depart'); $('c-ph').textContent='exit — no lens to find her in'; },3600);
 }
-loopA(); setTimeout(loopB,600); setTimeout(loopC,1200);
+runA(); setTimeout(runB,600); setTimeout(runC,1200);
 </script>
 </body></html>
