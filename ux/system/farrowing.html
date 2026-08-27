@@ -618,11 +618,11 @@
 
 <!-- ============ 09a session ============ -->
 <h2>09a · The session drawer</h2>
-<p style="max-width:80ch">Every class is a cell; the <b>whole cell is the tap target</b> — the quiet <span class="mono">+</span> badge on its edge only names the gesture, so nothing on the sheet is a slab of ink. A cell you touched this visit shows its receipt in place: the green wash and a <span class="mono">+1</span> beside the count — Healthy below was 6 when the sheet opened. The sheet runs ~470px; the room list stays readable behind it.</p>
+<p style="max-width:80ch">Every class is a cell and the <b>whole cell is the tap target</b> — the quiet <span class="mono">+</span> badge names the gesture. The totals print once: the column labels <span class="mono">LIVE · 9 / DEAD · 3</span> are the derived numbers, and the interval chip rides the header. A cell touched this visit takes a green border and its per-visit delta — Healthy below was 6 when the sheet opened. Nothing on the phone is documentation: the rules live here, beside it.</p>
 <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
 <div>
 <div class="vlabel">The session drawer · just tapped Healthy</div>
-<div class="phone" style="display:flex;flex-direction:column;height:830px;background:var(--well)">
+<div class="phone" style="display:flex;flex-direction:column;height:780px;background:var(--well)">
   <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
   <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
   <div class="list" style="opacity:.45">
@@ -634,12 +634,11 @@
   <div style="flex:1"></div>
   <div class="fs">
     <div class="grab"></div>
-    <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">started 6h · parity 3</span></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 2px 12px"><span style="font-family:var(--mono);font-size:21px;font-weight:700">9 live · 3 dead</span><span class="b b-amber">last now</span></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 10px">
+    <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">started 6h · parity 3</span><span class="b b-amber" style="margin-left:auto">last now</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin-top:12px">
       <span class="fk" style="margin:0">Live · 9</span>
       <span class="fk" style="margin:0">Dead · 3</span>
-      <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--hair2);border-radius:12px;padding:6px 8px 6px 12px;background:var(--green-wash);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Healthy</span><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--green)">+1</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink)">7</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;gap:7px;border:1.5px solid var(--green);border-radius:12px;padding:6px 8px 6px 12px;background:var(--card);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Healthy</span><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--green)">+1</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink)">7</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
       <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--hair2);border-radius:12px;padding:6px 8px 6px 12px;background:var(--card);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Stillborn</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink)">2</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
       <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--hair2);border-radius:12px;padding:6px 8px 6px 12px;background:var(--card);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Weak</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink)">1</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
       <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--hair2);border-radius:12px;padding:6px 8px 6px 12px;background:var(--card);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Mummified</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink)">1</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
@@ -648,21 +647,20 @@
     </div>
     <div style="display:flex;align-items:center;gap:10px;padding:11px 2px 2px;border-top:1px solid var(--hair);margin-top:12px"><span style="font-size:13px;font-weight:700;white-space:nowrap">Trail · 9 ›</span><span style="font-family:var(--mono);font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">+1 healthy · 09:41 · G.H</span></div>
     <div class="shbar"><button class="cta sec">Save</button><button class="cta" style="flex:1">Finish farrowing</button></div>
-    <div class="aud">the whole cell is the target — tap anywhere tallies it · the green +1 and wash are this visit · long-press for − and the stepper</div>
   </div>
 </div>
 </div>
 <div style="flex:1;min-width:340px;max-width:520px">
   <h3 style="margin-top:6px">Rules</h3>
   <table class="stab"><thead><tr><th style="width:28%">Rule</th><th>Why</th></tr></thead><tbody>
-    <tr><td>Whole-cell target</td><td>Tap anywhere in the cell — the largest possible glove target. The edge <span class="mono">+</span> is the affordance (V2&#39;s lesson), rendered quiet on the well so no wall of ink forms (V1&#39;s lesson). Long-press opens − and the stepper.</td></tr>
-    <tr><td>The edited state</td><td>A touched cell washes green and carries its per-visit delta (<span class="mono">+1</span>, amber <span class="mono">−1</span> for corrections) beside the count — <span class="mono">7</span> can never masquerade as &quot;was already 7&quot;. Deltas clear when the sheet closes; the trail keeps them forever.</td></tr>
-    <tr><td>Headline derives</td><td><span class="mono">9 live · 3 dead</span> is the column sums plus unclassified tallies — entered nowhere. A live tally also resets the interval chip (<span class="mono">last now</span>).</td></tr>
-    <tr><td>Unclassified</td><td>A <span class="mono">+</span> on the group label is a plain birth — legal at 2am, refined at cleanup with ✎. The morning batch entry uses the same cells in one visit; the trail records one stamped visit, no birth times pretended.</td></tr>
+    <tr><td>Whole-cell target</td><td>Tap anywhere in the cell tallies its class, committed as it lands — the largest glove target. The edge <span class="mono">+</span> is the affordance; long-press opens − and the stepper.</td></tr>
+    <tr><td>Totals print once</td><td>The column labels carry the derived sums; there is no separate headline. A live tally resets the interval chip in the header (<span class="mono">last now</span>).</td></tr>
+    <tr><td>The edited state</td><td>A touched cell takes a <b>green border</b> and its per-visit delta (<span class="mono">+1</span>; amber <span class="mono">−1</span> for corrections) beside the count — a 7 can never masquerade as &quot;was already 7&quot;. No background wash: the border reads crisply on the light ground. Deltas clear when the sheet closes; the trail keeps them.</td></tr>
+    <tr><td>Unclassified</td><td>A tap on the group label is a plain birth — legal at 2am, refined at cleanup with ✎. The morning batch entry uses the same cells in one visit; the trail records one stamped visit, no birth times pretended.</td></tr>
     <tr><td>Died after birth</td><td>The sixth cell routes to the death drawer (09b) — the ledger, never these counters. − stays a miscount correction.</td></tr>
     <tr><td>Sub-actions one tap away</td><td>The trail collapses to its latest stamped line + <span class="mono">Trail · 9 ›</span>; the full receipt, every line ✎, sits behind it.</td></tr>
     <tr><td>Save vs Finish</td><td>Save closes the sheet and keeps her Active — every tap already committed, so Save gates nothing. Finish farrowing crosses her to Done (motion B).</td></tr>
-    <tr><td>Both models</td><td>Attended: the sheet is the interval tracker — <span class="mono">last now</span> runs off asserted tallies only. Unattended free farrow: the hand returns and enters the litter cell by cell in one visit.</td></tr>
+    <tr><td>Both models</td><td>Attended: the sheet is the interval tracker — the chip runs off asserted tallies only. Unattended free farrow: the hand returns and enters the litter cell by cell in one visit.</td></tr>
   </tbody></table>
 </div>
 </div>
@@ -690,7 +688,6 @@
     <div class="flbl">When</div>
     <div style="display:flex;gap:8px;padding:8px 0 2px"><span class="pchip cur">Today</span><span class="pchip">Yesterday</span><span class="pchip">Not sure</span></div>
     <div class="shbar"><button class="cta" style="flex:1">Record 3 died</button></div>
-    <div class="aud">the count derives from the cause taps — 3 crushed is 3 taps and Record · when defaults today · not sure carries the span since the last count</div>
   </div>
 </div>
 </div>
