@@ -618,10 +618,10 @@
 
 <!-- ============ 09a session ============ -->
 <h2>09a · The session drawer</h2>
-<p style="max-width:80ch">The drawer, converged after two review rounds. Every class is directly enterable — its own cell, its own visible <span class="mono">+</span> — in two labeled columns whose totals derive the headline. The sheet runs ~430px on a 760px phone; the room list stays readable behind it. What the rejected candidates taught: filled chips read as a wall (V1), a tile with no <span class="mono">+</span> does not read as input (V2), and hiding the classes behind a link hides the actual work (V3).</p>
+<p style="max-width:80ch">Every class is a cell; the <b>whole cell is the tap target</b> — the quiet <span class="mono">+</span> badge on its edge only names the gesture, so nothing on the sheet is a slab of ink. A cell you touched this visit shows its receipt in place: the green wash and a <span class="mono">+1</span> beside the count — Healthy below was 6 when the sheet opened. The sheet runs ~470px; the room list stays readable behind it.</p>
 <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
 <div>
-<div class="vlabel">The session drawer · tap the row body</div>
+<div class="vlabel">The session drawer · just tapped Healthy</div>
 <div class="phone" style="display:flex;flex-direction:column;height:830px;background:var(--well)">
   <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
   <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
@@ -635,70 +635,73 @@
   <div class="fs">
     <div class="grab"></div>
     <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">started 6h · parity 3</span></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 2px 12px"><span style="font-family:var(--mono);font-size:21px;font-weight:700">8 live · 3 dead</span><span class="b b-amber">last 45m</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 2px 12px"><span style="font-family:var(--mono);font-size:21px;font-weight:700">9 live · 3 dead</span><span class="b b-amber">last now</span></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 10px">
-      <span class="fk" style="margin:0">Live · 8</span>
+      <span class="fk" style="margin:0">Live · 9</span>
       <span class="fk" style="margin:0">Dead · 3</span>
-      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--hair2);border-radius:12px;padding:6px 6px 6px 12px;background:var(--card)"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Healthy</span><span style="font-family:var(--mono);font-size:18px;font-weight:700">6</span><span style="width:44px;height:44px;border-radius:10px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;flex:0 0 auto">+</span></div>
-      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--hair2);border-radius:12px;padding:6px 6px 6px 12px;background:var(--card)"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Stillborn</span><span style="font-family:var(--mono);font-size:18px;font-weight:700">2</span><span style="width:40px;height:40px;border-radius:10px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;flex:0 0 auto">+</span></div>
-      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--hair2);border-radius:12px;padding:6px 6px 6px 12px;background:var(--card)"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Weak</span><span style="font-family:var(--mono);font-size:18px;font-weight:700">1</span><span style="width:40px;height:40px;border-radius:10px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;flex:0 0 auto">+</span></div>
-      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--hair2);border-radius:12px;padding:6px 6px 6px 12px;background:var(--card)"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Mummified</span><span style="font-family:var(--mono);font-size:18px;font-weight:700">1</span><span style="width:40px;height:40px;border-radius:10px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;flex:0 0 auto">+</span></div>
-      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--hair2);border-radius:12px;padding:6px 6px 6px 12px;background:var(--card)"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Deformed</span><span style="font-family:var(--mono);font-size:18px;font-weight:700">1</span><span style="width:40px;height:40px;border-radius:10px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;flex:0 0 auto">+</span></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--red);border-radius:12px;padding:6px 12px;background:var(--card)"><span style="font-size:13px;font-weight:700;color:var(--red)">Died after birth</span><span class="chev" style="color:var(--red)">›</span></div>
+      <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--hair2);border-radius:12px;padding:6px 8px 6px 12px;background:var(--green-wash);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Healthy</span><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--green)">+1</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink)">7</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--hair2);border-radius:12px;padding:6px 8px 6px 12px;background:var(--card);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Stillborn</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink)">2</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--hair2);border-radius:12px;padding:6px 8px 6px 12px;background:var(--card);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Weak</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink)">1</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--hair2);border-radius:12px;padding:6px 8px 6px 12px;background:var(--card);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Mummified</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink)">1</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--hair2);border-radius:12px;padding:6px 8px 6px 12px;background:var(--card);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Deformed</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink)">1</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--red);border-radius:12px;padding:6px 12px;background:var(--card);min-height:52px"><span style="font-size:13px;font-weight:700;color:var(--red)">Died after birth</span><span class="chev" style="color:var(--red)">›</span></div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;padding:11px 2px 2px;border-top:1px solid var(--hair);margin-top:12px"><span style="font-size:13px;font-weight:700;white-space:nowrap">Trail · 8 ›</span><span style="font-family:var(--mono);font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">+1 deformed · 08:56 · G.H</span></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:11px 2px 2px;border-top:1px solid var(--hair);margin-top:12px"><span style="font-size:13px;font-weight:700;white-space:nowrap">Trail · 9 ›</span><span style="font-family:var(--mono);font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">+1 healthy · 09:41 · G.H</span></div>
     <div class="shbar"><button class="cta sec">Save</button><button class="cta" style="flex:1">Finish farrowing</button></div>
-    <div class="aud">every + tallies its class, committed · long-press a cell for − and the stepper · a plain birth at 2am: + on the group label — unclassified, legal</div>
+    <div class="aud">the whole cell is the target — tap anywhere tallies it · the green +1 and wash are this visit · long-press for − and the stepper</div>
   </div>
 </div>
 </div>
 <div style="flex:1;min-width:340px;max-width:520px">
   <h3 style="margin-top:6px">Rules</h3>
   <table class="stab"><thead><tr><th style="width:28%">Rule</th><th>Why</th></tr></thead><tbody>
-    <tr><td>One cell per class</td><td>Healthy · Weak · Deformed under <span class="mono">LIVE · 8</span>, Stillborn · Mummified under <span class="mono">DEAD · 3</span>. Tap <span class="mono">+</span> tallies that class, committed as it lands. Healthy&#39;s <span class="mono">+</span> is the largest — ~85% of taps. Long-press a cell for − and its stepper.</td></tr>
-    <tr><td>Headline derives</td><td><span class="mono">8 live · 3 dead</span> is the column sums plus unclassified tallies — entered nowhere.</td></tr>
-    <tr><td>Unclassified</td><td>A <span class="mono">+</span> on the group label is a plain birth — legal at 2am, refined at cleanup with ✎. The morning batch entry uses the same cells, counts entered in one visit; the trail records one stamped visit and no birth times are pretended.</td></tr>
+    <tr><td>Whole-cell target</td><td>Tap anywhere in the cell — the largest possible glove target. The edge <span class="mono">+</span> is the affordance (V2&#39;s lesson), rendered quiet on the well so no wall of ink forms (V1&#39;s lesson). Long-press opens − and the stepper.</td></tr>
+    <tr><td>The edited state</td><td>A touched cell washes green and carries its per-visit delta (<span class="mono">+1</span>, amber <span class="mono">−1</span> for corrections) beside the count — <span class="mono">7</span> can never masquerade as &quot;was already 7&quot;. Deltas clear when the sheet closes; the trail keeps them forever.</td></tr>
+    <tr><td>Headline derives</td><td><span class="mono">9 live · 3 dead</span> is the column sums plus unclassified tallies — entered nowhere. A live tally also resets the interval chip (<span class="mono">last now</span>).</td></tr>
+    <tr><td>Unclassified</td><td>A <span class="mono">+</span> on the group label is a plain birth — legal at 2am, refined at cleanup with ✎. The morning batch entry uses the same cells in one visit; the trail records one stamped visit, no birth times pretended.</td></tr>
     <tr><td>Died after birth</td><td>The sixth cell routes to the death drawer (09b) — the ledger, never these counters. − stays a miscount correction.</td></tr>
-    <tr><td>Sub-actions one tap away</td><td>The trail collapses to its latest stamped line + <span class="mono">Trail · 8 ›</span>; the full receipt, every line ✎, sits behind it.</td></tr>
-    <tr><td>Save vs Finish</td><td>Save closes the sheet and keeps her Active — the checkpoint the hand expects; every tap already committed, so Save gates nothing. Finish farrowing crosses her to Done (motion B).</td></tr>
-    <tr><td>Both models</td><td>Attended: the sheet is the interval tracker — <span class="mono">last 45m</span> runs off asserted times only. Unattended free farrow: the hand returns, opens the same sheet, and enters the litter cell by cell in one visit.</td></tr>
+    <tr><td>Sub-actions one tap away</td><td>The trail collapses to its latest stamped line + <span class="mono">Trail · 9 ›</span>; the full receipt, every line ✎, sits behind it.</td></tr>
+    <tr><td>Save vs Finish</td><td>Save closes the sheet and keeps her Active — every tap already committed, so Save gates nothing. Finish farrowing crosses her to Done (motion B).</td></tr>
+    <tr><td>Both models</td><td>Attended: the sheet is the interval tracker — <span class="mono">last now</span> runs off asserted tallies only. Unattended free farrow: the hand returns and enters the litter cell by cell in one visit.</td></tr>
   </tbody></table>
 </div>
 </div>
 
 <!-- ============ 09b death ============ -->
-<h2>09b · Piglet death — one tap, dated in words</h2>
-<p style="max-width:76ch">Not all piglets make it. While the litter is anywhere in the product — session, piglet care, check-in — <span class="mono">Piglet died…</span> opens the same drawer. The common case is one piglet, found this morning: the drawer opens ready and <span class="mono">Record</span> is the only required tap. When causes mix, the cause chips carry counts — the same per-class grammar as the session sheet — without a single stepper appearing for the one-piglet case. The census ticks; that is the receipt (motion C).</p>
+<h2>09b · Piglet death — the causes are the counter</h2>
+<p style="max-width:80ch">Not all piglets make it, and the drawer must cost almost nothing. So the cause cells <b>are</b> the entry: each tap is one death of that cause, the count derives, and <span class="mono">Record 3 died</span> writes once. Three crushed overnight = three taps and Record — four touches total. An uncaused death is a tap on <span class="mono">Unknown</span>, a cause like any other. Same drawer everywhere: in the task while it is open, in check-in after.</p>
 <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
 <div>
-<div class="vlabel">The death drawer · mixed causes carry counts</div>
+<div class="vlabel">The death drawer · cause-led</div>
 <div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--well)">
       <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
       <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Check-in</div></div></div>
       <div style="flex:1"></div>
       <div class="fs">
-        <div class="grab"></div>
-        <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">litter · day 6 · 8 live</span></div>
-        <div class="ctr"><span class="lbl">Died</span><span class="b">−</span><span class="n">3</span><span class="b plus">+</span></div>
-        <div class="flbl">When</div>
-        <div style="display:flex;gap:8px;padding:6px 0 2px"><span class="pchip cur">Today</span><span class="pchip">Yesterday</span><span class="pchip">Not sure</span></div>
-        <div class="flbl">Cause · optional — tap tallies one</div>
-        <div style="display:flex;gap:8px;padding:6px 0 2px;flex-wrap:wrap"><span class="pchip cur">Crushed <span class="c">·2</span></span><span class="pchip cur">Scours <span class="c">·1</span></span><span class="pchip">Starve-out</span><span class="pchip">Other</span></div>
-        <div class="shbar"><button class="cta" style="flex:1">Record 3 died</button></div>
-        <div class="aud">opens at died 1 · today — the one-piglet case is a single tap on record</div>
-      </div>
+    <div class="grab"></div>
+    <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">litter · day 6 · 8 live</span></div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;padding:10px 2px 10px"><span class="fk" style="margin:0">Cause — each tap is one death</span><span style="font-size:12px;font-weight:700;color:var(--ink2)">Other cause ›</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 10px">
+      <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--hair2);border-radius:12px;padding:6px 8px 6px 12px;background:var(--card);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Crushed</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink)">2</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--hair2);border-radius:12px;padding:6px 8px 6px 12px;background:var(--card);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Scours</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink)">1</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--hair2);border-radius:12px;padding:6px 8px 6px 12px;background:var(--card);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Starve-out</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink3)">0</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
+      <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--hair2);border-radius:12px;padding:6px 8px 6px 12px;background:var(--card);min-height:52px"><span style="font-size:13px;font-weight:600;flex:1;min-width:0">Unknown</span><span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink3)">0</span><span style="width:30px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:var(--well);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex:0 0 auto">+</span></div>
     </div>
+    <div class="flbl">When</div>
+    <div style="display:flex;gap:8px;padding:8px 0 2px"><span class="pchip cur">Today</span><span class="pchip">Yesterday</span><span class="pchip">Not sure</span></div>
+    <div class="shbar"><button class="cta" style="flex:1">Record 3 died</button></div>
+    <div class="aud">the count derives from the cause taps — 3 crushed is 3 taps and Record · when defaults today · not sure carries the span since the last count</div>
+  </div>
+</div>
 </div>
 <div style="flex:1;min-width:340px;max-width:520px">
   <h3 style="margin-top:6px">Rules</h3>
-  <table class="stab"><thead><tr><th style="width:30%">Rule</th><th>Why</th></tr></thead><tbody>
-    <tr><td>Opens ready</td><td>The drawer opens at <span class="mono">Died 1 · Today</span>. The common case — one piglet — is <span class="mono">Record</span>, one tap; a cause is one more, optional. The stepper and the chips only earn attention when the loss is bigger than one.</td></tr>
-    <tr><td>Causes tally</td><td>A cause chip is a tally, not a single-select: each tap assigns one death to it and the chip carries its count (<span class="mono">Crushed ·2</span>). The chips can lead the counter — tapping <span class="mono">Crushed ×2, Scours ×1</span> reads <span class="mono">Died 3</span> without touching the stepper. Long-press a chip opens its count stepper — the same correction grammar as treatment tokens (09c). No wall of steppers exists; counts appear only on the chips that hold them.</td></tr>
-    <tr><td>Cause optional</td><td>Doors, never gates. Any remainder the chips do not cover stays plain <span class="mono">dead</span> — legal, complete, refined later with ✎. Three uncaused deaths at 2am are three taps on <span class="mono">+</span>.</td></tr>
-    <tr><td>Words, not pickers</td><td><span class="mono">Today</span> is the default, <span class="mono">Yesterday</span> one tap, <span class="mono">Not sure</span> silently records the honest interval since the last count. The data keeps the span; analytics buckets it; display prints words — <span class="mono">died between jul 12 and today</span> — the hand never sees a picker.</td></tr>
-    <tr><td>One commit</td><td>Unlike the session&#39;s per-tap ledger, this drawer is a judgment: <span class="mono">Record</span> writes once — count, date words, cause split — one stamped ledger event. Until then the drawer is scratch; closing it loses an entry no one made.</td></tr>
-    <tr><td>Named piglets</td><td>A tagged piglet is never subtracted namelessly — if the litter has identity rows and the count exceeds the untagged remainder, the drawer becomes a roster naming which.</td></tr>
-    <tr><td>Where · receipt</td><td>Task open → in the task. Task closed → in check-in. Same drawer, same record. The census ticks on the litter row and the pen header (motion C); the trail reads <span class="mono">3 died · crushed 2 · scours 1 · today · G.H</span>, ✎ forever.</td></tr>
+  <table class="stab"><thead><tr><th style="width:28%">Rule</th><th>Why</th></tr></thead><tbody>
+    <tr><td>Cause-led</td><td>There is no Died stepper to feed first — tapping <span class="mono">Crushed</span> twice and <span class="mono">Scours</span> once reads <span class="mono">Record 3 died</span> with no other touch. Long-press a cell for − and its stepper. Whole-cell targets, per-visit deltas, same grammar as the session sheet (09a).</td></tr>
+    <tr><td>Four causes cover the tail that matters</td><td>Crushing is typically half or more of pre-weaning deaths; scours and starve-out the next block; <span class="mono">Unknown</span> is honest and legal. Those four are one tap and cover ~95% of records. <span class="mono">Other cause ›</span> opens the farm&#39;s configured list (savaged, splay-leg …) for the rest — two taps, never a wall of tiles.</td></tr>
+    <tr><td>When — kept because it is free</td><td><span class="mono">Today</span> is the default and costs zero taps; <span class="mono">Yesterday</span> one; <span class="mono">Not sure</span> silently records the span since the last count. It stays because day-of-death is real analytics: crushing clusters in days 1–3, and a shift in that curve flags a crate or supervision problem. Words, never a date picker.</td></tr>
+    <tr><td>One commit</td><td><span class="mono">Record 3 died</span> writes once — count, causes, date words — one stamped ledger event. Until then the drawer is scratch; the census ticks on Record (motion C) and the trail reads <span class="mono">3 died · crushed 2 · scours 1 · today · G.H</span>, ✎ forever.</td></tr>
+    <tr><td>Named piglets</td><td>A tagged piglet is never subtracted namelessly — if the count exceeds the untagged remainder, the drawer becomes a roster naming which.</td></tr>
   </tbody></table>
 </div>
 </div>

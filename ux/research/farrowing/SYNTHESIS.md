@@ -258,3 +258,22 @@ twice offline), where the later stamp standing is the correct outcome anyway.
    explicit "done here for now" checkpoint the hand expects mid-farrowing. Finish farrowing
    remains the litter-closing act. Every entry still commits per tap; Save gates nothing.
 5. **The session sheet ruled below standard** — rebuilt in a per-frame optimization round.
+
+---
+
+## 9 · Owner review of the drawers (2026-08-27, round three)
+
+1. **Whole-cell targets, no ink slabs.** The class cells are the tap targets themselves;
+   a quiet edge + names the gesture. Filled buttons survive only as the small standard
+   stepper squares nothing else on the sheet competes with.
+2. **The edited state.** A cell touched this visit washes green and carries its per-visit
+   delta (+1 / amber −1) beside the count, so a 7 can never masquerade as "was already 7".
+   Deltas clear when the sheet closes; the trail keeps them.
+3. **The death drawer is cause-led.** No Died stepper to feed: each tap on a cause cell
+   IS one death, the count derives, Record N died writes once — 3 crushed = 4 touches.
+   Causes: Crushed · Scours · Starve-out · Unknown cover ~95% of pre-weaning mortality
+   records at one tap (crushing alone is typically half or more); Other › opens the farm's
+   configured list for the tail. Unknown is a cause, not a failure.
+4. **When stays because it is free.** Today default costs zero taps; day-of-death is real
+   analytics (crushing clusters in days 1–3; a shift in the curve flags crate or
+   supervision problems). Words, never a picker.
