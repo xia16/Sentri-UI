@@ -8,6 +8,7 @@
 | [check-in.html](system/check-in.html) | The check-in: pen cards, batch cards, feed, triage, pen sheet, unit sheet |
 | [workflows.html](system/workflows.html) | **The review deck** — 23 workflows end to end; pick a chip, swipe inside |
 | [motion.html](system/motion.html) | Mark-to-move motion spec, with the front-end implementation contract |
+| [farrowing.html](system/farrowing.html) | The farrowing suite: room, session sheet, piglet death, day-cohort, tag/weigh conveyor, count doors, batch close |
 
 ## model/ — the product model
 | File | What it is |

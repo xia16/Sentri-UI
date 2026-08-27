@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentri — Farrowing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* synthesized VI — Panel structure · Ledger temperature · Board discipline */
+    --ground:#F7F6F2;          /* one-step-warm neutral, never clinical */
+    --card:#FFFFFF;
+    --well:#EFEEE8;            /* recessed surfaces */
+    --ink:#1C1E19;
+    --ink2:#51544B;
+    --ink3:#8B8E83;
+    --hair:#E7E6DF;
+    --hair2:#D8D7CE;
+    /* status — the only color allowed on a screen */
+    --red:#C2402E;      --red-wash:#F9EAE7;
+    --amber:#96660D;    --amber-fill:#D99A21; --amber-wash:#F8F0DC;
+    --blue:#3E56C4;     --blue-wash:#EBEFF9;
+    --green:#3B8A50;    --green-wash:#EAF2EC;
+    --gray:#7C7F76;     --gray-wash:#F0F0EB;
+    --sans:'Plus Jakarta Sans',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 48px}
+  .mono{font-family:var(--mono)}
+  .anno{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3)}
+
+  header.page{display:flex;justify-content:space-between;padding:26px 0;border-bottom:1px solid var(--hair2)}
+  h1{font-size:44px;font-weight:800;letter-spacing:-.015em;line-height:1.1;margin:64px 0 20px}
+  .lede{font-size:17px;color:var(--ink2);max-width:64ch;margin-bottom:40px}
+  .tokens{display:flex;gap:24px;align-items:center;padding:18px 0 56px;flex-wrap:wrap}
+  .sw{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--ink2)}
+  .sw i{width:22px;height:22px;border-radius:5px;display:inline-block;border:1px solid rgba(0,0,0,.06)}
+
+  section.screen{display:grid;grid-template-columns:430px 1fr;gap:64px;padding:64px 0;border-top:1px solid var(--ink)}
+  .sec-label{grid-column:1/-1;display:flex;justify-content:space-between;margin-bottom:8px}
+  h2{font-size:24px;font-weight:800}
+  .notes{padding-top:8px}
+  .note{padding:14px 0;border-top:1px solid var(--hair)}
+  .note:first-child{border-top:none}
+  .note b{display:block;font-size:15px;margin-bottom:3px}
+  .note p{font-size:13.5px;color:var(--ink2);max-width:52ch}
+  .note .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--ink3);text-transform:uppercase}
+
+  /* ============ phone ============ */
+  .phone{width:390px;background:var(--ground);border:1px solid var(--hair2);border-radius:34px;overflow:hidden;box-shadow:0 8px 32px rgba(28,30,25,.10);position:relative}
+  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:12px 22px 6px;font-family:var(--mono);font-size:12px;font-weight:600}
+  .appbar{display:flex;align-items:center;gap:12px;padding:10px 16px 12px}
+  .appbar .back{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--ink)}
+  .appbar .ttl{font-size:17px;font-weight:700}
+  .appbar .sub{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .appbar>div:nth-child(2){min-width:0;flex:1}
+  .appbar .det{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--ink2);border:1px solid var(--hair2);border-radius:9px;padding:8px 12px}
+
+  /* legacy card styles (unused by base screens) */
+  .round{margin:2px 16px 12px;background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:14px 16px}
+  .round .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .round .big{font-family:var(--mono);font-weight:700;font-size:26px;letter-spacing:-.01em}
+  .round .big small{font-size:13px;font-weight:500;color:var(--ink3);letter-spacing:0}
+  .gauge{display:flex;gap:2.5px;margin:10px 0 8px}
+  .gauge i{height:7px;flex:1;border-radius:2px;background:var(--well)}
+  .gauge i.f-green{background:var(--green)}
+  .gauge i.f-blue{background:var(--blue)}
+  .round .att{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+
+  /* state lens */
+  .lensrow{display:flex;align-items:center;gap:8px;margin:8px 12px 10px}
+  .lensrow .lens{flex:1;margin:0}
+  .lensfil{flex:0 0 auto;width:44px;height:44px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--ink);position:relative}
+  .lensfil.on{border-color:var(--ink);color:var(--ink)}
+  .lensfil .fc{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .lens{display:flex;background:var(--well);border-radius:11px;padding:3px;margin:8px 16px 10px}
+  .lens button{flex:0 1 auto;min-width:0;border:0;background:transparent;font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink2);padding:9px 12px;border-radius:9px;display:flex;gap:5px;justify-content:center;align-items:center;white-space:nowrap}
+  .lens{justify-content:space-between}
+  .lens button .n{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink3)}
+  .lens button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(28,30,25,.08)}
+  .lens button.on .n{color:var(--ink2)}
+
+  /* pen strip */
+  .penstrip{display:flex;gap:6px;padding:2px 16px 12px;align-items:center;overflow:hidden}
+  .pchip{flex:0 0 auto;height:40px;min-width:56px;padding:0 10px;border-radius:9px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;gap:5px;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink2)}
+  .pchip .c{color:var(--ink);font-weight:700}
+  .pchip.cur{background:var(--ink);border-color:var(--ink);color:#fff}
+  .pchip.cur .c{color:#fff}
+  .pchip.clear{color:var(--ink3)}
+  .pchip .dot{width:6px;height:6px;border-radius:2px;background:var(--amber-fill)}
+  .pchip .ok{color:var(--green);font-size:11px}
+  .pgrid{flex:0 0 auto;width:40px;height:40px;border-radius:9px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:15px}
+
+  /* list */
+  .list{background:transparent;border-top:none;padding:8px 12px 14px;display:flex;flex-direction:column;gap:10px}
+  .pen{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--card)}
+  .pen .code{font-family:var(--mono);font-size:12px;font-weight:700;background:var(--well);border-radius:8px;padding:4px 9px}
+  .pen .agg{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+  .pen .agg.ok{color:var(--green)}
+  .pen input{width:18px;height:18px;accent-color:var(--ink)}
+  .row{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 16px;border-top:1px solid var(--hair)}
+  .row:first-of-type{border-top:none}
+  .row .cb{width:22px;height:22px;border:1.5px solid var(--hair2);border-radius:6px;flex:0 0 auto}
+  .row .cb.on{background:var(--ink);border-color:var(--ink);position:relative}
+  .row .cb.on::after{content:"✓";color:#fff;font-size:13px;position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .row .tag{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.02em;flex:0 0 62px}
+  .row .st{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+  .row .st .l1{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:6px}
+  .row .st .l2{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .rail{margin-left:auto;text-align:right;flex:0 0 auto;display:flex;align-items:center;gap:10px}
+  .row .word{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+  .row .chev{color:var(--hair2);font-size:16px}
+  .row .tw{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.02em;color:var(--ink);border:1px solid var(--hair2);border-radius:7px;padding:6px 8px;white-space:nowrap}
+  .row .tw.done{color:var(--ink3);border-color:var(--hair)}
+  .row.dim .l1{color:var(--ink2);font-weight:500}
+  .row.done{background:var(--card)}
+  .s-red{color:var(--red)} .s-amber{color:var(--amber)} .s-blue{color:var(--ink2)} .s-green{color:var(--green)} .s-gray{color:var(--gray)}
+  .b{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.06em;padding:2.5px 7px;border-radius:5px;text-transform:uppercase}
+  .b-amber{background:var(--amber-wash);color:var(--amber)}
+  .b-red{background:var(--red-wash);color:var(--red)}
+  .b-gray{background:var(--gray-wash);color:var(--gray)}
+  .edit{width:34px;height:34px;border:1px solid var(--hair);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:13px}
+
+  /* bottom bars */
+  .bar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--hair);padding:12px 16px 22px;display:flex;gap:10px;align-items:center}
+  .cta{flex:1;height:54px;border-radius:12px;background:var(--ink);color:#fff;font-family:var(--sans);font-size:15.5px;font-weight:700;border:0;display:flex;align-items:center;justify-content:center}
+  .cta.sec{background:var(--card);color:var(--ink);border:1.5px solid var(--ink);flex:0 0 auto;padding:0 20px}
+  .selinfo{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;white-space:nowrap}
+  .selinfo .x{width:30px;height:30px;border-radius:8px;border:1px solid var(--hair2);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:13px}
+  .barnote{position:absolute;left:0;right:0;bottom:100%;padding:8px 16px;background:transparent}
+
+  .divider-note{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);padding:8px 16px;background:var(--ground)}
+
+  /* screen variations (branch sections — base screens above stay untouched) */
+  .vlabel{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin:26px 0 10px}
+  .hd2{background:var(--ground);border-bottom:1px solid var(--hair)}
+  .readout{display:flex;align-items:flex-end;gap:20px;padding:6px 18px 18px}
+  .readout .m .n{font-family:var(--mono);font-weight:700;font-size:34px;line-height:.95;letter-spacing:-.02em;color:var(--ink)}
+  .readout .m .l{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--ink3);margin-top:7px;text-transform:uppercase}
+  .readout .vr{width:1px;align-self:stretch;background:var(--hair2)}
+  .readout .ctx{margin-left:auto;text-align:right}
+  .readout .ctx .a{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;line-height:1.7}
+  .readout .endr{display:inline-block;margin-top:7px;font-size:12px;font-weight:700;color:var(--ink2);border:1px solid var(--hair2);border-radius:8px;padding:5px 10px;white-space:nowrap}
+  /* bottom bar · NAV state (dock) */
+  .dock{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--hair);padding:10px 16px 18px}
+  .row.scanned{background:var(--green-wash)}
+  .row .scanb{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--green);text-transform:uppercase}
+  .dock .penstrip{padding:0 0 8px}
+  .dockrow{display:flex;align-items:center;gap:8px}
+  .dockrow .tool{flex:0 0 auto}
+  .dockrow .penstrip{flex:1;min-width:0;padding:0;overflow:hidden;mask-image:linear-gradient(90deg,#000 88%,transparent)}
+
+  .tool{width:48px;height:48px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--ink)}
+  .tool.scan{background:var(--ink);border-color:var(--ink);color:#fff}
+  .pchip{height:48px}
+  .dh{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  /* unit block */
+  .unit{padding:12px 16px 4px;border-top:1px solid var(--hair);margin-top:2px}
+  .unit .un{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.1}
+  .unit .ul{font-size:12px;color:var(--ink3);margin-top:3px}
+  .unit .ul b{color:var(--ink2);font-weight:600}
+  /* task-level context strip — display only */
+  .taskctx{display:flex;align-items:center;gap:12px;margin:0 16px 12px;padding:9px 12px;background:var(--well);border-radius:10px}
+  .taskctx .tl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);flex:0 0 auto}
+  .taskctx .tc{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);white-space:nowrap}
+  .taskctx .tc b{color:var(--ink);font-weight:700}
+  .taskctx .tcv{color:var(--ink3);font-size:15px;line-height:1;margin-left:2px}
+
+  /* header variations 01-H */
+  .hA .capsule{margin:0 16px 8px;height:30px;border-radius:15px;background:var(--well);display:flex;align-items:center;gap:10px;padding:0 12px 0 14px}
+  .hA .capsule .gauge{margin:0;flex:1}
+  .hA .capsule .gauge i{height:5px}
+  .hA .capsule .t{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink2);white-space:nowrap}
+  .hA .capsule .t b{color:var(--ink)}
+  .hA .big{padding:2px 16px 0}
+  .hA .big .u{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  .hA .big .tsk{font-size:13px;color:var(--ink2);margin-top:4px}
+  .hA .big .tsk b{color:var(--ink);font-weight:700}
+  .hB .unitsel{margin:4px 16px 8px;height:52px;border:1px solid var(--hair2);border-radius:12px;background:var(--card);display:flex;align-items:center;padding:0 12px 0 14px;gap:10px}
+  .hB .unitsel .u{font-size:17px;font-weight:800;letter-spacing:-.01em}
+  .hB .unitsel .m{font-size:12px;color:var(--ink3);margin-left:2px}
+  .hB .unitsel .dd{margin-left:auto;font-size:14px;color:var(--ink2)}
+  .hB .tline{display:flex;align-items:center;gap:10px;margin:0 16px 8px;padding:0 2px}
+  .hB .tline .gauge{margin:0;flex:1}
+  .hB .tline .gauge i{height:5px}
+  .hB .tline .t{font-family:var(--mono);font-size:10.5px;color:var(--ink2);white-space:nowrap}
+  .hB .tline .t b{color:var(--ink)}
+  .ttl2{padding:0 16px}
+  .ttl2 .u{font-size:22px;font-weight:800;letter-spacing:-.015em}
+  .ttl2 .u span{color:var(--ink3);font-weight:600}
+  .ctxbar{margin:12px 12px 8px;border:1px solid var(--hair);border-radius:12px;background:var(--card);display:grid;grid-template-columns:1fr 1fr}
+  .ctxbar>div{padding:11px 14px 12px;display:grid;grid-template-rows:auto auto auto;row-gap:6px;align-content:start}
+  .ctxbar .numwrap{display:flex;flex-direction:column;gap:5px}
+  .ctxbar>div+div{border-left:1px solid var(--hair)}
+  .ctxbar .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .ctxbar .num{display:flex;align-items:baseline;gap:4px;line-height:1}
+  .ctxbar .num b{font-family:var(--mono);font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+  .ctxbar .num span{font-family:var(--mono);font-size:12px;color:var(--ink2);white-space:nowrap}
+  .ctxbar .sub{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink3);align-self:end}
+  .ctxbar .gauge{margin:0}
+  .ctxbar .kspace{height:7px}
+  .ctxbar .num.under b{color:var(--amber)}
+  .ctxbar .gauge i{height:5px}
+  /* go-to-pen chip (dock idle state) */
+  .goto{flex:0 0 auto;height:48px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);color:var(--ink);display:flex;align-items:center;gap:7px;padding:0 12px}
+  .goto .gi{font-size:17px;line-height:1}
+  .goto .gp{font-family:var(--mono);font-size:12.5px;font-weight:700}
+  .scanbtn{flex:1;min-width:0;height:48px;border-radius:11px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;gap:9px;font-size:14.5px;font-weight:700}
+  .scanbtn .si{font-size:17px;line-height:1}
+  .narrow{flex:0 0 auto;display:flex;gap:6px}
+  .tool.fil{position:relative}
+  .tool.fil .fc{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .filline{display:flex;align-items:center;gap:6px;padding:0 18px 10px;font-size:12px;color:var(--ink3)}
+  .filline b{color:var(--ink2);font-weight:600}
+  .filline .clr{margin-left:auto;font-weight:700;color:var(--ink);font-size:12px}
+  .filbar{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--well);border-top:1px solid var(--hair);font-size:12.5px;color:var(--ink2)}
+  .filbar .fk{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .filbar .fchip{background:var(--card);border:1px solid var(--hair2);border-radius:7px;padding:3px 8px;font-weight:600;color:var(--ink)}
+  .filbar .fx{margin-left:auto;font-weight:700;color:var(--ink2)}
+  /* pen selector (dock idle state) */
+  .pensel{flex:1;min-width:0;display:flex;align-items:center;gap:6px}
+  .pensel .arr{width:48px;height:48px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--ink);flex:0 0 auto}
+  .pensel .cur{flex:1;min-width:0;height:48px;border-radius:11px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 10px}
+  .pensel .cur .pc{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:.04em;white-space:nowrap;flex:0 0 auto}
+  .pensel .cur .pl{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .pensel .cur .dd{margin-left:auto;color:rgba(255,255,255,.7);font-size:12px;flex:0 0 auto}
+  /* pen picker sheet */
+  .pk{background:var(--card);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid var(--hair);padding:0 16px 20px}
+  .pk .seg{display:flex;background:var(--well);border-radius:12px;padding:3px;margin:8px 0 14px}
+  .pk .seg span{flex:1;height:48px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--ink2);border-radius:10px}
+  .pk .seg span.on{background:var(--ink);color:#fff}
+  .pk .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .pk .cell{height:58px;border-radius:12px;border:1px solid var(--hair2);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .pk .cell .pc{font-family:var(--mono);font-size:14px;font-weight:700}
+  .pk .cell .n{font-family:var(--mono);font-size:10.5px;color:var(--ink2)}
+  .pk .cell.clear{color:var(--ink3)} .pk .cell.clear .n{color:var(--green)}
+  .pk .cell.cur{background:var(--ink);border-color:var(--ink);color:#fff} .pk .cell.cur .n{color:rgba(255,255,255,.7)}
+  .pk .cell{position:relative}
+  .pk .cell.sig::after{content:"";position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:2px;background:var(--amber-fill)}
+  /* grid variations carousel */
+  .caro{display:flex;gap:24px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 4px 18px;-webkit-overflow-scrolling:touch}
+  .caro::-webkit-scrollbar{height:6px} .caro::-webkit-scrollbar-thumb{background:var(--hair2);border-radius:3px}
+  .slide{flex:0 0 auto;width:390px;scroll-snap-align:start}
+  .slide .vlabel{margin:0 0 10px}
+  .slide .why{font-size:12.5px;color:var(--ink2);margin-top:12px;max-width:390px;line-height:1.5}
+  .slide .why b{color:var(--ink)}
+  .caro-hint{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:-4px 0 12px}
+  .pg{display:grid;grid-template-columns:28px repeat(4,1fr);gap:8px;align-items:stretch}
+  .pg .col{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink3);text-align:center;padding-bottom:2px}
+  .pg .rown{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink3);display:flex;align-items:center;justify-content:center}
+  .pg .cell{min-height:64px;border-radius:12px;border:1px solid var(--hair2);background:var(--card);padding:8px 7px 7px;min-width:0;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+  .pg .cell .pc{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.02em}
+  .pg .cell .n{font-family:var(--mono);font-size:10.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+  .pg.tall .cell{min-height:78px;justify-content:flex-start;gap:3px}
+  .pg.tall .cell .n{overflow:visible}
+  .pg.tall .cell .tag{margin-top:auto}
+  .pg .cell .n.g{color:var(--green)} .pg .cell .n.a{color:var(--amber)} .pg .cell .n.b{color:var(--blue)} .pg .cell .n.r{color:var(--red)}
+  .pg .cell.clear .pc{color:var(--ink3)}
+  .pg .cell.cur{background:var(--ink);border-color:var(--ink)} .pg .cell.cur .pc,.pg .cell.cur .n,.pg .cell.cur .tag{color:#fff}
+  .pg .cell.empty{border-style:dashed;background:transparent} .pg .cell.empty .pc,.pg .cell.empty .n{color:var(--hair2)}
+  .pg .cell .dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:2px}
+  .pg .cell .dot.a{background:var(--amber-fill)} .pg .cell .dot.r{background:var(--red)} .pg .cell .dot.g{background:var(--green)} .pg .cell .dot.b{background:var(--blue)}
+  .pg .cell.tint-a{background:var(--amber-wash);border-color:#E9D9B0} .pg .cell.tint-r{background:var(--red-wash);border-color:#EBC5BE} .pg .cell.tint-b{background:var(--blue-wash);border-color:#C9D2EF}
+  .pg .cell .bar{height:4px;border-radius:2px;background:var(--well);overflow:hidden;margin-top:4px}
+  .pg .cell .bar i{display:block;height:100%;background:var(--green)}
+  .pg .cell.cur .bar{background:rgba(255,255,255,.2)} .pg .cell.cur .bar i{background:#fff}
+  .pg .cell .tag{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.02em}
+  .legend2{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);text-align:center;padding-top:12px}
+  /* unified pen picker — chip cell */
+  .upk{display:grid;grid-template-columns:22px repeat(4,1fr);gap:8px 8px;overflow-x:auto}
+  .upk .col{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink3);text-align:center;padding-bottom:4px;letter-spacing:.06em}
+  .upk .rown{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink3);display:flex;align-items:center;justify-content:center}
+  .uc{height:68px;border-radius:12px;border:1px solid var(--hair);background:var(--card);position:relative;min-width:0;padding:10px 8px 9px 10px;display:flex;flex-direction:column;justify-content:space-between}
+  .uc .pc{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.02em;color:var(--ink);line-height:1;display:flex;align-items:center;justify-content:space-between}
+  .uc .pc .tick{color:var(--green);font-size:12px;font-weight:800}
+  .uc.cur{border-color:var(--ink);border-width:1.5px}
+  .uc.dim{background:var(--well);border-color:var(--hair)} .uc.dim .pc{color:var(--ink3)}
+  .uc.empty{border-style:dashed;background:transparent} .uc.empty .pc{color:var(--hair2)}
+  .uc .ch{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 6px;border-radius:5px;line-height:1.2;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .uc .ch .x{flex:0 0 auto}
+  .uc .ch.ca{background:var(--amber-wash);color:var(--amber)}
+  .uc .ch.cr{background:var(--red-wash);color:var(--red)}
+  .uc .ch.cn{background:var(--well);color:var(--ink2)}
+  .uc .ch.cgr{background:var(--green-wash);color:var(--green)}
+  .uc .ch.cg{background:var(--gray-wash);color:var(--ink3)}
+  .uc .ch .x{font-weight:600;opacity:.9}
+  .uc .qt{font-family:var(--mono);font-size:10px;color:var(--ink3);line-height:1;letter-spacing:-.01em;white-space:nowrap;overflow:visible;width:100%;display:block}
+  .uc .wd,.uc .ln,.uc .ct,.uc .mk,.uc .ok,.uc .qm{display:none}
+  .pk.tall{max-height:75%}
+  /* row anatomy */
+  .rowdemo{position:relative;width:430px;margin:34px auto 44px}
+  .rowdemo .row{border:1.5px solid var(--hair2);border-radius:14px;background:var(--card)}
+  .rowdemo .lbl{position:absolute;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);white-space:nowrap}
+  /* peek popover */
+  .peek{position:absolute;left:16px;right:16px;bottom:118px;background:var(--card);border:1px solid var(--hair2);border-radius:14px;box-shadow:0 12px 32px rgba(28,30,25,.16);padding:14px 16px 12px;z-index:3}
+  .peek::after{content:"";position:absolute;left:50%;bottom:-7px;width:12px;height:12px;background:var(--card);border-right:1px solid var(--hair2);border-bottom:1px solid var(--hair2);transform:translateX(-50%) rotate(45deg)}
+  .peek .ph{display:flex;align-items:baseline;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--hair)}
+  .peek .ph .pc{font-family:var(--mono);font-size:13px;font-weight:700}
+  .peek .ph .ps{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+  .peek .grp{padding:11px 0;border-top:1px solid var(--hair)}
+  .peek .ph + .grp{border-top:none}
+  .peek .ph + .pr{padding-top:11px}
+  .peek .pr{display:flex;align-items:center;gap:10px;font-size:12.5px;min-height:20px}
+  .peek .pr + .pr{border-top:1px solid var(--hair);padding-top:11px;margin-top:11px}
+  .peek .pr .tag{font-family:var(--mono);font-size:12px;font-weight:600;flex:0 0 58px}
+  .peek .pr .st{flex:1;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .peek .pr .st.dim{color:var(--ink3)}
+  .peek .pr .ch{display:inline-flex;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px}
+  .peek .pr .ch.ca{background:var(--amber-wash);color:var(--amber)} .peek .pr .ch.cr{background:var(--red-wash);color:var(--red)} .peek .pr .ch.cgr{background:var(--green-wash);color:var(--green)}
+  .peek .pr .ok{color:var(--green);font-weight:800;font-size:12px}
+  .peek .pr .word{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;flex:0 0 auto}
+  .peek .pf{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);text-align:center;padding-top:12px;margin-top:11px;border-top:1px solid var(--hair)}
+  .peek .trt{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em;padding:6px 0 0 68px}
+  .peek .trt span{font-family:var(--mono);font-size:10px;letter-spacing:.02em;padding:3px 8px;border-radius:5px;border:1px solid var(--hair2);color:var(--ink3)}
+  .peek .trt span.due{background:var(--amber-wash);border-color:transparent;color:var(--amber);font-weight:600}
+  .uc.pressed{border-color:var(--ink);background:var(--well)}
+  /* anatomy / status table */
+  .anat{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+  .anat .big{width:200px;height:120px;border-radius:18px;border:1.5px solid var(--hair2);background:var(--card);position:relative;margin:30px auto 40px;left:0}
+  .anat .big .pc{position:absolute;left:18px;top:14px;font-family:var(--mono);font-size:22px;font-weight:700}
+  .anat .big .mk{position:absolute;right:18px;top:18px;width:16px;height:16px;border-radius:4px;background:var(--amber-fill)}
+  .anat .big .ct{position:absolute;right:18px;bottom:12px;font-family:var(--mono);font-size:26px;font-weight:700;line-height:1}
+  .anat .lbl{position:absolute;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+  .stab{width:100%;border-collapse:collapse;font-size:13px}
+  .stab th,.stab td{padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top;text-align:left}
+  .stab thead th{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+  .stab td:first-child{font-weight:700;white-space:nowrap}
+  .stab .sw{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:6px}
+  .stab .sw.r{background:var(--red)} .stab .sw.a{background:var(--amber-fill)} .stab .sw.b{background:var(--blue)}
+  .stab .ok{color:var(--green);font-weight:800;margin-right:4px}
+  .stab .em{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--well);border:1px solid var(--hair);vertical-align:-1px;margin-right:6px}
+  .stab .mono{font-size:12px}
+  /* task detail sheet */
+  .sheet{background:var(--card);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid var(--hair);flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .grab{width:36px;height:4px;border-radius:2px;background:var(--hair2);margin:10px auto 6px}
+  .sh{display:flex;align-items:baseline;justify-content:space-between;padding:6px 20px 14px}
+  .sh .t{font-size:17px;font-weight:700}
+  .sh .x{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);white-space:nowrap;flex:0 0 auto;margin-left:12px}
+  .sh .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sec{padding:12px 20px 14px;border-top:1px solid var(--hair)}
+  .sec .k{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:block}
+  .kv{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;font-size:13.5px}
+  .kv .v{font-family:var(--mono);font-size:12.5px;color:var(--ink);font-weight:600}
+  .kv .lbl{color:var(--ink2)}
+  .kpi{display:flex;align-items:baseline;gap:8px}
+  .kpi .n{font-family:var(--mono);font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1}
+  .kpi .u{font-size:13px;color:var(--ink2)}
+  .kpi .tgt{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink3);text-transform:uppercase}
+  .legend{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px}
+  .legend .sq{width:8px;height:8px;border-radius:2px;flex:0 0 auto}
+  .legend .w{font-weight:600;flex:0 0 130px}
+  .legend .d{color:var(--ink2);font-size:12.5px}
+  .rowlink{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--hair);font-size:14px;font-weight:600}
+  .rowlink .chev{color:var(--hair2)}
+  .endtask{margin:auto 16px 20px;height:52px;border-radius:12px;border:1.5px solid var(--red);color:var(--red);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;background:var(--card)}
+  /* record sheet — shell anatomy + field kit */
+  .shelldemo{position:relative;width:390px;margin:44px auto 56px}
+  .shelldemo .sheetbox{background:var(--card);border:1.5px solid var(--hair2);border-radius:18px;padding:10px 16px 16px}
+  .shelldemo .grab{width:36px;height:4px;border-radius:2px;background:var(--hair2);margin:2px auto 10px}
+  .shelldemo .fake{height:14px;border-radius:4px;background:var(--well);margin:10px 0}
+  .shelldemo .fake.s{width:60%}
+  .shelldemo .lbl{position:absolute;width:150px;text-align:right;left:-166px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);line-height:1.4}
+  .kit{display:grid;grid-template-columns:1fr 1fr;gap:24px 32px;margin:18px 0 8px}
+  .kitcard{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:15px 17px}
+  .kitcard .kn{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .kitcard .kd{font-size:12.5px;color:var(--ink2);margin:2px 0 12px}
+  .kitcard .krule{font-size:12px;color:var(--ink3);margin-top:13px;padding-top:10px;border-top:1px solid var(--hair)}
+  .kitcard.newk{border-color:var(--hair2);box-shadow:inset 3px 0 0 var(--green)}
+  .fpick{display:flex;align-items:center;min-height:52px;border:1px solid var(--hair2);border-radius:12px;padding:0 14px;font-size:14px;font-weight:600;margin-top:8px}
+  .fpick .v{margin-left:auto;font-family:var(--mono);font-size:12.5px;color:var(--ink);font-weight:600}
+  .fpick .v.ph{color:var(--ink3);font-weight:500}
+  .fpick .chv{color:var(--hair2);font-size:16px;margin-left:8px}
+  .fnote{border:1px solid var(--hair2);border-radius:12px;padding:12px 14px;min-height:74px;font-size:13.5px;color:var(--ink3);margin-top:8px}
+  .fphoto{display:flex;gap:8px;margin-top:8px}
+  .fphoto .th{width:54px;height:54px;border-radius:10px;background:var(--well);border:1px solid var(--hair)}
+  .fphoto .add{width:54px;height:54px;border-radius:10px;border:1.5px dashed var(--hair2);display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:20px}
+  .fmeas{display:flex;align-items:baseline;gap:7px;border:1.5px solid var(--ink);border-radius:12px;padding:11px 14px;margin-top:8px}
+  .fmeas b{font-family:var(--mono);font-size:22px;font-weight:700}
+  .fmeas span{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+  .fcond{margin-top:10px;padding-left:13px;border-left:2px solid var(--amber-fill)}
+  .fcond .ct{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+  .req{color:var(--red);font-weight:700}
+  /* interaction sheets */
+  .sh2{display:flex;align-items:center;gap:10px;padding:2px 2px 12px;border-bottom:1px solid var(--hair)}
+  .sh2 .tag{font-family:var(--mono);font-size:16px;font-weight:700}
+  .sh2 .pc{font-family:var(--mono);font-size:11px;font-weight:700;background:var(--well);border-radius:6px;padding:3px 8px}
+  .sh2 .bk{font-size:17px;color:var(--ink2);margin-right:-2px}
+  .sh2 .mr{flex:0 0 auto;width:38px;height:34px;margin-left:12px;border:1px solid var(--hair2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--ink);letter-spacing:.06em}
+  .sh2 .vit{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em}
+  .opt{display:flex;align-items:center;gap:12px;min-height:52px;border:1px solid var(--hair2);border-radius:12px;padding:0 14px;margin-top:10px;font-size:14.5px;font-weight:600}
+  .opt .rad{width:20px;height:20px;border-radius:10px;border:1.5px solid var(--hair2);flex:0 0 auto}
+  .opt.on{border-color:var(--ink);border-width:1.5px}
+  .opt.on .rad{border-color:var(--ink);background:radial-gradient(circle at center,var(--ink) 0 6px,transparent 7px)}
+  .opt .hint{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.06em}
+  .shbar{display:flex;gap:10px;margin-top:16px}
+  .shbar .cta.sec{flex:0 0 auto;padding:0 18px}
+  .aud{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:center;padding-top:10px}
+  /* timeline (breeding) */
+  .tl{padding:6px 0 2px}
+  .tl .ev{display:flex;gap:12px;padding:9px 0;align-items:flex-start}
+  .tl .dot{width:10px;height:10px;border-radius:3px;margin-top:4px;flex:0 0 auto;background:var(--well);border:1px solid var(--hair2)}
+  .tl .ev.done .dot{background:var(--green);border-color:var(--green)}
+  .tl .ev.cur .dot{background:var(--card);border:2.5px solid var(--ink)}
+  .tl .ev .t{font-size:13.5px;font-weight:600}
+  .tl .ev .m{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-top:2px}
+  .tl .ev.dim .t{color:var(--ink3);font-weight:500}
+  /* counters (farrowing) */
+  .ctr{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--hair)}
+  .ctr:first-of-type{border-top:none}
+  .ctr .lbl{font-size:13.5px;font-weight:600;flex:1}
+  .ctr .n{font-family:var(--mono);font-size:20px;font-weight:700;width:40px;text-align:center}
+  .ctr .b{width:44px;height:44px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--ink);text-transform:none;letter-spacing:0;padding:0}
+  .ctr .b.plus{background:var(--ink);border-color:var(--ink);color:#fff}
+  /* segmented scale (postpartum) */
+  .fseg{display:flex;background:var(--well);border-radius:10px;padding:3px;margin-top:8px}
+  .fseg span{flex:1;height:40px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--ink2);border-radius:8px}
+  .fseg span.on{background:var(--ink);color:#fff}
+  .flbl{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-top:14px}
+  /* numpad (tag/weigh) */
+  .padwrap{display:flex;gap:12px;margin-top:12px}
+  .pv{min-width:0}
+  .pv{flex:1}
+  .pv .cur{border:1.5px solid var(--ink);border-radius:12px;padding:10px 12px}
+  .pv .cur .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .pv .cur .v{font-family:var(--mono);font-size:22px;font-weight:700;margin-top:2px}
+  .pv .prev{font-family:var(--mono);font-size:10.5px;color:var(--ink3);padding:8px 2px 0;line-height:1.8}
+  .pad{display:grid;grid-template-columns:repeat(3,50px);gap:8px;flex:0 0 auto}
+  .pad span{height:48px;border:1px solid var(--hair2);border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:600}
+  /* checklist (treatments) */
+  .chk{display:flex;align-items:center;gap:12px;min-height:50px;border-top:1px solid var(--hair);font-size:14px;font-weight:600}
+  .chk:first-of-type{border-top:none}
+  .chk .cb{width:22px;height:22px;border:1.5px solid var(--hair2);border-radius:6px}
+  .chk.on .cb{background:var(--ink);border-color:var(--ink);position:relative}
+  .chk.on .cb::after{content:"✓";color:#fff;font-size:13px;position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .chk .who{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink3)}
+  /* filter sheet */
+  .fs{background:var(--card);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid var(--hair);padding:0 16px 18px}
+  .fs .fgrp{padding:14px 0 6px;border-top:1px solid var(--hair)}
+  .fs .fgrp:first-of-type{border-top:none}
+  .fs .fk{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;display:block}
+  .fs .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .fs .chips span{height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--hair2);background:var(--card);display:inline-flex;align-items:center;font-size:13px;font-weight:600;color:var(--ink2)}
+  .fs .chips span.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .fs .fbar{display:flex;gap:10px;margin-top:16px}
+  .fs .fbar .cta.sec{flex:0 0 auto;padding:0 22px}
+  /* collapsible prose */
+  details.more{margin:8px 0 22px;max-width:74ch}
+  details.more>summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);border:1px solid var(--hair2);border-radius:8px;padding:7px 12px;background:var(--card)}
+  details.more>summary::-webkit-details-marker{display:none}
+  details.more>summary::before{content:"+";font-weight:700;color:var(--ink3)}
+  details.more[open]>summary::before{content:"–"}
+  details.more>*:not(summary){margin-top:14px}
+  details.more.wide{max-width:none}
+  table.cfg{table-layout:fixed}
+  table.cfg th:nth-child(1){width:11%} table.cfg th:nth-child(2){width:11%} table.cfg th:nth-child(3){width:11%} table.cfg th:nth-child(4){width:12%} table.cfg th:nth-child(5){width:20%} table.cfg th:nth-child(6){width:11%} table.cfg th:nth-child(7){width:6%}
+  /* variation table */
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--hair);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+  td:first-child{font-weight:700;width:22%}
+  footer{padding:36px 0 72px;color:var(--ink3);font-size:13px}
+  /* 05 · the pig, and many pigs */
+  .doors{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:18px 0 6px}
+  .door{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:15px 17px;display:flex;flex-direction:column}
+  .door .dk{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .door .dn{font-size:15.5px;font-weight:700;margin:3px 0 10px}
+  .door .dg{font-family:var(--mono);font-size:11px;color:var(--ink2);background:var(--well);border-radius:8px;padding:9px 11px;margin-bottom:11px;letter-spacing:.02em}
+  .door .dd{font-size:12.5px;color:var(--ink2);margin-top:auto}
+  .door .dd b{color:var(--ink)}
+  .prow:first-of-type{border-top:none}
+  .arity{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0 4px}
+  .arity .ac{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:15px 17px}
+  .arity .ac .an{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);font-weight:700}
+  .arity .ac .ad{font-size:12.5px;color:var(--ink2);margin:5px 0 10px}
+  .arity .ac .al{font-family:var(--mono);font-size:11px;color:var(--ink3);line-height:1.75;border-top:1px solid var(--hair);padding-top:10px}
+  .psheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-top-left-radius:20px;border-top-right-radius:20px;box-shadow:0 -12px 34px rgba(28,30,25,.13);border-top:1px solid var(--hair)}
+  .psheet .grab{margin:9px auto 5px}
+  .phd{display:flex;align-items:center;gap:10px;padding:0 16px 11px;border-bottom:1px solid var(--ink)}
+  .phd .x{width:30px;height:30px;border-radius:8px;border:1px solid var(--hair2);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:13px;flex:0 0 auto}
+  .phd .cnt{font-size:13.5px;font-weight:700}
+  .phd .up{margin-left:auto;color:var(--ink3);font-size:14px}
+  .strip{padding:2px 14px 12px}
+  .strip .sk{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);padding:12px 2px 9px}
+  .tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .tile{min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px}
+  .tile .ti{width:100%;height:44px;border-radius:12px;background:var(--well);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--ink);line-height:1}
+  .tile.dth .ti{background:transparent;border:1.5px solid var(--red);color:var(--red)}
+  .tile.dth .tl{color:var(--red)}
+  .tile .tl{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
+  .vna{display:flex;align-items:center;padding:0 16px 16px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+  .vna b{font-weight:600;color:var(--ink3)}
+  .vna .chv{margin-left:auto;font-size:13px;color:var(--hair2)}
+  .pills{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .pill{min-height:48px;display:flex;align-items:center;padding:0 14px;border-radius:12px;background:var(--well);font-size:13.5px;font-weight:600;line-height:1.2}
+  .pill:only-child,.pill:nth-child(odd):last-child{grid-column:1/-1}
+  .pill .pt{margin-left:auto;padding-left:8px;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);white-space:nowrap}
+  .ckwrap{padding:0 16px 12px}
+  .ckin{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase}
+  .ckin.due{color:var(--amber)}
+  .ckin.done{color:var(--green)}
+  .ckin .act{margin-left:auto;font-family:var(--sans);font-size:12px;font-weight:700;text-transform:none;letter-spacing:0;border:1.5px solid var(--ink);color:var(--ink);border-radius:9px;padding:7px 12px}
+  .pgk{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);padding:15px 16px 5px}
+  .pline{display:flex;align-items:baseline;gap:10px;padding:5px 16px;font-size:13.5px}
+  .pline .pl{font-weight:600}
+  .pline .pr{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.03em;white-space:nowrap}
+  .pline.hist .pl{font-weight:500;color:var(--ink2)}
+  .barpair{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:6px;max-width:824px}
+  .barstrip{width:390px;background:var(--card);border:1px solid var(--hair2);border-radius:16px;overflow:hidden}
+  .fs .pchip{flex:0 0 auto;height:40px;min-width:56px;padding:0 12px;border-radius:9px;border:1px solid var(--hair2);background:var(--card);display:inline-flex;align-items:center;justify-content:center;gap:5px;font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink)}
+  .fs .pchip.cur{background:var(--ink);border-color:var(--ink);color:#fff}
+  .fs .rowlink{padding:13px 2px;gap:12px;justify-content:flex-start}
+  .fs .rowlink .st{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;text-align:left}
+  .fs .rowlink .st .l1{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
+  .fs .rowlink .st .l2{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.04em;font-weight:500}
+  .fs .rowlink .chev{margin-left:auto}
+  .fs .sh2 .tag{white-space:nowrap}
+</style>
+<style>
+  /* 06 · check-in */
+  .dot{width:9px;height:9px;border-radius:5px;flex:0 0 auto;display:inline-block;margin-right:2px}
+  .dot.r{background:var(--red)} .dot.a{background:var(--amber-fill)}
+  .list .pen + .pen,.strip2 .pen + .pen{border-top:1px solid var(--hair2)}
+  .pen .cnt{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--ink3);letter-spacing:.04em}
+  .pen .fslot{margin-left:auto;display:flex;align-items:baseline;gap:5px;font-family:var(--mono);letter-spacing:.04em}
+  .pen .fslot b{font-size:11px;font-weight:600;color:var(--ink2)}
+  .pen .fslot .fr{font-size:10.5px;font-weight:500;color:var(--ink3)}
+  .pen .fslot .un{font-size:9.5px;color:var(--ink3)}
+  .pen .fslot .wr{display:inline-flex;align-items:center;gap:3px;color:var(--red);font-size:10.5px;font-weight:700;margin-left:5px;align-self:center}
+  .pen .cv2{color:var(--ink3);font-size:12px;margin-left:10px}
+  .pen input{width:16px;height:16px;accent-color:var(--ink);opacity:.75}
+  .hright{margin-left:auto;text-align:right;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+  .hright .tot{font-family:var(--mono);font-size:11px;color:var(--ink2);letter-spacing:.02em}
+  .hstamp{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;border:1.5px solid var(--ink);border-radius:9px;padding:7px 10px;color:var(--ink);font-weight:700}
+  .hstamp.due{border-color:var(--amber-fill);color:var(--amber)}
+  .hstamp.done{border:none;padding:0;color:var(--green)}
+  .hbtn{margin-left:auto;font-size:12.5px;font-weight:700;border:1.5px solid var(--ink);border-radius:9px;padding:8px 12px;white-space:nowrap}
+  .subst{color:var(--amber)} .subst.ok{color:var(--green)}
+  .row.tail{min-height:42px}
+  .row.tail .l1{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.06em;color:var(--ink2)}
+  .pcard{background:var(--card);border:1px solid var(--hair);border-radius:14px;overflow:hidden}
+  .pcard .pen input{width:22px;height:22px;opacity:1;border-radius:6px}
+  .pcard .row{border-top:1px solid var(--hair)}
+  .pcard .row.tail{min-height:46px}
+  .bcards{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 12px 12px;scroll-padding-left:12px;-webkit-overflow-scrolling:touch}
+  .bcards::-webkit-scrollbar{display:none}
+  .bcard{flex:0 0 262px;scroll-snap-align:start;border:1px solid var(--hair);border-radius:12px;background:var(--card);padding:11px 14px 12px}
+  .bcard .bk{display:flex;align-items:baseline;justify-content:space-between}
+  .bcard .bk .bn{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:700}
+  .bcard .bk .bd{font-family:var(--mono);font-size:10.5px;color:var(--ink2)}
+  .bcard .bp{font-size:14px;font-weight:700;margin-top:6px;letter-spacing:-.01em}
+  .bcard .bp span{font-weight:600;color:var(--ink2)}
+  .bcard .bf{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-top:5px}
+  .bcard .bf b{font-weight:700;color:var(--ink);font-size:11.5px}
+  .lgd{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin:10px 0 4px}
+  .lgd i{display:inline-block;width:10px;height:10px;border-radius:5px;margin-right:7px;vertical-align:0}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
+  .strip2{width:390px;background:var(--card);border:1px solid var(--hair2);border-radius:16px;overflow:hidden}
+</style>
+<body>
+<div class="wrap">
+
+<header class="page">
+  <span class="anno">Sentri · Design system · farrowing</span>
+  <span class="anno">Companion to components.html · screens.html · check-in.html · motion.html</span>
+</header>
+
+<h1>Farrowing</h1>
+<p class="lede">The farrowing room, from a sow going into labor to the batch closing: the standing surface, the session sheet, piglet care by day-age, identity capture, the count, and the close. Requirements and every owner decision live in <span class="mono">ux/research/farrowing/SYNTHESIS.md</span> — this document is those decisions drawn.</p>
+
+<div class="note" style="max-width:76ch;margin-bottom:26px"><b>Nothing here is a new component.</b> The room is the unified list (01), the session is the C6 Session chassis, piglet care is C4 inline tokens, tag/weigh is the C3 Conveyor, the count is the count-subject drawer, and every commit follows the motion contract. Section numbers continue the shared series as <b>09</b>.</div>
+
+<!-- ============ 09 hero ============ -->
+<h2>09 · The farrowing room — a standing surface that drains</h2>
+<p style="max-width:76ch">Not a windowed task: each sow is her own window (<span class="mono">expected = service + 114 d</span>, hardcoded). The list is the room view — there is no dashboard and no grid. The All lens below shows every register at once; on the walk the hand lives in Active.</p>
+<div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
+<div>
+<div class="vlabel">The room · All lens</div>
+<div class="phone" style="display:flex;flex-direction:column;height:915px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2"><div class="u">Farrowing</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last record <b style="color:var(--ink2);font-weight:600">23:00</b> · G. Hansen</div></div></div>
+    <div class="ctxbar"><div><span class="k">Unit 7</span><div class="numwrap"><div class="num under"><b>10</b><span>live / litter</span></div><div class="kspace"></div></div><span class="sub">target 12</span></div><div><span class="k">Task overview ›</span><div class="numwrap"><div class="num"><b>2</b><span>farrowing</span></div><div class="kspace"></div></div><span class="sub">9 awaiting · queue</span></div></div>
+    <div class="lensrow"><div class="lens"><button>Awaiting <span class="n">9</span></button><button>Active <span class="n">2</span></button><button>Done <span class="n">8</span></button><button class="on">All <span class="n">19</span></button></div><div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">B1</span><span class="agg">1 sow</span></div>
+      <div class="row"><span class="tag">000418</span><div class="st"><span class="l1">8 live · 1 dead <span class="b b-amber">last 45m</span></span><span class="l2">started 6h · parity 3</span></div><div class="rail"><span class="word s-blue">ACTIVE</span><span class="chev">›</span></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">B2</span><span class="agg">1 sow</span></div>
+      <div class="row"><span class="tag">000392</span><div class="st"><span class="l1">3 live <span class="b b-red">day 117</span></span><span class="l2">started 1h · last 12m</span></div><div class="rail"><span class="word s-blue">ACTIVE</span><span class="chev">›</span></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">B4</span><span class="agg">2 sows</span></div>
+      <div class="row"><span class="tag">000455</span><div class="st"><span class="l1">Due today · day 114</span><span class="l2">parity 2 · 12 born last</span></div><div class="rail"><span class="chev">›</span></div></div>
+      <div class="row dim"><span class="tag">000467</span><div class="st"><span class="l1">Expected · in 2 days</span><span class="l2">day 112 · parity 5</span></div><div class="rail"><span class="chev">›</span></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">B3</span><span class="agg">1 sow</span></div>
+      <div class="row dim done"><span class="tag">000406</span><div class="st"><span class="l1">Final · 11 live · 2 dead</span><span class="l2">final 05:58 · G.H</span></div><div class="rail"><div class="edit">✎</div></div></div></div>
+      </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">B1</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+</div>
+</div>
+<div style="flex:1;min-width:340px;max-width:520px">
+  <h3 style="margin-top:6px">What is on this screen</h3>
+  <table class="stab"><thead><tr><th style="width:30%">Register</th><th>Carries</th></tr></thead><tbody>
+    <tr><td>Lens</td><td><span class="mono">Awaiting / Active / Done / All</span> — state names (lens law). No End task here: the surface drains sow by sow; batch close is 09f.</td></tr>
+    <tr><td>Active row</td><td><span class="mono">8 live · 1 dead</span> — the litter so far. The <span class="mono">LAST 45M</span> chip is the escalated measurement: the birth-interval engine runs only off asserted times, never tap times.</td></tr>
+    <tr><td>Awaiting rows</td><td><span class="mono">Due today · day 114</span> full strength; <span class="mono">Expected · in 2 days</span> in the forecast register — light line, full-strength row, never disabled. Overdue prints the day chip red from day 116 (<span class="mono">day 117</span> above).</td></tr>
+    <tr><td>Done row</td><td><span class="mono">Final · 11 live · 2 dead</span>, stamp, ✎ — reopens the same session sheet read-only. There is no separate detail screen.</td></tr>
+    <tr><td>Ctxbar</td><td>Unit KPI <span class="mono">10 live/litter · target 12</span>; overview counts states, no day gauge — there is no window.</td></tr>
+    <tr><td>Receipts</td><td>First count on an Awaiting sow crosses her to Active — that <i>is</i> "farrowing started". Final crosses to Done. Sow death or abortion exits every lens; the census ticks (motion C).</td></tr>
+  </tbody></table>
+</div>
+</div>
+
+<!-- ============ 09a session ============ -->
+<h2>09a · The session sheet — every tap is the record</h2>
+<p style="max-width:76ch">Row tap opens the C6 Session over the list. Two counters. Each ± commits instantly — closing the sheet loses nothing, reopening resumes, shift change is invisible (every line is stamped). <b>There is no Save.</b> Finish is the one closing act.</p>
+<div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
+<div>
+<div class="vlabel">Session · tap the row body</div>
+<div class="phone" style="display:flex;flex-direction:column;height:880px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs">
+        <div class="grab"></div>
+        <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">started 6h · parity 3</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 2px 4px"><span style="font-family:var(--mono);font-size:22px;font-weight:700">8 live · 1 dead</span><span class="b b-amber">last 45m</span></div>
+        <div class="ctr"><span class="lbl">Live</span><span class="b">−</span><span class="n">8</span><span class="b plus">+</span></div>
+        <div class="ctr"><span class="lbl">Dead</span><span class="b">−</span><span class="n">1</span><span class="b plus">+</span></div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 2px 2px"><span style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)">dead · cause optional</span><span class="pchip">Stillborn</span><span class="pchip">Mummified</span></div>
+        <div style="border-top:1px solid var(--hair);margin-top:10px;padding:10px 2px 2px;display:flex;flex-direction:column;gap:7px">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--ink2)">+1 dead · stillborn · 02:14 · G.H <span class="edit" style="display:inline-flex;transform:scale(.8)">✎</span></span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--ink2)">+2 live · 02:14 · G.H</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--ink2)">+3 live · 23:55 · L.M</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--ink3)">started · 23:00 · L.M</span>
+        </div>
+        <div class="shbar"><button class="cta sec">Piglet died…</button><button class="cta" style="flex:1">Finish farrowing</button></div>
+        <div class="aud">each ± commits · minus corrects a miscount · a death after birth is Piglet died — the ledger, not the counter</div>
+      </div>
+    </div>
+</div>
+<div style="flex:1;min-width:340px;max-width:520px">
+  <h3 style="margin-top:6px">Rules</h3>
+  <table class="stab"><thead><tr><th style="width:30%">Rule</th><th>Why</th></tr></thead><tbody>
+    <tr><td>Two counters</td><td><span class="mono">Live</span> and <span class="mono">Dead</span>. Nothing else is asked mid-birth. Stillborn / mummified is the <b>optional cause slot</b> on the dead record — the same grammar as Report death — filled when obvious (a mummy is unmistakable), skipped at 2am, refined at cleanup with ✎.</td></tr>
+    <tr><td>Counters are facts, verbs are events</td><td>− corrects a miscount. A piglet that dies after birth is <span class="mono">Piglet died…</span> (09b) — live-born stays a birth fact and the ledger explains the count. The KPI wall depends on this split.</td></tr>
+    <tr><td>The trail is the receipt</td><td>Stamped lines, newest first, each ✎. A burst entry (<span class="mono">+3</span>) is indistinguishable from a catch-up — by design. Shift handover reads itself.</td></tr>
+    <tr><td>Finish</td><td>The one closing act: crosses her to Done (motion B). Reopening a finished session is the ✎ on the Done row — same sheet, read-only until touched, every change stamped.</td></tr>
+    <tr><td>Refinements</td><td>Weak / deformed counts, birth weights, assistance — all optional enrichment, entered at the farm&#39;s own accord, never gating anything.</td></tr>
+  </tbody></table>
+</div>
+</div>
+
+<!-- ============ 09b death ============ -->
+<h2>09b · Piglet death — one tap, dated in words</h2>
+<p style="max-width:76ch">Not all piglets make it. While the litter is anywhere in the product — session, piglet care, check-in — <span class="mono">Piglet died…</span> opens the same drawer. Count, a date in words, cause optional. The census ticks; that is the receipt (motion C).</p>
+<div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
+<div>
+<div class="vlabel">The death drawer · same everywhere</div>
+<div class="phone" style="display:flex;flex-direction:column;height:760px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Check-in</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs">
+        <div class="grab"></div>
+        <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">litter · day 6 · 8 live</span></div>
+        <div class="ctr"><span class="lbl">Died</span><span class="b">−</span><span class="n">2</span><span class="b plus">+</span></div>
+        <div class="flbl">When</div>
+        <div style="display:flex;gap:8px;padding:6px 0 2px"><span class="pchip cur">Today</span><span class="pchip">Yesterday</span><span class="pchip">Not sure</span></div>
+        <div class="flbl">Cause · optional</div>
+        <div style="display:flex;gap:8px;padding:6px 0 2px;flex-wrap:wrap"><span class="pchip">Crushed</span><span class="pchip">Scours</span><span class="pchip">Starve-out</span><span class="pchip">Other</span></div>
+        <div class="shbar"><button class="cta" style="flex:1">Record 2 died</button></div>
+        <div class="aud">not sure carries the span since the last count — jul 12 · today — the hand never picks dates</div>
+      </div>
+    </div>
+</div>
+<div style="flex:1;min-width:340px;max-width:520px">
+  <h3 style="margin-top:6px">Rules</h3>
+  <table class="stab"><thead><tr><th style="width:30%">Rule</th><th>Why</th></tr></thead><tbody>
+    <tr><td>Words, not pickers</td><td><span class="mono">Today</span> is the default, <span class="mono">Yesterday</span> one tap, <span class="mono">Not sure</span> silently records the honest interval since the last count. The data keeps the span; analytics buckets it; the hand never sees a date range.</td></tr>
+    <tr><td>Cause optional</td><td>Doors, never gates. An uncaused death record is legal and complete.</td></tr>
+    <tr><td>Named piglets</td><td>A tagged piglet is never subtracted namelessly — if the litter has identity rows and the count exceeds the untagged remainder, the drawer becomes a roster naming which.</td></tr>
+    <tr><td>Where</td><td>Task open → in the task. Task closed → in check-in. Same drawer, same record.</td></tr>
+  </tbody></table>
+</div>
+</div>
+
+<!-- ============ 09c cohort ============ -->
+<h2>09c · Piglet processing — the day-cohort, not the ladder</h2>
+<p style="max-width:76ch">The working set is every litter due today, in crate walk order. The per-litter day-age ladder survives only as the litter record&#39;s schedule strip — the drill-in, not the workplace. Treatments are tokens on the row; each token commits for the whole litter, exceptions by count.</p>
+<div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
+<div>
+<div class="vlabel">Due today · crate order</div>
+<div class="phone" style="display:flex;flex-direction:column;height:860px">
+    <div class="statusbar"><span>9:41</span><span>●●●○ ⌁</span></div>
+    <div class="appbar" style="padding-bottom:0"><div class="back">←</div><div class="ttl2"><div class="u">Piglet processing</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Last record <b style="color:var(--ink2);font-weight:600">08:40</b> · G. Hansen</div></div></div>
+    <div class="ctxbar"><div><span class="k">Unit 7</span><div class="numwrap"><div class="num"><b>90</b><span>% on time</span></div><div class="kspace"></div></div><span class="sub">target ≥ 90%</span></div><div><span class="k">Task overview ›</span><div class="numwrap"><div class="num"><b>14</b><span>/ 20 litters</span></div><div class="gauge"><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i class="f-green"></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><span class="sub">today</span></div></div>
+    <div class="lensrow"><div class="lens"><button class="on">Due today <span class="n">6</span></button><button>Done <span class="n">14</span></button><button>All <span class="n">20</span></button></div><div class="lensfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg></div></div>
+    <div class="list" style="flex:1">
+      <div class="pcard"><div class="pen"><span class="code">B1</span><span class="agg">3 litters</span></div>
+      <div class="row"><div class="cb"></div><span class="tag">000221</span><div class="st"><span class="l1">12 piglets · day 3</span><span class="l2" style="display:flex;gap:6px;align-items:center;overflow:visible"><span class="tw">teeth</span><span class="tw">iron</span><span class="tw">tag/weigh ›</span></span></div><div class="rail"></div></div>
+      <div class="row"><div class="cb"></div><span class="tag">000228</span><div class="st"><span class="l1">11 piglets · day 3 <span class="b b-amber">incl 3 fostered · 2d older</span></span><span class="l2" style="display:flex;gap:6px;align-items:center;overflow:visible"><span class="tw done">teeth ✓ 08:12</span><span class="tw">iron · 4 left</span></span></div><div class="rail"></div></div>
+      <div class="row dim done"><span class="tag">000234</span><div class="st"><span class="l1">All done · 9 piglets</span><span class="l2">08:31 · G.H</span></div><div class="rail"><div class="edit">✎</div></div></div></div>
+      <div class="pcard"><div class="pen"><span class="code">B2</span><span class="agg">2 litters</span></div>
+      <div class="row"><div class="cb"></div><span class="tag">000240</span><div class="st"><span class="l1">10 piglets · day 5</span><span class="l2" style="display:flex;gap:6px;align-items:center;overflow:visible"><span class="tw" style="color:var(--red);border-color:var(--red)">drops · 2d late</span><span class="tw">tag/weigh ›</span></span></div><div class="rail"></div></div></div>
+      </div>
+    <div class="dock"><div class="dockrow"><div class="goto"><span class="gi" style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="gp">B1</span></div><div class="scanbtn"><span class="si" style="display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M7 12h10"/></svg></span>Scan ear tag</div><div class="tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div></div>
+</div>
+</div>
+<div style="flex:1;min-width:340px;max-width:520px">
+  <h3 style="margin-top:6px">Rules</h3>
+  <table class="stab"><thead><tr><th style="width:30%">Rule</th><th>Why</th></tr></thead><tbody>
+    <tr><td>Token tap = litter mark</td><td>One tap marks the treatment for all 12 (advance-in-place: wash + stamp, token flips to <span class="mono">teeth ✓ 08:12</span>). A long-press opens the count stepper for exceptions — <span class="mono">iron · 7 of 12</span> commits 7, the token becomes <span class="mono">iron · 5 left</span> and the row stays due. No separate partial state exists.</td></tr>
+    <tr><td>Last token crosses</td><td>When the last due token flips, the row settles, holds 800 ms, and group-collapses atop Done (motion B). Counts tick everywhere in the same frame.</td></tr>
+    <tr><td>Late is not gone</td><td>An undone day accumulates, oldest first, red: <span class="mono">drops · 2d late</span>. Done late stamps the actual who · when; the on-time KPI absorbs it; the row never nags twice. No conversion in v1.</td></tr>
+    <tr><td>Fosters</td><td>Ride the crate&#39;s schedule. The reminder is the standing chip — <span class="mono">incl 3 fostered · 2d older</span> — a fact, not a notification.</td></tr>
+    <tr><td>Catch-up</td><td>End of row, gun down, phone out: checkboxes → bulk mark sheet → one commit, one reflow. Entry-time stamps are acceptable; the day is the compliance grain.</td></tr>
+    <tr><td>Two hands</td><td>Live sync — a row the other hand finishes departs your list (the same group collapse). Offline, records merge append-only; same mark twice dedupes as same litter · treatment · day.</td></tr>
+  </tbody></table>
+</div>
+</div>
+
+<!-- ============ 09d conveyor ============ -->
+<h2>09d · Tag · notch · weigh — one piglet, one confirm</h2>
+<p style="max-width:76ch">The heaviest data entry on the farm, so the metric is taps per piglet. The pairing — which piglet got which tag — is captured at the moment the tag goes in the ear, never reconstructed later. <span class="mono">tag/weigh ›</span> on the litter row opens the C3 Conveyor.</p>
+<div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
+<div>
+<div class="vlabel">The conveyor · from the litter row</div>
+<div class="phone" style="display:flex;flex-direction:column;height:880px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Piglet processing</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs">
+        <div class="grab"></div>
+        <div class="sh2"><span class="pc">B1</span><span class="tag">000221</span><span class="vit">litter · piglet 5 of 12</span></div>
+        <div class="padwrap">
+          <div class="pv"><div class="cur"><div class="k">Tag · suggested — edit or scan</div><div class="v">001238</div><div style="display:flex;gap:8px;margin-top:8px"><span class="pchip cur">♂</span><span class="pchip">♀</span><span class="pchip">notch…</span></div><div class="k" style="margin-top:8px">Weight · optional</div><div class="v" style="color:var(--ink3)">1.51 <span style="font-size:12px">kg</span></div></div>
+          <div class="prev">001237 · 1.51 kg ♂ ✓<br>001236 · 1.38 kg ♀ ✓<br>001235 · 1.44 kg ♀ ✓</div></div>
+          <div class="pad"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>·</span><span>0</span><span>⌫</span></div>
+        </div>
+        <div class="shbar"><button class="cta sec">Done · 4 of 12</button><button class="cta" style="flex:1">Confirm · next</button></div>
+        <div class="aud">confirm commits that piglet · next tag suggests +1 · scan overrides · duplicates warn amber, never block</div>
+      </div>
+    </div>
+</div>
+<div style="flex:1;min-width:340px;max-width:520px">
+  <h3 style="margin-top:6px">Rules</h3>
+  <table class="stab"><thead><tr><th style="width:30%">Rule</th><th>Why</th></tr></thead><tbody>
+    <tr><td>Suggested, never managed</td><td>The system owns no ranges. The first tag is typed or scanned; after that the field suggests +1 because strips are sequential — a typing convenience, editable, wrong at most once. Scan (visual code or RFID) always overrides. Duplicates warn amber inline and commit anyway — tag purchases are the farm&#39;s own.</td></tr>
+    <tr><td>Per-piglet commit</td><td>The tag is physically in the ear, so the record follows the world at Confirm. Interruption loses nothing; re-entry resumes at <span class="mono">5 of 12</span> with the suggestion at last +1. Finishing early is legal — keepers-only farms stop at 5 of 12 and the rest stay the group count.</td></tr>
+    <tr><td>The running list</td><td><span class="mono">001237 · 1.51 kg ♂ ✓</span> — the receipt, and the two-person audit channel: the recorder reads the last line back to the tagger when either suspects drift.</td></tr>
+    <tr><td>Optional everywhere</td><td>Weight (previous ghosts as placeholder — a hint, never a value), notch, sex where derivable. A litter tagged with zero weights is complete. Notch-only farms use the same sheet with the notch as the identity; lookup-by-notch exists wherever lookup-by-tag does.</td></tr>
+    <tr><td>Fix later</td><td>Every pairing stays viewable and ✎ forever — swapping two piglets&#39; tags is two stamped edits. Nothing is sealed at submit, because there is no submit.</td></tr>
+  </tbody></table>
+</div>
+</div>
+
+<!-- ============ 09e count ============ -->
+<h2>09e · The count — assertion commits, doors explain</h2>
+<p style="max-width:76ch">Hands count at processing, fostering, and weaning — the count is a by-product of piglets in hands. A fresh count that disagrees with the ledger is news that one line is missing, not an anomaly to launder. The count always commits; the delta renders as doors.</p>
+<div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
+<div>
+<div class="vlabel">Count drawer · delta = 2 down</div>
+<div class="phone" style="display:flex;flex-direction:column;height:790px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Weaning</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs">
+        <div class="grab"></div>
+        <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">litter · counted jul 12 · 20</span></div>
+        <div class="ctr"><span class="lbl">Counted now</span><span class="b">−</span><span class="n">18</span><span class="b plus">+</span></div>
+        <div class="flbl">2 fewer than the ledger — what happened?</div>
+        <div class="rowlink"><div class="st"><span class="l1">Record 2 deaths</span><span class="l2">death drawer · died 2 pre-filled</span></div><span class="chev">›</span></div>
+        <div class="rowlink"><div class="st"><span class="l1">Record a foster</span><span class="l2">pairing · moved 2 pre-filled</span></div><span class="chev">›</span></div>
+        <div class="rowlink"><div class="st"><span class="l1">Just set count</span><span class="l2">tallies as anomaly · note optional</span></div><span class="chev">›</span></div>
+        <div class="aud">the count committed at the stepper · a door writes the real event and the count re-derives · never auto-removed, never blocked</div>
+      </div>
+    </div>
+</div>
+<div style="flex:1;min-width:340px;max-width:520px">
+  <h3 style="margin-top:6px">Rules</h3>
+  <table class="stab"><thead><tr><th style="width:30%">Rule</th><th>Why</th></tr></thead><tbody>
+    <tr><td>The ledger is the truth</td><td><span class="mono">count = live-born − deaths ± fosters</span>. The doors are the three missing-line kinds. Up-deltas mirror: record births · foster in · just set count. The system never invents or removes piglets on its own.</td></tr>
+    <tr><td>Just set count</td><td>Legal, always — including at weaning. It tallies as a compliance anomaly on the console, the trail keeps <span class="mono">2 unexplained</span>, and the transfer never blocks. Blocking manufactures fake deaths; the anomaly tally is the honest pressure.</td></tr>
+    <tr><td>Receipt</td><td>The census ticks on the litter row and the pen header (motion C); the trail reads <span class="mono">was 20 · 2 died · since jul 12</span>.</td></tr>
+  </tbody></table>
+</div>
+</div>
+
+<!-- ============ 09f close ============ -->
+<h2>09f · Closing the batch — doors, never a wall</h2>
+<p style="max-width:76ch">Close farrowing = done farrowing this batch. Anyone may close. Sows that died or aborted already left through their own verbs, so the remainder is only sows that have not farrowed — and one of them may never have been in pig at all, which is exactly why closing can never be blocked: a hard gate manufactures fake records; provenance is the audit.</p>
+<div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
+<div>
+<div class="vlabel">Close · from the task detail sheet</div>
+<div class="phone" style="display:flex;flex-direction:column;height:790px;background:var(--well)">
+      <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+      <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
+      <div style="flex:1"></div>
+      <div class="fs">
+        <div class="grab"></div>
+        <div class="sh2"><span class="pc">B22</span><span class="tag" style="font-size:13px">Close farrowing</span><span class="vit">19 sows · 16 final</span></div>
+        <div class="flbl">2 sows have not farrowed</div>
+        <div class="rowlink"><span class="tag" style="flex:0 0 62px">000455</span><div class="st"><span class="l1">Not farrowed · day 118</span><span class="l2">not in pig? · disposition</span></div><span class="chev">›</span></div>
+        <div class="rowlink"><span class="tag" style="flex:0 0 62px">000467</span><div class="st"><span class="l1">Expected · in 1 day</span><span class="l2">day 113 · move to next batch?</span></div><span class="chev">›</span></div>
+        <div class="shbar"><button class="cta" style="flex:1">Close · 2 stay watched in check-in</button></div>
+        <div class="aud">closing never blocks · the two escalate to the strip and check-in until dispositioned · every entry stamped is the audit</div>
+      </div>
+    </div>
+</div>
+<div style="flex:1;min-width:340px;max-width:520px">
+  <h3 style="margin-top:6px">Rules</h3>
+  <table class="stab"><thead><tr><th style="width:30%">Rule</th><th>Why</th></tr></thead><tbody>
+    <tr><td>Anyone closes</td><td>No role gate. The close is itself a stamped record.</td></tr>
+    <tr><td>Remainder = doors</td><td>Each unfarrowed sow offers her disposition (<span class="mono">not in pig · move to next batch · abort</span>) — or close anyway and she escalates: red strip row, watched in check-in, never expiring silently.</td></tr>
+    <tr><td>No ceremony</td><td>The closed run is the task sheet frozen — progress, tallies, who closed, when — reached from Today&#39;s done card. Tallies live in the lenses all along; nothing waits for the close to be visible.</td></tr>
+  </tbody></table>
+</div>
+</div>
+
+<!-- ============ 09g contract ============ -->
+<h2>09g · The production mapping — nine screens, six surfaces</h2>
+<table class="stab" style="max-width:1000px"><thead><tr><th style="width:26%">Production (生产任务)</th><th style="width:24%">Becomes</th><th>What died, and why</th></tr></thead><tbody>
+  <tr><td>分娩（分娩中） in-progress screen</td><td>09 room + 09a session</td><td>The dashboard grid — the Active lens is the room view.</td></tr>
+  <tr><td>记录分娩 record form</td><td>09a session counters</td><td>The form + 提交结果: five-way classification mid-birth, birth date field, submit. Two counters and stamped taps replace all of it.</td></tr>
+  <tr><td>分娩详情 detail screen</td><td>09a reopened read-only</td><td>The separate surface. ✎ everywhere; nothing is sealed.</td></tr>
+  <tr><td>仔猪处理 day-age ladder</td><td>09c cohort + litter strip</td><td>The per-sow accordion as the workplace; 提交后不可再查看 (a record you cannot re-read is a bug by law).</td></tr>
+  <tr><td>耳标/耳缺/体重 edit table</td><td>09d conveyor</td><td>The batch table + 确定 — pairing reconstructed from memory, one submit to lose. One piglet, one confirm.</td></tr>
+  <tr><td>仔猪数量确认 count dialog</td><td>09e count doors</td><td>Auto-remove + forced reason + confirm checkbox — the red wall. Assertion commits; doors write real events; anomalies tally for compliance.</td></tr>
+  <tr><td>结束任务 end ceremony</td><td>09f close + frozen sheet</td><td>The summary card ceremony. Tallies were live all along; the frozen sheet is the record; provenance replaces sign-off.</td></tr>
+  <tr><td>配种 mating sheet · F edge cases</td><td>parked</td><td>Next round — the mating conveyor detail and scan eligibility verdicts.</td></tr>
+</tbody></table>
+
+<h3 style="margin-top:30px">Receipts — every commit in this suite</h3>
+<table class="stab" style="max-width:1000px"><thead><tr><th style="width:30%">Commit</th><th style="width:18%">Motion</th><th>Receipt</th></tr></thead><tbody>
+  <tr><td>First count on an Awaiting sow</td><td>B · cross</td><td>Awaiting → Active; this is &quot;farrowing started&quot;</td></tr>
+  <tr><td>Session ± tap</td><td>A · advance</td><td>counter digit · trail line · row totals · LAST chip resets</td></tr>
+  <tr><td>Finish farrowing</td><td>B · cross</td><td>lands atop Done · <span class="mono">final 05:58 · G.H</span></td></tr>
+  <tr><td>Treatment token tap</td><td>A · advance</td><td>token flips ✓ + stamp · wash</td></tr>
+  <tr><td>Last token on a litter</td><td>B · cross</td><td>row collapses atop Done · counts tick by 1</td></tr>
+  <tr><td>Conveyor confirm</td><td>A · advance</td><td>running-list line · <span class="mono">5 of 12</span> ticks</td></tr>
+  <tr><td>Count set / death / foster</td><td>C · exit or A</td><td>census ticks on row + pen header · trail explains</td></tr>
+  <tr><td>Sow death · abortion</td><td>C · exit</td><td>leaves every lens · terminal band on her page · 1200 ms read</td></tr>
+  <tr><td>Close farrowing</td><td>—</td><td>task sheet freezes · escalated sows appear on the strip</td></tr>
+</tbody></table>
+
+<p style="max-width:76ch;margin-top:26px;font-size:13px;color:var(--ink2)">Requirements, the five slice briefs, and every owner ruling: <span class="mono">ux/research/farrowing/</span>. Motion timings and the collapse implementation: <span class="mono">motion.html</span>. The chassis definitions: <span class="mono">components.html 04d</span>.</p>
+
+</div>
+</body></html>
