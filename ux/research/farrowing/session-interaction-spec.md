@@ -28,9 +28,9 @@ births; a last-write-wins "set healthy = 5" would eat one).
 |---|---|---|---|---|
 | `birth(class)` | + on an alive class (healthy / weak / deformed) | +1 | +1 | +1 |
 | `birth_dead(class)` | + on stillborn / mummified | +1 | — | — |
-| `dead_found(unknown)` | + on Unknown (a body whose timing can't be told) | +1 | — | — |
+| `dead_found(cause?)` | dead-cause + → instant (Alive = 0) or `new` chip | +1 | if died-after | — |
 | `miscount(class)` | Readjust mode: − or set | −1 | per class | per class |
-| `death(cause, when)` | Died › (during) or Report death (09b, after) | — | — | −1 |
+| `death(cause, when)` | dead-cause + → `counted` chip (during) · Report death (09b, after) | — | — | −1 |
 | `death_amend / retract` | ✎ on a death line in the record | — | — | +1 if retracted |
 | `recount(class, n)` | numpad: up-only in tally, absolute in Readjust | sets | sets | derives |
 | `foster_out / in (n)` | Pairing | — | — | ∓n |
@@ -43,23 +43,33 @@ is no "alive, unclassified". Dead classes ARE causes, and each implies its birth
 crushed ⇒ born alive (then died); stillborn / mummified ⇒ born dead; unknown ⇒ born, status
 unknown. The hand records what the eye sees; the routing derives.
 
-**Three gestures, three meanings — no questions anywhere (owner ruling):**
-- **+ on a class** = a birth (alive classes) or a newly found body (dead classes). The
-  only gesture on the default sheet. If a pig is born, it is — there is no − beside it.
-- **Died ›** = a counted piglet is gone. The only path to a death, always. Born stands,
-  Alive −1, cause follows.
-- **Readjust** = an explicit button that enters correction mode. Only there do the
-  classes show − (and the numpad set): every change in Readjust is a `miscount` /
-  reclassification correction, logged as such. Deaths cannot be recorded in Readjust —
-  the mode says so in one line and points at Died. Leaving the mode returns the calm
-  tally sheet.
+**Two gestures and a mode — one surface, no doors, no tabs (owner rulings):**
+- **+ on a class** is the only tally gesture. If a pig is born, it is — no − beside it.
+- **Readjust** is an explicit button entering correction mode: only there do classes show
+  − and absolute set; every change logs as a `miscount`/reclassification. Deaths cannot
+  be recorded in Readjust — one line says so.
+- **There is no Died door during farrowing.** The dead-cause cells ARE the death path;
+  the separate Report-death drawer (09b) exists only after Final and in check-in.
 
-The earlier "minus asks miscount-or-died" question dies with the minus: the three paths
-carry the three meanings, and a hand can no longer casually decrement a birth fact —
-correcting one is a deliberate act you enter a mode to do. Residual risk (a hand using
-Readjust to hide a death) is accepted: entering a correction mode to record a death is
-more friction than the Died door beside it, and a Readjust decrement visibly drops Born
-in front of them.
+**How a dead-cause + resolves without a second surface.** The classes carry the answer:
+- `Stillborn` / `Mummified` — born dead by definition. Commits instantly. Born +1.
+- `Crushed` / `Scours` / `Unknown` / `Other ›` — a dead body of this cause. The one real
+  ambiguity is whether this body was already in the alive count. If the litter&#39;s Alive
+  count is **zero**, there is nothing it could have been counted in — commits instantly
+  as a new find (Born +1; for a died-after cause that is birth + death in the ledger;
+  for Unknown, timing stays unknown). If Alive &gt; 0, two chips slide out on the same
+  row — **`counted` · `new`** — one tap: `counted` keeps Born and drops Alive (the
+  attended mid-session death); `new` adds the body (Born +1). Same sheet, same row, one
+  extra tap only when the question is real.
+- The two unknowns collapse: a counted piglet dead of unknown cause and an uncounted body
+  of unknown everything are both a tap on `Unknown` — the chip answer tells the ledger
+  which it was; the hand never sees the distinction.
+- Order never breaks correctness, only tap count: a morning hand who tallies the dead
+  pile before the living answers zero questions; one who counts the living first answers
+  `new` per body. Either order sums.
+
+Residual risk (a hand hiding a death as a Readjust decrement) is accepted: the correction
+mode is more friction than the cause cell beside it, and the decrement visibly drops Born.
 
 **Typing counts.** In the default sheet, tapping a count opens the numpad but only counts
 *up* — typing 12 over 4 records 8 births (the morning-pile case); typing down is refused
@@ -81,8 +91,8 @@ with a one-line pointer to Readjust. Inside Readjust the numpad sets absolutely.
 ### During the tally (attended)
 - Birth: + healthy (or weak/deformed). Born and Alive tick.
 - Born dead: + stillborn. Born ticks, Alive doesn't.
-- Counted piglet dies, body tossed in the bucket: `Died ›` → crushed. Born 10 stands,
-  Alive 5, crushed 2. **Removal of the body is physical, not digital** —
+- Counted piglet dies, body tossed in the bucket: `+ Crushed` → chips slide out →
+  `counted`. Born 10 stands, Alive 5, crushed 2. Two taps, same sheet. **Removal of the body is physical, not digital** —
   the death event already told the story; carcass disposal is out of scope in v1.
 - Mis-tap: Readjust → −. Two taps, deliberate; a same-visit correction nets to nothing in the trail.
 - Numpad: tap the count, type 12 — records the difference as births (up-only in the
@@ -90,9 +100,9 @@ with a one-line pointer to Readjust. Inside Readjust the numpad sets absolutely.
   wins, deltas after it apply on top.
 
 ### The morning after (unattended)
-One pass, one surface: alive classes for the living, dead-class taps for the pile —
-crushed 2 · stillborn 1 · mummified 1 · unknown 1. Born derives 10. No born-dead vs
-died-after question is ever asked; the causes answer it. The trail records one stamped
+One pass, one surface — dead pile first, then the living, and zero questions: crushed 2 ·
+stillborn 1 · mummified 1 · unknown 1, then the alive classes. Born derives 10. (Living
+first also works; each pile body then takes one `new` chip tap.) The trail records one stamped
 visit; no birth times are pretended, so the interval engine stays silent.
 
 ### Two people, one litter
