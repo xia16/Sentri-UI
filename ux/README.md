@@ -22,6 +22,7 @@
 | [research/ops/](research/ops/) | Six per-cluster operation briefs + [SYNTHESIS.md](research/ops/SYNTHESIS.md) |
 | [research/checkin/](research/checkin/) | Feed PRD mobile slice, pen-count calibration, row-content synthesis |
 | [research/tasks/](research/tasks/) | Per-task PRDs from the 生产任务 Figma |
+| [research/farrowing/](research/farrowing/) | The farrowing-suite brainstorm: five slice briefs + [SYNTHESIS.md](research/farrowing/SYNTHESIS.md) — interaction models before design |
 | [research/inspection/](research/inspection/) | The 巡检 Figma, documented part by part |
 
 archive/ holds superseded renders.
