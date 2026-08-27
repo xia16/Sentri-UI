@@ -277,3 +277,29 @@ twice offline), where the later stamp standing is the correct outcome anyway.
 4. **When stays because it is free.** Today default costs zero taps; day-of-death is real
    analytics (crushing clusters in days 1–3; a shift in the curve flags crate or
    supervision problems). Words, never a picker.
+
+---
+
+## 10 · Owner rounds four and five: the form question and the timer (2026-08-27)
+
+**Document over log.** The session sheet is an always-open document — the hand edits state,
+never history; the trail is the append-only log the system writes beneath, netted per class
+per visit. Corrections are visible as corrections. A +/− pair cancelled within the same
+visit is an undo and never reaches the trail; after the sheet closes, a − is a real
+correction line. Reclassification is −1 here +1 there, read by the netted trail as a move;
+death is always the Died-after-birth door, never minus.
+
+**The form itself is under owner review as two candidates, side by side in 09a:**
+A · the cell grid (whole-cell targets, edge +, minus after first touch); B · the classic
+stepper form — the old product's own shape completed and restyled (visible − n + per class,
+minus dim at 0, no hairlines, derived section totals, tap-the-count-to-type for batch
+entry, plus the row the old form was missing: Died after birth). The owner asked for
+another round of thinking against how other apps do count forms; the analysis favors B's
+familiarity (carts, stock-takes, iOS steppers) over A's larger targets.
+
+**The interval chip: evidence of tracking, not surveillance.** The owner flagged both
+failure modes — a stale chip misleads when the hand was merely busy, and leaving for the
+night would turn the whole room amber. Ruling: the chip lives only while records are fresh;
+amber past ~60 m (the husbandry check-her band); gone past ~90 m rather than stale —
+absence makes no claim, so the room fades to calm overnight and the chip returns with the
+next tally. Never a threshold config, never a notification, never asked-for times.

@@ -617,11 +617,11 @@
 </div>
 
 <!-- ============ 09a session ============ -->
-<h2>09a · The session drawer</h2>
-<p style="max-width:80ch">Every class is a cell and the <b>whole cell is the tap target</b> — the quiet <span class="mono">+</span> badge names the gesture. The totals print once: the column labels <span class="mono">LIVE · 9 / DEAD · 3</span> are the derived numbers, and the interval chip rides the header. A cell touched this visit takes a green border and its per-visit delta — Healthy below was 6 when the sheet opened. Nothing on the phone is documentation: the rules live here, beside it.</p>
-<div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
+<h2>09a · The session drawer — two candidates</h2>
+<p style="max-width:80ch">Same contract, two forms. <b>A</b> is the cell grid: whole-cell targets, a quiet edge <span class="mono">+</span>, minus behind a long-press. <b>B</b> is the classic stepper form — the old product&#39;s own shape, completed and restyled: visible <span class="mono">− n +</span> on every class (minus dim at 0, the universal convention), the one row the old form was missing (<span class="mono">Died after birth ›</span>), no hairlines, derived section totals, and <b>tap the count to type it</b> — the batch-entry hand enters 12 healthy on the numpad instead of twelve taps. In both: a cell or row touched this visit shows its green per-visit delta; a mis-tap is undone by −, and a +/− pair cancelled in the same visit never reaches the trail.</p>
+<div style="display:flex;gap:34px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px">
 <div>
-<div class="vlabel">The session drawer · just tapped Healthy</div>
+<div class="vlabel">A · Cells — whole-cell tap</div>
 <div class="phone" style="display:flex;flex-direction:column;height:780px;background:var(--well)">
   <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
   <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
@@ -650,17 +650,51 @@
   </div>
 </div>
 </div>
+<div>
+<div class="vlabel">B · Stepper form — the familiar shape</div>
+<div class="phone" style="display:flex;flex-direction:column;height:930px;background:var(--well)">
+  <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
+  <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
+  <div class="list" style="opacity:.45">
+    <div class="pcard"><div class="pen"><span class="code">B1</span><span class="agg">1 sow</span></div>
+    <div class="row"><span class="tag">000418</span><div class="st"><span class="l1">8 live · 3 dead <span class="b b-amber">last 45m</span></span><span class="l2">started 6h · parity 3</span></div><div class="rail"><span class="word s-green">ACTIVE</span><span class="chev">›</span></div></div></div>
+    <div class="pcard"><div class="pen"><span class="code">B2</span><span class="agg">1 sow</span></div>
+    <div class="row"><span class="tag">000392</span><div class="st"><span class="l1">Started · no record yet</span><span class="l2">marked 23:10 · L.M · parity 5</span></div><div class="rail"><span class="word s-green">ACTIVE</span><span class="chev">›</span></div></div></div>
+  </div>
+  <div style="flex:1"></div>
+  <div class="fs">
+    <div class="grab"></div>
+    <div class="sh2"><span class="pc">B1</span><span class="tag">000418</span><span class="vit">started 6h · parity 3</span><span class="b b-amber" style="margin-left:auto">last now</span></div>
+    <span class="fk" style="margin:12px 0 2px;display:block">Live · 9</span>
+    <div class="ctr" style="border-top:none;padding:6px 0"><span class="lbl">Healthy</span><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--green)">+1</span><span class="b" style="">−</span><span class="n">7</span><span class="b plus">+</span></div>
+    <div class="ctr" style="border-top:none;padding:6px 0"><span class="lbl">Weak</span><span class="b" style="">−</span><span class="n">1</span><span class="b plus">+</span></div>
+    <div class="ctr" style="border-top:none;padding:6px 0"><span class="lbl">Deformed</span><span class="b" style="">−</span><span class="n">1</span><span class="b plus">+</span></div>
+    <span class="fk" style="margin:10px 0 2px;display:block">Dead · 3</span>
+    <div class="ctr" style="border-top:none;padding:6px 0"><span class="lbl">Stillborn</span><span class="b" style="">−</span><span class="n">2</span><span class="b plus">+</span></div>
+    <div class="ctr" style="border-top:none;padding:6px 0"><span class="lbl">Mummified</span><span class="b" style="">−</span><span class="n">1</span><span class="b plus">+</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--red);border-radius:12px;padding:10px 12px;margin-top:10px"><span style="font-size:13px;font-weight:700;color:var(--red)">Died after birth</span><span class="chev" style="color:var(--red)">›</span></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:11px 2px 2px;border-top:1px solid var(--hair);margin-top:12px"><span style="font-size:13px;font-weight:700;white-space:nowrap">Trail · 9 ›</span><span style="font-family:var(--mono);font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">+1 healthy · 09:41 · G.H</span></div>
+    <div class="shbar"><button class="cta sec">Save</button><button class="cta" style="flex:1">Finish farrowing</button></div>
+  </div>
+</div>
+</div>
 <div style="flex:1;min-width:340px;max-width:520px">
-  <h3 style="margin-top:6px">Rules</h3>
+  <h3 style="margin-top:6px">The trade</h3>
+  <table class="stab"><thead><tr><th style="width:24%"></th><th>A · cells</th><th>B · steppers</th></tr></thead><tbody>
+    <tr><td>Learn cost</td><td>new pattern — minus must be discovered</td><td>zero — every cart and stock app works this way</td></tr>
+    <tr><td>Tap target</td><td>whole cell, largest possible</td><td>44px buttons, kit standard</td></tr>
+    <tr><td>Mis-tap undo</td><td>− appears after first tap</td><td>− always there</td></tr>
+    <tr><td>Batch entry</td><td>taps only</td><td>steppers + tap-count-to-type</td></tr>
+    <tr><td>Height</td><td>~430px</td><td>~540px</td></tr>
+  </table>
+  <h3 style="margin-top:22px">Rules — either form</h3>
   <table class="stab"><thead><tr><th style="width:28%">Rule</th><th>Why</th></tr></thead><tbody>
-    <tr><td>Whole-cell target</td><td>Tap anywhere in the cell tallies its class, committed as it lands — the largest glove target. The edge <span class="mono">+</span> is the affordance; long-press opens − and the stepper.</td></tr>
-    <tr><td>Totals print once</td><td>The column labels carry the derived sums; there is no separate headline. A live tally resets the interval chip in the header (<span class="mono">last now</span>).</td></tr>
-    <tr><td>The edited state</td><td>A touched cell takes a <b>green border</b> and its per-visit delta (<span class="mono">+1</span>; amber <span class="mono">−1</span> for corrections) beside the count — a 7 can never masquerade as &quot;was already 7&quot;. No background wash: the border reads crisply on the light ground. Deltas clear when the sheet closes; the trail keeps them.</td></tr>
-    <tr><td>Unclassified</td><td>A tap on the group label is a plain birth — legal at 2am, refined at cleanup with ✎. The morning batch entry uses the same cells in one visit; the trail records one stamped visit, no birth times pretended.</td></tr>
-    <tr><td>Died after birth</td><td>The sixth cell routes to the death drawer (09b) — the ledger, never these counters. − stays a miscount correction.</td></tr>
-    <tr><td>Sub-actions one tap away</td><td>The trail collapses to its latest stamped line + <span class="mono">Trail · 9 ›</span>; the full receipt, every line ✎, sits behind it.</td></tr>
-    <tr><td>Save vs Finish</td><td>Save closes the sheet and keeps her Active — every tap already committed, so Save gates nothing. Finish farrowing crosses her to Done (motion B).</td></tr>
-    <tr><td>Both models</td><td>Attended: the sheet is the interval tracker — the chip runs off asserted tallies only. Unattended free farrow: the hand returns and enters the litter cell by cell in one visit.</td></tr>
+    <tr><td>Document over log</td><td>The sheet is the always-open document — the hand edits state, never history. The trail is the append-only log the system writes beneath: every change lands as a stamped line, netted per class per visit. Corrections are visible as corrections; nothing is ever deleted or rewritten. Reopening after Finish is the same sheet, same rules.</td></tr>
+    <tr><td>The edited state</td><td>A class touched this visit carries its delta (<span class="mono">+1</span> green · <span class="mono">−1</span> amber) beside the count — a 7 cannot masquerade as &quot;was already 7&quot;. Deltas clear on close; the trail keeps them.</td></tr>
+    <tr><td>Corrections</td><td>− is a miscount. Reclassification (&quot;that healthy is actually weak&quot;) is <span class="mono">−1</span> here, <span class="mono">+1</span> there — the visit-netted trail reads it as a move, born-alive unchanged. A death is the <span class="mono">Died after birth ›</span> row, never −.</td></tr>
+    <tr><td>Totals print once</td><td>The section labels carry the derived sums. A live tally resets the interval chip.</td></tr>
+    <tr><td>The interval chip</td><td>Evidence of tracking, not surveillance: it lives only while records are fresh — amber past ~60&#8202;m (the check-her band), <b>gone past ~90&#8202;m</b> rather than stale. Absence makes no claim: leave for the night and the room fades to calm, no amber wall; sit back down and tally, and it returns. Never a threshold config, never a notification, never asked-for times.</td></tr>
+    <tr><td>Save vs Finish</td><td>Save closes the sheet, keeps her Active; every tap already committed. Finish crosses her to Done.</td></tr>
   </tbody></table>
 </div>
 </div>
