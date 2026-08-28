@@ -21,7 +21,8 @@ The sheet shows two numbers a hand can physically observe, and derives the fact:
   bodies leave the crate; the pile is never re-countable. The type carries the timing
   (stillborn/mummified ⇒ born dead; crushed/scours ⇒ died after) — no timing question,
   **no WHEN anywhere**: the stamp is the date.
-- **Born = Alive + Σ Dead.** Derived, displayed, never entered. Locks at Finish.
+- **Born = Alive + Σ Dead (± fosters after they exist).** Derived, displayed, never
+  entered. Locks at Finish.
 
 The counted/new ambiguity that haunted every earlier model dissolves mechanically:
 - New body found: `+1 crushed`, alive untouched → Born +1.
@@ -33,10 +34,11 @@ The hand never answers the question; their two observations encode it.
 | Gesture | Meaning | Ledger event |
 |---|---|---|
 | Alive − / + / type-to-set | converge to the crate | `alive_assert(n)` — signed delta logged, stamped |
-| Report death button → drawer tally + Record | bodies by type, one drawer visit | `dead(type)` per tally — append |
+| Record dead button → drawer | the drawer shows committed totals; every tap commits; − capsules correct over-tallies whenever found; Done closes — no Record ceremony, nothing staged, nothing lost to interruption | `dead(type)` / `correction(type,−1)` per tap |
 | − in the drawer (capsule, once n > 0) | took one back — an over-tally correction, never a death | `correction(type, −1)`; same-visit pairs net out |
-| Adjust (after lock only) | the warned amendment path on the record ("Born 14 is locked — adjusting amends the record. Continue?"); during farrowing there is no Adjust — the Alive capsule&#39;s − and the drawer&#39;s capsules cover every correction where it happened | `amendment(…)` |
-| Finish farrowing | shows the run summary, asks "Any weak or deformed?" (healthy = remainder), then Lock born N (hold-to-commit) | `classify(weak n, deformed n)` + `final()` |
+| Adjust (after lock only) | warns first, then asks the only real question — More born › or Count was wrong › — so an amendment always states where the extra goes and the invariant never breaks silently | `amendment(…)` |
+| Close | closes the sheet — everything already committed; the `saved hh:mm · who` stamp beside History teaches persistence, recency and identity | — |
+| Finish farrowing (hidden until any event exists) | shows the run summary, asks "Any weak or deformed?" (healthy = remainder), then Lock born N (hold-to-commit) | `classify(weak n, deformed n)` + `final()` |
 | Report death (after Finish) | the same drawer on the record; Born frozen | `death(type)` |
 | Foster (after Finish) | Pairing (C7): n moved + receiving sow — the 12–48 h equalization walk; never during farrowing | `foster_out/in(n)` |
 | ✎ on the record | stamped amendment, the deliberate exception | `amendment(…)` |
@@ -57,7 +59,9 @@ The hand never answers the question; their two observations encode it.
 
 ## 3 · Invariants
 
-1. `Born = Alive + Σ Dead` at every moment, on every device.
+1. `Born = Alive + Σ Dead + fostered out − fostered in` at every moment, on every device;
+   fostering prints on both records (donor `fostered out 2 → 000431`, receiver the mirror),
+   and the receiver&#39;s Born stays her own birth fact.
 2. Born is never directly editable; it moves only through the two observable numbers
    (before Finish) or stamped amendment (after).
 3. Every dead piglet is one tally in exactly one type.
@@ -99,3 +103,22 @@ The hand never answers the question; their two observations encode it.
 2. Is `euthanized` in the default six or behind Other ›?
 3. Early classification (optional weak/deformed before Finish): worth the two extra cells
    on the during sheet, or strictly at Finish in v1?
+
+## 7 · Audit rulings applied (2026-08-28, user-flow-audit.md)
+
+- The drawer is state-showing with per-tap commits — the Record ceremony died (dead-path
+  blocker B1). Stillborn · mummified lead its list; the button is **Record dead**, named
+  for the pile (B3).
+- **Save died; Close replaced it** (B4): everything commits per tap, and the
+  `saved hh:mm · who` stamp beside History teaches persistence, recency and who (also
+  resolving the sheet's missing recency/identity echo).
+- Every − on Alive raises a transient *died? record it as dead* hint, and the Born foot
+  line ticks visibly (B2). Never a gate.
+- Finish is hidden until any event exists; Lock is hold-to-commit and drawn as such; the
+  post-lock Adjust warning offers More born › / Count was wrong › (B5, C10, C3).
+- Wrong-sow: loud header identity, freshness stamp on idle reopen, and a void-last-visit
+  correction (B6).
+- Litter weight soft-warns outside ~0.8–2.5 kg per piglet; both optional facts print on
+  the locked record with ✎ (C8).
+- Trail renamed **History** (count dropped) on the session surfaces (C4).
+- Invariant 1 corrected for fostering (C6).
