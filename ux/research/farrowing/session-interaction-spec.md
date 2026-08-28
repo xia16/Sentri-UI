@@ -14,11 +14,12 @@ The sheet shows two numbers a hand can physically observe, and derives the fact:
 - **Alive** — one number, no classes: the hand converges it to the crate with − / + (or
   taps the framed count and types). Live piglets stay in the crate, so the total is always
   re-countable; nobody computes a delta or knows "which are new".
-- **Dead** — one side, every type together: stillborn · mummified · crushed · scours ·
-  starve-out · other (absorbing the unknowable). **Append-only** (+), because bodies leave the crate and
-  the pile is never re-countable. Each type is tallied as found; the type itself carries
-  the timing analytics needs (stillborn/mummified ⇒ born dead; crushed/scours ⇒ died
-  after) — no timing question, and **no WHEN anywhere**: the stamp is the date.
+- **Dead** — every type (stillborn · mummified · crushed · scours · starve-out · other)
+  lives in **one death drawer product-wide** (09b), opened during farrowing by the
+  `Dead · 5 ›` door whose read line keeps the breakdown on the sheet. Append-only —
+  bodies leave the crate; the pile is never re-countable. The type carries the timing
+  (stillborn/mummified ⇒ born dead; crushed/scours ⇒ died after) — no timing question,
+  **no WHEN anywhere**: the stamp is the date.
 - **Born = Alive + Σ Dead.** Derived, displayed, never entered. Locks at Finish.
 
 The counted/new ambiguity that haunted every earlier model dissolves mechanically:
@@ -31,11 +32,12 @@ The hand never answers the question; their two observations encode it.
 | Gesture | Meaning | Ledger event |
 |---|---|---|
 | Alive − / + / type-to-set | converge to the crate | `alive_assert(n)` — signed delta logged, stamped |
-| + on a dead type | one more body of this type | `dead(type)` — append |
-| − on a dead type (cart capsule, shown once n > 0) | took one back — an over-tally correction, never a death | `correction(type, −1)`; same-visit pairs net out |
+| Dead · n › door → drawer tally + Record | bodies by type, one drawer visit | `dead(type)` per tally — append |
+| − in the drawer (capsule, once n > 0) | took one back — an over-tally correction, never a death | `correction(type, −1)`; same-visit pairs net out |
 | Adjust | in the bar beside Save: the only place anything counts down — − / set on both sides, logged as corrections; after the lock it warns first ("Born 14 is locked — adjusting amends the record. Continue?") and stamps as an amendment | `correction(…)` / `amendment(…)` |
 | Finish farrowing | shows the run summary, asks "Any weak or deformed?" (healthy = remainder), then Lock born N (hold-to-commit) | `classify(weak n, deformed n)` + `final()` |
-| Report death (after Finish) | same dead-type tally on the record; alive drops; Born frozen | `death(type)` |
+| Report death (after Finish) | the same drawer on the record; Born frozen | `death(type)` |
+| Foster (after Finish) | Pairing (C7): n moved + receiving sow — the 12–48 h equalization walk; never during farrowing | `foster_out/in(n)` |
 | ✎ on the record | stamped amendment, the deliberate exception | `amendment(…)` |
 
 - A counted piglet that dies mid-session: tally the body on the dead side, then Adjust
