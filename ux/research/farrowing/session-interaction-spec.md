@@ -44,6 +44,10 @@ The hand never answers the question; their two observations encode it.
 - **Classification happens once, at Finish**, phrased as the question a hand would ask —
   *any weak or deformed?* — with healthy deriving as the remainder. Optional earlier,
   never demanded.
+- **Two optional facts ride the Finish sheet**, never gating the lock: **litter weight**
+  (one number, kg — avg birth weight is a standard survival KPI where a scale exists) and
+  **assisted farrowing** (one checkbox — sow-level dystocia fact feeding her breeding
+  record). Skippable in one glance; stamped when filled.
 - Same-visit +/− pairs net to nothing in the trail; the trail nets per type per visit;
   the ledger is append-only, stamped who · when, merged as a union across devices
   (deltas and appends interleave safely; asserts resolve by later stamp).
