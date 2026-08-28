@@ -618,10 +618,10 @@
 
 <!-- ============ 09a session ============ -->
 <h2>09a · The session drawer — the final model</h2>
-<p style="max-width:80ch">The final form: the sheet observes only <b>Alive</b> — one capsule the hand converges to the crate — and every dead piglet, stillborn or died-after, goes through <b>one death drawer</b> (09b), opened by the <span class="mono">Dead · 5 ›</span> door whose read line keeps the story on the sheet. <span class="mono">Born = alive + dead</span> derives and prints at the foot. A reported death raises Born unless alive came down in the same breath — the arithmetic settles counted-vs-new by itself. Finish shows the summary, asks the question, and locks; after the lock, <span class="mono">Foster</span> joins <span class="mono">Report death</span> as the litter&#39;s routine first-days actions (cross-fostering happens 12–48&#8202;h after birth, never during).</p>
+<p style="max-width:80ch">The final form: the sheet observes only <b>Alive</b> — one capsule the hand converges to the crate — and every dead piglet, stillborn or died-after, goes through <b>one death drawer</b> (09b), opened by the <span class="mono">Dead · 5 ›</span> door whose read line keeps the story on the sheet. <span class="mono">Born = alive + dead</span> derives and prints at the foot. A reported death raises Born unless alive came down in the same breath — the arithmetic settles counted-vs-new by itself. Finish shows the summary, asks the question, and locks; after the lock, <span class="mono">Foster</span> joins <span class="mono">Report death</span> as the routine first-days actions and <span class="mono">Adjust</span> is the warned amendment path (cross-fostering happens 12–48&#8202;h after birth, never during).</p>
 <div style="display:flex;gap:34px;overflow-x:auto;padding-bottom:12px;align-items:flex-start">
 <div style="flex:0 0 auto">
-<div class="vlabel">During · alive is the state, dead is the door</div>
+<div class="vlabel">During · alive is the state, death is a button</div>
 <div class="phone" style="display:flex;flex-direction:column;height:1010px;background:var(--well)">
   <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
   <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
@@ -641,19 +641,16 @@
       <span style="width:72px;height:48px;border:1px solid var(--hair2);border-radius:11px;background:var(--card);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:28px;font-weight:700">9</span>
       <span style="width:44px;height:44px;border-radius:11px;border:1px solid var(--hair2);background:var(--card);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;flex:0 0 auto">+</span>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;padding:12px 2px;border-top:1px solid var(--hair);min-height:64px">
-      <div style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:0">
-        <span style="font-size:13.5px;font-weight:700">Dead · 5</span>
-        <span style="font-family:var(--mono);font-size:11px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">stillborn 1 · mummified 1 · crushed 2 · other 1</span>
-      </div>
-      <span class="chev">›</span>
+    <div style="display:flex;flex-direction:column;gap:5px;padding:12px 2px;border-top:1px solid var(--hair)">
+      <span class="fk" style="margin:0">Dead · 5</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">stillborn 1 · mummified 1 · crushed 2 · other 1</span>
     </div>
     <div style="display:flex;align-items:baseline;gap:10px;padding:10px 2px 4px;border-top:1px solid var(--hair);min-height:44px">
       <span class="fk" style="margin:0">Born</span>
       <span style="font-family:var(--mono);font-size:20px;font-weight:700;line-height:1">14</span>
       <span style="font-size:13px;font-weight:700;color:var(--ink2);margin-left:auto;white-space:nowrap">Trail · 2 ›</span>
     </div>
-    <div class="shbar"><button class="cta sec" style="flex:1">Adjust</button><button class="cta sec" style="flex:1">Save</button><button class="cta" style="flex:1.2">Finish</button></div>
+    <div class="shbar"><button class="cta sec" style="flex:1.5">Report death</button><button class="cta sec" style="flex:1">Save</button><button class="cta" style="flex:1.1">Finish</button></div>
   </div>
 </div>
 </div>
@@ -725,7 +722,7 @@
 <div style="max-width:1000px">
   <h3 style="margin-top:26px">Rules — the final model (session-interaction-spec.md)</h3>
   <table class="stab"><thead><tr><th style="width:26%">Rule</th><th>Why</th></tr></thead><tbody>
-    <tr><td>A picture of the crate</td><td><b>Alive</b> — one classless count, <b>append-only</b>: the + or typing up (tap the framed count). <b>Dead</b> — one side, five types + Other, append-only, tallied as found. <span class="mono">Born = alive + dead</span> — derived, shown alone, never entered. The sheet observes only Alive (cart capsule: − appears once there is something to take back; the framed count types). Every dead piglet goes through <b>one death drawer product-wide</b> — the <span class="mono">Dead · 5 ›</span> door, whose read line keeps the whole story on the sheet. Born derives from alive + dead and prints at the foot, the total under its addends; no key can touch it directly.</td></tr>
+    <tr><td>A picture of the crate</td><td><b>Alive</b> — one classless count, <b>append-only</b>: the + or typing up (tap the framed count). <b>Dead</b> — one side, five types + Other, append-only, tallied as found. <span class="mono">Born = alive + dead</span> — derived, shown alone, never entered. The sheet observes only Alive (cart capsule: − appears once there is something to take back; the framed count types). Every dead piglet goes through <b>one death drawer product-wide</b>, opened by the <span class="mono">Report death</span> button in the bar; the dead breakdown prints on the sheet as plain metadata — a read line, never a disclosure row. Born derives from alive + dead and prints at the foot; no key can touch it directly.</td></tr>
     <tr><td>Nothing counts down here</td><td>Both sides only grow. Every downward move — mis-taps, miscounts, a counted piglet that died (tally the body, then adjust alive down) — lives in <b>Adjust</b>, in the bar beside Save: a correction surface whose changes log as corrections.</td></tr>
     <tr><td>Finish is a summary first</td><td>Tapping Finish farrowing shows the run — <span class="mono">14 born · 9 alive · 5 dead</span> with the dead breakdown — then asks the one question: <b>Any weak or deformed?</b> Healthy derives as the remainder. <span class="mono">Lock born 14</span> is verb-led, hold-to-commit, separated from Back.</td></tr>
     <tr><td>After the lock</td><td>The record: read lines, <span class="mono">Report death</span> as the one routine action — and <b>Adjust survives the lock</b>, behind a warning that quotes the fact (&quot;Born 14 is locked — adjusting amends the record. Continue?&quot;) before opening the same drawer; every change stamps as an amendment.</td></tr>

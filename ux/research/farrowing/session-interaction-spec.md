@@ -16,7 +16,8 @@ The sheet shows two numbers a hand can physically observe, and derives the fact:
   re-countable; nobody computes a delta or knows "which are new".
 - **Dead** — every type (stillborn · mummified · crushed · scours · starve-out · other)
   lives in **one death drawer product-wide** (09b), opened during farrowing by the
-  `Dead · 5 ›` door whose read line keeps the breakdown on the sheet. Append-only —
+  Report death button; the breakdown prints on the sheet as plain metadata, never a
+  disclosure row. Append-only —
   bodies leave the crate; the pile is never re-countable. The type carries the timing
   (stillborn/mummified ⇒ born dead; crushed/scours ⇒ died after) — no timing question,
   **no WHEN anywhere**: the stamp is the date.
@@ -32,9 +33,9 @@ The hand never answers the question; their two observations encode it.
 | Gesture | Meaning | Ledger event |
 |---|---|---|
 | Alive − / + / type-to-set | converge to the crate | `alive_assert(n)` — signed delta logged, stamped |
-| Dead · n › door → drawer tally + Record | bodies by type, one drawer visit | `dead(type)` per tally — append |
+| Report death button → drawer tally + Record | bodies by type, one drawer visit | `dead(type)` per tally — append |
 | − in the drawer (capsule, once n > 0) | took one back — an over-tally correction, never a death | `correction(type, −1)`; same-visit pairs net out |
-| Adjust | in the bar beside Save: the only place anything counts down — − / set on both sides, logged as corrections; after the lock it warns first ("Born 14 is locked — adjusting amends the record. Continue?") and stamps as an amendment | `correction(…)` / `amendment(…)` |
+| Adjust (after lock only) | the warned amendment path on the record ("Born 14 is locked — adjusting amends the record. Continue?"); during farrowing there is no Adjust — the Alive capsule&#39;s − and the drawer&#39;s capsules cover every correction where it happened | `amendment(…)` |
 | Finish farrowing | shows the run summary, asks "Any weak or deformed?" (healthy = remainder), then Lock born N (hold-to-commit) | `classify(weak n, deformed n)` + `final()` |
 | Report death (after Finish) | the same drawer on the record; Born frozen | `death(type)` |
 | Foster (after Finish) | Pairing (C7): n moved + receiving sow — the 12–48 h equalization walk; never during farrowing | `foster_out/in(n)` |
