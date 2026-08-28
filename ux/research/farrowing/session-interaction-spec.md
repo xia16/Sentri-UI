@@ -34,7 +34,7 @@ The hand never answers the question; their two observations encode it.
 | Gesture | Meaning | Ledger event |
 |---|---|---|
 | Alive − / + / type-to-set | converge to the crate | `alive_assert(n)` — signed delta logged, stamped |
-| Record dead button → drawer | the drawer shows committed totals; every tap commits; − capsules correct over-tallies whenever found; Done closes — no Record ceremony, nothing staged, nothing lost to interruption | `dead(type)` / `correction(type,−1)` per tap |
+| Record dead button → drawer | at rest every row is read-state: committed count + a lone +. Touching a row grows the − capsule and its per-visit delta (+1 green / −1 amber) beside the count — the receipt of what the number was before this visit. Every tap commits; − is not clamped, so old over-tallies fix by touch-then-step-down; Done closes, deltas clear, History keeps them | `dead(type)` / `correction(type,−1)` per tap |
 | − in the drawer (capsule, once n > 0) | took one back — an over-tally correction, never a death | `correction(type, −1)`; same-visit pairs net out |
 | Adjust (after lock only) | warns first, then asks the only real question — More born › or Count was wrong › — so an amendment always states where the extra goes and the invariant never breaks silently | `amendment(…)` |
 | Close | closes the sheet — everything already committed; the `saved hh:mm · who` stamp beside History teaches persistence, recency and identity | — |
@@ -122,3 +122,7 @@ The hand never answers the question; their two observations encode it.
   the locked record with ✎ (C8).
 - Trail renamed **History** (count dropped) on the session surfaces (C4).
 - Invariant 1 corrected for fostering (C6).
+- **Rest is read-state** (owner ruling, round ten): drawer rows at rest show committed
+  count + lone +; the − and the per-visit delta grow in only on touch. The delta chip is
+  the anti-accident receipt — a changed number always shows what it was before this
+  visit, on the drawer rows and on the Alive field alike.
