@@ -34,7 +34,7 @@ The hand never answers the question; their two observations encode it.
 | Gesture | Meaning | Ledger event |
 |---|---|---|
 | Alive − / + / type-to-set | converge to the crate | `alive_assert(n)` — signed delta logged, stamped |
-| Record dead button → drawer | at rest every row is read-state: committed count + a lone +. Touching a row grows the − capsule and its per-visit delta (+1 green / −1 amber) beside the count — the receipt of what the number was before this visit. Every tap commits; − is not clamped, so old over-tallies fix by touch-then-step-down; Done closes, deltas clear, History keeps them | `dead(type)` / `correction(type,−1)` per tap |
+| Record dead button → drawer | at rest every row is read-state: committed count + a lone +. Touching a row grows the − capsule and a plain receipt beside the count — `was 2` — never a signed second number that could read as a pending accumulator. Every tap commits; − is not clamped, so old over-tallies fix by touch-then-step-down; Done closes, deltas clear, History keeps them | `dead(type)` / `correction(type,−1)` per tap |
 | − in the drawer (capsule, once n > 0) | took one back — an over-tally correction, never a death | `correction(type, −1)`; same-visit pairs net out |
 | Adjust (after lock only) | warns first, then asks the only real question — More born › or Count was wrong › — so an amendment always states where the extra goes and the invariant never breaks silently | `amendment(…)` |
 | Close | closes the sheet — everything already committed; the `saved hh:mm · who` stamp beside History teaches persistence, recency and identity | — |
@@ -123,6 +123,7 @@ The hand never answers the question; their two observations encode it.
 - Trail renamed **History** (count dropped) on the session surfaces (C4).
 - Invariant 1 corrected for fostering (C6).
 - **Rest is read-state** (owner ruling, round ten): drawer rows at rest show committed
-  count + lone +; the − and the per-visit delta grow in only on touch. The delta chip is
-  the anti-accident receipt — a changed number always shows what it was before this
-  visit, on the drawer rows and on the Alive field alike.
+  count + lone +; the − and the per-visit delta grow in only on touch. The receipt is the words `was N`
+  (under the Alive counter, beside a touched drawer row) — a past number cannot be
+  misread as a pending accumulator, which a signed +4 chip was (owner catch, round
+  eleven). One live number per field, always.
