@@ -11,12 +11,12 @@ counted/new question, the Died door, append-only logs) live in git history.
 
 The sheet shows two numbers a hand can physically observe, and derives the fact:
 
-- **Alive** — one number, no classes, kept equal to the living piglets in the crate.
-  *Convergence, not arithmetic*: the hand taps ± (or types, numpad) until the screen
-  matches what they see. Works because live piglets stay in the crate and are always
-  re-countable. Nobody ever computes a delta or knows "which ones are new".
+- **Alive** — one number, no classes, **append-only**: the hand taps + (or taps the framed
+  count and types up) until the screen matches the crate. Live piglets stay in the crate,
+  so the total is always re-countable; nobody computes a delta or knows "which are new".
+  Nothing on the tally sheet counts down — every downward move is Adjust's job.
 - **Dead** — one side, every type together: stillborn · mummified · crushed · scours ·
-  starve-out · unknown · other ›. **Append-only** (+), because bodies leave the crate and
+  starve-out · other (absorbing the unknowable). **Append-only** (+), because bodies leave the crate and
   the pile is never re-countable. Each type is tallied as found; the type itself carries
   the timing analytics needs (stillborn/mummified ⇒ born dead; crushed/scours ⇒ died
   after) — no timing question, and **no WHEN anywhere**: the stamp is the date.
@@ -33,17 +33,17 @@ The hand never answers the question; their two observations encode it.
 |---|---|---|
 | Alive ± / type-to-set | converge to the crate | `alive_assert(n)` — system logs the signed delta, stamped |
 | + on a dead type | one more body of this type | `dead(type)` — append |
-| Adjust | correction mode: − / set on dead types; alive corrections noted as such | `correction(…)`, logged as a correction |
-| Finish farrowing | classify the living, lock Born | `classify(weak n, deformed n)` + `final()` |
+| Adjust | in the bar beside Save: the only place anything counts down — − / set on both sides, logged as corrections; after the lock it warns first ("Born 14 is locked — adjusting amends the record. Continue?") and stamps as an amendment | `correction(…)` / `amendment(…)` |
+| Finish farrowing | shows the run summary, asks "Any weak or deformed?" (healthy = remainder), then Lock born N (hold-to-commit) | `classify(weak n, deformed n)` + `final()` |
 | Report death (after Finish) | same dead-type tally on the record; alive drops; Born frozen | `death(type)` |
 | ✎ on the record | stamped amendment, the deliberate exception | `amendment(…)` |
 
-- **Alive-down hint, never a gate**: converging alive downward shows one quiet line —
-  "found a body? tally it on the dead side" — because a down-move without a dead tap
-  lowers Born (see accepted costs).
-- **Classification happens once, at Finish**, when a settled litter is actually
-  assessable: enter `weak n · deformed n`; **healthy derives as the remainder**. Optional
-  early classification is allowed (freedom principle) but never asked for.
+- A counted piglet that dies mid-session: tally the body on the dead side, then Adjust
+  alive down — Born holds. Adjust reminds inline that a found body belongs on the dead
+  side before alive comes down.
+- **Classification happens once, at Finish**, phrased as the question a hand would ask —
+  *any weak or deformed?* — with healthy deriving as the remainder. Optional earlier,
+  never demanded.
 - Same-visit +/− pairs net to nothing in the trail; the trail nets per type per visit;
   the ledger is append-only, stamped who · when, merged as a union across devices
   (deltas and appends interleave safely; asserts resolve by later stamp).
