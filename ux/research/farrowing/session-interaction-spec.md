@@ -135,9 +135,12 @@ The hand never answers the question; their two observations encode it.
   receipt (`5 posted · +4 this visit`). Drawer rows: posted stays still, the pending chip
   moves (`2 +1`). − drains pending only, clamped by construction; it can never touch
   posted state. Close/Done folds pending into posted as one stamped event.
-- **− at the floor becomes a door — everywhere, anytime.** The boundary is the pending
-  window, not the lock: with nothing pending, − offers `died ›` / `miscount` on Alive and
-  drawer rows alike, during farrowing as much as after. During, the correction is the
+- **The posted figure is the door.** Tapping a posted count opens its correction event —
+  provenance first, then what happened (miscount · wrong type › · wrong sow), then the
+  right value; wrong type writes the paired move as one event. On Alive, where − is
+  always present, − at the floor offers the same door (`died ›` / `miscount`). Never a
+  bogus + to reach a minus. The boundary is the pending window, not the lock —
+  corrections work during farrowing as much as after. During, the correction is the
   plain event; post-lock, corrections touching Born add the banner and the More-born /
   Count-was-wrong question. One component, escalating ceremony.
 - **Corrections are events, not edits.** The amend path (post-lock Adjust, cross-session
