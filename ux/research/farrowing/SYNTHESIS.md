@@ -320,3 +320,24 @@ person. Ruling: + is always free; − on an alive class opens the one decision �
 (Born drops) or died › (moves to a cause; Born stands, Alive drops). − on a cause cell is
 always a miscount. The Born/Alive-now split (round five) plus this rule closes the
 disappearing-death hole: the story always sums for whoever walks in next.
+
+---
+
+## 12 · Final model + professional design review (2026-08-28)
+
+The session model reached its terminal form (session-interaction-spec.md): the sheet is a
+picture of the crate — Alive one classless converge number, Dead one append-only side of
+type tallies, Born = alive + dead derived and locked at Finish where the living are
+classified once (healthy = remainder). No died-after button, no counted/new question, no
+WHEN anywhere.
+
+A three-lens professional panel (visual craft · barn ergonomics · system/copy) reviewed
+the drawn screens; 39 findings, all P1/P2 applied: one 44px key size product-wide, fixed
+numeral slots and unified 12px insets, whole-cell targets with 16px column gutters,
+zero cells keep full-ink labels with quiet outline + and grey digit (informative, never
+disabled), the alive count rendered as a framed field so type-to-set is discoverable, a
+reserved hint line so nothing reflows under a moving finger, landed-tap feedback with a
+transient inline undo (adapted from the panel's toast suggestion — toasts stay banned),
+Lock born N as a verb-led hold-to-commit CTA separated from Back, copy tightened to slot
+discipline (started 07:30 · Dead · 5 · Classify the living · final · ✎ to amend · one
+Other › across drawers · trail grammar unified).
