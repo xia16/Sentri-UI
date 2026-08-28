@@ -11,10 +11,9 @@ counted/new question, the Died door, append-only logs) live in git history.
 
 The sheet shows two numbers a hand can physically observe, and derives the fact:
 
-- **Alive** — one number, no classes, **append-only**: the hand taps + (or taps the framed
-  count and types up) until the screen matches the crate. Live piglets stay in the crate,
-  so the total is always re-countable; nobody computes a delta or knows "which are new".
-  Nothing on the tally sheet counts down — every downward move is Adjust's job.
+- **Alive** — one number, no classes: the hand converges it to the crate with − / + (or
+  taps the framed count and types). Live piglets stay in the crate, so the total is always
+  re-countable; nobody computes a delta or knows "which are new".
 - **Dead** — one side, every type together: stillborn · mummified · crushed · scours ·
   starve-out · other (absorbing the unknowable). **Append-only** (+), because bodies leave the crate and
   the pile is never re-countable. Each type is tallied as found; the type itself carries
@@ -31,8 +30,9 @@ The hand never answers the question; their two observations encode it.
 
 | Gesture | Meaning | Ledger event |
 |---|---|---|
-| Alive ± / type-to-set | converge to the crate | `alive_assert(n)` — system logs the signed delta, stamped |
+| Alive − / + / type-to-set | converge to the crate | `alive_assert(n)` — signed delta logged, stamped |
 | + on a dead type | one more body of this type | `dead(type)` — append |
+| − on a dead type (cart capsule, shown once n > 0) | took one back — an over-tally correction, never a death | `correction(type, −1)`; same-visit pairs net out |
 | Adjust | in the bar beside Save: the only place anything counts down — − / set on both sides, logged as corrections; after the lock it warns first ("Born 14 is locked — adjusting amends the record. Continue?") and stamps as an amendment | `correction(…)` / `amendment(…)` |
 | Finish farrowing | shows the run summary, asks "Any weak or deformed?" (healthy = remainder), then Lock born N (hold-to-commit) | `classify(weak n, deformed n)` + `final()` |
 | Report death (after Finish) | same dead-type tally on the record; alive drops; Born frozen | `death(type)` |
