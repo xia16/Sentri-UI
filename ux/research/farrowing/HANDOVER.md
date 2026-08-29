@@ -9,6 +9,9 @@ touching anything.
 
 ## 1 · Read these, in this order
 
+0. `RULINGS.md` — **the standing rulings, current answers only; it outranks everything
+   below.** The chronological docs contain superseded positions (that is how a previous
+   session got confused about the dead WHEN chips); when in doubt, RULINGS wins.
 1. `ux/system/components.html` — the law book. Row grammar, chip law, zero rule, field
    kit, the chassis (04d), lens law, forecast register. Every law here is owner-ratified;
    never re-litigate one silently.
