@@ -275,7 +275,7 @@ twice offline), where the later stamp standing is the correct outcome anyway.
    Causes: Crushed · Scours · Starve-out · Unknown cover ~95% of pre-weaning mortality
    records at one tap (crushing alone is typically half or more); Other › opens the farm's
    configured list for the tail. Unknown is a cause, not a failure.
-4. **When stays because it is free.** Today default costs zero taps; day-of-death is real
+4. **~~When stays because it is free~~ — SUPERSEDED by the no-WHEN ruling (see RULINGS.md): the chips are dead everywhere.** Today default costs zero taps; day-of-death is real
    analytics (crushing clusters in days 1–3; a shift in the curve flags crate or
    supervision problems). Words, never a picker.
 

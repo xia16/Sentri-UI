@@ -1,5 +1,7 @@
 # Farrowing session — interaction spec (final model)
 
+> **RULINGS.md outranks this file where they disagree.**
+
 The state model behind the session drawer. Supersedes all earlier drafts of this file and
 any drawn detail in farrowing.html 09a where they disagree. Decided across owner rounds
 four through nine; the discarded intermediate models (class steppers, tally chips, the
@@ -85,7 +87,7 @@ The hand never answers the question; their two observations encode it.
   alive 5→4. Born: 4 alive + 1 dead = 5, unchanged. ✓
 - **Revisit (the walkthrough that killed append-only)**: logged 5, returns, sees 9 → taps
   + until 9 (or types 9). No memory, no math, no knowing which are new. ✓
-- **Morning after**: alive → 5; pile → crushed 2, stillborn 1, mummified 1, unknown 1.
+- **Morning after**: alive → 5; pile → crushed 2, stillborn 1, mummified 1, other 1.
   Born derives 10. Identical gesture set to the attended flow. ✓
 - **Person B**: reads Born 10 · Alive 5; counts 5 → touches nothing. Counts 4 → either
   tallies the body they found, or Adjusts if they judge a miscount. Born never accepts a
