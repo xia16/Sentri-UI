@@ -1,11 +1,15 @@
 # Farrowing drawer — the complete interaction map (low-fi requirements)
 
+> **RULINGS.md outranks this file where they disagree.** The 2026-08-29 rulings round
+> answered §9's questions and pinned the §8 placements; both sections carry the answers
+> inline, marked RULED.
+
 Every action and interaction inside the farrowing drawer suite, walked path by path, with
 no UI. This file reconciles session-interaction-spec.md, user-flow-audit.md,
-count-entry-pattern.md, the owner rulings in SYNTHESIS §6–§12, and the drawn state of
-farrowing.html 09/09a/09b. Where those sources disagreed, the later ruling stands and §7
-records every disagreement found. Where an interaction existed in no source at all, §8
-proposes the requirement and marks it for owner sign-off.
+count-entry-pattern.md, the owner rulings in SYNTHESIS §6–§12 and RULINGS.md, and the
+drawn state of farrowing.html 09/09a/09b. Where those sources disagreed, the later ruling
+stands and §7 records every disagreement found. Where an interaction existed in no source
+at all, §8 proposes the requirement and marks it for owner sign-off.
 
 Two design metrics govern every row here, per the owner's brief:
 
@@ -25,20 +29,31 @@ Two design metrics govern every row here, per the owner's brief:
 ```
                     started mark ─────────────┐
                     or first count event      ▼
-  AWAITING ────────────────────────────────► ACTIVE ──── Lock born N ────► DONE
-     │                                        │                            │
-     │  disposition at batch close            │  sow death / abortion      │  (record;
-     │  (not in pig · abort · next batch)     │  (sow verbs, outside       │   never a
-     ▼                                        ▼   this suite — C5 open)    ▼   lens exit)
-   leaves the batch                        exits every lens             stays in Done/All
+  AWAITING ◄───────────────────────────────► ACTIVE ──── Lock born N ────► DONE
+     │          (◄ False alarm revert,        │                            │
+     │           started-mark-only state)     │  sow dies (Report death    │  (record;
+     │  disposition at batch close            │  on HER page, not here)    │   never a
+     │  (not in pig · abort · next batch)     ▼                            ▼   lens exit)
+     ▼                                     ENDED · sow died            stays in Done/All
+   leaves the batch                        (terminal; Born derives from
+                                            what stands, classification
+                                            skipped — amendable via Adjust;
+                                            litter record survives with an
+                                            orphan-count Foster prompt;
+                                            she exits every lens, motion C)
 ```
 
 - Opening a sheet **never** changes state. Only a written event crosses her: the started
   mark or any count event crosses Awaiting → Active; Lock crosses Active → Done.
-- Done is terminal for the session. Post-lock events (deaths, fosters, amendments) write
-  to the record; they never reopen Active.
-- There is no Undo of a cross as a gesture; a false started mark reverts through Adjust
-  (§8-G3), stamped.
+- Done and Ended are terminal for the session. Post-lock/post-end events (deaths,
+  fosters, amendments) write to the record; they never reopen Active.
+- False alarm (RULED): while the session holds nothing beyond the started mark, the
+  sheet offers a plain revert — a stamped correction event, Active → Awaiting. Once any
+  count exists she ends only via Finish or a sow-exit verb.
+- Sow death mid-farrowing (RULED, was C5): sow verbs never live on the litter sheet —
+  that is why the button says Record dead, not Report death. Her death is recorded on
+  her: tap her identity (the sh2 tag block / her identity on the room row) → sow page →
+  Report death. The event itself ends the session as `ended · sow died`.
 
 ### Sheet modes (one sheet, four faces)
 
@@ -68,9 +83,10 @@ Two design metrics govern every row here, per the owner's brief:
 | E2 | Room row tap, Active sow | sheet · During | |
 | E3 | Room row tap, Done sow | sheet · After | the ✎ on the row is a glyph, not a separate target |
 | E4 | Scan ear tag (dock) | her sheet in whatever mode her state dictates | also resolves a sow not in this room's list |
-| E5 | Started mark | — writes `started` | **placement currently unspecced — §8-G1** |
+| E5 | Started mark — the room row's left-edge action on an Awaiting sow (RULED, three-zone law: left edge acts) | — writes `started` | truly one tap; any first recorded event starts her equally |
 | E6 | Check-in litter row death entry | dead drawer · Check-in mode | must be this same component (cross-surface debt) |
 | E7 | Count drawer down-door `Record N died` | dead drawer, pre-filled mode | 09e scope; drawer must accept a target count (§8-G9) |
+| E8 | Her identity (sh2 tag block; her identity on the room row) | sow page | RULED with the sow-death ruling; the route to every sow verb. Row-level target geometry vs the row-tap-opens-sheet rule → §9-Q1 |
 
 Non-entries, deliberate: no notification ever opens a sheet; the interval chip is not
 tappable; pen headers navigate the room, never a sow.
@@ -90,6 +106,8 @@ union-merged offline.
 | Lens `Awaiting / Active / Done / All` | tap | — | list refilters, counts shown in lens | room |
 | Filter | tap | — | filter sheet (chassis-standard) | room |
 | Sow row | tap | — | — | sheet (mode per state) |
+| Awaiting row · left-edge action | tap | `started` | motion B cross → Active, `Started · no record yet` | room |
+| Row identity (tag) | tap | — | — | sow page (E8 — geometry §9-Q1) |
 | Goto pen | tap | — | list scrolls to pen | room |
 | Scan ear tag | tap → scan | — | — | her sheet |
 | Task overview › | tap | — | — | overview |
@@ -110,19 +128,26 @@ Row grammar (the receipts this surface owes):
 - Done: `Final · N alive` (alive **now**, ticking with post-lock events) / line 2
   `born N · final <date> · who` (§7-D4 fixes the current drawn grammar).
 
-### 2.2 Session sheet · Pre-start (the zero face — §8-G1 proposes, owner signs)
+### 2.2 Session sheet · Pre-start (the zero face — placements RULED)
 
 | Element | Gesture | Commits | Receipt | Lands |
 |---|---|---|---|---|
-| Mark started (bar, primary) | tap | `started` | header vit `marked hh:mm · who`; room row crosses to Active | sheet stays open |
 | Alive `− 0 +` / type | first + or set | `alive_assert` | as During; crosses her to Active — counting IS starting | During |
 | Record dead | tap → drawer | `dead(type)` per tap | as During; crosses her to Active | drawer |
+| Sheet identity (sh2) | tap | — | — | sow page (E8) |
 | Close / grab / backdrop | tap or swipe | — | nothing written, still Awaiting | room |
 
+- The started mark does NOT live here (RULED): it is the room row's left-edge action
+  (E5). Opening the sheet and recording anything starts her equally — no new sheet
+  chrome for starting.
+- While a session holds nothing beyond the started mark, the sheet shows the plain
+  `False alarm` revert (RULED) — a stamped correction, Active → Awaiting. It disappears
+  at the first count event.
 - Finish absent (no event exists). Adjust absent (nothing posted to correct — the one
   state where the door has no figures; hiding beats a dead door, and "no dim-as-disabled"
   stays intact because nothing is drawn disabled).
-- Header vit shows her due line (`due day 114` / `day 117`), not `started`.
+- Header vit shows her due line (`due day 114` / `day 117`), not `started`; after the
+  mark alone, `marked hh:mm · who`.
 - The batch-entry morning case needs no special mode: the hand converges Alive and
   tallies the pile exactly as During; the first event backfills the cross.
 
@@ -135,14 +160,17 @@ Row grammar (the receipts this surface owes):
 | Alive framed count | tap | — (opens pad) | pad grows in; typing previews | pad inline |
 | pad set | confirm digit entry | `alive_assert(n)` absolute | as above | pad folds |
 | Record dead | tap | — | — | dead drawer |
-| Adjust | tap | folds pending first (§8-G5) | — | Adjust picker |
+| Adjust | tap | folds pending first (RULED) | — | Adjust picker |
+| Sheet identity (sh2) | tap | — | — | sow page (E8) |
 | History › | tap | — | — | History (read-only) |
 | Close | tap | folds pending → one stamped visit event | room row updates; `saved hh:mm · who` was already live | room |
 | Grab swipe / backdrop tap | swipe/tap | same as Close | same | room |
 | Finish (hidden until any count event) | tap | — | — | Finishing |
 
 Dead zones: `Born 14 · Dead 5` (derived — no tap-the-fact, one-door law), the breakdown
-metadata line, the receipt line, the saved stamp, the header identity.
+metadata line, the receipt line, the saved stamp. The header identity is no longer dead:
+it is the one door to the sow page (E8) — the wrong-crate tripwire and the sow-verb
+route in a single, honest place.
 
 **2.3a · The Alive pending model (signed, unlike the drawer):**
 
@@ -180,10 +208,11 @@ metadata line, the receipt line, the saved stamp, the header identity.
   `Dead · N — every body, born dead or died`, N = posted + pending.
 - Rest is read-state: posted count + lone +. A row a hand has not touched this visit
   shows no −, no chip, no affordance beyond +.
-- Types, in order: Stillborn · Mummified · Crushed · Scours · Starve-out · Other.
-  Born-dead leads because it is the common during-farrowing case. The type carries the
-  timing; **no WHEN anywhere** — the stamp is the date (but see §7-A4 for the check-in
-  tension).
+- Types, in order (RULED — the five defaults + Other): Stillborn · Mummified · Crushed ·
+  Scours · Starve-out · Other. Born-dead leads because it is the common during-farrowing
+  case. `euthanized` lives behind Other › in v1 — promote only if farm data shows
+  frequency. The type carries the timing; **no WHEN anywhere, absolutely — including
+  check-in** (RULED; §7-A4 resolved): the stamp is the date.
 - Corrections to **posted** dead counts never happen here — Adjust only. The − can
   never reach posted state by construction.
 - Pre-filled mode (E7): opens with the door's count as unassigned pending demanding
@@ -191,6 +220,14 @@ metadata line, the receipt line, the saved stamp, the header identity.
   must name which.
 
 ### 2.5 Adjust — the one correction door
+
+The shape is a deliberate drill-in, owner-ratified (2026-08-29): **click in → the list
+of the current counts → click the figure to change → the few options** (what happened →
+should-be value). Recording stays flat on the sheet; correcting announces itself and
+sits one level deeper by design — the two doors are differently shaped on purpose.
+Entering Adjust folds the pending window first (RULED): corrections operate on posted
+state only, so the picker's figures are posted = live and a correction can never race a
+buffer.
 
 Step 1 · **Picker** (which figure?):
 
@@ -222,7 +259,7 @@ Step 2 · **Correction event** (what happened?):
 
 | Element | Gesture | Commits | Receipt | Lands |
 |---|---|---|---|---|
-| Weak / Deformed `− n +` | tap | `classify` per tap (§7-A5) | Healthy remainder recomputes live; sum clamped to alive | — |
+| Weak / Deformed `− n +` | tap | `classify` per tap (RULED; §7-A5 resolved) | Healthy remainder recomputes live; sum clamped to alive | — |
 | Litter weight field | tap → pad | `litter_weight(kg)` on set | soft range hint outside ~0.8–2.5 kg/piglet — words, never a gate | — |
 | Assisted checkbox | tap | `assisted(bool)` | check | — |
 | Back / grab | tap/swipe | — (entries already committed) | — | During |
@@ -250,6 +287,9 @@ Step 2 · **Correction event** (what happened?):
   faces are the same ledger read from opposite ends.
 - No alive counter exists here. Extra live piglets found later are `Adjust → More born ›`
   — never a count assert on this sheet.
+- Anyone may amend born post-lock (RULED, standing unless the owner vetoes): open ✎,
+  stamped, no role gate — provenance over sign-off deters falsification, permissions do
+  not.
 - Foster is post-lock only (the 12–48 h equalization window is guidance in copy, never a
   gate). No foster during farrowing, ever.
 - Read lines (living / dead / since final / fostered / weight · assisted) are dead zones
@@ -279,7 +319,7 @@ Tap counts start from the During sheet unless noted; +2 overhead from the room (
 | P4 | New body found (was never counted) | 3 | Record dead → Crushed + → Done; Alive untouched; Born +1 |
 | P5 | Revisit convergence (logged 5, sees 9) | 4 or 2 | Alive + ×4, or count-tap → type 9 |
 | P6 | Morning-after batch (unattended) | ~8 | converge Alive to 5 → Record dead → crushed ++ · stillborn + · mummified + · Other + → Done; Born derives 10 |
-| P7 | Passing hand marks labor | 2 | row → Mark started (§8-G1) |
+| P7 | Passing hand marks labor | 1 | the room row's left-edge action (RULED) — truly one tap, no sheet opened |
 | P8 | Person B verifies, all agrees | 0 | reads Born · Alive; touches nothing |
 | P9 | Mis-tap fixed same visit | 2 | Alive + then Alive − (or drawer + then −); trail shows nothing |
 | P10 | Over-tally caught next visit | 4 | Adjust → Crushed → Miscount (default) → should-be − → Correct to 1 |
@@ -290,20 +330,21 @@ Tap counts start from the During sheet unless noted; +2 overhead from the room (
 | P15 | Premature lock, three more born | 4 | After: Adjust → Born → More born › → +3 · where: alive now → commit |
 | P16 | Death after final | 3 | After: Record dead → type + → Done; alive-now derives down |
 | P17 | Foster out | — | After: Foster → Pairing flow (its own spec) |
-| P18 | Euthanized deformed piglet | 3 | After: Record dead → (list position per §9-Q2) → Done |
+| P18 | Euthanized deformed piglet | 4 | After: Record dead → Other › → euthanized → Done (RULED: behind Other in v1) |
 | P19 | Interrupted mid-drawer (bolts at a scream) | 0 lost | every tap already committed; pending folds on next Done/close; nothing vanishes |
 | P20 | Phone dies / sleeps mid-visit | 0 lost | taps committed; reopen shows freshness stamp; convergence gesture re-heals |
 | P21 | Peek at an Awaiting sow | 0 | open → Close; no state change |
-| P22 | False started mark | 3 | Adjust → Started → False alarm → she returns to Awaiting, stamped (§8-G3) |
-| P23 | Sow dies mid-farrowing | — | leaves via sow verbs outside this suite; session disposition OPEN (§9-Q3, C5) |
+| P22 | False started mark | 2 | row → False alarm on the sheet (RULED: plain revert, exists only while the session holds nothing but the mark) → back to Awaiting, stamped |
+| P23 | Sow dies mid-farrowing | 3 + sow flow | sheet identity → sow page → Report death (RULED). Session ends `ended · sow died`: Born derives from what stands, classification skipped (amendable via Adjust), litter record surfaces its orphan count as a Foster prompt, she exits every lens |
 | P24 | Check-in death, litter weaned off record | 3 | litter row → same drawer → type + → Done |
 
 Ease audit against the metric: P1 (the 90% action) is one tap on the sheet itself; the
 worst routine path (P6, a whole overnight litter) is ~8 taps on two surfaces; every
 correction is ≤ 6 taps through one door. No path requires a third component. The one
-structural cost is deliberate: every dead tally pays the drawer round-trip (P2 — 3 taps
-for the single commonest event) to keep one component product-wide — flagged as the
-standing ease-vs-cleanliness trade in §9-Q1, not silently accepted.
+structural cost is deliberate and now owner-ratified (Q1): every dead tally pays the
+drawer round-trip — and it is tally-then-dismiss, not a ceremony, because every tap
+already commits; a hand that bolts mid-drawer loses nothing (P19). The correction
+drill-in's depth (P10–P12) is equally deliberate — see §2.5.
 
 ---
 
@@ -368,18 +409,13 @@ path is a falsification incentive. No foster during farrowing. No role gates in 
   farrowing's Alive deliberately allows convergence below posted (signed pending). The
   general pattern (clamp) still governs tally rows. **Fixed: mapping bullet carries the
   convergence exception.**
-- A4 **Open tension, needs owner:** SYNTHESIS §7.5 (owner ruling: late-found deaths
-  offer `Today · Yesterday · Not sure` chips) vs the final no-WHEN law (§12: stamp is
-  the date, no WHEN anywhere). The one-drawer law means check-in's late-death case
-  currently loses the chips the owner explicitly ruled for. Either §7.5 is superseded
-  (accepted cost §4 says dates = stamps) or the drawer's check-in mode alone carries the
-  three chips. → §9-Q4.
-- A5 Per-tap commit vs the Finish ceremony: classification was specced as
-  `classify(weak, deformed) + final()` at Lock — a two-stage ceremony of exactly the
-  shape B1 killed in the drawer (Back or a dead phone silently discards entered
-  classification). This map specs classify-per-tap (§2.6), with `final()` alone at the
-  hold. Costs nothing visible; closes the last uncommitted state in the suite. → owner
-  confirm, §9-Q5.
+- A4 **RESOLVED (RULINGS):** no-WHEN is absolute, including check-in. The
+  Today/Yesterday/Not-sure chips are dead; SYNTHESIS §9.4 is struck in place; any other
+  mention is a stale artifact.
+- A5 **RESOLVED (RULINGS):** classify-per-tap confirmed. The weak/deformed steppers
+  commit per tap like every control, healthy re-derives live; `Lock born N` remains the
+  suite's one staged act (hold-to-commit, audit-mandated). The last two-stage ceremony
+  is dead.
 
 **B · Drawn artifact vs the law (register only — fix in the next render round, not here):**
 
@@ -413,21 +449,20 @@ that way — B4/B6 are the only number/grammar drifts found.
 
 ## 8 · Gaps — interactions no source accounted for (proposed here, owner signs)
 
-- **G1 · The started mark has no home.** Every source says "one-tap started mark";
-  none says where. Proposal: primary bar action `Mark started` on the Pre-start sheet
-  (§2.2) — so the true cost is row-tap + tap. No row-level control (rows stay clean, no
-  hidden gestures). 09's "one tap, nothing else asked" copy then means one tap *in the
-  sheet*.
+- **G1 · RULED — the started mark lives on the room row's left edge** (three-zone law:
+  left edge acts), one true tap from the walk; any first recorded event starts her
+  equally; no new sheet chrome. (This map's earlier bar-action proposal is superseded.)
 - **G2 · Negative pending display.** `5 posted · −2 this visit` (worded, amber −2), same
   slot as the positive receipt. Never drawn; needed for honest convergence.
-- **G3 · Un-starting a false alarm.** Adjust picker (post-start, pre-event) offers
-  `Started` → `False alarm` → she reverts to Awaiting, stamped. Without this the only
-  exit from a mis-tap is a fake farrowing.
+- **G3 · RULED — the false-alarm revert is a plain action on the sheet**, existing only
+  while the session holds nothing beyond the started mark (Active → Awaiting, stamped
+  correction). Once any count exists she ends only via Finish or a sow-exit verb. (Not
+  via Adjust as first proposed.)
 - **G4 · Type-to-set pad.** Tapping any framed count (Alive, should-be, weight) grows
   the standard inline pad under the field; set commits an absolute assert; grab/tap-out
   folds it without writing. One pad grammar product-wide (the conveyor already has it).
-- **G5 · Adjust × pending.** Opening Adjust folds pending first (a visit checkpoint), so
-  the picker's figures are posted = live and a correction can never race a buffer.
+- **G5 · RULED — Adjust folds pending on entry**; corrections operate on posted state
+  only.
 - **G6 · Wrong sow, the full shape.** Scope step (`this figure` / `this visit` — the
   audit's void-last-visit) → sow picker (scan-first) → mirrored stamped events on both
   records; both Histories carry the move; both figures wear ✎.
@@ -445,27 +480,34 @@ that way — B4/B6 are the only number/grammar drifts found.
   (weak/deformed) · litter weight · assisted. Alive-now is derived and absent. During:
   Alive + posted dead types only.
 - **G11 · History contract** as §2.8 — currently a door to nowhere in both modes.
-- **G12 · Visit boundary.** A visit ends at Close/dismiss or after ~90 min idle
-  (auto-fold, same band that kills the chip). Sleep/background alone does not end it —
-  protects the convergence-after-sleep behavior the audit praised.
+- **G12 · RULED — the visit ends at Close, at sheet dismiss, on Adjust entry, or after
+  ~90 min idle** — the same boundary as the interval-chip fade, so there is exactly one
+  notion of "visit over". Sleep/background alone does not end it — protects the
+  convergence-after-sleep behavior the audit praised.
+- **G13 · Picker auto-skip (new proposal).** When exactly one figure holds a posted
+  value (the common early-session state: only Alive), Adjust skips Step 1 and opens the
+  correction event directly, back-titled with the figure. Saves the drill-in's one
+  redundant tap without adding an entrance; the two-step shape returns the moment a
+  second figure posts.
 
 ---
 
 ## 9 · Unresolved questions (owner)
 
-- Q1 · Stillborn tap cost: is 3 taps (drawer round-trip) acceptable for the single
-  commonest during-farrowing event, or does the sheet earn a persistent one-tap
-  `+ stillborn` shortcut that writes the same drawer event? (Shortcut breaks "one
-  resting control per figure" on the sheet; keeping the round-trip is the cleanliness
-  call. Recommendation: keep the drawer; revisit only if field use complains.)
-- Q2 · `euthanized`: in the default six or behind Other ›? (Walkthrough P18 needs it.)
-- Q3 · Sow dies mid-farrowing (C5, still open): does her session Finish as-is (litter
-  enrolls in processing) or park in a third terminal state? The sheet also still has no
-  route to the sow verbs (audit C7) — where does that door live?
-- Q4 · §7-A4: do the relative-date chips (`Today · Yesterday · Not sure`) survive in the
-  drawer's check-in mode, or is no-WHEN absolute product-wide?
-- Q5 · §7-A5: confirm classify-per-tap on the Finish sheet (kills the last two-stage
-  ceremony) — or was lock-time classify deliberate?
-- Q6 · G1/G3/G5/G12 proposals as written?
-- Q7 · Standing from before: dead-type defaults confirm; B2 who may amend born-alive
-  post-lock.
+The seven questions of the first pass were all answered in the 2026-08-29 rulings round
+— RULINGS.md holds them, and they are folded into §0–§8 above marked RULED. Still open:
+
+- Q1 · **Row-target geometry for the sow-page door (E8).** The ruling names two identity
+  entrances: the sheet's sh2 tag block and "the room row". But the row's zones are now
+  spoken for — left edge acts (started mark), body opens the sheet, rail is state — so a
+  row-level tag tap would be a third target on one row. Recommendation: sheet-first (the
+  sheet's identity block is the one sow-page door; the room row offers none) — one tap
+  more, zero row ambiguity. Confirm or overrule.
+- Q2 · **G13, the picker auto-skip** when only one figure holds a posted value — accept?
+- Q3 · **The still-unruled proposals**: G2 (negative pending wording), G4 (one pad
+  grammar), G6 (wrong-sow scope + mirrored events), G7 (Other › two targets on one row),
+  G8 (roster mode), G9 (pre-filled door mechanics), G11 (History contract). Written as
+  requirements above; sign or amend before their surfaces are drawn.
+- Q4 · **Born amendment post-lock is open-✎ for anyone** (stamped, no role gate) —
+  standing per the rulings round unless you veto it here.
+- Not questions but owed: the §7-B render fixes (B1–B9) when the drawing rounds resume.

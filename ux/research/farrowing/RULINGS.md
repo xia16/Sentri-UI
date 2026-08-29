@@ -29,7 +29,9 @@ history lives in git.
 - ONE correction door: Adjust, always available beside Record dead. Pick figure → banner →
   provenance → what-happened chips (miscount · wrong type › · wrong sow) → should-be
   value → signed delta + permanent ✎ glyph. Post-lock adds More born › / Count was
-  wrong ›. No floor-doors, no tap-the-fact, no other entrances, ever.
+  wrong ›. No floor-doors, no tap-the-fact, no other entrances, ever. The drill-in shape
+  is owner-ratified (2026-08-29): click in → the list of the current counts → click the
+  figure → the few options. Corrections announce themselves; recording stays flat.
 - Entering Adjust folds the pending window first — corrections operate on posted state only.
 - The visit (pending window) ends on Close, on sheet dismiss, on Adjust entry, or after
   ~90 min idle — the same boundary as the interval-chip fade; one notion of "visit over".
