@@ -54,8 +54,9 @@ history lives in git.
 - First recorded event — or the one-tap started mark — crosses Awaiting → Active. The
   started mark lives on the room row's left-edge action (three-zone law: left edge acts);
   opening the sheet and recording anything starts her equally. No new chrome.
-- False alarm: while a session holds no events beyond the started mark, the sheet offers
-  a plain revert (correction event, Active → Awaiting). Once any count exists she ends
+- False-alarm revert: while a session holds no events beyond the started mark, the sheet
+  offers the plain `Not farrowing` button (correction event, Active → Awaiting). Button
+  copy renamed from "False alarm" 2026-08-29 — it failed the owner's first read. Once any count exists she ends
   only via Finish or a sow-exit verb.
 - **Sow dies mid-farrowing:** sow verbs never live on the litter sheet. Her death is
   recorded on the sow — tap her identity (sh2 tag / room row) → sow page → Report death

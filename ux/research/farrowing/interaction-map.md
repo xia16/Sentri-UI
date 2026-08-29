@@ -30,7 +30,7 @@ Two design metrics govern every row here, per the owner's brief:
                     started mark ─────────────┐
                     or first count event      ▼
   AWAITING ◄───────────────────────────────► ACTIVE ──── Lock born N ────► DONE
-     │          (◄ False alarm revert,        │                            │
+     │          (◄ Not farrowing revert,      │                            │
      │           started-mark-only state)     │  sow dies (Report death    │  (record;
      │  disposition at batch close            │  on HER page, not here)    │   never a
      │  (not in pig · abort · next batch)     ▼                            ▼   lens exit)
@@ -47,7 +47,7 @@ Two design metrics govern every row here, per the owner's brief:
   mark or any count event crosses Awaiting → Active; Lock crosses Active → Done.
 - Done and Ended are terminal for the session. Post-lock/post-end events (deaths,
   fosters, amendments) write to the record; they never reopen Active.
-- False alarm (RULED): while the session holds nothing beyond the started mark, the
+- False alarm (RULED; drawn as `Not farrowing`): while the session holds nothing beyond the started mark, the
   sheet offers a plain revert — a stamped correction event, Active → Awaiting. Once any
   count exists she ends only via Finish or a sow-exit verb.
 - Sow death mid-farrowing (RULED, was C5): sow verbs never live on the litter sheet —
@@ -144,7 +144,7 @@ Row grammar (the receipts this surface owes):
   (E5). Opening the sheet and recording anything starts her equally — no new sheet
   chrome for starting.
 - While a session holds nothing beyond the started mark, the sheet shows the plain
-  `False alarm` revert (RULED) — a stamped correction, Active → Awaiting. It disappears
+  `Not farrowing` revert (RULED) — a stamped correction, Active → Awaiting. It disappears
   at the first count event.
 - Finish absent (no event exists). Adjust absent (nothing posted to correct — the one
   state where the door has no figures; hiding beats a dead door, and "no dim-as-disabled"
@@ -337,7 +337,7 @@ Tap counts start from the During sheet unless noted; +2 overhead from the room (
 | P19 | Interrupted mid-drawer (bolts at a scream) | 0 lost | every tap already committed; pending folds on next Done/close; nothing vanishes |
 | P20 | Phone dies / sleeps mid-visit | 0 lost | taps committed; reopen shows freshness stamp; convergence gesture re-heals |
 | P21 | Peek at an Awaiting sow | 0 | open → Close; no state change |
-| P22 | False started mark | 2 | row → False alarm on the sheet (RULED: plain revert, exists only while the session holds nothing but the mark) → back to Awaiting, stamped |
+| P22 | False started mark | 2 | row → Not farrowing on the sheet (RULED: plain revert, exists only while the session holds nothing but the mark) → back to Awaiting, stamped |
 | P23 | Sow dies mid-farrowing | 3 + sow flow | sheet identity → sow page → Report death (RULED). Session ends `ended · sow died`: Born derives from what stands, classification skipped (amendable via Adjust), litter record surfaces its orphan count as a Foster prompt, she exits every lens |
 | P24 | Check-in death, litter weaned off record | 3 | litter row → same drawer → type + → Done |
 
