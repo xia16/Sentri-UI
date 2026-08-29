@@ -36,16 +36,16 @@ The hand never answers the question; their two observations encode it.
 | Alive − / + / type-to-set | converge to the crate | `alive_assert(n)` — signed delta logged, stamped |
 | Record dead button → drawer | at rest every row is read-state: committed count + a lone +. Touching a row grows the − capsule and a plain receipt beside the count — `was 2` — never a signed second number that could read as a pending accumulator. Every tap commits; − is not clamped, so old over-tallies fix by touch-then-step-down; Done closes, deltas clear, History keeps them | `dead(type)` / `correction(type,−1)` per tap |
 | − in the drawer (capsule, once n > 0) | took one back — an over-tally correction, never a death | `correction(type, −1)`; same-visit pairs net out |
-| Adjust (after lock only) | warns first, then asks the only real question — More born › or Count was wrong › — so an amendment always states where the extra goes and the invariant never breaks silently | `amendment(…)` |
+| Adjust (always available, beside Record dead) | THE one correction door for every posted figure: pick the figure → banner → provenance → what happened (miscount · wrong type › · wrong sow) → should-be value. During farrowing plain; post-lock the same surface adds the Born ceremony (More born › / Count was wrong ›) | `correction(…)` / `amendment(…)` |
 | Close | closes the sheet — everything already committed; the `saved hh:mm · who` stamp beside History teaches persistence, recency and identity | — |
 | Finish farrowing (hidden until any event exists) | shows the run summary, asks "Any weak or deformed?" (healthy = remainder), then Lock born N (hold-to-commit) | `classify(weak n, deformed n)` + `final()` |
 | Report death (after Finish) | the same drawer on the record; Born frozen | `death(type)` |
 | Foster (after Finish) | Pairing (C7): n moved + receiving sow — the 12–48 h equalization walk; never during farrowing | `foster_out/in(n)` |
 | ✎ on the record | stamped amendment, the deliberate exception | `amendment(…)` |
 
-- A counted piglet that dies mid-session: tally the body on the dead side, then Adjust
-  alive down — Born holds. Adjust reminds inline that a found body belongs on the dead
-  side before alive comes down.
+- A counted piglet that dies mid-session: Record dead (+1 type), then converge alive
+  down — two taps, Born holds by arithmetic. An alive net-down without a tallied body
+  shows the standing reminder line and the Born tick.
 - **Classification happens once, at Finish**, phrased as the question a hand would ask —
   *any weak or deformed?* — with healthy deriving as the remainder. Optional earlier,
   never demanded.
@@ -98,8 +98,8 @@ The hand never answers the question; their two observations encode it.
 
 ## 6 · Open questions
 
-1. Dead-type list: stillborn · mummified · crushed · scours · starve-out · unknown +
-   Other › (farm-configured tail) — confirm the six defaults.
+1. Dead-type list: stillborn · mummified · crushed · scours · starve-out + Other
+   (absorbing the unknowable; farm-configured tail behind it) — confirm the defaults.
 2. Is `euthanized` in the default six or behind Other ›?
 3. Early classification (optional weak/deformed before Finish): worth the two extra cells
    on the during sheet, or strictly at Finish in v1?
