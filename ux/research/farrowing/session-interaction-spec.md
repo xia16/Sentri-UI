@@ -34,8 +34,8 @@ The hand never answers the question; their two observations encode it.
 | Gesture | Meaning | Ledger event |
 |---|---|---|
 | Alive − / + / type-to-set | converge to the crate | `alive_assert(n)` — signed delta logged, stamped |
-| Record dead button → drawer | at rest every row is read-state: committed count + a lone +. Touching a row grows the − capsule and a plain receipt beside the count — `was 2` — never a signed second number that could read as a pending accumulator. Every tap commits; − is not clamped, so old over-tallies fix by touch-then-step-down; Done closes, deltas clear, History keeps them | `dead(type)` / `correction(type,−1)` per tap |
-| − in the drawer (capsule, once n > 0) | took one back — an over-tally correction, never a death | `correction(type, −1)`; same-visit pairs net out |
+| Record dead button → drawer | at rest every row is read-state: posted count + a lone +. The first + grows the − capsule and the pending chip beside the still posted count — `2 +1`. Every tap commits; − drains pending only, **clamped at pending 0 by construction** — it can never touch posted state. Old over-tallies are corrections and route through Adjust. Done folds pending into posted as one stamped event per type; History keeps the lines | `dead(type)` / `correction(type,−1)` per tap |
+| − in the drawer (capsule, once pending > 0) | took one back — undoing this visit's tally, never a death and never a posted correction | `correction(type, −1)`; same-visit pairs net out |
 | Adjust (always available, beside Record dead) | THE one correction door for every posted figure: pick the figure → banner → provenance → what happened (miscount · wrong type › · wrong sow) → should-be value. During farrowing plain; post-lock the same surface adds the Born ceremony (More born › / Count was wrong ›) | `correction(…)` / `amendment(…)` |
 | Close | closes the sheet — everything already committed; the `saved hh:mm · who` stamp beside History teaches persistence, recency and identity | — |
 | Finish farrowing (hidden until any event exists) | shows the run summary, asks "Any weak or deformed?" (healthy = remainder), then Lock born N (hold-to-commit) | `classify(weak n, deformed n)` + `final()` |
@@ -122,11 +122,13 @@ The hand never answers the question; their two observations encode it.
   the locked record with ✎ (C8).
 - Trail renamed **History** (count dropped) on the session surfaces (C4).
 - Invariant 1 corrected for fostering (C6).
-- **Rest is read-state** (owner ruling, round ten): drawer rows at rest show committed
-  count + lone +; the − and the per-visit delta grow in only on touch. The receipt is the words `was N`
-  (under the Alive counter, beside a touched drawer row) — a past number cannot be
-  misread as a pending accumulator, which a signed +4 chip was (owner catch, round
-  eleven). One live number per field, always.
+- **Rest is read-state** (owner ruling, round ten): drawer rows at rest show posted
+  count + lone +; the − and the pending chip grow in only on touch. Receipt forms, final
+  (superseding this bullet's earlier `was N` wording, per the §8 posted/pending
+  adoption): under Alive the worded decomposition `5 posted · +4 this visit`; beside a
+  touched drawer row the pending chip with posted still — `2 +1`. The owner's round-11
+  catch was a *bare* signed number beside a figure reading as a second live count; the
+  words and the still-posted anchor resolve it. One live number per field, always.
 
 ## 8 · The count-entry pattern adopted (2026-08-28, count-entry-pattern.md)
 

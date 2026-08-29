@@ -62,8 +62,11 @@ deliberately-shaped flow that announces itself:
 
 ## Mapping to the session sheet
 
-- Alive: `14  +3` — posted fact plain, session chip distinct, − drains the chip only;
-  fold-on-close event. Tap the chip's count area to type (numpad = absolute assert).
+- Alive: `14  +3` — posted fact plain, session chip distinct; fold-on-close event. Tap
+  the chip's count area to type (numpad = absolute assert). Deviation from the general
+  pattern, deliberate: Alive is an *assert* surface, so its − is not clamped at posted —
+  pending is signed and convergence below posted is honest (reminder line + Born tick).
+  The clamp governs tally rows (the dead drawer), where the pile is append-only.
 - Dead drawer rows: identical grammar per type; rest state is posted fact + lone +.
 - The Adjust/amend door (post-lock, and cross-session corrections): rebuilt as the
   correction event flow above — banner state, reason chips, computed delta, corner glyph
