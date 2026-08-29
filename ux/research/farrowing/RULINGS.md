@@ -36,8 +36,8 @@ history lives in git.
 - When exactly one figure holds a posted value, the Adjust picker skips itself and opens
   the correction event directly (accepted 2026-08-29).
 - Identity is sheet-first: the sh2 header is the one door to her sow page; the room row
-  offers no sow-page target — its zones are spoken for (left edge Start on Awaiting rows,
-  body opens the sheet, rail is state). Confirmed 2026-08-29.
+  offers no sow-page target — its zones are spoken for (body opens the
+  sheet, rail is state, the left edge stays clean). Confirmed 2026-08-29.
 - The interaction-map §8 proposals are ratified as written (2026-08-29): negative pending
   reads `5 posted · −2 this visit`; one type-to-set pad grammar product-wide; wrong-sow =
   scope (figure/visit) → scan-first sow → mirrored stamped events; Other › label is the
@@ -51,13 +51,17 @@ history lives in git.
   the one staged act in the suite.
 
 ## Starting and ending a session
-- First recorded event — or the one-tap started mark — crosses Awaiting → Active. The
-  started mark lives on the room row's left-edge action (three-zone law: left edge acts);
-  opening the sheet and recording anything starts her equally. No new chrome.
-- False-alarm revert: while a session holds no events beyond the started mark, the sheet
-  offers the plain `Not farrowing` button (correction event, Active → Awaiting). Button
-  copy renamed from "False alarm" 2026-08-29 — it failed the owner's first read. Once any count exists she ends
-  only via Finish or a sow-exit verb.
+- First recorded event — or the started mark — crosses Awaiting → Active. The mark is
+  **demoted machinery** (owner, 2026-08-29: keep the signal, demote the machinery): it is
+  the quiet `Mark started` beside `Record dead` on the pre-start sheet — two taps on the
+  walk, no room-row chrome, Awaiting rows carry no controls. Recording anything starts
+  her equally. (Supersedes the earlier left-edge-action placement.)
+- A wrong mark corrects through **Adjust**, the one door — no dedicated revert button
+  (the plain False-alarm/Not-farrowing button died with the demotion; it was a second
+  correction entrance and its label failed the owner's first read). Mark-only session:
+  the picker holds the lone figure `Started` and auto-skips to the event; `not farrowing`
+  reverts her to Awaiting, stamped. Once any count exists she ends only via Finish or a
+  sow-exit verb.
 - **Sow dies mid-farrowing:** sow verbs never live on the litter sheet. Her death is
   recorded on the sow — tap her identity (sh2 tag / room row) → sow page → Report death
   (terminal cluster). The event ends the session without Finish: state `ended · sow
