@@ -33,6 +33,17 @@ history lives in git.
   is owner-ratified (2026-08-29): click in → the list of the current counts → click the
   figure → the few options. Corrections announce themselves; recording stays flat.
 - Entering Adjust folds the pending window first — corrections operate on posted state only.
+- When exactly one figure holds a posted value, the Adjust picker skips itself and opens
+  the correction event directly (accepted 2026-08-29).
+- Identity is sheet-first: the sh2 header is the one door to her sow page; the room row
+  offers no sow-page target — its zones are spoken for (left edge Start on Awaiting rows,
+  body opens the sheet, rail is state). Confirmed 2026-08-29.
+- The interaction-map §8 proposals are ratified as written (2026-08-29): negative pending
+  reads `5 posted · −2 this visit`; one type-to-set pad grammar product-wide; wrong-sow =
+  scope (figure/visit) → scan-first sow → mirrored stamped events; Other › label is the
+  tail door while its + tallies unclassified; roster mode past the untagged remainder;
+  pre-filled door mode for count-drawer deltas; History = read-only, netted per visit,
+  open visit printed as its running top line.
 - The visit (pending window) ends on Close, on sheet dismiss, on Adjust entry, or after
   ~90 min idle — the same boundary as the interval-chip fade; one notion of "visit over".
 - Save is dead; Close closes; the `saved hh:mm · who` stamp teaches persistence.

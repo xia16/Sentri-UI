@@ -119,14 +119,17 @@ pen headers, the `Last record 23:10 · L. Meyer` appbar line. None tappable.
 Row grammar (the receipts this surface owes):
 
 - Active, attended: line 1 `9 alive · 5 dead` + interval chip while fresh; line 2
-  `born 14 · started 6h · parity 3`. The chip runs off record stamps: present while the
-  last record < ~60 m, amber ~60–90 m, gone past ~90 m. Absence makes no claim.
-- Active, unattended: `Started · no record yet` / `marked 23:10 · L.M · parity 5`. Flips
-  to totals the moment any count lands.
+  `born 14 · started 6h`. (Parity dropped from Active line 2 — three facts truncated at
+  render width, and parity is stable background living on the sheet and the Awaiting
+  rows. Drawn-round deviation, 2026-08-29.) The chip runs off record stamps: present
+  while the last record < ~60 m, amber ~60–90 m, gone past ~90 m. Absence makes no claim.
+- Active, unattended: `Started · no record yet` / `marked 23:10 · L.M`. Flips to totals
+  the moment any count lands.
 - Awaiting: forecast register (`Expected · in 2 days` light) → `Due today · day 114` →
-  red chip from day 116 (`No record · day 117`).
-- Done: `Final · N alive` (alive **now**, ticking with post-lock events) / line 2
-  `born N · final <date> · who` (§7-D4 fixes the current drawn grammar).
+  red chip from day 116 (`No record · day 117`); parity rides line 2 here, where it aids
+  prediction. Left edge carries `Start`.
+- Done: `11 alive` (alive **now**, ticking with post-lock events) / line 2
+  `born 13 · final 05:58 · G.H` — drawn in the 2026-08-29 round; B4 resolved.
 
 ### 2.2 Session sheet · Pre-start (the zero face — placements RULED)
 
@@ -417,33 +420,28 @@ path is a falsification incentive. No foster during farrowing. No role gates in 
   suite's one staged act (hold-to-commit, audit-mandated). The last two-stage ceremony
   is dead.
 
-**B · Drawn artifact vs the law (register only — fix in the next render round, not here):**
+**B · Drawn artifact vs the law — ALL FIXED in the 2026-08-29 drawn round except B9:**
 
-- B1 09a intro paragraph still narrates Save / Report death / the Trail door — three
-  renames ago (Close / Record dead / History). Mock is right, prose is stale.
-- B2 09b: Other row lacks its › (the farm-tail door; "one Other › across drawers" is the
-  ruled copy law). Currently Other is drawn as a plain tally row only.
-- B3 Adjust picker and event phones have no sow identity header — the wrong-sow ruling
-  (B6) demands loud identity precisely on correction surfaces. Banner ≠ identity.
-- B4 Done-row grammar differs between sections: 09 room shows `Final · 11 live · 2 dead`
-  (birth-time totals, frozen) while the After backdrop shows `6 alive` / `born 14 ·
-  final aug 27` (alive now, ticking). The second is the law (alive-now must tick with
-  post-final deaths); 09's Done row and its rules-table copy need the same grammar.
-- B5 `live` vs `alive` drift on row line 1 (09 room rows say "live", 09a backdrops and
-  the handover say "alive"). One word, everywhere.
-- B6 09's rules table cites `8 live · 1 dead` while its own mock draws `8 live · 3 dead`
-  — mock numbers must agree with every caption (owner law, caught twice before).
-- B7 The interval chip is drawn amber at `last 45m`; the ruling sets amber at ~60–90 m
-  (neutral before). Either the mock time or the mock color is wrong.
-- B8 The During sheet reserves no hint line — the panel adopted a reserved slot so the
-  died-hint never reflows the sheet; the drawn hero has nowhere for it to appear.
-- B9 09e's death door copy says "death drawer · died 2 pre-filled" — the component is
-  the dead drawer and nothing about it is "died 2" until types are chosen; align when
-  09e gets its round (E7/§8-G9 define the actual mechanics).
+- B1 FIXED — 09a intro rewritten (Close / Record dead / History; workflow-order framing).
+- B2 FIXED — Other row wears its › (label = the farm-tail door, + tallies unclassified).
+- B3 FIXED — every Adjust phone (picker · event · wrong-sow) carries the sh2 identity
+  header above the banner.
+- B4 FIXED — one Done-row grammar everywhere: `11 alive` / `born 13 · final 05:58 · G.H`.
+- B5 FIXED — `alive` everywhere on row line 1.
+- B6 FIXED — 09's rules-table numbers now quote the mock (`9 alive · 5 dead`; the room
+  hero and the 09a backdrops now show the same 000418 moment).
+- B7 FIXED — chip drawn `last 60m` amber, agreeing with `saved 08:41` on the sheet and
+  the 9:41 statusbar; the appbar's room-level last record now agrees too (08:41 · G.H).
+- B8 FIXED — the reserved hint line is drawn under the Alive receipt, shown in its
+  raised state (`fewer alive? tally the body — Record dead`).
+- B9 open — 09e's door copy aligns when 09e gets its round (E7/§8-G9 define the
+  mechanics).
 
-**C · Fidelity note:** the mocks in 09a/09b agree with each other numerically
-(9 + 5 = 14; classification 1+1+7 = 9; After 14 − 6 dead − 2 fostered = 6). Keep it
-that way — B4/B6 are the only number/grammar drifts found.
+**C · Fidelity note:** one timeline now runs the whole 09/09a/09b suite — started 07:30,
+visits at 07:35/07:52/08:12, a correction 08:20, the open visit to 08:41, statusbar
+9:41; posted alive 5 (+4 pending = 9), dead 5 by type; Born 14; History's lines sum to
+exactly these figures. Every new mock must join this timeline or use a sow the suite
+has never shown (the ended record uses 000399).
 
 ---
 
@@ -463,11 +461,13 @@ that way — B4/B6 are the only number/grammar drifts found.
   folds it without writing. One pad grammar product-wide (the conveyor already has it).
 - **G5 · RULED — Adjust folds pending on entry**; corrections operate on posted state
   only.
-- **G6 · Wrong sow, the full shape.** Scope step (`this figure` / `this visit` — the
-  audit's void-last-visit) → sow picker (scan-first) → mirrored stamped events on both
-  records; both Histories carry the move; both figures wear ✎.
-- **G7 · Other ›.** The label is the door (farm-configured tail list; picking a cause
-  tallies it), the + on the row tallies unclassified. Two targets, one row, both honest.
+- **G6 · Wrong sow, the full shape — RATIFIED, drawn 2026-08-29.** Scope step
+  (`this figure` / `this visit` — the audit's void-last-visit) → sow picker (scan-first)
+  → mirrored stamped events on both records; both Histories carry the move; both figures
+  wear ✎.
+- **G7 · Other › — RATIFIED, drawn 2026-08-29.** The label is the door (farm-configured
+  tail list; picking a cause tallies it), the + on the row tallies unclassified. Two
+  targets, one row, both honest.
 - **G8 · Roster mode.** Once tags exist and a tally exceeds the untagged remainder, the
   drawer row expands to a piglet roster (scan-first) — a tagged piglet is never
   subtracted namelessly. Applies in check-in/post-lock contexts; during farrowing there
@@ -479,35 +479,31 @@ that way — B4/B6 are the only number/grammar drifts found.
 - **G10 · Post-lock picker contents.** Born (ceremony) · each dead type · classification
   (weak/deformed) · litter weight · assisted. Alive-now is derived and absent. During:
   Alive + posted dead types only.
-- **G11 · History contract** as §2.8 — currently a door to nowhere in both modes.
+- **G11 · History contract — RATIFIED, drawn 2026-08-29** as §2.8, plus one addition
+  discovered while drawing: the open visit prints its running net as the top line
+  (`+4 alive · this visit · open · 08:41 · G.H`), which is what makes the `saved` stamp
+  and the list agree mid-visit.
 - **G12 · RULED — the visit ends at Close, at sheet dismiss, on Adjust entry, or after
   ~90 min idle** — the same boundary as the interval-chip fade, so there is exactly one
   notion of "visit over". Sleep/background alone does not end it — protects the
   convergence-after-sleep behavior the audit praised.
-- **G13 · Picker auto-skip (new proposal).** When exactly one figure holds a posted
-  value (the common early-session state: only Alive), Adjust skips Step 1 and opens the
-  correction event directly, back-titled with the figure. Saves the drill-in's one
-  redundant tap without adding an entrance; the two-step shape returns the moment a
-  second figure posts.
+- **G13 · Picker auto-skip — ACCEPTED (owner "ok", 2026-08-29).** When exactly one
+  figure holds a posted value (the common early-session state: only Alive), Adjust skips
+  Step 1 and opens the correction event directly, back-titled with the figure. Saves the
+  drill-in's one redundant tap without adding an entrance; the two-step shape returns
+  the moment a second figure posts.
 
 ---
 
 ## 9 · Unresolved questions (owner)
 
-The seven questions of the first pass were all answered in the 2026-08-29 rulings round
-— RULINGS.md holds them, and they are folded into §0–§8 above marked RULED. Still open:
+The seven questions of the first pass were answered in the 2026-08-29 rulings round;
+the second pass's four (row geometry, G13, the G-proposals, open-✎) were accepted in
+the owner's "ok" of the same day — sheet-first identity confirmed, G13 in, proposals
+ratified as written, no veto on open-✎. RULINGS.md holds all of it. Still open:
 
-- Q1 · **Row-target geometry for the sow-page door (E8).** The ruling names two identity
-  entrances: the sheet's sh2 tag block and "the room row". But the row's zones are now
-  spoken for — left edge acts (started mark), body opens the sheet, rail is state — so a
-  row-level tag tap would be a third target on one row. Recommendation: sheet-first (the
-  sheet's identity block is the one sow-page door; the room row offers none) — one tap
-  more, zero row ambiguity. Confirm or overrule.
-- Q2 · **G13, the picker auto-skip** when only one figure holds a posted value — accept?
-- Q3 · **The still-unruled proposals**: G2 (negative pending wording), G4 (one pad
-  grammar), G6 (wrong-sow scope + mirrored events), G7 (Other › two targets on one row),
-  G8 (roster mode), G9 (pre-filled door mechanics), G11 (History contract). Written as
-  requirements above; sign or amend before their surfaces are drawn.
-- Q4 · **Born amendment post-lock is open-✎ for anyone** (stamped, no role gate) —
-  standing per the rulings round unless you veto it here.
-- Not questions but owed: the §7-B render fixes (B1–B9) when the drawing rounds resume.
+- B9 — 09e's death-door copy and the G9 pre-filled mechanics, at 09e's own round.
+- The undrawn interactions that have requirements but no pixels yet: G2 negative
+  pending, G4 the pad, G8 roster mode, G10's post-lock picker face, the false-alarm
+  screen is drawn but the post-lock Adjust (Born ceremony) still is not.
+- Owner screenshot review of the 2026-08-29 drawn round (this round).
