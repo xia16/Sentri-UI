@@ -90,8 +90,9 @@ history lives in git.
   recorded on the sow — tap her identity (sh2 tag / room row) → sow page → Report death
   (terminal cluster). The event ends the session without Finish: state `ended · sow
   died`, Born derives from what stands, classification skipped (amendable via Adjust),
-  the litter record survives and immediately surfaces its orphan count as a Foster
-  prompt. She exits every lens (motion C); the litter lives on under piglet care.
+  the litter record survives and leads with the orphan fact (`N alive · no sow` — the
+  foster door returns when fostering un-parks). She exits every lens (motion C); the
+  litter lives on under piglet care.
 
 - **A non-empty ledger is never unreachable** (attack audit, 2026-08-30): any face of a
   session that has events shows `History ›` — including the zero face of an un-crossed
@@ -114,7 +115,14 @@ history lives in git.
   silently"; never claim more.
 
 ## After the lock
-- Bar: Adjust · Foster · Record dead. Foster = Pairing, the 12–48 h window, never during.
+- **Fostering is PARKED (owner, 2026-08-30)** — farrowing stabilizes first; fostering
+  gets its own round later, receiver-eligibility question parked with it. v1 farrowing
+  ships NO foster doors anywhere: the After bar is `Adjust · Record dead`; the ended
+  record shows the orphan FACT (`N alive · no sow`), not a Pairing door. The ledger
+  keeps the foster terms (events reserved, derivations unchanged with foster = 0) so
+  fostering bolts on without rework. Do not design, draw, or build foster flows until
+  the owner reopens them.
+- Bar: Adjust · Record dead.
 - **Anyone may amend born post-lock — open ✎, stamped, no role gate.** Provenance over
   sign-off (the owner's compliance stance): falsification is deterred by the visible
   amendment trail, not by permissions. (Standing unless the owner vetoes.)

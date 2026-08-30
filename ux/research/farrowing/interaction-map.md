@@ -41,7 +41,7 @@ Two design metrics govern every row here, per the owner's brief:
                                             what stands, classification
                                             skipped — amendable via Adjust;
                                             litter record survives with an
-                                            orphan-count Foster prompt;
+                                            orphan fact: N alive · no sow;
                                             she exits every lens, motion C)
 ```
 
@@ -70,7 +70,7 @@ Two design metrics govern every row here, per the owner's brief:
 | Pre-start | Awaiting sow opened | header · Alive at 0 · `Record dead` · bar `Close` — nothing else exists yet |
 | During | Active | header · Alive hero · record block · bar `Close · Finish` |
 | Finishing | Finish tapped | summary · classification · optional facts · bar `Back · Lock` |
-| After | Done | header · locked figures · read lines · History · bar `Adjust · Foster · Record dead` |
+| After | Done | header · locked figures · read lines · History · bar `Adjust · Record dead` (Foster parked) |
 
 ### Drawer modes (one dead drawer, four contexts)
 
@@ -299,7 +299,7 @@ Step 2 · **Correction event** (what happened?):
 | Element | Gesture | Commits | Receipt | Lands |
 |---|---|---|---|---|
 | Adjust | tap | — | — | Adjust, post-lock flavor |
-| Foster | tap | `foster_out/in(n)` at its own commit | both records print the move | Pairing (C7) |
+| Foster | — PARKED (owner 2026-08-30): no foster doors in v1; bar = `Adjust · Record dead` | — | — | — |
 | Record dead | tap | `death(type)` per tally | `since final` line + alive-now derive down + room row tick | dead drawer, post-lock mode |
 | History › | tap | — | — | History |
 | ✎ glyph on a figure | tap | — | provenance reveal: original → correction · who · when · why (read-only) | inline reveal |
@@ -312,16 +312,16 @@ Step 2 · **Correction event** (what happened?):
 - Anyone may amend born post-lock (RULED, standing unless the owner vetoes): open ✎,
   stamped, no role gate — provenance over sign-off deters falsification, permissions do
   not.
-- Foster is post-lock only (the 12–48 h equalization window is guidance in copy, never a
-  gate). No foster during farrowing, ever.
-- Read lines (living / dead / since final / fostered / weight · assisted) are dead zones
+- Fostering is PARKED (owner 2026-08-30) — no foster doors in v1; its round comes after
+  farrowing stabilizes. (When it returns: post-lock only, 12–48 h as guidance.)
+- Read lines (living / dead / since final / weight · assisted) are dead zones
   except their ✎ glyphs.
 
 ### 2.8 History (read-only; undrawn — minimal contract, §8-G11)
 
 - One list, newest first, netted per type per visit: `+4 alive · 08:41 · G.H`,
   `+1 crushed · 08:12 · G.H`, `−1 stillborn · miscount · 09:02 · G.H ✎`,
-  `fostered out 2 → 000431`, `final · born 14 · 08:12 · G.H`.
+  `final · born 14 · 08:12 · G.H`.
 - Correction lines carry why; tap nothing — the list IS the reveal. Same-visit netted
   pairs never appear. Append-only, never editable, no actions on this surface.
 - Reached from During and After; Close returns to the host.
@@ -351,7 +351,7 @@ Tap counts start from the During sheet unless noted; +2 overhead from the room (
 | P14 | Finish, normal | ~5 + hold | Finish → Weak + → Deformed + → (skip optionals) → hold Lock |
 | P15 | Premature lock, three more born | 4 | After: Adjust → Born → More born › → +3 · where: alive now → commit |
 | P16 | Death after final | 3 | After: Record dead → type + → Done; alive-now derives down |
-| P17 | Foster out | — | After: Foster → Pairing flow (its own spec) |
+| P17 | Foster out | — | PARKED — fostering gets its own round after farrowing stabilizes |
 | P18 | Euthanized deformed piglet | 4 | After: Record dead → Other › → euthanized → Done (RULED: behind Other in v1) |
 | P19 | Interrupted mid-drawer (bolts at a scream) | 0 lost | every tap already committed; pending folds on next Done/close; nothing vanishes |
 | P20 | Phone dies / sleeps mid-visit | 0 lost | taps committed; reopen shows freshness stamp; convergence gesture re-heals |
