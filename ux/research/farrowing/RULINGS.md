@@ -7,16 +7,25 @@ history lives in git.
 
 ## Model
 - Born = Alive + Σ Dead + fostered out − fostered in. Derived, never entered, locks at Finish.
-- Alive: one classless number (− / + / type). **The floor rule (owner, 2026-08-30):**
-  + is free; − drains only this visit's pending and clamps at
-  `floor = posted − dead tallied this visit` — the drawer unlocks the steps down. At the
-  floor − grays out (the suite's ONE disabled control, a scoped owner exception to
-  no-dim-as-disabled); tapping it shows two quiet pointers in the reserved line:
-  `Pigs died? Record dead` · `Count wrong? Adjust`. Type-to-set clamps identically.
-  Below-floor truth has exactly two doors: bodies (Record dead) or a reason (Adjust).
-  **Born can never drop silently, by construction.** The savaged accepted-cost is
-  deleted: a vanished piglet is `Adjust → Gone · no body` — a stamped truth. Pending
-  folds into posted as one stamped event when the visit ends.
+- Alive: one classless number (− / + / type). **The Born floor (owner 2026-08-30;
+  formula corrected by the attack audit the same day):** + is free; − drains pending and
+  clamps at the floor `min alive = B* − current dead total`, where **B\* = Born at the
+  last posted count of the living** (re-anchored by every alive fold and every Adjust
+  commit). In words: the count may come down only as far as the bodies recorded since
+  you last counted — across visits, not per visit (the per-visit formula collapsed at
+  every fold boundary: it stranded honest convergence after an interruption and let
+  tally-then-undo drop Born silently). The drawer's − also obeys it: `dead_undo` grays
+  when undoing a body would strand alive below the floor. At the floor the − grays out
+  (the floor's grays are the suite's one disabled-control family, a scoped owner
+  exception to no-dim-as-disabled); tapping the grayed − shows two quiet pointers:
+  `Pigs died? Record dead` · `Count wrong? Adjust`. A type-to-set below the floor is
+  REFUSED, never silently clamped — typed value struck amber + the same pointers, no
+  event. **Born can never sink below its floor except through Adjust — on one device by
+  construction; across devices the merge contract flags rather than applies a breach.**
+  The savaged accepted-cost stays deleted: a vanished piglet is `Adjust → Gone · no
+  body` pre-lock; post-lock the door is the litter census (count drawer → just set
+  count → unexplained anomaly), never a fabricated death. Pending folds into posted as
+  one stamped event when the visit ends.
 - Dead: five default types — stillborn · mummified · crushed · scours · starve-out — plus
   Other (absorbs the unknowable; farm-configured tail, euthanized included, behind it).
 - **No WHEN anywhere, absolutely — including check-in.** The stamp is the date. The
@@ -71,16 +80,38 @@ history lives in git.
   but nothing recorded stays honestly Awaiting; the shift is told in person. There is no
   `started` event, no `Started · no record yet` register, no mark revert. (Arc: bar
   action → row left edge → sheet action → killed. `started hh:mm` on sheet and row now
-  means the first record.) While posted state is non-zero she ends only via Finish or a
+  means the first record.) While her live total is non-zero she ends only via Finish or a
   sow-exit verb; a session recounted back to all-zero simply reads Awaiting again —
-  **registers derive from posted state**, so a stray first tap un-crosses itself when
-  recounted away (History keeps the lines). Added 2026-08-30 from the misclick walk.
+  **registers derive from the live total (posted + open pending)**, so a stray + crosses
+  her the moment it lands and its undo or fold-to-nothing un-crosses her (History keeps
+  the lines). Refined 2026-08-30 by the attack audit from "posted state", which
+  disagreed with the cross-on-first-tap rule about which face a stray tap produced.
 - **Sow dies mid-farrowing:** sow verbs never live on the litter sheet. Her death is
   recorded on the sow — tap her identity (sh2 tag / room row) → sow page → Report death
   (terminal cluster). The event ends the session without Finish: state `ended · sow
   died`, Born derives from what stands, classification skipped (amendable via Adjust),
   the litter record survives and immediately surfaces its orphan count as a Foster
   prompt. She exits every lens (motion C); the litter lives on under piglet care.
+
+- **A non-empty ledger is never unreachable** (attack audit, 2026-08-30): any face of a
+  session that has events shows `History ›` — including the zero face of an un-crossed
+  sow (the bare Pre-start applies only to a virgin session), and Adjust rides wherever
+  posted figures exist. The batch-close remainder distinguishes `no records` from
+  `records · corrected to zero ›` so a zeroed litter can never pass as a virgin sow.
+- **Merge contract (DRAFT, supersedes blanket last-write-wins):** count events merge as
+  signed deltas against their device-visible base; absolute sets decompose to deltas. A
+  merged result that would breach a zero floor or the Born floor is never silently
+  applied — it holds at the floor and posts a `sync review` line (History + console
+  anomaly tally), resolved through Adjust. Events stamped before a `final`/`session_end`
+  but arriving after are flagged the same way and offered through the record's own
+  ceremony (More born › / Count was wrong ›) — never silently dropped, never silently
+  applied. Duplicate finals: earliest stands, later flags. Device clocks are never
+  trusted to resolve a conflict.
+- **Upward honesty (attack audit):** the floor guards Born downward; upward, + is free
+  by physics (more piglets seen were born). Upward integrity is provenance-only — every
+  + is stamped — and the console owes the audit views (per-hand gone-rates,
+  correction-then-reassert patterns, sync-review tallies). Say "Born can never DROP
+  silently"; never claim more.
 
 ## After the lock
 - Bar: Adjust · Foster · Record dead. Foster = Pairing, the 12–48 h window, never during.

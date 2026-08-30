@@ -47,9 +47,11 @@ Two design metrics govern every row here, per the owner's brief:
 
 - Opening a sheet **never** changes state. Only a written event crosses her: the first
   count event crosses Awaiting → Active; Lock crosses Active → Done.
-- **Registers derive from posted state** (2026-08-30, from the misclick walk): a session
-  recounted or corrected back to all-zero reads Awaiting again — a stray first tap
-  un-crosses itself, History keeps the lines, no revert affordance exists or is needed.
+- **Registers derive from the live total (posted + open pending)** (2026-08-30; refined
+  by the attack audit): a stray + crosses her as it lands; its undo, fold-to-nothing, or
+  correction to all-zero un-crosses her. History keeps the lines, and a non-empty ledger
+  is never unreachable — an un-crossed sow's zero face still shows `History ›` and
+  Adjust. No revert affordance exists or is needed.
 - Done and Ended are terminal for the session. Post-lock/post-end events (deaths,
   fosters, amendments) write to the record; they never reopen Active.
 - The started mark is KILLED (owner, 2026-08-29 — see RULINGS): no `started` event, no
@@ -183,15 +185,22 @@ route in a single, honest place.
   `5 posted · +4 this visit`; with bodies tallied and alive brought down,
   `5 posted · −2 this visit` (§8-G2 for the drawn form). The receipt never mentions the
   floor — the grayed − carries it.
-- `+` is free. `−` drains this visit only and clamps at
-  **floor = posted − dead tallied this visit** — the drawer unlocks the steps down,
-  physically enforcing drawer-first for deaths. Type-to-set clamps identically.
-- At the floor, `−` grays out — the suite's ONE disabled control (scoped owner exception
-  to no-dim-as-disabled). Tapping it writes nothing and shows two quiet pointers in the
-  reserved line for ~4 s (draft): `Pigs died? Record dead` · `Count wrong? Adjust`.
-- Consequence, by construction: **Born can never drop silently.** Every drop is bodies
-  or a stamped Adjust reason; the savaged accepted-cost is deleted — a vanished piglet
-  is `Adjust → Gone · no body`, a stamped truth.
+- `+` is free. `−` drains pending and clamps at the **Born floor**:
+  `min alive = B* − current dead total`, B\* = Born at the last posted count of the
+  living (re-anchored by every alive fold and every Adjust commit) — bodies since the
+  last count unlock the steps down, ACROSS visit boundaries. (The per-visit formula
+  died in the 2026-08-30 attack audit: it stranded honest convergence at every fold and
+  let tally-then-undo drop Born silently.) `dead_undo` obeys the same floor. A
+  type-to-set below the floor is refused, never silently clamped.
+- At the floor, `−` grays out — the floor's grays are the suite's one disabled-control
+  family (scoped owner exception to no-dim-as-disabled). Tapping it writes nothing and
+  shows two quiet pointers in the reserved line for ~4 s (draft):
+  `Pigs died? Record dead` · `Count wrong? Adjust`.
+- Consequence: **Born can never sink below its floor except through Adjust** — per
+  device by construction; across devices the merge contract (contract C7) flags a
+  breach instead of applying it. The savaged accepted-cost stays deleted — a vanished
+  piglet is `Adjust → Gone · no body` pre-lock; post-lock the door is the litter census
+  (count drawer → unexplained), never a fabricated death.
 - Every tap commits its event immediately (crash-safe); Close nets the visit into the
   trail as one line. Same-visit +/− pairs net to nothing.
 
