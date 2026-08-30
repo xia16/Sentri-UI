@@ -30,24 +30,36 @@ history lives in git.
   Other (absorbs the unknowable; farm-configured tail, euthanized included, behind it).
 - **No WHEN anywhere, absolutely — including check-in.** The stamp is the date. The
   Today/Yesterday/Not-sure chips are dead; any mention elsewhere is a stale artifact.
-- Classification (weak/deformed, healthy = remainder) happens at Finish, commits per tap;
-  optional earlier, never demanded. Optional facts at Finish: litter weight (soft range
-  warn), assisted checkbox.
+- Classification (weak/deformed) happens at Finish, commits per tap; optional earlier,
+  never demanded. **Healthy has no form row (owner, 2026-08-30)** — it derives silently
+  (alive − weak − deformed) and prints on the record; the sheet asks only the two
+  numbers a hand reports. If there are none, there are none. Optional facts at Finish:
+  litter weight (soft range warn) + assisted checkbox, presented as one cohesive group.
 - No staleness tracking on Active sows; interval chip fades (~60 m amber, gone ~90 m).
 - Due = service + 114 d hardcoded; overdue chip from day 116.
 
 ## Surfaces & entrances
 - ONE dead drawer product-wide, opened by the Record dead button (during · on the record ·
-  in check-in). Rest is read-state; touch grows − and the pending chip left of the still posted value (`+1  2`); Done folds.
+  in check-in). Rest is read-state (label · posted value · lone +). Touched: the value
+  itself turns green while it carries this visit's additions — **the chip is retired
+  (owner, 2026-08-30): the number is the receipt, same grammar as Alive** — and − grows
+  in, graying at its floor exactly like Alive's. `Other` is a plain tally row — the ›
+  tail door is retired (owner, same round); Other absorbs everything unclassified. Done
+  folds; the dismiss gesture is identical to Done (see exit grammar).
 - **Stillborn entry stays in the drawer — no sheet shortcut.** (Owner-ratified; one
   entrance per concept. In practice it is tally-then-dismiss, not a 3-tap ceremony,
   because every tap already commits.)
-- ONE correction door: Adjust, always available beside Record dead. Pick figure → banner →
-  provenance → what-happened chips (miscount · wrong type › · wrong sow) → should-be
-  value → signed delta + permanent ✎ glyph. Post-lock adds More born › / Count was
-  wrong ›. No floor-doors, no tap-the-fact, no other entrances, ever. The drill-in shape
-  is owner-ratified (2026-08-29): click in → the list of the current counts → click the
-  figure → the few options. Corrections announce themselves; recording stays flat.
+- ONE correction door: Adjust, always available beside Record dead — and it is ONE
+  SCREEN (owner, 2026-08-30, superseding the two-step drill-in and the what-happened
+  chips): the figure list edits in place (− n + / type per figure). The amber banner
+  (`Correcting a past record · logged as <who>`) and a live change summary
+  (`stillborn 1 → 0`) appear at the FIRST change, not on entry. Exits: `Back` discards
+  the draft; `Save` commits everything as one stamped correction event — every corrected
+  figure wears ✎ forever. Why is no longer asked; the delta is the record. A wrong type
+  is −1 here · +1 there; a wrong sow is a correction here and a recording on the right
+  sow (the linked mirrored move is retired). Post-lock the same screen carries the Born
+  ceremony. Adjust remains the only door to posted state; the Born floor governs every
+  recording surface outside it. No floor-doors, no tap-the-fact, no other entrances.
 - Entering Adjust folds the pending window first — corrections operate on posted state only.
 - **What Adjust adjusts: the observations, never the derivation.** During: Alive and each
   posted dead type; Born has no door pre-lock (it heals when its inputs heal). Post-lock:
@@ -55,8 +67,7 @@ history lives in git.
   weight, assisted. And the split (2026-08-30): a MISSED fact is a recording (drawer +,
   alive +), never an Adjust — there is no "missed entry" chip; Adjust exists for figures
   that must come down, change kind, or change sow.
-- When exactly one figure holds a posted value, the Adjust picker skips itself and opens
-  the correction event directly (accepted 2026-08-29).
+- (Auto-skip retired with the one-screen Adjust — there is no picker to skip.)
 - Identity is sheet-first: the sh2 header is the one door to her sow page; the room row
   offers no sow-page target — its zones are spoken for (body opens the
   sheet, rail is state, the left edge stays clean). Confirmed 2026-08-29.
@@ -68,7 +79,15 @@ history lives in git.
   open visit printed as its running top line.
 - The visit (pending window) ends on Close, on sheet dismiss, on Adjust entry, or after
   ~90 min idle — the same boundary as the interval-chip fade; one notion of "visit over".
-- Save is dead; Close closes; the `saved hh:mm · who` stamp teaches persistence.
+- **The exit grammar (owner-aligned, 2026-08-30):** recording surfaces (session sheet,
+  dead drawer) commit per tap — their single exit (`Close` / `Done`) and the dismiss
+  gesture are identical; nothing is ever lost to an interruption (the audit's data-loss
+  blocker stands). Ceremonies (Adjust, Lock born N) are staged — `Back`/`Cancel`
+  discards the stage, the primary verb (`Save` / `Lock born N`) commits; swipe equals
+  the left exit. There is still no Save on recording surfaces. The `saved hh:mm · who`
+  stamp rides the sheet HEADER beside `started` (identity + recency in one place;
+  moved from the record block, owner 2026-08-30); History is a compact › door in the
+  record block.
 - Finish hidden until any event exists; Lock born N is hold-to-commit, drawn as such —
   the one staged act in the suite.
 

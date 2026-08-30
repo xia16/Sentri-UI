@@ -240,16 +240,17 @@ route in a single, honest place.
 
 ### 2.5 Adjust — the one correction door
 
-The shape is a deliberate drill-in, owner-ratified (2026-08-29): **click in → the list
-of the current counts → click the figure to change → the few options** (what happened →
-should-be value). Recording stays flat on the sheet; correcting announces itself and
-sits one level deeper by design — the two doors are differently shaped on purpose.
-Entering Adjust folds the pending window first (RULED): corrections operate on posted
-state only, so the picker's figures are posted = live and a correction can never race a
-buffer. What it adjusts is the observations, never the derivation: Born has no door
-pre-lock. And a missed fact is a recording (drawer +, alive +), never an Adjust — no
-"missed entry" chip exists; the door serves figures that must come down, change kind,
-or change sow (RULED 2026-08-30).
+RE-RULED 2026-08-30 (supersedes the two-step drill-in): Adjust is **one screen — the
+figure list, editable in place** (− n + / type per posted figure). Untouched it is a
+quiet list; at the FIRST change the amber banner and a live change summary
+(`stillborn 1 → 0`) appear, and `Save` joins the bar. `Back` discards the draft;
+`Save` commits every delta as ONE stamped correction event, each corrected figure
+wearing ✎ forever. No chips, no reasons, no second screen; wrong type = −1 here +1
+there; wrong sow = correct here, record on the right sow. Entering Adjust still folds
+the pending window (open question C11-2 stands). What it adjusts is the observations,
+never the derivation: Born has no door pre-lock. A missed fact is a recording (drawer
++, alive +), never an Adjust — the door serves figures that must come down or change
+kind (RULED 2026-08-30).
 
 Step 1 · **Picker** (which figure?):
 
@@ -344,10 +345,10 @@ Tap counts start from the During sheet unless noted; +2 overhead from the room (
 | P7 | Passing hand sees labor, nothing to count | 0 | no app act (the mark is killed): recording nothing asserts nothing; she stays Awaiting and the next shift is told in person |
 | P8 | Person B verifies, all agrees | 0 | reads Born · Alive; touches nothing |
 | P9 | Mis-tap fixed same visit | 2 | Alive + then Alive − (or drawer + then −); trail shows nothing |
-| P10 | Over-tally caught next visit | 4 | Adjust → Crushed → Miscount (default) → should-be − → Correct to 1 |
-| P11 | Wrong type (stillborn was mummified) | 5 | Adjust → Stillborn → Wrong type › → Mummified → Correct — one paired event |
-| P12 | Wrong sow discovered | ~6 | Adjust → figure or visit scope → Wrong sow → pick sow → Correct (§8-G6) |
-| P13 | Savaged (vanished, no body) | 3–4 | − is floored, so: Adjust → (auto-skip) → `Gone · no body` → should-be → commit; Born drops with a stamped reason — the silent-drop cost is deleted |
+| P10 | Over-tally caught next visit | 4 | Adjust → Crushed − → Save |
+| P11 | Wrong type (stillborn was mummified) | 5 | Adjust → Stillborn − → Mummified + → Save — two deltas, one stamped event |
+| P12 | Wrong sow discovered | ~6 | Adjust here (figure − → Save), then record on the right sow — two trails, no linkage (owner-accepted) |
+| P13 | Savaged (vanished, no body) | 3–4 | − is floored, so: Adjust → Alive − → Save; Born drops with a stamped ✎ correction (the reason chips are retired; the delta + stamp are the provenance) |
 | P14 | Finish, normal | ~5 + hold | Finish → Weak + → Deformed + → (skip optionals) → hold Lock |
 | P15 | Premature lock, three more born | 4 | After: Adjust → Born → More born › → +3 · where: alive now → commit |
 | P16 | Death after final | 3 | After: Record dead → type + → Done; alive-now derives down |
