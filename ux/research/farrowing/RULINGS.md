@@ -58,8 +58,10 @@ history lives in git.
   but nothing recorded stays honestly Awaiting; the shift is told in person. There is no
   `started` event, no `Started · no record yet` register, no mark revert. (Arc: bar
   action → row left edge → sheet action → killed. `started hh:mm` on sheet and row now
-  means the first record.) Once any count exists she ends only via Finish or a sow-exit
-  verb.
+  means the first record.) While posted state is non-zero she ends only via Finish or a
+  sow-exit verb; a session recounted back to all-zero simply reads Awaiting again —
+  **registers derive from posted state**, so a stray first tap un-crosses itself when
+  recounted away (History keeps the lines). Added 2026-08-30 from the misclick walk.
 - **Sow dies mid-farrowing:** sow verbs never live on the litter sheet. Her death is
   recorded on the sow — tap her identity (sh2 tag / room row) → sow page → Report death
   (terminal cluster). The event ends the session without Finish: state `ended · sow

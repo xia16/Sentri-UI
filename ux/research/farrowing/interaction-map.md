@@ -45,6 +45,9 @@ Two design metrics govern every row here, per the owner's brief:
 
 - Opening a sheet **never** changes state. Only a written event crosses her: the first
   count event crosses Awaiting → Active; Lock crosses Active → Done.
+- **Registers derive from posted state** (2026-08-30, from the misclick walk): a session
+  recounted or corrected back to all-zero reads Awaiting again — a stray first tap
+  un-crosses itself, History keeps the lines, no revert affordance exists or is needed.
 - Done and Ended are terminal for the session. Post-lock/post-end events (deaths,
   fosters, amendments) write to the record; they never reopen Active.
 - The started mark is KILLED (owner, 2026-08-29 — see RULINGS): no `started` event, no
@@ -334,7 +337,7 @@ Tap counts start from the During sheet unless noted; +2 overhead from the room (
 | P19 | Interrupted mid-drawer (bolts at a scream) | 0 lost | every tap already committed; pending folds on next Done/close; nothing vanishes |
 | P20 | Phone dies / sleeps mid-visit | 0 lost | taps committed; reopen shows freshness stamp; convergence gesture re-heals |
 | P21 | Peek at an Awaiting sow | 0 | open → Close; no state change |
-| P22 | (retired with the started mark — no mark, no false mark) | — | |
+| P22 | Stray first tap, discovered later | 1–2 | reopen → converge to the crate (or Adjust → miscount → 0). Posted back to all-zero → she reads Awaiting again (registers derive from posted state); same-visit catch is P9 |
 | P23 | Sow dies mid-farrowing | 3 + sow flow | sheet identity → sow page → Report death (RULED). Session ends `ended · sow died`: Born derives from what stands, classification skipped (amendable via Adjust), litter record surfaces its orphan count as a Foster prompt, she exits every lens |
 | P24 | Check-in death, litter weaned off record | 3 | litter row → same drawer → type + → Done |
 
