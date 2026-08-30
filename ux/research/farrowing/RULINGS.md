@@ -40,6 +40,12 @@ history lives in git.
   is owner-ratified (2026-08-29): click in → the list of the current counts → click the
   figure → the few options. Corrections announce themselves; recording stays flat.
 - Entering Adjust folds the pending window first — corrections operate on posted state only.
+- **What Adjust adjusts: the observations, never the derivation.** During: Alive and each
+  posted dead type; Born has no door pre-lock (it heals when its inputs heal). Post-lock:
+  Born gains its ceremony (More born › / Count was wrong ›) plus classification, litter
+  weight, assisted. And the split (2026-08-30): a MISSED fact is a recording (drawer +,
+  alive +), never an Adjust — there is no "missed entry" chip; Adjust exists for figures
+  that must come down, change kind, or change sow.
 - When exactly one figure holds a posted value, the Adjust picker skips itself and opens
   the correction event directly (accepted 2026-08-29).
 - Identity is sheet-first: the sh2 header is the one door to her sow page; the room row

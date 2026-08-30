@@ -237,7 +237,10 @@ should-be value). Recording stays flat on the sheet; correcting announces itself
 sits one level deeper by design — the two doors are differently shaped on purpose.
 Entering Adjust folds the pending window first (RULED): corrections operate on posted
 state only, so the picker's figures are posted = live and a correction can never race a
-buffer.
+buffer. What it adjusts is the observations, never the derivation: Born has no door
+pre-lock. And a missed fact is a recording (drawer +, alive +), never an Adjust — no
+"missed entry" chip exists; the door serves figures that must come down, change kind,
+or change sow (RULED 2026-08-30).
 
 Step 1 · **Picker** (which figure?):
 
