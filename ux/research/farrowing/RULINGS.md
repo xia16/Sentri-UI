@@ -38,7 +38,7 @@ history lives in git.
 
 ## Surfaces & entrances
 - ONE dead drawer product-wide, opened by the Record dead button (during · on the record ·
-  in check-in). Rest is read-state; touch grows − and the pending receipt; Done folds.
+  in check-in). Rest is read-state; touch grows − and the pending chip left of the still posted value (`+1  2`); Done folds.
 - **Stillborn entry stays in the drawer — no sheet shortcut.** (Owner-ratified; one
   entrance per concept. In practice it is tally-then-dismiss, not a 3-tap ceremony,
   because every tap already commits.)
