@@ -35,7 +35,7 @@ The hand never answers the question; their two observations encode it.
 
 | Gesture | Meaning | Ledger event |
 |---|---|---|
-| Alive − / + / type-to-set | converge to the crate | `alive_assert(n)` — signed delta logged, stamped |
+| Alive − / + / type-to-set | converge to the crate; − clamps at `posted − dead tallied this visit` and grays at the floor (RULINGS, 2026-08-30) | `alive_assert(n)` — signed delta logged, stamped |
 | Record dead button → drawer | at rest every row is read-state: posted count + a lone +. The first + grows the − capsule and the pending chip beside the still posted count — `2 +1`. Every tap commits; − drains pending only, **clamped at pending 0 by construction** — it can never touch posted state. Old over-tallies are corrections and route through Adjust. Done folds pending into posted as one stamped event per type; History keeps the lines | `dead(type)` / `correction(type,−1)` per tap |
 | − in the drawer (capsule, once pending > 0) | took one back — undoing this visit's tally, never a death and never a posted correction | `correction(type, −1)`; same-visit pairs net out |
 | Adjust (always available, beside Record dead) | THE one correction door for every posted figure: pick the figure → banner → provenance → what happened (miscount · wrong type › · wrong sow) → should-be value. During farrowing plain; post-lock the same surface adds the Born ceremony (More born › / Count was wrong ›) | `correction(…)` / `amendment(…)` |
@@ -73,9 +73,9 @@ The hand never answers the question; their two observations encode it.
 
 ## 4 · Accepted costs (owner-signed)
 
-- A piglet that vanishes without a body (savaged) reads as alive-down with no dead tally,
-  and Born quietly drops during farrowing. The hint mitigates; post-Finish the case must
-  route through Report death because Born is locked.
+- ~~A piglet that vanishes without a body (savaged) reads as alive-down with no dead
+  tally, and Born quietly drops.~~ SUPERSEDED (RULINGS, 2026-08-30): the floor rule makes
+  a silent Born drop impossible; the savaged case is `Adjust → Gone · no body`, stamped.
 - A double-tapped body inflates the pile permanently unless Adjusted — the pile is not
   re-countable, so the system cannot catch it.
 - No WHEN means death dates equal record dates; at daily-walk granularity this is the

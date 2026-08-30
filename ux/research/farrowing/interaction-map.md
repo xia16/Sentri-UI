@@ -161,7 +161,7 @@ Row grammar (the receipts this surface owes):
 | Element | Gesture | Commits | Receipt | Lands |
 |---|---|---|---|---|
 | Alive `+` | tap | `alive_assert(+1)` | count ticks; receipt line recomputes; Born foot ticks | — |
-| Alive `−` | tap | `alive_assert(−1)` | count ticks; below posted: reminder line + Born tick (§2.3a) | — |
+| Alive `−` | tap | `alive_assert(−1)` | count ticks; clamps + grays at the floor; a tap on the grayed − shows the two pointers (§2.3a) | — |
 | Alive framed count | tap | — (opens pad) | pad grows in; typing previews | pad inline |
 | pad set | confirm digit entry | `alive_assert(n)` absolute | as above | pad folds |
 | Record dead | tap | — | — | dead drawer |
@@ -177,18 +177,23 @@ metadata line, the receipt line, the saved stamp. The header identity is no long
 it is the one door to the sow page (E8) — the wrong-crate tripwire and the sow-verb
 route in a single, honest place.
 
-**2.3a · The Alive pending model (signed, unlike the drawer):**
+**2.3a · The Alive floor model (owner-ruled 2026-08-30 — the clamp, every figure):**
 
 - Big number = live total = posted + pending. Receipt = words, always:
-  `5 posted · +4 this visit`. Pending may go negative — convergence below posted is
-  honest — and then reads `5 posted · −2 this visit` (§8-G2 for the drawn form).
+  `5 posted · +4 this visit`; with bodies tallied and alive brought down,
+  `5 posted · −2 this visit` (§8-G2 for the drawn form). The receipt never mentions the
+  floor — the grayed − carries it.
+- `+` is free. `−` drains this visit only and clamps at
+  **floor = posted − dead tallied this visit** — the drawer unlocks the steps down,
+  physically enforcing drawer-first for deaths. Type-to-set clamps identically.
+- At the floor, `−` grays out — the suite's ONE disabled control (scoped owner exception
+  to no-dim-as-disabled). Tapping it writes nothing and shows two quiet pointers in the
+  reserved line for ~4 s (draft): `Pigs died? Record dead` · `Count wrong? Adjust`.
+- Consequence, by construction: **Born can never drop silently.** Every drop is bodies
+  or a stamped Adjust reason; the savaged accepted-cost is deleted — a vanished piglet
+  is `Adjust → Gone · no body`, a stamped truth.
 - Every tap commits its event immediately (crash-safe); Close nets the visit into the
   trail as one line. Same-visit +/− pairs net to nothing.
-- Every `−` raises the transient inline hint (*died? tally the body in Record dead*) in
-  the reserved hint line — reserved, so nothing reflows under the finger. Never a popup,
-  never a gate.
-- No clamp on `−`: the savaged-piglet case (alive down, no body) is an accepted cost,
-  mitigated by the hint and the visible Born tick.
 
 **2.3b · Wrong-sow and idle:**
 
@@ -330,7 +335,7 @@ Tap counts start from the During sheet unless noted; +2 overhead from the room (
 | P10 | Over-tally caught next visit | 4 | Adjust → Crushed → Miscount (default) → should-be − → Correct to 1 |
 | P11 | Wrong type (stillborn was mummified) | 5 | Adjust → Stillborn → Wrong type › → Mummified → Correct — one paired event |
 | P12 | Wrong sow discovered | ~6 | Adjust → figure or visit scope → Wrong sow → pick sow → Correct (§8-G6) |
-| P13 | Savaged (alive down, no body) | 1 | Alive −; hint shows; Born drops — accepted cost, story still sums |
+| P13 | Savaged (vanished, no body) | 3–4 | − is floored, so: Adjust → (auto-skip) → `Gone · no body` → should-be → commit; Born drops with a stamped reason — the silent-drop cost is deleted |
 | P14 | Finish, normal | ~5 + hold | Finish → Weak + → Deformed + → (skip optionals) → hold Lock |
 | P15 | Premature lock, three more born | 4 | After: Adjust → Born → More born › → +3 · where: alive now → commit |
 | P16 | Death after final | 3 | After: Record dead → type + → Done; alive-now derives down |
@@ -360,8 +365,9 @@ drill-in's depth (P10–P12) is equally deliberate — see §2.5.
    amendment after.
 3. One resting control per figure: Alive's `− n +`; a drawer row's lone `+`. Everything
    else is read-state.
-4. Pending on Alive is signed (convergence); pending on a dead row is non-negative
-   (a pile is append-only) — the drawer's `−` clamps at pending 0 by construction.
+4. Every figure obeys the clamp: a dead row's `−` floors at pending 0; Alive's `−`
+   floors at posted − dead tallied this visit. **Born can never decrease except through
+   Adjust** — by construction, not by teaching.
 5. Corrections to posted state pass through Adjust, and nowhere else. Additive surfaces
    stay pure; no gesture hides a second meaning.
 6. Every event commits at the tap and stamps who · when; visits net in History; nothing

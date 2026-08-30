@@ -57,7 +57,7 @@
 <h2>C1 · The ledger — events and derivations</h2>
 <p>One append-only event log per litter session, every event stamped <code>who · when · device</code>. Nothing is ever updated or deleted; corrections append. Two read layers: the <b>event stream</b> (every tap, crash-safe, synced) and the <b>ledger view</b> (History: events netted per type per visit — a same-visit +/− pair renders as nothing).</p>
 <table class="stab"><thead><tr><th style="width:16%">Event</th><th style="width:27%">Payload</th><th style="width:15%">Written by</th><th>Effect</th></tr></thead><tbody>
-<tr><td>alive_tap</td><td><code>{delta:+1|−1}</code> or <code>{set:n}</code> (pad)</td><td>Alive − / + / type-to-set</td><td>moves the open visit's pending sum (signed; may go below 0). Commits immediately; folds at visit end into one net line. Net 0 → no History line.</td></tr>
+<tr><td>alive_tap</td><td><code>{delta:+1|−1}</code> or <code>{set:n}</code> (pad)</td><td>Alive − / + / type-to-set</td><td>moves the open visit's pending sum. <b>Floor rule:</b> the total clamps at <code>floor = posted − dead tallied this visit</code>; − and set can never pass it. Commits immediately; folds at visit end into one net line. Net 0 → no History line.</td></tr>
 <tr><td>dead_tally</td><td><code>{type}</code></td><td>drawer row +, tail-list pick</td><td>pending[type] += 1. Types: <code>stillborn · mummified · crushed · scours · starve_out · other</code> (+ farm tail values behind other). Commits immediately.</td></tr>
 <tr><td>dead_undo</td><td><code>{type}</code></td><td>drawer row − (grown-in)</td><td>pending[type] −= 1. <b>Guard: pending[type] &gt; 0</b> — can never touch posted. Same-visit pair nets to nothing.</td></tr>
 <tr><td>visit_fold</td><td><code>{alive:{from,to}, dead:{type:+n…}}</code></td><td>system, at visit end (C3)</td><td>pending → posted as ONE stamped History line per figure. Emitted only if net ≠ 0.</td></tr>
@@ -106,7 +106,7 @@ always      registers derive from posted state (C2)             // incl. the all
 <tr><td>Opens</td><td>first write-tap on a sheet or drawer (not on open — opening writes nothing).</td></tr>
 <tr><td>Ends (folds) <span class="tag t-ruled">ruled</span></td><td>on Close · on sheet dismiss (grab swipe / backdrop tap — identical to Close) · on Adjust entry (corrections operate on posted state only) · after <b>90 min idle</b> (same boundary as the chip fade — one notion of "visit over"). Phone sleep / app background alone does NOT end it.</td></tr>
 <tr><td>Ends (folds) <span class="tag t-draft">draft</span></td><td>on entering the Finish face — the summary reviews posted truth and the lock must not race a buffer. Mirrors the Adjust rule; awaiting owner confirmation.</td></tr>
-<tr><td>Pending, Alive</td><td>signed. Display = posted + pending in the big number; receipt reads <code>5 posted · +4 this visit</code>, or <code>5 posted · −2 this visit</code> (amber −2) below posted <span class="tag t-undrawn">undrawn</span>.</td></tr>
+<tr><td>Pending, Alive</td><td>signed within the floor — negative only against bodies tallied this visit. Receipt reads <code>5 posted · +4 this visit</code> or <code>5 posted · −2 this visit</code> (amber −2) <span class="tag t-undrawn">undrawn</span>; the receipt never mentions the floor — the grayed − carries it.</td></tr>
 <tr><td>Pending, dead types</td><td>non-negative per type (a pile is append-only). − clamps at 0 and withers out.</td></tr>
 <tr><td>Undo scope</td><td>the pending window is the free-undo window, session-long, never a toast timer. Posted state is only ever moved by Adjust.</td></tr>
 </tbody></table>
@@ -124,7 +124,8 @@ always      registers derive from posted state (C2)             // incl. the all
 <h2>C5 · Element states</h2>
 <h3>5.1 · Alive counter (During; zeroed on Pre-start)</h3>
 <table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
-<tr><td>display</td><td>big number = posted + pending, mono, framed. − and + are 56px keys; nothing is ever dimmed or disabled — − below zero total is simply inert (total floors at 0).</td></tr>
+<tr><td>display</td><td>big number = posted + pending, mono, framed. − and + are 56px keys.</td></tr>
+<tr><td>− at the floor <span class="tag t-ruled">ruled</span></td><td>− is live while total &gt; floor (<code>posted − dead tallied this visit</code>); AT the floor it <b>grays out</b> — the suite's one disabled control, a scoped owner exception (2026-08-30) to no-dim-as-disabled. Tapping the grayed − writes nothing and shows the pointers (5.2). Born can never drop silently, by construction.</td></tr>
 <tr><td>tap framed count</td><td>type-to-set <span class="tag t-undrawn">undrawn</span>: the standard inline pad grows under the field (one pad grammar product-wide, as the conveyor's); set commits <code>alive_tap{set:n}</code> as an absolute assert; tap-out/grab folds the pad without writing.</td></tr>
 <tr><td>every − tap</td><td>raises the hint line (5.2). No dialog, no gate, ever.</td></tr>
 <tr><td>receipt line</td><td>always rendered under the counter: <code>5 posted · +4 this visit</code> · negative form amber (C3) · pre-start form <code>no records yet — the first one starts her litter</code>.</td></tr>
@@ -132,7 +133,7 @@ always      registers derive from posted state (C2)             // incl. the all
 <h3>5.2 · The reserved hint line</h3>
 <table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
 <tr><td>slot</td><td>one line under the receipt, height always reserved — nothing may reflow under a moving finger.</td></tr>
-<tr><td>visible</td><td>copy <code>fewer alive? tally the body — Record dead</code>, amber: shown for <b>4 s after any − tap</b> <span class="tag t-draft">draft</span>, and continuously while pending &lt; 0. Otherwise empty.</td></tr>
+<tr><td>visible</td><td>two quiet pointer lines, shown for <b>4 s</b> <span class="tag t-draft">draft</span> after a tap on the grayed −: <code>Pigs died? Record dead</code> · <code>Count wrong? Adjust</code>. Otherwise empty — never raised by ordinary taps above the floor.</td></tr>
 </tbody></table>
 <h3>5.3 · The dead drawer (one component, four contexts)</h3>
 <table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
@@ -151,7 +152,7 @@ always      registers derive from posted state (C2)             // incl. the all
 <tr><td>entry</td><td>always available beside Record dead (During) and on the record bars (After/Ended). Entry folds pending first. Hidden only on Pre-start (nothing posted; hidden, never dimmed).</td></tr>
 <tr><td>step 1 · picker</td><td>amber banner <code>Correcting a past record · logged as &lt;who&gt;</code> under the sh2 identity header (identity is mandatory on every correction surface). Lists only figures with posted values. During: Alive + posted dead types. Post-lock adds: Born (ceremony) · classification · litter weight · assisted <span class="tag t-undrawn">undrawn</span>. Alive_now never appears (derived).</td></tr>
 <tr><td>auto-skip <span class="tag t-ruled">ruled</span></td><td>exactly one posted figure → skip the picker, open the event back-titled with the figure.</td></tr>
-<tr><td>step 2 · event</td><td>figure + provenance line (<code>posted 07:30 · G.H</code>) · chips <code>Miscount (default) · Wrong type › · Wrong sow</code> · should-be stepper/pad · consequence preview line · <code>Cancel / Correct to N</code>. Commit appends <code>correction</code>; figure wears ✎ forever.</td></tr>
+<tr><td>step 2 · event</td><td>figure + provenance line (<code>posted 07:30 · G.H</code>) · what-happened chips per figure — dead types: <code>Miscount (default) · Wrong type › · Wrong sow</code>; Alive: <code>Miscount (default) · Gone · no body · Wrong sow</code> (Gone = the vanished-piglet truth; Born drops with a stamped reason) · should-be stepper/pad · consequence preview line · <code>Cancel / Correct to N</code>. Commit appends <code>correction</code>; figure wears ✎ forever.</td></tr>
 <tr><td>wrong sow</td><td>adds scope (<code>This figure</code> / <code>This visit</code>) then receiver (scan-first, type fallback); one committed move mirrored on both records, both ✎, both Histories.</td></tr>
 <tr><td>post-lock Born</td><td>warn first, then the one real question: <code>More born ›</code> (asks where the extra goes — alive now / died — and writes both lines) or <code>Count was wrong ›</code> (plain correction). The invariant never breaks silently. <span class="tag t-undrawn">undrawn</span></td></tr>
 </tbody></table>
@@ -187,7 +188,7 @@ always      registers derive from posted state (C2)             // incl. the all
 <tr><td>overdue chip from</td><td>day 116</td><td>due + 2 — examine or induce <span class="tag t-ruled">ruled</span></td></tr>
 <tr><td>interval chip neutral / amber / gone</td><td>&lt;60 / 60–90 / &gt;90 min</td><td><span class="tag t-ruled">ruled</span></td></tr>
 <tr><td>visit idle fold</td><td>90 min</td><td>aligned to chip-gone — one notion of "visit over" <span class="tag t-ruled">ruled</span></td></tr>
-<tr><td>hint line duration</td><td>4 s after −; constant while pending &lt; 0</td><td><span class="tag t-draft">draft</span></td></tr>
+<tr><td>pointer lines duration</td><td>4 s after a tap on the grayed −</td><td><span class="tag t-draft">draft</span></td></tr>
 <tr><td>hold-to-commit</td><td>800 ms, fill affordance</td><td><span class="tag t-draft">draft</span></td></tr>
 <tr><td>litter-weight soft warn</td><td>outside 0.8–2.5 kg × alive</td><td>words, never a gate <span class="tag t-ruled">ruled</span></td></tr>
 <tr><td>foster window</td><td>12–48 h</td><td>copy/guidance only — never enforced, foster is post-lock only <span class="tag t-ruled">ruled</span></td></tr>
@@ -227,14 +228,14 @@ always      registers derive from posted state (C2)             // incl. the all
 <table class="stab"><thead><tr><th style="width:6%">#</th><th>Invariant — violating any of these is a bug</th></tr></thead><tbody>
 <tr><td>1</td><td><code>Born = Alive + Σ Dead + fostered_out − fostered_in</code> at every moment, on every device.</td></tr>
 <tr><td>2</td><td>Born is never directly editable — two observable numbers before the lock, stamped amendment after.</td></tr>
-<tr><td>3</td><td>Every dead piglet is one tally in exactly one type; the drawer's − can never touch posted state.</td></tr>
+<tr><td>3</td><td>Every dead piglet is one tally in exactly one type; no − can ever touch posted state — dead rows floor at pending 0, Alive floors at posted − dead tallied this visit. <b>Born never decreases except through Adjust.</b></td></tr>
 <tr><td>4</td><td>Nothing is deleted; corrections append, stamped, visible as corrections, ✎ forever.</td></tr>
 <tr><td>5</td><td>Corrections to posted state pass through Adjust and nowhere else; why is asked only there.</td></tr>
 <tr><td>6</td><td>Every event commits at the tap; opening/reading/closing writes nothing; registers derive from posted state.</td></tr>
 <tr><td>7</td><td>One resting control per figure; anything not listed as tappable has no affordance.</td></tr>
 <tr><td>8</td><td>Same gesture for every hand: make the screen match the crate.</td></tr>
 </tbody></table>
-<div class="note"><b>Never build:</b> Save · submit buttons · success toasts · confirmation dialogs on recording · WHEN/date questions in the drawer · staleness escalations, threshold configs, notifications · dim-as-disabled (absent, never greyed) · hard gates anywhere (a blocked path is a falsification incentive) · role gates (v1) · foster during farrowing · scattered correction entrances (floor-doors, tap-the-fact, hidden gestures) · a separate detail screen (the sheet reopened IS the record).</div>
+<div class="note"><b>Never build:</b> Save · submit buttons · success toasts · confirmation dialogs on recording · WHEN/date questions in the drawer · staleness escalations, threshold configs, notifications · dim-as-disabled (absent, never greyed — ONE scoped exception: Alive's − at its floor, owner-ruled) · hard gates anywhere (a blocked path is a falsification incentive) · role gates (v1) · foster during farrowing · scattered correction entrances (floor-doors, tap-the-fact, hidden gestures) · a separate detail screen (the sheet reopened IS the record).</div>
 
 <h2>C11 · Open items</h2>
 <table class="stab"><thead><tr><th style="width:30%">Item</th><th>State</th></tr></thead><tbody>

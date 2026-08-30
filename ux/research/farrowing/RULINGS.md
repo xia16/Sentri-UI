@@ -7,9 +7,16 @@ history lives in git.
 
 ## Model
 - Born = Alive + Σ Dead + fostered out − fostered in. Derived, never entered, locks at Finish.
-- Alive: one classless number, converged to the crate (− / + / type). Posted + pending:
-  − drains pending free; net-down below posted is honest convergence with a standing
-  reminder line. Pending folds into posted as one stamped event when the visit ends.
+- Alive: one classless number (− / + / type). **The floor rule (owner, 2026-08-30):**
+  + is free; − drains only this visit's pending and clamps at
+  `floor = posted − dead tallied this visit` — the drawer unlocks the steps down. At the
+  floor − grays out (the suite's ONE disabled control, a scoped owner exception to
+  no-dim-as-disabled); tapping it shows two quiet pointers in the reserved line:
+  `Pigs died? Record dead` · `Count wrong? Adjust`. Type-to-set clamps identically.
+  Below-floor truth has exactly two doors: bodies (Record dead) or a reason (Adjust).
+  **Born can never drop silently, by construction.** The savaged accepted-cost is
+  deleted: a vanished piglet is `Adjust → Gone · no body` — a stamped truth. Pending
+  folds into posted as one stamped event when the visit ends.
 - Dead: five default types — stillborn · mummified · crushed · scours · starve-out — plus
   Other (absorbs the unknowable; farm-configured tail, euthanized included, behind it).
 - **No WHEN anywhere, absolutely — including check-in.** The stamp is the date. The
@@ -80,5 +87,5 @@ history lives in git.
 ## Style laws that bit us (obey without being asked)
 - Copy anchor constructions verbatim; no design text inside phone mocks; every number on
   every mock agrees with every other; self-describing tokens ≤14 chars; no dim-as-
-  disabled; census-only pen headers; no toasts; no submit buttons; consolidate, never
+  disabled (one scoped exception: Alive − at its floor, owner 2026-08-30); census-only pen headers; no toasts; no submit buttons; consolidate, never
   patch.
