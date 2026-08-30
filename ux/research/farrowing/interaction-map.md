@@ -2,7 +2,9 @@
 
 > **RULINGS.md outranks this file where they disagree.** The 2026-08-29 rulings round
 > answered §9's questions and pinned the §8 placements; both sections carry the answers
-> inline, marked RULED.
+> inline, marked RULED. The developer-facing rendering of this contract is
+> `ux/system/farrowing-contract.html` (every state, transition, element state, constant,
+> and sync rule) — keep the two in lockstep.
 
 Every action and interaction inside the farrowing drawer suite, walked path by path, with
 no UI. This file reconciles session-interaction-spec.md, user-flow-audit.md,
