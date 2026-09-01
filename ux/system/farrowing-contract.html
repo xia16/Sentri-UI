@@ -104,7 +104,7 @@ always      registers derive from posted state (C2)             // incl. the all
 <p>A visit is one device's open editing window on one session. Every tap commits its event immediately (crash-safe); the visit is only the <b>netting and undo boundary</b>, and its close emits <code>visit_fold</code>.</p>
 <table class="stab"><thead><tr><th style="width:30%">Rule</th><th>Contract</th></tr></thead><tbody>
 <tr><td>Opens</td><td>first write-tap on a sheet or drawer (not on open — opening writes nothing).</td></tr>
-<tr><td>Ends (folds) <span class="tag t-ruled">ruled</span></td><td>on Close · on sheet dismiss (grab swipe / backdrop tap — identical to Close) · on Adjust entry (corrections operate on posted state only; the audit challenges this trigger — C11) · at Lock commit and at <code>session_end</code> · after <b>90 min idle, measured from the last interaction on the sheet</b> (any tap, not just committed records — a hand standing through a slow farrowing is not idle) <span class="tag t-draft">draft</span>. Phone sleep / app background alone does NOT end it. A fold under an open sheet repaints receipt and capsules with the standard settle; a control drawn pre-fold acts on post-fold state (a stale − tap is a no-op).</td></tr>
+<tr><td>Ends (folds) <span class="tag t-ruled">ruled</span></td><td>on sheet dismiss (grab swipe / backdrop tap) · at <b>Adjust Save</b> (fold-on-entry DROPPED, owner 2026-09-01: Adjust displays live figures, Back touches nothing, Save folds the visit then applies the correction atomically — one moment, two events, History honest) · at Lock commit and at <code>session_end</code> · after <b>90 min idle, measured from the last interaction on the sheet</b> (any tap, not just committed records — a hand standing through a slow farrowing is not idle) <span class="tag t-draft">draft</span>. Phone sleep / app background alone does NOT end it. A fold under an open sheet repaints receipt and capsules with the standard settle; a control drawn pre-fold acts on post-fold state (a stale − tap is a no-op).</td></tr>
 <tr><td>Ends (folds) <span class="tag t-draft">draft</span></td><td>on entering the Finish face — the summary reviews posted truth and the lock must not race a buffer. Mirrors the Adjust rule; awaiting owner confirmation.</td></tr>
 <tr><td>Pending, Alive</td><td>signed within the floor — negative only against bodies tallied this visit. Receipt reads <code>5 posted · +4 this visit</code> or <code>5 posted · −2 this visit</code> (amber −2) <span class="tag t-undrawn">undrawn</span>; the receipt never mentions the floor — the grayed − carries it.</td></tr>
 <tr><td>Pending, dead types</td><td>non-negative per type (a pile is append-only). − clamps at 0 and withers out.</td></tr>
@@ -136,7 +136,7 @@ always      registers derive from posted state (C2)             // incl. the all
 <h3>5.2 · The reserved hint line</h3>
 <table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
 <tr><td>slot</td><td>one line under the receipt, height always reserved — nothing may reflow under a moving finger.</td></tr>
-<tr><td>visible</td><td>two quiet pointer lines, shown for <b>4 s</b> <span class="tag t-draft">draft</span> after a tap on the grayed −: <code>Pigs died? Record dead</code> · <code>Count wrong? Adjust</code>. Otherwise empty — never raised by ordinary taps above the floor.</td></tr>
+<tr><td>visible</td><td>two quiet pointer lines, shown for <b>4 s</b> <span class="tag t-draft">draft</span> after a tap on the grayed −, each keyed to its precondition: <code>Bodies? Record dead</code> · <code>Wrong count? Adjust</code>. Otherwise empty — never raised by ordinary taps above the floor.</td></tr>
 </tbody></table>
 <h3>5.3 · The dead drawer (one component, four contexts)</h3>
 <table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
@@ -177,6 +177,7 @@ always      registers derive from posted state (C2)             // incl. the all
 <table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
 <tr><td>visible · neutral</td><td>last record &lt; 60 min: <code>last 45m</code>, neutral chip.</td></tr>
 <tr><td>visible · amber</td><td>60–90 min: <code>last 60m</code> amber — the husbandry check-her band.</td></tr>
+<tr><td>day-chip priority <span class="tag t-ruled">ruled</span></td><td>past day 116 the red <code>day 117</code> chip keeps the line-1 slot even on an ACTIVE row, winning over the interval chip when both apply (one chip per row; the rarer signal wins). Surveillance survives a stray tap; the un-cross restores the Awaiting register. <span class="tag t-undrawn">undrawn</span></td></tr>
 <tr><td>gone</td><td>&gt; 90 min or no records: absent. Absence makes no claim — the room fades calm overnight. Driven by record stamps only; never config, never a notification.</td></tr>
 </tbody></table>
 <h3>5.8 · Identity, freshness, dead zones</h3>

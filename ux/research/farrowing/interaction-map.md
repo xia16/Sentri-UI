@@ -167,7 +167,7 @@ Row grammar (the receipts this surface owes):
 | Alive framed count | tap | — (opens pad) | pad grows in; typing previews | pad inline |
 | pad set | confirm digit entry | `alive_assert(n)` absolute | as above | pad folds |
 | Record dead | tap | — | — | dead drawer |
-| Adjust › (quiet door, record line) | tap | folds pending first (RULED; open question C11-2) | — | Adjust (one screen) |
+| Adjust › (quiet door, record line) | tap | nothing — peeking posts nothing (fold-on-entry dropped 2026-09-01; Save folds-then-corrects atomically) | — | Adjust (one screen) |
 | Sheet identity (sh2) | tap | — | — | sow page (E8) |
 | History › | tap | — | — | History (read-only) |
 | Grab swipe / backdrop tap | swipe/tap | folds pending → one stamped visit event (there is no Close button, 2026-09-01) | room row updates; the header's saved stamp was already live | room |
@@ -193,8 +193,8 @@ route in a single, honest place.
   type-to-set below the floor is refused, never silently clamped.
 - At the floor, `−` grays out — the floor's grays are the suite's one disabled-control
   family (scoped owner exception to no-dim-as-disabled). Tapping it writes nothing and
-  shows two quiet pointers in the reserved line for ~4 s (draft):
-  `Pigs died? Record dead` · `Count wrong? Adjust`.
+  shows two quiet pointers in the reserved line for ~4 s (draft), keyed to their
+  preconditions: `Bodies? Record dead` · `Wrong count? Adjust`.
 - Consequence: **Born can never sink below its floor except through Adjust** — per
   device by construction; across devices the merge contract (contract C7) flags a
   breach instead of applying it. The savaged accepted-cost stays deleted — a vanished

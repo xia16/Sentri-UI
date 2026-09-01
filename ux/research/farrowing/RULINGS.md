@@ -17,8 +17,10 @@ history lives in git.
   tally-then-undo drop Born silently). The drawer's − also obeys it: `dead_undo` grays
   when undoing a body would strand alive below the floor. At the floor the − grays out
   (the floor's grays are the suite's one disabled-control family, a scoped owner
-  exception to no-dim-as-disabled); tapping the grayed − shows two quiet pointers:
-  `Pigs died? Record dead` · `Count wrong? Adjust`. A type-to-set below the floor is
+  exception to no-dim-as-disabled); tapping the grayed − shows two quiet pointers, each keyed to its
+  precondition (owner copy round, 2026-09-01): `Bodies? Record dead` ·
+  `Wrong count? Adjust` — a vanished piglet has no body, so it falls to Adjust where
+  it belongs. A type-to-set below the floor is
   REFUSED, never silently clamped — typed value struck amber + the same pointers, no
   event. **Born can never sink below its floor except through Adjust — on one device by
   construction; across devices the merge contract flags rather than applies a breach.**
@@ -36,6 +38,11 @@ history lives in git.
   numbers a hand reports. If there are none, there are none. Optional facts at Finish:
   litter weight (soft range warn) + assisted checkbox, presented as one cohesive group.
 - No staleness tracking on Active sows; interval chip fades (~60 m amber, gone ~90 m).
+- **The red day chip survives the cross** (owner, 2026-09-01): past day 116 it keeps its
+  line-1 chip slot even while she reads ACTIVE, taking priority over the interval chip
+  when both apply (one chip per row, the rarer signal wins). A stray tap can no longer
+  switch off an overdue sow's surveillance; corrected back to zero she reads Awaiting
+  again and the register heals itself. A fact, not an escalation — no new grammar.
 - Due = service + 114 d hardcoded; overdue chip from day 116.
 
 ## Surfaces & entrances
@@ -78,8 +85,10 @@ history lives in git.
   tail door while its + tallies unclassified; roster mode past the untagged remainder;
   pre-filled door mode for count-drawer deltas; History = read-only, netted per visit,
   open visit printed as its running top line.
-- The visit (pending window) ends on Close, on sheet dismiss, on Adjust entry, or after
-  ~90 min idle — the same boundary as the interval-chip fade; one notion of "visit over".
+- The visit (pending window) ends on sheet dismiss, at Lock, at session end, at Adjust
+  SAVE (fold-on-entry dropped, owner 2026-09-01 — peeking posts nothing; Adjust shows
+  live figures, Back touches nothing, Save folds the visit then applies the correction
+  in one atomic moment), or after ~90 min idle measured from the last interaction.
 - **The exit grammar (owner-aligned 2026-08-30; Close-the-button killed 2026-09-01):**
   recording surfaces commit per tap — nothing is ever lost to an interruption, and
   closing saves nothing because everything is already in. The session sheet has NO
