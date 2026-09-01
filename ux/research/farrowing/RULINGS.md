@@ -18,9 +18,10 @@ history lives in git.
   when undoing a body would strand alive below the floor. At the floor the − grays out
   (the floor's grays are the suite's one disabled-control family, a scoped owner
   exception to no-dim-as-disabled); tapping the grayed − shows two quiet pointers, each keyed to its
-  precondition (owner copy round, 2026-09-01): `Bodies? Record dead` ·
-  `Wrong count? Adjust` — a vanished piglet has no body, so it falls to Adjust where
-  it belongs. A type-to-set below the floor is
+  precondition (owner copy rounds, 2026-09-01): `Found dead? Record dead` ·
+  `Wrong count? Adjust` — "found" carries the body precondition naturally; a vanished
+  piglet was never found, so it falls to Adjust where it belongs. ("Bodies?" was
+  vetoed as morgue copy.) A type-to-set below the floor is
   REFUSED, never silently clamped — typed value struck amber + the same pointers, no
   event. **Born can never sink below its floor except through Adjust — on one device by
   construction; across devices the merge contract flags rather than applies a breach.**

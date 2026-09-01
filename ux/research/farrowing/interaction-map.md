@@ -194,7 +194,7 @@ route in a single, honest place.
 - At the floor, `−` grays out — the floor's grays are the suite's one disabled-control
   family (scoped owner exception to no-dim-as-disabled). Tapping it writes nothing and
   shows two quiet pointers in the reserved line for ~4 s (draft), keyed to their
-  preconditions: `Bodies? Record dead` · `Wrong count? Adjust`.
+  preconditions: `Found dead? Record dead` · `Wrong count? Adjust`.
 - Consequence: **Born can never sink below its floor except through Adjust** — per
   device by construction; across devices the merge contract (contract C7) flags a
   breach instead of applying it. The savaged accepted-cost stays deleted — a vanished
