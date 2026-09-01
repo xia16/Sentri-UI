@@ -49,8 +49,9 @@ history lives in git.
 - **Stillborn entry stays in the drawer — no sheet shortcut.** (Owner-ratified; one
   entrance per concept. In practice it is tally-then-dismiss, not a 3-tap ceremony,
   because every tap already commits.)
-- ONE correction door: Adjust, always available beside Record dead — and it is ONE
-  SCREEN (owner, 2026-08-30, superseding the two-step drill-in and the what-happened
+- ONE correction door: Adjust, always available as the quiet `Adjust ›` door on the
+  record line (demoted from a button, 2026-09-01 — the ceremony inside is loud, the
+  door need not be) — and it is ONE SCREEN (owner, 2026-08-30, superseding the two-step drill-in and the what-happened
   chips): the figure list edits in place (− n + / type per figure). The amber banner
   (`Correcting a past record · logged as <who>`) and a live change summary
   (`stillborn 1 → 0`) appear at the FIRST change, not on entry. Exits: `Back` discards
@@ -79,12 +80,22 @@ history lives in git.
   open visit printed as its running top line.
 - The visit (pending window) ends on Close, on sheet dismiss, on Adjust entry, or after
   ~90 min idle — the same boundary as the interval-chip fade; one notion of "visit over".
-- **The exit grammar (owner-aligned, 2026-08-30):** recording surfaces (session sheet,
-  dead drawer) commit per tap — their single exit (`Close` / `Done`) and the dismiss
-  gesture are identical; nothing is ever lost to an interruption (the audit's data-loss
-  blocker stands). Ceremonies (Adjust, Lock born N) are staged — `Back`/`Cancel`
-  discards the stage, the primary verb (`Save` / `Lock born N`) commits; swipe equals
-  the left exit. There is still no Save on recording surfaces. The `saved hh:mm · who`
+- **The exit grammar (owner-aligned 2026-08-30; Close-the-button killed 2026-09-01):**
+  recording surfaces commit per tap — nothing is ever lost to an interruption, and
+  closing saves nothing because everything is already in. The session sheet has NO
+  close button: the grab handle and the backdrop are the exit. The drawer keeps `Done`
+  as its explicit return. Ceremonies (Adjust, Lock born N) are staged — `Back` discards
+  the stage, the primary verb (`Save` / `Lock born N`) commits; swipe equals the left
+  exit. There is still no Save on recording surfaces, and no posts-when-you-close
+  copy — the model explains itself through − and the visit receipt.
+- **Chrome follows frequency (owner, 2026-09-01):** counting is the hero; recording
+  dead is the one secondary button; finishing is the one primary; correcting and
+  reading are quiet doors — `History ›` and `Adjust ›` side by side on the record line.
+  The During bar holds Finish alone; four stacked buttons never return.
+- **One stepper shape (owner, 2026-09-01): `− n +` everywhere** — the Alive counter's
+  own anatomy on every counting row (drawer, Adjust, Finish): value hugs its +, the −
+  lives (or reserves its slot) to the value's left. The value-left-of-cluster variant
+  is retired. The `saved hh:mm · who`
   stamp rides the sheet HEADER beside `started` (identity + recency in one place;
   moved from the record block, owner 2026-08-30); History is a compact › door in the
   record block.

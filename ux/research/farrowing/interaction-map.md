@@ -67,8 +67,8 @@ Two design metrics govern every row here, per the owner's brief:
 
 | Mode | When | Zones present |
 |---|---|---|
-| Pre-start | Awaiting sow opened | header · Alive at 0 · `Record dead` · bar `Close` — nothing else exists yet |
-| During | Active | header · Alive hero · record block · bar `Close · Finish` |
+| Pre-start | Awaiting sow opened | header · Alive at 0 · `Record dead` — no bar; grab/backdrop dismisses |
+| During | Active | header (started + saved) · Alive hero · record block with `History › · Adjust ›` doors · `Record dead` · bar `Finish` alone |
 | Finishing | Finish tapped | summary · classification · optional facts · bar `Back · Lock` |
 | After | Done | header · locked figures · read lines · History · bar `Adjust · Record dead` (Foster parked) |
 
@@ -167,11 +167,10 @@ Row grammar (the receipts this surface owes):
 | Alive framed count | tap | — (opens pad) | pad grows in; typing previews | pad inline |
 | pad set | confirm digit entry | `alive_assert(n)` absolute | as above | pad folds |
 | Record dead | tap | — | — | dead drawer |
-| Adjust | tap | folds pending first (RULED) | — | Adjust picker |
+| Adjust › (quiet door, record line) | tap | folds pending first (RULED; open question C11-2) | — | Adjust (one screen) |
 | Sheet identity (sh2) | tap | — | — | sow page (E8) |
 | History › | tap | — | — | History (read-only) |
-| Close | tap | folds pending → one stamped visit event | room row updates; `saved hh:mm · who` was already live | room |
-| Grab swipe / backdrop tap | swipe/tap | same as Close | same | room |
+| Grab swipe / backdrop tap | swipe/tap | folds pending → one stamped visit event (there is no Close button, 2026-09-01) | room row updates; the header's saved stamp was already live | room |
 | Finish (hidden until any count event) | tap | — | — | Finishing |
 
 Dead zones: `Born 14 · Dead 5` (derived — no tap-the-fact, one-door law), the breakdown
