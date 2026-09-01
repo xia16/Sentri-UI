@@ -162,7 +162,14 @@ history lives in git.
   keeps the foster terms (events reserved, derivations unchanged with foster = 0) so
   fostering bolts on without rework. Do not design, draw, or build foster flows until
   the owner reopens them.
-- Bar: Adjust · Record dead.
+- Record faces (After · Ended) wear During's chrome ranking (drawn 2026-09-01): the
+  quiet `History › · Adjust ›` doors ride the figure line; the bar holds `Record dead`
+  alone. The standalone History row is gone from the record faces.
+- Post-lock Adjust, drawn: Born renders as a locked row whose one key is an amber ✎ —
+  tapping it expands a recessed ceremony tray in place (`More born ›` with a signed
+  delta + alive/died chips, or `Count was wrong ›` with a plain total); the change joins
+  the same summary and Save. Nine rows group under the record's own zone captions
+  (dead · living · at birth).
 - **Anyone may amend born post-lock — open ✎, stamped, no role gate.** Provenance over
   sign-off (the owner's compliance stance): falsification is deterred by the visible
   amendment trail, not by permissions. (Standing unless the owner vetoes.)

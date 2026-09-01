@@ -70,7 +70,7 @@ Two design metrics govern every row here, per the owner's brief:
 | Pre-start | Awaiting sow opened | header · Alive at 0 · `Record dead` — no bar; grab/backdrop dismisses |
 | During | Active | header (started + saved) · Alive hero · record block with `History › · Adjust ›` doors · `Record dead` · bar `Finish` alone |
 | Finishing | Finish tapped | summary · classification · optional facts · bar `Back · Lock` |
-| After | Done | header · locked figures · read lines · History · bar `Adjust · Record dead` (Foster parked) |
+| After | Done | header · locked figures with `History › · Adjust ›` doors · read lines · bar `Record dead` alone |
 
 ### Drawer modes (one dead drawer, four contexts)
 
@@ -458,7 +458,9 @@ path is a falsification incentive. No foster during farrowing. No role gates in 
 
 **C · Fidelity note:** one timeline now runs the whole 09/09a/09b suite — first records
 07:30, then 07:52/08:12, a correction 08:20, the open visit to 08:41, statusbar 9:41
-(rows say `started 2h`, meaning the first record); posted alive 5 (+4 pending = 9), dead 5 by type; Born 14; History's lines sum to
+(rows say `started 2h`, meaning the first record); the floor/pad state phones run
+their own sow, 000472 (posted 9 · +2 crushed this visit · converged to the floor 7 ·
+Born 11), so the canonical 000418 arc never forks; posted alive 5 (+4 pending = 9), dead 5 by type; Born 14; History's lines sum to
 exactly these figures. Every new mock must join this timeline or use a sow the suite
 has never shown (the ended record uses 000399).
 
