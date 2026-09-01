@@ -167,9 +167,14 @@ history lives in git.
   keeps the foster terms (events reserved, derivations unchanged with foster = 0) so
   fostering bolts on without rework. Do not design, draw, or build foster flows until
   the owner reopens them.
-- Record faces (After · Ended) wear During's chrome ranking (drawn 2026-09-01): the
-  quiet `History › · Adjust ›` doors ride the figure line; the bar holds `Record dead`
-  alone. The standalone History row is gone from the record faces.
+- **The record face is three numbers (owner, 2026-09-01 — "too much going on"):**
+  `born ✎ · alive now · dead` in one readout card (they visibly sum: born − dead =
+  alive now), ONE quiet causes line beneath (since-final deaths fold into their cause
+  totals), the orphan fact on Ended, a single `History ›` foot row, bar
+  `Adjust · Record dead`. Classification, litter weight, assisted, and the
+  since-final split are History/console detail — never on the face. This also
+  dissolves the living-sums-vs-alive-now arithmetic trip: classification left the
+  face entirely.
 - Post-lock Adjust, drawn: Born renders as a locked row whose one key is an amber ✎ —
   tapping it expands a recessed ceremony tray in place (`More born ›` with a signed
   delta + alive/died chips, or `Count was wrong ›` with a plain total); the change joins
