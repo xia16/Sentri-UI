@@ -240,6 +240,34 @@ history lives in git.
 - Extra live piglet found later routes through the count drawer's up-doors, surfaced on
   the record as More born › inside Adjust.
 
+## The craft pass (three-lens review, 2026-09-01 — applied; owner to nod on the marked items)
+- **Counting rows keep one silhouette:** every row draws `[−] n [+]`; the − is present
+  always and wears the floor-gray when it has nothing to undo (the drawer's own ruling),
+  the value cell always prints (a quiet gray 0 when empty — the zero rule). No row ever
+  changes shape as it wakes. Row labels 15px/600; rows **60px** (glove spacing —
+  supersedes 54, OWNER NOD requested); stepper glyphs are 14px SVG strokes centered in
+  the key (hero 18px), never text glyphs sitting on a baseline.
+- **Every sheet section has a title row, not a caps sentence:** `Dead 6 · born dead or
+  died`, `Sow died · how` — the After face's own title-row construction; tracked
+  micro-caps are for ≤3-word eyebrows only.
+- **The two-way segment control is the white raised pill** (`.lens button.on` idiom:
+  card bg + shadow, selected 700 ink, unselected 600 ink2, pill radius 9 in a radius-12
+  track) — an ink-filled segment fought Save for primacy.
+- **The Photos field renders as a well card** (no outline — the emptiest element must
+  not have the strongest border), collapsed to one 44px row when empty (`Photos ·
+  optional` + the camera); the live camera is a card-bg circle with a 1.5px ink3 ring
+  and ink glyph so it never reads disabled; inactive = well fill, hair2 glyph, no ring;
+  20px gap above it so it cannot be hit overshooting `Other +`.
+- **Radios are visible:** 2px ink3 rings; selected = 2px ink ring + 10px ink dot; the
+  whole 60px row is the target; the selected label weighs 700.
+- **The sow's warning stacks** (14/700 red headline over 12 mono ink2 consequence, 1px
+  red border on the wash); the HOLD caption is 11px/700 at 85% (Lock's too).
+- **Bars:** `Back · Save` with a 24px gap in both drawer modes (a wet thumb must not clip
+  Back reaching for Save); one margin unit (16/20) through the sheet.
+- Logged for a suite-wide token decision, not applied: raise key borders to 1.5px ink3
+  for 3:1 barn contrast; secondary buttons as tinted fill instead of outline; radius
+  scale 6/9/12/22; home-indicator safe area in the chassis.
+
 ## Style laws that bit us (obey without being asked)
 - Copy anchor constructions verbatim; no design text inside phone mocks; every number on
   every mock agrees with every other; self-describing tokens ≤14 chars; no dim-as-
