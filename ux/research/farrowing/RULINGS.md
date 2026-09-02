@@ -131,13 +131,19 @@ history lives in git.
   her the moment it lands and its undo or fold-to-nothing un-crosses her (History keeps
   the lines). Refined 2026-08-30 by the attack audit from "posted state", which
   disagreed with the cross-on-first-tap rule about which face a stray tap produced.
-- **Sow dies mid-farrowing:** sow verbs never live on the litter sheet. Her death is
-  recorded on the sow — tap her identity (sh2 tag / room row) → sow page → Report death
-  (terminal cluster). The event ends the session without Finish: state `ended · sow
-  died`, Born derives from what stands, classification skipped (amendable via Adjust),
-  the litter record survives and leads with the orphan fact (`N alive · no sow` — the
-  foster door returns when fostering un-parks). She exits every lens (motion C); the
-  litter lives on under piglet care.
+- **Sow dies mid-farrowing (re-ruled 2026-09-01):** the door is in the death context —
+  the Record dead drawer has two modes on the room's own lens pill, `Piglets · The sow`;
+  the sow mode asks one thing, how (`Farrowing · Prolapse · Found dead · Other`), and
+  `Save` records her death and ends the session. (The identity-header route was a door
+  nobody could see.) Her sow page then leads with the death — pig-actions round. The
+  event ends the session without Finish: state `ended · sow died`, Born derives from
+  what stands, classification skipped (amendable via Adjust),
+  the litter record survives. **She stays in the room** (re-ruled 2026-09-01, replacing
+  "exits every lens"): a Done-register row — `7 alive` + red chip `sow died` / `born 10 ·
+  aug 28 · L.M`, ✎ rail — the orphan litter is the row the next shift most needs, and
+  she drains only at batch close. Her record face opens with a red warning band
+  carrying the cause (`Sow died · prolapse · aug 28 · 06:20 · L.M`) above the unified
+  fact line; no separate orphan block — the status and `Alive 7` already say it.
 
 - **A non-empty ledger is never unreachable** (attack audit, 2026-08-30): any face of a
   session that has events shows `History ›` — including the zero face of an un-crossed
