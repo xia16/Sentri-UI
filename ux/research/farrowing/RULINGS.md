@@ -133,8 +133,15 @@ history lives in git.
   disagreed with the cross-on-first-tap rule about which face a stray tap produced.
 - **Sow dies mid-farrowing (re-ruled 2026-09-01):** the door is in the death context —
   the Record dead drawer has two modes on the room's own lens pill, `Piglets · The sow`;
-  the sow mode asks one thing, how (`Farrowing · Prolapse · Found dead · Other`), and
-  `Save` records her death and ends the session. (The identity-header route was a door
+  the sow mode asks one thing, how (`Farrowing · Prolapse · Found dead · Other` — the
+  cheap 95%; farm-configurable later like the piglet tail), and `Save` records her
+  death and ends the session. **The sow's `Other` opens an optional free-text line**
+  (owner, 2026-09-01: a sow is a high-value animal whose exact reason someone will
+  want; a piglet's Other stays a plain fallback tally). **Photos are optional on both
+  drawer modes** — one quiet `Add photo · optional ›` row at the foot, never per
+  tally: piglet photos attach to this visit's tallies (the pile you are counting —
+  for the unknown or the investigable), sow photos to her death. Nothing ever waits
+  on a photo or a text; Save/Done never gate. (The identity-header route was a door
   nobody could see.) Her sow page then leads with the death — pig-actions round. The
   event ends the session without Finish: state `ended · sow died`, Born derives from
   what stands, classification skipped (amendable via Adjust),
