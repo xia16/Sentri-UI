@@ -168,10 +168,13 @@ history lives in git.
   fostering bolts on without rework. Do not design, draw, or build foster flows until
   the owner reopens them.
 - **The record face IS the During sheet, locked (owner, 2026-09-01 — "the completed
-  UI must speak the same language"):** same header (vit = the final/ended stamp),
-  same hero with the keys gone (`Alive now` in the framed count), the same fact line
-  `Born N · Dead N ›` with its causes line, the orphan fact on Ended, and the bar
-  `Adjust · Record dead` where Finish stood. No readout cards, no separate anatomy.
+  UI must speak the same language"):** same header (vit now carries parity), the
+  state said explicitly where the hero stood — a status band `Farrowing finished ·
+  aug 27 · 08:12 · G.H` (Ended: `Farrowing ended · sow died · …`) — then ONE unified
+  fact line `Born 14 · Alive 8 · Dead 6 ›` with its causes line (the owner's
+  optimization: alive-now and the born/dead figures are one status, not two zones),
+  the orphan fact on Ended, and the bar `Adjust · Record dead` where Finish stood.
+  No readout cards, no separate anatomy, no counter on a locked face.
   Classification, litter weight, assisted, and the since-final split are History and
   console detail — never on the face (since-final deaths fold into their cause totals).
 - **History is the chevron on the fact line, product-wide:** `Born 14 · Dead 5 ›` —
