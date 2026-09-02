@@ -10,7 +10,7 @@ history lives in git.
 - Alive: one classless number (− / + / type). **The Born floor (owner 2026-08-30;
   formula corrected by the attack audit the same day):** + is free; − drains pending and
   clamps at the floor `min alive = B* − current dead total`, where **B\* = Born at the
-  last posted count of the living** (re-anchored by every alive fold and every Adjust
+  last posted count of the living** (re-anchored by every alive fold and every Edit
   commit). In words: the count may come down only as far as the bodies recorded since
   you last counted — across visits, not per visit (the per-visit formula collapsed at
   every fold boundary: it stranded honest convergence after an interruption and let
@@ -19,13 +19,13 @@ history lives in git.
   (the floor's grays are the suite's one disabled-control family, a scoped owner
   exception to no-dim-as-disabled); tapping the grayed − shows two quiet pointers, each keyed to its
   precondition (owner copy rounds, 2026-09-01): `Found dead? Record dead` ·
-  `Wrong count? Adjust` — "found" carries the body precondition naturally; a vanished
-  piglet was never found, so it falls to Adjust where it belongs. ("Bodies?" was
+  `Wrong count? Edit` — "found" carries the body precondition naturally; a vanished
+  piglet was never found, so it falls to Edit where it belongs. ("Bodies?" was
   vetoed as morgue copy.) A type-to-set below the floor is
   REFUSED, never silently clamped — typed value struck amber + the same pointers, no
-  event. **Born can never sink below its floor except through Adjust — on one device by
+  event. **Born can never sink below its floor except through Edit — on one device by
   construction; across devices the merge contract flags rather than applies a breach.**
-  The savaged accepted-cost stays deleted: a vanished piglet is `Adjust → Gone · no
+  The savaged accepted-cost stays deleted: a vanished piglet is `Edit → Gone · no
   body` pre-lock; post-lock the door is the litter census (count drawer → just set
   count → unexplained anomaly), never a fabricated death. Pending folds into posted as
   one stamped event when the visit ends.
@@ -58,7 +58,7 @@ history lives in git.
 - **Stillborn entry stays in the drawer — no sheet shortcut.** (Owner-ratified; one
   entrance per concept. In practice it is tally-then-dismiss, not a 3-tap ceremony,
   because every tap already commits.)
-- ONE correction door: Adjust, always available in the During bar — and it is ONE
+- ONE correction door: Edit, always available in the During bar — and it is ONE
   SCREEN (owner, 2026-08-30, superseding the two-step drill-in and the what-happened
   chips): the figure list edits in place (− n + / type per figure). The amber banner
   (`Correcting a past record · logged as <who>`) and a live change summary
@@ -67,16 +67,16 @@ history lives in git.
   figure wears ✎ forever. Why is no longer asked; the delta is the record. A wrong type
   is −1 here · +1 there; a wrong sow is a correction here and a recording on the right
   sow (the linked mirrored move is retired). Post-lock the same screen carries the Born
-  ceremony. Adjust remains the only door to posted state; the Born floor governs every
+  ceremony. Edit remains the only door to posted state; the Born floor governs every
   recording surface outside it. No floor-doors, no tap-the-fact, no other entrances.
-- Entering Adjust folds the pending window first — corrections operate on posted state only.
-- **What Adjust adjusts: the observations, never the derivation.** During: Alive and each
+- Entering Edit folds the pending window first — corrections operate on posted state only.
+- **What Edit adjusts: the observations, never the derivation.** During: Alive and each
   posted dead type; Born has no door pre-lock (it heals when its inputs heal). Post-lock:
   Born gains its ceremony (More born › / Count was wrong ›) plus classification, litter
   weight, assisted. And the split (2026-08-30): a MISSED fact is a recording (drawer +,
-  alive +), never an Adjust — there is no "missed entry" chip; Adjust exists for figures
+  alive +), never an Edit — there is no "missed entry" chip; Edit exists for figures
   that must come down, change kind, or change sow.
-- (Auto-skip retired with the one-screen Adjust — there is no picker to skip.)
+- (Auto-skip retired with the one-screen Edit — there is no picker to skip.)
 - Identity is sheet-first: the sh2 header is the one door to her sow page; the room row
   offers no sow-page target — its zones are spoken for (body opens the
   sheet, rail is state, the left edge stays clean). Confirmed 2026-08-29.
@@ -86,20 +86,20 @@ history lives in git.
   tail door while its + tallies unclassified; roster mode past the untagged remainder;
   pre-filled door mode for count-drawer deltas; History = read-only, netted per visit,
   open visit printed as its running top line.
-- The visit (pending window) ends on sheet dismiss, at Lock, at session end, at Adjust
-  SAVE (fold-on-entry dropped, owner 2026-09-01 — peeking posts nothing; Adjust shows
+- The visit (pending window) ends on sheet dismiss, at Lock, at session end, at Edit
+  SAVE (fold-on-entry dropped, owner 2026-09-01 — peeking posts nothing; Edit shows
   live figures, Back touches nothing, Save folds the visit then applies the correction
   in one atomic moment), or after ~90 min idle measured from the last interaction.
 - **The exit grammar (owner-aligned 2026-08-30; Close-the-button killed 2026-09-01):**
   recording surfaces commit per tap — nothing is ever lost to an interruption, and
   closing saves nothing because everything is already in. The session sheet has NO
   close button: the grab handle and the backdrop are the exit. The drawer keeps `Done`
-  as its explicit return. Ceremonies (Adjust, Lock born N) are staged — `Back` discards
+  as its explicit return. Ceremonies (Edit, Lock born N) are staged — `Back` discards
   the stage, the primary verb (`Save` / `Lock born N`) commits; swipe equals the left
   exit. There is still no Save on recording surfaces, and no posts-when-you-close
   copy — the model explains itself through − and the visit receipt.
 - **The During bar, settled by a blind three-lens panel (2026-09-01): `Close · Finish`.**
-  `Record dead · Adjust` ride the counter as a two-up directly under the receipt (they
+  `Record dead · Edit` ride the counter as a two-up directly under the receipt (they
   act on the counting; the facts drop to a quiet footer with the History chevron). All
   three blind reviewers rejected both `Save` (lies on an auto-saving sheet — the receipt
   already says saved; teaches a first-week hand to re-enter after an accidental swipe)
@@ -109,10 +109,10 @@ history lives in git.
   unreliable target. The bar rule across all four sheets: **the bar holds exits only**
   (Close·Finish · Back·Save · Back·Save · Back·Lock). Pre-start: `Record dead` under
   the counter. **Three button registers (owner, 2026-09-01):** tools (`Record dead ·
-  Adjust`, mid-sheet) wear a soft well fill with no border; exits (`Close`) are
+  Edit`, mid-sheet) wear a soft well fill with no border; exits (`Close`) are
   outlined; the one primary (`Finish`, `Save`, `Lock`) is ink-filled. **One layout
   across states:** the pre-start face keeps the During skeleton — `Record dead` live
-  (a stillborn can be the first record), `Adjust` and `Finish` DISABLED in the
+  (a stillborn can be the first record), `Edit` and `Finish` DISABLED in the
   floor-gray family until there is something to correct or lock, a gray
   `Born 0 · Dead 0` footer. This supersedes "Finish hidden until any event exists":
   on one sheet nothing appears out of nowhere; unavailable controls are present and
@@ -121,10 +121,10 @@ history lives in git.
   sheet where it destroys a draft; and two of three blind readers read `+4 new` as
   pending — consider the receipt wording once more.
 - **One stepper shape (owner, 2026-09-01): `− n +` everywhere** — the Alive counter's
-  own anatomy on every counting row (drawer, Adjust, Finish); digit centered between
+  own anatomy on every counting row (drawer, Edit, Finish); digit centered between
   its keys.
 - **Type-to-set is retired on count figures (owner, 2026-09-01):** up is +, down is
-  bodies or Adjust — typing a count serves no case the steppers don't. The pad grammar
+  bodies or Edit — typing a count serves no case the steppers don't. The pad grammar
   survives only where typing is real input (ear tags, weights). This closes the pad's
   commit-affordance and decimal-key questions unasked.
 - **Receipt copy (owner, 2026-09-01):** `N saved · +X new` / `N saved · −X new` — save
@@ -190,7 +190,7 @@ history lives in git.
   bar (`Saving ends farrowing · 7 alive stay under piglet care`) and `Save · HOLD`. (The identity-header route was a door
   nobody could see.) Her sow page then leads with the death — pig-actions round. The
   event ends the session without Finish: state `ended · sow died`, Born derives from
-  what stands, classification skipped (amendable via Adjust),
+  what stands, classification skipped (amendable via Edit),
   the litter record survives. **She stays in the room** (re-ruled 2026-09-01, replacing
   "exits every lens"): a Done-register row — `7 alive` + red chip `sow died` / `born 10 ·
   aug 28 · L.M`, ✎ rail — the orphan litter is the row the next shift most needs, and
@@ -200,14 +200,14 @@ history lives in git.
 
 - **A non-empty ledger is never unreachable** (attack audit, 2026-08-30): any face of a
   session that has events shows `History ›` — including the zero face of an un-crossed
-  sow (the bare Pre-start applies only to a virgin session), and Adjust rides wherever
+  sow (the bare Pre-start applies only to a virgin session), and Edit rides wherever
   posted figures exist. The batch-close remainder distinguishes `no records` from
   `records · corrected to zero ›` so a zeroed litter can never pass as a virgin sow.
 - **Merge contract (DRAFT, supersedes blanket last-write-wins):** count events merge as
   signed deltas against their device-visible base; absolute sets decompose to deltas. A
   merged result that would breach a zero floor or the Born floor is never silently
   applied — it holds at the floor and posts a `sync review` line (History + console
-  anomaly tally), resolved through Adjust. Events stamped before a `final`/`session_end`
+  anomaly tally), resolved through Edit. Events stamped before a `final`/`session_end`
   but arriving after are flagged the same way and offered through the record's own
   ceremony (More born › / Count was wrong ›) — never silently dropped, never silently
   applied. Duplicate finals: earliest stands, later flags. Device clocks are never
@@ -221,7 +221,7 @@ history lives in git.
 ## After the lock
 - **Fostering is PARKED (owner, 2026-08-30)** — farrowing stabilizes first; fostering
   gets its own round later, receiver-eligibility question parked with it. v1 farrowing
-  ships NO foster doors anywhere: the After bar is `Adjust · Record dead`; the ended
+  ships NO foster doors anywhere: the After bar is `Edit · Record dead`; the ended
   record shows the orphan FACT (`N alive · no sow`), not a Pairing door. The ledger
   keeps the foster terms (events reserved, derivations unchanged with foster = 0) so
   fostering bolts on without rework. Do not design, draw, or build foster flows until
@@ -232,7 +232,7 @@ history lives in git.
   aug 27 · 08:12 · G.H` (Ended: `Farrowing ended · sow died · …`) — then ONE unified
   fact line `Born 14 · Alive 8 · Dead 6 ›` with its causes line (the owner's
   optimization: alive-now and the born/dead figures are one status, not two zones),
-  the orphan fact on Ended, and the bar `Adjust · Record dead` where Finish stood.
+  the orphan fact on Ended, and the bar `Edit · Record dead` where Finish stood.
   No readout cards, no separate anatomy, no counter on a locked face.
   Classification, litter weight, assisted, and the since-final split are History and
   console detail — never on the face (since-final deaths fold into their cause totals).
@@ -240,13 +240,13 @@ history lives in git.
   the line is the door, on During and on every record face. No "History" word, no
   separate row, no stacked doors.
 - **The correction mark is the amber value, not a pencil (owner, 2026-09-01):** a
-  corrected figure prints amber forever — the register Adjust already uses for a
-  changed value — so the record shows one edit door (Adjust) and one correction
-  color. The ✎ survives only as the Born row's edit KEY inside post-lock Adjust.
+  corrected figure prints amber forever — the register Edit already uses for a
+  changed value — so the record shows one edit door (Edit) and one correction
+  color. The ✎ survives only as the Born row's edit KEY inside post-lock Edit.
 - Receipt copy, both directions: `5 saved · +4 new` · `9 saved · 2 died` — under the
   floor, alive can only fall by counted piglets that died, so the receipt says so;
   "−2 new" was nonsense.
-- Post-lock Adjust, drawn: Born renders as a locked row whose one key is an amber ✎ —
+- Post-lock Edit, drawn: Born renders as a locked row whose one key is an amber ✎ —
   tapping it expands a recessed ceremony tray in place (`More born ›` with a signed
   delta + alive/died chips, or `Count was wrong ›` with a plain total); the change joins
   the same summary and Save. Nine rows group under the record's own zone captions
@@ -255,7 +255,7 @@ history lives in git.
   sign-off (the owner's compliance stance): falsification is deterred by the visible
   amendment trail, not by permissions. (Standing unless the owner vetoes.)
 - Extra live piglet found later routes through the count drawer's up-doors, surfaced on
-  the record as More born › inside Adjust.
+  the record as More born › inside Edit.
 
 ## The craft pass (three-lens review, 2026-09-01 — applied; owner to nod on the marked items)
 - **Counting rows keep one silhouette:** every row draws `[−] n [+]`; the − is present
@@ -284,6 +284,24 @@ history lives in git.
 - Logged for a suite-wide token decision, not applied: raise key borders to 1.5px ink3
   for 3:1 barn contrast; secondary buttons as tinted fill instead of outline; radius
   scale 6/9/12/22; home-indicator safe area in the chassis.
+
+## Names and glyphs
+- **The correction door is `Edit`** (owner, 2026-09-01 — renamed from Adjust, which
+  smelled of settings and named no object). Edit opens an editable copy of the record;
+  the amber ceremony inside carries the gravity, the door stays plain. Pointers read
+  `Wrong count? Edit`; the tool pair is `Record dead · Edit`. Every "Edit" in this
+  folder that predates 2026-09-01 was written as Adjust; the rename is global.
+- **Icon convention (owner, 2026-09-01): words carry actions, icons carry objects.**
+  Every action button is a word. Icons appear only from a closed vocabulary where the
+  object is universally pictured and a word would be redundant or would not fit:
+  camera (attach photo) · scan frame (ear tag) · magnifier (search) · funnel (filter) ·
+  grid (go to pen) · › (opens detail — never an action) · + / − (stepper) · ✎ (edit
+  this locked figure). Anything else gets a word. One glyph = one meaning product-wide.
+  Form: stroke only, one weight (2.2 at 18px / 1.8 at 20px), round caps, currentColor
+  — never filled, never two-tone, never emoji. No icons inside text buttons (the
+  dock's `Scan ear tag` is the one sanctioned pairing), no icons on list rows, and
+  status is never an icon — status is a chip word or a color register. Icon-only
+  controls: ≥44px target and a spoken label.
 
 ## Style laws that bit us (obey without being asked)
 - Copy anchor constructions verbatim; no design text inside phone mocks; every number on

@@ -577,7 +577,7 @@
 <!-- ============ 09 hero ============ -->
 <h2>09 · The farrowing room — a standing surface that drains</h2>
 <p style="max-width:76ch">Not a windowed task: each sow is her own window (<span class="mono">expected = service + 114 d</span>, hardcoded). The list is the room view — no dashboard, no grid. And it serves two farrowing models at once: the <b>attended</b> sow whose litter is being tracked birth by birth, and the <b>unattended</b> sow who farrows free and gets her whole litter entered as one batch when the hand comes back. The All lens below shows every register; on the walk the hand lives in Active.</p>
-<div style="max-width:76ch;border:1px solid var(--hair);border-radius:12px;padding:12px 16px;margin:14px 0 18px;font-family:var(--mono);font-size:12px;color:var(--ink2);overflow-x:auto;white-space:nowrap">the workflow, in section order · <b>09</b> the room → <b>09a</b> the session sheet (before → during → finish → after → ended) → <b>09b</b> the doors (Record dead · Adjust · History) → 09c–09f piglet care · counts · batch close · dev handoff: <a href="farrowing-contract.html">the state contract</a></div>
+<div style="max-width:76ch;border:1px solid var(--hair);border-radius:12px;padding:12px 16px;margin:14px 0 18px;font-family:var(--mono);font-size:12px;color:var(--ink2);overflow-x:auto;white-space:nowrap">the workflow, in section order · <b>09</b> the room → <b>09a</b> the session sheet (before → during → finish → after → ended) → <b>09b</b> the doors (Record dead · Edit · History) → 09c–09f piglet care · counts · batch close · dev handoff: <a href="farrowing-contract.html">the state contract</a></div>
 <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
 <div>
 <div class="vlabel">The room · All lens</div>
@@ -641,7 +641,7 @@
 
 <!-- ============ 09a session ============ -->
 <h2>09a · The session sheet — the litter&#39;s life, in order</h2>
-<p style="max-width:80ch">One sheet, four faces, drawn here in workflow order: before the first count → during → Finish → the locked record — plus the one abnormal end, the sow dying mid-farrowing. One axis per zone, one job per zone. The hero is the hand&#39;s 90% action: the Alive counter, centered, symmetric keys in thumb reach, the framed number typing on tap. The header carries identity and recency together (<span class="mono">started 07:30</span> over <span class="mono">saved 08:41 · G.H</span>); beneath the hero the record reads as one compact block — <span class="mono">Born 14 · Dead 5</span> with its <span class="mono">History ›</span> door inline, the breakdown, and <span class="mono">Record dead · Adjust</span> beside the data they touch. The sheet has no close button — the grab and the backdrop are the exit, everything already in; the bar holds only Finish. <span class="mono">Born = alive + Σ dead</span> derives; the arithmetic settles counted-vs-new by itself; every tap commits; one dead drawer and one correction door serve the whole product (09b). Her identity in the header is the one door to her sow page.</p>
+<p style="max-width:80ch">One sheet, four faces, drawn here in workflow order: before the first count → during → Finish → the locked record — plus the one abnormal end, the sow dying mid-farrowing. One axis per zone, one job per zone. The hero is the hand&#39;s 90% action: the Alive counter, centered, symmetric keys in thumb reach, the framed number typing on tap. The header carries identity and recency together (<span class="mono">started 07:30</span> over <span class="mono">saved 08:41 · G.H</span>); beneath the hero the record reads as one compact block — <span class="mono">Born 14 · Dead 5</span> with its <span class="mono">History ›</span> door inline, the breakdown, and <span class="mono">Record dead · Edit</span> beside the data they touch. The sheet has no close button — the grab and the backdrop are the exit, everything already in; the bar holds only Finish. <span class="mono">Born = alive + Σ dead</span> derives; the arithmetic settles counted-vs-new by itself; every tap commits; one dead drawer and one correction door serve the whole product (09b). Her identity in the header is the one door to her sow page.</p>
 <div style="display:flex;gap:34px;overflow-x:auto;padding-bottom:12px;align-items:flex-start">
 <div style="flex:0 0 auto">
 <div class="vlabel">Before the first count · nothing recorded yet</div>
@@ -668,7 +668,7 @@
       <span style="font-family:var(--mono);font-size:10.5px;color:var(--ink3)">no records yet — the first one starts her litter</span>
       <span style="font-family:var(--mono);font-size:10.5px;color:var(--ink3);min-height:14px;line-height:14px"></span>
     </div>
-    <div style="display:flex;gap:10px;margin-top:4px"><button class="cta" style="flex:1.2;height:44px;font-size:13.5px;background:var(--well);color:var(--ink);border:0;box-shadow:none">Record dead</button><button class="cta" style="flex:1;height:44px;font-size:13.5px;background:var(--well);color:var(--ink3);border:0;box-shadow:none">Adjust</button></div>
+    <div style="display:flex;gap:10px;margin-top:4px"><button class="cta" style="flex:1.2;height:44px;font-size:13.5px;background:var(--well);color:var(--ink);border:0;box-shadow:none">Record dead</button><button class="cta" style="flex:1;height:44px;font-size:13.5px;background:var(--well);color:var(--ink3);border:0;box-shadow:none">Edit</button></div>
     <div style="border-top:1px solid var(--hair);padding:14px 2px 0;margin-top:14px">
       <div style="display:flex;align-items:center;gap:10px;min-height:24px"><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink3)">Born 0 · Dead 0</span></div>
     </div>
@@ -701,7 +701,7 @@
       <span style="font-family:var(--mono);font-size:10.5px;color:var(--ink3)">5 saved · <span style="color:var(--green);font-weight:700">+4</span> new</span>
       <span style="font-family:var(--mono);font-size:10.5px;color:var(--ink3);min-height:14px;line-height:14px"></span>
     </div>
-    <div style="display:flex;gap:10px;margin-top:4px"><button class="cta" style="flex:1.2;height:44px;font-size:13.5px;background:var(--well);color:var(--ink);border:0;box-shadow:none">Record dead</button><button class="cta" style="flex:1;height:44px;font-size:13.5px;background:var(--well);color:var(--ink);border:0;box-shadow:none">Adjust</button></div>
+    <div style="display:flex;gap:10px;margin-top:4px"><button class="cta" style="flex:1.2;height:44px;font-size:13.5px;background:var(--well);color:var(--ink);border:0;box-shadow:none">Record dead</button><button class="cta" style="flex:1;height:44px;font-size:13.5px;background:var(--well);color:var(--ink);border:0;box-shadow:none">Edit</button></div>
     <div style="border-top:1px solid var(--hair);padding:14px 2px 0;margin-top:14px">
       <div style="display:flex;align-items:center;gap:10px;min-height:24px">
         <span style="font-family:var(--mono);font-size:13px;font-weight:700">Born 14 · Dead 5</span>
@@ -1302,9 +1302,9 @@
         <span style="width:56px;height:56px;border-radius:14px;border:1px solid var(--hair2);background:var(--card);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex:0 0 auto"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 7h10M7 2v10"/></svg></span>
       </div>
       <span style="font-family:var(--mono);font-size:10.5px;color:var(--ink3)">9 saved · <span style="color:var(--ink);font-weight:700">2</span> died</span>
-      <span style="font-family:var(--mono);font-size:10.5px;color:var(--amber);min-height:14px;line-height:14px">Found dead? <span style="font-weight:700">Record dead</span> · Wrong count? <span style="font-weight:700">Adjust</span></span>
+      <span style="font-family:var(--mono);font-size:10.5px;color:var(--amber);min-height:14px;line-height:14px">Found dead? <span style="font-weight:700">Record dead</span> · Wrong count? <span style="font-weight:700">Edit</span></span>
     </div>
-    <div style="display:flex;gap:10px;margin-top:4px"><button class="cta" style="flex:1.2;height:44px;font-size:13.5px;background:var(--well);color:var(--ink);border:0;box-shadow:none">Record dead</button><button class="cta" style="flex:1;height:44px;font-size:13.5px;background:var(--well);color:var(--ink);border:0;box-shadow:none">Adjust</button></div>
+    <div style="display:flex;gap:10px;margin-top:4px"><button class="cta" style="flex:1.2;height:44px;font-size:13.5px;background:var(--well);color:var(--ink);border:0;box-shadow:none">Record dead</button><button class="cta" style="flex:1;height:44px;font-size:13.5px;background:var(--well);color:var(--ink);border:0;box-shadow:none">Edit</button></div>
     <div style="border-top:1px solid var(--hair);padding:14px 2px 0;margin-top:14px">
       <div style="display:flex;align-items:center;gap:10px;min-height:24px">
         <span style="font-family:var(--mono);font-size:13px;font-weight:700">Born 11 · Dead 4</span>
@@ -1968,7 +1968,7 @@
       </div>
       <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:5px;white-space:nowrap">stillborn 1 · mummified 1 · crushed 3 · other 1</div>
     </div>
-    <div class="shbar" style="margin-top:16px"><button class="cta sec" style="flex:1">Adjust</button><button class="cta" style="flex:1.35">Record dead</button></div>
+    <div class="shbar" style="margin-top:16px"><button class="cta sec" style="flex:1">Edit</button><button class="cta" style="flex:1.35">Record dead</button></div>
   </div>
 </div>
 </div>
@@ -1989,7 +1989,7 @@
       </div>
       <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:5px;white-space:nowrap">stillborn 2 · crushed 1</div>
     </div>
-    <div class="shbar" style="margin-top:16px"><button class="cta sec" style="flex:1">Adjust</button><button class="cta" style="flex:1.35">Record dead</button></div>
+    <div class="shbar" style="margin-top:16px"><button class="cta sec" style="flex:1">Edit</button><button class="cta" style="flex:1.35">Record dead</button></div>
   </div>
 </div>
 </div>
@@ -1997,22 +1997,22 @@
 <div style="max-width:1000px">
   <h3 style="margin-top:26px">Rules — the final model, post-audit (session-interaction-spec.md · user-flow-audit.md)</h3>
   <table class="stab"><thead><tr><th style="width:26%">Rule</th><th>Why</th></tr></thead><tbody>
-    <tr><td>Before the first count</td><td>Opening a sheet never writes; a peek costs nothing. The zero face has no Finish (an all-zero litter cannot lock Born 0), no Adjust (nothing posted to correct), and no start ceremony — the first recorded event <i>is</i> the start, so the only controls are the ones that record: the Alive counter and <span class="mono">Record dead</span>.</td></tr>
+    <tr><td>Before the first count</td><td>Opening a sheet never writes; a peek costs nothing. The zero face has no Finish (an all-zero litter cannot lock Born 0), no Edit (nothing posted to correct), and no start ceremony — the first recorded event <i>is</i> the start, so the only controls are the ones that record: the Alive counter and <span class="mono">Record dead</span>.</td></tr>
     <tr><td>Her identity is the door</td><td>The sh2 header (pen chip + tag) opens her sow page — the one route to sow verbs from this suite, and the wrong-crate tripwire stays loud. Sow verbs never live on the litter sheet; that is why the button says <span class="mono">Record dead</span>, not Report death.</td></tr>
-    <tr><td>The floor under −</td><td>+ is free; − drains only this visit and stops at <span class="mono">posted − dead tallied new</span> — the drawer unlocks the steps down, so death entry is drawer-first by construction. At the floor the − grays out (the suite&#39;s one disabled control, owner-ruled); tapping it shows two quiet pointers in the reserved line — <span class="mono">Pigs died? Record dead</span> · <span class="mono">Count wrong? Adjust</span> — then they fade. Born can never drop silently: every drop is bodies, or a stamped Adjust reason (<span class="mono">Gone · no body</span> covers the vanished piglet).</td></tr>
+    <tr><td>The floor under −</td><td>+ is free; − drains only this visit and stops at <span class="mono">posted − dead tallied new</span> — the drawer unlocks the steps down, so death entry is drawer-first by construction. At the floor the − grays out (the suite&#39;s one disabled control, owner-ruled); tapping it shows two quiet pointers in the reserved line — <span class="mono">Pigs died? Record dead</span> · <span class="mono">Count wrong? Edit</span> — then they fade. Born can never drop silently: every drop is bodies, or a stamped Edit reason (<span class="mono">Gone · no body</span> covers the vanished piglet).</td></tr>
     <tr><td>A picture of the crate</td><td>Alive: one capsule converged to the crate (framed count types on tap). Dead: one drawer product-wide, opened by <span class="mono">Record dead</span> — named for the pile, because stillborns were never alive and &quot;death&quot; misled. The breakdown prints as metadata; <span class="mono">Born = alive + Σ dead + fostered out − fostered in</span> derives and prints at the foot.</td></tr>
     <tr><td>Posted + pending</td><td>The big number is the live total the hand converges to the crate; the receipt beneath decomposes it (<span class="mono">5 saved · +4 new</span>). − drains this visit only, floored at posted − dead tallied this visit (see The floor under −). Close folds pending into posted as one stamped event.</td></tr>
-    <tr><td>One correction door: Adjust</td><td>Additive surfaces stay pure — no floor-doors, no tap-the-fact, no mid-gesture questions. Every correction to posted state lives behind <span class="mono">Adjust</span>, ONE screen: the figure list editable in place. The amber banner and the change summary (<span class="mono">stillborn 1 → 0</span>) appear at the first change; <span class="mono">Back</span> discards, <span class="mono">Save</span> commits everything as one stamped event; every corrected figure prints amber forever. Post-lock the same screen carries the Born ceremony.</td></tr>
-    <tr><td>Lock, guarded</td><td><span class="mono">Finish</span> appears only once any event exists (an all-zero sheet cannot lock Born 0). <span class="mono">Lock born 14</span> is hold-to-commit and drawn as such. After the lock, Adjust warns and then asks the only real question — <span class="mono">More born ›</span> or <span class="mono">Count was wrong ›</span> — so an amendment always says where the extra goes and the invariant never breaks silently.</td></tr>
+    <tr><td>One correction door: Edit</td><td>Additive surfaces stay pure — no floor-doors, no tap-the-fact, no mid-gesture questions. Every correction to posted state lives behind <span class="mono">Edit</span>, ONE screen: the figure list editable in place. The amber banner and the change summary (<span class="mono">stillborn 1 → 0</span>) appear at the first change; <span class="mono">Back</span> discards, <span class="mono">Save</span> commits everything as one stamped event; every corrected figure prints amber forever. Post-lock the same screen carries the Born ceremony.</td></tr>
+    <tr><td>Lock, guarded</td><td><span class="mono">Finish</span> appears only once any event exists (an all-zero sheet cannot lock Born 0). <span class="mono">Lock born 14</span> is hold-to-commit and drawn as such. After the lock, Edit warns and then asks the only real question — <span class="mono">More born ›</span> or <span class="mono">Count was wrong ›</span> — so an amendment always says where the extra goes and the invariant never breaks silently.</td></tr>
     <tr><td>Wrong sow</td><td>The sheet header carries loud identity (pen chip + tag); an idle sheet re-opened after long silence shows its freshness stamp first; and a void-last-visit correction exists for the 3am wrong-crate discovery — appended, stamped, honest.</td></tr>
     <tr><td>Optional facts live on</td><td>Litter weight soft-warns outside ~0.8–2.5 kg per piglet and lives in History with the other at-birth facts — the record face carries only the three numbers and their causes.</td></tr>
-    <tr><td>Ended · sow died</td><td>Her death is recorded on her sow page (via the identity header), never here. The event ends the session without Finish: <span class="mono">ended · sow died</span>, Born derives from what stands, classification skipped and amendable via Adjust. She exits every lens (motion C); the litter record survives under piglet care and leads with the orphan fact — <span class="mono">7 alive · no sow</span> (the foster door returns when fostering un-parks). Classify-per-tap means whatever was entered is already committed; nothing is lost to the abnormal end.</td></tr>
+    <tr><td>Ended · sow died</td><td>Her death is recorded on her sow page (via the identity header), never here. The event ends the session without Finish: <span class="mono">ended · sow died</span>, Born derives from what stands, classification skipped and amendable via Edit. She exits every lens (motion C); the litter record survives under piglet care and leads with the orphan fact — <span class="mono">7 alive · no sow</span> (the foster door returns when fostering un-parks). Classify-per-tap means whatever was entered is already committed; nothing is lost to the abnormal end.</td></tr>
   </tbody></table>
 </div>
 
 <!-- ============ 09b death ============ -->
-<h2>09b · The doors — Record dead · Adjust · History</h2>
-<p style="max-width:80ch">The three surfaces that open over the sheet, in the order a hand meets them. One dead drawer serves every dead piglet in the product, and it speaks the Alive counter&#39;s grammar: every tap commits, and a value that carries this visit&#39;s additions prints green — the number is the receipt. Stillborn and mummified lead because born-dead is the common case; <span class="mono">Done</span> just closes, and the dismiss gesture is Done. Adjust is the one correction door, ONE screen: the record editable in place — quiet until the first change, then the amber banner, the change summary, and <span class="mono">Save</span>; <span class="mono">Back</span> discards. History is the read-only ledger both faces of the sheet share. The audit&#39;s dead-path blockers — tallies lost to interruption, overshoots with no fix, stillborn breaking the &quot;death&quot; frame — stay dead here.</p>
+<h2>09b · The doors — Record dead · Edit · History</h2>
+<p style="max-width:80ch">The three surfaces that open over the sheet, in the order a hand meets them. One dead drawer serves every dead piglet in the product, and it speaks the Alive counter&#39;s grammar: every tap commits, and a value that carries this visit&#39;s additions prints green — the number is the receipt. Stillborn and mummified lead because born-dead is the common case; <span class="mono">Done</span> just closes, and the dismiss gesture is Done. Edit is the one correction door, ONE screen: the record editable in place — quiet until the first change, then the amber banner, the change summary, and <span class="mono">Save</span>; <span class="mono">Back</span> discards. History is the read-only ledger both faces of the sheet share. The audit&#39;s dead-path blockers — tallies lost to interruption, overshoots with no fix, stillborn breaking the &quot;death&quot; frame — stay dead here.</p>
 <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
 <div>
 <div class="vlabel">The drawer · posted 2 · one green 3 on crushed</div>
@@ -2066,7 +2066,7 @@
 </div>
 </div>
 <div>
-<div class="vlabel">Adjust · the record, editable</div>
+<div class="vlabel">Edit · the record, editable</div>
 <div class="phone" style="display:flex;flex-direction:column;height:840px;background:var(--well)">
       <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
       <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
@@ -2089,7 +2089,7 @@
 </div>
 </div>
 <div>
-<div class="vlabel">Adjust · changed — banner, summary, Save</div>
+<div class="vlabel">Edit · changed — banner, summary, Save</div>
 <div class="phone" style="display:flex;flex-direction:column;height:840px;background:var(--well)">
       <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
       <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
@@ -2677,7 +2677,7 @@
 <body>
 <div class="wrap" style="padding:40px 48px 80px">
 <div data-shot="rest">
-<div class="vlabel">Adjust · post-lock — the record, editable</div>
+<div class="vlabel">Edit · post-lock — the record, editable</div>
 <div class="phone" style="display:flex;flex-direction:column;height:940px;background:var(--well)">
       <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
       <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
@@ -3275,7 +3275,7 @@
 <body>
 <div class="wrap" style="padding:40px 48px 80px">
 <div data-shot="armed">
-<div class="vlabel">Adjust · post-lock — More born, armed</div>
+<div class="vlabel">Edit · post-lock — More born, armed</div>
 <div class="phone" style="display:flex;flex-direction:column;height:1075px;background:var(--well)">
       <div class="statusbar" style="color:var(--ink3)"><span>9:41</span><span>●●●○ ⌁</span></div>
       <div class="appbar" style="opacity:.45"><div class="back">←</div><div><div class="ttl">Farrowing</div></div></div>
@@ -3337,11 +3337,11 @@
 <div style="flex:1;min-width:340px;max-width:520px">
   <h3 style="margin-top:6px">Rules</h3>
   <table class="stab"><thead><tr><th style="width:28%">Rule</th><th>Why</th></tr></thead><tbody>
-    <tr><td>Rest is read-state</td><td>At rest a row shows its posted count and a lone + — the smallest accident surface. Touched, the − grows into its reserved slot and the value itself prints green while it carries this visit&#39;s additions — same receipt grammar as Alive, no second number. − drains this visit only and grays at its floor. Done folds pending into posted as one stamped event per type; dismissing is Done. The drawer only tallies — corrections to posted counts live behind <span class="mono">Adjust</span>.</td></tr>
+    <tr><td>Rest is read-state</td><td>At rest a row shows its posted count and a lone + — the smallest accident surface. Touched, the − grows into its reserved slot and the value itself prints green while it carries this visit&#39;s additions — same receipt grammar as Alive, no second number. − drains this visit only and grays at its floor. Done folds pending into posted as one stamped event per type; dismissing is Done. The drawer only tallies — corrections to posted counts live behind <span class="mono">Edit</span>.</td></tr>
     <tr><td>Every body, one list</td><td>Stillborn and mummified lead — born dead is the common during-farrowing case and the label <span class="mono">Record dead</span> is named for the pile, not for a live-death incident. The type carries the timing; <b>no WHEN</b> — the stamp is the date. Other absorbs the unknowable; the farm&#39;s configured tail lives behind it.</td></tr>
     <tr><td>One drawer everywhere</td><td>During farrowing via <span class="mono">Record dead</span>, on the locked record via the same button, in check-in off the litter row — always carrying the surface&#39;s own context in its header. A tagged piglet is never subtracted namelessly: past the untagged remainder the drawer becomes a roster naming which.</td></tr>
     <tr><td>Other is plain</td><td>One tally row like every other — the tail door is retired. Other absorbs everything unclassified, euthanized included; Unknown is a cause, not a failure.</td></tr>
-    <tr><td>Adjust wears identity</td><td>The correction screen keeps the loud sow header — identity matters most exactly where the past is being rewritten; the banner alone is not identity. The banner and summary appear only once a change exists: an untouched Adjust is a quiet, readable copy of the record.</td></tr>
+    <tr><td>Edit wears identity</td><td>The correction screen keeps the loud sow header — identity matters most exactly where the past is being rewritten; the banner alone is not identity. The banner and summary appear only once a change exists: an untouched Edit is a quiet, readable copy of the record.</td></tr>
     <tr><td>Wrong type · wrong sow</td><td>No machinery: a wrong type is −1 here and +1 there — two deltas in one Save; a wrong sow is a correction here and a recording on her record. Two stamped trails; the ✎ and History tell the story.</td></tr>
     <tr><td>History</td><td>Read-only, newest first, netted per type per visit; the open visit prints its running net at the top; correction lines carry their from→to and their ✎ (<span class="mono">stillborn 1 → 0 ✎</span>). Same-visit undo pairs never appear. Nothing here is tappable — the list is the reveal.</td></tr>
   </tbody></table>
