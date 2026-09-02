@@ -147,14 +147,16 @@ history lives in git.
   (owner, 2026-09-01: a sow is a high-value animal whose exact reason someone will
   want; a piglet's Other stays a plain fallback tally). **Photos are optional on both
   drawer modes** — a labeled field at the foot (`Photos — optional`), never per tally,
-  whose control is ONE 44px camera ICON button on the label row (owner, 2026-09-01 —
-  the word lives in the row label `Photos`, the button is the glyph). It is inactive
+  drawn as ONE enclosed card (owner, 2026-09-01: the card is the field — label, control
+  and thumbnails all inside a bordered radius-12 box, so the section is a different
+  object from the list rows) whose control is a 44px camera icon in a soft filled
+  circle — deliberately not the keys' outlined squircle, so it never reads as another
+  + (the word lives in the label `Photos`, the button is the glyph). It is inactive
   until the draft holds a death — a tally or a chosen reason — and becomes active with
   the first one (drawn greyed → live: a scoped exception like the floor's, because a
   photo with nothing to attach to has no meaning). Tap → the camera, capture-first
-  (the library is the camera UI's own shortcut). Attached photos sit in an ENCLOSED
-  CARD beneath the row — bordered, radius 12 — so the photo group reads as a
-  different object from the list rows. Tap a thumbnail → the viewer, where `Delete`
+  (the library is the camera UI's own shortcut). Attached photos sit inside the same card
+  beneath its header row. Tap a thumbnail → the viewer, where `Delete`
   is a full-size button beside `Back` — deletion lives in the viewer, never as a
   badge. (The dashed tile, the corner ×, and the text button are all retired.)
   Photos ride the Save (piglets: the visit's tallies — the pile you are counting; sow:
