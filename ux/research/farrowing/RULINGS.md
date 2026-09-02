@@ -98,11 +98,20 @@ history lives in git.
   the stage, the primary verb (`Save` / `Lock born N`) commits; swipe equals the left
   exit. There is still no Save on recording surfaces, and no posts-when-you-close
   copy — the model explains itself through − and the visit receipt.
-- **The During bar (owner, 2026-09-01, second pass):** `Adjust · Record dead · Finish`
-  — three buttons, Finish the one primary. The quiet-door experiment died on sight
-  (stacked `History › Adjust ›` read as bad UX); the record block is pure facts
-  (`Born · Dead` + breakdown). **No History door during farrowing** — history is
-  record-face detail, not barn chrome. Pre-start bar: `Record dead` alone.
+- **The During bar, settled by a blind three-lens panel (2026-09-01): `Close · Finish`.**
+  `Record dead · Adjust` ride the counter as a two-up directly under the receipt (they
+  act on the counting; the facts drop to a quiet footer with the History chevron). All
+  three blind reviewers rejected both `Save` (lies on an auto-saving sheet — the receipt
+  already says saved; teaches a first-week hand to re-enter after an accidental swipe)
+  and `Back` (would mean "keep everything" here and "discard the draft" one sheet
+  deeper). `Close` names the sheet, not the data; it earns its button because leaving
+  happens ten times a farrowing and wet nitrile through a case makes the handle an
+  unreliable target. The bar rule across all four sheets: **the bar holds exits only**
+  (Close·Finish · Back·Save · Back·Save · Back·Lock). Pre-start: `Record dead` under
+  the counter, bar `Close` alone. Two panel notes logged for the owner: relabel the
+  staged sheets' `Back` → `Cancel` so "left button is safe" never transfers into a
+  sheet where it destroys a draft; and two of three blind readers read `+4 new` as
+  pending — consider the receipt wording once more.
 - **One stepper shape (owner, 2026-09-01): `− n +` everywhere** — the Alive counter's
   own anatomy on every counting row (drawer, Adjust, Finish); digit centered between
   its keys.
