@@ -108,7 +108,15 @@ history lives in git.
   happens ten times a farrowing and wet nitrile through a case makes the handle an
   unreliable target. The bar rule across all four sheets: **the bar holds exits only**
   (Close·Finish · Back·Save · Back·Save · Back·Lock). Pre-start: `Record dead` under
-  the counter, bar `Close` alone. Two panel notes logged for the owner: relabel the
+  the counter. **Three button registers (owner, 2026-09-01):** tools (`Record dead ·
+  Adjust`, mid-sheet) wear a soft well fill with no border; exits (`Close`) are
+  outlined; the one primary (`Finish`, `Save`, `Lock`) is ink-filled. **One layout
+  across states:** the pre-start face keeps the During skeleton — `Record dead` live
+  (a stillborn can be the first record), `Adjust` and `Finish` DISABLED in the
+  floor-gray family until there is something to correct or lock, a gray
+  `Born 0 · Dead 0` footer. This supersedes "Finish hidden until any event exists":
+  on one sheet nothing appears out of nowhere; unavailable controls are present and
+  quiet. Two panel notes logged for the owner: relabel the
   staged sheets' `Back` → `Cancel` so "left button is safe" never transfers into a
   sheet where it destroys a draft; and two of three blind readers read `+4 new` as
   pending — consider the receipt wording once more.
