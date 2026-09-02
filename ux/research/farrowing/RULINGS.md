@@ -151,7 +151,17 @@ history lives in git.
   opens the camera capture-first (gallery as the secondary), returns to the drawer with
   the thumbnail in place; tapping a thumbnail views it with Remove; photos ride the
   Save (piglets: the visit's tallies — the pile you are counting; sow: her death),
-  uploads queue offline. Nothing ever waits on a photo or a text; Save never gates. (The identity-header route was a door
+  uploads queue offline. Nothing ever waits on a photo or a text; Save never gates.
+  **Where batch photos surface (owner question, 2026-09-01): in History.** Piglet deaths
+  are saved as one batch per drawer visit, so the photos ride that batch's History line
+  — a compact thumbnail strip under `+3 crushed · +1 other · 08:12 · G.H`, tap to view.
+  Sow photos ride the `sow died` line the same way. Removal exists only while
+  drafting (the thumbnail's corner ×); once saved, photos are evidence — view-only
+  from History in v1. Photos are a labeled FIELD in the form flow (`Photos —
+  optional`), never an afterthought after a divider.
+- **Saving the sow's death is hold-to-commit (owner, 2026-09-01):** it is the suite's
+  second irreversible act, so it gets Lock's grammar — a red warning callout above the
+  bar (`Saving ends farrowing · 7 alive stay under piglet care`) and `Save · HOLD`. (The identity-header route was a door
   nobody could see.) Her sow page then leads with the death — pig-actions round. The
   event ends the session without Finish: state `ended · sow died`, Born derives from
   what stands, classification skipped (amendable via Adjust),
