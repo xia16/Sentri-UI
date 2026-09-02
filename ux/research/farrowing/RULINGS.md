@@ -167,14 +167,23 @@ history lives in git.
   keeps the foster terms (events reserved, derivations unchanged with foster = 0) so
   fostering bolts on without rework. Do not design, draw, or build foster flows until
   the owner reopens them.
-- **The record face is three numbers (owner, 2026-09-01 — "too much going on"):**
-  `born ✎ · alive now · dead` in one readout card (they visibly sum: born − dead =
-  alive now), ONE quiet causes line beneath (since-final deaths fold into their cause
-  totals), the orphan fact on Ended, a single `History ›` foot row, bar
-  `Adjust · Record dead`. Classification, litter weight, assisted, and the
-  since-final split are History/console detail — never on the face. This also
-  dissolves the living-sums-vs-alive-now arithmetic trip: classification left the
-  face entirely.
+- **The record face IS the During sheet, locked (owner, 2026-09-01 — "the completed
+  UI must speak the same language"):** same header (vit = the final/ended stamp),
+  same hero with the keys gone (`Alive now` in the framed count), the same fact line
+  `Born N · Dead N ›` with its causes line, the orphan fact on Ended, and the bar
+  `Adjust · Record dead` where Finish stood. No readout cards, no separate anatomy.
+  Classification, litter weight, assisted, and the since-final split are History and
+  console detail — never on the face (since-final deaths fold into their cause totals).
+- **History is the chevron on the fact line, product-wide:** `Born 14 · Dead 5 ›` —
+  the line is the door, on During and on every record face. No "History" word, no
+  separate row, no stacked doors.
+- **The correction mark is the amber value, not a pencil (owner, 2026-09-01):** a
+  corrected figure prints amber forever — the register Adjust already uses for a
+  changed value — so the record shows one edit door (Adjust) and one correction
+  color. The ✎ survives only as the Born row's edit KEY inside post-lock Adjust.
+- Receipt copy, both directions: `5 saved · +4 new` · `9 saved · 2 died` — under the
+  floor, alive can only fall by counted piglets that died, so the receipt says so;
+  "−2 new" was nonsense.
 - Post-lock Adjust, drawn: Born renders as a locked row whose one key is an amber ✎ —
   tapping it expands a recessed ceremony tray in place (`More born ›` with a signed
   delta + alive/died chips, or `Count was wrong ›` with a plain total); the change joins
