@@ -49,11 +49,12 @@ history lives in git.
 ## Surfaces & entrances
 - ONE dead drawer product-wide, opened by the Record dead button (during · on the record ·
   in check-in). Rest is read-state (label · posted value · lone +). Touched: the value
-  itself turns green while it carries this visit's additions — **the chip is retired
+  itself turns green while it carries the draft's additions — **the chip is retired
   (owner, 2026-08-30): the number is the receipt, same grammar as Alive** — and − grows
   in, graying at its floor exactly like Alive's. `Other` is a plain tally row — the ›
-  tail door is retired (owner, same round); Other absorbs everything unclassified. Done
-  folds; the dismiss gesture is identical to Done (see exit grammar).
+  tail door is retired (owner, same round); Other absorbs everything unclassified. The
+  drawer is staged (2026-09-01): `Save` commits the draft as one stamped event, `Back`
+  or the dismiss gesture discards it.
 - **Stillborn entry stays in the drawer — no sheet shortcut.** (Owner-ratified; one
   entrance per concept. In practice it is tally-then-dismiss, not a 3-tap ceremony,
   because every tap already commits.)
@@ -132,16 +133,25 @@ history lives in git.
   the lines). Refined 2026-08-30 by the attack audit from "posted state", which
   disagreed with the cross-on-first-tap rule about which face a stray tap produced.
 - **Sow dies mid-farrowing (re-ruled 2026-09-01):** the door is in the death context —
-  the Record dead drawer has two modes on the room's own lens pill, `Piglets · The sow`;
-  the sow mode asks one thing, how (`Farrowing · Prolapse · Found dead · Other` — the
-  cheap 95%; farm-configurable later like the piglet tail), and `Save` records her
-  death and ends the session. **The sow's `Other` opens an optional free-text line**
+  the Record dead drawer has two modes on the system's two-way segment control (the
+  `.pk .seg` metrics: equal segments, centered labels, ink when selected — NOT the
+  filter lens, whose content-sized buttons spread to the ends), `Piglets · The sow`.
+  The sow mode is a LIST like the piglets' — the same 54px row anatomy — with a radio
+  per cause (`Farrowing · Prolapse · Found dead · Other`, the cheap 95%;
+  farm-configurable later), single-select; `Save` records her death and ends the
+  session. **Both modes end `Back · Save` (owner, 2026-09-01):** the drawer is a
+  staged surface — tallies and the cause are a draft until Save, Back discards — so
+  nobody clicks Done on a death record casually; `Done` is retired from the drawer.
+  Accepted cost, chosen: a phone dying mid-drawer loses that draft's tallies, a
+  seconds-long window in which the bodies are still there to recount. **The sow's `Other` opens an optional free-text line**
   (owner, 2026-09-01: a sow is a high-value animal whose exact reason someone will
   want; a piglet's Other stays a plain fallback tally). **Photos are optional on both
-  drawer modes** — one quiet `Add photo · optional ›` row at the foot, never per
-  tally: piglet photos attach to this visit's tallies (the pile you are counting —
-  for the unknown or the investigable), sow photos to her death. Nothing ever waits
-  on a photo or a text; Save/Done never gate. (The identity-header route was a door
+  drawer modes** — a photo strip at the foot, never per tally: a dashed `+ photo` add
+  tile (a button, not a chevron row), thumbnails growing to its left. Tapping the tile
+  opens the camera capture-first (gallery as the secondary), returns to the drawer with
+  the thumbnail in place; tapping a thumbnail views it with Remove; photos ride the
+  Save (piglets: the visit's tallies — the pile you are counting; sow: her death),
+  uploads queue offline. Nothing ever waits on a photo or a text; Save never gates. (The identity-header route was a door
   nobody could see.) Her sow page then leads with the death — pig-actions round. The
   event ends the session without Finish: state `ended · sow died`, Born derives from
   what stands, classification skipped (amendable via Adjust),
