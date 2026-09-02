@@ -146,12 +146,15 @@ history lives in git.
   seconds-long window in which the bodies are still there to recount. **The sow's `Other` opens an optional free-text line**
   (owner, 2026-09-01: a sow is a high-value animal whose exact reason someone will
   want; a piglet's Other stays a plain fallback tally). **Photos are optional on both
-  drawer modes** — a photo strip at the foot, never per tally: a dashed `+ photo` add
-  tile (a button, not a chevron row), thumbnails growing to its left. Tapping the tile
-  opens the camera capture-first (gallery as the secondary), returns to the drawer with
-  the thumbnail in place; tapping a thumbnail views it with Remove; photos ride the
-  Save (piglets: the visit's tallies — the pile you are counting; sow: her death),
-  uploads queue offline. Nothing ever waits on a photo or a text; Save never gates.
+  drawer modes** — a labeled field at the foot (`Photos — optional`), never per tally,
+  whose control is ONE compact outlined button, `Add photo` (owner round, 2026-09-01:
+  a word beats a glyph for gloves, dim barns, and screen readers; the dashed tile and
+  its 22px corner × are retired — wrong targets for gloved hands). Tap → the camera,
+  capture-first (the library is the camera UI's own shortcut); back in the drawer the
+  thumbnail sits left of the button. Tap a thumbnail → the viewer, where `Delete` is a
+  full-size button beside `Back` — deletion lives in the viewer, never as a badge.
+  Photos ride the Save (piglets: the visit's tallies — the pile you are counting; sow:
+  her death), uploads queue offline. Nothing ever waits on a photo or a text; Save never gates.
   **Where batch photos surface (owner question, 2026-09-01): in History.** Piglet deaths
   are saved as one batch per drawer visit, so the photos ride that batch's History line
   — a compact thumbnail strip under `+3 crushed · +1 other · 08:12 · G.H`, tap to view.
