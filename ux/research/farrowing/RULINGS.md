@@ -54,7 +54,7 @@ history lives in git.
   in, graying at its floor exactly like Alive's. `Other` is a plain tally row — the ›
   tail door is retired (owner, same round); Other absorbs everything unclassified. The
   drawer is staged (2026-09-01): `Save` commits the draft as one stamped event, `Back`
-  or the dismiss gesture discards it.
+  or the dismiss gesture keeps it on the device, `Clear` on the title row discards it.
 - **Stillborn entry stays in the drawer — no sheet shortcut.** (Owner-ratified; one
   entrance per concept. In practice it is tally-then-dismiss, not a 3-tap ceremony,
   because every tap already commits.)
@@ -62,8 +62,9 @@ history lives in git.
   SCREEN (owner, 2026-08-30, superseding the two-step drill-in and the what-happened
   chips): the figure list edits in place (− n + / type per figure). The amber banner
   (`Correcting a past record · logged as <who>`) and a live change summary
-  (`stillborn 1 → 0`) appear at the FIRST change, not on entry. Exits: `Back` discards
-  the draft; `Save` commits everything as one stamped correction event — every corrected
+  (`stillborn 1 → 0`) appear at the FIRST change, not on entry. Exits: `Back` keeps the
+  draft on the device, `Clear` (text action on the summary row) discards it; `Save`
+  commits everything as one stamped correction event — every corrected
   figure wears ✎ forever. Why is no longer asked; the delta is the record. A wrong type
   is −1 here · +1 there; a wrong sow is a correction here and a recording on the right
   sow (the linked mirrored move is retired). Post-lock the same screen carries the Born
@@ -93,24 +94,27 @@ history lives in git.
 - **The exit grammar (owner-aligned 2026-08-30; Close-the-button killed 2026-09-01):**
   recording surfaces commit per tap — nothing is ever lost to an interruption, and
   closing saves nothing because everything is already in. The session sheet has NO
-  close button: the grab handle and the backdrop are the exit. The drawer keeps `Done`
-  as its explicit return. Ceremonies (Edit, Lock born N) are staged — `Back` discards
-  the stage, the primary verb (`Save` / `Lock born N`) commits; swipe equals the left
-  exit. There is still no Save on recording surfaces, and no posts-when-you-close
+  close button: the grab handle and the backdrop are the exit. The drawer and Edit are
+  staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save`
+  commits; `Done` is retired. Finish's `Back` is pure navigation (its steppers commit
+  per tap) and `Lock born N` commits the lock. There is still no Save on recording surfaces, and no posts-when-you-close
   copy — the model explains itself through − and the visit receipt.
 - **The During bar, settled by a blind three-lens panel (2026-09-01): `Close · Finish`.**
   `Record dead · Edit` ride the counter as a two-up directly under the receipt (they
   act on the counting; the facts drop to a quiet footer with the History chevron). All
   three blind reviewers rejected both `Save` (lies on an auto-saving sheet — the receipt
   already says saved; teaches a first-week hand to re-enter after an accidental swipe)
-  and `Back` (would mean "keep everything" here and "discard the draft" one sheet
-  deeper). `Close` names the sheet, not the data; it earns its button because leaving
+  and `Back` (a navigation verb on a surface with nothing staged — `Close` names the
+  sheet). `Close` names the sheet, not the data; it earns its button because leaving
   happens ten times a farrowing and wet nitrile through a case makes the handle an
   unreliable target. The bar rule across all four sheets: **the bar holds exits only**
   (Close·Finish · Back·Save · Back·Save · Back·Lock). Pre-start: `Record dead` under
   the counter. **Three button registers (owner, 2026-09-01):** tools (`Record dead ·
   Edit`, mid-sheet) wear a soft well fill with no border; exits (`Close`) are
-  outlined; the one primary (`Finish`, `Save`, `Lock`) is ink-filled. **One layout
+  outlined; the one primary (`Finish`, `Save`, `Lock`) is ink-filled. The fourth,
+  quietest register is the TEXT ACTION — a bare word (sans 13/700 ink2, no container,
+  ≥44px hit area, right-aligned on the row it acts on, present only while it applies)
+  for small draft-only acts like `Clear`. **One layout
   across states:** the pre-start face keeps the During skeleton — `Record dead` live
   (a stillborn can be the first record), `Edit` and `Finish` DISABLED in the
   floor-gray family until there is something to correct or lock, a gray
@@ -156,11 +160,18 @@ history lives in git.
   The sow mode is a LIST like the piglets' — the same 54px row anatomy — with a radio
   per cause (`Farrowing · Prolapse · Found dead · Other`, the cheap 95%;
   farm-configurable later), single-select; `Save` records her death and ends the
-  session. **Both modes end `Back · Save` (owner, 2026-09-01):** the drawer is a
-  staged surface — tallies and the cause are a draft until Save, Back discards — so
-  nobody clicks Done on a death record casually; `Done` is retired from the drawer.
-  Accepted cost, chosen: a phone dying mid-drawer loses that draft's tallies, a
-  seconds-long window in which the bodies are still there to recount. **The sow's `Other` opens an optional free-text line**
+  session. **Both modes end `Back · Save`, with `Clear` on the title row (owner,
+  2026-09-01):** the drawer is a staged surface — tallies and the cause are a DRAFT
+  until Save. Three honest verbs: `Back` navigates away and KEEPS the draft on the
+  device (reopen and it is still there, green); `Clear` discards the draft (a text
+  action on the title row, present only while a draft exists); `Save` commits. Same
+  triad on Edit (Clear on its summary row). Nobody closes a death record casually,
+  and nothing is lost to an interruption — pocketing the phone, backgrounding, or Back
+  all keep the draft, so the earlier accepted cost (a mid-drawer draft lost) is
+  deleted. While a draft waits, the sheet's `Record dead` tool shows it in the green
+  register: `Record dead +2` (undrawn). Finish keeps `Back · Lock` (its steppers are
+  already committed — Back is pure navigation there); the counting sheet keeps
+  `Close · Finish` (nothing to clear). **The sow's `Other` opens an optional free-text line**
   (owner, 2026-09-01: a sow is a high-value animal whose exact reason someone will
   want; a piglet's Other stays a plain fallback tally). **Photos are optional on both
   drawer modes** — a labeled field at the foot (`Photos — optional`), never per tally,

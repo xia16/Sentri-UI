@@ -242,7 +242,7 @@ route in a single, honest place.
 RE-RULED 2026-08-30 (supersedes the two-step drill-in): Edit is **one screen — the
 figure list, editable in place** (− n + / type per posted figure). Untouched it is a
 quiet list; at the FIRST change the amber banner and a live change summary
-(`stillborn 1 → 0`) appear, and `Save` joins the bar. `Back` discards the draft;
+(`stillborn 1 → 0`) appear, and `Save` joins the bar. `Back` keeps the draft on the device, `Clear` on the summary row discards it;
 `Save` commits every delta as ONE stamped correction event, each corrected figure
 wearing ✎ forever. No chips, no reasons, no second screen; wrong type = −1 here +1
 there; wrong sow = correct here, record on the right sow. Entering Edit still folds
