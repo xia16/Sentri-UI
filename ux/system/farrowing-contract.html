@@ -86,8 +86,8 @@ always      registers derive from posted state (C2)             // incl. the all
                                         (terminal record +         write to the record,
                                          orphan Foster prompt)     never reopen ACTIVE</pre>
 <table class="stab"><thead><tr><th style="width:18%">State</th><th style="width:30%">Definition</th><th>Row rendering (copy from mocks)</th></tr></thead><tbody>
-<tr><td>AWAITING</td><td>live total (posted + open pending) at zero. Sub-registers derive from <code>day = today − first_service</code>: <b>forecast</b> day &lt; 114 (light line, full-strength row, never disabled) · <b>due</b> 114–115 · <b>overdue</b> ≥ 116 (red day chip)</td><td><code>Expected · in 2 days</code> / <code>Due today · day 114</code> / <code>No record</code> + red <code>day 117</code>; line 2 = <code>due … · parity n</code></td></tr>
-<tr><td>ACTIVE</td><td>live total ≠ all-zero and no <code>final</code>/<code>session_end</code>. <b>Registers derive from the live total</b> — a stray + crosses her as it lands; its undo or a fold-to-nothing un-crosses her</td><td>line 1 <code>9 alive · 5 dead</code> + interval chip (C5.7); line 2 <code>born 14 · started 2h</code> (started = first record). <code>ACTIVE</code> prints green</td></tr>
+<tr><td>AWAITING</td><td>live total (posted + open pending) at zero. Sub-registers derive from <code>day = today − first_service</code>: <b>forecast</b> day &lt; 114 (light line, full-strength row, never disabled) · <b>due</b> 114–115 · <b>overdue</b> ≥ 116 (red line 1). Rows speak in days from due, never gestation day (owner, 2026-09-03); the gestation day prints on the sheet header only</td><td><code>Due in 2 days</code> / <code>Due tomorrow</code> / <code>Due today</code> / <code>Overdue · 3 days</code> (red; days over = day − 114); line 2 on every Awaiting row = <code>parity n · m born last</code></td></tr>
+<tr><td>ACTIVE</td><td>live total ≠ all-zero and no <code>final</code>/<code>session_end</code>. <b>Registers derive from the live total</b> — a stray + crosses her as it lands; its undo or a fold-to-nothing un-crosses her</td><td>line 1 <code>9 alive · 5 dead</code> (+ the red <code>overdue 3d</code> chip past day 116, C5.7); line 2 <code>last record 1h ago · G.H</code> — recency in words (C5.7). Born is not on the row (it is alive + dead). <code>ACTIVE</code> prints green</td></tr>
 <tr><td>DONE</td><td><code>final</code> exists</td><td><code>11 alive</code> (alive_now, live-derived) / <code>born 13 · final 05:58 · G.H</code>; rail = ✎ glyph, row dim</td></tr>
 <tr><td>ENDED_SOW_DIED</td><td><code>session_end</code> exists</td><td>stays in the room as a Done-register row: <code>7 alive</code> + red chip <code>sow died</code> / <code>born 10 · aug 28 · L.M</code>, ✎ rail; drains at batch close (re-ruled 2026-09-01 — replaces "exits every lens")</td></tr>
 </tbody></table>
@@ -177,25 +177,25 @@ always      registers derive from posted state (C2)             // incl. the all
 <tr><td>open visit</td><td>tops the list as its running net, green: <code>+4 alive · this visit · open&nbsp;&nbsp;08:41 · G.H</code> — keeps the saved stamp and the list agreeing mid-visit.</td></tr>
 <tr><td>interaction</td><td>none. Nothing tappable; Close returns to host. The list is the reveal.</td></tr>
 </tbody></table>
-<h3>5.7 · The interval chip (room rows, ACTIVE only)</h3>
+<h3>5.7 · Recency and the overdue chip (room rows, ACTIVE only)</h3>
 <table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
-<tr><td>visible · neutral</td><td>last record &lt; 60 min: <code>last 29m</code>, neutral gray chip (drawn 2026-09-01 on the floor-state phone).</td></tr>
-<tr><td>visible · amber</td><td>60–90 min: <code>last 60m</code> amber — the husbandry check-her band.</td></tr>
-<tr><td>day-chip priority <span class="tag t-ruled">ruled</span></td><td>past day 116 the red <code>day 117</code> chip keeps the line-1 slot even on an ACTIVE row, winning over the interval chip when both apply (one chip per row; the rarer signal wins). Surveillance survives a stray tap; the un-cross restores the Awaiting register. <span class="tag t-undrawn">undrawn</span></td></tr>
-<tr><td>gone</td><td>&gt; 90 min or no records: absent. Absence makes no claim — the room fades calm overnight. Driven by record stamps only; never config, never a notification.</td></tr>
+<tr><td>recency line <span class="tag t-draft">draft</span></td><td>line 2 = <code>last record &lt;age&gt; · &lt;initials&gt;</code>: the newest record's age (minute resolution under 1 h — <code>2m ago</code>, <code>29m ago</code>; hour resolution after — <code>1h ago</code>, <code>7h ago</code>; a calendar day past 24 h — <code>yesterday</code>) and the hand who wrote it. Ticks live; driven by record stamps only, never config, never a notification.</td></tr>
+<tr><td>never colored by age <span class="tag t-ruled">ruled</span></td><td>no staleness tracking on ACTIVE sows: the line reads the same at <code>2m ago</code> and <code>7h ago</code>. Overnight the room reads calm because the words are calm, not because a chip faded.</td></tr>
+<tr><td>overdue chip <span class="tag t-ruled">ruled</span></td><td>past day 116 an ACTIVE row carries the red <code>overdue 3d</code> chip beside the counts (line 1) — the Awaiting row's red <code>Overdue · 3 days</code> line, surviving the cross in chip form because line 1 is taken by the counts. Surveillance survives a stray tap; the un-cross restores the Awaiting row. Drawn on the row-states strip.</td></tr>
+<tr><td>interval chip</td><td>RETIRED (owner, 2026-09-03) — <code>last 60m</code> said neither what nor whose; the recency line replaces it.</td></tr>
 </tbody></table>
 <h3>5.8 · Identity, freshness, dead zones</h3>
 <table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
 <tr><td>sh2 identity header</td><td>pen chip + tag on every sheet/drawer/Edit face. Tap → her sow page (the ONE route to sow verbs). Sheet-first: the room row has no sow-page target.</td></tr>
 <tr><td>idle reopen</td><td>a During sheet reopened with last record &gt; 90 min leads with its freshness stamp emphasized until first touch <span class="tag t-draft">draft mechanism</span> — the wrong-crate tripwire.</td></tr>
-<tr><td>dead zones</td><td>not tappable, no affordance: <code>Born N · Dead N</code> (derived; no tap-the-fact), breakdown metadata, receipt + hint lines, saved stamp, interval + day chips, pen headers, row line-2.</td></tr>
+<tr><td>dead zones</td><td>not tappable, no affordance: <code>Born N · Dead N</code> (derived; no tap-the-fact), breakdown metadata, receipt + hint lines, saved stamp, the overdue chip, pen headers, row line-2 (the recency line included).</td></tr>
 </tbody></table>
 
 <h2>C6 · Constants</h2>
 <table class="stab"><thead><tr><th style="width:34%">Constant</th><th style="width:18%">Value</th><th>Source</th></tr></thead><tbody>
 <tr><td>gestation / due</td><td>service + 114 d</td><td>hardcoded, no farm config (3-3-3 rule) <span class="tag t-ruled">ruled</span></td></tr>
 <tr><td>overdue chip from</td><td>day 116</td><td>due + 2 — examine or induce <span class="tag t-ruled">ruled</span></td></tr>
-<tr><td>interval chip neutral / amber / gone</td><td>&lt;60 / 60–90 / &gt;90 min</td><td><span class="tag t-ruled">ruled</span></td></tr>
+<tr><td>row recency resolution</td><td>minutes &lt; 1 h · hours &lt; 24 h · <code>yesterday</code> after</td><td><span class="tag t-draft">draft</span></td></tr>
 <tr><td>visit idle fold</td><td>90 min</td><td>aligned to chip-gone — one notion of "visit over" <span class="tag t-ruled">ruled</span></td></tr>
 <tr><td>pointer lines duration</td><td>4 s after a tap on the grayed −</td><td><span class="tag t-draft">draft</span></td></tr>
 <tr><td>hold-to-commit</td><td>800 ms, fill affordance</td><td><span class="tag t-draft">draft</span></td></tr>

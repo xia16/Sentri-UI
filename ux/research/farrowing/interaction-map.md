@@ -96,7 +96,7 @@ Two design metrics govern every row here, per the owner's brief:
 | E7 | Count drawer down-door `Record N died` | dead drawer, pre-filled mode | 09e scope; drawer must accept a target count (§8-G9) |
 | E8 | Her identity (sh2 tag block; her identity on the room row) | sow page | RULED with the sow-death ruling; the route to every sow verb. Row-level target geometry vs the row-tap-opens-sheet rule → §9-Q1 |
 
-Non-entries, deliberate: no notification ever opens a sheet; the interval chip is not
+Non-entries, deliberate: no notification ever opens a sheet; the recency line is not
 tappable; pen headers navigate the room, never a sow.
 
 ---
@@ -120,22 +120,25 @@ union-merged offline.
 | Task overview › | tap | — | — | overview |
 | Back ← | tap | — | — | Today |
 
-Dead zones: the interval chip (`last 45m`), the day chip (`day 117`), line-2 metadata,
+Dead zones: the overdue chip (`overdue 3d`), line-2 metadata (the recency line included),
 pen headers, the `Last record 23:10 · L. Meyer` appbar line. None tappable.
 
 Row grammar (the receipts this surface owes):
 
-- Active, attended: line 1 `9 alive · 5 dead` + interval chip while fresh; line 2
-  `born 14 · started 6h`. (Parity dropped from Active line 2 — three facts truncated at
-  render width, and parity is stable background living on the sheet and the Awaiting
-  rows. Drawn-round deviation, 2026-08-29.) The chip runs off record stamps: present
-  while the last record < ~60 m, amber ~60–90 m, gone past ~90 m. Absence makes no claim.
+- Active, attended: line 1 `9 alive · 5 dead` (+ the red `overdue 3d` chip past day
+  116); line 2 `last record 1h ago · G.H` — recency in words, the newest record's age
+  and hand, never colored by age. `born 14` left the row (it is alive + dead, already
+  on line 1) and the interval chip is retired (owner, 2026-09-03: `last 60m` said
+  neither what nor whose). Parity stays off Active rows (drawn-round deviation,
+  2026-08-29: stable background, living on the sheet and the Awaiting rows).
 - Unattended / free farrow: no start state — she rides Awaiting (forecast → due →
   overdue red chip) until the batch entry, which crosses her to Active and typically
   runs straight to Finish in the same visit.
-- Awaiting: forecast register (`Expected · in 2 days` light) → `Due today · day 114` →
-  red chip from day 116 (`No record · day 117`); parity rides line 2 here, where it aids
-  prediction. Rows carry no controls.
+- Awaiting: days from due, never gestation day (owner, 2026-09-03): `Due in 2 days` /
+  `Due tomorrow` (forecast, light) → `Due today` → `Overdue · 3 days` (red line 1 from
+  day 116; days over = day − 114; the gestation day lives on the sheet header). Line 2
+  is one grammar on every Awaiting row — `parity 6 · 9 born last`, the prediction
+  context. Rows carry no controls.
 - Done: `11 alive` (alive **now**, ticking with post-lock events) / line 2
   `born 13 · final 05:58 · G.H` — drawn in the 2026-08-29 round; B4 resolved.
 
@@ -450,7 +453,8 @@ path is a falsification incentive. No foster during farrowing. No role gates in 
 - B6 FIXED — 09's rules-table numbers now quote the mock (`9 alive · 5 dead`; the room
   hero and the 09a backdrops now show the same 000418 moment).
 - B7 FIXED — chip drawn `last 60m` amber, agreeing with `saved 08:41` on the sheet and
-  the 9:41 statusbar; the appbar's room-level last record now agrees too (08:41 · G.H).
+  the 9:41 statusbar (chip since retired, 2026-09-03 — the row now reads `last record
+  1h ago · G.H`, same stamps); the appbar's room-level last record now agrees too (08:41 · G.H).
 - B8 FIXED — the reserved hint line is drawn under the Alive receipt, shown in its
   raised state (`fewer alive? tally the body — Record dead`).
 - B9 open — 09e's door copy aligns when 09e gets its round (E7/§8-G9 define the
@@ -458,7 +462,7 @@ path is a falsification incentive. No foster during farrowing. No role gates in 
 
 **C · Fidelity note:** one timeline now runs the whole 09/09a/09b suite — first records
 07:30, then 07:52/08:12, a correction 08:20, the open visit to 08:41, statusbar 9:41
-(rows say `started 2h`, meaning the first record); the floor/pad state phones run
+(rows say `last record 1h ago · G.H`); the floor/pad state phones run
 their own sow, 000472 (posted 9 · +2 crushed this visit · converged to the floor 7 ·
 Born 11), so the canonical 000418 arc never forks; posted alive 5 (+4 pending = 9), dead 5 by type; Born 14; History's lines sum to
 exactly these figures. Every new mock must join this timeline or use a sow the suite

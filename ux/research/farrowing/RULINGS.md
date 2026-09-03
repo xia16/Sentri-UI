@@ -38,13 +38,21 @@ history lives in git.
   (alive − weak − deformed) and prints on the record; the sheet asks only the two
   numbers a hand reports. If there are none, there are none. Optional facts at Finish:
   litter weight (soft range warn) + assisted checkbox, presented as one cohesive group.
-- No staleness tracking on Active sows; interval chip fades (~60 m amber, gone ~90 m).
-- **The red day chip survives the cross** (owner, 2026-09-01): past day 116 it keeps its
-  line-1 chip slot even while she reads ACTIVE, taking priority over the interval chip
-  when both apply (one chip per row, the rarer signal wins). A stray tap can no longer
-  switch off an overdue sow's surveillance; corrected back to zero she reads Awaiting
-  again and the register heals itself. A fact, not an escalation — no new grammar.
-- Due = service + 114 d hardcoded; overdue chip from day 116.
+- No staleness tracking on Active sows. **The interval chip is retired (owner,
+  2026-09-03):** the Active row's line 2 is recency in words — `last record 1h ago ·
+  G.H`, the newest record's age and hand — ticking off record stamps and never colored
+  by age. `born 14` leaves the row: it is alive + dead, already on line 1.
+- **The overdue signal survives the cross** (owner, 2026-09-01; re-worded 2026-09-03):
+  on an Awaiting row it is the red line-1 phrase `Overdue · 3 days`; past day 116 a
+  crossed ACTIVE row keeps it as the red chip `overdue 3d` beside the counts (one chip
+  per row). A stray tap can no longer switch off an overdue sow's surveillance;
+  corrected back to zero she reads `Overdue · 3 days` again and the register heals
+  itself. A fact, not an escalation — no new grammar.
+- Due = service + 114 d hardcoded; overdue from day 116, spoken as days over due
+  (day − 114). **Rows speak in days from due, never gestation day (owner, 2026-09-03):**
+  `Due in 2 days` · `Due tomorrow` · `Due today` · `Overdue · 3 days`; line 2 on every
+  Awaiting row is `parity n · m born last`. The gestation day lives on the sheet header
+  only.
 
 ## Surfaces & entrances
 - ONE dead drawer product-wide, opened by the Record dead button (during · on the record ·
