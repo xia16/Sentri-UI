@@ -120,13 +120,13 @@ union-merged offline.
 | Task overview › | tap | — | — | overview |
 | Back ← | tap | — | — | Today |
 
-Dead zones: the overdue chip (`overdue 3d`), line-2 metadata (the recency line included),
+Dead zones: the overdue number (`3 days`), line-2 metadata (the recency line included),
 pen headers, the `Last record 23:10 · L. Meyer` appbar line. None tappable.
 
 Row grammar (the receipts this surface owes):
 
-- Active, attended: line 1 `9 alive · 5 dead` (+ the red `overdue 3d` chip past day
-  116); line 2 `last record 1h ago · G.H` — recency in words, the newest record's age
+- Active, attended: line 1 `9 alive · 5 dead` — never a chip; the overdue signal ends
+  at the first record (owner, 2026-09-03). Line 2 `last record 1h ago · G.H` — recency in words, the newest record's age
   and hand, never colored by age. `born 14` left the row (it is alive + dead, already
   on line 1) and the interval chip is retired (owner, 2026-09-03: `last 60m` said
   neither what nor whose). Parity stays off Active rows (drawn-round deviation,
@@ -135,8 +135,9 @@ Row grammar (the receipts this surface owes):
   overdue red chip) until the batch entry, which crosses her to Active and typically
   runs straight to Finish in the same visit.
 - Awaiting: days from due, never gestation day (owner, 2026-09-03): `Due in 2 days` /
-  `Due tomorrow` (forecast, light) → `Due today` → `Overdue · 3 days` (red line 1 from
-  day 116; days over = day − 114; the gestation day lives on the sheet header). Line 2
+  `Due tomorrow` (forecast, light) → `Due today` → `Overdue · 3 days` (from day 116, the
+  number in red, the word ink; days over = day − 114; the gestation day lives on the
+  sheet header). Line 2
   is one grammar on every Awaiting row — `parity 6 · 9 born last`, the prediction
   context. Rows carry no controls.
 - Done: `11 alive` (alive **now**, ticking with post-lock events) / line 2

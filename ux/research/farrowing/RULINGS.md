@@ -42,12 +42,17 @@ history lives in git.
   2026-09-03):** the Active row's line 2 is recency in words — `last record 1h ago ·
   G.H`, the newest record's age and hand — ticking off record stamps and never colored
   by age. `born 14` leaves the row: it is alive + dead, already on line 1.
-- **The overdue signal survives the cross** (owner, 2026-09-01; re-worded 2026-09-03):
-  on an Awaiting row it is the red line-1 phrase `Overdue · 3 days`; past day 116 a
-  crossed ACTIVE row keeps it as the red chip `overdue 3d` beside the counts (one chip
-  per row). A stray tap can no longer switch off an overdue sow's surveillance;
-  corrected back to zero she reads `Overdue · 3 days` again and the register heals
-  itself. A fact, not an escalation — no new grammar.
+- **The overdue signal ends at the first record** (owner, 2026-09-03, superseding
+  "the chip survives the cross" of 2026-09-01): recorded is acted, so an Active row is
+  never red and carries no chip. The lateness stays a fact on the sheet header
+  (`day 117`) and her sow page. Accepted cost: a stray +1 nobody undoes hides an
+  overdue sow behind `1 alive · 0 dead` until the next hand reads the crate — the
+  receipt, the − undo and the crate itself are the guards; undone, she reads
+  `Overdue · 3 days` again.
+- **Color lives on the value, the word stays ink** (owner, 2026-09-03): `Overdue ·
+  3 days` prints the number red and the word ink — the same value-color grammar as a
+  green draft addition and an amber corrected figure. Chips are for state words
+  (`sow died`); numbers are colored in place.
 - Due = service + 114 d hardcoded; overdue from day 116, spoken as days over due
   (day − 114). **Rows speak in days from due, never gestation day (owner, 2026-09-03):**
   `Due in 2 days` · `Due tomorrow` · `Due today` · `Overdue · 3 days`; line 2 on every
