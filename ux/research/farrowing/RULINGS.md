@@ -49,6 +49,13 @@ history lives in git.
   overdue sow behind `1 alive · 0 dead` until the next hand reads the crate — the
   receipt, the − undo and the crate itself are the guards; undone, she reads
   `Overdue · 3 days` again.
+- **The shot is logged, and the row reads it** (owner, 2026-09-03): induction and the
+  other overdue dispositions (pregnancy check, vet, move to next batch) are sow-page
+  events, recorded there — never on the litter sheet, they are not litter facts. The
+  overdue row reads her latest disposition into line 2 (`induced yesterday · L.M`) so
+  the next hand watches instead of treating twice. The number stays red until she
+  farrows or leaves the batch: red is the overdue fact, line 2 is what has been done
+  about it. This is the room's one read of sow-page events.
 - **Color lives on the value, the word stays ink** (owner, 2026-09-03): `Overdue ·
   3 days` prints the number red and the word ink — the same value-color grammar as a
   green draft addition and an amber corrected figure. Chips are for state words
@@ -118,8 +125,10 @@ history lives in git.
   know they can count, leave, come back and finish last — is answered by copy, not by a
   tutorial: the receipt's `saved` sits on the live total (`9 saved · +4 new`, `7 saved ·
   2 died`) so no figure on the sheet ever looks unsaved; the header stamp ticks at
-  every tap; and the pre-start face carries the flow once, on its reserved pointer
-  line — `every tap saves · come back anytime · finish when done` — the one state with room for it.
+  every tap. The pre-start face stays bare — `no records yet` — because the sheet is
+  not the place for copy (owner, 2026-09-03, retiring the flow line drawn that
+  morning); the how-to lives in the list view instead: one sentence under the room's
+  title, `Count as she farrows. Every tap saves, come back anytime. Finish when she's done.`.
 - **The During bar, settled by a blind three-lens panel (2026-09-01): `Close · Finish farrowing`.**
   `Record dead · Edit` ride the counter as a two-up directly under the receipt (they
   act on the counting; the facts drop to a quiet footer with the History chevron). All

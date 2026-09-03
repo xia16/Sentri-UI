@@ -139,7 +139,9 @@ Row grammar (the receipts this surface owes):
   number in red, the word ink; days over = day − 114; the gestation day lives on the
   sheet header). Line 2
   is one grammar on every Awaiting row — `parity 6 · 9 born last`, the prediction
-  context. Rows carry no controls.
+  context — except an overdue sow with a disposition logged on her sow page, whose
+  line 2 reads the latest one (`induced yesterday · L.M`; owner, 2026-09-03); the
+  number stays red until she farrows or leaves the batch. Rows carry no controls.
 - Done: `11 alive` (alive **now**, ticking with post-lock events) / line 2
   `born 13 · final 05:58 · G.H` — drawn in the 2026-08-29 round; B4 resolved.
 
