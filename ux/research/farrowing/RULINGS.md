@@ -112,7 +112,15 @@ history lives in git.
   commits; `Done` is retired. Finish's `Back` is pure navigation (its steppers commit
   per tap) and `Lock born N` commits the lock. There is still no Save on recording surfaces, and no posts-when-you-close
   copy — the model explains itself through − and the visit receipt.
-- **The During bar, settled by a blind three-lens panel (2026-09-01): `Close · Finish`.**
+- **`Finish` is `Finish farrowing` (owner, 2026-09-03):** the bare verb read as "finish
+  this entry" to a hand who is only logging; the object names what ends, and the Finish
+  sheet's hold-to-lock stays the second guard. The same fear — that a hand will not
+  know they can count, leave, come back and finish last — is answered by copy, not by a
+  tutorial: the receipt's `saved` sits on the live total (`9 saved · +4 new`, `7 saved ·
+  2 died`) so no figure on the sheet ever looks unsaved; the header stamp ticks at
+  every tap; and the pre-start face carries the flow once, on its reserved pointer
+  line — `every tap saves · come back anytime · finish when done` — the one state with room for it.
+- **The During bar, settled by a blind three-lens panel (2026-09-01): `Close · Finish farrowing`.**
   `Record dead · Edit` ride the counter as a two-up directly under the receipt (they
   act on the counting; the facts drop to a quiet footer with the History chevron). All
   three blind reviewers rejected both `Save` (lies on an auto-saving sheet — the receipt
@@ -124,12 +132,12 @@ history lives in git.
   (Close·Finish · Back·Save · Back·Save · Back·Lock). Pre-start: `Record dead` under
   the counter. **Three button registers (owner, 2026-09-01):** tools (`Record dead ·
   Edit`, mid-sheet) wear a soft well fill with no border; exits (`Close`) are
-  outlined; the one primary (`Finish`, `Save`, `Lock`) is ink-filled. The fourth,
+  outlined; the one primary (`Finish farrowing`, `Save`, `Lock`) is ink-filled. The fourth,
   quietest register is the TEXT ACTION — a bare word (sans 13/700 ink2, no container,
   ≥44px hit area, right-aligned on the row it acts on, present only while it applies)
   for small draft-only acts like `Clear`. **One layout
   across states:** the pre-start face keeps the During skeleton — `Record dead` live
-  (a stillborn can be the first record), `Edit` and `Finish` DISABLED in the
+  (a stillborn can be the first record), `Edit` and `Finish farrowing` DISABLED in the
   floor-gray family until there is something to correct or lock, a gray
   `Born 0 · Dead 0` footer. This supersedes "Finish hidden until any event exists":
   on one sheet nothing appears out of nowhere; unavailable controls are present and
@@ -184,7 +192,7 @@ history lives in git.
   deleted. While a draft waits, the sheet's `Record dead` tool shows it in the green
   register: `Record dead +2` (undrawn). Finish keeps `Back · Lock` (its steppers are
   already committed — Back is pure navigation there); the counting sheet keeps
-  `Close · Finish` (nothing to clear). **The sow's `Other` opens an optional free-text line**
+  `Close · Finish farrowing` (nothing to clear). **The sow's `Other` opens an optional free-text line**
   (owner, 2026-09-01: a sow is a high-value animal whose exact reason someone will
   want; a piglet's Other stays a plain fallback tally). **Photos are optional on both
   drawer modes** — a labeled field at the foot (`Photos — optional`), never per tally,
@@ -267,7 +275,7 @@ history lives in git.
   corrected figure prints amber forever — the register Edit already uses for a
   changed value — so the record shows one edit door (Edit) and one correction
   color. The ✎ survives only as the Born row's edit KEY inside post-lock Edit.
-- Receipt copy, both directions: `5 saved · +4 new` · `9 saved · 2 died` — under the
+- Receipt copy, both directions: `9 saved · +4 new` · `7 saved · 2 died` — under the
   floor, alive can only fall by counted piglets that died, so the receipt says so;
   "−2 new" was nonsense.
 - Post-lock Edit, drawn: Born renders as a locked row whose one key is an amber ✎ —

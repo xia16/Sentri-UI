@@ -67,8 +67,8 @@ Two design metrics govern every row here, per the owner's brief:
 
 | Mode | When | Zones present |
 |---|---|---|
-| Pre-start | Awaiting sow opened | the During skeleton: header · Alive at 0 · tools `Record dead` (live) · `Edit` (disabled) · gray `Born 0 · Dead 0` · bar `Close · Finish` (Finish disabled) |
-| During | Active | header (started + saved) · Alive hero + receipt · tools `Record dead · Edit` (soft fill) · facts footer `Born · Dead ›` (chevron = History) · bar `Close · Finish` |
+| Pre-start | Awaiting sow opened | the During skeleton: header · Alive at 0 · tools `Record dead` (live) · `Edit` (disabled) · gray `Born 0 · Dead 0` · bar `Close · Finish farrowing` (Finish disabled) |
+| During | Active | header (started + saved) · Alive hero + receipt · tools `Record dead · Edit` (soft fill) · facts footer `Born · Dead ›` (chevron = History) · bar `Close · Finish farrowing` |
 | Finishing | Finish tapped | summary · classification · optional facts · bar `Back · Lock` |
 | After | Done | header (parity) · status band `Farrowing finished · stamp` · fact line `Born · Alive · Dead ›` + causes · bar `Edit · Record dead` |
 
