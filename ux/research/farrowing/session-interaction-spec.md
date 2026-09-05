@@ -35,9 +35,9 @@ The hand never answers the question; their two observations encode it.
 
 | Gesture | Meaning | Ledger event |
 |---|---|---|
-| Alive − / + / type-to-set | converge to the crate | `alive_assert(n)` — signed delta logged, stamped |
-| Record dead button → drawer | at rest every row is read-state: committed count + a lone +. Touching a row grows the − capsule and a plain receipt beside the count — `was 2` — never a signed second number that could read as a pending accumulator. Every tap commits; − is not clamped, so old over-tallies fix by touch-then-step-down; Done closes, deltas clear, History keeps them | `dead(type)` / `correction(type,−1)` per tap |
-| − in the drawer (capsule, once n > 0) | took one back — an over-tally correction, never a death | `correction(type, −1)`; same-visit pairs net out |
+| Alive − / + / type-to-set | converge to the crate; − clamps at `posted − dead tallied this visit` and grays at the floor (RULINGS, 2026-08-30) | `alive_assert(n)` — signed delta logged, stamped |
+| Record dead button → drawer | at rest every row is read-state: posted count + a lone +. The first + grows the − capsule and the pending chip immediately left of the still posted count — `+1  2`. Every tap commits; − drains pending only, **clamped at pending 0 by construction** — it can never touch posted state. Old over-tallies are corrections and route through Adjust. Done folds pending into posted as one stamped event per type; History keeps the lines | `dead(type)` / `correction(type,−1)` per tap |
+| − in the drawer (capsule, once pending > 0) | took one back — undoing this visit's tally, never a death and never a posted correction | `correction(type, −1)`; same-visit pairs net out |
 | Adjust (always available, beside Record dead) | THE one correction door for every posted figure: pick the figure → banner → provenance → what happened (miscount · wrong type › · wrong sow) → should-be value. During farrowing plain; post-lock the same surface adds the Born ceremony (More born › / Count was wrong ›) | `correction(…)` / `amendment(…)` |
 | Close | closes the sheet — everything already committed; the `saved hh:mm · who` stamp beside History teaches persistence, recency and identity | — |
 | Finish farrowing (hidden until any event exists) | shows the run summary, asks "Any weak or deformed?" (healthy = remainder), then Lock born N (hold-to-commit) | `classify(weak n, deformed n)` + `final()` |
@@ -73,9 +73,9 @@ The hand never answers the question; their two observations encode it.
 
 ## 4 · Accepted costs (owner-signed)
 
-- A piglet that vanishes without a body (savaged) reads as alive-down with no dead tally,
-  and Born quietly drops during farrowing. The hint mitigates; post-Finish the case must
-  route through Report death because Born is locked.
+- ~~A piglet that vanishes without a body (savaged) reads as alive-down with no dead
+  tally, and Born quietly drops.~~ SUPERSEDED (RULINGS, 2026-08-30): the floor rule makes
+  a silent Born drop impossible; the savaged case is `Adjust → Gone · no body`, stamped.
 - A double-tapped body inflates the pile permanently unless Adjusted — the pile is not
   re-countable, so the system cannot catch it.
 - No WHEN means death dates equal record dates; at daily-walk granularity this is the
@@ -124,18 +124,20 @@ The hand never answers the question; their two observations encode it.
   the locked record with ✎ (C8).
 - Trail renamed **History** (count dropped) on the session surfaces (C4).
 - Invariant 1 corrected for fostering (C6).
-- **Rest is read-state** (owner ruling, round ten): drawer rows at rest show committed
-  count + lone +; the − and the per-visit delta grow in only on touch. The receipt is the words `was N`
-  (under the Alive counter, beside a touched drawer row) — a past number cannot be
-  misread as a pending accumulator, which a signed +4 chip was (owner catch, round
-  eleven). One live number per field, always.
+- **Rest is read-state** (owner ruling, round ten): drawer rows at rest show posted
+  count + lone +; the − and the pending chip grow in only on touch. Receipt forms, final
+  (superseding this bullet's earlier `was N` wording, per the §8 posted/pending
+  adoption): under Alive the worded decomposition `5 posted · +4 this visit`; beside a
+  touched drawer row the pending chip left of the still posted value — `+1  2`. The owner's round-11
+  catch was a *bare* signed number beside a figure reading as a second live count; the
+  words and the still-posted anchor resolve it. One live number per field, always.
 
 ## 8 · The count-entry pattern adopted (2026-08-28, count-entry-pattern.md)
 
 - **Posted + pending, everywhere a count meets live entry.** Alive: the big number is the
   live total (posted + pending) the hand converges; the decomposition beneath is the
   receipt (`5 posted · +4 this visit`). Drawer rows: posted stays still, the pending chip
-  moves (`2 +1`). − drains pending only, clamped by construction; it can never touch
+  moves (`+1  2`). − drains pending only, clamped by construction; it can never touch
   posted state. Close/Done folds pending into posted as one stamped event.
 - **One correction door: Adjust.** Additive surfaces are pure (alive converges, the
   drawer tallies; pending − is free undo, nothing else hides on a gesture). Every

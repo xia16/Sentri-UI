@@ -7,9 +7,10 @@ confirmation. Mating (screens 2–3) is parked for its own round; everything els
 suite. Five discussants each took a slice and anchored on the standing research
 (`tasks/farrowing.html`, `tasks/piglet-processing.html`, `ops/SYNTHESIS.md`, the chassis
 in components 04d, the motion contract). Their full briefs sit beside this file:
-**[HANDOVER.md](HANDOVER.md) — start here if you are new.** [session](session.md) · [session-interaction-spec](session-interaction-spec.md) · [ladder](ladder.md) · [identity](identity.md) ·
-[count](count.md) · [lifecycle](lifecycle.md). This synthesis is the map; the briefs
-carry the evidence.
+**[HANDOVER.md](HANDOVER.md) — start here if you are new.** [session](session.md) · [session-interaction-spec](session-interaction-spec.md) · [interaction-map](interaction-map.md) · [ladder](ladder.md) · [identity](identity.md) ·
+[count](count.md) · [lifecycle](lifecycle.md). This synthesis is the map of the suite;
+the briefs carry the evidence; the interaction-map is the reconciled walk of every
+gesture in the session drawer.
 
 This is an interaction-model map, not visual design. Nothing here is drawn yet.
 

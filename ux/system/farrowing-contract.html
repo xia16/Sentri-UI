@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentri — Farrowing state contract</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#F7F6F2; --card:#FFFFFF; --well:#EFEEE8;
+    --ink:#1C1E19; --ink2:#51544B; --ink3:#8B8E83;
+    --hair:#E7E6DF; --hair2:#D8D7CE;
+    --red:#C2402E; --red-wash:#F9EAE7;
+    --amber:#96660D; --amber-wash:#F8F0DC;
+    --green:#3B8A50; --green-wash:#EAF2EC;
+    --sans:'Plus Jakarta Sans',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 48px 120px}
+  .mono{font-family:var(--mono)}
+  h1{font-size:40px;font-weight:800;letter-spacing:-.015em;line-height:1.1;margin:56px 0 16px}
+  h2{font-size:22px;font-weight:800;margin:64px 0 6px;padding-top:20px;border-top:1px solid var(--ink)}
+  h3{font-size:15px;font-weight:800;margin:26px 0 8px}
+  p{font-size:14px;color:var(--ink2);max-width:80ch;margin-bottom:10px}
+  .lede{font-size:16.5px;color:var(--ink2);max-width:72ch;margin-bottom:8px}
+  .stab{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0 6px}
+  .stab th,.stab td{padding:9px 10px;border-bottom:1px solid var(--hair);vertical-align:top;text-align:left}
+  .stab thead th{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink)}
+  .stab td:first-child{font-weight:700;white-space:nowrap}
+  .stab td{color:var(--ink2)} .stab td:first-child{color:var(--ink)}
+  code{font-family:var(--mono);font-size:12px;background:var(--well);border:1px solid var(--hair);border-radius:5px;padding:1px 5px;overflow-wrap:anywhere}
+  .stab{table-layout:fixed}
+  .stab td{overflow-wrap:break-word}
+  .stab td:first-child{white-space:normal}
+  pre{font-family:var(--mono);font-size:12px;line-height:1.55;background:var(--well);border:1px solid var(--hair);border-radius:12px;padding:16px 20px;overflow-x:auto;margin:12px 0;color:var(--ink)}
+  .tag{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;border-radius:6px;padding:2px 7px;vertical-align:1px;margin-left:6px}
+  .t-ruled{background:var(--green-wash);color:var(--green);border:1px solid var(--green)}
+  .t-draft{background:var(--amber-wash);color:var(--amber);border:1px solid var(--amber)}
+  .t-undrawn{background:var(--well);color:var(--ink3);border:1px solid var(--hair2)}
+  .note{border:1px solid var(--hair2);border-radius:12px;background:var(--card);padding:14px 18px;margin:14px 0;font-size:13.5px;color:var(--ink2);max-width:86ch}
+  .note b{color:var(--ink)}
+  .toc{font-family:var(--mono);font-size:12px;color:var(--ink2);border:1px solid var(--hair);border-radius:12px;padding:14px 18px;margin:20px 0 0;max-width:86ch}
+  a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Farrowing — the state contract</h1>
+<p class="lede">The developer handoff for the farrowing suite: every state, transition, element state, constant, and sync rule, in one place, implementable without reading the design history. Authority order: <span class="mono">ux/research/farrowing/RULINGS.md</span> outranks everything; <span class="mono">interaction-map.md</span> is the walked evidence; <a href="farrowing.html">farrowing.html 09–09b</a> is the visual truth and the copy source — <b>copy strings verbatim from the mocks</b>. Rows tagged <span class="tag t-draft">draft</span> are implementable defaults not yet owner-ruled; <span class="tag t-undrawn">undrawn</span> means specced here but not yet in a mock.</p>
+<div class="toc">C1 ledger &amp; events · C2 sow state machine · C3 the visit (pending window) · C4 sheet faces · C5 element states · C6 constants · C7 sync &amp; offline · C8 receipts matrix · C9 batch close · C10 invariants &amp; never-list · C11 open items</div>
+
+<h2>C1 · The ledger — events and derivations</h2>
+<p>One append-only event log per litter session, every event stamped <code>who · when · device</code>. Nothing is ever updated or deleted; corrections append. Two read layers: the <b>event stream</b> (every tap, crash-safe, synced) and the <b>ledger view</b> (History: events netted per type per visit — a same-visit +/− pair renders as nothing).</p>
+<table class="stab"><thead><tr><th style="width:16%">Event</th><th style="width:27%">Payload</th><th style="width:15%">Written by</th><th>Effect</th></tr></thead><tbody>
+<tr><td>alive_tap</td><td><code>{delta:+1|−1}</code> or <code>{set:n}</code> (pad)</td><td>Alive − / + / type-to-set</td><td>moves the open visit's pending sum. <b>The Born floor (audit-corrected):</b> the total clamps at <code>min&nbsp;alive = B* − current dead total</code>, where <code>B*</code> = Born at the last posted count of the living (re-anchored by every alive fold and every Edit commit) — bodies since the last count unlock the steps down, across visit boundaries. Commits immediately; folds at visit end into one net line. Net 0 → no History line.</td></tr>
+<tr><td>dead_tally</td><td><code>{type}</code></td><td>drawer row +</td><td>draft[type] += 1 inside the open drawer. Types: <code>stillborn · mummified · crushed · scours · starve_out · other</code>. The drawer is STAGED (owner, 2026-09-01): its draft becomes one stamped <code>dead</code> event at <code>Save</code>; <code>Back</code>/dismiss keeps the draft on the device; <code>Clear</code> discards it. Nothing is lost to an interruption.</td></tr>
+<tr><td>dead_undo</td><td><code>{type}</code></td><td>drawer row − (grown-in)</td><td>pending[type] −= 1. <b>Guards: pending[type] &gt; 0, AND undoing must not strand alive below the Born floor</b> (tally-then-undo was the audit's silent-drop attack) — when it would, this − grays like Alive's. Can never touch posted. Same-visit pair nets to nothing.</td></tr>
+<tr><td>visit_fold</td><td><code>{alive:{from,to}, dead:{type:+n…}, photos?[]}</code></td><td>system, at visit end (C3)</td><td>pending → posted as ONE stamped History line per figure. Emitted only if net ≠ 0.</td></tr>
+<tr><td>correction</td><td><code>{deltas:[{figure, from, to}…]}</code></td><td>Edit only (Save)</td><td>ONE stamped event carrying every changed figure's from→to; each corrected figure prints amber forever (the correction register — no pencil glyph on records). Why is no longer asked (owner, 2026-08-30 — the delta is the record). A wrong type is two deltas in one Save; a wrong sow is a correction here plus a recording on the right sow (linked mirrored moves retired).</td></tr>
+<tr><td>classify_set</td><td><code>{field:weak|deformed, value:n}</code></td><td>Finish steppers, per tap</td><td>healthy derives as remainder; never stored.</td></tr>
+<tr><td>litter_weight / assisted</td><td><code>{kg}</code> / <code>{bool}</code></td><td>Finish optional facts</td><td>optional forever; live in History with the other at-birth facts (never on the record face); never gate the lock.</td></tr>
+<tr><td>final</td><td><code>{born}</code></td><td>Lock born N (hold-to-commit)</td><td>freezes Born; session → DONE. Guard: ≥1 count event posted (C4).</td></tr>
+<tr><td>foster_out / foster_in <span class="tag t-undrawn">parked</span></td><td><code>{n, sow}</code></td><td>— (fostering is parked, owner 2026-08-30)</td><td>reserved: mirrored lines on both records, receiver's Born untouched. No surface exposes these in v1; derivations keep the terms at 0 so fostering bolts on without rework.</td></tr>
+<tr><td>session_end</td><td><code>{reason:sow_died, cause, detail?, photos?[]}</code></td><td>the drawer's sow mode (Save)</td><td>session → ENDED without <code>final</code>; Born freezes at derived value; classification skipped (amendable via Edit).</td></tr>
+</tbody></table>
+<h3>Derivations (never stored, never editable)</h3>
+<pre>pre-lock    Born      = alive_posted + alive_pending + Σ dead(all types, posted+pending)
+                        + fostered_out − fostered_in            // fosters are 0 pre-lock by rule
+post-lock   alive_now = born_locked − Σ dead_since_lock − fostered_out + fostered_in
+always      healthy   = alive − weak − deformed                 // Finish face only
+always      registers derive from posted state (C2)             // incl. the all-zero un-cross</pre>
+
+<h2>C2 · The sow state machine</h2>
+<pre>                    first count event ────────┐
+                                              ▼
+  AWAITING ────────────────────────────────► ACTIVE ──── final() ────► DONE
+     │                                        │                        │ (record; stays
+     │  disposition at batch close            │  session_end           │  in Done/All,
+     │  (not_in_pig · abort · next_batch)     ▼  (sow died)            ▼  never departs)
+   leaves the batch                     ENDED_SOW_DIED             post-lock events
+                                        (terminal record +         write to the record,
+                                         orphan Foster prompt)     never reopen ACTIVE</pre>
+<table class="stab"><thead><tr><th style="width:18%">State</th><th style="width:30%">Definition</th><th>Row rendering (copy from mocks)</th></tr></thead><tbody>
+<tr><td>AWAITING</td><td>live total (posted + open pending) at zero. Sub-registers derive from <code>day = today − first_service</code>: <b>forecast</b> day &lt; 114 (light line, full-strength row, never disabled) · <b>due</b> 114–115 · <b>overdue</b> ≥ 116 (the days-over number in red; the word stays ink). Rows speak in days from due, never gestation day (owner, 2026-09-03); the gestation day prints on the sheet header only</td><td><code>Due in 2 days</code> / <code>Due tomorrow</code> / <code>Due today</code> / <code>Overdue · 3 days</code> (number red; days over = day − 114); line 2 on every Awaiting row = <code>parity n · m born last</code> — except an overdue sow with a disposition on her sow page, whose line 2 reads the latest one: <code>induced yesterday · L.M</code> (owner, 2026-09-03). The number stays red until she farrows or leaves the batch: red is the overdue fact, line 2 is what has been done about it. Read dependency: the room reads sow-page events (induction and the other dispositions are sow treatments/events, never litter events — C1 is untouched)</td></tr>
+<tr><td>ACTIVE</td><td>live total ≠ all-zero and no <code>final</code>/<code>session_end</code>. <b>Registers derive from the live total</b> — a stray + crosses her as it lands; its undo or a fold-to-nothing un-crosses her</td><td>line 1 <code>9 alive · 5 dead</code> — never a chip, the overdue signal ends at the first record (C5.7); line 2 <code>last record 1h ago · G.H</code> — recency in words (C5.7). Born is not on the row (it is alive + dead). <code>ACTIVE</code> prints green</td></tr>
+<tr><td>DONE</td><td><code>final</code> exists</td><td><code>11 alive</code> (alive_now, live-derived) / <code>born 13 · final 05:58 · G.H</code>; rail = ✎ glyph, row dim</td></tr>
+<tr><td>ENDED_SOW_DIED</td><td><code>session_end</code> exists</td><td>stays in the room as a Done-register row: <code>7 alive</code> + red chip <code>sow died</code> / <code>born 10 · aug 28 · L.M</code>, ✎ rail; drains at batch close (re-ruled 2026-09-01 — replaces "exits every lens")</td></tr>
+</tbody></table>
+<table class="stab"><thead><tr><th style="width:34%">Transition</th><th style="width:22%">Trigger</th><th>Rules</th></tr></thead><tbody>
+<tr><td>AWAITING → ACTIVE</td><td>first count event (alive_tap or dead_tally)</td><td>this IS "farrowing started" — there is no start ceremony, no started mark, no start event. Motion B cross on the room row.</td></tr>
+<tr><td>ACTIVE → AWAITING <span class="tag t-ruled">ruled</span></td><td>posted state returns to all-zero (recount or correction)</td><td><b>registers derive from the live total</b>: a stray first tap un-crosses itself when undone, recounted, or corrected away. History keeps the lines — and any face of a session with events shows <code>History ›</code> (the bare Pre-start is for virgin sessions only), so a zeroed litter is never buried. No revert affordance exists.</td></tr>
+<tr><td>ACTIVE → DONE</td><td><code>final</code> via hold-to-commit</td><td>guard: ≥1 posted count event (all-zero cannot lock Born 0). Motion B cross to Done; lens counts + batch tallies tick same frame.</td></tr>
+<tr><td>ACTIVE → ENDED_SOW_DIED</td><td>the Record dead drawer's <b>The sow</b> mode: cause chip + Save</td><td>the drawer carries two modes on the lens pill (<code>Piglets · The sow</code>); the sow mode is a staged form (chips <code>Farrowing · Prolapse · Found dead · Other</code>, bar <code>Back · Save</code>) — Save writes <code>session_end{cause}</code>. Born freezes at derived value. Her sow page leads with the death (pig-actions).</td></tr>
+<tr><td>AWAITING → out of batch</td><td>disposition door at batch close (C9)</td><td><code>not_in_pig · abort · next_batch</code>, or close-anyway → escalation (red strip row, watched in check-in, never expires silently).</td></tr>
+<tr><td>opening / reading / closing any surface</td><td>—</td><td><b>never changes state, never writes.</b> A peek costs nothing.</td></tr>
+</tbody></table>
+
+<h2>C3 · The visit — the pending window</h2>
+<p>A visit is one device's open editing window on one session. Every tap commits its event immediately (crash-safe); the visit is only the <b>netting and undo boundary</b>, and its close emits <code>visit_fold</code>.</p>
+<table class="stab"><thead><tr><th style="width:30%">Rule</th><th>Contract</th></tr></thead><tbody>
+<tr><td>Opens</td><td>first write-tap on a sheet or drawer (not on open — opening writes nothing).</td></tr>
+<tr><td>Ends (folds) <span class="tag t-ruled">ruled</span></td><td>on sheet dismiss (grab swipe / backdrop tap) · at <b>Edit Save</b> (fold-on-entry DROPPED, owner 2026-09-01: Edit displays live figures, Back touches nothing, Save folds the visit then applies the correction atomically — one moment, two events, History honest) · at Lock commit and at <code>session_end</code> · after <b>90 min idle, measured from the last interaction on the sheet</b> (any tap, not just committed records — a hand standing through a slow farrowing is not idle) <span class="tag t-draft">draft</span>. Phone sleep / app background alone does NOT end it. A fold under an open sheet repaints receipt and capsules with the standard settle; a control drawn pre-fold acts on post-fold state (a stale − tap is a no-op).</td></tr>
+<tr><td>Ends (folds) <span class="tag t-draft">draft</span></td><td>on entering the Finish face — the summary reviews posted truth and the lock must not race a buffer. Mirrors the Edit rule; awaiting owner confirmation.</td></tr>
+<tr><td>Pending, Alive</td><td>signed within the floor — negative only against bodies tallied this visit. Receipt reads <code>5 posted · +4 this visit</code> or <code>5 posted · −2 this visit</code> (amber −2) <span class="tag t-undrawn">undrawn</span>; the receipt never mentions the floor — the grayed − carries it.</td></tr>
+<tr><td>Pending, dead types</td><td>non-negative per type (a pile is append-only). − clamps at 0 and withers out.</td></tr>
+<tr><td>Undo scope</td><td>the pending window is the free-undo window, session-long, never a toast timer. Posted state is only ever moved by Edit.</td></tr>
+</tbody></table>
+
+<h2>C4 · Sheet faces — one sheet, five faces</h2>
+<table class="stab"><thead><tr><th style="width:14%">Face</th><th style="width:20%">Guard</th><th style="width:38%">Zones present</th><th>Bar</th></tr></thead><tbody>
+<tr><td>Pre-start</td><td>AWAITING opened</td><td>the During skeleton, one layout across states (owner, 2026-09-01): sh2 header (vit = due line) · Alive hero at 0 (receipt: <code>no records yet</code>; the reserved pointer line stays empty — the sheet carries no task copy, the room title does) · tool two-up <code>Record dead</code> (live — a stillborn can be the first record) · <code>Edit</code> (disabled: nothing posted) · gray footer <code>Born 0 · Dead 0</code> (no chevron until the ledger has lines; a zeroed/corrected litter shows <code>History ›</code> and a live Edit — a non-empty ledger is never unreachable). Button registers: tools = well fill, no border; exits = outlined; primary = ink; disabled = floor-gray family.</td><td><code>Close · Finish farrowing</code> — Finish disabled (floor-gray) until ≥1 count event; never hidden</td></tr>
+<tr><td>During</td><td>ACTIVE</td><td>sh2 (vit stacks <code>started 07:30</code> over <code>saved 08:41 · G.H</code> — identity + recency) · Alive hero + receipt + reserved pointer line · two-up <code>Record dead · Edit</code> directly under the receipt (they act on the counting) · record block <code>Born 14 · Dead 5 ›</code> + breakdown as a quiet footer — the chevron on the fact line is the History door (whole line is the target, ≥44px). Grab/backdrop also dismiss.</td><td><code>Close · Finish farrowing</code> (blind-panel ruling: Close = leave, everything already stored; Finish disabled — floor-gray — until ≥1 count event exists). Mid-sheet <code>Record dead · Edit</code> wear the TOOL register (well fill, no border) so they never read as a second bar.</td></tr>
+<tr><td>Finishing</td><td>Finish tapped</td><td>summary card (read-only) · <code>Any weak or deformed?</code> steppers, healthy = remainder · Optional: litter weight + assisted. All commit per tap.</td><td><code>Back · Lock born N</code> (hold-to-commit)</td></tr>
+<tr><td>After · the missing-piglet note</td><td colspan="3">a piglet missing post-lock with no body has NO door on this face by design — the route is the litter census in check-in (count drawer → <code>Just set count · N unexplained</code>, the ruled anomaly path). Record dead here would fabricate a death; More born is for extra live. Devs: do not invent a door.</td></tr>
+<tr><td>After</td><td>DONE</td><td>sh2 (vit <code>final aug 27 · 08:12 · G.H</code>) · the During anatomy, locked: sh2 vit <code>parity 3</code> · status band <code>Farrowing finished · aug 27 · 08:12 · G.H</code> where the hero stood (the state said explicitly, not as tag metadata) · ONE fact line <code>Born 14 · Alive 8 · Dead 6 ›</code> (14 prints amber = corrected; the chevron IS the History door) · causes line (<code>stillborn 1 · mummified 1 · crushed 3 · other 1</code>, since-final folded in). Classification, weight, assisted, since-final split = History/console detail, never on the face (owner, 2026-09-01).</td><td><code>Edit · Record dead</code> (Record dead primary; Foster parked)</td></tr>
+<tr><td>Ended</td><td>ENDED_SOW_DIED</td><td>sh2 (vit <code>ended aug 28 · sow died</code>) · <code>10 born · ended</code> + <code>7 alive now</code> · read lines + <code>classification · skipped — ✎ via Edit</code> · orphan FACT line <code>7 alive · no sow</code> (renders only while alive_now &gt; 0; becomes the foster door when fostering un-parks) · <code>History ›</code>.</td><td><code>Edit · Record dead</code></td></tr>
+</tbody></table>
+<div class="note"><b>The mode flip, stated once:</b> During, Alive is observed and Born derives. After the lock (or end), Born is frozen and alive_now derives. Post-lock dead tallies therefore move alive_now automatically; during, they never touch Alive — the hand converges it separately.</div>
+
+<h2>C5 · Element states</h2>
+<h3>5.0 · The stepper shape (universal) <span class="tag t-ruled">ruled</span></h3>
+<table class="stab"><tbody><tr><td style="width:26%">− n +</td><td>every counting row in the suite — the Alive hero, drawer rows, Edit rows, Finish rows — uses the Alive counter's own anatomy: value hugs its + on the right; − lives (or reserves its 44px slot, drawer rest rows) to the value's left. The value-left-of-key-cluster variant is retired (owner, 2026-09-01). Values mono 17/700 in a fixed slot so the column aligns screen-wide.</td></tr></tbody></table>
+<h3>5.1 · Alive counter (During; zeroed on Pre-start)</h3>
+<table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
+<tr><td>display</td><td>big number = posted + pending, mono, framed. − and + are 56px keys.</td></tr>
+<tr><td>− at the floor <span class="tag t-ruled">ruled</span></td><td>− is live while total &gt; floor (<code>posted − dead tallied this visit</code>); AT the floor it <b>grays out</b> — the suite's one disabled control, a scoped owner exception (2026-08-30) to no-dim-as-disabled. Tapping the grayed − writes nothing and shows the pointers (5.2). Born can never drop silently, by construction.</td></tr>
+<tr><td>tap framed count</td><td>RETIRED (owner, 2026-09-01): no type-to-set on count figures — up is +, down is bodies or Edit. The framed count is display only. Pads remain on tag and weight fields (real typed input).</td></tr>
+<tr><td>every − tap</td><td>raises the hint line (5.2). No dialog, no gate, ever.</td></tr>
+<tr><td>receipt line</td><td>always rendered under the counter: <code>9 saved · +4 new</code> · down form <code>7 saved · 2 died</code> (alive can only fall by counted piglets that died) · pre-start form <code>no records yet</code>.</td></tr>
+</tbody></table>
+<h3>5.2 · The reserved hint line</h3>
+<table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
+<tr><td>slot</td><td>one line under the receipt, height always reserved — nothing may reflow under a moving finger.</td></tr>
+<tr><td>visible</td><td>two quiet pointer lines, shown for <b>4 s</b> <span class="tag t-draft">draft</span> after a tap on the grayed −, each keyed to its precondition: <code>Found dead? Record dead</code> · <code>Wrong count? Edit</code>. Otherwise empty — never raised by ordinary taps above the floor.</td></tr>
+</tbody></table>
+<h3>5.3 · The dead drawer (one component, four contexts)</h3>
+<table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
+<tr><td>contexts</td><td>During (header <code>farrowing · 9 alive</code>) · post-lock (<code>final &lt;date&gt; · N alive now</code>; tallies derive alive_now down) · ended (<code>ended &lt;date&gt; · N alive</code> — she never finalized; same behavior as post-lock) · check-in via the litter row (litter context) · all the same component, header carries the host's context.</td></tr>
+<tr><td>row at rest</td><td>label + posted count + lone <b>+</b>. Nothing else. Zero-count rows show label + lone + (full ink, never dimmed).</td></tr>
+<tr><td>silhouette + press state <span class="tag t-ruled">ruled</span></td><td>every row draws <code>[−] n [+]</code> at 60px: the − is always present (floor-gray when it has nothing to undo), the value always prints (gray 0 when empty). Keys show a drawn press state (fill ink, white glyph, ≥120 ms) so a gloved hand sees which key took the tap; the touched row's ground may wash green. <b>Dismiss vs scroll:</b> while the draft is non-empty, list over-scroll never chains into sheet dismiss — dismiss only from the grab/header strip (full width × 44px, drag ≥120px with velocity).</td></tr>
+<tr><td>row touched (pending &gt; 0)</td><td>− capsule grows in; the VALUE itself renders green while it carries this visit's additions (the chip is retired, owner 2026-08-30 — the number is the receipt, same grammar as Alive). − drains pending only; at its floor it GRAYS in place (visible, disabled — the floor-gray family), never vanishes mid-visit.</td></tr>
+<tr><td>Other</td><td>a plain tally row like every other (the › tail door is retired, owner 2026-08-30). Other absorbs everything unclassified — including euthanized in v1. Unknown is a cause, not a failure.</td></tr>
+<tr><td>header line</td><td><code>Dead · 6 — every body, born dead or died</code>; 6 = posted + pending live total.</td></tr>
+<tr><td>Back · Clear · Save</td><td>both modes, same grammar: <code>Save</code> commits the draft (tallies and photos, or cause + detail + photos) as one stamped event and returns to the host. <code>Back</code> and the dismiss gesture navigate away and KEEP the draft on the device (persisted across background and restart; reopening restores it green). <code>Clear</code> — a text action on the title row, rendered only while the draft is non-empty — discards it, no dialog. While a draft waits, the sheet's <code>Record dead</code> tool shows <code>+N</code> in the green register. Same triad on Edit (Clear on its summary row). <code>Done</code> is retired.</td></tr>
+<tr><td>roster mode <span class="tag t-undrawn">undrawn</span></td><td>once a tally would exceed the untagged remainder, the row expands to a piglet roster (scan-first) — a tagged piglet is never subtracted namelessly. Never triggers during farrowing (no tags yet).</td></tr>
+<tr><td>pre-filled mode <span class="tag t-undrawn">undrawn</span></td><td>entered from the count drawer's <code>Record N died ›</code>: opens with N unassigned pending on a header line; each type-tap converts one; Done with a remainder returns it to the count's unexplained tally, never silently absorbed. Own micro-round pending (09e).</td></tr>
+<tr><td>NO WHEN</td><td>absolute, all contexts, including check-in: the stamp is the date. No date chips, no pickers, ever.</td></tr>
+<tr><td>two modes <span class="tag t-ruled">ruled</span></td><td>the drawer header carries the system's two-way segment control (<code>.pk .seg</code> metrics — equal segments, centered, ink when selected; never the filter lens): <code>Piglets</code> (the tally list) · <code>The sow</code> (a radio list — one 54px row per cause, <code>Farrowing · Prolapse · Found dead · Other</code>, single-select; selecting Other expands an optional free-text line beneath it). Both modes end <code>Back · Save</code>; the sow's Save writes <code>session_end</code> and ends the session.</td></tr>
+<tr><td>photos <span class="tag t-ruled">ruled</span></td><td>a labeled field in the form flow (<code>Photos — optional</code>): ONE enclosed card (bordered, radius 12) that IS the field: header row = <code>Photos — optional</code> label + a 44px camera icon in a soft filled circle (well bg, no border — never the keys' outlined squircle; <code>aria-label="Add photo"</code>); thumbnails (56px) row beneath when any. The icon is inactive until the draft holds a death (a tally or a chosen reason), active from the first one — a scoped disabled state, owner-ruled. Tap → the native camera, capture-first (library via the camera's own shortcut) → back with the photo in the card; never per tally. Tap a thumbnail → full-screen viewer (<code>Photo 1 of 2</code>) with <code>Back · Delete</code> as full-size buttons — deletion lives in the viewer while drafting, never as a corner badge. Photos ride the Save (piglets: that visit's batch; sow: <code>session_end</code>) and surface in <b>History</b> as a compact thumbnail strip under the batch's line (<code>+3 crushed · +1 other · 08:12 · G.H · 2 photos</code>, tap to view). Saved photos are view-only in v1 (evidence); removal only while drafting. Uploads queue offline; the event commits without waiting.</td></tr>
+<tr><td>the sow's Save <span class="tag t-ruled">ruled</span></td><td>hold-to-commit, Lock's grammar: stacked red warning above the bar (<code>Saving ends farrowing</code> / <code>N alive stay under piglet care</code>) + <code>Save · HOLD</code>. The hold is DRAWN: a fill sweeps left→right across the button over the hold duration, resets on early release (with a receipt), one haptic tick at commit — shared with Lock. Radio rows: the whole 60px row is the target, not the 22px ring. Writes <code>session_end</code>.</td></tr>
+</tbody></table>
+<h3>5.4 · Edit — the one correction door (ONE screen, owner 2026-08-30)</h3>
+<table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
+<tr><td>entry</td><td>always available beside Record dead (During) and on the record bars (After/Ended). Entry folds pending first. Hidden only on Pre-start (nothing posted; hidden, never dimmed).</td></tr>
+<tr><td>what it adjusts <span class="tag t-ruled">ruled</span></td><td>the observations, never the derivation: During = Alive + posted dead types (Born has no door pre-lock — it heals when its inputs heal); post-lock adds Born (ceremony) · classification · weight · assisted. A MISSED fact is a recording (drawer +, alive +), never an Edit — do not build a "missed entry" chip; the door serves figures that must come down, change kind, or change sow. <b>Zero-delta commits write nothing</b> (Correct to N where N = posted closes with no event, no ✎); <b>Cancel from an auto-skipped event returns to the host sheet</b>, not to a picker that never appeared. <b>More born › → died opens the dead drawer in pre-filled mode</b> (G9 mechanics) so every death lands in exactly one type — never a typeless death line. The should-be stepper floors at 0: its − at 0 is inert, full ink (never grayed — the floor-gray exception belongs to Alive alone).</td></tr>
+<tr><td>the screen</td><td>the figure list, editable in place: each posted figure as a row (label · value mono 17/700 · [−][+] 44px keys; type-to-set on the value). During: Alive + posted dead types. Post-lock adds Born (a locked row whose one key is an amber ✎ — tapping expands the ceremony tray in place) · classification · litter weight · assisted — drawn 2026-09-01. Alive_now never appears (derived). Untouched, it is a quiet list under the sh2 identity header — no banner, no Save.</td></tr>
+<tr><td>on first change</td><td>the amber banner (<code>Correcting a past record · logged as &lt;who&gt;</code>) and the live change summary (<code>stillborn 1 → 0</code>, one mono line per changed figure) appear; <code>Save</code> appears in the bar (absent before — never grayed). Changed values render in the correction register (amber family), never green.</td></tr>
+<tr><td>exits</td><td><code>Back</code> (sec) keeps the draft on the device — nothing written; swipe = Back. <code>Clear</code> (text action on the summary row, rendered only while a delta exists) discards it. <code>Save</code> (primary) commits every delta as ONE stamped <code>correction</code> event. Zero-delta state never shows Save. (The two-step drill-in, the what-happened chips, the Gone·no-body chip, and the auto-skip are all retired — the ✎ + stamp + delta are the provenance.)</td></tr>
+<tr><td>wrong sow / wrong type</td><td>no machinery: wrong type = −1 here, +1 there (two deltas, one Save); wrong sow = correct this record down here, record on the right sow there. Two stamped trails, no linkage (owner-accepted simplification).</td></tr>
+<tr><td>post-lock Born</td><td>warn first, then the one real question: <code>More born ›</code> (asks where the extra goes — alive now / died — and writes both lines) or <code>Count was wrong ›</code> (plain correction). The invariant never breaks silently. <span class="tag t-undrawn">undrawn</span></td></tr>
+</tbody></table>
+<h3>5.5 · Finish controls</h3>
+<table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
+<tr><td>weak / deformed steppers</td><td>commit per tap (<code>classify_set</code>); clamp: weak + deformed ≤ alive. <b>Healthy has NO row</b> (owner, 2026-08-30): it derives silently and prints on the record — the sheet asks only the two numbers a hand reports.</td></tr>
+<tr><td>litter weight</td><td>optional; pad on tap; soft words-warning outside 0.8–2.5 kg × alive <span class="tag t-draft">draft copy</span> — never a gate.</td></tr>
+<tr><td>Lock born N</td><td>hold-to-commit: press <b>800 ms</b> <span class="tag t-draft">draft</span> with visible fill; early release cancels with a receipt, no commit. Doubled gap from Back. On commit: motion B cross → After.</td></tr>
+<tr><td>Back / dismiss</td><td>returns to During; classification already committed per tap — nothing lost, re-entering Finish shows it.</td></tr>
+</tbody></table>
+<h3>5.6 · History (read-only)</h3>
+<table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
+<tr><td>list</td><td>newest first, one line per figure per visit (netted): <code>+3 crushed · +1 other&nbsp;&nbsp;08:12 · G.H</code>. Corrections carry the amber ✎ and their from→to: <code>crushed 3 → 2 ✎</code>. Final and ended lines included. Same-visit undo pairs never appear.</td></tr>
+<tr><td>open visit</td><td>tops the list as its running net, green: <code>+4 alive · this visit · open&nbsp;&nbsp;08:41 · G.H</code> — keeps the saved stamp and the list agreeing mid-visit.</td></tr>
+<tr><td>interaction</td><td>none. Nothing tappable; Close returns to host. The list is the reveal.</td></tr>
+</tbody></table>
+<h3>5.7 · Recency (room rows, ACTIVE only)</h3>
+<table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
+<tr><td>recency line <span class="tag t-draft">draft</span></td><td>line 2 = <code>last record &lt;age&gt; · &lt;initials&gt;</code>: the newest record's age (minute resolution under 1 h — <code>2m ago</code>, <code>29m ago</code>; hour resolution after — <code>1h ago</code>, <code>7h ago</code>; a calendar day past 24 h — <code>yesterday</code>) and the hand who wrote it. Ticks live; driven by record stamps only, never config, never a notification.</td></tr>
+<tr><td>never colored by age <span class="tag t-ruled">ruled</span></td><td>no staleness tracking on ACTIVE sows: the line reads the same at <code>2m ago</code> and <code>7h ago</code>. Overnight the room reads calm because the words are calm, not because a chip faded.</td></tr>
+<tr><td>overdue on ACTIVE <span class="tag t-ruled">ruled</span></td><td>NONE. The overdue signal ends at the first record (owner, 2026-09-03, superseding the 2026-09-01 chip that survived the cross): recorded is acted. The lateness stays a fact on the sheet header (<code>day 117</code>) and her sow page. Accepted cost: a stray +1 nobody undoes hides an overdue sow behind <code>1 alive · 0 dead</code> until the next hand reads the crate — the receipt, the − undo and the crate itself are the guards. Undoing it (Edit to zero) restores the Awaiting row, red number and all (row-states strip).</td></tr>
+<tr><td>interval chip</td><td>RETIRED (owner, 2026-09-03) — <code>last 60m</code> said neither what nor whose; the recency line replaces it.</td></tr>
+</tbody></table>
+<h3>5.8 · Identity, freshness, dead zones</h3>
+<table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
+<tr><td>sh2 identity header</td><td>pen chip + tag on every sheet/drawer/Edit face. Tap → her sow page (the ONE route to sow verbs). Sheet-first: the room row has no sow-page target.</td></tr>
+<tr><td>idle reopen</td><td>a During sheet reopened with last record &gt; 90 min leads with its freshness stamp emphasized until first touch <span class="tag t-draft">draft mechanism</span> — the wrong-crate tripwire.</td></tr>
+<tr><td>dead zones</td><td>not tappable, no affordance: <code>Born N · Dead N</code> (derived; no tap-the-fact), breakdown metadata, receipt + hint lines, saved stamp, the overdue number, pen headers, row line-2 (the recency line included).</td></tr>
+</tbody></table>
+
+<h2>C6 · Constants</h2>
+<table class="stab"><thead><tr><th style="width:34%">Constant</th><th style="width:18%">Value</th><th>Source</th></tr></thead><tbody>
+<tr><td>gestation / due</td><td>service + 114 d</td><td>hardcoded, no farm config (3-3-3 rule) <span class="tag t-ruled">ruled</span></td></tr>
+<tr><td>overdue chip from</td><td>day 116</td><td>due + 2 — examine or induce <span class="tag t-ruled">ruled</span></td></tr>
+<tr><td>row recency resolution</td><td>minutes &lt; 1 h · hours &lt; 24 h · <code>yesterday</code> after</td><td><span class="tag t-draft">draft</span></td></tr>
+<tr><td>visit idle fold</td><td>90 min</td><td>aligned to chip-gone — one notion of "visit over" <span class="tag t-ruled">ruled</span></td></tr>
+<tr><td>pointer lines duration</td><td>4 s after a tap on the grayed −</td><td><span class="tag t-draft">draft</span></td></tr>
+<tr><td>hold-to-commit</td><td>800 ms, fill affordance</td><td><span class="tag t-draft">draft</span></td></tr>
+<tr><td>litter-weight soft warn</td><td>outside 0.8–2.5 kg × alive</td><td>words, never a gate <span class="tag t-ruled">ruled</span></td></tr>
+<tr><td>foster window</td><td>12–48 h</td><td>copy/guidance only — never enforced, foster is post-lock only <span class="tag t-ruled">ruled</span></td></tr>
+<tr><td>dead-type defaults</td><td>stillborn · mummified · crushed · scours · starve-out + Other</td><td>euthanized behind Other in v1 <span class="tag t-ruled">ruled</span></td></tr>
+</tbody></table>
+
+<h2>C7 · Sync &amp; offline — the merge contract <span class="tag t-draft">draft</span></h2>
+<p>Rewritten after the attack audit: blanket last-write-wins on absolute asserts let a stale device silently drop Born across phones, fold payloads had no defined merge, and events could arrive after a lock with nowhere to land. The contract below flags what it cannot honestly merge — it never silently drops, never silently applies a breach, and never trusts a device clock to pick a winner.</p>
+<table class="stab"><thead><tr><th style="width:30%">Rule</th><th>Contract</th></tr></thead><tbody>
+<tr><td>per-tap commit</td><td>every event persists locally at the tap and syncs when online. There is no unsaved state anywhere in the suite; kill the app mid-tap and nothing is lost.</td></tr>
+<tr><td>merge</td><td>append-only union; <b>count events merge as signed deltas against their device-visible base</b> — absolute sets decompose to deltas, so two offline observers add information instead of overwriting each other. A merged result that would breach a zero floor or the Born floor is not applied: the figure holds at its floor and a <code>sync review</code> line posts (History + console anomaly tally), resolved through Edit.</td></tr>
+<tr><td>merge × final / session_end</td><td>events stamped before a lock/end but arriving after are flagged as sync review and offered through the record's own ceremony (More born › / Count was wrong ›) — never silently dropped (per-tap-commit's promise), never silently applied (the lock's promise). Duplicate <code>final</code>s: earliest stands, later flags.</td></tr>
+<tr><td>live sync</td><td>online, another hand's events land on your open sheet as posted-state changes (your pending rides on top). Room rows, lens counts, census tick in the same frame (motion C).</td></tr>
+<tr><td>double-tally</td><td>two hands tallying the same body double-counts the pile — accepted cost, visible via live sync, fixed via Edit. No locking, no claiming in v1.</td></tr>
+<tr><td>stamps</td><td>every event carries who · when · device; History and the <code>saved hh:mm · who</code> stamp render them. Entry-time stamping is the compliance grain — no sign-off ceremony exists.</td></tr>
+</tbody></table>
+
+<h2>C8 · Receipts matrix — where each event echoes</h2>
+<table class="stab"><thead><tr><th style="width:20%">Event</th><th>Sheet</th><th>Room row</th><th>History</th><th>Elsewhere</th></tr></thead><tbody>
+<tr><td>alive_tap</td><td>count + receipt + Born foot tick</td><td>line-1 totals + fresh chip</td><td>netted at fold</td><td>census</td></tr>
+<tr><td>dead_tally</td><td>Dead N + breakdown</td><td>line-1 totals</td><td>netted at fold</td><td>census</td></tr>
+<tr><td>correction</td><td>figure wears ✎</td><td>totals re-derive</td><td>signed line + why</td><td>—</td></tr>
+<tr><td>classify_set</td><td>remainder recomputes</td><td>—</td><td>at final</td><td>—</td></tr>
+<tr><td>final</td><td>face flips to After</td><td>crosses to Done</td><td>line</td><td>batch tallies (C9)</td></tr>
+<tr><td>dead (post-lock)</td><td>since-final line + alive_now</td><td>Done row alive ticks</td><td>line</td><td>census</td></tr>
+<tr><td>foster_out/in (parked)</td><td>—</td><td>—</td><td>—</td><td>reserved for the fostering round</td></tr>
+<tr><td>session_end</td><td>face flips to Ended + Foster prompt</td><td>departs every lens</td><td>line</td><td>census; sow record</td></tr>
+</tbody></table>
+
+<h2>C9 · Batch close (09f)</h2>
+<table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
+<tr><td>open</td><td>the room drains sow by sow; no End task on the room; lenses carry the tallies all along.</td></tr>
+<tr><td>closing sheet</td><td><code>Close farrowing</code> from the task detail: lists the unfarrowed remainder, each with disposition doors (<code>not in pig? · abort? · next batch?</code>). Anyone may close — no role gate.</td></tr>
+<tr><td>close anyway</td><td>never blocked (a hard gate manufactures fake records). Undispositioned sows escalate: red strip row, watched in check-in, never expiring silently.</td></tr>
+<tr><td>remainder honesty</td><td>the close sheet distinguishes <code>no records</code> from <code>records · corrected to zero ›</code> (History door) — a zeroed litter can never pass as a virgin sow; and ACTIVE sows list informationally (<code>still farrowing — finish her ›</code>), close never blocks on them. 09f round.</td></tr>
+<tr><td>closed</td><td>the frozen task sheet (tallies, who, when), reached from Today's done card. No summary ceremony.</td></tr>
+</tbody></table>
+
+<h2>C10 · Invariants and the never-list</h2>
+<table class="stab"><thead><tr><th style="width:6%">#</th><th>Invariant — violating any of these is a bug</th></tr></thead><tbody>
+<tr><td>1</td><td><code>Born = Alive + Σ Dead + fostered_out − fostered_in</code> at every moment, on every device.</td></tr>
+<tr><td>2</td><td>Born is never directly editable — two observable numbers before the lock, stamped amendment after.</td></tr>
+<tr><td>3</td><td>Every dead piglet is one tally in exactly one type; no − can ever touch posted state — dead rows floor at pending 0 (and at the Born floor), Alive floors at <code>B* − current dead total</code>. <b>Born never sinks below its floor except through Edit</b> — per device by construction, across devices by the flagging merge. Upward, integrity is provenance-only: every + is stamped; the console owes the per-hand audit views.</td></tr>
+<tr><td>4</td><td>Nothing is deleted; corrections append, stamped, visible as corrections, ✎ forever.</td></tr>
+<tr><td>5</td><td>Corrections to posted state pass through Edit and nowhere else; why is asked only there.</td></tr>
+<tr><td>6</td><td>Every event commits at the tap; opening/reading/closing writes nothing; registers derive from posted state.</td></tr>
+<tr><td>7</td><td>One resting control per figure; anything not listed as tappable has no affordance.</td></tr>
+<tr><td>8</td><td>Same gesture for every hand: make the screen match the crate.</td></tr>
+</tbody></table>
+<div class="note"><b>Never build:</b> Save · submit buttons · success toasts · confirmation dialogs on recording · WHEN/date questions in the drawer · staleness escalations, threshold configs, notifications · dim-as-disabled (absent, never greyed — ONE scoped exception: Alive's − at its floor, owner-ruled) · hard gates anywhere (a blocked path is a falsification incentive) · role gates (v1) · foster during farrowing · scattered correction entrances (floor-doors, tap-the-fact, hidden gestures) · a separate detail screen (the sheet reopened IS the record).</div>
+
+<h3>Room title · the task description <span class="tag t-draft">draft</span></h3>
+<p>Under the room's <code>Last record 08:41 · G. Hansen</code> line, one sentence of task copy (owner, 2026-09-03 — the list view carries the how-to, the sheet stays bare): <code>Count as she farrows. Every tap saves, come back anytime. Finish when she's done.</code>. Static; never a banner, never dismissable, never repeated on the sheet.</p>
+
+<h2>C11 · Open items</h2>
+<table class="stab"><thead><tr><th style="width:30%">Item</th><th>State</th></tr></thead><tbody>
+<tr><td>draft constants</td><td>pointers 4 s · hold 800 ms · Finish-entry fold · idle-reopen freshness · interaction-based 90-min idle · the C7 merge contract — implement as specced, owner + engineering may re-tune.</td></tr>
+<tr><td>owner questions from the attack audit (2026-08-30)</td><td>1 · pointer line 2 copy: extend to <code>No body, or count wrong? Edit</code> so the savaged case routes right (line 1 sends "died" to the drawer, which is wrong when there is no body)? 2 · drop the fold-on-Edit-entry trigger (a cancelled peek currently folds the visit, contradicting "opening writes nothing"; the Born floor no longer needs the fold — corrections can target posted with pending riding, picker annotating <code>+N pending</code>)? 3 · Active rows keep the day counter as a quiet line-2 fact (<code>day 117</code>) so one stray tap cannot switch off an overdue sow's surveillance — or accept the recovery-after-doubt? 4 · PARKED with fostering (owner 2026-08-30). 5 · console debt acknowledged: per-hand gone-rates, correction-then-reassert flags, sync-review queue.</td></tr>
+<tr><td>specced, undrawn</td><td>the Born ceremony's choosing middle state (✎ tapped, the two doors visible, nothing armed) · the zeroed-litter Pre-start (History/Edit doors on a non-virgin zero face) · roster mode · pre-filled drawer mode. NEW small questions from the drawn round: how a valid type-to-set commits (pad-fold? explicit key?) and whether the pad's <code>·</code> key blanks on integer count fields.</td></tr>
+<tr><td>other surfaces</td><td>09c cohort · 09d conveyor · 09e count doors · 09f close await their design rounds; this contract governs the session suite (09–09b) plus C9's ruled skeleton.</td></tr>
+</tbody></table>
+
+</div>
+</body>
+</html>
