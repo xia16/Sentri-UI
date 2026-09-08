@@ -66,6 +66,17 @@ history lives in git.
   invites typing, and type-to-set is retired; the keys own the input, as on every
   drawer row. **The identity header wears the ›** it always was: the one door to her
   sow page, now signposted in the icon vocabulary.
+- **Edit folds what a hand rarely fixes (owner, 2026-09-08 — "it shouldn't be fully
+  flattened out"):** post-lock, weak · deformed · litter weight · assisted sit behind
+  one disclosure row, `At finish` over `weak 1 · deformed 1 · 12.6 kg · assisted ›`,
+  expanding in place as a well tray whose key column does not move. Born and the dead
+  list stay flat: they are what a hand comes to fix. **The Born ceremony is a popup**
+  (the owner's word, same round): a centered dialog over the dimmed sheet — `Born 14 ·
+  correct it`, `More born` / `Count was wrong` as radio rows, the stepper and the
+  Alive/Died chips under the chosen one, `Back · Apply`. Apply returns to Edit with Born
+  amber and the summary line; Save on Edit commits. The inline tray is retired.
+  **Sheets stay sheets:** a full-height sheet that scrolls is fine; what has to stay
+  clean is the content, not the container.
 - **Color lives on the value, the word stays ink** (owner, 2026-09-03): `Overdue ·
   3 days` prints the number red and the word ink — the same value-color grammar as a
   green draft addition and an amber corrected figure. Chips are for state words
@@ -307,10 +318,10 @@ history lives in git.
   floor, alive can only fall by counted piglets that died, so the receipt says so;
   "−2 new" was nonsense.
 - Post-lock Edit, drawn: Born renders as a locked row whose one key is an amber ✎ —
-  tapping it expands a recessed ceremony tray in place (`More born ›` with a signed
-  delta + alive/died chips, or `Count was wrong ›` with a plain total); the change joins
-  the same summary and Save. Nine rows group under the record's own zone captions
-  (dead · living · at birth).
+  tapping it opens the ceremony popup (2026-09-08; the inline tray is retired): `More
+  born` with a signed delta + Alive/Died chips, or `Count was wrong` with a plain total;
+  Apply returns the change to the same summary and Save. The list is Born, the dead
+  rows, and one `At finish` disclosure row folding living · at birth.
 - **Anyone may amend born post-lock — open ✎, stamped, no role gate.** Provenance over
   sign-off (the owner's compliance stance): falsification is deterred by the visible
   amendment trail, not by permissions. (Standing unless the owner vetoes.)

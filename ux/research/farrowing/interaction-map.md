@@ -277,7 +277,7 @@ Step 2 · **Correction event** (what happened?):
 - Wrong type › adds the destination type; commits the paired move as one event.
 - Wrong sow adds scope (this figure / this visit) + sow picker; mirrored events both
   records (§8-G6).
-- Post-lock, Born first shows the ceremony: amber warn → `More born ›` (asks where the
+- Post-lock, Born first shows the ceremony (a popup over Edit since 2026-09-08; living · at birth fold behind one `At finish` disclosure row): amber warn → `More born ›` (asks where the
   extra goes: alive now / died, then writes both lines) or `Count was wrong ›` (plain
   correction). The invariant never breaks silently (audit B5).
 - Both steps sit under the amber banner `Correcting a past record · logged as <who>`,
