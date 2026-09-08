@@ -62,8 +62,12 @@ deliberately-shaped flow that announces itself:
 
 ## Mapping to the session sheet
 
-- Alive: `14  +3` — posted fact plain, session chip distinct, − drains the chip only;
-  fold-on-close event. Tap the chip's count area to type (numpad = absolute assert).
+- Alive: `14  +3` — posted fact plain, session chip distinct; fold-on-close event. Tap
+  the chip's count area to type (numpad = absolute assert). The earlier convergence
+  exception is repealed (owner, 2026-08-30): Alive now obeys the general clamp, with the
+  floor widened by bodies — `floor = posted − dead tallied this visit` — so death entry
+  still converges in two observations while a bare − can never rewrite posted history.
+  Below the floor: Record dead or Adjust. One pattern, every figure.
 - Dead drawer rows: identical grammar per type; rest state is posted fact + lone +.
 - The Adjust/amend door (post-lock, and cross-session corrections): rebuilt as the
   correction event flow above — banner state, reason chips, computed delta, corner glyph

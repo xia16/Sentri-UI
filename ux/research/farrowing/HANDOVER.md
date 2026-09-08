@@ -26,6 +26,10 @@ touching anything.
    §6–§12 in chronological order (later supersedes earlier).
 5. `ux/research/farrowing/session-interaction-spec.md` — the session model, FINAL. §1–§3
    are the contract; §7–§8 record audit and pattern adoptions.
+   **Then `interaction-map.md`** — the complete low-fi walk of every surface, state,
+   gesture, path and receipt in the drawer suite, with the inconsistency register (§7),
+   the gap proposals awaiting owner sign-off (§8), and the open questions (§9). It is
+   the reconciled contract; check a drawn detail against it before the older briefs.
 6. `ux/research/farrowing/count-entry-pattern.md` — the researched posted/pending/
    correction architecture. It is cited law now, product-wide.
 7. `ux/research/farrowing/user-flow-audit.md` — what simulated users broke and how it was
