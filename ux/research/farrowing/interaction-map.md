@@ -70,7 +70,7 @@ Two design metrics govern every row here, per the owner's brief:
 | Pre-start | Awaiting sow opened | the During skeleton: header · Alive at 0 · tools `Record dead` (live) · `Edit` (disabled) · gray `Born 0 · Dead 0` · bar `Close · Finish farrowing` (Finish disabled) |
 | During | Active | header (started + saved) · Alive hero + receipt · tools `Record dead · Edit` (soft fill) · facts footer `Born · Dead ›` (chevron = History) · bar `Close · Finish farrowing` |
 | Finishing | Finish tapped | summary · classification · optional facts · bar `Back · Lock` |
-| After | Done | header (parity) · status band `Farrowing finished · stamp` · fact line `Born · Alive · Dead ›` + causes · bar `Edit · Record dead` |
+| After | Done | header (vit `finished · aug 27 · G.H`) · hero `Alive` over a plain `8` · receipt `of 14 born · 5 days old · 1 died since finish` · footer `Dead 6 ›` + causes (chevron = History) · bar `Edit · Record dead` |
 
 ### Drawer modes (one dead drawer, four contexts)
 
