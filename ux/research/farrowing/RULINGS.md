@@ -209,8 +209,16 @@ history lives in git.
   triad on Edit (Clear on its summary row). Nobody closes a death record casually,
   and nothing is lost to an interruption — pocketing the phone, backgrounding, or Back
   all keep the draft, so the earlier accepted cost (a mid-drawer draft lost) is
-  deleted. While a draft waits, the sheet's `Record dead` tool shows it in the green
-  register: `Record dead +2` (undrawn). Finish keeps `Back · Lock` (its steppers are
+  deleted. While a draft waits, the host says so in words (owner-ruled `+N`, re-worded
+  2026-09-08 so color is never the only carrier): the sheet's `Record dead` tool
+  stacks `1 unsaved` in green mono under its label, the drawer's title row reads
+  `Dead 6 · 1 unsaved` beside the total, and Edit's tool stacks `unsaved` while its
+  draft lives. **Finish with a draft waiting:** Finish opens — the weak/deformed
+  steppers and the optional facts are usable — but `Lock born N` waits in the
+  floor-gray family with the pointer `1 death unsaved · Record dead` above the bar.
+  A draft never crosses the lock: a stillborn drafted before lock and saved after
+  would move Born past a frozen figure. Clear is one tap, so nothing is falsified;
+  this is a guard on the lock, not a gate on recording. Finish keeps `Back · Lock` (its steppers are
   already committed — Back is pure navigation there); the counting sheet keeps
   `Close · Finish farrowing` (nothing to clear). **The sow's `Other` opens an optional free-text line**
   (owner, 2026-09-01: a sow is a high-value animal whose exact reason someone will
