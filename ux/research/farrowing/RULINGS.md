@@ -304,19 +304,23 @@ history lives in git.
   modest 24px (the row's numbers, present but demoted) over key-value rows that the
   row cannot carry — `Dead` with its causes, `At finish` (`weak 1 · deformed 1 · 12.6
   kg · assisted`), `Finished` with the full stamp `aug 27 · 08:12 · G. Hansen`.
-  `Record`: the ledger as a timeline — a rail with dots, grouped by day so each row
+  `Record`: a disclosure row (`Record` over `7 entries · latest +1 crushed · aug 29 ›`)
+  that PUSHES the Record page — left-to-right navigation, not more sheet (owner,
+  2026-09-08: "collapse the record; clicking in opens the record page"). The Record
+  page is the ledger as a timeline: a rail with dots, grouped by day so each row
   carries only time and hand, events in sans (`+3 crushed · +1 other`), the lock a
   filled milestone (`Farrowing finished · born 14`), corrections amber with ✎, the
   sow's death a red milestone, photos as camera tiles under their row. Newest first,
-  netted per visit. No hero, no status band, no mono log, no History chevron (the
-  ledger is the face). Attended or batch, one face: a batch litter's record is two
+  netted per visit, nothing tappable. The same page opens from the During footer's
+  chevron while counting, with the open visit as its green top row — History-as-a-
+  sheet is retired; there is one ledger surface. No hero, no status band, no mono log. Attended or batch, one face: a batch litter's record is two
   rows, an attended one scrolls. Bar `Edit · Record dead`. Ended keeps its red band
   and omits the `Finished` row (nothing was finished). This reverses 2026-09-01:
   classification, litter weight and assisted DO print on the face — they are the
   record.
-- **History post-lock is the face itself:** the During footer's `Born 14 · Dead 5 ›`
-  chevron still opens History while counting; on a locked record the ledger is
-  inline, so the chevron and the separate History face are retired there.
+- **One ledger surface, the Record page:** pushed from the During footer's `Born 14 ·
+  Dead 5 ›` while counting and from the face's `Record ›` once locked. Read-only,
+  the list is the reveal.
 - **History is the chevron on the fact line, product-wide:** `Born 14 · Dead 5 ›` —
   the line is the door, on During and on every record face. No "History" word, no
   separate row, no stacked doors.
