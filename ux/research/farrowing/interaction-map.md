@@ -70,8 +70,8 @@ Two design metrics govern every row here, per the owner's brief:
 | Pre-start | Awaiting sow opened | the During skeleton: header · Alive at 0 · tools `Record dead` (live) · `Edit` (disabled) · gray `Born 0 · Dead 0` · bar `Close · Finish farrowing` (Finish disabled) |
 | During | Active | header (started + saved) · Alive hero + receipt · tools `Record dead · Edit` (soft fill) · facts footer `Born · Dead ›` (chevron = History) · bar `Close · Finish farrowing` |
 | Finishing | Finish tapped | summary · classification · optional facts · bar `Back · Lock` |
-| After | Done | header (parity) · the Finish summary card reused (`14 born | 8 alive | 6 dead` + causes) · two-line rows At finish / Finished / `Record` › (pushes the Record page) · bar `Edit · Record dead` |
-| Record | any, ≥1 event | a pushed page: the ledger as a timeline (rail, day headers, sans events, finish milestone, amber corrections, red sow-death, green open visit, photo tiles) · read-only, ← returns · opened from the During footer chevron and the face's Record row |
+| After | Done | header (parity) · the Finish summary card reused (`14 born | 8 alive | 6 dead` + causes) · two-line rows At finish / Finished / `Farrowing record` › (pushes the Farrowing record page) · bar `Edit · Record dead` |
+| Farrowing record | any, ≥1 event | a pushed page: the ledger as a timeline (rail, day headers, sans events, finish milestone, amber corrections, red sow-death, green open visit, photo tiles) · read-only, ← returns · opened from the During footer chevron and the face's Record row |
 
 ### Drawer modes (one dead drawer, four contexts)
 

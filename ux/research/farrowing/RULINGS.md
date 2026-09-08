@@ -306,22 +306,23 @@ history lives in git.
   present but demoted. Under it, no second card — plain two-line list rows in the room
   row's grammar, label over a mono line: `At finish` / `weak 1 · deformed 1 · 12.6 kg ·
   assisted`, `Finished` / `aug 27 · 08:12 · G. Hansen`, and
-  `Record` / `7 entries · latest +1 crushed · aug 29` › — the row that PUSHES the Record
-  page — left-to-right navigation, not more sheet (owner,
-  2026-09-08: "collapse the record; clicking in opens the record page"). The Record
-  page is the ledger as a timeline: a rail with dots, grouped by day so each row
+  `Farrowing record` / `+1 crushed · aug 29 · L.M` › — the row that PUSHES the
+  Farrowing record page — left-to-right navigation, not more sheet (owner,
+  2026-09-08: "collapse the record; clicking in opens the record page"). The Farrowing
+  record page is the ledger as a timeline: a rail with dots, grouped by day so each row
   carries only time and hand, events in sans (`+3 crushed · +1 other`), the lock a
   filled milestone (`Farrowing finished · born 14`), corrections amber with ✎, the
   sow's death a red milestone, photos as camera tiles under their row. Newest first,
-  netted per visit, nothing tappable. The same page opens from the During footer's
+  netted per visit, nothing tappable, and no explanatory note on the page. The same
+  page opens from the During footer's
   chevron while counting, with the open visit as its green top row — History-as-a-
   sheet is retired; there is one ledger surface. No hero, no status band, no mono log. Attended or batch, one face: a batch litter's record is two
   rows, an attended one scrolls. Bar `Edit · Record dead`. Ended keeps its red band
   and omits the `Finished` row (nothing was finished). This reverses 2026-09-01:
   classification, litter weight and assisted DO print on the face — they are the
   record.
-- **One ledger surface, the Record page:** pushed from the During footer's `Born 14 ·
-  Dead 5 ›` while counting and from the face's `Record ›` once locked. Read-only,
+- **One ledger surface, the Farrowing record page:** pushed from the During footer's `Born 14 ·
+  Dead 5 ›` while counting and from the face's `Farrowing record ›` once locked. Read-only,
   the list is the reveal.
 - **History is the chevron on the fact line, product-wide:** `Born 14 · Dead 5 ›` —
   the line is the door, on During and on every record face. No "History" word, no
@@ -395,3 +396,10 @@ history lives in git.
   every mock agrees with every other; self-describing tokens ≤14 chars; no dim-as-
   disabled (one scoped exception: Alive − at its floor, owner 2026-08-30); census-only pen headers; no toasts; no submit buttons; consolidate, never
   patch.
+- **Copy pass on the record (owner, 2026-09-08):** the row is `Farrowing record`, never
+  bare `Record` — the noun collided with the verb in `Record dead` one row below. Its
+  mono line is the ledger's newest row verbatim (`+1 crushed · aug 29 · L.M`), no
+  entry counts, no "latest". The page title is `Farrowing record`. The open visit's
+  row reads `+4 alive · this visit` — "open" was jargon, green already says it. Design
+  and developer language never prints on a product surface: the page's "netted per
+  visit" footnote is gone; that rule lives here and in the contract.
