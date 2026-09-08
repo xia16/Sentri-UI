@@ -309,8 +309,9 @@ history lives in git.
   `Farrowing record` / `+1 crushed · aug 29 · L.M` › — the row that PUSHES the
   Farrowing record page — left-to-right navigation, not more sheet (owner,
   2026-09-08: "collapse the record; clicking in opens the record page"). The Farrowing
-  record page is the ledger as a timeline: a rail with dots, grouped by day so each row
-  carries only time and hand, events in sans (`+3 crushed · +1 other`), the lock a
+  record page is the ledger as a timeline: a rail with dots, grouped by day — the day
+  header carries the date and the hand (`aug 26 · G.H`) when one hand wrote the day,
+  so rows carry only the time; a second hand prints on its own rows — events in sans (`+3 crushed · +1 other`), the lock a
   filled milestone (`Farrowing finished · born 14`), corrections amber with ✎, the
   sow's death a red milestone, photos as camera tiles under their row. Newest first,
   netted per visit, nothing tappable, and no explanatory note on the page. The same
