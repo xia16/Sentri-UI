@@ -264,9 +264,9 @@ history lives in git.
   what stands, classification skipped (amendable via Edit),
   the litter record survives. **She stays in the room** (re-ruled 2026-09-01, replacing
   "exits every lens"): a Done-register row — `7 alive` + red chip `sow died` / `born 10 ·
-  aug 28 · L.M`, ✎ rail — the orphan litter is the row the next shift most needs, and
+  yesterday · L.M`, ✎ rail — the orphan litter is the row the next shift most needs, and
   she drains only at batch close. Her record face opens with a red warning band
-  carrying the cause (`Sow died · prolapse · aug 28 · 06:20 · L.M`) above the unified
+  carrying the cause (`Sow died · prolapse · aug 25 · 06:20 · L.M`) above the unified
   fact line; no separate orphan block — the status and `Alive 7` already say it.
 
 - **A non-empty ledger is never unreachable** (attack audit, 2026-08-30): any face of a
@@ -409,5 +409,7 @@ history lives in git.
   Farrowing record page's day headers (`5 days ago · L.M`, then `aug 27 · G.H`) and the
   face's Farrowing record line (`+1 crushed · 5 days ago · L.M`). A record's own stamps
   keep their absolute date and time — the `Finished` row, the sow-death band — because
-  they are facts, not recency. Room rows already speak this way under a day
-  (`1h ago`); the week rule extends the same ladder.
+  they are facts, not recency. Room rows speak the same ladder: `1h ago` under a
+  day, `yesterday` for the ended sow, the date from seven days. (The ended sow's death
+  moved to aug 25 so the room, whose today is aug 26, no longer shows a death in its
+  own future.)
