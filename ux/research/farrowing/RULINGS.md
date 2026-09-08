@@ -297,19 +297,23 @@ history lives in git.
   keeps the foster terms (events reserved, derivations unchanged with foster = 0) so
   fostering bolts on without rework. Do not design, draw, or build foster flows until
   the owner reopens them.
-- **The record face IS the During sheet, locked (owner, 2026-09-01; re-cut
-  2026-09-08 — "they clicked in for a reason"):** the room row already says `8 alive ·
-  6 dead` / `born 14 · final aug 27`, so the face leads with what the row cannot carry.
-  Same header, the vit now `finished · aug 27 · G.H` (the state, said once, where the
-  During header said `saved`); the hero where the counter stood — `Alive` over a plain
-  `8`, no keys — with the receipt slot carrying the litter's story, `of 14 born · 5 days
-  old · 1 died since finish`; then the footer `Dead 6 ›` with its causes line (the
-  chevron is History); then `Edit · Record dead`. One emphasis (the hero), two
-  hairlines, no status band — the band and the bold three-number fact line were the
-  mess. Ended keeps its red band (`Sow died · prolapse` + stamp): a warning register,
-  not a status; its receipt reads `of 10 born · 2 days old · under piglet care`.
-  Classification, litter weight, assisted, and the since-final split by cause are
-  History and console detail — never on the face.
+- **The record face IS the record (owner, 2026-09-08 — "the information in the list
+  view should be smaller; they clicked in for something else"):** the row already
+  says `8 alive · 6 dead` and `born 14`, so on the face those numbers shrink to the
+  header's vit line and the body carries only what the row cannot: `at finish` (`weak
+  1 · deformed 1 · 12.6 kg · assisted`), `dead 6` with its causes, and `record` — the
+  ledger inline, newest first, netted per visit, every line stamped `aug 26 · 08:12 ·
+  G.H`, corrections amber with ✎ (`crushed 3 → 2 ✎`), the lock as its own line
+  (`finished · born 14`), deaths since finish above it, photos as thumbnails under
+  their line. No hero, no status band, no three-number fact line. Attended or
+  batch, the same face: a batch litter's record is two lines (the one visit, the
+  finish), an attended one scrolls. The bar stays `Edit · Record dead`. Ended keeps
+  its red band (a warning, not a status) and lists `sow died · prolapse` as the top
+  line of its record. This reverses 2026-09-01: classification, litter weight and
+  assisted DO print on the face, as the at-finish line — they are the record.
+- **History post-lock is the face itself:** the During footer's `Born 14 · Dead 5 ›`
+  chevron still opens History while counting; on a locked record the ledger is
+  inline, so the chevron and the separate History face are retired there.
 - **History is the chevron on the fact line, product-wide:** `Born 14 · Dead 5 ›` —
   the line is the door, on During and on every record face. No "History" word, no
   separate row, no stacked doors.
