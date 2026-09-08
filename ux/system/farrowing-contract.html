@@ -71,7 +71,8 @@
 <h3>Derivations (never stored, never editable)</h3>
 <pre>pre-lock    Born      = alive_posted + alive_pending + Σ dead(all types, posted+pending)
                         + fostered_out − fostered_in            // fosters are 0 pre-lock by rule
-post-lock   alive_now = born_locked − Σ dead_since_lock − fostered_out + fostered_in
+post-lock   alive_now = alive_at_lock − Σ dead_since_lock − fostered_out + fostered_in
+            where alive_at_lock = born_locked − Σ dead_at_lock   (born already counts the pre-lock dead)
 always      healthy   = alive − weak − deformed                 // Finish face only
 always      registers derive from posted state (C2)             // incl. the all-zero un-cross</pre>
 
@@ -86,9 +87,9 @@ always      registers derive from posted state (C2)             // incl. the all
                                         (terminal record +         write to the record,
                                          orphan Foster prompt)     never reopen ACTIVE</pre>
 <table class="stab"><thead><tr><th style="width:18%">State</th><th style="width:30%">Definition</th><th>Row rendering (copy from mocks)</th></tr></thead><tbody>
-<tr><td>AWAITING</td><td>live total (posted + open pending) at zero. Sub-registers derive from <code>day = today − first_service</code>: <b>forecast</b> day &lt; 114 (light line, full-strength row, never disabled) · <b>due</b> 114–115 · <b>overdue</b> ≥ 116 (the days-over number in red; the word stays ink). Rows speak in days from due, never gestation day (owner, 2026-09-03); the gestation day prints on the sheet header only</td><td><code>Due in 2 days</code> / <code>Due tomorrow</code> / <code>Due today</code> / <code>Overdue · 3 days</code> (number red; days over = day − 114); line 2 on every Awaiting row = <code>parity n · m born last</code> — except an overdue sow with a disposition on her sow page, whose line 2 reads the latest one: <code>induced yesterday · L.M</code> (owner, 2026-09-03). The number stays red until she farrows or leaves the batch: red is the overdue fact, line 2 is what has been done about it. Read dependency: the room reads sow-page events (induction and the other dispositions are sow treatments/events, never litter events — C1 is untouched)</td></tr>
-<tr><td>ACTIVE</td><td>live total ≠ all-zero and no <code>final</code>/<code>session_end</code>. <b>Registers derive from the live total</b> — a stray + crosses her as it lands; its undo or a fold-to-nothing un-crosses her</td><td>line 1 <code>9 alive · 5 dead</code> — never a chip, the overdue signal ends at the first record (C5.7); line 2 <code>last record 1h ago · G.H</code> — recency in words (C5.7). Born is not on the row (it is alive + dead). <code>ACTIVE</code> prints green</td></tr>
-<tr><td>DONE</td><td><code>final</code> exists</td><td><code>11 alive</code> (alive_now, live-derived) / <code>born 13 · final 05:58 · G.H</code>; rail = ✎ glyph, row dim</td></tr>
+<tr><td>AWAITING</td><td>live total (posted + open pending) at zero. Sub-registers derive from <code>day = today − first_service</code>: <b>forecast</b> day &lt; 114 (light line, full-strength row, never disabled) · <b>due</b> 114–115 · <b>overdue</b> ≥ 116 (the days-over number in red; the word stays ink). Rows speak in days from due, never gestation day (owner, 2026-09-03); the gestation day prints on the sheet header only</td><td><code>Due in 2 days</code> / <code>Due tomorrow</code> / <code>Due today</code> (day 114) / <code>Due yesterday</code> (day 115 — still the due window, not red) / <code>Overdue · 3 days</code> (number red from day 116; days over = day − 114); line 2 on every Awaiting row = <code>parity n · m born last</code> — except an overdue sow with a disposition on her sow page, whose line 2 reads the latest one: <code>induced yesterday · L.M</code> (owner, 2026-09-03). The number stays red until she farrows or leaves the batch: red is the overdue fact, line 2 is what has been done about it. Read dependency: the room reads sow-page events (induction and the other dispositions are sow treatments/events, never litter events — C1 is untouched)</td></tr>
+<tr><td>ACTIVE</td><td>live total ≠ all-zero and no <code>final</code>/<code>session_end</code>. <b>Registers derive from the live total</b> — a stray + crosses her as it lands; its undo or a fold-to-nothing un-crosses her</td><td>line 1 <code>9 alive · 5 dead</code> — never a chip, the overdue signal ends at the first record (C5.7); line 2 <code>born 14 · 1h ago · G.H</code> — the litter so far, then recency in words (C5.7). Every litter row carries its three numbers: alive · dead on line 1, born on line 2. <code>ACTIVE</code> prints green</td></tr>
+<tr><td>DONE</td><td><code>final</code> exists</td><td><code>11 alive · 2 dead</code> (alive_now, live-derived) / <code>born 13 · final 05:58 · G.H</code>; rail = ✎ glyph, row dim</td></tr>
 <tr><td>ENDED_SOW_DIED</td><td><code>session_end</code> exists</td><td>stays in the room as a Done-register row: <code>7 alive</code> + red chip <code>sow died</code> / <code>born 10 · aug 28 · L.M</code>, ✎ rail; drains at batch close (re-ruled 2026-09-01 — replaces "exits every lens")</td></tr>
 </tbody></table>
 <table class="stab"><thead><tr><th style="width:34%">Transition</th><th style="width:22%">Trigger</th><th>Rules</th></tr></thead><tbody>
@@ -131,7 +132,7 @@ always      registers derive from posted state (C2)             // incl. the all
 <tr><td>− at the floor <span class="tag t-ruled">ruled</span></td><td>− is live while total &gt; floor (<code>posted − dead tallied this visit</code>); AT the floor it <b>grays out</b> — the suite's one disabled control, a scoped owner exception (2026-08-30) to no-dim-as-disabled. Tapping the grayed − writes nothing and shows the pointers (5.2). Born can never drop silently, by construction.</td></tr>
 <tr><td>tap framed count</td><td>RETIRED (owner, 2026-09-01): no type-to-set on count figures — up is +, down is bodies or Edit. The framed count is display only. Pads remain on tag and weight fields (real typed input).</td></tr>
 <tr><td>every − tap</td><td>raises the hint line (5.2). No dialog, no gate, ever.</td></tr>
-<tr><td>receipt line</td><td>always rendered under the counter: <code>9 saved · +4 new</code> · down form <code>7 saved · 2 died</code> (alive can only fall by counted piglets that died) · pre-start form <code>no records yet</code>.</td></tr>
+<tr><td>receipt line</td><td>always rendered under the counter: <code>Saved · +4 this visit</code> · down form <code>Saved · 2 died this visit</code> (alive can only fall by counted piglets that died) · pre-start form <code>no records yet</code>.</td></tr>
 </tbody></table>
 <h3>5.2 · The reserved hint line</h3>
 <table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
@@ -179,7 +180,7 @@ always      registers derive from posted state (C2)             // incl. the all
 </tbody></table>
 <h3>5.7 · Recency (room rows, ACTIVE only)</h3>
 <table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
-<tr><td>recency line <span class="tag t-draft">draft</span></td><td>line 2 = <code>last record &lt;age&gt; · &lt;initials&gt;</code>: the newest record's age (minute resolution under 1 h — <code>2m ago</code>, <code>29m ago</code>; hour resolution after — <code>1h ago</code>, <code>7h ago</code>; a calendar day past 24 h — <code>yesterday</code>) and the hand who wrote it. Ticks live; driven by record stamps only, never config, never a notification.</td></tr>
+<tr><td>recency line <span class="tag t-draft">draft</span></td><td>line 2 = <code>born N · &lt;age&gt; · &lt;initials&gt;</code>: the litter so far (alive + Σ dead), then the newest record's age (minute resolution under 1 h — <code>2m ago</code>, <code>29m ago</code>; hour resolution after — <code>1h ago</code>, <code>7h ago</code>; a calendar day past 24 h — <code>yesterday</code>) and the hand who wrote it. Ticks live; driven by record stamps only, never config, never a notification.</td></tr>
 <tr><td>never colored by age <span class="tag t-ruled">ruled</span></td><td>no staleness tracking on ACTIVE sows: the line reads the same at <code>2m ago</code> and <code>7h ago</code>. Overnight the room reads calm because the words are calm, not because a chip faded.</td></tr>
 <tr><td>overdue on ACTIVE <span class="tag t-ruled">ruled</span></td><td>NONE. The overdue signal ends at the first record (owner, 2026-09-03, superseding the 2026-09-01 chip that survived the cross): recorded is acted. The lateness stays a fact on the sheet header (<code>day 117</code>) and her sow page. Accepted cost: a stray +1 nobody undoes hides an overdue sow behind <code>1 alive · 0 dead</code> until the next hand reads the crate — the receipt, the − undo and the crate itself are the guards. Undoing it (Edit to zero) restores the Awaiting row, red number and all (row-states strip).</td></tr>
 <tr><td>interval chip</td><td>RETIRED (owner, 2026-09-03) — <code>last 60m</code> said neither what nor whose; the recency line replaces it.</td></tr>
@@ -188,7 +189,7 @@ always      registers derive from posted state (C2)             // incl. the all
 <table class="stab"><thead><tr><th style="width:26%">State</th><th>Contract</th></tr></thead><tbody>
 <tr><td>sh2 identity header</td><td>pen chip + tag on every sheet/drawer/Edit face. Tap → her sow page (the ONE route to sow verbs). Sheet-first: the room row has no sow-page target.</td></tr>
 <tr><td>idle reopen</td><td>a During sheet reopened with last record &gt; 90 min leads with its freshness stamp emphasized until first touch <span class="tag t-draft">draft mechanism</span> — the wrong-crate tripwire.</td></tr>
-<tr><td>dead zones</td><td>not tappable, no affordance: <code>Born N · Dead N</code> (derived; no tap-the-fact), breakdown metadata, receipt + hint lines, saved stamp, the overdue number, pen headers, row line-2 (the recency line included).</td></tr>
+<tr><td>dead zones</td><td>not tappable, no affordance: the breakdown line under the fact line (the fact line itself, <code>Born N · Dead N ›</code>, IS the History door — C4; what is dead is tap-the-fact as a correction entrance),  receipt + hint lines, saved stamp, the overdue number, pen headers, row line-2 (the recency line included).</td></tr>
 </tbody></table>
 
 <h2>C6 · Constants</h2>
@@ -224,7 +225,7 @@ always      registers derive from posted state (C2)             // incl. the all
 <tr><td>final</td><td>face flips to After</td><td>crosses to Done</td><td>line</td><td>batch tallies (C9)</td></tr>
 <tr><td>dead (post-lock)</td><td>since-final line + alive_now</td><td>Done row alive ticks</td><td>line</td><td>census</td></tr>
 <tr><td>foster_out/in (parked)</td><td>—</td><td>—</td><td>—</td><td>reserved for the fostering round</td></tr>
-<tr><td>session_end</td><td>face flips to Ended + Foster prompt</td><td>departs every lens</td><td>line</td><td>census; sow record</td></tr>
+<tr><td>session_end</td><td>face flips to Ended: red band with the cause, figures frozen as they stood, bar <code>Edit · Record dead</code> — no Foster prompt, fostering is parked</td><td>stays in the room as a Done-register row with the red <code>sow died</code> chip; drains at batch close (re-ruled 2026-09-01, replacing "departs every lens")</td><td>line</td><td>census; sow record</td></tr>
 </tbody></table>
 
 <h2>C9 · Batch close (09f)</h2>
@@ -247,7 +248,7 @@ always      registers derive from posted state (C2)             // incl. the all
 <tr><td>7</td><td>One resting control per figure; anything not listed as tappable has no affordance.</td></tr>
 <tr><td>8</td><td>Same gesture for every hand: make the screen match the crate.</td></tr>
 </tbody></table>
-<div class="note"><b>Never build:</b> Save · submit buttons · success toasts · confirmation dialogs on recording · WHEN/date questions in the drawer · staleness escalations, threshold configs, notifications · dim-as-disabled (absent, never greyed — ONE scoped exception: Alive's − at its floor, owner-ruled) · hard gates anywhere (a blocked path is a falsification incentive) · role gates (v1) · foster during farrowing · scattered correction entrances (floor-doors, tap-the-fact, hidden gestures) · a separate detail screen (the sheet reopened IS the record).</div>
+<div class="note"><b>Never build:</b> Save · submit buttons on recording surfaces (the counting sheet and Finish's steppers commit per tap; the staged drawer and Edit keep their Save by ruling) · success toasts · confirmation dialogs on recording · WHEN/date questions in the drawer · staleness escalations, threshold configs, notifications · dim-as-disabled (absent, never greyed — ONE scoped exception: Alive's − at its floor, owner-ruled) · hard gates anywhere (a blocked path is a falsification incentive) · role gates (v1) · foster during farrowing · scattered correction entrances (floor-doors, tap-the-fact, hidden gestures) · a separate detail screen (the sheet reopened IS the record).</div>
 
 <h3>Room title · the task description <span class="tag t-draft">draft</span></h3>
 <p>Under the room's <code>Last record 08:41 · G. Hansen</code> line, one sentence of task copy (owner, 2026-09-03 — the list view carries the how-to, the sheet stays bare): <code>Count as she farrows. Every tap saves, come back anytime. Finish when she's done.</code>. Static; never a banner, never dismissable, never repeated on the sheet.</p>

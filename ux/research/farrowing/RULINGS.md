@@ -39,9 +39,11 @@ history lives in git.
   numbers a hand reports. If there are none, there are none. Optional facts at Finish:
   litter weight (soft range warn) + assisted checkbox, presented as one cohesive group.
 - No staleness tracking on Active sows. **The interval chip is retired (owner,
-  2026-09-03):** the Active row's line 2 is recency in words — `last record 1h ago ·
-  G.H`, the newest record's age and hand — ticking off record stamps and never colored
-  by age. `born 14` leaves the row: it is alive + dead, already on line 1.
+  2026-09-03):** the Active row's line 2 leads with the litter so far and ends with recency in
+  words — `born 14 · 1h ago · G.H`, the newest record's age and hand — ticking off
+  record stamps and never colored by age. **Every litter row carries its three numbers
+  (owner, 2026-09-08):** alive · dead on line 1, born on line 2 — `11 alive · 2 dead` /
+  `born 13 · final 05:58 · G.H` on Done rows too.
 - **The overdue signal ends at the first record** (owner, 2026-09-03, superseding
   "the chip survives the cross" of 2026-09-01): recorded is acted, so an Active row is
   never red and carries no chip. The lateness stays a fact on the sheet header
@@ -56,13 +58,22 @@ history lives in git.
   the next hand watches instead of treating twice. The number stays red until she
   farrows or leaves the batch: red is the overdue fact, line 2 is what has been done
   about it. This is the room's one read of sow-page events.
+- **The hero owns the total; the receipt owns the change (owner, 2026-09-08, on
+  Codex's reading):** `Saved · +4 this visit` under the big 9, `Saved · 2 died this
+  visit` at the floor, bare `Saved` when the visit changed nothing. The earlier
+  `9 saved · +4 new` printed the hero's number twice and left `new` to be read as
+  pending. **The hero numeral is plain** (same round): no box — a bordered field
+  invites typing, and type-to-set is retired; the keys own the input, as on every
+  drawer row. **The identity header wears the ›** it always was: the one door to her
+  sow page, now signposted in the icon vocabulary.
 - **Color lives on the value, the word stays ink** (owner, 2026-09-03): `Overdue ·
   3 days` prints the number red and the word ink — the same value-color grammar as a
   green draft addition and an amber corrected figure. Chips are for state words
   (`sow died`); numbers are colored in place.
 - Due = service + 114 d hardcoded; overdue from day 116, spoken as days over due
   (day − 114). **Rows speak in days from due, never gestation day (owner, 2026-09-03):**
-  `Due in 2 days` · `Due tomorrow` · `Due today` · `Overdue · 3 days`; line 2 on every
+  `Due in 2 days` · `Due tomorrow` · `Due today` · `Due yesterday` (day 115: still the
+  due window, not red — the gap Codex named, 2026-09-08) · `Overdue · 3 days`; line 2 on every
   Awaiting row is `parity n · m born last`. The gestation day lives on the sheet header
   only.
 
@@ -123,8 +134,8 @@ history lives in git.
   this entry" to a hand who is only logging; the object names what ends, and the Finish
   sheet's hold-to-lock stays the second guard. The same fear — that a hand will not
   know they can count, leave, come back and finish last — is answered by copy, not by a
-  tutorial: the receipt's `saved` sits on the live total (`9 saved · +4 new`, `7 saved ·
-  2 died`) so no figure on the sheet ever looks unsaved; the header stamp ticks at
+  tutorial: the receipt's `saved` sits on the live total (`Saved · +4 this visit`, `Saved · 2
+  died this visit`) so no figure on the sheet ever looks unsaved; the header stamp ticks at
   every tap. The pre-start face stays bare — `no records yet` — because the sheet is
   not the place for copy (owner, 2026-09-03, retiring the flow line drawn that
   morning); the how-to lives in the list view instead: one sentence under the room's
@@ -284,7 +295,7 @@ history lives in git.
   corrected figure prints amber forever — the register Edit already uses for a
   changed value — so the record shows one edit door (Edit) and one correction
   color. The ✎ survives only as the Born row's edit KEY inside post-lock Edit.
-- Receipt copy, both directions: `9 saved · +4 new` · `7 saved · 2 died` — under the
+- Receipt copy, both directions: `Saved · +4 this visit` · `Saved · 2 died this visit` — under the
   floor, alive can only fall by counted piglets that died, so the receipt says so;
   "−2 new" was nonsense.
 - Post-lock Edit, drawn: Born renders as a locked row whose one key is an amber ✎ —

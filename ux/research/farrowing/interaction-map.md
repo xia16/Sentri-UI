@@ -126,23 +126,24 @@ pen headers, the `Last record 23:10 · L. Meyer` appbar line. None tappable.
 Row grammar (the receipts this surface owes):
 
 - Active, attended: line 1 `9 alive · 5 dead` — never a chip; the overdue signal ends
-  at the first record (owner, 2026-09-03). Line 2 `last record 1h ago · G.H` — recency in words, the newest record's age
-  and hand, never colored by age. `born 14` left the row (it is alive + dead, already
-  on line 1) and the interval chip is retired (owner, 2026-09-03: `last 60m` said
+  at the first record (owner, 2026-09-03). Line 2 `born 14 · 1h ago · G.H` — the litter so far, then recency in words, the
+  newest record's age and hand, never colored by age (every litter row carries its
+  three numbers, owner 2026-09-08). The interval chip is retired (owner, 2026-09-03: `last 60m` said
   neither what nor whose). Parity stays off Active rows (drawn-round deviation,
   2026-08-29: stable background, living on the sheet and the Awaiting rows).
 - Unattended / free farrow: no start state — she rides Awaiting (forecast → due →
   overdue red chip) until the batch entry, which crosses her to Active and typically
   runs straight to Finish in the same visit.
 - Awaiting: days from due, never gestation day (owner, 2026-09-03): `Due in 2 days` /
-  `Due tomorrow` (forecast, light) → `Due today` → `Overdue · 3 days` (from day 116, the
+  `Due tomorrow` (forecast, light) → `Due today` → `Due yesterday` (day 115) → `Overdue · 3
+  days` (from day 116, the
   number in red, the word ink; days over = day − 114; the gestation day lives on the
   sheet header). Line 2
   is one grammar on every Awaiting row — `parity 6 · 9 born last`, the prediction
   context — except an overdue sow with a disposition logged on her sow page, whose
   line 2 reads the latest one (`induced yesterday · L.M`; owner, 2026-09-03); the
   number stays red until she farrows or leaves the batch. Rows carry no controls.
-- Done: `11 alive` (alive **now**, ticking with post-lock events) / line 2
+- Done: `11 alive · 2 dead` (alive **now**, ticking with post-lock events) / line 2
   `born 13 · final 05:58 · G.H` — drawn in the 2026-08-29 round; B4 resolved.
 
 ### 2.2 Session sheet · Pre-start (the zero face — placements RULED)
@@ -465,7 +466,7 @@ path is a falsification incentive. No foster during farrowing. No role gates in 
 
 **C · Fidelity note:** one timeline now runs the whole 09/09a/09b suite — first records
 07:30, then 07:52/08:12, a correction 08:20, the open visit to 08:41, statusbar 9:41
-(rows say `last record 1h ago · G.H`); the floor/pad state phones run
+(rows say `born 14 · 1h ago · G.H`); the floor/pad state phones run
 their own sow, 000472 (posted 9 · +2 crushed this visit · converged to the floor 7 ·
 Born 11), so the canonical 000418 arc never forks; posted alive 5 (+4 pending = 9), dead 5 by type; Born 14; History's lines sum to
 exactly these figures. Every new mock must join this timeline or use a sow the suite
