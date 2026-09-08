@@ -300,12 +300,14 @@ history lives in git.
 - **The record face IS the record (owner, 2026-09-08 — "they clicked in for
   something else", then "this is a half-assed design"):** designed, not listed. Same
   header (vit `parity 3`), then two captioned cards in the Finish sheet's grammar.
-  `Outcome`: a bordered card with the stat trio `8 alive · 6 dead · 14 born` at a
-  modest 24px (the row's numbers, present but demoted) over key-value rows that the
-  row cannot carry — `Dead` with its causes, `At finish` (`weak 1 · deformed 1 · 12.6
-  kg · assisted`), `Finished` with the full stamp `aug 27 · 08:12 · G. Hansen`.
-  `Record`: a disclosure row (`Record` over `7 entries · latest +1 crushed · aug 29 ›`)
-  that PUSHES the Record page — left-to-right navigation, not more sheet (owner,
+  The Finish sheet's own summary card, reused verbatim (owner, 2026-09-08: "is a card
+  the best way?" — one card, and the one the hand already saw at Finish): the well
+  block `14 born | 8 alive | 6 dead` with the causes line inside it, the row's numbers
+  present but demoted. Under it, no second card — plain two-line list rows in the room
+  row's grammar, label over a mono line: `At finish` / `weak 1 · deformed 1 · 12.6 kg ·
+  assisted`, `Finished` / `aug 27 · 08:12 · G. Hansen`, and
+  `Record` / `7 entries · latest +1 crushed · aug 29` › — the row that PUSHES the Record
+  page — left-to-right navigation, not more sheet (owner,
   2026-09-08: "collapse the record; clicking in opens the record page"). The Record
   page is the ledger as a timeline: a rail with dots, grouped by day so each row
   carries only time and hand, events in sans (`+3 crushed · +1 other`), the lock a
