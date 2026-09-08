@@ -404,3 +404,10 @@ history lives in git.
   row reads `+4 alive · this visit` — "open" was jargon, green already says it. Design
   and developer language never prints on a product surface: the page's "netted per
   visit" footnote is gone; that rule lives here and in the contract.
+- **Dates speak relative within the week (owner, 2026-09-08):** `today` · `yesterday` ·
+  `N days ago` up to six; from seven days on, the date (`aug 27`). This governs the
+  Farrowing record page's day headers (`5 days ago · L.M`, then `aug 27 · G.H`) and the
+  face's Farrowing record line (`+1 crushed · 5 days ago · L.M`). A record's own stamps
+  keep their absolute date and time — the `Finished` row, the sow-death band — because
+  they are facts, not recency. Room rows already speak this way under a day
+  (`1h ago`); the week rule extends the same ladder.
