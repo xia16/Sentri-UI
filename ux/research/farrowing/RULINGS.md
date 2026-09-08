@@ -297,20 +297,23 @@ history lives in git.
   keeps the foster terms (events reserved, derivations unchanged with foster = 0) so
   fostering bolts on without rework. Do not design, draw, or build foster flows until
   the owner reopens them.
-- **The record face IS the record (owner, 2026-09-08 — "the information in the list
-  view should be smaller; they clicked in for something else"):** the row already
-  says `8 alive · 6 dead` and `born 14`, so on the face those numbers shrink to the
-  header's vit line and the body carries only what the row cannot: `at finish` (`weak
-  1 · deformed 1 · 12.6 kg · assisted`), `dead 6` with its causes, and `record` — the
-  ledger inline, newest first, netted per visit, every line stamped `aug 26 · 08:12 ·
-  G.H`, corrections amber with ✎ (`crushed 3 → 2 ✎`), the lock as its own line
-  (`finished · born 14`), deaths since finish above it, photos as thumbnails under
-  their line. No hero, no status band, no three-number fact line. Attended or
-  batch, the same face: a batch litter's record is two lines (the one visit, the
-  finish), an attended one scrolls. The bar stays `Edit · Record dead`. Ended keeps
-  its red band (a warning, not a status) and lists `sow died · prolapse` as the top
-  line of its record. This reverses 2026-09-01: classification, litter weight and
-  assisted DO print on the face, as the at-finish line — they are the record.
+- **The record face IS the record (owner, 2026-09-08 — "they clicked in for
+  something else", then "this is a half-assed design"):** designed, not listed. Same
+  header (vit `parity 3`), then two captioned cards in the Finish sheet's grammar.
+  `Outcome`: a bordered card with the stat trio `8 alive · 6 dead · 14 born` at a
+  modest 24px (the row's numbers, present but demoted) over key-value rows that the
+  row cannot carry — `Dead` with its causes, `At finish` (`weak 1 · deformed 1 · 12.6
+  kg · assisted`), `Finished` with the full stamp `aug 27 · 08:12 · G. Hansen`.
+  `Record`: the ledger as a timeline — a rail with dots, grouped by day so each row
+  carries only time and hand, events in sans (`+3 crushed · +1 other`), the lock a
+  filled milestone (`Farrowing finished · born 14`), corrections amber with ✎, the
+  sow's death a red milestone, photos as camera tiles under their row. Newest first,
+  netted per visit. No hero, no status band, no mono log, no History chevron (the
+  ledger is the face). Attended or batch, one face: a batch litter's record is two
+  rows, an attended one scrolls. Bar `Edit · Record dead`. Ended keeps its red band
+  and omits the `Finished` row (nothing was finished). This reverses 2026-09-01:
+  classification, litter weight and assisted DO print on the face — they are the
+  record.
 - **History post-lock is the face itself:** the During footer's `Born 14 · Dead 5 ›`
   chevron still opens History while counting; on a locked record the ledger is
   inline, so the chevron and the separate History face are retired there.
