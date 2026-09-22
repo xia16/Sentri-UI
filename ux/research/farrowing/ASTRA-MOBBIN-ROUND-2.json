@@ -1,0 +1,424 @@
+{
+  "date": "2026-09-11",
+  "task_intent": "Research mobile bottom sheets for a farm farrowing workflow while preserving existing interactions.",
+  "note": "Search response metadata. Only inline preview images were examined for flows; unshown screens are not evidence of behavior. Image URLs expire; canonical Mobbin links are retained.",
+  "searches": [
+    {
+      "query": "Logging a baby's feeding and viewing the saved feeding entry",
+      "platform": "ios",
+      "page": 1,
+      "has_next_page": true,
+      "flows": [
+        {
+          "id": "9cd04ac8-c463-4b29-bea7-9bb657d0a67f",
+          "name": "Logging a food",
+          "actions": [
+            "Logging & Tracking"
+          ],
+          "mobbin_url": "https://mobbin.com/flows/9cd04ac8-c463-4b29-bea7-9bb657d0a67f",
+          "app_name": "Noom",
+          "platform": "ios",
+          "screen_count": 3,
+          "screens": [
+            {
+              "screen_id": "c44d6dba-e9b3-4846-a356-66643d233127",
+              "image_url": "https://mobbin.com/api/mcp/short/RNcVpFVM",
+              "position": 1
+            },
+            {
+              "screen_id": "c9b02529-4053-4bf0-8210-9556cb17b022",
+              "image_url": "https://mobbin.com/api/mcp/short/uLrvKv5v",
+              "position": 2
+            },
+            {
+              "screen_id": "ff3844b6-268f-4ff4-9c68-854912af3da3",
+              "image_url": "https://mobbin.com/api/mcp/short/lvarPu9O",
+              "position": 3
+            }
+          ]
+        },
+        {
+          "id": "fabfcfd5-f3cb-4e4d-8b5f-0bda061eb37a",
+          "name": "Logging a dose",
+          "actions": [
+            "Logging & Tracking"
+          ],
+          "mobbin_url": "https://mobbin.com/flows/fabfcfd5-f3cb-4e4d-8b5f-0bda061eb37a",
+          "app_name": "Oura",
+          "platform": "ios",
+          "screen_count": 3,
+          "screens": [
+            {
+              "screen_id": "0ee3693e-7720-4f50-88c8-9b297f130409",
+              "image_url": "https://mobbin.com/api/mcp/short/prTKxIh6",
+              "position": 1
+            },
+            {
+              "screen_id": "d0ec906f-2b04-4057-a96d-837655949580",
+              "image_url": "https://mobbin.com/api/mcp/short/70fbBFdu",
+              "position": 2
+            },
+            {
+              "screen_id": "34b5f9ab-7c53-4b07-a724-d4db1b297e63",
+              "image_url": "https://mobbin.com/api/mcp/short/PHq79VHc",
+              "position": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "Recording repetitions during a strength workout and finishing the session",
+      "platform": "ios",
+      "page": 1,
+      "has_next_page": true,
+      "flows": [
+        {
+          "id": "d88683b7-90c0-4cf1-8a45-296099e59a3b",
+          "name": "Completing a strength workout",
+          "actions": [
+            "Starting & Completing"
+          ],
+          "mobbin_url": "https://mobbin.com/flows/d88683b7-90c0-4cf1-8a45-296099e59a3b",
+          "app_name": "Runna",
+          "platform": "ios",
+          "screen_count": 11,
+          "screens": [
+            {
+              "screen_id": "2dc50d36-e7da-4b52-baec-cd1463d38b20",
+              "image_url": "https://mobbin.com/api/mcp/short/LfSj3mB2",
+              "position": 1
+            },
+            {
+              "screen_id": "a36135b8-0492-4af0-ae13-3973ef82f4ad",
+              "image_url": "https://mobbin.com/api/mcp/short/h5SIE4HW",
+              "position": 2
+            },
+            {
+              "screen_id": "1073d491-0836-4d4a-b2bb-0080d069989a",
+              "image_url": "https://mobbin.com/api/mcp/short/Fgzjvx0M",
+              "position": 3
+            },
+            {
+              "screen_id": "78cab55c-578a-4f9c-84a3-d043c190c366",
+              "image_url": "https://mobbin.com/api/mcp/short/jLXf0Xxy",
+              "position": 4
+            },
+            {
+              "screen_id": "9a13a212-beaf-44e9-a7b0-871e8f99515b",
+              "image_url": "https://mobbin.com/api/mcp/short/oMhgV4yB",
+              "position": 5
+            },
+            {
+              "screen_id": "db8ce392-a5fa-4b82-a894-30b637f4a11e",
+              "image_url": "https://mobbin.com/api/mcp/short/V0beGdjn",
+              "position": 6
+            },
+            {
+              "screen_id": "818e42db-0b83-4d29-8f03-3421bb5f8705",
+              "image_url": "https://mobbin.com/api/mcp/short/imKf3Hwv",
+              "position": 7
+            },
+            {
+              "screen_id": "0aec5421-6810-4cfb-8c8e-be03608927b9",
+              "image_url": "https://mobbin.com/api/mcp/short/IK9bjjvR",
+              "position": 8
+            },
+            {
+              "screen_id": "8c7c9862-12ed-47e1-a5f9-9ae4283dc5c8",
+              "image_url": "https://mobbin.com/api/mcp/short/9g1hMH5e",
+              "position": 9
+            },
+            {
+              "screen_id": "17370017-7a17-48d8-9be4-c2c24f292b2f",
+              "image_url": "https://mobbin.com/api/mcp/short/7A29iIQz",
+              "position": 10
+            },
+            {
+              "screen_id": "ab45dddd-4542-489e-a6fc-d2334fd0b654",
+              "image_url": "https://mobbin.com/api/mcp/short/qQy131G5",
+              "position": 11
+            }
+          ]
+        },
+        {
+          "id": "91d9a275-24f7-4dea-b152-c96d31c7cedd",
+          "name": "Adding a log",
+          "actions": [
+            "Logging & Tracking"
+          ],
+          "mobbin_url": "https://mobbin.com/flows/91d9a275-24f7-4dea-b152-c96d31c7cedd",
+          "app_name": "Centr",
+          "platform": "ios",
+          "screen_count": 5,
+          "screens": [
+            {
+              "screen_id": "ef6fc9d5-7009-45cd-98b7-b4525c6530b8",
+              "image_url": "https://mobbin.com/api/mcp/short/RzqTQbXy",
+              "position": 1
+            },
+            {
+              "screen_id": "e5b7bc35-7e72-4f68-bbdd-ecf1c8fb11a0",
+              "image_url": "https://mobbin.com/api/mcp/short/C87CzeGk",
+              "position": 2
+            },
+            {
+              "screen_id": "b3493afa-6b17-410b-9e2e-31227ad67d3c",
+              "image_url": "https://mobbin.com/api/mcp/short/hu6woEi1",
+              "position": 3
+            },
+            {
+              "screen_id": "56d8c3fe-0ad6-418f-9062-cb7b3745d7aa",
+              "image_url": "https://mobbin.com/api/mcp/short/nj2iJuIR",
+              "position": 4
+            },
+            {
+              "screen_id": "66e49635-400d-470b-92cc-ec7f34aa2dcb",
+              "image_url": "https://mobbin.com/api/mcp/short/vLM7lEqZ",
+              "position": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "Editing a saved activity and reviewing the updated activity details",
+      "platform": "ios",
+      "page": 1,
+      "has_next_page": true,
+      "flows": [
+        {
+          "id": "ae89a84b-b381-4c36-b6bb-cdf24b1e4ee1",
+          "name": "Edit an activity",
+          "actions": [],
+          "mobbin_url": "https://mobbin.com/flows/ae89a84b-b381-4c36-b6bb-cdf24b1e4ee1",
+          "app_name": "AllTrails",
+          "platform": "ios",
+          "screen_count": 4,
+          "screens": [
+            {
+              "screen_id": "18148679-3d86-4990-90af-9d19663b84bc",
+              "image_url": "https://mobbin.com/api/mcp/short/gmrXZt6q",
+              "position": 1
+            },
+            {
+              "screen_id": "20cd4bc4-dec0-431d-88de-9bd61d2d07bd",
+              "image_url": "https://mobbin.com/api/mcp/short/3GBGpJbC",
+              "position": 2
+            },
+            {
+              "screen_id": "4fb38295-67da-4794-bfca-2fee3026141c",
+              "image_url": "https://mobbin.com/api/mcp/short/UOqDC5za",
+              "position": 3
+            },
+            {
+              "screen_id": "6d3bc537-fef1-4a8f-af6a-9dd668936a3a",
+              "image_url": "https://mobbin.com/api/mcp/short/1ADzd7Fz",
+              "position": 4
+            }
+          ]
+        },
+        {
+          "id": "324587ce-b5c4-4e8e-8075-f0158d75aef9",
+          "name": "Editing an activity",
+          "actions": [
+            "Editing & Updating"
+          ],
+          "mobbin_url": "https://mobbin.com/flows/324587ce-b5c4-4e8e-8075-f0158d75aef9",
+          "app_name": "Runna",
+          "platform": "ios",
+          "screen_count": 5,
+          "screens": [
+            {
+              "screen_id": "4380f6e6-66b3-4666-a09e-762c89a3fcd1",
+              "image_url": "https://mobbin.com/api/mcp/short/941CHn2s",
+              "position": 1
+            },
+            {
+              "screen_id": "2923ab17-7672-4b1c-a204-7cbc45569cbe",
+              "image_url": "https://mobbin.com/api/mcp/short/bYxwQPZ2",
+              "position": 2
+            },
+            {
+              "screen_id": "81ecd57d-6b3e-4bbd-b1b9-1f585be2939c",
+              "image_url": "https://mobbin.com/api/mcp/short/BwKzJHPO",
+              "position": 3
+            },
+            {
+              "screen_id": "788609c6-ba66-4b0c-b548-cbad073ed888",
+              "image_url": "https://mobbin.com/api/mcp/short/vQV8Vkpe",
+              "position": 4
+            },
+            {
+              "screen_id": "21d544b1-c4fe-4d30-9bbf-c4d1ff0d474d",
+              "image_url": "https://mobbin.com/api/mcp/short/rMONIyhW",
+              "position": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "A water intake counter with a large total and minus and plus controls",
+      "platform": "ios",
+      "screens": [
+        {
+          "id": "ee9e6af0-33c5-4eeb-b125-3b7dc55d0468",
+          "image_url": "https://mobbin.com/api/mcp/short/9n9a2UGk",
+          "mobbin_url": "https://mobbin.com/screens/ee9e6af0-33c5-4eeb-b125-3b7dc55d0468",
+          "app_name": "GO Club",
+          "platform": "ios"
+        },
+        {
+          "id": "c6ba672b-b16b-441b-aa65-48c750299e19",
+          "image_url": "https://mobbin.com/api/mcp/short/EvEJL12Y",
+          "mobbin_url": "https://mobbin.com/screens/c6ba672b-b16b-441b-aa65-48c750299e19",
+          "app_name": "Garmin Connect",
+          "platform": "ios"
+        },
+        {
+          "id": "72c2c383-93ef-494b-9053-bf6bc217e8f0",
+          "image_url": "https://mobbin.com/api/mcp/short/Vaw0RAlh",
+          "mobbin_url": "https://mobbin.com/screens/72c2c383-93ef-494b-9053-bf6bc217e8f0",
+          "app_name": "Bevel",
+          "platform": "ios"
+        }
+      ]
+    },
+    {
+      "query": "A form showing unsaved changes with options to keep editing or save a draft",
+      "platform": "ios",
+      "screens": [
+        {
+          "id": "546daefb-c788-4fad-9d35-4a9615ff8218",
+          "image_url": "https://mobbin.com/api/mcp/short/87BdSXc3",
+          "mobbin_url": "https://mobbin.com/screens/546daefb-c788-4fad-9d35-4a9615ff8218",
+          "app_name": "Reddit",
+          "platform": "ios"
+        },
+        {
+          "id": "302f5179-3aca-4211-8218-d89f081ce3eb",
+          "image_url": "https://mobbin.com/api/mcp/short/oKSv2cBm",
+          "mobbin_url": "https://mobbin.com/screens/302f5179-3aca-4211-8218-d89f081ce3eb",
+          "app_name": "Gojek",
+          "platform": "ios"
+        },
+        {
+          "id": "beed654c-76cd-4e1d-b533-038a3c4667d3",
+          "image_url": "https://mobbin.com/api/mcp/short/pjjXz7s2",
+          "mobbin_url": "https://mobbin.com/screens/beed654c-76cd-4e1d-b533-038a3c4667d3",
+          "app_name": "GoPro Quik",
+          "platform": "ios"
+        }
+      ]
+    },
+    {
+      "query": "A review screen showing changed values before and after editing a record",
+      "platform": "ios",
+      "screens": [
+        {
+          "id": "c06533bc-cfd8-40da-b005-c0d4633a4eba",
+          "image_url": "https://mobbin.com/api/mcp/short/zq7hyGJr",
+          "mobbin_url": "https://mobbin.com/screens/c06533bc-cfd8-40da-b005-c0d4633a4eba",
+          "app_name": "GitHub",
+          "platform": "ios"
+        },
+        {
+          "id": "4e13dfe2-c783-4569-be53-efecd1c9f433",
+          "image_url": "https://mobbin.com/api/mcp/short/bFluEN1p",
+          "mobbin_url": "https://mobbin.com/screens/4e13dfe2-c783-4569-be53-efecd1c9f433",
+          "app_name": "MacroFactor",
+          "platform": "ios"
+        },
+        {
+          "id": "54258d9f-cc90-4f59-b111-d7c0cdada5d2",
+          "image_url": "https://mobbin.com/api/mcp/short/PTuvJz12",
+          "mobbin_url": "https://mobbin.com/screens/54258d9f-cc90-4f59-b111-d7c0cdada5d2",
+          "app_name": "Turo",
+          "platform": "ios"
+        }
+      ]
+    },
+    {
+      "query": "A work list grouped by location with item identifiers, statuses, and last updated information",
+      "platform": "ios",
+      "screens": [
+        {
+          "id": "6fd405f8-7297-4f85-8886-006105dd30ec",
+          "image_url": "https://mobbin.com/api/mcp/short/kgacF4GJ",
+          "mobbin_url": "https://mobbin.com/screens/6fd405f8-7297-4f85-8886-006105dd30ec",
+          "app_name": "Airtasker",
+          "platform": "ios"
+        },
+        {
+          "id": "0bac8206-3f12-45f6-93ba-68fd65d78009",
+          "image_url": "https://mobbin.com/api/mcp/short/ltYYnKSL",
+          "mobbin_url": "https://mobbin.com/screens/0bac8206-3f12-45f6-93ba-68fd65d78009",
+          "app_name": "Urban Company",
+          "platform": "ios"
+        },
+        {
+          "id": "42a1ca62-e034-4e60-839f-11948dcc8588",
+          "image_url": "https://mobbin.com/api/mcp/short/7cYlTJtJ",
+          "mobbin_url": "https://mobbin.com/screens/42a1ca62-e034-4e60-839f-11948dcc8588",
+          "app_name": "monday.com",
+          "platform": "ios"
+        }
+      ]
+    },
+    {
+      "query": "A disabled action button with an inline explanation showing what must be completed first",
+      "platform": "ios",
+      "screens": [
+        {
+          "id": "684d7565-e468-42e2-9b30-07ed0a9559ce",
+          "image_url": "https://mobbin.com/api/mcp/short/sjacYO0t",
+          "mobbin_url": "https://mobbin.com/screens/684d7565-e468-42e2-9b30-07ed0a9559ce",
+          "app_name": "Blackbird",
+          "platform": "ios"
+        },
+        {
+          "id": "e059597c-6870-45a0-9aae-02ebc7d5a1e5",
+          "image_url": "https://mobbin.com/api/mcp/short/Bp8A0bIW",
+          "mobbin_url": "https://mobbin.com/screens/e059597c-6870-45a0-9aae-02ebc7d5a1e5",
+          "app_name": "Wise",
+          "platform": "ios"
+        },
+        {
+          "id": "7e725786-004a-4d47-879d-34c5e223acb7",
+          "image_url": "https://mobbin.com/api/mcp/short/azlKjcE5",
+          "mobbin_url": "https://mobbin.com/screens/7e725786-004a-4d47-879d-34c5e223acb7",
+          "app_name": "Tinder",
+          "platform": "ios"
+        }
+      ]
+    },
+    {
+      "query": "A completed session summary with a timestamp, author, and recorded measurements",
+      "platform": "ios",
+      "screens": [
+        {
+          "id": "fd5e4a0c-1c91-43e6-97cb-63fe2623fea6",
+          "image_url": "https://mobbin.com/api/mcp/short/Xpf5rid7",
+          "mobbin_url": "https://mobbin.com/screens/fd5e4a0c-1c91-43e6-97cb-63fe2623fea6",
+          "app_name": "Strava",
+          "platform": "ios"
+        },
+        {
+          "id": "3e06cb93-f155-4124-a177-b1df0a90aaac",
+          "image_url": "https://mobbin.com/api/mcp/short/9yYegt26",
+          "mobbin_url": "https://mobbin.com/screens/3e06cb93-f155-4124-a177-b1df0a90aaac",
+          "app_name": "AllTrails",
+          "platform": "ios"
+        },
+        {
+          "id": "e05a359f-c4be-44e7-93e8-855603393cf2",
+          "image_url": "https://mobbin.com/api/mcp/short/vn5cVcA6",
+          "mobbin_url": "https://mobbin.com/screens/e05a359f-c4be-44e7-93e8-855603393cf2",
+          "app_name": "Slopes",
+          "platform": "ios"
+        }
+      ]
+    }
+  ]
+}

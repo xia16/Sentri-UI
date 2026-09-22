@@ -1,0 +1,27 @@
+/* Task overview is an entrance to units; the numbers support the route choice. */
+.farrowing-phone .task-overview-sheet .task-overview-content{gap:20px}
+.farrowing-phone .task-overview-sheet .task-progress-section{display:flex;flex-direction:column;gap:24px}
+.farrowing-phone .task-overview-sheet .task-overview-content .task-progress{padding:14px 16px;margin:0}
+.farrowing-phone .task-overview-sheet .task-metrics{margin-top:12px;gap:10px}
+.farrowing-phone .task-overview-sheet .task-metrics strong{font-size:23px;font-weight:500;line-height:1.25}
+.farrowing-phone .task-overview-sheet .task-metrics span{font-size:10px}
+.unit-routing-heading{margin-bottom:12px}
+.unit-routing-surface{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff}
+.unit-routing-columns,.unit-route{display:grid;grid-template-columns:minmax(78px,1.5fr) repeat(3,minmax(0,1fr)) 18px;column-gap:8px;align-items:center}
+.unit-routing-columns{padding:12px 14px;background:var(--surface);font-size:9px;color:var(--muted);border-bottom:1px solid var(--line)}
+.unit-routing-columns>span:not(:first-child){text-align:center}
+.unit-route{width:100%;min-height:76px;padding:14px;background:#fff;border:0;text-align:left;font:500 14px var(--sans);color:var(--ink);cursor:pointer}
+.unit-routing-surface>div[role=list]>div+div{border-top:1px solid #e8eddf}
+.unit-route-name{display:flex;flex-direction:column;gap:5px;align-items:flex-start;min-width:0}
+.unit-route-name :is(strong,small){display:block;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.unit-route-name strong{font-size:14px;font-weight:500}
+.unit-route-name small{font-size:9px;color:var(--muted);font-weight:400}
+.unit-route-number{font:400 15px var(--mono);text-align:center}
+.unit-route>svg{width:18px;height:18px;stroke:var(--green)}
+.unit-route:hover{background:#f3f7ef}
+.unit-route:active{background:#eaf2e5}
+.farrowing-phone .unit-route:focus-visible{outline-offset:-3px;border-radius:9px}
+.task-overview-details{padding-top:4px}
+.task-overview-details .task-other-outcomes{margin-top:20px}
+.task-overview-details .task-performance-surface{padding:0}
+@media(max-width:370px){.unit-routing-columns,.unit-route{column-gap:5px;grid-template-columns:minmax(65px,1.35fr) repeat(3,minmax(0,1fr)) 16px;padding-left:12px;padding-right:12px}.unit-route-name strong{font-size:13px}.unit-routing-columns{font-size:9px}}

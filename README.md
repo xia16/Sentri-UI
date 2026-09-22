@@ -4,6 +4,19 @@ A clean full-stack starter running on
 [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
 Drizzle support.
 
+## Sentri UX design system
+
+The `ux/` directory holds the Sentri design system and product research as
+static, linked HTML prototypes — no build step. To browse it:
+
+```bash
+npm run ux
+```
+
+Then open the printed link (`ux/system/home-astra-prototype.html`, the
+current component library). See [ux/README.md](ux/README.md) for the full
+index.
+
 ## Prerequisites
 
 - Node.js `>=22.13.0`

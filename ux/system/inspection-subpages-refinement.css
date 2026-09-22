@@ -1,0 +1,117 @@
+/* Inspection subpages: scoped alignment for drawers, records, editors and dialogs.
+   The roster remains owned by inspection-home-refinement.css. */
+.inspection-phone .sheet,
+.inspection-phone .dialog{color:var(--ink);}
+
+/* All secondary pages use the same readable inset and anchored action footer. */
+.inspection-phone .sheet>.utility-header{min-height:64px;padding-top:8px;padding-bottom:10px;}
+.inspection-phone .sheet>.utility-header h3,
+.inspection-phone .sheet>.utility-header .st-heading-title{overflow-wrap:anywhere;}
+.inspection-phone .sheet>.sheet-body{min-height:0;}
+.inspection-phone .sheet-footer{min-height:68px;padding:12px 18px max(12px,env(safe-area-inset-bottom));gap:10px;}
+.inspection-phone .sheet-footer .button{min-height:44px;}
+.inspection-phone .sheet-footer .text-button{min-height:44px;padding:10px 8px;}
+.inspection-phone .sheet-footer .button.primary[data-action^="save-"]:disabled,
+.inspection-phone .sheet-footer .button.primary[data-action^="record-"]:disabled{opacity:.55;}
+
+/* Action menus and review rows are quiet navigation surfaces, not clinical cards. */
+.inspection-phone .actions-sheet .sheet-body,
+.inspection-phone .review-sheet .sheet-body{padding-top:0;}
+.inspection-phone .actions-subjects{background:var(--surface);border-bottom:1px solid var(--line);}
+.inspection-phone .action-group-label{margin-top:18px;color:var(--muted);}
+.inspection-phone .review-list li:not(.st-row){min-height:56px;padding:8px 0;border-bottom:1px solid #e8eddf;}
+.inspection-phone .review-list li>span{min-width:0;}
+.inspection-phone .review-list strong{font:500 13px var(--mono);}
+.inspection-phone .review-list small{color:var(--muted);}
+
+/* Embedded subject detail, pen detail and production records. */
+.inspection-phone .detail-section{min-width:0;}
+.inspection-phone .detail-line{min-height:44px;padding:8px 0;border-bottom:1px solid #e8eddf;}
+.inspection-phone .detail-line:last-child{border-bottom:0;}
+.inspection-phone .detail-line>strong{font-weight:500;}
+
+.inspection-phone .pig-detail-footer{position:sticky;bottom:0;z-index:2;}
+.inspection-phone .pig-current-tasks{padding:0;border:0;background:transparent;}
+.inspection-phone .record-tabs{margin-left:0;margin-right:0;}
+
+/* Health and condition catalogs keep the selected state visible without changing meaning. */
+.inspection-phone .health-tabs{margin-bottom:10px;}
+.inspection-phone .health-catalog{border-top:1px solid #e8eddf;}
+.inspection-phone .catalog-group h5{padding-top:12px;}
+.inspection-phone .catalog-item{min-height:58px;padding:9px 0;}
+.inspection-phone .catalog-item[aria-selected=true],
+.inspection-phone .catalog-item:has(input:checked){background:var(--green-wash);}
+.inspection-phone .catalog-item input{margin-left:2px;}
+.inspection-phone .selected-conditions{padding:10px 12px;border:1px solid #dfe8d8;border-radius:10px;background:var(--green-wash);color:#40583a;}
+.inspection-phone .choice-list{display:flex;flex-direction:column;gap:0;}
+.inspection-phone .choice-option{min-height:52px;padding:10px 0;border-bottom:1px solid #e8eddf;}
+.inspection-phone .choice-option label{min-height:44px;}
+
+/* Feed overview, feed editor and optional record steps. */
+.inspection-phone .feed-facts,
+.inspection-phone .feed-breakdown{min-width:0;}
+.inspection-phone .feed-pig-rows,.inspection-phone .feed-inline-pigs{border:1px solid #e8eddf;border-radius:12px;overflow:hidden;background:#fff;}
+.inspection-phone .feed-pig-row{min-height:64px;padding:8px 12px;border-bottom:1px solid #e8eddf;}
+.inspection-phone .feed-pig-row:last-child{border-bottom:0;}
+.inspection-phone .feed-reading{font:500 12px var(--mono);}
+.inspection-phone .feed-change-state{max-width:145px;line-height:1.35;}
+.inspection-phone .feed-optional-controls{gap:10px;}
+.inspection-phone .feed-optional-item{min-height:44px;border:1px solid #e8eddf;border-radius:10px;background:var(--surface);}
+.inspection-phone .plan-preview{padding:8px 12px;border:1px solid #dfe8d8;border-radius:10px;background:var(--green-wash);}
+.inspection-phone .individual-ration{border:1px solid #dfe8d8;}
+
+/* Logs and timeline filters. */
+.inspection-phone .log-filter-controls{gap:8px;}
+.inspection-phone .log-category-select select,
+.inspection-phone .log-date-trigger{border-radius:12px;}
+.inspection-phone .log-empty{padding:24px 12px;border:1px dashed var(--line);border-radius:12px;background:var(--surface);}
+.inspection-phone .walk-event{padding:13px 0;}
+.inspection-phone .log-date-options{border-top:1px solid #e8eddf;}
+.inspection-phone .log-date-option{border-bottom:1px solid #e8eddf;}
+
+/* Bulk recording keeps the pig list scrollable while fields and actions stay reachable. */
+.inspection-phone .bulk-action-sheet>.sheet-body{padding-left:18px;padding-right:18px;}
+.inspection-phone .bulk-action-layout{gap:12px;}
+.inspection-phone .bulk-pigs{border:1px solid #e8eddf;border-radius:12px;background:#fff;overflow:hidden;}
+.inspection-phone .bulk-pig-row{min-height:68px;border-top-color:#e8eddf;}
+.inspection-phone .bulk-controls.facts-surface{padding:12px;background:var(--surface);}
+.inspection-phone .bulk-controls .field input,
+.inspection-phone .bulk-controls .field select,
+.inspection-phone .bulk-controls .field textarea{background:#fff;}
+.inspection-phone .bulk-control-grid{gap:10px;}
+.inspection-phone .bulk-condition-button{border-radius:12px;background:#fff;}
+
+/* Pickers and narrow dialogs are stable next steps in the same task flow. */
+.inspection-phone .picker-step>.utility-header{min-height:58px;}
+.inspection-phone .picker-step>.sheet-body{padding-top:12px;}
+.inspection-phone .picker-step .health-catalog,
+.inspection-phone .picker-step .medicine-results{border-top:1px solid #e8eddf;}
+.inspection-phone .medicine-option{min-height:64px;border-bottom:1px solid #e8eddf;}
+.inspection-phone .medicine-option:last-child{border-bottom:0;}
+.inspection-phone .catalog-path{background:var(--paper);}
+.inspection-phone .dialog{border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 28px #26351e18;}
+.inspection-phone .dialog .dialog-body{padding:18px;}
+.inspection-phone .dialog .dialog-footer{padding:12px 18px;gap:10px;border-top:1px solid var(--line);}
+
+/* Unit/environment, equipment and check-in confirmation surfaces. */
+.inspection-phone .unit-detail-section{padding-bottom:20px;}
+.inspection-phone .unit-detail-section:last-child{padding-bottom:0;}
+.inspection-phone .unit-sensor-reading{border:1px solid #e8eddf;background:var(--surface);}
+.inspection-phone .unit-fault-card{border-color:#eadfca;}
+.inspection-phone .unit-empty-state{border:1px dashed var(--line);}
+.inspection-phone .walk-complete{padding-top:18px;}
+.inspection-phone .walk-complete>.complete-mark{background:var(--green-wash);color:var(--green);}
+.inspection-phone .feed-feature{border:1px solid #dfe8d8;background:var(--surface);}
+
+@media(max-width:370px){
+ .inspection-phone .sheet-footer{padding-left:12px;padding-right:12px;}
+ .inspection-phone .sheet>.utility-header{padding-left:12px;padding-right:12px;}
+ .inspection-phone .sheet>.sheet-body{padding-left:12px;padding-right:12px;}
+ .inspection-phone .bulk-action-sheet>.sheet-body{padding-left:12px;padding-right:12px;}
+ .inspection-phone .bulk-control-grid{grid-template-columns:1fr;}
+ .inspection-phone .feed-change-state{max-width:110px;}
+}
+
+/* Keep compact controls reachable on touch screens without changing desktop study chrome. */
+.inspection-phone :is(.catalog-search input,.stage-legend button,.record-tabs button,.inspection-filter-summary .text-button,.unit-summary-heading .text-button,.profile-details-link,.dock-selection-summary .selection-review,.feed-percent-control input[type="number"],.feed-range-labels .text-button,.feed-amount-fields input[type="range"],.log-results .text-button,.instruction-detail .text-button,.bulk-reading input){min-height:44px;}
+.inspection-phone .bulk-controls :is(input,select,textarea){min-height:44px;}

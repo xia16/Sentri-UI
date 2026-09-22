@@ -1,0 +1,41 @@
+/* Shared visual vocabulary for the current Sentri prototypes. */
+:root{--ground:#f3f4ee;--paper:#fff;--app-background:#f6f7f1;--surface:#f8faf5;--ink:#20291f;--muted:#657060;--line:#dfe4d8;--well:#eef1e7;--wash:#eef1e7;--green:#276640;--green-wash:#eaf2e5;--amber:#896017;--red:#a13a2d;--focus:#577fa6}
+body{background:var(--ground);color:var(--ink)}
+:is(.farrowing-phone,.inspection-phone){background:var(--app-background);border-color:#c7d0bd}
+:is(.farrowing-phone,.inspection-phone) :is(.statusbar,.task-header){background:var(--app-background)}
+:is(.farrowing-phone,.inspection-phone) .task-header{padding:4px 18px 10px;gap:12px}
+:is(.farrowing-phone,.inspection-phone) .task-header h2{font-size:22px;line-height:1.25;font-weight:500;letter-spacing:-.6px}
+:is(.farrowing-phone,.inspection-phone) .task-header>.task-return{width:44px;min-width:44px;height:44px;border:1px solid var(--line);border-radius:12px;background:#fff}
+:is(.farrowing-phone,.inspection-phone) .task-activity{padding-left:18px;padding-right:18px;color:var(--muted)}
+:is(.farrowing-phone,.inspection-phone) .task-activity strong{font-weight:500}
+:is(.farrowing-phone,.inspection-phone) :is(.sheet,.dialog){background:var(--paper);color:var(--ink)}
+:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]{background:var(--app-background)}
+:is(.farrowing-phone,.inspection-phone) .sheet>.utility-header{padding-left:18px;padding-right:18px;border-color:var(--line)}
+:is(.farrowing-phone,.inspection-phone) :is(.utility-header h3,.page-header h3,.dialog h3){font-size:20px;line-height:1.3;font-weight:500;letter-spacing:-.4px}
+:is(.farrowing-phone,.inspection-phone) :is(.section-title,.read-heading,.section-heading){font-size:13px;font-weight:500;letter-spacing:0}
+:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]>.sheet-body{padding:18px 18px 24px}
+:is(.farrowing-phone,.inspection-phone) :is(.sheet-footer,.inspect-dock,.room-dock){background:#fff;border-color:var(--line)}
+:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]>.sheet-footer{padding-left:18px;padding-right:18px}
+:is(.farrowing-phone,.inspection-phone) :is(.button,.key){font-weight:500;border-radius:12px;min-height:44px}
+:is(.farrowing-phone,.inspection-phone) .button.secondary{background:#fff;border-color:#bdc7b6;color:var(--ink)}
+:is(.farrowing-phone,.inspection-phone) .button.primary:not(:disabled){background:var(--ink);border-color:var(--ink);color:#fff}
+:is(.farrowing-phone,.inspection-phone) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea){border-color:#bdc7b6;border-radius:12px}
+:is(.farrowing-phone,.inspection-phone) :is(.room-tabs,.segment,.scope-tabs,.health-tabs){background:var(--well);border-color:var(--line)}
+:is(.farrowing-phone,.inspection-phone) :is(.room-tabs,.segment,.scope-tabs,.health-tabs) button{font-weight:400;min-height:44px}
+:is(.farrowing-phone,.inspection-phone) :is(.room-tabs,.segment,.scope-tabs,.health-tabs) :is(button[aria-pressed=true],button[aria-selected=true],button.on){font-weight:500;background:#fff;color:var(--ink)}
+:is(.farrowing-phone,.inspection-phone) :is(button,a,input,select,textarea,summary):focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+/* Action semantics remain explicit; destructive controls never inherit the green treatment. */
+:is(.farrowing-phone,.inspection-phone) .button:is(.danger,.task-end-confirm):not(:disabled){background:var(--red);border-color:var(--red);color:#fff}
+:is(.farrowing-phone,.inspection-phone) .button.task-end-early:not(:disabled){background:#fff1ee;border-color:var(--red);color:var(--red)}
+@media(max-width:370px){
+ :is(.farrowing-phone,.inspection-phone) .task-header{gap:8px;padding-left:12px;padding-right:12px}
+ :is(.farrowing-phone,.inspection-phone) .task-header h2{font-size:20px}
+ :is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]>:is(.utility-header,.sheet-body,.sheet-footer){padding-left:12px;padding-right:12px}
+}
+
+/* Shared room context and explicit record commits. */
+:is(.farrowing-phone,.inspection-phone) .task-context-card{background:#fff;border-color:var(--line);border-radius:18px;box-shadow:0 3px 12px #26351e04}
+:is(.farrowing-phone,.inspection-phone) .tc-task:before{background:var(--line)}
+:is(.farrowing-phone,.inspection-phone) .tc-task:active{background:var(--green-wash)}
+:is(.farrowing-phone,.inspection-phone) .tc-heading{color:var(--muted);font-weight:500}
+.farrowing-phone .button[data-action="deletePhoto"]:not(:disabled){background:var(--red);border-color:var(--red);color:#fff}

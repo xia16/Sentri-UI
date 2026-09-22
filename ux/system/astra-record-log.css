@@ -1,0 +1,7 @@
+/* Shared log typography and timeline geometry for task record drawers. */
+.phone .record-timeline{margin:0 0 22px}
+.phone .record-timeline article{position:relative;margin:0 0 0 5px;padding:0 0 20px 17px;border-left:1px solid #dce2d3}
+.phone .record-timeline article:before{content:'';position:absolute;left:-4px;top:5px;width:7px;height:7px;border-radius:50%;background:#8b9d7d}
+.phone .record-timeline strong{font-size:13px;font-weight:600}
+.phone .record-timeline p{font-size:12px;line-height:1.5;margin:5px 0}
+.phone .record-timeline small{display:block;font-size:11px;line-height:1.5;color:#59644f;margin-top:4px}
