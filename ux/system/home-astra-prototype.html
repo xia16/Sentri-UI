@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Sentri · Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home-astra-prototype.css?v=mobile-components-5">
+  <link rel="stylesheet" href="astra-home-task-card.css?v=mobile-components-5">
+<link rel="stylesheet" href="sentri-visual-foundation.css?v=components-2"><link rel="stylesheet" href="home-subpages-refinement.css?v=mobile-components-5"><link rel="stylesheet" href="sentri-components.css?v=mobile-components-6"><script src="sentri-components.js?v=mobile-components-5"></script></head>
+<body data-st-context="page">
+  <main class="studio">
+    <header class="studio-header"><a class="wordmark" href="home-astra-prototype.html">sentri<span>•</span></a><span>HOME / DESIGN STUDY 04</span><a href="sentri-components-study.html">Component study ↗</a><a href="task-cards-astra-prototype.html">Task card gallery ↗</a><a href="inspection-astra-concept.html?layout=focus">Inspection study ↗</a></header>
+    <div class="stage">
+      <aside class="design-notes">
+        <p class="eyebrow">A PLACE TO BEGIN</p>
+        <h1>See the work.<br>Find your way.</h1>
+        <p class="intro">One overview. Two ways to work.<br>Follow a task across units, or stay in a unit and work through its tasks.</p>
+        <div class="preview-links" aria-label="Preview starting points">
+          <button data-demo="sections"><span>01</span><div><strong>Choose a section</strong><small>A quiet view across the farm</small></div><b>↗</b></button>
+          <button data-demo="overview"><span>02</span><div><strong>Plan by task</strong><small>See what is ready across units</small></div><b>↗</b></button>
+          <button data-demo="unit"><span>03</span><div><strong>Work by place</strong><small>Tasks and inspection, in one unit</small></div><b>↗</b></button>
+        </div>
+        <p class="study-note">390 × 844 phone preview · fictional farm data.<br>Assistant, scanning and records are previews. No live farm data is read or changed.</p>
+        <button class="reset-study" id="reset-study">Reset sample work ↻</button>
+        <div class="sync-demo"><label for="sync-demo">Connection preview</label><select id="sync-demo"><option value="offline">No signal · 3 pending</option><option value="online">Connected · ready to upload</option><option value="failed">Upload fails · retry needed</option><option value="synced">All records uploaded</option></select><p>Sample records only. Uploads are simulated.</p></div>
+        <div class="sync-demo"><label for="work-preview">Work preview</label><select id="work-preview"><option value="mixed">Mixed day · due, waiting & completed</option><option value="active">Work due now</option><option value="waiting">Waiting for next work</option><option value="round-complete">Current work recorded</option><option value="ready">All required work recorded</option></select><p>Illustrative schedule states. Completed tasks remain below open work.</p></div>
+        <div class="sync-demo"><label for="attention-preview">Unit attention preview</label><select id="attention-preview"><option value="current">Mixed attention</option><option value="clear">No flagged items</option><option value="health">Health only</option><option value="feed">Feed only</option><option value="maintenance">Maintenance only</option><option value="busy">High counts · wrapping chips</option><option value="unknown">Summary unavailable</option></select><p>Fictional attention snapshots, separate from task progress. Health excludes findings with no action needed.</p></div>
+      </aside>
+      <section class="device" aria-label="Sentri interactive homepage">
+        <div class="statusbar"><span>9:41</span><span class="device-status" aria-hidden="true">▂▄▆ &nbsp; ▰</span></div>
+        <div id="app"></div>
+        <div id="overlay"></div>
+        <div id="notice" role="status" aria-live="polite"></div>
+      </section>
+      <aside class="margin-note"><span class="tiny-orbit"></span><p>YOUR WORK,<br>IN CONTEXT.</p><div class="vertical-rule"></div><p>SECTION<br>↓<br>UNIT<br>↓<br>PEN</p></aside>
+    </div>
+    <footer class="studio-footer"><span>Astra / Sentri · First homepage direction</span><span>Shared controls. Clear context. Room to work.</span></footer>
+  </main>
+  <script src="astra-home-task-card.js?v=header-alignment-4"></script>
+  <script src="home-astra-prototype.js?v=mobile-components-5"></script>
+</body>
+</html>

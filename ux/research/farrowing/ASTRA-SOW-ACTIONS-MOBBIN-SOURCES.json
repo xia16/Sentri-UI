@@ -1,0 +1,250 @@
+{
+  "date": "2026-09-17",
+  "task_intent": "Refine a mobile animal-record actions drawer with many state-dependent actions and fast category navigation.",
+  "note": "Metadata from searches whose inline previews were inspected. Image URLs expire; use canonical Mobbin URLs for citations.",
+  "results": [
+    {
+      "search": 0,
+      "screens": [
+        {
+          "index": 0,
+          "id": "408c71ad-183a-460f-af83-07337c30126b",
+          "image_url": "https://mobbin.com/api/mcp/short/SZnttC6w",
+          "mobbin_url": "https://mobbin.com/screens/408c71ad-183a-460f-af83-07337c30126b",
+          "app_name": "MacroFactor",
+          "platform": "ios"
+        },
+        {
+          "index": 1,
+          "id": "fa732879-924a-4416-b4e8-cae48780e8be",
+          "image_url": "https://mobbin.com/api/mcp/short/qtTa6Us9",
+          "mobbin_url": "https://mobbin.com/screens/fa732879-924a-4416-b4e8-cae48780e8be",
+          "app_name": "Shopee",
+          "platform": "ios"
+        },
+        {
+          "index": 2,
+          "id": "5cebc585-9255-410b-8d29-842d28213f1f",
+          "image_url": "https://mobbin.com/api/mcp/short/Q3kWyAIr",
+          "mobbin_url": "https://mobbin.com/screens/5cebc585-9255-410b-8d29-842d28213f1f",
+          "app_name": "Urban Company",
+          "platform": "ios"
+        },
+        {
+          "index": 3,
+          "id": "04c8596a-0694-4bbe-a6c5-153971605d61",
+          "image_url": "https://mobbin.com/api/mcp/short/StFJxpdi",
+          "mobbin_url": "https://mobbin.com/screens/04c8596a-0694-4bbe-a6c5-153971605d61",
+          "app_name": "Forest",
+          "platform": "ios"
+        },
+        {
+          "index": 4,
+          "id": "8fb1297d-c390-4a3e-8acc-199f278b5a38",
+          "image_url": "https://mobbin.com/api/mcp/short/PYzJ5GwD",
+          "mobbin_url": "https://mobbin.com/screens/8fb1297d-c390-4a3e-8acc-199f278b5a38",
+          "app_name": "Skip",
+          "platform": "ios"
+        }
+      ]
+    },
+    {
+      "search": 1,
+      "flows": [
+        {
+          "index": 0,
+          "id": "c88017f5-ee07-4173-a1cd-e105c10c8640",
+          "name": "Adding an exersice",
+          "actions": [
+            "Logging & Tracking"
+          ],
+          "screen_count": 8,
+          "mobbin_url": "https://mobbin.com/flows/c88017f5-ee07-4173-a1cd-e105c10c8640",
+          "app_name": "MyFitnessPal",
+          "platform": "ios",
+          "screens": [
+            {
+              "screen_id": "f68d8d61-d035-43ff-8ec6-a135b7be7e3e",
+              "image_url": "https://mobbin.com/api/mcp/short/xbA2tOIp",
+              "position": 1
+            },
+            {
+              "screen_id": "9b9b4842-45dc-4787-befe-49eaf5370aef",
+              "image_url": "https://mobbin.com/api/mcp/short/H2tJk9LF",
+              "position": 2
+            },
+            {
+              "screen_id": "ea2bb5c8-7734-4fd1-bc9e-b338fb15e8ab",
+              "image_url": "https://mobbin.com/api/mcp/short/0hZoZWYh",
+              "position": 3
+            },
+            {
+              "screen_id": "6742fecb-c4a4-4f84-af58-9e48f3fe058d",
+              "image_url": "https://mobbin.com/api/mcp/short/QTfQMi2x",
+              "position": 4
+            },
+            {
+              "screen_id": "73d48d63-002e-40ae-82ed-5b46fb5a218e",
+              "image_url": "https://mobbin.com/api/mcp/short/Txe4OQW4",
+              "position": 5
+            },
+            {
+              "screen_id": "91145d30-3e04-4f09-8a55-35940f61fdda",
+              "image_url": "https://mobbin.com/api/mcp/short/nnIdIy2M",
+              "position": 6
+            },
+            {
+              "screen_id": "ad87a8d7-442f-4b3a-9f91-7230cb12e06e",
+              "image_url": "https://mobbin.com/api/mcp/short/2qkuvjLL",
+              "position": 7
+            },
+            {
+              "screen_id": "ed78b750-eeec-4cda-a849-200579313ab1",
+              "image_url": "https://mobbin.com/api/mcp/short/fDzu4JII",
+              "position": 8
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "id": "242a06d7-37fb-4327-880c-f3247b6702a3",
+          "name": "Add activities",
+          "actions": [],
+          "screen_count": 3,
+          "mobbin_url": "https://mobbin.com/flows/242a06d7-37fb-4327-880c-f3247b6702a3",
+          "app_name": "Fitbit",
+          "platform": "ios",
+          "screens": [
+            {
+              "screen_id": "a525a9e9-8d68-4b25-9204-a22eace4ddbd",
+              "image_url": "https://mobbin.com/api/mcp/short/sTvT1c8Z",
+              "position": 1
+            },
+            {
+              "screen_id": "9bae9235-aacc-4c91-99ab-b5405fcda75c",
+              "image_url": "https://mobbin.com/api/mcp/short/PY2OyOsA",
+              "position": 2
+            },
+            {
+              "screen_id": "e04b81b9-1663-4f5a-8634-0a3bc457df69",
+              "image_url": "https://mobbin.com/api/mcp/short/D1vEETAU",
+              "position": 3
+            }
+          ]
+        }
+      ],
+      "page": 1,
+      "has_next_page": true
+    },
+    {
+      "search": 2,
+      "screens": [
+        {
+          "index": 0,
+          "id": "445bf9a9-0708-4128-b6be-56f3336ebf49",
+          "image_url": "https://mobbin.com/api/mcp/short/A6mbMP9X",
+          "mobbin_url": "https://mobbin.com/screens/445bf9a9-0708-4128-b6be-56f3336ebf49",
+          "app_name": "Uber Eats",
+          "platform": "ios"
+        },
+        {
+          "index": 1,
+          "id": "0c5b88b9-72cf-48ac-a4b2-6cc87b8b16cb",
+          "image_url": "https://mobbin.com/api/mcp/short/nw9WvxJi",
+          "mobbin_url": "https://mobbin.com/screens/0c5b88b9-72cf-48ac-a4b2-6cc87b8b16cb",
+          "app_name": "X",
+          "platform": "ios"
+        },
+        {
+          "index": 2,
+          "id": "fcf4b73d-d178-4907-8dd5-2b7e200e2682",
+          "image_url": "https://mobbin.com/api/mcp/short/FiYc5cwq",
+          "mobbin_url": "https://mobbin.com/screens/fcf4b73d-d178-4907-8dd5-2b7e200e2682",
+          "app_name": "Base",
+          "platform": "ios"
+        },
+        {
+          "index": 3,
+          "id": "0aa4a1db-324e-493e-9a80-4036ffdb004d",
+          "image_url": "https://mobbin.com/api/mcp/short/QEv7CZTc",
+          "mobbin_url": "https://mobbin.com/screens/0aa4a1db-324e-493e-9a80-4036ffdb004d",
+          "app_name": "Glovo",
+          "platform": "ios"
+        },
+        {
+          "index": 4,
+          "id": "4b1a7a6e-f93c-486f-97e5-736865654014",
+          "image_url": "https://mobbin.com/api/mcp/short/FuJpbVht",
+          "mobbin_url": "https://mobbin.com/screens/4b1a7a6e-f93c-486f-97e5-736865654014",
+          "app_name": "Lyft",
+          "platform": "ios"
+        }
+      ]
+    },
+    {
+      "search": 3,
+      "screens": [
+        {
+          "index": 0,
+          "id": "6d541d61-ef40-4190-a91a-815925e83657",
+          "image_url": "https://mobbin.com/api/mcp/short/YRm3LRpm",
+          "mobbin_url": "https://mobbin.com/screens/6d541d61-ef40-4190-a91a-815925e83657",
+          "app_name": "Notion",
+          "platform": "ios"
+        },
+        {
+          "index": 1,
+          "id": "7dd0e017-2e66-4c15-a310-46e40740c904",
+          "image_url": "https://mobbin.com/api/mcp/short/3dqHO6VH",
+          "mobbin_url": "https://mobbin.com/screens/7dd0e017-2e66-4c15-a310-46e40740c904",
+          "app_name": "Notion",
+          "platform": "ios"
+        },
+        {
+          "index": 2,
+          "id": "d8873d9d-0ce3-43a6-aa75-820d932ad1b1",
+          "image_url": "https://mobbin.com/api/mcp/short/oQtShWvc",
+          "mobbin_url": "https://mobbin.com/screens/d8873d9d-0ce3-43a6-aa75-820d932ad1b1",
+          "app_name": "Notion",
+          "platform": "ios"
+        }
+      ]
+    },
+    {
+      "search": 4,
+      "flows": [
+        {
+          "index": 0,
+          "id": "d589d191-5373-49ba-afe0-4c2db878572c",
+          "name": "Choosing an item",
+          "actions": [
+            "Selecting & Choosing"
+          ],
+          "screen_count": 3,
+          "mobbin_url": "https://mobbin.com/flows/d589d191-5373-49ba-afe0-4c2db878572c",
+          "app_name": "Taco Bell",
+          "platform": "ios",
+          "screens": [
+            {
+              "screen_id": "fb826ff5-7986-4d1d-bcf8-282044425652",
+              "image_url": "https://mobbin.com/api/mcp/short/UIJZAREF",
+              "position": 1
+            },
+            {
+              "screen_id": "5eb009e5-8ad0-43fa-bef7-a77c97929410",
+              "image_url": "https://mobbin.com/api/mcp/short/SbCSiyW3",
+              "position": 2
+            },
+            {
+              "screen_id": "17d1663b-6609-4731-b715-c4f5c58d8cfb",
+              "image_url": "https://mobbin.com/api/mcp/short/RUBaUsaw",
+              "position": 3
+            }
+          ]
+        }
+      ],
+      "page": 1,
+      "has_next_page": true
+    }
+  ]
+}

@@ -1,7 +1,0 @@
-export interface TabsProps {
-  /** Strings or { value, label, count? } */
-  tabs: Array<string | { value: string; label: string; count?: number }>;
-  value: string;
-  onChange?: (value: string) => void;
-  style?: React.CSSProperties;
-}

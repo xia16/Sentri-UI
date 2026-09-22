@@ -1,0 +1,114 @@
+/* Farrowing leaf views: scoped alignment after the shared Sentri foundation.
+   Task overview, progress, and unit-routing rules live in the parent stylesheet. */
+.farrowing-phone{--subpage-pad:18px;--subpage-radius:18px;--subpage-wash:var(--surface,#f8faf5)}
+.farrowing-phone :is(.room-home,.room-scroll,.room-utility,.feature-page,.detail-sheet,.record-page){color:var(--ink)}
+
+/* Room list, pen groups, search, scan, and filter entry points. */
+.farrowing-phone .room-scroll{background:var(--app-background,#f6f7f1)}
+.farrowing-phone .room-controls{background:var(--app-background,#f6f7f1);border-bottom:1px solid transparent}
+.farrowing-phone .room-tabs{border:1px solid var(--line);padding:3px}
+.farrowing-phone .room-tabs button{color:var(--muted);font-weight:400}
+.farrowing-phone .room-tabs button[aria-pressed=true]{color:var(--ink);font-weight:500;background:var(--paper,#fff)}
+.farrowing-phone .room-filter-button,.farrowing-phone .dock-search{border-color:var(--line);background:var(--paper,#fff)}
+.farrowing-phone .room-list{gap:12px;padding-bottom:22px}
+.farrowing-phone .pen-card{border-color:var(--line);border-radius:var(--subpage-radius);box-shadow:0 2px 8px rgba(32,41,31,.04)}
+.farrowing-phone .room-list .pen-top{background:var(--surface,#f8faf5);border-color:var(--line);padding-left:14px;padding-right:14px}
+.farrowing-phone .room-sow-row{min-height:76px;padding:13px 14px;border-color:var(--line)}
+.farrowing-phone .room-sow-row:active{background:var(--green-wash,#eaf2e5)}
+.farrowing-phone .room-sow-row .row-main{font-weight:500}
+.farrowing-phone .room-sow-row .row-detail{min-width:0}
+.farrowing-phone .room-sow-row :is(.row-main,.row-sub){display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.farrowing-phone .room-empty{padding:28px 16px;text-align:center}
+.farrowing-phone .room-empty strong{font-weight:500}
+.farrowing-phone .room-dock{padding-top:12px}
+.farrowing-phone .dock-scan{background:var(--ink);border-color:var(--ink)}
+.farrowing-phone .room-home{padding:32px 20px;background:var(--app-background,#f6f7f1);min-height:100%}
+.farrowing-phone .room-home h2{font-weight:500}
+.farrowing-phone .home-task{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%;margin-top:22px;padding:17px 16px;border:1px solid var(--line);border-radius:var(--subpage-radius);background:var(--paper,#fff);text-align:left;box-shadow:0 2px 8px rgba(32,41,31,.04)}
+.farrowing-phone .home-task-title{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:500}
+.farrowing-phone .home-task-states{font-size:11px;color:var(--muted)}
+.farrowing-phone .home-resume{font-size:11px;color:var(--green)}
+.farrowing-phone :is(.room-filter-sheet,.picker-sheet,.room-search-sheet) .sheet-body{padding-top:20px}
+.farrowing-phone .filter-section{border-color:var(--line)}
+.farrowing-phone .due-options button,.farrowing-phone .parity-options button,.farrowing-phone .pen-cell{border-color:var(--line)}
+.farrowing-phone .due-options button[aria-pressed=true],.farrowing-phone .parity-options button[aria-pressed=true],.farrowing-phone .pen-cell.current{background:var(--green-wash,#eaf2e5);border-color:#8ea88a;color:var(--ink)}
+.farrowing-phone .room-search-label input{border-color:#bdc7b6}
+.farrowing-phone .search-result{border-color:var(--line)}
+.farrowing-phone .scanner-demo{background:var(--well);border:1px solid var(--line)}
+
+/* Pen detail, feed guidance, notes, equipment faults, and pen log. */
+.farrowing-phone :is(.pen-detail-sheet,.pen-form-sheet,.pen-feed-page,.pen-log-sheet) .sheet-body{padding:20px var(--subpage-pad) 24px}
+.farrowing-phone .pen-detail-sheet .sheet-body{display:flex;flex-direction:column;gap:22px}
+
+
+
+.farrowing-phone .pen-notices{gap:10px;margin-bottom:0}
+.farrowing-phone .pen-notice{border-color:var(--line);border-radius:12px;background:var(--surface,#f8faf5)}
+.farrowing-phone .pen-notice-fault{background:#fff8ea;border-color:#ead9b8}
+.farrowing-phone .pen-detail-copy{font-size:13px;line-height:1.7}
+.farrowing-phone .pen-detail-meta{font-family:var(--mono);font-size:10px}
+.farrowing-phone .pen-field{gap:8px}
+.farrowing-phone .pen-field :is(input,select,textarea){border-color:#bdc7b6}
+
+/* Count, death, correction, finish, and completed record sheets. */
+.farrowing-phone .sheet[data-view=count] .count-area{background:var(--green-wash,#eaf2e5);border-radius:16px;padding:16px 12px 10px}
+.farrowing-phone .sheet[data-view=count] .count-label{color:#356547;font-weight:500}
+.farrowing-phone .sheet[data-view=count] .hero-value{color:#203d2b}
+.farrowing-phone .sheet[data-view=count] .hero-stepper .key[data-value="1"]{background:var(--green);border-color:var(--green)}
+.farrowing-phone .sheet[data-view=count] .record-inline-actions .record-toolbar-action{border-color:var(--line);font-weight:500}
+.farrowing-phone .sheet[data-view=finish] .finish-body,.farrowing-phone .sheet[data-view=locked] .completed-record-body{padding-top:18px}
+.farrowing-phone .sheet[data-view=finish] .finish-totals,.farrowing-phone .sheet[data-view=locked] .facts-surface{padding:14px}
+.farrowing-phone .sheet[data-view=finish] :is(.finish-condition,.finish-extras){border-color:var(--line);border-radius:var(--subpage-radius)}
+.farrowing-phone .sheet[data-view=death] .sheet-body,.farrowing-phone .sheet[data-view=edit] .edit-body{padding-top:16px}
+.farrowing-phone .sheet[data-view=death] .segment,.farrowing-phone .sheet[data-view=edit] .change-summary{border:1px solid var(--line)}
+.farrowing-phone .sheet[data-view=death] .danger-band{background:#fff1ee;border-color:#edc8c0;color:var(--red)}
+.farrowing-phone .sheet[data-view=edit] .change-summary{background:#fff5df;border-color:#efdbb0;color:var(--amber)}
+.farrowing-phone .sheet[data-view=editFinish] .edit-body{padding-top:16px}
+.farrowing-phone .sheet[data-view=locked] .record-inline-actions{padding-top:4px}
+
+/* History and death breakdown pages. */
+.farrowing-phone .detail-sheet[data-size] .sheet-body{padding:20px var(--subpage-pad) 24px}
+.farrowing-phone .death-breakdown-facts{margin:0;border:1px solid var(--line);border-radius:var(--subpage-radius);background:var(--surface,#f8faf5);padding:4px 14px}
+.farrowing-phone .death-breakdown-facts>div{display:flex;justify-content:space-between;align-items:center;min-height:48px;border-bottom:1px solid var(--line)}
+.farrowing-phone .death-breakdown-facts>div:last-child{border-bottom:0}
+.farrowing-phone .death-breakdown-facts dd{font:500 15px var(--mono);margin:0}
+
+/* Linked piglet care, identity, foster, mortality, marker, and reconciliation pages. */
+.farrowing-phone .feature-page>.utility-header{background:var(--surface,#f8faf5)}
+.farrowing-phone .feature-page>.sheet-body{gap:18px}
+.farrowing-phone :is(.feature-callout,.feature-summary){border:1px solid var(--line);background:var(--surface,#f8faf5)}
+.farrowing-phone .feature-tabs{border:1px solid var(--line)}
+.farrowing-phone .processing-day,.farrowing-phone .piglet-roster,.farrowing-phone .foster-sows{border-color:var(--line)}
+.farrowing-phone .processing-day-head{background:var(--surface,#f8faf5)}
+.farrowing-phone .processing-task,.farrowing-phone .piglet-row,.farrowing-phone .foster-sows button{border-color:var(--line)}
+.farrowing-phone .piglet-row-main{font-weight:400}
+.farrowing-phone .feature-tool{border-color:#bdc7b6;color:var(--green)}
+.farrowing-phone .feature-choice button[aria-pressed=true],.farrowing-phone .foster-sows button[aria-pressed=true]{background:var(--green-wash,#eaf2e5);border-color:#8ea88a;color:var(--ink)}
+.farrowing-phone .feature-warning{background:#fff5df;border:1px solid #efdbb0;color:var(--amber)}
+.farrowing-phone .feature-photo{border-color:#9cac99;background:var(--surface,#f8faf5)}
+.farrowing-phone .feature-page .sheet-footer{padding-top:14px}
+
+/* Task closure review and receipt; overview selectors stay with the parent. */
+.farrowing-phone .task-end-sheet .sheet-body{gap:16px}
+.farrowing-phone .task-end-sheet .task-warning-card{border-color:#efdbb0;background:#fff5df}
+.farrowing-phone .task-end-sheet .task-review-sows{border-top:1px solid var(--line)}
+.farrowing-phone .task-end-sheet .task-review-sow{min-height:68px;border-color:var(--line)}
+.farrowing-phone .task-end-sheet .task-review-sow strong{font-weight:500}
+.farrowing-phone .task-end-sheet .task-review-sow span:first-child{min-width:0;overflow:hidden}
+.farrowing-phone .task-end-sheet .task-review-sow span:first-child :is(strong,small){display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.farrowing-phone .task-end-sheet .task-death-review{padding:0 14px 12px}
+.farrowing-phone .task-end-sheet .task-death-litter{border-color:var(--line)}
+.farrowing-phone .task-end-sheet .task-ended-mark{background:var(--green-wash,#eaf2e5)}
+
+@media(max-width:370px){
+ .farrowing-phone{--subpage-pad:12px}
+ .farrowing-phone .room-sow-row{padding-left:11px;padding-right:11px}
+ .farrowing-phone .room-home{padding-left:14px;padding-right:14px}
+ .farrowing-phone :is(.detail-sheet,.pen-detail-sheet,.pen-form-sheet,.pen-feed-page,.pen-log-sheet) .sheet-body{padding-left:var(--subpage-pad);padding-right:var(--subpage-pad)}
+ .farrowing-phone .feature-page>.sheet-body{gap:14px}
+}
+
+@media(prefers-reduced-motion:reduce){.farrowing-phone .button:active{transform:none}}
+.farrowing-phone :is(.processing-task,.piglet-row-main,.foster-sows button,.task-warning-card,.task-review-sow) :is(strong,small){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.farrowing-phone .processing-task>span:last-child,.farrowing-phone .task-warning-copy{min-width:0;overflow:hidden}
+.farrowing-phone .piglet-row-main>span,.farrowing-phone .task-warning-copy>span,.farrowing-phone .feature-door :is(strong,small){display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
