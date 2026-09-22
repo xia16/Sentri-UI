@@ -1,0 +1,30 @@
+# Farrowing interaction sources — Astra research
+
+Researched 2026-09-11. Scope: presentation of the existing farrowing workflow. These are primary-source checks, separate from Mobbin visual references. No HTML changed.
+
+## Constraints and interpretation
+
+Read `RULINGS.md`. Preserve the room-to-sheet relationship, unboxed Alive total with −/+, receipt of the visit's change, correction through Edit, staged death/correction drafts, Finish classification and hold-to-lock, and separate Farrowing record page. Do not add foster flows or turn the locked face into its full ledger.
+
+`RULINGS.md` retains contradictory historical bullets, including whether the counting sheet has a Close button. The parent review identifies the later explicit bar ruling and the latest rendered source/user screenshots as `Close · Finish farrowing`; retain that behavior. Do not use a generic platform guideline to silently settle a product-rule conflict or alter save semantics.
+
+## Six findings to apply
+
+1. **Keep the task attached to its room.** Apple describes sheets as scoped tasks associated with the current context, supports expanding sheet heights and visible grabbers, and advises against stacking sheets. **Application:** retain the visible room backdrop and sheet identity; use a taller scrolling sheet when Finish/Edit needs room, with clear transitions within the sheet flow. Do not turn counting into a standalone full-screen dashboard. This is a design recommendation consistent with the local sheet ruling, not proof that every screen must fit a half-height sheet. [Apple: Sheets](https://developer.apple.com/design/human-interface-guidelines/sheets) ([official page content](https://developer.apple.com/tutorials/data/design/human-interface-guidelines/sheets.json)).
+
+2. **Make count controls reliably targetable before tightening spacing.** WCAG 2.2 AA target-size minimum is 24 × 24 CSS px with specified exceptions; the enhanced AAA criterion is 44 × 44 CSS px, also with exceptions. **Application:** use at least 44 × 44 CSS px for independent controls and retain spacious stepper rows; reduce redundant section padding instead of shrinking ± hit areas. Entire disclosure rows can carry their navigation target. The 44 px choice is an enhanced baseline, not a claim that AA requires 44. [W3C: Target Size Minimum](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum), [Target Size Enhanced](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced).
+
+3. **Build hierarchy with grouping, size and weight.** Apple recommends consistent text styles that communicate importance and scale with larger text settings. **Application:** keep Alive the dominant value during counting; group its receipt immediately below it. At Finish/After, reuse the Born/Alive/Dead summary, with causes subordinate. Use clear section labels for finish observations and provenance rather than giving every line the same visual weight. Preserve the suite's typefaces; the guidance does not require adopting Apple's system font. [Apple: Typography](https://developer.apple.com/design/human-interface-guidelines/typography) ([official page content](https://developer.apple.com/tutorials/data/design/human-interface-guidelines/typography.json)).
+
+4. **Quiet must still be legible.** WCAG AA requires 4.5:1 for ordinary text and 3:1 for qualifying large text. Essential non-text control/state cues need 3:1 against adjacent colors, with exceptions; not every decorative divider needs 3:1. **Application:** verify secondary labels, cause counts, timestamps, stepper glyphs and checkbox states against their actual backgrounds. Demote metadata through grouping and weight before making it faint. Don't claim that a pale button boundary fails solely from its fill if contrasting content already identifies the control. [W3C: Contrast Minimum](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum), [Non-text Contrast](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast).
+
+5. **Keep save feedback close to the count and available to assistive technology.** WCAG's status-message criterion requires programmatically determinable status updates without moving focus; it does not mandate toast messages. **Application:** retain the inline `Saved · +4 this visit` receipt, updating a polite, atomic status region so the announced message has context. Do not announce only a bare number or move focus on each tap. Dead/Edit draft feedback must describe the draft until Save; presentation must never imply that staged edits are already posted. [W3C: Status Messages](https://www.w3.org/WAI/WCAG22/Understanding/status-messages).
+
+6. **Let content grow; do not compress or clip the phone.** WCAG requires text enlargement to 200% without losing content/functionality and reflow for ordinary vertically scrolling content at a width equivalent to 320 CSS px. **Application:** avoid fixed-height cards that shrink inside flex columns, permit cause lines and long names to wrap, and ensure the last field remains reachable above an action footer. Test the actual individual screen at 320 and typical phone widths, plus text enlargement; a side-by-side desktop presentation alone is insufficient. [W3C: Resize Text](https://www.w3.org/WAI/WCAG22/Understanding/resize-text), [Reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow).
+
+## Limits
+
+- These sources establish platform recommendations and accessibility baselines; they do not establish optimal barn spacing, glove accuracy, glare tolerance or faster farrowing work. Claims about those need device testing with actual workers, gloves and lighting.
+- Apple sheets' generic Cancel/Done examples do not match this product's immediate-recording versus staged-draft distinction; do not copy their button labels or commit behavior.
+- This is guidance research, not a WCAG conformance audit. No compliance claim is made for the existing HTML or proposed concept.
+- Research does not justify changing floor calculations, posted/draft boundaries, correction provenance, death classifications or lock behavior.

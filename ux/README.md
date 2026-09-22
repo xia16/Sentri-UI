@@ -3,12 +3,16 @@
 ## system/ — the design system and its screens (start here)
 | File | What it is |
 |---|---|
+| [home-astra-prototype.html](system/home-astra-prototype.html) | Home / today — the entrance |
+| [inspection-astra-concept.html](system/inspection-astra-concept.html) | The inspection walk |
+| [farrowing-astra-concept.html](system/farrowing-astra-concept.html) | The farrowing flow |
 | [components.html](system/components.html) | The parts and the laws: row grammar, record-sheet shell + field kit, the chassis, the entrance (verb sheet), detail-page grammar, the consistency contract |
-| [screens.html](system/screens.html) | The 8 production tasks rendered on the unified list |
-| [check-in.html](system/check-in.html) | The check-in: pen cards, batch cards, feed, triage, pen sheet, unit sheet |
-| [workflows.html](system/workflows.html) | **The review deck** — 23 workflows end to end; pick a chip, swipe inside |
 | [motion.html](system/motion.html) | Mark-to-move motion spec, with the front-end implementation contract |
-| [farrowing.html](system/farrowing.html) | The farrowing suite: room, session sheet, piglet death, day-cohort, tag/weigh conveyor, count doors, batch close |
+| [farrowing-contract.html](system/farrowing-contract.html) | The farrowing state contract (developer handoff) |
+
+Shared layer — every screen renders from these: `sentri-components.js/.css` (heading · panel · facts · row · log · field · picker field + sheet · segment · icon button), `sentri-icons.js` (one icon registry), `sentri-visual-foundation.css` (tokens), `astra-surfaces.js/.css` (sheet/page presentation). Guardrails: `no-native-selects.test.cjs`, `icon-registry.test.cjs` — run all suites with `node <file>` in `system/`.
+
+Superseded renders live in [archive/](archive/): the old farrowing suite (`farrowing.html`), the unified task list (`screens.html`), the check-in study (`check-in.html`), and the workflow review deck (`workflows.html`).
 
 ## model/ — the product model
 | File | What it is |

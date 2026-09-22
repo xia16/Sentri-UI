@@ -1,0 +1,248 @@
+/*
+ * Sentri home leaf refinement
+ *
+ * Loaded after the home and task-card study styles.  Selectors stay inside
+ * the phone device or the gallery's detail surface so the study chrome and
+ * shared task-card composition remain untouched.
+ */
+
+/* Shared leaf rhythm and readable secondary copy. */
+.device .unit-hub-unified{background:#f1f6e8;border:1px solid #c8d7b7;border-radius:18px;overflow:hidden;margin-bottom:24px}
+.device .unit-hub-unified .unit-hub-inspect{border:0;border-radius:0;background:transparent;padding:16px;gap:12px}
+.device .unit-hub-unified .unit-hub-inspect>svg:first-child{align-self:center;width:38px;height:38px;padding:9px;border-radius:11px;background:#2d6841;color:#fff;flex:none}
+.device .unit-hub-unified .unit-hub-inspect>span{font-size:15px;color:#244b30}
+.device .unit-hub-unified .unit-hub-inspect>svg:last-child{color:#2d6841}
+.device .unit-hub-unified .unit-hub-inspect small{font-size:11px;margin-top:5px}
+.device .unit-hub-unified .unit-hub-inspect .unit-last-check{font-size:10px;margin-top:7px}
+.device .unit-check-row{display:flex;align-items:center;gap:8px;margin:-3px 16px 13px}
+.device .unit-check-row>small{font-size:10px;line-height:1.4;color:var(--muted)}
+.device .unit-attention{padding:0 16px 15px}
+.device .unit-attention-chips{display:flex;flex-wrap:wrap;gap:7px}
+.device .unit-attention-chip{display:inline-flex;align-items:center;gap:5px;max-width:100%;justify-content:center;padding:6px 8px;background:#fffefb;border:1px solid #d3dfc3;border-radius:8px;line-height:1.4;color:#36563d}
+.device .unit-attention-chip>svg{width:14px;height:14px;flex:none;color:#527c39}
+.device .unit-attention-chip>span{font-size:10px}
+.device .unit-attention-chip>strong{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;margin-left:2px}
+.device .unit-attention-clear,.device .unit-attention-unknown{display:flex;align-items:center;gap:6px;font-size:11px;line-height:1.5;color:var(--muted);margin:0}
+.device .unit-attention-clear>svg{width:14px;height:14px;color:var(--green)}
+.device .unit-attention-chips+.unit-attention-unknown{margin-top:10px}
+.device .unit-hub-unified .unit-hub-environment{margin:0;border:0;border-top:1px solid #d2e1bb;border-radius:0;padding:10px 16px;background:#fffef8;gap:6px}
+.device .unit-environment-label{font-size:10px;color:var(--muted)}
+.device .unit-environment-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%}
+.device .unit-environment-bottom>svg{width:14px;height:14px;color:#657060;flex:none}
+.device .unit-hub-unified .unit-live-readings{gap:14px;flex-wrap:wrap}
+.device .unit-hub-unified .unit-live-readings>span{font-size:11px;gap:3px}
+.device .unit-hub-unified .unit-live-readings small{font-size:9px}
+.device .unit-device-count{font-size:11px}
+.device .unit-hub-unified button:hover{background:#e4f1ca}
+.device .unit-hub-unified button:focus-visible{outline:2px solid var(--focus);outline-offset:-3px}
+@media(max-width:370px){.device .unit-attention{padding-left:12px;padding-right:12px}.device .unit-check-row{margin-left:12px;margin-right:12px}.device .unit-hub-unified .unit-live-readings{gap:8px}}
+
+/* Long row copy stays one line on the phone; the full accessible name remains
+   available from the row/button itself. */
+.device .section-card-top strong,
+.device .section-card .population,
+.device .route-copy strong,
+.device .route-copy small,
+.device .tool-row strong,
+.device .tool-row small,
+.device .upcoming-row > span,
+.device .upcoming-row > div,
+.device .upcoming-row small,
+.device .sync-record span,
+.device .sync-record small,
+.device .hc-heading strong,
+.device .hc-heading small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.device .app-scroll.screen-enter,
+.device .environment-page,
+.device .maintenance-page {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+.device .page-head {
+  min-height: 76px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  background: #f8faf5;
+}
+
+.device .page-head h2 { font-weight: 500; }
+.device .page-head p,
+.device .work-note,
+.device .helper { color: #657060; }
+.device .preview-badge { background: #fff; }
+
+/* Section and unit pickers: whole rows are the target and selected state is
+   carried by surface/border contrast rather than a green action treatment. */
+.device .section-list { gap: 10px; }
+
+.device .section-card {
+  min-height: 76px;
+  border-color: #dfe4d8;
+  box-shadow: 0 1px 2px #20291f08;
+}
+
+.device .section-card.selected {
+  background: #eaf2e5;
+  border-color: #a9bda0;
+}
+
+.device .section-card-top strong { font-weight: 500; }
+.device .section-work { margin-top: 14px; }
+
+/* Environment, connected devices and maintenance share one quiet paper
+   surface; amber remains reserved for open attention. */
+.device .sensor-tabs button,
+.device .sensor-period button,
+.device .device-mode button {
+  min-height: 44px;
+}
+
+.device .sensor-tabs button[aria-pressed="true"] {
+  background: #eaf2e5;
+  border-color: #b8cbb0;
+  color: var(--ink);
+}
+
+.device .sensor-detail,
+.device .device-control,
+.device .maintenance-card {
+  box-shadow: 0 1px 2px #20291f08;
+}
+
+.device .sensor-detail-heading strong { font-weight: 400; }
+.device .sensor-history summary { color: var(--ink); }
+.device .device-mode button[aria-pressed="true"] {
+  background: #eaf2e5;
+  box-shadow: none;
+  color: var(--ink);
+}
+
+.device .maintenance-card {
+  min-height: 90px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.device .maintenance-card:not(.resolved) { background: #fffaf0; }
+.device .maintenance-card.resolved { background: #f8faf5; }
+.device .maintenance-card-top small { color: #896017; }
+.device .maintenance-card.resolved .maintenance-card-top small { color: #657060; }
+
+/* Saved-work drawer and other drawers. */
+.device .drawer { background: #fff; }
+.device .drawer-head { min-height: 64px; border-bottom: 1px solid var(--line); }
+.device .drawer-body { padding-top: 14px; }
+.device .sync-summary.pending { background: #fff8ec; }
+.device .sync-summary:not(.pending) { background: #eaf2e5; }
+.device .sync-drawer .primary { background: var(--ink); }
+.device .drawer-body .primary:disabled { background: #7c8979; }
+.device .drawer-body .primary[data-action="close"] {
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid #cbd6c0;
+}
+
+/* Search/scan and toolbox records retain neutral navigation colour. */
+.device .tool-row,
+.device .route-row { min-height: 76px; }
+.device .tool-row:hover,
+.device .route-row:hover { background: #fafcf7; }
+.device .scan-frame { background: #eef3e8; }
+.device .log-item { min-height: 62px; }
+
+/* Assistant and clarification: amber marks input needed; green only marks a
+   saved/complete result. */
+.device .assistant-tabs button[aria-pressed="true"] {
+  color: var(--ink);
+  border-bottom-color: #577046;
+}
+.device .finding { background: #fffaf0; border-color: #e5dcc5; }
+.device .finding .overline,
+.device .assistant-hero .overline { color: #896017; }
+.device .message:not(.user) { background: #f8faf5; }
+.device .message.user { background: #eaf2e5; }
+.device .composer button,
+.device #answer-form .primary,
+.device .drawer-body #fault-form .primary { background: #20291f; }
+
+/* Placeholder/task lifecycle surfaces.  The complete action is the only
+   green primary; ending early remains a red doorway/confirmation. */
+.device .empty-state .complete-mark { background: #eaf2e5; color: #276640; }
+.device .page-footer .primary[data-action="complete-task"] { background: var(--ink); }
+.device .page-footer .secondary[data-action="end-task-early"] {
+  color: #a13a2d;
+  border-color: #e5b8b0;
+  background: #fff1ee;
+}
+.device .placeholder { background: #fafcf7; border-color: #c6d2bc; }
+
+/* Gallery detail dialogs: preserve task card status semantics and make
+   completion/early end visually distinct without changing the JS states. */
+body:has(#detail) #detail {
+  border-color: #dfe4d8;
+  background: #fff;
+  box-shadow: 0 18px 50px #20291f22;
+}
+
+body:has(#detail) #detail .detail-heading {
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e8eddf;
+}
+
+body:has(#detail) #detail .detail-link {
+  background: #20291f;
+}
+
+body:has(#detail) #detail .placeholder {
+  background: #f8faf5;
+  border-color: #c6d2bc;
+}
+
+body:has(#detail) #detail .lifecycle-primary:not(:disabled) {
+  background: var(--ink);
+}
+
+body:has(#detail) #detail .lifecycle-primary:disabled {
+  background: #7c8979;
+  color: #fff;
+  cursor: default;
+}
+
+body:has(#detail) #detail .lifecycle-early {
+  color: #a13a2d;
+  background: #fff1ee;
+  border: 1px solid #e5b8b0;
+  border-radius: 10px;
+  min-height: 48px;
+  width: 100%;
+}
+
+body:has(#detail) #detail .lifecycle-actions button[data-confirm-end] {
+  background: #a13a2d;
+  color: #fff;
+  border-color: #a13a2d;
+}
+
+/* Home's early-end confirmation uses data-action; the gallery uses the
+   data-confirm-end attribute. Both keep the final destructive step red. */
+.device .drawer-body [data-action="confirm-end-task"],
+body:has(#detail) #detail .lifecycle-actions [data-confirm-end] {
+  background: #a13a2d;
+  color: #fff;
+  border-color: #a13a2d;
+}
+
+@media (max-width: 430px) {
+  .device .page-head h2 { font-size: 19px; }
+  .device .sensor-detail,
+  .device .device-control { padding: 14px; }
+  body:has(#detail) #detail { width: min(440px, calc(100% - 20px)); }
+}

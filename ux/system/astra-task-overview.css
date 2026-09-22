@@ -1,0 +1,31 @@
+/* A shared hierarchy, with optional progress only for bounded measures. */
+.task-context-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);border:1px solid #cdd2c1;border-radius:15px;overflow:hidden;background:#f6f4eb;box-shadow:0 2px 6px #2037190c,inset 0 1px 0 #ffffffa6;color:var(--ink,#20291f);font-family:var(--sans,'Plus Jakarta Sans',sans-serif)}
+.tc-unit,.tc-task{display:flex;flex-direction:column;align-items:flex-start;padding:12px 15px;min-width:0;gap:0}
+.tc-task{position:relative;border:0;background:transparent;text-decoration:none;text-align:left;cursor:pointer;color:inherit;border-radius:0;font:inherit;transition:background .15s ease}
+.tc-task:before{content:'';position:absolute;left:0;top:14px;bottom:14px;width:1px;background:#d3d6c8;pointer-events:none}
+.tc-task:active{background:#ececdf}
+.tc-heading{display:flex;align-items:center;justify-content:space-between;gap:5px;min-height:19px;width:100%;font-size:11px;line-height:1.4;color:#65715c}
+.tc-task .tc-heading{font-weight:600;color:#38462f}
+.tc-heading svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.7;flex-shrink:0}
+.tc-value{display:flex;align-items:baseline;gap:5px;margin-top:5px;min-height:35px;white-space:nowrap}
+.tc-value strong{font:600 31px/1.15 var(--mono,'IBM Plex Mono',monospace);letter-spacing:-1.4px;font-variant-numeric:tabular-nums}
+.tc-suffix{font-size:17px;font-weight:500}.tc-denominator{font:400 15px var(--mono,'IBM Plex Mono',monospace);color:#738069;letter-spacing:-.5px}
+.tc-description{font-size:11px;font-weight:500;line-height:1.5;margin-top:2px;color:#394432}
+.tc-scope{color:#748068;font-size:10px;font-weight:400;white-space:nowrap}
+.tc-support{font-size:10px;line-height:1.6;color:#6e7965;margin-top:6px}
+.tc-target-attention{color:#8a672c}
+.tc-progress{height:4px;display:block;align-self:stretch;background:#dce5d1;border-radius:4px;margin-top:10px;overflow:hidden}
+.tc-progress i{display:block;height:100%;border-radius:inherit;background:#647f51}
+.tc-progress-time{background:#e1e4dc}.tc-progress-time i{background:#8a957e}
+.tc-progress+.tc-support{margin-top:7px}
+.task-status-bar{display:flex;width:100%;height:8px;border-radius:6px;overflow:hidden;gap:2px;background:#e2e6dc}
+.task-status-bar>i{display:block;height:100%;flex-shrink:1}
+.task-status-farrowed{background:#57724e}
+.task-status-active{background:#9daa87}
+.task-status-awaiting{background:#dce2d4}
+.task-status-bar-compact{height:5px;margin-top:10px;gap:1px}
+.task-status-bar-compact+.tc-support{margin-top:7px}
+.room-context-strip.overview-host{display:block;padding:0;margin:0 16px 10px;border:0;box-shadow:none;background:transparent;border-radius:0}
+.overview-host .tc-value strong{font-size:31px}
+@media(max-width:370px){.room-context-strip.overview-host{margin-left:12px;margin-right:12px}.tc-unit,.tc-task{padding:12px}.tc-value strong,.overview-host .tc-value strong{font-size:29px}.tc-description{font-size:10.5px}.tc-scope{font-size:9px}.tc-support{font-size:9.5px}}
+@media(prefers-reduced-motion:reduce){.tc-task{transition:none}}
