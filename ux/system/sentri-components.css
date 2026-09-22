@@ -108,6 +108,28 @@ button.st-row[aria-current="location"]{background:#eaf2e5;box-shadow:inset 3px 0
 .st-category-tabs button:focus-visible{outline:2px solid var(--focus,#577fa6);outline-offset:-2px}
 @container(max-width:310px){.st-category-footer .st-category-tabs button{padding-left:4px;padding-right:4px;font-size:11px}}
 
+/* Picker field: the mobile-standard choice control that replaces native selects.
+   The trigger echoes text-input geometry; the sheet lists options as tappable rows. */
+.st-picker-field .st-picker-trigger{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:46px;padding:12px;border:1px solid #bdc7b6;border-radius:12px;background:var(--st-paper);color:var(--st-ink);font:400 14px/1.5 var(--sans,'Plus Jakarta Sans',sans-serif);text-align:left;touch-action:manipulation}
+.st-picker-trigger .st-picker-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-picker-trigger.is-placeholder .st-picker-value{color:var(--st-muted)}
+.st-picker-trigger>svg{width:15px;height:15px;flex:none;color:var(--st-muted);fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.st-picker-trigger:disabled{opacity:.5}
+.st-picker-options{display:flex;flex-direction:column;margin:0;padding:0}
+.st-picker-option{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:56px;padding:12px 2px;border:0;border-bottom:1px solid var(--st-rule);border-radius:0;background:transparent;color:var(--st-ink);text-align:left;font-family:var(--sans,'Plus Jakarta Sans',sans-serif);touch-action:manipulation}
+.st-picker-option:last-child{border-bottom:0}
+.st-picker-option-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.st-picker-option-copy strong{font-size:13px;font-weight:500;color:inherit}
+.st-picker-option-copy small{font-size:11px;color:var(--st-muted)}
+.st-picker-option>svg{width:16px;height:16px;flex:none;color:#276640;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.st-picker-option[aria-selected="true"] .st-picker-option-copy strong{font-weight:600}
+.st-picker-option:active{background:#f1f5eb}
+:is(.st-picker-trigger,.st-picker-option):focus-visible{outline:3px solid #577fa6;outline-offset:2px}
+/* Filter button: one canonical toolbar control for every room/list screen. */
+:is(.inspection-phone,.farrowing-phone) .room-filter-button{min-width:48px;height:48px;display:grid;place-items:center;background:var(--st-paper);border:1px solid var(--st-line);border-radius:12px;position:relative;color:var(--st-ink)}
+:is(.inspection-phone,.farrowing-phone) .room-filter-button svg{width:17px;height:17px}
+:is(.inspection-phone,.farrowing-phone) .filter-badge{position:absolute;right:-3px;top:-4px;min-width:17px;height:17px;border-radius:9px;display:grid;place-items:center;background:var(--st-ink);color:#fff;font:10px var(--mono,'IBM Plex Mono',monospace)}
+
 .device .st-home-drawer-footer>.secondary{flex:1;min-width:0;min-height:48px;margin:0}
 .device .st-home-drawer-footer>.danger{background:#a13a2d;border-color:#a13a2d;color:#fff}
 

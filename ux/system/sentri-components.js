@@ -30,7 +30,27 @@
     const current=categories.some(c=>c.id===active)?active:categories[0]?.id;
     return `<footer class="sheet-footer st-category-footer ${esc(className)}"><button type="button" class="surface-back record-back" data-action="${esc(backAction)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span>Back</span></button><nav class="st-category-tabs action-category-nav" aria-label="${esc(label)}">${categories.map(c=>`<button type="button" data-action="${esc(categoryAction)}" data-value="${esc(c.id)}" aria-current="${c.id===current?'location':'false'}"${c.disabled?' disabled':''}>${esc(c.label)}</button>`).join('')}</nav></footer>`;
   }
-  const api=Object.freeze({heading,panel,facts,row,rowGroup,log,categoryFooter});
+  const chevron='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
+  const check='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4L19 6"/></svg>';
+  function field({label='',control='',className=''}={}){
+    return `<label class="field ${esc(className)}">${label}${control}</label>`;
+  }
+  /* Mobile-standard choice control: a trigger button that opens a picker sheet.
+     Replaces native <select>; the host app owns the picker view and state. */
+  function pickerField({label='',value='',display='',placeholder='Choose',action='open-picker',key='',disabled=false,className=''}={}){
+    const text=display!==''?display:value,has=text!=null&&text!=='';
+    return field({label,className:'st-picker-field '+className,control:`<button type="button" class="st-picker-trigger${has?'':' is-placeholder'}" data-action="${esc(action)}" data-picker-key="${esc(key)}"${disabled?' disabled':''}><span class="st-picker-value">${esc(has?text:placeholder)}</span>${chevron}</button>`});
+  }
+  function pickerOptions({options=[],selected='',action='picker-select',className=''}={}){
+    return `<div class="st-picker-options ${esc(className)}" role="listbox">${options.map(([v,label,sub])=>`<button type="button" class="st-picker-option" data-action="${esc(action)}" data-value="${esc(v)}" role="option" aria-selected="${v===selected}"><span class="st-picker-option-copy"><strong>${esc(label)}</strong>${sub?`<small>${esc(sub)}</small>`:''}</span>${v===selected?check:''}</button>`).join('')}</div>`;
+  }
+  function segment({options=[],active='',action='',className='',ariaLabel=''}={}){
+    return `<div class="st-segment segment ${esc(className)}" role="group"${ariaLabel?` aria-label="${esc(ariaLabel)}"`:''}>${options.map(([v,label])=>`<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}">${label}</button>`).join('')}</div>`;
+  }
+  function iconButton({action='',icon='',label='',className='',value='',badge='',disabled=false}={}){
+    return `<button type="button" class="icon-button ${esc(className)}" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${disabled?' disabled':''}>${icon}${badge!==''&&badge!=null?`<span class="filter-badge">${esc(badge)}</span>`:''}</button>`;
+  }
+  const api=Object.freeze({heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,segment,iconButton});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

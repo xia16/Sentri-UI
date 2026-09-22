@@ -25,7 +25,7 @@
     upload:'M12 16V4m-4 4 4-4 4 4M4 15v6h16v-6',
     offline:'m3 3 18 18M4 9a13 13 0 0 1 2-1M10 6a14 14 0 0 1 10 3M7 13a8 8 0 0 1 3-1M14 12a8 8 0 0 1 3 1M10 17a3 3 0 0 1 4 0M12 21h.01'
   };
-  const icon = key => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[key] || paths.arrow}"/></svg>`;
+  const icon = key => window.SentriIcons ? window.SentriIcons.icon(key) : `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[key] || paths.arrow}"/></svg>`;
   const btn = (action, text, cls='', value='', extra='') => `<button type="button" class="${cls}" data-action="${action}" data-value="${esc(value)}" ${extra}>${text}</button>`;
   const ib = (action, key, label, value='') => btn(action, icon(key), 'icon-button', value, `aria-label="${esc(label)}"`);
   const sections = [
