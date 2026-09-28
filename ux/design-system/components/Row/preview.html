@@ -1,0 +1,18 @@
+<!-- @dsCard group="Lists" height=330 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<body>
+<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="a"></div></div>
+<script>
+const UI = window.SentriUI, I = window.SentriIcons.icon;
+a.innerHTML = UI.rowGroup(
+  UI.row({ title: 'Farrowing', description: '3 sows due today · room 3', icon: I('farrow'), action: 'open', value: 'farrowing', trailing: '<span style="color:var(--amber);font-size:10px;font-weight:500">Due now</span>' }) +
+  UI.row({ title: 'Feed check', description: '12 pens · last yesterday', icon: I('feed'), action: 'open', value: 'feed', attrs: { 'aria-current': 'location' } }) +
+  UI.row({ title: 'Pregnancy check', description: 'Done · 31 checked', icon: I('pregnancy'), action: 'open', value: 'preg', trailing: '<span style="color:var(--green);font-size:10px;font-weight:500">Done</span>' }) +
+  UI.row({ title: 'Environment', description: '21.4° · 64% humidity', icon: I('temperature') }),
+  { title: 'Room 3' }
+);
+</script>
+</body>
+</html>

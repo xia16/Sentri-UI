@@ -1,0 +1,14 @@
+<!-- @dsCard group="Controls" height=300 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<body>
+<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div class="sheet-footer" style="position:relative;margin:0 -16px;padding:14px 18px 28px;display:flex;gap:12px"><button type="button" class="button secondary surface-back" style="width:86px"><span>Back</span></button><button type="button" class="button primary">Record for 12 pigs</button></div>
+<div class="sheet-footer" style="position:relative;margin:12px -16px 0;padding:14px 18px 28px;display:flex;gap:12px"><button type="button" class="button task-end-early">End early</button><button type="button" class="button danger">End task</button></div>
+<div class="sheet-footer" style="position:relative;margin:12px -16px 0;padding:14px 18px 28px;display:flex;gap:12px"><button type="button" class="button primary" disabled>Confirm &amp; next</button></div></div>
+<script>
+const UI = window.SentriUI, I = window.SentriIcons.icon;
+document.querySelector('.surface-back').insertAdjacentHTML('afterbegin', I('back'));
+</script>
+</body>
+</html>
