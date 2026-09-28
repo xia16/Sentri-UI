@@ -29,7 +29,9 @@ test('feed review uses compact rows with explicit current, new and change states
   const context = model.seed();
   model.openFeedEditor(context, 'pigs', ['000306', '000312']);
   let html = model.overlay(context);
-  assert.match(html, /feed-inline-pigs is-short/);
+  assert.match(html, /pig-review-card bulk-pigs is-short/);
+  assert.match(html, /data-bulk-rows/);
+  assert.match(html, /bulk-details-overlay/);
   assert.match(html, />2 selected</);
   assert.equal((html.match(/Unchanged/g) || []).length, 2);
   assert.match(html, /<small>Current<\/small>/);

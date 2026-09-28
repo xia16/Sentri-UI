@@ -16,7 +16,7 @@
     check:'M5 12l4 4L19 6',
     note:'M5 3h14v18H5zM8 8h8M8 12h8M8 16h5',
     feed:'M3 12h18l-3 7H6zM7 8l1-2 2 1-1 2zM12 5l1-2 2 1-1 2zM15 9l1-2 2 1-1 2z',
-    condition:'M12 4v16M4 12h16',
+    link:'M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-2 2M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l2-2',condition:'M12 4v16M4 12h16',
     weight:'M5 6h14l2 15H3zM8 6a4 4 0 0 1 8 0M12 11v4',
     search:'M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14M15 15l6 6',
     grid:'M3 3h7v7H3zM14 3h7v7H3zM3 14h7v7H3zM14 14h7v7H3z',

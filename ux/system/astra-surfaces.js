@@ -3,7 +3,7 @@
 'use strict';
 const inspectionPages=new Set(['actions','pig','pig-profile','pig-production','pig-production-batch','pig-origin','pig-log','pig-feed','pig-feed-curve','pig-feed-changes','history','pen-detail','pen-log','feed','feed-editor','unit-detail','environment','equipment','batch-detail','treatment','sow-transfer']);
 const farrowingPages=new Set(['history','roomOverview','roomEndTask','roomTaskReceipt','roomTaskSows','roomPenDetail','roomPenFeed','roomPenLog','marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile']);
-function isPage(app,view,context){return app==='inspection'?(inspectionPages.has(view)||!!(context?.form?.recordEditor&&context.form.bulk)):farrowingPages.has(view);}
+function isPage(app,view,context){return app==='inspection'?(inspectionPages.has(view)||!!(context?.form?.recordEditor&&context.form.bulk&&!['picker','medicine-picker','bulk-health-picker','record-optional'].includes(view))):farrowingPages.has(view);}
 const backContent='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span>Back</span>';
 function normalizeBack(html){
  return html.replace(/<button\b([^>]*)>([\s\S]*?)<\/button>/g,(button,attrs,body)=>{
@@ -22,14 +22,14 @@ function markContext(html,page){
   return next+' data-st-context="'+context+'"'+end;
  });
 }
-function present(html,{page=false,backAction='back',status='' }={}){
+function present(html,{page=false,backAction='back',status='',footerBack=true }={}){
  html=normalizeBack(html);
  html=markContext(html,page);
  if(!page){
   // Nested drawers use footer navigation too; keep a separate Close control.
   html=html.replace(/<header\b([^>]*)>([\s\S]*?)<\/header>/,(_,attrs,body)=>'<header'+attrs+'>'+body.replace(/<button\b[^>]*class="[^"]*\bdrawer-header-back\b[^"]*"[^>]*>[\s\S]*?<\/button>/g,'')+'</header>');
   const hasFooterBack=/<(?:div|footer)\b[^>]*class="[^"]*\bsheet-footer\b[^\"]*"[^>]*>[\s\S]*?\bclass="[^"]*\bsurface-back\b/.test(html);
-  if(hasFooterBack)return html;
+  if(hasFooterBack||!footerBack)return html;
   const back='<button type="button" class="surface-back record-back" data-action="'+backAction+'" aria-label="Back">'+backContent+'</button>';
   const footer=/(<(?:div|footer)\b[^>]*class="[^"]*\bsheet-footer\b[^\"]*"[^>]*>)/;
   return footer.test(html)?html.replace(footer,'$1'+back):html.replace(/<\/section>\s*$/,'<footer class="sheet-footer">'+back+'</footer></section>');

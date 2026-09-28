@@ -42,7 +42,7 @@ test('medicine picker preserves the treatment page and entered dose behind it', 
   const c = context('pig'); c.selected.add(c.pigId); model.openBulkAction(c, 'treatment');
   c.form.dose = '2'; c.view = 'medicine-picker';
   const html = model.inspectionSurface(c);
-  assert.match(html, /class="drawer-background" inert aria-hidden="true"/);
+  assert.match(html, /class="drawer-background chooser-background" inert aria-hidden="true"/);
   assert.match(html, /data-presentation="page"/);
   assert.match(html, /data-bulk-key="dose"[^>]*value="2"/);
   assert.match(html, /class="sheet picker-step medicine-picker-step"/);

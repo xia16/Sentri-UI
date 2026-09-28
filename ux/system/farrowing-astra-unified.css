@@ -46,7 +46,7 @@
 .farrowing-phone .tools .tool>svg{width:16px;height:16px;color:#69765e}
 .farrowing-phone .tools .tool>small{flex-basis:100%}
 .farrowing-phone .summary .causes{border:0;padding-top:0}
-.farrowing-phone .read-section{padding:0;margin:0 0 24px}
+.farrowing-phone .read-section{border-top:0;padding:0;margin:0 0 24px}
 .farrowing-phone .sheet[data-view="locked"] .summary{margin:4px 0 8px}
 .farrowing-phone .sheet[data-view="locked"] .summary-grid{padding-bottom:8px}
 .farrowing-phone .sheet[data-view="locked"] .metric strong{font-size:25px;line-height:1.15}
@@ -145,7 +145,7 @@
 /* Finish: a task header, quiet totals, and one aligned column of controls. */
 .farrowing-phone .sheet[data-view="finish"]{height:auto;max-height:var(--drawer-long)}
 .farrowing-phone .sheet[data-view="finish"]>.sheet-body{flex:0 1 auto}
-.farrowing-phone .finish-header{border-bottom:1px solid var(--line);margin-bottom:16px}
+.farrowing-phone .finish-header{border-bottom:1px solid var(--line);margin-bottom:0}
 .farrowing-phone .finish-body{display:flex;flex-direction:column;gap:20px;padding-bottom:16px}
 .farrowing-phone .finish-body>*{flex-shrink:0}
 .farrowing-phone .finish-totals{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;background:#f6f7f2;border-radius:12px;padding:13px 16px;margin:0}
