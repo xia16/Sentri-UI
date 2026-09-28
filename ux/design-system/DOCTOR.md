@@ -62,3 +62,12 @@ and nothing checks it.
 
 `tokens.json` says `"version": 1`. Designs need to record which version they
 were built against.
+
+## Rendered lint, same day
+
+`design_lint.mjs` on the farrowing and inspection boards (each phone canvas
+measured as its own screen, 1440×900): **397 errors, all token drift** —
+spacing 290, colour 58, radius 30, font size 19. **Geometry is clean**: no
+sideways scroll, protrusion, clipped text, ink collisions, overlapping tap
+areas, unreachable content or undersized targets. The finished screens are
+sound; they just do not read the tokens.
