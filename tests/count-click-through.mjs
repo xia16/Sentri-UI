@@ -36,12 +36,18 @@ try {
   await page.waitForURL(/count\.html/); await ready(page);
   assert.equal(await page.locator('[role="spinbutton"]').first().innerText(), '12');
   await page.click('[data-action="step"][data-step="-1"]');
-  assert.match(await text(page, '[data-ds="Stepper"]'), /1 fewer · Save writes unexplained loss 1/);
+  assert.match(await text(page, '[data-ds="Stepper"]'), /1 fewer · Save writes unexplained loss 1 piglet/);
   await page.click('[data-action="save"]');
-  assert.match(await text(page, '.pp-receipt'), /Saved · counted 11 · Unexplained loss 1/);
+  assert.match(await text(page, '.pp-receipt'), /Saved · unexplained loss 1 piglet/);
+  // a double tap right after Save lands nowhere
+  await page.click('[data-action="back"]');
+  assert.match(page.url(), /count\.html/);
+  // one open line: its doors are right on the litter (no extra hop)
+  assert.match((await page.locator('[data-action="suggest"]').first().innerText()).replace(/\s+/g, ' '), /B08 gained 1 piglet/);
   console.log('ok 2 litter Set count 11:', await text(page, '.pp-receipt'));
 
   // 3. Back to the room: the strip and B06's row show the open loss, beside B08's gain (never netted).
+  await page.waitForTimeout(450);
   await page.click('[data-action="back"]');
   await page.waitForURL(/litter\.html/); await ready(page);
   await page.click('[data-action="close"]');
@@ -50,13 +56,13 @@ try {
   assert.match(strip1, /Unexplained loss 3 B06 D03/); assert.match(strip1, /Unexplained gain 1 B08/); assert.match(strip1, /Net drift −2 piglets/);
   console.log('ok 3 room shows the open loss:', strip1);
 
-  // 4. The drift strip → the room's open lines → B06's suggestion `Crate B08 gained 1 — same piglet?` → the Move sheet, pre-filled.
+  // 4. The drift strip → the room's open lines → B06's suggestion `B08 gained 1 piglet · both lines close` → the Move sheet, pre-filled.
   await page.click('[data-action="explain"]');
   await page.waitForURL(/count\.html\?state=explain/); await ready(page);
   const sug = page.locator('[data-action="suggest"][data-value$="|C-B08-gain"]').first();
-  assert.match((await sug.innerText()).replace(/\s+/g, ' '), /Crate B08 gained 1 — same piglet\?/);
+  assert.match((await sug.innerText()).replace(/\s+/g, ' '), /B08 gained 1 piglet both lines close \d+ min/);
   await sug.click();
-  assert.match(await text(page, '[role="dialog"]'), /Alive stays 11 in B06 and 10 in B08/);
+  assert.match(await text(page, '[role="dialog"]'), /Alive stays 11 piglets in B06 and 10 piglets in B08/);
   await page.click('[data-action="open-move"]');
   await page.waitForURL(/move\.html\?.*state=move-explain/); await ready(page);
   assert.match(await text(page, '[role="dialog"]'), /Closes 1 unexplained loss and 1 gain/);

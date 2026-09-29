@@ -10,8 +10,9 @@
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* Layout only, tokens from tokens.css. No compositions of its own: the page draws cards, the shared header,
-   tools and receipt (shell-ui.js) and the Stepper candidate's hero variant. */
+/* Layout only, tokens from tokens.css. The page draws cards, the shared header, tools and receipt (shell-ui.js)
+   and the Stepper candidate's hero variant. One state the Button card lacks is drawn here, as litter.html does:
+   a primary that waits on a step stays present and quiet (aria-disabled, focusable), its reason beside it. */
 .ct-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
 .ct-phone .scrim { inset: 0; }
 .ct-body { display: flex; flex-direction: column; gap: var(--space-section); padding-bottom: var(--space-panel); }
@@ -27,6 +28,7 @@
 .ct-bar > .pp-receipt { flex-basis: 100%; }
 .ct-bar > .button { flex: 1; }
 .ct-bar > .button.secondary:not(:only-of-type) { flex: none; }
+.ct-phone.ct-phone.ct-phone .sheet-footer.sheet-footer .button.primary[aria-disabled="true"] { background: var(--disabled-fill); border-color: var(--disabled-fill); color: var(--disabled-ink); }
 @media (max-width: 370px) { .ct-summary { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
 </style>
 </head>
@@ -41,19 +43,22 @@
 (function () {
   var UI = window.SentriUI, U = window.PPUI;
 
-  /* ---- states: a variant of the shared fixture + UI state. Every figure is the ledger's: select.countDraft (the number seen
-     against Alive, the item Save writes, which tagged piglets must be named, why Save is gray), select.explain (each open line,
-     its death door and the Moves the app suggests, ranked by room then time, validated through append), select.counts (the
-     counts on a litter, which stands, what each wrote, sync review) and select.moveDraft (alive after an explaining Move).
-     Save commits through append. `save`: the state is the moment after Save (committed at load, not kept in the tab). ---- */
+  /* ---- states: a variant of the shared fixture + UI state. Every figure is the ledger's: select.countDraft (the number seen,
+     what Save writes and which open line it replaces, which tagged piglets must be named, why Save waits), select.explain
+     (each open line, its death door and the Moves the app suggests, ranked, with what each leaves open), select.counts (the
+     standing count, what each wrote, sync review) and select.moveDraft (alive after an explaining Move). Save commits through
+     append. `save`: the state is the moment after Save (committed at load, not kept in the tab). ---- */
   var STATES = {
     'count':           { view: 'count', crate: 'A02' },
     'count-match':     { view: 'host', crate: 'A02', save: 12 },
     'count-loss':      { view: 'host', crate: 'A02', save: 10 },
     'count-gain':      { view: 'host', crate: 'A02', save: 13 },
+    'count-recount':   { view: 'count', crate: 'D03', observed: 13 },
     'count-named':     { view: 'count', crate: 'B06', observed: 8 },
-    'count-kept':      { view: 'host', crate: 'A02', kept: { observed: 10, rows: [] } },
-    'count-prelock':   { view: 'prelock', crate: 'D01' },
+    'count-kept':      { view: 'host', crate: 'A02', kept: { observed: 10, rows: [], at: '2026-09-29T06:00' } },
+    'count-prelock':   { view: 'count', crate: 'D01' },
+    'count-weaned':    { view: 'count', crate: 'D02' },
+    'count-ended':     { view: 'count', crate: 'A02', data: 'ended' },
     'count-conflict':  { view: 'host', crate: 'A07', data: 'count-offline' },
     'explain':         { view: 'explain', crate: 'B06', data: 'explain' },
     'explain-suggest': { view: 'suggest', crate: 'B06', data: 'explain', line: 'C-B06-loss', pick: 'C-B08-gain' },
@@ -63,24 +68,29 @@
   var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'count';
   var spec = JSON.parse(JSON.stringify(STATES[name]));
-  var store, TODAY, NOW, crate, room, S;
+  var STALE_MIN = 90;                     // a kept count older than a visit (RULINGS: ~90 minutes idle ends a visit) asks for a recount
+  var store, TODAY, NOW, crate, S, lastTap = 0;
 
   /* ---- the ledger ---- */
   function L(c) { return store.derived.litters[c || crate]; }
   function sow(c) { return store.sow(c || crate) || { sow: '', parity: 0, unit: 7 }; }
   var memo = { key: '', val: null };
   function draft() {
-    var d = { observed: S.observed, missingRows: S.rows.slice() }, key = JSON.stringify(d) + crate + store.events.length;
+    var d = { observed: S.observed, missingRows: S.rows.slice(), at: S.at }, key = JSON.stringify(d) + crate + store.events.length;
     if (memo.key !== key) memo = { key: key, val: store.select.countDraft(store.derived, crate, d, { who: window.PPFixtures.ME }) };
     return memo.val;
   }
   function explain() { return store.select.explain(store.derived, S.room ? { room: S.room } : { litter: crate }, { who: window.PPFixtures.ME }); }
-  function dirty() { return S.observed !== L().alive || S.rows.length > 0; }
-  // The draft stays on this phone (sessionStorage) until Save or Clear; a state that shows a kept draft holds it in memory only.
+  function dirty() { return S.observed !== draft().base || S.rows.length > 0; }
+  function minsSince(at) { return Math.round((Date.parse(NOW) - Date.parse(at)) / 60000); }
+  function stale() { return !!S.at && minsSince(S.at) > STALE_MIN; }
+
+  /* ---- the draft stays on this phone with its observation time, saved on every change (sessionStorage); a state that
+     shows a kept draft holds it in memory only ---- */
   var DKEY = function () { return 'pp-count-draft:' + store.name + ':' + crate; };
   var mem = spec.kept ? { d: spec.kept } : null;
   function keepDraft() {
-    var d = dirty() ? { observed: S.observed, rows: S.rows.slice() } : null;
+    var d = dirty() ? { observed: S.observed, rows: S.rows.slice(), at: S.at } : null;
     if (mem) { mem.d = d; return; }
     try { if (d) sessionStorage.setItem(DKEY(), JSON.stringify(d)); else sessionStorage.removeItem(DKEY()); } catch (e) {}
   }
@@ -90,8 +100,10 @@
   /* ---- helpers ---- */
   var pl = PP.one;
   function span(id, args, o) { return U.span(id, args, o); }
+  function np(n) { return PP.tn('pp.common.unit.piglet', n); }            // `12 piglets` · `12头`
   function pigs(n) { return { id: pl('pp.common.unit.piglet', n), args: { n: n } }; }
   function stamp(at, who) { return U.stamp(at, who, TODAY); }
+  function when(at) { return String(at).slice(0, 10) === String(TODAY).slice(0, 10) ? U.time(at) : U.date(at) + ' · ' + U.time(at); }
   function fact(label, labelArgs, value, valueArgs, meta, metaArgs, tone) {
     var f = { label: '', strs: { label: label }, args: { label: labelArgs } };
     if (tone) f.valueHtml = span(value, valueArgs, { tone: tone }); else { f.value = ''; f.strs.value = value; f.args.value = valueArgs; }
@@ -102,25 +114,24 @@
     var strs = { title: o.title }, args = { title: o.titleArgs };
     if (o.desc) { strs.description = o.desc; args.description = o.descArgs; }
     if (o.trail) { strs.trailing = o.trail; args.trailing = o.trailArgs; }
-    return UI.row({ title: '', description: o.desc ? '' : undefined, trailing: o.trailHtml || (o.trail ? '' : undefined), action: o.action, value: o.value, strs: strs, args: args });
+    return UI.row({ title: '', description: o.desc ? '' : undefined, trailing: o.trail ? '' : undefined, action: o.action, value: o.value, strs: strs, args: args });
   }
-  function button(cls, action, id, args, disabled) {
+  function button(cls, action, id, args, quiet) {
     return '<button type="button" class="button ' + cls + '" data-ds="Button" data-action="' + action + '" data-str="' + id + '"' +
-      (args ? " data-args='" + U.esc(JSON.stringify(args)) + "'" : '') + (disabled ? ' disabled' : '') + '>' + U.esc(PP.t(id, args)) + '</button>';
+      (args ? " data-args='" + U.esc(JSON.stringify(args)) + "'" : '') + (quiet ? ' aria-disabled="true"' : '') + '>' + U.esc(PP.t(id, args)) + '</button>';
   }
   function textAction(action, id) {
     return '<button type="button" class="st-text-action" data-ds="Button" data-action="' + action + '" data-str="' + id + '">' + U.esc(PP.t(id)) + '</button>';
   }
   function rowLabel(r) { return r.tag ? { id: 'pp.count.row.tag', args: { tag: r.tag } } : { id: 'pp.count.row.notch', args: { notch: r.notch } }; }
   function eventOf(id) { return store.events.filter(function (e) { return e.id === id; })[0] || null; }
-  // One open line's words: `Unexplained loss 2` (red) · `Unexplained gain 1` (blue); `… · 1 of 2 open` once part is explained.
   function lineTitle(l, withCode) {
-    var base = l.open < l.qty ? 'pp.count.line.' + l.kind + '_part' : 'pp.count.line.' + l.kind;
-    return { id: withCode ? base + '_code' : base, args: { n: l.open, q: l.qty, code: l.litter } };
+    var base = 'pp.count.line.' + l.kind + (l.open < l.qty ? '_part' : '') + (withCode ? '_code' : '');
+    return { id: base, args: { np: np(l.open), qp: np(l.qty), code: l.litter } };
   }
-  function lineStamp(l) { return { id: 'pp.count.line.stamp', args: { n: l.observed, stamp: stamp(l.at, l.who), was: l.aliveBefore } }; }
+  function lineStamp(l) { return { id: 'pp.count.line.stamp', args: { op: np(l.observed), stamp: stamp(l.at, l.who), wp: np(l.aliveBefore) } }; }
 
-  /* ---- the litter host: the shared header, the ledger's figures, the tools, the open lines and the counts ---- */
+  /* ---- the litter host: the shared header, the ledger's figures, the tools, the open line and the counts ---- */
   function hostHead() {
     var x = L();
     var sub = x.phase === 'open' ? span('pp.count.host.sub_farrowing', { u: x.room }) : span('pp.count.host.sub', { u: x.room, day: x.dayAge });
@@ -133,52 +144,77 @@
     items.push(fact('label.dead', null, pigs(x.dead.total).id, pigs(x.dead.total).args));
     return UI.facts(items, { columns: items.length });
   }
+  // A kept draft shows its age: the observation it holds, when it was counted, and what the record says now.
   function keptRow() {
     var k = keptDraft();
     if (!k) return '';
-    return UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.kept.title', titleArgs: { n: k.observed }, desc: 'status.unsaved', descArgs: { n: 1 } }));
+    return UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.kept.title', titleArgs: { np: np(k.observed) },
+      desc: 'pp.count.kept.desc', descArgs: { t: when(k.at), rp: np(L().alive) } }));
   }
+  // One open line opens its doors right here; several lead to Explain.
   function openSection() {
-    var lines = store.select.explain(store.derived, { litter: crate }).lines;
+    var lines = explain0();
     if (!lines.length) return '';
+    var head = UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: 'pp.count.open.title', description: 'pp.count.open.desc' } });
+    if (lines.length === 1) return '<section class="ct-group">' + head + '</section>' + lineSection(lines[0], false);
     var rows = lines.map(function (l) {
       var t = lineTitle(l), s = lineStamp(l);
       return row({ action: 'open-explain', value: crate, title: t.id, titleArgs: t.args, desc: s.id, descArgs: s.args, trail: 'pp.count.act.explain' });
     }).join('');
-    return '<section class="ct-group">' + UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: 'pp.count.open.title', description: 'pp.count.open.desc' } }) + UI.rowGroup(rows) + '</section>';
+    return '<section class="ct-group">' + head + UI.rowGroup(rows) + '</section>';
   }
-  // The counts on this litter, newest first: each an observation, stamped; the one standing leads.
+  function explain0() { return store.select.explain(store.derived, { litter: crate }, { who: window.PPFixtures.ME }).lines; }
+  // The counts on this litter, newest first: each an observation with who and when; the one that stands says so.
   function countsSection() {
     var c = store.select.counts(store.derived, crate);
     if (!c || !c.counts.length) return '';
     var list = c.counts.slice().reverse();
-    var review = c.review ? c.counts[c.counts.length - 1] : null;             // the standing count crossed a change it did not see
     var facts = UI.facts(list.slice(0, 3).map(function (k) {
-      var ev = eventOf(k.id) || {}, meta, margs = { k: Math.abs(k.wrote), base: k.baseAlive };
-      if (k.review) meta = 'pp.count.c.review'; else if (k.wrote < 0) meta = 'pp.count.c.wrote_loss'; else if (k.wrote > 0) meta = 'pp.count.c.wrote_gain';
-      else meta = k.aliveBefore === k.baseAlive || k.baseAlive == null ? 'pp.count.c.matched' : 'pp.count.c.wrote_none';
-      if (k.stands) { meta = meta + '_stands'; }
-      return fact(ev.syncedAt ? 'pp.count.c.label_synced' : 'pp.count.c.label', { stamp: stamp(k.at, k.who), t: ev.syncedAt ? U.time(ev.syncedAt) : '' }, pigs(k.observed).id, pigs(k.observed).args, meta, margs);
+      var ev = eventOf(k.id) || {}, rest;
+      if (k.late) rest = PP.t('pp.count.c.late');
+      else if (k.crossed.length) rest = PP.t('pp.count.c.phone', { who: k.who, bp: np(k.baseAlive) });
+      else if (k.wrote < 0) rest = PP.t('pp.count.c.loss', { kp: np(-k.wrote) });
+      else if (k.wrote > 0) rest = PP.t('pp.count.c.gain', { kp: np(k.wrote) });
+      else rest = PP.t('pp.count.c.match');
+      var by = k.supersededBy ? eventOf(k.supersededBy) : null;
+      var meta = k.stands ? ['pp.count.c.stands', { rest: rest }] : by ? ['pp.count.c.replaced', { t: when(by.at), rest: rest }] : ['pp.count.c.plain', { rest: rest }];
+      return fact(ev.syncedAt ? 'pp.count.c.label_synced' : 'pp.count.c.label', { stamp: stamp(k.at, k.who), t: ev.syncedAt ? U.time(ev.syncedAt) : '' },
+        pigs(k.observed).id, pigs(k.observed).args, meta[0], meta[1]);
     }), { columns: 1 });
     var out = '<section class="ct-group">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.count.c.title' } }) + facts;
-    if (review) {
-      var crossed = review.crossed.map(eventOf).filter(Boolean)[0] || {};
-      var what = crossed.type === 'death' ? 'pp.count.review.death' : crossed.type === 'move' ? 'pp.count.review.move' : 'pp.count.review.weaned';
-      out += UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.review.title', description: what },
-        args: { description: { who: review.who, t: U.time(crossed.at || review.at), by: crossed.who || '' } } }) +
+    if (c.review) {
+      var st = c.counts.filter(function (k) { return k.stands; })[0];
+      var desc, dargs = { np: np(st.observed) };
+      if (st.crossed.length) {
+        var x = eventOf(st.crossed[0]) || {};
+        desc = x.type === 'move' ? 'pp.count.review.move' : x.type === 'weaned' ? 'pp.count.review.weaned' : 'pp.count.review.death';
+        dargs.who = st.who; dargs.t = U.time(x.at || st.at); dargs.by = x.who || '';
+      } else {
+        var o = eventOf(st.order[0]) || {};
+        desc = 'pp.count.review.order'; dargs.who = o.who || ''; dargs.t = U.time(o.at || st.at);
+      }
+      out += UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.review.title', description: desc }, args: { description: dargs } }) +
         UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.review.again', titleArgs: { code: crate }, desc: 'pp.count.review.again_desc' }));
     }
     return out + '</section>';
   }
+  /* The receipt owns the change this Save made; colour sits on the numeral only (the totals stay in the record). */
   function receiptLine() {
     var r = S.receipt;
     if (!r) return '';
-    if (r.kind === 'match') return U.receipt([{ id: 'pp.count.rcpt.match', args: { n: r.observed } }]);
-    return U.receipt([{ id: 'pp.count.rcpt.counted', args: { n: r.observed } }, { id: 'pp.count.rcpt.' + r.kind, args: { n: Math.abs(r.diff) }, tone: r.kind === 'loss' ? 'red' : 'blue' }]);
+    var gap = PP.lang === 'zh' ? '' : ' ';
+    function part(id, n, tone) { return span(id) + gap + span('pp.count.rcpt.n', { n: n }, { tone: tone }) + gap + span(pl('pp.count.rcpt.unit', n)); }
+    var segs = [span('receipt.saved')];
+    if (r.sup.loss) segs.push(part('pp.count.rcpt.closes_loss', r.sup.loss, 'green'));
+    if (r.sup.gain) segs.push(part('pp.count.rcpt.closes_gain', r.sup.gain, 'green'));
+    if (r.kind === 'loss') segs.push(part('pp.count.rcpt.loss', -r.diff, 'red'));
+    else if (r.kind === 'gain') segs.push(part('pp.count.rcpt.gain', r.diff, 'blue'));
+    else segs.push(span('pp.count.rcpt.match'));
+    return '<p class="pp-receipt" data-ds="Candidate:Receipt" role="status" aria-live="polite"><span>' + segs.join(' ') + '</span></p>';
   }
   function hostHtml(inert) {
-    // A count under sync review leads: the worker's next act is to count again.
     var c = store.select.counts(store.derived, crate);
+    // a count under sync review leads: the next act is to count again
     var body = hostFacts() + U.tools(crate) + keptRow() + (c && c.review ? countsSection() + openSection() : openSection() + countsSection());
     return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (inert ? ' inert' : '') + '>' + hostHead() +
       '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
@@ -187,64 +223,100 @@
 
   /* ---- the Set count drawer: a staged assertion (Back keeps the draft, Clear discards it, Save writes one stamped count) ---- */
   function hint(d) {
-    if (d.why === 'farrowing_open') return { id: 'pp.count.hint.match' };
+    var sup = d.supersedes || { loss: 0, gain: 0 };
+    if (sup.loss || sup.gain) {
+      var what = sup.loss ? 'loss' : 'gain', n = sup.loss || sup.gain;
+      if (d.kind === 'match') return { id: 'pp.count.hint.back_' + what, args: { np: np(n) } };
+      return { id: 'pp.count.hint.replace_' + d.kind, args: { kp: np(Math.abs(d.diff)) } };
+    }
     if (d.kind === 'match') return { id: 'pp.count.hint.match' };
-    return { id: 'pp.count.hint.' + d.kind, args: { k: Math.abs(d.diff) } };
+    return { id: 'pp.count.hint.' + d.kind, args: { k: Math.abs(d.diff), kp: np(Math.abs(d.diff)) } };
   }
   function rosterSection(d) {
     if (!d.needRows && !S.rows.length) return '';
     var h = UI.heading({ title: '', description: '', kind: 'section', level: 3,
-      strs: { title: pl('pp.count.named.title', d.needRows), description: pl('pp.count.named.desc', d.untagged) },
-      args: { title: { n: d.needRows }, description: { u: d.untagged, k: d.maxRows, n: d.needRows } } });
+      strs: { title: pl('pp.count.named.title', d.needRows), description: pl('pp.count.named.desc', d.needRows) },
+      args: { description: { up: np(d.untagged), kp: np(d.maxRows), n: d.needRows } } });
     var rows = UI.choiceGroup(d.roster.map(function (r) {
       var l = rowLabel(r);
       return UI.choiceRow({ label: '', mode: 'multi', action: 'pick-row', value: r.rowId, selected: S.rows.indexOf(r.rowId) >= 0, strs: { label: l.id }, args: { label: l.args } });
     }));
-    return '<section class="ct-group">' + h + rows + '</section>';
+    return '<section class="ct-group" data-target="roster">' + h + rows + '</section>';
   }
   function pointer(d) {
+    if (S.failed) return { id: 'pp.count.why.failed' };
+    if (stale()) return { id: 'pp.count.why.stale', args: { t: when(S.at), ago: U.ago(S.at, NOW) } };
     if (d.why === 'name_the_rows') return { id: pl('pp.count.why.rows', d.needRows - d.picked.length), args: { n: d.needRows - d.picked.length } };
     if (d.why === 'too_many_rows') return { id: pl('pp.count.why.too_many', d.maxRows), args: { n: d.maxRows } };
     if (d.why) return { id: 'pp.count.why.check' };
     return null;
+  }
+  function endedPanel() {
+    var E = store.derived.ended;
+    if (!E || !E.event || !L().inTask) return '';
+    return UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.ended.title', description: 'pp.count.ended.desc' },
+      args: { title: { date: U.date(E.at) } } });
   }
   function countDrawer() {
     var d = draft(), h = hint(d), p = pointer(d), x = L();
     var hero = UI.stepper({ label: '', value: S.observed, min: 0, key: 'observed', variant: 'hero', draft: dirty(), hint: '', reserveHint: true,
       strs: { label: 'pp.count.seen', value: 'ds.field.figure', hint: h.id, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { label: { code: crate }, hint: h.args } });
-    var summary = p ? '<div class="ct-summary">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: p.id }, args: { title: p.args } }) + '</div>' : '';
-    var size = d.needRows || S.rows.length ? ' data-size="long"' : ' data-size="medium" data-sizing="content"';
+    var summary = p ? '<div class="ct-summary" role="status">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: p.id }, args: { title: p.args } }) + '</div>' : '';
+    // the size is reserved once the count is below alive on a litter with tagged piglets, so the roster never makes it jump
+    var long = d.roster.length && S.observed < d.base;
+    var size = long ? ' data-size="long"' : ' data-size="medium" data-sizing="content"';
+    var sub = d.open.loss || d.open.gain ? span(pl('pp.count.sub_open', x.alive), { code: crate, ap: np(x.alive), op: np(d.open.loss || d.open.gain), what: PP.t(d.open.loss ? 'pp.count.sub_missing' : 'pp.count.sub_extra') })
+      : span('pp.count.sub', { code: crate, ap: np(x.alive), day: x.dayAge });
     return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Sheet" data-st-context="drawer"' + size + ' role="dialog" aria-modal="true">' +
-      '<header class="utility-header ct-head"><div class="pp-hdr-title"><h3 data-str="pp.count.title">' + U.esc(PP.t('pp.count.title')) + '</h3><p>' +
-      span(pl('pp.count.sub', x.alive), { code: crate, n: x.alive, day: x.dayAge }) + '</p></div>' + (dirty() ? textAction('clear', 'act.clear') : '') + '</header>' +
-      '<div class="sheet-body"><div class="ct-body">' + hero + rosterSection(d) + '</div></div>' + summary +
-      '<footer class="sheet-footer ct-bar">' + button('secondary', 'back', 'act.back') + button('primary', 'save', 'act.save', null, !d.event) + '</footer></section>';
+      '<header class="utility-header ct-head"><div class="pp-hdr-title"><h3 data-str="pp.count.title">' + U.esc(PP.t('pp.count.title')) + '</h3><p>' + sub + '</p></div>' +
+      (dirty() ? textAction('clear', 'act.clear') : '') + '</header>' +
+      '<div class="sheet-body"><div class="ct-body">' + hero + endedPanel() + rosterSection(d) + '</div></div>' + summary +
+      '<footer class="sheet-footer ct-bar">' + button('secondary', 'back', 'act.back') + button('primary', 'save', 'act.save', null, !d.event || stale() || S.failed) + '</footer></section>';
   }
 
-  /* ---- before the lock the count is the farrowing sheet's (RULINGS Q13 / Model): a hand-off, not a second counter ---- */
-  function prelockDrawer() {
-    var x = L(), ev = x.lastEvent;
-    var door = UI.rowGroup(row({ action: 'open-farrowing', value: crate, title: 'pp.count.pre.door', titleArgs: { code: crate },
-      desc: 'pp.count.pre.door_desc', descArgs: { n: x.born, ago: U.ago(ev.at, NOW), who: ev.who } }));
+  /* ---- where the ledger does not take a count, the door says why: before the lock the count is the farrowing sheet's (hand-off);
+     a weaned-out litter has nothing to count ---- */
+  function refusedDrawer(why) {
+    var x = L(), body, sub;
+    if (why === 'farrowing_open') {
+      var ev = x.lastEvent;
+      sub = span('pp.count.pre.why', { code: crate });
+      body = UI.rowGroup(row({ action: 'open-farrowing', value: crate, title: 'pp.count.pre.door', titleArgs: { code: crate },
+        desc: 'pp.count.pre.door_desc', descArgs: { bp: np(x.born), ago: U.ago(ev.at, NOW), who: ev.who } }));
+    } else {
+      var w = store.events.filter(function (e) { return e.type === 'weaned' && e.litter === crate; }).pop() || {};
+      sub = span('pp.count.weaned', { code: crate, date: w.at ? U.date(w.at) : '', np: np(x.weaned) });
+      body = UI.rowGroup(row({ action: 'open-move', value: crate, title: 'pp.count.weaned_move', desc: 'pp.count.weaned_move_desc', descArgs: { code: crate } }));
+    }
     return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="short" data-sizing="content" role="dialog" aria-modal="true">' +
-      '<header class="utility-header"><div class="pp-hdr-title"><h3 data-str="pp.count.title">' + U.esc(PP.t('pp.count.title')) + '</h3><p>' + span('pp.count.pre.why', { code: crate }) + '</p></div></header>' +
-      '<div class="sheet-body"><div class="ct-body">' + door + '</div></div>' +
+      '<header class="utility-header"><div class="pp-hdr-title"><h3 data-str="pp.count.title">' + U.esc(PP.t('pp.count.title')) + '</h3><p>' + sub + '</p></div></header>' +
+      '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
       '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + '</footer></section>';
   }
 
-  /* ---- Explain: the open lines one by one (litter, or the room from its drift strip), each with its doors ---- */
+  /* ---- Explain: the open lines one by one (a litter, or the unit from its drift strip), each with its doors ---- */
+  function effect(s) {
+    var l = s.left;
+    if (!l.loss && !l.gain) return PP.t('pp.count.sug.both');
+    return l.loss ? PP.t('pp.count.sug.gain_closes', { kp: np(l.loss) }) : PP.t('pp.count.sug.loss_closes', { kp: np(l.gain) });
+  }
+  // how far apart the two counts were: the rail word of a suggestion (`5 min`, `2h`)
+  function gap(m) { return m == null ? null : m < 60 ? ['pp.count.sug.gap_min', { m: m }] : ['pp.count.sug.gap_h', { h: Math.round(m / 60) }]; }
   function suggestionRow(l, s) {
-    var t = s.kind === 'gain' ? 'pp.count.sug.gained' : 'pp.count.sug.lost';
-    var d = s.room !== l.room ? 'pp.count.sug.desc_unit' : 'pp.count.sug.desc';
-    var gap = s.gapMin == null ? '' : s.gapMin < 60 ? PP.t('pp.count.sug.gap_min', { m: s.gapMin }) : PP.t('pp.count.sug.gap_h', { h: Math.round(s.gapMin / 60) });
-    return row({ action: 'suggest', value: l.id + '|' + s.id, title: t, titleArgs: { code: s.litter, n: s.open },
-      desc: d, descArgs: { n: s.observed, stamp: stamp(s.at, s.who), gap: gap, u: s.room } });
+    var cross = s.room !== l.room, g = gap(s.gapMin);
+    var t = (s.kind === 'gain' ? 'pp.count.sug.gained' : 'pp.count.sug.lost') + (cross ? '_unit' : '');
+    return row({ action: 'suggest', value: l.id + '|' + s.id, title: t, titleArgs: { code: s.litter, np: np(s.open), u: s.room },
+      desc: 'pp.count.sug.desc', descArgs: { effect: effect(s) }, trail: g && g[0], trailArgs: g && g[1] });
   }
   function lineSection(l, withCode) {
     var t = lineTitle(l, withCode), st = lineStamp(l), rows = [];
-    l.suggestions.slice(0, 3).forEach(function (s) { rows.push(suggestionRow(l, s)); });
-    if (l.death) rows.push(row({ action: 'open-dead', value: l.litter, title: 'act.record_dead', desc: pl('pp.count.ex.dead_desc', l.open), descArgs: { n: l.open } }));
+    var all = S.more[l.id] ? l.suggestions : l.suggestions.slice(0, 3);
+    all.forEach(function (s) { rows.push(suggestionRow(l, s)); });
+    var more = l.suggestions.length - all.length;
+    if (more > 0) rows.push(row({ action: 'more', value: l.id, title: pl('pp.count.sug.more', more), titleArgs: { n: more } }));
+    if (l.kind === 'gain') rows.push(row({ action: 'move-in', value: l.id, title: 'pp.count.ex.move_in', desc: 'pp.count.ex.move_in_desc', descArgs: { code: l.litter } }));
+    if (l.death) rows.push(row({ action: 'open-dead', value: l.litter, title: 'act.record_dead', desc: pl('pp.count.ex.dead_desc', l.open), descArgs: { np: np(l.open) } }));
     rows.push(row({ action: 'open-count', value: l.litter, title: 'pp.count.title', desc: 'pp.count.ex.again_desc', descArgs: { code: l.litter } }));
     var none = l.suggestions.length ? '' : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: l.kind === 'loss' ? 'pp.count.ex.none_loss' : 'pp.count.ex.none_gain' } });
     var review = l.review ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.review.line' } }) : '';
@@ -254,8 +326,9 @@
   }
   function explainHtml(inert) {
     var x = explain(), head;
-    if (S.room) head = UI.heading({ title: '', description: '', kind: 'page', level: 2, strs: { title: 'pp.count.ex.title_room', description: 'pp.count.ex.sub' }, args: { title: { u: S.room }, description: { l: x.openLoss, g: x.openGain } } });
-    else head = UI.heading({ title: '', description: '', kind: 'page', level: 2, strs: { title: 'pp.count.ex.title', description: 'pp.count.ex.sub' }, args: { title: { code: crate }, description: { l: x.openLoss, g: x.openGain } } });
+    var sub = { lp: np(x.openLoss), gp: np(x.openGain) };
+    if (S.room) head = UI.heading({ title: '', description: '', kind: 'page', level: 2, strs: { title: 'pp.count.ex.title_room', description: 'pp.count.ex.sub' }, args: { title: { u: S.room }, description: sub } });
+    else head = UI.heading({ title: '', description: '', kind: 'page', level: 2, strs: { title: 'pp.count.ex.title', description: 'pp.count.ex.sub' }, args: { title: { code: crate }, description: sub } });
     var body = x.lines.length ? x.lines.map(function (l) { return lineSection(l, !!S.room); }).join('')
       : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.ex.empty' } });
     return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (inert ? ' inert' : '') + '>' +
@@ -263,11 +336,16 @@
       '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
       '<footer class="sheet-footer ct-bar">' + button('secondary', 'back', 'act.back') + '</footer></section>';
   }
-  /* The suggestion, side by side: both counts (who, when, where), what saving it as a Move does, and the door to the Move sheet.
-     A suggestion is never proof; nothing pairs until the worker saves the Move. */
+  /* The suggestion, side by side: both counts (who, when, where), what saving it as a Move closes and leaves open, and the door
+     to the Move sheet. A suggestion is never proof; nothing pairs until the worker saves the Move. */
+  function lineOf(id) {
+    var out = null;
+    [explain(), store.select.explain(store.derived, {}, {})].forEach(function (x) { x.lines.forEach(function (a) { if (!out && a.id === id) out = a; }); });
+    return out;
+  }
   function suggestion() {
-    var x = explain(), l = null, s = null;
-    x.lines.forEach(function (a) { if (a.id === S.line) { l = a; a.suggestions.forEach(function (b) { if (b.id === S.pick) s = b; }); } });
+    var l = lineOf(S.line), s = null;
+    if (l) l.suggestions.forEach(function (b) { if (b.id === S.pick) s = b; });
     return l && s ? { l: l, s: s } : null;
   }
   function suggestDrawer() {
@@ -278,59 +356,65 @@
     var cross = loss.room !== gain.room;
     var side = function (y, kind) {
       return fact(cross ? 'pp.count.sg.side_unit' : 'pp.count.sg.side', { code: y.litter, u: y.room },
-        'pp.count.line.' + kind, { n: y.open }, 'pp.count.sg.stamp', { n: y.observed, stamp: stamp(y.at, y.who) }, kind === 'loss' ? 'red' : 'blue');
+        'pp.count.line.' + kind, { np: np(y.open) }, 'pp.count.sg.stamp', { op: np(y.observed), stamp: stamp(y.at, y.who) }, kind === 'loss' ? 'red' : 'blue');
     };
-    var t = l.kind === 'loss' ? 'pp.count.sug.gained' : 'pp.count.sug.lost';
-    var body = UI.facts([side({ litter: loss.litter, room: loss.room, open: loss.open, observed: loss.observed, at: loss.at, who: loss.who }, 'loss'),
-                         side({ litter: gain.litter, room: gain.room, open: gain.open, observed: gain.observed, at: gain.at, who: gain.who }, 'gain')], { columns: 2 }) +
-      UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: pl('pp.count.sg.if', m.n), description: 'pp.count.sg.alive' },
-        args: { title: { n: m.n }, description: { a: m.from, x: mv.delta ? mv.delta.from[1] : '', b: m.to, y: mv.delta ? mv.delta.to[1] : '' } } });
+    var t = (l.kind === 'loss' ? 'pp.count.sug.gained' : 'pp.count.sug.lost') + (s.room !== l.room ? '_unit' : '');
+    var body = UI.facts([side(loss, 'loss'), side(gain, 'gain')], { columns: 2 }) +
+      UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.sg.if', description: 'pp.count.sg.alive' },
+        args: { title: { np: np(m.n), effect: effect(s) }, description: { a: m.from, xp: mv.delta ? np(mv.delta.from[1]) : '', b: m.to, yp: mv.delta ? np(mv.delta.to[1]) : '' } } });
     return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="medium" data-sizing="content" role="dialog" aria-modal="true">' +
-      '<header class="utility-header"><div class="pp-hdr-title"><h3>' + span(t, { code: s.litter, n: s.open }) + '</h3><p>' + span('pp.count.sg.sub') + '</p></div></header>' +
+      '<header class="utility-header"><div class="pp-hdr-title"><h3>' + span(t, { code: s.litter, np: np(s.open), u: s.room }) + '</h3><p>' + span('pp.count.sg.sub') + '</p></div></header>' +
       '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
       '<footer class="sheet-footer ct-bar">' + button('secondary', 'back', 'act.back') + button('primary', 'open-move', 'pp.count.sg.move', { n: m.n, from: m.from, to: m.to }, !mv.event) + '</footer></section>';
   }
 
   function render() {
     var html;
-    if (S.view === 'count') html = hostHtml(true) + countDrawer();
-    else if (S.view === 'prelock') html = hostHtml(true) + prelockDrawer();
+    if (S.view === 'count') { var w = draft().why; html = hostHtml(true) + (w === 'farrowing_open' || w === 'weaned' ? refusedDrawer(w) : countDrawer()); }
     else if (S.view === 'explain') html = explainHtml(false);
     else if (S.view === 'suggest') { var dr = suggestDrawer(); html = explainHtml(!!dr) + dr; }
     else html = hostHtml(false);
     var root = document.getElementById('screen');
+    var body = root.querySelector('[role="dialog"] .sheet-body'), top = body ? body.scrollTop : 0;
     root.innerHTML = html;
     PP.apply(root);
+    var nb = root.querySelector('[role="dialog"] .sheet-body'); if (nb) nb.scrollTop = top;
   }
 
   /* ---- acts ---- */
   // The variant always travels (`data=base` too): a page whose state names its own variant must not fall back to it.
   function nav(page, params) { location.href = PP.href(page, Object.assign({ data: store.name }, params)); }
+  function here() { return location.pathname + location.search; }
   function openCount(c) {
     if (c && c !== crate) { nav('count.html', { state: 'count', crate: c }); return; }
-    if (L().phase !== 'locked') { S.view = 'prelock'; return; }
     var k = keptDraft();
-    S.observed = k ? k.observed : L().alive; S.rows = k ? k.rows.slice() : []; S.view = 'count'; S.receipt = null;
+    S.rows = k ? k.rows.slice() : []; S.at = k ? k.at : null; S.failed = false; S.view = 'count'; S.receipt = null;
+    S.observed = k ? k.observed : draft().base;
   }
+  function touch() { S.at = NOW; S.failed = false; }        // any change to the count is a fresh observation
   function save() {
     var d = draft();
     if (!d.event) return false;
-    var r = store.commit(d.event);
-    if (!r.ok) return false;
-    S.receipt = { kind: d.kind, observed: d.observed, diff: d.diff };
-    dropDraft(); S.rows = []; S.view = 'host';
+    var r = store.commit(Object.assign({}, d.event, { at: S.at || NOW }));
+    if (!r.ok) { S.failed = true; return false; }
+    S.receipt = { kind: d.kind, diff: d.diff, sup: d.supersedes };
+    dropDraft(); S.rows = []; S.at = null; S.view = 'host'; lastTap = Date.now();
     return true;
   }
   function back() {
     if (S.view === 'count') { keepDraft(); S.view = 'host'; return; }
-    if (S.view === 'prelock') { S.view = 'host'; return; }
     if (S.view === 'suggest') { S.view = 'explain'; return; }
     if (S.view === 'explain' && S.from === 'host') { S.view = 'host'; S.from = ''; return; }
     if (S.view === 'explain' && S.room) { nav('room.html', { state: 'room', unit: S.room !== 7 ? S.room : '' }); return 'nav'; }
     nav('litter.html', { state: 'litter', crate: crate, unit: qs.get('unit') });
     return 'nav';
   }
+  function goTo(target) {
+    var t = document.querySelector('[data-target="' + target + '"]');
+    if (t) { t.scrollIntoView({ block: 'center' }); var f = t.querySelector('input, button'); if (f) f.focus({ preventScroll: true }); }
+  }
   document.getElementById('screen').addEventListener('click', function (ev) {
+    if (Date.now() - lastTap < 400) return;                                      // a double tap after Save lands nowhere
     if (ev.target.closest('[data-dismiss]')) { back(); render(); return; }      // the scrim is Back
     var b = ev.target.closest('[data-action]');
     if (!b) return;
@@ -338,24 +422,38 @@
     if (a === 'pick-row') v = b.value;
     if (a === 'step') {
       if (b.getAttribute('aria-disabled') === 'true') return;
-      S.observed = Math.max(0, S.observed + (+b.dataset.step));
-      if (S.observed >= L().alive) S.rows = [];                                // nothing missing: no tagged piglet to name
+      S.observed = Math.max(0, S.observed + (+b.dataset.step)); touch();
+      if (S.observed >= draft().base) S.rows = [];                               // nothing missing: no tagged piglet to name
+      keepDraft();
     }
-    else if (a === 'pick-row') { var i = S.rows.indexOf(v); if (i >= 0) S.rows.splice(i, 1); else S.rows.push(v); }
-    else if (a === 'clear') { dropDraft(); S.observed = L().alive; S.rows = []; }
-    else if (a === 'save') { if (b.disabled) return; save(); }
+    else if (a === 'pick-row') { var i = S.rows.indexOf(v); if (i >= 0) S.rows.splice(i, 1); else S.rows.push(v); touch(); keepDraft(); }
+    else if (a === 'clear') { dropDraft(); S.observed = draft().base; S.rows = []; S.at = null; S.failed = false; }
+    else if (a === 'save') {
+      if (b.getAttribute('aria-disabled') === 'true') { render(); if (draft().why === 'name_the_rows' || draft().why === 'too_many_rows') goTo('roster'); return; }
+      save();
+    }
     else if (a === 'back') { if (back() === 'nav') return; }
     else if (a === 'open-count') openCount(v);
     else if (a === 'open-explain') { S.view = 'explain'; S.from = 'host'; S.room = 0; }
     else if (a === 'suggest') { var p = v.split('|'); S.line = p[0]; S.pick = p[1]; S.view = 'suggest'; }
+    else if (a === 'more') { S.more[v] = true; }
     else if (a === 'open-dead') { nav('dead.html', { state: 'dead', crate: v || crate, unit: qs.get('unit') }); return; }
-    else if (a === 'open-move') {
-      var sg = suggestion(); if (!sg || b.disabled) return;
+    else if (a === 'move-in') {
+      var gl = lineOf(v); if (!gl) return;
+      nav('move.html', { state: 'move', crate: gl.litter, dir: 'in', n: gl.open, explains: ',' + gl.id }); return;
+    }
+    else if (a === 'open-move' && S.view === 'suggest') {
+      var sg = suggestion(); if (!sg || b.getAttribute('aria-disabled') === 'true') return;
       var m = sg.s.move;
       nav('move.html', { state: 'move-explain', crate: m.from, other: m.to, n: m.n, rows: m.rows.join(','), explains: m.explains.join(',') });
       return;
     }
-    else if (a === 'open-farrowing') { location.href = '/ux/system/farrowing-astra-concept.html'; return; }
+    else if (a === 'open-move') { nav('move.html', { state: 'move', crate: v || crate }); return; }
+    else if (a === 'open-farrowing') {
+      // the hand-off carries its context: the crate, the sow, the state, the language, and the way back here
+      location.href = '/ux/system/farrowing-astra-concept.html?' + new URLSearchParams({ state: 'farrowing', unit: L().room, crate: crate, sow: sow().sow, back: here() }).toString() + (PP.lang === 'zh' ? '&lang=zh' : '');
+      return;
+    }
     else if (a === 'open-sow') { document.documentElement.setAttribute('data-door', 'open-sow:' + (v || '')); return; }
     else { document.documentElement.setAttribute('data-door', a + ':' + (v || '')); return; }
     render();
@@ -363,17 +461,17 @@
 
   PP.ready.then(function () {
     store = PP.open(spec.data || 'base', spec.save != null ? { session: false } : null);
-    TODAY = store.today; NOW = window.PPFixtures.NOW;
+    TODAY = store.today; NOW = store.today === window.PPFixtures.TODAY ? window.PPFixtures.NOW : store.today + 'T16:30';
     crate = qs.get('crate') || spec.crate || '';
-    room = +(qs.get('unit') || spec.room || 0);
-    S = { view: spec.view, observed: 0, rows: [], receipt: null, room: spec.view === 'explain' && !qs.get('crate') ? room : 0, line: spec.line || '', pick: spec.pick || '', from: '' };
-    if (S.room && !crate) crate = store.select.explain(store.derived, { room: S.room }).lines.map(function (l) { return l.litter; })[0] || 'A02';
+    var room = +(qs.get('unit') || spec.room || 0);
+    S = { view: spec.view, observed: 0, rows: [], at: null, failed: false, receipt: null, more: {},
+      room: spec.view === 'explain' && !qs.get('crate') ? room : 0, line: spec.line || '', pick: spec.pick || '', from: '' };
     if (!L()) crate = 'A02';
-    if (S.view === 'count' || S.view === 'prelock') {
+    if (S.view === 'count') {
       openCount();
-      if (spec.observed != null) S.observed = spec.observed;
+      if (spec.observed != null) { S.observed = spec.observed; S.at = NOW; }
     }
-    if (spec.save != null) { openCount(); S.observed = spec.save; save(); }
+    if (spec.save != null) { openCount(); S.observed = spec.save; S.at = NOW; save(); lastTap = 0; }
     render();
   });
 })();
