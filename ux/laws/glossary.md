@@ -43,6 +43,19 @@ Defined by farrowing and used here unchanged (RULINGS *Model*; the Finish sheet)
 | **Healthy** | piglets | alive − weak − deformed; derived, no form row, printed on the record | as Weak / Deformed | one litter |
 | **Weaned** 断奶 | piglets | piglets that left the litter at weaning; the last term of the ledger | stamped at weaning | one litter |
 
+## Dead picker (slice 9)
+
+The one shared dead drawer, as farrowing's, opened from processing. Counts in it use Alive and Dead above unchanged.
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Dead N** (drawer title) 死亡 N头 | piglets | the litter's Dead plus the bodies in this drawer's draft | now; the draft part is unsaved until Save | one litter |
+| **Unsaved** 未保存 | piglets | bodies in the drawer's draft: untagged tallies plus picked tagged piglets. Back keeps them on the device; Clear discards them | from the first tally until Save or Clear | one litter, one device |
+| **Born dead** 出生即死 | piglets | stillborn + mummified recorded by farrowing; printed on the drawer's context line after the lock, because those two causes leave the list there | fixed at the farrowing lock | one litter |
+| **Tagged** 有耳标 | alive piglets | alive piglets with a current ear-tag identity row; each is picked by its tag and dies against that row | now | one litter |
+| **Untagged** 无耳标 | alive piglets | Alive − Tagged; tallied by cause, and tallies stop at this number so a tagged piglet is never subtracted namelessly | now | one litter |
+| **The N missing** 不明减少的N头 | piglets | the litter's open unexplained losses (see *Open / explained*); `One of the 2 missing?` asks whether the drafted body is one of them | now | one litter |
+
 ## Count grammar
 
 The count leads the word and the unit is written: `{n} piglets`, singular `{n} piglet` (`pp.common.unit.piglet.one` / `.many`, `PP.tn`); zh has one form and no space between numeral and classifier (`14头`, `3日龄`). Ruled anchors that stay as they are: `born {n}` and `day {n}` (en), `Saved · +{n} this visit` and `Saved · {n} died this visit` (farrowing's, under `fr.*`; a processing receipt names its outcome and is registered by the slice that writes it), and label-then-count headers such as `Dead 6` and `Unexplained loss {n}`.

@@ -28,7 +28,18 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "inspection", "url": "ux/system/inspection-astra-concept.html", "locales": ["en"],
       "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] },
     { "name": "pp-index", "url": "ux/tasks/piglet-processing/index.html", "strict": true },
-    { "name": "ds-field-cards", "url": "ux/design-system/components/field-cards-demo.html", "strict": true }
+    { "name": "ds-field-cards", "url": "ux/design-system/components/field-cards-demo.html", "strict": true },
+    { "name": "pp-dead-dead", "url": "ux/tasks/piglet-processing/dead.html?state=dead", "strict": true },
+    { "name": "pp-dead-dead-tallied", "url": "ux/tasks/piglet-processing/dead.html?state=dead-tallied", "strict": true },
+    { "name": "pp-dead-dead-draft", "url": "ux/tasks/piglet-processing/dead.html?state=dead-draft", "strict": true },
+    { "name": "pp-dead-dead-tagged", "url": "ux/tasks/piglet-processing/dead.html?state=dead-tagged", "strict": true },
+    { "name": "pp-dead-dead-tagged-picked", "url": "ux/tasks/piglet-processing/dead.html?state=dead-tagged-picked", "strict": true },
+    { "name": "pp-dead-dead-open-loss", "url": "ux/tasks/piglet-processing/dead.html?state=dead-open-loss", "strict": true },
+    { "name": "pp-dead-dead-open-loss-yes", "url": "ux/tasks/piglet-processing/dead.html?state=dead-open-loss-yes", "strict": true },
+    { "name": "pp-dead-dead-open-loss-no", "url": "ux/tasks/piglet-processing/dead.html?state=dead-open-loss-no", "strict": true },
+    { "name": "pp-dead-dead-sow", "url": "ux/tasks/piglet-processing/dead.html?state=dead-sow", "strict": true },
+    { "name": "pp-dead-farrowing-drawer", "url": "ux/tasks/piglet-processing/dead.html?state=farrowing-drawer", "strict": true },
+    { "name": "pp-dead-farrowing-drawer-draft", "url": "ux/tasks/piglet-processing/dead.html?state=farrowing-drawer-draft", "strict": true }
   ]
 }
 ```
