@@ -8,10 +8,12 @@
 <link rel="stylesheet" href="/ux/design-system/components/bundle.css">
 <link rel="stylesheet" href="shell.css">
 <style>
-/* Layout only, tokens from tokens.css. No candidate: the Move is Sheet + Segment + ChoiceList + Stepper + Facts + Heading + Row. */
+/* Layout only, tokens from tokens.css; one Candidate composition (Candidate:Radio, below). */
 .mv-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
 .mv-phone .scrim { inset: 0; }
 .mv-title { flex: 1; min-width: 0; }
+.mv-head { display: flex; align-items: flex-start; gap: var(--space-footer-gap); }
+.mv-head > .st-text-action { min-width: var(--touch-min); justify-content: flex-end; }   /* the text action's hit area is 44px tall only; widen it to 44 */
 .mv-body { display: flex; flex-direction: column; gap: var(--space-section); padding-bottom: var(--space-panel); }
 .mv-body > * { margin: 0; }
 .mv-face { display: flex; flex-direction: column; gap: var(--space-section); }
@@ -23,11 +25,24 @@
 .mv-summary { flex: none; display: flex; flex-direction: column; gap: var(--space-row-y); padding: var(--space-row-y) var(--space-gutter); }
 .mv-summary > * { margin: 0; }
 .mv-phone .sheet[data-st-context="drawer"] > .sheet-body { flex: 1; }
-.mv-receipt { display: flex; flex-direction: column; gap: var(--space-panel); padding-bottom: var(--space-panel); }
-.mv-receipt > * { margin: 0; }
 .sheet-footer > .button { flex: 1; }
 .sheet-footer > .button.secondary:not(:only-child) { flex: none; }
 @media (max-width: 370px) { .mv-summary { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
+
+/* Candidate:Radio — single-select rows with a visible radio (RULINGS craft pass: 2px rings; selected = ink ring + 10px ink dot;
+   the whole row is the target; the selected label is heavier). ChoiceList geometry; a design-system batch will make the card. */
+.mv-radios { margin: 0; background: var(--inset); border: 1px solid var(--line); border-radius: var(--radius-inset); overflow: hidden; }
+.mv-radio { display: flex; align-items: center; gap: var(--space-footer-gap); width: 100%; min-height: var(--choice-row-min); margin: 0; padding: var(--space-row-y) var(--space-panel); border: 0; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.mv-radio + .mv-radio { border-top: 1px solid var(--rule); }
+.mv-radio:active { background: var(--choice-press); }
+.mv-radio:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+.mv-radio-mark { flex: none; width: 22px; height: 22px; box-sizing: border-box; border: 2px solid var(--muted); border-radius: 50%; }
+.mv-radio[aria-checked="true"] .mv-radio-mark { border-color: var(--ink); background: var(--ink); box-shadow: inset 0 0 0 4px var(--inset); }
+.mv-radio-copy { display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0; }
+.mv-radio-label { font-size: var(--type-choice-label-size); font-weight: 500; line-height: 1.4; }
+.mv-radio[aria-checked="true"] .mv-radio-label { font-weight: 600; }
+.mv-radio-meta { font-size: var(--type-choice-meta-size); line-height: 1.4; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .mv-radio { transition: none; } }
 </style>
 </head>
 <body>
@@ -40,282 +55,495 @@
 (function () {
   var UI = window.SentriUI, ICON = window.SentriIcons;
   var zh = PP.lang === 'zh';
+  var TODAY = zh ? '9月29日' : 'Sep 29', WHO = 'G.H', UNIT = 7;
 
-  /* ---- fixtures: Unit 7, Sep 29. Every number printed on every state comes from here. ----
-     done[d] = piglets of the litter recorded for dose d; equal to alive = all done, 0 = none, between = part done.
-     Invisible doses (asked when part done): iron, coccidiosis, health. Visible (checked on the pig): teeth, tail, castrate. */
+  /* ---- schedule (farm config stand-in) ----
+     Each scheduled dose is its own obligation, due at a day-age. castrate is counted against males (Q16).
+     teeth has a console "last age-day" of 7: past it an undone piglet is missed, not owed (Q15). */
+  var TX = ['teeth', 'tail', 'iron', 'coccidiosis', 'castrate'];
+  var DUE = { teeth: 1, tail: 1, iron: 3, coccidiosis: 3, castrate: 5 };
+  var LAST = { teeth: 7 };
   var INVISIBLE = { iron: 1, coccidiosis: 1, health: 1 };
-  var DOSES = ['iron', 'coccidiosis', 'teeth', 'tail'];
-  var LIT = {
-    B01: { tag: '000226', day: 3, born: 10, dead: 3, alive: 7, died: true, done: { teeth: 7, tail: 7, iron: 0, coccidiosis: 0 } },
-    B02: { tag: '000241', day: 4, born: 9, dead: 1, alive: 8, done: { iron: 8, coccidiosis: 8, teeth: 8, tail: 8 } },
-    B04: { tag: '000254', day: 4, born: 10, dead: 1, alive: 9, done: { iron: 9, coccidiosis: 9, teeth: 9, tail: 9 } },
-    B06: { tag: '000261', day: 3, born: 13, dead: 1, alive: 12, done: { iron: 0, coccidiosis: 0, teeth: 0, tail: 0 } },
-    B08: { tag: '000270', day: 0, alive: 6, dead: 1, sofar: 7, farrowing: true, ago: 2, who: 'L.M' },
-    B09: { tag: '000247', day: 4, born: 11, dead: 1, alive: 10, done: { iron: 8, coccidiosis: 10, teeth: 10, tail: 7 } },
-    B10: { tag: '000265', day: 3, born: 12, dead: 1, alive: 11, done: { iron: 0, coccidiosis: 0, teeth: 0, tail: 0 } },
-    C01: { tag: '000283', day: 5, born: 13, dead: 1, alive: 12, done: { iron: 12, coccidiosis: 12, teeth: 12, tail: 12 } },
-    C03: { tag: '000288', day: 4, born: 11, dead: 1, alive: 10, done: { iron: 10, coccidiosis: 10, teeth: 10, tail: 10 },
-           tags: ['000301', '000302', '000303', '000304', '000305', '000306', '000307', '000308', '000309', '000310'] },
-    C05: { tag: '000292', day: 4, born: 9, dead: 1, alive: 8, done: { iron: 0, coccidiosis: 0, teeth: 0, tail: 0 } },
-    D02: { tag: '000233', empty: true, alive: 0 }
-  };
-  var UNIT = 7, WHO = 'G.H';
-  // The room's other litters offered from each source: nearest day-age first; sows with no piglets in their own group.
-  function listFor(src) {
-    var me = LIT[src], near = [], empty = [];
-    Object.keys(LIT).forEach(function (c) {
-      var l = LIT[c];
-      if (c === src || l.farrowing) return;                 // pre-lock litters are never offered (the farrowing sheet owns them)
-      if (src.charAt(0) !== c.charAt(0) && !l.empty) return;  // this row of crates; the search finds the rest
-      (l.empty ? empty : near).push(c);
+
+  /* ---- fixtures: Unit 7 (rows B, C, D) and one crate in Unit 8; Sep 29 ----
+     Alive is never stored: alive() derives it from the ledger, so every face balances.
+     done[d] = alive own piglets recorded for dose d; deferred[d] = piglets skipped for a passing reason (still owed). */
+  function base() {
+    return {
+      B01: { unit: 7, tag: '000226', day: 8, born: 10, dead: 3, males: 3, died: true, done: { teeth: 0, tail: 7, iron: 7, coccidiosis: 7, castrate: 0 } },
+      B02: { unit: 7, tag: '000241', day: 4, born: 9, dead: 1, males: 4, done: { teeth: 8, tail: 8, iron: 8, coccidiosis: 8 } },
+      B04: { unit: 7, tag: '000254', day: 4, born: 10, dead: 1, males: 5, done: { teeth: 9, tail: 9, iron: 9, coccidiosis: 9 } },
+      B06: { unit: 7, tag: '000261', day: 3, born: 13, dead: 1, males: 6, done: { teeth: 0, tail: 0, iron: 0, coccidiosis: 0 } },
+      B08: { unit: 7, tag: '000270', day: 0, farrowing: true, live: 6, dead: 1, sofar: 7, ago: 2, by: 'L.M' },
+      B09: { unit: 7, tag: '000247', day: 4, born: 11, dead: 1, males: 5, done: { teeth: 10, tail: 7, iron: 8, coccidiosis: 10 },
+             deferred: { iron: { n: 2, reason: 'weak' }, tail: { n: 3, reason: 'weak' } } },
+      B10: { unit: 7, tag: '000265', day: 3, born: 12, dead: 1, males: 6, done: { teeth: 0, tail: 0, iron: 0, coccidiosis: 0 } },
+      C01: { unit: 7, tag: '000283', day: 5, born: 13, dead: 1, males: 6, done: { teeth: 12, tail: 12, iron: 12, coccidiosis: 12, castrate: 0 } },
+      C03: { unit: 7, tag: '000288', day: 4, born: 11, dead: 1, males: 5, done: { teeth: 10, tail: 10, iron: 10, coccidiosis: 10 },
+             ids: ['000301', '000302', '000303', '000304', '000305', '000306', '000307', '000308', 'n:12-9'] },
+      C05: { unit: 7, tag: '000292', day: 4, born: 9, dead: 1, males: 4, done: { teeth: 0, tail: 0, iron: 0, coccidiosis: 0 } },
+      D02: { unit: 7, tag: '000233', day: 26, born: 12, dead: 1, weaned: 11, done: {} },
+      A03: { unit: 8, tag: '000318', day: 4, born: 11, dead: 1, males: 5, done: { teeth: 10, tail: 10, iron: 10, coccidiosis: 10 } }
+    };
+  }
+  var LIT = base();
+  var MOVES = [];                                     // posted Move records: { id, from, to, n, rows, answers, explains, time, who }
+
+  function inOut(code) {
+    var o = { out: 0, inn: 0, outMoves: [], inMoves: [] };
+    MOVES.forEach(function (m) {
+      if (m.from === code) { o.out += m.n; o.outMoves.push(m); }
+      if (m.to === code) { o.inn += m.n; o.inMoves.push(m); }
     });
-    near.sort(function (a, b) { return Math.abs(LIT[a].day - me.day) - Math.abs(LIT[b].day - me.day) || (a < b ? -1 : 1); });
-    return { near: near, empty: empty };
+    return o;
+  }
+  // An explaining Move relabels an open loss/gain as moved out/in: the loss and gain it closes leave the ledger.
+  function closed(code, side) {
+    return MOVES.reduce(function (s, m) { return s + (m.explains && ((side === 'loss' && m.from === code) || (side === 'gain' && m.to === code)) ? m.n : 0); }, 0);
+  }
+  function ledger(code) {
+    var l = LIT[code], io = inOut(code);
+    if (l.farrowing) return { alive: l.live, dead: l.dead };
+    var loss = (l.loss || 0) - closed(code, 'loss'), gain = (l.gain || 0) - closed(code, 'gain');
+    var alive = l.born - l.dead - (l.weaned || 0) - loss + gain - io.out + io.inn;
+    return { born: l.born, dead: l.dead, weaned: l.weaned || 0, loss: loss, gain: gain, out: io.out, inn: io.inn, alive: alive, io: io };
+  }
+  function alive(code) { return ledger(code).alive; }
+  function dueDoses(day) { return TX.filter(function (d) { return DUE[d] <= day; }); }
+  function pop(code, d) { return d === 'castrate' ? (LIT[code].males || 0) : alive(code); }
+  function status(code) {
+    var l = LIT[code];
+    if (l.died) return 'died';
+    var ds = dueDoses(l.day), a = alive(code);
+    if (!ds.length) return 'due';
+    var full = ds.every(function (d) { return (l.done[d] || 0) >= pop(code, d); });
+    var none = ds.every(function (d) { return !(l.done[d] || 0); });
+    return full ? 'done' : none ? 'due' : 'part';
   }
 
-  /* ---- states ---- */
+  /* ---- the draft and the one resolved record ---- */
   var STATES = {
-    'move':           { view: 'move', from: 'B06', n: 1 },
-    'move-review':    { view: 'move', from: 'B06', to: 'B04', n: 2 },
-    'move-ask':       { view: 'move', from: 'B09', to: 'B02', n: 1, answers: { iron: 'unknown' } },
-    'move-tagged':    { view: 'move', from: 'C03', to: 'C05', picked: ['000304', '000307'] },
-    'move-orphan':    { view: 'move', from: 'B01', to: 'D02', n: 7 },
-    'move-prelock':   { view: 'prelock', face: 'B08' },
-    'move-receipt':   { view: 'receipt', from: 'B06', to: 'B04', n: 2, time: '09:42' },
-    'owed-from-move': { view: 'owed', face: 'B04', from: 'B06', n: 2, time: '09:42' },
-    'unknown-check':  { view: 'owed', face: 'B02', from: 'B09', n: 1, time: '10:05', answers: { iron: 'unknown' }, drawer: 'iron' }
+    'move':              { view: 'move', face: 'B06' },
+    'move-review':       { view: 'move', face: 'B06', other: 'B04', n: 2 },
+    'move-into':         { view: 'move', face: 'B04', dir: 'in', other: 'B10', n: 1 },
+    'move-ask':          { view: 'move', face: 'B09', other: 'B02', n: 2 },
+    'move-repeat':       { view: 'move', face: 'B04', other: 'B02', n: 1, prior: [{ id: 'MV-0929-01', from: 'B06', to: 'B04', n: 2, time: '09:42' }] },
+    'move-tagged':       { view: 'move', face: 'C03', other: 'C05', rows: ['000304', '000307'], n: 0 },
+    'move-orphan':       { view: 'move', face: 'B01', other: 'D02', n: 7 },
+    'move-explain':      { view: 'move', face: 'B06', other: 'B04', n: 1, explains: ['UL-B06-0929-1', 'UG-B04-0929-1'], fx: { B06: { loss: 1 }, B04: { gain: 1 } } },
+    'move-cross':        { view: 'move', face: 'B06', other: 'A03', n: 1 },
+    'move-prelock':      { view: 'prelock', face: 'B08' },
+    'move-receipt':      { view: 'receipt', face: 'B06', other: 'B04', n: 2, time: '09:42' },
+    'move-draft-kept':   { view: 'face', face: 'B06', other: 'B04', n: 2, kept: true },
+    'move-orphan-saved': { view: 'face', face: 'B01', prior: [{ id: 'MV-0929-04', from: 'B01', to: 'D02', n: 7, time: '11:05' }] },
+    'nurse-arrived':     { view: 'face', face: 'D02', prior: [{ id: 'MV-0929-04', from: 'B01', to: 'D02', n: 7, time: '11:05' }] },
+    'owed-from-move':    { view: 'face', face: 'B04', prior: [{ id: 'MV-0929-01', from: 'B06', to: 'B04', n: 2, time: '09:42' }] },
+    'owed-arrived-done': { view: 'face', face: 'C05', prior: [{ id: 'MV-0929-02', from: 'C03', to: 'C05', n: 2, rows: ['000304', '000307'], time: '09:10' },
+                                                              { id: 'MV-0929-03', from: 'B06', to: 'C05', n: 1, time: '10:20' }] },
+    'unknown-check':     { view: 'face', face: 'B02', drawer: 'MV-0929-05:iron', had: 1, rest: 'record',
+                           prior: [{ id: 'MV-0929-05', from: 'B09', to: 'B02', n: 2, answers: { iron: 'unknown' }, time: '10:05' }] }
   };
   var name = STATES[PP.state] ? PP.state : 'move';
   var S = JSON.parse(JSON.stringify(STATES[name]));
-  if (PP.state === 'move-prelock' && new URLSearchParams(location.search).get('data') === 'other') {
-    S = { view: 'move', from: 'B06', n: 1, query: 'B08' };
+  if (PP.state === 'move-prelock' && new URLSearchParams(location.search).get('data') === 'other') S = { view: 'move', face: 'B06', query: 'B08' };
+  S.dir = S.dir || 'out'; S.answers = S.answers || {}; S.rows = S.rows || []; S.untagged = S.untagged || 0;
+  if (S.n == null) S.n = 1;
+  if (S.fx) Object.keys(S.fx).forEach(function (c) { Object.assign(LIT[c], S.fx[c]); });
+  // prior moves: each is posted with the answers and carry it resolved to at its own time, against the fixtures as they stood
+  (S.prior || []).forEach(function (m) { m.carry = carry(m); m.who = WHO; MOVES.push(m); });
+  var RECEIPT_AT_LOAD = S.view === 'receipt';
+  var DEFAULT = JSON.stringify({ other: '', n: 1, rows: [], untagged: 0, answers: {}, dir: 'out' });
+
+  function source() { return S.dir === 'out' ? S.face : S.other; }
+  function receiver() { return S.dir === 'out' ? S.other : S.face; }
+  function sourceIds(code) { return code && LIT[code].ids ? LIT[code].ids : null; }
+  function remainder(code) { var ids = sourceIds(code); return ids ? Math.max(0, alive(code) - ids.length) : 0; }
+  function count() { return sourceIds(source()) ? S.rows.length + S.untagged : S.n; }
+  function canSource(c) { var l = LIT[c]; return !!l && !l.farrowing && alive(c) > 0; }
+  function canReceive(c) { var l = LIT[c]; return !!l && !l.farrowing && !l.died; }
+  // Clamp on every change: roles valid, n within the source's alive, rows only from the source.
+  function normalize() {
+    if (S.view !== 'move') return;
+    if (!canSource(S.face)) S.dir = 'in';                              // a sow with no piglets can only receive
+    if (S.other) {
+      var bad = S.other === S.face || !LIT[S.other] || LIT[S.other].farrowing ||
+        (S.dir === 'out' && !canReceive(S.other)) || (S.dir === 'in' && !canSource(S.other));
+      if (bad) S.other = '';
+    }
+    var src = source();
+    if (!src) return;
+    var max = alive(src);
+    S.n = Math.max(0, Math.min(S.n, max));
+    var ids = sourceIds(src) || [];
+    S.rows = S.rows.filter(function (r) { return ids.indexOf(r) >= 0; });
+    S.untagged = Math.max(0, Math.min(S.untagged, remainder(src)));
   }
-  S.dir = S.dir || 'out';
-  S.answers = S.answers || {};
+  function draftExists() { return JSON.stringify({ other: S.other || '', n: S.n, rows: S.rows, untagged: S.untagged, answers: S.answers, dir: S.dir }) !== DEFAULT; }
+  function record() {
+    return { id: S.id || 'MV-0929-06', from: source(), to: receiver(), n: count(), rows: S.rows.slice(), untagged: S.untagged,
+             answers: JSON.parse(JSON.stringify(S.answers)), explains: S.explains || null, time: S.time || '11:30', who: WHO };
+  }
+
+  /* What the moved piglets owe, per dose, from the source's state (RULINGS round 2, Q14–Q16). One function for review, receipt and faces.
+     all done → done · none done → owe (a lapsed window → missed; a deferral's reason travels) ·
+     part done → invisible: the answer (yes · no · unknown); visible: check on the pig. */
+  function knownOwing(code, d) {
+    return inOut(code).inMoves.reduce(function (s, m) { return s + (m.carry && m.carry[d] && m.carry[d].kind === 'owe' ? m.n : 0); }, 0);
+  }
+  function answerFor(rec, d) {
+    if (rec.answers && rec.answers[d]) return rec.answers[d];
+    return knownOwing(rec.from, d) ? 'no' : 'unknown';
+  }
+  function carry(rec) {
+    var s = LIT[rec.from], out = {};
+    dueDoses(s.day).forEach(function (d) {
+      var p = pop(rec.from, d), v = s.done[d] || 0, kind;
+      var lapsed = LAST[d] && s.day > LAST[d];
+      if (p === 0) return;
+      if (v >= p) kind = 'done';
+      else if (v === 0) kind = lapsed ? 'missed' : 'owe';
+      else if (INVISIBLE[d]) { var a = answerFor(rec, d); kind = a === 'yes' ? 'done' : a === 'no' ? 'owe' : 'unknown'; }
+      else kind = lapsed ? 'missed' : 'check';
+      out[d] = { kind: kind, reason: kind === 'owe' && s.deferred && s.deferred[d] ? s.deferred[d].reason : '' };
+    });
+    return out;
+  }
+  // The source's coverage after the Move: a Yes debits n; Don't know / check leave a range, never a false "all done".
+  function sourceAfter(rec, c) {
+    var s = LIT[rec.from], after = alive(rec.from) - rec.n, out = [];
+    Object.keys(c).forEach(function (d) {
+      if (d === 'castrate') return;
+      var v = s.done[d] || 0;
+      if (c[d].kind === 'unknown' || c[d].kind === 'check') out.push({ d: d, lo: Math.max(0, v - rec.n), hi: Math.min(v, after), of: after });
+    });
+    return out;
+  }
 
   /* ---- helpers ---- */
   function span(id, args, cls) {
     return '<span' + (cls ? ' class="' + cls + '"' : '') + ' data-str="' + id + '"' +
       (args ? " data-args='" + JSON.stringify(args).replace(/'/g, '&#39;') + "'" : '') + '></span>';
   }
-  function pig(n) { return 'pp.common.unit.piglet.' + (n === 1 && !zh ? 'one' : 'many'); }
-  function one(base, n) { return base + (n === 1 ? '.one' : '.many'); }
-  function doseList(list) { return list.map(function (d) { return PP.t('pp.move.dose.' + d); }).join(' · '); }
+  function pl(base, n) { return base + (n === 1 && !zh ? '.one' : '.many'); }
+  function txName(d) { return PP.t('pp.common.tx.' + d); }
+  function txList(list) { return list.map(txName).join(' · '); }
+  function where(code) { return LIT[code].unit !== UNIT; }
   function row(o) {
     var strs = { title: o.title }, args = { title: o.titleArgs };
     if (o.desc) { strs.description = o.desc; args.description = o.descArgs; }
-    return UI.row({ title: '', description: o.desc ? '' : undefined, action: o.action, value: o.value, strs: strs, args: args });
+    if (o.trail) { strs.trailing = o.trail; args.trailing = o.trailArgs; }
+    return UI.row({ title: '', description: o.desc ? '' : undefined, trailing: o.trail ? '' : undefined, action: o.action, value: o.value, strs: strs, args: args });
   }
   function fact(label, labelArgs, value, valueArgs, meta, metaArgs) {
     var f = { label: '', value: '', strs: { label: label, value: value }, args: { label: labelArgs, value: valueArgs } };
     if (meta) { f.meta = ''; f.strs.meta = meta; f.args.meta = metaArgs; }
     return f;
   }
+  function pigs(n) { return { id: pl('pp.common.unit.piglet', n), args: { n: n } }; }
   function button(cls, action, id, args, disabled) {
     return '<button type="button" class="button ' + cls + '" data-ds="Button" data-action="' + action + '" data-str="' + id + '"' +
       (args ? " data-args='" + JSON.stringify(args).replace(/'/g, '&#39;') + "'" : '') + (disabled ? ' disabled' : '') + '></button>';
   }
-  function status(l) {
-    if (l.empty) return null;
-    var vals = DOSES.map(function (d) { return l.done[d] || 0; });
-    if (vals.every(function (v) { return v >= l.alive; })) return 'done';
-    if (vals.every(function (v) { return v === 0; })) return 'due';
-    return 'part';
+  function textAction(action, id, args) {
+    return '<button type="button" class="st-text-action" data-ds="Button" data-action="' + action + '" data-str="' + id + '"' +
+      (args ? " data-args='" + JSON.stringify(args).replace(/'/g, '&#39;') + "'" : '') + '></button>';
   }
-
-  /* What the moved piglets owe, per dose, from the source's state (RULINGS round 2, Q14):
-     all done → carried done · none done → owed in the receiver · part done → invisible: asked; visible: check on the pig. */
-  function carry(from, to) {
-    var s = LIT[from], r = LIT[to], out = { done: [], owe: [], ask: [], check: [] };
-    DOSES.forEach(function (d) {
-      var v = s.done[d] || 0;
-      if (v >= s.alive) out.done.push(d);
-      else if (v === 0) out.owe.push(d);
-      else if (INVISIBLE[d]) out.ask.push(d);
-      else out.check.push(d);
-    });
-    // an answer turns an asked dose into done (yes), owed (no), or leaves it unknown on the receiver
-    out.unknown = [];
-    out.ask.forEach(function (d) {
-      var a = S.answers[d] || 'unknown';
-      (a === 'yes' ? out.done : a === 'no' ? out.owe : out.unknown).push(d);
-    });
-    return out;
+  // Candidate:Radio. opts: [{ value, id, args, meta, metaArgs }]
+  function radios(action, opts, active, label) {
+    return '<div class="mv-radios" data-ds="Candidate:Radio" role="radiogroup" aria-label="' + label.replace(/"/g, '&quot;') + '">' + opts.map(function (o) {
+      var on = o.value === active;
+      return '<button type="button" class="mv-radio" role="radio" aria-checked="' + on + '" data-action="' + action + '" data-value="' + o.value + '">' +
+        '<span class="mv-radio-mark" aria-hidden="true"></span><span class="mv-radio-copy">' + span(o.id, o.args, 'mv-radio-label') +
+        (o.meta ? span(o.meta, o.metaArgs, 'mv-radio-meta') : '') + '</span></button>';
+    }).join('') + '</div>';
   }
-  function count() { return S.picked ? S.picked.length : S.n; }
-  function ends() { return S.dir === 'out' ? { a: S.from, b: S.to } : { a: S.to, b: S.from }; }
+  function stamp(t) { return TODAY + ' · ' + t + ' · ' + WHO; }
 
-  /* ---- the litter face behind a drawer (a stand-in for the litter sheet: header, the ledger, the Move door) ---- */
+  /* ---- the litter face (a stand-in for the litter sheet: header, ledger, what arrivals owe, moves, the Move door) ---- */
   function header(code) {
-    var l = LIT[code];
-    var sub = l.farrowing ? span('pp.move.face.sub_farrowing', { u: UNIT }) :
-      l.died ? span('pp.move.face.sub_died', { u: UNIT, day: l.day }) : span('pp.move.face.sub', { u: UNIT, day: l.day });
+    var l = LIT[code], sub;
+    if (l.farrowing) sub = span('pp.move.face.sub_farrowing', { u: l.unit });
+    else if (l.died) sub = span('pp.move.face.sub_died', { u: l.unit, day: l.day });
+    else if (alive(code) === 0) sub = span('pp.move.face.sub_empty', { u: l.unit });
+    else if (l.weaned && inOut(code).inn) sub = span('pp.move.face.sub_nurse', { u: l.unit, day: LIT[inOut(code).inMoves[0].from].day, code: inOut(code).inMoves[0].from });
+    else sub = span('pp.move.face.sub', { u: l.unit, day: l.day });
     return '<header class="utility-header"><div class="mv-title"><h3>' + span('pp.move.face.title', { code: code, tag: l.tag }) + '</h3><p>' + sub + '</p></div></header>';
   }
-  function ledger(code, moved) {
-    var l = LIT[code], items = [];
-    if (l.born != null) items.push(fact('label.born', null, pig(l.born), { n: l.born }));
-    items.push(fact('label.dead', null, pig(l.dead), { n: l.dead }));
-    if (moved && moved.dir === 'in') items.push(fact('pp.move.label.moved_in', null, pig(moved.n), { n: moved.n }, 'pp.move.fact.from', { code: moved.code, time: moved.time, who: WHO }));
-    if (moved && moved.dir === 'out') items.push(fact('pp.move.label.moved_out', null, pig(moved.n), { n: moved.n }, 'pp.move.fact.to', { code: moved.code, time: moved.time, who: WHO }));
-    var alive = l.alive + (moved ? (moved.dir === 'in' ? moved.n : -moved.n) : 0);
-    items.push(fact('label.alive', null, pig(alive), { n: alive }));
+  function ledgerFacts(code) {
+    var g = ledger(code), items = [];
+    if (g.born != null) items.push(fact('label.born', null, pigs(g.born).id, pigs(g.born).args));
+    items.push(fact('label.dead', null, pigs(g.dead).id, pigs(g.dead).args));
+    if (g.weaned) items.push(fact('pp.move.label.weaned', null, pigs(g.weaned).id, pigs(g.weaned).args));
+    if (g.loss) items.push(fact('pp.move.label.loss', null, pigs(g.loss).id, pigs(g.loss).args, 'pp.move.fact.open'));
+    if (g.gain) items.push(fact('pp.move.label.gain', null, pigs(g.gain).id, pigs(g.gain).args, 'pp.move.fact.open'));
+    if (g.out) items.push(fact('pp.move.label.moved_out', null, pigs(g.out).id, pigs(g.out).args, pl('pp.move.fact.moves', g.io.outMoves.length), { k: g.io.outMoves.length }));
+    if (g.inn) items.push(fact('pp.move.label.moved_in', null, pigs(g.inn).id, pigs(g.inn).args, pl('pp.move.fact.moves', g.io.inMoves.length), { k: g.io.inMoves.length }));
+    items.push(fact('label.alive', null, pigs(g.alive).id, pigs(g.alive).args));
     return UI.facts(items, { columns: items.length === 3 ? 3 : 2 });
   }
-  function faceSheet(code, bodyHtml, inert) {
-    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (inert ? ' inert' : '') + '>' + header(code) +
-      '<div class="sheet-body"><div class="mv-face">' + bodyHtml + '</div></div>' +
-      '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + '</footer></section>';
+  // One row per Move, newest first; each is the Edit door for that record (S8 owns Edit's screens).
+  function movesGroup(code) {
+    var io = inOut(code), ms = io.inMoves.concat(io.outMoves).sort(function (a, b) { return a.time < b.time ? 1 : -1; });
+    if (!ms.length) return '';
+    return UI.rowGroup(ms.map(function (m) {
+      var inn = m.to === code, other = inn ? m.from : m.to;
+      var t = where(other) ? (inn ? 'pp.move.moves.in_unit' : 'pp.move.moves.out_unit') : (inn ? 'pp.move.moves.in' : 'pp.move.moves.out');
+      return row({ action: 'edit-move', value: m.id, title: pl(t, m.n), titleArgs: { n: m.n, code: other, u: LIT[other].unit },
+        desc: m.explains ? 'pp.move.moves.stamp_explains' : 'pp.move.moves.stamp', descArgs: { stamp: stamp(m.time) }, trail: 'act.edit' });
+    }).join(''), { title: '', strs: { title: 'pp.move.moves.title' } });
+  }
+  // What the arrivals owe here, one row per dose, merged across Moves with per-source counts.
+  function arrivalRows(code) {
+    var io = inOut(code);
+    if (!io.inn) return '';
+    var own = alive(code) - io.inn, l = LIT[code], rows = [];
+    TX.forEach(function (d) {
+      var owe = [], done = 0, unknown = 0, check = [], missed = [], males = [];
+      io.inMoves.forEach(function (m) {
+        var c = m.carry[d]; if (!c) return;
+        var r = S.resolved && S.resolved[m.id + d];
+        if (r) { if (r.rest === 'owed' && m.n - r.had > 0) owe.push({ from: m.from, n: m.n - r.had, carry: m.carry }); return; }
+        if (c.kind === 'owe') (d === 'castrate' ? males : owe).push(m);
+        else if (c.kind === 'done') done += m.n;
+        else if (c.kind === 'unknown') unknown += m.n;
+        else if (c.kind === 'check') check.push(m);
+        else if (c.kind === 'missed') missed.push(m);
+      });
+      if (!owe.length && !done && !unknown && !check.length && !missed.length && !males.length) return;
+      var ownOwed = own > 0 && DUE[d] <= l.day && d !== 'castrate' ? Math.max(0, own - (l.done[d] || 0)) : 0;
+      var arrOwed = owe.reduce(function (s, m) { return s + m.n; }, 0), total = ownOwed + arrOwed, parts = [];
+      if (total && !ownOwed && owe.length === 1) parts.push(PP.t('pp.move.frag.owed_from', { n: total, code: owe[0].from }));
+      else {
+        if (total) parts.push(PP.t('pp.move.frag.owed', { n: total }));
+        owe.forEach(function (m) { parts.push(PP.t('pp.move.frag.from', { k: m.n, code: m.from })); });
+      }
+      if (done) parts.push(PP.t('pp.move.frag.arrived_done', { k: done }));
+      if (unknown) parts.push(PP.t('pp.move.frag.unknown', { k: unknown }));
+      check.forEach(function (m) { parts.push(PP.t('pp.move.frag.check', { k: m.n, code: m.from })); });
+      males.forEach(function (m) { parts.push(PP.t('pp.move.frag.males', { k: m.n, code: m.from })); });
+      missed.forEach(function (m) { parts.push(PP.t('pp.move.frag.missed', { k: m.n, code: m.from })); });
+      var reason = owe.filter(function (m) { return m.carry[d].reason; })[0];
+      if (reason) parts.push(PP.t('pp.move.frag.deferred', { reason: PP.t('pp.move.reason.' + reason.carry[d].reason) }));
+      var resolveBy = unknown || check.length ? (io.inMoves.filter(function (m) { return m.carry[d] && (m.carry[d].kind === 'unknown' || m.carry[d].kind === 'check'); })[0]) : null;
+      rows.push(row({ action: resolveBy ? 'open-resolve' : total ? 'record' : 'open-dose', value: resolveBy ? resolveBy.id + ':' + d : d + ':' + total,
+        title: 'pp.common.tx.' + d, desc: 'pp.move.owed.line', descArgs: { text: parts.join(' · ') } }));
+    });
+    if (!rows.length) return '';
+    return UI.rowGroup(rows.join(''), { title: '', strs: { title: 'pp.move.owed.title' } });
   }
   function moveDoor(code) {
-    return UI.rowGroup(row({ action: 'open-move', value: code, title: 'pp.move.sheet.title', desc: 'pp.move.door.desc' }));
+    if (!canSource(code) && !canReceive(code)) return '';
+    var desc = S.kept ? pl('pp.move.door.kept', count()) : 'pp.move.door.desc';
+    var r = S.kept ? record() : null;
+    return UI.rowGroup(row({ action: 'open-move', value: code, title: 'pp.move.sheet.title', desc: desc, descArgs: r ? { n: r.n, from: r.from, to: r.to } : null }));
+  }
+  function faceHtml(code, inert) {
+    var body = ledgerFacts(code) + arrivalRows(code) + movesGroup(code) + moveDoor(code);
+    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (inert ? ' inert' : '') + '>' + header(code) +
+      '<div class="sheet-body"><div class="mv-face">' + body + '</div></div>' +
+      '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + '</footer></section>';
   }
 
   /* ---- the Move drawer ---- */
+  function crateMeta(c) {
+    var l = LIT[c], st = alive(c) === 0 ? 'empty' : status(c);
+    var args = { day: l.day, n: alive(c), tag: l.tag, u: l.unit, state: PP.t('pp.move.crate.state.' + st) };
+    return { id: st === 'empty' ? (where(c) ? 'pp.move.crate.meta_unit_empty' : 'pp.move.crate.meta_empty') : (where(c) ? 'pp.move.crate.meta_unit' : 'pp.move.crate.meta'), args: args };
+  }
   function crateRow(c) {
-    var l = LIT[c], st = status(l);
-    var meta = l.empty ? 'pp.move.crate.meta.empty' : 'pp.move.crate.meta.' + st;
-    return UI.choiceRow({ label: '', meta: '', mode: 'single', action: 'pick-crate', value: c, selected: S.to === c,
-      strs: { label: 'pp.move.crate.code', meta: meta }, args: { label: { code: c }, meta: { day: l.day, n: l.alive, tag: l.tag } } });
+    var m = crateMeta(c);
+    return UI.choiceRow({ label: '', meta: '', mode: 'single', action: 'pick-crate', value: c, selected: S.other === c,
+      strs: { label: 'pp.move.crate.code', meta: m.id }, args: { label: { code: c }, meta: m.args } });
+  }
+  function candidates() {
+    var near = [], empty = [], me = LIT[S.face];
+    Object.keys(LIT).forEach(function (c) {
+      var l = LIT[c];
+      if (c === S.face || l.farrowing || l.unit !== me.unit) return;
+      if (alive(c) > 0 && c.charAt(0) !== S.face.charAt(0)) return;          // this row of crates; the search finds the rest
+      if (S.dir === 'out' ? !canReceive(c) : !canSource(c)) return;
+      (alive(c) === 0 ? empty : near).push(c);
+    });
+    near.sort(function (a, b) { return Math.abs(LIT[a].day - me.day) - Math.abs(LIT[b].day - me.day) || (a < b ? -1 : 1); });
+    return { near: near, empty: empty };
+  }
+  function directionSection() {
+    if (!canSource(S.face)) return '';
+    return radios('dir', [
+      { value: 'out', id: 'pp.move.dir.out', args: { code: S.face }, meta: 'pp.move.dir.out_meta' },
+      { value: 'in', id: 'pp.move.dir.in', args: { code: S.face }, meta: 'pp.move.dir.in_meta' }], S.dir, PP.t('pp.move.dir.aria'));
   }
   function crateSection() {
-    var other = S.dir === 'out' ? 'pp.move.to.title' : 'pp.move.from.title';
+    var label = S.dir === 'out' ? 'pp.move.to.title' : 'pp.move.from.title';
+    if (S.other && !S.query) {                               // chosen: the list folds into one picker; tap it to choose again
+      var m = crateMeta(S.other);
+      return UI.pickerField({ label: '', display: S.other, action: 'change-crate', key: 'crate',
+        strs: { label: label, display: 'pp.move.crate.chosen' }, args: { display: { code: S.other, meta: PP.t(m.id, m.args) } } });
+    }
     var find = '<div class="mv-find">' +
       UI.choiceSearch({ label: PP.t('pp.move.search.label'), placeholder: PP.t('pp.move.search.placeholder'), value: S.query || '' }) +
       UI.iconButton({ action: 'scan', icon: ICON.icon('scan'), label: PP.t('pp.move.aria.scan') }) + '</div>';
-    if (S.to && !S.query) {                                   // chosen: the list folds into one picker; tap it to choose again
-      var l2 = LIT[S.to], meta = l2.empty ? 'pp.move.crate.meta.empty' : 'pp.move.crate.meta.' + status(l2);
-      return UI.pickerField({ label: '', display: S.to, action: 'change-crate', key: 'crate',
-        strs: { label: other, display: 'pp.move.crate.chosen' }, args: { display: { code: S.to, meta: PP.t(meta, { day: l2.day, n: l2.alive, tag: l2.tag }) } } });
-    }
     var lists;
     if (S.query) {
       var q = S.query.toUpperCase(), hit = LIT[q];
-      if (hit && hit.farrowing) {
-        lists = UI.choiceGroup(UI.choiceRow({ label: '', meta: '', mode: 'navigate', action: 'open-farrowing', value: q,
-          strs: { label: 'pp.move.crate.code', meta: 'pp.move.crate.meta.farrowing' }, args: { label: { code: q } } }));
-      } else if (hit) {
-        lists = UI.choiceGroup(crateRow(q));
-      } else {
-        lists = UI.choiceEmpty('', { strs: { text: 'pp.move.search.none' }, args: { text: { q: S.query } } });
-      }
+      if (q === S.face) lists = UI.choiceEmpty('', { strs: { text: 'pp.move.search.self' }, args: { text: { q: q } } });
+      else if (hit && hit.farrowing) lists = UI.choiceGroup(UI.choiceRow({ label: '', meta: '', mode: 'navigate', action: 'open-farrowing', value: q,
+          strs: { label: 'pp.move.crate.code', meta: where(q) ? 'pp.move.crate.meta_unit_farrowing' : 'pp.move.crate.meta_farrowing' }, args: { label: { code: q }, meta: { u: hit.unit } } }));
+      else if (hit && (S.dir === 'out' ? canReceive(q) : canSource(q))) lists = UI.choiceGroup(crateRow(q));
+      else if (hit) lists = UI.choiceEmpty('', { strs: { text: S.dir === 'out' ? 'pp.move.search.not_receiver' : 'pp.move.search.not_source' }, args: { text: { q: q } } });
+      else lists = UI.choiceEmpty('', { strs: { text: 'pp.move.search.none' }, args: { text: { q: S.query } } });
     } else {
-      var L = listFor(S.from);
-      lists = UI.choiceGroup(L.near.map(crateRow), { title: '', strs: { title: 'pp.move.list.near' }, args: { title: { u: UNIT } } }) +
+      var L = candidates();
+      lists = UI.choiceGroup(L.near.map(crateRow), { title: '', strs: { title: 'pp.move.list.near' }, args: { title: { row: S.face.charAt(0) } } }) +
         (L.empty.length ? UI.choiceGroup(L.empty.map(crateRow), { title: '', strs: { title: 'pp.move.list.empty' } }) : '');
     }
-    return '<section class="mv-group">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: other } }) + find + lists + '</section>';
+    return '<section class="mv-group">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: label } }) + find + lists + '</section>';
   }
   function countSection() {
-    var src = LIT[S.dir === 'out' ? S.from : (S.to || S.from)];
-    if (S.picked) {
-      var tags = LIT[S.from].tags;
+    var src = source();
+    if (!src) return '';
+    var a = alive(src), ids = sourceIds(src), small = a <= 8 || LIT[src].died;
+    var ptr = small && !ids && S.n < a ? [{ label: '', action: 'all', value: String(a), strs: { label: 'pp.move.count.all' }, args: { label: { n: a } } }] : [];
+    if (ids) {
+      var rem = remainder(src);
       return '<section class="mv-group">' +
-        UI.heading({ title: '', meta: '', kind: 'section', level: 3, strs: { title: 'pp.move.tags.title', meta: 'pp.move.tags.meta' }, args: { meta: { n: S.picked.length, total: tags.length } },
+        UI.heading({ title: '', meta: '', kind: 'section', level: 3, strs: { title: 'pp.move.rows.title', meta: pl('pp.move.rows.meta', a) }, args: { meta: { n: count(), total: a } },
           action: UI.iconButton({ action: 'scan-tag', icon: ICON.icon('scan'), label: PP.t('act.scan') }) }) +
-        UI.choiceGroup(tags.map(function (t) {
-          return UI.choiceRow({ label: '', mode: 'multi', action: 'pick-tag', value: t, selected: S.picked.indexOf(t) >= 0, strs: { label: 'pp.move.tag' }, args: { label: { tag: t } } });
-        })) + '</section>';
+        UI.choiceGroup(ids.map(function (r) {
+          var notch = r.indexOf('n:') === 0;
+          return UI.choiceRow({ label: '', mode: 'multi', action: 'pick-row', value: r, selected: S.rows.indexOf(r) >= 0,
+            strs: { label: notch ? 'pp.move.rows.notch' : 'pp.move.rows.tag' }, args: { label: notch ? { notch: r.slice(2) } : { tag: r } } });
+        })) +
+        (rem ? UI.stepper({ label: '', description: '', value: S.untagged, min: 0, max: rem, key: 'untagged', hint: '', reserveHint: S.untagged >= rem,
+          strs: { label: 'pp.move.rows.untagged', description: pl('pp.move.rows.untagged_of', rem), value: 'ds.field.figure', hint: S.untagged >= rem ? pl('pp.move.rows.untagged_ceiling', rem) : undefined,
+                  decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' }, args: { description: { n: rem }, hint: { n: rem } } }) : '') +
+        '</section>';
     }
-    return UI.stepper({ label: '', description: '', value: S.n, min: 1, max: src.alive, key: 'n',
-      strs: { label: 'label.piglets', description: 'pp.move.count.of', value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
-      args: { description: { n: src.alive, code: S.dir === 'out' ? S.from : (S.to || S.from) } } });
+    return UI.stepper({ label: '', description: '', value: S.n, min: 1, max: a, key: 'n', hint: '', pointers: ptr, reserveHint: ptr.length > 0 || S.n >= a,
+      strs: { label: 'label.piglets', description: pl('pp.move.count.of', a), value: 'ds.field.figure', hint: S.n >= a && !ptr.length ? pl('pp.move.count.ceiling', a) : undefined,
+              decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
+      args: { description: { n: a, code: src }, hint: { n: a, code: src } } });
   }
-  function askSection() {
-    if (!S.to) return '';
-    var e = ends(), c = carry(e.a, e.b);
-    if (!c.ask.length) return '';
-    var qs = c.ask.map(function (d) {
-      var a = S.answers[d] || 'unknown';
-      return '<div class="mv-group">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.move.ask.q.' + d } }) +
-        UI.segment({ action: 'answer', ariaLabel: PP.t('pp.move.ask.q.' + d), active: d + ':' + a, options: [
-          [d + ':yes', 'Yes', { strs: { label: 'pp.move.ask.yes' } }],
-          [d + ':no', 'No', { strs: { label: 'pp.move.ask.no' } }],
-          [d + ':unknown', "Don't know", { strs: { label: 'pp.move.ask.unknown' } }]] }) + '</div>';
+  function askSection(rec) {
+    var s = LIT[rec.from], asks = [], checks = [];
+    dueDoses(s.day).forEach(function (d) {
+      var p = pop(rec.from, d), v = s.done[d] || 0;
+      if (v > 0 && v < p) (INVISIBLE[d] ? asks : checks).push(d);
+    });
+    if (!asks.length) return '';
+    var qs = asks.map(function (d) {
+      var a = answerFor(rec, d), k = knownOwing(rec.from, d);
+      return '<div class="mv-group">' +
+        UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: pl('pp.move.ask.q', rec.n), description: k ? pl('pp.move.ask.moved_before', k) : 'pp.move.ask.hint' },
+          args: { title: { tx: txName(d), n: rec.n }, description: { k: k } } }) +
+        radios('answer', [
+          { value: d + ':yes', id: 'pp.move.ask.yes' },
+          { value: d + ':no', id: 'pp.move.ask.no' },
+          { value: d + ':unknown', id: 'pp.move.ask.unknown', meta: 'pp.move.ask.unknown_meta' }], d + ':' + a, PP.t(pl('pp.move.ask.q', rec.n), { tx: txName(d), n: rec.n })) + '</div>';
     }).join('');
-    return '<section class="mv-group">' +
-      UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: 'pp.move.ask.title', description: 'pp.move.ask.desc' }, args: { title: { code: e.a }, description: { code: e.a } } }) +
-      qs + '</section>';
+    var head = { title: 'pp.move.ask.title' }, hargs = { title: { code: rec.from } };
+    if (checks.length) { head.description = 'pp.move.ask.checks'; hargs.description = { txs: txList(checks) }; }
+    return '<section class="mv-group">' + UI.heading({ title: '', description: checks.length ? '' : undefined, kind: 'section', level: 3, strs: head, args: hargs }) + qs + '</section>';
   }
-  /* What the moved piglets bring to the receiver, one fact per outcome; read before Save and again on the receipt. */
-  function carrySection(c, to, n) {
+  // The same facts on the review and on the receipt.
+  function carrySection(rec, withEdit) {
+    var c = carry(rec), groups = { owe: [], unknown: [], check: [], done: [], missed: [] }, reasons = [];
+    Object.keys(c).forEach(function (d) { if (d === 'castrate') return; groups[c[d].kind].push(d); if (c[d].reason) reasons.push(d); });
     var items = [];
-    function add(kind, list) { if (list.length) items.push(fact('pp.move.carry.l.' + kind, null, 'pp.move.carry.doses', { doses: doseList(list) })); }
-    add('owe', c.owe); add('unknown', c.unknown); add('check', c.check); add('done', c.done);
-    if (S.picked && S.picked.length) items.push(fact('pp.move.carry.l.tags', null, 'pp.move.carry.doses', { doses: S.picked.join(' · ') }));
+    ['owe', 'unknown', 'check', 'done', 'missed'].forEach(function (k) {
+      if (!groups[k].length) return;
+      var meta = k === 'owe' && reasons.length ? 'pp.move.carry.deferred' : null;
+      var f = fact('pp.move.carry.l.' + k, null, 'pp.move.carry.doses', { doses: txList(groups[k]) }, meta,
+        { txs: txList(reasons), reason: reasons.length ? PP.t('pp.move.reason.' + c[reasons[0]].reason) : '', code: rec.from });
+      items.push(f);
+    });
+    if (c.castrate) items.push(fact('pp.move.carry.l.males', null, pl('pp.move.carry.males.' + c.castrate.kind, rec.n), { n: rec.n }));
+    if (rec.rows && rec.rows.length) items.push(fact('pp.move.carry.l.rows', null, 'pp.move.carry.doses', { doses: rec.rows.map(function (r) { return r.indexOf('n:') === 0 ? PP.t('pp.move.rows.notch', { notch: r.slice(2) }) : r; }).join(' · ') }));
     if (!items.length) return '';
+    var t = where(rec.to) ? 'pp.move.carry.title_unit' : 'pp.move.carry.title';
     return '<section class="mv-group">' +
-      UI.heading({ title: '', kind: 'section', level: 3, strs: { title: one('pp.move.carry.title', n) }, args: { title: { n: n, to: to } } }) +
+      UI.heading({ title: '', kind: 'section', level: 3, strs: { title: pl(t, rec.n) }, args: { title: { n: rec.n, to: rec.to, u: LIT[rec.to].unit } },
+        action: withEdit ? textAction('edit-move', 'act.edit') : '' }) +
       UI.facts(items, { columns: 1 }) + '</section>';
   }
-  function summary() {
-    if (!S.to) return '<div class="mv-summary">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.move.pointer.choose' } }) + '</div>';
-    var e = ends(), n = count(), a = LIT[e.a], b = LIT[e.b];
-    var aAfter = a.alive - n, bAfter = b.alive + n;
-    var fa = fact('pp.move.delta.from', { code: e.a }, 'pp.move.delta.value', { a: a.alive, b: aAfter }, aAfter === 0 ? 'pp.move.delta.none_left' : null);
-    var fb = fact('pp.move.delta.to', { code: e.b }, 'pp.move.delta.value', { a: b.alive, b: bAfter }, b.empty ? 'pp.move.delta.keeps_day' : null, { day: a.day, code: e.a });
-    return '<div class="mv-summary">' + UI.facts([fa, fb]) + '</div>';
+  function deltas(rec) {
+    var a0 = alive(rec.from), b0 = alive(rec.to), eff = rec.explains ? 0 : rec.n;
+    var cover = sourceAfter(rec, carry(rec));
+    var aMeta = a0 - eff === 0 ? 'pp.move.delta.none_left' : cover.length ? 'pp.move.delta.check' : null;
+    var aArgs = cover.length ? { text: cover.map(function (x) { return PP.t('pp.move.delta.range', { tx: txName(x.d), lo: x.lo, hi: x.hi, of: x.of }); }).join(' · ') } : null;
+    var bMeta = b0 === 0 ? 'pp.move.delta.keeps_day' : null;
+    return UI.facts([
+      fact(where(rec.from) ? 'pp.move.delta.from_unit' : 'pp.move.delta.from', { code: rec.from, u: LIT[rec.from].unit }, 'pp.move.delta.value', { a: a0, b: a0 - eff }, aMeta, aArgs),
+      fact(where(rec.to) ? 'pp.move.delta.to_unit' : 'pp.move.delta.to', { code: rec.to, u: LIT[rec.to].unit }, 'pp.move.delta.value', { a: b0, b: b0 + eff }, bMeta, { day: LIT[rec.from].day, code: rec.from, u: LIT[rec.to].unit })]);
   }
-  function carryNow() { if (!S.to) return ''; var e = ends(); return carrySection(carry(e.a, e.b), e.b, count()); }
+  function pointer() {
+    if (S.query && LIT[S.query.toUpperCase()] && LIT[S.query.toUpperCase()].farrowing) return { id: 'pp.move.pointer.farrowing', args: { code: S.query.toUpperCase() } };
+    if (!S.other) return { id: 'pp.move.pointer.choose' };
+    if (count() < 1) return { id: 'pp.move.pointer.pick' };
+    return null;
+  }
+  function summary(rec) {
+    var p = pointer();
+    if (p) return '<div class="mv-summary">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: p.id }, args: { title: p.args } }) + '</div>';
+    var ex = rec.explains ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.move.explain.closes' } }) : '';
+    return '<div class="mv-summary">' + deltas(rec) + ex + '</div>';
+  }
   function moveDrawer() {
-    var src = S.dir === 'out' ? S.from : S.from, l = LIT[src];
-    var ready = S.to && count() > 0, e = ends();
-    var seg = UI.segment({ action: 'dir', ariaLabel: PP.t('pp.move.dir.aria'), active: S.dir, options: [
-      ['out', 'Out', { strs: { label: 'pp.move.dir.out' }, args: { label: { code: S.from } } }],
-      ['in', 'In', { strs: { label: 'pp.move.dir.in' }, args: { label: { code: S.from } } }]] });
-    var primary = ready ? button('primary', 'save-move', 'pp.move.act.move', { n: count(), from: e.a, to: e.b }) : button('primary', 'save-move', 'pp.move.act.move_bare', null, true);
+    var rec = record(), f = S.face, ready = !pointer() && rec.n >= 1 && rec.n <= alive(rec.from);
+    var sub = alive(f) > 0 ? span('pp.move.sheet.sub', { code: f, n: alive(f), day: LIT[f].day }) : span('pp.move.sheet.sub_empty', { code: f });
+    var explain = S.explains ? UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: 'pp.move.explain.title', description: 'pp.move.explain.desc' },
+      args: { title: { code: S.other, n: rec.n }, description: { from: rec.from, to: rec.to } } }) : '';
+    var body = explain + directionSection() + crateSection() + countSection() + (S.other ? askSection(rec) + carrySection(rec, false) : '');
+    var primary = ready ? button('primary', 'save-move', 'pp.move.act.move', { n: rec.n, from: rec.from, to: rec.to }) : button('primary', 'save-move', 'pp.move.act.move_bare', null, true);
     return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
-      '<header class="utility-header"><div class="mv-title"><h3 data-str="pp.move.sheet.title"></h3><p>' + span('pp.move.sheet.sub', { code: src, n: l.alive, day: l.day }) + '</p></div></header>' +
-      '<div class="sheet-body"><div class="mv-body">' + seg + crateSection() + countSection() + askSection() + carryNow() + '</div></div>' +
-      summary() +
+      '<header class="utility-header mv-head"><div class="mv-title"><h3 data-str="pp.move.sheet.title"></h3><p>' + sub + '</p></div>' +
+      (draftExists() ? textAction('clear', 'act.clear') : '') + '</header>' +
+      '<div class="sheet-body"><div class="mv-body">' + body + '</div></div>' + summary(rec) +
       '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + primary + '</footer></section>';
   }
 
-  /* ---- the receipt: the Move drawer after Save ---- */
-  function receiptDrawer() {
-    var n = count(), c = carry(S.from, S.to), a = LIT[S.from], b = LIT[S.to];
-    var body = '<div class="mv-receipt">' +
-      UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.move.receipt.spray_why' }, args: { title: { to: S.to } } }) +
-      UI.facts([fact('pp.move.delta.from', { code: S.from }, 'pp.move.delta.value', { a: a.alive, b: a.alive - n }),
-                fact('pp.move.delta.to', { code: S.to }, 'pp.move.delta.value', { a: b.alive, b: b.alive + n })]) +
-      carrySection(c, S.to, n) + '</div>';
+  /* ---- the receipt: the same record, after Save ---- */
+  function receiptDrawer(rec) {
+    var body = '<div class="mv-body">' +
+      UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.move.receipt.spray_why' }, args: { title: { to: rec.to } } }) +
+      deltaAfter(rec) + carrySection(rec, true) + '</div>';
     return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="medium" data-sizing="content" role="dialog" aria-modal="true">' +
-      '<header class="utility-header"><div class="mv-title"><h3>' + span(one('pp.move.receipt.spray', n), { n: n }) + '</h3><p>' + span('pp.move.receipt.title', { n: n, to: S.to, time: S.time, who: WHO }) + '</p></div></header>' +
+      '<header class="utility-header"><div class="mv-title"><h3>' + span(pl('pp.move.receipt.spray', rec.n), { n: rec.n }) + '</h3><p>' +
+      span(pl(where(rec.to) ? 'pp.move.receipt.title_unit' : 'pp.move.receipt.title', rec.n), { n: rec.n, to: rec.to, u: LIT[rec.to].unit, time: rec.time, who: rec.who }) + '</p></div></header>' +
       '<div class="sheet-body">' + body + '</div>' +
       '<footer class="sheet-footer">' + button('secondary', 'close', 'act.close') + '</footer></section>';
   }
-
-  /* ---- the receiving litter: what the arrivals owe ---- */
-  function arrivalRows() {
-    var c = carry(S.from, S.face), rows = [];
-    c.unknown.forEach(function (d) { if (S.resolved && S.resolved[d]) return; rows.push(row({ action: 'check-unknown', value: d, title: 'pp.common.tx.' + d, desc: 'pp.move.owed.unknown', descArgs: { n: S.n, dose: PP.t('pp.move.dose.' + d) } })); });
-    c.owe.forEach(function (d) { rows.push(row({ action: 'record', value: d, title: 'pp.common.tx.' + d, desc: 'pp.move.owed.owe', descArgs: { n: S.n, code: S.from } })); });
-    c.check.forEach(function (d) { rows.push(row({ action: 'record', value: d, title: 'pp.common.tx.' + d, desc: 'pp.move.owed.check', descArgs: { n: S.n, code: S.from } })); });
-    if (!rows.length) return '';
-    return UI.rowGroup(rows.join(''), { title: '', strs: { title: 'pp.move.owed.title' }, args: { title: { code: S.from } } });
+  // After the Move is posted, before → after reads from the ledger minus/plus this record.
+  function deltaAfter(rec) {
+    var eff = rec.explains ? 0 : rec.n, a1 = alive(rec.from), b1 = alive(rec.to);
+    return UI.facts([
+      fact(where(rec.from) ? 'pp.move.delta.from_unit' : 'pp.move.delta.from', { code: rec.from, u: LIT[rec.from].unit }, 'pp.move.delta.value', { a: a1 + eff, b: a1 }),
+      fact(where(rec.to) ? 'pp.move.delta.to_unit' : 'pp.move.delta.to', { code: rec.to, u: LIT[rec.to].unit }, 'pp.move.delta.value', { a: b1 - eff, b: b1 })]);
   }
-  function unknownDrawer() {
-    var d = S.drawer, pick = S.resolve || '';
-    var dose = PP.t('pp.move.dose.' + d);
-    var rows = [
-      UI.choiceRow({ label: '', meta: '', mode: 'single', action: 'resolve', value: 'had', selected: pick === 'had',
-        strs: { label: 'pp.move.unk.had', meta: 'pp.move.unk.had_meta' }, args: { label: { dose: dose } } }),
-      UI.choiceRow({ label: '', meta: '', mode: 'single', action: 'resolve', value: 'give', selected: pick === 'give',
-        strs: { label: 'pp.move.unk.give', meta: 'pp.move.unk.give_meta' }, args: { label: { dose: dose }, meta: { dose: dose, n: S.n } } })
-    ];
-    return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="short" data-sizing="content" role="dialog" aria-modal="true">' +
-      '<header class="utility-header"><div class="mv-title"><h3>' + span('pp.move.unk.title', { dose: PP.t('pp.common.tx.' + d), n: S.n, code: S.from }) + '</h3><p>' +
-      span('pp.move.owed.unknown', { n: S.n, dose: dose }) + '</p></div></header>' +
-      '<div class="sheet-body"><div class="mv-body">' + UI.choiceGroup(rows) + '</div></div>' +
-      '<footer class="sheet-footer">' + button('secondary', 'close-unknown', 'act.back') + button('primary', 'save-unknown', 'act.save', null, !pick) + '</footer></section>';
+
+  /* ---- resolving an arrival: how many already had it (unknown or check-on-the-pig) ---- */
+  function resolveDrawer() {
+    var parts = S.drawer.split(':'), m = MOVES.filter(function (x) { return x.id === parts[0]; })[0], d = parts[1];
+    var n = m.n, had = Math.max(0, Math.min(S.had || 0, n)), rest = n - had, kind = m.carry[d].kind;
+    var body = UI.stepper({ label: '', description: '', value: had, min: 0, max: n, key: 'had', hint: '', reserveHint: had >= n,
+      strs: { label: 'pp.move.res.had', description: pl('pp.move.res.of', n), value: 'ds.field.figure', hint: had >= n ? pl('pp.move.res.ceiling', n) : undefined, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
+      args: { description: { n: n }, hint: { n: n } } });
+    if (rest) body += '<div class="mv-group">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: pl('pp.move.res.rest', rest) }, args: { title: { n: rest } } }) +
+      radios('rest', [{ value: 'record', id: pl('pp.move.res.record', rest), args: { tx: txName(d), n: rest } },
+                      { value: 'owed', id: pl('pp.move.res.owed', rest), args: { n: rest } }], S.rest || 'record', PP.t(pl('pp.move.res.rest', rest), { n: rest })) + '</div>';
+    body += UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.move.res.note' } });
+    return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="medium" data-sizing="content" role="dialog" aria-modal="true">' +
+      '<header class="utility-header"><div class="mv-title"><h3>' + span(pl('pp.move.res.title', n), { tx: txName(d), n: n, code: m.from }) + '</h3><p>' +
+      span(kind === 'unknown' ? 'pp.move.res.sub_unknown' : 'pp.move.res.sub_check', { tx: txName(d) }) + '</p></div></header>' +
+      '<div class="sheet-body"><div class="mv-body">' + body + '</div></div>' +
+      '<footer class="sheet-footer">' + button('secondary', 'close-resolve', 'act.back') + button('primary', 'save-resolve', 'act.save') + '</footer></section>';
   }
 
   /* ---- move-prelock: the door to the farrowing sheet ---- */
   function prelockDrawer() {
     var l = LIT[S.face];
     var door = UI.rowGroup(row({ action: 'open-farrowing', value: S.face, title: 'pp.move.pre.door', titleArgs: { code: S.face },
-      desc: 'pp.move.pre.door_desc', descArgs: { n: l.sofar, h: l.ago, who: l.who } }));
+      desc: 'pp.move.pre.door_desc', descArgs: { n: l.sofar, h: l.ago, who: l.by } }));
     return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="short" data-sizing="content" role="dialog" aria-modal="true">' +
       '<header class="utility-header"><div class="mv-title"><h3 data-str="pp.move.sheet.title"></h3><p>' + span('pp.move.pre.why', { code: S.face }) + '</p></div></header>' +
       '<div class="sheet-body"><div class="mv-body">' + door + '</div></div>' +
@@ -323,42 +551,49 @@
   }
 
   function render() {
+    normalize();
     var html;
-    if (S.view === 'move') {
-      html = faceSheet(S.from, ledger(S.from) + moveDoor(S.from), true) + moveDrawer();
-    } else if (S.view === 'receipt') {
-      html = faceSheet(S.from, ledger(S.from, { dir: 'out', n: count(), code: S.to, time: S.time }) + moveDoor(S.from), true) + receiptDrawer();
-    } else if (S.view === 'owed') {
-      html = faceSheet(S.face, ledger(S.face, { dir: 'in', n: S.n, code: S.from, time: S.time }) + arrivalRows() + moveDoor(S.face), !!S.drawer) + (S.drawer ? unknownDrawer() : '');
-    } else if (S.view === 'prelock') {
-      html = faceSheet(S.face, ledger(S.face), true) + prelockDrawer();
-    }
+    if (S.view === 'move') html = faceHtml(S.face, true) + moveDrawer();
+    else if (S.view === 'receipt') html = faceHtml(S.face, true) + receiptDrawer(S.saved);
+    else if (S.view === 'face') html = faceHtml(S.face, !!S.drawer) + (S.drawer ? resolveDrawer() : '');
+    else if (S.view === 'prelock') html = faceHtml(S.face, true) + prelockDrawer();
     document.getElementById('screen').innerHTML = html;
     PP.apply(document.getElementById('screen'));
+  }
+  function post() {                                   // Save: the one resolved record is posted, then read back by the receipt
+    var rec = record(); rec.carry = carry(rec);
+    MOVES.push(rec); S.saved = rec; S.view = 'receipt'; S.kept = false;
   }
 
   document.getElementById('screen').addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-action]');
     if (!b) return;
     var a = b.dataset.action, v = b.dataset.value;
-    if (a === 'pick-tag') v = b.value;                        // a multi row's checkbox carries its tag as value
-    if (a === 'pick-crate') { S.to = v; S.query = ''; render(); }
-    else if (a === 'change-crate') { S.to = ''; render(); }
-    else if (a === 'dir') { S.dir = v; render(); }
+    if (a === 'pick-row') v = b.value;                         // a multi row's checkbox carries its id as value
+    if (a === 'pick-crate') { S.other = v; S.query = ''; S.rows = []; S.untagged = 0; S.answers = {}; render(); }
+    else if (a === 'change-crate') { S.other = ''; S.rows = []; S.untagged = 0; S.answers = {}; render(); }
+    else if (a === 'dir') { if (S.dir !== v) { S.dir = v; S.rows = []; S.untagged = 0; S.answers = {}; } render(); }
     else if (a === 'step') {
       if (b.getAttribute('aria-disabled') === 'true') return;
-      S.n += +b.dataset.step; render();
-    } else if (a === 'pick-tag') {
-      var i = S.picked.indexOf(v); if (i >= 0) S.picked.splice(i, 1); else S.picked.push(v); render();
-    } else if (a === 'answer') { var p = v.split(':'); S.answers[p[0]] = p[1]; render(); }
-    else if (a === 'save-move') { if (!S.to || !count()) return; S.view = 'receipt'; S.time = '09:42'; render(); }
-    else if (a === 'check-unknown') { S.drawer = v; render(); }
-    else if (a === 'close-unknown') { S.drawer = ''; render(); }
-    else if (a === 'save-unknown') { if (!S.resolve) return; S.resolved = S.resolved || {}; S.resolved[S.drawer] = S.resolve; S.drawer = ''; S.resolve = ''; render(); }
-    else if (a === 'resolve') { S.resolve = v; render(); }
+      var k = b.dataset.value, st = +b.dataset.step;
+      if (k === 'n') S.n += st; else if (k === 'untagged') S.untagged += st; else if (k === 'had') S.had = (S.had || 0) + st;
+      render();
+    }
+    else if (a === 'all') { S.n = +v; render(); }
+    else if (a === 'pick-row') { var i = S.rows.indexOf(v); if (i >= 0) S.rows.splice(i, 1); else S.rows.push(v); render(); }
+    else if (a === 'answer') { var p = v.split(':'); S.answers[p[0]] = p[1]; render(); }
+    else if (a === 'clear') { var keep = { view: 'move', face: S.face }; S = Object.assign(JSON.parse(DEFAULT), keep); render(); }
+    else if (a === 'back' && S.view === 'move') { S.view = 'face'; S.kept = draftExists(); render(); }   // Back keeps the draft
+    else if (a === 'open-move') { S.view = 'move'; S.kept = false; render(); }
+    else if (a === 'save-move') { if (b.disabled) return; post(); render(); }
+    else if (a === 'close') { S.view = 'face'; render(); }
+    else if (a === 'open-resolve') { S.drawer = v; S.had = 0; S.rest = 'record'; render(); }
+    else if (a === 'rest') { S.rest = v; render(); }
+    else if (a === 'close-resolve') { S.drawer = ''; render(); }
+    else if (a === 'save-resolve') { S.resolved = S.resolved || {}; S.resolved[S.drawer.replace(':', '')] = { had: S.had, rest: S.rest }; S.drawer = ''; render(); }
     else document.documentElement.setAttribute('data-door', a + ':' + (v || ''));
   });
-  PP.ready.then(render);
+  PP.ready.then(function () { if (RECEIPT_AT_LOAD) { S.view = 'move'; normalize(); post(); } render(); });
 })();
 </script>
 </body>
