@@ -93,10 +93,14 @@
   }
   // Opened from a gain line on count.html (`Move from another crate`): this litter receives, the worker picks the source;
   // the Move explains the gain only (`explains: [null, gain]`), so the source loses the piglets and this litter keeps its alive.
+  // The direction stays `in` whatever the litter's state (a sow-died crate may receive: it is the only way to close its gain);
+  // n is capped at the gain; a source with an open loss is flagged and may be paired (`explains: [loss, gain]`) by the worker.
   if (name === 'move' && qs.get('explains')) {
-    S.explains = qs.get('explains').split(','); S.dir = qs.get('dir') === 'in' ? 'in' : 'out'; S.n = +qs.get('n') || 1;
+    S.explains = qs.get('explains').split(','); S.explains[0] = S.explains[0] || null; S.dir = 'in'; S.n = +qs.get('n') || 1; S.gainMode = true;
   }
-  function gainOnly() { return !!S.explains && !S.explains[0]; }
+  function gainOnly() { return !!S.gainMode; }
+  function gainOpen() { var g = L(S.face).unexplained.gains.filter(function (x) { return x.id === S.explains[1]; })[0]; return g ? g.open : 0; }
+  function openLossOf(c) { return L(c).unexplained.losses.filter(function (x) { return x.open > 0; })[0] || null; }
   S.dir = S.dir || 'out'; S.answers = S.answers || {}; S.rows = S.rows || []; S.untagged = S.untagged || 0;
   if (S.n == null) S.n = 1;
   var DEFAULT = JSON.stringify({ other: '', n: 1, rows: [], untagged: 0, answers: {}, dir: 'out' });
@@ -113,7 +117,7 @@
   function txList(ids) { return ids.map(txName).join(' · '); }
   function farrowing(c) { return !!L(c) && L(c).phase === 'open'; }
   function canSource(c) { return !!L(c) && L(c).phase === 'locked' && alive(c) > 0; }
-  function canReceive(c) { return !!L(c) && L(c).phase === 'locked' && !L(c).sowDied; }
+  function canReceive(c) { return !!L(c) && L(c).phase === 'locked' && (!L(c).sowDied || (gainOnly() && c === S.face)); }
   function source() { return S.dir === 'out' ? S.face : S.other; }
   function receiver() { return S.dir === 'out' ? S.other : S.face; }
   function liveRows(c) { return L(c).identity.rows.filter(function (r) { return r.litter === c && r.status === 'alive'; }); }
@@ -132,8 +136,11 @@
   // Clamp on every change: roles valid, rows only from the source (the ledger clamps n).
   function normalize() {
     if (S.view !== 'move') return;
-    if (!canSource(S.face)) S.dir = 'in';                              // a sow with no piglets can only receive
-    if (!canReceive(S.face) && canSource(S.face)) S.dir = 'out';        // a litter whose sow died can only send
+    if (gainOnly()) S.dir = 'in';                                       // explaining this litter's gain: it receives
+    else {
+      if (!canSource(S.face)) S.dir = 'in';                            // a sow with no piglets can only receive
+      if (!canReceive(S.face) && canSource(S.face)) S.dir = 'out';      // a litter whose sow died can only send
+    }
     if (S.explains && !gainOnly()) return;                              // an explaining Move is locked to its crates, direction and count
     if (S.other) {
       var bad = S.other === S.face || !L(S.other) || farrowing(S.other) || (S.dir === 'out' && !canReceive(S.other)) || (S.dir === 'in' && !canSource(S.other));
@@ -145,6 +152,12 @@
     var ids = liveRows(src).map(function (r) { return r.rowId; });
     S.rows = S.rows.filter(function (r) { return ids.indexOf(r) >= 0; });
     S.untagged = Math.max(0, Math.min(S.untagged, remainder(src)));
+    if (gainOnly()) {                                                   // a Move explaining a gain carries at most the gain
+      var cap = gainOpen();
+      S.n = Math.min(S.n, cap); S.rows = S.rows.slice(0, cap); S.untagged = Math.min(S.untagged, cap - S.rows.length);
+      var lo = openLossOf(src);
+      if (S.explains[0] && (!lo || lo.id !== S.explains[0])) S.explains[0] = null;   // the pairing belongs to the source picked
+    }
   }
   function draftExists() { return JSON.stringify({ other: S.other || '', n: S.n, rows: S.rows, untagged: S.untagged, answers: S.answers, dir: S.dir }) !== DEFAULT; }
 
@@ -265,7 +278,11 @@
   function crateMeta(c) {
     var empty = alive(c) === 0;
     var args = { day: L(c).dayAge, n: alive(c), tag: tag(c), u: unitOf(c), state: empty ? '' : PP.t('pp.move.crate.state.' + crateState(c)) };
-    return { id: empty ? (where(c) ? 'pp.move.crate.meta_unit_empty' : 'pp.move.crate.meta_empty') : (where(c) ? 'pp.move.crate.meta_unit' : 'pp.move.crate.meta'), args: args };
+    var id = empty ? (where(c) ? 'pp.move.crate.meta_unit_empty' : 'pp.move.crate.meta_empty') : (where(c) ? 'pp.move.crate.meta_unit' : 'pp.move.crate.meta');
+    // explaining a gain: a source with an open loss is flagged (it may be the same piglet)
+    var lo = gainOnly() && !empty ? openLossOf(c) : null;
+    if (lo) { id += '_loss'; args.k = lo.open; }
+    return { id: id, args: args };
   }
   function crateRow(c) {
     var m = crateMeta(c);
@@ -341,10 +358,24 @@
                   decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' }, args: { description: { n: rem }, hint: { n: rem } } }) : '') +
         '</section>';
     }
+    if (gainOnly()) {                                        // at most the gain: a larger move is a plain Move of its own
+      var g = gainOpen(), mx = Math.min(a, g), capHint = S.n >= mx ? (mx === g ? pl('pp.move.explain.gain_cap', g) : pl('pp.move.count.ceiling', a)) : undefined;
+      return UI.stepper({ label: '', description: '', value: S.n, min: 1, max: mx, key: 'n', hint: '', reserveHint: true,
+        strs: { label: 'label.piglets', description: pl('pp.move.count.of', a), value: 'ds.field.figure', hint: capHint, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
+        args: { description: { n: a, code: src }, hint: { n: mx === g ? g : a, code: src, to: receiver() } } });
+    }
     return UI.stepper({ label: '', description: '', value: S.n, min: 1, max: a, key: 'n', hint: '', pointers: ptr, reserveHint: ptr.length > 0 || S.n >= a,
       strs: { label: 'label.piglets', description: pl('pp.move.count.of', a), value: 'ds.field.figure', hint: S.n >= a && !ptr.length ? pl('pp.move.count.ceiling', a) : undefined,
               decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { description: { n: a, code: src }, hint: { n: a, code: src } } });
+  }
+  /* Explaining a gain from a source that has an open loss: the worker may say it is the same piglet (both lines close). */
+  function pairSection() {
+    if (!gainOnly() || !S.other) return '';
+    var lo = openLossOf(S.other);
+    if (!lo) return '';
+    return UI.choiceGroup(UI.choiceRow({ label: '', meta: '', mode: 'multi', action: 'pair-loss', value: lo.id, selected: S.explains[0] === lo.id,
+      strs: { label: pl('pp.move.explain.pair', lo.open), meta: 'pp.move.explain.pair_meta' }, args: { label: { code: S.other, n: lo.open }, meta: { code: S.other } } }));
   }
   function dueAt(c, id) { var D = L(c).doses[id]; return D && D.status && D.status !== 'later'; }
   function askSection(dr) {
@@ -407,7 +438,7 @@
   function summary(dr) {
     var p = pointer(dr);
     if (p) return '<div class="mv-summary">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: p.id }, args: { title: p.args } }) + '</div>';
-    var ex = S.explains ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: gainOnly() ? 'pp.move.explain.closes_gain' : 'pp.move.explain.closes' }, args: { title: { to: receiver() } } }) : '';
+    var ex = S.explains ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: gainOnly() && !S.explains[0] ? 'pp.move.explain.closes_gain' : 'pp.move.explain.closes' }, args: { title: { to: receiver() } } }) : '';
     return '<div class="mv-summary">' + deltas(source(), receiver(), dr.delta, dr.sourceAfter) + ex + '</div>';
   }
   function reviewRec(dr) { return { from: source(), to: receiver(), n: dr.n, rows: S.rows, packets: dr.carry, aliveBefore: alive(source()) }; }
@@ -417,7 +448,7 @@
     var explain = S.explains ? UI.heading({ title: '', description: '', kind: 'section', level: 3,
       strs: gainOnly() ? { title: 'pp.move.explain.title_gain', description: 'pp.move.explain.desc_gain' } : { title: 'pp.move.explain.title', description: 'pp.move.explain.desc' },
       args: { title: { code: receiver(), n: gainOnly() ? S.n : count() }, description: { from: source(), to: receiver() } } }) : '';
-    var body = explain + directionSection() + crateSection() + countSection() + (S.other && dr.event ? askSection(dr) + carrySection(reviewRec(dr), false) : '');
+    var body = explain + directionSection() + crateSection() + pairSection() + countSection() + (S.other && dr.event ? askSection(dr) + carrySection(reviewRec(dr), false) : '');
     var primary = ready ? button('primary', 'save-move', 'pp.move.act.move', { n: dr.n, from: source(), to: receiver() }) : button('primary', 'save-move', 'pp.move.act.move_bare', null, true);
     return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
       '<header class="utility-header mv-head"><div class="pp-hdr-title"><h3 data-str="pp.move.sheet.title">' + U.esc(PP.t('pp.move.sheet.title')) + '</h3><p>' + sub + '</p></div>' +
@@ -508,8 +539,13 @@
     var b = ev.target.closest('[data-action]');
     if (!b) return;
     var a = b.dataset.action, v = b.dataset.value;
-    if (a === 'pick-row') v = b.value;                         // a multi row's checkbox carries its id as value
-    if (a === 'pick-crate') { S.other = v; S.query = ''; S.rows = []; S.untagged = 0; S.answers = {}; render(); }
+    if (a === 'pick-row' || a === 'pair-loss') v = b.value;  // a multi row's checkbox carries its id as value
+    if (a === 'pick-crate') {
+      S.other = v; S.query = ''; S.rows = []; S.untagged = 0; S.answers = {};
+      // explaining a gain from a tagged source: the stray starts as untagged (a tag, if it has one, is picked instead)
+      if (gainOnly() && S.dir === 'in' && hasRows(v)) S.untagged = Math.min(S.n, remainder(v));
+      render();
+    }
     else if (a === 'change-crate') { if (S.explains && !gainOnly()) return; S.other = ''; S.rows = []; S.untagged = 0; S.answers = {}; render(); }
     else if (a === 'dir') { if (S.dir !== v) { S.dir = v; S.rows = []; S.untagged = 0; S.answers = {}; } render(); }
     else if (a === 'step') {
@@ -520,6 +556,7 @@
     }
     else if (a === 'all') { S.n = +v; render(); }
     else if (a === 'pick-row') { var i = S.rows.indexOf(v); if (i >= 0) S.rows.splice(i, 1); else S.rows.push(v); render(); }
+    else if (a === 'pair-loss') { S.explains[0] = S.explains[0] === v ? null : v; render(); }   // the worker pairs; the app never does
     else if (a === 'answer') { var p = v.split(':'); S.answers[p[0]] = p[1]; render(); }
     else if (a === 'clear') { var keep = { view: 'move', face: S.face }; S = Object.assign(JSON.parse(DEFAULT), keep); render(); }   // Clear also drops an explaining link
     else if (a === 'back' && S.view === 'move') { S.view = 'face'; S.kept = draftExists(); render(); }   // Back keeps the draft
