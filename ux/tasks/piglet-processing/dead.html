@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dead picker</title>
+<link rel="stylesheet" href="/ux/design-system/tokens.css">
+<link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="shell.css">
+<style>
+/* Layout only, tokens from tokens.css. The drawer is one Candidate composition (Candidate:DeadDrawer);
+   the ruled visuals the cards lack are marked Candidate:Radio, Candidate:Photos, Candidate:TextAction. */
+.dd-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
+.dd-phone .scrim { inset: 0; }
+.dd-stack { display: flex; flex-direction: column; gap: var(--space-section); }
+.dd-stack > * { margin: 0; }
+.dd-rows { display: flex; flex-direction: column; }
+.dd-group > * + * { margin-top: var(--space-heading); }
+.dd-group > .st-heading { margin-bottom: 0; }
+.dd-bar { flex-wrap: wrap; justify-content: space-between; column-gap: var(--space-section); }
+.dd-bar > .primary, .dd-bar > .danger { flex: 1; }
+.dd-why { flex-basis: 100%; margin: 0 0 var(--space-row-y); }
+/* Candidate:DeadDrawer — (1) [retired: the Stepper candidate now has draft:true];
+   (2) the green `unsaved` words; (3) mono identity labels; (4) the sow's stacked warning; (5) the hold sweep;
+   (6) a gray Save that stays focusable (aria-disabled) — the bundle only grays :disabled. */
+.dd-unsaved { color: var(--green); font-family: var(--font-mono); }
+.dd-phone .st-heading .st-heading-title > span.dd-unsaved.dd-unsaved, .dd-unsaved { font-size: var(--type-choice-meta-size); font-weight: 500; letter-spacing: 0; color: var(--green); font-family: var(--font-mono); }
+.dd-receipt > span { white-space: nowrap; }
+.dd-mono .st-choice-label { font-family: var(--font-mono); }
+.dd-warn { display: flex; flex-direction: column; gap: var(--space-heading); padding: var(--space-panel); background: var(--red-wash); border: 1px solid var(--red); border-radius: var(--radius-inset); }
+.dd-warn strong { color: var(--red); font-size: var(--type-button-size); font-weight: 600; }
+.dd-warn span { color: var(--muted); font-family: var(--font-mono); font-size: var(--type-choice-meta-size); }
+.dd-hold { position: relative; overflow: hidden; flex-direction: column; touch-action: none; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
+.dd-hold > * { position: relative; pointer-events: none; }
+.dd-hold small { font-size: var(--type-meta-size); font-weight: 600; }
+.dd-hold::before { content: ''; position: absolute; inset: 0; background: var(--ink); opacity: .35; transform: scaleX(0); transform-origin: left; }
+.dd-hold.is-holding::before { transform: scaleX(1); transition: transform 850ms linear; }
+.dd-live:empty { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.dd-phone.dd-phone.dd-phone .dd-bar.dd-bar.dd-bar .button.button[aria-disabled="true"] { background: var(--disabled-fill); border-color: var(--disabled-fill); color: var(--disabled-ink); cursor: default; }
+/* Candidate:TextAction — the ruled text-action register (13/700 ink2, no container, 44px hit). */
+.dd-phone .st-heading-action .dd-text-action.dd-text-action, .dd-text-action { min-height: var(--touch-min); padding: 0; border: 0; background: none; font-size: var(--type-row-title-size); font-weight: 700; color: var(--muted); text-align: left; }
+.dd-pointer { display: flex; flex-direction: column; align-items: flex-start; }
+.dd-pointer p { margin: 0; font-size: var(--type-choice-meta-size); color: var(--muted); }
+/* Candidate:Radio — RULINGS craft pass: 2px ring, selected 2px ink ring + 10px dot, the whole 60px row. */
+.dd-radios { display: flex; flex-direction: column; }
+.dd-radio { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); width: 100%; min-height: 60px; padding: 0; border: 0; border-bottom: 1px solid var(--rule); background: none; color: var(--ink); font-family: var(--font-sans); font-size: var(--type-choice-label-size); font-weight: 500; text-align: left; cursor: pointer; }
+.dd-radio:last-child { border-bottom: 0; }
+.dd-radio::after { content: ''; flex: none; width: 20px; height: 20px; box-sizing: border-box; border: 2px solid var(--muted); border-radius: 50%; background: var(--paper); }
+.dd-radio[aria-checked="true"] { font-weight: 600; }
+.dd-radio[aria-checked="true"]::after { border-color: var(--ink); background: radial-gradient(circle, var(--ink) 5px, var(--paper) 5.5px); }
+/* Candidate:Photos — RULINGS craft pass: a well card; the live camera is a card-bg circle with a 1.5px ring. */
+.dd-photos { display: flex; align-items: center; gap: var(--space-row-y); min-height: var(--touch-min); padding: 0 0 0 var(--space-row-x); background: var(--well); border-radius: var(--radius-control); }
+.dd-photos-label { flex: 1; font-size: var(--type-row-title-size); font-weight: 500; }
+.dd-photos-label small { margin-left: var(--space-row-y); font-size: var(--type-description-size); font-weight: 400; color: var(--muted); }
+.dd-camera { display: grid; place-items: center; width: var(--touch-min); height: var(--touch-min); padding: 0; border: 1.5px solid var(--muted); border-radius: 50%; background: var(--paper); color: var(--ink); cursor: pointer; }
+.dd-camera[aria-disabled="true"] { border-color: var(--well); background: var(--well); color: var(--disabled-ink); cursor: default; }
+.dd-camera svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+@media (prefers-reduced-motion: reduce) { .dd-hold.is-holding::before { transition: none; } }
+</style>
+</head>
+<body>
+<main class="inspection-phone dd-phone" data-st-context="page">
+  <div id="screen"></div>
+</main>
+<script src="/ux/design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+<script>
+(function () {
+  var UI = window.SentriUI, ICON = window.SentriIcons;
+  var zh = PP.lang === 'zh';
+
+  // ---- Litter facts. The drawer forks on these, never on the task or the surface. -------------
+  //  phase 'open'  : farrowing not locked. Six causes, no cap, tallies never touch Alive (Born derives).
+  //  phase 'locked': four causes, capped at unidentified alive + open loss; bodies leave Alive unless drawn from an open loss.
+  //  The surface (farrowing during · farrowing record · check-in · processing) chooses copy only.
+  var ALL = ['stillborn', 'mummified', 'crushed', 'scours', 'starve_out', 'other'];
+  var LOCKED = ['crushed', 'scours', 'starve_out', 'other'];
+  var SOW = { open: ['farrowing', 'prolapse', 'found', 'other'], locked: ['prolapse', 'found', 'other'] };
+  var pig = function (id, tag, notch, sex, w) { return { id: id, tag: tag, notch: notch, sex: sex, w: w }; };
+  var LITTERS = {
+    A: { surface: 'processing', phase: 'locked', tag: '000254', pen: 'B04', day: 3, born: 14, dead: { stillborn: 1, crushed: 1 }, identified: [], openLosses: [], modes: ['piglets', 'sow'] },
+    B: { surface: 'processing', phase: 'locked', tag: '000271', pen: 'B06', day: 3, born: 13, dead: { stillborn: 1 }, openLosses: [], modes: ['piglets', 'sow'], identified: [
+      pig('r1', '271001', '', 'f', '1.6'), pig('r2', '271002', '', 'm', '1.5'), pig('r3', '271003', '', 'f', '1.4'), pig('r4', '271004', '', 'm', '1.1'),
+      pig('r5', '271005', '', 'f', ''), pig('r6', '271006', '', 'm', '1.7'), pig('r7', '271007', '', 'm', '1.3'), pig('r8', '271008', '', 'f', '1.5'),
+      pig('r9', '', '27-14', '', '')] },
+    C: { surface: 'processing', phase: 'locked', tag: '000288', pen: 'B09', day: 4, born: 12, dead: { stillborn: 1 }, identified: [], modes: ['piglets', 'sow'],
+      openLosses: [{ id: 'L1', qty: 1, at: 'Sep 27' }, { id: 'L2', qty: 1, at: 'Sep 28' }] },
+    D: { surface: 'processing', phase: 'locked', tag: '000312', pen: 'B11', day: 3, born: 11, dead: { stillborn: 1 }, identified: [], openLosses: [], modes: ['piglets'] },
+    F: { surface: 'farrowing', phase: 'open', tag: '000418', pen: 'B1', parity: 3, alive: 9, dead: { stillborn: 1, mummified: 1, crushed: 2, other: 1 }, identified: [], openLosses: [], modes: ['piglets', 'sow'] },
+    G: { surface: 'farrowing', phase: 'locked', tag: '000418', pen: 'B1', parity: 3, born: 14, dead: { stillborn: 1, mummified: 1, crushed: 3, other: 1 }, identified: [], openLosses: [], modes: ['piglets', 'sow'] }
+  };
+  // state → litter, drawer open, mode, tallies, picks {rowId: cause}, from-the-missing k (null = unasked), sow {cause}, save first
+  var STATES = {
+    'dead':                   { L: 'A', open: true },
+    'dead-tallied':           { L: 'A', open: true, tallies: { crushed: 1 } },
+    'dead-draft':             { L: 'A', open: false, tallies: { crushed: 1 } },
+    'dead-draft-sow':         { L: 'A', open: false, sow: 'prolapse' },
+    'dead-tagged':            { L: 'B', open: true },
+    'dead-tagged-picked':     { L: 'B', open: true, tallies: { scours: 1 }, picks: { r4: 'crushed', r9: 'crushed' } },
+    'dead-tagged-nocause':    { L: 'B', open: true, picks: { r4: '' } },
+    'dead-open-loss':         { L: 'C', open: true, tallies: { crushed: 1 } },
+    'dead-open-loss-yes':     { L: 'C', open: true, tallies: { crushed: 1 }, k: 1 },
+    'dead-open-loss-no':      { L: 'C', open: true, tallies: { crushed: 1 }, k: 0 },
+    'dead-open-loss-split':   { L: 'C', open: true, tallies: { crushed: 2 }, k: 1 },
+    'dead-saved':             { L: 'C', open: true, tallies: { crushed: 2 }, k: 1, photos: 2, save: true },
+    'dead-open-loss-floor':   { L: 'C', open: true, tallies: { crushed: 11 }, k: 2 },
+    'dead-tagged-second':     { L: 'B', open: true, picks: { r4: 'crushed', r9: '' } },
+    'dead-sow':               { L: 'A', open: true, mode: 'sow', sow: 'prolapse' },
+    'dead-sow-recorded':      { L: 'D', open: true },
+    'farrowing-drawer':       { L: 'F', open: true },
+    'farrowing-drawer-draft': { L: 'F', open: true, tallies: { crushed: 1 } },
+    'farrowing-drawer-locked':{ L: 'G', open: true, tallies: { crushed: 1 } }
+  };
+  var name = STATES[PP.state] ? PP.state : 'dead';
+  var spec = STATES[name];
+  var L = JSON.parse(JSON.stringify(LITTERS[spec.L]));
+  L.deadRows = {};                                   // identity status derives from the death event, keyed by row id
+  // Two drafts, one per mode (the draft envelope is keyed litter + mode).
+  var S = { open: spec.open, mode: spec.mode || (spec.sow && !spec.tallies ? 'sow' : 'piglets'),
+    pig: { tallies: Object.assign({}, spec.tallies || {}), picks: Object.assign({}, spec.picks || {}), k: spec.k == null ? null : spec.k, photos: spec.photos || 0 },
+    sow: { cause: spec.sow || '', note: '', photos: 0 },
+    hint: '', why: false, live: '', armed: false, receipt: null, closedAt: 0, door: '', saving: false };
+
+  var sum = function (o) { return Object.keys(o).reduce(function (t, k) { return t + (o[k] || 0); }, 0); };
+  var locked = function () { return L.phase === 'locked'; };
+  var causes = function () { return locked() ? LOCKED : ALL; };
+  var deadN = function () { return sum(L.dead); };
+  var lossN = function () { return L.openLosses.reduce(function (t, x) { return t + x.qty; }, 0); };
+  var alive = function () { return locked() ? L.born - deadN() - lossN() : L.alive; };
+  var bornDead = function () { return (L.dead.stillborn || 0) + (L.dead.mummified || 0); };
+  var roster = function () { return L.identified.filter(function (p) { return !L.deadRows[p.id]; }); };
+  var unidentified = function () { return alive() - roster().length; };
+  var picks = function () { return Object.keys(S.pig.picks); };
+  var bodies = function () { return sum(S.pig.tallies); };              // unidentified bodies only
+  var pigN = function () { return bodies() + picks().length; };
+  var cap = function () { return locked() ? unidentified() + lossN() : Infinity; };
+  var kMax = function () { return Math.min(bodies(), lossN()); };
+  // Alive can never go negative: new deaths must be live unidentified piglets; the rest must come from the missing.
+  var kMin = function () { return locked() ? Math.max(0, bodies() - unidentified()) : 0; };
+  var settleK = function () {                        // raising bodies raises k to its floor; the answer survives while valid
+    if (!bodies()) { S.pig.k = null; return; }
+    if (kMin() > 0) S.pig.k = Math.max(S.pig.k == null ? 0 : S.pig.k, kMin());
+    if (S.pig.k != null) S.pig.k = Math.min(S.pig.k, kMax());
+  };
+  var asksLoss = function () { return locked() && lossN() > 0; };
+  var needK = function () { return asksLoss() && bodies() > 0 && S.pig.k == null; };
+  var sowDraft = function () { return !!S.sow.cause; };
+  var idLabel = function (p) { return p.tag ? { id: 'ds.dead.id.tag', args: { tag: p.tag } } : { id: 'ds.dead.id.notch', args: { notch: p.notch } }; };
+  var idText = function (p) { var l = idLabel(p); return PP.t(l.id, l.args); };
+  // Why Save is gray, first missing step first. Each reason names where to go.
+  function why() {
+    if (S.mode === 'sow') {
+      if (pigN()) return { id: 'ds.dead.why.sow_pending', args: { n: pigN() }, to: 'mode-piglets' };
+      if (!S.sow.cause) return { id: 'ds.dead.why.sow_cause', to: 'sow-causes' };
+      return null;
+    }
+    if (!pigN()) return { id: 'ds.dead.why.empty', to: 'tallies', quiet: true };
+    var bare = picks().filter(function (r) { return !S.pig.picks[r]; });
+    if (bare.length === 1) return { id: 'ds.dead.why.cause_one', args: { id: idText(rowOf(bare[0])) }, to: 'pick-cause' };
+    if (bare.length) return { id: 'ds.dead.why.cause_many', args: { n: bare.length }, to: 'pick-cause' };
+    if (needK() || (asksLoss() && bodies() && S.pig.k < kMin())) return { id: 'ds.dead.why.missing', to: 'loss' };
+    return null;
+  }
+  var rowOf = function (id) { return L.identified.filter(function (p) { return p.id === id; })[0]; };
+
+  // ---- Helpers ------------------------------------------------------------------------------
+  function span(id, args, cls, ds) {
+    return '<span' + (cls ? ' class="' + cls + '"' : '') + (ds ? ' data-ds="' + ds + '"' : '') + ' data-str="' + id + '"' +
+      (args ? " data-args='" + JSON.stringify(args).replace(/'/g, '&#39;') + "'" : '') + '></span>';
+  }
+  var esc = function (v) { return String(v).replace(/[&"<]/g, function (c) { return c === '&' ? '&amp;' : c === '<' ? '&lt;' : '&quot;'; }); };
+  var unit = function (n) { return { id: 'pp.common.unit.piglet.' + (n === 1 && !zh ? 'one' : 'many'), args: { n: n } }; };
+  function fact(label, n) { var u = unit(n); return { label: '', value: '', strs: { label: label, value: u.id }, args: { value: u.args } }; }
+  function btn(action, str, cls, gray, extra) {
+    return '<button type="button" class="button ' + cls + '" data-ds="Button" data-action="' + action + '"' + (gray ? ' aria-disabled="true"' : '') + (extra || '') +
+      ' data-str="' + str + '"></button>';
+  }
+  function radios(items, action, selected, target) {
+    return '<div class="dd-radios" role="radiogroup" data-target="' + target + '">' + items.map(function (it) {
+      return '<button type="button" class="dd-radio" data-ds="Candidate:Radio" role="radio" aria-checked="' + (it.v === selected) + '" data-action="' + action + '" data-value="' + it.v + '">' +
+        span(it.id, it.args) + '</button>';
+    }).join('') + '</div>';
+  }
+
+  // ---- The host (a litter face). Mock: the surface owns it; the drawer only asks it to say `unsaved`. --
+  function host() {
+    var n = pigN(), words = '';
+    if (n) words += span('status.unsaved', { n: n }, 'dd-unsaved', 'Candidate:DeadDrawer');
+    if (sowDraft()) words += span('ds.dead.sow_unsaved', null, 'dd-unsaved', 'Candidate:DeadDrawer');
+    var born = locked() ? L.born : alive() + deadN();
+    var receipt = '';
+    if (S.receipt) {
+      receipt = '<p class="dd-unsaved dd-receipt" data-ds="Candidate:DeadDrawer" role="status">' + span('receipt.saved') + S.receipt.map(function (r) { return ' ' + span(r.id, r.args); }).join('') + '</p>';
+    }
+    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (S.open ? ' inert' : '') + '>' +
+      '<header class="utility-header">' + UI.heading({ title: '', description: '', kind: 'page', level: 2,
+        strs: { title: 'pp.dead.hdr.tag', description: L.surface === 'farrowing' ? 'pp.dead.hdr.parity' : 'pp.dead.hdr.day' },
+        args: { title: { tag: L.tag }, description: { pen: L.pen, n: L.surface === 'farrowing' ? L.parity : L.day } } }) + '</header>' +
+      '<div class="sheet-body"><div class="dd-stack">' + UI.facts([fact('label.born', born), fact('label.alive', alive()), fact('label.dead', deadN())], { columns: 3 }) +
+      '<div class="dd-group">' + UI.rowGroup(UI.row({ title: '', action: 'open-dead', value: 'dead', trailing: words, strs: { title: 'act.record_dead' } })) + receipt + '</div>' +
+      '</div></div><footer class="sheet-footer">' + btn('close-host', L.surface === 'farrowing' ? 'act.close' : 'act.back', 'secondary') + '</footer></section>';
+  }
+
+  // ---- The drawer ------------------------------------------------------------------------------
+  function header() {
+    var sow = S.mode === 'sow', n = pigN();
+    var draft = sow ? sowDraft() : n > 0;
+    var clear = draft ? '<button type="button" class="dd-text-action" data-ds="Candidate:TextAction" data-action="clear" data-str="act.clear"></button>' : '';
+    var h = UI.heading({ title: '', description: '', action: clear, kind: 'page', level: 3,
+      strs: { title: sow ? 'ds.dead.title.sow' : 'ds.dead.title.total', description: sow ? 'ds.dead.sub.sow' : locked() ? 'ds.dead.sub.locked' : 'ds.dead.sub.open' },
+      args: { title: { n: deadN() + n }, description: { pen: L.pen, alive: alive(), bd: bornDead() } } });
+    if (n && !sow) h = h.replace('</span></h3>', '</span>' + span('ds.dead.title.unsaved', { n: n }, 'dd-unsaved') + '</h3>');
+    return '<header class="utility-header dd-grab" data-grab>' + h + '</header>';
+  }
+  function tallyRow(c) {
+    var posted = L.dead[c] || 0, d = S.pig.tallies[c] || 0, full = bodies() >= cap();
+    return UI.stepper({ label: '', value: posted + d, min: posted, max: full ? posted + d : null, key: c, action: 'dead-step',
+      draft: d > 0, reserveHint: S.hint === c, hint: S.hint === c ? ' ' : '',
+      strs: Object.assign({ label: 'ds.dead.cause.' + c, value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
+        S.hint === c ? { hint: roster().length ? 'ds.dead.hint.cap_identified' : 'ds.dead.hint.cap' } : {}),
+      args: { hint: { n: cap() } } });
+  }
+  function lossStepper() {
+    if (!asksLoss()) return '';
+    var m = lossN(), a = alive(), b = bodies(), k = S.pig.k, hint;
+    if (!b) hint = { id: 'ds.dead.loss.open', args: { m: m } };
+    else if (k == null) hint = { id: 'ds.dead.loss.ask' };
+    else if (kMin() > 0 && k === kMin()) hint = { id: 'ds.dead.loss.atleast', args: { n: kMin() } };
+    else {
+      var after = a - (b - k) - picks().length, left = m - k;
+      hint = a === after ? (left ? { id: 'ds.dead.loss.stay', args: { a: a, left: left } } : { id: 'ds.dead.loss.closed', args: { a: a } })
+        : { id: 'ds.dead.loss.move', args: { a: a, b: after, left: left } };
+    }
+    // `None were missing` is an explicit answer (a text action), so the floor-gray minus keeps its one meaning.
+    var none = b && k == null && !kMin() ? '<button type="button" class="dd-text-action" data-ds="Candidate:TextAction" data-action="loss-none" data-str="ds.dead.loss.none"></button>' : '';
+    return '<div data-target="loss">' + UI.stepper({ label: '', value: k || 0, min: k == null ? 0 : kMin(), max: kMax(), key: 'k', action: 'loss-step', hint: ' ',
+      strs: { label: 'ds.dead.loss.label', value: 'ds.field.figure', hint: hint.id, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
+      args: { label: { m: m }, hint: hint.args } }) + none + '</div>';
+  }
+  function identifiedBlock() {
+    var rows = roster();
+    if (!rows.length) return '';
+    var list = UI.choiceGroup(rows.map(function (p) {
+      var l = idLabel(p), meta = p.sex ? 'ds.dead.pig.' + p.sex + (p.w ? '_w' : '') : p.w ? 'ds.dead.pig.w' : '';
+      return UI.choiceRow({ label: '', meta: '', mode: 'multi', action: 'pick', value: p.id, selected: p.id in S.pig.picks, className: 'dd-mono',
+        strs: Object.assign({ label: l.id }, meta ? { meta: meta } : {}), args: { label: l.args, meta: { w: p.w } } });
+    }), {});
+    var scan = '<button type="button" data-action="scan" data-str="act.scan"></button>';
+    var out = '<div class="dd-group">' + UI.heading({ title: '', kind: 'group', level: 4, action: scan, strs: { title: 'ds.dead.identified' }, args: { title: { n: rows.length } } }) + list + '</div>';
+    // One cause control for everything picked, below the roster: ticking never moves a row under the thumb.
+    var ps = picks();
+    if (ps.length) {
+      var shared = ps.every(function (r) { return S.pig.picks[r] && S.pig.picks[r] === S.pig.picks[ps[0]]; }) ? S.pig.picks[ps[0]] : '';
+      var title = ps.length === 1 ? { id: 'ds.dead.cause_for_one', args: { id: idText(rowOf(ps[0])) } } : { id: 'ds.dead.cause_for_many', args: { n: ps.length } };
+      out += '<div class="dd-group" data-target="pick-cause">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: title.id }, args: { title: title.args } }) +
+        radios(LOCKED.map(function (c) { return { v: c, id: 'ds.dead.cause.' + c }; }), 'pick-cause', shared, 'pick-cause') + '</div>';
+    }
+    return out;
+  }
+  function photos(live, key) {
+    var n = S[key].photos;
+    return '<div class="dd-photos" data-ds="Candidate:Photos"><span class="dd-photos-label">' + span('ds.dead.photos') +
+      '<small data-str="' + (n ? 'ds.dead.photos_n' : 'ds.field.optional') + '"' + (n ? " data-args='{\"n\":" + n + "}'" : '') + '></small></span>' +
+      '<button type="button" class="dd-camera" data-action="add-photo" data-value="' + key + '"' + (live ? '' : ' aria-disabled="true"') +
+      ' aria-label="' + (zh ? '添加照片' : 'Add a photo') + '">' + ICON.icon('camera') + '</button></div>';
+  }
+  function piglets() {
+    var out = [], rows = causes().map(tallyRow).join('');
+    var lead = roster().length && pigN() ? '<p class="dd-pointer">' + span('ds.dead.hint.identified', null, 'st-field-hint') + '</p>' : '';
+    var group = roster().length
+      ? '<div class="dd-group" data-target="tallies">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'ds.dead.unidentified' }, args: { title: { n: unidentified() } } }) + lead + '<div class="dd-rows">' + rows + lossStepper() + '</div></div>'
+      : '<div class="dd-rows" data-target="tallies">' + rows + lossStepper() + '</div>';
+    out.push(group);
+    if (locked()) out.push('<div class="dd-pointer"><button type="button" class="dd-text-action" data-ds="Candidate:TextAction" data-action="farrowing-edit" data-str="ds.dead.born_dead"></button></div>');
+    out.push(identifiedBlock());
+    out.push(photos(pigN() > 0, 'pig'));
+    return out.join('');
+  }
+  function sowMode() {
+    var out = ['<div data-target="sow-causes">' + radios(SOW[L.phase].map(function (c) { return { v: c, id: 'ds.dead.sow.' + c }; }), 'sow-cause', S.sow.cause, 'sow-causes') + '</div>'];
+    if (S.sow.cause === 'other') out.push(UI.field({ label: span('ds.dead.sow.other_label'), control: '<input type="text" data-field="sowNote" value="' + esc(S.sow.note) + '">', ds: 'Field' }));
+    out.push(photos(!!S.sow.cause, 'sow'));
+    var stay = L.surface === 'processing' ? 'pp.dead.sow.stay' : 'ds.dead.sow.stay_' + L.phase;
+    out.push('<div class="dd-warn" role="status"><strong data-str="ds.dead.sow.warn_' + L.phase + '"></strong>' + span(stay, { n: alive() }) + '</div>');
+    return out.join('');
+  }
+  function footer() {
+    var w = why(), gray = !!w, pointer = '';
+    if (w && (!w.quiet || S.why)) pointer = '<p class="dd-why dd-pointer" role="status">' + span(w.id, w.args, 'st-field-hint') + '</p>';
+    var live = '<p class="dd-live dd-why" aria-live="polite">' + (S.live ? span(S.live, null, 'st-field-hint') : '') + '</p>';
+    var back = btn('back', 'act.back', 'secondary');
+    if (S.mode === 'sow') {
+      return '<footer class="sheet-footer dd-bar">' + pointer + live + back +
+        '<button type="button" class="button danger dd-hold" data-ds="Button" data-action="hold-save"' + (gray ? ' aria-disabled="true"' : '') + '>' +
+        span('act.save') + '<small data-str="ds.dead.hold"></small></button></footer>';
+    }
+    return '<footer class="sheet-footer dd-bar">' + pointer + back + btn('save', 'act.save', 'primary', gray) + '</footer>';
+  }
+  function drawer() {
+    var segs = L.modes.length > 1 ? UI.segment({ options: [['piglets', 'Piglets', { strs: { label: 'label.piglets' } }], ['sow', 'The sow', { strs: { label: 'ds.dead.seg.sow' } }]],
+      active: S.mode, action: 'mode', ariaLabel: zh ? '记录死亡对象' : 'Record death for' }) : '';
+    return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Candidate:DeadDrawer" data-phase="' + L.phase + '" data-surface="' + L.surface +
+      '" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
+      header() + '<div class="sheet-body"><div class="dd-stack">' + segs + (S.mode === 'sow' ? sowMode() : piglets()) + '</div></div>' + footer() + '</section>';
+  }
+  // Re-render keeps the body's scroll and the focused control (a requirement of the shared component).
+  var rendering = false;           // a re-render replaces the focused button; that is not focus leaving it
+  function render() {
+    var root = document.getElementById('screen'), body = root.querySelector('[data-ds="Candidate:DeadDrawer"] .sheet-body');
+    var top = body ? body.scrollTop : 0, f = document.activeElement, key = null;
+    if (f && root.contains(f) && f.dataset && f.dataset.action) key = [f.dataset.action, f.dataset.value || '', f.dataset.step || ''];
+    rendering = true; root.innerHTML = host() + (S.open ? drawer() : ''); rendering = false;
+    PP.apply(root);
+    var nb = root.querySelector('[data-ds="Candidate:DeadDrawer"] .sheet-body');
+    if (nb) nb.scrollTop = top;
+    if (key) {
+      var sel = '[data-action="' + key[0] + '"]' + (key[1] ? '[data-value="' + key[1] + '"]' : '') + (key[2] ? '[data-step="' + key[2] + '"]' : '');
+      var el = root.querySelector(sel); if (el) el.focus({ preventScroll: true });
+    }
+    if (S.door) document.documentElement.setAttribute('data-door', S.door);
+  }
+
+  // ---- Behaviour: staged. Back (and scrim, swipe) keeps; Clear discards the mode on screen; Save commits once. --
+  function close() { S.open = false; S.hint = ''; S.why = false; S.live = ''; S.armed = false; S.closedAt = Date.now(); }
+  function clearMode() {
+    if (S.mode === 'sow') S.sow = { cause: '', note: '', photos: 0 };
+    else S.pig = { tallies: {}, picks: {}, k: null, photos: 0 };
+    S.hint = ''; S.why = false;
+  }
+  function savePiglets() {
+    if (S.saving || why()) return;                   // idempotent per draft
+    S.saving = true;
+    var d = S.pig, k = d.k || 0, lines = [];
+    Object.keys(d.tallies).forEach(function (c) {
+      L.dead[c] = (L.dead[c] || 0) + d.tallies[c];
+      lines.push({ id: 'ds.dead.receipt.line', args: { n: d.tallies[c], cause: PP.t('dead.' + c) } });
+    });
+    Object.keys(d.picks).forEach(function (r) {       // an identified piglet dies against its row; the row stays, its status derives
+      var c = d.picks[r]; L.dead[c] = (L.dead[c] || 0) + 1; L.deadRows[r] = c;
+      lines.push({ id: 'ds.dead.receipt.row', args: { id: idText(rowOf(r)), cause: PP.t('dead.' + c) } });
+    });
+    for (var i = 0; i < L.openLosses.length && k > 0; i++) {   // allocation: oldest loss first
+      var take = Math.min(k, L.openLosses[i].qty); L.openLosses[i].qty -= take; k -= take;
+    }
+    L.openLosses = L.openLosses.filter(function (x) { return x.qty > 0; });
+    if (locked() && d.k != null && lossN()) lines.push({ id: 'ds.dead.receipt.missing', args: { n: lossN() } });
+    if (d.photos) lines.push({ id: 'ds.dead.receipt.photos.' + (d.photos === 1 && !zh ? 'one' : 'many'), args: { n: d.photos } });
+    S.receipt = lines;
+    S.door = 'dead_batch:' + JSON.stringify({ lines: lines.map(function (x) { return x.args; }), photos: d.photos });
+    S.pig = { tallies: {}, picks: {}, k: null, photos: 0 };
+    close(); S.mode = sowDraft() ? 'sow' : 'piglets';
+    S.saving = false;
+  }
+  function saveSow() {
+    if (why()) return;
+    S.door = 'sow_died:' + S.sow.cause + ' · photos ' + S.sow.photos + (L.surface === 'processing' ? ' → orphan litter face (edge.html?state=orphan)' : ' → session ended');
+    S.sow = { cause: '', note: '', photos: 0 }; L.modes = ['piglets']; S.mode = 'piglets'; close();
+  }
+  function goTo(w) {
+    S.why = true; render();
+    if (!w) return;
+    if (w.to === 'mode-piglets') { S.mode = 'piglets'; render(); return; }
+    var t = document.querySelector('[data-target="' + w.to + '"]');
+    if (t) { t.scrollIntoView({ block: 'center' }); var f = t.querySelector('button'); if (f) f.focus({ preventScroll: true }); }
+  }
+  // The two-step sow Save disarms on any change, when focus leaves the button, and after 5 s.
+  var armTimer = null;
+  function disarm() { if (!S.armed) return; S.armed = false; clearTimeout(armTimer); if (S.live === 'ds.dead.hold.armed') S.live = ''; }
+  var screen = document.getElementById('screen');
+  screen.addEventListener('click', function (ev) {
+    if (ev.target.closest('[data-dismiss]')) { close(); render(); return; }   // scrim = Back
+    var b = ev.target.closest('[data-action]');
+    if (!b) return;
+    var a = b.dataset.action, v = b.dataset.value, gray = b.getAttribute('aria-disabled') === 'true';
+    if (a !== 'hold-save') disarm();
+    if (a === 'pick') return;                                      // the checkbox's change event handles it
+    if (a === 'close-host') { if (Date.now() - S.closedAt < 400) return; S.door = 'host-back'; }
+    else if (a === 'dead-step') {
+      var step = +b.dataset.step, d = S.pig.tallies[v] || 0;
+      if (gray) { if (step > 0) S.hint = v; render(); return; }
+      d = Math.max(0, d + step); if (d) S.pig.tallies[v] = d; else delete S.pig.tallies[v];
+      S.hint = ''; settleK();
+    }
+    else if (a === 'loss-step') {
+      var s = +b.dataset.step;
+      if (!bodies()) return;
+      if (gray) return;
+      if (S.pig.k == null) S.pig.k = s > 0 ? Math.max(1, kMin()) : 0;
+      else S.pig.k = Math.max(kMin(), Math.min(kMax(), S.pig.k + s));
+    }
+    else if (a === 'loss-none') { if (bodies() && !kMin()) S.pig.k = 0;
+    }
+    else if (a === 'pick-cause') { picks().forEach(function (r) { S.pig.picks[r] = v; }); }
+    else if (a === 'mode') S.mode = v;
+    else if (a === 'sow-cause') S.sow.cause = v;
+    else if (a === 'clear') clearMode();
+    else if (a === 'back') close();                                // keeps both drafts on the device
+    else if (a === 'open-dead') { S.open = true; S.receipt = null; S.mode = pigN() || !sowDraft() ? 'piglets' : 'sow'; S.pig.k = null; settleK(); }
+    else if (a === 'add-photo') { if (gray) return; S[v].photos += 1; }
+    else if (a === 'save') { if (gray) { goTo(why()); return; } savePiglets(); }
+    else if (a === 'hold-save') {                                  // keyboard / switch: a two-step confirm instead of the hold
+      if (gray) { goTo(why()); return; }
+      if (ev.detail !== 0) return;                                 // pointer taps are handled by the hold
+      if (!S.armed) { S.armed = true; S.live = 'ds.dead.hold.armed'; clearTimeout(armTimer); armTimer = setTimeout(function () { if (S.armed) { disarm(); render(); } }, 5000); }
+      else { disarm(); saveSow(); }
+    }
+    else { S.door = a + ':' + (v || ''); }
+    render();
+  });
+  screen.addEventListener('change', function (ev) {
+    var t = ev.target;
+    if (t.dataset.action === 'pick') {
+      disarm(); if (t.checked) S.pig.picks[t.value] = ''; else delete S.pig.picks[t.value];
+      render();
+    }
+  });
+  screen.addEventListener('input', function (ev) { if (ev.target.dataset.field === 'sowNote') { S.sow.note = ev.target.value; if (S.armed) { disarm(); var l = screen.querySelector('.dd-live'); if (l) l.innerHTML = ''; } } });
+  screen.addEventListener('focusout', function (ev) {
+    if (!rendering && S.armed && ev.target.closest && ev.target.closest('.dd-hold') && !(ev.relatedTarget && ev.relatedTarget.closest && ev.relatedTarget.closest('.dd-hold'))) { disarm(); render(); }
+  });
+  // Swipe down on the drawer's header = Back.
+  var grab = null;
+  screen.addEventListener('pointerdown', function (ev) { if (ev.target.closest('[data-grab]')) grab = ev.clientY; }, true);
+  screen.addEventListener('pointerup', function (ev) { if (grab != null && ev.clientY - grab > 100) { close(); render(); } grab = null; }, true);
+  // Saving the sow's death is hold-to-commit: the sweep is drawn; sliding within the button keeps the hold.
+  var timer = null, held = null;
+  function cancelHold(msg) {
+    if (!held) return;
+    clearTimeout(timer); held.classList.remove('is-holding'); held = null;
+    S.live = msg; var l = screen.querySelector('.dd-live'); if (l) { l.innerHTML = span(msg, null, 'st-field-hint'); PP.apply(l); }
+  }
+  screen.addEventListener('pointerdown', function (ev) {
+    var b = ev.target.closest('[data-action="hold-save"]');
+    if (!b || b.getAttribute('aria-disabled') === 'true') return;
+    ev.preventDefault(); held = b; b.setPointerCapture(ev.pointerId); b.classList.add('is-holding');
+    var l = screen.querySelector('.dd-live'); if (l) { l.innerHTML = span('ds.dead.hold.start', null, 'st-field-hint'); PP.apply(l); }
+    var t0 = Date.now(); held.dataset.t0 = t0;
+    timer = setTimeout(function () { var h = held; held = null; if (h) h.classList.remove('is-holding'); if (why()) { render(); return; } saveSow(); render(); }, 850);
+  });
+  screen.addEventListener('pointermove', function (ev) {
+    if (!held) return;
+    var r = held.getBoundingClientRect();
+    if (ev.clientX < r.left || ev.clientX > r.right || ev.clientY < r.top || ev.clientY > r.bottom) cancelHold('ds.dead.hold.cancel');
+  });
+  screen.addEventListener('pointerup', function () { if (held) cancelHold(Date.now() - (+held.dataset.t0) < 300 ? 'ds.dead.hold.keep' : 'ds.dead.hold.cancel'); });
+  screen.addEventListener('pointercancel', function () { cancelHold('ds.dead.hold.cancel'); });
+  screen.addEventListener('contextmenu', function (ev) { if (ev.target.closest('.dd-hold')) ev.preventDefault(); });
+
+  PP.ready.then(function () {
+    settleK();
+    if (spec.save) savePiglets();
+    render();
+  });
+})();
+</script>
+</body>
+</html>
