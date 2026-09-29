@@ -203,7 +203,7 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
   // The newest stamped event of any kind: treatment, count, move, death, identity or correction — in its own words.
   function evWhat(ev) {
     var e = store.events.filter(function (x) { return x.id === ev.id; })[0] || {};
-    if (ev.type === 'treat') return name(txOf(e.dose));
+    if (ev.type === 'treat') return name(ev.tx || txOf(e.dose || ev.dose));   // a correction's fresh mark has no event of its own (R1-15)
     if (ev.type === 'count') return PP.t('pp.room.ev.count', { n: e.observed });
     if (ev.type === 'move') return PP.t('pp.room.ev.move', { n: e.n });
     if (ev.type === 'death') return PP.t('pp.room.ev.dead', { n: (e.lines || []).reduce(function (t, l) { return t + (l.rowId ? 1 : l.n); }, 0) });
@@ -478,7 +478,7 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
   var boot = PP.ready.then(function () {
     store = PP.open(start.data);
     CFG = store.config;
-    NOW = store.today + 'T10:30';
+    NOW = store.now();                 // the phone's clock: advances with the records made in the session (R1-15)
     // room-bulk-ticked: ticks a bulk page left on this phone (slice #7's device draft).
     if (start.ticks) { try { sessionStorage.setItem('pp-bulk-ticks:' + store.name + ':' + ROOM + ':' + start.ticks.dose, JSON.stringify(start.ticks.sel)); } catch (e) {} }
     render(); restoreScroll();

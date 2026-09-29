@@ -11,11 +11,8 @@
 /* The litter header's door (to the sow page): a bare button around text + ›. */
 .pp-door { display: inline-flex; align-items: center; gap: var(--space-key-gap); min-height: var(--touch-min); padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; }
 .pp-door svg { width: var(--glyph-key); height: var(--glyph-key); flex: none; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-/* Candidate:Tool — RULINGS button registers: a tool wears a soft well fill with no border (mid-sheet acts). */
+/* The two tools sit in a two-column grid (the buttons are Button's tool register, ADR 0002). */
 .pp-tools { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-footer-gap); }
-.pp-tool { display: flex; align-items: center; justify-content: center; width: 100%; min-height: var(--control-height); margin: 0; padding: 0 var(--space-row-x); border: 0; border-radius: var(--radius-control); background: var(--well); color: var(--ink); font: 600 var(--type-button-size)/1.4 var(--font-sans); cursor: pointer; }
-.pp-tool:active { background: var(--choice-press); }
-.pp-tool:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 /* Colour on the value inside a line; the word stays ink. */
 .pp-tone[data-tone="red"], .pp-litter .pp-tok[data-tone="red"] { color: var(--red); }
 .pp-tone[data-tone="amber"], .pp-litter .pp-tok[data-tone="amber"] { color: var(--amber); }

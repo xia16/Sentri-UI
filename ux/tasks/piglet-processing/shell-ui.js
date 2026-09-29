@@ -1,7 +1,7 @@
 /* Piglet processing shared UI: what two or more pages draw (ticket #19). Built from the design system's
    factories plus four compositions (CSS in shell.css, tokens only):
      litterHeader  the litter's identity header: `A02 · 000231 ›` (the door to the sow), parity, day
-     tools         `Record dead · Set count` in the tool register (a soft well, no outline)
+     tools         `Record dead · Set count`: Button's tool register (adopted, ADR 0002)
      recordGroup   the Record group: Move, identity, birth litter weight (and why, outside a task)
      weightRow     the birth-litter-weight row, missing or set
      litterRow     Candidate:LitterRow — the room's row law (room, End)
@@ -29,10 +29,14 @@
     var p = parts(iso), same = today && String(iso).slice(0, 10) === String(today).slice(0, 10);
     return same ? PP.t('pp.common.stamp.today', { t: p.t, who: who }) : PP.t('pp.common.stamp.date', { date: U.date(iso), t: p.t, who: who });
   };
-  /* Recency ladder (room): `1h ago` under a day, `yesterday`, `N days ago` to six, the date from seven. */
+  /* Recency ladder (room): `just now` under a minute (and a stamp ahead of now: never "1h ago"), `N min ago` under an hour,
+     `Nh ago` (whole hours, rounded down) under a day, `yesterday`, `N days ago` to six, the date from seven. `now` is the
+     store's clock (`store.now()`), which advances with the records made in the session (R1-15). */
   U.ago = function (iso, now) {
-    var mins = Math.max(0, (Date.parse(now) - Date.parse(iso)) / 60000);
-    if (mins < 1440) return PP.t('time.hours_ago', { n: Math.max(1, Math.ceil(mins / 60)) });
+    var mins = (Date.parse(now) - Date.parse(iso)) / 60000;
+    if (!(mins >= 1)) return PP.t('time.just_now');
+    if (mins < 60) return PP.t('time.minutes_ago', { n: Math.floor(mins) });
+    if (mins < 1440) return PP.t('time.hours_ago', { n: Math.floor(mins / 60) });
     var days = Math.floor(mins / 1440);
     if (days === 1) return PP.t('time.yesterday');
     if (days < 7) return PP.t('time.days_ago', { n: days });
@@ -53,8 +57,9 @@
 
   /* ---- tools: the two quick acts on the litter's numbers, in the tool register ---- */
   U.tools = function (crate) {
+    // Button's tool register (ADR 0002 adoption: Candidate:Tool → `button({ register: 'tool' })`, `.pp-tool` deleted)
     function tool(action, id) {
-      return '<button type="button" class="pp-tool" data-ds="Candidate:Tool" data-action="' + action + '" data-value="' + esc(crate) + '" data-str="' + id + '">' + esc(PP.t(id)) + '</button>';
+      return UI.button({ label: PP.t(id), register: 'tool', action: action, value: crate, strs: { label: id } });
     }
     return '<div class="pp-tools">' + tool('open-dead', 'act.record_dead') + tool('open-count', 'pp.count.title') + '</div>';
   };
