@@ -81,14 +81,27 @@
   };
 
   /* ---- Candidate:LitterRow: the Row card's geometry with the row law's mono line 2, one named chip and the rail ----
-     o: { code, l1: [tok], toks: [tok], chip: ['red'|'amber', 'sowdied'|'unlocked'] | null, static, action, value, attrs, flash }
+     o: { code, l1: [tok], toks: [tok], chip: ['red'|'amber', 'sowdied'|'unlocked'] | null, static, select, selected, action, value, attrs, flash }
      tok: [wordId, args, valueId?, tone?] — the value carries the colour; without a value id the tone colours the word. */
+  // t[4]: a word after the value (`due 2 days ago`); t[5]: no spaces between the parts (zh). A null word leads with the value.
   function tok(t) {
+    if (t[2] && (t[4] || !t[0])) {
+      var sp = t[5] ? '' : ' ';
+      return '<span class="pp-tok">' + (t[0] ? U.span(t[0], t[1]) + sp : '') + U.span(t[2], t[1], { tone: t[3] }) + (t[4] ? sp + U.span(t[4], t[1]) : '') + '</span>';
+    }
     if (t[2]) return '<span class="pp-tok">' + U.span(t[0], t[1]) + ' ' + U.span(t[2], t[1], { tone: t[3] }) + '</span>';
     return '<span class="pp-tok"' + (t[3] ? ' data-tone="' + t[3] + '"' : '') + '>' + U.span(t[0], t[1]) + '</span>';
   }
-  U.tok = function (word, args, val, tone) { return [word, args || {}, val || null, tone || null]; };
+  U.tok = function (word, args, val, tone, after, tight) { return [word, args || {}, val || null, tone || null, after || null, !!tight]; };
   U.litterRow = function (o) {
+    // select: the row is a <label> around ChoiceList's multi trail (a checkbox) in place of the chevron (bulk, slice #7).
+    if (o.select) {
+      return '<label class="st-row pp-litter" data-ds="Candidate:LitterRow" data-select' + (o.flash ? ' data-flash' : '') + (o.attrs || '') + '>' +
+        '<span class="pp-code">' + U.span('pp.room.code', { code: o.code }) + '</span>' +
+        '<span class="st-row-copy"><strong>' + o.l1.map(tok).join('') + '</strong><small class="pp-mono">' + o.toks.map(tok).join('') + '</small></span>' +
+        (o.chip ? '<span class="pp-chip" data-tone="' + o.chip[0] + '">' + U.span('pp.room.chip.' + o.chip[1]) + '</span>' : '') +
+        '<span class="st-choice-trail"><input type="checkbox" data-action="' + (o.action || 'toggle') + '" value="' + esc(o.value || o.code) + '"' + (o.selected ? ' checked' : '') + '></span></label>';
+    }
     var tag = o.static ? 'div' : 'button';
     return '<' + tag + (o.static ? '' : ' type="button" data-action="' + (o.action || 'open-litter') + '" data-value="' + esc(o.value || o.code) + '"') + (o.attrs || '') +
       ' class="st-row pp-litter" data-ds="Candidate:LitterRow"' + (o.flash ? ' data-flash' : '') + '>' +

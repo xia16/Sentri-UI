@@ -20,6 +20,7 @@
 .pp-controls .segment { flex: 1; min-width: 0; }
 .pp-block > .st-heading { margin-bottom: 8px; }
 .pp-filtered { margin-top: 20px; }
+.pp-bulkdoor { padding-top: var(--space-heading); }
 .pp-list { display: flex; flex-direction: column; gap: var(--space-footer-gap); }
 .pp-dock { position: sticky; bottom: 0; margin: 0 calc(-1 * var(--space-gutter)) -20px; }
 @media (max-width: 370px) { .pp-dock { margin-left: calc(-1 * var(--space-gutter-narrow)); margin-right: calc(-1 * var(--space-gutter-narrow)); padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
@@ -70,6 +71,8 @@
     'room': { data: 'base' }, 'room-empty': { data: 'quiet', room: 8 }, 'room-all-done': { data: 'all-done' },
     'room-overdue': { data: 'behind' }, 'room-drift': { data: 'drift' },
     'room-filter': { data: 'base', sheet: 'filter', filter: ['iron'] },
+    'room-bulk-ticked': { data: 'base', filter: ['iron'], ticks: { dose: 'iron3', sel: ['A02', 'A04', 'A07', 'B01', 'B06', 'B10', 'C05'] } },
+    'room-bulk-ended': { data: 'ended-moves', filter: ['iron'] },
     'room-scan': { data: 'base', sheet: 'scan' },
     'room-find': { data: 'base', sheet: 'find', q: '000354' },
     'room-scan-hit': { data: 'base', sheet: 'find', q: '000354', scanned: true },
@@ -233,8 +236,32 @@
     });
     var seg = UI.segment({ options: opts, active: S.lens, action: 'lens', ariaLabel: '' });
     var f = (roomTx().length || S.filter.length) ? UI.iconButton({ action: 'filter', icon: I('filter'), label: 'Filter litters', className: 'room-filter-button' }) : '';
-    var sum = (S.filter.length || S.missed) ? '<div class="pp-filtered">' + UI.heading({ title: '', kind: 'group', level: 4, action: '<button type="button" data-action="clear-filter" data-str="act.clear">' + U.esc(PP.t('act.clear')) + '</button>', strs: { title: 'pp.room.filtered' }, args: { title: { what: filterWhat() } } }) + '</div>' : '';
+    var sum = (S.filter.length || S.missed) ? '<div class="pp-filtered">' + UI.heading({ title: '', kind: 'group', level: 4, action: '<button type="button" data-action="clear-filter" data-str="act.clear">' + U.esc(PP.t('act.clear')) + '</button>', strs: { title: 'pp.room.filtered' }, args: { title: { what: filterWhat() } } }) + bulkDoor() + '</div>' : '';
     return '<div class="pp-controlwrap"><div class="pp-controls">' + seg + f + '</div>' + sum + '</div>';
+  }
+  // Filtered by one treatment that two or more litters owe: the door to record it for several litters at once (bulk.html, slice #7).
+  function bulkDoor() {
+    if (S.filter.length !== 1 || S.missed) return '';
+    var tx = S.filter[0], best = null;
+    // The litters a bulk record can write (the ledger's bulkDraft): after End only catch-up, and no door when there is none.
+    CFG.doses.filter(function (d) { return d.tx === tx; }).forEach(function (d) {
+      var b = store.select.bulkDraft(store.derived, { room: ROOM, dose: d.id });
+      var ids = b.rows.filter(function (r) { return r.kind === 'record'; }).map(function (r) { return r.litter; });
+      if (!best || ids.length > best.k) best = { dose: d.id, k: ids.length, ids: ids, ended: !!b.ended };
+    });
+    // Ticks left on this phone (a bulk draft) say so here — only those that can still be recorded, written back.
+    var ticked = 0, key = best ? 'pp-bulk-ticks:' + store.name + ':' + ROOM + ':' + best.dose : '';
+    try {
+      if (key) {
+        var kept = (JSON.parse(sessionStorage.getItem(key) || '[]') || []).filter(function (id) { return best.ids.indexOf(id) >= 0; });
+        if (kept.length) sessionStorage.setItem(key, JSON.stringify(kept)); else sessionStorage.removeItem(key);
+        ticked = kept.length;
+      }
+    } catch (e) {}
+    if (!best || best.k < (best.ended ? 1 : 2)) return '';
+    var desc = ticked ? ['pp.bulk.door_ticked', { k: ticked }] : [PP.one('pp.bulk.door_desc', best.k), { k: best.k }];
+    return '<div class="pp-bulkdoor">' + UI.rowGroup(UI.row({ title: '', description: '', action: 'open-bulk', value: tx,
+      strs: { title: 'pp.bulk.door', description: desc[0] }, args: { title: { tx: PP.lang === 'zh' ? name(tx) : name(tx).toLowerCase() }, description: desc[1] } })) + '</div>';
   }
   // The treatments this lens's litters owe, did today or have next — one filter row per treatment (iron day 3 and day 14 are one word).
   function roomTx() {
@@ -380,12 +407,14 @@
 
   screen.addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-action]'); if (!b) return;
-    var a = b.dataset.action, v = b.dataset.value;
+    // ChoiceList's multi row carries its value on the checkbox (`value`), not `data-value`.
+    var a = b.dataset.action, v = b.dataset.value != null ? b.dataset.value : b.value;
     if (a === 'scrim') { if (Date.now() - S.opened < 300) return; closeSheet(); return; }
     if (a === 'back') { location.href = PP.href('index.html'); return; }
     if (a === 'open-litter') { saveScroll(); location.href = litterHref(v, b.dataset.piglet, b.dataset.unit); return; }
     if (a === 'overview') { location.href = PP.href('end.html', { state: 'overview', data: store.name !== 'base' ? store.name : '' }); return; }
     if (a === 'retry') { location.reload(); return; }
+    if (a === 'open-bulk') { saveScroll(); location.href = PP.href('bulk.html', { state: 'bulk', tx: v, unit: ROOM !== 7 ? ROOM : '', data: store.name !== 'base' ? store.name : '' }); return; }
     if (a === 'lens') { S.lens = v; persist(); }
     else if (a === 'filter') { openSheet('filter'); }
     else if (a === 'scan') { openSheet('scan'); }
@@ -444,6 +473,8 @@
     store = PP.open(start.data);
     CFG = store.config;
     NOW = store.today + 'T10:30';
+    // room-bulk-ticked: ticks a bulk page left on this phone (slice #7's device draft).
+    if (start.ticks) { try { sessionStorage.setItem('pp-bulk-ticks:' + store.name + ':' + ROOM + ':' + start.ticks.dose, JSON.stringify(start.ticks.sel)); } catch (e) {} }
     render(); restoreScroll();
   });
   // The one registry exception: when the registry itself failed to load there is nothing to look strings up in.
