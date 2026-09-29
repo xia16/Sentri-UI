@@ -311,3 +311,13 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   it. Lenses then judge the design, and the module's tests judge the
   arithmetic. It would also be the contract developers build from.
 - **Cost:** high — most review-round blockers, several fix rounds per slice.
+
+## 21 · Slices — the doctor's verb rule reads only the first word
+
+- **Stage:** Slices, S9.
+- **What happened:** the doctor checks that an `action` string starts with a
+  registered verb by its first word, so the ruled multi-word verbs (`End
+  task`, `Set count`) always fail; designers either live with a false gap or
+  relabel strings to hide it.
+- **Change:** match the longest registered verb as a prefix.
+- **Cost:** low.
