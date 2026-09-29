@@ -167,6 +167,16 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-edit-reopen-set", "url": "ux/tasks/piglet-processing/edit.html?state=reopen-set", "strict": true },
     { "name": "pp-edit-edit-move", "url": "ux/tasks/piglet-processing/edit.html?state=edit-move", "strict": true },
     { "name": "pp-edit-edit-after-end", "url": "ux/tasks/piglet-processing/edit.html?state=edit-after-end", "strict": true },
+    { "name": "pp-edit-record-page-concurrent", "url": "ux/tasks/piglet-processing/edit.html?state=record-page-concurrent", "strict": true },
+    { "name": "pp-edit-edit-gated", "url": "ux/tasks/piglet-processing/edit.html?state=edit-gated", "strict": true },
+    { "name": "pp-edit-wrong-litter-back", "url": "ux/tasks/piglet-processing/edit.html?state=wrong-litter-back", "strict": true },
+    { "name": "pp-edit-edit-row-dup", "url": "ux/tasks/piglet-processing/edit.html?state=edit-row-dup", "strict": true },
+    { "name": "pp-edit-withdraw-dead", "url": "ux/tasks/piglet-processing/edit.html?state=withdraw-dead", "strict": true },
+    { "name": "pp-edit-edit-move-void", "url": "ux/tasks/piglet-processing/edit.html?state=edit-move-void", "strict": true },
+    { "name": "pp-edit-edit-move-rows", "url": "ux/tasks/piglet-processing/edit.html?state=edit-move-rows", "strict": true },
+    { "name": "pp-edit-edit-after-end-lower", "url": "ux/tasks/piglet-processing/edit.html?state=edit-after-end-lower", "strict": true },
+    { "name": "pp-edit-edit-restored", "url": "ux/tasks/piglet-processing/edit.html?state=edit-restored", "strict": true },
+    { "name": "pp-edit-litter-saved", "url": "ux/tasks/piglet-processing/litter.html?state=litter&crate=A02&data=a02-corrected&stay=1&saved=correction", "strict": true },
     { "name": "pp-edit-litter-corrected", "url": "ux/tasks/piglet-processing/litter.html?state=litter&crate=A02&data=a02-corrected&stay=1", "strict": true },
     { "name": "pp-edit-litter-wrong-there", "url": "ux/tasks/piglet-processing/litter.html?state=litter&crate=A04&data=a02-wrong-litter&stay=1", "strict": true }
   ]

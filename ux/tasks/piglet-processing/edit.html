@@ -10,24 +10,26 @@
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* Layout only, tokens from tokens.css. One Candidate composition: EditBanner (below). The litter header, receipt and
-   stamp words come from the shell (shell-ui.js, shell.css). */
+/* Layout only, tokens from tokens.css. Candidate compositions: EditBanner and WellTray (below). The litter header,
+   receipt and stamp words come from the shell (shell-ui.js, shell.css). */
 .ed-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
 .ed-phone .scrim { inset: 0; }
 .ed-body { display: flex; flex-direction: column; gap: var(--space-section); }
 .ed-body > * { margin: 0; }
 .ed-group { display: flex; flex-direction: column; gap: var(--space-heading); }
 .ed-group > * { margin: 0; }
-.ed-drawer-body { display: flex; flex-direction: column; gap: var(--space-row-y); }
-.ed-drawer-body > * { margin: 0; }
-.ed-pad { padding: 0 var(--space-gutter) var(--space-row-y); }
+.ed-pad { flex: none; padding: var(--space-row-y) var(--space-gutter); background: var(--paper); border-top: 1px solid var(--line); }
 .ed-phone .sheet-footer > .button { flex: 1; }
 .ed-phone .sheet-footer { flex-wrap: wrap; row-gap: var(--space-row-y); }
 .ed-phone .sheet-footer > .pp-receipt { flex-basis: 100%; }
-/* Button has no aria-disabled face; Save keeps its place and takes the disabled fill while it waits (as the litter sheet). */
-.ed-phone .sheet-footer .button.primary[aria-disabled="true"] { background: var(--disabled-fill); border-color: var(--disabled-fill); color: var(--disabled-ink); }
-/* The value line under a record-page entry: colour on the value, the words ink. */
+/* Button has no aria-disabled face (logged for the design-system panel): Save keeps its place and takes the disabled
+   fill while it waits. The bundle's primary rule is (0,7,0); this one is (0,9,0) so the waiting face renders. */
+.ed-phone.inspection-phone .sheet .sheet-footer .button.primary[aria-disabled="true"]:not(:disabled):not(.danger) { background: var(--disabled-fill); border-color: var(--disabled-fill); color: var(--disabled-ink); }
+/* A record-page entry's change lines, moved right under its title (see logHtml): colour on the value, the words ink. */
 .ed-delta { margin: 0; font-size: var(--type-description-size); line-height: 1.5; color: var(--ink); }
+.ed-delta + .ed-delta { margin-top: var(--space-key-gap); }
+/* Each part of a change line wraps as a whole, so a wrapped part never lies under another. */
+.ed-delta > span, .ed-banner-line > span { display: inline-block; max-width: 100%; }
 /* Candidate:EditBanner — farrowing's amber banner (`Correcting a past record · logged as G.H`) with the live change
    summary under it and Clear on its title row; present from the first change, never on entry. */
 .ed-banner { display: flex; flex-direction: column; gap: var(--space-key-gap); padding: var(--space-row-y) var(--space-panel); background: var(--amber-wash); border: 1px solid var(--amber); border-radius: var(--radius-inset); }
@@ -35,7 +37,15 @@
 .ed-banner-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-footer-gap); }
 .ed-banner-title { margin: 0; font-size: var(--type-row-title-size); font-weight: 600; line-height: 1.4; color: var(--ink); }
 .ed-banner-line { margin: 0; font-size: var(--type-row-title-size); line-height: 1.5; color: var(--ink); }
-.ed-banner-head > .st-text-action { flex: none; min-width: var(--touch-min); justify-content: flex-end; padding: 0; }
+.ed-banner-head > .st-text-action, .ed-later .st-text-action { flex: none; min-width: var(--touch-min); justify-content: flex-end; padding: 0; }
+/* The records a change would drop: each named, each with its door. */
+.ed-later { display: flex; flex-direction: column; gap: var(--space-key-gap); }
+.ed-later-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-footer-gap); }
+.ed-later-row > .ed-banner-line { flex: 1; min-width: 0; }
+/* Candidate:WellTray — farrowing's At-finish tray: a row expands in place into a well whose fields edit within the one
+   Edit screen (no drawer, no second Save). */
+.ed-tray { display: flex; flex-direction: column; gap: var(--space-row-y); padding: var(--space-row-y) var(--space-panel) var(--space-panel); background: var(--well); border-radius: var(--radius-inset); }
+.ed-tray > * { margin: 0; }
 </style>
 </head>
 <body>
@@ -47,40 +57,54 @@
 <script src="shell-ui.js"></script>
 <script>
 (function () {
-  var UI = window.SentriUI, U = window.PPUI;
+  var UI = window.SentriUI, U = window.PPUI, ICON = window.SentriIcons;
 
   /* ---- states: a variant of the shared fixture + the crate + the Edit draft. What can be corrected, the change summary,
-     why Save waits and the effect of Save are the ledger's (select.edit: the draft replayed exactly as append would);
-     the record page is select.record. Save commits the correction events through the store's commitAll, one stamped act. ---- */
+     the records a change would drop, why Save waits and the effect of Save are the ledger's (select.edit: the draft is ONE
+     correction event, replayed exactly as append would); the record page is select.record. Save commits that one event.
+     Draft keys `@<dose>` name the newest mark of that dose. ---- */
   var STATES = {
-    'record-page':           { view: 'record', data: 'a02-marked', crate: 'A02' },
-    'record-page-corrected': { view: 'record', data: 'a02-corrected', crate: 'A02' },
-    'edit':                  { view: 'edit', data: 'a02-marked', crate: 'A02' },
-    'edit-changed':          { view: 'edit', data: 'a02-marked', crate: 'A02', draft: { marks: { 'T-A02-visit': { n: 10, reason: 'weak' } } } },
-    'edit-unrecord':         { view: 'edit', data: 'a02-marked', crate: 'A02', draft: { marks: { 'T-A02-tail': { void: true } } } },
-    'wrong-litter':          { view: 'edit', data: 'a02-marked', crate: 'A02', draft: { marks: { 'T-A02-tail': { to: 'A04' } } } },
-    'wrong-litter-there':    { view: 'record', data: 'a02-wrong-litter', crate: 'A04' },
-    'edit-row':              { view: 'edit', data: 'a02-tags-all', crate: 'A02', row: 'A02-r4', pad: 'weight', typed: { weight: '1.15' } },
-    'withdraw-row':          { view: 'edit', data: 'a02-tags-over', crate: 'A02', row: 'A02-r13', draft: { rows: { 'A02-r13': { withdraw: true } } } },
-    'reopen-set':            { view: 'edit', data: 'keepers-closed', crate: 'A07', lead: 'rows', draft: { reopen: true } },
-    'edit-move':             { view: 'edit', data: 'moved-b06-b08', crate: 'B06', lead: 'moves', draft: { moves: { 'MV-0929-01': { n: 1 } } } },
-    'edit-after-end':        { view: 'edit', data: 'ended', crate: 'B03', draft: { marks: { 'T-B03-wrong': { to: 'B01' } } } }
+    'record-page':            { view: 'record', data: 'a02-marked', crate: 'A02' },
+    'record-page-corrected':  { view: 'record', data: 'a02-corrected', crate: 'A02' },
+    'record-page-concurrent': { view: 'record', data: 'a02-concurrent', crate: 'A02' },
+    'edit':                   { view: 'edit', data: 'a02-marked', crate: 'A02' },
+    'edit-changed':           { view: 'edit', data: 'a02-marked', crate: 'A02', draft: { marks: { 'T-A02-visit': { n: 10, reason: 'weak' } } } },
+    'edit-unrecord':          { view: 'edit', data: 'a02-marked', crate: 'A02', draft: { marks: { 'T-A02-tail': { void: true } } } },
+    'edit-gated':             { view: 'edit', data: 'a02-followup', crate: 'A02', draft: { marks: { 'T-A02-visit': { n: 12 } } } },
+    'wrong-litter':           { view: 'edit', data: 'a02-marked', crate: 'A02', draft: { marks: { 'T-A02-tail': { to: 'A04' } } } },
+    'wrong-litter-there':     { view: 'record', data: 'a02-wrong-litter', crate: 'A04' },
+    'wrong-litter-back':      { view: 'edit', data: 'a02-wrong-litter', crate: 'A04', draft: { marks: { '@tail': { back: true } } } },
+    'edit-row':               { view: 'edit', data: 'a02-tags-all', crate: 'A02', lead: 'rows', row: 'A02-r4', pad: 'weight', typed: { weight: '1.15' } },
+    'edit-row-dup':           { view: 'edit', data: 'a02-tags-all', crate: 'A02', lead: 'rows', row: 'A02-r4', pad: 'tag', typed: { tag: '004305' } },
+    'withdraw-row':           { view: 'edit', data: 'a02-tags-over', crate: 'A02', lead: 'rows', row: 'A02-r13', draft: { rows: { 'A02-r13': { withdraw: true } } } },
+    'withdraw-dead':          { view: 'edit', data: 'base', crate: 'B04', lead: 'rows', row: 'B04-r3', draft: { rows: { 'B04-r3': { withdraw: true } } } },
+    'reopen-set':             { view: 'edit', data: 'keepers-closed', crate: 'A07', lead: 'rows', draft: { reopen: true } },
+    'edit-move':              { view: 'edit', data: 'moved-b06-b08', crate: 'B06', lead: 'moves', draft: { moves: { 'MV-0929-01': { n: 1 } } } },
+    'edit-move-void':         { view: 'edit', data: 'moved-b06-b08', crate: 'B06', lead: 'moves', draft: { moves: { 'MV-0929-01': { void: true } } } },
+    'edit-move-rows':         { view: 'edit', data: 'moved-to-c05', crate: 'C03', lead: 'moves', draft: { moves: { 'MV-0929-02': { rows: ['C03-r4'] } } } },
+    'edit-after-end':         { view: 'edit', data: 'ended', crate: 'B03', draft: { marks: { 'T-B03-wrong': { to: 'B01' } } } },
+    'edit-after-end-lower':   { view: 'edit', data: 'ended', crate: 'C04', draft: { marks: { '@health': { n: 7 } } } },
+    'edit-restored':          { view: 'edit', data: 'a02-corrected', crate: 'A02', restore: { draft: { marks: { 'T-A02-visit': { n: 11, reason: 'weak' } } }, base: { marks: { 'T-A02-visit': 12 } } } }
   };
   var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'edit';
   var st = STATES[name];
   var store, CFG, TODAY, SOW, crate, ME;
   var view = st.view;
-  var draft = { marks: {}, moves: {}, rows: {}, reopen: false };
-  var lead = '', rowOpen = null, pad = null, typed = {}, picker = null, ceilTap = '', drawerClosedAt = 0, lastSave = 0;
+  var EMPTY = function () { return { marks: {}, moves: {}, rows: {}, reopen: false }; };
+  var draft = EMPTY();
+  var lead = '', rowOpen = null, pad = null, typed = {}, picker = null, pickerBefore = null, ceilTap = '', drawerClosedAt = 0, lastSave = 0, notices = [];
 
   /* ---- the ledger ---- */
   function L(c) { return store.derived.litters[c || crate]; }
   function stamp() { return { id: 'edit-draft', at: null, who: ME }; }
-  function E() { return store.select.edit(store.derived, crate, draft, stamp()); }
+  var memo = { k: '', v: null };
+  function E() { var k = JSON.stringify(draft) + store.events.length; if (memo.k !== k) memo = { k: k, v: store.select.edit(store.derived, crate, draft, stamp()) }; return memo.v; }
   function doseCfg(id) { return CFG.doses.filter(function (d) { return d.id === id; })[0]; }
   function mark(e, id) { return e.marks.filter(function (m) { return m.id === id; })[0]; }
   function row(e, id) { return e.rows.filter(function (r) { return r.rowId === id; })[0]; }
+  function move(e, id) { return e.moves.filter(function (m) { return m.id === id; })[0]; }
+  function changeOf(e, key, val) { return e.changes.filter(function (c) { return c[key] === val; })[0]; }
 
   /* ---- words ---- */
   var span = function (id, args, tone) { return U.span(id, args, { tone: tone }); };
@@ -89,36 +113,44 @@
   function txText(dose) { var t = tx(dose); return PP.t(t[0], t[1]); }
   function pigs(n) { return [PP.one('pp.common.unit.piglet', n), { n: n }]; }
   function pigsText(n) { return PP.tn('pp.common.unit.piglet', n); }
-  function why(k) { return PP.t('pp.litter.why.' + k); }
-  function idOf(r) { return r.tag || r.notch || ''; }
+  function why(k) { return PP.t(k === 'not_done' ? 'pp.edit.why.not_done_word' : 'pp.litter.why.' + k); }
+  function idOf(r) { return (r && (r.tag || r.notch)) || ''; }
   function stampText(iso, who) { return U.stamp(iso, who, TODAY); }
   function sexWord(s) { return PP.t(s === 'b' ? 'pp.common.sex.boar' : 'pp.common.sex.gilt'); }
+  // Record-page day headers: today, yesterday, then the date.
   function dayWord(date) {
     var a = Date.UTC(+date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10)), b = Date.UTC(+TODAY.slice(0, 4), +TODAY.slice(5, 7) - 1, +TODAY.slice(8, 10));
     var k = Math.round((b - a) / 86400000);
-    return k === 0 ? PP.t('time.today') : k === 1 ? PP.t('time.yesterday') : k < 7 ? PP.t('time.days_ago', { n: k }) : U.date(date);
+    return k === 0 ? PP.t('time.today') : k === 1 ? PP.t('time.yesterday') : U.date(date);
   }
-  function textAction(action, id, args) {
-    return '<button type="button" class="st-text-action" data-ds="Button" data-action="' + action + '" data-str="' + id + '"' +
+  function textAction(action, id, args, value) {
+    return '<button type="button" class="st-text-action" data-ds="Button" data-action="' + action + '"' + (value != null ? ' data-value="' + U.esc(value) + '"' : '') + ' data-str="' + id + '"' +
       (args ? " data-args='" + U.esc(JSON.stringify(args)) + "'" : '') + '>' + U.esc(PP.t(id, args)) + '</button>';
   }
   function button(kind, action, id, disabled) {
     return '<button type="button" class="button ' + kind + '" data-ds="Button" data-action="' + action + '" data-str="' + id + '"' + (disabled ? ' aria-disabled="true"' : '') + '>' + U.esc(PP.t(id)) + '</button>';
   }
   function header(sub) { return U.litterHeader({ crate: crate, sow: SOW.sow, parity: SOW.parity, sub: span(sub) }); }
-  // A value's delta, amber: `12 → 10`.
-  function delta(a, b) { return span('pp.edit.delta', { a: a, b: b }, 'amber'); }
+  // A changed value, amber, with its unit: `12 → 10 piglets`.
+  function dPigs(a, b) { return span(PP.one('pp.edit.delta_pigs', b), { a: a, b: b }, 'amber'); }
+  function dText(a, b) { return span('pp.edit.delta', { a: a, b: b }, 'amber'); }
+  function fieldText(k, v) {
+    if (v == null || v === '') return PP.t('ds.field.placeholder');
+    if (k === 'weight') return PP.t('pp.common.kg', { w: v });
+    if (k === 'sex') return sexWord(v);
+    return String(v);
+  }
+  function castrText(c) {
+    return ['hernia', 'cryptorchid', 'kept', 'deferred'].filter(function (k) { return c[k]; }).map(function (k) {
+      return PP.t('pp.common.mark.part', { n: c[k], reason: why(k === 'deferred' && c.deferReason ? c.deferReason : k) });
+    }).join(PP.lang === 'zh' ? '，' : ', ');
+  }
+  function amountOf(f) { return f.castration ? f.castration.castrated || 0 : f.n; }
+  function line(html) { return '<p class="ed-banner-line">' + html + '</p>'; }
 
   /* =====================================================================================================
      The litter record page: the ledger as a timeline (Log), newest first, grouped by day; read-only.
      ===================================================================================================== */
-  function castrText(c) {
-    var parts = ['hernia', 'cryptorchid', 'kept', 'deferred'].filter(function (k) { return c[k]; }).map(function (k) {
-      return PP.t('pp.common.mark.part', { n: c[k], reason: why(k === 'deferred' && c.deferReason ? c.deferReason : k) });
-    });
-    return parts.join(PP.lang === 'zh' ? '，' : ', ');
-  }
-  // What a treat record says, as a title: `Iron · day 3 · 12 piglets · 2 deferred: weak`.
   function treatTitle(x) {
     var t = txText(x.dose);
     if (x.castration) {
@@ -129,24 +161,37 @@
     if (x.deferred && x.deferred.n) return ['pp.edit.rec.treat_def', { tx: t, pigs: pigsText(x.n), k: x.deferred.n, reason: why(x.deferred.reason || 'deferred') }];
     return ['pp.edit.rec.treat', { tx: t, pigs: pigsText(x.n) }];
   }
-  function amountOf(f) { return f.castration ? f.castration.castrated || 0 : f.n; }
-  // The value line under a correction: the changed value amber, the rest ink.
-  function correctionLine(x) {
-    var b = x.before, a = x.after;
-    if (x.target.type === 'treat') {
-      if (!a) return delta(amountOf(b), 0) + SEP() + span(x.fresh ? 'pp.edit.rec.done_on' : 'pp.edit.rec.by_mistake', x.fresh ? { code: x.fresh.litter } : null);
-      var out = delta(amountOf(b), amountOf(a));
-      if (!a.castration && a.deferred && a.deferred.n) out += SEP() + span('pp.common.mark.deferred', { k: a.deferred.n, reason: why(a.deferred.reason || 'deferred') }, 'amber');
-      if (a.castration && castrText(a.castration)) out += SEP() + span('pp.edit.rec.castr_rest', { rest: castrText(a.castration) }, 'amber');
-      return out;
-    }
-    if (x.target.type === 'move') {
-      if (!a) return delta(b.n, 0);
-      var parts = [];
-      if (a.n !== b.n) parts.push(delta(b.n, a.n));
-      var ob = b.from === crate ? b.to : b.from, oa = a.from === crate ? a.to : a.from;
-      if (a.from !== b.from || a.to !== b.to) parts.push(ob === oa ? span('pp.edit.rec.move_legs', { a: b.from + '→' + b.to, b: a.from + '→' + a.to }, 'amber') : delta(ob, oa));
-      return parts.join(SEP());
+  // One change of a correction, as a line: the act it touched (with its stamp), the changed value amber.
+  function recChange(ch) {
+    var b = ch.before, a = ch.after, T = ch.target || {};
+    var of = T.at ? SEP() + span('pp.edit.rec.of', { stamp: stampText(T.at, T.who) }) : '';
+    switch (ch.kind) {
+      case 'mark':
+        var rest = a.castration ? (castrText(a.castration) ? SEP() + span('pp.edit.rec.castr_rest', { rest: castrText(a.castration) }, 'amber') : '')
+          : a.deferred && a.deferred.n ? SEP() + span(a.deferred.reason === 'not_done' ? 'pp.edit.ch.not_done' : 'pp.common.mark.deferred', { k: a.deferred.n, reason: why(a.deferred.reason || 'deferred') }, 'amber') : '';
+        return span(tx(T.dose)[0], tx(T.dose)[1]) + ' ' + dPigs(amountOf(b), amountOf(a)) + rest + of;
+      case 'void':
+        return span(tx(T.dose)[0], tx(T.dose)[1]) + ' ' + dPigs(amountOf(b), 0) + SEP() + span('pp.edit.rec.by_mistake') + of;
+      case 'wrong':
+        if (!ch.here) return span(tx(T.dose)[0], tx(T.dose)[1]) + ' ' + span(pigs(amountOf(ch.fresh))[0], pigs(amountOf(ch.fresh))[1], 'amber') + SEP() + span('pp.edit.rec.fresh.from', { code: T.litter, stamp: stampText(ch.fresh.at, ch.fresh.who) });
+        return span(tx(T.dose)[0], tx(T.dose)[1]) + ' ' + dPigs(amountOf(b), 0) + SEP() + span('pp.edit.rec.done_on', { code: ch.fresh.litter }) + ' ' + span(pigs(amountOf(ch.fresh))[0], pigs(amountOf(ch.fresh))[1], 'amber') + of;
+      case 'restore':
+        return span(tx(T.dose)[0], tx(T.dose)[1]) + ' ' + span('pp.edit.ch.restored', null, 'amber') + of;
+      case 'move':
+        var parts = [];
+        if (a.n !== b.n) parts.push(dPigs(b.n, a.n));
+        if (a.to !== b.to) parts.push(dText(b.to, a.to));
+        if (a.from !== b.from) parts.push(dText(b.from, a.from));
+        if (JSON.stringify(a.rows) !== JSON.stringify(b.rows) && a.n === b.n) parts.push(span('pp.edit.ch.rows_picked', null, 'amber'));
+        return span('pp.edit.ch.move', { a: b.from, b: b.to }) + ' ' + parts.join(SEP()) + of;
+      case 'move_void':
+        return span('pp.edit.ch.move', { a: b.from, b: b.to }) + ' ' + dPigs(b.n, 0) + SEP() + span('pp.edit.rec.by_mistake') + of;
+      case 'row':
+        return span('pp.id.row.id', { id: idOf(ch.row) }) + ' ' + Object.keys(ch.set || {}).map(function (k) { return span('pp.edit.f.' + k + '_word') + ' ' + span('pp.edit.to_value', { b: fieldText(k, ch.set[k]) }, 'amber'); }).join(SEP());
+      case 'withdraw':
+        return span('pp.id.row.id', { id: idOf(ch.row) }) + ' ' + span('pp.edit.ch.withdrawn', null, 'amber') + SEP() + span('pp.edit.rec.by_mistake');
+      case 'reopen':
+        return span('pp.edit.ch.keepers') + ' ' + span('pp.edit.ch.reopened', null, 'amber') + of;
     }
     return '';
   }
@@ -157,27 +202,17 @@
       case 'farrowed':
         title = [x.locked ? 'pp.edit.rec.farrowed' : 'pp.edit.rec.farrowing', { born: x.born }];
         detail = ['pp.edit.rec.farrowed.d', { alive: x.alive, dead: x.dead }]; break;
-      case 'treat': title = treatTitle(x); break;
+      case 'treat':
+        title = treatTitle(x);
+        // the superseded record says when it was corrected; the correction entry holds the new value
+        if (x.corrected && x.corrected.length) { var c = x.corrected[x.corrected.length - 1]; detail = ['pp.edit.rec.superseded', { stamp: stampText(c.at, c.who) }]; }
+        break;
       case 'correction':
-        if (x.target.type === 'treat') {
-          var t = txText(x.before.dose);
-          title = [!x.after ? (x.fresh ? 'pp.edit.rec.wrong_here' : 'pp.edit.rec.void') : 'pp.edit.rec.corr', { tx: t }];
-          detail = ['pp.edit.rec.of', { stamp: stampText(x.target.at, x.target.who) }];
-        } else if (x.target.type === 'move') {
-          var ob = x.before.from === crate ? x.before.to : x.before.from;
-          title = [x.before.from === crate ? 'pp.edit.rec.move_corr_out' : 'pp.edit.rec.move_corr_in', { code: ob }];
-          detail = ['pp.edit.rec.of', { stamp: stampText(x.target.at, x.target.who) }];
-        } else title = ['pp.edit.rec.corr_other', null];
-        extra = correctionLine(x);
-        if (x.afterEnd) detail = ['pp.edit.rec.after_end', { stamp: stampText(x.target.at, x.target.who) }];
+        title = [x.changes.length > 1 ? 'pp.edit.rec.correction_n' : 'pp.edit.rec.correction', { n: x.changes.length }];
+        extra = x.changes.map(function (ch) { return '<p class="ed-delta">' + recChange(ch) + '</p>'; }).join('');
+        if (x.concurrent) detail = ['pp.edit.rec.concurrent', null];
+        else if (x.afterEnd) detail = [x.flagged ? 'pp.edit.rec.after_end_flag' : 'pp.edit.rec.after_end', null];
         break;
-      case 'fresh':
-        title = ['pp.edit.rec.fresh', { tx: txText(x.fresh.dose) }];
-        extra = span(x.fresh.castration ? 'pp.common.mark.castrated' : pigs(x.fresh.n)[0], x.fresh.castration ? { c: x.fresh.castration.castrated } : { n: x.fresh.n }, 'amber') +
-          SEP() + span('pp.edit.rec.fresh.from', { code: x.fresh.from, stamp: stampText(x.target.at, x.target.who) });
-        if (x.afterEnd) detail = ['pp.edit.rec.after_end_flag', null];
-        break;
-      case 'reopen': title = ['pp.edit.rec.reopen', null]; detail = ['pp.edit.rec.of', { stamp: stampText(x.target.at, x.target.who) }]; break;
       case 'death':
         var list = Object.keys(x.byCause).map(function (c) { return PP.t('pp.edit.rec.death_part', { n: x.byCause[c], cause: PP.t('dead.' + c.replace('-', '_')) }); }).join(' · ');
         title = ['pp.edit.rec.death', { list: list }];
@@ -187,30 +222,32 @@
         title = ['pp.edit.rec.count', { n: x.observed }];
         detail = x.wrote < 0 ? ['pp.edit.rec.count.loss', { k: -x.wrote }] : x.wrote > 0 ? ['pp.edit.rec.count.gain', { k: x.wrote }] : ['pp.edit.rec.count.same', null];
         break;
-      case 'move': title = [x.dir === 'out' ? 'pp.edit.rec.move_out' : 'pp.edit.rec.move_in', { pigs: pigsText(x.n), code: x.other }]; break;
+      case 'move':
+        title = [x.dir === 'out' ? 'pp.edit.rec.move_out' : 'pp.edit.rec.move_in', { pigs: pigsText(x.n), code: x.other }];
+        if (x.corrected && x.corrected.length) { var cm = x.corrected[x.corrected.length - 1]; detail = ['pp.edit.rec.superseded', { stamp: stampText(cm.at, cm.who) }]; }
+        break;
       case 'rows':
         title = x.n === 1 ? ['pp.edit.rec.rows_one', { first: idOf(x.first) }] : ['pp.edit.rec.rows', { n: x.n, first: idOf(x.first), last: idOf(x.last) }]; break;
       case 'row_edit':
         title = ['pp.edit.rec.row_edit', { id: idOf(x.row) }];
-        extra = Object.keys(x.set).map(function (k) { return span('pp.edit.f.' + k + '_word') + ' ' + delta(fieldText(k, x.before[k]), fieldText(k, x.set[k])); }).join(SEP());
+        extra = '<p class="ed-delta">' + Object.keys(x.set).map(function (k) { return span('pp.edit.f.' + k + '_word') + ' ' + dText(fieldText(k, x.before[k]), fieldText(k, x.set[k])); }).join(SEP()) + '</p>';
         break;
       case 'row_withdraw': title = ['pp.edit.rec.row_withdraw', { id: idOf(x.row) }]; break;
       case 'closed': title = ['pp.edit.rec.closed', null]; break;
       case 'sow_died': title = ['pp.edit.rec.sow_died', null]; break;
       case 'weaned': title = ['pp.edit.rec.weaned', { pigs: pigsText(x.n) }]; break;
       case 'end_task': title = ['pp.edit.rec.end', null]; break;
-      default: title = ['pp.edit.rec.corr_other', null];
+      default: title = ['pp.edit.rec.correction', null];
     }
     e.strs.title = title[0]; e.args.title = title[1];
     if (detail) { e.detail = ''; e.strs.detail = detail[0]; e.args.detail = detail[1]; }
-    if (extra) e.extraHtml = '<p class="ed-delta">' + extra + '</p>';
+    if (extra) e.extraHtml = extra;
     return e;
   }
-  function fieldText(k, v) {
-    if (v == null || v === '') return PP.t('ds.field.placeholder');
-    if (k === 'weight') return PP.t('pp.common.kg', { w: v });
-    if (k === 'sex') return sexWord(v);
-    return String(v);
+  // The Log card prints extraHtml after the stamp; the change lines belong right under the title, so they move there.
+  // (Logged for the design-system panel: Log has no slot under the title.)
+  function logHtml(groups) {
+    return UI.log(groups, { strs: { empty: 'pp.edit.rec.empty' } }).replace(/(<strong class="st-log-title">[\s\S]*?<\/strong>)([\s\S]*?)(<div class="st-log-extra">[\s\S]*?<\/div>)(<\/article>)/g, '$1$3$2$4');
   }
   function recordPage() {
     var R = store.select.record(store.derived, crate);
@@ -219,75 +256,122 @@
         entries: g.entries.map(function (x) { return entry(x, g); }) };
     });
     return '<section class="sheet" data-ds="Sheet" data-presentation="page">' + header('pp.edit.rec.title') +
-      '<div class="sheet-body"><div class="ed-body">' + UI.log(groups, { strs: { empty: 'pp.edit.rec.empty' } }) + '</div></div>' +
+      '<div class="sheet-body"><div class="ed-body">' + logHtml(groups) + '</div></div>' +
       '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + button('secondary', 'open-edit', 'act.edit') + '</footer></section>';
   }
 
   /* =====================================================================================================
-     Edit: ONE screen. Marks edit in place (− n +); lowering one asks why for the rest, in place; the amber banner and
-     the live summary appear at the first change; Back keeps the draft on this phone, Clear discards it, Save commits.
+     Edit: ONE screen. Marks edit in place (− n +); lowering one asks why for the rest, in place; identity rows expand in
+     place (a well tray); the amber banner and the live summary appear at the first change; Back keeps the draft on this
+     phone, Clear discards it, Save commits one correction.
      ===================================================================================================== */
+  function effectText(e, c) {
+    var x = e.effects[c]; if (!x || x[0] === x[1]) return '';
+    var d = x[1] - x[0];
+    return span(d < 0 ? 'pp.edit.ch.gets_fewer' : 'pp.edit.ch.gets_more', { code: c, n: Math.abs(d) });
+  }
   function changeLine(c, e) {
-    var label, value, rest = '';
+    var label = '', value = '', rest = '';
     if (c.kind === 'mark') {
-      label = span(tx(c.dose)[0], tx(c.dose)[1]); value = delta(c.from, c.to);
-      if (c.rest) rest = SEP() + (c.reason ? span('pp.common.mark.deferred', { k: c.rest, reason: why(c.reason) }) : span('pp.edit.ch.rest_open', { k: c.rest }));
+      label = span(tx(c.dose)[0], tx(c.dose)[1]); value = dPigs(c.from, c.to);
+      if (c.rest) rest = SEP() + (c.reason === 'not_done' ? span('pp.edit.ch.not_done', { k: c.rest }) : c.reason ? span('pp.common.mark.deferred', { k: c.rest, reason: why(c.reason) }) : span('pp.edit.ch.rest_open', { k: c.rest }));
     } else if (c.kind === 'void') {
-      label = span(tx(c.dose)[0], tx(c.dose)[1]); value = delta(c.from, 0); rest = SEP() + span('pp.edit.rec.by_mistake');
+      label = span(tx(c.dose)[0], tx(c.dose)[1]); value = dPigs(c.from, 0); rest = SEP() + span(c.afterEnd ? 'pp.edit.ch.not_done' : 'pp.edit.rec.by_mistake', { k: c.from });
     } else if (c.kind === 'wrong') {
-      label = span(tx(c.dose)[0], tx(c.dose)[1]); value = delta(c.from, 0);
-      rest = SEP() + span('pp.edit.ch.there', { code: c.to }) + ' ' + span(pigs(c.n)[0], pigs(c.n)[1], 'amber');
-    } else if (c.kind === 'move') {
-      label = span(c.dir === 'out' ? 'pp.edit.ch.move_out' : 'pp.edit.ch.move_in', { code: c.fromOther });
+      label = span(tx(c.dose)[0], tx(c.dose)[1]); value = dPigs(c.from, 0);
+      if (c.to) rest = SEP() + span('pp.edit.rec.done_on', { code: c.to }) + ' ' + span(pigs(c.n)[0], pigs(c.n)[1], 'amber') + (c.rest && c.reason ? SEP() + span('pp.common.mark.deferred', { k: c.rest, reason: why(c.reason) }) : '');
+    } else if (c.kind === 'back') {
+      label = span(tx(c.dose)[0], tx(c.dose)[1]); value = dPigs(c.n, 0); rest = SEP() + span('pp.edit.ch.back', { code: c.from });
+    } else if (c.kind === 'move' || c.kind === 'move_void') {
+      var src = c.dir === 'out' ? crate : (c.fromOther || c.other), dst = c.dir === 'out' ? (c.fromOther || c.other) : crate;
+      label = span('pp.edit.ch.move', { a: src, b: dst });
       var v = [];
-      if (c.toN !== c.fromN) v.push(delta(c.fromN, c.toN));
-      if (c.toOther !== c.fromOther) v.push(delta(c.fromOther, c.toOther));
+      if (c.kind === 'move_void') v.push(dPigs(c.fromN, 0));
+      else {
+        if (c.toN !== c.fromN) v.push(dPigs(c.fromN, c.toN));
+        if (c.toOther !== c.fromOther) v.push(dText(c.fromOther, c.toOther));
+        if (c.rows && c.toN === c.fromN) v.push(span('pp.edit.ch.rows_picked', null, 'amber'));
+      }
       value = v.join(SEP());
+      var fx = Object.keys(e.effects).filter(function (k) { return k !== crate; }).map(function (k) { return effectText(e, k); }).filter(Boolean);
+      if (c.kind === 'move_void') fx.push(span('pp.edit.rec.by_mistake'));
+      if (fx.length) rest = SEP() + fx.join(SEP());
     } else if (c.kind === 'row') {
       label = span('pp.id.row.id', { id: c.tag || c.notch });
-      value = Object.keys(c.set).map(function (k) { return span('pp.edit.f.' + k + '_word') + ' ' + delta(fieldText(k, c.before[k]), fieldText(k, c.set[k])); }).join(SEP());
+      value = Object.keys(c.set).map(function (k) { return span('pp.edit.f.' + k + '_word') + ' ' + dText(fieldText(k, c.before[k]), fieldText(k, c.set[k])); }).join(SEP());
     } else if (c.kind === 'withdraw') {
-      label = span('pp.id.row.id', { id: c.tag || c.notch }); value = span('pp.edit.ch.withdrawn', null, 'amber');
+      label = span('pp.id.row.id', { id: c.tag || c.notch }); value = span('pp.edit.ch.withdrawn', null, 'amber'); rest = SEP() + span('pp.edit.rec.by_mistake');
     } else if (c.kind === 'reopen') {
       label = span('pp.edit.ch.keepers'); value = span('pp.edit.ch.reopened', null, 'amber');
     }
-    return '<p class="ed-banner-line">' + label + ' ' + value + rest + '</p>';
+    return line(label + ' ' + value + rest);
   }
   function banner(e) {
     if (!e.changes.length) return '';
     var lines = e.changes.map(function (c) { return changeLine(c, e); }).join('');
-    // After End: the correction is flagged for review and End's closing figures stay as they were (ledger: correction_after_end).
-    var after = e.ended ? '<p class="ed-banner-line">' + span(e.flags.some(function (f) { return f.reason === 'correction_after_end'; }) ? 'pp.edit.after_end_flag' : 'pp.edit.after_end') + '</p>' : '';
+    var after = e.ended ? line(span(e.flags.some(function (f) { return f.reason === 'correction_after_end'; }) ? 'pp.edit.after_end_flag' : 'pp.edit.after_end')) : '';
     return '<section class="ed-banner" data-ds="Candidate:EditBanner" role="status" aria-live="polite">' +
-      '<div class="ed-banner-head"><p class="ed-banner-title">' + span('pp.edit.banner', { who: ME }) + '</p>' + textAction('clear', 'act.clear') + '</div>' + lines + after + '</section>';
+      '<div class="ed-banner-head"><p class="ed-banner-title">' + span('pp.edit.banner', { who: ME }) + '</p>' + textAction('clear', 'act.clear') + '</div>' + lines + after + laterBlock(e) + '</section>';
   }
-  function markValue(m) { var x = draft.marks[m.id]; if (!x) return m.n; if (x.void || x.to) return 0; return x.n == null ? m.n : x.n; }
+  // A change that would drop or invalidate later records names each, with its door; Save waits until they are fixed.
+  function laterLabel(r) {
+    var t = r.type === 'treat' ? ['pp.edit.later.treat', { tx: txText(r.dose), code: r.litter }] : r.type === 'death' ? ['pp.edit.later.death', { code: r.litter }]
+      : r.type === 'move' ? ['pp.edit.later.move', { a: r.litter, b: r.to }] : r.type === 'count' ? ['pp.edit.later.count', { code: r.litter }]
+        : r.type === 'identity' ? ['pp.edit.later.row', { code: r.litter }] : ['pp.edit.later.other', { code: r.litter || crate }];
+    return span(t[0], t[1]) + SEP() + span('pp.common.stamp.date', { date: U.date(r.at), t: U.time(r.at), who: r.who });
+  }
+  function laterBlock(e) {
+    if (!e.later.length) return '';
+    return '<div class="ed-later">' + line(span(PP.one('pp.edit.later.title', e.later.length), { n: e.later.length }, 'amber')) +
+      e.later.map(function (r) {
+        var here = r.litter === crate && r.type === 'treat' && mark(e, r.id);
+        return '<div class="ed-later-row">' + line(laterLabel(r)) + textAction(here ? 'focus-mark' : 'open-later', here ? 'pp.edit.later.fix_here' : 'pp.edit.later.open', null, here ? r.id : r.litter) + '</div>';
+      }).join('') + '</div>';
+  }
+  function markValue(m, e) {
+    var x = draft.marks[m.id]; if (!x) return m.n; if (x.void || x.to !== undefined || x.back) return 0; return x.n == null ? m.n : x.n;
+  }
   function choice(action, value, label, meta, on, args) {
     return UI.choiceRow({ label: '', meta: meta ? '' : undefined, mode: 'single', action: action, value: value, selected: on,
       strs: Object.assign({ label: label }, meta ? { meta: meta } : {}), args: args ? { label: args, meta: args } : undefined });
   }
+  function stepper(key, action, labelId, labelArgs, desc, descArgs, value, min, max, changed, hintId, hintArgs) {
+    var atCeil = ceilTap === key && max != null && value >= max;
+    return UI.stepper({ label: '', description: desc ? '' : undefined, value: value, min: min, max: max, key: key, action: action, changed: changed, hint: atCeil ? '' : undefined,
+      strs: Object.assign({ label: labelId, value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' }, desc ? { description: desc } : {}, atCeil ? { hint: hintId } : {}),
+      args: { label: labelArgs, description: descArgs, hint: hintArgs } });
+  }
+  function stampStrs(iso, who) { return ['pp.common.stamp.' + (iso.slice(0, 10) === TODAY ? 'today' : 'date'), { t: U.time(iso), who: who, date: U.date(iso) }]; }
   function markBlock(m, e) {
-    var x = draft.marks[m.id] || {}, v = markValue(m), t = tx(m.dose), rest = m.whole - v;
-    var atCeil = ceilTap === m.id && v >= m.whole;
-    var out = UI.stepper({ label: '', description: '', value: v, min: 0, max: m.whole, key: m.id, action: 'mark-step',
-      changed: v !== m.n || m.corrected || !!x.void || !!x.to, hint: atCeil ? '' : undefined,
-      strs: Object.assign({ label: t[0], description: 'pp.common.stamp.' + (m.at.slice(0, 10) === TODAY ? 'today' : 'date'), value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' }, atCeil ? { hint: 'pp.edit.ceil' } : {}),
-      args: { label: t[1], description: { t: U.time(m.at), who: m.who, date: U.date(m.at) }, hint: { n: m.whole } } });
-    if (rest > 0 || x.void || x.to) {
-      var mode = x.to ? 'to' : x.void ? 'void' : x.reason || '';
-      var rows = [choice('mark-why', m.id + ':weak', 'pp.litter.reason.weak', 'pp.litter.reason.stays', mode === 'weak'),
-        choice('mark-why', m.id + ':sick', 'pp.litter.reason.sick', 'pp.litter.reason.stays', mode === 'sick'),
-        choice('mark-why', m.id + ':void', 'pp.edit.why.mistake', 'pp.edit.why.mistake_meta', mode === 'void'),
-        choice('mark-why', m.id + ':to', 'pp.edit.why.other', 'pp.edit.why.other_meta', mode === 'to')];
-      out += UI.choiceGroup(rows, { title: '', strs: { title: 'pp.edit.rest.title' }, args: { title: { n: x.void || x.to ? m.whole : rest } } });
-      if (x.to !== undefined) {
-        var c = e.changes.filter(function (ch) { return ch.mark === m.id; })[0];
-        out += UI.pickerField({ label: '', display: x.to || '', placeholder: '', action: 'pick-crate', key: m.id,
-          strs: { label: 'pp.edit.to.label', display: 'pp.room.code', placeholder: 'pp.edit.select' }, args: { display: { code: x.to } } });
-        if (x.to && c) out += U.receipt([{ id: 'pp.edit.to.line', args: { code: x.to } }, { id: pigs(c.n)[0], args: pigs(c.n)[1], tone: 'amber' }]);
-      }
+    var x = draft.marks[m.id] || {}, v = markValue(m, e), t = tx(m.dose), rest = m.whole - v, s = stampStrs(m.at, m.who);
+    var out = stepper(m.id, 'mark-step', t[0], t[1], s[0], s[1], v, 0, m.whole, v !== m.n || m.corrected || !!x.void || x.to !== undefined || !!x.back, 'pp.edit.ceil', { n: m.whole });
+    if (m.viaCorrection) out += UI.choiceGroup(choice('mark-back', m.id, 'pp.edit.back', 'pp.edit.back_meta', !!x.back, { code: m.from }));
+    // the why appears only once the hand lowers the mark (a record's own deferral is not a question)
+    if (!x.back && (v < m.n || x.void || x.to !== undefined)) {
+      var mode = x.to !== undefined ? 'to' : x.void ? 'void' : x.reason || '';
+      var rows = [];
+      // after End a lowered mark is a fact (not done), never owed: no weak/sick choice
+      if (!e.ended) rows.push(choice('mark-why', m.id + ':weak', 'pp.litter.reason.weak', 'pp.litter.reason.stays', mode === 'weak'), choice('mark-why', m.id + ':sick', 'pp.litter.reason.sick', 'pp.litter.reason.stays', mode === 'sick'));
+      rows.push(choice('mark-why', m.id + ':void', 'pp.edit.why.mistake', e.ended ? 'pp.edit.why.mistake_meta_end' : 'pp.edit.why.mistake_meta', mode === 'void'),
+        choice('mark-why', m.id + ':to', 'pp.edit.why.other', 'pp.edit.why.other_meta', mode === 'to'));
+      var n = x.void || x.to !== undefined ? m.whole : rest;
+      out += UI.choiceGroup(rows, { title: '', strs: { title: e.ended ? 'pp.edit.rest.title_end' : 'pp.edit.rest.title' }, args: { title: { n: n } } });
+      if (x.to !== undefined) out += wrongBlock(m, e, x);
     }
-    return '<div class="ed-group">' + out + '</div>';
+    return '<div class="ed-group" data-mark="' + U.esc(m.id) + '">' + out + '</div>';
+  }
+  // Wrong litter: the right crate, and how many were done there (the original count, capped at what it owes); the deferred part travels.
+  function wrongBlock(m, e, x) {
+    var c = changeOf(e, 'mark', m.id), out = UI.pickerField({ label: '', display: x.to || '', placeholder: '', action: 'pick-crate', key: m.id,
+      strs: { label: 'pp.edit.to.label', display: 'pp.room.code', placeholder: 'pp.edit.select' }, args: { display: { code: x.to } } });
+    if (x.to && c) {
+      var cap = c.owedThere == null ? m.whole : c.owedThere;
+      out += stepper('to:' + m.id, 'to-step', 'pp.edit.to.n', { code: x.to }, 'pp.edit.to.n_desc', { t: U.time(m.at), who: m.who, n: cap }, c.n, 1, cap, true, 'pp.edit.to.ceil', { code: x.to, n: cap });
+      var restThere = cap - c.n;
+      if (restThere > 0 && !m.castration) out += UI.choiceGroup([choice('to-why', m.id + ':weak', 'pp.litter.reason.weak', 'pp.litter.reason.stays', c.reason === 'weak'),
+        choice('to-why', m.id + ':sick', 'pp.litter.reason.sick', 'pp.litter.reason.stays', c.reason === 'sick')], { title: '', strs: { title: 'pp.edit.to.rest' }, args: { title: { n: restThere, code: x.to } } });
+    }
+    return out;
   }
   function marksSection(e) {
     if (!e.marks.length) return '';
@@ -297,128 +381,195 @@
   function movesSection(e) {
     if (!e.moves.length) return '';
     var blocks = e.moves.map(function (m) {
-      var x = draft.moves[m.id] || {}, n = x.n == null ? m.n : x.n, other = x.to || m.other, tagged = m.rows && m.rows.length;
+      var x = draft.moves[m.id] || {}, n = x.rows ? null : x.n == null ? m.n : x.n, other = x.to || m.other, tagged = m.rows && m.rows.length, s = stampStrs(m.at, m.who);
       var head = UI.heading({ title: '', kind: 'group', level: 4, description: '',
-        strs: { title: m.dir === 'out' ? 'pp.edit.move.out' : 'pp.edit.move.in', description: 'pp.common.stamp.' + (m.at.slice(0, 10) === TODAY ? 'today' : 'date') },
-        args: { title: { code: m.other }, description: { t: U.time(m.at), who: m.who, date: U.date(m.at) } } });
-      var pick = UI.pickerField({ label: '', display: other, action: 'pick-move', key: m.id,
-        strs: { label: m.dir === 'out' ? 'pp.edit.move.to' : 'pp.edit.move.from', display: 'pp.room.code' }, args: { display: { code: other } } });
-      var step = tagged ? '' : UI.stepper({ label: '', value: n, min: 1, key: m.id, action: 'move-step', changed: n !== m.n || m.corrected,
-        strs: { label: 'label.piglets', value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' } });
-      return '<div class="ed-group">' + head + pick + step + '</div>';
+        strs: { title: m.dir === 'out' ? 'pp.edit.move.out' : 'pp.edit.move.in', description: s[0] }, args: { title: { code: m.other }, description: s[1] } });
+      var out = head;
+      if (!x.void) {
+        out += UI.pickerField({ label: '', display: other, action: 'pick-move', key: m.id,
+          strs: { label: m.dir === 'out' ? 'pp.edit.move.to' : 'pp.edit.move.from', display: 'pp.room.code' }, args: { display: { code: other } } });
+        if (tagged) out += moveRows(m, x);
+        else out += stepper(m.id, 'move-step', 'label.piglets', null, null, null, n, 1, null, n !== m.n || m.corrected);
+      }
+      out += UI.choiceGroup(choice('move-void', m.id, 'pp.edit.why.mistake', 'pp.edit.move.void_meta', !!x.void));
+      return '<div class="ed-group">' + out + '</div>';
     }).join('');
     return '<section class="ed-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.edit.sec.moves' } }) + blocks + '</section>';
   }
-  function rowLine(r) {
-    var parts = [];
-    if (r.sex) parts.push(sexWord(r.sex));
-    if (r.weight != null) parts.push(PP.t('pp.common.kg', { w: r.weight }));
-    return parts.join(' · ');
-  }
-  function idSection(e) {
-    var out = '';
-    if (e.closed) {
-      out += UI.choiceGroup(choice('reopen', 'set', 'pp.edit.reopen', 'pp.edit.reopen_meta', !!draft.reopen, { k: e.closed.k, stamp: stampText(e.closed.at, e.closed.who) }));
-    }
-    if (e.rows.length) {
-      out += UI.rowGroup(e.rows.map(function (r) {
-        var d = draft.rows[r.rowId], line = rowLine(r);
-        return UI.row({ title: '', description: line ? '' : undefined, trailing: d ? '' : undefined, action: 'open-row', value: r.rowId,
-          strs: Object.assign({ title: 'pp.id.row.id' }, line ? { description: 'pp.edit.row.line' } : {}, d ? { trailing: 'status.unsaved' } : {}),
-          args: { title: { id: idOf(r) }, description: { line: line }, trailing: { n: 1 } } });
-      }).join(''));
-    }
-    if (!out) return '';
-    return '<section class="ed-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, meta: e.rows.length ? '' : undefined,
-      strs: Object.assign({ title: 'pp.edit.sec.rows' }, e.rows.length ? { meta: 'pp.edit.sec.rows_meta' } : {}), args: { meta: { n: e.rows.length } } }) + out + '</section>';
-  }
-  // What Save waits for, above the bar: the draft's own step first, then the ledger's refusal.
-  function waiting(e) {
-    var noCrate = Object.keys(draft.marks).some(function (k) { return draft.marks[k].to === ''; });
-    if (noCrate) return ['pp.edit.wait.crate', null];
-    if (e.step) return [PP.one('pp.edit.wait.reason', e.step.n), { n: e.step.n }];
-    if (e.why) return ['pp.edit.wait.refused', null];
-    return null;
-  }
-  function dirty() { return !!(Object.keys(draft.marks).length || Object.keys(draft.moves).length || Object.keys(draft.rows).length || draft.reopen); }
-  // The section the entrance came for leads (a Move receipt → Moves, the identity table → Identity); fixed for the visit, so nothing moves under the thumb.
-  function sections(e) {
-    var s = { marks: marksSection(e), moves: movesSection(e), rows: idSection(e) };
-    var order = lead === 'moves' ? ['moves', 'marks', 'rows'] : lead === 'rows' ? ['rows', 'marks', 'moves'] : ['marks', 'moves', 'rows'];
-    return order.map(function (k) { return s[k]; }).join('');
-  }
-  function editPage(e) {
-    var w = waiting(e), can = !!e.events && !w;
-    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (rowOpen || picker ? ' inert' : '') + '>' + header('pp.edit.title') +
-      '<div class="sheet-body"><div class="ed-body">' + banner(e) + sections(e) + '</div></div>' +
-      '<footer class="sheet-footer">' + (w && dirty() ? U.receipt([{ id: w[0], args: w[1] }]) : '') + button('secondary', 'back', 'act.back') + button('primary', 'save', 'act.save', !can) + '</footer></section>';
+  // A tagged Move's count is changed by picking its rows: the moved rows and the source's live rows.
+  function moveRows(m, x) {
+    var picked = x.rows || m.rows, src = m.dir === 'out' ? crate : m.other;
+    var pool = [];
+    Object.keys(store.derived.litters).forEach(function (c) { L(c).identity.rows.forEach(function (r) { if (m.rows.indexOf(r.rowId) >= 0 || (r.litter === src && r.status === 'alive')) pool.push(r); }); });
+    var seen = {};
+    pool = pool.filter(function (r) { if (seen[r.rowId]) return false; seen[r.rowId] = 1; return true; });
+    return UI.choiceGroup(pool.map(function (r) {
+      return UI.choiceRow({ label: '', mode: 'multi', action: 'move-row', value: m.id + ':' + r.rowId, selected: picked.indexOf(r.rowId) >= 0, strs: { label: 'pp.id.row.id' }, args: { label: { id: idOf(r) } } });
+    }), { title: '', strs: { title: 'pp.edit.move.rows' }, args: { title: { n: picked.length } } });
   }
 
-  /* ---- an identity row, corrected in a drawer over Edit: tag, notch, sex, weight, or withdrawn (stamped, kept) ---- */
-  function rowDraft(r) { return draft.rows[r.rowId] || (draft.rows[r.rowId] = { set: {} }); }
+  /* ---- identity: rows expand in place into a well tray; one banner, one summary, one Save ---- */
   function current(r, k) { var d = draft.rows[r.rowId]; return d && d.set && k in d.set ? d.set[k] : r[k]; }
+  function rowDraft(r) { return draft.rows[r.rowId] || (draft.rows[r.rowId] = { set: {} }); }
   function tidy(r) {
     var d = draft.rows[r.rowId]; if (!d) return;
     if (d.set) Object.keys(d.set).forEach(function (k) { if ((d.set[k] == null ? null : d.set[k]) === (r[k] == null ? null : r[k])) delete d.set[k]; });
     if (!d.withdraw && (!d.set || !Object.keys(d.set).length)) delete draft.rows[r.rowId];
   }
-  function rowDrawer(e) {
-    var r = row(e, rowOpen); if (!r) return '';
-    var d = draft.rows[r.rowId] || {}, withdraw = !!d.withdraw;
+  // Amber forever: a value a correction ever changed (the ledger's provenance), or one this draft changes.
+  function amberField(r, k) { var d = draft.rows[r.rowId]; return !!(r.correctedFields && r.correctedFields[k]) || !!(d && d.set && k in d.set); }
+  function rowHtml(r) {
+    var open = rowOpen === r.rowId, d = draft.rows[r.rowId];
+    var parts = [];
+    if (current(r, 'sex')) parts.push(span(current(r, 'sex') === 'b' ? 'pp.common.sex.boar' : 'pp.common.sex.gilt', null, amberField(r, 'sex') ? 'amber' : null));
+    if (current(r, 'weight') != null) parts.push(span('pp.common.kg', { w: current(r, 'weight') }, amberField(r, 'weight') ? 'amber' : null));
+    if (r.status === 'dead') parts.push(span('pp.edit.row.dead'));
+    var k = r.tag || r.notch ? (r.tag ? 'tag' : 'notch') : 'tag';
+    var trail = d ? '<span class="st-row-trailing">' + span(d.withdraw ? 'pp.edit.ch.withdrawn' : 'status.unsaved', { n: 1 }, d.withdraw ? 'amber' : 'green') + '</span>' : '';
+    return '<button type="button" class="st-row" data-ds="Row" data-action="open-row" data-value="' + U.esc(r.rowId) + '" aria-expanded="' + open + '"><span class="st-row-copy"><strong>' +
+      span('pp.id.row.id', { id: current(r, k) || idOf(r) }, amberField(r, k) ? 'amber' : null) + '</strong>' + (parts.length ? '<small class="pp-mark">' + parts.join(SEP()) + '</small>' : '') + '</span>' +
+      trail + '<span class="st-row-chevron">' + ICON.icon('chevron') + '</span></button>';
+  }
+  function tray(r, e) {
+    var d = draft.rows[r.rowId] || {}, out = '';
     var scheme = CFG.identity.scheme, idKey = r.tag || scheme === 'tag' ? 'tag' : 'notch';
-    var fields = '';
-    // Ear tag (or notch): typed on the Numpad's readout (a tag has no unit, so it is not a Measure).
     ['tag', 'notch'].forEach(function (k) {
       if (k !== idKey && !r[k]) return;
-      var v = pad === k ? typed[k] : current(r, k), changed = (current(r, k) || null) !== (r[k] || null);
-      fields += UI.row({ title: '', trailing: span('pp.id.row.id', { id: v || PP.t('ds.field.placeholder') }, changed ? 'amber' : null), action: 'open-pad', value: k,
-        strs: { title: 'pp.edit.f.' + k } });
+      var v = pad === k ? typed[k] : current(r, k);
+      out += UI.row({ title: '', trailing: span('pp.id.row.id', { id: v || PP.t('ds.field.placeholder') }, amberField(r, k) ? 'amber' : null), action: 'open-pad', value: k, strs: { title: 'pp.edit.f.' + k } });
+    });
+    e.warnings.filter(function (w) { return w.rowId === r.rowId; }).forEach(function (w) {
+      out += U.receipt([{ id: w.here ? 'pp.edit.warn.here' : 'pp.edit.warn.there', args: { id: w.value, code: w.litter }, tone: 'amber' }]);
     });
     var sex = current(r, 'sex');
-    fields += UI.choiceGroup([choice('row-sex', 'b', 'pp.common.sex.boar_l', null, sex === 'b'), choice('row-sex', 'g', 'pp.common.sex.gilt_l', null, sex === 'g')],
-      { title: '', strs: { title: 'pp.common.sex.label' } });
-    var w = pad === 'weight' ? typed.weight : current(r, 'weight'), wChanged = (current(r, 'weight') == null ? null : +current(r, 'weight')) !== (r.weight == null ? null : +r.weight);
-    fields += UI.measure({ label: '', optional: '', value: w == null ? '' : String(w), unit: 'kg', key: 'weight', active: pad === 'weight', controls: 'ed-pad', changed: wChanged, note: wChanged ? ' ' : '',
-      strs: Object.assign({ label: 'pp.edit.f.weight', optional: 'ds.field.optional', value: 'ds.field.figure', unit: 'ds.field.unit.kg', placeholder: 'ds.field.placeholder' }, wChanged ? { note: r.weight == null ? 'pp.edit.f.was_none' : 'ds.field.measure.was' } : {}),
+    out += UI.choiceGroup([choice('row-sex', 'b', 'pp.common.sex.boar_l', null, sex === 'b'), choice('row-sex', 'g', 'pp.common.sex.gilt_l', null, sex === 'g')], { title: '', strs: { title: 'pp.common.sex.label' } });
+    var w = pad === 'weight' ? typed.weight : current(r, 'weight'), wAmber = amberField(r, 'weight');
+    var changedNow = d.set && 'weight' in d.set;
+    out += UI.measure({ label: '', optional: '', value: w == null ? '' : String(w), unit: 'kg', key: 'weight', active: pad === 'weight', controls: 'ed-pad', changed: wAmber, note: changedNow ? ' ' : '',
+      strs: Object.assign({ label: 'pp.edit.f.weight', optional: 'ds.field.optional', value: 'ds.field.figure', unit: 'ds.field.unit.kg', placeholder: 'ds.field.placeholder' }, changedNow ? { note: r.weight == null ? 'pp.edit.f.was_none' : 'ds.field.measure.was' } : {}),
       args: { value: { n: w == null ? '' : w }, note: { v: r.weight } } });
-    fields += UI.choiceGroup(choice('row-withdraw', r.rowId, 'pp.edit.withdraw', 'pp.edit.withdraw_meta', withdraw), { title: '', strs: { title: 'pp.edit.withdraw_title' } });
+    out += UI.choiceGroup(choice('row-withdraw', r.rowId, 'pp.edit.why.mistake', 'pp.edit.withdraw_meta', !!d.withdraw));
+    if (d.withdraw && r.status === 'dead') {
+      out += '<div class="ed-later-row">' + U.receipt([{ id: 'pp.edit.wait.row_dead', args: { id: idOf(r) }, tone: 'amber' }]) + textAction('open-record', 'pp.edit.door.death') + '</div>';
+    }
+    return '<div class="ed-tray" data-ds="Candidate:WellTray">' + out + '</div>';
+  }
+  function rowsList(e) {
+    var groups = [], cur = [];
+    e.rows.forEach(function (r) {
+      cur.push(rowHtml(r));
+      if (rowOpen === r.rowId) { groups.push(UI.rowGroup(cur.join(''))); cur = []; groups.push(tray(r, e)); }
+    });
+    if (cur.length) groups.push(UI.rowGroup(cur.join('')));
+    return groups.join('');
+  }
+  function idSection(e) {
+    var out = '';
+    if (e.closed) out += UI.choiceGroup(choice('reopen', 'set', 'pp.edit.reopen', 'pp.edit.reopen_meta', !!draft.reopen, { k: e.closed.k, stamp: stampText(e.closed.at, e.closed.who) }));
+    if (e.rows.length) out += rowsList(e);
+    if (!out) return '';
+    return '<section class="ed-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, meta: e.rows.length ? '' : undefined,
+      strs: Object.assign({ title: 'pp.edit.sec.rows' }, e.rows.length ? { meta: 'pp.edit.sec.rows_meta' } : {}), args: { meta: { n: e.rows.length } } }) + out + '</section>';
+  }
+  // The section the entrance came for leads (a Move → Moves, the identity table → Identity); fixed for the visit.
+  function sections(e) {
+    var s = { marks: marksSection(e), moves: movesSection(e), rows: idSection(e) };
+    var order = lead === 'moves' ? ['moves', 'marks', 'rows'] : lead === 'rows' ? ['rows', 'marks', 'moves'] : ['marks', 'moves', 'rows'];
+    return order.map(function (k) { return s[k]; }).join('');
+  }
+  // What Save waits for, above the bar, named: the draft's own step first, then the ledger's refusal.
+  function waiting(e) {
+    if (!e.why) return null;
+    var d = e.whyDetail || {}, dd = d.detail || {};
+    var tgt = d.target ? e.changes.filter(function (c) { return c.mark === d.target || c.move === d.target; })[0] : null;
+    switch (e.why) {
+      case 'reason': return [PP.one('pp.edit.wait.reason', d.n), { n: d.n }];
+      case 'reason_there': return [PP.one('pp.edit.wait.reason_there', d.n), { n: d.n, code: d.litter }];
+      case 'crate': return ['pp.edit.wait.crate', null];
+      case 'changes_later': return [PP.one('pp.edit.later.title', e.later.length), { n: e.later.length }];
+      case 'row_dead': return ['pp.edit.wait.row_dead', { id: d.tag || d.notch || '' }];
+      case 'more_than_owed': return ['pp.edit.wait.more_than_owed', { n: dd.owed != null ? dd.owed : '', code: (tgt && (tgt.to || tgt.toOther)) || crate }];
+      case 'nothing_owed': return ['pp.edit.wait.nothing_owed', { code: (tgt && tgt.to) || crate }];
+      case 'alive_negative': return ['pp.edit.wait.alive', { code: (tgt && tgt.source) || crate, n: dd.alive != null ? dd.alive : '' }];
+      case 'name_the_rows': return ['pp.edit.wait.rows', null];
+      case 'task_ended': return ['pp.edit.wait.task_ended', null];
+      case 'already_withdrawn': return ['pp.edit.wait.already', null];
+      case 'tag_or_notch': return ['pp.edit.wait.tag_or_notch', null];
+      case 'more_rows_than_alive': return ['pp.edit.wait.more_rows', { n: L().alive }];
+      default: return ['pp.edit.wait.refused', { code: crate }];
+    }
+  }
+  function dirty() { return !!(Object.keys(draft.marks).length || Object.keys(draft.moves).length || Object.keys(draft.rows).length || draft.reopen); }
+  function editPage(e) {
+    var w = waiting(e), can = !!e.events && !w;
+    var restored = notices.length ? U.receipt(notices.map(function (n) { return { id: n[0], args: n[1], tone: 'amber' }; })) : '';
     var padHtml = '';
-    if (pad) {
+    if (pad && rowOpen) {
       var isW = pad === 'weight';
       padHtml = '<div class="ed-pad">' + UI.numpad({ id: 'ed-pad', key: pad, label: isW ? undefined : '', value: typed[pad] || '', decimals: isW ? 2 : 0, intLength: isW ? 2 : undefined, maxLength: isW ? undefined : pad === 'tag' ? 6 : 8,
         strs: Object.assign({ digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad' }, isW ? {} : { label: 'pp.edit.f.' + pad, value: 'ds.field.figure' }),
         args: { value: { n: typed[pad] || '' } } }) + '</div>';
     }
-    var ev = E(), w8 = waiting(ev), can = !!ev.events && !w8;
-    var head = UI.heading({ title: '', kind: 'page', level: 3, description: '',
-      strs: { title: 'pp.id.row.id', description: 'pp.edit.row.sub' }, args: { title: { id: idOf(r) }, description: { stamp: stampText(r.addedAt, r.addedBy) } } });
-    return '<div class="scrim" data-ds="Sheet" data-action="row-back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" data-sizing="content" role="dialog" aria-modal="true">' +
-      '<header class="utility-header">' + head + '</header>' +
-      '<div class="sheet-body"><div class="ed-drawer-body">' + fields + '</div></div>' + padHtml +
-      '<footer class="sheet-footer">' + button('secondary', 'row-back', 'act.back') + button('primary', 'save', 'act.save', !can) + '</footer></section>';
+    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (picker ? ' inert' : '') + '>' + header('pp.edit.title') +
+      '<div class="sheet-body"><div class="ed-body">' + restored + banner(e) + sections(e) + '</div></div>' + padHtml +
+      '<footer class="sheet-footer">' + (w && dirty() ? U.receipt([{ id: w[0], args: w[1] }]) : '') + button('secondary', 'back', 'act.back') + button('primary', 'save', 'act.save', !can) + '</footer></section>';
   }
 
-  /* ---- the crate picker: where a mark belongs (the litters that owe that dose now), or where a Move went ---- */
+  /* ---- the crate picker: where a mark belongs (litters that owe that dose now), where a Move went; other units after ---- */
   function pickerDrawer(e) {
-    var opts, sel, title;
+    var opts, sel, title, here = L().room;
+    var group = function (room) { return room === here ? {} : { group: 'pp.edit.to.unit' }; };
     if (picker.kind === 'mark') {
       var m = mark(e, picker.id);
       sel = (draft.marks[m.id] || {}).to || '';
       title = ['pp.edit.to.title', { tx: txText(m.dose) }];
       opts = e.targets(m.dose).map(function (t) {
-        return [t.litter, t.litter, '', t.room === L().room ? '' : 'other', { strs: Object.assign({ label: 'pp.room.code', sub: t.owed == null ? 'pp.edit.to.alive' : 'pp.edit.to.owes' }, t.room === L().room ? {} : { group: 'pp.edit.to.other_unit' }), args: { label: { code: t.litter }, sub: { n: t.owed, alive: t.alive } } }];
+        return [t.litter, t.litter, '', t.room === here ? '' : 'u' + t.room, { strs: Object.assign({ label: 'pp.room.code', sub: t.owed == null ? 'pp.edit.to.alive' : 'pp.edit.to.owes' }, group(t.room)), args: { label: { code: t.litter }, sub: { n: t.owed, alive: t.alive }, group: { n: t.room } } }];
       });
     } else {
-      var mv = e.moves.filter(function (x) { return x.id === picker.id; })[0];
+      var mv = move(e, picker.id);
       sel = (draft.moves[mv.id] || {}).to || mv.other;
       title = [mv.dir === 'out' ? 'pp.edit.move.to' : 'pp.edit.move.from', null];
-      opts = Object.keys(store.derived.litters).filter(function (c) { var X = L(c); return c !== crate && X.room === L().room && X.phase === 'locked' && !X.sowDied; }).sort()
-        .map(function (c) { return [c, c, '', '', { strs: { label: 'pp.room.code', sub: 'pp.edit.to.alive' }, args: { label: { code: c }, sub: { alive: L(c).alive } } }]; });
+      opts = e.crates().filter(function (c) { return mv.dir === 'in' || !c.sowDied; }).map(function (c) {
+        return [c.litter, c.litter, '', c.room === here ? '' : 'u' + c.room, { strs: Object.assign({ label: 'pp.room.code', sub: 'pp.edit.to.alive' }, group(c.room)), args: { label: { code: c.litter }, sub: { alive: c.alive }, group: { n: c.room } } }];
+      });
     }
     return '<div class="scrim" data-ds="Sheet" data-action="picker-back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
       '<header class="utility-header">' + UI.heading({ title: '', kind: 'page', level: 3, strs: { title: title[0] }, args: { title: title[1] } }) + '</header>' +
       '<div class="sheet-body">' + UI.chooserList(UI.pickerOptions({ options: opts, selected: sel, action: 'pick' }), { tone: 'inset', ds: 'PickerField' }) + '</div>' +
       '<footer class="sheet-footer">' + button('secondary', 'picker-back', 'act.back') + '</footer></section>';
+  }
+
+  /* ---- drafts live on this phone (localStorage: they survive a locked phone); each carries the values it was drawn on ---- */
+  function key() { return 'pp-edit:' + store.name + ':' + crate; }
+  function baseOf(e) {
+    var b = { marks: {}, moves: {}, rows: {}, closed: e.closed ? e.closed.id : null };
+    Object.keys(draft.marks).forEach(function (k) { var m = mark(e, k); if (m) b.marks[k] = m.n; });
+    Object.keys(draft.moves).forEach(function (k) { var m = move(e, k); if (m) b.moves[k] = m.n + ':' + m.other; });
+    Object.keys(draft.rows).forEach(function (k) { var r = row(e, k); if (r) b.rows[k] = JSON.stringify([r.tag, r.notch, r.sex, r.weight]); });
+    return b;
+  }
+  function persist() {
+    try { if (dirty()) localStorage.setItem(key(), JSON.stringify({ draft: draft, base: baseOf(E()) })); else localStorage.removeItem(key()); } catch (err) {}
+  }
+  // A restored draft that no longer applies says what changed, and drops only that part.
+  function restore(saved) {
+    var d = saved.draft || {}, b = saved.base || {}, e0 = store.select.edit(store.derived, crate, EMPTY(), stamp());
+    draft = Object.assign(EMPTY(), JSON.parse(JSON.stringify(d)));
+    Object.keys(draft.marks).forEach(function (k) {
+      var m = mark(e0, k);
+      if (!m) { notices.push(['pp.edit.restored.gone', { what: PP.t('pp.edit.restored.a_mark') }]); delete draft.marks[k]; }
+      else if (b.marks && b.marks[k] != null && b.marks[k] !== m.n) { notices.push(['pp.edit.restored.changed', { what: txText(m.dose), now: pigsText(m.n) }]); delete draft.marks[k]; }
+    });
+    Object.keys(draft.moves).forEach(function (k) {
+      var m = move(e0, k);
+      if (!m || (b.moves && b.moves[k] && b.moves[k] !== m.n + ':' + m.other)) { notices.push(['pp.edit.restored.move', null]); delete draft.moves[k]; }
+    });
+    Object.keys(draft.rows).forEach(function (k) {
+      var r = row(e0, k);
+      if (!r || (b.rows && b.rows[k] && b.rows[k] !== JSON.stringify([r.tag, r.notch, r.sex, r.weight]))) { notices.push(['pp.edit.restored.row', { id: r ? idOf(r) : k }]); delete draft.rows[k]; }
+    });
+    if (draft.reopen && (!e0.closed || (b.closed && b.closed !== e0.closed.id))) { notices.push(['pp.edit.restored.reopen', null]); draft.reopen = false; }
   }
 
   /* ---- render: keeps scroll and focus ---- */
@@ -428,11 +579,11 @@
     var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-action]');
     var fk = f ? [f.dataset.action, f.dataset.value || '', f.dataset.step || '', f.dataset.key || ''] : null;
     if (view === 'record') scr.innerHTML = recordPage();
-    else { var e = E(); scr.innerHTML = editPage(e) + (rowOpen ? rowDrawer(e) : '') + (picker ? pickerDrawer(e) : ''); }
+    else { var e = E(); scr.innerHTML = editPage(e) + (picker ? pickerDrawer(e) : ''); }
     PP.apply(scr);
     var nb = scr.querySelector('[data-presentation="page"] .sheet-body'); if (nb) nb.scrollTop = top;
     // The pad rule: the host scrolls the active field into view above the docked pad.
-    var act = pad && scr.querySelector('[data-st-context="drawer"] [data-field="' + pad + '"], [data-st-context="drawer"] [data-action="open-pad"][data-value="' + pad + '"]');
+    var act = pad && scr.querySelector('.ed-tray [data-field="' + pad + '"], .ed-tray [data-action="open-pad"][data-value="' + pad + '"]');
     if (act) act.scrollIntoView({ block: 'nearest' });
     if (fk) {
       var t = Array.prototype.filter.call(scr.querySelectorAll('[data-action]'), function (x) {
@@ -440,21 +591,21 @@
       })[0];
       if (t) t.focus({ preventScroll: true });
     }
-    try { if (dirty()) sessionStorage.setItem(key(), JSON.stringify(draft)); else sessionStorage.removeItem(key()); } catch (err) {}
+    if (view === 'edit') persist();
   }
-  function key() { return 'pp-edit:' + store.name + ':' + crate; }
 
   /* ---- where Back and Save return: the page that opened Edit ---- */
-  function home() {
+  function home(extra) {
     var from = qs.get('from') || (view === 'record' ? 'litter' : st.view === 'record' ? 'record' : 'litter');
     var data = store.name !== 'base' ? store.name : '';
     if (from === 'record') return PP.href('edit.html', { state: 'record-page', crate: crate, data: store.name });
     if (from === 'id') return PP.href('id.html', { state: 'id-table', crate: crate, data: data });
-    return PP.href('litter.html', { state: 'litter', crate: crate, stay: 1, data: data });
+    return PP.href('litter.html', Object.assign({ state: 'litter', crate: crate, stay: 1, data: data }, extra || {}));
   }
   function commitRowTyping() {
     if (!rowOpen || !pad) return;
     var r = row(E(), rowOpen), v = typed[pad];
+    if (!r) return;
     if (pad === 'weight') { var c = UI.numpadCommit(v || '', { decimals: 2 }); rowDraft(r).set.weight = c == null ? null : +c; }
     else rowDraft(r).set[pad] = v || null;
     tidy(r);
@@ -465,9 +616,9 @@
     if (!e.events || waiting(e)) { render(); return; }
     var r = store.commitAll(e.events);
     if (!r.ok) { render(); return; }
-    draft = { marks: {}, moves: {}, rows: {}, reopen: false };
-    try { sessionStorage.removeItem(key()); } catch (err) {}
-    location.href = home();
+    draft = EMPTY();
+    try { localStorage.removeItem(key()); } catch (err) {}
+    location.href = home({ saved: 'correction' });
   }
 
   document.getElementById('screen').addEventListener('click', function (ev) {
@@ -479,33 +630,50 @@
       var m = mark(e, v), x = draft.marks[v] || {};
       if (b.getAttribute('aria-disabled') === 'true') { ceilTap = +b.dataset.step > 0 ? v : ''; render(); return; }
       ceilTap = '';
-      var n = Math.max(0, Math.min(m.whole, markValue(m) + (+b.dataset.step)));
-      delete x.void; delete x.to;
+      var n = Math.max(0, Math.min(m.whole, markValue(m, e) + (+b.dataset.step)));
+      delete x.void; delete x.to; delete x.back; delete x.n2;
       x.n = n;
       if (n === m.n) delete draft.marks[v]; else draft.marks[v] = x;
       render();
     } else if (a === 'mark-why') {
       var p = v.split(':'), mm = mark(e, p[0]), y = draft.marks[p[0]] || {};
       if (p[1] === 'void') draft.marks[p[0]] = { void: true };
-      else if (p[1] === 'to') { draft.marks[p[0]] = { to: y.to || '' }; picker = { kind: 'mark', id: p[0] }; }
-      else draft.marks[p[0]] = { n: y.void || y.to != null ? mm.whole - 1 : (y.n == null ? mm.n : y.n), reason: p[1] };
+      else if (p[1] === 'to') { draft.marks[p[0]] = { to: y.to || '' }; openPicker({ kind: 'mark', id: p[0] }); }
+      else draft.marks[p[0]] = { n: y.void || y.to !== undefined ? mm.whole - 1 : (y.n == null ? mm.n : y.n), reason: p[1] };
       render();
-    } else if (a === 'pick-crate') { picker = { kind: 'mark', id: b.dataset.pickerKey }; render();
-    } else if (a === 'pick-move') { picker = { kind: 'move', id: b.dataset.pickerKey }; render();
+    } else if (a === 'mark-back') { var z0 = draft.marks[v]; if (z0 && z0.back) delete draft.marks[v]; else draft.marks[v] = { back: true }; render();
+    } else if (a === 'to-step') {
+      if (b.getAttribute('aria-disabled') === 'true') { ceilTap = +b.dataset.step > 0 ? v : ''; render(); return; }
+      ceilTap = '';
+      var id0 = v.replace(/^to:/, ''), c0 = changeOf(e, 'mark', id0), z = draft.marks[id0];
+      z.n = (c0 && c0.n != null ? c0.n : 1) + (+b.dataset.step); render();
+    } else if (a === 'to-why') { var q = v.split(':'); draft.marks[q[0]].reason = q[1]; render();
+    } else if (a === 'pick-crate') { openPicker({ kind: 'mark', id: b.dataset.pickerKey }); render();
+    } else if (a === 'pick-move') { openPicker({ kind: 'move', id: b.dataset.pickerKey }); render();
     } else if (a === 'pick') {
-      if (picker.kind === 'mark') draft.marks[picker.id] = { to: v };
-      else { var mv = e.moves.filter(function (q) { return q.id === picker.id; })[0], z = draft.moves[mv.id] || {}; z.to = v; if (v === mv.other) delete z.to; draft.moves[mv.id] = z; if (!Object.keys(z).length) delete draft.moves[mv.id]; }
-      picker = null; drawerClosedAt = now; render();
-    } else if (a === 'picker-back') { if (picker.kind === 'mark' && draft.marks[picker.id] && !draft.marks[picker.id].to) delete draft.marks[picker.id]; picker = null; drawerClosedAt = now; render();
+      if (picker.kind === 'mark') { var old = draft.marks[picker.id] || {}; draft.marks[picker.id] = { to: v }; if (old.to === v) draft.marks[picker.id] = old; }
+      else { var mv = move(e, picker.id), zz = draft.moves[mv.id] || {}; zz.to = v; if (v === mv.other) delete zz.to; if (Object.keys(zz).length) draft.moves[mv.id] = zz; else delete draft.moves[mv.id]; }
+      picker = null; pickerBefore = null; drawerClosedAt = now; render();
+    } else if (a === 'picker-back') {
+      // Back keeps the draft that existed before the picker opened
+      draft = JSON.parse(pickerBefore); picker = null; pickerBefore = null; drawerClosedAt = now; render();
     } else if (a === 'move-step') {
       if (b.getAttribute('aria-disabled') === 'true') return;
-      var mo = e.moves.filter(function (q) { return q.id === v; })[0], w = draft.moves[v] || {};
+      var mo = move(e, v), w = draft.moves[v] || {};
       w.n = Math.max(1, (w.n == null ? mo.n : w.n) + (+b.dataset.step));
       if (w.n === mo.n) delete w.n;
       if (Object.keys(w).length) draft.moves[v] = w; else delete draft.moves[v];
       render();
+    } else if (a === 'move-row') {
+      var pr = v.split(':'), mr = move(e, pr[0]), wr = draft.moves[pr[0]] || {}, list = (wr.rows || mr.rows).slice(), i = list.indexOf(pr[1]);
+      if (i >= 0) list.splice(i, 1); else list.push(pr[1]);
+      wr.rows = list;
+      if (JSON.stringify(list.slice().sort()) === JSON.stringify(mr.rows.slice().sort())) delete wr.rows;
+      if (Object.keys(wr).length) draft.moves[pr[0]] = wr; else delete draft.moves[pr[0]];
+      render();
+    } else if (a === 'move-void') { var mv0 = draft.moves[v]; if (mv0 && mv0.void) delete draft.moves[v]; else draft.moves[v] = { void: true }; render();
     } else if (a === 'reopen') { draft.reopen = !draft.reopen; render();
-    } else if (a === 'open-row') { rowOpen = v; pad = null; typed = {}; render();
+    } else if (a === 'open-row') { commitRowTyping(); rowOpen = rowOpen === v ? null : v; pad = null; typed = {}; render();
     } else if (a === 'open-pad' || a === 'open-numpad') {
       if (pad === v) return;                                         // tapping the active field again does nothing
       commitRowTyping();
@@ -519,23 +687,28 @@
       var r1 = row(e, rowOpen); commitRowTyping();
       rowDraft(r1).set.sex = current(r1, 'sex') === v ? null : v; tidy(r1); render();
     } else if (a === 'row-withdraw') {
-      var r2 = row(e, rowOpen), d2 = rowDraft(r2); d2.withdraw = !d2.withdraw; tidy(r2); render();
-    } else if (a === 'row-back') {
-      if (pad) { commitRowTyping(); pad = null; render(); return; }    // Back closes the pad first; the typed value is kept
-      rowOpen = null; drawerClosedAt = now; render();
+      var r2 = row(e, v), d2 = rowDraft(r2); d2.withdraw = !d2.withdraw; tidy(r2); render();
+    } else if (a === 'focus-mark') {
+      var t0 = document.querySelector('[data-mark="' + v + '"]'); if (t0) { t0.scrollIntoView({ block: 'center' }); var k0 = t0.querySelector('[data-action="mark-step"]'); if (k0) k0.focus(); }
+    } else if (a === 'open-later') {
+      location.href = PP.href('edit.html', { state: 'record-page', crate: v, data: store.name });
+    } else if (a === 'open-record') {
+      location.href = PP.href('edit.html', { state: 'record-page', crate: crate, data: store.name });
     } else if (a === 'clear') {
-      draft = { marks: {}, moves: {}, rows: {}, reopen: false }; typed = {}; render();
+      draft = EMPTY(); typed = {}; notices = []; render();
     } else if (a === 'save') {
       if (b.getAttribute('aria-disabled') === 'true' || now - lastSave < 600) { render(); return; }
       lastSave = now; save();
     } else if (a === 'back') {
       if (now - drawerClosedAt < 400) return;
+      if (pad) { commitRowTyping(); pad = null; render(); return; }  // Back closes the pad first; the typed value is kept
+      commitRowTyping(); persist();
       location.href = home();
     } else if (a === 'open-edit') {
       location.href = PP.href('edit.html', { state: 'edit', crate: crate, data: store.name, from: 'record' });
-    } else if (a === 'open-sow') { document.documentElement.setAttribute('data-door', a + ':' + (v || ''));
     } else document.documentElement.setAttribute('data-door', a + ':' + (v || ''));
   });
+  function openPicker(p) { pickerBefore = JSON.stringify(Object.assign({}, draft, { marks: Object.assign({}, draft.marks) })); if (p.kind === 'mark') { var bm = JSON.parse(pickerBefore); var pm = bm.marks[p.id]; if (pm && pm.to === '') delete bm.marks[p.id]; pickerBefore = JSON.stringify(bm); } picker = p; }
 
   PP.ready.then(function () {
     ME = window.PPFixtures.ME;
@@ -547,9 +720,22 @@
     SOW = store.sow(crate) || { sow: '', parity: 0 };
     if (!L()) { document.getElementById('screen').innerHTML = ''; return; }
     var own = !q || q === st.crate;
-    if (own && st.draft) draft = Object.assign(draft, JSON.parse(JSON.stringify(st.draft)));
-    else { try { var kept = JSON.parse(sessionStorage.getItem(key()) || 'null'); if (kept) draft = Object.assign(draft, kept); } catch (err) {} }
-    // Arriving on a row (the identity table's row, ?row= its tag, notch or id): the row drawer opens over Edit.
+    var e0 = view === 'edit' ? store.select.edit(store.derived, crate, EMPTY(), stamp()) : null;
+    var resolve = function (d) {
+      Object.keys(d.marks || {}).forEach(function (k) {
+        if (k.charAt(0) !== '@') return;
+        var m = e0.marks.filter(function (x) { return x.dose === k.slice(1); })[0];
+        if (m) d.marks[m.id] = d.marks[k];
+        delete d.marks[k];
+      });
+      return d;
+    };
+    if (view === 'edit') {
+      if (own && st.restore) restore(JSON.parse(JSON.stringify(st.restore)));
+      else if (own && st.draft) draft = Object.assign(EMPTY(), resolve(JSON.parse(JSON.stringify(st.draft))));
+      else { try { var kept = JSON.parse(localStorage.getItem(key()) || 'null'); if (kept) restore(kept); } catch (err) {} }
+    }
+    // Arriving on a row (the identity table's row, ?row= its tag, notch or id): it opens in place.
     var want = qs.get('row') || (own ? st.row : null);
     if (want) { var hit = L().identity.rows.filter(function (r) { return r.rowId === want || r.tag === want || r.notch === want; })[0]; if (hit) rowOpen = hit.rowId; }
     if (own && st.pad && rowOpen) { pad = st.pad; typed = Object.assign({}, st.typed || {}); commitRowTyping(); }

@@ -116,7 +116,9 @@
       });
     } else {
       out.push(U.span(PP.one('pp.common.unit.piglet', r.n), { n: r.n }, { tone: tone }));
-      if (r.deferred) out.push(U.span('pp.common.mark.deferred', { k: r.deferred, reason: why(r.deferReason || 'deferred') }, { tone: tone }));
+      // corrected after End, the rest is a fact (`2 not done · corrected after End`), not a deferral
+      if (r.deferred && r.deferReason === 'not_done') out.push(U.span('pp.common.mark.not_done', { k: r.deferred }, { tone: tone }));
+      else if (r.deferred) out.push(U.span('pp.common.mark.deferred', { k: r.deferred, reason: why(r.deferReason || 'deferred') }, { tone: tone }));
       if (r.product) out.push(U.span('pp.litter.product.' + r.product));
     }
     return '<span class="pp-mark">' + out.join(' ' + U.span('pp.common.sep') + ' ') + '</span>';
