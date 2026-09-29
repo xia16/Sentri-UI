@@ -216,6 +216,56 @@ try {
   assert.match(page.url(), /edge\.html/);
   console.log('ok 14 edge weight drawer: phone Back closes it, stays on the page');
 
+  // 15. The dead drawer's Save hands its receipt to the litter (`saved=dead`, pp-receipt:dead), shown once.
+  await openLitter(page, 'A02', null, true);
+  await page.click('[data-action="open-dead"]');
+  await page.waitForURL(/dead\.html/); await ready(page);
+  await page.click('[data-action="dead-step"][data-value="crushed"][data-step="1"]');
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/litter\.html\?.*saved=dead/); await ready(page);
+  assert.match(await bar(page), /Saved · \+1 crushed/);
+  assert.match(await face(page), /Alive 11 · Dead 2/);
+  await page.reload(); await ready(page);
+  assert.doesNotMatch(await bar(page), /crushed/);              // handed over once, then dropped
+  console.log('ok 15 dead Save → litter receipt:', (await bar(page)).slice(0, 40), '(once)');
+
+  // 16. Drafts other pages keep on this phone show on their doors: Record dead, Set count, identity.
+  await page.click('[data-action="open-dead"]');
+  await page.waitForURL(/dead\.html/); await ready(page);
+  await page.click('[data-action="dead-step"][data-value="crushed"][data-step="1"]');
+  await page.click('[data-action="dead-step"][data-value="crushed"][data-step="1"]');
+  await page.click('[data-action="back"]');
+  await page.waitForURL(/litter\.html/); await ready(page);
+  assert.match(await text(page, '.pp-tools'), /Record dead Set count 2 unsaved/);
+  await page.click('[data-action="open-count"]');
+  await page.waitForURL(/count\.html/); await ready(page);
+  await page.click('[data-action="step"][data-step="-1"]');
+  await page.click('[data-st-context="drawer"] [data-action="back"]');      // the count drawer, then the count face
+  await page.waitForSelector('[data-st-context="drawer"]', { state: 'detached' });
+  await page.waitForTimeout(450);
+  await page.click('[data-action="back"]');
+  await page.waitForURL(/litter\.html/); await ready(page);
+  assert.match(await text(page, '.pp-tools'), /Record dead Set count 2 unsaved 10 counted · not saved/);
+  await page.click('[data-ds="Row"][data-action="open-identity"] >> nth=-1');
+  await page.waitForURL(/id\.html/); await ready(page);
+  await page.click('[data-action="open-run"]');
+  for (const k of '0043') await page.click(`[data-action="numpad"][data-value="tag"][data-key="${k}"]`);
+  await page.click('[data-action="close"]');
+  await page.waitForURL(/litter\.html/); await ready(page);
+  assert.match(await face(page), /Record identity a piglet in hand · not saved/);
+  console.log('ok 16 drafts on the doors: dead 2 unsaved · Set count 10 · identity in hand');
+
+  // 17. edge: Record dead from a litter outside the task comes back to its own face, with the receipt.
+  await openLitter(page, 'E01', null, true);
+  assert.match(page.url(), /edge\.html/);
+  await page.click('[data-action="open-dead"]');
+  await page.waitForURL(/dead\.html\?.*back=edge\.html/); await ready(page);
+  await page.click('[data-action="dead-step"][data-value="crushed"][data-step="1"]');
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/edge\.html\?.*saved=dead/); await ready(page);
+  assert.match(await text(page, '#screen'), /Saved · \+1 crushed/);
+  console.log('ok 17 edge → Record dead → Save → back on edge with the receipt');
+
   await browser.close();
 } finally {
   server.kill();

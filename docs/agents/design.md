@@ -202,6 +202,8 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-litter-all-deferred", "url": "ux/tasks/piglet-processing/litter.html?state=all-deferred", "strict": true },
     { "name": "pp-litter-all-deferred-saved", "url": "ux/tasks/piglet-processing/litter.html?state=all-deferred-saved", "strict": true },
     { "name": "pp-litter-corrected", "url": "ux/tasks/piglet-processing/litter.html?state=corrected", "strict": true },
+    { "name": "pp-litter-dead-saved", "url": "ux/tasks/piglet-processing/litter.html?state=dead-saved", "strict": true },
+    { "name": "pp-litter-drafts-on-doors", "url": "ux/tasks/piglet-processing/litter.html?state=drafts-on-doors", "strict": true },
     { "name": "pp-move-move", "url": "ux/tasks/piglet-processing/move.html?state=move", "strict": true },
     { "name": "pp-move-move-review", "url": "ux/tasks/piglet-processing/move.html?state=move-review", "strict": true },
     { "name": "pp-move-move-into", "url": "ux/tasks/piglet-processing/move.html?state=move-into", "strict": true },

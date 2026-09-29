@@ -68,6 +68,7 @@
   var opt = spec[4] || {};
   var conflict = null;                                       // this phone's weight, kept as a conflict with one set meanwhile
   var saved = null;                                          // receipt after Save
+  var deadRcpt = null;                                       // the dead drawer's receipt, handed over on its Save
   if (opt.dead === 'full') { padHint = 'pp.edge.weight.dead_places'; }
 
   function L() { return store.derived.litters[crate]; }
@@ -141,6 +142,7 @@
     }
     out.push(owed());
     if (x.phase === 'locked') out.push(UI.rowGroup(U.weightRow(weight, crate, TODAY)));
+    if (deadRcpt) out.push(U.receipt(deadRcpt));
     if (saved) out.push(saved.out ? U.receipt([{ id: 'pp.edge.weight.receipt_range', args: { w: saved.w, min: saved.min, max: saved.max }, tone: 'amber' }])
       : U.receipt([{ id: 'pp.edge.weight.receipt', args: { w: saved.w } }]));
     return out.join('');
@@ -212,7 +214,8 @@
       readWeight(); draft = ''; drawer = false; padOpen = false; PP.drawerBack(null); render();
     }
     else if (a === 'close') nav('room.html', { state: 'room', unit: qs.get('unit') });
-    else if (a === 'open-dead') nav('dead.html', { state: 'dead', crate: crate, unit: qs.get('unit') });
+    // the dead drawer comes back to this face (its Back and its Save), not to the litter sheet this litter does not have
+    else if (a === 'open-dead') nav('dead.html', { state: 'dead', crate: crate, unit: qs.get('unit'), back: backHere() });
     else if (a === 'open-move') nav('move.html', { state: 'move', crate: crate });
     else if (a === 'record-treatment') nav('litter.html', { state: 'litter', crate: crate, stay: 1, unit: qs.get('unit') });
     else document.documentElement.setAttribute('data-door', a + ':' + (b.dataset.value || ''));
@@ -224,6 +227,11 @@
       if (padOpen && draft) { padOpen = false; padHint = ''; guardBack(); } else drawer = false;
       render();
     });
+  }
+  function backHere() {
+    var p = new URLSearchParams(location.search);
+    ['saved', 'fresh'].forEach(function (k) { p.delete(k); });
+    return 'edge.html' + (p.toString() ? '?' + p.toString() : '');
   }
   function readWeight() {
     weight = L().birthWeight;
@@ -238,6 +246,9 @@
     if (qs.get('sow')) crate = store.crateOfSow(qs.get('sow')) || crate;
     SOW = store.sow(crate) || { sow: '', parity: 0, weight: null };
     readWeight();
+    if (qs.get('saved') === 'dead' || qs.get('saved') === 'sow') {
+      try { var hr = JSON.parse(sessionStorage.getItem('pp-receipt:dead') || 'null'); sessionStorage.removeItem('pp-receipt:dead'); if (hr && hr.parts) deadRcpt = hr.parts; } catch (e) {}
+    }
     if (opt.saved && weight) { var u0 = usual(liveBorn()); saved = { w: weight.kg, out: +weight.kg < +u0[0] || +weight.kg > +u0[1], min: u0[0], max: u0[1] }; }
     if (drawer) guardBack();
     render();
