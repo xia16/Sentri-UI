@@ -13,14 +13,14 @@ a.innerHTML = UI.rowGroup(
   UI.row({ title: 'Environment', description: '21.4° · 64% humidity', icon: I('temperature') }),
   { title: 'Room 3' }
 );
-// Candidate (ADR 0002): litter rows (code, token lines with colour on the value, one chip), select, two targets, a done row.
+// Candidate (ADR 0002): litter rows (code, token lines with colour on the value, one chip), rowSelect, rowAction, a done row.
 const owed = n => [{ text: 'owed' }, { text: String(n), tone: 'amber' }];
 b.innerHTML = UI.rowGroup(
   UI.row({ code: 'A02', title: ['Iron and tail'], description: ['2h ago', owed(4), 'parity 3'], mono: true, wrap: true, action: 'open-litter', value: 'A02' }) +
   UI.row({ code: 'B04', title: [[{ text: 'Overdue' }, { text: '3 days', tone: 'red' }]], description: ['7 alive', 'parity 5'], mono: true, wrap: true, chip: { text: 'sow died', tone: 'red' }, action: 'open-litter', value: 'B04' }) +
-  UI.row({ code: 'C01', title: ['Iron and tail'], description: [owed(9)], mono: true, select: { checked: true, action: 'toggle' } }) +
-  UI.row({ title: 'Iron and tail', description: 'owed 12', action: 'open-dose', value: 'iron', act: { label: 'Record 12', action: 'record', value: 'iron' } }) +
-  UI.row({ title: 'Iron · 12', description: 'all 12 · 09:14 · G.H · 2 weak kept back, dosed after the count · 10:02 · L.M', wrap: true, rail: 'edit', action: 'open-edit', value: 'iron-done' }),
+  UI.rowSelect({ code: 'C01', title: ['Iron and tail'], description: [owed(9)], mono: true, checked: true, action: 'toggle', value: 'C01' }) +
+  UI.rowAction({ title: 'Iron and tail', description: 'owed 12', action: 'open-dose', value: 'iron', act: { label: 'Record 12', action: 'record', value: 'iron' } }) +
+  UI.row({ title: 'Iron · 12', description: 'all 12 · 09:14 · G.H · 2 weak kept back, dosed after the count · 10:02 · L.M', wrap: true, trail: 'edit', action: 'open-edit', value: 'iron-done' }),
   { title: 'Candidate variants' }
 );
 </script>

@@ -15,12 +15,12 @@
 .demo-bar > .button.primary, .demo-bar > .button.danger { flex: 1; }
 .demo-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-footer-gap); }
 .demo-stack > * + * { margin-top: 8px; }
-.demo-right { display: flex; justify-content: flex-end; }
+.demo-right { display: flex; justify-content: flex-end; gap: var(--space-footer-gap); }
 </style>
 </head>
 <body>
 <!-- Every state of the second design-system candidate batch (ADR 0002), en and zh (?lang=zh): Button registers,
-     the waiting face and hold; ChoiceList radio; Status; Banner; Photos; the Row variants; Log's group line;
+     the waiting face and hold; ChoiceList radio; Status; Banner; Photos; the Row roots; Log's group line;
      Numpad compact. Sample litter: crate B04, 11 alive, day 3. Pressed and focus are drawn with the data-preview hook. -->
 <main class="phone inspection-phone" data-st-context="page">
   <div id="screen"></div>
@@ -34,42 +34,55 @@
   function card(title, states) { return '<section class="demo-card">' + UI.heading({ title: '', kind: 'section', level: 2, strs: { title: D + title } }) + states.join('') + '</section>'; }
   function p(id, args, tone, mono) { return { text: '', tone: tone, mono: mono, strs: { text: id }, args: args ? { text: args } : undefined }; }
   function b(o) { return UI.button(Object.assign({ label: '' }, o, { strs: { label: o.id }, args: o.args ? { label: o.args } : undefined })); }
+  var back = function () { return b({ id: 'act.back', register: 'secondary', action: 'back', className: 'surface-back' }); };
 
   // ---- Button: the four registers, the waiting face, hold ----
-  var bar = '<div class="demo-bar">' + b({ id: 'act.back', register: 'secondary', action: 'back', className: 'surface-back' }) + b({ id: 'act.save', register: 'primary', action: 'save' }) + '</div>';
+  var bar = '<div class="demo-bar">' + back() + b({ id: 'act.save', register: 'primary', action: 'save' }) + '</div>';
   var tools = '<div class="demo-pair">' + b({ id: 'act.record_dead', register: 'tool', action: 'open-dead', value: 'tool-a' }) + b({ id: 'pp.count.title', register: 'tool', action: 'open-count', value: 'tool-b' }) + '</div>';
   var text = '<div class="demo-right">' + b({ id: 'act.clear', register: 'text', action: 'clear', value: 'text-a' }) + '</div>';
-  var waiting = '<div class="demo-bar">' + UI.buttonReason({ id: 'demo-why', text: '', strs: { text: D + 'reason_cause' } }) +
-    b({ id: 'act.back', register: 'secondary', action: 'back', className: 'surface-back' }) + b({ id: 'act.save', register: 'primary', action: 'save', waiting: true, describedby: 'demo-why' }) + '</div>';
-  function hold(phase, cap, capArgs, val, tone, label, labelArgs) {
-    return '<div class="demo-bar">' + b({ id: 'act.back', register: 'secondary', action: 'back', className: 'surface-back' }) +
-      UI.holdButton({ label: '', caption: '', phase: phase, value: val, tone: tone, strs: { label: label || 'pp.end.act.end', caption: cap }, args: { label: labelArgs, caption: capArgs } }) + '</div>';
+  function waiting(key) {
+    return '<div class="demo-bar">' + UI.buttonReason({ id: 'why-' + key, text: '', strs: { text: D + 'reason_cause' } }) +
+      back() + b({ id: 'act.save', register: 'primary', action: 'save', value: key, waiting: true, describedby: 'why-' + key }) + '</div>';
+  }
+  // A hold: its progress echoes in a status line above the bar, outside the thumb's footprint.
+  function hold(o) {
+    var line = 'line-' + o.val;
+    return '<div class="demo-bar">' + UI.buttonReason({ id: line, text: '', strs: o.line ? { text: o.line } : undefined }) + back() +
+      UI.holdButton({ label: '', caption: '', phase: o.phase || 'idle', value: o.val, tone: o.tone, waiting: o.waiting, describedby: o.waiting ? line : '', statusId: o.waiting ? '' : line,
+        strs: { label: o.label || 'pp.end.act.end', caption: o.cap }, args: { label: o.labelArgs } }) + '</div>';
   }
   var button = card('button', [
     st('registers', '<div class="demo-stack">' + bar + tools + text + '</div>'),
     st('tool_states', '<div class="demo-pair">' + b({ id: 'act.record_dead', register: 'tool', action: 'open-dead', value: 'tool-pressed' }) + b({ id: 'pp.count.title', register: 'tool', action: 'open-count', value: 'tool-focus' }) + '</div>'),
-    st('text_states', '<div class="demo-right">' + b({ id: 'act.clear', register: 'text', action: 'clear', value: 'text-pressed' }) + b({ id: 'act.edit', register: 'text', action: 'edit', value: 'text-focus' }) + '</div>'),
-    st('waiting', waiting),
-    st('hold_idle', hold('idle', 'pp.end.hold.caption', null, 'h-idle')),
-    st('hold_holding', hold('holding', 'pp.end.hold.keep', null, 'h-holding')),
-    st('hold_armed', hold('armed', 'ds.c2.hold.again', null, 'h-armed')),
-    st('hold_pending', hold('pending', 'pp.end.hold.pending', null, 'h-pending')),
-    st('hold_primary', hold('idle', 'ds.c2.hold.lock', null, 'h-lock', 'primary', 'fr.act.lock', { n: 14 }))
+    st('text_states', '<div class="demo-right">' + b({ id: 'act.clear', register: 'text', action: 'clear', value: 'text-pressed' }) + b({ id: 'act.edit', register: 'text', action: 'edit', value: 'text-focus' }) + b({ id: 'act.clear', register: 'text', action: 'clear', value: 'text-waiting', waiting: true }) + '</div>'),
+    st('waiting', waiting('w-quiet')),
+    st('waiting_answered', waiting('w-answered')),
+    st('hold_idle', hold({ val: 'h-idle', cap: 'pp.end.hold.caption' })),
+    st('hold_holding', hold({ val: 'h-holding', phase: 'holding', cap: 'pp.end.hold.keep', line: 'pp.end.hold.keep' })),
+    st('hold_armed', hold({ val: 'h-armed', phase: 'armed', cap: 'ds.c2.hold.again', line: 'ds.c2.hold.again' })),
+    st('hold_pending', hold({ val: 'h-pending', phase: 'pending', cap: 'pp.end.hold.pending', line: 'pp.end.hold.pending' })),
+    st('hold_unknown', hold({ val: 'h-unknown', phase: 'unknown', cap: 'ds.c2.hold.unknown', line: 'ds.c2.hold.unknown' })),
+    st('hold_waiting', hold({ val: 'h-waiting', waiting: true, cap: 'pp.end.hold.caption', line: D + 'hold_reason' })),
+    st('hold_primary', hold({ val: 'h-lock', tone: 'primary', cap: 'ds.c2.hold.lock', label: 'fr.act.lock', labelArgs: { n: 14 } }))
   ]);
 
-  // ---- ChoiceList radio: rows (whole row the target) and inline (the Stepper silhouette) ----
+  // ---- ChoiceList radio: 60px rows (whole row the target) and inline (the Stepper silhouette) ----
   var litters = [['A02', 11, 3], ['B04', 12, 3], ['C01', 9, 4]].map(function (r) {
     return { value: r[0], label: r[0], mono: true, meta: '', strs: { label: D + 'code', meta: D + 'litter_meta' }, args: { label: { code: r[0] }, meta: { n: r[1], d: r[2] } } };
   });
   var reasons = ['weak', 'sick', 'small'].map(function (k) { return { value: k, label: '', strs: { label: D + k } }; });
-  function rows(opts, sel, key, title) { return UI.choiceRadios({ label: '', options: opts, selected: sel, action: 'choose', key: key, strs: { label: D + title } }); }
+  function rows(opts, sel, key, title, optional) {
+    return UI.choiceRadios({ label: '', optional: '', options: opts, selected: sel, action: 'choose', key: key,
+      strs: Object.assign({ label: D + title, clear: 'act.clear' }, optional ? { optional: 'ds.field.optional' } : {}) });
+  }
   function sex(sel, key) {
-    return UI.panel(UI.choiceRadios({ layout: 'inline', label: '', optional: '', selected: sel, key: key, action: 'sex', strs: { label: D + 'sex', optional: 'ds.field.optional' },
+    return UI.panel(UI.choiceRadios({ layout: 'inline', label: '', optional: '', selected: sel, key: key, action: 'sex', strs: { label: D + 'sex', optional: 'ds.field.optional', clear: 'act.clear' },
       options: [{ value: 'b', label: '', strs: { label: D + 'boar' } }, { value: 'g', label: '', strs: { label: D + 'gilt' } }] }));
   }
   var radio = card('radio', [
-    st('radio_none', rows(reasons, '', 'why', 'why')),
+    st('radio_none', rows(reasons, '', 'why', 'why', true)),
     st('radio_chosen', rows(litters, 'B04', 'which', 'which')),
+    st('radio_clear', rows(reasons, 'sick', 'why-clear', 'why', true)),
     st('radio_pressed', rows(reasons, 'weak', 'why-pressed', 'why')),
     st('radio_focus', rows(reasons, 'weak', 'why-focus', 'why')),
     st('inline_empty', sex('', 'sex-empty')),
@@ -87,49 +100,54 @@
     UI.statusLine([p(D + 'parity', { n: 3 }), [p(D + 'owed'), p(D + 'n', { n: 4 }, 'amber')]], { sep: 'dot', mono: true }) + '</div>';
   var status = card('status', [st('words', words), st('lines', lines)]);
 
-  // ---- Banner: danger above a hold, a terminal fact, the correction banner ----
+  // ---- Banner: danger above a hold, a terminal fact, the correction banner, Cleared · Undo ----
   var banner = card('banner', [
-    st('danger', UI.banner({ tone: 'danger', headline: '', consequence: '', strs: { headline: 'ds.dead.sow.warn_open', consequence: D + 'sow_consequence' } }) + hold('idle', 'ds.dead.hold', null, 'h-sow', 'danger', 'act.save')),
+    st('danger', UI.banner({ tone: 'danger', headline: '', consequence: '', strs: { headline: 'ds.dead.sow.warn_open', consequence: D + 'sow_consequence' } }) +
+      hold({ val: 'h-sow', cap: 'ds.dead.hold', label: 'act.save' })),
     st('terminal', UI.banner({ tone: 'danger', headline: '', consequence: '', strs: { headline: D + 'sow_died', consequence: D + 'sow_stamp' } })),
     st('correction', UI.banner({ tone: 'correction', headline: '', consequence: '', id: 'demo-edit',
       strs: { headline: D + 'correcting', consequence: D + 'logged_as' }, args: { consequence: { who: 'G.H' } },
       summary: [[p(D + 'stillborn', { a: 1 }), p(D + 'n', { n: 0 }, 'amber')], [p(D + 'alive_from', { a: 10 }), p(D + 'n', { n: 11 }, 'amber')]],
-      actions: [{ label: '', action: 'clear', strs: { label: 'act.clear' } }] }))
+      actions: [{ label: '', action: 'clear', strs: { label: 'act.clear' } }] })),
+    st('cleared_undo', UI.banner({ tone: 'correction', headline: '', consequence: '', id: 'demo-cleared',
+      strs: { headline: D + 'correcting', consequence: D + 'logged_as' }, args: { consequence: { who: 'G.H' } },
+      summary: [p(D + 'cleared')], actions: [{ label: '', action: 'undo-clear', strs: { label: 'ds.c2.undo' } }] }))
   ]);
 
-  // ---- Photos: inactive → live, attached, full ----
-  var pstrs = { label: 'ds.c2.photos.label', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera', thumb: 'ds.c2.aria.thumb', index: 'ds.c2.photos.index' };
+  // ---- Photos: inactive → live, attached (one waiting to upload), full, camera denied ----
+  var pstrs = { label: 'ds.c2.photos.label', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera', thumb: 'ds.c2.aria.thumb', thumbPending: 'ds.c2.aria.thumb_pending', index: 'ds.c2.photos.index' };
   function ph(o, extra) { return UI.photos(Object.assign({ label: '', optional: '', key: o.key }, o, { strs: Object.assign({}, pstrs, extra && extra.strs), args: extra && extra.args })); }
-  function items(n) { var a = []; for (var i = 1; i <= n; i++) a.push({ id: 'p' + i }); return a; }
+  function items(n, pending) { var a = []; for (var i = 1; i <= n; i++) a.push({ id: 'p' + i, pending: i === pending }); return a; }
   var photos = card('photos', [
     st('photos_inactive', ph({ key: 'ph-inactive', active: false, hint: '' }, { strs: { hint: 'ds.c2.photos.inactive' } })),
     st('photos_empty', ph({ key: 'ph-empty' })),
-    st('photos_some', ph({ key: 'ph-some', items: items(3), count: [p('ds.c2.photos.attached', { n: 3 }), p('ds.c2.photos.waiting', { n: 1 }, 'amber')] })),
+    st('photos_some', ph({ key: 'ph-some', items: items(3, 3), count: [p('ds.c2.photos.attached', { n: 3 }), p('ds.c2.photos.waiting', { n: 1 }, 'amber')] })),
     st('photos_full', ph({ key: 'ph-full', items: items(12), count: p('ds.c2.photos.attached', { n: 12 }), hint: '' }, { strs: { hint: 'ds.c2.photos.full' }, args: { hint: { n: 12 } } })),
+    st('photos_error', ph({ key: 'ph-denied', error: 'denied', hint: '' }, { strs: { hint: 'ds.c2.photos.denied' } })),
     st('photos_states', ph({ key: 'ph-states', items: items(2), count: p('ds.c2.photos.attached', { n: 2 }) }))
   ]);
 
-  // ---- Row variants ----
-  function lrow(code, o) {
-    return UI.row(Object.assign({ title: '', code: '', action: 'open-litter', value: code, mono: true, wrap: true, strs: { code: D + 'code' }, args: { code: { code: code } } }, o));
-  }
+  // ---- Row: row (code, token lines, one chip, trail), rowSelect, rowAction ----
+  function codeArgs(code) { return { strs: { code: D + 'code' }, args: { code: { code: code } } }; }
+  function lrow(code, o) { return UI.row(Object.assign({ title: '', code: '', action: 'open-litter', value: code, mono: true, wrap: true }, codeArgs(code), o)); }
+  function srow(code, o) { return UI.rowSelect(Object.assign({ title: '', code: '', value: code, action: 'toggle', mono: true, wrap: true }, codeArgs(code), o)); }
   var litterRows = UI.rowGroup(
     lrow('A02', { title: [p(D + 'iron')], description: [p(D + 'hours', { n: 2 }), [p(D + 'owed'), p(D + 'n', { n: 4 }, 'amber')], p(D + 'parity', { n: 3 })] }) +
     lrow('B04', { title: [[p(D + 'overdue'), p(D + 'days', { n: 3 }, 'red')]], description: [p(D + 'fact_alive', { n: 7 }), p(D + 'parity', { n: 5 })], chip: { text: '', tone: 'red', strs: { text: D + 'w_sow_died' } } }) +
     lrow('C01', { title: [p(D + 'castrate')], description: [p(D + 'fact_alive', { n: 9 }), [p(D + 'owed'), p(D + 'n', { n: 5 }, 'amber')]], chip: { text: '', tone: 'amber', strs: { text: D + 'unlocked' } } }) +
     lrow('D06', { action: '', title: [p(D + 'all_done')], description: [p(D + 'fact_alive', { n: 12 })] }));
   var selectRows = UI.rowGroup(
-    lrow('A02', { select: { checked: true, action: 'toggle' }, title: [p(D + 'iron')], description: [[p(D + 'owed'), p(D + 'n', { n: 4 }, 'amber')]] }) +
-    lrow('C01', { select: { checked: false, action: 'toggle' }, title: [p(D + 'iron')], description: [[p(D + 'owed'), p(D + 'n', { n: 9 }, 'amber')]] }));
-  function txRow(key) {
-    return UI.row({ title: '', description: '', action: 'open-dose', value: key, strs: { title: D + 'iron', description: D + 'owed_n' }, args: { description: { n: 12 } },
-      act: { label: '', action: 'record', value: key, strs: { label: D + 'record_n' }, args: { label: { n: 12 } } } });
+    srow('A02', { checked: true, title: [p(D + 'iron')], description: [[p(D + 'owed'), p(D + 'n', { n: 4 }, 'amber')]] }) +
+    srow('C01', { checked: false, title: [p(D + 'iron')], description: [[p(D + 'owed'), p(D + 'n', { n: 9 }, 'amber')]] }));
+  function txRow(key, busy) {
+    return UI.rowAction({ id: 'tx-' + key, title: '', description: '', action: 'open-dose', value: key, strs: { title: D + 'iron', description: D + 'owed_n' }, args: { description: { n: 12 } },
+      act: { label: '', action: 'record', value: key, busy: busy, strs: { label: busy ? D + 'recording' : D + 'record_n' }, args: { label: { n: 12 } } } });
   }
-  var doneRow = UI.row({ title: '', description: '', action: 'open-edit', value: 'iron-done', rail: 'edit', wrap: true, strs: { title: D + 'iron_done', description: D + 'evidence' } });
+  var doneRow = UI.row({ title: '', description: '', action: 'open-edit', value: 'iron-done', trail: 'edit', wrap: true, strs: { title: D + 'iron_done', description: D + 'evidence' } });
   var row = card('row', [
     st('row_litter', litterRows),
     st('row_select', selectRows),
-    st('row_act', UI.rowGroup(txRow('iron'))),
+    st('row_act', UI.rowGroup(txRow('iron') + txRow('iron-busy', true))),
     st('row_done', UI.rowGroup(doneRow)),
     st('row_states', UI.rowGroup(lrow('A05', { value: 'row-pressed', title: [p(D + 'iron')], description: [[p(D + 'owed'), p(D + 'n', { n: 2 }, 'amber')]] }) + txRow('door-focus')))
   ]);
@@ -145,7 +163,9 @@
   var screen = document.getElementById('screen');
   screen.innerHTML = UI.heading({ title: '', kind: 'page', level: 1, strs: { title: D + 'title' } }) + button + radio + status + banner + photos + row + log + numpad;
   screen.className = 'demo-card';
-  // Pressed, focus and a hold in progress are interaction states; the data-preview hook draws them still.
+  // Live regions mount empty and are filled after (here at once, so the still demo shows them).
+  UI.liveFill(screen, { delay: 0 });
+  // Pressed, focus, a hold in progress and an answered tap are interaction states; the data-preview hook draws them still.
   function mark(sel, state) { var el = screen.querySelector(sel); if (el) el.setAttribute('data-preview', state); }
   mark('[data-value="tool-pressed"]', 'pressed');
   mark('[data-value="tool-focus"]', 'focus');
@@ -159,9 +179,15 @@
   mark('[data-field="ph-states"] .st-photos-camera', 'pressed');
   mark('[data-field="ph-states"] .st-photos-thumb', 'focus');
   mark('.st-row-door[data-value="door-focus"]', 'focus');
-  var pressedRow = screen.querySelector('[data-value="row-pressed"]'); if (pressedRow) pressedRow.setAttribute('data-preview', 'pressed');
-  // The hold is live here: press and hold (or press twice from the keyboard). Nothing is recorded; the demo resets.
-  UI.holdBind(screen, { onCommit: function (el) { setTimeout(function () { el.setAttribute('data-phase', 'idle'); el.removeAttribute('aria-disabled'); }, 1200); } });
+  mark('[data-value="row-pressed"]', 'pressed');
+  var answered = document.getElementById('why-w-answered'); if (answered) answered.setAttribute('data-answer', '');
+  // The live pieces: hold (press and hold, or press twice from the keyboard), the radio keys, the waiting guard.
+  // Nothing is recorded; a hold settles as done and resets after a moment.
+  var t = function (id) { return window.PP ? window.PP.t(id) : id; };
+  var holds = UI.holdBind(screen, { t: t, cues: { keep: 'pp.end.hold.keep', tap: 'ds.dead.hold.keep', released: 'ds.dead.hold.cancel', again: 'ds.c2.hold.again', early: 'ds.c2.hold.again', pending: 'pp.end.hold.pending' },
+    onCommit: function (el) { setTimeout(function () { holds.settle(el, 'failed'); }, 1200); } });
+  UI.radioBind(screen, { onChange: function () {} });
+  screen.addEventListener('click', function (ev) { var c = ev.target.closest('[data-action]'); if (c) UI.guard(c); });
 })();
 </script>
 <script src="/ux/tasks/piglet-processing/shell.js"></script>

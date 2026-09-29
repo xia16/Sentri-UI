@@ -26,33 +26,56 @@ Call `SentriUI.row({ title, description, icon, action, value, trailing, disabled
 
 ## Candidate additions ([ADR 0002](../../adr/0002-candidates-2.md))
 
-**Status: candidate.** These are options on the one Row, not new cards: the room's litter row, the treatment row with a one-tap, the done row whose evidence wraps. Not approved. Without these options the output is byte-for-byte unchanged.
+**Status: candidate.** One row anatomy over **three roots**, split by what the root element is. They share one internal copy (code, title, line 2). They were revised after the design panel and are not approved.
 
-**Options**
-- `code`: a leading mono identifier (`A02`) at `identifier` size, 600, in `ink`, in a column `row-code-min` (40px) wide so codes line up down a list. It takes the icon tile's place; a row has one or the other.
-- `title` and `description` as **token lists** (the Status card's grammar), with colour on the value only: `title: [[{ text: 'Overdue' }, { text: '3 days', tone: 'red' }]]`. A token-list description draws a `muted` `·` between tokens.
+| Call | Root | Use |
+|---|---|---|
+| `row(props)` | `<button>` (with `action`) or `<div>` | The litter row, a done row, every list row. Without the candidate options the output is byte-for-byte unchanged (tested). |
+| `rowSelect(props)` | `<label>` around a checkbox | A bulk pick. |
+| `rowAction(props)` | `<div>` holding two sibling buttons | The treatment row: the copy is the door, the button records in one tap. |
+
+**Shared options** (all three roots)
+- `code`: a leading mono identifier (`A02`) at **`identifier-strong`** (12px/600) in `ink`, in a column `row-code-min` (40px) wide so codes line up down a list. It takes the icon tile's place; `code` and `icon` together warn in development, and the code wins.
+- `title` and `description` as **token lists** (the Status card's grammar), with colour on the value only, at 600: `title: [[{ text: 'Overdue' }, { text: '3 days', tone: 'red' }]]`. A token-list description puts a `muted` `·` text node between tokens.
 - `mono: true`: line 2 in IBM Plex Mono. This is the row law's line 2 (`2h ago · owed 4 · parity 3`: time, then counts, then codes).
-- `chip`: the row's **one** status word (`{ text, tone }`, a Status word at most `chip-max` wide). It is the reason this row needs you first (`sow died`, `unlocked`).
+- `chip`: the row's **one** status word (`{ text, tone }`, a Status word at most `row-chip-max` wide). It is the reason this row needs you first (`sow died`, `unlocked`). `chip` and `trailing` together warn in development, and the chip wins.
 - `wrap: true`: the title and line 2 wrap instead of truncating (evidence, long mono lines). The row grows; it never truncates a record.
-- `rail`: the right end. The default is a chevron when the row has an `action`. `'edit'` draws ✎ (a done row, whose tap opens Edit). `'none'` leaves it empty (the bar acts).
-- `select: { checked, action, value }`: select mode, for a bulk pick. The row is a `<label>` and the trailing slot is ChoiceList's checkbox. There is no chevron, and tapping anywhere toggles.
-- `act: { label, action, value, strs, args }`: **two targets**. The copy becomes the door (`action`, with an inline ›) and a secondary Button on the right acts in one tap (`Record 12`). The root is a `<div>` holding two sibling buttons; they are never nested.
+- `id`: a stable root id.
 
-**Composed shapes** (task-level names for one card)
-- Litter row: `code`, a token `title`, a `mono` token `description`, an optional `chip`, `wrap`.
-- Treatment row: `act`.
-- Evidence row: `wrap` and `rail: 'edit'` on a done row.
+**`row` only**
+- `trail`, **one slot**: `'auto'` (the default: a chevron when the row has an `action`), `'chevron'`, `'edit'` (✎: a done row whose tap opens Edit) or `'none'` (the bar acts). An unknown value warns in development.
+- `trailing`: a **typed** word before the trail (`{ text, tone, strs, args }`). A plain string is the legacy trusted-HTML path, kept for existing callers; new code passes the object.
+
+**`rowSelect` only:** `checked`, `action` (default `select`), `value`. The whole row is the `<label>`, and the trailing slot is ChoiceList's checkbox. There is no chevron.
+
+**`rowAction` only:** `action` and `value` for the door, and `act` for the one-tap: a Button, secondary by default.
+- The act button is **named by its label plus the row title** (`aria-labelledby="<id>-act <id>-title"`), so it reads "Record 12 Iron and tail".
+- `act.busy: true` gives the **pending face** after the first tap (`aria-disabled`, `aria-busy`, the label from the host, such as `Recording 12`) until the host settles; then it re-renders.
 
 **States (additions)**
-- Pressed: a button row and a select row fill `press`. The door of an `act` row fills `press` on its own, and the act button presses as a Button.
-- Focus: a door takes the 3px `focus` ring at 2px offset, inside the row's padding.
-- Selected (select mode): the checkbox is checked, and nothing else changes. Selection is a check, never a fill.
-- Settle: a committed row may take the one shared `green-wash` flash (DS README, Motion). The host sets it.
+- **Pressed:** a button row and a select row fill `press`. The door of a `rowAction` fills `press` on its own, and the act button presses as a Button.
+- **Focus:** a door takes the 3px `focus` ring at 2px offset, inside the row's padding.
+- **Selected** (`rowSelect`): the checkbox is checked, and nothing else changes. Selection is a check, never a fill.
+- **Busy** (`rowAction`): the act's pending face.
+- **Settle:** a committed row may take the one shared `green-wash` flash (DS README, Motion). The host sets it.
+
+**Component contract**
+- **Props:** see the table and the lists above. The TypeScript shapes are `RowProps`, `RowSelectProps` and `RowActionProps`, over the shared `RowCopyProps`.
+- **Events:**
+  - `row`: a click on `<button data-action data-value>`, with the payload `{ value }`.
+  - `rowSelect`: **`change` only**, never click. `SentriUI.rowSelectChange(event)` returns `{ value, checked, action }`, or null for anything else.
+  - `rowAction`: two click targets, the door (`action`) and the act (`act.action`), each with its own `data-value`.
+- **Slots:** the leading code or icon, the title tokens, the line-2 tokens, the chip or trailing word, and the trail. There are no other slots.
+- **Ids:** `id` on the root. A `rowAction` also writes `<id>-title` and `<id>-act`, generated when no `id` is given.
 
 **Don'ts**
-- Don't put two chips on a row, or say in the chip what line 2 already says.
+- Don't put two chips on a row, or a chip beside a trailing word, or say in the chip what line 2 already says.
 - Don't colour a whole token when its value can carry the colour.
-- Don't put icons on list rows (RULINGS: no icons on list rows). The ✎ rail is the one closed-vocabulary glyph.
+- Don't nest a button in a button. The two targets of `rowAction` are siblings.
+- Don't put icons on list rows (RULINGS: no icons on list rows). The ✎ trail is the one closed-vocabulary glyph.
 
 **Strings (additions)**
-`strs: { code }` and `args: { code }`. Token parts take their own `strs: { text }` and `args: { text }`. `chip` takes Status's `strs: { text }`, and `act` takes Button's `strs: { label }`.
+- `strs: { code }` and `args: { code }`.
+- Token parts take their own `strs: { text }` and `args: { text }`.
+- `chip` and a typed `trailing` take Status's `strs: { text }`; `act` takes Button's `strs: { label }`.
+- The separator is `ds.sep`.

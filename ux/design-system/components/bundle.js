@@ -92,33 +92,53 @@
   function rowGroup(content,{title='',level=5,className='',strs,args}={}){
     return panel((title||has({strs},'title')?heading({title,kind:'group',level,className:'st-row-group-label',strs,args}):'')+content,{className:'st-row-group '+className,ds:'Row'});
   }
-  /* Candidate (ADR 0002) row options: code (leading mono identifier), title/description as token lists with colour on
-     the value, mono (the row law's line 2), chip (one Status word), wrap, rail ('edit' = the ✎ of a done row, 'none'),
-     select (a checkbox trail on a <label>), act (a second, one-tap target: the copy is the door, the button acts).
+  /* Row (candidate additions, ADR 0002). Three roots over one copy: row (a button or a div), rowSelect (a <label> with a
+     checkbox), rowAction (two sibling targets). Candidate options: code, token-list title/description (colour on the
+     value), mono, chip, wrap, trail ('auto' · 'chevron' · 'edit' · 'none'), typed trailing ({ text, tone }), id.
      Without them the output is unchanged. */
-  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',attrs={},strs,args,code='',mono=false,chip=null,wrap=false,rail='',select=null,act=null,tight=false}={}){
-    const o={strs,args};
-    const safeAttrs=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
-    // With strs.trailing the value is plain fallback text (escaped); without it, trailing stays trusted raw HTML.
-    const trail=has(o,'trailing')?`<span class="st-row-trailing">${tx(trailing,o,'trailing')}</span>`:trailing?`<span class="st-row-trailing">${trailing}</span>`:'';
+  function rowCopy({title,description,code,mono,tight,o,titleId=''}){
     const tList=Array.isArray(title),dList=Array.isArray(description);
     const titleHtml=tList?toks(title,{tight}):tx(title,o,'title');
     const showDesc=dList?description.length>0:(description||has(o,'description'));
-    const small=showDesc?`<small${mono?' data-mono=""':''}${dList?' data-sep="dot"':''}>${dList?toks(description,{tight,dot:true}):tx(description,o,'description')}</small>`:'';
+    const small=showDesc?`<small${mono?' data-mono=""':''}>${dList?toks(description,{tight,dot:true}):tx(description,o,'description')}</small>`:'';
     const codeHtml=code||has(o,'code')?`<span class="st-row-code">${tx(code,o,'code')}</span>`:'';
-    const chipHtml=chip?status(Object.assign({},chip,{className:'st-row-chip'})):'';
-    const wrapAttr=wrap?' data-wrap=""':'';
-    const edit=`<span class="st-row-chevron" data-rail="edit">${glyph('edit')}</span>`;
-    if(select){
-      return `<label class="st-row ${esc(className)}" data-ds="Row" data-select=""${wrapAttr}${safeAttrs}>${codeHtml}<span class="st-row-copy"><strong>${titleHtml}</strong>${small}</span>${chipHtml}<span class="st-choice-trail"><input type="checkbox" data-action="${esc(select.action||'select')}" value="${esc(select.value!=null?select.value:value)}"${select.checked?' checked':''}></span></label>`;
-    }
-    if(act){
-      const door=`<button type="button" class="st-row-door" data-action="${esc(action)}" data-value="${esc(value)}">${codeHtml}<span class="st-row-copy"><strong>${titleHtml}<span class="st-row-door-chevron">${arrow}</span></strong>${small}</span></button>`;
-      return `<div class="st-row ${esc(className)}" data-ds="Row" data-act=""${wrapAttr}${safeAttrs}>${door}${chipHtml}${button(Object.assign({register:'secondary'},act))}</div>`;
-    }
+    return {codeHtml,titleHtml,small,strong:inner=>`<strong${titleId?` id="${esc(titleId)}"`:''}>${titleHtml}${inner||''}</strong>`};
+  }
+  const safeAttr=attrs=>Object.entries(attrs||{}).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
+  function rowChip(chip,trailing,card){
+    if(chip&&trailing)warn(card,'chip and trailing together: a row says one thing on the right; the chip wins');
+    return chip?status(Object.assign({},chip,{className:'st-row-chip'})):'';
+  }
+  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',trail='auto',attrs={},strs,args,code='',mono=false,chip=null,wrap=false,tight=false,id=''}={}){
+    const o={strs,args};
+    if(code&&icon)warn('Row','code and icon together: a row leads with one; the code wins');
+    const tr=oneOf('Row','trail',trail,['auto','chevron','edit','none'],'auto');
+    const typed=trailing&&typeof trailing==='object';
+    // With strs.trailing the value is plain fallback text (escaped); a string without it stays legacy trusted HTML.
+    const trailHtml=chip?'':typed?`<span class="st-row-trailing">${part(trailing)}</span>`:has(o,'trailing')?`<span class="st-row-trailing">${tx(trailing,o,'trailing')}</span>`:trailing?`<span class="st-row-trailing">${trailing}</span>`:'';
+    const c=rowCopy({title,description,code,mono,tight,o});
     const tag=action?'button':'div';
-    const railHtml=rail==='edit'?edit:action&&rail!=='none'?`<span class="st-row-chevron">${arrow}</span>`:'';
-    return `<${tag} class="st-row ${esc(className)}" data-ds="Row"${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrapAttr}${safeAttrs}>${icon?`<span class="st-row-icon">${icon}</span>`:''}${codeHtml}<span class="st-row-copy"><strong>${titleHtml}</strong>${small}</span>${chipHtml}${trail}${railHtml}</${tag}>`;
+    const railHtml=tr==='edit'?`<span class="st-row-chevron" data-rail="edit">${glyph('edit')}</span>`:(tr==='chevron'||(tr==='auto'&&action))?`<span class="st-row-chevron">${arrow}</span>`:'';
+    return `<${tag} class="st-row ${esc(className)}" data-ds="Row"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${icon&&!code?`<span class="st-row-icon">${icon}</span>`:''}${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${rowChip(chip,trailing,'Row')}${trailHtml}${railHtml}</${tag}>`;
+  }
+  /* rowSelect: a bulk pick. The whole row is a <label>; the payload is change-only: rowSelectChange(event) → { value, checked }. */
+  function rowSelect({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,checked=false,action='select',value='',id='',className='',attrs={},strs,args}={}){
+    const o={strs,args},c=rowCopy({title,description,code,mono,tight,o});
+    return `<label class="st-row ${esc(className)}" data-ds="Row" data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${rowChip(chip,'','Row')}<span class="st-choice-trail"><input type="checkbox" data-action="${esc(action)}" value="${esc(value)}"${checked?' checked':''}></span></label>`;
+  }
+  function rowSelectChange(ev){
+    const t=ev&&ev.target;
+    if(!t||t.type!=='checkbox'||!(t.closest&&t.closest('.st-row[data-select]')))return null;
+    return {value:t.value,checked:!!t.checked,action:t.getAttribute('data-action')};
+  }
+  /* rowAction: two sibling targets. The copy is the door (action, an inline ›); the act button records in one tap. The act
+     button is named by its label plus the row title. act.pending: the pending face after the first tap, until the host settles. */
+  function rowAction({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,action='',value='',act={},id='',className='',attrs={},strs,args}={}){
+    const o={strs,args},rid=id||fieldId('st-row'),tid=rid+'-title',aid=rid+'-act';
+    const c=rowCopy({title,description,code,mono,tight,o,titleId:tid});
+    const door=`<button type="button" class="st-row-door" data-action="${esc(action)}" data-value="${esc(value)}">${c.codeHtml}<span class="st-row-copy">${c.strong(`<span class="st-row-door-chevron">${arrow}</span>`)}${c.small}</span></button>`;
+    const btn=button(Object.assign({register:'secondary'},act,{id:aid,labelledby:`${aid} ${tid}`}));
+    return `<div class="st-row ${esc(className)}" data-ds="Row" data-act="" id="${esc(rid)}"${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${door}${rowChip(chip,'','Row')}${btn}</div>`;
   }
   /* groups: [{label, strs:{label}, args:{label}, entries:[{category,title,detail,meta,strs:{…},args:{…}}]}]; options.strs.empty for the empty line. */
   function log(groups,{className='',empty='No activity recorded yet',strs,args}={}){
@@ -180,11 +200,11 @@
   }
   // lead: optional control between heading and panel (e.g. a segment that filters only this group).
   // radio (candidate, ADR 0002): the panel is the radiogroup, labelled by the heading.
-  function choiceGroup(rows,{title='',lead='',className='',radio=false,id='',strs,args}={}){
+  function choiceGroup(rows,{title='',lead='',className='',radio=false,aside='',id='',strs,args}={}){
     const body=Array.isArray(rows)?rows.join(''):rows;
     const showTitle=title||has({strs},'title');
     const hid=radio&&showTitle?(id||fieldId('st-choice'))+'-title':'';
-    return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${tx(title,{strs,args},'title')}</h5>`:''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
+    return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
   }
   function choiceSearch({label='Search',placeholder='',value='',attrs={}}={}){
     const extra=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
@@ -368,128 +388,273 @@
     };
   }
   /* ---- Design-system candidates 2 (candidate, ADR 0002): Status, Banner, Photos, the Button factory with its
-     text / tool registers, waiting face and hold, ChoiceList radio. ----
+     text / tool registers, waiting face and hold, ChoiceList radio, the Row roots. ----
      Colour lives on the value, the word stays ink (RULINGS, 2026-09-03). A part is a string or
      { text, tone, mono, strs:{text}, args:{text} }; a token is a part or a list of parts (a word and its value);
-     tone is amber · progress · green · red · muted and colours only that part. */
+     tone is amber · progress · green · red · muted and colours only that part (at 600). */
+  const isDev=()=>!!(root.SentriUIDev||(root.location&&/^(localhost|127\.0\.0\.1|\[::1\])$/.test(root.location.hostname||'')));
+  function warn(card,msg){if(isDev()&&root.console&&root.console.warn)root.console.warn(`[SentriUI ${card}] ${msg}`);}
+  function oneOf(card,prop,v,list,def){if(v==null||v==='')return def;if(!list.includes(v)){warn(card,`${prop}: unknown value "${v}", using "${def}"`);return def;}return v;}
   const TONES=['amber','progress','green','red','muted'];
-  const toneOf=t=>TONES.includes(t)?t:'';
+  const toneOf=(t,card='Status')=>t==null||t===''?'':oneOf(card,'tone',t,TONES,'');
   function part(p){
     if(p==null||p==='')return '';
     if(typeof p!=='object')return esc(p);
     const t=toneOf(p.tone),inner=tx(p.text,p,'text');
     return t||p.mono?`<span class="st-part"${t?` data-tone="${t}"`:''}${p.mono?' data-mono=""':''}>${inner}</span>`:inner;
   }
-  // tokens: each is wrapped so a container with data-sep="dot" draws the `·` between them; parts in a token join by a space
-  // (tight: no space, for zh strings that carry none).
+  // The `·` between tokens is a real text node, styled (never a pseudo-element), so it copies and reads.
+  const SEP='<span class="st-sep" data-str="ds.sep">·</span>';
   function toks(list,{tight=false,dot=false}={}){
-    return (list||[]).filter(t=>t!=null&&t!=='').map(t=>`<span class="st-tok">${Array.isArray(t)?t.map(part).join(tight?'':' '):part(t)}</span>`).join(tight||dot?'':' ');
+    return (list||[]).filter(t=>t!=null&&t!=='').map(t=>`<span class="st-tok">${Array.isArray(t)?t.map(part).join(tight?'':' '):part(t)}</span>`).join(dot?SEP:tight?'':' ');
+  }
+  /* A live region is mounted empty and filled afterwards: content inserted with the region is not announced.
+     The card writes the content into a <template> inside the region; liveFill(root) moves it in (clear, then set). */
+  const live=(tag,attrs,html)=>`<${tag}${attrs} role="status" aria-live="polite" aria-atomic="true" data-live=""><template>${html}</template></${tag}>`;
+  function announce(el,html,{delay=60,then}={}){
+    if(!el)return;
+    el.innerHTML='';
+    const set=()=>{el.innerHTML=html;if(then)then(el);};
+    if(delay<=0)set();else setTimeout(set,delay);
+  }
+  function liveFill(scope,{delay=60,then}={}){
+    (scope&&scope.querySelectorAll?Array.from(scope.querySelectorAll('[data-live]')):[]).forEach(el=>{
+      const tpl=el.querySelector(':scope > template');
+      if(tpl)announce(el,tpl.innerHTML,{delay,then});
+    });
   }
   /* Status · word: a coloured state word with a 4px dot (`due now`, `sow died`) — never a filled badge. */
-  function status({text='',tone='muted',className='',strs,args}={}){
-    return `<span class="st-status ${esc(className)}" data-ds="Status" data-tone="${toneOf(tone)||'muted'}">${tx(text,{strs,args},'text')}</span>`;
+  function status({text='',tone='muted',id='',className='',strs,args}={}){
+    return `<span class="st-status ${esc(className)}" data-ds="Status"${id?` id="${esc(id)}"`:''} data-tone="${toneOf(tone)||'muted'}">${tx(text,{strs,args},'text')}</span>`;
   }
+  /* The tokens as HTML, for announce() into a region the host already holds. */
+  function statusText(tokens,{sep='',tight=false}={}){return toks(tokens,{tight,dot:sep==='dot'});}
   /* Status · line: one body line whose values carry the colour (the receipt: `Saved · +4 this visit`).
-     live: a persistent role=status region the host patches in place. sep 'dot' draws `·` between tokens. */
-  function statusLine(tokens,{live=false,sep='',mono=false,tight=false,id='',className=''}={}){
-    return `<p class="st-status-line ${esc(className)}" data-ds="Status"${id?` id="${esc(id)}"`:''}${live?' role="status" aria-live="polite"':''}${mono?' data-mono=""':''}${sep==='dot'?' data-sep="dot"':''}>${toks(tokens,{tight,dot:sep==='dot'})}</p>`;
+     live: a persistent role=status region, mounted empty and filled by liveFill (or announce). */
+  function statusLine(tokens,{live:isLive=false,sep='',mono=false,tight=false,id='',className=''}={}){
+    const s=oneOf('Status','sep',sep,['dot',''],'');
+    const attrs=` class="st-status-line ${esc(className)}" data-ds="Status"${id?` id="${esc(id)}"`:''}${mono?' data-mono=""':''}`;
+    const html=toks(tokens,{tight,dot:s==='dot'});
+    return isLive?live('p',attrs,html):`<p${attrs}>${html}</p>`;
   }
   /* Banner: a headline over its consequence, on a wash. tone 'danger' (red: an irreversible act or a terminal
-     fact) or 'correction' (amber wash: Edit's banner, with a live change summary and the Clear text action). */
-  function banner({tone='danger',headline='',consequence='',summary=null,actions=[],live=false,id='',className='',strs,args}={}){
-    const o={strs,args},t=tone==='correction'?'correction':'danger';
+     fact) or 'correction' (a strong amber wash with an amber border: Edit's banner, with a live change summary and
+     Clear, then `Cleared · Undo`). One live region per banner: the summary when there is one, else the banner itself. */
+  function banner({tone='danger',headline='',consequence='',summary=null,actions=[],live:isLive=false,id='',className='',strs,args}={}){
+    const o={strs,args},t=oneOf('Banner','tone',tone,['danger','correction'],'danger');
+    const bid=id||fieldId('st-banner');
     const cons=consequence||has(o,'consequence')?`<span class="st-banner-consequence">${tx(consequence,o,'consequence')}</span>`:'';
-    const sumHtml=summary==null?'':Array.isArray(summary)?toks(summary,{dot:true}):tx(summary,o,'summary');
-    const sum=summary==null&&!has(o,'summary')?'':`<div class="st-banner-summary"><p class="st-banner-summary-text"${id?` id="${esc(id)}-summary"`:''} role="status" aria-live="polite"${Array.isArray(summary)?' data-sep="dot"':''}>${sumHtml}</p>${textActions(actions,'')}</div>`;
-    return `<div class="st-banner ${esc(className)}" data-ds="Banner" data-tone="${t}"${id?` id="${esc(id)}"`:''}${live?' role="status" aria-live="polite"':''}><strong class="st-banner-headline">${tx(headline,o,'headline')}</strong>${cons}${sum}</div>`;
+    const hasSum=summary!=null||has(o,'summary');
+    const sumHtml=summary==null?tx('',o,'summary'):Array.isArray(summary)?toks(summary,{dot:true}):tx(summary,o,'summary');
+    const sum=hasSum?`<div class="st-banner-summary">${live('p',` class="st-banner-summary-text" id="${esc(bid)}-summary"`,sumHtml)}${textActions(actions,'')}</div>`:'';
+    const body=`<strong class="st-banner-headline">${tx(headline,o,'headline')}</strong>${cons}`;
+    if(isLive&&hasSum)warn('Banner','live and summary together: the summary is the one live region');
+    const attrs=` class="st-banner ${esc(className)}" data-ds="Banner" data-tone="${t}" id="${esc(bid)}"`;
+    return isLive&&!hasSum?live('div',attrs,body):`<div${attrs}>${body}${sum}</div>`;
   }
-  /* Photos: the record's photo field — a well card, the label and the camera circle on one 44px row, thumbnails
-     beneath it. Inactive until there is something to attach to (the camera is floor-gray: aria-disabled, still
-     tappable, answered in the hint). At max the camera grays the same way. Thumbnails open the viewer. */
-  function photos({label='Photos',optional='',count=null,active=true,items=[],max=12,action='photo-add',viewAction='photo-view',key='photos',hint='',id='',className='',strs,args}={}){
+  /* Photos: the record's photo field — a well card, the label and the camera circle on one 44px row, the answer line
+     under it, thumbnails beneath. Inactive until there is something to attach to; at max the camera grays the same way
+     (floor-gray: aria-disabled, still tappable, data-reason says why, answered in the line). Thumbnails open the viewer.
+     error: 'denied' (camera permission) · 'too-large' — answered amber; a cancelled capture says nothing. */
+  function photos({label='Photos',optional='',count=null,active=true,items=[],max=12,action='photo-add',viewAction='photo-view',key='photos',hint='',error='',id='',className='',strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{},pid=id||fieldId('st-photos'),hid=pid+'-hint',lid=pid+'-label';
-    const list=items||[],full=list.length>=max,gray=!active||full;
-    const countHtml=count==null?'':`<small class="st-photos-count"${Array.isArray(count)?' data-sep="dot"':''}>${Array.isArray(count)?toks(count,{dot:true}):part(count)}</small>`;
-    const head=`<div class="st-photos-head"><span class="st-photos-label" id="${esc(lid)}"><span${sa(s.label,a.label)}>${esc(label)}</span>${optional||has(o,'optional')?`<small>${tx(optional,o,'optional')}</small>`:''}${countHtml}</span><button type="button" class="st-photos-camera" data-action="${esc(action)}" data-value="${esc(key)}" aria-describedby="${esc(hid)}"${gray?' aria-disabled="true"':''}${ariaText('Take a photo',s.camera,a.camera)}>${glyph('camera')}</button></div>`;
-    const thumbs=list.length?`<ul class="st-photos-items" aria-labelledby="${esc(lid)}">${list.map((it,i)=>`<li><button type="button" class="st-photos-thumb" data-action="${esc(viewAction)}" data-value="${esc(it.id!=null?it.id:i)}"${ariaText(it.alt||`Photo ${i+1}`,s.thumb,{n:i+1})}>${it.src?`<img src="${esc(it.src)}" alt="">`:`<span class="st-photos-index"${sa(s.index,{n:i+1})}>${i+1}</span>`}</button></li>`).join('')}</ul>`:'';
-    return `<div class="st-photos ${esc(className)}" data-ds="Photos" data-field="${esc(key)}"${!active?' data-inactive=""':''}${full?' data-full=""':''}>${head}${thumbs}${hintLine('st-photos-hint',{id:hid,text:hint,o})}</div>`;
+    const err=oneOf('Photos','error',error,['denied','too-large','cancelled'],'');
+    const list=items||[],full=list.length>=max,reason=!active?'inactive':full?'full':'';
+    const countHtml=count==null?'':`<small class="st-photos-count">${Array.isArray(count)?toks(count,{dot:true}):part(count)}</small>`;
+    const head=`<div class="st-photos-head"><span class="st-photos-label" id="${esc(lid)}"><span${sa(s.label,a.label)}>${esc(label)}</span>${optional||has(o,'optional')?`<small>${tx(optional,o,'optional')}</small>`:''}${countHtml}</span><button type="button" class="st-photos-camera" id="${esc(pid)}-camera" data-action="${esc(action)}" data-value="${esc(key)}" aria-describedby="${esc(hid)}"${reason?` aria-disabled="true" data-reason="${reason}"`:''}${ariaText('Take a photo',s.camera,a.camera)}>${glyph('camera')}</button></div>`;
+    const thumb=(it,i)=>`<li><button type="button" class="st-photos-thumb" id="${esc(pid)}-thumb-${i+1}" data-action="${esc(viewAction)}" data-value="${esc(it.id!=null?it.id:i)}"${it.pending?' data-pending=""':''}${ariaText(it.alt||`Photo ${i+1}${it.pending?' · waiting to upload':''}`,it.pending?s.thumbPending:s.thumb,{n:i+1})}>${it.src?`<img src="${esc(it.src)}" alt="">`:`<span class="st-photos-index"${sa(s.index,{n:i+1})}>${i+1}</span>`}</button></li>`;
+    const thumbs=list.length?`<ul class="st-photos-items" aria-labelledby="${esc(lid)}">${list.map(thumb).join('')}</ul>`:'';
+    const hl=hintLine('st-photos-hint',{id:hid,text:err==='cancelled'?'':hint,tone:err&&err!=='cancelled'?'warn':'',o});
+    return `<div class="st-photos ${esc(className)}" data-ds="Photos" id="${esc(pid)}" data-field="${esc(key)}"${!active?' data-inactive=""':''}${full?' data-full=""':''}${err?` data-error="${err}"`:''}>${head}${hl}${thumbs}</div>`;
   }
   /* Button, as a factory. Registers (RULINGS, three button registers + the text action): primary (the one commit,
      ink) · secondary (an exit, outlined) · tool (a mid-sheet act, a soft well, no border) · text (the quietest: a bare
-     word, 13px, no container, ≥44px) · danger · end-early. waiting: the waiting face — present, quiet, focusable
-     (aria-disabled, never disabled); the tap reaches the host, which answers in a buttonReason line. */
+     word, 13/700 ink-2, no container, ≥44px) · danger · end-early. waiting: the waiting face — present, quiet,
+     focusable (aria-disabled, never disabled); guard() answers its tap. busy: sent, until the host settles. */
   const REGISTER={primary:'button primary',secondary:'button secondary',tool:'button tool',danger:'button danger','end-early':'button task-end-early'};
-  function button({label='',register='secondary',action='',value='',waiting=false,describedby='',attrs={},className='',strs,args}={}){
-    const o={strs,args},r=register==='text'||REGISTER[register]?register:'secondary';
-    const safe=Object.entries(attrs||{}).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
+  function button({label='',register='secondary',action='',value='',waiting=false,busy=false,describedby='',labelledby='',id='',attrs={},className='',strs,args}={}){
+    const o={strs,args},r=oneOf('Button','register',register,['primary','secondary','tool','text','danger','end-early'],'secondary');
     const cls=r==='text'?'st-text-action':REGISTER[r];
-    return `<button type="button" class="${cls}${className?' '+esc(className):''}" data-ds="Button" data-register="${r}" data-action="${esc(action)}" data-value="${esc(value)}"${waiting?' aria-disabled="true"':''}${describedby?` aria-describedby="${esc(describedby)}"`:''}${safe}>${tx(label,o,'label')}</button>`;
+    return `<button type="button" class="${cls}${className?' '+esc(className):''}" data-ds="Button" data-register="${r}"${id?` id="${esc(id)}"`:''} data-action="${esc(action)}" data-value="${esc(value)}"${waiting||busy?' aria-disabled="true"':''}${busy?' aria-busy="true" data-busy=""':''}${describedby?` aria-describedby="${esc(describedby)}"`:''}${labelledby?` aria-labelledby="${esc(labelledby)}"`:''}${safeAttr(attrs)}>${tx(label,o,'label')}</button>`;
   }
-  /* The reason a waiting button waits (or a refused tap's answer), one persistent status line beside the bar. */
+  /* The reason a waiting button waits, one persistent status line beside the bar (row-title size). */
   function buttonReason({text='',id='',actions=[],className='',strs,args}={}){
     const o={strs,args},show=text||has(o,'text');
     return `<p class="st-field-hint st-button-reason ${esc(className)}" data-ds="Button"${id?` id="${esc(id)}"`:''} role="status" aria-live="polite" data-tone="muted">${show?`<span class="st-field-hint-text">${tx(text,o,'text')}</span>`:''}${textActions(actions,'')}</p>`;
   }
-  /* Hold-to-commit (Button `hold`): the suite's irreversible acts (Lock born N, the sow's death, End task).
-     phase idle · holding (the sweep runs for hold-commit) · armed (keyboard: the second press commits) · pending (sent).
-     The caption under the verb is the button's own live line; the host sets it per phase. */
-  function holdButton({label='',caption='',action='hold',value='',tone='danger',phase='idle',id='',className='',strs,args}={}){
-    const o={strs,args},bid=id||fieldId('st-hold'),cid=bid+'-caption';
-    const p=['idle','holding','armed','pending'].includes(phase)?phase:'idle';
-    return `<button type="button" class="button ${tone==='primary'?'primary':'danger'} st-hold${className?' '+esc(className):''}" id="${esc(bid)}" data-ds="Button" data-register="hold" data-action="${esc(action)}" data-value="${esc(value)}" data-phase="${p}" aria-describedby="${esc(cid)}"${p==='pending'?' aria-disabled="true" aria-busy="true"':''}><span class="st-hold-label">${tx(label,o,'label')}</span><small class="st-hold-caption" id="${esc(cid)}" aria-live="polite">${tx(caption,o,'caption')}</small></button>`;
+  /* The shared guard for delegated clicks: true when the control is aria-disabled (waiting, busy, floor-gray). It answers
+     the tap: every status line the control is described by flashes (data-answer) and re-announces (clear, then set). */
+  function guard(el,{answer=true,flash=1200}={}){
+    if(!el||!el.getAttribute||el.getAttribute('aria-disabled')!=='true')return false;
+    if(answer&&root.document){
+      (el.getAttribute('aria-describedby')||'').split(/\s+/).filter(Boolean).forEach(rid=>{
+        const r=root.document.getElementById(rid);if(!r||!/status/.test(r.getAttribute('role')||''))return;
+        announce(r,r.innerHTML);r.setAttribute('data-answer','');clearTimeout(r._stAnswer);r._stAnswer=setTimeout(()=>r.removeAttribute('data-answer'),flash);
+      });
+    }
+    return true;
   }
-  /* The hold's rules, pure. event: 'down' · 'up' (with held ms) · 'leave' · 'cancel' · 'blur' · 'escape' · 'elapsed'
-     (hold-commit ran out) · 'key' (a keyboard or switch press) · 'timeout' (hold-arm ran out) · 'done' · 'failed'.
-     Returns { phase, commit, cue }: commit is true exactly once; cue names what the caption should say
-     ('keep' holding · 'tap' a tap, not a hold · 'released' · 'again' press again · null). */
-  function holdStep(state,event){
-    const phase=(state&&state.phase)||'idle',ev=typeof event==='string'?{type:event}:(event||{});
-    const out=(p,commit=false,cue=null)=>({phase:p,commit,cue});
-    if(phase==='pending')return ev.type==='done'||ev.type==='failed'?out('idle'):out('pending');
+  /* Hold-to-commit (Button `hold`): the suite's irreversible acts (Lock born N, the sow's death, End task).
+     phase idle · holding (the sweep runs for hold-commit) · armed (keyboard: a second press ≥ minArm later commits) ·
+     pending (sent) · done · unknown (the answer never came: never idle again — an irreversible act is not re-offered).
+     statusId: a status line outside the thumb's footprint (above the bar) that echoes the progress. */
+  const HOLD=Object.freeze({commit:850,arm:5000,minArm:400,slop:20,vibrateCommit:40,vibrateRelease:[15,60,15]});
+  const HOLD_PHASES=['idle','holding','armed','pending','done','unknown'];
+  function holdButton({label='',caption='',action='hold',value='',tone='danger',phase='idle',waiting=false,describedby='',statusId='',id='',className='',strs,args}={}){
+    const o={strs,args},bid=id||fieldId('st-hold'),cid=bid+'-caption';
+    const p=oneOf('Button','phase',phase,HOLD_PHASES,'idle'),t=oneOf('Button','tone',tone,['danger','primary'],'danger');
+    const off=waiting||['pending','done','unknown'].includes(p);
+    const desc=[cid,statusId,describedby].filter(Boolean).join(' ');
+    return `<button type="button" class="button ${t} st-hold${className?' '+esc(className):''}" id="${esc(bid)}" data-ds="Button" data-register="hold" data-action="${esc(action)}" data-value="${esc(value)}" data-phase="${p}"${waiting?' data-waiting=""':''}${statusId?` data-hold-status="${esc(statusId)}"`:''} aria-describedby="${esc(desc)}"${off?' aria-disabled="true"':''}${p==='pending'?' aria-busy="true"':''}><span class="st-hold-label">${tx(label,o,'label')}</span><small class="st-hold-caption" id="${esc(cid)}">${tx(caption,o,'caption')}</small></button>`;
+  }
+  /* The hold's rules, pure. state { phase, armedAt }. event: 'down' · { type:'up', held } · 'leave' · 'cancel' · 'blur' ·
+     'escape' · 'elapsed' · { type:'key', at, repeat } · 'timeout' · { type:'settle', outcome:'done'|'failed'|'unknown' }.
+     Returns { phase, armedAt, commit, cue }: commit is true exactly once. A repeated key (held Enter) is ignored, and a
+     second press sooner than minArm after arming is answered ('early') and does not commit. */
+  function holdStep(state,event,{minArm=HOLD.minArm}={}){
+    const phase=(state&&state.phase)||'idle',armedAt=state&&state.armedAt!=null?state.armedAt:null;
+    const ev=typeof event==='string'?{type:event}:(event||{});
+    const out=(p,commit=false,cue=null,at=null)=>({phase:p,armedAt:at,commit,cue});
+    if(phase==='done'||phase==='unknown')return out(phase);
+    if(phase==='pending'){
+      if(ev.type!=='settle')return out('pending');
+      return ev.outcome==='done'?out('done',false,'done'):ev.outcome==='failed'?out('idle',false,'failed'):out('unknown',false,'unknown');
+    }
     switch(ev.type){
       case 'down':return phase==='holding'?out('holding'):out('holding',false,'keep');
-      case 'elapsed':return phase==='holding'?out('pending',true):out(phase);
-      case 'up':return phase==='holding'?out('idle',false,(ev.held||0)<300?'tap':'released'):out(phase);
-      case 'leave':case 'cancel':case 'blur':case 'escape':return phase==='holding'||phase==='armed'?out('idle',false,phase==='holding'?'released':null):out(phase);
-      case 'key':return phase==='armed'?out('pending',true):phase==='idle'?out('armed',false,'again'):out(phase);
-      case 'timeout':return phase==='armed'?out('idle'):out(phase);
-      default:return out(phase);
+      case 'elapsed':return phase==='holding'?out('pending',true,'pending'):out(phase,false,null,armedAt);
+      case 'up':return phase==='holding'?out('idle',false,(ev.held||0)<300?'tap':'released'):out(phase,false,null,armedAt);
+      case 'leave':case 'cancel':case 'blur':case 'escape':
+        return phase==='holding'?out('idle',false,'released'):phase==='armed'?out('idle',false,'disarmed'):out(phase);
+      case 'key':
+        if(ev.repeat)return out(phase,false,null,armedAt);
+        if(phase==='idle')return out('armed',false,'again',ev.at!=null?ev.at:0);
+        if(phase==='armed'){
+          if(armedAt!=null&&ev.at!=null&&ev.at-armedAt<minArm)return out('armed',false,'early',armedAt);
+          return out('pending',true,'pending');
+        }
+        return out(phase,false,null,armedAt);
+      case 'timeout':return phase==='armed'?out('idle',false,'disarmed'):out(phase,false,null,armedAt);
+      default:return out(phase,false,null,armedAt);
     }
   }
-  /* Wires every hold button under root. onPhase(el, phase, cue) lets the host set the caption; onCommit(el) runs once
-     per completed hold or second keyboard press. Returns { destroy }. */
-  function holdBind(root,{selector='.st-hold',ms=850,armMs=5000,onPhase=()=>{},onCommit=()=>{},now=()=>Date.now()}={}){
-    let el=null,t0=0,timer=null,armTimer=null;
-    const step=(b,e)=>{const r=holdStep({phase:b.getAttribute('data-phase')},e);b.setAttribute('data-phase',r.phase);if(r.phase==='pending')b.setAttribute('aria-disabled','true');onPhase(b,r.phase,r.cue);if(r.commit)onCommit(b);return r;};
-    const clear=()=>{clearTimeout(timer);timer=null;el=null;};
-    const down=e=>{const b=e.target.closest&&e.target.closest(selector);if(!b||e.button!==0||b.getAttribute('aria-disabled')==='true')return;e.preventDefault();if(b.setPointerCapture&&e.pointerId!=null)b.setPointerCapture(e.pointerId);el=b;t0=now();clearTimeout(armTimer);step(b,'down');timer=setTimeout(()=>{const x=el;clear();if(x&&x.isConnected)step(x,'elapsed');},ms);};
-    const up=()=>{if(!el)return;const x=el,held=now()-t0;clear();step(x,{type:'up',held});};
-    const move=e=>{if(!el)return;const r=el.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){const x=el;clear();step(x,'leave');}};
-    const cancel=()=>{if(!el)return;const x=el;clear();step(x,'cancel');};
-    const click=e=>{const b=e.target.closest&&e.target.closest(selector);if(!b||e.detail!==0)return;if(b.getAttribute('aria-disabled')==='true')return;const r=step(b,'key');clearTimeout(armTimer);if(r.phase==='armed')armTimer=setTimeout(()=>{if(b.getAttribute('data-phase')==='armed')step(b,'timeout');},armMs);};
-    const blur=e=>{const b=e.target.closest&&e.target.closest(selector);if(b&&['holding','armed'].includes(b.getAttribute('data-phase'))){if(el===b)clear();step(b,'blur');}};
-    const key=e=>{if(e.key!=='Escape')return;root.querySelectorAll(selector).forEach(b=>{if(['holding','armed'].includes(b.getAttribute('data-phase'))){if(el===b)clear();step(b,'escape');}});};
+  const tokenMs=(name,def)=>{try{const v=root.getComputedStyle&&root.document?root.getComputedStyle(root.document.documentElement).getPropertyValue(name).trim():'';const n=parseFloat(v);return Number.isFinite(n)?(/ms$/.test(v)?n:/s$/.test(v)?n*1000:n):def;}catch(e){return def;}};
+  /* Wires every hold button under root. It owns data-phase, aria-disabled and aria-busy; restores the idle caption on every
+     idle transition; sets the caption and the status line from cues ({ keep, tap, released, disarmed, again, early,
+     pending, done, failed, unknown } → string ids, through t(id)); vibrates on commit and release where supported.
+     onCommit(el) runs once per completed hold or second press; the host then calls settle(el, 'done'|'failed'|'unknown').
+     A waiting hold (waiting: true) answers its press through guard() and onRefused(el). Returns { settle, destroy }. */
+  function holdBind(scope,{selector='.st-hold',ms,armMs,minArm=HOLD.minArm,slop=HOLD.slop,cues={},t=id=>id,vibrate=true,onPhase=()=>{},onCommit=()=>{},onRefused=()=>{},now=()=>Date.now()}={}){
+    const commitMs=ms!=null?ms:tokenMs('--hold-commit',HOLD.commit),armFor=armMs!=null?armMs:tokenMs('--hold-arm',HOLD.arm);
+    const idleCap=new WeakMap(),armedAt=new WeakMap();
+    let el=null,pid=null,t0=0,timer=null,armTimer=null,lastKey=0;
+    const buzz=p=>{if(vibrate&&root.navigator&&root.navigator.vibrate)try{root.navigator.vibrate(p);}catch(e){}};
+    const remember=b=>{const c=b.querySelector('.st-hold-caption');if(c&&!idleCap.has(b)&&b.getAttribute('data-phase')==='idle')idleCap.set(b,c.outerHTML);};
+    scope.querySelectorAll(selector).forEach(remember);
+    function apply(b,r){
+      b.setAttribute('data-phase',r.phase);
+      if(r.armedAt!=null)armedAt.set(b,r.armedAt);else armedAt.delete(b);
+      const off=b.hasAttribute('data-waiting')||['pending','done','unknown'].includes(r.phase);
+      if(off)b.setAttribute('aria-disabled','true');else b.removeAttribute('aria-disabled');
+      if(r.phase==='pending')b.setAttribute('aria-busy','true');else b.removeAttribute('aria-busy');
+      const cap=b.querySelector('.st-hold-caption'),id=r.cue&&cues[r.cue];
+      // Every idle transition restores the idle caption; the cue for it goes to the status line only.
+      if(r.phase==='idle'){if(idleCap.has(b)&&cap)cap.outerHTML=idleCap.get(b);}
+      else if(id&&cap){cap.setAttribute('data-str',id);cap.textContent=t(id);}
+      const line=b.getAttribute('data-hold-status')&&root.document&&root.document.getElementById(b.getAttribute('data-hold-status'));
+      if(line&&id)announce(line,`<span data-str="${esc(id)}">${esc(t(id))}</span>`);
+      if(r.commit)buzz(HOLD.vibrateCommit);else if(r.cue==='released')buzz(HOLD.vibrateRelease);
+      onPhase(b,r.phase,r.cue);
+      if(r.commit)onCommit(b);
+      return r;
+    }
+    const step=(b,e)=>apply(b,holdStep({phase:b.getAttribute('data-phase'),armedAt:armedAt.get(b)},e,{minArm}));
+    const stop=()=>{clearTimeout(timer);timer=null;el=null;pid=null;};
+    const refuse=b=>{guard(b);onRefused(b);};
+    const down=e=>{const b=e.target.closest&&e.target.closest(selector);if(!b||e.button!==0||el)return;remember(b);
+      if(b.hasAttribute('data-waiting')){refuse(b);return;}
+      if(b.getAttribute('aria-disabled')==='true')return;
+      e.preventDefault();if(b.setPointerCapture&&e.pointerId!=null)try{b.setPointerCapture(e.pointerId);}catch(x){}
+      el=b;pid=e.pointerId;t0=now();clearTimeout(armTimer);step(b,'down');
+      timer=setTimeout(()=>{const x=el;stop();if(x&&x.isConnected)step(x,'elapsed');},commitMs);};
+    const mine=e=>el&&(pid==null||e.pointerId==null||e.pointerId===pid);
+    const up=e=>{if(!mine(e))return;const x=el,held=now()-t0;stop();step(x,{type:'up',held});};
+    const move=e=>{if(!mine(e))return;const r=el.getBoundingClientRect();
+      if(e.clientX<r.left-slop||e.clientX>r.right+slop||e.clientY<r.top-slop||e.clientY>r.bottom+slop){const x=el;stop();step(x,'leave');}};
+    const cancel=e=>{if(!mine(e))return;const x=el;stop();step(x,'cancel');};
+    const press=(b,repeat)=>{remember(b);
+      if(b.hasAttribute('data-waiting')){if(!repeat)refuse(b);return;}
+      if(b.getAttribute('aria-disabled')==='true')return;
+      const r=step(b,{type:'key',at:now(),repeat});
+      clearTimeout(armTimer);
+      if(r.phase==='armed')armTimer=setTimeout(()=>{if(b.getAttribute('data-phase')==='armed')step(b,'timeout');},armFor);};
+    const key=e=>{
+      if(e.key==='Escape'){let hit=false;scope.querySelectorAll(selector).forEach(b=>{if(['holding','armed'].includes(b.getAttribute('data-phase'))){hit=true;if(el===b)stop();step(b,'escape');}});if(hit){e.stopPropagation();e.preventDefault();}return;}
+      const b=e.target.closest&&e.target.closest(selector);if(!b||(e.key!=='Enter'&&e.key!==' '))return;
+      e.preventDefault();lastKey=now();press(b,!!e.repeat);};
+    const keyup=e=>{const b=e.target.closest&&e.target.closest(selector);if(b&&e.key===' ')e.preventDefault();};
+    // A switch or an assistive click arrives as a click with detail 0 and no keydown before it.
+    const click=e=>{const b=e.target.closest&&e.target.closest(selector);if(!b)return;e.preventDefault();if(e.detail!==0||now()-lastKey<100)return;press(b,false);};
+    const blur=e=>{const b=e.target.closest&&e.target.closest(selector);if(b&&['holding','armed'].includes(b.getAttribute('data-phase'))){if(el===b)stop();step(b,'blur');}};
     const menu=e=>{if(e.target.closest&&e.target.closest(selector))e.preventDefault();};
-    const on=[['pointerdown',down],['pointerup',up],['pointermove',move],['pointercancel',cancel],['click',click],['focusout',blur],['keydown',key],['contextmenu',menu]];
-    on.forEach(([n,f])=>root.addEventListener(n,f));
-    return {destroy(){clear();clearTimeout(armTimer);on.forEach(([n,f])=>root.removeEventListener(n,f));}};
+    const on=[['pointerdown',down],['pointerup',up],['pointermove',move],['pointercancel',cancel],['click',click],['focusout',blur],['keydown',key],['keyup',keyup],['contextmenu',menu]];
+    on.forEach(([n,f])=>scope.addEventListener(n,f));
+    return {
+      settle(b,outcome){return step(b,{type:'settle',outcome:oneOf('Button','outcome',outcome,['done','failed','unknown'],'unknown')}).phase;},
+      destroy(){stop();clearTimeout(armTimer);on.forEach(([n,f])=>scope.removeEventListener(n,f));}
+    };
   }
-  /* ChoiceList radio as a field (candidate, ADR 0002). layout 'rows': a ChoiceList group whose rows carry a visible
-     radio (the whole row is the target). layout 'inline': the Stepper's silhouette — label left, two or three short
-     options right, one 60px row (the sex field). Roving tabindex: the selected option (or the first) is the tab stop;
-     the host moves selection on ArrowUp/Down/Left/Right. An optional field clears when its chosen radio is tapped again. */
-  function choiceRadios({label='',optional='',options=[],selected='',action='choose',key='',layout='rows',lead='',id='',className='',strs,args}={}){
+  /* ChoiceList radio as a field (candidate, ADR 0002). layout 'rows': a ChoiceList group of 60px radio rows (the whole row
+     is the target). layout 'inline': the Stepper's silhouette — label left, two or three short options right, one 60px
+     row (the sex field). Roving tab stop (radioBind moves it). An optional field clears through a visible `Clear` text
+     action while a value is chosen (data-action "<action>-clear"); focus then returns to the group's tab stop. */
+  const MONO_OK=/^[A-Za-z0-9 .·:/-]*$/;
+  function choiceRadios({label='',optional='',options=[],selected='',action='choose',key='',layout='rows',lead='',clear='Clear',id='',className='',strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{},rid=id||fieldId('st-radios');
-    const stop=options.some(x=>x.value===selected)?selected:(options[0]&&options[0].value);
-    if(layout!=='inline'){
+    const lay=oneOf('ChoiceList','layout',layout,['rows','inline'],'rows');
+    options.forEach(x=>{if(x.mono&&!MONO_OK.test(String(x.label||'')))warn('ChoiceList',`mono is for Latin and digit codes only: "${x.label}"`);});
+    const chosen=options.some(x=>x.value===selected),stop=chosen?selected:(options[0]&&options[0].value);
+    const isOptional=!!(optional||has(o,'optional'));
+    const clearBtn=isOptional&&chosen?button({label:clear,register:'text',action:action+'-clear',value:key,id:rid+'-clear',strs:s.clear?{label:s.clear}:undefined}):'';
+    if(lay==='rows'){
       const rows=options.map(x=>choiceRow({mode:'radio',label:x.label,meta:x.meta||'',value:x.value,action,selected:x.value===selected,mono:!!x.mono,tabindex:x.value===stop?0:-1,attrs:{'data-field':key},strs:x.strs,args:x.args}));
-      return choiceGroup(rows,{title:label,lead,radio:true,id:rid,className,strs:s.label?{title:s.label}:undefined,args:a.label?{title:a.label}:undefined});
+      return choiceGroup(rows,{title:label,lead,radio:true,aside:clearBtn,id:rid,className,strs:s.label?{title:s.label}:undefined,args:a.label?{title:a.label}:undefined});
     }
     const lid=rid+'-label';
     const opt=x=>`<button type="button" class="st-choice-inline-opt" role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}"><span class="st-radio" aria-hidden="true"></span><span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span></button>`;
-    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio" data-field="${esc(key)}" role="radiogroup" aria-labelledby="${esc(lid)}"><span class="st-choice-inline-label" id="${esc(lid)}"><span${sa(s.label,a.label)}>${esc(label)}</span>${optional||has(o,'optional')?`<small>${tx(optional,o,'optional')}</small>`:''}</span><span class="st-choice-inline-opts">${options.map(opt).join('')}</span></div>`;
+    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio" id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span></div>`;
   }
-  const api=Object.freeze({heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,status,statusLine,banner,photos,button,buttonReason,holdButton,holdStep,holdBind,choiceRadios});
+  /* The radio keyboard model, pure: ArrowDown/ArrowRight → next, ArrowUp/ArrowLeft → previous (both wrap), Home → first,
+     End → last. Returns the value to select and focus, or null for any other key. */
+  function radioNext(values,current,k){
+    const n=values.length;if(!n)return null;
+    const i=values.indexOf(current);
+    if(k==='Home')return values[0];
+    if(k==='End')return values[n-1];
+    if(k==='ArrowDown'||k==='ArrowRight')return values[i<0?0:(i+1)%n];
+    if(k==='ArrowUp'||k==='ArrowLeft')return values[i<0?n-1:(i-1+n)%n];
+    return null;
+  }
+  /* Wires the keyboard model under root: the arrow keys select and focus (onChange(key, value) re-renders; the radio with
+     that value then takes focus). Space and Enter select through the ordinary click. Returns { destroy }. */
+  function radioBind(scope,{onChange=()=>{}}={}){
+    const key=e=>{
+      const r=e.target.closest&&e.target.closest('[role="radio"]');if(!r)return;
+      const group=r.closest('[role="radiogroup"]');if(!group)return;
+      const radios=Array.from(group.querySelectorAll('[role="radio"]'));
+      const cur=radios.find(x=>x.getAttribute('aria-checked')==='true')||r;
+      const next=radioNext(radios.map(x=>x.getAttribute('data-value')),r.getAttribute('data-value')||cur.getAttribute('data-value'),e.key);
+      if(next==null)return;
+      e.preventDefault();
+      const field=(r.closest('[data-field]')||{}).getAttribute?r.closest('[data-field]').getAttribute('data-field'):'';
+      onChange(field,next);
+      const target=Array.from(scope.querySelectorAll('[role="radio"]')).find(x=>x.getAttribute('data-value')===next&&(x.closest('[data-field]')||{}).getAttribute&&x.closest('[data-field]').getAttribute('data-field')===field);
+      if(target&&target.focus)target.focus();
+    };
+    scope.addEventListener('keydown',key);
+    return {destroy(){scope.removeEventListener('keydown',key);}};
+  }
+  const api=Object.freeze({heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

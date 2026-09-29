@@ -11,6 +11,7 @@ terminal.innerHTML = UI.banner({ tone: 'danger', headline: 'Sow died · prolapse
 correction.innerHTML = UI.banner({ tone: 'correction', headline: 'Correcting a past record', consequence: 'logged as G.H',
   summary: [[{ text: 'stillborn 1 →' }, { text: '0', tone: 'amber' }], [{ text: 'alive 10 →' }, { text: '11', tone: 'amber' }]],
   actions: [{ label: 'Clear', action: 'clear' }] });
+UI.liveFill(document.body, { delay: 0 });
 </script>
 </body>
 </html>
