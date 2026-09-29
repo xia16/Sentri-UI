@@ -74,6 +74,14 @@
   --glyph-pad: 20px;
   --caret-width: 2px;
   --status-dot: 4px;
+  --radio-size: 20px;
+  --radio-dot: 10px;
+  --ring-width: 2px;
+  --photo-tile: 56px;
+  --row-code-min: 40px;
+  --chip-max: 96px;
+  --hold-commit: 850ms;
+  --hold-arm: 5000ms;
   --drawer-compact-max: 42%;
   --drawer-short-max: 58%;
   --drawer-medium-max: 76%;

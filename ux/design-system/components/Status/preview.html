@@ -1,0 +1,18 @@
+<!-- @dsCard group="Status" height=260 subtitle="Candidate · words with a dot, lines with colour on the value" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<body>
+<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="words" style="display:flex;flex-wrap:wrap;gap:12px"></div><div id="lines" style="margin-top:24px;display:flex;flex-direction:column;gap:8px"></div></div>
+<script>
+const UI = window.SentriUI;
+// Words: one per tone. Lines: the receipt, an overdue value, the row law's mono line 2.
+words.innerHTML = [['due now', 'amber'], ['in progress', 'progress'], ['done', 'green'], ['waiting', 'muted'], ['sow died', 'red']]
+  .map(([text, tone]) => UI.status({ text, tone })).join('');
+lines.innerHTML =
+  UI.statusLine(['Saved', { text: '+4 this visit', tone: 'green' }], { sep: 'dot', live: true }) +
+  UI.statusLine([[{ text: 'Overdue' }, { text: '3 days', tone: 'red' }]]) +
+  UI.statusLine(['parity 3', [{ text: 'owed' }, { text: '4', tone: 'amber' }]], { sep: 'dot', mono: true });
+</script>
+</body>
+</html>

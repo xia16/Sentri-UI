@@ -1,9 +1,9 @@
-<!-- @dsCard group="Choosers" height=500 -->
+<!-- @dsCard group="Choosers" height=900 -->
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
 <body>
-<div class="inspection-phone" data-st-context="drawer" style="max-width:390px;padding:16px;background:var(--paper);font-family:var(--sans);color:var(--ink)"><div id="a"></div></div>
+<div class="inspection-phone" data-st-context="drawer" style="max-width:390px;padding:16px;background:var(--paper);font-family:var(--sans);color:var(--ink)"><div id="a"></div><div id="b" style="margin-top:24px"></div></div>
 <script>
 const UI = window.SentriUI, I = window.SentriIcons.icon;
 a.innerHTML = UI.choiceSearch({ label: 'Search medicines' }) +
@@ -15,6 +15,13 @@ a.innerHTML = UI.choiceSearch({ label: 'Search medicines' }) +
     UI.choiceRow({ label: 'Amoxicillin', meta: '1 ml / 10 kg', mode: 'single', action: 'pick', value: 'amox', selected: true }),
     UI.choiceRow({ label: 'Meloxicam', meta: 'Last used yesterday', mode: 'single', action: 'pick', value: 'melox' })
   ], { title: 'Recent' });
+// Candidate (ADR 0002): radio rows (mono labels for crate codes) and the inline radio field.
+b.innerHTML = UI.choiceRadios({ label: 'Which litter', key: 'to', selected: 'B04', options: [
+    { value: 'A02', label: 'A02', meta: '11 alive · day 3', mono: true },
+    { value: 'B04', label: 'B04', meta: '12 alive · day 3', mono: true },
+    { value: 'C01', label: 'C01', meta: '9 alive · day 4', mono: true }] }) +
+  UI.choiceRadios({ label: 'Why they stay', key: 'why', options: [{ value: 'weak', label: 'Weak' }, { value: 'sick', label: 'Sick' }] }) +
+  UI.panel(UI.choiceRadios({ layout: 'inline', label: 'Sex', optional: 'Optional', key: 'sex', selected: 'g', options: [{ value: 'b', label: 'Boar' }, { value: 'g', label: 'Gilt' }] }));
 </script>
 </body>
 </html>

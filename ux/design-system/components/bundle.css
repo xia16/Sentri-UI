@@ -28,7 +28,7 @@ svg{width:20px;height:20px;display:block;flex-shrink:0;fill:none;stroke:currentC
 .button.secondary{min-width:86px;font-weight:600}
 .button:hover:not(:disabled){filter:brightness(.96)}
 .button:active:not(:disabled){transform:translateY(1px)}
-.button.danger{background:var(--red);border-color:var(--red)}
+.button.danger:not([aria-disabled="true"]){background:var(--red);border-color:var(--red)}
 .icon-button{background:transparent;min-width:44px;height:44px;display:grid;place-items:center;border-radius:10px;position:relative}
 .segment{display:flex;border-radius:10px;padding:3px;margin-top:16px;border:1px solid transparent}
 .segment button{flex:1;min-height:38px;background:transparent;font-size:12px;border-radius:8px}
@@ -58,15 +58,15 @@ body{background:var(--ground);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]>.sheet-footer{padding-left:18px;padding-right:18px}
 :is(.farrowing-phone,.inspection-phone) :is(.button,.key){font-weight:500;border-radius:12px;min-height:44px}
 :is(.farrowing-phone,.inspection-phone) .button.secondary{background:#fff;border-color:#bdc7b6;color:var(--ink)}
-:is(.farrowing-phone,.inspection-phone) .button.primary:not(:disabled){background:var(--ink);border-color:var(--ink);color:#fff}
+:is(.farrowing-phone,.inspection-phone) .button.primary:not(:disabled):not([aria-disabled="true"]){background:var(--ink);border-color:var(--ink);color:#fff}
 :is(.farrowing-phone,.inspection-phone) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea){border-color:#bdc7b6;border-radius:12px}
 :is(.farrowing-phone,.inspection-phone) :is(.room-tabs,.segment,.scope-tabs,.health-tabs){background:var(--well);border-color:var(--line)}
 :is(.farrowing-phone,.inspection-phone) :is(.room-tabs,.segment,.scope-tabs,.health-tabs) button{font-weight:400;min-height:44px}
 :is(.farrowing-phone,.inspection-phone) :is(.room-tabs,.segment,.scope-tabs,.health-tabs) :is(button[aria-pressed=true],button[aria-selected=true],button.on){font-weight:500;background:#fff;color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) :is(button,a,input,select,textarea,summary):focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 /* Action semantics remain explicit; destructive controls never inherit the green treatment. */
-:is(.farrowing-phone,.inspection-phone) .button:is(.danger,.task-end-confirm):not(:disabled){background:var(--red);border-color:var(--red);color:#fff}
-:is(.farrowing-phone,.inspection-phone) .button.task-end-early:not(:disabled){background:#fff1ee;border-color:var(--red);color:var(--red)}
+:is(.farrowing-phone,.inspection-phone) .button:is(.danger,.task-end-confirm):not(:disabled):not([aria-disabled="true"]){background:var(--red);border-color:var(--red);color:#fff}
+:is(.farrowing-phone,.inspection-phone) .button.task-end-early:not(:disabled):not([aria-disabled="true"]){background:#fff1ee;border-color:var(--red);color:var(--red)}
 @media(max-width:370px){
  :is(.farrowing-phone,.inspection-phone) .task-header{gap:8px;padding-left:12px;padding-right:12px}
  :is(.farrowing-phone,.inspection-phone) .task-header h2{font-size:20px}
@@ -119,7 +119,7 @@ body{background:var(--ground);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) .sheet-footer>.surface-back:only-child{width:100%;min-width:0;flex:1 1 auto;grid-column:1/-1;background:var(--ink,#20291e);border-color:var(--ink,#20291e);color:#fff;font-weight:600}
 :is(.farrowing-phone,.inspection-phone) .sheet-footer>.surface-back:only-child:active{background:var(--ink,#20291e);border-color:var(--ink,#20291e);color:#fff}
 
-/* 5 · sentri-components.css */
+/* 5 · sentri-components.css (the waiting face, ADR 0002: the ink / red / red-wash register rules skip aria-disabled) */
 /* Canonical shared components, loaded after legacy prototype styles.
    Context belongs to the containing page/drawer, not its individual panels. */
 :root{--st-canvas:#f6f7f1;--st-paper:#fff;--st-inset:#f6f8f1;--st-ink:#20291f;--st-muted:#657060;--st-line:#dfe4d8;--st-rule:#e8eddf;--st-panel-bg:var(--st-paper);--st-space-section:24px;--st-radius:18px;--drawer-compact-max:42%;--drawer-short-max:58%;--drawer-medium-height:76%;--drawer-medium-max:76%;--drawer-long-height:85%;--drawer-long-max:85%}
@@ -194,7 +194,7 @@ button.st-row[aria-current="location"]{background:#eaf2e5;box-shadow:inset 3px 0
 .st-empty{margin:0;font-size:12px;line-height:1.6;color:var(--st-muted)}
 .st-section+.st-section{margin-top:var(--st-space-section)}
 /* Screen-level controls follow the existing footer/back contract. */
-:is(.inspection-phone,.farrowing-phone,.device) :is(.button.primary,.primary-button,.lifecycle-primary):not(:disabled):not(.danger):not(.task-end-early):not(.task-end-confirm){background:#20291f;border-color:#20291f;color:#fff}
+:is(.inspection-phone,.farrowing-phone,.device) :is(.button.primary,.primary-button,.lifecycle-primary):not(:disabled):not([aria-disabled="true"]):not(.danger):not(.task-end-early):not(.task-end-confirm){background:#20291f;border-color:#20291f;color:#fff}
 :is(.inspection-phone,.farrowing-phone) .button.task-complete:not(:disabled){background:#20291f;border-color:#20291f;color:#fff}
 :is(.inspection-phone,.farrowing-phone) .finish-walk:not(:disabled){background:#20291f;border-color:#20291f;color:#fff}
 :is(.st-row,.st-heading-action button,.st-heading-action a):focus-visible{outline:3px solid #577fa6;outline-offset:-3px}
@@ -409,3 +409,109 @@ button.st-measure-box:is(:active,[data-preview~="pressed"]){background:var(--pre
 .st-numpad-key.st-numpad-key{width:100%;height:var(--choice-row-min);font:500 var(--type-figure-size)/1 var(--font-mono);font-variant-numeric:tabular-nums}
 .st-numpad-key svg{width:var(--glyph-pad);height:var(--glyph-pad);stroke-width:1.8}
 @media (prefers-reduced-motion:reduce){:is(.st-stepper-face,.st-numpad-key){transition:none}.st-stepper-key:is(:active,[data-preview~="pressed"]) .st-stepper-face,.st-numpad-key:is(:active,[data-preview~="pressed"]){transform:none}}
+
+/* 7 · Design-system candidates 2 (candidate, ADR 0002): Status, Banner, Photos, Button registers / waiting / hold,
+   ChoiceList radio, Row variants. Tokens only, including the candidate sizes (radio-size, radio-dot, ring-width,
+   photo-tile, row-code-min, chip-max) and motion (hold-commit). */
+/* Status: colour lives on the value; the word stays ink */
+.st-part[data-tone="amber"]{color:var(--amber)}
+.st-part[data-tone="progress"]{color:var(--progress)}
+.st-part[data-tone="green"]{color:var(--green)}
+.st-part[data-tone="red"]{color:var(--red)}
+.st-part[data-tone="muted"]{color:var(--muted)}
+.st-part[data-mono],.st-status-line[data-mono],.st-choice-label[data-mono],.st-choice-inline-opt [data-mono]{font-family:var(--font-mono)}
+.st-tok{display:inline-block;max-width:100%}
+[data-sep="dot"]>.st-tok+.st-tok::before{content:"·";margin:0 4px;color:var(--muted)}
+.st-status{display:inline-flex;align-items:center;gap:var(--status-dot);font:500 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
+.st-status::before{content:"";flex:none;width:var(--status-dot);height:var(--status-dot);border-radius:50%;background:currentColor}
+.st-status[data-tone="amber"]{color:var(--amber)}
+.st-status[data-tone="progress"]{color:var(--progress)}
+.st-status[data-tone="green"]{color:var(--green)}
+.st-status[data-tone="red"]{color:var(--red)}
+.st-status-line.st-status-line{display:block;margin:0;font:400 var(--type-row-title-size)/1.5 var(--font-sans);color:var(--ink)}
+.st-status-line.st-status-line[data-mono]{font-family:var(--font-mono)}
+
+/* Row variants: code · token lines · chip · wrap · rail ✎ · select · act (two targets) */
+.st-row.st-row .st-row-code{flex:none;min-width:var(--row-code-min);font:600 var(--type-identifier-size)/1.5 var(--font-mono);color:var(--ink)}
+.st-row.st-row .st-row-copy small[data-mono]{font-family:var(--font-mono)}
+.st-row.st-row[data-wrap] .st-row-copy :is(strong,small){white-space:normal;overflow:visible;text-overflow:clip}
+.st-row.st-row .st-row-chip{flex:none;max-width:var(--chip-max);overflow-wrap:anywhere}
+.st-row-chevron[data-rail="edit"] svg{width:var(--glyph-key);height:var(--glyph-key)}
+label.st-row[data-select]{cursor:pointer}
+label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{background:var(--press)}
+.st-row.st-row[data-act]{padding-top:0;padding-bottom:0}
+.st-row-door.st-row-door{display:flex;align-items:center;gap:var(--space-row-y);flex:1;min-width:0;align-self:stretch;min-height:var(--row-min);margin:0;padding:0;border:0;border-radius:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.st-row-door:active{background:var(--press)}
+.st-row-door:is(:focus-visible,[data-preview~="focus"]){outline:3px solid var(--focus);outline-offset:2px}
+.st-row.st-row .st-row-door strong{display:flex;align-items:center;gap:4px}
+.st-row-door-chevron{display:flex;flex:none;color:var(--muted)}
+.st-row-door-chevron svg{width:var(--glyph-key);height:var(--glyph-key);stroke-width:1.6}
+.st-row[data-act] .button{flex:none;min-height:var(--touch-min)}
+
+/* Button registers: tool (a soft well, no border) and text (the bare word); the waiting face; the reason line */
+.button.tool{min-height:var(--control-height);background:var(--well);border-color:var(--well);color:var(--ink)}
+.button:not([aria-disabled="true"])[data-preview~="pressed"]{filter:brightness(.96);transform:translateY(1px)}
+.st-text-action.st-text-action{justify-content:flex-start;min-width:var(--touch-min)}
+.st-text-action:is(:active,[data-preview~="pressed"]){color:var(--muted)}
+.button:is(:focus-visible,[data-preview~="focus"]){outline:3px solid var(--focus);outline-offset:2px}
+/* waiting: present, quiet, focusable (aria-disabled); outranks every register's fill */
+.button.button[aria-disabled="true"]{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink);cursor:default;filter:none;transform:none}
+.st-button-reason.st-button-reason{flex-basis:100%;font-size:var(--type-choice-meta-size)}
+/* hold: the sweep fills the button over hold-commit; the caption rides under the verb */
+.button.st-hold{position:relative;overflow:hidden;flex-direction:column;gap:4px;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.st-hold>.st-hold-label,.st-hold>.st-hold-caption{position:relative;pointer-events:none}
+.st-hold-caption{font:600 var(--type-description-size)/1.3 var(--font-sans)}
+.st-hold::before{content:"";position:absolute;inset:0;background:var(--ink);transform:scaleX(0);transform-origin:left}
+.button.primary.st-hold::before{background:var(--muted)}
+.st-hold[data-phase="holding"]::before{transform:scaleX(1);transition:transform var(--hold-commit) linear}
+.st-hold[data-phase="holding"][data-preview~="still"]::before{transform:scaleX(.6);transition:none}
+.st-hold[data-phase="pending"]::before{transform:scaleX(1);transition:none}
+.button.button.st-hold[data-phase="pending"]{color:var(--paper)}
+.st-hold[data-phase="armed"]{outline:3px solid var(--focus);outline-offset:2px}
+
+/* ChoiceList radio: a 2px ring; selected = an ink ring and a 10px ink dot; the whole row is the target */
+.st-radio{display:grid;place-items:center;flex:none;box-sizing:border-box;width:var(--radio-size);height:var(--radio-size);border:var(--ring-width) solid var(--muted);border-radius:50%;background:var(--paper)}
+.st-radio::after{content:"";display:none;width:var(--radio-dot);height:var(--radio-dot);border-radius:50%;background:var(--ink)}
+[aria-checked="true"] .st-radio{border-color:var(--ink)}
+[aria-checked="true"] .st-radio::after{display:block}
+.st-choice-row[data-mode="radio"][aria-checked="true"] .st-choice-label{font-weight:600}
+.st-choice-row.st-choice-row[data-mode="radio"]:is(:active,[data-preview~="pressed"]){background:var(--choice-press)}
+.st-choice-row.st-choice-row[data-mode="radio"]:is(:focus-visible,[data-preview~="focus"]){outline:3px solid var(--focus);outline-offset:-3px}
+.st-choice-inline{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:var(--space-row-y);min-height:var(--stepper-row-min)}
+.st-choice-inline-label{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;font:600 var(--type-choice-label-size)/1.4 var(--font-sans);color:var(--ink)}
+.st-choice-inline-label small{font:400 var(--type-choice-meta-size)/1.4 var(--font-sans);color:var(--muted)}
+.st-choice-inline-opts{display:flex;gap:var(--space-key-gap);align-self:stretch}
+.st-choice-inline-opt.st-choice-inline-opt{display:flex;align-items:center;gap:var(--space-key-gap);min-width:var(--back-width);min-height:var(--stepper-row-min);margin:0;padding:0 var(--space-row-y);border:0;border-radius:var(--radius-control);background:transparent;color:var(--ink);font:500 var(--type-choice-label-size)/1.4 var(--font-sans);cursor:pointer;touch-action:manipulation}
+.st-choice-inline-opt[aria-checked="true"]{font-weight:600}
+.st-choice-inline-opt:is(:active,[data-preview~="pressed"]){background:var(--press)}
+.st-choice-inline-opt:is(:focus-visible,[data-preview~="focus"]){outline:3px solid var(--focus);outline-offset:2px}
+
+/* Banner: headline over consequence on a wash; danger red, correction amber with its live summary and Clear */
+.st-banner{display:flex;flex-direction:column;gap:4px;margin:0;padding:var(--space-row-y) var(--space-panel);border:1px solid var(--red);border-radius:var(--radius-inset);background:var(--red-wash);color:var(--ink)}
+.st-banner-headline{font:600 var(--type-choice-label-size)/1.4 var(--font-sans);color:var(--red)}
+.st-banner-consequence{font:400 var(--type-choice-meta-size)/1.5 var(--font-mono);color:var(--muted)}
+.st-banner[data-tone="correction"]{border-color:var(--pending-border);background:var(--amber-wash)}
+.st-banner[data-tone="correction"] .st-banner-headline{color:var(--ink)}
+.st-banner-summary{display:flex;align-items:center;justify-content:space-between;gap:var(--space-row-y);min-height:var(--touch-min);margin-top:4px;border-top:1px solid var(--pending-border)}
+.st-banner-summary-text.st-banner-summary-text{flex:1;min-width:0;margin:0;font:500 var(--type-choice-meta-size)/1.5 var(--font-mono);color:var(--ink)}
+.st-banner-summary .st-text-action{padding:0;justify-content:flex-end}
+
+/* Photos: a well card, no outline; the camera is a paper circle with a ring (inactive: well, no ring) */
+.st-photos{display:flex;flex-direction:column;margin:0;padding:0 0 0 var(--space-row-x);border-radius:var(--radius-control);background:var(--well);color:var(--ink)}
+.st-photos-head{display:flex;align-items:center;gap:var(--space-row-y);min-height:var(--touch-min)}
+.st-photos-label{display:flex;align-items:baseline;flex-wrap:wrap;column-gap:8px;flex:1;min-width:0;font:500 var(--type-row-title-size)/1.4 var(--font-sans)}
+.st-photos-label small{font:400 var(--type-description-size)/1.4 var(--font-sans);color:var(--muted)}
+.st-photos-camera.st-photos-camera{display:grid;place-items:center;flex:none;width:var(--touch-min);height:var(--touch-min);margin:0;padding:0;border:var(--ring-width) solid var(--muted);border-radius:50%;background:var(--paper);color:var(--ink);cursor:pointer;touch-action:manipulation}
+.st-photos-camera svg{width:var(--glyph-pad);height:var(--glyph-pad);stroke-width:1.8}
+.st-photos-camera.st-photos-camera[aria-disabled="true"]{border-color:var(--well);background:var(--well);color:var(--disabled-ink);cursor:default}
+.st-photos-camera:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){background:var(--press)}
+.st-photos-camera:is(:focus-visible,[data-preview~="focus"]),.st-photos-thumb:is(:focus-visible,[data-preview~="focus"]){outline:3px solid var(--focus);outline-offset:2px}
+.st-photos-items{display:flex;flex-wrap:wrap;gap:var(--space-key-gap);margin:0;padding:0 var(--space-row-x) var(--space-row-x) 0;list-style:none}
+.st-photos-thumb.st-photos-thumb{display:grid;place-items:center;width:var(--photo-tile);height:var(--photo-tile);margin:0;padding:0;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius-segment);background:var(--paper);color:var(--muted);font:500 var(--type-identifier-size)/1 var(--font-mono);cursor:pointer}
+.st-photos-thumb img{width:100%;height:100%;object-fit:cover}
+.st-photos-hint.st-photos-hint{padding-right:var(--space-row-x);font-size:var(--type-choice-meta-size)}
+.st-photos-hint:not(:empty){padding-bottom:var(--space-row-y)}
+
+/* Numpad compact: the run without its running list (the host speaks the last record in the status line) */
+.st-numpad-feedback[data-compact]{gap:0}
+@media (prefers-reduced-motion:reduce){.st-hold[data-phase="holding"]::before{transition:none;transform:scaleX(.5)}}

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Candidates 2</title>
+<link rel="stylesheet" href="/ux/design-system/tokens.css">
+<link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="/ux/tasks/piglet-processing/shell.css">
+<style>
+/* layout only: the order of the states and the gaps between them */
+.demo-card > * + * { margin-top: var(--space-section); }
+.demo-state > * + * { margin-top: var(--space-row-y); }
+.demo-bar { display: flex; flex-wrap: wrap; gap: var(--space-footer-gap); }
+.demo-bar > .button.primary, .demo-bar > .button.danger { flex: 1; }
+.demo-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-footer-gap); }
+.demo-stack > * + * { margin-top: 8px; }
+.demo-right { display: flex; justify-content: flex-end; }
+</style>
+</head>
+<body>
+<!-- Every state of the second design-system candidate batch (ADR 0002), en and zh (?lang=zh): Button registers,
+     the waiting face and hold; ChoiceList radio; Status; Banner; Photos; the Row variants; Log's group line;
+     Numpad compact. Sample litter: crate B04, 11 alive, day 3. Pressed and focus are drawn with the data-preview hook. -->
+<main class="phone inspection-phone" data-st-context="page">
+  <div id="screen"></div>
+</main>
+<script src="/ux/design-system/components/bundle.js"></script>
+<script>
+(function () {
+  var UI = window.SentriUI;
+  var D = 'ds.c2.demo.';
+  function st(title, body) { return '<div class="demo-state">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: D + title } }) + body + '</div>'; }
+  function card(title, states) { return '<section class="demo-card">' + UI.heading({ title: '', kind: 'section', level: 2, strs: { title: D + title } }) + states.join('') + '</section>'; }
+  function p(id, args, tone, mono) { return { text: '', tone: tone, mono: mono, strs: { text: id }, args: args ? { text: args } : undefined }; }
+  function b(o) { return UI.button(Object.assign({ label: '' }, o, { strs: { label: o.id }, args: o.args ? { label: o.args } : undefined })); }
+
+  // ---- Button: the four registers, the waiting face, hold ----
+  var bar = '<div class="demo-bar">' + b({ id: 'act.back', register: 'secondary', action: 'back', className: 'surface-back' }) + b({ id: 'act.save', register: 'primary', action: 'save' }) + '</div>';
+  var tools = '<div class="demo-pair">' + b({ id: 'act.record_dead', register: 'tool', action: 'open-dead', value: 'tool-a' }) + b({ id: 'pp.count.title', register: 'tool', action: 'open-count', value: 'tool-b' }) + '</div>';
+  var text = '<div class="demo-right">' + b({ id: 'act.clear', register: 'text', action: 'clear', value: 'text-a' }) + '</div>';
+  var waiting = '<div class="demo-bar">' + UI.buttonReason({ id: 'demo-why', text: '', strs: { text: D + 'reason_cause' } }) +
+    b({ id: 'act.back', register: 'secondary', action: 'back', className: 'surface-back' }) + b({ id: 'act.save', register: 'primary', action: 'save', waiting: true, describedby: 'demo-why' }) + '</div>';
+  function hold(phase, cap, capArgs, val, tone, label, labelArgs) {
+    return '<div class="demo-bar">' + b({ id: 'act.back', register: 'secondary', action: 'back', className: 'surface-back' }) +
+      UI.holdButton({ label: '', caption: '', phase: phase, value: val, tone: tone, strs: { label: label || 'pp.end.act.end', caption: cap }, args: { label: labelArgs, caption: capArgs } }) + '</div>';
+  }
+  var button = card('button', [
+    st('registers', '<div class="demo-stack">' + bar + tools + text + '</div>'),
+    st('tool_states', '<div class="demo-pair">' + b({ id: 'act.record_dead', register: 'tool', action: 'open-dead', value: 'tool-pressed' }) + b({ id: 'pp.count.title', register: 'tool', action: 'open-count', value: 'tool-focus' }) + '</div>'),
+    st('text_states', '<div class="demo-right">' + b({ id: 'act.clear', register: 'text', action: 'clear', value: 'text-pressed' }) + b({ id: 'act.edit', register: 'text', action: 'edit', value: 'text-focus' }) + '</div>'),
+    st('waiting', waiting),
+    st('hold_idle', hold('idle', 'pp.end.hold.caption', null, 'h-idle')),
+    st('hold_holding', hold('holding', 'pp.end.hold.keep', null, 'h-holding')),
+    st('hold_armed', hold('armed', 'ds.c2.hold.again', null, 'h-armed')),
+    st('hold_pending', hold('pending', 'pp.end.hold.pending', null, 'h-pending')),
+    st('hold_primary', hold('idle', 'ds.c2.hold.lock', null, 'h-lock', 'primary', 'fr.act.lock', { n: 14 }))
+  ]);
+
+  // ---- ChoiceList radio: rows (whole row the target) and inline (the Stepper silhouette) ----
+  var litters = [['A02', 11, 3], ['B04', 12, 3], ['C01', 9, 4]].map(function (r) {
+    return { value: r[0], label: r[0], mono: true, meta: '', strs: { label: D + 'code', meta: D + 'litter_meta' }, args: { label: { code: r[0] }, meta: { n: r[1], d: r[2] } } };
+  });
+  var reasons = ['weak', 'sick', 'small'].map(function (k) { return { value: k, label: '', strs: { label: D + k } }; });
+  function rows(opts, sel, key, title) { return UI.choiceRadios({ label: '', options: opts, selected: sel, action: 'choose', key: key, strs: { label: D + title } }); }
+  function sex(sel, key) {
+    return UI.panel(UI.choiceRadios({ layout: 'inline', label: '', optional: '', selected: sel, key: key, action: 'sex', strs: { label: D + 'sex', optional: 'ds.field.optional' },
+      options: [{ value: 'b', label: '', strs: { label: D + 'boar' } }, { value: 'g', label: '', strs: { label: D + 'gilt' } }] }));
+  }
+  var radio = card('radio', [
+    st('radio_none', rows(reasons, '', 'why', 'why')),
+    st('radio_chosen', rows(litters, 'B04', 'which', 'which')),
+    st('radio_pressed', rows(reasons, 'weak', 'why-pressed', 'why')),
+    st('radio_focus', rows(reasons, 'weak', 'why-focus', 'why')),
+    st('inline_empty', sex('', 'sex-empty')),
+    st('inline_chosen', sex('g', 'sex-chosen')),
+    st('inline_focus', sex('g', 'sex-states'))
+  ]);
+
+  // ---- Status: words (a dot and a coloured word) and lines (colour on the value, the word ink) ----
+  var words = '<div class="demo-bar">' + [['w_due', 'amber'], ['w_progress', 'progress'], ['w_done', 'green'], ['w_waiting', 'muted'], ['w_sow_died', 'red']].map(function (w) {
+    return UI.status({ text: '', tone: w[1], strs: { text: D + w[0] } });
+  }).join('') + '</div>';
+  var lines = '<div class="demo-stack">' +
+    UI.statusLine([p(D + 'saved'), [p(D + 'plus_visit', { n: 4 }, 'green')]], { sep: 'dot', live: true }) +
+    UI.statusLine([[p(D + 'overdue'), p(D + 'days', { n: 3 }, 'red')]]) +
+    UI.statusLine([p(D + 'parity', { n: 3 }), [p(D + 'owed'), p(D + 'n', { n: 4 }, 'amber')]], { sep: 'dot', mono: true }) + '</div>';
+  var status = card('status', [st('words', words), st('lines', lines)]);
+
+  // ---- Banner: danger above a hold, a terminal fact, the correction banner ----
+  var banner = card('banner', [
+    st('danger', UI.banner({ tone: 'danger', headline: '', consequence: '', strs: { headline: 'ds.dead.sow.warn_open', consequence: D + 'sow_consequence' } }) + hold('idle', 'ds.dead.hold', null, 'h-sow', 'danger', 'act.save')),
+    st('terminal', UI.banner({ tone: 'danger', headline: '', consequence: '', strs: { headline: D + 'sow_died', consequence: D + 'sow_stamp' } })),
+    st('correction', UI.banner({ tone: 'correction', headline: '', consequence: '', id: 'demo-edit',
+      strs: { headline: D + 'correcting', consequence: D + 'logged_as' }, args: { consequence: { who: 'G.H' } },
+      summary: [[p(D + 'stillborn', { a: 1 }), p(D + 'n', { n: 0 }, 'amber')], [p(D + 'alive_from', { a: 10 }), p(D + 'n', { n: 11 }, 'amber')]],
+      actions: [{ label: '', action: 'clear', strs: { label: 'act.clear' } }] }))
+  ]);
+
+  // ---- Photos: inactive → live, attached, full ----
+  var pstrs = { label: 'ds.c2.photos.label', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera', thumb: 'ds.c2.aria.thumb', index: 'ds.c2.photos.index' };
+  function ph(o, extra) { return UI.photos(Object.assign({ label: '', optional: '', key: o.key }, o, { strs: Object.assign({}, pstrs, extra && extra.strs), args: extra && extra.args })); }
+  function items(n) { var a = []; for (var i = 1; i <= n; i++) a.push({ id: 'p' + i }); return a; }
+  var photos = card('photos', [
+    st('photos_inactive', ph({ key: 'ph-inactive', active: false, hint: '' }, { strs: { hint: 'ds.c2.photos.inactive' } })),
+    st('photos_empty', ph({ key: 'ph-empty' })),
+    st('photos_some', ph({ key: 'ph-some', items: items(3), count: [p('ds.c2.photos.attached', { n: 3 }), p('ds.c2.photos.waiting', { n: 1 }, 'amber')] })),
+    st('photos_full', ph({ key: 'ph-full', items: items(12), count: p('ds.c2.photos.attached', { n: 12 }), hint: '' }, { strs: { hint: 'ds.c2.photos.full' }, args: { hint: { n: 12 } } })),
+    st('photos_states', ph({ key: 'ph-states', items: items(2), count: p('ds.c2.photos.attached', { n: 2 }) }))
+  ]);
+
+  // ---- Row variants ----
+  function lrow(code, o) {
+    return UI.row(Object.assign({ title: '', code: '', action: 'open-litter', value: code, mono: true, wrap: true, strs: { code: D + 'code' }, args: { code: { code: code } } }, o));
+  }
+  var litterRows = UI.rowGroup(
+    lrow('A02', { title: [p(D + 'iron')], description: [p(D + 'hours', { n: 2 }), [p(D + 'owed'), p(D + 'n', { n: 4 }, 'amber')], p(D + 'parity', { n: 3 })] }) +
+    lrow('B04', { title: [[p(D + 'overdue'), p(D + 'days', { n: 3 }, 'red')]], description: [p(D + 'fact_alive', { n: 7 }), p(D + 'parity', { n: 5 })], chip: { text: '', tone: 'red', strs: { text: D + 'w_sow_died' } } }) +
+    lrow('C01', { title: [p(D + 'castrate')], description: [p(D + 'fact_alive', { n: 9 }), [p(D + 'owed'), p(D + 'n', { n: 5 }, 'amber')]], chip: { text: '', tone: 'amber', strs: { text: D + 'unlocked' } } }) +
+    lrow('D06', { action: '', title: [p(D + 'all_done')], description: [p(D + 'fact_alive', { n: 12 })] }));
+  var selectRows = UI.rowGroup(
+    lrow('A02', { select: { checked: true, action: 'toggle' }, title: [p(D + 'iron')], description: [[p(D + 'owed'), p(D + 'n', { n: 4 }, 'amber')]] }) +
+    lrow('C01', { select: { checked: false, action: 'toggle' }, title: [p(D + 'iron')], description: [[p(D + 'owed'), p(D + 'n', { n: 9 }, 'amber')]] }));
+  function txRow(key) {
+    return UI.row({ title: '', description: '', action: 'open-dose', value: key, strs: { title: D + 'iron', description: D + 'owed_n' }, args: { description: { n: 12 } },
+      act: { label: '', action: 'record', value: key, strs: { label: D + 'record_n' }, args: { label: { n: 12 } } } });
+  }
+  var doneRow = UI.row({ title: '', description: '', action: 'open-edit', value: 'iron-done', rail: 'edit', wrap: true, strs: { title: D + 'iron_done', description: D + 'evidence' } });
+  var row = card('row', [
+    st('row_litter', litterRows),
+    st('row_select', selectRows),
+    st('row_act', UI.rowGroup(txRow('iron'))),
+    st('row_done', UI.rowGroup(doneRow)),
+    st('row_states', UI.rowGroup(lrow('A05', { value: 'row-pressed', title: [p(D + 'iron')], description: [[p(D + 'owed'), p(D + 'n', { n: 2 }, 'amber')]] }) + txRow('door-focus')))
+  ]);
+
+  // ---- Log: a line under the group label; Numpad compact ----
+  var log = card('log', [UI.log([{ label: '', description: '', strs: { label: D + 'log_group', description: D + 'log_desc' },
+    entries: [{ title: '', meta: '', strs: { title: D + 'log_entry', meta: D + 'log_meta' } }] }])]);
+  var padStrs = { digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad', recent: 'ds.field.aria.recent', value: 'ds.field.figure', placeholder: 'ds.field.placeholder' };
+  var numpad = card('numpad', [UI.numpad({ compact: true, label: '', value: '000258', suggested: true, maxLength: 6, key: 'tag-compact', hint: '',
+    actions: [{ label: '', action: 'edit-piglet', strs: { label: 'pp.id.ptr.edit_piglet' }, args: { label: { i: 4 } } }],
+    strs: Object.assign({ label: 'ds.field.numpad.tag_label', hint: D + 'last' }, padStrs), args: { label: { i: 5, n: 11 }, hint: { tag: '000257', w: '1.51' } } })]);
+
+  var screen = document.getElementById('screen');
+  screen.innerHTML = UI.heading({ title: '', kind: 'page', level: 1, strs: { title: D + 'title' } }) + button + radio + status + banner + photos + row + log + numpad;
+  screen.className = 'demo-card';
+  // Pressed, focus and a hold in progress are interaction states; the data-preview hook draws them still.
+  function mark(sel, state) { var el = screen.querySelector(sel); if (el) el.setAttribute('data-preview', state); }
+  mark('[data-value="tool-pressed"]', 'pressed');
+  mark('[data-value="tool-focus"]', 'focus');
+  mark('[data-value="text-pressed"]', 'pressed');
+  mark('[data-value="text-focus"]', 'focus');
+  mark('[data-value="h-holding"]', 'still');
+  mark('[data-field="why-pressed"][data-value="sick"]', 'pressed');
+  mark('[data-field="why-focus"][data-value="small"]', 'focus');
+  mark('[data-field="sex-states"] [data-value="b"]', 'focus');
+  mark('[data-field="sex-states"] [data-value="g"]', 'pressed');
+  mark('[data-field="ph-states"] .st-photos-camera', 'pressed');
+  mark('[data-field="ph-states"] .st-photos-thumb', 'focus');
+  mark('.st-row-door[data-value="door-focus"]', 'focus');
+  var pressedRow = screen.querySelector('[data-value="row-pressed"]'); if (pressedRow) pressedRow.setAttribute('data-preview', 'pressed');
+  // The hold is live here: press and hold (or press twice from the keyboard). Nothing is recorded; the demo resets.
+  UI.holdBind(screen, { onCommit: function (el) { setTimeout(function () { el.setAttribute('data-phase', 'idle'); el.removeAttribute('aria-disabled'); }, 1200); } });
+})();
+</script>
+<script src="/ux/tasks/piglet-processing/shell.js"></script>
+</body>
+</html>
