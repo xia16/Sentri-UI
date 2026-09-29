@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piglet processing</title>
+<link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="shell.css">
+</head>
+<body>
+<main class="phone inspection-phone" data-st-context="page">
+  <div class="st-heading" data-ds="Heading" data-kind="page"><div class="st-heading-main"><h1 class="st-heading-title"><span data-str="pp.common.task"></span></h1></div></div>
+  <div class="st-panel st-row-group" data-ds="Panel">
+    <div class="st-heading st-row-group-label" data-ds="Heading" data-kind="group"><div class="st-heading-main"><h2 class="st-heading-title"><span data-str="pp.common.slices"></span></h2></div></div>
+    <a class="st-row" data-ds="Row" data-slice="room" href="room.html"><span class="st-row-copy"><strong data-str="pp.room.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
+    <a class="st-row" data-ds="Row" data-slice="litter" href="litter.html"><span class="st-row-copy"><strong data-str="pp.litter.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
+    <a class="st-row" data-ds="Row" data-slice="bulk" href="bulk.html"><span class="st-row-copy"><strong data-str="pp.bulk.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
+    <a class="st-row" data-ds="Row" data-slice="id" href="id.html"><span class="st-row-copy"><strong data-str="pp.id.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
+    <a class="st-row" data-ds="Row" data-slice="dead" href="dead.html"><span class="st-row-copy"><strong data-str="pp.dead.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
+    <a class="st-row" data-ds="Row" data-slice="count" href="count.html"><span class="st-row-copy"><strong data-str="pp.count.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
+    <a class="st-row" data-ds="Row" data-slice="move" href="move.html"><span class="st-row-copy"><strong data-str="pp.move.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
+    <a class="st-row" data-ds="Row" data-slice="edit" href="edit.html"><span class="st-row-copy"><strong data-str="pp.edit.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
+    <a class="st-row" data-ds="Row" data-slice="end" href="end.html"><span class="st-row-copy"><strong data-str="pp.end.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
+    <a class="st-row" data-ds="Row" data-slice="edge" href="edge.html"><span class="st-row-copy"><strong data-str="pp.edge.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
+  </div>
+</main>
+<script src="/ux/design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+<script>
+PP.ready.then(function () {
+  document.querySelectorAll('a[data-slice]').forEach(function (a) { a.href = a.dataset.slice + '.html?lang=' + PP.lang; });
+});
+</script>
+</body>
+</html>

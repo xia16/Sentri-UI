@@ -1,0 +1,4 @@
+/* Piglet processing screen frame: the page gutter and section gap only, in token values. */
+.phone { max-width: 390px; margin: 0 auto; padding: 20px 18px; min-height: 100vh; background: var(--st-canvas, #f6f7f1); }
+.phone > * + * { margin-top: 24px; }
+@media (max-width: 370px) { .phone { padding-left: 12px; padding-right: 12px; } }
