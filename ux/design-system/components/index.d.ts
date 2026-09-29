@@ -10,6 +10,11 @@
 type IconHtml = string;
 /** Only `data-*` and `aria-*` keys are kept; everything else is dropped. */
 type SafeAttrs = Record<string, string | number | boolean>;
+/** Registry ids for a component's text slots. The slot is wrapped in `<span data-str="id">`
+ *  and filled by the screen shell; without an id the output is unchanged. */
+type Strs<K extends string> = { [P in K]?: string };
+/** Arguments for the string at each slot, written as `data-args` JSON. */
+type StrArgs<K extends string> = { [P in K]?: Record<string, unknown> };
 
 export interface HeadingProps {
   title: string;
@@ -26,6 +31,8 @@ export interface HeadingProps {
   /** h1–h6; default 4. */
   level?: number;
   className?: string;
+  strs?: Strs<'title' | 'description' | 'meta'>;
+  args?: StrArgs<'title' | 'description' | 'meta'>;
 }
 
 export interface PanelOptions {
@@ -41,6 +48,8 @@ export interface Fact {
   valueHtml?: string;
   /** A small muted line under the value. */
   meta?: string;
+  strs?: Strs<'label' | 'value' | 'meta'>;
+  args?: StrArgs<'label' | 'value' | 'meta'>;
 }
 
 export interface RowProps {
@@ -56,6 +65,9 @@ export interface RowProps {
   trailing?: string;
   attrs?: SafeAttrs;
   className?: string;
+  /** With strs.trailing, `trailing` is escaped fallback text rather than trusted HTML. */
+  strs?: Strs<'title' | 'description' | 'trailing'>;
+  args?: StrArgs<'title' | 'description' | 'trailing'>;
 }
 
 export interface LogEntry {
@@ -66,10 +78,12 @@ export interface LogEntry {
   /** 9px label above the title. */
   category?: string;
   extraHtml?: string;
+  strs?: Strs<'category' | 'title' | 'detail' | 'meta'>;
+  args?: StrArgs<'category' | 'title' | 'detail' | 'meta'>;
 }
-export interface LogGroup { label?: string; entries: LogEntry[] }
+export interface LogGroup { label?: string; entries: LogEntry[]; strs?: Strs<'label'>; args?: StrArgs<'label'> }
 
-export interface Category { id: string; label: string; disabled?: boolean }
+export interface Category { id: string; label: string; disabled?: boolean; strs?: Strs<'label'>; args?: StrArgs<'label'> }
 export interface CategoryFooterProps {
   categories: Category[];
   active?: string;
@@ -80,6 +94,9 @@ export interface CategoryFooterProps {
   /** Accessible name of the tab nav; default "Action categories". */
   label?: string;
   className?: string;
+  /** back = the Back text. The nav `label` is an aria-label and has no twin. */
+  strs?: Strs<'back'>;
+  args?: StrArgs<'back'>;
 }
 
 export interface PickerFieldProps {
@@ -96,10 +113,13 @@ export interface PickerFieldProps {
   key?: string;
   disabled?: boolean;
   className?: string;
+  /** display (or value) targets the shown value; placeholder targets the empty state. */
+  strs?: Strs<'label' | 'display' | 'value' | 'placeholder'>;
+  args?: StrArgs<'label' | 'display' | 'value' | 'placeholder'>;
 }
 
-/** [value, label, subtitle?, groupName?] */
-export type PickerOption = [string, string, string?, string?];
+/** [value, label, subtitle?, groupName?, ids?]; a group's ids come from its first option. */
+export type PickerOption = [string, string, string?, string?, { strs?: Strs<'label' | 'sub' | 'group'>; args?: StrArgs<'label' | 'sub' | 'group'> }?];
 
 export interface ChoiceRowProps {
   label: string;
@@ -111,11 +131,13 @@ export interface ChoiceRowProps {
   selected?: boolean;
   attrs?: SafeAttrs;
   className?: string;
+  strs?: Strs<'label' | 'meta'>;
+  args?: StrArgs<'label' | 'meta'>;
 }
 
 export interface SegmentProps {
-  /** [value, label] — the label is raw HTML so a count can be marked up. */
-  options: [string, string][];
+  /** [value, label, ids?] — the label is raw HTML so a count can be marked up. */
+  options: [string, string, { strs?: Strs<'label'>; args?: StrArgs<'label'> }?][];
   active?: string;
   action?: string;
   ariaLabel?: string;
@@ -132,24 +154,27 @@ export interface IconButtonProps {
   badge?: string | number;
   disabled?: boolean;
   className?: string;
+  /** badge only; `label` is an aria-label and has no twin. */
+  strs?: Strs<'badge'>;
+  args?: StrArgs<'badge'>;
 }
 
 export interface SentriUI {
   heading(props: HeadingProps): string;
-  panel(content: string, options?: PanelOptions): string;
+  panel(content: string, options?: PanelOptions & { ds?: string }): string;
   facts(items: Fact[], options?: { columns?: 1 | 2 | 3; className?: string }): string;
   row(props: RowProps): string;
-  rowGroup(content: string, options?: { title?: string; level?: number; className?: string }): string;
-  log(groups: LogGroup[], options?: { empty?: string; className?: string }): string;
+  rowGroup(content: string, options?: { title?: string; level?: number; className?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
+  log(groups: LogGroup[], options?: { empty?: string; className?: string; strs?: Strs<'empty'>; args?: StrArgs<'empty'> }): string;
   categoryFooter(props: CategoryFooterProps): string;
-  field(props: { label?: string; control?: string; className?: string }): string;
+  field(props: { label?: string; control?: string; className?: string; ds?: string }): string;
   pickerField(props: PickerFieldProps): string;
   pickerOptions(props: { options: PickerOption[]; selected?: string; action?: string; className?: string }): string;
-  chooserList(content: string, options?: { tone?: 'flat' | 'inset'; className?: string }): string;
+  chooserList(content: string, options?: { tone?: 'flat' | 'inset'; className?: string; ds?: string }): string;
   choiceRow(props: ChoiceRowProps): string;
-  choiceGroup(rows: string | string[], options?: { title?: string; lead?: string; className?: string }): string;
+  choiceGroup(rows: string | string[], options?: { title?: string; lead?: string; className?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
   choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs }): string;
-  choiceEmpty(text: string): string;
+  choiceEmpty(text: string, options?: { strs?: Strs<'text'>; args?: StrArgs<'text'> }): string;
   segment(props: SegmentProps): string;
   iconButton(props: IconButtonProps): string;
 }

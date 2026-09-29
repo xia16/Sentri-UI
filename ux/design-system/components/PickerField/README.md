@@ -17,3 +17,6 @@ Call `SentriUI.pickerField({ label, value, display, placeholder, action, key, di
 - A picker returns exactly one record. Use `ChoiceList` with `mode: 'multi'` for several, and show the count in the trigger ("2 selected", "None").
 - Two to four outcomes are a Choice field, not a picker. A fifth outcome makes it a picker.
 - No native selects anywhere. A guardrail test enforces this.
+
+**Strings**
+`pickerField` takes `strs: { label, display | value, placeholder }` and `args`; the id sits on the value span (the placeholder id when nothing is chosen). `pickerOptions` options take a fifth element `{ strs: { label, sub, group }, args }`. Without `strs` the output is unchanged.

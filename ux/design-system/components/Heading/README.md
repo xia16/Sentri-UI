@@ -20,3 +20,6 @@ Call `SentriUI.heading({ title, kind, icon, description, meta, action, level })`
 - Do use `icon` only where the icon names the subject: a feed heading takes `SentriIcons.icon('feed')`. The icon is 16px and `muted`.
 - Don't render a heading for an empty section. Empty sections are absent.
 - Don't put status colour in a heading.
+
+**Strings**
+Optional `strs: { title, description, meta }` (registry ids) and `args: { title: {...} }`: each slot is wrapped in `<span data-str data-args>` for the screen shell to fill; without `strs` the output is unchanged.

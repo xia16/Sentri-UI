@@ -19,3 +19,6 @@ Call `SentriUI.panel(content, { tag, className })`.
 - Don't nest panels. A panel inside a panel turns transparent, so use a heading or rules instead.
 - Don't add a left-border accent. Don't add a shadow.
 - Separate panels with `space-section` (24px), each under its own heading.
+
+**Strings**
+`panel` has no text slots. `rowGroup` and `log` take `strs`/`args` (see Row and Log); the root carries `data-ds="Panel"`.

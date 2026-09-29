@@ -16,3 +16,6 @@ Call `SentriUI.facts(items, { columns })`. Each item is `{ label, value | valueH
 **Do and don't**
 - Put IDs in `valueHtml` with `font-family:var(--mono)`, so an ear tag reads as an ID.
 - Don't put actions in facts. A detail page reads; it never acts.
+
+**Strings**
+Per fact `strs: { label, value, meta }` and `args: { value: {...} }` (value ids are ignored when `valueHtml` is set); without `strs` the output is unchanged.
