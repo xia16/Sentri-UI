@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Record for several litters</title>
+<link rel="stylesheet" href="/ux/design-system/tokens.css">
+<link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="shell.css">
+<script type="module" src="ledger.js"></script>
+<script type="module" src="fixtures.js"></script>
+<style>
+/* Layout, tokens from tokens.css. Rows are the shared Candidate:LitterRow (shell-ui.js) in its select form; the
+   receipt is the shared Candidate:Receipt. */
+.bk-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
+.bk-phone .scrim { inset: 0; }
+.bk-body { display: flex; flex-direction: column; gap: var(--space-section); }
+.bk-body > * { margin: 0; }
+.bk-drawer-body { display: flex; flex-direction: column; gap: var(--space-section); }
+.bk-drawer-body > * { margin: 0; }
+/* The bar: the live summary (or the receipt) above Close and the one primary, so a tick never reflows the rows. */
+.bk-bar { flex-wrap: wrap; row-gap: var(--space-row-y); }
+.bk-bar > .pp-receipt, .bk-bar > .bk-doors { flex-basis: 100%; }
+.bk-doors { display: flex; flex-wrap: wrap; column-gap: var(--space-section); }
+.bk-bar > .button { flex: 1; }
+.bk-bar > .button.secondary:not(:only-of-type) { flex: none; }
+.sheet[data-st-context="drawer"] .sheet-footer > .button { flex: 1; }
+.sheet[data-st-context="drawer"] .sheet-footer > .button.secondary { flex: none; }
+.pp-litter[data-select] { cursor: pointer; }
+/* Motion (DS README): in bulk the selection bar leaves first, 200ms ease. */
+.bk-bar { transition: transform 200ms ease; }
+.bk-bar[data-leaving] { transform: translateY(110%); }
+@media (prefers-reduced-motion: reduce) { .bk-bar { transition: none; } }
+</style>
+</head>
+<body>
+<main class="inspection-phone bk-phone" data-st-context="page">
+  <div id="screen"></div>
+</main>
+<script src="/ux/design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+<script src="shell-ui.js"></script>
+<script>
+(function () {
+  var UI = window.SentriUI, U = window.PPUI;
+  var zh = PP.lang === 'zh';
+
+  /* ---- states: a fixture variant + the selection + UI state. Every row and figure is the ledger's
+     (select.bulkDraft over the shared log); the commit goes through the store's commitAll.
+     meantime: another phone records a litter after the review was read (it arrives with the commit).
+     offline: this phone records with the log it had; another phone's record of the same litter syncs after. ---- */
+  var SEVEN = ['A02', 'A04', 'B06', 'B10', 'A05', 'C04', 'C02'];
+  var FOUR = ['A02', 'A04', 'B06', 'B10'];
+  var STATES = {
+    'bulk':                   { data: 'base' },
+    'bulk-select':            { data: 'base', sel: SEVEN },
+    'bulk-review':            { data: 'base', sel: SEVEN, review: true },
+    'bulk-deferred':          { data: 'base', sel: FOUR.concat(['B09']), review: true },
+    'bulk-deferred-saved':    { data: 'base', sel: FOUR.concat(['B09']), review: true, commit: true },
+    'bulk-receipt':           { data: 'base', sel: FOUR, review: true, meantime: 'B06', commit: true },
+    'bulk-offline-collision': { data: 'base', sel: FOUR, offline: { litter: 'B06', at: '2026-09-29T10:26' }, commit: true }
+  };
+  var name = STATES[PP.state] ? PP.state : 'bulk';
+  var st = STATES[name];
+  var qs = PP.q;
+  var ROOM = +(qs.get('unit') || 7);
+  var TX = qs.get('tx') || 'iron';
+  var store, CFG, DOSE;
+  var S = { sel: [], review: false, reviewed: [], receipt: null, held: [], flash: false };
+  var lastCommit = 0, reviewClosedAt = 0, holdTimer = 0, oldBar = '';
+
+  /* ---- the ledger ---- */
+  function bulk(sel, stamp) { return store.select.bulkDraft(store.derived, { room: ROOM, dose: DOSE, selected: sel || S.sel, stamp: stamp || { who: PP.me } }); }
+  function doseCfg(id) { return CFG.doses.filter(function (d) { return d.id === id; })[0]; }
+  function pickDose() {
+    if (qs.get('dose') && doseCfg(qs.get('dose'))) return qs.get('dose');
+    var ids = CFG.doses.filter(function (d) { return d.tx === TX; }).map(function (d) { return d.id; });
+    var has = function (kinds) { return ids.filter(function (id) { return store.select.bulkDraft(store.derived, { room: ROOM, dose: id }).rows.some(function (r) { return kinds.indexOf(r.kind) >= 0; }); })[0]; };
+    return has(['record', 'sheet']) || has(['done']) || ids[0] || CFG.doses[0].id;
+  }
+
+  /* ---- words ---- */
+  var one = PP.one;
+  function T(id, args, tone) { return U.tok(id, args, null, tone); }
+  function pig(n) { return T(one('pp.common.unit.piglet', n), { n: n }); }
+  function title() { var d = doseCfg(DOSE); return { tx: PP.t('pp.common.tx.' + d.tx), d: d.due }; }
+  function txLower() { var t = title(), s = PP.t('pp.bulk.tx', t); return zh ? s : s.charAt(0).toLowerCase() + s.slice(1); }
+  function dueTok(late) { return late === 0 ? T('pp.room.tok.due_today') : late === 1 ? T('pp.room.tok.due_yest', {}, 'red') : T('pp.room.tok.due_ago', { n: late }, 'red'); }
+  function chip(r) { return r.sowDied ? ['red', 'sowdied'] : r.phase === 'open' ? ['amber', 'unlocked'] : null; }
+  function codes(ids) { return ids.join(' '); }
+
+  /* ---- a litter row: line 1 what a bulk record does here, line 2 time → counts ---- */
+  function spec(r) {
+    if (r.kind === 'record') return { l1: [T(one('pp.bulk.l1.owed', r.n), { n: r.n })], toks: [dueTok(r.lateBy), T('pp.common.unit.day', { n: r.day })] };
+    if (r.kind === 'done') {
+      var toks = [];
+      r.records.forEach(function (x) { toks.push(T('pp.common.stamp.today', { t: U.time(x.at), who: x.who })); if (!r.collided) toks.push(pig(x.n)); });
+      if (r.collided) toks.push(T('pp.room.tok.collide', { n: r.records.length }, 'amber'));
+      return { l1: [T('pp.bulk.l1.done')], toks: toks };
+    }
+    if (r.kind === 'not_due') return { l1: [T(r.inDays === 1 ? 'pp.bulk.l1.tomorrow' : 'pp.bulk.l1.in', { n: r.inDays })], toks: [T('pp.common.unit.day', { n: r.day }), pig(r.alive)] };
+    var l1 = r.why === 'deferred' ? T('pp.bulk.l1.deferred', { n: r.n, reason: PP.t('pp.litter.why.' + (r.reason || 'deferred')) })
+      : r.why === 'missed' ? T('pp.bulk.l1.missed', { n: r.n, d: r.last })
+      : r.why === 'unknown' ? T('pp.bulk.l1.unknown', { n: r.n }) : T('pp.bulk.l1.males');
+    return { l1: [l1], toks: [dueTok(r.lateBy), T('pp.bulk.tok.sheet')] };
+  }
+  function row(r, how) {
+    var s = spec(r), o = { code: r.litter, l1: s.l1, toks: s.toks, chip: chip(r), flash: S.flash && S.held.indexOf(r.litter) >= 0 };
+    if (how === 'select') { o.select = true; o.selected = S.sel.indexOf(r.litter) >= 0; }
+    else if (how === 'door') { o.action = 'open-litter'; }
+    else o.static = true;
+    return U.litterRow(o);
+  }
+  function group(titleId, rows, how, meta) {
+    if (!rows.length) return '';
+    return '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: titleId } }) +
+      UI.rowGroup(rows.map(function (r) { return row(r, how); }).join('')) + '</section>';
+  }
+
+  /* ---- the page: every litter of the room this dose touches today, grouped by what a bulk record does there ---- */
+  function header() {
+    var clear = S.sel.length ? '<button type="button" data-action="clear" data-str="act.clear">' + U.esc(PP.t('act.clear')) + '</button>' : '';
+    return '<header class="utility-header">' + UI.heading({ title: '', kind: 'page', level: 3, description: '', action: clear,
+      strs: { title: 'pp.bulk.head', description: 'pp.bulk.howto' }, args: { title: title(), description: { n: ROOM } } }) + '</header>';
+  }
+  function body() {
+    var rows = bulk().rows, by = { record: [], sheet: [], done: [], not_due: [] };
+    // Hold, then depart: a row this commit changed keeps its place (turned into its new state) until the hand is idle.
+    rows.forEach(function (r) { by[S.held.indexOf(r.litter) >= 0 ? 'record' : r.kind].push(r); });
+    if (!rows.length) return UI.panel(UI.choiceEmpty('', { strs: { text: 'pp.bulk.empty' }, args: { text: { tx: txLower() } } }));
+    return group('pp.bulk.grp.record', by.record, 'select') + group('pp.bulk.grp.sheet', by.sheet, 'select') +
+      group('pp.bulk.grp.done', by.done, 'select') + group('pp.bulk.grp.not_due', by.not_due, 'select');
+  }
+  function btn(kind, action, id, args) {
+    return '<button type="button" class="button ' + kind + '" data-ds="Button" data-action="' + action + '" data-str="' + id + '"' +
+      (args ? " data-args='" + U.esc(JSON.stringify(args)) + "'" : '') + '>' + U.esc(PP.t(id, args)) + '</button>';
+  }
+  /* What the selection will do, in one line: `4 litters · 46 piglets · 2 already done · 1 not due`. */
+  function summary(p) {
+    var parts = [];
+    if (p.litters) parts.push({ id: one('pp.bulk.part.litters', p.litters), args: { k: p.litters } }, { id: one('pp.common.unit.piglet', p.piglets), args: { n: p.piglets } });
+    else parts.push({ id: 'pp.bulk.part.none' });
+    if (p.done.length) parts.push({ id: 'pp.bulk.part.done', args: { k: p.done.length } });
+    if (p.notDue.length) parts.push({ id: 'pp.bulk.part.not_due', args: { k: p.notDue.length } });
+    if (p.sheet.length) parts.push({ id: one('pp.bulk.part.sheet', p.sheet.length), args: { k: p.sheet.length } });
+    if (p.refused.length) parts.push({ id: 'pp.bulk.part.refused', args: { k: p.refused.length } });
+    return parts;
+  }
+  function receiptLines() {
+    var R = S.receipt, out = '';
+    if (R.recorded.length) {
+      out += U.receipt([{ id: 'pp.bulk.rcpt.saved', args: { tx: txLower() } }, { id: one('pp.bulk.part.litters', R.recorded.length), args: { k: R.recorded.length } },
+        { id: one('pp.common.unit.piglet', R.piglets), args: { n: R.piglets }, tone: 'green' }].concat(R.late ? [{ id: one('pp.bulk.rcpt.late', R.late), args: { k: R.late } }] : []));
+      out += U.receipt([{ id: 'pp.bulk.rcpt.each', args: { list: R.recorded.map(function (x) { return PP.t('pp.bulk.rcpt.one', { code: x.litter, n: x.n }); }).join(' · ') } }]);
+    }
+    R.nothing.forEach(function (x) {
+      out += U.receipt([{ id: 'pp.bulk.rcpt.meantime', args: { code: x.litter, t: U.time(x.other.at), who: x.other.who } }, { id: 'pp.bulk.rcpt.nothing', tone: 'amber' }]);
+    });
+    R.double.forEach(function (x) {
+      out += U.receipt([{ id: 'pp.bulk.rcpt.double', args: { code: x.litter, t: U.time(x.other.at), who: x.other.who } }, { id: 'pp.bulk.rcpt.double_flag', tone: 'amber' }]);
+    });
+    if (R.already.length) out += U.receipt([{ id: 'pp.bulk.rcpt.already', args: { list: codes(R.already) } }, { id: 'pp.bulk.rcpt.nothing' }]);
+    if (R.notDue.length) out += U.receipt([{ id: 'pp.bulk.rcpt.not_due', args: { list: codes(R.notDue) } }]);
+    if (R.sheet.length) out += U.receipt([{ id: 'pp.bulk.rcpt.sheet', args: { list: codes(R.sheet) } }]);
+    // A litter this act did not record keeps a door to its own sheet (reasons, early records).
+    var doors = R.sheet.concat(R.notDue);
+    if (doors.length) out += '<div class="bk-doors">' + doors.map(function (id) {
+      return '<button type="button" class="st-text-action" data-ds="Button" data-action="open-litter" data-value="' + U.esc(id) + '" data-str="pp.bulk.act.sheet" data-args=\'' + U.esc(JSON.stringify({ code: id })) + '\'>' + U.esc(PP.t('pp.bulk.act.sheet', { code: id })) + '</button>';
+    }).join('') + '</div>';
+    return out;
+  }
+  function footer() {
+    var inner = '';
+    if (S.receipt) inner = receiptLines() + btn('secondary', 'close', 'act.close');
+    else if (S.sel.length) {
+      var p = bulk().plan;
+      inner = U.receipt(summary(p)) + btn('secondary', 'close', 'act.close') + (p.litters ? btn('primary', 'review', one('pp.bulk.act.review', p.litters), { k: p.litters }) : '');
+    } else inner = btn('secondary', 'close', 'act.close');
+    return '<footer class="sheet-footer bk-bar">' + inner + '</footer>';
+  }
+
+  /* ---- the review: what the commit will do per litter, before it is made ---- */
+  function reviewDrawer() {
+    var b = bulk(), p = b.plan, byId = {};
+    b.rows.forEach(function (r) { byId[r.litter] = r; });
+    var pick = function (ids) { return ids.map(function (id) { return byId[id]; }).filter(Boolean); };
+    S.reviewed = p.record.map(function (x) { return x.litter; });
+    var d = doseCfg(DOSE);
+    var desc = d.product ? ['pp.bulk.rv.prod', { prod: PP.t('pp.litter.product.' + d.product) }] : ['pp.bulk.rv.all', null];
+    var head = UI.heading({ title: '', kind: 'page', level: 3, description: '', strs: { title: 'pp.bulk.rv.title', description: desc[0] }, args: { title: { tx: txLower() }, description: desc[1] } });
+    var refused = p.refused.map(function (x) { return x.litter; });
+    var content = U.receipt(summary(p)) +
+      group('pp.bulk.rv.record', pick(S.reviewed), 'static') +
+      group('pp.bulk.rv.done', pick(p.done), 'static') +
+      group('pp.bulk.rv.not_due', pick(p.notDue), 'door') +
+      group('pp.bulk.rv.sheet', pick(p.sheet), 'door') +
+      group('pp.bulk.rv.refused', pick(refused), 'door') +
+      (p.litters ? UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.bulk.rv.pointer' } }) : '');
+    return '<div class="scrim" data-ds="Sheet" data-action="back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" data-sizing="content" role="dialog" aria-modal="true">' +
+      '<header class="utility-header">' + head + '</header><div class="sheet-body"><div class="bk-drawer-body">' + content + '</div></div>' +
+      '<footer class="sheet-footer">' + btn('secondary', 'back', 'act.back') + (p.litters ? btn('primary', 'record', one('pp.bulk.act.record', p.piglets), { n: p.piglets }) : '') + '</footer></section>';
+  }
+
+  /* ---- render: keeps scroll and focus ---- */
+  function render(bar) {
+    var scr = document.getElementById('screen');
+    var pb = scr.querySelector('[data-presentation="page"] .sheet-body'), top = pb ? pb.scrollTop : 0;
+    var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-action]');
+    var fk = f ? [f.dataset.action, f.value || f.dataset.value || ''] : null;
+    scr.innerHTML = '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (S.review ? ' inert' : '') + '>' + header() +
+      '<div class="sheet-body"><div class="bk-body">' + body() + '</div></div>' + (bar || footer()) + '</section>' + (S.review ? reviewDrawer() : '');
+    PP.apply(scr);
+    var nb = scr.querySelector('[data-presentation="page"] .sheet-body'); if (nb) nb.scrollTop = top;
+    if (fk) {
+      var t = Array.prototype.filter.call(scr.querySelectorAll('[data-action]'), function (e) { return e.dataset.action === fk[0] && (e.value || e.dataset.value || '') === fk[1] && !e.closest('[inert]'); })[0];
+      if (t) t.focus({ preventScroll: true });
+    }
+  }
+
+  /* ---- commit: the review's plan, re-read against the log as it is now, written as one act (commitAll, one stamp).
+     A litter another phone finished in the meantime is not in it: the ledger would refuse it, and the receipt says so. ---- */
+  function commit(seen) {
+    var st0 = store.stamp(), stamp = { at: st0.at, who: PP.me };
+    if (seen) stamp.seen = seen;
+    var b = bulk(S.sel, stamp);
+    var evs = b.plan.events.map(function (e) { return Object.assign({ at: stamp.at }, seen ? { seen: seen } : {}, e); });
+    var res = evs.length ? store.commitAll(evs) : { ok: true, events: [] };
+    lastCommit = Date.now();
+    if (!res.ok) { S.review = true; return false; }
+    var now = {}; bulk([]).rows.forEach(function (r) { now[r.litter] = r; });
+    var R = { recorded: b.plan.record, piglets: b.plan.piglets, late: b.plan.record.filter(function (x) { return x.lateBy > 0; }).length,
+      nothing: [], double: [], already: b.plan.done, notDue: b.plan.notDue, sheet: b.plan.sheet, mine: res.events.map(function (e) { return e.id; }) };
+    S.reviewed.forEach(function (id) {
+      if (b.plan.record.some(function (x) { return x.litter === id; })) return;
+      var r = now[id], other = r && r.records ? r.records[r.records.length - 1] : null;
+      if (other) R.nothing.push({ litter: id, other: other });
+    });
+    // A litter the review promised and another phone finished says so once, as `nothing added`, not again as `already done`.
+    R.already = R.already.filter(function (id) { return !R.nothing.some(function (x) { return x.litter === id; }); });
+    S.receipt = R; recheck();
+    S.held = R.recorded.map(function (x) { return x.litter; }).concat(R.nothing.map(function (x) { return x.litter; }));
+    S.sel = []; S.review = false;
+    return true;
+  }
+  /* After a sync: a record of ours that another phone's record collides with is flagged, both kept. */
+  function recheck() {
+    var R = S.receipt; if (!R) return;
+    R.double = [];
+    bulk([]).rows.forEach(function (r) {
+      if (r.kind !== 'done' || !r.records.some(function (x) { return R.mine.indexOf(x.id) >= 0 && x.collided; })) return;
+      r.records.forEach(function (x) { if (x.collided && R.mine.indexOf(x.id) < 0) R.double.push({ litter: r.litter, other: x }); });
+    });
+  }
+  /* Another hand's record arrives through the ledger (PP.sync({ type: 'treat', litter: 'B06', dose: 'iron3', n: 12 })). */
+  PP.sync = function (event, quiet) {
+    var r = store.commit(Object.assign({ who: 'L.M', device: 'P-LM' }, event));
+    if (r.ok) { recheck(); if (!quiet) render(); }
+    return r;
+  };
+
+  /* ---- hold, then depart: 800ms of idle after the flash, any touch or scroll resets it ---- */
+  function armHold() {
+    clearTimeout(holdTimer);
+    if (S.held.length) holdTimer = setTimeout(function () { S.held = []; S.flash = false; render(); }, 800);
+  }
+  ['pointerdown', 'touchstart', 'scroll'].forEach(function (e) { window.addEventListener(e, armHold, { passive: true, capture: true }); });
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function nav(page, params) { location.href = PP.href(page, Object.assign({ data: store.name !== 'base' ? store.name : '' }, params)); }
+  var scr = document.getElementById('screen');
+  scr.addEventListener('change', function (ev) {
+    var t = ev.target; if (!t.matches('input[data-action="toggle"]')) return;
+    var i = S.sel.indexOf(t.value);
+    if (t.checked && i < 0) S.sel.push(t.value); else if (!t.checked && i >= 0) S.sel.splice(i, 1);
+    S.receipt = null; S.held = []; S.flash = false;
+    render();
+  });
+  scr.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-action]'); if (!b || b.matches('input')) return;
+    var a = b.dataset.action, v = b.dataset.value, now = Date.now();
+    if (a === 'clear') { S.sel = []; render(); }
+    else if (a === 'review') { if (now - lastCommit < 600) return; S.review = true; render(); }
+    else if (a === 'back') { S.review = false; reviewClosedAt = now; render(); }
+    else if (a === 'record') {
+      if (now - lastCommit < 600) return;
+      oldBar = footer();
+      if (!commit()) { render(); return; }
+      if (reduce) { S.flash = false; render(); armHold(); return; }
+      // 0ms: the rows change in place and flash; the selection bar leaves first (200ms), then the receipt takes the bar.
+      S.flash = true; render(oldBar);
+      var bar = scr.querySelector('.bk-bar');
+      requestAnimationFrame(function () {
+        bar.setAttribute('data-leaving', '');
+        scr.querySelectorAll('.pp-litter[data-flash]').forEach(function (x) { x.removeAttribute('data-flash'); });
+      });
+      setTimeout(function () {
+        var cur = scr.querySelector('.bk-bar'); if (!cur) return;
+        var tmp = document.createElement('div'); tmp.innerHTML = footer(); PP.apply(tmp);
+        cur.replaceWith(tmp.firstChild);
+        var c = scr.querySelector('.bk-bar [data-action="close"]'); if (c) c.focus({ preventScroll: true });
+        armHold();
+      }, 200);
+    }
+    else if (a === 'close') { if (now - reviewClosedAt < 400) return; nav('room.html', { state: 'room', filter: doseCfg(DOSE).tx, unit: ROOM !== 7 ? ROOM : '' }); }
+    else if (a === 'open-litter') { nav('litter.html', { state: 'litter', crate: v, unit: ROOM !== 7 ? ROOM : '' }); }
+  });
+
+  PP.ready.then(function () {
+    PP.me = window.PPFixtures.ME;
+    // A state that writes on boot keeps its records out of this tab's log, so every other state opens clean.
+    store = PP.open(st.data, st.commit ? { session: false } : {});
+    CFG = store.config;
+    DOSE = pickDose();
+    S.sel = (st.sel || []).slice();
+    if (qs.get('crate') && S.sel.indexOf(qs.get('crate')) < 0) S.sel.push(qs.get('crate'));
+    if (st.review) { S.review = true; render(); }
+    if (st.meantime) {
+      var m = bulk().rows.filter(function (r) { return r.litter === st.meantime; })[0];
+      PP.sync({ type: 'treat', litter: m.litter, dose: DOSE, n: m.n, at: '2026-09-29T10:30' }, true);
+    }
+    if (st.commit) {
+      var seen = st.offline ? store.events.map(function (e) { return e.id; }) : null;
+      if (st.offline) S.reviewed = bulk().plan.record.map(function (x) { return x.litter; });
+      commit(seen);
+      if (st.offline) {
+        var o = bulk([]).rows.filter(function (r) { return r.litter === st.offline.litter; })[0];
+        PP.sync({ type: 'treat', litter: o.litter, dose: DOSE, n: o.alive, at: st.offline.at, seen: seen }, true);
+      }
+      S.held = []; S.flash = false;
+    }
+    render();
+  });
+})();
+</script>
+</body>
+</html>

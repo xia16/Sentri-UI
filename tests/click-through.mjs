@@ -56,6 +56,34 @@ try {
   assert.match(dead, /11 piglets/);
   console.log('ok 2 room → litter → Record dead → Save → room:', dead);
 
+  // 3. room → filter iron → Record for several litters → tick 4 → review → Record → room: the four leave the iron filter.
+  await page.goto(base + 'room.html?state=room&fresh=1'); await ready(page);
+  await page.click('[data-action="filter"]');
+  await page.click('input[data-action="toggle-dose"][value="iron"]');
+  await page.click('[data-action="close-sheet"]');
+  await page.waitForSelector('[data-action="open-bulk"]');
+  await page.click('[data-action="open-bulk"]');
+  await page.waitForURL(/bulk\.html/); await ready(page);
+  for (const c of ['A02', 'A04', 'B06', 'B10']) await page.check(`input[data-action="toggle"][value="${c}"]`);
+  assert.match(await text(page, '.bk-bar .pp-receipt'), /4 litters · 46 piglets/);
+  await page.click('[data-action="review"]');
+  assert.match(await text(page, '[data-st-context="drawer"]'), /Will record/);
+  await page.click('[data-action="record"]');
+  await page.waitForSelector('.bk-bar [data-action="close"]');
+  await page.waitForTimeout(300);
+  const receipt = await text(page, '.bk-bar');
+  assert.match(receipt, /Saved · iron · day 3 · 4 litters · 46 piglets/);
+  await page.waitForTimeout(1000);
+  await page.click('.bk-bar [data-action="close"]');
+  await page.waitForURL(/room\.html/); await ready(page);
+  for (const c of ['A02', 'A04', 'B06', 'B10']) assert.equal(await page.locator(`[data-action="open-litter"][data-value="${c}"]`).count(), 0);
+  assert.match(await rowText(page, 'A07'), /Iron/);
+  await page.click('[data-action="clear-filter"]');
+  const a02 = await rowText(page, 'A02');
+  assert.doesNotMatch(a02, /Iron/);
+  assert.match(a02, /Dock tail/);
+  console.log('ok 3 room → filter iron → Record for several → review → Record → room:', receipt, '⇒ A02', a02);
+
   await browser.close();
 } finally {
   server.kill();

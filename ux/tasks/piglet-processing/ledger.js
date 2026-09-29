@@ -33,7 +33,7 @@
      derive(events, config, { today })   → Derived (README: ux/laws/glossary.md, Ledger module)
      append(events, event, config, opts) → { ok, reason, detail, event, events, derived, dependents }
      balances(litter)                    → the ledger identity for one derived litter
-     select.room / litter / deathDraft / moveDraft / end — what pages render; drafts are validated
+     select.room / litter / deathDraft / moveDraft / end / bulkDraft — what pages render; drafts are validated
        by the same replay `append` runs
 */
 
@@ -1337,6 +1337,65 @@ function moveDraftSelect(derived, draft, stamp) {
   };
 }
 
+/* One dose for several litters (slice #7, bulk). Each litter's record is its one-tap: every owed piglet,
+   no reasons. Rows: every litter of the room (or `litters`) in the task, alive, where the dose is owed now,
+   was recorded today, or is not yet due — each with what a bulk record would do there:
+     record   owed now, nothing to ask: `n` piglets (late by `lateBy` days)
+     done     nothing owed and recorded today: the records (who, when, collided)
+     not_due  due in `inDays` days — early is deliberate, on the litter's own sheet
+     sheet    owed with something to ask (`why`: deferred with its reason · unknown arrivals · missed window ·
+              males, castration's first count): the bulk act never asks reasons, so the litter goes to its sheet
+   `selected` litters are then replayed in order exactly as the store's commitAll appends them (one stamp):
+   the plan's `events` are what to commit; a refusal lands in `refused` with the ledger's reason and detail. */
+function bulkDraftSelect(derived, opts) {
+  const o = opts || {};
+  const doseId = o.dose;
+  if (!derived.config.doses.some((d) => d.id === doseId)) return { why: 'unknown_dose', rows: [], plan: null };
+  const today = derived.today;
+  const pool = Object.values(derived.litters).filter((L) => L.inTask && L.alive > 0 &&
+    (o.litters ? o.litters.includes(L.id) : o.room == null || L.room === o.room));
+  const rows = [];
+  for (const L of pool) {
+    const D = L.doses[doseId];
+    if (!D || D.status == null) continue;
+    const row = { litter: L.id, alive: L.alive, day: L.dayAge, status: D.status, lateBy: D.status === 'late' ? L.dayAge - D.due : 0,
+      sowDied: !!L.sowDied, phase: L.phase };
+    const collided = (r) => D.possibleDoubleTreatment.some((p) => p.includes(r.id));
+    const todays = D.records.filter((r) => dayNumber(r.at) === today).map((r) => ({ id: r.id, at: r.at, who: r.who, n: r.n, collided: collided(r) }));
+    if (D.status === 'later') Object.assign(row, { kind: 'not_due', inDays: D.due - L.dayAge });
+    else if (D.done) { if (!todays.length) continue; Object.assign(row, { kind: 'done', records: todays, collided: todays.some((r) => r.collided) }); }
+    else if (D.owed == null) Object.assign(row, { kind: 'sheet', why: 'males' });
+    else if (D.status === 'missed') Object.assign(row, { kind: 'sheet', why: 'missed', n: D.owed, last: D.last });
+    else if (D.deferred > 0) Object.assign(row, { kind: 'sheet', why: 'deferred', n: D.owed, reason: D.deferReason });
+    else if (D.unknownAfterMove > 0) Object.assign(row, { kind: 'sheet', why: 'unknown', n: D.unknownAfterMove });
+    else Object.assign(row, { kind: 'record', n: D.owed });
+    rows.push(row);
+  }
+  rows.sort((a, b) => (a.litter < b.litter ? -1 : a.litter > b.litter ? 1 : 0));
+  const byId = new Map(rows.map((r) => [r.litter, r]));
+  const plan = { record: [], done: [], notDue: [], sheet: [], refused: [], litters: 0, piglets: 0, events: [] };
+  const input = derived.input || { events: [], config: {}, opts: {} };
+  const st = o.stamp || {};
+  let events = input.events;
+  (o.selected || []).forEach((id, i) => {
+    const row = byId.get(id);
+    if (!row) return;
+    if (row.kind === 'done') { plan.done.push(id); return; }
+    if (row.kind === 'not_due') { plan.notDue.push(id); return; }
+    if (row.kind === 'sheet') { plan.sheet.push(id); return; }
+    const ev = { type: 'treat', litter: id, dose: doseId, n: row.n };
+    const e = Object.assign({ id: (st.id || '__bulk') + ':' + i, at: st.at || input.opts.today || null, who: st.who || null }, st.seen ? { seen: st.seen } : {}, ev);
+    const r = append(events, e, input.config, input.opts);
+    if (!r.ok) { plan.refused.push({ litter: id, why: r.reason, detail: r.detail }); return; }
+    events = r.events;
+    plan.record.push({ litter: id, n: row.n, lateBy: row.lateBy });
+    plan.events.push(ev);
+    plan.litters += 1;
+    plan.piglets += row.n;
+  });
+  return { dose: doseId, rows, plan, why: null };
+}
+
 /* End task figures (slice S9 glossary) over a set of derived litters. */
 function endFigures(cfg, litterViews) {
   const order = doseOrder(cfg);
@@ -1380,7 +1439,7 @@ function endSelect(derived) {
   return { atEnd: derived.ended && derived.ended.snapshot ? clone(derived.ended.snapshot) : null, now: endFigures(derived.config, derived.litters), ended: derived.ended ? Object.assign({}, derived.ended, { snapshot: undefined }) : null };
 }
 
-export const select = { room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect };
+export const select = { room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect, bulkDraft: bulkDraftSelect };
 export const PPLedger = { derive, append, balances, dayNumber, select };
 export default PPLedger;
 if (typeof window !== 'undefined') window.PPLedger = PPLedger;

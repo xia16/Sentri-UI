@@ -1347,3 +1347,40 @@ test('property: concurrent records give the same owed in every permutation', () 
     assert.equal(readings.size, 1, `seed ${seed}: ${JSON.stringify(recs)} ${[...readings]}`);
   }
 });
+
+// ---- bulk (slice #7): one dose for several litters ------------------------------------------------
+
+test('bulk: each litter is classified; the plan records only the one-tap litters, in one replay', () => {
+  const b = book();
+  const cfg = { doses: IRON_ONLY.doses, identity: { scheme: 'none' } };
+  b.farrowed('A02', 12); b.farrowed('A04', 11); b.farrowed('B09', 10); b.farrowed('C04', 9);
+  b.farrowed('C02', 14, {}, { birthDate: on(2).slice(0, 10), at: on(2) });
+  b.treat('B09', 'iron3', 8, { deferred: { n: 2, reason: 'weak' }, at: on(3, '08:00') });
+  b.treat('C04', 'iron3', 9, { at: on(3, '08:30'), who: 'L.M' });
+  const d = run(b, cfg, 3);
+  const r = select.bulkDraft(d, { room: 'R3', dose: 'iron3', selected: ['A02', 'A04', 'C04', 'C02', 'B09'], stamp: { at: on(3, '10:31'), who: 'G.H' } });
+  const kind = Object.fromEntries(r.rows.map((x) => [x.litter, x.kind]));
+  assert.deepEqual(kind, { A02: 'record', A04: 'record', B09: 'sheet', C02: 'not_due', C04: 'done' });
+  assert.equal(r.rows.find((x) => x.litter === 'C04').records[0].who, 'L.M');
+  assert.deepEqual([r.plan.litters, r.plan.piglets, r.plan.done, r.plan.notDue, r.plan.sheet], [2, 23, ['C04'], ['C02'], ['B09']]);
+  // the plan's events commit as they were replayed
+  let ev = b.ev;
+  r.plan.events.forEach((e, i) => { const a = append(ev, Object.assign({ id: 'bk' + i, at: on(3, '10:31'), who: 'G.H' }, e), cfg, TODAY(3)); assert.ok(a.ok); ev = a.events; });
+  const after = select.bulkDraft(derive(ev, cfg, TODAY(3)), { room: 'R3', dose: 'iron3' });
+  assert.deepEqual(after.rows.filter((x) => x.kind === 'done').map((x) => x.litter), ['A02', 'A04', 'C04']);
+});
+
+test('bulk: a litter another phone finished is no longer in the plan; an offline twin is kept and flagged', () => {
+  const b = book();
+  const cfg = { doses: IRON_ONLY.doses, identity: { scheme: 'none' } };
+  const f = b.farrowed('B06', 12);
+  b.treat('B06', 'iron3', 12, { at: on(3, '10:30'), who: 'L.M' });
+  assert.equal(select.bulkDraft(run(b, cfg, 3), { room: 'R3', dose: 'iron3', selected: ['B06'] }).plan.litters, 0);
+  // offline: this phone had only the farrowing when it recorded
+  const r = select.bulkDraft(derive([f], cfg, TODAY(3)), { room: 'R3', dose: 'iron3', selected: ['B06'] });
+  const a = append(b.ev, Object.assign({ id: 'mine', at: on(3, '10:31'), who: 'G.H', seen: [f.id] }, r.plan.events[0]), cfg, TODAY(3));
+  assert.ok(a.ok);
+  const done = select.bulkDraft(a.derived, { room: 'R3', dose: 'iron3' }).rows[0];
+  assert.equal(done.kind, 'done');
+  assert.ok(done.collided);
+});
