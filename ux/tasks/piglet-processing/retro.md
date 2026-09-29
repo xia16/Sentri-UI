@@ -150,3 +150,17 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   checked against the component layer at Start: the doctor can render each
   card's preview and require `data-ds` on its root.
 - **Cost:** medium.
+
+## 11 · Slices — the ladder assumes one slice meets a missing card at a time
+
+- **Stage:** Slices, before the first parallel wave.
+- **What happened:** the doctor's growth rule says the ladder fills a missing
+  card "when a design first needs it". Five of six frontier slices need
+  Stepper, and two need Numpad and Measure. Run in parallel, each designer
+  would climb the ladder alone and five steppers would reach the panel.
+  Resequenced: a field-cards step (extract farrowing's ruled `− n +` stepper
+  and pad grammar as candidates, one panel) runs first; slices that need no
+  new field start alongside it.
+- **Change:** at chart time, cross the slices with the doctor's growth gaps;
+  any card two or more frontier slices need becomes its own first ticket.
+- **Cost:** low (caught before dispatch).
