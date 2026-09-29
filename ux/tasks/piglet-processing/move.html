@@ -251,6 +251,8 @@
       groups.forEach(function (g) { parts.push(d.visible ? PP.t('pp.move.frag.check', { k: g.n, code: g.from }) : PP.t('pp.move.frag.unknown', { k: g.n })); });
       if (!parts.length) return;
       var g0 = groups[0];
+      // a litter with no task (a nurse sow from a previous batch) records no treatments (RULINGS round 2, Q18): not done
+      if (!x.inTask) { parts.push(PP.t('pp.edge.notask.why')); rows.push(row({ title: 'pp.common.tx.' + d.tx, desc: 'pp.move.owed.line', descArgs: { text: parts.join(' · ') } })); return; }
       rows.push(row({ action: g0 ? 'open-resolve' : D.owed ? 'record' : 'open-dose', value: g0 ? g0.id + ':' + d.id : d.id,
         title: 'pp.common.tx.' + d.tx, desc: 'pp.move.owed.line', descArgs: { text: parts.join(' · ') } }));
     });
@@ -403,7 +405,12 @@
   function carrySection(rec, withEdit) {
     var groups = { owe: [], unknown: [], check: [], done: [] }, items = [];
     Object.keys(rec.packets).forEach(function (id) { if (!doseCfg(id).castration && dueAt(rec.to, id) && KIND[rec.packets[id]]) groups[KIND[rec.packets[id]]].push(id); });
-    ['owe', 'unknown', 'check', 'done'].forEach(function (k) { if (groups[k].length) items.push(fact('pp.move.carry.l.' + k, null, 'pp.move.carry.doses', { doses: txList(groups[k]) })); });
+    // into a litter whose task has ended, what the arrivals owe stays not done: no marks after End (RULINGS round 3)
+    var endedTo = (store.derived.tasks || []).some(function (t) { return t.ended && t.ended.event && t.litters.indexOf(rec.to) >= 0; });
+    // into a litter with no task, what they owe is not done either (RULINGS round 2, Q18)
+    var noTask = L(rec.to) && !L(rec.to).inTask;
+    var oweKey = noTask ? 'owe_notask' : endedTo ? 'owe_ended' : 'owe';
+    ['owe', 'unknown', 'check', 'done'].forEach(function (k) { if (groups[k].length) items.push(fact('pp.move.carry.l.' + (k === 'owe' ? oweKey : k), null, 'pp.move.carry.doses', { doses: txList(groups[k]) })); });
     var cid = CFG.doses.filter(function (d) { return d.castration; })[0].id;
     if (dueAt(rec.to, cid) && KIND[rec.packets[cid]]) {
       var C = L(rec.from).doses[cid].castration, a = rec.aliveBefore;

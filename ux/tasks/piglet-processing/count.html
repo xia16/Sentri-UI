@@ -44,7 +44,7 @@
   var UI = window.SentriUI, U = window.PPUI;
 
   /* ---- states: a variant of the shared fixture + UI state. Every figure is the ledger's: select.countDraft (the number seen,
-     what Save writes and which open line it replaces, which tagged piglets must be named, why Save waits), select.explain
+     what Save writes — a count never closes a line, RULINGS round 3 — which tagged piglets must be named, why Save waits), select.explain
      (each open line, its death door and the Moves the app suggests, ranked, with what each leaves open), select.counts (the
      standing count, what each wrote, sync review) and select.moveDraft (alive after an explaining Move). Save commits through
      append. `save`: the state is the moment after Save (committed at load, not kept in the tab). ---- */
@@ -65,7 +65,9 @@
     'explain-suggest': { view: 'suggest', crate: 'B06', data: 'explain', line: 'C-B06-loss', pick: 'C-B08-gain' },
     'explain-pick':    { view: 'suggest', crate: 'B06', data: 'explain-named', line: 'C-B06-named', pick: 'C-B08-gain' },
     'explain-open':    { view: 'explain', crate: 'D03' },
-    'explain-room':    { view: 'explain', room: 7, data: 'explain' }
+    'explain-room':    { view: 'explain', room: 7, data: 'explain' },
+    // RULINGS round 3: the same body recorded twice is held for review until a worker answers one body or two
+    'held-body':       { view: 'host', crate: 'A07', data: 'held-body' }
   };
   var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'count';
@@ -140,9 +142,8 @@
     var base = 'pp.count.line.' + l.kind + (l.open < l.qty ? '_part' : '') + (withCode ? '_code' : '');
     return { id: base, args: { np: np(l.open), qp: np(l.qty), code: l.litter } };
   }
-  // the base the difference was taken from; a recount names the count whose line it replaced
+  // the base the difference was taken from (no count replaces another: RULINGS round 3)
   function lineStamp(l) {
-    if (l.replaced) return { id: 'pp.count.line.recount', args: { rp: np(l.replaced.observed), op: np(l.observed), stamp: stamp(l.at, l.who) } };
     return { id: 'pp.count.line.stamp', args: { op: np(l.observed), stamp: stamp(l.at, l.who), wp: np(l.sizedAgainst) } };
   }
 
@@ -187,7 +188,7 @@
     var facts = UI.facts(list.slice(0, 3).map(function (k) {
       var ev = eventOf(k.id) || {}, rest;
       if (k.late) rest = PP.t('pp.count.c.late');
-      else if (k.disputed && !k.supersededBy) rest = PP.t('pp.count.c.disputed');
+      else if (k.disputed && !k.settledBy) rest = PP.t('pp.count.c.disputed');
       else if (k.crossed.length) rest = PP.t('pp.count.c.phone', { who: k.who, bp: np(k.baseAlive) });
       else if (k.wrote < 0) rest = PP.t('pp.count.c.loss', { kp: np(-k.wrote) });
       else if (k.wrote > 0) rest = PP.t('pp.count.c.gain', { kp: np(k.wrote) });
@@ -227,17 +228,31 @@
     var gap = PP.lang === 'zh' ? '' : ' ';
     function part(id, n, tone) { return span(id) + gap + span('pp.count.rcpt.n', { n: n }, { tone: tone }) + gap + span(pl('pp.count.rcpt.unit', n)); }
     var segs = [span('receipt.saved')];
-    if (r.sup.loss) segs.push(part('pp.count.rcpt.closes_loss', r.sup.loss, 'green'));
-    if (r.sup.gain) segs.push(part('pp.count.rcpt.closes_gain', r.sup.gain, 'green'));
     if (r.kind === 'loss') segs.push(part('pp.count.rcpt.loss', -r.diff, 'red'));
     else if (r.kind === 'gain') segs.push(part('pp.count.rcpt.gain', r.diff, 'blue'));
     else segs.push(span('pp.count.rcpt.match'));
     return '<p class="pp-receipt" data-ds="Candidate:Receipt" role="status" aria-live="polite"><span>' + segs.join(' ') + '</span></p>';
   }
+  /* The same body recorded twice (RULINGS round 3): the second allocation of one missing piglet is held — Dead and
+     Alive stay — until a worker answers one body (the duplicate is withdrawn) or two (a second death). */
+  function heldSection() {
+    var x = L(), held = (x.held || []).filter(function (h) { return !h.resolved; });
+    if (!held.length) return '';
+    return held.map(function (h) {
+      var first = null;
+      x.deaths.forEach(function (d) { if (!first && d.id !== h.event && d.fromMissing > 0) first = d; });
+      var ev = eventOf(h.event) || {};
+      var head = UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.held.title', description: 'pp.count.held.desc' },
+        args: { description: { a: first ? first.who : '', b: h.who, t: U.time(ev.syncedAt || h.at), dp: np(x.dead.total), ap: np(x.alive) } } });
+      var rows = row({ action: 'resolve', value: h.event + '|one', title: 'pp.count.held.one', desc: 'pp.count.held.one_meta', descArgs: { ap: np(x.alive) } }) +
+        row({ action: 'resolve', value: h.event + '|two', title: 'pp.count.held.two', desc: 'pp.count.held.two_meta', descArgs: { ap: np(Math.max(0, x.alive - h.n)) } });
+      return '<section class="ct-group" data-ds="Candidate:HeldBody">' + head + UI.rowGroup(rows) + '</section>';
+    }).join('');
+  }
   function hostHtml(inert) {
     var c = store.select.counts(store.derived, crate);
-    // a count under sync review leads: the next act is to count again
-    var body = hostFacts() + U.tools(crate) + keptRow() + (c && c.review ? countsSection() + openSection() : openSection() + countsSection());
+    // a held body or a count under sync review leads: the next act is to answer it, or to count again
+    var body = hostFacts() + U.tools(crate) + keptRow() + heldSection() + (c && c.review ? countsSection() + openSection() : openSection() + countsSection());
     return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (inert ? ' inert' : '') + '>' + hostHead() +
       '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
       '<footer class="sheet-footer ct-bar">' + receiptLine() + button('secondary', 'back', 'act.back') + '</footer></section>';
@@ -245,12 +260,6 @@
 
   /* ---- the Set count drawer: a staged assertion (Back keeps the draft, Clear discards it, Save writes one stamped count) ---- */
   function hint(d) {
-    var sup = d.supersedes || { loss: 0, gain: 0 };
-    if (sup.loss || sup.gain) {
-      var what = sup.loss ? 'loss' : 'gain', n = sup.loss || sup.gain;
-      if (d.kind === 'match') return { id: 'pp.count.hint.back_' + what, args: { np: np(n) } };
-      return { id: 'pp.count.hint.replace_' + d.kind, args: { kp: np(Math.abs(d.diff)) } };
-    }
     if (d.kind === 'match') return { id: 'pp.count.hint.match' };
     return { id: 'pp.count.hint.' + d.kind, args: { k: Math.abs(d.diff), kp: np(Math.abs(d.diff)) } };
   }
@@ -342,6 +351,8 @@
     if (l.kind === 'gain') rows.push(row({ action: 'move-in', value: l.id, title: 'pp.count.ex.move_in', desc: 'pp.count.ex.move_in_desc', descArgs: { code: l.litter } }));
     if (l.death) rows.push(row({ action: 'open-dead', value: l.litter, title: 'act.record_dead', desc: pl('pp.count.ex.dead_desc', l.open), descArgs: { np: np(l.open) } }));
     rows.push(row({ action: 'open-count', value: l.litter, title: 'pp.count.title', desc: 'pp.count.ex.again_desc', descArgs: { code: l.litter } }));
+    // a mistaken count is corrected through Edit (RULINGS round 3): withdrawn or set, stamped, its line goes
+    rows.push(row({ action: 'edit-count', value: l.litter + '|' + l.id, title: 'pointer.wrong_count', desc: 'pp.count.ex.wrong_desc', descArgs: { op: np(l.observed) } }));
     var none = l.suggestions.length ? '' : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: l.kind === 'loss' ? 'pp.count.ex.none_loss' : 'pp.count.ex.none_gain' } });
     var review = l.review ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.review.line' } }) : '';
     return '<section class="ct-group">' +
@@ -353,8 +364,8 @@
     var sub = { lp: np(x.openLoss), gp: np(x.openGain) };
     if (S.room) head = UI.heading({ title: '', description: '', kind: 'page', level: 2, strs: { title: 'pp.count.ex.title_room', description: 'pp.count.ex.sub' }, args: { title: { u: S.room }, description: sub } });
     else head = UI.heading({ title: '', description: '', kind: 'page', level: 2, strs: { title: 'pp.count.ex.title', description: 'pp.count.ex.sub' }, args: { title: { code: crate }, description: sub } });
-    var body = x.lines.length ? x.lines.map(function (l) { return lineSection(l, !!S.room); }).join('')
-      : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.ex.empty' } });
+    var body = (S.room ? '' : heldSection()) + (x.lines.length ? x.lines.map(function (l) { return lineSection(l, !!S.room); }).join('')
+      : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.ex.empty' } }));
     return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (inert ? ' inert' : '') + '>' +
       '<header class="utility-header">' + head + '</header>' +
       '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
@@ -437,7 +448,7 @@
     if (!d.event) return false;
     var r = store.commit(Object.assign({}, d.event, { at: S.at || NOW }));
     if (!r.ok) { S.failed = true; return false; }
-    S.receipt = { kind: d.kind, diff: d.diff, sup: d.supersedes };
+    S.receipt = { kind: d.kind, diff: d.diff };
     dropDraft(); S.rows = []; S.at = null; S.view = 'host'; lastTap = Date.now();
     return true;
   }
@@ -454,9 +465,11 @@
     if (t) { t.scrollIntoView({ block: 'center' }); var f = t.querySelector('input, button'); if (f) f.focus({ preventScroll: true }); }
   }
   document.getElementById('screen').addEventListener('click', function (ev) {
-    if (Date.now() - lastTap < 400) return;                                      // a double tap after Save lands nowhere
+    var b0 = ev.target.closest('[data-action]');
+    // a double tap after Save lands nowhere — except on stepper keys, where a double tap is two steps
+    if (Date.now() - lastTap < 400 && !(b0 && b0.dataset.action === 'step')) return;
     if (ev.target.closest('[data-dismiss]')) { back(); render(); return; }      // the scrim is Back
-    var b = ev.target.closest('[data-action]');
+    var b = b0;
     if (!b) return;
     var a = b.dataset.action, v = b.dataset.value;
     if (a === 'pick-row' || a === 'pick-named') v = b.value;
@@ -481,6 +494,11 @@
       if (j >= 0) S.pickRows.splice(j, 1); else if (sgn && S.pickRows.length < sgn.s.move.n) S.pickRows.push(v);
     }
     else if (a === 'more') { S.more[v] = true; }
+    else if (a === 'edit-count') { var ec = v.split('|'); nav('edit.html', { state: 'edit', crate: ec[0], count: ec[1], from: 'count' }); return; }
+    else if (a === 'resolve') {
+      var rv = v.split('|'), r = store.commit({ type: 'resolve', litter: crate, held: rv[0], answer: rv[1] });
+      if (!r.ok) S.failed = true;
+    }
     else if (a === 'open-dead') { nav('dead.html', { state: 'dead', crate: v || crate, unit: qs.get('unit') }); return; }
     else if (a === 'move-in') {
       var gl = lineOf(v); if (!gl) return;

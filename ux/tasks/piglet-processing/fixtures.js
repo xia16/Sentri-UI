@@ -388,8 +388,8 @@ const POST = {
   moves(b) {
     b.death('C02', oct(18, '06:50'), 'G.H', [{ cause: 'crushed', rowId: 'C02-r11' }, { cause: 'crushed', rowId: 'C02-r12' }]);
     b.move('C02', 'F03', 4, oct(18, '07:30'), 'L.M', { rows: ['C02-r1', 'C02-r2', 'C02-r3', 'C02-r4'], answers: {} });
+    // arrivals into an ended litter keep their owed doses as not done (RULINGS round 3): no catch-up record
     b.move('F05', 'D01', 2, oct(18, '07:40'), 'L.M', { answers: {} });
-    b.treat('D01', 'health', oct(18, '08:00'), 'L.M', 2);
   }
 };
 
@@ -495,14 +495,36 @@ export const VARIANTS = {
   // Count and explain (#10). gain-b08: L.M found 10 in B08 (9 by the record) — the gain a count on B06 can
   // be explained against (the click-through). count-offline: A07, G.H counted 13 at 09:40 (a loss of 1),
   // recorded a crushed piglet at 09:45 (a new body, not one of the missing); L.M's phone, offline since
-  // before both, counted 12 at 09:50 and synced at 10:20 — the later count stands, the two never sum, and
-  // hers crossed a death it did not see (sync review).
+  // before both, counted 12 at 09:50 and synced at 10:20 — the two counts disagree (neither saw the other):
+  // both kept under sync review, neither writes a line, the two never sum; hers crossed a death it did not see.
   // explain-named: L.M found 10 in B06 and named two tagged piglets missing (271002, 271004); B08 has 1 extra —
   // the suggested Move carries 1, so the worker picks which named piglet it is
   'explain-named': V((b) => {
     base(b);
     b.count('B06', sep(29, '09:50'), 'L.M', 10, { baseAlive: 12, id: 'C-B06-named', missingRows: ['B06-r2', 'B06-r4'] });
     b.count('B08', sep(29, '09:55'), 'L.M', 10, { baseAlive: 9, id: 'C-B08-gain' });
+  }),
+  // RULINGS round 3: a mistaken count corrected through Edit (B06's loss withdrawn, stamped, the original kept)
+  'b06-count-corrected': V((b) => {
+    base(b);
+    b.count('B06', sep(29, '09:50'), 'L.M', 11, { baseAlive: 12, id: 'C-B06-loss' });
+    b.count('B08', sep(29, '09:55'), 'L.M', 10, { baseAlive: 9, id: 'C-B08-gain' });
+    b.push({ type: 'correction', changes: [{ target: 'C-B06-loss', void: true }], at: sep(29, '10:10'), who: 'G.H', id: 'X-B06-count' });
+  }),
+  // RULINGS round 3: the same body recorded twice. A07 counted 13 (1 missing); two phones, offline, each found
+  // one body and took it from that missing piglet — the second is held for review (Dead 1 more, not 2).
+  'held-body': V((b) => {
+    base(b);
+    b.count('A07', sep(29, '09:40'), 'G.H', 13, { baseAlive: 14, id: 'C-A07-held' });
+    const seen = b.ids();
+    b.death('A07', sep(29, '09:50'), 'L.M', [{ cause: 'crushed', n: 1 }], { id: 'D-A07-lm', seen, lossAlloc: [{ lossId: 'C-A07-held', qty: 1 }], device: 'P-LM', syncedAt: sep(29, '10:05') });
+    b.death('A07', sep(29, '09:55'), 'G.H', [{ cause: 'crushed', n: 1 }], { id: 'D-A07-gh', seen, lossAlloc: [{ lossId: 'C-A07-held', qty: 1 }], device: 'P-GH', syncedAt: sep(29, '10:12') });
+  }),
+  // two offline phones weighed B04 on the same day: both kept as a conflict (no later-save-wins by clock)
+  'b04-weights-conflict': V((b) => {
+    base(b); const seen = b.ids();
+    b.push({ type: 'litter_weight', litter: 'B04', kg: '17.2', at: sep(29, '09:20'), who: 'L.M', seen, id: 'LW-B04-lm' });
+    b.push({ type: 'litter_weight', litter: 'B04', kg: '17.6', at: sep(29, '09:05'), who: 'G.H', seen, id: 'LW-B04-gh' });
   }),
   'gain-b08': V((b) => { base(b); b.count('B08', sep(29, '09:55'), 'L.M', 10, { baseAlive: 9, id: 'C-B08-gain' }); }),
   'count-offline': V((b) => {
@@ -595,7 +617,7 @@ export function open(name, opts) {
       return { unit: L.room, sow: L.sow ? L.sow.tag : '', parity: L.sow ? L.sow.parity : null, weight: L.birthWeight, notchLitter: (SOW_DATA[id] || {}).notchLitter || null };
     },
     crateOfSow(tag) { const hit = Object.values(derived.litters).find((L) => L.sow && L.sow.tag === tag); return hit ? hit.id : null; },
-    weights(id) { const L = derived.litters[id]; return L ? L.weights.map((w) => ({ kg: w.kg, day: w.day, at: w.at, who: w.who, event: w.event })) : []; },
+    weights(id) { const L = derived.litters[id]; return L ? L.weights.map((w) => ({ kg: w.kg, day: w.day, at: w.at, who: w.who, event: w.event, conflicts: (w.conflicts || []).slice() })) : []; },
     /* The next stamp on this phone: after the fixture's now, one minute per record. */
     stamp() {
       clock++;

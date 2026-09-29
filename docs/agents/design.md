@@ -49,6 +49,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-id-id-close-confirm", "url": "ux/tasks/piglet-processing/id.html?state=id-close-confirm", "strict": true },
     { "name": "pp-id-id-draft-kept", "url": "ux/tasks/piglet-processing/id.html?state=id-draft-kept", "strict": true },
     { "name": "pp-id-litter-weight-refused", "url": "ux/tasks/piglet-processing/id.html?state=litter-weight-refused", "strict": true },
+    { "name": "pp-id-litter-weight-conflict", "url": "ux/tasks/piglet-processing/id.html?state=litter-weight-conflict", "strict": true },
     { "name": "pp-id-id-pair", "url": "ux/tasks/piglet-processing/id.html?state=id-pair", "strict": true },
     { "name": "pp-id-litter-weight-consumed", "url": "ux/tasks/piglet-processing/id.html?state=litter-weight-consumed", "strict": true },
     { "name": "ds-field-cards", "url": "ux/design-system/components/field-cards-demo.html", "strict": true },
@@ -72,6 +73,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-dead-dead-open-loss-floor", "url": "ux/tasks/piglet-processing/dead.html?state=dead-open-loss-floor", "strict": true },
     { "name": "pp-dead-dead-tagged-second", "url": "ux/tasks/piglet-processing/dead.html?state=dead-tagged-second", "strict": true },
     { "name": "pp-edge-no-task", "url": "ux/tasks/piglet-processing/edge.html?state=no-task", "strict": true },
+    { "name": "pp-edge-nurse-arrivals", "url": "ux/tasks/piglet-processing/edge.html?state=nurse-arrivals", "strict": true },
     { "name": "pp-edge-orphan", "url": "ux/tasks/piglet-processing/edge.html?state=orphan", "strict": true },
     { "name": "pp-edge-orphan-unlocked", "url": "ux/tasks/piglet-processing/edge.html?state=orphan-unlocked", "strict": true },
     { "name": "pp-edge-prelock", "url": "ux/tasks/piglet-processing/edge.html?state=prelock", "strict": true },
@@ -132,6 +134,8 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-litter-missed", "url": "ux/tasks/piglet-processing/litter.html?state=missed", "strict": true },
     { "name": "pp-litter-double-flag", "url": "ux/tasks/piglet-processing/litter.html?state=double-flag", "strict": true },
     { "name": "pp-litter-all-done", "url": "ux/tasks/piglet-processing/litter.html?state=all-done", "strict": true },
+    { "name": "pp-litter-after-end", "url": "ux/tasks/piglet-processing/litter.html?state=after-end", "strict": true },
+    { "name": "pp-litter-corrected-after-end", "url": "ux/tasks/piglet-processing/litter.html?state=corrected-after-end", "strict": true },
     { "name": "pp-litter-draft-waiting", "url": "ux/tasks/piglet-processing/litter.html?state=draft-waiting", "strict": true },
     { "name": "pp-litter-castrate-catchup", "url": "ux/tasks/piglet-processing/litter.html?state=castrate-catchup", "strict": true },
     { "name": "pp-litter-castrate-none", "url": "ux/tasks/piglet-processing/litter.html?state=castrate-none", "strict": true },
@@ -176,6 +180,8 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-edit-edit-move-rows", "url": "ux/tasks/piglet-processing/edit.html?state=edit-move-rows", "strict": true },
     { "name": "pp-edit-edit-after-end-lower", "url": "ux/tasks/piglet-processing/edit.html?state=edit-after-end-lower", "strict": true },
     { "name": "pp-edit-edit-restored", "url": "ux/tasks/piglet-processing/edit.html?state=edit-restored", "strict": true },
+    { "name": "pp-edit-edit-count", "url": "ux/tasks/piglet-processing/edit.html?state=edit-count", "strict": true },
+    { "name": "pp-edit-record-page-count", "url": "ux/tasks/piglet-processing/edit.html?state=record-page-count", "strict": true },
     { "name": "pp-edit-litter-saved", "url": "ux/tasks/piglet-processing/litter.html?state=litter&crate=A02&data=a02-corrected&stay=1&saved=correction", "strict": true },
     { "name": "pp-edit-litter-corrected", "url": "ux/tasks/piglet-processing/litter.html?state=litter&crate=A02&data=a02-corrected&stay=1", "strict": true },
     { "name": "pp-edit-litter-wrong-there", "url": "ux/tasks/piglet-processing/litter.html?state=litter&crate=A04&data=a02-wrong-litter&stay=1", "strict": true },
@@ -197,6 +203,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-count-explain-suggest", "url": "ux/tasks/piglet-processing/count.html?state=explain-suggest", "strict": true },
     { "name": "pp-count-explain-open", "url": "ux/tasks/piglet-processing/count.html?state=explain-open", "strict": true },
     { "name": "pp-count-explain-room", "url": "ux/tasks/piglet-processing/count.html?state=explain-room", "strict": true },
+    { "name": "pp-count-held-body", "url": "ux/tasks/piglet-processing/count.html?state=held-body", "strict": true },
     { "name": "pp-bulk-door", "url": "ux/tasks/piglet-processing/room.html?state=room&filter=iron", "strict": true },
     { "name": "pp-bulk-door-ticked", "url": "ux/tasks/piglet-processing/room.html?state=room-bulk-ticked", "strict": true },
     { "name": "pp-bulk-door-ended", "url": "ux/tasks/piglet-processing/room.html?state=room-bulk-ended", "strict": true },
@@ -208,8 +215,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-bulk-bulk-receipt", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-receipt&tx=iron", "strict": true },
     { "name": "pp-bulk-bulk-changed", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-changed&tx=iron", "strict": true },
     { "name": "pp-bulk-bulk-offline-collision", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-offline-collision&tx=iron", "strict": true },
-    { "name": "pp-bulk-bulk-ended", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-ended&tx=iron", "strict": true },
-    { "name": "pp-bulk-bulk-ended-none", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-ended-none&tx=iron", "strict": true }
+    { "name": "pp-bulk-bulk-ended", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-ended&tx=iron", "strict": true }
   ]
 }
 ```

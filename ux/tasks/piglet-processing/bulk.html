@@ -67,8 +67,8 @@
       LM({ type: 'move', from: 'B09', to: 'A02', n: 1, rows: ['B09-r10'], answers: { iron3: 'no' }, at: '2026-09-29T10:30' }),
       LM({ type: 'move', from: 'B10', to: 'D02', n: 11, answers: {}, at: '2026-09-29T10:30' })] },
     'bulk-offline-collision': { data: 'base', sel: FOUR, offline: { litter: 'B06', n: 10, at: '2026-09-29T10:26' }, commit: true },
-    'bulk-ended':             { data: 'ended-moves' },
-    'bulk-ended-none':        { data: 'ended' }
+    // after End no new marks (RULINGS round 3): no rows, and the room omits the bulk door
+    'bulk-ended':             { data: 'ended-moves' }
   };
   var name = STATES[PP.state] ? PP.state : 'bulk';
   var st = STATES[name];
@@ -130,9 +130,7 @@
     var changed = S.receipt && S.receipt.changed.indexOf(r.litter) >= 0;
     if (r.kind === 'record') {
       var toks = changed ? [T('pp.bulk.tok.changed', {}, 'amber')] : [];
-      // Catch-up rows owe for their arrivals, not for the litter's schedule: no due word.
-      if (r.catchUp) toks.push(T('pp.common.unit.day', { n: r.day }), T(r.outside ? 'pp.bulk.tok.outside' : 'pp.bulk.tok.catchup'));
-      else toks.push(dueTok(r.lateBy), T('pp.common.unit.day', { n: r.day }));
+      toks.push(dueTok(r.lateBy), T('pp.common.unit.day', { n: r.day }));
       return { l1: [T(one('pp.bulk.l1.owed', r.n), { n: r.n })], toks: toks };
     }
     if (r.kind === 'done') {
@@ -216,8 +214,8 @@
     S.contract = {};
     bulk().rows.forEach(function (r) { if (S.sel.indexOf(r.litter) >= 0 && r.kind === 'record') S.contract[r.litter] = { n: r.n, alive: r.alive, dead: r.dead, moved: r.moved, counted: r.counted }; });
   }
-  // `counts late` is a schedule word: catch-up rows (arrivals after End, litters outside the task) are not late.
-  function lateCount(list) { return list.filter(function (x) { return x.lateBy > 0 && !x.catchUp; }).length; }
+  // `counts late` is a schedule word (bulk lists only litters in the task, before End: RULINGS round 3, Q18).
+  function lateCount(list) { return list.filter(function (x) { return x.lateBy > 0; }).length; }
   function footer(opts) {
     var inner = S.receipt ? receiptLines() : '';
     if (S.sel.length) {

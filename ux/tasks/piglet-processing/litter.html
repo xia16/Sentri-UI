@@ -71,7 +71,11 @@
     'missed':             { data: 'base', crate: 'B04' },
     'snapshot-kept':      { data: 'base', crate: 'B04', drawer: { dose: 'iron14' } },
     'double-flag':        { data: 'base', crate: 'A05' },
-    'all-done':           { data: 'a02-all-done', crate: 'A02', visit: ['T-A02-visit'], receipt: 'saved' }
+    'all-done':           { data: 'a02-all-done', crate: 'A02', visit: ['T-A02-visit'], receipt: 'saved' },
+    // RULINGS round 3: after End no new marks — a mark done after End is evidence (kept, never counted); a mark withdrawn
+    // after End reads not done · corrected after End
+    'after-end':          { data: 'ended-after-end', crate: 'B01' },
+    'corrected-after-end': { data: 'ended-correct', crate: 'B03' }
   };
   var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'litter';
@@ -201,12 +205,14 @@
     }).join('');
   }
   function owedSection() {
-    var v = view(), left = v.dosesLeft.left;
-    var h = UI.heading({ title: '', kind: 'section', level: 3, meta: left ? '' : undefined,
-      strs: Object.assign({ title: 'pp.litter.section.owed' }, left ? { meta: 'pp.litter.owed.meta' } : {}),
-      args: left ? { meta: { left: left, total: v.dosesLeft.total } } : undefined });
+    // treatments left (what can be done now) and unfinished (a missed dose is unfinished, never a treatment left)
+    var v = view(), left = v.dosesLeft.left, missed = v.unfinished.missed;
+    var meta = left ? (missed ? 'pp.litter.owed.meta_missed' : 'pp.litter.owed.meta') : missed ? 'pp.litter.owed.missed_only' : null;
+    var h = UI.heading({ title: '', kind: 'section', level: 3, meta: meta ? '' : undefined,
+      strs: Object.assign({ title: 'pp.litter.section.owed' }, meta ? { meta: meta } : {}),
+      args: meta ? { meta: { left: left, total: v.dosesLeft.total, m: missed } } : undefined });
     var rows = owedRows();
-    if (!left) {
+    if (!left && !missed) {
       var next = v.later.filter(function (x) { return !isDone(x.dose); })[0];
       rows += UI.row({ title: '', description: next ? '' : undefined, strs: Object.assign({ title: 'pp.litter.owed.none' }, next ? { description: next.inDays === 1 ? 'pp.litter.next.tomorrow' : 'pp.litter.next.in' } : {}),
         args: next ? { description: { tx: lower(titleText(next.dose)), k: next.inDays } } : undefined });
@@ -262,6 +268,23 @@
   }
 
   /* ---- later: future doses; early is deliberate (open, then Save) ---- */
+  /* After End (RULINGS round 3): a treatment done after End on an offline phone is kept as evidence, stamped, never
+     counted; a mark withdrawn or lowered after End is not done · corrected after End. Facts, never actionable. */
+  function afterEndSection() {
+    var v = view(), rows = [];
+    v.afterEnd.forEach(function (x) {
+      var t = title(x.dose);
+      rows.push(UI.row({ title: '', description: '', trailing: '', className: 'lt-rec', strs: { title: t[0], description: 'pp.litter.after_end.line', trailing: 'pp.litter.after_end.tag' },
+        args: { title: t[1], description: { pigs: pigs(x.n), stamp: U.stamp(x.at, x.who, TODAY) } } }).replace('data-ds="Row"', 'data-ds="Candidate:EvidenceRow"'));
+    });
+    v.correctedAfterEnd.forEach(function (x) {
+      var t = title(x.dose);
+      rows.push(UI.row({ title: '', description: '', className: 'lt-rec', strs: { title: t[0], description: 'pp.edit.ch.not_done' }, args: { title: t[1], description: { k: x.n } } })
+        .replace('data-ds="Row"', 'data-ds="Candidate:EvidenceRow"'));
+    });
+    if (!rows.length) return '';
+    return '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.litter.sec.after_end' } }) + UI.rowGroup(rows.join('')) + '</section>';
+  }
   function laterSection() {
     var xs = view().later.filter(function (x) { return !isDone(x.dose) || visitRec(x.dose); });
     if (!xs.length) return '';
@@ -398,7 +421,7 @@
     var fk = f ? [f.dataset.action, f.dataset.value || '', f.dataset.step || ''] : null;
     scr.innerHTML =
       '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (drawer ? ' inert' : '') + '>' + header() +
-      '<div class="sheet-body"><div class="lt-body">' + factLine() + U.tools(crate) + owedSection() + recordedSection() + notesSection() + laterSection() + recordGroup() + '</div></div>' +
+      '<div class="sheet-body"><div class="lt-body">' + factLine() + U.tools(crate) + owedSection() + afterEndSection() + recordedSection() + notesSection() + laterSection() + recordGroup() + '</div></div>' +
       faceFooter() + '</section>' + (drawer ? doseDrawer() : '');
     PP.apply(scr);
     var nb = scr.querySelector('[data-presentation="page"] .sheet-body'), nd = scr.querySelector('[data-st-context="drawer"] .sheet-body');

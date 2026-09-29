@@ -84,14 +84,17 @@
     'edit-move-rows':         { view: 'edit', data: 'moved-to-c05', crate: 'C03', lead: 'moves', draft: { moves: { 'MV-0929-02': { rows: ['C03-r4'] } } } },
     'edit-after-end':         { view: 'edit', data: 'ended', crate: 'B03', draft: { marks: { 'T-B03-wrong': { to: 'B01' } } } },
     'edit-after-end-lower':   { view: 'edit', data: 'ended', crate: 'C04', draft: { marks: { '@health': { n: 7 } } } },
-    'edit-restored':          { view: 'edit', data: 'a02-corrected', crate: 'A02', restore: { draft: { marks: { 'T-A02-visit': { n: 11, reason: 'weak' } } }, base: { marks: { 'T-A02-visit': 12 } } } }
+    'edit-restored':          { view: 'edit', data: 'a02-corrected', crate: 'A02', restore: { draft: { marks: { 'T-A02-visit': { n: 11, reason: 'weak' } } }, base: { marks: { 'T-A02-visit': 12 } } } },
+    // RULINGS round 3: a mistaken count is corrected through Edit (withdrawn here); the record page shows the correction
+    'edit-count':             { view: 'edit', data: 'explain', crate: 'B06', lead: 'counts', draft: { counts: { 'C-B06-loss': { void: true } } } },
+    'record-page-count':      { view: 'record', data: 'b06-count-corrected', crate: 'B06' }
   };
   var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'edit';
   var st = STATES[name];
   var store, CFG, TODAY, SOW, crate, ME;
   var view = st.view;
-  var EMPTY = function () { return { marks: {}, moves: {}, rows: {}, reopen: false }; };
+  var EMPTY = function () { return { marks: {}, moves: {}, rows: {}, counts: {}, reopen: false }; };
   var draft = EMPTY();
   var lead = '', rowOpen = null, pad = null, typed = {}, picker = null, pickerBefore = null, ceilTap = '', drawerClosedAt = 0, lastSave = 0, notices = [];
 
@@ -104,6 +107,7 @@
   function mark(e, id) { return e.marks.filter(function (m) { return m.id === id; })[0]; }
   function row(e, id) { return e.rows.filter(function (r) { return r.rowId === id; })[0]; }
   function move(e, id) { return e.moves.filter(function (m) { return m.id === id; })[0]; }
+  function countOf(e, id) { return e.counts.filter(function (c) { return c.id === id; })[0]; }
   function changeOf(e, key, val) { return e.changes.filter(function (c) { return c[key] === val; })[0]; }
 
   /* ---- words ---- */
@@ -192,6 +196,10 @@
         return span('pp.id.row.id', { id: idOf(ch.row) }) + ' ' + span('pp.edit.ch.withdrawn', null, 'amber') + SEP() + span('pp.edit.rec.by_mistake');
       case 'reopen':
         return span('pp.edit.ch.keepers') + ' ' + span('pp.edit.ch.reopened', null, 'amber') + of;
+      case 'count':
+        return span('pp.edit.ch.count') + ' ' + dPigs(b.observed, a.observed) + of;
+      case 'count_void':
+        return span('pp.edit.ch.count') + ' ' + span(pigs(b.observed)[0], pigs(b.observed)[1]) + ' ' + span('pp.edit.ch.count_void', null, 'amber') + SEP() + span('pp.edit.rec.by_mistake') + of;
     }
     return '';
   }
@@ -220,7 +228,8 @@
         break;
       case 'count':
         title = ['pp.edit.rec.count', { n: x.observed }];
-        detail = x.wrote < 0 ? ['pp.edit.rec.count.loss', { k: -x.wrote }] : x.wrote > 0 ? ['pp.edit.rec.count.gain', { k: x.wrote }] : ['pp.edit.rec.count.same', null];
+        if (x.corrected && x.corrected.length) { var cc = x.corrected[x.corrected.length - 1]; detail = ['pp.edit.rec.superseded', { stamp: stampText(cc.at, cc.who) }]; }
+        else detail = x.wrote < 0 ? ['pp.edit.rec.count.loss', { k: -x.wrote }] : x.wrote > 0 ? ['pp.edit.rec.count.gain', { k: x.wrote }] : ['pp.edit.rec.count.same', null];
         break;
       case 'move':
         title = [x.dir === 'out' ? 'pp.edit.rec.move_out' : 'pp.edit.rec.move_in', { pigs: pigsText(x.n), code: x.other }];
@@ -237,6 +246,7 @@
       case 'sow_died': title = ['pp.edit.rec.sow_died', null]; break;
       case 'weaned': title = ['pp.edit.rec.weaned', { pigs: pigsText(x.n) }]; break;
       case 'end_task': title = ['pp.edit.rec.end', null]; break;
+      case 'resolve': title = [x.answer === 'two' ? 'pp.edit.rec.resolve_two' : 'pp.edit.rec.resolve_one', null]; break;
       default: title = ['pp.edit.rec.correction', null];
     }
     e.strs.title = title[0]; e.args.title = title[1];
@@ -303,6 +313,10 @@
       label = span('pp.id.row.id', { id: c.tag || c.notch }); value = span('pp.edit.ch.withdrawn', null, 'amber'); rest = SEP() + span('pp.edit.rec.by_mistake');
     } else if (c.kind === 'reopen') {
       label = span('pp.edit.ch.keepers'); value = span('pp.edit.ch.reopened', null, 'amber');
+    } else if (c.kind === 'count') {
+      label = span('pp.edit.ch.count'); value = dPigs(c.from, c.to);
+    } else if (c.kind === 'count_void') {
+      label = span('pp.edit.ch.count'); value = span(pigs(c.from)[0], pigs(c.from)[1]) + ' ' + span('pp.edit.ch.count_void', null, 'amber'); rest = SEP() + span('pp.edit.count.line_goes');
     }
     return line(label + ' ' + value + rest);
   }
@@ -471,10 +485,23 @@
     return '<section class="ed-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, meta: e.rows.length ? '' : undefined,
       strs: Object.assign({ title: 'pp.edit.sec.rows' }, e.rows.length ? { meta: 'pp.edit.sec.rows_meta' } : {}), args: { meta: { n: e.rows.length } } }) + out + '</section>';
   }
-  // The section the entrance came for leads (a Move → Moves, the identity table → Identity); fixed for the visit.
+  // Counts (RULINGS round 3): a mistaken count is corrected here — its number set, or withdrawn; its line goes.
+  function countsSection(e) {
+    var list = e.counts.filter(function (c) { return !c.late; });
+    if (!list.length) return '';
+    var blocks = list.map(function (c) {
+      var x = draft.counts[c.id] || {}, v = x.observed == null ? c.observed : x.observed, s = stampStrs(c.at, c.who), out = '';
+      if (!x.void) out += stepper('count:' + c.id, 'count-step', 'pp.edit.count.label', null, s[0], s[1], v, 0, null, v !== c.observed || c.corrected);
+      else out += UI.heading({ title: '', kind: 'group', level: 4, description: '', strs: { title: 'pp.edit.count.label', description: s[0] }, args: { description: s[1] } });
+      out += UI.choiceGroup(choice('count-void', c.id, 'pp.edit.why.mistake', 'pp.edit.count.void_meta', !!x.void));
+      return '<div class="ed-group" data-count="' + U.esc(c.id) + '">' + out + '</div>';
+    }).join('');
+    return '<section class="ed-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.edit.sec.counts' } }) + blocks + '</section>';
+  }
+  // The section the entrance came for leads (a Move → Moves, the identity table → Identity, a count → Counts); fixed for the visit.
   function sections(e) {
-    var s = { marks: marksSection(e), moves: movesSection(e), rows: idSection(e) };
-    var order = lead === 'moves' ? ['moves', 'marks', 'rows'] : lead === 'rows' ? ['rows', 'marks', 'moves'] : ['marks', 'moves', 'rows'];
+    var s = { marks: marksSection(e), moves: movesSection(e), rows: idSection(e), counts: countsSection(e) };
+    var order = lead === 'counts' ? ['counts', 'marks', 'moves', 'rows'] : lead === 'moves' ? ['moves', 'marks', 'rows', 'counts'] : lead === 'rows' ? ['rows', 'marks', 'moves', 'counts'] : ['marks', 'moves', 'rows', 'counts'];
     return order.map(function (k) { return s[k]; }).join('');
   }
   // What Save waits for, above the bar, named: the draft's own step first, then the ledger's refusal.
@@ -499,7 +526,7 @@
       default: return ['pp.edit.wait.refused', { code: crate }];
     }
   }
-  function dirty() { return !!(Object.keys(draft.marks).length || Object.keys(draft.moves).length || Object.keys(draft.rows).length || draft.reopen); }
+  function dirty() { return !!(Object.keys(draft.marks).length || Object.keys(draft.moves).length || Object.keys(draft.rows).length || Object.keys(draft.counts || {}).length || draft.reopen); }
   function editPage(e) {
     var w = waiting(e), can = !!e.events && !w;
     var restored = notices.length ? U.receipt(notices.map(function (n) { return { id: n[0], args: n[1], tone: 'amber' }; })) : '';
@@ -543,7 +570,8 @@
   /* ---- drafts live on this phone (localStorage: they survive a locked phone); each carries the values it was drawn on ---- */
   function key() { return 'pp-edit:' + store.name + ':' + crate; }
   function baseOf(e) {
-    var b = { marks: {}, moves: {}, rows: {}, closed: e.closed ? e.closed.id : null };
+    var b = { marks: {}, moves: {}, rows: {}, counts: {}, closed: e.closed ? e.closed.id : null };
+    Object.keys(draft.counts || {}).forEach(function (k) { var c = countOf(e, k); if (c) b.counts[k] = c.observed; });
     Object.keys(draft.marks).forEach(function (k) { var m = mark(e, k); if (m) b.marks[k] = m.n; });
     Object.keys(draft.moves).forEach(function (k) { var m = move(e, k); if (m) b.moves[k] = m.n + ':' + m.other; });
     Object.keys(draft.rows).forEach(function (k) { var r = row(e, k); if (r) b.rows[k] = JSON.stringify([r.tag, r.notch, r.sex, r.weight]); });
@@ -568,6 +596,10 @@
     Object.keys(draft.rows).forEach(function (k) {
       var r = row(e0, k);
       if (!r || (b.rows && b.rows[k] && b.rows[k] !== JSON.stringify([r.tag, r.notch, r.sex, r.weight]))) { notices.push(['pp.edit.restored.row', { id: r ? idOf(r) : k }]); delete draft.rows[k]; }
+    });
+    Object.keys(draft.counts || {}).forEach(function (k) {
+      var c = countOf(e0, k);
+      if (!c || (b.counts && b.counts[k] != null && b.counts[k] !== c.observed)) { notices.push(['pp.edit.restored.count', null]); delete draft.counts[k]; }
     });
     if (draft.reopen && (!e0.closed || (b.closed && b.closed !== e0.closed.id))) { notices.push(['pp.edit.restored.reopen', null]); draft.reopen = false; }
   }
@@ -600,6 +632,7 @@
     var data = store.name !== 'base' ? store.name : '';
     if (from === 'record') return PP.href('edit.html', { state: 'record-page', crate: crate, data: store.name });
     if (from === 'id') return PP.href('id.html', { state: 'id-table', crate: crate, data: data });
+    if (from === 'count') return PP.href('count.html', { state: 'explain', crate: crate, data: store.name });
     return PP.href('litter.html', Object.assign({ state: 'litter', crate: crate, stay: 1, data: data }, extra || {}));
   }
   function commitRowTyping() {
@@ -672,6 +705,13 @@
       if (Object.keys(wr).length) draft.moves[pr[0]] = wr; else delete draft.moves[pr[0]];
       render();
     } else if (a === 'move-void') { var mv0 = draft.moves[v]; if (mv0 && mv0.void) delete draft.moves[v]; else draft.moves[v] = { void: true }; render();
+    } else if (a === 'count-step') {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      var cid = v.replace(/^count:/, ''), ct = countOf(e, cid), cw = draft.counts[cid] || {};
+      cw.observed = Math.max(0, (cw.observed == null ? ct.observed : cw.observed) + (+b.dataset.step));
+      if (cw.observed === ct.observed) delete draft.counts[cid]; else draft.counts[cid] = { observed: cw.observed };
+      render();
+    } else if (a === 'count-void') { var cv = draft.counts[v]; if (cv && cv.void) delete draft.counts[v]; else draft.counts[v] = { void: true }; render();
     } else if (a === 'reopen') { draft.reopen = !draft.reopen; render();
     } else if (a === 'open-row') { commitRowTyping(); rowOpen = rowOpen === v ? null : v; pad = null; typed = {}; render();
     } else if (a === 'open-pad' || a === 'open-numpad') {
@@ -739,7 +779,7 @@
     var want = qs.get('row') || (own ? st.row : null);
     if (want) { var hit = L().identity.rows.filter(function (r) { return r.rowId === want || r.tag === want || r.notch === want; })[0]; if (hit) rowOpen = hit.rowId; }
     if (own && st.pad && rowOpen) { pad = st.pad; typed = Object.assign({}, st.typed || {}); commitRowTyping(); }
-    lead = qs.get('move') || qs.get('from') === 'move' ? 'moves' : qs.get('from') === 'id' || qs.get('row') ? 'rows' : own ? st.lead || '' : '';
+    lead = qs.get('count') || qs.get('from') === 'count' ? 'counts' : qs.get('move') || qs.get('from') === 'move' ? 'moves' : qs.get('from') === 'id' || qs.get('row') ? 'rows' : own ? st.lead || '' : '';
     render();
   });
 })();
