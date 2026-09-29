@@ -1,7 +1,10 @@
-/* Piglet processing shell: ?state= and ?lang=, the string registry, [data-str] fill. */
+/* Piglet processing shell: ?state=, ?data= and ?lang=, the string registry, [data-str] fill, and the
+   shared ledger + fixture (ledger.js and fixtures.js load as modules in each page's head).
+   PP.ready resolves once the registry is in and the modules have run; PP.open(variant) opens the
+   fixture's store (its log, the derived ledger, commit through append). */
 (function () {
   var q = new URLSearchParams(location.search);
-  var PP = (window.PP = { state: q.get('state') || '', lang: q.get('lang') === 'zh' ? 'zh' : 'en', strings: {}, ready: null });
+  var PP = (window.PP = { state: q.get('state') || '', data: q.get('data') || '', lang: q.get('lang') === 'zh' ? 'zh' : 'en', strings: {}, ready: null, q: q });
 
   function fill(text, args) {
     return String(text).replace(/\{(\w+)\}/g, function (m, k) { return args && args[k] != null ? args[k] : m; });
@@ -16,6 +19,7 @@
     var a = Object.assign({ n: n }, args || {});
     return PP.t(base + (n === 1 && PP.lang === 'en' ? '.one' : '.many'), a);
   };
+  PP.one = function (base, n) { return base + (n === 1 && PP.lang === 'en' ? '.one' : '.many'); };
   PP.apply = function (root) {
     (root || document).querySelectorAll('[data-str]').forEach(function (el) {
       var args = null;
@@ -32,13 +36,30 @@
       });
     });
   };
+  /* A link to another page of the task, carrying the language. */
+  PP.href = function (page, params) {
+    var p = new URLSearchParams();
+    Object.keys(params || {}).forEach(function (k) { if (params[k] != null && params[k] !== '') p.set(k, params[k]); });
+    if (PP.lang === 'zh') p.set('lang', 'zh');
+    var s = p.toString();
+    return page + (s ? '?' + s : '');
+  };
+  /* The fixture store for a variant (`?data=` wins over the page's own choice when it names one). */
+  PP.open = function (variant, opts) {
+    var F = window.PPFixtures;
+    var name = PP.data && F.VARIANTS[PP.data] ? PP.data : variant;
+    return F.open(name, Object.assign({ fresh: q.get('fresh') === '1' }, opts || {}));
+  };
 
   document.documentElement.lang = PP.lang === 'zh' ? 'zh-CN' : 'en';
   document.documentElement.setAttribute('data-state', PP.state);
-  PP.ready = fetch('/ux/laws/strings.json')
-    .then(function (r) { return r.json(); })
-    .then(function (reg) {
-      PP.strings = reg.strings || {};
+  // Module scripts (ledger.js, fixtures.js) run before DOMContentLoaded.
+  var modules = new Promise(function (resolve) {
+    if (document.readyState !== 'loading') resolve(); else document.addEventListener('DOMContentLoaded', resolve);
+  });
+  PP.ready = Promise.all([fetch('/ux/laws/strings.json').then(function (r) { return r.json(); }), modules])
+    .then(function (res) {
+      PP.strings = res[0].strings || {};
       PP.apply();
       document.documentElement.setAttribute('data-ready', '');
       return PP;

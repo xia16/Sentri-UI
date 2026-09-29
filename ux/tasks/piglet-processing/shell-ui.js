@@ -1,0 +1,106 @@
+/* Piglet processing shared UI: what two or more pages draw (ticket #19). Built from the design system's
+   factories plus four compositions (CSS in shell.css, tokens only):
+     litterHeader  the litter's identity header: `A02 · 000231 ›` (the door to the sow), parity, day
+     tools         `Record dead · Set count` in the tool register (a soft well, no outline)
+     recordGroup   the Record group: Move, identity, birth litter weight (and why, outside a task)
+     weightRow     the birth-litter-weight row, missing or set
+     litterRow     Candidate:LitterRow — the room's row law (room, End)
+     receipt       Candidate:Receipt — one body line, colour on the value only
+   Plus the words every page stamps with: span, stamp, date, ago. Needs window.SentriUI and PP. */
+(function () {
+  var UI = window.SentriUI, ICON = window.SentriIcons;
+  var U = (window.PPUI = {});
+
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  U.esc = esc;
+  /* A registered string as a span (filled now and by PP.apply); tone colours the value. */
+  U.span = function (id, args, o) {
+    o = o || {};
+    var cls = [o.cls, o.tone ? 'pp-tone' : ''].filter(Boolean).join(' ');
+    return '<span' + (cls ? ' class="' + cls + '"' : '') + (o.ds ? ' data-ds="' + o.ds + '"' : '') + (o.tone ? ' data-tone="' + o.tone + '"' : '') +
+      ' data-str="' + id + '"' + (args ? " data-args='" + esc(JSON.stringify(args)) + "'" : '') + '>' + esc(PP.t(id, args)) + '</span>';
+  };
+
+  /* ---- time words: `09:14 · G.H` today, `Sep 27 · 07:52 · L.M` before ---- */
+  function parts(iso) { var s = String(iso); return { y: +s.slice(0, 4), m: +s.slice(5, 7), d: +s.slice(8, 10), t: s.slice(11, 16) }; }
+  U.date = function (iso) { var p = parts(iso); return PP.t('pp.common.date.m' + p.m, { d: p.d }); };
+  U.time = function (iso) { return parts(iso).t; };
+  U.stamp = function (iso, who, today) {
+    var p = parts(iso), same = today && String(iso).slice(0, 10) === String(today).slice(0, 10);
+    return same ? PP.t('pp.common.stamp.today', { t: p.t, who: who }) : PP.t('pp.common.stamp.date', { date: U.date(iso), t: p.t, who: who });
+  };
+  /* Recency ladder (room): `1h ago` under a day, `yesterday`, `N days ago` to six, the date from seven. */
+  U.ago = function (iso, now) {
+    var mins = Math.max(0, (Date.parse(now) - Date.parse(iso)) / 60000);
+    if (mins < 1440) return PP.t('time.hours_ago', { n: Math.max(1, Math.ceil(mins / 60)) });
+    var days = Math.floor(mins / 1440);
+    if (days === 1) return PP.t('time.yesterday');
+    if (days < 7) return PP.t('time.days_ago', { n: days });
+    return U.date(iso);
+  };
+
+  /* ---- the litter header: crate first (the first fact), the one door to the sow page ---- */
+  U.litterHeader = function (o) {
+    var a = { crate: o.crate, tag: o.sow };
+    var ctx = o.day != null
+      ? '<p class="pp-hdr-context">' + U.span('pp.common.hdr.parity', { n: o.parity }) + U.span('pp.common.unit.day', { n: o.day }) + '</p>'
+      : '<p>' + U.span('pp.common.hdr.parity', { n: o.parity }) + '</p>';
+    return '<header class="utility-header"' + (o.attrs || '') + '><div class="pp-hdr-title"><h3><button type="button" class="pp-door" data-action="open-sow" data-value="' + esc(o.sow) +
+      '" data-str-attr="aria-label:pp.common.hdr.sow_aria" data-args=\'' + esc(JSON.stringify(a)) + '\' aria-label="' + esc(PP.t('pp.common.hdr.sow_aria', a)) + '">' +
+      U.span('pp.common.hdr.door', a, { cls: 'pp-mono' }) + ICON.icon('chevron') + '</button></h3>' + ctx + '</div>' + (o.action || '') + '</header>';
+  };
+
+  /* ---- tools: the two quick acts on the litter's numbers, in the tool register ---- */
+  U.tools = function (crate) {
+    function tool(action, id) {
+      return '<button type="button" class="pp-tool" data-ds="Candidate:Tool" data-action="' + action + '" data-value="' + esc(crate) + '" data-str="' + id + '">' + esc(PP.t(id)) + '</button>';
+    }
+    return '<div class="pp-tools">' + tool('open-dead', 'act.record_dead') + tool('open-count', 'pp.count.title') + '</div>';
+  };
+
+  /* ---- the birth litter weight row: missing (optional, a door to record it) or set (value and who set it) ---- */
+  U.weightRow = function (w, crate, today) {
+    if (!w) return UI.row({ title: '', trailing: '', action: 'open-weight', value: crate, strs: { title: 'pp.common.weight.record', trailing: 'pp.common.weight.optional' } });
+    return UI.row({ title: '', description: '', trailing: '', action: 'open-farrowing-edit', value: 'birth-weight',
+      strs: { title: 'pp.common.weight.title', trailing: 'pp.common.kg', description: w.by === 'finish' ? 'pp.common.weight.by_finish' : 'pp.common.weight.by_here' },
+      args: { trailing: { w: w.kg }, description: { stamp: U.stamp(w.at, w.who, today) } } });
+  };
+
+  /* ---- the Record group: the other acts on this litter ----
+     o: { crate, move: true, identity: { scheme, k, n } | null, weight: <SOWS weight> | undefined, weightSet: show the set weight too, why: id } */
+  U.recordGroup = function (o) {
+    var rows = '';
+    if (o.move !== false) rows += UI.row({ title: '', description: '', action: 'open-move', value: o.crate, strs: { title: 'pp.move.title', description: 'pp.common.record.move_desc' } });
+    if (o.identity) rows += UI.row({ title: '', description: '', action: 'open-identity', value: o.crate,
+      strs: { title: 'pp.common.record.identity', description: 'pp.common.record.id_line.' + o.identity.scheme }, args: { description: { k: o.identity.k, n: o.identity.n } } });
+    if (o.weight !== undefined && (!o.weight || o.weightSet)) rows += U.weightRow(o.weight, o.crate, o.today);
+    if (!rows) return '';
+    return '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', description: o.why ? '' : undefined, kind: 'group', level: 3,
+      strs: Object.assign({ title: 'pp.common.record.title' }, o.why ? { description: o.why } : {}) }) + UI.rowGroup(rows) + '</section>';
+  };
+
+  /* ---- Candidate:LitterRow: the Row card's geometry with the row law's mono line 2, one named chip and the rail ----
+     o: { code, l1: [tok], toks: [tok], chip: ['red'|'amber', 'sowdied'|'unlocked'] | null, static, action, value, attrs, flash }
+     tok: [wordId, args, valueId?, tone?] — the value carries the colour; without a value id the tone colours the word. */
+  function tok(t) {
+    if (t[2]) return '<span class="pp-tok">' + U.span(t[0], t[1]) + ' ' + U.span(t[2], t[1], { tone: t[3] }) + '</span>';
+    return '<span class="pp-tok"' + (t[3] ? ' data-tone="' + t[3] + '"' : '') + '>' + U.span(t[0], t[1]) + '</span>';
+  }
+  U.tok = function (word, args, val, tone) { return [word, args || {}, val || null, tone || null]; };
+  U.litterRow = function (o) {
+    var tag = o.static ? 'div' : 'button';
+    return '<' + tag + (o.static ? '' : ' type="button" data-action="' + (o.action || 'open-litter') + '" data-value="' + esc(o.value || o.code) + '"') + (o.attrs || '') +
+      ' class="st-row pp-litter" data-ds="Candidate:LitterRow"' + (o.flash ? ' data-flash' : '') + '>' +
+      '<span class="pp-code">' + U.span('pp.room.code', { code: o.code }) + '</span>' +
+      '<span class="st-row-copy"><strong>' + o.l1.map(tok).join('') + '</strong><small class="pp-mono">' + o.toks.map(tok).join('') + '</small></span>' +
+      (o.chip ? '<span class="pp-chip" data-tone="' + o.chip[0] + '">' + U.span('pp.room.chip.' + o.chip[1]) + '</span>' : '') +
+      (o.static ? '' : '<span class="st-row-chevron">' + ICON.icon('chevron') + '</span>') + '</' + tag + '>';
+  };
+
+  /* ---- Candidate:Receipt: the change the last record made, one line; parts [{ id, args, tone }] ---- */
+  U.receipt = function (list, o) {
+    o = o || {};
+    return '<p class="pp-receipt" data-ds="Candidate:Receipt" role="status" aria-live="polite"' + (o.attrs || '') + '>' +
+      list.filter(Boolean).map(function (p) { return U.span(p.id, p.args, { tone: p.tone }); }).join(' ') + '</p>';
+  };
+})();
