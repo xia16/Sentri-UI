@@ -2529,3 +2529,24 @@ test('N7 a double-issued tag: an add with twinOf is a separate piglet (identifie
   c.identity('A', 'add', { rowId: 'r2', tag: '004301', twinOf: 'r1' });
   assert.equal(run(c, cfg).litters.A.identity.done, true);                         // both piglets identified
 });
+
+test('R1-15 every fixture log is causally consistent with its stamps: the causal last record is the latest-stamped', async () => {
+  const F = await import('../ux/tasks/piglet-processing/fixtures.js');
+  for (const [name, make] of Object.entries(F.VARIANTS)) {
+    const v = make();
+    const d = derive(v.events, v.config, { today: v.today });
+    assert.deepEqual(d.rejected.map((r) => r.id), [], name + ': every fixture event is accepted');
+    // an online write (no `seen`) is never stamped before an event it counts as having seen
+    let latest = '';
+    for (const e of v.events) {
+      if (!Array.isArray(e.seen)) assert.ok(e.at >= latest || e.type === 'correction', name + ': ' + e.id + ' at ' + e.at + ' comes after ' + latest);
+      if (!Array.isArray(e.seen) && e.at > latest) latest = e.at;
+    }
+    // among the litter events no other write is concurrent with, the latest stamp is the room's Last record
+    const bad = new Set(d.rejected.map((r) => r.id));
+    const free = v.events.filter((e) => (e.litter || e.from) && !bad.has(e.id) && !v.events.some((o) => d.causal.concurrent(o.id, e.id)));
+    const top = free.reduce((m, e) => (!m || e.at > m.at ? e : m), null);
+    const last = select.room(d, { lens: 'all' }).lastRecord;
+    if (top) assert.equal(last.at >= top.at, true, name + ': Last record ' + last.at + ' ' + last.type + ' is not before ' + top.at + ' ' + top.type);
+  }
+});
