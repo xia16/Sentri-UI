@@ -67,8 +67,8 @@
       LM({ type: 'move', from: 'B09', to: 'A02', n: 1, rows: ['B09-r10'], answers: { iron3: 'no' }, at: '2026-09-29T10:30' }),
       LM({ type: 'move', from: 'B10', to: 'D02', n: 11, answers: {}, at: '2026-09-29T10:30' })] },
     'bulk-offline-collision': { data: 'base', sel: FOUR, offline: { litter: 'B06', n: 10, at: '2026-09-29T10:26' }, commit: true },
-    'bulk-ended':             { data: 'ended-moves' },
-    'bulk-ended-none':        { data: 'ended' }
+    // after End no new marks (RULINGS round 3): no rows, and the room omits the bulk door
+    'bulk-ended':             { data: 'ended-moves' }
   };
   var name = STATES[PP.state] ? PP.state : 'bulk';
   var st = STATES[name];

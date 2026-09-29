@@ -96,7 +96,9 @@
     'id-pair':            { data: 'a02-tags-pair', l: 'A02', face: 'table' },
     // Counts saved when 5 were identified (4 boars · 3 gilts not identified); two boars identified since consume two boar counts.
     'litter-weight-consumed': { data: 'a02-tags-seven', l: 'A02', face: 'table', open: 'weight' },
-    'litter-weight-refused': { data: 'a02-tags-lm', l: 'A02', face: 'table', drawer: { w: '304', boars: 0, gilts: 0 } }
+    'litter-weight-refused': { data: 'a02-tags-lm', l: 'A02', face: 'table', drawer: { w: '304', boars: 0, gilts: 0 } },
+    // two offline phones weighed B04 the same day: the ledger keeps both as a conflict (no later-save-wins by clock)
+    'litter-weight-conflict': { data: 'b04-weights-conflict', l: 'B04', face: 'table' }
   };
   // The usual per-piglet weight by day-age (console): the soft range, never a gate.
   var USUAL = { 1: [0.8, 2.4], 2: [0.9, 2.6], 3: [1.0, 2.8], 4: [1.1, 3.0], 9: [1.8, 4.2] };
@@ -146,7 +148,12 @@
       closed = { t: hm(ce.at), who: ce.who, k: distinct().length };
     }
   }
-  function loadWeights() { lwRecs = store.weights(crate).filter(function (x) { return x.at; }).map(function (x) { return { w: x.kg, day: x.day, d: dom(x.at), t: hm(x.at), who: x.who }; }); }
+  function loadWeights() {
+    lwRecs = store.weights(crate).filter(function (x) { return x.at; }).map(function (x) {
+      return { w: x.kg, day: x.day, d: dom(x.at), t: hm(x.at), who: x.who,
+        conflicts: (x.conflicts || []).map(function (c) { return { w: c.kg, d: dom(c.at), t: hm(c.at), who: c.who }; }) };
+    });
+  }
   function commit(e) { var r = store.commit(Object.assign({ type: 'identity', litter: crate }, e)); if (r.ok) reload(); return r; }
   function alive() { return L.alive; }
 
@@ -406,6 +413,12 @@
   function weighSection() {
     var today = lwRecs.filter(function (x) { return x.d === dom(NOW); })[0];
     var rowsHtml = lwRecs.slice().reverse().map(function (x) {
+      // two phones weighed the same day without seeing each other: both show until one is corrected
+      if (x.conflicts.length) {
+        var c = x.conflicts[0];
+        return UI.row({ title: '', description: '', trailing: span('pp.id.lw.check', null, 'id-tone', 'amber'), action: 'edit-weight', value: String(x.day),
+          strs: { title: 'pp.id.lw.rec', description: 'pp.id.lw.line_conflict' }, args: { title: { day: x.day }, description: { w: x.w, stamp: stamp(x), w2: c.w, stamp2: stamp(c) } } });
+      }
       return UI.row({ title: '', description: '', action: x.d === dom(NOW) ? 'open-weight' : 'edit-weight', value: String(x.day),
         strs: { title: 'pp.id.lw.rec', description: 'pp.id.lw.line' }, args: { title: { day: x.day }, description: { w: x.w, stamp: stamp(x) } } });
     }).join('');

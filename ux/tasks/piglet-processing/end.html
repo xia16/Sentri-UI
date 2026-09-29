@@ -145,25 +145,31 @@
       var at = e.syncedAt || e.at;
       if (e.type !== 'identity') idRun = null;
       if (e.type === 'treat') {
-        var rj = rejected(e.id), n = e.castration ? e.castration.castrated : e.n;
-        // done after End on a phone that had not seen it: kept, stamped and flagged by the ledger (never in atEnd)
+        var n = e.castration ? e.castration.castrated : e.n;
+        // done after End on a phone that had not seen it: kept, stamped, flagged — never counted (RULINGS round 3)
         if (flagged(e.id, 'after_end')) out.push({ kind: 'afterend', code: e.litter, k: e.dose, n: n, stamped: e.at, at: at, who: e.who });
         else if (flagged(e.id, 'arrived_after_end')) out.push({ kind: 'late', code: e.litter, k: e.dose, n: n, stamped: e.at, at: at, who: e.who });
-        else if (!rj) out.push({ kind: 'catchup', code: e.litter, k: e.dose, n: n, at: at, who: e.who });
-      } else if (e.type === 'correction' && e.fresh) {
-        var t = store.events.filter(function (x) { return x.id === e.target; })[0] || {};
-        out.push({ kind: 'wrong', code: e.fresh.litter, from: t.litter, k: e.fresh.dose, n: e.fresh.castration ? e.fresh.castration.castrated : e.fresh.n, at: at, who: e.who });
-      } else if (e.type === 'correction' && e.set && e.set.castration) {
-        var o = store.events.filter(function (x) { return x.id === e.target; })[0] || {};
-        out.push({ kind: 'edit', code: o.litter, a: (o.castration || {}).castrated, b: e.set.castration.castrated, at: at, who: e.who });
+      } else if (e.type === 'correction' && !rejected(e.id)) {
+        // one correction is one act: the one-event form (`changes[]`) or the older single form
+        var list = e.changes || [{ target: e.target, void: e.void, set: e.set, fresh: e.fresh }];
+        list.forEach(function (ch) {
+          if (ch.identity) return;
+          var t = store.events.filter(function (x) { return x.id === ch.target; })[0] || {};
+          if (ch.fresh) out.push({ kind: 'wrong', code: ch.fresh.litter, from: t.litter, k: ch.fresh.dose, n: ch.fresh.castration ? ch.fresh.castration.castrated : ch.fresh.n, at: at, who: e.who });
+          else if (t.type !== 'treat') return;
+          else if (ch.void) out.push({ kind: 'void', code: t.litter, k: t.dose, n: t.castration ? t.castration.castrated : t.n, at: at, who: e.who });
+          else if (ch.set && ch.set.castration) out.push({ kind: 'edit', code: t.litter, a: (t.castration || {}).castrated, b: ch.set.castration.castrated, at: at, who: e.who });
+          else if (ch.set && ch.set.n != null) out.push({ kind: 'lower', code: t.litter, k: t.dose, a: t.n, b: ch.set.n, at: at, who: e.who });
+        });
       } else if (e.type === 'identity' && e.op === 'add') {
         if (idRun && idRun.code === e.litter) idRun.n++; else { idRun = { kind: 'id', code: e.litter, n: 1, at: at, who: e.who }; out.push(idRun); }
       } else if (e.type === 'death') out.push({ kind: 'death', code: e.litter, n: lineCount(e), at: at, who: e.who });
       else if (e.type === 'count') out.push({ kind: 'count', code: e.litter, n: e.observed, at: at, who: e.who });
       else if (e.type === 'move') {
         var inT = function (c) { return CFG.task.litters.indexOf(c) >= 0; };
+        // arrivals owe their doses as not done: no marks after End (RULINGS round 3)
         var owes = (Lx(e.to).moves.filter(function (m) { return m.id === e.id; })[0] || { packets: {} }).packets;
-        var owed = Object.keys(owes).filter(function (k) { return owes[k] === 'owed' && Lx(e.to).doses[k].catchUp > 0; });
+        var owed = Object.keys(owes).filter(function (k) { return owes[k] === 'owed' && Lx(e.to).doses[k].status !== 'later'; });
         if (inT(e.from)) out.push({ kind: 'out', code: e.from, to: e.to, unit: Lx(e.to).room, n: e.n, at: at, who: e.who });
         if (inT(e.to)) out.push({ kind: 'in', code: e.to, from: e.from, unit: Lx(e.from).room, n: e.n, owes: owed, at: at, who: e.who });
       }
@@ -234,7 +240,7 @@
       if (e.kind === 'out') out.push(T('pp.end.tok.out_after', { n: e.n }));
       if (e.kind === 'late') out.push(T(one('pp.end.tok.late_mark', 1), { n: 1 }));
       if (e.kind === 'afterend') out.push(T('pp.end.tok.afterend', { name: name(e.k), n: e.n }));
-      if (where === 'face' && e.kind === 'catchup') out.push(T('pp.end.tok.catchup', { name: name(e.k), n: e.n }));
+      if (where === 'face' && (e.kind === 'void' || e.kind === 'lower')) out.push(T('pp.end.tok.corrected', { name: name(e.k) }));
       if (where === 'face' && e.kind === 'wrong') out.push(T('pp.end.tok.wrong', { name: name(e.k), n: e.n }));
       if (where === 'face' && e.kind === 'edit') out.push(T('pp.end.tok.castrated', { a: e.a, b: e.b }, 'pp.end.tok.castrated.v', 'amber'));
       if (where === 'face' && e.kind === 'id') out.push(T('pp.end.tok.id_after', { n: e.n }));
@@ -243,7 +249,12 @@
   }
   // Not done for one litter × dose on the ended face: frozen at End, less the piglets gone since (the live figure when lower).
   function notDone(l, e) { var now = (fig(false).byLitter[l.code] || []).filter(function (x) { return x.dose === e.dose; })[0]; return now ? Math.min(e.n || 0, now.n || 0) : 0; }
-  function catchUps(l) { var x = Lx(l.code); return CFG.doses.filter(function (d) { return x.doses[d.id].catchUp > 0; }).map(function (d) { return { k: d.id, n: x.doses[d.id].catchUp }; }); }
+  // Piglets moved in after End: their owed doses stay not done (RULINGS round 3), per dose.
+  function arrivalsNotDone(l) {
+    var by = {};
+    postOf(l.code, 'in').forEach(function (e) { e.owes.forEach(function (k) { by[k] = (by[k] || 0) + e.n; }); });
+    return Object.keys(by).map(function (k) { return { k: k, n: by[k] }; });
+  }
   // The ended face: the same items, final — not done, frozen at End, except piglets that left the task.
   function endedRow(l) {
     var l1 = [], why = {}, now = litter(l.code, false);
@@ -251,7 +262,7 @@
       l1.push(T('pp.end.u.notdone', { name: name(e.dose), n: notDone(l, e) }));
       if (e.kind === 'missed') why.w = doseCfg(e.dose).last; else if (e.kind === 'not_due') why.a = 1; else why.o = 1;
     });
-    catchUps(l).forEach(function (a) { l1.push(T('pp.end.u.owed', { name: name(a.k), n: a.n })); });
+    arrivalsNotDone(l).forEach(function (a) { l1.push(T('pp.end.u.notdone', { name: name(a.k), n: a.n })); });
     if (!now.idDone) l1.push(T('pp.end.u.unid', { n: now.alive - now.identified }));
     if (!l1.length) l1 = [T('pp.room.l1.finished')];
     var toks = [dayTok(now), pigTok(now.alive)];
@@ -345,7 +356,8 @@
       if (e.kind === 'count') return { title: '', strs: Object.assign({ title: 'pp.end.since.count' }, m), args: Object.assign({ title: { code: e.code, n: e.n } }, a) };
       if (e.kind === 'wrong') return { title: '', strs: Object.assign({ title: 'pp.end.since.wrong', detail: 'pp.end.since.wrong.detail' }, m), args: Object.assign({ title: { code: e.code, name: name(e.k), n: e.n }, detail: { from: e.from } }, a) };
       if (e.kind === 'late') return { title: '', strs: Object.assign({ title: 'pp.end.since.late', detail: 'pp.end.since.late.detail' }, m), args: Object.assign({ title: { code: e.code, name: name(e.k), n: e.n }, detail: { date: date(e.stamped), time: time(e.stamped) } }, a) };
-      if (e.kind === 'catchup') return { title: '', strs: Object.assign({ title: 'pp.end.since.catchup', detail: 'pp.end.since.catchup.detail' }, m), args: Object.assign({ title: { code: e.code, name: name(e.k), n: e.n } }, a) };
+      if (e.kind === 'void') return { title: '', strs: Object.assign({ title: 'pp.end.since.void', detail: 'pp.end.since.void.detail' }, m), args: Object.assign({ title: { code: e.code, name: name(e.k), n: e.n } }, a) };
+      if (e.kind === 'lower') return { title: '', strs: Object.assign({ title: 'pp.end.since.lower', detail: 'pp.end.since.void.detail' }, m), args: Object.assign({ title: { code: e.code, name: name(e.k), a: e.a, b: e.b } }, a) };
       if (e.kind === 'afterend') return { title: '', strs: Object.assign({ title: 'pp.end.since.afterend', detail: 'pp.end.since.afterend.detail' }, m), args: Object.assign({ title: { code: e.code, name: name(e.k), n: e.n }, detail: { date: date(e.stamped), time: time(e.stamped) } }, a) };
       if (e.kind === 'out') return { title: '', strs: Object.assign({ title: 'pp.end.since.move', detail: 'pp.end.since.out.detail' }, m), args: Object.assign({ title: { n: e.n, from: e.code, to: e.to }, detail: { unit: e.unit, n: e.n } }, a) };
       return { title: '', strs: Object.assign({ title: 'pp.end.since.move', detail: 'pp.end.since.in.detail' }, m), args: Object.assign({ title: { n: e.n, from: e.from, to: e.code }, detail: { unit: e.unit, name: e.owes.map(name).join(' · ') } }, a) };
@@ -452,13 +464,13 @@
       var g = groups.filter(function (x) { return x.k === k && x.kind === kind; })[0];
       if (!g) { g = { k: k, kind: kind, n: 0, codes: [], since: false }; groups.push(g); }
       g.n += n; if (g.codes.indexOf(code) < 0) g.codes.push(code);
-      // A mark stamped before End, a correction, a catch-up or an after-End treatment on this litter and dose.
-      if (postOf(code).some(function (e) { return e.k === k && /late|wrong|catchup|afterend/.test(e.kind); })) g.since = true;
+      // A mark stamped before End, a correction or an after-End treatment on this litter and dose.
+      if (postOf(code).some(function (e) { return e.k === k && /late|wrong|void|lower|afterend/.test(e.kind); })) g.since = true;
     }
     atEnd.filter(function (l) { return l.unfinished; }).forEach(function (l) {
       l.list.forEach(function (e) { add(e.kind === 'missed' ? 'missed' : e.kind === 'not_due' ? 'ahead' : 'owed', e.dose, notDone(l, e), l.code); });
     });
-    atEnd.forEach(function (l) { catchUps(l).forEach(function (a) { add('owed', a.k, a.n, l.code); }); });
+    atEnd.forEach(function (l) { arrivalsNotDone(l).forEach(function (a) { add('owed', a.k, a.n, l.code); }); });
     var ndTotal = sum(groups, function (g) { return g.n; });
     var nd = groups.map(function (g) {
       return UI.row({ title: '', strs: { title: 'pp.end.u.' + g.kind, description: g.since ? 'pp.end.w.since' : 'pp.end.codes' }, args: { title: { name: name(g.k), n: g.n }, description: { list: g.codes.join(' ') } } });

@@ -248,7 +248,7 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
   function bulkDoor() {
     if (S.filter.length !== 1 || S.missed) return '';
     var tx = S.filter[0], best = null;
-    // The litters a bulk record can write (the ledger's bulkDraft): after End only catch-up, and no door when there is none.
+    // The litters a bulk record can write (the ledger's bulkDraft): after End none (no new marks), so no door.
     CFG.doses.filter(function (d) { return d.tx === tx; }).forEach(function (d) {
       var b = store.select.bulkDraft(store.derived, { room: ROOM, dose: d.id });
       var ids = b.rows.filter(function (r) { return r.kind === 'record'; }).map(function (r) { return r.litter; });

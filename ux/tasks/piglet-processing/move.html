@@ -403,7 +403,9 @@
   function carrySection(rec, withEdit) {
     var groups = { owe: [], unknown: [], check: [], done: [] }, items = [];
     Object.keys(rec.packets).forEach(function (id) { if (!doseCfg(id).castration && dueAt(rec.to, id) && KIND[rec.packets[id]]) groups[KIND[rec.packets[id]]].push(id); });
-    ['owe', 'unknown', 'check', 'done'].forEach(function (k) { if (groups[k].length) items.push(fact('pp.move.carry.l.' + k, null, 'pp.move.carry.doses', { doses: txList(groups[k]) })); });
+    // into a litter whose task has ended, what the arrivals owe stays not done: no marks after End (RULINGS round 3)
+    var endedTo = (store.derived.tasks || []).some(function (t) { return t.ended && t.ended.event && t.litters.indexOf(rec.to) >= 0; });
+    ['owe', 'unknown', 'check', 'done'].forEach(function (k) { if (groups[k].length) items.push(fact('pp.move.carry.l.' + (k === 'owe' && endedTo ? 'owe_ended' : k), null, 'pp.move.carry.doses', { doses: txList(groups[k]) })); });
     var cid = CFG.doses.filter(function (d) { return d.castration; })[0].id;
     if (dueAt(rec.to, cid) && KIND[rec.packets[cid]]) {
       var C = L(rec.from).doses[cid].castration, a = rec.aliveBefore;
