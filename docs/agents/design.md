@@ -154,7 +154,19 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-move-owed-from-move", "url": "ux/tasks/piglet-processing/move.html?state=owed-from-move", "strict": true },
     { "name": "pp-move-owed-arrived-done", "url": "ux/tasks/piglet-processing/move.html?state=owed-arrived-done", "strict": true },
     { "name": "pp-move-unknown-check", "url": "ux/tasks/piglet-processing/move.html?state=unknown-check", "strict": true },
-    { "name": "pp-move-move-prelock-other", "url": "ux/tasks/piglet-processing/move.html?state=move-prelock&data=other", "strict": true }
+    { "name": "pp-move-move-prelock-other", "url": "ux/tasks/piglet-processing/move.html?state=move-prelock&data=other", "strict": true },
+    { "name": "pp-count-count", "url": "ux/tasks/piglet-processing/count.html?state=count", "strict": true },
+    { "name": "pp-count-count-match", "url": "ux/tasks/piglet-processing/count.html?state=count-match", "strict": true },
+    { "name": "pp-count-count-loss", "url": "ux/tasks/piglet-processing/count.html?state=count-loss", "strict": true },
+    { "name": "pp-count-count-gain", "url": "ux/tasks/piglet-processing/count.html?state=count-gain", "strict": true },
+    { "name": "pp-count-count-named", "url": "ux/tasks/piglet-processing/count.html?state=count-named", "strict": true },
+    { "name": "pp-count-count-kept", "url": "ux/tasks/piglet-processing/count.html?state=count-kept", "strict": true },
+    { "name": "pp-count-count-prelock", "url": "ux/tasks/piglet-processing/count.html?state=count-prelock", "strict": true },
+    { "name": "pp-count-count-conflict", "url": "ux/tasks/piglet-processing/count.html?state=count-conflict", "strict": true },
+    { "name": "pp-count-explain", "url": "ux/tasks/piglet-processing/count.html?state=explain", "strict": true },
+    { "name": "pp-count-explain-suggest", "url": "ux/tasks/piglet-processing/count.html?state=explain-suggest", "strict": true },
+    { "name": "pp-count-explain-open", "url": "ux/tasks/piglet-processing/count.html?state=explain-open", "strict": true },
+    { "name": "pp-count-explain-room", "url": "ux/tasks/piglet-processing/count.html?state=explain-room", "strict": true }
   ]
 }
 ```

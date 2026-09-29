@@ -133,6 +133,27 @@ Counts the Move sheet, its receipt and the receiving litter print. A Move is one
 | **Moves** 转移记录 (`Moved in 3 · 2 moves`) | Move records | every Move on this litter, in or out, each one correctable through Edit as one record | cumulative, stamped | one litter |
 | **Sow with no piglets** 无仔猪的母猪 | sows | locked sows in the room whose litter is at 0 alive (nurse-sow candidates); listed apart from the age-sorted litters | now | one room |
 
+### Count and explain (slice #10, `count.html`)
+
+Set count records the number seen; the difference against the ledger's Alive is written as one unexplained gain or loss, stamped, with no reason asked. Explain shows the open lines one by one with what could close them. Every figure is the ledger's (`select.countDraft`, `select.explain`, `select.counts`).
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Seen** 看到 (`Seen in A02` · `12`) | piglets | the head count the worker saw in the crate: one observation, never a sum of taps; the draft opens at the ledger's Alive | the draft; stamped at Save | one litter |
+| **Alive by the record** 记录存活 (`12 alive by the record`) | piglets | the ledger's Alive when the drawer opened | now | one litter |
+| **Difference** (`2 fewer · Save writes unexplained loss 2`) | piglets | Seen − Alive now; matching writes nothing (`Matches the record`) | the draft | one litter |
+| **Missing tagged piglets** 少了的已标识仔猪 (`pick at least 1`) | identity rows | the identified piglets a lower count names as missing: at least alive rows − Seen (what the untagged piglets cannot cover), at most the loss | the draft; stamped with the count | one litter |
+| **Untagged** 未标识 (`3 untagged piglets`) | piglets | Alive − alive identity rows in this litter | now | one litter |
+| **Count receipt** (`Saved · counted 10 · Unexplained loss 2`) | piglets | the count just saved on this phone and the item it wrote (loss red, gain blue); a match says `matches the record` | the last count on this phone | one litter |
+| **Open line** (`Unexplained loss 2`, `… · of 3` once part is explained) | piglets | one unexplained item's open part; the `of` figure is the item's size when counted | from the count until a death or a Move explains it | one litter; never netted against another line |
+| **Record said** (`record said 12`) | piglets | the ledger's Alive just before that count was applied | the count's place in the log | one litter |
+| **Suggestion** 建议 (`Crate B08 gained 1 — same piglet?`) | one open line | an open line of the opposite sign on another locked litter; the Move it proposes carries min(the two open figures), naming the loss's missing rows; listed only when the replay accepts that Move. Ranked: the same unit first (cross-unit allowed), then by minutes between the two counts | now | two litters; never proof, never paired until the worker saves the Move |
+| **Minutes apart** (`5 min apart`, `2h apart`) | minutes | the time between the two counts' stamps | fixed | one pair |
+| **Explain totals** (`loss 3 · gain 1 open`) | piglets | sum of the open lines shown (a litter, or a unit from its drift strip); the same figures as the room's strip | now | one litter or one unit |
+| **Counts** 计数记录 | count records | every Set count on this litter, newest first; `stands`: the last one applied (the later count stands); `wrote`: the item it wrote against the ledger when applied, never against the phone's base | cumulative, stamped | one litter |
+| **Phone saw** (`phone saw 14`) | piglets | the Alive the writing phone had when it counted (`baseAlive`); display only, never summed | the count's stamp | one litter |
+| **Sync review** 同步待核对 | one count | a count that did not see a death, Move or weaning recorded meanwhile (`count_concurrent`); two counts of one crate are not a conflict | until a later count stands | one litter |
+
 ## Count grammar
 
 The count leads the word and the unit is written: `{n} piglets`, singular `{n} piglet` (`pp.common.unit.piglet.one` / `.many`, `PP.tn`); zh has one form and no space between numeral and classifier (`14头`, `3日龄`). Ruled anchors that stay as they are: `born {n}` and `day {n}` (en), `Saved · +{n} this visit` and `Saved · {n} died this visit` (farrowing's, under `fr.*`; a processing receipt names its outcome and is registered by the slice that writes it), and label-then-count headers such as `Dead 6` and `Unexplained loss {n}`.

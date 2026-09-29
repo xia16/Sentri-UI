@@ -48,6 +48,11 @@
 .pp-strip { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: var(--space-panel); row-gap: 4px; padding: var(--space-row-y) var(--space-footer-gap); border-radius: var(--radius-inset); background: var(--well); font-size: var(--type-panel-title-size); color: var(--ink); }
 .pp-strip .pp-grp { display: inline-flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
 .pp-strip .pp-codes { font-family: var(--font-mono); font-size: var(--type-identifier-size); color: var(--muted); }
+/* The strip is the door to the room's open lines (count.html?state=explain): a bare button, 44px, focus ring. */
+button.pp-strip { width: 100%; min-height: var(--touch-min); margin: 0; border: 0; font-family: inherit; text-align: left; cursor: pointer; }
+button.pp-strip:active { background: var(--choice-press); }
+button.pp-strip > svg { align-self: center; margin-left: auto; width: var(--glyph-key); height: var(--glyph-key); flex: none; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .pp-wide { width: 100%; }
 .pp-last { margin-top: 4px; }
 
@@ -188,7 +193,7 @@
     if (h.openLoss) parts += grp('pp.room.loss_open', h.openLoss, h.lossLitters);
     if (h.openGain) parts += grp('pp.room.gain_open', h.openGain, h.gainLitters);
     if (h.showNet) parts += '<span class="pp-grp">' + U.span(Math.abs(h.netDrift) === 1 && PP.lang === 'en' ? 'pp.room.drift.one' : 'pp.room.drift', { n: signed(h.netDrift) }) + '</span>';
-    return '<div class="pp-strip" data-ds="Candidate:DriftStrip">' + parts + '</div>';
+    return '<button type="button" class="pp-strip" data-ds="Candidate:DriftStrip" data-action="explain">' + parts + I('chevron') + '</button>';
   }
   // The newest stamped event of any kind: treatment, count, move, death, identity or correction — in its own words.
   function evWhat(ev) {
@@ -382,6 +387,7 @@
     if (a === 'scrim') { if (Date.now() - S.opened < 300) return; closeSheet(); return; }
     if (a === 'back') { location.href = PP.href('index.html'); return; }
     if (a === 'open-litter') { saveScroll(); location.href = litterHref(v, b.dataset.piglet, b.dataset.unit); return; }
+    if (a === 'explain') { location.href = PP.href('count.html', { state: 'explain', unit: ROOM, data: store.name }); return; }
     if (a === 'overview') { location.href = PP.href('end.html', { state: 'overview', data: store.name !== 'base' ? store.name : '' }); return; }
     if (a === 'retry') { location.reload(); return; }
     if (a === 'lens') { S.lens = v; persist(); }

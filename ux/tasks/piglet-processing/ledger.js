@@ -33,8 +33,8 @@
      derive(events, config, { today })   → Derived (README: ux/laws/glossary.md, Ledger module)
      append(events, event, config, opts) → { ok, reason, detail, event, events, derived, dependents }
      balances(litter)                    → the ledger identity for one derived litter
-     select.room / litter / deathDraft / moveDraft / end — what pages render; drafts are validated
-       by the same replay `append` runs
+     select.room / litter / deathDraft / moveDraft / end / countDraft / explain / counts — what pages
+       render; drafts are validated by the same replay `append` runs
 */
 
 const DAY_MS = 86400000;
@@ -1337,6 +1337,113 @@ function moveDraftSelect(derived, draft, stamp) {
   };
 }
 
+/* Set count (slice #10): the number seen against the ledger's Alive, the item Save would write, which
+   identified piglets the count must name (the untagged remainder cannot cover the rest), and why Save
+   is gray — the same replay `append` runs. A matching count is a valid observation that writes nothing. */
+function countDraftSelect(derived, litterId, draft, stamp) {
+  const L = derived.litters[litterId];
+  if (!L) return { why: 'unknown_litter', event: null };
+  const dr = draft || {};
+  const observed = dr.observed == null ? L.alive : dr.observed;
+  const rows = L.identity.rows.filter((r) => r.litter === L.id && r.status === 'alive');
+  const picked = (dr.missingRows || []).filter((id) => rows.some((r) => r.rowId === id));
+  const diff = observed - L.alive;
+  const out = {
+    phase: L.phase, alive: L.alive, observed, diff, kind: diff < 0 ? 'loss' : diff > 0 ? 'gain' : 'match',
+    roster: rows.map((r) => ({ rowId: r.rowId, tag: r.tag || null, notch: r.notch || null })),
+    untagged: Math.max(0, L.alive - rows.length),
+    needRows: Math.max(0, rows.length - observed),        // rows the untagged piglets cannot account for
+    maxRows: Math.max(0, -diff), picked: picked.slice(),
+    open: { loss: L.unexplained.openLoss, gain: L.unexplained.openGain },
+    why: null, event: null, after: null
+  };
+  if (L.phase !== 'locked') { out.why = 'farrowing_open'; return out; }
+  if (picked.length < out.needRows) out.why = 'name_the_rows';
+  else if (picked.length > out.maxRows) out.why = 'too_many_rows';
+  const ev = { type: 'count', litter: L.id, observed, baseAlive: L.alive };
+  if (picked.length) ev.missingRows = picked.slice();
+  if (!out.why) {
+    const r = trial(derived, ev, stamp);
+    if (!r.ok) out.why = r.reason;
+    else {
+      const A = r.derived.litters[L.id];
+      out.after = { alive: A.alive, openLoss: A.unexplained.openLoss, openGain: A.unexplained.openGain };
+      out.event = ev;
+    }
+  }
+  return out;
+}
+
+/* Explain (slice #10): every open unexplained line, one by one, never netted, with what could explain it —
+   a death (losses only; the dead drawer takes the body from the open loss) and the Moves the app suggests
+   between an open loss and an open gain on another litter. Suggestions are ranked by room (the same room
+   first, cross-room allowed), then by how close the two counts were in time; each is validated by the same
+   replay `append` runs. A suggestion is never proof and is never paired by itself: the worker saves the Move. */
+function explainSelect(derived, opts, stamp) {
+  const o = opts || {};
+  const all = Object.values(derived.litters).filter((L) => L.phase === 'locked');
+  const scope = all.filter((L) => (o.litter ? L.id === o.litter : o.room == null || L.room === o.room));
+  const opens = (L, kind) => (kind === 'loss' ? L.unexplained.losses : L.unexplained.gains).filter((x) => x.open > 0);
+  const gapMin = (a, b) => { const x = time(a), y = time(b); return x == null || y == null ? null : Math.round(Math.abs(x - y) / 60000); };
+  const lines = [];
+  for (const L of scope) {
+    for (const kind of ['loss', 'gain']) {
+      for (const x of opens(L, kind)) {
+        const other = kind === 'loss' ? 'gain' : 'loss';
+        const suggestions = [];
+        for (const M of all) {
+          if (M.id === L.id) continue;
+          for (const y of opens(M, other)) {
+            const lossL = kind === 'loss' ? L : M, loss = kind === 'loss' ? x : y;
+            const gainL = kind === 'loss' ? M : L, gain = kind === 'loss' ? y : x;
+            const n = Math.min(loss.open, gain.open);
+            const named = lossL.identity.rows.filter((r) => r.litter === lossL.id && r.status === 'missing' && r.lossId === loss.id).map((r) => r.rowId);
+            const rows = named.slice(0, n);
+            const d = moveDraftSelect(derived, { from: lossL.id, to: gainL.id, n, rows, explains: [loss.id, gain.id] }, stamp);
+            if (!d.event) continue;
+            suggestions.push({
+              litter: M.id, room: M.room, sameRoom: M.room === L.room, kind: other, id: y.id, qty: y.qty, open: y.open, at: y.at, who: y.who,
+              observed: (M.counts.find((c) => c.id === y.id) || {}).observed ?? null, gapMin: gapMin(x.at, y.at),
+              move: { from: lossL.id, to: gainL.id, n: d.n, rows, explains: [loss.id, gain.id] }
+            });
+          }
+        }
+        suggestions.sort((a, b) => (b.sameRoom - a.sameRoom) || ((a.gapMin ?? 1e9) - (b.gapMin ?? 1e9)) || (a.litter < b.litter ? -1 : 1));
+        const c = L.counts.find((k) => k.id === x.id) || {};
+        lines.push({
+          litter: L.id, room: L.room, kind, id: x.id, qty: x.qty, open: x.open, rows: x.rows.slice(), at: x.at, who: x.who,
+          observed: c.observed ?? null, aliveBefore: c.aliveBefore ?? null,
+          explainedBy: x.explainedBy.map((b) => Object.assign({}, b)),
+          review: L.flags.some((f) => f.kind === 'sync_review' && (f.events || []).includes(x.id)),
+          death: kind === 'loss' ? { litter: L.id, max: x.open } : null,
+          suggestions
+        });
+      }
+    }
+  }
+  lines.sort((a, b) => (a.litter < b.litter ? -1 : a.litter > b.litter ? 1 : (time(a.at) || 0) - (time(b.at) || 0)));
+  return {
+    lines,
+    openLoss: lines.filter((l) => l.kind === 'loss').reduce((s, l) => s + l.open, 0),
+    openGain: lines.filter((l) => l.kind === 'gain').reduce((s, l) => s + l.open, 0)
+  };
+}
+
+/* The counts on one litter, newest last, each with what it wrote against the ledger (never against the
+   device's base, so two counts never sum) and whether it crossed a death, Move or weaning it did not see. */
+function countsSelect(derived, litterId) {
+  const L = derived.litters[litterId];
+  if (!L) return null;
+  const review = L.flags.filter((f) => f.kind === 'sync_review' && f.reason === 'count_concurrent');
+  const list = L.counts.map((c) => {
+    const crossed = review.filter((f) => (f.events || []).includes(c.id)).flatMap((f) => f.events.filter((id) => id !== c.id));
+    return Object.assign({}, c, { stands: false, crossed, review: crossed.length > 0, deviceDiff: c.baseAlive == null ? null : c.observed - c.baseAlive });
+  });
+  if (list.length) list[list.length - 1].stands = true;
+  // under review while the standing count is one that crossed an unseen change; a later count settles it
+  return { litter: L.id, alive: L.alive, counts: list, review: list.length ? list[list.length - 1].review : false };
+}
+
 /* End task figures (slice S9 glossary) over a set of derived litters. */
 function endFigures(cfg, litterViews) {
   const order = doseOrder(cfg);
@@ -1380,7 +1487,7 @@ function endSelect(derived) {
   return { atEnd: derived.ended && derived.ended.snapshot ? clone(derived.ended.snapshot) : null, now: endFigures(derived.config, derived.litters), ended: derived.ended ? Object.assign({}, derived.ended, { snapshot: undefined }) : null };
 }
 
-export const select = { room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect };
+export const select = { room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect, countDraft: countDraftSelect, explain: explainSelect, counts: countsSelect };
 export const PPLedger = { derive, append, balances, dayNumber, select };
 export default PPLedger;
 if (typeof window !== 'undefined') window.PPLedger = PPLedger;

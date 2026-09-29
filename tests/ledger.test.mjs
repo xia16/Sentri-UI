@@ -1347,3 +1347,72 @@ test('property: concurrent records give the same owed in every permutation', () 
     assert.equal(readings.size, 1, `seed ${seed}: ${JSON.stringify(recs)} ${[...readings]}`);
   }
 });
+
+// ---- Set count and Explain (slice #10) -----------------------------------------------------
+
+test('select.countDraft: an observation against Alive; a match writes nothing; the rows the remainder cannot cover must be named', () => {
+  const b = book();
+  b.farrowed('A', 12);
+  for (let i = 1; i <= 3; i++) b.identity('A', 'add', { rowId: 'r' + i, tag: '00000' + i });
+  b.farrowed('P', 9, {}, { locked: false });
+  const d = run(b, IRON_ONLY);
+  const m = select.countDraft(d, 'A', { observed: 12 });
+  assert.equal(m.kind, 'match'); assert.equal(m.why, null);
+  assert.deepEqual(m.after, { alive: 12, openLoss: 0, openGain: 0 });
+  const g = select.countDraft(d, 'A', { observed: 13 });
+  assert.equal(g.kind, 'gain'); assert.deepEqual(g.after, { alive: 13, openLoss: 0, openGain: 1 });
+  // 12 alive, 3 tagged, 9 untagged: a count of 2 must name 1 tagged piglet (at most 10)
+  const n = select.countDraft(d, 'A', { observed: 2 });
+  assert.equal(n.why, 'name_the_rows'); assert.equal(n.needRows, 1); assert.equal(n.maxRows, 10); assert.equal(n.untagged, 9);
+  const ok = select.countDraft(d, 'A', { observed: 2, missingRows: ['r2'] });
+  assert.equal(ok.why, null); assert.deepEqual(ok.event.missingRows, ['r2']);
+  assert.equal(append(b.ev, Object.assign({ id: 'z' }, ok.event), IRON_ONLY, TODAY(3)).ok, true);
+  assert.equal(select.countDraft(d, 'A', { observed: 11, missingRows: ['r1', 'r2'] }).why, 'too_many_rows');
+  assert.equal(select.countDraft(d, 'P', { observed: 8 }).why, 'farrowing_open');
+});
+
+test('select.explain: each open line with a death door (losses) and ranked Move suggestions, never netted', () => {
+  const b = book();
+  b.farrowed('A', 10); b.farrowed('B', 10); b.farrowed('C', 10, {}, { room: 'R4' }); b.farrowed('D', 10);
+  const l = b.count('A', 9, { at: on(3, '09:00') });
+  b.count('B', 11, { at: on(3, '11:00') });            // same room, 2h later
+  b.count('C', 11, { at: on(3, '09:05') });            // another room, 5 min later
+  b.count('D', 8, { at: on(3, '09:30') });             // a second loss: never netted against A's
+  const d = run(b, IRON_ONLY);
+  const x = select.explain(d, { room: 'R3' });
+  assert.equal(x.openLoss, 3); assert.equal(x.openGain, 1);
+  const a = x.lines.find((y) => y.id === l.id);
+  assert.deepEqual(a.death, { litter: 'A', max: 1 });
+  assert.deepEqual(a.suggestions.map((s) => s.litter), ['B', 'C']);   // same room first, cross-room allowed
+  assert.deepEqual(a.suggestions[0].move, { from: 'A', to: 'B', n: 1, rows: [], explains: [l.id, a.suggestions[0].id] });
+  // saving the suggested Move closes both lines; Alive does not move
+  const mv = select.moveDraft(d, a.suggestions[0].move);
+  b.move('A', 'B', 1, Object.assign({}, mv.event));
+  const d2 = run(b, IRON_ONLY);
+  assert.equal(d2.litters.A.alive, 9); assert.equal(d2.litters.B.alive, 11);
+  assert.equal(select.explain(d2, { litter: 'A' }).lines.length, 0);
+  assert.equal(select.explain(d2, { litter: 'B' }).lines.length, 0);
+  // nothing left in this room to pair with D's loss: the other room's gain is still suggested, and it stays open until saved
+  const dd = select.explain(d2, { litter: 'D' }).lines[0];
+  assert.equal(dd.open, 2); assert.deepEqual(dd.suggestions.map((s) => s.litter), ['C']);
+  allBalanced(d2);
+});
+
+test('select.counts: two offline counts — the later stands, never summed; a count that crossed an unseen death is flagged', () => {
+  const b = book();
+  const f = b.farrowed('A', 14);
+  b.count('A', 13, { baseAlive: 14 });
+  b.death('A', [{ cause: 'crushed', n: 1 }]);
+  const late = b.count('A', 12, { baseAlive: 14, seen: [f.id] });
+  const d = run(b, IRON_ONLY);
+  const c = select.counts(d, 'A');
+  assert.equal(d.litters.A.alive, 12);                  // the later count stands: not 14 − 1 − 1 − 2
+  assert.equal(c.counts[1].id, late.id);
+  assert.equal(c.counts[1].stands, true); assert.equal(c.counts[1].wrote, 0); assert.equal(c.counts[1].deviceDiff, -2);
+  assert.equal(c.counts[1].review, true); assert.equal(c.review, true);
+  allBalanced(d);
+  // a later count, online, settles the review; the flagged count stays in the trail
+  b.count('A', 12, { baseAlive: 12 });
+  const c2 = select.counts(run(b, IRON_ONLY), 'A');
+  assert.equal(c2.review, false); assert.equal(c2.counts[1].review, true); assert.equal(c2.counts[2].stands, true);
+});

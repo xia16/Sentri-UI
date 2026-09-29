@@ -86,6 +86,11 @@
   var S = JSON.parse(JSON.stringify(STATES[name]));
   if (PP.state === 'move-prelock' && qs.get('data') === 'other') S = { view: 'move', face: 'B06', query: 'D01' };
   if (qs.get('crate') && name === 'move') S.face = qs.get('crate');
+  // Opened from a suggestion on count.html (Explain): the pair it names, pre-filled — from, to, n, the missing rows and `explains`.
+  if (name === 'move-explain' && qs.get('explains')) {
+    S.face = qs.get('crate'); S.other = qs.get('other'); S.n = +qs.get('n') || 1; S.explains = qs.get('explains').split(',');
+    S.rows = qs.get('rows') ? qs.get('rows').split(',') : []; S.dir = 'out';
+  }
   S.dir = S.dir || 'out'; S.answers = S.answers || {}; S.rows = S.rows || []; S.untagged = S.untagged || 0;
   if (S.n == null) S.n = 1;
   var DEFAULT = JSON.stringify({ other: '', n: 1, rows: [], untagged: 0, answers: {}, dir: 'out' });

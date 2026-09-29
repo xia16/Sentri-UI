@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set count</title>
+<link rel="stylesheet" href="/ux/design-system/tokens.css">
+<link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="shell.css">
+<script type="module" src="ledger.js"></script>
+<script type="module" src="fixtures.js"></script>
+<style>
+/* Layout only, tokens from tokens.css. No compositions of its own: the page draws cards, the shared header,
+   tools and receipt (shell-ui.js) and the Stepper candidate's hero variant. */
+.ct-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
+.ct-phone .scrim { inset: 0; }
+.ct-body { display: flex; flex-direction: column; gap: var(--space-section); padding-bottom: var(--space-panel); }
+.ct-body > * { margin: 0; }
+.ct-group { display: flex; flex-direction: column; gap: var(--space-heading); }
+.ct-group > * { margin: 0; }
+.ct-head { display: flex; align-items: flex-start; gap: var(--space-footer-gap); }
+.ct-head > .st-text-action { min-width: var(--touch-min); justify-content: flex-end; }
+.ct-summary { flex: none; display: flex; flex-direction: column; gap: var(--space-row-y); padding: var(--space-row-y) var(--space-gutter); }
+.ct-summary > * { margin: 0; }
+.ct-phone .sheet[data-st-context="drawer"] > .sheet-body { flex: 1; }
+.ct-bar { flex-wrap: wrap; row-gap: var(--space-row-y); }
+.ct-bar > .pp-receipt { flex-basis: 100%; }
+.ct-bar > .button { flex: 1; }
+.ct-bar > .button.secondary:not(:only-of-type) { flex: none; }
+@media (max-width: 370px) { .ct-summary { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
+</style>
+</head>
+<body>
+<main class="inspection-phone ct-phone" data-st-context="page">
+  <div id="screen"></div>
+</main>
+<script src="/ux/design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+<script src="shell-ui.js"></script>
+<script>
+(function () {
+  var UI = window.SentriUI, U = window.PPUI;
+
+  /* ---- states: a variant of the shared fixture + UI state. Every figure is the ledger's: select.countDraft (the number seen
+     against Alive, the item Save writes, which tagged piglets must be named, why Save is gray), select.explain (each open line,
+     its death door and the Moves the app suggests, ranked by room then time, validated through append), select.counts (the
+     counts on a litter, which stands, what each wrote, sync review) and select.moveDraft (alive after an explaining Move).
+     Save commits through append. `save`: the state is the moment after Save (committed at load, not kept in the tab). ---- */
+  var STATES = {
+    'count':           { view: 'count', crate: 'A02' },
+    'count-match':     { view: 'host', crate: 'A02', save: 12 },
+    'count-loss':      { view: 'host', crate: 'A02', save: 10 },
+    'count-gain':      { view: 'host', crate: 'A02', save: 13 },
+    'count-named':     { view: 'count', crate: 'B06', observed: 8 },
+    'count-kept':      { view: 'host', crate: 'A02', kept: { observed: 10, rows: [] } },
+    'count-prelock':   { view: 'prelock', crate: 'D01' },
+    'count-conflict':  { view: 'host', crate: 'A07', data: 'count-offline' },
+    'explain':         { view: 'explain', crate: 'B06', data: 'explain' },
+    'explain-suggest': { view: 'suggest', crate: 'B06', data: 'explain', line: 'C-B06-loss', pick: 'C-B08-gain' },
+    'explain-open':    { view: 'explain', crate: 'D03' },
+    'explain-room':    { view: 'explain', room: 7, data: 'explain' }
+  };
+  var qs = PP.q;
+  var name = STATES[PP.state] ? PP.state : 'count';
+  var spec = JSON.parse(JSON.stringify(STATES[name]));
+  var store, TODAY, NOW, crate, room, S;
+
+  /* ---- the ledger ---- */
+  function L(c) { return store.derived.litters[c || crate]; }
+  function sow(c) { return store.sow(c || crate) || { sow: '', parity: 0, unit: 7 }; }
+  var memo = { key: '', val: null };
+  function draft() {
+    var d = { observed: S.observed, missingRows: S.rows.slice() }, key = JSON.stringify(d) + crate + store.events.length;
+    if (memo.key !== key) memo = { key: key, val: store.select.countDraft(store.derived, crate, d, { who: window.PPFixtures.ME }) };
+    return memo.val;
+  }
+  function explain() { return store.select.explain(store.derived, S.room ? { room: S.room } : { litter: crate }, { who: window.PPFixtures.ME }); }
+  function dirty() { return S.observed !== L().alive || S.rows.length > 0; }
+  // The draft stays on this phone (sessionStorage) until Save or Clear; a state that shows a kept draft holds it in memory only.
+  var DKEY = function () { return 'pp-count-draft:' + store.name + ':' + crate; };
+  var mem = spec.kept ? { d: spec.kept } : null;
+  function keepDraft() {
+    var d = dirty() ? { observed: S.observed, rows: S.rows.slice() } : null;
+    if (mem) { mem.d = d; return; }
+    try { if (d) sessionStorage.setItem(DKEY(), JSON.stringify(d)); else sessionStorage.removeItem(DKEY()); } catch (e) {}
+  }
+  function keptDraft() { if (mem) return mem.d; try { return JSON.parse(sessionStorage.getItem(DKEY()) || 'null'); } catch (e) { return null; } }
+  function dropDraft() { if (mem) { mem.d = null; return; } try { sessionStorage.removeItem(DKEY()); } catch (e) {} }
+
+  /* ---- helpers ---- */
+  var pl = PP.one;
+  function span(id, args, o) { return U.span(id, args, o); }
+  function pigs(n) { return { id: pl('pp.common.unit.piglet', n), args: { n: n } }; }
+  function stamp(at, who) { return U.stamp(at, who, TODAY); }
+  function fact(label, labelArgs, value, valueArgs, meta, metaArgs, tone) {
+    var f = { label: '', strs: { label: label }, args: { label: labelArgs } };
+    if (tone) f.valueHtml = span(value, valueArgs, { tone: tone }); else { f.value = ''; f.strs.value = value; f.args.value = valueArgs; }
+    if (meta) { f.meta = ''; f.strs.meta = meta; f.args.meta = metaArgs; }
+    return f;
+  }
+  function row(o) {
+    var strs = { title: o.title }, args = { title: o.titleArgs };
+    if (o.desc) { strs.description = o.desc; args.description = o.descArgs; }
+    if (o.trail) { strs.trailing = o.trail; args.trailing = o.trailArgs; }
+    return UI.row({ title: '', description: o.desc ? '' : undefined, trailing: o.trailHtml || (o.trail ? '' : undefined), action: o.action, value: o.value, strs: strs, args: args });
+  }
+  function button(cls, action, id, args, disabled) {
+    return '<button type="button" class="button ' + cls + '" data-ds="Button" data-action="' + action + '" data-str="' + id + '"' +
+      (args ? " data-args='" + U.esc(JSON.stringify(args)) + "'" : '') + (disabled ? ' disabled' : '') + '>' + U.esc(PP.t(id, args)) + '</button>';
+  }
+  function textAction(action, id) {
+    return '<button type="button" class="st-text-action" data-ds="Button" data-action="' + action + '" data-str="' + id + '">' + U.esc(PP.t(id)) + '</button>';
+  }
+  function rowLabel(r) { return r.tag ? { id: 'pp.count.row.tag', args: { tag: r.tag } } : { id: 'pp.count.row.notch', args: { notch: r.notch } }; }
+  function eventOf(id) { return store.events.filter(function (e) { return e.id === id; })[0] || null; }
+  // One open line's words: `Unexplained loss 2` (red) · `Unexplained gain 1` (blue); `… · 1 of 2 open` once part is explained.
+  function lineTitle(l, withCode) {
+    var base = l.open < l.qty ? 'pp.count.line.' + l.kind + '_part' : 'pp.count.line.' + l.kind;
+    return { id: withCode ? base + '_code' : base, args: { n: l.open, q: l.qty, code: l.litter } };
+  }
+  function lineStamp(l) { return { id: 'pp.count.line.stamp', args: { n: l.observed, stamp: stamp(l.at, l.who), was: l.aliveBefore } }; }
+
+  /* ---- the litter host: the shared header, the ledger's figures, the tools, the open lines and the counts ---- */
+  function hostHead() {
+    var x = L();
+    var sub = x.phase === 'open' ? span('pp.count.host.sub_farrowing', { u: x.room }) : span('pp.count.host.sub', { u: x.room, day: x.dayAge });
+    return U.litterHeader({ crate: crate, sow: sow().sow, parity: sow().parity, sub: sub });
+  }
+  function hostFacts() {
+    var x = L(), items = [];
+    if (x.phase === 'locked') items.push(fact('label.born', null, pigs(x.born).id, pigs(x.born).args));
+    items.push(fact('label.alive', null, pigs(x.alive).id, pigs(x.alive).args));
+    items.push(fact('label.dead', null, pigs(x.dead.total).id, pigs(x.dead.total).args));
+    return UI.facts(items, { columns: items.length });
+  }
+  function keptRow() {
+    var k = keptDraft();
+    if (!k) return '';
+    return UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.kept.title', titleArgs: { n: k.observed }, desc: 'status.unsaved', descArgs: { n: 1 } }));
+  }
+  function openSection() {
+    var lines = store.select.explain(store.derived, { litter: crate }).lines;
+    if (!lines.length) return '';
+    var rows = lines.map(function (l) {
+      var t = lineTitle(l), s = lineStamp(l);
+      return row({ action: 'open-explain', value: crate, title: t.id, titleArgs: t.args, desc: s.id, descArgs: s.args, trail: 'pp.count.act.explain' });
+    }).join('');
+    return '<section class="ct-group">' + UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: 'pp.count.open.title', description: 'pp.count.open.desc' } }) + UI.rowGroup(rows) + '</section>';
+  }
+  // The counts on this litter, newest first: each an observation, stamped; the one standing leads.
+  function countsSection() {
+    var c = store.select.counts(store.derived, crate);
+    if (!c || !c.counts.length) return '';
+    var list = c.counts.slice().reverse();
+    var review = c.review ? c.counts[c.counts.length - 1] : null;             // the standing count crossed a change it did not see
+    var facts = UI.facts(list.slice(0, 3).map(function (k) {
+      var ev = eventOf(k.id) || {}, meta, margs = { k: Math.abs(k.wrote), base: k.baseAlive };
+      if (k.review) meta = 'pp.count.c.review'; else if (k.wrote < 0) meta = 'pp.count.c.wrote_loss'; else if (k.wrote > 0) meta = 'pp.count.c.wrote_gain';
+      else meta = k.aliveBefore === k.baseAlive || k.baseAlive == null ? 'pp.count.c.matched' : 'pp.count.c.wrote_none';
+      if (k.stands) { meta = meta + '_stands'; }
+      return fact(ev.syncedAt ? 'pp.count.c.label_synced' : 'pp.count.c.label', { stamp: stamp(k.at, k.who), t: ev.syncedAt ? U.time(ev.syncedAt) : '' }, pigs(k.observed).id, pigs(k.observed).args, meta, margs);
+    }), { columns: 1 });
+    var out = '<section class="ct-group">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.count.c.title' } }) + facts;
+    if (review) {
+      var crossed = review.crossed.map(eventOf).filter(Boolean)[0] || {};
+      var what = crossed.type === 'death' ? 'pp.count.review.death' : crossed.type === 'move' ? 'pp.count.review.move' : 'pp.count.review.weaned';
+      out += UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.review.title', description: what },
+        args: { description: { who: review.who, t: U.time(crossed.at || review.at), by: crossed.who || '' } } }) +
+        UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.review.again', titleArgs: { code: crate }, desc: 'pp.count.review.again_desc' }));
+    }
+    return out + '</section>';
+  }
+  function receiptLine() {
+    var r = S.receipt;
+    if (!r) return '';
+    if (r.kind === 'match') return U.receipt([{ id: 'pp.count.rcpt.match', args: { n: r.observed } }]);
+    return U.receipt([{ id: 'pp.count.rcpt.counted', args: { n: r.observed } }, { id: 'pp.count.rcpt.' + r.kind, args: { n: Math.abs(r.diff) }, tone: r.kind === 'loss' ? 'red' : 'blue' }]);
+  }
+  function hostHtml(inert) {
+    // A count under sync review leads: the worker's next act is to count again.
+    var c = store.select.counts(store.derived, crate);
+    var body = hostFacts() + U.tools(crate) + keptRow() + (c && c.review ? countsSection() + openSection() : openSection() + countsSection());
+    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (inert ? ' inert' : '') + '>' + hostHead() +
+      '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
+      '<footer class="sheet-footer ct-bar">' + receiptLine() + button('secondary', 'back', 'act.back') + '</footer></section>';
+  }
+
+  /* ---- the Set count drawer: a staged assertion (Back keeps the draft, Clear discards it, Save writes one stamped count) ---- */
+  function hint(d) {
+    if (d.why === 'farrowing_open') return { id: 'pp.count.hint.match' };
+    if (d.kind === 'match') return { id: 'pp.count.hint.match' };
+    return { id: 'pp.count.hint.' + d.kind, args: { k: Math.abs(d.diff) } };
+  }
+  function rosterSection(d) {
+    if (!d.needRows && !S.rows.length) return '';
+    var h = UI.heading({ title: '', description: '', kind: 'section', level: 3,
+      strs: { title: pl('pp.count.named.title', d.needRows), description: pl('pp.count.named.desc', d.untagged) },
+      args: { title: { n: d.needRows }, description: { u: d.untagged, k: d.maxRows, n: d.needRows } } });
+    var rows = UI.choiceGroup(d.roster.map(function (r) {
+      var l = rowLabel(r);
+      return UI.choiceRow({ label: '', mode: 'multi', action: 'pick-row', value: r.rowId, selected: S.rows.indexOf(r.rowId) >= 0, strs: { label: l.id }, args: { label: l.args } });
+    }));
+    return '<section class="ct-group">' + h + rows + '</section>';
+  }
+  function pointer(d) {
+    if (d.why === 'name_the_rows') return { id: pl('pp.count.why.rows', d.needRows - d.picked.length), args: { n: d.needRows - d.picked.length } };
+    if (d.why === 'too_many_rows') return { id: pl('pp.count.why.too_many', d.maxRows), args: { n: d.maxRows } };
+    if (d.why) return { id: 'pp.count.why.check' };
+    return null;
+  }
+  function countDrawer() {
+    var d = draft(), h = hint(d), p = pointer(d), x = L();
+    var hero = UI.stepper({ label: '', value: S.observed, min: 0, key: 'observed', variant: 'hero', draft: dirty(), hint: '', reserveHint: true,
+      strs: { label: 'pp.count.seen', value: 'ds.field.figure', hint: h.id, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
+      args: { label: { code: crate }, hint: h.args } });
+    var summary = p ? '<div class="ct-summary">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: p.id }, args: { title: p.args } }) + '</div>' : '';
+    var size = d.needRows || S.rows.length ? ' data-size="long"' : ' data-size="medium" data-sizing="content"';
+    return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Sheet" data-st-context="drawer"' + size + ' role="dialog" aria-modal="true">' +
+      '<header class="utility-header ct-head"><div class="pp-hdr-title"><h3 data-str="pp.count.title">' + U.esc(PP.t('pp.count.title')) + '</h3><p>' +
+      span(pl('pp.count.sub', x.alive), { code: crate, n: x.alive, day: x.dayAge }) + '</p></div>' + (dirty() ? textAction('clear', 'act.clear') : '') + '</header>' +
+      '<div class="sheet-body"><div class="ct-body">' + hero + rosterSection(d) + '</div></div>' + summary +
+      '<footer class="sheet-footer ct-bar">' + button('secondary', 'back', 'act.back') + button('primary', 'save', 'act.save', null, !d.event) + '</footer></section>';
+  }
+
+  /* ---- before the lock the count is the farrowing sheet's (RULINGS Q13 / Model): a hand-off, not a second counter ---- */
+  function prelockDrawer() {
+    var x = L(), ev = x.lastEvent;
+    var door = UI.rowGroup(row({ action: 'open-farrowing', value: crate, title: 'pp.count.pre.door', titleArgs: { code: crate },
+      desc: 'pp.count.pre.door_desc', descArgs: { n: x.born, ago: U.ago(ev.at, NOW), who: ev.who } }));
+    return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="short" data-sizing="content" role="dialog" aria-modal="true">' +
+      '<header class="utility-header"><div class="pp-hdr-title"><h3 data-str="pp.count.title">' + U.esc(PP.t('pp.count.title')) + '</h3><p>' + span('pp.count.pre.why', { code: crate }) + '</p></div></header>' +
+      '<div class="sheet-body"><div class="ct-body">' + door + '</div></div>' +
+      '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + '</footer></section>';
+  }
+
+  /* ---- Explain: the open lines one by one (litter, or the room from its drift strip), each with its doors ---- */
+  function suggestionRow(l, s) {
+    var t = s.kind === 'gain' ? 'pp.count.sug.gained' : 'pp.count.sug.lost';
+    var d = s.room !== l.room ? 'pp.count.sug.desc_unit' : 'pp.count.sug.desc';
+    var gap = s.gapMin == null ? '' : s.gapMin < 60 ? PP.t('pp.count.sug.gap_min', { m: s.gapMin }) : PP.t('pp.count.sug.gap_h', { h: Math.round(s.gapMin / 60) });
+    return row({ action: 'suggest', value: l.id + '|' + s.id, title: t, titleArgs: { code: s.litter, n: s.open },
+      desc: d, descArgs: { n: s.observed, stamp: stamp(s.at, s.who), gap: gap, u: s.room } });
+  }
+  function lineSection(l, withCode) {
+    var t = lineTitle(l, withCode), st = lineStamp(l), rows = [];
+    l.suggestions.slice(0, 3).forEach(function (s) { rows.push(suggestionRow(l, s)); });
+    if (l.death) rows.push(row({ action: 'open-dead', value: l.litter, title: 'act.record_dead', desc: pl('pp.count.ex.dead_desc', l.open), descArgs: { n: l.open } }));
+    rows.push(row({ action: 'open-count', value: l.litter, title: 'pp.count.title', desc: 'pp.count.ex.again_desc', descArgs: { code: l.litter } }));
+    var none = l.suggestions.length ? '' : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: l.kind === 'loss' ? 'pp.count.ex.none_loss' : 'pp.count.ex.none_gain' } });
+    var review = l.review ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.review.line' } }) : '';
+    return '<section class="ct-group">' +
+      UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: t.id, description: st.id }, args: { title: t.args, description: st.args } }) +
+      review + none + UI.rowGroup(rows.join('')) + '</section>';
+  }
+  function explainHtml(inert) {
+    var x = explain(), head;
+    if (S.room) head = UI.heading({ title: '', description: '', kind: 'page', level: 2, strs: { title: 'pp.count.ex.title_room', description: 'pp.count.ex.sub' }, args: { title: { u: S.room }, description: { l: x.openLoss, g: x.openGain } } });
+    else head = UI.heading({ title: '', description: '', kind: 'page', level: 2, strs: { title: 'pp.count.ex.title', description: 'pp.count.ex.sub' }, args: { title: { code: crate }, description: { l: x.openLoss, g: x.openGain } } });
+    var body = x.lines.length ? x.lines.map(function (l) { return lineSection(l, !!S.room); }).join('')
+      : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.ex.empty' } });
+    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (inert ? ' inert' : '') + '>' +
+      '<header class="utility-header">' + head + '</header>' +
+      '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
+      '<footer class="sheet-footer ct-bar">' + button('secondary', 'back', 'act.back') + '</footer></section>';
+  }
+  /* The suggestion, side by side: both counts (who, when, where), what saving it as a Move does, and the door to the Move sheet.
+     A suggestion is never proof; nothing pairs until the worker saves the Move. */
+  function suggestion() {
+    var x = explain(), l = null, s = null;
+    x.lines.forEach(function (a) { if (a.id === S.line) { l = a; a.suggestions.forEach(function (b) { if (b.id === S.pick) s = b; }); } });
+    return l && s ? { l: l, s: s } : null;
+  }
+  function suggestDrawer() {
+    var p = suggestion();
+    if (!p) { S.view = 'explain'; return ''; }
+    var l = p.l, s = p.s, m = s.move, loss = l.kind === 'loss' ? l : s, gain = l.kind === 'loss' ? s : l;
+    var mv = store.select.moveDraft(store.derived, m, { who: window.PPFixtures.ME });
+    var cross = loss.room !== gain.room;
+    var side = function (y, kind) {
+      return fact(cross ? 'pp.count.sg.side_unit' : 'pp.count.sg.side', { code: y.litter, u: y.room },
+        'pp.count.line.' + kind, { n: y.open }, 'pp.count.sg.stamp', { n: y.observed, stamp: stamp(y.at, y.who) }, kind === 'loss' ? 'red' : 'blue');
+    };
+    var t = l.kind === 'loss' ? 'pp.count.sug.gained' : 'pp.count.sug.lost';
+    var body = UI.facts([side({ litter: loss.litter, room: loss.room, open: loss.open, observed: loss.observed, at: loss.at, who: loss.who }, 'loss'),
+                         side({ litter: gain.litter, room: gain.room, open: gain.open, observed: gain.observed, at: gain.at, who: gain.who }, 'gain')], { columns: 2 }) +
+      UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: pl('pp.count.sg.if', m.n), description: 'pp.count.sg.alive' },
+        args: { title: { n: m.n }, description: { a: m.from, x: mv.delta ? mv.delta.from[1] : '', b: m.to, y: mv.delta ? mv.delta.to[1] : '' } } });
+    return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="medium" data-sizing="content" role="dialog" aria-modal="true">' +
+      '<header class="utility-header"><div class="pp-hdr-title"><h3>' + span(t, { code: s.litter, n: s.open }) + '</h3><p>' + span('pp.count.sg.sub') + '</p></div></header>' +
+      '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
+      '<footer class="sheet-footer ct-bar">' + button('secondary', 'back', 'act.back') + button('primary', 'open-move', 'pp.count.sg.move', { n: m.n, from: m.from, to: m.to }, !mv.event) + '</footer></section>';
+  }
+
+  function render() {
+    var html;
+    if (S.view === 'count') html = hostHtml(true) + countDrawer();
+    else if (S.view === 'prelock') html = hostHtml(true) + prelockDrawer();
+    else if (S.view === 'explain') html = explainHtml(false);
+    else if (S.view === 'suggest') { var dr = suggestDrawer(); html = explainHtml(!!dr) + dr; }
+    else html = hostHtml(false);
+    var root = document.getElementById('screen');
+    root.innerHTML = html;
+    PP.apply(root);
+  }
+
+  /* ---- acts ---- */
+  // The variant always travels (`data=base` too): a page whose state names its own variant must not fall back to it.
+  function nav(page, params) { location.href = PP.href(page, Object.assign({ data: store.name }, params)); }
+  function openCount(c) {
+    if (c && c !== crate) { nav('count.html', { state: 'count', crate: c }); return; }
+    if (L().phase !== 'locked') { S.view = 'prelock'; return; }
+    var k = keptDraft();
+    S.observed = k ? k.observed : L().alive; S.rows = k ? k.rows.slice() : []; S.view = 'count'; S.receipt = null;
+  }
+  function save() {
+    var d = draft();
+    if (!d.event) return false;
+    var r = store.commit(d.event);
+    if (!r.ok) return false;
+    S.receipt = { kind: d.kind, observed: d.observed, diff: d.diff };
+    dropDraft(); S.rows = []; S.view = 'host';
+    return true;
+  }
+  function back() {
+    if (S.view === 'count') { keepDraft(); S.view = 'host'; return; }
+    if (S.view === 'prelock') { S.view = 'host'; return; }
+    if (S.view === 'suggest') { S.view = 'explain'; return; }
+    if (S.view === 'explain' && S.from === 'host') { S.view = 'host'; S.from = ''; return; }
+    if (S.view === 'explain' && S.room) { nav('room.html', { state: 'room', unit: S.room !== 7 ? S.room : '' }); return 'nav'; }
+    nav('litter.html', { state: 'litter', crate: crate, unit: qs.get('unit') });
+    return 'nav';
+  }
+  document.getElementById('screen').addEventListener('click', function (ev) {
+    if (ev.target.closest('[data-dismiss]')) { back(); render(); return; }      // the scrim is Back
+    var b = ev.target.closest('[data-action]');
+    if (!b) return;
+    var a = b.dataset.action, v = b.dataset.value;
+    if (a === 'pick-row') v = b.value;
+    if (a === 'step') {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      S.observed = Math.max(0, S.observed + (+b.dataset.step));
+      if (S.observed >= L().alive) S.rows = [];                                // nothing missing: no tagged piglet to name
+    }
+    else if (a === 'pick-row') { var i = S.rows.indexOf(v); if (i >= 0) S.rows.splice(i, 1); else S.rows.push(v); }
+    else if (a === 'clear') { dropDraft(); S.observed = L().alive; S.rows = []; }
+    else if (a === 'save') { if (b.disabled) return; save(); }
+    else if (a === 'back') { if (back() === 'nav') return; }
+    else if (a === 'open-count') openCount(v);
+    else if (a === 'open-explain') { S.view = 'explain'; S.from = 'host'; S.room = 0; }
+    else if (a === 'suggest') { var p = v.split('|'); S.line = p[0]; S.pick = p[1]; S.view = 'suggest'; }
+    else if (a === 'open-dead') { nav('dead.html', { state: 'dead', crate: v || crate, unit: qs.get('unit') }); return; }
+    else if (a === 'open-move') {
+      var sg = suggestion(); if (!sg || b.disabled) return;
+      var m = sg.s.move;
+      nav('move.html', { state: 'move-explain', crate: m.from, other: m.to, n: m.n, rows: m.rows.join(','), explains: m.explains.join(',') });
+      return;
+    }
+    else if (a === 'open-farrowing') { location.href = '/ux/system/farrowing-astra-concept.html'; return; }
+    else if (a === 'open-sow') { document.documentElement.setAttribute('data-door', 'open-sow:' + (v || '')); return; }
+    else { document.documentElement.setAttribute('data-door', a + ':' + (v || '')); return; }
+    render();
+  });
+
+  PP.ready.then(function () {
+    store = PP.open(spec.data || 'base', spec.save != null ? { session: false } : null);
+    TODAY = store.today; NOW = window.PPFixtures.NOW;
+    crate = qs.get('crate') || spec.crate || '';
+    room = +(qs.get('unit') || spec.room || 0);
+    S = { view: spec.view, observed: 0, rows: [], receipt: null, room: spec.view === 'explain' && !qs.get('crate') ? room : 0, line: spec.line || '', pick: spec.pick || '', from: '' };
+    if (S.room && !crate) crate = store.select.explain(store.derived, { room: S.room }).lines.map(function (l) { return l.litter; })[0] || 'A02';
+    if (!L()) crate = 'A02';
+    if (S.view === 'count' || S.view === 'prelock') {
+      openCount();
+      if (spec.observed != null) S.observed = spec.observed;
+    }
+    if (spec.save != null) { openCount(); S.observed = spec.save; save(); }
+    render();
+  });
+})();
+</script>
+</body>
+</html>
