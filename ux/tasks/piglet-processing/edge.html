@@ -46,11 +46,12 @@
   var day = function (m, d) { return zh ? m + '月' + d + '日' : 'Sep' + ' ' + d; };
   var stamp = function (m, d, time, who) { return day(m, d) + ' · ' + time + ' · ' + who; };
   var FX = {
-    'no-task':  { tag: '000391', pen: 'C07', parity: 2, day: 4, born: 11, alive: 10, dead: 1 },
+    'no-task':  { tag: '000391', pen: 'C07', parity: 2, day: 4, born: 11, alive: 10, dead: 1, live: 10 },
     'orphan':   { tag: '000418', pen: 'B01', parity: 3, day: 3, born: 10, alive: 7, dead: 3, cause: 'pp.edge.cause.prolapse', died: stamp(9, 28, '06:20', 'L.M'),
                   owed: [['iron', 7, 3], ['tail', 7, 3]] },
     'prelock':  { tag: '000437', pen: 'B02', parity: 2, day: 0, alive: 9, dead: 1, owed: [['cord', 9, 0], ['nasal', 9, 0]] },
     'birth-weight-missing': { tag: '000462', pen: 'C03', parity: 4, day: 1, born: 13, alive: 12, dead: 1, live: 12 },
+    'birth-weight-typed':   { tag: '000462', pen: 'C03', parity: 4, day: 1, born: 13, alive: 12, dead: 1, live: 12, typed: '16.4' },
     'birth-weight-set':     { tag: '000462', pen: 'C03', parity: 4, day: 1, born: 13, alive: 12, dead: 1, live: 12, weight: '16.4', by: stamp(9, 28, '14:52', 'G.H') }
   };
   var name = FX[PP.state] ? PP.state : 'no-task';
@@ -119,6 +120,7 @@
     if (name === 'no-task') {
       out.push(UI.panel(UI.heading({ title: '', description: '', kind: 'panel', level: 3, strs: { title: 'pp.edge.notask.title', description: 'pp.edge.notask.why' } }), { ds: 'Panel' }));
       out.push(facts());
+      out.push(weightBlock());
       out.push(UI.rowGroup(
         row({ icon: 'alert', action: 'open-dead', value: 'dead', title: 'act.record_dead', desc: 'pp.edge.desc.dead', descArgs: { n: f.dead } }) +
         row({ icon: 'record', action: 'open-count', value: 'count', title: 'pp.count.title', desc: 'pp.edge.desc.alive', descArgs: { n: f.alive } }) +
@@ -160,7 +162,7 @@
       });
     }
   }
-  var pendingValue = '';
+  var pendingValue = f.typed || '';
   document.getElementById('screen').addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-action]');
     if (!b) return;
@@ -170,7 +172,7 @@
       document.documentElement.setAttribute('data-door', b.dataset.action + ':' + (b.dataset.value || ''));
     }
   });
-  PP.ready.then(function () { render(''); });
+  PP.ready.then(function () { render(f.typed || ''); });
 })();
 </script>
 </body>

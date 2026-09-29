@@ -32,6 +32,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-edge-orphan", "url": "ux/tasks/piglet-processing/edge.html?state=orphan", "strict": true },
     { "name": "pp-edge-prelock", "url": "ux/tasks/piglet-processing/edge.html?state=prelock", "strict": true },
     { "name": "pp-edge-birth-weight-missing", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-missing", "strict": true },
+    { "name": "pp-edge-birth-weight-typed", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-typed", "strict": true },
     { "name": "pp-edge-birth-weight-set", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-set", "strict": true }
   ]
 }
