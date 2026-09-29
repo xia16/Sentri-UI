@@ -73,6 +73,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-dead-dead-open-loss-floor", "url": "ux/tasks/piglet-processing/dead.html?state=dead-open-loss-floor", "strict": true },
     { "name": "pp-dead-dead-tagged-second", "url": "ux/tasks/piglet-processing/dead.html?state=dead-tagged-second", "strict": true },
     { "name": "pp-edge-no-task", "url": "ux/tasks/piglet-processing/edge.html?state=no-task", "strict": true },
+    { "name": "pp-edge-nurse-arrivals", "url": "ux/tasks/piglet-processing/edge.html?state=nurse-arrivals", "strict": true },
     { "name": "pp-edge-orphan", "url": "ux/tasks/piglet-processing/edge.html?state=orphan", "strict": true },
     { "name": "pp-edge-orphan-unlocked", "url": "ux/tasks/piglet-processing/edge.html?state=orphan-unlocked", "strict": true },
     { "name": "pp-edge-prelock", "url": "ux/tasks/piglet-processing/edge.html?state=prelock", "strict": true },

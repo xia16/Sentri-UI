@@ -45,7 +45,9 @@
     'birth-weight-range': ['C02', '34.2', null, false], 'birth-weight-refused': ['C02', '99.9', null, true], 'birth-weight-set': ['C02', null, 'c02-weight-set'],
     // this phone's 16.4 synced after A.K had set 14.8 (farrowing's Edit, 09:38): the ledger keeps both, the first stands
     'birth-weight-conflict': ['C02', null, 'c02-weight-conflict'], 'birth-weight-deadtap': ['C02', '16.4', null, true, { dead: 'full' }],
-    'birth-weight-saved': ['C02', null, 'c02-weight-saved', false, { saved: true }]
+    'birth-weight-saved': ['C02', null, 'c02-weight-saved', false, { saved: true }],
+    // a nurse sow outside every task (RULINGS round 2, Q18): her arrivals' doses stay not done — no treatments recorded
+    'nurse-arrivals': ['D02', null, 'moved-orphan']
   };
   var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'no-task';
@@ -87,9 +89,17 @@
     return UI.facts(items, { columns: items.length === 3 ? 3 : 2 });
   }
   function owed() {
-    if (!L().recordable) return '';
     var xs = view().owed;
     if (!xs.length) return '';
+    // a litter with no task records deaths, counts and moves — treatments not: what it owes is not done, never a door
+    if (!L().recordable) {
+      return UI.rowGroup(xs.filter(function (o) { return o.owed; }).map(function (o) {
+        var d = CFG().doses.filter(function (x) { return x.id === o.dose; })[0];
+        // both iron doses carry their day (`Iron · day 3`, `Iron · day 14`)
+        var iron = d.tx === 'iron';
+        return row({ title: iron ? 'pp.litter.tx_day' : 'pp.common.tx.' + d.tx, titleArgs: iron ? { tx: PP.t('pp.common.tx.iron'), d: d.due } : null, desc: 'pp.edge.notask.owed', descArgs: { n: o.owed } });
+      }).join(''), { title: '', strs: { title: 'pp.edge.section.owed' } });
+    }
     return UI.rowGroup(xs.map(function (o) {
       // A mark records the heads counted at tap time; piglets born after it raise that dose's owed.
       var after = o.owedFrom.filter(function (f) { return f.kind === 'born_after_mark'; })[0];

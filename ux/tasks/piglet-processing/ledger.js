@@ -116,7 +116,7 @@ function newDose(cfg) {
     treated: 0,            // piglets marked by this litter's own records (history, never retired)
     coverage: [],          // carried evidence groups { id, kind: move|had|gain, n, rows|null, from, at }
     unknowns: [],          // unresolved groups { id, kind: move|gain, n, rows|null, from, at }
-    records: [], collisions: [], collided: [], castration: null, fullAt: null, checks: [], catchUp: 0, afterEnd: []
+    records: [], collisions: [], collided: [], castration: null, fullAt: null, checks: [], afterEnd: []
   };
 }
 
@@ -967,8 +967,6 @@ function applyMove(ctx, e) {
   concurrentCountFlag(ctx, S, e); concurrentCountFlag(ctx, R, e);
   const explaining = !!(loss || gain);
   const after = relationOf(ctx, e, S.id) !== 'before';
-  // arrivals owe their doses here; only a litter outside every task (a nurse sow) records them (no catch-up after End)
-  const catchUpR = ctx.cfg.tasks.length > 0 && !taskOf(ctx, R.id);
   const allNamed = gainQ === 0 && rowIds.length === n;
 
   const packets = {}, owedOut = {};
@@ -995,7 +993,7 @@ function applyMove(ctx, e) {
     packets[d.id] = outcome;
     if (plainIn) {
       if (outcome === 'done') cover(DR, e, 'move', plainIn, allNamed ? rowIds : null, S.id);
-      if (outcome === 'owed') { raise(ctx, R, DR, e, 'arrival', plainIn); if (catchUpR) DR.catchUp += plainIn; }
+      if (outcome === 'owed') raise(ctx, R, DR, e, 'arrival', plainIn);
       if (outcome === 'check' || outcome === 'unknown') unknownGroup(DR, e, 'move', plainIn, allNamed ? rowIds : null, S.id);
     }
     // untreated piglets leaving lower the source's owed; Yes and Don't know leave it (over-owe)
@@ -1027,9 +1025,8 @@ function taskGate(ctx, L, e, D, unknownTarget) {
   if (!ctx.cfg.tasks.length) return {};
   const T = taskOf(ctx, L.id);
   if (!T) {
-    // a litter outside every task (a nurse sow from a previous batch): only its arrivals' doses are recordable
-    if (D && !unknownTarget && D.catchUp > 0) return { catchUp: true };
-    if (D && unknownTarget && total(D.unknowns) > 0) return {};
+    // a litter with no task records deaths, counts and moves — treatments not (RULINGS round 2, Q18): a nurse sow's
+    // arrivals keep their owed doses as not done (`Not in a processing task`)
     throw new Reject('no_task', { litter: L.id });
   }
   const rel = endRelation(ctx, e, T.id);
@@ -1095,8 +1092,7 @@ function applyTreat(ctx, e) {
 
   const t = readTreat(d, e);
   const accounted = t.treated + t.deferN + t.exemptN + t.females;
-  if (gate.catchUp && t.treated + t.exemptN + t.females > D.catchUp) throw new Reject('task_ended', { catchUp: D.catchUp });
-  if (!collided.length && !isStale && !gate.catchUp) {
+  if (!collided.length && !isStale) {
     if (sh == null) {                                    // castration's first record: males are counted now
       if (t.treated + t.deferN + t.exemptN > L.alive) throw new Reject('more_than_alive');
     } else if (accounted !== sh) {
@@ -1110,7 +1106,6 @@ function applyTreat(ctx, e) {
   const left = V == null ? t.deferN : Math.max(0, Math.min(V, aliveView(ctx, L, e)) - t.treated - t.exemptN - t.females);
   D.recs.push({ event: e.id, index: ctx.index, left, deferN: t.deferN, deferReason: t.deferReason });
   refresh(ctx, L, D);
-  if (gate.catchUp) D.catchUp = Math.max(0, D.catchUp - t.treated - t.exemptN - t.females);
   D.treated += t.treated;
   D.exempt += t.exemptN;
   for (const [k, v] of Object.entries(t.exemptBy)) D.exemptBy[k] = (D.exemptBy[k] || 0) + v;
@@ -1121,7 +1116,7 @@ function applyTreat(ctx, e) {
     C.females += t.females;
     for (const k of NOTE_REASONS) if (t.castr[k]) L.notes.push({ kind: k, n: t.castr[k], event: e.id, at: e.at || null });
   }
-  D.records.push(record(ctx, L, d, e, { n: t.treated, deferred: t.deferN, deferReason: t.deferReason, exempt: t.exemptN, exemptBy: t.exemptBy, females: t.females, castration: t.castr ? clone(t.castr) : null, catchUp: !!gate.catchUp }));
+  D.records.push(record(ctx, L, d, e, { n: t.treated, deferred: t.deferN, deferReason: t.deferReason, exempt: t.exemptN, exemptBy: t.exemptBy, females: t.females, castration: t.castr ? clone(t.castr) : null }));
   completed(ctx, L, D, e);
   if (collided.length) {
     D.collisions.push([collided[0].id, e.id]);
@@ -1178,7 +1173,7 @@ function applyTreatUnknown(ctx, e) {
   takeUnknown(D, Math.min(e.n, avail), e.group);
   D.treated += e.n;
   if (d.castration && D.castration) D.castration.castrated += e.n;
-  D.records.push(record(ctx, L, d, e, { n: e.n, group: e.group || null, deferred: 0, deferReason: null, exempt: 0, exemptBy: {}, females: 0, castration: null, catchUp: false }));
+  D.records.push(record(ctx, L, d, e, { n: e.n, group: e.group || null, deferred: 0, deferReason: null, exempt: 0, exemptBy: {}, females: 0, castration: null }));
   completed(ctx, L, D, e);
   if (collided.length) {
     D.collisions.push([collided[0].id, e.id]);
@@ -1390,11 +1385,8 @@ function view(ctx, L, corrections, today) {
     flags: L.flags.map((f) => clone(f)),
     lastEvent: L.lastEvent, lastRecord: L.lastRecord
   };
-  // a litter outside every task (a nurse sow): the doses its arrivals owe stay recordable (`catchUp`)
-  if (!out.inTask) for (const d of ctx.cfg.doses) out.doses[d.id].catchUp = dose(ctx, L, d.id).catchUp;
-  // treatments can be recorded here: a litter in a task, or one outside every task holding arrivals
-  // that owe a dose (a nurse sow from a previous batch)
-  out.recordable = out.inTask || Object.values(doses).some((x) => x.catchUp > 0 && x.owed > 0) || Object.values(doses).some((x) => x.unknownAfterMove > 0 && !out.inTask && ctx.cfg.tasks.length > 0);
+  // treatments can be recorded only on a litter in a task (RULINGS round 2, Q18)
+  out.recordable = out.inTask;
   out.balanced = balances(out);
   return out;
 }
@@ -1841,7 +1833,7 @@ function countsSelect(derived, litterId) {
 /* One dose for several litters (slice #7, bulk). Each litter's record is its one-tap: every owed piglet,
    no reasons. Rows: every litter of the room (or `litters`) that can hold a record of this dose, alive, where
    the dose is owed now, was recorded today, or is not yet due — each with what a bulk record would do there:
-     record   owed now, nothing to ask: `n` piglets (late by `lateBy` days; `catchUp` after End)
+     record   owed now, nothing to ask: `n` piglets (late by `lateBy` days)
      done     nothing owed and recorded today: the records (who, when, piglets, collided)
      not_due  due in `inDays` days — early is deliberate, on the litter's own sheet
      sheet    owed with something to ask (`why`: castration — males are counted on the sheet · deferred with its
@@ -1859,7 +1851,7 @@ function bulkDraftSelect(derived, opts) {
   const today = derived.today;
   const endedOf = (L) => { const T = (derived.tasks || []).find((t) => t.id === L.task); return T && T.ended ? T.ended : null; };
   let ended = null;
-  const pool = Object.values(derived.litters).filter((L) => L.alive > 0 && (L.inTask || L.recordable) &&
+  const pool = Object.values(derived.litters).filter((L) => L.alive > 0 && L.inTask &&
     (o.litters ? o.litters.includes(L.id) : o.room == null || L.room === o.room));
   const rows = [];
   for (const L of pool) {
@@ -1868,17 +1860,12 @@ function bulkDraftSelect(derived, opts) {
     const E = endedOf(L);
     if (E) ended = ended || { at: E.at, who: E.who };
     const row = { litter: L.id, alive: L.alive, dead: L.dead.total, moved: L.movedIn + L.movedOut, counted: L.counts.length, day: L.dayAge, status: D.status, lateBy: D.status === 'late' ? L.dayAge - D.due : 0,
-      sowDied: !!L.sowDied, phase: L.phase, catchUp: false };
+      sowDied: !!L.sowDied, phase: L.phase };
     const collided = (r) => D.possibleDoubleTreatment.some((p) => p.includes(r.id));
     const todays = D.records.filter((r) => dayNumber(r.at) === today).map((r) => ({ id: r.id, at: r.at, who: r.who, n: r.n, collided: collided(r) }));
     const last = todays.length ? todays[todays.length - 1] : null;
     if (E) continue;                                     // after End no new marks (RULINGS round 3): no rows
-    if (!L.inTask) {
-      // outside every task (a nurse sow): only arrivals that owe the dose, and only as many as arrived
-      if (!(D.catchUp > 0 && D.owed > 0) || D.isCastration) continue;
-      Object.assign(row, { kind: 'record', n: Math.min(D.catchUp, D.owed), catchUp: true, outside: !L.inTask });
-    }
-    else if (D.status === 'later') Object.assign(row, { kind: 'not_due', inDays: D.due - L.dayAge });
+    if (D.status === 'later') Object.assign(row, { kind: 'not_due', inDays: D.due - L.dayAge });
     else if (D.done) { if (!todays.length) continue; Object.assign(row, { kind: 'done', records: todays, collided: todays.some((r) => r.collided) }); }
     else if (D.isCastration) Object.assign(row, { kind: 'sheet', why: 'castration', n: D.owed });
     else if (D.status === 'missed') Object.assign(row, { kind: 'sheet', why: 'missed', n: D.owed, last: D.last });
@@ -1927,8 +1914,8 @@ function bulkDraftSelect(derived, opts) {
     const r = append(events, e, input.config, input.opts);
     if (!r.ok) { Object.assign(out, { outcome: 'refused', why: r.reason, detail: r.detail }); plan.refused.push({ litter: id, why: r.reason, detail: r.detail }); return; }
     events = r.events;
-    Object.assign(out, { outcome: died ? 'died' : 'record', n: row.n, was: rev ? rev.n : row.n, died, lateBy: row.lateBy, catchUp: row.catchUp });
-    plan.record.push({ litter: id, n: row.n, lateBy: row.lateBy, died, catchUp: row.catchUp });
+    Object.assign(out, { outcome: died ? 'died' : 'record', n: row.n, was: rev ? rev.n : row.n, died, lateBy: row.lateBy });
+    plan.record.push({ litter: id, n: row.n, lateBy: row.lateBy, died });
     plan.events.push(ev);
     plan.litters += 1;
     plan.piglets += row.n;
