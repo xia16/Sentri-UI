@@ -338,7 +338,8 @@ button.st-row[aria-current="location"]{background:#eaf2e5;box-shadow:inset 3px 0
 .st-stepper-key.st-stepper-key:focus-visible{outline:none}
 :is(.st-stepper-key:focus-visible,.st-stepper-key[data-preview~="focus"]) .st-stepper-face,:is(.st-numpad-key,.st-measure-box,.st-stepper-value,.st-text-action):is(:focus-visible,[data-preview~="focus"]){outline:3px solid var(--focus);outline-offset:2px}
 .st-field-hint.st-field-hint{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0;padding:0;font:400 var(--type-input-size)/1.4 var(--font-sans);color:var(--muted)}
-.st-field-hint[data-reserve]{min-height:calc(var(--type-input-size) * 1.4)}
+.st-field-hint[data-reserve="text"]{min-height:calc(var(--type-input-size) * 1.4)}
+.st-field-hint[data-reserve="action"]{min-height:var(--touch-min)}
 .st-field-hint[data-tone="amber"]{color:var(--amber)}
 .st-field-hint[data-tone="amber"]::before{content:"";flex:none;width:var(--status-dot);height:var(--status-dot);border-radius:50%;background:currentColor}
 .st-text-action.st-text-action{display:inline-flex;align-items:center;min-height:var(--touch-min);margin:0;padding:0 8px 0 0;border:0;border-radius:0;background:transparent;color:var(--ink);font:600 var(--type-row-title-size)/1.4 var(--font-sans);cursor:pointer}
@@ -361,9 +362,7 @@ button.st-row[aria-current="location"]{background:#eaf2e5;box-shadow:inset 3px 0
 .st-stepper[data-zero] .st-stepper-value{color:var(--muted)}
 .st-stepper[data-changed] .st-stepper-value{color:var(--amber)}
 .st-stepper-hint.st-stepper-hint{grid-column:1/-1}
-.st-stepper-hint[data-reserve="action"]{min-height:var(--touch-min)}
 .st-stepper[data-variant="row"] .st-stepper-hint[data-reserve="text"]{margin-bottom:var(--space-row-y)}
-.st-stepper-hint-text{color:var(--muted)}
 /* Stepper · hero */
 .st-stepper[data-variant="hero"]{grid-template-columns:minmax(0,1fr);justify-items:stretch;row-gap:8px;min-height:0}
 .st-stepper[data-variant="hero"] .st-stepper-copy{align-items:center;text-align:center}
@@ -397,8 +396,13 @@ button.st-measure-box:is(:active,[data-preview~="pressed"]){background:var(--pre
 .st-numpad-readout{display:flex;flex-direction:column;gap:8px}
 .st-numpad-label{font:600 var(--type-choice-label-size)/1.4 var(--font-sans);color:var(--ink)}
 .st-numpad-readout[data-suggested] .st-measure-value{color:var(--muted)}
-.st-numpad-recent.st-numpad-recent{display:flex;flex-direction:column;gap:2px;margin:0;padding:0 var(--space-row-x);list-style:none;font:500 var(--type-input-size)/1.5 var(--font-mono);color:var(--ink)}
-.st-numpad-recent[data-reserve]{min-height:calc(var(--type-input-size) * 1.5 * 3 + 4px)}
+/* the bounded feedback region: fixed heights that scroll inside themselves, so feedback never moves the keys.
+   Sized for the longest status in en and zh (two lines, or one line with a text action) and three list lines. */
+.st-numpad-feedback{display:flex;flex-direction:column;gap:4px}
+.st-numpad-hint.st-numpad-hint{height:var(--touch-min);overflow-y:auto;overscroll-behavior:contain}
+.st-numpad-recent.st-numpad-recent{display:flex;flex-direction:column;gap:2px;height:calc(var(--type-input-size) * 1.5 * 3 + 4px);margin:0;padding:0 var(--space-row-x);overflow-y:auto;overscroll-behavior:contain;list-style:none;font:500 var(--type-input-size)/1.5 var(--font-mono);color:var(--ink)}
+.st-numpad-recent li[data-tone="amber"]{display:flex;align-items:center;gap:6px;color:var(--amber)}
+.st-numpad-recent li[data-tone="amber"]::before{content:"";flex:none;width:var(--status-dot);height:var(--status-dot);border-radius:50%;background:currentColor}
 .st-numpad-keys{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-key-gap)}
 .st-numpad-key.st-numpad-key{width:100%;height:var(--choice-row-min);font:500 var(--type-figure-size)/1 var(--font-mono);font-variant-numeric:tabular-nums}
 .st-numpad-key svg{width:var(--glyph-pad);height:var(--glyph-pad);stroke-width:1.8}
