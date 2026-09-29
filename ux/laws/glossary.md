@@ -70,16 +70,24 @@ Banned: **Submit**, **Confirm**, **Complete**. The design system README's "Confi
 
 ## Room list (仔猪处理 · 单元)
 
-Slice S1 (`room.html`). Counts the room's lenses and rows print; owed, missed, open loss/gain and net drift keep the definitions above.
+Slice S1 (`room.html`). Owed, missed, open loss/gain and net drift keep the definitions above. The four lenses partition by the same test on every fixture:
 
 | Term (zh) | Entity | Population | Time | Scope |
 |---|---|---|---|---|
-| **Owed litters** 待处理的窝 (lens `Owed {n}`) | litters | litters with at least one scheduled dose owed: due today, late, missed, or partly done, including a litter whose farrowing is not yet locked | now | one room; unit: litters. A missed dose keeps its litter here |
-| **Done litters** 已处理的窝 (lens `Done {n}`) | litters | litters with every dose due today recorded (early counts) and nothing else owed | today | one room; unit: litters |
-| **Later litters** 之后的窝 (lens `Later {n}`) | litters | litters in the task with nothing owed and nothing recorded today, whose next dose is due on a later day | now | one room; unit: litters. A litter done today is Done, not Later |
-| **Piglets on a row** `{n} piglets` (line 2) | piglets | owed rows: alive piglets still needing the dose named on line 1 (the largest count when several doses are named); partly-done rows print `{left} of {n}`: owed of alive; Done and Later rows: alive | now | one litter |
-| **Due {n} days ago** 逾期 (chip `Late`) | days | whole days since the oldest dose still owed and not window-bound was due | now | one litter. Late is still owed; the row never stops asking |
-| **Last day {n}** (chip `Missed`) | day-age | the treatment's console last age-day, printed on a missed row instead of lateness | fixed by the treatment | one litter; missed stays inside Owed |
-| **Open loss / open gain** chip | heads | the litter has an open unexplained loss (gain); the count prints on line 2 (`loss 2 open`), the chip only when no more urgent chip applies (Not locked > Missed > Late > Open loss > Open gain) | until explained | one litter |
-| **Net drift** on the room header | heads | open unexplained gains minus open unexplained losses in the room, signed (`+1`, `−2`); shown only while a gain or loss is open | now | one room |
-| **Litter found by tag or notch** | one piglet, one litter | a piglet whose current identity row carries the tag or notch typed or scanned, in this room | as of the latest stamped change | one room; not found means no identity row here, not that the piglet does not exist |
+| **Owed** 待处理 (lens `Owed {n}`) | litters | litters in the task with at least one dose doable now: due today or late. A litter whose only outstanding items are missed leaves this lens; a litter with a live dose and a lapse leads with the live dose | now | one room; unit: litters |
+| **Done** 已处理 (lens `Done {n}`) | litters | litters with every dose due today recorded today, nothing owed and nothing missed | today | one room; unit: litters |
+| **Later** 之后 (lens `Later {n}`) | litters | litters in the task with nothing due today and nothing recorded today; includes litters whose only outstanding items are missed | now | one room; unit: litters |
+| **All** 全部 (lens `All {n}`) | litters | every litter in the room, including those not in the task | now | one room; unit: litters |
+| **Coming up** 接下来 (block) | litters | on an empty Owed pile: litters whose next dose falls soonest, not tied to the Later count (a litter done today can appear here) | now | one room |
+| **Litters owing today** (lead figure) | litters | the Owed count | now | one room |
+| **Piglets on a row** | piglets | owed rows: piglets still needing the oldest dose named on line 1; castration counts males (`6 males`); partly-done rows print `{left} still owed` of the dose's population; Done and Later rows: alive | now | one litter |
+| **Due {n} days ago** (red) | days | whole days since the oldest dose still owed was due; `due yesterday` at 1 | now | one litter. Late is still owed |
+| **Window ended day {n}** (amber) | day-age | the treatment's console last age-day, on a missed litter's row | fixed by the treatment | one litter |
+| **N records · check** (amber) | records | two or more records from different hands for one dose (possible double treatment); the flag lives on the litter page | until resolved | one litter |
+| **Open loss / gain on a row** | heads | appended last on line 2 of any row, whatever its state, including a litter not in the task (`loss 2 open` red, `gain 1 open` blue) | until explained | one litter |
+| **Net drift** | heads | open gains minus open losses, signed with unit (`−2 piglets`); printed only while both a gain and a loss are open | now | one room |
+| **Litter found by tag or notch** | piglets, litters | every piglet whose current identity row matches the full tag (6 digits), the last 4 digits of a tag, or a notch (`n-n`, separators trimmed); a notch may match several litters; a match outside this room prints its unit or `weaned` | as of the latest stamped change | all rooms; opens the litter with `&piglet=` |
+
+Recency words on a row come from the record's timestamp: `1h ago` under a day, `yesterday`, `N days ago` to six, the date from seven days.
+
+**Developer note: hold, then depart.** A row that a hand's record or a sync moves out of the current lens stays in place for 800ms of idle (any touch or scroll resets the timer), flashes `green-wash`, then leaves. The same law covers rows changed by another worker (`PP.sync`).

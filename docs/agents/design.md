@@ -35,7 +35,10 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-room-room-drift", "url": "ux/tasks/piglet-processing/room.html?state=room-drift", "strict": true },
     { "name": "pp-room-room-filter", "url": "ux/tasks/piglet-processing/room.html?state=room-filter", "strict": true },
     { "name": "pp-room-room-scan", "url": "ux/tasks/piglet-processing/room.html?state=room-scan", "strict": true },
-    { "name": "pp-room-room-scan-none", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-none", "strict": true }
+    { "name": "pp-room-room-scan-none", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-none", "strict": true },
+    { "name": "pp-room-room-find", "url": "ux/tasks/piglet-processing/room.html?state=room-find", "strict": true },
+    { "name": "pp-room-room-find-many", "url": "ux/tasks/piglet-processing/room.html?state=room-find-many", "strict": true },
+    { "name": "pp-room-room-error", "url": "ux/tasks/piglet-processing/room.html?state=room-error", "strict": true }
   ]
 }
 ```
