@@ -790,7 +790,11 @@
      litter link here. Two answers: "Same injection, recorded twice" withdraws one record (kept, stamped; which one is
      asked) · "Given twice" keeps both and records a double dose for the vet; either way the dose counts once.
      ===================================================================================================== */
-  function dblPair() { var want = qs.get('dose'); return pairs().filter(function (p) { return !want || p.dose === want; })[0] || null; }
+  // ?dose= and ?double=<recA>+<recB> (the litter's door) name the pair; without them, the litter's first open pair
+  function dblPair() {
+    var want = qs.get('dose'), recs = (qs.get('double') || '').split(/[+ ]/).filter(Boolean);
+    return pairs().filter(function (p) { return (!want || p.dose === want) && recs.every(function (r) { return p.records.indexOf(r) >= 0; }); })[0] || null;
+  }
   function dblDraft(p) { return store.select.doubleDraft(store.derived, { litter: crate, dose: p.dose, records: p.records, answer: dbl.answer || null, withdraw: dbl.withdraw || undefined }, stamp()); }
   function recTitle(r) { return r.castration ? PP.t('pp.common.mark.castrated', { c: r.castration.castrated || 0 }) : pigsText(r.n); }
   function doublePage() {
@@ -1119,7 +1123,9 @@
     SOW = store.sow(crate) || { sow: '', parity: 0 };
     if (!L()) { document.getElementById('screen').innerHTML = ''; return; }
     var own = !q || q === st.crate;
-    var e0 = view === 'edit' ? store.select.edit(store.derived, crate, EMPTY(), stamp()) : null;
+    // The litter's possible-double door (edit.html?state=edit&double=<a>+<b>&dose=…) opens the answer sheet itself
+    if (qs.get('double')) view = 'double';
+    var e0 =view === 'edit' ? store.select.edit(store.derived, crate, EMPTY(), stamp()) : null;
     var resolve = function (d) {
       Object.keys(d.marks || {}).forEach(function (k) {
         if (k.charAt(0) !== '@') return;
@@ -1149,7 +1155,14 @@
     if (want) { var hit = L().identity.rows.filter(function (r) { return r.rowId === want || r.tag === want || r.notch === want; })[0]; if (hit) rowOpen = hit.rowId; }
     if (own && st.pad && rowOpen) { pad = st.pad; typed = Object.assign({}, st.typed || {}); commitRowTyping(); }
     lead = qs.get('count') || qs.get('from') === 'count' ? 'counts' : qs.get('move') || qs.get('from') === 'move' ? 'moves' : qs.get('death') || qs.get('from') === 'dead' ? 'deaths' : qs.get('from') === 'id' || qs.get('row') ? 'rows' : own ? st.lead || '' : '';
+    // A recorded row's door (?record=<id>) opens Edit on that record: its section leads, and it is scrolled to and focused
+    var recId = view === 'edit' ? qs.get('record') : null;
+    if (recId && !lead) lead = e0.deaths.some(function (x) { return x.id === recId; }) ? 'deaths' : e0.moves.some(function (x) { return x.id === recId; }) ? 'moves' : e0.counts.some(function (x) { return x.id === recId; }) ? 'counts' : 'marks';
     render();
+    if (recId) {
+      var tgt = document.querySelector('[data-mark="' + recId + '"], [data-death="' + recId + '"], [data-count="' + recId + '"]');
+      if (tgt) { tgt.scrollIntoView({ block: 'start' }); var k1 = tgt.querySelector('[data-action]'); if (k1) k1.focus({ preventScroll: true }); }
+    }
   });
 })();
 </script>

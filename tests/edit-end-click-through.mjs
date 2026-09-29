@@ -143,8 +143,15 @@ try {
   assert.match(rec, /given twice · a double dose for the vet · counted once/);
   console.log('ok 5 R1-29 A05 → Edit → Answer → Given twice → Save → record page:', rc);
 
-  // 6. R1-29: "Same injection, recorded twice" asks which record, withdraws it (kept, stamped).
+  // 6. R1-29: the litter's own review door opens the answer sheet directly; Back returns to the litter.
   await openLitter(page, 'A05');
+  await page.click('[data-action="open-review"]');
+  await page.waitForURL(/edit\.html\?.*double=/); await ready(page);
+  assert.match(await text(page, '#screen'), /Possible double treatment · Iron · day 3 .*What happened\?/);
+  await page.click('[data-action="back"]');
+  await page.waitForURL(/litter\.html/); await ready(page);
+
+  // 6b. "Same injection, recorded twice" asks which record, withdraws it (kept, stamped).
   await openEdit(page);
   await page.click('[data-action="mark-step"][data-value="T-A05-lm"][data-step="-1"]');
   const opts = await text(page, '[data-mark="T-A05-lm"]');

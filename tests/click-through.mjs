@@ -141,9 +141,10 @@ try {
   assert.match((await text(page, '#ed-saved')).replace(/\s*·\s*/g, ' · '), /Correction saved · A02 · Iron · day 3 owed 0 → 2/);
   await page.click('[data-action="back"]');
   await page.waitForURL(/litter\.html/); await ready(page);
-  const rec = page.locator('.lt-rec', { hasText: 'Iron · day 3' }).first();
-  assert.match((await rec.innerText()).replace(/\s+/g, ' '), /10 piglets · 2 deferred: weak/);
-  assert.equal(await rec.locator('.pp-tone[data-tone="amber"]').count(), 2);
+  // the evidence row is Row (ADR 0002): its tap opens Edit (✎); a corrected figure is amber and says what it was (R1-28)
+  const rec = page.locator('[data-ds="Row"][data-action="open-edit"]', { hasText: 'Iron · day 3' }).first();
+  assert.match((await rec.innerText()).replace(/\s+/g, ' '), /10 piglets\s*·?\s*2 deferred: weak.*was 12 · corrected/);
+  assert.equal(await rec.locator('.st-part[data-tone="amber"]').count(), 3);
   assert.match(await text(page, '[data-action="open-dose"][data-value="iron3"]'), /2 owed|weak/);
   await page.click('[data-action="open-record"]');
   await page.waitForURL(/edit\.html\?state=record-page/); await ready(page);
