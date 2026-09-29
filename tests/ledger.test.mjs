@@ -221,7 +221,7 @@ test('owed is a stored count shown as min(owed, alive): a death lowers it only p
 
 // ---- counts, losses, deaths -----------------------------------------------------------------
 
-test('count lower → one open unexplained loss; count higher → a separate gain, never netted', () => {
+test('count lower → one open unexplained loss; a recount supersedes it (provisional ruling), never a second line', () => {
   const b = book();
   b.farrowed('B14', 11, { stillborn: 1 });
   const c1 = b.count('B14', 9, { baseAlive: 10 });
@@ -229,11 +229,12 @@ test('count lower → one open unexplained loss; count higher → a separate gai
   assert.equal(L.alive, 9);
   assert.equal(L.unexplained.openLoss, 1);
   assert.equal(L.unexplained.losses[0].id, c1.id);
-  b.count('B14', 10, { baseAlive: 9 });
+  const c2 = b.count('B14', 10, { baseAlive: 9 });
   L = run(b).litters.B14;
   assert.equal(L.alive, 10);
-  assert.equal(L.unexplained.openLoss, 1);
-  assert.equal(L.unexplained.openGain, 1);
+  assert.equal(L.unexplained.openLoss, 0);
+  assert.equal(L.unexplained.openGain, 0);
+  assert.deepEqual(L.unexplained.losses[0].explainedBy, [{ event: c2.id, kind: 'superseded', qty: 1 }]);   // kept in the trail
   assert.ok(balances(L));
 });
 
@@ -736,9 +737,9 @@ test('CX3 explaining G1 does not consume G2\'s unknowns', () => {
   b.farrowed('S', 10); b.farrowed('R', 9); b.treat('R', 'iron3', 9);
   const loss = b.count('S', 9);
   const g1 = b.count('R', 10);
-  b.count('R', 11);
   b.check('R', 'iron3', 1, 0, { group: g1.id });             // G1's stray already had it
   b.move('S', 'R', 1, { explains: [loss.id, g1.id], answers: { iron3: 'no' } });
+  b.count('R', 11);                                          // G2 (under recount-supersedes, a later count's own line)
   const D = run(b, IRON_ONLY).litters.R.doses.iron3;
   assert.equal(D.unknownAfterMove, 1);                       // G2 untouched
   assert.equal(D.owed, 0);                                   // G1 was resolved by the check, not re-opened
@@ -1359,9 +1360,9 @@ test('select.countDraft: an observation against Alive; a match writes nothing; t
   const d = run(b, IRON_ONLY);
   const m = select.countDraft(d, 'A', { observed: 12 });
   assert.equal(m.kind, 'match'); assert.equal(m.why, null);
-  assert.deepEqual(m.after, { alive: 12, openLoss: 0, openGain: 0 });
+  assert.deepEqual(m.after, { alive: 12, openLoss: 0, openGain: 0, stands: true });
   const g = select.countDraft(d, 'A', { observed: 13 });
-  assert.equal(g.kind, 'gain'); assert.deepEqual(g.after, { alive: 13, openLoss: 0, openGain: 1 });
+  assert.equal(g.kind, 'gain'); assert.deepEqual(g.after, { alive: 13, openLoss: 0, openGain: 1, stands: true });
   // 12 alive, 3 tagged, 9 untagged: a count of 2 must name 1 tagged piglet (at most 10)
   const n = select.countDraft(d, 'A', { observed: 2 });
   assert.equal(n.why, 'name_the_rows'); assert.equal(n.needRows, 1); assert.equal(n.maxRows, 10); assert.equal(n.untagged, 9);
@@ -1399,23 +1400,95 @@ test('select.explain: each open line with a death door (losses) and ranked Move 
   allBalanced(d2);
 });
 
-test('select.counts: two offline counts — the later stands, never summed; a count that crossed an unseen death is flagged', () => {
+test('select.counts: the standing count is the latest by tap time; it supersedes, never sums; a count that crossed an unseen death is flagged', () => {
   const b = book();
   const f = b.farrowed('A', 14);
-  b.count('A', 13, { baseAlive: 14 });
-  b.death('A', [{ cause: 'crushed', n: 1 }]);
-  const late = b.count('A', 12, { baseAlive: 14, seen: [f.id] });
+  b.count('A', 13, { baseAlive: 14, at: on(3, '09:40') });
+  b.death('A', [{ cause: 'crushed', n: 1 }], { at: on(3, '09:45') });
+  const late = b.count('A', 12, { baseAlive: 14, seen: [f.id], at: on(3, '09:50') });
   const d = run(b, IRON_ONLY);
   const c = select.counts(d, 'A');
   assert.equal(d.litters.A.alive, 12);                  // the later count stands: not 14 − 1 − 1 − 2
-  assert.equal(c.counts[1].id, late.id);
-  assert.equal(c.counts[1].stands, true); assert.equal(c.counts[1].wrote, 0); assert.equal(c.counts[1].deviceDiff, -2);
+  assert.equal(d.litters.A.unexplained.openLoss, 1);    // one line at most: 14 − 1 dead − 12 seen
+  assert.equal(c.counts[1].id, late.id); assert.equal(c.standing, late.id);
+  assert.equal(c.counts[1].stands, true); assert.equal(c.counts[1].wrote, -1); assert.equal(c.counts[1].deviceDiff, -2);
   assert.equal(c.counts[1].review, true); assert.equal(c.review, true);
   allBalanced(d);
   // a later count, online, settles the review; the flagged count stays in the trail
-  b.count('A', 12, { baseAlive: 12 });
-  const c2 = select.counts(run(b, IRON_ONLY), 'A');
+  b.count('A', 12, { baseAlive: 12, at: on(3, '10:00') });
+  const d2 = run(b, IRON_ONLY), c2 = select.counts(d2, 'A');
   assert.equal(c2.review, false); assert.equal(c2.counts[1].review, true); assert.equal(c2.counts[2].stands, true);
+  assert.equal(d2.litters.A.unexplained.openLoss, 1);
+});
+
+test('recount supersedes: 10 then 12 → no open lines', () => {
+  const b = book();
+  b.farrowed('A', 12);
+  b.count('A', 10, { at: on(3, '09:00') });
+  const r = b.count('A', 12, { at: on(3, '09:20') });
+  const L = run(b, IRON_ONLY).litters.A;
+  assert.equal(L.alive, 12); assert.equal(L.unexplained.openLoss, 0); assert.equal(L.unexplained.openGain, 0);
+  assert.equal(L.unexplained.losses[0].qty, 2);                       // the original stays in the trail
+  assert.deepEqual(L.unexplained.losses[0].explainedBy, [{ event: r.id, kind: 'superseded', qty: 2 }]);
+  assert.equal(L.counts[0].supersededBy, r.id);
+  assert.ok(balances(L));
+});
+
+test('recount supersedes: 13 then 12 → no open lines; the superseded gain\'s unknown doses retire', () => {
+  const b = book();
+  b.farrowed('A', 12); b.treat('A', 'iron3', 12);
+  b.count('A', 13, { at: on(3, '09:00') });
+  let L = run(b, IRON_ONLY).litters.A;
+  assert.equal(L.doses.iron3.unknownAfterMove, 1);
+  b.count('A', 12, { at: on(3, '09:20') });
+  L = run(b, IRON_ONLY).litters.A;
+  assert.equal(L.alive, 12); assert.equal(L.unexplained.openGain, 0); assert.equal(L.unexplained.openLoss, 0);
+  assert.equal(L.doses.iron3.unknownAfterMove, 0); assert.equal(L.doses.iron3.owed, 0);
+  assert.ok(balances(L));
+});
+
+test('recount supersedes: offline 9 / online 13 / recount 13 → one line at most; tap order, not arrival, decides', () => {
+  const b = book();
+  const f = b.farrowed('A', 12);
+  b.count('A', 13, { at: on(3, '09:30') });                             // online, arrives first
+  const off = b.count('A', 9, { seen: [f.id], at: on(3, '09:00') });   // tapped earlier, synced later
+  let d = run(b, IRON_ONLY), L = d.litters.A;
+  assert.equal(L.alive, 13); assert.equal(L.unexplained.openLoss, 0); assert.equal(L.unexplained.openGain, 1);
+  const c = select.counts(d, 'A');
+  assert.equal(c.counts.find((k) => k.id === off.id).stands, false);
+  assert.equal(c.review, true);                                         // arrival order ≠ tap order: sync review
+  assert.ok(L.flags.some((x) => x.reason === 'count_order'));
+  b.count('A', 13, { at: on(3, '10:00') });
+  d = run(b, IRON_ONLY); L = d.litters.A;
+  assert.equal(L.alive, 13); assert.equal(L.unexplained.openLoss + L.unexplained.openGain, 1);
+  assert.equal(select.counts(d, 'A').review, false);
+  assert.ok(balances(L));
+});
+
+test('recount supersedes: a superseded loss gives back its named missing piglets', () => {
+  const b = book();
+  b.farrowed('A', 4);
+  for (let i = 1; i <= 4; i++) b.identity('A', 'add', { rowId: 'r' + i, tag: '00000' + i });
+  b.count('A', 3, { missingRows: ['r2'], at: on(3, '09:00') });
+  assert.equal(run(b, IRON_ONLY).litters.A.identity.missing, 1);
+  b.count('A', 4, { at: on(3, '09:20') });
+  const L = run(b, IRON_ONLY).litters.A;
+  assert.equal(L.identity.missing, 0); assert.equal(L.identity.liveRows, 4); assert.equal(L.alive, 4);
+});
+
+test('counts are accepted after End (litter facts, RULINGS Q5); a weaned-out litter refuses a count', () => {
+  const b = book();
+  b.farrowed('A', 10); b.farrowed('W', 8);
+  const cfg = Object.assign({}, IRON_ONLY, { task: { id: 'T', litters: ['A', 'W'] } });
+  b.weaned('W', { n: 8 });
+  b.ev.push({ id: 'END', type: 'end_task', at: on(3, '12:00'), who: 'G.H' });
+  const c = b.count('A', 9, { at: on(3, '13:00') });
+  const w = b.count('W', 1, { at: on(3, '13:05') });
+  const d = run(b, cfg);
+  assert.ok(d.ended && d.ended.event === 'END');
+  assert.equal(rejectedReason(d, c), undefined); assert.equal(d.litters.A.unexplained.openLoss, 1);
+  assert.equal(rejectedReason(d, w), 'weaned');
+  assert.equal(select.countDraft(d, 'W', { observed: 0 }).why, 'weaned');
 });
 
 // =============================================================================================
