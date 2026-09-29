@@ -22,6 +22,10 @@
 /* Candidate:DangerBand — farrowing's red warning band, on tokens only. */
 .edge-band { padding: var(--space-panel); background: var(--red-wash); border: 1px solid var(--red); border-radius: var(--radius-inset); color: var(--red); font-size: 13px; font-weight: 500; }
 .edge-drawer-body { display: flex; flex-direction: column; gap: var(--space-row-y); }
+.edge-receipt { margin: 0; font-size: 11px; color: var(--muted); }
+.edge-receipt[data-tone="warn"] { color: var(--amber); }
+.edge-actions { display: flex; gap: var(--space-footer-gap); padding-top: var(--space-row-y); }
+.edge-actions .button { flex: 1; }
 .edge-pad { padding: 0 var(--space-gutter) var(--space-row-y); }
 </style>
 </head>
@@ -40,18 +44,20 @@
 
   // Fixtures. Born = live-born + stillborn on every litter; every number printed comes from here.
   var FX = {
-    'no-task':  { tag: '000391', pen: 'C07', parity: 2, day: 4, born: 11, alive: 10, dead: 1, still: 1, live: 10, record: true, weight: 'missing' },
-    'orphan':   { tag: '000418', pen: 'B01', parity: 3, day: 3, born: 10, alive: 7, dead: 3, still: 1, live: 9, record: true, band: stamp(28, '06:20', 'L.M'),
+    'no-task':  { tag: '000391', pen: 'C07', parity: 2, day: 4, born: 11, alive: 10, dead: 1, still: 1, live: 10, record: true, noTask: true, weight: 'missing' },
+    'orphan':   { tag: '000418', pen: 'B01', parity: 3, day: 3, born: 10, alive: 7, dead: 3, still: 1, live: 9, record: true, band: stamp(28, '06:20', 'L.M'), cause: true,
                   weight: '13.6', by: 'finish', at: stamp(26, '18:05', 'G.H'), owed: [['iron', 7, 3], ['tail', 7, 3]] },
     'orphan-unlocked': { tag: '000429', pen: 'B03', parity: 1, day: 1, born: 8, derived: true, alive: 6, dead: 2, still: 1, live: 7, record: true, band: stamp(28, '06:20', 'L.M'),
                   weight: 'missing', owed: [['tail', 6, 1]] },
-    'prelock':  { tag: '000437', pen: 'B02', parity: 2, day: 0, alive: 9, dead: 1, prelock: true, owed: [['cord', 9, 0], ['nasal', 9, 0]] },
-    'weight':   { tag: '000462', pen: 'C03', parity: 4, day: 1, born: 13, alive: 12, dead: 1, still: 1, live: 12, record: true, weight: 'missing' }
+    'prelock':  { tag: '000437', pen: 'B02', parity: 2, day: 0, alive: 9, dead: 1, prelock: true, owed: [['cord', 1, 0, 'late'], ['nasal', 9, 0]] },
+    'weight':   { tag: '000462', pen: 'C03', parity: 4, day: 1, born: 13, alive: 12, dead: 1, still: 1, live: 12, record: true, weight: 'missing', late: { w: '14.8', at: stamp(29, '09:38', 'A.K') } }
   };
   var STATES = {
     'no-task': ['no-task'], 'orphan': ['orphan'], 'orphan-unlocked': ['orphan-unlocked'], 'prelock': ['prelock'],
     'birth-weight-missing': ['weight'], 'birth-weight-entry': ['weight', '', null, true], 'birth-weight-typed': ['weight', '16.4', null, true],
-    'birth-weight-range': ['weight', '34.2', null, false], 'birth-weight-refused': ['weight', '99.9', null, false], 'birth-weight-set': ['weight', null, '16.4']
+    'birth-weight-range': ['weight', '34.2', null, false], 'birth-weight-refused': ['weight', '99.9', null, true], 'birth-weight-set': ['weight', null, '16.4'],
+    'birth-weight-conflict': ['weight', '16.4', null, false, { conflict: true }], 'birth-weight-deadtap': ['weight', '16.4', null, true, { dead: 'full' }],
+    'birth-weight-saved': ['weight', null, '34.2', false, { saved: true }]
   };
   var name = STATES[PP.state] ? PP.state : 'no-task';
   var spec = STATES[name];
@@ -62,7 +68,13 @@
   var draft = spec[1] || '';                                 // typed string in the pad (the staged draft)
   var padOpen = !!spec[3];                                   // the docked Numpad is editing the Measure
   var padHint = '', padHintArgs = null;
-  if (spec[2]) { weight = spec[2]; by = 'finish'; at = stamp(28, '14:52', 'G.H'); }
+  var opt = spec[4] || {};
+  var conflict = !!opt.conflict;                             // Save found a weight that was set meanwhile
+  var saved = null;                                          // receipt after Save
+  if (opt.dead === 'full') { padHint = 'pp.edge.weight.dead_places'; }
+  if (spec[2]) { weight = spec[2]; by = opt.saved ? 'here' : 'finish'; at = opt.saved ? stamp(29, '09:42', 'G.H') : stamp(28, '14:52', 'G.H'); }
+  var usual = function (n) { return [(n * 0.8).toFixed(1), (n * 2.5).toFixed(1)]; };
+  if (opt.saved) { var u0 = usual(f.live); saved = { w: weight, out: true, min: u0[0], max: u0[1] }; }
 
   function span(id, args, cls) {
     return '<span' + (cls ? ' class="' + cls + '"' : '') + ' data-str="' + id + '"' +
@@ -89,7 +101,9 @@
   function owed() {
     if (!f.owed) return '';
     return UI.rowGroup(f.owed.map(function (o) {
-      return row({ action: 'record-treatment', value: o[0], title: 'pp.common.tx.' + o[0], desc: 'pp.edge.tx.desc', descArgs: { n: o[1], d: o[2] } });
+      // A mark records the heads counted at tap time; piglets born after it raise that dose's owed.
+      return row({ action: 'record-treatment', value: o[0], title: 'pp.common.tx.' + o[0],
+        desc: o[3] ? 'pp.edge.tx.desc_late.' + (o[1] === 1 && !zh ? 'one' : 'many') : 'pp.edge.tx.desc', descArgs: { n: o[1], d: o[2] } });
     }).join(''), { title: '', strs: { title: 'pp.edge.section.owed' } });
   }
   function recordGroup(withWhy) {
@@ -115,14 +129,18 @@
   }
   function body() {
     var out = [];
-    if (f.band) out.push('<div class="edge-band" data-ds="Candidate:DangerBand" role="status">' + span('pp.edge.orphan.band', { cause: PP.t('pp.edge.cause.prolapse'), stamp: f.band }) + '</div>');
+    if (f.band) out.push('<div class="edge-band" data-ds="Candidate:DangerBand" role="status">' + (f.cause
+      ? span('pp.edge.orphan.band', { cause: PP.t('pp.edge.cause.prolapse'), stamp: f.band })
+      : span('pp.edge.orphan.band_nocause', { stamp: f.band })) + '</div>');
     if (f.prelock) {
       out.push(UI.rowGroup(row({ action: 'open-farrowing', value: f.tag, title: 'pp.edge.prelock.door', desc: 'pp.edge.prelock.door_desc' })));
     }
     out.push(facts());
-    if (f.record) out.push(recordGroup(name === 'no-task'));
+    if (f.record) out.push(recordGroup(!!f.noTask));
     out.push(owed());
-    if (!f.prelock) out.push(weightRow());
+    if (!f.prelock && f.live !== 0) out.push(weightRow());
+    if (saved) out.push('<p class="edge-receipt" role="status"' + (saved.out ? ' data-tone="warn"' : '') + '>' + (saved.out
+      ? span('pp.edge.weight.receipt_range', { w: saved.w, min: saved.min, max: saved.max }) : span('pp.edge.weight.receipt', { w: saved.w })) + '</p>');
     return out.join('');
   }
   function faceFooter() {
@@ -135,17 +153,21 @@
     var refused = has && num > hard, out = has && !refused && (num < +min || num > +max);
     var ms = { label: 'pp.edge.weight.label', optional: 'pp.edge.weight.optional', value: 'ds.field.figure', unit: 'ds.field.unit.kg', placeholder: 'ds.field.placeholder' };
     var margs = { value: { n: draft } }, hint = '';
-    if (!padOpen && refused) { hint = ' '; ms.hint = 'ds.field.measure.refused'; margs.hint = { max: hard, n: n }; }
+    if (refused) { hint = ' '; ms.hint = 'ds.field.measure.refused'; margs.hint = { max: hard, n: n }; }
     else if (!padOpen && out) { hint = ' '; ms.hint = 'ds.field.measure.range'; margs.hint = { min: min, max: max, v: draft }; }
     var measure = UI.measure({ label: '', optional: '', value: draft, unit: 'kg', placeholder: '—', key: 'bw', active: padOpen, controls: 'bw-pad',
-      tone: !padOpen && refused ? 'refused' : '', range: padOpen ? null : [+min, +max], hint: hint, strs: ms, args: margs });
+      tone: refused ? 'refused' : '', range: padOpen ? null : [+min, +max], hint: hint, strs: ms, args: margs });
+    var cp = conflict ? '<div class="edge-conflict">' + UI.facts([{ label: '', value: '', meta: '', strs: { label: 'pp.edge.weight.conflict_label', value: 'pp.edge.weight.value', meta: 'pp.edge.data.stamp' },
+        args: { value: { w: f.late.w }, meta: { stamp: f.late.at } } }], { columns: 1 }) +
+      '<div class="edge-actions"><button type="button" class="button secondary" data-ds="Button" data-action="keep-theirs" data-str="pp.edge.weight.keep_theirs"></button>' +
+      '<button type="button" class="button secondary" data-ds="Button" data-action="open-farrowing-edit" data-value="birth-weight" data-str="act.edit"></button></div></div>' : '';
     var pad = padOpen ? '<div class="edge-pad">' + UI.numpad({ decimals: 1, intLength: 2, value: draft, key: 'bw', id: 'bw-pad', hint: padHint ? ' ' : '',
       strs: Object.assign({ digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad' }, padHint ? { hint: padHint } : {}),
       args: { hint: padHintArgs } }) + '</div>' : '';
-    var ok = has && num > 0 && !refused;
+    var ok = has && num > 0 && !refused && !conflict;
     return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" data-sizing="content" role="dialog" aria-modal="true">' +
       '<header class="utility-header"><div class="edge-title"><h3 data-str="pp.edge.weight.title"></h3><p>' + span('pp.edge.weight.pop', { n: n }) + '</p></div></header>' +
-      '<div class="sheet-body"><div class="edge-drawer-body">' + measure + '</div></div>' + pad +
+      '<div class="sheet-body"><div class="edge-drawer-body">' + measure + cp + '</div></div>' + pad +
       '<footer class="sheet-footer"><button type="button" class="button secondary" data-ds="Button" data-action="close-weight" data-str="act.back"></button>' +
       '<button type="button" class="button primary" data-ds="Button" data-action="save-weight" data-str="act.save"' + (ok ? '' : ' disabled') + '></button></footer></section>';
   }
@@ -158,22 +180,27 @@
   function key(k) {
     var r = UI.numpadInput({ value: draft }, k, { decimals: 1, intLength: 2 });
     draft = r.value; padHint = ''; padHintArgs = null;
-    if (r.dead === 'full') { padHint = 'ds.field.numpad.dead_places'; padHintArgs = { n: 1 }; }
+    if (r.dead === 'full') padHint = 'pp.edge.weight.dead_places';
+    else if (r.dead === 'point') padHint = 'pp.edge.weight.dead_point';
     else if (r.dead === 'empty') padHint = 'ds.field.numpad.dead_empty';
   }
   document.getElementById('screen').addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-action]');
     if (!b) return;
     var a = b.dataset.action;
-    if (a === 'numpad') { if (b.getAttribute('aria-disabled') !== 'true') key(b.dataset.key); render(); }
+    if (a === 'numpad') { key(b.dataset.key); render(); }   // floor-gray keys still answer through the reducer's dead reason
     else if (a === 'open-weight') { drawer = true; padOpen = !draft; render(); }
     else if (a === 'open-numpad') { if (!padOpen) { padOpen = true; padHint = ''; render(); } }   // tapping the active Measure does nothing
     else if (a === 'close-weight') { if (padOpen && draft) padOpen = false; else drawer = false; padHint = ''; render(); }   // Back closes the pad first; the draft is kept
     else if (a === 'save-weight') {
       var val = UI.numpadCommit(draft, { decimals: 1 });
       if (val == null || !(parseFloat(val) > 0) || parseFloat(val) > f.live * 5) return;
+      if (f.late && !weight) { conflict = true; padOpen = false; render(); return; }        // only when missing: never overwrite a weight set meanwhile
+      var u = usual(f.live);
+      saved = { w: val, out: parseFloat(val) < +u[0] || parseFloat(val) > +u[1], min: u[0], max: u[1] };
       weight = val; by = 'here'; at = stamp(29, '09:42', 'G.H'); draft = ''; drawer = false; padOpen = false; render();
-    } else document.documentElement.setAttribute('data-door', a + ':' + (b.dataset.value || ''));
+    } else if (a === 'keep-theirs') { weight = f.late.w; by = 'finish'; at = f.late.at; draft = ''; conflict = false; drawer = false; padOpen = false; render(); }
+    else document.documentElement.setAttribute('data-door', a + ':' + (b.dataset.value || ''));
   });
   PP.ready.then(render);
 })();
