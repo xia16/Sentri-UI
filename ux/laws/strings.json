@@ -66,6 +66,7 @@
     "ds.field.demo.suggested": {"en": "Suggested", "zh": "建议值", "kind": "preview"},
     "ds.field.demo.suggested_edited": {"en": "Suggestion edited", "zh": "已改动建议值", "kind": "preview"},
     "ds.field.demo.title": {"en": "Field cards", "zh": "字段组件", "kind": "preview"},
+    "ds.field.demo.weight_warn": {"en": "Weight outside the usual", "zh": "体重超出常见范围", "kind": "preview"},
     "ds.field.demo.warn": {"en": "Out of range, after the pad closes", "zh": "键盘关闭后超出范围", "kind": "preview"},
     "ds.field.figure": {"en": "{n}", "zh": "{n}", "kind": "figure"},
     "ds.field.measure.range": {"en": "Usual {min}–{max} kg · this is {v}", "zh": "常见 {min}–{max} kg · 本次 {v}", "kind": "status"},

@@ -94,7 +94,7 @@
     st('dead_tap', tag({ value: '000258', hint: 'Tag is 6 digits', strs: { hint: 'ds.field.numpad.dead_full' }, args: { hint: { n: 6 } } })),
     st('duplicate', tag({ value: '000254', tone: 'warn', hint: '000254 is already on crate B04 · records anyway', strs: { hint: 'ds.field.numpad.duplicate' }, args: { hint: { tag: '000254', crate: 'B04' } } })),
     st('short', tag({ value: '00025', tone: 'warn', hint: '5 of 6 digits', strs: { hint: 'ds.field.numpad.short' }, args: { hint: { k: 5, n: 6 } } })),
-    st('warn', UI.numpad({ label: 'Piglet 5 of 11 · weight', value: '0.62', unit: 'kg', decimals: 2, intLength: 2, tone: 'warn', key: 'weight', recent: recent, hint: 'Outside the usual 1.0–2.8 kg at day 3', strs: nstrs({ label: 'ds.field.numpad.weight_label', unit: 'ds.field.unit.kg', hint: 'ds.field.numpad.weight_range' }), args: { label: { i: 5, n: 11 }, hint: { min: '1.0', max: '2.8', d: 3 } } })),
+    st('weight_warn', UI.numpad({ label: 'Piglet 5 of 11 · weight', value: '0.62', unit: 'kg', decimals: 2, intLength: 2, tone: 'warn', key: 'weight', recent: recent, hint: 'Outside the usual 1.0–2.8 kg at day 3', strs: nstrs({ label: 'ds.field.numpad.weight_label', unit: 'ds.field.unit.kg', hint: 'ds.field.numpad.weight_range' }), args: { label: { i: 5, n: 11 }, hint: { min: '1.0', max: '2.8', d: 3 } } })),
     st('pressed', UI.numpad({ decimals: 1, value: '16', key: 'pad-pressed', strs: nstrs() })),
     st('focus', UI.numpad({ decimals: 1, value: '16', key: 'pad-focus', strs: nstrs() })),
     st('run', '<div class="demo-dock">' + tag({ value: '000258', suggested: true, key: 'tag-run', hint: 'Next tag · Record to use', strs: { hint: 'ds.field.numpad.suggested' } }) + bar('ds.field.demo.record_next') + '</div>')
