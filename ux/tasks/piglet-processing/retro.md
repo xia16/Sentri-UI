@@ -38,6 +38,10 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   skill; the only `dispatch.py` is in the adam-agent-workflow plugin's
   `events/` folder (several cached versions).
 - **Why:** the reference points at a skill layout that does not exist here.
+- **Update (Slices):** that `dispatch.py` is an event-hook dispatcher with no
+  `plan` command at all. Tiering was decided by hand: Opus for slices that
+  change a shared component or carry the ledger (S2, S5, S6, S7, S9), Sonnet
+  for the rest.
 - **Change:** name the path, or state the tiering rule in the skill.
 - **Cost:** low.
 
@@ -105,3 +109,44 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   on `main`, or conventions should say the map branch is cut from wherever
   the setup lives.
 - **Cost:** low now; the closing PR is larger to review.
+
+## 8 · Slices — the lint has no notion of a screen state
+
+- **Stage:** Slices, S0.
+- **What happened:** the lint renders `pages` from the config, one URL each.
+  Every `?state=` a slice adds must be its own `pages` entry in
+  `docs/agents/design.md`, so six parallel slices all edit one JSON block —
+  a merge conflict per slice — and a state not listed there is never linted.
+- **Change:** let a page entry carry `states: [...]` (the lint appends
+  `?state=` for each), or let the lint discover states from a page's own
+  index (`data-states` on the root).
+- **Cost:** low per slice; the driver resolves the conflicts.
+
+## 9 · Slices — the design system's tokens were never consumable, and the doctor passed it
+
+- **Stage:** Slices, S0.
+- **What happened:** `bundle.css` reads `--ink`, `--red`, `--line`,
+  `--app-background`, `--font-sans` … but nothing defines them: the import
+  brought `tokens.json` and no `tokens.css` (the artifact generates its CSS
+  at render). Any screen built "only from the design system" rendered with
+  inherited or missing colours. The doctor reported **core present** because
+  it checks that token categories exist in `tokens.json`, not that a page can
+  use them. Fixed by generating `tokens.css` from `tokens.json`
+  (`scripts/tokens-css.py`), no values changed.
+- **Change:** the doctor's core check should render one probe element with the
+  bundle and assert the core tokens resolve; the import step should generate
+  or copy the CSS the bundle expects.
+- **Cost:** medium — caught by the first designer, before any slice screens.
+
+## 10 · Slices — the components cannot be used on a strict page
+
+- **Stage:** Slices, S0.
+- **What happened:** `SentriUI` factories escape every string and mark no
+  component root, but strict pages need `data-str` on text and `data-ds` on
+  roots. The S0 designer hand-copied component markup to pass the lint — the
+  drift the design system exists to prevent. Added an additive `strs`/`args`
+  option and a `data-ds` root marker to the bundle before the parallel slices.
+- **Change:** the contract the lint enforces (`data-str`, `data-ds`) should be
+  checked against the component layer at Start: the doctor can render each
+  card's preview and require `data-ds` on its root.
+- **Cost:** medium.
