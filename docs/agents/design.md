@@ -154,6 +154,8 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-end-overview-ended", "url": "ux/tasks/piglet-processing/end.html?state=overview-ended", "strict": true },
     { "name": "pp-end-end-again", "url": "ux/tasks/piglet-processing/end.html?state=end-again", "strict": true },
     { "name": "pp-end-receipt-since", "url": "ux/tasks/piglet-processing/end.html?state=receipt-since", "strict": true },
+    { "name": "pp-end-overview-unit8", "url": "ux/tasks/piglet-processing/end.html?state=overview&unit=8&data=quiet", "strict": true },
+    { "name": "pp-end-no-task", "url": "ux/tasks/piglet-processing/end.html?state=overview&unit=9", "strict": true },
     { "name": "pp-litter-litter", "url": "ux/tasks/piglet-processing/litter.html?state=litter", "strict": true },
     { "name": "pp-litter-litter-partial", "url": "ux/tasks/piglet-processing/litter.html?state=litter-partial", "strict": true },
     { "name": "pp-litter-litter-short-count", "url": "ux/tasks/piglet-processing/litter.html?state=litter-short-count", "strict": true },

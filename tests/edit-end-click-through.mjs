@@ -175,7 +175,7 @@ try {
   //    possible double, the day's records by hand and the doses ending drops → hold → the receipt freezes the double as
   //    unresolved at End; Back returns to the room (R1-30).
   await page.goto(base + 'room.html?state=room&data=late&fresh=1'); await ready(page);
-  await page.click('[data-action="overview"]');
+  await page.click('.task-return');                                           // the room's Back opens the task overview
   await page.waitForURL(/end\.html/); await ready(page);
   const ov = await text(page, '[data-st-context="drawer"]');
   assert.match(ov, /Piglet deaths .*4 piglets/);
@@ -197,18 +197,22 @@ try {
   await page.waitForURL(/room\.html/); await ready(page);
   console.log('ok 8 room → overview → End (review open, day by hand, drops) → hold → receipt → Back → room');
 
-  // 9. R1-13: after End the overview offers no End; it names the real ender and opens the receipt.
-  await page.click('[data-action="overview"]');
-  await page.waitForURL(/end\.html/); await ready(page);
+  // 9. R1-13: after End the room's Back lands on the ended task (no End anywhere); an overview or End review opened after
+  //    End names the real ender before any hold, and opens the receipt.
+  await page.click('.task-return');
+  await page.waitForURL(/end\.html\?.*state=ended/); await ready(page);
+  assert.equal(await page.locator('[data-action="review"], [data-action="hold"]').count(), 0);
+  await page.goto(base + 'end.html?state=end-review&data=late'); await ready(page);
   const again = await text(page, '[data-st-context="drawer"]');
   assert.match(again, /Already ended by G\.H/);
-  assert.equal(await page.locator('[data-action="review"]').count(), 0);
-  console.log('ok 9 R1-13 overview after End: already ended by G.H, no End');
+  assert.equal(await page.locator('[data-action="hold"]').count(), 0);
+  await page.click('[data-st-context="drawer"] [data-action="receipt"]');
+  assert.match(await text(page, '[data-st-context="drawer"]'), /Unresolved at End/);
+  console.log('ok 9 R1-13 after End: the ended task, no End; a second End names G.H before any hold');
 
-  // 10. Round 4: the review End froze stays answerable: receipt row → the double → Same injection → Save → back to the
-  //     ended task: Since End says it was answered; the receipt's frozen list no longer holds it.
-  await page.click('[data-action="receipt"]');
-  await page.click('[data-action="open-review"]');
+  // 10. Round 4: the review End froze stays answerable: receipt row → the double → Given twice → Save → back to the
+  //     ended task: Since End says it was answered; the frozen list no longer holds it.
+  await page.click('[data-st-context="drawer"] [data-action="open-review"]');
   await page.waitForURL(/state=double/); await ready(page);
   await page.click('[data-action="dbl-answer"][data-value="twice"]');
   await page.click('[data-action="save"]');
@@ -217,12 +221,12 @@ try {
   await page.waitForURL(/end\.html/); await ready(page);
   const face = await text(page, '#screen');
   assert.match(face, /A05 · Iron d3 · possible double answered: given twice/);
-  assert.doesNotMatch(face, /Unresolved at End/);
+  assert.doesNotMatch(face, /Unresolved at End Frozen at End/);              // the frozen list no longer holds it
   console.log('ok 10 an unresolved-at-End double answered after End → Since End');
 
   // 11. R1-30: End blocked by farrowing says where to end it and opens the litter still farrowing (never the concept board).
   await page.goto(base + 'room.html?state=room&fresh=1'); await ready(page);
-  await page.click('[data-action="overview"]');
+  await page.click('.task-return');                                           // the room's Back opens the task overview
   await page.waitForURL(/end\.html/); await ready(page);
   await page.click('[data-action="review"]');
   const bl = await text(page, '[data-st-context="drawer"]');

@@ -748,10 +748,26 @@
     });
     return out;
   }
+  function valueTokens(id) {
+    var R = store.select.record(store.derived, crate), x = null, out = [];
+    R.days.forEach(function (g) { g.entries.forEach(function (y) { if (y.id === id) x = y; }); });
+    if (!x || x.kind !== 'correction') return out;
+    x.changes.forEach(function (ch) {
+      if (ch.kind === 'mark' && ch.before && ch.after) {
+        out.push([txPart(ch.target.dose), dPigsPart(amountOf(ch.before), amountOf(ch.after))]);
+        var a = ch.after.castration || {}, b = ch.before.castration || {};
+        ['hernia', 'cryptorchid', 'kept', 'deferred'].forEach(function (k) { if ((a[k] || 0) !== (b[k] || 0)) out.push([part('pp.litter.why.' + k), dTextPart(b[k] || 0, a[k] || 0)]); });
+      } else if (ch.kind === 'row') {
+        Object.keys(ch.set || {}).forEach(function (k) { out.push([part('pp.id.row.id', { id: idOf(ch.row) }), part('pp.edit.f.' + k + '_word'), part('pp.edit.to_value', { b: fieldText(k, ch.set[k]) }, 'amber')]); });
+      }
+    });
+    return out;
+  }
   function savedLine() {
     if (!saved) return '';
     var fx = receiptOf(saved.id), tokens = [part('pp.edit.saved', null, 'green')];
-    if (!fx || !fx.length) tokens.push(part('pp.edit.fx.none'));
+    // no litter figure moved (a castration reason, an identity field): the receipt names the values the correction changed
+    if (!fx || !fx.length) { var own = valueTokens(saved.id); tokens = tokens.concat(own.length ? own : [part('pp.edit.fx.none')]); }
     else fx.forEach(function (f) { tokens.push(part('pp.room.code', { code: f.code })); tokens = tokens.concat(f.tokens); });
     return sline(tokens, { live: true, id: 'ed-saved' });
   }
@@ -916,7 +932,10 @@
     if (from === 'id') return PP.href('id.html', { state: 'id-table', crate: crate, data: data });
     if (from === 'count') return PP.href('count.html', { state: 'explain', crate: crate, data: store.name });
     if (from === 'room') return PP.href('room.html', { state: 'room', unit: L().room, data: data });
-    if (from === 'end') return PP.href('end.html', { state: 'ended', data: data });
+    if (from === 'end') {
+      var over = (store.derived.tasks || []).some(function (T) { return T.id === L().task && T.ended && T.ended.event; });
+      return PP.href('end.html', { state: over ? 'ended' : 'end-review', unit: qs.get('unit') || '', data: data });
+    }
     return PP.href('litter.html', Object.assign({ state: 'litter', crate: crate, stay: 1, data: data }, extra || {}));
   }
   function commitRowTyping() {

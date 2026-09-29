@@ -82,15 +82,21 @@
     already: !!start.already, unconfirmed: !!start.unconfirmed,
     mandatory: qs.get('mandatory') === '1', opened: 0, ovScroll: 0
   };
-  var store, CFG, UNIT = 7, WEIGH_DAY = 21, frozen = { key: '', d: null };
-  function load(name) { S.data = name || S.data; store = window.PPFixtures.open(S.data, { fresh: qs.get('fresh') === '1' }); CFG = store.config; }
+  // The unit comes from the room (?unit=, 7 by default); its task is the configured task whose litters stand in it.
+  var store, CFG, UNIT = +(qs.get('unit') || 7) || 7, TASK = null, WEIGH_DAY = 21, frozen = { key: '', d: null };
+  function load(name) {
+    S.data = name || S.data; store = window.PPFixtures.open(S.data, { fresh: qs.get('fresh') === '1' }); CFG = store.config;
+    var list = CFG.tasks || (CFG.task ? [CFG.task] : []);
+    TASK = list.filter(function (t) { return t.litters.some(function (id) { var L = store.derived.litters[id]; return L && L.room === UNIT; }); })[0] || null;
+  }
 
   /* ---- the ledger ---- */
   function D() { return store.derived; }
-  function E() { return store.select.end(D()); }
+  function E() { return store.select.end(D(), { task: TASK.id }); }
   function fig(atEnd) { var e = E(); return atEnd && e.atEnd ? e.atEnd : e.now; }
-  function ended() { return D().ended && D().ended.event ? D().ended : null; }
-  function taskIds() { return CFG.task.litters.filter(function (id) { return D().litters[id]; }); }
+  function ended() { var T0 = (D().tasks || []).filter(function (t) { return t.id === TASK.id; })[0]; return T0 && T0.ended && T0.ended.event ? T0.ended : null; }
+  function inTask(c) { return TASK.litters.indexOf(c) >= 0; }
+  function taskIds() { return TASK.litters.filter(function (id) { return D().litters[id]; }); }
   function Lx(id) { return D().litters[id]; }
   /* The ledger as it stood at End (the log up to end_task, replayed): the receipt's outcomes are frozen from it, never
      read live (R1-21). */
@@ -141,17 +147,17 @@
       aheadLitters: ls.filter(function (l) { return l.ahead > 0; }).length,
       alive: sum(ls, function (l) { return l.alive; }), identified: sum(ls, function (l) { return l.identified; }) };
   }
-  function outside() { return Object.keys(D().litters).filter(function (id) { var x = Lx(id); return x.room === UNIT && !x.inTask; }).sort(); }
+  function outside() { return Object.keys(D().litters).filter(function (id) { var x = Lx(id); return x.room === UNIT && !inTask(id); }).sort(); }
   // End is refused while the batch's farrowing task is open (the ledger's own gate), and while this phone holds drafts.
   var gate = { key: '', open: false };
   function blocked() {
     var why = [], key = store.name + store.events.length;
-    if (gate.key !== key) gate = { key: key, open: !ended() && store.trial({ type: 'end_task' }).reason === 'farrowing_task_open' };
+    if (gate.key !== key) gate = { key: key, open: !ended() && store.trial({ type: 'end_task', task: TASK.id }).reason === 'farrowing_task_open' };
     if (gate.open) why.push({ kind: 'farrowing' });
     if (S.drafts) window.PPFixtures.DEVICE_DRAFTS.forEach(function (d) { why.push({ kind: d.kind === 'death' ? 'draft-death' : 'draft-edit', code: d.litter }); });
     return why;
   }
-  function farrowingNow() { return Object.keys(D().litters).filter(function (id) { return Lx(id).phase === 'open' && Lx(id).inTask; }).sort(); }
+  function farrowingNow() { return Object.keys(D().litters).filter(function (id) { return Lx(id).phase === 'open' && inTask(id); }).sort(); }
 
   /* ---- the log after End: every kind of post-End event, in its own words ---- */
   function endIndex() { var e = ended(); return e ? store.events.findIndex(function (x) { return x.id === e.event; }) : -1; }
@@ -187,7 +193,7 @@
       } else if (e.type === 'death') out.push({ kind: 'death', code: e.litter, n: lineCount(e), at: at, who: e.who });
       else if (e.type === 'count') out.push({ kind: 'count', code: e.litter, n: e.observed, at: at, who: e.who });
       else if (e.type === 'move') {
-        var inT = function (c) { return CFG.task.litters.indexOf(c) >= 0; };
+        var inT = inTask;
         // arrivals owe their doses as not done: no marks after End (RULINGS round 3)
         var owes = (Lx(e.to).moves.filter(function (m) { return m.id === e.id; })[0] || { packets: {} }).packets;
         var owed = Object.keys(owes).filter(function (k) { return owes[k] === 'owed' && Lx(e.to).doses[k].status !== 'later'; });
@@ -386,7 +392,7 @@
     var today = store.today, by = {}, order = [];
     store.events.forEach(function (e) {
       if (String(e.at).slice(0, 10) !== today || rejected(e.id) || ['treat', 'death', 'count', 'move'].indexOf(e.type) < 0) return;
-      var code = e.litter || e.from; if (CFG.task.litters.indexOf(code) < 0 && CFG.task.litters.indexOf(e.to) < 0) return;
+      var code = e.litter || e.from; if (!inTask(code) && !inTask(e.to)) return;
       if (!by[e.who]) { by[e.who] = []; order.push(e.who); }
       by[e.who].push(e);
     });
@@ -462,7 +468,7 @@
   function btn(register, action, id) { return UI.button({ label: PP.t(id), register: register, action: action, strs: { label: id } }); }
   function overviewSheet() {
     var t = totals(false), out = outside(), en = ended();
-    var lit = '<div class="pp-block">' + h({ strs: { title: 'pp.end.lit.title', description: out.length ? 'pp.end.lit.desc.outside' : 'pp.end.lit.desc' }, args: { description: { code: out.join(' ') } } }) +
+    var lit = '<div class="pp-block">' + h({ strs: { title: 'pp.end.lit.title', description: out.length ? one('pp.end.lit.desc.outside', out.length) : 'pp.end.lit.desc' }, args: { description: { code: out.join(' ') } } }) +
       rows(litters(false).map(overviewRow).join('')) + '</div>';
     // After End the overview never offers End again: it says who ended it and opens the receipt (R1-13)
     return sheetFrame('pp.end.ov.title', {}, 'pp.end.scope', { n: UNIT, k: t.litters },
@@ -588,7 +594,12 @@
   /* ---- render ---- */
   var screen = document.getElementById('screen'), phone = document.getElementById('phone');
   function render() {
-    var sh = S.sheet === 'overview' ? overviewSheet() : S.sheet === 'review' ? reviewSheet() : S.sheet === 'receipt' ? receiptSheet() : S.sheet === 'handoff' ? handoffSheet() : '';
+    if (!TASK) {
+      // A unit with no processing task: nothing to end here; its litters record deaths, counts and moves (Q18)
+      screen.innerHTML = header('pp.room.unit', { n: UNIT }, '', null, true) + UI.panel(h({ strs: { title: 'pp.end.none.title', description: 'pp.end.none.desc' }, args: { title: { n: UNIT } } }));
+      PP.apply(screen); return;
+    }
+    var sh =S.sheet === 'overview' ? overviewSheet() : S.sheet === 'review' ? reviewSheet() : S.sheet === 'receipt' ? receiptSheet() : S.sheet === 'handoff' ? handoffSheet() : '';
     screen.innerHTML = (S.ended ? endedFace() : backdrop()) + sh;
     phone.classList.toggle('pp-locked', !!S.sheet);
     var b = screen.querySelector('.task-return'); if (b) b.setAttribute('data-str-attr', 'aria-label:act.back');
@@ -651,7 +662,7 @@
       // The answer never came: End may have gone through. The hold goes unknown (terminal); point at the task.
       if (qs.get('recheck') === 'unconfirmed') { holds.settle(el, 'unknown'); S.unconfirmed = true; setUrl(false, history.state); render(); return; }
       if (blocked().length) { holds.settle(el, 'failed'); setUrl(false, history.state); render(); return; }
-      var r = store.commit({ type: 'end_task' });
+      var r = store.commit({ type: 'end_task', task: TASK.id });
       if (!r.ok) { holds.settle(el, 'failed'); if (r.reason === 'already_ended') S.already = true; setUrl(false, history.state); render(); return; }
       holds.settle(el, 'done');
       finishEnded('receipt');
@@ -687,8 +698,13 @@
     if (a === 'open-review') {
       var r = (fig(!!ended()).reviews || []).concat(fig(false).reviews || []).filter(function (x) { return x.id === v; })[0];
       if (!r) return;
-      location.href = r.kind === 'double' ? PP.href('edit.html', { state: 'double', crate: r.litter, dose: r.dose, from: 'end', data: store.name !== 'base' ? store.name : '' })
-        : PP.href('edit.html', { state: 'record-page', crate: r.litter, data: store.name !== 'base' ? store.name : '' });
+      // the same doors as the room's review list: a held body and a count conflict on the count sheet, a crossed correction on
+      // the record page; a possible double on its answer sheet
+      var p = { crate: r.litter, unit: UNIT !== 7 ? UNIT : '', data: store.name };
+      location.href = r.kind === 'double' ? PP.href('edit.html', Object.assign({ state: 'double', dose: r.dose, from: 'end' }, p))
+        : r.kind === 'held' ? PP.href('count.html', Object.assign({ state: 'held-body' }, p))
+          : r.kind === 'count' ? PP.href('count.html', Object.assign({ state: 'count-conflict' }, p))
+            : PP.href('edit.html', Object.assign({ state: 'record-page' }, p));
       return;
     }
     if (a === 'already-receipt') { finishEnded('receipt', 'ended-by-other'); return; }
@@ -700,7 +716,7 @@
     var q = qs.get('data');
     load(ALIAS[q] || (window.PPFixtures.VARIANTS[q] ? q : start.data));
     // Ended already (here or on another phone): the task opens as ended; the review never offers End again (R1-13)
-    if (ended()) S.ended = true;
+    if (TASK && ended()) S.ended = true;
     render();
   });
   // The one registry exception: when the registry itself failed to load there is nothing to look strings up in.
