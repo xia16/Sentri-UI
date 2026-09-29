@@ -208,7 +208,7 @@ function frontierInfo(ctx, L, D) {
   const live = frontier.filter((r) => !L.zeros.some((z) => z.index > r.index && !saw(r.event, z.event)));
   let best = null;
   for (const r of live) if (!best || r.deferN > best.deferN) best = r;
-  return { frontier, deferred: best ? best.deferN : 0, reason: best ? best.deferReason : null, lastIndex: frontier.reduce((m, r) => Math.max(m, r.index), -1) };
+  return { frontier, deferred: best ? best.deferN : 0, reason: best ? best.deferReason : null, by: best ? best.deferBy || null : null, lastIndex: frontier.reduce((m, r) => Math.max(m, r.index), -1) };
 }
 function refresh(ctx, L, D) { D.stored = owedAt(ctx, L, D, null); }
 function refreshAll(ctx, L) { for (const D of Object.values(L.doses)) refresh(ctx, L, D); }
@@ -519,7 +519,7 @@ function replay(log, effective, fresh, cfg, causal, today) {
     lit: (id) => { if (!litters.has(id)) litters.set(id, newLitter(id)); return litters.get(id); }
   };
   const rejected = [];
-  const run = (e, index) => {
+  const run = (e, index, via) => {
     ctx.pending = [];
     ctx.index = index;
     try {
@@ -529,7 +529,8 @@ function replay(log, effective, fresh, cfg, causal, today) {
         L.accepted.push(e.id); L.types[e.id] = e.type;
         // what it was, in its own words for a page: a treatment names its dose (a correction's fresh mark has no event of its own)
         const dc = e.dose ? ctx.doseCfg.get(e.dose) : null;
-        L.lastEvent = { id: e.id, type: e.type, at: e.at || null, who: e.who || null, dose: e.dose || null, tx: dc ? dc.tx : null,
+        // a correction's fresh mark keeps its act's time on the record; as the litter's latest write it is the correction's
+        L.lastEvent = { id: e.id, type: e.type, at: (via && via.at) || e.at || null, who: (via && via.who) || e.who || null, actAt: e.at || null, dose: e.dose || null, tx: dc ? dc.tx : null,
           n: e.type === 'treat' ? (e.castration ? e.castration.castrated || 0 : e.n) : e.type === 'move' ? e.n : e.type === 'death' ? (e.lines || []).reduce((s, l) => s + (l.rowId ? 1 : l.n || 0), 0) : e.type === 'weaned' ? e.n : null,
           observed: e.type === 'count' ? e.observed : null, via: e.viaCorrection || null };
       }
@@ -545,7 +546,7 @@ function replay(log, effective, fresh, cfg, causal, today) {
     carried.get(s.viaCorrection).push(s);
   }
   log.forEach((raw, index) => {
-    if (raw.type === 'correction') { for (const s of carried.get(raw.id) || []) run(s, index); return; }
+    if (raw.type === 'correction') { for (const s of carried.get(raw.id) || []) run(s, index, raw); return; }
     const e = effective.has(raw.id) ? effective.get(raw.id) : raw;
     if (e === null) return;                              // voided by a correction
     run(e, index);
@@ -1230,7 +1231,7 @@ function taskGate(ctx, L, e, D, unknownTarget) {
 }
 
 function readTreat(d, e) {
-  let treated, deferN, exemptN, females = 0, deferReason = null, castr = null;
+  let treated, deferN, exemptN, females = 0, deferReason = null, castr = null, deferBy = null;
   const exemptBy = {};
   if (d.castration) {
     const c = e.castration || {};
@@ -1249,8 +1250,14 @@ function readTreat(d, e) {
     if (![treated, deferN, exemptN].every(isCount)) throw new Reject('bad_numbers');
     if (exemptN) exemptBy[e.exempt.reason || 'other'] = exemptN;
     deferReason = deferN ? (e.deferred.reason || null) : null;
+    // N12: untreated piglets split by reason (`weak_sick`, by: { weak, sick }): the parts add up to the deferred
+    if (deferN && e.deferred.by) {
+      const parts = Object.entries(e.deferred.by).filter(([, v]) => v);
+      if (!parts.every(([, v]) => isCount(v)) || parts.reduce((s2, [, v]) => s2 + v, 0) !== deferN) throw new Reject('bad_numbers', { deferred: deferN, by: e.deferred.by });
+      if (parts.length) deferBy = Object.fromEntries(parts);
+    }
   }
-  return { treated, deferN, exemptN, females, deferReason, castr, exemptBy };
+  return { treated, deferN, exemptN, females, deferReason, deferBy, castr, exemptBy };
 }
 
 function completed(ctx, L, D, e) {
@@ -1300,7 +1307,7 @@ function applyTreat(ctx, e) {
   const left = V == null || ranged ? t.deferN : Math.max(0, Math.min(V, aliveView(ctx, L, e)) - t.treated - t.exemptN - t.females);
   // deferred as not yet due (R1-4): which age groups they are, as the writer saw them
   const notDue = t.deferReason === 'not_due' && t.deferN ? cohortsNotDue(ctx, L, D, d, dayNumber(e.at), t.deferN) : null;
-  D.recs.push({ event: e.id, index: ctx.index, left, deferN: t.deferN, deferReason: t.deferReason, notDue });
+  D.recs.push({ event: e.id, index: ctx.index, left, deferN: t.deferN, deferReason: t.deferReason, deferBy: t.deferBy, notDue });
   if (ranged) settleDoubt(ctx, D, e);
   refresh(ctx, L, D);
   D.treated += t.treated;
@@ -1313,7 +1320,7 @@ function applyTreat(ctx, e) {
     C.females += t.females;
     for (const k of NOTE_REASONS) if (t.castr[k]) L.notes.push({ kind: k, n: t.castr[k], event: e.id, at: e.at || null });
   }
-  D.records.push(record(ctx, L, d, e, { n: t.treated, deferred: t.deferN, deferReason: t.deferReason, exempt: t.exemptN, exemptBy: t.exemptBy, females: t.females, castration: t.castr ? clone(t.castr) : null }));
+  D.records.push(record(ctx, L, d, e, { n: t.treated, deferred: t.deferN, deferReason: t.deferReason, deferBy: t.deferBy ? Object.assign({}, t.deferBy) : null, exempt: t.exemptN, exemptBy: t.exemptBy, females: t.females, castration: t.castr ? clone(t.castr) : null }));
   completed(ctx, L, D, e);
   if (collided.length) {
     D.collisions.push([collided[0].id, e.id]);
@@ -1573,7 +1580,10 @@ function view(ctx, L, corrections, today) {
     const deferred = Math.min(fi.deferred, owed == null ? fi.deferred : owed);
     const lastZero = L.zeros.length ? L.zeros[L.zeros.length - 1].index : -1;
     const owedFrom = [];
-    if (deferred) owedFrom.push({ kind: 'deferred', n: deferred, reason: fi.reason });
+    // the split by reason (N12), capped to what is still deferred — never invented
+    let deferBy = null;
+    if (deferred && fi.by) { let k = deferred; deferBy = {}; for (const [r, v] of Object.entries(fi.by)) { const t = Math.min(k, v); if (t) deferBy[r] = t; k -= t; } }
+    if (deferred) owedFrom.push(Object.assign({ kind: 'deferred', n: deferred, reason: fi.reason }, deferBy ? { by: Object.assign({}, deferBy) } : {}));
     if (fi.frontier.length) {
       for (const x of D.entries) {
         if (!(x.delta > 0) || !RAISES.has(x.kind) || x.index <= Math.max(fi.lastIndex, lastZero)) continue;
@@ -1600,6 +1610,7 @@ function view(ctx, L, corrections, today) {
       treated: D.treated,
       deferred,
       deferReason: deferred ? fi.reason : null,
+      deferBy,                                       // N12: { weak, sick } when the untreated were split by reason; else null
       exempt: D.exempt, exemptBy: Object.assign({}, D.exemptBy),
       missed: status === 'missed' && owed ? owed : 0,
       unknownAfterMove: unknown,
@@ -1904,7 +1915,7 @@ function litterSelect(derived, id, opts) {
       range: D.range ? { lo: D.owedLo, hi: D.owed, of: L.alive, doubt: D.doubt.map((x) => Object.assign({}, x)) } : null,
       // R1-4: the owed piglets by age group; `owedNow` those whose dose is due now (the rest can be deferred `not_due`)
       owedNow: D.owedNow, groups: D.groups.map((g) => clone(g)),
-      deferred: D.deferred, deferReason: D.deferReason,
+      deferred: D.deferred, deferReason: D.deferReason, deferBy: D.deferBy,
       unknown: D.unknownAfterMove, checkOnPig: D.checkOnPig, owedFrom: D.owedFrom.map((x) => Object.assign({}, x)),
       males: D.isCastration ? D.males : undefined
     })),
