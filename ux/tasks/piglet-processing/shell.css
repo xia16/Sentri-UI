@@ -23,7 +23,6 @@
 .pp-tone[data-tone="blue"], .pp-litter .pp-tok[data-tone="blue"] { color: var(--progress); }
 /* Candidate:Receipt — the receipt line is body text; its value carries the colour. */
 .pp-receipt { display: flex; flex-wrap: wrap; column-gap: var(--status-dot); margin: 0; font-size: var(--type-row-title-size); line-height: 1.5; color: var(--ink); }
-.pp-receipt > span { white-space: nowrap; }
 
 /* Candidate:LitterRow: the Row card's geometry with the row law's mono line 2, one named chip and the rail. */
 .pp-litter { transition: background 1100ms ease-out; }
