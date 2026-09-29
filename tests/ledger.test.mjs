@@ -1401,8 +1401,9 @@ test('R4-3 a correction after End that brings a dose to 0 shows in now, never in
   b.ev.push({ id: 'end', type: 'end_task', at: on(5, '12:00') });
   b.correction(t.id, { set: { n: 12, deferred: undefined }, at: on(6) });
   const e = select.end(run(b, R4T(['A02']), 6));
-  assert.equal(e.atEnd.litters.A02.owed, 2);
-  assert.equal(e.now.litters.A02.owed, 0);
+  // iron3 2 owed at End (tail's 12 missed stays in both)
+  assert.equal(e.atEnd.litters.A02.owed, 14);
+  assert.equal(e.now.litters.A02.owed, 12);
   assert.equal(e.atEnd.byLitter.A02.find((x) => x.dose === 'iron3').n, 2);
   assert.equal(e.now.byLitter.A02.find((x) => x.dose === 'iron3'), undefined);
 });
@@ -1413,7 +1414,7 @@ test('R4-4 select.end gives per-litter totals', () => {
   b.farrowed('A02', 10);
   b.treat('A02', 'iron3', 8, { deferred: { n: 2, reason: 'weak' } });
   b.move('S', 'A02', 1, { answers: { iron3: 'unknown' } });
-  const e = select.end(run(b, R4T(['A02']), 5));
+  const e = select.end(run(b, R4T(['A02', 'S']), 5));
   // day 5: iron3 owed 2 + unknown 1; tail missed (window day 4) 11; castration due, males uncounted; iron14 not due 11
   assert.deepEqual(e.now.litters.A02, {
     done: 8, owed: 13, unknown: 1, missed: 11, notDue: 11, malesUncounted: true,
