@@ -20,11 +20,12 @@
 .dd-bar { flex-wrap: wrap; justify-content: space-between; column-gap: var(--space-section); }
 .dd-bar > .primary, .dd-bar > .danger { flex: 1; }
 .dd-why { flex-basis: 100%; margin: 0 0 var(--space-row-y); }
-/* Candidate:DeadDrawer — (1) the Stepper's green draft value (a tone:'draft' is going to the Stepper candidate);
+/* Candidate:DeadDrawer — (1) [retired: the Stepper candidate now has draft:true];
    (2) the green `unsaved` words; (3) mono identity labels; (4) the sow's stacked warning; (5) the hold sweep;
    (6) a gray Save that stays focusable (aria-disabled) — the bundle only grays :disabled. */
-.dd-draft .st-stepper-value, .dd-unsaved { color: var(--green); font-family: var(--font-mono); }
+.dd-unsaved { color: var(--green); font-family: var(--font-mono); }
 .dd-phone .st-heading .st-heading-title > span.dd-unsaved.dd-unsaved, .dd-unsaved { font-size: var(--type-choice-meta-size); font-weight: 500; letter-spacing: 0; color: var(--green); font-family: var(--font-mono); }
+.dd-receipt > span { white-space: nowrap; }
 .dd-mono .st-choice-label { font-family: var(--font-mono); }
 .dd-warn { display: flex; flex-direction: column; gap: var(--space-heading); padding: var(--space-panel); background: var(--red-wash); border: 1px solid var(--red); border-radius: var(--radius-inset); }
 .dd-warn strong { color: var(--red); font-size: var(--type-button-size); font-weight: 600; }
@@ -81,7 +82,7 @@
     B: { surface: 'processing', phase: 'locked', tag: '000271', pen: 'B06', day: 3, born: 13, dead: { stillborn: 1 }, openLosses: [], modes: ['piglets', 'sow'], identified: [
       pig('r1', '271001', '', 'f', '1.6'), pig('r2', '271002', '', 'm', '1.5'), pig('r3', '271003', '', 'f', '1.4'), pig('r4', '271004', '', 'm', '1.1'),
       pig('r5', '271005', '', 'f', ''), pig('r6', '271006', '', 'm', '1.7'), pig('r7', '271007', '', 'm', '1.3'), pig('r8', '271008', '', 'f', '1.5'),
-      pig('r9', '', '27-14', 'm', '')] },
+      pig('r9', '', '27-14', '', '')] },
     C: { surface: 'processing', phase: 'locked', tag: '000288', pen: 'B09', day: 4, born: 12, dead: { stillborn: 1 }, identified: [], modes: ['piglets', 'sow'],
       openLosses: [{ id: 'L1', qty: 1, at: 'Sep 27' }, { id: 'L2', qty: 1, at: 'Sep 28' }] },
     D: { surface: 'processing', phase: 'locked', tag: '000312', pen: 'B11', day: 3, born: 11, dead: { stillborn: 1 }, identified: [], openLosses: [], modes: ['piglets'] },
@@ -101,7 +102,9 @@
     'dead-open-loss-yes':     { L: 'C', open: true, tallies: { crushed: 1 }, k: 1 },
     'dead-open-loss-no':      { L: 'C', open: true, tallies: { crushed: 1 }, k: 0 },
     'dead-open-loss-split':   { L: 'C', open: true, tallies: { crushed: 2 }, k: 1 },
-    'dead-saved':             { L: 'C', open: true, tallies: { crushed: 2 }, k: 1, save: true },
+    'dead-saved':             { L: 'C', open: true, tallies: { crushed: 2 }, k: 1, photos: 2, save: true },
+    'dead-open-loss-floor':   { L: 'C', open: true, tallies: { crushed: 11 }, k: 2 },
+    'dead-tagged-second':     { L: 'B', open: true, picks: { r4: 'crushed', r9: '' } },
     'dead-sow':               { L: 'A', open: true, mode: 'sow', sow: 'prolapse' },
     'dead-sow-recorded':      { L: 'D', open: true },
     'farrowing-drawer':       { L: 'F', open: true },
@@ -114,7 +117,7 @@
   L.deadRows = {};                                   // identity status derives from the death event, keyed by row id
   // Two drafts, one per mode (the draft envelope is keyed litter + mode).
   var S = { open: spec.open, mode: spec.mode || (spec.sow && !spec.tallies ? 'sow' : 'piglets'),
-    pig: { tallies: Object.assign({}, spec.tallies || {}), picks: Object.assign({}, spec.picks || {}), k: spec.k == null ? null : spec.k, photos: 0 },
+    pig: { tallies: Object.assign({}, spec.tallies || {}), picks: Object.assign({}, spec.picks || {}), k: spec.k == null ? null : spec.k, photos: spec.photos || 0 },
     sow: { cause: spec.sow || '', note: '', photos: 0 },
     hint: '', why: false, live: '', armed: false, receipt: null, closedAt: 0, door: '', saving: false };
 
@@ -132,6 +135,13 @@
   var pigN = function () { return bodies() + picks().length; };
   var cap = function () { return locked() ? unidentified() + lossN() : Infinity; };
   var kMax = function () { return Math.min(bodies(), lossN()); };
+  // Alive can never go negative: new deaths must be live unidentified piglets; the rest must come from the missing.
+  var kMin = function () { return locked() ? Math.max(0, bodies() - unidentified()) : 0; };
+  var settleK = function () {                        // raising bodies raises k to its floor; the answer survives while valid
+    if (!bodies()) { S.pig.k = null; return; }
+    if (kMin() > 0) S.pig.k = Math.max(S.pig.k == null ? 0 : S.pig.k, kMin());
+    if (S.pig.k != null) S.pig.k = Math.min(S.pig.k, kMax());
+  };
   var asksLoss = function () { return locked() && lossN() > 0; };
   var needK = function () { return asksLoss() && bodies() > 0 && S.pig.k == null; };
   var sowDraft = function () { return !!S.sow.cause; };
@@ -148,7 +158,7 @@
     var bare = picks().filter(function (r) { return !S.pig.picks[r]; });
     if (bare.length === 1) return { id: 'ds.dead.why.cause_one', args: { id: idText(rowOf(bare[0])) }, to: 'pick-cause' };
     if (bare.length) return { id: 'ds.dead.why.cause_many', args: { n: bare.length }, to: 'pick-cause' };
-    if (needK()) return { id: 'ds.dead.why.missing', to: 'loss' };
+    if (needK() || (asksLoss() && bodies() && S.pig.k < kMin())) return { id: 'ds.dead.why.missing', to: 'loss' };
     return null;
   }
   var rowOf = function (id) { return L.identified.filter(function (p) { return p.id === id; })[0]; };
@@ -180,7 +190,7 @@
     var born = locked() ? L.born : alive() + deadN();
     var receipt = '';
     if (S.receipt) {
-      receipt = '<p class="dd-unsaved" data-ds="Candidate:DeadDrawer" role="status">' + span('receipt.saved') + S.receipt.map(function (r) { return ' ' + span(r.id, r.args); }).join('') + '</p>';
+      receipt = '<p class="dd-unsaved dd-receipt" data-ds="Candidate:DeadDrawer" role="status">' + span('receipt.saved') + S.receipt.map(function (r) { return ' ' + span(r.id, r.args); }).join('') + '</p>';
     }
     return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (S.open ? ' inert' : '') + '>' +
       '<header class="utility-header">' + UI.heading({ title: '', description: '', kind: 'page', level: 2,
@@ -205,7 +215,7 @@
   function tallyRow(c) {
     var posted = L.dead[c] || 0, d = S.pig.tallies[c] || 0, full = bodies() >= cap();
     return UI.stepper({ label: '', value: posted + d, min: posted, max: full ? posted + d : null, key: c, action: 'dead-step',
-      className: d ? 'dd-draft' : '', hint: S.hint === c ? ' ' : '',
+      draft: d > 0, reserveHint: S.hint === c, hint: S.hint === c ? ' ' : '',
       strs: Object.assign({ label: 'ds.dead.cause.' + c, value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
         S.hint === c ? { hint: roster().length ? 'ds.dead.hint.cap_identified' : 'ds.dead.hint.cap' } : {}),
       args: { hint: { n: cap() } } });
@@ -215,29 +225,32 @@
     var m = lossN(), a = alive(), b = bodies(), k = S.pig.k, hint;
     if (!b) hint = { id: 'ds.dead.loss.open', args: { m: m } };
     else if (k == null) hint = { id: 'ds.dead.loss.ask' };
+    else if (kMin() > 0 && k === kMin()) hint = { id: 'ds.dead.loss.atleast', args: { n: kMin() } };
     else {
       var after = a - (b - k) - picks().length, left = m - k;
       hint = a === after ? (left ? { id: 'ds.dead.loss.stay', args: { a: a, left: left } } : { id: 'ds.dead.loss.closed', args: { a: a } })
         : { id: 'ds.dead.loss.move', args: { a: a, b: after, left: left } };
     }
-    return '<div data-target="loss">' + UI.stepper({ label: '', value: k || 0, min: 0, max: kMax(), key: 'k', action: 'loss-step', hint: ' ',
+    // `None were missing` is an explicit answer (a text action), so the floor-gray minus keeps its one meaning.
+    var none = b && k == null && !kMin() ? '<button type="button" class="dd-text-action" data-ds="Candidate:TextAction" data-action="loss-none" data-str="ds.dead.loss.none"></button>' : '';
+    return '<div data-target="loss">' + UI.stepper({ label: '', value: k || 0, min: k == null ? 0 : kMin(), max: kMax(), key: 'k', action: 'loss-step', hint: ' ',
       strs: { label: 'ds.dead.loss.label', value: 'ds.field.figure', hint: hint.id, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
-      args: { label: { m: m }, hint: hint.args } }) + '</div>';
+      args: { label: { m: m }, hint: hint.args } }) + none + '</div>';
   }
   function identifiedBlock() {
     var rows = roster();
     if (!rows.length) return '';
     var list = UI.choiceGroup(rows.map(function (p) {
-      var l = idLabel(p);
+      var l = idLabel(p), meta = p.sex ? 'ds.dead.pig.' + p.sex + (p.w ? '_w' : '') : p.w ? 'ds.dead.pig.w' : '';
       return UI.choiceRow({ label: '', meta: '', mode: 'multi', action: 'pick', value: p.id, selected: p.id in S.pig.picks, className: 'dd-mono',
-        strs: { label: l.id, meta: 'ds.dead.pig.' + p.sex + (p.w ? '_w' : '') }, args: { label: l.args, meta: { w: p.w } } });
+        strs: Object.assign({ label: l.id }, meta ? { meta: meta } : {}), args: { label: l.args, meta: { w: p.w } } });
     }), {});
     var scan = '<button type="button" data-action="scan" data-str="act.scan"></button>';
     var out = '<div class="dd-group">' + UI.heading({ title: '', kind: 'group', level: 4, action: scan, strs: { title: 'ds.dead.identified' }, args: { title: { n: rows.length } } }) + list + '</div>';
     // One cause control for everything picked, below the roster: ticking never moves a row under the thumb.
     var ps = picks();
     if (ps.length) {
-      var shared = ps.every(function (r) { return S.pig.picks[r] === S.pig.picks[ps[0]]; }) ? S.pig.picks[ps[0]] : '';
+      var shared = ps.every(function (r) { return S.pig.picks[r] && S.pig.picks[r] === S.pig.picks[ps[0]]; }) ? S.pig.picks[ps[0]] : '';
       var title = ps.length === 1 ? { id: 'ds.dead.cause_for_one', args: { id: idText(rowOf(ps[0])) } } : { id: 'ds.dead.cause_for_many', args: { n: ps.length } };
       out += '<div class="dd-group" data-target="pick-cause">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: title.id }, args: { title: title.args } }) +
         radios(LOCKED.map(function (c) { return { v: c, id: 'ds.dead.cause.' + c }; }), 'pick-cause', shared, 'pick-cause') + '</div>';
@@ -291,11 +304,12 @@
       header() + '<div class="sheet-body"><div class="dd-stack">' + segs + (S.mode === 'sow' ? sowMode() : piglets()) + '</div></div>' + footer() + '</section>';
   }
   // Re-render keeps the body's scroll and the focused control (a requirement of the shared component).
+  var rendering = false;           // a re-render replaces the focused button; that is not focus leaving it
   function render() {
     var root = document.getElementById('screen'), body = root.querySelector('[data-ds="Candidate:DeadDrawer"] .sheet-body');
     var top = body ? body.scrollTop : 0, f = document.activeElement, key = null;
     if (f && root.contains(f) && f.dataset && f.dataset.action) key = [f.dataset.action, f.dataset.value || '', f.dataset.step || ''];
-    root.innerHTML = host() + (S.open ? drawer() : '');
+    rendering = true; root.innerHTML = host() + (S.open ? drawer() : ''); rendering = false;
     PP.apply(root);
     var nb = root.querySelector('[data-ds="Candidate:DeadDrawer"] .sheet-body');
     if (nb) nb.scrollTop = top;
@@ -330,15 +344,16 @@
     }
     L.openLosses = L.openLosses.filter(function (x) { return x.qty > 0; });
     if (locked() && d.k != null && lossN()) lines.push({ id: 'ds.dead.receipt.missing', args: { n: lossN() } });
+    if (d.photos) lines.push({ id: 'ds.dead.receipt.photos.' + (d.photos === 1 && !zh ? 'one' : 'many'), args: { n: d.photos } });
     S.receipt = lines;
-    S.door = 'dead_batch:' + JSON.stringify(lines.map(function (x) { return x.args; }));
+    S.door = 'dead_batch:' + JSON.stringify({ lines: lines.map(function (x) { return x.args; }), photos: d.photos });
     S.pig = { tallies: {}, picks: {}, k: null, photos: 0 };
     close(); S.mode = sowDraft() ? 'sow' : 'piglets';
     S.saving = false;
   }
   function saveSow() {
     if (why()) return;
-    S.door = 'sow_died:' + S.sow.cause + (L.surface === 'processing' ? ' → orphan litter face (edge.html?state=orphan)' : ' → session ended');
+    S.door = 'sow_died:' + S.sow.cause + ' · photos ' + S.sow.photos + (L.surface === 'processing' ? ' → orphan litter face (edge.html?state=orphan)' : ' → session ended');
     S.sow = { cause: '', note: '', photos: 0 }; L.modes = ['piglets']; S.mode = 'piglets'; close();
   }
   function goTo(w) {
@@ -348,40 +363,46 @@
     var t = document.querySelector('[data-target="' + w.to + '"]');
     if (t) { t.scrollIntoView({ block: 'center' }); var f = t.querySelector('button'); if (f) f.focus({ preventScroll: true }); }
   }
+  // The two-step sow Save disarms on any change, when focus leaves the button, and after 5 s.
+  var armTimer = null;
+  function disarm() { if (!S.armed) return; S.armed = false; clearTimeout(armTimer); if (S.live === 'ds.dead.hold.armed') S.live = ''; }
   var screen = document.getElementById('screen');
   screen.addEventListener('click', function (ev) {
     if (ev.target.closest('[data-dismiss]')) { close(); render(); return; }   // scrim = Back
     var b = ev.target.closest('[data-action]');
     if (!b) return;
     var a = b.dataset.action, v = b.dataset.value, gray = b.getAttribute('aria-disabled') === 'true';
+    if (a !== 'hold-save') disarm();
     if (a === 'pick') return;                                      // the checkbox's change event handles it
     if (a === 'close-host') { if (Date.now() - S.closedAt < 400) return; S.door = 'host-back'; }
     else if (a === 'dead-step') {
       var step = +b.dataset.step, d = S.pig.tallies[v] || 0;
       if (gray) { if (step > 0) S.hint = v; render(); return; }
       d = Math.max(0, d + step); if (d) S.pig.tallies[v] = d; else delete S.pig.tallies[v];
-      S.hint = '';
-      if (!bodies()) S.pig.k = null;                               // the answer survives while it is still valid
-      else if (S.pig.k != null) S.pig.k = Math.min(S.pig.k, kMax());
+      S.hint = ''; settleK();
     }
     else if (a === 'loss-step') {
       var s = +b.dataset.step;
       if (!bodies()) return;
-      if (S.pig.k == null) S.pig.k = s > 0 ? 1 : 0;                // − at 0 answers "none"
-      else if (!gray) S.pig.k = Math.max(0, Math.min(kMax(), S.pig.k + s));
+      if (gray) return;
+      if (S.pig.k == null) S.pig.k = s > 0 ? Math.max(1, kMin()) : 0;
+      else S.pig.k = Math.max(kMin(), Math.min(kMax(), S.pig.k + s));
+    }
+    else if (a === 'loss-none') { if (bodies() && !kMin()) S.pig.k = 0;
     }
     else if (a === 'pick-cause') { picks().forEach(function (r) { S.pig.picks[r] = v; }); }
     else if (a === 'mode') S.mode = v;
     else if (a === 'sow-cause') S.sow.cause = v;
     else if (a === 'clear') clearMode();
     else if (a === 'back') close();                                // keeps both drafts on the device
-    else if (a === 'open-dead') { S.open = true; S.receipt = null; S.mode = sowDraft() && !pigN() ? 'sow' : S.mode; }
+    else if (a === 'open-dead') { S.open = true; S.receipt = null; S.mode = pigN() || !sowDraft() ? 'piglets' : 'sow'; S.pig.k = null; settleK(); }
     else if (a === 'add-photo') { if (gray) return; S[v].photos += 1; }
     else if (a === 'save') { if (gray) { goTo(why()); return; } savePiglets(); }
     else if (a === 'hold-save') {                                  // keyboard / switch: a two-step confirm instead of the hold
       if (gray) { goTo(why()); return; }
       if (ev.detail !== 0) return;                                 // pointer taps are handled by the hold
-      if (!S.armed) { S.armed = true; S.live = 'ds.dead.hold.armed'; } else { saveSow(); }
+      if (!S.armed) { S.armed = true; S.live = 'ds.dead.hold.armed'; clearTimeout(armTimer); armTimer = setTimeout(function () { if (S.armed) { disarm(); render(); } }, 5000); }
+      else { disarm(); saveSow(); }
     }
     else { S.door = a + ':' + (v || ''); }
     render();
@@ -389,11 +410,14 @@
   screen.addEventListener('change', function (ev) {
     var t = ev.target;
     if (t.dataset.action === 'pick') {
-      if (t.checked) { var ps = picks(); S.pig.picks[t.value] = ps.length ? S.pig.picks[ps[0]] : ''; } else delete S.pig.picks[t.value];
+      disarm(); if (t.checked) S.pig.picks[t.value] = ''; else delete S.pig.picks[t.value];
       render();
     }
   });
-  screen.addEventListener('input', function (ev) { if (ev.target.dataset.field === 'sowNote') S.sow.note = ev.target.value; });
+  screen.addEventListener('input', function (ev) { if (ev.target.dataset.field === 'sowNote') { S.sow.note = ev.target.value; if (S.armed) { disarm(); var l = screen.querySelector('.dd-live'); if (l) l.innerHTML = ''; } } });
+  screen.addEventListener('focusout', function (ev) {
+    if (!rendering && S.armed && ev.target.closest && ev.target.closest('.dd-hold') && !(ev.relatedTarget && ev.relatedTarget.closest && ev.relatedTarget.closest('.dd-hold'))) { disarm(); render(); }
+  });
   // Swipe down on the drawer's header = Back.
   var grab = null;
   screen.addEventListener('pointerdown', function (ev) { if (ev.target.closest('[data-grab]')) grab = ev.clientY; }, true);
@@ -411,7 +435,7 @@
     ev.preventDefault(); held = b; b.setPointerCapture(ev.pointerId); b.classList.add('is-holding');
     var l = screen.querySelector('.dd-live'); if (l) { l.innerHTML = span('ds.dead.hold.start', null, 'st-field-hint'); PP.apply(l); }
     var t0 = Date.now(); held.dataset.t0 = t0;
-    timer = setTimeout(function () { held = null; saveSow(); render(); }, 850);
+    timer = setTimeout(function () { var h = held; held = null; if (h) h.classList.remove('is-holding'); if (why()) { render(); return; } saveSow(); render(); }, 850);
   });
   screen.addEventListener('pointermove', function (ev) {
     if (!held) return;
@@ -423,6 +447,7 @@
   screen.addEventListener('contextmenu', function (ev) { if (ev.target.closest('.dd-hold')) ev.preventDefault(); });
 
   PP.ready.then(function () {
+    settleK();
     if (spec.save) savePiglets();
     render();
   });

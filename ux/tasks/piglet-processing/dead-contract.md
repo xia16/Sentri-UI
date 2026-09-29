@@ -36,15 +36,27 @@ dead_batch {
          | {cause, rowId} ],     // one identified piglet each
   lossSeen:  [ {lossId, qty} ],  // the open losses on screen when the hand answered
   lossAlloc: [ {lossId, qty} ],  // bodies drawn from them, oldest loss first; Σ qty = the "From the missing" answer
-  photos: []
+  photos: [ photoRef ]         // ride this Save; uploads queue offline, the event never waits
 }
-sow_died { litterId, cause, note?, photos[] }   // never batched with piglets
+sow_died { litterId, cause, note?, photos: [ photoRef ] }   // never batched with piglets; photos ride this Save
 ```
 
 - **Allocation.** The hand answers how many of the untagged bodies were missing (a Stepper,
   `0 … min(untagged bodies, Σ open loss)`); the device allocates them to open losses oldest first.
   Identified piglets are never missing (they were on the roster) and never draw from a loss.
-- **Alive** after a locked batch: `alive − (untagged bodies − allocated) − identified piglets`.
+- **Alive** after a locked batch: `alive − (untagged bodies − allocated) − identified piglets`. It can never go
+  negative: the answer has a floor `kMin = max(0, untagged bodies − unidentified alive)` (new deaths must be live
+  unidentified piglets; picked identified piglets are already on the roster). The Stepper's floor is kMin; it is
+  pre-set to kMin with `At least 2 must be from the missing`; raising the tallies raises the answer to kMin; Save
+  refuses an answer below kMin. The tally cap (`unidentified alive + Σ open loss`) keeps kMin ≤ Σ open loss.
+- **`None were missing` is an explicit answer** (a text action shown while the question is unanswered and kMin
+  is 0). The floor-gray − never answers anything; it keeps its one meaning.
+- **Photos** ride the Save that holds them: the receipt and the History line say so (`Saved · +2 crushed ·
+  1 missing still open · 2 photos`).
+- **A new tick starts with no cause**: ticking another identified piglet never copies a cause; the shared
+  control reads `Cause for 2 picked` with nothing selected until a cause is chosen for all of them, and Save
+  points at the first piglet without one (`Pick a cause for notch 27-14`). Rows with no sex or weight print
+  no meta line.
 - **Identity status** is derived from the death event, keyed by `rowId`, idempotent per row. The row is
   never deleted: the identity table (S4) shows it with status `dead · <cause> · <date>`, excluded from
   Identified and from `n of N`, kept in *Identity rows on record*. It leaves the picker.
@@ -54,7 +66,7 @@ sow_died { litterId, cause, note?, photos[] }   // never batched with piglets
 
 Key: `litterId + mode`. The piglet draft and the sow draft are separate: a piglet Save never erases a
 sow draft; `Clear` clears only the mode on screen; the drawer reopens in the mode holding the draft
-(piglets when both do).
+(piglets when both do — the page does the same).
 
 ```
 { litterId, mode, baseVersion,
@@ -62,7 +74,7 @@ sow draft; `Clear` clears only the mode on screen; the drawer reopens in the mod
   sowCause, sowNote, photoRefs [] }                          // sow
 ```
 
-- The loss answer is **not** persisted: it is re-asked on restore.
+- The loss answer is **not** persisted: it is re-asked on every reopen (pre-set to kMin when that is above 0).
 - **Restore trims to changed truth and says so**: a picked row that died elsewhere, or tallies above
   a lowered cap, are dropped on reopen with one line naming what was dropped.
 - The host says a draft waits in words: `1 unsaved` (piglets), `sow cause unsaved` (sow).
@@ -85,6 +97,8 @@ through Edit. Two deaths for one `rowId` keep the earliest; the later is flagged
   Back ignores taps for ~400 ms after the drawer closes.
 - The sow's Save is hold-to-commit (850 ms): `touch-action:none`, no callout, sliding within the button
   keeps the hold, a plain tap says `Keep holding to save`, an `aria-live` line reports start and
-  cancel, and keyboard or switch access uses a two-step alternative (`Press Save again`).
+  cancel, and keyboard or switch access uses a two-step alternative (`Press Save again`). The armed step
+  disarms on any change (cause, mode, photo, note), when focus leaves the button, and after 5 s. When the
+  hold completes, the timer rechecks what Save needs before it commits.
 - Identified piglets: picked from the roster or by `Scan ear tag`; one cause control for everything
   picked sits below the roster, so ticking never moves a row under the thumb.

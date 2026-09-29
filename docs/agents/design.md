@@ -46,6 +46,8 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-dead-dead-open-loss-split", "url": "ux/tasks/piglet-processing/dead.html?state=dead-open-loss-split", "strict": true },
     { "name": "pp-dead-dead-saved", "url": "ux/tasks/piglet-processing/dead.html?state=dead-saved", "strict": true },
     { "name": "pp-dead-dead-sow-recorded", "url": "ux/tasks/piglet-processing/dead.html?state=dead-sow-recorded", "strict": true },
+    { "name": "pp-dead-dead-open-loss-floor", "url": "ux/tasks/piglet-processing/dead.html?state=dead-open-loss-floor", "strict": true },
+    { "name": "pp-dead-dead-tagged-second", "url": "ux/tasks/piglet-processing/dead.html?state=dead-tagged-second", "strict": true },
     { "name": "pp-room-room", "url": "ux/tasks/piglet-processing/room.html?state=room", "strict": true },
     { "name": "pp-room-room-empty", "url": "ux/tasks/piglet-processing/room.html?state=room-empty", "strict": true },
     { "name": "pp-room-room-all-done", "url": "ux/tasks/piglet-processing/room.html?state=room-all-done", "strict": true },
