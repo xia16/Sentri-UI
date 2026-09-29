@@ -78,6 +78,7 @@ Slice S1 (`room.html`). Owed, missed, open loss/gain and net drift keep the defi
 | **Done** 已处理 (lens `Done {n}`) | litters | litters with every dose due today recorded today, nothing owed and nothing missed | today | one room; unit: litters |
 | **Later** 之后 (lens `Later {n}`) | litters | litters in the task with nothing due today and nothing recorded today; includes litters whose only outstanding items are missed | now | one room; unit: litters |
 | **All** 全部 (lens `All {n}`) | litters | every litter in the room, including those not in the task | now | one room; unit: litters |
+| **Finished litter** 处理完毕的窝 | litters | a litter with nothing owed, nothing missed and no next dose: every configured treatment is done; sits in Later with `All treatments done` and its last record stamp (in Done on the day of that record) | now | one room |
 | **Coming up** 接下来 (block) | litters | on an empty Owed pile: litters whose next dose falls soonest, not tied to the Later count (a litter done today can appear here) | now | one room |
 | **Litters owing today** (lead figure) | litters | the Owed count | now | one room |
 | **Piglets on a row** | piglets | owed rows: piglets still needing the oldest dose named on line 1; castration counts males (`6 males`); partly-done rows print `{left} still owed` of the dose's population; Done and Later rows: alive | now | one litter |
@@ -86,8 +87,15 @@ Slice S1 (`room.html`). Owed, missed, open loss/gain and net drift keep the defi
 | **N records · check** (amber) | records | two or more records from different hands for one dose (possible double treatment); the flag lives on the litter page | until resolved | one litter |
 | **Open loss / gain on a row** | heads | appended last on line 2 of any row, whatever its state, including a litter not in the task (`loss 2 open` red, `gain 1 open` blue) | until explained | one litter |
 | **Net drift** | heads | open gains minus open losses, signed with unit (`−2 piglets`); printed only while both a gain and a loss are open | now | one room |
+| **Sow died** 母猪死亡 (chip) | litter | the litter's sow died; line 2 still shows what the litter owes, and the chip outranks `Farrowing not locked` | until weaning | one litter |
 | **Litter found by tag or notch** | piglets, litters | every piglet whose current identity row matches the full tag (6 digits), the last 4 digits of a tag, or a notch (`n-n`, separators trimmed); a notch may match several litters; a match outside this room prints its unit or `weaned` | as of the latest stamped change | all rooms; opens the litter with `&piglet=` |
 
 Recency words on a row come from the record's timestamp: `1h ago` under a day, `yesterday`, `N days ago` to six, the date from seven days.
 
 **Developer note: hold, then depart.** A row that a hand's record or a sync moves out of the current lens stays in place for 800ms of idle (any touch or scroll resets the timer), flashes `green-wash`, then leaves. The same law covers rows changed by another worker (`PP.sync`).
+
+**Missed, one term.** English `missed`, Chinese `已过处理期`, on the row, the filter and the `n litters missed a treatment ›` line.
+
+**On-time KPI (T-27) is not on the room.** The room shows what is owed now; the on-time share (marks on or before the planned day over scheduled marks, early counting as on time) is a task-level figure that belongs to the Task overview and End review (slice S9) and to the console. The room's header door `Task overview` leads there (`end.html?state=overview`); End task is never in the dock.
+
+**Registry exception.** If the string registry itself fails to load, the page prints one hard-coded English line and a Retry button, because there is nothing to look strings up in. It is the only unregistered visible text on the page.
