@@ -57,3 +57,51 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   reference task (`*-contract.html`, closure docs), not just the rulings file;
   or the config should name them.
 - **Cost:** low (caught before the user saw it).
+
+## 5 · Charting — the grilling asked for rulings the owner needed facts to make
+
+- **Stage:** Charting, grilling round 1.
+- **What happened:** the owner answered several questions with fact questions
+  of their own: do piglets that skip iron get it later? how do farms handle a
+  piglet fostered from an unprocessed litter into a processed one? are
+  farrowing sows individually housed, so multi-sow pens don't arise? The
+  research had most of these facts (domain.md A1, A5) but the questions
+  showed only options and a recommendation, not the practice behind them.
+  Three questions came back as "investigate first", costing a round.
+- **Why:** the grilling format carries options and a recommendation; nothing
+  in the skill says to put the domain fact that grounds each option in front
+  of the owner.
+- **Change:** each grilling question states the real-world practice it rests
+  on (one or two sourced lines) before the options. The research brief should
+  also ask "how do farms handle X today" for every open question, not only
+  "what do the sources say".
+- **Cost:** medium (a research round and a grilling round).
+
+## 6 · Charting — wayfinder is not invocable and there is no tracker doc
+
+- **Stage:** Charting, step 3.
+- **What happened:** the skill says to chart with Matt's `wayfinder`; the
+  plugin ships it with `disable-model-invocation`, so it is not in the
+  session's skill list, and the repo has no tracker doc
+  (`docs/agents/issue-tracker.md`) naming how sub-issues and blocking are
+  expressed. I read wayfinder's SKILL.md directly and used GitHub's native
+  sub-issues and `blocked_by` dependencies. Wayfinder's own rule — tickets are
+  *decisions*, "plan, don't do" — contradicts design-drive's "one ticket per
+  design slice"; the map's Notes override it explicitly.
+- **Change:** design-drive should either carry the map/ticket shape itself or
+  name the tracker operations; and say plainly that its tickets are build
+  slices, so wayfinder's decision-ticket rule is overridden.
+- **Cost:** low.
+
+## 7 · Charting — the map branch cannot be cut from `main`
+
+- **Stage:** Charting, map branch.
+- **What happened:** conventions say `map/<n>-<slug>` is cut from `main`, but
+  the design-system import, the design config and this map's research sit on
+  `design/piglet-processing-pilot`, 10 commits ahead of `main`. Cutting from
+  `main` would leave the map without its design system. Cut from the pilot
+  branch's head instead; the closing PR to `main` will carry those 10 commits.
+- **Change:** Start should end by landing the setup (import, config, doctor)
+  on `main`, or conventions should say the map branch is cut from wherever
+  the setup lives.
+- **Cost:** low now; the closing PR is larger to review.
