@@ -26,3 +26,22 @@ The two ways a surface is presented. A *drawer* rises over the page. A *page* ta
 - The header title (`sheet-title`, 20px).
 - The body content.
 - A footer with at most two actions, primary on the right.
+
+**States**
+- Default: the drawer over its `scrim`, or the page on the whole canvas. Both are static containers.
+- Pressed, disabled: these belong to the buttons and rows inside. A sheet has none of its own.
+- Focus: controls inside take the global 3px `focus` ring. The sheet itself takes none.
+- Error, loading, empty: not drawn. A sheet has no busy or failed presentation. Its body holds the empty line of whatever it contains.
+
+**Page presentation needs a positioned parent**
+`data-presentation="page"` draws the sheet as `position:absolute; inset:0; height:100%; max-height:100%`, with no radius or shadow, at `z-index:3`. It is therefore sized by its nearest positioned ancestor, and the drawer's percentage heights and the `scrim` are too. Give the screen root, the `.inspection-phone` or `.farrowing-phone` element, this CSS:
+
+```css
+.inspection-phone {
+  position: relative;   /* the containing block for .sheet and .scrim */
+  height: 100dvh;       /* a fixed height; percent heights resolve against it */
+  overflow: hidden;     /* nothing scrolls the root; .sheet-body scrolls */
+}
+```
+
+Without `position:relative` the page sheet fills the viewport or a far ancestor. Without a fixed height a percent-height drawer collapses to its content and the page sheet is only as tall as its parent. The preview uses a 460px root.
