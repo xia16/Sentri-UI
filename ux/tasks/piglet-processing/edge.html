@@ -36,18 +36,17 @@
   var UI = window.SentriUI, U = window.PPUI;
   var zh = PP.lang === 'zh';
 
-  // States: a crate of the shared fixture + UI state. Born, Alive, Dead, Owed and the sow's death are the ledger's
-  // (select.litter over fixtures.js); the birth litter weight is farrowing's fact, carried by the fixture (not in the ledger).
-  // [crate, typed draft, weight set meanwhile, pad open, options]
+  // States: a crate of the shared fixture + UI state. Born, Alive, Dead, Owed, the sow's death and the birth litter weight
+  // are the ledger's (select.litter; `farrowed` carries the weight set at Finish, `birth_weight` one recorded here, only
+  // when missing; a concurrent second is kept as a conflict). [crate, typed draft, fixture variant, pad open, options]
   var STATES = {
     'no-task': ['E01'], 'orphan': ['B01'], 'orphan-unlocked': ['D06'], 'prelock': ['D01'],
     'birth-weight-missing': ['C02'], 'birth-weight-entry': ['C02', '', null, true], 'birth-weight-typed': ['C02', '16.4', null, true],
-    'birth-weight-range': ['C02', '34.2', null, false], 'birth-weight-refused': ['C02', '99.9', null, true], 'birth-weight-set': ['C02', null, '16.4'],
-    'birth-weight-conflict': ['C02', '16.4', null, false, { conflict: true }], 'birth-weight-deadtap': ['C02', '16.4', null, true, { dead: 'full' }],
-    'birth-weight-saved': ['C02', null, '34.2', false, { saved: true }]
+    'birth-weight-range': ['C02', '34.2', null, false], 'birth-weight-refused': ['C02', '99.9', null, true], 'birth-weight-set': ['C02', null, 'c02-weight-set'],
+    // this phone's 16.4 synced after A.K had set 14.8 (farrowing's Edit, 09:38): the ledger keeps both, the first stands
+    'birth-weight-conflict': ['C02', null, 'c02-weight-conflict'], 'birth-weight-deadtap': ['C02', '16.4', null, true, { dead: 'full' }],
+    'birth-weight-saved': ['C02', null, 'c02-weight-saved', false, { saved: true }]
   };
-  // Another phone set the weight while this one typed (the conflict state): A.K, 09:38.
-  var LATE = { kg: '14.8', by: 'finish', at: '2026-09-29T09:38', who: 'A.K' };
   var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'no-task';
   var spec = STATES[name];
@@ -58,7 +57,7 @@
   var padOpen = !!spec[3];                                   // the docked Numpad is editing the Measure
   var padHint = '', padHintArgs = null;
   var opt = spec[4] || {};
-  var conflict = !!opt.conflict;                             // Save found a weight that was set meanwhile
+  var conflict = null;                                       // this phone's weight, kept as a conflict with one set meanwhile
   var saved = null;                                          // receipt after Save
   if (opt.dead === 'full') { padHint = 'pp.edge.weight.dead_places'; }
 
@@ -88,7 +87,7 @@
     return UI.facts(items, { columns: items.length === 3 ? 3 : 2 });
   }
   function owed() {
-    if (!L().inTask) return '';
+    if (!L().recordable) return '';
     var xs = view().owed;
     if (!xs.length) return '';
     return UI.rowGroup(xs.map(function (o) {
@@ -116,7 +115,7 @@
     out.push(facts());
     if (x.phase === 'locked') {
       out.push(U.tools(crate));
-      out.push(U.recordGroup({ crate: crate, why: x.inTask ? null : 'pp.edge.notask.why', today: TODAY }));
+      out.push(U.recordGroup({ crate: crate, why: x.recordable ? null : 'pp.edge.notask.why', today: TODAY }));
     }
     out.push(owed());
     if (x.phase === 'locked') out.push(UI.rowGroup(U.weightRow(weight, crate, TODAY)));
@@ -139,7 +138,7 @@
     var measure = UI.measure({ label: '', optional: '', value: draft, unit: 'kg', placeholder: '—', key: 'bw', active: padOpen, controls: 'bw-pad',
       tone: refused ? 'refused' : '', range: padOpen ? null : [+min, +max], hint: hint, strs: ms, args: margs });
     var cp = conflict ? '<div class="edge-conflict">' + UI.facts([{ label: '', value: '', meta: '', strs: { label: 'pp.edge.weight.conflict_label', value: 'pp.common.kg', meta: 'pp.edge.data.stamp' },
-        args: { value: { w: LATE.kg }, meta: { stamp: U.stamp(LATE.at, LATE.who, TODAY) } } }], { columns: 1 }) +
+        args: { value: { w: weight.kg }, meta: { stamp: U.stamp(weight.at, weight.who, TODAY) } } }], { columns: 1 }) +
       '<div class="edge-actions"><button type="button" class="button secondary" data-ds="Button" data-action="keep-theirs" data-str="pp.edge.weight.keep_theirs"></button>' +
       '<button type="button" class="button secondary" data-ds="Button" data-action="open-farrowing-edit" data-value="birth-weight" data-str="act.edit"></button></div></div>' : '';
     var pad = padOpen ? '<div class="edge-pad">' + UI.numpad({ decimals: 1, intLength: 2, value: draft, key: 'bw', id: 'bw-pad', hint: padHint ? ' ' : '',
@@ -176,27 +175,39 @@
     else if (a === 'close-weight') { if (padOpen && draft) padOpen = false; else drawer = false; padHint = ''; render(); }   // Back closes the pad first; the draft is kept
     else if (a === 'save-weight') {
       var val = UI.numpadCommit(draft, { decimals: 1 });
-      if (val == null || !(parseFloat(val) > 0) || parseFloat(val) > liveBorn() * 5) return;
-      if (name === 'birth-weight-conflict' && !weight) { conflict = true; padOpen = false; render(); return; }   // only when missing: never overwrite a weight set meanwhile
+      if (val == null || !(parseFloat(val) > 0) || parseFloat(val) > liveBorn() * 5 || conflict) return;
+      // only when missing: the ledger refuses a weight this phone saw set, and keeps one it could not have seen as a conflict
+      var r = store.commit({ type: 'birth_weight', litter: crate, kg: val });
+      if (!r.ok) { readWeight(); render(); return; }
+      readWeight();
+      if (conflict) { padOpen = false; render(); return; }
       var u = usual(liveBorn());
       saved = { w: val, out: parseFloat(val) < +u[0] || parseFloat(val) > +u[1], min: u[0], max: u[1] };
-      weight = { kg: val, by: 'here', at: TODAY + 'T09:42', who: window.PPFixtures.ME }; draft = ''; drawer = false; padOpen = false; render();
-    } else if (a === 'keep-theirs') { weight = LATE; draft = ''; conflict = false; drawer = false; padOpen = false; render(); }
+      draft = ''; drawer = false; padOpen = false; render();
+    } else if (a === 'keep-theirs') {
+      // keeping theirs withdraws this phone's weight: a stamped correction, the original kept
+      if (conflict) store.commit({ type: 'correction', target: conflict.event, void: true });
+      readWeight(); draft = ''; drawer = false; padOpen = false; render();
+    }
     else if (a === 'close') nav('room.html', { state: 'room', unit: qs.get('unit') });
     else if (a === 'open-dead') nav('dead.html', { state: 'dead', crate: crate, unit: qs.get('unit') });
     else if (a === 'open-move') nav('move.html', { state: 'move', crate: crate });
     else if (a === 'record-treatment') nav('litter.html', { state: 'litter', crate: crate, stay: 1, unit: qs.get('unit') });
     else document.documentElement.setAttribute('data-door', a + ':' + (b.dataset.value || ''));
   });
+  function readWeight() {
+    weight = L().birthWeight;
+    conflict = (L().birthWeightConflicts || []).filter(function (c) { return c.who === window.PPFixtures.ME; })[0] || null;
+    if (conflict) { drawer = true; draft = conflict.kg; }
+  }
   PP.ready.then(function () {
-    store = PP.open('base');
+    store = PP.open(spec[2] || 'base');
     TODAY = store.today;
     crate = qs.get('crate') || spec[0];
-    if (qs.get('sow')) Object.keys(window.PPFixtures.SOWS).forEach(function (c) { if (window.PPFixtures.SOWS[c].sow === qs.get('sow')) crate = c; });
+    if (qs.get('sow')) crate = store.crateOfSow(qs.get('sow')) || crate;
     SOW = store.sow(crate) || { sow: '', parity: 0, weight: null };
-    weight = SOW.weight;
-    if (spec[2]) weight = opt.saved ? { kg: spec[2], by: 'here', at: TODAY + 'T09:42', who: window.PPFixtures.ME } : { kg: spec[2], by: 'finish', at: '2026-09-28T14:52', who: 'G.H' };
-    if (opt.saved) { var u0 = usual(liveBorn()); saved = { w: spec[2], out: +spec[2] < +u0[0] || +spec[2] > +u0[1], min: u0[0], max: u0[1] }; }
+    readWeight();
+    if (opt.saved && weight) { var u0 = usual(liveBorn()); saved = { w: weight.kg, out: +weight.kg < +u0[0] || +weight.kg > +u0[1], min: u0[0], max: u0[1] }; }
     render();
   });
 })();

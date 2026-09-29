@@ -337,7 +337,8 @@
   }
   function dueAt(c, id) { var D = L(c).doses[id]; return D && D.status && D.status !== 'later'; }
   function askSection(dr) {
-    var src = source(), asks = (dr.asks || []).filter(function (id) { return dueAt(src, id); }), checks = Object.keys(dr.carry || {}).filter(function (id) { return dr.carry[id] === 'check' && !doseCfg(id).castration && dueAt(src, id); });
+    // the selector leaves out doses not yet due at the receiver
+    var asks = dr.asks || [], checks = Object.keys(dr.carry || {}).filter(function (id) { return dr.carry[id] === 'check' && !doseCfg(id).castration; });
     if (!asks.length) return '';
     var n = dr.n;
     var qs2 = asks.map(function (id) {
@@ -355,14 +356,14 @@
     return '<section class="mv-group">' + UI.heading({ title: '', description: checks.length ? '' : undefined, kind: 'section', level: 3, strs: head, args: hargs }) + qs2 + '</section>';
   }
   var KIND = { owed: 'owe', done: 'done', unknown: 'unknown', check: 'check' };
-  /* What the moved piglets carry, per dose due at the source — the ledger's packets (review) or the posted record's (receipt).
+  /* What the moved piglets carry, per dose due at the receiver — the ledger's packets (review) or the posted record's (receipt).
      Castration moves as a range of males: the source's males are known once it has a castration record, never which piglets. */
   function carrySection(rec, withEdit) {
     var groups = { owe: [], unknown: [], check: [], done: [] }, items = [];
-    Object.keys(rec.packets).forEach(function (id) { if (!doseCfg(id).castration && dueAt(rec.from, id) && KIND[rec.packets[id]]) groups[KIND[rec.packets[id]]].push(id); });
+    Object.keys(rec.packets).forEach(function (id) { if (!doseCfg(id).castration && dueAt(rec.to, id) && KIND[rec.packets[id]]) groups[KIND[rec.packets[id]]].push(id); });
     ['owe', 'unknown', 'check', 'done'].forEach(function (k) { if (groups[k].length) items.push(fact('pp.move.carry.l.' + k, null, 'pp.move.carry.doses', { doses: txList(groups[k]) })); });
     var cid = CFG.doses.filter(function (d) { return d.castration; })[0].id;
-    if (dueAt(rec.from, cid) && KIND[rec.packets[cid]]) {
+    if (dueAt(rec.to, cid) && KIND[rec.packets[cid]]) {
       var C = L(rec.from).doses[cid].castration, a = rec.aliveBefore;
       var lo = C ? Math.max(0, rec.n - (a - C.males)) : 0, hi = C ? Math.min(rec.n, C.males) : rec.n;
       items.push(fact('pp.move.carry.l.males', null, 'pp.move.carry.males_range.' + KIND[rec.packets[cid]], { lo: lo, hi: hi, n: rec.n }));
@@ -377,7 +378,7 @@
   }
   function rowOf(id) { var out = null; Object.keys(store.derived.litters).forEach(function (c) { L(c).identity.rows.forEach(function (r) { if (r.rowId === id) out = r; }); }); return out; }
   function deltas(from, to, delta, cover) {
-    cover = cover.filter(function (x) { return dueAt(from, x.dose) && x.hi > 0; });
+    cover = cover.filter(function (x) { return x.hi > 0; });
     var aMeta = delta.from[1] === 0 ? 'pp.move.delta.none_left' : cover.length ? 'pp.move.delta.check' : null;
     var aArgs = cover.length ? { text: cover.map(function (x) { return PP.t('pp.move.delta.range', { tx: txName(x.dose), lo: x.lo, hi: x.hi, of: x.of }); }).join(' · ') } : null;
     var bMeta = delta.to[0] === 0 ? 'pp.move.delta.keeps_day' : null;

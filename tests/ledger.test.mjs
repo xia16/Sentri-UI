@@ -1054,8 +1054,9 @@ test('END-a a mark stamped before End but applied after it is accepted, flagged 
   const afterStamp = b.treat('A02', 'iron3', 12, { at: on(5, '13:00'), seen: [f.id] });
   const d = run(b, TASKED(['A02']), 5);
   assert.equal(rejectedReason(d, before), undefined);
-  assert.equal(rejectedReason(d, afterStamp), 'task_ended');
-  assert.deepEqual(d.flags.filter((g) => g.kind === 'task').map((g) => [g.reason, g.events[0]]), [['arrived_after_end', before.id]]);
+  // done after End on a phone that had not seen End: kept, stamped, flagged (#19 ruling)
+  assert.equal(rejectedReason(d, afterStamp), undefined);
+  assert.deepEqual(d.flags.filter((g) => g.kind === 'task').map((g) => [g.reason, g.events[0]]), [['arrived_after_end', before.id], ['after_end', afterStamp.id]]);
   assert.equal(d.ended.event, end.id);
 });
 
@@ -1346,4 +1347,191 @@ test('property: concurrent records give the same owed in every permutation', () 
     }
     assert.equal(readings.size, 1, `seed ${seed}: ${JSON.stringify(recs)} ${[...readings]}`);
   }
+});
+
+// =============================================================================================
+// Round 4 — integration follow-ups (#19): rulings contradictions, then the gaps the pages worked around.
+
+const R4 = {
+  doses: [
+    { id: 'iron3', tx: 'iron', due: 3 },
+    { id: 'tail', tx: 'tail', due: 3, last: 4, visible: true },
+    { id: 'castrate', tx: 'castrate', due: 5, visible: true, castration: true },
+    { id: 'iron14', tx: 'iron', due: 14 }
+  ],
+  identity: { scheme: 'none' }
+};
+const R4T = (litters, extra) => Object.assign({}, R4, { task: Object.assign({ id: 'T', litters }, extra || {}) });
+
+test('R4-1 a dose due on or before the End day and never recorded counts as not on time', () => {
+  const b = book();
+  b.farrowed('A02', 12); b.farrowed('A05', 11);
+  for (const x of ['iron3', 'tail']) b.treat('A05', x, 11, { at: on(3) });
+  b.ev.push({ id: 'end', type: 'end_task', at: on(3, '12:00') });
+  const e = select.end(run(b, R4T(['A02', 'A05']), 3));
+  // A02: iron3 and tail due today, never recorded → not on time; A05 both on time; castration and iron14 not due
+  assert.deepEqual(e.atEnd.onTime, { n: 2, k: 4 });
+  assert.deepEqual(e.now.onTime, { n: 2, k: 4 });
+  // before End the overview still leaves due-today-unrecorded out
+  const b2 = book();
+  b2.farrowed('A02', 12);
+  assert.deepEqual(select.end(run(b2, R4T(['A02']), 3)).now.onTime, { n: 0, k: 0 });
+});
+
+test('R4-2 a treatment done after End on a phone that had not seen End is kept, stamped, flagged after_end', () => {
+  const b = book();
+  const f = b.farrowed('A02', 12);
+  const end = { id: 'end', type: 'end_task', at: on(5, '12:00') };
+  b.ev.push(end);
+  const off = b.treat('A02', 'iron3', 12, { at: on(5, '15:00'), seen: [f.id], who: 'L.M' });
+  const knew = b.treat('A02', 'tail', 12, { at: on(5, '15:05'), seen: [f.id, end.id] });
+  const d = run(b, R4T(['A02']), 5);
+  assert.equal(rejectedReason(d, off), undefined);
+  assert.equal(rejectedReason(d, knew), 'task_ended');
+  assert.deepEqual(d.flags.filter((g) => g.kind === 'task').map((g) => [g.reason, g.events[0]]), [['after_end', off.id]]);
+  const e = select.end(d);
+  assert.deepEqual(e.atEnd.byLitter.A02.find((x) => x.dose === 'iron3'), { dose: 'iron3', kind: 'owed', n: 12 });
+  assert.equal(e.now.byLitter.A02.find((x) => x.dose === 'iron3'), undefined);
+});
+
+test('R4-3 a correction after End that brings a dose to 0 shows in now, never in atEnd', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  const t = b.treat('A02', 'iron3', 10, { at: on(3), deferred: { n: 2, reason: 'weak' } });
+  b.ev.push({ id: 'end', type: 'end_task', at: on(5, '12:00') });
+  b.correction(t.id, { set: { n: 12, deferred: undefined }, at: on(6) });
+  const e = select.end(run(b, R4T(['A02']), 6));
+  // iron3 2 owed at End (tail's 12 missed stays in both)
+  assert.equal(e.atEnd.litters.A02.owed, 14);
+  assert.equal(e.now.litters.A02.owed, 12);
+  assert.equal(e.atEnd.byLitter.A02.find((x) => x.dose === 'iron3').n, 2);
+  assert.equal(e.now.byLitter.A02.find((x) => x.dose === 'iron3'), undefined);
+});
+
+test('R4-4 select.end gives per-litter totals', () => {
+  const b = book();
+  b.farrowed('S', 10); b.treat('S', 'iron3', 7, { deferred: { n: 3, reason: 'weak' } });
+  b.farrowed('A02', 10);
+  b.treat('A02', 'iron3', 8, { deferred: { n: 2, reason: 'weak' } });
+  b.move('S', 'A02', 1, { answers: { iron3: 'unknown' } });
+  const e = select.end(run(b, R4T(['A02', 'S']), 5));
+  // day 5: iron3 owed 2 + unknown 1; tail missed (window day 4) 11; castration due, males uncounted; iron14 not due 11
+  assert.deepEqual(e.now.litters.A02, {
+    done: 8, owed: 13, unknown: 1, missed: 11, notDue: 11, malesUncounted: true,
+    onTime: { n: 0, k: 2 }, excluded: 2, unfinished: true
+  });
+});
+
+test('R4-5 same tag within and across litters: identity.sameTag and per-row alsoOn; findId for a typed value', () => {
+  const b = book();
+  const f = b.farrowed('B04', 6); b.farrowed('A05', 6);
+  b.identity('B04', 'add', { rowId: 'B04-r8', tag: '004517' });
+  b.identity('A05', 'add', { rowId: 'A05-r3', tag: '004517' });
+  b.identity('A05', 'add', { rowId: 'A05-r1', tag: '000354' });
+  b.identity('A05', 'add', { rowId: 'A05-r9', tag: '000354', seen: [f.id] });      // a pair within the litter, offline
+  const d = run(b, IRON_ONLY);
+  const A = d.litters.A05.identity;
+  assert.deepEqual(A.sameTag.map((g) => [g.tag, g.rows.map((r) => r.litter + ':' + r.rowId).sort()]), [
+    ['004517', ['A05:A05-r3', 'B04:B04-r8']], ['000354', ['A05:A05-r1', 'A05:A05-r9']]]);
+  assert.deepEqual(A.rows.find((r) => r.rowId === 'A05-r3').alsoOn, [{ litter: 'B04', rowId: 'B04-r8' }]);
+  assert.equal(A.distinct, 2);
+  assert.equal(A.pairs, 1);
+  assert.deepEqual(select.findId(d, { tag: '004517' }, 'A05'), [{ litter: 'B04', rowId: 'B04-r8', status: 'alive' }]);
+});
+
+test('R4-6a birth litter weight: only when missing; a concurrent second is kept as a conflict', () => {
+  const b = book();
+  const f = b.farrowed('C02', 15, { stillborn: 1 }, { sow: { tag: '000462', parity: 4 } });
+  b.farrowed('A02', 13, {}, { birthWeight: '15.2', at: on(0, '18:05') });
+  const w1 = b.ev.push({ id: 'w1', type: 'birth_weight', litter: 'C02', kg: '16.4', at: on(1, '09:38'), who: 'A.K' }) && b.ev[b.ev.length - 1];
+  const again = { id: 'w2', type: 'birth_weight', litter: 'C02', kg: '17.0', at: on(1, '09:40'), who: 'G.H' };
+  const mine = { id: 'w3', type: 'birth_weight', litter: 'C02', kg: '16.9', at: on(1, '09:42'), who: 'G.H', seen: [f.id] };
+  b.ev.push(again, mine);
+  const d = run(b, IRON_ONLY, 1);
+  assert.deepEqual(d.litters.C02.sow, { tag: '000462', parity: 4 });
+  assert.equal(d.litters.A02.birthWeight.by, 'finish');
+  assert.equal(d.litters.C02.birthWeight.kg, '16.4');
+  assert.equal(d.litters.C02.birthWeight.event, w1.id);
+  assert.equal(rejectedReason(d, again), 'already_recorded');
+  assert.deepEqual(d.litters.C02.birthWeightConflicts.map((x) => [x.kg, x.event]), [['16.9', 'w3']]);
+  assert.deepEqual(d.flags.map((g) => g.reason), ['birth_weight_conflict']);
+});
+
+test('R4-6b weigh-day litter weight: one per weigh day, the later replaces and keeps history', () => {
+  const b = book();
+  b.farrowed('B04', 12);
+  b.ev.push({ id: 'lw1', type: 'litter_weight', litter: 'B04', kg: '15.9', at: on(3, '08:40'), who: 'L.M' });
+  b.ev.push({ id: 'lw2', type: 'litter_weight', litter: 'B04', kg: '16.1', at: on(3, '09:10'), who: 'G.H' });
+  b.ev.push({ id: 'lw3', type: 'litter_weight', litter: 'B04', kg: '57.5', at: on(21, '08:00'), who: 'G.H' });
+  const W = run(b, IRON_ONLY, 21).litters.B04.weights;
+  assert.deepEqual(W.map((x) => [x.day, x.kg, x.replaced.map((r) => r.kg)]), [[3, '16.1', ['15.9']], [21, '57.5', []]]);
+});
+
+test('R4-6c boar/gilt counts for piglets without a record are consumed by matching-sex records', () => {
+  const b = book();
+  b.farrowed('A02', 13, { stillborn: 1 });                                          // 12 alive
+  const sx = ['g', 'b', 'b', 'g', 'b'];
+  sx.forEach((s, i) => b.identity('A02', 'add', { rowId: 'r' + i, tag: '00430' + i, sex: s }));
+  b.ev.push({ id: 'sc', type: 'sex_counts', litter: 'A02', boars: 4, gilts: 3, at: on(3, '09:00'), who: 'G.H' });
+  b.identity('A02', 'add', { rowId: 'r6', tag: '004306', sex: 'b' });
+  b.identity('A02', 'add', { rowId: 'r7', tag: '004307', sex: 'b' });
+  let S = run(b, IRON_ONLY).litters.A02.sexCounts;
+  assert.deepEqual([S.saved.boars, S.saved.gilts, S.residualBoars, S.residualGilts, S.boars, S.gilts, S.unresolved], [4, 3, 2, 3, 7, 5, false]);
+  b.identity('A02', 'add', { rowId: 'r8', tag: '004308' });                          // unsexed: which bucket is unknowable
+  S = run(b, IRON_ONLY).litters.A02.sexCounts;
+  assert.equal(S.unresolved, true);
+  const over = { id: 'sc2', type: 'sex_counts', litter: 'A02', boars: 9, gilts: 0, at: on(3, '09:30') };
+  b.ev.push(over);
+  assert.equal(rejectedReason(run(b, IRON_ONLY), over), 'more_than_unidentified');
+});
+
+test('R4-7 the room counts collision records; moveDraft omits doses not yet due at the receiver', () => {
+  const b = book();
+  const f = b.farrowed('A05', 11);
+  b.treat('A05', 'iron3', 11, { seen: [f.id] }); b.treat('A05', 'iron3', 11, { seen: [f.id] });
+  b.treat('A05', 'iron3', 11, { seen: [f.id] });
+  const d = run(b, R4T(['A05']), 3);
+  assert.equal(select.room(d, { lens: 'all' }).rows[0].collide, 3);
+  const b2 = book();
+  b2.farrowed('S', 10);
+  b2.farrowed('R', 8, {}, { birthDate: on(2).slice(0, 10) });                        // day 1 at the receiver
+  const m = select.moveDraft(run(b2, R4, 3), { from: 'S', to: 'R', n: 1 });
+  assert.deepEqual(Object.keys(m.carry), []);
+  assert.deepEqual(m.asks, []);
+});
+
+test('R4-8 castration before its first record: selectors say males uncounted', () => {
+  const b = book();
+  b.farrowed('B01', 14, {}, { birthDate: on(-2).slice(0, 10) });                    // day 5
+  const d = run(b, R4T(['B01']), 3);
+  assert.equal(d.litters.B01.doses.castrate.males, 'uncounted');
+  assert.equal(select.room(d, { lens: 'owed' }).rows[0].doses.find((x) => x.dose === 'castrate').males, 'uncounted');
+  assert.equal(select.litter(d, 'B01').owed.find((x) => x.dose === 'castrate').males, 'uncounted');
+  assert.equal(select.end(d).now.byLitter.B01.find((x) => x.dose === 'castrate').males, 'uncounted');
+  b.castrate('B01', { castrated: 6 });
+  assert.equal(run(b, R4T(['B01']), 3).litters.B01.doses.castrate.males, 6);
+});
+
+test('R4-9 several tasks per config; a nurse sow outside any task can record her arrivals', () => {
+  const cfg = Object.assign({}, R4, { tasks: [{ id: 'T7', litters: ['A02', 'S'] }, { id: 'T8', litters: ['F02'] }] });
+  const b = book();
+  b.farrowed('A02', 12); b.farrowed('F02', 10); b.farrowed('S', 10); b.farrowed('D02', 12);
+  b.weaned('D02', { at: on(3, '07:00') });
+  const tF = b.treat('F02', 'iron3', 10);
+  b.ev.push({ id: 'end8', type: 'end_task', task: 'T8', at: on(3, '12:00') });
+  const afterF = b.treat('F02', 'tail', 10, { at: on(3, '13:00') });
+  const a02 = b.treat('A02', 'iron3', 12, { at: on(3, '13:00') });
+  b.move('S', 'D02', 3, { at: on(3, '13:10') });                                     // S did nothing yet: the arrivals owe
+  const nurse = b.treat('D02', 'iron3', 3, { at: on(3, '13:20') });
+  const more = b.treat('D02', 'tail', 3, { at: on(3, '13:25') });
+  const d = run(b, cfg, 3);
+  for (const e of [tF, a02, nurse]) assert.equal(rejectedReason(d, e), undefined, e.id);
+  assert.equal(rejectedReason(d, afterF), 'task_ended');
+  assert.equal(rejectedReason(d, more), undefined);                                  // tail is owed by the arrivals too
+  assert.equal(d.litters.F02.task, 'T8');
+  assert.equal(d.litters.D02.task, null);
+  assert.equal(select.end(d, { task: 'T8' }).atEnd.unfinishedLitters.length, 1);
+  assert.equal(select.end(d, { task: 'T7' }).atEnd, null);
+  const extra = b.treat('D02', 'iron3', 1, { at: on(3, '13:30') });
+  assert.equal(rejectedReason(run(b, cfg, 3), extra), 'no_task');
 });

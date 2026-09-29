@@ -116,6 +116,8 @@
   function counts(lv) {
     var xs = lv.filter(function (o) { return o.n != null && o.n > 0; });
     var unk = lv.filter(function (o) { return o.unknown > 0; }).map(function (o) { return T('pp.room.tok.unknown', { name: name(o.tx), n: o.unknown }, 'amber'); });
+    // castration before its first record: the ledger says males are uncounted
+    unk = lv.filter(function (o) { return o.males === 'uncounted'; }).map(function () { return T('pp.common.males_uncounted'); }).concat(unk);
     if (!xs.length) return unk;
     var same = xs.every(function (o) { return o.n === xs[0].n && castr(o) === castr(xs[0]); });
     if (same && xs.length === lv.length) return [castr(xs[0]) ? male(xs[0].n) : pig(xs[0].n)].concat(unk);
@@ -163,7 +165,7 @@
       s.l1 = T('pp.room.l1.finished');
       s.tok = f.lastRecord ? recToks(f) : [T('pp.common.unit.day', { n: f.day }), pig(f.alive)];
     }
-    if (f.collide) s.tok.push(T('pp.room.tok.collide', { n: f.collide + 1 }, 'amber'));
+    if (f.collide) s.tok.push(T('pp.room.tok.collide', { n: f.collide }, 'amber'));
     if (f.loss) s.tok.push(T('pp.room.tok.loss', { k: f.loss }, 'red'));
     if (f.gain) s.tok.push(T('pp.room.tok.gain', { k: f.gain }, 'blue'));
     return s;
