@@ -133,30 +133,38 @@ Recency words on a row come from the record's timestamp: `1h ago` under a day, `
 
 **Rail glyphs.** Every litter row ends in `›`, done rows included: RULINGS "Names and glyphs" reserves ✎ for editing a locked figure (one glyph, one meaning), and RULINGS outranks the README row law's ✎-when-done. This reverses the round-1 decline.
 
-## End task, the ended task and the weaning handoff (仔猪处理 · 结束任务)
+## End task, the ended task and the handoff to weaning (仔猪处理 · 结束任务)
 
-Slice S9 (`end.html`). *Unfinished litters* and *Unfinished piglet-doses* keep the definitions above (the not-yet-due line is provisional). A **treatment** here is one litter × one scheduled dose (the unit a mark is dated on); a **piglet-dose** (头次) is one piglet × one scheduled dose.
+Slice S9 (`end.html`). *Unfinished litters* and *Unfinished piglet-doses* keep the definitions above (the not-yet-due line is provisional). A **treatment** here is one litter × one scheduled dose (the unit a mark is dated on); a **piglet-dose** (头次) is one piglet × one scheduled dose. Every value prints its unit (`11 piglet-doses`, `6 of 9 litters`, `92 of 95 piglets`).
 
 | Term (zh) | Entity | Population | Time | Scope |
 |---|---|---|---|---|
-| **Done** 已处理 (progress, per-litter `done {n}`) | piglet-doses | piglets a Record marked for a scheduled dose (castration counts males) | cumulative to now | whole task / one litter |
-| **Owed** 待处理 (progress, per-litter `owed {n}`) | piglet-doses | Owed as defined above: due today, late or missed; red on a litter row when any of it is late | now | whole task / one litter; `{n} missed` is the missed part, shown inside it |
-| **Not yet due** 未到期 (progress, `ahead {n}`) | piglet-doses | scheduled doses whose due day-age is still ahead | now | whole task / one litter |
+| **Farrowing task open** 分娩任务尚未结束 (the guard) | the batch's farrowing task | the farrowing task of this batch, across all its units, not ended; a sow still farrowing is its detail, not the guard | now; rechecked on the final End | one batch |
+| **Unsaved drafts on this phone** 本机未保存的草稿 | drafts | death drafts and correction (Edit) drafts held on this phone for the task's litters, each with its route | now | this phone only (drafts never leave the device) |
+| **Done** 已处理 (progress, row `done {n}`) | piglet-doses | piglets a Record marked for a scheduled dose (castration counts males) | cumulative to now | whole task / one litter |
+| **Owed** 待处理 (progress, row `owed {n}`) | piglet-doses | Owed as defined above; the value is red on a row when any of it is late; `{n} of them missed` is its missed part | now | whole task / one litter |
+| **Not yet due** 未到期 | piglet-doses | scheduled doses whose due day-age is still ahead | now (review and receipt: at End) | whole task / one litter |
 | **Whole-task progress total** (`{n} piglet-doses`) | piglet-doses | Done + Owed + Not yet due | now | whole task |
-| **Identity done** 标识完成 (`{n} of {k}`) | litters | litters whose identity step is done under the farm's done rule | now | whole task; k = litters in the task |
-| **On-time treatments** 准时处理率 (`{n}%`, `{n} of {k} treatments`) | treatments | on time: recorded fully on or before the planned day (early counts as on time) ÷ treatments recorded or past their planned day (late, owed-late and missed count against; due today and not yet due are left out) | now in the overview; at End in the review and receipt | whole task. Not on the room |
-| **Late or missed** 延迟或已过处理期 | treatments | k − n of the on-time line | as above | whole task |
-| **Piglet deaths** 仔猪死亡 (outcomes) | piglets | deaths recorded in processing (farrowing's deaths belong to farrowing), crate codes listed | cumulative, task start to now (receipt: to End) | whole task |
-| **Piglets moved** 转移仔猪 | piglets | piglets carried by Move records inside the task, each move printed `from → to` | as above | whole task |
-| **Unexplained loss / gain** (outcomes, `{n} open`) | heads | open unexplained items, as on the room header | now (receipt: at End) | whole task |
+| **Identity done** 标识完成 (`{n} of {k} litters`) | litters | litters whose identity step is done under the farm's rule: every alive piglet identified, or a candidates farm's closed set | now | whole task |
+| **{n} unidentified** (row token) | piglets | alive piglets without a notch or tag, once the identity day has come | now | one litter |
+| **With work left** 仍有待处理 / **Only doses not yet due** 仅有未到期 | litters | the Unfinished litters split: owed or missed doses, or identity not done / nothing but doses not yet due | at End | one batch |
+| **On-time treatments** 准时处理率 (`{n}%`, `{n} of {k} scheduled treatments (litter × dose) due by today`) | treatments | on time: fully recorded on or before the planned day (early counts) ÷ treatments recorded or past their planned day. Overview: due today and later are left out (`{n} due today or later, left out`). At End: a dose due that day and never recorded counts as not on time; only not-yet-due are left out (`{n} not yet due at End, left out`) | now (overview) / at End (review, receipt) | whole task. Not on the room |
+| **Not on time** 不准时 | treatments | k − n of the on-time line | as above | whole task |
+| **Piglet deaths** 仔猪死亡 / **Piglets moved** 转移仔猪 | piglets | deaths recorded in processing (farrowing's are farrowing's) / piglets carried by Move records inside the task, each printed `from → to` | task start to now (receipt: to End) | whole task |
+| **Unexplained loss / gain** (`{n} piglets open`) | piglets | open unexplained items, as on the room header | now (receipt: at End) | whole task |
 | **Sow deaths** 母猪死亡 | sows | sows of the task's litters recorded dead | as above | whole task |
-| **Finished litters** 已完成的窝 (receipt) | litters | litters in the task that are not Unfinished litters | frozen at End | one batch |
-| **Not done at End** 结束时未完成 (`{name} · {n} not done`) | piglet-doses | the unfinished piglet-doses of one litter, final: `owed at End`, `window ended day n` (missed) or `not due at End` | frozen at End | one litter; after End they can no longer be recorded |
-| **Since End** 结束后的记录 | records | corrections (Edit) and identity rows written after End, stamped; they change the live litter, never the receipt | after End | whole task |
-| **Alive** 存活 (handed to weaning) | piglets | the ledger's Alive, summed | now, live (not the End snapshot) | whole task |
-| **Identified** 已标识 (handed to weaning, `{n} of {k}`) | piglets | identified alive piglets of k alive | now | whole task |
-| **Litter weights** 窝重 (handed to weaning, `{n} of {k}`) | litters | litters with a weigh-day litter weight | now | whole task; k = litters |
+| **Finished litters** 已完成的窝 | litters | litters in the task that are not Unfinished litters | frozen at End | one batch |
+| **Not done at End** 结束时未完成 (`{name} · {n} not done`) | piglet-doses | a litter's unfinished piglet-doses, final: `owed at End`, `window ended day n` or `not due at End`. Frozen at End, except piglets moved out after End, which leave it (`{n} moved out after End`) | frozen at End | one litter; can no longer be recorded |
+| **Arrived after End** (`{n} arrived after End · catch-up`) | piglets | piglets moved into an ended task's litter after End; the doses they owe stay recordable as catch-up (`{name} · {n} owed`) *(provisional)* | from the Move | one litter |
+| **Mark arrived after End** (`{n} mark arrived after End`) | records | a mark stamped before End that synced after it: accepted, counted, flagged (merge contract: flag, never drop); the receipt's figures stay as at End *(provisional)* | from its arrival | one litter |
+| **Correction after End** (`{name} {n} · correction after End`) | records | the fresh record a wrong-litter correction writes on the right litter after End, stamped as a correction *(provisional)* | from its stamp | one litter |
+| **Since End** 结束后的记录 | records | every record written after End: deaths, Set counts, Moves, Edits, wrong-litter corrections, identity rows, late-arriving marks | after End | whole task; newest first |
+| **Alive** 存活 (ended face, For weaning) | piglets | the ledger's Alive, summed | now, live (deaths and moves after End change it) | whole task / one litter |
+| **Identified** 已标识 (For weaning, `{n} of {k} piglets`) | piglets | identified alive piglets of k alive | now | whole task / one litter |
+| **Litter weights** 窝重 (For weaning, `{n} of {k} litters`) | litters | litters with a weigh-day litter weight; `{n} litters not yet at day 21` for those whose weigh day is still ahead | now | whole task; per litter `{kg} kg` or `weigh day 21 not yet due` |
 
-**Receipt figures describe the closure event.** Everything on the receipt is as at End; the litter records stay live, so the ended face (`Since End`, `{n} identified after End`, an amber corrected value) can differ from the receipt. The handoff to weaning reads the live ledger.
+**Receipt figures describe the closure event.** Everything on the receipt is as at End; the litter records stay live, so the ended face can differ from the receipt. For weaning reads the live ledger.
 
-**Mandatory changes words only.** `Mandatory · {n} litters unfinished` and `… will be reported not done` replace the plain lines; End is never blocked by it.
+**Mandatory changes words only.** `Mandatory · {n} litters unfinished` and `reported to the farm as not done` replace the plain lines; End is never blocked by it.
+
+**End is a shared-state commit.** After the hold the phone waits for the server's recheck (`Checking every litter`); offline, End is refused (`End needs a connection`); a change found by the recheck is said in one line (`Figures changed while you held · review again`) and the review shows again. The task can't be reopened *(provisional, map ledger)*.
