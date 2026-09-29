@@ -22,8 +22,8 @@
 .dd-bar { flex-wrap: wrap; justify-content: space-between; column-gap: var(--space-section); }
 .dd-bar > .primary, .dd-bar > .danger { flex: 1; }
 .dd-pointer { display: flex; flex-direction: column; align-items: flex-start; }
-/* the drawer header: the title line wraps under Clear at 360 instead of running into it */
-.dd-grab .st-heading-aside { max-width: none; }
+/* the drawer header: Clear sits low, beside the entry's line — never up against the litter face's day line behind it (360) */
+.dd-grab .st-heading-aside { max-width: none; align-self: flex-end; }
 .dd-grab .st-heading-description .st-status { margin-left: var(--space-row-y); }
 /* the photo viewer: one photo, full width (a stand-in frame: the prototype has no camera) */
 .dd-photo { display: grid; place-items: center; width: 100%; aspect-ratio: 3 / 4; border-radius: var(--radius-inset); background: var(--well); color: var(--muted); font-family: var(--font-mono); font-size: var(--type-button-size); }
@@ -383,9 +383,9 @@
   // The photo viewer: one photo; Delete only while drafting (always, here: nothing saved is shown on this page), 24px from Back.
   function viewer() {
     var v = S.viewer, list = S[v.key].photos, i = list.map(function (p) { return p.id; }).indexOf(v.id);
-    return '<div class="scrim" data-action="viewer-back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
+    return '<div class="scrim" data-dismiss-viewer></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
       '<header class="utility-header">' + UI.heading({ title: '', description: '', kind: 'page', level: 3, strs: { title: 'pp.dead.photo.title', description: 'pp.dead.photo.sub' }, args: { title: { n: i + 1, m: list.length } } }) + '</header>' +
-      '<div class="sheet-body"><div class="dd-photo" role="img" data-str-attr="aria-label:ds.c2.aria.thumb" data-args=\'{"n":' + (i + 1) + '}\' aria-label="' + U.esc(PP.t('ds.c2.aria.thumb', { n: i + 1 })) + '">' + (i + 1) + '</div></div>' +
+      '<div class="sheet-body"><div class="dd-photo" role="img" data-str-attr="aria-label:ds.c2.aria.thumb" data-args=\'{"n":' + (i + 1) + '}\' aria-label="' + U.esc(PP.t('ds.c2.aria.thumb', { n: i + 1 })) + '">' + span('ds.c2.photos.index', { n: i + 1 }) + '</div></div>' +
       '<footer class="sheet-footer dd-viewer-bar">' + btn('viewer-back', 'act.back', 'secondary') + btn('photo-delete', 'pp.dead.photo.delete', 'danger') + '</footer></section>';
   }
   // Re-render keeps the body's scroll and the focused control (a requirement of the shared component).
@@ -480,6 +480,7 @@
 
   var screen = document.getElementById('screen');
   screen.addEventListener('click', function (ev) {
+    if (ev.target.closest('[data-dismiss-viewer]')) { var v0 = S.viewer; S.viewer = null; if (v0) S.focus = '[data-action="photo-view"][data-value="' + v0.id + '"]'; render(); return; }
     if (ev.target.closest('[data-dismiss]')) { if (S.picking || !S.viewer) { keep(); leave(''); } return; }   // scrim = Back
     var b = ev.target.closest('[data-action]');
     if (!b) return;

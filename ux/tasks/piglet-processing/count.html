@@ -255,8 +255,9 @@
   }
   /* The same body recorded twice (RULINGS round 3): the second allocation of one missing piglet is held — Dead and
      Alive stay — until a worker answers one body (the duplicate is withdrawn) or two (a second death). */
+  function heldOpen() { return (L().held || []).filter(function (h) { return !h.resolved; }); }
   function heldSection() {
-    var x = L(), held = (x.held || []).filter(function (h) { return !h.resolved; });
+    var x = L(), held = heldOpen();
     if (!held.length) return '';
     return held.map(function (h) {
       var first = null;
@@ -338,7 +339,7 @@
       strs: { label: 'pp.count.seen', value: 'ds.field.figure', hint: h.id, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { label: { code: crate }, hint: h.args } });
     // the size is reserved once the count is below alive on a litter with tagged piglets, so the roster never makes it jump
-    var long = d.roster.length && S.observed < d.base;
+    var long = (d.roster.length && S.observed < d.base) || sanity(d) === 'zero' || heldOpen().length > 0;
     var size = long ? ' data-size="long"' : ' data-size="medium" data-sizing="content"';
     var sub = d.open.loss || d.open.gain ? span(pl('pp.count.sub_open', x.alive), { code: crate, ap: np(x.alive), op: np(d.open.loss || d.open.gain), what: PP.t(d.open.loss ? 'pp.count.sub_missing' : 'pp.count.sub_extra') })
       : span('pp.count.sub', { code: crate, ap: np(x.alive), day: x.dayAge });
