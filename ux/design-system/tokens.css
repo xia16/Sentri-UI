@@ -37,6 +37,8 @@
   --count-surface: #eff8f1;
   --count-ink: #203d2b;
   --count-key: #28734b;
+  --ink-2: #465143;
+  --amber-wash-strong: #f6e7bf;
   --scrim: #37402c24;
   --dialog-backdrop: #20271f55;
   --space-gutter: 18px;
@@ -74,6 +76,19 @@
   --glyph-pad: 20px;
   --caret-width: 2px;
   --status-dot: 4px;
+  --radio-size: 20px;
+  --radio-dot: 10px;
+  --ring-width: 2px;
+  --ring-width-fine: 1.5px;
+  --radio-row-min: 60px;
+  --photo-tile: 56px;
+  --row-code-min: 40px;
+  --row-chip-max: 96px;
+  --type-weight-strong: 700;
+  --hold-sweep-opacity: 0.35;
+  --hold-caption-opacity: 0.85;
+  --hold-commit: 850ms;
+  --hold-arm: 5000ms;
   --drawer-compact-max: 42%;
   --drawer-short-max: 58%;
   --drawer-medium-max: 76%;
@@ -98,5 +113,6 @@
   --type-figure-lg-size: 27px;
   --type-figure-size: 21px;
   --type-identifier-size: 12px;
+  --type-identifier-strong-size: 12px;
   --type-overline-size: 10px;
 }

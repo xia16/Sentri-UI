@@ -4,7 +4,7 @@ import json, pathlib
 root = pathlib.Path(__file__).resolve().parent.parent / "ux" / "design-system"
 t = json.loads((root / "tokens.json").read_text(encoding="utf-8"))
 lines = []
-for group in ("color", "spacing", "radius", "shadow", "size", "drawer"):
+for group in ("color", "spacing", "radius", "shadow", "size", "weight", "opacity", "motion", "drawer"):
     for tok in t.get(group, {}).get("tokens", []):
         lines.append(f"  --{tok['name']}: {tok['value']};")
 fam = t.get("type", {}).get("families", {})

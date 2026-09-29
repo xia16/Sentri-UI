@@ -27,3 +27,14 @@ Call `SentriUI.log(groups, { empty })`. `groups` is a list of `{ label, entries:
 
 **Strings**
 Per group `strs: { label }`, per entry `strs: { category, title, detail, meta }`, each with an `args` twin; the empty line takes `strs: { empty }` in the options. Without `strs` the output is unchanged.
+
+## Candidate addition ([ADR 0002](../../adr/0002-candidates-2.md))
+
+**Status: candidate.** A group may carry `description`: one `muted` 11px line under its label that says what the whole group means (`Since End` over `Kept and stamped; the ended figures do not change`). It uses the Heading's description slot, so nothing new is drawn.
+
+**Component contract**
+- **Props:** `log(groups, { empty, className, strs, args })`, where each group is `{ label, description, entries, strs: { label, description }, args }` and each entry is `{ title, detail, meta, category, extraHtml, strs, args }`.
+- **Events:** none; entries hold no actions.
+- **Slots:** the group label and description, and the entry text; `extraHtml` is the one raw slot.
+
+Without `description` the output is unchanged.

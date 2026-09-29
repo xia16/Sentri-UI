@@ -102,3 +102,16 @@ Call `SentriUI.numpad({ label, value, unit, placeholder, suggested, decimals, ma
 - Running-list items take `{ text, tone, strs: { text }, args: { text } }`: `ds.field.numpad.recent`, or `.recent_dup` for a warned line.
 - Status actions take `{ label, action, strs: { label }, args }`: `ds.field.numpad.use_suggestion`, `Use {tag}`, kind `pointer`, because "Use" is not a registered verb.
 - Hint copy: `ds.field.numpad.suggested`, `.duplicate`, `.short`, `.dead_full`, `.dead_places`, `.dead_empty`, `.dead_scan`, `.weight_range`.
+
+## Candidate addition ([ADR 0002](../../adr/0002-candidates-2.md))
+
+**Status: candidate.** `compact: true` is the run without its three-line running list.
+- Use it for a run that must fit one 360 × 740 phone with a field above the pad (the tag and weigh run with the sex field).
+- The host speaks the last record in the status line instead (`Last 000257 · 1.51 kg`, with a text action such as `Edit piglet 4`).
+- The status line keeps its reserved `touch-min` height, so the keys still never move.
+- The readout, the keys and the event contract are unchanged.
+
+**Component contract**
+- **Props:** as above, plus `compact`.
+- **Events:** each key is `<button data-action="<action, default numpad>" data-value="<key>" data-key="0–9 | . | back">`, and each status-line text action has its own `data-action`.
+- **Slots:** the readout label, the status line (text and text actions), and the running list (absent when `compact`).

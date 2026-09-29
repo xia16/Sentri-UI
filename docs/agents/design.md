@@ -53,6 +53,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-id-id-pair", "url": "ux/tasks/piglet-processing/id.html?state=id-pair", "strict": true },
     { "name": "pp-id-litter-weight-consumed", "url": "ux/tasks/piglet-processing/id.html?state=litter-weight-consumed", "strict": true },
     { "name": "ds-field-cards", "url": "ux/design-system/components/field-cards-demo.html", "strict": true },
+    { "name": "ds-candidates-2", "url": "ux/design-system/components/candidates-2-demo.html", "strict": true },
     { "name": "pp-dead-dead", "url": "ux/tasks/piglet-processing/dead.html?state=dead", "strict": true },
     { "name": "pp-dead-dead-tallied", "url": "ux/tasks/piglet-processing/dead.html?state=dead-tallied", "strict": true },
     { "name": "pp-dead-dead-draft", "url": "ux/tasks/piglet-processing/dead.html?state=dead-draft", "strict": true },

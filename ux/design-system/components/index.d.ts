@@ -53,21 +53,35 @@ export interface Fact {
 }
 
 export interface RowProps {
-  title: string;
-  description?: string;
+  /** A string, or (candidate, ADR 0002) a token list with colour on the value: `[[{text:'Overdue'},{text:'3 days',tone:'red'}]]`. */
+  title: string | Token[];
+  /** A string, or (candidate) a token list the row draws with `·` between tokens — the row law's line 2. */
+  description?: string | Token[];
   /** 18px icon in a 34px tinted tile. */
   icon?: IconHtml;
   /** When set the row is a <button data-action> with a chevron; otherwise a static <div>. */
   action?: string;
   value?: string;
   disabled?: boolean;
-  /** Trusted HTML before the chevron (a status word, a count). */
-  trailing?: string;
+  /** Before the rail: a typed word ({ text, tone }). A plain string is legacy trusted HTML (with strs.trailing, escaped text). Not with chip. */
+  trailing?: string | Exclude<Part, string>;
+  /** Candidate: the right end. auto (default): a chevron when action is set · chevron · edit (✎, a done row whose tap opens Edit) · none. */
+  trail?: 'auto' | 'chevron' | 'edit' | 'none';
   attrs?: SafeAttrs;
   className?: string;
-  /** With strs.trailing, `trailing` is escaped fallback text rather than trusted HTML. */
-  strs?: Strs<'title' | 'description' | 'trailing'>;
-  args?: StrArgs<'title' | 'description' | 'trailing'>;
+  /** Candidate: a leading mono identifier (crate `A02`) at `identifier-strong`, in a `row-code-min` column. Not with icon. */
+  code?: string;
+  /** Candidate: line 2 set in mono (the row law). */
+  mono?: boolean;
+  /** Candidate: the row's one status chip (a Status word). Not with trailing. */
+  chip?: StatusProps;
+  /** Candidate: title and description wrap instead of truncating (evidence lines, long mono tokens). */
+  wrap?: boolean;
+  /** Token parts join without spaces (zh strings that carry none). */
+  tight?: boolean;
+  id?: string;
+  strs?: Strs<'title' | 'description' | 'trailing' | 'code'>;
+  args?: StrArgs<'title' | 'description' | 'trailing' | 'code'>;
 }
 
 export interface LogEntry {
@@ -81,7 +95,8 @@ export interface LogEntry {
   strs?: Strs<'category' | 'title' | 'detail' | 'meta'>;
   args?: StrArgs<'category' | 'title' | 'detail' | 'meta'>;
 }
-export interface LogGroup { label?: string; entries: LogEntry[]; strs?: Strs<'label'>; args?: StrArgs<'label'> }
+/** description (candidate, ADR 0002): one muted line under the group label. */
+export interface LogGroup { label?: string; description?: string; entries: LogEntry[]; strs?: Strs<'label' | 'description'>; args?: StrArgs<'label' | 'description'> }
 
 export interface Category { id: string; label: string; disabled?: boolean; strs?: Strs<'label'>; args?: StrArgs<'label'> }
 export interface CategoryFooterProps {
@@ -124,11 +139,15 @@ export type PickerOption = [string, string, string?, string?, { strs?: Strs<'lab
 export interface ChoiceRowProps {
   label: string;
   meta?: string;
-  /** navigate: chevron · single: check when selected · multi: checkbox. */
-  mode?: 'navigate' | 'single' | 'multi';
+  /** navigate: chevron · single: check when selected · multi: checkbox · radio (candidate): a visible ring, role=radio. */
+  mode?: 'navigate' | 'single' | 'multi' | 'radio';
   action?: string;
   value?: string;
   selected?: boolean;
+  /** Candidate: the label is an identifier, set in mono (crate codes, ear tags). */
+  mono?: boolean;
+  /** radio only: the roving tab stop (0) or not (-1). */
+  tabindex?: 0 | -1;
   attrs?: SafeAttrs;
   className?: string;
   strs?: Strs<'label' | 'meta'>;
@@ -251,6 +270,8 @@ export interface FieldAction { label: string; action: string; value?: string; st
 /** Candidate. 1–9 · [. or gap] 0 ⌫; keys are `<button data-action data-value=key data-key="0-9|.|back">`.
  *  No commit key: the surface's bar primary commits. Keys never move. */
 export interface NumpadProps {
+  /** Candidate (ADR 0002): a run without the running list; the host speaks the last record in the status line. */
+  compact?: boolean;
   /** The readout's label ("Piglet 5 of 11 · ear tag"); omit for keys only, under a Measure. */
   label?: string;
   /** The typed string — always a string (tags keep leading zeros). */
@@ -291,7 +312,221 @@ export type NumpadKey = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9
 export type NumpadInputKey = NumpadKey | 'suggestion';
 export interface NumpadLimits { decimals?: number; maxLength?: number; intLength?: number }
 
+/* ---- Design-system candidates 2 (candidate, ADR 0002) ---- */
+export type Tone = 'amber' | 'progress' | 'green' | 'red' | 'muted';
+/** A piece of a line. tone colours this part only (the value, at 600); mono sets it in IBM Plex Mono. */
+export type Part = string | { text: string; tone?: Tone; mono?: boolean; strs?: Strs<'text'>; args?: StrArgs<'text'> };
+/** A token: one part, or a word and its value as a list of parts. Tokens with sep 'dot' are joined by a real `·` text node. */
+export type Token = Part | Part[];
+/** Status · word: a coloured state word with a 4px dot. */
+export interface StatusProps { text: string; tone?: Tone; id?: string; className?: string; strs?: Strs<'text'>; args?: StrArgs<'text'> }
+export interface StatusLineOptions {
+  /** A persistent role=status region, mounted empty: its content waits in a <template> until liveFill() or announce(). */
+  live?: boolean;
+  /** 'dot' puts `·` between tokens. */
+  sep?: 'dot' | '';
+  mono?: boolean;
+  tight?: boolean;
+  id?: string;
+  className?: string;
+}
+export interface BannerProps {
+  /** danger: red wash and border, red 700 headline (an irreversible act, a terminal fact).
+   *  correction: `amber-wash-strong` with an `amber` border (Edit). */
+  tone?: 'danger' | 'correction';
+  headline: string;
+  /** The mono line under the headline: what it costs, or the stamp. */
+  consequence?: string;
+  /** correction: the live change summary (`stillborn 1 → 0`), tokens with the corrected values amber. After Clear: `Cleared` with Undo. */
+  summary?: string | Token[] | null;
+  /** Text actions on the summary row (Clear; after it, Undo). */
+  actions?: FieldAction[];
+  /** No summary: the banner itself is the one live region (it appears in answer to a choice). */
+  live?: boolean;
+  /** Stable id; the summary region is `<id>-summary`. */
+  id?: string;
+  className?: string;
+  strs?: Strs<'headline' | 'consequence' | 'summary'>;
+  args?: StrArgs<'headline' | 'consequence' | 'summary'>;
+}
+/** pending: this photo waits to upload (an amber dot on the tile, and its spoken label says so). */
+export interface PhotoItem { id?: string; src?: string; alt?: string; pending?: boolean }
+export interface PhotosProps {
+  label?: string;
+  optional?: string;
+  /** The count and upload state beside the label: `3 attached · 1 waiting to upload`. */
+  count?: Token | Token[] | null;
+  /** false: nothing to attach to yet; the camera is floor-gray (aria-disabled, data-reason="inactive"), its tap answered. */
+  active?: boolean;
+  items?: PhotoItem[];
+  /** Default 12; at max the camera grays the same way (data-reason="full"). */
+  max?: number;
+  /** Default 'photo-add'. */
+  action?: string;
+  /** Default 'photo-view': a thumbnail opens the viewer (where Delete lives, while drafting only). */
+  viewAction?: string;
+  key?: string;
+  /** The answer line under the header row (role=status, always mounted). */
+  hint?: string;
+  /** denied (camera permission) · too-large: the card's own registered message, amber (it wins over hint). cancelled: nothing is said. */
+  error?: '' | 'denied' | 'too-large' | 'cancelled';
+  /** Stable id: the camera is `<id>-camera`, thumbnails `<id>-thumb-<n>`. */
+  id?: string;
+  className?: string;
+  /** camera, thumb and thumbPending are aria-labels (thumb gets {n}); index is a thumbnail's fallback number. */
+  strs?: Strs<'label' | 'optional' | 'hint' | 'camera' | 'thumb' | 'thumbPending' | 'index'>;
+  args?: StrArgs<'label' | 'optional' | 'hint' | 'camera'>;
+}
+export type ButtonRegister = 'primary' | 'secondary' | 'tool' | 'text' | 'danger' | 'end-early';
+export interface ButtonProps {
+  label: string;
+  /** primary: the one commit (ink) · secondary: an exit (outlined) · tool: a mid-sheet act (soft well, no border) ·
+   *  text: the bare word (13/700 `ink-2`, ≥44px, no container) · danger · end-early. Default secondary; unknown values warn in dev. */
+  register?: ButtonRegister;
+  action?: string;
+  value?: string;
+  /** The waiting face: aria-disabled (never disabled), focusable; guard() answers the tap. Every register, text included. */
+  waiting?: boolean;
+  /** Sent, until the host settles: aria-disabled + aria-busy (a row's one-tap after its first tap). */
+  busy?: boolean;
+  /** The id of the buttonReason that says why it waits. */
+  describedby?: string;
+  labelledby?: string;
+  id?: string;
+  attrs?: SafeAttrs;
+  className?: string;
+  strs?: Strs<'label'>;
+  args?: StrArgs<'label'>;
+}
+/** unknown: the answer never came — terminal; the act is never offered again from this button. */
+export type HoldPhase = 'idle' | 'holding' | 'armed' | 'pending' | 'done' | 'unknown';
+export interface HoldButtonProps {
+  label: string;
+  /** The idle line under the verb (`Hold to end`); holdBind swaps it per cue and restores it on every idle transition. */
+  caption?: string;
+  action?: string;
+  value?: string;
+  /** danger (default; an ink sweep) or primary (Lock; a paper sweep), both at `hold-sweep-opacity`. */
+  tone?: 'danger' | 'primary';
+  phase?: HoldPhase;
+  /** Waiting: aria-disabled; a press is answered (guard + onRefused), never held. */
+  waiting?: boolean;
+  /** The reason a waiting hold waits. */
+  describedby?: string;
+  /** A status line outside the thumb's footprint (above the bar) that echoes the progress. */
+  statusId?: string;
+  id?: string;
+  className?: string;
+  strs?: Strs<'label' | 'caption'>;
+  args?: StrArgs<'label' | 'caption'>;
+}
+export type HoldCue = null | 'keep' | 'tap' | 'released' | 'disarmed' | 'again' | 'early' | 'pending' | 'done' | 'failed' | 'unknown';
+export type HoldEvent = 'down' | 'leave' | 'cancel' | 'blur' | 'escape' | 'elapsed' | 'timeout'
+  | { type: 'up'; held: number } | { type: 'key'; at: number; repeat?: boolean } | { type: 'settle'; outcome: 'done' | 'failed' | 'unknown' };
+export interface HoldBindOptions {
+  selector?: string;
+  /** Default: the `--hold-commit` token (850ms). */
+  ms?: number;
+  /** Default: the `--hold-arm` token (5000ms). */
+  armMs?: number;
+  /** The least time between arming and the committing press (400ms). */
+  minArm?: number;
+  /** Pointer slop before a hold counts as left (20px). */
+  slop?: number;
+  /** Cue → string id for the caption and the status line. */
+  cues?: Partial<Record<Exclude<HoldCue, null>, string>>;
+  t?: (id: string) => string;
+  /** navigator.vibrate: 40ms on commit, [15, 60, 15] on release. Default true. */
+  vibrate?: boolean;
+  onPhase?: (el: HTMLElement, phase: HoldPhase, cue: HoldCue) => void;
+  onCommit?: (el: HTMLElement) => void;
+  onRefused?: (el: HTMLElement) => void;
+  now?: () => number;
+}
+export interface RadioOption { value: string; label: string; meta?: string; /** Latin and digit codes only (warns in dev otherwise). */ mono?: boolean; strs?: Strs<'label' | 'meta'>; args?: StrArgs<'label' | 'meta'> }
+export interface ChoiceRadiosProps {
+  label: string;
+  /** Makes the field optional: while a value is chosen, a `Clear` text action (data-action "<action>-clear") shows. */
+  optional?: string;
+  options: RadioOption[];
+  selected?: string;
+  /** Default 'choose'. */
+  action?: string;
+  /** Written as data-field. */
+  key?: string;
+  /** rows (default): 60px ChoiceList rows with a visible radio. inline: label left, two or three short options right, one row. */
+  layout?: 'rows' | 'inline';
+  lead?: string;
+  /** The Clear label (default "Clear"). */
+  clear?: string;
+  /** Stable id; Clear is `<id>-clear`. */
+  id?: string;
+  className?: string;
+  strs?: Strs<'label' | 'optional' | 'clear'>;
+  args?: StrArgs<'label' | 'optional'>;
+}
+/** The shared row fields (row, rowSelect, rowAction). */
+export interface RowCopyProps {
+  title: string | Token[];
+  description?: string | Token[];
+  /** A leading mono identifier (crate `A02`) at `identifier-strong`, in a `row-code-min` column. Not with an icon. */
+  code?: string;
+  /** Line 2 in mono (the row law). */
+  mono?: boolean;
+  /** The row's one status chip (a Status word). Not with trailing. */
+  chip?: StatusProps;
+  /** Title and line 2 wrap instead of truncating. */
+  wrap?: boolean;
+  tight?: boolean;
+  id?: string;
+  className?: string;
+  attrs?: SafeAttrs;
+  strs?: Strs<'title' | 'description' | 'code'>;
+  args?: StrArgs<'title' | 'description' | 'code'>;
+}
+export interface RowSelectProps extends RowCopyProps { checked?: boolean; /** Default 'select'. */ action?: string; value: string }
+export interface RowActionProps extends RowCopyProps {
+  /** The door (the copy, with an inline ›). */
+  action: string;
+  value?: string;
+  /** The one-tap. Named by its label plus the row title. busy: the pending face until the host settles. */
+  act: ButtonProps;
+}
+
 export interface SentriUI {
+  status(props: StatusProps): string;
+  statusLine(tokens: Token[], options?: StatusLineOptions): string;
+  /** The tokens as HTML, for announce() into a region the host holds. */
+  statusText(tokens: Token[], options?: { sep?: 'dot' | ''; tight?: boolean }): string;
+  /** Clear a live region, then set it (default after 60ms), so the change is announced. */
+  announce(el: Element, html: string, options?: { delay?: number; then?: (el: Element) => void }): void;
+  /** Fill every empty live region under scope from its <template> (call once after inserting card markup). */
+  liveFill(scope: Element, options?: { delay?: number; then?: (el: Element) => void }): void;
+  banner(props: BannerProps): string;
+  photos(props: PhotosProps): string;
+  button(props: ButtonProps): string;
+  /** The persistent status line (row-title size) that says why a waiting button waits. */
+  buttonReason(props: { text?: string; id?: string; actions?: FieldAction[]; className?: string; strs?: Strs<'text'>; args?: StrArgs<'text'> }): string;
+  /** For delegated clicks: true when the control is aria-disabled; answers it (its reason lines flash and re-announce). */
+  guard(el: Element | null, options?: { answer?: boolean; flash?: number }): boolean;
+  /** Focus target only if focus is still inside leaving (a banner at its Undo timeout); returns whether it moved focus. */
+  handFocus(leaving: Element, target: HTMLElement | null): boolean;
+  holdButton(props: HoldButtonProps): string;
+  /** The hold's rules: commit is true exactly once; repeats are ignored; a second press sooner than minArm is 'early'. */
+  /** A press past armedAt + arm is a fresh first press (re-arms, never commits). */
+  holdStep(state: { phase?: HoldPhase; armedAt?: number | null }, event: HoldEvent, options?: { minArm?: number; arm?: number }): { phase: HoldPhase; armedAt: number | null; commit: boolean; cue: HoldCue };
+  /** Wires every hold under root; owns data-phase, aria-disabled and aria-busy. */
+  holdBind(root: Element, options?: HoldBindOptions): { settle(el: Element, outcome: 'done' | 'failed' | 'unknown'): HoldPhase; destroy(): void };
+  readonly HOLD: { commit: number; arm: number; minArm: number; slop: number; vibrateCommit: number; vibrateRelease: number[] };
+  choiceRadios(props: ChoiceRadiosProps): string;
+  /** The radio keyboard model: the value the key moves to, or null. */
+  radioNext(values: string[], current: string, key: string): string | null;
+  /** Arrow keys select and focus inside every radiogroup under root; onChange re-renders. */
+  radioBind(root: Element, options?: { onChange?: (field: string, value: string) => void }): { destroy(): void };
+  rowSelect(props: RowSelectProps): string;
+  rowAction(props: RowActionProps): string;
+  /** From a 'change' event on a rowSelect: { value, checked, action }, or null. */
+  rowSelectChange(event: Event | { target: unknown }): { value: string; checked: boolean; action: string } | null;
   stepper(props: StepperProps): string;
   measure(props: MeasureProps): string;
   numpad(props: NumpadProps): string;
@@ -317,7 +552,8 @@ export interface SentriUI {
   pickerOptions(props: { options: PickerOption[]; selected?: string; action?: string; className?: string }): string;
   chooserList(content: string, options?: { tone?: 'flat' | 'inset'; className?: string; ds?: string }): string;
   choiceRow(props: ChoiceRowProps): string;
-  choiceGroup(rows: string | string[], options?: { title?: string; lead?: string; className?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
+  /** radio (candidate): the panel is a radiogroup labelled by the heading. */
+  choiceGroup(rows: string | string[], options?: { title?: string; lead?: string; className?: string; radio?: boolean; /** Raw HTML at the heading's right end (a radio field's Clear). */ aside?: string; id?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
   choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs }): string;
   choiceEmpty(text: string, options?: { strs?: Strs<'text'>; args?: StrArgs<'text'> }): string;
   segment(props: SegmentProps): string;
