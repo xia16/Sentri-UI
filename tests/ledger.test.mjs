@@ -216,7 +216,7 @@ test('owed is a stored count shown as min(owed, alive): a death lowers it only p
   x = run(b).litters.A02.doses.iron3;
   assert.equal(run(b).litters.A02.alive, 2);
   assert.equal(x.owed, 2);
-  assert.equal(x.owedStored, 3);
+  assert.equal(x.owedStored, 2);                           // capped when its population shrank below it (round 3, item 5)
 });
 
 // ---- counts, losses, deaths -----------------------------------------------------------------
@@ -940,20 +940,20 @@ test('select.deathDraft: caps, kMin/kMax, why', () => {
   b.farrowed('B14', 4);
   b.identity('B14', 'add', { rowId: 'r1', tag: '1' });
   b.count('B14', 3);
-  const L = run(b, IRON_ONLY).litters.B14;                     // alive 3, 1 row, loss 1 → unidentified 2
-  let s = select.deathDraft(L, { tallies: { crushed: 3 } });
+  const dd0 = run(b, IRON_ONLY), L = 'B14';                   // alive 3, 1 row, loss 1 → unidentified 2
+  let s = select.deathDraft(dd0, L, { tallies: { crushed: 3 } });
   assert.equal(s.cap, 3);
   assert.equal(s.kMin, 1);
   assert.equal(s.kMax, 1);
   assert.equal(s.why, 'missing');
-  s = select.deathDraft(L, { tallies: { crushed: 3 }, k: 1 });
+  s = select.deathDraft(dd0, L, { tallies: { crushed: 3 }, k: 1 });
   assert.equal(s.why, null);
   assert.deepEqual(s.event.lines, [{ cause: 'crushed', n: 3 }]);
   assert.equal(s.event.fromMissing, 1);
   assert.equal(append(b.ev, Object.assign({ id: 'z1' }, s.event), IRON_ONLY, TODAY(3)).ok, true);
-  assert.equal(select.deathDraft(L, { picks: { r1: null } }).why, 'cause_one');
-  assert.equal(select.deathDraft(L, {}).why, 'empty');
-  assert.equal(select.deathDraft(L, { tallies: { crushed: 4 }, k: 1 }).why, 'over_cap');
+  assert.equal(select.deathDraft(dd0, L, { picks: { r1: null } }).why, 'cause_one');
+  assert.equal(select.deathDraft(dd0, L, {}).why, 'empty');
+  assert.equal(select.deathDraft(dd0, L, { tallies: { crushed: 4 }, k: 1 }).why, 'over_cap');
 });
 
 test('select.moveDraft: clamp, carry preview, pairing deltas', () => {
@@ -982,11 +982,11 @@ test('select.end: unfinished litters and piglet-doses (incl. not yet due), on-ti
   const { b, cfg } = roomBook();
   const d = derive(b.ev, cfg, TODAY(3));
   const e = select.end(d);
-  assert.deepEqual(e.unfinishedLitters.slice().sort(), ['A02', 'A05', 'B04', 'C02', 'C04']);
-  assert.deepEqual(e.byLitter.A05.map((x) => [x.dose, x.kind, x.n]), [['iron14', 'not_due', 11]]);
+  assert.deepEqual(e.now.unfinishedLitters.slice().sort(), ['A02', 'A05', 'B04', 'C02', 'C04']);
+  assert.deepEqual(e.now.byLitter.A05.map((x) => [x.dose, x.kind, x.n]), [['iron14', 'not_due', 11]]);
   // treatments: A05 ×4 on time, C04 ×4 early (on time); B04 iron3 late-owed, castration late, teeth/cocci missed;
   // A02 due today unrecorded and everything not yet due are left out
-  assert.deepEqual(e.onTime, { n: 8, k: 12 });
+  assert.deepEqual(e.now.onTime, { n: 8, k: 12 });
 });
 
 // ---- property, strengthened -----------------------------------------------------------------
@@ -1025,9 +1025,11 @@ test('property: raw identity rows never exceed alive; coverage never exceeds its
         assert.ok(balances(X), tag + ' balances');
         const live = X.identity.rows.filter((x) => x.litter === X.id && x.status === 'alive').length;
         assert.equal(X.identity.liveRows, live, tag);
-        assert.ok(live <= X.alive, tag + ': raw rows ≤ alive');
+        assert.ok(live <= X.alive || X.flags.some((g) => g.reason === 'identity_reconcile'), tag + ': raw rows ≤ alive unless an offline conflict is open');
+        assert.equal(X.identity.conflict, Math.max(0, live - X.alive), tag);
         const D = X.doses.iron3;
         assert.ok(D.carriedFromMove <= X.alive, tag + ': coverage ≤ alive');
+        assert.ok((D.owed || 0) + D.unknownAfterMove + D.carriedFromMove <= X.alive, tag + ': owed, unknown and carried are exclusive');
         assert.ok(D.unknownAfterMove <= X.alive, tag + ': unknown ≤ alive');
         assert.ok(D.owed === null || D.owed <= X.alive);
         for (const g of D.coverage) {
@@ -1085,7 +1087,7 @@ test('END-c piglets moved out after End reduce the ended task\'s not-done; arriv
   let d = run(b, TASKED(['A02', 'A05']), 3);
   assert.deepEqual(d.litters.A02.movedOutAfterEnd, [{ move: out.id, n: 2, to: 'X', owed: { iron3: 2 } }]);
   const e = select.end(d);
-  assert.deepEqual(e.byLitter.A02, [{ dose: 'iron3', kind: 'owed', n: 10 }]);
+  assert.deepEqual(e.now.byLitter.A02, [{ dose: 'iron3', kind: 'owed', n: 10 }]);
   assert.equal(d.litters.A05.doses.iron3.owed, 1);
   assert.equal(d.litters.A05.doses.iron3.catchUp, 1);
   const catchUp = b.treat('A05', 'iron3', 1, { at: on(3, '14:00') });
@@ -1096,4 +1098,224 @@ test('END-c piglets moved out after End reduce the ended task\'s not-done; arriv
   assert.equal(d.litters.A05.doses.iron3.owed, 0);
   assert.equal(rejectedReason(d, again), 'task_ended');
   assert.ok(inn);
+});
+
+// =============================================================================================
+// Round 3 — the second attack (all accepted but catch-up, which stays provisional).
+
+function twoOrders(build) {
+  // build(b, f, first) returns the ids; the two concurrent records are appended in both orders
+  const out = [];
+  for (const order of [0, 1]) {
+    const b = book();
+    const f = b.farrowed('A02', 10);
+    const recs = build(f);
+    for (const r of order ? recs.slice().reverse() : recs) b.treat('A02', 'iron3', r.n, Object.assign({ seen: [f.id] }, r.o));
+    out.push(run(b, IRON_ONLY).litters.A02.doses.iron3);
+  }
+  return out;
+}
+
+test('R3-1 unequal concurrent records give the same outstanding reading in either replay order', () => {
+  const [ab, ba] = twoOrders(() => [{ n: 2, o: { deferred: { n: 8, reason: 'weak' } } }, { n: 8, o: { deferred: { n: 2, reason: 'weak' } } }]);
+  assert.equal(ab.owed, 2);
+  assert.equal(ba.owed, 2);
+  assert.equal(ab.possibleDoubleTreatment.length, 1);
+  const [fp, pf] = twoOrders(() => [{ n: 10, o: {} }, { n: 8, o: { deferred: { n: 2, reason: 'weak' } } }]);
+  assert.equal(fp.owed, 0);
+  assert.equal(pf.owed, 0);
+});
+
+test('R3-1b a catch-up that saw both concurrent records starts from their reconciled reading', () => {
+  const b = book();
+  const f = b.farrowed('A02', 10);
+  const a = b.treat('A02', 'iron3', 2, { seen: [f.id], deferred: { n: 8, reason: 'weak' } });
+  const c = b.treat('A02', 'iron3', 8, { seen: [f.id], deferred: { n: 2, reason: 'weak' } });
+  const catchUp = b.treat('A02', 'iron3', 2, { seen: [f.id, a.id, c.id] });
+  const d = run(b, IRON_ONLY);
+  assert.equal(rejectedReason(d, catchUp), undefined);
+  assert.equal(d.litters.A02.doses.iron3.owed, 0);
+});
+
+test('R3-2 unknown-target records collide like any treatment', () => {
+  const b = book();
+  b.farrowed('S', 10); b.treat('S', 'iron3', 7, { deferred: { n: 3, reason: 'weak' } });
+  b.farrowed('R', 8); b.treat('R', 'iron3', 8);
+  const m = b.move('S', 'R', 1, { answers: { iron3: 'unknown' } });
+  const heads = b.ev.map((e) => e.id);
+  const p1 = b.treat('R', 'iron3', 1, { target: 'unknown', seen: heads });
+  const p2 = b.treat('R', 'iron3', 1, { target: 'unknown', seen: heads });
+  const d = run(b, IRON_ONLY);
+  assert.equal(rejectedReason(d, p2), undefined);
+  const D = d.litters.R.doses.iron3;
+  assert.equal(D.unknownAfterMove, 0);
+  assert.deepEqual(D.possibleDoubleTreatment, [[p1.id, p2.id]]);
+  assert.ok(m);
+});
+
+test('R3-3 explaining an old gain never erases another piglet\'s confirmed deferral', () => {
+  const b = book();
+  b.farrowed('S', 10); b.farrowed('R', 9);
+  const loss = b.count('S', 9);
+  const g = b.count('R', 10);                                 // before any record: the stray owes
+  b.treat('R', 'iron3', 9, { deferred: { n: 1, reason: 'weak' } });
+  b.move('S', 'R', 1, { explains: [loss.id, g.id], answers: { iron3: 'yes' } });
+  const D = run(b, IRON_ONLY).litters.R.doses.iron3;
+  assert.equal(D.owed, 1);                                    // the weak one is still owed
+  assert.equal(D.deferred, 1);
+});
+
+test('R3-4 unknown groups carried by named rows retire and travel with the row', () => {
+  const b = book();
+  b.farrowed('S', 10); b.treat('S', 'iron3', 7, { deferred: { n: 3, reason: 'weak' } });
+  b.identity('S', 'add', { rowId: 'r1', tag: '1' });
+  b.identity('S', 'add', { rowId: 'r2', tag: '2' });
+  b.farrowed('R', 8); b.treat('R', 'iron3', 8);
+  b.farrowed('T', 5); b.treat('T', 'iron3', 5);
+  b.move('S', 'R', undefined, { rows: ['r1', 'r2'], answers: { iron3: 'unknown' } });
+  assert.equal(run(b, IRON_ONLY).litters.R.doses.iron3.unknownAfterMove, 2);
+  b.death('R', [{ cause: 'crushed', rowId: 'r1' }]);
+  let d = run(b, IRON_ONLY);
+  assert.equal(d.litters.R.doses.iron3.unknownAfterMove, 1);
+  b.move('R', 'T', undefined, { rows: ['r2'], answers: { iron3: 'unknown' } });
+  d = run(b, IRON_ONLY);
+  assert.equal(d.litters.R.doses.iron3.unknownAfterMove, 0);
+  assert.equal(d.litters.T.doses.iron3.unknownAfterMove, 1);
+  assert.deepEqual(d.litters.T.doses.iron3.unknownGroups[0].rows, ['r2']);
+});
+
+test('R3-5 a debt whose population is gone does not re-attach to unrelated arrivals', () => {
+  const b = book();
+  b.farrowed('A', 10); b.treat('A', 'iron3', 8, { deferred: { n: 2, reason: 'weak' } });
+  b.death('A', [{ cause: 'scours', n: 10 }]);
+  b.farrowed('S', 6); b.treat('S', 'iron3', 6);
+  b.move('S', 'A', 3);
+  const D = run(b, IRON_ONLY).litters.A.doses.iron3;
+  assert.equal(D.owed, 0);
+  assert.equal(D.carriedFromMove, 3);
+});
+
+test('R3-6 outstanding populations are exclusive: owed + unknown never exceed alive', () => {
+  const b = book();
+  b.farrowed('S', 10); b.treat('S', 'iron3', 7, { deferred: { n: 3, reason: 'weak' } });
+  b.farrowed('R', 10);                                        // unrecorded: all 10 owe
+  b.move('S', 'R', 2, { answers: { iron3: 'unknown' } });     // 12 alive: 10 owed + 2 unknown
+  b.death('R', [{ cause: 'crushed', n: 3 }]);                 // 9 alive
+  const d = run(b, Object.assign({}, IRON_ONLY, { task: { id: 'T', litters: ['R'] } }));
+  const D = d.litters.R.doses.iron3;
+  assert.ok(D.owed + D.unknownAfterMove <= d.litters.R.alive);
+  const e = select.end(d);
+  assert.ok(e.now.unfinishedPigletDoses <= d.litters.R.alive);
+});
+
+test('R3-7 a mixed death (named missing row + fromMissing) reserves each named loss once', () => {
+  const b = book();
+  b.farrowed('T1', 4);
+  b.identity('T1', 'add', { rowId: 'r1', tag: '1' });
+  b.count('T1', 2, { missingRows: ['r1'] });                  // loss 2: r1 named + 1 unnamed
+  b.death('T1', [{ cause: 'crushed', rowId: 'r1' }, { cause: 'crushed', n: 1 }], { fromMissing: 1 });
+  const d = run(b, IRON_ONLY);
+  assert.equal(d.litters.T1.alive, 2);
+  assert.equal(d.litters.T1.unexplained.openLoss, 0);
+  assert.deepEqual(d.flags, []);
+});
+
+test('R3-8 an explaining Move cannot spend a named missing piglet\'s loss without moving that row', () => {
+  const b = book();
+  b.farrowed('T1', 3); b.farrowed('T2', 3);
+  b.identity('T1', 'add', { rowId: 'r1', tag: '1' });
+  const loss = b.count('T1', 2, { missingRows: ['r1'] });
+  b.move('T1', 'T2', 1, { explains: [loss.id, null] });       // untagged: the loss stays open for r1
+  let d = run(b, IRON_ONLY);
+  assert.equal(d.litters.T1.unexplained.openLoss, 1);
+  assert.equal(d.litters.T1.alive, 1);
+  assert.equal(d.litters.T1.identity.rows.find((r) => r.rowId === 'r1').status, 'missing');
+  b.move('T1', 'T2', 1, { rows: ['r1'], explains: [loss.id, null] });
+  d = run(b, IRON_ONLY);
+  assert.equal(d.litters.T1.unexplained.openLoss, 0);
+  assert.equal(d.litters.T2.identity.rows.find((r) => r.rowId === 'r1').status, 'alive');
+  assert.ok(balances(d.litters.T1) && balances(d.litters.T2));
+});
+
+test('R3-9 an offline count that could not name rows is kept and raises identity_reconcile', () => {
+  const b = book();
+  const f = b.farrowed('T1', 2);
+  b.identity('T1', 'add', { rowId: 'r1', tag: '1' });
+  b.identity('T1', 'add', { rowId: 'r2', tag: '2' });
+  const c = b.count('T1', 1, { seen: [f.id] });
+  const d = run(b, IRON_ONLY);
+  assert.equal(rejectedReason(d, c), undefined);
+  assert.equal(d.litters.T1.alive, 1);
+  assert.equal(d.litters.T1.identity.conflict, 1);
+  assert.deepEqual(d.flags.map((g) => g.reason), ['identity_reconcile']);
+  const online = b.count('T1', 0);
+  assert.equal(rejectedReason(run(b, IRON_ONLY), online), 'name_the_rows');
+});
+
+test('R3-10 selectors run the same validation and effects as append', () => {
+  const cfg = Object.assign({}, IRON_ONLY, { task: { id: 'T', litters: ['A02'] } });
+  const b = book();
+  b.farrowed('A02', 12); b.farrowed('T2', 4);
+  b.identity('T2', 'add', { rowId: 'r1', tag: '1' });
+  b.ev.push({ id: 'end', type: 'end_task', at: on(3, '12:00') });
+  const d = derive(b.ev, cfg, TODAY(3));
+  const lit = select.litter(d, 'A02', { drafts: { iron3: { n: 12 } }, stamp: { at: on(3, '13:00') } });
+  assert.equal(lit.drafts.iron3.why, 'task_ended');
+  assert.equal(lit.drafts.iron3.event, null);
+  const mv = select.moveDraft(d, { from: 'T2', to: 'A02', n: 4 });
+  assert.equal(mv.why, 'name_the_rows');
+  const dd = select.deathDraft(d, 'T2', { tallies: { crushed: 4 } });
+  assert.equal(dd.why, 'over_cap');
+  const ok = select.deathDraft(d, 'T2', { tallies: { crushed: 3 } });
+  assert.equal(ok.why, null);
+  assert.equal(ok.after.alive, 1);                             // the effect, from the same replay append runs
+});
+
+test('R3-11 a writer that saw End is after End whatever its clock says', () => {
+  const b = book();
+  const f = b.farrowed('A02', 12);
+  const end = { id: 'end', type: 'end_task', at: on(5, '12:00') };
+  b.ev.push(end);
+  const t = b.treat('A02', 'iron3', 12, { at: on(5, '09:00'), seen: [f.id, end.id] });
+  const d = run(b, TASKED(['A02']), 5);
+  assert.equal(rejectedReason(d, t), 'task_ended');
+});
+
+test('R3-12 End waits for the batch\'s farrowing task', () => {
+  const cfg = Object.assign({}, IRON_ONLY, { task: { id: 'T', litters: ['A02'], farrowingTask: 'open' } });
+  const b = book();
+  b.farrowed('A02', 12);
+  const e1 = { id: 'end1', type: 'end_task', at: on(5) };
+  b.ev.push(e1);
+  assert.equal(rejectedReason(run(b, cfg, 5), e1), 'farrowing_task_open');
+  b.ev.push({ id: 'ft', type: 'farrowing_task_ended', at: on(5, '10:00') });
+  const e2 = { id: 'end2', type: 'end_task', at: on(5, '11:00') };
+  b.ev.push(e2);
+  const d = run(b, cfg, 5);
+  assert.equal(rejectedReason(d, e2), undefined);
+  assert.equal(d.ended.event, 'end2');
+});
+
+test('R3-13 End snapshots the closure figures; select.end gives atEnd and now', () => {
+  const b = book();
+  b.farrowed('A02', 12); b.farrowed('A05', 11);
+  const wrong = b.treat('A02', 'iron3', 12, { at: on(3) });
+  b.ev.push({ id: 'end', type: 'end_task', at: on(5, '12:00'), who: 'G.H' });
+  b.correction(wrong.id, { void: true, fresh: { litter: 'A05', dose: 'iron3', n: 11 }, at: on(6) });
+  const e = select.end(run(b, TASKED(['A02', 'A05']), 6));
+  assert.deepEqual(e.atEnd.unfinishedLitters, ['A05']);
+  assert.deepEqual(e.now.unfinishedLitters, ['A02']);
+  assert.deepEqual(e.atEnd.onTime, { n: 1, k: 2 });
+});
+
+test('R3-14 on time only if owed and unknown both reached 0 by the due day', () => {
+  const b = book();
+  const bd = on(0).slice(0, 10);
+  b.farrowed('S', 10, {}, { birthDate: bd }); b.treat('S', 'iron3', 7, { deferred: { n: 3, reason: 'weak' }, at: on(2) });
+  b.farrowed('R', 8, {}, { birthDate: bd });
+  b.move('S', 'R', 1, { answers: { iron3: 'unknown' }, at: on(2, '10:00') });
+  b.treat('R', 'iron3', 8, { at: on(3) });
+  b.check('R', 'iron3', 1, 0, { at: on(5) });
+  const e = select.end(run(b, TASKED(['R']), 5));
+  assert.deepEqual(e.now.onTime, { n: 0, k: 1 });
 });
