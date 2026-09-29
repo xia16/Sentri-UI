@@ -56,6 +56,35 @@ Defined by farrowing and used here unchanged (RULINGS *Model*; the Finish sheet)
 | **Healthy** | piglets | alive − weak − deformed; derived, no form row, printed on the record | as Weak / Deformed | one litter |
 | **Weaned** 断奶 | piglets | piglets that left the litter at weaning; the last term of the ledger | stamped at weaning | one litter |
 
+## Dead picker (slice 9)
+
+The one shared dead drawer (farrowing, farrowing record, check-in, processing). It forks on the litter's phase (open · locked), not on the task. Counts in it use Alive and Dead above unchanged. Contract: `ux/tasks/piglet-processing/dead-contract.md`.
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Dead N** (drawer title) 死亡 N头 | piglets | the litter's Dead plus the bodies in this drawer's draft | now; the draft part is unsaved until Save | one litter |
+| **Unsaved** 未保存 | piglets | bodies in the drawer's piglet draft: not-identified tallies plus picked identified piglets (the sow's draft is `sow cause unsaved`, never counted here). Back keeps them on the device; Clear discards them | from the first tally until Save or Clear | one litter, one device |
+| **Born dead** 出生即死 | piglets | stillborn + mummified recorded by farrowing; printed on the drawer's context line after the lock, because those two causes leave the list there (a born-dead body found later is Born's correction, through Edit) | fixed at the farrowing lock | one litter |
+| **Identified** 已标识 (in the picker) | alive piglets | the litter's live identity rows (tag or notch) with no death; each is picked by its tag, or its notch when it has no tag, and dies against that row | now | one litter |
+| **Not identified** 未标识 (in the picker) | alive piglets | Alive − Identified; tallied by cause | now | one litter |
+| **The N missing** 少了的N头 | piglets | Σ of the litter's open unexplained losses (see *Open / explained*) | now | one litter |
+| **From the missing** 来自少了的N头 | piglets | how many of this draft's not-identified bodies were among the missing; drawn from the open losses oldest first, so they leave the loss, not Alive. Never an identified piglet | at Save | one litter |
+| **Tally cap (locked)** | piglets | Not identified + the N missing: the most not-identified bodies one draft can hold after the lock | now | one litter |
+
+## Edge litters (slice 14)
+
+Terms for the litter faces that differ from the ordinary litter sheet. Counts on these faces use the terms above unchanged (Born, Alive, Dead, Owed, Birth litter weight).
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Litter outside a task** 无任务的窝 | the litter | a real litter that no processing task covers (late farrower, re-entered sow). Deaths, counts and moves are recordable; treatments are not | now | one litter. Which task it should join is open (map question Q33) |
+| **Orphan litter** 孤儿窝 | the litter | a litter whose sow died after farrowing was locked; it keeps its schedule and stays in the task. Alive is the ledger's Alive, unchanged by the death | from the sow's death | one litter; the red `sow died` word and band come from farrowing's Done-register grammar |
+| **Orphan litter, sow died mid-farrowing** 分娩中母猪死亡的窝 | the litter | a litter whose sow died before Finish: her session ended without a lock, so Born is derived (counted at her death, never locked) and no birth litter weight was asked | from the sow's death | one litter |
+| **Litter before lock** 未锁定的窝 | the litter | a litter whose farrowing session is still open: Born is not final, so processing prints Alive and Dead only, with `count still open`. Count changes and deaths are recorded on the farrowing sheet; owed treatments are recorded here | until the farrowing lock | one litter |
+| **Owed line** `{n} piglets owed · due day {d}` | piglets | Owed (above) for one dose, with the day-age it falls due (`due day`, so it never reads as the litter's age) | now | one litter per dose |
+| **Owed after an earlier mark** `{n} piglet owed · born after the mark` 标记后出生 | piglets | on a litter before its lock, a treatment mark records the heads counted at tap time (stored, never recomputed); piglets born after the mark raise that dose's Owed by their number, and a later count change does not falsify the mark | from the tap until the dose is recorded for them | one litter per dose |
+| **Live-born weighed** `{n} live-born piglets weighed at birth` | piglets | the live-born piglets of this farrowing, weighed together: the provisional population of Birth litter weight. Born = live-born + stillborn | at farrowing Finish, or when processing records it while missing | one litter |
+
 ## Count grammar
 
 The count leads the word and the unit is written: `{n} piglets`, singular `{n} piglet` (`pp.common.unit.piglet.one` / `.many`, `PP.tn`); zh has one form and no space between numeral and classifier (`14头`, `3日龄`). Ruled anchors that stay as they are: `born {n}` and `day {n}` (en), `Saved · +{n} this visit` and `Saved · {n} died this visit` (farrowing's, under `fr.*`; a processing receipt names its outcome and is registered by the slice that writes it), and label-then-count headers such as `Dead 6` and `Unexplained loss {n}`.
@@ -80,3 +109,39 @@ Buttons name the act. The register is `ux/laws/strings.json` (`verbs`); an actio
 | **Scan** 扫描 | read an ear tag with the camera |
 
 Banned: **Submit**, **Confirm**, **Complete**. The design system README's "Confirm & next" example is superseded by the rulings.
+
+## Room list (仔猪处理 · 单元)
+
+Slice S1 (`room.html`). Owed, missed, open loss/gain and net drift keep the definitions above. The four lenses partition by the same test on every fixture:
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Owed** 待处理 (lens `Owed {n}`) | litters | litters in the task with at least one dose doable now: due today or late. A litter whose only outstanding items are missed leaves this lens; a litter with a live dose and a lapse leads with the live dose | now | one room; unit: litters |
+| **Done** 已处理 (lens `Done {n}`) | litters | litters with every dose due today recorded today, nothing owed and nothing missed | today | one room; unit: litters |
+| **Later** 之后 (lens `Later {n}`) | litters | litters in the task with nothing due today and nothing recorded today; includes litters whose only outstanding items are missed | now | one room; unit: litters |
+| **All** 全部 (lens `All {n}`) | litters | every litter in the room, including those not in the task | now | one room; unit: litters |
+| **Finished litter** 处理完毕的窝 | litters | a litter with nothing owed, nothing missed and no next dose: every configured treatment is done; sits in Later with `All treatments done` and its last record stamp (in Done on the day of that record) | now | one room |
+| **Coming up** 接下来 (block) | litters | on an empty Owed pile: litters whose next dose falls soonest, not tied to the Later count (a litter done today can appear here) | now | one room |
+| **Litters owing today** (lead figure) | litters | the Owed count as displayed: held rows included, and under an active filter only the filtered litters | now | one room |
+| **Piglets on a row** | piglets | owed rows: piglets still needing the oldest dose named on line 1; castration counts males (`6 males`); partly-done rows print `{left} still owed` of the dose's population; Done and Later rows: alive | now | one litter |
+| **Due {n} days ago** (red) | days | whole days since the oldest dose still owed was due; `due yesterday` at 1 | now | one litter. Late is still owed |
+| **Window ended day {n}** (amber) | day-age | the treatment's console last age-day, on a missed litter's row | fixed by the treatment | one litter |
+| **N records · check** (amber) | records | two or more records from different hands for one dose (possible double treatment); the flag lives on the litter page | until resolved | one litter |
+| **Open loss / gain on a row** | heads | appended last on line 2 of any row, whatever its state, including a litter not in the task (`loss 2 open` red, `gain 1 open` blue) | until explained | one litter |
+| **Net drift** | heads | open gains minus open losses, signed with unit (`−2 piglets`); printed only while both a gain and a loss are open | now | one room |
+| **Sow died** 母猪死亡 (chip) | litter | the litter's sow died; line 2 still shows what the litter owes, and the chip outranks `Farrowing not locked` | until weaning | one litter |
+| **Litter found by tag or notch** | piglets, litters | every piglet whose current identity row matches the full tag (6 digits), the last 4 digits of a tag, or a notch (`n-n`, separators trimmed); a notch may match several litters; a match outside this room prints its unit or `weaned` | as of the latest stamped change | all rooms; opens the litter with `&piglet=` |
+
+Recency words on a row come from the record's timestamp: `1h ago` under a day, `yesterday`, `N days ago` to six, the date from seven days.
+
+**Developer note: hold, then depart.** A row that a hand's record or a sync moves out of the current lens stays in place for 800ms of idle (any touch or scroll resets the timer), flashes `green-wash`, then leaves. The same law covers rows changed by another worker (`PP.sync`).
+
+**Missed, one term.** English `missed`, Chinese `已过处理期`, on the row, the filter and the `n litters missed a treatment ›` line.
+
+**On-time KPI (T-27) is not on the room.** The room shows what is owed now; the on-time share (marks on or before the planned day over scheduled marks, early counting as on time) is a task-level figure that belongs to the Task overview and End review (slice S9) and to the console. The room's header door `Task overview` leads there (`end.html?state=overview`); End task is never in the dock.
+
+**Registry exception.** If the string registry itself fails to load, the page prints one hard-coded English line and a Retry button, because there is nothing to look strings up in. It is the only unregistered visible text on the page.
+
+**Last record (header).** The newest stamped event of any kind in the room: a treatment, a Set count, a Move, a death or an Edit, printed with its own words (`Set count 11 · D03 · 1h ago · G.H`), so a just-made record stays findable after its row departs.
+
+**Rail glyphs.** Every litter row ends in `›`, done rows included: RULINGS "Names and glyphs" reserves ✎ for editing a locked figure (one glyph, one meaning), and RULINGS outranks the README row law's ✎-when-done. This reverses the round-1 decline.

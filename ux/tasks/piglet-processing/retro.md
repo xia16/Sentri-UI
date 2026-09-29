@@ -290,3 +290,34 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   day-ages and schedule — and every page reads it; shared UI (a header, a
   Record group) is extracted to the shell the first time two slices need it.
 - **Cost:** medium (a reconciliation pass at integration).
+
+## 20 · Slices — every slice re-implemented the ledger, and the lenses became code reviewers
+
+- **Stage:** Slices, S1 · S2 · S5 · S7 review rounds.
+- **What happened:** because the design is "HTML that works", each page
+  carries its own arithmetic for alive, owed, treated, open losses and moves.
+  The blockers the lenses found in rounds 2–3 were almost all arithmetic in
+  those private copies: negative alive in the dead drawer (cap vs allocation),
+  owed read from "the last record" (castration catch-up), `Σn > alive` as a
+  double-treatment test, a Move receipt that reversed its own record, a
+  finished litter crashing the room list. Each fix was local; the same class
+  reappeared in the next slice. Exit rounds kept finding real majors (S1 took
+  four rounds, S5 three).
+- **Why:** the loop gives each slice a page and a fixture but no shared
+  domain model, so the ruled ledger (RULINGS round 2) exists only in prose.
+- **Change:** when a map rules a ledger or state model, its first ticket
+  builds it once as a small shared module (`ledger.js`: events in, derived
+  facts out, with tests from the ruling's scenarios), and slices render from
+  it. Lenses then judge the design, and the module's tests judge the
+  arithmetic. It would also be the contract developers build from.
+- **Cost:** high — most review-round blockers, several fix rounds per slice.
+
+## 21 · Slices — the doctor's verb rule reads only the first word
+
+- **Stage:** Slices, S9.
+- **What happened:** the doctor checks that an `action` string starts with a
+  registered verb by its first word, so the ruled multi-word verbs (`End
+  task`, `Set count`) always fail; designers either live with a false gap or
+  relabel strings to hide it.
+- **Change:** match the longest registered verb as a prefix.
+- **Cost:** low.
