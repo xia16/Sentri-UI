@@ -373,3 +373,22 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   one-paragraph `collab` challenge), and the skill's *Deciding* section
   says so.
 - **Cost:** medium (one design round built on a wrong rule).
+
+## 25 · Slices — four driver defaults contradicted owner rulings; one question round fixed them
+
+- **Stage:** after the last slice, an other-family check of all ~34 driver
+  decisions against RULINGS.
+- **What happened:** 4 provisional defaults *contradicted* owner rulings
+  (orphan Move before lock, catch-up treatments after End, after-End offline
+  treatments applied, recount superseding lines), ~13 *extended* them, and 3
+  were bugs. The skill says a real divergence goes to *Waiting on you* while
+  the rest proceeds; I had instead shipped the defaults into designs. One
+  four-question round with the owner (all recommended options taken) settled
+  them, and a single rulings pass applies them across ledger and pages.
+  S8's exit review was folded into that pass and the walk-throughs rather
+  than run separately (driver decision, to avoid reviewing code about to
+  change).
+- **Change:** (a) retro 24's rule — challenge each provisional before it
+  ships; (b) a provisional that contradicts an owner ruling is never a
+  design default: the design follows the ruling and the exception is asked.
+- **Cost:** medium (one cross-cutting rework pass).
