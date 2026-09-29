@@ -113,7 +113,25 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-litter-castrate-catchup", "url": "ux/tasks/piglet-processing/litter.html?state=castrate-catchup", "strict": true },
     { "name": "pp-litter-castrate-none", "url": "ux/tasks/piglet-processing/litter.html?state=castrate-none", "strict": true },
     { "name": "pp-litter-stale-tap", "url": "ux/tasks/piglet-processing/litter.html?state=stale-tap", "strict": true },
-    { "name": "pp-litter-snapshot-kept", "url": "ux/tasks/piglet-processing/litter.html?state=snapshot-kept", "strict": true }
+    { "name": "pp-litter-snapshot-kept", "url": "ux/tasks/piglet-processing/litter.html?state=snapshot-kept", "strict": true },
+    { "name": "pp-move-move", "url": "ux/tasks/piglet-processing/move.html?state=move", "strict": true },
+    { "name": "pp-move-move-review", "url": "ux/tasks/piglet-processing/move.html?state=move-review", "strict": true },
+    { "name": "pp-move-move-into", "url": "ux/tasks/piglet-processing/move.html?state=move-into", "strict": true },
+    { "name": "pp-move-move-ask", "url": "ux/tasks/piglet-processing/move.html?state=move-ask", "strict": true },
+    { "name": "pp-move-move-repeat", "url": "ux/tasks/piglet-processing/move.html?state=move-repeat", "strict": true },
+    { "name": "pp-move-move-tagged", "url": "ux/tasks/piglet-processing/move.html?state=move-tagged", "strict": true },
+    { "name": "pp-move-move-orphan", "url": "ux/tasks/piglet-processing/move.html?state=move-orphan", "strict": true },
+    { "name": "pp-move-move-orphan-saved", "url": "ux/tasks/piglet-processing/move.html?state=move-orphan-saved", "strict": true },
+    { "name": "pp-move-nurse-arrived", "url": "ux/tasks/piglet-processing/move.html?state=nurse-arrived", "strict": true },
+    { "name": "pp-move-move-explain", "url": "ux/tasks/piglet-processing/move.html?state=move-explain", "strict": true },
+    { "name": "pp-move-move-cross", "url": "ux/tasks/piglet-processing/move.html?state=move-cross", "strict": true },
+    { "name": "pp-move-move-prelock", "url": "ux/tasks/piglet-processing/move.html?state=move-prelock", "strict": true },
+    { "name": "pp-move-move-receipt", "url": "ux/tasks/piglet-processing/move.html?state=move-receipt", "strict": true },
+    { "name": "pp-move-move-draft-kept", "url": "ux/tasks/piglet-processing/move.html?state=move-draft-kept", "strict": true },
+    { "name": "pp-move-owed-from-move", "url": "ux/tasks/piglet-processing/move.html?state=owed-from-move", "strict": true },
+    { "name": "pp-move-owed-arrived-done", "url": "ux/tasks/piglet-processing/move.html?state=owed-arrived-done", "strict": true },
+    { "name": "pp-move-unknown-check", "url": "ux/tasks/piglet-processing/move.html?state=unknown-check", "strict": true },
+    { "name": "pp-move-move-prelock-other", "url": "ux/tasks/piglet-processing/move.html?state=move-prelock&data=other", "strict": true }
   ]
 }
 ```
