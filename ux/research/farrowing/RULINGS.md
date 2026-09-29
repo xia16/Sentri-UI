@@ -467,3 +467,46 @@ investigation and not yet ruled.
   (correct posted) · Set count · End task; Back / Clear / Save / Close as farrowing; no
   Mark; Submit / Confirm / Complete banned. Provisional — may change if a better verb
   appears.
+
+### Round 2 (owner agreed all as recommended, 2026-09-29)
+
+- **The litter ledger (Q12):** every litter balances at all times —
+  `Alive = Born − Dead − Moved out + Moved in ± Unexplained − Weaned`; Born never moves here.
+  Three records: **Count** (the worker records the number seen; the difference is written as
+  an unexplained gain or loss, stamped); **Move** (one record changes both litters at once,
+  n piglets from crate A to crate B — fosters, nurse sows, strays, across rooms too);
+  **Explain** (each open gain/loss stays open, one by one, never netted, until explained by a
+  death — the dead picker asks "one of the 2 missing?" and takes the body from the open loss —
+  or by a move the app suggests and the worker confirms; unexplained stays open as a room-header
+  line and a console anomaly). The app never pairs by itself. Two offline counts of one crate
+  are two observations: the later stands, differences are never summed. This supersedes
+  "Gone · no body" wording only in processing; farrowing's pre-lock grammar is unchanged.
+- **Moves in processing v1 (Q13):** Move opens only on litters whose farrowing is locked
+  (before the lock the farrowing sheet owns the count). Farrowing's own foster door stays parked.
+- **What moved piglets owe (Q14):** source all done / none done → the moved piglets carry it
+  (a done crate goes back to due for them: `iron · tail · castrate — 1 owed · from crate 14`).
+  Source partly done → the Move asks per invisible treatment (iron, toltrazuril, vaccines, 保健):
+  `Had iron? Yes / No / Don't know`. Don't know → receiving litter shows `1 arrived · iron
+  unknown — check spray mark`, resolved by recording or "already had". The Move receipt says to
+  spray-mark moved piglets. Visible treatments (teeth, tail, castration, ID) are checked on the pig.
+- **Skips carry a reason, and the reason decides (Q15):** Deferred (weak, sick) → stays due,
+  shows next visit. Exempt (hernia, cryptorchid, kept boar …) → leaves the task; hernia and
+  cryptorchid become a litter note. Lapsed → past the treatment's optional console "last
+  age-day" (e.g. teeth d7, toltrazuril d7; iron has none) it shows as **missed**, not overdue.
+  This amends round 1's "no clinical cut-off" for window-bound treatments only.
+- **Castration record (Q16):** `castrated 5 · not castrated 1: hernia`; not-castrated split by
+  reason (hernia · cryptorchid · deferred · kept boar); the two together give the male count;
+  only deferred stays due. Every treatment: one tap records all live piglets; lowering the
+  number asks a reason for the rest.
+- **Identity schemes are farm config (Q17):** scheme (none · notch · tag · notch-then-tag), who
+  (all · candidates), which age-day, and the done rule (all alive, or the worker closes the
+  candidate set — `9 of 20 identified — done` is complete, the 11 are not overdue). Processing
+  holds only the processing-day identity step; tagging a notched candidate later is selection
+  (留种), out of this map.
+- **Scope (Q18):** multi-sow pens out of v1. Birth litter weight is farrowing's; processing may
+  record it only when missing, no nag. Postpartum check stays a separate task. A sow's death
+  leaves her litter on its schedule in the task. A litter with no task: deaths, counts and moves
+  recordable; treatments not.
+- **Decided for the owner (driver):** each scheduled dose is its own obligation (iron d3 and
+  iron d14 are two items); move suggestions are ranked by time and room, never proof; open
+  gains and losses show separately on the room header beside the net drift.
