@@ -39,7 +39,13 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-dead-dead-open-loss-no", "url": "ux/tasks/piglet-processing/dead.html?state=dead-open-loss-no", "strict": true },
     { "name": "pp-dead-dead-sow", "url": "ux/tasks/piglet-processing/dead.html?state=dead-sow", "strict": true },
     { "name": "pp-dead-farrowing-drawer", "url": "ux/tasks/piglet-processing/dead.html?state=farrowing-drawer", "strict": true },
-    { "name": "pp-dead-farrowing-drawer-draft", "url": "ux/tasks/piglet-processing/dead.html?state=farrowing-drawer-draft", "strict": true }
+    { "name": "pp-dead-farrowing-drawer-draft", "url": "ux/tasks/piglet-processing/dead.html?state=farrowing-drawer-draft", "strict": true },
+    { "name": "pp-dead-farrowing-drawer-locked", "url": "ux/tasks/piglet-processing/dead.html?state=farrowing-drawer-locked", "strict": true },
+    { "name": "pp-dead-dead-draft-sow", "url": "ux/tasks/piglet-processing/dead.html?state=dead-draft-sow", "strict": true },
+    { "name": "pp-dead-dead-tagged-nocause", "url": "ux/tasks/piglet-processing/dead.html?state=dead-tagged-nocause", "strict": true },
+    { "name": "pp-dead-dead-open-loss-split", "url": "ux/tasks/piglet-processing/dead.html?state=dead-open-loss-split", "strict": true },
+    { "name": "pp-dead-dead-saved", "url": "ux/tasks/piglet-processing/dead.html?state=dead-saved", "strict": true },
+    { "name": "pp-dead-dead-sow-recorded", "url": "ux/tasks/piglet-processing/dead.html?state=dead-sow-recorded", "strict": true }
   ]
 }
 ```

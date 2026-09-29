@@ -45,16 +45,18 @@ Defined by farrowing and used here unchanged (RULINGS *Model*; the Finish sheet)
 
 ## Dead picker (slice 9)
 
-The one shared dead drawer, as farrowing's, opened from processing. Counts in it use Alive and Dead above unchanged.
+The one shared dead drawer (farrowing, farrowing record, check-in, processing). It forks on the litter's phase (open · locked), not on the task. Counts in it use Alive and Dead above unchanged. Contract: `ux/tasks/piglet-processing/dead-contract.md`.
 
 | Term (zh) | Entity | Population | Time | Scope |
 |---|---|---|---|---|
 | **Dead N** (drawer title) 死亡 N头 | piglets | the litter's Dead plus the bodies in this drawer's draft | now; the draft part is unsaved until Save | one litter |
-| **Unsaved** 未保存 | piglets | bodies in the drawer's draft: untagged tallies plus picked tagged piglets. Back keeps them on the device; Clear discards them | from the first tally until Save or Clear | one litter, one device |
-| **Born dead** 出生即死 | piglets | stillborn + mummified recorded by farrowing; printed on the drawer's context line after the lock, because those two causes leave the list there | fixed at the farrowing lock | one litter |
-| **Tagged** 有耳标 | alive piglets | alive piglets with a current ear-tag identity row; each is picked by its tag and dies against that row | now | one litter |
-| **Untagged** 无耳标 | alive piglets | Alive − Tagged; tallied by cause, and tallies stop at this number so a tagged piglet is never subtracted namelessly | now | one litter |
-| **The N missing** 不明减少的N头 | piglets | the litter's open unexplained losses (see *Open / explained*); `One of the 2 missing?` asks whether the drafted body is one of them | now | one litter |
+| **Unsaved** 未保存 | piglets | bodies in the drawer's piglet draft: not-identified tallies plus picked identified piglets (the sow's draft is `sow cause unsaved`, never counted here). Back keeps them on the device; Clear discards them | from the first tally until Save or Clear | one litter, one device |
+| **Born dead** 出生即死 | piglets | stillborn + mummified recorded by farrowing; printed on the drawer's context line after the lock, because those two causes leave the list there (a born-dead body found later is Born's correction, through Edit) | fixed at the farrowing lock | one litter |
+| **Identified** 已标识 (in the picker) | alive piglets | the litter's live identity rows (tag or notch) with no death; each is picked by its tag, or its notch when it has no tag, and dies against that row | now | one litter |
+| **Not identified** 未标识 (in the picker) | alive piglets | Alive − Identified; tallied by cause | now | one litter |
+| **The N missing** 少了的N头 | piglets | Σ of the litter's open unexplained losses (see *Open / explained*) | now | one litter |
+| **From the missing** 来自少了的N头 | piglets | how many of this draft's not-identified bodies were among the missing; drawn from the open losses oldest first, so they leave the loss, not Alive. Never an identified piglet | at Save | one litter |
+| **Tally cap (locked)** | piglets | Not identified + the N missing: the most not-identified bodies one draft can hold after the lock | now | one litter |
 
 ## Count grammar
 
