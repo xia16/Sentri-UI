@@ -51,6 +51,28 @@
     return F.open(name, Object.assign({ fresh: q.get('fresh') === '1' }, opts || {}));
   };
 
+  /* R1-24: the phone's (or browser's) Back with a drawer open closes the drawer — the page's own Back, so the draft is
+     kept for Resume — and never leaves the page. A page calls PP.drawerBack(onBack) when a drawer opens (one history
+     entry is pushed for it) and PP.drawerBack(null) when it closes the drawer itself (the entry is taken back). */
+  var drawerEntry = null, skipPop = 0;
+  PP.drawerBack = function (onBack) {
+    if (onBack) {
+      if (!drawerEntry) { try { history.pushState({ ppDrawer: true }, ''); } catch (e) { return; } }
+      drawerEntry = { onBack: onBack };
+      return;
+    }
+    if (!drawerEntry) return;
+    drawerEntry = null;
+    if (history.state && history.state.ppDrawer) { skipPop++; history.back(); }
+  };
+  window.addEventListener('popstate', function () {
+    if (skipPop) { skipPop--; return; }
+    if (!drawerEntry) return;
+    var f = drawerEntry.onBack;
+    drawerEntry = null;
+    f();
+  });
+
   document.documentElement.lang = PP.lang === 'zh' ? 'zh-CN' : 'en';
   document.documentElement.setAttribute('data-state', PP.state);
   // Module scripts (ledger.js, fixtures.js) run before DOMContentLoaded.

@@ -10,14 +10,12 @@
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* Layout only, tokens from tokens.css; one Candidate composition (the red band). The header, tools, Record group,
-   weight row and receipt come from the shell (shell-ui.js, shell.css). */
+/* Layout only, tokens from tokens.css. The sow's danger band is Banner (ADR 0002 adoption). The header, tools, Record
+   group, weight row and receipt come from the shell (shell-ui.js, shell.css). */
 .edge-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
 .edge-phone .scrim { inset: 0; }
 .edge-body { display: flex; flex-direction: column; gap: var(--space-section); }
 .edge-body > * { margin: 0; }
-/* Candidate:DangerBand — farrowing's red warning band, on tokens only. */
-.edge-band { padding: var(--space-panel); background: var(--red-wash); border: 1px solid var(--red); border-radius: var(--radius-inset); color: var(--red); font-size: 13px; font-weight: 500; }
 .edge-drawer-body { display: flex; flex-direction: column; gap: var(--space-row-y); }
 .edge-actions { display: flex; gap: var(--space-footer-gap); padding-top: var(--space-row-y); }
 .edge-actions .button { flex: 1; }
@@ -46,10 +44,19 @@
     // this phone's 16.4 synced after A.K had set 14.8 (farrowing's Edit, 09:38): the ledger keeps both, the first stands
     'birth-weight-conflict': ['C02', null, 'c02-weight-conflict'], 'birth-weight-deadtap': ['C02', '16.4', null, true, { dead: 'full' }],
     'birth-weight-saved': ['C02', null, 'c02-weight-saved', false, { saved: true }],
-    // a nurse sow outside every task (RULINGS round 2, Q18): her arrivals' doses stay not done — no treatments recorded
-    'nurse-arrivals': ['D02', null, 'moved-orphan']
+    // a litter outside every task that took piglets from another one outside it (F02 → A03, both Unit 8): the header
+    // balances with the move (R1-10); nothing can be treated here
+    'no-task-moved': ['A03', null, null, false, { pre: [{ type: 'move', from: 'F02', to: 'A03', n: 2, answers: {} }] }]
   };
+  /* One sheet, not two: an orphaned litter (its sow died, locked or ended by her death) and a nurse sow that joined the
+     task (round 4) are the litter sheet itself, with the band or the nurse line — these old links forward there. */
+  var FORWARD = { 'orphan': ['orphan', 'B01'], 'orphan-unlocked': ['orphan-unlocked', 'D06'], 'nurse-arrivals': ['nurse', 'D02', 'moved-orphan'] };
   var qs = PP.q;
+  if (FORWARD[PP.state]) {
+    var fw = FORWARD[PP.state];
+    location.replace(PP.href('litter.html', { state: fw[0], crate: qs.get('crate') || fw[1], stay: 1, unit: qs.get('unit'), data: qs.get('data') || fw[2] || '' }));
+    return;
+  }
   var name = STATES[PP.state] ? PP.state : 'no-task';
   var spec = STATES[name];
   var store, crate, SOW, TODAY;
@@ -81,12 +88,18 @@
     return { label: '', value: '', strs: Object.assign({ label: label, value: p.id }, meta ? { meta: meta } : {}), args: Object.assign({ value: p.args }, meta ? { meta: metaArgs } : {}) };
   }
   function facts() {
-    var x = L(), items = [], still = x.dead.byCause.stillborn || 0;
+    var x = L(), items = [], still = x.dead.byCause.stillborn || 0, b = store.select.balance(store.derived, crate);
     // Before the lock Born is not final: processing prints Alive and Dead only.
     if (x.phase === 'locked') items.push(fact('label.born', x.born, x.endedBySowDeath ? 'pp.edge.born.derived' : null));
     items.push(fact('label.alive', x.alive));
     items.push(fact('label.dead', x.dead.total, still ? 'pp.edge.dead.stillborn' : null, { n: still }));
-    return UI.facts(items, { columns: items.length === 3 ? 3 : 2 });
+    // R1-10: the header balances — every other term of the ledger identity when it is not zero
+    if (b.movedIn) items.push(fact('pp.edge.fact.in', b.movedIn));
+    if (b.movedOut) items.push(fact('pp.edge.fact.out', b.movedOut));
+    if (b.weaned) items.push(fact('pp.edge.fact.weaned', b.weaned));
+    if (b.loss) items.push(fact('pp.edge.fact.loss', b.loss));
+    if (b.gain) items.push(fact('pp.edge.fact.gain', b.gain));
+    return UI.facts(items, { columns: items.length % 3 === 0 ? 3 : 2 });
   }
   function owed() {
     var xs = view().owed;
@@ -114,9 +127,8 @@
     var sd = L().sowDied;
     if (!sd) return '';
     var st = U.stamp(sd.at, sd.who, '');
-    return '<div class="edge-band" data-ds="Candidate:DangerBand" role="status">' + (sd.cause
-      ? span('pp.edge.orphan.band', { cause: PP.t('pp.edge.cause.' + sd.cause), stamp: st })
-      : span('pp.edge.orphan.band_nocause', { stamp: st })) + '</div>';
+    var h = sd.cause ? ['pp.edge.orphan.band', { cause: PP.t('pp.edge.cause.' + sd.cause), stamp: st }] : ['pp.edge.orphan.band_nocause', { stamp: st }];
+    return UI.banner({ tone: 'danger', headline: PP.t(h[0], h[1]), strs: { headline: h[0] }, args: { headline: h[1] } });
   }
   function body() {
     var out = [], x = L();
@@ -180,9 +192,9 @@
     if (!b) return;
     var a = b.dataset.action;
     if (a === 'numpad') { key(b.dataset.key); render(); }   // floor-gray keys still answer through the reducer's dead reason
-    else if (a === 'open-weight') { drawer = true; padOpen = !draft; render(); }
+    else if (a === 'open-weight') { drawer = true; padOpen = !draft; guardBack(); render(); }
     else if (a === 'open-numpad') { if (!padOpen) { padOpen = true; padHint = ''; render(); } }   // tapping the active Measure does nothing
-    else if (a === 'close-weight') { if (padOpen && draft) padOpen = false; else drawer = false; padHint = ''; render(); }   // Back closes the pad first; the draft is kept
+    else if (a === 'close-weight') { if (padOpen && draft) padOpen = false; else { drawer = false; PP.drawerBack(null); } padHint = ''; render(); }   // Back closes the pad first; the draft is kept
     else if (a === 'save-weight') {
       var val = UI.numpadCommit(draft, { decimals: 1 });
       if (val == null || !(parseFloat(val) > 0) || parseFloat(val) > liveBorn() * 5 || conflict) return;
@@ -193,11 +205,11 @@
       if (conflict) { padOpen = false; render(); return; }
       var u = usual(liveBorn());
       saved = { w: val, out: parseFloat(val) < +u[0] || parseFloat(val) > +u[1], min: u[0], max: u[1] };
-      draft = ''; drawer = false; padOpen = false; render();
+      draft = ''; drawer = false; padOpen = false; PP.drawerBack(null); render();
     } else if (a === 'keep-theirs') {
       // keeping theirs withdraws this phone's weight: a stamped correction, the original kept
       if (conflict) store.commit({ type: 'correction', target: conflict.event, void: true });
-      readWeight(); draft = ''; drawer = false; padOpen = false; render();
+      readWeight(); draft = ''; drawer = false; padOpen = false; PP.drawerBack(null); render();
     }
     else if (a === 'close') nav('room.html', { state: 'room', unit: qs.get('unit') });
     else if (a === 'open-dead') nav('dead.html', { state: 'dead', crate: crate, unit: qs.get('unit') });
@@ -205,19 +217,29 @@
     else if (a === 'record-treatment') nav('litter.html', { state: 'litter', crate: crate, stay: 1, unit: qs.get('unit') });
     else document.documentElement.setAttribute('data-door', a + ':' + (b.dataset.value || ''));
   });
+  /* R1-24: the phone's Back with the drawer open is the drawer's own Back: the pad closes first, then the drawer; the typed
+     draft is kept. */
+  function guardBack() {
+    PP.drawerBack(function () {
+      if (padOpen && draft) { padOpen = false; padHint = ''; guardBack(); } else drawer = false;
+      render();
+    });
+  }
   function readWeight() {
     weight = L().birthWeight;
     conflict = (L().birthWeightConflicts || []).filter(function (c) { return c.who === window.PPFixtures.ME; })[0] || null;
     if (conflict) { drawer = true; draft = conflict.kg; }
   }
   PP.ready.then(function () {
-    store = PP.open(spec[2] || 'base');
+    store = PP.open(spec[2] || 'base', opt.pre ? { session: false } : null);
+    (opt.pre || []).forEach(function (e) { store.commit(e); });
     TODAY = store.today;
     crate = qs.get('crate') || spec[0];
     if (qs.get('sow')) crate = store.crateOfSow(qs.get('sow')) || crate;
     SOW = store.sow(crate) || { sow: '', parity: 0, weight: null };
     readWeight();
     if (opt.saved && weight) { var u0 = usual(liveBorn()); saved = { w: weight.kg, out: +weight.kg < +u0[0] || +weight.kg > +u0[1], min: u0[0], max: u0[1] }; }
+    if (drawer) guardBack();
     render();
   });
 })();
