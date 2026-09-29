@@ -10,8 +10,9 @@
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* Layout only, tokens from tokens.css. Candidate compositions: Radio (the sex field), CompactRun (the Numpad run
-   with its running list folded into the status line), Tool (the soft-well mid-sheet act), plus coloured status words. */
+/* Layout only, tokens from tokens.css. Cards (ADR 0002): ChoiceList `choiceRadios` inline (the sex field), Numpad
+   `compact` (the run with its running list folded into the status line), Button `tool` (closing the candidate set),
+   plus coloured status words. */
 .id-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
 .id-phone .scrim { inset: 0; }
 .id-body { display: flex; flex-direction: column; gap: var(--space-section); }
@@ -27,29 +28,10 @@
 /* The header's progress door: a text action on the title row, colour on the value when it is over alive. */
 .id-door { display: inline-flex; align-items: center; gap: 4px; }
 .id-door svg { width: 15px; height: 15px; flex: none; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-/* Candidate:CompactRun — the Numpad's run readout (its own markup) over the keys-only Numpad; the three-line running
-   list is folded into the status line as one `Last …` line with Undo. */
-.id-compact { display: flex; flex-direction: column; gap: var(--space-row-y); }
-/* Candidate:Radio — a single-select field with visible radios (RULINGS craft pass: 2px rings, selected = ink ring + dot,
-   the selected label weighs 700). Stepper silhouette: label left, the choices right, one 60px row. Optional: tapping the
-   chosen radio again clears it (missing, never a default). */
-.id-radio { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: var(--space-row-y); min-height: var(--stepper-row-min); }
-.id-radio-label { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; font: 600 var(--type-choice-label-size)/1.4 var(--font-sans); color: var(--ink); }
-.id-radio-label small { font: 400 var(--type-choice-meta-size)/1.4 var(--font-sans); color: var(--muted); }
-.id-radio-opts { display: flex; gap: var(--space-key-gap); align-self: stretch; }
-.id-radio-opt { display: flex; align-items: center; gap: var(--space-key-gap); min-height: var(--stepper-row-min); min-width: var(--back-width); margin: 0; padding: 0 var(--space-row-y); border: 0; border-radius: var(--radius-control); background: transparent; color: var(--ink); font: 600 var(--type-choice-label-size)/1.4 var(--font-sans); cursor: pointer; touch-action: manipulation; }
-.id-radio-opt:active { background: var(--press); }
-.id-radio-opt:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-.id-radio-ring { display: grid; place-items: center; flex: none; width: var(--glyph-pad); height: var(--glyph-pad); box-sizing: border-box; border: var(--caret-width) solid var(--muted); border-radius: 50%; }
-.id-radio-opt[aria-checked="true"] { font-weight: 700; }
-.id-radio-opt[aria-checked="true"] .id-radio-ring { border-color: var(--ink); }
-.id-radio-opt[aria-checked="true"] .id-radio-ring::after { content: ""; width: calc(var(--glyph-pad) / 2); height: calc(var(--glyph-pad) / 2); border-radius: 50%; background: var(--ink); }
-/* Candidate:Tool lives in shell.css (shared with the litter sheet's tools). */
 /* Status words: colour lives on the value (dead red, a sync duplicate or an over count amber). */
 .id-tone[data-tone="red"] { color: var(--red); }
 .id-tone[data-tone="amber"] { color: var(--amber); }
 .id-tone[data-tone="green"] { color: var(--green); }
-@media (prefers-reduced-motion: reduce) { .id-radio-opt { transition: none; } }
 </style>
 </head>
 <body>
@@ -62,14 +44,14 @@
 <script>
 (function () {
   var UI = window.SentriUI, ICON = window.SentriIcons, U = window.PPUI;
-  var zh = PP.lang === 'zh';
   var ME = 'G.H';
 
   /* ---- states: a variant of the shared fixture (fixtures.js) + the crate + UI state. The identity rows, Alive, the day-age,
      the farm's scheme, the closed candidate set and over-alive are the ledger's (identity rows over the shared log);
      Record, Undo and closing the set commit identity events through append. The weigh-day litter weight (`litter_weight`),
      the boar/gilt counts for piglets not identified (`sex_counts`) and the same-tag lookup (`identity.sameTag`, row `alsoOn`,
-     `select.findId`) are the ledger's too. ---- */
+     `select.findId`) are the ledger's too. A piglet in hand and an unsaved litter weight are drafts on this phone
+     (sessionStorage), kept through Close and restored on reopen. ---- */
   // bag: the first tag in the hand's bag for this litter — what the camera reads when the scan button is tapped here.
   var BAG = { A02: '004301', B04: '004521', C02: '004401', A07: '004610' };
   var STATES = {
@@ -79,7 +61,14 @@
     'id-weight':          { data: 'a02-tags-gh', l: 'A02', sex: 'g', weight: '1.4', active: 'weight' },
     'id-warned':          { data: 'a02-tags-gh', l: 'A02', tag: '00430', sex: 'g', weight: '0.62', press: 'record' },
     'id-partial':         { data: 'a02-tags-lm', l: 'A02' },
+    // a full tag typed: nothing to warn about (the pad does not repeat its length); a digit past it says why
+    'id-typed':           { data: 'a02-tags-gh', l: 'A02', tag: '004309' },
+    'id-typed-full':      { data: 'a02-tags-gh', l: 'A02', tag: '004309', key: '5' },
     'id-duplicate':       { data: 'a02-tags-gh', l: 'A02', tag: '004514' },
+    // the same tag as a piglet of this litter: caught again (the primary), or a different piglet (a double-issued tag)
+    'id-same':            { data: 'a02-tags-gh', l: 'A02', tag: '004301' },
+    'id-twin':            { data: 'a02-tags-gh', l: 'A02', tag: '004301', sex: 'b', twin: true },
+    'id-twin-table':      { data: 'a02-tags-gh', l: 'A02', tag: '004301', sex: 'b', twin: true, press: 'record', then: 'table' },
     'id-recatch':         { data: 'a02-tags-gh', l: 'A02', scan: '004302', weight: '1.4' },
     'id-recatch-edit':    { data: 'a02-tags-gh', l: 'A02', scan: '004301', sex: 'b' },
     'id-all':             { data: 'a02-tags-all', l: 'A02' },
@@ -89,94 +78,124 @@
     'id-close-confirm':   { data: 'keepers', l: 'A07', face: 'table', confirm: true },
     'id-candidates-done': { data: 'keepers-closed', l: 'A07', face: 'table' },
     'id-notch-only':      { data: 'notch', l: 'A04' },
+    // 99 is the last notch number: the next suggestion is the lowest free one, never 100; 0 is not a number
+    'id-notch-top':       { data: 'notch', l: 'A04', tag: '99', press: 'record' },
+    'id-notch-zero':      { data: 'notch', l: 'A04', tag: '0', press: 'record' },
     'id-table':           { data: 'base', l: 'B04', face: 'table' },
-    'id-draft-kept':      { data: 'a02-tags-lm', l: 'A02', face: 'table', tag: '004306', sex: 'g', lwDraft: { w: '16.', boars: 0, gilts: 0 } },
+    // a cross-litter duplicate recorded, and a row corrected through Edit: both stay amber on the row
+    'id-table-flags':     { data: 'a02-tags-gh', l: 'A02', face: 'table', pre: [
+      { id: 'PRE-A02-dup', type: 'identity', litter: 'A02', op: 'add', rowId: 'A02-r4', tag: '004514', sex: 'b', weight: 1.36 },
+      { id: 'PRE-A02-fix', type: 'identity', litter: 'A02', op: 'edit', rowId: 'A02-r2', set: { weight: 1.44 } }] },
+    // drafts kept on this phone: the piglet in hand and an unsaved litter weight, back after Close
+    'id-draft-kept':      { data: 'a02-tags-lm', l: 'A02', face: 'table', kept: { run: { tag: '004306', sex: 'g', weight: '' }, lw: { w: '16.', boars: 0, gilts: 0 } } },
+    'id-kept-run':        { data: 'a02-tags-lm', l: 'A02', kept: { run: { tag: '004306', sex: 'g', weight: '1.4' } } },
     'litter-weight':      { data: 'a02-tags-lm', l: 'A02', face: 'table', drawer: { w: '16.8', boars: 4, gilts: 2 } },
+    'litter-weight-typing': { data: 'a02-tags-gh', l: 'A02', face: 'table', drawer: { w: '16.8', active: true, boars: 0, gilts: 0 } },
+    'litter-weight-saved': { data: 'a02-tags-gh', l: 'A02', face: 'table', drawer: { w: '16.8', boars: 1, gilts: 0 }, press: 'save' },
     'litter-weight-warn': { data: 'a02-tags-lm', l: 'A02', face: 'table', drawer: { w: '36.2', boars: 0, gilts: 0 } },
     'id-pair':            { data: 'a02-tags-pair', l: 'A02', face: 'table' },
     // Counts saved when 5 were identified (4 boars · 3 gilts not identified); two boars identified since consume two boar counts.
     'litter-weight-consumed': { data: 'a02-tags-seven', l: 'A02', face: 'table', open: 'weight' },
-    'litter-weight-refused': { data: 'a02-tags-lm', l: 'A02', face: 'table', drawer: { w: '304', boars: 0, gilts: 0 } },
+    // three whole digits: 168 on a day-3 litter of 12 is a slipped decimal (over 72 kg), refused with the reason
+    'litter-weight-refused': { data: 'a02-tags-lm', l: 'A02', face: 'table', drawer: { w: '168', boars: 0, gilts: 0 } },
+    // a weigh day other than day 3: B04 at day 27 on 17 Oct, 10 alive, a weaning weight over 99 kg
+    'litter-weight-wean': { data: 'late', l: 'B04', face: 'table', drawer: { w: '104.2', active: true, boars: 0, gilts: 0 } },
     // two offline phones weighed B04 the same day: the ledger keeps both as a conflict (no later-save-wins by clock)
     'litter-weight-conflict': { data: 'b04-weights-conflict', l: 'B04', face: 'table' }
   };
-  // The usual per-piglet weight by day-age (console): the soft range, never a gate.
-  var USUAL = { 1: [0.8, 2.4], 2: [0.9, 2.6], 3: [1.0, 2.8], 4: [1.1, 3.0], 9: [1.8, 4.2] };
-  // Refused only when physically impossible: over 6 kg per alive piglet on a suckling litter (a slipped decimal).
-  var HARD_KG = 6;
+  // The usual per-piglet weight by day-age (console): the soft range, never a gate. Between the listed days it is
+  // interpolated; past the last it holds.
+  var USUAL = [[0, 0.7, 2.2], [1, 0.8, 2.4], [2, 0.9, 2.6], [3, 1.0, 2.8], [4, 1.1, 3.0], [9, 1.8, 4.2], [14, 2.6, 5.6], [21, 4.0, 9.5], [28, 5.5, 11.5]];
+  var TAGLEN = 6, NOTCHLEN = 2, NOTCHMAX = 99, LWINT = 3;
 
   var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'id-empty';
   var st = STATES[name];
   var store, crate, F, L, notch, keepers, NOW;
   var rows = [];                          // this litter's identity rows (the ledger's), in the page's shape
+  var twins = {};                         // rowId → the row it shares a printed tag with (recorded as a different piglet)
   var log = [];                           // every Record this visit and before, in order; the status line shows the newest
   var closed = null;
   var lwRecs = [];
   var face = st.face || 'run';
   var visitStart = 0;                     // rows recorded from here on are this visit's (Undo reaches only these)
-  var TAGLEN = 6, NOTCHLEN = 2;
 
   /* ---- the ledger ---- */
-  function hm(iso) { return String(iso).slice(11, 16); }
-  function dom(iso) { return +String(iso).slice(8, 10); }
-  function key(r) { return notch ? String(r.n) : r.tag; }
+  function key(r) { return notch ? String(r.n) : twins[r.rowId] ? r.tag + '#' + r.rowId : r.tag; }
   function elsewhereOf(tag, notchKey) {
     // Where the farm holds this identity now, outside this litter: the ledger's lookup (select.findId).
     var hit = store.select.findId(store.derived, tag ? { tag: tag } : { notch: notchKey }, crate)[0];
     return hit ? hit.litter : '';
   }
   function pageRow(r) {
-    var x = r.edits.length ? r.edits[r.edits.length - 1] : null, at = x ? x.at : r.addedAt, who = x ? x.who : r.addedBy;
-    var o = { rowId: r.rowId, tag: r.tag, n: r.notch ? +String(r.notch).split('-').pop() : null, sex: r.sex, w: r.weight == null ? null : String(r.weight), who: who, t: hm(at), d: dom(at) };
-    if (x) o.first = { t: hm(r.addedAt), who: r.addedBy, d: dom(r.addedAt) };
-    if (r.status === 'dead') o.dead = { cause: r.cause, d: dom(r.deathAt) };
-    if (r.status === 'withdrawn') o.gone = { t: hm(r.withdrawn.at), who: r.withdrawn.who };
+    var x = r.edits.length ? r.edits[r.edits.length - 1] : null;
+    var o = { rowId: r.rowId, tag: r.tag, n: r.notch ? +String(r.notch).split('-').pop() : null, sex: r.sex, w: r.weight == null ? null : String(r.weight),
+      who: x ? x.who : r.addedBy, at: x ? x.at : r.addedAt, corrected: !!x };
+    if (r.status === 'dead') o.dead = { cause: r.cause, at: r.deathAt };
+    if (r.status === 'withdrawn') o.gone = { at: r.withdrawn.at, who: r.withdrawn.who };
     // the same tag on another crate, and a same-tag pair within this litter: the ledger's same-tag groups
     var also = r.alsoOn || [];
-    if (r.tag && !notch) o.dup = (also.filter(function (x) { return x.litter !== crate; })[0] || {}).litter || '';
-    o.pair = also.some(function (x) { return x.litter === crate; });
+    if (r.tag && !notch) o.dup = (also.filter(function (y) { return y.litter !== crate; })[0] || {}).litter || '';
+    o.pair = also.some(function (y) { return y.litter === crate; });
     return o;
   }
   function reload() {
     L = store.derived.litters[crate];
+    // A different piglet recorded under a tag already on this litter (a double-issued tag): the add carries `twinOf`.
+    twins = {};
+    store.events.forEach(function (e) { if (e.type === 'identity' && (e.op || 'add') === 'add' && e.litter === crate && e.twinOf) twins[e.rowId] = e.twinOf; });
     var ledgerRows = L.identity.rows.filter(function (r) { return r.litter === crate && (r.status === 'alive' || r.status === 'dead' || r.status === 'withdrawn'); });
     rows = ledgerRows.map(pageRow);
     closed = null;
     if (L.identity.closed) {
       var ce = store.events.filter(function (e) { return e.type === 'identity' && e.op === 'close' && e.litter === crate; }).pop();
-      closed = { t: hm(ce.at), who: ce.who, k: distinct().length };
+      closed = { at: ce.at, who: ce.who, k: distinct().length };
     }
   }
   function loadWeights() {
     lwRecs = store.weights(crate).filter(function (x) { return x.at; }).map(function (x) {
-      return { w: x.kg, day: x.day, d: dom(x.at), t: hm(x.at), who: x.who,
-        conflicts: (x.conflicts || []).map(function (c) { return { w: c.kg, d: dom(c.at), t: hm(c.at), who: c.who }; }) };
+      return { w: x.kg, day: x.day, at: x.at, who: x.who,
+        conflicts: (x.conflicts || []).map(function (c) { return { w: c.kg, at: c.at, who: c.who }; }) };
     });
   }
   function commit(e) { var r = store.commit(Object.assign({ type: 'identity', litter: crate }, e)); if (r.ok) reload(); return r; }
   function alive() { return L.alive; }
+  var today = function (iso) { return String(iso).slice(0, 10) === store.today; };
 
   /* ---- the run's draft: tag (or notch number), sex, weight; the host holds it, the DOM never does ---- */
-  var run = { tag: { value: '', suggested: false, suggestion: '' }, sex: null, weight: '', active: 'tag', note: null, armed: '', armedAt: 0 };
-  var drawer = st.drawer ? { w: st.drawer.w, active: false, boars: st.drawer.boars, gilts: st.drawer.gilts } : null;
-  var drawerKept = st.lwDraft ? Object.assign({ active: false }, st.lwDraft) : null;   // Back keeps the drawer's draft on the device
+  var run = { tag: { value: '', suggested: false, suggestion: '' }, sex: null, weight: '', active: 'tag', note: null, armed: '', armedAt: 0, twin: false };
+  var drawer = st.drawer ? { w: st.drawer.w, active: !!st.drawer.active, boars: st.drawer.boars, gilts: st.drawer.gilts } : null;
+  var drawerKept = null;                  // Back and Close keep the drawer's draft on the device
   var confirm = !!st.confirm;
   var receipt = null, lastCommit = 0;
 
   /* ---- derived ---- */
   var current = function () { return rows.filter(function (r) { return !r.gone; }); };
   var living = function () { return current().filter(function (r) { return !r.dead; }); };
-  // Distinct identities: a same-tag pair (two hands, one piglet, offline) counts once until Edit resolves it.
+  // Distinct identities: a same-tag pair (two hands, one piglet, offline) counts once until Edit resolves it; a piglet
+  // recorded as a different piglet under a double-issued tag counts as its own.
   var distinct = function () { var seen = {}; return living().filter(function (r) { var k = key(r); if (seen[k]) return false; seen[k] = 1; return true; }); };
-  var pairs = function () { return L.identity.pairs; };
-  var identified = function () { return Math.min(distinct().length, alive()); };
+  var pairs = function () { return living().length - distinct().length; };
   var over = function () { return Math.max(0, distinct().length - alive()); };
+  var allIn = function () { return !keepers && distinct().length >= alive(); };
+  // The rows that share a printed tag because it was issued twice (one of them recorded as a different piglet).
+  function twinGroup(r) {
+    if (!r.tag || notch || r.dead) return false;
+    var same = living().filter(function (x) { return x.tag === r.tag; });
+    return same.length > 1 && same.some(function (x) { return twins[x.rowId]; });
+  }
   function idText(r) { return notch ? PP.t('pp.id.notch', { litter: F.notchLitter, n: r.n }) : r.tag; }
   function idOf(v) { return notch ? PP.t('pp.id.notch', { litter: F.notchLitter, n: +v }) : v; }
   function nextSuggestion() {
     var cur = current();
-    if (notch) { var m = cur.reduce(function (s, r) { return Math.max(s, r.n); }, 0); return String(m + 1); }
+    if (notch) {
+      // the next number after the highest cut here; past the last number, the lowest one not yet used
+      var used = {}; cur.forEach(function (r) { used[r.n] = 1; });
+      var m = cur.reduce(function (s, r) { return Math.max(s, r.n); }, 0);
+      if (m < NOTCHMAX) return String(m + 1);
+      for (var i = 1; i <= NOTCHMAX; i++) if (!used[i] && !elsewhereOf(null, F.notchLitter + '-' + i)) return String(i);
+      return '';
+    }
     // The next tag follows the last one recorded here in sequence (I-6: last + 1); a tag that warned as a duplicate is an
     // outlier from someone else's bag, not the sequence. Tags already used anywhere are skipped.
     var seq = cur.filter(function (r) { return !r.dup && r.tag && r.tag.length === TAGLEN && living().filter(function (x) { return x.tag === r.tag; }).length < 2; });
@@ -185,41 +204,44 @@
     for (;;) { t = ('000000' + n).slice(-TAGLEN); if (!elsewhereOf(t) && !cur.some(function (r) { return r.tag === t; })) return t; n++; }
   }
   function freshPiglet() {
-    var s = nextSuggestion();
+    // Every alive piglet identified: nothing to suggest (a 13th needs Set count first).
+    var s = allIn() ? '' : nextSuggestion();
     run.tag = { value: s, suggested: !!s, suggestion: s };
-    run.sex = null; run.sexTouched = false; run.weight = ''; run.weightTouched = false; run.active = 'tag'; run.note = null; run.armed = ''; run.prefill = null;
+    run.sex = null; run.sexTouched = false; run.weight = ''; run.weightTouched = false; run.active = 'tag'; run.note = null; run.armed = ''; run.prefill = null; run.twin = false;
   }
   function draftDirty() { return !!((run.tag.value && !run.tag.suggested) || run.sex || run.weight); }
   function find(v) {               // this litter's current row for a value: alive (caught again) or dead (a dead piglet here)
     if (!v) return null;
     var k = notch ? String(+v) : v;
     var d = distinct(), i;
-    for (i = 0; i < d.length; i++) if (key(d[i]) === k) return { r: d[i], i: i };          // a living record wins
-    for (i = 0; i < rows.length; i++) if (!rows[i].gone && rows[i].dead && key(rows[i]) === k) return { r: rows[i], i: -1 };
+    for (i = 0; i < d.length; i++) if ((notch ? key(d[i]) : d[i].tag) === k) return { r: d[i], i: i };          // a living record wins
+    for (i = 0; i < rows.length; i++) if (!rows[i].gone && rows[i].dead && (notch ? key(rows[i]) : rows[i].tag) === k) return { r: rows[i], i: -1 };
     return null;
   }
+  function hitNow() { return run.tag.suggested ? null : find(run.tag.value); }
+  // A tag already on a living piglet here: the page asks nothing, it offers both readings (caught again is the primary).
+  function canTwin(hit) { return !notch && hit && !hit.r.dead && living().length < alive(); }
   function elsewhere(v) {
     if (!v) return '';
     if (notch) return elsewhereOf(null, F.notchLitter + '-' + (+v));
     return v.length === TAGLEN ? elsewhereOf(v) : '';
   }
-  function fullTag(v) { return notch ? v.length >= NOTCHLEN : v.length >= TAGLEN; }
 
   /* ---- strings ---- */
   function esc(s) { return U.esc(s); }
   function span(id, args, cls, tone) { return U.span(id, args, { cls: cls, tone: tone }); }
-  function button(cls, action, id, args, extra) {
-    return '<button type="button" class="button ' + cls + '" data-ds="Button" data-action="' + action + '"' + (extra || '') +
-      ' data-str="' + id + '"' + (args ? " data-args='" + esc(JSON.stringify(args)) + "'" : '') + '>' + esc(PP.t(id, args)) + '</button>';
+  function button(register, action, id, args) {       // 'secondary surface-back': the register, then any extra class
+    var r = register.split(' ');
+    return UI.button({ label: '', register: r[0], className: r.slice(1).join(' '), action: action, strs: { label: id }, args: args ? { label: args } : undefined });
   }
   var sexWord = function (s) { return PP.t('pp.common.sex.' + (s === 'b' ? 'boar' : 'gilt')); };
   var kg = function (w) { return PP.t('pp.common.kg', { w: w }); };
-  function stamp(r) { return r.d === dom(NOW) ? PP.t('pp.common.stamp.today', { t: r.t, who: r.who }) : PP.t('pp.common.stamp.date', { date: PP.t('pp.common.date.m9', { d: r.d }), t: r.t, who: r.who }); }
+  function stamp(r) { return U.stamp(r.at, r.who, store.today); }
   function shape(r) { return (r.sex ? 's' : '') + (r.w ? 'w' : '') || 'n'; }
   function lineArgs(r) { return { tag: idText(r), sex: r.sex ? sexWord(r.sex) : '', w: r.w || '' }; }
   function ago(r) {
-    var p = r.t.split(':'), q = hm(NOW).split(':'), m = (+q[0] * 60 + +q[1]) - (+p[0] * 60 + +p[1]);
-    if (r.d !== dom(NOW)) return PP.t('pp.common.date.m9', { d: r.d });
+    if (!today(r.at)) return U.date(r.at);
+    var m = Math.round((Date.parse(NOW) - Date.parse(r.at)) / 60000);
     return m >= 60 ? PP.t('time.hours_ago', { n: Math.floor(m / 60) }) : PP.t('pp.id.ago.min', { n: Math.max(1, m) });
   }
 
@@ -243,37 +265,45 @@
     return '<header class="utility-header">' + h + scan + '</header>';
   }
 
-  /* ---- the sex field: Candidate:Radio (the shared sex words) ---- */
+  /* ---- the sex field: ChoiceList radio, inline and optional (a visible Clear, never a re-tap clear) ---- */
   function radio(sex) {
-    var opt = function (v, label) {
-      return '<button type="button" class="id-radio-opt" role="radio" aria-checked="' + (sex === v) + '" data-action="sex" data-value="' + v + '">' +
-        '<span class="id-radio-ring" aria-hidden="true"></span>' + span(label) + '</button>';
-    };
-    return '<div class="id-radio" data-ds="Candidate:Radio" data-field="sex" role="radiogroup" aria-labelledby="id-sex-label">' +
-      '<span class="id-radio-label" id="id-sex-label">' + span('pp.common.sex.label') + '<small>' + span('ds.field.optional') + '</small></span>' +
-      '<span class="id-radio-opts">' + opt('b', 'pp.common.sex.boar_l') + opt('g', 'pp.common.sex.gilt_l') + '</span></div>';
+    return UI.choiceRadios({ label: '', optional: 'Optional', layout: 'inline', action: 'sex', key: 'sex', id: 'id-sex', selected: sex || '',
+      options: [{ value: 'b', label: '', strs: { label: 'pp.common.sex.boar_l' } }, { value: 'g', label: '', strs: { label: 'pp.common.sex.gilt_l' } }],
+      strs: { label: 'pp.common.sex.label', optional: 'ds.field.optional', clear: 'act.clear' } });
   }
   var measureStrs = { optional: 'ds.field.optional', value: 'ds.field.figure', unit: 'ds.field.unit.kg', placeholder: 'ds.field.placeholder' };
   function weightField() {
-    var tag = run.tag.value || run.tag.suggestion;
-    var label = tag ? ['pp.id.weight_of', { tag: idOf(tag) }] : ['pp.id.weight', null];
+    // The weight is named by the piglet it belongs to, as the readout names it (`Piglet 4 of 12 · weight`), never by the tag.
+    var lab = runLabels().weight;
     // Weight warnings speak in the pad's status line (the pad stays on weight), so the field never changes height.
     return UI.measure({ label: '', optional: 'Optional', value: run.weight, unit: 'kg', key: 'weight', controls: 'id-pad', active: run.active === 'weight',
-      strs: Object.assign({ label: label[0] }, measureStrs), args: { label: label[1] } });
+      strs: Object.assign({ label: lab[0] }, measureStrs), args: { label: lab[1] } });
   }
 
   /* ---- what Record will do: warnings, the re-catch plan, the idle line ---- */
-  function usual() { return USUAL[L.dayAge] || USUAL[3]; }
+  function usual(day) {
+    var d = day == null ? L.dayAge : day, i;
+    if (d <= USUAL[0][0]) return [USUAL[0][1], USUAL[0][2]];
+    for (i = 1; i < USUAL.length; i++) {
+      if (d <= USUAL[i][0]) {
+        var a = USUAL[i - 1], b = USUAL[i], f = (d - a[0]) / (b[0] - a[0]);
+        return [+(a[1] + f * (b[1] - a[1])).toFixed(1), +(a[2] + f * (b[2] - a[2])).toFixed(1)];
+      }
+    }
+    var z = USUAL[USUAL.length - 1]; return [z[1], z[2]];
+  }
+  // Refused only when physically impossible: over twice the usual top per alive piglet (6 kg at day 3), a slipped decimal.
+  function hardKg() { return Math.max(6, Math.ceil(usual()[1] * 2)); }
   function warnings() {            // soft warnings; a warned Record needs a second, deliberate tap
     var out = [], v = run.tag.value;
     if (!notch && v && !run.tag.suggested && v.length < TAGLEN) out.push({ k: 'short', id: 'ds.field.numpad.short', args: { k: v.length, n: TAGLEN }, field: 'tag' });
     var w = run.weight ? SentriUI.numpadCommit(run.weight, { decimals: 2 }) : null, u = usual();
-    var hit = run.tag.suggested ? null : find(v);
+    var hit = run.twin ? null : hitNow();
     var recorded = !(hit && !hit.r.dead && hit.r.w);          // a re-catch keeps its posted weight: the draft's is not recorded
     if (w && recorded && (+w < u[0] || +w > u[1])) out.push({ k: 'weight', id: 'ds.field.numpad.weight_range', args: { min: u[0].toFixed(1), max: u[1].toFixed(1), d: L.dayAge }, field: 'weight' });
     return out;
   }
-  function signature() { return [run.tag.value, run.sex, run.weight].join('|'); }
+  function signature() { return [run.tag.value, run.sex, run.weight, run.twin].join('|'); }
   function againPlan(hit) {        // a piglet caught again: posted facts stand, only missing ones are added
     var r = hit.r, parts = [], differs = false, w = run.weight ? SentriUI.numpadCommit(run.weight, { decimals: 2 }) : null;
     if (r.sex) {
@@ -287,8 +317,9 @@
     return { parts: parts, differs: differs, adds: parts.filter(function (p) { return p[0] === 'pp.id.again.adds'; }).length };
   }
   var joinParts = function (parts) { return parts.map(function (p) { return PP.t(p[0], p[1]); }).join(' · '); };
+  var setCount = function () { return { label: '', action: 'set-count', strs: { label: 'pp.id.ptr.set_count' }, args: { label: { n: alive() } } }; };
   function status() {              // one status line: the most urgent thing Record would say, else the last recorded piglet
-    var v = run.tag.value, hit = run.tag.suggested ? null : find(v);
+    var v = run.tag.value, hit = hitNow();
     if (run.note) return run.note;
     if (run.armed) {
       var ws = warnings();
@@ -296,56 +327,56 @@
       if (ws.length === 1) return { id: ws[0].id, args: ws[0].args, tone: 'warn' };
     }
     if (hit && hit.r.dead) return { id: 'pp.id.hint.dead_here', args: { tag: idText(hit.r) }, tone: 'warn' };
-    if (hit) {
-      var p = againPlan(hit);
-      var s = { id: 'pp.id.hint.again', args: { tag: idText(hit.r), i: hit.i + 1, what: joinParts(p.parts) }, tone: 'warn' };
-      if (p.differs) s.actions = [{ label: '', action: 'edit-row', value: key(hit.r), strs: { label: 'pp.id.ptr.edit_piglet' }, args: { label: { i: hit.i + 1 } } }];
-      return s;
+    if (hit && run.twin) {
+      return { id: 'pp.id.hint.twin', args: { tag: idText(hit.r) }, tone: 'warn',
+        actions: [{ label: '', action: 'twin', value: 'same', strs: { label: 'pp.id.ptr.same' }, args: { label: { i: hit.i + 1 } } }] };
     }
+    if (hit) {
+      // Caught again is the primary; a different piglet with the same printed tag is offered beside it, on the same line
+      // (the fields show what the record holds; after Record the line says what was added and what stayed).
+      if (canTwin(hit)) return { id: 'pp.id.hint.again_here', args: { tag: idText(hit.r), i: hit.i + 1 }, tone: 'warn',
+        actions: [{ label: '', action: 'twin', value: 'other', strs: { label: 'pp.id.ptr.twin' } }] };
+      var p = againPlan(hit);
+      return { id: 'pp.id.hint.again', args: { tag: idText(hit.r), i: hit.i + 1, what: joinParts(p.parts) }, tone: 'warn',
+        actions: p.differs ? [{ label: '', action: 'edit-row', value: key(hit.r), strs: { label: 'pp.id.ptr.edit_piglet' }, args: { label: { i: hit.i + 1 } } }] : [] };
+    }
+    if (allIn()) return { id: 'pp.id.hint.all', args: { n: alive() }, actions: [setCount()] };
     var where = elsewhere(v);
     if (where) return { id: notch ? 'pp.id.hint.dup_notch' : 'ds.field.numpad.duplicate', args: { tag: idOf(v), crate: where }, tone: 'warn' };
-    if (v && !run.tag.suggested && fullTag(v)) return notch ? { id: 'pp.id.hint.notch_full', args: { n: NOTCHLEN } } : { id: 'ds.field.numpad.dead_full', args: { n: TAGLEN } };
-    if (!keepers && distinct().length >= alive()) {
-      return { id: 'pp.id.hint.all', args: { n: alive() }, actions: [{ label: '', action: 'set-count', strs: { label: 'pp.id.ptr.set_count' }, args: { label: { n: alive() } } }] };
-    }
     var last = log[log.length - 1];
     if (last) {
-      var r = last.r, base = last.again ? 'pp.id.last.again' : 'pp.id.last.t' + (r.sex ? 's' : '') + (r.w ? 'w' : '') + (r.dup ? '_dup' : '');
+      var r = last.r, tw = !last.again && twinGroup(r);
+      var base = last.again ? 'pp.id.last.again' : tw ? 'pp.id.last.twin' : 'pp.id.last.t' + (r.sex ? 's' : '') + (r.w ? 'w' : '') + (r.dup ? '_dup' : '');
       var a = Object.assign(lineArgs(r), { i: last.again || 0, crate: r.dup || '' });
       var mine = log.length > visitStart && r.who === ME && !last.again && !r.gone && !draftDirty();   // Undo never overwrites a draft
-      return { id: base, args: a, tone: r.dup ? 'warn' : '', actions: mine ? [{ label: '', action: 'undo', strs: { label: 'pp.id.ptr.undo' } }] : [] };
+      return { id: base, args: a, tone: r.dup || tw ? 'warn' : '', actions: mine ? [{ label: '', action: 'undo', strs: { label: 'pp.id.ptr.undo' } }] : [] };
     }
     if (run.tag.suggested) return { id: notch ? 'pp.id.hint.next_notch' : 'ds.field.numpad.suggested' };
     return null;
   }
 
-  /* ---- the docked run: Candidate:CompactRun (readout + keys-only Numpad with its status line) ---- */
+  /* ---- the docked run: Numpad compact (readout + status line + keys; the last record lives in the status line) ---- */
   var padStrs = { digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad', recent: 'ds.field.aria.recent', value: 'ds.field.figure', placeholder: 'ds.field.placeholder' };
-  function readoutLabel() {
-    var hit = run.tag.suggested ? null : find(run.tag.value);
-    var i = hit && !hit.r.dead ? hit.i + 1 : distinct().length + 1;
-    if (notch) return ['pp.id.run.notch', { i: i, n: alive(), litter: F.notchLitter }];
-    if (keepers) return ['pp.id.run.keeper', { i: i }];
-    if (i > alive()) return ['pp.id.run.tag_open', { i: i }];
-    return ['ds.field.numpad.tag_label', { i: i, n: alive() }];
-  }
-  function readout() {
-    // The readout is the Numpad's own run markup (label + value box), taken from the card so nothing is hand-copied.
-    var lab = readoutLabel();
-    var html = UI.numpad({ id: 'id-readout-src', key: 'tag', label: '', value: run.tag.value, suggested: run.tag.suggested, maxLength: notch ? NOTCHLEN : TAGLEN,
-      strs: Object.assign({ label: lab[0] }, padStrs), args: { label: lab[1] } });
-    var t = document.createElement('template'); t.innerHTML = html;
-    return t.content.querySelector('.st-numpad-readout').outerHTML;
+  function runLabels() {           // the readout's label and the weight's, both naming the same piglet
+    var hit = hitNow();
+    var i = hit && !hit.r.dead && !run.twin ? hit.i + 1 : distinct().length + 1;
+    if (!hit && allIn()) return { tag: ['pp.id.run.tag_plain', null], weight: ['pp.id.weight', null] };
+    if (notch) return { tag: ['pp.id.run.notch', { i: i, n: alive(), litter: F.notchLitter }], weight: ['ds.field.numpad.weight_label', { i: i, n: alive() }] };
+    if (keepers) return { tag: ['pp.id.run.keeper', { i: i }], weight: ['pp.id.run.keeper_weight', { i: i }] };
+    if (i > alive()) return { tag: ['pp.id.run.tag_open', { i: i }], weight: ['pp.id.run.weight_open', { i: i }] };
+    return { tag: ['ds.field.numpad.tag_label', { i: i, n: alive() }], weight: ['ds.field.numpad.weight_label', { i: i, n: alive() }] };
   }
   function pad() {
-    var o = { id: 'id-pad', strs: Object.assign({}, padStrs), args: {} };
+    var o = { id: 'id-pad', compact: true, strs: Object.assign({}, padStrs), args: {} };
     var s;
     if (run.active === 'weight') {
       Object.assign(o, { key: 'weight', value: run.weight, decimals: 2, intLength: 2 });
       s = run.note || (run.armed ? status() : null);
       if (!s && run.tag.value) s = { actions: [{ label: '', action: 'to-tag', strs: { label: 'pp.id.ptr.back_tag' }, args: { label: { tag: idOf(run.tag.value) } } }] };
     } else {
-      Object.assign(o, { key: 'tag', value: run.tag.value, suggested: run.tag.suggested, maxLength: notch ? NOTCHLEN : TAGLEN });
+      var lab = runLabels().tag;
+      Object.assign(o, { key: 'tag', label: '', value: run.tag.value, suggested: run.tag.suggested, maxLength: notch ? NOTCHLEN : TAGLEN });
+      o.strs.label = lab[0]; o.args.label = lab[1];
       s = status();
     }
     if (s) {
@@ -354,22 +385,26 @@
       if (s.actions) o.actions = s.actions;
     }
     if (run.active === 'tag' && !run.tag.value && run.tag.suggestion && !(s && s.actions && s.actions.length)) {
-      o.actions = [{ label: '', action: 'numpad-suggestion', strs: { label: 'ds.field.numpad.use_suggestion' }, args: { label: { tag: run.tag.suggestion } } }];
+      o.actions = [{ label: '', action: 'numpad-suggestion', strs: { label: 'ds.field.numpad.use_suggestion' }, args: { label: { tag: idOf(run.tag.suggestion) } } }];
     }
-    return (run.active === 'tag' ? readout() : '') + UI.numpad(o);
+    return UI.numpad(o);
   }
-  function primary() {
-    var hit = run.tag.suggested ? null : find(run.tag.value);
+  function primary() {             // the one commit; null when there is nothing this sheet can record
+    var hit = hitNow();
     if (run.armed) return ['pp.id.act.record_anyway', { tag: idOf(run.tag.value) }];
+    if (hit && !hit.r.dead && run.twin) return ['pp.id.act.record_twin', { tag: idText(hit.r) }];
     if (hit && !hit.r.dead) return ['pp.id.act.record_again', { i: hit.i + 1 }];
+    // Every alive piglet identified and no piglet of this litter on the pad: Record has nothing to do (the status line
+    // offers Set count), so Close is the sheet's one way on.
+    if (allIn()) return null;
     return [keepers ? 'pp.id.act.record_next_keeper' : 'pp.id.act.record_next', null];
   }
   function runFace() {
     var p = primary();
-    return '<div class="page-background"><section class="sheet" data-ds="Sheet" data-presentation="page"' + (drawer || confirm ? ' inert' : '') + '>' + header(true) +
-      '<div class="id-run"><div class="id-run-fields">' + radio(run.sex) + weightField() + '</div>' +
-      '<div class="id-compact" data-ds="Candidate:CompactRun">' + pad() + '</div></div>' +
-      '<footer class="sheet-footer">' + button('secondary', 'close', 'act.close') + button('primary', 'record', p[0], p[1]) + '</footer></section></div>';
+    var bar = p ? button('secondary', 'close', 'act.close') + button('primary', 'record', p[0], p[1]) : button('primary', 'close', 'act.close');
+    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (drawer || confirm ? ' inert' : '') + '>' + header(true) +
+      '<div class="id-run"><div class="id-run-fields">' + radio(run.sex) + weightField() + '</div>' + pad() + '</div>' +
+      '<footer class="sheet-footer">' + bar + '</footer></section>';
   }
 
   /* ---- the table face: the litter's identified piglets, viewable and editable (through S8's Edit) forever ---- */
@@ -402,16 +437,16 @@
   }
   function keepersBlock() {
     if (!keepers) return '';
-    if (closed) {                  // the closing count and stamp, not a live count; Edit (S8) reopens it, stamped
+    if (closed) {                  // the closing count and stamp, not a live count; Edit (S8) reopens it to add a keeper, stamped
       return UI.rowGroup(UI.row({ title: '', description: '', action: 'edit-done', value: crate, strs: { title: 'pp.id.done.title', description: 'pp.id.done.line' },
-        args: { title: { k: closed.k }, description: { k: closed.k, stamp: stamp({ d: dom(NOW), t: closed.t, who: closed.who }), r: Math.max(0, alive() - closed.k) } } }));
+        args: { title: { k: closed.k }, description: { k: closed.k, stamp: stamp(closed), r: Math.max(0, alive() - closed.k) } } }));
     }
     if (over() || pairs()) return UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.id.close.wait' } });
-    return '<button type="button" class="pp-tool" data-ds="Candidate:Tool" data-action="close-set" data-str="pp.id.act.done" data-args=\'{"k":' + distinct().length + '}\'>' +
-      esc(PP.t('pp.id.act.done', { k: distinct().length })) + '</button>';
+    return UI.button({ label: '', register: 'tool', action: 'close-set', strs: { label: 'pp.id.act.done' }, args: { label: { k: distinct().length } } });
   }
   function weighSection() {
-    var today = lwRecs.filter(function (x) { return x.d === dom(NOW); })[0];
+    // A weigh-day record is keyed by the day-age it was weighed at (day 3, day 21 at weaning …), not by the clock date.
+    var todays = todayRec();
     var rowsHtml = lwRecs.slice().reverse().map(function (x) {
       // two phones weighed the same day without seeing each other: both show until one is corrected
       if (x.conflicts.length) {
@@ -419,10 +454,10 @@
         return UI.row({ title: '', description: '', trailing: span('pp.id.lw.check', null, 'id-tone', 'amber'), action: 'edit-weight', value: String(x.day),
           strs: { title: 'pp.id.lw.rec', description: 'pp.id.lw.line_conflict' }, args: { title: { day: x.day }, description: { w: x.w, stamp: stamp(x), w2: c.w, stamp2: stamp(c) } } });
       }
-      return UI.row({ title: '', description: '', action: x.d === dom(NOW) ? 'open-weight' : 'edit-weight', value: String(x.day),
+      return UI.row({ title: '', description: '', action: x.day === L.dayAge ? 'open-weight' : 'edit-weight', value: String(x.day),
         strs: { title: 'pp.id.lw.rec', description: 'pp.id.lw.line' }, args: { title: { day: x.day }, description: { w: x.w, stamp: stamp(x) } } });
     }).join('');
-    if (!today) {
+    if (!todays) {
       var tr = drawerKept && drawerDirty(drawerKept) ? span('status.unsaved', { n: 1 }, 'id-tone', 'green') : span('ds.field.optional');
       rowsHtml = UI.row({ title: '', trailing: tr, action: 'open-weight', value: String(L.dayAge), strs: { title: 'pp.id.lw.rec' }, args: { title: { day: L.dayAge } } }) + rowsHtml;
     }
@@ -431,10 +466,15 @@
     return '<section class="id-group" role="status" aria-live="polite">' + h + UI.rowGroup(rowsHtml) + '</section>';
   }
   function tableRow(r) {
-    var trail = r.dead ? span('pp.id.row.dead', { cause: PP.t('dead.' + r.dead.cause), date: PP.t('pp.common.date.m9', { d: r.dead.d }) }, 'id-tone', 'red')
-      : !r.dead && (r.pair || (notch && living().filter(function (x) { return key(x) === key(r); }).length > 1)) ? span('pp.id.row.pair', null, 'id-tone', 'amber')
-      : r.dup ? span('pp.id.row.dup', { crate: r.dup }, 'id-tone', 'amber') : '';
-    return UI.row({ title: '', description: '', trailing: trail, action: 'edit-row', value: key(r),
+    // Colour lives on the value: dead red; a double-issued tag, a same-tag pair, a tag also on another crate and a
+    // corrected row amber — each flag stays on the row until Edit resolves it.
+    var flags = [];
+    if (r.dead) flags.push(span('pp.id.row.dead', { cause: PP.t('dead.' + r.dead.cause), date: U.date(r.dead.at) }, 'id-tone', 'red'));
+    else if (twinGroup(r)) flags.push(span('pp.id.row.twin', null, 'id-tone', 'amber'));
+    else if (r.pair || (notch && living().filter(function (x) { return key(x) === key(r); }).length > 1)) flags.push(span('pp.id.row.pair', null, 'id-tone', 'amber'));
+    if (r.dup) flags.push(span('pp.id.row.dup', { crate: r.dup }, 'id-tone', 'amber'));
+    if (r.corrected) flags.push(span('pp.id.row.corrected', null, 'id-tone', 'amber'));
+    return UI.row({ title: '', description: '', trailing: flags.join(' ' + span('pp.common.sep') + ' '), action: 'edit-row', value: key(r),
       strs: { title: 'pp.id.row.id', description: 'pp.id.row.' + shape(r) },
       args: { title: { id: idText(r) }, description: { sex: r.sex ? sexWord(r.sex) : '', w: r.w || '', stamp: stamp(r) } } });
   }
@@ -452,9 +492,9 @@
     var p = draftDirty() ? ['pp.id.act.record_resume', { n: 1 }] : ['pp.id.act.record', null];
     // A closed candidate set takes no records until Edit reopens it.
     var bar = keepers && closed ? button('secondary', 'close', 'act.close') : button('secondary', 'close', 'act.close') + button('primary', 'open-run', p[0], p[1]);
-    return '<div class="page-background"><section class="sheet" data-ds="Sheet" data-presentation="page"' + (drawer || confirm ? ' inert' : '') + '>' + header(false) +
+    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (drawer || confirm ? ' inert' : '') + '>' + header(false) +
       '<div class="sheet-body">' + body + '</div>' +
-      '<footer class="sheet-footer">' + bar + '</footer></section></div>';
+      '<footer class="sheet-footer">' + bar + '</footer></section>';
   }
 
   /* ---- the weigh-day drawer: today's litter weight + boar/gilt counts for piglets not identified. Staged: Back keeps, Clear discards, Save commits ---- */
@@ -462,11 +502,11 @@
   function drawerState(d) {
     var v = d.w, num = parseFloat(v);
     if (v === '' || d.active) return '';
-    if (num > HARD_KG * alive()) return 'refused';
+    if (num > hardKg() * alive()) return 'refused';
     var r = drawerRange();
     return num < r[0] || num > r[1] ? 'warn' : '';
   }
-  function todayRec() { return lwRecs.filter(function (x) { return x.d === dom(NOW); })[0] || null; }
+  function todayRec() { return lwRecs.filter(function (x) { return x.day === L.dayAge; })[0] || null; }
   function posted() { var t = todayRec(), c = tally(); return { w: t ? t.w : '', boars: c.cb, gilts: c.cg }; }
   function wChange(d) {            // the committed weight differs from today's posted one (1.4 = 1.40); clearing is not a change
     var w = d.w === '' ? null : SentriUI.numpadCommit(d.w, { decimals: 1 }), p = posted().w;
@@ -479,7 +519,7 @@
     var o = { label: '', optional: 'Optional', value: drawer.w, unit: 'kg', key: 'lw', controls: 'id-lw-pad', active: drawer.active,
       strs: Object.assign({ label: 'pp.id.lw.row' }, measureStrs), args: {} };
     if (s === 'warn') { o.range = rng; o.hint = ''; o.strs.hint = 'ds.field.measure.range'; o.args.hint = { min: rng[0].toFixed(1), max: rng[1].toFixed(1), v: kg(drawer.w) }; }
-    if (s === 'refused') { o.tone = 'refused'; o.hint = ''; o.strs.hint = 'ds.field.measure.refused'; o.args.hint = { max: HARD_KG * alive(), n: alive() }; }
+    if (s === 'refused') { o.tone = 'refused'; o.hint = ''; o.strs.hint = 'ds.field.measure.refused'; o.args.hint = { max: hardKg() * alive(), n: alive() }; }
     var cleared = drawer.w === '' && posted().w;       // removing a posted weight is a correction: Edit, not Save
     if (cleared && !drawer.active) { o.hint = ''; o.strs.hint = 'pp.id.lw.clear_edit'; o.args.hint = { w: posted().w }; }
     var body = UI.measure(o);
@@ -491,7 +531,7 @@
             ceil ? { hint: 'pp.id.lw.ceiling' } : {}),
           args: { description: { t: v + fromRows, k: fromRows }, hint: { r: rem } } });
       };
-      body += '<div class="id-group">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.id.lw.counts' }, args: { title: { r: rem } } }) +
+      body += '<div class="id-group" id="id-lw-counts">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.id.lw.counts' }, args: { title: { r: rem } } }) +
         step('boars', 'pp.id.lw.boars', 'pp.id.lw.boars_all', drawer.boars, drawer.gilts, t.rb) +
         step('gilts', 'pp.id.lw.gilts', 'pp.id.lw.gilts_all', drawer.gilts, drawer.boars, t.rg) + '</div>';
     }
@@ -499,8 +539,13 @@
     var clear = dirty ? '<button type="button" data-action="clear" data-str="act.clear">' + esc(PP.t('act.clear')) + '</button>' : '';
     var head = UI.heading({ title: '', kind: 'page', level: 2, description: '', action: clear,
       strs: { title: 'pp.id.sec.weigh', description: 'pp.id.lw.sub' }, args: { description: { n: alive(), d: L.dayAge } } });
-    var padActs = cleared ? [{ label: '', action: 'edit-weight', value: String(L.dayAge), strs: { label: 'pp.id.lw.edit_ptr' }, args: { label: { w: posted().w } } }] : [];
-    var dock = drawer.active ? '<div class="id-dock">' + UI.numpad({ id: 'id-lw-pad', key: 'lw', value: drawer.w, decimals: 1, intLength: 2, actions: padActs, strs: Object.assign({}, padStrs) }) + '</div>' : '';
+    // The pad's status line: why a key did nothing, the way to the counts it covers (the keys never hide them for good),
+    // or the correction a cleared weight needs.
+    var padActs = cleared ? [{ label: '', action: 'edit-weight', value: String(L.dayAge), strs: { label: 'pp.id.lw.edit_ptr' }, args: { label: { w: posted().w } } }]
+      : rem > 0 ? [{ label: '', action: 'to-counts', strs: { label: 'pp.id.lw.to_counts' }, args: { label: { r: rem } } }] : [];
+    var po = { id: 'id-lw-pad', key: 'lw', value: drawer.w, decimals: 1, intLength: LWINT, actions: padActs, strs: Object.assign({}, padStrs), args: {} };
+    if (drawer.note) { po.hint = ''; po.strs.hint = drawer.note.id; po.args.hint = drawer.note.args || null; }
+    var dock = drawer.active ? '<div class="id-dock">' + UI.numpad(po) + '</div>' : '';
     // Save is withheld (not greyed) while nothing changed or the value is refused; the reason sits beside the value.
     var save = dirty && s !== 'refused' ? button('primary', 'save', 'act.save') : '';
     return '<div class="scrim" data-ds="Sheet" data-action="back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" data-sizing="content" role="dialog" aria-modal="true">' +
@@ -525,6 +570,16 @@
       '<footer class="sheet-footer">' + button('secondary surface-back', 'confirm-back', 'act.back') + button('primary', 'confirm-close', 'pp.id.act.done', { k: k }) + '</footer></section>';
   }
 
+  /* ---- drafts on this phone: the piglet in hand and an unsaved litter weight survive Close, a call, a crash ---- */
+  function draftKey() { return 'pp-id-draft:' + store.name + ':' + crate; }
+  function saveDraft() {
+    var d = {}, lw = drawer && drawerDirty(drawer) ? drawer : drawerKept && drawerDirty(drawerKept) ? drawerKept : null;
+    if (draftDirty()) d.run = { tag: run.tag.suggested ? '' : run.tag.value, sex: run.sex, weight: run.weight, twin: run.twin };
+    if (lw) d.lw = { w: lw.w, boars: lw.boars, gilts: lw.gilts };
+    try { if (d.run || d.lw) sessionStorage.setItem(draftKey(), JSON.stringify(d)); else sessionStorage.removeItem(draftKey()); } catch (e) { /* private mode: the draft lives as long as the page */ }
+  }
+  function loadDraft() { try { return JSON.parse(sessionStorage.getItem(draftKey()) || 'null'); } catch (e) { return null; } }
+
   /* ---- render: patch the DOM in place so field roots, focus and live regions survive ---- */
   function morph(from, to) {
     if (from.nodeType !== to.nodeType || from.nodeName !== to.nodeName) { from.replaceWith(to.cloneNode(true)); return; }
@@ -543,6 +598,7 @@
     t.innerHTML = (face === 'run' ? runFace() : tableFace()) + (drawer ? weightDrawer() : '') + (confirm ? confirmDrawer() : '');
     PP.apply(t);
     morph(screen, (function () { var w = screen.cloneNode(false); while (t.firstChild) w.appendChild(t.firstChild); return w; })());
+    saveDraft();
   }
 
   /* ---- keys, scans, Record ---- */
@@ -556,14 +612,17 @@
       return;
     }
     var r = SentriUI.numpadInput(run.tag, k, { maxLength: notch ? NOTCHLEN : TAGLEN });
+    if (r.value !== run.tag.value) run.twin = false;
     run.tag = { value: r.value, suggested: r.suggested, suggestion: r.suggestion };
     if (r.dead === 'empty') run.note = { id: 'ds.field.numpad.dead_empty' };
+    // a digit past a full tag says why, once, on the tap (a full tag on its own says nothing)
+    else if (r.dead === 'full') run.note = notch ? { id: 'pp.id.hint.notch_full', args: { n: NOTCHLEN } } : { id: 'ds.field.numpad.dead_full', args: { n: TAGLEN } };
     afterTag();
   }
   function afterTag() {             // a caught-again piglet shows what its record holds; the prefill follows the tag
-    var hit = run.tag.suggested ? null : find(run.tag.value);
+    var hit = run.twin ? null : hitNow();
     var k = hit && !hit.r.dead ? key(hit.r) : null;
-    if (run.prefill && run.prefill.k !== k) {      // the tag moved away (backspace, another scan): untouched prefilled facts go
+    if (run.prefill && run.prefill.k !== k) {      // the tag moved away (backspace, another scan, a different piglet): untouched prefilled facts go
       if (run.prefill.sex && !run.sexTouched) run.sex = null;
       if (run.prefill.w && !run.weightTouched) run.weight = '';
       run.prefill = null;
@@ -579,7 +638,7 @@
     var r = SentriUI.numpadScan(run.tag, digits, { maxLength: TAGLEN });
     run.active = 'tag'; run.note = null; run.armed = '';
     if (r.dead) { run.note = { id: 'ds.field.numpad.dead_scan', args: { n: TAGLEN } }; return; }
-    run.tag = { value: r.value, suggested: false, suggestion: r.suggestion };
+    run.tag = { value: r.value, suggested: false, suggestion: r.suggestion }; run.twin = false;
     afterTag();
   }
   function rowById(id) { return rows.filter(function (r) { return r.rowId === id; })[0]; }
@@ -589,6 +648,10 @@
     var raw = run.tag.value, v = notch ? (raw ? String(+raw) : '') : raw;
     // A row needs its identity: a tag on a tag farm, a notch number on a notch farm. Sex and weight never block.
     if (!v) { run.active = 'tag'; run.note = { id: notch ? 'pp.id.hint.no_notch' : 'pp.id.hint.no_tag', tone: 'warn' }; render(); return; }
+    // A notch number runs 1–99: 0 is not one, and the page says so instead of refusing in silence.
+    if (notch && (+v < 1 || +v > NOTCHMAX)) { run.active = 'tag'; run.note = { id: 'pp.id.hint.notch_range', args: { id: idOf(v), max: NOTCHMAX }, tone: 'warn' }; render(); return; }
+    var hit = find(v);
+    if (!primary()) { run.note = null; render(); return; }
     var ws = warnings();
     if (ws.length && run.armed !== signature()) {
       run.armed = signature(); run.armedAt = now; run.note = null;
@@ -597,8 +660,7 @@
     }
     lastCommit = now; run.armed = ''; run.note = null;
     var w = run.weight ? SentriUI.numpadCommit(run.weight, { decimals: 2 }) : null;
-    var hit = find(v);
-    if (hit && !hit.r.dead) {
+    if (hit && !hit.r.dead && !run.twin) {
       // Caught again in this pass: one piglet, one row. Missing facts are added under this stamp; posted facts stand (Edit changes them).
       var p = againPlan(hit), r = hit.r, set = {};
       if (!r.sex && run.sex) set.sex = run.sex;
@@ -613,11 +675,13 @@
     }
     var e = { op: 'add', rowId: crate + '-p' + Date.now().toString(36) };
     if (notch) e.notch = F.notchLitter + '-' + v; else e.tag = v;
+    // A different piglet under a tag already on this litter (a double-issued tag): its own row, marked as such.
+    if (hit && !hit.r.dead && run.twin) e.twinOf = hit.r.rowId;
     if (run.sex) e.sex = run.sex;
     if (w) e.weight = +w;
     var res = commit(e);
     // The ledger refuses a row past Alive from this phone: every alive piglet is identified (Set count if one more is here).
-    if (!res.ok) { run.note = res.reason === 'more_rows_than_alive' ? { id: 'pp.id.hint.all', args: { n: alive() }, actions: [{ label: '', action: 'set-count', strs: { label: 'pp.id.ptr.set_count' }, args: { label: { n: alive() } } }] } : { id: 'pp.id.hint.refused', tone: 'warn' }; render(); return; }
+    if (!res.ok) { run.note = res.reason === 'more_rows_than_alive' ? { id: 'pp.id.hint.all', args: { n: alive() }, actions: [setCount()] } : { id: 'pp.id.hint.refused', tone: 'warn' }; render(); return; }
     log.push({ r: rowById(res.event.rowId) });
     freshPiglet();
     render();
@@ -625,12 +689,32 @@
   function undo() {                // the newest row of this visit, by this hand: withdrawn (stamped), back on the pad to fix
     var last = log[log.length - 1];
     if (!last || last.again || last.r.who !== ME || log.length <= visitStart || draftDirty()) return;
-    var r = last.r;
+    var r = last.r, wasTwin = !!twins[r.rowId];
     if (!commit({ op: 'withdraw', rowId: r.rowId }).ok) return;
     log.pop();
     run.tag = { value: notch ? String(r.n) : r.tag, suggested: false, suggestion: nextSuggestion() };
-    run.sex = r.sex; run.sexTouched = true; run.weight = r.w || ''; run.weightTouched = true; run.active = 'tag'; run.armed = '';
+    run.sex = r.sex; run.sexTouched = true; run.weight = r.w || ''; run.weightTouched = true; run.active = 'tag'; run.armed = ''; run.twin = wasTwin;
     run.note = { id: 'pp.id.hint.undone', args: { tag: idText(r) } };
+  }
+  function openWeight() {
+    var t = todayRec(), c = tally();              // opens clamped: counts already consumed by records are not offered again
+    drawer = drawerKept ? Object.assign({}, drawerKept, { active: false }) : { w: t ? t.w : '', active: !t, boars: c.cb, gilts: c.cg };
+  }
+  function saveWeight() {
+    drawer.active = false; drawer.note = null;
+    if (drawerState(drawer) === 'refused' || !drawerDirty(drawer)) return;
+    // Only what changed is saved. One record per weigh day: a second weighing today replaces today's value
+    // (the later stamp stands; the record keeps both).
+    var w = wChange(drawer), cb = countsChange(drawer), evs = [];
+    if (w) evs.push({ type: 'litter_weight', litter: crate, kg: w, day: L.dayAge });
+    if (cb) evs.push({ type: 'sex_counts', litter: crate, boars: drawer.boars, gilts: drawer.gilts });
+    var res = store.commitAll(evs);
+    if (!res.ok) return;
+    reload(); loadWeights();
+    // The receipt speaks the litter's boars and gilts in all, as the tiles above print them (identified + not identified).
+    var t = tally(), bg = { b: PP.tn('pp.id.n_boars', t.b), g: PP.tn('pp.id.n_gilts', t.g) };
+    receipt = w && cb ? ['pp.id.rcpt.both', Object.assign({ w: w }, bg)] : w ? ['pp.id.rcpt.weight', { w: w }] : ['pp.id.rcpt.counts', bg];
+    drawer = null; drawerKept = null;
   }
 
   var scanner = SentriUI.numpadScanner({
@@ -641,10 +725,15 @@
 
   document.getElementById('screen').addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-action]');
-    if (!b) return;
+    if (!b || !store) return;
     var a = b.dataset.action, v = b.dataset.value;
     if (a === 'numpad') {
-      if (v === 'lw') drawer.w = SentriUI.numpadInput({ value: drawer.w }, b.dataset.key, { decimals: 1, intLength: 2 }).value;
+      if (v === 'lw') {
+        var r = SentriUI.numpadInput({ value: drawer.w }, b.dataset.key, { decimals: 1, intLength: LWINT });
+        drawer.w = r.value;
+        drawer.note = r.dead === 'empty' ? { id: 'ds.field.numpad.dead_empty' } : r.dead === 'full' && drawer.w.indexOf('.') < 0 ? { id: 'pp.id.lw.dead_int', args: { n: LWINT } }
+          : r.dead ? { id: 'ds.field.numpad.dead_places', args: { n: 1 } } : null;
+      }
       else typeKey(b.dataset.key);
       render();
     } else if (a === 'numpad-suggestion') { typeKey('suggestion'); render(); }
@@ -654,11 +743,12 @@
       if (run.active !== 'weight') { run.active = 'weight'; run.note = null; render(); }
     }
     else if (a === 'to-tag') { run.active = 'tag'; render(); }
-    else if (a === 'sex') {
-      run.sexTouched = true; run.armed = ''; run.note = null;
-      run.sex = run.sex === v ? null : v;             // optional: tapping the chosen one again clears it
-      render();
+    else if (a === 'sex') { run.sexTouched = true; run.armed = ''; run.note = null; run.sex = v; render(); }
+    else if (a === 'sex-clear') {                     // the optional field's visible Clear: missing, never a default
+      run.sexTouched = true; run.armed = ''; run.sex = null; render();
+      var first = document.querySelector('#id-sex [role="radio"]'); if (first && document.activeElement === document.body) first.focus();
     }
+    else if (a === 'twin') { run.twin = v === 'other'; run.armed = ''; run.note = null; afterTag(); render(); }
     else if (a === 'record') record();
     else if (a === 'undo') { undo(); render(); }
     else if (a === 'close-set') { if (!over() && !pairs()) { confirm = true; render(); } }
@@ -666,35 +756,26 @@
     else if (a === 'confirm-close') { if (commit({ op: 'close' }).ok) confirm = false; render(); }
     else if (a === 'open-table') { face = 'table'; receipt = null; render(); }
     else if (a === 'open-run') { if (keepers && closed) return; face = 'run'; if (!draftDirty()) freshPiglet(); render(); }   // an unfinished piglet resumes
-    else if (a === 'open-weight') {
-      var t = todayRec(), c = tally();              // opens clamped: counts already consumed by records are not offered again
-      drawer = drawerKept || { w: t ? t.w : '', active: !t, boars: c.cb, gilts: c.cg }; render();
+    else if (a === 'open-weight') { openWeight(); render(); }
+    else if (a === 'to-counts') {                     // the pad steps aside so the counts it covered are in view
+      drawer.active = false; drawer.note = null; render();
+      var g = document.getElementById('id-lw-counts'); if (g && g.scrollIntoView) g.scrollIntoView({ block: 'nearest' });
     }
     else if (a === 'count') {
-      drawer.active = false;
+      drawer.active = false; drawer.note = null;
       if (b.getAttribute('aria-disabled') === 'true') { drawer.ceil = +b.dataset.step > 0 ? v : ''; render(); return; }
       drawer.ceil = ''; drawer[v] += +b.dataset.step; render();
     }
-    else if (a === 'back') { drawer.active = false; drawerKept = drawerDirty(drawer) ? drawer : null; drawer = null; render(); }
+    else if (a === 'back') { drawer.active = false; drawer.note = null; drawerKept = drawerDirty(drawer) ? drawer : null; drawer = null; render(); }
     else if (a === 'clear') { var tr = todayRec(), tc = tally(); drawer = { w: tr ? tr.w : '', active: false, boars: tc.cb, gilts: tc.cg }; drawerKept = null; render(); }
-    else if (a === 'save') {
-      drawer.active = false;
-      if (drawerState(drawer) === 'refused' || !drawerDirty(drawer)) { render(); return; }
-      // Only what changed is saved. One record per weigh day: a second weighing today replaces today's value
-      // (the later stamp stands; the record keeps both).
-      var w = wChange(drawer), cb = countsChange(drawer), wChanged = !!w, evs = [];
-      if (wChanged) evs.push({ type: 'litter_weight', litter: crate, kg: w, day: L.dayAge });
-      if (cb) evs.push({ type: 'sex_counts', litter: crate, boars: drawer.boars, gilts: drawer.gilts });
-      var res = store.commitAll(evs);
-      if (!res.ok) { render(); return; }
-      reload(); loadWeights();
-      var bg = { b: PP.tn('pp.id.n_boars', drawer.boars), g: PP.tn('pp.id.n_gilts', drawer.gilts) };
-      receipt = wChanged && cb ? ['pp.id.rcpt.both', Object.assign({ w: w }, bg)] : wChanged ? ['pp.id.rcpt.weight', { w: w }] : ['pp.id.rcpt.counts', bg];
-      drawer = null; drawerKept = null; render();
-    }
-    else if (a === 'close') { location.href = PP.href('litter.html', { state: 'litter', crate: crate, data: store.name !== 'base' ? store.name : '' }); }
+    else if (a === 'save') { saveWeight(); render(); }
+    // Close keeps a piglet in hand and an unsaved weight on this phone (saved on every change); reopening restores them.
+    else if (a === 'close') { if (drawer) drawerKept = drawerDirty(drawer) ? drawer : null; saveDraft(); location.href = PP.href('litter.html', { state: 'litter', crate: crate, data: store.name !== 'base' ? store.name : '' }); }
     // Edit (ticket #12): a row opens its correction drawer; Edit and the closed set open the litter's one Edit screen.
-    else if (a === 'edit-row' || a === 'open-edit' || a === 'edit-done') { location.href = PP.href('edit.html', { state: 'edit', crate: crate, row: a === 'edit-row' ? v : '', from: 'id', data: store.name }); }
+    else if (a === 'edit-row' || a === 'open-edit' || a === 'edit-done') {
+      var row = a === 'edit-row' ? living().concat(rows).filter(function (x) { return key(x) === v; })[0] : null;
+      location.href = PP.href('edit.html', { state: 'edit', crate: crate, row: row ? row.rowId : a === 'edit-row' ? v : '', from: 'id', data: store.name });
+    }
     else document.documentElement.setAttribute('data-door', a + ':' + (v || ''));
   });
 
@@ -706,19 +787,36 @@
     F = store.sow(crate) || {};
     notch = store.config.identity.scheme === 'notch'; keepers = store.config.identity.who === 'candidates';
     NOW = store.today + 'T10:30';
+    // A state's own records (a row flagged, a row corrected), committed once per tab.
+    (st.pre || []).forEach(function (e) { if (!store.events.some(function (x) { return x.id === e.id; })) store.commit(e); });
+    if (qs.get('fresh') === '1') { try { sessionStorage.removeItem(draftKey()); } catch (e) { /* nothing kept */ } }
+    if (st.kept) { try { sessionStorage.setItem(draftKey(), JSON.stringify(st.kept)); } catch (e) { /* nothing kept */ } }
     reload();
     loadWeights();
     // Every row already in, oldest first: the status line reads the newest; this visit starts after them.
-    log = rows.filter(function (r) { return !r.gone; }).slice().sort(function (x, y) { return x.d - y.d || (x.t < y.t ? -1 : x.t > y.t ? 1 : 0); }).map(function (r) { return { r: r }; });
+    log = rows.filter(function (r) { return !r.gone; }).slice().sort(function (x, y) { return x.at < y.at ? -1 : x.at > y.at ? 1 : 0; }).map(function (r) { return { r: r }; });
     visitStart = log.length;
     freshPiglet();
+    // What this phone kept from before (Close, a call, a crash): the piglet in hand and an unsaved litter weight.
+    var kept = st.tag || st.scan || st.sex || st.weight || st.drawer ? null : loadDraft();
+    if (kept && kept.run) {
+      run.tag = { value: kept.run.tag || run.tag.value, suggested: !kept.run.tag && run.tag.suggested, suggestion: run.tag.suggestion };
+      afterTag();
+      run.sex = kept.run.sex || null; run.sexTouched = !!kept.run.sex; run.weight = kept.run.weight || ''; run.weightTouched = !!kept.run.weight; run.twin = !!kept.run.twin;
+      if (run.tag.value && !run.tag.suggested) run.note = { id: 'pp.id.hint.kept', args: { tag: idOf(run.tag.value) } };
+    }
+    if (kept && kept.lw) drawerKept = { w: kept.lw.w, boars: kept.lw.boars, gilts: kept.lw.gilts, active: false };
     if (st.tag) { run.tag = { value: st.tag, suggested: false, suggestion: run.tag.suggestion }; afterTag(); }
     if (st.scan) scanTag(st.scan);
     if (st.sex) { run.sex = st.sex; run.sexTouched = true; }
     if (st.weight) { run.weight = st.weight; run.weightTouched = true; }
+    if (st.twin) { run.twin = true; afterTag(); }
     if (st.active) run.active = st.active;
+    if (st.key) typeKey(st.key);
     render();
     if (st.press === 'record') record();
+    if (st.press === 'save') { saveWeight(); render(); }
+    if (st.then === 'table') { face = 'table'; render(); }
     if (st.open === 'weight') { var t0 = todayRec(), c0 = tally(); drawer = { w: t0 ? t0.w : '', active: false, boars: c0.cb, gilts: c0.cg }; render(); }
     // Resuming another hand's litter: the status line says whose piglets are already in, until the first key.
     var lastRow = log.length ? log[log.length - 1].r : null;
@@ -726,6 +824,7 @@
       run.note = { id: 'pp.id.hint.resume', args: { k: living().length, who: lastRow.who, when: ago(lastRow) } };
       render();
     }
+    SentriUI.radioBind(document.getElementById('screen'), { onChange: function (field, value) { if (field === 'sex') { run.sex = value; run.sexTouched = true; run.armed = ''; run.note = null; render(); } } });
   });
 })();
 </script>
