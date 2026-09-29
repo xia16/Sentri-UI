@@ -12,7 +12,7 @@
      A02 000231 · day 3 · 12 alive · owes iron and tail today; nobody tagged yet     [room, litter, dead, id, edit, record page]
      A04 000236 · day 3 · 11 · owes iron and tail                                    [id notch farm]
      A05 000240 · day 3 · 11 · iron recorded twice offline (possible double); tail 6 + 5 weak  [room, litter double-flag]
-     A07 000245 · day 3 · 14 · owes iron and tail                                    [id keepers, dead farrowing record]
+     A07 000245 · day 3 · 14 · owes iron and tail                                    [id keepers, dead farrowing record, count offline]
      B01 000187 · day 5 · 13 · sow died Sep 28 (prolapse); iron 2 days late; castration due; no birth weight  [room, litter late, edge orphan, move orphan]
      B02 000241 · day 4 · 8  · done so far                                           [move ask, unknown-check]
      B03 000199 · day 7 · 11 · castrated 4 + cryptorchid 1 + 2 sick deferred; coccidiosis due  [litter castrate-catchup]
@@ -490,6 +490,26 @@ export const VARIANTS = {
     base(b);
     b.count('B06', sep(29, '09:50'), 'L.M', 11, { baseAlive: 12, id: 'C-B06-loss' });
     b.count('B08', sep(29, '09:55'), 'L.M', 10, { baseAlive: 9, id: 'C-B08-gain' });
+  }),
+
+  // Count and explain (#10). gain-b08: L.M found 10 in B08 (9 by the record) — the gain a count on B06 can
+  // be explained against (the click-through). count-offline: A07, G.H counted 13 at 09:40 (a loss of 1),
+  // recorded a crushed piglet at 09:45 (a new body, not one of the missing); L.M's phone, offline since
+  // before both, counted 12 at 09:50 and synced at 10:20 — the later count stands, the two never sum, and
+  // hers crossed a death it did not see (sync review).
+  // explain-named: L.M found 10 in B06 and named two tagged piglets missing (271002, 271004); B08 has 1 extra —
+  // the suggested Move carries 1, so the worker picks which named piglet it is
+  'explain-named': V((b) => {
+    base(b);
+    b.count('B06', sep(29, '09:50'), 'L.M', 10, { baseAlive: 12, id: 'C-B06-named', missingRows: ['B06-r2', 'B06-r4'] });
+    b.count('B08', sep(29, '09:55'), 'L.M', 10, { baseAlive: 9, id: 'C-B08-gain' });
+  }),
+  'gain-b08': V((b) => { base(b); b.count('B08', sep(29, '09:55'), 'L.M', 10, { baseAlive: 9, id: 'C-B08-gain' }); }),
+  'count-offline': V((b) => {
+    base(b); const seen = b.ids();
+    b.count('A07', sep(29, '09:40'), 'G.H', 13, { baseAlive: 14, id: 'C-A07-gh' });
+    b.death('A07', sep(29, '09:45'), 'G.H', [{ cause: 'crushed', n: 1 }], { id: 'D-A07-gh' });
+    b.count('A07', sep(29, '09:50'), 'L.M', 12, { baseAlive: 14, id: 'C-A07-lm', seen, device: 'P-LM', syncedAt: sep(29, '10:20') });
   }),
 
   // identity and weigh (S4)

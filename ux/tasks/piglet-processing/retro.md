@@ -354,3 +354,22 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   loader, so slices add files instead of editing a shared one; the driver
   gives each agent its own scratch subfolder.
 - **Cost:** low (merge work for the driver).
+
+## 24 · Slices — a driver's provisional ruling contradicted a standing ruling
+
+- **Stage:** Slices, S6 round 1 → exit.
+- **What happened:** to close the miscount dead end I ruled provisionally
+  that "the latest standing count by tap time" supersedes earlier lines.
+  Tap time across phones is a device clock, and RULINGS' merge contract says
+  device clocks are never trusted to resolve a conflict. The designer built
+  it faithfully; the other-family Consistency lens caught it in the exit
+  round (a skewed clock makes an older count stand). Revised to causal order
+  with concurrent counts left under sync review.
+- **Why:** provisional rulings were written fast, mid-round, without a check
+  against RULINGS; nobody reviews the driver's own rulings until a lens
+  trips on their consequence.
+- **Change:** every provisional entry the driver writes is challenged once
+  by the other family against RULINGS before it goes to designers (a
+  one-paragraph `collab` challenge), and the skill's *Deciding* section
+  says so.
+- **Cost:** medium (one design round built on a wrong rule).

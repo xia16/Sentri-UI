@@ -56,7 +56,72 @@ try {
   assert.match(dead, /11 piglets/);
   console.log('ok 2 room → litter → Record dead → Save → room:', dead);
 
-  // 3. litter → record iron → Edit → iron 12 → 10, 2 weak → Save → the litter prints the value amber → the record page
+  // 3. room → filter iron → Record for several litters → tick 4 → review → Record → room: the four leave the iron filter.
+  await page.goto(base + 'room.html?state=room&fresh=1'); await ready(page);
+  await page.click('[data-action="filter"]');
+  await page.click('input[data-action="toggle-dose"][value="iron"]');
+  await page.click('[data-action="close-sheet"]');
+  await page.waitForSelector('[data-action="open-bulk"]');
+  await page.click('[data-action="open-bulk"]');
+  await page.waitForURL(/bulk\.html/); await ready(page);
+  // ticks are a draft on this phone: Close keeps them, the room door says so, reopening restores them
+  for (const c of ['A02', 'A04']) await page.check(`input[data-action="toggle"][value="${c}"]`);
+  await page.click('.bk-bar [data-action="close"]');
+  await page.waitForURL(/room\.html/); await ready(page);
+  assert.match(await text(page, '[data-action="open-bulk"]'), /2 ticked · not recorded/);
+  await page.click('[data-action="open-bulk"]');
+  await page.waitForURL(/bulk\.html/); await ready(page);
+  assert.ok(await page.isChecked('input[data-action="toggle"][value="A04"]'));
+  for (const c of ['B06', 'B10']) await page.check(`input[data-action="toggle"][value="${c}"]`);
+  assert.match(await text(page, '.bk-bar .pp-receipt'), /4 litters · 46 piglets · not recorded yet/);
+  // a double tap on Review: the second tap lands on Record at the same spot and is swallowed, Record wearing its pressed face
+  const rv = await page.locator('.bk-bar [data-action="review"]').boundingBox();
+  const at = [rv.x + rv.width / 2, rv.y + rv.height / 2];
+  await page.mouse.click(...at); await page.mouse.click(...at);
+  assert.equal(await page.locator('[data-st-context="drawer"]').count(), 1);
+  assert.equal(await page.getAttribute('[data-action="record"]', 'aria-busy'), 'true');
+  const review = await text(page, '[data-st-context="drawer"]');
+  assert.match(review, /A02 12 piglets · A04 11 piglets · B06 12 piglets · B10 11 piglets/);
+  await page.waitForTimeout(400);                                    // a deliberate tap after the guard records at once
+  assert.equal(await page.getAttribute('[data-action="record"]', 'aria-busy'), null);
+  const rc = await page.locator('[data-action="record"]').boundingBox();
+  const at2 = [rc.x + rc.width / 2, rc.y + rc.height / 2];
+  await page.mouse.click(...at2); await page.mouse.click(...at2);   // …and its double tap never lands on Close
+  await page.waitForSelector('.bk-bar [data-action="close"]');
+  assert.match(page.url(), /bulk\.html/);
+  await page.waitForTimeout(300);
+  const receipt = await text(page, '.bk-bar');
+  assert.match(receipt, /Saved · iron · day 3 · 4 litters · 46 piglets/);
+  // hold, then depart: the finished row keeps its place, then leaves for Done today (a door to its sheet)
+  assert.equal(await page.locator('[data-action="open-litter"][data-value="A02"]').count(), 0);
+  await page.waitForTimeout(1300);
+  assert.equal(await page.locator('[data-action="open-litter"][data-value="A02"]').count(), 1);
+  await page.click('.bk-bar [data-action="close"]');
+  await page.waitForURL(/room\.html/); await ready(page);
+  for (const c of ['A02', 'A04', 'B06', 'B10']) assert.equal(await page.locator(`[data-action="open-litter"][data-value="${c}"]`).count(), 0);
+  assert.match(await rowText(page, 'A07'), /Iron/);
+  await page.click('[data-action="clear-filter"]');
+  const a02 = await rowText(page, 'A02');
+  assert.doesNotMatch(a02, /Iron/);
+  assert.match(a02, /Dock tail/);
+  console.log('ok 3 room → filter iron → Record for several → review → Record → room:', receipt, '⇒ A02', a02);
+
+
+  // 4. the review is a contract frozen when it opens: a sync moves 1 piglet into A02 → Record → A02 `changed`, never 13.
+  await page.goto(base + 'bulk.html?state=bulk-review&tx=iron&fresh=1'); await ready(page);
+  await page.evaluate(() => PP.sync({ type: 'move', from: 'B09', to: 'A02', n: 1, rows: ['B09-r10'], answers: { iron3: 'no' } }));
+  const frozen = await text(page, '[data-st-context="drawer"]');
+  assert.match(frozen, /A04 11 piglets · B06 12 piglets · B10 11 piglets/);
+  assert.match(frozen, /Record for 34 piglets/);
+  await page.waitForTimeout(400);
+  await page.click('[data-action="record"]');
+  await page.waitForSelector('.bk-bar:not([inert]) [data-action="close"]');
+  const changed = await text(page, '.bk-bar:not([inert])');
+  assert.match(changed, /A02 · changed since review · 13 piglets now · record on its sheet/);
+  assert.match(changed, /3 litters · 34 piglets/);
+  console.log('ok 4 review frozen → sync moves 1 into A02 → Record:', changed);
+
+  // 5. litter → record iron → Edit → iron 12 → 10, 2 weak → Save → the litter prints the value amber → the record page
   //    shows the correction (ticket #12).
   await page.goto(base + 'litter.html?state=litter&crate=A02&stay=1&fresh=1'); await ready(page);
   await page.click('[data-action="record"][data-value="iron3"]');
@@ -80,9 +145,9 @@ try {
   await page.waitForURL(/edit\.html\?state=record-page/); await ready(page);
   const log = await text(page, '[data-ds="Log"]');
   assert.match(log, /Correction Iron · day 3 12 → 10 piglets · 2 deferred: weak .*Iron · day 3 · 12 piglets corrected/);
-  console.log('ok 3 litter → Edit → 12 → 10 · 2 weak → Save → litter amber → record page:', log.slice(0, 120));
+  console.log('ok 5 litter → Edit → 12 → 10 · 2 weak → Save → litter amber → record page:', log.slice(0, 120));
 
-  // 4. Edit → tail was done on another crate → A04 → Save → A04's record page shows the act at its own time (ticket #12).
+  // 6. Edit → tail was done on another crate → A04 → Save → A04's record page shows the act at its own time (ticket #12).
   await page.goto(base + 'edit.html?state=edit&crate=A02&data=a02-marked&fresh=1'); await ready(page);
   await page.click('[data-action="mark-step"][data-value="T-A02-tail"][data-step="-1"]');
   await page.click('[data-action="mark-why"][data-value="T-A02-tail:to"]');
@@ -93,7 +158,7 @@ try {
   await page.goto(base + 'edit.html?state=record-page&crate=A04&data=a02-marked'); await ready(page);
   const there = await text(page, '[data-ds="Log"]');
   assert.match(there, /Correction Dock tail 11 piglets · was on A02 · 08:40 · L\.M/);
-  console.log('ok 4 Edit → wrong litter → A04 → Save → A04 record page:', there.slice(0, 100));
+  console.log('ok 6 Edit → wrong litter → A04 → Save → A04 record page:', there.slice(0, 100));
 
   await browser.close();
 } finally {

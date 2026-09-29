@@ -510,3 +510,21 @@ investigation and not yet ruled.
 - **Decided for the owner (driver):** each scheduled dose is its own obligation (iron d3 and
   iron d14 are two items); move suggestions are ranked by time and room, never proof; open
   gains and losses show separately on the room header beside the net drift.
+
+### Round 3 (owner, 2026-09-30 — four provisional calls that contradicted standing rulings)
+
+- **Orphans of a mid-farrowing sow death can be moved (Q13 amended):** Move opens once her
+  farrowing session is over — locked, **or ended by the sow's death**. (Confirms the provisional.)
+- **After End, no new treatment marks — kept as flagged evidence (Q5 clarified):** piglets moved
+  into an ended litter keep their owed doses as **not done** (never recordable as catch-up), and a
+  treatment done after End that syncs later is **kept on the record, stamped and flagged `after
+  End`, but never counted** as a task treatment; neither reopens the task. (Replaces the
+  provisional catch-up and after-End-apply lines.)
+- **A recount never closes a line (Q12 kept):** unexplained lines close only by a death or a
+  confirmed Move. A **mistaken count is corrected through Edit** (stamped, original kept), which
+  removes its line. A later count is an observation like any other. (Replaces the provisional
+  "recount supersedes".)
+- **The same body recorded twice is held for review (merge contract applied):** when two offline
+  deaths allocate one missing piglet, the second allocation is held as a sync-review conflict (Dead
+  1, Alive 9) until a worker confirms one body or two — never silently a second death. (Replaces the
+  driver's "excess becomes a plain death".)
