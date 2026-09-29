@@ -257,3 +257,18 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   more than ~15 findings. Re-runs after a fix round only need the lenses
   whose findings were applied.
 - **Cost:** medium (tokens and driver time; no design harm).
+
+## 18 · Slices — the lint cannot see inside a drawer, and trusts any card name
+
+- **Stage:** Slices, S7 (Move), S10.
+- **What happened:** (a) the lint's full-page screenshot captures the page,
+  not the content of an internally scrolling drawer, so everything below a
+  drawer's fold (the Move's questions, the tag list, the owed section) was
+  never seen by the lint or by lenses reading its screenshots; S7's designer
+  wrote a tall-viewport Playwright script to look. (b) `ds-unmarked` checks
+  that a control sits inside *some* `data-ds`, not that the name is a card:
+  S10 marks wrappers `data-ds="Section"` and passes.
+- **Change:** the lint scrolls each `[data-st-context=drawer]` body and
+  screenshots it in pages; `data-ds` values must match a folder in
+  `components/` or start with `Candidate:`.
+- **Cost:** medium — lenses judged states from partial pictures.
