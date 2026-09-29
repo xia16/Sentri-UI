@@ -116,7 +116,7 @@ function newDose(cfg) {
     treated: 0,            // piglets marked by this litter's own records (history, never retired)
     coverage: [],          // carried evidence groups { id, kind: move|had|gain, n, rows|null, from, at }
     unknowns: [],          // unresolved groups { id, kind: move|gain, n, rows|null, from, at }
-    records: [], collisions: [], collided: [], castration: null, fullAt: null, checks: [], catchUp: 0
+    records: [], collisions: [], collided: [], castration: null, fullAt: null, checks: [], catchUp: 0, afterEnd: []
   };
 }
 
@@ -127,7 +127,7 @@ function newLitter(id) {
     aliveLog: [], zeros: [],
     losses: [], gains: [], moves: [], counts: [], deaths: [], notes: [],
     doses: {}, idClosed: false, flags: [], accepted: [], types: {}, lastEvent: null, lastRecord: null,
-    movedOutAfterEnd: [], sow: null, birthWeight: null, birthWeightConflicts: [], weights: [], sexCountsRec: null
+    movedOutAfterEnd: [], held: [], sow: null, birthWeight: null, birthWeightConflicts: [], weights: [], sexCountsRec: null
   };
 }
 
@@ -324,7 +324,8 @@ export function derive(events, config, opts) {
       if (cand) live.push(root.id);
       touched.push(root.id);
       if (ch.fresh) {
-        trialSynth.set(ch.synth, Object.assign({ at: c.at || null, who: c.who || null }, clone(ch.fresh), { id: ch.synth, type: 'treat', viaCorrection: c.id, from: root.litter || null }, c.seen ? { seen: c.seen } : {}));
+        // the fresh record keeps the original act's time and hand; the correction carries its own
+        trialSynth.set(ch.synth, Object.assign({ at: root.at || c.at || null, who: root.who || c.who || null }, clone(ch.fresh), { id: ch.synth, type: 'treat', viaCorrection: c.id, from: root.litter || null }, c.seen ? { seen: c.seen } : {}));
         made.push(ch.synth);
       }
     }
@@ -531,6 +532,7 @@ function apply(ctx, e) {
     case 'end_task': return applyEndTask(ctx, e);
     case 'farrowing_task_ended': ctx.farrowing.set(e.task || (ctx.cfg.task ? ctx.cfg.task.id : null), 'ended'); return [];
     case 'birth_weight': return applyBirthWeight(ctx, e);
+    case 'resolve': return applyResolve(ctx, e);
     case 'litter_weight': return applyLitterWeight(ctx, e);
     case 'sex_counts': return applySexCounts(ctx, e);
     default: throw new Reject('unknown_type');
@@ -597,6 +599,31 @@ function applyEndTask(ctx, e) {
   return [];
 }
 
+/* resolve { litter, held: <death id>, answer: 'one' | 'two' } — a held body answered: one body (the
+   duplicate is withdrawn, nothing applied) or two (applied now as a plain death). */
+function applyResolve(ctx, e) {
+  const L = needLitter(ctx, e.litter);
+  const h = L.held.find((x) => x.event === e.held);
+  if (!h) throw new Reject('unknown_held', { held: e.held });
+  if (h.resolved) throw new Reject('already_resolved', { answer: h.resolved, by: h.resolvedBy });
+  if (e.answer !== 'one' && e.answer !== 'two') throw new Reject('bad_answer');
+  if (e.answer === 'two') {
+    const rowsHere = liveRows(ctx, L.id);
+    const rows = h.rows.filter((id) => { const r = ctx.rows.get(id); return r && r.litter === L.id && r.status === 'missing'; });
+    if (h.untagged + rows.length > L.alive) throw new Reject('alive_negative', { alive: L.alive });
+    if (h.untagged > L.alive - rowsHere) throw new Reject(rowsHere > 0 ? 'name_the_rows' : 'more_than_alive');
+    const byCause = Object.assign({}, h.causes);
+    for (const id of rows) { const c = h.rowCauses[id]; byCause[c] = (byCause[c] || 0) + 1; const r = ctx.rows.get(id); r.status = 'dead'; r.cause = c; r.deathAt = e.at || null; r.deathEvent = e.id; delete r.lossId; retireRow(L, id); }
+    for (const [c, k] of Object.entries(byCause)) L.deadByCause[c] = (L.deadByCause[c] || 0) + k;
+    const n = h.untagged + rows.length;
+    L.deadTotal += n;
+    aliveChange(ctx, L, e, -n);
+    L.deaths.push({ id: e.id, byCause, plain: n, rows: 0, fromMissing: 0, held: 0, excess: 0, at: e.at || null, who: e.who || null, phase: L.phase, resolves: h.event });
+  }
+  h.resolved = e.answer; h.resolvedBy = { event: e.id, at: e.at || null, who: e.who || null };
+  return [L];
+}
+
 /* birth_weight { litter, kg } — the birth litter weight, recorded in processing only when missing.
    A writer that saw it set is refused; one that could not have (offline) is kept as a conflict. */
 function applyBirthWeight(ctx, e) {
@@ -624,9 +651,20 @@ function applyLitterWeight(ctx, e) {
   const kg = parseFloat(e.kg);
   if (!(kg > 0)) throw new Reject('bad_numbers');
   const day = e.day != null ? e.day : (L.birthDay == null || dayNumber(e.at) == null ? null : dayNumber(e.at) - L.birthDay);
-  const rec = { day, kg: String(e.kg), at: e.at || null, who: e.who || null, event: e.id, replaced: [] };
+  const rec = { day, kg: String(e.kg), at: e.at || null, who: e.who || null, event: e.id, replaced: [], conflicts: [] };
   const i = L.weights.findIndex((w) => w.day === day);
-  if (i >= 0) { const old = L.weights[i]; rec.replaced = old.replaced.concat([{ kg: old.kg, at: old.at, who: old.who, event: old.event }]); L.weights[i] = rec; }
+  if (i >= 0) {
+    const old = L.weights[i];
+    // a phone that had not seen the day's value: both kept, flagged — never "the later save wins" by clock
+    if (!ctx.causal.saw(e.id, old.event)) {
+      old.conflicts.push({ kg: rec.kg, at: rec.at, who: rec.who, event: e.id });
+      flag(ctx, L, 'sync_review', 'litter_weight_conflict', [old.event, e.id], { day });
+      return [L];
+    }
+    rec.replaced = old.replaced.concat([{ kg: old.kg, at: old.at, who: old.who, event: old.event }], old.conflicts.filter((c) => ctx.causal.saw(e.id, c.event)).map((c) => Object.assign({}, c)));
+    rec.conflicts = old.conflicts.filter((c) => !ctx.causal.saw(e.id, c.event));
+    L.weights[i] = rec;
+  }
   else { L.weights.push(rec); L.weights.sort((a, b) => (a.day == null ? 0 : a.day) - (b.day == null ? 0 : b.day)); }
   return [L];
 }
@@ -652,15 +690,15 @@ function distinctKeys(ctx, litterId) {
 /* count { litter, observed, baseAlive, missingRows? } — an observation. The difference against
    Alive now (not against the device's base) becomes one unexplained item, so two offline counts
    of one crate never sum. On a litter with identity rows the count names which rows are missing. */
-/* A recount supersedes (provisional ruling, map #3, revised): a count supersedes the lines of the counts
-   it causally saw (`seen`) — device clocks never order two counts (RULINGS merge contract). Each line is
-   relabelled `superseded` naming the new count (the original stays in the trail); a superseded loss gives
-   back its named missing rows, a superseded gain retires the unknown-dose groups it created.
-   Two causally concurrent counts (neither saw the other) disagree: both stay as observations under
-   `sync review` (`count_conflict`), neither stands, neither writes a line — the open lines they carried are
-   relabelled `disputed` — so the result is the same in either arrival order. A fresh count that saw both
-   settles it. Concurrent counts of the same number agree and are one observation. A count that arrives
-   after a count that saw it stands for nothing (`count_order`). */
+/* A recount never closes a line (RULINGS round 3, Q12 kept): unexplained lines close only by a death or a
+   confirmed Move; a mistaken count is corrected through Edit (a `correction` on the count: withdrawn or
+   `observed` set, stamped, original kept), which removes its line. A later count is an observation like
+   any other: sized against Alive now, it writes its own line.
+   Two causally concurrent counts (neither saw the other) of different numbers disagree: both stay as
+   observations under `sync review` (`count_conflict`), neither writes a line — the line the first one
+   wrote is held as `disputed` — so the result is the same in either arrival order. A later count that
+   saw them settles it (`settledBy`) and writes its own line. A count that arrives after a count that saw
+   it stands for nothing (`count_order`). Device clocks never order two counts. */
 function applyCount(ctx, e) {
   const L = needLitter(ctx, e.litter);
   needLocked(L);
@@ -672,14 +710,14 @@ function applyCount(ctx, e) {
   if (later) {
     flag(ctx, L, 'sync_review', 'count_order', [e.id, later.id]);
     L.counts.push({ id: e.id, observed: e.observed, baseAlive: e.baseAlive == null ? null : e.baseAlive, aliveBefore: L.alive, sizedAgainst: null, wrote: 0,
-      missingRows: missing.slice(), at: e.at || null, who: e.who || null, supersededBy: later.id, late: true, disputed: false, superseded: { loss: 0, gain: 0 } });
+      missingRows: missing.slice(), at: e.at || null, who: e.who || null, supersededBy: later.id, late: true, disputed: false, settledBy: null });
     return [L];
   }
   // concurrent counts that saw the same number agree: nothing to settle, they are one observation
-  const concurrent = L.counts.filter((c) => !ctx.causal.saw(e.id, c.id) && c.observed !== e.observed);
+  const concurrent = L.counts.filter((c) => !c.late && !ctx.causal.saw(e.id, c.id) && c.observed !== e.observed);
   const disputedIds = new Set(concurrent.map((c) => c.id));
-  // every open line is a count's: the ones this count saw are superseded, a concurrent count's are disputed
-  const openL = L.losses.filter((x) => x.remaining > 0), openG = L.gains.filter((x) => x.remaining > 0);
+  // only the lines the concurrent counts themselves wrote are held as disputed; every other line stays open
+  const openL = L.losses.filter((x) => x.remaining > 0 && disputedIds.has(x.id)), openG = L.gains.filter((x) => x.remaining > 0 && disputedIds.has(x.id));
   const lossBack = openL.reduce((s, x) => s + x.remaining, 0), gainBack = openG.reduce((s, x) => s + x.remaining, 0);
   const lossIds = new Set(openL.map((x) => x.id));
   const giveBack = [...ctx.rows.values()].filter((r) => r.litter === L.id && r.status === 'missing' && lossIds.has(r.lossId));
@@ -689,7 +727,7 @@ function applyCount(ctx, e) {
     if (r.status !== 'alive' && !giveBack.includes(r)) throw new Reject('row_not_alive', { rowId: id, status: r.status });
   }
   const before = L.alive;
-  const base = before + lossBack - gainBack;              // Alive without the open lines this count supersedes or disputes
+  const base = before + lossBack - gainBack;
   const diff = e.observed - base;
   const disputed = concurrent.length > 0;
   if (!disputed) {
@@ -699,30 +737,26 @@ function applyCount(ctx, e) {
   }
   concurrentCountFlag(ctx, L, e);
   if (disputed) flag(ctx, L, 'sync_review', 'count_conflict', [e.id].concat([...disputedIds]));
-  // earlier counts this one saw stop standing; concurrent ones are disputed; their open lines relabel; Alive returns to `base`
   for (const c of L.counts) {
     if (disputedIds.has(c.id)) c.disputed = true;
-    else if (!c.supersededBy) c.supersededBy = e.id;
+    else if (!disputed && c.disputed && !c.settledBy && ctx.causal.saw(e.id, c.id)) c.settledBy = e.id;
   }
-  const relabel = (x) => ({ event: e.id, kind: disputedIds.has(x.id) ? 'disputed' : 'superseded', qty: x.remaining });
-  for (const x of openL) { x.explainedBy.push(relabel(x)); x.remaining = 0; }
+  const hold = (x) => ({ event: e.id, kind: 'disputed', qty: x.remaining });
+  for (const x of openL) { x.explainedBy.push(hold(x)); x.remaining = 0; }
   for (const r of giveBack) { r.status = 'alive'; delete r.lossId; }
   for (const x of openG) {
     for (const d of ctx.cfg.doses) {
       const D = L.doses[d.id];
       if (!D || !x.doses) continue;
-      if (x.doses[d.id] === 'owed') lower(ctx, L, D, e, 'superseded', x.remaining);
+      if (x.doses[d.id] === 'owed') lower(ctx, L, D, e, 'disputed', x.remaining);
       else if (x.doses[d.id] === 'unknown') takeUnknown(D, x.remaining, x.id);
     }
-    x.explainedBy.push(relabel(x)); x.remaining = 0;
+    x.explainedBy.push(hold(x)); x.remaining = 0;
   }
   if (lossBack !== gainBack) aliveChange(ctx, L, e, lossBack - gainBack);
-  if (disputed) {
-    // an observation kept under sync review: no line, nothing stands until a count that saw both
-    L.counts.push({ id: e.id, observed: e.observed, baseAlive: e.baseAlive == null ? null : e.baseAlive, aliveBefore: before, sizedAgainst: base, wrote: 0,
-      missingRows: missing.slice(), at: e.at || null, who: e.who || null, supersededBy: null, late: false, disputed: true, superseded: { loss: lossBack, gain: gainBack } });
-    return [L];
-  }
+  const rec = { id: e.id, observed: e.observed, baseAlive: e.baseAlive == null ? null : e.baseAlive, aliveBefore: before, sizedAgainst: base, wrote: 0,
+    missingRows: missing.slice(), at: e.at || null, who: e.who || null, supersededBy: null, late: false, disputed, settledBy: null };
+  if (disputed) { L.counts.push(rec); return [L]; }
   const item = { id: e.id, qty: Math.abs(diff), remaining: Math.abs(diff), at: e.at || null, who: e.who || null, explainedBy: [] };
   if (diff < 0) {
     item.rows = missing.slice();
@@ -742,8 +776,8 @@ function applyCount(ctx, e) {
     L.gains.push(item);
   }
   aliveChange(ctx, L, e, diff);
-  L.counts.push({ id: e.id, observed: e.observed, baseAlive: e.baseAlive == null ? null : e.baseAlive, aliveBefore: before, sizedAgainst: base, wrote: diff,
-    missingRows: missing.slice(), at: e.at || null, who: e.who || null, supersededBy: null, late: false, disputed: false, superseded: { loss: lossBack, gain: gainBack } });
+  rec.wrote = diff;
+  L.counts.push(rec);
   return [L];
 }
 
@@ -756,8 +790,10 @@ function namedOpen(ctx, loss, except) {
 /* death { litter, lines:[{cause,n}|{cause,rowId}], lossAlloc?:[{lossId,qty}], fromMissing? }
    Open phase: tallies never touch Alive, Born derives. Locked: an identified piglet counted
    missing draws from its own loss; untagged bodies may draw only the unnamed part of open losses
-   (each named piglet is reserved once); the rest leave Alive. Allocations aggregate by loss; a
-   loss already spent turns the excess into a plain death flagged `sync review`. */
+   (each named piglet is reserved once); the rest leave Alive. Allocations aggregate by loss. A body
+   allocated to a loss already spent (two offline deaths for one missing piglet) is HELD for review
+   (RULINGS round 3): not applied — Dead and Alive stay — flagged `sync review` (`held_body`) until a
+   worker answers `resolve`: one body (the duplicate is withdrawn) or two (applied as a plain death). */
 function applyDeath(ctx, e) {
   const L = needLitter(ctx, e.litter);
   const lines = e.lines || [];
@@ -787,6 +823,7 @@ function applyDeath(ctx, e) {
 
   const take = new Map();                 // loss → qty taken by this event
   let excess = 0;
+  const heldRows = [];
   const room = (loss) => loss.remaining - (take.get(loss) || 0);
   const unnamedFree = (loss) => Math.max(0, room(loss) - namedOpen(ctx, loss, resolving));
   let missingPlain = 0;
@@ -794,7 +831,7 @@ function applyDeath(ctx, e) {
     const r = ctx.rows.get(ln.rowId);
     const loss = L.losses.find((x) => x.id === r.lossId);
     if (loss && room(loss) > 0) take.set(loss, (take.get(loss) || 0) + 1);
-    else { missingPlain++; excess++; }
+    else { heldRows.push(ln); excess++; }
   }
   let allocated = 0;
   if (locked && untagged > 0) {
@@ -826,7 +863,8 @@ function applyDeath(ctx, e) {
       excess += q - t;
     }
   }
-  const plain = locked ? untagged - allocated : 0;
+  const heldUntagged = locked ? excess - heldRows.length : 0;       // allocated to a spent loss: held, not applied
+  const plain = locked ? untagged - allocated - heldUntagged : 0;
 
   if (locked) {
     const rowsHere = liveRows(ctx, L.id);
@@ -839,27 +877,38 @@ function applyDeath(ctx, e) {
     }
   }
 
+  // the held bodies take their causes from the last tallies
+  const heldCauses = {};
+  let h = heldUntagged;
+  for (const l of tallies.slice().reverse()) { if (!h) break; const k = Math.min(h, l.n); heldCauses[l.cause] = (heldCauses[l.cause] || 0) + k; h -= k; }
+  const appliedRows = missingRowDeaths.filter((l) => !heldRows.includes(l));
   const byCause = {};
   for (const l of tallies) byCause[l.cause] = (byCause[l.cause] || 0) + l.n;
-  for (const l of aliveRowDeaths.concat(missingRowDeaths)) byCause[l.cause] = (byCause[l.cause] || 0) + 1;
-  const n = untagged + aliveRowDeaths.length + missingRowDeaths.length;
+  for (const [c, k] of Object.entries(heldCauses)) { byCause[c] -= k; if (!byCause[c]) delete byCause[c]; }
+  for (const l of aliveRowDeaths.concat(appliedRows)) byCause[l.cause] = (byCause[l.cause] || 0) + 1;
+  const n = untagged - heldUntagged + aliveRowDeaths.length + appliedRows.length;
   for (const [c, k] of Object.entries(byCause)) L.deadByCause[c] = (L.deadByCause[c] || 0) + k;
   L.deadTotal += n;
-  for (const l of aliveRowDeaths.concat(missingRowDeaths)) {
+  for (const l of aliveRowDeaths.concat(locked ? appliedRows : missingRowDeaths)) {
     const r = ctx.rows.get(l.rowId);
     r.status = 'dead'; r.cause = l.cause; r.deathAt = e.at || null; r.deathEvent = e.id;
     retireRow(L, l.rowId);
   }
   if (!locked) {
-    L.born += untagged + missingRowDeaths.length;         // open: Born = Alive + Σ Dead
+    L.born += untagged + missingRowDeaths.length;         // open: Born = Alive + Σ Dead (nothing held before the lock)
     aliveChange(ctx, L, e, -aliveRowDeaths.length);
   } else {
     for (const [loss, q] of take) { loss.remaining -= q; loss.explainedBy.push({ event: e.id, kind: 'death', qty: q }); }
     aliveChange(ctx, L, e, -(plain + missingPlain + aliveRowDeaths.length));
   }
-  if (excess > 0) flag(ctx, L, 'sync_review', 'loss_over_consumed', [e.id], { excess });
+  const heldN = locked ? heldUntagged + heldRows.length : 0;
+  if (heldN > 0) {
+    L.held.push({ event: e.id, n: heldN, untagged: heldUntagged, rows: heldRows.map((l) => l.rowId), causes: heldCauses,
+      rowCauses: Object.fromEntries(heldRows.map((l) => [l.rowId, l.cause])), at: e.at || null, who: e.who || null, resolved: null, resolvedBy: null });
+    flag(ctx, L, 'sync_review', 'held_body', [e.id], { held: heldN });
+  }
   const fromLoss = [...take.values()].reduce((s, v) => s + v, 0);
-  L.deaths.push({ id: e.id, byCause, plain: locked ? plain + missingPlain : untagged, rows: aliveRowDeaths.length + missingRowDeaths.length, fromMissing: fromLoss, excess, at: e.at || null, who: e.who || null, phase: L.phase });
+  L.deaths.push({ id: e.id, byCause, plain: locked ? plain : untagged, rows: aliveRowDeaths.length + (locked ? appliedRows.length : missingRowDeaths.length), fromMissing: fromLoss, held: heldN, excess: heldN, at: e.at || null, who: e.who || null, phase: L.phase });
   return [L];
 }
 
@@ -918,7 +967,8 @@ function applyMove(ctx, e) {
   concurrentCountFlag(ctx, S, e); concurrentCountFlag(ctx, R, e);
   const explaining = !!(loss || gain);
   const after = relationOf(ctx, e, S.id) !== 'before';
-  const catchUpR = relationOf(ctx, e, R.id) !== 'before' || (ctx.cfg.tasks.length > 0 && !taskOf(ctx, R.id));
+  // arrivals owe their doses here; only a litter outside every task (a nurse sow) records them (no catch-up after End)
+  const catchUpR = ctx.cfg.tasks.length > 0 && !taskOf(ctx, R.id);
   const allNamed = gainQ === 0 && rowIds.length === n;
 
   const packets = {}, owedOut = {};
@@ -969,7 +1019,10 @@ function applyMove(ctx, e) {
   return [S, R];
 }
 
-/* treat's task gate. Catch-up after End for arrivals is PROVISIONAL (map ledger). */
+/* treat's task gate (RULINGS round 3, Q5 clarified): after End no new treatment marks. A mark done
+   after End on a phone that had not seen End is kept as evidence, stamped and flagged `after_end`, never
+   counted; a writer that saw End is refused; arrivals into an ended litter stay not done. A mark stamped
+   before End and synced after it is applied, flagged (map provisional). */
 function taskGate(ctx, L, e, D, unknownTarget) {
   if (!ctx.cfg.tasks.length) return {};
   const T = taskOf(ctx, L.id);
@@ -983,8 +1036,7 @@ function taskGate(ctx, L, e, D, unknownTarget) {
   if (rel === 'before') return {};
   if (e.viaCorrection) return { flag: 'correction_after_end' };
   if (rel === 'arrived') return { flag: 'arrived_after_end' };
-  if (rel === 'after_unseen') return { flag: 'after_end' };          // done after End on a phone that had not seen it (map ledger)
-  if (D && !unknownTarget && D.catchUp > 0) return { catchUp: true };  // PROVISIONAL (map ledger)
+  if (rel === 'after_unseen') return { evidence: true, flag: 'after_end' };
   const E = ctx.ends.get(T.id);
   throw new Reject('task_ended', { at: E.at, who: E.who });
 }
@@ -1029,6 +1081,7 @@ function applyTreat(ctx, e) {
   const d = needDose(ctx, e.dose);
   const D = dose(ctx, L, d.id);
   const gate = taskGate(ctx, L, e, D);
+  if (gate.evidence) return afterEndEvidence(ctx, L, d, D, e, readTreat(d, e).treated);
   const own = D.records.filter((r) => r.target !== 'unknown');
   const seen = (id) => ctx.causal.saw(e.id, id);
   const V = owedAt(ctx, L, D, seen);
@@ -1080,6 +1133,15 @@ function applyTreat(ctx, e) {
   return [L];
 }
 
+/* A treatment done after End that synced later: kept on the record, stamped, flagged — never counted
+   (not in owed, treated or on-time). */
+function afterEndEvidence(ctx, L, d, D, e, n) {
+  D.afterEnd.push({ id: e.id, dose: d.id, n, target: e.target || null, castration: e.castration ? clone(e.castration) : null,
+    deferred: e.deferred ? Object.assign({}, e.deferred) : null, at: e.at || null, who: e.who || null, device: e.device || null });
+  flag(ctx, L, 'task', 'after_end', [e.id], { dose: d.id });
+  return [L];
+}
+
 function record(ctx, L, d, e, fields) {
   const dayAge = L.birthDay == null || dayNumber(e.at) == null ? null : dayNumber(e.at) - L.birthDay;
   let timing = null;
@@ -1108,6 +1170,7 @@ function applyTreatUnknown(ctx, e) {
   const D = dose(ctx, L, d.id);
   const gate = taskGate(ctx, L, e, D, true);
   if (!isCount(e.n) || e.n === 0) throw new Reject('bad_numbers');
+  if (gate.evidence) return afterEndEvidence(ctx, L, d, D, e, e.n);
   const mine = D.records.filter((r) => r.target === 'unknown' && (!e.group || r.group === e.group));
   const collided = mine.filter((r) => ctx.causal.concurrent(r.id, e.id));
   const avail = Math.min(e.group ? total(D.unknowns.filter((g) => g.id === e.group)) : total(D.unknowns), L.alive);
@@ -1266,8 +1329,8 @@ function view(ctx, L, corrections, today) {
       unknownGroups: D.unknowns.map((g) => clone(g)),
       carriedFromMove: carried,
       coverage: D.coverage.map((g) => clone(g)),
-      catchUp: D.catchUp,
       fullAt: D.fullAt,
+      afterEnd: D.afterEnd.map((x) => clone(x)),
       done: owed === 0 && unknown === 0,
       records: D.records.map((r) => Object.assign({}, r, { corrected: corrections.has(r.id) })),
       possibleDoubleTreatment: D.collisions.map((p) => p.slice()),
@@ -1305,6 +1368,7 @@ function view(ctx, L, corrections, today) {
     unexplained: { openLoss: openL, openGain: openG, losses: L.losses.map(item), gains: L.gains.map(item) },
     moves: L.moves.map((m) => clone(m)),
     movedOutAfterEnd: L.movedOutAfterEnd.map((m) => clone(m)),
+    held: L.held.map((h) => clone(h)),
     counts: L.counts.map((c) => clone(c)),
     deaths: L.deaths.map((x) => clone(x)),
     doses,
@@ -1326,6 +1390,8 @@ function view(ctx, L, corrections, today) {
     flags: L.flags.map((f) => clone(f)),
     lastEvent: L.lastEvent, lastRecord: L.lastRecord
   };
+  // a litter outside every task (a nurse sow): the doses its arrivals owe stay recordable (`catchUp`)
+  if (!out.inTask) for (const d of ctx.cfg.doses) out.doses[d.id].catchUp = dose(ctx, L, d.id).catchUp;
   // treatments can be recorded here: a litter in a task, or one outside every task holding arrivals
   // that owe a dose (a nurse sow from a previous batch)
   out.recordable = out.inTask || Object.values(doses).some((x) => x.catchUp > 0 && x.owed > 0) || Object.values(doses).some((x) => x.unknownAfterMove > 0 && !out.inTask && ctx.cfg.tasks.length > 0);
@@ -1436,6 +1502,7 @@ function roomFacts(derived, L) {
   const collide = Ds.reduce((s, D) => s + D.collidedRecords.length, 0);
   return {
     litter: L.id, lens, kind, day: L.dayAge, alive: L.alive,
+    unfinished: { n: live.length + lapsed.length, missed: lapsed.length },
     doses: live.map(doseRow), lateBy, partly: lens === 'owed' && !!recToday,
     missed: lapsed.map((D) => ({ dose: D.dose, tx: D.tx, last: D.last, n: D.owed })),
     next, lastRecord: L.lastRecord, doneToday,
@@ -1537,7 +1604,12 @@ function litterSelect(derived, id, opts) {
       unknown: D.unknownAfterMove, owedFrom: D.owedFrom.map((x) => Object.assign({}, x)),
       males: D.isCastration ? D.males : undefined
     })),
-    dosesLeft: { left: now.length, total: Ds.filter((D) => D.status !== 'later').length },
+    // treatments left: what can be done now (a missed dose is not one); unfinished: owed or missed
+    dosesLeft: { left: now.filter((D) => D.status !== 'missed').length, total: Ds.filter((D) => D.status !== 'later').length },
+    unfinished: { n: now.length, missed: now.filter((D) => D.status === 'missed').length },
+    correctedAfterEnd: Ds.filter((D) => D.notDoneAfterEnd > 0).sort(order).map((D) => ({ dose: D.dose, tx: D.tx, n: D.notDoneAfterEnd })),
+    afterEnd: Ds.flatMap((D) => D.afterEnd.map((x) => Object.assign({ tx: D.tx }, x))),
+    held: L.held.map((h) => Object.assign({}, h)),
     recorded: Ds.filter((D) => D.records.length).sort(order).map((D) => ({ dose: D.dose, tx: D.tx, records: D.records.map((r) => Object.assign({}, r)), collisions: D.possibleDoubleTreatment })),
     later: Ds.filter((D) => D.status === 'later').sort(order).map((D) => ({ dose: D.dose, tx: D.tx, due: D.due, inDays: D.due - L.dayAge })),
     identity: L.identity, unexplained: L.unexplained, notes: L.notes, flags: L.flags,
@@ -1643,16 +1715,14 @@ function countDraftSelect(derived, litterId, draft, stamp) {
   if (!L) return { why: 'unknown_litter', event: null };
   const dr = draft || {};
   const observed = dr.observed == null ? L.alive : dr.observed;
-  // a recount supersedes the open lines: it is sized against Alive without them, and a missing named piglet comes back
+  // a count is an observation like any other (RULINGS round 3): sized against Alive, it never closes a line
   const openLoss = L.unexplained.openLoss, openGain = L.unexplained.openGain;
-  const base = L.alive + openLoss - openGain;
-  const openIds = new Set(L.unexplained.losses.filter((x) => x.open > 0).map((x) => x.id));
-  const rows = L.identity.rows.filter((r) => r.litter === L.id && (r.status === 'alive' || (r.status === 'missing' && openIds.has(r.lossId))));
+  const base = L.alive;
+  const rows = L.identity.rows.filter((r) => r.litter === L.id && r.status === 'alive');
   const picked = (dr.missingRows || []).filter((id) => rows.some((r) => r.rowId === id));
   const diff = observed - base;
   const out = {
     phase: L.phase, alive: L.alive, base, observed, diff, kind: diff < 0 ? 'loss' : diff > 0 ? 'gain' : 'match',
-    supersedes: { loss: openLoss, gain: openGain },
     roster: rows.map((r) => ({ rowId: r.rowId, tag: r.tag || null, notch: r.notch || null })),
     untagged: Math.max(0, base - rows.length),
     needRows: Math.max(0, rows.length - observed),        // rows the untagged piglets cannot account for
@@ -1727,7 +1797,8 @@ function explainSelect(derived, opts, stamp) {
           observed: c.observed ?? null, aliveBefore: c.aliveBefore ?? null,
           // the base the difference was taken from, and the count whose line this one replaced (a recount)
           sizedAgainst: c.sizedAgainst ?? null,
-          replaced: ((r) => (r ? { id: r.id, observed: r.observed, at: r.at, who: r.who } : null))(L.counts.filter((k) => k.supersededBy === x.id).pop()),
+          replaced: null,                                   // no count replaces another (RULINGS round 3)
+          wrongCount: { count: x.id, edit: L.id },          // `Wrong count? Edit`: the count is corrected through Edit
           explainedBy: x.explainedBy.map((b) => Object.assign({}, b)),
           review: L.flags.some((f) => f.kind === 'sync_review' && (f.events || []).includes(x.id)),
           death: kind === 'loss' ? { litter: L.id, max: x.open } : null,
@@ -1750,18 +1821,18 @@ function countsSelect(derived, litterId) {
   const L = derived.litters[litterId];
   if (!L) return null;
   const flags = L.flags.filter((f) => f.kind === 'sync_review' && ['count_concurrent', 'count_order', 'count_conflict'].includes(f.reason));
-  // in log order; the count that nothing superseded and nothing disputes stands (clocks never order counts)
+  // in log order; every count not disputed and not late stands as an observation; the latest one leads
   const list = L.counts.map((c) => {
     const mine = flags.filter((f) => (f.events || []).includes(c.id));
     const others = (reason) => mine.filter((f) => f.reason === reason).flatMap((f) => f.events.filter((id) => id !== c.id));
     const crossed = others('count_concurrent'), order = others('count_order'), against = others('count_conflict');
-    return Object.assign({}, c, { stands: !c.supersededBy && !c.disputed && !c.late, crossed, order, against,
+    return Object.assign({}, c, { stands: !c.disputed && !c.late, crossed, order, against,
       review: crossed.length + order.length > 0, deviceDiff: c.baseAlive == null ? null : c.observed - c.baseAlive });
   });
-  const standing = list.find((c) => c.stands) || null;
-  // two counts disagree while disputed counts stand unsuperseded: `count again` until a count that saw both
-  const open = list.filter((c) => c.disputed && !c.supersededBy);
-  const conflict = !standing && open.length > 0;
+  const standing = list.filter((c) => c.stands).pop() || null;
+  // two counts disagree until a later count saw them (`settledBy`): `count again`
+  const open = list.filter((c) => c.disputed && !c.settledBy);
+  const conflict = open.length > 0;
   // under review while the counts disagree, or the standing count crossed an unseen change or was overtaken; a later count settles it
   return { litter: L.id, alive: L.alive, counts: list, standing: standing ? standing.id : null, conflict, disputed: open.map((c) => c.id),
     review: conflict || !!(standing && standing.review) };
@@ -1801,8 +1872,9 @@ function bulkDraftSelect(derived, opts) {
     const collided = (r) => D.possibleDoubleTreatment.some((p) => p.includes(r.id));
     const todays = D.records.filter((r) => dayNumber(r.at) === today).map((r) => ({ id: r.id, at: r.at, who: r.who, n: r.n, collided: collided(r) }));
     const last = todays.length ? todays[todays.length - 1] : null;
-    if (E || !L.inTask) {
-      // after End (or outside every task): only arrivals that owe the dose, and only as many as arrived
+    if (E) continue;                                     // after End no new marks (RULINGS round 3): no rows
+    if (!L.inTask) {
+      // outside every task (a nurse sow): only arrivals that owe the dose, and only as many as arrived
       if (!(D.catchUp > 0 && D.owed > 0) || D.isCastration) continue;
       Object.assign(row, { kind: 'record', n: Math.min(D.catchUp, D.owed), catchUp: true, outside: !L.inTask });
     }
@@ -1986,12 +2058,13 @@ function correctionWalk(derived) {
       hist.get(root.id).push({ by: c.id, value: after });
       let fresh = null;
       if (ch.fresh) {
-        fresh = Object.assign({ at: c.at || null, who: c.who || null }, clone(ch.fresh), { id: ch.synth, type: 'treat', from: root.litter || null });
+        fresh = Object.assign({ at: root.at || c.at || null, who: root.who || c.who || null }, clone(ch.fresh), { id: ch.synth, type: 'treat', from: root.litter || null });
         synth.set(ch.synth, fresh);
         origin.set(ch.synth, root.id);
       }
       const kind = root.type === 'identity' && root.op === 'close' ? 'reopen'
         : root.type === 'move' ? (after ? 'move' : 'move_void')
+          : root.type === 'count' ? (after ? 'count' : 'count_void')
           : ch.restore ? 'restore' : fresh ? 'wrong' : !after ? 'void' : 'mark';
       out.push({ kind, target: { id: root.id, type: root.type, at: root.at || null, who: root.who || null, litter: root.litter || root.from || null, synth: isSynth, dose: root.dose || null },
         before: recFields(before), after: after ? recFields(after) : null, fresh: fresh ? recFields(fresh) : null });
@@ -2066,6 +2139,7 @@ function recordSelect(derived, id) {
     else if (e.type === 'sow_died') out.push(Object.assign(base, { kind: 'sow_died', cause: e.cause || null }));
     else if (e.type === 'weaned') out.push(Object.assign(base, { kind: 'weaned', n: e.n == null ? null : e.n }));
     else if (e.type === 'end_task') out.push(Object.assign(base, { kind: 'end_task' }));
+    else if (e.type === 'resolve') out.push(Object.assign(base, { kind: 'resolve', held: e.held, answer: e.answer }));
   });
   out.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : b.index - a.index));
   const days = [];
@@ -2136,6 +2210,9 @@ function editSelect(derived, id, draft, stamp) {
     .sort((a, b) => (a.room === L.room ? 0 : 1) - (b.room === L.room ? 0 : 1) || (a.room - b.room) || (a.id < b.id ? -1 : 1))
     .map((X) => ({ litter: X.id, room: X.room, alive: X.alive, sowDied: !!X.sowDied }));
 
+  // counts on this litter (RULINGS round 3: a mistaken count is corrected through Edit)
+  const counts = L.counts.map((c) => ({ id: c.id, observed: c.observed, wrote: c.wrote, aliveBefore: c.aliveBefore, at: c.at, who: c.who,
+    disputed: !!c.disputed, late: !!c.late, corrected: !!(derived.corrections && derived.corrections[c.id]) }));
   const changes = [], list = [];
   let step = null;                                     // the draft's own step still missing (Save waits)
   const need = (s) => { if (!step) step = s; };
@@ -2216,6 +2293,16 @@ function editSelect(derived, id, draft, stamp) {
       }
     }
   }
+  for (const c of counts) {
+    const x = (dr.counts || {})[c.id];
+    if (!x) continue;
+    if (x.void) { list.push({ target: c.id, void: true }); changes.push({ kind: 'count_void', count: c.id, from: c.observed }); }
+    else if (x.observed != null && x.observed !== c.observed) {
+      if (!isCount(x.observed)) { need({ why: 'bad_numbers', count: c.id }); continue; }
+      list.push({ target: c.id, set: { observed: x.observed } });
+      changes.push({ kind: 'count', count: c.id, from: c.observed, to: x.observed });
+    }
+  }
   if (dr.reopen && closed) {
     list.push({ target: closed.id, void: true });
     changes.push({ kind: 'reopen', k: closed.k });
@@ -2246,7 +2333,7 @@ function editSelect(derived, id, draft, stamp) {
   }
   const A = after ? after.litters[id] : null;
   return {
-    litter: id, marks, rows, moves, closed, targets, crates, ended,
+    litter: id, marks, rows, moves, counts, closed, targets, crates, ended,
     changes, step, why, whyDetail, later, warnings,
     events: why || !event ? null : [event],
     afterEnd: ended && !!event,

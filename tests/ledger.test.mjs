@@ -942,7 +942,8 @@ test('select.litter: owed today with one-tap, recorded, later; a treat draft', (
   const d = derive(b.ev, cfg, TODAY(3));
   const v = select.litter(d, 'B04', { drafts: { teeth: { n: 8 } } });
   assert.deepEqual(v.owed.map((x) => [x.dose, x.status, x.owed, x.oneTap]), [['iron3', 'late', 10, 10], ['teeth', 'missed', 10, 10], ['cocci', 'missed', 10, 10]]);
-  assert.deepEqual(v.dosesLeft, { left: 3, total: 4 });
+  assert.deepEqual(v.dosesLeft, { left: 1, total: 4 });              // missed doses are not treatments left (map provisional)…
+  assert.deepEqual(v.unfinished, { n: 3, missed: 2 });              // …but they are unfinished (rulings round 3 check)
   assert.deepEqual(v.recorded.map((x) => x.dose), ['castrate']);
   assert.deepEqual(v.later.map((x) => [x.dose, x.inDays]), [['iron14', 5]]);
   assert.deepEqual(v.drafts.teeth, { owed: 10, treated: 8, notTreated: 2, why: 'reason_missing', event: null });

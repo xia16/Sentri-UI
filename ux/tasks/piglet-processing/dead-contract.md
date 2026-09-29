@@ -81,9 +81,21 @@ sow draft; `Clear` clears only the mode on screen; the drawer reopens in the mod
 
 ## Merge (per RULINGS' draft merge contract)
 
-Allocations apply in stamp order until a loss is spent. Any excess becomes a plain death (it leaves
-Alive) and is flagged `sync review` on the Farrowing record page (History) and in the console, resolved
-through Edit. Two deaths for one `rowId` keep the earliest; the later is flagged the same way.
+Allocations apply in log order until a loss is spent (aggregated per loss; each named missing piglet is
+reserved once). **The same body recorded twice is held for review (RULINGS round 3):** a body allocated
+to a loss already spent — two offline deaths for one missing piglet — is **not applied**: Dead and Alive
+stay (`Dead 1, Alive 9`), the death carries `held`, and it is flagged `sync review` (`held_body`) on the
+litter's count host and Explain (`count.html?state=held-body`), the record page and the console, until a
+worker answers:
+
+```
+resolve { litter, held: <death id>, answer: 'one' | 'two' }
+```
+
+`one body` — the same piglet: the duplicate is withdrawn, nothing applied. `two bodies` — two piglets
+died: the held body applies now as a plain death (it leaves Alive; refused if Alive cannot cover it).
+It is never silently a second death. Two deaths for one `rowId` keep the earliest; the later is flagged
+`sync review` (`row_already_dead`).
 
 ## Interaction requirements of the shared component
 
