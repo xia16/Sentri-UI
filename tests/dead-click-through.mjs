@@ -86,8 +86,8 @@ try {
   assert.match(await text(page, '[data-action="open-record"]'), /Alive 12/);
   await page.click('[data-action="close"]');
   await page.waitForURL(/room\.html/); await ready(page);
-  assert.match(await text(page, '[data-ds="Candidate:DriftStrip"]'), /Unexplained loss 1 D03/);
-  console.log('ok 3 neighbour crate → D03\'s loss:', await text(page, '[data-ds="Candidate:DriftStrip"]'));
+  assert.match(await text(page, '[data-action="explain"]'), /Unexplained loss 1 D03/);
+  console.log('ok 3 neighbour crate → D03\'s loss:', await text(page, '[data-action="explain"]'));
 
   // 4. R1-8 room-level: the drift strip → the room's open lines → `Found a body?` → whose? D03 → Save: back on Explain with
   // the receipt `all missing found`; D03's line is gone.
