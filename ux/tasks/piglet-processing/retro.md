@@ -222,3 +222,20 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   the backend's image input; until then the skill should say "name the image
   paths in the prompt" and ask the lens to cite what it saw in each image.
 - **Cost:** low.
+
+## 16 · Slices — lint side effects designers tripped on
+
+- **Stage:** Slices, first wave (field cards, S1, S10).
+- **What happened:** (a) on Windows the lint's `server.kill()` on a
+  `shell:true` spawn leaves `serve-ux` listening, so the next run on that
+  port silently reuses a server rooted in whichever worktree started it;
+  (b) the tap-size rule measures the transformed rect, so a 44px control
+  that scales to .96 on press (the design-system's press law) fails the
+  44px minimum — the Stepper author moved keys to 46px to pass; (c) a
+  content-sized drawer under ~30% of the screen is not treated as a layer,
+  so the page behind reports collisions — S1 forced its scan sheet to
+  `long`; (d) the first slice designers each widened `allow` themselves.
+- **Change:** kill the process tree (or serve in-process); measure tap size
+  on the untransformed box; treat any `[data-st-context=drawer]` as a layer;
+  the brief says `allow` is the driver's.
+- **Cost:** low each; (b) and (c) bent designs toward the tool.
