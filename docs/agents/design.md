@@ -28,7 +28,22 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "inspection", "url": "ux/system/inspection-astra-concept.html", "locales": ["en"],
       "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] },
     { "name": "pp-index", "url": "ux/tasks/piglet-processing/index.html", "strict": true },
-    { "name": "ds-field-cards", "url": "ux/design-system/components/field-cards-demo.html", "strict": true }
+    { "name": "ds-field-cards", "url": "ux/design-system/components/field-cards-demo.html", "strict": true },
+    { "name": "pp-room-room", "url": "ux/tasks/piglet-processing/room.html?state=room", "strict": true },
+    { "name": "pp-room-room-empty", "url": "ux/tasks/piglet-processing/room.html?state=room-empty", "strict": true },
+    { "name": "pp-room-room-all-done", "url": "ux/tasks/piglet-processing/room.html?state=room-all-done", "strict": true },
+    { "name": "pp-room-room-overdue", "url": "ux/tasks/piglet-processing/room.html?state=room-overdue", "strict": true },
+    { "name": "pp-room-room-drift", "url": "ux/tasks/piglet-processing/room.html?state=room-drift", "strict": true },
+    { "name": "pp-room-room-filter", "url": "ux/tasks/piglet-processing/room.html?state=room-filter", "strict": true },
+    { "name": "pp-room-room-scan", "url": "ux/tasks/piglet-processing/room.html?state=room-scan", "strict": true },
+    { "name": "pp-room-room-scan-none", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-none", "strict": true },
+    { "name": "pp-room-room-find", "url": "ux/tasks/piglet-processing/room.html?state=room-find", "strict": true },
+    { "name": "pp-room-room-find-many", "url": "ux/tasks/piglet-processing/room.html?state=room-find-many", "strict": true },
+    { "name": "pp-room-room-error", "url": "ux/tasks/piglet-processing/room.html?state=room-error", "strict": true },
+    { "name": "pp-room-room-finished", "url": "ux/tasks/piglet-processing/room.html?state=room-finished", "strict": true },
+    { "name": "pp-room-room-none", "url": "ux/tasks/piglet-processing/room.html?state=room-none", "strict": true },
+    { "name": "pp-room-room-scan-unavailable", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-unavailable", "strict": true },
+    { "name": "pp-room-room-scan-hit", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-hit", "strict": true }
   ]
 }
 ```

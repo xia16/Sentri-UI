@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piglet processing · Room</title>
+<link rel="stylesheet" href="/ux/design-system/tokens.css">
+<link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="shell.css">
+<style>
+/* Room list: layout only, from tokens.css. Candidate:LitterRow, Candidate:LeadFigure and Candidate:DriftStrip are described in the report. */
+#screen { display: flex; flex-direction: column; gap: var(--space-section); }
+.pp-head { display: flex; align-items: flex-start; gap: var(--space-footer-gap); }
+.pp-head > .pp-title { flex: 1; min-width: 0; }
+.pp-head .st-heading { margin: 0; }
+.pp-head .pp-title > .st-heading + .st-heading { margin-top: 4px; }
+.pp-controls { display: flex; align-items: center; gap: var(--space-footer-gap); }
+.pp-controls .segment { flex: 1; min-width: 0; }
+.pp-block > .st-heading { margin-bottom: 8px; }
+.pp-filtered { margin-top: 20px; }
+.pp-list { display: flex; flex-direction: column; gap: var(--space-footer-gap); }
+.pp-dock { position: sticky; bottom: 0; margin: 0 calc(-1 * var(--space-gutter)) -20px; }
+@media (max-width: 370px) { .pp-dock { margin-left: calc(-1 * var(--space-gutter-narrow)); margin-right: calc(-1 * var(--space-gutter-narrow)); padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
+.pp-dock .button { gap: 8px; }
+.pp-dock .button svg { width: 18px; height: 18px; }
+.pp-locked { position: relative; height: 100vh; overflow: hidden; }
+.pp-layer .scrim { inset: 0; }
+.pp-layer .sheet { max-height: 85%; }
+.pp-layer .sheet-body { padding-bottom: var(--space-panel); }
+.pp-layer .utility-header { display: flex; align-items: center; gap: var(--space-footer-gap); padding: var(--space-gutter) var(--space-gutter) 8px; }
+.pp-layer .utility-header .st-heading { margin: 0; flex: 1; }
+.pp-layer .sheet-footer { justify-content: flex-end; }
+.pp-scan-frame { display: grid; place-items: center; min-height: 200px; margin-bottom: var(--space-footer-gap); border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--inset); color: var(--ink); }
+.pp-scan-frame svg { width: 64px; height: 64px; }
+.pp-findbar { display: flex; align-items: flex-start; gap: var(--space-footer-gap); }
+.pp-findbar .field { flex: 1; min-width: 0; margin: 0; }
+.pp-findbar + #scan-results { margin-top: var(--space-footer-gap); }
+.pp-results > * + * { margin-top: var(--space-footer-gap); }
+
+/* Candidate:LeadFigure: the number of litters that owe today, in the figure style of farrowing's task header. */
+.pp-lead { display: flex; align-items: baseline; gap: var(--space-footer-gap); }
+.pp-lead .pp-fig { font-family: var(--font-mono); font-size: var(--type-figure-lg-size); font-weight: 500; color: var(--ink); }
+.pp-lead .pp-leadlab { font-size: var(--type-row-title-size); color: var(--muted); }
+
+/* Candidate:DriftStrip: open unexplained gain and loss on one compact read-only strip; each crate code is grouped with its figure. */
+.pp-strip { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: var(--space-panel); row-gap: 4px; padding: var(--space-row-y) var(--space-footer-gap); border-radius: var(--radius-inset); background: var(--well); font-size: var(--type-panel-title-size); color: var(--ink); }
+.pp-strip .pp-grp { display: inline-flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
+.pp-strip .pp-codes { font-family: var(--font-mono); font-size: var(--type-identifier-size); color: var(--muted); }
+.pp-wide { width: 100%; }
+.pp-last { margin-top: 4px; }
+
+/* Candidate:LitterRow: the Row card's geometry with the row law's mono line 2, one named chip and the rail. */
+.pp-litter { transition: background 1100ms ease-out; }
+.pp-litter[data-flash] { background: var(--green-wash); }
+.pp-litter .pp-code { flex: none; min-width: 40px; font-family: var(--font-mono); font-size: var(--type-identifier-size); font-weight: 600; color: var(--ink); }
+.st-row.pp-litter .st-row-copy small.pp-mono { font-family: var(--font-mono); white-space: normal; overflow: visible; text-overflow: clip; }
+.pp-litter .pp-tok { display: inline-block; white-space: nowrap; }
+.pp-litter .pp-tok:not(:last-child)::after { content: "·"; margin-left: 4px; margin-right: 4px; color: var(--muted); }
+.pp-litter .pp-tok[data-tone="red"] { color: var(--red); }
+.pp-litter .pp-tok[data-tone="amber"] { color: var(--amber); }
+.pp-litter .pp-tok[data-tone="blue"] { color: var(--progress); }
+.pp-litter .pp-chip { flex: none; display: inline-flex; align-items: center; gap: 4px; max-width: 96px; font-size: var(--type-description-size); color: var(--amber); }
+.pp-litter .pp-chip[data-tone="red"] { color: var(--red); }
+.pp-litter .pp-chip::before { content: ""; flex: none; width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
+@media (prefers-reduced-motion: reduce) { .pp-litter { transition: none; } }
+</style>
+</head>
+<body>
+<main class="phone inspection-phone" data-st-context="page" id="phone">
+  <div id="screen"></div>
+</main>
+<script src="/ux/design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+<script>
+(function () {
+  var UI = window.SentriUI, I = window.SentriIcons.icon;
+
+  /* ---- time: the fixture's "now" and every stamp are absolute; words are derived (RULINGS: room rows speak the recency ladder) ---- */
+  var qs0 = new URLSearchParams(location.search);
+  var NOW = qs0.get('live') === '1' ? new Date() : new Date(2026, 8, 29, 10, 30);
+  function T(minsAgo) { return new Date(NOW.getTime() - minsAgo * 60000).toISOString(); }
+  var MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  function ago(iso) {
+    var d = new Date(iso), mins = Math.max(0, (NOW - d) / 60000);
+    if (mins < 1440) return PP.t('time.hours_ago', { n: Math.max(1, Math.ceil(mins / 60)) });
+    var days = Math.floor(mins / 1440);
+    if (days === 1) return PP.t('time.yesterday');
+    if (days < 7) return PP.t('time.days_ago', { n: days });
+    return PP.t('pp.room.date', { date: PP.lang === 'zh' ? (d.getMonth() + 1) + '月' + d.getDate() + '日' : MONTHS[d.getMonth()] + ' ' + d.getDate() });
+  }
+  function today(iso) { return new Date(iso) >= new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate()); }
+
+  /* ---- fixtures: Unit 7, one per day-shape. A dose is {d, sched: its due day-age, n: piglets owed (males for castrate), of: population, missed, last} ---- */
+  function D(d, sched, n, of, o) { return Object.assign({ d: d, sched: sched, n: n, of: of }, o || {}); }
+  function L(code, day, alive, o) { return Object.assign({ code: code, day: day, alive: alive, owes: [] }, o || {}); }
+  var FIX = {
+    base: [
+      L('A02', 3, 12, { owes: [D('iron', 3, 12, 12), D('tail', 3, 12, 12)], collide: 2 }),
+      L('A05', 3, 11, { owes: [D('tail', 3, 5, 11)], rec: { at: T(60), who: 'L.M', d: 'tail' } }),
+      L('B01', 5, 13, { owes: [D('iron', 3, 13, 13), D('castrate', 5, 7, 7)], sowDied: true }),
+      L('B04', 9, 10, { owes: [D('coccidiosis', 7, 10, 10, { missed: true, last: 7 })] }),
+      L('C02', 1, 14, { next: { doses: ['iron', 'tail'], inn: 2 } }),
+      L('C04', 3, 9, { rec: { at: T(120), who: 'G.H', d: 'tail' }, did: ['iron', 'tail'], next: { doses: ['castrate'], inn: 2 } }),
+      L('D01', 0, 8, { unlocked: true, owes: [D('cord', 0, 8, 8), D('nasal', 0, 8, 8)] }),
+      L('D03', 5, 11, { owes: [D('castrate', 5, 6, 6)], loss: 2, ev: [{ at: T(5), kind: 'count', n: 11, who: 'G.H' }] }),
+      L('D05', 6, 10, { rec: { at: T(1500), who: 'L.M', d: 'tail' }, did: ['iron', 'tail'], next: { doses: ['coccidiosis'], inn: 1 } }),
+      L('E01', 2, 7, { notask: true })
+    ],
+    drift: [
+      L('A02', 3, 12, { owes: [D('iron', 3, 12, 12), D('tail', 3, 12, 12)], collide: 2, loss: 1 }),
+      L('A05', 3, 11, { owes: [D('tail', 3, 5, 11)], rec: { at: T(60), who: 'L.M', d: 'tail' } }),
+      L('B01', 5, 13, { owes: [D('iron', 3, 13, 13), D('castrate', 5, 7, 7)], sowDied: true }),
+      L('B04', 9, 10, { owes: [D('coccidiosis', 7, 10, 10, { missed: true, last: 7 })] }),
+      L('C02', 1, 14, { next: { doses: ['iron', 'tail'], inn: 2 } }),
+      L('C04', 3, 9, { rec: { at: T(120), who: 'G.H', d: 'tail' }, did: ['iron', 'tail'], next: { doses: ['castrate'], inn: 2 } }),
+      L('D01', 0, 8, { unlocked: true, owes: [D('cord', 0, 8, 8), D('nasal', 0, 8, 8)] }),
+      L('D03', 5, 11, { owes: [D('castrate', 5, 6, 6)], loss: 2, ev: [{ at: T(5), kind: 'count', n: 11, who: 'G.H' }] }),
+      L('D05', 6, 10, { rec: { at: T(1500), who: 'L.M', d: 'tail' }, did: ['iron', 'tail'], gain: 1, next: { doses: ['coccidiosis'], inn: 1 } }),
+      L('E01', 2, 7, { notask: true, loss: 1 })
+    ],
+    quiet: [
+      L('A02', 1, 12, { next: { doses: ['iron', 'tail'], inn: 2 } }),
+      L('A05', 1, 11, { next: { doses: ['iron', 'tail'], inn: 2 } }),
+      L('B01', 2, 13, { next: { doses: ['iron', 'tail'], inn: 1 } }),
+      L('C02', 1, 14, { next: { doses: ['iron', 'tail'], inn: 2 } }),
+      L('D03', 2, 11, { next: { doses: ['iron', 'tail'], inn: 1 } })
+    ],
+    alldone: [
+      L('A02', 3, 12, { rec: { at: T(120), who: 'G.H', d: 'tail' }, did: ['iron', 'tail'], next: { doses: ['castrate'], inn: 2 } }),
+      L('A05', 3, 11, { rec: { at: T(180), who: 'L.M', d: 'tail' }, did: ['iron', 'tail'], next: { doses: ['castrate'], inn: 2 } }),
+      L('B01', 5, 13, { rec: { at: T(60), who: 'G.H', d: 'castrate' }, did: ['iron', 'castrate'], next: { doses: ['coccidiosis'], inn: 2 } }),
+      L('B04', 5, 10, { rec: { at: T(240), who: 'G.H', d: 'castrate' }, did: ['iron', 'castrate'], next: { doses: ['coccidiosis'], inn: 2 } }),
+      L('C04', 3, 9, { rec: { at: T(120), who: 'G.H', d: 'tail' }, did: ['iron', 'tail'], next: { doses: ['castrate'], inn: 2 } }),
+      L('D03', 3, 11, { rec: { at: T(300), who: 'L.M', d: 'castrate' }, did: ['iron', 'tail'], next: { doses: ['castrate'], inn: 2 } })
+    ],
+    finished: [
+      L('A02', 21, 12, { rec: { at: T(4320), who: 'G.H', d: 'iron' } }),
+      L('A05', 18, 11, { rec: { at: T(11520), who: 'L.M', d: 'iron' } }),
+      L('C02', 3, 14, { owes: [D('iron', 3, 14, 14), D('tail', 3, 14, 14)] }),
+      L('D03', 2, 11, { next: { doses: ['iron', 'tail'], inn: 1 } })
+    ],
+    none: [],
+    behind: [
+      L('A02', 6, 12, { owes: [D('iron', 3, 12, 12), D('tail', 3, 12, 12)] }),
+      L('A05', 5, 11, { owes: [D('iron', 3, 11, 11)] }),
+      L('B01', 8, 13, { owes: [D('iron', 3, 13, 13), D('castrate', 5, 7, 7)] }),
+      L('B04', 10, 10, { owes: [D('coccidiosis', 7, 10, 10, { missed: true, last: 7 }), D('iron', 3, 10, 10)] }),
+      L('C02', 3, 14, { owes: [D('iron', 3, 14, 14), D('tail', 3, 14, 14)] }),
+      L('C04', 5, 9, { owes: [D('castrate', 5, 4, 6)], rec: { at: T(180), who: 'G.H', d: 'castrate' } }),
+      L('D03', 6, 11, { rec: { at: T(300), who: 'L.M', d: 'castrate' }, did: ['iron', 'castrate'], next: { doses: ['coccidiosis'], inn: 1 } }),
+      L('D05', 4, 10, { owes: [D('tail', 3, 10, 10)] }),
+      L('E02', 6, 11, { owes: [D('tail', 3, 5, 11), D('castrate', 5, 7, 7)], rec: { at: T(60), who: 'L.M', d: 'tail' } })
+    ]
+  };
+  var PIGLETS = [
+    { tag: '000254', notch: '12-5', crate: 'A05' },
+    { tag: '000255', notch: '12-6', crate: 'A05' },
+    { tag: '000391', notch: '9-2', crate: 'B01' },
+    { tag: null, notch: '7-3', crate: 'C04' },
+    { tag: '000402', notch: '4-2', crate: 'A02' },
+    { tag: '000733', notch: '4-2', crate: 'D03' },
+    { tag: '000512', notch: '4-1', unit: 3, crate: 'F02' },
+    { tag: '000188', notch: '2-9', weaned: true }
+  ];
+  var STATES = {
+    'room': { fix: 'base' }, 'room-empty': { fix: 'quiet' }, 'room-all-done': { fix: 'alldone' },
+    'room-overdue': { fix: 'behind' }, 'room-drift': { fix: 'drift' },
+    'room-filter': { fix: 'base', sheet: 'filter', filter: ['iron'] },
+    'room-scan': { fix: 'base', sheet: 'scan' },
+    'room-find': { fix: 'base', sheet: 'find', q: '000254' },
+    'room-scan-hit': { fix: 'base', sheet: 'find', q: '000254', scanned: true },
+    'room-find-many': { fix: 'base', sheet: 'find', q: '4-2' },
+    'room-scan-none': { fix: 'base', sheet: 'find', q: '000999' },
+    'room-error': { fix: 'base', error: true },
+    'room-finished': { fix: 'finished' }, 'room-none': { fix: 'none' },
+    'room-scan-unavailable': { fix: 'base', sheet: 'scan', unavailable: true }
+  };
+  var start = STATES[PP.state] || STATES.room;
+  var qs = new URLSearchParams(location.search);
+  var S = {
+    lens: qs.get('lens') || start.lens || 'owed',
+    filter: qs.get('filter') ? qs.get('filter').split(',') : (start.filter || []).slice(),
+    missed: qs.get('missed') === '1',
+    sheet: start.sheet || '', q: qs.get('q') || start.q || '', opened: 0, flash: '', error: !!start.error, unavailable: !!start.unavailable, scanned: !!start.scanned, cameFrom: ''
+  };
+  var LITTERS = FIX[start.fix];
+  var LIVE = qs.get('live') === '1';
+  var held = {}, holdTimer = 0;
+
+  /* ---- what each litter owes ---- */
+  function live(l) { return l.owes.filter(function (o) { return !o.missed; }).sort(function (a, b) { return a.sched - b.sched; }); }
+  function lapsed(l) { return l.owes.filter(function (o) { return o.missed; }); }
+  function lateBy(l) { return Math.max.apply(null, [0].concat(live(l).map(function (o) { return l.day - o.sched; }))); }
+  function doneToday(l) { return !l.notask && !live(l).length && !lapsed(l).length && !!l.rec && today(l.rec.at); }
+  function isOwed(l) { return !l.notask && live(l).length > 0; }
+  function isDone(l) { return doneToday(l); }
+  function isLater(l) { return !l.notask && !isOwed(l) && !isDone(l); }
+  function partly(l) { return isOwed(l) && !!l.rec && today(l.rec.at); }
+  function rank(l) { return lateBy(l) ? 0 : partly(l) ? 2 : 1; }
+  function byCode(a, b) { return a.code < b.code ? -1 : 1; }
+  function byWalk(a, b) { return rank(a) - rank(b) || (rank(a) === 0 ? lateBy(b) - lateBy(a) : 0) || byCode(a, b); }
+  function byNext(a, b) { return (a.next ? a.next.inn : 99) - (b.next ? b.next.inn : 99) || byCode(a, b); }
+  function doseSet(l, lens) {
+    var ds = { owed: live(l).map(function (o) { return o.d; }), done: l.did || [],
+      later: (l.next ? l.next.doses : []).concat(lapsed(l).map(function (o) { return o.d; })) };
+    ds.all = ds.owed.concat(l.did || [], ds.later);
+    return ds[lens];
+  }
+  function member(l, lens) { return lens === 'owed' ? isOwed(l) : lens === 'done' ? isDone(l) : lens === 'later' ? isLater(l) : true; }
+  function matches(l, lens, filt) {
+    if (S.missed && !lapsed(l).length) return false;
+    if (filt.length) { var ds = doseSet(l, lens); if (!filt.some(function (f) { return ds.indexOf(f) >= 0; })) return false; }
+    return true;
+  }
+  function lensOf(lens, filt) {
+    filt = filt || S.filter;
+    var xs = LITTERS.filter(function (l) { return member(l, lens) && matches(l, lens, filt); });
+    if (lens === 'owed') xs.sort(byWalk); else if (lens === 'later') xs.sort(byNext); else xs.sort(byCode);
+    // Hold, then depart: a row a sync moved out of this lens stays put until the hand is idle.
+    Object.keys(held).forEach(function (c) { if (held[c].lens === lens && !xs.some(function (x) { return x.code === c; })) xs.push(held[c].l); });
+    return lens === 'owed' ? xs.sort(byWalk) : xs;
+  }
+  var DOSE_ORDER = ['cord', 'nasal', 'teeth', 'iron', 'tail', 'castrate', 'coccidiosis', 'health'];
+  function roomDoses() {
+    var seen = {};
+    LITTERS.forEach(function (l) { l.owes.concat([]).forEach(function (o) { seen[o.d] = 1; }); (l.did || []).forEach(function (d) { seen[d] = 1; }); if (l.next) l.next.doses.forEach(function (d) { seen[d] = 1; }); });
+    return DOSE_ORDER.filter(function (d) { return seen[d]; });
+  }
+
+  /* ---- strings ---- */
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function sa(id, args) { return 'data-str="' + id + '"' + (args ? " data-args='" + esc(JSON.stringify(args)) + "'" : ''); }
+  function S_(id, args) { return '<span ' + sa(id, args) + '>' + esc(PP.t(id, args)) + '</span>'; }
+  function dose(d) { return PP.t('pp.common.tx.' + d); }
+  function doseList(ds) {
+    var count = {}; ds.forEach(function (o) { count[o.d] = (count[o.d] || 0) + 1; });
+    return ds.map(function (o) { return count[o.d] > 1 ? PP.t('pp.room.dose.withday', { name: dose(o.d), n: o.sched }) : dose(o.d); }).join(' · ');
+  }
+  function nameList(ds) { return ds.map(dose).join(' · '); }
+  function pig(n) { return ['pp.common.unit.piglet.' + (n === 1 && PP.lang === 'en' ? 'one' : 'many'), { n: n }]; }
+  function male(n) { return ['pp.room.tok.males.' + (n === 1 && PP.lang === 'en' ? 'one' : 'many'), { n: n }]; }
+
+  /* ---- the litter row (row law: line 1 the fact, line 2 mono time -> counts -> codes, open loss/gain appended; one named chip) ---- */
+  function still(o) { return o.d === 'castrate' ? ['pp.room.tok.still.males', { n: o.n, total: o.of }] : ['pp.room.tok.still.piglets', { n: o.n, total: o.of }]; }
+  function counts(lv) {
+    var differ = lv.some(function (o) { return o.n !== lv[0].n; });
+    if (!differ) return [lv[0].d === 'castrate' ? male(lv[0].n) : pig(lv[0].n)];
+    return lv.map(function (o) { return o.d === 'castrate' ? ['pp.room.tok.dosemales', { name: dose(o.d), n: o.n }] : ['pp.room.tok.dosecount', { name: dose(o.d), n: o.n }]; });
+  }
+  function lapseToks(lp) {
+    if (!lp.length) return [];
+    var out = [['pp.room.tok.missed', { dose: lp.map(function (o) { return dose(o.d); }).join(' \u00b7 ') }, 'amber']], seen = {};
+    lp.forEach(function (o) { if (!seen[o.last]) { seen[o.last] = 1; out.push(['pp.room.tok.window', { n: o.last }, 'amber']); } });
+    return out;
+  }
+  function dueTok(late) { return late === 0 ? ['pp.room.tok.due_today', {}, ''] : late === 1 ? ['pp.room.tok.due_yest', {}, 'red'] : ['pp.room.tok.due_ago', { n: late }, 'red']; }
+  function remainders(lv) {
+    var same = lv.every(function (o) { return o.n === lv[0].n && o.of === lv[0].of && (o.d === 'castrate') === (lv[0].d === 'castrate'); });
+    if (same) return [still(lv[0])];
+    return lv.map(function (o) { return o.d === 'castrate' ? ['pp.room.tok.stilldose.males', { name: dose(o.d), n: o.n, total: o.of }] : ['pp.room.tok.stilldose.piglets', { name: dose(o.d), n: o.n, total: o.of }]; });
+  }
+  function recToks(l) { return [['pp.room.tok.recorded', { when: ago(l.rec.at) }], pig(l.alive), ['pp.room.who', { who: l.rec.who }]]; }
+  function spec(l) {
+    var s = { l1: null, tok: [], rail: 'chevron', chip: chipOf(l) };
+    var lv = live(l), lp = lapsed(l);
+    if (l.notask) { s.l1 = ['pp.room.l1.none', {}]; s.tok = [['pp.common.unit.day', { n: l.day }], pig(l.alive)]; }
+    else if (lv.length) {
+      s.l1 = ['pp.room.l1.owes', { doses: doseList(lv) }];
+      var late = lateBy(l);
+      if (partly(l)) s.tok = [['pp.room.tok.recorded', { when: ago(l.rec.at) }]].concat(late ? [dueTok(late)] : [], remainders(lv), [['pp.room.who', { who: l.rec.who }]]);
+      else s.tok = [dueTok(late)].concat(counts(lv));
+      s.tok = s.tok.concat(lapseToks(lp));
+    } else if (isDone(l)) {
+      s.l1 = ['pp.room.l1.done', {}]; s.tok = recToks(l);
+    } else if (lp.length) {
+      s.l1 = ['pp.room.l1.owes', { doses: nameList(lp) }];
+      s.tok = [['pp.common.unit.day', { n: l.day }], pig(lp[0].n)].concat(lapseToks(lp));
+    } else if (l.next) {
+      var nx = l.next; s.l1 = nx.inn === 1 ? ['pp.room.l1.tomorrow', { doses: nameList(nx.doses) }] : ['pp.room.l1.next', { doses: nameList(nx.doses), n: nx.inn }];
+      s.tok = l.rec ? recToks(l) : [['pp.common.unit.day', { n: l.day }], pig(l.alive)];
+    } else {
+      // Nothing owed, nothing missed, nothing coming: every treatment is done.
+      s.l1 = ['pp.room.l1.finished', {}];
+      s.tok = l.rec ? recToks(l) : [['pp.common.unit.day', { n: l.day }], pig(l.alive)];
+    }
+    if (l.collide) s.tok.push(['pp.room.tok.collide', { n: l.collide }, 'amber']);
+    if (l.loss) s.tok.push(['pp.room.tok.loss', { k: l.loss }, 'red']);
+    if (l.gain) s.tok.push(['pp.room.tok.gain', { k: l.gain }, 'blue']);
+    return s;
+  }
+  function chipOf(l) { return l.sowDied ? ['red', 'sowdied'] : l.unlocked ? ['amber', 'unlocked'] : null; }
+  function litterHref(code, piglet, unit) { return 'litter.html?state=litter' + (unit ? '&unit=' + unit : '') + '&crate=' + code + (piglet ? '&piglet=' + encodeURIComponent(piglet) : '') + (PP.lang === 'zh' ? '&lang=zh' : ''); }
+  function litterRow(l, piglet) {
+    var s = spec(l);
+    return '<button type="button" class="st-row pp-litter" data-ds="Candidate:LitterRow" data-action="open-litter" data-value="' + l.code + '"' + (piglet ? ' data-piglet="' + esc(piglet) + '"' : '') + (S.flash === l.code ? ' data-flash' : '') + '>' +
+      '<span class="pp-code">' + S_('pp.room.code', { code: l.code }) + '</span>' +
+      '<span class="st-row-copy"><strong>' + S_(s.l1[0], s.l1[1]) + '</strong><small class="pp-mono">' +
+      s.tok.map(function (t) { return '<span class="pp-tok"' + (t[2] ? ' data-tone="' + t[2] + '"' : '') + '>' + S_(t[0], t[1]) + '</span>'; }).join('') + '</small></span>' +
+      (s.chip ? '<span class="pp-chip" data-tone="' + s.chip[0] + '">' + S_('pp.room.chip.' + s.chip[1]) + '</span>' : '') +
+      '<span class="st-row-chevron">' + I(s.rail) + '</span></button>';
+  }
+  function rows(xs, piglet) { return UI.rowGroup(xs.map(function (l) { return litterRow(l, piglet); }).join('')); }
+
+  /* ---- header ---- */
+  function heads() {
+    var loss = 0, gain = 0, lc = [], gc = [];
+    LITTERS.forEach(function (l) { if (l.loss) { loss += l.loss; lc.push(l.code); } if (l.gain) { gain += l.gain; gc.push(l.code); } });
+    return { loss: loss, gain: gain, lc: lc.sort(), gc: gc.sort(), net: gain - loss };
+  }
+  function signed(n) { return n > 0 ? '+' + n : n < 0 ? '−' + Math.abs(n) : '0'; }
+  function driftStrip() {
+    var h = heads(); if (!h.loss && !h.gain) return '';
+    function grp(id, n, codes) { return '<span class="pp-grp">' + S_(id, { n: n }) + '<span class="pp-codes">' + S_('pp.room.codes', { list: codes.join(' ') }) + '</span></span>'; }
+    var parts = '';
+    if (h.loss) parts += grp('pp.room.loss_open', h.loss, h.lc);
+    if (h.gain) parts += grp('pp.room.gain_open', h.gain, h.gc);
+    if (h.loss && h.gain) parts += '<span class="pp-grp">' + S_(Math.abs(h.net) === 1 && PP.lang === 'en' ? 'pp.room.drift.one' : 'pp.room.drift', { n: signed(h.net) }) + '</span>';
+    return '<div class="pp-strip" data-ds="Candidate:DriftStrip">' + parts + '</div>';
+  }
+  function byCodeOf(c) { return LITTERS.filter(function (l) { return l.code === c; })[0]; }
+  function evWhat(x) { return x.kind === 'count' ? PP.t('pp.room.ev.count', { n: x.n }) : x.kind === 'move' ? PP.t('pp.room.ev.move', { n: x.n }) : x.kind === 'dead' ? PP.t('pp.room.ev.dead', { n: x.n }) : PP.t('pp.room.ev.edit'); }
+  // The newest stamped event of any kind: treatment, count, move, death or correction.
+  function lastRecord() {
+    var best = null;
+    function take(e) { if (!best || new Date(e.at) > new Date(best.at)) best = e; }
+    LITTERS.forEach(function (l) {
+      if (l.rec) take({ at: l.rec.at, what: dose(l.rec.d || 'iron'), code: l.code, who: l.rec.who });
+      (l.ev || []).forEach(function (x) { take({ at: x.at, what: evWhat(x), code: l.code, who: x.who }); });
+    });
+    if (!best) return '';
+    return UI.heading({ title: '', kind: 'group', level: 4, className: 'pp-last', strs: { title: 'pp.room.last' }, args: { title: { when: ago(best.at), what: best.what, code: best.code, who: best.who } } });
+  }
+  function lead() {
+    var n = lensOf('owed').length;
+    return '<div><div class="pp-lead" data-ds="Candidate:LeadFigure"><span class="pp-fig">' + S_('pp.room.lead.figure', { n: n }) + '</span><span class="pp-leadlab">' + S_('pp.room.lead.' + (n === 1 && PP.lang === 'en' ? 'one' : 'many')) + '</span></div>' + lastRecord() + '</div>';
+  }
+  function header() {
+    return '<header class="task-header pp-head">' +
+      UI.iconButton({ action: 'back', icon: I('back'), label: 'Back', className: 'task-return' }) +
+      '<div class="pp-title">' +
+      UI.heading({ title: '', kind: 'group', level: 3, strs: { title: 'pp.common.task' }, action: '<button type="button" data-action="overview" ' + sa('pp.room.overview') + '>' + esc(PP.t('pp.room.overview')) + '</button>' }) +
+      UI.heading({ title: '', kind: 'page', level: 2, description: '', strs: { title: 'pp.room.unit', description: 'pp.room.howto' }, args: { title: { n: 7 } } }) +
+      '</div></header>';
+  }
+  function filterWhat() {
+    var w = []; if (S.missed) w.push(PP.t('pp.room.filter.missed')); if (S.filter.length) w.push(nameList(S.filter.map(function (d) { return { d: d }; })));
+    return w.join(' · ');
+  }
+  function controls() {
+    var counts = {}; ['owed', 'done', 'later', 'all'].forEach(function (k) { counts[k] = lensOf(k).length; });
+    var opts = ['owed', 'done', 'later', 'all'].map(function (k) {
+      return [k, PP.t('pp.room.lens.' + k, { n: counts[k] }), { strs: { label: 'pp.room.lens.' + k }, args: { label: { n: counts[k] } } }];
+    });
+    var seg = UI.segment({ options: opts, active: S.lens, action: 'lens', ariaLabel: '' });
+    var lensDoses = LITTERS.filter(function (l) { return member(l, S.lens); }).some(function (l) { return doseSet(l, S.lens).length > 0; });
+    var f = (lensDoses || S.filter.length) ? UI.iconButton({ action: 'filter', icon: I('filter'), label: 'Filter litters', className: 'room-filter-button' }) : '';
+    var sum = (S.filter.length || S.missed) ? '<div class="pp-filtered">' + UI.heading({ title: '', kind: 'group', level: 4, action: '<button type="button" data-action="clear-filter" ' + sa('act.clear') + '>' + esc(PP.t('act.clear')) + '</button>', strs: { title: 'pp.room.filtered' }, args: { title: { what: filterWhat() } } }) + '</div>' : '';
+    return '<div class="pp-controlwrap"><div class="pp-controls">' + seg + f + '</div>' + sum + '</div>';
+  }
+  function comingUp() {
+    var xs = LITTERS.filter(function (l) { return !l.notask && !live(l).length && l.next && matches(l, 'all', S.filter); });
+    if (!xs.length) return '';
+    var min = Math.min.apply(null, xs.map(function (l) { return l.next.inn; }));
+    xs = xs.filter(function (l) { return l.next.inn === min; }).sort(byCode).map(function (l) { return Object.assign({}, l, { rec: null, did: [], loss: 0, gain: 0, collide: 0, owes: [] }); });
+    return '<div class="pp-block">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.room.next' } }) + rows(xs.map(forceNext)) + '</div>';
+  }
+  function forceNext(l) { return Object.assign({}, l, { _next: true }); }
+  function missedLine() {
+    var n = LITTERS.filter(function (l) { return lapsed(l).length; }).length;
+    if (!n || S.missed) return '';
+    var one = n === 1 && PP.lang === 'en';
+    return UI.rowGroup(UI.row({ title: '', action: 'show-missed', strs: { title: 'pp.room.missed.' + (one ? 'one' : 'many') }, args: { title: { n: n } } }));
+  }
+  function list() {
+    if (!LITTERS.length) return UI.panel(UI.choiceEmpty('', { strs: { text: 'pp.room.empty.none' } }));
+    var xs = lensOf(S.lens);
+    if (xs.length) return rows(xs) + (S.lens === 'owed' ? missedLine() : '');
+    var anyDone = LITTERS.some(isDone);
+    var id = (S.filter.length || S.missed) ? 'pp.room.empty.filter' : S.lens === 'owed' ? (anyDone ? 'pp.room.empty.alldone' : 'pp.room.empty.owed') : 'pp.room.empty.' + S.lens;
+    return UI.panel(UI.choiceEmpty('', { strs: { text: id } })) + (S.lens === 'owed' ? missedLine() + comingUp() : '');
+  }
+  function dock() {
+    return '<footer class="sheet-footer pp-dock" data-ds="Sheet">' +
+      '<button type="button" class="button primary" data-action="scan">' + I('scan') + '<span ' + sa('act.scan') + '>' + esc(PP.t('act.scan')) + '</span></button>' + UI.iconButton({ action: 'find', icon: I('search'), label: 'Find a piglet by tag or notch', className: 'room-filter-button' }) + '</footer>';
+  }
+
+  /* ---- sheets: one exit, the footer Close (the bar holds exits only) ---- */
+  function sheetFrame(titleId, body, footer, sizing) {
+    return '<div class="pp-layer" data-ds="Sheet"><div class="scrim" data-action="scrim"></div>' +
+      '<section class="sheet" data-st-context="drawer" data-size="' + (sizing ? 'medium" data-sizing="content' : 'long') + '" role="dialog">' +
+      '<header class="utility-header">' + UI.heading({ title: '', kind: 'page', level: 3, strs: { title: titleId } }) + '</header>' +
+      '<div class="sheet-body">' + body + '</div>' + footer + '</section></div>';
+  }
+  function closeFooter() {
+    return '<footer class="sheet-footer"><button type="button" class="button secondary" data-action="close-sheet" ' + sa('act.close') + '>' + esc(PP.t('act.close')) + '</button></footer>';
+  }
+  function filterSheet() {
+    var rowsH = roomDoses().map(function (d) {
+      var n = lensOf(S.lens, [d]).length;
+      if (!n && S.filter.indexOf(d) < 0) return '';
+      return UI.choiceRow({ label: '', meta: '', mode: 'multi', action: 'toggle-dose', value: d, selected: S.filter.indexOf(d) >= 0,
+        strs: { label: 'pp.common.tx.' + d, meta: 'pp.room.filter.n.' + (n === 1 && PP.lang === 'en' ? 'one' : 'many') }, args: { meta: { n: n } } });
+    });
+    var head = UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.room.filter.treatment' },
+      action: S.filter.length ? '<button type="button" data-action="clear-filter" ' + sa('act.clear') + '>' + esc(PP.t('act.clear')) + '</button>' : '' });
+    return sheetFrame('pp.room.filter.title', head + UI.choiceGroup(rowsH, {}), closeFooter(), true);
+  }
+
+  /* ---- lookup: nothing until the input can be a full tag or a notch; every match is listed ---- */
+  function normal(q) { return q.trim().replace(/[‐-―−\s.\/_]+/g, '-'); }
+  function lookup(raw) {
+    var q = normal(raw);
+    if (/^\d{6}$/.test(q)) return { q: q, hits: PIGLETS.filter(function (p) { return p.tag === q; }) };
+    if (/^\d{4}$/.test(q)) return { q: q, hits: PIGLETS.filter(function (p) { return p.tag && p.tag.slice(-4) === q; }) };
+    if (/^\d+-\d+$/.test(q)) return { q: q, hits: PIGLETS.filter(function (p) { return p.notch === q; }) };
+    return null;
+  }
+  function hitBlock(p) {
+    var ids = p.tag && p.notch ? ['pp.room.scan.ids_both', { tag: p.tag, notch: p.notch }] : p.tag ? ['pp.room.scan.ids_tag', { tag: p.tag }] : ['pp.room.scan.ids_notch', { notch: p.notch }];
+    var head = UI.heading({ title: '', kind: 'group', level: 4, strs: { title: ids[0] }, args: { title: ids[1] } });
+    var lit = LITTERS.filter(function (l) { return l.code === p.crate; })[0];
+    var body;
+    if (lit) body = rows([lit], p.tag || p.notch);
+    else if (p.weaned) body = UI.rowGroup(UI.row({ title: '', strs: { title: 'pp.room.scan.weaned' } }));
+    else body = UI.rowGroup(UI.row({ title: '', action: 'open-litter', value: p.crate, attrs: { 'data-unit': p.unit, 'data-piglet': p.tag || p.notch }, strs: { title: 'pp.room.scan.in_unit' }, args: { title: { n: p.unit, code: p.crate } } }));
+    return '<div>' + head + body + '</div>';
+  }
+  function findResults() {
+    var r = lookup(S.q); if (!r) return '';
+    if (!r.hits.length) return UI.choiceEmpty('', { strs: { text: 'pp.room.scan.none' }, args: { text: { q: r.q } } }) + UI.choiceEmpty('', { strs: { text: 'pp.room.scan.hint' } });
+    return '<div class="pp-results">' + r.hits.map(hitBlock).join('') + '</div>';
+  }
+  function scanSheet() {
+    var typeBtn = '<button type="button" class="button ' + (S.unavailable ? 'primary' : 'secondary') + ' pp-wide" data-action="type" ' + sa('pp.room.scan.type') + '>' + esc(PP.t('pp.room.scan.type')) + '</button>';
+    var body = S.unavailable
+      ? UI.panel(UI.choiceEmpty('', { strs: { text: 'pp.room.scan.unavailable' } })) + '<div class="pp-block">' + typeBtn + '</div>'
+      : '<div class="pp-scan-frame" data-ds="Candidate:ScanFrame">' + I('scan') + '</div>' + UI.heading({ title: '', kind: 'section', level: 4, strs: { title: 'pp.room.scan.hold' } }) + typeBtn;
+    return sheetFrame('act.scan', body, closeFooter());
+  }
+  function findSheet() {
+    var body = '<div class="pp-findbar">' +
+      UI.choiceSearch({ label: 'Ear tag or notch', placeholder: 'Ear tag or notch', value: S.q, attrs: { 'data-role': 'q', inputmode: 'text', 'data-str-attr': 'aria-label:pp.room.scan.placeholder;placeholder:pp.room.scan.placeholder' } }) +
+      '</div>' + (S.scanned ? '' : UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.room.find.hint' } })) +
+      '<div id="scan-results">' + findResults() + '</div>';
+    return sheetFrame('pp.room.scan.title', body, closeFooter());
+  }
+  function errorView() {
+    return UI.panel(UI.choiceEmpty('', { strs: { text: 'pp.room.err.title' } }) + UI.choiceEmpty('', { strs: { text: 'pp.room.err.why' } }) +
+      '<button type="button" class="button secondary" data-action="retry" ' + sa('pp.room.err.retry') + '>' + esc(PP.t('pp.room.err.retry')) + '</button>');
+  }
+
+  /* ---- render ---- */
+  var screen = document.getElementById('screen'), phone = document.getElementById('phone');
+  function render() {
+    if (S.error) { screen.innerHTML = header() + errorView(); phone.classList.remove('pp-locked'); tag(); return; }
+    screen.innerHTML = header() + lead() + driftStrip() + controls() + list() + dock() +
+      (S.sheet === 'filter' ? filterSheet() : S.sheet === 'scan' ? scanSheet() : S.sheet === 'find' ? findSheet() : '');
+    phone.classList.toggle('pp-locked', !!S.sheet);
+    tag();
+    if (S.sheet === 'find') { var i = screen.querySelector('[data-role=q]'); if (i && !S.scanned && !i.dataset.focused) { i.dataset.focused = '1'; try { i.focus(); } catch (e) {} } }
+  }
+  function tag() {
+    function aria(sel, id) { var e = screen.querySelector(sel); if (e) e.setAttribute('data-str-attr', 'aria-label:' + id); }
+    aria('.task-return', 'act.back'); aria('[data-action="filter"]', 'pp.room.aria.filter'); aria('.pp-dock [data-action="find"]', 'pp.room.aria.find'); aria('.segment', 'pp.room.lens.aria');
+    PP.apply(screen);
+  }
+
+  /* ---- URL, history, scroll ---- */
+  function url() {
+    var p = new URLSearchParams(location.search);
+    ['lens', 'filter', 'missed'].forEach(function (k) { p.delete(k); });
+    if (S.lens !== (start.lens || 'owed')) p.set('lens', S.lens);
+    if (S.filter.length) p.set('filter', S.filter.join(','));
+    if (S.missed) p.set('missed', '1');
+    var s = p.toString(); return location.pathname + (s ? '?' + s : '');
+  }
+  function persist() { try { history.replaceState(history.state, '', url()); } catch (e) {} }
+  function openSheet(name) {
+    S.sheet = name; S.opened = Date.now();
+    try { history.pushState({ sheet: name }, '', location.href); } catch (e) {}
+  }
+  function closeSheet() {
+    S.q = ''; var st = history.state;
+    if (st && st.sheet && !st.deep) { history.back(); return; }
+    S.sheet = ''; render(); refocus();
+  }
+  function refocus() { var b = screen.querySelector('[data-action="scan"]'); if (b) b.focus(); }
+  window.addEventListener('popstate', function (ev) {
+    var sh = (ev.state && ev.state.sheet) || '';
+    if (!sh) S.q = '';
+    S.sheet = sh; render(); if (!sh) refocus();
+  });
+  if (S.sheet) { try { history.replaceState({ sheet: S.sheet, deep: true }, '', location.href); } catch (e) {} }
+  function scrollKey() { return 'pp-room-scroll:' + PP.state + ':' + S.lens; }
+  function saveScroll() { try { sessionStorage.setItem(scrollKey(), String(window.scrollY)); } catch (e) {} }
+  function restoreScroll() { try { var y = +sessionStorage.getItem(scrollKey()); if (y && !S.sheet) window.scrollTo(0, y); } catch (e) {} }
+
+  screen.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-action]'); if (!b) return;
+    var a = b.dataset.action, v = b.dataset.value;
+    if (a === 'scrim') { if (Date.now() - S.opened < 300) return; closeSheet(); return; }
+    if (a === 'back') { location.href = 'index.html' + (PP.lang === 'zh' ? '?lang=zh' : ''); return; }
+    if (a === 'open-litter') { saveScroll(); location.href = litterHref(v, b.dataset.piglet, b.dataset.unit); return; }
+    if (a === 'overview') { location.href = 'end.html?state=overview' + (PP.lang === 'zh' ? '&lang=zh' : ''); return; }
+    if (a === 'retry') { location.reload(); return; }
+    if (a === 'lens') { S.lens = v; persist(); }
+    else if (a === 'filter') { openSheet('filter'); }
+    else if (a === 'scan') { openSheet('scan'); }
+    else if (a === 'find') { openSheet('find'); }
+    else if (a === 'type') { S.scanned = false; S.sheet = 'find'; try { history.replaceState({ sheet: 'find', deep: !!(history.state && history.state.deep) }, '', location.href); } catch (e) {} }
+    else if (a === 'close-sheet') { closeSheet(); return; }
+    else if (a === 'toggle-dose') { var i = S.filter.indexOf(v); if (i >= 0) S.filter.splice(i, 1); else S.filter.push(v); persist(); }
+    else if (a === 'clear-filter') { S.filter = []; if (S.missed) { S.missed = false; if (S.cameFrom) S.lens = S.cameFrom; } persist(); }
+    else if (a === 'show-missed') { S.cameFrom = S.lens; S.missed = true; S.lens = 'all'; persist(); }
+    render();
+  });
+  screen.addEventListener('input', function (ev) {
+    if (ev.target.dataset.role !== 'q') return;
+    S.q = ev.target.value;
+    var r = document.getElementById('scan-results'); r.innerHTML = findResults(); PP.apply(r);
+  });
+  screen.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Enter' || ev.target.dataset.role !== 'q') return;
+    ev.preventDefault();
+    var r = lookup(S.q);
+    if (r && r.hits.length === 1 && PIGLETS.indexOf(r.hits[0]) >= 0 && r.hits[0].crate && LITTERS.some(function (l) { return l.code === r.hits[0].crate; })) { saveScroll(); location.href = litterHref(r.hits[0].crate, r.hits[0].tag || r.hits[0].notch); }
+    else ev.target.blur();
+  });
+
+  /* ---- sync: a row that a sync changes departs by the same law as a hand's record: hold 800ms of idle, any touch resets ---- */
+  function armHold() {
+    clearTimeout(holdTimer);
+    if (Object.keys(held).length) holdTimer = setTimeout(function () { held = {}; S.flash = ''; render(); }, 800);
+  }
+  ['pointerdown', 'touchstart', 'scroll'].forEach(function (e) { window.addEventListener(e, armHold, { passive: true, capture: true }); });
+  PP.sync = function (code, patch) {
+    var l = LITTERS.filter(function (x) { return x.code === code; })[0]; if (!l) return;
+    var before = Object.assign({}, l), was = member(l, S.lens);
+    Object.assign(l, patch);
+    if (was && !member(l, S.lens)) held[code] = { lens: S.lens, l: before };
+    S.flash = code; render(); armHold();
+  };
+
+  // Resume (phone unlocked, or past midnight): re-derive from the clock and let rows that changed lens depart by the same law.
+  PP.resume = function () {
+    var before = {}; LITTERS.forEach(function (l) { before[l.code] = { in: member(l, S.lens), snap: Object.assign({}, l) }; });
+    if (LIVE) NOW = new Date();
+    LITTERS.forEach(function (l) { if (before[l.code].in && !member(l, S.lens)) held[l.code] = { lens: S.lens, l: before[l.code].snap }; });
+    render(); armHold();
+  };
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && !S.error) PP.resume(); });
+
+  // A successful scan resolves into the Find result for that tag.
+  PP.scanned = function (tag) { S.q = tag; S.scanned = true; S.sheet = 'find'; try { history.replaceState({ sheet: 'find', deep: !!(history.state && history.state.deep) }, '', location.href); } catch (e) {} render(); };
+
+  var boot = PP.ready.then(function () { render(); restoreScroll(); });
+  // The one registry exception: when the registry itself failed to load there is nothing to look strings up in.
+  boot.catch(function () {
+    screen.innerHTML = '<p>Couldn’t load the unit.</p><button type="button" onclick="location.reload()">Retry</button>';
+  });
+})();
+</script>
+</body>
+</html>
