@@ -8,28 +8,20 @@
 <link rel="stylesheet" href="/ux/design-system/components/bundle.css">
 <link rel="stylesheet" href="shell.css">
 <style>
-/* Layout only: the page frame, header split, and the two candidate compositions (tokens from tokens.css). */
+/* Layout only, tokens from tokens.css; one Candidate composition (the red band). */
 .edge-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
-.edge-context { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.edge-phone .scrim { inset: 0; }
 .edge-title { flex: 1; min-width: 0; }
+.edge-context { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.edge-door { display: inline-flex; align-items: center; gap: 4px; min-height: var(--touch-min); padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; }
+.edge-door svg { width: 15px; height: 15px; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .edge-body { display: flex; flex-direction: column; gap: var(--space-section); }
 .edge-body > * { margin: 0; }
+.edge-group > * + * { margin-top: var(--space-heading); }
 .edge-mono { font-family: var(--font-mono); }
-/* Candidate:StatusWord — coloured text with a 4px dot (README, Colour). */
-.edge-status { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; }
-.edge-status::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
-.edge-status[data-tone="red"] { color: var(--red); }
-.edge-status[data-tone="amber"] { color: var(--amber); }
 /* Candidate:DangerBand — farrowing's red warning band, on tokens only. */
-.edge-band { display: flex; flex-direction: column; gap: 4px; padding: var(--space-panel); background: var(--red-wash); border: 1px solid var(--red); border-radius: var(--radius-inset); color: var(--red); }
-.edge-band strong { font-size: 13px; font-weight: 500; }
-.edge-band small { font-size: 11px; color: var(--muted); }
-/* Candidate:Measure — placeholder: mono value field with its unit always shown. */
-.edge-measure { display: flex; align-items: center; gap: 8px; }
-.edge-measure input { font-family: var(--font-mono); font-size: 21px; }
-.edge-measure .edge-unit { font-family: var(--font-mono); font-size: 14px; color: var(--muted); }
-.edge-receipt { margin: 0; font-size: 11px; color: var(--muted); }
-.edge-footer-gap { flex: 1; }
+.edge-band { padding: var(--space-panel); background: var(--red-wash); border: 1px solid var(--red); border-radius: var(--radius-inset); color: var(--red); font-size: 13px; font-weight: 500; }
+.edge-drawer-body { display: flex; flex-direction: column; gap: var(--space-row-y); }
 </style>
 </head>
 <body>
@@ -42,45 +34,54 @@
 (function () {
   var UI = window.SentriUI, ICON = window.SentriIcons;
   var zh = PP.lang === 'zh';
-  // Fixtures. One litter per state; every number below is printed from these.
-  var day = function (m, d) { return zh ? m + '月' + d + '日' : 'Sep' + ' ' + d; };
-  var stamp = function (m, d, time, who) { return day(m, d) + ' · ' + time + ' · ' + who; };
-  var FX = {
-    'no-task':  { tag: '000391', pen: 'C07', parity: 2, day: 4, born: 11, alive: 10, dead: 1, live: 10 },
-    'orphan':   { tag: '000418', pen: 'B01', parity: 3, day: 3, born: 10, alive: 7, dead: 3, cause: 'pp.edge.cause.prolapse', died: stamp(9, 28, '06:20', 'L.M'),
-                  owed: [['iron', 7, 3], ['tail', 7, 3]] },
-    'prelock':  { tag: '000437', pen: 'B02', parity: 2, day: 0, alive: 9, dead: 1, owed: [['cord', 9, 0], ['nasal', 9, 0]] },
-    'birth-weight-missing': { tag: '000462', pen: 'C03', parity: 4, day: 1, born: 13, alive: 12, dead: 1, live: 12 },
-    'birth-weight-typed':   { tag: '000462', pen: 'C03', parity: 4, day: 1, born: 13, alive: 12, dead: 1, live: 12, typed: '16.4' },
-    'birth-weight-set':     { tag: '000462', pen: 'C03', parity: 4, day: 1, born: 13, alive: 12, dead: 1, live: 12, weight: '16.4', by: stamp(9, 28, '14:52', 'G.H') }
-  };
-  var name = FX[PP.state] ? PP.state : 'no-task';
-  var f = FX[name];
-  var weight = f.weight || '';      // birth-weight-missing can become set through the Record below
-  var weightBy = f.by || '';
-  var receipt = false;
+  var stamp = function (d, time, who) { return (zh ? '9月' + d + '日' : 'Sep ' + d) + ' · ' + time + ' · ' + who; };
+  var A = { pad: 'ds.field.figure' };
 
-  function S(id, args) { return { id: id, args: args }; }
-  function span(id, args, cls, tone) {
-    return '<span' + (cls ? ' class="' + cls + '"' : '') + (tone ? ' data-tone="' + tone + '"' : '') + ' data-str="' + id + '"' +
+  // Fixtures. Born = live-born + stillborn on every litter; every number printed comes from here.
+  var FX = {
+    'no-task':  { tag: '000391', pen: 'C07', parity: 2, day: 4, born: 11, alive: 10, dead: 1, still: 1, live: 10, record: true, weight: 'missing' },
+    'orphan':   { tag: '000418', pen: 'B01', parity: 3, day: 3, born: 10, alive: 7, dead: 3, still: 1, live: 9, record: true, band: stamp(28, '06:20', 'L.M'),
+                  weight: '13.6', by: 'finish', at: stamp(26, '18:05', 'G.H'), owed: [['iron', 7, 3], ['tail', 7, 3]] },
+    'orphan-unlocked': { tag: '000429', pen: 'B03', parity: 1, day: 1, born: 8, derived: true, alive: 6, dead: 2, still: 1, live: 7, record: true, band: stamp(28, '06:20', 'L.M'),
+                  weight: 'missing', owed: [['tail', 6, 1]] },
+    'prelock':  { tag: '000437', pen: 'B02', parity: 2, day: 0, alive: 9, dead: 1, prelock: true, owed: [['cord', 9, 0], ['nasal', 9, 0]] },
+    'weight':   { tag: '000462', pen: 'C03', parity: 4, day: 1, born: 13, alive: 12, dead: 1, still: 1, live: 12, record: true, weight: 'missing' }
+  };
+  var STATES = {
+    'no-task': ['no-task'], 'orphan': ['orphan'], 'orphan-unlocked': ['orphan-unlocked'], 'prelock': ['prelock'],
+    'birth-weight-missing': ['weight'], 'birth-weight-entry': ['weight', ''], 'birth-weight-typed': ['weight', '16.4'],
+    'birth-weight-range': ['weight', '34.2'], 'birth-weight-set': ['weight', null, '16.4']
+  };
+  var name = STATES[PP.state] ? PP.state : 'no-task';
+  var spec = STATES[name];
+  var f = Object.assign({}, FX[spec[0]]);
+  var weight = f.weight === 'missing' ? '' : f.weight;       // '' = missing
+  var by = f.by || '', at = f.at || '';
+  var drawer = spec[1] != null;                              // the birth-weight drawer is open
+  var draft = spec[1] || '';                                 // typed string in the pad
+  if (spec[2]) { weight = spec[2]; by = 'finish'; at = stamp(28, '14:52', 'G.H'); }
+
+  function span(id, args, cls) {
+    return '<span' + (cls ? ' class="' + cls + '"' : '') + ' data-str="' + id + '"' +
       (args ? " data-args='" + JSON.stringify(args).replace(/'/g, '&#39;') + "'" : '') + '></span>';
   }
+  var pig = function (n) { return { id: 'pp.common.unit.piglet.' + (n === 1 && !zh ? 'one' : 'many'), args: { n: n } }; };
   function row(o) {
-    return UI.row({ title: '', description: o.desc ? '' : undefined, icon: o.icon ? ICON.icon(o.icon) : '', action: o.action, value: o.value,
-      strs: Object.assign({ title: o.title }, o.desc ? { description: o.desc } : {}),
-      args: Object.assign({ title: o.titleArgs }, o.desc ? { description: o.descArgs } : {}) });
+    var strs = { title: o.title }, args = { title: o.titleArgs };
+    if (o.desc) { strs.description = o.desc; args.description = o.descArgs; }
+    if (o.trail) { strs.trailing = o.trail; args.trailing = o.trailArgs; }
+    return UI.row({ title: '', description: o.desc ? '' : undefined, trailing: o.trail ? '' : undefined, action: o.action, value: o.value, strs: strs, args: args });
+  }
+  function fact(label, n, meta, metaArgs) {
+    var p = pig(n);
+    return { label: '', value: '', strs: Object.assign({ label: label, value: p.id }, meta ? { meta: meta } : {}), args: Object.assign({ value: p.args }, meta ? { meta: metaArgs } : {}) };
   }
   function facts() {
     var items = [];
-    if (f.born != null) items.push({ label: '', value: '', strs: { label: 'label.born', value: 'pp.edge.data.n' }, args: { value: { n: f.born } } });
-    items.push({ label: '', value: '', strs: Object.assign({ label: 'label.alive', value: 'pp.edge.data.n' }, name === 'prelock' ? { meta: 'pp.edge.prelock.moving' } : {}), args: { value: { n: f.alive } } });
-    items.push({ label: '', value: '', strs: { label: 'label.dead', value: 'pp.edge.data.n' }, args: { value: { n: f.dead } } });
+    if (f.born != null) items.push(fact('label.born', f.born, f.derived ? 'pp.edge.born.derived' : null));
+    items.push(fact('label.alive', f.alive));
+    items.push(fact('label.dead', f.dead, f.still ? 'pp.edge.dead.stillborn' : null, { n: f.still }));
     return UI.facts(items, { columns: items.length === 3 ? 3 : 2 });
-  }
-  function sowRow() {
-    var died = name === 'orphan';
-    return UI.rowGroup(row({ icon: 'profile', action: 'open-sow', value: f.tag, title: 'pp.edge.sow.title', titleArgs: { tag: f.tag },
-      desc: died ? 'pp.edge.sow.died' : 'pp.edge.sow.page', descArgs: died ? { stamp: f.died } : undefined }));
   }
   function owed() {
     if (!f.owed) return '';
@@ -88,91 +89,86 @@
       return row({ action: 'record-treatment', value: o[0], title: 'pp.common.tx.' + o[0], desc: 'pp.edge.tx.desc', descArgs: { n: o[1], d: o[2] } });
     }).join(''), { title: '', strs: { title: 'pp.edge.section.owed' } });
   }
+  function recordGroup(withWhy) {
+    return '<section class="edge-group" data-ds="Section">' +
+      UI.heading({ title: '', description: withWhy ? '' : undefined, kind: 'group', level: 3,
+        strs: Object.assign({ title: 'pp.edge.section.record' }, withWhy ? { description: 'pp.edge.notask.why' } : {}) }) +
+      UI.rowGroup(
+        row({ action: 'open-dead', value: 'dead', title: 'act.record_dead' }) +
+        row({ action: 'open-count', value: 'count', title: 'pp.count.title' }) +
+        row({ action: 'open-move', value: 'move', title: 'pp.move.title', desc: 'pp.edge.desc.move' })) + '</section>';
+  }
+  function weightRow() {
+    if (!weight) return UI.rowGroup(row({ action: 'open-weight', value: 'weight', title: 'pp.edge.weight.title', trail: 'pp.edge.weight.optional' }));
+    return UI.rowGroup(row({ action: 'open-farrowing-edit', value: 'birth-weight', title: 'pp.edge.weight.title',
+      trail: 'pp.edge.weight.value', trailArgs: { w: weight },
+      desc: by === 'finish' ? 'pp.edge.weight.by_finish' : 'pp.edge.weight.by_here', descArgs: { stamp: at } }));
+  }
   function header() {
-    var right = name === 'orphan' ? span('pp.edge.chip.sow_died', null, 'edge-status', 'red')
-      : name === 'prelock' ? span('pp.edge.hdr.day_open', { n: f.day })
-      : span('pp.common.unit.day', { n: f.day });
-    return '<header class="utility-header"><div class="edge-title"><h3>' + span('pp.edge.hdr.sow', { tag: f.tag }, 'edge-mono') + '</h3>' +
-      '<p class="edge-context">' + span('pp.edge.hdr.pen_parity', { pen: f.pen, n: f.parity }) + right + '</p></div></header>';
-  }
-  function weightBlock() {
-    if (weight) {
-      return '<section data-ds="Section">' +
-        UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: 'pp.edge.weight.title', description: 'pp.edge.weight.set_in' },
-          action: '<button type="button" data-action="open-farrowing-edit" data-value="birth-weight"><span data-str="act.edit"></span></button>' }) +
-        UI.facts([{ label: '', value: '', meta: '', strs: { label: 'pp.edge.weight.live_born', value: 'pp.edge.weight.value', meta: 'pp.edge.data.stamp' },
-          args: { label: { n: f.live }, value: { w: weight }, meta: { stamp: weightBy } } }], { columns: 1 }) +
-        (receipt ? '<p class="edge-receipt" role="status" data-str="pp.edge.weight.receipt" data-args=\'{"w":"' + weight + '"}\'></p>' : '') + '</section>';
-    }
-    return '<section data-ds="Section">' +
-      UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: 'pp.edge.weight.title', description: 'pp.edge.weight.optional' }, args: { description: { n: f.live } } }) +
-      UI.field({ ds: 'Candidate:Measure', label: '',
-        control: '<span class="edge-measure"><input id="w" inputmode="decimal" autocomplete="off" aria-describedby="w-unit" data-str-attr="aria-label:pp.edge.weight.title"><span class="edge-unit" id="w-unit" data-str="pp.common.unit.kg"></span></span>' }) +
-      '</section>';
-  }
-  function footer(pending) {
-    return '<footer class="sheet-footer">' +
-      '<button type="button" class="button secondary surface-back" data-ds="Button" data-action="back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span data-str="act.back"></span></button>' +
-      (pending ? '<button type="button" class="button primary" data-ds="Button" data-action="record-weight" data-str="pp.edge.weight.record" data-args=\'{"w":"' + pending + '"}\'></button>' : '') + '</footer>';
+    var label = { tag: f.tag };
+    return '<header class="utility-header"><div class="edge-title"><h3><button type="button" class="edge-door" data-action="open-sow" data-value="' + f.tag +
+      '" data-str-attr="aria-label:pp.edge.sow.title" data-args=\'' + JSON.stringify(label) + '\'>' + span('pp.edge.hdr.sow', label, 'edge-mono') + ICON.icon('chevron') + '</button></h3>' +
+      '<p class="edge-context">' + span('pp.edge.hdr.pen_parity', { pen: f.pen, n: f.parity }) + span('pp.common.unit.day', { n: f.day }) + '</p></div></header>';
   }
   function body() {
     var out = [];
-    if (name === 'no-task') {
-      out.push(UI.panel(UI.heading({ title: '', description: '', kind: 'panel', level: 3, strs: { title: 'pp.edge.notask.title', description: 'pp.edge.notask.why' } }), { ds: 'Panel' }));
-      out.push(facts());
-      out.push(weightBlock());
-      out.push(UI.rowGroup(
-        row({ icon: 'alert', action: 'open-dead', value: 'dead', title: 'act.record_dead', desc: 'pp.edge.desc.dead', descArgs: { n: f.dead } }) +
-        row({ icon: 'record', action: 'open-count', value: 'count', title: 'pp.count.title', desc: 'pp.edge.desc.alive', descArgs: { n: f.alive } }) +
-        row({ icon: 'transfer', action: 'open-move', value: 'move', title: 'pp.move.title', desc: 'pp.edge.desc.move' }),
-        { title: '', strs: { title: 'pp.edge.section.record' } }));
-      out.push(sowRow());
-    } else if (name === 'orphan') {
-      out.push('<div class="edge-band" data-ds="Candidate:DangerBand" role="status"><strong>' + span('pp.edge.orphan.band', { cause: PP.t(f.cause) }) + '</strong><small>' + span('pp.edge.orphan.stays', { n: f.alive }) + '</small></div>');
-      out.push(facts());
-      out.push(owed());
-      out.push(sowRow());
-    } else if (name === 'prelock') {
-      out.push(UI.rowGroup(row({ icon: 'farrow', action: 'open-farrowing', value: f.tag, title: 'pp.edge.prelock.door', desc: 'pp.edge.prelock.door_desc' })));
-      out.push(facts());
-      out.push(owed());
-      out.push(sowRow());
-    } else {
-      out.push(facts());
-      out.push(weightBlock());
-      out.push(sowRow());
+    if (f.band) out.push('<div class="edge-band" data-ds="Candidate:DangerBand" role="status">' + span('pp.edge.orphan.band', { cause: PP.t('pp.edge.cause.prolapse'), stamp: f.band }) + '</div>');
+    if (f.prelock) {
+      out.push(UI.rowGroup(row({ action: 'open-farrowing', value: f.tag, title: 'pp.edge.prelock.door', desc: 'pp.edge.prelock.door_desc' })));
     }
+    out.push(facts());
+    out.push(owed());
+    if (f.record) out.push(recordGroup(name === 'no-task'));
+    if (!f.prelock) out.push(weightRow());
     return out.join('');
   }
-  function render(pending) {
-    document.getElementById('screen').innerHTML =
-      '<section class="sheet" data-ds="Sheet" data-presentation="page" data-name="' + name + '">' + header() +
-      '<div class="sheet-body"><div class="edge-body">' + body() + '</div></div>' + footer(pending) + '</section>';
-    PP.apply(document.getElementById('screen'));
-    var w = document.getElementById('w');
-    if (w) {
-      w.value = pendingValue;
-      w.addEventListener('input', function () {
-        var v = w.value.replace(',', '.');
-        pendingValue = w.value;
-        var ok = /^\d{1,2}(\.\d)?$/.test(v) && parseFloat(v) > 0;
-        var btn = document.querySelector('[data-action="record-weight"]');
-        if (ok && !btn) { render(v); document.getElementById('w').focus(); }
-        else if (!ok && btn) { render(''); document.getElementById('w').focus(); }
-      });
-    }
+  function faceFooter() {
+    return '<footer class="sheet-footer"><button type="button" class="button secondary" data-ds="Button" data-action="back" data-str="act.back"></button></footer>';
   }
-  var pendingValue = f.typed || '';
+  function drawerHtml() {
+    var v = draft, n = f.live;
+    var min = (n * 0.8).toFixed(1), max = (n * 2.5).toFixed(1);
+    var num = parseFloat(v), out = !isNaN(num) && (num < +min || num > +max);
+    var ms = { label: 'pp.edge.weight.label', optional: 'pp.edge.weight.optional', value: 'ds.field.figure', unit: 'ds.field.unit.kg', placeholder: 'ds.field.placeholder' };
+    if (out) ms.hint = 'ds.field.measure.range';
+    var measure = UI.measure({ label: '', optional: '', value: v, unit: 'kg', placeholder: '—', key: 'bw', active: true, range: [+min, +max], hint: out ? ' ' : '',
+      strs: ms, args: { hint: { min: min, max: max, n: n } } });
+    var pad = UI.numpad({ decimals: 1, value: v, key: 'bw', strs: { digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad' } });
+    var ok = !isNaN(num) && num > 0;
+    return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="medium" data-sizing="content" role="dialog" aria-modal="true">' +
+      '<header class="utility-header"><div class="edge-title"><h3 data-str="pp.edge.weight.title"></h3><p>' + span('pp.edge.weight.pop', { n: n }) + '</p></div></header>' +
+      '<div class="sheet-body"><div class="edge-drawer-body">' + measure + pad + '</div></div>' +
+      '<footer class="sheet-footer"><button type="button" class="button secondary" data-ds="Button" data-action="close-weight" data-str="act.back"></button>' +
+      '<button type="button" class="button primary" data-ds="Button" data-action="save-weight" data-str="act.save"' + (ok ? '' : ' disabled') + '></button></footer></section>';
+  }
+  function render() {
+    document.getElementById('screen').innerHTML =
+      '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (drawer ? ' inert' : '') + '>' + header() +
+      '<div class="sheet-body"><div class="edge-body">' + body() + '</div></div>' + faceFooter() + '</section>' + (drawer ? drawerHtml() : '');
+    PP.apply(document.getElementById('screen'));
+  }
+  function key(k) {
+    var v = draft;
+    if (k === 'back') v = v.slice(0, -1);
+    else if (k === '.') { if (v && v.indexOf('.') < 0) v += '.'; }
+    else if (v.indexOf('.') >= 0) { if (v.length - v.indexOf('.') - 1 < 1) v += k; }
+    else if (v.length < 2) v = (v === '0' ? '' : v) + k;
+    draft = v;
+  }
   document.getElementById('screen').addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-action]');
     if (!b) return;
-    if (b.dataset.action === 'record-weight') {
-      weight = pendingValue.replace(',', '.'); weightBy = stamp(9, 29, '09:42', 'G.H'); receipt = true; pendingValue = ''; render('');
-    } else {
-      document.documentElement.setAttribute('data-door', b.dataset.action + ':' + (b.dataset.value || ''));
-    }
+    var a = b.dataset.action;
+    if (a === 'numpad') { if (b.getAttribute('aria-disabled') !== 'true') key(b.dataset.key); render(); }
+    else if (a === 'open-weight' || a === 'open-numpad') { drawer = true; render(); }
+    else if (a === 'close-weight') { drawer = false; render(); }          // Back keeps the draft
+    else if (a === 'save-weight') {
+      var num = parseFloat(draft);
+      if (!(num > 0)) return;
+      weight = String(num % 1 ? num : num.toFixed(1)); by = 'here'; at = stamp(29, '09:42', 'G.H'); draft = ''; drawer = false; render();
+    } else document.documentElement.setAttribute('data-door', a + ':' + (b.dataset.value || ''));
   });
-  PP.ready.then(function () { render(f.typed || ''); });
+  PP.ready.then(render);
 })();
 </script>
 </body>
