@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Identity and weigh</title>
+<link rel="stylesheet" href="/ux/design-system/tokens.css">
+<link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="shell.css">
+<style>
+/* Layout only, tokens from tokens.css. One candidate composition: Radio (the sex field). */
+.id-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
+.id-phone .scrim { inset: 0; }
+.id-body { display: flex; flex-direction: column; gap: var(--space-section); }
+.id-body > * { margin: 0; }
+.id-fields { display: flex; flex-direction: column; gap: var(--space-row-y); }
+.id-group > * + * { margin-top: var(--space-heading); }
+/* The pad docks above the bar, anchored at the bottom: its keys sit at one place whatever sits above them. */
+.id-dock { flex: none; display: flex; flex-direction: column; justify-content: flex-end; padding: var(--space-row-y) var(--space-gutter-sheet) var(--space-row-y); background: var(--paper); border-top: 1px solid var(--line); }
+.id-drawer-body { display: flex; flex-direction: column; gap: var(--space-row-y); }
+@media (max-width: 370px) { .id-dock { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
+/* Candidate:Radio — a single-select field with visible radios (RULINGS craft pass: 2px rings, selected = ink ring + dot,
+   the selected label weighs 700). Stepper silhouette: label left, the choices right, one 60px row. Optional: tapping the
+   chosen radio again clears it (missing, never a default). */
+.id-radio { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: var(--space-row-y); min-height: var(--stepper-row-min); }
+.id-radio-label { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; font: 600 var(--type-choice-label-size)/1.4 var(--font-sans); color: var(--ink); }
+.id-radio-label small { font: 400 var(--type-choice-meta-size)/1.4 var(--font-sans); color: var(--muted); }
+.id-radio-opts { display: flex; gap: var(--space-key-gap); align-self: stretch; }
+.id-radio-opt { display: flex; align-items: center; gap: var(--space-key-gap); min-height: var(--stepper-row-min); min-width: var(--back-width); margin: 0; padding: 0 var(--space-row-y); border: 0; border-radius: var(--radius-control); background: transparent; color: var(--ink); font: 600 var(--type-choice-label-size)/1.4 var(--font-sans); cursor: pointer; touch-action: manipulation; }
+.id-radio-opt:active { background: var(--press); }
+.id-radio-opt:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.id-radio-ring { display: grid; place-items: center; flex: none; width: var(--glyph-pad); height: var(--glyph-pad); box-sizing: border-box; border: var(--caret-width) solid var(--muted); border-radius: 50%; }
+.id-radio-opt[aria-checked="true"] { font-weight: 700; }
+.id-radio-opt[aria-checked="true"] .id-radio-ring { border-color: var(--ink); }
+.id-radio-opt[aria-checked="true"] .id-radio-ring::after { content: ""; width: calc(var(--glyph-pad) / 2); height: calc(var(--glyph-pad) / 2); border-radius: 50%; background: var(--ink); }
+/* Status words on a row's trailing slot: colour lives on the word (dead red, a sync duplicate amber). */
+.id-tone[data-tone="red"] { color: var(--red); }
+.id-tone[data-tone="amber"] { color: var(--amber); }
+@media (prefers-reduced-motion: reduce) { .id-radio-opt { transition: none; } }
+</style>
+</head>
+<body>
+<main class="inspection-phone id-phone" data-st-context="page">
+  <div id="screen"></div>
+</main>
+<script src="/ux/design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+<script>
+(function () {
+  var UI = window.SentriUI, ICON = window.SentriIcons;
+  var zh = PP.lang === 'zh';
+  var ME = 'G.H';
+
+  /* ---- fixtures: every number printed comes from here. Today is Sep 29; tags are the farm's 6-digit ear tags. ----
+     Litters follow the litter sheet (S2): A02, B04, C04. A07 and A04 sit on the two other farm configurations
+     (keepers only; notch). Scheme is farm config (RULINGS Q17): scheme · who · age-day · done rule. */
+  var FARMS = {
+    tagAll:  { scheme: 'tag', who: 'all', day: 3 },
+    keepers: { scheme: 'tag', who: 'candidates', day: 3 },
+    notch:   { scheme: 'notch', who: 'all', day: 3 }
+  };
+  var LITTERS = {
+    A02: { crate: 'A02', bag: '004301', sow: '000231', day: 3, born: 13, alive: 12, dead: 1 },
+    B04: { crate: 'B04', bag: '004521', sow: '000254', day: 9, born: 12, alive: 10, dead: 2 },
+    C04: { crate: 'C04', bag: '004401', sow: '000266', day: 2, born: 10, alive: 9, dead: 1 },
+    A07: { crate: 'A07', bag: '004610', sow: '000245', day: 3, born: 15, alive: 14, dead: 1 },
+    A04: { crate: 'A04', sow: '000236', day: 3, born: 11, alive: 11, dead: 0, notchLitter: '118' }
+  };
+  // bag: the first tag in the hand's bag for this litter — what the camera reads when the scan button is tapped here.
+  // Row: { tag | n (notch piglet number), sex 'b'|'g'|null, w (string kg)|null, who, t, d (day of month), dead, dup (crate) }
+  function R(tag, sex, w, who, t, o) { return Object.assign({ tag: tag, sex: sex, w: w, who: who, t: t, d: 29 }, o || {}); }
+  function N(n, sex, w, who, t) { return { n: n, sex: sex, w: w, who: who, t: t, d: 29 }; }
+  var A02_GH = [R('004301', 'g', '1.42', ME, '09:14'), R('004302', 'b', null, ME, '09:15'), R('004303', 'b', '1.38', ME, '09:16')];
+  var A02_LM = [R('004301', 'g', '1.42', 'L.M', '08:10'), R('004302', 'b', '1.38', 'L.M', '08:11'), R('004303', 'b', null, 'L.M', '08:13'),
+                R('004304', 'g', '1.51', 'L.M', '08:14'), R('004305', 'b', '1.29', 'L.M', '08:16')];
+  var A02_ALL = A02_GH.concat([R('004304', 'g', '1.51', ME, '09:17'), R('004305', 'b', '1.29', ME, '09:18'), R('004306', 'g', '1.47', ME, '09:19'),
+    R('004307', 'b', '1.55', ME, '09:20'), R('004308', 'g', '1.33', ME, '09:21'), R('004309', 'g', null, ME, '09:22'), R('004310', 'b', '1.61', ME, '09:23'),
+    R('004311', 'g', '1.36', ME, '09:24'), R('004312', 'b', '1.44', ME, '09:25')]);
+  // B04 was identified on its day 3 (sep 23). 004512 was crushed on sep 25 — its row stays, marked dead.
+  // 004517 was typed offline by L.M; A05 already had it — the sync marks both rows, merges nothing.
+  var B04_ROWS = [R('004510', 'b', '1.46', ME, '08:05', { d: 23 }), R('004511', 'g', '1.38', ME, '08:06', { d: 23 }), R('004512', 'b', '1.21', ME, '08:07', { d: 23, dead: true }),
+    R('004513', 'g', '1.52', ME, '08:08', { d: 23 }), R('004514', 'b', null, ME, '08:09', { d: 23 }), R('004515', 'g', '1.44', ME, '08:10', { d: 23 }),
+    R('004516', 'b', '1.60', 'L.M', '08:31', { d: 23 }), R('004517', 'g', '1.35', 'L.M', '08:32', { d: 23, dup: 'A05' }), R('004518', null, '1.29', 'L.M', '08:33', { d: 23 }),
+    R('004519', 'b', '1.41', 'L.M', '08:34', { d: 23 }), R('004520', 'g', '1.33', 'L.M', '08:35', { d: 23 })];
+  var A07_ROWS = ['004601', '004602', '004603', '004604', '004605', '004606', '004607', '004608', '004609'].map(function (t, i) {
+    return R(t, i === 4 ? 'b' : 'g', ['1.62', '1.58', '1.66', '1.71', '1.80', '1.59', '1.64', '1.69', '1.57'][i], ME, '09:0' + i);
+  });
+  var A04_ROWS = [N(1, 'b', '1.30', ME, '09:10'), N(2, 'g', '1.25', ME, '09:11'), N(3, 'g', null, ME, '09:12')];
+  // Every tag the farm has used, and where: the duplicate lookup runs on every accepted value.
+  var ELSEWHERE = { '004517': 'A05' };
+  B04_ROWS.forEach(function (r) { if (!r.dead) ELSEWHERE[r.tag] = ELSEWHERE[r.tag] ? ELSEWHERE[r.tag] : 'B04'; });
+  ELSEWHERE['004517'] = 'A05';
+  ELSEWHERE['004512'] = 'B04';
+  A07_ROWS.forEach(function (r) { ELSEWHERE[r.tag] = 'A07'; });
+
+  var STATES = {
+    'id-empty':           { farm: 'tagAll', l: 'A02', rows: [] },
+    'id-no-tag':          { farm: 'tagAll', l: 'A02', rows: [], hint: ['pp.id.hint.no_tag', null, 'warn'] },
+    'id-entry':           { farm: 'tagAll', l: 'A02', rows: A02_GH, clock: '09:17' },
+    'id-weight':          { farm: 'tagAll', l: 'A02', rows: A02_GH, clock: '09:17', sex: 'g', weight: '1.4', active: 'weight' },
+    'id-partial':         { farm: 'tagAll', l: 'A02', rows: A02_LM, clock: '09:17' },
+    'id-duplicate':       { farm: 'tagAll', l: 'A02', rows: A02_GH, clock: '09:17', tag: '004514' },
+    'id-recatch':         { farm: 'tagAll', l: 'A02', rows: A02_GH, clock: '09:17', scan: '004302' },
+    'id-all':             { farm: 'tagAll', l: 'A02', rows: A02_ALL, clock: '09:26' },
+    'id-early':           { farm: 'tagAll', l: 'C04', rows: [], clock: '09:30' },
+    'id-candidates':      { farm: 'keepers', l: 'A07', rows: A07_ROWS, clock: '09:10' },
+    'id-candidates-done': { farm: 'keepers', l: 'A07', rows: A07_ROWS, clock: '09:10', closed: { t: '09:10', who: ME }, face: 'table' },
+    'id-notch-only':      { farm: 'notch', l: 'A04', rows: A04_ROWS, clock: '09:13' },
+    'id-table':           { farm: 'tagAll', l: 'B04', rows: B04_ROWS, clock: '09:30', face: 'table', lw: { w: '15.9', d: 23, who: 'L.M', t: '08:40', day: 3 } },
+    'litter-weight':      { farm: 'tagAll', l: 'A02', rows: A02_LM, clock: '09:17', face: 'table', drawer: { w: '16.8', boars: 4, gilts: 2 } },
+    'litter-weight-warn': { farm: 'tagAll', l: 'A02', rows: A02_LM, clock: '09:17', face: 'table', drawer: { w: '36.2', boars: 0, gilts: 0 } }
+  };
+  // The usual per-piglet weight by day-age (console): the soft range, never a gate.
+  var USUAL = { 2: [0.9, 2.6], 3: [1.0, 2.8], 9: [1.8, 4.2] };
+  var HARD_KG = 6;                  // a litter weight over 6 kg per alive piglet is refused (a slipped decimal)
+
+  var name = STATES[PP.state] ? PP.state : 'id-empty';
+  var st = STATES[name];
+  var F = FARMS[st.farm], L = LITTERS[st.l], notch = F.scheme === 'notch', keepers = F.who === 'candidates';
+  var rows = st.rows.map(function (r) { return Object.assign({}, r); });
+  var log = rows.map(function (r) { return { r: r }; });   // the running list: every Record, newest last (a re-catch is a line, not a row)
+  var closed = st.closed || null;
+  var lw = st.lw || null, counts = st.counts || { boars: 0, gilts: 0 };
+  var face = st.face || 'run';
+  var clock = (function (s) { var p = s.split(':'); return +p[0] * 60 + +p[1]; })(st.clock || '09:17') - 1;
+  var TAGLEN = 6, NOTCHLEN = 2;
+
+  /* ---- the run's draft: tag (or notch number), sex, weight; the host holds it, the DOM never does ---- */
+  var run = { tag: { value: '', suggested: false, suggestion: '' }, sex: null, weight: '', active: 'tag', hint: null, warned: '', again: -1 };
+  var drawer = st.drawer ? { w: st.drawer.w, active: false, boars: st.drawer.boars, gilts: st.drawer.gilts } : null;
+  var drawerKept = null;              // Back keeps the drawer's draft on the device
+  var receipt = null, lastCommit = 0;
+
+  /* ---- derived ---- */
+  var living = function () { return rows.filter(function (r) { return !r.dead; }); };
+  var identified = function () { return living().length; };
+  function key(r) { return notch ? String(r.n) : r.tag; }
+  function idText(r) { return notch ? PP.t('pp.id.notch', { litter: L.notchLitter, n: r.n }) : r.tag; }
+  function nextSuggestion() {
+    if (notch) { var m = rows.reduce(function (s, r) { return Math.max(s, r.n); }, 0); return String(m + 1); }
+    // The next tag follows the last one recorded here in sequence (I-6: last + 1); a tag that warned as a duplicate
+    // is an outlier from someone else's bag, not the sequence. Tags already used anywhere are skipped.
+    var seq = rows.filter(function (r) { return !r.dup; });
+    if (!seq.length) return '';
+    var n = +seq[seq.length - 1].tag + 1, t;
+    for (;;) { t = ('000000' + n).slice(-TAGLEN); if (!ELSEWHERE[t] && !rows.some(function (r) { return r.tag === t; })) return t; n++; }
+  }
+  function freshPiglet() {
+    var s = nextSuggestion();
+    run.tag = { value: s, suggested: !!s, suggestion: s };
+    run.sex = null; run.sexTouched = false; run.weight = ''; run.active = 'tag'; run.hint = null; run.warned = ''; run.again = -1;
+  }
+  function currentTag() { return run.tag.value; }
+  function againIndex(v) {
+    if (!v) return -1;
+    for (var i = 0; i < rows.length; i++) if (!rows[i].dead && key(rows[i]) === (notch ? String(+v) : v)) return i;
+    return -1;
+  }
+  function elsewhere(v) { return !notch && v && v.length === TAGLEN ? ELSEWHERE[v] || '' : ''; }
+  function allIdentified() { return !keepers && identified() >= L.alive; }
+
+  /* ---- strings ---- */
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function span(id, args, cls, tone) {
+    return '<span' + (cls ? ' class="' + cls + '"' : '') + (tone ? ' data-tone="' + tone + '"' : '') + ' data-str="' + id + '"' +
+      (args ? " data-args='" + esc(JSON.stringify(args)) + "'" : '') + '>' + esc(PP.t(id, args)) + '</span>';
+  }
+  function button(cls, action, value, id, args, extra) {
+    return '<button type="button" class="button ' + cls + '" data-ds="Button" data-action="' + action + '"' + (value != null ? ' data-value="' + esc(value) + '"' : '') + (extra || '') +
+      ' data-str="' + id + '"' + (args ? " data-args='" + esc(JSON.stringify(args)) + "'" : '') + '>' + esc(PP.t(id, args)) + '</button>';
+  }
+  var sexWord = function (s) { return PP.t('pp.id.sex.' + (s === 'b' ? 'boar' : 'gilt')); };
+  function stamp(r) {
+    return r.d === 29 ? PP.t('pp.id.stamp.today', { t: r.t, who: r.who }) : PP.t('pp.id.stamp.date', { date: PP.t('pp.id.date', { d: r.d }), t: r.t, who: r.who });
+  }
+  function shape(r) { return (r.sex ? 's' : '') + (r.w ? 'w' : '') || 'n'; }
+  function recentLine(r, extra) {
+    var k = (r.sex ? 's' : '') + (r.w ? 'w' : ''), base = 'pp.id.recent.t' + k;
+    var a = { tag: idText(r), sex: r.sex ? sexWord(r.sex) : '', w: r.w || '' };
+    if (extra) { base = 'pp.id.recent.again'; a.i = extra.i; }
+    else if (r.dup) { base += '_dup'; a.crate = r.dup; }
+    return { text: PP.t(base, a), tone: r.dup ? 'warn' : undefined, strs: { text: base }, args: { text: a } };
+  }
+
+  /* ---- header: the litter and the farm's configured scheme ---- */
+  function header(withScan) {
+    var d = notch ? 'pp.id.hdr.notch_all' : keepers ? 'pp.id.hdr.tag_keep' : 'pp.id.hdr.tag_all';
+    var early = L.day < F.day;
+    var h = UI.heading({ title: '', kind: 'page', level: 1, description: '',
+      strs: { title: 'pp.id.hdr.title', description: early ? d + '_early' : d },
+      args: { title: { crate: L.crate }, description: { n: L.day, due: F.day } } });
+    var scan = withScan ? UI.iconButton({ action: 'scan', icon: ICON.icon('scan'), label: PP.t('act.scan'), className: 'room-filter-button' })
+      .replace('aria-label=', 'data-str-attr="aria-label:act.scan" aria-label=') : '';
+    return '<header class="utility-header">' + h + scan + '</header>';
+  }
+
+  /* ---- progress: the fact line is the door to the litter's identity rows ---- */
+  function ago(r) {
+    var p = r.t.split(':'), m = clock + 1 - (+p[0] * 60 + +p[1]);
+    if (r.d !== 29) return PP.t('pp.id.date', { d: r.d });
+    return m >= 60 ? PP.t('time.hours_ago', { n: Math.floor(m / 60) }) : PP.t('pp.id.ago.min', { n: Math.max(1, m) });
+  }
+  function progressRow() {
+    var k = identified(), last = rows[rows.length - 1];
+    var t = keepers ? ['pp.id.prog.so_far', { k: k }] : ['pp.id.prog.k_of_n', { k: k, n: L.alive }];
+    return UI.rowGroup(UI.row({ title: '', description: last ? '' : undefined, action: 'open-table', value: L.crate,
+      strs: Object.assign({ title: t[0] }, last ? { description: 'pp.id.prog.last' } : {}),
+      args: { title: t[1], description: last ? { when: ago(last), who: last.who } : undefined } }));
+  }
+
+  /* ---- the sex field: Candidate:Radio ---- */
+  function radio(sex) {
+    var opt = function (v, label) {
+      return '<button type="button" class="id-radio-opt" role="radio" aria-checked="' + (sex === v) + '" data-action="sex" data-value="' + v + '">' +
+        '<span class="id-radio-ring" aria-hidden="true"></span>' + span(label) + '</button>';
+    };
+    return '<div class="id-radio" data-ds="Candidate:Radio" role="radiogroup" aria-labelledby="id-sex-label">' +
+      '<span class="id-radio-label" id="id-sex-label">' + span('pp.id.sex.label') + '<small>' + span('ds.field.optional') + '</small></span>' +
+      '<span class="id-radio-opts">' + opt('b', 'pp.id.sex.boar_l') + opt('g', 'pp.id.sex.gilt_l') + '</span></div>';
+  }
+  var measureStrs = { optional: 'ds.field.optional', value: 'ds.field.figure', unit: 'ds.field.unit.kg', placeholder: 'ds.field.placeholder' };
+  function weightField() {
+    var tag = run.tag.value && !run.tag.suggested ? run.tag.value : run.tag.suggestion;
+    var label = notch ? (tag ? ['pp.id.weight_of', { tag: PP.t('pp.id.notch', { litter: L.notchLitter, n: tag }) }] : ['pp.id.weight', null])
+      : (tag ? ['pp.id.weight_of', { tag: tag }] : ['pp.id.weight', null]);
+    var u = USUAL[L.day], o = { label: '', optional: 'Optional', value: run.weight, unit: 'kg', key: 'weight', controls: 'id-pad', active: run.active === 'weight',
+      strs: Object.assign({ label: label[0] }, measureStrs), args: { label: label[1] } };
+    if (run.hint && run.hint.field === 'weight') {
+      o.tone = 'warn'; o.hint = ''; o.strs.hint = 'ds.field.measure.range'; o.args.hint = { min: u[0].toFixed(1), max: u[1].toFixed(1), v: run.weight };
+    }
+    return UI.measure(o);
+  }
+
+  /* ---- the docked pad: the tag run (readout + feedback + keys), or keys under the weight Measure ---- */
+  var padStrs = { digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad', recent: 'ds.field.aria.recent', value: 'ds.field.figure', placeholder: 'ds.field.placeholder' };
+  function recentList() {
+    var out = [];
+    for (var i = log.length - 1; i >= 0 && out.length < 3; i--) out.push(recentLine(log[i].r, log[i].again ? { i: log[i].again } : null));
+    return out;
+  }
+  function pad() {
+    var o;
+    if (run.active === 'weight') {
+      var back = { label: '', action: 'to-tag', strs: { label: 'pp.id.ptr.back_tag' }, args: { label: { tag: notch ? PP.t('pp.id.notch', { litter: L.notchLitter, n: run.tag.value }) : run.tag.value } } };
+      o = { id: 'id-pad', key: 'weight', value: run.weight, decimals: 2, intLength: 2, actions: run.tag.value ? [back] : [], strs: Object.assign({}, padStrs) };
+      if (run.hint && run.hint.field !== 'weight') { o.hint = ''; o.strs.hint = run.hint.id; o.args = { hint: run.hint.args }; if (run.hint.tone) o.tone = run.hint.tone; }
+      return UI.numpad(o);
+    }
+    var i = rows.length + 1;
+    var label = notch ? ['pp.id.run.notch', { i: i, n: L.alive, litter: L.notchLitter }]
+      : keepers || allIdentified() ? ['pp.id.run.tag_open', { i: i }]
+      : ['ds.field.numpad.tag_label', { i: i, n: L.alive }];
+    if (run.again >= 0) label = notch ? ['pp.id.run.notch', { i: run.again + 1, n: L.alive, litter: L.notchLitter }] : ['ds.field.numpad.tag_label', { i: run.again + 1, n: L.alive }];
+    o = { id: 'id-pad', key: 'tag', label: '', value: run.tag.value, suggested: run.tag.suggested, maxLength: notch ? NOTCHLEN : TAGLEN, recent: recentList(),
+      strs: Object.assign({ label: label[0] }, padStrs), args: { label: label[1] } };
+    var h = run.hint && !run.hint.field ? run.hint : null;
+    if (!h && allIdentified()) h = { id: 'pp.id.hint.all', args: { n: L.alive }, actions: [{ label: '', action: 'set-count', strs: { label: 'pp.id.ptr.set_count' }, args: { label: { n: L.alive } } }] };
+    if (!h && run.tag.suggested) h = { id: notch ? 'pp.id.hint.next_notch' : 'ds.field.numpad.suggested' };
+    if (h) { o.hint = ''; o.strs.hint = h.id; o.args.hint = h.args || null; if (h.tone) o.tone = h.tone; if (h.actions) o.actions = h.actions; }
+    if (!run.tag.value && run.tag.suggestion && !(h && h.actions)) {
+      o.actions = [{ label: '', action: 'numpad-suggestion', strs: { label: 'ds.field.numpad.use_suggestion' }, args: { label: { tag: run.tag.suggestion } } }];
+    }
+    return UI.numpad(o);
+  }
+  // The live check on every accepted value: duplicate elsewhere, or the same piglet caught again in this pass.
+  function check() {
+    var v = run.tag.value;
+    run.again = -1;
+    run.hint = null;
+    var ai = againIndex(v);
+    if (ai >= 0 && !run.tag.suggested) {
+      run.again = ai;
+      var r = rows[ai];
+      // The row's posted facts show in the fields; Record adds only what the row lacks.
+      if (r.sex && !run.sexTouched) run.sex = r.sex;
+      run.hint = { id: 'pp.id.hint.again', args: { tag: idText(r), i: ai + 1 }, tone: 'warn' };
+      return;
+    }
+    var where = elsewhere(v);
+    if (where) run.hint = { id: 'ds.field.numpad.duplicate', args: { tag: v, crate: where }, tone: 'warn' };
+  }
+
+  function runBar() {
+    var primary = run.again >= 0 ? ['pp.id.act.record_again', { i: run.again + 1 }] : ['pp.id.act.record_next', null];
+    return '<footer class="sheet-footer">' + button('secondary', 'close', null, 'act.close') + button('primary', 'record', null, primary[0], primary[1]) + '</footer>';
+  }
+  function runFace() {
+    var tools = keepers && !closed ? button('secondary', 'close-set', null, 'pp.id.act.done', { k: identified() }) : '';
+    // Capture order: the piglet's own fields first (the tag is the pad's readout), then the litter's progress door
+    // and, on a keepers farm, the act that closes the set.
+    var body = '<div class="id-body"><div class="id-fields">' + radio(run.sex) + weightField() + '</div>' + progressRow() + tools + '</div>';
+    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (drawer ? ' inert' : '') + '>' + header(!notch) +
+      '<div class="sheet-body">' + body + '</div><div class="id-dock">' + pad() + '</div>' + runBar() + '</section>';
+  }
+
+  /* ---- the table face: the litter's identity rows, viewable and editable (through S8's Edit) forever ---- */
+  function tally() {
+    var b = 0, g = 0;
+    living().forEach(function (r) { if (r.sex === 'b') b++; if (r.sex === 'g') g++; });
+    return { b: b + counts.boars, g: g + counts.gilts, rb: b, rg: g };
+  }
+  function factsBlock() {
+    var k = identified(), t = tally();
+    var idv = keepers && !closed ? ['pp.id.fact.so_far_v', { k: k }] : ['pp.id.fact.k_of_n', { k: k, n: L.alive }];
+    return UI.facts([
+      { label: '', value: '', strs: { label: keepers && !closed ? 'pp.id.fact.so_far' : 'pp.id.fact.identified', value: idv[0] }, args: { value: idv[1] } },
+      { label: '', value: '', strs: { label: 'pp.id.fact.boars', value: 'ds.field.figure' }, args: { value: { n: t.b } } },
+      { label: '', value: '', strs: { label: 'pp.id.fact.gilts', value: 'ds.field.figure' }, args: { value: { n: t.g } } }
+    ], { columns: 3 });
+  }
+  function doneRow() {
+    if (!closed) return '';
+    return UI.rowGroup(UI.row({ title: '', description: '', strs: { title: 'pp.id.done.title', description: 'pp.id.done.line' },
+      args: { title: { k: identified(), n: L.alive }, description: { stamp: stamp({ d: 29, t: closed.t, who: closed.who }), r: L.alive - identified() } } }));
+  }
+  function weighSection() {
+    var row = lw
+      ? UI.row({ title: '', description: '', action: 'open-weight', value: L.crate, strs: { title: 'pp.id.lw.row', description: 'pp.id.lw.line' },
+          args: { description: { w: lw.w, day: lw.day, stamp: stamp(lw) } } })
+      : UI.row({ title: '', trailing: '', action: 'open-weight', value: L.crate, strs: { title: 'pp.id.lw.row', trailing: 'ds.field.optional' } });
+    var h = UI.heading({ title: '', kind: 'section', level: 3, description: receipt ? '' : undefined,
+      strs: Object.assign({ title: 'pp.id.sec.weigh' }, receipt ? { description: receipt[0] } : {}), args: receipt ? { description: receipt[1] } : undefined });
+    return '<section class="id-group" role="status" aria-live="polite">' + h + UI.rowGroup(row) + '</section>';
+  }
+  function tableRow(r) {
+    var trail = r.dead ? span('pp.id.row.dead', null, 'id-tone', 'red') : r.dup ? span('pp.id.row.dup', { crate: r.dup }, 'id-tone', 'amber') : '';
+    return UI.row({ title: '', description: '', trailing: trail, action: 'edit-row', value: key(r),
+      strs: { title: 'pp.id.row.id', description: 'pp.id.row.' + shape(r) },
+      args: { title: { id: idText(r) }, description: { sex: r.sex ? sexWord(r.sex) : '', w: r.w || '', stamp: stamp(r) } } });
+  }
+  function rowsSection() {
+    if (!rows.length) return '';
+    var edit = '<button type="button" data-action="open-edit" data-value="' + L.crate + '" data-str="act.edit">' + esc(PP.t('act.edit')) + '</button>';
+    var h = UI.heading({ title: '', kind: 'section', level: 3, action: edit, strs: { title: 'pp.id.sec.rows' }, args: { title: { n: rows.length } } });
+    return '<section class="id-group">' + h + UI.rowGroup(rows.map(tableRow).join('')) + '</section>';
+  }
+  function tableFace() {
+    var body = '<div class="id-body">' + factsBlock() + doneRow() + weighSection() + rowsSection() + '</div>';
+    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (drawer ? ' inert' : '') + '>' + header(false) +
+      '<div class="sheet-body">' + body + '</div>' +
+      '<footer class="sheet-footer">' + button('secondary', 'close', null, 'act.close') + button('primary', 'open-run', null, 'pp.id.act.record') + '</footer></section>';
+  }
+
+  /* ---- the weigh-day drawer: litter weight + boar/gilt counts for piglets without a row. Staged: Back keeps, Clear discards, Save commits ---- */
+  function remainder() { return Math.max(0, L.alive - identified()); }
+  function drawerRange() { var u = USUAL[L.day]; return [+(u[0] * L.alive).toFixed(1), +(u[1] * L.alive).toFixed(1)]; }
+  function drawerState() {
+    var v = drawer.w, num = parseFloat(v);
+    if (v === '' || drawer.active) return '';
+    if (num > HARD_KG * L.alive) return 'refused';
+    var r = drawerRange();
+    return num < r[0] || num > r[1] ? 'warn' : '';
+  }
+  function posted() { return { w: lw ? lw.w : '', boars: counts.boars, gilts: counts.gilts }; }
+  function drawerDirty() { var p = posted(); return drawer.w !== p.w || drawer.boars !== p.boars || drawer.gilts !== p.gilts; }
+  function weightDrawer() {
+    var rng = drawerRange(), s = drawerState(), rem = remainder(), t = tally();
+    var o = { label: '', optional: 'Optional', value: drawer.w, unit: 'kg', key: 'lw', controls: 'id-lw-pad', active: drawer.active,
+      strs: Object.assign({ label: 'pp.id.lw.row' }, measureStrs), args: {} };
+    if (s === 'warn') { o.range = rng; o.hint = ''; o.strs.hint = 'ds.field.measure.range'; o.args.hint = { min: rng[0].toFixed(1), max: rng[1].toFixed(1), v: drawer.w }; }
+    if (s === 'refused') { o.tone = 'refused'; o.hint = ''; o.strs.hint = 'ds.field.measure.refused'; o.args.hint = { max: HARD_KG * L.alive, n: L.alive }; }
+    var body = UI.measure(o);
+    if (rem > 0) {
+      var cap = function (other) { return rem - other; };
+      var step = function (k, label, v, other, fromRows) {
+        var ceil = drawer.ceil === k && v >= cap(other);
+        return UI.stepper({ label: '', description: '', value: v, min: 0, max: cap(other), key: k, action: 'count', draft: v > counts[k], hint: ceil ? '' : undefined,
+          strs: Object.assign({ label: label, description: 'pp.id.lw.from_rows', value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
+            ceil ? { hint: 'pp.id.lw.ceiling' } : {}),
+          args: { description: { k: fromRows }, hint: { r: rem } } });
+      };
+      body += '<div class="id-group">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.id.lw.counts' }, args: { title: { r: rem } } }) +
+        step('boars', 'pp.id.lw.boars', drawer.boars, drawer.gilts, t.rb) + step('gilts', 'pp.id.lw.gilts', drawer.gilts, drawer.boars, t.rg) + '</div>';
+    }
+    var clear = drawerDirty() ? '<button type="button" data-action="clear" data-str="act.clear">' + esc(PP.t('act.clear')) + '</button>' : '';
+    var head = UI.heading({ title: '', kind: 'page', level: 2, description: '', action: clear,
+      strs: { title: 'pp.id.sec.weigh', description: 'pp.id.lw.sub' }, args: { description: { n: L.alive, d: L.day } } });
+    var dock = drawer.active ? '<div class="id-dock">' + UI.numpad({ id: 'id-lw-pad', key: 'lw', value: drawer.w, decimals: 1, intLength: 2, strs: Object.assign({}, padStrs) }) + '</div>' : '';
+    var ok = drawerDirty() && s !== 'refused';
+    return '<div class="scrim" data-ds="Sheet" data-action="back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" data-sizing="content" role="dialog" aria-modal="true">' +
+      '<header class="utility-header">' + head + '</header>' +
+      '<div class="sheet-body"><div class="id-drawer-body">' + body + '</div></div>' + dock +
+      '<footer class="sheet-footer">' + button('secondary', 'back', null, 'act.back') + button('primary', 'save', null, 'act.save', null, ok ? '' : ' disabled') + '</footer></section>';
+  }
+
+  /* ---- render ---- */
+  function render() {
+    var screen = document.getElementById('screen');
+    screen.innerHTML = (face === 'run' ? runFace() : tableFace()) + (drawer ? weightDrawer() : '');
+    PP.apply(screen);
+  }
+  function tick() { clock += 1; var h = Math.floor(clock / 60), m = clock % 60; return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m; }
+
+  /* ---- keys, scans, Record ---- */
+  function typeKey(k) {
+    if (run.active === 'weight') {
+      var w = SentriUI.numpadInput({ value: run.weight }, k, { decimals: 2, intLength: 2 });
+      run.weight = w.value;
+      run.warned = '';
+      run.hint = w.dead === 'empty' ? { id: 'ds.field.numpad.dead_empty' } : w.dead ? { id: 'ds.field.numpad.dead_places', args: { n: 2 } } : null;
+      return;
+    }
+    var limits = { maxLength: notch ? NOTCHLEN : TAGLEN };
+    var r = SentriUI.numpadInput(run.tag, k, limits);
+    run.tag = { value: r.value, suggested: r.suggested, suggestion: r.suggestion };
+    run.warned = '';
+    check();
+    if (r.dead) run.hint = { id: r.dead === 'empty' ? 'ds.field.numpad.dead_empty' : notch ? 'pp.id.hint.notch_full' : 'ds.field.numpad.dead_full', args: { n: notch ? NOTCHLEN : TAGLEN } };
+  }
+  function scanTag(digits) {
+    if (notch) return;
+    var r = SentriUI.numpadScan(run.tag, digits, { maxLength: TAGLEN });
+    run.active = 'tag';
+    if (r.dead) { run.hint = { id: 'ds.field.numpad.dead_scan', args: { n: TAGLEN } }; return; }
+    run.tag = { value: r.value, suggested: false, suggestion: r.suggestion };
+    run.warned = '';
+    check();
+  }
+  function record() {
+    var now = Date.now();
+    if (now - lastCommit < 600) return;                       // a repeat tap within 600ms of a commit is ignored
+    var raw = currentTag();
+    var v = notch ? (raw ? String(+raw) : '') : raw;
+    // A row needs its identity: a tag on a tag farm, a notch number on a notch farm. Sex and weight never block.
+    if (!v) { run.active = 'tag'; run.hint = { id: notch ? 'pp.id.hint.no_notch' : 'pp.id.hint.no_tag', tone: 'warn' }; render(); return; }
+    if (!notch && v.length < TAGLEN && run.warned !== 'short:' + v) {
+      run.warned = 'short:' + v; run.active = 'tag';
+      run.hint = { id: 'ds.field.numpad.short', args: { k: v.length, n: TAGLEN }, tone: 'warn' }; render(); return;
+    }
+    var w = run.weight ? SentriUI.numpadCommit(run.weight, { decimals: 2 }) : null, u = USUAL[L.day];
+    if (w && (+w < u[0] || +w > u[1]) && run.warned !== 'w:' + w) {
+      run.warned = 'w:' + w; run.active = 'tag'; run.weight = w;
+      run.hint = { field: 'weight', tone: 'warn' }; render(); return;
+    }
+    lastCommit = now;
+    var ai = againIndex(v);
+    if (ai >= 0) {
+      // Caught again in this pass: one piglet, one row. Missing facts are added under this stamp; posted facts stand (Edit changes them).
+      var row = rows[ai];
+      if (!row.sex && run.sex) row.sex = run.sex;
+      if (!row.w && w) row.w = w;
+      tick();
+      log.push({ r: row, again: ai + 1 });
+      freshPiglet();
+      run.hint = { id: 'pp.id.hint.again_done', args: { tag: idText(row), i: ai + 1 } };
+      render(); return;
+    }
+    var nr = notch ? { n: +v } : { tag: v };
+    nr.sex = run.sex; nr.w = w; nr.who = ME; nr.t = tick(); nr.d = 29;
+    if (!notch && elsewhere(v)) nr.dup = elsewhere(v);
+    rows.push(nr);
+    log.push({ r: nr });
+    freshPiglet();
+    render();
+  }
+
+  var scanner = SentriUI.numpadScanner({
+    onKey: function (k) { if (face === 'run' && !drawer) { typeKey(k); render(); } },
+    onScan: function (d) { if (face === 'run' && !drawer) { scanTag(d); render(); } }
+  });
+  document.addEventListener('keydown', function (ev) { if (face === 'run' && !drawer && scanner.handle(ev)) ev.preventDefault(); });
+
+  document.getElementById('screen').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-action]');
+    if (!b) return;
+    var a = b.dataset.action, v = b.dataset.value;
+    if (a === 'numpad') {
+      if (v === 'lw') {
+        var s = SentriUI.numpadInput({ value: drawer.w }, b.dataset.key, { decimals: 1, intLength: 2 });
+        drawer.w = s.value;
+      } else typeKey(b.dataset.key);
+      render();
+    } else if (a === 'numpad-suggestion') { typeKey('suggestion'); render(); }
+    else if (a === 'scan') { scanTag(st.scan || run.tag.suggestion || L.bag); render(); }
+    else if (a === 'open-numpad') {
+      if (v === 'lw') { if (!drawer.active) { drawer.active = true; render(); } return; }
+      if (run.active !== 'weight') { run.active = 'weight'; if (run.hint && !run.hint.field) run.hint = null; render(); }
+    }
+    else if (a === 'to-tag') { run.active = 'tag'; check(); render(); }
+    else if (a === 'sex') {
+      run.sexTouched = true;
+      run.sex = run.sex === v ? null : v;             // optional: tapping the chosen one again clears it
+      if (run.active === 'weight') run.active = 'tag';
+      render();
+    }
+    else if (a === 'record') record();
+    else if (a === 'close-set') {
+      closed = { t: tick(), who: ME }; face = 'table'; receipt = null; render();
+    }
+    else if (a === 'open-table') { face = 'table'; receipt = null; render(); }
+    else if (a === 'open-run') { face = 'run'; freshPiglet(); render(); }
+    else if (a === 'open-weight') { drawer = drawerKept || { w: lw ? lw.w : '', active: !lw, boars: counts.boars, gilts: counts.gilts }; render(); }
+    else if (a === 'count') {
+      drawer.active = false;
+      if (b.getAttribute('aria-disabled') === 'true') { drawer.ceil = +b.dataset.step > 0 ? v : ''; render(); return; }
+      drawer.ceil = ''; drawer[v] += +b.dataset.step; render();
+    }
+    else if (a === 'back') { drawer.active = false; drawerKept = drawer; drawer = null; render(); }
+    else if (a === 'clear') { drawer = { w: lw ? lw.w : '', active: false, boars: counts.boars, gilts: counts.gilts }; drawerKept = null; render(); }
+    else if (a === 'save') {
+      drawer.active = false;
+      if (drawerState() === 'refused') { render(); return; }
+      var w = SentriUI.numpadCommit(drawer.w, { decimals: 1 }), t = tick();
+      // Later stamp stands: a second weighing the same day replaces the value, both stamped in the ledger.
+      if (w !== (lw ? lw.w : null) && w) lw = { w: w, d: 29, t: t, who: ME, day: L.day };
+      var cb = drawer.boars !== counts.boars || drawer.gilts !== counts.gilts;
+      counts = { boars: drawer.boars, gilts: drawer.gilts };
+      var bg = { b: PP.tn('pp.id.n_boars', counts.boars), g: PP.tn('pp.id.n_gilts', counts.gilts) };
+      receipt = w && cb ? ['pp.id.rcpt.both', Object.assign({ w: w }, bg)] : w ? ['pp.id.rcpt.weight', { w: w }] : ['pp.id.rcpt.counts', bg];
+      drawer = null; drawerKept = null; render();
+    }
+    else document.documentElement.setAttribute('data-door', a + ':' + (v || ''));
+  });
+
+  /* ---- initial state ---- */
+  freshPiglet();
+  if (st.tag) { run.tag = { value: st.tag, suggested: false, suggestion: run.tag.suggestion }; check(); }
+  if (st.scan) { scanTag(st.scan); }
+  if (st.sex) run.sex = st.sex;
+  if (st.weight) { run.weight = st.weight; }
+  if (st.active) run.active = st.active;
+  if (st.hint) run.hint = { id: st.hint[0], args: st.hint[1], tone: st.hint[2] };
+  // Resuming another hand's litter: the status line says whose rows are already in, once, until the first key.
+  var lastRow = rows[rows.length - 1];
+  PP.ready.then(function () {
+    if (face === 'run' && !run.hint && lastRow && lastRow.who !== ME && run.tag.suggested) {
+      run.hint = { id: 'pp.id.hint.resume', args: { k: rows.length, who: lastRow.who, when: ago(lastRow) } };
+    }
+  });
+  if (st.drawer) drawer.active = false;
+  PP.ready.then(render);
+})();
+</script>
+</body>
+</html>

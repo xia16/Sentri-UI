@@ -28,6 +28,21 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "inspection", "url": "ux/system/inspection-astra-concept.html", "locales": ["en"],
       "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] },
     { "name": "pp-index", "url": "ux/tasks/piglet-processing/index.html", "strict": true },
+    { "name": "pp-id-id-empty", "url": "ux/tasks/piglet-processing/id.html?state=id-empty", "strict": true },
+    { "name": "pp-id-id-no-tag", "url": "ux/tasks/piglet-processing/id.html?state=id-no-tag", "strict": true },
+    { "name": "pp-id-id-entry", "url": "ux/tasks/piglet-processing/id.html?state=id-entry", "strict": true },
+    { "name": "pp-id-id-weight", "url": "ux/tasks/piglet-processing/id.html?state=id-weight", "strict": true },
+    { "name": "pp-id-id-partial", "url": "ux/tasks/piglet-processing/id.html?state=id-partial", "strict": true },
+    { "name": "pp-id-id-duplicate", "url": "ux/tasks/piglet-processing/id.html?state=id-duplicate", "strict": true },
+    { "name": "pp-id-id-recatch", "url": "ux/tasks/piglet-processing/id.html?state=id-recatch", "strict": true },
+    { "name": "pp-id-id-all", "url": "ux/tasks/piglet-processing/id.html?state=id-all", "strict": true },
+    { "name": "pp-id-id-early", "url": "ux/tasks/piglet-processing/id.html?state=id-early", "strict": true },
+    { "name": "pp-id-id-candidates", "url": "ux/tasks/piglet-processing/id.html?state=id-candidates", "strict": true },
+    { "name": "pp-id-id-candidates-done", "url": "ux/tasks/piglet-processing/id.html?state=id-candidates-done", "strict": true },
+    { "name": "pp-id-id-notch-only", "url": "ux/tasks/piglet-processing/id.html?state=id-notch-only", "strict": true },
+    { "name": "pp-id-id-table", "url": "ux/tasks/piglet-processing/id.html?state=id-table", "strict": true },
+    { "name": "pp-id-litter-weight", "url": "ux/tasks/piglet-processing/id.html?state=litter-weight", "strict": true },
+    { "name": "pp-id-litter-weight-warn", "url": "ux/tasks/piglet-processing/id.html?state=litter-weight-warn", "strict": true },
     { "name": "ds-field-cards", "url": "ux/design-system/components/field-cards-demo.html", "strict": true }
   ]
 }

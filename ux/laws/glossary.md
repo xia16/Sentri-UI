@@ -35,6 +35,19 @@ The litter ledger, at all times: `Alive = Born − Dead − Moved out + Moved in
 | **Birth litter weight** 初生窝重 *(provisional, map ledger)* | live-born piglets of this farrowing, weighed together (alternative not chosen: all born incl. stillborn) | total weight, farrowing's optional fact at Finish | at farrowing Finish | one litter. Unit kg. Not used in any per-piglet calculation until the owner rules the population. Processing records it only when missing, with no nag |
 | **Day-age** 日龄 | the litter | days since the litter's birth date, birth day being day 0 | now | one litter; every scheduled dose is due at a day-age. Unit: days, printed `day {n}` |
 
+### Identity and weigh (S4 · `pp.id`)
+
+Terms the identity run, the litter's identity table and the weigh-day drawer print. *Identified*, *Identified so far*, *Identity rows on record*, *Identity done* and *Litter weight* above are used unchanged.
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Identity row** 标识记录 | one piglet's identity | a tag **or** a notch (litter number + piglet number, `118-4`), with optional sex and weight; committed one at a time by `Record · next piglet`, stamped (who · when) | from its Record; stays viewable and editable after entry and after End task; a mistaken row is withdrawn by a stamped act in Edit, never deleted | one litter. *Identity rows · n* on the table counts every current row, dead piglets' rows included (= *Identity rows on record*) |
+| **Piglet i of n** 第i头，共n头 | the run's position | i = current rows + 1; n = the litter's Alive. On a candidates farm, and once every alive piglet has a row, there is no n (`Piglet 13 · ear tag`) | now | one litter, one run |
+| **Boars** 公猪 / **Gilts** 母猪 | alive piglets | alive piglets with a row whose sex is boar (or gilt), plus the weigh-day counts recorded for piglets **without a row**; a row with no sex counts in neither | now; the counts are stamped by Save in the weigh-day drawer | one litter. Derived from rows where rows exist, never asked twice |
+| **Without a row** 无标识记录 | alive piglets | Alive − Identified: the piglets the boar and gilt counts may describe | now | one litter; the ceiling of the weigh-day counts |
+| **Duplicate tag** 耳标重复 | one tag value | a tag already on a current row of **another** litter; warned where it is used (`also on B04`), recorded anyway, never merged | at entry, or at sync for an offline entry | farm-wide |
+| **Caught again** 重复捕捉 | one piglet | a tag or notch that is already a current row of **this** litter; Record adds only the facts that row lacks and makes no second row | during the run | one litter; posted facts change only through Edit |
+
 Defined by farrowing and used here unchanged (RULINGS *Model*; the Finish sheet):
 
 | Term (zh) | Entity | Population | Time | Scope |
