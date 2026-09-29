@@ -67,3 +67,19 @@ Buttons name the act. The register is `ux/laws/strings.json` (`verbs`); an actio
 | **Scan** 扫描 | read an ear tag with the camera |
 
 Banned: **Submit**, **Confirm**, **Complete**. The design system README's "Confirm & next" example is superseded by the rulings.
+
+## Room list (仔猪处理 · 单元)
+
+Slice S1 (`room.html`). Counts the room's lenses and rows print; owed, missed, open loss/gain and net drift keep the definitions above.
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Owed litters** 待处理的窝 (lens `Owed {n}`) | litters | litters with at least one scheduled dose owed: due today, late, missed, or partly done, including a litter whose farrowing is not yet locked | now | one room; unit: litters. A missed dose keeps its litter here |
+| **Done litters** 已处理的窝 (lens `Done {n}`) | litters | litters with every dose due today recorded (early counts) and nothing else owed | today | one room; unit: litters |
+| **Later litters** 之后的窝 (lens `Later {n}`) | litters | litters in the task with nothing owed and nothing recorded today, whose next dose is due on a later day | now | one room; unit: litters. A litter done today is Done, not Later |
+| **Piglets on a row** `{n} piglets` (line 2) | piglets | owed rows: alive piglets still needing the dose named on line 1 (the largest count when several doses are named); partly-done rows print `{left} of {n}`: owed of alive; Done and Later rows: alive | now | one litter |
+| **Due {n} days ago** 逾期 (chip `Late`) | days | whole days since the oldest dose still owed and not window-bound was due | now | one litter. Late is still owed; the row never stops asking |
+| **Last day {n}** (chip `Missed`) | day-age | the treatment's console last age-day, printed on a missed row instead of lateness | fixed by the treatment | one litter; missed stays inside Owed |
+| **Open loss / open gain** chip | heads | the litter has an open unexplained loss (gain); the count prints on line 2 (`loss 2 open`), the chip only when no more urgent chip applies (Not locked > Missed > Late > Open loss > Open gain) | until explained | one litter |
+| **Net drift** on the room header | heads | open unexplained gains minus open unexplained losses in the room, signed (`+1`, `−2`); shown only while a gain or loss is open | now | one room |
+| **Litter found by tag or notch** | one piglet, one litter | a piglet whose current identity row carries the tag or notch typed or scanned, in this room | as of the latest stamped change | one room; not found means no identity row here, not that the piglet does not exist |
