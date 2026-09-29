@@ -930,6 +930,7 @@
     "pp.move.carry.males_range.owe": {"en": "{lo}–{hi} males among the {n} · owed", "zh": "这{n}头中{lo}–{hi}头公猪 · 待阉割", "kind": "body"},
     "pp.move.carry.males_range.done": {"en": "{lo}–{hi} males among the {n} · castrated", "zh": "这{n}头中{lo}–{hi}头公猪 · 已阉割", "kind": "body"},
     "pp.move.carry.males_range.check": {"en": "{lo}–{hi} males among the {n} · check on the pig", "zh": "这{n}头中{lo}–{hi}头公猪 · 看猪确认", "kind": "body"},
-    "pp.move.carry.males_range.unknown": {"en": "{lo}–{hi} males among the {n} · unknown", "zh": "这{n}头中{lo}–{hi}头公猪 · 情况不明", "kind": "body"}
+    "pp.move.carry.males_range.unknown": {"en": "{lo}–{hi} males among the {n} · unknown", "zh": "这{n}头中{lo}–{hi}头公猪 · 情况不明", "kind": "body"},
+    "pp.end.u.males": {"en": "{name} · males not counted", "zh": "{name} · 公猪未计数", "kind": "body"}
   }
 }

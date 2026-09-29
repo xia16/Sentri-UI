@@ -369,7 +369,7 @@ const POST = {
     b.death('A02', oct(18, '07:10'), 'G.H', [{ cause: 'crushed', rowId: 'A02-r10' }]);
     b.push({ type: 'correction', target: 'T-B03-wrong', void: true, fresh: { litter: 'B01', dose: 'castrate', castration: { castrated: 1 } }, at: oct(18, '08:20'), who: 'L.M' }, 'X');
     const a05 = b.events.find((e) => e.litter === 'A05' && e.dose === 'castrate');
-    b.push({ type: 'correction', target: a05.id, set: { castration: { castrated: 4 } }, at: oct(18, '08:40'), who: 'L.M' }, 'X');
+    b.push({ type: 'correction', target: a05.id, set: { castration: { castrated: 4, cryptorchid: 1 } }, at: oct(18, '08:40'), who: 'L.M' }, 'X');
     b.rows('D01', oct(18, '09:05'), 'L.M', tags('D01', 6000 + TASK7.indexOf('D01') * 20 + 5, 3, 6));
     b.count('D03', oct(18, '09:30'), 'G.H', 11, { baseAlive: 11 });
   },
