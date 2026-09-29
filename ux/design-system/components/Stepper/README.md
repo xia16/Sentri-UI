@@ -21,7 +21,7 @@ Call `SentriUI.stepper({ label, description, value, min, max, step, key, action,
 - **Value.** IBM Plex Mono `figure` (21px/500), with tabular numerals.
   - The cell is 3ch wide, or 4ch when `max ≥ 1000`, so the keys never move as the count gains a digit.
   - The value is a `role="spinbutton"` with `aria-valuenow`, `aria-valuemin` and `aria-valuemax`, and is labelled by the label.
-- **Hint line.** The line under the row is reserved, so no row slides under the thumb when a pointer appears.
+- **Status region (the hint line).** One persistent `role="status"` line under the row, always mounted. Both keys and the value point to it with `aria-describedby`. It is reserved, so no row slides under the thumb when a pointer appears.
   - It is `touch-min` (44px) tall where pointers can appear: the hero, `min > 0`, or `pointers` given.
   - It is one text line where only a ceiling note can appear (`max` given).
   - In a row that can do neither, it takes no space.
@@ -49,18 +49,31 @@ Call `SentriUI.stepper({ label, description, value, min, max, step, key, action,
 - **Focus:** a 3px `focus` ring, offset 2px, on the key face. The spinbutton value takes the same ring.
 - **Error or out of range:** none. A stepper cannot hold an invalid value: the floor and ceiling gray the key instead of refusing a tap.
 - **Corrected:** a figure corrected in Edit (`changed: true`) prints in `amber`.
-- **Loading:** none. The tap commits and the digit ticks at once.
+- **Loading:** none. The digit ticks at once, whatever kind of host it is (see *Commit contract*).
 
 **Behaviour, decided deliberately**
 - There is no auto-repeat on hold. A double tap is two steps. Counts are small, and a runaway repeat under a wet glove costs more than a second tap.
 - `step` defaults to 1. `data-step` carries `−step` or `step`.
 - The keys are `user-select: none` and `-webkit-touch-callout: none`, so a long press never selects or opens a callout.
 
+**Commit contract**
+
+A key emits a **requested delta** (`data-step`). The component never commits. The host decides what the delta does, and there are two kinds of host.
+- **Immediate hosts** are recording surfaces: farrowing's Alive counter, the litter sheet's counts. Each accepted tap posts one stamped event at once (who · when), live-synced, append-only. Nothing is pending on the device, and a hand that bolts mid-count loses nothing. The visit nets these events into one row when it ends (RULINGS: the visit ends on sheet dismiss, at Lock, at session end, or after about 90 minutes idle).
+- **Staged hosts** are drawers that edit a draft: the dead drawer, Edit. Each tap changes a **draft** held on the device and posts nothing.
+  - **Save** posts the whole draft as one stamped event.
+  - **Clear** discards the draft. It is a text action, present only while a draft exists.
+  - **Back** leaves and keeps the draft on the device (pure navigation, RULINGS verbs).
+  - The draft survives interruption and is shown as `N unsaved` until it is saved or cleared.
+- Either way the host applies the floor and the ceiling before it accepts a delta. A delta against a floor-gray key is answered with pointers and never applied.
+
 **Event contract**
-- Every key is `<button data-action="<action, default step>" data-value="<key>" data-step="-1 | 1">`. The root carries `data-field="<key>"`.
-- Delegate with `event.target.closest('[data-action]')`. A floor-gray key still fires. Check `aria-disabled` and answer with pointers; don't change the value.
-- Hardware keyboard: ArrowUp and ArrowDown on the focused value are + and −, through the same handler (the host binds them on `[role=spinbutton]`).
-- The host holds the value, commits on every tap, and re-renders by patching the one stepper keyed by `data-field`. It keeps the root mounted so focus and the `aria-live` value survive.
+- Every key is `<button data-action="<action, default step>" data-value="<key>" data-step="-step | step">`. The root carries `data-field="<key>"`.
+- Delegate with `event.target.closest('[data-action]')`. A floor-gray key still fires. Check `aria-disabled` and answer in the status region; don't apply the delta.
+- Pointers are text actions with their own `data-action` (for example `record-dead`, `edit`).
+- Hardware keyboard: ArrowUp and ArrowDown on the focused value request + and −, through the same handler (the host binds them on `[role=spinbutton]`).
+- Re-render by patching the one stepper keyed by `data-field`. Keep the root mounted so focus, the `aria-live` value and the status region survive.
+- **Announcements are concise:** the value announces its number, and the status region announces the pointer or ceiling sentence. The label is never re-announced on a tap.
 
 **What the caller provides**
 - `label`: the thing counted, in sentence case, 14 characters or fewer in en.

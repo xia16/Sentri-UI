@@ -1,6 +1,7 @@
 # ADR 0001: Field cards (Stepper, Measure, Numpad)
 
-- **Status:** candidate. The design panel accepted the cards with changes on 2026-09-29, and the changes are applied on `ds/field-cards`. The owner has two deviations to nod on (listed below).
+- **Status:** candidate. On 2026-09-29 the design panel accepted the cards with changes, and a refute pass by the other model family found six majors, all accepted. Both sets of changes are applied on `ds/field-cards`.
+- **Not every ruling is honoured as written.** The cards keep **two deviations** from owner rulings, and each waits on the owner's nod (see *Deviations for the owner's nod*).
 - **Map:** [Piglet processing design map, issue #3](https://github.com/xia16/Sentri-UI/issues/3).
 - **Cards:** [Stepper](../components/Stepper/README.md) · [Measure](../components/Measure/README.md) · [Numpad](../components/Numpad/README.md). You can see every state on the strict demo page `components/field-cards-demo.html` (lint page `ds-field-cards`).
 
@@ -10,7 +11,7 @@ The design-system README's record-sheet law names ten field types, but only Pick
 
 ## Decision: extract, don't invent
 
-The owner has already ruled on the anatomy in farrowing. These cards encode those rulings rather than propose new ones.
+The owner has already ruled on the anatomy in farrowing. These cards encode those rulings rather than propose new ones. There are two exceptions, the deviations listed below.
 
 - **Stepper.**
   - RULINGS "One stepper shape: `− n +` everywhere".
@@ -75,6 +76,25 @@ The panel (worker, steward, interaction and developer critics) accepted all thre
 - Retiring `count-key` / `count-surface` waits on the owner's ruling on the colour of +.
 - A shared field box with PickerField would change an existing card; it is logged as design-system cleanup.
 - Stronger pressed and disabled contrast for glare is a suite-wide token decision the rulings already log for the owner.
+
+## What the refute pass changed
+
+The refute pass came from the other model family. All six of its majors were accepted.
+1. **Stepper commit contract.** A key emits a *requested delta* and never commits. The README separates the two kinds of host:
+   - **Immediate hosts** are recording surfaces: each tap posts a stamped event.
+   - **Staged hosts** are the dead drawer and Edit: taps change a draft, Save posts it, Clear discards it, and Back keeps the draft on the device.
+2. **A scan is atomic.** A scan replaces whatever is typed or suggested; it is never appended.
+   - `numpadScan` validates the digits and the length.
+   - `numpadScanner` recognises a wedge burst: at least 4 digits, each ≤ 35ms apart, ending in Enter. Ordinary keystrokes keep appending.
+   - The reducer and burst tests live in `tests/field-cards.test.mjs`.
+3. **Cleared is not an untouched suggestion.** The last ⌫ reaches a stable empty (missing). Returning to the suggestion is a named transition, the `Use 000258` text action.
+4. **The duplicate check runs on every accepted value, suggestions included.** Record stays available.
+   - The warning survives the advance as an amber mark on the running-list line (`000254 · 1.42 kg · also on B04`).
+   - A duplicate found after offline sync gets the same mark, and nothing is merged or blocked.
+5. **Announcements.** Each card has one persistent `role="status"` region, and the controls reference it with `aria-describedby`. A Measure's value is live while its pad is open, and the Numpad's readout value is live. Labels are never re-announced.
+6. **The keys are truly stationary.** The Numpad's feedback region (status line and running list) is bounded: its heights are fixed and it scrolls inside itself, sized for the longest status in en and zh.
+   - The demo shows the change before and after a warning.
+   - In all 15 run states, en and zh, the keys sit 218px from the top of the pad.
 
 ## Deviations for the owner's nod
 

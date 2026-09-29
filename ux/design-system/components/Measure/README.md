@@ -13,7 +13,7 @@ Call `SentriUI.measure({ label, optional, value, unit, unitGap, placeholder, key
   - padding of `space-row-y` × `space-row-x`.
 - **Value** in IBM Plex Mono `figure` (21px/500), tabular, in `ink`. It shows the typed string verbatim, with no locale formatting.
 - **Unit** in mono `identifier` 12px `muted`, 6px after the value on the same baseline. `unitGap: false` sets it tight, for `40.6°`.
-- **Hint** below the box, in `input` 14px. A status hint starts with a `status-dot`. The `note` line (muted) goes under it.
+- **Status region (the hint)** below the box, in `input` 14px: one persistent `role="status"` line, always mounted, which the box points to with `aria-describedby`. A status hint starts with a `status-dot`. The `note` line (muted, also in `aria-describedby`) goes under it.
 
 **The pad rule (written once, here and in Numpad)**
 - The Numpad docks above the bar, in the thumb zone.
@@ -47,6 +47,7 @@ Call `SentriUI.measure({ label, optional, value, unit, unitGap, placeholder, key
 **Event contract**
 - The box is `<button data-action="<action, default open-numpad>" data-value="<key>" aria-expanded aria-controls="<pad id>">`. The root carries `data-field`.
 - The accessible name is label + value + unit (`aria-labelledby`).
+- **Announcements.** While the pad is open, the Measure's value is a polite live region, so each keystroke announces only the new value (`16.8`), never the label. The range warning or refusal announces once, through the status region, when the pad closes.
 - Delegate with `closest('[data-action]')`.
 - The typed draft is a **string** that the host holds. It survives interruption (a scream, a phone sleeping) because it lives with the host, not the DOM.
 - The host normalises the draft on commit with `SentriUI.numpadCommit(value, { decimals })`:

@@ -166,7 +166,8 @@ export interface IconButtonProps {
 /** A text action shown in a Stepper's hint line (the fourth register, ≥44px). */
 export interface StepperPointer { label: string; action: string; value?: string; strs?: Strs<'label'>; args?: StrArgs<'label'> }
 
-/** Candidate. `− n +`: keys are `<button data-action data-value=key data-step="-step|step">`. */
+/** Candidate. `− n +`: keys are `<button data-action data-value=key data-step="-step|step">`.
+ *  A key emits a requested delta; the host posts it (immediate host) or adds it to a draft (staged host). */
 export interface StepperProps {
   label: string;
   /** One muted line under the label, e.g. "among 11 alive". */
@@ -240,7 +241,10 @@ export interface MeasureProps {
   args?: StrArgs<'label' | 'optional' | 'value' | 'unit' | 'placeholder' | 'hint' | 'note'>;
 }
 
-export interface NumpadRecent { text: string; strs?: Strs<'text'>; args?: StrArgs<'text'> }
+/** A running-list line; tone 'warn' keeps an amber mark (`000254 · 1.42 kg · also on B04`). */
+export interface NumpadRecent { text: string; tone?: 'warn'; strs?: Strs<'text'>; args?: StrArgs<'text'> }
+/** A text action in a status line, e.g. `Use 000258`. */
+export interface FieldAction { label: string; action: string; value?: string; strs?: Strs<'label'>; args?: StrArgs<'label'> }
 /** Candidate. 1–9 · [. or gap] 0 ⌫; keys are `<button data-action data-value=key data-key="0-9|.|back">`.
  *  No commit key: the surface's bar primary commits. Keys never move. */
 export interface NumpadProps {
@@ -267,7 +271,10 @@ export interface NumpadProps {
   action?: string;
   /** warn: amber hint (duplicate tag, short tag, unusual weight); the value still records. */
   tone?: 'warn';
+  /** The status line (role=status, always mounted, 44px, scrolls inside itself). */
   hint?: string;
+  /** Text actions in the status line, e.g. the named `Use 000258` transition. */
+  actions?: FieldAction[];
   className?: string;
   /** digit gets args {n} per key; back, pad and recent are aria-labels (data-str-attr). */
   strs?: Strs<'label' | 'value' | 'unit' | 'placeholder' | 'hint' | 'digit' | 'decimal' | 'back' | 'pad' | 'recent'>;
@@ -277,6 +284,8 @@ export interface NumpadProps {
 /** The typed draft the host holds between keys. */
 export interface NumpadState { value: string; suggested?: boolean; suggestion?: string }
 export type NumpadKey = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '.' | 'back';
+/** 'suggestion' is the named transition back to the suggested tag (never the last ⌫). */
+export type NumpadInputKey = NumpadKey | 'suggestion';
 export interface NumpadLimits { decimals?: number; maxLength?: number; intLength?: number }
 
 export interface SentriUI {
@@ -284,11 +293,15 @@ export interface SentriUI {
   measure(props: MeasureProps): string;
   numpad(props: NumpadProps): string;
   /** Apply one key; `dead` says which dead tap to answer in the hint line. */
-  numpadInput(state: NumpadState, key: NumpadKey, limits?: NumpadLimits): Required<NumpadState> & { dead: null | 'full' | 'point' | 'empty' };
+  numpadInput(state: NumpadState, key: NumpadInputKey, limits?: NumpadLimits): Required<NumpadState> & { dead: null | 'full' | 'point' | 'empty' };
+  /** A scan replaces whatever is typed or suggested; invalid (not digits, wrong length) keeps the state with dead 'scan'. */
+  numpadScan(state: NumpadState, scanned: string, limits?: { maxLength?: number }): Required<NumpadState> & { dead: null | 'scan'; scanned: boolean };
   /** The committed value: `16.` → `16`, weights lose leading zeros, empty → null (missing). */
   numpadCommit(value: string, options?: { decimals?: number }): string | null;
   /** Hardware keyboard / wedge scanner → pad key; Enter returns 'enter' and never commits. */
   numpadKey(event: Pick<KeyboardEvent, 'key'>): NumpadKey | 'enter' | null;
+  /** Wedge-scanner bursts (≥ minKeys digits, each ≤ gap ms apart, ending in Enter) go to onScan once; other keys to onKey. */
+  numpadScanner(options: { onKey?: (key: NumpadKey) => void; onScan?: (digits: string) => void; gap?: number; minKeys?: number; now?: () => number; later?: (f: () => void, ms: number) => unknown; cancel?: (handle: unknown) => void }): { handle(event: Pick<KeyboardEvent, 'key'>): boolean; flush(): void };
   heading(props: HeadingProps): string;
   panel(content: string, options?: PanelOptions & { ds?: string }): string;
   facts(items: Fact[], options?: { columns?: 1 | 2 | 3; className?: string }): string;

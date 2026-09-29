@@ -1,4 +1,4 @@
-<!-- @dsCard group="Fields" height=2400 subtitle="Candidate · the one pad, for ear tags and weights" -->
+<!-- @dsCard group="Fields" height=3600 subtitle="Candidate · the one pad, for ear tags and weights" -->
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}.stack>*+*{margin-top:24px}</style></head>
@@ -14,6 +14,10 @@ n.innerHTML = [
   tag({ value: '', recent: [] }),
   tag({ value: '000258', suggested: true, hint: 'Next tag · Record to use' }),
   tag({ value: '00025' }),
+  tag({ value: '', actions: [{ label: 'Use 000258', action: 'numpad-suggestion' }] }),
+  tag({ value: '000258', suggested: true, tone: 'warn', hint: '000258 is already on crate B04 · records anyway' }),
+  tag({ label: 'Piglet 6 of 11 · ear tag', value: '000258', suggested: true, hint: 'Next tag · Record to use', recent: [{ text: '000254 · 1.42 kg · also on B04', tone: 'warn' }, ...recent.slice(0, 2)] }),
+  tag({ value: '12', hint: 'Scan not read · a tag is 6 digits' }),
   tag({ value: '000258', hint: 'Tag is 6 digits' }),
   tag({ value: '000254', tone: 'warn', hint: '000254 is already on crate B04 · records anyway' }),
   tag({ value: '00025', tone: 'warn', hint: '5 of 6 digits' }),
