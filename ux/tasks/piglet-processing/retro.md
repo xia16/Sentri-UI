@@ -209,3 +209,16 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   (every `components/*/preview.html`), and treat drift found there as the
   design system's, reported once, never charged to a slice.
 - **Cost:** medium (a designer's lint run spent; config patched by the driver).
+
+## 15 · Slices — the other-family lens cannot be handed screenshots as files
+
+- **Stage:** Slices, S10 review (Consistency lens).
+- **What happened:** the skill says the other-family lens is "handed
+  screenshots and the lint report as files". `collab.py discuss --context`
+  reads every context file as UTF-8 text and crashed on the first PNG. Worked
+  around by naming the image paths inside the prompt for the colleague's CLI
+  to open itself — whether it actually looked at them is unverified.
+- **Change:** `collab` should accept `--image <path>` and pass images through
+  the backend's image input; until then the skill should say "name the image
+  paths in the prompt" and ask the lens to cite what it saw in each image.
+- **Cost:** low.
