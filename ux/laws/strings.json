@@ -922,6 +922,7 @@
     "pp.litter.pointer.ended": {"en": "The task has ended · this can't be recorded", "zh": "任务已结束 · 无法记录", "kind": "pointer"},
     "pp.litter.pointer.no_task": {"en": "Not in a processing task · treatments can't be recorded", "zh": "不在仔猪处理任务内 · 无法记录处理", "kind": "pointer"},
     "pp.litter.pointer.check": {"en": "Check the counts against what is owed", "zh": "请核对与待处理的头数", "kind": "pointer"},
-    "pp.litter.resume.now": {"en": "Owed changed since · now {n} owed", "zh": "待处理已变 · 现剩{n}头", "kind": "status"}
+    "pp.litter.resume.now": {"en": "Owed changed since · now {n} owed", "zh": "待处理已变 · 现剩{n}头", "kind": "status"},
+    "ds.dead.why.check": {"en": "More than this litter can lose · check the counts", "zh": "超过本窝可减少的头数 · 请核对", "kind": "pointer"}
   }
 }
