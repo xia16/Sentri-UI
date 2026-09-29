@@ -40,3 +40,20 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
 - **Why:** the reference points at a skill layout that does not exist here.
 - **Change:** name the path, or state the tiering rule in the skill.
 - **Cost:** low.
+
+## 4 · Charting — domain research missed the reference task's closure contract
+
+- **Stage:** Charting, research.
+- **What happened:** the domain agent reported that farrowing "never closes
+  under RULINGS", so processing's wait-for-farrowing dependency "has nothing
+  to wait on". `ux/research/farrowing/ASTRA-TASK-CLOSURE.md` (2026-09-17)
+  defines farrowing's End task and supersedes `lifecycle.md`. The blind
+  second-model pass caught it; my own merge would have carried the error into
+  the grilling as a false premise.
+- **Why:** the research brief named RULINGS and SYNTHESIS as the internal law
+  but not the reference task's later contracts; RULINGS itself does not link
+  them.
+- **Change:** the research brief should list every signed-off contract of the
+  reference task (`*-contract.html`, closure docs), not just the rulings file;
+  or the config should name them.
+- **Cost:** low (caught before the user saw it).

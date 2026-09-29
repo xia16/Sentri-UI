@@ -413,3 +413,57 @@ history lives in git.
   day, `yesterday` for the ended sow, the date from seven days. (The ended sow's death
   moved to aug 25 so the room, whose today is aug 26, no longer shows a death in its
   own future.)
+
+## Piglet processing (仔猪处理) — grilling, 2026-09-29
+
+Owner answers from the design-drive grilling. They bind the piglet-processing
+map; where one touches farrowing's own law it says so. **Open** lines are under
+investigation and not yet ruled.
+
+- **The mark carries the configured product and dose (Q2, owner):** the console's
+  product + dose for that treatment is snapshotted onto the mark automatically; the
+  worker enters nothing extra. Actual-use deviations (substitutions) are v2.
+- **Identity schemes differ by farm (Q3, owner):** some farms notch every piglet, some
+  notch only piglets with breeding potential and tag them later, some tag all, some tag
+  only and never notch. The design must serve every scheme; tag **or** notch identifies.
+  **Sex and weight are optional** and never block a row. National (防疫) tags are out of
+  scope. *Open:* how a farm's scheme is expressed (config) and what "identity work done"
+  means for a keepers-only farm.
+- **Count differences are unexplained gain / unexplained loss (Q4, owner):** a high count
+  is NOT routed to More born; both directions are one stamped unexplained adjustment.
+  *Open — owner asked for an elegant, balanced model:* recount, added piglets, adoption
+  (fostering), a piglet that jumped into another pen, a body found after an unexplained
+  loss — "in the end the whole thing should balance out".
+- **End task mirrors farrowing's (Q5, owner, agreed as recommended):** manual only, never
+  auto-closes at window end; review shows unfinished litters and treatments in numbers;
+  hold-to-commit with receipt; cannot end while the batch's farrowing task is open (reason
+  shown); the mandatory flag changes wording only, never blocks; after End no new marks,
+  while corrections and identity rows stay writable, stamped.
+- **Late and early (Q6, owner):** late stays due until done or task end, carries its real
+  date, counts late; no clinical cut-off in v1. Early is allowed for any scheduled item
+  actually done, counts on time. **Plus: a worker may explicitly skip piglets for a
+  reason** (e.g. weak piglets skip iron). *Open:* what a skip does to the obligation
+  (catch-up vs permanent) per treatment, and a better castration interaction than a bare
+  "done".
+- **Corrections (Q7, owner, agreed as recommended):** anyone may un-record or change a mark
+  through Edit — stamped, original kept, corrected value amber. Identity rows stay
+  viewable and editable after entry and after End; withdrawing a mistaken row is a stamped
+  act, not a deletion. Wrong litter = correction here + fresh record there.
+  提交后不可再查看 is a form artefact, not a compliance lock.
+- **Double treatment (Q8, owner, agreed as recommended):** a done treatment shows who and
+  when and a second tap does nothing; offline collisions keep both records, flagged as a
+  possible double treatment, never merged. No claiming of litters in v1.
+- **Deaths from processing (Q9, owner):** a worker in processing who sees dead piglets marks
+  them dead quickly, through **one shared dead picker** — the same one farrowing uses. The
+  only difference is that when the litter has tagged piglets, the picker shows them too.
+  (A change to the shared dead drawer; owner-approved in principle, drawn in its slice.)
+- **Fostering / adoption reopened for investigation (Q9–Q10, owner):** the owner asks how
+  farms handle a piglet moved from an unprocessed litter into a processed one (or the
+  reverse) and how the record reminds them. Parking stands for farrowing until this
+  investigation reports; not yet ruled for processing.
+- **Multi-sow pens (Q10):** out of scope if farrowing is individually housed in practice;
+  owner asked for the scenario check before ruling. *Open.*
+- **Verbs (Q11, owner, provisional):** Record (commit an act or observation) · Edit
+  (correct posted) · Set count · End task; Back / Clear / Save / Close as farrowing; no
+  Mark; Submit / Confirm / Complete banned. Provisional — may change if a better verb
+  appears.
