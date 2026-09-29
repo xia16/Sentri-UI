@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piglet processing · End task</title>
+<link rel="stylesheet" href="/ux/design-system/tokens.css">
+<link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="shell.css">
+<style>
+/* End task, the ended task and the weaning handoff: layout only, from tokens.css.
+   Candidate:LitterRow is S1's (room.html), reused as is; Candidate:HoldButton is this slice's (see the report). */
+#screen { display: flex; flex-direction: column; gap: var(--space-section); }
+.pp-head { display: flex; align-items: flex-start; gap: var(--space-footer-gap); }
+.pp-head > .pp-title { flex: 1; min-width: 0; }
+.pp-head .st-heading { margin: 0; }
+.pp-head .pp-title > .st-heading + .st-heading { margin-top: 4px; }
+.pp-block > .st-heading { margin-bottom: 8px; }
+.pp-stack { display: flex; flex-direction: column; gap: var(--space-footer-gap); }
+.pp-dock { position: sticky; bottom: 0; margin: 0 calc(-1 * var(--space-gutter)) -20px; }
+@media (max-width: 370px) { .pp-dock { margin-left: calc(-1 * var(--space-gutter-narrow)); margin-right: calc(-1 * var(--space-gutter-narrow)); padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
+.pp-dock .button, .pp-layer .sheet-footer .button { flex: 1; }
+.pp-dock .button.secondary, .pp-layer .sheet-footer .button.secondary { flex: none; min-width: var(--back-width); }
+.pp-locked { position: relative; height: 100vh; overflow: hidden; }
+.pp-layer .scrim { inset: 0; }
+.pp-layer .sheet { max-height: calc(100% - 32px); }
+.pp-layer .sheet-body { display: flex; flex-direction: column; gap: var(--space-section); padding-bottom: var(--space-panel); }
+.pp-layer .sheet-body > * { flex: none; }
+.pp-layer .utility-header { padding: var(--space-gutter) var(--space-gutter) 8px; }
+.pp-layer .utility-header .st-heading { margin: 0; }
+.pp-layer .sheet-footer { gap: var(--space-section); }
+
+/* Candidate:LitterRow (S1): the Row card's geometry with the row law's mono line 2, one named chip and the rail. */
+.pp-litter .pp-code { flex: none; min-width: 40px; font-family: var(--font-mono); font-size: var(--type-identifier-size); font-weight: 600; color: var(--ink); }
+.st-row.pp-litter .st-row-copy small.pp-mono { font-family: var(--font-mono); white-space: normal; overflow: visible; text-overflow: clip; }
+.st-row.pp-litter .st-row-copy strong { white-space: normal; overflow: visible; text-overflow: clip; }
+.st-row.pp-litter .st-row-copy strong .pp-tok { display: inline-block; max-width: 100%; white-space: normal; }
+.pp-litter .pp-tok { display: inline-block; white-space: nowrap; }
+.pp-litter .pp-tok:not(:last-child)::after { content: "·"; margin-left: 4px; margin-right: 4px; color: var(--muted); }
+.pp-litter .pp-tok[data-tone="red"] { color: var(--red); }
+.pp-litter .pp-tok[data-tone="amber"] { color: var(--amber); }
+.pp-litter .pp-chip { flex: none; display: inline-flex; align-items: center; gap: 4px; max-width: 96px; font-size: var(--type-description-size); color: var(--amber); }
+.pp-litter .pp-chip[data-tone="red"] { color: var(--red); }
+.pp-litter .pp-chip::before { content: ""; flex: none; width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
+
+/* Candidate:HoldButton: the danger Button with farrowing's 850ms hold-to-commit fill (ASTRA-TASK-CLOSURE). */
+.pp-hold { position: relative; overflow: hidden; flex-direction: column; gap: 4px; touch-action: none; user-select: none; -webkit-user-select: none; }
+.pp-hold > span, .pp-hold > small { position: relative; z-index: 1; pointer-events: none; }
+.pp-hold > small { font-size: var(--type-description-size); font-weight: 600; }
+.pp-hold::before { content: ""; position: absolute; inset: 0; transform: scaleX(0); transform-origin: left; background: var(--ink); }
+.pp-hold[data-holding]::before { transform: scaleX(1); transition: transform 850ms linear; }
+.pp-hold[data-holding="static"]::before { transform: scaleX(.6); transition: none; }
+</style>
+</head>
+<body>
+<main class="phone inspection-phone" data-st-context="page" id="phone">
+  <div id="screen"></div>
+</main>
+<script src="/ux/design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+<script>
+(function () {
+  var UI = window.SentriUI, I = window.SentriIcons.icon;
+  var qs = new URLSearchParams(location.search);
+
+  /* ---- the schedule (console config, sample): one obligation per scheduled dose; identity = notch every piglet on day 3 ---- */
+  var DOSES = [
+    { k: 'cord', day: 0 }, { k: 'nasal', day: 0 }, { k: 'iron', day: 3 }, { k: 'tail', day: 3 },
+    { k: 'castrate', day: 5, males: true }, { k: 'coccidiosis', day: 7, last: 7 }, { k: 'health', day: 21 }
+  ];
+  var UNIT = 7, WEIGH_DAY = 21;
+
+  /* ---- fixtures: Unit 7, the room list's crates (room.html `base`), and the same litters 18 days on.
+     st: one code per DOSES entry. o on time · l recorded late · p due today, not yet · P<n> due today, n still owed ·
+     O<n> late, n owed (no n: all) · M missed (past the last age-day) · N not yet due.
+     id: identity (notch, all piglets): done · due · ahead · <n>/<k> identified. ---- */
+  function L(code, day, alive, males, st, o) { return Object.assign({ code: code, day: day, alive: alive, males: males, st: st.split(' '), id: 'done' }, o || {}); }
+  var FIX = {
+    // 29 Sep 10:30 — the room list's `base`. D01 is still farrowing, so the batch's farrowing task is open.
+    now: { now: new Date(2026, 8, 29, 10, 30), litters: [
+      L('A02', 3, 12, 6, 'o o p p N N N', { id: 'due' }),
+      L('A05', 3, 11, 5, 'o o o P5 N N N'),
+      L('B01', 5, 13, 7, 'o o O o p N N', { sowDied: true }),
+      L('B04', 9, 10, 5, 'o o o o o M N'),
+      L('C02', 1, 14, 7, 'o o N N N N N', { id: 'ahead' }),
+      L('C04', 3, 9, 4, 'o o o o N N N'),
+      L('D01', 0, 8, 4, 'p p N N N N N', { id: 'ahead', unlocked: true }),
+      L('D03', 5, 11, 6, 'o o o o p N N', { loss: 2 }),
+      L('D05', 6, 10, 5, 'o o l l o N N')
+    ], outside: ['E01'], deaths: [], moves: [], sowDeaths: ['B01'] },
+    // 17 Oct 16:10 — farrowing ended; 3 piglets died (A02, B01, C02); 3 moved B01 → C04; D03's loss of 2 still open.
+    late: { now: new Date(2026, 9, 17, 16, 10), litters: [
+      L('A02', 21, 11, 6, 'o o o o o o o', { weighed: true }),
+      L('A05', 21, 11, 5, 'o o o o o o o', { weighed: true }),
+      L('B01', 23, 9, 7, 'o o l o O1 o o', { sowDied: true, weighed: true }),
+      L('B04', 27, 10, 5, 'o o o o o M o', { weighed: true }),
+      L('C02', 19, 13, 7, 'o o o o o o N'),
+      L('C04', 21, 12, 4, 'o o o o o o o', { weighed: true }),
+      L('D01', 18, 8, 4, 'o o o o o o N', { id: '5/8' }),
+      L('D03', 23, 11, 6, 'o o o o o o o', { loss: 2, weighed: true }),
+      L('D05', 24, 10, 5, 'o o l l o o o', { weighed: true })
+    ], outside: ['E01'], deaths: ['A02', 'B01', 'C02'], moves: [{ from: 'B01', to: 'C04', n: 3 }], sowDeaths: ['B01'] }
+  };
+  var ENDED = { at: new Date(2026, 9, 17, 16, 20), who: 'G. Hansen' };
+  // Records after End: a correction (Edit, S8) and identity rows. They write, stamped; the receipt's snapshot does not change.
+  var SINCE = [
+    { kind: 'id', code: 'D01', n: 3, at: new Date(2026, 9, 18, 9, 5), who: 'L.M' },
+    { kind: 'edit', code: 'A05', a: 5, b: 4, at: new Date(2026, 9, 18, 8, 40), who: 'L.M' }
+  ];
+
+  var STATES = {
+    'overview': { fix: 'now' },
+    'end-review': { fix: 'late', sheet: 'review' },
+    'end-hold': { fix: 'late', sheet: 'review', holding: true },
+    'end-blocked': { fix: 'now', sheet: 'review' },
+    'end-blocked-draft': { fix: 'late', sheet: 'review', draft: 'D03' },
+    'receipt': { fix: 'late', ended: true, sheet: 'receipt' },
+    'ended': { fix: 'late', ended: true },
+    'ended-correct': { fix: 'late', ended: true, since: true },
+    'weaning-handoff': { fix: 'late', ended: true, sheet: 'handoff' }
+  };
+  var start = STATES[PP.state] || STATES.overview;
+  var S = {
+    fix: qs.get('data') === 'late' || qs.get('data') === 'now' ? qs.get('data') : start.fix,
+    sheet: start.sheet || '', ended: !!start.ended, since: !!start.since, draft: start.draft || '',
+    holding: !!start.holding, mandatory: qs.get('mandatory') === '1', opened: 0
+  };
+  var F = FIX[S.fix];
+
+  /* ---- derivations: every number on the page comes from here ---- */
+  function parse(code) { return { c: code.charAt(0), n: code.length > 1 ? +code.slice(1) : null }; }
+  function doses(l) {
+    return DOSES.map(function (d, i) {
+      var p = parse(l.st[i]), pop = d.males ? l.males : l.alive, owed = 0, ahead = 0;
+      if (p.c === 'p') owed = pop; else if (p.c === 'P' || p.c === 'O') owed = p.n == null ? pop : p.n; else if (p.c === 'M') owed = pop; else if (p.c === 'N') ahead = pop;
+      return { k: d.k, day: d.day, last: d.last, c: p.c, pop: pop, owed: owed, missed: p.c === 'M' ? pop : 0, ahead: ahead, done: pop - owed - ahead };
+    });
+  }
+  function ident(l) {
+    if (l.id === 'done') return { done: true, have: l.alive, of: l.alive };
+    if (l.id === 'due' || l.id === 'ahead') return { done: false, have: 0, of: l.alive, ahead: l.id === 'ahead' };
+    var x = l.id.split('/'); var have = +x[0];
+    if (S.since) SINCE.forEach(function (e) { if (e.kind === 'id' && e.code === l.code) have += e.n; });
+    return { done: have >= +x[1], have: have, of: +x[1], was: +x[0] };
+  }
+  function sum(xs, f) { return xs.reduce(function (a, x) { return a + f(x); }, 0); }
+  function litterSums(l) {
+    var ds = doses(l);
+    return { ds: ds, done: sum(ds, function (d) { return d.done; }), owed: sum(ds, function (d) { return d.owed; }), missed: sum(ds, function (d) { return d.missed; }), ahead: sum(ds, function (d) { return d.ahead; }),
+      late: ds.some(function (d) { return d.c === 'O'; }) };
+  }
+  // Unfinished is decided at End from the End snapshot: identity uses the value at End, never a later row.
+  function unfinishedAtEnd(l) { var s = litterSums(l); var x = l.id; var idDone = x === 'done' || (x.indexOf('/') > 0 && +x.split('/')[0] >= +x.split('/')[1]); return s.owed > 0 || s.ahead > 0 || !idDone; }
+  function unidAtEnd(l) { if (l.id === 'done') return 0; if (l.id.indexOf('/') > 0) { var x = l.id.split('/'); return +x[1] - +x[0]; } return l.alive; }
+  function totals() {
+    var ls = F.litters, t = { done: 0, owed: 0, missed: 0, ahead: 0, ontime: 0, due: 0, idDone: 0, litters: ls.length, unf: [], alive: 0, identified: 0, weighed: 0 };
+    ls.forEach(function (l) {
+      var s = litterSums(l); t.done += s.done; t.owed += s.owed; t.missed += s.missed; t.ahead += s.ahead; t.alive += l.alive;
+      s.ds.forEach(function (d) { if ('olOM'.indexOf(d.c) >= 0) { t.due++; if (d.c === 'o') t.ontime++; } });
+      var id = ident(l); if (id.done) t.idDone++; t.identified += id.have; if (l.weighed) t.weighed++;
+      if (unfinishedAtEnd(l)) t.unf.push(l);
+    });
+    t.total = t.done + t.owed + t.ahead;
+    t.pct = t.due ? Math.round(100 * t.ontime / t.due) : null;
+    return t;
+  }
+  function loss() { var n = 0, c = []; F.litters.forEach(function (l) { if (l.loss) { n += l.loss; c.push(l.code); } }); return { n: n, codes: c }; }
+  function blocked() {
+    var why = [];
+    F.litters.forEach(function (l) { if (l.unlocked) why.push({ kind: 'farrowing', code: l.code }); });
+    if (S.draft) why.push({ kind: 'draft', code: S.draft });
+    return why;
+  }
+
+  /* ---- strings ---- */
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function sa(id, args) { return 'data-str="' + id + '"' + (args ? " data-args='" + esc(JSON.stringify(args)) + "'" : ''); }
+  function S_(id, args) { return '<span ' + sa(id, args) + '>' + esc(PP.t(id, args)) + '</span>'; }
+  function one(base, n) { return base + (n === 1 && PP.lang === 'en' ? '.one' : '.many'); }
+  function dose(k) { return PP.t('pp.common.tx.' + k); }
+  var MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  function date(d) { return PP.lang === 'zh' ? (d.getMonth() + 1) + '月' + d.getDate() + '日' : MONTHS[d.getMonth()] + ' ' + d.getDate(); }
+  function time(d) { return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
+  function stampArgs(d, who) { return { date: date(d), time: time(d), who: who }; }
+  function h(o) { return UI.heading(Object.assign({ title: '', kind: 'section', level: 4 }, o)); }
+
+  /* ---- Candidate:LitterRow (S1) ---- */
+  function litterRow(l, l1, toks, opts) {
+    opts = opts || {};
+    var chip = l.sowDied ? ['red', 'sowdied'] : l.unlocked && !S.ended ? ['amber', 'unlocked'] : null;
+    var tag = opts.static ? 'div' : 'button';
+    return '<' + tag + (opts.static ? '' : ' type="button" data-action="open-litter" data-value="' + l.code + '"') + ' class="st-row pp-litter" data-ds="Candidate:LitterRow">' +
+      '<span class="pp-code">' + S_('pp.room.code', { code: l.code }) + '</span>' +
+      '<span class="st-row-copy"><strong>' + l1.map(function (t) { return '<span class="pp-tok">' + S_(t[0], t[1]) + '</span>'; }).join('') + '</strong><small class="pp-mono">' +
+      toks.map(function (t) { return '<span class="pp-tok"' + (t[2] ? ' data-tone="' + t[2] + '"' : '') + '>' + S_(t[0], t[1]) + '</span>'; }).join('') + '</small></span>' +
+      (chip ? '<span class="pp-chip" data-tone="' + chip[0] + '">' + S_('pp.room.chip.' + chip[1]) + '</span>' : '') +
+      (opts.static ? '' : '<span class="st-row-chevron">' + I('chevron') + '</span>') + '</' + tag + '>';
+  }
+  function rows(html) { return UI.rowGroup(html); }
+
+  // Overview row: what the litter owes now, then its piglet-doses done · owed · missed · ahead.
+  function overviewRow(l) {
+    var s = litterSums(l), owedNames = s.ds.filter(function (d) { return d.owed > 0; }).map(function (d) { return dose(d.k); });
+    var l1 = owedNames.length ? [['pp.room.l1.owes', { doses: owedNames.join(' · ') }]] : s.ahead ? [['pp.end.l1.nothing', {}]] : [['pp.room.l1.finished', {}]];
+    var toks = [['pp.common.unit.day', { n: l.day }], ['pp.end.tok.done', { n: s.done }]];
+    if (s.owed) toks.push(['pp.end.tok.owed', { n: s.owed }, s.late ? 'red' : '']);
+    if (s.missed) toks.push(['pp.end.tok.missed', { n: s.missed }, 'amber']);
+    if (s.ahead) toks.push(['pp.end.tok.ahead', { n: s.ahead }]);
+    if (l.loss) toks.push(['pp.room.tok.loss', { k: l.loss }, 'red']);
+    return litterRow(l, l1, toks);
+  }
+  // Review and receipt row: what End would leave (or left) not done, in numbers.
+  function unfinishedParts(l) {
+    // Owed and missed doses are named one by one; doses not yet due fold into one item once there are two or more.
+    var s = litterSums(l), l1 = [], toks = [['pp.common.unit.day', { n: l.day }]], late = -1, win = null;
+    var ahead = s.ds.filter(function (d) { return d.ahead; });
+    s.ds.forEach(function (d) {
+      if (d.missed) { l1.push(['pp.end.u.missed', { name: dose(d.k), n: d.missed }]); if (win == null) win = d.last; }
+      else if (d.owed) { l1.push(['pp.end.u.owed', { name: dose(d.k), n: d.owed }]); late = Math.max(late, l.day - d.day); }
+    });
+    if (ahead.length === 1) l1.push(['pp.end.u.ahead', { name: dose(ahead[0].k), n: ahead[0].ahead }]);
+    else if (ahead.length) l1.push(['pp.end.u.ahead_many', { k: ahead.length, n: sum(ahead, function (d) { return d.ahead; }) }]);
+    if (late > 0) toks.push(['pp.room.tok.due_ago', { n: late }, 'red']); else if (late === 0) toks.push(['pp.room.tok.due_today', {}]);
+    if (win != null) toks.push(['pp.room.tok.window', { n: win }, 'amber']);
+    if (ahead.length) toks.push(['pp.end.tok.dueday', { n: ahead[0].day }]);
+    var u = unidAtEnd(l); if (u) l1.push(['pp.end.u.unid', { n: u }]);
+    return { l1: l1, toks: toks };
+  }
+  // The ended face: the same items, now final — not done, never owed.
+  function endedRow(l) {
+    var s = litterSums(l), l1 = [], toks = [['pp.common.unit.day', { n: l.day }], pig(l.alive)], why = {};
+    s.ds.forEach(function (d) {
+      var n = d.owed + d.ahead; if (!n) return;
+      l1.push(['pp.end.u.notdone', { name: dose(d.k), n: n }]);
+      if (d.missed) why.w = d.last; else if (d.ahead) why.a = 1; else why.o = 1;
+    });
+    if (why.o) toks.push(['pp.end.tok.owed_end', {}]);
+    if (why.w != null) toks.push(['pp.room.tok.window', { n: why.w }, 'amber']);
+    if (why.a) toks.push(['pp.end.tok.notdue_end', {}]);
+    var id = ident(l), u = unidAtEnd(l);
+    if (u && !id.done) l1.push(['pp.end.u.unid', { n: id.of - id.have }]);
+    if (S.since && id.was != null && id.have > id.was) toks.push(['pp.end.tok.id_after', { n: id.have - id.was }]);
+    if (l.loss) toks.push(['pp.room.tok.loss', { k: l.loss }, 'red']);
+    if (!l1.length) l1 = [['pp.room.l1.finished', {}]];
+    return litterRow(l, l1, toks);
+  }
+  function finishedRow(l) {
+    var toks = [['pp.common.unit.day', { n: l.day }], pig(l.alive)];
+    if (S.since) SINCE.forEach(function (e) { if (e.kind === 'edit' && e.code === l.code) { toks.push(['pp.end.tok.castrated', { a: e.a, b: e.b }, 'amber']); toks.push(['pp.end.tok.edited', { date: date(e.at), who: e.who }]); } });
+    if (l.loss) toks.push(['pp.room.tok.loss', { k: l.loss }, 'red']);
+    return litterRow(l, [['pp.room.l1.finished', {}]], toks);
+  }
+  function pig(n) { return [one('pp.common.unit.piglet', n), { n: n }]; }
+
+  /* ---- shared blocks ---- */
+  function progressBlock(t) {
+    return '<div class="pp-block">' + h({ strs: { title: 'pp.end.ov.progress', meta: 'pp.end.ov.progress.meta' }, args: { meta: { n: t.total } } }) +
+      UI.facts([
+        { label: '', strs: { label: 'pp.end.f.done', value: 'pp.end.f.n' }, args: { value: { n: t.done } } },
+        { label: '', strs: { label: 'pp.end.f.owed', value: 'pp.end.f.n', meta: t.missed ? 'pp.end.f.missed' : undefined }, args: { value: { n: t.owed }, meta: { n: t.missed } } },
+        { label: '', strs: { label: 'pp.end.f.ahead', value: 'pp.end.f.n' }, args: { value: { n: t.ahead } } },
+        { label: '', strs: { label: 'pp.end.f.identity', value: 'pp.end.f.of' }, args: { value: { n: t.idDone, k: t.litters } } }
+      ], { columns: 2 }) + '</div>';
+  }
+  function ontimeBlock(t) {
+    return '<div class="pp-block">' + h({ strs: { title: 'pp.end.ot.title', description: 'pp.end.ot.rule' } }) +
+      UI.facts([
+        { label: '', strs: { label: 'pp.end.ot.label', value: 'pp.end.ot.pct', meta: 'pp.end.ot.of' }, args: { value: { n: t.pct }, meta: { n: t.ontime, k: t.due } } },
+        { label: '', strs: { label: 'pp.end.ot.late', value: 'pp.end.f.n' }, args: { value: { n: t.due - t.ontime } } }
+      ], { columns: 2 }) + '</div>';
+  }
+  function outcomeRow(titleId, n, trailId, codes) {
+    return UI.row({ title: '', description: '', trailing: '', strs: Object.assign({ title: titleId, trailing: trailId }, codes ? { description: 'pp.end.codes' } : {}),
+      args: { trailing: { n: n }, description: codes ? { list: codes } : undefined } });
+  }
+  function outcomesBlock(titleId) {
+    var ls = loss(), mv = F.moves, moved = sum(mv, function (m) { return m.n; });
+    return '<div class="pp-block">' + h({ strs: { title: titleId } }) + rows(
+      outcomeRow('pp.end.out.deaths', F.deaths.length, 'pp.end.f.n', F.deaths.length ? F.deaths.join(' ') : '') +
+      outcomeRow('pp.end.out.moved', moved, 'pp.end.f.n', mv.length ? mv.map(function (m) { return PP.t('pp.end.out.move', { from: m.from, to: m.to }); }).join(' ') : '') +
+      outcomeRow('pp.end.out.loss', ls.n, ls.n ? 'pp.end.out.open' : 'pp.end.f.n', ls.codes.join(' ')) +
+      outcomeRow('pp.end.out.gain', 0, 'pp.end.f.n', '') +
+      outcomeRow('pp.end.out.sow', F.sowDeaths.length, 'pp.end.f.n', F.sowDeaths.join(' '))
+    ) + '</div>';
+  }
+
+  /* ---- views ---- */
+  function header(titleId, titleArgs, descId, descArgs, back) {
+    return '<header class="task-header pp-head">' +
+      (back ? UI.iconButton({ action: 'back', icon: I('back'), label: 'Back', className: 'task-return' }) : '') +
+      '<div class="pp-title">' +
+      h({ kind: 'group', level: 3, strs: { title: 'pp.common.task' } }) +
+      h({ kind: 'page', level: 2, strs: { title: titleId, description: descId }, args: { title: titleArgs, description: descArgs } }) +
+      '</div></header>';
+  }
+  function overview() {
+    var t = totals();
+    var lit = '<div class="pp-block">' + h({ strs: { title: 'pp.end.lit.title', description: F.outside.length ? 'pp.end.lit.desc.outside' : 'pp.end.lit.desc' }, args: { description: { code: F.outside.join(' ') } } }) +
+      rows(F.litters.map(overviewRow).join('')) + '</div>';
+    return header('pp.end.ov.title', {}, 'pp.end.scope', { n: UNIT, k: t.litters }) +
+      progressBlock(t) + ontimeBlock(t) + lit + outcomesBlock('pp.end.out.title') +
+      '<footer class="sheet-footer pp-dock" data-ds="Sheet">' +
+      '<button type="button" class="button secondary" data-action="back" ' + sa('act.back') + '>' + esc(PP.t('act.back')) + '</button>' +
+      '<button type="button" class="button task-end-early" data-action="review" ' + sa('pp.end.act.end') + '>' + esc(PP.t('pp.end.act.end')) + '</button></footer>';
+  }
+  function endedFace() {
+    var t = totals(), unf = F.litters.filter(unfinishedAtEnd), fin = F.litters.filter(function (l) { return !unfinishedAtEnd(l); });
+    var since = S.since ? '<div class="pp-block">' + UI.log([{ label: '', strs: { label: 'pp.end.since.title' }, entries: SINCE.map(function (e) {
+      return e.kind === 'edit'
+        ? { title: '', strs: { title: 'pp.end.since.edit', detail: 'pp.end.since.edit.detail', meta: 'pp.end.stamp' }, args: { title: { code: e.code, a: e.a, b: e.b }, meta: stampArgs(e.at, e.who) } }
+        : { title: '', strs: { title: one('pp.end.since.id', e.n), meta: 'pp.end.stamp' }, args: { title: { code: e.code, n: e.n }, meta: stampArgs(e.at, e.who) } };
+    }) }]) + '</div>' : '';
+    return header('pp.room.unit', { n: UNIT }, 'pp.end.ended.stamp', stampArgs(ENDED.at, ENDED.who), true) +
+      UI.panel(h({ strs: { title: 'pp.end.ended.head', description: 'pp.end.ended.desc' } })) +
+      rows(UI.row({ title: '', action: 'receipt', strs: { title: 'pp.end.ended.receipt', description: one('pp.end.ended.receipt.desc', t.unf.length) }, args: { description: { n: t.unf.length } } }) +
+        UI.row({ title: '', action: 'handoff', strs: { title: 'pp.end.w.title', description: 'pp.end.w.row' }, args: { description: { n: t.alive } } })) +
+      since +
+      (unf.length ? '<div class="pp-block">' + h({ strs: { title: 'pp.end.nd.title', meta: one('pp.end.n.litters', unf.length) }, args: { meta: { n: unf.length } } }) + rows(unf.map(endedRow).join('')) + '</div>' : '') +
+      (fin.length ? '<div class="pp-block">' + h({ strs: { title: 'pp.end.fin.title', meta: one('pp.end.n.litters', fin.length) }, args: { meta: { n: fin.length } } }) + rows(fin.map(finishedRow).join('')) + '</div>' : '');
+  }
+
+  /* ---- drawers ---- */
+  function sheetFrame(titleId, titleArgs, descId, descArgs, body, footer) {
+    return '<div class="pp-layer" data-ds="Sheet"><div class="scrim" data-action="scrim"></div>' +
+      '<section class="sheet" data-st-context="drawer" data-size="long" role="dialog">' +
+      '<header class="utility-header">' + h({ kind: 'page', level: 3, strs: { title: titleId, description: descId }, args: { title: titleArgs, description: descArgs } }) + '</header>' +
+      '<div class="sheet-body">' + body + '</div>' + footer + '</section></div>';
+  }
+  function unfinishedBlock(t, isStatic) {
+    if (!t.unf.length) return '';
+    return '<div class="pp-block">' + h({ strs: { title: isStatic ? 'pp.end.nd.title' : 'pp.end.rv.list', meta: one('pp.end.n.litters', t.unf.length) }, args: { meta: { n: t.unf.length } } }) +
+      rows(t.unf.map(function (l) { var p = unfinishedParts(l); return litterRow(l, p.l1, p.toks, { static: isStatic }); }).join('')) + '</div>';
+  }
+  function notDoneFacts(t) {
+    return UI.facts([
+      { label: '', strs: { label: 'pp.end.f.owed', value: 'pp.end.f.n', meta: t.missed ? 'pp.end.f.missed' : undefined }, args: { value: { n: t.owed }, meta: { n: t.missed } } },
+      { label: '', strs: { label: 'pp.end.f.ahead', value: 'pp.end.f.n' }, args: { value: { n: t.ahead } } }
+    ], { columns: 2 });
+  }
+  function reviewSheet() {
+    var t = totals(), why = blocked(), body = '';
+    why.forEach(function (w) {
+      var route = w.kind === 'farrowing'
+        ? UI.row({ title: '', action: 'farrowing', strs: { title: 'pp.end.rv.farrowing', description: 'pp.end.rv.farrowing.desc' }, args: { title: { n: UNIT }, description: { code: w.code } } })
+        : UI.row({ title: '', action: 'open-litter', value: w.code, strs: { title: 'pp.room.code', description: 'pp.end.rv.draft.row' }, args: { title: { code: w.code } } });
+      body += '<div class="pp-block">' + UI.panel(h({ strs: { title: w.kind === 'farrowing' ? 'pp.end.rv.blocked' : one('pp.end.rv.draft', 1), description: w.kind === 'farrowing' ? 'pp.end.rv.blocked.why' : 'pp.end.rv.draft.why' }, args: { title: { n: 1 }, description: { code: w.code } } })) + '</div>' + rows(route);
+    });
+    var n = t.unf.length, pd = t.owed + t.ahead;
+    var headId = !n ? 'pp.end.rv.none' : one(S.mandatory ? 'pp.end.rv.unf.m' : 'pp.end.rv.unf', n);
+    body += UI.panel(h({ strs: { title: headId, description: n ? (S.mandatory ? 'pp.end.rv.unf.desc.m' : 'pp.end.rv.unf.desc') : 'pp.end.rv.after.desc' }, args: { title: { n: n || t.litters }, description: { n: pd } } })) +
+      (n ? notDoneFacts(t) : '') + unfinishedBlock(t, false) +
+      (n ? '<div class="pp-block">' + h({ strs: { title: 'pp.end.rv.after', description: 'pp.end.rv.after.desc' } }) + '</div>' : '') +
+      ontimeBlock(t) + outcomesBlock('pp.end.out.title');
+    var foot = '<footer class="sheet-footer">' + '<button type="button" class="button secondary" data-action="close-sheet" ' + sa('act.back') + '>' + esc(PP.t('act.back')) + '</button>' +
+      (why.length ? '' : '<button type="button" class="button danger pp-hold" data-ds="Candidate:HoldButton" data-action="hold" aria-describedby="pp-hold-cap"' + (S.holding ? ' data-holding="static"' : '') + '>' +
+        S_('pp.end.act.end') + '<small id="pp-hold-cap" role="status" ' + sa(S.holding ? 'pp.end.hold.keep' : 'pp.end.hold.caption') + '>' + esc(PP.t(S.holding ? 'pp.end.hold.keep' : 'pp.end.hold.caption')) + '</small></button>') + '</footer>';
+    return sheetFrame('pp.end.title', {}, 'pp.end.rv.scope', { n: UNIT, k: t.litters }, body, foot);
+  }
+  function closeFooter() {
+    return '<footer class="sheet-footer"><button type="button" class="button secondary" data-action="close-sheet" ' + sa('act.close') + '>' + esc(PP.t('act.close')) + '</button></footer>';
+  }
+  function receiptSheet() {
+    var t = totals(), n = t.unf.length;
+    var headId = !n ? 'pp.end.rc.none' : one(S.mandatory ? 'pp.end.rc.head.m' : 'pp.end.rc.head', n);
+    var body = UI.panel(h({ strs: { title: headId, description: 'pp.end.rc.desc' }, args: { title: { n: n || t.litters } } })) +
+      UI.facts([
+        { label: '', strs: { label: 'pp.end.f.finished', value: 'pp.end.f.of' }, args: { value: { n: t.litters - n, k: t.litters } } },
+        { label: '', strs: { label: 'pp.end.f.unfinished', value: 'pp.end.f.n' }, args: { value: { n: n } } }
+      ], { columns: 2 }) +
+      (n ? notDoneFacts(t) : '') + unfinishedBlock(t, true) + ontimeBlock(t) + outcomesBlock('pp.end.out.title') +
+      rows(UI.row({ title: '', action: 'handoff', strs: { title: 'pp.end.w.title', description: 'pp.end.w.row' }, args: { description: { n: t.alive } } }));
+    return sheetFrame('pp.end.rc.title', {}, 'pp.end.stamp', stampArgs(ENDED.at, ENDED.who), body, closeFooter());
+  }
+  function handoffSheet() {
+    var t = totals(), ls = loss(), unid = F.litters.filter(function (l) { var i = ident(l); return !i.done; });
+    // Not done at End, grouped by dose and why.
+    var groups = [];
+    F.litters.filter(unfinishedAtEnd).forEach(function (l) {
+      litterSums(l).ds.forEach(function (d) {
+        var kind = d.missed ? 'missed' : d.owed ? 'owed' : d.ahead ? 'ahead' : ''; if (!kind) return;
+        var g = groups.filter(function (x) { return x.k === d.k && x.kind === kind; })[0];
+        if (!g) { g = { k: d.k, kind: kind, n: 0, codes: [] }; groups.push(g); }
+        g.n += d.owed + d.ahead; g.codes.push(l.code);
+      });
+    });
+    var nd = groups.map(function (g) {
+      return UI.row({ title: '', strs: { title: 'pp.end.u.' + g.kind, description: 'pp.end.codes' }, args: { title: { name: dose(g.k), n: g.n }, description: { list: g.codes.join(' ') } } });
+    }).join('');
+    var body = UI.facts([
+      { label: '', strs: { label: 'pp.end.w.alive', value: one('pp.common.unit.piglet', t.alive), meta: 'pp.end.w.alive.meta' }, args: { value: { n: t.alive } } },
+      { label: '', strs: { label: 'pp.end.w.identified', value: 'pp.end.f.of', meta: unid.length ? 'pp.end.w.unid' : undefined }, args: { value: { n: t.identified, k: t.alive }, meta: unid.length ? { code: unid.map(function (l) { return l.code; }).join(' '), n: sum(unid, function (l) { var i = ident(l); return i.of - i.have; }) } : undefined } },
+      { label: '', strs: { label: 'pp.end.w.weights', value: 'pp.end.f.of', meta: 'pp.end.w.weights.meta' }, args: { value: { n: t.weighed, k: t.litters }, meta: { n: WEIGH_DAY } } },
+      { label: '', strs: { label: 'pp.end.out.loss', value: 'pp.end.out.open', meta: ls.n ? 'pp.end.codes' : undefined }, args: { value: { n: ls.n }, meta: { list: ls.codes.join(' ') } } }
+    ], { columns: 2 }) +
+      (nd ? '<div class="pp-block">' + h({ strs: { title: 'pp.end.nd.title', meta: 'pp.end.w.pd' }, args: { meta: { n: t.owed + t.ahead } } }) + rows(nd) + '</div>' : '') +
+      UI.panel(h({ strs: { title: 'pp.end.w.note' } }));
+    return sheetFrame('pp.end.w.title', {}, 'pp.end.w.desc', { n: UNIT }, body, closeFooter());
+  }
+
+  /* ---- render ---- */
+  var screen = document.getElementById('screen'), phone = document.getElementById('phone');
+  function render() {
+    if (S.ended) { F = FIX.late; }
+    screen.innerHTML = (S.ended ? endedFace() : overview()) +
+      (S.sheet === 'review' ? reviewSheet() : S.sheet === 'receipt' ? receiptSheet() : S.sheet === 'handoff' ? handoffSheet() : '');
+    phone.classList.toggle('pp-locked', !!S.sheet);
+    var b = screen.querySelector('.task-return'); if (b) b.setAttribute('data-str-attr', 'aria-label:act.back');
+    PP.apply(screen);
+  }
+
+  /* ---- URL and history: every view is a state; a drawer is one history entry ---- */
+  function stateName() {
+    if (S.ended) return S.sheet === 'receipt' ? 'receipt' : S.sheet === 'handoff' ? 'weaning-handoff' : S.since ? 'ended-correct' : 'ended';
+    if (S.sheet === 'review') return blocked().length ? (S.draft ? 'end-blocked-draft' : 'end-blocked') : 'end-review';
+    return 'overview';
+  }
+  function url() {
+    var p = new URLSearchParams(location.search); p.set('state', stateName());
+    if (!S.ended && S.fix !== (STATES[stateName()] || {}).fix) p.set('data', S.fix); else p.delete('data');
+    return location.pathname + '?' + p.toString();
+  }
+  function openSheet(name) { S.sheet = name; S.opened = Date.now(); try { history.pushState({ sheet: name }, '', url()); } catch (e) {} render(); }
+  function closeSheet() {
+    stopHold(); var st = history.state;
+    if (st && st.sheet && !st.deep) { history.back(); return; }
+    S.sheet = ''; S.holding = false; try { history.replaceState({}, '', url()); } catch (e) {} render();
+  }
+  window.addEventListener('popstate', function (ev) { stopHold(); S.sheet = (ev.state && ev.state.sheet) || ''; S.holding = false; render(); });
+  if (S.sheet) { try { history.replaceState({ sheet: S.sheet, deep: true }, '', location.href); } catch (e) {} }
+
+  function lang(u) { return u + (PP.lang === 'zh' ? (u.indexOf('?') >= 0 ? '&' : '?') + 'lang=zh' : ''); }
+  function litterHref(code) { return lang('litter.html?state=litter&crate=' + code + (S.ended ? '&task=ended' : '')); }
+
+  /* ---- hold to End: 850ms; release, cancel, blur, leaving the view or Escape cancels; a tap does nothing ---- */
+  var holdTimer = 0, holdEl = null;
+  function caption(id) { var c = holdEl && holdEl.querySelector('small'); if (c) { c.setAttribute('data-str', id); c.textContent = PP.t(id); } }
+  function startHold(el) {
+    if (holdEl) return; holdEl = el; el.setAttribute('data-holding', ''); caption('pp.end.hold.keep');
+    holdTimer = setTimeout(function () { var ok = holdEl === el && el.isConnected; stopHold(); if (ok) commitEnd(); }, 850);
+  }
+  function stopHold() { clearTimeout(holdTimer); if (holdEl) { holdEl.removeAttribute('data-holding'); caption('pp.end.hold.caption'); } holdEl = null; }
+  // The final End rechecks every litter: a farrowing reopened or a draft saved elsewhere since the review opened blocks it here.
+  function commitEnd() {
+    if (blocked().length) { render(); return; }
+    S.ended = true; S.sheet = 'receipt'; S.holding = false;
+    try { history.replaceState({ sheet: 'receipt', deep: true }, '', url()); } catch (e) {}
+    render();
+  }
+  screen.addEventListener('pointerdown', function (ev) {
+    var el = ev.target.closest('.pp-hold'); if (!el || ev.button !== 0) return;
+    if (el.getAttribute('data-holding') === 'static') el.removeAttribute('data-holding');
+    try { el.setPointerCapture(ev.pointerId); } catch (e) {}
+    startHold(el);
+  });
+  ['pointerup', 'pointercancel'].forEach(function (n) { screen.addEventListener(n, function () { stopHold(); }); });
+  screen.addEventListener('focusout', function (ev) { if (ev.target === holdEl) stopHold(); });
+  window.addEventListener('blur', stopHold);
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState !== 'visible') stopHold(); });
+  screen.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') { if (holdEl) { stopHold(); return; } if (S.sheet) closeSheet(); return; }
+    var el = ev.target.closest && ev.target.closest('.pp-hold');
+    if (el && (ev.key === ' ' || ev.key === 'Enter')) { ev.preventDefault(); if (!ev.repeat) startHold(el); }
+  });
+  screen.addEventListener('keyup', function (ev) { if (ev.target.closest && ev.target.closest('.pp-hold') && (ev.key === ' ' || ev.key === 'Enter')) { ev.preventDefault(); stopHold(); } });
+
+  screen.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-action]'); if (!b) return;
+    var a = b.dataset.action, v = b.dataset.value;
+    if (a === 'hold') return;
+    if (a === 'scrim') { if (Date.now() - S.opened < 300) return; closeSheet(); return; }
+    if (a === 'close-sheet') { closeSheet(); return; }
+    if (a === 'back') { location.href = S.ended ? lang('index.html') : lang('room.html?state=room'); return; }
+    if (a === 'review') { openSheet('review'); return; }
+    if (a === 'receipt') { openSheet('receipt'); return; }
+    if (a === 'handoff') { openSheet('handoff'); return; }
+    if (a === 'open-litter') { location.href = litterHref(v); return; }
+    if (a === 'farrowing') { location.href = '/ux/system/farrowing-astra-concept.html'; return; }
+  });
+
+  var boot = PP.ready.then(render);
+  // The one registry exception: when the registry itself failed to load there is nothing to look strings up in.
+  boot.catch(function () {
+    screen.innerHTML = '<p>Couldn’t load the task.</p><button type="button" onclick="location.reload()">Retry</button>';
+  });
+})();
+</script>
+</body>
+</html>

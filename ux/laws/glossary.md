@@ -103,3 +103,31 @@ Recency words on a row come from the record's timestamp: `1h ago` under a day, `
 **Last record (header).** The newest stamped event of any kind in the room: a treatment, a Set count, a Move, a death or an Edit, printed with its own words (`Set count 11 · D03 · 1h ago · G.H`), so a just-made record stays findable after its row departs.
 
 **Rail glyphs.** Every litter row ends in `›`, done rows included: RULINGS "Names and glyphs" reserves ✎ for editing a locked figure (one glyph, one meaning), and RULINGS outranks the README row law's ✎-when-done. This reverses the round-1 decline.
+
+## End task, the ended task and the weaning handoff (仔猪处理 · 结束任务)
+
+Slice S9 (`end.html`). *Unfinished litters* and *Unfinished piglet-doses* keep the definitions above (the not-yet-due line is provisional). A **treatment** here is one litter × one scheduled dose (the unit a mark is dated on); a **piglet-dose** (头次) is one piglet × one scheduled dose.
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Done** 已处理 (progress, per-litter `done {n}`) | piglet-doses | piglets a Record marked for a scheduled dose (castration counts males) | cumulative to now | whole task / one litter |
+| **Owed** 待处理 (progress, per-litter `owed {n}`) | piglet-doses | Owed as defined above: due today, late or missed; red on a litter row when any of it is late | now | whole task / one litter; `{n} missed` is the missed part, shown inside it |
+| **Not yet due** 未到期 (progress, `ahead {n}`) | piglet-doses | scheduled doses whose due day-age is still ahead | now | whole task / one litter |
+| **Whole-task progress total** (`{n} piglet-doses`) | piglet-doses | Done + Owed + Not yet due | now | whole task |
+| **Identity done** 标识完成 (`{n} of {k}`) | litters | litters whose identity step is done under the farm's done rule | now | whole task; k = litters in the task |
+| **On-time treatments** 准时处理率 (`{n}%`, `{n} of {k} treatments`) | treatments | on time: recorded fully on or before the planned day (early counts as on time) ÷ treatments recorded or past their planned day (late, owed-late and missed count against; due today and not yet due are left out) | now in the overview; at End in the review and receipt | whole task. Not on the room |
+| **Late or missed** 延迟或已过处理期 | treatments | k − n of the on-time line | as above | whole task |
+| **Piglet deaths** 仔猪死亡 (outcomes) | piglets | deaths recorded in processing (farrowing's deaths belong to farrowing), crate codes listed | cumulative, task start to now (receipt: to End) | whole task |
+| **Piglets moved** 转移仔猪 | piglets | piglets carried by Move records inside the task, each move printed `from → to` | as above | whole task |
+| **Unexplained loss / gain** (outcomes, `{n} open`) | heads | open unexplained items, as on the room header | now (receipt: at End) | whole task |
+| **Sow deaths** 母猪死亡 | sows | sows of the task's litters recorded dead | as above | whole task |
+| **Finished litters** 已完成的窝 (receipt) | litters | litters in the task that are not Unfinished litters | frozen at End | one batch |
+| **Not done at End** 结束时未完成 (`{name} · {n} not done`) | piglet-doses | the unfinished piglet-doses of one litter, final: `owed at End`, `window ended day n` (missed) or `not due at End` | frozen at End | one litter; after End they can no longer be recorded |
+| **Since End** 结束后的记录 | records | corrections (Edit) and identity rows written after End, stamped; they change the live litter, never the receipt | after End | whole task |
+| **Alive** 存活 (handed to weaning) | piglets | the ledger's Alive, summed | now, live (not the End snapshot) | whole task |
+| **Identified** 已标识 (handed to weaning, `{n} of {k}`) | piglets | identified alive piglets of k alive | now | whole task |
+| **Litter weights** 窝重 (handed to weaning, `{n} of {k}`) | litters | litters with a weigh-day litter weight | now | whole task; k = litters |
+
+**Receipt figures describe the closure event.** Everything on the receipt is as at End; the litter records stay live, so the ended face (`Since End`, `{n} identified after End`, an amber corrected value) can differ from the receipt. The handoff to weaning reads the live ledger.
+
+**Mandatory changes words only.** `Mandatory · {n} litters unfinished` and `… will be reported not done` replace the plain lines; End is never blocked by it.
