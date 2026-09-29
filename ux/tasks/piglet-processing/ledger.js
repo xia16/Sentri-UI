@@ -1991,8 +1991,9 @@ function moveDraftSelect(derived, draft, stamp) {
   if (!r.ok) return { n, max: maxN, why: r.reason, event: null, delta: null, carry: {}, asks: [], sourceAfter: [] };
   const mv = r.derived.litters[R.id].moves[r.derived.litters[R.id].moves.length - 1];
   const mv0 = blank.ok ? blank.derived.litters[R.id].moves[blank.derived.litters[R.id].moves.length - 1] : mv;
-  // doses not yet due at the receiver are left out: nothing is carried, asked or ranged for them
-  const dueHere = (d) => R.dayAge == null || R.dayAge >= d.due;
+  // doses not yet due for the moved piglets are left out: nothing is carried, asked or ranged for them. Their own age decides
+  // (the source's), never the receiver's (R1-4)
+  const dueHere = (d) => S.dayAge == null || S.dayAge >= d.due;
   const doses = derived.config.doses.filter(dueHere);
   const asks = doses.filter((d) => !d.visible && mv0.packets[d.id] === 'unknown').map((d) => d.id);
   const carry = {};
