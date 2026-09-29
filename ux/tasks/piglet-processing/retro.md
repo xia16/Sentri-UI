@@ -196,3 +196,16 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
 - **Change:** the lint should start its own server on a free port unless told
   to reuse one; the skill should say worktrees need the scripts by path.
 - **Cost:** low (caught before dispatch).
+
+## 14 · Slices — lint calibration never rendered the component bundle
+
+- **Stage:** Slices, S10 (first slice screens).
+- **What happened:** every strict slice page failed the lint with 164 errors,
+  all from the design system's own components (spacing 5 / 9 / 10, radius 6).
+  Start's calibration ran only on farrowing and inspection, which use their
+  own prototype CSS, never `bundle.css`, so the bundle's drift was invisible
+  until a designer built from it — the one path the loop mandates.
+- **Change:** calibrate the lint on the design system's own card previews too
+  (every `components/*/preview.html`), and treat drift found there as the
+  design system's, reported once, never charged to a slice.
+- **Cost:** medium (a designer's lint run spent; config patched by the driver).

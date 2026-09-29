@@ -20,7 +20,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
   ],
   "locales": ["en", "zh"],
   "locale_param": "lang",
-  "allow": { "spacing": [2, 4, 6, 8, 20] },
+  "allow": { "spacing": [2, 4, 5, 6, 8, 9, 10, 20], "radius": [6] },
   "reference_tasks": ["farrowing"],
   "pages": [
     { "name": "farrowing", "url": "ux/system/farrowing-astra-concept.html", "locales": ["en"],
@@ -39,3 +39,8 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
   marked `"strict": true` so every string needs a registry id.
 - `allow.spacing` holds the small steps the component cards name (rules,
   icon gaps, the sheet body's 20px top) that `tokens.json` does not list yet.
+- `allow` also holds **component-owned drift** found by the first slice:
+  spacing 5 (Facts `dt`, Heading description), 9 (`.field` gap), 10
+  (`sheet-footer`, `utility-header` gaps) and radius 6 (Heading action). They
+  come from the bundle, not from any task; a slice must not use them in its
+  own CSS. Removing them is design-system cleanup (map #3, *Not yet specified*).
