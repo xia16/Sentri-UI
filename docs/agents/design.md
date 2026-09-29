@@ -165,6 +165,8 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-count-count-recount", "url": "ux/tasks/piglet-processing/count.html?state=count-recount", "strict": true },
     { "name": "pp-count-count-weaned", "url": "ux/tasks/piglet-processing/count.html?state=count-weaned", "strict": true },
     { "name": "pp-count-count-ended", "url": "ux/tasks/piglet-processing/count.html?state=count-ended", "strict": true },
+    { "name": "pp-count-count-kept-newer", "url": "ux/tasks/piglet-processing/count.html?state=count-kept-newer", "strict": true },
+    { "name": "pp-count-explain-pick", "url": "ux/tasks/piglet-processing/count.html?state=explain-pick", "strict": true },
     { "name": "pp-move-move-explain-gain", "url": "ux/tasks/piglet-processing/move.html?state=move&crate=B08&dir=in&n=1&explains=,C-B08-gain&data=explain", "strict": true },
     { "name": "pp-count-count-conflict", "url": "ux/tasks/piglet-processing/count.html?state=count-conflict", "strict": true },
     { "name": "pp-count-explain", "url": "ux/tasks/piglet-processing/count.html?state=explain", "strict": true },

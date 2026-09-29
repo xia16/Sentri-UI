@@ -471,6 +471,13 @@ export const VARIANTS = {
   // recorded a crushed piglet at 09:45 (a new body, not one of the missing); L.M's phone, offline since
   // before both, counted 12 at 09:50 and synced at 10:20 — the later count stands, the two never sum, and
   // hers crossed a death it did not see (sync review).
+  // explain-named: L.M found 10 in B06 and named two tagged piglets missing (271002, 271004); B08 has 1 extra —
+  // the suggested Move carries 1, so the worker picks which named piglet it is
+  'explain-named': V((b) => {
+    base(b);
+    b.count('B06', sep(29, '09:50'), 'L.M', 10, { baseAlive: 12, id: 'C-B06-named', missingRows: ['B06-r2', 'B06-r4'] });
+    b.count('B08', sep(29, '09:55'), 'L.M', 10, { baseAlive: 9, id: 'C-B08-gain' });
+  }),
   'gain-b08': V((b) => { base(b); b.count('B08', sep(29, '09:55'), 'L.M', 10, { baseAlive: 9, id: 'C-B08-gain' }); }),
   'count-offline': V((b) => {
     base(b); const seen = b.ids();

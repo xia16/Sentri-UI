@@ -76,6 +76,30 @@ try {
   assert.doesNotMatch(await rowText(page, 'B06'), /loss/); assert.doesNotMatch(await rowText(page, 'B08'), /gain/);
   console.log('ok 5 both lines closed:', strip2);
 
+  // 6. A gain line's `Move from another crate`: the source with an open loss is flagged; the worker pairs it; both close.
+  await page.goto(base + 'count.html?state=explain&crate=B08&data=explain&fresh=1'); await ready(page);
+  await page.click('[data-action="move-in"]');
+  await page.waitForURL(/move\.html/); await ready(page);
+  const b06 = page.locator('[data-action="pick-crate"][data-value="B06"]').first();
+  assert.match((await b06.innerText()).replace(/\s+/g, ' '), /loss 1 open/);
+  await b06.click();
+  await page.click('[data-action="pair-loss"]');
+  assert.match(await text(page, '[role="dialog"]'), /Closes 1 unexplained loss and 1 gain/);
+  await page.click('[data-action="save-move"]');
+  await page.goto(base + 'room.html?state=room&lens=all&data=explain'); await ready(page);
+  const strip3 = await text(page, '[data-ds="Candidate:DriftStrip"]');
+  assert.doesNotMatch(strip3, /B06|B08/);
+  console.log('ok 6 gain line → Move from another crate, paired with B06\'s loss:', strip3);
+
+  // 7. Two offline counts that never saw each other: neither stands; the litter asks for a new count, which settles it.
+  await page.goto(base + 'count.html?state=count-conflict&fresh=1'); await ready(page);
+  assert.match(await text(page, '#screen'), /Two counts disagree/);
+  await page.click('[data-action="open-count"][data-value="A07"]');
+  await page.click('[data-action="save"]');
+  await page.waitForTimeout(450);
+  assert.doesNotMatch(await text(page, '#screen'), /Two counts disagree/);
+  console.log('ok 7 two counts disagree → count again settles it:', await text(page, '.pp-receipt'));
+
   await browser.close();
 } finally {
   server.kill();

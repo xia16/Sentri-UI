@@ -55,13 +55,15 @@
     'count-gain':      { view: 'host', crate: 'A02', save: 13 },
     'count-recount':   { view: 'count', crate: 'D03', observed: 13 },
     'count-named':     { view: 'count', crate: 'B06', observed: 8 },
-    'count-kept':      { view: 'host', crate: 'A02', kept: { observed: 10, rows: [], at: '2026-09-29T06:00' } },
+    'count-kept':      { view: 'host', crate: 'A02', kept: { observed: 10, rows: [], at: '2026-09-29T06:00', ageMin: 270 } },
+    'count-kept-newer': { view: 'count', crate: 'A02', data: 'drift', kept: { observed: 10, rows: [], at: '2026-09-29T08:50', ageMin: 20, seen: [] } },
     'count-prelock':   { view: 'count', crate: 'D01' },
     'count-weaned':    { view: 'count', crate: 'D02' },
     'count-ended':     { view: 'count', crate: 'A02', data: 'ended' },
     'count-conflict':  { view: 'host', crate: 'A07', data: 'count-offline' },
     'explain':         { view: 'explain', crate: 'B06', data: 'explain' },
     'explain-suggest': { view: 'suggest', crate: 'B06', data: 'explain', line: 'C-B06-loss', pick: 'C-B08-gain' },
+    'explain-pick':    { view: 'suggest', crate: 'B06', data: 'explain-named', line: 'C-B06-named', pick: 'C-B08-gain' },
     'explain-open':    { view: 'explain', crate: 'D03' },
     'explain-room':    { view: 'explain', room: 7, data: 'explain' }
   };
@@ -82,15 +84,24 @@
   }
   function explain() { return store.select.explain(store.derived, S.room ? { room: S.room } : { litter: crate }, { who: window.PPFixtures.ME }); }
   function dirty() { return S.observed !== draft().base || S.rows.length > 0; }
-  function minsSince(at) { return Math.round((Date.parse(NOW) - Date.parse(at)) / 60000); }
-  function stale() { return !!S.at && minsSince(S.at) > STALE_MIN; }
+  function countIds() { return L().counts.map(function (c) { return c.id; }); }
+  /* A kept count is stale when a newer count reached this phone after it was observed (same-device order: the counts it had
+     seen, never clocks between devices), or when this phone's own clock, read now, says it is older than a visit. Once stale,
+     Save waits until the count is touched again (a fresh observation). */
+  function stale() {
+    if (!S.at) return null;
+    var newer = L().counts.filter(function (c) { return (S.seen || []).indexOf(c.id) < 0; });
+    if (newer.length) return { kind: 'newer', c: newer[newer.length - 1] };
+    if (Date.now() - (S.obsMs || 0) > STALE_MIN * 60000) return { kind: 'old' };
+    return null;
+  }
 
-  /* ---- the draft stays on this phone with its observation time, saved on every change (sessionStorage); a state that
-     shows a kept draft holds it in memory only ---- */
+  /* ---- the draft stays on this phone with its observation time and the counts it had seen, saved on every change
+     (sessionStorage); a state that shows a kept draft holds it in memory only ---- */
   var DKEY = function () { return 'pp-count-draft:' + store.name + ':' + crate; };
-  var mem = spec.kept ? { d: spec.kept } : null;
+  var mem = spec.kept ? { d: null } : null;
   function keepDraft() {
-    var d = dirty() ? { observed: S.observed, rows: S.rows.slice(), at: S.at } : null;
+    var d = dirty() ? { observed: S.observed, rows: S.rows.slice(), at: S.at, obsMs: S.obsMs, seen: S.seen } : null;
     if (mem) { mem.d = d; return; }
     try { if (d) sessionStorage.setItem(DKEY(), JSON.stringify(d)); else sessionStorage.removeItem(DKEY()); } catch (e) {}
   }
@@ -129,7 +140,11 @@
     var base = 'pp.count.line.' + l.kind + (l.open < l.qty ? '_part' : '') + (withCode ? '_code' : '');
     return { id: base, args: { np: np(l.open), qp: np(l.qty), code: l.litter } };
   }
-  function lineStamp(l) { return { id: 'pp.count.line.stamp', args: { op: np(l.observed), stamp: stamp(l.at, l.who), wp: np(l.aliveBefore) } }; }
+  // the base the difference was taken from; a recount names the count whose line it replaced
+  function lineStamp(l) {
+    if (l.replaced) return { id: 'pp.count.line.recount', args: { rp: np(l.replaced.observed), op: np(l.observed), stamp: stamp(l.at, l.who) } };
+    return { id: 'pp.count.line.stamp', args: { op: np(l.observed), stamp: stamp(l.at, l.who), wp: np(l.sizedAgainst) } };
+  }
 
   /* ---- the litter host: the shared header, the ledger's figures, the tools, the open line and the counts ---- */
   function hostHead() {
@@ -172,6 +187,7 @@
     var facts = UI.facts(list.slice(0, 3).map(function (k) {
       var ev = eventOf(k.id) || {}, rest;
       if (k.late) rest = PP.t('pp.count.c.late');
+      else if (k.disputed && !k.supersededBy) rest = PP.t('pp.count.c.disputed');
       else if (k.crossed.length) rest = PP.t('pp.count.c.phone', { who: k.who, bp: np(k.baseAlive) });
       else if (k.wrote < 0) rest = PP.t('pp.count.c.loss', { kp: np(-k.wrote) });
       else if (k.wrote > 0) rest = PP.t('pp.count.c.gain', { kp: np(k.wrote) });
@@ -182,7 +198,13 @@
         pigs(k.observed).id, pigs(k.observed).args, meta[0], meta[1]);
     }), { columns: 1 });
     var out = '<section class="ct-group">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.count.c.title' } }) + facts;
-    if (c.review) {
+    if (c.conflict) {
+      // two counts disagree (neither saw the other): neither stands until a count that saw both
+      var list = c.counts.filter(function (k) { return c.disputed.indexOf(k.id) >= 0; })
+        .map(function (k) { return PP.t('pp.count.review.one', { who: k.who, np: np(k.observed) }); }).join(' · ');
+      out += UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.review.conflict', description: 'pp.count.review.conflict_desc' }, args: { description: { list: list } } }) +
+        UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.review.again', titleArgs: { code: crate }, desc: 'pp.count.review.conflict_again' }));
+    } else if (c.review) {
       var st = c.counts.filter(function (k) { return k.stands; })[0];
       var desc, dargs = { np: np(st.observed) };
       if (st.crossed.length) {
@@ -245,7 +267,9 @@
   }
   function pointer(d) {
     if (S.failed) return { id: 'pp.count.why.failed' };
-    if (stale()) return { id: 'pp.count.why.stale', args: { t: when(S.at), ago: U.ago(S.at, NOW) } };
+    var st = stale();
+    if (st && st.kind === 'newer') return { id: 'pp.count.why.newer', args: { who: st.c.who, np: np(st.c.observed), t: when(st.c.at) } };
+    if (st) return { id: 'pp.count.why.stale', args: { t: when(S.at) } };
     if (d.why === 'name_the_rows') return { id: pl('pp.count.why.rows', d.needRows - d.picked.length), args: { n: d.needRows - d.picked.length } };
     if (d.why === 'too_many_rows') return { id: pl('pp.count.why.too_many', d.maxRows), args: { n: d.maxRows } };
     if (d.why) return { id: 'pp.count.why.check' };
@@ -351,8 +375,10 @@
   function suggestDrawer() {
     var p = suggestion();
     if (!p) { S.view = 'explain'; return ''; }
-    var l = p.l, s = p.s, m = s.move, loss = l.kind === 'loss' ? l : s, gain = l.kind === 'loss' ? s : l;
-    var mv = store.select.moveDraft(store.derived, m, { who: window.PPFixtures.ME });
+    var l = p.l, s = p.s, m = moveOf(s), loss = l.kind === 'loss' ? l : s, gain = l.kind === 'loss' ? s : l;
+    var picked = !s.pickFrom || S.pickRows.length === m.n;
+    // before the pick, the figures are the replay's with the first named rows (Alive after does not depend on which)
+    var mv = store.select.moveDraft(store.derived, picked ? m : Object.assign({}, m, { rows: s.pickFrom.slice(0, m.n) }), { who: window.PPFixtures.ME });
     var cross = loss.room !== gain.room;
     var side = function (y, kind) {
       return fact(cross ? 'pp.count.sg.side_unit' : 'pp.count.sg.side', { code: y.litter, u: y.room },
@@ -362,11 +388,22 @@
     var body = UI.facts([side(loss, 'loss'), side(gain, 'gain')], { columns: 2 }) +
       UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.sg.if', description: 'pp.count.sg.alive' },
         args: { title: { np: np(m.n), effect: effect(s) }, description: { a: m.from, xp: mv.delta ? np(mv.delta.from[1]) : '', b: m.to, yp: mv.delta ? np(mv.delta.to[1]) : '' } } });
-    return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="medium" data-sizing="content" role="dialog" aria-modal="true">' +
+    // more named missing piglets than the Move carries: the worker picks which (never the app)
+    if (s.pickFrom) {
+      var rows = L(loss.litter).identity.rows;
+      body += '<section class="ct-group" data-target="pick">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: pl('pp.count.sg.pick', m.n) }, args: { title: { n: m.n, code: loss.litter } } }) +
+        UI.choiceGroup(s.pickFrom.map(function (id) {
+          var r = rows.filter(function (x) { return x.rowId === id; })[0] || { tag: id }, lb = rowLabel(r);
+          return UI.choiceRow({ label: '', mode: 'multi', action: 'pick-named', value: id, selected: S.pickRows.indexOf(id) >= 0, strs: { label: lb.id }, args: { label: lb.args } });
+        })) + '</section>';
+    }
+    var summary = picked ? '' : '<div class="ct-summary" role="status">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: pl('pp.count.why.pick', m.n) }, args: { title: { n: m.n } } }) + '</div>';
+    return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Sheet" data-st-context="drawer"' + (s.pickFrom ? ' data-size="long"' : ' data-size="medium" data-sizing="content"') + ' role="dialog" aria-modal="true">' +
       '<header class="utility-header"><div class="pp-hdr-title"><h3>' + span(t, { code: s.litter, np: np(s.open), u: s.room }) + '</h3><p>' + span('pp.count.sg.sub') + '</p></div></header>' +
-      '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
-      '<footer class="sheet-footer ct-bar">' + button('secondary', 'back', 'act.back') + button('primary', 'open-move', 'pp.count.sg.move', { n: m.n, from: m.from, to: m.to }, !mv.event) + '</footer></section>';
+      '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' + summary +
+      '<footer class="sheet-footer ct-bar">' + button('secondary', 'back', 'act.back') + button('primary', 'open-move', 'pp.count.sg.move', { n: m.n, from: m.from, to: m.to }, !picked || !mv.event) + '</footer></section>';
   }
+  function moveOf(s) { return s.pickFrom ? Object.assign({}, s.move, { rows: S.pickRows.slice() }) : s.move; }
 
   function render() {
     var html;
@@ -388,10 +425,13 @@
   function openCount(c) {
     if (c && c !== crate) { nav('count.html', { state: 'count', crate: c }); return; }
     var k = keptDraft();
-    S.rows = k ? k.rows.slice() : []; S.at = k ? k.at : null; S.failed = false; S.view = 'count'; S.receipt = null;
+    S.rows = k ? k.rows.slice() : []; S.at = k ? k.at : null; S.obsMs = k ? k.obsMs : 0; S.seen = k ? k.seen : null;
+    S.failed = false; S.view = 'count'; S.receipt = null;
     S.observed = k ? k.observed : draft().base;
   }
-  function touch() { S.at = NOW; S.failed = false; }        // any change to the count is a fresh observation
+  // any change to the count is a fresh observation: its time (the stamp Save writes; this phone's clock for staleness)
+  // and the counts this phone had at that moment
+  function touch() { S.at = NOW; S.obsMs = Date.now(); S.seen = countIds(); S.failed = false; }
   function save() {
     var d = draft();
     if (!d.event) return false;
@@ -419,7 +459,7 @@
     var b = ev.target.closest('[data-action]');
     if (!b) return;
     var a = b.dataset.action, v = b.dataset.value;
-    if (a === 'pick-row') v = b.value;
+    if (a === 'pick-row' || a === 'pick-named') v = b.value;
     if (a === 'step') {
       if (b.getAttribute('aria-disabled') === 'true') return;
       S.observed = Math.max(0, S.observed + (+b.dataset.step)); touch();
@@ -427,7 +467,7 @@
       keepDraft();
     }
     else if (a === 'pick-row') { var i = S.rows.indexOf(v); if (i >= 0) S.rows.splice(i, 1); else S.rows.push(v); touch(); keepDraft(); }
-    else if (a === 'clear') { dropDraft(); S.observed = draft().base; S.rows = []; S.at = null; S.failed = false; }
+    else if (a === 'clear') { dropDraft(); S.observed = draft().base; S.rows = []; S.at = null; S.obsMs = 0; S.seen = null; S.failed = false; }
     else if (a === 'save') {
       if (b.getAttribute('aria-disabled') === 'true') { render(); if (draft().why === 'name_the_rows' || draft().why === 'too_many_rows') goTo('roster'); return; }
       save();
@@ -435,7 +475,11 @@
     else if (a === 'back') { if (back() === 'nav') return; }
     else if (a === 'open-count') openCount(v);
     else if (a === 'open-explain') { S.view = 'explain'; S.from = 'host'; S.room = 0; }
-    else if (a === 'suggest') { var p = v.split('|'); S.line = p[0]; S.pick = p[1]; S.view = 'suggest'; }
+    else if (a === 'suggest') { var p = v.split('|'); S.line = p[0]; S.pick = p[1]; S.pickRows = []; S.view = 'suggest'; }
+    else if (a === 'pick-named') {
+      var sgn = suggestion(), j = S.pickRows.indexOf(v);
+      if (j >= 0) S.pickRows.splice(j, 1); else if (sgn && S.pickRows.length < sgn.s.move.n) S.pickRows.push(v);
+    }
     else if (a === 'more') { S.more[v] = true; }
     else if (a === 'open-dead') { nav('dead.html', { state: 'dead', crate: v || crate, unit: qs.get('unit') }); return; }
     else if (a === 'move-in') {
@@ -443,8 +487,9 @@
       nav('move.html', { state: 'move', crate: gl.litter, dir: 'in', n: gl.open, explains: ',' + gl.id }); return;
     }
     else if (a === 'open-move' && S.view === 'suggest') {
-      var sg = suggestion(); if (!sg || b.getAttribute('aria-disabled') === 'true') return;
-      var m = sg.s.move;
+      var sg = suggestion(); if (!sg) return;
+      if (b.getAttribute('aria-disabled') === 'true') { if (sg.s.pickFrom) { render(); goTo('pick'); } return; }
+      var m = moveOf(sg.s);
       nav('move.html', { state: 'move-explain', crate: m.from, other: m.to, n: m.n, rows: m.rows.join(','), explains: m.explains.join(',') });
       return;
     }
@@ -464,15 +509,21 @@
     TODAY = store.today; NOW = store.today === window.PPFixtures.TODAY ? window.PPFixtures.NOW : store.today + 'T16:30';
     crate = qs.get('crate') || spec.crate || '';
     var room = +(qs.get('unit') || spec.room || 0);
-    S = { view: spec.view, observed: 0, rows: [], at: null, failed: false, receipt: null, more: {},
+    S = { view: spec.view, observed: 0, rows: [], at: null, obsMs: 0, seen: null, pickRows: [], failed: false, receipt: null, more: {},
       room: spec.view === 'explain' && !qs.get('crate') ? room : 0, line: spec.line || '', pick: spec.pick || '', from: '' };
     if (!L()) crate = 'A02';
+    if (spec.kept) {
+      var kk = spec.kept;
+      mem.d = { observed: kk.observed, rows: kk.rows || [], at: kk.at, obsMs: Date.now() - (kk.ageMin || 0) * 60000, seen: kk.seen || countIds() };
+    }
     if (S.view === 'count') {
       openCount();
-      if (spec.observed != null) { S.observed = spec.observed; S.at = NOW; }
+      if (spec.observed != null) { S.observed = spec.observed; touch(); }
     }
-    if (spec.save != null) { openCount(); S.observed = spec.save; S.at = NOW; save(); lastTap = 0; }
+    if (spec.save != null) { openCount(); S.observed = spec.save; touch(); save(); lastTap = 0; }
     render();
+    // staleness is read from this phone's clock at every check: re-check while the drawer is open
+    setInterval(function () { if (S.view === 'count') render(); }, 30000);
   });
 })();
 </script>
