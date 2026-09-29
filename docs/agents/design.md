@@ -20,7 +20,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
   ],
   "locales": ["en", "zh"],
   "locale_param": "lang",
-  "allow": { "spacing": [2, 3, 4, 5, 6, 7, 8, 9, 10, 17, 20], "radius": [2, 4, 6, 8, 9, 11, 13] },
+  "allow": { "spacing": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 17, 20], "radius": [2, 4, 6, 8, 9, 11, 13] },
   "reference_tasks": ["farrowing"],
   "pages": [
     { "name": "farrowing", "url": "ux/system/farrowing-astra-concept.html", "locales": ["en"],
@@ -28,11 +28,15 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "inspection", "url": "ux/system/inspection-astra-concept.html", "locales": ["en"],
       "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] },
     { "name": "pp-index", "url": "ux/tasks/piglet-processing/index.html", "strict": true },
+    { "name": "ds-field-cards", "url": "ux/design-system/components/field-cards-demo.html", "strict": true },
     { "name": "pp-edge-no-task", "url": "ux/tasks/piglet-processing/edge.html?state=no-task", "strict": true },
     { "name": "pp-edge-orphan", "url": "ux/tasks/piglet-processing/edge.html?state=orphan", "strict": true },
+    { "name": "pp-edge-orphan-unlocked", "url": "ux/tasks/piglet-processing/edge.html?state=orphan-unlocked", "strict": true },
     { "name": "pp-edge-prelock", "url": "ux/tasks/piglet-processing/edge.html?state=prelock", "strict": true },
     { "name": "pp-edge-birth-weight-missing", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-missing", "strict": true },
+    { "name": "pp-edge-birth-weight-entry", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-entry", "strict": true },
     { "name": "pp-edge-birth-weight-typed", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-typed", "strict": true },
+    { "name": "pp-edge-birth-weight-range", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-range", "strict": true },
     { "name": "pp-edge-birth-weight-set", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-set", "strict": true }
   ]
 }
@@ -49,6 +53,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
   spacing 3, 5, 7, 9, 10, 17 and radius 2, 4, 6, 8, 9, 11, 13 — every
   off-token value in `bundle.css` (scanned 2026-09-29; e.g. Facts `dt` 5,
   `.field` gap 9, footer gaps 10, `.button` padding 17 / gap 7, Heading
-  action radius 6). They
+  action radius 6), plus 1 — the browser's default button padding the bundle
+  does not reset. They
   come from the bundle, not from any task; a slice must not use them in its
   own CSS. Removing them is design-system cleanup (map #3, *Not yet specified*).

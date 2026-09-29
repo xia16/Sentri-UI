@@ -159,7 +159,97 @@ export interface IconButtonProps {
   args?: StrArgs<'badge'>;
 }
 
+/** Candidate. `− n +`: each key is `<button data-action data-value=key data-step="-1|1">`.
+ *  A key at the floor (− at min) or ceiling (+ at max) is aria-disabled (the floor-gray), still tappable. */
+export interface StepperProps {
+  label: string;
+  /** One muted line under the label, e.g. "among 11 alive". */
+  description?: string;
+  /** Always prints; 0 prints in muted. */
+  value: number;
+  /** Floor; default 0. */
+  min?: number;
+  /** Ceiling; omit when + is free. */
+  max?: number;
+  /** Sent as data-value. */
+  key?: string;
+  /** Default "step". */
+  action?: string;
+  /** row: 60px sheet row (default) · hero: the count sheet's one number. */
+  variant?: 'row' | 'hero';
+  /** changed: a corrected value in Edit, amber. */
+  tone?: 'changed';
+  /** One line under the row: the floor pointer, or the hero's receipt. */
+  hint?: string;
+  /** Id of the label element; generated when omitted. */
+  id?: string;
+  className?: string;
+  /** value gets args {n} automatically; decrease/increase are the keys' aria-labels (data-str-attr). */
+  strs?: Strs<'label' | 'description' | 'value' | 'hint' | 'decrease' | 'increase'>;
+  args?: StrArgs<'label' | 'description' | 'value' | 'hint' | 'decrease' | 'increase'>;
+}
+
+/** Candidate. A measured value with its unit; the box is `<button data-action="open-numpad" data-value=key>`. */
+export interface MeasureProps {
+  label: string;
+  /** A muted word beside the label, e.g. "Optional". */
+  optional?: string;
+  /** The typed string ("16.8"); empty prints the placeholder. Missing is not zero. */
+  value?: string;
+  /** Always written, e.g. "kg". */
+  unit: string;
+  /** Default "—". */
+  placeholder?: string;
+  key?: string;
+  /** Default "open-numpad". */
+  action?: string;
+  /** The Numpad is open beneath it: ink border and caret. */
+  active?: boolean;
+  /** Soft range [min, max]: outside it the tone becomes warn (the value still records). */
+  range?: [number, number];
+  /** warn: soft amber hint · refused: struck amber, not recorded · changed: corrected in Edit. */
+  tone?: 'warn' | 'refused' | 'changed';
+  hint?: string;
+  id?: string;
+  className?: string;
+  strs?: Strs<'label' | 'optional' | 'value' | 'unit' | 'placeholder' | 'hint'>;
+  args?: StrArgs<'label' | 'optional' | 'value' | 'unit' | 'placeholder' | 'hint'>;
+}
+
+export interface NumpadRecent { text: string; strs?: Strs<'text'>; args?: StrArgs<'text'> }
+/** Candidate. 1–9 · [. or gap] 0 ⌫; each key is `<button data-action data-value=key data-key="0-9|.|back">`.
+ *  No commit key: the surface's bar primary commits. */
+export interface NumpadProps {
+  /** The readout's label ("Piglet 5 of 11 · ear tag"); omit for keys only, under a Measure. */
+  label?: string;
+  /** The typed string. */
+  value?: string;
+  unit?: string;
+  placeholder?: string;
+  /** value is the next tag in sequence, muted until the first key replaces it. */
+  suggested?: boolean;
+  /** 0 (default): no decimal key, its slot stays empty. n: a "." key and n places. */
+  decimals?: number;
+  /** Digits before the digit keys go floor-gray (6 for ear tags). */
+  maxLength?: number;
+  /** Newest first; at most three shown. */
+  recent?: NumpadRecent[];
+  key?: string;
+  /** Default "numpad". */
+  action?: string;
+  /** error: red readout, cannot record as typed · warn: amber hint, still records. */
+  tone?: 'error' | 'warn';
+  hint?: string;
+  className?: string;
+  /** digit gets args {n} per key; back, pad and recent are aria-labels (data-str-attr). */
+  strs?: Strs<'label' | 'value' | 'unit' | 'placeholder' | 'hint' | 'digit' | 'decimal' | 'back' | 'pad' | 'recent'>;
+  args?: StrArgs<'label' | 'value' | 'unit' | 'placeholder' | 'hint' | 'decimal' | 'back' | 'pad' | 'recent'>;
+}
+
 export interface SentriUI {
+  stepper(props: StepperProps): string;
+  measure(props: MeasureProps): string;
+  numpad(props: NumpadProps): string;
   heading(props: HeadingProps): string;
   panel(content: string, options?: PanelOptions & { ds?: string }): string;
   facts(items: Fact[], options?: { columns?: 1 | 2 | 3; className?: string }): string;
@@ -192,7 +282,7 @@ export type IconName =
   | 'alert' | 'signal' | 'battery' | 'filter' | 'minus' | 'plus' | 'record' | 'camera' | 'edit' | 'wrench'
   | 'details' | 'calendar' | 'bookmark' | 'transfer' | 'down' | 'arrow' | 'place' | 'home' | 'toolbox' | 'spark'
   | 'heat' | 'pregnancy' | 'farrow' | 'barn' | 'return' | 'send' | 'health' | 'temperature' | 'humidity' | 'air'
-  | 'upload' | 'offline';
+  | 'upload' | 'offline' | 'backspace';
 
 declare global {
   interface Window { SentriUI: SentriUI; SentriIcons: SentriIcons }
