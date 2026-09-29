@@ -217,6 +217,7 @@
   /* ---- the receipt: what the last record on this phone changed (or why nothing was recorded); in the bar, so the rows never reflow ---- */
   function receiptLine() {
     if (!receipt) return '';
+    if (receipt.kind === 'correction') return U.receipt([{ id: 'pp.common.saved_correction' }]);   // back from Edit's Save (ticket #12)
     var id = receipt.dose, tx = lower(titleText(id)), r = receipt.rec, k = receipt.kind, parts;
     if (k === 'already') parts = [{ id: 'pp.litter.rcpt.already', args: { tx: tx, t: U.time(receipt.other.at), who: receipt.other.who } }, { id: 'pp.litter.rcpt.nothing' }];
     else if (k === 'stale' && receipt.other) parts = [{ id: 'pp.litter.rcpt.stale', args: { tx: tx, t: U.time(receipt.other.at), who: receipt.other.who, m: receipt.other.n } }, { id: 'pp.litter.rcpt.now_owed', args: { n: receipt.now }, tone: 'amber' }];
@@ -489,6 +490,7 @@
     if (st.drafts) drafts = JSON.parse(JSON.stringify(st.drafts));
     (st.visit || []).forEach(function (id) { visit[id] = true; });
     if (st.receipt) { var r0 = recordOf(st.visit[0]); receipt = { kind: 'saved', dose: r0.dose, rec: r0 }; }
+    if (qs.get('saved') === 'correction') receipt = { kind: 'correction' };
     if (st.tap) tap(st.tap.dose, st.tap.n);
     if (st.drawer) {
       drawer = freshDraft(st.drawer.dose);

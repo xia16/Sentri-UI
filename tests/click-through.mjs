@@ -66,11 +66,12 @@ try {
   assert.equal(await page.locator('[data-ds="Candidate:EditBanner"]').count(), 0);          // no banner on entry
   const minus = page.locator('[data-action="mark-step"][data-step="-1"]').first();
   await minus.click(); await minus.click();
-  assert.match(await text(page, '[data-ds="Candidate:EditBanner"]'), /Correcting a past record · logged as G\.H.*Iron · day 3 12 → 10 · 2 not treated/);
+  assert.match(await text(page, '[data-ds="Candidate:EditBanner"]'), /Correcting a past record · logged as G\.H.*Iron · day 3 12 → 10 piglets · 2 not treated/);
   assert.equal(await page.locator('[data-action="save"][aria-disabled="true"]').count(), 1);   // Save waits for the reason
   await page.click('[data-action="mark-why"][data-value$=":weak"]');
   await page.click('[data-action="save"]');
   await page.waitForURL(/litter\.html/); await ready(page);
+  assert.match(await text(page, '.pp-receipt'), /Saved · correction/);
   const rec = page.locator('.lt-rec', { hasText: 'Iron · day 3' }).first();
   assert.match((await rec.innerText()).replace(/\s+/g, ' '), /10 piglets · 2 deferred: weak/);
   assert.equal(await rec.locator('.pp-tone[data-tone="amber"]').count(), 2);
@@ -78,8 +79,21 @@ try {
   await page.click('[data-action="open-record"]');
   await page.waitForURL(/edit\.html\?state=record-page/); await ready(page);
   const log = await text(page, '[data-ds="Log"]');
-  assert.match(log, /Iron · day 3 corrected .*12 → 10 · 2 deferred: weak.*Iron · day 3 · 12 piglets/);
+  assert.match(log, /Correction Iron · day 3 12 → 10 piglets · 2 deferred: weak .*Iron · day 3 · 12 piglets corrected/);
   console.log('ok 3 litter → Edit → 12 → 10 · 2 weak → Save → litter amber → record page:', log.slice(0, 120));
+
+  // 4. Edit → tail was done on another crate → A04 → Save → A04's record page shows the act at its own time (ticket #12).
+  await page.goto(base + 'edit.html?state=edit&crate=A02&data=a02-marked&fresh=1'); await ready(page);
+  await page.click('[data-action="mark-step"][data-value="T-A02-tail"][data-step="-1"]');
+  await page.click('[data-action="mark-why"][data-value="T-A02-tail:to"]');
+  await page.click('[data-action="pick"][data-value="A04"]');
+  assert.match(await text(page, '[data-ds="Candidate:EditBanner"]'), /Dock tail 12 → 0 piglets · done on A04 11 piglets/);
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.goto(base + 'edit.html?state=record-page&crate=A04&data=a02-marked'); await ready(page);
+  const there = await text(page, '[data-ds="Log"]');
+  assert.match(there, /Correction Dock tail 11 piglets · was on A02 · 08:40 · L\.M/);
+  console.log('ok 4 Edit → wrong litter → A04 → Save → A04 record page:', there.slice(0, 100));
 
   await browser.close();
 } finally {
