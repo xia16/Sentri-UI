@@ -26,11 +26,11 @@
     UI.row({ title: '', action: 'open', value: 'move', strs: { title: 'pp.move.title' } }),
     UI.row({ title: '', action: 'open', value: 'edit', strs: { title: 'pp.edit.title' } }),
     UI.row({ title: '', action: 'open', value: 'end', strs: { title: 'pp.end.title' } }),
-    UI.row({ title: '', action: 'open', value: 'edge', strs: { title: 'pp.edge.title' } })
+    UI.row({ title: '', action: 'open', value: 'edge', strs: { title: 'preview.slice.edge' } })
   ];
   document.getElementById('screen').innerHTML =
     UI.heading({ title: '', kind: 'page', level: 1, strs: { title: 'pp.common.task' } }) +
-    UI.rowGroup(rows.join(''), { title: '', strs: { title: 'pp.common.slices' } });
+    UI.rowGroup(rows.join(''), { title: '', strs: { title: 'preview.slices' } });
   document.getElementById('screen').addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-action="open"]');
     if (b) location.href = b.dataset.value + '.html?lang=' + PP.lang;

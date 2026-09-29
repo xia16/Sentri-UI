@@ -11,6 +11,11 @@
     if (!e) return id;
     return fill(e[PP.lang] || e.en || id, args);
   };
+  // Plural: PP.tn('pp.common.unit.piglet', 3) picks '.one' when n is 1 (en only; zh has one form).
+  PP.tn = function (base, n, args) {
+    var a = Object.assign({ n: n }, args || {});
+    return PP.t(base + (n === 1 && PP.lang === 'en' ? '.one' : '.many'), a);
+  };
   PP.apply = function (root) {
     (root || document).querySelectorAll('[data-str]').forEach(function (el) {
       var args = null;
