@@ -402,17 +402,48 @@ const POST = {
 // ---------------------------------------------------------------------------------------------
 // variants: base + the deltas a state needs. Each builds { events, today, config }.
 
+/* A log causally consistent with its stamps: an event without `seen` saw everything before it in the log (an online write),
+   so the log runs in stamp order; an event that names what it saw (`seen`, an offline phone) comes after all of it. A stable
+   sort by stamp, then each `seen` event moved after the last event it saw. The variants build in story order, where an
+   offline phone's `seen` is everything built before the events it missed; in stamp order that reads as "offline since the
+   earliest event it missed": it keeps only what was stamped before then. */
+export function causalOrder(events) {
+  const list = events.map((e, i) => {
+    if (!Array.isArray(e.seen)) return e;
+    const had = new Set(e.seen);
+    const missed = events.slice(0, i).filter((x) => !had.has(x.id));
+    if (!missed.length) return e;
+    const since = missed.reduce((m, x) => (x.at < m ? x.at : m), missed[0].at);
+    const keep = new Set(e.seen.filter((id) => { const x = events.find((y) => y.id === id); return x && x.at < since; }));
+    return Object.assign({}, e, { seen: e.seen.filter((id) => keep.has(id)) });
+  });
+  // an offline write reaches the log when it syncs: after everything built before it (never earlier than its stamp), so the
+  // online writes stamped before that sync do not count as having seen it
+  let upTo = '';
+  const keyed = list.map((e, i) => { upTo = e.at > upTo ? e.at : upTo; return { e, i, k: Array.isArray(e.seen) ? upTo : e.at }; });
+  const out = keyed.sort((a, b) => (a.k < b.k ? -1 : a.k > b.k ? 1 : a.i - b.i)).map((x) => x.e);
+  for (let moved = true, guard = 0; moved && guard < events.length * 4; guard++) {
+    moved = false;
+    for (let k = 0; k < out.length; k++) {
+      const e = out[k];
+      if (!Array.isArray(e.seen) || !e.seen.length) continue;
+      const last = Math.max(...e.seen.map((id) => out.findIndex((x) => x.id === id)));
+      if (last > k) { out.splice(k, 1); out.splice(last, 0, e); moved = true; break; }
+    }
+  }
+  return out;
+}
 const V = (fn, today = TODAY, over) => () => {
   const b = builder(); fn(b);
   const config = Object.assign({}, CONFIG, over || {});
-  return { events: b.events, today, config };
+  return { events: causalOrder(b.events), today, config };
 };
 
 export const VARIANTS = {
   base: V(base),
 
   // room (S1)
-  'all-done': V((b) => { base(b); recordAllOwed(b, TODAY, '09:'); }),
+  'all-done': V((b) => { base(b); recordAllOwed(b, TODAY, '10:'); }),
   behind: V(base, '2026-10-02'),
   drift: V((b) => {
     base(b);
@@ -475,7 +506,7 @@ export const VARIANTS = {
     b.push({ type: 'correction', changes: [{ target: 'T-A02-visit', set: { n: 10, deferred: { n: 2, reason: 'weak' } } }], at: sep(29, '10:31'), who: ME, seen, device: 'P-GH', id: 'X-A02-gh' });
   }),
   // birth litter weight (S10): set at farrowing's Edit, saved here, and a conflict with another phone
-  'c02-weight-set': V((b) => { base(b); b.push({ type: 'birth_weight', litter: 'C02', kg: '16.4', source: 'farrowing', at: sep(28, '14:52'), who: 'G.H' }, 'BW-C02'); }),
+  'c02-weight-set': V((b) => { base(b); b.push({ type: 'birth_weight', litter: 'C02', kg: '16.4', source: 'farrowing', at: sep(28, '18:52'), who: 'G.H' }, 'BW-C02'); }),
   'c02-weight-saved': V((b) => { base(b); b.push({ type: 'birth_weight', litter: 'C02', kg: '34.2', at: sep(29, '09:42'), who: ME }, 'BW-C02'); }),
   'c02-weight-conflict': V((b) => {
     base(b); const seen = b.ids();
@@ -559,7 +590,7 @@ export const VARIANTS = {
     b.move('A07', 'A04', 3, sep(29, '09:40'), ME, { id: 'MV-0929-06', answers: { iron3: 'unknown' } });
   }),
   // R1-4: D06's day-1 orphans (2) fostered onto D03 (day 5): their own age — iron in 2 days, not late
-  'move-young': V((b) => { base(b); b.move('D06', 'D03', 2, sep(29, '09:30'), ME, { id: 'MV-0929-07', answers: {} }); }),
+  'move-young': V((b) => { base(b); b.move('D06', 'D03', 2, sep(29, '10:27'), ME, { id: 'MV-0929-07', answers: {} }); }),
   // R1-19: C05 emptied by a move (all 8 to B08, now 17 — past a sane litter size): C05 closes, nothing owed
   'emptied': V((b) => { base(b); b.move('C05', 'B08', 8, sep(29, '09:30'), ME, { id: 'MV-0929-08', answers: {} }); }),
 

@@ -519,7 +519,7 @@ function replay(log, effective, fresh, cfg, causal, today) {
     lit: (id) => { if (!litters.has(id)) litters.set(id, newLitter(id)); return litters.get(id); }
   };
   const rejected = [];
-  const run = (e, index) => {
+  const run = (e, index, via) => {
     ctx.pending = [];
     ctx.index = index;
     try {
@@ -529,7 +529,8 @@ function replay(log, effective, fresh, cfg, causal, today) {
         L.accepted.push(e.id); L.types[e.id] = e.type;
         // what it was, in its own words for a page: a treatment names its dose (a correction's fresh mark has no event of its own)
         const dc = e.dose ? ctx.doseCfg.get(e.dose) : null;
-        L.lastEvent = { id: e.id, type: e.type, at: e.at || null, who: e.who || null, dose: e.dose || null, tx: dc ? dc.tx : null,
+        // a correction's fresh mark keeps its act's time on the record; as the litter's latest write it is the correction's
+        L.lastEvent = { id: e.id, type: e.type, at: (via && via.at) || e.at || null, who: (via && via.who) || e.who || null, actAt: e.at || null, dose: e.dose || null, tx: dc ? dc.tx : null,
           n: e.type === 'treat' ? (e.castration ? e.castration.castrated || 0 : e.n) : e.type === 'move' ? e.n : e.type === 'death' ? (e.lines || []).reduce((s, l) => s + (l.rowId ? 1 : l.n || 0), 0) : e.type === 'weaned' ? e.n : null,
           observed: e.type === 'count' ? e.observed : null, via: e.viaCorrection || null };
       }
@@ -545,7 +546,7 @@ function replay(log, effective, fresh, cfg, causal, today) {
     carried.get(s.viaCorrection).push(s);
   }
   log.forEach((raw, index) => {
-    if (raw.type === 'correction') { for (const s of carried.get(raw.id) || []) run(s, index); return; }
+    if (raw.type === 'correction') { for (const s of carried.get(raw.id) || []) run(s, index, raw); return; }
     const e = effective.has(raw.id) ? effective.get(raw.id) : raw;
     if (e === null) return;                              // voided by a correction
     run(e, index);
