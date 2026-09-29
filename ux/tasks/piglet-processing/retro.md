@@ -209,3 +209,84 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   (every `components/*/preview.html`), and treat drift found there as the
   design system's, reported once, never charged to a slice.
 - **Cost:** medium (a designer's lint run spent; config patched by the driver).
+
+## 15 · Slices — the other-family lens cannot be handed screenshots as files
+
+- **Stage:** Slices, S10 review (Consistency lens).
+- **What happened:** the skill says the other-family lens is "handed
+  screenshots and the lint report as files". `collab.py discuss --context`
+  reads every context file as UTF-8 text and crashed on the first PNG. Worked
+  around by naming the image paths inside the prompt for the colleague's CLI
+  to open itself — whether it actually looked at them is unverified.
+- **Change:** `collab` should accept `--image <path>` and pass images through
+  the backend's image input; until then the skill should say "name the image
+  paths in the prompt" and ask the lens to cite what it saw in each image.
+- **Cost:** low.
+
+## 16 · Slices — lint side effects designers tripped on
+
+- **Stage:** Slices, first wave (field cards, S1, S10).
+- **What happened:** (a) on Windows the lint's `server.kill()` on a
+  `shell:true` spawn leaves `serve-ux` listening, so the next run on that
+  port silently reuses a server rooted in whichever worktree started it;
+  (b) the tap-size rule measures the transformed rect, so a 44px control
+  that scales to .96 on press (the design-system's press law) fails the
+  44px minimum — the Stepper author moved keys to 46px to pass; (c) a
+  content-sized drawer under ~30% of the screen is not treated as a layer,
+  so the page behind reports collisions — S1 forced its scan sheet to
+  `long`; (d) the first slice designers each widened `allow` themselves.
+- **Change:** kill the process tree (or serve in-process); measure tap size
+  on the untransformed box; treat any `[data-st-context=drawer]` as a layer;
+  the brief says `allow` is the driver's.
+- **Cost:** low each; (b) and (c) bent designs toward the tool.
+
+## 17 · Slices — seven lenses per round overlap heavily
+
+- **Stage:** Slices, S10 and S1 round 1.
+- **What happened:** of S10's ~45 lens findings, the same five defects were
+  raised by three or four lenses each (stale weight label, missing record
+  group on orphan, sow-died said three times, Edit target too small, weight
+  field above the actions). S1 repeated the pattern (scan vs find by five
+  lenses, the chip/line-2 duplication by four). Each round costs seven agent
+  runs plus the driver's merge of overlapping reports; the unique yield came
+  mostly from Scenarios (the mid-farrowing sow death, list reflow under the
+  thumb) and Consistency (rulings the designer missed).
+- **Change:** run Scenarios, Consistency (other family) and one combined
+  "craft" lens (interaction + copy + information + visual + simplicity with
+  their checklists) in round 1; split the craft lens only when it returns
+  more than ~15 findings. Re-runs after a fix round only need the lenses
+  whose findings were applied.
+- **Cost:** medium (tokens and driver time; no design harm).
+
+## 18 · Slices — the lint cannot see inside a drawer, and trusts any card name
+
+- **Stage:** Slices, S7 (Move), S10.
+- **What happened:** (a) the lint's full-page screenshot captures the page,
+  not the content of an internally scrolling drawer, so everything below a
+  drawer's fold (the Move's questions, the tag list, the owed section) was
+  never seen by the lint or by lenses reading its screenshots; S7's designer
+  wrote a tall-viewport Playwright script to look. (b) `ds-unmarked` checks
+  that a control sits inside *some* `data-ds`, not that the name is a card:
+  S10 marks wrappers `data-ds="Section"` and passes.
+- **Change:** the lint scrolls each `[data-st-context=drawer]` body and
+  screenshots it in pages; `data-ds` values must match a folder in
+  `components/` or start with `Candidate:`.
+- **Cost:** medium — lenses judged states from partial pictures.
+
+## 19 · Slices — parallel slices invented their own litters
+
+- **Stage:** Slices, S1 × S2 × S10 × S7.
+- **What happened:** each designer made up fixtures for the same room: crate
+  A02 owes iron + tail on the room list and five doses on the litter sheet;
+  C04 is day 3 on one and day 2 on another; S10 and S2 registered duplicate
+  strings for the same Record group because neither was on the map branch.
+  "Every number on every mock agrees" held inside a slice and broke across
+  them. The walk-through agents would hit contradictions the moment they
+  click from room to litter.
+- **Why:** the brief gave each slice the rule but no shared data; parallel
+  slices cannot see each other's branches.
+- **Change:** the first slice ticket (or the driver at charting) writes one
+  fixture module for the task — the room, its crates and litters, their
+  day-ages and schedule — and every page reads it; shared UI (a header, a
+  Record group) is extracted to the shell the first time two slices need it.
+- **Cost:** medium (a reconciliation pass at integration).

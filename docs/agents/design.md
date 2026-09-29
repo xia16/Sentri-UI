@@ -37,7 +37,22 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-edge-birth-weight-entry", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-entry", "strict": true },
     { "name": "pp-edge-birth-weight-typed", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-typed", "strict": true },
     { "name": "pp-edge-birth-weight-range", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-range", "strict": true },
-    { "name": "pp-edge-birth-weight-set", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-set", "strict": true }
+    { "name": "pp-edge-birth-weight-set", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-set", "strict": true },
+    { "name": "pp-room-room", "url": "ux/tasks/piglet-processing/room.html?state=room", "strict": true },
+    { "name": "pp-room-room-empty", "url": "ux/tasks/piglet-processing/room.html?state=room-empty", "strict": true },
+    { "name": "pp-room-room-all-done", "url": "ux/tasks/piglet-processing/room.html?state=room-all-done", "strict": true },
+    { "name": "pp-room-room-overdue", "url": "ux/tasks/piglet-processing/room.html?state=room-overdue", "strict": true },
+    { "name": "pp-room-room-drift", "url": "ux/tasks/piglet-processing/room.html?state=room-drift", "strict": true },
+    { "name": "pp-room-room-filter", "url": "ux/tasks/piglet-processing/room.html?state=room-filter", "strict": true },
+    { "name": "pp-room-room-scan", "url": "ux/tasks/piglet-processing/room.html?state=room-scan", "strict": true },
+    { "name": "pp-room-room-scan-none", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-none", "strict": true },
+    { "name": "pp-room-room-find", "url": "ux/tasks/piglet-processing/room.html?state=room-find", "strict": true },
+    { "name": "pp-room-room-find-many", "url": "ux/tasks/piglet-processing/room.html?state=room-find-many", "strict": true },
+    { "name": "pp-room-room-error", "url": "ux/tasks/piglet-processing/room.html?state=room-error", "strict": true },
+    { "name": "pp-room-room-finished", "url": "ux/tasks/piglet-processing/room.html?state=room-finished", "strict": true },
+    { "name": "pp-room-room-none", "url": "ux/tasks/piglet-processing/room.html?state=room-none", "strict": true },
+    { "name": "pp-room-room-scan-unavailable", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-unavailable", "strict": true },
+    { "name": "pp-room-room-scan-hit", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-hit", "strict": true }
   ]
 }
 ```

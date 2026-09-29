@@ -1,22 +1,25 @@
-<!-- @dsCard group="Fields" height=980 subtitle="Candidate · a measured value, unit always written" -->
+<!-- @dsCard group="Fields" height=1400 subtitle="Candidate · a measured value, unit always written" -->
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}.stack>*+*{margin-top:20px}</style></head>
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}.stack>*+*{margin-top:20px}.dock{display:flex;flex-direction:column;gap:12px}</style></head>
 <body>
 <div class="inspection-phone stack" data-st-context="page" id="m" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"></div>
 <script>
 const UI = window.SentriUI;
-// Litter weight of 11 piglets; usual 0.8–2.5 kg each → 8.8–27.5 kg.
+// Litter weight of 11 piglets; usual 0.8–2.5 kg each → 8.8–27.5 kg. The range is checked only with the pad closed.
 const base = { label: 'Litter weight', optional: 'Optional', unit: 'kg', range: [8.8, 27.5] };
 m.innerHTML = [
   UI.measure({ ...base, value: '16.8', key: 'default' }),
   UI.measure({ ...base, value: '', key: 'empty' }),
   UI.measure({ ...base, label: 'Pressed', value: '16.8', key: 'pressed' }),
   UI.measure({ ...base, label: 'Focus', value: '16.8', key: 'focus' }),
-  UI.measure({ ...base, value: '16.', active: true, key: 'open' }) + UI.numpad({ decimals: 1, value: '16.', key: 'open' }),
-  UI.measure({ ...base, value: '30.4', key: 'warn', hint: 'Outside the usual 8.8–27.5 kg for 11 piglets' }),
+  UI.measure({ ...base, label: 'Typing · not checked yet', value: '30.4', active: true, key: 'typing' }),
+  UI.measure({ ...base, value: '30.4', key: 'warn', hint: 'Usual 8.8–27.5 kg · this is 30.4' }),
   UI.measure({ ...base, value: '304', tone: 'refused', key: 'refused', hint: 'Not recorded · over 55 kg for 11 piglets' }),
-  UI.measure({ ...base, value: '16.2', tone: 'changed', key: 'edit', hint: 'was 16.8 kg' })
+  UI.measure({ ...base, value: '16.2', changed: true, key: 'edit', note: 'was 16.8 kg' }),
+  UI.measure({ ...base, value: '29.0', changed: true, key: 'edit-warn', hint: 'Usual 8.8–27.5 kg · this is 29.0', note: 'was 16.8 kg' }),
+  UI.measure({ label: 'Rectal temperature', unit: '°', unitGap: false, value: '40.6', key: 'temp' }),
+  '<div class="dock">' + UI.measure({ ...base, value: '16.', active: true, key: 'open', controls: 'pad-open' }) + UI.numpad({ id: 'pad-open', decimals: 1, intLength: 2, value: '16.', key: 'open' }) + '</div>'
 ].map(h => '<div>' + h + '</div>').join('');
 document.querySelector('.st-measure-box[data-value="pressed"]').setAttribute('data-preview', 'pressed');
 document.querySelector('.st-measure-box[data-value="focus"]').setAttribute('data-preview', 'focus');

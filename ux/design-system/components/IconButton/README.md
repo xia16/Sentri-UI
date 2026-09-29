@@ -17,5 +17,12 @@ Call `SentriUI.iconButton({ icon, label, action, value, badge, disabled, classNa
 - Use an icon button only for a tool whose glyph is universal. Every verb gets a labelled button or tile.
 - When a filter is applied, show the badge and the one-line "Filtered · …" summary with a Clear action. Don't rely on the badge alone.
 
+**States**
+- Default: a 44px borderless target, or the 48px bordered `room-filter-button`. With a `badge`, a 17px `ink` disc sits on the corner.
+- Pressed: not drawn. The stylesheet has no hover or active rule for it.
+- Disabled: `disabled` gives it the flat grey fill and `#92998d` glyph that every disabled button takes. Prefer omission: leave out a tool that can't be used.
+- Focus: the global 3px `focus` ring at 2px offset.
+- Error, loading, empty: not drawn. A filter with nothing applied shows no badge.
+
 **Strings**
 Optional `strs: { badge }` and `args` for the count badge. `label` is an `aria-label` attribute and has no `data-str` twin.
