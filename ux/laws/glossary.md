@@ -103,3 +103,27 @@ Recency words on a row come from the record's timestamp: `1h ago` under a day, `
 **Last record (header).** The newest stamped event of any kind in the room: a treatment, a Set count, a Move, a death or an Edit, printed with its own words (`Set count 11 · D03 · 1h ago · G.H`), so a just-made record stays findable after its row departs.
 
 **Rail glyphs.** Every litter row ends in `›`, done rows included: RULINGS "Names and glyphs" reserves ✎ for editing a locked figure (one glyph, one meaning), and RULINGS outranks the README row law's ✎-when-done. This reverses the round-1 decline.
+
+## Ledger module (`ux/tasks/piglet-processing/ledger.js`)
+
+One module computes every figure above from the litter's events; pages render its output and never redo the arithmetic. `derive(events, config, { today })` replays the log (corrections applied in place, originals kept) and returns per litter, per room, `rejected[]` (event, reason) and `flags[]`. Tests: `tests/ledger.test.mjs`.
+
+**Events.** `farrowed` (born, dead at birth by cause, locked) · `count` (observed, the Alive the device saw) · `death` (lines by cause or by identity row; `lossAlloc` or `fromMissing`) · `sow_died` · `move` (from, to, n, rows, per-dose answers yes/no/unknown, optional `explains: [lossId, gainId]`) · `treat` (dose, n, deferred n + reason, exempt n + reason; castration as castrated + not castrated by reason) · `check` (arrivals: had / lacks) · `identity` (add, edit, withdraw, close) · `correction` (target id; `set` or `void`) · `weaned`. Every event carries `id`, `at`, `who` and optionally `seen`: the ids the device had when it wrote it. Without `seen` the event saw the whole log before it.
+
+| Derived term | Computed from |
+|---|---|
+| **Alive** | Born − Dead − Moved out + Moved in − open loss + open gain − Weaned; checked by `balances()` after every event. An event that would take it below 0 is refused (`alive_negative`, `more_than_alive`); a Move above the source's Alive is clamped to it and flagged `sync review` |
+| **Born / Dead** | the `farrowed` figures; while the farrowing is open a death adds to both (Born = Alive + Σ Dead) |
+| **Unexplained loss / gain** | one item per Count, `observed − Alive now` (not against the device's base, so two counts of one crate never sum). Open = qty − what deaths and Moves took from it. Never netted |
+| **Explained** | a death's allocation (oldest loss first, `fromMissing`) or a Move's `explains`: the named side relabels, Alive does not move on that side |
+| **Owed** | before a dose's first record: Alive − carried − unknown (castration: none until the first record counts the males). From the first record on: a stored count, set to what the record left owed (deferred), raised by arrivals that owe the dose and by a check's `lacks`, lowered by a Move answered No; shown as `min(stored, Alive)` |
+| **Treated** | Σ n of the litter's own records for the dose; never retired by deaths or moves |
+| **Deferred / exempt** | deferred: the latest record's deferred n, capped at owed. Exempt: Σ of exempt piglets (castration: hernia, cryptorchid, kept boar); hernia and cryptorchid also write a litter note |
+| **Missed** | owed, when today's day-age is past the dose's last age-day |
+| **Carried from move** | arrivals whose source had done the dose for all, answered Yes, or checked as already had |
+| **Unknown after move** | arrivals answered Don't know (invisible dose) or from a part-done source (visible dose: check on the pig), and the piglets of an unexplained gain on a dose already recorded; shown as `min(unknown, Alive)` until a `check` or an explaining Move's answer resolves them |
+| **Early / late / after window** | the record's day-age against the dose's due day-age and last age-day; early counts on time |
+| **Possible double treatment** | two records of one dose where neither event had seen the other (`seen`); never from treated > Alive. A record whose dose already shows nothing owed, with no such collision, records nothing (`nothing_owed`, naming who and when) |
+| **Sync review** | a loss over-consumed (the excess is a plain death), a Move clamped or naming more than is open, a count concurrent with a death, Move or weaning, a second death of one row, a row added past Alive offline |
+| **Identified / rows on record** | rows in this litter with status alive / every non-withdrawn row in this litter, dead ones included. Rows are never deleted: dead, weaned and withdrawn are statuses |
+| **Room: open loss, open gain, net drift** | Σ open items of the room's litters; net drift = open gain − open loss |

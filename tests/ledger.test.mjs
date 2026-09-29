@@ -1,0 +1,688 @@
+// The shared piglet-processing ledger (ticket #18): one test per ruled scenario.
+// node --test tests/ledger.test.mjs — no dependencies.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { derive, append, balances } from '../ux/tasks/piglet-processing/ledger.js';
+
+// ---- fixtures -------------------------------------------------------------------------------
+// Litters are born on Sep 20 (day 0). `on(d)` stamps day-age d.
+const on = (d, hh = '09:00') => { const x = new Date(Date.UTC(2026, 8, 20 + d)); return x.toISOString().slice(0, 10) + 'T' + hh; };
+const TODAY = (d) => ({ today: on(d) });
+
+const CONFIG = {
+  doses: [
+    { id: 'iron3', tx: 'iron', due: 3, product: 'Gleptosil', amount: '1 ml' },
+    { id: 'teeth', tx: 'teeth', due: 3, last: 7, visible: true },
+    { id: 'castrate', tx: 'castrate', due: 3, visible: true, castration: true },
+    { id: 'cocci', tx: 'coccidiosis', due: 3, last: 7, product: 'Baycox', amount: '1 ml' },
+    { id: 'iron14', tx: 'iron', due: 14, product: 'Gleptosil', amount: '1 ml' }
+  ],
+  identity: { scheme: 'notch', who: 'all', day: 3 }
+};
+const IRON_ONLY = { doses: [CONFIG.doses[0]], identity: { scheme: 'tag', who: 'all' } };
+
+function book() {
+  let n = 0;
+  const ev = [];
+  const mk = (type, o) => { const e = Object.assign({ id: 'e' + (++n), type, at: on(3), who: 'G.H' }, o); ev.push(e); return e; };
+  return {
+    ev,
+    farrowed: (litter, born, dead = {}, o = {}) => mk('farrowed', Object.assign({ litter, room: 'R3', birthDate: on(0).slice(0, 10), born, dead, locked: true, at: on(0) }, o)),
+    count: (litter, observed, o = {}) => mk('count', Object.assign({ litter, observed }, o)),
+    death: (litter, lines, o = {}) => mk('death', Object.assign({ litter, lines }, o)),
+    move: (from, to, n, o = {}) => mk('move', Object.assign({ from, to, n }, o)),
+    treat: (litter, dose, n, o = {}) => mk('treat', Object.assign({ litter, dose, n }, o)),
+    castrate: (litter, castration, o = {}) => mk('treat', Object.assign({ litter, dose: 'castrate', castration }, o)),
+    check: (litter, dose, had, lacks, o = {}) => mk('check', Object.assign({ litter, dose, had, lacks }, o)),
+    identity: (litter, op, o = {}) => mk('identity', Object.assign({ litter, op }, o)),
+    sowDied: (litter, o = {}) => mk('sow_died', Object.assign({ litter, cause: 'prolapse' }, o)),
+    weaned: (litter, o = {}) => mk('weaned', Object.assign({ litter }, o)),
+    correction: (target, o = {}) => mk('correction', Object.assign({ target }, o))
+  };
+}
+const run = (b, cfg = CONFIG, day = 3) => derive(b.ev, cfg, TODAY(day));
+const rejectedReason = (d, e) => (d.rejected.find((r) => r.id === e.id) || {}).reason;
+function allBalanced(d) {
+  for (const L of Object.values(d.litters)) assert.ok(balances(L), 'litter ' + L.id + ' balances');
+}
+
+// ---- treatments -----------------------------------------------------------------------------
+
+test('one tap records all: owed = alive, one record, done', () => {
+  const b = book();
+  b.farrowed('A02', 13, { stillborn: 1 });
+  b.treat('A02', 'iron3', 12);
+  const d = run(b);
+  const x = d.litters.A02.doses.iron3;
+  assert.equal(d.litters.A02.alive, 12);
+  assert.equal(x.owed, 0);
+  assert.equal(x.treated, 12);
+  assert.equal(x.done, true);
+  assert.equal(x.records[0].product, 'Gleptosil');   // snapshot from config
+  assert.equal(x.records[0].timing, 'on_time');
+});
+
+test('a record that leaves piglets without a reason is refused', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  const t = b.treat('A02', 'iron3', 10);
+  assert.equal(rejectedReason(run(b), t), 'reason_missing');
+});
+
+test('short count deferred, then caught up next visit', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  b.treat('A02', 'iron3', 10, { deferred: { n: 2, reason: 'weak' } });
+  let x = run(b).litters.A02.doses.iron3;
+  assert.equal(x.owed, 2);
+  assert.equal(x.deferred, 2);
+  assert.equal(x.deferReason, 'weak');
+  b.treat('A02', 'iron3', 2, { at: on(4) });
+  x = run(b, CONFIG, 4).litters.A02.doses.iron3;
+  assert.equal(x.owed, 0);
+  assert.equal(x.deferred, 0);
+  assert.equal(x.treated, 12);
+  assert.equal(x.records[1].timing, 'late');
+});
+
+test('exempt leaves the obligation for good', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  b.treat('A02', 'iron3', 11, { exempt: { n: 1, reason: 'vet' } });
+  const x = run(b).litters.A02.doses.iron3;
+  assert.equal(x.owed, 0);
+  assert.equal(x.exempt, 1);
+});
+
+test('castration: first record counts males; catch-up keeps prior exemptions and owes only deferred', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  assert.equal(run(b).litters.A02.doses.castrate.owed, null);   // males unknown before the first record
+  b.castrate('A02', { castrated: 5, hernia: 1, deferred: 2 });
+  let d = run(b), x = d.litters.A02.doses.castrate;
+  assert.equal(x.owed, 2);
+  assert.equal(x.exempt, 1);
+  assert.deepEqual(x.castration, { castrated: 5, notCastrated: { hernia: 1, cryptorchid: 0, kept: 0, deferred: 2 }, females: 0, males: 8 });
+  assert.deepEqual(d.litters.A02.notes.map((n) => [n.kind, n.n]), [['hernia', 1]]);
+  // a catch-up must account for the 2 owed only
+  const bad = b.castrate('A02', { castrated: 5 }, { at: on(5) });
+  assert.equal(rejectedReason(run(b, CONFIG, 5), bad), 'more_than_owed');
+  b.ev.pop();
+  b.castrate('A02', { castrated: 1, cryptorchid: 1 }, { at: on(5) });
+  d = run(b, CONFIG, 5); x = d.litters.A02.doses.castrate;
+  assert.equal(x.owed, 0);
+  assert.equal(x.exempt, 2);
+  assert.equal(x.castration.castrated, 6);
+  assert.equal(x.castration.notCastrated.hernia, 1);           // kept from the first record
+  assert.equal(x.castration.notCastrated.cryptorchid, 1);
+  assert.equal(x.castration.notCastrated.deferred, 0);
+  assert.equal(x.castration.males, 8);
+});
+
+test('all-female litter: castration recorded as none, nothing owed', () => {
+  const b = book();
+  b.farrowed('A05', 9);
+  b.castrate('A05', { castrated: 0 });
+  const x = run(b).litters.A05.doses.castrate;
+  assert.equal(x.owed, 0);
+  assert.equal(x.castration.males, 0);
+  assert.equal(x.done, true);
+});
+
+test('early counts on time', () => {
+  const b = book();
+  b.farrowed('C04', 9);
+  b.treat('C04', 'iron3', 9, { at: on(2) });
+  const r = run(b, CONFIG, 2).litters.C04.doses.iron3.records[0];
+  assert.equal(r.timing, 'early');
+  assert.equal(r.onTime, true);
+});
+
+test('late: stays owed, then records late with its real date', () => {
+  const b = book();
+  b.farrowed('B01', 14);
+  let x = run(b, CONFIG, 5).litters.B01.doses.iron3;
+  assert.equal(x.status, 'late');
+  assert.equal(x.owed, 14);
+  b.treat('B01', 'iron3', 14, { at: on(5) });
+  x = run(b, CONFIG, 5).litters.B01.doses.iron3;
+  assert.equal(x.records[0].timing, 'late');
+  assert.equal(x.records[0].onTime, false);
+  assert.equal(x.records[0].dayAge, 5);
+});
+
+test('missed after the window: shown as missed, still owed; iron has no window', () => {
+  const b = book();
+  b.farrowed('B04', 10);
+  const d = run(b, CONFIG, 9).litters.B04.doses;
+  assert.equal(d.teeth.status, 'missed');
+  assert.equal(d.teeth.missed, 10);
+  assert.equal(d.teeth.owed, 10);           // missed is inside owed
+  assert.equal(d.iron3.status, 'late');
+  assert.equal(d.iron3.missed, 0);
+  b.treat('B04', 'teeth', 10, { at: on(9) });
+  assert.equal(run(b, CONFIG, 9).litters.B04.doses.teeth.records[0].timing, 'after_window');
+});
+
+test('a stale second tap (device already saw it done) records nothing', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  const first = b.treat('A02', 'iron3', 12, { at: on(3, '08:40'), who: 'L.M' });
+  const second = b.treat('A02', 'iron3', 12, { seen: ['e1', first.id] });
+  const d = run(b);
+  assert.equal(rejectedReason(d, second), 'nothing_owed');
+  assert.equal(d.rejected.find((r) => r.id === second.id).detail.by, 'L.M');
+  assert.equal(d.litters.A02.doses.iron3.treated, 12);
+  assert.equal(d.flags.length, 0);
+});
+
+test('offline collision: two records neither saw → both kept, possible double treatment', () => {
+  const b = book();
+  const f = b.farrowed('A05', 11);
+  const a = b.treat('A05', 'iron3', 11, { seen: [f.id], device: 'p1', who: 'L.M' });
+  const c = b.treat('A05', 'iron3', 11, { seen: [f.id], device: 'p2' });
+  const d = run(b);
+  const x = d.litters.A05.doses.iron3;
+  assert.equal(x.records.length, 2);
+  assert.equal(x.treated, 22);
+  assert.equal(x.owed, 0);
+  assert.deepEqual(x.possibleDoubleTreatment, [[a.id, c.id]]);
+  assert.equal(d.flags.filter((g) => g.kind === 'possible_double_treatment').length, 1);
+});
+
+test('a death the treating phone had not seen is no collision (Σn > alive is not the test)', () => {
+  const b = book();
+  const f = b.farrowed('A05', 11);
+  b.death('A05', [{ cause: 'crushed', n: 1 }], { seen: [f.id] });
+  b.treat('A05', 'iron3', 11, { seen: [f.id] });            // treated 11 on 10 alive
+  const d = run(b);
+  const x = d.litters.A05.doses.iron3;
+  assert.equal(x.treated, 11);
+  assert.equal(x.owed, 0);
+  assert.deepEqual(x.possibleDoubleTreatment, []);
+  assert.equal(d.flags.filter((g) => g.kind === 'possible_double_treatment').length, 0);
+});
+
+test('owed is a stored count shown as min(owed, alive): a death lowers it only past alive', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  b.treat('A02', 'iron3', 9, { deferred: { n: 3, reason: 'weak' } });
+  b.death('A02', [{ cause: 'crushed', n: 1 }]);
+  let x = run(b).litters.A02.doses.iron3;
+  assert.equal(x.owed, 3);                  // the dead one may have been treated: never hide an untreated piglet
+  b.death('A02', [{ cause: 'scours', n: 9 }]);
+  x = run(b).litters.A02.doses.iron3;
+  assert.equal(run(b).litters.A02.alive, 2);
+  assert.equal(x.owed, 2);
+  assert.equal(x.owedStored, 3);
+});
+
+// ---- counts, losses, deaths -----------------------------------------------------------------
+
+test('count lower → one open unexplained loss; count higher → a separate gain, never netted', () => {
+  const b = book();
+  b.farrowed('B14', 11, { stillborn: 1 });
+  const c1 = b.count('B14', 9, { baseAlive: 10 });
+  let L = run(b).litters.B14;
+  assert.equal(L.alive, 9);
+  assert.equal(L.unexplained.openLoss, 1);
+  assert.equal(L.unexplained.losses[0].id, c1.id);
+  b.count('B14', 10, { baseAlive: 9 });
+  L = run(b).litters.B14;
+  assert.equal(L.alive, 10);
+  assert.equal(L.unexplained.openLoss, 1);
+  assert.equal(L.unexplained.openGain, 1);
+  assert.ok(balances(L));
+});
+
+test('two offline counts of one crate: the later stands, differences never sum', () => {
+  const b = book();
+  const f = b.farrowed('B14', 10);
+  b.count('B14', 9, { seen: [f.id], baseAlive: 10 });
+  b.count('B14', 9, { seen: [f.id], baseAlive: 10 });
+  const d = run(b);
+  assert.equal(d.litters.B14.alive, 9);
+  assert.equal(d.litters.B14.unexplained.openLoss, 1);
+  assert.equal(d.flags.length, 0);
+});
+
+test('a count crossing an unseen death is flagged sync review', () => {
+  const b = book();
+  const f = b.farrowed('B14', 10);
+  b.count('B14', 9, { seen: [f.id], baseAlive: 10 });
+  b.death('B14', [{ cause: 'crushed', n: 1 }], { seen: [f.id] });
+  const d = run(b);
+  assert.deepEqual(d.flags.map((g) => [g.kind, g.reason]), [['sync_review', 'count_concurrent']]);
+  allBalanced(d);
+});
+
+test('counts are refused before the lock (the farrowing sheet owns the count)', () => {
+  const b = book();
+  b.farrowed('B08', 7, {}, { locked: false });
+  const c = b.count('B08', 6);
+  assert.equal(rejectedReason(run(b), c), 'farrowing_open');
+});
+
+test('body found later draws from the loss: no double subtraction', () => {
+  const b = book();
+  b.farrowed('B14', 10);
+  const c = b.count('B14', 9);
+  b.death('B14', [{ cause: 'crushed', n: 1 }], { lossAlloc: [{ lossId: c.id, qty: 1 }], at: on(4) });
+  const L = run(b).litters.B14;
+  assert.equal(L.alive, 9);
+  assert.equal(L.dead.total, 1);
+  assert.equal(L.unexplained.openLoss, 0);
+  assert.deepEqual(L.unexplained.losses[0].explainedBy.map((x) => [x.kind, x.qty]), [['death', 1]]);
+  assert.ok(balances(L));
+});
+
+test('split: two bodies, one of the 2 missing + one new death', () => {
+  const b = book();
+  b.farrowed('B14', 10);
+  b.count('B14', 8);
+  b.death('B14', [{ cause: 'crushed', n: 2 }], { fromMissing: 1 });
+  const L = run(b).litters.B14;
+  assert.equal(L.alive, 7);
+  assert.equal(L.dead.total, 2);
+  assert.equal(L.unexplained.openLoss, 1);
+  assert.equal(L.unexplained.losses[0].open, 1);
+  assert.ok(balances(L));
+});
+
+test('oldest loss consumed first', () => {
+  const b = book();
+  b.farrowed('B14', 10);
+  const c1 = b.count('B14', 9, { at: on(3) });
+  const c2 = b.count('B14', 8, { at: on(4) });
+  b.death('B14', [{ cause: 'crushed', n: 1 }], { fromMissing: 1, at: on(5) });
+  const L = run(b).litters.B14;
+  assert.equal(L.unexplained.losses.find((x) => x.id === c1.id).open, 0);
+  assert.equal(L.unexplained.losses.find((x) => x.id === c2.id).open, 1);
+});
+
+test('over-allocation is refused: alive never goes below 0', () => {
+  const b = book();
+  b.farrowed('B14', 2);
+  const d1 = b.death('B14', [{ cause: 'crushed', n: 3 }]);
+  const d = run(b);
+  assert.ok(['more_than_alive', 'alive_negative'].includes(rejectedReason(d, d1)));
+  assert.equal(d.litters.B14.alive, 2);
+  const d2 = b.death('B14', [{ cause: 'crushed', n: 1 }], { fromMissing: 2 });
+  assert.equal(rejectedReason(run(b), d2), 'alloc_exceeds_bodies');
+});
+
+test('two phones consume one loss → the excess is a plain death flagged sync review', () => {
+  const b = book();
+  const f = b.farrowed('B14', 10);
+  const c = b.count('B14', 9);
+  const p1 = b.death('B14', [{ cause: 'crushed', n: 1 }], { seen: [f.id, c.id], lossAlloc: [{ lossId: c.id, qty: 1 }] });
+  const p2 = b.death('B14', [{ cause: 'crushed', n: 1 }], { seen: [f.id, c.id], lossAlloc: [{ lossId: c.id, qty: 1 }] });
+  const d = run(b);
+  const L = d.litters.B14;
+  assert.equal(L.unexplained.openLoss, 0);
+  assert.equal(L.dead.total, 2);
+  assert.equal(L.alive, 8);
+  assert.deepEqual(d.flags.map((g) => [g.kind, g.reason, g.events[0]]), [['sync_review', 'loss_over_consumed', p2.id]]);
+  assert.equal(L.deaths.find((x) => x.id === p1.id).excess, 0);
+  assert.ok(balances(L));
+});
+
+test('open-phase deaths never touch Alive: Born derives', () => {
+  const b = book();
+  b.farrowed('B08', 7, { stillborn: 1 }, { locked: false });
+  b.death('B08', [{ cause: 'crushed', n: 1 }]);
+  const L = run(b).litters.B08;
+  assert.equal(L.phase, 'open');
+  assert.equal(L.alive, 6);
+  assert.equal(L.born, 8);
+  assert.equal(L.dead.total, 2);
+  assert.ok(balances(L));
+});
+
+test("sow died ends her session: Move opens, schedule continues", () => {
+  const b = book();
+  b.farrowed('B01', 8, {}, { locked: false });
+  b.farrowed('B02', 9);
+  b.sowDied('B01');
+  b.move('B01', 'B02', 2);
+  const d = run(b);
+  assert.equal(d.litters.B01.phase, 'locked');
+  assert.equal(d.litters.B01.sowDied.cause, 'prolapse');
+  assert.equal(d.litters.B01.alive, 6);
+  assert.equal(d.litters.B01.doses.iron3.owed, 6);
+  assert.equal(d.rejected.length, 0);
+});
+
+// ---- moves ----------------------------------------------------------------------------------
+
+test('Move untagged: one record, both litters; none-done source → arrivals owe in a done litter', () => {
+  const b = book();
+  b.farrowed('B06', 13, { stillborn: 1 });   // 12 alive, nothing done
+  b.farrowed('B04', 10, { crushed: 1 });     // 9 alive, iron done
+  b.treat('B04', 'iron3', 9);
+  b.move('B06', 'B04', 2, { at: on(3, '09:42') });
+  const d = run(b);
+  assert.equal(d.litters.B06.alive, 10);
+  assert.equal(d.litters.B04.alive, 11);
+  assert.equal(d.litters.B04.movedIn, 2);
+  assert.equal(d.litters.B06.movedOut, 2);
+  assert.equal(d.litters.B04.doses.iron3.owed, 2);         // a done crate goes back to due for them
+  assert.equal(d.litters.B04.moves[0].packets.iron3, 'owed');
+  assert.equal(d.litters.B06.doses.iron3.owed, 10);
+  allBalanced(d);
+});
+
+test('Move from an all-done source carries the evidence; the receiver does not owe it', () => {
+  const b = book();
+  b.farrowed('C01', 12); b.treat('C01', 'iron3', 12);
+  b.farrowed('B10', 11);
+  b.move('C01', 'B10', 1);
+  const d = run(b);
+  assert.equal(d.litters.B10.doses.iron3.carriedFromMove, 1);
+  assert.equal(d.litters.B10.doses.iron3.owed, 11);        // 12 alive − 1 carried
+  assert.equal(d.litters.C01.doses.iron3.owed, 0);
+});
+
+test('Move tagged: rows are picked, never counted; custody moves', () => {
+  const b = book();
+  b.farrowed('B09', 10); b.farrowed('B02', 8);
+  b.identity('B09', 'add', { rowId: 'r1', tag: '271004' });
+  b.identity('B09', 'add', { rowId: 'r2', tag: '271005' });
+  b.move('B09', 'B02', undefined, { rows: ['r1'] });
+  const d = run(b, IRON_ONLY);
+  assert.equal(d.litters.B09.alive, 9);
+  assert.equal(d.litters.B02.alive, 9);
+  assert.equal(d.litters.B09.identity.identified, 1);
+  assert.equal(d.litters.B02.identity.identified, 1);
+  assert.equal(d.litters.B02.identity.rows.find((r) => r.rowId === 'r1').birthLitter, 'B09');
+});
+
+test('Move from a part-done source: Yes / No / Don\'t know — and source coverage moves too', () => {
+  // B09: 10 alive, iron 7 treated + 3 deferred (owed 3). Three moves of 1 each to three done litters.
+  const b = book();
+  b.farrowed('B09', 10);
+  b.treat('B09', 'iron3', 7, { deferred: { n: 3, reason: 'weak' } });
+  for (const c of ['X1', 'X2', 'X3']) { b.farrowed(c, 9); b.treat(c, 'iron3', 9); }
+  b.move('B09', 'X1', 1, { answers: { iron3: 'yes' } });
+  b.move('B09', 'X2', 1, { answers: { iron3: 'no' } });
+  b.move('B09', 'X3', 1, { answers: { iron3: 'unknown' } });
+  const d = run(b, IRON_ONLY);
+  assert.equal(d.litters.X1.doses.iron3.carriedFromMove, 1);
+  assert.equal(d.litters.X1.doses.iron3.owed, 0);
+  assert.equal(d.litters.X2.doses.iron3.owed, 1);
+  assert.equal(d.litters.X3.doses.iron3.unknownAfterMove, 1);
+  assert.equal(d.litters.X3.doses.iron3.owed, 0);
+  assert.equal(d.litters.X3.doses.iron3.done, false);
+  // source: the No took one untreated piglet with it (3 → 2); Yes and Don't know left owed at 2
+  assert.equal(d.litters.B09.alive, 7);
+  assert.equal(d.litters.B09.doses.iron3.owed, 2);
+  assert.equal(d.litters.B09.doses.iron3.owedStored, 2);
+  allBalanced(d);
+});
+
+test('visible dose from a part-done source is checked on the pig, no question asked', () => {
+  const b = book();
+  b.farrowed('B09', 10);
+  b.treat('B09', 'teeth', 7, { deferred: { n: 3, reason: 'weak' } });
+  b.farrowed('B02', 8); b.treat('B02', 'teeth', 8);
+  b.move('B09', 'B02', 1, { answers: { teeth: 'yes' } });   // an answer for a visible dose is ignored
+  const x = run(b).litters.B02;
+  assert.equal(x.moves[0].packets.teeth, 'check');
+  assert.equal(x.doses.teeth.unknownAfterMove, 1);
+});
+
+test('arrival check resolves the unknown: already had / did not', () => {
+  const b = book();
+  b.farrowed('B09', 10); b.treat('B09', 'iron3', 7, { deferred: { n: 3, reason: 'weak' } });
+  b.farrowed('B02', 8); b.treat('B02', 'iron3', 8);
+  b.move('B09', 'B02', 2, { answers: { iron3: 'unknown' } });
+  b.check('B02', 'iron3', 1, 1);
+  const x = run(b, IRON_ONLY).litters.B02.doses.iron3;
+  assert.equal(x.unknownAfterMove, 0);
+  assert.equal(x.carriedFromMove, 1);
+  assert.equal(x.owed, 1);
+  const bad = b.check('B02', 'iron3', 1, 0);
+  assert.equal(rejectedReason(run(b, IRON_ONLY), bad), 'more_than_unknown');
+});
+
+test('arrivals owe what the source owed, per dose (iron d3 and iron d14 are two obligations)', () => {
+  const b = book();
+  b.farrowed('S', 10);
+  b.treat('S', 'iron3', 10);                                  // iron d3 done, iron d14 not yet
+  b.farrowed('R', 9);
+  b.treat('R', 'iron3', 9);
+  b.treat('R', 'iron14', 9, { at: on(14) });                   // R is older, done both
+  b.move('S', 'R', 1, { at: on(14, '10:00') });
+  const x = run(b, CONFIG, 14).litters.R;
+  assert.equal(x.doses.iron3.owed, 0);
+  assert.equal(x.doses.iron3.carriedFromMove, 1);
+  assert.equal(x.doses.iron14.owed, 1);
+});
+
+test('explaining Move: loss and gain relabelled, zero Alive effect', () => {
+  const b = book();
+  b.farrowed('B14', 10); b.farrowed('B16', 9);
+  const loss = b.count('B14', 9);
+  const gain = b.count('B16', 10);
+  let d = run(b);
+  assert.equal(d.rooms.R3.openLoss, 1);
+  assert.equal(d.rooms.R3.openGain, 1);
+  assert.equal(d.rooms.R3.netDrift, 0);                      // net 0, yet two open items
+  b.move('B14', 'B16', 1, { explains: [loss.id, gain.id] });
+  d = run(b);
+  assert.equal(d.litters.B14.alive, 9);
+  assert.equal(d.litters.B16.alive, 10);
+  assert.equal(d.litters.B14.movedOut, 1);
+  assert.equal(d.litters.B16.movedIn, 1);
+  assert.equal(d.rooms.R3.openLoss, 0);
+  assert.equal(d.rooms.R3.openGain, 0);
+  allBalanced(d);
+});
+
+test('explaining Move resolves the gain\'s unknown by the answer, never by the source\'s present state', () => {
+  const b = book();
+  b.farrowed('B14', 10); b.farrowed('B16', 9);
+  b.treat('B16', 'iron3', 9);
+  const loss = b.count('B14', 9);
+  const gain = b.count('B16', 10);                            // the stray's iron: unknown
+  assert.equal(run(b, IRON_ONLY).litters.B16.doses.iron3.unknownAfterMove, 1);
+  b.treat('B14', 'iron3', 9);                                 // source treated after the stray left
+  b.move('B14', 'B16', 1, { explains: [loss.id, gain.id], answers: { iron3: 'no' } });
+  const x = run(b, IRON_ONLY).litters.B16.doses.iron3;
+  assert.equal(x.unknownAfterMove, 0);
+  assert.equal(x.owed, 1);
+});
+
+test('Move clamped to source alive, flagged sync review', () => {
+  const b = book();
+  const f1 = b.farrowed('B06', 3), f2 = b.farrowed('B04', 9);
+  b.move('B06', 'B04', 2, { seen: [f1.id, f2.id] });
+  b.move('B06', 'B04', 2, { seen: [f1.id, f2.id] });
+  const d = run(b);
+  assert.equal(d.litters.B06.alive, 0);
+  assert.equal(d.litters.B04.alive, 12);
+  assert.equal(d.litters.B04.movedIn, 3);
+  assert.deepEqual(d.flags.map((g) => g.reason), ['move_clamped']);
+  allBalanced(d);
+});
+
+test('Move refused before the lock', () => {
+  const b = book();
+  b.farrowed('B08', 7, {}, { locked: false }); b.farrowed('B04', 9);
+  const m = b.move('B08', 'B04', 1);
+  assert.equal(rejectedReason(run(b), m), 'farrowing_open');
+});
+
+// ---- identity -------------------------------------------------------------------------------
+
+test('identified piglet dies: row kept with status dead, leaves Identified, stays on record', () => {
+  const b = book();
+  b.farrowed('B01', 3);
+  b.identity('B01', 'add', { rowId: 'r1', notch: '12-1', sex: 'm' });
+  b.identity('B01', 'add', { rowId: 'r2', notch: '12-2' });
+  b.death('B01', [{ cause: 'crushed', rowId: 'r1' }]);
+  const L = run(b).litters.B01;
+  assert.equal(L.alive, 2);
+  assert.equal(L.identity.identified, 1);
+  assert.equal(L.identity.onRecord, 2);
+  const r1 = L.identity.rows.find((r) => r.rowId === 'r1');
+  assert.equal(r1.status, 'dead');
+  assert.equal(r1.cause, 'crushed');
+  // a second death of the same row: earliest stands, the later is flagged
+  b.death('B01', [{ cause: 'scours', rowId: 'r1' }]);
+  const d = run(b);
+  assert.equal(d.litters.B01.alive, 2);
+  assert.deepEqual(d.flags.map((g) => g.reason), ['row_already_dead']);
+});
+
+test('identity rows: edit and withdraw are stamped, never deleted; done rule', () => {
+  const b = book();
+  b.farrowed('B01', 2);
+  b.identity('B01', 'add', { rowId: 'r1', tag: '271004' });
+  b.identity('B01', 'add', { rowId: 'r2', tag: '271009' });
+  let L = run(b).litters.B01;
+  assert.equal(L.identity.done, true);
+  b.identity('B01', 'edit', { rowId: 'r2', set: { tag: '271006', weight: 1.4 } });
+  b.identity('B01', 'withdraw', { rowId: 'r1' });
+  L = run(b).litters.B01;
+  assert.equal(L.identity.identified, 1);
+  assert.equal(L.identity.onRecord, 1);
+  assert.equal(L.identity.rows.length, 2);
+  assert.equal(L.identity.rows.find((r) => r.rowId === 'r2').edits[0].before.tag, '271009');
+  assert.equal(L.identity.done, false);
+  const extra = b.identity('B01', 'add', { rowId: 'r3', tag: '1' });
+  b.identity('B01', 'add', { rowId: 'r4', tag: '2' });
+  assert.equal(rejectedReason(run(b), extra), undefined);
+  assert.equal(rejectedReason(run(b), b.ev[b.ev.length - 1]), 'more_rows_than_alive');
+});
+
+test('candidates scheme: done when the worker closes the set', () => {
+  const cfg = { doses: [], identity: { scheme: 'notch', who: 'candidates' } };
+  const b = book();
+  b.farrowed('B01', 20);
+  b.identity('B01', 'add', { rowId: 'r1', notch: '1-1' });
+  assert.equal(run(b, cfg).litters.B01.identity.done, false);
+  b.identity('B01', 'close');
+  assert.equal(run(b, cfg).litters.B01.identity.done, true);
+});
+
+// ---- corrections, weaning, rooms -------------------------------------------------------------
+
+test('correction replaces a record in place; original kept; void un-records', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  const t = b.treat('A02', 'iron3', 12);
+  b.correction(t.id, { set: { n: 10, deferred: { n: 2, reason: 'sick' } }, who: 'L.M' });
+  let d = run(b);
+  let x = d.litters.A02.doses.iron3;
+  assert.equal(x.owed, 2);
+  assert.equal(x.records[0].corrected, true);
+  assert.equal(d.corrections[t.id][0].who, 'L.M');
+  assert.equal(b.ev.find((e) => e.id === t.id).n, 12);       // the original event is untouched
+  b.correction(t.id, { void: true });
+  x = run(b).litters.A02.doses.iron3;
+  assert.equal(x.records.length, 0);
+  assert.equal(x.owed, 12);
+});
+
+test('weaned closes the equation', () => {
+  const b = book();
+  b.farrowed('A02', 12, { stillborn: 1 });
+  b.identity('A02', 'add', { rowId: 'r1', tag: '9' });
+  b.weaned('A02', { at: on(21) });
+  const L = run(b, CONFIG, 21).litters.A02;
+  assert.equal(L.alive, 0);
+  assert.equal(L.weaned, 11);
+  assert.equal(L.identity.rows[0].status, 'weaned');
+  assert.ok(balances(L));
+  const w = b.weaned('A02', { n: 1 });
+  assert.equal(rejectedReason(run(b), w), 'alive_negative');
+});
+
+test('room: open loss and open gain heads beside net drift; open only; cross-room move', () => {
+  const b = book();
+  b.farrowed('A1', 10); b.farrowed('A2', 10); b.farrowed('B1', 10, {}, { room: 'R4' });
+  const l = b.count('A1', 8);
+  b.count('A2', 11);
+  b.death('A1', [{ cause: 'crushed', n: 1 }], { lossAlloc: [{ lossId: l.id, qty: 1 }] });
+  b.move('A2', 'B1', 2);
+  const d = run(b);
+  assert.equal(d.rooms.R3.openLoss, 1);
+  assert.equal(d.rooms.R3.openGain, 1);
+  assert.equal(d.rooms.R3.netDrift, 0);
+  assert.equal(d.rooms.R4.alive, 12);
+  assert.equal(d.rooms.R4.netDrift, 0);
+});
+
+test('append snapshots product and dose and reports refusals', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  const r = append(b.ev, { id: 'n1', type: 'treat', litter: 'A02', dose: 'cocci', n: 12, at: on(3) }, CONFIG, TODAY(3));
+  assert.equal(r.ok, true);
+  assert.equal(r.event.product, 'Baycox');
+  assert.equal(r.derived.litters.A02.doses.cocci.records[0].amount, '1 ml');
+  const r2 = append(r.events, { id: 'n2', type: 'treat', litter: 'A02', dose: 'cocci', n: 12, at: on(3) }, CONFIG, TODAY(3));
+  assert.equal(r2.ok, false);
+  assert.equal(r2.reason, 'nothing_owed');
+});
+
+// ---- property: balance identity after every event -------------------------------------------
+
+function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+
+test('balance identity holds after every event (random sequences, incl. offline writes)', () => {
+  const LITTERS = ['P1', 'P2', 'P3', 'Q1'];
+  const tally = { events: 0, rejected: 0, flags: 0 };
+  for (let seed = 1; seed <= 60; seed++) {
+    const r = rng(seed);
+    const pick = (a) => a[Math.floor(r() * a.length)];
+    const int = (lo, hi) => lo + Math.floor(r() * (hi - lo + 1));
+    const b = book();
+    for (const l of LITTERS) b.farrowed(l, int(6, 14), { stillborn: int(0, 2) }, { room: l[0] === 'Q' ? 'R4' : 'R3' });
+    let rowN = 0;
+    for (let step = 0; step < 40; step++) {
+      const d0 = run(b);
+      const l = pick(LITTERS), m = pick(LITTERS.filter((x) => x !== l));
+      const L = d0.litters[l];
+      if (!L || !d0.litters[m]) continue;                      // a corrected farrowing may have voided a litter
+      // offline: sometimes the device saw only a random prefix of the log
+      const o = r() < 0.3 ? { seen: b.ev.slice(0, int(1, b.ev.length)).map((e) => e.id) } : {};
+      const k = pick(['count', 'death', 'deathMissing', 'move', 'explain', 'treat', 'treatShort', 'check', 'id', 'rowDeath', 'weanSome', 'correct']);
+      if (k === 'count') b.count(l, Math.max(0, L.alive + int(-2, 2)), o);
+      if (k === 'death') b.death(l, [{ cause: 'crushed', n: int(1, 3) }], o);
+      if (k === 'deathMissing') b.death(l, [{ cause: 'scours', n: int(1, 2) }], Object.assign({ fromMissing: 1 }, o));
+      if (k === 'move') b.move(l, m, int(1, 3), Object.assign({ answers: { iron3: pick(['yes', 'no', 'unknown']) } }, o));
+      if (k === 'explain') {
+        const loss = L.unexplained.losses.find((x) => x.open > 0), gain = d0.litters[m].unexplained.gains.find((x) => x.open > 0);
+        b.move(l, m, 1, Object.assign({ explains: [loss ? loss.id : null, gain ? gain.id : null], answers: { iron3: 'unknown' } }, o));
+      }
+      if (k === 'treat') { const ow = L.doses.iron3.owed; b.treat(l, pick(['iron3', 'cocci']), ow || 1, o); }
+      if (k === 'treatShort') { const ow = L.doses.iron3.owed || 1; const n = int(0, ow); b.treat(l, 'iron3', n, Object.assign({ deferred: { n: ow - n, reason: 'weak' } }, o)); }
+      if (k === 'check') b.check(l, 'iron3', int(0, 1), int(0, 1), o);
+      if (k === 'id') b.identity(l, 'add', Object.assign({ rowId: 'row' + (++rowN), tag: String(rowN) }, o));
+      if (k === 'rowDeath') { const row = L.identity.rows.find((x) => x.status === 'alive' && x.litter === l); if (row) b.death(l, [{ cause: 'crushed', rowId: row.rowId }], o); }
+      if (k === 'weanSome') b.weaned(l, Object.assign({ n: int(1, 2) }, o));
+      if (k === 'correct') { const t = pick(b.ev.filter((e) => e.type === 'count' || e.type === 'treat') .concat([b.ev[0]])); b.correction(t.id, r() < 0.5 ? { void: true } : { set: t.type === 'count' ? { observed: int(0, 12) } : {} }); }
+      const d = run(b);
+      let inSum = 0, outSum = 0;
+      for (const X of Object.values(d.litters)) {
+        assert.ok(X.alive >= 0, `seed ${seed} step ${step}: alive ≥ 0`);
+        assert.ok(balances(X), `seed ${seed} step ${step} ${k}: ${X.id} balances`);
+        assert.ok(X.unexplained.openLoss >= 0 && X.unexplained.openGain >= 0);
+        for (const D of Object.values(X.doses)) {
+          if (D.owed != null) assert.ok(D.owed >= 0 && D.owed <= X.alive, `seed ${seed}: owed within alive`);
+          assert.ok(D.unknownAfterMove >= 0);
+        }
+        assert.ok(X.identity.identified <= X.alive);
+        inSum += X.movedIn; outSum += X.movedOut;
+      }
+      assert.equal(inSum, outSum, 'every move has two legs');
+      for (const R of Object.values(d.rooms)) assert.equal(R.netDrift, R.openGain - R.openLoss);
+    }
+    const d = run(b);
+    tally.events += b.ev.length; tally.rejected += d.rejected.length; tally.flags += d.flags.length;
+  }
+  // the sequences must exercise the ledger, not just bounce off it
+  assert.ok(tally.rejected / tally.events < 0.5, JSON.stringify(tally));
+  assert.ok(tally.flags > 0, 'offline writes produce some flags');
+});
