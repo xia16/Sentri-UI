@@ -371,9 +371,11 @@
   function crateSection() {
     var label = S.dir === 'out' ? 'pp.move.to.title' : 'pp.move.from.title';
     if (S.other && !S.query) {                               // chosen: the list folds into one picker; tap it to choose again (not on an explaining Move)
-      var m = crateMeta(S.other);
+      var m = crateMeta(S.other), far = where(S.other) && alive(S.other) > 0;
+      // another unit's crate: its unit and alive fit the picker at 360; its state reads in the review below
       return UI.pickerField({ label: '', display: S.other, action: S.explains && !gainOnly() ? '' : 'change-crate', key: 'crate',
-        strs: { label: label, display: 'pp.move.crate.chosen' }, args: { display: { code: S.other, meta: PP.t(m.id, m.args) } } });
+        strs: { label: label, display: far ? 'pp.move.crate.picked_unit' : 'pp.move.crate.chosen' },
+        args: { display: far ? { code: S.other, u: unitOf(S.other), n: alive(S.other) } : { code: S.other, meta: PP.t(m.id, m.args) } } });
     }
     var find = '<div class="mv-find">' +
       UI.choiceSearch({ label: PP.t('pp.move.search.label'), placeholder: PP.t('pp.move.search.placeholder'), value: S.query || '',

@@ -769,6 +769,7 @@ function applyDouble(ctx, e) {
     if (!ids.includes(gone)) throw new Reject('bad_records');
     const kept = ids.find((x) => x !== gone);
     if (!D.records.some((r) => r.id === kept)) throw new Reject('unknown_record');
+    if (D.records.some((r) => r.id === gone)) throw new Reject('not_withdrawn', { record: gone });   // the withdrawal was refused
     D.doubles.push(Object.assign({ answer: 'same', records: ids.slice(), withdrawn: gone, kept }, stamp));
   }
   D.resolvedPairs.push(ids.slice());

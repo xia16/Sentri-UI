@@ -1095,6 +1095,7 @@
     "pp.move.count.of.many": {"en": "of {n} piglets in {code}", "zh": "{code}共{n}头", "kind": "body"},
     "pp.move.count.of.one": {"en": "of {n} piglet in {code}", "zh": "{code}共{n}头", "kind": "body"},
     "pp.move.crate.chosen": {"en": "{code} · {meta}", "zh": "{code} · {meta}", "kind": "body"},
+    "pp.move.crate.picked_unit": {"en": "{code} · Unit {u} · {n} alive", "zh": "{code} · {u}单元 · {n}头存活", "kind": "body"},
     "pp.move.crate.code": {"en": "{code}", "zh": "{code}", "kind": "label"},
     "pp.move.crate.meta": {"en": "day {day} · {n} alive · {state}", "zh": "{day}日龄 · {n}头存活 · {state}", "kind": "body"},
     "pp.move.crate.meta_empty": {"en": "no piglets · sow {tag}", "zh": "无仔猪 · 母猪 {tag}", "kind": "body"},
