@@ -24,7 +24,7 @@ try {
 
   // 1. The room before: D03's loss 2 (base) and B08's gain 1; nothing open on B06.
   await page.goto(base + 'room.html?state=room&lens=all&data=gain-b08&fresh=1'); await ready(page);
-  const strip0 = await text(page, '[data-ds="Candidate:DriftStrip"]');
+  const strip0 = await text(page, '[data-action="explain"]');
   assert.match(strip0, /Unexplained loss 2 D03/); assert.match(strip0, /Unexplained gain 1 B08/);
   assert.doesNotMatch(await rowText(page, 'B06'), /loss/);
   console.log('ok 1 room before:', strip0);
@@ -52,7 +52,7 @@ try {
   await page.waitForURL(/litter\.html/); await ready(page);
   await page.click('[data-action="close"]');
   await page.waitForURL(/room\.html/); await ready(page);
-  const strip1 = await text(page, '[data-ds="Candidate:DriftStrip"]');
+  const strip1 = await text(page, '[data-action="explain"]');
   assert.match(strip1, /Unexplained loss 3 B06 D03/); assert.match(strip1, /Unexplained gain 1 B08/); assert.match(strip1, /Net drift −2 piglets/);
   console.log('ok 3 room shows the open loss:', strip1);
 
@@ -71,7 +71,7 @@ try {
 
   // 5. The room after: both lines closed; D03's loss (nothing to pair) stays open.
   await page.goto(base + 'room.html?state=room&lens=all&data=gain-b08'); await ready(page);
-  const strip2 = await text(page, '[data-ds="Candidate:DriftStrip"]');
+  const strip2 = await text(page, '[data-action="explain"]');
   assert.match(strip2, /Unexplained loss 2 D03/); assert.doesNotMatch(strip2, /gain/); assert.doesNotMatch(strip2, /B06/);
   assert.doesNotMatch(await rowText(page, 'B06'), /loss/); assert.doesNotMatch(await rowText(page, 'B08'), /gain/);
   console.log('ok 5 both lines closed:', strip2);
@@ -87,7 +87,7 @@ try {
   assert.match(await text(page, '[role="dialog"]'), /Closes 1 unexplained loss and 1 gain/);
   await page.click('[data-action="save-move"]');
   await page.goto(base + 'room.html?state=room&lens=all&data=explain'); await ready(page);
-  const strip3 = await text(page, '[data-ds="Candidate:DriftStrip"]');
+  const strip3 = await text(page, '[data-action="explain"]');
   assert.doesNotMatch(strip3, /B06|B08/);
   console.log('ok 6 gain line → Move from another crate, paired with B06\'s loss:', strip3);
 
