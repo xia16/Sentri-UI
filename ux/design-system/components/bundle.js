@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"Icon"}]} */
+/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"}]} */
 /* SentriIcons (sentri-icons.js) and SentriUI (sentri-components.js), verbatim. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
@@ -55,6 +55,7 @@
     humidity:'M12 3S5 11 5 15a7 7 0 0 0 14 0c0-4-7-12-7-12z',
     air:'M3 8h12a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h5',
     upload:'M12 16V4m-4 4 4-4 4 4M4 15v6h16v-6',
+    backspace:'M9 5h12v14H9l-6-7zM12 9l6 6M18 9l-6 6',
     offline:'m3 3 18 18M4 9a13 13 0 0 1 2-1M10 6a14 14 0 0 1 10 3M7 13a8 8 0 0 1 3-1M14 12a8 8 0 0 1 3 1M10 17a3 3 0 0 1 4 0M12 21h.01'
   };
   const icon=k=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[k]||paths.chevron}"/></svg>`;
@@ -173,7 +174,70 @@
     const o={strs,args},hasBadge=(badge!==''&&badge!=null)||has(o,'badge');
     return `<button type="button" class="icon-button ${esc(className)}" data-ds="IconButton" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${disabled?' disabled':''}>${icon}${hasBadge?`<span class="filter-badge">${tx(badge,o,'badge')}</span>`:''}</button>`;
   }
-  const api=Object.freeze({heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton});
+  /* ---- Field cards (candidate): Stepper, Measure, Numpad ----
+     The record sheet's counting and typing fields. Each emits data-action with data-value = the caller's
+     field key; the caller owns the value, the floor and the ceiling and re-renders on every tap.
+     A key with nothing to do (− at the floor, + at the ceiling, ⌫ on an empty value, digits on a full value)
+     wears the floor-gray: aria-disabled, still tappable so the host can answer it with a pointer — the one
+     scoped disabled family. strs.value / strs.digit get args {n} filled in when the caller gives none. */
+  let fieldUid=0;
+  const fieldId=p=>`${p}-${++fieldUid}`;
+  const glyph=k=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${(root.SentriIcons&&root.SentriIcons.paths[k])||''}"/></svg>`;
+  // aria-label with an optional registry twin (filled by the shell through data-str-attr).
+  const ariaText=(text,id,args)=>` aria-label="${esc(text)}"${id?` data-str-attr="aria-label:${esc(id)}"${args?` data-args="${esc(JSON.stringify(args))}"`:''}`:''}`;
+  const withN=(o,key,n)=>{if(has(o,key)&&!(o.args&&o.args[key]))o.args=Object.assign({},o.args,{[key]:{n:String(n)}});return o;};
+  const hintTone=t=>t==='error'?'red':t==='warn'||t==='refused'?'amber':'muted';
+  function hintLine(cls,text,tone,o){
+    if(!(text||has(o,'hint')))return '';
+    return `<p class="st-field-hint ${cls}" data-tone="${hintTone(tone)}"${tone?' role="status"':''}>${tx(text,o,'hint')}</p>`;
+  }
+  /* Stepper: `− n +`, the one counting shape. variant 'row' (a 60px sheet row) or 'hero' (the one number a count sheet sets). */
+  function stepper({label='',description='',value=0,action='step',key='',min=0,max=null,variant='row',tone='',hint='',id='',className='',strs,args}={}){
+    const o=withN({strs,args},'value',value);
+    const n=Number(value)||0,hero=variant==='hero',lid=id||fieldId('st-stepper');
+    const s=strs||{},a=o.args||{};
+    const floorGray=n<=min,ceilGray=max!=null&&n>=max;
+    const key1=(step,gray)=>`<button type="button" class="st-stepper-key" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${step}"${gray?' aria-disabled="true"':''}${step<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}>${glyph(step<0?'minus':'plus')}</button>`;
+    const t=tone==='changed'?tone:'';
+    const copy=`<span class="st-stepper-copy"><span class="st-stepper-label" id="${esc(lid)}">${tx(label,o,'label')}</span>${description||has(o,'description')?`<small class="st-stepper-description">${tx(description,o,'description')}</small>`:''}</span>`;
+    const val=`<span class="st-stepper-value"${sa(s.value,a.value)} aria-live="polite">${esc(n)}</span>`;
+    return `<div class="st-stepper ${esc(className)}" data-ds="Stepper" data-variant="${hero?'hero':'row'}" role="group" aria-labelledby="${esc(lid)}"${n===0?' data-zero=""':''}${t?` data-tone="${t}"`:''}>${copy}<span class="st-stepper-keys">${key1(-1,floorGray)}${val}${key1(1,ceilGray)}</span>${hintLine('st-stepper-hint',hint,'',o)}</div>`;
+  }
+  /* The box a measured or typed value sits in; shared by Measure (a button) and Numpad's readout (static). */
+  function valueBox(tag,{value='',unit='',placeholder='—',active=false,attrs=''},o){
+    const empty=value===''||value==null,s=o.strs||{},a=o.args||{};
+    const shown=empty?(active?'':placeholder):value;
+    const vid=empty?(active?'':s.placeholder):s.value,vargs=empty?a.placeholder:(a.value||(s.value?{n:String(value)}:null));
+    return `<${tag} class="st-measure-box"${attrs}><span class="st-measure-value"${vid?sa(vid,vargs):''}>${esc(shown)}</span>${unit||has(o,'unit')?`<span class="st-measure-unit">${tx(unit,o,'unit')}</span>`:''}</${tag}>`;
+  }
+  /* Measure: one measured value, mono, unit always written. A button that opens the Numpad beneath it (active). */
+  function measure({label='',optional='',value='',unit='',placeholder='—',action='open-numpad',key='',active=false,range=null,tone='',hint='',id='',className='',strs,args}={}){
+    const o={strs,args},lid=id||fieldId('st-measure'),num=parseFloat(value);
+    const out=Array.isArray(range)&&!Number.isNaN(num)&&(num<range[0]||num>range[1]);
+    const t=['refused','changed','warn'].includes(tone)?tone:out?'warn':'';
+    const empty=value===''||value==null;
+    const lab=`<span class="st-measure-label" id="${esc(lid)}"><span${sa(o.strs&&o.strs.label,o.args&&o.args.label)}>${esc(label)}</span>${optional||has(o,'optional')?`<small>${tx(optional,o,'optional')}</small>`:''}</span>`;
+    const box=valueBox('button',{value,unit,placeholder,active,attrs:` type="button" data-action="${esc(action)}" data-value="${esc(key)}" aria-labelledby="${esc(lid)}" aria-expanded="${active?'true':'false'}"`},o);
+    return `<div class="st-measure ${esc(className)}" data-ds="Measure"${empty?' data-empty=""':''}${active?' data-active=""':''}${t?` data-tone="${t}"`:''}>${lab}${box}${hintLine('st-measure-hint',hint,t==='changed'?'':t,o)}</div>`;
+  }
+  /* Numpad: the one type-to-set pad, for real typed input only (ear tags, weights). 1–9, then [. or gap] 0 ⌫.
+     No commit key: the surface's bar primary commits (Record · next piglet); the pad only edits its readout. */
+  function numpad({label='',value='',unit='',placeholder='—',suggested=false,decimals=0,maxLength=null,recent=[],action='numpad',key='',tone='',hint='',className='',strs,args}={}){
+    const o={strs,args},s=strs||{},a=args||{};
+    const v=value==null?'':String(value),typing=suggested?'':v;
+    const dot=typing.indexOf('.'),places=dot<0?0:typing.length-dot-1;
+    const full=(maxLength!=null&&typing.replace('.','').length>=maxLength)||(decimals>0&&dot>=0&&places>=decimals);
+    const t=['error','warn'].includes(tone)?tone:suggested?'suggested':'';
+    const readout=label||has(o,'label')?`<div class="st-numpad-readout"${t?` data-tone="${t}"`:''}><span class="st-numpad-label"${sa(s.label,a.label)}>${esc(label)}</span>${valueBox('div',{value:v,unit,placeholder,active:true},o)}</div>`:'';
+    const list=recent.length?`<ol class="st-numpad-recent"${ariaText('Recorded',s.recent,a.recent)}>${recent.slice(0,3).map(r=>`<li>${tx(r.text,r,'text')}</li>`).join('')}</ol>`:'';
+    const k=(d,gray)=>`<button type="button" class="st-numpad-key" data-action="${esc(action)}" data-value="${esc(key)}" data-key="${d}"${gray?' aria-disabled="true"':''}><span${d==='.'?sa(s.decimal,a.decimal):sa(s.digit,s.digit?{n:d}:null)}>${d}</span></button>`;
+    const keys=['1','2','3','4','5','6','7','8','9'].map(d=>k(d,full)).join('')
+      +(decimals>0?k('.',dot>=0||full):'<span class="st-numpad-gap" aria-hidden="true"></span>')
+      +k('0',full)
+      +`<button type="button" class="st-numpad-key" data-action="${esc(action)}" data-value="${esc(key)}" data-key="back"${typing===''?' aria-disabled="true"':''}${ariaText('Backspace',s.back,a.back)}>${glyph('backspace')}</button>`;
+    return `<div class="st-numpad ${esc(className)}" data-ds="Numpad"${t?` data-tone="${t}"`:''}${full?' data-full=""':''}>${readout}${hintLine('st-numpad-hint',hint,t==='suggested'?'':t,o)}${list}<div class="st-numpad-keys" role="group"${ariaText('Number pad',s.pad,a.pad)}>${keys}</div></div>`;
+  }
+  const api=Object.freeze({heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
