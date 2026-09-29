@@ -58,6 +58,20 @@ The one shared dead drawer (farrowing, farrowing record, check-in, processing). 
 | **From the missing** 来自少了的N头 | piglets | how many of this draft's not-identified bodies were among the missing; drawn from the open losses oldest first, so they leave the loss, not Alive. Never an identified piglet | at Save | one litter |
 | **Tally cap (locked)** | piglets | Not identified + the N missing: the most not-identified bodies one draft can hold after the lock | now | one litter |
 
+## Edge litters (slice 14)
+
+Terms for the litter faces that differ from the ordinary litter sheet. Counts on these faces use the terms above unchanged (Born, Alive, Dead, Owed, Birth litter weight).
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Litter outside a task** 无任务的窝 | the litter | a real litter that no processing task covers (late farrower, re-entered sow). Deaths, counts and moves are recordable; treatments are not | now | one litter. Which task it should join is open (map question Q33) |
+| **Orphan litter** 孤儿窝 | the litter | a litter whose sow died after farrowing was locked; it keeps its schedule and stays in the task. Alive is the ledger's Alive, unchanged by the death | from the sow's death | one litter; the red `sow died` word and band come from farrowing's Done-register grammar |
+| **Orphan litter, sow died mid-farrowing** 分娩中母猪死亡的窝 | the litter | a litter whose sow died before Finish: her session ended without a lock, so Born is derived (counted at her death, never locked) and no birth litter weight was asked | from the sow's death | one litter |
+| **Litter before lock** 未锁定的窝 | the litter | a litter whose farrowing session is still open: Born is not final, so processing prints Alive and Dead only, with `count still open`. Count changes and deaths are recorded on the farrowing sheet; owed treatments are recorded here | until the farrowing lock | one litter |
+| **Owed line** `{n} piglets owed · due day {d}` | piglets | Owed (above) for one dose, with the day-age it falls due (`due day`, so it never reads as the litter's age) | now | one litter per dose |
+| **Owed after an earlier mark** `{n} piglet owed · born after the mark` 标记后出生 | piglets | on a litter before its lock, a treatment mark records the heads counted at tap time (stored, never recomputed); piglets born after the mark raise that dose's Owed by their number, and a later count change does not falsify the mark | from the tap until the dose is recorded for them | one litter per dose |
+| **Live-born weighed** `{n} live-born piglets weighed at birth` | piglets | the live-born piglets of this farrowing, weighed together: the provisional population of Birth litter weight. Born = live-born + stillborn | at farrowing Finish, or when processing records it while missing | one litter |
+
 ## Count grammar
 
 The count leads the word and the unit is written: `{n} piglets`, singular `{n} piglet` (`pp.common.unit.piglet.one` / `.many`, `PP.tn`); zh has one form and no space between numeral and classifier (`14头`, `3日龄`). Ruled anchors that stay as they are: `born {n}` and `day {n}` (en), `Saved · +{n} this visit` and `Saved · {n} died this visit` (farrowing's, under `fr.*`; a processing receipt names its outcome and is registered by the slice that writes it), and label-then-count headers such as `Dead 6` and `Unexplained loss {n}`.
