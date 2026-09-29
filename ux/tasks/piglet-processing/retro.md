@@ -183,3 +183,16 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   ruling") should be in lenses.md, not improvised.
 - **Cost:** medium (three lens rounds; one real product gap found, which is
   the loop working).
+
+## 13 · Slices — parallel lints would have checked each other's worktrees
+
+- **Stage:** Slices, before the first parallel wave.
+- **What happened:** the lint reuses whatever answers on the config's port
+  (`if (await up(base)) return null`). Two designers linting at once from two
+  worktrees would render each other's files and pass or fail on the wrong
+  design. Added `--port N` to the lint; each designer gets its own port.
+  Also, `.claude/` is untracked, so worktrees have no copy of the skill's
+  scripts: designers run them from the main checkout with `--repo <worktree>`.
+- **Change:** the lint should start its own server on a free port unless told
+  to reuse one; the skill should say worktrees need the scripts by path.
+- **Cost:** low (caught before dispatch).
