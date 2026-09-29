@@ -1945,7 +1945,7 @@ test('R4-8 castration before its first record: selectors say males uncounted', (
   assert.equal(run(b, R4T(['B01']), 3).litters.B01.doses.castrate.males, 6);
 });
 
-test('R4-9 several tasks per config; a nurse sow outside any task can record her arrivals', () => {
+test('R4-9 several tasks per config; a nurse sow outside every task records no treatments (RULINGS round 2, Q18)', () => {
   const cfg = Object.assign({}, R4, { tasks: [{ id: 'T7', litters: ['A02', 'S'] }, { id: 'T8', litters: ['F02'] }] });
   const b = book();
   b.farrowed('A02', 12); b.farrowed('F02', 10); b.farrowed('S', 10); b.farrowed('D02', 12);
@@ -1958,9 +1958,14 @@ test('R4-9 several tasks per config; a nurse sow outside any task can record her
   const nurse = b.treat('D02', 'iron3', 3, { at: on(3, '13:20') });
   const more = b.treat('D02', 'tail', 3, { at: on(3, '13:25') });
   const d = run(b, cfg, 3);
-  for (const e of [tF, a02, nurse]) assert.equal(rejectedReason(d, e), undefined, e.id);
+  for (const e of [tF, a02]) assert.equal(rejectedReason(d, e), undefined, e.id);
   assert.equal(rejectedReason(d, afterF), 'task_ended');
-  assert.equal(rejectedReason(d, more), undefined);                                  // tail is owed by the arrivals too
+  // a litter with no task records deaths, counts and moves — treatments not: the arrivals' doses stay not done
+  assert.equal(rejectedReason(d, nurse), 'no_task');
+  assert.equal(rejectedReason(d, more), 'no_task');
+  assert.deepEqual([d.litters.D02.doses.iron3.owed, d.litters.D02.doses.tail.owed, d.litters.D02.recordable], [3, 3, false]);
+  assert.equal(d.litters.D02.doses.iron3.catchUp, undefined);
+  assert.deepEqual(select.bulkDraft(d, { room: 'R3', dose: 'iron3' }).rows.map((r) => r.litter).includes('D02'), false);
   assert.equal(d.litters.F02.task, 'T8');
   assert.equal(d.litters.D02.task, null);
   assert.equal(select.end(d, { task: 'T8' }).atEnd.unfinishedLitters.length, 1);
