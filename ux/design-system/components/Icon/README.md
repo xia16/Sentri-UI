@@ -15,3 +15,7 @@ The shared glyph registry. `SentriIcons.icon(name)` returns an inline `<svg view
 - An unknown name falls back to the chevron, so check spellings against `IconName` in the types.
 - Icons support a word. They never replace one.
 - Known source quirk: the `grid` path draws its second and fourth squares back to x = 3 (`M14 3h7v7H3z`). Copied here as is.
+
+**States**
+- Default only: an icon is static and takes its colour from the container. It has no pressed, disabled, focus, error, loading or empty state of its own. The button or row that holds it owns those.
+- Unknown name: draws the chevron. Check spellings against `IconName`.

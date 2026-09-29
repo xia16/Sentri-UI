@@ -19,5 +19,11 @@ Call `SentriUI.log(groups, { empty })`. `groups` is a list of `{ label, entries:
 - Write the newest entry exactly as it was recorded. Don't summarise it.
 - Don't put actions inside entries. Editing a record opens its sheet from the row that owns it.
 
+**States**
+- Default: entries on the `log-line` thread. The last entry's thread ends at its dot.
+- Empty: a log with no entries, or only empty groups, renders one `muted` 12px line ("No activity recorded yet"). Groups with no entries are dropped.
+- Pressed, disabled, focus: none, because entries are text and hold no actions. `extraHtml` may hold a control, which then follows that control's own states.
+- Error, loading: not drawn.
+
 **Strings**
 Per group `strs: { label }`, per entry `strs: { category, title, detail, meta }`, each with an `args` twin; the empty line takes `strs: { empty }` in the options. Without `strs` the output is unchanged.

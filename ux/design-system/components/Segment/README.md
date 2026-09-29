@@ -20,5 +20,12 @@ Call `SentriUI.segment({ options: [[value, label], …], active, action, ariaLab
 - Never put an ellipsis on a status word.
 - Labels are raw HTML, so a count can sit in a `<span>`.
 
+**States**
+- Default: a `well` track of buttons. The active one (`aria-pressed="true"`) turns `paper` at weight 500.
+- Pressed: not drawn. The buttons have no hover or active style. The change shows when the caller re-renders with the new `active`.
+- Disabled: not drawn. `segment` has no `disabled` option.
+- Focus: the global 3px `focus` ring on the button.
+- Error, loading, empty: not drawn. A segment always has options.
+
 **Strings**
 Per option a third element `{ strs: { label }, args: { label: {...} } }`, e.g. `['a', 'All', { strs: { label: 'pp.all' } }]`; the label is wrapped in a `data-str` span. Without it the output is unchanged.
