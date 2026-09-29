@@ -1576,18 +1576,22 @@ test('bulk: a litter another phone finished is no longer in the plan; an offline
 test('bulk: the review is a contract — changed, died, gone and castration each get their own outcome', () => {
   const b = book();
   const cfg = { doses: [IRON_ONLY.doses[0], CONFIG.doses[2]], identity: { scheme: 'none' } };
-  b.farrowed('A02', 12); b.farrowed('A04', 11); b.farrowed('B06', 12); b.farrowed('B10', 11); b.farrowed('B09', 10);
-  const sel = ['A02', 'A04', 'B06', 'B10'];
+  b.farrowed('A02', 12); b.farrowed('A04', 11); b.farrowed('B06', 12); b.farrowed('B10', 11); b.farrowed('B09', 10); b.farrowed('A05', 11);
+  const sel = ['A02', 'A04', 'B06', 'B10', 'A05'];
   const d0 = run(b, cfg, 3);
   const reviewed = {};
-  select.bulkDraft(d0, { room: 'R3', dose: 'iron3' }).rows.forEach((r) => { reviewed[r.litter] = { n: r.n, alive: r.alive, dead: r.dead }; });
+  select.bulkDraft(d0, { room: 'R3', dose: 'iron3' }).rows.forEach((r) => { reviewed[r.litter] = { n: r.n, alive: r.alive, dead: r.dead, moved: r.moved, counted: r.counted }; });
   assert.equal(select.bulkDraft(d0, { room: 'R3', dose: 'castrate' }).rows[0].kind, 'sheet');
   b.death('B06', [{ cause: 'crushed', n: 2 }], { at: on(3, '10:32') });
   b.move('B09', 'A02', 1, { answers: { iron3: 'no' }, at: on(3, '10:33') });
   b.move('B10', 'B09', 11, { answers: {}, at: on(3, '10:34') });
+  // a death and an arrival in one litter: the number is the same, the litter is not
+  b.death('A05', [{ cause: 'crushed', n: 1 }], { at: on(3, '10:35') });
+  b.move('B09', 'A05', 1, { answers: { iron3: 'no' }, at: on(3, '10:36') });
   const p = select.bulkDraft(run(b, cfg, 3), { room: 'R3', dose: 'iron3', selected: sel, reviewed }).plan;
   const out = Object.fromEntries(p.outcomes.map((x) => [x.litter, x.outcome]));
-  assert.deepEqual(out, { A02: 'changed', A04: 'record', B06: 'died', B10: 'gone' });
+  assert.deepEqual(out, { A02: 'changed', A04: 'record', B06: 'died', B10: 'gone', A05: 'changed' });
+  assert.equal(p.outcomes.find((x) => x.litter === 'A02').n, 13);
   assert.deepEqual([p.litters, p.piglets], [2, 21]);
   assert.equal(p.outcomes.find((x) => x.litter === 'B06').died, 2);
 });

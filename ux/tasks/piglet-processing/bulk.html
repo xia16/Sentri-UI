@@ -32,7 +32,9 @@
 .bk-bar { transition: transform 200ms ease; }
 .bk-bar[data-leaving] { transform: translateY(110%); }
 .pp-litter[data-departing] { opacity: 0; transform: scaleY(0); transform-origin: top; transition: opacity 180ms ease, transform 180ms ease; }
-@media (prefers-reduced-motion: reduce) { .bk-bar, .pp-litter[data-departing] { transition: none; } }
+/* While the double-tap guard waits, the button wears the DS press face (README, States: brightness .96, down 1px). */
+.button[aria-busy="true"] { filter: brightness(.96); transform: translateY(1px); }
+@media (prefers-reduced-motion: reduce) { .bk-bar, .pp-litter[data-departing] { transition: none; } .button[aria-busy="true"] { transform: none; } }
 </style>
 </head>
 <body>
@@ -58,6 +60,7 @@
     'bulk-select':            { data: 'base', sel: FOUR },
     'bulk-review':            { data: 'base', sel: FOUR, review: true },
     'bulk-deferred':          { data: 'base', sel: FOUR, review: true, meantime: [LM({ type: 'treat', litter: 'B06', dose: 'iron3', n: 10, deferred: { n: 2, reason: 'weak' }, at: '2026-09-29T10:20' })], before: true },
+    'bulk-deferred-saved':    { data: 'base', sel: FOUR, review: true, commit: true, meantime: [LM({ type: 'treat', litter: 'B06', dose: 'iron3', n: 10, deferred: { n: 2, reason: 'weak' }, at: '2026-09-29T10:20' })], before: true },
     'bulk-receipt':           { data: 'base', sel: FOUR, review: true, meantime: [LM({ type: 'treat', litter: 'B06', dose: 'iron3', n: 12, at: '2026-09-29T10:30' })], commit: true },
     'bulk-changed':           { data: 'base', sel: FOUR, review: true, commit: true, meantime: [
       LM({ type: 'death', litter: 'B06', lines: [{ cause: 'crushed', n: 2 }], at: '2026-09-29T10:30' }),
@@ -74,7 +77,23 @@
   var TX = qs.get('tx') || 'iron';
   var store, CFG, DOSE, TICKS;
   var S = { sel: [], review: false, contract: {}, receipt: null, held: [], flash: false, failed: null };
-  var lastCommit = 0, reviewOpenedAt = 0, reviewClosedAt = 0, holdTimer = 0;
+  var holdTimer = 0;
+  /* Double-tap guard: only the tap sequence that opened the review (or committed) is swallowed — the next tap within 350ms
+     at the same spot lands on the button now under the finger; while it waits that button wears its pressed face.
+     A deliberate tap after that works at once. */
+  var guard = null, GUARD_MS = 350, GUARD_PX = 24;
+  function arm(ev, what) {
+    guard = { x: ev.clientX, y: ev.clientY, t: Date.now(), what: what };
+    applyBusy();
+    setTimeout(function () { guard = null; applyBusy(); }, GUARD_MS);
+  }
+  function applyBusy() {
+    scr.querySelectorAll('[aria-busy]').forEach(function (e) { e.removeAttribute('aria-busy'); });
+    if (guard) scr.querySelectorAll('.button[data-action="' + guard.what + '"]').forEach(function (e) { e.setAttribute('aria-busy', 'true'); });
+  }
+  function swallowed(ev) {
+    return !!(guard && Date.now() - guard.t < GUARD_MS && Math.abs(ev.clientX - guard.x) < GUARD_PX && Math.abs(ev.clientY - guard.y) < GUARD_PX);
+  }
 
   /* ---- the ledger ---- */
   function bulk(sel, stamp, reviewed) {
@@ -155,7 +174,7 @@
     b.rows.forEach(function (r) { by[S.held.indexOf(r.litter) >= 0 ? 'record' : r.kind].push(r); });
     var ended = b.ended ? U.receipt([{ id: 'pp.bulk.ended', tone: 'amber' }]) : '';
     if (!b.rows.length) return UI.panel(UI.choiceEmpty('', { strs: { text: b.ended ? 'pp.bulk.empty_ended' : 'pp.bulk.empty' }, args: { text: { tx: txLower() } } }));
-    var free = by.record.filter(function (r) { return r.kind === 'record' && S.sel.indexOf(r.litter) < 0 && !isChanged(r.litter); }).length;
+    var free = by.record.filter(function (r) { return r.kind === 'record' && !r.outside && S.sel.indexOf(r.litter) < 0 && !isChanged(r.litter); }).length;
     var owedHow = function (r) { return r.kind !== 'record' || isChanged(r.litter) ? (S.held.indexOf(r.litter) >= 0 ? 'static' : 'door') : 'select'; };
     return ended + group('pp.bulk.grp.record', by.record, owedHow, free ? textAction('tick-all', 'pp.bulk.act.tick_all') : '') +
       group('pp.bulk.grp.sheet', by.sheet, 'door') + group('pp.bulk.grp.done', by.done, 'door') + group('pp.bulk.grp.not_due', by.not_due, 'door') +
@@ -178,8 +197,10 @@
       var c = x.litter;
       if (x.outcome === 'died') out += U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: c } }, { id: one('pp.bulk.rcpt.died', x.died), args: { k: x.died }, tone: 'red' }, { id: 'pp.bulk.rcpt.recorded', args: { pigs: pigs(x.n) } }]);
       else if (x.outcome === 'changed') out += U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: c } }, { id: 'pp.bulk.rcpt.changed', tone: 'amber' }, { id: 'pp.bulk.rcpt.changed_now', args: { pigs: pigs(x.n) } }]);
+      else if (x.outcome === 'gone' && x.other) out += U.receipt([{ id: 'pp.bulk.rcpt.meantime', args: { code: c, t: U.time(x.other.at), who: x.other.who, pigs: pigs(x.other.n) } }, { id: 'pp.bulk.rcpt.nothing', tone: 'amber' }]);
       else if (x.outcome === 'gone') out += U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: c } }, { id: 'pp.bulk.rcpt.gone', tone: 'amber' }]);
       else if (x.outcome === 'nothing') out += U.receipt([{ id: 'pp.bulk.rcpt.meantime', args: { code: c, t: U.time(x.other.at), who: x.other.who, pigs: pigs(x.other.n) } }, { id: 'pp.bulk.rcpt.nothing', tone: 'amber' }]);
+      else if (x.outcome === 'sheet' && x.other) out += U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: c } }, { id: 'pp.bulk.rcpt.sheet_by', args: { who: x.other.who, m: x.other.n, n: x.n }, tone: 'amber' }]);
       else if (x.outcome === 'sheet') out += U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: c } }, { id: 'pp.bulk.rcpt.sheet', tone: 'amber' }]);
       else if (x.outcome === 'refused') out += U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: c } }, { id: 'pp.bulk.rcpt.refused' }, { id: why(x.why), tone: 'amber' }]);
     });
@@ -190,6 +211,13 @@
   }
   var WHY = ['task_ended', 'no_task', 'nothing_owed', 'more_than_owed', 'reason_missing', 'empty'];
   function why(r) { return 'pp.bulk.why.' + (WHY.indexOf(r) >= 0 ? r : 'other'); }
+  /* The contract: what the review shows for each ticked litter, frozen when Review opens (piglets, alive, dead, moves, counts). */
+  function freeze() {
+    S.contract = {};
+    bulk().rows.forEach(function (r) { if (S.sel.indexOf(r.litter) >= 0 && r.kind === 'record') S.contract[r.litter] = { n: r.n, alive: r.alive, dead: r.dead, moved: r.moved, counted: r.counted }; });
+  }
+  // `counts late` is a schedule word: catch-up rows (arrivals after End, litters outside the task) are not late.
+  function lateCount(list) { return list.filter(function (x) { return x.lateBy > 0 && !x.catchUp; }).length; }
   function footer(opts) {
     var inner = S.receipt ? receiptLines() : '';
     if (S.sel.length) {
@@ -202,11 +230,9 @@
 
   /* ---- the review: the counts, each litter's quantity (the contract), and only the litters that differ from the ticks ---- */
   function reviewDrawer() {
-    var b = bulk(), p = b.plan, byId = {};
+    // Judged against the contract frozen when Review opened: a sync re-renders this drawer but never rebases it.
+    var b = bulk(null, null, S.contract), p = b.plan, byId = {};
     b.rows.forEach(function (r) { byId[r.litter] = r; });
-    // What the worker reads here is what Record may write: each litter's piglets, alive and dead as shown.
-    S.contract = {};
-    p.record.forEach(function (x) { var r = byId[x.litter]; S.contract[x.litter] = { n: r.n, alive: r.alive, dead: r.dead }; });
     var d = doseCfg(DOSE);
     var desc = d.product ? ['pp.bulk.rv.prod', { prod: PP.t('pp.litter.product.' + d.product) }] : ['pp.bulk.rv.all', null];
     var head = UI.heading({ title: '', kind: 'page', level: 3, description: '', strs: { title: 'pp.bulk.rv.title', description: desc[0] }, args: { title: { tx: txLower() }, description: desc[1] } });
@@ -215,10 +241,12 @@
     if (b.counts.not_due) parts.push({ id: one('pp.bulk.part.not_due', b.counts.not_due), args: { k: b.counts.not_due } });
     if (b.counts.sheet) parts.push({ id: one('pp.bulk.part.sheet', b.counts.sheet), args: { k: b.counts.sheet } });
     var each = U.receipt([{ id: 'pp.bulk.rcpt.each', args: { list: p.record.map(function (x) { return PP.t('pp.bulk.rcpt.one', { code: x.litter, pigs: pigs(x.n) }); }).join(' · ') } }]);
-    var late = p.record.filter(function (x) { return x.lateBy > 0; }).length;
-    var differ = p.outcomes.filter(function (x) { return x.outcome !== 'record'; }).map(function (x) { return byId[x.litter]; }).filter(Boolean);
+    var late = lateCount(p.record);
+    var differ = p.outcomes.filter(function (x) { return x.outcome !== 'record' && x.outcome !== 'died'; }).map(function (x) { return byId[x.litter]; }).filter(Boolean);
     var gone = p.outcomes.filter(function (x) { return x.outcome === 'gone'; });
+    var died = p.outcomes.filter(function (x) { return x.outcome === 'died'; });
     var content = U.receipt(parts) + (p.litters ? each : '') + (late ? U.receipt([{ id: one('pp.bulk.rv.late', late), args: { k: late } }]) : '') +
+      died.map(function (x) { return U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: x.litter } }, { id: one('pp.bulk.rcpt.died', x.died), args: { k: x.died }, tone: 'red' }, { id: 'pp.bulk.rv.will_record', args: { pigs: pigs(x.n) } }]); }).join('') +
       group('pp.bulk.rv.differ', differ, 'door') +
       gone.map(function (x) { return U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: x.litter } }, { id: 'pp.bulk.rcpt.gone', tone: 'amber' }]); }).join('') +
       (S.failed ? U.receipt([{ id: 'pp.bulk.rv.failed' }, { id: why(S.failed), tone: 'amber' }]) : '') +
@@ -252,10 +280,9 @@
     var b = bulk(S.sel, stamp, S.contract);
     var evs = b.plan.events.map(function (e) { return Object.assign({ at: stamp.at }, seen ? { seen: seen } : {}, e); });
     var res = evs.length ? store.commitAll(evs) : { ok: true, events: [] };
-    lastCommit = Date.now();
     if (!res.ok) { S.failed = res.reason; S.review = true; return false; }
     S.failed = null;
-    S.receipt = { outcomes: b.plan.outcomes, litters: b.plan.litters, piglets: b.plan.piglets, late: b.plan.record.filter(function (x) { return x.lateBy > 0; }).length,
+    S.receipt = { outcomes: b.plan.outcomes, litters: b.plan.litters, piglets: b.plan.piglets, late: lateCount(b.plan.record),
       changed: b.plan.changed.slice(), double: [], mine: res.events.map(function (e) { return e.id; }) };
     recheck();
     S.held = b.plan.outcomes.filter(function (x) { return x.outcome === 'record' || x.outcome === 'died' || x.outcome === 'nothing'; }).map(function (x) { return x.litter; });
@@ -310,23 +337,24 @@
   });
   scr.addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-action]'); if (!b || b.matches('input')) return;
-    var a = b.dataset.action, v = b.dataset.value, now = Date.now();
+    var a = b.dataset.action, v = b.dataset.value;
+    if (swallowed(ev)) return;                                              // the rest of the tap that opened the review or committed
     if (a === 'clear') { S.sel = []; saveTicks(); render(); }
     else if (a === 'tick-all') {
-      bulk().rows.forEach(function (r) { if (r.kind === 'record' && !isChanged(r.litter) && S.sel.indexOf(r.litter) < 0) S.sel.push(r.litter); });
+      bulk().rows.forEach(function (r) { if (r.kind === 'record' && !r.outside && !isChanged(r.litter) && S.sel.indexOf(r.litter) < 0) S.sel.push(r.litter); });
       saveTicks(); render();
     }
-    else if (a === 'review') { if (now - lastCommit < 600) return; S.review = true; S.failed = null; reviewOpenedAt = now; render(); }
-    else if (a === 'back') { S.review = false; reviewClosedAt = now; render(); }
+    else if (a === 'review') { S.review = true; S.failed = null; freeze(); render(); arm(ev, 'record'); }
+    else if (a === 'back') { S.review = false; S.contract = {}; render(); arm(ev, 'close'); }
     else if (a === 'record') {
-      if (now - reviewOpenedAt < 600 || now - lastCommit < 600) return;      // a tap meant for the bar's Review never records
       var old = footer();
       if (!commit()) { render(); return; }
+      arm(ev, 'close');
       if (reduce) { S.flash = false; render(); armHold(); return; }
       // 0ms: the rows change in place and flash; the selection bar leaves first (200ms), then the receipt takes the bar.
       S.flash = true; scr.innerHTML = ''; render();
       var bar = scr.querySelector('.bk-bar'), tmp0 = document.createElement('div');
-      tmp0.innerHTML = old; PP.apply(tmp0); bar.replaceWith(tmp0.firstChild);
+      tmp0.innerHTML = old; PP.apply(tmp0); tmp0.firstChild.setAttribute('inert', ''); bar.replaceWith(tmp0.firstChild);
       requestAnimationFrame(function () {
         var ob = scr.querySelector('.bk-bar'); if (ob) ob.setAttribute('data-leaving', '');
         scr.querySelectorAll('.pp-litter[data-flash]').forEach(function (x) { x.removeAttribute('data-flash'); });
@@ -336,11 +364,10 @@
         var tmp = document.createElement('div'); tmp.innerHTML = footer(); PP.apply(tmp);
         cur.replaceWith(tmp.firstChild);
         var c = scr.querySelector('.bk-bar [data-action="close"]'); if (c) c.focus({ preventScroll: true });
-        armHold();
+        applyBusy(); armHold();
       }, 200);
     }
     else if (a === 'close') {
-      if (now - reviewClosedAt < 400 || now - lastCommit < 600) return;     // a second tap on Record never lands on Close
       nav('room.html', { state: 'room', filter: doseCfg(DOSE).tx, unit: ROOM !== 7 ? ROOM : '' });
     }
     else if (a === 'open-litter') { nav('litter.html', { state: 'litter', crate: v, unit: ROOM !== 7 ? ROOM : '' }); }
@@ -354,10 +381,12 @@
     DOSE = pickDose();
     TICKS = 'pp-bulk-ticks:' + store.name + ':' + ROOM + ':' + DOSE;
     var rec = bulk([]).rows.filter(function (r) { return r.kind === 'record'; }).map(function (r) { return r.litter; });
+    // Ticks stay true: only litters that can still be recorded, written back so the room's door never claims more.
     S.sel = (st.sel || loadTicks()).filter(function (id) { return rec.indexOf(id) >= 0; });
+    if (!st.sel) saveTicks();
     if (qs.get('crate') && rec.indexOf(qs.get('crate')) >= 0 && S.sel.indexOf(qs.get('crate')) < 0) S.sel.push(qs.get('crate'));
     if (st.meantime && st.before) st.meantime.forEach(function (e) { PP.sync(e, true); });
-    if (st.review) { S.review = true; render(); }
+    if (st.review) { S.review = true; freeze(); render(); }
     if (st.meantime && !st.before) st.meantime.forEach(function (e) { PP.sync(e, true); });
     if (st.commit) {
       var seen = st.offline ? store.events.map(function (e) { return e.id; }) : null;

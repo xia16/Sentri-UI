@@ -1508,10 +1508,11 @@ function bulkDraftSelect(derived, opts) {
     if (!D || D.status == null) continue;
     const E = endedOf(L);
     if (E) ended = ended || { at: E.at, who: E.who };
-    const row = { litter: L.id, alive: L.alive, dead: L.dead.total, day: L.dayAge, status: D.status, lateBy: D.status === 'late' ? L.dayAge - D.due : 0,
+    const row = { litter: L.id, alive: L.alive, dead: L.dead.total, moved: L.movedIn + L.movedOut, counted: L.counts.length, day: L.dayAge, status: D.status, lateBy: D.status === 'late' ? L.dayAge - D.due : 0,
       sowDied: !!L.sowDied, phase: L.phase, catchUp: false };
     const collided = (r) => D.possibleDoubleTreatment.some((p) => p.includes(r.id));
     const todays = D.records.filter((r) => dayNumber(r.at) === today).map((r) => ({ id: r.id, at: r.at, who: r.who, n: r.n, collided: collided(r) }));
+    const last = todays.length ? todays[todays.length - 1] : null;
     if (E || !L.inTask) {
       // after End (or outside every task): only arrivals that owe the dose, and only as many as arrived
       if (!(D.catchUp > 0 && D.owed > 0) || D.isCastration) continue;
@@ -1521,7 +1522,7 @@ function bulkDraftSelect(derived, opts) {
     else if (D.done) { if (!todays.length) continue; Object.assign(row, { kind: 'done', records: todays, collided: todays.some((r) => r.collided) }); }
     else if (D.isCastration) Object.assign(row, { kind: 'sheet', why: 'castration', n: D.owed });
     else if (D.status === 'missed') Object.assign(row, { kind: 'sheet', why: 'missed', n: D.owed, last: D.last });
-    else if (D.deferred > 0) Object.assign(row, { kind: 'sheet', why: 'deferred', n: D.owed, reason: D.deferReason });
+    else if (D.deferred > 0) Object.assign(row, { kind: 'sheet', why: 'deferred', n: D.owed, reason: D.deferReason, last });
     else if (D.unknownAfterMove > 0) Object.assign(row, { kind: 'sheet', why: 'unknown', n: D.unknownAfterMove });
     else Object.assign(row, { kind: 'record', n: D.owed });
     rows.push(row);
@@ -1540,8 +1541,11 @@ function bulkDraftSelect(derived, opts) {
     const out = { litter: id };
     plan.outcomes.push(out);
     if (!row) {
-      const L = derived.litters[id];
-      Object.assign(out, { outcome: 'gone', was: rev ? rev.n : null, alive: L ? L.alive : 0 });
+      // left the list: every piglet gone, or (catch-up) another phone recorded the arrivals — then who and when
+      const L = derived.litters[id], D = L && L.doses[doseId];
+      const recs = D ? D.records.filter((r) => dayNumber(r.at) === today) : [];
+      const other = recs.length ? { id: recs[recs.length - 1].id, at: recs[recs.length - 1].at, who: recs[recs.length - 1].who, n: recs[recs.length - 1].n } : null;
+      Object.assign(out, { outcome: 'gone', was: rev ? rev.n : null, alive: L ? L.alive : 0, other: L && L.alive > 0 ? other : null });
       plan.gone.push(id); return;
     }
     if (row.kind === 'done') {
@@ -1549,11 +1553,13 @@ function bulkDraftSelect(derived, opts) {
       Object.assign(out, { outcome: rev ? 'nothing' : 'done', other, records: row.records }); plan.done.push(id); return;
     }
     if (row.kind === 'not_due') { Object.assign(out, { outcome: 'not_due', inDays: row.inDays }); plan.notDue.push(id); return; }
-    if (row.kind === 'sheet') { Object.assign(out, { outcome: 'sheet', why: row.why, n: row.n, was: rev ? rev.n : null }); plan.sheet.push(id); return; }
+    if (row.kind === 'sheet') { Object.assign(out, { outcome: 'sheet', why: row.why, n: row.n, was: rev ? rev.n : null, other: row.last || null }); plan.sheet.push(id); return; }
     let died = 0;
-    if (rev && (row.n !== rev.n || row.alive !== rev.alive)) {
+    // Deaths alone may lower the number (named); a move, a count or anything else since the review is `changed`.
+    const other = rev && (rev.moved !== undefined && (row.moved !== rev.moved || row.counted !== rev.counted));
+    if (rev && (other || row.n !== rev.n || row.alive !== rev.alive || row.dead !== rev.dead)) {
       died = row.dead - rev.dead;
-      const onlyDeaths = died > 0 && rev.n - row.n === died && rev.alive - row.alive === died;
+      const onlyDeaths = !other && died > 0 && rev.n - row.n === died && rev.alive - row.alive === died;
       if (!onlyDeaths) { Object.assign(out, { outcome: 'changed', was: rev.n, n: row.n, alive: row.alive }); plan.changed.push(id); return; }
     }
     const ev = { type: 'treat', litter: id, dose: doseId, n: row.n };

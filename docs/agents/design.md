@@ -162,6 +162,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-bulk-bulk-select", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-select&tx=iron", "strict": true },
     { "name": "pp-bulk-bulk-review", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-review&tx=iron", "strict": true },
     { "name": "pp-bulk-bulk-deferred", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-deferred&tx=iron", "strict": true },
+    { "name": "pp-bulk-bulk-deferred-saved", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-deferred-saved&tx=iron", "strict": true },
     { "name": "pp-bulk-bulk-receipt", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-receipt&tx=iron", "strict": true },
     { "name": "pp-bulk-bulk-changed", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-changed&tx=iron", "strict": true },
     { "name": "pp-bulk-bulk-offline-collision", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-offline-collision&tx=iron", "strict": true },

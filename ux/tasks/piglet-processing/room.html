@@ -246,13 +246,19 @@
     // The litters a bulk record can write (the ledger's bulkDraft): after End only catch-up, and no door when there is none.
     CFG.doses.filter(function (d) { return d.tx === tx; }).forEach(function (d) {
       var b = store.select.bulkDraft(store.derived, { room: ROOM, dose: d.id });
-      var k = b.rows.filter(function (r) { return r.kind === 'record'; }).length;
-      if (!best || k > best.k) best = { dose: d.id, k: k, ended: !!b.ended };
+      var ids = b.rows.filter(function (r) { return r.kind === 'record'; }).map(function (r) { return r.litter; });
+      if (!best || ids.length > best.k) best = { dose: d.id, k: ids.length, ids: ids, ended: !!b.ended };
     });
+    // Ticks left on this phone (a bulk draft) say so here — only those that can still be recorded, written back.
+    var ticked = 0, key = best ? 'pp-bulk-ticks:' + store.name + ':' + ROOM + ':' + best.dose : '';
+    try {
+      if (key) {
+        var kept = (JSON.parse(sessionStorage.getItem(key) || '[]') || []).filter(function (id) { return best.ids.indexOf(id) >= 0; });
+        if (kept.length) sessionStorage.setItem(key, JSON.stringify(kept)); else sessionStorage.removeItem(key);
+        ticked = kept.length;
+      }
+    } catch (e) {}
     if (!best || best.k < (best.ended ? 1 : 2)) return '';
-    // Ticks left on this phone (a bulk draft) say so here.
-    var ticked = 0;
-    try { ticked = (JSON.parse(sessionStorage.getItem('pp-bulk-ticks:' + store.name + ':' + ROOM + ':' + best.dose) || '[]') || []).length; } catch (e) {}
     var desc = ticked ? ['pp.bulk.door_ticked', { k: ticked }] : [PP.one('pp.bulk.door_desc', best.k), { k: best.k }];
     return '<div class="pp-bulkdoor">' + UI.rowGroup(UI.row({ title: '', description: '', action: 'open-bulk', value: tx,
       strs: { title: 'pp.bulk.door', description: desc[0] }, args: { title: { tx: PP.lang === 'zh' ? name(tx) : name(tx).toLowerCase() }, description: desc[1] } })) + '</div>';
