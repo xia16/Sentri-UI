@@ -18,6 +18,7 @@ The 52 glyphs of the `SentriIcons` registry (`ux/system/sentri-icons.js`). Each 
 - `farrow` stands for farrowing, `pregnancy` for the pregnancy check, `feed` for feed, `health` for health and `treat` for treatment.
 - `transfer` means move.
 - `offline` means no signal, and `upload` means records waiting to upload.
+- `backspace` (candidate, ADR 0001) deletes the last typed character on the Numpad. It is the 53rd glyph: it lives in the bundle's `SentriIcons` and in `backspace.svg` here, not yet in `ux/system/sentri-icons.js` or the artifact's asset blobs.
 
 **Known quirk**
 - `grid` draws its second and fourth squares back to x = 3. This comes from the source, and the file keeps it as is.

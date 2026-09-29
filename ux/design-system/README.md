@@ -55,6 +55,7 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
 
 - **Press:** rows and options fill `press` (choosers `choice-press`); buttons darken (`brightness(.96)`) and move down 1px. Stepper keys scale to .96.
 - **Disabled:** primary buttons go `disabled-fill` with `disabled-ink`. But prefer omission: blocked verbs are left out, not greyed, with one line saying why ("4 not available for a gilt ›"). Done rows differ by ✓, stamp and ✎ — never by grey.
+- **The floor-gray (the one scoped exception to "no dim-as-disabled"; owner, 2026-08-30).** A field key with nothing to do — a stepper's − at its floor or + at its ceiling, a Numpad's ⌫ on an empty value, `.` after a point, digits when the value is full — fills `disabled-fill` with a `disabled-ink` glyph. It is `aria-disabled`, never `disabled`: the tap still reaches the host, which answers it in the field's reserved hint line (pointers such as `Found dead? Record dead` · `Wrong count? Edit` at a floor, a sentence at a ceiling, `Tag is 6 digits` on a full pad). Nothing else is ever greyed. Used by [Stepper](components/Stepper/README.md) and [Numpad](components/Numpad/README.md).
 - **Focus:** a solid 3px `focus` ring, offset 2px (rows: −3px, inside the row). It holds 3.9:1 or better on every Sentri surface.
 - **Current location:** `green-wash` background plus the `current-marker` inset bar (`aria-current="location"`).
 
@@ -81,7 +82,7 @@ First segment is the working pile, second the finished pile, All always last. Fo
 
 ### The record sheet
 
-Fields stack in capture order, never in columns. The bar holds at most two actions, primary right. Only these fields may enter a sheet: **Choice** (2–4 outcomes; a fifth makes it a picker), **Scale** (3–5 graded steps), **Stepper** (counting animals; + filled `ink`), **Measure** (mono, unit always shown), **Checklist**, **Numpad** (values entered in sequence), **Picker**, **Multi-picker**, **Note** (optional unless a choice requires it; never the primary way to capture a fact) and **Photos** (up to 12, attached to the event). A dependent field appears inline beneath its trigger; if a reveal would push more than two fields, the event is a composite of summary rows.
+Fields stack in capture order, never in columns. The bar holds at most two actions, primary right. Only these fields may enter a sheet: **Choice** (2–4 outcomes; a fifth makes it a picker), **Scale** (3–5 graded steps), **Stepper** (counting animals; + filled `ink` — [card](components/Stepper/README.md)), **Measure** (mono, unit always shown — [card](components/Measure/README.md)), **Checklist**, **Numpad** (typed input only: ear tags and weights, under a Measure or in a run — [card](components/Numpad/README.md)), **Picker**, **Multi-picker**, **Note** (optional unless a choice requires it; never the primary way to capture a fact) and **Photos** (up to 12, attached to the event). A dependent field appears inline beneath its trigger; if a reveal would push more than two fields, the event is a composite of summary rows.
 
 ### Containers
 
@@ -102,6 +103,7 @@ It reads; it never acts. The fact line puts words left and the trail (when · wh
 - Every icon keeps its word. Glyphs are for recognition, never meaning on their own: verb tiles, rows and buttons always carry a label; icon-only buttons carry an `aria-label`.
 - Never hand-draw an inline SVG in a screen: add the path to the registry so every app renders the same glyph. No emoji; the only glyph characters in copy are `·` (separator), `→` (movement and deltas), `›` (more) and `×` (multiples).
 - The `Icons` asset group holds each glyph as a standalone SVG drawn in `ink` at stroke 1.6.
+- Field keys are the one heavier exception: the Stepper's `minus` / `plus` draw at stroke 2.2 (`glyph-key` 14px, `glyph-key-hero` 18px) and the Numpad's `backspace` at 1.8 (`glyph-pad` 20px), so a key reads at arm's length in glare. `backspace` (a left-pointing key cap with an ×) is the registry's 53rd glyph, candidate with the field cards (ADR 0001); it means "delete the last typed character" and nothing else.
 
 ## The wordmark
 
