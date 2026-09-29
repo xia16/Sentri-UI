@@ -1572,3 +1572,35 @@ test('bulk: a litter another phone finished is no longer in the plan; an offline
   assert.equal(done.kind, 'done');
   assert.ok(done.collided);
 });
+
+test('bulk: the review is a contract — changed, died, gone and castration each get their own outcome', () => {
+  const b = book();
+  const cfg = { doses: [IRON_ONLY.doses[0], CONFIG.doses[2]], identity: { scheme: 'none' } };
+  b.farrowed('A02', 12); b.farrowed('A04', 11); b.farrowed('B06', 12); b.farrowed('B10', 11); b.farrowed('B09', 10);
+  const sel = ['A02', 'A04', 'B06', 'B10'];
+  const d0 = run(b, cfg, 3);
+  const reviewed = {};
+  select.bulkDraft(d0, { room: 'R3', dose: 'iron3' }).rows.forEach((r) => { reviewed[r.litter] = { n: r.n, alive: r.alive, dead: r.dead }; });
+  assert.equal(select.bulkDraft(d0, { room: 'R3', dose: 'castrate' }).rows[0].kind, 'sheet');
+  b.death('B06', [{ cause: 'crushed', n: 2 }], { at: on(3, '10:32') });
+  b.move('B09', 'A02', 1, { answers: { iron3: 'no' }, at: on(3, '10:33') });
+  b.move('B10', 'B09', 11, { answers: {}, at: on(3, '10:34') });
+  const p = select.bulkDraft(run(b, cfg, 3), { room: 'R3', dose: 'iron3', selected: sel, reviewed }).plan;
+  const out = Object.fromEntries(p.outcomes.map((x) => [x.litter, x.outcome]));
+  assert.deepEqual(out, { A02: 'changed', A04: 'record', B06: 'died', B10: 'gone' });
+  assert.deepEqual([p.litters, p.piglets], [2, 21]);
+  assert.equal(p.outcomes.find((x) => x.litter === 'B06').died, 2);
+});
+
+test('bulk: after End only catch-up rows for arrivals, and the result says the task ended', () => {
+  const b = book();
+  const cfg = { doses: IRON_ONLY.doses, identity: { scheme: 'none' }, task: { id: 'T', litters: ['A02', 'A04'] } };
+  b.farrowed('A02', 12); b.farrowed('A04', 11); b.farrowed('Z01', 5);
+  b.treat('A02', 'iron3', 12, { at: on(3, '08:00') }); b.treat('A04', 'iron3', 11, { at: on(3, '08:05') });
+  b.ev.push({ id: 'end', type: 'end_task', at: on(5, '12:00'), who: 'G.H' });
+  b.move('Z01', 'A04', 2, { answers: { iron3: 'no' }, at: on(6, '09:00') });
+  const r = select.bulkDraft(run(b, cfg, 6), { room: 'R3', dose: 'iron3', selected: ['A04'] });
+  assert.ok(r.ended);
+  assert.deepEqual(r.rows.map((x) => [x.litter, x.kind, x.n, x.catchUp]), [['A04', 'record', 2, true]]);
+  assert.equal(r.plan.litters, 1);
+});
