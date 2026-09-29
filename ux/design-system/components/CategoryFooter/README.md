@@ -18,3 +18,6 @@ Call `SentriUI.categoryFooter({ categories: [{ id, label, disabled }], active, b
 **Rules**
 - Leave out an empty category. Don't disable it.
 - Back keeps its position between a pig's details and its action menu, so the return control never moves under the thumb.
+
+**Strings**
+`strs: { back }` for the Back text and per category `strs: { label }`, with `args` twins. The nav `label` is an `aria-label` attribute and has no twin. Without `strs` the output is unchanged.

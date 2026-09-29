@@ -1,0 +1,4 @@
+/* Piglet processing screen frame: the page gutter and section gap only, read from tokens.css. */
+.phone { max-width: 390px; margin: 0 auto; padding: 20px var(--space-gutter); min-height: 100vh; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
+.phone > * + * { margin-top: var(--space-section); }
+@media (max-width: 370px) { .phone { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }

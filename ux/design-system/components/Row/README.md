@@ -20,3 +20,6 @@ Call `SentriUI.row({ title, description, icon, action, value, trailing, disabled
 - Pressed rows fill with `press`.
 - The row you are standing in takes `attrs: { 'aria-current': 'location' }`. It gets `green-wash` and the 3px `current-marker`.
 - `disabled` exists, but prefer omission. Leave out a row that can't be acted on, and add one line saying why.
+
+**Strings**
+`row` takes `strs: { title, description, trailing }` and `args`; with `strs.trailing`, `trailing` is escaped fallback text instead of trusted HTML. `rowGroup` takes `strs: { title }` and its root is `data-ds="Row"`. Without `strs` the output is unchanged.

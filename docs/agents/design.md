@@ -26,7 +26,8 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "farrowing", "url": "ux/system/farrowing-astra-concept.html", "locales": ["en"],
       "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] },
     { "name": "inspection", "url": "ux/system/inspection-astra-concept.html", "locales": ["en"],
-      "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] }
+      "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] },
+    { "name": "pp-index", "url": "ux/tasks/piglet-processing/index.html", "strict": true }
   ]
 }
 ```

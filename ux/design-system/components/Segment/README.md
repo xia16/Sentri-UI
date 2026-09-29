@@ -19,3 +19,6 @@ Call `SentriUI.segment({ options: [[value, label], …], active, action, ariaLab
 - When space runs out, drop the counts on inactive segments first.
 - Never put an ellipsis on a status word.
 - Labels are raw HTML, so a count can sit in a `<span>`.
+
+**Strings**
+Per option a third element `{ strs: { label }, args: { label: {...} } }`, e.g. `['a', 'All', { strs: { label: 'pp.all' } }]`; the label is wrapped in a `data-str` span. Without it the output is unchanged.

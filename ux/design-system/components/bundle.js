@@ -63,88 +63,115 @@
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
 
-/* Shared reading components. Business rules and navigation stay with callers. */
+/* Shared reading components. Business rules and navigation stay with callers.
+   Every root carries data-ds="<CardName>". Every text slot has an optional string-id twin:
+   pass strs:{slot:'registry.id'} (and args:{slot:{...}}) and the slot is wrapped in
+   <span data-str="id" data-args="…"> for the screen shell to fill. Without strs, output is unchanged. */
 (function(root){
   'use strict';
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  // String-id twin helpers. sa: attribute text for an id; tx: escaped text, wrapped in a span when an id is given.
+  const sa=(id,args)=>id?` data-str="${esc(id)}"${args&&Object.keys(args).length?` data-args="${esc(JSON.stringify(args))}"`:''}`:'';
+  const tx=(text,o,key)=>{const id=o&&o.strs&&o.strs[key];return id?`<span${sa(id,o.args&&o.args[key])}>${esc(text)}</span>`:esc(text);};
+  const has=(o,key)=>!!(o&&o.strs&&o.strs[key]);
   const arrow='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
-  function heading({title,icon='',description='',meta='',action='',kind='section',level=4,className=''}={}){
+  function heading({title,icon='',description='',meta='',action='',kind='section',level=4,className='',strs,args}={}){
+    const o={strs,args};
     const k=['page','section','group','panel'].includes(kind)?kind:'section',h=Math.max(1,Math.min(6,Number(level)||4));
-    return `<div class="st-heading ${esc(className)}" data-kind="${k}"${icon?' data-has-icon="true"':''}><div class="st-heading-main"><h${h} class="st-heading-title">${icon?`<span class="st-heading-icon">${icon}</span>`:''}<span>${esc(title)}</span></h${h}>${description?`<p class="st-heading-description">${esc(description)}</p>`:''}</div>${meta||action?`<div class="st-heading-aside">${meta?`<span class="st-heading-meta">${esc(meta)}</span>`:''}${action?`<span class="st-heading-action">${action}</span>`:''}</div>`:''}</div>`;
+    const showDesc=description||has(o,'description'),showMeta=meta||has(o,'meta');
+    return `<div class="st-heading ${esc(className)}" data-ds="Heading" data-kind="${k}"${icon?' data-has-icon="true"':''}><div class="st-heading-main"><h${h} class="st-heading-title">${icon?`<span class="st-heading-icon">${icon}</span>`:''}<span${sa(strs&&strs.title,args&&args.title)}>${esc(title)}</span></h${h}>${showDesc?`<p class="st-heading-description">${tx(description,o,'description')}</p>`:''}</div>${showMeta||action?`<div class="st-heading-aside">${showMeta?`<span class="st-heading-meta">${tx(meta,o,'meta')}</span>`:''}${action?`<span class="st-heading-action">${action}</span>`:''}</div>`:''}</div>`;
   }
-  function panel(content,{className='',tag='div'}={}){
+  function panel(content,{className='',tag='div',ds='Panel'}={}){
     const t=['div','section','article','aside','dl'].includes(tag)?tag:'div';
-    return `<${t} class="st-panel ${esc(className)}">${content}</${t}>`;
+    return `<${t} class="st-panel ${esc(className)}" data-ds="${esc(ds)}">${content}</${t}>`;
   }
   function facts(items,{className='',columns=2}={}){
-    return `<dl class="st-panel st-facts ${esc(className)}" data-columns="${columns===3?3:columns===1?1:2}">${items.map(i=>`<div class="st-fact"><dt>${esc(i.label)}</dt><dd>${i.valueHtml!=null?i.valueHtml:esc(i.value==null||i.value===''?'—':i.value)}</dd>${i.meta?`<small>${esc(i.meta)}</small>`:''}</div>`).join('')}</dl>`;
+    return `<dl class="st-panel st-facts ${esc(className)}" data-ds="Facts" data-columns="${columns===3?3:columns===1?1:2}">${items.map(i=>`<div class="st-fact"><dt>${tx(i.label,i,'label')}</dt><dd>${i.valueHtml!=null?i.valueHtml:has(i,'value')?tx(i.value,i,'value'):esc(i.value==null||i.value===''?'—':i.value)}</dd>${i.meta||has(i,'meta')?`<small>${tx(i.meta,i,'meta')}</small>`:''}</div>`).join('')}</dl>`;
   }
-  function rowGroup(content,{title='',level=5,className=''}={}){
-    return panel((title?heading({title,kind:'group',level,className:'st-row-group-label'}):'')+content,{className:'st-row-group '+className});
+  function rowGroup(content,{title='',level=5,className='',strs,args}={}){
+    return panel((title||has({strs},'title')?heading({title,kind:'group',level,className:'st-row-group-label',strs,args}):'')+content,{className:'st-row-group '+className,ds:'Row'});
   }
-  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',attrs={}}={}){
+  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',attrs={},strs,args}={}){
+    const o={strs,args};
     const tag=action?'button':'div',safeAttrs=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
-    return `<${tag} class="st-row ${esc(className)}"${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${safeAttrs}>${icon?`<span class="st-row-icon">${icon}</span>`:''}<span class="st-row-copy"><strong>${esc(title)}</strong>${description?`<small>${esc(description)}</small>`:''}</span>${trailing?`<span class="st-row-trailing">${trailing}</span>`:''}${action?`<span class="st-row-chevron">${arrow}</span>`:''}</${tag}>`;
+    // With strs.trailing the value is plain fallback text (escaped); without it, trailing stays trusted raw HTML.
+    const trail=has(o,'trailing')?`<span class="st-row-trailing">${tx(trailing,o,'trailing')}</span>`:trailing?`<span class="st-row-trailing">${trailing}</span>`:'';
+    return `<${tag} class="st-row ${esc(className)}" data-ds="Row"${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${safeAttrs}>${icon?`<span class="st-row-icon">${icon}</span>`:''}<span class="st-row-copy"><strong>${tx(title,o,'title')}</strong>${description||has(o,'description')?`<small>${tx(description,o,'description')}</small>`:''}</span>${trail}${action?`<span class="st-row-chevron">${arrow}</span>`:''}</${tag}>`;
   }
-  function log(groups,{className='',empty='No activity recorded yet'}={}){
+  /* groups: [{label, strs:{label}, args:{label}, entries:[{category,title,detail,meta,strs:{…},args:{…}}]}]; options.strs.empty for the empty line. */
+  function log(groups,{className='',empty='No activity recorded yet',strs,args}={}){
     const nonempty=groups.filter(g=>g.entries?.length);
-    if(!nonempty.length)return panel(`<p class="st-empty">${esc(empty)}</p>`,{className:'st-log '+className});
-    return panel(nonempty.map(g=>`<section class="st-log-group">${g.label?heading({title:g.label,kind:'group'}):''}<div class="st-log-entries">${g.entries.map(e=>`<article class="st-log-entry">${e.category?`<span class="st-log-category">${esc(e.category)}</span>`:''}<strong class="st-log-title">${esc(e.title)}</strong>${e.detail?`<p>${esc(e.detail)}</p>`:''}${e.meta?`<small>${esc(e.meta)}</small>`:''}${e.extraHtml?`<div class="st-log-extra">${e.extraHtml}</div>`:''}</article>`).join('')}</div></section>`).join(''),{className:'st-log '+className});
+    if(!nonempty.length)return panel(`<p class="st-empty">${tx(empty,{strs,args},'empty')}</p>`,{className:'st-log '+className,ds:'Log'});
+    return panel(nonempty.map(g=>`<section class="st-log-group">${g.label||has(g,'label')?heading({title:g.label,kind:'group',strs:has(g,'label')?{title:g.strs.label}:undefined,args:g.args&&g.args.label?{title:g.args.label}:undefined}):''}<div class="st-log-entries">${g.entries.map(e=>`<article class="st-log-entry">${e.category||has(e,'category')?`<span class="st-log-category">${tx(e.category,e,'category')}</span>`:''}<strong class="st-log-title">${tx(e.title,e,'title')}</strong>${e.detail||has(e,'detail')?`<p>${tx(e.detail,e,'detail')}</p>`:''}${e.meta||has(e,'meta')?`<small>${tx(e.meta,e,'meta')}</small>`:''}${e.extraHtml?`<div class="st-log-extra">${e.extraHtml}</div>`:''}</article>`).join('')}</div></section>`).join(''),{className:'st-log '+className,ds:'Log'});
   }
-  function categoryFooter({categories=[],active='',backAction='back',categoryAction='action-category',label='Action categories',className=''}={}){
+  /* strs.back = the Back text; categories[i].strs.label = each tab. The nav aria-label stays plain text. */
+  function categoryFooter({categories=[],active='',backAction='back',categoryAction='action-category',label='Action categories',className='',strs,args}={}){
     const current=categories.some(c=>c.id===active)?active:categories[0]?.id;
-    return `<footer class="sheet-footer st-category-footer ${esc(className)}"><button type="button" class="surface-back record-back" data-action="${esc(backAction)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span>Back</span></button><nav class="st-category-tabs action-category-nav" aria-label="${esc(label)}">${categories.map(c=>`<button type="button" data-action="${esc(categoryAction)}" data-value="${esc(c.id)}" aria-current="${c.id===current?'location':'false'}"${c.disabled?' disabled':''}>${esc(c.label)}</button>`).join('')}</nav></footer>`;
+    return `<footer class="sheet-footer st-category-footer ${esc(className)}" data-ds="CategoryFooter"><button type="button" class="surface-back record-back" data-action="${esc(backAction)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span${sa(strs&&strs.back,args&&args.back)}>Back</span></button><nav class="st-category-tabs action-category-nav" aria-label="${esc(label)}">${categories.map(c=>`<button type="button" data-action="${esc(categoryAction)}" data-value="${esc(c.id)}" aria-current="${c.id===current?'location':'false'}"${c.disabled?' disabled':''}>${tx(c.label,c,'label')}</button>`).join('')}</nav></footer>`;
   }
   const chevron='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
   const check='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4L19 6"/></svg>';
-  function field({label='',control='',className=''}={}){
-    return `<label class="field ${esc(className)}">${label}${control}</label>`;
+  function field({label='',control='',className='',ds=''}={}){
+    return `<label class="field ${esc(className)}"${ds?` data-ds="${esc(ds)}"`:''}>${label}${control}</label>`;
   }
   /* Mobile-standard choice control: a trigger button that opens a picker sheet.
-     Replaces native <select>; the host app owns the picker view and state. */
-  function pickerField({label='',value='',display='',placeholder='Choose',action='open-picker',key='',disabled=false,className=''}={}){
-    const text=display!==''?display:value,has=text!=null&&text!=='';
-    return field({label,className:'st-picker-field '+className,control:`<button type="button" class="st-picker-trigger${has?'':' is-placeholder'}" data-action="${esc(action)}" data-picker-key="${esc(key)}"${disabled?' disabled':''}><span class="st-picker-value">${esc(has?text:placeholder)}</span>${chevron}</button>`});
+     Replaces native <select>; the host app owns the picker view and state.
+     strs: label (raw label wrapped in a span), display or value (the shown value), placeholder. */
+  function pickerField({label='',value='',display='',placeholder='Choose',action='open-picker',key='',disabled=false,className='',strs,args}={}){
+    const text=display!==''?display:value,shown=text!=null&&text!=='';
+    const s=strs||{},a=args||{};
+    let id,idArgs,vtext;
+    if(shown){id=s.display||s.value;idArgs=s.display?a.display:a.value;vtext=text;}
+    else if(s.placeholder){id=s.placeholder;idArgs=a.placeholder;vtext=placeholder;}
+    else if(s.display||s.value){id=s.display||s.value;idArgs=s.display?a.display:a.value;vtext='';}
+    else vtext=placeholder;
+    const lab=s.label?`<span${sa(s.label,a.label)}>${label}</span>`:label;
+    return field({label:lab,className:'st-picker-field '+className,ds:'PickerField',control:`<button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" data-action="${esc(action)}" data-picker-key="${esc(key)}"${disabled?' disabled':''}><span class="st-picker-value"${sa(id,idArgs)}>${esc(vtext)}</span>${chevron}</button>`});
   }
   // Shared chooser surface: flat catalogue lists or a muted inset for short choices.
-  function chooserList(content,{className='',tone='flat'}={}){
-    return `<div class="st-chooser-list ${esc(className)}" data-chooser-tone="${tone==='inset'?'inset':'flat'}">${content}</div>`;
+  function chooserList(content,{className='',tone='flat',ds='ChoiceList'}={}){
+    return `<div class="st-chooser-list ${esc(className)}" data-ds="${esc(ds)}" data-chooser-tone="${tone==='inset'?'inset':'flat'}">${content}</div>`;
   }
+  /* options: [value,label,sub?,group?,{strs:{label,sub,group},args:{…}}?]; the group's strs come from its first option. */
   function pickerOptions({options=[],selected='',action='picker-select',className=''}={}){
     const groups=[];
-    for(const option of options){const name=option[3]||'';let group=groups.find(g=>g.name===name);if(!group){group={name,items:[]};groups.push(group);}group.items.push(option);}
-    const row=([v,label,sub])=>`<button type="button" class="st-picker-option st-chooser-row" data-action="${esc(action)}" data-value="${esc(v)}" role="option" aria-selected="${v===selected}"><span class="st-picker-option-copy"><strong>${esc(label)}</strong>${sub?`<small>${esc(sub)}</small>`:''}</span>${v===selected?check:''}</button>`;
-    const content=groups.map(g=>g.name?`<div class="st-chooser-section" role="group" aria-label="${esc(g.name)}"><h5 class="st-chooser-subtitle" aria-hidden="true">${esc(g.name)}</h5><div class="st-chooser-section-options">${g.items.map(row).join('')}</div></div>`:g.items.map(row).join('')).join('');
-    return chooserList(`<div class="st-picker-options ${esc(className)}" role="listbox">${content}</div>`,{tone:groups.some(g=>g.name)?'flat':'inset'});
+    for(const option of options){const name=option[3]||'';let group=groups.find(g=>g.name===name);if(!group){group={name,items:[],x:option[4]};groups.push(group);}group.items.push(option);}
+    const row=([v,label,sub,,x])=>`<button type="button" class="st-picker-option st-chooser-row" data-action="${esc(action)}" data-value="${esc(v)}" role="option" aria-selected="${v===selected}"><span class="st-picker-option-copy"><strong>${tx(label,x,'label')}</strong>${sub||has(x,'sub')?`<small>${tx(sub,x,'sub')}</small>`:''}</span>${v===selected?check:''}</button>`;
+    const content=groups.map(g=>g.name?`<div class="st-chooser-section" role="group" aria-label="${esc(g.name)}"><h5 class="st-chooser-subtitle" aria-hidden="true">${tx(g.name,g.x,'group')}</h5><div class="st-chooser-section-options">${g.items.map(row).join('')}</div></div>`:g.items.map(row).join('')).join('');
+    return chooserList(`<div class="st-picker-options ${esc(className)}" role="listbox">${content}</div>`,{tone:groups.some(g=>g.name)?'flat':'inset',ds:'PickerField'});
   }
   /* Choice chooser primitives. Every chooser shape is composed from these three:
      flat list = one untitled group; sectioned list = several titled groups;
      nested = navigate rows, then a leaf list (flat or sectioned) under a new sheet title.
      Row geometry never varies: label, optional meta line, one trailing slot on the right.
      mode: 'navigate' (chevron), 'single' (check when selected), 'multi' (checkbox). */
-  function choiceRow({label='',meta='',mode='single',action='',value='',selected=false,attrs={},className=''}={}){
+  function choiceRow({label='',meta='',mode='single',action='',value='',selected=false,attrs={},className='',strs,args}={}){
+    const o={strs,args};
     const extra=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
-    const copy=`<span class="st-choice-copy"><span class="st-choice-label">${esc(label)}</span>${meta?`<span class="st-choice-meta">${esc(meta)}</span>`:''}</span>`;
-    if(mode==='multi')return `<label class="st-choice-row ${esc(className)}" data-mode="multi">${copy}<span class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${selected?' checked':''}${extra}></span></label>`;
+    const copy=`<span class="st-choice-copy"><span class="st-choice-label">${tx(label,o,'label')}</span>${meta||has(o,'meta')?`<span class="st-choice-meta">${tx(meta,o,'meta')}</span>`:''}</span>`;
+    if(mode==='multi')return `<label class="st-choice-row ${esc(className)}" data-ds="ChoiceList" data-mode="multi">${copy}<span class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${selected?' checked':''}${extra}></span></label>`;
     const trail=mode==='navigate'?chevron:selected?check:'';
     const state=mode==='single'?` aria-pressed="${selected?'true':'false'}"`:'';
-    return `<button type="button" class="st-choice-row ${esc(className)}" data-mode="${mode==='navigate'?'navigate':'single'}" data-action="${esc(action)}" data-value="${esc(value)}"${state}${extra}>${copy}<span class="st-choice-trail" aria-hidden="true">${trail}</span></button>`;
+    return `<button type="button" class="st-choice-row ${esc(className)}" data-ds="ChoiceList" data-mode="${mode==='navigate'?'navigate':'single'}" data-action="${esc(action)}" data-value="${esc(value)}"${state}${extra}>${copy}<span class="st-choice-trail" aria-hidden="true">${trail}</span></button>`;
   }
   // lead: optional control between heading and panel (e.g. a segment that filters only this group).
-  function choiceGroup(rows,{title='',lead='',className=''}={}){
+  function choiceGroup(rows,{title='',lead='',className='',strs,args}={}){
     const body=Array.isArray(rows)?rows.join(''):rows;
-    return `<section class="st-choice-group ${esc(className)}"${title?` aria-label="${esc(title)}"`:''}>${title?`<h5 class="st-choice-heading">${esc(title)}</h5>`:''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-choice-panel">${body}</div></section>`;
+    const showTitle=title||has({strs},'title');
+    return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?`<h5 class="st-choice-heading">${tx(title,{strs,args},'title')}</h5>`:''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-choice-panel">${body}</div></section>`;
   }
   function choiceSearch({label='Search',placeholder='',value='',attrs={}}={}){
     const extra=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
-    return `<label class="field catalog-search st-choice-search"><input type="search" aria-label="${esc(label)}" placeholder="${esc(placeholder||label)}" value="${esc(value)}"${extra}></label>`;
+    return `<label class="field catalog-search st-choice-search" data-ds="ChoiceList"><input type="search" aria-label="${esc(label)}" placeholder="${esc(placeholder||label)}" value="${esc(value)}"${extra}></label>`;
   }
-  function choiceEmpty(text){return `<p class="st-choice-empty">${esc(text)}</p>`;}
+  function choiceEmpty(text,{strs,args}={}){return `<p class="st-choice-empty" data-ds="ChoiceList">${tx(text,{strs,args},'text')}</p>`;}
+  /* options: [value,label,{strs:{label},args:{label}}?]; label is raw HTML, kept as the span's fallback. */
   function segment({options=[],active='',action='',className='',ariaLabel=''}={}){
-    return `<div class="st-segment segment ${esc(className)}" role="group"${ariaLabel?` aria-label="${esc(ariaLabel)}"`:''}>${options.map(([v,label])=>`<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}">${label}</button>`).join('')}</div>`;
+    return `<div class="st-segment segment ${esc(className)}" data-ds="Segment" role="group"${ariaLabel?` aria-label="${esc(ariaLabel)}"`:''}>${options.map(([v,label,x])=>`<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}">${has(x,'label')?`<span${sa(x.strs.label,x.args&&x.args.label)}>${label}</span>`:label}</button>`).join('')}</div>`;
   }
-  function iconButton({action='',icon='',label='',className='',value='',badge='',disabled=false}={}){
-    return `<button type="button" class="icon-button ${esc(className)}" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${disabled?' disabled':''}>${icon}${badge!==''&&badge!=null?`<span class="filter-badge">${esc(badge)}</span>`:''}</button>`;
+  function iconButton({action='',icon='',label='',className='',value='',badge='',disabled=false,strs,args}={}){
+    const o={strs,args},hasBadge=(badge!==''&&badge!=null)||has(o,'badge');
+    return `<button type="button" class="icon-button ${esc(className)}" data-ds="IconButton" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${disabled?' disabled':''}>${icon}${hasBadge?`<span class="filter-badge">${tx(badge,o,'badge')}</span>`:''}</button>`;
   }
   const api=Object.freeze({heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton});
   root.SentriUI=api;

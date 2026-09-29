@@ -18,3 +18,6 @@ Call `SentriUI.log(groups, { empty })`. `groups` is a list of `{ label, entries:
 **Do and don't**
 - Write the newest entry exactly as it was recorded. Don't summarise it.
 - Don't put actions inside entries. Editing a record opens its sheet from the row that owns it.
+
+**Strings**
+Per group `strs: { label }`, per entry `strs: { category, title, detail, meta }`, each with an `args` twin; the empty line takes `strs: { empty }` in the options. Without `strs` the output is unchanged.
