@@ -10,13 +10,21 @@
    unexplained gain or loss, one item each, never netted. A loss is explained by a death (the
    dead picker's "from the missing") or a Move naming it; explaining relabels, Alive does not move.
 
-   Obligations. Owed is a stored count per scheduled dose from the litter's birth: every live-born
-   piglet owes every dose. A record sets it to what the record left (deferred); arrivals that owe
-   it, births after a pre-lock mark, gains before the first record and a check's "did not" raise
-   it; a Move taking untreated piglets away lowers it. Deaths never lower it — it is shown as
-   min(owed, alive), so an untreated piglet is never hidden (over-owing is the accepted cost).
-   Evidence that moved piglets carry (coverage) and piglets whose status is unknown are kept in
-   groups, one per arrival or gain, so each is resolved or retired on its own.
+   Obligations. Owed per scheduled dose is a function of the records and of the changes around
+   them, not of the order they arrived in:
+     - every live-born piglet owes every dose (castration: nothing until its first record counts
+       the males); births after a pre-lock mark, arrivals that owe it, gains before the first
+       record and a check's "did not" add to it; untreated piglets moving out take from it;
+     - a record leaves what it left in its writer's view (`left`: the deferred piglets);
+     - the reading is the minimum, over the records no other record saw (the frontier), of that
+       record's `left` plus the changes it did not see — so concurrent records reconcile to the
+       same figure in any replay order, and overlap never proves a deferred piglet treated beyond
+       what some record's own count proves;
+     - when a litter's alive reaches 0 its population is gone, and its debt, unknowns and carried
+       evidence with it (a zero point); arrivals start afresh.
+   Shown per dose, exclusively: owed = min(owed, alive); unknown ≤ alive − owed; carried ≤ the rest.
+   Evidence and unknowns are kept in groups, one per arrival or gain; groups carried by named rows
+   retire with the row.
 
    Causality. Every event may carry `seen`: the ids its device had when it wrote it. Concurrent
    records (neither saw the other) are kept and flagged; device clocks never decide a conflict.
@@ -25,7 +33,8 @@
      derive(events, config, { today })   → Derived (README: ux/laws/glossary.md, Ledger module)
      append(events, event, config, opts) → { ok, reason, detail, event, events, derived, dependents }
      balances(litter)                    → the ledger identity for one derived litter
-     select.room / litter / deathDraft / moveDraft / end — what pages render, no arithmetic in pages
+     select.room / litter / deathDraft / moveDraft / end — what pages render; drafts are validated
+       by the same replay `append` runs
 */
 
 const DAY_MS = 86400000;
@@ -44,6 +53,7 @@ const isCount = (v) => Number.isInteger(v) && v >= 0;
 const sum = (o) => Object.values(o || {}).reduce((s, v) => s + (v || 0), 0);
 const clone = (o) => (o === undefined ? undefined : JSON.parse(JSON.stringify(o)));
 const time = (s) => { const t = Date.parse(s); return Number.isNaN(t) ? null : t; };
+const total = (groups) => groups.reduce((s, g) => s + g.n, 0);
 
 const ALIVE_CHANGING = new Set(['count', 'death', 'move', 'weaned']);
 const EXEMPT_REASONS = ['hernia', 'cryptorchid', 'kept'];      // castration reasons that leave the task
@@ -71,7 +81,7 @@ function prepare(events) {
 }
 
 /* Ancestors are the transitive closure of `seen`. Without `seen` the event saw the whole log
-   before it (an online write). */
+   before it (an online write). A correction's fresh mark (`<id>:fresh`) has its correction's view. */
 function ancestry(log) {
   const anc = new Map();
   const all = new Set();
@@ -88,10 +98,9 @@ function ancestry(log) {
     anc.set(e.id, set);
     all.add(e.id);
   }
-  // a correction's fresh mark (`<id>:fresh`) has its correction's causal view
   const key = (id) => (anc.has(id) ? id : String(id).replace(/:fresh$/, ''));
   const saw = (later, earlier) => { const s = anc.get(key(later)); return !!s && s.has(key(earlier)); };
-  return { saw, concurrent: (a, b) => !saw(a, b) && !saw(b, a) };
+  return { saw, concurrent: (a, b) => a !== b && !saw(a, b) && !saw(b, a) };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -99,16 +108,15 @@ function ancestry(log) {
 
 function newDose(cfg) {
   return {
-    stored: null,          // owed, stored (null: castration before its first record)
-    recorded: false,
-    deferred: 0, deferReason: null,
+    isCastration: cfg.castration, visible: cfg.visible,
+    stored: null,          // the owed reading (cached): null for castration before its first record
+    recs: [],              // own records for the owed reading { event, index, left, deferN, deferReason }
+    entries: [],           // changes to what is owed { event, index, kind, delta }
     exempt: 0, exemptBy: {},
     treated: 0,            // piglets marked by this litter's own records (history, never retired)
     coverage: [],          // carried evidence groups { id, kind: move|had|gain, n, rows|null, from, at }
-    unknowns: [],          // unresolved groups { id, kind: move|gain, n, from, at }
-    log: [],               // stored-owed changes { event, kind, delta, after }
-    records: [], collisions: [], castration: null, fullAt: null, checks: [], catchUp: 0,
-    visible: cfg.visible
+    unknowns: [],          // unresolved groups { id, kind: move|gain, n, rows|null, from, at }
+    records: [], collisions: [], castration: null, fullAt: null, checks: [], catchUp: 0
   };
 }
 
@@ -116,29 +124,66 @@ function newLitter(id) {
   return {
     id, room: null, phase: 'none', sowDied: null, birthDay: null, atBirth: null,
     born: 0, deadByCause: {}, deadTotal: 0, movedIn: 0, movedOut: 0, weaned: 0, alive: 0,
+    aliveLog: [], zeros: [],
     losses: [], gains: [], moves: [], counts: [], deaths: [], notes: [],
     doses: {}, idClosed: false, flags: [], accepted: [], types: {}, lastEvent: null, lastRecord: null,
     movedOutAfterEnd: []
   };
 }
 
-const total = (groups) => groups.reduce((s, g) => s + g.n, 0);
-function shown(L, D) { return D.stored == null ? null : Math.min(D.stored, L.alive); }
-function logOwed(D, e, kind, delta) { D.log.push({ event: e.id, kind, delta, after: D.stored }); }
-function raise(D, e, kind, n) {
-  if (n <= 0 || D.stored == null) return;
-  D.stored += n; logOwed(D, e, kind, n);
+/* The owed reading over the events `keep` admits (null filter: everything). */
+function owedAt(ctx, L, D, keep) {
+  const ok = keep || (() => true);
+  const ents = D.entries.filter((x) => ok(x.event));
+  const recs = D.recs.filter((r) => ok(r.event));
+  const zeros = L.zeros.filter((z) => ok(z.event));
+  const lastZero = zeros.length ? zeros[zeros.length - 1].index : -1;
+  if (!recs.length) {
+    if (D.isCastration) return null;
+    return Math.max(0, ents.filter((x) => x.index > lastZero).reduce((s, x) => s + x.delta, 0));
+  }
+  const saw = ctx.causal.saw;
+  const frontier = recs.filter((r) => !recs.some((o) => o !== r && saw(o.event, r.event)));
+  let best = Infinity;
+  for (const r of frontier) {
+    const unseenZero = zeros.filter((z) => !saw(r.event, z.event) && z.event !== r.event).pop();
+    const unseen = ents.filter((x) => x.event !== r.event && !saw(r.event, x.event));
+    const v = unseenZero
+      ? unseen.filter((x) => x.index > unseenZero.index).reduce((s, x) => s + x.delta, 0)
+      : r.left + unseen.reduce((s, x) => s + x.delta, 0);
+    best = Math.min(best, v);
+  }
+  return Math.max(0, best);
 }
-function lower(D, e, kind, n) {
+function frontierInfo(ctx, L, D) {
+  const saw = ctx.causal.saw;
+  const frontier = D.recs.filter((r) => !D.recs.some((o) => o !== r && saw(o.event, r.event)));
+  const live = frontier.filter((r) => !L.zeros.some((z) => z.index > r.index && !saw(r.event, z.event)));
+  let best = null;
+  for (const r of live) if (!best || r.deferN > best.deferN) best = r;
+  return { frontier, deferred: best ? best.deferN : 0, reason: best ? best.deferReason : null, lastIndex: frontier.reduce((m, r) => Math.max(m, r.index), -1) };
+}
+function refresh(ctx, L, D) { D.stored = owedAt(ctx, L, D, null); }
+function refreshAll(ctx, L) { for (const D of Object.values(L.doses)) refresh(ctx, L, D); }
+function owedShown(L, D) { return D.stored == null ? null : Math.min(D.stored, L.alive); }
+function unknownShown(L, D) { return Math.min(total(D.unknowns), Math.max(0, L.alive - (owedShown(L, D) || 0))); }
+function change(ctx, L, D, e, kind, delta) {
+  if (!delta) return;
+  D.entries.push({ event: e.id, index: ctx.index, kind, delta });
+  refresh(ctx, L, D);
+}
+function raise(ctx, L, D, e, kind, n) { if (n > 0 && !(D.isCastration && !D.recs.length)) change(ctx, L, D, e, kind, n); }
+function lower(ctx, L, D, e, kind, n) {
   if (n <= 0 || D.stored == null) return;
-  const before = D.stored;
-  D.stored = Math.max(0, D.stored - n);
-  D.deferred = Math.min(D.deferred, D.stored);
-  logOwed(D, e, kind, D.stored - before);
+  change(ctx, L, D, e, kind, -Math.min(n, D.stored));
 }
 function cover(D, e, kind, n, rows, from) {
   if (n <= 0) return;
   D.coverage.push({ id: e.id, kind, n, rows: rows ? rows.slice() : null, from: from || null, at: e.at || null });
+}
+function unknownGroup(D, e, kind, n, rows, from) {
+  if (n <= 0) return;
+  D.unknowns.push({ id: e.id, kind, n, rows: rows ? rows.slice() : null, from: from || null, at: e.at || null });
 }
 function takeUnknown(D, n, groupId) {
   let left = n;
@@ -147,23 +192,40 @@ function takeUnknown(D, n, groupId) {
     if (groupId && g.id !== groupId) continue;
     const t = Math.min(left, g.n);
     g.n -= t; left -= t;
+    if (g.rows) g.rows = g.rows.slice(0, g.n);
   }
   D.unknowns = D.unknowns.filter((g) => g.n > 0);
   return n - left;
 }
+/* A named piglet leaves (dies, goes missing, moves, is weaned or withdrawn): the evidence and the
+   unknown it carried leave with it. */
 function retireRow(L, rowId) {
   for (const D of Object.values(L.doses)) {
-    for (const g of D.coverage) if (g.rows && g.rows.includes(rowId)) { g.rows = g.rows.filter((x) => x !== rowId); g.n = g.rows.length; }
+    for (const list of [D.coverage, D.unknowns]) {
+      for (const g of list) if (g.rows && g.rows.includes(rowId)) { g.rows = g.rows.filter((x) => x !== rowId); g.n = g.rows.length; }
+    }
     D.coverage = D.coverage.filter((g) => g.n > 0);
+    D.unknowns = D.unknowns.filter((g) => g.n > 0);
   }
 }
+function aliveChange(ctx, L, e, delta) {
+  L.alive += delta;
+  L.aliveLog.push({ event: e.id, delta });
+  if (L.alive === 0 && delta < 0) {
+    // the population is gone: its debt, unknowns and evidence do not re-attach to later arrivals
+    L.zeros.push({ event: e.id, index: ctx.index });
+    for (const D of Object.values(L.doses)) { D.unknowns = []; D.coverage = []; }
+    refreshAll(ctx, L);
+  }
+}
+function aliveView(ctx, L, e) { return L.aliveLog.reduce((s, x) => s + (ctx.causal.saw(e.id, x.event) ? x.delta : 0), 0); }
 
 /* What moved piglets carry for one dose (RULINGS Q14): the source did it for all → done;
    did none → the arrivals owe it; partly → asked (invisible) or checked on the pig (visible). */
 function classify(L, D) {
   if (total(D.unknowns) > 0) return 'part';
-  if (!D.recorded) return total(D.coverage) > 0 ? 'part' : 'none';
-  if (shown(L, D) === 0) return 'done';
+  if (!D.recs.length) return total(D.coverage) > 0 ? 'part' : 'none';
+  if (owedShown(L, D) === 0) return 'done';
   if (D.treated + total(D.coverage) === 0) return 'none';
   return 'part';
 }
@@ -179,7 +241,11 @@ function outcomeFor(cls, d, answer) {
 
 function normalizeConfig(config) {
   const c = config || {};
-  const task = c.task ? { id: c.task.id || null, litters: (c.task.litters || []).slice(), ended: c.task.ended ? Object.assign({}, c.task.ended) : null } : null;
+  const task = c.task ? {
+    id: c.task.id || null, litters: (c.task.litters || []).slice(),
+    ended: c.task.ended ? Object.assign({}, c.task.ended) : null,
+    farrowingTask: c.task.farrowingTask === 'open' ? 'open' : 'ended'
+  } : null;
   return {
     doses: (c.doses || []).map((d) => ({
       id: d.id, tx: d.tx || d.id, due: d.due, last: d.last == null ? null : d.last,
@@ -229,10 +295,27 @@ export function derive(events, config, opts) {
   };
   for (const L of res.litters.values()) {
     if (L.phase === 'none') continue;
-    out.litters[L.id] = view(res.ctx, L, corrections);
+    out.litters[L.id] = view(res.ctx, L, corrections, today);
   }
-  for (const L of Object.values(out.litters)) {
-    const r = out.rooms[L.room] || (out.rooms[L.room] = { room: L.room, litters: [], openLoss: 0, openGain: 0, netDrift: 0, alive: 0 });
+  out.rooms = rooms(out.litters);
+  // closure facts are frozen as the log stood at End: corrections and arrivals after it do not
+  // rewrite them (they replay at their original place in the live figures only)
+  if (res.ended && res.ended.event) {
+    const endAt = (events || []).findIndex((x) => x && x.id === res.ended.event);
+    if (endAt >= 0 && endAt < (events || []).length - 1) {
+      const pre = derive(events.slice(0, endAt + 1), config, opts);
+      if (pre.ended && pre.ended.event === res.ended.event) res.ended.snapshot = pre.ended.snapshot;
+    }
+  }
+  // the input, for selectors that validate drafts through the same replay (not enumerable)
+  Object.defineProperty(out, 'input', { value: { events: events || [], config, opts: opts || {} }, enumerable: false });
+  return out;
+}
+
+function rooms(litters) {
+  const out = {};
+  for (const L of Object.values(litters)) {
+    const r = out[L.room] || (out[L.room] = { room: L.room, litters: [], openLoss: 0, openGain: 0, netDrift: 0, alive: 0 });
     r.litters.push(L.id);
     r.openLoss += L.unexplained.openLoss;
     r.openGain += L.unexplained.openGain;
@@ -247,7 +330,8 @@ function replay(log, effective, fresh, cfg, causal, today) {
   const ctx = {
     cfg, causal, today, litters, rows: new Map(), flags: [], pending: [],
     doseCfg: new Map(cfg.doses.map((d) => [d.id, d])),
-    ended: cfg.task && cfg.task.ended ? Object.assign({ index: null }, cfg.task.ended) : null,
+    ended: cfg.task && cfg.task.ended ? Object.assign({ index: null, event: null, snapshot: null }, cfg.task.ended) : null,
+    farrowingTask: cfg.task ? cfg.task.farrowingTask : 'ended',
     lit: (id) => { if (!litters.has(id)) litters.set(id, newLitter(id)); return litters.get(id); }
   };
   const rejected = [];
@@ -288,6 +372,13 @@ function concurrentCountFlag(ctx, L, e) {
     if (ctx.causal.concurrent(id, e.id)) flag(ctx, L, 'sync_review', 'count_concurrent', [id, e.id]);
   }
 }
+/* A departure the untagged piglets cannot cover must name its rows. Online that is refused; an
+   offline writer that could not know the rows is kept and raises an identity conflict. */
+function identityGate(ctx, L, e, ok, detail) {
+  if (ok) return;
+  if (!stale(ctx, L, e)) throw new Reject('name_the_rows', detail);
+  flag(ctx, L, 'sync_review', 'identity_reconcile', [e.id], detail);
+}
 function needLitter(ctx, id) {
   const L = ctx.litters.get(id);
   if (!L || L.phase === 'none') throw new Reject('unknown_litter', { litter: id });
@@ -303,17 +394,23 @@ function liveRows(ctx, litterId) {
 }
 function uniqueIds(ids) { if (new Set(ids).size !== ids.length) throw new Reject('duplicate_row'); }
 function inTask(ctx, id) { return !ctx.cfg.task || ctx.cfg.task.litters.includes(id); }
-/* After End: by log position when End is an event in the log, else by stamp. */
-function afterEnd(ctx, e) {
+
+/* Where an event stands against End. Causal knowledge first: a writer that saw End is after it,
+   whatever its clock says. Then the log: applied after End but not having seen it → stamped
+   before End = arrived after End; stamped after = after End. Without an End event, the stamp. */
+function endRelation(ctx, e) {
   const E = ctx.ended;
-  if (!E) return false;
-  if (E.index != null) return ctx.index > E.index;
+  if (!E) return 'before';
+  if (E.event) {
+    if (ctx.causal.saw(e.id, E.event)) return 'after';
+    if (E.index != null && ctx.index > E.index) {
+      const a = time(e.at), b = time(E.at);
+      return a != null && b != null && a <= b ? 'arrived' : 'after';
+    }
+    return 'before';
+  }
   const a = time(e.at), b = time(E.at);
-  return a == null || b == null ? true : a > b;
-}
-function stampedAfterEnd(ctx, e) {
-  const a = time(e.at), b = time(ctx.ended.at);
-  return a == null || b == null ? true : a > b;
+  return a == null || b == null || a > b ? 'after' : 'before';
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -331,6 +428,7 @@ function apply(ctx, e) {
     case 'identity': return applyIdentity(ctx, e);
     case 'weaned': return applyWeaned(ctx, e);
     case 'end_task': return applyEndTask(ctx, e);
+    case 'farrowing_task_ended': ctx.farrowingTask = 'ended'; return [];
     default: throw new Reject('unknown_type');
   }
 }
@@ -355,12 +453,13 @@ function applyFarrowed(ctx, e) {
   L.born = e.born;
   L.deadByCause = Object.assign({}, dead);
   L.deadTotal = deadN;
-  L.alive = aliveNew;
   L.phase = e.locked ? 'locked' : 'open';
+  L.alive += aliveNew - L.alive; L.aliveLog.push({ event: e.id, delta: first ? aliveNew : 0 });
+  if (!first) L.aliveLog[L.aliveLog.length - 1].delta = aliveNew - (L.aliveLog.slice(0, -1).reduce((s, x) => s + x.delta, 0));
   for (const d of ctx.cfg.doses) {
     const D = dose(ctx, L, d.id);
-    if (first) { if (!d.castration) { D.stored = 0; raise(D, e, 'born', aliveNew); if (!aliveNew) logOwed(D, e, 'born', 0); } }
-    else raise(D, e, D.recorded ? 'born_after_mark' : 'born', newHeads);
+    if (first) { if (!d.castration) { D.stored = 0; raise(ctx, L, D, e, 'born', aliveNew); } }
+    else raise(ctx, L, D, e, D.recs.length ? 'born_after_mark' : 'born', newHeads);
   }
   return [L];
 }
@@ -374,17 +473,22 @@ function applySowDied(ctx, e) {
   return [L];
 }
 
-/* end_task { at, who } — End as a log event, so "applied after End" is a log position. */
+/* end_task { at, who } — End as a log event, so "applied after End" is a log position. Refused
+   while the batch's farrowing task is open (RULINGS Q5). Snapshots the closure figures. */
 function applyEndTask(ctx, e) {
-  if (ctx.ended && ctx.ended.index != null) throw new Reject('already_ended', { at: ctx.ended.at, who: ctx.ended.who });
-  ctx.ended = { at: e.at || null, who: e.who || null, index: ctx.index, event: e.id };
+  if (ctx.ended && ctx.ended.event) throw new Reject('already_ended', { at: ctx.ended.at, who: ctx.ended.who });
+  if (ctx.farrowingTask === 'open') throw new Reject('farrowing_task_open');
+  const day = dayNumber(e.at);
+  const views = {};
+  for (const L of ctx.litters.values()) if (L.phase !== 'none') views[L.id] = view(ctx, L, new Map(), day);
+  ctx.ended = { at: e.at || null, who: e.who || null, index: ctx.index, event: e.id, snapshot: null };
+  ctx.ended.snapshot = endFigures(ctx.cfg, views);
   return [];
 }
 
 /* count { litter, observed, baseAlive, missingRows? } — an observation. The difference against
    Alive now (not against the device's base) becomes one unexplained item, so two offline counts
-   of one crate never sum. On a litter with identity rows the count names which rows are missing:
-   a count cannot drop below the rows still present. */
+   of one crate never sum. On a litter with identity rows the count names which rows are missing. */
 function applyCount(ctx, e) {
   const L = needLitter(ctx, e.litter);
   needLocked(L);
@@ -399,7 +503,8 @@ function applyCount(ctx, e) {
   const before = L.alive;
   const diff = e.observed - before;
   if (missing.length && missing.length > -diff) throw new Reject('bad_numbers', { missingRows: missing.length, loss: Math.max(0, -diff) });
-  if (e.observed < liveRows(ctx, L.id) - missing.length) throw new Reject('name_the_rows', { rows: liveRows(ctx, L.id), observed: e.observed });
+  const rowsLeft = liveRows(ctx, L.id) - missing.length;
+  identityGate(ctx, L, e, e.observed >= rowsLeft, { rows: rowsLeft, observed: e.observed });
   concurrentCountFlag(ctx, L, e);
   const item = { id: e.id, qty: Math.abs(diff), remaining: Math.abs(diff), at: e.at || null, who: e.who || null, explainedBy: [] };
   if (diff < 0) {
@@ -408,32 +513,32 @@ function applyCount(ctx, e) {
     L.losses.push(item);
   }
   if (diff > 0) {
-    // an unexplained gain has no known origin: before a dose's first record it simply owes it (everyone
-    // does); after, its status is unknown
+    // an unexplained gain has no known origin: before a dose's first record it simply owes it
+    // (everyone does); after, its status is unknown
     item.doses = {};
     for (const d of ctx.cfg.doses) {
       const D = dose(ctx, L, d.id);
       if (D.stored == null) continue;
-      if (!D.recorded) { raise(D, e, 'gain', diff); item.doses[d.id] = 'owed'; }
-      else { D.unknowns.push({ id: e.id, kind: 'gain', n: diff, from: null, at: e.at || null }); item.doses[d.id] = 'unknown'; }
+      if (!D.recs.length) { raise(ctx, L, D, e, 'gain', diff); item.doses[d.id] = 'owed'; }
+      else { unknownGroup(D, e, 'gain', diff, null, null); item.doses[d.id] = 'unknown'; }
     }
     L.gains.push(item);
   }
-  L.alive = e.observed;
+  aliveChange(ctx, L, e, diff);
   L.counts.push({ id: e.id, observed: e.observed, baseAlive: e.baseAlive == null ? null : e.baseAlive, aliveBefore: before, wrote: diff, missingRows: missing.slice(), at: e.at || null, who: e.who || null });
   return [L];
 }
 
-function namedOpen(ctx, loss) {
+function namedOpen(ctx, loss, except) {
   let n = 0;
-  for (const r of ctx.rows.values()) if (r.status === 'missing' && r.lossId === loss.id) n++;
+  for (const r of ctx.rows.values()) if (r.status === 'missing' && r.lossId === loss.id && !(except && except.has(r.rowId))) n++;
   return n;
 }
 
 /* death { litter, lines:[{cause,n}|{cause,rowId}], lossAlloc?:[{lossId,qty}], fromMissing? }
    Open phase: tallies never touch Alive, Born derives. Locked: an identified piglet counted
-   missing draws from its loss; untagged bodies drawn from open losses leave Alive untouched; the
-   rest leave Alive and may not exceed the unidentified alive. Allocations aggregate by loss; a
+   missing draws from its own loss; untagged bodies may draw only the unnamed part of open losses
+   (each named piglet is reserved once); the rest leave Alive. Allocations aggregate by loss; a
    loss already spent turns the excess into a plain death flagged `sync review`. */
 function applyDeath(ctx, e) {
   const L = needLitter(ctx, e.litter);
@@ -460,11 +565,12 @@ function applyDeath(ctx, e) {
     else if (r.status === 'alive') aliveRowDeaths.push(ln);
     else throw new Reject('row_not_alive', { rowId: ln.rowId, status: r.status });
   }
+  const resolving = new Set(missingRowDeaths.map((l) => l.rowId));
 
-  // allocation: named missing piglets first, then untagged bodies (aggregated per loss)
   const take = new Map();                 // loss → qty taken by this event
   let excess = 0;
   const room = (loss) => loss.remaining - (take.get(loss) || 0);
+  const unnamedFree = (loss) => Math.max(0, room(loss) - namedOpen(ctx, loss, resolving));
   let missingPlain = 0;
   for (const ln of missingRowDeaths) {
     const r = ctx.rows.get(ln.rowId);
@@ -484,21 +590,19 @@ function applyDeath(ctx, e) {
       }
     } else if (e.fromMissing) {
       if (!isCount(e.fromMissing)) throw new Reject('bad_numbers');
+      if (e.fromMissing > untagged) throw new Reject('alloc_exceeds_bodies');
       let left = e.fromMissing;
       for (const loss of L.losses) {                     // oldest first: losses are kept in log order
         if (!left) break;
-        const free = Math.max(0, room(loss) - namedOpen(ctx, loss));
-        const t = Math.min(left, free);
+        const t = Math.min(left, unnamedFree(loss));
         if (t > 0) { want.set(loss, t); left -= t; }
       }
-      if (e.fromMissing > untagged) throw new Reject('alloc_exceeds_bodies');
       excess += left;
     }
     const wantTotal = [...want.values()].reduce((s, v) => s + v, 0);
     if (wantTotal > untagged) throw new Reject('alloc_exceeds_bodies');
     for (const [loss, q] of want) {
-      const free = Math.max(0, room(loss) - namedOpen(ctx, loss));
-      const t = Math.min(q, free);
+      const t = Math.min(q, unnamedFree(loss));
       if (t > 0) take.set(loss, (take.get(loss) || 0) + t);
       allocated += t;
       excess += q - t;
@@ -508,8 +612,13 @@ function applyDeath(ctx, e) {
 
   if (locked) {
     const rowsHere = liveRows(ctx, L.id);
+    const leaving = plain + missingPlain + aliveRowDeaths.length;
+    if (leaving > L.alive) throw new Reject(rowsHere > 0 ? 'name_the_rows' : 'more_than_alive', { leaving, alive: L.alive });
     const unidentified = L.alive - rowsHere;
-    if (plain + missingPlain > unidentified) throw new Reject(rowsHere > 0 ? 'name_the_rows' : 'more_than_alive', { plain: plain + missingPlain, unidentified });
+    if (plain + missingPlain > unidentified) {
+      if (rowsHere === 0) throw new Reject('more_than_alive', { plain: plain + missingPlain, unidentified });
+      identityGate(ctx, L, e, false, { plain: plain + missingPlain, unidentified });
+    }
   }
 
   const byCause = {};
@@ -518,18 +627,17 @@ function applyDeath(ctx, e) {
   const n = untagged + aliveRowDeaths.length + missingRowDeaths.length;
   for (const [c, k] of Object.entries(byCause)) L.deadByCause[c] = (L.deadByCause[c] || 0) + k;
   L.deadTotal += n;
-  if (!locked) {
-    L.born += untagged;                                  // open: Born = Alive + Σ Dead
-    L.alive -= aliveRowDeaths.length;
-    L.born += missingRowDeaths.length;
-  } else {
-    L.alive -= plain + missingPlain + aliveRowDeaths.length;
-    for (const [loss, q] of take) { loss.remaining -= q; loss.explainedBy.push({ event: e.id, kind: 'death', qty: q }); }
-  }
   for (const l of aliveRowDeaths.concat(missingRowDeaths)) {
     const r = ctx.rows.get(l.rowId);
     r.status = 'dead'; r.cause = l.cause; r.deathAt = e.at || null; r.deathEvent = e.id;
     retireRow(L, l.rowId);
+  }
+  if (!locked) {
+    L.born += untagged + missingRowDeaths.length;         // open: Born = Alive + Σ Dead
+    aliveChange(ctx, L, e, -aliveRowDeaths.length);
+  } else {
+    for (const [loss, q] of take) { loss.remaining -= q; loss.explainedBy.push({ event: e.id, kind: 'death', qty: q }); }
+    aliveChange(ctx, L, e, -(plain + missingPlain + aliveRowDeaths.length));
   }
   if (excess > 0) flag(ctx, L, 'sync_review', 'loss_over_consumed', [e.id], { excess });
   const fromLoss = [...take.values()].reduce((s, v) => s + v, 0);
@@ -539,8 +647,9 @@ function applyDeath(ctx, e) {
 
 /* move { from, to, n, rows[], answers:{doseId:'yes'|'no'|'unknown'}, explains?:[lossId|null, gainId|null] }
    One record, both litters. A side named in `explains` relabels its open item (zero Alive effect
-   there). Rows are named, unique, and a fully identified source must name who leaves. Untagged n
-   above the source's Alive is clamped and flagged. */
+   there); untagged piglets may spend only a loss's unnamed part — a named missing piglet's share
+   is spent only by moving that row. Rows are named and unique; a source with rows names who
+   leaves. Untagged n above the source's Alive is clamped and flagged. */
 function applyMove(ctx, e) {
   const S = needLitter(ctx, e.from), R = needLitter(ctx, e.to);
   if (S === R) throw new Reject('same_litter');
@@ -564,59 +673,68 @@ function applyMove(ctx, e) {
   let n = e.n != null ? e.n : rowIds.length;
   if (!isCount(n) || n < rowIds.length) throw new Reject('bad_numbers');
 
-  const lossQ = loss ? Math.min(n - aliveRows.length, loss.remaining) : 0;
-  if (lossQ < missingRows.length) throw new Reject('bad_numbers', { missingRows: missingRows.length });
-  if (loss && loss.remaining < n - aliveRows.length) flag(ctx, S, 'sync_review', 'explained_more_than_open', [e.id], { lossId: loss.id });
-  let untaggedOut = n - lossQ - aliveRows.length;
+  const untaggedAsked = n - rowIds.length;
+  const unnamed = loss ? Math.max(0, loss.remaining - missingRows.length - namedOpen(ctx, loss, new Set(missingRows))) : 0;
+  const lossUntagged = Math.min(untaggedAsked, unnamed);
+  const lossQ = missingRows.length + lossUntagged;
+  if (loss && lossUntagged < untaggedAsked) flag(ctx, S, 'sync_review', 'explained_more_than_open', [e.id], { lossId: loss.id });
+  let untaggedOut = untaggedAsked - lossUntagged;
   const rowsS = liveRows(ctx, S.id);
   const unidentified = S.alive - rowsS;
   if (untaggedOut > unidentified) {
-    if (rowsS > 0) throw new Reject('name_the_rows', { untagged: untaggedOut, unidentified });
-    flag(ctx, S, 'sync_review', 'move_clamped', [e.id], { asked: n, alive: S.alive });
-    untaggedOut = unidentified;
-    n = lossQ + aliveRows.length + untaggedOut;
+    if (rowsS > 0 && untaggedOut + aliveRows.length <= S.alive) identityGate(ctx, S, e, false, { untagged: untaggedOut, unidentified });
+    else {
+      if (rowsS > 0 && !stale(ctx, S, e)) throw new Reject('name_the_rows', { untagged: untaggedOut, unidentified });
+      flag(ctx, S, 'sync_review', 'move_clamped', [e.id], { asked: n, alive: S.alive });
+      untaggedOut = Math.max(0, S.alive - aliveRows.length);
+    }
   }
+  n = lossQ + aliveRows.length + untaggedOut;
   if (n === 0) throw new Reject('nothing_to_move');
   const plainOut = n - lossQ;
+  if (plainOut > S.alive) throw new Reject('alive_negative', { alive: S.alive, leaving: plainOut });   // rows under an open identity conflict
   const gainQ = gain ? Math.min(n, gain.remaining) : 0;
   if (gain && gainQ < n) flag(ctx, R, 'sync_review', 'explained_more_than_open', [e.id], { gainId: gain.id });
   const plainIn = n - gainQ;
-  if (liveRows(ctx, R.id) + rowIds.length > R.alive + plainIn) throw new Reject('name_the_rows', { receiver: R.id });
+  identityGate(ctx, R, e, liveRows(ctx, R.id) + rowIds.length <= R.alive + plainIn, { receiver: R.id });
   concurrentCountFlag(ctx, S, e); concurrentCountFlag(ctx, R, e);
   const explaining = !!(loss || gain);
-  const after = afterEnd(ctx, e);
+  const rel = endRelation(ctx, e);
+  const after = rel !== 'before';
+  const allNamed = gainQ === 0 && rowIds.length === n;
 
   const packets = {}, owedOut = {};
   for (const d of ctx.cfg.doses) {
     const DS = dose(ctx, S, d.id), DR = dose(ctx, R, d.id);
     const answer = (e.answers || {})[d.id];
-    // the explained gain's piglets: resolve what the gain parked, by the answer only (challenge #6)
+    // the explained gain's piglets: resolve what the gain parked, by the answer only (challenge #6).
+    // An owed gain absorbed by a record since (the record saw it) is part of that record's figure:
+    // no deduction without attribution.
     if (gain && gainQ) {
       const st = gain.doses && gain.doses[d.id];
       const ans = d.visible ? 'unknown' : answer;
-      if (st === 'owed' && ans === 'yes') { lower(DR, e, 'explained', gainQ); cover(DR, e, 'gain', gainQ, null, S.id); }
+      const absorbed = DR.recs.some((r) => ctx.causal.saw(r.event, gain.id));
+      if (st === 'owed' && ans === 'yes') { if (!absorbed) lower(ctx, R, DR, e, 'explained', gainQ); cover(DR, e, 'gain', gainQ, null, S.id); }
       if (st === 'unknown') {
         const grp = DR.unknowns.find((g) => g.id === gain.id);
         const k = grp ? Math.min(gainQ, grp.n) : 0;
         if (k && ans === 'yes') { takeUnknown(DR, k, gain.id); cover(DR, e, 'gain', k, null, S.id); }
-        if (k && ans === 'no') { takeUnknown(DR, k, gain.id); raise(DR, e, 'arrival', k); }
+        if (k && ans === 'no') { takeUnknown(DR, k, gain.id); raise(ctx, R, DR, e, 'arrival', k); }
       }
     }
     const cls = explaining ? 'asked' : classify(S, DS);
     const outcome = outcomeFor(cls, d, answer);
     packets[d.id] = outcome;
     if (plainIn) {
-      if (outcome === 'done') cover(DR, e, 'move', plainIn, gainQ === 0 && aliveRows.length + missingRows.length === n ? rowIds : null, S.id);
-      if (outcome === 'owed') { raise(DR, e, 'arrival', plainIn); if (after) DR.catchUp += plainIn; }
-      if (outcome === 'check' || outcome === 'unknown') DR.unknowns.push({ id: e.id, kind: 'move', n: plainIn, from: S.id, at: e.at || null });
+      if (outcome === 'done') cover(DR, e, 'move', plainIn, allNamed ? rowIds : null, S.id);
+      if (outcome === 'owed') { raise(ctx, R, DR, e, 'arrival', plainIn); if (after) DR.catchUp += plainIn; }
+      if (outcome === 'check' || outcome === 'unknown') unknownGroup(DR, e, 'move', plainIn, allNamed ? rowIds : null, S.id);
     }
-    // source coverage moves too (challenge #2): untreated piglets leaving lower the source's owed;
-    // Yes and Don't know leave it (the source can only over-owe)
-    if (outcome === 'owed') { const before = shown(S, DS); lower(DS, e, 'moved_out', n); if (before) owedOut[d.id] = Math.min(n, before); }
+    // untreated piglets leaving lower the source's owed; Yes and Don't know leave it (over-owe)
+    if (outcome === 'owed') { const before = owedShown(S, DS); lower(ctx, S, DS, e, 'moved_out', n); if (before) owedOut[d.id] = Math.min(n, before); }
   }
 
-  S.alive -= plainOut; S.movedOut += n;
-  R.alive += plainIn; R.movedIn += n;
+  S.movedOut += n; R.movedIn += n;
   if (loss && lossQ) { loss.remaining -= lossQ; loss.explainedBy.push({ event: e.id, kind: 'move', qty: lossQ, to: R.id }); }
   if (gain && gainQ) { gain.remaining -= gainQ; gain.explainedBy.push({ event: e.id, kind: 'move', qty: gainQ, from: S.id }); }
   for (const id of rowIds) {
@@ -624,6 +742,8 @@ function applyMove(ctx, e) {
     retireRow(S, id);
     r.litter = R.id; r.status = 'alive'; delete r.lossId;
   }
+  aliveChange(ctx, S, e, -plainOut);
+  aliveChange(ctx, R, e, plainIn);
   const rec = { id: e.id, n, rows: rowIds.slice(), explains: [loss ? loss.id : null, gain ? gain.id : null], packets, answers: Object.assign({}, e.answers || {}), at: e.at || null, who: e.who || null, afterEnd: after };
   S.moves.push(Object.assign({ dir: 'out', other: R.id, aliveEffect: -plainOut }, rec));
   R.moves.push(Object.assign({ dir: 'in', other: S.id, aliveEffect: plainIn }, rec));
@@ -631,49 +751,18 @@ function applyMove(ctx, e) {
   return [S, R];
 }
 
+/* treat's task gate. Catch-up after End for arrivals is PROVISIONAL (map ledger). */
 function taskGate(ctx, L, e, D) {
   if (!inTask(ctx, L.id)) throw new Reject('no_task', { litter: L.id });
-  if (!ctx.ended) return {};
+  const rel = endRelation(ctx, e);
+  if (rel === 'before') return {};
   if (e.viaCorrection) return { flag: 'correction_after_end' };
-  if (!afterEnd(ctx, e)) return {};
-  if (!stampedAfterEnd(ctx, e)) return { flag: 'arrived_after_end' };
+  if (rel === 'arrived') return { flag: 'arrived_after_end' };
   if (D && D.catchUp > 0) return { catchUp: true };
   throw new Reject('task_ended', { at: ctx.ended.at, who: ctx.ended.who });
 }
 
-/* The dose as the writer saw it: the owed the latest record it had seen left, plus the changes it
-   had seen since. null when it had seen no record. */
-function viewOwed(ctx, D, e) {
-  let v = null;
-  for (const x of D.log) {
-    if (!ctx.causal.saw(e.id, x.event)) continue;
-    if (x.kind === 'record') v = x.after;
-    else if (v != null) v = Math.max(0, v + x.delta);
-  }
-  return v;
-}
-
-/* treat { litter, dose, n, deferred?:{n,reason}, exempt?:{n,reason}, castration?, product?, amount? }
-   castration: { castrated, hernia, cryptorchid, kept, deferred, females?, deferReason? }
-   A record the writer made on a dose it saw done records nothing (the tap guard, decided in the
-   writer's causal view before any collision). An online record accounts for every owed piglet.
-   Concurrent records are both kept, flagged `possible double treatment`, and never prove the
-   deferred piglets were treated: the owed they leave is the larger of the sequential result and
-   what this record itself left plus the raises it had not seen. */
-function applyTreat(ctx, e) {
-  const L = needLitter(ctx, e.litter);
-  const d = needDose(ctx, e.dose);
-  const D = dose(ctx, L, d.id);
-  const gate = taskGate(ctx, L, e, D);
-  const own = D.records.filter((r) => r.target !== 'unknown');
-  const seenRecs = own.filter((r) => ctx.causal.saw(e.id, r.id));
-  const nothing = (r) => new Reject('nothing_owed', r ? { by: r.who, at: r.at, record: r.id } : null);
-  if (seenRecs.length && viewOwed(ctx, D, e) === 0) throw nothing(seenRecs[seenRecs.length - 1]);
-  const isStale = stale(ctx, L, e);
-  const collided = own.filter((r) => ctx.causal.concurrent(r.id, e.id));
-  const sh = shown(L, D);
-  if (!collided.length && sh === 0) throw nothing(own[own.length - 1]);
-
+function readTreat(d, e) {
   let treated, deferN, exemptN, females = 0, deferReason = null, castr = null;
   const exemptBy = {};
   if (d.castration) {
@@ -694,12 +783,42 @@ function applyTreat(ctx, e) {
     if (exemptN) exemptBy[e.exempt.reason || 'other'] = exemptN;
     deferReason = deferN ? (e.deferred.reason || null) : null;
   }
-  const accounted = treated + deferN + exemptN + females;
-  if (gate.catchUp && treated + exemptN + females > D.catchUp) throw new Reject('task_ended', { catchUp: D.catchUp });
+  return { treated, deferN, exemptN, females, deferReason, castr, exemptBy };
+}
 
+function completed(ctx, L, D, e) {
+  if (D.fullAt == null && owedShown(L, D) === 0 && unknownShown(L, D) === 0) {
+    D.fullAt = L.birthDay == null || dayNumber(e.at) == null ? null : dayNumber(e.at) - L.birthDay;
+  }
+}
+
+/* treat { litter, dose, n, deferred?:{n,reason}, exempt?:{n,reason}, castration?, product?, amount? }
+   castration: { castrated, hernia, cryptorchid, kept, deferred, females?, deferReason? }
+   Judged first in the writer's view: a writer that had seen the dose done records nothing. An
+   online record accounts for every owed piglet. Concurrent records are both kept and flagged
+   `possible double treatment`; the owed reading reconciles them (see Obligations above). */
+function applyTreat(ctx, e) {
+  const L = needLitter(ctx, e.litter);
+  const d = needDose(ctx, e.dose);
+  const D = dose(ctx, L, d.id);
+  const gate = taskGate(ctx, L, e, D);
+  const own = D.records.filter((r) => r.target !== 'unknown');
+  const seen = (id) => ctx.causal.saw(e.id, id);
+  const V = owedAt(ctx, L, D, seen);
+  const nothing = (r) => new Reject('nothing_owed', r ? { by: r.who, at: r.at, record: r.id } : null);
+  const seenRecs = own.filter((r) => seen(r.id));
+  if (seenRecs.length && V === 0) throw nothing(seenRecs[seenRecs.length - 1]);
+  const isStale = stale(ctx, L, e);
+  const collided = own.filter((r) => ctx.causal.concurrent(r.id, e.id));
+  const sh = owedShown(L, D);
+  if (!collided.length && sh === 0) throw nothing(own[own.length - 1]);
+
+  const t = readTreat(d, e);
+  const accounted = t.treated + t.deferN + t.exemptN + t.females;
+  if (gate.catchUp && t.treated + t.exemptN + t.females > D.catchUp) throw new Reject('task_ended', { catchUp: D.catchUp });
   if (!collided.length && !isStale && !gate.catchUp) {
     if (sh == null) {                                    // castration's first record: males are counted now
-      if (treated + deferN + exemptN > L.alive) throw new Reject('more_than_alive');
+      if (t.treated + t.deferN + t.exemptN > L.alive) throw new Reject('more_than_alive');
     } else if (accounted !== sh) {
       throw new Reject(accounted > sh ? 'more_than_owed' : 'reason_missing', { owed: sh, accounted });
     }
@@ -707,36 +826,23 @@ function applyTreat(ctx, e) {
     throw new Reject('empty');
   }
 
-  const base = sh == null ? treated + deferN + exemptN + females : sh;
-  const seq = Math.max(0, base - treated - exemptN - females);
-  let owedAfter = seq;
-  if (gate.catchUp) owedAfter = Math.max(0, (D.stored || 0) - treated - exemptN - females);
-  else if (collided.length || isStale) {
-    const unseenRaise = D.log.filter((x) => x.delta > 0 && x.kind !== 'record' && !ctx.causal.saw(e.id, x.event)).reduce((s, x) => s + x.delta, 0);
-    owedAfter = Math.max(seq, deferN + unseenRaise);
-  }
-  const prevDeferred = D.deferred;
-  D.recorded = true;
-  D.stored = owedAfter;
-  logOwed(D, e, 'record', 0);
-  D.deferred = Math.min(owedAfter, gate.catchUp ? prevDeferred : deferN + (isStale || collided.length ? prevDeferred : 0));
-  if (deferN) D.deferReason = deferReason;
-  if (!D.deferred) D.deferReason = null;
-  if (gate.catchUp) D.catchUp = Math.max(0, D.catchUp - treated - exemptN - females);
-  D.treated += treated;
-  D.exempt += exemptN;
-  for (const [k, v] of Object.entries(exemptBy)) D.exemptBy[k] = (D.exemptBy[k] || 0) + v;
-  if (castr) {
+  // what this record left, in its writer's view
+  const left = V == null ? t.deferN : Math.max(0, Math.min(V, aliveView(ctx, L, e)) - t.treated - t.exemptN - t.females);
+  D.recs.push({ event: e.id, index: ctx.index, left, deferN: t.deferN, deferReason: t.deferReason });
+  refresh(ctx, L, D);
+  if (gate.catchUp) D.catchUp = Math.max(0, D.catchUp - t.treated - t.exemptN - t.females);
+  D.treated += t.treated;
+  D.exempt += t.exemptN;
+  for (const [k, v] of Object.entries(t.exemptBy)) D.exemptBy[k] = (D.exemptBy[k] || 0) + v;
+  if (t.castr) {
     const C = D.castration || (D.castration = { castrated: 0, notCastrated: { hernia: 0, cryptorchid: 0, kept: 0, deferred: 0 }, females: 0 });
-    C.castrated += treated;
-    for (const k of EXEMPT_REASONS) C.notCastrated[k] += castr[k] || 0;
-    C.notCastrated.deferred = D.deferred;               // only deferred stays due; it is a current figure
-    C.females += females;
-    for (const k of NOTE_REASONS) if (castr[k]) L.notes.push({ kind: k, n: castr[k], event: e.id, at: e.at || null });
+    C.castrated += t.treated;
+    for (const k of EXEMPT_REASONS) C.notCastrated[k] += t.castr[k] || 0;
+    C.females += t.females;
+    for (const k of NOTE_REASONS) if (t.castr[k]) L.notes.push({ kind: k, n: t.castr[k], event: e.id, at: e.at || null });
   }
-  const rec = record(ctx, L, d, e, { n: treated, deferred: deferN, deferReason, exempt: exemptN, exemptBy, females, castration: castr ? clone(castr) : null, catchUp: !!gate.catchUp });
-  if (owedAfter === 0 && D.fullAt == null) D.fullAt = rec.dayAge;
-  D.records.push(rec);
+  D.records.push(record(ctx, L, d, e, { n: t.treated, deferred: t.deferN, deferReason: t.deferReason, exempt: t.exemptN, exemptBy: t.exemptBy, females: t.females, castration: t.castr ? clone(t.castr) : null, catchUp: !!gate.catchUp }));
+  completed(ctx, L, D, e);
   if (collided.length) {
     D.collisions.push([collided[0].id, e.id]);
     flag(ctx, L, 'possible_double_treatment', 'sync_collision', collided.map((r) => r.id).concat(e.id), { dose: d.id });
@@ -765,19 +871,27 @@ function record(ctx, L, d, e, fields) {
 }
 
 /* treat { litter, dose, n, target:'unknown', group? } — record the dose on unknown arrivals
-   (RULINGS Q14: resolved by recording). */
+   (RULINGS Q14: resolved by recording). Concurrent records on unknowns collide like any other:
+   both kept, flagged; the unknown never goes below 0. */
 function applyTreatUnknown(ctx, e) {
   const L = needLitter(ctx, e.litter);
   const d = needDose(ctx, e.dose);
   const D = dose(ctx, L, d.id);
   const gate = taskGate(ctx, L, e, null);
   if (!isCount(e.n) || e.n === 0) throw new Reject('bad_numbers');
-  const avail = e.group ? total(D.unknowns.filter((g) => g.id === e.group)) : total(D.unknowns);
-  if (e.n > Math.min(avail, L.alive)) throw new Reject('more_than_unknown', { unknown: avail });
-  takeUnknown(D, e.n, e.group);
+  const mine = D.records.filter((r) => r.target === 'unknown' && (!e.group || r.group === e.group));
+  const collided = mine.filter((r) => ctx.causal.concurrent(r.id, e.id));
+  const avail = Math.min(e.group ? total(D.unknowns.filter((g) => g.id === e.group)) : total(D.unknowns), L.alive);
+  if (!collided.length && e.n > avail) throw new Reject('more_than_unknown', { unknown: avail });
+  takeUnknown(D, Math.min(e.n, avail), e.group);
   D.treated += e.n;
   if (d.castration && D.castration) D.castration.castrated += e.n;
-  D.records.push(record(ctx, L, d, e, { n: e.n, deferred: 0, deferReason: null, exempt: 0, exemptBy: {}, females: 0, castration: null, catchUp: false }));
+  D.records.push(record(ctx, L, d, e, { n: e.n, group: e.group || null, deferred: 0, deferReason: null, exempt: 0, exemptBy: {}, females: 0, castration: null, catchUp: false }));
+  completed(ctx, L, D, e);
+  if (collided.length) {
+    D.collisions.push([collided[0].id, e.id]);
+    flag(ctx, L, 'possible_double_treatment', 'sync_collision', collided.map((r) => r.id).concat(e.id), { dose: d.id, target: 'unknown' });
+  }
   if (gate.flag) flag(ctx, L, 'task', gate.flag, [e.id], { dose: d.id });
   return [L];
 }
@@ -794,8 +908,9 @@ function applyCheck(ctx, e) {
   if (had + lacks > Math.min(avail, L.alive)) throw new Reject('more_than_unknown', { unknown: avail });
   takeUnknown(D, had + lacks, e.group);
   cover(D, e, 'had', had, null, null);
-  raise(D, e, 'lacks', lacks);
+  raise(ctx, L, D, e, 'lacks', lacks);
   D.checks.push({ id: e.id, had, lacks, group: e.group || null, at: e.at || null, who: e.who || null });
+  completed(ctx, L, D, e);
   return [L];
 }
 
@@ -809,7 +924,10 @@ function applyIdentity(ctx, e) {
   if (op === 'add') {
     if (ctx.rows.has(e.rowId)) throw new Reject('duplicate_row', { rowId: e.rowId });
     if (!e.tag && !e.notch) throw new Reject('tag_or_notch');
-    if (liveRows(ctx, L.id) + 1 > L.alive) throw new Reject('more_rows_than_alive');
+    if (liveRows(ctx, L.id) + 1 > L.alive) {
+      if (!stale(ctx, L, e)) throw new Reject('more_rows_than_alive');
+      flag(ctx, L, 'sync_review', 'identity_reconcile', [e.id], { rows: liveRows(ctx, L.id) + 1, alive: L.alive });
+    }
     ctx.rows.set(e.rowId, {
       rowId: e.rowId, litter: L.id, birthLitter: L.id, tag: e.tag || null, notch: e.notch || null,
       sex: e.sex || null, weight: e.weight == null ? null : e.weight, status: 'alive',
@@ -854,27 +972,28 @@ function applyWeaned(ctx, e) {
   }
   if (named.length > n) throw new Reject('bad_numbers');
   const rowsHere = liveRows(ctx, L.id);
-  if (n < L.alive && n - named.length > L.alive - rowsHere) throw new Reject('name_the_rows', { untagged: n - named.length, unidentified: L.alive - rowsHere });
+  identityGate(ctx, L, e, n === L.alive || n - named.length <= L.alive - rowsHere, { untagged: n - named.length, unidentified: L.alive - rowsHere });
   concurrentCountFlag(ctx, L, e);
-  L.alive -= n; L.weaned += n;
+  L.weaned += n;
   const set = new Set(named);
+  const allOut = n === L.alive;
   for (const r of ctx.rows.values()) {
     if (r.litter !== L.id || r.status !== 'alive') continue;
-    if (set.has(r.rowId) || L.alive === 0) { r.status = 'weaned'; r.weanedAt = e.at || null; retireRow(L, r.rowId); }
+    if (set.has(r.rowId) || allOut) { r.status = 'weaned'; r.weanedAt = e.at || null; retireRow(L, r.rowId); }
   }
+  aliveChange(ctx, L, e, -n);
   return [L];
 }
 
 // ---------------------------------------------------------------------------------------------
 // view: the derived facts a page renders
 
-function view(ctx, L, corrections) {
-  const today = ctx.today;
+function view(ctx, L, corrections, today) {
   const dayAge = L.birthDay != null && today != null ? today - L.birthDay : null;
   const doses = {};
   for (const d of ctx.cfg.doses) {
     const D = dose(ctx, L, d.id);
-    const owed = shown(L, D);
+    const owed = owedShown(L, D);
     let status = null;
     if (dayAge != null) {
       if (dayAge < d.due) status = 'later';
@@ -882,15 +1001,16 @@ function view(ctx, L, corrections) {
       else if (dayAge > d.due) status = 'late';
       else status = 'due';
     }
-    const unknown = Math.min(total(D.unknowns), L.alive);
-    // why the stored owed stands: the latest record's deferral, then raises since
-    let lastRec = -1;
-    D.log.forEach((x, i) => { if (x.kind === 'record') lastRec = i; });
+    const unknown = unknownShown(L, D);
+    const carried = Math.min(total(D.coverage), Math.max(0, L.alive - (owed || 0) - unknown));
+    const fi = frontierInfo(ctx, L, D);
+    const deferred = Math.min(fi.deferred, owed == null ? fi.deferred : owed);
+    const lastZero = L.zeros.length ? L.zeros[L.zeros.length - 1].index : -1;
     const owedFrom = [];
-    if (D.deferred) owedFrom.push({ kind: 'deferred', n: D.deferred, reason: D.deferReason });
-    if (lastRec >= 0) {
-      for (const x of D.log.slice(lastRec + 1)) {
-        if (!(x.delta > 0) || !RAISES.has(x.kind)) continue;
+    if (deferred) owedFrom.push({ kind: 'deferred', n: deferred, reason: fi.reason });
+    if (fi.frontier.length) {
+      for (const x of D.entries) {
+        if (!(x.delta > 0) || !RAISES.has(x.kind) || x.index <= Math.max(fi.lastIndex, lastZero)) continue;
         const f = owedFrom.find((o) => o.kind === x.kind);
         if (f) f.n += x.delta; else owedFrom.push({ kind: x.kind, n: x.delta });
       }
@@ -898,32 +1018,32 @@ function view(ctx, L, corrections) {
     doses[d.id] = {
       dose: d.id, tx: d.tx, due: d.due, last: d.last, visible: d.visible, isCastration: d.castration, product: d.product, amount: d.amount,
       status,
-      owed,                                          // shown: min(stored, alive); null = castration before its first record
+      owed,                                          // shown: min(owed, alive); null = castration before its first record
       owedStored: D.stored,
       owedFrom,
       treated: D.treated,
-      deferred: owed == null ? D.deferred : Math.min(D.deferred, owed),
-      deferReason: D.deferReason,
+      deferred,
+      deferReason: deferred ? fi.reason : null,
       exempt: D.exempt, exemptBy: Object.assign({}, D.exemptBy),
       missed: status === 'missed' && owed ? owed : 0,
       unknownAfterMove: unknown,
-      unknownGroups: D.unknowns.map((g) => Object.assign({}, g)),
-      carriedFromMove: Math.min(total(D.coverage), L.alive),
+      unknownGroups: D.unknowns.map((g) => clone(g)),
+      carriedFromMove: carried,
       coverage: D.coverage.map((g) => clone(g)),
       catchUp: D.catchUp,
       fullAt: D.fullAt,
       done: owed === 0 && unknown === 0,
       records: D.records.map((r) => Object.assign({}, r, { corrected: corrections.has(r.id) })),
-      possibleDoubleTreatment: D.collisions.map((p) => p.slice()),
-      castrationFacts: d.castration ? (D.castration ? {
-        castrated: D.castration.castrated,
-        notCastrated: Object.assign({}, D.castration.notCastrated),
-        females: D.castration.females,
-        males: D.castration.castrated + sum(D.castration.notCastrated)
-      } : null) : undefined
+      possibleDoubleTreatment: D.collisions.map((p) => p.slice())
     };
-    if (d.castration) doses[d.id].castration = doses[d.id].castrationFacts;
-    delete doses[d.id].castrationFacts;
+    if (d.castration) {
+      doses[d.id].castration = D.castration ? {
+        castrated: D.castration.castrated,
+        notCastrated: Object.assign({}, D.castration.notCastrated, { deferred }),
+        females: D.castration.females,
+        males: D.castration.castrated + sum(D.castration.notCastrated) - D.castration.notCastrated.deferred + deferred
+      } : null;
+    }
   }
   const rowsHere = [...ctx.rows.values()].filter((r) => r.litter === L.id);
   const live = rowsHere.filter((r) => r.status === 'alive').length;
@@ -943,11 +1063,11 @@ function view(ctx, L, corrections) {
     moves: L.moves.map((m) => clone(m)),
     movedOutAfterEnd: L.movedOutAfterEnd.map((m) => clone(m)),
     counts: L.counts.map((c) => clone(c)),
-    deaths: L.deaths.map((d) => clone(d)),
+    deaths: L.deaths.map((x) => clone(x)),
     doses,
     identity: {
       scheme: scheme.scheme, who: scheme.who,
-      identified: live, liveRows: live,
+      identified: Math.min(live, L.alive), liveRows: live, conflict: Math.max(0, live - L.alive),
       missing: rowsHere.filter((r) => r.status === 'missing').length,
       onRecord: rowsHere.filter((r) => r.status !== 'withdrawn').length,
       rows: [...ctx.rows.values()].filter((r) => r.litter === L.id || r.birthLitter === L.id).map((r) => clone(r)),
@@ -985,19 +1105,27 @@ export function append(events, event, config, opts) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// selectors: what the pages render. Pages hold no ledger arithmetic.
+// selectors: what the pages render. Pages hold no ledger arithmetic; drafts go through `append`.
 
 function doseOrder(cfg) { const ix = new Map(cfg.doses.map((d, i) => [d.id, i])); return (a, b) => a.due - b.due || ix.get(a.dose) - ix.get(b.dose); }
 function population(D) { return D.castration ? D.castration.males : null; }
+const todoOf = (D) => (D.owed == null ? !D.records.length : D.owed > 0 || D.unknownAfterMove > 0);
+
+/* Try a draft exactly as `append` would, with the page's stamp. */
+function trial(derived, event, stamp) {
+  const input = derived.input || { events: [], config: {}, opts: {} };
+  const st = stamp || {};
+  const e = Object.assign({ id: st.id || '__draft', at: st.at || input.opts.today || null, who: st.who || null }, st.seen ? { seen: st.seen } : {}, event);
+  return append(input.events, e, input.config, input.opts);
+}
 
 /* One litter as the room sees it (room glossary, slice S1). */
 function roomFacts(derived, L) {
   const cfg = derived.config, order = doseOrder(cfg), today = derived.today;
   const Ds = Object.values(L.doses);
-  const todo = (D) => D.owed == null ? !D.records.length : D.owed > 0 || D.unknownAfterMove > 0;
-  const live = Ds.filter((D) => (D.status === 'due' || D.status === 'late') && todo(D)).sort(order);
-  const lapsed = Ds.filter((D) => D.status === 'missed' && todo(D)).sort(order);
-  const ahead = Ds.filter((D) => D.status === 'later' && todo(D)).sort(order);
+  const live = Ds.filter((D) => (D.status === 'due' || D.status === 'late') && todoOf(D)).sort(order);
+  const lapsed = Ds.filter((D) => D.status === 'missed' && todoOf(D)).sort(order);
+  const ahead = Ds.filter((D) => D.status === 'later' && todoOf(D)).sort(order);
   const recToday = L.lastRecord && L.lastRecord.day === today ? L.lastRecord : null;
   const doneToday = Ds.filter((D) => D.records.some((r) => dayNumber(r.at) === today)).map((D) => D.dose);
   let next = null;
@@ -1076,30 +1204,29 @@ function roomSelect(derived, opts) {
   };
 }
 
-/* A treat draft against one dose: owed, the not-treated remainder, why Save is gray. */
-function treatDraft(L, D, draft) {
+/* A treat draft against one dose: owed, the not-treated remainder, why Save is gray, and the
+   event — refused exactly as `append` would refuse it. */
+function treatDraft(derived, L, D, draft, stamp) {
   const dr = draft || {};
+  let out, ev;
   if (D.isCastration) {
     const c = dr.castration || {};
     const males = (c.castrated || 0) + (c.hernia || 0) + (c.cryptorchid || 0) + (c.kept || 0) + (c.deferred || 0);
+    out = { owed: D.owed, males, why: null, event: null };
+    ev = { type: 'treat', litter: L.id, dose: D.dose, castration: Object.assign({ castrated: 0 }, c) };
+  } else {
     const owed = D.owed;
-    let why = null;
-    if (owed === 0) why = 'nothing_owed';
-    else if (owed == null ? males > L.alive : males + (c.females || 0) !== owed) why = owed != null && males + (c.females || 0) > owed ? 'more_than_owed' : owed == null ? 'more_than_alive' : 'reason_missing';
-    return { owed, males, why, event: why ? null : { type: 'treat', litter: L.id, dose: D.dose, castration: Object.assign({ castrated: 0 }, c) } };
+    const n = dr.n == null ? owed : dr.n;
+    const k = (dr.deferred && dr.deferred.n) || 0, x = (dr.exempt && dr.exempt.n) || 0;
+    out = { owed, treated: n, notTreated: Math.max(0, (owed || 0) - n - k - x), why: null, event: null };
+    ev = { type: 'treat', litter: L.id, dose: D.dose, n };
+    if (k) ev.deferred = Object.assign({}, dr.deferred);
+    if (x) ev.exempt = Object.assign({}, dr.exempt);
   }
-  const owed = D.owed;
-  const n = dr.n == null ? owed : dr.n;
-  const k = (dr.deferred && dr.deferred.n) || 0, x = (dr.exempt && dr.exempt.n) || 0;
-  const notTreated = Math.max(0, owed - n - k - x);
-  let why = null;
-  if (owed === 0) why = 'nothing_owed';
-  else if (n + k + x > owed) why = 'more_than_owed';
-  else if (notTreated > 0) why = 'reason_missing';
-  const ev = { type: 'treat', litter: L.id, dose: D.dose, n };
-  if (k) ev.deferred = Object.assign({}, dr.deferred);
-  if (x) ev.exempt = Object.assign({}, dr.exempt);
-  return { owed, treated: n, notTreated, why, event: why ? null : ev };
+  const r = trial(derived, ev, stamp);
+  if (!r.ok) out.why = r.reason;
+  else { out.event = ev; out.after = r.derived.litters[L.id].doses[D.dose]; }
+  return out;
 }
 
 function litterSelect(derived, id, opts) {
@@ -1108,10 +1235,9 @@ function litterSelect(derived, id, opts) {
   const o = opts || {};
   const order = doseOrder(derived.config);
   const Ds = Object.values(L.doses);
-  const todo = (D) => D.owed == null ? !D.records.length : D.owed > 0 || D.unknownAfterMove > 0;
-  const now = Ds.filter((D) => D.status !== 'later' && todo(D)).sort(order);
+  const now = Ds.filter((D) => D.status !== 'later' && todoOf(D)).sort(order);
   const drafts = {};
-  for (const [doseId, dr] of Object.entries(o.drafts || {})) if (L.doses[doseId]) drafts[doseId] = treatDraft(L, L.doses[doseId], dr);
+  for (const [doseId, dr] of Object.entries(o.drafts || {})) if (L.doses[doseId]) drafts[doseId] = treatDraft(derived, L, L.doses[doseId], dr, o.stamp);
   return {
     id: L.id, inTask: L.inTask,
     header: { born: L.born, alive: L.alive, dead: L.dead.total, dayAge: L.dayAge, phase: L.phase, sowDied: !!L.sowDied },
@@ -1129,16 +1255,18 @@ function litterSelect(derived, id, opts) {
   };
 }
 
-/* The shared dead drawer's arithmetic (slice S5): caps, the from-the-missing range, why Save is gray. */
-function deathDraftSelect(L, draft) {
+/* The shared dead drawer (slice S5): caps, the from-the-missing range, why Save is gray — the
+   drawer's own steps first, then whatever `append` would refuse — and the effect of Save. */
+function deathDraftSelect(derived, litterId, draft, stamp) {
+  const L = derived.litters[litterId];
+  if (!L) return { why: 'unknown_litter', event: null };
   const dr = draft || {};
   const locked = L.phase === 'locked';
   const tallies = dr.tallies || {};
   const picks = dr.picks || {};
   const lossN = L.unexplained.openLoss;
   const roster = L.identity.rows.filter((r) => r.litter === L.id && (r.status === 'alive' || r.status === 'missing'));
-  const liveRowsN = L.identity.liveRows;
-  const unidentified = L.alive - liveRowsN;
+  const unidentified = Math.max(0, L.alive - L.identity.liveRows);
   const bodies = sum(tallies);
   const pickIds = Object.keys(picks);
   const cap = locked ? unidentified + lossN : Infinity;
@@ -1154,69 +1282,65 @@ function deathDraftSelect(L, draft) {
   else if (asksLoss && bodies > 0 && (k == null || k < kMin || k > kMax)) why = 'missing';
   const lines = Object.entries(tallies).filter(([, n]) => n > 0).map(([cause, n]) => ({ cause, n }))
     .concat(pickIds.map((rowId) => ({ cause: picks[rowId], rowId })));
+  const ev = Object.assign({ type: 'death', litter: L.id, lines }, locked && bodies && k ? { fromMissing: k } : {});
+  let after = null;
+  if (!why) {
+    const r = trial(derived, ev, stamp);
+    if (!r.ok) why = r.reason;
+    else { const A = r.derived.litters[L.id]; after = { alive: A.alive, dead: A.dead.total, openLoss: A.unexplained.openLoss }; }
+  }
   return {
     phase: L.phase,
     causes: locked ? ['crushed', 'scours', 'starve-out', 'other'] : ['stillborn', 'mummified', 'crushed', 'scours', 'starve-out', 'other'],
     roster: roster.map((r) => ({ rowId: r.rowId, tag: r.tag, notch: r.notch, status: r.status })),
     bodies, picks: pickIds.length, unidentified, openLoss: lossN, cap, kMin, kMax, asksLoss,
-    needK: asksLoss && bodies > 0 && k == null, why,
-    event: why ? null : Object.assign({ type: 'death', litter: L.id, lines }, locked && bodies && k ? { fromMissing: k } : {})
+    needK: asksLoss && bodies > 0 && k == null, why, after,
+    event: why ? null : ev
   };
 }
 
-/* The Move sheet's arithmetic (slice S7): clamp, before → after both sides, carry preview. */
-function moveDraftSelect(derived, draft) {
+/* The Move sheet (slice S7): the clamp, then the same replay `append` runs gives the before → after
+   on both sides, what each dose carries, the questions to ask, and why Save is gray. */
+function moveDraftSelect(derived, draft, stamp) {
   const dr = draft || {};
   const S = derived.litters[dr.from], R = derived.litters[dr.to];
   let why = null;
   if (!S) why = 'no_source'; else if (!R) why = 'no_receiver'; else if (S === R) why = 'same_litter';
-  else if (S.phase !== 'locked' || R.phase !== 'locked') why = 'farrowing_open';
   if (why) return { why, event: null };
   const ex = dr.explains || [];
   const loss = ex[0] ? S.unexplained.losses.find((x) => x.id === ex[0]) : null;
-  const gain = ex[1] ? R.unexplained.gains.find((x) => x.id === ex[1]) : null;
   const rows = dr.rows || [];
-  const unidentified = S.alive - S.identity.liveRows;
   const maxN = (loss ? loss.open : 0) + S.alive;
   let n = dr.n == null ? rows.length : dr.n;
   n = Math.max(rows.length, Math.min(n, maxN));
-  const lossQ = loss ? Math.min(n - rows.length, loss.open) : 0;
-  const untagged = n - lossQ - rows.length;
-  if (untagged > unidentified) why = 'name_the_rows';
-  if (n === 0) why = why || 'empty';
-  const gainQ = gain ? Math.min(n, gain.open) : 0;
-  const explaining = !!(loss || gain);
-  const carry = {}, asks = [], sourceAfter = [];
-  const after = S.alive - (n - lossQ);
+  const ev = { type: 'move', from: S.id, to: R.id, n, rows: rows.slice(), answers: Object.assign({}, dr.answers || {}) };
+  if (ex.length) ev.explains = [ex[0] || null, ex[1] || null];
+  const r = trial(derived, ev, stamp);
+  const blank = trial(derived, Object.assign({}, ev, { answers: {} }), stamp);
+  if (!r.ok) return { n, max: maxN, why: r.reason, event: null, delta: null, carry: {}, asks: [], sourceAfter: [] };
+  const mv = r.derived.litters[R.id].moves[r.derived.litters[R.id].moves.length - 1];
+  const mv0 = blank.ok ? blank.derived.litters[R.id].moves[blank.derived.litters[R.id].moves.length - 1] : mv;
+  const asks = derived.config.doses.filter((d) => !d.visible && mv0.packets[d.id] === 'unknown').map((d) => d.id);
+  const after = r.derived.litters[S.id].alive;
+  const sourceAfter = [];
   for (const d of derived.config.doses) {
     const D = S.doses[d.id];
-    let cls;
-    if (explaining) cls = 'asked';
-    else if (D.unknownAfterMove > 0) cls = 'part';
-    else if (!D.records.length) cls = D.carriedFromMove > 0 ? 'part' : 'none';
-    else if (D.owed === 0) cls = 'done';
-    else if (D.treated + D.carriedFromMove === 0) cls = 'none';
-    else cls = 'part';
-    const outcome = outcomeFor(cls, d, (dr.answers || {})[d.id]);
-    carry[d.id] = outcome;
-    if ((cls === 'part' || cls === 'asked') && !d.visible) asks.push(d.id);
-    if ((outcome === 'unknown' || outcome === 'check') && D.owed != null && !d.castration) {
+    if ((mv.packets[d.id] === 'unknown' || mv.packets[d.id] === 'check') && D.owed != null && !d.castration) {
       const covered = S.alive - D.owed;
-      sourceAfter.push({ dose: d.id, lo: Math.max(0, covered - n), hi: Math.min(covered, after), of: after });
+      sourceAfter.push({ dose: d.id, lo: Math.max(0, covered - mv.n), hi: Math.min(covered, after), of: after });
     }
   }
-  const delta = { from: [S.alive, S.alive - (n - lossQ)], to: [R.alive, R.alive + (n - gainQ)] };
-  const ev = { type: 'move', from: S.id, to: R.id, n, rows: rows.slice(), answers: Object.assign({}, dr.answers || {}) };
-  if (explaining) ev.explains = [loss ? loss.id : null, gain ? gain.id : null];
-  return { n, max: maxN, unidentified, delta, carry, asks, sourceAfter, why, event: why ? null : ev };
+  return {
+    n: mv.n, max: maxN, unidentified: Math.max(0, S.alive - S.identity.liveRows),
+    delta: { from: [S.alive, after], to: [R.alive, r.derived.litters[R.id].alive] },
+    carry: Object.assign({}, mv.packets), asks, sourceAfter, why: null, event: ev
+  };
 }
 
-/* End task figures (slice S9 glossary): unfinished litters and piglet-doses (incl. not yet due),
-   progress, the on-time share of treatments (litter × dose, fully recorded by the planned day;
-   due today unrecorded and not yet due unrecorded are left out). */
-function endSelect(derived) {
-  const order = doseOrder(derived.config);
-  const litters = Object.values(derived.litters).filter((L) => L.inTask);
+/* End task figures (slice S9 glossary) over a set of derived litters. */
+function endFigures(cfg, litterViews) {
+  const order = doseOrder(cfg);
+  const litters = Object.values(litterViews).filter((L) => L.inTask);
   const byLitter = {}, unfinished = [];
   const progress = { done: 0, owed: 0, missed: 0, ahead: 0 };
   let n = 0, k = 0, idDone = 0;
@@ -1224,7 +1348,7 @@ function endSelect(derived) {
     const list = [];
     for (const D of Object.values(L.doses).sort(order)) {
       progress.done += D.treated;
-      const left = D.owed == null ? null : D.owed + D.unknownAfterMove;
+      const left = D.owed == null ? null : D.owed + D.unknownAfterMove;   // exclusive by construction: ≤ alive
       const kind = D.status === 'later' ? 'not_due' : D.status === 'missed' ? 'missed' : 'owed';
       if (left == null) { if (!D.records.length) list.push({ dose: D.dose, kind, n: null }); }
       else if (left > 0) {
@@ -1232,26 +1356,28 @@ function endSelect(derived) {
         if (kind === 'not_due') progress.ahead += left; else progress.owed += left;
         if (kind === 'missed') progress.missed += left;
       }
-      const recorded = D.records.length > 0;
-      if (recorded || L.dayAge > D.due) {
+      if (D.records.length || L.dayAge > D.due) {
         k++;
         if (D.fullAt != null && D.fullAt <= D.due) n++;
       }
     }
     byLitter[L.id] = list;
-    const idOk = L.identity.done !== false;
     if (L.identity.done === true) idDone++;
-    if (list.length || !idOk) unfinished.push(L.id);
+    if (list.length || L.identity.done === false) unfinished.push(L.id);
   }
   progress.total = progress.done + progress.owed + progress.ahead;
-  const pieces = Object.values(byLitter).flat().reduce((s, x) => s + (x.n || 0), 0);
   return {
     unfinishedLitters: unfinished, finishedLitters: litters.map((L) => L.id).filter((id) => !unfinished.includes(id)),
-    byLitter, unfinishedPigletDoses: pieces, progress,
+    byLitter, unfinishedPigletDoses: Object.values(byLitter).flat().reduce((s, x) => s + (x.n || 0), 0), progress,
     onTime: { n, k }, identityDone: { n: idDone, k: litters.length },
-    movedOutAfterEnd: litters.flatMap((L) => L.movedOutAfterEnd.map((m) => Object.assign({ litter: L.id }, m))),
-    ended: derived.ended
+    movedOutAfterEnd: litters.flatMap((L) => L.movedOutAfterEnd.map((m) => Object.assign({ litter: L.id }, m)))
   };
+}
+
+/* `atEnd`: the closure figures frozen by `end_task`; `now`: the live figures, amendments since
+   End included. */
+function endSelect(derived) {
+  return { atEnd: derived.ended && derived.ended.snapshot ? clone(derived.ended.snapshot) : null, now: endFigures(derived.config, derived.litters), ended: derived.ended ? Object.assign({}, derived.ended, { snapshot: undefined }) : null };
 }
 
 export const select = { room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect };

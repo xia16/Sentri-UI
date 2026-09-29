@@ -216,7 +216,7 @@ test('owed is a stored count shown as min(owed, alive): a death lowers it only p
   x = run(b).litters.A02.doses.iron3;
   assert.equal(run(b).litters.A02.alive, 2);
   assert.equal(x.owed, 2);
-  assert.equal(x.owedStored, 2);                           // capped when its population shrank below it (round 3, item 5)
+  assert.equal(x.owedStored, 3);                           // stored; only a zero point (alive 0) extinguishes it (round 3, item 5)
 });
 
 // ---- counts, losses, deaths -----------------------------------------------------------------
@@ -1302,7 +1302,8 @@ test('R3-13 End snapshots the closure figures; select.end gives atEnd and now', 
   const wrong = b.treat('A02', 'iron3', 12, { at: on(3) });
   b.ev.push({ id: 'end', type: 'end_task', at: on(5, '12:00'), who: 'G.H' });
   b.correction(wrong.id, { void: true, fresh: { litter: 'A05', dose: 'iron3', n: 11 }, at: on(6) });
-  const e = select.end(run(b, TASKED(['A02', 'A05']), 6));
+  const cfg = { doses: IRON_ONLY.doses, identity: { scheme: 'none' }, task: { id: 'T', litters: ['A02', 'A05'] } };
+  const e = select.end(run(b, cfg, 6));
   assert.deepEqual(e.atEnd.unfinishedLitters, ['A05']);
   assert.deepEqual(e.now.unfinishedLitters, ['A02']);
   assert.deepEqual(e.atEnd.onTime, { n: 1, k: 2 });
@@ -1318,4 +1319,31 @@ test('R3-14 on time only if owed and unknown both reached 0 by the due day', () 
   b.check('R', 'iron3', 1, 0, { at: on(5) });
   const e = select.end(run(b, TASKED(['R']), 5));
   assert.deepEqual(e.now.onTime, { n: 0, k: 1 });
+});
+
+// ---- property: concurrent records reconcile to one reading in every replay order ----------------
+
+test('property: concurrent records give the same owed in every permutation', () => {
+  const perms = (a) => (a.length <= 1 ? [a] : a.flatMap((x, i) => perms(a.slice(0, i).concat(a.slice(i + 1))).map((p) => [x].concat(p))));
+  for (let seed = 201; seed <= 260; seed++) {
+    const r = rng(seed);
+    const int = (lo, hi) => lo + Math.floor(r() * (hi - lo + 1));
+    const N = int(3, 12), k = int(2, 3);
+    const recs = [];
+    for (let i = 0; i < k; i++) { const n = int(0, N); recs.push({ n, def: N - n }); }
+    const withDeath = r() < 0.5;
+    const readings = new Set();
+    for (const order of perms(recs.map((_, i) => i))) {
+      const b = book();
+      const f = b.farrowed('A02', N);
+      if (withDeath) b.death('A02', [{ cause: 'crushed', n: 1 }], { seen: [f.id] });
+      for (const i of order) {
+        const x = recs[i];
+        b.treat('A02', 'iron3', x.n, Object.assign({ seen: [f.id], device: 'p' + i }, x.def ? { deferred: { n: x.def, reason: 'weak' } } : {}));
+      }
+      const D = run(b, IRON_ONLY).litters.A02.doses.iron3;
+      readings.add(D.owed + '/' + D.deferred);
+    }
+    assert.equal(readings.size, 1, `seed ${seed}: ${JSON.stringify(recs)} ${[...readings]}`);
+  }
 });
