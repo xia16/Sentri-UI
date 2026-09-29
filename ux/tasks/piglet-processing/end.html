@@ -100,16 +100,13 @@
     return same ? PP.t('pp.room.dose.withday', { name: PP.t('pp.common.tx.' + d.tx), n: d.due }) : PP.t('pp.common.tx.' + d.tx);
   }
   function sum(xs, f) { return xs.reduce(function (a, x) { return a + (f(x) || 0); }, 0); }
-  // One litter as End reads it: the selector's per-dose list, and the litter's own ledger figures.
+  // One litter as End reads it: the selector's per-dose list and per-litter totals (atEnd frozen, or now), and the litter's facts.
   function litter(id, atEnd) {
-    var x = Lx(id), list = (fig(atEnd).byLitter[id] || []);
+    var x = Lx(id), f = fig(atEnd), list = (f.byLitter[id] || []), t = f.litters[id] || { done: 0, owed: 0, unknown: 0, missed: 0, notDue: 0, excluded: 0 };
     var idDay = x.dayAge >= (CFG.identity.day || 0);
     return {
       code: id, day: x.dayAge, alive: x.alive, sowDied: !!x.sowDied, unlocked: x.phase === 'open', loss: x.unexplained.openLoss,
-      list: list, done: sum(Object.values(x.doses), function (d) { return d.treated; }),
-      owed: sum(list.filter(function (e) { return e.kind !== 'not_due'; }), function (e) { return e.n; }),
-      missed: sum(list.filter(function (e) { return e.kind === 'missed'; }), function (e) { return e.n; }),
-      ahead: sum(list.filter(function (e) { return e.kind === 'not_due'; }), function (e) { return e.n; }),
+      list: list, done: t.done, owed: t.owed + t.unknown, missed: t.missed, ahead: t.notDue, excluded: t.excluded,
       late: list.some(function (e) { return e.kind === 'owed' && x.doses[e.dose].status === 'late'; }),
       idDone: x.identity.done !== false, idAhead: !idDay, identified: x.identity.identified, unid: x.identity.done === false && idDay ? x.alive - x.identity.identified : 0,
       unfinished: fig(atEnd).unfinishedLitters.indexOf(id) >= 0
@@ -119,9 +116,8 @@
   function workLeft(l) { return l.list.some(function (e) { return e.kind !== 'not_due'; }) || !l.idDone; }
   function totals(atEnd) {
     var f = fig(atEnd), ls = litters(atEnd), unf = ls.filter(function (l) { return l.unfinished; });
-    var all = taskIds().length * CFG.doses.length;
-    return { done: f.progress.done, owed: f.progress.owed, missed: f.progress.missed, ahead: f.progress.ahead, total: f.progress.total,
-      ontime: f.onTime.n, due: f.onTime.k, excluded: all - f.onTime.k, pct: f.onTime.k ? Math.round(100 * f.onTime.n / f.onTime.k) : null,
+    return { done: f.progress.done, owed: f.progress.owed + f.progress.unknown, missed: f.progress.missed, ahead: f.progress.ahead, total: f.progress.total,
+      ontime: f.onTime.n, due: f.onTime.k, excluded: sum(ls, function (l) { return l.excluded; }), pct: f.onTime.k ? Math.round(100 * f.onTime.n / f.onTime.k) : null,
       idDone: f.identityDone.n, litters: f.identityDone.k, unf: unf, work: unf.filter(workLeft).length,
       alive: sum(ls, function (l) { return l.alive; }), identified: sum(ls, function (l) { return l.identified; }) };
   }
@@ -150,7 +146,8 @@
       if (e.type !== 'identity') idRun = null;
       if (e.type === 'treat') {
         var rj = rejected(e.id), n = e.castration ? e.castration.castrated : e.n;
-        if (rj && rj.reason === 'task_ended') out.push({ kind: 'afterend', code: e.litter, k: e.dose, n: n, stamped: e.at, at: at, who: e.who });
+        // done after End on a phone that had not seen it: kept, stamped and flagged by the ledger (never in atEnd)
+        if (flagged(e.id, 'after_end')) out.push({ kind: 'afterend', code: e.litter, k: e.dose, n: n, stamped: e.at, at: at, who: e.who });
         else if (flagged(e.id, 'arrived_after_end')) out.push({ kind: 'late', code: e.litter, k: e.dose, n: n, stamped: e.at, at: at, who: e.who });
         else if (!rj) out.push({ kind: 'catchup', code: e.litter, k: e.dose, n: n, at: at, who: e.who });
       } else if (e.type === 'correction' && e.fresh) {
@@ -212,7 +209,7 @@
     return row(l, l1, toks);
   }
   // Review and receipt row: what End leaves (or left) not done, in numbers. Doses not yet due fold into one item from two.
-  function entryWord(e, word) { return e.n == null ? T('pp.end.u.males', { name: name(e.dose) }) : T(word, { name: name(e.dose), n: e.n }); }
+  function entryWord(e, word) { return e.males === 'uncounted' ? T('pp.end.u.males', { name: name(e.dose) }) : T(word, { name: name(e.dose), n: e.n }); }
   function unfinishedParts(l) {
     var l1 = [], toks = [dayTok(l)], late = -1, win = null, today = false;
     var ahead = l.list.filter(function (e) { return e.kind === 'not_due'; });

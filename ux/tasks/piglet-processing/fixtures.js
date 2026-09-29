@@ -33,8 +33,9 @@
      E01 000395 · day 2 · 7  · outside the task (a late farrower)                    [room, edge no-task]
      Unit 8: A03 · F02 (piglet 000512) · F03 · F05 (outside this task)               [move cross, room find, end moves]
 
-   Not in the ledger — page facts carried here and reported as ledger issues: the sow's tag and parity,
-   the birth litter weight, weigh-day litter weights and boar/gilt counts, drafts held on this phone. */
+   The sow's tag and parity and the birth litter weight ride on `farrowed`; weigh-day litter weights,
+   boar/gilt counts and birth weights recorded in processing are ledger events. Not in the ledger:
+   the notch litter number a notch farm cuts (farm config) and drafts held on this phone. */
 
 import { derive, append, select, dayNumber } from './ledger.js';
 
@@ -68,11 +69,11 @@ export const CONFIG = {
   task: { id: 'PP-U7-0926', litters: TASK7, farrowingTask: 'open' }
 };
 
-/* The sow and her crate: facts the ledger does not hold. `weight`: the birth litter weight
-   (farrowing's optional fact at Finish), null while missing. `notchLitter`: the litter number a
-   notch farm cuts. */
+/* The sow and her crate, as farrowing posts them on `farrowed` (sow tag, parity, the birth litter
+   weight at Finish — null while missing). `notchLitter`: the litter number a notch farm cuts (config,
+   not a ledger fact). */
 const W = (kg, at, who) => ({ kg, by: 'finish', at, who });
-export const SOWS = {
+const SOW_DATA = {
   A02: { unit: 7, sow: '000231', parity: 3, weight: W('15.2', '2026-09-26T18:05', 'G.H') },
   A04: { unit: 7, sow: '000236', parity: 2, weight: W('13.4', '2026-09-26T16:30', 'L.M'), notchLitter: '118' },
   A05: { unit: 7, sow: '000240', parity: 4, weight: W('14.1', '2026-09-26T17:40', 'L.M') },
@@ -102,8 +103,8 @@ export const SOWS = {
 };
 
 /* Weigh-day litter weights (identity and weigh, S4) and the weigh-day 21 weights End hands to
-   weaning: not in the ledger. */
-export const LITTER_WEIGHTS = {
+   weaning: posted as `litter_weight` events by the variants that need them. */
+const LITTER_WEIGHTS = {
   base: { B04: [{ kg: '15.9', day: 3, at: '2026-09-23T08:40', who: 'L.M' }] },
   late: {
     A02: [{ kg: '66.0', day: 21 }], A05: [{ kg: '63.8', day: 21 }], B01: [{ kg: '51.3', day: 21 }], B04: [{ kg: '15.9', day: 3 }, { kg: '57.5', day: 21 }],
@@ -127,7 +128,13 @@ function builder() {
   return {
     events, ids, push,
     farrowed(litter, room, birthDate, born, dead, at, who, locked = true) {
-      return push({ type: 'farrowed', litter, room, birthDate, born, dead, locked, at, who }, 'F-' + litter);
+      const sd = SOW_DATA[litter] || {};
+      const e = { type: 'farrowed', litter, room, birthDate, born, dead, locked, at, who, sow: { tag: sd.sow || null, parity: sd.parity == null ? null : sd.parity } };
+      if (sd.weight && locked) { e.birthWeight = sd.weight.kg; }
+      return push(e, 'F-' + litter);
+    },
+    weights(set, at, who) {
+      for (const [litter, list] of Object.entries(set)) for (const w of list) push({ type: 'litter_weight', litter, kg: w.kg, day: w.day, at: w.at || at, who: w.who || who }, 'LW-' + litter);
     },
     treat(litter, dose, at, who, n, extra) { return push(Object.assign({ type: 'treat', litter, dose, n, at, who }, extra || {}), 'T-' + litter); },
     castrate(litter, at, who, c, extra) { return push(Object.assign({ type: 'treat', litter, dose: 'castrate', castration: c, at, who }, extra || {}), 'T-' + litter); },
@@ -271,6 +278,7 @@ function base(b) {
   b.rows('A05', sep(29, '09:35'), 'L.M', [{ rowId: 'A05-r1', tag: '000354', notch: '12-5' }, { rowId: 'A05-r2', tag: '000355', notch: '12-6' }, { rowId: 'A05-r3', tag: '004517' }]);
   // D03: Set count 11 against 13 alive: an unexplained loss of 2, open
   b.count('D03', sep(29, '10:25'), 'G.H', 11, { baseAlive: 13 });
+  b.weights(LITTER_WEIGHTS.base);
   return b;
 }
 
@@ -335,6 +343,10 @@ function late(b) {
       }
     }
   }
+  // the weigh-day 21 litter weights End hands to weaning
+  const day21 = {};
+  for (const [id, list] of Object.entries(LITTER_WEIGHTS.late)) { const w = list.filter((x) => x.day === 21); if (w.length) day21[id] = w; }
+  b.weights(day21, oct(17, '15:00'), 'G.H');
   // the wrong-litter mark End's corrections fix: meant for B01, tapped on B03
   b.castrate('B03', oct(17, '15:40'), 'L.M', { castrated: 1 }, { id: 'T-B03-wrong' });
   return b;
@@ -411,7 +423,7 @@ export const VARIANTS = {
     b.castrate('F02', sep(28, '08:20'), 'A.K', { castrated: 6 });
     b.treat('F03', 'cord', sep(28, '18:20'), 'A.K', 10); b.treat('F03', 'nasal', sep(28, '18:22'), 'A.K', 10);
     b.treat('F05', 'cord', sep(27, '18:20'), 'A.K', 9); b.treat('F05', 'nasal', sep(27, '18:22'), 'A.K', 9);
-  }, TODAY, { task: { id: 'PP-U7-U8-0925', litters: TASK7.concat(['A03', 'F02', 'F03', 'F05']), farrowingTask: 'open' } }),
+  }, TODAY, { tasks: [CONFIG.task, { id: 'PP-U8-0925', litters: ['A03', 'F02', 'F03', 'F05'] }] }),
 
   // litter sheet (S2)
   'a02-partial': V((b) => { base(b); b.treat('A02', 'tail', sep(29, '08:40'), 'L.M', 12); b.treat('A02', 'iron3', sep(29, '09:14'), ME, 12, { id: 'T-A02-visit' }); }),
@@ -429,6 +441,15 @@ export const VARIANTS = {
     b.castrate('C05', sep(29, '09:32'), ME, { castrated: 0 }, { id: 'T-C05-visit' });
   }),
   'c02-early': V((b) => { base(b); b.treat('C02', 'iron3', sep(29, '09:30'), ME, 14, { id: 'T-C02-visit' }); }),
+
+  // birth litter weight (S10): set at farrowing's Edit, saved here, and a conflict with another phone
+  'c02-weight-set': V((b) => { base(b); b.push({ type: 'birth_weight', litter: 'C02', kg: '16.4', source: 'farrowing', at: sep(28, '14:52'), who: 'G.H' }, 'BW-C02'); }),
+  'c02-weight-saved': V((b) => { base(b); b.push({ type: 'birth_weight', litter: 'C02', kg: '34.2', at: sep(29, '09:42'), who: ME }, 'BW-C02'); }),
+  'c02-weight-conflict': V((b) => {
+    base(b); const seen = b.ids();
+    b.push({ type: 'birth_weight', litter: 'C02', kg: '14.8', source: 'farrowing', at: sep(29, '09:38'), who: 'A.K' }, 'BW-C02');
+    b.push({ type: 'birth_weight', litter: 'C02', kg: '16.4', at: sep(29, '09:42'), who: ME, seen }, 'BW-C02');
+  }),
 
   // Move (S7): records already posted
   'moved-b06-b08': V((b) => { base(b); b.move('B06', 'B08', 2, sep(29, '09:42'), ME, { id: 'MV-0929-01', answers: {} }); }),
@@ -475,7 +496,11 @@ export const VARIANTS = {
     b.rows('A02', sep(29, '09:12'), ME, [row('A02', 6, ['004305', 'b', 1.31])], { seen });
   }),
   // A02 with 7 tagged (two boars since the counts were saved at 5)
-  'a02-tags-seven': V((b) => { base(b); a02(b, A02_LM, sep(29, '08:10'), 'L.M'); a02(b, [['004306', 'b', 1.44], ['004307', 'b', 1.52]], sep(29, '09:15'), ME, 6); }),
+  'a02-tags-seven': V((b) => {
+    base(b); a02(b, A02_LM, sep(29, '08:10'), 'L.M');
+    b.push({ type: 'sex_counts', litter: 'A02', boars: 4, gilts: 3, at: sep(29, '08:30'), who: 'L.M' }, 'SC-A02');
+    a02(b, [['004306', 'b', 1.44], ['004307', 'b', 1.52]], sep(29, '09:15'), ME, 6);
+  }),
   keepers: V((b) => {
     base(b);
     b.rows('A07', sep(29, '09:00'), ME, tags('A07', 4601, 9, 1, (i) => ({ sex: i === 4 ? 'b' : 'g', weight: [1.62, 1.58, 1.66, 1.71, 1.8, 1.59, 1.64, 1.69, 1.57][i] })));
@@ -529,8 +554,15 @@ export function open(name, opts) {
     get derived() { return derived; },
     get added() { return added.slice(); },
     litter(id) { return derived.litters[id] || null; },
-    sow(id) { return SOWS[id] || null; },
-    weights(id) { const set = /^(late|ended)/.test(vname) ? LITTER_WEIGHTS.late : LITTER_WEIGHTS.base; return (set[id] || []).slice(); },
+    /* The sow as the ledger holds her (`farrowed`), the unit (room), the birth litter weight, and the
+       farm's notch litter number (config). */
+    sow(id) {
+      const L = derived.litters[id];
+      if (!L) return null;
+      return { unit: L.room, sow: L.sow ? L.sow.tag : '', parity: L.sow ? L.sow.parity : null, weight: L.birthWeight, notchLitter: (SOW_DATA[id] || {}).notchLitter || null };
+    },
+    crateOfSow(tag) { const hit = Object.values(derived.litters).find((L) => L.sow && L.sow.tag === tag); return hit ? hit.id : null; },
+    weights(id) { const L = derived.litters[id]; return L ? L.weights.map((w) => ({ kg: w.kg, day: w.day, at: w.at, who: w.who, event: w.event })) : []; },
     /* The next stamp on this phone: after the fixture's now, one minute per record. */
     stamp() {
       clock++;
@@ -579,6 +611,6 @@ export function piglets(derived) {
   return out;
 }
 
-export const PPFixtures = { CONFIG, FARMS, SOWS, LITTER_WEIGHTS, DEVICE_DRAFTS, VARIANTS, TODAY, NOW, ME, open, piglets };
+export const PPFixtures = { CONFIG, FARMS, DEVICE_DRAFTS, VARIANTS, TODAY, NOW, ME, open, piglets };
 export default PPFixtures;
 if (typeof window !== 'undefined') window.PPFixtures = PPFixtures;
