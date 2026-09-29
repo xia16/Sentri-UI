@@ -221,7 +221,7 @@ test('owed is a stored count shown as min(owed, alive): a death lowers it only p
 
 // ---- counts, losses, deaths -----------------------------------------------------------------
 
-test('count lower → one open unexplained loss; a recount supersedes it (provisional ruling), never a second line', () => {
+test('count lower → one open unexplained loss; a recount never closes it (RULINGS round 3): it writes its own line', () => {
   const b = book();
   b.farrowed('B14', 11, { stillborn: 1 });
   const c1 = b.count('B14', 9, { baseAlive: 10 });
@@ -232,9 +232,10 @@ test('count lower → one open unexplained loss; a recount supersedes it (provis
   const c2 = b.count('B14', 10, { baseAlive: 9 });
   L = run(b).litters.B14;
   assert.equal(L.alive, 10);
-  assert.equal(L.unexplained.openLoss, 0);
-  assert.equal(L.unexplained.openGain, 0);
-  assert.deepEqual(L.unexplained.losses[0].explainedBy, [{ event: c2.id, kind: 'superseded', qty: 1 }]);   // kept in the trail
+  assert.equal(L.unexplained.openLoss, 1);                  // never netted, never closed by a count
+  assert.equal(L.unexplained.openGain, 1);
+  assert.equal(L.unexplained.gains[0].id, c2.id);
+  assert.deepEqual(L.unexplained.losses[0].explainedBy, []);
   assert.ok(balances(L));
 });
 
@@ -314,20 +315,32 @@ test('over-allocation is refused: alive never goes below 0', () => {
   assert.equal(rejectedReason(run(b), d2), 'alloc_exceeds_bodies');
 });
 
-test('two phones consume one loss → the excess is a plain death flagged sync review', () => {
+test('two phones consume one loss → the second body is held for review (RULINGS round 3), never a second death', () => {
   const b = book();
   const f = b.farrowed('B14', 10);
   const c = b.count('B14', 9);
   const p1 = b.death('B14', [{ cause: 'crushed', n: 1 }], { seen: [f.id, c.id], lossAlloc: [{ lossId: c.id, qty: 1 }] });
   const p2 = b.death('B14', [{ cause: 'crushed', n: 1 }], { seen: [f.id, c.id], lossAlloc: [{ lossId: c.id, qty: 1 }] });
-  const d = run(b);
-  const L = d.litters.B14;
+  let d = run(b);
+  let L = d.litters.B14;
   assert.equal(L.unexplained.openLoss, 0);
-  assert.equal(L.dead.total, 2);
-  assert.equal(L.alive, 8);
-  assert.deepEqual(d.flags.map((g) => [g.kind, g.reason, g.events[0]]), [['sync_review', 'loss_over_consumed', p2.id]]);
-  assert.equal(L.deaths.find((x) => x.id === p1.id).excess, 0);
+  assert.equal(L.dead.total, 1);                            // Dead 1, Alive 9: the duplicate is not applied
+  assert.equal(L.alive, 9);
+  assert.deepEqual(L.held.map((h) => [h.event, h.n, h.resolved]), [[p2.id, 1, null]]);
+  assert.deepEqual(d.flags.map((g) => [g.kind, g.reason, g.events[0]]), [['sync_review', 'held_body', p2.id]]);
+  assert.equal(L.deaths.find((x) => x.id === p1.id).held, 0);
   assert.ok(balances(L));
+  // one body: the duplicate is withdrawn
+  const one = { id: 'res1', type: 'resolve', litter: 'B14', held: p2.id, answer: 'one', at: on(3, '11:00'), who: 'G.H' };
+  L = derive(b.ev.concat([one]), CONFIG, TODAY(3)).litters.B14;
+  assert.deepEqual([L.dead.total, L.alive, L.held[0].resolved], [1, 9, 'one']);
+  // two bodies: the second applies as a plain death
+  const two = { id: 'res2', type: 'resolve', litter: 'B14', held: p2.id, answer: 'two', at: on(3, '11:00'), who: 'G.H' };
+  d = derive(b.ev.concat([two]), CONFIG, TODAY(3)); L = d.litters.B14;
+  assert.deepEqual([L.dead.total, L.alive, L.held[0].resolved], [2, 8, 'two']);
+  assert.ok(balances(L));
+  const again = { id: 'res3', type: 'resolve', litter: 'B14', held: p2.id, answer: 'one', at: on(3, '11:05') };
+  assert.equal(rejectedReason(derive(b.ev.concat([two, again]), CONFIG, TODAY(3)), again), 'already_resolved');
 });
 
 test('open-phase deaths never touch Alive: Born derives', () => {
@@ -801,8 +814,9 @@ test('CX7 loss allocations aggregate by loss id; one missing piglet is consumed 
   const d = run(b, IRON_ONLY);
   const L = d.litters.B14;
   assert.equal(L.unexplained.openLoss, 0);
-  assert.equal(L.alive, 8);                                  // one from the loss, one plain
-  assert.deepEqual(d.flags.map((g) => [g.reason, g.events[0]]), [['loss_over_consumed', dd.id]]);
+  assert.equal(L.alive, 9);                                  // one from the loss; the second allocation is held for review
+  assert.equal(L.held[0].n, 1);
+  assert.deepEqual(d.flags.map((g) => [g.reason, g.events[0]]), [['held_body', dd.id]]);
   const bad = b.death('B14', [{ cause: 'crushed', n: 1 }], { lossAlloc: [{ lossId: c.id, qty: -1 }] });
   assert.equal(rejectedReason(run(b, IRON_ONLY), bad), 'bad_numbers');
 });
@@ -1057,8 +1071,10 @@ test('END-a a mark stamped before End but applied after it is accepted, flagged 
   const afterStamp = b.treat('A02', 'iron3', 12, { at: on(5, '13:00'), seen: [f.id] });
   const d = run(b, TASKED(['A02']), 5);
   assert.equal(rejectedReason(d, before), undefined);
-  // done after End on a phone that had not seen End: kept, stamped, flagged (#19 ruling)
+  // done after End on a phone that had not seen End: kept, stamped, flagged — never counted (RULINGS round 3)
   assert.equal(rejectedReason(d, afterStamp), undefined);
+  assert.equal(d.litters.A02.doses.iron3.treated, 12);
+  assert.deepEqual(d.litters.A02.doses.iron3.afterEnd.map((x) => x.id), [afterStamp.id]);
   assert.deepEqual(d.flags.filter((g) => g.kind === 'task').map((g) => [g.reason, g.events[0]]), [['arrived_after_end', before.id], ['after_end', afterStamp.id]]);
   assert.equal(d.ended.event, end.id);
 });
@@ -1083,27 +1099,23 @@ test('END-b a correction after End voids a wrong-litter mark and carries the fre
   assert.equal(rejectedReason(d2, bad), 'correction_invalid');
 });
 
-test('END-c piglets moved out after End reduce the ended task\'s not-done; arrivals keep owed recordable (catch-up)', () => {
+test('END-c piglets moved out after End reduce the ended task\'s not-done; arrivals after End stay not done (RULINGS round 3)', () => {
   const b = book();
   b.farrowed('A02', 12); b.farrowed('A05', 11); b.farrowed('X', 6);
   b.treat('A05', 'iron3', 11);
   b.ev.push({ id: 'end', type: 'end_task', at: on(3, '12:00'), who: 'G.H' });
   const out = b.move('A02', 'X', 2, { at: on(3, '13:00') });
-  const inn = b.move('X', 'A05', 1, { at: on(3, '13:05') });
+  b.move('X', 'A05', 1, { at: on(3, '13:05') });
   let d = run(b, TASKED(['A02', 'A05']), 3);
   assert.deepEqual(d.litters.A02.movedOutAfterEnd, [{ move: out.id, n: 2, to: 'X', owed: { iron3: 2 } }]);
   const e = select.end(d);
   assert.deepEqual(e.now.byLitter.A02, [{ dose: 'iron3', kind: 'owed', n: 10 }]);
-  assert.equal(d.litters.A05.doses.iron3.owed, 1);
-  assert.equal(d.litters.A05.doses.iron3.catchUp, 1);
-  const catchUp = b.treat('A05', 'iron3', 1, { at: on(3, '14:00') });
-  const again = b.treat('A02', 'iron3', 10, { at: on(3, '14:10') });
+  assert.equal(d.litters.A05.doses.iron3.owed, 1);            // not done: never recordable as catch-up
+  assert.equal(d.litters.A05.doses.iron3.catchUp, undefined);
+  assert.deepEqual(e.now.byLitter.A05, [{ dose: 'iron3', kind: 'owed', n: 1 }]);
+  const late = b.treat('A05', 'iron3', 1, { at: on(3, '14:00') });
   d = run(b, TASKED(['A02', 'A05']), 3);
-  assert.equal(rejectedReason(d, catchUp), undefined);
-  assert.equal(d.litters.A05.doses.iron3.records[1].catchUp, true);
-  assert.equal(d.litters.A05.doses.iron3.owed, 0);
-  assert.equal(rejectedReason(d, again), 'task_ended');
-  assert.ok(inn);
+  assert.equal(rejectedReason(d, late), 'task_ended');
 });
 
 // =============================================================================================
@@ -1611,7 +1623,7 @@ test('select.explain: each open line with a death door (losses) and ranked Move 
   allBalanced(d2);
 });
 
-test('select.counts: a count that saw the other stands and supersedes; a count that crossed an unseen death is flagged', () => {
+test('select.counts: the latest count stands (none supersedes); a count that crossed an unseen death is flagged', () => {
   const b = book();
   b.farrowed('A', 14);
   const g = b.count('A', 13, { baseAlive: 14, at: on(3, '09:40') });
@@ -1623,7 +1635,8 @@ test('select.counts: a count that saw the other stands and supersedes; a count t
   assert.equal(d.litters.A.unexplained.openLoss, 1);    // one line at most: 14 − 1 dead − 12 seen
   assert.equal(c.standing, late.id);
   const k = c.counts.find((x) => x.id === late.id);
-  assert.equal(k.stands, true); assert.equal(k.wrote, -1); assert.equal(k.deviceDiff, -2); assert.equal(k.sizedAgainst, 13);
+  // the earlier count's loss stays open; this count is sized against Alive (12 after the death) and writes nothing
+  assert.equal(k.stands, true); assert.equal(k.wrote, 0); assert.equal(k.deviceDiff, -2); assert.equal(k.sizedAgainst, 12);
   assert.deepEqual(k.crossed, [dd.id]); assert.equal(c.review, true); assert.equal(c.conflict, false);
   allBalanced(d);
   // a later count, online, settles the review; the flagged count stays in the trail
@@ -1658,15 +1671,17 @@ test('no clock ordering: two causally concurrent counts disagree — neither sta
   }
 });
 
-test('explain lines say what their count was sized against and which count it replaced', () => {
+test('explain lines say what their count was sized against; no count replaces another', () => {
   const b = book();
   b.farrowed('A', 12);
   const p = b.count('A', 10, { at: on(3, '09:00') });
   const r = b.count('A', 13, { at: on(3, '09:20') });
   const l = select.explain(run(b, IRON_ONLY), { litter: 'A' }).lines[0];
-  assert.equal(l.id, r.id); assert.equal(l.kind, 'gain'); assert.equal(l.open, 1);
-  assert.equal(l.aliveBefore, 10); assert.equal(l.sizedAgainst, 12);
-  assert.deepEqual(l.replaced, { id: p.id, observed: 10, at: on(3, '09:00'), who: 'G.H' });
+  // both lines open (a recount never closes a line): the loss of 2, then the gain of 3 sized against Alive 10
+  const g = select.explain(run(b, IRON_ONLY), { litter: 'A' }).lines.find((x) => x.id === r.id);
+  assert.equal(l.id, p.id); assert.equal(g.kind, 'gain'); assert.equal(g.open, 3);
+  assert.equal(g.aliveBefore, 10); assert.equal(g.sizedAgainst, 10);
+  assert.equal(g.replaced, null);
 });
 
 test('deathDraft: kMax leaves out the named missing piglets (their loss is theirs)', () => {
@@ -1695,33 +1710,30 @@ test('explain: a suggested Move with fewer piglets than the named missing rows a
   assert.equal(select.moveDraft(run(b, IRON_ONLY), Object.assign({}, s.move, { rows: ['r2'] })).why, null);
 });
 
-test('recount supersedes: 10 then 12 → no open lines', () => {
+test('a recount never closes a line: 10 then 12 → a loss of 2 and a gain of 2, both open', () => {
   const b = book();
   b.farrowed('A', 12);
   b.count('A', 10, { at: on(3, '09:00') });
   const r = b.count('A', 12, { at: on(3, '09:20') });
   const L = run(b, IRON_ONLY).litters.A;
-  assert.equal(L.alive, 12); assert.equal(L.unexplained.openLoss, 0); assert.equal(L.unexplained.openGain, 0);
-  assert.equal(L.unexplained.losses[0].qty, 2);                       // the original stays in the trail
-  assert.deepEqual(L.unexplained.losses[0].explainedBy, [{ event: r.id, kind: 'superseded', qty: 2 }]);
-  assert.equal(L.counts[0].supersededBy, r.id);
+  assert.equal(L.alive, 12); assert.equal(L.unexplained.openLoss, 2); assert.equal(L.unexplained.openGain, 2);
+  assert.equal(L.unexplained.gains[0].id, r.id);
+  assert.equal(L.counts[0].supersededBy, null);
   assert.ok(balances(L));
 });
 
-test('recount supersedes: 13 then 12 → no open lines; the superseded gain\'s unknown doses retire', () => {
+test('a recount never closes a line: 13 then 12 → the gain\'s unknown doses stay', () => {
   const b = book();
   b.farrowed('A', 12); b.treat('A', 'iron3', 12);
   b.count('A', 13, { at: on(3, '09:00') });
-  let L = run(b, IRON_ONLY).litters.A;
-  assert.equal(L.doses.iron3.unknownAfterMove, 1);
   b.count('A', 12, { at: on(3, '09:20') });
-  L = run(b, IRON_ONLY).litters.A;
-  assert.equal(L.alive, 12); assert.equal(L.unexplained.openGain, 0); assert.equal(L.unexplained.openLoss, 0);
-  assert.equal(L.doses.iron3.unknownAfterMove, 0); assert.equal(L.doses.iron3.owed, 0);
+  const L = run(b, IRON_ONLY).litters.A;
+  assert.equal(L.alive, 12); assert.equal(L.unexplained.openGain, 1); assert.equal(L.unexplained.openLoss, 1);
+  assert.equal(L.doses.iron3.unknownAfterMove, 1);
   assert.ok(balances(L));
 });
 
-test('recount supersedes: offline 9 / online 13 / recount 13 → one line at most; clocks never decide', () => {
+test('concurrent counts still disagree under sync review; a fresh count writes its own line against Alive', () => {
   const b = book();
   const f = b.farrowed('A', 12);
   b.count('A', 13, { at: on(3, '09:30') });                             // online, arrives first
@@ -1730,23 +1742,22 @@ test('recount supersedes: offline 9 / online 13 / recount 13 → one line at mos
   assert.equal(L.alive, 12); assert.equal(L.unexplained.openLoss, 0); assert.equal(L.unexplained.openGain, 0);
   const c = select.counts(d, 'A');
   assert.equal(c.counts.find((k) => k.id === off.id).stands, false);
-  assert.equal(c.conflict, true); assert.equal(c.review, true);        // two counts disagree: count again
+  assert.equal(c.conflict, true); assert.equal(c.review, true);
   b.count('A', 13, { at: on(3, '10:00') });
   d = run(b, IRON_ONLY); L = d.litters.A;
-  assert.equal(L.alive, 13); assert.equal(L.unexplained.openLoss + L.unexplained.openGain, 1);
+  assert.equal(L.alive, 13); assert.equal(L.unexplained.openGain, 1);
   assert.equal(select.counts(d, 'A').review, false);
   assert.ok(balances(L));
 });
 
-test('recount supersedes: a superseded loss gives back its named missing piglets', () => {
+test('a recount never gives back a named missing piglet: only a death or a Move closes its line', () => {
   const b = book();
   b.farrowed('A', 4);
   for (let i = 1; i <= 4; i++) b.identity('A', 'add', { rowId: 'r' + i, tag: '00000' + i });
   b.count('A', 3, { missingRows: ['r2'], at: on(3, '09:00') });
-  assert.equal(run(b, IRON_ONLY).litters.A.identity.missing, 1);
   b.count('A', 4, { at: on(3, '09:20') });
   const L = run(b, IRON_ONLY).litters.A;
-  assert.equal(L.identity.missing, 0); assert.equal(L.identity.liveRows, 4); assert.equal(L.alive, 4);
+  assert.equal(L.identity.missing, 1); assert.equal(L.alive, 4); assert.equal(L.unexplained.openLoss, 1); assert.equal(L.unexplained.openGain, 1);
 });
 
 test('counts are accepted after End (litter facts, RULINGS Q5); a weaned-out litter refuses a count', () => {
@@ -1806,7 +1817,13 @@ test('R4-2 a treatment done after End on a phone that had not seen End is kept, 
   assert.deepEqual(d.flags.filter((g) => g.kind === 'task').map((g) => [g.reason, g.events[0]]), [['after_end', off.id]]);
   const e = select.end(d);
   assert.deepEqual(e.atEnd.byLitter.A02.find((x) => x.dose === 'iron3'), { dose: 'iron3', kind: 'owed', n: 12 });
-  assert.equal(e.now.byLitter.A02.find((x) => x.dose === 'iron3'), undefined);
+  // kept as evidence, never counted (RULINGS round 3): owed, treated and on-time unchanged
+  assert.deepEqual(e.now.byLitter.A02.find((x) => x.dose === 'iron3'), { dose: 'iron3', kind: 'owed', n: 12 });
+  const D = d.litters.A02.doses.iron3;
+  assert.deepEqual([D.treated, D.records.length], [0, 0]);
+  assert.deepEqual(D.afterEnd.map((x) => [x.id, x.n, x.at, x.who]), [[off.id, 12, on(5, '15:00'), 'L.M']]);
+  assert.deepEqual(e.now.onTime, e.atEnd.onTime);
+  assert.deepEqual(select.litter(d, 'A02').afterEnd.map((x) => [x.dose, x.n]), [['iron3', 12]]);
 });
 
 test('R4-3 a correction after End that brings a dose to 0 shows in now, never in atEnd', () => {
@@ -2011,7 +2028,7 @@ test('bulk: the review is a contract — changed, died, gone and castration each
   assert.equal(p.outcomes.find((x) => x.litter === 'B06').died, 2);
 });
 
-test('bulk: after End only catch-up rows for arrivals, and the result says the task ended', () => {
+test('bulk: after End no rows — arrivals stay not done (RULINGS round 3); the result says the task ended', () => {
   const b = book();
   const cfg = { doses: IRON_ONLY.doses, identity: { scheme: 'none' }, task: { id: 'T', litters: ['A02', 'A04'] } };
   b.farrowed('A02', 12); b.farrowed('A04', 11); b.farrowed('Z01', 5);
@@ -2020,6 +2037,106 @@ test('bulk: after End only catch-up rows for arrivals, and the result says the t
   b.move('Z01', 'A04', 2, { answers: { iron3: 'no' }, at: on(6, '09:00') });
   const r = select.bulkDraft(run(b, cfg, 6), { room: 'R3', dose: 'iron3', selected: ['A04'] });
   assert.ok(r.ended);
-  assert.deepEqual(r.rows.map((x) => [x.litter, x.kind, x.n, x.catchUp]), [['A04', 'record', 2, true]]);
-  assert.equal(r.plan.litters, 1);
+  assert.deepEqual(r.rows, []);
+  assert.equal(r.plan.litters, 0);
+});
+
+// =============================================================================================
+// Rulings round 3 (owner, 2026-09-30) and the provisional check's bugs.
+
+test('R5-2 a mistaken count is corrected through Edit: withdrawn or set, stamped, original kept, its line goes', () => {
+  const b = book();
+  b.farrowed('B14', 10);
+  const c = b.count('B14', 9, { at: on(3, '09:00') });
+  let d = run(b, IRON_ONLY);
+  // the Edit screen lists the count and writes one correction
+  const ed = select.edit(d, 'B14', { counts: { [c.id]: { void: true } } }, { id: 'X1', at: on(3, '09:30'), who: 'L.M' });
+  assert.deepEqual(ed.counts.map((k) => [k.id, k.observed, k.wrote]), [[c.id, 9, -1]]);
+  assert.deepEqual(ed.changes.map((x) => [x.kind, x.count]), [['count_void', c.id]]);
+  assert.equal(ed.why, null);
+  b.ev.push(Object.assign({ id: 'X1', at: on(3, '09:30'), who: 'L.M' }, ed.events[0]));
+  d = run(b, IRON_ONLY);
+  let L = d.litters.B14;
+  assert.deepEqual([L.alive, L.unexplained.openLoss, L.unexplained.losses.length], [10, 0, 0]);
+  assert.equal(d.corrections[c.id][0].who, 'L.M');
+  assert.equal(b.ev.find((e) => e.id === c.id).observed, 9);        // the original event is untouched
+  const rec = select.record(d, 'B14').days.flatMap((g) => g.entries).find((x) => x.kind === 'correction');
+  assert.deepEqual(rec.changes.map((x) => x.kind), ['count_void']);
+  // set observed: the line is resized
+  const b2 = book();
+  b2.farrowed('B14', 10);
+  const c2 = b2.count('B14', 9);
+  b2.correction(c2.id, { set: { observed: 8 }, at: on(3, '10:00') });
+  L = run(b2, IRON_ONLY).litters.B14;
+  assert.deepEqual([L.alive, L.unexplained.openLoss], [8, 2]);
+  // gated on the whole log: a body drawn from that loss would lose its loss
+  const b3 = book();
+  b3.farrowed('B14', 10);
+  const c3 = b3.count('B14', 9);
+  b3.death('B14', [{ cause: 'crushed', n: 1 }], { lossAlloc: [{ lossId: c3.id, qty: 1 }] });
+  const x3 = b3.correction(c3.id, { void: true, at: on(3, '10:00') });
+  assert.equal(rejectedReason(run(b3, IRON_ONLY), x3), 'changes_later');
+});
+
+test('R5-5 on time keeps a future dose recorded early (iron d14 on d3); only unrecorded not-yet-due doses are left out', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  for (const x of ['iron3', 'tail', 'iron14']) b.treat('A02', x, 12, { at: on(3) });
+  let e = select.end(run(b, R4T(['A02']), 3));
+  assert.deepEqual(e.now.onTime, { n: 3, k: 3 });
+  assert.equal(e.now.litters.A02.excluded, 1);                         // castration: unrecorded, not yet due
+  b.ev.push({ id: 'end', type: 'end_task', at: on(3, '12:00') });
+  e = select.end(run(b, R4T(['A02']), 3));
+  assert.deepEqual(e.atEnd.onTime, { n: 3, k: 3 });
+});
+
+test('R5-6 a wrong-litter fresh record keeps the original act\'s time and hand; on-time is judged at the receiving litter', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  b.farrowed('A05', 11, {}, { birthDate: on(1).slice(0, 10) });      // day 2 on the act's day: iron3 due tomorrow there
+  const t = b.treat('A02', 'iron3', 12, { at: on(3, '08:40'), who: 'G.H' });
+  b.ev.push({ id: 'X', type: 'correction', changes: [{ target: t.id, void: true, fresh: { litter: 'A05', dose: 'iron3', n: 11 } }], at: on(4, '09:00'), who: 'L.M' });
+  const d = run(b, IRON_ONLY, 4);
+  const r = d.litters.A05.doses.iron3.records[0];
+  assert.deepEqual([r.at, r.who, r.dayAge, r.timing], [on(3, '08:40'), 'G.H', 2, 'early']);
+  assert.deepEqual(d.corrections[t.id].map((x) => [x.at, x.who]), [[on(4, '09:00'), 'L.M']]);
+});
+
+test('R5-8 two same-day litter weights from two offline phones are both kept as a conflict', () => {
+  const b = book();
+  const f = b.farrowed('B04', 12);
+  b.ev.push({ id: 'lw1', type: 'litter_weight', litter: 'B04', kg: '15.9', at: on(3, '09:10'), who: 'L.M', seen: [f.id] });
+  b.ev.push({ id: 'lw2', type: 'litter_weight', litter: 'B04', kg: '16.4', at: on(3, '08:40'), who: 'G.H', seen: [f.id] });
+  let d = run(b, IRON_ONLY, 3);
+  const W = d.litters.B04.weights;
+  assert.deepEqual(W.map((x) => [x.day, x.kg, x.conflicts.map((c) => c.kg)]), [[3, '15.9', ['16.4']]]);
+  assert.deepEqual(d.flags.map((g) => g.reason), ['litter_weight_conflict']);
+  // a weighing that saw the day's value replaces it (history kept)
+  b.ev.push({ id: 'lw3', type: 'litter_weight', litter: 'B04', kg: '16.0', at: on(3, '10:00'), who: 'G.H' });
+  d = run(b, IRON_ONLY, 3);
+  assert.deepEqual(d.litters.B04.weights.map((x) => [x.kg, x.replaced.map((r) => r.kg), x.conflicts.length]), [['16.0', ['15.9', '16.4'], 0]]);
+});
+
+test('R5-9 treatments left and unfinished differ: a missed dose is unfinished, not a treatment left', () => {
+  const b = book();
+  const cfg = Object.assign({}, R4T(['B04']));
+  b.farrowed('B04', 10, {}, { birthDate: on(-2).slice(0, 10) });      // day 5: tail (window day 4) missed
+  b.treat('B04', 'iron3', 10, { at: on(3) });
+  const d = run(b, cfg, 3);
+  const v = select.litter(d, 'B04');
+  assert.deepEqual(v.dosesLeft, { left: 1, total: 3 });                // castration only: tail missed is not left
+  assert.deepEqual(v.unfinished, { n: 2, missed: 1 });
+  const row = select.room(d, { lens: 'all' }).rows.find((r) => r.litter === 'B04');
+  assert.deepEqual(row.unfinished, { n: 2, missed: 1 });
+});
+
+test('R5-10 a mark withdrawn after End reads not done · corrected after End on the litter sheet', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  const t = b.treat('A02', 'iron3', 12, { at: on(3) });
+  b.ev.push({ id: 'end', type: 'end_task', at: on(5, '12:00') });
+  b.ev.push({ id: 'X', type: 'correction', changes: [{ target: t.id, void: true }], at: on(6), who: 'L.M' });
+  const v = select.litter(run(b, R4T(['A02']), 6), 'A02');
+  assert.deepEqual(v.correctedAfterEnd.map((x) => [x.dose, x.n]), [['iron3', 12]]);
+  assert.equal(v.owed.find((x) => x.dose === 'iron3'), undefined);
 });
