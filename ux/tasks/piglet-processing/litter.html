@@ -228,6 +228,7 @@
   }
   // Groups of different ages each say their own day; arrivals of the litter's own age just say where they came from.
   function agesDiffer(gs) { return gs.some(function (g) { return g.dayAge !== gs[0].dayAge; }); }
+  function hasDraft(id) { return !!(drafts[id] || drafts['range:' + id]); }
   function showGroups(o) { return agesDiffer(o.groups); }
   function arrivalToks(gs) {
     return gs.filter(function (g) { return g.kind !== 'own'; }).map(function (g) { return groupToks(g)[0]; });
@@ -235,7 +236,7 @@
   function splitNow(o) { return !doseCfg(o.dose).castration && o.owed != null && o.owedNow < o.owed && o.owedNow > 0; }
   function owedToks(o) {
     var t = [], castrate = doseCfg(o.dose).castration;
-    if (drafts[o.dose]) return [P('status.unsaved', { n: 1 }, 'green')];
+    if (hasDraft(o.dose)) return [P('status.unsaved', { n: 1 }, 'green')];
     if (o.status === 'due' && !showGroups(o)) t.push(P('pp.litter.due', { d: o.due }));
     // Colour on the value, the word ink: `late 2 days`, `missed after day 7`.
     if (o.status === 'late' && !showGroups(o)) t.push([P('pp.litter.tag.late'), P(one('pp.litter.days', o.lateBy), { k: o.lateBy }, 'red')]);
@@ -261,10 +262,10 @@
     // `after day N`), a range (R1-3: counted on the pig), or nothing owed now. The whole row is the door and says so.
     if (o.males === 'uncounted' || o.status === 'missed' || o.range || !n) {
       return UI.row({ title: titleTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose,
-        trailing: drafts[o.dose] ? { text: PP.t('pp.litter.act.resume'), strs: { text: 'pp.litter.act.resume' } } : '' });
+        trailing: hasDraft(o.dose) ? { text: PP.t('pp.litter.act.resume'), strs: { text: 'pp.litter.act.resume' } } : '' });
     }
     // A waiting draft replaces the one-tap: no full-count commit competes with it.
-    var act = drafts[o.dose] ? { label: PP.t('pp.litter.act.resume'), action: 'open-dose', value: o.dose, strs: { label: 'pp.litter.act.resume' } }
+    var act = hasDraft(o.dose) ? { label: PP.t('pp.litter.act.resume'), action: 'open-dose', value: o.dose, strs: { label: 'pp.litter.act.resume' } }
       : { label: PP.t(one('pp.litter.act.record_n', n), { n: n }), action: 'record', value: o.dose, attrs: { 'data-n': n }, strs: { label: one('pp.litter.act.record_n', n) }, args: { label: { n: n } } };
     return UI.rowAction({ id: 'lt-tx-' + o.dose, title: titleTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose, act: act });
   }
@@ -645,6 +646,7 @@
   }
   function rangeDrawer() {
     var id = drawer.dose, o = view().owed.filter(function (x) { return x.dose === id; })[0], rg = o.range;
+    drawer.still = Math.max(rg.lo, Math.min(rg.hi, drawer.still));   // a resumed draft stays inside the range as it stands now
     var body = stepperRow('still', 'pp.litter.range.still', 'pp.litter.range.still_desc', { lo: rg.lo, hi: rg.hi }, drawer.still, rg.hi, one('pp.litter.ceil.owed', rg.hi), { n: rg.hi }, rg.lo);
     if (drawer.still) body += radios('rest', one('pp.litter.range.them', drawer.still), { n: drawer.still },
       [['record', one('pp.litter.range.record', drawer.still), { tx: lower(titleText(id)), n: drawer.still }], ['owed', one('pp.litter.range.leave', drawer.still), { n: drawer.still }]], drawer.rest);
@@ -788,7 +790,9 @@
     } else if (a === 'undo') { undo(v); render(); }
     else if (a === 'open-dose') {
       if (isDone(v) || endedTask()) return;
-      openDrawer(drafts[v] ? resume(v) : drafts['range:' + v] ? resume('range:' + v) : freshDraft(v)); render();
+      var fr = freshDraft(v);                                     // a range draft resumes only while the range stands
+      if (fr.kind !== 'range') delete drafts['range:' + v];
+      openDrawer(fr.kind === 'range' ? (drafts[fr.key] ? resume(fr.key) : fr) : drafts[v] ? resume(v) : fr); render();
     } else if (a === 'open-resolve') {
       if (endedTask()) return;
       openDrawer(drafts['res:' + v] ? resume('res:' + v) : freshResolve(v)); render();
