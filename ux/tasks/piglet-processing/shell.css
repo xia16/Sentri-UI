@@ -2,3 +2,37 @@
 .phone { max-width: 390px; margin: 0 auto; padding: 20px var(--space-gutter); min-height: 100vh; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
 .phone > * + * { margin-top: var(--space-section); }
 @media (max-width: 370px) { .phone { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
+
+/* Shared UI (shell-ui.js): layout and the compositions two pages draw, tokens only. */
+.pp-mono { font-family: var(--font-mono); }
+.pp-group > * + * { margin-top: var(--space-heading); }
+.pp-hdr-title { flex: 1; min-width: 0; }
+.pp-hdr-context { display: flex; justify-content: space-between; align-items: center; gap: var(--space-key-gap); }
+/* The litter header's door (to the sow page): a bare button around text + ›. */
+.pp-door { display: inline-flex; align-items: center; gap: var(--space-key-gap); min-height: var(--touch-min); padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; }
+.pp-door svg { width: var(--glyph-key); height: var(--glyph-key); flex: none; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+/* Candidate:Tool — RULINGS button registers: a tool wears a soft well fill with no border (mid-sheet acts). */
+.pp-tools { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-footer-gap); }
+.pp-tool { display: flex; align-items: center; justify-content: center; width: 100%; min-height: var(--control-height); margin: 0; padding: 0 var(--space-row-x); border: 0; border-radius: var(--radius-control); background: var(--well); color: var(--ink); font: 600 var(--type-button-size)/1.4 var(--font-sans); cursor: pointer; }
+.pp-tool:active { background: var(--choice-press); }
+.pp-tool:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+/* Colour on the value inside a line; the word stays ink. */
+.pp-tone[data-tone="red"], .pp-litter .pp-tok[data-tone="red"] { color: var(--red); }
+.pp-tone[data-tone="amber"], .pp-litter .pp-tok[data-tone="amber"] { color: var(--amber); }
+.pp-tone[data-tone="green"] { color: var(--green); }
+.pp-tone[data-tone="blue"], .pp-litter .pp-tok[data-tone="blue"] { color: var(--progress); }
+/* Candidate:Receipt — the receipt line is body text; its value carries the colour. */
+.pp-receipt { display: flex; flex-wrap: wrap; column-gap: var(--status-dot); margin: 0; font-size: var(--type-row-title-size); line-height: 1.5; color: var(--ink); }
+
+/* Candidate:LitterRow: the Row card's geometry with the row law's mono line 2, one named chip and the rail. */
+.pp-litter { transition: background 1100ms ease-out; }
+.pp-litter[data-flash] { background: var(--green-wash); }
+.pp-litter .pp-code { flex: none; min-width: 40px; font-family: var(--font-mono); font-size: var(--type-identifier-size); font-weight: 600; color: var(--ink); }
+.st-row.pp-litter .st-row-copy small.pp-mono { font-family: var(--font-mono); white-space: normal; overflow: visible; text-overflow: clip; }
+.st-row.pp-litter .st-row-copy strong { white-space: normal; overflow: visible; text-overflow: clip; }
+.pp-litter .pp-tok { display: inline-block; max-width: 100%; }
+.pp-litter .pp-tok:not(:last-child)::after { content: "·"; margin-left: 4px; margin-right: 4px; color: var(--muted); }
+.pp-litter .pp-chip { flex: none; display: inline-flex; align-items: center; gap: 4px; max-width: 96px; font-size: var(--type-description-size); color: var(--amber); }
+.pp-litter .pp-chip[data-tone="red"] { color: var(--red); }
+.pp-litter .pp-chip::before { content: ""; flex: none; width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
+@media (prefers-reduced-motion: reduce) { .pp-litter { transition: none; } }

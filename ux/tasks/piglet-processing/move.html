@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Move piglets</title>
+<link rel="stylesheet" href="/ux/design-system/tokens.css">
+<link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="shell.css">
+<script type="module" src="ledger.js"></script>
+<script type="module" src="fixtures.js"></script>
+<style>
+/* Layout only, tokens from tokens.css; one Candidate composition (Candidate:Radio, below). */
+.mv-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
+.mv-phone .scrim { inset: 0; }
+.mv-title { flex: 1; min-width: 0; }
+.mv-head { display: flex; align-items: flex-start; gap: var(--space-footer-gap); }
+.mv-head > .st-text-action { min-width: var(--touch-min); justify-content: flex-end; }   /* the text action's hit area is 44px tall only; widen it to 44 */
+.mv-body { display: flex; flex-direction: column; gap: var(--space-section); padding-bottom: var(--space-panel); }
+.mv-body > * { margin: 0; }
+.mv-face { display: flex; flex-direction: column; gap: var(--space-section); }
+.mv-face > * { margin: 0; }
+.mv-group { display: flex; flex-direction: column; gap: var(--space-heading); }
+.mv-group > * { margin: 0; }
+.mv-find { display: flex; align-items: center; gap: var(--space-footer-gap); }
+.mv-find > .field { flex: 1; min-width: 0; margin: 0; }
+.mv-summary { flex: none; display: flex; flex-direction: column; gap: var(--space-row-y); padding: var(--space-row-y) var(--space-gutter); }
+.mv-summary > * { margin: 0; }
+.mv-phone .sheet[data-st-context="drawer"] > .sheet-body { flex: 1; }
+.sheet-footer > .button { flex: 1; }
+.sheet-footer > .button.secondary:not(:only-child) { flex: none; }
+@media (max-width: 370px) { .mv-summary { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
+
+/* Candidate:Radio — single-select rows with a visible radio (RULINGS craft pass: 2px rings; selected = ink ring + 10px ink dot;
+   the whole row is the target; the selected label is heavier). ChoiceList geometry; a design-system batch will make the card. */
+.mv-radios { margin: 0; background: var(--inset); border: 1px solid var(--line); border-radius: var(--radius-inset); overflow: hidden; }
+.mv-radio { display: flex; align-items: center; gap: var(--space-footer-gap); width: 100%; min-height: var(--choice-row-min); margin: 0; padding: var(--space-row-y) var(--space-panel); border: 0; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.mv-radio + .mv-radio { border-top: 1px solid var(--rule); }
+.mv-radio:active { background: var(--choice-press); }
+.mv-radio:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+.mv-radio-mark { flex: none; width: 22px; height: 22px; box-sizing: border-box; border: 2px solid var(--muted); border-radius: 50%; }
+.mv-radio[aria-checked="true"] .mv-radio-mark { border-color: var(--ink); background: var(--ink); box-shadow: inset 0 0 0 4px var(--inset); }
+.mv-radio-copy { display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0; }
+.mv-radio-label { font-size: var(--type-choice-label-size); font-weight: 500; line-height: 1.4; }
+.mv-radio[aria-checked="true"] .mv-radio-label { font-weight: 600; }
+.mv-radio-meta { font-size: var(--type-choice-meta-size); line-height: 1.4; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .mv-radio { transition: none; } }
+</style>
+</head>
+<body>
+<main class="inspection-phone mv-phone" data-st-context="page">
+  <div id="screen"></div>
+</main>
+<script src="/ux/design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+<script src="shell-ui.js"></script>
+<script>
+(function () {
+  var UI = window.SentriUI, ICON = window.SentriIcons, U = window.PPUI;
+  var zh = PP.lang === 'zh';
+
+  /* ---- states: a variant of the shared fixture + the face + the draft. Every figure — both litters' ledgers, what each dose
+     carries, the questions to ask, the source's coverage range, before → after, why Move is gray — is the ledger's
+     (select.moveDraft / derive over fixtures.js). Save and the arrivals' checks commit through append. ---- */
+  var STATES = {
+    'move':              { view: 'move', face: 'B06' },
+    'move-review':       { view: 'move', face: 'B06', other: 'B08', n: 2 },
+    'move-into':         { view: 'move', face: 'B08', dir: 'in', other: 'B10', n: 1 },
+    'move-ask':          { view: 'move', face: 'B09', other: 'B02', rows: ['B09-r9', 'B09-r10'] },
+    'move-repeat':       { view: 'move', face: 'B08', other: 'B02', n: 1, data: 'moved-b06-b08' },
+    'move-tagged':       { view: 'move', face: 'C03', other: 'C05', rows: ['C03-r4', 'C03-r7'] },
+    'move-orphan':       { view: 'move', face: 'B01', other: 'D02', allRows: true },
+    'move-explain':      { view: 'move', face: 'B06', other: 'B08', n: 1, explains: ['C-B06-loss', 'C-B08-gain'], data: 'explain' },
+    'move-cross':        { view: 'move', face: 'B06', other: 'A03', n: 1 },
+    'move-prelock':      { view: 'prelock', face: 'D01' },
+    'move-receipt':      { view: 'receipt', face: 'B06', other: 'B08', n: 2 },
+    'move-draft-kept':   { view: 'face', face: 'B06', other: 'B08', n: 2, kept: true },
+    'move-orphan-saved': { view: 'face', face: 'B01', data: 'moved-orphan' },
+    'nurse-arrived':     { view: 'face', face: 'D02', data: 'moved-orphan' },
+    'owed-from-move':    { view: 'face', face: 'B08', data: 'moved-b06-b08' },
+    'owed-arrived-done': { view: 'face', face: 'C05', data: 'moved-to-c05' },
+    'unknown-check':     { view: 'face', face: 'B02', drawer: 'MV-0929-05:iron3', had: 1, rest: 'record', data: 'moved-unknown' }
+  };
+  var qs = PP.q;
+  var name = STATES[PP.state] ? PP.state : 'move';
+  var S = JSON.parse(JSON.stringify(STATES[name]));
+  if (PP.state === 'move-prelock' && qs.get('data') === 'other') S = { view: 'move', face: 'B06', query: 'D01' };
+  if (qs.get('crate') && name === 'move') S.face = qs.get('crate');
+  S.dir = S.dir || 'out'; S.answers = S.answers || {}; S.rows = S.rows || []; S.untagged = S.untagged || 0;
+  if (S.n == null) S.n = 1;
+  var DEFAULT = JSON.stringify({ other: '', n: 1, rows: [], untagged: 0, answers: {}, dir: 'out' });
+  var store, CFG, TODAY, UNIT, resolveDrafts = {};
+
+  /* ---- the ledger ---- */
+  function L(c) { return store.derived.litters[c]; }
+  function alive(c) { return L(c).alive; }
+  function unitOf(c) { return L(c).room; }
+  function where(c) { return unitOf(c) !== UNIT; }
+  function tag(c) { return (store.sow(c) || {}).sow || ''; }
+  function doseCfg(id) { return CFG.doses.filter(function (d) { return d.id === id; })[0]; }
+  function txName(id) { return PP.t('pp.common.tx.' + doseCfg(id).tx); }
+  function txList(ids) { return ids.map(txName).join(' · '); }
+  function farrowing(c) { return !!L(c) && L(c).phase === 'open'; }
+  function canSource(c) { return !!L(c) && L(c).phase === 'locked' && alive(c) > 0; }
+  function canReceive(c) { return !!L(c) && L(c).phase === 'locked' && !L(c).sowDied; }
+  function source() { return S.dir === 'out' ? S.face : S.other; }
+  function receiver() { return S.dir === 'out' ? S.other : S.face; }
+  function liveRows(c) { return L(c).identity.rows.filter(function (r) { return r.litter === c && r.status === 'alive'; }); }
+  function remainder(c) { return Math.max(0, alive(c) - liveRows(c).length); }
+  function hasRows(c) { return liveRows(c).length > 0; }
+  function count() { return hasRows(source()) ? S.rows.length + S.untagged : S.n; }
+  function draftInput() {
+    return { from: source(), to: receiver(), n: count(), rows: hasRows(source()) ? S.rows.slice() : [], answers: Object.assign({}, S.answers), explains: S.explains || undefined };
+  }
+  var memo = { key: '', val: null };
+  function draft() {
+    var d = draftInput(), key = JSON.stringify(d) + store.events.length;
+    if (memo.key !== key) memo = { key: key, val: store.select.moveDraft(store.derived, d, { who: window.PPFixtures.ME }) };
+    return memo.val;
+  }
+  // Clamp on every change: roles valid, rows only from the source (the ledger clamps n).
+  function normalize() {
+    if (S.view !== 'move') return;
+    if (!canSource(S.face)) S.dir = 'in';                              // a sow with no piglets can only receive
+    if (!canReceive(S.face) && canSource(S.face)) S.dir = 'out';        // a litter whose sow died can only send
+    if (S.explains) return;                                             // an explaining Move is locked to its crates, direction and count
+    if (S.other) {
+      var bad = S.other === S.face || !L(S.other) || farrowing(S.other) || (S.dir === 'out' && !canReceive(S.other)) || (S.dir === 'in' && !canSource(S.other));
+      if (bad) S.other = '';
+    }
+    var src = source();
+    if (!src) return;
+    S.n = Math.max(0, Math.min(S.n, alive(src)));
+    var ids = liveRows(src).map(function (r) { return r.rowId; });
+    S.rows = S.rows.filter(function (r) { return ids.indexOf(r) >= 0; });
+    S.untagged = Math.max(0, Math.min(S.untagged, remainder(src)));
+  }
+  function draftExists() { return JSON.stringify({ other: S.other || '', n: S.n, rows: S.rows, untagged: S.untagged, answers: S.answers, dir: S.dir }) !== DEFAULT; }
+
+  /* ---- helpers ---- */
+  function span(id, args, cls) { return U.span(id, args, { cls: cls }); }
+  var pl = PP.one;
+  function row(o) {
+    var strs = { title: o.title }, args = { title: o.titleArgs };
+    if (o.desc) { strs.description = o.desc; args.description = o.descArgs; }
+    if (o.trail) { strs.trailing = o.trail; args.trailing = o.trailArgs; }
+    return UI.row({ title: '', description: o.desc ? '' : undefined, trailing: o.trail ? '' : undefined, action: o.action, value: o.value, strs: strs, args: args });
+  }
+  function fact(label, labelArgs, value, valueArgs, meta, metaArgs) {
+    var f = { label: '', value: '', strs: { label: label, value: value }, args: { label: labelArgs, value: valueArgs } };
+    if (meta) { f.meta = ''; f.strs.meta = meta; f.args.meta = metaArgs; }
+    return f;
+  }
+  function pigs(n) { return { id: pl('pp.common.unit.piglet', n), args: { n: n } }; }
+  function button(cls, action, id, args, disabled) {
+    return '<button type="button" class="button ' + cls + '" data-ds="Button" data-action="' + action + '" data-str="' + id + '"' +
+      (args ? " data-args='" + U.esc(JSON.stringify(args)) + "'" : '') + (disabled ? ' disabled' : '') + '>' + U.esc(PP.t(id, args)) + '</button>';
+  }
+  function textAction(action, id, args) {
+    return '<button type="button" class="st-text-action" data-ds="Button" data-action="' + action + '" data-str="' + id + '"' +
+      (args ? " data-args='" + U.esc(JSON.stringify(args)) + "'" : '') + '>' + U.esc(PP.t(id, args)) + '</button>';
+  }
+  // Candidate:Radio. opts: [{ value, id, args, meta, metaArgs }]
+  function radios(action, opts, active, label) {
+    return '<div class="mv-radios" data-ds="Candidate:Radio" role="radiogroup" aria-label="' + U.esc(label) + '">' + opts.map(function (o) {
+      var on = o.value === active;
+      return '<button type="button" class="mv-radio" role="radio" aria-checked="' + on + '" data-action="' + action + '" data-value="' + o.value + '">' +
+        '<span class="mv-radio-mark" aria-hidden="true"></span><span class="mv-radio-copy">' + span(o.id, o.args, 'mv-radio-label') +
+        (o.meta ? span(o.meta, o.metaArgs, 'mv-radio-meta') : '') + '</span></button>';
+    }).join('') + '</div>';
+  }
+  function stamp(at, who) { return U.stamp(at, who, TODAY); }
+  function rowLabel(r) { return r.tag ? PP.t('pp.move.rows.tag', { tag: r.tag }) : PP.t('pp.move.rows.notch', { notch: r.notch }); }
+
+  /* ---- the litter face (a stand-in for the litter sheet: the shared header, the ledger, what arrivals owe, moves, the Move door) ---- */
+  function header(c) {
+    var x = L(c), sub, inn = x.moves.filter(function (m) { return m.dir === 'in'; });
+    if (farrowing(c)) sub = span('pp.move.face.sub_farrowing', { u: x.room });
+    else if (x.sowDied) sub = span('pp.move.face.sub_died', { u: x.room, day: x.dayAge });
+    else if (x.alive === 0) sub = span('pp.move.face.sub_empty', { u: x.room });
+    else if (x.weaned && inn.length) sub = span('pp.move.face.sub_nurse', { u: x.room, day: L(inn[0].other).dayAge, code: inn[0].other });
+    else sub = span('pp.move.face.sub', { u: x.room, day: x.dayAge });
+    return U.litterHeader({ crate: c, sow: tag(c), parity: (store.sow(c) || {}).parity, sub: sub });
+  }
+  function ledgerFacts(c) {
+    var x = L(c), items = [], outs = x.moves.filter(function (m) { return m.dir === 'out'; }).length, ins = x.moves.filter(function (m) { return m.dir === 'in'; }).length;
+    if (x.phase === 'locked') items.push(fact('label.born', null, pigs(x.born).id, pigs(x.born).args));
+    items.push(fact('label.dead', null, pigs(x.dead.total).id, pigs(x.dead.total).args));
+    if (x.weaned) items.push(fact('pp.move.label.weaned', null, pigs(x.weaned).id, pigs(x.weaned).args));
+    if (x.unexplained.openLoss) items.push(fact('pp.move.label.loss', null, pigs(x.unexplained.openLoss).id, pigs(x.unexplained.openLoss).args, 'pp.move.fact.open'));
+    if (x.unexplained.openGain) items.push(fact('pp.move.label.gain', null, pigs(x.unexplained.openGain).id, pigs(x.unexplained.openGain).args, 'pp.move.fact.open'));
+    if (x.movedOut) items.push(fact('pp.move.label.moved_out', null, pigs(x.movedOut).id, pigs(x.movedOut).args, pl('pp.move.fact.moves', outs), { k: outs }));
+    if (x.movedIn) items.push(fact('pp.move.label.moved_in', null, pigs(x.movedIn).id, pigs(x.movedIn).args, pl('pp.move.fact.moves', ins), { k: ins }));
+    items.push(fact('label.alive', null, pigs(x.alive).id, pigs(x.alive).args));
+    return UI.facts(items, { columns: items.length === 3 ? 3 : 2 });
+  }
+  // One row per Move, newest first; each is the Edit door for that record (S8 owns Edit's screens).
+  function movesGroup(c) {
+    var ms = L(c).moves.slice().sort(function (a, b) { return a.at < b.at ? 1 : -1; });
+    if (!ms.length) return '';
+    return UI.rowGroup(ms.map(function (m) {
+      var inn = m.dir === 'in', t = where(m.other) ? (inn ? 'pp.move.moves.in_unit' : 'pp.move.moves.out_unit') : (inn ? 'pp.move.moves.in' : 'pp.move.moves.out');
+      return row({ action: 'edit-move', value: m.id, title: pl(t, m.n), titleArgs: { n: m.n, code: m.other, u: unitOf(m.other) },
+        desc: m.explains && (m.explains[0] || m.explains[1]) ? 'pp.move.moves.stamp_explains' : 'pp.move.moves.stamp', descArgs: { stamp: stamp(m.at, m.who) }, trail: 'act.edit' });
+    }).join(''), { title: '', strs: { title: 'pp.move.moves.title' } });
+  }
+  // What the arrivals owe here, one row per dose: the ledger's owed (with what arrivals added), unknown and carried groups by source.
+  function arrivalRows(c) {
+    var x = L(c), ins = x.moves.filter(function (m) { return m.dir === 'in'; });
+    if (!ins.length) return '';
+    var rows = [];
+    CFG.doses.forEach(function (d) {
+      var D = x.doses[d.id];
+      if (D.status === 'later' || D.status == null) return;
+      var arrOwed = (D.owedFrom.filter(function (f) { return f.kind === 'arrival'; })[0] || {}).n || 0;
+      var owedSrc = ins.filter(function (m) { return m.packets[d.id] === 'owed'; });
+      var groups = D.unknownGroups.filter(function (g) { return g.kind === 'move'; });
+      if (!arrOwed && !groups.length && !D.carriedFromMove && !owedSrc.length) return;
+      var parts = [];
+      if (d.castration && owedSrc.length) owedSrc.forEach(function (m) { parts.push(PP.t('pp.move.frag.males', { k: m.n, code: m.other })); });
+      else if (D.owed) {
+        // The ledger's owed, and the arrivals that raised it (a Move whose packet for this dose was `owed`).
+        if (owedSrc.length === 1 && (arrOwed === D.owed || (!D.records.length && owedSrc[0].n === D.owed))) parts.push(PP.t('pp.move.frag.owed_from', { n: D.owed, code: owedSrc[0].other }));
+        else { parts.push(PP.t('pp.move.frag.owed', { n: D.owed })); owedSrc.forEach(function (m) { parts.push(PP.t('pp.move.frag.from', { k: m.n, code: m.other })); }); }
+      }
+      if (D.carriedFromMove) parts.push(PP.t('pp.move.frag.arrived_done', { k: D.carriedFromMove }));
+      groups.forEach(function (g) { parts.push(d.visible ? PP.t('pp.move.frag.check', { k: g.n, code: g.from }) : PP.t('pp.move.frag.unknown', { k: g.n })); });
+      if (!parts.length) return;
+      var g0 = groups[0];
+      rows.push(row({ action: g0 ? 'open-resolve' : D.owed ? 'record' : 'open-dose', value: g0 ? g0.id + ':' + d.id : d.id,
+        title: 'pp.common.tx.' + d.tx, desc: 'pp.move.owed.line', descArgs: { text: parts.join(' · ') } }));
+    });
+    if (!rows.length) return '';
+    return UI.rowGroup(rows.join(''), { title: '', strs: { title: 'pp.move.owed.title' } });
+  }
+  function moveDoor(c) {
+    if (!canSource(c) && !canReceive(c)) return '';
+    var desc = S.kept ? pl('pp.move.door.kept', count()) : 'pp.move.door.desc';
+    return UI.rowGroup(row({ action: 'open-move', value: c, title: 'pp.move.sheet.title', desc: desc, descArgs: S.kept ? { n: count(), from: source(), to: receiver() } : null }));
+  }
+  function faceHtml(c, inert) {
+    var body = ledgerFacts(c) + arrivalRows(c) + movesGroup(c) + moveDoor(c);
+    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (inert ? ' inert' : '') + '>' + header(c) +
+      '<div class="sheet-body"><div class="mv-face">' + body + '</div></div>' +
+      '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + '</footer></section>';
+  }
+
+  /* ---- the Move drawer ---- */
+  function crateState(c) {
+    if (L(c).sowDied) return 'died';
+    var f = store.select.room(store.derived, { room: unitOf(c), lens: 'all' }).rows.filter(function (r) { return r.litter === c; })[0];
+    return !f || f.kind !== 'owes' ? 'done' : f.partly ? 'part' : 'due';
+  }
+  function crateMeta(c) {
+    var empty = alive(c) === 0;
+    var args = { day: L(c).dayAge, n: alive(c), tag: tag(c), u: unitOf(c), state: empty ? '' : PP.t('pp.move.crate.state.' + crateState(c)) };
+    return { id: empty ? (where(c) ? 'pp.move.crate.meta_unit_empty' : 'pp.move.crate.meta_empty') : (where(c) ? 'pp.move.crate.meta_unit' : 'pp.move.crate.meta'), args: args };
+  }
+  function crateRow(c) {
+    var m = crateMeta(c);
+    return UI.choiceRow({ label: '', meta: '', mode: 'single', action: 'pick-crate', value: c, selected: S.other === c,
+      strs: { label: 'pp.move.crate.code', meta: m.id }, args: { label: { code: c }, meta: m.args } });
+  }
+  function candidates() {
+    var near = [], empty = [], me = L(S.face);
+    Object.keys(store.derived.litters).forEach(function (c) {
+      var x = L(c);
+      if (c === S.face || farrowing(c) || x.room !== me.room) return;
+      if (x.alive > 0 && c.charAt(0) !== S.face.charAt(0)) return;          // this row of crates; the search finds the rest
+      if (S.dir === 'out' ? !canReceive(c) : !canSource(c)) return;
+      (x.alive === 0 ? empty : near).push(c);
+    });
+    near.sort(function (a, b) { return Math.abs(L(a).dayAge - me.dayAge) - Math.abs(L(b).dayAge - me.dayAge) || (a < b ? -1 : 1); });
+    return { near: near, empty: empty.sort() };
+  }
+  function directionSection() {
+    // Only the directions this face can take: Into is hidden when it can't receive, Out when it has nothing to send; an explaining Move is locked.
+    if (S.explains || !canSource(S.face) || !canReceive(S.face)) return '';
+    return radios('dir', [
+      { value: 'out', id: 'pp.move.dir.out', args: { code: S.face }, meta: 'pp.move.dir.out_meta' },
+      { value: 'in', id: 'pp.move.dir.in', args: { code: S.face }, meta: 'pp.move.dir.in_meta' }], S.dir, PP.t('pp.move.dir.aria'));
+  }
+  function crateSection() {
+    var label = S.dir === 'out' ? 'pp.move.to.title' : 'pp.move.from.title';
+    if (S.other && !S.query) {                               // chosen: the list folds into one picker; tap it to choose again (not on an explaining Move)
+      var m = crateMeta(S.other);
+      return UI.pickerField({ label: '', display: S.other, action: S.explains ? '' : 'change-crate', key: 'crate',
+        strs: { label: label, display: 'pp.move.crate.chosen' }, args: { display: { code: S.other, meta: PP.t(m.id, m.args) } } });
+    }
+    var find = '<div class="mv-find">' +
+      UI.choiceSearch({ label: PP.t('pp.move.search.label'), placeholder: PP.t('pp.move.search.placeholder'), value: S.query || '' }) +
+      UI.iconButton({ action: 'scan', icon: ICON.icon('scan'), label: PP.t('pp.move.aria.scan') }) + '</div>';
+    var lists;
+    if (S.query) {
+      var q = S.query.toUpperCase(), hit = L(q);
+      if (q === S.face) lists = UI.choiceEmpty('', { strs: { text: 'pp.move.search.self' }, args: { text: { q: q } } });
+      else if (hit && farrowing(q)) lists = UI.choiceGroup(UI.choiceRow({ label: '', meta: '', mode: 'navigate', action: 'open-farrowing', value: q,
+          strs: { label: 'pp.move.crate.code', meta: where(q) ? 'pp.move.crate.meta_unit_farrowing' : 'pp.move.crate.meta_farrowing' }, args: { label: { code: q }, meta: { u: unitOf(q) } } }));
+      else if (hit && (S.dir === 'out' ? canReceive(q) : canSource(q))) lists = UI.choiceGroup(crateRow(q));
+      else if (hit) lists = UI.choiceEmpty('', { strs: { text: S.dir === 'out' ? 'pp.move.search.not_receiver' : 'pp.move.search.not_source' }, args: { text: { q: q } } });
+      else lists = UI.choiceEmpty('', { strs: { text: 'pp.move.search.none' }, args: { text: { q: S.query } } });
+    } else {
+      var C = candidates();
+      lists = UI.choiceGroup(C.near.map(crateRow), { title: '', strs: { title: 'pp.move.list.near' }, args: { title: { row: S.face.charAt(0) } } }) +
+        (C.empty.length ? UI.choiceGroup(C.empty.map(crateRow), { title: '', strs: { title: 'pp.move.list.empty' } }) : '');
+    }
+    return '<section class="mv-group">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: label } }) + find + lists + '</section>';
+  }
+  function countSection() {
+    var src = source();
+    if (!src) return '';
+    var a = alive(src), ids = liveRows(src), small = a <= 8 || L(src).sowDied;
+    if (S.explains) {                                        // locked: the count the loss and gain already wrote
+      return UI.stepper({ label: '', description: '', value: count(), min: count(), max: count(), key: 'n',
+        strs: { label: 'label.piglets', description: pl('pp.move.count.of', a), value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
+        args: { description: { n: a, code: src } } });
+    }
+    var ptr = small && !ids.length && S.n < a ? [{ label: '', action: 'all', value: String(a), strs: { label: 'pp.move.count.all' }, args: { label: { n: a } } }] : [];
+    if (ids.length) {
+      var rem = remainder(src);
+      return '<section class="mv-group">' +
+        UI.heading({ title: '', meta: '', kind: 'section', level: 3, strs: { title: 'pp.move.rows.title', meta: pl('pp.move.rows.meta', a) }, args: { meta: { n: count(), total: a } },
+          action: UI.iconButton({ action: 'scan-tag', icon: ICON.icon('scan'), label: PP.t('act.scan') }) }) +
+        UI.choiceGroup(ids.map(function (r) {
+          return UI.choiceRow({ label: '', mode: 'multi', action: 'pick-row', value: r.rowId, selected: S.rows.indexOf(r.rowId) >= 0,
+            strs: { label: r.tag ? 'pp.move.rows.tag' : 'pp.move.rows.notch' }, args: { label: r.tag ? { tag: r.tag } : { notch: r.notch } } });
+        })) +
+        (rem ? UI.stepper({ label: '', description: '', value: S.untagged, min: 0, max: rem, key: 'untagged', hint: '', reserveHint: S.untagged >= rem,
+          strs: { label: 'pp.move.rows.untagged', description: pl('pp.move.rows.untagged_of', rem), value: 'ds.field.figure', hint: S.untagged >= rem ? pl('pp.move.rows.untagged_ceiling', rem) : undefined,
+                  decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' }, args: { description: { n: rem }, hint: { n: rem } } }) : '') +
+        '</section>';
+    }
+    return UI.stepper({ label: '', description: '', value: S.n, min: 1, max: a, key: 'n', hint: '', pointers: ptr, reserveHint: ptr.length > 0 || S.n >= a,
+      strs: { label: 'label.piglets', description: pl('pp.move.count.of', a), value: 'ds.field.figure', hint: S.n >= a && !ptr.length ? pl('pp.move.count.ceiling', a) : undefined,
+              decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
+      args: { description: { n: a, code: src }, hint: { n: a, code: src } } });
+  }
+  function dueAt(c, id) { var D = L(c).doses[id]; return D && D.status && D.status !== 'later'; }
+  function askSection(dr) {
+    var src = source(), asks = (dr.asks || []).filter(function (id) { return dueAt(src, id); }), checks = Object.keys(dr.carry || {}).filter(function (id) { return dr.carry[id] === 'check' && !doseCfg(id).castration && dueAt(src, id); });
+    if (!asks.length) return '';
+    var n = dr.n;
+    var qs2 = asks.map(function (id) {
+      var a = S.answers[id] || 'unknown', k = (L(src).doses[id].owedFrom.filter(function (f) { return f.kind === 'arrival'; })[0] || {}).n || 0;
+      return '<div class="mv-group">' +
+        UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: pl('pp.move.ask.q', n), description: k ? pl('pp.move.ask.moved_before', k) : 'pp.move.ask.hint' },
+          args: { title: { tx: txName(id), n: n }, description: { k: k } } }) +
+        radios('answer', [
+          { value: id + ':yes', id: 'pp.move.ask.yes' },
+          { value: id + ':no', id: 'pp.move.ask.no' },
+          { value: id + ':unknown', id: 'pp.move.ask.unknown', meta: 'pp.move.ask.unknown_meta' }], id + ':' + a, PP.t(pl('pp.move.ask.q', n), { tx: txName(id), n: n })) + '</div>';
+    }).join('');
+    var head = { title: 'pp.move.ask.title' }, hargs = { title: { code: src } };
+    if (checks.length) { head.description = 'pp.move.ask.checks'; hargs.description = { txs: txList(checks) }; }
+    return '<section class="mv-group">' + UI.heading({ title: '', description: checks.length ? '' : undefined, kind: 'section', level: 3, strs: head, args: hargs }) + qs2 + '</section>';
+  }
+  var KIND = { owed: 'owe', done: 'done', unknown: 'unknown', check: 'check' };
+  /* What the moved piglets carry, per dose due at the source — the ledger's packets (review) or the posted record's (receipt).
+     Castration moves as a range of males: the source's males are known once it has a castration record, never which piglets. */
+  function carrySection(rec, withEdit) {
+    var groups = { owe: [], unknown: [], check: [], done: [] }, items = [];
+    Object.keys(rec.packets).forEach(function (id) { if (!doseCfg(id).castration && dueAt(rec.from, id) && KIND[rec.packets[id]]) groups[KIND[rec.packets[id]]].push(id); });
+    ['owe', 'unknown', 'check', 'done'].forEach(function (k) { if (groups[k].length) items.push(fact('pp.move.carry.l.' + k, null, 'pp.move.carry.doses', { doses: txList(groups[k]) })); });
+    var cid = CFG.doses.filter(function (d) { return d.castration; })[0].id;
+    if (dueAt(rec.from, cid) && KIND[rec.packets[cid]]) {
+      var C = L(rec.from).doses[cid].castration, a = rec.aliveBefore;
+      var lo = C ? Math.max(0, rec.n - (a - C.males)) : 0, hi = C ? Math.min(rec.n, C.males) : rec.n;
+      items.push(fact('pp.move.carry.l.males', null, 'pp.move.carry.males_range.' + KIND[rec.packets[cid]], { lo: lo, hi: hi, n: rec.n }));
+    }
+    if (rec.rows && rec.rows.length) items.push(fact('pp.move.carry.l.rows', null, 'pp.move.carry.doses', { doses: rec.rows.map(function (id) { return rowLabel(rowOf(id)); }).join(' · ') }));
+    if (!items.length) return '';
+    var t = where(rec.to) ? 'pp.move.carry.title_unit' : 'pp.move.carry.title';
+    return '<section class="mv-group">' +
+      UI.heading({ title: '', kind: 'section', level: 3, strs: { title: pl(t, rec.n) }, args: { title: { n: rec.n, to: rec.to, u: unitOf(rec.to) } },
+        action: withEdit ? textAction('edit-move', 'act.edit') : '' }) +
+      UI.facts(items, { columns: 1 }) + '</section>';
+  }
+  function rowOf(id) { var out = null; Object.keys(store.derived.litters).forEach(function (c) { L(c).identity.rows.forEach(function (r) { if (r.rowId === id) out = r; }); }); return out; }
+  function deltas(from, to, delta, cover) {
+    cover = cover.filter(function (x) { return dueAt(from, x.dose) && x.hi > 0; });
+    var aMeta = delta.from[1] === 0 ? 'pp.move.delta.none_left' : cover.length ? 'pp.move.delta.check' : null;
+    var aArgs = cover.length ? { text: cover.map(function (x) { return PP.t('pp.move.delta.range', { tx: txName(x.dose), lo: x.lo, hi: x.hi, of: x.of }); }).join(' · ') } : null;
+    var bMeta = delta.to[0] === 0 ? 'pp.move.delta.keeps_day' : null;
+    return UI.facts([
+      fact(where(from) ? 'pp.move.delta.from_unit' : 'pp.move.delta.from', { code: from, u: unitOf(from) }, 'pp.move.delta.value', { a: delta.from[0], b: delta.from[1] }, aMeta, aArgs),
+      fact(where(to) ? 'pp.move.delta.to_unit' : 'pp.move.delta.to', { code: to, u: unitOf(to) }, 'pp.move.delta.value', { a: delta.to[0], b: delta.to[1] }, bMeta, { day: L(from).dayAge, code: from, u: unitOf(to) })]);
+  }
+  function pointer(dr) {
+    if (S.query && L(S.query.toUpperCase()) && farrowing(S.query.toUpperCase())) return { id: 'pp.move.pointer.farrowing', args: { code: S.query.toUpperCase() } };
+    if (!S.other) return { id: 'pp.move.pointer.choose' };
+    if (count() < 1) return { id: 'pp.move.pointer.pick' };
+    if (dr.why) return { id: dr.why === 'name_the_rows' ? 'pp.move.pointer.rows' : 'pp.move.pointer.check' };
+    return null;
+  }
+  function summary(dr) {
+    var p = pointer(dr);
+    if (p) return '<div class="mv-summary">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: p.id }, args: { title: p.args } }) + '</div>';
+    var ex = S.explains ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.move.explain.closes' } }) : '';
+    return '<div class="mv-summary">' + deltas(source(), receiver(), dr.delta, dr.sourceAfter) + ex + '</div>';
+  }
+  function reviewRec(dr) { return { from: source(), to: receiver(), n: dr.n, rows: S.rows, packets: dr.carry, aliveBefore: alive(source()) }; }
+  function moveDrawer() {
+    var f = S.face, dr = S.other ? draft() : { why: 'no_receiver' }, ready = !pointer(dr) && !!dr.event;
+    var sub = alive(f) > 0 ? span('pp.move.sheet.sub', { code: f, n: alive(f), day: L(f).dayAge }) : span('pp.move.sheet.sub_empty', { code: f });
+    var explain = S.explains ? UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: 'pp.move.explain.title', description: 'pp.move.explain.desc' },
+      args: { title: { code: receiver(), n: count() }, description: { from: source(), to: receiver() } } }) : '';
+    var body = explain + directionSection() + crateSection() + countSection() + (S.other && dr.event ? askSection(dr) + carrySection(reviewRec(dr), false) : '');
+    var primary = ready ? button('primary', 'save-move', 'pp.move.act.move', { n: dr.n, from: source(), to: receiver() }) : button('primary', 'save-move', 'pp.move.act.move_bare', null, true);
+    return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
+      '<header class="utility-header mv-head"><div class="pp-hdr-title"><h3 data-str="pp.move.sheet.title">' + U.esc(PP.t('pp.move.sheet.title')) + '</h3><p>' + sub + '</p></div>' +
+      (draftExists() || S.explains ? textAction('clear', 'act.clear') : '') + '</header>' +
+      '<div class="sheet-body"><div class="mv-body">' + body + '</div></div>' + summary(dr) +
+      '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + primary + '</footer></section>';
+  }
+
+  /* ---- the receipt: the posted record, read back from the ledger ---- */
+  function receiptDrawer(sv) {
+    var m = L(sv.to).moves.filter(function (x) { return x.id === sv.id; })[0];
+    var rec = { from: sv.from, to: sv.to, n: m.n, rows: m.rows, packets: m.packets, aliveBefore: sv.delta.from[0] };
+    var body = '<div class="mv-body">' +
+      UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.move.receipt.spray_why' }, args: { title: { to: sv.to } } }) +
+      deltas(sv.from, sv.to, { from: [sv.delta.from[0], alive(sv.from)], to: [sv.delta.to[0], alive(sv.to)] }, sv.sourceAfter) + carrySection(rec, true) + '</div>';
+    return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="medium" data-sizing="content" role="dialog" aria-modal="true">' +
+      '<header class="utility-header"><div class="pp-hdr-title"><h3>' + span(pl('pp.move.receipt.spray', m.n), { n: m.n }) + '</h3><p>' +
+      span(pl(where(sv.to) ? 'pp.move.receipt.title_unit' : 'pp.move.receipt.title', m.n), { n: m.n, to: sv.to, u: unitOf(sv.to), time: U.time(m.at), who: m.who }) + '</p></div></header>' +
+      '<div class="sheet-body">' + body + '</div>' +
+      '<footer class="sheet-footer">' + button('secondary', 'close', 'act.close') + '</footer></section>';
+  }
+
+  /* ---- resolving an arrival: how many already had it (unknown or check-on-the-pig). Save writes the stamped check and the
+     records together (append, all or nothing): an obligation is never cleared without a record. Back keeps the draft. ---- */
+  function resolving() {
+    var p = S.drawer.split(':'), g = L(S.face).doses[p[1]].unknownGroups.filter(function (x) { return x.id === p[0]; })[0];
+    return { group: p[0], dose: p[1], n: g ? g.n : 0, from: g ? g.from : '' };
+  }
+  function resolveEvents() {
+    var r = resolving(), had = Math.max(0, Math.min(S.had || 0, r.n)), rest = r.n - had, out = [];
+    if (S.rest === 'owed') out.push({ type: 'check', litter: S.face, dose: r.dose, had: had, lacks: rest, group: r.group });
+    else {
+      if (had) out.push({ type: 'check', litter: S.face, dose: r.dose, had: had, group: r.group });
+      if (rest) out.push({ type: 'treat', litter: S.face, dose: r.dose, n: rest, target: 'unknown', group: r.group });
+    }
+    return out;
+  }
+  function resolveDrawer() {
+    var r = resolving(), n = r.n, had = Math.max(0, Math.min(S.had || 0, n)), rest = n - had, visible = doseCfg(r.dose).visible;
+    var body = UI.stepper({ label: '', description: '', value: had, min: 0, max: n, key: 'had', hint: '', reserveHint: had >= n,
+      strs: { label: 'pp.move.res.had', description: pl('pp.move.res.of', n), value: 'ds.field.figure', hint: had >= n ? pl('pp.move.res.ceiling', n) : undefined, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
+      args: { description: { n: n }, hint: { n: n } } });
+    if (rest) body += '<div class="mv-group">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: pl('pp.move.res.rest', rest) }, args: { title: { n: rest } } }) +
+      radios('rest', [{ value: 'record', id: pl('pp.move.res.record', rest), args: { tx: txName(r.dose), n: rest } },
+                      { value: 'owed', id: pl('pp.move.res.owed', rest), args: { n: rest } }], S.rest || 'record', PP.t(pl('pp.move.res.rest', rest), { n: rest })) + '</div>';
+    body += UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.move.res.note' } });
+    return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="medium" data-sizing="content" role="dialog" aria-modal="true">' +
+      '<header class="utility-header"><div class="pp-hdr-title"><h3>' + span(pl('pp.move.res.title', n), { tx: txName(r.dose), n: n, code: r.from }) + '</h3><p>' +
+      span(visible ? 'pp.move.res.sub_check' : 'pp.move.res.sub_unknown', { tx: txName(r.dose) }) + '</p></div></header>' +
+      '<div class="sheet-body"><div class="mv-body">' + body + '</div></div>' +
+      '<footer class="sheet-footer">' + button('secondary', 'close-resolve', 'act.back') + button('primary', 'save-resolve', 'act.save') + '</footer></section>';
+  }
+
+  /* ---- move-prelock: the door to the farrowing sheet ---- */
+  function prelockDrawer() {
+    var x = L(S.face), ev = x.lastEvent, h = Math.max(1, Math.ceil((Date.parse(TODAY + 'T10:30') - Date.parse(ev.at)) / 3600000));
+    var door = UI.rowGroup(row({ action: 'open-farrowing', value: S.face, title: 'pp.move.pre.door', titleArgs: { code: S.face },
+      desc: 'pp.move.pre.door_desc', descArgs: { n: x.born, h: h, who: ev.who } }));
+    return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="short" data-sizing="content" role="dialog" aria-modal="true">' +
+      '<header class="utility-header"><div class="pp-hdr-title"><h3 data-str="pp.move.sheet.title">' + U.esc(PP.t('pp.move.sheet.title')) + '</h3><p>' + span('pp.move.pre.why', { code: S.face }) + '</p></div></header>' +
+      '<div class="sheet-body"><div class="mv-body">' + door + '</div></div>' +
+      '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + '</footer></section>';
+  }
+
+  function render() {
+    normalize();
+    var html;
+    if (S.view === 'move') html = faceHtml(S.face, true) + moveDrawer();
+    else if (S.view === 'receipt') html = faceHtml(S.face, true) + receiptDrawer(S.saved);
+    else if (S.view === 'face') html = faceHtml(S.face, !!S.drawer) + (S.drawer ? resolveDrawer() : '');
+    else if (S.view === 'prelock') html = faceHtml(S.face, true) + prelockDrawer();
+    document.getElementById('screen').innerHTML = html;
+    PP.apply(document.getElementById('screen'));
+  }
+  // Save: the one record goes through append; the receipt reads it back. The draft resets (moved identity rows have left the source).
+  function post() {
+    var dr = draft();
+    if (!dr.event) return false;
+    var before = { from: source(), to: receiver(), delta: dr.delta, sourceAfter: dr.sourceAfter };
+    var r = store.commit(dr.event);
+    if (!r.ok) return false;
+    S.saved = Object.assign({ id: r.event.id }, before);
+    S = Object.assign(JSON.parse(DEFAULT), { view: 'receipt', face: S.face, saved: S.saved, kept: false });
+    return true;
+  }
+
+  document.getElementById('screen').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-action]');
+    if (!b) return;
+    var a = b.dataset.action, v = b.dataset.value;
+    if (a === 'pick-row') v = b.value;                         // a multi row's checkbox carries its id as value
+    if (a === 'pick-crate') { S.other = v; S.query = ''; S.rows = []; S.untagged = 0; S.answers = {}; render(); }
+    else if (a === 'change-crate') { if (S.explains) return; S.other = ''; S.rows = []; S.untagged = 0; S.answers = {}; render(); }
+    else if (a === 'dir') { if (S.dir !== v) { S.dir = v; S.rows = []; S.untagged = 0; S.answers = {}; } render(); }
+    else if (a === 'step') {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      var k = b.dataset.value, st = +b.dataset.step;
+      if (k === 'n' && !S.explains) S.n += st; else if (k === 'untagged') S.untagged += st; else if (k === 'had') S.had = (S.had || 0) + st;
+      render();
+    }
+    else if (a === 'all') { S.n = +v; render(); }
+    else if (a === 'pick-row') { var i = S.rows.indexOf(v); if (i >= 0) S.rows.splice(i, 1); else S.rows.push(v); render(); }
+    else if (a === 'answer') { var p = v.split(':'); S.answers[p[0]] = p[1]; render(); }
+    else if (a === 'clear') { var keep = { view: 'move', face: S.face }; S = Object.assign(JSON.parse(DEFAULT), keep); render(); }   // Clear also drops an explaining link
+    else if (a === 'back' && S.view === 'move') { S.view = 'face'; S.kept = draftExists(); render(); }   // Back keeps the draft
+    else if (a === 'back') { location.href = PP.href('litter.html', { state: 'litter', crate: S.face, data: store.name !== 'base' ? store.name : '' }); }
+    else if (a === 'open-move') { S.view = 'move'; S.kept = false; render(); }
+    else if (a === 'save-move') { if (b.disabled) return; post(); render(); }
+    else if (a === 'close') { S.view = 'face'; render(); }
+    else if (a === 'open-resolve') { S.drawer = v; var kept = resolveDrafts[v]; S.had = kept ? kept.had : 0; S.rest = kept ? kept.rest : 'record'; render(); }
+    else if (a === 'rest') { S.rest = v; render(); }
+    else if (a === 'close-resolve') { resolveDrafts[S.drawer] = { had: S.had || 0, rest: S.rest }; S.drawer = ''; render(); }
+    else if (a === 'save-resolve') {
+      var res = store.commitAll(resolveEvents());
+      if (!res.ok) { document.documentElement.setAttribute('data-door', 'refused:' + res.reason); return; }
+      delete resolveDrafts[S.drawer]; S.drawer = ''; render();
+    }
+    else if (a === 'record' || a === 'open-dose') { location.href = PP.href('litter.html', { state: 'litter', crate: S.face, stay: 1, data: store.name !== 'base' ? store.name : '' }); }
+    else document.documentElement.setAttribute('data-door', a + ':' + (v || ''));
+  });
+  PP.ready.then(function () {
+    store = PP.open(S.data || 'base', STATES[name].view === 'receipt' ? { session: false } : null);
+    CFG = store.config; TODAY = store.today; UNIT = L(S.face).room;
+    if (S.allRows) S.rows = liveRows(S.face).map(function (r) { return r.rowId; });
+    // A count on a source with tagged piglets is the untagged ones (the rest are picked by their tags).
+    if (S.other && hasRows(source()) && !S.rows.length && S.n) S.untagged = Math.min(S.n, remainder(source()));
+    if (S.view === 'receipt') { S.view = 'move'; normalize(); post(); }
+    render();
+  });
+})();
+</script>
+</body>
+</html>
