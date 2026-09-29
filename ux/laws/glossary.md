@@ -43,6 +43,23 @@ Defined by farrowing and used here unchanged (RULINGS *Model*; the Finish sheet)
 | **Healthy** | piglets | alive − weak − deformed; derived, no form row, printed on the record | as Weak / Deformed | one litter |
 | **Weaned** 断奶 | piglets | piglets that left the litter at weaning; the last term of the ledger | stamped at weaning | one litter |
 
+## Litter sheet (slice 6)
+
+The ordinary litter face: what one litter owes today and what has been recorded on it. Counts use the terms above unchanged (Born, Alive, Dead, Owed, Treated, Skipped: deferred / exempt, Missed, Castrated / not castrated, Possible double treatment, Identified).
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Doses left today** `{left} of {total} left` 剩{left}项，共{total}项 | scheduled doses | left: doses due at or before today (late and missed included) that still have owed piglets; total: every dose due at or before today. Identity is not a dose here (S4 owns it) | now | one litter; unit: doses (项), never piglets |
+| **Owed line** `due day {d} · {n} owed`; `late {k} days · {n} owed`; `missed after day {d} · {n} owed` | piglets | Owed for one dose. `late {k} days`: k = the litter's day-age − the dose's due day-age. `missed after day {d}`: d = the dose's last age-day | now | one litter per dose |
+| **Record {n}** 记录{n}头 | piglets | the one-tap population: Owed for that dose, i.e. every live piglet not yet treated or exempt | the tap; stamped | one litter per dose. Castration has no one-tap until its first record, because males are unknown before they are counted |
+| **Treated** (drawer) `of {n} owed` 已处理 · 共{n}头待处理 | piglets | the piglets this record treats; starts at Owed and only comes down | the record being drafted | one litter per dose |
+| **Not treated** `{n} not treated · why?` | piglets | Owed − Treated in this record; one reason for all of them. Weak and sick defer (stay owed, shown next visit) | the record being drafted | one litter per dose |
+| **Males** `{n} males` 公猪 | male piglets | castrated + every not-castrated reason in the castration draft; derived, never entered up front | the record being drafted; printed on the record as `castrated 5 · not castrated 1: hernia` | one litter |
+| **Receipt count** `Saved · iron · 12 piglets` | piglets | the change the last record made (piglets it treated), never the litter's total; `· 2 deferred` counts that record's deferred piglets | the last record on this phone | one litter; the Owed heading's count owns the total |
+| **early / late** (Recorded row) 提前 / 迟做 | one record | early: the record's day-age is before the dose's due day (counts on time); late: after it (counts late, carries its real date) | the record's stamp | one record |
+| **Litter note** 窝备注 | piglets | not castrated for hernia or cryptorchid, from the castration record | the castration record's stamp | one litter |
+| **Identify line** `notch · {k} of {n} identified` | alive piglets | Identified of Alive, on an all-piglet notch farm | now | one litter; the door to S4 |
+
 ## Count grammar
 
 The count leads the word and the unit is written: `{n} piglets`, singular `{n} piglet` (`pp.common.unit.piglet.one` / `.many`, `PP.tn`); zh has one form and no space between numeral and classifier (`14头`, `3日龄`). Ruled anchors that stay as they are: `born {n}` and `day {n}` (en), `Saved · +{n} this visit` and `Saved · {n} died this visit` (farrowing's, under `fr.*`; a processing receipt names its outcome and is registered by the slice that writes it), and label-then-count headers such as `Dead 6` and `Unexplained loss {n}`.

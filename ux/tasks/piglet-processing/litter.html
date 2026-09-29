@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Litter sheet</title>
+<link rel="stylesheet" href="/ux/design-system/tokens.css">
+<link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="shell.css">
+<style>
+/* Layout only, tokens from tokens.css. Two Candidate compositions: TreatmentRow and StatusWord. */
+.lt-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
+.lt-phone .scrim { inset: 0; }
+.lt-title { flex: 1; min-width: 0; }
+.lt-context { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.lt-mono { font-family: var(--font-mono); }
+.lt-body { display: flex; flex-direction: column; gap: var(--space-section); }
+.lt-body > * { margin: 0; }
+.lt-group > * + * { margin-top: var(--space-heading); }
+.lt-drawer-body { display: flex; flex-direction: column; gap: var(--space-row-y); }
+/* The identity header door (S10's) and the TreatmentRow's left door: a bare button around text + ›. */
+.lt-door { display: inline-flex; align-items: center; gap: 4px; min-height: var(--touch-min); padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; }
+.lt-door svg { width: 15px; height: 15px; flex: none; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+/* Candidate:TreatmentRow — Row anatomy with two targets: the copy opens the dose, the button records it. */
+.lt-tx .lt-door { flex: 1; min-width: 0; align-self: stretch; }
+.lt-tx .lt-door .st-row-copy { flex: 1; min-width: 0; }
+.st-row.lt-tx .st-row-copy strong { display: flex; align-items: center; gap: 4px; }
+.lt-tx .button { flex: none; min-height: var(--touch-min); }
+/* Candidate:StatusWord — a coloured status word inside a mono line (colour on the value, the word stays ink elsewhere). */
+.lt-tone[data-tone="red"] { color: var(--red); }
+.lt-tone[data-tone="amber"] { color: var(--amber); }
+</style>
+</head>
+<body>
+<main class="inspection-phone lt-phone" data-st-context="page">
+  <div id="screen"></div>
+</main>
+<script src="/ux/design-system/components/bundle.js"></script>
+<script src="shell.js"></script>
+<script>
+(function () {
+  var UI = window.SentriUI, ICON = window.SentriIcons;
+  var zh = PP.lang === 'zh';
+  var ME = 'G.H';
+
+  /* ---- fixtures: every number printed comes from here. Today is Sep 29. ----
+     The farm's schedule (console): iron day 3 and iron day 14 are two doses; teeth, tail and
+     coccidiosis close after day 7 (their last age-day); castration day 3. Product + dose snapshot
+     onto every mark; the worker enters none of it. */
+  var SCHEDULE = [
+    { id: 'iron3', tx: 'iron', due: 3, product: 'iron' },
+    { id: 'teeth', tx: 'teeth', due: 3, last: 7 },
+    { id: 'tail', tx: 'tail', due: 3, last: 7 },
+    { id: 'castrate', tx: 'castrate', due: 3, castrate: true },
+    { id: 'cocci', tx: 'coccidiosis', due: 3, last: 7, product: 'cocci' },
+    { id: 'iron14', tx: 'iron', due: 14, product: 'iron' }
+  ];
+  var LITTERS = {
+    A02: { crate: 'A02', tag: '000231', parity: 3, day: 3, born: 13, alive: 12, dead: 1, idDone: 0 },
+    A05: { crate: 'A05', tag: '000240', parity: 4, day: 3, born: 12, alive: 11, dead: 1, idDone: 0 },
+    B01: { crate: 'B01', tag: '000187', parity: 5, day: 5, born: 14, alive: 13, dead: 1, idDone: 13, weightMissing: true },
+    B04: { crate: 'B04', tag: '000254', parity: 2, day: 9, born: 12, alive: 10, dead: 2, idDone: 10 },
+    C04: { crate: 'C04', tag: '000266', parity: 1, day: 2, born: 10, alive: 9, dead: 1 }
+  };
+  // Records: { dose, n, t (hh:mm), date (null = today), who, deferred: {n, reason}, castr: {c, hernia, cryptorchid, deferred, kept} }
+  function R(dose, n, t, who, o) { return Object.assign({ dose: dose, n: n, t: t, who: who, date: null }, o || {}); }
+  var CASTR_A02 = { c: 5, hernia: 1, cryptorchid: 0, deferred: 0, kept: 0 };
+  var STATES = {
+    'litter':         { l: 'A02', recs: [] },
+    'litter-partial': { l: 'A02', recs: [R('teeth', 12, '08:40', 'L.M'), R('iron3', 12, '09:14', ME)], receipt: ['saved', 'iron3', 12] },
+    'litter-short-count': { l: 'A02', recs: [], drawer: { dose: 'iron3', n: 10, reason: '' } },
+    'litter-short-saved': { l: 'A02', recs: [R('iron3', 10, '09:14', ME, { deferred: { n: 2, reason: 'weak' } })], receipt: ['deferred', 'iron3', 10, 2] },
+    'castrate':       { l: 'A02', recs: [R('iron3', 12, '09:14', ME), R('teeth', 12, '09:15', ME), R('tail', 12, '09:16', ME)],
+                        drawer: { dose: 'castrate', castr: { c: 5, hernia: 1, cryptorchid: 0, deferred: 0, kept: 0 } } },
+    'castrate-saved': { l: 'A02', recs: [R('iron3', 12, '09:14', ME), R('teeth', 12, '09:15', ME), R('tail', 12, '09:16', ME),
+                        R('castrate', 5, '09:20', ME, { castr: CASTR_A02 })], receipt: ['castr', 'castrate', 5, 1] },
+    'done-by-other':  { l: 'A02', recs: [R('iron3', 12, '08:40', 'L.M')], receipt: ['already', 'iron3', 0, 0, '08:40', 'L.M'] },
+    'early':          { l: 'C04', recs: [R('iron3', 9, '09:30', ME)], receipt: ['early', 'iron3', 9] },
+    'late':           { l: 'B01', recs: [R('teeth', 13, '07:50', 'L.M', { date: 27 }), R('tail', 13, '07:52', 'L.M', { date: 27 })] },
+    'missed':         { l: 'B04', recs: [R('iron3', 10, '08:05', ME, { date: 23 }), R('teeth', 10, '08:06', ME, { date: 23 }), R('tail', 10, '08:07', ME, { date: 23 }),
+                        R('castrate', 5, '08:12', ME, { date: 23, castr: { c: 5, hernia: 1, cryptorchid: 0, deferred: 0, kept: 0 } })] },
+    'double-flag':    { l: 'A05', recs: [R('teeth', 11, '08:40', 'L.M'), R('iron3', 11, '08:40', 'L.M'), R('iron3', 11, '08:52', ME)] },
+    'all-done':       { l: 'A02', recs: [R('iron3', 12, '09:14', ME), R('teeth', 12, '09:15', ME), R('tail', 12, '09:16', ME),
+                        R('castrate', 5, '09:20', ME, { castr: CASTR_A02 }), R('cocci', 12, '09:22', ME)], receipt: ['saved', 'cocci', 12] }
+  };
+  // The room list links litter.html?state=litter&crate=<code>: each crate opens its own face.
+  var CRATE_STATE = { A02: 'litter', A05: 'double-flag', B01: 'late', B04: 'missed', C04: 'early' };
+  var qs = new URLSearchParams(location.search);
+  var name = STATES[PP.state] ? PP.state : 'litter';
+  if (name === 'litter' && CRATE_STATE[qs.get('crate')]) name = CRATE_STATE[qs.get('crate')];
+  var st = STATES[name];
+  var L = LITTERS[st.l];
+  var recs = st.recs.map(function (r) { return Object.assign({}, r); });
+  var receipt = st.receipt || null;
+  var drawer = st.drawer ? JSON.parse(JSON.stringify(st.drawer)) : null;
+  var drafts = {};                    // Back keeps a drawer's draft on the device, per dose
+  var clock = 60 * 9 + 23;            // the next tap stamps 09:24, then onward (minutes)
+
+  /* ---- the ledger for one dose ---- */
+  function dose(id) { return SCHEDULE.filter(function (d) { return d.id === id; })[0]; }
+  function recsOf(id) { return recs.filter(function (r) { return r.dose === id; }); }
+  // Owed = live piglets still needing the dose: not treated, not exempt. Deferred stays owed.
+  // Castration: males are unknown until castrated + not castrated are counted; afterwards only deferred stays owed.
+  function owed(d) {
+    var rs = recsOf(d.id);
+    if (d.castrate) {
+      var c = rs.filter(function (r) { return r.castr; });
+      if (!c.length) return { n: null };
+      var def = c[c.length - 1].castr.deferred - rs.filter(function (r) { return !r.castr; }).reduce(function (s, r) { return s + r.n; }, 0);
+      return { n: Math.max(0, def), deferredOnly: def > 0 };
+    }
+    var treated = rs.reduce(function (s, r) { return s + r.n; }, 0);
+    var n = Math.max(0, L.alive - treated);
+    var last = rs.filter(function (r) { return r.deferred; }).pop();
+    return { n: n, reason: n && last ? last.deferred.reason : '' };
+  }
+  function isDone(d) { var o = owed(d); return o.n === 0; }
+  function status(d) {
+    if (d.due > L.day) return 'later';
+    if (d.last != null && L.day > d.last) return 'missed';
+    if (L.day > d.due) return 'late';
+    return 'due';
+  }
+  function flagged(d) { return !d.castrate && recsOf(d.id).length > 1 && recsOf(d.id).reduce(function (s, r) { return s + r.n; }, 0) > L.alive; }
+
+  /* ---- strings ---- */
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function span(id, args, cls, tone) {
+    return '<span' + (cls ? ' class="' + cls + '"' : '') + (tone ? ' data-ds="Candidate:StatusWord" data-tone="' + tone + '"' : '') + ' data-str="' + id + '"' +
+      (args ? " data-args='" + esc(JSON.stringify(args)) + "'" : '') + '>' + esc(PP.t(id, args)) + '</span>';
+  }
+  var pigs = function (n) { return PP.tn('pp.common.unit.piglet', n); };
+  var txName = function (d) { return PP.t('pp.common.tx.' + d.tx); };
+  var one = function (base, n) { return base + (n === 1 && !zh ? '.one' : '.many'); };
+  function stamp(r) {
+    return r.date ? PP.t('pp.litter.stamp.date', { d: r.date, t: r.t, who: r.who }) : PP.t('pp.litter.stamp.today', { t: r.t, who: r.who });
+  }
+  function reasonName(k) { return PP.t('pp.litter.why.' + k); }
+  function castrLine(c) {
+    var not = [], k = 0;
+    ['hernia', 'cryptorchid', 'deferred', 'kept'].forEach(function (x) { if (c[x]) { not.push([x, c[x]]); k += c[x]; } });
+    // One reason: `not castrated 1: hernia`; several: `not castrated 3: hernia 1, deferred 2`.
+    not = not.length === 1 ? [reasonName(not[0][0])] : not.map(function (p) { return PP.t('pp.litter.castr.part', { n: p[1], reason: reasonName(p[0]) }); });
+    return k ? PP.t('pp.litter.castr.line', { c: c.c, k: k, why: not.join(zh ? '，' : ', ') }) : PP.t('pp.litter.castr.line_all', { c: c.c });
+  }
+
+  /* ---- header: S10's identity header, crate first (the first fact), the one door to the sow page ---- */
+  function header() {
+    var a = { crate: L.crate, tag: L.tag };
+    return '<header class="utility-header"><div class="lt-title"><h3><button type="button" class="lt-door" data-action="open-sow" data-value="' + L.tag +
+      '" data-str-attr="aria-label:pp.litter.hdr.sow_aria" data-args=\'' + JSON.stringify(a) + '\'>' + span('pp.litter.hdr.door', a, 'lt-mono') + ICON.icon('chevron') + '</button></h3>' +
+      '<p class="lt-context">' + span('pp.litter.hdr.parity', { n: L.parity }) + span('pp.common.unit.day', { n: L.day }) + '</p></div></header>';
+  }
+  function fact(label, n) {
+    return { label: '', value: '', strs: { label: label, value: one('pp.common.unit.piglet', n) }, args: { value: { n: n } } };
+  }
+  function facts() { return UI.facts([fact('label.born', L.born), fact('label.alive', L.alive), fact('label.dead', L.dead)], { columns: 3 }); }
+
+  /* ---- owed today ---- */
+  function owedLine(d, o) {
+    var parts = [];
+    var s = status(d);
+    if (s === 'due') parts.push(span('pp.litter.due', { d: d.due }));
+    // Colour lives on the value, the word stays ink: `late 2 days` prints 2 days red.
+    if (s === 'late') parts.push(span('pp.litter.tag.late') + ' ' + span(one('pp.litter.days', L.day - d.due), { k: L.day - d.due }, 'lt-tone', 'red'));
+    if (s === 'missed') parts.push(span('pp.litter.missed', { d: d.last }, 'lt-tone', 'red'));
+    if (o.n == null) parts.push(span('pp.litter.castr.count_as_you_cut'));
+    else if (o.deferredOnly) parts.push(span('pp.litter.owed_deferred', { n: o.n }));
+    else if (o.reason) parts.push(span('pp.litter.owed_reason', { n: o.n, reason: reasonName(o.reason) }));
+    else parts.push(span('pp.litter.owed', { n: o.n }));
+    return parts.join(' ' + span('pp.litter.sep') + ' ');
+  }
+  function txRow(d) {
+    var o = owed(d);
+    var door = '<button type="button" class="lt-door" data-action="open-dose" data-value="' + d.id + '"><span class="st-row-copy"><strong>' +
+      span('pp.common.tx.' + d.tx) + ICON.icon('chevron') + '</strong><small>' + owedLine(d, o) + '</small></span></button>';
+    // Castration before its record: males are unknown, so there is no one-tap; the door is the record.
+    var btn = o.n == null ? '' : '<button type="button" class="button secondary" data-ds="Button" data-action="record" data-value="' + d.id + '" data-str="pp.litter.act.record_n" data-args=\'{"n":' + o.n + '}\'>' + esc(PP.t('pp.litter.act.record_n', { n: o.n })) + '</button>';
+    return '<div class="st-row lt-tx" data-ds="Candidate:TreatmentRow">' + door + btn + '</div>';
+  }
+  function receiptArgs() {
+    if (!receipt) return null;
+    var d = dose(receipt[1]), k = receipt[0];
+    // Receipts speak the dose in lower case mid-line (`Saved · iron · 12 piglets`).
+    var tx = d.id === 'iron14' ? PP.t('pp.litter.tx_day', { tx: txName(d), d: d.due }) : txName(d);
+    var a = { tx: zh ? tx : tx.toLowerCase(), pigs: pigs(receipt[2]) };
+    if (k === 'deferred') a.k = receipt[3];
+    if (k === 'castr' || k === 'castr_all') { a.c = receipt[2]; a.k = receipt[3]; }
+    if (k === 'already') { a.t = receipt[4]; a.who = receipt[5]; }
+    return ['pp.litter.rcpt.' + k, a];
+  }
+  function owedSection() {
+    var due = SCHEDULE.filter(function (d) { return status(d) !== 'later' && !isDone(d); });
+    var today = SCHEDULE.filter(function (d) { return status(d) !== 'later'; });
+    var ra = receiptArgs();
+    var h = UI.heading({ title: '', kind: 'section', level: 3, meta: due.length ? '' : undefined, description: ra ? '' : undefined,
+      strs: Object.assign({ title: 'pp.litter.section.owed' }, due.length ? { meta: 'pp.litter.owed.meta' } : {}, ra ? { description: ra[0] } : {}),
+      args: Object.assign({ meta: { left: due.length, total: today.length } }, ra ? { description: ra[1] } : {}) });
+    var body = due.length ? UI.rowGroup(due.map(txRow).join('')) : UI.panel(UI.choiceEmpty('', { strs: { text: 'pp.litter.owed.none' } }));
+    return '<section class="lt-group" data-ds="Section" role="status" aria-live="polite">' + h + body + '</section>';
+  }
+
+  /* ---- recorded: one row per record, never merged ---- */
+  function recRow(r) {
+    var d = dose(r.dose), line, trail = '', tone = '';
+    var title = d.id === 'iron14' ? ['pp.litter.tx_day', { tx: txName(d), d: d.due }] : ['pp.common.tx.' + d.tx, null];
+    var prod = d.product ? PP.t('pp.litter.product.' + d.product) : '';
+    if (r.castr) line = ['pp.litter.done.castr', { stamp: stamp(r), what: castrLine(r.castr) }];
+    else if (r.deferred) line = ['pp.litter.done.deferred', { stamp: stamp(r), pigs: pigs(r.n), k: r.deferred.n, reason: reasonName(r.deferred.reason), prod: prod }];
+    else line = [prod ? 'pp.litter.done.prod' : 'pp.litter.done', { stamp: stamp(r), pigs: pigs(r.n), prod: prod }];
+    var recDay = r.date ? L.day - (29 - r.date) : L.day;
+    if (flagged(d)) { trail = 'pp.litter.flag.double_short'; tone = 'amber'; }
+    else if (recDay < d.due) trail = 'pp.litter.tag.early';
+    else if (recDay > d.due) trail = 'pp.litter.tag.late';
+    return UI.row({ title: '', description: '', trailing: trail ? span(trail, null, tone ? 'lt-tone' : '', tone) : '',
+      strs: { title: title[0], description: line[0] }, args: { title: title[1], description: line[1] } });
+  }
+  function recordedSection() {
+    if (!recs.length) return '';
+    var order = recs.slice().sort(function (a, b) { return (b.date || 99) - (a.date || 99) || (a.t < b.t ? 1 : -1); });
+    var flags = SCHEDULE.filter(flagged);
+    var edit = '<button type="button" data-action="open-edit" data-value="' + L.crate + '" data-str="act.edit">' + esc(PP.t('act.edit')) + '</button>';
+    var h = UI.heading({ title: '', kind: 'section', level: 3, action: edit, description: flags.length ? '' : undefined,
+      strs: Object.assign({ title: 'pp.litter.section.recorded' }, flags.length ? { description: 'pp.litter.flag.double' } : {}),
+      args: flags.length ? { description: { tx: txName(flags[0]) } } : undefined });
+    return '<section class="lt-group" data-ds="Section">' + h + UI.rowGroup(order.map(recRow).join('')) + '</section>';
+  }
+
+  /* ---- litter notes: hernia and cryptorchid from castration ---- */
+  function notesSection() {
+    var rows = [];
+    recs.forEach(function (r) {
+      if (!r.castr) return;
+      ['hernia', 'cryptorchid'].forEach(function (x) {
+        if (r.castr[x]) rows.push(UI.row({ title: '', description: '', strs: { title: 'pp.litter.reason.' + x, description: 'pp.litter.note.line' },
+          args: { description: { pigs: pigs(r.castr[x]), stamp: stamp(r) } } }));
+      });
+    });
+    if (!rows.length) return '';
+    return '<section class="lt-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.litter.section.notes' } }) + UI.rowGroup(rows.join('')) + '</section>';
+  }
+
+  /* ---- later: future doses; early is deliberate (open, then Save) ---- */
+  function laterSection() {
+    var xs = SCHEDULE.filter(function (d) { return status(d) === 'later' && !isDone(d); });
+    if (!xs.length) return '';
+    var rows = xs.map(function (d) {
+      var k = d.due - L.day;
+      var title = d.id === 'iron14' ? ['pp.litter.tx_day', { tx: txName(d), d: d.due }] : ['pp.common.tx.' + d.tx, null];
+      return UI.row({ title: '', description: '', action: 'open-dose', value: d.id,
+        strs: { title: title[0], description: k === 1 ? 'pp.litter.later.tomorrow' : 'pp.litter.later.in' }, args: { title: title[1], description: { d: d.due, k: k } } });
+    });
+    return '<section class="lt-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.litter.section.later' } }) + UI.rowGroup(rows.join('')) + '</section>';
+  }
+
+  /* ---- the other acts on this litter: S10's Record group ---- */
+  function recordGroup() {
+    var r = function (action, title, desc, descArgs, trail) {
+      return UI.row({ title: '', description: desc ? '' : undefined, trailing: trail ? '' : undefined, action: action, value: L.crate,
+        strs: Object.assign({ title: title }, desc ? { description: desc } : {}, trail ? { trailing: trail } : {}), args: desc ? { description: descArgs } : undefined });
+    };
+    var rows = r('open-dead', 'act.record_dead') + r('open-count', 'pp.count.title') + r('open-move', 'pp.move.title', 'pp.litter.desc.move');
+    if (L.idDone != null) rows += r('open-identity', 'pp.litter.id.title', 'pp.litter.id.line', { k: L.idDone, n: L.alive });
+    if (L.weightMissing) rows += r('open-weight', 'pp.litter.weight.title', null, null, 'pp.litter.weight.optional');
+    return '<section class="lt-group" data-ds="Section">' + UI.heading({ title: '', kind: 'group', level: 3, strs: { title: 'pp.litter.section.record' } }) + UI.rowGroup(rows) + '</section>';
+  }
+  function faceFooter() {
+    return '<footer class="sheet-footer"><button type="button" class="button secondary" data-ds="Button" data-action="close" data-str="act.close">' + esc(PP.t('act.close')) + '</button></footer>';
+  }
+
+  /* ---- the dose drawer (staged: Back keeps the draft, Clear discards it, Save commits) ---- */
+  function stepperRow(key, label, desc, descArgs, value, max) {
+    return UI.stepper({ label: '', description: desc ? '' : undefined, value: value, min: 0, max: max, key: key,
+      strs: Object.assign({ label: label, value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' }, desc ? { description: desc } : {}),
+      args: desc ? { description: descArgs } : undefined });
+  }
+  function doseDrawer() {
+    var d = dose(drawer.dose), s = status(d);
+    var clear = dirty() ? '<button type="button" data-action="clear" data-str="act.clear">' + esc(PP.t('act.clear')) + '</button>' : '';
+    var body, ok, titleArgs = { tx: txName(d), d: d.due }, sub;
+    if (d.castrate) {
+      var c = drawer.castr, males = c.c + c.hernia + c.cryptorchid + c.deferred + c.kept;
+      var cap = function (x) { return L.alive - males + c[x]; };
+      body = stepperRow('c', 'pp.litter.castr.castrated', null, null, c.c, cap('c')) +
+        '<div class="lt-group">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.litter.castr.not' } }) +
+        stepperRow('hernia', 'pp.litter.reason.hernia', 'pp.litter.reason.leaves_note', null, c.hernia, cap('hernia')) +
+        stepperRow('cryptorchid', 'pp.litter.reason.cryptorchid', 'pp.litter.reason.leaves_note', null, c.cryptorchid, cap('cryptorchid')) +
+        stepperRow('deferred', 'pp.litter.reason.deferred', 'pp.litter.reason.stays_castr', null, c.deferred, cap('deferred')) +
+        stepperRow('kept', 'pp.litter.reason.kept', 'pp.litter.reason.leaves', null, c.kept, cap('kept')) + '</div>';
+      sub = [one('pp.litter.castr.males', males), { n: males }];
+      ok = males > 0;
+    } else {
+      var o = owed(d), max = o.n, rest = max - drawer.n;
+      sub = d.product ? ['pp.litter.drawer.product', { prod: PP.t('pp.litter.product.' + d.product), n: L.alive }] : ['pp.litter.drawer.alive', { n: L.alive }];
+      body = '';
+      if (s !== 'due') body += UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.litter.drawer.' + s }, args: { title: { d: s === 'missed' ? d.last : d.due } } });
+      body += stepperRow('n', 'pp.litter.stepper.treated', 'pp.litter.stepper.of', { n: max }, drawer.n, max);
+      if (rest > 0) {
+        body += UI.choiceGroup(['weak', 'sick'].map(function (k) {
+          return UI.choiceRow({ label: '', meta: '', mode: 'single', action: 'reason', value: k, selected: drawer.reason === k,
+            strs: { label: 'pp.litter.reason.' + k, meta: 'pp.litter.reason.stays' } });
+        }), { title: '', strs: { title: one('pp.litter.rest.why', rest) }, args: { title: { n: rest } } });
+      }
+      ok = drawer.n > 0 && (rest === 0 || !!drawer.reason);
+    }
+    var head = UI.heading({ title: '', kind: 'page', level: 3, description: '', action: clear,
+      strs: { title: 'pp.litter.tx_day', description: sub[0] }, args: { title: titleArgs, description: sub[1] } });
+    return '<div class="scrim" data-ds="Sheet" data-action="back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="medium" data-sizing="content" role="dialog" aria-modal="true">' +
+      '<header class="utility-header">' + head + '</header>' +
+      '<div class="sheet-body"><div class="lt-drawer-body">' + body + '</div></div>' +
+      '<footer class="sheet-footer"><button type="button" class="button secondary" data-ds="Button" data-action="back" data-str="act.back">' + esc(PP.t('act.back')) + '</button>' +
+      '<button type="button" class="button primary" data-ds="Button" data-action="save" data-str="act.save"' + (ok ? '' : ' disabled') + '>' + esc(PP.t('act.save')) + '</button></footer></section>';
+  }
+  function freshDraft(d) {
+    if (d.castrate) return { dose: d.id, castr: { c: 0, hernia: 0, cryptorchid: 0, deferred: 0, kept: 0 } };
+    return { dose: d.id, n: owed(d).n, reason: '' };
+  }
+  function dirty() {
+    var f = freshDraft(dose(drawer.dose));
+    return JSON.stringify(f) !== JSON.stringify(drawer);
+  }
+
+  /* ---- render ---- */
+  function render() {
+    document.getElementById('screen').innerHTML =
+      '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (drawer ? ' inert' : '') + '>' + header() +
+      '<div class="sheet-body"><div class="lt-body">' + facts() + owedSection() + recordedSection() + notesSection() + laterSection() + recordGroup() + '</div></div>' +
+      faceFooter() + '</section>' + (drawer ? doseDrawer() : '');
+    PP.apply(document.getElementById('screen'));
+  }
+  function tick() { clock += 1; var h = Math.floor(clock / 60), m = clock % 60; return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m; }
+  function commit(d, n, extra) {
+    var s = status(d);
+    recs.push(R(d.id, n, tick(), ME, extra));
+    if (extra && extra.castr) { var k = extra.castr.hernia + extra.castr.cryptorchid + extra.castr.deferred + extra.castr.kept; receipt = [k ? 'castr' : 'castr_all', d.id, extra.castr.c, k]; }
+    else if (extra && extra.deferred) receipt = ['deferred', d.id, n, extra.deferred.n];
+    else receipt = [s === 'later' ? 'early' : s === 'due' ? 'saved' : 'late', d.id, n];
+  }
+  document.getElementById('screen').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-action]');
+    if (!b) return;
+    var a = b.dataset.action, v = b.dataset.value;
+    if (a === 'record') {
+      var d = dose(v), o = owed(d);
+      // A second tap does nothing: another hand's mark already covers these piglets.
+      if (name === 'done-by-other' && v === 'iron3') { receipt = ['already', v, 0, 0, '08:40', 'L.M']; render(); return; }
+      if (!o.n) return;
+      commit(d, o.n, d.castrate ? { castr: { c: o.n, hernia: 0, cryptorchid: 0, deferred: 0, kept: 0 } } : null);
+      render();
+    } else if (a === 'open-dose') {
+      var dd = dose(v);
+      if (isDone(dd)) return;
+      drawer = drafts[v] || freshDraft(dd); render();
+    } else if (a === 'step') {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      var step = +b.dataset.step;
+      if (drawer.castr) drawer.castr[v] += step; else { drawer.n += step; if (drawer.n === owed(dose(drawer.dose)).n) drawer.reason = ''; }
+      render();
+    } else if (a === 'reason') { drawer.reason = v; render(); }
+    else if (a === 'back') { drafts[drawer.dose] = drawer; drawer = null; render(); }
+    else if (a === 'clear') { drawer = freshDraft(dose(drawer.dose)); delete drafts[drawer.dose]; render(); }
+    else if (a === 'save') {
+      var sd = dose(drawer.dose);
+      if (sd.castrate) commit(sd, drawer.castr.c, { castr: Object.assign({}, drawer.castr) });
+      else {
+        var rest = owed(sd).n - drawer.n;
+        commit(sd, drawer.n, rest > 0 ? { deferred: { n: rest, reason: drawer.reason } } : null);
+      }
+      delete drafts[drawer.dose]; drawer = null; render();
+    } else document.documentElement.setAttribute('data-door', a + ':' + (v || ''));
+  });
+  PP.ready.then(render);
+})();
+</script>
+</body>
+</html>

@@ -28,6 +28,18 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "inspection", "url": "ux/system/inspection-astra-concept.html", "locales": ["en"],
       "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] },
     { "name": "pp-index", "url": "ux/tasks/piglet-processing/index.html", "strict": true },
+    { "name": "pp-litter-litter", "url": "ux/tasks/piglet-processing/litter.html?state=litter", "strict": true },
+    { "name": "pp-litter-litter-partial", "url": "ux/tasks/piglet-processing/litter.html?state=litter-partial", "strict": true },
+    { "name": "pp-litter-litter-short-count", "url": "ux/tasks/piglet-processing/litter.html?state=litter-short-count", "strict": true },
+    { "name": "pp-litter-litter-short-saved", "url": "ux/tasks/piglet-processing/litter.html?state=litter-short-saved", "strict": true },
+    { "name": "pp-litter-castrate", "url": "ux/tasks/piglet-processing/litter.html?state=castrate", "strict": true },
+    { "name": "pp-litter-castrate-saved", "url": "ux/tasks/piglet-processing/litter.html?state=castrate-saved", "strict": true },
+    { "name": "pp-litter-done-by-other", "url": "ux/tasks/piglet-processing/litter.html?state=done-by-other", "strict": true },
+    { "name": "pp-litter-early", "url": "ux/tasks/piglet-processing/litter.html?state=early", "strict": true },
+    { "name": "pp-litter-late", "url": "ux/tasks/piglet-processing/litter.html?state=late", "strict": true },
+    { "name": "pp-litter-missed", "url": "ux/tasks/piglet-processing/litter.html?state=missed", "strict": true },
+    { "name": "pp-litter-double-flag", "url": "ux/tasks/piglet-processing/litter.html?state=double-flag", "strict": true },
+    { "name": "pp-litter-all-done", "url": "ux/tasks/piglet-processing/litter.html?state=all-done", "strict": true },
     { "name": "ds-field-cards", "url": "ux/design-system/components/field-cards-demo.html", "strict": true }
   ]
 }
