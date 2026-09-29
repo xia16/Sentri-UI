@@ -1400,25 +1400,88 @@ test('select.explain: each open line with a death door (losses) and ranked Move 
   allBalanced(d2);
 });
 
-test('select.counts: the standing count is the latest by tap time; it supersedes, never sums; a count that crossed an unseen death is flagged', () => {
+test('select.counts: a count that saw the other stands and supersedes; a count that crossed an unseen death is flagged', () => {
   const b = book();
-  const f = b.farrowed('A', 14);
-  b.count('A', 13, { baseAlive: 14, at: on(3, '09:40') });
-  b.death('A', [{ cause: 'crushed', n: 1 }], { at: on(3, '09:45') });
-  const late = b.count('A', 12, { baseAlive: 14, seen: [f.id], at: on(3, '09:50') });
+  b.farrowed('A', 14);
+  const g = b.count('A', 13, { baseAlive: 14, at: on(3, '09:40') });
+  const dd = b.death('A', [{ cause: 'crushed', n: 1 }], { at: on(3, '09:45') });
+  const late = b.count('A', 12, { baseAlive: 14, seen: [g.id], at: on(3, '09:50') });   // saw G.H's count, not the death
   const d = run(b, IRON_ONLY);
   const c = select.counts(d, 'A');
-  assert.equal(d.litters.A.alive, 12);                  // the later count stands: not 14 − 1 − 1 − 2
+  assert.equal(d.litters.A.alive, 12);                  // never summed: not 14 − 1 − 1 − 2
   assert.equal(d.litters.A.unexplained.openLoss, 1);    // one line at most: 14 − 1 dead − 12 seen
-  assert.equal(c.counts[1].id, late.id); assert.equal(c.standing, late.id);
-  assert.equal(c.counts[1].stands, true); assert.equal(c.counts[1].wrote, -1); assert.equal(c.counts[1].deviceDiff, -2);
-  assert.equal(c.counts[1].review, true); assert.equal(c.review, true);
+  assert.equal(c.standing, late.id);
+  const k = c.counts.find((x) => x.id === late.id);
+  assert.equal(k.stands, true); assert.equal(k.wrote, -1); assert.equal(k.deviceDiff, -2); assert.equal(k.sizedAgainst, 13);
+  assert.deepEqual(k.crossed, [dd.id]); assert.equal(c.review, true); assert.equal(c.conflict, false);
   allBalanced(d);
   // a later count, online, settles the review; the flagged count stays in the trail
   b.count('A', 12, { baseAlive: 12, at: on(3, '10:00') });
   const d2 = run(b, IRON_ONLY), c2 = select.counts(d2, 'A');
   assert.equal(c2.review, false); assert.equal(c2.counts[1].review, true); assert.equal(c2.counts[2].stands, true);
   assert.equal(d2.litters.A.unexplained.openLoss, 1);
+});
+
+test('no clock ordering: two causally concurrent counts disagree — neither stands, neither writes a line, in either arrival order', () => {
+  const mk = (first) => {
+    const b = book();
+    const f = b.farrowed('A', 12);
+    const a = () => b.count('A', 13, { seen: [f.id], at: on(3, '09:30'), id: 'cA' });
+    const z = () => b.count('A', 9, { seen: [f.id], at: on(3, '09:00'), id: 'cZ' });   // an earlier clock must not matter
+    if (first) { a(); z(); } else { z(); a(); }
+    return b;
+  };
+  for (const first of [true, false]) {
+    const b = mk(first);
+    const d = run(b, IRON_ONLY), L = d.litters.A, c = select.counts(d, 'A');
+    assert.equal(L.alive, 12); assert.equal(L.unexplained.openLoss, 0); assert.equal(L.unexplained.openGain, 0);
+    assert.equal(c.standing, null); assert.equal(c.conflict, true); assert.equal(c.review, true);
+    assert.ok(c.counts.every((k) => !k.stands && k.disputed));
+    assert.ok(L.flags.some((x) => x.reason === 'count_conflict'));
+    assert.ok(balances(L));
+    // a fresh count that saw both settles it: one line at most
+    b.count('A', 13, { at: on(3, '10:00') });
+    const d2 = run(b, IRON_ONLY), c2 = select.counts(d2, 'A');
+    assert.equal(d2.litters.A.alive, 13); assert.equal(d2.litters.A.unexplained.openGain, 1);
+    assert.equal(c2.conflict, false); assert.equal(c2.review, false);
+  }
+});
+
+test('explain lines say what their count was sized against and which count it replaced', () => {
+  const b = book();
+  b.farrowed('A', 12);
+  const p = b.count('A', 10, { at: on(3, '09:00') });
+  const r = b.count('A', 13, { at: on(3, '09:20') });
+  const l = select.explain(run(b, IRON_ONLY), { litter: 'A' }).lines[0];
+  assert.equal(l.id, r.id); assert.equal(l.kind, 'gain'); assert.equal(l.open, 1);
+  assert.equal(l.aliveBefore, 10); assert.equal(l.sizedAgainst, 12);
+  assert.deepEqual(l.replaced, { id: p.id, observed: 10, at: on(3, '09:00'), who: 'G.H' });
+});
+
+test('deathDraft: kMax leaves out the named missing piglets (their loss is theirs)', () => {
+  const b = book();
+  b.farrowed('A', 6);
+  for (let i = 1; i <= 2; i++) b.identity('A', 'add', { rowId: 'r' + i, tag: '00000' + i });
+  b.count('A', 3, { missingRows: ['r1'] });                 // loss 3: r1 named + 2 unnamed
+  const d = run(b, IRON_ONLY);
+  const s = select.deathDraft(d, 'A', { tallies: { crushed: 3 } });
+  assert.equal(s.kMax, 2);
+  const ok = select.deathDraft(d, 'A', { tallies: { crushed: 3 }, k: 2 });
+  assert.equal(ok.why, null);
+  b.death('A', [{ cause: 'crushed', n: 3 }], { fromMissing: 2 });
+  assert.ok(!run(b, IRON_ONLY).litters.A.flags.some((f) => f.reason === 'loss_over_consumed'));
+});
+
+test('explain: a suggested Move with fewer piglets than the named missing rows asks which row', () => {
+  const b = book();
+  b.farrowed('A', 4); b.farrowed('B', 8);
+  for (let i = 1; i <= 4; i++) b.identity('A', 'add', { rowId: 'r' + i, tag: '00000' + i });
+  const loss = b.count('A', 2, { missingRows: ['r1', 'r2'] });
+  b.count('B', 9);
+  const s = select.explain(run(b, IRON_ONLY), { litter: 'A' }).lines[0].suggestions[0];
+  assert.equal(s.move.n, 1); assert.deepEqual(s.pickFrom, ['r1', 'r2']); assert.deepEqual(s.move.rows, []);
+  assert.equal(s.move.explains[0], loss.id);
+  assert.equal(select.moveDraft(run(b, IRON_ONLY), Object.assign({}, s.move, { rows: ['r2'] })).why, null);
 });
 
 test('recount supersedes: 10 then 12 → no open lines', () => {
@@ -1447,17 +1510,16 @@ test('recount supersedes: 13 then 12 → no open lines; the superseded gain\'s u
   assert.ok(balances(L));
 });
 
-test('recount supersedes: offline 9 / online 13 / recount 13 → one line at most; tap order, not arrival, decides', () => {
+test('recount supersedes: offline 9 / online 13 / recount 13 → one line at most; clocks never decide', () => {
   const b = book();
   const f = b.farrowed('A', 12);
   b.count('A', 13, { at: on(3, '09:30') });                             // online, arrives first
-  const off = b.count('A', 9, { seen: [f.id], at: on(3, '09:00') });   // tapped earlier, synced later
+  const off = b.count('A', 9, { seen: [f.id], at: on(3, '09:00') });   // offline: saw neither the online count nor its line
   let d = run(b, IRON_ONLY), L = d.litters.A;
-  assert.equal(L.alive, 13); assert.equal(L.unexplained.openLoss, 0); assert.equal(L.unexplained.openGain, 1);
+  assert.equal(L.alive, 12); assert.equal(L.unexplained.openLoss, 0); assert.equal(L.unexplained.openGain, 0);
   const c = select.counts(d, 'A');
   assert.equal(c.counts.find((k) => k.id === off.id).stands, false);
-  assert.equal(c.review, true);                                         // arrival order ≠ tap order: sync review
-  assert.ok(L.flags.some((x) => x.reason === 'count_order'));
+  assert.equal(c.conflict, true); assert.equal(c.review, true);        // two counts disagree: count again
   b.count('A', 13, { at: on(3, '10:00') });
   d = run(b, IRON_ONLY); L = d.litters.A;
   assert.equal(L.alive, 13); assert.equal(L.unexplained.openLoss + L.unexplained.openGain, 1);
