@@ -368,7 +368,7 @@ export interface PhotosProps {
   key?: string;
   /** The answer line under the header row (role=status, always mounted). */
   hint?: string;
-  /** denied (camera permission) · too-large: the hint is amber. cancelled: nothing is said. */
+  /** denied (camera permission) · too-large: the card's own registered message, amber (it wins over hint). cancelled: nothing is said. */
   error?: '' | 'denied' | 'too-large' | 'cancelled';
   /** Stable id: the camera is `<id>-camera`, thumbnails `<id>-thumb-<n>`. */
   id?: string;
@@ -509,9 +509,12 @@ export interface SentriUI {
   buttonReason(props: { text?: string; id?: string; actions?: FieldAction[]; className?: string; strs?: Strs<'text'>; args?: StrArgs<'text'> }): string;
   /** For delegated clicks: true when the control is aria-disabled; answers it (its reason lines flash and re-announce). */
   guard(el: Element | null, options?: { answer?: boolean; flash?: number }): boolean;
+  /** Focus target only if focus is still inside leaving (a banner at its Undo timeout); returns whether it moved focus. */
+  handFocus(leaving: Element, target: HTMLElement | null): boolean;
   holdButton(props: HoldButtonProps): string;
   /** The hold's rules: commit is true exactly once; repeats are ignored; a second press sooner than minArm is 'early'. */
-  holdStep(state: { phase?: HoldPhase; armedAt?: number | null }, event: HoldEvent, options?: { minArm?: number }): { phase: HoldPhase; armedAt: number | null; commit: boolean; cue: HoldCue };
+  /** A press past armedAt + arm is a fresh first press (re-arms, never commits). */
+  holdStep(state: { phase?: HoldPhase; armedAt?: number | null }, event: HoldEvent, options?: { minArm?: number; arm?: number }): { phase: HoldPhase; armedAt: number | null; commit: boolean; cue: HoldCue };
   /** Wires every hold under root; owns data-phase, aria-disabled and aria-busy. */
   holdBind(root: Element, options?: HoldBindOptions): { settle(el: Element, outcome: 'done' | 'failed' | 'unknown'): HoldPhase; destroy(): void };
   readonly HOLD: { commit: number; arm: number; minArm: number; slop: number; vibrateCommit: number; vibrateRelease: number[] };

@@ -26,7 +26,7 @@ How a state is said. There are two placements, and one rule under both: **colour
 - **Live:** a `live` line is a persistent `role="status"` region with `aria-atomic`.
   - It is **mounted empty**, because content inserted together with its region is not announced. The card writes the content into a `<template>` inside the region.
   - The host calls `SentriUI.liveFill(scope)` once after inserting the markup: it clears the region, then sets it.
-  - To change it later, call `SentriUI.announce(el, SentriUI.statusText(tokens))`, which clears and then sets after 60ms.
+  - To change it later, call `SentriUI.announce(el, SentriUI.statusText(tokens))`, which clears and then sets after 60ms. `announce` keeps the latest message per region and cancels a superseded one, so two calls in quick succession land the second, never an empty region.
 - **Pressed, disabled, focus:** none. Status is text and holds no action. A status that opens something sits inside a Row or a Button, which owns those states.
 - **Error, loading:** not drawn. There is no spinner word: a pending upload is the amber word `waiting to upload`.
 - **Empty:** absent. A row with nothing to flag has no chip; an empty slot stays empty.

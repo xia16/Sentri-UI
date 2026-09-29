@@ -146,3 +146,83 @@ test('button waiting: aria-disabled, focusable, described by its reason; text re
   assert.doesNotMatch(html, /\sdisabled[\s>]/);
   assert.match(UI.button({ label: 'Clear', register: 'text', waiting: true }), /class="st-text-action"[^>]*aria-disabled="true"/);
 });
+
+// ---- Refute round (gpt-6-astra): each class pinned by a test that failed on e32a857 ----
+function fakeHoldDom() {
+  const attrs = { 'data-phase': 'idle' };
+  const b = {
+    isConnected: true,
+    getAttribute: k => (k in attrs ? attrs[k] : null), setAttribute: (k, v) => { attrs[k] = String(v); },
+    removeAttribute: k => { delete attrs[k]; }, hasAttribute: k => k in attrs,
+    querySelector: () => null, closest: () => b,
+  };
+  const handlers = {};
+  const scope = { addEventListener: (n, f) => { handlers[n] = f; }, removeEventListener: () => {}, querySelectorAll: () => [b] };
+  const ev = (key, repeat) => ({ key, repeat, target: b, preventDefault() {}, stopPropagation() {} });
+  return { b, scope, handlers, ev, attrs };
+}
+test('refute 1: a held Enter does not extend the arm window; a press after it re-arms, never commits', () => {
+  let t = 0, commits = 0;
+  const d = fakeHoldDom();
+  const h = UI.holdBind(d.scope, { now: () => t, vibrate: false, onCommit: () => { commits++; } });
+  d.handlers.keydown(d.ev('Enter', false));                 // t=0: arm
+  for (t = 100; t <= 6000; t += 100) d.handlers.keydown(d.ev('Enter', true));   // held 6s: repeats only
+  t = 6500; d.handlers.keydown(d.ev('Enter', false));       // after the 5s deadline
+  assert.equal(commits, 0);
+  assert.equal(d.attrs['data-phase'], 'armed', 'the late press is a fresh first press');
+  t = 7000; d.handlers.keydown(d.ev('Enter', false));       // a deliberate second press inside the new window
+  assert.equal(commits, 1);
+  h.destroy();
+});
+test('refute 1: holdStep enforces the arm deadline against armedAt', () => {
+  const late = UI.holdStep({ phase: 'armed', armedAt: 0 }, { type: 'key', at: 6500 }, { arm: 5000 });
+  assert.equal(late.commit, false);
+  assert.equal(late.phase, 'armed');
+  assert.equal(late.armedAt, 6500);
+  assert.equal(UI.holdStep({ phase: 'armed', armedAt: 0 }, { type: 'key', at: 4900 }, { arm: 5000 }).commit, true);
+});
+test('refute 2: two guard calls 30ms apart keep the reason (announce never reads the emptied DOM)', async () => {
+  const reason = { innerHTML: 'Choose a cause for 2 crushed to save', getAttribute: k => (k === 'role' ? 'status' : null), setAttribute() {}, removeAttribute() {} };
+  const btn = { getAttribute: k => (k === 'aria-disabled' ? 'true' : k === 'aria-describedby' ? 'why' : null) };
+  const prev = globalThis.document;
+  globalThis.document = { getElementById: id => (id === 'why' ? reason : null) };
+  try {
+    UI.guard(btn, { flash: 10 });
+    await new Promise(r => setTimeout(r, 30));
+    UI.guard(btn, { flash: 10 });
+    await new Promise(r => setTimeout(r, 150));
+    assert.equal(reason.innerHTML, 'Choose a cause for 2 crushed to save');
+  } finally { globalThis.document = prev; }
+});
+test('refute 2: a superseded announcement never lands', async () => {
+  const el = { innerHTML: '' };
+  UI.announce(el, 'first');
+  UI.announce(el, 'second');
+  await new Promise(r => setTimeout(r, 150));
+  assert.equal(el.innerHTML, 'second');
+});
+test('refute 3: a capture error resolves to its registered message, amber, without a caller hint', () => {
+  const strings = JSON.parse(readFileSync(new URL('../ux/laws/strings.json', import.meta.url), 'utf8')).strings;
+  for (const [error, id] of [['denied', 'ds.c2.photos.denied'], ['too-large', 'ds.c2.photos.too_large']]) {
+    const html = UI.photos({ error });
+    assert.match(html, new RegExp(`data-tone="amber"><span class="st-field-hint-text"><span data-str="${id.replace(/\./g, '\\.')}">`));
+    assert.ok(html.includes(strings[id].en), `${error}: the en message is the fallback text`);
+    assert.ok(strings[id].zh, `${error}: zh is registered`);
+  }
+  assert.doesNotMatch(UI.photos({ error: 'cancelled' }), /st-field-hint-text/, 'a cancelled capture says nothing');
+});
+test('refute 4: handFocus moves focus only when it is still inside what is leaving', () => {
+  let focused = 0;
+  const target = { focus: () => { focused++; } };
+  const inside = {}, outside = {};
+  const leaving = { contains: n => n === inside };
+  const prev = globalThis.document;
+  try {
+    globalThis.document = { activeElement: outside };
+    assert.equal(UI.handFocus(leaving, target), false);
+    assert.equal(focused, 0, 'focus elsewhere is left alone');
+    globalThis.document = { activeElement: inside };
+    assert.equal(UI.handFocus(leaving, target), true);
+    assert.equal(focused, 1);
+  } finally { globalThis.document = prev; }
+});

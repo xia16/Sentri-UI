@@ -411,12 +411,19 @@
   /* A live region is mounted empty and filled afterwards: content inserted with the region is not announced.
      The card writes the content into a <template> inside the region; liveFill(root) moves it in (clear, then set). */
   const live=(tag,attrs,html)=>`<${tag}${attrs} role="status" aria-live="polite" aria-atomic="true" data-live=""><template>${html}</template></${tag}>`;
+  /* The latest message per region is kept here, not read back from the DOM (which is empty while an announcement is
+     in flight); a newer announcement cancels the one it supersedes. */
+  const liveState=new WeakMap();
   function announce(el,html,{delay=60,then}={}){
     if(!el)return;
+    const prev=liveState.get(el);if(prev&&prev.timer)clearTimeout(prev.timer);
+    const st={html,timer:null};liveState.set(el,st);
     el.innerHTML='';
-    const set=()=>{el.innerHTML=html;if(then)then(el);};
-    if(delay<=0)set();else setTimeout(set,delay);
+    const set=()=>{st.timer=null;if(liveState.get(el)!==st)return;el.innerHTML=st.html;if(then)then(el);};
+    if(delay<=0)set();else st.timer=setTimeout(set,delay);
   }
+  /* The message a region holds or is about to hold. */
+  const liveMessage=el=>{const st=liveState.get(el);return st?st.html:el.innerHTML;};
   function liveFill(scope,{delay=60,then}={}){
     (scope&&scope.querySelectorAll?Array.from(scope.querySelectorAll('[data-live]')):[]).forEach(el=>{
       const tpl=el.querySelector(':scope > template');
@@ -456,15 +463,18 @@
      under it, thumbnails beneath. Inactive until there is something to attach to; at max the camera grays the same way
      (floor-gray: aria-disabled, still tappable, data-reason says why, answered in the line). Thumbnails open the viewer.
      error: 'denied' (camera permission) · 'too-large' — answered amber; a cancelled capture says nothing. */
+  const PHOTO_ERRORS={denied:{id:'ds.c2.photos.denied',en:'Camera not allowed · allow it in Settings, then try again'},'too-large':{id:'ds.c2.photos.too_large',en:'Photo too large to attach · take it again'}};
   function photos({label='Photos',optional='',count=null,active=true,items=[],max=12,action='photo-add',viewAction='photo-view',key='photos',hint='',error='',id='',className='',strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{},pid=id||fieldId('st-photos'),hid=pid+'-hint',lid=pid+'-label';
     const err=oneOf('Photos','error',error,['denied','too-large','cancelled'],'');
+    const ERR=PHOTO_ERRORS[err];
     const list=items||[],full=list.length>=max,reason=!active?'inactive':full?'full':'';
     const countHtml=count==null?'':`<small class="st-photos-count">${Array.isArray(count)?toks(count,{dot:true}):part(count)}</small>`;
     const head=`<div class="st-photos-head"><span class="st-photos-label" id="${esc(lid)}"><span${sa(s.label,a.label)}>${esc(label)}</span>${optional||has(o,'optional')?`<small>${tx(optional,o,'optional')}</small>`:''}${countHtml}</span><button type="button" class="st-photos-camera" id="${esc(pid)}-camera" data-action="${esc(action)}" data-value="${esc(key)}" aria-describedby="${esc(hid)}"${reason?` aria-disabled="true" data-reason="${reason}"`:''}${ariaText('Take a photo',s.camera,a.camera)}>${glyph('camera')}</button></div>`;
     const thumb=(it,i)=>`<li><button type="button" class="st-photos-thumb" id="${esc(pid)}-thumb-${i+1}" data-action="${esc(viewAction)}" data-value="${esc(it.id!=null?it.id:i)}"${it.pending?' data-pending=""':''}${ariaText(it.alt||`Photo ${i+1}${it.pending?' · waiting to upload':''}`,it.pending?s.thumbPending:s.thumb,{n:i+1})}>${it.src?`<img src="${esc(it.src)}" alt="">`:`<span class="st-photos-index"${sa(s.index,{n:i+1})}>${i+1}</span>`}</button></li>`;
     const thumbs=list.length?`<ul class="st-photos-items" aria-labelledby="${esc(lid)}">${list.map(thumb).join('')}</ul>`:'';
-    const hl=hintLine('st-photos-hint',{id:hid,text:err==='cancelled'?'':hint,tone:err&&err!=='cancelled'?'warn':'',o});
+    // An error is answered with its own registered message (it wins over hint); a cancelled capture says nothing.
+    const hl=ERR?hintLine('st-photos-hint',{id:hid,text:ERR.en,tone:'warn',o:{strs:{hint:ERR.id}}}):hintLine('st-photos-hint',{id:hid,text:err==='cancelled'?'':hint,o});
     return `<div class="st-photos ${esc(className)}" data-ds="Photos" id="${esc(pid)}" data-field="${esc(key)}"${!active?' data-inactive=""':''}${full?' data-full=""':''}${err?` data-error="${err}"`:''}>${head}${hl}${thumbs}</div>`;
   }
   /* Button, as a factory. Registers (RULINGS, three button registers + the text action): primary (the one commit,
@@ -489,9 +499,17 @@
     if(answer&&root.document){
       (el.getAttribute('aria-describedby')||'').split(/\s+/).filter(Boolean).forEach(rid=>{
         const r=root.document.getElementById(rid);if(!r||!/status/.test(r.getAttribute('role')||''))return;
-        announce(r,r.innerHTML);r.setAttribute('data-answer','');clearTimeout(r._stAnswer);r._stAnswer=setTimeout(()=>r.removeAttribute('data-answer'),flash);
+        announce(r,liveMessage(r));r.setAttribute('data-answer','');clearTimeout(r._stAnswer);r._stAnswer=setTimeout(()=>r.removeAttribute('data-answer'),flash);
       });
     }
+    return true;
+  }
+  /* When something leaves (a banner at its Undo timeout, a cleared field's Clear), move focus to target only if focus is
+     still inside what is leaving; focus the worker put elsewhere is left alone. Returns whether it moved focus. */
+  function handFocus(leaving,target){
+    const a=root.document&&root.document.activeElement;
+    if(!leaving||!a||!leaving.contains||!leaving.contains(a))return false;
+    if(target&&target.focus)target.focus();
     return true;
   }
   /* Hold-to-commit (Button `hold`): the suite's irreversible acts (Lock born N, the sow's death, End task).
@@ -511,7 +529,7 @@
      'escape' · 'elapsed' · { type:'key', at, repeat } · 'timeout' · { type:'settle', outcome:'done'|'failed'|'unknown' }.
      Returns { phase, armedAt, commit, cue }: commit is true exactly once. A repeated key (held Enter) is ignored, and a
      second press sooner than minArm after arming is answered ('early') and does not commit. */
-  function holdStep(state,event,{minArm=HOLD.minArm}={}){
+  function holdStep(state,event,{minArm=HOLD.minArm,arm=HOLD.arm}={}){
     const phase=(state&&state.phase)||'idle',armedAt=state&&state.armedAt!=null?state.armedAt:null;
     const ev=typeof event==='string'?{type:event}:(event||{});
     const out=(p,commit=false,cue=null,at=null)=>({phase:p,armedAt:at,commit,cue});
@@ -530,6 +548,8 @@
         if(ev.repeat)return out(phase,false,null,armedAt);
         if(phase==='idle')return out('armed',false,'again',ev.at!=null?ev.at:0);
         if(phase==='armed'){
+          // Past the arm window (whatever the timers did): this press is a fresh first press.
+          if(armedAt!=null&&ev.at!=null&&ev.at-armedAt>arm)return out('armed',false,'again',ev.at);
           if(armedAt!=null&&ev.at!=null&&ev.at-armedAt<minArm)return out('armed',false,'early',armedAt);
           return out('pending',true,'pending');
         }
@@ -568,7 +588,7 @@
       if(r.commit)onCommit(b);
       return r;
     }
-    const step=(b,e)=>apply(b,holdStep({phase:b.getAttribute('data-phase'),armedAt:armedAt.get(b)},e,{minArm}));
+    const step=(b,e)=>apply(b,holdStep({phase:b.getAttribute('data-phase'),armedAt:armedAt.get(b)},e,{minArm,arm:armFor}));
     const stop=()=>{clearTimeout(timer);timer=null;el=null;pid=null;};
     const refuse=b=>{guard(b);onRefused(b);};
     const down=e=>{const b=e.target.closest&&e.target.closest(selector);if(!b||e.button!==0||el)return;remember(b);
@@ -582,12 +602,14 @@
     const move=e=>{if(!mine(e))return;const r=el.getBoundingClientRect();
       if(e.clientX<r.left-slop||e.clientX>r.right+slop||e.clientY<r.top-slop||e.clientY>r.bottom+slop){const x=el;stop();step(x,'leave');}};
     const cancel=e=>{if(!mine(e))return;const x=el;stop();step(x,'cancel');};
-    const press=(b,repeat)=>{remember(b);
-      if(b.hasAttribute('data-waiting')){if(!repeat)refuse(b);return;}
+    // A repeat (a key held down) is ignored before anything else: it never touches the timers or the phase.
+    const press=(b,repeat)=>{if(repeat)return;remember(b);
+      if(b.hasAttribute('data-waiting')){refuse(b);return;}
       if(b.getAttribute('aria-disabled')==='true')return;
-      const r=step(b,{type:'key',at:now(),repeat});
-      clearTimeout(armTimer);
-      if(r.phase==='armed')armTimer=setTimeout(()=>{if(b.getAttribute('data-phase')==='armed')step(b,'timeout');},armFor);};
+      const was=armedAt.get(b),r=step(b,{type:'key',at:now()});
+      // The deadline belongs to armedAt: a new timer only when a new arm began, and it fires at armedAt + armFor.
+      if(r.phase!=='armed'){clearTimeout(armTimer);armTimer=null;return;}
+      if(r.armedAt!==was){clearTimeout(armTimer);const at=r.armedAt;armTimer=setTimeout(()=>{if(b.getAttribute('data-phase')==='armed'&&armedAt.get(b)===at)step(b,'timeout');},Math.max(0,at+armFor-now()));}};
     const key=e=>{
       if(e.key==='Escape'){let hit=false;scope.querySelectorAll(selector).forEach(b=>{if(['holding','armed'].includes(b.getAttribute('data-phase'))){hit=true;if(el===b)stop();step(b,'escape');}});if(hit){e.stopPropagation();e.preventDefault();}return;}
       const b=e.target.closest&&e.target.closest(selector);if(!b||(e.key!=='Enter'&&e.key!==' '))return;
@@ -654,7 +676,7 @@
     scope.addEventListener('keydown',key);
     return {destroy(){scope.removeEventListener('keydown',key);}};
   }
-  const api=Object.freeze({heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind});
+  const api=Object.freeze({heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

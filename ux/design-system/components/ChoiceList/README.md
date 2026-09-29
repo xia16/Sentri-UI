@@ -88,7 +88,7 @@ Compose it from four calls:
   - Space and Enter select through the ordinary click.
   - The pure rule is `SentriUI.radioNext(values, current, key)`, which the tests cover.
 - **Roving tab stop:** the selected option, or the first, has `tabindex="0"`; the others have `-1`.
-- **Focus return:** after `Clear`, focus moves to the group's tab stop (the first option).
+- **Focus return:** after `Clear`, focus moves to the group's tab stop (the first option), through `SentriUI.handFocus(clearButton, firstOption)`, because Clear itself leaves the page. If focus is elsewhere, it stays there.
 - Re-render by patching the group, and keep it mounted so focus survives.
 
 **Strings (radio)**

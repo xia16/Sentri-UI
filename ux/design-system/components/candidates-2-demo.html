@@ -123,7 +123,7 @@
     st('photos_empty', ph({ key: 'ph-empty' })),
     st('photos_some', ph({ key: 'ph-some', items: items(3, 3), count: [p('ds.c2.photos.attached', { n: 3 }), p('ds.c2.photos.waiting', { n: 1 }, 'amber')] })),
     st('photos_full', ph({ key: 'ph-full', items: items(12), count: p('ds.c2.photos.attached', { n: 12 }), hint: '' }, { strs: { hint: 'ds.c2.photos.full' }, args: { hint: { n: 12 } } })),
-    st('photos_error', ph({ key: 'ph-denied', error: 'denied', hint: '' }, { strs: { hint: 'ds.c2.photos.denied' } })),
+    st('photos_error', ph({ key: 'ph-denied', error: 'denied' })),
     st('photos_states', ph({ key: 'ph-states', items: items(2), count: p('ds.c2.photos.attached', { n: 2 }) }))
   ]);
 

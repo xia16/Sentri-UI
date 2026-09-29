@@ -33,7 +33,7 @@ Call `SentriUI.photos({ label, optional, count, active, items, max, action, view
 - **Live** (the default): the ringed `paper` circle.
 - **Attached:** thumbnails under the header. The count says how many photos there are and how many wait to upload. Uploads queue offline. Nothing ever waits on a photo, and Save never gates on one.
 - **Full** (`items.length >= max`, 12): the camera grays the same way (`data-reason="full"`), and the tap is answered (`12 photos at most`).
-- **Errors:**
+- **Errors:** the card resolves each kind to its own registered message (en and zh, in `strings.json`), in amber in the answer line. The caller passes only `error`, never a hint for it, and an error wins over `hint`.
   - `error: 'denied'`: camera permission was refused. The answer is amber (`Camera not allowed · allow it in Settings, then try again`).
   - `error: 'too-large'`: amber (`Photo too large to attach · take it again`).
   - `error: 'cancelled'`: the worker backed out of the camera, so **nothing is said**.
@@ -59,6 +59,7 @@ Call `SentriUI.photos({ label, optional, count, active, items, max, action, view
   - Once saved, photos are evidence: the viewer opened from History shows `Back` only. There is no Delete from History in v1.
 - **Focus return:**
   - After the viewer closes, focus returns to the thumbnail that opened it, or to the camera if that thumbnail was deleted.
+  - When the answer line's `Undo` expires, use `SentriUI.handFocus(line, camera)`: focus moves only if it is still on the expiring `Undo`.
   - After a capture, focus returns to the camera.
 - **Slots:** the label, optional word and count; the answer line; the thumbnails.
 

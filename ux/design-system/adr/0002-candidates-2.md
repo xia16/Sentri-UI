@@ -107,6 +107,18 @@ The test for a new card is a second consumer and a shape no existing card can ta
 
 **Every card README** gains a **Component contract** section: props, emitted events with their payloads, slots and ids. There are stable `id` props, and unknown enum values warn in development.
 
+## What the refute pass changed (other model family, on e32a857)
+
+All four majors were accepted. Each class is pinned by a test that failed on e32a857 (`tests/candidates-2.test.mjs`, "refute 1–4").
+1. **A held Enter extended the arm window.** Every repeated keydown restarted the 5s timer, so holding Enter for 6s and pressing again at 6.5s committed.
+   - Repeats are now ignored before any timer is touched.
+   - `holdStep` enforces the deadline against `armedAt` (`arm` option): a press after the window re-arms and never commits.
+2. **Two quick waiting taps emptied the reason.** `guard` re-announced the region's current HTML, which `announce` had just cleared.
+   - `announce` now keeps the latest message per region and cancels superseded announcements.
+   - `guard` re-announces that message, not the DOM.
+3. **`photos({ error: 'denied' })` rendered an empty line.** The card now resolves `denied` and `too-large` to their registered messages (`ds.c2.photos.denied` / `.too_large`, en and zh) in amber, and the demo passes no hint for them.
+4. **Banner expiry stole focus.** New `handFocus(leaving, target)` moves focus only when it is still inside what is leaving. The Banner, ChoiceList Clear and Photos Undo contracts use it.
+
 ## Deviations still for the owner's nod
 
 These are to be recorded in the map's provisional ledger.

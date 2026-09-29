@@ -55,6 +55,7 @@ The footer and bar actions. It is a CSS component (`<button class="button primar
 - **A tap is answered:** the host's delegated click calls `SentriUI.guard(el)` first. When the control is `aria-disabled`, guard returns true, and every status line the control is described by:
   - flashes (`data-answer`: an `amber-wash` highlight that fades over 1.1s, with no fade under reduced motion);
   - re-announces (it is cleared, then set again after 60ms).
+  - The message is kept by `announce` itself, never read back from the region (which is empty while an announcement is in flight). A newer announcement cancels the one it supersedes, so rapid taps never empty the reason.
 - Prefer omission when the worker cannot make the button live from this sheet. Use waiting when one visible step makes it live (`Choose a cause for 2 crushed to save`).
 - **Busy** (`busy: true`): sent, until the host settles. `aria-disabled` and `aria-busy`, with the waiting face (a row's one-tap after its first tap).
 
@@ -80,7 +81,8 @@ The footer and bar actions. It is a CSS component (`<button class="button primar
   - A quick tap (under 300ms) is answered `Keep holding to save`.
 - **Keyboard and switch — a two-step:**
   - The first press arms. A second press **at least 400ms later** and within **`hold-arm` (5s)** commits.
-  - A key held down (`keydown.repeat`) is ignored.
+  - A key held down (`keydown.repeat`) is ignored **before anything else**: it never touches the phase or the arm timer.
+  - The deadline belongs to `armedAt`. `holdStep` checks every press against `armedAt + hold-arm` whatever the timers did, and a press after the window is a fresh first press (it arms again and never commits). The timer only exists to show the disarm on time.
   - A press sooner than 400ms is answered (`early`) and does not re-arm.
   - Blur, Escape or the timeout disarms.
   - Escape stops propagating, so it does not also close the sheet.

@@ -48,7 +48,7 @@ Call `SentriUI.banner({ tone, headline, consequence, summary, actions, live, id 
 - **Focus return:**
   - After `Clear`, focus moves to `Undo`.
   - After `Undo`, focus moves to `Clear`.
-  - When the banner goes away (the timeout, or the last change undone by hand), focus moves to the sheet's first field, which the host names.
+  - When the banner goes away (the Undo timeout, or the last change undone by hand), call `SentriUI.handFocus(banner, firstField)` before removing it. It moves focus to the sheet's first field (which the host names) **only if focus is still inside the banner**; focus the worker has put elsewhere is left alone.
 - **Slots:** headline, consequence, summary tokens, and actions.
 
 **Don'ts**
