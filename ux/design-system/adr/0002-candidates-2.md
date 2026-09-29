@@ -119,6 +119,11 @@ All four majors were accepted. Each class is pinned by a test that failed on e32
 3. **`photos({ error: 'denied' })` rendered an empty line.** The card now resolves `denied` and `too-large` to their registered messages (`ds.c2.photos.denied` / `.too_large`, en and zh) in amber, and the demo passes no hint for them.
 4. **Banner expiry stole focus.** New `handFocus(leaving, target)` moves focus only when it is still inside what is leaving. The Banner, ChoiceList Clear and Photos Undo contracts use it.
 
+**Refute round 2 (on 188a61d), one major accepted.** A `guard` replay dropped the host's localization.
+- `announce` cached the raw payload but not its `then`, so a zh host that fills `data-str` ids in `then` saw the reason go blank on a tap. A tap during the first 60ms cancelled the localization entirely.
+- Now the message and its `then` are stored together, and every replay runs `then` again.
+- Two tests pin both timings: a tap after the reason rendered, and a tap during the first delay.
+
 ## Deviations still for the owner's nod
 
 These are to be recorded in the map's provisional ledger.

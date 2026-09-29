@@ -417,13 +417,14 @@
   function announce(el,html,{delay=60,then}={}){
     if(!el)return;
     const prev=liveState.get(el);if(prev&&prev.timer)clearTimeout(prev.timer);
-    const st={html,timer:null};liveState.set(el,st);
+    const st={html,then,timer:null};liveState.set(el,st);
     el.innerHTML='';
     const set=()=>{st.timer=null;if(liveState.get(el)!==st)return;el.innerHTML=st.html;if(then)then(el);};
     if(delay<=0)set();else st.timer=setTimeout(set,delay);
   }
-  /* The message a region holds or is about to hold. */
-  const liveMessage=el=>{const st=liveState.get(el);return st?st.html:el.innerHTML;};
+  /* The message a region holds or is about to hold, with the host's `then` (its localization), so a replay renders
+     exactly as the first announcement did, whether it lands before or after that first one rendered. */
+  const liveMessage=el=>{const st=liveState.get(el);return st?{html:st.html,then:st.then}:{html:el.innerHTML,then:null};};
   function liveFill(scope,{delay=60,then}={}){
     (scope&&scope.querySelectorAll?Array.from(scope.querySelectorAll('[data-live]')):[]).forEach(el=>{
       const tpl=el.querySelector(':scope > template');
@@ -499,7 +500,7 @@
     if(answer&&root.document){
       (el.getAttribute('aria-describedby')||'').split(/\s+/).filter(Boolean).forEach(rid=>{
         const r=root.document.getElementById(rid);if(!r||!/status/.test(r.getAttribute('role')||''))return;
-        announce(r,liveMessage(r));r.setAttribute('data-answer','');clearTimeout(r._stAnswer);r._stAnswer=setTimeout(()=>r.removeAttribute('data-answer'),flash);
+        const m=liveMessage(r);announce(r,m.html,{then:m.then||undefined});r.setAttribute('data-answer','');clearTimeout(r._stAnswer);r._stAnswer=setTimeout(()=>r.removeAttribute('data-answer'),flash);
       });
     }
     return true;

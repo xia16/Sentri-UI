@@ -226,3 +226,41 @@ test('refute 4: handFocus moves focus only when it is still inside what is leavi
     assert.equal(focused, 1);
   } finally { globalThis.document = prev; }
 });
+
+// ---- Refute round 2 (on 188a61d): a guard replay keeps the host's localization ----
+function localizingLine() {
+  const line = { innerHTML: '', getAttribute: k => (k === 'role' ? 'status' : null), setAttribute() {}, removeAttribute() {} };
+  let runs = 0;
+  // A zh host: the payload has an empty fallback and a data-str id; `then` (PP.apply) fills it.
+  const then = el => { runs++; el.innerHTML = el.innerHTML.replace('<span data-str="why"></span>', '<span data-str="why">保存前请选择原因</span>'); };
+  return { line, then, runs: () => runs };
+}
+async function withDoc(line, fn) {
+  const prev = globalThis.document;
+  globalThis.document = { getElementById: id => (id === 'why' ? line : null) };
+  try { await fn(); } finally { globalThis.document = prev; }
+}
+const waitBtn = { getAttribute: k => (k === 'aria-disabled' ? 'true' : k === 'aria-describedby' ? 'why' : null) };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+test('refute 2b: a tap after the reason rendered replays it localized', async () => {
+  const L = localizingLine();
+  await withDoc(L.line, async () => {
+    UI.announce(L.line, '<span data-str="why"></span>', { then: L.then });
+    await sleep(100);
+    assert.match(L.line.innerHTML, /保存前请选择原因/);
+    UI.guard(waitBtn, { flash: 10 });
+    await sleep(100);
+    assert.match(L.line.innerHTML, /保存前请选择原因/, 'the replay is localized, not blank');
+  });
+});
+test('refute 2b: a tap during the first delay still localizes the reason', async () => {
+  const L = localizingLine();
+  await withDoc(L.line, async () => {
+    UI.announce(L.line, '<span data-str="why"></span>', { then: L.then });
+    await sleep(20);
+    UI.guard(waitBtn, { flash: 10 });
+    await sleep(150);
+    assert.ok(L.runs() >= 1, 'the localization ran');
+    assert.match(L.line.innerHTML, /保存前请选择原因/);
+  });
+});

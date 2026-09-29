@@ -55,7 +55,7 @@ The footer and bar actions. It is a CSS component (`<button class="button primar
 - **A tap is answered:** the host's delegated click calls `SentriUI.guard(el)` first. When the control is `aria-disabled`, guard returns true, and every status line the control is described by:
   - flashes (`data-answer`: an `amber-wash` highlight that fades over 1.1s, with no fade under reduced motion);
   - re-announces (it is cleared, then set again after 60ms).
-  - The message is kept by `announce` itself, never read back from the region (which is empty while an announcement is in flight). A newer announcement cancels the one it supersedes, so rapid taps never empty the reason.
+  - The message is kept by `announce` itself, never read back from the region (which is empty while an announcement is in flight). A newer announcement cancels the one it supersedes, so rapid taps never empty the reason. The host's `then` (its localization, such as `PP.apply`) is stored with the message and runs on every replay, so a tap re-announces the reason localized, before or after the first announcement rendered.
 - Prefer omission when the worker cannot make the button live from this sheet. Use waiting when one visible step makes it live (`Choose a cause for 2 crushed to save`).
 - **Busy** (`busy: true`): sent, until the host settles. `aria-disabled` and `aria-busy`, with the waiting face (a row's one-tap after its first tap).
 
