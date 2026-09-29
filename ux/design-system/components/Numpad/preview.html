@@ -1,4 +1,4 @@
-<!-- @dsCard group="Fields" height=1400 subtitle="Candidate · the one pad, for ear tags and weights" -->
+<!-- @dsCard group="Fields" height=3600 subtitle="Candidate · the one pad, for ear tags and weights" -->
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}.stack>*+*{margin-top:24px}</style></head>
@@ -11,11 +11,17 @@ const recent = [['000257', '1.51'], ['000256', '1.38'], ['000255', '1.44']].map(
 const tag = o => UI.numpad({ label: 'Piglet 5 of 11 · ear tag', maxLength: 6, key: 'tag', recent, ...o });
 n.innerHTML = [
   tag({ value: '0002' }),
-  tag({ value: '', recent: [], label: 'Empty · piglet 1 of 11 · ear tag' }),
-  tag({ value: '000258', suggested: true, hint: 'Next tag in sequence · type to replace' }),
-  tag({ value: '000258', label: 'Full · piglet 5 of 11 · ear tag' }),
-  tag({ value: '000254', tone: 'error', hint: '000254 is already on crate B04' }),
-  UI.numpad({ label: 'Piglet 5 of 11 · weight', value: '0.62', unit: 'kg', decimals: 2, tone: 'warn', key: 'weight', hint: 'Outside the usual 1.0–2.8 kg at day 3' }),
+  tag({ value: '', recent: [] }),
+  tag({ value: '000258', suggested: true, hint: 'Next tag · Record to use' }),
+  tag({ value: '00025' }),
+  tag({ value: '', actions: [{ label: 'Use 000258', action: 'numpad-suggestion' }] }),
+  tag({ value: '000258', suggested: true, tone: 'warn', hint: '000258 is already on crate B04 · records anyway' }),
+  tag({ label: 'Piglet 6 of 11 · ear tag', value: '000258', suggested: true, hint: 'Next tag · Record to use', recent: [{ text: '000254 · 1.42 kg · also on B04', tone: 'warn' }, ...recent.slice(0, 2)] }),
+  tag({ value: '12', hint: 'Scan not read · a tag is 6 digits' }),
+  tag({ value: '000258', hint: 'Tag is 6 digits' }),
+  tag({ value: '000254', tone: 'warn', hint: '000254 is already on crate B04 · records anyway' }),
+  tag({ value: '00025', tone: 'warn', hint: '5 of 6 digits' }),
+  UI.numpad({ label: 'Piglet 5 of 11 · weight', value: '0.62', unit: 'kg', decimals: 2, intLength: 2, tone: 'warn', key: 'weight', recent, hint: 'Outside the usual 1.0–2.8 kg at day 3' }),
   UI.numpad({ decimals: 1, value: '16', key: 'pressed' })
 ].map(h => '<div>' + h + '</div>').join('');
 document.querySelector('[data-value="pressed"][data-key="7"]').setAttribute('data-preview', 'pressed');

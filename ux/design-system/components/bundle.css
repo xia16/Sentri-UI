@@ -325,71 +325,87 @@ button.st-row[aria-current="location"]{background:#eaf2e5;box-shadow:inset 3px 0
 .st-choice-search.st-choice-search{margin:0 0 20px}
 .st-choice-empty{margin:0;padding:24px 17px;font:400 13px/1.5 var(--sans,'Plus Jakarta Sans',sans-serif);color:var(--st-muted)}
 
-/* 6 · Field cards (candidate): Stepper, Measure, Numpad.
-   Tokens from tokens.css only. Literals with no token yet, named in each card's README:
-   60px stepper row (craft pass), 54px hero key, 56px pad key, 14/18/20px glyph boxes, 2px caret, 4px hint dot. */
+/* 6 · Field cards (candidate, ADR 0001): Stepper, Measure, Numpad.
+   Tokens only, including the candidate sizes (stepper-row-min, hero-key, glyph-*, caret-width, status-dot, space-key-gap). */
 .st-stepper.st-stepper,.st-measure.st-measure,.st-numpad.st-numpad{margin:0;padding:0;border:0;background:transparent;color:var(--ink);font-family:var(--font-sans)}
-/* shared: keys and boxes */
-.st-stepper-key.st-stepper-key,.st-numpad-key.st-numpad-key{display:grid;place-items:center;flex:none;min-width:0;min-height:0;margin:0;padding:0;border:1px solid var(--control-border);border-radius:var(--radius-control);background:var(--paper);color:var(--ink);box-shadow:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform 120ms ease}
-.st-stepper-key svg,.st-numpad-key svg{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
-.st-stepper-key.st-stepper-key[aria-disabled="true"],.st-numpad-key.st-numpad-key[aria-disabled="true"]{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink);cursor:default}
-:is(.st-stepper-key,.st-numpad-key):not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){transform:scale(.96);background:var(--press)}
-:is(.st-stepper-key,.st-numpad-key,.st-measure-box):is(:focus-visible,[data-preview~="focus"]){outline:3px solid var(--focus);outline-offset:2px}
-.st-field-hint.st-field-hint{display:flex;align-items:baseline;gap:6px;margin:0;padding:0;font:400 var(--type-choice-meta-size)/1.4 var(--font-sans);color:var(--muted)}
+/* shared: keys, faces, hint line, text action */
+.st-stepper-key.st-stepper-key,.st-numpad-key.st-numpad-key{margin:0;padding:0;min-width:0;min-height:0;box-shadow:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.st-stepper-face,.st-numpad-key.st-numpad-key{display:grid;place-items:center;border:1px solid var(--control-border);border-radius:var(--radius-control);background:var(--paper);color:var(--ink);transition:transform 120ms ease}
+:is(.st-stepper-face,.st-numpad-key) svg{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+/* the floor-gray: a key with nothing to do (DS README, States) */
+.st-stepper-key[aria-disabled="true"] .st-stepper-face,.st-numpad-key.st-numpad-key[aria-disabled="true"]{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink);cursor:default}
+.st-stepper-key:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]) .st-stepper-face,.st-numpad-key.st-numpad-key:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){transform:scale(.96);background:var(--press)}
+.st-stepper-key.st-stepper-key:focus-visible{outline:none}
+:is(.st-stepper-key:focus-visible,.st-stepper-key[data-preview~="focus"]) .st-stepper-face,:is(.st-numpad-key,.st-measure-box,.st-stepper-value,.st-text-action):is(:focus-visible,[data-preview~="focus"]){outline:3px solid var(--focus);outline-offset:2px}
+.st-field-hint.st-field-hint{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0;padding:0;font:400 var(--type-input-size)/1.4 var(--font-sans);color:var(--muted)}
+.st-field-hint[data-reserve="text"]{min-height:calc(var(--type-input-size) * 1.4)}
+.st-field-hint[data-reserve="action"]{min-height:var(--touch-min)}
 .st-field-hint[data-tone="amber"]{color:var(--amber)}
-.st-field-hint[data-tone="red"]{color:var(--red)}
-.st-field-hint:is([data-tone="amber"],[data-tone="red"])::before{content:"";flex:none;width:4px;height:4px;border-radius:50%;background:currentColor;transform:translateY(-2px)}
+.st-field-hint[data-tone="amber"]::before{content:"";flex:none;width:var(--status-dot);height:var(--status-dot);border-radius:50%;background:currentColor}
+.st-text-action.st-text-action{display:inline-flex;align-items:center;min-height:var(--touch-min);margin:0;padding:0 8px 0 0;border:0;border-radius:0;background:transparent;color:var(--ink);font:600 var(--type-row-title-size)/1.4 var(--font-sans);cursor:pointer}
 
-/* Stepper · row: label left, `− n +` right, one 60px silhouette in every state */
-.st-stepper.st-stepper{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:var(--space-row-y);min-height:60px}
+/* Stepper · row: label left, `− n +` right; each key's hit area spans the whole row height */
+.st-stepper.st-stepper{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:var(--space-row-y);min-height:var(--stepper-row-min)}
 .st-stepper+.st-stepper{border-top:1px solid var(--rule)}
 .st-stepper-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
 .st-stepper-label{font:600 var(--type-choice-label-size)/1.4 var(--font-sans);color:var(--ink);overflow-wrap:anywhere}
 .st-stepper-description{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
-.st-stepper-keys{display:flex;align-items:center;gap:8px}
-.st-stepper-key.st-stepper-key{width:var(--field-height);height:var(--field-height)}
-.st-stepper-key svg{width:14px;height:14px;stroke-width:2.2}
-.st-stepper-key.st-stepper-key[data-step="1"]:not([aria-disabled="true"]){background:var(--ink);border-color:var(--ink);color:var(--paper)}
-.st-stepper-key[data-step="1"]:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){background:var(--ink);filter:brightness(.96)}
-.st-stepper-value{min-width:3ch;text-align:center;font:500 var(--type-figure-size)/1.2 var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.st-stepper-keys{display:flex;align-items:center;gap:var(--space-key-gap);align-self:stretch}
+.st-stepper-key.st-stepper-key{display:grid;place-items:center;flex:none;width:var(--field-height);min-height:var(--stepper-row-min);align-self:stretch;border:0;border-radius:0;background:transparent;color:inherit}
+.st-stepper-face{width:var(--field-height);height:var(--field-height)}
+.st-stepper-face svg{width:var(--glyph-key);height:var(--glyph-key);stroke-width:2.2}
+.st-stepper-key[data-step^="-"] .st-stepper-face{color:var(--ink)}
+.st-stepper-key:not([data-step^="-"]):not([aria-disabled="true"]) .st-stepper-face{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.st-stepper-key:not([data-step^="-"]):not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]) .st-stepper-face{background:var(--ink);filter:brightness(.96)}
+.st-stepper-value{min-width:3ch;text-align:center;font:500 var(--type-figure-size)/1.2 var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink);-webkit-user-select:none;user-select:none}
+.st-stepper[data-wide] .st-stepper-value{min-width:4ch}
 .st-stepper[data-zero] .st-stepper-value{color:var(--muted)}
-.st-stepper[data-tone="changed"] .st-stepper-value{color:var(--amber)}
-.st-stepper-hint.st-stepper-hint{grid-column:1/-1;padding:0 0 var(--space-row-y)}
-/* Stepper · hero: the one number a count sheet sets */
+.st-stepper[data-changed] .st-stepper-value{color:var(--amber)}
+.st-stepper[data-draft] .st-stepper-value{color:var(--green)}
+.st-stepper-hint.st-stepper-hint{grid-column:1/-1}
+.st-stepper[data-variant="row"] .st-stepper-hint[data-reserve="text"]{margin-bottom:var(--space-row-y)}
+/* Stepper · hero */
 .st-stepper[data-variant="hero"]{grid-template-columns:minmax(0,1fr);justify-items:stretch;row-gap:8px;min-height:0}
 .st-stepper[data-variant="hero"] .st-stepper-copy{align-items:center;text-align:center}
 .st-stepper[data-variant="hero"] .st-stepper-label{font-size:var(--type-section-title-size);color:var(--muted)}
 .st-stepper[data-variant="hero"] .st-stepper-keys{justify-content:space-between}
-.st-stepper[data-variant="hero"] .st-stepper-key{width:54px;height:54px;border-radius:var(--radius-inset)}
-.st-stepper[data-variant="hero"] .st-stepper-key svg{width:18px;height:18px}
+.st-stepper[data-variant="hero"] .st-stepper-key{width:var(--hero-key);min-height:var(--hero-key)}
+.st-stepper[data-variant="hero"] .st-stepper-face{width:var(--hero-key);height:var(--hero-key);border-radius:var(--radius-inset)}
+.st-stepper[data-variant="hero"] .st-stepper-face svg{width:var(--glyph-key-hero);height:var(--glyph-key-hero)}
 .st-stepper[data-variant="hero"] .st-stepper-value{flex:1;font:600 var(--type-hero-count-size)/1.15 var(--font-mono);letter-spacing:-3px;color:var(--count-ink)}
 .st-stepper[data-variant="hero"][data-zero] .st-stepper-value{color:var(--muted)}
-.st-stepper[data-variant="hero"][data-tone="changed"] .st-stepper-value{color:var(--amber)}
-.st-stepper[data-variant="hero"] .st-stepper-hint{justify-content:center;padding:0;text-align:center}
+.st-stepper[data-variant="hero"][data-changed] .st-stepper-value{color:var(--amber)}
+.st-stepper[data-variant="hero"][data-draft] .st-stepper-value{color:var(--green)}
+.st-stepper[data-variant="hero"] .st-stepper-hint{justify-content:center;text-align:center}
 
-/* Measure: label above, a field-shaped box with the value in mono and its unit always written */
+/* Measure: label above, a field-shaped box, value in mono with its unit always written */
 .st-measure.st-measure{display:flex;flex-direction:column;gap:8px}
-.st-measure-label{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;font:600 var(--type-panel-title-size)/1.5 var(--font-sans);color:var(--ink)}
-.st-measure-label small{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
+.st-measure-label{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;font:600 var(--type-choice-label-size)/1.4 var(--font-sans);color:var(--ink)}
+.st-measure-label small{font:400 var(--type-choice-meta-size)/1.4 var(--font-sans);color:var(--muted)}
 .st-measure-box.st-measure-box{display:flex;align-items:baseline;gap:6px;width:100%;min-height:var(--field-height);margin:0;padding:var(--space-row-y) var(--space-row-x);box-sizing:border-box;border:1px solid var(--control-border);border-radius:var(--radius-control);background:var(--paper);color:var(--ink);box-shadow:none;text-align:left;font:inherit;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.st-measure-box[data-unit-gap="none"]{gap:0}
 button.st-measure-box:is(:active,[data-preview~="pressed"]){background:var(--press)}
-.st-measure-value{font:500 var(--type-figure-size)/1.2 var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.st-measure-value{font:500 var(--type-figure-size)/1.2 var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink);white-space:pre}
 .st-measure-unit{font:500 var(--type-identifier-size)/1.5 var(--font-mono);color:var(--muted)}
 .st-measure[data-empty]:not([data-active]) .st-measure-value{color:var(--muted)}
-.st-measure[data-active] .st-measure-box,.st-numpad-readout .st-measure-box.st-measure-box{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);cursor:default}
-:is(.st-measure[data-active],.st-numpad-readout:not([data-tone="suggested"])) .st-measure-value::after{content:"";display:inline-block;width:2px;height:1em;margin-left:2px;background:var(--ink);vertical-align:-.12em}
-.st-measure:is([data-tone="changed"],[data-tone="refused"]) .st-measure-value{color:var(--amber)}
-.st-measure[data-tone="refused"] .st-measure-value{text-decoration:line-through;text-decoration-thickness:2px}
+.st-measure[data-active] .st-measure-box,.st-numpad-readout .st-measure-box.st-measure-box{border-color:var(--ink);box-shadow:inset 0 0 0 calc(var(--caret-width) - 1px) var(--ink);cursor:default}
+:is(.st-measure[data-active],.st-numpad-readout:not([data-suggested])) .st-measure-value::after{content:"";display:inline-block;width:var(--caret-width);height:1em;margin-left:2px;background:var(--ink);vertical-align:-.12em}
+.st-measure[data-changed] .st-measure-value,.st-measure[data-tone="refused"] .st-measure-value{color:var(--amber)}
+.st-measure[data-tone="refused"] .st-measure-value{text-decoration:line-through;text-decoration-thickness:var(--caret-width)}
 
-/* Numpad: readout, running list, hint, then 1–9 · [. or gap] 0 ⌫ in the thumb zone */
+/* Numpad: readout, reserved hint, reserved running list, then 1–9 · [. or gap] 0 ⌫ — keys never move */
 .st-numpad.st-numpad{display:flex;flex-direction:column;gap:var(--space-row-y)}
 .st-numpad-readout{display:flex;flex-direction:column;gap:8px}
-.st-numpad-label{font:600 var(--type-panel-title-size)/1.5 var(--font-sans);color:var(--ink)}
-.st-numpad-readout[data-tone="suggested"] .st-measure-value{color:var(--muted)}
-.st-numpad-readout[data-tone="error"] .st-measure-box.st-measure-box{border-color:var(--red);box-shadow:inset 0 0 0 1px var(--red)}
-.st-numpad-recent.st-numpad-recent{display:flex;flex-direction:column;gap:2px;margin:0;padding:0 var(--space-row-x);list-style:none;font:500 var(--type-identifier-size)/1.5 var(--font-mono);color:var(--muted)}
-.st-numpad-keys{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.st-numpad-key.st-numpad-key{width:100%;height:56px;font:500 var(--type-figure-size)/1 var(--font-mono);font-variant-numeric:tabular-nums}
-.st-numpad-key svg{width:20px;height:20px;stroke-width:1.8}
-@media (prefers-reduced-motion:reduce){:is(.st-stepper-key,.st-numpad-key){transition:none}:is(.st-stepper-key,.st-numpad-key):is(:active,[data-preview~="pressed"]){transform:none}}
-.st-measure[data-active]+.st-numpad{margin-top:var(--space-row-y)}
+.st-numpad-label{font:600 var(--type-choice-label-size)/1.4 var(--font-sans);color:var(--ink)}
+.st-numpad-readout[data-suggested] .st-measure-value{color:var(--muted)}
+/* the bounded feedback region: fixed heights that scroll inside themselves, so feedback never moves the keys.
+   Sized for the longest status in en and zh (two lines, or one line with a text action) and three list lines. */
+.st-numpad-feedback{display:flex;flex-direction:column;gap:4px}
+.st-numpad-hint.st-numpad-hint{height:var(--touch-min);overflow-y:auto;overscroll-behavior:contain}
+.st-numpad-recent.st-numpad-recent{display:flex;flex-direction:column;gap:2px;height:calc(var(--type-input-size) * 1.5 * 3 + 4px);margin:0;padding:0 var(--space-row-x);overflow-y:auto;overscroll-behavior:contain;list-style:none;font:500 var(--type-input-size)/1.5 var(--font-mono);color:var(--ink)}
+.st-numpad-recent li[data-tone="amber"]{display:flex;align-items:center;gap:6px;color:var(--amber)}
+.st-numpad-recent li[data-tone="amber"]::before{content:"";flex:none;width:var(--status-dot);height:var(--status-dot);border-radius:50%;background:currentColor}
+.st-numpad-keys{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-key-gap)}
+.st-numpad-key.st-numpad-key{width:100%;height:var(--choice-row-min);font:500 var(--type-figure-size)/1 var(--font-mono);font-variant-numeric:tabular-nums}
+.st-numpad-key svg{width:var(--glyph-pad);height:var(--glyph-pad);stroke-width:1.8}
+@media (prefers-reduced-motion:reduce){:is(.st-stepper-face,.st-numpad-key){transition:none}.st-stepper-key:is(:active,[data-preview~="pressed"]) .st-stepper-face,.st-numpad-key:is(:active,[data-preview~="pressed"]){transform:none}}
