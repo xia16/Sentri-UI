@@ -437,7 +437,7 @@
   PP.ready.then(function () {
     store = PP.open(spec.data || 'base', spec.save ? { session: false } : null);
     crate = qs.get('crate') || spec.crate;
-    if (qs.get('sow')) Object.keys(window.PPFixtures.SOWS).forEach(function (c) { if (window.PPFixtures.SOWS[c].sow === qs.get('sow')) crate = c; });
+    if (qs.get('sow')) crate = store.crateOfSow(qs.get('sow')) || crate;
     SOWF = store.sow(crate) || { sow: '', parity: 0 };
     surface = spec.surface || 'processing';
     settleK();

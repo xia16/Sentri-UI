@@ -67,8 +67,9 @@
 
   /* ---- states: a variant of the shared fixture (fixtures.js) + the crate + UI state. The identity rows, Alive, the day-age,
      the farm's scheme, the closed candidate set and over-alive are the ledger's (identity rows over the shared log);
-     Record, Undo and closing the set commit identity events through append. The weigh-day litter weight and the boar/gilt
-     counts for piglets not identified are not in the ledger: they are carried by the fixture and this page (reported). ---- */
+     Record, Undo and closing the set commit identity events through append. The weigh-day litter weight (`litter_weight`),
+     the boar/gilt counts for piglets not identified (`sex_counts`) and the same-tag lookup (`identity.sameTag`, row `alsoOn`,
+     `select.findId`) are the ledger's too. ---- */
   // bag: the first tag in the hand's bag for this litter — what the camera reads when the scan button is tapped here.
   var BAG = { A02: '004301', B04: '004521', C02: '004401', A07: '004610' };
   var STATES = {
@@ -94,7 +95,7 @@
     'litter-weight-warn': { data: 'a02-tags-lm', l: 'A02', face: 'table', drawer: { w: '36.2', boars: 0, gilts: 0 } },
     'id-pair':            { data: 'a02-tags-pair', l: 'A02', face: 'table' },
     // Counts saved when 5 were identified (4 boars · 3 gilts not identified); two boars identified since consume two boar counts.
-    'litter-weight-consumed': { data: 'a02-tags-seven', l: 'A02', face: 'table', counts: { boars: 4, gilts: 3, at: ['004301', '004302', '004303', '004304', '004305'] }, open: 'weight' },
+    'litter-weight-consumed': { data: 'a02-tags-seven', l: 'A02', face: 'table', open: 'weight' },
     'litter-weight-refused': { data: 'a02-tags-lm', l: 'A02', face: 'table', drawer: { w: '304', boars: 0, gilts: 0 } }
   };
   // The usual per-piglet weight by day-age (console): the soft range, never a gate.
@@ -110,7 +111,6 @@
   var log = [];                           // every Record this visit and before, in order; the status line shows the newest
   var closed = null;
   var lwRecs = [];
-  var counts = st.counts || { boars: 0, gilts: 0, at: [] };   // boar/gilt counts for piglets not identified, and who was identified when they were saved
   var face = st.face || 'run';
   var visitStart = 0;                     // rows recorded from here on are this visit's (Undo reaches only these)
   var TAGLEN = 6, NOTCHLEN = 2;
@@ -120,8 +120,8 @@
   function dom(iso) { return +String(iso).slice(8, 10); }
   function key(r) { return notch ? String(r.n) : r.tag; }
   function elsewhereOf(tag, notchKey) {
-    // Every identity the farm has used, and where: the lookup runs on every accepted value, tags and notches alike.
-    var hit = window.PPFixtures.piglets(store.derived).filter(function (p) { return p.litter !== crate && (tag ? p.tag === tag : p.notch === notchKey); })[0];
+    // Where the farm holds this identity now, outside this litter: the ledger's lookup (select.findId).
+    var hit = store.select.findId(store.derived, tag ? { tag: tag } : { notch: notchKey }, crate)[0];
     return hit ? hit.litter : '';
   }
   function pageRow(r) {
@@ -130,7 +130,10 @@
     if (x) o.first = { t: hm(r.addedAt), who: r.addedBy, d: dom(r.addedAt) };
     if (r.status === 'dead') o.dead = { cause: r.cause, d: dom(r.deathAt) };
     if (r.status === 'withdrawn') o.gone = { t: hm(r.withdrawn.at), who: r.withdrawn.who };
-    if (r.tag && !notch) o.dup = elsewhereOf(r.tag);
+    // the same tag on another crate, and a same-tag pair within this litter: the ledger's same-tag groups
+    var also = r.alsoOn || [];
+    if (r.tag && !notch) o.dup = (also.filter(function (x) { return x.litter !== crate; })[0] || {}).litter || '';
+    o.pair = also.some(function (x) { return x.litter === crate; });
     return o;
   }
   function reload() {
@@ -143,6 +146,7 @@
       closed = { t: hm(ce.at), who: ce.who, k: distinct().length };
     }
   }
+  function loadWeights() { lwRecs = store.weights(crate).filter(function (x) { return x.at; }).map(function (x) { return { w: x.kg, day: x.day, d: dom(x.at), t: hm(x.at), who: x.who }; }); }
   function commit(e) { var r = store.commit(Object.assign({ type: 'identity', litter: crate }, e)); if (r.ok) reload(); return r; }
   function alive() { return L.alive; }
 
@@ -158,7 +162,7 @@
   var living = function () { return current().filter(function (r) { return !r.dead; }); };
   // Distinct identities: a same-tag pair (two hands, one piglet, offline) counts once until Edit resolves it.
   var distinct = function () { var seen = {}; return living().filter(function (r) { var k = key(r); if (seen[k]) return false; seen[k] = 1; return true; }); };
-  var pairs = function () { return living().length - distinct().length; };
+  var pairs = function () { return L.identity.pairs; };
   var identified = function () { return Math.min(distinct().length, alive()); };
   var over = function () { return Math.max(0, distinct().length - alive()); };
   function idText(r) { return notch ? PP.t('pp.id.notch', { litter: F.notchLitter, n: r.n }) : r.tag; }
@@ -362,18 +366,11 @@
   }
 
   /* ---- the table face: the litter's identified piglets, viewable and editable (through S8's Edit) forever ---- */
+  // Boars and gilts: the ledger's `sexCounts` (identified rows by sex, plus the saved counts for piglets not identified,
+  // consumed by later rows of the same sex; an unsexed row leaves the split unresolved).
   function tally() {
-    var b = 0, g = 0, u = 0, nb = 0, ng = 0, nu = 0, at = counts.at || [];
-    distinct().forEach(function (r) {
-      var fresh = at.indexOf(key(r)) < 0;          // identified after the counts were saved: it consumes one of them
-      if (r.sex === 'b') { b++; if (fresh) nb++; } else if (r.sex === 'g') { g++; if (fresh) ng++; } else { u++; if (fresh) nu++; }
-    });
-    // A boar record consumes a residual boar count, a gilt a gilt; an unsexed record consumes the pool, and which bucket
-    // it came from is unknowable — then the split is unresolved (never printed past Alive).
-    var rem = Math.max(0, alive() - identified()), rb = Math.max(0, counts.boars - nb), rg = Math.max(0, counts.gilts - ng);
-    var unresolved = rb + rg > rem;
-    var cb = Math.min(rb, rem), cg = Math.min(rg, rem - cb);
-    return { b: b + cb, g: g + cg, rb: b, rg: g, u: u, cb: cb, cg: cg, rem: rem, unresolved: unresolved && (nu > 0 || rb + rg > rem) };
+    var S = L.sexCounts;
+    return { b: S.boars, g: S.gilts, rb: S.sexedBoars, rg: S.sexedGilts, u: S.unsexed, cb: S.residualBoars, cg: S.residualGilts, rem: S.remaining, unresolved: S.unresolved };
   }
   function factsBlock() {
     var k = distinct().length, t = tally(), hide = over() ? 'pp.id.fact.over' : t.unresolved ? 'pp.id.fact.unresolved' : '';
@@ -422,7 +419,7 @@
   }
   function tableRow(r) {
     var trail = r.dead ? span('pp.id.row.dead', { cause: PP.t('dead.' + r.dead.cause), date: PP.t('pp.common.date.m9', { d: r.dead.d }) }, 'id-tone', 'red')
-      : !r.dead && living().filter(function (x) { return key(x) === key(r); }).length > 1 ? span('pp.id.row.pair', null, 'id-tone', 'amber')
+      : !r.dead && (r.pair || (notch && living().filter(function (x) { return key(x) === key(r); }).length > 1)) ? span('pp.id.row.pair', null, 'id-tone', 'amber')
       : r.dup ? span('pp.id.row.dup', { crate: r.dup }, 'id-tone', 'amber') : '';
     return UI.row({ title: '', description: '', trailing: trail, action: 'edit-row', value: key(r),
       strs: { title: 'pp.id.row.id', description: 'pp.id.row.' + shape(r) },
@@ -476,7 +473,7 @@
     if (rem > 0) {
       var step = function (k, label, desc, v, other, fromRows) {
         var cap = rem - other, ceil = drawer.ceil === k && v >= cap;
-        return UI.stepper({ label: '', description: '', value: v, min: 0, max: cap, key: k, action: 'count', draft: v > counts[k], hint: ceil ? '' : undefined,
+        return UI.stepper({ label: '', description: '', value: v, min: 0, max: cap, key: k, action: 'count', draft: v > (L.sexCounts.saved || { boars: 0, gilts: 0 })[k], hint: ceil ? '' : undefined,
           strs: Object.assign({ label: label, description: desc, value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
             ceil ? { hint: 'pp.id.lw.ceiling' } : {}),
           args: { description: { t: v + fromRows, k: fromRows }, hint: { r: rem } } });
@@ -672,10 +669,13 @@
       if (drawerState(drawer) === 'refused' || !drawerDirty(drawer)) { render(); return; }
       // Only what changed is saved. One record per weigh day: a second weighing today replaces today's value
       // (the later stamp stands; the record keeps both).
-      var w = wChange(drawer), cb = countsChange(drawer), stampT = store.stamp(), wChanged = !!w;
-      if (wChanged) { lwRecs = lwRecs.filter(function (x) { return x.d !== dom(NOW); }); lwRecs.push({ w: w, day: L.dayAge, d: dom(stampT.at), t: hm(stampT.at), who: ME }); }
-      if (cb) counts = { boars: drawer.boars, gilts: drawer.gilts, at: distinct().map(key) };
-      var bg = { b: PP.tn('pp.id.n_boars', counts.boars), g: PP.tn('pp.id.n_gilts', counts.gilts) };
+      var w = wChange(drawer), cb = countsChange(drawer), wChanged = !!w, evs = [];
+      if (wChanged) evs.push({ type: 'litter_weight', litter: crate, kg: w, day: L.dayAge });
+      if (cb) evs.push({ type: 'sex_counts', litter: crate, boars: drawer.boars, gilts: drawer.gilts });
+      var res = store.commitAll(evs);
+      if (!res.ok) { render(); return; }
+      reload(); loadWeights();
+      var bg = { b: PP.tn('pp.id.n_boars', drawer.boars), g: PP.tn('pp.id.n_gilts', drawer.gilts) };
       receipt = wChanged && cb ? ['pp.id.rcpt.both', Object.assign({ w: w }, bg)] : wChanged ? ['pp.id.rcpt.weight', { w: w }] : ['pp.id.rcpt.counts', bg];
       drawer = null; drawerKept = null; render();
     }
@@ -689,12 +689,12 @@
   PP.ready.then(function () {
     store = PP.open(st.data);
     crate = qs.get('crate') || st.l;
-    if (qs.get('sow')) Object.keys(window.PPFixtures.SOWS).forEach(function (c) { if (window.PPFixtures.SOWS[c].sow === qs.get('sow')) crate = c; });
+    if (qs.get('sow')) crate = store.crateOfSow(qs.get('sow')) || crate;
     F = store.sow(crate) || {};
     notch = store.config.identity.scheme === 'notch'; keepers = store.config.identity.who === 'candidates';
     NOW = store.today + 'T10:30';
     reload();
-    lwRecs = store.weights(crate).filter(function (x) { return x.at; }).map(function (x) { return { w: x.kg, day: x.day, d: dom(x.at), t: hm(x.at), who: x.who }; });
+    loadWeights();
     // Every row already in, oldest first: the status line reads the newest; this visit starts after them.
     log = rows.filter(function (r) { return !r.gone; }).slice().sort(function (x, y) { return x.d - y.d || (x.t < y.t ? -1 : x.t > y.t ? 1 : 0); }).map(function (r) { return { r: r }; });
     visitStart = log.length;

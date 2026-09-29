@@ -116,7 +116,7 @@ function newDose(cfg) {
     treated: 0,            // piglets marked by this litter's own records (history, never retired)
     coverage: [],          // carried evidence groups { id, kind: move|had|gain, n, rows|null, from, at }
     unknowns: [],          // unresolved groups { id, kind: move|gain, n, rows|null, from, at }
-    records: [], collisions: [], castration: null, fullAt: null, checks: [], catchUp: 0
+    records: [], collisions: [], collided: [], castration: null, fullAt: null, checks: [], catchUp: 0
   };
 }
 
@@ -127,7 +127,7 @@ function newLitter(id) {
     aliveLog: [], zeros: [],
     losses: [], gains: [], moves: [], counts: [], deaths: [], notes: [],
     doses: {}, idClosed: false, flags: [], accepted: [], types: {}, lastEvent: null, lastRecord: null,
-    movedOutAfterEnd: []
+    movedOutAfterEnd: [], sow: null, birthWeight: null, birthWeightConflicts: [], weights: [], sexCountsRec: null
   };
 }
 
@@ -241,11 +241,12 @@ function outcomeFor(cls, d, answer) {
 
 function normalizeConfig(config) {
   const c = config || {};
-  const task = c.task ? {
-    id: c.task.id || null, litters: (c.task.litters || []).slice(),
-    ended: c.task.ended ? Object.assign({}, c.task.ended) : null,
-    farrowingTask: c.task.farrowingTask === 'open' ? 'open' : 'ended'
-  } : null;
+  const list = Array.isArray(c.tasks) ? c.tasks : c.task ? [c.task] : [];
+  const tasks = list.map((t, i) => ({
+    id: t.id || 'task' + (i + 1), litters: (t.litters || []).slice(),
+    ended: t.ended ? Object.assign({}, t.ended) : null,
+    farrowingTask: t.farrowingTask === 'open' ? 'open' : 'ended'
+  }));
   return {
     doses: (c.doses || []).map((d) => ({
       id: d.id, tx: d.tx || d.id, due: d.due, last: d.last == null ? null : d.last,
@@ -253,7 +254,7 @@ function normalizeConfig(config) {
       product: d.product == null ? null : d.product, amount: d.amount == null ? null : d.amount
     })),
     identity: Object.assign({ scheme: 'none', who: 'all', day: null }, c.identity || {}),
-    task
+    tasks, task: tasks[0] || null
   };
 }
 
@@ -291,7 +292,9 @@ export function derive(events, config, opts) {
   const res = replay(log, effective, fresh, cfg, causal, today);
   const out = {
     litters: {}, rooms: {}, rejected: rejected.concat(corrRejected, res.rejected), flags: res.flags,
-    corrections: Object.fromEntries(corrections), config: cfg, today, ended: res.ended
+    corrections: Object.fromEntries(corrections), config: cfg, today,
+    ended: res.ctx.ends.get(cfg.task ? cfg.task.id : null) || null,
+    tasks: cfg.tasks.map((t) => ({ id: t.id, litters: t.litters.slice(), ended: res.ctx.ends.get(t.id) || null }))
   };
   for (const L of res.litters.values()) {
     if (L.phase === 'none') continue;
@@ -300,11 +303,13 @@ export function derive(events, config, opts) {
   out.rooms = rooms(out.litters);
   // closure facts are frozen as the log stood at End: corrections and arrivals after it do not
   // rewrite them (they replay at their original place in the live figures only)
-  if (res.ended && res.ended.event) {
-    const endAt = (events || []).findIndex((x) => x && x.id === res.ended.event);
+  for (const [taskId, E] of res.ctx.ends) {
+    if (!E || !E.event) continue;
+    const endAt = (events || []).findIndex((x) => x && x.id === E.event);
     if (endAt >= 0 && endAt < (events || []).length - 1) {
       const pre = derive(events.slice(0, endAt + 1), config, opts);
-      if (pre.ended && pre.ended.event === res.ended.event) res.ended.snapshot = pre.ended.snapshot;
+      const P = pre.tasks.find((t) => t.id === taskId);
+      if (P && P.ended && P.ended.event === E.event) E.snapshot = P.ended.snapshot;
     }
   }
   // the input, for selectors that validate drafts through the same replay (not enumerable)
@@ -330,8 +335,8 @@ function replay(log, effective, fresh, cfg, causal, today) {
   const ctx = {
     cfg, causal, today, litters, rows: new Map(), flags: [], pending: [],
     doseCfg: new Map(cfg.doses.map((d) => [d.id, d])),
-    ended: cfg.task && cfg.task.ended ? Object.assign({ index: null, event: null, snapshot: null }, cfg.task.ended) : null,
-    farrowingTask: cfg.task ? cfg.task.farrowingTask : 'ended',
+    ends: new Map(cfg.tasks.filter((t) => t.ended).map((t) => [t.id, Object.assign({ index: null, event: null, snapshot: null, task: t.id }, t.ended)])),
+    farrowing: new Map(cfg.tasks.map((t) => [t.id, t.farrowingTask])),
     lit: (id) => { if (!litters.has(id)) litters.set(id, newLitter(id)); return litters.get(id); }
   };
   const rejected = [];
@@ -356,7 +361,7 @@ function replay(log, effective, fresh, cfg, causal, today) {
     if (e === null) return;                              // voided by a correction
     run(e, index);
   });
-  return { litters, rejected, flags: ctx.flags, ctx, ended: ctx.ended };
+  return { litters, rejected, flags: ctx.flags, ctx };
 }
 
 function flag(ctx, L, kind, reason, eventIds, extra) {
@@ -393,25 +398,28 @@ function liveRows(ctx, litterId) {
   return n;
 }
 function uniqueIds(ids) { if (new Set(ids).size !== ids.length) throw new Reject('duplicate_row'); }
-function inTask(ctx, id) { return !ctx.cfg.task || ctx.cfg.task.litters.includes(id); }
+function taskOf(ctx, id) { return ctx.cfg.tasks.find((t) => t.litters.includes(id)) || null; }
+function inTask(ctx, id) { return !ctx.cfg.tasks.length || !!taskOf(ctx, id); }
 
 /* Where an event stands against End. Causal knowledge first: a writer that saw End is after it,
    whatever its clock says. Then the log: applied after End but not having seen it → stamped
    before End = arrived after End; stamped after = after End. Without an End event, the stamp. */
-function endRelation(ctx, e) {
-  const E = ctx.ended;
+function endRelation(ctx, e, taskId) {
+  const E = taskId ? ctx.ends.get(taskId) : null;
   if (!E) return 'before';
   if (E.event) {
-    if (ctx.causal.saw(e.id, E.event)) return 'after';
+    if (ctx.causal.saw(e.id, E.event)) return 'after_seen';
     if (E.index != null && ctx.index > E.index) {
       const a = time(e.at), b = time(E.at);
-      return a != null && b != null && a <= b ? 'arrived' : 'after';
+      return a != null && b != null && a <= b ? 'arrived' : 'after_unseen';
     }
     return 'before';
   }
+  // End known from config only: nothing tells what the writer knew; the stamp decides
   const a = time(e.at), b = time(E.at);
-  return a == null || b == null || a > b ? 'after' : 'before';
+  return a == null || b == null || a > b ? 'after_seen' : 'before';
 }
+function relationOf(ctx, e, litterId) { const T = taskOf(ctx, litterId); return T ? endRelation(ctx, e, T.id) : 'before'; }
 
 // ---------------------------------------------------------------------------------------------
 // apply one event; returns the litters it touched; throws Reject
@@ -428,7 +436,10 @@ function apply(ctx, e) {
     case 'identity': return applyIdentity(ctx, e);
     case 'weaned': return applyWeaned(ctx, e);
     case 'end_task': return applyEndTask(ctx, e);
-    case 'farrowing_task_ended': ctx.farrowingTask = 'ended'; return [];
+    case 'farrowing_task_ended': ctx.farrowing.set(e.task || (ctx.cfg.task ? ctx.cfg.task.id : null), 'ended'); return [];
+    case 'birth_weight': return applyBirthWeight(ctx, e);
+    case 'litter_weight': return applyLitterWeight(ctx, e);
+    case 'sex_counts': return applySexCounts(ctx, e);
     default: throw new Reject('unknown_type');
   }
 }
@@ -450,6 +461,8 @@ function applyFarrowed(ctx, e) {
   L.room = e.room != null ? e.room : L.room;
   L.birthDay = dayNumber(e.birthDate != null ? e.birthDate : (first ? e.at : null)) ?? L.birthDay;
   L.atBirth = { born: e.born, dead: Object.assign({}, dead) };
+  if (e.sow) L.sow = { tag: e.sow.tag == null ? null : e.sow.tag, parity: e.sow.parity == null ? null : e.sow.parity };
+  if (e.birthWeight != null && !L.birthWeight) L.birthWeight = { kg: String(e.birthWeight), by: 'finish', at: e.at || null, who: e.who || null, event: e.id };
   L.born = e.born;
   L.deadByCause = Object.assign({}, dead);
   L.deadTotal = deadN;
@@ -476,14 +489,71 @@ function applySowDied(ctx, e) {
 /* end_task { at, who } — End as a log event, so "applied after End" is a log position. Refused
    while the batch's farrowing task is open (RULINGS Q5). Snapshots the closure figures. */
 function applyEndTask(ctx, e) {
-  if (ctx.ended && ctx.ended.event) throw new Reject('already_ended', { at: ctx.ended.at, who: ctx.ended.who });
-  if (ctx.farrowingTask === 'open') throw new Reject('farrowing_task_open');
+  const taskId = e.task || (ctx.cfg.task ? ctx.cfg.task.id : null);
+  const T = ctx.cfg.tasks.find((t) => t.id === taskId) || null;
+  if (ctx.cfg.tasks.length && !T) throw new Reject('unknown_task', { task: taskId });
+  const had = ctx.ends.get(taskId);
+  if (had && had.event) throw new Reject('already_ended', { at: had.at, who: had.who });
+  if (ctx.farrowing.get(taskId) === 'open') throw new Reject('farrowing_task_open');
   const day = dayNumber(e.at);
   const views = {};
   for (const L of ctx.litters.values()) if (L.phase !== 'none') views[L.id] = view(ctx, L, new Map(), day);
-  ctx.ended = { at: e.at || null, who: e.who || null, index: ctx.index, event: e.id, snapshot: null };
-  ctx.ended.snapshot = endFigures(ctx.cfg, views);
+  const E = { task: taskId, at: e.at || null, who: e.who || null, index: ctx.index, event: e.id, snapshot: null };
+  ctx.ends.set(taskId, E);
+  E.snapshot = endFigures(ctx.cfg, views, { task: taskId, closing: true, endDay: day });
   return [];
+}
+
+/* birth_weight { litter, kg } — the birth litter weight, recorded in processing only when missing.
+   A writer that saw it set is refused; one that could not have (offline) is kept as a conflict. */
+function applyBirthWeight(ctx, e) {
+  const L = needLitter(ctx, e.litter);
+  needLocked(L);
+  const kg = parseFloat(e.kg);
+  if (!(kg > 0)) throw new Reject('bad_numbers');
+  const W = L.birthWeight;
+  if (W) {
+    if (ctx.causal.saw(e.id, W.event)) throw new Reject('already_recorded', { kg: W.kg, by: W.by, at: W.at, who: W.who });
+    L.birthWeightConflicts.push({ kg: String(e.kg), at: e.at || null, who: e.who || null, event: e.id });
+    flag(ctx, L, 'sync_review', 'birth_weight_conflict', [W.event, e.id]);
+    return [L];
+  }
+  // `source: 'farrowing'`: set through farrowing's own Edit (reads as set at Finish)
+  L.birthWeight = { kg: String(e.kg), by: e.source === 'farrowing' ? 'finish' : 'here', at: e.at || null, who: e.who || null, event: e.id };
+  return [L];
+}
+
+/* litter_weight { litter, kg, day? } — the weigh-day litter weight: one per weigh day (day-age); a
+   second weighing that day replaces the first, which stays in `replaced`. */
+function applyLitterWeight(ctx, e) {
+  const L = needLitter(ctx, e.litter);
+  needLocked(L);
+  const kg = parseFloat(e.kg);
+  if (!(kg > 0)) throw new Reject('bad_numbers');
+  const day = e.day != null ? e.day : (L.birthDay == null || dayNumber(e.at) == null ? null : dayNumber(e.at) - L.birthDay);
+  const rec = { day, kg: String(e.kg), at: e.at || null, who: e.who || null, event: e.id, replaced: [] };
+  const i = L.weights.findIndex((w) => w.day === day);
+  if (i >= 0) { const old = L.weights[i]; rec.replaced = old.replaced.concat([{ kg: old.kg, at: old.at, who: old.who, event: old.event }]); L.weights[i] = rec; }
+  else { L.weights.push(rec); L.weights.sort((a, b) => (a.day == null ? 0 : a.day) - (b.day == null ? 0 : b.day)); }
+  return [L];
+}
+
+/* sex_counts { litter, boars, gilts } — boars and gilts among the piglets without an identity row,
+   as counted on the weigh day. Later rows consume them by sex (see `sexCounts` in the view). */
+function applySexCounts(ctx, e) {
+  const L = needLitter(ctx, e.litter);
+  if (!isCount(e.boars) || !isCount(e.gilts)) throw new Reject('bad_numbers');
+  const keys = distinctKeys(ctx, L.id);
+  const unidentified = Math.max(0, L.alive - Math.min(keys.length, L.alive));
+  if (e.boars + e.gilts > unidentified) throw new Reject('more_than_unidentified', { unidentified });
+  L.sexCountsRec = { boars: e.boars, gilts: e.gilts, keys, at: e.at || null, who: e.who || null, event: e.id };
+  return [L];
+}
+function rowKey(r) { return r.tag ? 't:' + r.tag : 'n:' + r.notch; }
+function distinctKeys(ctx, litterId) {
+  const seen = [];
+  for (const r of ctx.rows.values()) if (r.litter === litterId && r.status === 'alive' && !seen.includes(rowKey(r))) seen.push(rowKey(r));
+  return seen;
 }
 
 /* count { litter, observed, baseAlive, missingRows? } — an observation. The difference against
@@ -699,8 +769,8 @@ function applyMove(ctx, e) {
   identityGate(ctx, R, e, liveRows(ctx, R.id) + rowIds.length <= R.alive + plainIn, { receiver: R.id });
   concurrentCountFlag(ctx, S, e); concurrentCountFlag(ctx, R, e);
   const explaining = !!(loss || gain);
-  const rel = endRelation(ctx, e);
-  const after = rel !== 'before';
+  const after = relationOf(ctx, e, S.id) !== 'before';
+  const catchUpR = relationOf(ctx, e, R.id) !== 'before' || (ctx.cfg.tasks.length > 0 && !taskOf(ctx, R.id));
   const allNamed = gainQ === 0 && rowIds.length === n;
 
   const packets = {}, owedOut = {};
@@ -727,7 +797,7 @@ function applyMove(ctx, e) {
     packets[d.id] = outcome;
     if (plainIn) {
       if (outcome === 'done') cover(DR, e, 'move', plainIn, allNamed ? rowIds : null, S.id);
-      if (outcome === 'owed') { raise(ctx, R, DR, e, 'arrival', plainIn); if (after) DR.catchUp += plainIn; }
+      if (outcome === 'owed') { raise(ctx, R, DR, e, 'arrival', plainIn); if (catchUpR) DR.catchUp += plainIn; }
       if (outcome === 'check' || outcome === 'unknown') unknownGroup(DR, e, 'move', plainIn, allNamed ? rowIds : null, S.id);
     }
     // untreated piglets leaving lower the source's owed; Yes and Don't know leave it (over-owe)
@@ -747,19 +817,28 @@ function applyMove(ctx, e) {
   const rec = { id: e.id, n, rows: rowIds.slice(), explains: [loss ? loss.id : null, gain ? gain.id : null], packets, answers: Object.assign({}, e.answers || {}), at: e.at || null, who: e.who || null, afterEnd: after };
   S.moves.push(Object.assign({ dir: 'out', other: R.id, aliveEffect: -plainOut }, rec));
   R.moves.push(Object.assign({ dir: 'in', other: S.id, aliveEffect: plainIn }, rec));
-  if (after && inTask(ctx, S.id)) S.movedOutAfterEnd.push({ move: e.id, n, to: R.id, owed: owedOut });
+  if (after && taskOf(ctx, S.id)) S.movedOutAfterEnd.push({ move: e.id, n, to: R.id, owed: owedOut });
   return [S, R];
 }
 
 /* treat's task gate. Catch-up after End for arrivals is PROVISIONAL (map ledger). */
-function taskGate(ctx, L, e, D) {
-  if (!inTask(ctx, L.id)) throw new Reject('no_task', { litter: L.id });
-  const rel = endRelation(ctx, e);
+function taskGate(ctx, L, e, D, unknownTarget) {
+  if (!ctx.cfg.tasks.length) return {};
+  const T = taskOf(ctx, L.id);
+  if (!T) {
+    // a litter outside every task (a nurse sow from a previous batch): only its arrivals' doses are recordable
+    if (D && !unknownTarget && D.catchUp > 0) return { catchUp: true };
+    if (D && unknownTarget && total(D.unknowns) > 0) return {};
+    throw new Reject('no_task', { litter: L.id });
+  }
+  const rel = endRelation(ctx, e, T.id);
   if (rel === 'before') return {};
   if (e.viaCorrection) return { flag: 'correction_after_end' };
   if (rel === 'arrived') return { flag: 'arrived_after_end' };
-  if (D && D.catchUp > 0) return { catchUp: true };
-  throw new Reject('task_ended', { at: ctx.ended.at, who: ctx.ended.who });
+  if (rel === 'after_unseen') return { flag: 'after_end' };          // done after End on a phone that had not seen it (map ledger)
+  if (D && !unknownTarget && D.catchUp > 0) return { catchUp: true };  // PROVISIONAL (map ledger)
+  const E = ctx.ends.get(T.id);
+  throw new Reject('task_ended', { at: E.at, who: E.who });
 }
 
 function readTreat(d, e) {
@@ -845,6 +924,8 @@ function applyTreat(ctx, e) {
   completed(ctx, L, D, e);
   if (collided.length) {
     D.collisions.push([collided[0].id, e.id]);
+    for (const r of collided) if (!D.collided.includes(r.id)) D.collided.push(r.id);
+    D.collided.push(e.id);
     flag(ctx, L, 'possible_double_treatment', 'sync_collision', collided.map((r) => r.id).concat(e.id), { dose: d.id });
   }
   if (gate.flag) flag(ctx, L, 'task', gate.flag, [e.id], { dose: d.id });
@@ -877,7 +958,7 @@ function applyTreatUnknown(ctx, e) {
   const L = needLitter(ctx, e.litter);
   const d = needDose(ctx, e.dose);
   const D = dose(ctx, L, d.id);
-  const gate = taskGate(ctx, L, e, null);
+  const gate = taskGate(ctx, L, e, D, true);
   if (!isCount(e.n) || e.n === 0) throw new Reject('bad_numbers');
   const mine = D.records.filter((r) => r.target === 'unknown' && (!e.group || r.group === e.group));
   const collided = mine.filter((r) => ctx.causal.concurrent(r.id, e.id));
@@ -890,6 +971,8 @@ function applyTreatUnknown(ctx, e) {
   completed(ctx, L, D, e);
   if (collided.length) {
     D.collisions.push([collided[0].id, e.id]);
+    for (const r of collided) if (!D.collided.includes(r.id)) D.collided.push(r.id);
+    D.collided.push(e.id);
     flag(ctx, L, 'possible_double_treatment', 'sync_collision', collided.map((r) => r.id).concat(e.id), { dose: d.id, target: 'unknown' });
   }
   if (gate.flag) flag(ctx, L, 'task', gate.flag, [e.id], { dose: d.id });
@@ -1034,9 +1117,12 @@ function view(ctx, L, corrections, today) {
       fullAt: D.fullAt,
       done: owed === 0 && unknown === 0,
       records: D.records.map((r) => Object.assign({}, r, { corrected: corrections.has(r.id) })),
-      possibleDoubleTreatment: D.collisions.map((p) => p.slice())
+      possibleDoubleTreatment: D.collisions.map((p) => p.slice()),
+      collidedRecords: D.collided.slice()
     };
     if (d.castration) {
+      // before the first record nobody has counted the males: pages print `males counted as you cut`
+      doses[d.id].males = D.castration ? D.castration.castrated + sum(D.castration.notCastrated) - D.castration.notCastrated.deferred + deferred : 'uncounted';
       doses[d.id].castration = D.castration ? {
         castrated: D.castration.castrated,
         notCastrated: Object.assign({}, D.castration.notCastrated, { deferred }),
@@ -1047,14 +1133,18 @@ function view(ctx, L, corrections, today) {
   }
   const rowsHere = [...ctx.rows.values()].filter((r) => r.litter === L.id);
   const live = rowsHere.filter((r) => r.status === 'alive').length;
+  const distinct = distinctKeys(ctx, L.id).length;          // a same-tag pair within the litter counts once
   const scheme = ctx.cfg.identity;
   let idDone = null;
-  if (scheme.scheme !== 'none') idDone = scheme.who === 'candidates' ? L.idClosed : live >= L.alive;
+  if (scheme.scheme !== 'none') idDone = scheme.who === 'candidates' ? L.idClosed : distinct >= L.alive;
+  const groups = sameTagGroups(ctx);
+  const mine = groups.filter((g) => g.rows.some((r) => r.litter === L.id));
+  const alsoOn = (r) => { const g = groups.find((x) => x.rows.some((y) => y.rowId === r.rowId)); return g ? g.rows.filter((y) => y.rowId !== r.rowId).map((y) => ({ litter: y.litter, rowId: y.rowId })) : []; };
   const openL = L.losses.reduce((s, x) => s + x.remaining, 0), openG = L.gains.reduce((s, x) => s + x.remaining, 0);
   const item = (x) => ({ id: x.id, qty: x.qty, open: x.remaining, rows: x.rows || [], at: x.at, who: x.who, explainedBy: x.explainedBy.map((b) => Object.assign({}, b)) });
   const out = {
     id: L.id, room: L.room, phase: L.phase, endedBySowDeath: !!L.endedBySowDeath,
-    inTask: inTask(ctx, L.id),
+    inTask: inTask(ctx, L.id), task: taskOf(ctx, L.id) ? taskOf(ctx, L.id).id : null,
     sowDied: L.sowDied ? Object.assign({}, L.sowDied) : null,
     birthDay: L.birthDay, dayAge,
     born: L.born, dead: { total: L.deadTotal, byCause: Object.assign({}, L.deadByCause) },
@@ -1067,18 +1157,62 @@ function view(ctx, L, corrections, today) {
     doses,
     identity: {
       scheme: scheme.scheme, who: scheme.who,
-      identified: Math.min(live, L.alive), liveRows: live, conflict: Math.max(0, live - L.alive),
+      identified: Math.min(distinct, L.alive), liveRows: live, distinct, pairs: live - distinct, conflict: Math.max(0, live - L.alive),
       missing: rowsHere.filter((r) => r.status === 'missing').length,
       onRecord: rowsHere.filter((r) => r.status !== 'withdrawn').length,
-      rows: [...ctx.rows.values()].filter((r) => r.litter === L.id || r.birthLitter === L.id).map((r) => clone(r)),
+      rows: [...ctx.rows.values()].filter((r) => r.litter === L.id || r.birthLitter === L.id).map((r) => Object.assign(clone(r), { alsoOn: alsoOn(r) })),
+      sameTag: mine.map((g) => ({ tag: g.tag, rows: g.rows.map((y) => Object.assign({}, y)) })),
       closed: L.idClosed, done: idDone
     },
+    sow: L.sow ? Object.assign({}, L.sow) : null,
+    birthWeight: L.birthWeight ? Object.assign({}, L.birthWeight) : null,
+    birthWeightConflicts: L.birthWeightConflicts.map((x) => Object.assign({}, x)),
+    weights: L.weights.map((w) => clone(w)),
+    sexCounts: sexCounts(ctx, L),
     notes: L.notes.map((n) => Object.assign({}, n)),
     flags: L.flags.map((f) => clone(f)),
     lastEvent: L.lastEvent, lastRecord: L.lastRecord
   };
+  // treatments can be recorded here: a litter in a task, or one outside every task holding arrivals
+  // that owe a dose (a nurse sow from a previous batch)
+  out.recordable = out.inTask || Object.values(doses).some((x) => x.catchUp > 0 && x.owed > 0) || Object.values(doses).some((x) => x.unknownAfterMove > 0 && !out.inTask && ctx.cfg.tasks.length > 0);
   out.balanced = balances(out);
   return out;
+}
+
+/* Every tag held by two or more rows that are still in a litter (alive or missing), in the order
+   the tags were first recorded: a sync duplicate within a litter, or the same tag on two crates. */
+function sameTagGroups(ctx) {
+  const by = new Map();
+  for (const r of ctx.rows.values()) {
+    if (!r.tag || (r.status !== 'alive' && r.status !== 'missing')) continue;
+    if (!by.has(r.tag)) by.set(r.tag, []);
+    by.get(r.tag).push({ litter: r.litter, rowId: r.rowId, status: r.status });
+  }
+  return [...by.entries()].filter(([, rows]) => rows.length > 1).map(([tag, rows]) => ({ tag, rows }));
+}
+
+/* Boars and gilts: identified rows by sex, plus the saved counts for piglets without a row, which
+   later rows consume — a boar row a boar count, a gilt a gilt; an unsexed row consumes the pool,
+   and which bucket it came from is unknowable (then the split is unresolved; never past Alive). */
+function sexCounts(ctx, L) {
+  const rec = L.sexCountsRec;
+  const keys = [];
+  let b = 0, g = 0, u = 0, nb = 0, ng = 0, nu = 0;
+  for (const r of ctx.rows.values()) {
+    if (r.litter !== L.id || r.status !== 'alive' || keys.includes(rowKey(r))) continue;
+    keys.push(rowKey(r));
+    const fresh = !rec || !rec.keys.includes(rowKey(r));
+    if (r.sex === 'b') { b++; if (fresh) nb++; } else if (r.sex === 'g') { g++; if (fresh) ng++; } else { u++; if (fresh) nu++; }
+  }
+  const rem = Math.max(0, L.alive - Math.min(keys.length, L.alive));
+  const rb = rec ? Math.max(0, rec.boars - nb) : 0, rg = rec ? Math.max(0, rec.gilts - ng) : 0;
+  const cb = Math.min(rb, rem), cg = Math.min(rg, rem - cb);
+  return {
+    saved: rec ? { boars: rec.boars, gilts: rec.gilts, at: rec.at, who: rec.who, event: rec.event } : null,
+    boars: b + cb, gilts: g + cg, sexedBoars: b, sexedGilts: g, unsexed: u,
+    residualBoars: cb, residualGilts: cg, remaining: rem, unresolved: !!rec && rb + rg > rem
+  };
 }
 
 /* The ledger identity for one derived litter. */
@@ -1108,7 +1242,7 @@ export function append(events, event, config, opts) {
 // selectors: what the pages render. Pages hold no ledger arithmetic; drafts go through `append`.
 
 function doseOrder(cfg) { const ix = new Map(cfg.doses.map((d, i) => [d.id, i])); return (a, b) => a.due - b.due || ix.get(a.dose) - ix.get(b.dose); }
-function population(D) { return D.castration ? D.castration.males : null; }
+function population(D) { return typeof D.males === 'number' ? D.males : null; }
 const todoOf = (D) => (D.owed == null ? !D.records.length : D.owed > 0 || D.unknownAfterMove > 0);
 
 /* Try a draft exactly as `append` would, with the page's stamp. */
@@ -1143,8 +1277,10 @@ function roomFacts(derived, L) {
   else if (lapsed.length) kind = 'missed';
   else if (next) kind = 'next';
   else kind = 'finished';
-  const doseRow = (D) => ({ dose: D.dose, tx: D.tx, due: D.due, n: D.owed == null ? null : D.owed, of: D.isCastration ? population(D) : L.alive, unknown: D.unknownAfterMove, status: D.status });
-  const collide = Ds.reduce((s, D) => s + D.possibleDoubleTreatment.length, 0);
+  const doseRow = (D) => Object.assign({ dose: D.dose, tx: D.tx, due: D.due, n: D.owed == null ? null : D.owed, of: D.isCastration ? population(D) : L.alive, unknown: D.unknownAfterMove, status: D.status },
+    D.isCastration ? { males: D.males } : {});
+  // `n records — check`: every record that took part in a collision, not the pairs
+  const collide = Ds.reduce((s, D) => s + D.collidedRecords.length, 0);
   return {
     litter: L.id, lens, kind, day: L.dayAge, alive: L.alive,
     doses: live.map(doseRow), lateBy, partly: lens === 'owed' && !!recToday,
@@ -1245,7 +1381,8 @@ function litterSelect(derived, id, opts) {
       dose: D.dose, tx: D.tx, due: D.due, status: D.status, lateBy: D.status === 'late' ? L.dayAge - D.due : 0,
       missedAfter: D.status === 'missed' ? D.last : null,
       owed: D.owed, oneTap: D.owed == null ? null : D.owed, deferred: D.deferred, deferReason: D.deferReason,
-      unknown: D.unknownAfterMove, owedFrom: D.owedFrom.map((x) => Object.assign({}, x))
+      unknown: D.unknownAfterMove, owedFrom: D.owedFrom.map((x) => Object.assign({}, x)),
+      males: D.isCastration ? D.males : undefined
     })),
     dosesLeft: { left: now.length, total: Ds.filter((D) => D.status !== 'later').length },
     recorded: Ds.filter((D) => D.records.length).sort(order).map((D) => ({ dose: D.dose, tx: D.tx, records: D.records.map((r) => Object.assign({}, r)), collisions: D.possibleDoubleTreatment })),
@@ -1320,10 +1457,15 @@ function moveDraftSelect(derived, draft, stamp) {
   if (!r.ok) return { n, max: maxN, why: r.reason, event: null, delta: null, carry: {}, asks: [], sourceAfter: [] };
   const mv = r.derived.litters[R.id].moves[r.derived.litters[R.id].moves.length - 1];
   const mv0 = blank.ok ? blank.derived.litters[R.id].moves[blank.derived.litters[R.id].moves.length - 1] : mv;
-  const asks = derived.config.doses.filter((d) => !d.visible && mv0.packets[d.id] === 'unknown').map((d) => d.id);
+  // doses not yet due at the receiver are left out: nothing is carried, asked or ranged for them
+  const dueHere = (d) => R.dayAge == null || R.dayAge >= d.due;
+  const doses = derived.config.doses.filter(dueHere);
+  const asks = doses.filter((d) => !d.visible && mv0.packets[d.id] === 'unknown').map((d) => d.id);
+  const carry = {};
+  for (const d of doses) if (mv.packets[d.id]) carry[d.id] = mv.packets[d.id];
   const after = r.derived.litters[S.id].alive;
   const sourceAfter = [];
-  for (const d of derived.config.doses) {
+  for (const d of doses) {
     const D = S.doses[d.id];
     if ((mv.packets[d.id] === 'unknown' || mv.packets[d.id] === 'check') && D.owed != null && !d.castration) {
       const covered = S.alive - D.owed;
@@ -1333,51 +1475,71 @@ function moveDraftSelect(derived, draft, stamp) {
   return {
     n: mv.n, max: maxN, unidentified: Math.max(0, S.alive - S.identity.liveRows),
     delta: { from: [S.alive, after], to: [R.alive, r.derived.litters[R.id].alive] },
-    carry: Object.assign({}, mv.packets), asks, sourceAfter, why: null, event: ev
+    carry, asks, sourceAfter, why: null, event: ev
   };
 }
 
-/* End task figures (slice S9 glossary) over a set of derived litters. */
-function endFigures(cfg, litterViews) {
+/* End task figures (slice S9 glossary) over a set of derived litters, for one task.
+   On time: a treatment (litter × dose) recorded fully — owed and unknown both 0 — by its planned
+   day, over the treatments recorded or due. Before End, a dose due today and unrecorded is left
+   out; at End (and after), a dose due on or before the End day and never recorded counts against. */
+function endFigures(cfg, litterViews, opts) {
+  const o = opts || {};
   const order = doseOrder(cfg);
-  const litters = Object.values(litterViews).filter((L) => L.inTask);
-  const byLitter = {}, unfinished = [];
-  const progress = { done: 0, owed: 0, missed: 0, ahead: 0 };
+  const litters = Object.values(litterViews).filter((L) => (o.task ? L.task === o.task : L.inTask));
+  const byLitter = {}, per = {}, unfinished = [];
+  const progress = { done: 0, owed: 0, unknown: 0, missed: 0, ahead: 0 };
   let n = 0, k = 0, idDone = 0;
   for (const L of litters) {
     const list = [];
+    const t = { done: 0, owed: 0, unknown: 0, missed: 0, notDue: 0, malesUncounted: false, onTime: { n: 0, k: 0 }, excluded: 0, unfinished: false };
+    const age = o.closing && o.endDay != null && L.birthDay != null ? o.endDay - L.birthDay : L.dayAge;
     for (const D of Object.values(L.doses).sort(order)) {
-      progress.done += D.treated;
-      const left = D.owed == null ? null : D.owed + D.unknownAfterMove;   // exclusive by construction: ≤ alive
+      t.done += D.treated;
       const kind = D.status === 'later' ? 'not_due' : D.status === 'missed' ? 'missed' : 'owed';
-      if (left == null) { if (!D.records.length) list.push({ dose: D.dose, kind, n: null }); }
-      else if (left > 0) {
-        list.push({ dose: D.dose, kind, n: left });
-        if (kind === 'not_due') progress.ahead += left; else progress.owed += left;
-        if (kind === 'missed') progress.missed += left;
+      const owed = D.owed == null ? 0 : D.owed, unk = D.unknownAfterMove;
+      if (D.owed == null) {
+        if (!D.records.length) { list.push({ dose: D.dose, kind, n: null, males: 'uncounted' }); if (kind !== 'not_due') t.malesUncounted = true; }
+      } else if (owed + unk > 0) {
+        list.push({ dose: D.dose, kind, n: owed + unk });
       }
-      if (D.records.length || L.dayAge > D.due) {
-        k++;
-        if (D.fullAt != null && D.fullAt <= D.due) n++;
-      }
+      if (kind === 'not_due') t.notDue += owed + unk;
+      else { t.owed += owed; t.unknown += unk; if (kind === 'missed') t.missed += owed; }
+      const counted = D.records.length > 0 || age > D.due || (o.closing && age >= D.due);
+      if (counted) { t.onTime.k++; if (D.fullAt != null && D.fullAt <= D.due) t.onTime.n++; }
+      else t.excluded++;
     }
+    t.unfinished = list.length > 0 || L.identity.done === false;
     byLitter[L.id] = list;
+    per[L.id] = t;
+    progress.done += t.done; progress.owed += t.owed; progress.unknown += t.unknown; progress.missed += t.missed; progress.ahead += t.notDue;
+    n += t.onTime.n; k += t.onTime.k;
     if (L.identity.done === true) idDone++;
-    if (list.length || L.identity.done === false) unfinished.push(L.id);
+    if (t.unfinished) unfinished.push(L.id);
   }
-  progress.total = progress.done + progress.owed + progress.ahead;
+  progress.total = progress.done + progress.owed + progress.unknown + progress.ahead;
   return {
     unfinishedLitters: unfinished, finishedLitters: litters.map((L) => L.id).filter((id) => !unfinished.includes(id)),
-    byLitter, unfinishedPigletDoses: Object.values(byLitter).flat().reduce((s, x) => s + (x.n || 0), 0), progress,
+    byLitter, litters: per, unfinishedPigletDoses: Object.values(byLitter).flat().reduce((s, x) => s + (x.n || 0), 0), progress,
     onTime: { n, k }, identityDone: { n: idDone, k: litters.length },
     movedOutAfterEnd: litters.flatMap((L) => L.movedOutAfterEnd.map((m) => Object.assign({ litter: L.id }, m)))
   };
 }
 
-/* `atEnd`: the closure figures frozen by `end_task`; `now`: the live figures, amendments since
-   End included. */
-function endSelect(derived) {
-  return { atEnd: derived.ended && derived.ended.snapshot ? clone(derived.ended.snapshot) : null, now: endFigures(derived.config, derived.litters), ended: derived.ended ? Object.assign({}, derived.ended, { snapshot: undefined }) : null };
+/* One task's End figures: `atEnd`, frozen by `end_task` from the log as it stood at End; `now`,
+   live, amendments since End included. Both carry per-litter totals (`litters`). */
+function endSelect(derived, opts) {
+  const o = opts || {};
+  const taskId = o.task || (derived.config.task ? derived.config.task.id : null);
+  const T = (derived.tasks || []).find((x) => x.id === taskId);
+  const E = T ? T.ended : derived.ended;
+  const closed = !!(E && (E.event || E.at));
+  return {
+    task: taskId,
+    atEnd: E && E.snapshot ? clone(E.snapshot) : null,
+    now: endFigures(derived.config, derived.litters, { task: taskId, closing: closed, endDay: E ? dayNumber(E.at) : null }),
+    ended: E ? Object.assign({}, E, { snapshot: undefined }) : null
+  };
 }
 
 /* ---- corrections and the litter record (slice S8, ticket #12) ---- */
@@ -1602,7 +1764,21 @@ function editSelect(derived, id, draft, stamp) {
   };
 }
 
-export const select = { room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect, record: recordSelect, edit: editSelect };
+/* Where a tag or notch is held now (rows alive or missing), except in one litter: the lookup a
+   page runs on a value being typed, before it is a row. */
+function findId(derived, id, exceptLitter) {
+  const out = [];
+  for (const L of Object.values(derived.litters)) {
+    if (L.id === exceptLitter) continue;
+    for (const r of L.identity.rows) {
+      if (r.litter !== L.id || (r.status !== 'alive' && r.status !== 'missing')) continue;
+      if ((id.tag && r.tag === id.tag) || (id.notch && r.notch === id.notch)) out.push({ litter: L.id, rowId: r.rowId, status: r.status });
+    }
+  }
+  return out;
+}
+
+export const select = { findId, room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect, record: recordSelect, edit: editSelect };
 export const PPLedger = { derive, append, balances, dayNumber, select };
 export default PPLedger;
 if (typeof window !== 'undefined') window.PPLedger = PPLedger;
