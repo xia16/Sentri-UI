@@ -1039,3 +1039,61 @@ test('property: raw identity rows never exceed alive; coverage never exceeds its
     }
   }
 });
+
+// ---- End task, from the map's provisional ledger ---------------------------------------------
+
+const TASKED = (litters) => Object.assign({}, IRON_ONLY, { task: { id: 'T', litters } });
+
+test('END-a a mark stamped before End but applied after it is accepted, flagged arrived_after_end', () => {
+  const b = book();
+  const f = b.farrowed('A02', 12);
+  const end = b.ev.push({ id: 'end', type: 'end_task', at: on(5, '12:00'), who: 'G.H' }) && b.ev[b.ev.length - 1];
+  const before = b.treat('A02', 'iron3', 12, { at: on(5, '09:00'), seen: [f.id] });   // offline, synced after End
+  const afterStamp = b.treat('A02', 'iron3', 12, { at: on(5, '13:00'), seen: [f.id] });
+  const d = run(b, TASKED(['A02']), 5);
+  assert.equal(rejectedReason(d, before), undefined);
+  assert.equal(rejectedReason(d, afterStamp), 'task_ended');
+  assert.deepEqual(d.flags.filter((g) => g.kind === 'task').map((g) => [g.reason, g.events[0]]), [['arrived_after_end', before.id]]);
+  assert.equal(d.ended.event, end.id);
+});
+
+test('END-b a correction after End voids a wrong-litter mark and carries the fresh mark for the right litter', () => {
+  const b = book();
+  b.farrowed('A02', 12); b.farrowed('A05', 11);
+  const wrong = b.treat('A02', 'iron3', 12, { at: on(3) });
+  b.ev.push({ id: 'end', type: 'end_task', at: on(5, '12:00'), who: 'G.H' });
+  const c = b.correction(wrong.id, { void: true, fresh: { litter: 'A05', dose: 'iron3', n: 11 }, at: on(6) });
+  const d = run(b, TASKED(['A02', 'A05']), 6);
+  assert.equal(rejectedReason(d, c), undefined);
+  assert.equal(d.litters.A02.doses.iron3.owed, 12);
+  assert.equal(d.litters.A05.doses.iron3.owed, 0);
+  assert.equal(d.litters.A05.doses.iron3.records[0].viaCorrection, c.id);
+  assert.deepEqual(d.flags.filter((g) => g.kind === 'task').map((g) => g.reason), ['correction_after_end']);
+  // a fresh mark that cannot stand makes the whole correction invalid; the wrong mark stays
+  const bad = b.correction(wrong.id, { void: true, fresh: { litter: 'A05', dose: 'iron3', n: 99 }, at: on(6) });
+  const d2 = run(b, TASKED(['A02', 'A05']), 6);
+  assert.equal(rejectedReason(d2, bad), 'correction_invalid');
+});
+
+test('END-c piglets moved out after End reduce the ended task\'s not-done; arrivals keep owed recordable (catch-up)', () => {
+  const b = book();
+  b.farrowed('A02', 12); b.farrowed('A05', 11); b.farrowed('X', 6);
+  b.treat('A05', 'iron3', 11);
+  b.ev.push({ id: 'end', type: 'end_task', at: on(3, '12:00'), who: 'G.H' });
+  const out = b.move('A02', 'X', 2, { at: on(3, '13:00') });
+  const inn = b.move('X', 'A05', 1, { at: on(3, '13:05') });
+  let d = run(b, TASKED(['A02', 'A05']), 3);
+  assert.deepEqual(d.litters.A02.movedOutAfterEnd, [{ move: out.id, n: 2, to: 'X', owed: { iron3: 2 } }]);
+  const e = select.end(d);
+  assert.deepEqual(e.byLitter.A02, [{ dose: 'iron3', kind: 'owed', n: 10 }]);
+  assert.equal(d.litters.A05.doses.iron3.owed, 1);
+  assert.equal(d.litters.A05.doses.iron3.catchUp, 1);
+  const catchUp = b.treat('A05', 'iron3', 1, { at: on(3, '14:00') });
+  const again = b.treat('A02', 'iron3', 10, { at: on(3, '14:10') });
+  d = run(b, TASKED(['A02', 'A05']), 3);
+  assert.equal(rejectedReason(d, catchUp), undefined);
+  assert.equal(d.litters.A05.doses.iron3.records[1].catchUp, true);
+  assert.equal(d.litters.A05.doses.iron3.owed, 0);
+  assert.equal(rejectedReason(d, again), 'task_ended');
+  assert.ok(inn);
+});
