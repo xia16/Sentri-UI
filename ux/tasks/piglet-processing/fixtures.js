@@ -449,10 +449,24 @@ export const VARIANTS = {
     base(b); b.treat('A02', 'tail', sep(29, '08:40'), 'L.M', 12, { id: 'T-A02-tail' }); b.treat('A02', 'iron3', sep(29, '09:14'), ME, 12, { id: 'T-A02-visit' });
     b.push({ type: 'correction', target: 'T-A02-visit', set: { n: 10, deferred: { n: 2, reason: 'weak' } }, at: sep(29, '10:31'), who: ME, id: 'X-A02-iron' });
   }),
-  // …or L.M's tail was done on A04, not A02: un-recorded on A02 and recorded fresh on A04 (A04's 11), one stamped act
+  // …or L.M's tail was done on A04, not A02: withdrawn on A02 and the act recorded on A04 (A04's 11) at its own
+  // time and hand (08:40 · L.M), one stamped correction by G.H at 10:31
   'a02-wrong-litter': V((b) => {
     base(b); b.treat('A02', 'tail', sep(29, '08:40'), 'L.M', 12, { id: 'T-A02-tail' }); b.treat('A02', 'iron3', sep(29, '09:14'), ME, 12, { id: 'T-A02-visit' });
-    b.push({ type: 'correction', target: 'T-A02-tail', void: true, fresh: { litter: 'A04', dose: 'tail', n: 11 }, at: sep(29, '10:31'), who: ME, id: 'X-A02-tail' });
+    b.push({ type: 'correction', changes: [{ target: 'T-A02-tail', void: true, fresh: { litter: 'A04', dose: 'tail', n: 11, at: sep(29, '08:40'), who: 'L.M' } }], at: sep(29, '10:31'), who: ME, id: 'X-A02-tail' });
+  }),
+  // A02: iron 10 + 2 weak at 09:14, then L.M's follow-up for the 2 weak at 10:05 (a later record a correction must not drop)
+  'a02-followup': V((b) => {
+    base(b); b.treat('A02', 'tail', sep(29, '08:40'), 'L.M', 12, { id: 'T-A02-tail' });
+    b.treat('A02', 'iron3', sep(29, '09:14'), ME, 10, { id: 'T-A02-visit', deferred: { n: 2, reason: 'weak' } });
+    b.treat('A02', 'iron3', sep(29, '10:05'), 'L.M', 2, { id: 'T-A02-follow' });
+  }),
+  // two phones corrected A02's iron offline, neither saw the other: both kept, flagged sync review
+  'a02-concurrent': V((b) => {
+    base(b); b.treat('A02', 'tail', sep(29, '08:40'), 'L.M', 12, { id: 'T-A02-tail' }); b.treat('A02', 'iron3', sep(29, '09:14'), ME, 12, { id: 'T-A02-visit' });
+    const seen = b.ids();
+    b.push({ type: 'correction', changes: [{ target: 'T-A02-visit', set: { n: 11, deferred: { n: 1, reason: 'weak' } } }], at: sep(29, '10:20'), who: 'L.M', seen, device: 'P-LM', id: 'X-A02-lm' });
+    b.push({ type: 'correction', changes: [{ target: 'T-A02-visit', set: { n: 10, deferred: { n: 2, reason: 'weak' } } }], at: sep(29, '10:31'), who: ME, seen, device: 'P-GH', id: 'X-A02-gh' });
   }),
   // birth litter weight (S10): set at farrowing's Edit, saved here, and a conflict with another phone
   'c02-weight-set': V((b) => { base(b); b.push({ type: 'birth_weight', litter: 'C02', kg: '16.4', source: 'farrowing', at: sep(28, '14:52'), who: 'G.H' }, 'BW-C02'); }),
