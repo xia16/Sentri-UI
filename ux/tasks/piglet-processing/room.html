@@ -71,6 +71,8 @@
     'room': { data: 'base' }, 'room-empty': { data: 'quiet', room: 8 }, 'room-all-done': { data: 'all-done' },
     'room-overdue': { data: 'behind' }, 'room-drift': { data: 'drift' },
     'room-filter': { data: 'base', sheet: 'filter', filter: ['iron'] },
+    'room-bulk-ticked': { data: 'base', filter: ['iron'], ticks: { dose: 'iron3', sel: ['A02', 'A04', 'A07', 'B01', 'B06', 'B10', 'C05'] } },
+    'room-bulk-ended': { data: 'ended-moves', filter: ['iron'] },
     'room-scan': { data: 'base', sheet: 'scan' },
     'room-find': { data: 'base', sheet: 'find', q: '000354' },
     'room-scan-hit': { data: 'base', sheet: 'find', q: '000354', scanned: true },
@@ -240,11 +242,20 @@
   // Filtered by one treatment that two or more litters owe: the door to record it for several litters at once (bulk.html, slice #7).
   function bulkDoor() {
     if (S.filter.length !== 1 || S.missed) return '';
-    var k = sel('owed', S.filter).rows.length;
-    if (k < 2) return '';
-    var tx = S.filter[0];
+    var tx = S.filter[0], best = null;
+    // The litters a bulk record can write (the ledger's bulkDraft): after End only catch-up, and no door when there is none.
+    CFG.doses.filter(function (d) { return d.tx === tx; }).forEach(function (d) {
+      var b = store.select.bulkDraft(store.derived, { room: ROOM, dose: d.id });
+      var k = b.rows.filter(function (r) { return r.kind === 'record'; }).length;
+      if (!best || k > best.k) best = { dose: d.id, k: k, ended: !!b.ended };
+    });
+    if (!best || best.k < (best.ended ? 1 : 2)) return '';
+    // Ticks left on this phone (a bulk draft) say so here.
+    var ticked = 0;
+    try { ticked = (JSON.parse(sessionStorage.getItem('pp-bulk-ticks:' + store.name + ':' + ROOM + ':' + best.dose) || '[]') || []).length; } catch (e) {}
+    var desc = ticked ? ['pp.bulk.door_ticked', { k: ticked }] : [PP.one('pp.bulk.door_desc', best.k), { k: best.k }];
     return '<div class="pp-bulkdoor">' + UI.rowGroup(UI.row({ title: '', description: '', action: 'open-bulk', value: tx,
-      strs: { title: 'pp.bulk.door', description: PP.one('pp.bulk.door_desc', k) }, args: { title: { tx: PP.lang === 'zh' ? name(tx) : name(tx).toLowerCase() }, description: { k: k } } })) + '</div>';
+      strs: { title: 'pp.bulk.door', description: desc[0] }, args: { title: { tx: PP.lang === 'zh' ? name(tx) : name(tx).toLowerCase() }, description: desc[1] } })) + '</div>';
   }
   // The treatments this lens's litters owe, did today or have next — one filter row per treatment (iron day 3 and day 14 are one word).
   function roomTx() {
@@ -456,6 +467,8 @@
     store = PP.open(start.data);
     CFG = store.config;
     NOW = store.today + 'T10:30';
+    // room-bulk-ticked: ticks a bulk page left on this phone (slice #7's device draft).
+    if (start.ticks) { try { sessionStorage.setItem('pp-bulk-ticks:' + store.name + ':' + ROOM + ':' + start.ticks.dose, JSON.stringify(start.ticks.sel)); } catch (e) {} }
     render(); restoreScroll();
   });
   // The one registry exception: when the registry itself failed to load there is nothing to look strings up in.
