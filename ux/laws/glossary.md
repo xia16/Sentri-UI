@@ -43,6 +43,18 @@ Defined by farrowing and used here unchanged (RULINGS *Model*; the Finish sheet)
 | **Healthy** | piglets | alive − weak − deformed; derived, no form row, printed on the record | as Weak / Deformed | one litter |
 | **Weaned** 断奶 | piglets | piglets that left the litter at weaning; the last term of the ledger | stamped at weaning | one litter |
 
+## Edge litters (slice 14)
+
+Terms for the litter faces that differ from the ordinary litter sheet. Counts on these faces use the terms above unchanged (Born, Alive, Dead, Owed, Birth litter weight).
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Litter outside a task** 无任务的窝 | the litter | a real litter that no processing task covers (late farrower, re-entered sow). Deaths, counts and moves are recordable; treatments are not | now | one litter. Which task it should join is open (map question Q33) |
+| **Orphan litter** 孤儿窝 | the litter | a litter whose sow died after farrowing was locked; it keeps its schedule and stays in the task. Alive is the ledger's Alive, unchanged by the death | from the sow's death | one litter; the red `sow died` word and band come from farrowing's Done-register grammar |
+| **Litter before lock** 未锁定的窝 | the litter | a litter whose farrowing session is still open: Born is not final, so processing prints Alive and Dead only, with `count still open`. Count changes and deaths are recorded on the farrowing sheet; owed treatments are recorded here | until the farrowing lock | one litter |
+| **Owed line** `{n} owed · day {d}` | piglets | Owed (above) for one dose, with the dose's due day-age | now | one litter per dose |
+| **Live-born weighed** `{n} live-born` | piglets | the live-born piglets of this farrowing, weighed together: the provisional population of Birth litter weight | at farrowing Finish, or when processing records it while missing | one litter |
+
 ## Count grammar
 
 The count leads the word and the unit is written: `{n} piglets`, singular `{n} piglet` (`pp.common.unit.piglet.one` / `.many`, `PP.tn`); zh has one form and no space between numeral and classifier (`14头`, `3日龄`). Ruled anchors that stay as they are: `born {n}` and `day {n}` (en), `Saved · +{n} this visit` and `Saved · {n} died this visit` (farrowing's, under `fr.*`; a processing receipt names its outcome and is registered by the slice that writes it), and label-then-count headers such as `Dead 6` and `Unexplained loss {n}`.
