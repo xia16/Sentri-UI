@@ -38,13 +38,14 @@ try {
   await page.click('[data-action="step"][data-step="-1"]');
   assert.match(await text(page, '[data-ds="Stepper"]'), /1 fewer · Save writes unexplained loss 1 piglet/);
   await page.click('[data-action="save"]');
-  assert.match(await text(page, '.pp-receipt'), /Saved · unexplained loss 1 piglet/);
+  await page.waitForSelector('#ct-receipt span');
+  assert.match(await text(page, '#ct-receipt'), /Saved\s*·\s*unexplained loss 1 piglet/);
   // a double tap right after Save lands nowhere
   await page.click('[data-action="back"]');
   assert.match(page.url(), /count\.html/);
   // one open line: its doors are right on the litter (no extra hop)
   assert.match((await page.locator('[data-action="suggest"]').first().innerText()).replace(/\s+/g, ' '), /B08 gained 1 piglet/);
-  console.log('ok 2 litter Set count 11:', await text(page, '.pp-receipt'));
+  console.log('ok 2 litter Set count 11:', await text(page, '#ct-receipt'));
 
   // 3. Back to the room: the strip and B06's row show the open loss, beside B08's gain (never netted).
   await page.waitForTimeout(450);
@@ -98,7 +99,76 @@ try {
   await page.click('[data-action="save"]');
   await page.waitForTimeout(450);
   assert.doesNotMatch(await text(page, '#screen'), /Two counts disagree/);
-  console.log('ok 7 two counts disagree → count again settles it:', await text(page, '.pp-receipt'));
+  await page.waitForSelector('#ct-receipt span');
+  console.log('ok 7 two counts disagree → count again settles it:', await text(page, '#ct-receipt'));
+
+  const toCount = async (code, data) => {
+    await page.goto(base + `room.html?state=room&lens=all&fresh=1${data ? '&data=' + data : ''}`); await ready(page);
+    await page.click(`[data-action="open-litter"][data-value="${code}"]`);
+    await page.waitForURL(/litter\.html/); await ready(page);
+    await page.click('[data-action="open-count"]');
+    await page.waitForURL(/count\.html/); await ready(page);
+  };
+  const step = async (d, n) => { for (let i = 0; i < n; i++) await page.click(`[data-action="step"][data-step="${d}"]`); };
+
+  // 8. R1-27: a count far above Alive asks before it saves; a waiting Save answers the tap and saves nothing; `17 is right` lets
+  // it save. R1-11: the gain says "check on the pig" (it owes nothing new).
+  await toCount('A02');
+  await step(1, 5);
+  assert.match(await text(page, '#ct-why'), /17 piglets is 5 more than the record's 12 piglets · count again, or say it's right/);
+  assert.match(await text(page, '[data-ds="Stepper"]'), /recorded treatments stand · check on the pig/);
+  await page.click('[data-action="save"]', { force: true });
+  assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
+  await page.click('[data-action="sure"]');
+  await page.click('[data-action="save"]');
+  await page.waitForSelector('#ct-receipt span');
+  assert.match(await text(page, '#ct-receipt'), /unexplained gain 5 piglets\s*·\s*check on the pig/);
+  assert.match(await text(page, '#screen'), /Check on the pig · it owes nothing new/);
+  console.log('ok 8 a count far above Alive asks first; the gain owes nothing new:', await text(page, '#ct-receipt'));
+
+  // 9. R1-27: 0 asks "moved or weaned?" (the Move door is right there); the draft kept on Back is never a stale 0 ready to Save.
+  await toCount('B10');
+  await step(-1, 11);
+  assert.match(await text(page, '[data-target="zero"]'), /None seen in B10 · moved or weaned\? .* Record a Move from B10/);
+  assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
+  await page.click('[role="dialog"] [data-action="back"]');
+  assert.match(await text(page, '#screen'), /Set count 0 piglets counted \d\d:\d\d · not saved/);
+  await page.click('[data-action="open-count"][data-value="B10"]');
+  assert.equal(await page.locator('[role="spinbutton"]').first().innerText(), '0');
+  assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
+  assert.match(await text(page, '#ct-why'), /0 writes all 11 piglets as missing/);
+  await page.click('[data-target="zero"] [data-action="open-move"]');
+  await page.waitForURL(/move\.html\?.*crate=B10/);
+  console.log('ok 9 0 asks moved or weaned; the kept 0 still asks; the Move door opens');
+
+  // 10. R1-9: Set count names the tagged piglet it knows is missing (optional: the untagged could cover it); the line then
+  // carries 271004, and its body (Record dead from the line) closes it — Alive stays.
+  await toCount('B06');
+  await step(-1, 1);
+  assert.match(await text(page, '[data-target="roster"]'), /Which tagged piglets are missing\? · optional/);
+  await page.check('input[data-action="pick-row"][value="B06-r4"]');
+  await page.click('[data-action="save"]');
+  await page.waitForSelector('#ct-receipt span');
+  await page.waitForTimeout(450);
+  await page.click('[data-action="open-dead"][data-value="B06"]');
+  await page.waitForURL(/dead\.html/); await ready(page);
+  assert.match(await text(page, '[data-ds="ChoiceList"]'), /271004 counted missing/);
+  await page.check('input[data-action="pick"][value="B06-r4"]');
+  await page.click('[data-action="pick-cause"][data-value="crushed"]');
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/count\.html\?state=host.*saved=dead/); await ready(page);
+  await page.waitForSelector('#ct-receipt span');
+  assert.match(await text(page, '#ct-receipt'), /271004 crushed\s*·\s*all missing found/);
+  assert.match(await text(page, '[data-ds="Facts"]'), /Alive 11 piglets/);
+  console.log('ok 10 a named missing piglet body closes its line:', await text(page, '#ct-receipt'));
+
+  // 11. R1-22: a held body is answered in the Set count drawer, above the number (never under the sheet).
+  await toCount('A07', 'held-body');
+  const drawerText = await text(page, '[role="dialog"]');
+  assert.ok(drawerText.indexOf('Same body recorded twice?') >= 0 && drawerText.indexOf('Same body recorded twice?') < drawerText.indexOf('Seen in A07'));
+  await page.click('[role="dialog"] [data-action="resolve"][data-value$="|two"]');
+  assert.doesNotMatch(await text(page, '#screen'), /Same body recorded twice\?/);
+  console.log('ok 11 held body answered in the Set count drawer: Two bodies');
 
   await browser.close();
 } finally {
