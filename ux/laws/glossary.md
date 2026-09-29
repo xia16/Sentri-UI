@@ -224,6 +224,8 @@ One module computes every figure above from the litter's events; pages render it
 
 **Page concern.** Unsaved drafts live on the device; the ledger cannot see them. End review must warn from the device's own drafts before End.
 
+**Shared fixture** (`fixtures.js`, ticket #19). Every page opens one variant of one event log + config (Unit 7, Unit 8 for cross-room cases; `?data=` names the variant) and renders the selectors above; a page state is a variant plus UI state. Commits go through `append` and stay in the tab's log (sessionStorage), so a record on one page shows on the next. Facts the ledger does not hold travel beside it in the fixture: the sow's tag and parity, the birth litter weight, weigh-day litter weights and boar/gilt counts for piglets not identified, drafts held on the phone.
+
 ### Known limits (not fixed before merge)
 
 Each with the event sequence that shows it.
