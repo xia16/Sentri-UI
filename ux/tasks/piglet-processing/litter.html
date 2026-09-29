@@ -10,33 +10,19 @@
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* Layout, tokens from tokens.css. Candidate compositions: TreatmentRow, EvidenceRow, Radio here; Tool, Receipt and the
-   litter header come from the shell (shell-ui.js, shell.css). */
+/* Layout only, tokens from tokens.css. Cards (ADR 0002): Row `rowAction` (the treatment row), `row({ wrap, trail: 'edit' })`
+   (the evidence row), ChoiceList `choiceRadios`, Button `waiting` + `buttonReason` + `guard`, Banner (the sow died). The
+   header, tools and receipt come from the shell (shell-ui.js, shell.css). */
 .lt-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
 .lt-phone .scrim { inset: 0; }
 .lt-body { display: flex; flex-direction: column; gap: var(--space-section); }
 .lt-body > * { margin: 0; }
 .lt-drawer-body { display: flex; flex-direction: column; gap: var(--space-row-y); }
-/* The receipt sits in the bar above Close, so a record never reflows the row stack. */
+/* The receipt and the reason line sit in the bar above its buttons, so a record never reflows the row stack. */
 .lt-bar { flex-wrap: wrap; row-gap: var(--space-row-y); }
 .lt-bar > .pp-receipt { flex-basis: 100%; }
 .lt-bar > .button { flex: 1; }
-/* The TreatmentRow's left door: a bare button around text + ›. */
-.lt-door { display: inline-flex; align-items: center; gap: var(--space-key-gap); min-height: var(--touch-min); padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; }
-.lt-door svg { width: var(--glyph-key); height: var(--glyph-key); flex: none; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-/* Candidate:TreatmentRow — Row anatomy with two targets: the copy opens the dose, the button records it. */
-.lt-tx .lt-door { flex: 1; min-width: 0; align-self: stretch; }
-.lt-tx .lt-door .st-row-copy { flex: 1; min-width: 0; }
-.st-row.lt-tx .st-row-copy strong { display: flex; align-items: center; gap: var(--space-key-gap); }
-.lt-tx .button { flex: none; min-height: var(--touch-min); }
-/* Candidate:EvidenceRow — a done Row whose evidence line wraps instead of truncating. */
-.st-row.lt-rec .st-row-copy small { white-space: normal; }
-/* Candidate:Radio — the craft pass's visible radio: a ring, and an ink dot when chosen. */
-.lt-radio { display: block; box-sizing: border-box; width: var(--glyph-pad); height: var(--glyph-pad); border: var(--caret-width) solid var(--control-border); border-radius: 50%; }
-[aria-checked="true"] .lt-radio { border-color: var(--ink); background: var(--ink); box-shadow: inset 0 0 0 var(--caret-width) var(--paper); }
-[aria-checked="true"] .st-choice-label { font-weight: 600; }
-/* Button has no aria-disabled face; Save keeps its place and takes the disabled fill while it waits. */
-.lt-phone .sheet-footer .button.primary[aria-disabled="true"] { background: var(--disabled-fill); border-color: var(--disabled-fill); color: var(--disabled-ink); }
+.lt-confirm { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--space-footer-gap); }
 </style>
 </head>
 <body>
@@ -48,16 +34,17 @@
 <script src="shell-ui.js"></script>
 <script>
 (function () {
-  var UI = window.SentriUI, ICON = window.SentriIcons, U = window.PPUI;
+  var UI = window.SentriUI, U = window.PPUI;
   var zh = PP.lang === 'zh';
 
   /* ---- states: a fixture variant (fixtures.js) + the crate + UI state. Every figure on the face is the ledger's
      (select.litter over the shared log); drafts are validated by the same replay `append` runs; Save and the
-     one-tap commit through `append`. `visit`: the record this phone made this visit (it keeps its place). ---- */
+     one-tap commit through `append`. `visit`: the record this phone made this visit (it keeps its place).
+     `pre`: records made at load (the moment after them), kept out of the tab's log like `tap`. ---- */
   var STATES = {
     'litter':             { data: 'base' },
     'litter-partial':     { data: 'a02-partial', crate: 'A02', visit: ['T-A02-visit'], receipt: 'saved' },
-    'draft-waiting':      { data: 'base', crate: 'A02', drafts: { iron3: { n: 10, reason: '', owed: 12 } } },
+    'draft-waiting':      { data: 'base', crate: 'A02', drafts: { iron3: { kind: 'dose', dose: 'iron3', n: 10, reason: '', owed: 12 } } },
     'litter-short-count': { data: 'base', crate: 'A02', drawer: { dose: 'iron3', n: 10, reason: '' } },
     'litter-short-saved': { data: 'a02-short', crate: 'A02', visit: ['T-A02-visit'], receipt: 'saved' },
     'castrate':           { data: 'a02-castrate', crate: 'A02', drawer: { dose: 'castrate', castr: { castrated: 3, hernia: 1, cryptorchid: 0, kept: 0, deferred: 2, deferReason: 'weak' } } },
@@ -75,42 +62,74 @@
     // RULINGS round 3: after End no new marks — a mark done after End is evidence (kept, never counted); a mark withdrawn
     // after End reads not done · corrected after End
     'after-end':          { data: 'ended-after-end', crate: 'B01' },
-    'corrected-after-end': { data: 'ended-correct', crate: 'B03' }
+    'corrected-after-end': { data: 'ended-correct', crate: 'B03' },
+    // scenario round 1 (fix/r1-litter)
+    'arrived-unknown':    { data: 'moved-unknown', crate: 'B02' },                                   // R1-2
+    'arrived-resolve':    { data: 'moved-unknown', crate: 'B02', resolve: { dose: 'iron3', had: 1 } },  // R1-2
+    'arrived-check':      { data: 'moved-unknown', crate: 'B02', resolve: { dose: 'tail', had: 1, rest: 'record' } },
+    'range':              { data: 'move-doubt', crate: 'A07' },                                       // R1-3
+    'range-check':        { data: 'move-doubt', crate: 'A07', range: { dose: 'iron3', still: 1 } },
+    'arrivals-young':     { data: 'move-young', crate: 'D03' },                                       // R1-4
+    'not-due':            { data: 'base', crate: 'A02', pre: [{ type: 'move', from: 'D06', to: 'A02', n: 2, answers: {} }] },
+    'closed':             { data: 'emptied', crate: 'C05' },                                          // R1-19
+    'orphan':             { data: 'base', crate: 'B01' },                                             // one sheet
+    'orphan-unlocked':    { data: 'base', crate: 'D06' },
+    'nurse':              { data: 'moved-orphan', crate: 'D02' },                                     // round 4
+    'ended':              { data: 'ended', crate: 'B01' },                                            // R1-13
+    'ended-review':       { data: 'ended', crate: 'A05' },
+    'held':               { data: 'held-body', crate: 'A07' },                                        // R1-22
+    'count-conflict':     { data: 'count-offline', crate: 'A07' },
+    'double-answered':    { data: 'double-twice', crate: 'A05' },
+    'identity-late':      { data: 'base', crate: 'C05' },                                             // R1-17
+    'keepers-closed':     { data: 'keepers-closed', crate: 'A07' },
+    'one-tap-saved':      { data: 'base', crate: 'A02', tap: { dose: 'iron3', n: 12 } },              // R1-25 Undo
+    'no-males-confirm':   { data: 'a02-castrate', crate: 'A02', drawer: { dose: 'castrate', castr: { castrated: 3, hernia: 1, cryptorchid: 0, kept: 0, deferred: 0, deferReason: '' }, confirmNone: true } },
+    'split-reasons':      { data: 'base', crate: 'A02', drawer: { dose: 'iron3', n: 10, reason: 'split', weak: 1 } },
+    'all-deferred':       { data: 'base', crate: 'A02', drawer: { dose: 'iron3', n: 0, reason: 'weak' } },
+    'all-deferred-saved': { data: 'base', crate: 'A02', pre: [{ type: 'treat', litter: 'A02', dose: 'iron3', n: 0, deferred: { n: 12, reason: 'weak' } }], preVisit: true },
+    'corrected':          { data: 'a02-corrected', crate: 'A02' }                                     // R1-28
   };
   var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'litter';
   var st = STATES[name];
   var store, CFG, SOW, TODAY, crate;
   var visit = {};                         // record ids this phone made this visit
-  var receipt = null;                     // { kind, dose, rec, other, now }
-  var drawer = null;                      // the open dose drawer's draft
-  var drafts = {};                        // Back keeps a drawer's draft on the device, per dose
-  var lastCommit = 0, drawerClosedAt = 0, ceilTap = '';
+  var receipt = null;                     // { kind, dose, rec, other, now, undo }
+  var drawer = null;                      // the open drawer's draft: { kind: dose|resolve|range, key, dose, … }
+  var drafts = {};                        // Back keeps a drawer's draft on the device, per drawer key
+  var lastCommit = 0, drawerClosedAt = 0, drawerOpenedAt = 0, ceilTap = '';
 
   /* ---- the ledger ---- */
   function L() { return store.derived.litters[crate]; }
   function view(extra) { return store.select.litter(store.derived, crate, Object.assign({ stamp: { who: PP.me } }, extra || {})); }
   function doseCfg(id) { return CFG.doses.filter(function (d) { return d.id === id; })[0]; }
   function D(id) { return L().doses[id]; }
-  function owedNow(id) { var x = D(id); return x.owed; }                  // shown owed (null: castration before its first record)
+  function owedOf(id) { return D(id).owed; }                               // shown owed (null: castration before its first record)
   function isDone(id) { var x = D(id); return x.owed === 0 && x.unknownAfterMove === 0; }
   function recordOf(id) {
     var out = null;
     Object.keys(L().doses).forEach(function (k) { L().doses[k].records.forEach(function (r) { if (r.id === id) out = r; }); });
     return out;
   }
+  function rawEvent(id) { return store.events.filter(function (e) { return e.id === id; })[0] || null; }
   function visitRec(id) { var rs = D(id).records.filter(function (r) { return visit[r.id]; }); return rs[rs.length - 1] || null; }
+  function unknownGroups(id) { return (D(id).unknownGroups || []).filter(function (g) { return g.n > 0; }); }
+  // The task this litter is in has ended (RULINGS round 3): nothing on it reads actionable (R1-13)
+  function endedTask() { return (store.derived.tasks || []).filter(function (t) { return t.ended && t.litters.indexOf(crate) >= 0; })[0] || null; }
+  function tagOf(rowId) { var r = (L().identity.rows || []).filter(function (x) { return x.rowId === rowId; })[0]; return r ? r.tag || r.notch : null; }
 
-  /* ---- strings ---- */
+  /* ---- strings: a token part is a registered string (filled now and by PP.apply); tone colours the value ---- */
+  function P(id, args, tone) { return { text: PP.t(id, args), tone: tone || undefined, strs: { text: id }, args: args ? { text: args } : undefined }; }
   var span = function (id, args, tone) { return U.span(id, args, { tone: tone }); };
-  var SEP = function () { return ' ' + span('pp.litter.sep') + ' '; };
   var one = PP.one;
   var pigs = function (n) { return PP.tn('pp.common.unit.piglet', n); };
+  function btn(o) { return UI.button(Object.assign({ label: PP.t(o.id, o.args) }, o, { id: '', strs: { label: o.id }, args: o.args ? { label: o.args } : undefined })); }
   // Both iron doses carry their day everywhere (`Iron · day 3`, `Iron · day 14`).
   function title(id) { var d = doseCfg(id); return d.tx === 'iron' ? ['pp.litter.tx_day', { tx: PP.t('pp.common.tx.iron'), d: d.due }] : ['pp.common.tx.' + d.tx, null]; }
   function titleText(id) { var t = title(id); return PP.t(t[0], t[1]); }
+  function titleTok(id) { var t = title(id); return [P(t[0], t[1])]; }
   function lower(s) { return zh ? s : s.charAt(0).toLowerCase() + s.slice(1); }
-  function stamp(r) { return U.stamp(r.at, r.who, TODAY); }
+  function stampText(at, who) { return U.stamp(at, who, TODAY); }
   function reasonName(k) { return PP.t('pp.litter.why.' + k); }
   function castrLine(c) {
     var not = [], k = 0;
@@ -121,88 +140,170 @@
     not = not.length === 1 ? [label(not[0][0])] : not.map(function (p) { return PP.t('pp.litter.castr.part', { n: p[1], reason: label(p[0]) }); });
     return k ? PP.t('pp.litter.castr.line', { c: c.castrated, k: k, why: not.join(zh ? '，' : ', ') }) : PP.t('pp.litter.castr.line_all', { c: c.castrated });
   }
-  // The record's own evidence, printed from the record (its product snapshot, never the console's current one).
+  // The deferral as the record wrote it: one reason, or split (`2 deferred: 1 weak, 1 sick`, N12 — from the event's `by`).
+  function deferTok(r, tone) {
+    var ev = rawEvent(r.id), by = ev && ev.deferred && ev.deferred.by;
+    if (by && by.weak && by.sick) return P('pp.litter.def.split', { k: r.deferred, w: by.weak, s: by.sick }, tone);
+    return P('pp.common.mark.deferred', { k: r.deferred, reason: reasonName(r.deferReason || 'deferred') }, tone);
+  }
+  /* The record's own evidence line as tokens, printed from the record (its product snapshot, never the console's current
+     one). A corrected record, or one recorded through a correction, prints its figures amber with what it was (R1-28). */
   function evidence(r) {
-    var prod = r.product ? PP.t('pp.litter.product.' + r.product) : '';
-    if (r.castration) return ['pp.litter.done.castr', { stamp: stamp(r), what: castrLine(r.castration) }];
-    if (r.target === 'unknown') return ['pp.litter.done.arrived', { stamp: stamp(r), pigs: pigs(r.n) }];
-    if (r.deferred) return [prod ? 'pp.litter.done.deferred_prod' : 'pp.litter.done.deferred', { stamp: stamp(r), pigs: pigs(r.n), k: r.deferred, reason: reasonName(r.deferReason || 'deferred'), prod: prod }];
-    return [prod ? 'pp.litter.done.prod' : 'pp.litter.done', { stamp: stamp(r), pigs: pigs(r.n), prod: prod }];
+    var tone = r.corrected || r.viaCorrection ? 'amber' : null, out = [P(r.at && r.at.slice(0, 10) === TODAY.slice(0, 10) ? 'pp.common.stamp.today' : 'pp.common.stamp.date', { date: U.date(r.at), t: U.time(r.at), who: r.who })];
+    if (r.castration) out.push(P('pp.litter.done.what', { what: castrLine(r.castration) }, tone));
+    else if (r.target === 'unknown') out.push(P('pp.litter.done.arrived_n', { pigs: pigs(r.n) }, tone));
+    else if (!r.n && r.deferred) out.push(P('pp.litter.done.none_treated', null, tone));   // 0 treated: the deferral is the record
+    else out.push(P(one('pp.common.unit.piglet', r.n), { n: r.n }, tone));
+    if (!r.castration && r.deferred && r.deferReason === 'not_done') out.push(P('pp.common.mark.not_done', { k: r.deferred }, tone));
+    else if (!r.castration && r.deferred) out.push(deferTok(r, tone));
+    if (!r.castration && r.product) out.push(P('pp.litter.product.' + r.product));
+    if (r.corrected) {
+      var ev = rawEvent(r.id), was = ev ? (ev.castration ? ev.castration.castrated : ev.n) : null, now = r.castration ? r.castration.castrated : r.n;
+      out.push(was != null && was !== now ? P('pp.litter.rec.was', { n: was }, 'amber') : P('pp.litter.rec.corrected', null, 'amber'));
+    }
+    if (r.viaCorrection && r.from) out.push(P('pp.litter.rec.from', { code: r.from }, 'amber'));
+    return out;
   }
   function collided(r) { return D(r.dose).possibleDoubleTreatment.some(function (p) { return p.indexOf(r.id) >= 0; }); }
+  function twice(r) { return (D(r.dose).doubles || []).some(function (x) { return x.answer === 'twice' && x.records.indexOf(r.id) >= 0; }); }
   function recTag(r) {
-    if (collided(r)) return ['pp.litter.flag.double_short', null, 'amber'];
-    if (r.timing === 'after_window') return ['pp.litter.tag.after', { d: doseCfg(r.dose).last }, ''];
-    if (r.timing === 'early') return ['pp.litter.tag.early', null, ''];
-    if (r.timing === 'late') return ['pp.litter.tag.late', null, ''];
+    if (collided(r)) return P('pp.litter.flag.double_short', null, 'amber');
+    if (twice(r)) return P('pp.litter.tag.twice', null, 'amber');
+    if (r.timing === 'after_window') return P('pp.litter.tag.after', { d: doseCfg(r.dose).last });
+    if (r.timing === 'early') return P('pp.litter.tag.early');
+    if (r.timing === 'late') return P('pp.litter.tag.late');
     return null;
   }
+  // A done row (Row, wrap): its tap opens Edit on this record (✎).
   function evidenceRow(r) {
-    var t = title(r.dose), e = evidence(r), tag = recTag(r);
-    var trail = tag ? span(tag[0], tag[1], tag[2] || null) : '';
-    // A corrected record (Edit, ticket #12) prints its value amber forever: the shell's mark line colours the value only.
-    if (r.corrected || r.viaCorrection) {
-      return '<div class="st-row lt-rec" data-ds="Candidate:EvidenceRow"><span class="st-row-copy"><strong>' + span(t[0], t[1]) + '</strong><small>' + U.markLine(r, TODAY) + '</small></span>' +
-        (trail ? '<span class="st-row-trailing">' + trail + '</span>' : '') + '</div>';
-    }
-    return UI.row({ title: '', description: '', trailing: trail, className: 'lt-rec', strs: { title: t[0], description: e[0] }, args: { title: t[1], description: e[1] } })
-      .replace('data-ds="Row"', 'data-ds="Candidate:EvidenceRow"');
+    var tag = recTag(r), desc = evidence(r);
+    if (tag) desc.push(tag);
+    return UI.row({ title: titleTok(r.dose), description: desc, wrap: true, trail: 'edit', action: 'open-edit', value: r.id });
   }
 
-  /* ---- header (shared): crate first, the door to the sow page; the fact line is the door to the record page ---- */
+  /* ---- header (shared): crate first, the door to the sow page ---- */
   function header() { return U.litterHeader({ crate: crate, sow: SOW.sow, parity: SOW.parity }); }
+  /* The sow died (farrowing's danger band): her orphans keep their schedule on this one sheet (edge.html forwards here). */
+  function orphanBanner() {
+    var sd = L().sowDied;
+    if (!sd) return '';
+    var head = sd.cause ? ['pp.litter.orphan.head', { cause: PP.t('pp.edge.cause.' + sd.cause), stamp: stampText(sd.at, sd.who) }] : ['pp.litter.orphan.head_nocause', { stamp: stampText(sd.at, sd.who) }];
+    // after End her orphans' schedule is over: the band states the fact only
+    var cons = endedTask() ? null : L().endedBySowDeath ? ['pp.litter.orphan.unlocked', { n: L().born }] : [L().alive ? 'pp.litter.orphan.cons' : 'pp.litter.orphan.cons_empty', null];
+    return UI.banner({ tone: 'danger', headline: '', consequence: '', strs: Object.assign({ headline: head[0] }, cons ? { consequence: cons[0] } : {}), args: { headline: head[1], consequence: cons && cons[1] } });
+  }
+  /* R1-10: the header balances — Born · Alive · Dead, and every other term of the identity when it is not zero (moved in,
+     moved out, weaned, unexplained). The line is the door to the record page. A nurse sow's earlier litter has its own line. */
   function factLine() {
-    var h = view().header, born = new Date(L().birthDay * 86400000).toISOString().slice(0, 10);
-    return UI.rowGroup(UI.row({ title: '', description: '', action: 'open-record', value: crate,
-      strs: { title: 'pp.litter.factline', description: 'pp.litter.factline.day' },
-      args: { title: { born: h.born, alive: h.alive, dead: h.dead }, description: { n: h.dayAge, date: U.date(born) } } }));
+    var b = view().balance, born = new Date(L().birthDay * 86400000).toISOString().slice(0, 10), t = [];
+    if (b.born || !b.earlier) t.push(P('pp.litter.bal.born', { n: b.born }));
+    t.push(P('pp.litter.bal.alive', { n: b.alive }));
+    t.push(P('pp.litter.bal.dead', { n: b.dead }));
+    if (b.movedIn) t.push(P('pp.litter.bal.in', { n: b.movedIn }));
+    if (b.movedOut) t.push(P('pp.litter.bal.out', { n: b.movedOut }));
+    if (b.weaned) t.push(P('pp.litter.bal.weaned', { n: b.weaned }));
+    if (b.loss) t.push(P('pp.litter.bal.loss', { n: b.loss }, 'red'));
+    if (b.gain) t.push(P('pp.litter.bal.gain', { n: b.gain }, 'progress'));
+    // a Row title joins its tokens with a space: the `·` between the terms is a registered string of its own
+    t = t.reduce(function (acc, x, i) { return i ? acc.concat([P('pp.litter.sep'), x]) : [x]; }, []);
+    var rows = UI.row({ title: t, description: [P('pp.litter.factline.day', { n: L().dayAge, date: U.date(born) })], wrap: true, action: 'open-record', value: crate });
+    var n = view().nurse, e = view().earlier;
+    if (n) rows += UI.row({ title: [P('pp.litter.nurse.title')], description: [P('pp.litter.nurse.from', { code: n.from, stamp: stampText(n.at, (L().moves.filter(function (m) { return m.id === n.since; })[0] || {}).who || '') })], wrap: true });
+    if (e) rows += UI.row({ title: [P('pp.litter.nurse.earlier')], description: [P('pp.litter.bal.born', { n: e.born }), P('pp.litter.bal.dead', { n: e.dead }), P('pp.litter.bal.weaned', { n: e.weaned }), P('pp.common.unit.day', { n: e.dayAge })], wrap: true });
+    return UI.rowGroup(rows);
   }
 
   /* ---- owed today ---- */
-  function owedLine(o) {
-    var parts = [];
-    if (drafts[o.dose]) return span('status.unsaved', { n: 1 }, 'green');
-    if (o.ended) return span('pp.litter.ended_line');
-    if (o.status === 'due') parts.push(span('pp.litter.due', { d: o.due }));
-    // Colour on the value, the word ink: `late 2 days`, `missed after day 7`.
-    if (o.status === 'late') parts.push(span('pp.litter.tag.late') + ' ' + span(one('pp.litter.days', o.lateBy), { k: o.lateBy }, 'red'));
-    if (o.status === 'missed') parts.push(span('pp.litter.missed_word') + ' ' + span('pp.litter.missed_day', { d: o.missedAfter }, 'red'));
-    var castrate = doseCfg(o.dose).castration;
-    if (o.owed && o.deferred && o.deferReason) parts.push(span(castrate ? one('pp.litter.owed_males_reason', o.owed) : 'pp.litter.owed_reason', { n: o.owed, reason: reasonName(o.deferReason) }));
-    else if (o.males === 'uncounted') parts.push(span('pp.common.males_uncounted'));
-    else if (o.owed != null && (o.owed || !o.unknown)) parts.push(span(castrate ? one('pp.litter.castr.owed', o.owed) : 'pp.litter.owed', { n: o.owed }));
-    if (o.unknown) parts.push(span('pp.litter.owed_unknown', { n: o.unknown }, 'amber'));
-    return parts.join(SEP());
+  // Which piglets owe (R1-4, R1-18): an age group's size, its crate and tags where the ledger knows them, and its own day.
+  function whenTok(g) {
+    if (g.status === 'later') return P(one('pp.litter.when.in', g.inDays), { n: g.inDays });
+    if (g.status === 'late') return [P('pp.litter.tag.late'), P(one('pp.litter.days', g.lateBy), { k: g.lateBy }, 'red')];
+    if (g.status === 'missed') return P('pp.litter.when.missed');
+    return P('pp.litter.when.today');
   }
-  function txRow(o) {
-    var t = title(o.dose);
-    // Castration before its first record: males are unknown, so there is no one-tap; the whole row is the door and says so.
-    // A missed dose has no one-tap either: it is recorded from the drawer, tagged `after day N`. Nor a dose End closed.
-    if (o.males === 'uncounted' || o.status === 'missed' || o.ended || !o.owed) {
-      var trail = drafts[o.dose] ? 'pp.litter.act.resume' : null;
-      return '<button type="button" class="st-row lt-tx" data-ds="Candidate:TreatmentRow" data-action="open-dose" data-value="' + o.dose + '"><span class="st-row-copy"><strong>' +
-        span(t[0], t[1]) + '</strong><small>' + owedLine(o) + '</small></span>' + (trail ? '<span class="st-row-trailing">' + span(trail) + '</span>' : '') +
-        '<span class="st-row-chevron">' + ICON.icon('chevron') + '</span></button>';
+  function groupToks(g) {
+    var tags = (g.rows || []).map(tagOf).filter(Boolean);
+    var who = g.kind === 'own' ? P('pp.litter.grp.own', { k: g.n }) : tags.length && tags.length <= 3 ? P('pp.litter.grp.from_tags', { k: g.n, code: g.from, tags: tags.join(', ') }) : P('pp.litter.grp.from', { k: g.n, code: g.from });
+    return [who, P('pp.litter.grp.day', { d: g.dayAge }), whenTok(g)];
+  }
+  // Groups of different ages each say their own day; arrivals of the litter's own age just say where they came from.
+  function agesDiffer(gs) { return gs.some(function (g) { return g.dayAge !== gs[0].dayAge; }); }
+  function hasDraft(id) { return !!(drafts[id] || drafts['range:' + id]); }
+  function showGroups(o) { return agesDiffer(o.groups); }
+  function arrivalToks(gs) {
+    return gs.filter(function (g) { return g.kind !== 'own'; }).map(function (g) { return groupToks(g)[0]; });
+  }
+  function splitNow(o) { return !doseCfg(o.dose).castration && o.owed != null && o.owedNow < o.owed && o.owedNow > 0; }
+  function owedToks(o) {
+    var t = [], castrate = doseCfg(o.dose).castration;
+    if (hasDraft(o.dose)) return [P('status.unsaved', { n: 1 }, 'green')];
+    if (o.status === 'due' && !showGroups(o)) t.push(P('pp.litter.due', { d: o.due }));
+    // Colour on the value, the word ink: `late 2 days`, `missed after day 7`.
+    if (o.status === 'late' && !showGroups(o)) t.push([P('pp.litter.tag.late'), P(one('pp.litter.days', o.lateBy), { k: o.lateBy }, 'red')]);
+    if (o.status === 'missed') t.push([P('pp.litter.missed_word'), P('pp.litter.missed_day', { d: o.missedAfter }, 'red')]);
+    if (o.range) {
+      // R1-3: after a Don't-know move out the source owes a range: no one-tap number, the worker checks on the pig
+      t.push(P('pp.litter.range', { lo: o.range.lo, hi: o.range.hi, of: o.range.of }, 'amber'));
+      o.range.doubt.forEach(function (x) { t.push(P('pp.litter.range.doubt', { n: x.n, to: x.to })); });
+      return t;
     }
-    var door = '<button type="button" class="lt-door" data-action="open-dose" data-value="' + o.dose + '"><span class="st-row-copy"><strong>' +
-      span(t[0], t[1]) + ICON.icon('chevron') + '</strong><small>' + owedLine(o) + '</small></span></button>';
+    if (o.owed && o.deferred && o.deferReason && o.deferReason !== 'not_due') t.push(P(castrate ? one('pp.litter.owed_males_reason', o.owed) : 'pp.litter.owed_reason', { n: o.owed, reason: reasonName(o.deferReason) }));
+    else if (o.males === 'uncounted') t.push(P('pp.common.males_uncounted'));
+    else if (splitNow(o)) t.push(P('pp.litter.owed_now', { n: o.owedNow, of: o.owed }));
+    else if (o.owed != null) t.push(P(castrate ? one('pp.litter.castr.owed', o.owed) : 'pp.litter.owed', { n: o.owed }));
+    if (showGroups(o)) o.groups.forEach(function (g) { t = t.concat(groupToks(g)); });
+    else t = t.concat(arrivalToks(o.groups));
+    return t;
+  }
+  function tapN(o) { return splitNow(o) ? o.owedNow : o.oneTap; }
+  function txRow(o) {
+    var n = tapN(o);
+    // No one-tap: castration before its first record (males are unknown), a missed dose (recorded from the drawer, tagged
+    // `after day N`), a range (R1-3: counted on the pig), or nothing owed now. The whole row is the door and says so.
+    if (o.males === 'uncounted' || o.status === 'missed' || o.range || !n) {
+      return UI.row({ title: titleTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose,
+        trailing: hasDraft(o.dose) ? { text: PP.t('pp.litter.act.resume'), strs: { text: 'pp.litter.act.resume' } } : '' });
+    }
     // A waiting draft replaces the one-tap: no full-count commit competes with it.
-    var btn = drafts[o.dose]
-      ? '<button type="button" class="button secondary" data-ds="Button" data-action="open-dose" data-value="' + o.dose + '" data-str="pp.litter.act.resume">' + U.esc(PP.t('pp.litter.act.resume')) + '</button>'
-      : '<button type="button" class="button secondary" data-ds="Button" data-action="record" data-value="' + o.dose + '" data-n="' + o.oneTap + '" data-str="' + one('pp.litter.act.record_n', o.oneTap) + '" data-args=\'{"n":' + o.oneTap + '}\'>' + U.esc(PP.t(one('pp.litter.act.record_n', o.oneTap), { n: o.oneTap })) + '</button>';
-    return '<div class="st-row lt-tx" data-ds="Candidate:TreatmentRow">' + door + btn + '</div>';
+    var act = hasDraft(o.dose) ? { label: PP.t('pp.litter.act.resume'), action: 'open-dose', value: o.dose, strs: { label: 'pp.litter.act.resume' } }
+      : { label: PP.t(one('pp.litter.act.record_n', n), { n: n }), action: 'record', value: o.dose, attrs: { 'data-n': n }, strs: { label: one('pp.litter.act.record_n', n) }, args: { label: { n: n } } };
+    return UI.rowAction({ id: 'lt-tx-' + o.dose, title: titleTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose, act: act });
+  }
+  // R1-2, R1-18: arrivals whose dose is not known — `unknown — check spray mark` (invisible), `check on the pig` (visible) —
+  // resolved here: Already had it · Record now · Leave owed.
+  function unknownRows(id, o) {
+    var d = doseCfg(id);
+    return unknownGroups(id).map(function (g) {
+      var key = 'res:' + g.id + ':' + id, tags = (g.rows || []).map(tagOf).filter(Boolean);
+      var who = tags.length && tags.length <= 3 ? P('pp.litter.grp.from_tags', { k: g.n, code: g.from, tags: tags.join(', ') }) : P('pp.litter.grp.from', { k: g.n, code: g.from });
+      var desc = drafts[key] ? [P('status.unsaved', { n: 1 }, 'green')] : [who, d.visible ? P('pp.litter.arr.check', null, 'amber') : P('pp.litter.arr.unknown', null, 'amber')];
+      if (o && o.status === 'late' && !drafts[key]) desc.push([P('pp.litter.tag.late'), P(one('pp.litter.days', o.lateBy), { k: o.lateBy }, 'red')]);
+      return UI.row({ title: titleTok(id), description: desc, wrap: true, action: 'open-resolve', value: g.id + ':' + id,
+        trailing: drafts[key] ? { text: PP.t('pp.litter.act.resume'), strs: { text: 'pp.litter.act.resume' } } : '' });
+    }).join('');
+  }
+  // R1-17: the processing-day identity step is owed on its day, like a treatment; done when done.
+  function identityRow() {
+    var x = view().identityDue;
+    if (x.status !== 'due' && x.status !== 'late') return '';
+    var scheme = PP.t('pp.litter.id.scheme.' + x.scheme), t = [];
+    if (x.who === 'candidates') t.push(P('pp.litter.id.keepers', { k: x.identified }));
+    else t.push(P('pp.litter.id.owed', { n: x.owed }));
+    if (x.status === 'due') t.push(P('pp.litter.due', { d: x.day }));
+    else t.push([P('pp.litter.tag.late'), P(one('pp.litter.days', x.lateBy), { k: x.lateBy }, 'red')]);
+    return UI.row({ title: [P('pp.litter.id.title', { scheme: scheme })], description: t, wrap: true, action: 'open-identity', value: crate });
   }
   function owedRows() {
     var v = view(), byDose = {};
     v.owed.forEach(function (o) { byDose[o.dose] = o; });
-    // End closed the task: a dose it made unwritable says so, with no one-tap (the ledger refuses the record).
-    v.owed.forEach(function (o) { if (o.owed) { var tr = view({ drafts: (function () { var x = {}; x[o.dose] = doseCfg(o.dose).castration ? { castration: { castrated: o.owed } } : { n: o.owed }; return x; })() }).drafts[o.dose]; o.ended = tr && tr.why === 'task_ended'; } });
     // Nothing moves under the thumb: a dose recorded this visit keeps its place and turns into its stamp.
     return CFG.doses.filter(function (d) { return D(d.id).status && D(d.id).status !== 'later'; }).map(function (d) {
       var r = visitRec(d.id);
       if (r && isDone(d.id)) return evidenceRow(r);
-      return byDose[d.id] ? txRow(byDose[d.id]) : '';
-    }).join('');
+      // arrivals of unknown treatment and nothing else owed: their own row only, never a `0 owed` dose (R1-2)
+      var o = byDose[d.id], only = o && o.owed === 0 && !o.range && unknownGroups(d.id).length;
+      return (o && !only ? txRow(o) : '') + unknownRows(d.id, only ? o : null);
+    }).join('') + identityRow();
   }
   function owedSection() {
     // treatments left (what can be done now) and unfinished (a missed dose is unfinished, never a treatment left)
@@ -212,15 +313,64 @@
       strs: Object.assign({ title: 'pp.litter.section.owed' }, meta ? { meta: meta } : {}),
       args: meta ? { meta: { left: left, total: v.dosesLeft.total, m: missed } } : undefined });
     var rows = owedRows();
-    if (!left && !missed) {
-      var next = v.later.filter(function (x) { return !isDone(x.dose); })[0];
-      rows += UI.row({ title: '', description: next ? '' : undefined, strs: Object.assign({ title: 'pp.litter.owed.none' }, next ? { description: next.inDays === 1 ? 'pp.litter.next.tomorrow' : 'pp.litter.next.in' } : {}),
-        args: next ? { description: { tx: lower(titleText(next.dose)), k: next.inDays } } : undefined });
+    if (!left && !missed && !identityRow()) {
+      var next = laterItems()[0];
+      rows += UI.row({ title: [P('pp.litter.owed.none')], description: next ? [P(next.inDays === 1 ? 'pp.litter.next.tomorrow' : 'pp.litter.next.in', { tx: lower(next.label), k: next.inDays })] : '' });
     }
     return '<section class="pp-group" data-ds="Section">' + h + UI.rowGroup(rows) + '</section>';
   }
+  /* R1-19: a litter emptied by moves (alive 0 after the lock) is closed: nothing owed, nothing later; its record stays. */
+  function closedSection() {
+    var b = view().balance;
+    return '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.litter.section.closed' } }) +
+      UI.rowGroup(UI.row({ title: [P('pp.litter.closed.title')], description: [P('pp.litter.closed.desc', { out: b.movedOut, w: b.weaned })], wrap: true })) + '</section>';
+  }
+  /* R1-13: after End the litter reads as the End left it — `not done at End` per dose (End's own snapshot), never owed today,
+     never a count of what is left, no Later rows; review items open at End read `unresolved at End` (below). */
+  function endedSection(T) {
+    var items = ((T.ended.snapshot || {}).byLitter || {})[crate] || [];
+    var rows = items.map(function (x) {
+      var id = x.kind === 'missed' ? 'pp.litter.end.missed' : x.kind === 'not_due' ? 'pp.litter.end.not_due' : 'pp.litter.end.owed';
+      return UI.row({ title: titleTok(x.dose), description: [P(id, { n: x.n })], wrap: true });
+    }).join('') || UI.row({ title: [P('pp.litter.end.none')] });
+    return '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', description: '', kind: 'section', level: 3,
+      strs: { title: 'pp.litter.section.ended', description: 'pp.litter.end.meta' }, args: { description: { stamp: stampText(T.ended.at, T.ended.who) } } }) + UI.rowGroup(rows) + '</section>';
+  }
 
-  /* ---- the receipt: what the last record on this phone changed (or why nothing was recorded); in the bar, so the rows never reflow ---- */
+  /* ---- R1-22: what this litter holds for review, each with its door to the answer (a held body, two counts that disagree,
+     a possible double treatment — answered in Edit: same injection recorded twice, or given twice). After End an open item
+     reads `unresolved at End` and stays answerable (round 4). ---- */
+  function reviewItems() { return store.select.reviews(store.derived, {}).items.filter(function (x) { return x.litter === crate; }); }
+  function reviewRow(x) {
+    var t, d = [];
+    if (x.kind === 'double') {
+      var recs = x.records.map(recordOf).filter(Boolean);
+      t = [P('pp.litter.review.double', { tx: titleText(x.dose) })];
+      recs.forEach(function (r) { d.push(P('pp.litter.review.rec', { stamp: stampText(r.at, r.who), pigs: pigs(r.n) })); });
+      d.push(P('pp.litter.review.double_q'));
+    } else if (x.kind === 'held') {
+      t = [P('pp.litter.review.held')];
+      d.push(P('pp.litter.review.held_desc', { stamp: stampText(x.at, x.who), dead: L().dead.total, alive: L().alive }));
+    } else if (x.kind === 'count') {
+      t = [P('pp.litter.review.count')];
+      x.counts.forEach(function (c) { d.push(P('pp.litter.review.count_one', { who: c.who, t: U.time(c.at), pigs: pigs(c.observed) })); });
+      d.push(P('pp.litter.review.count_q'));
+    } else {
+      t = [P('pp.litter.review.correction')];
+      d.push(P('pp.litter.review.correction_q'));
+    }
+    if (x.status === 'unresolved_at_end') d.push(P('pp.litter.review.at_end', null, 'amber'));
+    return UI.row({ title: t, description: d, wrap: true, action: 'open-review', value: x.id });
+  }
+  function reviewSection() {
+    var xs = reviewItems();
+    if (!xs.length) return '';
+    return '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, meta: '', strs: { title: 'pp.litter.section.review', meta: 'pp.litter.review.meta' }, args: { meta: { n: xs.length } } }) +
+      UI.rowGroup(xs.map(reviewRow).join('')) + '</section>';
+  }
+
+  /* ---- the receipt: what the last record on this phone changed (or why nothing was recorded); in the bar, so the rows
+     never reflow. A one-tap record offers Undo (a stamped withdrawal, the original kept). ---- */
   function receiptLine() {
     if (!receipt) return '';
     if (receipt.kind === 'correction') return U.receipt([{ id: 'pp.common.saved_correction' }]);   // back from Edit's Save (ticket #12)
@@ -228,107 +378,149 @@
     if (k === 'already') parts = [{ id: 'pp.litter.rcpt.already', args: { tx: tx, t: U.time(receipt.other.at), who: receipt.other.who } }, { id: 'pp.litter.rcpt.nothing' }];
     else if (k === 'stale' && receipt.other) parts = [{ id: 'pp.litter.rcpt.stale', args: { tx: tx, t: U.time(receipt.other.at), who: receipt.other.who, m: receipt.other.n } }, { id: 'pp.litter.rcpt.now_owed', args: { n: receipt.now }, tone: 'amber' }];
     else if (k === 'stale') parts = [{ id: 'pp.litter.rcpt.changed', args: { tx: tx } }, { id: 'pp.litter.rcpt.now_owed', args: { n: receipt.now }, tone: 'amber' }];
-    else if (r.castration) {
+    else if (k === 'undone') parts = [{ id: 'pp.litter.rcpt.undone', args: { tx: tx } }, { id: one('pp.litter.rcpt.undone_n', receipt.n), args: { n: receipt.n }, tone: 'amber' }];
+    else if (k === 'resolved') {
+      parts = [{ id: 'pp.litter.rcpt.saved', args: { tx: tx } }];
+      if (receipt.had) parts.push({ id: 'pp.litter.rcpt.had', args: { k: receipt.had }, tone: 'green' });
+      if (receipt.rec) parts.push({ id: 'pp.litter.rcpt.now_rec', args: { k: receipt.rec }, tone: 'green' });
+      if (receipt.left) parts.push({ id: 'pp.litter.rcpt.left', args: { k: receipt.left }, tone: 'amber' });
+      if (!receipt.had && !receipt.rec && !receipt.left) parts.push({ id: 'pp.litter.rcpt.none_owe', tone: 'green' });
+    } else if (r.castration) {
       var c = r.castration, not = (c.hernia || 0) + (c.cryptorchid || 0) + (c.deferred || 0) + (c.kept || 0);
       parts = [{ id: 'pp.litter.rcpt.saved', args: { tx: tx } }];
       if (!c.castrated && !not) parts.push({ id: 'pp.litter.castr.none_line', tone: 'green' });
       else { parts.push({ id: 'pp.litter.rcpt.castrated', args: { c: c.castrated }, tone: 'green' }); if (not) parts.push({ id: 'pp.litter.rcpt.not_castrated', args: { k: not } }); }
     } else {
-      parts = [{ id: 'pp.litter.rcpt.saved', args: { tx: tx } }, { id: one('pp.common.unit.piglet', r.n), args: { n: r.n }, tone: 'green' }];
-      if (r.deferred) parts.push({ id: 'pp.litter.rcpt.deferred', args: { k: r.deferred } });
+      parts = [{ id: 'pp.litter.rcpt.saved', args: { tx: tx } }];
+      // 0 treated and every one deferred records the deferral, never `0 piglets` (R1-25)
+      if (r.n) parts.push({ id: one('pp.common.unit.piglet', r.n), args: { n: r.n }, tone: 'green' });
+      else parts.push({ id: 'pp.litter.rcpt.none_treated' });
+      if (r.deferred && r.deferReason === 'not_due') parts.push({ id: 'pp.litter.rcpt.not_due', args: { k: r.deferred } });
+      else if (r.deferred) parts.push({ id: 'pp.litter.rcpt.deferred', args: { k: r.deferred } });
       if (r.timing === 'late' || r.timing === 'after_window') parts.push({ id: 'pp.litter.rcpt.late' });
       if (r.timing === 'early') parts.push({ id: 'pp.litter.rcpt.early' });
     }
-    return U.receipt(parts);
+    var undo = receipt.undo && recordOf(receipt.undo) ? '<div class="lt-confirm">' + U.receipt(parts) + btn({ id: 'pp.litter.act.undo', register: 'text', action: 'undo', value: receipt.undo }) + '</div>' : U.receipt(parts);
+    return undo;
   }
 
-  /* ---- recorded: one row per record, never merged; records made this visit settle here when the sheet is left ---- */
+  /* ---- recorded: one row per record, never merged, newest first; a record made this visit shows here at once (unless it
+     turned its own owed row into its stamp); each row opens Edit. Identity done shows here too (R1-17). ---- */
+  // a dose done this visit on its day keeps its owed row as its stamp; one done early (still `later`) goes to Recorded (R1-25)
+  function inPlace(r) { return visit[r.id] && isDone(r.dose) && D(r.dose).status !== 'later'; }
+  function identityDoneRow() {
+    var x = view().identityDue, I = L().identity;
+    if (x.scheme === 'none' || (!x.identified && !I.closed)) return '';
+    if (x.status !== 'done' && x.status !== 'later' && x.who !== 'candidates') return '';
+    var scheme = PP.t('pp.litter.id.scheme.' + x.scheme);
+    var d = x.who === 'candidates' ? (I.closed ? P('pp.litter.id.closed', { k: x.identified }) : P('pp.litter.id.keepers', { k: x.identified })) : P('pp.litter.id.done', { k: x.identified, n: x.of });
+    return UI.row({ title: [P('pp.litter.id.title', { scheme: scheme })], description: [d], wrap: true, action: 'open-identity', value: crate });
+  }
   function recordedSection() {
     var all = [];
     view().recorded.forEach(function (g) { g.records.forEach(function (r) { all.push(r); }); });
-    if (!all.length) return '';
-    // The Edit door shows whenever any record exists, this visit's included.
-    var xs = all.filter(function (r) { return !visit[r.id]; }).sort(function (a, b) { return a.at < b.at ? 1 : a.at > b.at ? -1 : 0; });
-    var col = view().recorded.filter(function (g) { return g.collisions.length; });
-    var edit = '<button type="button" data-action="open-edit" data-value="' + crate + '" data-str="act.edit">' + U.esc(PP.t('act.edit')) + '</button>';
-    var h = UI.heading({ title: '', kind: 'section', level: 3, action: edit, description: col.length ? '' : undefined,
-      strs: Object.assign({ title: 'pp.litter.section.recorded' }, col.length ? { description: 'pp.litter.flag.double' } : {}),
-      args: col.length ? { description: { tx: titleText(col[0].dose) } } : undefined });
-    return '<section class="pp-group" data-ds="Section">' + h + (xs.length ? UI.rowGroup(xs.map(evidenceRow).join('')) : '') + '</section>';
+    var idRow = identityDoneRow();
+    if (!all.length && !idRow) return '';
+    var xs = all.filter(function (r) { return !inPlace(r); }).sort(function (a, b) { return a.at < b.at ? 1 : a.at > b.at ? -1 : 0; });
+    var edit = btn({ id: 'act.edit', register: 'text', action: 'open-edit', value: crate });
+    var h = UI.heading({ title: '', kind: 'section', level: 3, action: edit, strs: { title: 'pp.litter.section.recorded' } });
+    var rows = xs.map(evidenceRow).join('') + idRow;
+    // answered `given twice` (round 4): a double dose for the vet, counted once
+    view().recorded.forEach(function (g) { (g.doubleDoses || []).forEach(function (x) {
+      rows += UI.row({ title: titleTok(g.dose), description: [P('pp.litter.twice.line', { stamp: stampText(x.at, x.who) }, 'amber')], wrap: true });
+    }); });
+    return '<section class="pp-group" data-ds="Section">' + h + (rows ? UI.rowGroup(rows) : '') + '</section>';
   }
 
-  /* ---- litter notes: hernia and cryptorchid from castration (the ledger's notes) ---- */
+  /* ---- litter notes: hernia and cryptorchid from castration (the ledger's notes); the piglet may be identified (N12) ---- */
   function notesSection() {
     var rows = view().notes.map(function (n) {
       var r = recordOf(n.event) || { at: n.at, who: '' };
-      return UI.row({ title: '', description: '', strs: { title: 'pp.litter.reason.' + n.kind, description: 'pp.litter.note.line' }, args: { description: { pigs: pigs(n.n), stamp: stamp(r) } } });
+      return UI.row({ title: [P('pp.litter.reason.' + n.kind)], description: [P('pp.litter.note.line', { pigs: pigs(n.n), stamp: stampText(r.at, r.who) }), P('pp.litter.note.identify')], wrap: true, action: 'open-identity', value: crate });
     });
     if (!rows.length) return '';
     return '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.litter.section.notes' } }) + UI.rowGroup(rows.join('')) + '</section>';
   }
 
-  /* ---- later: future doses; early is deliberate (open, then Save) ---- */
   /* After End (RULINGS round 3): a treatment done after End on an offline phone is kept as evidence, stamped, never
      counted; a mark withdrawn or lowered after End is not done · corrected after End. Facts, never actionable. */
   function afterEndSection() {
     var v = view(), rows = [];
     v.afterEnd.forEach(function (x) {
-      var t = title(x.dose);
-      rows.push(UI.row({ title: '', description: '', trailing: '', className: 'lt-rec', strs: { title: t[0], description: 'pp.litter.after_end.line', trailing: 'pp.litter.after_end.tag' },
-        args: { title: t[1], description: { pigs: pigs(x.n), stamp: U.stamp(x.at, x.who, TODAY) } } }).replace('data-ds="Row"', 'data-ds="Candidate:EvidenceRow"'));
+      rows.push(UI.row({ title: titleTok(x.dose), description: [P('pp.litter.after_end.line', { pigs: pigs(x.n), stamp: stampText(x.at, x.who) }), P('pp.litter.after_end.tag')], wrap: true }));
     });
-    v.correctedAfterEnd.forEach(function (x) {
-      var t = title(x.dose);
-      rows.push(UI.row({ title: '', description: '', className: 'lt-rec', strs: { title: t[0], description: 'pp.edit.ch.not_done' }, args: { title: t[1], description: { k: x.n } } })
-        .replace('data-ds="Row"', 'data-ds="Candidate:EvidenceRow"'));
-    });
+    v.correctedAfterEnd.forEach(function (x) { rows.push(UI.row({ title: titleTok(x.dose), description: [P('pp.edit.ch.not_done', { k: x.n })], wrap: true })); });
     if (!rows.length) return '';
     return '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.litter.sec.after_end' } }) + UI.rowGroup(rows.join('')) + '</section>';
   }
+  /* ---- later: future doses, each on the owing piglets' own day (R1-4: arrivals by their age); early is deliberate
+     (open, then Save). A dose with records keeps them in Recorded; here it says what is still to come. ---- */
+  function laterItems() {
+    var out = view().later.filter(function (x) { return !isDone(x.dose); }).map(function (x) {
+      var g = D(x.dose).groups || [], ins = g.filter(function (y) { return y.status === 'later'; }).map(function (y) { return y.inDays; });
+      return { dose: x.dose, due: x.due, inDays: ins.length ? Math.min.apply(null, ins) : x.inDays, label: titleText(x.dose) };
+    });
+    var id = view().identityDue;
+    if (id.status === 'later') out.push({ identity: true, due: id.day, inDays: id.inDays, label: PP.t('pp.litter.id.title', { scheme: PP.t('pp.litter.id.scheme.' + id.scheme) }) });
+    return out.sort(function (a, b) { return a.inDays - b.inDays; });
+  }
   function laterSection() {
-    var xs = view().later.filter(function (x) { return !isDone(x.dose) || visitRec(x.dose); });
+    var xs = laterItems();
     if (!xs.length) return '';
     var rows = xs.map(function (x) {
-      if (visitRec(x.dose) && isDone(x.dose)) return evidenceRow(visitRec(x.dose));
-      var t = title(x.dose);
-      return UI.row({ title: '', description: '', action: 'open-dose', value: x.dose,
-        strs: { title: t[0], description: drafts[x.dose] ? 'status.unsaved' : x.inDays === 1 ? 'pp.litter.later.tomorrow' : 'pp.litter.later.in' },
-        args: { title: t[1], description: drafts[x.dose] ? { n: 1 } : { d: x.due, k: x.inDays } } });
+      if (x.identity) return UI.row({ title: [P('pp.litter.id.title', { scheme: PP.t('pp.litter.id.scheme.' + view().identityDue.scheme) })], description: [P(x.inDays === 1 ? 'pp.litter.later.tomorrow' : 'pp.litter.later.in', { d: x.due, k: x.inDays })], action: 'open-identity', value: crate });
+      var Dx = D(x.dose), t = [];
+      if (drafts[x.dose]) t.push(P('status.unsaved', { n: 1 }, 'green'));
+      else if (Dx.groups && agesDiffer(Dx.groups)) Dx.groups.forEach(function (g) { t = t.concat(groupToks(g)); });
+      else {
+        // a partial early record (castration done early, some deferred) keeps what is still owed in view (R1-25)
+        if (Dx.records.length && Dx.owed && !arrivalToks(Dx.groups || []).length) t.push(P(doseCfg(x.dose).castration ? one('pp.litter.castr.owed', Dx.owed) : 'pp.litter.owed', { n: Dx.owed }));
+        t = t.concat(arrivalToks(Dx.groups || []));
+        t.push(P(x.inDays === 1 ? 'pp.litter.later.tomorrow' : 'pp.litter.later.in', { d: x.due, k: x.inDays }));
+      }
+      return UI.row({ title: titleTok(x.dose), description: t, wrap: true, action: 'open-dose', value: x.dose });
     });
     return '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.litter.section.later' } }) + UI.rowGroup(rows.join('')) + '</section>';
   }
 
-  /* ---- the Record group (shared) ---- */
+  /* ---- the Record group: Move, identity (keepers read `set closed` once closed — never "so far"), birth litter weight ---- */
   function recordGroup() {
-    var idc = CFG.identity, id = view().identity;
-    return U.recordGroup({ crate: crate, today: TODAY,
-      identity: idc.scheme === 'none' ? null : { scheme: idc.who === 'candidates' ? 'candidates' : idc.scheme, k: id.identified, n: L().alive },
-      weight: SOW.weight });
+    var idc = CFG.identity, id = view().identityDue, rows = UI.row({ title: '', description: '', action: 'open-move', value: crate, strs: { title: 'pp.move.title', description: 'pp.common.record.move_desc' } });
+    if (idc.scheme !== 'none' && (L().alive || id.identified)) {
+      var line = idc.who === 'candidates' ? (L().identity.closed ? ['pp.litter.id.rg_closed', { k: id.identified }] : ['pp.common.record.id_line.candidates', { k: id.identified }])
+        : ['pp.common.record.id_line.' + idc.scheme, { k: id.identified, n: L().alive }];
+      rows += UI.row({ title: '', description: '', action: 'open-identity', value: crate, strs: { title: 'pp.common.record.identity', description: line[0] }, args: { description: line[1] } });
+    }
+    if (!SOW.weight) rows += U.weightRow(null, crate, TODAY);
+    return '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', kind: 'group', level: 3, strs: { title: 'pp.common.record.title' } }) + UI.rowGroup(rows) + '</section>';
   }
   function faceFooter() {
-    return '<footer class="sheet-footer lt-bar">' + receiptLine() + '<button type="button" class="button secondary" data-ds="Button" data-action="close" data-str="act.close">' + U.esc(PP.t('act.close')) + '</button></footer>';
+    return '<footer class="sheet-footer lt-bar">' + receiptLine() + btn({ id: 'act.close', register: 'secondary', action: 'close' }) + '</footer>';
   }
 
-  /* ---- the dose drawer (staged: Back keeps the draft, Clear discards it, Save commits; the ledger says why Save is gray) ---- */
-  function stepperRow(key, label, desc, descArgs, value, max, ceilId, ceilArgs) {
+  /* ---- the drawers (staged: Back keeps the draft, Clear discards it, Save commits; Save waits with its reason) ---- */
+  function stepperRow(key, label, desc, descArgs, value, max, ceilId, ceilArgs, min) {
     var atCeil = ceilTap === key && max != null && value >= max;     // the host answers a tap on the grayed +, not every row at its cap
-    return UI.stepper({ label: '', description: desc ? '' : undefined, value: value, min: 0, max: max, key: key, hint: atCeil ? '' : undefined,
+    return UI.stepper({ label: '', description: desc ? '' : undefined, value: value, min: min || 0, max: max, key: key, hint: atCeil ? '' : undefined,
       strs: Object.assign({ label: label, value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' }, desc ? { description: desc } : {}, atCeil ? { hint: ceilId } : {}),
       args: Object.assign({}, desc ? { description: descArgs } : {}, atCeil ? { hint: ceilArgs } : {}) });
   }
-  function radio(action, value, label, meta, on) {
-    return '<button type="button" class="st-choice-row" data-ds="Candidate:Radio" role="radio" aria-checked="' + on + '" data-action="' + action + '" data-value="' + value + '">' +
-      '<span class="st-choice-copy"><span class="st-choice-label">' + span(label) + '</span>' + (meta ? '<span class="st-choice-meta">' + span(meta) + '</span>' : '') + '</span>' +
-      '<span class="st-choice-trail" aria-hidden="true"><span class="lt-radio"></span></span></button>';
+  function radios(key, label, labelArgs, options, selected, lead) {
+    return UI.choiceRadios({ label: PP.t(label, labelArgs), layout: 'rows', action: 'radio', key: key, id: 'lt-' + key, selected: selected || '', lead: lead || '',
+      options: options.map(function (o) { return { value: o[0], label: PP.t(o[1], o[2]), meta: o[3] ? PP.t(o[3], o[4]) : '', strs: Object.assign({ label: o[1] }, o[3] ? { meta: o[3] } : {}), args: { label: o[2], meta: o[4] } }; }),
+      strs: { label: label }, args: { label: labelArgs } });
   }
+  // Untreated piglets: weak, sick, or some of each (N12: 1 weak, 1 sick).
   function reasonGroup(rest, chosen, castr) {
     var lead = UI.heading({ title: '', kind: 'group', level: 5, strs: { title: 'pp.litter.reason.stays' } });
-    return '<div role="radiogroup">' + UI.choiceGroup(['weak', 'sick'].map(function (k) { return radio('reason', k, 'pp.litter.reason.' + k, null, chosen === k); }),
-      { title: '', lead: lead, strs: { title: castr ? 'pp.litter.castr.why' : one('pp.litter.rest.why', rest) }, args: { title: { n: rest } } }) + '</div>';
+    var opts = [['weak', 'pp.litter.reason.weak'], ['sick', 'pp.litter.reason.sick']];
+    if (!castr && rest > 1) opts.push(['split', 'pp.litter.reason.split']);
+    return radios('reason', castr ? 'pp.litter.castr.why' : one('pp.litter.rest.why', rest), { n: rest }, opts, chosen, lead);
   }
   var ZERO = { castrated: 0, hernia: 0, cryptorchid: 0, kept: 0, deferred: 0, deferReason: '' };
   function csum(c) { return c.castrated + c.hernia + c.cryptorchid + c.kept + c.deferred; }
-  /* The draft as the ledger reads it: a treat event, or null while it waits for the hand's own step. */
+  function restOf() { return owedOf(drawer.dose) - drawer.n; }
+  /* The draft as the ledger reads it: a treat event (or a check, for a range), or the resolve's records. */
   function draftEvent() {
     var id = drawer.dose;
     if (drawer.castr) {
@@ -337,33 +529,50 @@
       if (c.deferred && c.deferReason) e.deferReason = c.deferReason;
       return { castration: e };
     }
-    var rest = owedNow(id) - drawer.n, d = { n: drawer.n };
-    if (rest > 0 && drawer.reason) d.deferred = { n: rest, reason: drawer.reason };
+    var rest = restOf(), d = { n: drawer.n };
+    if (rest > 0 && drawer.reason === 'split') {
+      var w = Math.min(drawer.weak || 0, rest), s = rest - w;
+      d.deferred = { n: rest, reason: w && s ? 'weak_sick' : w ? 'weak' : 'sick', by: { weak: w, sick: s } };
+    } else if (rest > 0 && drawer.reason) d.deferred = { n: rest, reason: drawer.reason };
     return d;
   }
   function drawerSel() { var x = {}; x[drawer.dose] = draftEvent(); return view({ drafts: x }).drafts[drawer.dose]; }
-  // What Save still waits for, said above the bar ('' when Save can commit): the drawer's own steps first, then the ledger's why.
+  // What Save still waits for ('' when Save can commit): the drawer's own steps first, then the ledger's why.
   function waiting() {
-    var id = drawer.dose, o = owedNow(id);
+    var id = drawer.dose, o = owedOf(id);
+    if (endedTask()) return ['pp.litter.pointer.ended', null];
+    if (drawer.kind === 'resolve') { var r = resolving(), rest = r.n - drawer.had; return rest && !drawer.rest ? [one('pp.litter.pointer.rest', rest), { n: rest }] : null; }
+    if (drawer.kind === 'range') return drawer.still && !drawer.rest ? [one('pp.litter.pointer.range', drawer.still), { n: drawer.still }] : null;
     if (drawer.castr) {
       var c = drawer.castr, sum = csum(c);
+      if (drawer.confirmNone) return ['pp.litter.pointer.none', null];
       if (o != null && sum !== o) return [one('pp.litter.pointer.males', o - sum), { n: o - sum }];
       if (o == null && !sum && !c.none) return ['pp.litter.pointer.no_males', null];
       if (c.deferred && !c.deferReason) return [one('pp.litter.pointer.reason', c.deferred), { n: c.deferred }];
     } else {
-      var rest = o - drawer.n;
-      if (rest > 0 && !drawer.reason) return [one('pp.litter.pointer.reason', rest), { n: rest }];
+      var rest2 = restOf();
+      if (rest2 > 0 && !drawer.reason) return [one('pp.litter.pointer.reason', rest2), { n: rest2 }];
+      if (!drawer.n && !rest2) return ['pp.litter.pointer.empty', null];
     }
     var why = drawerSel().why;
     if (!why) return null;
     return [why === 'task_ended' ? 'pp.litter.pointer.ended' : why === 'no_task' ? 'pp.litter.pointer.no_task' : 'pp.litter.pointer.check', null];
   }
+  function drawerShell(head, body, size) {
+    var w = waiting();
+    return '<div class="scrim" data-ds="Sheet" data-action="back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="' + (size || 'long') + '" data-sizing="content" role="dialog" aria-modal="true">' +
+      '<header class="utility-header">' + head + '</header>' +
+      '<div class="sheet-body"><div class="lt-drawer-body">' + body + '</div></div>' +
+      '<footer class="sheet-footer lt-bar">' + UI.buttonReason({ id: 'lt-why', text: w ? PP.t(w[0], w[1]) : '', strs: w ? { text: w[0] } : undefined, args: w ? { text: w[1] } : undefined }) +
+      btn({ id: 'act.back', register: 'secondary', action: 'back' }) +
+      btn({ id: 'act.save', register: 'primary', action: 'save', waiting: !!w, describedby: 'lt-why' }) + '</footer></section>';
+  }
   function doseDrawer() {
     var id = drawer.dose, x = D(id), t = title(id), d = doseCfg(id);
-    var clear = dirty() ? '<button type="button" data-action="clear" data-str="act.clear">' + U.esc(PP.t('act.clear')) + '</button>' : '';
+    var clear = dirty() ? btn({ id: 'act.clear', register: 'text', action: 'clear' }) : '';
     var body = '', sub;
     if (d.castration) {
-      var c = drawer.castr, sum = csum(c), o = owedNow(id);
+      var c = drawer.castr, sum = csum(c), o = owedOf(id);
       // Catch-up works on the outstanding males only: every stepper is capped at what is still owed.
       var total = o == null ? L().alive : o;
       var cap = function (k) { return total - sum + c[k]; };
@@ -371,59 +580,135 @@
       sub = o == null ? [one('pp.litter.castr.males', sum), { n: sum }] : [one('pp.litter.castr.owed', o), { n: o }];
       body += stepperRow('castrated', 'pp.litter.castr.castrated', null, null, c.castrated, cap('castrated'), ceil[0], ceil[1]) +
         '<div class="pp-group">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.litter.castr.not' } }) +
-        stepperRow('hernia', 'pp.litter.reason.hernia', 'pp.litter.reason.leaves_note', null, c.hernia, cap('hernia'), ceil[0], ceil[1]) +
+        stepperRow('hernia', 'pp.litter.reason.hernia', 'pp.litter.reason.hernia_note', null, c.hernia, cap('hernia'), ceil[0], ceil[1]) +
         stepperRow('cryptorchid', 'pp.litter.reason.cryptorchid', 'pp.litter.reason.leaves_note', null, c.cryptorchid, cap('cryptorchid'), ceil[0], ceil[1]) +
         stepperRow('deferred', 'pp.litter.reason.deferred', 'pp.litter.reason.stays_short', null, c.deferred, cap('deferred'), ceil[0], ceil[1]) +
         stepperRow('kept', 'pp.litter.reason.kept', 'pp.litter.reason.leaves', null, c.kept, cap('kept'), ceil[0], ceil[1]) + '</div>';
       if (c.deferred) body += reasonGroup(c.deferred, c.deferReason, true);
-      if (o == null) body += UI.chooserList(radio('no-males', 'none', 'pp.litter.castr.none', 'pp.litter.castr.none_meta', !!c.none), { tone: 'inset', ds: 'ChoiceList' });
+      if (o == null) {
+        body += UI.chooserList(UI.choiceRow({ mode: 'radio', label: PP.t('pp.litter.castr.none'), meta: PP.t('pp.litter.castr.none_meta'), action: 'no-males', value: 'none', selected: !!c.none,
+          strs: { label: 'pp.litter.castr.none', meta: 'pp.litter.castr.none_meta' } }), { tone: 'inset', ds: 'ChoiceList' });
+        // R1-25: No males never wipes counts silently — it asks first
+        if (drawer.confirmNone) body += '<div class="lt-confirm">' + U.receipt([{ id: one('pp.litter.castr.none_confirm', sum), args: { n: sum }, tone: 'amber' }]) +
+          btn({ id: 'pp.litter.castr.none_yes', register: 'text', action: 'no-males-yes' }) + btn({ id: 'pp.litter.castr.none_keep', register: 'text', action: 'no-males-keep' }) + '</div>';
+      }
     } else {
-      var max = owedNow(id), rest = max - drawer.n;
+      var max = owedOf(id), rest = max - drawer.n;
       sub = d.product ? ['pp.litter.drawer.product', { prod: PP.t('pp.litter.product.' + d.product), n: max }] : ['pp.litter.drawer.owed', { n: max }];
       if (x.status !== 'due') body += UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.litter.drawer.' + x.status }, args: { title: { d: x.status === 'missed' ? d.last : d.due } } });
       body += stepperRow('n', 'pp.litter.stepper.treated', 'pp.litter.stepper.of', { n: max }, drawer.n, max, one('pp.litter.ceil.owed', max), { n: max });
       if (rest > 0) body += reasonGroup(rest, drawer.reason);
+      if (rest > 1 && drawer.reason === 'split') {
+        var w = Math.min(drawer.weak || 0, rest);
+        body += stepperRow('weak', 'pp.litter.reason.weak', 'pp.litter.split.rest', { s: rest - w }, w, rest, one('pp.litter.ceil.rest', rest), { n: rest });
+      }
     }
     // A resumed draft whose owed changed meanwhile: clamped to what is owed now, and said.
     if (drawer.clamped != null) body += U.receipt([{ id: 'pp.litter.resume.now', args: { n: drawer.clamped }, tone: 'amber' }]);
-    var w = waiting();
-    if (w) body += U.receipt([{ id: w[0], args: w[1] }]);
     var head = UI.heading({ title: '', kind: 'page', level: 3, description: '', action: clear,
       strs: { title: t[0], description: sub[0] }, args: { title: t[1], description: sub[1] } });
-    return '<div class="scrim" data-ds="Sheet" data-action="back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" data-sizing="content" role="dialog" aria-modal="true">' +
-      '<header class="utility-header">' + head + '</header>' +
-      '<div class="sheet-body"><div class="lt-drawer-body">' + body + '</div></div>' +
-      '<footer class="sheet-footer"><button type="button" class="button secondary" data-ds="Button" data-action="back" data-str="act.back">' + U.esc(PP.t('act.back')) + '</button>' +
-      '<button type="button" class="button primary" data-ds="Button" data-action="save" data-str="act.save"' + (w ? ' aria-disabled="true"' : '') + '>' + U.esc(PP.t('act.save')) + '</button></footer></section>';
+    return drawerShell(head, body);
   }
+  /* R1-2: arrivals of unknown treatment, resolved on this litter: how many already had it (a stamped check, not a treatment);
+     the rest recorded now or left owed. Save writes the check and the records together (all or nothing). */
+  function resolving() {
+    var p = drawer.group, g = unknownGroups(drawer.dose).filter(function (x) { return x.id === p; })[0];
+    return { group: p, dose: drawer.dose, n: g ? g.n : 0, from: g ? g.from : '' };
+  }
+  function resolveEvents() {
+    var r = resolving(), had = Math.max(0, Math.min(drawer.had || 0, r.n)), rest = r.n - had, out = [];
+    if (drawer.rest === 'owed') out.push({ type: 'check', litter: crate, dose: r.dose, had: had, lacks: rest, group: r.group });
+    else {
+      if (had) out.push({ type: 'check', litter: crate, dose: r.dose, had: had, group: r.group });
+      if (rest) out.push({ type: 'treat', litter: crate, dose: r.dose, n: rest, target: 'unknown', group: r.group });
+    }
+    return out;
+  }
+  function resolveDrawer() {
+    var r = resolving(), n = r.n, had = Math.max(0, Math.min(drawer.had || 0, n)), rest = n - had, visible = doseCfg(r.dose).visible;
+    var tx = lower(titleText(r.dose));
+    var body = stepperRow('had', 'pp.move.res.had', one('pp.move.res.of', n), { n: n }, had, n, one('pp.move.res.ceiling', n), { n: n });
+    if (rest) body += radios('rest', one('pp.move.res.rest', rest), { n: rest },
+      [['record', one('pp.move.res.record', rest), { tx: tx, n: rest }], ['owed', one('pp.move.res.owed', rest), { n: rest }]], drawer.rest);
+    body += UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.move.res.note' } });
+    var clear = drawer.had || drawer.rest ? btn({ id: 'act.clear', register: 'text', action: 'clear' }) : '';
+    var head = UI.heading({ title: '', kind: 'page', level: 3, description: '', action: clear,
+      strs: { title: one('pp.move.res.title', n), description: visible ? 'pp.move.res.sub_check' : 'pp.move.res.sub_unknown' },
+      args: { title: { tx: titleText(r.dose), n: n, code: r.from }, description: { tx: titleText(r.dose) } } });
+    return drawerShell(head, body, 'medium');
+  }
+  /* R1-3: a range (`0–2 of 11 · check`) settles on the pig: how many still owe it; record them now, or leave them owed
+     (a stamped `check { owed }`). None still owe it: Save writes the check at 0. */
+  function rangeEvents() {
+    var id = drawer.dose;
+    if (drawer.still && drawer.rest === 'record') return [{ type: 'treat', litter: crate, dose: id, n: drawer.still }];
+    return [{ type: 'check', litter: crate, dose: id, owed: drawer.still }];
+  }
+  function rangeDrawer() {
+    var id = drawer.dose, o = view().owed.filter(function (x) { return x.dose === id; })[0], rg = o.range;
+    drawer.still = Math.max(rg.lo, Math.min(rg.hi, drawer.still));   // a resumed draft stays inside the range as it stands now
+    var body = stepperRow('still', 'pp.litter.range.still', 'pp.litter.range.still_desc', { lo: rg.lo, hi: rg.hi }, drawer.still, rg.hi, one('pp.litter.ceil.owed', rg.hi), { n: rg.hi }, rg.lo);
+    if (drawer.still) body += radios('rest', one('pp.litter.range.them', drawer.still), { n: drawer.still },
+      [['record', one('pp.litter.range.record', drawer.still), { tx: lower(titleText(id)), n: drawer.still }], ['owed', one('pp.litter.range.leave', drawer.still), { n: drawer.still }]], drawer.rest);
+    body += UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.litter.range.note' } });
+    var doubt = rg.doubt[0] || { n: 0, to: '' };
+    var head = UI.heading({ title: '', kind: 'page', level: 3, description: '', strs: { title: title(id)[0], description: 'pp.litter.range.sub' },
+      args: { title: title(id)[1], description: { lo: rg.lo, hi: rg.hi, of: rg.of, n: doubt.n, to: doubt.to } } });
+    return drawerShell(head, body, 'medium');
+  }
+  function drawerHtml() { return drawer.kind === 'resolve' ? resolveDrawer() : drawer.kind === 'range' ? rangeDrawer() : doseDrawer(); }
   function freshDraft(id) {
-    if (doseCfg(id).castration) return { dose: id, castr: Object.assign({}, ZERO) };
-    return { dose: id, n: owedNow(id), reason: '' };
+    var o = view().owed.filter(function (x) { return x.dose === id; })[0];
+    if (o && o.range) return { kind: 'range', key: 'range:' + id, dose: id, still: o.range.hi, rest: '' };
+    if (doseCfg(id).castration) return { kind: 'dose', key: id, dose: id, castr: Object.assign({}, ZERO) };
+    return { kind: 'dose', key: id, dose: id, n: owedOf(id), reason: '', weak: 0 };
   }
-  function dirty() { var f = freshDraft(drawer.dose); return JSON.stringify([f.n, f.reason, f.castr]) !== JSON.stringify([drawer.n, drawer.reason, drawer.castr]); }
-  function resume(id) {
-    var dr = JSON.parse(JSON.stringify(drafts[id])), o = owedNow(id);
-    dr.dose = id; dr.clamped = null;
-    // Draft Resume clamps to the current owed and says so (`now 2 owed`).
-    if (!dr.castr && dr.n > o) { dr.n = o; dr.clamped = o; }
-    else if (dr.owed != null && dr.owed !== o) dr.clamped = o;
-    if (!dr.castr && dr.n >= o) dr.reason = '';
+  function freshResolve(v) { var p = v.split(':'); return { kind: 'resolve', key: 'res:' + v, group: p[0], dose: p[1], had: 0, rest: '' }; }
+  function dirty() {
+    var f = drawer.kind === 'resolve' ? freshResolve(drawer.group + ':' + drawer.dose) : freshDraft(drawer.dose);
+    var pick = function (x) { return JSON.stringify([x.n, x.reason, x.weak || 0, x.castr, x.had, x.rest, x.still]); };
+    return pick(f) !== pick(drawer);
+  }
+  function resume(key) {
+    var dr = JSON.parse(JSON.stringify(drafts[key])), o = owedOf(dr.dose);
+    dr.clamped = null;
+    if (dr.kind === 'dose' && !dr.castr) {
+      // Draft Resume clamps to the current owed and says so (`now 2 owed`).
+      if (dr.n > o) { dr.n = o; dr.clamped = o; }
+      else if (dr.owed != null && dr.owed !== o) dr.clamped = o;
+      if (dr.n >= o) dr.reason = '';
+    }
     return dr;
   }
   function saveDrafts() { try { sessionStorage.setItem('pp-drafts:' + store.name + ':' + crate, JSON.stringify(drafts)); } catch (e) {} }
+  // Open a drawer; the phone's Back closes it like the drawer's own Back (R1-24: the draft is kept, Resume brings it back).
+  function openDrawer(d) { drawer = d; ceilTap = ''; drawerOpenedAt = Date.now(); PP.drawerBack(function () { keepAndClose(); render(); }); }
+  function keepAndClose() {
+    if (!drawer) return;
+    if (dirty()) drafts[drawer.key] = Object.assign({}, drawer, { owed: owedOf(drawer.dose), clamped: null }); else delete drafts[drawer.key];
+    saveDrafts(); drawer = null; drawerClosedAt = Date.now();
+  }
+  function closeDrawer() { drawer = null; drawerClosedAt = Date.now(); PP.drawerBack(null); }
 
   /* ---- render: keeps scroll and focus ---- */
+  function body() {
+    var T = endedTask(), v = view();
+    var main = T ? endedSection(T) + reviewSection() : v.closed ? closedSection() + reviewSection() : reviewSection() + owedSection();
+    return orphanBanner() + factLine() + U.tools(crate) + main + afterEndSection() + recordedSection() + notesSection() +
+      (T || v.closed ? '' : laterSection()) + recordGroup();
+  }
   function render() {
     var scr = document.getElementById('screen');
-    var body = scr.querySelector('[data-presentation="page"] .sheet-body'), dbody = scr.querySelector('[data-st-context="drawer"] .sheet-body');
-    var top = body ? body.scrollTop : 0, dtop = dbody ? dbody.scrollTop : 0;
+    var pb = scr.querySelector('[data-presentation="page"] .sheet-body'), dbody = scr.querySelector('[data-st-context="drawer"] .sheet-body');
+    var top = pb ? pb.scrollTop : 0, dtop = dbody ? dbody.scrollTop : 0;
     var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-action]');
     var fk = f ? [f.dataset.action, f.dataset.value || '', f.dataset.step || ''] : null;
     scr.innerHTML =
       '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (drawer ? ' inert' : '') + '>' + header() +
-      '<div class="sheet-body"><div class="lt-body">' + factLine() + U.tools(crate) + owedSection() + afterEndSection() + recordedSection() + notesSection() + laterSection() + recordGroup() + '</div></div>' +
-      faceFooter() + '</section>' + (drawer ? doseDrawer() : '');
+      '<div class="sheet-body"><div class="lt-body">' + body() + '</div></div>' +
+      faceFooter() + '</section>' + (drawer ? drawerHtml() : '');
     PP.apply(scr);
+    UI.liveFill(scr, { then: function (el) { PP.apply(el); } });
     var nb = scr.querySelector('[data-presentation="page"] .sheet-body'), nd = scr.querySelector('[data-st-context="drawer"] .sheet-body');
     if (nb) nb.scrollTop = top;
     if (nd) nd.scrollTop = dtop;
@@ -443,85 +728,152 @@
     return r;
   }
   function otherRecord(id) { var rs = D(id).records.filter(function (r) { return !visit[r.id]; }); return rs[rs.length - 1] || null; }
-  /* The tap resolves against current owed: if another hand changed it, record nothing and say so. */
+  /* The tap resolves against current owed: if another hand changed it, record nothing and say so. Piglets whose dose is not
+     due yet (arrivals younger than the litter, R1-4) are deferred `not_due` and come back on their own day. */
   function tap(id, label) {
-    var o = owedNow(id);
-    if (label !== o) { receipt = { kind: o ? 'stale' : 'already', dose: id, other: otherRecord(id), now: o }; return; }
-    if (!o) return;
-    var r = commit(doseCfg(id).castration ? { dose: id, castration: { castrated: o } } : { dose: id, n: o });
-    if (!r.ok) receipt = { kind: r.reason === 'nothing_owed' ? 'already' : 'stale', dose: id, other: otherRecord(id), now: owedNow(id) };
+    var o = view().owed.filter(function (x) { return x.dose === id; })[0], n = o ? tapN(o) : 0;
+    if (label !== n) { receipt = { kind: n ? 'stale' : 'already', dose: id, other: otherRecord(id), now: owedOf(id) }; return; }
+    if (!n) return;
+    var ev = doseCfg(id).castration ? { dose: id, castration: { castrated: n } } : { dose: id, n: n };
+    if (splitNow(o)) ev.deferred = { n: o.owed - n, reason: 'not_due' };
+    var r = commit(ev);
+    if (!r.ok) receipt = { kind: r.reason === 'nothing_owed' ? 'already' : 'stale', dose: id, other: otherRecord(id), now: owedOf(id) };
+    else receipt.undo = r.event.id;                              // R1-25: a one-tap record can be undone from its receipt
+  }
+  function undo(id) {
+    var r0 = recordOf(id);
+    if (!r0) return;
+    var r = store.commit({ type: 'correction', target: id, void: true });
+    lastCommit = Date.now();
+    if (!r.ok) return;
+    delete visit[id];
+    receipt = { kind: 'undone', dose: r0.dose, n: r0.castration ? r0.castration.castrated : r0.n };
+  }
+  function setRadio(field, value) {
+    if (!drawer) return;
+    if (field === 'reason') { if (drawer.castr) drawer.castr.deferReason = value; else { drawer.reason = value; if (value === 'split' && !drawer.weak) drawer.weak = 1; } }
+    else if (field === 'rest') drawer.rest = value;
+  }
+  function reviewDoor(v) {
+    var x = reviewItems().filter(function (y) { return y.id === v; })[0] || store.select.reviews(store.derived, {}).items.filter(function (y) { return y.id === v; })[0];
+    if (!x) return;
+    // the answers live where the records are corrected: Edit (a possible double: same / twice) and the count host (a held
+    // body: one / two; counts that disagree: count again)
+    if (x.kind === 'double') nav('edit.html', { state: 'edit', crate: crate, double: x.records.join('+'), dose: x.dose, from: 'litter', data: store.name });
+    else if (x.kind === 'held') nav('count.html', { state: 'held-body', crate: crate, unit: qs.get('unit'), data: store.name });
+    else if (x.kind === 'count') nav('count.html', { state: 'count-conflict', crate: crate, unit: qs.get('unit'), data: store.name });
+    else nav('edit.html', { state: 'record-page', crate: crate, data: store.name });
   }
   function nav(page, params) { location.href = PP.href(page, Object.assign({ data: store.name !== 'base' ? store.name : '' }, params)); }
-  document.getElementById('screen').addEventListener('click', function (ev) {
+  var screen = document.getElementById('screen');
+  UI.radioBind(screen, { onChange: function (field, value) { setRadio(field, value); render(); } });
+  screen.addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-action]');
     if (!b) return;
     var a = b.dataset.action, v = b.dataset.value, now = Date.now();
-    if (a === 'record') {
-      if (now - lastCommit < 600) return;                       // a repeat tap after a commit is ignored
-      tap(v, +b.dataset.n); render();
-    } else if (a === 'open-dose') {
-      if (isDone(v)) return;
-      ceilTap = ''; drawer = drafts[v] ? resume(v) : freshDraft(v); render();
-    } else if (a === 'step') {
+    if (a === 'step') {
       if (b.getAttribute('aria-disabled') === 'true') { ceilTap = +b.dataset.step > 0 ? v : ''; render(); return; }
       ceilTap = '';
       var step = +b.dataset.step;
-      if (drawer.castr) { drawer.castr[v] += step; drawer.castr.none = false; if (!drawer.castr.deferred) drawer.castr.deferReason = ''; }
-      else { drawer.n += step; if (drawer.n === owedNow(drawer.dose)) drawer.reason = ''; }
-      render();
-    } else if (a === 'reason') { if (drawer.castr) drawer.castr.deferReason = v; else drawer.reason = v; render(); }
-    else if (a === 'no-males') { drawer.castr = Object.assign({}, ZERO, { none: !drawer.castr.none }); render(); }
-    else if (a === 'back') {
-      if (dirty()) drafts[drawer.dose] = Object.assign({}, drawer, { owed: owedNow(drawer.dose), clamped: null }); else delete drafts[drawer.dose];
-      saveDrafts(); drawer = null; drawerClosedAt = now; render();
+      if (drawer.kind === 'resolve') drawer.had = (drawer.had || 0) + step;
+      else if (drawer.kind === 'range') { drawer.still += step; if (!drawer.still) drawer.rest = ''; }
+      else if (drawer.castr) { drawer.castr[v] += step; drawer.castr.none = false; drawer.confirmNone = false; if (!drawer.castr.deferred) drawer.castr.deferReason = ''; }
+      else if (v === 'weak') drawer.weak = (drawer.weak || 0) + step;
+      else { drawer.n += step; if (drawer.n === owedOf(drawer.dose)) drawer.reason = ''; if (drawer.weak > restOf()) drawer.weak = restOf(); }
+      render(); return;
     }
-    else if (a === 'clear') { var id = drawer.dose; delete drafts[id]; saveDrafts(); drawer = freshDraft(id); render(); }
+    // a waiting control answers its tap with its reason (Button `guard`): a gray Save says why (R1-25)
+    if (UI.guard(b)) return;
+    if (a === 'record') {
+      if (now - lastCommit < 600) return;                       // a repeat tap after a commit is ignored
+      tap(v, +b.dataset.n); render();
+    } else if (a === 'undo') { undo(v); render(); }
+    else if (a === 'open-dose') {
+      if (isDone(v) || endedTask()) return;
+      var fr = freshDraft(v);                                     // a range draft resumes only while the range stands
+      if (fr.kind !== 'range') delete drafts['range:' + v];
+      openDrawer(fr.kind === 'range' ? (drafts[fr.key] ? resume(fr.key) : fr) : drafts[v] ? resume(v) : fr); render();
+    } else if (a === 'open-resolve') {
+      if (endedTask()) return;
+      openDrawer(drafts['res:' + v] ? resume('res:' + v) : freshResolve(v)); render();
+    } else if (a === 'radio') { setRadio(b.closest('[data-field]') ? b.closest('[data-field]').dataset.field : '', v); render(); }
+    else if (a === 'no-males') {
+      // R1-25: counts already entered are never wiped by a tap — No males asks first
+      if (!drawer.castr.none && csum(drawer.castr)) { drawer.confirmNone = true; render(); return; }
+      drawer.castr = Object.assign({}, ZERO, { none: !drawer.castr.none }); drawer.confirmNone = false; render();
+    }
+    else if (a === 'no-males-yes') { drawer.castr = Object.assign({}, ZERO, { none: true }); drawer.confirmNone = false; render(); }
+    else if (a === 'no-males-keep') { drawer.confirmNone = false; render(); }
+    else if (a === 'back') { keepAndClose(); PP.drawerBack(null); render(); }
+    else if (a === 'clear') { var k = drawer.key; delete drafts[k]; saveDrafts(); drawer = drawer.kind === 'resolve' ? freshResolve(drawer.group + ':' + drawer.dose) : freshDraft(drawer.dose); render(); }
     else if (a === 'save') {
-      if (b.getAttribute('aria-disabled') === 'true' || now - lastCommit < 600) return;
-      var ds = drawerSel();
-      if (!ds.event) { render(); return; }
-      var r = commit(ds.event);
-      if (!r.ok) { render(); return; }
-      delete drafts[drawer.dose]; saveDrafts(); drawer = null; drawerClosedAt = now; render();
+      if (now - lastCommit < 600 && drawerOpenedAt < lastCommit) return;   // a repeat tap after a commit is ignored, not a fresh drawer's Save
+      var key = drawer.key, dose = drawer.dose;
+      if (drawer.kind === 'resolve' || drawer.kind === 'range') {
+        var evs = drawer.kind === 'resolve' ? resolveEvents() : rangeEvents(), rr = drawer.kind === 'resolve' ? resolving() : null;
+        var res = store.commitAll(evs);
+        lastCommit = now;
+        if (!res.ok) { render(); return; }
+        res.events.forEach(function (e) { if (e.type === 'treat') visit[e.id] = true; });
+        if (rr) {
+          var had = Math.min(drawer.had || 0, rr.n);
+          receipt = { kind: 'resolved', dose: dose, had: had, rec: drawer.rest === 'owed' ? 0 : rr.n - had, left: drawer.rest === 'owed' ? rr.n - had : 0 };
+        } else receipt = { kind: 'resolved', dose: dose, had: 0, rec: drawer.rest === 'record' ? drawer.still : 0, left: drawer.rest === 'record' ? 0 : drawer.still };
+      } else {
+        var ds = drawerSel();
+        if (!ds.event) { render(); return; }
+        var r = commit(ds.event);
+        if (!r.ok) { render(); return; }
+      }
+      delete drafts[key]; saveDrafts(); closeDrawer(); render();
     } else if (a === 'close') {
       if (now - drawerClosedAt < 400) return;                    // a tap meant for the drawer's bar never closes the sheet
       nav('room.html', { state: 'room', unit: qs.get('unit') || (SOW.unit !== 7 ? SOW.unit : '') });
+    } else if (a === 'open-review') { reviewDoor(v);
     } else if (a === 'open-dead') { nav('dead.html', { state: 'dead', crate: crate, unit: qs.get('unit') });
     } else if (a === 'open-count') { nav('count.html', { state: 'count', crate: crate, unit: qs.get('unit'), data: store.name });
     } else if (a === 'open-move') { nav('move.html', { state: 'move', crate: crate });
     } else if (a === 'open-identity') { nav('id.html', { state: 'id-table', crate: crate });
     } else if (a === 'open-weight') { nav('edge.html', { state: 'birth-weight-entry', crate: crate });
     } else if (a === 'open-record') { nav('edit.html', { state: 'record-page', crate: crate });
-    } else if (a === 'open-edit') { nav('edit.html', { state: 'edit', crate: crate, from: 'litter' });
+    } else if (a === 'open-edit') { nav('edit.html', Object.assign({ state: 'edit', crate: crate, from: 'litter' }, v && v !== crate ? { record: v } : {}));
     } else document.documentElement.setAttribute('data-door', a + ':' + (v || ''));
   });
 
   PP.ready.then(function () {
     PP.me = window.PPFixtures.ME;
-    store = PP.open(st.data);
+    // a state that records at load (`pre`, a one-tap) shows the moment after, kept out of the tab's log
+    store = PP.open(st.data, st.pre || st.tap ? { session: false } : null);
     CFG = store.config; TODAY = store.today;
     // The litter: ?crate=, or ?sow=, else the state's own.
     crate = qs.get('crate') || st.crate || 'A02';
     if (qs.get('sow')) crate = store.crateOfSow(qs.get('sow')) || crate;
     SOW = store.sow(crate) || { sow: '', parity: 0, unit: 7, weight: null };
     var Lx = L();
-    // From the room (state=litter): a litter outside the task, orphaned, or still farrowing opens its own face.
+    // From the room (state=litter): a litter outside the task, or still farrowing, opens its own face. An orphaned litter
+    // (its sow died, locked or ended by her death) is this sheet, with the band (one sheet, not two).
     if (name === 'litter' && Lx && !qs.get('stay')) {
-      var edge = !Lx.recordable ? 'no-task' : Lx.phase === 'open' ? 'prelock' : Lx.endedBySowDeath ? 'orphan-unlocked' : Lx.sowDied ? 'orphan' : '';
+      var edge = !Lx.recordable ? 'no-task' : Lx.phase === 'open' ? 'prelock' : '';
       if (edge) { location.replace(PP.href('edge.html', { state: edge, crate: crate, unit: qs.get('unit'), data: store.name !== 'base' ? store.name : '' })); return; }
     }
     try { drafts = JSON.parse(sessionStorage.getItem('pp-drafts:' + store.name + ':' + crate) || 'null') || {}; } catch (e) { drafts = {}; }
     if (st.drafts) drafts = JSON.parse(JSON.stringify(st.drafts));
+    (st.pre || []).forEach(function (e) { var r = store.commit(e); if (r.ok && st.preVisit) { visit[r.event.id] = true; receipt = { kind: 'saved', dose: e.dose, rec: recordOf(r.event.id) }; } });
     (st.visit || []).forEach(function (id) { visit[id] = true; });
     if (st.receipt) { var r0 = recordOf(st.visit[0]); receipt = { kind: 'saved', dose: r0.dose, rec: r0 }; }
     if (qs.get('saved') === 'correction') receipt = { kind: 'correction' };
     if (st.tap) tap(st.tap.dose, st.tap.n);
     if (st.drawer) {
-      drawer = freshDraft(st.drawer.dose);
-      if (st.drawer.n != null) drawer.n = st.drawer.n;
-      if (st.drawer.reason != null) drawer.reason = st.drawer.reason;
-      if (st.drawer.castr) drawer.castr = Object.assign({}, ZERO, st.drawer.castr);
+      var dr = freshDraft(st.drawer.dose);
+      ['n', 'reason', 'weak', 'confirmNone'].forEach(function (k) { if (st.drawer[k] != null) dr[k] = st.drawer[k]; });
+      if (st.drawer.castr) dr.castr = Object.assign({}, ZERO, st.drawer.castr);
+      openDrawer(dr);
     }
+    if (st.resolve) {
+      var g = unknownGroups(st.resolve.dose)[0];
+      if (g) openDrawer(Object.assign(freshResolve(g.id + ':' + st.resolve.dose), { had: st.resolve.had || 0, rest: st.resolve.rest || '' }));
+    }
+    if (st.range) openDrawer(Object.assign(freshDraft(st.range.dose), { still: st.range.still, rest: st.range.rest || '' }));
     render();
   });
 })();
