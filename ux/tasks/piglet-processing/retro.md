@@ -272,3 +272,21 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   screenshots it in pages; `data-ds` values must match a folder in
   `components/` or start with `Candidate:`.
 - **Cost:** medium — lenses judged states from partial pictures.
+
+## 19 · Slices — parallel slices invented their own litters
+
+- **Stage:** Slices, S1 × S2 × S10 × S7.
+- **What happened:** each designer made up fixtures for the same room: crate
+  A02 owes iron + tail on the room list and five doses on the litter sheet;
+  C04 is day 3 on one and day 2 on another; S10 and S2 registered duplicate
+  strings for the same Record group because neither was on the map branch.
+  "Every number on every mock agrees" held inside a slice and broke across
+  them. The walk-through agents would hit contradictions the moment they
+  click from room to litter.
+- **Why:** the brief gave each slice the rule but no shared data; parallel
+  slices cannot see each other's branches.
+- **Change:** the first slice ticket (or the driver at charting) writes one
+  fixture module for the task — the room, its crates and litters, their
+  day-ages and schedule — and every page reads it; shared UI (a header, a
+  Record group) is extracted to the shell the first time two slices need it.
+- **Cost:** medium (a reconciliation pass at integration).
