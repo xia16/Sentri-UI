@@ -458,6 +458,7 @@
       if (now - drawerClosedAt < 400) return;                    // a tap meant for the drawer's bar never closes the sheet
       nav('room.html', { state: 'room', unit: qs.get('unit') || (SOW.unit !== 7 ? SOW.unit : '') });
     } else if (a === 'open-dead') { nav('dead.html', { state: 'dead', crate: crate, unit: qs.get('unit') });
+    } else if (a === 'open-count') { nav('count.html', { state: 'count', crate: crate, unit: qs.get('unit'), data: store.name });
     } else if (a === 'open-move') { nav('move.html', { state: 'move', crate: crate });
     } else if (a === 'open-identity') { nav('id.html', { state: 'id-table', crate: crate });
     } else if (a === 'open-weight') { nav('edge.html', { state: 'birth-weight-entry', crate: crate });
