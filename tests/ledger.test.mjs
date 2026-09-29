@@ -2550,3 +2550,29 @@ test('R1-15 every fixture log is causally consistent with its stamps: the causal
     if (top) assert.equal(last.at >= top.at, true, name + ': Last record ' + last.at + ' ' + last.type + ' is not before ' + top.at + ' ' + top.type);
   }
 });
+
+test('N12 a split deferral carries its by-reason counts onto the record and the owed', () => {
+  const b = book();
+  b.farrowed('A', 12);
+  const t = b.treat('A', 'iron3', 9, { deferred: { n: 3, reason: 'weak_sick', by: { weak: 2, sick: 1 } } });
+  let d = run(b, R1);
+  const D = d.litters.A.doses.iron3;
+  assert.deepEqual(D.records[0].deferBy, { weak: 2, sick: 1 });
+  assert.equal(D.deferred, 3); assert.equal(D.deferReason, 'weak_sick');
+  assert.deepEqual(D.deferBy, { weak: 2, sick: 1 });
+  assert.deepEqual(D.owedFrom.find((x) => x.kind === 'deferred').by, { weak: 2, sick: 1 });
+  const row = select.litter(d, 'A').owed.find((x) => x.dose === 'iron3');
+  assert.deepEqual(row.deferBy, { weak: 2, sick: 1 });
+  // a one-reason deferral has no split
+  const c = book(); c.farrowed('A', 12); c.treat('A', 'iron3', 10, { deferred: { n: 2, reason: 'weak' } });
+  assert.equal(run(c, R1).litters.A.doses.iron3.deferBy, null);
+  // the split must add up to the deferred
+  const e = book(); e.farrowed('A', 12);
+  const bad = e.treat('A', 'iron3', 9, { deferred: { n: 3, reason: 'weak_sick', by: { weak: 1, sick: 1 } } });
+  assert.equal(rejectedReason(run(e, R1), bad), 'bad_numbers');
+  // a catch-up of one weak piglet leaves the rest by reason unknown: the split is capped, never invented
+  b.treat('A', 'iron3', 1, { deferred: { n: 2, reason: 'weak_sick', by: { weak: 1, sick: 1 } } });
+  d = run(b, R1);
+  assert.deepEqual(d.litters.A.doses.iron3.deferBy, { weak: 1, sick: 1 });
+  assert.ok(t);
+});

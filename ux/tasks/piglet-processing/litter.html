@@ -140,9 +140,9 @@
     not = not.length === 1 ? [label(not[0][0])] : not.map(function (p) { return PP.t('pp.litter.castr.part', { n: p[1], reason: label(p[0]) }); });
     return k ? PP.t('pp.litter.castr.line', { c: c.castrated, k: k, why: not.join(zh ? '，' : ', ') }) : PP.t('pp.litter.castr.line_all', { c: c.castrated });
   }
-  // The deferral as the record wrote it: one reason, or split (`2 deferred: 1 weak, 1 sick`, N12 — from the event's `by`).
+  // The deferral as the record wrote it: one reason, or split (`2 deferred: 1 weak, 1 sick`, N12 — the record's `deferBy`).
   function deferTok(r, tone) {
-    var ev = rawEvent(r.id), by = ev && ev.deferred && ev.deferred.by;
+    var by = r.deferBy;
     if (by && by.weak && by.sick) return P('pp.litter.def.split', { k: r.deferred, w: by.weak, s: by.sick }, tone);
     return P('pp.common.mark.deferred', { k: r.deferred, reason: reasonName(r.deferReason || 'deferred') }, tone);
   }
