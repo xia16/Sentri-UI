@@ -20,14 +20,22 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
   ],
   "locales": ["en", "zh"],
   "locale_param": "lang",
-  "allow": { "spacing": [2, 4, 6, 8, 20] },
+  "allow": { "spacing": [1, 2, 3, 4, 6, 7, 8, 9, 10, 17, 20], "radius": [6, 8, 9] },
   "reference_tasks": ["farrowing"],
   "pages": [
     { "name": "farrowing", "url": "ux/system/farrowing-astra-concept.html", "locales": ["en"],
       "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] },
     { "name": "inspection", "url": "ux/system/inspection-astra-concept.html", "locales": ["en"],
       "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] },
-    { "name": "pp-index", "url": "ux/tasks/piglet-processing/index.html", "strict": true }
+    { "name": "pp-index", "url": "ux/tasks/piglet-processing/index.html", "strict": true },
+    { "name": "pp-room-room", "url": "ux/tasks/piglet-processing/room.html?state=room", "strict": true },
+    { "name": "pp-room-room-empty", "url": "ux/tasks/piglet-processing/room.html?state=room-empty", "strict": true },
+    { "name": "pp-room-room-all-done", "url": "ux/tasks/piglet-processing/room.html?state=room-all-done", "strict": true },
+    { "name": "pp-room-room-overdue", "url": "ux/tasks/piglet-processing/room.html?state=room-overdue", "strict": true },
+    { "name": "pp-room-room-drift", "url": "ux/tasks/piglet-processing/room.html?state=room-drift", "strict": true },
+    { "name": "pp-room-room-filter", "url": "ux/tasks/piglet-processing/room.html?state=room-filter", "strict": true },
+    { "name": "pp-room-room-scan", "url": "ux/tasks/piglet-processing/room.html?state=room-scan", "strict": true },
+    { "name": "pp-room-room-scan-none", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-none", "strict": true }
   ]
 }
 ```
