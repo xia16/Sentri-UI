@@ -1,0 +1,24 @@
+<!-- @dsCard group="Fields" height=900 subtitle="Candidate · − n + rows and the hero count" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<body>
+<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="rows"></div><div id="hero" style="margin-top:24px"></div><div id="floor" style="margin-top:24px"></div></div>
+<script>
+const UI = window.SentriUI;
+// Rows among 11 alive: default, empty (0 · − at the floor), pressed, focus, at the ceiling, corrected in Edit.
+rows.innerHTML = UI.panel([
+  UI.stepper({ label: 'Weak', description: 'among 11 alive', value: 1, max: 11, key: 'weak' }),
+  UI.stepper({ label: 'Deformed', description: 'among 11 alive', value: 0, max: 10, key: 'deformed' }),
+  UI.stepper({ label: 'Pressed +', value: 2, max: 11, key: 'pressed' }),
+  UI.stepper({ label: 'Focus on +', value: 2, max: 11, key: 'focus' }),
+  UI.stepper({ label: 'Weak · at the ceiling', value: 11, max: 11, key: 'ceiling' }),
+  UI.stepper({ label: 'Alive · corrected', value: 10, tone: 'changed', key: 'edit' })
+].join(''));
+hero.innerHTML = UI.stepper({ variant: 'hero', label: 'Alive', value: 9, min: 5, key: 'alive', hint: 'Saved · +4 this visit' });
+floor.innerHTML = UI.stepper({ variant: 'hero', label: 'Alive', value: 9, min: 9, key: 'alive-floor', hint: 'Wrong count? Edit' });
+document.querySelector('[data-value="pressed"][data-step="1"]').setAttribute('data-preview', 'pressed');
+document.querySelector('[data-value="focus"][data-step="1"]').setAttribute('data-preview', 'focus');
+</script>
+</body>
+</html>

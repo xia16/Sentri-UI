@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Field cards</title>
+<link rel="stylesheet" href="/ux/design-system/tokens.css">
+<link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="/ux/tasks/piglet-processing/shell.css">
+<style>
+/* layout only: the order of the states and the gaps between them */
+.demo-card > * + * { margin-top: var(--space-section); }
+</style>
+</head>
+<body>
+<!-- Every state of the three candidate field cards (Stepper, Measure, Numpad), en and zh (?lang=zh).
+     Sample litter: crate B04, 11 alive, day 3. Pressed and focus are drawn with the cards' data-preview hook. -->
+<main class="phone inspection-phone" data-st-context="page">
+  <div id="screen"></div>
+</main>
+<script src="/ux/design-system/components/bundle.js"></script>
+<script>
+(function () {
+  var UI = window.SentriUI;
+  var F = 'ds.field.figure';
+  var aria = { decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' };
+  function st(title, body) { return '<div class="demo-state">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'ds.field.demo.' + title } }) + body + '</div>'; }
+  function card(title, states) { return '<section class="demo-card">' + UI.heading({ title: '', kind: 'section', level: 2, strs: { title: 'ds.field.demo.' + title } }) + states.join('') + '</section>'; }
+  function strs(extra) { return Object.assign({ value: F }, aria, extra || {}); }
+  var alive = { description: { n: 11 } };
+
+  // Stepper — rows among 11 alive (weak + deformed can never exceed alive), and the hero Alive count.
+  var stepper = card('stepper', [
+    st('default', UI.panel(
+      UI.stepper({ label: 'Weak', description: 'among 11 alive', value: 1, max: 11, key: 'weak', strs: strs({ label: 'label.weak', description: 'ds.field.demo.of_alive' }), args: alive }) +
+      UI.stepper({ label: 'Deformed', description: 'among 11 alive', value: 0, max: 10, key: 'deformed', strs: strs({ label: 'label.deformed', description: 'ds.field.demo.of_alive' }), args: alive })
+    )),
+    st('pressed', UI.panel(UI.stepper({ label: 'Weak', value: 2, max: 11, key: 'weak-pressed', strs: strs({ label: 'label.weak' }) }))),
+    st('focus', UI.panel(UI.stepper({ label: 'Weak', value: 2, max: 11, key: 'weak-focus', strs: strs({ label: 'label.weak' }) }))),
+    st('ceiling', UI.panel(UI.stepper({ label: 'Weak', description: 'among 11 alive', value: 11, max: 11, key: 'weak-ceiling', strs: strs({ label: 'label.weak', description: 'ds.field.demo.of_alive' }), args: alive }))),
+    st('changed', UI.panel(UI.stepper({ label: 'Alive', value: 10, key: 'alive-edit', tone: 'changed', strs: strs({ label: 'label.alive' }) }))),
+    st('hero', UI.stepper({ variant: 'hero', label: 'Alive', value: 9, min: 5, key: 'alive', hint: 'Saved · +4 this visit', strs: strs({ label: 'label.alive', hint: 'fr.receipt.saved_plus' }), args: { hint: { n: 4 } } })),
+    st('hero_floor', UI.stepper({ variant: 'hero', label: 'Alive', value: 9, min: 9, key: 'alive-floor', hint: 'Wrong count? Edit', strs: strs({ label: 'label.alive', hint: 'pointer.wrong_count' }) }))
+  ]);
+
+  // Measure — litter weight of 11 piglets; usual 0.8–2.5 kg each → 8.8–27.5 kg (a soft warning, never a gate).
+  var mstrs = function (extra) { return Object.assign({ label: 'ds.field.demo.litter_weight', optional: 'ds.field.optional', value: F, unit: 'ds.field.unit.kg', placeholder: 'ds.field.placeholder' }, extra || {}); };
+  var range = [8.8, 27.5];
+  var measure = card('measure', [
+    st('default', UI.measure({ label: 'Litter weight', optional: 'Optional', value: '16.8', unit: 'kg', range: range, key: 'lw', strs: mstrs() })),
+    st('empty', UI.measure({ label: 'Litter weight', optional: 'Optional', value: '', unit: 'kg', range: range, key: 'lw-empty', strs: mstrs() })),
+    st('pressed', UI.measure({ label: 'Litter weight', optional: 'Optional', value: '16.8', unit: 'kg', range: range, key: 'lw-pressed', strs: mstrs() })),
+    st('focus', UI.measure({ label: 'Litter weight', optional: 'Optional', value: '16.8', unit: 'kg', range: range, key: 'lw-focus', strs: mstrs() })),
+    st('active', UI.measure({ label: 'Litter weight', optional: 'Optional', value: '16.', unit: 'kg', range: range, active: true, key: 'lw-active', strs: mstrs() }) +
+      UI.numpad({ decimals: 1, value: '16.', key: 'lw-active', strs: { digit: F, decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad' } })),
+    st('warn', UI.measure({ label: 'Litter weight', optional: 'Optional', value: '30.4', unit: 'kg', range: range, key: 'lw-warn', hint: 'Outside the usual 8.8–27.5 kg for 11 piglets', strs: mstrs({ hint: 'ds.field.measure.range' }), args: { hint: { min: '8.8', max: '27.5', n: 11 } } })),
+    st('refused', UI.measure({ label: 'Litter weight', optional: 'Optional', value: '304', unit: 'kg', tone: 'refused', key: 'lw-refused', hint: 'Not recorded · over 55 kg for 11 piglets', strs: mstrs({ hint: 'ds.field.measure.refused' }), args: { hint: { max: 55, n: 11 } } })),
+    st('changed', UI.measure({ label: 'Litter weight', optional: 'Optional', value: '16.2', unit: 'kg', tone: 'changed', key: 'lw-edit', hint: 'was 16.8 kg', strs: mstrs({ hint: 'ds.field.measure.was' }), args: { hint: { v: '16.8' } } }))
+  ]);
+
+  // Numpad — the tag / weigh run on crate B04, piglet 5 of 11. Tags are 6 digits; weights take 2 decimals.
+  var tagLabel = { label: { i: 5, n: 11 } };
+  var nstrs = function (extra) { return Object.assign({ digit: F, value: F, decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad', recent: 'ds.field.aria.recent', placeholder: 'ds.field.placeholder' }, extra || {}); };
+  var recent = [['000257', '1.51'], ['000256', '1.38'], ['000255', '1.44']].map(function (r) {
+    return { text: r[0] + ' · ' + r[1] + ' kg', strs: { text: 'ds.field.numpad.recent' }, args: { text: { tag: r[0], w: r[1] } } };
+  });
+  var tag = function (o) { return UI.numpad(Object.assign({ label: 'Piglet 5 of 11 · ear tag', maxLength: 6, key: 'tag', recent: recent, strs: nstrs(Object.assign({ label: 'ds.field.numpad.tag_label' }, o.strs)), args: Object.assign({}, tagLabel, o.args) }, o.props)); };
+  var numpad = card('numpad', [
+    st('default', tag({ props: { value: '0002' } })),
+    st('empty', tag({ props: { value: '', recent: [] } })),
+    st('suggested', tag({ props: { value: '000258', suggested: true, hint: 'Next tag in sequence · type to replace' }, strs: { hint: 'ds.field.numpad.suggested' } })),
+    st('full', tag({ props: { value: '000258' } })),
+    st('error', tag({ props: { value: '000254', tone: 'error', hint: '000254 is already on crate B04' }, strs: { hint: 'ds.field.numpad.duplicate' }, args: { hint: { tag: '000254', crate: 'B04' } } })),
+    st('warn', UI.numpad({ label: 'Piglet 5 of 11 · weight', value: '0.62', unit: 'kg', decimals: 2, tone: 'warn', key: 'weight', hint: 'Outside the usual 1.0–2.8 kg at day 3', strs: nstrs({ label: 'ds.field.numpad.weight_label', unit: 'ds.field.unit.kg', hint: 'ds.field.numpad.weight_range' }), args: { label: { i: 5, n: 11 }, hint: { min: '1.0', max: '2.8', d: 3 } } })),
+    st('pressed', UI.numpad({ decimals: 1, value: '16', key: 'pad-pressed', strs: nstrs() })),
+    st('focus', UI.numpad({ decimals: 1, value: '16', key: 'pad-focus', strs: nstrs() })),
+    st('keys_only', UI.numpad({ decimals: 1, value: '', key: 'pad-keys', strs: nstrs() }))
+  ]);
+
+  var screen = document.getElementById('screen');
+  screen.innerHTML = UI.heading({ title: '', kind: 'page', level: 1, strs: { title: 'ds.field.demo.title' } }) + stepper + measure + numpad;
+  screen.className = 'demo-card';
+  // Pressed and focus are interaction states; the cards' data-preview hook draws them still.
+  function mark(sel, state) { var el = screen.querySelector(sel); if (el) el.setAttribute('data-preview', state); }
+  mark('[data-value="weak-pressed"][data-step="1"]', 'pressed');
+  mark('[data-value="weak-focus"][data-step="1"]', 'focus');
+  mark('.st-measure-box[data-value="lw-pressed"]', 'pressed');
+  mark('.st-measure-box[data-value="lw-focus"]', 'focus');
+  mark('[data-value="pad-pressed"][data-key="7"]', 'pressed');
+  mark('[data-value="pad-focus"][data-key="7"]', 'focus');
+})();
+</script>
+<script src="/ux/tasks/piglet-processing/shell.js"></script>
+</body>
+</html>
