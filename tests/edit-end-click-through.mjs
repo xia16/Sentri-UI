@@ -32,6 +32,15 @@ async function openEdit(page) {
   await page.click('[data-action="open-edit"]');
   await page.waitForURL(/edit\.html/); await ready(page);
 }
+// litter → Record dead: one crushed (with photos), Save returns to the litter
+async function recordDead(page, photos) {
+  await page.click('[data-action="open-dead"]');
+  await page.waitForURL(/dead\.html/); await ready(page);
+  await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  for (let i = 0; i < photos; i++) await page.click('[data-action="photo-add"]');
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/litter\.html/); await ready(page);
+}
 async function hold(page, sel, ms = 1100) {
   const b = await page.locator(sel).boundingBox();
   await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
@@ -46,13 +55,7 @@ try {
   // 1. R1-7: room → A02 → Record dead (+1 crushed) → Edit lists the death → Recorded by mistake → Save → the receipt
   //    says alive and dead went back; the litter reads Alive 12 again.
   await openLitter(page, 'A02');
-  await page.click('[data-action="open-dead"]');
-  await page.waitForURL(/dead\.html/); await ready(page);
-  await page.click('[data-action="dead-step"][data-value="crushed"][data-step="1"]');
-  await page.click('[data-action="save"]');
-  await page.waitForTimeout(500);
-  await page.click('[data-action="close-host"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await recordDead(page, 0);
   assert.match(await text(page, '[data-action="open-record"]'), /Alive 11/);
   await openEdit(page);
   const death = page.locator('[data-action="death-void"]').last();
@@ -68,12 +71,15 @@ try {
 
   // 2. R1-7: a death on the wrong litter moves: Edit → On another litter → A04 → Save → both litters' alive in the receipt;
   //    the record page says where it went.
-  await page.click('[data-action="open-dead"]');
-  await page.waitForURL(/dead\.html/); await ready(page);
-  await page.click('[data-action="dead-step"][data-value="crushed"][data-step="1"]');
-  await page.click('[data-action="save"]');
-  await page.waitForTimeout(500);
-  await page.click('[data-action="close-host"]');
+  await recordDead(page, 2);
+  await page.click('[data-action="open-record"]');                          // the death's photos show, and open (Back only)
+  await page.waitForURL(/state=record-page/); await ready(page);
+  await page.click('[data-action="rec-photo"]');
+  assert.match(await text(page, '[data-st-context="drawer"]'), /Photo 1 of 2/);
+  assert.equal(await page.locator('[data-st-context="drawer"] [data-action="photo-delete"]').count(), 0);
+  await page.click('[data-st-context="drawer"] [data-action="photo-back"]');
+  await page.waitForTimeout(400);
+  await page.click('[data-action="back"]');
   await page.waitForURL(/litter\.html/); await ready(page);
   await openEdit(page);
   await page.locator('[data-action="death-to"]').last().click();

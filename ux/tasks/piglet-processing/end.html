@@ -709,7 +709,8 @@
     }
     if (a === 'already-receipt') { finishEnded('receipt', 'ended-by-other'); return; }
     if (a === 'check-ended') { finishEnded('', 'ended'); return; }
-    if (a === 'open-dead') { location.href = route('dead.html', 'dead-draft', v); return; }
+    // the dead sheet's Save and Back return here (its `back`: this page, as it stands)
+    if (a === 'open-dead') { location.href = route('dead.html', 'dead-draft', v, { back: 'end.html' + location.search }); return; }
   });
 
   var boot = PP.ready.then(function () {

@@ -743,6 +743,7 @@
     "pp.edit.rec.count.disputed": {"en": "sync review · two counts disagree", "zh": "待同步核查 · 两次点数不一致", "kind": "body"},
     "pp.edit.rec.count.withdrawn": {"en": "withdrawn {stamp} · its unexplained line went", "zh": "已于{stamp}撤回 · 它的不明增减一并撤销", "kind": "body"},
     "pp.edit.rec.photos.many": {"en": "{n} photos", "zh": "{n}张照片", "kind": "body"},
+    "pp.edit.rec.note": {"en": "note: {note}", "zh": "备注：{note}", "kind": "body"},
     "pp.edit.rec.photos.one": {"en": "{n} photo", "zh": "{n}张照片", "kind": "body"},
     "pp.edit.rec.death.withdrawn": {"en": "withdrawn {stamp} · recorded by mistake", "zh": "已于{stamp}撤回 · 误记", "kind": "body"},
     "pp.edit.rec.death.moved_in": {"en": "moved here from {code}", "zh": "由{code}改记到此", "kind": "body"},

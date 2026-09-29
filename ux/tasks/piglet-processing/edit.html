@@ -41,6 +41,9 @@
 /* A record-page entry a door points at (the death or Move that explained a count line): marked, and briefly lit. */
 .st-log-extra:has(> .ed-anchor:only-child) { display: none; }
 .st-log-entry[data-flash] { background: var(--amber-wash); }
+.st-log-extra .st-photos-items { padding: var(--space-key-gap) 0 0; }
+/* the photo viewer (the dead sheet's, History face: Back only): one photo, full width — a stand-in frame, no camera here */
+.ed-photo { display: grid; place-items: center; width: 100%; aspect-ratio: 3 / 4; border-radius: var(--radius-inset); background: var(--well); color: var(--muted); font-family: var(--font-mono); font-size: var(--type-button-size); }
 /* Candidate:WellTray — farrowing's At-finish tray: a row expands in place into a well whose fields edit within the one
    Edit screen (no drawer, no second Save). */
 .ed-tray { display: flex; flex-direction: column; gap: var(--space-row-y); padding: var(--space-row-y) var(--space-panel) var(--space-panel); background: var(--well); border-radius: var(--radius-inset); }
@@ -117,7 +120,7 @@
   var EMPTY = function () { return { marks: {}, moves: {}, rows: {}, counts: {}, deaths: {}, reopen: false }; };
   var draft = EMPTY();
   var lead = '', rowOpen = null, pad = null, typed = {}, picker = null, pickerBefore = null, ceilTap = '', drawerClosedAt = 0, lastSave = 0, notices = [];
-  var cleared = null, clearTimer = 0, saved = null, dbl = { answer: '', withdraw: '' }, dblSaved = null;
+  var photo = null, cleared = null, clearTimer = 0, saved = null, dbl = { answer: '', withdraw: '' }, dblSaved = null;
 
   /* ---- the ledger ---- */
   function L(c) { return store.derived.litters[c || crate]; }
@@ -285,6 +288,19 @@
   }
   function withdrawnBy(x) { var c = x.corrected && x.corrected.length ? x.corrected[x.corrected.length - 1] : null; return c ? stampText(c.at, c.who) : ''; }
   function photosOf(id) { var ev = eventOf(id) || {}, p = ev.photos; return Array.isArray(p) ? p.length : typeof p === 'number' ? p : 0; }
+  // Photos card's thumbnails (the history face: no camera) and its viewer, Back only (ADR 0002: never Delete from History)
+  function thumbs(id, n) {
+    var out = '';
+    for (var i = 1; i <= n; i++) out += '<li><button type="button" class="st-photos-thumb" data-action="rec-photo" data-value="' + U.esc(id) + '|' + i + '" data-str-attr="aria-label:ds.c2.aria.thumb" data-args=\'{"n":' + i + '}\' aria-label="' + U.esc(PP.t('ds.c2.aria.thumb', { n: i })) + '">' + span('ds.c2.photos.index', { n: i }) + '</button></li>';
+    return '<ul class="st-photos-items" data-ds="Photos">' + out + '</ul>';
+  }
+  function photoViewer() {
+    var p = photo.split('|'), n = photosOf(p[0]), i = +p[1], ev = eventOf(p[0]) || {};
+    return '<div class="scrim" data-ds="Sheet" data-action="photo-back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
+      '<header class="utility-header">' + UI.heading({ title: '', description: '', kind: 'page', level: 3, strs: { title: 'pp.dead.photo.title', description: stampStrs(ev.at, ev.who)[0] }, args: { title: { n: i, m: n }, description: stampStrs(ev.at, ev.who)[1] } }) + '</header>' +
+      '<div class="sheet-body"><div class="ed-photo" role="img" data-str-attr="aria-label:ds.c2.aria.thumb" data-args=\'{"n":' + i + '}\' aria-label="' + U.esc(PP.t('ds.c2.aria.thumb', { n: i })) + '">' + span('ds.c2.photos.index', { n: i }) + '</div></div>' +
+      '<footer class="sheet-footer">' + button('secondary', 'photo-back', 'act.back') + '</footer></section>';
+  }
   function anchor(id) { return '<span class="ed-anchor" data-entry="' + U.esc(id) + '"></span>'; }
   function entry(x, g) {
     var meta = g.who ? ['pp.edit.rec.t', { t: U.time(x.at) }] : ['pp.common.stamp.today', { t: U.time(x.at), who: x.who }];
@@ -325,8 +341,9 @@
           var mv = movedTo(x.id);
           detail = mv ? ['pp.edit.rec.death.moved', { code: mv, stamp: withdrawnBy(x) }] : ['pp.edit.rec.death.withdrawn', { stamp: withdrawnBy(x) }];
         } else if (x.fromMissing) detail = ['pp.edit.rec.death.missing', { k: x.fromMissing }];
-        var ph = photosOf(x.id);
-        extra = anchor(x.id) + (ph ? sline([part(PP.one('pp.edit.rec.photos', ph), { n: ph })]) : '');
+        // the death's note and photos, as saved on the dead sheet: the photos open a viewer (Back only, no Delete from History)
+        var ph = photosOf(x.id), note = (eventOf(x.id) || {}).note;
+        extra = anchor(x.id) + (note ? sline([part('pp.edit.rec.note', { note: note })]) : '') + (ph ? sline([part(PP.one('pp.edit.rec.photos', ph), { n: ph })]) + thumbs(x.id, ph) : '');
         break;
       case 'count':
         title = ['pp.edit.rec.count', { n: x.observed }];
@@ -910,7 +927,7 @@
     var body = scr.querySelector('[data-presentation="page"] .sheet-body'), top = body ? body.scrollTop : 0;
     var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-action]');
     var fk = f ? [f.dataset.action, f.dataset.value || '', f.dataset.step || '', f.dataset.key || ''] : null;
-    if (view === 'record') scr.innerHTML = recordPage();
+    if (view === 'record') scr.innerHTML = recordPage().replace('data-presentation="page">', 'data-presentation="page"' + (photo ? ' inert' : '') + '>') + (photo ? photoViewer() : '');
     else if (view === 'double') scr.innerHTML = doublePage();
     else { var e = E(); scr.innerHTML = editPage(e) + (picker ? pickerDrawer(e) : ''); }
     PP.apply(scr);
@@ -1069,6 +1086,10 @@
       var sd = document.querySelector('[data-death]'); if (sd) sd.scrollIntoView({ block: 'start' });
     } else if (a === 'focus-mark') {
       var t0 = document.querySelector('[data-mark="' + v + '"]'); if (t0) { t0.scrollIntoView({ block: 'center' }); var k0 = t0.querySelector('[data-action="mark-step"]'); if (k0) k0.focus(); }
+    } else if (a === 'rec-photo') { photo = v; render(); var pb = document.querySelector('[data-st-context="drawer"] [data-action="photo-back"]'); if (pb) pb.focus();
+    } else if (a === 'photo-back') {
+      var was = photo; photo = null; drawerClosedAt = now; render();
+      var th = document.querySelector('[data-action="rec-photo"][data-value="' + was + '"]'); if (th) th.focus();
     } else if (a === 'goto-entry') {
       var an = document.querySelector('[data-entry="' + v + '"]'), art = an && an.closest('article');
       if (art) { art.scrollIntoView({ block: 'center' }); art.setAttribute('data-flash', ''); setTimeout(function () { art.removeAttribute('data-flash'); }, 1200); }
