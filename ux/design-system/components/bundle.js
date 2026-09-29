@@ -174,70 +174,129 @@
     const o={strs,args},hasBadge=(badge!==''&&badge!=null)||has(o,'badge');
     return `<button type="button" class="icon-button ${esc(className)}" data-ds="IconButton" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${disabled?' disabled':''}>${icon}${hasBadge?`<span class="filter-badge">${tx(badge,o,'badge')}</span>`:''}</button>`;
   }
-  /* ---- Field cards (candidate): Stepper, Measure, Numpad ----
-     The record sheet's counting and typing fields. Each emits data-action with data-value = the caller's
-     field key; the caller owns the value, the floor and the ceiling and re-renders on every tap.
-     A key with nothing to do (− at the floor, + at the ceiling, ⌫ on an empty value, digits on a full value)
-     wears the floor-gray: aria-disabled, still tappable so the host can answer it with a pointer — the one
-     scoped disabled family. strs.value / strs.digit get args {n} filled in when the caller gives none. */
+  /* ---- Field cards (candidate, ADR 0001): Stepper, Measure, Numpad ----
+     Event contract: every control is a <button data-action> whose data-value is the caller's field key;
+     Stepper keys add data-step (−step | step), Numpad keys add data-key (0–9 | . | back). Delegate with
+     closest('[data-action]'). The caller holds the value (always a string for typed input), commits and
+     re-renders; patch by field key and keep the roots mounted so focus and live regions survive.
+     The floor-gray (DS README, States): a key with nothing to do is aria-disabled, still tappable, and the
+     host answers the tap in the field's hint line. */
   let fieldUid=0;
   const fieldId=p=>`${p}-${++fieldUid}`;
   const glyph=k=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${(root.SentriIcons&&root.SentriIcons.paths[k])||''}"/></svg>`;
-  // aria-label with an optional registry twin (filled by the shell through data-str-attr).
+  // aria-label with an optional registry twin (the shell fills it through data-str-attr).
   const ariaText=(text,id,args)=>` aria-label="${esc(text)}"${id?` data-str-attr="aria-label:${esc(id)}"${args?` data-args="${esc(JSON.stringify(args))}"`:''}`:''}`;
-  const withN=(o,key,n)=>{if(has(o,key)&&!(o.args&&o.args[key]))o.args=Object.assign({},o.args,{[key]:{n:String(n)}});return o;};
-  const hintTone=t=>t==='error'?'red':t==='warn'||t==='refused'?'amber':'muted';
-  function hintLine(cls,text,tone,o){
-    if(!(text||has(o,'hint')))return '';
-    return `<p class="st-field-hint ${cls}" data-tone="${hintTone(tone)}"${tone?' role="status"':''}>${tx(text,o,'hint')}</p>`;
+  const hintTone=t=>t==='warn'||t==='refused'?'amber':'muted';
+  // One hint line. reserve keeps its height when empty, so nothing below it moves when a hint appears.
+  function hintLine(cls,{text='',tone='',o={},key='hint',reserve=false,inner=''}={}){
+    const show=text||has(o,key)||inner;
+    if(!show&&!reserve)return '';
+    const body=inner||(show?tx(text,o,key):'');
+    return `<p class="st-field-hint ${cls}" data-tone="${hintTone(tone)}"${reserve?` data-reserve="${reserve===true?'text':esc(reserve)}"`:''}${show?'':' aria-hidden="true"'}>${body}</p>`;
   }
-  /* Stepper: `− n +`, the one counting shape. variant 'row' (a 60px sheet row) or 'hero' (the one number a count sheet sets). */
-  function stepper({label='',description='',value=0,action='step',key='',min=0,max=null,variant='row',tone='',hint='',id='',className='',strs,args}={}){
-    const o=withN({strs,args},'value',value);
-    const n=Number(value)||0,hero=variant==='hero',lid=id||fieldId('st-stepper');
-    const s=strs||{},a=o.args||{};
-    const floorGray=n<=min,ceilGray=max!=null&&n>=max;
-    const key1=(step,gray)=>`<button type="button" class="st-stepper-key" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${step}"${gray?' aria-disabled="true"':''}${step<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}>${glyph(step<0?'minus':'plus')}</button>`;
-    const t=tone==='changed'?tone:'';
-    const copy=`<span class="st-stepper-copy"><span class="st-stepper-label" id="${esc(lid)}">${tx(label,o,'label')}</span>${description||has(o,'description')?`<small class="st-stepper-description">${tx(description,o,'description')}</small>`:''}</span>`;
-    const val=`<span class="st-stepper-value"${sa(s.value,a.value)} aria-live="polite">${esc(n)}</span>`;
-    return `<div class="st-stepper ${esc(className)}" data-ds="Stepper" data-variant="${hero?'hero':'row'}" role="group" aria-labelledby="${esc(lid)}"${n===0?' data-zero=""':''}${t?` data-tone="${t}"`:''}>${copy}<span class="st-stepper-keys">${key1(-1,floorGray)}${val}${key1(1,ceilGray)}</span>${hintLine('st-stepper-hint',hint,'',o)}</div>`;
-  }
-  /* The box a measured or typed value sits in; shared by Measure (a button) and Numpad's readout (static). */
-  function valueBox(tag,{value='',unit='',placeholder='—',active=false,attrs=''},o){
-    const empty=value===''||value==null,s=o.strs||{},a=o.args||{};
-    const shown=empty?(active?'':placeholder):value;
-    const vid=empty?(active?'':s.placeholder):s.value,vargs=empty?a.placeholder:(a.value||(s.value?{n:String(value)}:null));
-    return `<${tag} class="st-measure-box"${attrs}><span class="st-measure-value"${vid?sa(vid,vargs):''}>${esc(shown)}</span>${unit||has(o,'unit')?`<span class="st-measure-unit">${tx(unit,o,'unit')}</span>`:''}</${tag}>`;
-  }
-  /* Measure: one measured value, mono, unit always written. A button that opens the Numpad beneath it (active). */
-  function measure({label='',optional='',value='',unit='',placeholder='—',action='open-numpad',key='',active=false,range=null,tone='',hint='',id='',className='',strs,args}={}){
-    const o={strs,args},lid=id||fieldId('st-measure'),num=parseFloat(value);
-    const out=Array.isArray(range)&&!Number.isNaN(num)&&(num<range[0]||num>range[1]);
-    const t=['refused','changed','warn'].includes(tone)?tone:out?'warn':'';
-    const empty=value===''||value==null;
-    const lab=`<span class="st-measure-label" id="${esc(lid)}"><span${sa(o.strs&&o.strs.label,o.args&&o.args.label)}>${esc(label)}</span>${optional||has(o,'optional')?`<small>${tx(optional,o,'optional')}</small>`:''}</span>`;
-    const box=valueBox('button',{value,unit,placeholder,active,attrs:` type="button" data-action="${esc(action)}" data-value="${esc(key)}" aria-labelledby="${esc(lid)}" aria-expanded="${active?'true':'false'}"`},o);
-    return `<div class="st-measure ${esc(className)}" data-ds="Measure"${empty?' data-empty=""':''}${active?' data-active=""':''}${t?` data-tone="${t}"`:''}>${lab}${box}${hintLine('st-measure-hint',hint,t==='changed'?'':t,o)}</div>`;
-  }
-  /* Numpad: the one type-to-set pad, for real typed input only (ear tags, weights). 1–9, then [. or gap] 0 ⌫.
-     No commit key: the surface's bar primary commits (Record · next piglet); the pad only edits its readout. */
-  function numpad({label='',value='',unit='',placeholder='—',suggested=false,decimals=0,maxLength=null,recent=[],action='numpad',key='',tone='',hint='',className='',strs,args}={}){
+  /* Stepper: `− n +`, the one counting shape. variant 'row' (a 60px sheet row) or 'hero' (the count sheet's one number).
+     pointers: [{label, action, value, strs:{label}, args}] — text actions (≥44px) shown in the hint line at the floor. */
+  function stepper({label='',description='',value=0,min=0,max=null,step=1,action='step',key='',variant='row',changed=false,tone='',hint='',pointers=[],reserveHint,id='',className='',strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{};
-    const v=value==null?'':String(value),typing=suggested?'':v;
-    const dot=typing.indexOf('.'),places=dot<0?0:typing.length-dot-1;
-    const full=(maxLength!=null&&typing.replace('.','').length>=maxLength)||(decimals>0&&dot>=0&&places>=decimals);
-    const t=['error','warn'].includes(tone)?tone:suggested?'suggested':'';
-    const readout=label||has(o,'label')?`<div class="st-numpad-readout"${t?` data-tone="${t}"`:''}><span class="st-numpad-label"${sa(s.label,a.label)}>${esc(label)}</span>${valueBox('div',{value:v,unit,placeholder,active:true},o)}</div>`:'';
-    const list=recent.length?`<ol class="st-numpad-recent"${ariaText('Recorded',s.recent,a.recent)}>${recent.slice(0,3).map(r=>`<li>${tx(r.text,r,'text')}</li>`).join('')}</ol>`:'';
-    const k=(d,gray)=>`<button type="button" class="st-numpad-key" data-action="${esc(action)}" data-value="${esc(key)}" data-key="${d}"${gray?' aria-disabled="true"':''}><span${d==='.'?sa(s.decimal,a.decimal):sa(s.digit,s.digit?{n:d}:null)}>${d}</span></button>`;
-    const keys=['1','2','3','4','5','6','7','8','9'].map(d=>k(d,full)).join('')
-      +(decimals>0?k('.',dot>=0||full):'<span class="st-numpad-gap" aria-hidden="true"></span>')
-      +k('0',full)
-      +`<button type="button" class="st-numpad-key" data-action="${esc(action)}" data-value="${esc(key)}" data-key="back"${typing===''?' aria-disabled="true"':''}${ariaText('Backspace',s.back,a.back)}>${glyph('backspace')}</button>`;
-    return `<div class="st-numpad ${esc(className)}" data-ds="Numpad"${t?` data-tone="${t}"`:''}${full?' data-full=""':''}>${readout}${hintLine('st-numpad-hint',hint,t==='suggested'?'':t,o)}${list}<div class="st-numpad-keys" role="group"${ariaText('Number pad',s.pad,a.pad)}>${keys}</div></div>`;
+    const n=Number(value)||0,hero=variant==='hero',lid=id||fieldId('st-stepper'),d=Math.abs(Number(step)||1);
+    const floorGray=n<=min,ceilGray=max!=null&&n>=max;
+    const isChanged=changed||tone==='changed';
+    const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}"${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
+    const copy=`<span class="st-stepper-copy"><span class="st-stepper-label" id="${esc(lid)}">${tx(label,o,'label')}</span>${description||has(o,'description')?`<small class="st-stepper-description">${tx(description,o,'description')}</small>`:''}</span>`;
+    const vargs=a.value||(s.value?{n:String(n)}:null);
+    const val=`<span class="st-stepper-value" role="spinbutton" tabindex="0" aria-labelledby="${esc(lid)}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${esc(n)}</span>`;
+    const ptr=pointers.map(p=>`<button type="button" class="st-text-action" data-action="${esc(p.action||'')}" data-value="${esc(p.value!=null?p.value:key)}">${tx(p.label,p,'label')}</button>`).join('');
+    const canPoint=hero||min>0||pointers.length>0,reserve=reserveHint!=null?(reserveHint?(canPoint?'action':'text'):''):(canPoint?'action':max!=null?'text':'');
+    const hl=hintLine('st-stepper-hint',{text:ptr?'':hint,o,reserve,inner:ptr?`${hint||has(o,'hint')?`<span class="st-stepper-hint-text">${tx(hint,o,'hint')}</span>`:''}${ptr}`:''});
+    return `<div class="st-stepper ${esc(className)}" data-ds="Stepper" data-variant="${hero?'hero':'row'}" data-field="${esc(key)}" role="group" aria-labelledby="${esc(lid)}"${n===0?' data-zero=""':''}${isChanged?' data-changed=""':''}${max!=null&&max>=1000?' data-wide=""':''}>${copy}<span class="st-stepper-keys">${key1(-1,floorGray)}${val}${key1(1,ceilGray)}</span>${hl}</div>`;
   }
-  const api=Object.freeze({heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad});
+  /* The box a measured or typed value sits in; shared by Measure (a button) and the Numpad readout (static). */
+  function valueBox(tag,{value='',unit='',unitGap=true,placeholder='—',active=false,attrs='',vid='',uid=''},o){
+    const empty=value===''||value==null,s=o.strs||{},a=o.args||{};
+    const shown=empty?(active?'':placeholder):String(value);
+    const sid=empty?(active?'':s.placeholder):s.value,sargs=empty?a.placeholder:(a.value||(s.value?{n:String(value)}:null));
+    return `<${tag} class="st-measure-box"${unitGap?'':' data-unit-gap="none"'}${attrs}><span class="st-measure-value"${vid?` id="${esc(vid)}"`:''}${sid?sa(sid,sargs):''}>${esc(shown)}</span>${unit||has(o,'unit')?`<span class="st-measure-unit"${uid?` id="${esc(uid)}"`:''}>${tx(unit,o,'unit')}</span>`:''}</${tag}>`;
+  }
+  /* Measure: one measured value, mono, unit always written. A button that opens the docked Numpad (active).
+     range is evaluated only when the pad is closed (active false), never per keystroke. */
+  function measure({label='',optional='',value='',unit='',unitGap=true,placeholder='—',action='open-numpad',key='',active=false,controls='',range=null,tone='',changed=false,hint='',note='',id='',className='',strs,args}={}){
+    const o={strs,args},lid=id||fieldId('st-measure'),v=value==null?'':String(value),num=parseFloat(v);
+    const out=!active&&Array.isArray(range)&&v!==''&&!Number.isNaN(num)&&(num<range[0]||num>range[1]);
+    const t=tone==='refused'?'refused':tone==='warn'||out?'warn':'';
+    const isChanged=changed||tone==='changed';
+    const lab=`<span class="st-measure-label" id="${esc(lid)}"><span${sa(o.strs&&o.strs.label,o.args&&o.args.label)}>${esc(label)}</span>${optional||has(o,'optional')?`<small>${tx(optional,o,'optional')}</small>`:''}</span>`;
+    const vid=lid+'-value',uid=lid+'-unit';
+    const box=valueBox('button',{value:v,unit,unitGap,placeholder,active,vid,uid,attrs:` type="button" data-action="${esc(action)}" data-value="${esc(key)}" aria-labelledby="${esc(lid)} ${esc(vid)} ${esc(uid)}" aria-expanded="${active?'true':'false'}"${controls?` aria-controls="${esc(controls)}"`:''}`},o);
+    const hl=t?hintLine('st-measure-hint',{text:hint,tone:t,o}):hintLine('st-measure-hint',{text:hint,o});
+    const nl=note||has(o,'note')?hintLine('st-measure-note',{text:note,o,key:'note'}):'';
+    return `<div class="st-measure ${esc(className)}" data-ds="Measure" data-field="${esc(key)}"${v===''?' data-empty=""':''}${active?' data-active=""':''}${t?` data-tone="${t}"`:''}${isChanged?' data-changed=""':''}>${lab}${box}${hl}${nl}</div>`;
+  }
+  /* Numpad: the one type-to-set pad, for real typed input only (ear tags, weights), docked above the bar.
+     1–9 · [. or a gap] 0 ⌫. No commit key: the bar's primary commits. Keys never move: the hint line is
+     always reserved and, in a run, so are three lines of the running list. */
+  function numpadLimits(v,{decimals=0,maxLength=null,intLength=null}={}){
+    const dot=v.indexOf('.'),intPart=dot<0?v:v.slice(0,dot),frac=dot<0?'':v.slice(dot+1);
+    const digitsDead=dot>=0?frac.length>=decimals:((maxLength!=null&&v.length>=maxLength)||(intLength!=null&&intPart.length>=intLength));
+    return {dot,digitsDead,pointDead:decimals<=0||dot>=0};
+  }
+  function numpad({label='',value='',unit='',placeholder='—',suggested=false,decimals=0,maxLength=null,intLength=null,recent=null,id='',action='numpad',key='',tone='',hint='',className='',strs,args}={}){
+    const o={strs,args},s=strs||{},a=args||{},pid=id||fieldId('st-numpad');
+    const v=value==null?'':String(value),typing=suggested?'':v;
+    const L=numpadLimits(typing,{decimals,maxLength,intLength});
+    const t=tone==='warn'?'warn':'';
+    const run=!!(label||has(o,'label'));
+    const readout=run?`<div class="st-numpad-readout" role="status" aria-live="polite"${suggested?' data-suggested=""':''}><span class="st-numpad-label"${sa(s.label,a.label)}>${esc(label)}</span>${valueBox('div',{value:v,unit,placeholder,active:!suggested},o)}</div>`:'';
+    const items=(recent||[]).slice(0,3);
+    const list=run||items.length?`<ol class="st-numpad-recent" data-reserve=""${ariaText('Recorded',s.recent,a.recent)}>${items.map(r=>`<li>${tx(r.text,r,'text')}</li>`).join('')}</ol>`:'';
+    const k=(d,gray)=>`<button type="button" class="st-numpad-key" data-action="${esc(action)}" data-value="${esc(key)}" data-key="${d}"${gray?' aria-disabled="true"':''}><span${d==='.'?sa(s.decimal,a.decimal):sa(s.digit,s.digit?{n:d}:null)}>${d}</span></button>`;
+    const keys=['1','2','3','4','5','6','7','8','9'].map(d=>k(d,L.digitsDead)).join('')
+      +(decimals>0?k('.',L.pointDead):'<span class="st-numpad-gap" aria-hidden="true"></span>')
+      +k('0',L.digitsDead)
+      +`<button type="button" class="st-numpad-key" data-action="${esc(action)}" data-value="${esc(key)}" data-key="back"${typing===''&&!suggested?' aria-disabled="true"':''}${ariaText('Backspace',s.back,a.back)}>${glyph('backspace')}</button>`;
+    return `<div class="st-numpad ${esc(className)}" data-ds="Numpad" id="${esc(pid)}" data-field="${esc(key)}"${t?` data-tone="${t}"`:''}${L.digitsDead?' data-full=""':''}>${readout}${hintLine('st-numpad-hint',{text:hint,tone:t,o,reserve:true})}${list}<div class="st-numpad-keys" role="group"${ariaText('Number pad',s.pad,a.pad)}>${keys}</div></div>`;
+  }
+  /* The pad's string rules, so every host types the same way. state {value, suggested, suggestion};
+     returns the next state plus dead: null | 'full' | 'point' | 'empty' (answer it in the hint line). */
+  function numpadInput(state,k,{decimals=0,maxLength=null,intLength=null}={}){
+    const st={value:String(state&&state.value!=null?state.value:''),suggested:!!(state&&state.suggested),suggestion:String(state&&state.suggestion!=null?state.suggestion:'')};
+    const done=(value,suggested=false,dead=null)=>({value,suggested,suggestion:st.suggestion,dead});
+    if(k==='back'){
+      if(st.suggested)return done(st.value.slice(0,-1));
+      if(st.value==='')return st.suggestion?done(st.suggestion,true):done('',false,'empty');
+      const next=st.value.slice(0,-1);
+      return next===''&&st.suggestion?done(st.suggestion,true):done(next);
+    }
+    const base=st.suggested?'':st.value,L=numpadLimits(base,{decimals,maxLength,intLength});
+    if(k==='.'){
+      if(L.pointDead)return done(st.value,st.suggested,'point');
+      return done(base===''?'0.':base+'.');
+    }
+    if(/^[0-9]$/.test(k)){
+      if(L.digitsDead)return done(st.value,st.suggested,'full');
+      if(decimals>0&&base==='0')return done(k); // weights strip a leading zero; tags keep theirs
+      return done(base+k);
+    }
+    return done(st.value,st.suggested,null);
+  }
+  /* The committed value: a string, or null when empty (missing is not zero). '16.' → '16'; weights lose leading zeros. */
+  function numpadCommit(value,{decimals=0}={}){
+    let v=value==null?'':String(value);
+    if(v==='')return null;
+    if(v.endsWith('.'))v=v.slice(0,-1);
+    if(decimals>0)v=v.replace(/^0+(?=\d)/,'');
+    return v===''?null:v;
+  }
+  /* Hardware keyboard and wedge scanners: map a KeyboardEvent to a pad key through the same path.
+     Enter returns 'enter' — it never commits; a scanner's trailing Enter only ends its burst. */
+  function numpadKey(ev){
+    const k=ev&&ev.key;
+    if(/^[0-9]$/.test(k||''))return k;
+    if(k==='.'||k===','||k==='Decimal')return '.';
+    if(k==='Backspace')return 'back';
+    if(k==='Enter')return 'enter';
+    return null;
+  }
+  const api=Object.freeze({heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadCommit,numpadKey});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
