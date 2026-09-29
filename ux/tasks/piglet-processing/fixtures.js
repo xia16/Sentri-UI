@@ -343,9 +343,15 @@ function late(b) {
       }
     }
   }
-  // the weigh-day 21 litter weights End hands to weaning
-  const day21 = {};
-  for (const [id, list] of Object.entries(LITTER_WEIGHTS.late)) { const w = list.filter((x) => x.day === 21); if (w.length) day21[id] = w; }
+  // the weigh-day 21 litter weights End hands to weaning, each stamped on its litter's own day 21 (never on the End day)
+  const day21 = {}, byDay = derive(b.events, CONFIG, { today: '2026-10-17' });
+  for (const [id, list] of Object.entries(LITTER_WEIGHTS.late)) {
+    const L = byDay.litters[id];
+    const w = list.filter((x) => x.day === 21);
+    if (!w.length || !L || L.birthDay == null || L.birthDay + 21 > stop) continue;
+    const date = new Date((L.birthDay + 21) * 86400000).toISOString().slice(0, 10);
+    day21[id] = w.map((x) => Object.assign({ at: date + 'T09:30' }, x));
+  }
   b.weights(day21, oct(17, '15:00'), 'G.H');
   // the wrong-litter mark End's corrections fix: meant for B01, tapped on B03
   b.castrate('B03', oct(17, '15:40'), 'L.M', { castrated: 1 }, { id: 'T-B03-wrong' });

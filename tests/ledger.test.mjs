@@ -1922,7 +1922,7 @@ test('R4-6c boar/gilt counts for piglets without a record are consumed by matchi
   assert.equal(rejectedReason(run(b, IRON_ONLY), over), 'more_than_unidentified');
 });
 
-test('R4-7 the room counts collision records; moveDraft omits doses not yet due at the receiver', () => {
+test('R4-7 the room counts collision records; moveDraft omits doses not yet due for the moved piglets (their own age, R1-4)', () => {
   const b = book();
   const f = b.farrowed('A05', 11);
   b.treat('A05', 'iron3', 11, { seen: [f.id] }); b.treat('A05', 'iron3', 11, { seen: [f.id] });
@@ -1933,8 +1933,10 @@ test('R4-7 the room counts collision records; moveDraft omits doses not yet due 
   b2.farrowed('S', 10);
   b2.farrowed('R', 8, {}, { birthDate: on(2).slice(0, 10) });                        // day 1 at the receiver
   const m = select.moveDraft(run(b2, R4, 3), { from: 'S', to: 'R', n: 1 });
-  assert.deepEqual(Object.keys(m.carry), []);
+  assert.deepEqual(Object.keys(m.carry), ['iron3', 'tail']);                          // day 3 piglets: due for them, wherever they go
   assert.deepEqual(m.asks, []);
+  const back = select.moveDraft(run(b2, R4, 3), { from: 'R', to: 'S', n: 1 });        // day 1 piglets: nothing due yet
+  assert.deepEqual(Object.keys(back.carry), []);
 });
 
 test('R4-8 castration before its first record: selectors say males uncounted', () => {
@@ -2505,4 +2507,25 @@ test('R1-15 the room\'s last record is the latest by causal order, and names its
   const last = select.room(run(b, R1), { lens: 'all' }).lastRecord;
   assert.equal(last.id, t.id);                                      // it saw the other: later, whatever the clocks say
   assert.equal(last.dose, 'iron3'); assert.equal(last.tx, 'iron');
+});
+
+test('N7 a double-issued tag: an add with twinOf is a separate piglet (identified, done, sex counts, pairs)', () => {
+  const cfg = Object.assign({}, R1, { identity: { scheme: 'tag', who: 'all', day: 3 } });
+  const b = book();
+  b.farrowed('A', 3);
+  b.identity('A', 'add', { rowId: 'r1', tag: '004301', sex: 'b' });
+  b.identity('A', 'add', { rowId: 'r2', tag: '004301', sex: 'g', twinOf: 'r1' });   // a second piglet with the same printed number
+  let I = run(b, cfg).litters.A.identity;
+  assert.deepEqual([I.identified, I.distinct, I.pairs, I.done], [2, 2, 0, false]);
+  assert.deepEqual(I.sameTag.map((g) => [g.tag, g.twin, g.rows.length]), [['004301', true, 2]]);
+  const sc = run(b, cfg).litters.A.sexCounts;
+  assert.deepEqual([sc.boars, sc.gilts], [1, 1]);
+  b.identity('A', 'add', { rowId: 'r3', tag: '004301', sex: 'b' });                // a sync duplicate of r1 on top: one pair, not two
+  I = run(b, cfg).litters.A.identity;
+  assert.deepEqual([I.identified, I.pairs, I.done], [2, 1, false]);
+  const c = book();
+  c.farrowed('A', 2);
+  c.identity('A', 'add', { rowId: 'r1', tag: '004301' });
+  c.identity('A', 'add', { rowId: 'r2', tag: '004301', twinOf: 'r1' });
+  assert.equal(run(c, cfg).litters.A.identity.done, true);                         // both piglets identified
 });

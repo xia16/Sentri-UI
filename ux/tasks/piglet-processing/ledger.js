@@ -832,7 +832,8 @@ function applySexCounts(ctx, e) {
   L.sexCountsRec = { boars: e.boars, gilts: e.gilts, keys, at: e.at || null, who: e.who || null, event: e.id };
   return [L];
 }
-function rowKey(r) { return r.tag ? 't:' + r.tag : 'n:' + r.notch; }
+// a double-issued tag (N7: an add with `twinOf`) is a different piglet under the same printed number: its own key
+function rowKey(r) { return (r.tag ? 't:' + r.tag : 'n:' + r.notch) + (r.twinOf ? '#' + r.rowId : ''); }
 function distinctKeys(ctx, litterId) {
   const seen = [];
   for (const r of ctx.rows.values()) if (r.litter === litterId && r.status === 'alive' && !seen.includes(rowKey(r))) seen.push(rowKey(r));
@@ -1433,7 +1434,7 @@ function applyIdentity(ctx, e) {
       flag(ctx, L, 'sync_review', 'identity_reconcile', [e.id], { rows: liveRows(ctx, L.id) + 1, alive: L.alive });
     }
     ctx.rows.set(e.rowId, {
-      rowId: e.rowId, litter: L.id, birthLitter: L.id, tag: e.tag || null, notch: e.notch || null,
+      rowId: e.rowId, litter: L.id, birthLitter: L.id, tag: e.tag || null, notch: e.notch || null, twinOf: e.twinOf || null,
       sex: e.sex || null, weight: e.weight == null ? null : e.weight, status: 'alive',
       addedAt: e.at || null, addedBy: e.who || null, edits: []
     });
@@ -1657,7 +1658,7 @@ function view(ctx, L, corrections, today) {
       missing: rowsHere.filter((r) => r.status === 'missing').length,
       onRecord: rowsHere.filter((r) => r.status !== 'withdrawn').length,
       rows: [...ctx.rows.values()].filter((r) => r.litter === L.id || r.birthLitter === L.id).map((r) => Object.assign(clone(r), { alsoOn: alsoOn(r) })),
-      sameTag: mine.map((g) => ({ tag: g.tag, rows: g.rows.map((y) => Object.assign({}, y)) })),
+      sameTag: mine.map((g) => ({ tag: g.tag, twin: g.twin, rows: g.rows.map((y) => Object.assign({}, y)) })),
       closed: L.idClosed, done: idDone
     },
     sow: L.sow ? Object.assign({}, L.sow) : null,
@@ -1685,9 +1686,10 @@ function sameTagGroups(ctx) {
   for (const r of ctx.rows.values()) {
     if (!r.tag || (r.status !== 'alive' && r.status !== 'missing')) continue;
     if (!by.has(r.tag)) by.set(r.tag, []);
-    by.get(r.tag).push({ litter: r.litter, rowId: r.rowId, status: r.status });
+    by.get(r.tag).push({ litter: r.litter, rowId: r.rowId, status: r.status, twinOf: r.twinOf || null });
   }
-  return [...by.entries()].filter(([, rows]) => rows.length > 1).map(([tag, rows]) => ({ tag, rows }));
+  // twin: a double-issued tag recorded as a different piglet (N7) — known, not a sync duplicate
+  return [...by.entries()].filter(([, rows]) => rows.length > 1).map(([tag, rows]) => ({ tag, rows, twin: rows.some((x) => x.twinOf) }));
 }
 
 /* Boars and gilts: identified rows by sex, plus the saved counts for piglets without a row, which
