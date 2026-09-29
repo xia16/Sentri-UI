@@ -87,7 +87,12 @@
     'split-reasons':      { data: 'base', crate: 'A02', drawer: { dose: 'iron3', n: 10, reason: 'split', weak: 1 } },
     'all-deferred':       { data: 'base', crate: 'A02', drawer: { dose: 'iron3', n: 0, reason: 'weak' } },
     'all-deferred-saved': { data: 'base', crate: 'A02', pre: [{ type: 'treat', litter: 'A02', dose: 'iron3', n: 0, deferred: { n: 12, reason: 'weak' } }], preVisit: true },
-    'corrected':          { data: 'a02-corrected', crate: 'A02' }                                     // R1-28
+    'corrected':          { data: 'a02-corrected', crate: 'A02' },                                    // R1-28
+    // back from the dead drawer's Save: its receipt, handed over on this phone (pp-receipt:dead)
+    'dead-saved':         { data: 'base', crate: 'A02', saved: 'dead', handoff: { parts: [{ id: 'receipt.saved' }, { id: 'ds.dead.receipt.line', args: { n: 1, cause: 'crushed' }, tone: 'green' }], litter: 'A02', from: 'A02' } },
+    // drafts other pages keep on this phone, said on their doors
+    'drafts-on-doors':    { data: 'base', crate: 'A02', kept: { dead: { pig: { tallies: { crushed: 2 }, picks: {}, miss: {}, photos: [], note: '', route: '' }, sow: null },
+                            count: { observed: 10, rows: [], at: '2026-09-29T10:20', obsMs: 0, seen: [] }, id: { run: { tag: '004301', sex: 'g', weight: null } } } }
   };
   var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'litter';
@@ -374,6 +379,7 @@
   function receiptLine() {
     if (!receipt) return '';
     if (receipt.kind === 'correction') return U.receipt([{ id: 'pp.common.saved_correction' }]);   // back from Edit's Save (ticket #12)
+    if (receipt.kind === 'handoff') return U.receipt(receipt.parts);                                // back from the dead drawer's Save
     var id = receipt.dose, tx = lower(titleText(id)), r = receipt.rec, k = receipt.kind, parts;
     if (k === 'already') parts = [{ id: 'pp.litter.rcpt.already', args: { tx: tx, t: U.time(receipt.other.at), who: receipt.other.who } }, { id: 'pp.litter.rcpt.nothing' }];
     else if (k === 'stale' && receipt.other) parts = [{ id: 'pp.litter.rcpt.stale', args: { tx: tx, t: U.time(receipt.other.at), who: receipt.other.who, m: receipt.other.n } }, { id: 'pp.litter.rcpt.now_owed', args: { n: receipt.now }, tone: 'amber' }];
@@ -484,11 +490,35 @@
   }
 
   /* ---- the Record group: Move, identity (keepers read `set closed` once closed — never "so far"), birth litter weight ---- */
+  /* ---- drafts other pages keep on this phone (dead, count, identity), said on their doors: `Record dead · 2 unsaved`,
+     `Set count 10 · not saved`; each page keeps its own under `pp-<page>-draft:<variant>:<crate>` ---- */
+  function keptKey(k) { return 'pp-' + k + '-draft:' + store.name + ':' + crate; }
+  function kept(k) { try { return JSON.parse(sessionStorage.getItem(keptKey(k)) || 'null'); } catch (e) { return null; } }
+  function deadKept() {
+    var d = kept('dead');
+    if (!d) return null;
+    var n = 0;
+    if (d.pig) { Object.keys(d.pig.tallies || {}).forEach(function (c) { n += d.pig.tallies[c] || 0; }); n += Object.keys(d.pig.picks || {}).length; }
+    return n ? ['pp.litter.tool.dead_n', { n: n }] : d.sow || d.pig ? ['pp.litter.tool.dead_draft', null] : null;
+  }
+  function tools() {
+    var dk = deadKept(), ck = kept('count');
+    var cw = ck && ck.observed != null ? ['pp.litter.tool.count_n', { n: ck.observed }] : null;
+    // the door keeps its verb; what waits on this phone is a Status word under it (green: a draft), which names the door too
+    var tool = function (action, id, w) {
+      return UI.button({ label: PP.t(id), register: 'tool', action: action, value: crate, describedby: w ? 'lt-kept-' + action : '', strs: { label: id } });
+    };
+    var word = function (action, w) { return w ? UI.status({ text: PP.t(w[0], w[1]), tone: 'green', id: 'lt-kept-' + action, strs: { text: w[0] }, args: w[1] ? { text: w[1] } : undefined }) : '<span></span>'; };
+    return '<div class="pp-tools">' + tool('open-dead', 'act.record_dead', dk) + tool('open-count', 'pp.count.title', cw) +
+      (dk || cw ? word('open-dead', dk) + word('open-count', cw) : '') + '</div>';
+  }
   function recordGroup() {
     var idc = CFG.identity, id = view().identityDue, rows = UI.row({ title: '', description: '', action: 'open-move', value: crate, strs: { title: 'pp.move.title', description: 'pp.common.record.move_desc' } });
     if (idc.scheme !== 'none' && (L().alive || id.identified)) {
       var line = idc.who === 'candidates' ? (L().identity.closed ? ['pp.litter.id.rg_closed', { k: id.identified }] : ['pp.common.record.id_line.candidates', { k: id.identified }])
         : ['pp.common.record.id_line.' + idc.scheme, { k: id.identified, n: L().alive }];
+      var ik = kept('id');                                   // a piglet in hand, or a litter weight, not saved on the identity page
+      if (ik && (ik.run || ik.lw)) line = [ik.run ? 'pp.litter.id.draft_run' : 'pp.litter.id.draft_lw', null];
       rows += UI.row({ title: '', description: '', action: 'open-identity', value: crate, strs: { title: 'pp.common.record.identity', description: line[0] }, args: { description: line[1] } });
     }
     if (!SOW.weight) rows += U.weightRow(null, crate, TODAY);
@@ -694,7 +724,7 @@
   function body() {
     var T = endedTask(), v = view();
     var main = T ? endedSection(T) + reviewSection() : v.closed ? closedSection() + reviewSection() : reviewSection() + owedSection();
-    return orphanBanner() + factLine() + U.tools(crate) + main + afterEndSection() + recordedSection() + notesSection() +
+    return orphanBanner() + factLine() + tools() + main + afterEndSection() + recordedSection() + notesSection() +
       (T || v.closed ? '' : laterSection()) + recordGroup();
   }
   function render() {
@@ -862,6 +892,19 @@
     (st.visit || []).forEach(function (id) { visit[id] = true; });
     if (st.receipt) { var r0 = recordOf(st.visit[0]); receipt = { kind: 'saved', dose: r0.dose, rec: r0 }; }
     if (qs.get('saved') === 'correction') receipt = { kind: 'correction' };
+    // back from the dead drawer's Save (`saved=dead` | `saved=sow`): its receipt, handed over once and then dropped
+    if (qs.get('saved') === 'dead' || qs.get('saved') === 'sow' || st.saved) {
+      var hr = st.handoff || null;
+      try { hr = hr || JSON.parse(sessionStorage.getItem('pp-receipt:dead') || 'null'); sessionStorage.removeItem('pp-receipt:dead'); } catch (e) {}
+      if (hr && hr.parts && (hr.litter === crate || hr.from === crate)) receipt = { kind: 'handoff', parts: hr.parts };
+    }
+    if (st.kept) {
+      try {
+        sessionStorage.setItem(keptKey('dead'), JSON.stringify(st.kept.dead));
+        sessionStorage.setItem(keptKey('count'), JSON.stringify(st.kept.count));
+        sessionStorage.setItem(keptKey('id'), JSON.stringify(st.kept.id));
+      } catch (e) {}
+    }
     if (st.tap) tap(st.tap.dose, st.tap.n);
     if (st.drawer) {
       var dr = freshDraft(st.drawer.dose);
