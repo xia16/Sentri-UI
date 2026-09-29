@@ -49,6 +49,11 @@ Call `SentriUI.stepper({ label, description, value, min, max, step, key, action,
 - **Focus:** a 3px `focus` ring, offset 2px, on the key face. The spinbutton value takes the same ring.
 - **Error or out of range:** none. A stepper cannot hold an invalid value: the floor and ceiling gray the key instead of refusing a tap.
 - **Corrected:** a figure corrected in Edit (`changed: true`) prints in `amber`.
+- **Draft** (`draft: true` or `tone: 'draft'`): in a staged host, while the value carries an unsaved addition (posted 2, tapped + once, now 3), the value prints in `green`.
+  - RULINGS, dead drawer: "the value itself turns green while it carries the draft's additions … the number is the receipt, same grammar as Alive". There is no chip.
+  - − is live down to the posted value, which is the draft's floor, and grays there.
+  - Save posts the draft and the value returns to `ink`. Clear discards it the same way.
+  - `draft` and `changed` belong to different hosts (the dead drawer and Edit). If both are set, `draft` wins.
 - **Loading:** none. The digit ticks at once, whatever kind of host it is (see *Commit contract*).
 
 **Behaviour, decided deliberately**

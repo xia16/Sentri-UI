@@ -361,6 +361,7 @@ button.st-row[aria-current="location"]{background:#eaf2e5;box-shadow:inset 3px 0
 .st-stepper[data-wide] .st-stepper-value{min-width:4ch}
 .st-stepper[data-zero] .st-stepper-value{color:var(--muted)}
 .st-stepper[data-changed] .st-stepper-value{color:var(--amber)}
+.st-stepper[data-draft] .st-stepper-value{color:var(--green)}
 .st-stepper-hint.st-stepper-hint{grid-column:1/-1}
 .st-stepper[data-variant="row"] .st-stepper-hint[data-reserve="text"]{margin-bottom:var(--space-row-y)}
 /* Stepper · hero */
@@ -374,6 +375,7 @@ button.st-row[aria-current="location"]{background:#eaf2e5;box-shadow:inset 3px 0
 .st-stepper[data-variant="hero"] .st-stepper-value{flex:1;font:600 var(--type-hero-count-size)/1.15 var(--font-mono);letter-spacing:-3px;color:var(--count-ink)}
 .st-stepper[data-variant="hero"][data-zero] .st-stepper-value{color:var(--muted)}
 .st-stepper[data-variant="hero"][data-changed] .st-stepper-value{color:var(--amber)}
+.st-stepper[data-variant="hero"][data-draft] .st-stepper-value{color:var(--green)}
 .st-stepper[data-variant="hero"] .st-stepper-hint{justify-content:center;text-align:center}
 
 /* Measure: label above, a field-shaped box, value in mono with its unit always written */

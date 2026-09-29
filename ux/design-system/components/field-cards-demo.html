@@ -47,6 +47,7 @@
     st('focus', UI.panel(UI.stepper({ label: 'Weak', value: 2, key: 'weak-focus', reserveHint: false, strs: sstrs({ label: 'label.weak' }) }))),
     st('ceiling', UI.panel(UI.stepper({ label: 'Weak', description: 'among 11 alive', value: 11, max: 11, key: 'weak-ceiling', hint: "Weak and deformed can't pass 11 alive", strs: sstrs({ label: 'label.weak', description: 'ds.field.demo.of_alive', hint: 'ds.field.stepper.ceiling' }), args: { description: { n: 11 }, hint: { n: 11 } } }))),
     st('changed', UI.panel(UI.stepper({ label: 'Alive', value: 10, key: 'alive-edit', changed: true, reserveHint: false, strs: sstrs({ label: 'label.alive' }) }))),
+    st('draft', UI.panel(UI.stepper({ label: 'Crushed', value: 3, min: 2, key: 'crushed-draft', draft: true, reserveHint: false, strs: sstrs({ label: 'ds.field.demo.crushed' }) }))),
     st('hero', UI.stepper({ variant: 'hero', label: 'Alive', value: 9, min: 5, key: 'alive', hint: 'Saved · +4 this visit', strs: sstrs({ label: 'label.alive', hint: 'fr.receipt.saved_plus' }), args: { hint: { n: 4 } } })),
     st('hero_floor', UI.stepper({ variant: 'hero', label: 'Alive', value: 9, min: 9, key: 'alive-floor', pointers: [
       { label: 'Found dead? Record dead', action: 'record-dead', strs: { label: 'fr.pointer.found_dead' } },

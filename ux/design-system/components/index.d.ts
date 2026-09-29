@@ -188,7 +188,10 @@ export interface StepperProps {
   variant?: 'row' | 'hero';
   /** A corrected value in Edit, amber. `tone: 'changed'` is accepted as an alias. */
   changed?: boolean;
-  tone?: 'changed';
+  /** The value carries an unsaved staged addition (dead drawer): green, the number is the receipt. Wins over changed.
+   *  `tone: 'draft'` is accepted as an alias. */
+  draft?: boolean;
+  tone?: 'changed' | 'draft';
   /** The hint line: ceiling copy, or the hero's receipt. */
   hint?: string;
   /** Text actions at the floor: `Found dead? Record dead` · `Wrong count? Edit`. */

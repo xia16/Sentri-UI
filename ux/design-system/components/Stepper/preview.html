@@ -13,7 +13,8 @@ rows.innerHTML = UI.panel([
   UI.stepper({ label: 'Pressed +', value: 2, key: 'pressed' }),
   UI.stepper({ label: 'Focus on +', value: 2, key: 'focus' }),
   UI.stepper({ label: 'Weak', value: 11, max: 11, key: 'ceiling', hint: "Weak and deformed can't pass 11 alive" }),
-  UI.stepper({ label: 'Alive · corrected', value: 10, changed: true, key: 'edit' })
+  UI.stepper({ label: 'Alive · corrected', value: 10, changed: true, key: 'edit' }),
+  UI.stepper({ label: 'Crushed · draft +1', value: 3, min: 2, draft: true, key: 'draft' })
 ].join(''));
 hero.innerHTML = UI.stepper({ variant: 'hero', label: 'Alive', value: 9, min: 5, key: 'alive', hint: 'Saved · +4 this visit' });
 floor.innerHTML = UI.stepper({ variant: 'hero', label: 'Alive', value: 9, min: 9, key: 'alive-floor', pointers: [
