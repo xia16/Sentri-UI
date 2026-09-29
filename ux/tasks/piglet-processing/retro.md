@@ -239,3 +239,21 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   on the untransformed box; treat any `[data-st-context=drawer]` as a layer;
   the brief says `allow` is the driver's.
 - **Cost:** low each; (b) and (c) bent designs toward the tool.
+
+## 17 · Slices — seven lenses per round overlap heavily
+
+- **Stage:** Slices, S10 and S1 round 1.
+- **What happened:** of S10's ~45 lens findings, the same five defects were
+  raised by three or four lenses each (stale weight label, missing record
+  group on orphan, sow-died said three times, Edit target too small, weight
+  field above the actions). S1 repeated the pattern (scan vs find by five
+  lenses, the chip/line-2 duplication by four). Each round costs seven agent
+  runs plus the driver's merge of overlapping reports; the unique yield came
+  mostly from Scenarios (the mid-farrowing sow death, list reflow under the
+  thumb) and Consistency (rulings the designer missed).
+- **Change:** run Scenarios, Consistency (other family) and one combined
+  "craft" lens (interaction + copy + information + visual + simplicity with
+  their checklists) in round 1; split the craft lens only when it returns
+  more than ~15 findings. Re-runs after a fix round only need the lenses
+  whose findings were applied.
+- **Cost:** medium (tokens and driver time; no design harm).
