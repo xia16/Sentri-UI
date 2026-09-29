@@ -321,3 +321,22 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   relabel strings to hide it.
 - **Change:** match the longest registered verb as a prefix.
 - **Cost:** low.
+
+## 22 · Slices — the ledger attacks did not converge either, and that was the value
+
+- **Stage:** Slices, ticket #18.
+- **What happened:** the shared ledger passed 43 tests, then the other model
+  family found 11 counterexamples by executing event sequences; after the fix
+  (65 tests) a second round found 3 more blockers and 12 majors in deeper
+  interleavings (unequal concurrent records, named vs unnamed losses, closure
+  snapshots, on-time with unknowns). The third build (81 tests) closed them
+  and recorded 12 **known limits** with their sequences instead of chasing a
+  fourth round. Several findings were product questions in disguise (catch-up
+  after End, how a No answer is sized) — they went to the provisional ledger.
+- **Why it matters:** executable counterexamples were the most productive
+  review of the whole run: each was undeniable, cheap to turn into a test, and
+  fixed a class. Visual lenses on pages never reached this depth.
+- **Change:** for any ruled model, run the other-family attack as "produce an
+  event sequence that yields a false fact" with the code attached, and stop
+  after a round with no blocker by writing the rest as known limits.
+- **Cost:** medium, high value.
