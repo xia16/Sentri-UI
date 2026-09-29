@@ -37,6 +37,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-edge-birth-weight-entry", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-entry", "strict": true },
     { "name": "pp-edge-birth-weight-typed", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-typed", "strict": true },
     { "name": "pp-edge-birth-weight-range", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-range", "strict": true },
+    { "name": "pp-edge-birth-weight-refused", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-refused", "strict": true },
     { "name": "pp-edge-birth-weight-set", "url": "ux/tasks/piglet-processing/edge.html?state=birth-weight-set", "strict": true },
     { "name": "pp-room-room", "url": "ux/tasks/piglet-processing/room.html?state=room", "strict": true },
     { "name": "pp-room-room-empty", "url": "ux/tasks/piglet-processing/room.html?state=room-empty", "strict": true },

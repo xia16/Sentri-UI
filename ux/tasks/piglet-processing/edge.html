@@ -22,6 +22,7 @@
 /* Candidate:DangerBand — farrowing's red warning band, on tokens only. */
 .edge-band { padding: var(--space-panel); background: var(--red-wash); border: 1px solid var(--red); border-radius: var(--radius-inset); color: var(--red); font-size: 13px; font-weight: 500; }
 .edge-drawer-body { display: flex; flex-direction: column; gap: var(--space-row-y); }
+.edge-pad { padding: 0 var(--space-gutter) var(--space-row-y); }
 </style>
 </head>
 <body>
@@ -49,8 +50,8 @@
   };
   var STATES = {
     'no-task': ['no-task'], 'orphan': ['orphan'], 'orphan-unlocked': ['orphan-unlocked'], 'prelock': ['prelock'],
-    'birth-weight-missing': ['weight'], 'birth-weight-entry': ['weight', ''], 'birth-weight-typed': ['weight', '16.4'],
-    'birth-weight-range': ['weight', '34.2'], 'birth-weight-set': ['weight', null, '16.4']
+    'birth-weight-missing': ['weight'], 'birth-weight-entry': ['weight', '', null, true], 'birth-weight-typed': ['weight', '16.4', null, true],
+    'birth-weight-range': ['weight', '34.2', null, false], 'birth-weight-refused': ['weight', '99.9', null, false], 'birth-weight-set': ['weight', null, '16.4']
   };
   var name = STATES[PP.state] ? PP.state : 'no-task';
   var spec = STATES[name];
@@ -58,7 +59,9 @@
   var weight = f.weight === 'missing' ? '' : f.weight;       // '' = missing
   var by = f.by || '', at = f.at || '';
   var drawer = spec[1] != null;                              // the birth-weight drawer is open
-  var draft = spec[1] || '';                                 // typed string in the pad
+  var draft = spec[1] || '';                                 // typed string in the pad (the staged draft)
+  var padOpen = !!spec[3];                                   // the docked Numpad is editing the Measure
+  var padHint = '', padHintArgs = null;
   if (spec[2]) { weight = spec[2]; by = 'finish'; at = stamp(28, '14:52', 'G.H'); }
 
   function span(id, args, cls) {
@@ -105,10 +108,10 @@
       desc: by === 'finish' ? 'pp.edge.weight.by_finish' : 'pp.edge.weight.by_here', descArgs: { stamp: at } }));
   }
   function header() {
-    var label = { tag: f.tag };
+    var a = { pen: f.pen, tag: f.tag };
     return '<header class="utility-header"><div class="edge-title"><h3><button type="button" class="edge-door" data-action="open-sow" data-value="' + f.tag +
-      '" data-str-attr="aria-label:pp.edge.sow.title" data-args=\'' + JSON.stringify(label) + '\'>' + span('pp.edge.hdr.sow', label, 'edge-mono') + ICON.icon('chevron') + '</button></h3>' +
-      '<p class="edge-context">' + span('pp.edge.hdr.pen_parity', { pen: f.pen, n: f.parity }) + span('pp.common.unit.day', { n: f.day }) + '</p></div></header>';
+      '" data-str-attr="aria-label:pp.edge.hdr.sow_aria" data-args=\'' + JSON.stringify(a) + '\'>' + span('pp.edge.hdr.door', a, 'edge-mono') + ICON.icon('chevron') + '</button></h3>' +
+      '<p class="edge-context">' + span('pp.edge.hdr.parity', { n: f.parity }) + span('pp.common.unit.day', { n: f.day }) + '</p></div></header>';
   }
   function body() {
     var out = [];
@@ -117,27 +120,32 @@
       out.push(UI.rowGroup(row({ action: 'open-farrowing', value: f.tag, title: 'pp.edge.prelock.door', desc: 'pp.edge.prelock.door_desc' })));
     }
     out.push(facts());
-    out.push(owed());
     if (f.record) out.push(recordGroup(name === 'no-task'));
+    out.push(owed());
     if (!f.prelock) out.push(weightRow());
     return out.join('');
   }
   function faceFooter() {
-    return '<footer class="sheet-footer"><button type="button" class="button secondary" data-ds="Button" data-action="back" data-str="act.back"></button></footer>';
+    return '<footer class="sheet-footer"><button type="button" class="button secondary" data-ds="Button" data-action="close" data-str="act.close"></button></footer>';
   }
   function drawerHtml() {
-    var v = draft, n = f.live;
-    var min = (n * 0.8).toFixed(1), max = (n * 2.5).toFixed(1);
-    var num = parseFloat(v), out = !isNaN(num) && (num < +min || num > +max);
+    var n = f.live;
+    var min = (n * 0.8).toFixed(1), max = (n * 2.5).toFixed(1), hard = n * 5;          // usual 0.8-2.5 kg each; over 5 kg each is impossible
+    var num = parseFloat(draft), has = !isNaN(num);
+    var refused = has && num > hard, out = has && !refused && (num < +min || num > +max);
     var ms = { label: 'pp.edge.weight.label', optional: 'pp.edge.weight.optional', value: 'ds.field.figure', unit: 'ds.field.unit.kg', placeholder: 'ds.field.placeholder' };
-    if (out) ms.hint = 'ds.field.measure.range';
-    var measure = UI.measure({ label: '', optional: '', value: v, unit: 'kg', placeholder: '—', key: 'bw', active: true, range: [+min, +max], hint: out ? ' ' : '',
-      strs: ms, args: { hint: { min: min, max: max, n: n } } });
-    var pad = UI.numpad({ decimals: 1, value: v, key: 'bw', strs: { digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad' } });
-    var ok = !isNaN(num) && num > 0;
-    return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="medium" data-sizing="content" role="dialog" aria-modal="true">' +
+    var margs = { value: { n: draft } }, hint = '';
+    if (!padOpen && refused) { hint = ' '; ms.hint = 'ds.field.measure.refused'; margs.hint = { max: hard, n: n }; }
+    else if (!padOpen && out) { hint = ' '; ms.hint = 'ds.field.measure.range'; margs.hint = { min: min, max: max, v: draft }; }
+    var measure = UI.measure({ label: '', optional: '', value: draft, unit: 'kg', placeholder: '—', key: 'bw', active: padOpen, controls: 'bw-pad',
+      tone: !padOpen && refused ? 'refused' : '', range: padOpen ? null : [+min, +max], hint: hint, strs: ms, args: margs });
+    var pad = padOpen ? '<div class="edge-pad">' + UI.numpad({ decimals: 1, intLength: 2, value: draft, key: 'bw', id: 'bw-pad', hint: padHint ? ' ' : '',
+      strs: Object.assign({ digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad' }, padHint ? { hint: padHint } : {}),
+      args: { hint: padHintArgs } }) + '</div>' : '';
+    var ok = has && num > 0 && !refused;
+    return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" data-sizing="content" role="dialog" aria-modal="true">' +
       '<header class="utility-header"><div class="edge-title"><h3 data-str="pp.edge.weight.title"></h3><p>' + span('pp.edge.weight.pop', { n: n }) + '</p></div></header>' +
-      '<div class="sheet-body"><div class="edge-drawer-body">' + measure + pad + '</div></div>' +
+      '<div class="sheet-body"><div class="edge-drawer-body">' + measure + '</div></div>' + pad +
       '<footer class="sheet-footer"><button type="button" class="button secondary" data-ds="Button" data-action="close-weight" data-str="act.back"></button>' +
       '<button type="button" class="button primary" data-ds="Button" data-action="save-weight" data-str="act.save"' + (ok ? '' : ' disabled') + '></button></footer></section>';
   }
@@ -148,24 +156,23 @@
     PP.apply(document.getElementById('screen'));
   }
   function key(k) {
-    var v = draft;
-    if (k === 'back') v = v.slice(0, -1);
-    else if (k === '.') { if (v && v.indexOf('.') < 0) v += '.'; }
-    else if (v.indexOf('.') >= 0) { if (v.length - v.indexOf('.') - 1 < 1) v += k; }
-    else if (v.length < 2) v = (v === '0' ? '' : v) + k;
-    draft = v;
+    var r = UI.numpadInput({ value: draft }, k, { decimals: 1, intLength: 2 });
+    draft = r.value; padHint = ''; padHintArgs = null;
+    if (r.dead === 'full') { padHint = 'ds.field.numpad.dead_places'; padHintArgs = { n: 1 }; }
+    else if (r.dead === 'empty') padHint = 'ds.field.numpad.dead_empty';
   }
   document.getElementById('screen').addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-action]');
     if (!b) return;
     var a = b.dataset.action;
     if (a === 'numpad') { if (b.getAttribute('aria-disabled') !== 'true') key(b.dataset.key); render(); }
-    else if (a === 'open-weight' || a === 'open-numpad') { drawer = true; render(); }
-    else if (a === 'close-weight') { drawer = false; render(); }          // Back keeps the draft
+    else if (a === 'open-weight') { drawer = true; padOpen = !draft; render(); }
+    else if (a === 'open-numpad') { if (!padOpen) { padOpen = true; padHint = ''; render(); } }   // tapping the active Measure does nothing
+    else if (a === 'close-weight') { if (padOpen && draft) padOpen = false; else drawer = false; padHint = ''; render(); }   // Back closes the pad first; the draft is kept
     else if (a === 'save-weight') {
-      var num = parseFloat(draft);
-      if (!(num > 0)) return;
-      weight = String(num % 1 ? num : num.toFixed(1)); by = 'here'; at = stamp(29, '09:42', 'G.H'); draft = ''; drawer = false; render();
+      var val = UI.numpadCommit(draft, { decimals: 1 });
+      if (val == null || !(parseFloat(val) > 0) || parseFloat(val) > f.live * 5) return;
+      weight = val; by = 'here'; at = stamp(29, '09:42', 'G.H'); draft = ''; drawer = false; padOpen = false; render();
     } else document.documentElement.setAttribute('data-door', a + ':' + (b.dataset.value || ''));
   });
   PP.ready.then(render);
