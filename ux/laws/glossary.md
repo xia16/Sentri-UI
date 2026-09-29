@@ -43,6 +43,21 @@ Defined by farrowing and used here unchanged (RULINGS *Model*; the Finish sheet)
 | **Healthy** | piglets | alive − weak − deformed; derived, no form row, printed on the record | as Weak / Deformed | one litter |
 | **Weaned** 断奶 | piglets | piglets that left the litter at weaning; the last term of the ledger | stamped at weaning | one litter |
 
+## Dead picker (slice 9)
+
+The one shared dead drawer (farrowing, farrowing record, check-in, processing). It forks on the litter's phase (open · locked), not on the task. Counts in it use Alive and Dead above unchanged. Contract: `ux/tasks/piglet-processing/dead-contract.md`.
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Dead N** (drawer title) 死亡 N头 | piglets | the litter's Dead plus the bodies in this drawer's draft | now; the draft part is unsaved until Save | one litter |
+| **Unsaved** 未保存 | piglets | bodies in the drawer's piglet draft: not-identified tallies plus picked identified piglets (the sow's draft is `sow cause unsaved`, never counted here). Back keeps them on the device; Clear discards them | from the first tally until Save or Clear | one litter, one device |
+| **Born dead** 出生即死 | piglets | stillborn + mummified recorded by farrowing; printed on the drawer's context line after the lock, because those two causes leave the list there (a born-dead body found later is Born's correction, through Edit) | fixed at the farrowing lock | one litter |
+| **Identified** 已标识 (in the picker) | alive piglets | the litter's live identity rows (tag or notch) with no death; each is picked by its tag, or its notch when it has no tag, and dies against that row | now | one litter |
+| **Not identified** 未标识 (in the picker) | alive piglets | Alive − Identified; tallied by cause | now | one litter |
+| **The N missing** 少了的N头 | piglets | Σ of the litter's open unexplained losses (see *Open / explained*) | now | one litter |
+| **From the missing** 来自少了的N头 | piglets | how many of this draft's not-identified bodies were among the missing; drawn from the open losses oldest first, so they leave the loss, not Alive. Never an identified piglet | at Save | one litter |
+| **Tally cap (locked)** | piglets | Not identified + the N missing: the most not-identified bodies one draft can hold after the lock | now | one litter |
+
 ## Count grammar
 
 The count leads the word and the unit is written: `{n} piglets`, singular `{n} piglet` (`pp.common.unit.piglet.one` / `.many`, `PP.tn`); zh has one form and no space between numeral and classifier (`14头`, `3日龄`). Ruled anchors that stay as they are: `born {n}` and `day {n}` (en), `Saved · +{n} this visit` and `Saved · {n} died this visit` (farrowing's, under `fr.*`; a processing receipt names its outcome and is registered by the slice that writes it), and label-then-count headers such as `Dead 6` and `Unexplained loss {n}`.
