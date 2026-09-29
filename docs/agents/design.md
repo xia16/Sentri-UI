@@ -75,7 +75,28 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-room-room-finished", "url": "ux/tasks/piglet-processing/room.html?state=room-finished", "strict": true },
     { "name": "pp-room-room-none", "url": "ux/tasks/piglet-processing/room.html?state=room-none", "strict": true },
     { "name": "pp-room-room-scan-unavailable", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-unavailable", "strict": true },
-    { "name": "pp-room-room-scan-hit", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-hit", "strict": true }
+    { "name": "pp-room-room-scan-hit", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-hit", "strict": true },
+    { "name": "pp-end-overview", "url": "ux/tasks/piglet-processing/end.html?state=overview", "strict": true },
+    { "name": "pp-end-overview-late", "url": "ux/tasks/piglet-processing/end.html?state=overview&data=late", "strict": true },
+    { "name": "pp-end-end-review", "url": "ux/tasks/piglet-processing/end.html?state=end-review", "strict": true },
+    { "name": "pp-end-end-review-mandatory", "url": "ux/tasks/piglet-processing/end.html?state=end-review&mandatory=1", "strict": true },
+    { "name": "pp-end-end-hold", "url": "ux/tasks/piglet-processing/end.html?state=end-hold", "strict": true },
+    { "name": "pp-end-end-pending", "url": "ux/tasks/piglet-processing/end.html?state=end-pending", "strict": true },
+    { "name": "pp-end-end-changed", "url": "ux/tasks/piglet-processing/end.html?state=end-changed", "strict": true },
+    { "name": "pp-end-end-offline", "url": "ux/tasks/piglet-processing/end.html?state=end-offline", "strict": true },
+    { "name": "pp-end-receipt-late-mark", "url": "ux/tasks/piglet-processing/end.html?state=receipt-late-mark", "strict": true },
+    { "name": "pp-end-ended-moves", "url": "ux/tasks/piglet-processing/end.html?state=ended-moves", "strict": true },
+    { "name": "pp-end-end-already", "url": "ux/tasks/piglet-processing/end.html?state=end-already", "strict": true },
+    { "name": "pp-end-end-unconfirmed", "url": "ux/tasks/piglet-processing/end.html?state=end-unconfirmed", "strict": true },
+    { "name": "pp-end-receipt-after-end-mark", "url": "ux/tasks/piglet-processing/end.html?state=receipt-after-end-mark", "strict": true },
+    { "name": "pp-end-weaning-handoff-after", "url": "ux/tasks/piglet-processing/end.html?state=weaning-handoff&data=late-after", "strict": true },
+    { "name": "pp-end-end-blocked", "url": "ux/tasks/piglet-processing/end.html?state=end-blocked", "strict": true },
+    { "name": "pp-end-end-blocked-draft", "url": "ux/tasks/piglet-processing/end.html?state=end-blocked-draft", "strict": true },
+    { "name": "pp-end-receipt", "url": "ux/tasks/piglet-processing/end.html?state=receipt", "strict": true },
+    { "name": "pp-end-receipt-mandatory", "url": "ux/tasks/piglet-processing/end.html?state=receipt&mandatory=1", "strict": true },
+    { "name": "pp-end-ended", "url": "ux/tasks/piglet-processing/end.html?state=ended", "strict": true },
+    { "name": "pp-end-ended-correct", "url": "ux/tasks/piglet-processing/end.html?state=ended-correct", "strict": true },
+    { "name": "pp-end-weaning-handoff", "url": "ux/tasks/piglet-processing/end.html?state=weaning-handoff", "strict": true }
   ]
 }
 ```
