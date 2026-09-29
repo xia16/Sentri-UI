@@ -96,7 +96,24 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-end-receipt-mandatory", "url": "ux/tasks/piglet-processing/end.html?state=receipt&mandatory=1", "strict": true },
     { "name": "pp-end-ended", "url": "ux/tasks/piglet-processing/end.html?state=ended", "strict": true },
     { "name": "pp-end-ended-correct", "url": "ux/tasks/piglet-processing/end.html?state=ended-correct", "strict": true },
-    { "name": "pp-end-weaning-handoff", "url": "ux/tasks/piglet-processing/end.html?state=weaning-handoff", "strict": true }
+    { "name": "pp-end-weaning-handoff", "url": "ux/tasks/piglet-processing/end.html?state=weaning-handoff", "strict": true },
+    { "name": "pp-litter-litter", "url": "ux/tasks/piglet-processing/litter.html?state=litter", "strict": true },
+    { "name": "pp-litter-litter-partial", "url": "ux/tasks/piglet-processing/litter.html?state=litter-partial", "strict": true },
+    { "name": "pp-litter-litter-short-count", "url": "ux/tasks/piglet-processing/litter.html?state=litter-short-count", "strict": true },
+    { "name": "pp-litter-litter-short-saved", "url": "ux/tasks/piglet-processing/litter.html?state=litter-short-saved", "strict": true },
+    { "name": "pp-litter-castrate", "url": "ux/tasks/piglet-processing/litter.html?state=castrate", "strict": true },
+    { "name": "pp-litter-castrate-saved", "url": "ux/tasks/piglet-processing/litter.html?state=castrate-saved", "strict": true },
+    { "name": "pp-litter-done-by-other", "url": "ux/tasks/piglet-processing/litter.html?state=done-by-other", "strict": true },
+    { "name": "pp-litter-early", "url": "ux/tasks/piglet-processing/litter.html?state=early", "strict": true },
+    { "name": "pp-litter-late", "url": "ux/tasks/piglet-processing/litter.html?state=late", "strict": true },
+    { "name": "pp-litter-missed", "url": "ux/tasks/piglet-processing/litter.html?state=missed", "strict": true },
+    { "name": "pp-litter-double-flag", "url": "ux/tasks/piglet-processing/litter.html?state=double-flag", "strict": true },
+    { "name": "pp-litter-all-done", "url": "ux/tasks/piglet-processing/litter.html?state=all-done", "strict": true },
+    { "name": "pp-litter-draft-waiting", "url": "ux/tasks/piglet-processing/litter.html?state=draft-waiting", "strict": true },
+    { "name": "pp-litter-castrate-catchup", "url": "ux/tasks/piglet-processing/litter.html?state=castrate-catchup", "strict": true },
+    { "name": "pp-litter-castrate-none", "url": "ux/tasks/piglet-processing/litter.html?state=castrate-none", "strict": true },
+    { "name": "pp-litter-stale-tap", "url": "ux/tasks/piglet-processing/litter.html?state=stale-tap", "strict": true },
+    { "name": "pp-litter-snapshot-kept", "url": "ux/tasks/piglet-processing/litter.html?state=snapshot-kept", "strict": true }
   ]
 }
 ```
