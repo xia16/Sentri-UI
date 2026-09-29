@@ -41,7 +41,8 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-room-room-error", "url": "ux/tasks/piglet-processing/room.html?state=room-error", "strict": true },
     { "name": "pp-room-room-finished", "url": "ux/tasks/piglet-processing/room.html?state=room-finished", "strict": true },
     { "name": "pp-room-room-none", "url": "ux/tasks/piglet-processing/room.html?state=room-none", "strict": true },
-    { "name": "pp-room-room-scan-unavailable", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-unavailable", "strict": true }
+    { "name": "pp-room-room-scan-unavailable", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-unavailable", "strict": true },
+    { "name": "pp-room-room-scan-hit", "url": "ux/tasks/piglet-processing/room.html?state=room-scan-hit", "strict": true }
   ]
 }
 ```

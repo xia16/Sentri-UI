@@ -42,7 +42,7 @@
 .pp-lead .pp-fig { font-family: var(--font-mono); font-size: var(--type-figure-lg-size); font-weight: 500; color: var(--ink); }
 .pp-lead .pp-leadlab { font-size: var(--type-row-title-size); color: var(--muted); }
 
-/* Candidate:DriftStrip: open unexplained gain and loss on one compact line; each crate code is a tap target. */
+/* Candidate:DriftStrip: open unexplained gain and loss on one compact read-only strip; each crate code is grouped with its figure. */
 .pp-strip { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: var(--space-panel); row-gap: 4px; padding: var(--space-row-y) var(--space-footer-gap); border-radius: var(--radius-inset); background: var(--well); font-size: var(--type-panel-title-size); color: var(--ink); }
 .pp-strip .pp-grp { display: inline-flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
 .pp-strip .pp-codes { font-family: var(--font-mono); font-size: var(--type-identifier-size); color: var(--muted); }
@@ -102,7 +102,7 @@
       L('C02', 1, 14, { next: { doses: ['iron', 'tail'], inn: 2 } }),
       L('C04', 3, 9, { rec: { at: T(120), who: 'G.H', d: 'tail' }, did: ['iron', 'tail'], next: { doses: ['castrate'], inn: 2 } }),
       L('D01', 0, 8, { unlocked: true, owes: [D('cord', 0, 8, 8), D('nasal', 0, 8, 8)] }),
-      L('D03', 5, 11, { owes: [D('castrate', 5, 6, 6)], loss: 2 }),
+      L('D03', 5, 11, { owes: [D('castrate', 5, 6, 6)], loss: 2, ev: [{ at: T(5), kind: 'count', n: 11, who: 'G.H' }] }),
       L('D05', 6, 10, { rec: { at: T(1500), who: 'L.M', d: 'tail' }, did: ['iron', 'tail'], next: { doses: ['coccidiosis'], inn: 1 } }),
       L('E01', 2, 7, { notask: true })
     ],
@@ -114,7 +114,7 @@
       L('C02', 1, 14, { next: { doses: ['iron', 'tail'], inn: 2 } }),
       L('C04', 3, 9, { rec: { at: T(120), who: 'G.H', d: 'tail' }, did: ['iron', 'tail'], next: { doses: ['castrate'], inn: 2 } }),
       L('D01', 0, 8, { unlocked: true, owes: [D('cord', 0, 8, 8), D('nasal', 0, 8, 8)] }),
-      L('D03', 5, 11, { owes: [D('castrate', 5, 6, 6)], loss: 2 }),
+      L('D03', 5, 11, { owes: [D('castrate', 5, 6, 6)], loss: 2, ev: [{ at: T(5), kind: 'count', n: 11, who: 'G.H' }] }),
       L('D05', 6, 10, { rec: { at: T(1500), who: 'L.M', d: 'tail' }, did: ['iron', 'tail'], gain: 1, next: { doses: ['coccidiosis'], inn: 1 } }),
       L('E01', 2, 7, { notask: true, loss: 1 })
     ],
@@ -148,7 +148,8 @@
       L('C02', 3, 14, { owes: [D('iron', 3, 14, 14), D('tail', 3, 14, 14)] }),
       L('C04', 5, 9, { owes: [D('castrate', 5, 4, 6)], rec: { at: T(180), who: 'G.H', d: 'castrate' } }),
       L('D03', 6, 11, { rec: { at: T(300), who: 'L.M', d: 'castrate' }, did: ['iron', 'castrate'], next: { doses: ['coccidiosis'], inn: 1 } }),
-      L('D05', 4, 10, { owes: [D('tail', 3, 10, 10)] })
+      L('D05', 4, 10, { owes: [D('tail', 3, 10, 10)] }),
+      L('E02', 6, 11, { owes: [D('tail', 3, 5, 11), D('castrate', 5, 7, 7)], rec: { at: T(60), who: 'L.M', d: 'tail' } })
     ]
   };
   var PIGLETS = [
@@ -167,6 +168,7 @@
     'room-filter': { fix: 'base', sheet: 'filter', filter: ['iron'] },
     'room-scan': { fix: 'base', sheet: 'scan' },
     'room-find': { fix: 'base', sheet: 'find', q: '000254' },
+    'room-scan-hit': { fix: 'base', sheet: 'find', q: '000254', scanned: true },
     'room-find-many': { fix: 'base', sheet: 'find', q: '4-2' },
     'room-scan-none': { fix: 'base', sheet: 'find', q: '000999' },
     'room-error': { fix: 'base', error: true },
@@ -179,7 +181,7 @@
     lens: qs.get('lens') || start.lens || 'owed',
     filter: qs.get('filter') ? qs.get('filter').split(',') : (start.filter || []).slice(),
     missed: qs.get('missed') === '1',
-    sheet: start.sheet || '', q: qs.get('q') || start.q || '', opened: 0, flash: '', error: !!start.error, unavailable: !!start.unavailable, cameFrom: ''
+    sheet: start.sheet || '', q: qs.get('q') || start.q || '', opened: 0, flash: '', error: !!start.error, unavailable: !!start.unavailable, scanned: !!start.scanned, cameFrom: ''
   };
   var LITTERS = FIX[start.fix];
   var LIVE = qs.get('live') === '1';
@@ -245,7 +247,18 @@
     if (!differ) return [lv[0].d === 'castrate' ? male(lv[0].n) : pig(lv[0].n)];
     return lv.map(function (o) { return o.d === 'castrate' ? ['pp.room.tok.dosemales', { name: dose(o.d), n: o.n }] : ['pp.room.tok.dosecount', { name: dose(o.d), n: o.n }]; });
   }
-  function lapseToks(lp) { return lp.length ? [['pp.room.tok.missed', { dose: dose(lp[0].d) }, 'amber'], ['pp.room.tok.window', { n: lp[0].last }, 'amber']] : []; }
+  function lapseToks(lp) {
+    if (!lp.length) return [];
+    var out = [['pp.room.tok.missed', { dose: lp.map(function (o) { return dose(o.d); }).join(' \u00b7 ') }, 'amber']], seen = {};
+    lp.forEach(function (o) { if (!seen[o.last]) { seen[o.last] = 1; out.push(['pp.room.tok.window', { n: o.last }, 'amber']); } });
+    return out;
+  }
+  function dueTok(late) { return late === 0 ? ['pp.room.tok.due_today', {}, ''] : late === 1 ? ['pp.room.tok.due_yest', {}, 'red'] : ['pp.room.tok.due_ago', { n: late }, 'red']; }
+  function remainders(lv) {
+    var same = lv.every(function (o) { return o.n === lv[0].n && o.of === lv[0].of && (o.d === 'castrate') === (lv[0].d === 'castrate'); });
+    if (same) return [still(lv[0])];
+    return lv.map(function (o) { return o.d === 'castrate' ? ['pp.room.tok.stilldose.males', { name: dose(o.d), n: o.n, total: o.of }] : ['pp.room.tok.stilldose.piglets', { name: dose(o.d), n: o.n, total: o.of }]; });
+  }
   function recToks(l) { return [['pp.room.tok.recorded', { when: ago(l.rec.at) }], pig(l.alive), ['pp.room.who', { who: l.rec.who }]]; }
   function spec(l) {
     var s = { l1: null, tok: [], rail: 'chevron', chip: chipOf(l) };
@@ -254,11 +267,11 @@
     else if (lv.length) {
       s.l1 = ['pp.room.l1.owes', { doses: doseList(lv) }];
       var late = lateBy(l);
-      if (partly(l)) s.tok = [['pp.room.tok.recorded', { when: ago(l.rec.at) }], still(lv[0]), ['pp.room.who', { who: l.rec.who }]];
-      else s.tok = [late === 0 ? ['pp.room.tok.due_today', {}, ''] : late === 1 ? ['pp.room.tok.due_yest', {}, 'red'] : ['pp.room.tok.due_ago', { n: late }, 'red']].concat(counts(lv));
+      if (partly(l)) s.tok = [['pp.room.tok.recorded', { when: ago(l.rec.at) }]].concat(late ? [dueTok(late)] : [], remainders(lv), [['pp.room.who', { who: l.rec.who }]]);
+      else s.tok = [dueTok(late)].concat(counts(lv));
       s.tok = s.tok.concat(lapseToks(lp));
     } else if (isDone(l)) {
-      s.l1 = ['pp.room.l1.done', {}]; s.rail = 'edit'; s.tok = recToks(l);
+      s.l1 = ['pp.room.l1.done', {}]; s.tok = recToks(l);
     } else if (lp.length) {
       s.l1 = ['pp.room.l1.owes', { doses: nameList(lp) }];
       s.tok = [['pp.common.unit.day', { n: l.day }], pig(lp[0].n)].concat(lapseToks(lp));
@@ -305,13 +318,20 @@
     return '<div class="pp-strip" data-ds="Candidate:DriftStrip">' + parts + '</div>';
   }
   function byCodeOf(c) { return LITTERS.filter(function (l) { return l.code === c; })[0]; }
+  function evWhat(x) { return x.kind === 'count' ? PP.t('pp.room.ev.count', { n: x.n }) : x.kind === 'move' ? PP.t('pp.room.ev.move', { n: x.n }) : x.kind === 'dead' ? PP.t('pp.room.ev.dead', { n: x.n }) : PP.t('pp.room.ev.edit'); }
+  // The newest stamped event of any kind: treatment, count, move, death or correction.
   function lastRecord() {
-    var best = null; LITTERS.forEach(function (l) { if (l.rec && (!best || new Date(l.rec.at) > new Date(best.rec.at))) best = l; });
+    var best = null;
+    function take(e) { if (!best || new Date(e.at) > new Date(best.at)) best = e; }
+    LITTERS.forEach(function (l) {
+      if (l.rec) take({ at: l.rec.at, what: dose(l.rec.d || 'iron'), code: l.code, who: l.rec.who });
+      (l.ev || []).forEach(function (x) { take({ at: x.at, what: evWhat(x), code: l.code, who: x.who }); });
+    });
     if (!best) return '';
-    return UI.heading({ title: '', kind: 'group', level: 4, className: 'pp-last', strs: { title: 'pp.room.last' }, args: { title: { when: ago(best.rec.at), what: dose(best.rec.d || 'iron'), code: best.code, who: best.rec.who } } });
+    return UI.heading({ title: '', kind: 'group', level: 4, className: 'pp-last', strs: { title: 'pp.room.last' }, args: { title: { when: ago(best.at), what: best.what, code: best.code, who: best.who } } });
   }
   function lead() {
-    var n = LITTERS.filter(isOwed).length + Object.keys(held).filter(function (c) { return held[c].lens === 'owed' && !isOwed(byCodeOf(c)); }).length;
+    var n = lensOf('owed').length;
     return '<div><div class="pp-lead" data-ds="Candidate:LeadFigure"><span class="pp-fig">' + S_('pp.room.lead.figure', { n: n }) + '</span><span class="pp-leadlab">' + S_('pp.room.lead.' + (n === 1 && PP.lang === 'en' ? 'one' : 'many')) + '</span></div>' + lastRecord() + '</div>';
   }
   function header() {
@@ -332,7 +352,8 @@
       return [k, PP.t('pp.room.lens.' + k, { n: counts[k] }), { strs: { label: 'pp.room.lens.' + k }, args: { label: { n: counts[k] } } }];
     });
     var seg = UI.segment({ options: opts, active: S.lens, action: 'lens', ariaLabel: '' });
-    var f = UI.iconButton({ action: 'filter', icon: I('filter'), label: 'Filter litters', className: 'room-filter-button' });
+    var lensDoses = LITTERS.filter(function (l) { return member(l, S.lens); }).some(function (l) { return doseSet(l, S.lens).length > 0; });
+    var f = (lensDoses || S.filter.length) ? UI.iconButton({ action: 'filter', icon: I('filter'), label: 'Filter litters', className: 'room-filter-button' }) : '';
     var sum = (S.filter.length || S.missed) ? '<div class="pp-filtered">' + UI.heading({ title: '', kind: 'group', level: 4, action: '<button type="button" data-action="clear-filter" ' + sa('act.clear') + '>' + esc(PP.t('act.clear')) + '</button>', strs: { title: 'pp.room.filtered' }, args: { title: { what: filterWhat() } } }) + '</div>' : '';
     return '<div class="pp-controlwrap"><div class="pp-controls">' + seg + f + '</div>' + sum + '</div>';
   }
@@ -419,24 +440,24 @@
   function findSheet() {
     var body = '<div class="pp-findbar">' +
       UI.choiceSearch({ label: 'Ear tag or notch', placeholder: 'Ear tag or notch', value: S.q, attrs: { 'data-role': 'q', inputmode: 'text', 'data-str-attr': 'aria-label:pp.room.scan.placeholder;placeholder:pp.room.scan.placeholder' } }) +
-      '</div>' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.room.find.hint' } }) +
+      '</div>' + (S.scanned ? '' : UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.room.find.hint' } })) +
       '<div id="scan-results">' + findResults() + '</div>';
     return sheetFrame('pp.room.scan.title', body, closeFooter());
   }
   function errorView() {
-    return UI.panel(UI.choiceEmpty('', { strs: { text: 'pp.room.err.title' } }) +
+    return UI.panel(UI.choiceEmpty('', { strs: { text: 'pp.room.err.title' } }) + UI.choiceEmpty('', { strs: { text: 'pp.room.err.why' } }) +
       '<button type="button" class="button secondary" data-action="retry" ' + sa('pp.room.err.retry') + '>' + esc(PP.t('pp.room.err.retry')) + '</button>');
   }
 
   /* ---- render ---- */
   var screen = document.getElementById('screen'), phone = document.getElementById('phone');
   function render() {
-    if (S.error) { screen.innerHTML = header() + errorView() + dock(); phone.classList.remove('pp-locked'); tag(); return; }
+    if (S.error) { screen.innerHTML = header() + errorView(); phone.classList.remove('pp-locked'); tag(); return; }
     screen.innerHTML = header() + lead() + driftStrip() + controls() + list() + dock() +
       (S.sheet === 'filter' ? filterSheet() : S.sheet === 'scan' ? scanSheet() : S.sheet === 'find' ? findSheet() : '');
     phone.classList.toggle('pp-locked', !!S.sheet);
     tag();
-    if (S.sheet === 'find') { var i = screen.querySelector('[data-role=q]'); if (i && !i.dataset.focused) { i.dataset.focused = '1'; try { i.focus(); } catch (e) {} } }
+    if (S.sheet === 'find') { var i = screen.querySelector('[data-role=q]'); if (i && !S.scanned && !i.dataset.focused) { i.dataset.focused = '1'; try { i.focus(); } catch (e) {} } }
   }
   function tag() {
     function aria(sel, id) { var e = screen.querySelector(sel); if (e) e.setAttribute('data-str-attr', 'aria-label:' + id); }
@@ -470,8 +491,9 @@
     S.sheet = sh; render(); if (!sh) refocus();
   });
   if (S.sheet) { try { history.replaceState({ sheet: S.sheet, deep: true }, '', location.href); } catch (e) {} }
-  function saveScroll() { try { sessionStorage.setItem('pp-room-scroll', String(window.scrollY)); } catch (e) {} }
-  function restoreScroll() { try { var y = +sessionStorage.getItem('pp-room-scroll'); if (y && !S.sheet) window.scrollTo(0, y); } catch (e) {} }
+  function scrollKey() { return 'pp-room-scroll:' + PP.state + ':' + S.lens; }
+  function saveScroll() { try { sessionStorage.setItem(scrollKey(), String(window.scrollY)); } catch (e) {} }
+  function restoreScroll() { try { var y = +sessionStorage.getItem(scrollKey()); if (y && !S.sheet) window.scrollTo(0, y); } catch (e) {} }
 
   screen.addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-action]'); if (!b) return;
@@ -485,7 +507,7 @@
     else if (a === 'filter') { openSheet('filter'); }
     else if (a === 'scan') { openSheet('scan'); }
     else if (a === 'find') { openSheet('find'); }
-    else if (a === 'type') { S.sheet = 'find'; try { history.replaceState({ sheet: 'find', deep: !!(history.state && history.state.deep) }, '', location.href); } catch (e) {} }
+    else if (a === 'type') { S.scanned = false; S.sheet = 'find'; try { history.replaceState({ sheet: 'find', deep: !!(history.state && history.state.deep) }, '', location.href); } catch (e) {} }
     else if (a === 'close-sheet') { closeSheet(); return; }
     else if (a === 'toggle-dose') { var i = S.filter.indexOf(v); if (i >= 0) S.filter.splice(i, 1); else S.filter.push(v); persist(); }
     else if (a === 'clear-filter') { S.filter = []; if (S.missed) { S.missed = false; if (S.cameFrom) S.lens = S.cameFrom; } persist(); }
@@ -527,6 +549,9 @@
     render(); armHold();
   };
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && !S.error) PP.resume(); });
+
+  // A successful scan resolves into the Find result for that tag.
+  PP.scanned = function (tag) { S.q = tag; S.scanned = true; S.sheet = 'find'; try { history.replaceState({ sheet: 'find', deep: !!(history.state && history.state.deep) }, '', location.href); } catch (e) {} render(); };
 
   var boot = PP.ready.then(function () { render(); restoreScroll(); });
   // The one registry exception: when the registry itself failed to load there is nothing to look strings up in.
