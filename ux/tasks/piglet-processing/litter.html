@@ -136,6 +136,11 @@
   function evidenceRow(r) {
     var t = title(r.dose), e = evidence(r), tag = recTag(r);
     var trail = tag ? span(tag[0], tag[1], tag[2] || null) : '';
+    // A corrected record (Edit, ticket #12) prints its value amber forever: the shell's mark line colours the value only.
+    if (r.corrected || r.viaCorrection) {
+      return '<div class="st-row lt-rec" data-ds="Candidate:EvidenceRow"><span class="st-row-copy"><strong>' + span(t[0], t[1]) + '</strong><small>' + U.markLine(r, TODAY) + '</small></span>' +
+        (trail ? '<span class="st-row-trailing">' + trail + '</span>' : '') + '</div>';
+    }
     return UI.row({ title: '', description: '', trailing: trail, className: 'lt-rec', strs: { title: t[0], description: e[0] }, args: { title: t[1], description: e[1] } })
       .replace('data-ds="Row"', 'data-ds="Candidate:EvidenceRow"');
   }
@@ -212,6 +217,7 @@
   /* ---- the receipt: what the last record on this phone changed (or why nothing was recorded); in the bar, so the rows never reflow ---- */
   function receiptLine() {
     if (!receipt) return '';
+    if (receipt.kind === 'correction') return U.receipt([{ id: 'pp.common.saved_correction' }]);   // back from Edit's Save (ticket #12)
     var id = receipt.dose, tx = lower(titleText(id)), r = receipt.rec, k = receipt.kind, parts;
     if (k === 'already') parts = [{ id: 'pp.litter.rcpt.already', args: { tx: tx, t: U.time(receipt.other.at), who: receipt.other.who } }, { id: 'pp.litter.rcpt.nothing' }];
     else if (k === 'stale' && receipt.other) parts = [{ id: 'pp.litter.rcpt.stale', args: { tx: tx, t: U.time(receipt.other.at), who: receipt.other.who, m: receipt.other.n } }, { id: 'pp.litter.rcpt.now_owed', args: { n: receipt.now }, tone: 'amber' }];
@@ -462,7 +468,8 @@
     } else if (a === 'open-move') { nav('move.html', { state: 'move', crate: crate });
     } else if (a === 'open-identity') { nav('id.html', { state: 'id-table', crate: crate });
     } else if (a === 'open-weight') { nav('edge.html', { state: 'birth-weight-entry', crate: crate });
-    } else if (a === 'open-record') { location.href = PP.href('edit.html', { state: 'record-page', crate: crate });
+    } else if (a === 'open-record') { nav('edit.html', { state: 'record-page', crate: crate });
+    } else if (a === 'open-edit') { nav('edit.html', { state: 'edit', crate: crate, from: 'litter' });
     } else document.documentElement.setAttribute('data-door', a + ':' + (v || ''));
   });
 
@@ -484,6 +491,7 @@
     if (st.drafts) drafts = JSON.parse(JSON.stringify(st.drafts));
     (st.visit || []).forEach(function (id) { visit[id] = true; });
     if (st.receipt) { var r0 = recordOf(st.visit[0]); receipt = { kind: 'saved', dose: r0.dose, rec: r0 }; }
+    if (qs.get('saved') === 'correction') receipt = { kind: 'correction' };
     if (st.tap) tap(st.tap.dose, st.tap.n);
     if (st.drawer) {
       drawer = freshDraft(st.drawer.dose);

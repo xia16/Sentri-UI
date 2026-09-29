@@ -9,7 +9,7 @@
    day 3 (scheme tag · all · day 3); variants switch the farm to keepers or to notches.
 
    One story, one crate each (the page states that show it in brackets):
-     A02 000231 · day 3 · 12 alive · owes iron and tail today; nobody tagged yet     [room, litter, dead, id]
+     A02 000231 · day 3 · 12 alive · owes iron and tail today; nobody tagged yet     [room, litter, dead, id, edit, record page]
      A04 000236 · day 3 · 11 · owes iron and tail                                    [id notch farm]
      A05 000240 · day 3 · 11 · iron recorded twice offline (possible double); tail 6 + 5 weak  [room, litter double-flag]
      A07 000245 · day 3 · 14 · owes iron and tail                                    [id keepers, dead farrowing record, count offline]
@@ -442,6 +442,32 @@ export const VARIANTS = {
   }),
   'c02-early': V((b) => { base(b); b.treat('C02', 'iron3', sep(29, '09:30'), ME, 14, { id: 'T-C02-visit' }); }),
 
+  // corrections and the litter record (S8): A02 with tail (L.M 08:40) and iron (G.H 09:14) recorded today
+  'a02-marked': V((b) => { base(b); b.treat('A02', 'tail', sep(29, '08:40'), 'L.M', 12, { id: 'T-A02-tail' }); b.treat('A02', 'iron3', sep(29, '09:14'), ME, 12, { id: 'T-A02-visit' }); }),
+  // …then G.H corrected iron at 10:31: 10 treated, 2 weak deferred (the amber value on the sheet and the record page)
+  'a02-corrected': V((b) => {
+    base(b); b.treat('A02', 'tail', sep(29, '08:40'), 'L.M', 12, { id: 'T-A02-tail' }); b.treat('A02', 'iron3', sep(29, '09:14'), ME, 12, { id: 'T-A02-visit' });
+    b.push({ type: 'correction', target: 'T-A02-visit', set: { n: 10, deferred: { n: 2, reason: 'weak' } }, at: sep(29, '10:31'), who: ME, id: 'X-A02-iron' });
+  }),
+  // …or L.M's tail was done on A04, not A02: withdrawn on A02 and the act recorded on A04 (A04's 11) at its own
+  // time and hand (08:40 · L.M), one stamped correction by G.H at 10:31
+  'a02-wrong-litter': V((b) => {
+    base(b); b.treat('A02', 'tail', sep(29, '08:40'), 'L.M', 12, { id: 'T-A02-tail' }); b.treat('A02', 'iron3', sep(29, '09:14'), ME, 12, { id: 'T-A02-visit' });
+    b.push({ type: 'correction', changes: [{ target: 'T-A02-tail', void: true, fresh: { litter: 'A04', dose: 'tail', n: 11, at: sep(29, '08:40'), who: 'L.M' } }], at: sep(29, '10:31'), who: ME, id: 'X-A02-tail' });
+  }),
+  // A02: iron 10 + 2 weak at 09:14, then L.M's follow-up for the 2 weak at 10:05 (a later record a correction must not drop)
+  'a02-followup': V((b) => {
+    base(b); b.treat('A02', 'tail', sep(29, '08:40'), 'L.M', 12, { id: 'T-A02-tail' });
+    b.treat('A02', 'iron3', sep(29, '09:14'), ME, 10, { id: 'T-A02-visit', deferred: { n: 2, reason: 'weak' } });
+    b.treat('A02', 'iron3', sep(29, '10:05'), 'L.M', 2, { id: 'T-A02-follow' });
+  }),
+  // two phones corrected A02's iron offline, neither saw the other: both kept, flagged sync review
+  'a02-concurrent': V((b) => {
+    base(b); b.treat('A02', 'tail', sep(29, '08:40'), 'L.M', 12, { id: 'T-A02-tail' }); b.treat('A02', 'iron3', sep(29, '09:14'), ME, 12, { id: 'T-A02-visit' });
+    const seen = b.ids();
+    b.push({ type: 'correction', changes: [{ target: 'T-A02-visit', set: { n: 11, deferred: { n: 1, reason: 'weak' } } }], at: sep(29, '10:20'), who: 'L.M', seen, device: 'P-LM', id: 'X-A02-lm' });
+    b.push({ type: 'correction', changes: [{ target: 'T-A02-visit', set: { n: 10, deferred: { n: 2, reason: 'weak' } } }], at: sep(29, '10:31'), who: ME, seen, device: 'P-GH', id: 'X-A02-gh' });
+  }),
   // birth litter weight (S10): set at farrowing's Edit, saved here, and a conflict with another phone
   'c02-weight-set': V((b) => { base(b); b.push({ type: 'birth_weight', litter: 'C02', kg: '16.4', source: 'farrowing', at: sep(28, '14:52'), who: 'G.H' }, 'BW-C02'); }),
   'c02-weight-saved': V((b) => { base(b); b.push({ type: 'birth_weight', litter: 'C02', kg: '34.2', at: sep(29, '09:42'), who: ME }, 'BW-C02'); }),

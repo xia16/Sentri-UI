@@ -33,8 +33,8 @@
      derive(events, config, { today })   → Derived (README: ux/laws/glossary.md, Ledger module)
      append(events, event, config, opts) → { ok, reason, detail, event, events, derived, dependents }
      balances(litter)                    → the ledger identity for one derived litter
-     select.room / litter / deathDraft / moveDraft / end / bulkDraft / countDraft / explain / counts — what pages render; drafts are validated
-       by the same replay `append` runs
+     select.room / litter / deathDraft / moveDraft / end / bulkDraft / countDraft / explain / counts / record /
+       edit — what pages render; drafts are validated by the same replay `append` runs
 */
 
 const DAY_MS = 86400000;
@@ -98,7 +98,7 @@ function ancestry(log) {
     anc.set(e.id, set);
     all.add(e.id);
   }
-  const key = (id) => (anc.has(id) ? id : String(id).replace(/:fresh$/, ''));
+  const key = (id) => (anc.has(id) ? id : String(id).replace(/:(fresh|\d+)$/, ''));
   const saw = (later, earlier) => { const s = anc.get(key(later)); return !!s && s.has(key(earlier)); };
   return { saw, concurrent: (a, b) => a !== b && !saw(a, b) && !saw(b, a) };
 }
@@ -258,38 +258,125 @@ function normalizeConfig(config) {
   };
 }
 
-/* Corrections are transactional: each is tried against the replay; one that would make its
-   target invalid is refused (`correction_invalid`) and the record in force stays. A correction
-   may void a wrong-litter mark and carry the `fresh` treat for the right litter. */
+/* A correction is one stamped act (one Save): `changes: [{ target, void | restore | set, fresh? },
+   { identity: { litter, op, rowId, set } }, …]`; the older single form `{ target, void, set, fresh }`
+   reads as one change. What a change carries (a fresh treat, an identity op) replays at the
+   correction's place as `<correction id>:<n>` (`:fresh` in the single form), and can itself be
+   corrected by that id. */
+function changesOf(c) {
+  if (Array.isArray(c.changes)) return c.changes.map((x, i) => Object.assign({}, x, { synth: c.id + ':' + (i + 1) }));
+  return [{ target: c.target, void: c.void, restore: c.restore, set: c.set, fresh: c.fresh, synth: c.id + ':fresh' }];
+}
+
+/* Corrections are transactional: each is tried against the replay of the whole log and refused
+   when it would make one of its own targets invalid (`correction_invalid`) or drop or invalidate
+   any record after it (`changes_later`, naming them); the record in force stays. Withdrawing a
+   withdrawn record is refused; `restore` brings a withdrawn one back. Two corrections of one
+   record neither saw are both kept (the later in the log stands) and flagged sync review. */
 export function derive(events, config, opts) {
   const cfg = normalizeConfig(config);
   const today = dayNumber(opts && opts.today);
   const { log, byId, rejected } = prepare(events);
   const causal = ancestry(log);
   const rootOf = (id) => { let e = byId.get(id); while (e && e.type === 'correction') e = byId.get(e.target); return e; };
-  const effective = new Map();
-  const corrections = new Map();
-  const fresh = new Map();              // correction id → synthetic treat
-  const corrRejected = [];
-  for (const c of log) {
-    if (c.type !== 'correction') continue;
-    const root = rootOf(c.target);
-    if (!root) { corrRejected.push({ id: c.id, type: c.type, reason: 'unknown_target' }); continue; }
-    if (c.set && ('id' in c.set || 'type' in c.set)) { corrRejected.push({ id: c.id, type: c.type, reason: 'cannot_change_id_or_type' }); continue; }
-    const base = effective.has(root.id) ? effective.get(root.id) : root;
-    const candidate = c.void ? null : Object.assign(clone(base || root), c.set || {}, { id: root.id, type: root.type });
-    const trial = new Map(effective); trial.set(root.id, candidate);
-    const trialFresh = new Map(fresh);
-    if (c.fresh) trialFresh.set(c.id, Object.assign({}, c.fresh, { id: c.id + ':fresh', type: 'treat', at: c.at, who: c.who, viaCorrection: c.id, seen: c.seen }));
-    const res = replay(log, trial, trialFresh, cfg, causal, today);
-    const bad = res.rejected.find((r) => (candidate && r.id === root.id) || r.id === c.id + ':fresh');
-    if (bad) { corrRejected.push({ id: c.id, type: c.type, reason: 'correction_invalid', detail: { target: root.id, reason: bad.reason, detail: bad.detail } }); continue; }
-    effective.set(root.id, candidate);
-    if (c.fresh) fresh.set(c.id, trialFresh.get(c.id));
-    if (!corrections.has(root.id)) corrections.set(root.id, []);
-    corrections.get(root.id).push({ id: c.id, at: c.at || null, who: c.who || null, void: !!c.void, set: c.set || null, fresh: c.fresh ? c.id + ':fresh' : null });
+  const effective = new Map();          // record id → the record in force (null: withdrawn)
+  const lastLive = new Map();           // record id → the last version in force before a withdrawal
+  const corrections = new Map();        // record id (or synthetic id) → the corrections that touched it
+  const synth = new Map();              // synthetic id → the event a correction carries (fresh treat, identity op)
+  const corrRejected = [], corrFlags = [];
+  let base = replay(log, effective, synth, cfg, causal, today);
+  const endAt = new Map([...base.ctx.ends].filter(([, E]) => E && E.event).map(([t, E]) => [t, log.findIndex((x) => x.id === E.event)]));
+  const atEnd = new Map();              // task id → { effective, synth } as they stood when End was written
+  const describe = (r) => {
+    const e = byId.get(r.id) || synth.get(r.id) || {};
+    return { id: r.id, type: r.type, reason: r.reason, detail: r.detail || null, litter: e.litter || e.from || null, to: e.to || null, dose: e.dose || null, at: e.at || null, who: e.who || null, op: e.op || null, rowId: e.rowId || null };
+  };
+  log.forEach((c, index) => {
+    for (const [t, i] of endAt) if (i < index && !atEnd.has(t)) atEnd.set(t, { effective: new Map(effective), synth: new Map(synth) });
+    if (c.type !== 'correction') return;
+    const refuse = (reason, detail) => corrRejected.push({ id: c.id, type: c.type, reason, detail: detail || null });
+    const trial = new Map(effective), trialSynth = new Map(synth), trialLive = new Map(lastLive);
+    const live = [], made = [], touched = [];
+    let err = null;
+    for (const ch of changesOf(c)) {
+      if (ch.identity) {
+        trialSynth.set(ch.synth, Object.assign({}, ch.identity, { id: ch.synth, type: 'identity', at: c.at || null, who: c.who || null, viaCorrection: c.id }, c.seen ? { seen: c.seen } : {}));
+        made.push(ch.synth);
+        continue;
+      }
+      if (ch.set && ('id' in ch.set || 'type' in ch.set)) { err = ['cannot_change_id_or_type']; break; }
+      if (!byId.has(ch.target) && trialSynth.has(ch.target)) {        // a mark a correction recorded: edit it the same way
+        const cur = trialSynth.get(ch.target);
+        if (ch.void) { if (cur.withdrawn) { err = ['already_withdrawn', { target: ch.target }]; break; } trialSynth.set(ch.target, Object.assign({}, cur, { withdrawn: true })); }
+        else if (ch.restore) { if (!cur.withdrawn) { err = ['not_withdrawn', { target: ch.target }]; break; } const x = Object.assign({}, cur); delete x.withdrawn; trialSynth.set(ch.target, x); live.push(ch.target); }
+        else { if (cur.withdrawn) { err = ['withdrawn', { target: ch.target }]; break; } trialSynth.set(ch.target, Object.assign(clone(cur), ch.set || {}, { id: cur.id, type: cur.type })); live.push(ch.target); }
+        touched.push(ch.target);
+        continue;
+      }
+      const root = rootOf(ch.target);
+      if (!root) { err = ['unknown_target', { target: ch.target }]; break; }
+      const cur = trial.has(root.id) ? trial.get(root.id) : root;
+      let cand;
+      if (ch.restore) { if (cur !== null) { err = ['not_withdrawn', { target: root.id }]; break; } cand = clone(trialLive.get(root.id) || root); }
+      else if (ch.void) { if (cur === null) { err = ['already_withdrawn', { target: root.id }]; break; } trialLive.set(root.id, cur); cand = null; }
+      else { if (cur === null) { err = ['withdrawn', { target: root.id }]; break; } cand = Object.assign(clone(cur), ch.set || {}, { id: root.id, type: root.type }); }
+      trial.set(root.id, cand);
+      if (cand) live.push(root.id);
+      touched.push(root.id);
+      if (ch.fresh) {
+        trialSynth.set(ch.synth, Object.assign({ at: c.at || null, who: c.who || null }, clone(ch.fresh), { id: ch.synth, type: 'treat', viaCorrection: c.id, from: root.litter || null }, c.seen ? { seen: c.seen } : {}));
+        made.push(ch.synth);
+      }
+    }
+    if (err) { refuse(err[0], err[1]); return; }
+    const res = replay(log, trial, trialSynth, cfg, causal, today);
+    const bad = res.rejected.find((r) => live.includes(r.id) || made.includes(r.id));
+    if (bad) { refuse('correction_invalid', { target: bad.id, reason: bad.reason, detail: bad.detail }); return; }
+    // gated on the whole log: a correction never drops or invalidates a later record silently
+    const was = new Set(base.rejected.map((r) => r.id));
+    const later = res.rejected.filter((r) => !was.has(r.id));
+    if (later.length) { refuse('changes_later', { records: later.map(describe) }); return; }
+    for (const id of touched) {
+      const prior = corrections.get(id) || [];
+      const clash = prior.filter((p) => causal.concurrent(p.id, c.id));
+      if (clash.length) {
+        const e = byId.get(id) || trialSynth.get(id) || {};
+        corrFlags.push({ kind: 'sync_review', reason: 'correction_concurrent', litter: e.litter || e.from || null, events: clash.map((p) => p.id).concat(c.id), target: id });
+      }
+    }
+    effective.clear(); for (const [k, v] of trial) effective.set(k, v);
+    lastLive.clear(); for (const [k, v] of trialLive) lastLive.set(k, v);
+    synth.clear(); for (const [k, v] of trialSynth) synth.set(k, v);
+    base = res;
+    for (const id of touched) {
+      if (!corrections.has(id)) corrections.set(id, []);
+      corrections.get(id).push({ id: c.id, at: c.at || null, who: c.who || null, index });
+    }
+  });
+  const res = base;
+  for (const f of corrFlags) {
+    const L = res.litters.get(f.litter);
+    if (L) L.flags.push(f);
+    res.flags.push(f);
   }
-  const res = replay(log, effective, fresh, cfg, causal, today);
+  // after End: what a correction written after End leaves untreated is a fact (`not done · corrected
+  // after End`), never an actionable owed; End's own figures stay frozen (the snapshot below)
+  const short = new Map();
+  for (const [t, i] of endAt) {
+    const snap = atEnd.get(t);
+    if (!snap || ![...corrections.values()].flat().some((x) => x.index > i)) continue;
+    const pre = replay(log, snap.effective, snap.synth, cfg, causal, today);
+    const T = cfg.tasks.find((x) => x.id === t);
+    for (const id of T ? T.litters : []) {
+      const L = res.litters.get(id), P = pre.litters.get(id);
+      if (!L || !P) continue;
+      for (const d of cfg.doses) {
+        const a = owedShown(L, dose(res.ctx, L, d.id)), b = owedShown(P, dose(pre.ctx, P, d.id));
+        if (a != null && a > (b || 0)) short.set(id + ':' + d.id, a - (b || 0));
+      }
+    }
+  }
+  res.ctx.short = short;
   const out = {
     litters: {}, rooms: {}, rejected: rejected.concat(corrRejected, res.rejected), flags: res.flags,
     corrections: Object.fromEntries(corrections), config: cfg, today,
@@ -355,8 +442,14 @@ function replay(log, effective, fresh, cfg, causal, today) {
       rejected.push({ id: e.id, type: e.type, reason: err.reason, detail: err.detail });
     }
   };
+  const carried = new Map();            // correction id → the events it carries, in change order
+  for (const s of fresh.values()) {
+    if (s.withdrawn) continue;
+    if (!carried.has(s.viaCorrection)) carried.set(s.viaCorrection, []);
+    carried.get(s.viaCorrection).push(s);
+  }
   log.forEach((raw, index) => {
-    if (raw.type === 'correction') { if (fresh.has(raw.id)) run(fresh.get(raw.id), index); return; }
+    if (raw.type === 'correction') { for (const s of carried.get(raw.id) || []) run(s, index); return; }
     const e = effective.has(raw.id) ? effective.get(raw.id) : raw;
     if (e === null) return;                              // voided by a correction
     run(e, index);
@@ -1000,7 +1093,7 @@ function record(ctx, L, d, e, fields) {
     id: e.id, dose: d.id, target: e.target || null,
     product: e.product !== undefined ? e.product : d.product, amount: e.amount !== undefined ? e.amount : d.amount,
     dayAge, timing, onTime: timing === 'early' || timing === 'on_time',
-    at: e.at || null, who: e.who || null, device: e.device || null, viaCorrection: e.viaCorrection || null
+    at: e.at || null, who: e.who || null, device: e.device || null, viaCorrection: e.viaCorrection || null, from: e.viaCorrection ? e.from || null : null
   }, fields);
   L.lastRecord = { id: e.id, dose: d.id, at: e.at || null, who: e.who || null, day: dayNumber(e.at) };
   return rec;
@@ -1086,6 +1179,7 @@ function applyIdentity(ctx, e) {
     r.edits.push({ event: e.id, before, set: Object.assign({}, set), at: e.at || null, who: e.who || null });
   } else if (op === 'withdraw') {
     if (r.withdrawn) throw new Reject('already_withdrawn');
+    if (r.status === 'dead') throw new Reject('row_dead', { rowId: r.rowId, event: r.deathEvent || null });
     r.withdrawn = { event: e.id, at: e.at || null, who: e.who || null, statusBefore: r.status };
     r.status = 'withdrawn';
     retireRow(L, r.rowId);
@@ -1131,7 +1225,10 @@ function view(ctx, L, corrections, today) {
   const doses = {};
   for (const d of ctx.cfg.doses) {
     const D = dose(ctx, L, d.id);
-    const owed = owedShown(L, D);
+    const rawOwed = owedShown(L, D);
+    // corrected after End: the shortfall is a fact, not an actionable owed (derive computes `short`)
+    const notDoneAfterEnd = rawOwed == null ? 0 : Math.min(rawOwed, (ctx.short && ctx.short.get(L.id + ':' + d.id)) || 0);
+    const owed = rawOwed == null ? null : rawOwed - notDoneAfterEnd;
     let status = null;
     if (dayAge != null) {
       if (dayAge < d.due) status = 'later';
@@ -1140,7 +1237,7 @@ function view(ctx, L, corrections, today) {
       else status = 'due';
     }
     const unknown = unknownShown(L, D);
-    const carried = Math.min(total(D.coverage), Math.max(0, L.alive - (owed || 0) - unknown));
+    const carried = Math.min(total(D.coverage), Math.max(0, L.alive - (rawOwed || 0) - unknown));
     const fi = frontierInfo(ctx, L, D);
     const deferred = Math.min(fi.deferred, owed == null ? fi.deferred : owed);
     const lastZero = L.zeros.length ? L.zeros[L.zeros.length - 1].index : -1;
@@ -1158,6 +1255,7 @@ function view(ctx, L, corrections, today) {
       status,
       owed,                                          // shown: min(owed, alive); null = castration before its first record
       owedStored: D.stored,
+      notDoneAfterEnd,
       owedFrom,
       treated: D.treated,
       deferred,
@@ -1807,6 +1905,7 @@ function endFigures(cfg, litterViews, opts) {
   progress.total = progress.done + progress.owed + progress.unknown + progress.ahead;
   return {
     unfinishedLitters: unfinished, finishedLitters: litters.map((L) => L.id).filter((id) => !unfinished.includes(id)),
+    correctedAfterEnd: litters.flatMap((L) => Object.values(L.doses).filter((D) => D.notDoneAfterEnd).map((D) => ({ litter: L.id, dose: D.dose, n: D.notDoneAfterEnd }))),
     byLitter, litters: per, unfinishedPigletDoses: Object.values(byLitter).flat().reduce((s, x) => s + (x.n || 0), 0), progress,
     onTime: { n, k }, identityDone: { n: idDone, k: litters.length },
     movedOutAfterEnd: litters.flatMap((L) => L.movedOutAfterEnd.map((m) => Object.assign({ litter: L.id }, m)))
@@ -1829,6 +1928,333 @@ function endSelect(derived, opts) {
   };
 }
 
+/* ---- corrections and the litter record (slice S8, ticket #12) ---- */
+
+// The fields of a record a correction can change, as the page prints them.
+function recFields(e) {
+  if (!e) return null;
+  if (e.type === 'treat') return { litter: e.litter, dose: e.dose, n: e.n == null ? null : e.n, deferred: e.deferred ? Object.assign({}, e.deferred) : null, exempt: e.exempt ? Object.assign({}, e.exempt) : null, castration: e.castration ? Object.assign({}, e.castration) : null, at: e.at || null, who: e.who || null, from: e.from || null };
+  if (e.type === 'move') return { from: e.from, to: e.to, n: e.n, rows: (e.rows || []).slice() };
+  if (e.type === 'count') return { litter: e.litter, observed: e.observed };
+  if (e.type === 'identity') return { litter: e.litter, op: e.op || 'add', rowId: e.rowId || null, set: e.set ? Object.assign({}, e.set) : null };
+  return { litter: e.litter || null };
+}
+const touches = (e, id) => !!e && (e.litter === id || e.from === id || e.to === id);
+const dayOf = (at) => String(at || '').slice(0, 10);
+
+/* The corrections in force, walked in log order: each accepted correction with its changes, and for
+   each change what it stood on (`before`, as the writer's phone saw it) and what it left (`after`). */
+function correctionWalk(derived) {
+  const input = derived.input || { events: [] };
+  const events = input.events || [];
+  const bad = new Set(derived.rejected.map((r) => r.id));
+  const byId = new Map(events.map((e) => [e.id, e]));
+  const causal = ancestry(prepare(events).log);
+  const rootOf = (tid) => { let e = byId.get(tid); while (e && e.type === 'correction') e = byId.get(e.target); return e; };
+  const hist = new Map();                 // record id → [{ by, value }] in log order (value null: withdrawn)
+  const synth = new Map();                // synthetic id → the event a correction carried
+  const origin = new Map();               // synthetic fresh id → the record it came from
+  const walked = [];
+  const valueSeen = (id, c) => {
+    const h = hist.get(id) || [];
+    let v = byId.get(id) || null;
+    for (const x of h) if (causal.saw(c.id, x.by)) v = x.value;
+    if (!byId.has(id)) { const first = h.length ? h[0].value : synth.get(id) || null; if (!h.some((x) => causal.saw(c.id, x.by))) v = first; }
+    return v;
+  };
+  events.forEach((c, index) => {
+    if (c.type !== 'correction' || bad.has(c.id)) return;
+    const out = [];
+    for (const ch of changesOf(c)) {
+      if (ch.identity) {
+        const ev = Object.assign({}, ch.identity, { id: ch.synth, type: 'identity' });
+        synth.set(ch.synth, ev);
+        out.push({ kind: ch.identity.op === 'withdraw' ? 'withdraw' : 'row', synth: ch.synth, litter: ch.identity.litter, rowId: ch.identity.rowId, set: ch.identity.set ? Object.assign({}, ch.identity.set) : null });
+        continue;
+      }
+      const isSynth = !byId.has(ch.target);
+      const root = isSynth ? synth.get(ch.target) : rootOf(ch.target);
+      if (!root) continue;
+      const before = valueSeen(root.id, c);
+      const prev = (hist.get(root.id) || []).slice(-1)[0];
+      const cur = prev ? prev.value : isSynth ? synth.get(root.id) : root;
+      let after;
+      if (ch.void) after = null;
+      else if (ch.restore) { const live = (hist.get(root.id) || []).map((x) => x.value).filter(Boolean).pop(); after = clone(live || root); }
+      else after = Object.assign(clone(cur || root), ch.set || {}, { id: root.id, type: root.type });
+      if (!hist.has(root.id)) hist.set(root.id, []);
+      hist.get(root.id).push({ by: c.id, value: after });
+      let fresh = null;
+      if (ch.fresh) {
+        fresh = Object.assign({ at: c.at || null, who: c.who || null }, clone(ch.fresh), { id: ch.synth, type: 'treat', from: root.litter || null });
+        synth.set(ch.synth, fresh);
+        origin.set(ch.synth, root.id);
+      }
+      const kind = root.type === 'identity' && root.op === 'close' ? 'reopen'
+        : root.type === 'move' ? (after ? 'move' : 'move_void')
+          : ch.restore ? 'restore' : fresh ? 'wrong' : !after ? 'void' : 'mark';
+      out.push({ kind, target: { id: root.id, type: root.type, at: root.at || null, who: root.who || null, litter: root.litter || root.from || null, synth: isSynth, dose: root.dose || null },
+        before: recFields(before), after: after ? recFields(after) : null, fresh: fresh ? recFields(fresh) : null });
+    }
+    walked.push({ id: c.id, at: c.at || null, who: c.who || null, index, changes: out });
+  });
+  return { walked, synth, origin, byId };
+}
+
+/* The litter record page: the litter's ledger as a timeline. Every accepted event that touched the
+   litter, as it was written (a corrected one says when: `corrected 10:31`), and each correction as
+   ONE entry listing the acts it touched with their before → after (a withdrawn mark stays on the
+   page). Newest first, grouped by day; a day carries its hand when one hand wrote all of it. */
+function recordSelect(derived, id) {
+  const L = derived.litters[id];
+  if (!L) return null;
+  const input = derived.input || { events: [] };
+  const events = input.events || [];
+  const bad = new Set(derived.rejected.map((r) => r.id));
+  const W = correctionWalk(derived);
+  const T = (derived.tasks || []).find((t) => t.id === L.task);
+  const endAt = T && T.ended && T.ended.event ? events.findIndex((e) => e.id === T.ended.event) : -1;
+  const rows = new Map(L.identity.rows.map((r) => [r.rowId, r]));
+  const rowLabel = (rowId) => { const r = rows.get(rowId); return r ? { tag: r.tag, notch: r.notch } : { tag: null, notch: null }; };
+  const corrOf = (rid) => ((derived.corrections || {})[rid] || []).map((x) => ({ id: x.id, at: x.at, who: x.who }));
+  const out = [];
+  let run = null;
+  const walked = new Map(W.walked.map((w) => [w.id, w]));
+  events.forEach((e, index) => {
+    if (bad.has(e.id)) return;
+    const base = { id: e.id, at: e.at || null, who: e.who || null, index };
+    if (e.type === 'correction') {
+      run = null;
+      const w = walked.get(e.id);
+      if (!w) return;
+      const mine = w.changes.filter((ch) => (ch.target && (ch.target.litter === id || touches(ch.before, id) || touches(ch.after, id))) || (ch.fresh && ch.fresh.litter === id) || ch.litter === id)
+        .map((ch) => Object.assign({}, ch, { row: ch.rowId ? rowLabel(ch.rowId) : null, here: !(ch.fresh && ch.fresh.litter === id && ch.target && ch.target.litter !== id) }));
+      if (!mine.length) return;
+      out.push(Object.assign(base, {
+        kind: 'correction', changes: mine,
+        afterEnd: endAt >= 0 && index > endAt,
+        flagged: L.flags.some((f) => (f.reason === 'correction_after_end' && f.events.some((x) => String(x).startsWith(e.id + ':'))) || (f.reason === 'correction_concurrent' && f.events.includes(e.id))),
+        concurrent: L.flags.some((f) => f.reason === 'correction_concurrent' && f.events.includes(e.id))
+      }));
+      return;
+    }
+    if (!touches(e, id) && !(e.type === 'end_task' && L.inTask)) { run = null; return; }
+    const corrected = corrOf(e.id);
+    if (e.type === 'identity' && (e.op || 'add') === 'add') {
+      if (run && run.who === (e.who || null) && dayOf(run.at) === dayOf(e.at)) { run.n++; run.last = rowLabel(e.rowId); run.lastAt = e.at || null; return; }
+      run = Object.assign(base, { kind: 'rows', n: 1, first: rowLabel(e.rowId), last: rowLabel(e.rowId), lastAt: e.at || null });
+      out.push(run);
+      return;
+    }
+    run = null;
+    if (e.type === 'farrowed') out.push(Object.assign(base, { kind: 'farrowed', born: e.born, dead: sum(e.dead), alive: e.born - sum(e.dead), locked: !!e.locked }));
+    else if (e.type === 'treat') out.push(Object.assign(base, recFields(e), { kind: 'treat', target: e.target || null, corrected }));
+    else if (e.type === 'death') {
+      const d = L.deaths.find((x) => x.id === e.id);
+      const byCause = {};
+      for (const l of e.lines || []) byCause[l.cause] = (byCause[l.cause] || 0) + (l.rowId ? 1 : l.n || 0);
+      out.push(Object.assign(base, { kind: 'death', byCause, n: sum(byCause), fromMissing: d ? d.fromMissing : 0, rows: (e.lines || []).filter((l) => l.rowId).map((l) => rowLabel(l.rowId)) }));
+    } else if (e.type === 'count') {
+      const c = L.counts.find((x) => x.id === e.id);
+      out.push(Object.assign(base, { kind: 'count', observed: e.observed, wrote: c ? c.wrote : null, corrected }));
+    } else if (e.type === 'move') out.push(Object.assign(base, { kind: 'move', dir: e.from === id ? 'out' : 'in', other: e.from === id ? e.to : e.from, n: e.n, corrected }));
+    else if (e.type === 'identity' && e.op === 'edit') {
+      const r = rows.get(e.rowId), x = r ? r.edits.find((y) => y.event === e.id) : null;
+      out.push(Object.assign(base, { kind: 'row_edit', row: rowLabel(e.rowId), rowId: e.rowId, before: x ? Object.assign({}, x.before) : {}, set: Object.assign({}, e.set || {}) }));
+    } else if (e.type === 'identity' && e.op === 'withdraw') out.push(Object.assign(base, { kind: 'row_withdraw', row: rowLabel(e.rowId), rowId: e.rowId }));
+    else if (e.type === 'identity' && e.op === 'close') out.push(Object.assign(base, { kind: 'closed', corrected }));
+    else if (e.type === 'sow_died') out.push(Object.assign(base, { kind: 'sow_died', cause: e.cause || null }));
+    else if (e.type === 'weaned') out.push(Object.assign(base, { kind: 'weaned', n: e.n == null ? null : e.n }));
+    else if (e.type === 'end_task') out.push(Object.assign(base, { kind: 'end_task' }));
+  });
+  out.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : b.index - a.index));
+  const days = [];
+  for (const x of out) {
+    const d = dayOf(x.at);
+    let g = days[days.length - 1];
+    if (!g || g.date !== d) { g = { date: d, who: null, entries: [] }; days.push(g); }
+    g.entries.push(x);
+  }
+  for (const g of days) { const hands = new Set(g.entries.map((x) => x.who)); g.who = hands.size === 1 ? g.entries[0].who : null; }
+  return { litter: id, days, entries: out.length, newest: out[0] || null };
+}
+
+/* The one Edit screen for a litter (slice S8): what it can correct, and the draft checked by the
+   same replay `append` runs. Save commits ONE correction event carrying every change.
+     draft = { marks: { <record id>: { n, reason } | { void: true } | { to, n?, reason? } | { back: true } },
+               moves: { <move id>: { n?, to?, rows?, void? } },
+               rows: { <row id>: { set: {…} } | { withdraw: true } }, reopen: true }
+   A mark lowered leaves the rest deferred with a reason (after End: a fact, `not done`); `void`
+   withdraws it (stamped, the original kept); `to` withdraws it here and records the act on the right
+   litter at its original time (n defaults to the original, capped at what that litter owes; the
+   deferred part travels); `back` reverses a wrong-litter correction from the right litter. A Move is
+   corrected by id (count, crate, rows) or withdrawn; identity rows are edited or withdrawn; a
+   closed candidate set reopens by withdrawing its close. `later` names the records a change would
+   drop or invalidate: Save waits until they are corrected too (in the same draft). */
+function editSelect(derived, id, draft, stamp) {
+  const L = derived.litters[id];
+  if (!L) return null;
+  const dr = draft || {};
+  const input = derived.input || { events: [], config: {}, opts: {} };
+  const events = input.events || [];
+  const cfg = derived.config;
+  const order = doseOrder(cfg);
+  const W = correctionWalk(derived);
+  const T = (derived.tasks || []).find((t) => t.id === L.task);
+  const ended = !!(T && T.ended && T.ended.event);
+  const marks = [];
+  for (const D of Object.values(L.doses).sort(order)) {
+    for (const r of D.records) {
+      if (r.target === 'unknown') continue;
+      marks.push({ id: r.id, dose: r.dose, tx: D.tx, at: r.at, who: r.who, n: r.castration ? r.castration.castrated : r.n,
+        deferred: r.deferred || 0, deferReason: r.deferReason || null, exempt: r.exempt || 0, castration: r.castration ? Object.assign({}, r.castration) : null,
+        whole: r.castration ? (r.castration.castrated || 0) + (r.castration.deferred || 0) : (r.n || 0) + (r.deferred || 0) + (r.exempt || 0),
+        corrected: !!r.corrected || !!r.viaCorrection, viaCorrection: r.viaCorrection || null, from: r.from || null,
+        origin: r.viaCorrection ? W.origin.get(r.id) || null : null });
+    }
+  }
+  marks.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
+  const rowFields = new Map();              // row id → the fields a correction or edit ever changed (amber forever)
+  const rows = L.identity.rows.filter((r) => r.litter === id && r.status !== 'withdrawn').map((r) => {
+    const f = {};
+    for (const x of r.edits) for (const k of Object.keys(x.set || {})) f[k] = true;
+    rowFields.set(r.rowId, f);
+    return Object.assign({}, r, { corrected: r.edits.length > 0, correctedFields: f });
+  });
+  const moves = L.moves.map((m) => Object.assign({}, clone(m), { corrected: !!(derived.corrections && derived.corrections[m.id]) }));
+  let closeEv = null;
+  if (L.identity.closed) for (const e of events) if (e.type === 'identity' && e.op === 'close' && e.litter === id) closeEv = e;
+  const closed = closeEv ? { id: closeEv.id, at: closeEv.at || null, who: closeEv.who || null, k: L.identity.identified } : null;
+  const owedOf = (c, dose) => { const X = derived.litters[c]; return X && X.doses[dose] ? X.doses[dose].owed : null; };
+  // where a mark recorded on the wrong litter can go: litters in a task that owe that dose now, this unit first
+  const targets = (dose) => Object.values(derived.litters).filter((X) => X.id !== id && X.inTask && X.phase === 'locked' && X.alive > 0 && X.doses[dose] &&
+      (X.doses[dose].owed > 0 || (X.doses[dose].owed == null && !X.doses[dose].records.length)))
+    .sort((a, b) => (a.room === L.room ? 0 : 1) - (b.room === L.room ? 0 : 1) || (a.room - b.room) || (a.id < b.id ? -1 : 1))
+    .map((X) => ({ litter: X.id, room: X.room, owed: X.doses[dose].owed, alive: X.alive }));
+  // where a Move can go or come from: every locked litter, this unit first, other units after
+  const crates = () => Object.values(derived.litters).filter((X) => X.id !== id && X.phase === 'locked')
+    .sort((a, b) => (a.room === L.room ? 0 : 1) - (b.room === L.room ? 0 : 1) || (a.room - b.room) || (a.id < b.id ? -1 : 1))
+    .map((X) => ({ litter: X.id, room: X.room, alive: X.alive, sowDied: !!X.sowDied }));
+
+  const changes = [], list = [];
+  let step = null;                                     // the draft's own step still missing (Save waits)
+  const need = (s) => { if (!step) step = s; };
+  for (const m of marks) {
+    const x = (dr.marks || {})[m.id];
+    if (!x) continue;
+    if (x.back && m.viaCorrection && m.origin) {
+      list.push({ target: m.id, void: true }, { target: m.origin, restore: true });
+      changes.push({ kind: 'back', mark: m.id, dose: m.dose, n: m.n, from: m.from });
+    } else if (x.to !== undefined) {
+      if (!x.to) { need({ why: 'crate', mark: m.id }); changes.push({ kind: 'wrong', mark: m.id, dose: m.dose, from: m.n, to: null, n: null }); continue; }
+      const owedThere = owedOf(x.to, m.dose);
+      const n = x.n != null ? x.n : owedThere == null ? m.n : Math.min(m.n, owedThere);
+      let fresh;
+      if (m.castration) fresh = { litter: x.to, dose: m.dose, castration: { castrated: n }, at: m.at, who: m.who };
+      else {
+        fresh = { litter: x.to, dose: m.dose, n, at: m.at, who: m.who };
+        const rest = owedThere == null ? 0 : owedThere - n;
+        const reason = x.reason || m.deferReason || null;
+        if (rest > 0) { if (reason) fresh.deferred = { n: rest, reason }; else need({ why: 'reason_there', mark: m.id, n: rest, litter: x.to }); }
+      }
+      list.push({ target: m.id, void: true, fresh });
+      changes.push({ kind: 'wrong', mark: m.id, dose: m.dose, from: m.n, to: x.to, n, owedThere, rest: fresh.deferred ? fresh.deferred.n : 0, reason: fresh.deferred ? fresh.deferred.reason : null });
+    } else if (x.void) {
+      list.push({ target: m.id, void: true });
+      changes.push({ kind: 'void', mark: m.id, dose: m.dose, from: m.n, afterEnd: ended });
+    } else if (x.n != null && x.n !== m.n) {
+      const rest = m.whole - x.n - (m.castration ? 0 : m.exempt);
+      const reason = x.reason || (rest > 0 && ended ? 'not_done' : null) || (rest > 0 && m.deferReason) || null;
+      if (rest > 0 && !reason) need({ why: 'reason', mark: m.id, n: rest });
+      let set;
+      if (m.castration) set = { castration: Object.assign({}, m.castration, { castrated: x.n, deferred: rest || 0 }, rest > 0 ? { deferReason: reason } : {}) };
+      else set = { n: x.n, deferred: rest > 0 ? { n: rest, reason } : null };
+      list.push({ target: m.id, set });
+      changes.push({ kind: 'mark', mark: m.id, dose: m.dose, from: m.n, to: x.n, rest: Math.max(0, rest), reason, afterEnd: ended });
+    }
+  }
+  for (const m of moves) {
+    const x = (dr.moves || {})[m.id];
+    if (!x) continue;
+    const source = m.dir === 'out' ? id : m.other, legOther = m.dir === 'out' ? 'to' : 'from';
+    if (x.void) {
+      list.push({ target: m.id, void: true });
+      changes.push({ kind: 'move_void', move: m.id, dir: m.dir, fromN: m.n, other: m.other, source, receiver: m.dir === 'out' ? m.other : id });
+      continue;
+    }
+    const set = {};
+    if (x.rows) { const untagged = m.n - (m.rows || []).length; set.rows = x.rows.slice(); set.n = x.rows.length + untagged; }
+    else if (x.n != null && x.n !== m.n) set.n = x.n;
+    if (x.to && x.to !== m.other) set[legOther] = x.to;
+    if (!Object.keys(set).length || (set.n === m.n && !set[legOther] && JSON.stringify(set.rows || null) === JSON.stringify(m.rows || null))) continue;
+    list.push({ target: m.id, set });
+    changes.push({ kind: 'move', move: m.id, dir: m.dir, fromN: m.n, toN: set.n != null ? set.n : m.n, fromOther: m.other, toOther: set[legOther] || m.other, source, rows: set.rows || null });
+  }
+  const warnings = [];
+  for (const r of rows) {
+    const x = (dr.rows || {})[r.rowId];
+    if (!x) continue;
+    if (x.withdraw) {
+      if (r.status === 'dead') need({ why: 'row_dead', rowId: r.rowId, tag: r.tag, notch: r.notch, death: r.deathEvent || null });
+      list.push({ identity: { litter: id, op: 'withdraw', rowId: r.rowId } });
+      changes.push({ kind: 'withdraw', rowId: r.rowId, tag: r.tag, notch: r.notch });
+      continue;
+    }
+    const set = {};
+    for (const k of Object.keys(x.set || {})) if ((x.set[k] ?? null) !== (r[k] ?? null)) set[k] = x.set[k];
+    if (!Object.keys(set).length) continue;
+    list.push({ identity: { litter: id, op: 'edit', rowId: r.rowId, set } });
+    const before = {};
+    for (const k of Object.keys(set)) before[k] = r[k] ?? null;
+    changes.push({ kind: 'row', rowId: r.rowId, tag: r.tag, notch: r.notch, before, set });
+    // a tag or notch typed to one another live record holds warns, as entry does (it never blocks)
+    for (const k of ['tag', 'notch']) {
+      if (!set[k]) continue;
+      for (const X of Object.values(derived.litters)) for (const o of X.identity.rows) {
+        if (o.litter !== X.id || o.rowId === r.rowId || (o.status !== 'alive' && o.status !== 'missing') || o[k] !== set[k]) continue;
+        warnings.push({ rowId: r.rowId, field: k, value: set[k], litter: X.id, other: o.rowId, here: X.id === id });
+      }
+    }
+  }
+  if (dr.reopen && closed) {
+    list.push({ target: closed.id, void: true });
+    changes.push({ kind: 'reopen', k: closed.k });
+  }
+
+  let why = step ? step.why : null, whyDetail = step, after = null, flags = [], later = [];
+  const event = list.length ? { type: 'correction', changes: list } : null;
+  if (!why && event) {
+    const st = stamp || {};
+    const e = Object.assign({ id: st.id || '__edit', at: st.at || input.opts.today || null, who: st.who || null }, st.seen ? { seen: st.seen } : {}, event);
+    const r = append(events, e, input.config, input.opts);
+    if (!r.ok) {
+      why = r.reason === 'correction_invalid' && r.detail ? r.detail.reason : r.reason;
+      whyDetail = r.detail;
+      if (r.reason === 'changes_later') later = r.detail.records;
+    } else {
+      after = r.derived;
+      const had = new Set(derived.flags.map((f) => f.reason + ':' + f.events.join(',')));
+      flags = after.flags.filter((f) => !had.has(f.reason + ':' + f.events.join(','))).map((f) => clone(f));
+    }
+  }
+  // what each touched litter's alive does (a Move names both litters: `B06 2 → 1 · B08 gets 1 fewer`)
+  const effects = {};
+  if (after) {
+    const ids = new Set([id]);
+    for (const c of changes) { if (c.to) ids.add(c.to); if (c.fromOther) ids.add(c.fromOther); if (c.toOther) ids.add(c.toOther); if (c.other) ids.add(c.other); }
+    for (const c of ids) if (derived.litters[c] && after.litters[c]) effects[c] = [derived.litters[c].alive, after.litters[c].alive];
+  }
+  const A = after ? after.litters[id] : null;
+  return {
+    litter: id, marks, rows, moves, closed, targets, crates, ended,
+    changes, step, why, whyDetail, later, warnings,
+    events: why || !event ? null : [event],
+    afterEnd: ended && !!event,
+    flags, effects,
+    after: A ? { alive: A.alive, owed: Object.fromEntries(Object.entries(A.doses).map(([k, v]) => [k, v.owed])), notDone: Object.fromEntries(Object.entries(A.doses).map(([k, v]) => [k, v.notDoneAfterEnd])) } : null
+  };
+}
+
 /* Where a tag or notch is held now (rows alive or missing), except in one litter: the lookup a
    page runs on a value being typed, before it is a row. */
 function findId(derived, id, exceptLitter) {
@@ -1843,7 +2269,7 @@ function findId(derived, id, exceptLitter) {
   return out;
 }
 
-export const select = { findId, room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect, bulkDraft: bulkDraftSelect, countDraft: countDraftSelect, explain: explainSelect, counts: countsSelect };
+export const select = { findId, room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect, bulkDraft: bulkDraftSelect, countDraft: countDraftSelect, explain: explainSelect, counts: countsSelect, record: recordSelect, edit: editSelect };
 export const PPLedger = { derive, append, balances, dayNumber, select };
 export default PPLedger;
 if (typeof window !== 'undefined') window.PPLedger = PPLedger;

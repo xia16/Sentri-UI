@@ -573,6 +573,8 @@
       delete resolveDrafts[S.drawer]; S.drawer = ''; render();
     }
     else if (a === 'record' || a === 'open-dose') { location.href = PP.href('litter.html', { state: 'litter', crate: S.face, stay: 1, data: store.name !== 'base' ? store.name : '' }); }
+    // Edit (ticket #12) corrects a Move by id: its crate or count, one stamped correction that re-routes both legs.
+    else if (a === 'edit-move') { var mvs = L(S.face).moves; location.href = PP.href('edit.html', { state: 'edit', crate: S.face, move: v || (mvs[mvs.length - 1] || {}).id, from: 'move', data: store.name }); }
     else document.documentElement.setAttribute('data-door', a + ':' + (v || ''));
   });
   PP.ready.then(function () {
