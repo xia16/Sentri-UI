@@ -65,7 +65,17 @@
     'nurse-arrived':     { view: 'face', face: 'D02', data: 'moved-orphan' },
     'owed-from-move':    { view: 'face', face: 'B08', data: 'moved-b06-b08' },
     'owed-arrived-done': { view: 'face', face: 'C05', data: 'moved-to-c05' },
-    'unknown-check':     { view: 'face', face: 'B02', drawer: 'MV-0929-05:iron3', had: 1, rest: 'record', data: 'moved-unknown' }
+    'unknown-check':     { view: 'face', face: 'B02', drawer: 'MV-0929-05:iron3', had: 1, rest: 'record', data: 'moved-unknown' },
+    // scenario round 1
+    'move-search':       { view: 'move', face: 'B06', query: 'A0' },                         // R1-5: other rows and other units by code
+    'move-search-self':  { view: 'move', face: 'B06', query: 'B06' },                        // R1-31: this crate says why
+    'move-scan':         { view: 'move', face: 'B06', scan: true },                          // R1-5: the crate card fills the search
+    'move-answered':     { view: 'move', face: 'B09', other: 'B02', rows: ['B09-r9', 'B09-r10'], answers: { iron3: 'unknown' } },   // R1-18: Move says what it records
+    'move-crowded':      { view: 'move', face: 'C05', other: 'B08', n: 8 },                  // R1-31: past a sane litter size
+    'move-orphan-receipt': { view: 'receipt', face: 'B01', other: 'D02', allRows: true },    // round 4: the nurse sow joins the task
+    'move-doubt':        { view: 'face', face: 'A07', data: 'move-doubt' },                  // R1-3: the source owes a range
+    'move-young':        { view: 'face', face: 'D03', data: 'move-young' },                  // R1-4: arrivals keep their own age
+    'move-emptied':      { view: 'face', face: 'C05', data: 'emptied' }                      // R1-19: a litter emptied by moves closes
   };
   var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'move';
@@ -228,7 +238,8 @@
   function groupText(g) {
     var when = g.status === 'later' ? PP.t(pl('pp.move.frag.when.later', g.inDays), { n: g.inDays }) : g.status === 'late' ? PP.t(pl('pp.move.frag.when.late', g.lateBy), { n: g.lateBy })
       : g.status === 'missed' ? PP.t('pp.move.frag.when.missed') : PP.t('pp.move.frag.when.due');
-    var tags = g.rows && g.rows.length ? ' · ' + g.rows.map(function (id) { var r = rowOf(id); return r ? rowLabel(r) : id; }).join(' ') : '';
+    var tags = g.rows && g.rows.length ? ' · ' + g.rows.slice(0, 3).map(function (id) { var r = rowOf(id); return r ? rowLabel(r) : id; }).join(' ') + (g.rows.length > 3 ? ' +' + (g.rows.length - 3) : '') : '';
+    if (g.kind === 'own') return PP.t('pp.move.frag.own', { k: g.n, day: g.dayAge, when: when });
     return PP.t('pp.move.frag.group', { k: g.n, code: g.from, day: g.dayAge, when: when }) + tags;
   }
   // One row per Move, newest first; each is the Edit door for that record (S8 owns Edit's screens).
@@ -249,8 +260,8 @@
     CFG.doses.forEach(function (d) {
       var D = x.doses[d.id];
       var arrivals = (D.groups || []).filter(function (g) { return g.kind === 'arrival'; });
-      // a dose not yet due here still shows when arrivals owe it on their own day (R1-4)
-      if (D.status == null || (D.status === 'later' && !arrivals.length)) return;
+      // a dose not yet due for anyone here is left for later; one due for this litter shows when arrivals owe it on their own day (R1-4)
+      if (D.status == null || (D.status === 'later' && (!arrivals.length || x.dayAge < d.due))) return;
       var arrOwed = (D.owedFrom.filter(function (f) { return f.kind === 'arrival'; })[0] || {}).n || 0;
       var owedSrc = ins.filter(function (m) { return m.packets[d.id] === 'owed'; });
       var groups = D.unknownGroups.filter(function (g) { return g.kind === 'move'; });
@@ -260,7 +271,7 @@
       else if (D.owed) {
         // The ledger's owed, and which arrivals owe it: their crate, their own age, their tags (R1-4, R1-18)
         parts.push(PP.t('pp.move.frag.owed', { n: D.owed }));
-        if (arrivals.length) arrivals.forEach(function (g) { parts.push(groupText(g)); });
+        if (arrivals.length) D.groups.forEach(function (g) { parts.push(groupText(g)); });
         else owedSrc.forEach(function (m) { parts.push(PP.t('pp.move.frag.from', { k: m.n, code: m.other })); });
       }
       if (D.carriedFromMove) parts.push(PP.t('pp.move.frag.arrived_done', { k: D.carriedFromMove }));
