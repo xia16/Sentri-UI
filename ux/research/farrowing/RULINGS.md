@@ -528,3 +528,10 @@ investigation and not yet ruled.
   deaths allocate one missing piglet, the second allocation is held as a sync-review conflict (Dead
   1, Alive 9) until a worker confirms one body or two — never silently a second death. (Replaces the
   driver's "excess becomes a plain death".)
+
+### Round 4 (owner, 2026-09-29, after scenario round 1)
+
+- **A counted gain owes nothing new.** A count that finds more piglets than Alive changes Alive only; the litter's recorded treatments stand and the gain line reads "check on the pig". When the gain is later explained as a Move, the Move's rules apply to those piglets.
+- **Possible double treatment has two answers.** "Same injection, recorded twice" withdraws one record (kept, stamped). "Given twice" keeps both and records a double dose for the vet; it counts once toward done.
+- **A nurse sow outside every task joins the task when task piglets are moved onto her.** Her litter is added to the task; the arrivals keep their own schedule and can be treated there. Her own earlier facts stay on her earlier litter. (Supersedes round 2 Q18 for this case only; a litter with no task piglets still records deaths, counts and moves only.)
+- **End is allowed with review items open.** The End review lists them; ending freezes them as "unresolved at End" on the receipt and handoff; they stay answerable afterwards as corrections.

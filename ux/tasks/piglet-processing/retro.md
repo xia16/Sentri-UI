@@ -392,3 +392,15 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   ships; (b) a provisional that contradicts an owner ruling is never a
   design default: the design follows the ruling and the exception is asked.
 - **Cost:** medium (one cross-cutting rework pass).
+## 26. Panel verdict never written to a file (Slices · DS candidates-2 refute)
+What happened: the design panel's consolidated verdict lived only in the driver's message to the author; panel-c2.md held the panel's instructions. The other-family refute was asked to check the revision against "the verdict" and could not ("exact closure against that verdict could not be verified").
+Why: the skill says to consolidate panel findings but not where; the driver consolidated in chat.
+Change: a panel's consolidated verdict (accepted, declined with reason) is written to `research/panels/<candidate>.md` before the author sees it; the refute gets that file.
+## 27. Walk-through agents cannot write their report file (Scenario rounds)
+What happened: the brief told walk agents to write `<scratch>/report.md`; the harness refused subagent report-file writes, so every report came back only in the message and the driver re-typed condensed copies.
+Why: brief assumed subagents may write outside the repo freely.
+Change: walk briefs ask for the report as the final message (structured), and the driver writes scenarios.md from it.
+## 28. A page nobody could tap passed every slice gate (Slices · S4 identity)
+What happened: id.html's page sheet sat inside `.page-background` (pointer-events:none in bundle.css) — no button on the page took a tap. Lint (geometry/tokens/strings), lenses (screenshots) and state URLs all passed; only the first real-browser walk-through found it.
+Why: no gate clicked anything on that page — lint renders, lenses look, click-throughs covered other pages.
+Change: the lint (or the done gate) hit-tests every `button`/`[data-action]` in each state (elementFromPoint at its centre must be itself or a descendant); a slice isn't done without one scripted click-through on each page.
