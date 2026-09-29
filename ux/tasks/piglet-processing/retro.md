@@ -340,3 +340,17 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
   event sequence that yields a false fact" with the code attached, and stop
   after a round with no blocker by writing the rest as known limits.
 - **Cost:** medium, high value.
+
+## 23 · Slices — the shared ledger became a merge hotspot, and agents share one scratchpad
+
+- **Stage:** Slices, S3 / S6 / ledger follow-ups in parallel.
+- **What happened:** "no private arithmetic" sent every new slice to add its
+  own selector to `ledger.js` (`countDraft`, `explain`, `counts`,
+  `bulkDraft`) while the ledger's owner was changing it on another branch —
+  three branches edit one file and one `select` export line. Separately,
+  parallel agents wrote probe scripts into the one session scratchpad and
+  overwrote each other's.
+- **Change:** selectors live one per file (`select/<name>.js`) registered by a
+  loader, so slices add files instead of editing a shared one; the driver
+  gives each agent its own scratch subfolder.
+- **Cost:** low (merge work for the driver).
