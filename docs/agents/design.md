@@ -28,7 +28,17 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "inspection", "url": "ux/system/inspection-astra-concept.html", "locales": ["en"],
       "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] },
     { "name": "pp-index", "url": "ux/tasks/piglet-processing/index.html", "strict": true },
-    { "name": "ds-field-cards", "url": "ux/design-system/components/field-cards-demo.html", "strict": true }
+    { "name": "ds-field-cards", "url": "ux/design-system/components/field-cards-demo.html", "strict": true },
+    { "name": "pp-move-move", "url": "ux/tasks/piglet-processing/move.html?state=move", "strict": true },
+    { "name": "pp-move-move-review", "url": "ux/tasks/piglet-processing/move.html?state=move-review", "strict": true },
+    { "name": "pp-move-move-ask", "url": "ux/tasks/piglet-processing/move.html?state=move-ask", "strict": true },
+    { "name": "pp-move-move-tagged", "url": "ux/tasks/piglet-processing/move.html?state=move-tagged", "strict": true },
+    { "name": "pp-move-move-orphan", "url": "ux/tasks/piglet-processing/move.html?state=move-orphan", "strict": true },
+    { "name": "pp-move-move-prelock", "url": "ux/tasks/piglet-processing/move.html?state=move-prelock", "strict": true },
+    { "name": "pp-move-move-receipt", "url": "ux/tasks/piglet-processing/move.html?state=move-receipt", "strict": true },
+    { "name": "pp-move-owed-from-move", "url": "ux/tasks/piglet-processing/move.html?state=owed-from-move", "strict": true },
+    { "name": "pp-move-unknown-check", "url": "ux/tasks/piglet-processing/move.html?state=unknown-check", "strict": true },
+    { "name": "pp-move-move-prelock-other", "url": "ux/tasks/piglet-processing/move.html?state=move-prelock&data=other", "strict": true }
   ]
 }
 ```

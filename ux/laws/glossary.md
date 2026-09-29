@@ -43,6 +43,21 @@ Defined by farrowing and used here unchanged (RULINGS *Model*; the Finish sheet)
 | **Healthy** | piglets | alive − weak − deformed; derived, no form row, printed on the record | as Weak / Deformed | one litter |
 | **Weaned** 断奶 | piglets | piglets that left the litter at weaning; the last term of the ledger | stamped at weaning | one litter |
 
+### Move (slice #11, `move.html`)
+
+Counts the Move sheet, its receipt and the receiving litter print. A Move is one record that changes both litters (`12 → 10 · 9 → 11`); it opens only on a litter whose farrowing is locked or ended by the sow's death.
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Moved** 转移头数 (`Move 2 · B06 → B04`) | piglets | the piglets one Move takes from the source litter and adds to the receiving litter; untagged: a count; tagged: the ear tags picked | stamped at Save; one record | one Move, two litters |
+| **Before → after** (`12 → 10`) | piglets | a litter's Alive just before and just after this Move, printed for both litters before Save and on the receipt | the moment of Save | one litter each side of one Move |
+| **Arrived** 转入 (`1 arrived`) | piglets | piglets a Move added to this litter, while any treatment they brought is still owed, unknown or to check | from the Move until those items resolve | receiving litter, per Move (`from crate B09`) |
+| **Owed (from a move)** 待处理（转入） | piglets | arrived piglets whose source had done none of a dose; they owe it here even when this litter is done for it (the litter goes back to due for them) | from the Move until recorded, skipped with a reason, or task end | receiving litter, per scheduled dose |
+| **Arrive done** 已做，随猪带入 | piglets | moved piglets whose source had done a dose for every piglet; the evidence (who, when, source crate) travels with them and they do not owe it here | carried with its original stamp | receiving litter, per scheduled dose |
+| **Check on the pig** 看猪确认 | piglets | arrived piglets from a part-done source for a visible dose (teeth, tail, castration, identity): no question is asked at the Move; the hand looks when recording | from the Move until recorded or marked already had | receiving litter, per visible dose |
+| **Unknown — check spray mark** 情况不明 — 查看喷漆标记 | piglets | as *Treatment unknown after move* above: the invisible dose answered `Don't know` at the Move (iron, coccidiosis, health shot) | from the Move until `Already had` or the dose is recorded | receiving litter, per invisible dose |
+| **Sow with no piglets** 无仔猪的母猪 | sows | locked sows in the room whose litter is at 0 alive (nurse-sow candidates); listed apart from the age-sorted litters | now | one room |
+
 ## Count grammar
 
 The count leads the word and the unit is written: `{n} piglets`, singular `{n} piglet` (`pp.common.unit.piglet.one` / `.many`, `PP.tn`); zh has one form and no space between numeral and classifier (`14头`, `3日龄`). Ruled anchors that stay as they are: `born {n}` and `day {n}` (en), `Saved · +{n} this visit` and `Saved · {n} died this visit` (farrowing's, under `fr.*`; a processing receipt names its outcome and is registered by the slice that writes it), and label-then-count headers such as `Dead 6` and `Unexplained loss {n}`.
