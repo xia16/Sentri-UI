@@ -164,3 +164,22 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
 - **Change:** at chart time, cross the slices with the doctor's growth gaps;
   any card two or more frontier slices need becomes its own first ticket.
 - **Cost:** low (caught before dispatch).
+
+## 12 · Slices — S0's copy lens did not converge: the glossary defined states no slice had designed
+
+- **Stage:** Slices, S0 review rounds 1–3.
+- **What happened:** three fresh Copy-lens rounds each found real, different
+  defects — nearly all in glossary terms for states that belong to later
+  slices (owed vs missed, unfinished at End, identified vs alive). Each fix
+  exposed the next edge. One (an early End freezes not-yet-due doses) was a
+  product gap the grilling missed and went to the provisional ledger.
+- **Why:** S0 was asked to define every count up front, before any slice had
+  drawn the state that shows it; a lens attacking definitions with no screen
+  behind them has unlimited surface.
+- **Change:** S0 defines verbs, shared strings and only the counts already
+  ruled; each slice adds the glossary terms for the states it draws, and its
+  Copy lens attacks them with the screen beside them. Also: an exit rule per
+  lens loop ("stop when a round finds nothing that changes a record or a
+  ruling") should be in lenses.md, not improvised.
+- **Cost:** medium (three lens rounds; one real product gap found, which is
+  the loop working).
