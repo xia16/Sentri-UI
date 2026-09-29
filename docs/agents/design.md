@@ -27,7 +27,8 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
       "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] },
     { "name": "inspection", "url": "ux/system/inspection-astra-concept.html", "locales": ["en"],
       "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] },
-    { "name": "pp-index", "url": "ux/tasks/piglet-processing/index.html", "strict": true }
+    { "name": "pp-index", "url": "ux/tasks/piglet-processing/index.html", "strict": true },
+    { "name": "ds-field-cards", "url": "ux/design-system/components/field-cards-demo.html", "strict": true }
   ]
 }
 ```
