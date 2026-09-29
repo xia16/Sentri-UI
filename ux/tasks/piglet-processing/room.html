@@ -10,7 +10,8 @@
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* Room list: layout only, from tokens.css. Candidate:LitterRow, Candidate:LeadFigure and Candidate:DriftStrip are described in the report. */
+/* Room list: layout only, from tokens.css. The litter rows are the shell's (shell-ui.js); the drift, review and ended doors
+   are Row (ADR 0002: DriftStrip became a row with toned tokens). Candidate:LeadFigure and Candidate:ScanFrame stay task-level. */
 #screen { display: flex; flex-direction: column; gap: var(--space-section); }
 .pp-head { display: flex; align-items: flex-start; gap: var(--space-footer-gap); }
 .pp-head > .pp-title { flex: 1; min-width: 0; }
@@ -20,6 +21,8 @@
 .pp-controls .segment { flex: 1; min-width: 0; }
 .pp-block > .st-heading { margin-bottom: 8px; }
 .pp-filtered { margin-top: 20px; }
+.pp-controls + .pp-filtered { margin-top: 20px; }
+.pp-filtered:first-child { margin-top: 0; }
 .pp-bulkdoor { padding-top: var(--space-heading); }
 .pp-list { display: flex; flex-direction: column; gap: var(--space-footer-gap); }
 .pp-dock { position: sticky; bottom: 0; margin: 0 calc(-1 * var(--space-gutter)) -20px; }
@@ -30,6 +33,7 @@
 .pp-layer .scrim { inset: 0; }
 .pp-layer .sheet { max-height: 85%; }
 .pp-layer .sheet-body { padding-bottom: var(--space-panel); }
+.pp-layer .sheet-body > * + * { margin-top: var(--space-heading); }
 .pp-layer .utility-header { display: flex; align-items: center; gap: var(--space-footer-gap); padding: var(--space-gutter) var(--space-gutter) 8px; }
 .pp-layer .utility-header .st-heading { margin: 0; flex: 1; }
 .pp-layer .sheet-footer { justify-content: flex-end; }
@@ -39,25 +43,15 @@
 .pp-findbar .field { flex: 1; min-width: 0; margin: 0; }
 .pp-findbar + #scan-results { margin-top: var(--space-footer-gap); }
 .pp-results > * + * { margin-top: var(--space-footer-gap); }
+.pp-outside { margin-top: var(--space-section); }
+.pp-outside > .st-heading { margin-bottom: 8px; }
 
 /* Candidate:LeadFigure: the number of litters that owe today, in the figure style of farrowing's task header. */
 .pp-lead { display: flex; align-items: baseline; gap: var(--space-footer-gap); }
 .pp-lead .pp-fig { font-family: var(--font-mono); font-size: var(--type-figure-lg-size); font-weight: 500; color: var(--ink); }
 .pp-lead .pp-leadlab { font-size: var(--type-row-title-size); color: var(--muted); }
-
-/* Candidate:DriftStrip: open unexplained gain and loss on one compact read-only strip; each crate code is grouped with its figure. */
-.pp-strip { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: var(--space-panel); row-gap: 4px; padding: var(--space-row-y) var(--space-footer-gap); border-radius: var(--radius-inset); background: var(--well); font-size: var(--type-panel-title-size); color: var(--ink); }
-.pp-strip .pp-grp { display: inline-flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
-.pp-strip .pp-codes { font-family: var(--font-mono); font-size: var(--type-identifier-size); color: var(--muted); }
-/* The strip is the door to the room's open lines (count.html?state=explain): a bare button, 44px, focus ring. */
-button.pp-strip { width: 100%; min-height: var(--touch-min); margin: 0; border: 0; font-family: inherit; text-align: left; cursor: pointer; }
-button.pp-strip:active { background: var(--choice-press); }
-button.pp-strip > svg { align-self: center; margin-left: auto; width: var(--glyph-key); height: var(--glyph-key); flex: none; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .pp-wide { width: 100%; }
 .pp-last { margin-top: 4px; }
-
-/* Candidate:LitterRow lives in shell.css (shared with End). */
 </style>
 </head>
 <body>
@@ -71,11 +65,14 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
 (function () {
   var UI = window.SentriUI, I = window.SentriIcons.icon, U = window.PPUI;
 
-  /* ---- states: a fixture variant (the shared log, fixtures.js) + UI state. Every figure comes from the ledger's select.room. ---- */
+  /* ---- states: a fixture variant (the shared log, fixtures.js) + UI state. Every figure comes from the ledger's selectors
+     (select.room with identity, select.reviews, select.end). ---- */
   var STATES = {
     'room': { data: 'base' }, 'room-empty': { data: 'quiet', room: 8 }, 'room-all-done': { data: 'all-done' },
     'room-overdue': { data: 'behind' }, 'room-drift': { data: 'drift' },
     'room-filter': { data: 'base', sheet: 'filter', filter: ['iron'] },
+    'room-filtered': { data: 'base', filter: ['iron'] },
+    'room-filter-done': { data: 'a02-by-other', filter: ['iron'], lens: 'done' },
     'room-bulk-ticked': { data: 'base', filter: ['iron'], ticks: { dose: 'iron3', sel: ['A02', 'A04', 'A07', 'B01', 'B06', 'B10', 'C05'] } },
     'room-bulk-ended': { data: 'ended-moves', filter: ['iron'] },
     'room-scan': { data: 'base', sheet: 'scan' },
@@ -83,33 +80,67 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
     'room-scan-hit': { data: 'base', sheet: 'find', q: '000354', scanned: true },
     'room-find-many': { data: 'base', sheet: 'find', q: '4-2' },
     'room-scan-none': { data: 'base', sheet: 'find', q: '000999' },
+    'room-find-sow': { data: 'base', sheet: 'find', q: '000231' },
+    'room-find-crate': { data: 'base', sheet: 'find', q: 'F02' },
+    'room-find-garbage': { data: 'base', sheet: 'find', q: 'hello' },
     'room-error': { data: 'base', error: true },
     'room-finished': { data: 'late' }, 'room-none': { data: 'base', room: 9 },
-    'room-scan-unavailable': { data: 'base', sheet: 'scan', unavailable: true }
+    'room-scan-unavailable': { data: 'base', sheet: 'scan', unavailable: true },
+    // scenario round 1
+    'room-done-late': { data: 'all-done', lens: 'done' },
+    'room-deferred': { data: 'a02-short' },
+    'room-missed': { data: 'base', missed: true },
+    'room-all': { data: 'base', lens: 'all' },
+    'room-emptied': { data: 'emptied', lens: 'all' },
+    'room-ended': { data: 'ended' },
+    'room-ended-other': { data: 'ended-by-other', lens: 'all' },
+    'room-reviews': { data: 'held-body', sheet: 'reviews' },
+    'room-review-count': { data: 'count-offline' },
+    'room-ended-reviews': { data: 'ended', sheet: 'reviews' },
+    'room-units': { data: 'base', sheet: 'units' }
   };
   var start = STATES[PP.state] || STATES.room;
   var qs = PP.q;
   var S = {
-    lens: qs.get('lens') || start.lens || 'owed',
-    filter: qs.get('filter') ? qs.get('filter').split(',') : (start.filter || []).slice(),
-    missed: qs.get('missed') === '1',
+    lens: qs.get('lens') || start.lens || '',
+    filter: qs.has('filter') ? qs.get('filter').split(',').filter(Boolean) : (start.filter || []).slice(),
+    missed: qs.has('missed') ? qs.get('missed') === '1' : !!start.missed,
     sheet: start.sheet || '', q: qs.get('q') || start.q || '', opened: 0, flash: '', error: !!start.error, unavailable: !!start.unavailable, scanned: !!start.scanned, cameFrom: ''
   };
   var ROOM = +(qs.get('unit') || start.room || 7);
-  var store, NOW, CFG;
+  var store, CFG;
   var held = {}, holdTimer = 0;
 
-  /* ---- the ledger's room ---- */
-  function sel(lens, filter) { return store.select.room(store.derived, { room: ROOM, lens: lens || S.lens, filter: filter || S.filter, missedOnly: S.missed }); }
-  function lensOf(lens, filter) {
-    var xs = sel(lens, filter).rows.slice();
-    // Hold, then depart: a row a record or a sync moved out of this lens stays put until the hand is idle.
-    Object.keys(held).forEach(function (c) { if (held[c].lens === lens && !xs.some(function (x) { return x.litter === c; })) xs.push(held[c].f); });
-    return xs;
+  /* ---- the ledger, read once per derived log ---- */
+  var memo = { d: null };
+  function R() {
+    if (memo.d !== store.derived) {
+      memo.d = store.derived;
+      // identity is owed on its day (R1-17): the ledger counts it in the lens, kind and lateness
+      memo.room = store.select.room(store.derived, { room: ROOM, lens: 'all', identity: true });
+      memo.rev = store.select.reviews(store.derived, { room: ROOM });
+      memo.end = endOf(memo.room);
+    }
+    return memo;
   }
+  function facts() { return R().room.rows; }
+  // The task this room's litters are in, and its End (frozen figures) when it has ended (R1-13).
+  function endOf(room) {
+    var tasks = store.derived.tasks || [], ids = {};
+    room.rows.forEach(function (f) { var L = store.derived.litters[f.litter]; if (L && L.task) ids[L.task] = 1; });
+    var T = tasks.filter(function (t) { return ids[t.id] && t.ended; })[0];
+    if (!T) return null;
+    var e = store.select.end(store.derived, { task: T.id });
+    return e.ended && e.atEnd ? { at: e.ended.at, who: e.ended.who, atEnd: e.atEnd } : null;
+  }
+  function ended() { return R().end; }
+  function now() { return store.now(); }            // the phone's clock: advances with every record in the log (R1-15)
+
   function doseCfg(id) { return CFG.doses.filter(function (d) { return d.id === id; })[0]; }
-  function txOf(id) { return (doseCfg(id) || { tx: id }).tx; }
-  function name(tx) { return PP.t('pp.common.tx.' + tx); }
+  function txOf(id) { return id === 'identity' ? 'identity' : (doseCfg(id) || { tx: id }).tx; }
+  function scheme() { var s = CFG.identity || {}; return s.who === 'candidates' ? 'candidates' : s.scheme === 'notch' ? 'notch' : 'tag'; }
+  function txId(tx) { return tx === 'identity' ? 'pp.room.id.' + scheme() : 'pp.common.tx.' + tx; }
+  function name(tx) { return PP.t(txId(tx)); }
   function doseList(ds) {
     var count = {}; ds.forEach(function (o) { count[o.tx] = (count[o.tx] || 0) + 1; });
     return ds.map(function (o) { return count[o.tx] > 1 ? PP.t('pp.room.dose.withday', { name: name(o.tx), n: o.due }) : name(o.tx); }).join(' · ');
@@ -119,25 +150,110 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
   function pig(n) { return T(PP.one('pp.common.unit.piglet', n), { n: n }); }
   function male(n) { return T(PP.one('pp.room.tok.males', n), { n: n }); }
   var castr = function (o) { return !!(doseCfg(o.dose) || {}).castration; };
+  function dose(f, id) { var L = store.derived.litters[f.litter]; return L && L.doses[id] || {}; }
+
+  /* ---- what a litter owes, did today, has next and missed — by treatment word (iron d3 and d14 are one word) ---- */
+  function idLive(f) { return !!f.lens && (f.identity.status === 'due' || f.identity.status === 'late'); }
+  // The owed items: the ledger's doses, each with its deferral (weak, sick: stays due, never late — R1-16), plus the
+  // identity step on its day (R1-17).
+  function owedItems(f) {
+    var xs = f.doses.map(function (x) {
+      var D = dose(f, x.dose), def = D.deferred || 0;
+      return Object.assign({}, x, { deferred: def, reason: D.deferReason, deferredAll: def > 0 && x.n != null && def >= x.n });
+    });
+    if (idLive(f)) xs.push({ tx: 'identity', dose: 'identity', n: f.identity.owed, of: f.alive, lateBy: f.identity.lateBy, deferred: 0 });
+    return xs;
+  }
+  function lateOf(f) { return Math.max.apply(null, [0].concat(owedItems(f).filter(function (x) { return !x.deferredAll; }).map(function (x) { return x.lateBy || 0; }))); }
+  function owedTx(f) { return owedItems(f).map(function (x) { return x.tx; }); }
+  function doneTx(f) { return f.doneToday.map(txOf); }
+  function laterTx(f) { return (f.next ? f.next.doses.map(txOf) : []).concat(f.identity.status === 'later' ? ['identity'] : []); }
+  function missedTx(f) { return f.missed.map(function (o) { return o.tx; }); }
+
+  /* ---- lenses. Owed · Done · Later · All; missed is its own group (Q15: not overdue, never Later, never owed); an emptied
+     litter owes nothing (R1-19). Under a filter a litter sits in the lens of the filtered treatments. After End: Not done ·
+     Finished · All, from End's frozen figures. ---- */
+  function lensKeys() { return ended() ? ['notdone', 'finished', 'all'] : ['owed', 'done', 'later', 'all']; }
+  function naturalLens(f) {
+    if (!f.lens) return null;                          // not in the task
+    if (ended()) { var E = ended().atEnd; return E.unfinishedLitters.indexOf(f.litter) >= 0 ? 'notdone' : E.finishedLitters.indexOf(f.litter) >= 0 ? 'finished' : null; }
+    if (f.closed) return 'closed';
+    if (f.kind === 'missed') return 'missed';
+    return f.lens;
+  }
+  function filterLens(f, filter) {
+    if (!f.lens || f.closed || ended()) return null;
+    var hit = function (l) { return l.some(function (t) { return filter.indexOf(t) >= 0; }); };
+    if (hit(owedTx(f))) return 'owed';
+    if (hit(doneTx(f))) return 'done';
+    if (hit(laterTx(f))) return 'later';
+    if (hit(missedTx(f))) return 'missed';
+    return null;
+  }
+  function filtering() { return S.filter.length > 0 && !ended(); }
+  function lensOfF(f, filter) { filter = filter || (filtering() ? S.filter : []); return filter.length ? filterLens(f, filter) : naturalLens(f); }
+  function inView(f, lens, filter) {
+    filter = filter || (filtering() ? S.filter : []);
+    if (S.missed && !ended()) return !!f.lens && !f.closed && f.missed.length > 0 && (!filter.length || filterLens(f, filter) != null);
+    var l = lensOfF(f, filter);
+    if (lens === 'all') return filter.length ? !!l : true;
+    return l === lens;
+  }
+  var byCode = function (a, b) { return a.litter < b.litter ? -1 : a.litter > b.litter ? 1 : 0; };
+  function sorter(lens) {
+    if (lens === 'owed') {
+      var rank = function (f) { return lateOf(f) ? 0 : f.partly ? 2 : 1; };
+      return function (a, b) { return rank(a) - rank(b) || (rank(a) === 0 ? lateOf(b) - lateOf(a) : 0) || byCode(a, b); };
+    }
+    if (lens === 'later') return function (a, b) { return (a.next ? a.next.inDays : 999) - (b.next ? b.next.inDays : 999) || byCode(a, b); };
+    return byCode;
+  }
+  function viewRows(lens, filter) { return facts().filter(function (f) { return inView(f, lens, filter); }).sort(sorter(S.missed ? 'all' : lens)); }
+  function lensOf(lens) {
+    var xs = viewRows(lens);
+    // Hold, then depart: a row a record or a sync moved out of this lens stays put until the hand is idle.
+    Object.keys(held).forEach(function (c) { if (held[c].lens === lens && !xs.some(function (x) { return x.litter === c; })) xs.push(held[c].f); });
+    return xs;
+  }
+  // the litters that owe today (under the filter, the filtered treatments): the headline, whatever the view below shows
+  function owedCount() {
+    var n = facts().filter(function (f) { return lensOfF(f) === 'owed'; }).length;
+    return n + Object.keys(held).filter(function (c) { return held[c].lens === 'owed' && !facts().some(function (f) { return f.litter === c && lensOfF(f) === 'owed'; }); }).length;
+  }
+  function curLens() { var ks = lensKeys(); return ks.indexOf(S.lens) >= 0 ? S.lens : ks[0]; }
+
+  /* ---- review items (N4, R1-22): possible doubles, disputed counts, held bodies, concurrent corrections ---- */
+  function reviews() { return R().rev.items; }
+  function reviewsOf(code) { return reviews().filter(function (x) { return x.litter === code; }); }
 
   /* ---- the litter row (row law: line 1 the fact, line 2 mono time -> counts -> codes, open loss/gain appended; one named chip) ---- */
-  function counts(lv) {
+  // one word for all when every owed item owes the same (`12 piglets`); per treatment when some are deferred
+  function whole(xs, all) { return xs.length === (all || xs).length; }
+  function counts(lv, all) {
     var xs = lv.filter(function (o) { return o.n != null && o.n > 0; });
     var unk = lv.filter(function (o) { return o.unknown > 0; }).map(function (o) { return T('pp.room.tok.unknown', { name: name(o.tx), n: o.unknown }, 'amber'); });
     // castration before its first record: the ledger says males are uncounted
     unk = lv.filter(function (o) { return o.males === 'uncounted'; }).map(function () { return T('pp.common.males_uncounted'); }).concat(unk);
     if (!xs.length) return unk;
     var same = xs.every(function (o) { return o.n === xs[0].n && castr(o) === castr(xs[0]); });
-    if (same && xs.length === lv.length) return [castr(xs[0]) ? male(xs[0].n) : pig(xs[0].n)].concat(unk);
+    if (same && whole(xs, all || lv)) return [castr(xs[0]) ? male(xs[0].n) : pig(xs[0].n)].concat(unk);
     return xs.map(function (o) { return castr(o) ? T('pp.room.tok.dosemales', { name: name(o.tx), n: o.n }) : T('pp.room.tok.dosecount', { name: name(o.tx), n: o.n }); }).concat(unk);
   }
-  function remainders(lv) {
+  function remainders(lv, all) {
     var xs = lv.filter(function (o) { return o.n != null && o.of != null; });
     if (!xs.length) return [];
     var same = xs.every(function (o) { return o.n === xs[0].n && o.of === xs[0].of && castr(o) === castr(xs[0]); });
     function still(o) { return castr(o) ? T('pp.room.tok.still.males', { n: o.n, total: o.of }) : T('pp.room.tok.still.piglets', { n: o.n, total: o.of }); }
-    if (same && xs.length === lv.length) return [still(xs[0])];
+    if (same && whole(xs, all || lv)) return [still(xs[0])];
+    // `Nasal drops · 9 still owed`, never `9 of 9 piglets` (reads done, R1-16)
     return xs.map(function (o) { return castr(o) ? T('pp.room.tok.stilldose.males', { name: name(o.tx), n: o.n, total: o.of }) : T('pp.room.tok.stilldose.piglets', { name: name(o.tx), n: o.n, total: o.of }); });
+  }
+  // Deferred piglets (weak, sick) stay due and show next visit: their own words, never the red of late (R1-16).
+  function deferToks(xs, alone) {
+    return xs.filter(function (x) { return x.deferred > 0; }).map(function (x) {
+      var why = PP.t('pp.litter.why.' + (x.reason || 'deferred'));
+      return alone ? T('pp.room.tok.deferred', { n: x.deferred, reason: why }) : T('pp.room.tok.deferdose', { name: name(x.tx), n: x.deferred, reason: why });
+    });
   }
   function lapseToks(lp) {
     if (!lp.length) return [];
@@ -145,114 +261,190 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
     lp.forEach(function (o) { if (!seen[o.last]) { seen[o.last] = 1; out.push(T('pp.room.tok.window', { n: o.last }, 'amber')); } });
     return out;
   }
+  function windowToks(lp) { var seen = {}; return lp.filter(function (o) { if (seen[o.last]) return false; seen[o.last] = 1; return true; }).map(function (o) { return T('pp.room.tok.window', { n: o.last }, 'amber'); }); }
   function dueTok(late) { return late === 0 ? T('pp.room.tok.due_today') : late === 1 ? T('pp.room.tok.due_yest', {}, 'red') : T('pp.room.tok.due_ago', { n: late }, 'red'); }
-  function recToks(f) { return [T('pp.room.tok.recorded', { when: U.ago(f.lastRecord.at, NOW) }), pig(f.alive), T('pp.room.who', { who: f.lastRecord.who })]; }
-  function spec(f, forceNext) {
+  // A litter done late keeps its late marker once done (R1-16): the latest a dose recorded today became full, past its day.
+  function doneLate(f, only) {
+    var late = 0;
+    f.doneToday.forEach(function (id) {
+      if (only && only.indexOf(txOf(id)) < 0) return;
+      var D = dose(f, id);
+      if (D.fullAt != null && D.due != null && D.fullAt > D.due) late = Math.max(late, D.fullAt - D.due);
+    });
+    return late ? [T(PP.one('pp.room.tok.done_late', late), { n: late }, 'amber')] : [];
+  }
+  function recToks(f, only) {
+    return [T('pp.room.tok.recorded', { when: U.ago(f.lastRecord.at, now()) })].concat(doneLate(f, only), [pig(f.alive), T('pp.room.who', { who: f.lastRecord.who })]);
+  }
+  function dayToks(f) { return [T('pp.common.unit.day', { n: f.day }), pig(f.alive)]; }
+  function nextL1(nx) { return nx.inDays === 1 ? T('pp.room.l1.tomorrow', { doses: names(nx.doses) }) : T('pp.room.l1.next', { doses: names(nx.doses), n: nx.inDays }); }
+  function owesSpec(f, s) {
+    var items = owedItems(f), live = items.filter(function (x) { return !x.deferredAll; }), def = items.filter(function (x) { return x.deferredAll; });
+    var late = lateOf(f), alone = items.length === 1;
+    s.l1 = T('pp.room.l1.owes', { doses: doseList(items) });
+    if (f.partly && f.lastRecord) s.tok = [T('pp.room.tok.recorded', { when: U.ago(f.lastRecord.at, now()) })].concat(live.length ? [dueTok(late)] : [], remainders(live, items), deferToks(items, alone), [T('pp.room.who', { who: f.lastRecord.who })]);
+    else s.tok = (live.length ? [dueTok(late)] : []).concat(counts(live, items), deferToks(items, alone));
+    s.tok = s.tok.concat(lapseToks(f.missed));
+  }
+  // After End (R1-13): what End froze for the litter — not done, never owed; no new marks.
+  function endedSpec(f, s) {
+    var E = ended().atEnd, list = E.byLitter[f.litter] || [];
+    if (E.unfinishedLitters.indexOf(f.litter) < 0) { s.l1 = T('pp.room.l1.finished'); s.tok = dayToks(f); return; }
+    s.l1 = list.length ? list.map(function (x) { return x.n == null ? T('pp.room.end.males', { name: name(txOf(x.dose)) }) : T('pp.room.end.notdone', { name: name(txOf(x.dose)), n: x.n }); })
+      : T('pp.room.end.identity', { name: name('identity') });
+    if (!Array.isArray(s.l1[0])) s.l1 = [s.l1];
+    var kinds = {}; list.forEach(function (x) { kinds[x.kind] = 1; });
+    s.tok = dayToks(f).concat(kinds.owed ? [T('pp.room.end.owed', {}, 'amber')] : [], kinds.not_due ? [T('pp.room.end.not_due')] : [],
+      kinds.missed ? windowToks(list.filter(function (x) { return x.kind === 'missed'; }).map(function (x) { return { last: (doseCfg(x.dose) || {}).last }; })) : []);
+  }
+  function spec(f, mode) {
     var s = { l1: null, tok: [] };
-    if (forceNext) {
-      var nx0 = f.next; s.l1 = nx0.inDays === 1 ? T('pp.room.l1.tomorrow', { doses: names(nx0.doses) }) : T('pp.room.l1.next', { doses: names(nx0.doses), n: nx0.inDays });
-      s.tok = [T('pp.common.unit.day', { n: f.day }), pig(f.alive)];
-      return s;
-    }
-    if (f.kind === 'none') { s.l1 = T('pp.room.l1.none'); s.tok = [T('pp.common.unit.day', { n: f.day }), pig(f.alive)]; }
-    else if (f.kind === 'owes') {
-      s.l1 = T('pp.room.l1.owes', { doses: doseList(f.doses) });
-      if (f.partly) s.tok = [T('pp.room.tok.recorded', { when: U.ago(f.lastRecord.at, NOW) })].concat(f.lateBy ? [dueTok(f.lateBy)] : [], remainders(f.doses), [T('pp.room.who', { who: f.lastRecord.who })]);
-      else s.tok = [dueTok(f.lateBy)].concat(counts(f.doses));
-      s.tok = s.tok.concat(lapseToks(f.missed));
-    } else if (f.kind === 'done') {
-      s.l1 = T('pp.room.l1.done'); s.tok = recToks(f);
-    } else if (f.kind === 'missed') {
-      s.l1 = T('pp.room.l1.owes', { doses: f.missed.map(function (o) { return name(o.tx); }).join(' · ') });
-      s.tok = [T('pp.common.unit.day', { n: f.day }), pig(f.missed[0].n)].concat(lapseToks(f.missed));
-    } else if (f.kind === 'next') {
-      var nx = f.next; s.l1 = nx.inDays === 1 ? T('pp.room.l1.tomorrow', { doses: names(nx.doses) }) : T('pp.room.l1.next', { doses: names(nx.doses), n: nx.inDays });
-      s.tok = f.lastRecord ? recToks(f) : [T('pp.common.unit.day', { n: f.day }), pig(f.alive)];
-    } else {
+    if (!f.lens) { s.l1 = T('pp.room.l1.none'); s.tok = dayToks(f); }
+    else if (ended()) endedSpec(f, s);
+    else if (mode === 'next' && f.next) { s.l1 = nextL1(f.next); s.tok = dayToks(f); return s; }
+    else if (mode === 'donetx') { s.l1 = T('pp.room.l1.done_tx', { doses: S.filter.filter(function (t) { return doneTx(f).indexOf(t) >= 0; }).map(name).join(' · ') }); s.tok = recToks(f, S.filter); }
+    else if (mode === 'missed') { s.l1 = T('pp.room.l1.missed', { doses: f.missed.map(function (o) { return name(o.tx); }).join(' · ') }); s.tok = dayToks(f).concat(windowToks(f.missed)); }
+    else if (f.closed) { s.l1 = T('pp.room.l1.closed'); s.tok = [T('pp.common.unit.day', { n: f.day }), T('pp.room.tok.closed')]; }
+    else if (f.kind === 'owes') owesSpec(f, s);
+    else if (f.kind === 'done') { s.l1 = T('pp.room.l1.done'); s.tok = recToks(f); }
+    else if (f.kind === 'missed') { s.l1 = T('pp.room.l1.missed', { doses: f.missed.map(function (o) { return name(o.tx); }).join(' · ') }); s.tok = dayToks(f).concat(windowToks(f.missed)); }
+    else if (f.kind === 'next') { s.l1 = nextL1(f.next); s.tok = f.lastRecord ? recToks(f) : dayToks(f); }
+    else {
       // Nothing owed, nothing missed, nothing coming: every treatment is done.
       s.l1 = T('pp.room.l1.finished');
-      s.tok = f.lastRecord ? recToks(f) : [T('pp.common.unit.day', { n: f.day }), pig(f.alive)];
+      s.tok = f.lastRecord ? recToks(f) : dayToks(f);
     }
+    // review markers (R1-22): the row says it waits for an answer; the answer is where the room's review list sends you
     if (f.collide) s.tok.push(T('pp.room.tok.collide', { n: f.collide }, 'amber'));
+    var kinds = {}; reviewsOf(f.litter).forEach(function (x) { kinds[x.kind] = 1; });
+    ['held', 'count', 'correction'].forEach(function (k) { if (kinds[k]) s.tok.push(T('pp.room.tok.rev.' + k, {}, 'amber')); });
     if (f.loss) s.tok.push(T('pp.room.tok.loss', { k: f.loss }, 'red'));
     if (f.gain) s.tok.push(T('pp.room.tok.gain', { k: f.gain }, 'blue'));
     return s;
   }
-  function chip(f) { return f.chip === 'sowdied' ? ['red', 'sowdied'] : f.chip === 'unlocked' ? ['amber', 'unlocked'] : null; }
-  function litterHref(code, piglet, unit) {
-    return PP.href('litter.html', { state: 'litter', crate: code, unit: unit || ROOM, piglet: piglet, data: store.name !== 'base' ? store.name : '' });
+  // The row's reading in this lens: under a filter, the filtered treatment's own words (done: `Iron done`; later: `Iron in 2 days`).
+  function modeFor(f, lens) {
+    if (ended() || !f.lens) return null;
+    var l = S.missed ? 'missed' : lensOfF(f);
+    if (S.missed) return 'missed';
+    if (l === 'done' && f.kind !== 'done') return 'donetx';
+    if (l === 'later' && f.kind !== 'next') return 'next';
+    if (l === 'missed') return 'missed';
+    return lens === 'next' ? 'next' : null;
   }
-  function litterRow(f, piglet, forceNext) {
-    var s = spec(f, forceNext);
-    return U.litterRow({ code: f.litter, l1: [s.l1], toks: s.tok, chip: forceNext ? null : chip(f), flash: S.flash === f.litter,
+  function chip(f) { return f.chip === 'sowdied' ? ['red', 'sowdied'] : f.chip === 'unlocked' ? ['amber', 'unlocked'] : null; }
+  function dataParam() { return store.name !== 'base' ? store.name : ''; }
+  function litterHref(code, piglet, unit) {
+    return PP.href('litter.html', { state: 'litter', crate: code, unit: unit || ROOM, piglet: piglet, data: dataParam() });
+  }
+  function litterRow(f, piglet, lens) {
+    var mode = modeFor(f, lens), s = spec(f, mode);
+    return U.litterRow({ code: f.litter, l1: Array.isArray(s.l1[0]) ? s.l1 : [s.l1], toks: s.tok, chip: mode === 'next' && lens === 'next' ? null : chip(f), flash: S.flash === f.litter,
       attrs: piglet ? ' data-piglet="' + U.esc(piglet) + '"' : '' });
   }
-  function rows(xs, piglet, forceNext) { return UI.rowGroup(xs.map(function (f) { return litterRow(f, piglet, forceNext); }).join('')); }
+  function rows(xs, piglet, lens) { return UI.rowGroup(xs.map(function (f) { return litterRow(f, piglet, lens); }).join('')); }
 
   /* ---- header ---- */
   function signed(n) { return n > 0 ? '+' + n : n < 0 ? '−' + Math.abs(n) : '0'; }
-  function driftStrip() {
-    var h = sel().strip; if (!h.openLoss && !h.openGain) return '';
-    function grp(id, n, codes) { return '<span class="pp-grp">' + U.span(id, { n: n }) + '<span class="pp-codes">' + U.span('pp.room.codes', { list: codes.join(' ') }) + '</span></span>'; }
-    var parts = '';
-    if (h.openLoss) parts += grp('pp.room.loss_open', h.openLoss, h.lossLitters);
-    if (h.openGain) parts += grp('pp.room.gain_open', h.openGain, h.gainLitters);
-    if (h.showNet) parts += '<span class="pp-grp">' + U.span(Math.abs(h.netDrift) === 1 && PP.lang === 'en' ? 'pp.room.drift.one' : 'pp.room.drift', { n: signed(h.netDrift) }) + '</span>';
-    return '<button type="button" class="pp-strip" data-ds="Candidate:DriftStrip" data-action="explain">' + parts + I('chevron') + '</button>';
+  function fig(n, tone) { return { text: String(n), tone: tone, strs: { text: 'pp.room.lead.figure' }, args: { text: { n: n } } }; }
+  function codesPart(list) { return { text: list.join(' '), mono: true, strs: { text: 'pp.room.codes' }, args: { text: { list: list.join(' ') } } }; }
+  function stampPart(at, who) {
+    var today = String(at).slice(0, 10) === String(store.today).slice(0, 10);
+    return { text: U.stamp(at, who, store.today), mono: true, strs: { text: today ? 'pp.common.stamp.today' : 'pp.common.stamp.date' }, args: { text: { t: U.time(at), who: who, date: U.date(at) } } };
+  }
+  function word(id, args, tone) { return { text: PP.t(id, args), tone: tone, strs: { text: id }, args: { text: args || {} } }; }
+  // The drift door (ADR 0002: a Row with toned tokens): open unexplained loss and gain, each with its crates, beside the net.
+  function driftRow() {
+    var h = R().room.strip; if (!h.openLoss && !h.openGain) return '';
+    var d = [];
+    if (h.openLoss) d.push([word('pp.room.strip.loss'), fig(h.openLoss, 'red'), codesPart(h.lossLitters)]);
+    if (h.openGain) d.push([word('pp.room.strip.gain'), fig(h.openGain, 'progress'), codesPart(h.gainLitters)]);
+    if (h.showNet) d.push([word(Math.abs(h.netDrift) === 1 && PP.lang === 'en' ? 'pp.room.drift.one' : 'pp.room.drift', { n: signed(h.netDrift) })]);
+    return UI.row({ title: [[word('pp.room.strip.title')]], description: d, action: 'explain', wrap: true, id: 'pp-drift' });
+  }
+  var REV_ID = { double: 'pp.room.rev.double', count: 'pp.room.rev.count', held: 'pp.room.rev.held', correction: 'pp.room.rev.correction' };
+  // The review door (N4): everything held for an answer in this room, reachable from the header like the drift.
+  function reviewRow() {
+    var xs = reviews(); if (!xs.length) return '';
+    var d = xs.map(function (x) { return [word(REV_ID[x.kind], { tx: x.tx ? name(x.tx) : '' }), codesPart([x.litter])]; });
+    var unresolved = xs.some(function (x) { return x.status === 'unresolved_at_end'; });
+    return UI.row({ title: [[word('pp.room.rev.title'), fig(xs.length, 'amber')]], description: d, action: 'reviews', wrap: true, id: 'pp-reviews',
+      chip: unresolved ? { text: PP.t('pp.room.rev.unresolved'), tone: 'amber', strs: { text: 'pp.room.rev.unresolved' } } : null });
+  }
+  // After End (R1-13): the room reads ended — who and when, and the door to the receipt.
+  function endedRow() {
+    var E = ended(), unf = E.atEnd.unfinishedLitters.filter(function (c) { return facts().some(function (f) { return f.litter === c; }); }).length;
+    var stamp = stampPart(E.at, E.who);
+    var rc = unf ? word(PP.one('pp.room.ended.receipt', unf), { n: unf }) : word('pp.room.ended.receipt.none');
+    return UI.rowGroup(UI.row({ title: [[word('pp.room.ended.title')]], description: [[stamp], [rc]], action: 'receipt', wrap: true, id: 'pp-ended' }));
   }
   // The newest stamped event of any kind: treatment, count, move, death, identity or correction — in its own words.
   function evWhat(ev) {
     var e = store.events.filter(function (x) { return x.id === ev.id; })[0] || {};
-    if (ev.type === 'treat') return name(ev.tx || txOf(e.dose || ev.dose));   // a correction's fresh mark has no event of its own (R1-15)
+    var tx = ev.tx || (ev.dose || e.dose ? txOf(ev.dose || e.dose) : null);
+    if (ev.type === 'treat' || ev.type === 'check') return tx ? name(tx) : PP.t('pp.room.ev.edit');   // a correction's fresh mark carries its tx (R1-15)
     if (ev.type === 'count') return PP.t('pp.room.ev.count', { n: e.observed });
     if (ev.type === 'move') return PP.t('pp.room.ev.move', { n: e.n });
     if (ev.type === 'death') return PP.t('pp.room.ev.dead', { n: (e.lines || []).reduce(function (t, l) { return t + (l.rowId ? 1 : l.n); }, 0) });
-    if (ev.type === 'identity') return PP.t('pp.room.ev.id');
+    if (ev.type === 'identity' || ev.type === 'sex_counts') return PP.t('pp.room.ev.id');
+    if (ev.type === 'litter_weight' || ev.type === 'birth_weight') return PP.t('pp.room.ev.weight');
     if (ev.type === 'farrowed') return PP.t('pp.room.ev.farrowed');
     if (ev.type === 'sow_died') return PP.t('pp.room.ev.sow');
     if (ev.type === 'weaned') return PP.t('pp.room.ev.weaned', { n: e.n });
+    if (ev.type === 'double' || ev.type === 'resolve') return PP.t('pp.room.ev.review');
     return PP.t('pp.room.ev.edit');
   }
   function lastRecord() {
-    var best = sel().lastRecord;
+    var best = R().room.lastRecord;
     if (!best) return '';
-    return UI.heading({ title: '', kind: 'group', level: 4, className: 'pp-last', strs: { title: 'pp.room.last' }, args: { title: { when: U.ago(best.at, NOW), what: evWhat(best), code: best.litter, who: best.who } } });
+    return UI.heading({ title: '', kind: 'group', level: 4, className: 'pp-last', strs: { title: 'pp.room.last' }, args: { title: { when: U.ago(best.at, now()), what: evWhat(best), code: best.litter, who: best.who } } });
+  }
+  function filterWhat() {
+    var w = []; if (S.missed) w.push(PP.t('pp.room.filter.missed')); if (filtering()) w.push(S.filter.map(name).join(' · '));
+    return w.join(' · ');
   }
   function lead() {
-    var n = sel('owed').lead + Object.keys(held).filter(function (c) { return held[c].lens === 'owed'; }).length;
-    return '<div><div class="pp-lead" data-ds="Candidate:LeadFigure"><span class="pp-fig">' + U.span('pp.room.lead.figure', { n: n }) + '</span><span class="pp-leadlab">' + U.span('pp.room.lead.' + (n === 1 && PP.lang === 'en' ? 'one' : 'many')) + '</span></div>' + lastRecord() + '</div>';
+    if (ended()) return endedRow() + lastRecord();
+    var n = owedCount();
+    // a filter says so in the headline: `8 litters owe iron today` (R1-16)
+    var what = filtering() ? S.filter.map(function (t) { return PP.lang === 'zh' ? name(t) : name(t).toLowerCase(); }).join(' · ') : '';
+    var lab = what ? U.span(PP.one('pp.room.lead.f', n), { what: what }) : U.span('pp.room.lead.' + (n === 1 && PP.lang === 'en' ? 'one' : 'many'));
+    return '<div><div class="pp-lead" data-ds="Candidate:LeadFigure"><span class="pp-fig">' + U.span('pp.room.lead.figure', { n: n }) + '</span><span class="pp-leadlab">' + lab + '</span></div>' + lastRecord() + '</div>';
   }
+  function doors() { var h = reviewRow() + driftRow(); return h ? UI.rowGroup(h) : ''; }
   function header() {
+    var units = UI.button({ label: PP.t('pp.room.units.act'), register: 'text', action: 'units', strs: { label: 'pp.room.units.act' } });
     return '<header class="task-header pp-head">' +
       UI.iconButton({ action: 'back', icon: I('back'), label: 'Back', className: 'task-return' }) +
       '<div class="pp-title">' +
-      UI.heading({ title: '', kind: 'group', level: 3, strs: { title: 'pp.common.task' }, action: '<button type="button" data-action="overview" data-str="pp.room.overview">' + U.esc(PP.t('pp.room.overview')) + '</button>' }) +
-      UI.heading({ title: '', kind: 'page', level: 2, description: '', strs: { title: 'pp.room.unit', description: 'pp.room.howto' }, args: { title: { n: ROOM } } }) +
+      // Back is the way up to the task (its overview); the task line's one action is the way across, to another unit (R1-5)
+      UI.heading({ title: '', kind: 'group', level: 3, strs: { title: 'pp.common.task' }, action: units }) +
+      UI.heading({ title: '', kind: 'page', level: 2, description: '', strs: { title: 'pp.room.unit', description: ended() ? 'pp.room.ended.howto' : 'pp.room.howto' }, args: { title: { n: ROOM } } }) +
       '</div></header>';
   }
-  function filterWhat() {
-    var w = []; if (S.missed) w.push(PP.t('pp.room.filter.missed')); if (S.filter.length) w.push(S.filter.map(name).join(' · '));
-    return w.join(' · ');
-  }
   function controls() {
-    var counts = {}; ['owed', 'done', 'later', 'all'].forEach(function (k) { counts[k] = lensOf(k).length; });
-    var opts = ['owed', 'done', 'later', 'all'].map(function (k) {
-      return [k, PP.t('pp.room.lens.' + k, { n: counts[k] }), { strs: { label: 'pp.room.lens.' + k }, args: { label: { n: counts[k] } } }];
+    var ks = lensKeys(), lens = curLens();
+    var sum = (filtering() || (S.missed && !ended())) ? '<div class="pp-filtered">' + UI.heading({ title: '', kind: 'group', level: 4, description: S.missed ? '' : undefined,
+      action: '<button type="button" data-action="clear-filter" data-str="act.clear">' + U.esc(PP.t('act.clear')) + '</button>',
+      strs: Object.assign({ title: 'pp.room.filtered' }, S.missed ? { description: 'pp.room.missed.desc' } : {}), args: { title: { what: filterWhat() } } }) + bulkDoor() + '</div>' : '';
+    // the missed group is its own view: no lenses over it (it is never Later, never owed)
+    if (S.missed && !ended()) return '<div class="pp-controlwrap">' + sum + '</div>';
+    var cnt = {}; ks.forEach(function (k) { cnt[k] = lensOf(k).length; });
+    var opts = ks.map(function (k) {
+      return [k, PP.t('pp.room.lens.' + k, { n: cnt[k] }), { strs: { label: 'pp.room.lens.' + k }, args: { label: { n: cnt[k] } } }];
     });
-    var seg = UI.segment({ options: opts, active: S.lens, action: 'lens', ariaLabel: '' });
-    var f = (roomTx().length || S.filter.length) ? UI.iconButton({ action: 'filter', icon: I('filter'), label: 'Filter litters', className: 'room-filter-button' }) : '';
-    var sum = (S.filter.length || S.missed) ? '<div class="pp-filtered">' + UI.heading({ title: '', kind: 'group', level: 4, action: '<button type="button" data-action="clear-filter" data-str="act.clear">' + U.esc(PP.t('act.clear')) + '</button>', strs: { title: 'pp.room.filtered' }, args: { title: { what: filterWhat() } } }) + bulkDoor() + '</div>' : '';
+    var seg = UI.segment({ options: opts, active: lens, action: 'lens', ariaLabel: '' });
+    var f = !ended() && (roomTx().length || S.filter.length) ? UI.iconButton({ action: 'filter', icon: I('filter'), label: 'Filter litters', className: 'room-filter-button' }) : '';
     return '<div class="pp-controlwrap"><div class="pp-controls">' + seg + f + '</div>' + sum + '</div>';
   }
   // Filtered by one treatment that two or more litters owe: the door to record it for several litters at once (bulk.html, slice #7).
   function bulkDoor() {
-    if (S.filter.length !== 1 || S.missed) return '';
+    if (S.filter.length !== 1 || S.missed || ended() || S.filter[0] === 'identity') return '';
     var tx = S.filter[0], best = null;
-    // The litters a bulk record can write (the ledger's bulkDraft): after End none (no new marks), so no door.
     CFG.doses.filter(function (d) { return d.tx === tx; }).forEach(function (d) {
       var b = store.select.bulkDraft(store.derived, { room: ROOM, dose: d.id });
       var ids = b.rows.filter(function (r) { return r.kind === 'record'; }).map(function (r) { return r.litter; });
-      if (!best || ids.length > best.k) best = { dose: d.id, k: ids.length, ids: ids, ended: !!b.ended };
+      if (!best || ids.length > best.k) best = { dose: d.id, k: ids.length, ids: ids };
     });
     // Ticks left on this phone (a bulk draft) say so here — only those that can still be recorded, written back.
     var ticked = 0, key = best ? 'pp-bulk-ticks:' + store.name + ':' + ROOM + ':' + best.dose : '';
@@ -263,81 +455,151 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
         ticked = kept.length;
       }
     } catch (e) {}
-    if (!best || best.k < (best.ended ? 1 : 2)) return '';
-    var desc = ticked ? ['pp.bulk.door_ticked', { k: ticked }] : [PP.one('pp.bulk.door_desc', best.k), { k: best.k }];
+    if (!best || best.k < 2) return '';
+    // the headline counts every litter that owes it; the door says how many of them one record can take (deferred and
+    // unknown piglets need their own sheet), so the two never disagree silently
+    var owe = owedCount();
+    var desc = ticked ? ['pp.bulk.door_ticked', { k: ticked }] : best.k < owe ? ['pp.room.bulk.some', { k: best.k, n: owe }] : [PP.one('pp.bulk.door_desc', best.k), { k: best.k }];
     return '<div class="pp-bulkdoor">' + UI.rowGroup(UI.row({ title: '', description: '', action: 'open-bulk', value: tx,
       strs: { title: 'pp.bulk.door', description: desc[0] }, args: { title: { tx: PP.lang === 'zh' ? name(tx) : name(tx).toLowerCase() }, description: desc[1] } })) + '</div>';
   }
-  // The treatments this lens's litters owe, did today or have next — one filter row per treatment (iron day 3 and day 14 are one word).
+  // The treatments this room's litters owe, did today, have next or missed — one filter row per treatment (iron d3 and d14
+  // are one word; the identity step is one too).
   function roomTx() {
-    var ids = store.select.room(store.derived, { room: ROOM, lens: S.lens }).doses, seen = {};
-    return ids.map(txOf).filter(function (tx) { if (seen[tx]) return false; seen[tx] = 1; return true; });
+    var seen = {}, order = CFG.doses.map(function (d) { return d.tx; }).concat(['identity']);
+    facts().forEach(function (f) { if (!f.lens || f.closed) return; owedTx(f).concat(doneTx(f), laterTx(f), missedTx(f)).forEach(function (t) { seen[t] = 1; }); });
+    return order.filter(function (t, i) { return seen[t] && order.indexOf(t) === i; });
   }
   function comingUp() {
-    var xs = sel('owed').comingUp;
+    var xs = facts().filter(function (f) { return f.lens && !f.closed && f.next && f.kind !== 'owes'; });
     if (!xs.length) return '';
     var min = Math.min.apply(null, xs.map(function (f) { return f.next.inDays; }));
-    xs = xs.filter(function (f) { return f.next.inDays === min; });
-    return '<div class="pp-block">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.room.next' } }) + rows(xs, null, true) + '</div>';
+    xs = xs.filter(function (f) { return f.next.inDays === min; }).sort(byCode);
+    return '<div class="pp-block">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.room.next' } }) + rows(xs, null, 'next') + '</div>';
   }
-  function missedLine() {
-    var n = sel().missedLitters;
-    if (!n || S.missed) return '';
-    return UI.rowGroup(UI.row({ title: '', action: 'show-missed', strs: { title: PP.one('pp.room.missed', n) }, args: { title: { n: n } } }));
+  function missedLine(lens) {
+    if (S.missed || ended() || (lens !== 'owed' && lens !== 'later')) return '';
+    var n = facts().filter(function (f) { return f.lens && !f.closed && f.missed.length && (!filtering() || filterLens(f, S.filter) != null); }).length;
+    if (!n) return '';
+    return UI.rowGroup(UI.row({ title: '', description: '', action: 'show-missed', strs: { title: PP.one('pp.room.missed', n), description: 'pp.room.missed.short' }, args: { title: { n: n } } }));
+  }
+  // The litters in this unit that are not in the task: why All counts more than the task overview (R1-16 wording).
+  function outsideBlock(xs) {
+    if (!xs.length) return '';
+    var list = xs.map(function (f) { return f.litter; }).join(' ');
+    var k = facts().filter(function (f) { return !!f.lens; }).length;
+    return '<div class="pp-outside">' + UI.heading({ title: '', description: '', kind: 'group', level: 4, strs: { title: PP.one('pp.room.outside', xs.length), description: 'pp.room.outside.desc' },
+      args: { title: { list: list }, description: { k: k } } }) + rows(xs) + '</div>';
   }
   function list() {
-    var all = sel('all');
-    if (!all.counts.all) return UI.panel(UI.choiceEmpty('', { strs: { text: 'pp.room.empty.none' } }));
-    var xs = lensOf(S.lens);
-    if (xs.length) return rows(xs) + (S.lens === 'owed' ? missedLine() : '');
-    var anyDone = all.counts.done > 0;
-    var id = (S.filter.length || S.missed) ? 'pp.room.empty.filter' : S.lens === 'owed' ? (anyDone ? 'pp.room.empty.alldone' : 'pp.room.empty.owed') : 'pp.room.empty.' + S.lens;
-    return UI.panel(UI.choiceEmpty('', { strs: { text: id } })) + (S.lens === 'owed' ? missedLine() + comingUp() : '');
+    if (!facts().length) return UI.panel(UI.choiceEmpty('', { strs: { text: 'pp.room.empty.none' } }));
+    var lens = curLens(), xs = lensOf(lens);
+    if (lens === 'all' && !S.missed) {
+      var inT = xs.filter(function (f) { return !!f.lens; }), out = xs.filter(function (f) { return !f.lens; });
+      return (inT.length ? rows(inT, null, lens) : '') + outsideBlock(out);
+    }
+    if (xs.length) return rows(xs, null, lens) + missedLine(lens);
+    var anyDone = facts().some(function (f) { return naturalLens(f) === 'done'; });
+    var id = (filtering() || S.missed) ? 'pp.room.empty.filter' : lens === 'owed' ? (anyDone ? 'pp.room.empty.alldone' : 'pp.room.empty.owed') : 'pp.room.empty.' + lens;
+    return UI.panel(UI.choiceEmpty('', { strs: { text: id } })) + missedLine(lens) + (lens === 'owed' && !filtering() ? comingUp() : '');
   }
   function dock() {
     return '<footer class="sheet-footer pp-dock" data-ds="Sheet">' +
-      '<button type="button" class="button primary" data-action="scan">' + I('scan') + U.span('act.scan') + '</button>' + UI.iconButton({ action: 'find', icon: I('search'), label: 'Find a piglet by tag or notch', className: 'room-filter-button' }) + '</footer>';
+      '<button type="button" class="button primary" data-action="scan">' + I('scan') + U.span('act.scan') + '</button>' + UI.iconButton({ action: 'find', icon: I('search'), label: 'Find', className: 'room-filter-button' }) + '</footer>';
   }
 
   /* ---- sheets: one exit, the footer Close (the bar holds exits only) ---- */
-  function sheetFrame(titleId, body, footer, sizing) {
+  function sheetFrame(titleId, body, footer, sizing, args) {
     return '<div class="pp-layer" data-ds="Sheet"><div class="scrim" data-action="scrim"></div>' +
       '<section class="sheet" data-st-context="drawer" data-size="' + (sizing ? 'medium" data-sizing="content' : 'long') + '" role="dialog">' +
-      '<header class="utility-header">' + UI.heading({ title: '', kind: 'page', level: 3, strs: { title: titleId } }) + '</header>' +
+      '<header class="utility-header">' + UI.heading({ title: '', kind: 'page', level: 3, strs: { title: titleId }, args: args ? { title: args } : undefined }) + '</header>' +
       '<div class="sheet-body">' + body + '</div>' + footer + '</section></div>';
   }
   function closeFooter() {
     return '<footer class="sheet-footer"><button type="button" class="button secondary" data-action="close-sheet" data-str="act.close">' + U.esc(PP.t('act.close')) + '</button></footer>';
   }
   function filterSheet() {
+    var lens = curLens();
     var rowsH = roomTx().concat(S.filter.filter(function (tx) { return roomTx().indexOf(tx) < 0; })).map(function (tx) {
-      var n = sel(S.lens, [tx]).rows.length;
+      var n = viewRows(lens, [tx]).length;
       if (!n && S.filter.indexOf(tx) < 0) return '';
       return UI.choiceRow({ label: '', meta: '', mode: 'multi', action: 'toggle-dose', value: tx, selected: S.filter.indexOf(tx) >= 0,
-        strs: { label: 'pp.common.tx.' + tx, meta: PP.one('pp.room.filter.n', n) }, args: { meta: { n: n } } });
+        strs: { label: txId(tx), meta: PP.one('pp.room.filter.n', n) }, args: { meta: { n: n } } });
     });
     var head = UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.room.filter.treatment' },
       action: S.filter.length ? '<button type="button" data-action="clear-filter" data-str="act.clear">' + U.esc(PP.t('act.clear')) + '</button>' : '' });
-    return sheetFrame('pp.room.filter.title', head + UI.choiceGroup(rowsH, {}), closeFooter(), true);
+    return sheetFrame('pp.room.filter.title', head + UI.choiceGroup(rowsH.join(''), {}), closeFooter(), true);
+  }
+  // The review list (N4, R1-22): each item with a door to where it is answered; after End, frozen as unresolved at End.
+  var WHERE = { double: 'pp.room.rev.where.litter', count: 'pp.room.rev.where.count', held: 'pp.room.rev.where.count', correction: 'pp.room.rev.where.record' };
+  function reviewsSheet() {
+    var xs = reviews();
+    var body = UI.heading({ title: '', description: '', kind: 'group', level: 4, strs: { title: 'pp.room.rev.who', description: ended() ? 'pp.room.rev.after_end' : 'pp.room.rev.why' } });
+    body += xs.length ? UI.rowGroup(xs.map(function (x) {
+      var d = [];
+      if (x.at) d.push([stampPart(x.at, [].concat(x.who || []).join(' · '))]);
+      d.push([word(WHERE[x.kind])]);
+      return UI.row({ code: x.litter, title: [[word(REV_ID[x.kind], { tx: x.tx ? name(x.tx) : '' })]], description: d, action: 'open-review', value: x.id, wrap: true,
+        chip: x.status === 'unresolved_at_end' ? { text: PP.t('pp.room.rev.unresolved'), tone: 'amber', strs: { text: 'pp.room.rev.unresolved' } } : null,
+        strs: { code: 'pp.room.code' }, args: { code: { code: x.litter } } });
+    }).join('')) : UI.panel(UI.choiceEmpty('', { strs: { text: 'pp.room.rev.none' } }));
+    return sheetFrame('pp.room.rev.sheet', body, closeFooter());
+  }
+  function reviewHref(x) {
+    var p = { crate: x.litter, unit: ROOM, data: dataParam() };
+    if (x.kind === 'double') return litterHref(x.litter);
+    if (x.kind === 'held') return PP.href('count.html', Object.assign({ state: 'held-body' }, p, { data: store.name }));
+    if (x.kind === 'count') return PP.href('count.html', Object.assign({ state: 'count-conflict' }, p, { data: store.name }));
+    return PP.href('edit.html', Object.assign({ state: 'record-page' }, p, { data: store.name }));
+  }
+  // Another unit (R1-5): every unit the log knows, with what it owes today; the one you stand in is marked.
+  function units() {
+    var seen = {};
+    Object.keys(store.derived.litters).forEach(function (id) { var r = store.derived.litters[id].room; if (r != null) seen[r] = 1; });
+    seen[ROOM] = 1;
+    return Object.keys(seen).map(Number).sort(function (a, b) { return a - b; });
+  }
+  function unitsSheet() {
+    var body = UI.rowGroup(units().map(function (u) {
+      var rs = store.select.room(store.derived, { room: u, lens: 'all', identity: true }).rows, k = rs.length;
+      var inT = rs.filter(function (f) { return !!f.lens; }).length, owe = rs.filter(function (f) { return f.lens === 'owed' && !f.closed; }).length;
+      var ids = {}; rs.forEach(function (f) { var L = store.derived.litters[f.litter]; if (L && L.task) ids[L.task] = 1; });
+      var over = (store.derived.tasks || []).some(function (t) { return ids[t.id] && t.ended; });
+      var desc = !k ? ['pp.room.units.empty', {}] : !inT ? [PP.one('pp.room.units.notask', k), { k: k }] : over ? [PP.one('pp.room.units.ended', k), { k: k }]
+        : owe ? [PP.one('pp.room.units.owe', owe), { k: k, n: owe }] : [PP.one('pp.room.units.none', k), { k: k }];
+      return UI.row({ title: '', description: '', action: 'open-unit', value: String(u), attrs: u === ROOM ? { 'aria-current': 'location' } : {},
+        strs: { title: 'pp.room.unit', description: desc[0] }, args: { title: { n: u }, description: desc[1] } });
+    }).join(''));
+    return sheetFrame('pp.room.units.title', body, closeFooter(), true);
   }
 
-  /* ---- lookup over the ledger's identity rows, every room: nothing until the input can be a full tag or a notch ---- */
+  /* ---- Find over the ledger, every unit: a piglet's tag or notch, a sow's number, a crate's code (N9). Nothing while the
+     input can still become one; `No match` once it cannot. ---- */
   function normal(q) { return q.trim().replace(/[‐-―−\s.\/_]+/g, '-'); }
   function lookup(raw) {
-    var q = normal(raw), P = window.PPFixtures.piglets(store.derived).filter(function (p) { return p.status === 'alive' || p.status === 'weaned'; });
-    if (/^\d{6}$/.test(q)) return { q: q, hits: P.filter(function (p) { return p.tag === q; }) };
-    if (/^\d{4}$/.test(q)) return { q: q, hits: P.filter(function (p) { return p.tag && p.tag.slice(-4) === q; }) };
-    if (/^\d+-\d+$/.test(q)) return { q: q, hits: P.filter(function (p) { return p.notch === q; }) };
-    return null;
+    var q = normal(raw);
+    if (!q) return null;
+    var P = window.PPFixtures.piglets(store.derived).filter(function (p) { return p.status === 'alive' || p.status === 'weaned'; });
+    var Ls = store.derived.litters, codes = Object.keys(Ls).sort();
+    var litter = function (id) { var L = Ls[id]; return { kind: 'litter', litter: id, room: L.room, sow: L.sow ? L.sow.tag : '' }; };
+    var piglet = function (p) { return Object.assign({ kind: 'piglet' }, p); };
+    if (/^\d{6}$/.test(q)) return { q: q, hits: P.filter(function (p) { return p.tag === q; }).map(piglet).concat(codes.filter(function (id) { return Ls[id].sow && Ls[id].sow.tag === q; }).map(litter)) };
+    if (/^\d{4}$/.test(q)) return { q: q, hits: P.filter(function (p) { return p.tag && p.tag.slice(-4) === q; }).map(piglet) };
+    if (/^\d+-\d+$/.test(q)) return { q: q, hits: P.filter(function (p) { return p.notch === q; }).map(piglet) };
+    if (/^[a-z]\d{2}$/i.test(q)) { var c = q.toUpperCase(); return { q: c, hits: codes.filter(function (id) { return id === c; }).map(litter) }; }
+    // still typing: a few digits, a notch's first half, a crate's letter
+    if (/^\d{1,5}$/.test(q) || /^\d+-$/.test(q) || /^[a-z]\d?$/i.test(q)) return null;
+    return { q: raw.trim(), hits: [] };
   }
-  function hitBlock(p) {
-    var ids = p.tag && p.notch ? ['pp.room.scan.ids_both', { tag: p.tag, notch: p.notch }] : p.tag ? ['pp.room.scan.ids_tag', { tag: p.tag }] : ['pp.room.scan.ids_notch', { notch: p.notch }];
+  function hitBlock(h) {
+    var ids = h.kind === 'litter' ? ['pp.room.find.crate', { code: h.litter, sow: h.sow }]
+      : h.tag && h.notch ? ['pp.room.scan.ids_both', { tag: h.tag, notch: h.notch }] : h.tag ? ['pp.room.scan.ids_tag', { tag: h.tag }] : ['pp.room.scan.ids_notch', { notch: h.notch }];
     var head = UI.heading({ title: '', kind: 'group', level: 4, strs: { title: ids[0] }, args: { title: ids[1] } });
-    var here = p.room === ROOM ? sel('all', []).rows.filter(function (f) { return f.litter === p.litter; })[0] : null;
-    var body;
-    if (p.status === 'weaned') body = UI.rowGroup(UI.row({ title: '', strs: { title: 'pp.room.scan.weaned' } }));
-    else if (here) body = rows([here], p.tag || p.notch);
-    else body = UI.rowGroup(UI.row({ title: '', action: 'open-litter', value: p.litter, attrs: { 'data-unit': p.room, 'data-piglet': p.tag || p.notch }, strs: { title: 'pp.room.scan.in_unit' }, args: { title: { n: p.room, code: p.litter } } }));
+    var here = h.room === ROOM ? facts().filter(function (f) { return f.litter === h.litter; })[0] : null;
+    var pigTag = h.kind === 'piglet' ? h.tag || h.notch : null, body;
+    if (h.kind === 'piglet' && h.status === 'weaned') body = UI.rowGroup(UI.row({ title: '', strs: { title: 'pp.room.scan.weaned' } }));
+    else if (here) body = rows([here], pigTag);
+    else body = UI.rowGroup(UI.row({ title: '', action: 'open-litter', value: h.litter, attrs: { 'data-unit': h.room, 'data-piglet': pigTag || '' }, strs: { title: 'pp.room.scan.in_unit' }, args: { title: { n: h.room, code: h.litter } } }));
     return '<div>' + head + body + '</div>';
   }
   function findResults() {
@@ -354,7 +616,7 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
   }
   function findSheet() {
     var body = '<div class="pp-findbar">' +
-      UI.choiceSearch({ label: 'Ear tag or notch', placeholder: 'Ear tag or notch', value: S.q, attrs: { 'data-role': 'q', inputmode: 'text', 'data-str-attr': 'aria-label:pp.room.scan.placeholder;placeholder:pp.room.scan.placeholder' } }) +
+      UI.choiceSearch({ label: 'Find', placeholder: 'Find', value: S.q, attrs: { 'data-role': 'q', inputmode: 'text', 'data-str-attr': 'aria-label:pp.room.scan.placeholder;placeholder:pp.room.scan.placeholder' } }) +
       '</div>' + (S.scanned ? '' : UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.room.find.hint' } })) +
       '<div id="scan-results">' + findResults() + '</div>';
     return sheetFrame('pp.room.scan.title', body, closeFooter());
@@ -368,15 +630,15 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
   var screen = document.getElementById('screen'), phone = document.getElementById('phone');
   function render() {
     if (S.error) { screen.innerHTML = header() + errorView(); phone.classList.remove('pp-locked'); tag(); return; }
-    screen.innerHTML = header() + lead() + driftStrip() + controls() + list() + dock() +
-      (S.sheet === 'filter' ? filterSheet() : S.sheet === 'scan' ? scanSheet() : S.sheet === 'find' ? findSheet() : '');
+    screen.innerHTML = header() + lead() + doors() + controls() + list() + dock() +
+      (S.sheet === 'filter' ? filterSheet() : S.sheet === 'scan' ? scanSheet() : S.sheet === 'find' ? findSheet() : S.sheet === 'reviews' ? reviewsSheet() : S.sheet === 'units' ? unitsSheet() : '');
     phone.classList.toggle('pp-locked', !!S.sheet);
     tag();
     if (S.sheet === 'find') { var i = screen.querySelector('[data-role=q]'); if (i && !S.scanned && !i.dataset.focused) { i.dataset.focused = '1'; try { i.focus(); } catch (e) {} } }
   }
   function tag() {
     function aria(s, id) { var e = screen.querySelector(s); if (e) e.setAttribute('data-str-attr', 'aria-label:' + id); }
-    aria('.task-return', 'act.back'); aria('[data-action="filter"]', 'pp.room.aria.filter'); aria('.pp-dock [data-action="find"]', 'pp.room.aria.find'); aria('.segment', 'pp.room.lens.aria');
+    aria('.task-return', 'pp.room.aria.back'); aria('[data-action="filter"]', 'pp.room.aria.filter'); aria('.pp-dock [data-action="find"]', 'pp.room.aria.find'); aria('.segment', 'pp.room.lens.aria');
     PP.apply(screen);
   }
 
@@ -384,9 +646,17 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
   function url() {
     var p = new URLSearchParams(location.search);
     ['lens', 'filter', 'missed'].forEach(function (k) { p.delete(k); });
-    if (S.lens !== (start.lens || 'owed')) p.set('lens', S.lens);
+    if (S.lens && S.lens !== (start.lens || lensKeys()[0])) p.set('lens', S.lens);
     if (S.filter.length) p.set('filter', S.filter.join(','));
     if (S.missed) p.set('missed', '1');
+    // A state that carries a filter or the missed view names the plain room once the worker changes them: clearing a
+    // filter clears it from the URL too (R1-16).
+    var changed = S.filter.join(',') !== (start.filter || []).join(',') || S.missed !== !!start.missed;
+    if (changed && ((start.filter || []).length || start.missed)) {
+      p.set('state', 'room');
+      if (start.data !== 'base' && !p.get('data')) p.set('data', start.data);
+      if (start.room && !p.get('unit')) p.set('unit', start.room);
+    }
     var s = p.toString(); return location.pathname + (s ? '?' + s : '');
   }
   function persist() { try { history.replaceState(history.state, '', url()); } catch (e) {} }
@@ -397,39 +667,49 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
   function closeSheet() {
     S.q = ''; var st = history.state;
     if (st && st.sheet && !st.deep) { history.back(); return; }
-    S.sheet = ''; render(); refocus();
+    S.sheet = ''; render(); persist(); refocus();
   }
   function refocus() { var b = screen.querySelector('[data-action="scan"]'); if (b) b.focus(); }
   window.addEventListener('popstate', function (ev) {
     var sh = (ev.state && ev.state.sheet) || '';
     if (!sh) S.q = '';
-    S.sheet = sh; render(); if (!sh) refocus();
+    S.sheet = sh; persist(); render(); if (!sh) refocus();
   });
   if (S.sheet) { try { history.replaceState({ sheet: S.sheet, deep: true }, '', location.href); } catch (e) {} }
   function scrollKey() { return 'pp-room-scroll:' + PP.state + ':' + S.lens; }
   function saveScroll() { try { sessionStorage.setItem(scrollKey(), String(window.scrollY)); } catch (e) {} }
   function restoreScroll() { try { var y = +sessionStorage.getItem(scrollKey()); if (y && !S.sheet) window.scrollTo(0, y); } catch (e) {} }
+  function go(href) { saveScroll(); location.href = href; }
 
   screen.addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-action]'); if (!b) return;
     // ChoiceList's multi row carries its value on the checkbox (`value`), not `data-value`.
     var a = b.dataset.action, v = b.dataset.value != null ? b.dataset.value : b.value;
     if (a === 'scrim') { if (Date.now() - S.opened < 300) return; closeSheet(); return; }
-    if (a === 'back') { location.href = PP.href('index.html'); return; }
-    if (a === 'open-litter') { saveScroll(); location.href = litterHref(v, b.dataset.piglet, b.dataset.unit); return; }
-    if (a === 'explain') { location.href = PP.href('count.html', { state: 'explain', unit: ROOM, data: store.name }); return; }
-    if (a === 'overview') { location.href = PP.href('end.html', { state: 'overview', data: store.name !== 'base' ? store.name : '' }); return; }
+    // Back goes up to the task (its overview; after End, the ended task), never to the designer index (R1-5)
+    if (a === 'back') { go(PP.href('end.html', { state: ended() ? 'ended' : 'overview', unit: ROOM !== 7 ? ROOM : '', data: dataParam() })); return; }
+    if (a === 'open-litter') { go(litterHref(v, b.dataset.piglet, b.dataset.unit)); return; }
+    if (a === 'explain') { go(PP.href('count.html', { state: 'explain', unit: ROOM, data: store.name })); return; }
+    if (a === 'overview') { go(PP.href('end.html', { state: ended() ? 'ended' : 'overview', unit: ROOM !== 7 ? ROOM : '', data: dataParam() })); return; }
+    if (a === 'receipt') { go(PP.href('end.html', { state: 'receipt', data: store.name })); return; }
+    if (a === 'open-review') { var x = reviews().filter(function (r) { return r.id === v; })[0]; if (x) go(reviewHref(x)); return; }
+    if (a === 'open-unit') {
+      if (+v === ROOM) { closeSheet(); return; }
+      go(PP.href('room.html', { state: 'room', unit: +v !== 7 ? v : '', data: dataParam() })); return;
+    }
     if (a === 'retry') { location.reload(); return; }
-    if (a === 'open-bulk') { saveScroll(); location.href = PP.href('bulk.html', { state: 'bulk', tx: v, unit: ROOM !== 7 ? ROOM : '', data: store.name !== 'base' ? store.name : '' }); return; }
+    if (a === 'open-bulk') { go(PP.href('bulk.html', { state: 'bulk', tx: v, unit: ROOM !== 7 ? ROOM : '', data: dataParam() })); return; }
     if (a === 'lens') { S.lens = v; persist(); }
     else if (a === 'filter') { openSheet('filter'); }
     else if (a === 'scan') { openSheet('scan'); }
     else if (a === 'find') { openSheet('find'); }
+    else if (a === 'reviews') { openSheet('reviews'); }
+    else if (a === 'units') { openSheet('units'); }
     else if (a === 'type') { S.scanned = false; S.sheet = 'find'; try { history.replaceState({ sheet: 'find', deep: !!(history.state && history.state.deep) }, '', location.href); } catch (e) {} }
     else if (a === 'close-sheet') { closeSheet(); return; }
     else if (a === 'toggle-dose') { var i = S.filter.indexOf(v); if (i >= 0) S.filter.splice(i, 1); else S.filter.push(v); persist(); }
     else if (a === 'clear-filter') { S.filter = []; if (S.missed) { S.missed = false; if (S.cameFrom) S.lens = S.cameFrom; } persist(); }
-    else if (a === 'show-missed') { S.cameFrom = S.lens; S.missed = true; S.lens = 'all'; persist(); }
+    else if (a === 'show-missed') { S.cameFrom = S.lens; S.missed = true; persist(); }
     render();
   });
   screen.addEventListener('input', function (ev) {
@@ -440,8 +720,8 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
   screen.addEventListener('keydown', function (ev) {
     if (ev.key !== 'Enter' || ev.target.dataset.role !== 'q') return;
     ev.preventDefault();
-    var r = lookup(S.q);
-    if (r && r.hits.length === 1 && r.hits[0].status === 'alive') { saveScroll(); location.href = litterHref(r.hits[0].litter, r.hits[0].tag || r.hits[0].notch, r.hits[0].room); }
+    var r = lookup(S.q), h = r && r.hits.length === 1 ? r.hits[0] : null;
+    if (h && (h.kind === 'litter' || h.status === 'alive')) go(litterHref(h.litter, h.kind === 'piglet' ? h.tag || h.notch : '', h.room));
     else ev.target.blur();
   });
 
@@ -451,10 +731,10 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
     if (Object.keys(held).length) holdTimer = setTimeout(function () { held = {}; S.flash = ''; render(); }, 800);
   }
   ['pointerdown', 'touchstart', 'scroll'].forEach(function (e) { window.addEventListener(e, armHold, { passive: true, capture: true }); });
-  function snapshot() { var m = {}; sel().rows.forEach(function (f) { m[f.litter] = f; }); return m; }
+  function snapshot() { var m = {}, l = curLens(); viewRows(l).forEach(function (f) { m[f.litter] = f; }); return { lens: l, m: m }; }
   function holdDeparted(before) {
-    var now = snapshot();
-    Object.keys(before).forEach(function (c) { if (!now[c]) held[c] = { lens: S.lens, f: before[c] }; });
+    var now2 = snapshot().m;
+    Object.keys(before.m).forEach(function (c) { if (!now2[c]) held[c] = { lens: before.lens, f: before.m[c] }; });
   }
   // Another hand's record arrives (PP.sync({ type: 'treat', litter: 'A02', dose: 'iron3', n: 12, who: 'L.M' })): it goes through the ledger.
   PP.sync = function (event) {
@@ -478,13 +758,13 @@ button.pp-strip:focus-visible { outline: 3px solid var(--focus); outline-offset:
   var boot = PP.ready.then(function () {
     store = PP.open(start.data);
     CFG = store.config;
-    NOW = store.now();                 // the phone's clock: advances with the records made in the session (R1-15)
     // room-bulk-ticked: ticks a bulk page left on this phone (slice #7's device draft).
     if (start.ticks) { try { sessionStorage.setItem('pp-bulk-ticks:' + store.name + ':' + ROOM + ':' + start.ticks.dose, JSON.stringify(start.ticks.sel)); } catch (e) {} }
     render(); restoreScroll();
   });
   // The one registry exception: when the registry itself failed to load there is nothing to look strings up in.
-  boot.catch(function () {
+  boot.catch(function (e) {
+    if (window.console) console.error(e);
     screen.innerHTML = '<p>Couldn’t load the unit.</p><button type="button" onclick="location.reload()">Retry</button>';
   });
 })();
