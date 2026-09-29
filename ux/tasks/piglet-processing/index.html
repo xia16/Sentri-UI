@@ -10,27 +10,33 @@
 </head>
 <body>
 <main class="phone inspection-phone" data-st-context="page">
-  <div class="st-heading" data-ds="Heading" data-kind="page"><div class="st-heading-main"><h1 class="st-heading-title"><span data-str="pp.common.task"></span></h1></div></div>
-  <div class="st-panel st-row-group" data-ds="Panel">
-    <div class="st-heading st-row-group-label" data-ds="Heading" data-kind="group"><div class="st-heading-main"><h2 class="st-heading-title"><span data-str="pp.common.slices"></span></h2></div></div>
-    <a class="st-row" data-ds="Row" data-slice="room" href="room.html"><span class="st-row-copy"><strong data-str="pp.room.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
-    <a class="st-row" data-ds="Row" data-slice="litter" href="litter.html"><span class="st-row-copy"><strong data-str="pp.litter.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
-    <a class="st-row" data-ds="Row" data-slice="bulk" href="bulk.html"><span class="st-row-copy"><strong data-str="pp.bulk.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
-    <a class="st-row" data-ds="Row" data-slice="id" href="id.html"><span class="st-row-copy"><strong data-str="pp.id.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
-    <a class="st-row" data-ds="Row" data-slice="dead" href="dead.html"><span class="st-row-copy"><strong data-str="pp.dead.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
-    <a class="st-row" data-ds="Row" data-slice="count" href="count.html"><span class="st-row-copy"><strong data-str="pp.count.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
-    <a class="st-row" data-ds="Row" data-slice="move" href="move.html"><span class="st-row-copy"><strong data-str="pp.move.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
-    <a class="st-row" data-ds="Row" data-slice="edit" href="edit.html"><span class="st-row-copy"><strong data-str="pp.edit.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
-    <a class="st-row" data-ds="Row" data-slice="end" href="end.html"><span class="st-row-copy"><strong data-str="pp.end.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
-    <a class="st-row" data-ds="Row" data-slice="edge" href="edge.html"><span class="st-row-copy"><strong data-str="pp.edge.title"></strong></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></a>
-  </div>
+  <div id="screen"></div>
 </main>
 <script src="/ux/design-system/components/bundle.js"></script>
-<script src="shell.js"></script>
 <script>
-PP.ready.then(function () {
-  document.querySelectorAll('a[data-slice]').forEach(function (a) { a.href = a.dataset.slice + '.html?lang=' + PP.lang; });
-});
+(function () {
+  var UI = window.SentriUI;
+  var rows = [
+    UI.row({ title: '', action: 'open', value: 'room', strs: { title: 'pp.room.title' } }),
+    UI.row({ title: '', action: 'open', value: 'litter', strs: { title: 'pp.litter.title' } }),
+    UI.row({ title: '', action: 'open', value: 'bulk', strs: { title: 'pp.bulk.title' } }),
+    UI.row({ title: '', action: 'open', value: 'id', strs: { title: 'pp.id.title' } }),
+    UI.row({ title: '', action: 'open', value: 'dead', strs: { title: 'pp.dead.title' } }),
+    UI.row({ title: '', action: 'open', value: 'count', strs: { title: 'pp.count.title' } }),
+    UI.row({ title: '', action: 'open', value: 'move', strs: { title: 'pp.move.title' } }),
+    UI.row({ title: '', action: 'open', value: 'edit', strs: { title: 'pp.edit.title' } }),
+    UI.row({ title: '', action: 'open', value: 'end', strs: { title: 'pp.end.title' } }),
+    UI.row({ title: '', action: 'open', value: 'edge', strs: { title: 'pp.edge.title' } })
+  ];
+  document.getElementById('screen').innerHTML =
+    UI.heading({ title: '', kind: 'page', level: 1, strs: { title: 'pp.common.task' } }) +
+    UI.rowGroup(rows.join(''), { title: '', strs: { title: 'pp.common.slices' } });
+  document.getElementById('screen').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-action="open"]');
+    if (b) location.href = b.dataset.value + '.html?lang=' + PP.lang;
+  });
+})();
 </script>
+<script src="shell.js"></script>
 </body>
 </html>

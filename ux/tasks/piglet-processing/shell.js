@@ -17,6 +17,15 @@
       try { args = el.dataset.args ? JSON.parse(el.dataset.args) : null; } catch (err) { args = null; }
       el.textContent = PP.t(el.dataset.str, args);
     });
+    // data-str-attr="aria-label:id;placeholder:id" fills attributes the same way; data-args applies to all.
+    (root || document).querySelectorAll('[data-str-attr]').forEach(function (el) {
+      var args = null;
+      try { args = el.dataset.args ? JSON.parse(el.dataset.args) : null; } catch (err) { args = null; }
+      el.dataset.strAttr.split(';').forEach(function (pair) {
+        var i = pair.indexOf(':');
+        if (i > 0) el.setAttribute(pair.slice(0, i).trim(), PP.t(pair.slice(i + 1).trim(), args));
+      });
+    });
   };
 
   document.documentElement.lang = PP.lang === 'zh' ? 'zh-CN' : 'en';
