@@ -33,8 +33,8 @@
      derive(events, config, { today })   → Derived (README: ux/laws/glossary.md, Ledger module)
      append(events, event, config, opts) → { ok, reason, detail, event, events, derived, dependents }
      balances(litter)                    → the ledger identity for one derived litter
-     select.room / litter / deathDraft / moveDraft / end / countDraft / explain / counts — what pages
-       render; drafts are validated by the same replay `append` runs
+     select.room / litter / deathDraft / moveDraft / end / bulkDraft / countDraft / explain / counts — what pages render; drafts are validated
+       by the same replay `append` runs
 */
 
 const DAY_MS = 86400000;
@@ -1642,6 +1642,103 @@ function countsSelect(derived, litterId) {
   return { litter: L.id, alive: L.alive, counts: list, standing: standing ? standing.id : null, review: !!(standing && standing.review) };
 }
 
+/* One dose for several litters (slice #7, bulk). Each litter's record is its one-tap: every owed piglet,
+   no reasons. Rows: every litter of the room (or `litters`) that can hold a record of this dose, alive, where
+   the dose is owed now, was recorded today, or is not yet due — each with what a bulk record would do there:
+     record   owed now, nothing to ask: `n` piglets (late by `lateBy` days; `catchUp` after End)
+     done     nothing owed and recorded today: the records (who, when, piglets, collided)
+     not_due  due in `inDays` days — early is deliberate, on the litter's own sheet
+     sheet    owed with something to ask (`why`: castration — males are counted on the sheet · deferred with its
+              reason · unknown arrivals · missed window): the bulk act never asks, so the litter goes to its sheet
+   After its task's End a litter lists only catch-up (arrivals after End that owe the dose); `ended` says so.
+   The plan: `selected` litters replayed in order exactly as the store's commitAll appends them (one stamp).
+   `reviewed` ({ litter: { n, alive, dead } }, what the review showed) makes the review a contract: a litter whose
+   owed or alive moved since is not recorded (`changed`), unless the only change is deaths (`died`: recorded at the
+   lower number, named); every selected litter gets one outcome. */
+function bulkDraftSelect(derived, opts) {
+  const o = opts || {};
+  const doseId = o.dose;
+  const cfgD = derived.config.doses.find((d) => d.id === doseId);
+  if (!cfgD) return { why: 'unknown_dose', rows: [], plan: null };
+  const today = derived.today;
+  const endedOf = (L) => { const T = (derived.tasks || []).find((t) => t.id === L.task); return T && T.ended ? T.ended : null; };
+  let ended = null;
+  const pool = Object.values(derived.litters).filter((L) => L.alive > 0 && (L.inTask || L.recordable) &&
+    (o.litters ? o.litters.includes(L.id) : o.room == null || L.room === o.room));
+  const rows = [];
+  for (const L of pool) {
+    const D = L.doses[doseId];
+    if (!D || D.status == null) continue;
+    const E = endedOf(L);
+    if (E) ended = ended || { at: E.at, who: E.who };
+    const row = { litter: L.id, alive: L.alive, dead: L.dead.total, moved: L.movedIn + L.movedOut, counted: L.counts.length, day: L.dayAge, status: D.status, lateBy: D.status === 'late' ? L.dayAge - D.due : 0,
+      sowDied: !!L.sowDied, phase: L.phase, catchUp: false };
+    const collided = (r) => D.possibleDoubleTreatment.some((p) => p.includes(r.id));
+    const todays = D.records.filter((r) => dayNumber(r.at) === today).map((r) => ({ id: r.id, at: r.at, who: r.who, n: r.n, collided: collided(r) }));
+    const last = todays.length ? todays[todays.length - 1] : null;
+    if (E || !L.inTask) {
+      // after End (or outside every task): only arrivals that owe the dose, and only as many as arrived
+      if (!(D.catchUp > 0 && D.owed > 0) || D.isCastration) continue;
+      Object.assign(row, { kind: 'record', n: Math.min(D.catchUp, D.owed), catchUp: true, outside: !L.inTask });
+    }
+    else if (D.status === 'later') Object.assign(row, { kind: 'not_due', inDays: D.due - L.dayAge });
+    else if (D.done) { if (!todays.length) continue; Object.assign(row, { kind: 'done', records: todays, collided: todays.some((r) => r.collided) }); }
+    else if (D.isCastration) Object.assign(row, { kind: 'sheet', why: 'castration', n: D.owed });
+    else if (D.status === 'missed') Object.assign(row, { kind: 'sheet', why: 'missed', n: D.owed, last: D.last });
+    else if (D.deferred > 0) Object.assign(row, { kind: 'sheet', why: 'deferred', n: D.owed, reason: D.deferReason, last });
+    else if (D.unknownAfterMove > 0) Object.assign(row, { kind: 'sheet', why: 'unknown', n: D.unknownAfterMove });
+    else Object.assign(row, { kind: 'record', n: D.owed });
+    rows.push(row);
+  }
+  rows.sort((a, b) => (a.litter < b.litter ? -1 : a.litter > b.litter ? 1 : 0));
+  const counts = { record: 0, done: 0, not_due: 0, sheet: 0 };
+  for (const r of rows) counts[r.kind] += 1;
+  const byId = new Map(rows.map((r) => [r.litter, r]));
+  const plan = { outcomes: [], record: [], done: [], notDue: [], sheet: [], changed: [], gone: [], refused: [], litters: 0, piglets: 0, events: [] };
+  const input = derived.input || { events: [], config: {}, opts: {} };
+  const st = o.stamp || {};
+  const reviewed = o.reviewed || null;
+  let events = input.events;
+  (o.selected || []).forEach((id, i) => {
+    const row = byId.get(id), rev = reviewed ? reviewed[id] : null;
+    const out = { litter: id };
+    plan.outcomes.push(out);
+    if (!row) {
+      // left the list: every piglet gone, or (catch-up) another phone recorded the arrivals — then who and when
+      const L = derived.litters[id], D = L && L.doses[doseId];
+      const recs = D ? D.records.filter((r) => dayNumber(r.at) === today) : [];
+      const other = recs.length ? { id: recs[recs.length - 1].id, at: recs[recs.length - 1].at, who: recs[recs.length - 1].who, n: recs[recs.length - 1].n } : null;
+      Object.assign(out, { outcome: 'gone', was: rev ? rev.n : null, alive: L ? L.alive : 0, other: L && L.alive > 0 ? other : null });
+      plan.gone.push(id); return;
+    }
+    if (row.kind === 'done') {
+      const other = row.records[row.records.length - 1];
+      Object.assign(out, { outcome: rev ? 'nothing' : 'done', other, records: row.records }); plan.done.push(id); return;
+    }
+    if (row.kind === 'not_due') { Object.assign(out, { outcome: 'not_due', inDays: row.inDays }); plan.notDue.push(id); return; }
+    if (row.kind === 'sheet') { Object.assign(out, { outcome: 'sheet', why: row.why, n: row.n, was: rev ? rev.n : null, other: row.last || null }); plan.sheet.push(id); return; }
+    let died = 0;
+    // Deaths alone may lower the number (named); a move, a count or anything else since the review is `changed`.
+    const other = rev && (rev.moved !== undefined && (row.moved !== rev.moved || row.counted !== rev.counted));
+    if (rev && (other || row.n !== rev.n || row.alive !== rev.alive || row.dead !== rev.dead)) {
+      died = row.dead - rev.dead;
+      const onlyDeaths = !other && died > 0 && rev.n - row.n === died && rev.alive - row.alive === died;
+      if (!onlyDeaths) { Object.assign(out, { outcome: 'changed', was: rev.n, n: row.n, alive: row.alive }); plan.changed.push(id); return; }
+    }
+    const ev = { type: 'treat', litter: id, dose: doseId, n: row.n };
+    const e = Object.assign({ id: (st.id || '__bulk') + ':' + i, at: st.at || input.opts.today || null, who: st.who || null }, st.seen ? { seen: st.seen } : {}, ev);
+    const r = append(events, e, input.config, input.opts);
+    if (!r.ok) { Object.assign(out, { outcome: 'refused', why: r.reason, detail: r.detail }); plan.refused.push({ litter: id, why: r.reason, detail: r.detail }); return; }
+    events = r.events;
+    Object.assign(out, { outcome: died ? 'died' : 'record', n: row.n, was: rev ? rev.n : row.n, died, lateBy: row.lateBy, catchUp: row.catchUp });
+    plan.record.push({ litter: id, n: row.n, lateBy: row.lateBy, died, catchUp: row.catchUp });
+    plan.events.push(ev);
+    plan.litters += 1;
+    plan.piglets += row.n;
+  });
+  return { dose: doseId, castration: !!cfgD.castration, rows, counts, ended, plan, why: null };
+}
+
 /* End task figures (slice S9 glossary) over a set of derived litters, for one task.
    On time: a treatment (litter × dose) recorded fully — owed and unknown both 0 — by its planned
    day, over the treatments recorded or due. Before End, a dose due today and unrecorded is left
@@ -1719,7 +1816,7 @@ function findId(derived, id, exceptLitter) {
   return out;
 }
 
-export const select = { findId, room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect, countDraft: countDraftSelect, explain: explainSelect, counts: countsSelect };
+export const select = { findId, room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect, bulkDraft: bulkDraftSelect, countDraft: countDraftSelect, explain: explainSelect, counts: countsSelect };
 export const PPLedger = { derive, append, balances, dayNumber, select };
 export default PPLedger;
 if (typeof window !== 'undefined') window.PPLedger = PPLedger;

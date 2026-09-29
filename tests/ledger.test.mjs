@@ -1677,3 +1677,76 @@ test('R4-9 several tasks per config; a nurse sow outside any task can record her
   const extra = b.treat('D02', 'iron3', 1, { at: on(3, '13:30') });
   assert.equal(rejectedReason(run(b, cfg, 3), extra), 'no_task');
 });
+
+// ---- bulk (slice #7): one dose for several litters ------------------------------------------------
+
+test('bulk: each litter is classified; the plan records only the one-tap litters, in one replay', () => {
+  const b = book();
+  const cfg = { doses: IRON_ONLY.doses, identity: { scheme: 'none' } };
+  b.farrowed('A02', 12); b.farrowed('A04', 11); b.farrowed('B09', 10); b.farrowed('C04', 9);
+  b.farrowed('C02', 14, {}, { birthDate: on(2).slice(0, 10), at: on(2) });
+  b.treat('B09', 'iron3', 8, { deferred: { n: 2, reason: 'weak' }, at: on(3, '08:00') });
+  b.treat('C04', 'iron3', 9, { at: on(3, '08:30'), who: 'L.M' });
+  const d = run(b, cfg, 3);
+  const r = select.bulkDraft(d, { room: 'R3', dose: 'iron3', selected: ['A02', 'A04', 'C04', 'C02', 'B09'], stamp: { at: on(3, '10:31'), who: 'G.H' } });
+  const kind = Object.fromEntries(r.rows.map((x) => [x.litter, x.kind]));
+  assert.deepEqual(kind, { A02: 'record', A04: 'record', B09: 'sheet', C02: 'not_due', C04: 'done' });
+  assert.equal(r.rows.find((x) => x.litter === 'C04').records[0].who, 'L.M');
+  assert.deepEqual([r.plan.litters, r.plan.piglets, r.plan.done, r.plan.notDue, r.plan.sheet], [2, 23, ['C04'], ['C02'], ['B09']]);
+  // the plan's events commit as they were replayed
+  let ev = b.ev;
+  r.plan.events.forEach((e, i) => { const a = append(ev, Object.assign({ id: 'bk' + i, at: on(3, '10:31'), who: 'G.H' }, e), cfg, TODAY(3)); assert.ok(a.ok); ev = a.events; });
+  const after = select.bulkDraft(derive(ev, cfg, TODAY(3)), { room: 'R3', dose: 'iron3' });
+  assert.deepEqual(after.rows.filter((x) => x.kind === 'done').map((x) => x.litter), ['A02', 'A04', 'C04']);
+});
+
+test('bulk: a litter another phone finished is no longer in the plan; an offline twin is kept and flagged', () => {
+  const b = book();
+  const cfg = { doses: IRON_ONLY.doses, identity: { scheme: 'none' } };
+  const f = b.farrowed('B06', 12);
+  b.treat('B06', 'iron3', 12, { at: on(3, '10:30'), who: 'L.M' });
+  assert.equal(select.bulkDraft(run(b, cfg, 3), { room: 'R3', dose: 'iron3', selected: ['B06'] }).plan.litters, 0);
+  // offline: this phone had only the farrowing when it recorded
+  const r = select.bulkDraft(derive([f], cfg, TODAY(3)), { room: 'R3', dose: 'iron3', selected: ['B06'] });
+  const a = append(b.ev, Object.assign({ id: 'mine', at: on(3, '10:31'), who: 'G.H', seen: [f.id] }, r.plan.events[0]), cfg, TODAY(3));
+  assert.ok(a.ok);
+  const done = select.bulkDraft(a.derived, { room: 'R3', dose: 'iron3' }).rows[0];
+  assert.equal(done.kind, 'done');
+  assert.ok(done.collided);
+});
+
+test('bulk: the review is a contract — changed, died, gone and castration each get their own outcome', () => {
+  const b = book();
+  const cfg = { doses: [IRON_ONLY.doses[0], CONFIG.doses[2]], identity: { scheme: 'none' } };
+  b.farrowed('A02', 12); b.farrowed('A04', 11); b.farrowed('B06', 12); b.farrowed('B10', 11); b.farrowed('B09', 10); b.farrowed('A05', 11);
+  const sel = ['A02', 'A04', 'B06', 'B10', 'A05'];
+  const d0 = run(b, cfg, 3);
+  const reviewed = {};
+  select.bulkDraft(d0, { room: 'R3', dose: 'iron3' }).rows.forEach((r) => { reviewed[r.litter] = { n: r.n, alive: r.alive, dead: r.dead, moved: r.moved, counted: r.counted }; });
+  assert.equal(select.bulkDraft(d0, { room: 'R3', dose: 'castrate' }).rows[0].kind, 'sheet');
+  b.death('B06', [{ cause: 'crushed', n: 2 }], { at: on(3, '10:32') });
+  b.move('B09', 'A02', 1, { answers: { iron3: 'no' }, at: on(3, '10:33') });
+  b.move('B10', 'B09', 11, { answers: {}, at: on(3, '10:34') });
+  // a death and an arrival in one litter: the number is the same, the litter is not
+  b.death('A05', [{ cause: 'crushed', n: 1 }], { at: on(3, '10:35') });
+  b.move('B09', 'A05', 1, { answers: { iron3: 'no' }, at: on(3, '10:36') });
+  const p = select.bulkDraft(run(b, cfg, 3), { room: 'R3', dose: 'iron3', selected: sel, reviewed }).plan;
+  const out = Object.fromEntries(p.outcomes.map((x) => [x.litter, x.outcome]));
+  assert.deepEqual(out, { A02: 'changed', A04: 'record', B06: 'died', B10: 'gone', A05: 'changed' });
+  assert.equal(p.outcomes.find((x) => x.litter === 'A02').n, 13);
+  assert.deepEqual([p.litters, p.piglets], [2, 21]);
+  assert.equal(p.outcomes.find((x) => x.litter === 'B06').died, 2);
+});
+
+test('bulk: after End only catch-up rows for arrivals, and the result says the task ended', () => {
+  const b = book();
+  const cfg = { doses: IRON_ONLY.doses, identity: { scheme: 'none' }, task: { id: 'T', litters: ['A02', 'A04'] } };
+  b.farrowed('A02', 12); b.farrowed('A04', 11); b.farrowed('Z01', 5);
+  b.treat('A02', 'iron3', 12, { at: on(3, '08:00') }); b.treat('A04', 'iron3', 11, { at: on(3, '08:05') });
+  b.ev.push({ id: 'end', type: 'end_task', at: on(5, '12:00'), who: 'G.H' });
+  b.move('Z01', 'A04', 2, { answers: { iron3: 'no' }, at: on(6, '09:00') });
+  const r = select.bulkDraft(run(b, cfg, 6), { room: 'R3', dose: 'iron3', selected: ['A04'] });
+  assert.ok(r.ended);
+  assert.deepEqual(r.rows.map((x) => [x.litter, x.kind, x.n, x.catchUp]), [['A04', 'record', 2, true]]);
+  assert.equal(r.plan.litters, 1);
+});
