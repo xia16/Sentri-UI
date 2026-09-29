@@ -44,10 +44,8 @@ try {
   await page.click('[data-action="open-dead"]');
   await page.waitForURL(/dead\.html/); await ready(page);
   await page.click('[data-action="dead-step"][data-value="crushed"][data-step="1"]');
+  // Save returns to the litter it was opened from (no host stub, R1-26)
   await page.click('[data-action="save"]');
-  assert.match(await text(page, '.pp-receipt'), /Saved · \+1 crushed/);
-  await page.waitForTimeout(500);
-  await page.click('[data-action="close-host"]');
   await page.waitForURL(/litter\.html/); await ready(page);
   assert.match(await text(page, '[data-action="open-record"]'), /Alive 11 · Dead 2/);
   await page.click('[data-action="close"]');

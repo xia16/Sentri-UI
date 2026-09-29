@@ -1,6 +1,7 @@
-# Dead picker — data contract (slice 9, candidate)
+# Dead picker — data contract (slice 9, candidate; scenario round 1 fixes)
 
-The one shared dead drawer (`Candidate:DeadDrawer`, page `dead.html`). Farrowing, the farrowing
+The one shared dead drawer (the DeadDrawer composition, page `dead.html`: a task pattern built from cards —
+ChoiceList radios, Photos, Banner, Status, Button's text register, waiting face and hold; ADR 0002). Farrowing, the farrowing
 record, check-in and processing all open this component. It forks on **litter facts**, never on the
 task or the surface; the surface chooses copy only. Binds with RULINGS *Surfaces & entrances*,
 *Starting and ending a session*, and *Piglet processing* round 2 (the ledger).
@@ -10,8 +11,10 @@ task or the surface; the surface chooses copy only. Binds with RULINGS *Surfaces
 | Fact | Meaning |
 |---|---|
 | `phase` | `open` (farrowing not locked) or `locked` (after `Lock born N`, or after the sow's death ended the session) |
-| `identified[]` | the litter's live identity rows (`rowId`, tag or notch, sex?, weight?) that have no death |
-| `openLosses[]` | open unexplained losses (`lossId`, `qty`, `stampAt`), oldest first |
+| `identified[]` | the litter's identity rows with no death: alive, or **counted missing by name** (`status: missing`, its loss) — `rowId`, tag or notch, sex?, weight?, `canBeMissing` (alive, and an open loss has an unnamed part) |
+| `openLosses[]` | open unexplained losses (`lossId`, `qty`, `stampAt`, named rows), oldest first |
+| `roomLosses[]` | the other litters in the same room with an open loss that an untagged body can come from (processing only) |
+| `held[]` | bodies held for review on this litter (the same body recorded twice), unanswered |
 | `modes` | `['piglets','sow']`, or `['piglets']` when the sow's death is already recorded (the segment is not drawn) |
 | `causes[]` | `open`: stillborn · mummified · crushed · scours · starve-out · other. `locked`: crushed · scours · starve-out · other |
 | sow causes | `open`: farrowing · prolapse · found dead · other. `locked`: prolapse · found dead · other |
@@ -32,27 +35,51 @@ dead_batch {
   litterId, phase, hand,
   stampAt,            // Save time; the stamp is the date (no WHEN is asked)
   deviceBase,         // the litter version the draft was made against
-  lines: [ {cause, n}            // unidentified tallies
-         | {cause, rowId} ],     // one identified piglet each
+  lines: [ {cause, n, note?}                // unidentified tallies (`other` carries the note)
+         | {cause, rowId, fromLoss?} ],     // one identified piglet each; fromLoss: this tagged body is the missing one
   lossSeen:  [ {lossId, qty} ],  // the open losses on screen when the hand answered
   lossAlloc: [ {lossId, qty} ],  // bodies drawn from them, oldest loss first; Σ qty = the "From the missing" answer
-  photos: [ photoRef ]         // ride this Save; uploads queue offline, the event never waits
+  note?,                         // `Other · what happened` (optional)
+  photos: [ photoRef ]         // kept on the event; ride this Save; uploads queue offline, the event never waits
 }
-sow_died { litterId, cause, note?, photos: [ photoRef ] }   // never batched with piglets; photos ride this Save
+sow_died { litterId, cause, note?, photos: [ photoRef ] }   // never batched with piglets; photos ride this Save;
+                                                            // `other` keeps cause `other` and the note apart
 ```
 
 - **Allocation.** The hand answers how many of the untagged bodies were missing (a Stepper,
-  `0 … min(untagged bodies, Σ open loss)`); the device allocates them to open losses oldest first.
-  Identified piglets are never missing (they were on the roster) and never draw from a loss.
-- **Alive** after a locked batch: `alive − (untagged bodies − allocated) − identified piglets`. It can never go
+  `0 … min(untagged bodies, Σ unnamed open loss)`); the device allocates them to open losses oldest first.
+- **Identified piglets can be the missing ones (R1-9; supersedes "identified piglets are never missing").** A Set
+  count may name which tagged piglets are missing (required only when the untagged cannot cover the difference);
+  a named piglet is listed in the roster as `counted missing <time>`, and its body closes its own loss (Alive does
+  not move). An alive tagged piglet picked while a loss has an unnamed part (`canBeMissing`) is asked
+  `Was 271004 one of the 2 missing?` — `One of the missing · alive stays 11` (`fromLoss`: its body takes that
+  loss's unnamed share) or `Died here · alive 11 → 10`. There is no default: Save waits until it is answered.
+- **A body found in another crate (R1-8).** In processing, after the lock, the drawer lists the other litters of
+  the room with an open loss (`One of D03's 2 missing?`, with the count's stamp). Tapping one records the draft
+  **there**: the untagged bodies are presumed from that loss (the answer is preset to what is open and stays
+  editable); tagged picks are dropped (they belong to their own litter); the header reads
+  `Recording in D03 · found in A02` with `Record in A02 instead`. The app never pairs by itself. From the room's
+  Explain page, `Found a body?` opens the same drawer on a picker of the unit's open losses (`dead-found`).
+- **Alive** after a locked batch: `alive − (untagged bodies − allocated) − identified piglets not from a loss`
+  (a named-missing or `fromLoss` piglet was already taken off Alive by its count). It can never go
   negative: the answer has a floor `kMin = max(0, untagged bodies − unidentified alive)` (new deaths must be live
   unidentified piglets; picked identified piglets are already on the roster). The Stepper's floor is kMin; it is
   pre-set to kMin with `At least 2 must be from the missing`; raising the tallies raises the answer to kMin; Save
   refuses an answer below kMin. The tally cap (`unidentified alive + Σ open loss`) keeps kMin ≤ Σ open loss.
 - **`None were missing` is an explicit answer** (a text action shown while the question is unanswered and kMin
   is 0). The floor-gray − never answers anything; it keeps its one meaning.
-- **Photos** ride the Save that holds them: the receipt and the History line say so (`Saved · +2 crushed ·
-  1 missing still open · 2 photos`).
+- **Photos** ride the Save that holds them and are **kept on the event** (`photos`): the receipt and the History
+  line say so (`Saved · +2 crushed · 1 missing still open · 2 photos`). Before Save each thumbnail opens the viewer
+  (`Photo 2 of 2`, Back and Delete, 24px apart); Delete returns to the drawer with `Photo deleted · Undo` for 5 s.
+  The record page shows the event's photos (Back only: no Delete from History).
+- **This entry, not the litter's total (R1-26).** Every stepper starts at 0: it counts this Save's bodies. The
+  litter's running total is said apart (`12 alive · 1 dead so far` in the header, `3 recorded before` under a
+  cause), never prefilled. The stepper keys name the cause (`Crushed · one more`). The unsaved words are one unit
+  everywhere: `1 unsaved` / `1头未保存` (`pp.dead.unsaved`).
+- **`Other` has a note** (`What happened · optional`), kept on the event and on its line.
+- **The receipt says when the missing are all found**: `Saved · +1 crushed · all missing found` when this Save
+  closed the last open loss; otherwise `· 1 missing still open`. Routed or found from the room it names the litter
+  (`Saved · D03 · +1 crushed · all missing found`).
 - **A new tick starts with no cause**: ticking another identified piglet never copies a cause; the shared
   control reads `Cause for 2 picked` with nothing selected until a cause is chosen for all of them, and Save
   points at the first piglet without one (`Pick a cause for notch 27-14`). Rows with no sex or weight print
@@ -70,14 +97,19 @@ sow draft; `Clear` clears only the mode on screen; the drawer reopens in the mod
 
 ```
 { litterId, mode, baseVersion,
-  tallies {cause: n}, picks {rowId: cause}, photoRefs [],    // piglets
-  sowCause, sowNote, photoRefs [] }                          // sow
+  tallies {cause: n}, picks {rowId: cause}, miss {rowId: yes|no}, note, route, photoRefs [],   // piglets
+  sowCause, sowNote, photoRefs [] }                                                        // sow
 ```
+
+On the prototype the envelope lives in `sessionStorage` under `pp-dead-draft:<variant>:<litter the drawer
+opened on>`; `route` is the litter a found body is being recorded on.
 
 - The loss answer is **not** persisted: it is re-asked on every reopen (pre-set to kMin when that is above 0).
 - **Restore trims to changed truth and says so**: a picked row that died elsewhere, or tallies above
   a lowered cap, are dropped on reopen with one line naming what was dropped.
-- The host says a draft waits in words: `1 unsaved` (piglets), `sow cause unsaved` (sow).
+- The host says a draft waits in words: `1 unsaved` (piglets, `pp.dead.unsaved`: `1头未保存`), `sow cause unsaved`
+  (sow). The host is the page the drawer was opened from (the litter's `Record dead` door); the drawer page has no
+  host of its own.
 
 ## Merge (per RULINGS' draft merge contract)
 
@@ -105,12 +137,18 @@ It is never silently a second death. Two deaths for one `rowId` keep the earlies
   bar names the missing step (`Pick a cause for 271004`, `How many were missing?`); tapping the gray
   Save scrolls to that step. An empty draft names itself only when Save is tapped.
 - Re-rendering keeps the body's scroll position and the focused control.
-- After Save the host shows the receipt (`Saved · +1 crushed · 1 missing still open`); the host's own
-  Back ignores taps for ~400 ms after the drawer closes.
-- The sow's Save is hold-to-commit (850 ms): `touch-action:none`, no callout, sliding within the button
-  keeps the hold, a plain tap says `Keep holding to save`, an `aria-live` line reports start and
-  cancel, and keyboard or switch access uses a two-step alternative (`Press Save again`). The armed step
-  disarms on any change (cause, mode, photo, note), when focus leaves the button, and after 5 s. When the
-  hold completes, the timer rechecks what Save needs before it commits.
+- **Save and Back return to where the worker came from (R1-26)**: the page named by `back` (Explain, the count
+  host), else the litter. There is no host stub and no extra Back. Save hands its receipt over on the phone
+  (`sessionStorage` `pp-receipt:dead` = `{ parts: [{ id, args, tone }], litter, from, event }`, and `saved=dead` on
+  the URL); the page it returns to shows it (`Saved · +1 crushed · 1 missing still open`) and ignores taps for
+  ~400 ms. Back from a drawer opened on Explain returns to Explain.
+- **A held body is shown where the next body is recorded (R1-22)**: the drawer leads with `Same body recorded
+  twice?` and its two answers (One body / Two bodies) when the litter has one unanswered; the Set count drawer does
+  the same above its number.
+- The sow's Save is hold-to-commit (Button `holdButton` + `holdBind`, ADR 0002: 850 ms, the card's slop, repeat
+  guard and 400 ms arm floor): a plain tap says `Keep holding to save`, the status line beside the bar reports start
+  and cancel, and keyboard or switch access uses the card's two-step (`Press Save again`), disarmed after 5 s or on
+  blur. When the hold completes the page rechecks what Save needs before it commits (`settle(el, 'failed')`
+  otherwise). The warning above it is a `danger` Banner (live).
 - Identified piglets: picked from the roster or by `Scan ear tag`; one cause control for everything
   picked sits below the roster, so ticking never moves a row under the thumb.
