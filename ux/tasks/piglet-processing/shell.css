@@ -36,3 +36,5 @@
 .pp-litter .pp-chip[data-tone="red"] { color: var(--red); }
 .pp-litter .pp-chip::before { content: ""; flex: none; width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
 @media (prefers-reduced-motion: reduce) { .pp-litter { transition: none; } }
+/* A mark's evidence line (shell-ui.js markLine): each part wraps as a whole, so a wrapped part never lies under another. */
+.pp-mark > span { display: inline-block; max-width: 100%; }

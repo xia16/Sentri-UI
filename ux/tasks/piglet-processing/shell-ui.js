@@ -98,6 +98,30 @@
       (o.static ? '' : '<span class="st-row-chevron">' + ICON.icon('chevron') + '</span>') + '</' + tag + '>';
   };
 
+  /* ---- a stamp as a registered span: `09:14 · G.H` today, `Sep 26 · 18:20 · L.M` before ---- */
+  U.stampSpan = function (iso, who, today) {
+    var same = today && String(iso).slice(0, 10) === String(today).slice(0, 10);
+    return same ? U.span('pp.common.stamp.today', { t: U.time(iso), who: who }) : U.span('pp.common.stamp.date', { date: U.date(iso), t: U.time(iso), who: who });
+  };
+  /* ---- a mark's evidence line (ticket #12): `09:14 · G.H · 10 piglets · 2 deferred: weak`. A corrected mark, or one
+     recorded through a correction, prints its value amber forever (RULINGS Q7); the words stay ink. r: a ledger record. ---- */
+  U.markLine = function (r, today) {
+    var tone = r.corrected || r.viaCorrection ? 'amber' : null, out = [U.stampSpan(r.at, r.who, today)];
+    var why = function (k) { return PP.t('pp.litter.why.' + k); };
+    if (r.castration) {
+      var c = r.castration;
+      out.push(U.span('pp.common.mark.castrated', { c: c.castrated || 0 }, { tone: tone }));
+      ['hernia', 'cryptorchid', 'kept', 'deferred'].forEach(function (k) {
+        if (c[k]) out.push(U.span('pp.common.mark.part', { n: c[k], reason: why(k === 'deferred' && c.deferReason ? c.deferReason : k) }));
+      });
+    } else {
+      out.push(U.span(PP.one('pp.common.unit.piglet', r.n), { n: r.n }, { tone: tone }));
+      if (r.deferred) out.push(U.span('pp.common.mark.deferred', { k: r.deferred, reason: why(r.deferReason || 'deferred') }, { tone: tone }));
+      if (r.product) out.push(U.span('pp.litter.product.' + r.product));
+    }
+    return '<span class="pp-mark">' + out.join(' ' + U.span('pp.common.sep') + ' ') + '</span>';
+  };
+
   /* ---- Candidate:Receipt: the change the last record made, one line; parts [{ id, args, tone }] ---- */
   U.receipt = function (list, o) {
     o = o || {};

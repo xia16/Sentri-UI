@@ -33,8 +33,8 @@
      derive(events, config, { today })   → Derived (README: ux/laws/glossary.md, Ledger module)
      append(events, event, config, opts) → { ok, reason, detail, event, events, derived, dependents }
      balances(litter)                    → the ledger identity for one derived litter
-     select.room / litter / deathDraft / moveDraft / end — what pages render; drafts are validated
-       by the same replay `append` runs
+     select.room / litter / deathDraft / moveDraft / end / record / edit — what pages render; drafts
+       are validated by the same replay `append` runs
 */
 
 const DAY_MS = 86400000;
@@ -1380,7 +1380,229 @@ function endSelect(derived) {
   return { atEnd: derived.ended && derived.ended.snapshot ? clone(derived.ended.snapshot) : null, now: endFigures(derived.config, derived.litters), ended: derived.ended ? Object.assign({}, derived.ended, { snapshot: undefined }) : null };
 }
 
-export const select = { room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect };
+/* ---- corrections and the litter record (slice S8, ticket #12) ---- */
+
+// The fields of a record a correction can change, as the page prints them.
+function recFields(e) {
+  if (!e) return null;
+  if (e.type === 'treat') return { litter: e.litter, dose: e.dose, n: e.n == null ? null : e.n, deferred: e.deferred ? Object.assign({}, e.deferred) : null, exempt: e.exempt ? Object.assign({}, e.exempt) : null, castration: e.castration ? Object.assign({}, e.castration) : null };
+  if (e.type === 'move') return { from: e.from, to: e.to, n: e.n };
+  if (e.type === 'count') return { litter: e.litter, observed: e.observed };
+  if (e.type === 'identity') return { litter: e.litter, op: e.op };
+  return { litter: e.litter || null };
+}
+const touches = (e, id) => !!e && (e.litter === id || e.from === id || e.to === id);
+const dayOf = (at) => String(at || '').slice(0, 10);
+
+/* The litter record page: the litter's ledger as a timeline. Every accepted event that touched the
+   litter, as it was written, plus each correction with its before → after (a withdrawn mark stays on
+   the page, followed by the act that withdrew it). Newest first, grouped by day; a day carries its
+   hand when one hand wrote all of it. Read-only. */
+function recordSelect(derived, id) {
+  const L = derived.litters[id];
+  if (!L) return null;
+  const input = derived.input || { events: [] };
+  const events = input.events || [];
+  const bad = new Set(derived.rejected.map((r) => r.id));
+  const byId = new Map(events.map((e) => [e.id, e]));
+  const rootOf = (tid) => { let e = byId.get(tid); while (e && e.type === 'correction') e = byId.get(e.target); return e; };
+  const endAt = derived.ended && derived.ended.event ? events.findIndex((e) => e.id === derived.ended.event) : -1;
+  const rows = new Map(L.identity.rows.map((r) => [r.rowId, r]));
+  const rowLabel = (rowId) => { const r = rows.get(rowId); return r ? { tag: r.tag, notch: r.notch } : { tag: null, notch: null }; };
+  const eff = new Map();
+  const out = [];
+  let run = null;
+  events.forEach((e, index) => {
+    if (bad.has(e.id)) return;
+    const base = { id: e.id, at: e.at || null, who: e.who || null, index };
+    if (e.type === 'correction') {
+      run = null;
+      const root = rootOf(e.target);
+      if (!root) return;
+      const before = eff.has(root.id) ? eff.get(root.id) : root;
+      const after = e.void ? null : Object.assign(clone(before || root), e.set || {}, { id: root.id, type: root.type });
+      eff.set(root.id, after);
+      const here = touches(root, id) || touches(before, id) || touches(after, id);
+      const freshHere = !!(e.fresh && e.fresh.litter === id);
+      if (!here && !freshHere) return;
+      const kind = root.type === 'identity' && root.op === 'close' ? 'reopen' : freshHere && !here ? 'fresh' : 'correction';
+      out.push(Object.assign(base, {
+        kind, target: { id: root.id, type: root.type, at: root.at || null, who: root.who || null },
+        before: recFields(before), after: after ? recFields(after) : null, void: !!e.void,
+        fresh: e.fresh ? Object.assign({ from: root.litter || null }, clone(e.fresh)) : null,
+        afterEnd: endAt >= 0 && index > endAt,
+        flagged: L.flags.some((f) => f.reason === 'correction_after_end' && f.events.includes(e.id + ':fresh'))
+      }));
+      return;
+    }
+    if (!touches(e, id) && !(e.type === 'end_task' && L.inTask)) { run = null; return; }
+    const corrected = !!(derived.corrections && derived.corrections[e.id]);
+    if (e.type === 'identity' && (e.op || 'add') === 'add') {
+      if (run && run.who === (e.who || null) && dayOf(run.at) === dayOf(e.at)) { run.n++; run.last = rowLabel(e.rowId); run.lastAt = e.at || null; return; }
+      run = Object.assign(base, { kind: 'rows', n: 1, first: rowLabel(e.rowId), last: rowLabel(e.rowId), lastAt: e.at || null });
+      out.push(run);
+      return;
+    }
+    run = null;
+    if (e.type === 'farrowed') out.push(Object.assign(base, { kind: 'farrowed', born: e.born, dead: sum(e.dead), alive: e.born - sum(e.dead), locked: !!e.locked }));
+    else if (e.type === 'treat') out.push(Object.assign(base, recFields(e), { kind: 'treat', target: e.target || null, corrected }));
+    else if (e.type === 'death') {
+      const d = L.deaths.find((x) => x.id === e.id);
+      const byCause = {};
+      for (const l of e.lines || []) byCause[l.cause] = (byCause[l.cause] || 0) + (l.rowId ? 1 : l.n || 0);
+      out.push(Object.assign(base, { kind: 'death', byCause, n: sum(byCause), fromMissing: d ? d.fromMissing : 0, rows: (e.lines || []).filter((l) => l.rowId).map((l) => rowLabel(l.rowId)) }));
+    } else if (e.type === 'count') {
+      const c = L.counts.find((x) => x.id === e.id);
+      out.push(Object.assign(base, { kind: 'count', observed: e.observed, wrote: c ? c.wrote : null, corrected }));
+    } else if (e.type === 'move') {
+      const m = L.moves.find((x) => x.id === e.id);
+      const cur = eff.has(e.id) ? eff.get(e.id) : e;
+      out.push(Object.assign(base, { kind: 'move', dir: e.from === id ? 'out' : 'in', other: e.from === id ? e.to : e.from, n: e.n, corrected, inForce: !!m && !!cur }));
+    } else if (e.type === 'identity' && e.op === 'edit') {
+      const r = rows.get(e.rowId), x = r ? r.edits.find((y) => y.event === e.id) : null;
+      out.push(Object.assign(base, { kind: 'row_edit', row: rowLabel(e.rowId), rowId: e.rowId, before: x ? Object.assign({}, x.before) : {}, set: Object.assign({}, e.set || {}) }));
+    } else if (e.type === 'identity' && e.op === 'withdraw') out.push(Object.assign(base, { kind: 'row_withdraw', row: rowLabel(e.rowId), rowId: e.rowId }));
+    else if (e.type === 'identity' && e.op === 'close') out.push(Object.assign(base, { kind: 'closed', corrected }));
+    else if (e.type === 'sow_died') out.push(Object.assign(base, { kind: 'sow_died', cause: e.cause || null }));
+    else if (e.type === 'weaned') out.push(Object.assign(base, { kind: 'weaned', n: e.n == null ? null : e.n }));
+    else if (e.type === 'end_task') out.push(Object.assign(base, { kind: 'end_task' }));
+  });
+  out.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : b.index - a.index));
+  const days = [];
+  for (const x of out) {
+    const d = dayOf(x.at);
+    let g = days[days.length - 1];
+    if (!g || g.date !== d) { g = { date: d, who: null, entries: [] }; days.push(g); }
+    g.entries.push(x);
+  }
+  for (const g of days) { const hands = new Set(g.entries.map((x) => x.who)); g.who = hands.size === 1 ? g.entries[0].who : null; }
+  return { litter: id, days, entries: out.length, newest: out[0] || null };
+}
+
+/* The one Edit screen for a litter (slice S8): what it can correct, and the draft checked by the
+   same replay `append` runs.
+     draft = { marks: { <record id>: { n, reason } | { void: true } | { to: <crate> } },
+               moves: { <move id>: { n?, to? } }, rows: { <row id>: { set: {…} } | { withdraw: true } },
+               reopen: true }
+   A mark lowered leaves the rest deferred with a reason; `void` un-records it (stamped, the original
+   kept); `to` un-records it here and records it fresh on the right litter (the right litter's owed,
+   as a one-tap would). A Move is corrected by id (its legs re-route); identity rows are edited or
+   withdrawn; a closed candidate set reopens by voiding its close. Save commits `events` in order. */
+function editSelect(derived, id, draft, stamp) {
+  const L = derived.litters[id];
+  if (!L) return null;
+  const dr = draft || {};
+  const input = derived.input || { events: [], config: {}, opts: {} };
+  const events = input.events || [];
+  const cfg = derived.config;
+  const order = doseOrder(cfg);
+  const byId = new Map(events.map((e) => [e.id, e]));
+  const marks = [];
+  for (const D of Object.values(L.doses).sort(order)) {
+    for (const r of D.records) {
+      if (r.target === 'unknown') continue;
+      const whole = r.castration ? null : (r.n || 0) + (r.deferred || 0) + (r.exempt || 0);
+      marks.push({ id: r.id, dose: r.dose, tx: D.tx, at: r.at, who: r.who, n: r.castration ? r.castration.castrated : r.n,
+        deferred: r.deferred || 0, deferReason: r.deferReason || null, exempt: r.exempt || 0, castration: r.castration ? Object.assign({}, r.castration) : null,
+        whole: r.castration ? (r.castration.castrated || 0) + (r.castration.deferred || 0) : whole,
+        corrected: !!r.corrected || !!r.viaCorrection, viaCorrection: r.viaCorrection || null,
+        original: r.viaCorrection ? null : recFields(byId.get(r.id)) });
+    }
+  }
+  marks.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
+  const rows = L.identity.rows.filter((r) => r.litter === id && r.status !== 'withdrawn').map((r) => Object.assign({}, r, { corrected: r.edits.length > 0 }));
+  const moves = L.moves.map((m) => Object.assign({}, clone(m), { corrected: !!(derived.corrections && derived.corrections[m.id]) }));
+  let closeEv = null;
+  if (L.identity.closed) for (const e of events) if (e.type === 'identity' && e.op === 'close' && e.litter === id) closeEv = e;
+  const closed = closeEv ? { id: closeEv.id, at: closeEv.at || null, who: closeEv.who || null, k: L.identity.identified } : null;
+  // where a mark recorded on the wrong litter can go: litters in the task that owe that dose now
+  const targets = (dose) => Object.values(derived.litters).filter((T) => T.id !== id && T.inTask && T.phase === 'locked' && T.alive > 0 && T.doses[dose] &&
+      (T.doses[dose].owed > 0 || (T.doses[dose].owed == null && !T.doses[dose].records.length)))
+    .sort((a, b) => (a.room === L.room ? 0 : 1) - (b.room === L.room ? 0 : 1) || (a.id < b.id ? -1 : 1))
+    .map((T) => ({ litter: T.id, room: T.room, owed: T.doses[dose].owed, alive: T.alive }));
+
+  const list = [], changes = [];
+  let step = null;                                     // the draft's own step still missing (Save waits)
+  for (const m of marks) {
+    const x = (dr.marks || {})[m.id];
+    if (!x) continue;
+    if (x.to) {
+      const T = derived.litters[x.to], TD = T && T.doses[m.dose];
+      const owedThere = TD ? TD.owed : 0;
+      const fresh = m.castration ? { litter: x.to, dose: m.dose, castration: { castrated: owedThere == null ? m.n : Math.min(m.n, owedThere) } } : { litter: x.to, dose: m.dose, n: owedThere || 0 };
+      list.push({ type: 'correction', target: m.id, void: true, fresh });
+      changes.push({ kind: 'wrong', mark: m.id, dose: m.dose, from: m.n, to: x.to, n: m.castration ? fresh.castration.castrated : fresh.n });
+    } else if (x.void) {
+      list.push({ type: 'correction', target: m.id, void: true });
+      changes.push({ kind: 'void', mark: m.id, dose: m.dose, from: m.n });
+    } else if (x.n != null && x.n !== m.n) {
+      const rest = m.whole - x.n - (m.castration ? 0 : m.exempt);
+      const reason = x.reason || (rest > 0 && m.deferReason) || null;
+      if (rest > 0 && !reason && !step) step = { why: 'reason', mark: m.id, n: rest };
+      let set;
+      if (m.castration) set = { castration: Object.assign({}, m.castration, { castrated: x.n, deferred: rest || 0 }, rest > 0 ? { deferReason: reason } : {}) };
+      else set = { n: x.n, deferred: rest > 0 ? { n: rest, reason } : null };
+      list.push({ type: 'correction', target: m.id, set });
+      changes.push({ kind: 'mark', mark: m.id, dose: m.dose, from: m.n, to: x.n, rest: Math.max(0, rest), reason });
+    }
+  }
+  for (const m of moves.filter((mv) => mv.dir === 'out' || mv.dir === 'in')) {
+    const x = (dr.moves || {})[m.id];
+    if (!x) continue;
+    const set = {};
+    if (x.n != null && x.n !== m.n) set.n = x.n;
+    const legOther = m.dir === 'out' ? 'to' : 'from';
+    if (x.to && x.to !== m.other) set[legOther] = x.to;
+    if (!Object.keys(set).length) continue;
+    list.push({ type: 'correction', target: m.id, set });
+    changes.push({ kind: 'move', move: m.id, dir: m.dir, fromN: m.n, toN: set.n != null ? set.n : m.n, fromOther: m.other, toOther: set[legOther] || m.other });
+  }
+  for (const r of rows) {
+    const x = (dr.rows || {})[r.rowId];
+    if (!x) continue;
+    if (x.withdraw) {
+      list.push({ type: 'identity', litter: id, op: 'withdraw', rowId: r.rowId });
+      changes.push({ kind: 'withdraw', rowId: r.rowId, tag: r.tag, notch: r.notch });
+      continue;
+    }
+    const set = {};
+    for (const k of Object.keys(x.set || {})) if ((x.set[k] ?? null) !== (r[k] ?? null)) set[k] = x.set[k];
+    if (!Object.keys(set).length) continue;
+    list.push({ type: 'identity', litter: id, op: 'edit', rowId: r.rowId, set });
+    const before = {};
+    for (const k of Object.keys(set)) before[k] = r[k] ?? null;
+    changes.push({ kind: 'row', rowId: r.rowId, tag: r.tag, notch: r.notch, before, set });
+  }
+  if (dr.reopen && closed) {
+    list.push({ type: 'correction', target: closed.id, void: true });
+    changes.push({ kind: 'reopen', k: closed.k });
+  }
+
+  let why = step ? step.why : null, after = null, flags = [];
+  if (!why && list.length) {
+    const st = stamp || {};
+    let evs = events;
+    for (let i = 0; i < list.length; i++) {
+      const e = Object.assign({ id: (st.id || '__edit') + (list.length > 1 ? '-' + (i + 1) : ''), at: st.at || input.opts.today || null, who: st.who || null }, list[i]);
+      const r = append(evs, e, input.config, input.opts);
+      if (!r.ok) { why = r.reason; after = null; break; }
+      evs = r.events; after = r.derived;
+    }
+    if (after) {
+      const had = new Set(derived.flags.map((f) => f.reason + ':' + f.events.join(',')));
+      flags = after.flags.filter((f) => !had.has(f.reason + ':' + f.events.join(','))).map((f) => clone(f));
+    }
+  }
+  const A = after ? after.litters[id] : null;
+  return {
+    litter: id, marks, rows, moves, closed, targets,
+    changes, step, why, events: why || !list.length ? null : list,
+    ended: !!(derived.ended && derived.ended.event), afterEnd: !!(derived.ended && derived.ended.event) && list.some((e) => e.type === 'correction'),
+    flags, after: A ? { alive: A.alive, owed: Object.fromEntries(Object.entries(A.doses).map(([k, v]) => [k, v.owed])) } : null
+  };
+}
+
+export const select = { room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect, record: recordSelect, edit: editSelect };
 export const PPLedger = { derive, append, balances, dayNumber, select };
 export default PPLedger;
 if (typeof window !== 'undefined') window.PPLedger = PPLedger;

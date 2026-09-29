@@ -154,7 +154,21 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-move-owed-from-move", "url": "ux/tasks/piglet-processing/move.html?state=owed-from-move", "strict": true },
     { "name": "pp-move-owed-arrived-done", "url": "ux/tasks/piglet-processing/move.html?state=owed-arrived-done", "strict": true },
     { "name": "pp-move-unknown-check", "url": "ux/tasks/piglet-processing/move.html?state=unknown-check", "strict": true },
-    { "name": "pp-move-move-prelock-other", "url": "ux/tasks/piglet-processing/move.html?state=move-prelock&data=other", "strict": true }
+    { "name": "pp-move-move-prelock-other", "url": "ux/tasks/piglet-processing/move.html?state=move-prelock&data=other", "strict": true },
+    { "name": "pp-edit-record-page", "url": "ux/tasks/piglet-processing/edit.html?state=record-page", "strict": true },
+    { "name": "pp-edit-record-page-corrected", "url": "ux/tasks/piglet-processing/edit.html?state=record-page-corrected", "strict": true },
+    { "name": "pp-edit-edit", "url": "ux/tasks/piglet-processing/edit.html?state=edit", "strict": true },
+    { "name": "pp-edit-edit-changed", "url": "ux/tasks/piglet-processing/edit.html?state=edit-changed", "strict": true },
+    { "name": "pp-edit-edit-unrecord", "url": "ux/tasks/piglet-processing/edit.html?state=edit-unrecord", "strict": true },
+    { "name": "pp-edit-wrong-litter", "url": "ux/tasks/piglet-processing/edit.html?state=wrong-litter", "strict": true },
+    { "name": "pp-edit-wrong-litter-there", "url": "ux/tasks/piglet-processing/edit.html?state=wrong-litter-there", "strict": true },
+    { "name": "pp-edit-edit-row", "url": "ux/tasks/piglet-processing/edit.html?state=edit-row", "strict": true },
+    { "name": "pp-edit-withdraw-row", "url": "ux/tasks/piglet-processing/edit.html?state=withdraw-row", "strict": true },
+    { "name": "pp-edit-reopen-set", "url": "ux/tasks/piglet-processing/edit.html?state=reopen-set", "strict": true },
+    { "name": "pp-edit-edit-move", "url": "ux/tasks/piglet-processing/edit.html?state=edit-move", "strict": true },
+    { "name": "pp-edit-edit-after-end", "url": "ux/tasks/piglet-processing/edit.html?state=edit-after-end", "strict": true },
+    { "name": "pp-edit-litter-corrected", "url": "ux/tasks/piglet-processing/litter.html?state=litter&crate=A02&data=a02-corrected&stay=1", "strict": true },
+    { "name": "pp-edit-litter-wrong-there", "url": "ux/tasks/piglet-processing/litter.html?state=litter&crate=A04&data=a02-wrong-litter&stay=1", "strict": true }
   ]
 }
 ```

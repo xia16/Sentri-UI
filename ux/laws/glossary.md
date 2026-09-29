@@ -281,3 +281,19 @@ Slice S9 (`end.html`). *Unfinished litters* and *Unfinished piglet-doses* keep t
 **Mandatory changes words only.** `Mandatory · {n} litters unfinished` and `reported to the farm as not done` replace the plain lines; End is never blocked by it.
 
 **End is a shared-state commit.** After the hold the phone waits for the server's recheck (`Checking every litter`); offline, End is refused (`End needs a connection`); a change found by the recheck is said in one line (`Figures changed while you held · review again`) and the review shows again. Two more exits: `Already ended by {who} · {date} · {time}` opens their receipt; `No answer from the farm system · End may have gone through` points to the task as it stands and never offers the hold again. Once ended, Back never reopens the End flow: an overview or review left in history lands on the ended face. The task can't be reopened *(provisional, map ledger)*.
+
+## Corrections and the litter record (仔猪处理 · 修改与窝记录)
+
+Slice S8 (`edit.html`, ticket #12). Edit is one screen per litter; everything on it is the ledger's (`select.edit`, the draft replayed as `append` would) and Save commits one stamped act. The record page is `select.record`. Nothing is ever deleted: a withdrawn mark or row stays on the record with the act that withdrew it.
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Mark** 处理记录 (a stepper row in Edit, `Iron · day 3 · 12`) | piglets | the piglets one treat record marked (castration: the males castrated), as it stands now (after any earlier correction) | the record's own stamp (`09:14 · G.H`) | one record, one litter |
+| **Recorded then** (the stepper's ceiling, `12 were recorded`) | piglets | treated + deferred + exempt on that record: what it accounted for when it was written; a correction can lower or redistribute it, never raise it (a missed piglet is a new record) | the record's stamp | one record |
+| **Not treated here** 未在此处理 (`2 not treated here · why?`) | piglets | recorded-then minus the corrected mark; each needs a reason: weak or sick (deferred, stays owed), or the whole record was a mistake / done on another crate | the draft | one record |
+| **Change** (`12 → 10`, amber) | piglets / crates / fields | a value before and after the draft, printed in the banner and on the record page; the value is amber, the words ink | from the first change until Save or Clear; on the record page forever | one record, row, Move or set |
+| **Withdrawn** 已撤回 | one record or row | a mark or identity row recorded by mistake; stays on the record page with its original stamp and the withdrawing act's stamp; leaves every count | stamped at Save | one litter |
+| **Recorded here by correction** 经修改记在此窝 | piglets | the right litter's fresh record when a mark was done on another crate: the right litter's owed for that dose at Save (castration: the males castrated, up to what it owes) | the correction's stamp, not the original's (ledger) | the right litter |
+| **Corrected (amber)** 已修改 | a figure | any mark, Move, row value that a correction changed or created; prints amber on the litter sheet, in Edit and on the record page, forever | since the correction | one litter |
+| **After End** 任务结束后 (`flagged for review`) | corrections | a correction saved after End; a fresh record it creates is flagged `correction_after_end`; End's closing figures stay as closed | stamped after End | one task |
+| **Day header** (`today · G.H`) | record-page day | the records written on one date, newest first; the hand prints on the header when one hand wrote the whole day, else on each row | the date, relative within the week (`today`, `yesterday`, `3 days ago`, then `Sep 26`) | one litter |

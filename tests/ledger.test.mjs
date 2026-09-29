@@ -1347,3 +1347,68 @@ test('property: concurrent records give the same owed in every permutation', () 
     assert.equal(readings.size, 1, `seed ${seed}: ${JSON.stringify(recs)} ${[...readings]}`);
   }
 });
+
+// ---- the Edit screen and the litter record (slice S8, ticket #12) ----------------------------
+
+test('S8 edit: a lowered mark asks a reason, then Save is one stamped correction; the original is kept', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  const t = b.treat('A02', 'iron3', 12);
+  let d = run(b);
+  let e = select.edit(d, 'A02', { marks: { [t.id]: { n: 10 } } }, { id: 'x1', who: 'L.M' });
+  assert.equal(e.why, 'reason');
+  assert.equal(e.events, null);
+  e = select.edit(d, 'A02', { marks: { [t.id]: { n: 10, reason: 'weak' } } }, { id: 'x1', who: 'L.M' });
+  assert.equal(e.why, null);
+  assert.deepEqual(e.changes[0], { kind: 'mark', mark: t.id, dose: 'iron3', from: 12, to: 10, rest: 2, reason: 'weak' });
+  assert.equal(e.after.owed.iron3, 2);
+  for (const ev of e.events) b.ev.push(Object.assign({ id: 'x1', who: 'L.M', at: on(3, '10:31') }, ev));
+  d = run(b);
+  assert.equal(d.litters.A02.doses.iron3.records[0].corrected, true);
+  const rec = select.record(d, 'A02');
+  const corr = rec.days[0].entries[0];
+  assert.equal(corr.kind, 'correction');
+  assert.equal(corr.before.n, 12);
+  assert.equal(corr.after.n, 10);
+  assert.equal(rec.days[0].entries.find((x) => x.id === t.id).n, 12);      // the record as it was written
+});
+
+test('S8 edit: un-record and wrong litter are corrections, never deletions; the fresh record lands on the right litter', () => {
+  const b = book();
+  b.farrowed('A02', 12); b.farrowed('A04', 11);
+  const t = b.treat('A02', 'teeth', 12);
+  const d = run(b);
+  let e = select.edit(d, 'A02', { marks: { [t.id]: { void: true } } }, { id: 'x1' });
+  assert.equal(e.changes[0].kind, 'void');
+  assert.equal(e.after.owed.teeth, 12);
+  e = select.edit(d, 'A02', { marks: { [t.id]: { to: 'A04' } } }, { id: 'x2' });
+  assert.deepEqual(e.events[0].fresh, { litter: 'A04', dose: 'teeth', n: 11 });
+  assert.ok(e.targets('teeth').some((x) => x.litter === 'A04'));
+  for (const ev of e.events) b.ev.push(Object.assign({ id: 'x2', who: 'G.H', at: on(3, '10:31') }, ev));
+  const d2 = run(b);
+  assert.equal(d2.litters.A02.doses.teeth.owed, 12);
+  assert.equal(d2.litters.A04.doses.teeth.owed, 0);
+  assert.equal(select.record(d2, 'A04').days[0].entries[0].kind, 'fresh');
+  assert.equal(select.record(d2, 'A02').days[0].entries[0].kind, 'correction');
+});
+
+test('S8 edit: identity rows edit and withdraw; a closed set reopens by voiding its close; a Move is corrected by id', () => {
+  const cfg = { doses: [], identity: { scheme: 'tag', who: 'candidates' } };
+  const b = book();
+  b.farrowed('B06', 12); b.farrowed('B08', 9);
+  b.identity('B06', 'add', { rowId: 'r1', tag: '271001', weight: 1.51 });
+  b.identity('B06', 'add', { rowId: 'r2', tag: '271001' });
+  b.identity('B06', 'close');
+  const mv = b.move('B06', 'B08', 2);
+  const d = run(b, cfg);
+  const e = select.edit(d, 'B06', { rows: { r1: { set: { weight: 1.15 } }, r2: { withdraw: true } }, reopen: true, moves: { [mv.id]: { n: 1 } } }, { id: 'x' });
+  assert.equal(e.why, null);
+  assert.deepEqual(e.changes.map((c) => c.kind), ['move', 'row', 'withdraw', 'reopen']);
+  assert.equal(e.after.alive, 11);
+  for (const [i, ev] of e.events.entries()) b.ev.push(Object.assign({ id: 'x-' + (i + 1) }, ev));
+  const L = run(b, cfg).litters.B06;
+  assert.equal(L.identity.closed, false);
+  assert.equal(L.identity.liveRows, 1);
+  assert.equal(L.alive, 11);
+  assert.equal(run(b, cfg).litters.B08.alive, 10);
+});

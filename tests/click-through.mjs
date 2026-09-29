@@ -56,6 +56,31 @@ try {
   assert.match(dead, /11 piglets/);
   console.log('ok 2 room → litter → Record dead → Save → room:', dead);
 
+  // 3. litter → record iron → Edit → iron 12 → 10, 2 weak → Save → the litter prints the value amber → the record page
+  //    shows the correction (ticket #12).
+  await page.goto(base + 'litter.html?state=litter&crate=A02&stay=1&fresh=1'); await ready(page);
+  await page.click('[data-action="record"][data-value="iron3"]');
+  await page.waitForTimeout(700);
+  await page.click('[data-action="open-edit"]');
+  await page.waitForURL(/edit\.html/); await ready(page);
+  assert.equal(await page.locator('[data-ds="Candidate:EditBanner"]').count(), 0);          // no banner on entry
+  const minus = page.locator('[data-action="mark-step"][data-step="-1"]').first();
+  await minus.click(); await minus.click();
+  assert.match(await text(page, '[data-ds="Candidate:EditBanner"]'), /Correcting a past record · logged as G\.H.*Iron · day 3 12 → 10 · 2 not treated/);
+  assert.equal(await page.locator('[data-action="save"][aria-disabled="true"]').count(), 1);   // Save waits for the reason
+  await page.click('[data-action="mark-why"][data-value$=":weak"]');
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/litter\.html/); await ready(page);
+  const rec = page.locator('.lt-rec', { hasText: 'Iron · day 3' }).first();
+  assert.match((await rec.innerText()).replace(/\s+/g, ' '), /10 piglets · 2 deferred: weak/);
+  assert.equal(await rec.locator('.pp-tone[data-tone="amber"]').count(), 2);
+  assert.match(await text(page, '[data-action="open-dose"][data-value="iron3"]'), /2 owed|weak/);
+  await page.click('[data-action="open-record"]');
+  await page.waitForURL(/edit\.html\?state=record-page/); await ready(page);
+  const log = await text(page, '[data-ds="Log"]');
+  assert.match(log, /Iron · day 3 corrected .*12 → 10 · 2 deferred: weak.*Iron · day 3 · 12 piglets/);
+  console.log('ok 3 litter → Edit → 12 → 10 · 2 weak → Save → litter amber → record page:', log.slice(0, 120));
+
   await browser.close();
 } finally {
   server.kill();

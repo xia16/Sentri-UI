@@ -136,6 +136,11 @@
   function evidenceRow(r) {
     var t = title(r.dose), e = evidence(r), tag = recTag(r);
     var trail = tag ? span(tag[0], tag[1], tag[2] || null) : '';
+    // A corrected record (Edit, ticket #12) prints its value amber forever: the shell's mark line colours the value only.
+    if (r.corrected || r.viaCorrection) {
+      return '<div class="st-row lt-rec" data-ds="Candidate:EvidenceRow"><span class="st-row-copy"><strong>' + span(t[0], t[1]) + '</strong><small>' + U.markLine(r, TODAY) + '</small></span>' +
+        (trail ? '<span class="st-row-trailing">' + trail + '</span>' : '') + '</div>';
+    }
     return UI.row({ title: '', description: '', trailing: trail, className: 'lt-rec', strs: { title: t[0], description: e[0] }, args: { title: t[1], description: e[1] } })
       .replace('data-ds="Row"', 'data-ds="Candidate:EvidenceRow"');
   }
@@ -460,7 +465,8 @@
     } else if (a === 'open-move') { nav('move.html', { state: 'move', crate: crate });
     } else if (a === 'open-identity') { nav('id.html', { state: 'id-table', crate: crate });
     } else if (a === 'open-weight') { nav('edge.html', { state: 'birth-weight-entry', crate: crate });
-    } else if (a === 'open-record') { location.href = PP.href('edit.html', { state: 'record-page', crate: crate });
+    } else if (a === 'open-record') { nav('edit.html', { state: 'record-page', crate: crate });
+    } else if (a === 'open-edit') { nav('edit.html', { state: 'edit', crate: crate, from: 'litter' });
     } else document.documentElement.setAttribute('data-door', a + ':' + (v || ''));
   });
 
