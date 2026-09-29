@@ -1414,6 +1414,142 @@ test('S8 edit: identity rows edit and withdraw; a closed set reopens by voiding 
   assert.equal(run(b, cfg).litters.B08.alive, 10);
 });
 
+// ---- S8 review round 1: corrections gated on the whole log, after End, wrong litter, one event --
+
+const put = (b, ev, id, o = {}) => { const e = Object.assign({ id, at: on(3, '10:31'), who: 'G.H' }, ev, o); b.ev.push(e); return e; };
+
+test('S8-1 a correction that would invalidate a later record is refused and names it; fixing both in one Save passes', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  const t1 = b.treat('A02', 'iron3', 10, { deferred: { n: 2, reason: 'weak' } });
+  const t2 = b.treat('A02', 'iron3', 2, { at: on(4) });                     // the follow-up for the 2 weak
+  const d = run(b);
+  let e = select.edit(d, 'A02', { marks: { [t1.id]: { n: 12 } } }, { id: 'x1' });
+  assert.equal(e.why, 'changes_later');
+  assert.deepEqual(e.later.map((x) => [x.id, x.reason]), [[t2.id, 'nothing_owed']]);
+  assert.equal(e.after, null);                                              // never hides a dropped record
+  e = select.edit(d, 'A02', { marks: { [t1.id]: { n: 12 }, [t2.id]: { void: true } } }, { id: 'x1' });
+  assert.equal(e.why, null);
+  assert.equal(e.events.length, 1);
+  // written straight into the log, the ledger refuses it the same way
+  const c = put(b, { type: 'correction', target: t1.id, set: { n: 12, deferred: null } }, 'x2');
+  const r = run(b).rejected.find((x) => x.id === c.id);
+  assert.equal(r.reason, 'changes_later');
+  assert.equal(r.detail.records[0].id, t2.id);
+});
+
+test('S8-1b voiding a Move with deaths after it on the receiver is gated; Recorded by mistake voids both legs', () => {
+  const b = book();
+  b.farrowed('B06', 12); b.farrowed('B08', 9);
+  const mv = b.move('B06', 'B08', 2);
+  const d0 = run(b);
+  let e = select.edit(d0, 'B06', { moves: { [mv.id]: { void: true } } }, { id: 'x' });
+  assert.equal(e.why, null);
+  assert.equal(e.after.alive, 12);
+  b.death('B08', [{ cause: 'crushed', n: 11 }], { at: on(4) });
+  e = select.edit(run(b), 'B06', { moves: { [mv.id]: { void: true } } }, { id: 'x' });
+  assert.equal(e.why, 'changes_later');
+  assert.equal(e.later[0].type, 'death');
+});
+
+test('S8-2 after End a mark can be lowered or withdrawn as a fact: not done · corrected after End, never owed, End frozen', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  const t = b.treat('A02', 'iron3', 12, { at: on(3) });
+  b.ev.push({ id: 'end', type: 'end_task', at: on(5, '12:00'), who: 'G.H' });
+  const cfg = TASKED(['A02']);
+  const d = run(b, cfg, 6);
+  const e = select.edit(d, 'A02', { marks: { [t.id]: { n: 10 } } }, { id: 'x', at: on(6) });
+  assert.equal(e.why, null);                                                // no reason asked: it is a fact
+  put(b, e.events[0], 'x', { at: on(6) });
+  const D = run(b, cfg, 6).litters.A02.doses.iron3;
+  assert.equal(D.owed, 0);
+  assert.equal(D.notDoneAfterEnd, 2);
+  const s = select.end(run(b, cfg, 6));
+  assert.deepEqual(s.atEnd.unfinishedLitters, []);
+  assert.deepEqual(s.now.unfinishedLitters, []);
+  assert.deepEqual(s.now.correctedAfterEnd, [{ litter: 'A02', dose: 'iron3', n: 2 }]);
+  put(b, { type: 'correction', target: t.id, void: true }, 'y', { at: on(6, '11:00') });
+  assert.equal(run(b, cfg, 6).litters.A02.doses.iron3.notDoneAfterEnd, 12);
+});
+
+test('S8-3 wrong litter carries the act: n set by the worker, deferred travels, the original time kept, flagged from A02', () => {
+  const b = book();
+  b.farrowed('A02', 12); b.farrowed('A04', 12);
+  const t = b.treat('A02', 'iron3', 10, { deferred: { n: 2, reason: 'weak' }, at: on(3, '08:40'), who: 'L.M' });
+  const d = run(b);
+  let e = select.edit(d, 'A02', { marks: { [t.id]: { to: 'A04' } } }, { id: 'x' });
+  assert.deepEqual(e.events[0].changes[0].fresh, { litter: 'A04', dose: 'iron3', n: 10, deferred: { n: 2, reason: 'weak' }, at: on(3, '08:40'), who: 'L.M' });
+  e = select.edit(d, 'A02', { marks: { [t.id]: { to: 'A04', n: 9, reason: 'sick' } } }, { id: 'x' });
+  assert.equal(e.why, null);
+  assert.deepEqual(e.events[0].changes[0].fresh.deferred, { n: 3, reason: 'sick' });
+  put(b, select.edit(d, 'A02', { marks: { [t.id]: { to: 'A04' } } }, { id: 'x' }).events[0], 'x');
+  const r = run(b).litters.A04.doses.iron3.records[0];
+  assert.equal(r.at, on(3, '08:40'));
+  assert.equal(r.onTime, true);
+  assert.equal(r.from, 'A02');
+  assert.equal(r.viaCorrection, 'x');
+});
+
+test('S8-4 one Save is one correction event; concurrent corrections of one mark are both kept and flagged', () => {
+  const b = book();
+  b.farrowed('A02', 12);
+  b.identity('A02', 'add', { rowId: 'r1', notch: '4-1', weight: 1.51 });
+  const t = b.treat('A02', 'iron3', 12);
+  const d = run(b);
+  const e = select.edit(d, 'A02', { marks: { [t.id]: { n: 11, reason: 'weak' } }, rows: { r1: { set: { weight: 1.15 } } } }, { id: 'x' });
+  assert.equal(e.events.length, 1);
+  assert.equal(e.events[0].changes.length, 2);
+  const seen = b.ev.map((x) => x.id);
+  put(b, e.events[0], 'x', { seen });
+  put(b, { type: 'correction', changes: [{ target: t.id, set: { n: 10, deferred: { n: 2, reason: 'sick' } } }] }, 'y', { seen, who: 'L.M' });
+  const d2 = run(b);
+  assert.ok(d2.litters.A02.flags.some((f) => f.reason === 'correction_concurrent'));
+  assert.equal(d2.litters.A02.identity.rows[0].weight, 1.15);
+  const rec = select.record(d2, 'A02');
+  const ys = rec.days[0].entries.filter((x) => x.kind === 'correction');
+  assert.equal(ys.length, 2);
+  assert.ok(ys.every((x) => x.changes[0].before.n === 12));                // each saw 12
+});
+
+test('S8-5 the fresh mark is editable; voiding a void is refused; reversing a wrong-litter correction is atomic', () => {
+  const b = book();
+  b.farrowed('A02', 12); b.farrowed('A04', 11);
+  const t = b.treat('A02', 'teeth', 12);
+  put(b, { type: 'correction', changes: [{ target: t.id, void: true, fresh: { litter: 'A04', dose: 'teeth', n: 11 } }] }, 'x');
+  let d = run(b);
+  const f = d.litters.A04.doses.teeth.records[0];
+  assert.equal(f.id, 'x:1');
+  const e = select.edit(d, 'A04', { marks: { [f.id]: { n: 10, reason: 'weak' } } }, { id: 'y' });
+  assert.equal(e.why, null);
+  const again = put(b, { type: 'correction', changes: [{ target: t.id, void: true }] }, 'z');
+  assert.equal(run(b).rejected.find((r) => r.id === again.id).reason, 'already_withdrawn');
+  b.ev.pop();
+  const back = select.edit(d, 'A04', { marks: { [f.id]: { back: true } } }, { id: 'w' });
+  assert.equal(back.why, null);
+  put(b, back.events[0], 'w');
+  d = run(b);
+  assert.equal(d.litters.A02.doses.teeth.owed, 0);
+  assert.equal(d.litters.A04.doses.teeth.owed, 11);
+});
+
+test('S8-6 a tagged Move is corrected by picking rows; withdrawing a dead piglet\'s record is refused', () => {
+  const b = book();
+  b.farrowed('B06', 12); b.farrowed('B08', 9);
+  b.identity('B06', 'add', { rowId: 'r1', notch: '1-1' }); b.identity('B06', 'add', { rowId: 'r2', notch: '1-2' });
+  const mv = b.move('B06', 'B08', 2, { rows: ['r1', 'r2'] });
+  let d = run(b);
+  const e = select.edit(d, 'B06', { moves: { [mv.id]: { rows: ['r1'] } } }, { id: 'x' });
+  assert.equal(e.why, null);
+  assert.equal(e.after.alive, 11);
+  b.farrowed('C01', 10);
+  b.identity('C01', 'add', { rowId: 'c1', notch: '2-1' });
+  b.death('C01', [{ cause: 'crushed', rowId: 'c1' }]);
+  d = run(b);
+  const w = select.edit(d, 'C01', { rows: { c1: { withdraw: true } } }, { id: 'y' });
+  assert.equal(w.why, 'row_dead');
+});
+
 // =============================================================================================
 // Round 4 — integration follow-ups (#19): rulings contradictions, then the gaps the pages worked around.
 
