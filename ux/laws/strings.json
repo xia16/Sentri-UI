@@ -853,6 +853,7 @@
     "pp.common.weight.by_finish": {"en": "Set at Finish · {stamp}", "zh": "分娩结束时设定 · {stamp}", "kind": "status"},
     "pp.common.weight.by_here": {"en": "Recorded in processing · {stamp}", "zh": "仔猪处理中记录 · {stamp}", "kind": "status"},
     "pp.common.kg": {"en": "{w} kg", "zh": "{w} kg", "kind": "unit"},
+    "pp.common.males_uncounted": {"en": "males counted as you cut", "zh": "公猪边阉边计", "kind": "body"},
     "pp.common.sex.label": {"en": "Sex", "zh": "性别", "kind": "label"},
     "pp.common.sex.boar_l": {"en": "Boar", "zh": "公", "kind": "label"},
     "pp.common.sex.gilt_l": {"en": "Gilt", "zh": "母", "kind": "label"},
@@ -886,7 +887,7 @@
     "pp.move.carry.males_range.done": {"en": "{lo}–{hi} males among the {n} · castrated", "zh": "这{n}头中{lo}–{hi}头公猪 · 已阉割", "kind": "body"},
     "pp.move.carry.males_range.check": {"en": "{lo}–{hi} males among the {n} · check on the pig", "zh": "这{n}头中{lo}–{hi}头公猪 · 看猪确认", "kind": "body"},
     "pp.move.carry.males_range.unknown": {"en": "{lo}–{hi} males among the {n} · unknown", "zh": "这{n}头中{lo}–{hi}头公猪 · 情况不明", "kind": "body"},
-    "pp.end.u.males": {"en": "{name} · males not counted", "zh": "{name} · 公猪未计数", "kind": "body"},
+    "pp.end.u.males": {"en": "{name} · males counted as you cut", "zh": "{name} · 公猪边阉边计", "kind": "body"},
     "pp.id.hint.refused": {"en": "Not recorded · check the tag against this litter", "zh": "未记录 · 请核对耳标与本窝", "kind": "status"}
   }
 }

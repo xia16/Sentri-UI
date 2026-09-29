@@ -160,6 +160,7 @@
     if (o.status === 'missed') parts.push(span('pp.litter.missed_word') + ' ' + span('pp.litter.missed_day', { d: o.missedAfter }, 'red'));
     var castrate = doseCfg(o.dose).castration;
     if (o.owed && o.deferred && o.deferReason) parts.push(span(castrate ? one('pp.litter.owed_males_reason', o.owed) : 'pp.litter.owed_reason', { n: o.owed, reason: reasonName(o.deferReason) }));
+    else if (o.males === 'uncounted') parts.push(span('pp.common.males_uncounted'));
     else if (o.owed != null && (o.owed || !o.unknown)) parts.push(span(castrate ? one('pp.litter.castr.owed', o.owed) : 'pp.litter.owed', { n: o.owed }));
     if (o.unknown) parts.push(span('pp.litter.owed_unknown', { n: o.unknown }, 'amber'));
     return parts.join(SEP());
@@ -168,8 +169,8 @@
     var t = title(o.dose);
     // Castration before its first record: males are unknown, so there is no one-tap; the whole row is the door and says so.
     // A missed dose has no one-tap either: it is recorded from the drawer, tagged `after day N`. Nor a dose End closed.
-    if (o.owed == null || o.status === 'missed' || o.ended || !o.owed) {
-      var trail = drafts[o.dose] ? 'pp.litter.act.resume' : o.owed == null ? 'pp.litter.castr.door' : null;
+    if (o.males === 'uncounted' || o.status === 'missed' || o.ended || !o.owed) {
+      var trail = drafts[o.dose] ? 'pp.litter.act.resume' : null;
       return '<button type="button" class="st-row lt-tx" data-ds="Candidate:TreatmentRow" data-action="open-dose" data-value="' + o.dose + '"><span class="st-row-copy"><strong>' +
         span(t[0], t[1]) + '</strong><small>' + owedLine(o) + '</small></span>' + (trail ? '<span class="st-row-trailing">' + span(trail) + '</span>' : '') +
         '<span class="st-row-chevron">' + ICON.icon('chevron') + '</span></button>';
@@ -470,12 +471,12 @@
     CFG = store.config; TODAY = store.today;
     // The litter: ?crate=, or ?sow=, else the state's own.
     crate = qs.get('crate') || st.crate || 'A02';
-    if (qs.get('sow')) Object.keys(window.PPFixtures.SOWS).forEach(function (c) { if (window.PPFixtures.SOWS[c].sow === qs.get('sow')) crate = c; });
+    if (qs.get('sow')) crate = store.crateOfSow(qs.get('sow')) || crate;
     SOW = store.sow(crate) || { sow: '', parity: 0, unit: 7, weight: null };
     var Lx = L();
     // From the room (state=litter): a litter outside the task, orphaned, or still farrowing opens its own face.
     if (name === 'litter' && Lx && !qs.get('stay')) {
-      var edge = !Lx.inTask ? 'no-task' : Lx.phase === 'open' ? 'prelock' : Lx.endedBySowDeath ? 'orphan-unlocked' : Lx.sowDied ? 'orphan' : '';
+      var edge = !Lx.recordable ? 'no-task' : Lx.phase === 'open' ? 'prelock' : Lx.endedBySowDeath ? 'orphan-unlocked' : Lx.sowDied ? 'orphan' : '';
       if (edge) { location.replace(PP.href('edge.html', { state: edge, crate: crate, unit: qs.get('unit'), data: store.name !== 'base' ? store.name : '' })); return; }
     }
     try { drafts = JSON.parse(sessionStorage.getItem('pp-drafts:' + store.name + ':' + crate) || 'null') || {}; } catch (e) { drafts = {}; }
