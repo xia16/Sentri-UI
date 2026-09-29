@@ -64,16 +64,33 @@ try {
   await page.waitForSelector('[data-action="open-bulk"]');
   await page.click('[data-action="open-bulk"]');
   await page.waitForURL(/bulk\.html/); await ready(page);
-  for (const c of ['A02', 'A04', 'B06', 'B10']) await page.check(`input[data-action="toggle"][value="${c}"]`);
-  assert.match(await text(page, '.bk-bar .pp-receipt'), /4 litters · 46 piglets/);
+  // ticks are a draft on this phone: Close keeps them, the room door says so, reopening restores them
+  for (const c of ['A02', 'A04']) await page.check(`input[data-action="toggle"][value="${c}"]`);
+  await page.click('.bk-bar [data-action="close"]');
+  await page.waitForURL(/room\.html/); await ready(page);
+  assert.match(await text(page, '[data-action="open-bulk"]'), /2 ticked · not recorded/);
+  await page.click('[data-action="open-bulk"]');
+  await page.waitForURL(/bulk\.html/); await ready(page);
+  assert.ok(await page.isChecked('input[data-action="toggle"][value="A04"]'));
+  for (const c of ['B06', 'B10']) await page.check(`input[data-action="toggle"][value="${c}"]`);
+  assert.match(await text(page, '.bk-bar .pp-receipt'), /4 litters · 46 piglets · not recorded yet/);
   await page.click('[data-action="review"]');
-  assert.match(await text(page, '[data-st-context="drawer"]'), /Will record/);
+  const review = await text(page, '[data-st-context="drawer"]');
+  assert.match(review, /A02 12 piglets · A04 11 piglets · B06 12 piglets · B10 11 piglets/);
+  await page.click('[data-action="record"]');                       // a tap too soon after Review is ignored
+  assert.equal(await page.locator('[data-st-context="drawer"]').count(), 1);
+  await page.waitForTimeout(700);
   await page.click('[data-action="record"]');
   await page.waitForSelector('.bk-bar [data-action="close"]');
+  await page.click('.bk-bar [data-action="close"]');                  // a second tap right after Record does not leave
+  assert.match(page.url(), /bulk\.html/);
   await page.waitForTimeout(300);
   const receipt = await text(page, '.bk-bar');
   assert.match(receipt, /Saved · iron · day 3 · 4 litters · 46 piglets/);
-  await page.waitForTimeout(1000);
+  // hold, then depart: the finished row keeps its place, then leaves for Done today (a door to its sheet)
+  assert.equal(await page.locator('[data-action="open-litter"][data-value="A02"]').count(), 0);
+  await page.waitForTimeout(1300);
+  assert.equal(await page.locator('[data-action="open-litter"][data-value="A02"]').count(), 1);
   await page.click('.bk-bar [data-action="close"]');
   await page.waitForURL(/room\.html/); await ready(page);
   for (const c of ['A02', 'A04', 'B06', 'B10']) assert.equal(await page.locator(`[data-action="open-litter"][data-value="${c}"]`).count(), 0);

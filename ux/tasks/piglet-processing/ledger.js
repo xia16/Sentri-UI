@@ -1515,7 +1515,7 @@ function bulkDraftSelect(derived, opts) {
     if (E || !L.inTask) {
       // after End (or outside every task): only arrivals that owe the dose, and only as many as arrived
       if (!(D.catchUp > 0 && D.owed > 0) || D.isCastration) continue;
-      Object.assign(row, { kind: 'record', n: Math.min(D.catchUp, D.owed), catchUp: true });
+      Object.assign(row, { kind: 'record', n: Math.min(D.catchUp, D.owed), catchUp: true, outside: !L.inTask });
     }
     else if (D.status === 'later') Object.assign(row, { kind: 'not_due', inDays: D.due - L.dayAge });
     else if (D.done) { if (!todays.length) continue; Object.assign(row, { kind: 'done', records: todays, collided: todays.some((r) => r.collided) }); }

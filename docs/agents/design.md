@@ -156,13 +156,17 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-move-unknown-check", "url": "ux/tasks/piglet-processing/move.html?state=unknown-check", "strict": true },
     { "name": "pp-move-move-prelock-other", "url": "ux/tasks/piglet-processing/move.html?state=move-prelock&data=other", "strict": true },
     { "name": "pp-bulk-door", "url": "ux/tasks/piglet-processing/room.html?state=room&filter=iron", "strict": true },
+    { "name": "pp-bulk-door-ticked", "url": "ux/tasks/piglet-processing/room.html?state=room-bulk-ticked", "strict": true },
+    { "name": "pp-bulk-door-ended", "url": "ux/tasks/piglet-processing/room.html?state=room-bulk-ended", "strict": true },
     { "name": "pp-bulk-bulk", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk&tx=iron", "strict": true },
     { "name": "pp-bulk-bulk-select", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-select&tx=iron", "strict": true },
     { "name": "pp-bulk-bulk-review", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-review&tx=iron", "strict": true },
     { "name": "pp-bulk-bulk-deferred", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-deferred&tx=iron", "strict": true },
-    { "name": "pp-bulk-bulk-deferred-saved", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-deferred-saved&tx=iron", "strict": true },
     { "name": "pp-bulk-bulk-receipt", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-receipt&tx=iron", "strict": true },
-    { "name": "pp-bulk-bulk-offline-collision", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-offline-collision&tx=iron", "strict": true }
+    { "name": "pp-bulk-bulk-changed", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-changed&tx=iron", "strict": true },
+    { "name": "pp-bulk-bulk-offline-collision", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-offline-collision&tx=iron", "strict": true },
+    { "name": "pp-bulk-bulk-ended", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-ended&tx=iron", "strict": true },
+    { "name": "pp-bulk-bulk-ended-none", "url": "ux/tasks/piglet-processing/bulk.html?state=bulk-ended-none&tx=iron", "strict": true }
   ]
 }
 ```
