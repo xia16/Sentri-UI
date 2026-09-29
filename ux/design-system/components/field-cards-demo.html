@@ -17,8 +17,7 @@
 <body>
 <!-- Every state of the three candidate field cards (Stepper, Measure, Numpad), en and zh (?lang=zh).
      Sample litter: crate B04, 11 alive, day 3. Pressed and focus are drawn with the cards' data-preview hook.
-     The bars under the docked pads are the Button card; they carry data-lint-ignore because the Button card
-     is not token-clean yet (padding 10px 17px, gap 7px) — see ADR 0001. -->
+     The bars under the docked pads are the Button card. -->
 <main class="phone inspection-phone" data-st-context="page">
   <div id="screen"></div>
 </main>
@@ -30,7 +29,7 @@
   function st(title, body) { return '<div class="demo-state">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'ds.field.demo.' + title } }) + body + '</div>'; }
   function card(title, states) { return '<section class="demo-card">' + UI.heading({ title: '', kind: 'section', level: 2, strs: { title: 'ds.field.demo.' + title } }) + states.join('') + '</section>'; }
   function bar(primaryId) {
-    return '<div class="demo-bar" data-lint-ignore="">' +
+    return '<div class="demo-bar">' +
       '<button type="button" class="button secondary surface-back" data-ds="Button" data-action="back"><span data-str="act.back">Back</span></button>' +
       '<button type="button" class="button primary" data-ds="Button" data-action="commit"><span data-str="' + primaryId + '"></span></button></div>';
   }

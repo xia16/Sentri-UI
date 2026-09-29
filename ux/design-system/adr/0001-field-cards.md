@@ -85,6 +85,6 @@ These are to be recorded in the map's provisional ledger.
 ## Consequences and known gaps
 
 - Slices build counting rows, measured values and tag / weigh runs from these cards, and stop composing placeholders from farrowing's `row-stepper`.
-- The Button card is not token-clean yet: base `.button` has `padding: 10px 17px` and `gap: 7px`. The demo page's bars are drawn from it with `data-lint-ignore`, and the card needs a design-system cleanup.
+- The Button card is not token-clean yet: base `.button` has `padding: 10px 17px` and `gap: 7px`. The lint config's `allow` list accepts these as component-owned drift, so the demo's bars use the card as-is, with nothing ignored. The card still needs a design-system cleanup.
 - `backspace` is not yet in `ux/system/sentri-icons.js` or the artifact's asset blobs (`design-system.json`). They are left untouched on purpose.
 - `tokens.json` still carries `version: 1`. The doctor's version gap predates this ADR.
