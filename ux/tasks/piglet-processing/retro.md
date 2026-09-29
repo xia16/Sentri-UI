@@ -196,3 +196,64 @@ round or a rework) · **high** (user time, or a wrong design shipped to review).
 - **Change:** the lint should start its own server on a free port unless told
   to reuse one; the skill should say worktrees need the scripts by path.
 - **Cost:** low (caught before dispatch).
+
+## 14 · Slices — lint calibration never rendered the component bundle
+
+- **Stage:** Slices, S10 (first slice screens).
+- **What happened:** every strict slice page failed the lint with 164 errors,
+  all from the design system's own components (spacing 5 / 9 / 10, radius 6).
+  Start's calibration ran only on farrowing and inspection, which use their
+  own prototype CSS, never `bundle.css`, so the bundle's drift was invisible
+  until a designer built from it — the one path the loop mandates.
+- **Change:** calibrate the lint on the design system's own card previews too
+  (every `components/*/preview.html`), and treat drift found there as the
+  design system's, reported once, never charged to a slice.
+- **Cost:** medium (a designer's lint run spent; config patched by the driver).
+
+## 15 · Slices — the other-family lens cannot be handed screenshots as files
+
+- **Stage:** Slices, S10 review (Consistency lens).
+- **What happened:** the skill says the other-family lens is "handed
+  screenshots and the lint report as files". `collab.py discuss --context`
+  reads every context file as UTF-8 text and crashed on the first PNG. Worked
+  around by naming the image paths inside the prompt for the colleague's CLI
+  to open itself — whether it actually looked at them is unverified.
+- **Change:** `collab` should accept `--image <path>` and pass images through
+  the backend's image input; until then the skill should say "name the image
+  paths in the prompt" and ask the lens to cite what it saw in each image.
+- **Cost:** low.
+
+## 16 · Slices — lint side effects designers tripped on
+
+- **Stage:** Slices, first wave (field cards, S1, S10).
+- **What happened:** (a) on Windows the lint's `server.kill()` on a
+  `shell:true` spawn leaves `serve-ux` listening, so the next run on that
+  port silently reuses a server rooted in whichever worktree started it;
+  (b) the tap-size rule measures the transformed rect, so a 44px control
+  that scales to .96 on press (the design-system's press law) fails the
+  44px minimum — the Stepper author moved keys to 46px to pass; (c) a
+  content-sized drawer under ~30% of the screen is not treated as a layer,
+  so the page behind reports collisions — S1 forced its scan sheet to
+  `long`; (d) the first slice designers each widened `allow` themselves.
+- **Change:** kill the process tree (or serve in-process); measure tap size
+  on the untransformed box; treat any `[data-st-context=drawer]` as a layer;
+  the brief says `allow` is the driver's.
+- **Cost:** low each; (b) and (c) bent designs toward the tool.
+
+## 17 · Slices — seven lenses per round overlap heavily
+
+- **Stage:** Slices, S10 and S1 round 1.
+- **What happened:** of S10's ~45 lens findings, the same five defects were
+  raised by three or four lenses each (stale weight label, missing record
+  group on orphan, sow-died said three times, Edit target too small, weight
+  field above the actions). S1 repeated the pattern (scan vs find by five
+  lenses, the chip/line-2 duplication by four). Each round costs seven agent
+  runs plus the driver's merge of overlapping reports; the unique yield came
+  mostly from Scenarios (the mid-farrowing sow death, list reflow under the
+  thumb) and Consistency (rulings the designer missed).
+- **Change:** run Scenarios, Consistency (other family) and one combined
+  "craft" lens (interaction + copy + information + visual + simplicity with
+  their checklists) in round 1; split the craft lens only when it returns
+  more than ~15 findings. Re-runs after a fix round only need the lenses
+  whose findings were applied.
+- **Cost:** medium (tokens and driver time; no design harm).
