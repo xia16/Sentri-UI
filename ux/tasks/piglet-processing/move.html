@@ -91,6 +91,12 @@
     S.face = qs.get('crate'); S.other = qs.get('other'); S.n = +qs.get('n') || 1; S.explains = qs.get('explains').split(',');
     S.rows = qs.get('rows') ? qs.get('rows').split(',') : []; S.dir = 'out';
   }
+  // Opened from a gain line on count.html (`Move from another crate`): this litter receives, the worker picks the source;
+  // the Move explains the gain only (`explains: [null, gain]`), so the source loses the piglets and this litter keeps its alive.
+  if (name === 'move' && qs.get('explains')) {
+    S.explains = qs.get('explains').split(','); S.dir = qs.get('dir') === 'in' ? 'in' : 'out'; S.n = +qs.get('n') || 1;
+  }
+  function gainOnly() { return !!S.explains && !S.explains[0]; }
   S.dir = S.dir || 'out'; S.answers = S.answers || {}; S.rows = S.rows || []; S.untagged = S.untagged || 0;
   if (S.n == null) S.n = 1;
   var DEFAULT = JSON.stringify({ other: '', n: 1, rows: [], untagged: 0, answers: {}, dir: 'out' });
@@ -128,7 +134,7 @@
     if (S.view !== 'move') return;
     if (!canSource(S.face)) S.dir = 'in';                              // a sow with no piglets can only receive
     if (!canReceive(S.face) && canSource(S.face)) S.dir = 'out';        // a litter whose sow died can only send
-    if (S.explains) return;                                             // an explaining Move is locked to its crates, direction and count
+    if (S.explains && !gainOnly()) return;                              // an explaining Move is locked to its crates, direction and count
     if (S.other) {
       var bad = S.other === S.face || !L(S.other) || farrowing(S.other) || (S.dir === 'out' && !canReceive(S.other)) || (S.dir === 'in' && !canSource(S.other));
       if (bad) S.other = '';
@@ -289,7 +295,7 @@
     var label = S.dir === 'out' ? 'pp.move.to.title' : 'pp.move.from.title';
     if (S.other && !S.query) {                               // chosen: the list folds into one picker; tap it to choose again (not on an explaining Move)
       var m = crateMeta(S.other);
-      return UI.pickerField({ label: '', display: S.other, action: S.explains ? '' : 'change-crate', key: 'crate',
+      return UI.pickerField({ label: '', display: S.other, action: S.explains && !gainOnly() ? '' : 'change-crate', key: 'crate',
         strs: { label: label, display: 'pp.move.crate.chosen' }, args: { display: { code: S.other, meta: PP.t(m.id, m.args) } } });
     }
     var find = '<div class="mv-find">' +
@@ -315,7 +321,7 @@
     var src = source();
     if (!src) return '';
     var a = alive(src), ids = liveRows(src), small = a <= 8 || L(src).sowDied;
-    if (S.explains) {                                        // locked: the count the loss and gain already wrote
+    if (S.explains && !gainOnly()) {                         // locked: the count the loss and gain already wrote
       return UI.stepper({ label: '', description: '', value: count(), min: count(), max: count(), key: 'n',
         strs: { label: 'label.piglets', description: pl('pp.move.count.of', a), value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
         args: { description: { n: a, code: src } } });
@@ -343,7 +349,7 @@
   function dueAt(c, id) { var D = L(c).doses[id]; return D && D.status && D.status !== 'later'; }
   function askSection(dr) {
     // the selector leaves out doses not yet due at the receiver
-    var asks = dr.asks || [], checks = Object.keys(dr.carry || {}).filter(function (id) { return dr.carry[id] === 'check' && !doseCfg(id).castration; });
+    var src = source(), asks = dr.asks || [], checks = Object.keys(dr.carry || {}).filter(function (id) { return dr.carry[id] === 'check' && !doseCfg(id).castration; });
     if (!asks.length) return '';
     var n = dr.n;
     var qs2 = asks.map(function (id) {
@@ -401,15 +407,16 @@
   function summary(dr) {
     var p = pointer(dr);
     if (p) return '<div class="mv-summary">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: p.id }, args: { title: p.args } }) + '</div>';
-    var ex = S.explains ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.move.explain.closes' } }) : '';
+    var ex = S.explains ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: gainOnly() ? 'pp.move.explain.closes_gain' : 'pp.move.explain.closes' }, args: { title: { to: receiver() } } }) : '';
     return '<div class="mv-summary">' + deltas(source(), receiver(), dr.delta, dr.sourceAfter) + ex + '</div>';
   }
   function reviewRec(dr) { return { from: source(), to: receiver(), n: dr.n, rows: S.rows, packets: dr.carry, aliveBefore: alive(source()) }; }
   function moveDrawer() {
     var f = S.face, dr = S.other ? draft() : { why: 'no_receiver' }, ready = !pointer(dr) && !!dr.event;
     var sub = alive(f) > 0 ? span('pp.move.sheet.sub', { code: f, n: alive(f), day: L(f).dayAge }) : span('pp.move.sheet.sub_empty', { code: f });
-    var explain = S.explains ? UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: 'pp.move.explain.title', description: 'pp.move.explain.desc' },
-      args: { title: { code: receiver(), n: count() }, description: { from: source(), to: receiver() } } }) : '';
+    var explain = S.explains ? UI.heading({ title: '', description: '', kind: 'section', level: 3,
+      strs: gainOnly() ? { title: 'pp.move.explain.title_gain', description: 'pp.move.explain.desc_gain' } : { title: 'pp.move.explain.title', description: 'pp.move.explain.desc' },
+      args: { title: { code: receiver(), n: gainOnly() ? S.n : count() }, description: { from: source(), to: receiver() } } }) : '';
     var body = explain + directionSection() + crateSection() + countSection() + (S.other && dr.event ? askSection(dr) + carrySection(reviewRec(dr), false) : '');
     var primary = ready ? button('primary', 'save-move', 'pp.move.act.move', { n: dr.n, from: source(), to: receiver() }) : button('primary', 'save-move', 'pp.move.act.move_bare', null, true);
     return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
@@ -503,12 +510,12 @@
     var a = b.dataset.action, v = b.dataset.value;
     if (a === 'pick-row') v = b.value;                         // a multi row's checkbox carries its id as value
     if (a === 'pick-crate') { S.other = v; S.query = ''; S.rows = []; S.untagged = 0; S.answers = {}; render(); }
-    else if (a === 'change-crate') { if (S.explains) return; S.other = ''; S.rows = []; S.untagged = 0; S.answers = {}; render(); }
+    else if (a === 'change-crate') { if (S.explains && !gainOnly()) return; S.other = ''; S.rows = []; S.untagged = 0; S.answers = {}; render(); }
     else if (a === 'dir') { if (S.dir !== v) { S.dir = v; S.rows = []; S.untagged = 0; S.answers = {}; } render(); }
     else if (a === 'step') {
       if (b.getAttribute('aria-disabled') === 'true') return;
       var k = b.dataset.value, st = +b.dataset.step;
-      if (k === 'n' && !S.explains) S.n += st; else if (k === 'untagged') S.untagged += st; else if (k === 'had') S.had = (S.had || 0) + st;
+      if (k === 'n' && (!S.explains || gainOnly())) S.n += st; else if (k === 'untagged') S.untagged += st; else if (k === 'had') S.had = (S.had || 0) + st;
       render();
     }
     else if (a === 'all') { S.n = +v; render(); }
