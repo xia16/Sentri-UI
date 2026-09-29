@@ -97,7 +97,7 @@
   var receipt = null;                     // { kind, dose, rec, other, now, undo }
   var drawer = null;                      // the open drawer's draft: { kind: dose|resolve|range, key, dose, … }
   var drafts = {};                        // Back keeps a drawer's draft on the device, per drawer key
-  var lastCommit = 0, drawerClosedAt = 0, ceilTap = '';
+  var lastCommit = 0, drawerClosedAt = 0, drawerOpenedAt = 0, ceilTap = '';
 
   /* ---- the ledger ---- */
   function L() { return store.derived.litters[crate]; }
@@ -123,7 +123,7 @@
   var span = function (id, args, tone) { return U.span(id, args, { tone: tone }); };
   var one = PP.one;
   var pigs = function (n) { return PP.tn('pp.common.unit.piglet', n); };
-  function btn(o) { return UI.button(Object.assign({ label: PP.t(o.id, o.args) }, o, { strs: { label: o.id }, args: o.args ? { label: o.args } : undefined })); }
+  function btn(o) { return UI.button(Object.assign({ label: PP.t(o.id, o.args) }, o, { id: '', strs: { label: o.id }, args: o.args ? { label: o.args } : undefined })); }
   // Both iron doses carry their day everywhere (`Iron · day 3`, `Iron · day 14`).
   function title(id) { var d = doseCfg(id); return d.tx === 'iron' ? ['pp.litter.tx_day', { tx: PP.t('pp.common.tx.iron'), d: d.due }] : ['pp.common.tx.' + d.tx, null]; }
   function titleText(id) { var t = title(id); return PP.t(t[0], t[1]); }
@@ -473,7 +473,7 @@
       else if (Dx.groups && agesDiffer(Dx.groups)) Dx.groups.forEach(function (g) { t = t.concat(groupToks(g)); });
       else {
         // a partial early record (castration done early, some deferred) keeps what is still owed in view (R1-25)
-        if (Dx.records.length && Dx.owed) t.push(P(doseCfg(x.dose).castration ? one('pp.litter.castr.owed', Dx.owed) : 'pp.litter.owed', { n: Dx.owed }));
+        if (Dx.records.length && Dx.owed && !arrivalToks(Dx.groups || []).length) t.push(P(doseCfg(x.dose).castration ? one('pp.litter.castr.owed', Dx.owed) : 'pp.litter.owed', { n: Dx.owed }));
         t = t.concat(arrivalToks(Dx.groups || []));
         t.push(P(x.inDays === 1 ? 'pp.litter.later.tomorrow' : 'pp.litter.later.in', { d: x.due, k: x.inDays }));
       }
@@ -680,7 +680,7 @@
   }
   function saveDrafts() { try { sessionStorage.setItem('pp-drafts:' + store.name + ':' + crate, JSON.stringify(drafts)); } catch (e) {} }
   // Open a drawer; the phone's Back closes it like the drawer's own Back (R1-24: the draft is kept, Resume brings it back).
-  function openDrawer(d) { drawer = d; ceilTap = ''; PP.drawerBack(function () { keepAndClose(); render(); }); }
+  function openDrawer(d) { drawer = d; ceilTap = ''; drawerOpenedAt = Date.now(); PP.drawerBack(function () { keepAndClose(); render(); }); }
   function keepAndClose() {
     if (!drawer) return;
     if (dirty()) drafts[drawer.key] = Object.assign({}, drawer, { owed: owedOf(drawer.dose), clamped: null }); else delete drafts[drawer.key];
@@ -803,16 +803,16 @@
     else if (a === 'back') { keepAndClose(); PP.drawerBack(null); render(); }
     else if (a === 'clear') { var k = drawer.key; delete drafts[k]; saveDrafts(); drawer = drawer.kind === 'resolve' ? freshResolve(drawer.group + ':' + drawer.dose) : freshDraft(drawer.dose); render(); }
     else if (a === 'save') {
-      if (now - lastCommit < 600) return;
+      if (now - lastCommit < 600 && drawerOpenedAt < lastCommit) return;   // a repeat tap after a commit is ignored, not a fresh drawer's Save
       var key = drawer.key, dose = drawer.dose;
       if (drawer.kind === 'resolve' || drawer.kind === 'range') {
-        var evs = drawer.kind === 'resolve' ? resolveEvents() : rangeEvents();
+        var evs = drawer.kind === 'resolve' ? resolveEvents() : rangeEvents(), rr = drawer.kind === 'resolve' ? resolving() : null;
         var res = store.commitAll(evs);
         lastCommit = now;
         if (!res.ok) { render(); return; }
         res.events.forEach(function (e) { if (e.type === 'treat') visit[e.id] = true; });
-        if (drawer.kind === 'resolve') {
-          var rr = resolving(), had = Math.min(drawer.had || 0, rr.n);
+        if (rr) {
+          var had = Math.min(drawer.had || 0, rr.n);
           receipt = { kind: 'resolved', dose: dose, had: had, rec: drawer.rest === 'owed' ? 0 : rr.n - had, left: drawer.rest === 'owed' ? rr.n - had : 0 };
         } else receipt = { kind: 'resolved', dose: dose, had: 0, rec: drawer.rest === 'record' ? drawer.still : 0, left: drawer.rest === 'record' ? 0 : drawer.still };
       } else {
