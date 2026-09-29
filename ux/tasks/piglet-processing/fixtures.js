@@ -26,7 +26,7 @@
      C04 000266 · day 3 · 9  · iron and tail recorded today 08:30                    [room done]
      C05 000292 · day 4 · 8  · iron and tail a day late                              [move arrivals, litter no-males]
      D01 000437 · day 0 · farrowing still open; cord marked at 8, one born after     [room chip, edge prelock, move prelock, dead farrowing]
-     D02 000233 · day 26 · weaned Sep 28: a sow with no piglets (previous batch)     [move orphan → nurse]
+     D02 000233 · day 26 · weaned Sep 28: a sow with no piglets (previous batch); B01's orphans moved onto her bring her into the task (round 4) [move orphan → nurse]
      D03 000312 · day 5 · 11 · Set count 11 at 10:25 wrote a loss of 2; castration due  [room, dead open loss]
      D05 000296 · day 6 · 10 · iron and tail recorded late; castrated; coccidiosis tomorrow  [room]
      D06 000429 · day 1 · 6  · sow died mid-farrowing (Born derived: 8)              [edge orphan-unlocked]
@@ -265,8 +265,8 @@ function base(b) {
   // today, in walk order
   // A05: two phones recorded iron offline, neither saw the other: possible double treatment
   const before = b.ids();
-  b.treat('A05', 'iron3', sep(29, '08:40'), 'L.M', 11, { seen: before.slice(), device: 'P-LM' });
-  b.treat('A05', 'iron3', sep(29, '08:52'), 'G.H', 11, { seen: before.slice(), device: 'P-GH' });
+  b.treat('A05', 'iron3', sep(29, '08:40'), 'L.M', 11, { seen: before.slice(), device: 'P-LM', id: 'T-A05-lm' });
+  b.treat('A05', 'iron3', sep(29, '08:52'), 'G.H', 11, { seen: before.slice(), device: 'P-GH', id: 'T-A05-gh' });
   // D01: farrowing still open; cord marked at 8 heads, then one more born alive
   b.farrowed('D01', 7, TODAY, 9, { stillborn: 1 }, sep(29, '06:30'), 'L.M', false);
   b.treat('D01', 'cord', sep(29, '07:10'), 'L.M', 8);
@@ -495,8 +495,9 @@ export const VARIANTS = {
   // Count and explain (#10). gain-b08: L.M found 10 in B08 (9 by the record) — the gain a count on B06 can
   // be explained against (the click-through). count-offline: A07, G.H counted 13 at 09:40 (a loss of 1),
   // recorded a crushed piglet at 09:45 (a new body, not one of the missing); L.M's phone, offline since
-  // before both, counted 12 at 09:50 and synced at 10:20 — the two counts disagree (neither saw the other):
-  // both kept under sync review, neither writes a line, the two never sum; hers crossed a death it did not see.
+  // before both, counted 11 at 09:50 and synced at 10:20 — the two counts disagree even net of the death her phone had
+  // not seen (13 − 1 = 12, not 11): both kept under sync review, neither writes a line, the two never sum. (count-agree:
+  // she saw 12 — they agree net, R1-20.)
   // explain-named: L.M found 10 in B06 and named two tagged piglets missing (271002, 271004); B08 has 1 extra —
   // the suggested Move carries 1, so the worker picks which named piglet it is
   'explain-named': V((b) => {
@@ -531,8 +532,30 @@ export const VARIANTS = {
     base(b); const seen = b.ids();
     b.count('A07', sep(29, '09:40'), 'G.H', 13, { baseAlive: 14, id: 'C-A07-gh' });
     b.death('A07', sep(29, '09:45'), 'G.H', [{ cause: 'crushed', n: 1 }], { id: 'D-A07-gh' });
+    b.count('A07', sep(29, '09:50'), 'L.M', 11, { baseAlive: 14, id: 'C-A07-lm', seen, device: 'P-LM', syncedAt: sep(29, '10:20') });
+  }),
+  // R1-20: the same, but L.M saw 12 — 13 less the death her phone had not seen: the counts agree net, nothing to settle
+  // (Alive 12, the first count's missing piglet still open)
+  'count-agree': V((b) => {
+    base(b); const seen = b.ids();
+    b.count('A07', sep(29, '09:40'), 'G.H', 13, { baseAlive: 14, id: 'C-A07-gh' });
+    b.death('A07', sep(29, '09:45'), 'G.H', [{ cause: 'crushed', n: 1 }], { id: 'D-A07-gh' });
     b.count('A07', sep(29, '09:50'), 'L.M', 12, { baseAlive: 14, id: 'C-A07-lm', seen, device: 'P-LM', syncedAt: sep(29, '10:20') });
   }),
+  // round 4: a possible double answered — `twice` (a double dose for the vet, counted once) and `same` (one withdrawn)
+  'double-twice': V((b) => { base(b); b.push({ type: 'double', litter: 'A05', dose: 'iron3', records: ['T-A05-gh', 'T-A05-lm'], answer: 'twice', at: sep(29, '10:25'), who: ME }, 'DB-A05'); }),
+  'double-same': V((b) => { base(b); b.push({ type: 'double', litter: 'A05', dose: 'iron3', records: ['T-A05-gh', 'T-A05-lm'], answer: 'same', withdraw: 'T-A05-lm', at: sep(29, '10:25'), who: ME }, 'DB-A05'); }),
+  // R1-3: A07 iron 12 + 2 weak; 3 moved to A04 answered Don't know → A07 owes 0–2 of 11 (a range, no one-tap)
+  'move-doubt': V((b) => {
+    base(b);
+    b.treat('A07', 'iron3', sep(29, '09:20'), ME, 12, { deferred: { n: 2, reason: 'weak' }, id: 'T-A07-iron' });
+    b.treat('A04', 'iron3', sep(29, '09:25'), ME, 11, { id: 'T-A04-iron' });
+    b.move('A07', 'A04', 3, sep(29, '09:40'), ME, { id: 'MV-0929-06', answers: { iron3: 'unknown' } });
+  }),
+  // R1-4: D06's day-1 orphans (2) fostered onto D03 (day 5): their own age — iron in 2 days, not late
+  'move-young': V((b) => { base(b); b.move('D06', 'D03', 2, sep(29, '09:30'), ME, { id: 'MV-0929-07', answers: {} }); }),
+  // R1-19: C05 emptied by a move (all 8 to B08, now 17 — past a sane litter size): C05 closes, nothing owed
+  'emptied': V((b) => { base(b); b.move('C05', 'B08', 8, sep(29, '09:30'), ME, { id: 'MV-0929-08', answers: {} }); }),
 
   // identity and weigh (S4)
   'a02-tags-gh': V((b) => { base(b); a02(b, A02_GH, sep(29, '09:14'), ME); }),
@@ -601,8 +624,11 @@ export function open(name, opts) {
   let events = v.events.concat(added);
   const opt = { today: v.today };
   let derived = derive(events, v.config, opt);
-  let clock = 0;
+  let clock = 0;                        // stamps handed out and not yet in the log (a commitAll's run)
   const pad = (x) => String(x).padStart(2, '0');
+  const fmt = (ms) => { const t = new Date(ms); return t.getFullYear() + '-' + pad(t.getMonth() + 1) + '-' + pad(t.getDate()) + 'T' + pad(t.getHours()) + ':' + pad(t.getMinutes()); };
+  const start = Date.parse(v.today === TODAY ? NOW : v.today + 'T16:30');
+  const latest = (list) => { let m = start; for (const e of list) { const t = Date.parse(e.at); if (!Number.isNaN(t) && t > m) m = t; } return m; };
   const store = {
     name: vname, config: v.config, today: v.today, opts: opt,
     get events() { return events; },
@@ -618,11 +644,14 @@ export function open(name, opts) {
     },
     crateOfSow(tag) { const hit = Object.values(derived.litters).find((L) => L.sow && L.sow.tag === tag); return hit ? hit.id : null; },
     weights(id) { const L = derived.litters[id]; return L ? L.weights.map((w) => ({ kg: w.kg, day: w.day, at: w.at, who: w.who, event: w.event, conflicts: (w.conflicts || []).slice() })) : []; },
-    /* The next stamp on this phone: after the fixture's now, one minute per record. */
+    /* The phone's clock now (R1-15): the fixture's now, advanced by every record in the log — a new record is `just now`,
+       and a stamp never goes back behind one already written. */
+    now() { return fmt(latest(events)); },
+    /* The next stamp on this phone: one minute after the latest record (never before the fixture's now). */
     stamp() {
       clock++;
-      const t = new Date(Date.parse(v.today === TODAY ? NOW : v.today + 'T16:30') + (added.length + clock) * 60000);
-      return { id: 'P-' + vname + '-' + (added.length + clock) + '-' + Math.random().toString(36).slice(2, 6), at: t.getFullYear() + '-' + pad(t.getMonth() + 1) + '-' + pad(t.getDate()) + 'T' + pad(t.getHours()) + ':' + pad(t.getMinutes()), who: ME };
+      const t = new Date(latest(events) + clock * 60000);
+      return { id: 'P-' + vname + '-' + (added.length + clock) + '-' + Math.random().toString(36).slice(2, 6), at: fmt(t.getTime()), who: ME };
     },
     /* Try an event exactly as commit would (a draft's gate), without keeping it. */
     trial(event) { const st = store.stamp(); clock--; return append(events, Object.assign({ id: st.id, at: st.at, who: st.who }, event), v.config, opt); },
@@ -630,11 +659,12 @@ export function open(name, opts) {
     commit(event) {
       const st = store.stamp();
       const r = append(events, Object.assign({ id: st.id, at: st.at, who: st.who }, event), v.config, opt);
+      clock = 0;
       if (r.ok) {
         added = added.concat([r.event]);
         if (o.session !== false) saveSession(key, added);
         events = r.events; derived = r.derived;
-      } else clock--;
+      }
       return r;
     },
     /* Commit several events as one: every one is accepted, or none is kept (the first refusal is returned). */
@@ -643,9 +673,10 @@ export function open(name, opts) {
       for (const ev of list) {
         const st = store.stamp();
         const r = append(evs, Object.assign({ id: st.id, at: st.at, who: st.who }, ev), v.config, opt);
-        if (!r.ok) { clock -= out.length + 1; return r; }
+        if (!r.ok) { clock = 0; return r; }
         out.push(r.event); evs = r.events; der = r.derived;
       }
+      clock = 0;
       added = added.concat(out);
       if (o.session !== false) saveSession(key, added);
       events = evs; derived = der;

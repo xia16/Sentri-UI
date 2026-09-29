@@ -495,15 +495,15 @@ test('explaining Move: loss and gain relabelled, zero Alive effect', () => {
   allBalanced(d);
 });
 
-test('explaining Move resolves the gain\'s unknown by the answer, never by the source\'s present state', () => {
+test('explaining Move: Move rules as the source stood when its count found the piglet missing, never its present state', () => {
   const b = book();
   b.farrowed('B14', 10); b.farrowed('B16', 9);
   b.treat('B16', 'iron3', 9);
   const loss = b.count('B14', 9);
-  const gain = b.count('B16', 10);                            // the stray's iron: unknown
-  assert.equal(run(b, IRON_ONLY).litters.B16.doses.iron3.unknownAfterMove, 1);
-  b.treat('B14', 'iron3', 9);                                 // source treated after the stray left
-  b.move('B14', 'B16', 1, { explains: [loss.id, gain.id], answers: { iron3: 'no' } });
+  const gain = b.count('B16', 10);                            // a counted gain owes nothing new (round 4)
+  assert.equal(run(b, IRON_ONLY).litters.B16.doses.iron3.unknownAfterMove, 0);
+  b.treat('B14', 'iron3', 9);                                 // source treated after the stray left: not the stray
+  b.move('B14', 'B16', 1, { explains: [loss.id, gain.id], answers: { iron3: 'yes' } });   // an answer the app need not ask
   const x = run(b, IRON_ONLY).litters.B16.doses.iron3;
   assert.equal(x.unknownAfterMove, 0);
   assert.equal(x.owed, 1);
@@ -745,25 +745,26 @@ test('CX2b unidentified carrier: an unidentified death keeps the untreated owed 
   assert.ok(D.carriedFromMove <= L.alive);
 });
 
-test('CX3 explaining G1 does not consume G2\'s unknowns', () => {
+test('CX3 explaining G1 does not touch G2', () => {
   const b = book();
   b.farrowed('S', 10); b.farrowed('R', 9); b.treat('R', 'iron3', 9);
   const loss = b.count('S', 9);
   const g1 = b.count('R', 10);
-  b.check('R', 'iron3', 1, 0, { group: g1.id });             // G1's stray already had it
-  b.move('S', 'R', 1, { explains: [loss.id, g1.id], answers: { iron3: 'no' } });
-  b.count('R', 11);                                          // G2 (under recount-supersedes, a later count's own line)
-  const D = run(b, IRON_ONLY).litters.R.doses.iron3;
-  assert.equal(D.unknownAfterMove, 1);                       // G2 untouched
-  assert.equal(D.owed, 0);                                   // G1 was resolved by the check, not re-opened
+  b.move('S', 'R', 1, { explains: [loss.id, g1.id] });       // S had done nothing: G1's stray owes
+  const g2 = b.count('R', 11);                                // G2: its own line
+  const L = run(b, IRON_ONLY).litters.R;
+  assert.equal(L.doses.iron3.owed, 1);
+  assert.equal(L.doses.iron3.unknownAfterMove, 0);
+  assert.deepEqual(L.unexplained.gains.map((x) => [x.id, x.open]), [[g1.id, 0], [g2.id, 1]]);
 });
 
-test('CX3b explained gain into an unrecorded receiver answered Yes owes one, not two', () => {
+test('CX3b explained gain into an unrecorded receiver from a done source owes one, not two', () => {
   const b = book();
   b.farrowed('S', 10); b.farrowed('R', 1);
+  b.treat('S', 'iron3', 10);                                  // done before its count found one missing
   const loss = b.count('S', 9);
   const g = b.count('R', 2);
-  b.move('S', 'R', 1, { explains: [loss.id, g.id], answers: { iron3: 'yes' } });
+  b.move('S', 'R', 1, { explains: [loss.id, g.id] });
   const D = run(b, IRON_ONLY).litters.R.doses.iron3;
   assert.equal(D.owed, 1);
   assert.equal(D.carriedFromMove, 1);
@@ -984,7 +985,9 @@ test('select.moveDraft: clamp, carry preview, pairing deltas', () => {
   assert.deepEqual(m.delta, { from: [10, 0], to: [8, 18] });
   assert.deepEqual(m.asks, ['iron3']);
   assert.equal(m.carry.iron3, 'unknown');
-  assert.deepEqual(m.sourceAfter, [{ dose: 'iron3', lo: 0, hi: 0, of: 0 }]);
+  assert.deepEqual(m.sourceAfter, []);                            // every piglet left: the source closes (R1-19)
+  const three = select.moveDraft(d, { from: 'B09', to: 'B02', n: 3, answers: { iron3: 'unknown' } });
+  assert.deepEqual(three.sourceAfter, [{ dose: 'iron3', lo: 0, hi: 3, of: 7, owedBefore: 3 }]);   // the ledger's own range (R1-3)
   const one = select.moveDraft(d, { from: 'B09', to: 'B02', n: 1, answers: { iron3: 'yes' } });
   assert.equal(one.carry.iron3, 'done');
   assert.deepEqual(one.sourceAfter, []);
@@ -1723,14 +1726,15 @@ test('a recount never closes a line: 10 then 12 → a loss of 2 and a gain of 2,
   assert.ok(balances(L));
 });
 
-test('a recount never closes a line: 13 then 12 → the gain\'s unknown doses stay', () => {
+test('a recount never closes a line: 13 then 12 → both lines stay; the gain owes nothing new (round 4)', () => {
   const b = book();
   b.farrowed('A', 12); b.treat('A', 'iron3', 12);
   b.count('A', 13, { at: on(3, '09:00') });
   b.count('A', 12, { at: on(3, '09:20') });
   const L = run(b, IRON_ONLY).litters.A;
   assert.equal(L.alive, 12); assert.equal(L.unexplained.openGain, 1); assert.equal(L.unexplained.openLoss, 1);
-  assert.equal(L.doses.iron3.unknownAfterMove, 1);
+  assert.equal(L.doses.iron3.unknownAfterMove, 0);
+  assert.equal(L.doses.iron3.owed, 0);
   assert.ok(balances(L));
 });
 
@@ -1945,7 +1949,7 @@ test('R4-8 castration before its first record: selectors say males uncounted', (
   assert.equal(run(b, R4T(['B01']), 3).litters.B01.doses.castrate.males, 6);
 });
 
-test('R4-9 several tasks per config; a nurse sow outside every task records no treatments (RULINGS round 2, Q18)', () => {
+test('R4-9 several tasks per config; a nurse sow outside every task joins the task of the piglets moved onto her (RULINGS round 4)', () => {
   const cfg = Object.assign({}, R4, { tasks: [{ id: 'T7', litters: ['A02', 'S'] }, { id: 'T8', litters: ['F02'] }] });
   const b = book();
   b.farrowed('A02', 12); b.farrowed('F02', 10); b.farrowed('S', 10); b.farrowed('D02', 12);
@@ -1960,18 +1964,22 @@ test('R4-9 several tasks per config; a nurse sow outside every task records no t
   const d = run(b, cfg, 3);
   for (const e of [tF, a02]) assert.equal(rejectedReason(d, e), undefined, e.id);
   assert.equal(rejectedReason(d, afterF), 'task_ended');
-  // a litter with no task records deaths, counts and moves — treatments not: the arrivals' doses stay not done
-  assert.equal(rejectedReason(d, nurse), 'no_task');
-  assert.equal(rejectedReason(d, more), 'no_task');
-  assert.deepEqual([d.litters.D02.doses.iron3.owed, d.litters.D02.doses.tail.owed, d.litters.D02.recordable], [3, 3, false]);
-  assert.equal(d.litters.D02.doses.iron3.catchUp, undefined);
-  assert.deepEqual(select.bulkDraft(d, { room: 'R3', dose: 'iron3' }).rows.map((r) => r.litter).includes('D02'), false);
+  // round 4 (supersedes Q18 for this case): the nurse joins T7 with the arrivals; they are treated there
+  assert.equal(rejectedReason(d, nurse), undefined);
+  assert.equal(rejectedReason(d, more), undefined);
+  assert.deepEqual([d.litters.D02.doses.iron3.owed, d.litters.D02.doses.tail.owed, d.litters.D02.recordable], [0, 0, true]);
   assert.equal(d.litters.F02.task, 'T8');
-  assert.equal(d.litters.D02.task, null);
+  assert.equal(d.litters.D02.task, 'T7');
+  assert.deepEqual(d.tasks.find((t) => t.id === 'T7').litters, ['A02', 'S', 'D02']);
+  assert.equal(d.litters.D02.earlier.born, 12);
   assert.equal(select.end(d, { task: 'T8' }).atEnd.unfinishedLitters.length, 1);
   assert.equal(select.end(d, { task: 'T7' }).atEnd, null);
   const extra = b.treat('D02', 'iron3', 1, { at: on(3, '13:30') });
-  assert.equal(rejectedReason(run(b, cfg, 3), extra), 'no_task');
+  assert.equal(rejectedReason(run(b, cfg, 3), extra), 'nothing_owed');
+  // a litter with no task piglets still records no treatments
+  const c = book(); c.farrowed('E01', 7);
+  const t = c.treat('E01', 'iron3', 7);
+  assert.equal(rejectedReason(run(c, cfg, 3), t), 'no_task');
 });
 
 // ---- bulk (slice #7): one dose for several litters ------------------------------------------------
@@ -2145,4 +2153,356 @@ test('R5-10 a mark withdrawn after End reads not done · corrected after End on 
   const v = select.litter(run(b, R4T(['A02']), 6), 'A02');
   assert.deepEqual(v.correctedAfterEnd.map((x) => [x.dose, x.n]), [['iron3', 12]]);
   assert.equal(v.owed.find((x) => x.dose === 'iron3'), undefined);
+});
+
+// ---- scenario round 1 (R1-n) and owner round 4 ------------------------------------------------
+// R1: iron (invisible) and tail (visible) due day 3, castration day 5; one task unless a test says otherwise.
+const R1 = {
+  doses: [
+    { id: 'iron3', tx: 'iron', due: 3 },
+    { id: 'tail', tx: 'tail', due: 3, last: 7, visible: true },
+    { id: 'castrate', tx: 'castrate', due: 5, visible: true, castration: true }
+  ],
+  identity: { scheme: 'none' }
+};
+const R1T = (litters, extra) => Object.assign({}, R1, extra || {}, { task: { id: 'T', litters } });
+const bornOn = (d) => ({ birthDate: on(d).slice(0, 10), at: on(d) });
+
+test('R1-3 a Don\'t-know move leaves the source an owed RANGE, never a one-tap number; the receiver narrows it', () => {
+  const b = book();
+  b.farrowed('S', 11); b.farrowed('R', 9);
+  b.treat('S', 'iron3', 9, { deferred: { n: 2, reason: 'weak' } });
+  b.treat('R', 'iron3', 9);
+  const mv = b.move('S', 'R', 3, { answers: { iron3: 'unknown' }, at: on(3, '10:00') });
+  let d = run(b, R1);
+  let D = d.litters.S.doses.iron3;
+  assert.equal(d.litters.S.alive, 8);
+  assert.deepEqual([D.owedLo, D.owed], [0, 2]);                  // 0–2 of 8: the 2 weak may have left
+  assert.equal(D.range, true);
+  const row = select.litter(d, 'S').owed.find((x) => x.dose === 'iron3');
+  assert.equal(row.oneTap, null);                                 // no one-tap exact number
+  assert.deepEqual(row.range, { lo: 0, hi: 2, of: 8, doubt: [{ move: mv.id, to: 'R', n: 3 }] });
+  // the receiver checks the spray mark: 1 had it, 2 did not → the 2 weak were among the 3
+  b.check('R', 'iron3', 1, 2, { group: mv.id, at: on(3, '10:10') });
+  d = run(b, R1);
+  D = d.litters.S.doses.iron3;
+  assert.deepEqual([D.owedLo, D.owed, D.range], [0, 0, false]);
+  assert.equal(D.done, true);
+  allBalanced(d);
+});
+
+test('R1-3b a partial resolution narrows; a source record or check that saw the move settles the range', () => {
+  const b = book();
+  b.farrowed('S', 11); b.farrowed('R', 9);
+  b.treat('S', 'iron3', 9, { deferred: { n: 2, reason: 'weak' } });
+  b.treat('R', 'iron3', 9);
+  const mv = b.move('S', 'R', 3, { answers: { iron3: 'unknown' } });
+  b.check('R', 'iron3', 2, 0, { group: mv.id });                 // 2 had it, 1 still unknown
+  let D = run(b, R1).litters.S.doses.iron3;
+  assert.deepEqual([D.owedLo, D.owed], [1, 2]);
+  const over = b.treat('S', 'iron3', 3);
+  assert.equal(rejectedReason(run(b, R1), over), 'more_than_owed');
+  b.ev.pop();
+  b.treat('S', 'iron3', 1);                                       // counted on the pig: 1 without the mark
+  D = run(b, R1).litters.S.doses.iron3;
+  assert.deepEqual([D.owedLo, D.owed, D.range, D.done], [0, 0, false, true]);
+  // …or a check on the source: `owed` names what still owes after looking
+  const c = book();
+  c.farrowed('S', 11); c.farrowed('R', 9);
+  c.treat('S', 'iron3', 9, { deferred: { n: 2, reason: 'weak' } });
+  c.treat('R', 'iron3', 9);
+  c.move('S', 'R', 3, { answers: { iron3: 'unknown' } });
+  c.ev.push({ id: 'chk', type: 'check', litter: 'S', dose: 'iron3', owed: 1, at: on(3, '11:00'), who: 'G.H' });
+  D = run(c, R1).litters.S.doses.iron3;
+  assert.deepEqual([D.owedLo, D.owed, D.range], [1, 1, false]);
+  assert.equal(select.litter(run(c, R1), 'S').owed.find((x) => x.dose === 'iron3').oneTap, 1);
+});
+
+test('R1-4 moved piglets keep their own age: arrivals are grouped by origin age, lateness per group', () => {
+  const b = book();
+  b.farrowed('R', 10);                                            // day 5 on on(5)
+  b.treat('R', 'iron3', 10, { at: on(3) }); b.treat('R', 'tail', 10, { at: on(3) });
+  b.farrowed('Y', 6, {}, bornOn(4));                              // day 1 on on(5)
+  b.move('Y', 'R', 2, { at: on(5, '08:00') });
+  let d = run(b, R1, 5);
+  let D = d.litters.R.doses.iron3;
+  assert.equal(D.owed, 2);
+  assert.deepEqual(D.groups.map((g) => [g.kind, g.n, g.from, g.dayAge, g.status, g.lateBy, g.inDays]), [['arrival', 2, 'Y', 1, 'later', 0, 2]]);
+  assert.equal(D.status, 'later');                                // not late 2 days: they are day 1
+  assert.equal(D.owedNow, 0);
+  assert.equal(select.room(d, { lens: 'all' }).rows.find((r) => r.litter === 'R').doses.some((x) => x.dose === 'iron3'), false);
+  assert.equal(select.litter(d, 'R').owed.find((x) => x.dose === 'iron3'), undefined);
+  // …and older piglets into a younger litter owe now, late by their own age
+  const c = book();
+  c.farrowed('Y2', 8, {}, bornOn(4));                             // day 1
+  c.farrowed('O', 9);                                             // day 5, nothing done
+  c.move('O', 'Y2', 1, { at: on(5, '08:00') });
+  d = run(c, R1, 5);
+  D = d.litters.Y2.doses.iron3;
+  assert.deepEqual(D.groups.map((g) => [g.kind, g.n, g.dayAge, g.status, g.lateBy]), [['arrival', 1, 5, 'late', 2], ['own', 8, 1, 'later', 0]]);
+  assert.equal(D.status, 'late'); assert.equal(D.owedNow, 1);
+  const row = select.litter(d, 'Y2').owed.find((x) => x.dose === 'iron3');
+  assert.equal(row.lateBy, 2); assert.equal(row.owedNow, 1);
+  assert.deepEqual(row.groups.map((g) => g.kind), ['arrival', 'own']);
+  // recording the arrivals only: the own piglets are deferred `not_due` and stay due on their own day
+  c.treat('Y2', 'iron3', 1, { deferred: { n: 8, reason: 'not_due' }, at: on(5, '09:00') });
+  D = run(c, R1, 5).litters.Y2.doses.iron3;
+  assert.equal(D.owed, 8); assert.equal(D.status, 'later');
+});
+
+test('R1-6 round 4: a counted gain owes nothing new; the gain line reads check on the pig', () => {
+  const b = book();
+  b.farrowed('R', 9);
+  b.treat('R', 'iron3', 9); b.treat('R', 'tail', 9);
+  const g = b.count('R', 10);
+  let d = run(b, R1);
+  const x = d.litters.R;
+  assert.equal(x.alive, 10);
+  assert.equal(x.doses.iron3.owed, 0); assert.equal(x.doses.iron3.unknownAfterMove, 0); assert.equal(x.doses.iron3.done, true);
+  assert.equal(x.doses.tail.unknownAfterMove, 0);
+  assert.equal(x.unexplained.gains[0].check, true);
+  assert.notEqual(select.room(d, { lens: 'all' }).rows.find((r) => r.litter === 'R').kind, 'owes');
+  // when the gain is explained as a Move, Move rules apply to those piglets: a none-done source → they owe
+  b.farrowed('S', 10);
+  const loss = b.count('S', 9);
+  b.move('S', 'R', 1, { explains: [loss.id, g.id] });
+  d = run(b, R1);
+  assert.equal(d.litters.R.doses.iron3.owed, 1);
+  assert.equal(d.litters.R.moves[0].packets.iron3, 'owed');
+  allBalanced(d);
+});
+
+test('R1-18 known sources carry, only a partial source asks; visible doses are checked on the pig, never unknown', () => {
+  const b = book();
+  b.farrowed('S', 10); b.treat('S', 'iron3', 10); b.treat('S', 'tail', 10);   // all done
+  b.farrowed('R', 9); b.treat('R', 'iron3', 9);
+  const loss = b.count('S', 9, { at: on(3, '10:00') });
+  const gain = b.count('R', 10, { at: on(3, '10:01') });
+  let d = run(b, R1);
+  const dr = select.moveDraft(d, { from: 'S', to: 'R', n: 1, explains: [loss.id, gain.id] });
+  assert.deepEqual(dr.asks, []);                                  // the app knows: no question
+  assert.equal(dr.carry.iron3, 'done'); assert.equal(dr.carry.tail, 'done');
+  assert.deepEqual(dr.sourceAfter, []);                            // no invented doubt on the source
+  // a part-done source: iron asked, tail checked on the pig
+  const c = book();
+  c.farrowed('P', 10); c.treat('P', 'iron3', 7, { deferred: { n: 3, reason: 'weak' } }); c.treat('P', 'tail', 7, { deferred: { n: 3, reason: 'weak' } });
+  c.farrowed('Q', 9); c.treat('Q', 'iron3', 9); c.treat('Q', 'tail', 9);
+  d = run(c, R1);
+  const pd = select.moveDraft(d, { from: 'P', to: 'Q', n: 1 });
+  assert.deepEqual(pd.asks, ['iron3']);
+  assert.equal(pd.carry.tail, 'check');
+  assert.equal(pd.unanswered, 1);                                  // Move reads what it records only once answered
+  const done = select.moveDraft(d, { from: 'P', to: 'Q', n: 1, answers: { iron3: 'yes' } });
+  assert.equal(done.unanswered, 0);
+  c.move('P', 'Q', 1);
+  const Q = run(c, R1).litters.Q.doses.tail;
+  assert.equal(Q.unknownAfterMove, 1); assert.equal(Q.checkOnPig, 1);   // tail: `check on the pig`, not `unknown`
+});
+
+test('R1-19 a litter emptied by moves closes: nothing owed, not unfinished at End', () => {
+  const b = book();
+  b.farrowed('S', 5, {}, bornOn(-2));                              // day 5 on on(3): castration due, not counted
+  b.farrowed('N', 9);
+  b.move('S', 'N', 5);
+  const d = run(b, R1T(['S', 'N']), 3);
+  const S = d.litters.S;
+  assert.equal(S.alive, 0); assert.equal(S.closed, true);
+  for (const k of ['iron3', 'tail', 'castrate']) { assert.equal(S.doses[k].owed, 0, k); assert.equal(S.doses[k].done, true, k); }
+  assert.notEqual(select.room(d, { lens: 'all' }).rows.find((r) => r.litter === 'S').kind, 'owes');
+  assert.equal(select.end(d).now.unfinishedLitters.includes('S'), false);
+});
+
+test('R1-20 concurrent counts that agree net of a death one phone had not seen do not disagree', () => {
+  const b = book();
+  b.farrowed('A', 14);
+  const seen = b.ev.map((e) => e.id);
+  b.count('A', 13, { at: on(3, '09:40') });
+  b.death('A', [{ cause: 'crushed', n: 1 }], { at: on(3, '09:45') });
+  const late = b.count('A', 12, { at: on(3, '09:50'), seen, who: 'L.M' });
+  const d = run(b, R1);
+  const A = d.litters.A;
+  assert.equal(A.alive, 12);
+  assert.equal(A.unexplained.openLoss, 1);                         // the first count's missing piglet stays open
+  assert.equal(d.flags.some((f) => f.reason === 'count_conflict'), false);
+  const c = select.counts(d, 'A');
+  assert.equal(c.conflict, false); assert.equal(c.review, false);
+  assert.equal(c.counts.find((k) => k.id === late.id).agreesNet, true);
+  // …but two that disagree net still disagree
+  const x = book();
+  x.farrowed('A', 14);
+  const s2 = x.ev.map((e) => e.id);
+  x.count('A', 13); x.death('A', [{ cause: 'crushed', n: 1 }]);
+  x.count('A', 11, { seen: s2 });
+  assert.equal(run(x, R1).flags.some((f) => f.reason === 'count_conflict'), true);
+});
+
+test('round 4 a nurse sow outside every task joins the task; her earlier facts stay on her earlier litter', () => {
+  const b = book();
+  b.farrowed('S', 10);                                             // in the task, nothing done, day 3
+  b.farrowed('N', 12, { stillborn: 1 }, bornOn(-23));              // a previous batch: day 26
+  b.weaned('N', { at: on(2) });
+  const mv = b.move('S', 'N', 4, { at: on(3, '10:00') });
+  const d = run(b, R1T(['S']), 3);
+  const N = d.litters.N;
+  assert.equal(N.inTask, true); assert.equal(N.task, 'T'); assert.equal(N.recordable, true);
+  assert.deepEqual(N.nurse, { since: mv.id, at: on(3, '10:00'), from: 'S' });
+  assert.deepEqual([N.born, N.dead.total, N.weaned, N.movedIn, N.alive], [0, 0, 0, 4, 4]);
+  assert.deepEqual([N.earlier.born, N.earlier.dead, N.earlier.weaned, N.earlier.dayAge], [12, 1, 11, 26]);
+  assert.equal(N.dayAge, 3);                                       // the arrivals' age
+  assert.equal(N.doses.iron3.owed, 4); assert.equal(N.doses.iron3.status, 'due');
+  assert.ok(balances(N));
+  b.treat('N', 'iron3', 4, { at: on(3, '10:30') });
+  const d2 = run(b, R1T(['S']), 3);
+  assert.equal(d2.rejected.length, 0);
+  assert.equal(d2.litters.N.doses.iron3.done, true);
+  assert.deepEqual(d2.tasks[0].litters, ['S', 'N']);
+  // a litter with no task piglets still records no treatments
+  const c = book();
+  c.farrowed('E', 7); const t = c.treat('E', 'iron3', 7);
+  assert.equal(rejectedReason(run(c, R1T(['S'])), t), 'no_task');
+});
+
+test('round 4 possible double: `same` withdraws one record, `twice` keeps both, a double dose for the vet, counted once', () => {
+  const mk = () => {
+    const b = book();
+    b.farrowed('A', 11);
+    const seen = b.ev.map((e) => e.id);
+    const p1 = b.treat('A', 'iron3', 11, { seen, who: 'G.H', at: on(3, '09:00') });
+    const p2 = b.treat('A', 'iron3', 11, { seen, who: 'L.M', at: on(3, '09:05') });
+    return { b, p1, p2 };
+  };
+  let { b, p1, p2 } = mk();
+  assert.equal(select.reviews(run(b, R1)).items.filter((i) => i.kind === 'double').length, 1);
+  const dd = select.doubleDraft(run(b, R1), { litter: 'A', dose: 'iron3', records: [p1.id, p2.id], answer: 'twice' });
+  assert.deepEqual([dd.why, dd.after], [null, { treated: 11, owed: 0, doubleDoses: 1 }]);
+  assert.equal(select.doubleDraft(run(b, R1), { litter: 'A', dose: 'iron3', records: [p1.id, p2.id], answer: 'same' }).event.withdraw, p2.id);
+  b.ev.push({ id: 'dbl', type: 'double', litter: 'A', dose: 'iron3', records: [p1.id, p2.id], answer: 'twice', at: on(3, '10:00'), who: 'G.H' });
+  let d = run(b, R1);
+  let D = d.litters.A.doses.iron3;
+  assert.equal(D.records.length, 2);
+  assert.equal(D.treated, 11);                                      // counted once toward done
+  assert.deepEqual(D.doubleDoses.map((x) => [x.records.join(','), x.n, x.event]), [[p1.id + ',' + p2.id, 11, 'dbl']]);
+  assert.deepEqual(D.possibleDoubleTreatment, []);
+  assert.equal(select.reviews(d).items.length, 0);
+  ({ b, p1, p2 } = mk());
+  b.ev.push({ id: 'dbl', type: 'double', litter: 'A', dose: 'iron3', records: [p1.id, p2.id], answer: 'same', withdraw: p2.id, at: on(3, '10:00'), who: 'G.H' });
+  d = run(b, R1);
+  D = d.litters.A.doses.iron3;
+  assert.deepEqual(D.records.map((r) => r.id), [p1.id]);
+  assert.equal(D.treated, 11); assert.equal(D.done, true);
+  assert.deepEqual(D.possibleDoubleTreatment, []);
+  assert.deepEqual(D.doubles.map((x) => [x.answer, x.withdrawn]), [['same', p2.id]]);
+  assert.equal(select.reviews(d).items.length, 0);
+});
+
+test('round 4 End is allowed with review items open; they freeze as unresolved at End and stay answerable', () => {
+  const b = book();
+  b.farrowed('A', 11);
+  const seen = b.ev.map((e) => e.id);
+  const p1 = b.treat('A', 'iron3', 11, { seen, at: on(3, '09:00') });
+  const p2 = b.treat('A', 'iron3', 11, { seen, at: on(3, '09:05'), who: 'L.M' });
+  b.ev.push({ id: 'END', type: 'end_task', at: on(5, '16:00'), who: 'G.H' });
+  b.ev.push({ id: 'dbl', type: 'double', litter: 'A', dose: 'iron3', records: [p1.id, p2.id], answer: 'twice', at: on(6), who: 'G.H' });
+  const d = run(b, R1T(['A']), 6);
+  assert.equal(d.rejected.length, 0);
+  const e = select.end(d);
+  assert.deepEqual(e.atEnd.reviews.map((r) => [r.kind, r.litter, r.status]), [['double', 'A', 'unresolved_at_end']]);
+  const r = select.reviews(d);
+  assert.deepEqual(r.items, []);
+  assert.deepEqual(r.answeredAfterEnd.map((x) => [x.kind, x.litter, x.answer]), [['double', 'A', 'twice']]);
+});
+
+test('death corrections: withdraw a death, or move it to another litter (through Edit)', () => {
+  const b = book();
+  b.farrowed('A', 12); b.farrowed('B', 10);
+  const dth = b.death('A', [{ cause: 'crushed', n: 1 }]);
+  let d = run(b, R1);
+  const ed = select.edit(d, 'A');
+  assert.deepEqual(ed.deaths.map((x) => [x.id, x.n, x.movable]), [[dth.id, 1, true]]);
+  const w = select.edit(d, 'A', { deaths: { [dth.id]: { void: true } } });
+  assert.equal(w.why, null);
+  assert.deepEqual(w.changes, [{ kind: 'death_void', death: dth.id, n: 1 }]);
+  assert.deepEqual(w.effects.A, [11, 12]);
+  const m = select.edit(d, 'A', { deaths: { [dth.id]: { to: 'B' } } });
+  assert.deepEqual(m.changes, [{ kind: 'death_move', death: dth.id, n: 1, to: 'B' }]);
+  assert.deepEqual([m.effects.A, m.effects.B], [[11, 12], [10, 9]]);
+  b.ev.push(Object.assign({ id: 'X', at: on(3, '11:00'), who: 'G.H' }, m.events[0]));
+  d = run(b, R1);
+  assert.deepEqual([d.litters.A.alive, d.litters.B.alive, d.litters.B.dead.total], [12, 9, 1]);
+  const rec = select.record(d, 'B').days[0].entries.find((x) => x.kind === 'correction');
+  assert.equal(rec.changes[0].kind, 'death_move');
+});
+
+test('R1-9 a body with the tag of a piglet a count found missing closes that loss', () => {
+  const b = book();
+  b.farrowed('A', 12);
+  b.identity('A', 'add', { rowId: 'r1', tag: '004101' });
+  b.identity('A', 'add', { rowId: 'r2', tag: '004102' });
+  const loss = b.count('A', 11);                                    // unnamed: 10 untagged could cover it
+  let d = run(b, R1);
+  const dd = select.deathDraft(d, 'A', { picks: { r1: 'crushed' }, fromLoss: { r1: loss.id } });
+  assert.equal(dd.why, null);
+  assert.deepEqual(dd.after, { alive: 11, dead: 1, openLoss: 0 });
+  assert.equal(dd.roster.find((r) => r.rowId === 'r1').canBeMissing, true);
+  b.death('A', [{ cause: 'crushed', rowId: 'r1', fromLoss: loss.id }]);
+  d = run(b, R1);
+  assert.deepEqual([d.litters.A.alive, d.litters.A.unexplained.openLoss, d.litters.A.dead.total], [11, 0, 1]);
+  assert.equal(d.litters.A.identity.rows.find((r) => r.rowId === 'r1').status, 'dead');
+  allBalanced(d);
+});
+
+test('R1-10 select.balance: the header identity born + in − out − dead − weaned ± unexplained = alive', () => {
+  const b = book();
+  b.farrowed('A', 12, { stillborn: 1 }); b.farrowed('B', 10);
+  b.move('A', 'B', 2); b.death('A', [{ cause: 'crushed', n: 1 }]); b.count('A', 7); b.count('B', 13);
+  const d = run(b, R1);
+  const A = select.balance(d, 'A'), B = select.balance(d, 'B');
+  assert.deepEqual(A, { litter: 'A', born: 12, dead: 2, movedIn: 0, movedOut: 2, weaned: 0, gain: 0, loss: 1, alive: 7, holds: true, earlier: null });
+  assert.equal(B.gain, 1); assert.equal(B.alive, 13); assert.equal(B.holds, true);
+});
+
+test('R1-17 identity is owed on its configured day (Q17)', () => {
+  const cfg = Object.assign({}, R1, { identity: { scheme: 'tag', who: 'all', day: 3 } });
+  const b = book();
+  b.farrowed('A', 4); b.farrowed('C', 3, {}, bornOn(4));
+  let d = run(b, cfg, 5);
+  assert.deepEqual(select.identityDue(d, 'A'), { litter: 'A', scheme: 'tag', who: 'all', day: 3, status: 'late', lateBy: 2, inDays: 0, owed: 4, identified: 0, of: 4, done: false });
+  assert.equal(select.identityDue(d, 'C').status, 'later');
+  for (let i = 1; i <= 4; i++) b.identity('A', 'add', { rowId: 'a' + i, tag: 'T' + i });
+  d = run(b, cfg, 5);
+  assert.equal(select.identityDue(d, 'A').status, 'done');
+  // the room counts it as owed only when asked (the room page opts in)
+  const e = book(); e.farrowed('A', 4); e.treat('A', 'iron3', 4); e.treat('A', 'tail', 4);
+  const r = select.room(run(e, cfg, 3), { lens: 'all', identity: true }).rows.find((x) => x.litter === 'A');
+  assert.equal(r.kind, 'owes'); assert.deepEqual(r.identity, { status: 'due', owed: 4, lateBy: 0 });
+});
+
+test('N4 select.reviews lists what is held for review in a room: doubles, disputed counts, held bodies, concurrent corrections', () => {
+  const b = book();
+  b.farrowed('A', 11); b.farrowed('C', 14); b.farrowed('H', 14);
+  const seen = b.ev.map((e) => e.id);
+  b.treat('A', 'iron3', 11, { seen }); b.treat('A', 'iron3', 11, { seen });
+  b.count('C', 13, { seen }); b.count('C', 11, { seen });
+  const loss = b.count('H', 13);
+  const s2 = b.ev.map((e) => e.id);
+  b.death('H', [{ cause: 'crushed', n: 1 }], { seen: s2, lossAlloc: [{ lossId: loss.id, qty: 1 }] });
+  b.death('H', [{ cause: 'crushed', n: 1 }], { seen: s2, lossAlloc: [{ lossId: loss.id, qty: 1 }] });
+  const t = b.treat('A', 'tail', 11);
+  const s3 = b.ev.map((e) => e.id);
+  b.correction(t.id, { set: { n: 10, deferred: { n: 1, reason: 'weak' } }, seen: s3 });
+  b.correction(t.id, { set: { n: 9, deferred: { n: 2, reason: 'weak' } }, seen: s3 });
+  const r = select.reviews(run(b, R1), { room: 'R3' });
+  assert.deepEqual(r.items.map((i) => [i.kind, i.litter]).sort(), [['correction', 'A'], ['count', 'C'], ['double', 'A'], ['held', 'H']]);
+  assert.equal(r.n, 4);
+});
+
+test('R1-15 the room\'s last record is the latest by causal order, and names its dose', () => {
+  const b = book();
+  b.farrowed('A', 11, {}, { at: on(0) }); b.farrowed('B', 11, {}, { at: on(0) });
+  const seen = b.ev.map((e) => e.id);
+  const off = b.treat('B', 'iron3', 11, { at: on(3, '11:00'), seen, who: 'L.M' });   // a phone with a fast clock
+  const t = b.treat('A', 'iron3', 11, { at: on(3, '10:40'), seen: seen.concat([off.id]) });
+  const last = select.room(run(b, R1), { lens: 'all' }).lastRecord;
+  assert.equal(last.id, t.id);                                      // it saw the other: later, whatever the clocks say
+  assert.equal(last.dose, 'iron3'); assert.equal(last.tx, 'iron');
 });

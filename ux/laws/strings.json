@@ -1318,6 +1318,8 @@
     "status.unsaved": {"en": "{n} unsaved", "zh": "{n}条未保存", "kind": "status"},
     "time.days_ago": {"en": "{n} days ago", "zh": "{n}天前", "kind": "body"},
     "time.hours_ago": {"en": "{n}h ago", "zh": "{n}小时前", "kind": "body"},
+    "time.just_now": {"en": "just now", "zh": "刚刚", "kind": "body"},
+    "time.minutes_ago": {"en": "{n} min ago", "zh": "{n}分钟前", "kind": "body"},
     "time.today": {"en": "today", "zh": "今天", "kind": "body"},
     "time.yesterday": {"en": "yesterday", "zh": "昨天", "kind": "body"},
     "pp.common.hdr.door": {"en": "{crate} · {tag}", "zh": "{crate} · {tag}", "kind": "label"},

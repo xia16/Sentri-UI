@@ -29,10 +29,14 @@
     var p = parts(iso), same = today && String(iso).slice(0, 10) === String(today).slice(0, 10);
     return same ? PP.t('pp.common.stamp.today', { t: p.t, who: who }) : PP.t('pp.common.stamp.date', { date: U.date(iso), t: p.t, who: who });
   };
-  /* Recency ladder (room): `1h ago` under a day, `yesterday`, `N days ago` to six, the date from seven. */
+  /* Recency ladder (room): `just now` under a minute (and a stamp ahead of now: never "1h ago"), `N min ago` under an hour,
+     `Nh ago` (whole hours, rounded down) under a day, `yesterday`, `N days ago` to six, the date from seven. `now` is the
+     store's clock (`store.now()`), which advances with the records made in the session (R1-15). */
   U.ago = function (iso, now) {
-    var mins = Math.max(0, (Date.parse(now) - Date.parse(iso)) / 60000);
-    if (mins < 1440) return PP.t('time.hours_ago', { n: Math.max(1, Math.ceil(mins / 60)) });
+    var mins = (Date.parse(now) - Date.parse(iso)) / 60000;
+    if (!(mins >= 1)) return PP.t('time.just_now');
+    if (mins < 60) return PP.t('time.minutes_ago', { n: Math.floor(mins) });
+    if (mins < 1440) return PP.t('time.hours_ago', { n: Math.floor(mins / 60) });
     var days = Math.floor(mins / 1440);
     if (days === 1) return PP.t('time.yesterday');
     if (days < 7) return PP.t('time.days_ago', { n: days });
