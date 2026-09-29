@@ -267,7 +267,7 @@
         args: { description: { a: first ? first.who : '', b: h.who, t: U.time(ev.syncedAt || h.at), dp: np(x.dead.total), ap: np(x.alive) } } });
       var rows = row({ action: 'resolve', value: h.event + '|one', title: 'pp.count.held.one', desc: 'pp.count.held.one_meta', descArgs: { ap: np(x.alive) }, wrap: true }) +
         row({ action: 'resolve', value: h.event + '|two', title: 'pp.count.held.two', desc: 'pp.count.held.two_meta', descArgs: { ap: np(Math.max(0, x.alive - h.n)) }, wrap: true });
-      return '<section class="ct-group" data-ds="Candidate:HeldBody">' + head + UI.rowGroup(rows) + '</section>';
+      return '<section class="ct-group" data-target="held">' + head + UI.rowGroup(rows) + '</section>';
     }).join('');
   }
   function hostHtml(inert) {

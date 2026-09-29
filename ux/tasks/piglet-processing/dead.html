@@ -22,8 +22,8 @@
 .dd-bar { flex-wrap: wrap; justify-content: space-between; column-gap: var(--space-section); }
 .dd-bar > .primary, .dd-bar > .danger { flex: 1; }
 .dd-pointer { display: flex; flex-direction: column; align-items: flex-start; }
-/* the drawer header: Clear sits low, beside the entry's line — never up against the litter face's day line behind it (360) */
-.dd-grab .st-heading-aside { max-width: none; align-self: flex-end; }
+/* the drawer header: Clear sits centred on the title block — clear of the litter face's day line behind it (360) and of the segment below */
+.dd-grab .st-heading-aside { max-width: none; align-self: center; }
 .dd-grab .st-heading-description .st-status { margin-left: var(--space-row-y); }
 /* the photo viewer: one photo, full width (a stand-in frame: the prototype has no camera) */
 .dd-photo { display: grid; place-items: center; width: 100%; aspect-ratio: 3 / 4; border-radius: var(--radius-inset); background: var(--well); color: var(--muted); font-family: var(--font-mono); font-size: var(--type-button-size); }
