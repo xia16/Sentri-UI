@@ -435,7 +435,7 @@
   screen.addEventListener('contextmenu', function (ev) { if (ev.target.closest('.dd-hold')) ev.preventDefault(); });
 
   PP.ready.then(function () {
-    store = PP.open(spec.data || 'base');
+    store = PP.open(spec.data || 'base', spec.save ? { session: false } : null);
     crate = qs.get('crate') || spec.crate;
     if (qs.get('sow')) Object.keys(window.PPFixtures.SOWS).forEach(function (c) { if (window.PPFixtures.SOWS[c].sow === qs.get('sow')) crate = c; });
     SOWF = store.sow(crate) || { sow: '', parity: 0 };

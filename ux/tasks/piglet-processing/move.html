@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="/ux/design-system/tokens.css">
 <link rel="stylesheet" href="/ux/design-system/components/bundle.css">
 <link rel="stylesheet" href="shell.css">
+<script type="module" src="ledger.js"></script>
+<script type="module" src="fixtures.js"></script>
 <style>
 /* Layout only, tokens from tokens.css; one Candidate composition (Candidate:Radio, below). */
 .mv-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
@@ -51,183 +53,93 @@
 </main>
 <script src="/ux/design-system/components/bundle.js"></script>
 <script src="shell.js"></script>
+<script src="shell-ui.js"></script>
 <script>
 (function () {
-  var UI = window.SentriUI, ICON = window.SentriIcons;
+  var UI = window.SentriUI, ICON = window.SentriIcons, U = window.PPUI;
   var zh = PP.lang === 'zh';
-  var TODAY = zh ? '9月29日' : 'Sep 29', WHO = 'G.H', UNIT = 7;
 
-  /* ---- schedule (farm config stand-in) ----
-     Each scheduled dose is its own obligation, due at a day-age. castrate is counted against males (Q16).
-     teeth has a console "last age-day" of 7: past it an undone piglet is missed, not owed (Q15). */
-  var TX = ['teeth', 'tail', 'iron', 'coccidiosis', 'castrate'];
-  var DUE = { teeth: 1, tail: 1, iron: 3, coccidiosis: 3, castrate: 5 };
-  var LAST = { teeth: 7 };
-  var INVISIBLE = { iron: 1, coccidiosis: 1, health: 1 };
-
-  /* ---- fixtures: Unit 7 (rows B, C, D) and one crate in Unit 8; Sep 29 ----
-     Alive is never stored: alive() derives it from the ledger, so every face balances.
-     done[d] = alive own piglets recorded for dose d; deferred[d] = piglets skipped for a passing reason (still owed). */
-  function base() {
-    return {
-      B01: { unit: 7, tag: '000226', day: 8, born: 10, dead: 3, males: 3, died: true, done: { teeth: 0, tail: 7, iron: 7, coccidiosis: 7, castrate: 0 } },
-      B02: { unit: 7, tag: '000241', day: 4, born: 9, dead: 1, males: 4, done: { teeth: 8, tail: 8, iron: 8, coccidiosis: 8 } },
-      B04: { unit: 7, tag: '000254', day: 4, born: 10, dead: 1, males: 5, done: { teeth: 9, tail: 9, iron: 9, coccidiosis: 9 } },
-      B06: { unit: 7, tag: '000261', day: 3, born: 13, dead: 1, males: 6, done: { teeth: 0, tail: 0, iron: 0, coccidiosis: 0 } },
-      B08: { unit: 7, tag: '000270', day: 0, farrowing: true, live: 6, dead: 1, sofar: 7, ago: 2, by: 'L.M' },
-      B09: { unit: 7, tag: '000247', day: 4, born: 11, dead: 1, males: 5, done: { teeth: 10, tail: 7, iron: 8, coccidiosis: 10 },
-             deferred: { iron: { n: 2, reason: 'weak' }, tail: { n: 3, reason: 'weak' } } },
-      B10: { unit: 7, tag: '000265', day: 3, born: 12, dead: 1, males: 6, done: { teeth: 0, tail: 0, iron: 0, coccidiosis: 0 } },
-      C01: { unit: 7, tag: '000283', day: 5, born: 13, dead: 1, males: 6, done: { teeth: 12, tail: 12, iron: 12, coccidiosis: 12, castrate: 0 } },
-      C03: { unit: 7, tag: '000288', day: 4, born: 11, dead: 1, males: 5, done: { teeth: 10, tail: 10, iron: 10, coccidiosis: 10 },
-             ids: ['000301', '000302', '000303', '000304', '000305', '000306', '000307', '000308', 'n:12-9'] },
-      C05: { unit: 7, tag: '000292', day: 4, born: 9, dead: 1, males: 4, done: { teeth: 0, tail: 0, iron: 0, coccidiosis: 0 } },
-      D02: { unit: 7, tag: '000233', day: 26, born: 12, dead: 1, weaned: 11, done: {} },
-      A03: { unit: 8, tag: '000318', day: 4, born: 11, dead: 1, males: 5, done: { teeth: 10, tail: 10, iron: 10, coccidiosis: 10 } }
-    };
-  }
-  var LIT = base();
-  var MOVES = [];                                     // posted Move records: { id, from, to, n, rows, answers, explains, time, who }
-
-  function inOut(code) {
-    var o = { out: 0, inn: 0, outMoves: [], inMoves: [] };
-    MOVES.forEach(function (m) {
-      if (m.from === code) { o.out += m.n; o.outMoves.push(m); }
-      if (m.to === code) { o.inn += m.n; o.inMoves.push(m); }
-    });
-    return o;
-  }
-  // An explaining Move relabels an open loss/gain as moved out/in: the loss and gain it closes leave the ledger.
-  function closed(code, side) {
-    return MOVES.reduce(function (s, m) { return s + (m.explains && ((side === 'loss' && m.from === code) || (side === 'gain' && m.to === code)) ? m.n : 0); }, 0);
-  }
-  function ledger(code) {
-    var l = LIT[code], io = inOut(code);
-    if (l.farrowing) return { alive: l.live, dead: l.dead };
-    var loss = (l.loss || 0) - closed(code, 'loss'), gain = (l.gain || 0) - closed(code, 'gain');
-    var alive = l.born - l.dead - (l.weaned || 0) - loss + gain - io.out + io.inn;
-    return { born: l.born, dead: l.dead, weaned: l.weaned || 0, loss: loss, gain: gain, out: io.out, inn: io.inn, alive: alive, io: io };
-  }
-  function alive(code) { return ledger(code).alive; }
-  function dueDoses(day) { return TX.filter(function (d) { return DUE[d] <= day; }); }
-  function pop(code, d) { return d === 'castrate' ? (LIT[code].males || 0) : alive(code); }
-  function status(code) {
-    var l = LIT[code];
-    if (l.died) return 'died';
-    var ds = dueDoses(l.day), a = alive(code);
-    if (!ds.length) return 'due';
-    var full = ds.every(function (d) { return (l.done[d] || 0) >= pop(code, d); });
-    var none = ds.every(function (d) { return !(l.done[d] || 0); });
-    return full ? 'done' : none ? 'due' : 'part';
-  }
-
-  /* ---- the draft and the one resolved record ---- */
+  /* ---- states: a variant of the shared fixture + the face + the draft. Every figure — both litters' ledgers, what each dose
+     carries, the questions to ask, the source's coverage range, before → after, why Move is gray — is the ledger's
+     (select.moveDraft / derive over fixtures.js). Save and the arrivals' checks commit through append. ---- */
   var STATES = {
     'move':              { view: 'move', face: 'B06' },
-    'move-review':       { view: 'move', face: 'B06', other: 'B04', n: 2 },
-    'move-into':         { view: 'move', face: 'B04', dir: 'in', other: 'B10', n: 1 },
-    'move-ask':          { view: 'move', face: 'B09', other: 'B02', n: 2 },
-    'move-repeat':       { view: 'move', face: 'B04', other: 'B02', n: 1, prior: [{ id: 'MV-0929-01', from: 'B06', to: 'B04', n: 2, time: '09:42' }] },
-    'move-tagged':       { view: 'move', face: 'C03', other: 'C05', rows: ['000304', '000307'], n: 0 },
-    'move-orphan':       { view: 'move', face: 'B01', other: 'D02', n: 7 },
-    'move-explain':      { view: 'move', face: 'B06', other: 'B04', n: 1, explains: ['UL-B06-0929-1', 'UG-B04-0929-1'], fx: { B06: { loss: 1 }, B04: { gain: 1 } } },
+    'move-review':       { view: 'move', face: 'B06', other: 'B08', n: 2 },
+    'move-into':         { view: 'move', face: 'B08', dir: 'in', other: 'B10', n: 1 },
+    'move-ask':          { view: 'move', face: 'B09', other: 'B02', rows: ['B09-r9', 'B09-r10'] },
+    'move-repeat':       { view: 'move', face: 'B08', other: 'B02', n: 1, data: 'moved-b06-b08' },
+    'move-tagged':       { view: 'move', face: 'C03', other: 'C05', rows: ['C03-r4', 'C03-r7'] },
+    'move-orphan':       { view: 'move', face: 'B01', other: 'D02', allRows: true },
+    'move-explain':      { view: 'move', face: 'B06', other: 'B08', n: 1, explains: ['C-B06-loss', 'C-B08-gain'], data: 'explain' },
     'move-cross':        { view: 'move', face: 'B06', other: 'A03', n: 1 },
-    'move-prelock':      { view: 'prelock', face: 'B08' },
-    'move-receipt':      { view: 'receipt', face: 'B06', other: 'B04', n: 2, time: '09:42' },
-    'move-draft-kept':   { view: 'face', face: 'B06', other: 'B04', n: 2, kept: true },
-    'move-orphan-saved': { view: 'face', face: 'B01', prior: [{ id: 'MV-0929-04', from: 'B01', to: 'D02', n: 7, time: '11:05' }] },
-    'nurse-arrived':     { view: 'face', face: 'D02', prior: [{ id: 'MV-0929-04', from: 'B01', to: 'D02', n: 7, time: '11:05' }] },
-    'owed-from-move':    { view: 'face', face: 'B04', prior: [{ id: 'MV-0929-01', from: 'B06', to: 'B04', n: 2, time: '09:42' }] },
-    'owed-arrived-done': { view: 'face', face: 'C05', prior: [{ id: 'MV-0929-02', from: 'C03', to: 'C05', n: 2, rows: ['000304', '000307'], time: '09:10' },
-                                                              { id: 'MV-0929-03', from: 'B06', to: 'C05', n: 1, time: '10:20' }] },
-    'unknown-check':     { view: 'face', face: 'B02', drawer: 'MV-0929-05:iron', had: 1, rest: 'record',
-                           prior: [{ id: 'MV-0929-05', from: 'B09', to: 'B02', n: 2, answers: { iron: 'unknown' }, time: '10:05' }] }
+    'move-prelock':      { view: 'prelock', face: 'D01' },
+    'move-receipt':      { view: 'receipt', face: 'B06', other: 'B08', n: 2 },
+    'move-draft-kept':   { view: 'face', face: 'B06', other: 'B08', n: 2, kept: true },
+    'move-orphan-saved': { view: 'face', face: 'B01', data: 'moved-orphan' },
+    'nurse-arrived':     { view: 'face', face: 'D02', data: 'moved-orphan' },
+    'owed-from-move':    { view: 'face', face: 'B08', data: 'moved-b06-b08' },
+    'owed-arrived-done': { view: 'face', face: 'C05', data: 'moved-to-c05' },
+    'unknown-check':     { view: 'face', face: 'B02', drawer: 'MV-0929-05:iron3', had: 1, rest: 'record', data: 'moved-unknown' }
   };
+  var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'move';
   var S = JSON.parse(JSON.stringify(STATES[name]));
-  if (PP.state === 'move-prelock' && new URLSearchParams(location.search).get('data') === 'other') S = { view: 'move', face: 'B06', query: 'B08' };
+  if (PP.state === 'move-prelock' && qs.get('data') === 'other') S = { view: 'move', face: 'B06', query: 'D01' };
+  if (qs.get('crate') && name === 'move') S.face = qs.get('crate');
   S.dir = S.dir || 'out'; S.answers = S.answers || {}; S.rows = S.rows || []; S.untagged = S.untagged || 0;
   if (S.n == null) S.n = 1;
-  if (S.fx) Object.keys(S.fx).forEach(function (c) { Object.assign(LIT[c], S.fx[c]); });
-  // prior moves: each is posted with the answers and carry it resolved to at its own time, against the fixtures as they stood
-  (S.prior || []).forEach(function (m) { m.carry = carry(m); m.who = WHO; MOVES.push(m); });
-  var RECEIPT_AT_LOAD = S.view === 'receipt';
   var DEFAULT = JSON.stringify({ other: '', n: 1, rows: [], untagged: 0, answers: {}, dir: 'out' });
+  var store, CFG, TODAY, UNIT, resolveDrafts = {};
 
+  /* ---- the ledger ---- */
+  function L(c) { return store.derived.litters[c]; }
+  function alive(c) { return L(c).alive; }
+  function unitOf(c) { return L(c).room; }
+  function where(c) { return unitOf(c) !== UNIT; }
+  function tag(c) { return (store.sow(c) || {}).sow || ''; }
+  function doseCfg(id) { return CFG.doses.filter(function (d) { return d.id === id; })[0]; }
+  function txName(id) { return PP.t('pp.common.tx.' + doseCfg(id).tx); }
+  function txList(ids) { return ids.map(txName).join(' · '); }
+  function farrowing(c) { return !!L(c) && L(c).phase === 'open'; }
+  function canSource(c) { return !!L(c) && L(c).phase === 'locked' && alive(c) > 0; }
+  function canReceive(c) { return !!L(c) && L(c).phase === 'locked' && !L(c).sowDied; }
   function source() { return S.dir === 'out' ? S.face : S.other; }
   function receiver() { return S.dir === 'out' ? S.other : S.face; }
-  function sourceIds(code) { return code && LIT[code].ids ? LIT[code].ids : null; }
-  function remainder(code) { var ids = sourceIds(code); return ids ? Math.max(0, alive(code) - ids.length) : 0; }
-  function count() { return sourceIds(source()) ? S.rows.length + S.untagged : S.n; }
-  function canSource(c) { var l = LIT[c]; return !!l && !l.farrowing && alive(c) > 0; }
-  function canReceive(c) { var l = LIT[c]; return !!l && !l.farrowing && !l.died; }
-  // Clamp on every change: roles valid, n within the source's alive, rows only from the source.
+  function liveRows(c) { return L(c).identity.rows.filter(function (r) { return r.litter === c && r.status === 'alive'; }); }
+  function remainder(c) { return Math.max(0, alive(c) - liveRows(c).length); }
+  function hasRows(c) { return liveRows(c).length > 0; }
+  function count() { return hasRows(source()) ? S.rows.length + S.untagged : S.n; }
+  function draftInput() {
+    return { from: source(), to: receiver(), n: count(), rows: hasRows(source()) ? S.rows.slice() : [], answers: Object.assign({}, S.answers), explains: S.explains || undefined };
+  }
+  var memo = { key: '', val: null };
+  function draft() {
+    var d = draftInput(), key = JSON.stringify(d) + store.events.length;
+    if (memo.key !== key) memo = { key: key, val: store.select.moveDraft(store.derived, d, { who: window.PPFixtures.ME }) };
+    return memo.val;
+  }
+  // Clamp on every change: roles valid, rows only from the source (the ledger clamps n).
   function normalize() {
     if (S.view !== 'move') return;
     if (!canSource(S.face)) S.dir = 'in';                              // a sow with no piglets can only receive
+    if (!canReceive(S.face) && canSource(S.face)) S.dir = 'out';        // a litter whose sow died can only send
+    if (S.explains) return;                                             // an explaining Move is locked to its crates, direction and count
     if (S.other) {
-      var bad = S.other === S.face || !LIT[S.other] || LIT[S.other].farrowing ||
-        (S.dir === 'out' && !canReceive(S.other)) || (S.dir === 'in' && !canSource(S.other));
+      var bad = S.other === S.face || !L(S.other) || farrowing(S.other) || (S.dir === 'out' && !canReceive(S.other)) || (S.dir === 'in' && !canSource(S.other));
       if (bad) S.other = '';
     }
     var src = source();
     if (!src) return;
-    var max = alive(src);
-    S.n = Math.max(0, Math.min(S.n, max));
-    var ids = sourceIds(src) || [];
+    S.n = Math.max(0, Math.min(S.n, alive(src)));
+    var ids = liveRows(src).map(function (r) { return r.rowId; });
     S.rows = S.rows.filter(function (r) { return ids.indexOf(r) >= 0; });
     S.untagged = Math.max(0, Math.min(S.untagged, remainder(src)));
   }
   function draftExists() { return JSON.stringify({ other: S.other || '', n: S.n, rows: S.rows, untagged: S.untagged, answers: S.answers, dir: S.dir }) !== DEFAULT; }
-  function record() {
-    return { id: S.id || 'MV-0929-06', from: source(), to: receiver(), n: count(), rows: S.rows.slice(), untagged: S.untagged,
-             answers: JSON.parse(JSON.stringify(S.answers)), explains: S.explains || null, time: S.time || '11:30', who: WHO };
-  }
-
-  /* What the moved piglets owe, per dose, from the source's state (RULINGS round 2, Q14–Q16). One function for review, receipt and faces.
-     all done → done · none done → owe (a lapsed window → missed; a deferral's reason travels) ·
-     part done → invisible: the answer (yes · no · unknown); visible: check on the pig. */
-  function knownOwing(code, d) {
-    return inOut(code).inMoves.reduce(function (s, m) { return s + (m.carry && m.carry[d] && m.carry[d].kind === 'owe' ? m.n : 0); }, 0);
-  }
-  function answerFor(rec, d) {
-    if (rec.answers && rec.answers[d]) return rec.answers[d];
-    return knownOwing(rec.from, d) ? 'no' : 'unknown';
-  }
-  function carry(rec) {
-    var s = LIT[rec.from], out = {};
-    dueDoses(s.day).forEach(function (d) {
-      var p = pop(rec.from, d), v = s.done[d] || 0, kind;
-      var lapsed = LAST[d] && s.day > LAST[d];
-      if (p === 0) return;
-      if (v >= p) kind = 'done';
-      else if (v === 0) kind = lapsed ? 'missed' : 'owe';
-      else if (INVISIBLE[d]) { var a = answerFor(rec, d); kind = a === 'yes' ? 'done' : a === 'no' ? 'owe' : 'unknown'; }
-      else kind = lapsed ? 'missed' : 'check';
-      out[d] = { kind: kind, reason: kind === 'owe' && s.deferred && s.deferred[d] ? s.deferred[d].reason : '' };
-    });
-    return out;
-  }
-  // The source's coverage after the Move: a Yes debits n; Don't know / check leave a range, never a false "all done".
-  function sourceAfter(rec, c) {
-    var s = LIT[rec.from], after = alive(rec.from) - rec.n, out = [];
-    Object.keys(c).forEach(function (d) {
-      if (d === 'castrate') return;
-      var v = s.done[d] || 0;
-      if (c[d].kind === 'unknown' || c[d].kind === 'check') out.push({ d: d, lo: Math.max(0, v - rec.n), hi: Math.min(v, after), of: after });
-    });
-    return out;
-  }
 
   /* ---- helpers ---- */
-  function span(id, args, cls) {
-    return '<span' + (cls ? ' class="' + cls + '"' : '') + ' data-str="' + id + '"' +
-      (args ? " data-args='" + JSON.stringify(args).replace(/'/g, '&#39;') + "'" : '') + '></span>';
-  }
-  function pl(base, n) { return base + (n === 1 && !zh ? '.one' : '.many'); }
-  function txName(d) { return PP.t('pp.common.tx.' + d); }
-  function txList(list) { return list.map(txName).join(' · '); }
-  function where(code) { return LIT[code].unit !== UNIT; }
+  function span(id, args, cls) { return U.span(id, args, { cls: cls }); }
+  var pl = PP.one;
   function row(o) {
     var strs = { title: o.title }, args = { title: o.titleArgs };
     if (o.desc) { strs.description = o.desc; args.description = o.descArgs; }
@@ -242,113 +154,107 @@
   function pigs(n) { return { id: pl('pp.common.unit.piglet', n), args: { n: n } }; }
   function button(cls, action, id, args, disabled) {
     return '<button type="button" class="button ' + cls + '" data-ds="Button" data-action="' + action + '" data-str="' + id + '"' +
-      (args ? " data-args='" + JSON.stringify(args).replace(/'/g, '&#39;') + "'" : '') + (disabled ? ' disabled' : '') + '></button>';
+      (args ? " data-args='" + U.esc(JSON.stringify(args)) + "'" : '') + (disabled ? ' disabled' : '') + '>' + U.esc(PP.t(id, args)) + '</button>';
   }
   function textAction(action, id, args) {
     return '<button type="button" class="st-text-action" data-ds="Button" data-action="' + action + '" data-str="' + id + '"' +
-      (args ? " data-args='" + JSON.stringify(args).replace(/'/g, '&#39;') + "'" : '') + '></button>';
+      (args ? " data-args='" + U.esc(JSON.stringify(args)) + "'" : '') + '>' + U.esc(PP.t(id, args)) + '</button>';
   }
   // Candidate:Radio. opts: [{ value, id, args, meta, metaArgs }]
   function radios(action, opts, active, label) {
-    return '<div class="mv-radios" data-ds="Candidate:Radio" role="radiogroup" aria-label="' + label.replace(/"/g, '&quot;') + '">' + opts.map(function (o) {
+    return '<div class="mv-radios" data-ds="Candidate:Radio" role="radiogroup" aria-label="' + U.esc(label) + '">' + opts.map(function (o) {
       var on = o.value === active;
       return '<button type="button" class="mv-radio" role="radio" aria-checked="' + on + '" data-action="' + action + '" data-value="' + o.value + '">' +
         '<span class="mv-radio-mark" aria-hidden="true"></span><span class="mv-radio-copy">' + span(o.id, o.args, 'mv-radio-label') +
         (o.meta ? span(o.meta, o.metaArgs, 'mv-radio-meta') : '') + '</span></button>';
     }).join('') + '</div>';
   }
-  function stamp(t) { return TODAY + ' · ' + t + ' · ' + WHO; }
+  function stamp(at, who) { return U.stamp(at, who, TODAY); }
+  function rowLabel(r) { return r.tag ? PP.t('pp.move.rows.tag', { tag: r.tag }) : PP.t('pp.move.rows.notch', { notch: r.notch }); }
 
-  /* ---- the litter face (a stand-in for the litter sheet: header, ledger, what arrivals owe, moves, the Move door) ---- */
-  function header(code) {
-    var l = LIT[code], sub;
-    if (l.farrowing) sub = span('pp.move.face.sub_farrowing', { u: l.unit });
-    else if (l.died) sub = span('pp.move.face.sub_died', { u: l.unit, day: l.day });
-    else if (alive(code) === 0) sub = span('pp.move.face.sub_empty', { u: l.unit });
-    else if (l.weaned && inOut(code).inn) sub = span('pp.move.face.sub_nurse', { u: l.unit, day: LIT[inOut(code).inMoves[0].from].day, code: inOut(code).inMoves[0].from });
-    else sub = span('pp.move.face.sub', { u: l.unit, day: l.day });
-    return '<header class="utility-header"><div class="mv-title"><h3>' + span('pp.move.face.title', { code: code, tag: l.tag }) + '</h3><p>' + sub + '</p></div></header>';
+  /* ---- the litter face (a stand-in for the litter sheet: the shared header, the ledger, what arrivals owe, moves, the Move door) ---- */
+  function header(c) {
+    var x = L(c), sub, inn = x.moves.filter(function (m) { return m.dir === 'in'; });
+    if (farrowing(c)) sub = span('pp.move.face.sub_farrowing', { u: x.room });
+    else if (x.sowDied) sub = span('pp.move.face.sub_died', { u: x.room, day: x.dayAge });
+    else if (x.alive === 0) sub = span('pp.move.face.sub_empty', { u: x.room });
+    else if (x.weaned && inn.length) sub = span('pp.move.face.sub_nurse', { u: x.room, day: L(inn[0].other).dayAge, code: inn[0].other });
+    else sub = span('pp.move.face.sub', { u: x.room, day: x.dayAge });
+    return U.litterHeader({ crate: c, sow: tag(c), parity: (store.sow(c) || {}).parity, sub: sub });
   }
-  function ledgerFacts(code) {
-    var g = ledger(code), items = [];
-    if (g.born != null) items.push(fact('label.born', null, pigs(g.born).id, pigs(g.born).args));
-    items.push(fact('label.dead', null, pigs(g.dead).id, pigs(g.dead).args));
-    if (g.weaned) items.push(fact('pp.move.label.weaned', null, pigs(g.weaned).id, pigs(g.weaned).args));
-    if (g.loss) items.push(fact('pp.move.label.loss', null, pigs(g.loss).id, pigs(g.loss).args, 'pp.move.fact.open'));
-    if (g.gain) items.push(fact('pp.move.label.gain', null, pigs(g.gain).id, pigs(g.gain).args, 'pp.move.fact.open'));
-    if (g.out) items.push(fact('pp.move.label.moved_out', null, pigs(g.out).id, pigs(g.out).args, pl('pp.move.fact.moves', g.io.outMoves.length), { k: g.io.outMoves.length }));
-    if (g.inn) items.push(fact('pp.move.label.moved_in', null, pigs(g.inn).id, pigs(g.inn).args, pl('pp.move.fact.moves', g.io.inMoves.length), { k: g.io.inMoves.length }));
-    items.push(fact('label.alive', null, pigs(g.alive).id, pigs(g.alive).args));
+  function ledgerFacts(c) {
+    var x = L(c), items = [], outs = x.moves.filter(function (m) { return m.dir === 'out'; }).length, ins = x.moves.filter(function (m) { return m.dir === 'in'; }).length;
+    if (x.phase === 'locked') items.push(fact('label.born', null, pigs(x.born).id, pigs(x.born).args));
+    items.push(fact('label.dead', null, pigs(x.dead.total).id, pigs(x.dead.total).args));
+    if (x.weaned) items.push(fact('pp.move.label.weaned', null, pigs(x.weaned).id, pigs(x.weaned).args));
+    if (x.unexplained.openLoss) items.push(fact('pp.move.label.loss', null, pigs(x.unexplained.openLoss).id, pigs(x.unexplained.openLoss).args, 'pp.move.fact.open'));
+    if (x.unexplained.openGain) items.push(fact('pp.move.label.gain', null, pigs(x.unexplained.openGain).id, pigs(x.unexplained.openGain).args, 'pp.move.fact.open'));
+    if (x.movedOut) items.push(fact('pp.move.label.moved_out', null, pigs(x.movedOut).id, pigs(x.movedOut).args, pl('pp.move.fact.moves', outs), { k: outs }));
+    if (x.movedIn) items.push(fact('pp.move.label.moved_in', null, pigs(x.movedIn).id, pigs(x.movedIn).args, pl('pp.move.fact.moves', ins), { k: ins }));
+    items.push(fact('label.alive', null, pigs(x.alive).id, pigs(x.alive).args));
     return UI.facts(items, { columns: items.length === 3 ? 3 : 2 });
   }
   // One row per Move, newest first; each is the Edit door for that record (S8 owns Edit's screens).
-  function movesGroup(code) {
-    var io = inOut(code), ms = io.inMoves.concat(io.outMoves).sort(function (a, b) { return a.time < b.time ? 1 : -1; });
+  function movesGroup(c) {
+    var ms = L(c).moves.slice().sort(function (a, b) { return a.at < b.at ? 1 : -1; });
     if (!ms.length) return '';
     return UI.rowGroup(ms.map(function (m) {
-      var inn = m.to === code, other = inn ? m.from : m.to;
-      var t = where(other) ? (inn ? 'pp.move.moves.in_unit' : 'pp.move.moves.out_unit') : (inn ? 'pp.move.moves.in' : 'pp.move.moves.out');
-      return row({ action: 'edit-move', value: m.id, title: pl(t, m.n), titleArgs: { n: m.n, code: other, u: LIT[other].unit },
-        desc: m.explains ? 'pp.move.moves.stamp_explains' : 'pp.move.moves.stamp', descArgs: { stamp: stamp(m.time) }, trail: 'act.edit' });
+      var inn = m.dir === 'in', t = where(m.other) ? (inn ? 'pp.move.moves.in_unit' : 'pp.move.moves.out_unit') : (inn ? 'pp.move.moves.in' : 'pp.move.moves.out');
+      return row({ action: 'edit-move', value: m.id, title: pl(t, m.n), titleArgs: { n: m.n, code: m.other, u: unitOf(m.other) },
+        desc: m.explains && (m.explains[0] || m.explains[1]) ? 'pp.move.moves.stamp_explains' : 'pp.move.moves.stamp', descArgs: { stamp: stamp(m.at, m.who) }, trail: 'act.edit' });
     }).join(''), { title: '', strs: { title: 'pp.move.moves.title' } });
   }
-  // What the arrivals owe here, one row per dose, merged across Moves with per-source counts.
-  function arrivalRows(code) {
-    var io = inOut(code);
-    if (!io.inn) return '';
-    var own = alive(code) - io.inn, l = LIT[code], rows = [];
-    TX.forEach(function (d) {
-      var owe = [], done = 0, unknown = 0, check = [], missed = [], males = [];
-      io.inMoves.forEach(function (m) {
-        var c = m.carry[d]; if (!c) return;
-        var r = S.resolved && S.resolved[m.id + d];
-        if (r) { if (r.rest === 'owed' && m.n - r.had > 0) owe.push({ from: m.from, n: m.n - r.had, carry: m.carry }); return; }
-        if (c.kind === 'owe') (d === 'castrate' ? males : owe).push(m);
-        else if (c.kind === 'done') done += m.n;
-        else if (c.kind === 'unknown') unknown += m.n;
-        else if (c.kind === 'check') check.push(m);
-        else if (c.kind === 'missed') missed.push(m);
-      });
-      if (!owe.length && !done && !unknown && !check.length && !missed.length && !males.length) return;
-      var ownOwed = own > 0 && DUE[d] <= l.day && d !== 'castrate' ? Math.max(0, own - (l.done[d] || 0)) : 0;
-      var arrOwed = owe.reduce(function (s, m) { return s + m.n; }, 0), total = ownOwed + arrOwed, parts = [];
-      if (total && !ownOwed && owe.length === 1) parts.push(PP.t('pp.move.frag.owed_from', { n: total, code: owe[0].from }));
-      else {
-        if (total) parts.push(PP.t('pp.move.frag.owed', { n: total }));
-        owe.forEach(function (m) { parts.push(PP.t('pp.move.frag.from', { k: m.n, code: m.from })); });
+  // What the arrivals owe here, one row per dose: the ledger's owed (with what arrivals added), unknown and carried groups by source.
+  function arrivalRows(c) {
+    var x = L(c), ins = x.moves.filter(function (m) { return m.dir === 'in'; });
+    if (!ins.length) return '';
+    var rows = [];
+    CFG.doses.forEach(function (d) {
+      var D = x.doses[d.id];
+      if (D.status === 'later' || D.status == null) return;
+      var arrOwed = (D.owedFrom.filter(function (f) { return f.kind === 'arrival'; })[0] || {}).n || 0;
+      var owedSrc = ins.filter(function (m) { return m.packets[d.id] === 'owed'; });
+      var groups = D.unknownGroups.filter(function (g) { return g.kind === 'move'; });
+      if (!arrOwed && !groups.length && !D.carriedFromMove && !owedSrc.length) return;
+      var parts = [];
+      if (d.castration && owedSrc.length) owedSrc.forEach(function (m) { parts.push(PP.t('pp.move.frag.males', { k: m.n, code: m.other })); });
+      else if (D.owed) {
+        // The ledger's owed, and the arrivals that raised it (a Move whose packet for this dose was `owed`).
+        if (owedSrc.length === 1 && (arrOwed === D.owed || (!D.records.length && owedSrc[0].n === D.owed))) parts.push(PP.t('pp.move.frag.owed_from', { n: D.owed, code: owedSrc[0].other }));
+        else { parts.push(PP.t('pp.move.frag.owed', { n: D.owed })); owedSrc.forEach(function (m) { parts.push(PP.t('pp.move.frag.from', { k: m.n, code: m.other })); }); }
       }
-      if (done) parts.push(PP.t('pp.move.frag.arrived_done', { k: done }));
-      if (unknown) parts.push(PP.t('pp.move.frag.unknown', { k: unknown }));
-      check.forEach(function (m) { parts.push(PP.t('pp.move.frag.check', { k: m.n, code: m.from })); });
-      males.forEach(function (m) { parts.push(PP.t('pp.move.frag.males', { k: m.n, code: m.from })); });
-      missed.forEach(function (m) { parts.push(PP.t('pp.move.frag.missed', { k: m.n, code: m.from })); });
-      var reason = owe.filter(function (m) { return m.carry[d].reason; })[0];
-      if (reason) parts.push(PP.t('pp.move.frag.deferred', { reason: PP.t('pp.move.reason.' + reason.carry[d].reason) }));
-      var resolveBy = unknown || check.length ? (io.inMoves.filter(function (m) { return m.carry[d] && (m.carry[d].kind === 'unknown' || m.carry[d].kind === 'check'); })[0]) : null;
-      rows.push(row({ action: resolveBy ? 'open-resolve' : total ? 'record' : 'open-dose', value: resolveBy ? resolveBy.id + ':' + d : d + ':' + total,
-        title: 'pp.common.tx.' + d, desc: 'pp.move.owed.line', descArgs: { text: parts.join(' · ') } }));
+      if (D.carriedFromMove) parts.push(PP.t('pp.move.frag.arrived_done', { k: D.carriedFromMove }));
+      groups.forEach(function (g) { parts.push(d.visible ? PP.t('pp.move.frag.check', { k: g.n, code: g.from }) : PP.t('pp.move.frag.unknown', { k: g.n })); });
+      if (!parts.length) return;
+      var g0 = groups[0];
+      rows.push(row({ action: g0 ? 'open-resolve' : D.owed ? 'record' : 'open-dose', value: g0 ? g0.id + ':' + d.id : d.id,
+        title: 'pp.common.tx.' + d.tx, desc: 'pp.move.owed.line', descArgs: { text: parts.join(' · ') } }));
     });
     if (!rows.length) return '';
     return UI.rowGroup(rows.join(''), { title: '', strs: { title: 'pp.move.owed.title' } });
   }
-  function moveDoor(code) {
-    if (!canSource(code) && !canReceive(code)) return '';
+  function moveDoor(c) {
+    if (!canSource(c) && !canReceive(c)) return '';
     var desc = S.kept ? pl('pp.move.door.kept', count()) : 'pp.move.door.desc';
-    var r = S.kept ? record() : null;
-    return UI.rowGroup(row({ action: 'open-move', value: code, title: 'pp.move.sheet.title', desc: desc, descArgs: r ? { n: r.n, from: r.from, to: r.to } : null }));
+    return UI.rowGroup(row({ action: 'open-move', value: c, title: 'pp.move.sheet.title', desc: desc, descArgs: S.kept ? { n: count(), from: source(), to: receiver() } : null }));
   }
-  function faceHtml(code, inert) {
-    var body = ledgerFacts(code) + arrivalRows(code) + movesGroup(code) + moveDoor(code);
-    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (inert ? ' inert' : '') + '>' + header(code) +
+  function faceHtml(c, inert) {
+    var body = ledgerFacts(c) + arrivalRows(c) + movesGroup(c) + moveDoor(c);
+    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (inert ? ' inert' : '') + '>' + header(c) +
       '<div class="sheet-body"><div class="mv-face">' + body + '</div></div>' +
       '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + '</footer></section>';
   }
 
   /* ---- the Move drawer ---- */
+  function crateState(c) {
+    if (L(c).sowDied) return 'died';
+    var f = store.select.room(store.derived, { room: unitOf(c), lens: 'all' }).rows.filter(function (r) { return r.litter === c; })[0];
+    return !f || f.kind !== 'owes' ? 'done' : f.partly ? 'part' : 'due';
+  }
   function crateMeta(c) {
-    var l = LIT[c], st = alive(c) === 0 ? 'empty' : status(c);
-    var args = { day: l.day, n: alive(c), tag: l.tag, u: l.unit, state: PP.t('pp.move.crate.state.' + st) };
-    return { id: st === 'empty' ? (where(c) ? 'pp.move.crate.meta_unit_empty' : 'pp.move.crate.meta_empty') : (where(c) ? 'pp.move.crate.meta_unit' : 'pp.move.crate.meta'), args: args };
+    var empty = alive(c) === 0;
+    var args = { day: L(c).dayAge, n: alive(c), tag: tag(c), u: unitOf(c), state: empty ? '' : PP.t('pp.move.crate.state.' + crateState(c)) };
+    return { id: empty ? (where(c) ? 'pp.move.crate.meta_unit_empty' : 'pp.move.crate.meta_empty') : (where(c) ? 'pp.move.crate.meta_unit' : 'pp.move.crate.meta'), args: args };
   }
   function crateRow(c) {
     var m = crateMeta(c);
@@ -356,28 +262,29 @@
       strs: { label: 'pp.move.crate.code', meta: m.id }, args: { label: { code: c }, meta: m.args } });
   }
   function candidates() {
-    var near = [], empty = [], me = LIT[S.face];
-    Object.keys(LIT).forEach(function (c) {
-      var l = LIT[c];
-      if (c === S.face || l.farrowing || l.unit !== me.unit) return;
-      if (alive(c) > 0 && c.charAt(0) !== S.face.charAt(0)) return;          // this row of crates; the search finds the rest
+    var near = [], empty = [], me = L(S.face);
+    Object.keys(store.derived.litters).forEach(function (c) {
+      var x = L(c);
+      if (c === S.face || farrowing(c) || x.room !== me.room) return;
+      if (x.alive > 0 && c.charAt(0) !== S.face.charAt(0)) return;          // this row of crates; the search finds the rest
       if (S.dir === 'out' ? !canReceive(c) : !canSource(c)) return;
-      (alive(c) === 0 ? empty : near).push(c);
+      (x.alive === 0 ? empty : near).push(c);
     });
-    near.sort(function (a, b) { return Math.abs(LIT[a].day - me.day) - Math.abs(LIT[b].day - me.day) || (a < b ? -1 : 1); });
-    return { near: near, empty: empty };
+    near.sort(function (a, b) { return Math.abs(L(a).dayAge - me.dayAge) - Math.abs(L(b).dayAge - me.dayAge) || (a < b ? -1 : 1); });
+    return { near: near, empty: empty.sort() };
   }
   function directionSection() {
-    if (!canSource(S.face)) return '';
+    // Only the directions this face can take: Into is hidden when it can't receive, Out when it has nothing to send; an explaining Move is locked.
+    if (S.explains || !canSource(S.face) || !canReceive(S.face)) return '';
     return radios('dir', [
       { value: 'out', id: 'pp.move.dir.out', args: { code: S.face }, meta: 'pp.move.dir.out_meta' },
       { value: 'in', id: 'pp.move.dir.in', args: { code: S.face }, meta: 'pp.move.dir.in_meta' }], S.dir, PP.t('pp.move.dir.aria'));
   }
   function crateSection() {
     var label = S.dir === 'out' ? 'pp.move.to.title' : 'pp.move.from.title';
-    if (S.other && !S.query) {                               // chosen: the list folds into one picker; tap it to choose again
+    if (S.other && !S.query) {                               // chosen: the list folds into one picker; tap it to choose again (not on an explaining Move)
       var m = crateMeta(S.other);
-      return UI.pickerField({ label: '', display: S.other, action: 'change-crate', key: 'crate',
+      return UI.pickerField({ label: '', display: S.other, action: S.explains ? '' : 'change-crate', key: 'crate',
         strs: { label: label, display: 'pp.move.crate.chosen' }, args: { display: { code: S.other, meta: PP.t(m.id, m.args) } } });
     }
     var find = '<div class="mv-find">' +
@@ -385,34 +292,38 @@
       UI.iconButton({ action: 'scan', icon: ICON.icon('scan'), label: PP.t('pp.move.aria.scan') }) + '</div>';
     var lists;
     if (S.query) {
-      var q = S.query.toUpperCase(), hit = LIT[q];
+      var q = S.query.toUpperCase(), hit = L(q);
       if (q === S.face) lists = UI.choiceEmpty('', { strs: { text: 'pp.move.search.self' }, args: { text: { q: q } } });
-      else if (hit && hit.farrowing) lists = UI.choiceGroup(UI.choiceRow({ label: '', meta: '', mode: 'navigate', action: 'open-farrowing', value: q,
-          strs: { label: 'pp.move.crate.code', meta: where(q) ? 'pp.move.crate.meta_unit_farrowing' : 'pp.move.crate.meta_farrowing' }, args: { label: { code: q }, meta: { u: hit.unit } } }));
+      else if (hit && farrowing(q)) lists = UI.choiceGroup(UI.choiceRow({ label: '', meta: '', mode: 'navigate', action: 'open-farrowing', value: q,
+          strs: { label: 'pp.move.crate.code', meta: where(q) ? 'pp.move.crate.meta_unit_farrowing' : 'pp.move.crate.meta_farrowing' }, args: { label: { code: q }, meta: { u: unitOf(q) } } }));
       else if (hit && (S.dir === 'out' ? canReceive(q) : canSource(q))) lists = UI.choiceGroup(crateRow(q));
       else if (hit) lists = UI.choiceEmpty('', { strs: { text: S.dir === 'out' ? 'pp.move.search.not_receiver' : 'pp.move.search.not_source' }, args: { text: { q: q } } });
       else lists = UI.choiceEmpty('', { strs: { text: 'pp.move.search.none' }, args: { text: { q: S.query } } });
     } else {
-      var L = candidates();
-      lists = UI.choiceGroup(L.near.map(crateRow), { title: '', strs: { title: 'pp.move.list.near' }, args: { title: { row: S.face.charAt(0) } } }) +
-        (L.empty.length ? UI.choiceGroup(L.empty.map(crateRow), { title: '', strs: { title: 'pp.move.list.empty' } }) : '');
+      var C = candidates();
+      lists = UI.choiceGroup(C.near.map(crateRow), { title: '', strs: { title: 'pp.move.list.near' }, args: { title: { row: S.face.charAt(0) } } }) +
+        (C.empty.length ? UI.choiceGroup(C.empty.map(crateRow), { title: '', strs: { title: 'pp.move.list.empty' } }) : '');
     }
     return '<section class="mv-group">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: label } }) + find + lists + '</section>';
   }
   function countSection() {
     var src = source();
     if (!src) return '';
-    var a = alive(src), ids = sourceIds(src), small = a <= 8 || LIT[src].died;
-    var ptr = small && !ids && S.n < a ? [{ label: '', action: 'all', value: String(a), strs: { label: 'pp.move.count.all' }, args: { label: { n: a } } }] : [];
-    if (ids) {
+    var a = alive(src), ids = liveRows(src), small = a <= 8 || L(src).sowDied;
+    if (S.explains) {                                        // locked: the count the loss and gain already wrote
+      return UI.stepper({ label: '', description: '', value: count(), min: count(), max: count(), key: 'n',
+        strs: { label: 'label.piglets', description: pl('pp.move.count.of', a), value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
+        args: { description: { n: a, code: src } } });
+    }
+    var ptr = small && !ids.length && S.n < a ? [{ label: '', action: 'all', value: String(a), strs: { label: 'pp.move.count.all' }, args: { label: { n: a } } }] : [];
+    if (ids.length) {
       var rem = remainder(src);
       return '<section class="mv-group">' +
         UI.heading({ title: '', meta: '', kind: 'section', level: 3, strs: { title: 'pp.move.rows.title', meta: pl('pp.move.rows.meta', a) }, args: { meta: { n: count(), total: a } },
           action: UI.iconButton({ action: 'scan-tag', icon: ICON.icon('scan'), label: PP.t('act.scan') }) }) +
         UI.choiceGroup(ids.map(function (r) {
-          var notch = r.indexOf('n:') === 0;
-          return UI.choiceRow({ label: '', mode: 'multi', action: 'pick-row', value: r, selected: S.rows.indexOf(r) >= 0,
-            strs: { label: notch ? 'pp.move.rows.notch' : 'pp.move.rows.tag' }, args: { label: notch ? { notch: r.slice(2) } : { tag: r } } });
+          return UI.choiceRow({ label: '', mode: 'multi', action: 'pick-row', value: r.rowId, selected: S.rows.indexOf(r.rowId) >= 0,
+            strs: { label: r.tag ? 'pp.move.rows.tag' : 'pp.move.rows.notch' }, args: { label: r.tag ? { tag: r.tag } : { notch: r.notch } } });
         })) +
         (rem ? UI.stepper({ label: '', description: '', value: S.untagged, min: 0, max: rem, key: 'untagged', hint: '', reserveHint: S.untagged >= rem,
           strs: { label: 'pp.move.rows.untagged', description: pl('pp.move.rows.untagged_of', rem), value: 'ds.field.figure', hint: S.untagged >= rem ? pl('pp.move.rows.untagged_ceiling', rem) : undefined,
@@ -424,128 +335,136 @@
               decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { description: { n: a, code: src }, hint: { n: a, code: src } } });
   }
-  function askSection(rec) {
-    var s = LIT[rec.from], asks = [], checks = [];
-    dueDoses(s.day).forEach(function (d) {
-      var p = pop(rec.from, d), v = s.done[d] || 0;
-      if (v > 0 && v < p) (INVISIBLE[d] ? asks : checks).push(d);
-    });
+  function dueAt(c, id) { var D = L(c).doses[id]; return D && D.status && D.status !== 'later'; }
+  function askSection(dr) {
+    var src = source(), asks = (dr.asks || []).filter(function (id) { return dueAt(src, id); }), checks = Object.keys(dr.carry || {}).filter(function (id) { return dr.carry[id] === 'check' && !doseCfg(id).castration && dueAt(src, id); });
     if (!asks.length) return '';
-    var qs = asks.map(function (d) {
-      var a = answerFor(rec, d), k = knownOwing(rec.from, d);
+    var n = dr.n;
+    var qs2 = asks.map(function (id) {
+      var a = S.answers[id] || 'unknown', k = (L(src).doses[id].owedFrom.filter(function (f) { return f.kind === 'arrival'; })[0] || {}).n || 0;
       return '<div class="mv-group">' +
-        UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: pl('pp.move.ask.q', rec.n), description: k ? pl('pp.move.ask.moved_before', k) : 'pp.move.ask.hint' },
-          args: { title: { tx: txName(d), n: rec.n }, description: { k: k } } }) +
+        UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: pl('pp.move.ask.q', n), description: k ? pl('pp.move.ask.moved_before', k) : 'pp.move.ask.hint' },
+          args: { title: { tx: txName(id), n: n }, description: { k: k } } }) +
         radios('answer', [
-          { value: d + ':yes', id: 'pp.move.ask.yes' },
-          { value: d + ':no', id: 'pp.move.ask.no' },
-          { value: d + ':unknown', id: 'pp.move.ask.unknown', meta: 'pp.move.ask.unknown_meta' }], d + ':' + a, PP.t(pl('pp.move.ask.q', rec.n), { tx: txName(d), n: rec.n })) + '</div>';
+          { value: id + ':yes', id: 'pp.move.ask.yes' },
+          { value: id + ':no', id: 'pp.move.ask.no' },
+          { value: id + ':unknown', id: 'pp.move.ask.unknown', meta: 'pp.move.ask.unknown_meta' }], id + ':' + a, PP.t(pl('pp.move.ask.q', n), { tx: txName(id), n: n })) + '</div>';
     }).join('');
-    var head = { title: 'pp.move.ask.title' }, hargs = { title: { code: rec.from } };
+    var head = { title: 'pp.move.ask.title' }, hargs = { title: { code: src } };
     if (checks.length) { head.description = 'pp.move.ask.checks'; hargs.description = { txs: txList(checks) }; }
-    return '<section class="mv-group">' + UI.heading({ title: '', description: checks.length ? '' : undefined, kind: 'section', level: 3, strs: head, args: hargs }) + qs + '</section>';
+    return '<section class="mv-group">' + UI.heading({ title: '', description: checks.length ? '' : undefined, kind: 'section', level: 3, strs: head, args: hargs }) + qs2 + '</section>';
   }
-  // The same facts on the review and on the receipt.
+  var KIND = { owed: 'owe', done: 'done', unknown: 'unknown', check: 'check' };
+  /* What the moved piglets carry, per dose due at the source — the ledger's packets (review) or the posted record's (receipt).
+     Castration moves as a range of males: the source's males are known once it has a castration record, never which piglets. */
   function carrySection(rec, withEdit) {
-    var c = carry(rec), groups = { owe: [], unknown: [], check: [], done: [], missed: [] }, reasons = [];
-    Object.keys(c).forEach(function (d) { if (d === 'castrate') return; groups[c[d].kind].push(d); if (c[d].reason) reasons.push(d); });
-    var items = [];
-    ['owe', 'unknown', 'check', 'done', 'missed'].forEach(function (k) {
-      if (!groups[k].length) return;
-      var meta = k === 'owe' && reasons.length ? 'pp.move.carry.deferred' : null;
-      var f = fact('pp.move.carry.l.' + k, null, 'pp.move.carry.doses', { doses: txList(groups[k]) }, meta,
-        { txs: txList(reasons), reason: reasons.length ? PP.t('pp.move.reason.' + c[reasons[0]].reason) : '', code: rec.from });
-      items.push(f);
-    });
-    if (c.castrate) items.push(fact('pp.move.carry.l.males', null, pl('pp.move.carry.males.' + c.castrate.kind, rec.n), { n: rec.n }));
-    if (rec.rows && rec.rows.length) items.push(fact('pp.move.carry.l.rows', null, 'pp.move.carry.doses', { doses: rec.rows.map(function (r) { return r.indexOf('n:') === 0 ? PP.t('pp.move.rows.notch', { notch: r.slice(2) }) : r; }).join(' · ') }));
+    var groups = { owe: [], unknown: [], check: [], done: [] }, items = [];
+    Object.keys(rec.packets).forEach(function (id) { if (!doseCfg(id).castration && dueAt(rec.from, id) && KIND[rec.packets[id]]) groups[KIND[rec.packets[id]]].push(id); });
+    ['owe', 'unknown', 'check', 'done'].forEach(function (k) { if (groups[k].length) items.push(fact('pp.move.carry.l.' + k, null, 'pp.move.carry.doses', { doses: txList(groups[k]) })); });
+    var cid = CFG.doses.filter(function (d) { return d.castration; })[0].id;
+    if (dueAt(rec.from, cid) && KIND[rec.packets[cid]]) {
+      var C = L(rec.from).doses[cid].castration, a = rec.aliveBefore;
+      var lo = C ? Math.max(0, rec.n - (a - C.males)) : 0, hi = C ? Math.min(rec.n, C.males) : rec.n;
+      items.push(fact('pp.move.carry.l.males', null, 'pp.move.carry.males_range.' + KIND[rec.packets[cid]], { lo: lo, hi: hi, n: rec.n }));
+    }
+    if (rec.rows && rec.rows.length) items.push(fact('pp.move.carry.l.rows', null, 'pp.move.carry.doses', { doses: rec.rows.map(function (id) { return rowLabel(rowOf(id)); }).join(' · ') }));
     if (!items.length) return '';
     var t = where(rec.to) ? 'pp.move.carry.title_unit' : 'pp.move.carry.title';
     return '<section class="mv-group">' +
-      UI.heading({ title: '', kind: 'section', level: 3, strs: { title: pl(t, rec.n) }, args: { title: { n: rec.n, to: rec.to, u: LIT[rec.to].unit } },
+      UI.heading({ title: '', kind: 'section', level: 3, strs: { title: pl(t, rec.n) }, args: { title: { n: rec.n, to: rec.to, u: unitOf(rec.to) } },
         action: withEdit ? textAction('edit-move', 'act.edit') : '' }) +
       UI.facts(items, { columns: 1 }) + '</section>';
   }
-  function deltas(rec) {
-    var a0 = alive(rec.from), b0 = alive(rec.to), eff = rec.explains ? 0 : rec.n;
-    var cover = sourceAfter(rec, carry(rec));
-    var aMeta = a0 - eff === 0 ? 'pp.move.delta.none_left' : cover.length ? 'pp.move.delta.check' : null;
-    var aArgs = cover.length ? { text: cover.map(function (x) { return PP.t('pp.move.delta.range', { tx: txName(x.d), lo: x.lo, hi: x.hi, of: x.of }); }).join(' · ') } : null;
-    var bMeta = b0 === 0 ? 'pp.move.delta.keeps_day' : null;
+  function rowOf(id) { var out = null; Object.keys(store.derived.litters).forEach(function (c) { L(c).identity.rows.forEach(function (r) { if (r.rowId === id) out = r; }); }); return out; }
+  function deltas(from, to, delta, cover) {
+    cover = cover.filter(function (x) { return dueAt(from, x.dose) && x.hi > 0; });
+    var aMeta = delta.from[1] === 0 ? 'pp.move.delta.none_left' : cover.length ? 'pp.move.delta.check' : null;
+    var aArgs = cover.length ? { text: cover.map(function (x) { return PP.t('pp.move.delta.range', { tx: txName(x.dose), lo: x.lo, hi: x.hi, of: x.of }); }).join(' · ') } : null;
+    var bMeta = delta.to[0] === 0 ? 'pp.move.delta.keeps_day' : null;
     return UI.facts([
-      fact(where(rec.from) ? 'pp.move.delta.from_unit' : 'pp.move.delta.from', { code: rec.from, u: LIT[rec.from].unit }, 'pp.move.delta.value', { a: a0, b: a0 - eff }, aMeta, aArgs),
-      fact(where(rec.to) ? 'pp.move.delta.to_unit' : 'pp.move.delta.to', { code: rec.to, u: LIT[rec.to].unit }, 'pp.move.delta.value', { a: b0, b: b0 + eff }, bMeta, { day: LIT[rec.from].day, code: rec.from, u: LIT[rec.to].unit })]);
+      fact(where(from) ? 'pp.move.delta.from_unit' : 'pp.move.delta.from', { code: from, u: unitOf(from) }, 'pp.move.delta.value', { a: delta.from[0], b: delta.from[1] }, aMeta, aArgs),
+      fact(where(to) ? 'pp.move.delta.to_unit' : 'pp.move.delta.to', { code: to, u: unitOf(to) }, 'pp.move.delta.value', { a: delta.to[0], b: delta.to[1] }, bMeta, { day: L(from).dayAge, code: from, u: unitOf(to) })]);
   }
-  function pointer() {
-    if (S.query && LIT[S.query.toUpperCase()] && LIT[S.query.toUpperCase()].farrowing) return { id: 'pp.move.pointer.farrowing', args: { code: S.query.toUpperCase() } };
+  function pointer(dr) {
+    if (S.query && L(S.query.toUpperCase()) && farrowing(S.query.toUpperCase())) return { id: 'pp.move.pointer.farrowing', args: { code: S.query.toUpperCase() } };
     if (!S.other) return { id: 'pp.move.pointer.choose' };
     if (count() < 1) return { id: 'pp.move.pointer.pick' };
+    if (dr.why) return { id: dr.why === 'name_the_rows' ? 'pp.move.pointer.rows' : 'pp.move.pointer.check' };
     return null;
   }
-  function summary(rec) {
-    var p = pointer();
+  function summary(dr) {
+    var p = pointer(dr);
     if (p) return '<div class="mv-summary">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: p.id }, args: { title: p.args } }) + '</div>';
-    var ex = rec.explains ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.move.explain.closes' } }) : '';
-    return '<div class="mv-summary">' + deltas(rec) + ex + '</div>';
+    var ex = S.explains ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.move.explain.closes' } }) : '';
+    return '<div class="mv-summary">' + deltas(source(), receiver(), dr.delta, dr.sourceAfter) + ex + '</div>';
   }
+  function reviewRec(dr) { return { from: source(), to: receiver(), n: dr.n, rows: S.rows, packets: dr.carry, aliveBefore: alive(source()) }; }
   function moveDrawer() {
-    var rec = record(), f = S.face, ready = !pointer() && rec.n >= 1 && rec.n <= alive(rec.from);
-    var sub = alive(f) > 0 ? span('pp.move.sheet.sub', { code: f, n: alive(f), day: LIT[f].day }) : span('pp.move.sheet.sub_empty', { code: f });
+    var f = S.face, dr = S.other ? draft() : { why: 'no_receiver' }, ready = !pointer(dr) && !!dr.event;
+    var sub = alive(f) > 0 ? span('pp.move.sheet.sub', { code: f, n: alive(f), day: L(f).dayAge }) : span('pp.move.sheet.sub_empty', { code: f });
     var explain = S.explains ? UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: 'pp.move.explain.title', description: 'pp.move.explain.desc' },
-      args: { title: { code: S.other, n: rec.n }, description: { from: rec.from, to: rec.to } } }) : '';
-    var body = explain + directionSection() + crateSection() + countSection() + (S.other ? askSection(rec) + carrySection(rec, false) : '');
-    var primary = ready ? button('primary', 'save-move', 'pp.move.act.move', { n: rec.n, from: rec.from, to: rec.to }) : button('primary', 'save-move', 'pp.move.act.move_bare', null, true);
+      args: { title: { code: receiver(), n: count() }, description: { from: source(), to: receiver() } } }) : '';
+    var body = explain + directionSection() + crateSection() + countSection() + (S.other && dr.event ? askSection(dr) + carrySection(reviewRec(dr), false) : '');
+    var primary = ready ? button('primary', 'save-move', 'pp.move.act.move', { n: dr.n, from: source(), to: receiver() }) : button('primary', 'save-move', 'pp.move.act.move_bare', null, true);
     return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
-      '<header class="utility-header mv-head"><div class="mv-title"><h3 data-str="pp.move.sheet.title"></h3><p>' + sub + '</p></div>' +
-      (draftExists() ? textAction('clear', 'act.clear') : '') + '</header>' +
-      '<div class="sheet-body"><div class="mv-body">' + body + '</div></div>' + summary(rec) +
+      '<header class="utility-header mv-head"><div class="pp-hdr-title"><h3 data-str="pp.move.sheet.title">' + U.esc(PP.t('pp.move.sheet.title')) + '</h3><p>' + sub + '</p></div>' +
+      (draftExists() || S.explains ? textAction('clear', 'act.clear') : '') + '</header>' +
+      '<div class="sheet-body"><div class="mv-body">' + body + '</div></div>' + summary(dr) +
       '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + primary + '</footer></section>';
   }
 
-  /* ---- the receipt: the same record, after Save ---- */
-  function receiptDrawer(rec) {
+  /* ---- the receipt: the posted record, read back from the ledger ---- */
+  function receiptDrawer(sv) {
+    var m = L(sv.to).moves.filter(function (x) { return x.id === sv.id; })[0];
+    var rec = { from: sv.from, to: sv.to, n: m.n, rows: m.rows, packets: m.packets, aliveBefore: sv.delta.from[0] };
     var body = '<div class="mv-body">' +
-      UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.move.receipt.spray_why' }, args: { title: { to: rec.to } } }) +
-      deltaAfter(rec) + carrySection(rec, true) + '</div>';
+      UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.move.receipt.spray_why' }, args: { title: { to: sv.to } } }) +
+      deltas(sv.from, sv.to, { from: [sv.delta.from[0], alive(sv.from)], to: [sv.delta.to[0], alive(sv.to)] }, sv.sourceAfter) + carrySection(rec, true) + '</div>';
     return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="medium" data-sizing="content" role="dialog" aria-modal="true">' +
-      '<header class="utility-header"><div class="mv-title"><h3>' + span(pl('pp.move.receipt.spray', rec.n), { n: rec.n }) + '</h3><p>' +
-      span(pl(where(rec.to) ? 'pp.move.receipt.title_unit' : 'pp.move.receipt.title', rec.n), { n: rec.n, to: rec.to, u: LIT[rec.to].unit, time: rec.time, who: rec.who }) + '</p></div></header>' +
+      '<header class="utility-header"><div class="pp-hdr-title"><h3>' + span(pl('pp.move.receipt.spray', m.n), { n: m.n }) + '</h3><p>' +
+      span(pl(where(sv.to) ? 'pp.move.receipt.title_unit' : 'pp.move.receipt.title', m.n), { n: m.n, to: sv.to, u: unitOf(sv.to), time: U.time(m.at), who: m.who }) + '</p></div></header>' +
       '<div class="sheet-body">' + body + '</div>' +
       '<footer class="sheet-footer">' + button('secondary', 'close', 'act.close') + '</footer></section>';
   }
-  // After the Move is posted, before → after reads from the ledger minus/plus this record.
-  function deltaAfter(rec) {
-    var eff = rec.explains ? 0 : rec.n, a1 = alive(rec.from), b1 = alive(rec.to);
-    return UI.facts([
-      fact(where(rec.from) ? 'pp.move.delta.from_unit' : 'pp.move.delta.from', { code: rec.from, u: LIT[rec.from].unit }, 'pp.move.delta.value', { a: a1 + eff, b: a1 }),
-      fact(where(rec.to) ? 'pp.move.delta.to_unit' : 'pp.move.delta.to', { code: rec.to, u: LIT[rec.to].unit }, 'pp.move.delta.value', { a: b1 - eff, b: b1 })]);
-  }
 
-  /* ---- resolving an arrival: how many already had it (unknown or check-on-the-pig) ---- */
+  /* ---- resolving an arrival: how many already had it (unknown or check-on-the-pig). Save writes the stamped check and the
+     records together (append, all or nothing): an obligation is never cleared without a record. Back keeps the draft. ---- */
+  function resolving() {
+    var p = S.drawer.split(':'), g = L(S.face).doses[p[1]].unknownGroups.filter(function (x) { return x.id === p[0]; })[0];
+    return { group: p[0], dose: p[1], n: g ? g.n : 0, from: g ? g.from : '' };
+  }
+  function resolveEvents() {
+    var r = resolving(), had = Math.max(0, Math.min(S.had || 0, r.n)), rest = r.n - had, out = [];
+    if (S.rest === 'owed') out.push({ type: 'check', litter: S.face, dose: r.dose, had: had, lacks: rest, group: r.group });
+    else {
+      if (had) out.push({ type: 'check', litter: S.face, dose: r.dose, had: had, group: r.group });
+      if (rest) out.push({ type: 'treat', litter: S.face, dose: r.dose, n: rest, target: 'unknown', group: r.group });
+    }
+    return out;
+  }
   function resolveDrawer() {
-    var parts = S.drawer.split(':'), m = MOVES.filter(function (x) { return x.id === parts[0]; })[0], d = parts[1];
-    var n = m.n, had = Math.max(0, Math.min(S.had || 0, n)), rest = n - had, kind = m.carry[d].kind;
+    var r = resolving(), n = r.n, had = Math.max(0, Math.min(S.had || 0, n)), rest = n - had, visible = doseCfg(r.dose).visible;
     var body = UI.stepper({ label: '', description: '', value: had, min: 0, max: n, key: 'had', hint: '', reserveHint: had >= n,
       strs: { label: 'pp.move.res.had', description: pl('pp.move.res.of', n), value: 'ds.field.figure', hint: had >= n ? pl('pp.move.res.ceiling', n) : undefined, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { description: { n: n }, hint: { n: n } } });
     if (rest) body += '<div class="mv-group">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: pl('pp.move.res.rest', rest) }, args: { title: { n: rest } } }) +
-      radios('rest', [{ value: 'record', id: pl('pp.move.res.record', rest), args: { tx: txName(d), n: rest } },
+      radios('rest', [{ value: 'record', id: pl('pp.move.res.record', rest), args: { tx: txName(r.dose), n: rest } },
                       { value: 'owed', id: pl('pp.move.res.owed', rest), args: { n: rest } }], S.rest || 'record', PP.t(pl('pp.move.res.rest', rest), { n: rest })) + '</div>';
     body += UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.move.res.note' } });
     return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="medium" data-sizing="content" role="dialog" aria-modal="true">' +
-      '<header class="utility-header"><div class="mv-title"><h3>' + span(pl('pp.move.res.title', n), { tx: txName(d), n: n, code: m.from }) + '</h3><p>' +
-      span(kind === 'unknown' ? 'pp.move.res.sub_unknown' : 'pp.move.res.sub_check', { tx: txName(d) }) + '</p></div></header>' +
+      '<header class="utility-header"><div class="pp-hdr-title"><h3>' + span(pl('pp.move.res.title', n), { tx: txName(r.dose), n: n, code: r.from }) + '</h3><p>' +
+      span(visible ? 'pp.move.res.sub_check' : 'pp.move.res.sub_unknown', { tx: txName(r.dose) }) + '</p></div></header>' +
       '<div class="sheet-body"><div class="mv-body">' + body + '</div></div>' +
       '<footer class="sheet-footer">' + button('secondary', 'close-resolve', 'act.back') + button('primary', 'save-resolve', 'act.save') + '</footer></section>';
   }
 
   /* ---- move-prelock: the door to the farrowing sheet ---- */
   function prelockDrawer() {
-    var l = LIT[S.face];
+    var x = L(S.face), ev = x.lastEvent, h = Math.max(1, Math.ceil((Date.parse(TODAY + 'T10:30') - Date.parse(ev.at)) / 3600000));
     var door = UI.rowGroup(row({ action: 'open-farrowing', value: S.face, title: 'pp.move.pre.door', titleArgs: { code: S.face },
-      desc: 'pp.move.pre.door_desc', descArgs: { n: l.sofar, h: l.ago, who: l.by } }));
+      desc: 'pp.move.pre.door_desc', descArgs: { n: x.born, h: h, who: ev.who } }));
     return '<div class="scrim"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="short" data-sizing="content" role="dialog" aria-modal="true">' +
-      '<header class="utility-header"><div class="mv-title"><h3 data-str="pp.move.sheet.title"></h3><p>' + span('pp.move.pre.why', { code: S.face }) + '</p></div></header>' +
+      '<header class="utility-header"><div class="pp-hdr-title"><h3 data-str="pp.move.sheet.title">' + U.esc(PP.t('pp.move.sheet.title')) + '</h3><p>' + span('pp.move.pre.why', { code: S.face }) + '</p></div></header>' +
       '<div class="sheet-body"><div class="mv-body">' + door + '</div></div>' +
       '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + '</footer></section>';
   }
@@ -560,9 +479,16 @@
     document.getElementById('screen').innerHTML = html;
     PP.apply(document.getElementById('screen'));
   }
-  function post() {                                   // Save: the one resolved record is posted, then read back by the receipt
-    var rec = record(); rec.carry = carry(rec);
-    MOVES.push(rec); S.saved = rec; S.view = 'receipt'; S.kept = false;
+  // Save: the one record goes through append; the receipt reads it back. The draft resets (moved identity rows have left the source).
+  function post() {
+    var dr = draft();
+    if (!dr.event) return false;
+    var before = { from: source(), to: receiver(), delta: dr.delta, sourceAfter: dr.sourceAfter };
+    var r = store.commit(dr.event);
+    if (!r.ok) return false;
+    S.saved = Object.assign({ id: r.event.id }, before);
+    S = Object.assign(JSON.parse(DEFAULT), { view: 'receipt', face: S.face, saved: S.saved, kept: false });
+    return true;
   }
 
   document.getElementById('screen').addEventListener('click', function (ev) {
@@ -571,29 +497,43 @@
     var a = b.dataset.action, v = b.dataset.value;
     if (a === 'pick-row') v = b.value;                         // a multi row's checkbox carries its id as value
     if (a === 'pick-crate') { S.other = v; S.query = ''; S.rows = []; S.untagged = 0; S.answers = {}; render(); }
-    else if (a === 'change-crate') { S.other = ''; S.rows = []; S.untagged = 0; S.answers = {}; render(); }
+    else if (a === 'change-crate') { if (S.explains) return; S.other = ''; S.rows = []; S.untagged = 0; S.answers = {}; render(); }
     else if (a === 'dir') { if (S.dir !== v) { S.dir = v; S.rows = []; S.untagged = 0; S.answers = {}; } render(); }
     else if (a === 'step') {
       if (b.getAttribute('aria-disabled') === 'true') return;
       var k = b.dataset.value, st = +b.dataset.step;
-      if (k === 'n') S.n += st; else if (k === 'untagged') S.untagged += st; else if (k === 'had') S.had = (S.had || 0) + st;
+      if (k === 'n' && !S.explains) S.n += st; else if (k === 'untagged') S.untagged += st; else if (k === 'had') S.had = (S.had || 0) + st;
       render();
     }
     else if (a === 'all') { S.n = +v; render(); }
     else if (a === 'pick-row') { var i = S.rows.indexOf(v); if (i >= 0) S.rows.splice(i, 1); else S.rows.push(v); render(); }
     else if (a === 'answer') { var p = v.split(':'); S.answers[p[0]] = p[1]; render(); }
-    else if (a === 'clear') { var keep = { view: 'move', face: S.face }; S = Object.assign(JSON.parse(DEFAULT), keep); render(); }
+    else if (a === 'clear') { var keep = { view: 'move', face: S.face }; S = Object.assign(JSON.parse(DEFAULT), keep); render(); }   // Clear also drops an explaining link
     else if (a === 'back' && S.view === 'move') { S.view = 'face'; S.kept = draftExists(); render(); }   // Back keeps the draft
+    else if (a === 'back') { location.href = PP.href('litter.html', { state: 'litter', crate: S.face, data: store.name !== 'base' ? store.name : '' }); }
     else if (a === 'open-move') { S.view = 'move'; S.kept = false; render(); }
     else if (a === 'save-move') { if (b.disabled) return; post(); render(); }
     else if (a === 'close') { S.view = 'face'; render(); }
-    else if (a === 'open-resolve') { S.drawer = v; S.had = 0; S.rest = 'record'; render(); }
+    else if (a === 'open-resolve') { S.drawer = v; var kept = resolveDrafts[v]; S.had = kept ? kept.had : 0; S.rest = kept ? kept.rest : 'record'; render(); }
     else if (a === 'rest') { S.rest = v; render(); }
-    else if (a === 'close-resolve') { S.drawer = ''; render(); }
-    else if (a === 'save-resolve') { S.resolved = S.resolved || {}; S.resolved[S.drawer.replace(':', '')] = { had: S.had, rest: S.rest }; S.drawer = ''; render(); }
+    else if (a === 'close-resolve') { resolveDrafts[S.drawer] = { had: S.had || 0, rest: S.rest }; S.drawer = ''; render(); }
+    else if (a === 'save-resolve') {
+      var res = store.commitAll(resolveEvents());
+      if (!res.ok) { document.documentElement.setAttribute('data-door', 'refused:' + res.reason); return; }
+      delete resolveDrafts[S.drawer]; S.drawer = ''; render();
+    }
+    else if (a === 'record' || a === 'open-dose') { location.href = PP.href('litter.html', { state: 'litter', crate: S.face, stay: 1, data: store.name !== 'base' ? store.name : '' }); }
     else document.documentElement.setAttribute('data-door', a + ':' + (v || ''));
   });
-  PP.ready.then(function () { if (RECEIPT_AT_LOAD) { S.view = 'move'; normalize(); post(); } render(); });
+  PP.ready.then(function () {
+    store = PP.open(S.data || 'base', STATES[name].view === 'receipt' ? { session: false } : null);
+    CFG = store.config; TODAY = store.today; UNIT = L(S.face).room;
+    if (S.allRows) S.rows = liveRows(S.face).map(function (r) { return r.rowId; });
+    // A count on a source with tagged piglets is the untagged ones (the rest are picked by their tags).
+    if (S.other && hasRows(source()) && !S.rows.length && S.n) S.untagged = Math.min(S.n, remainder(source()));
+    if (S.view === 'receipt') { S.view = 'move'; normalize(); post(); }
+    render();
+  });
 })();
 </script>
 </body>

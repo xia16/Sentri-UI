@@ -924,6 +924,12 @@
     "pp.litter.pointer.check": {"en": "Check the counts against what is owed", "zh": "请核对与待处理的头数", "kind": "pointer"},
     "pp.litter.resume.now": {"en": "Owed changed since · now {n} owed", "zh": "待处理已变 · 现剩{n}头", "kind": "status"},
     "ds.dead.why.check": {"en": "More than this litter can lose · check the counts", "zh": "超过本窝可减少的头数 · 请核对", "kind": "pointer"},
-    "pp.edge.tx.desc_due": {"en": "due day {d}", "zh": "{d}日龄到期", "kind": "label"}
+    "pp.edge.tx.desc_due": {"en": "due day {d}", "zh": "{d}日龄到期", "kind": "label"},
+    "pp.move.pointer.rows": {"en": "Pick which piglets: they have tags or notches", "zh": "请选择具体哪几头：它们有耳标或耳缺", "kind": "pointer"},
+    "pp.move.pointer.check": {"en": "More than this litter can move · check the count", "zh": "超过本窝可转出的头数 · 请核对", "kind": "pointer"},
+    "pp.move.carry.males_range.owe": {"en": "{lo}–{hi} males among the {n} · owed", "zh": "这{n}头中{lo}–{hi}头公猪 · 待阉割", "kind": "body"},
+    "pp.move.carry.males_range.done": {"en": "{lo}–{hi} males among the {n} · castrated", "zh": "这{n}头中{lo}–{hi}头公猪 · 已阉割", "kind": "body"},
+    "pp.move.carry.males_range.check": {"en": "{lo}–{hi} males among the {n} · check on the pig", "zh": "这{n}头中{lo}–{hi}头公猪 · 看猪确认", "kind": "body"},
+    "pp.move.carry.males_range.unknown": {"en": "{lo}–{hi} males among the {n} · unknown", "zh": "这{n}头中{lo}–{hi}头公猪 · 情况不明", "kind": "body"}
   }
 }

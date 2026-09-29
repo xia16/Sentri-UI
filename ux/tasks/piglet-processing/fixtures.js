@@ -537,6 +537,20 @@ export function open(name, opts) {
       } else clock--;
       return r;
     },
+    /* Commit several events as one: every one is accepted, or none is kept (the first refusal is returned). */
+    commitAll(list) {
+      let evs = events, der = derived, out = [];
+      for (const ev of list) {
+        const st = store.stamp();
+        const r = append(evs, Object.assign({ id: st.id, at: st.at, who: st.who }, ev), v.config, opt);
+        if (!r.ok) { clock -= out.length + 1; return r; }
+        out.push(r.event); evs = r.events; der = r.derived;
+      }
+      added = added.concat(out);
+      if (o.session !== false) saveSession(key, added);
+      events = evs; derived = der;
+      return { ok: true, events: out, derived };
+    },
     reset() { added = []; saveSession(key, []); events = v.events.slice(); derived = derive(events, v.config, opt); },
     select
   };

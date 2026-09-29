@@ -39,10 +39,11 @@
     return U.date(iso);
   };
 
-  /* ---- the litter header: crate first (the first fact), the one door to the sow page ---- */
+  /* ---- the litter header: crate first (the first fact), the one door to the sow page ----
+     o: { crate, sow, parity, day?, sub? (html replacing the parity line), action? } */
   U.litterHeader = function (o) {
     var a = { crate: o.crate, tag: o.sow };
-    var ctx = o.day != null
+    var ctx = o.sub ? '<p>' + o.sub + '</p>' : o.day != null
       ? '<p class="pp-hdr-context">' + U.span('pp.common.hdr.parity', { n: o.parity }) + U.span('pp.common.unit.day', { n: o.day }) + '</p>'
       : '<p>' + U.span('pp.common.hdr.parity', { n: o.parity }) + '</p>';
     return '<header class="utility-header"' + (o.attrs || '') + '><div class="pp-hdr-title"><h3><button type="button" class="pp-door" data-action="open-sow" data-value="' + esc(o.sow) +
