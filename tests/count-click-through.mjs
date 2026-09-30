@@ -132,7 +132,7 @@ try {
   // 9. R1-27: 0 asks "moved or weaned?" (the Move door is right there); the draft kept on Back is never a stale 0 ready to Save.
   await toCount('B10');
   await step(-1, 11);
-  assert.match(await text(page, '[data-target="zero"]'), /None seen in B10 · moved or weaned\? .* Record a Move from B10/);
+  assert.match(await text(page, '[data-target="zero"]'), /None seen in B10 · moved or weaned\? Record a Move from B10/);
   assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
   await page.click('[role="dialog"] [data-action="back"]');
   assert.match(await text(page, '#screen'), /Set count 0 piglets counted \d\d:\d\d · not saved/);
@@ -149,12 +149,14 @@ try {
   await toCount('B06');
   await step(-1, 1);
   assert.match(await text(page, '[data-target="roster"]'), /Which tagged piglets are missing\? · optional/);
+  await page.click('[data-action="sub"][data-value="roster"]');
   await page.check('input[data-action="pick-row"][value="B06-r4"]');
   await page.click('[data-action="save"]');
   await page.waitForSelector('#ct-receipt span');
   await page.waitForTimeout(450);
   await page.click('[data-action="open-dead"][data-value="B06"]');
   await page.waitForURL(/dead\.html/); await ready(page);
+  await page.click('[data-action="sub"][data-value="tagged"]');
   assert.match(await text(page, '[data-ds="ChoiceList"]'), /271004 counted missing/);
   await page.check('input[data-action="pick"][value="B06-r4"]');
   await page.click('[data-action="pick-cause"][data-value="crushed"]');
@@ -169,6 +171,7 @@ try {
   await toCount('A07', 'held-body');
   const drawerText = await text(page, '[role="dialog"]');
   assert.ok(drawerText.indexOf('Same body recorded twice?') >= 0 && drawerText.indexOf('Same body recorded twice?') < drawerText.indexOf('Seen in A07'));
+  await page.click('[data-action="sub"][data-value="held"]');
   await page.click('[role="dialog"] [data-action="resolve"][data-value$="|two"]');
   assert.doesNotMatch(await text(page, '#screen'), /Same body recorded twice\?/);
   console.log('ok 11 held body answered in the Set count drawer: Two bodies');

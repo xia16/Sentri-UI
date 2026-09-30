@@ -6,44 +6,40 @@
 <title>Set count</title>
 <link rel="stylesheet" href="/ux/design-system/tokens.css">
 <link rel="stylesheet" href="/ux/design-system/components/bundle.css">
-<link rel="stylesheet" href="shell.css">
+<link rel="stylesheet" href="/ux/design-system/components/task-skeleton.css">
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* Layout only, tokens from tokens.css. The page draws cards (ADR 0002 adopted: Button's waiting face with its reason
-   line and guard, Button's text register, Status lines for the receipt), the shared header and tools (shell-ui.js) and
-   the Stepper's hero variant. */
-.ct-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
-.ct-phone .scrim { inset: 0; }
-.ct-body { display: flex; flex-direction: column; gap: var(--space-section); padding-bottom: var(--space-panel); }
+/* Layout only, tokens from tokens.css. The page is the task skeleton (ADR 0003): TaskPhone; TaskSheet for Set count and
+   the litter's counts (grab, title, subtitle, ✕ or Clear, divider, body, footer with Back + the primary); TaskPage for
+   Explain; TaskDialog for one question. The body is cards: Stepper (hero), Facts, Row, ChoiceList, Heading, Status and
+   Button's reason line. */
+.ct-over { display: contents; }
+/* The room behind the sheets: the page the worker returns to, drawn by its own page (inert, never focusable). */
+.ct-behind { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--app-background); pointer-events: none; }
+.ct-body { display: flex; flex-direction: column; gap: var(--space-section); }
 .ct-body > * { margin: 0; }
 .ct-group { display: flex; flex-direction: column; gap: var(--space-heading); }
 .ct-group > * { margin: 0; }
-.ct-head { display: flex; align-items: flex-start; gap: var(--space-footer-gap); }
-.ct-head > .st-text-action { min-width: var(--touch-min); justify-content: flex-end; }
-.ct-phone .sheet[data-st-context="drawer"] > .sheet-body { flex: 1; }
-.ct-bar { flex-wrap: wrap; row-gap: var(--space-row-y); }
-.ct-bar > .st-status-line, .ct-bar > .st-button-reason { flex-basis: 100%; margin: 0; }
-.ct-bar > .button { flex: 1; }
-.ct-bar > .button.secondary:not(:only-of-type) { flex: none; }
+.ct-body .st-status-line { margin: 0; }
 </style>
 </head>
-<body>
-<main class="inspection-phone ct-phone" data-st-context="page">
-  <div id="screen"></div>
-</main>
+<body class="tk-stage">
+<div id="screen"></div>
 <script src="/ux/design-system/components/bundle.js"></script>
+<script src="/ux/design-system/components/task-skeleton.js"></script>
 <script src="shell.js"></script>
 <script src="shell-ui.js"></script>
 <script>
 (function () {
-  var UI = window.SentriUI, U = window.PPUI;
+  var UI = window.SentriUI, U = window.PPUI, K = window.SentriTask;
 
   /* ---- states: a variant of the shared fixture + UI state. Every figure is the ledger's: select.countDraft (the number seen,
      what Save writes — a count never closes a line, RULINGS round 3 — which tagged piglets must be named, why Save waits), select.explain
      (each open line, its death door and the Moves the app suggests, ranked, with what each leaves open), select.counts (the
      standing count, what each wrote, sync review) and select.moveDraft (alive after an explaining Move). Save commits through
-     append. `save`: the state is the moment after Save (committed at load, not kept in the tab). ---- */
+     append. `save`: the state is the moment after Save (committed at load, not kept in the tab). `sub`: a view one level
+     down (roster: the tagged piglets a count names missing · held: the held-body question). ---- */
   var STATES = {
     'count':           { view: 'count', crate: 'A02' },
     'host':            { view: 'host', crate: 'A02' },
@@ -53,8 +49,10 @@
     'count-kept-zero': { view: 'count', crate: 'A02', kept: { observed: 0, rows: [], at: '2026-09-29T10:20', ageMin: 10 } },
     // R1-9: a count below Alive on a litter with tags may name which tagged piglets are missing (optional when untagged cover it)
     'count-name-optional': { view: 'count', crate: 'B06', observed: 11, rows: ['B06-r4'] },
+    'count-name-list': { view: 'count', crate: 'B06', observed: 11, rows: ['B06-r4'], sub: 'roster' },
     // R1-22: a held body is answered in the Set count drawer too, above the number
     'count-held':      { view: 'count', crate: 'A07', data: 'held-body' },
+    'count-held-ask':  { view: 'count', crate: 'A07', data: 'held-body', sub: 'held' },
     // R1-20: a concurrent count that agrees net of a death its phone had not seen
     'count-agree':     { view: 'host', crate: 'A07', data: 'count-agree' },
     // round 4: a counted gain owes nothing new — "check on the pig"; a body never explains a gain
@@ -66,6 +64,7 @@
     'count-gain':      { view: 'host', crate: 'A02', save: 13 },
     'count-recount':   { view: 'count', crate: 'D03', observed: 13 },
     'count-named':     { view: 'count', crate: 'B06', observed: 8 },
+    'count-named-list': { view: 'count', crate: 'B06', observed: 8, sub: 'roster' },
     'count-kept':      { view: 'host', crate: 'A02', kept: { observed: 10, rows: [], at: '2026-09-29T06:00', ageMin: 270 } },
     'count-kept-newer': { view: 'count', crate: 'A02', data: 'drift', kept: { observed: 10, rows: [], at: '2026-09-29T08:50', ageMin: 20, seen: [] } },
     'count-prelock':   { view: 'count', crate: 'D01' },
@@ -124,6 +123,7 @@
   /* ---- helpers ---- */
   var pl = PP.one;
   function span(id, args, o) { return U.span(id, args, o); }
+  var s = function (id, args) { return { text: PP.t(id, args), str: id, args: args }; };       // a skeleton text slot
   function np(n) { return PP.tn('pp.common.unit.piglet', n); }            // `12 piglets` · `12头`
   function pigs(n) { return { id: pl('pp.common.unit.piglet', n), args: { n: n } }; }
   function stamp(at, who) { return U.stamp(at, who, TODAY); }
@@ -134,23 +134,12 @@
     if (meta) { f.meta = ''; f.strs.meta = meta; f.args.meta = metaArgs; }
     return f;
   }
+  // A door row (Row card): one title, at most one meta line, a chevron or a trailing word.
   function row(o) {
     var strs = { title: o.title }, args = { title: o.titleArgs };
     if (o.desc) { strs.description = o.desc; args.description = o.descArgs; }
     if (o.trail) { strs.trailing = o.trail; args.trailing = o.trailArgs; }
-    return UI.row({ title: '', description: o.desc ? '' : undefined, trailing: o.trail ? '' : undefined, action: o.action, value: o.value, wrap: !!o.wrap, strs: strs, args: args });
-  }
-  function button(cls, action, id, args, quiet) {
-    return '<button type="button" class="button ' + cls + '" data-ds="Button" data-action="' + action + '" data-str="' + id + '"' +
-      (args ? " data-args='" + U.esc(JSON.stringify(args)) + "'" : '') + (quiet ? ' aria-disabled="true"' : '') + '>' + U.esc(PP.t(id, args)) + '</button>';
-  }
-  function textAction(action, id) { return UI.button({ label: PP.t(id), register: 'text', action: action, strs: { label: id } }); }
-  // Save, and the reason it waits (Button's waiting face, ADR 0002): present, quiet, focusable; a tap is answered by guard()
-  function saveBar(p, waiting, action, id, args) {
-    var reason = UI.buttonReason({ id: 'ct-why', text: p ? PP.t(p.id, p.args) : '', strs: p ? { text: p.id } : undefined, args: p && p.args ? { text: p.args } : undefined,
-      actions: p && p.act ? [{ label: PP.t(p.act.id, p.act.args), action: p.act.action, value: String(S.observed), strs: { label: p.act.id }, args: p.act.args ? { label: p.act.args } : undefined }] : [] });
-    return reason + button('secondary', 'back', 'act.back') +
-      UI.button({ label: PP.t(id || 'act.save', args), register: 'primary', action: action || 'save', waiting: waiting, describedby: 'ct-why', strs: { label: id || 'act.save' }, args: args ? { label: args } : undefined });
+    return UI.row({ title: '', description: o.desc ? '' : undefined, trailing: o.trail ? '' : undefined, action: o.action, value: o.value, strs: strs, args: args });
   }
   function rowLabel(r) { return r.tag ? { id: 'pp.count.row.tag', args: { tag: r.tag } } : { id: 'pp.count.row.notch', args: { notch: r.notch } }; }
   function eventOf(id) { return store.events.filter(function (e) { return e.id === id; })[0] || null; }
@@ -162,13 +151,61 @@
   function lineStamp(l) {
     return { id: 'pp.count.line.stamp', args: { op: np(l.observed), stamp: stamp(l.at, l.who), wp: np(l.sizedAgainst) } };
   }
-
-  /* ---- the litter host: the shared header, the ledger's figures, the tools, the open line and the counts ---- */
-  function hostHead() {
-    var x = L();
-    var sub = x.phase === 'open' ? span('pp.count.host.sub_farrowing', { u: x.room }) : span('pp.count.host.sub', { u: x.room, day: x.dayAge });
-    return U.litterHeader({ crate: crate, sow: sow().sow, parity: sow().parity, sub: sub });
+  // Save (or the step's primary), and the reason it waits (Button's waiting face, ADR 0002): the footer's status line
+  function saveFooter(p, waiting, action, id, args, backAction) {
+    return K.footer({ back: { action: backAction || 'back' }, status: p ? { text: PP.t(p.id, p.args), str: p.id, args: p.args, id: 'ct-why' } : null,
+      primary: { label: s(id || 'act.save', args), action: action || 'save', waiting: waiting } });
   }
+  // the answer a sanity question takes (`17 is right`, `None are there`): a text action under the number it questions
+  function sureAct(p) {
+    if (!p || !p.act) return '';
+    return UI.button({ label: PP.t(p.act.id, p.act.args), register: 'text', action: p.act.action, value: String(S.observed), strs: { label: p.act.id }, args: p.act.args ? { label: p.act.args } : undefined });
+  }
+  function subtitleOf() {
+    var x = L(), d = draft(), sub = [s('pp.count.sub.alive', { code: crate, a: x.alive })];
+    if (d.open && (d.open.loss || d.open.gain)) sub.push({ sep: true }, s(d.open.loss ? 'pp.count.sub.missing' : 'pp.count.sub.extra', { op: np(d.open.loss || d.open.gain) }));
+    var E = store.derived.ended;
+    if (E && E.event && x.inTask) sub.push({ sep: true }, s('pp.count.sub.ended', { date: U.date(E.at) }));
+    return sub;
+  }
+
+  /* ---- The receipt owns the change this Save made (Status line, ADR 0002): colour sits on the numeral only (the totals stay
+     in the record). A body saved from this page's doors comes back with the dead drawer's own receipt. ---- */
+  function tok(id, args, tone) { return { text: PP.t(id, args), strs: { text: id }, args: args ? { text: args } : undefined, tone: tone || '' }; }
+  function receiptLine() {
+    if (S.deadRcpt) return UI.statusLine(S.deadRcpt.map(function (p) { return tok(p.id, p.args, p.tone); }), { live: true, id: 'ct-receipt' });
+    var r = S.receipt;
+    if (!r) return '';
+    var n = Math.abs(r.diff), toks = [tok('receipt.saved')];
+    function part(id, tone) { return [tok(id), tok('pp.count.rcpt.n', { n: n }, tone), tok(pl('pp.count.rcpt.unit', n))]; }
+    if (r.kind === 'loss') toks.push(part('pp.count.rcpt.loss', 'red'));
+    else if (r.kind === 'gain') { toks.push(part('pp.count.rcpt.gain', 'progress')); toks.push(tok('pp.count.rcpt.check')); }
+    else toks.push(tok('pp.count.rcpt.match'));
+    return UI.statusLine(toks, { live: true, sep: 'dot', tight: PP.lang === 'zh', id: 'ct-receipt' });
+  }
+
+  /* ---- The same body recorded twice (RULINGS round 3): the second allocation of one missing piglet is held — Dead and
+     Alive stay — until a worker answers one body (the duplicate is withdrawn) or two (a second death). One row where the
+     next count or body is recorded (R1-22); the question one level down, as a dialog. ---- */
+  function heldOpen() { return (L().held || []).filter(function (h) { return !h.resolved; }); }
+  function heldRow() {
+    return heldOpen().map(function (h) {
+      return '<div data-target="held">' + UI.rowGroup(row({ action: 'sub', value: 'held', title: 'pp.count.held.title', desc: 'pp.count.held.row', descArgs: { b: h.who, t: U.time(h.at) } })) + '</div>';
+    }).join('');
+  }
+  function heldDialog() {
+    var x = L(), h = heldOpen()[0];
+    if (!h) return '';
+    var first = null;
+    x.deaths.forEach(function (d) { if (!first && d.id !== h.event && d.fromMissing > 0) first = d; });
+    var body = UI.rowGroup(row({ action: 'resolve', value: h.event + '|one', title: 'pp.count.held.one', desc: 'pp.count.held.one_short', descArgs: { ap: np(x.alive) } }) +
+      row({ action: 'resolve', value: h.event + '|two', title: 'pp.count.held.two', desc: 'pp.count.held.two_short', descArgs: { ap: np(Math.max(0, x.alive - h.n)) } }));
+    return K.dialog({ title: s('pp.count.held.title'), description: s('pp.count.held.ask', { a: first ? first.who : '', b: h.who }), body: body,
+      footer: K.footer({ back: { action: 'sub-back' } }) });
+  }
+
+  /* ---- The litter's counts (where Save lands): what the count wrote, the litter's figures, a kept draft, a held body, a
+     count to settle, and the open lines with their doors. Back returns to the litter drawer; Set count counts again. ---- */
   function hostFacts() {
     var x = L(), items = [];
     if (x.phase === 'locked') items.push(fact('label.born', null, pigs(x.born).id, pigs(x.born).args));
@@ -183,100 +220,53 @@
     return UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.kept.title', titleArgs: { np: np(k.observed) },
       desc: 'pp.count.kept.desc', descArgs: { t: when(k.at), rp: np(L().alive) } }));
   }
+  function explain0() { return store.select.explain(store.derived, { litter: crate }, { who: window.PPFixtures.ME }).lines; }
   // One open line opens its doors right here; several lead to Explain.
   function openSection() {
     var lines = explain0();
     if (!lines.length) return '';
-    var head = UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: 'pp.count.open.title', description: 'pp.count.open.desc' } });
-    if (lines.length === 1) return '<section class="ct-group">' + head + '</section>' + lineSection(lines[0], false);
+    if (lines.length === 1) return lineSection(lines[0], false);
     var rows = lines.map(function (l) {
-      var t = lineTitle(l), s = lineStamp(l);
-      return row({ action: 'open-explain', value: crate, title: t.id, titleArgs: t.args, desc: s.id, descArgs: s.args, trail: 'pp.count.act.explain' });
+      var t = lineTitle(l), st = lineStamp(l);
+      return row({ action: 'open-explain', value: crate, title: t.id, titleArgs: t.args, desc: st.id, descArgs: st.args, trail: 'pp.count.act.explain' });
     }).join('');
-    return '<section class="ct-group">' + head + UI.rowGroup(rows) + '</section>';
+    return '<section class="ct-group">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.count.open.title' } }) + UI.rowGroup(rows) + '</section>';
   }
-  function explain0() { return store.select.explain(store.derived, { litter: crate }, { who: window.PPFixtures.ME }).lines; }
-  // The counts on this litter, newest first: each an observation with who and when; the one that stands says so.
-  function countsSection() {
-    var c = store.select.counts(store.derived, crate);
-    if (!c || !c.counts.length) return '';
-    var list = c.counts.slice().reverse();
-    var facts = UI.facts(list.slice(0, 3).map(function (k) {
-      var ev = eventOf(k.id) || {}, rest;
-      if (k.late) rest = PP.t('pp.count.c.late');
-      else if (k.disputed && !k.settledBy) rest = PP.t('pp.count.c.disputed');
-      else if (k.crossed.length) rest = PP.t('pp.count.c.phone', { who: k.who, bp: np(k.baseAlive) });
-      // R1-20: two counts that saw the same crate, net of a change one phone had not seen: one observation, nothing to settle
-      else if (k.agreesNet) rest = PP.t('pp.count.c.agrees', { who: (eventOf(k.agreesWith[0]) || {}).who || '' });
-      else if (k.wrote < 0) rest = PP.t('pp.count.c.loss', { kp: np(-k.wrote) });
-      else if (k.wrote > 0) rest = PP.t('pp.count.c.gain', { kp: np(k.wrote) });
-      else rest = PP.t('pp.count.c.match');
-      var by = k.supersededBy ? eventOf(k.supersededBy) : null;
-      var meta = k.stands ? ['pp.count.c.stands', { rest: rest }] : by ? ['pp.count.c.replaced', { t: when(by.at), rest: rest }] : ['pp.count.c.plain', { rest: rest }];
-      return fact(ev.syncedAt ? 'pp.count.c.label_synced' : 'pp.count.c.label', { stamp: stamp(k.at, k.who), t: ev.syncedAt ? U.time(ev.syncedAt) : '' },
-        pigs(k.observed).id, pigs(k.observed).args, meta[0], meta[1]);
-    }), { columns: 1 });
-    var out = '<section class="ct-group">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.count.c.title' } }) + facts;
+  /* Two counts to settle: disagreeing (neither saw the other: neither stands) or under sync review (one missed a change).
+     One row; the counts themselves are said in its meta, and a new count settles it. */
+  function settleRow(c) {
     if (c.conflict) {
-      // two counts disagree (neither saw the other): neither stands until a count that saw both
       var list = c.counts.filter(function (k) { return c.disputed.indexOf(k.id) >= 0; })
         .map(function (k) { return PP.t('pp.count.review.one', { who: k.who, np: np(k.observed) }); }).join(' · ');
-      out += UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.review.conflict', description: 'pp.count.review.conflict_desc' }, args: { description: { list: list } } }) +
-        UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.review.again', titleArgs: { code: crate }, desc: 'pp.count.review.conflict_again' }));
-    } else if (c.review) {
-      var st = c.counts.filter(function (k) { return k.stands; })[0];
-      var desc, dargs = { np: np(st.observed) };
-      if (st.crossed.length) {
-        var x = eventOf(st.crossed[0]) || {};
-        desc = x.type === 'move' ? 'pp.count.review.move' : x.type === 'weaned' ? 'pp.count.review.weaned' : 'pp.count.review.death';
-        dargs.who = st.who; dargs.t = U.time(x.at || st.at); dargs.by = x.who || '';
-      } else {
-        var o = eventOf(st.order[0]) || {};
-        desc = 'pp.count.review.order'; dargs.who = o.who || ''; dargs.t = U.time(o.at || st.at);
-      }
-      out += UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.review.title', description: desc }, args: { description: dargs } }) +
-        UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.review.again', titleArgs: { code: crate }, desc: 'pp.count.review.again_desc' }));
+      return UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.review.conflict', desc: 'pp.count.review.conflict_row', descArgs: { list: list } }));
     }
-    return out + '</section>';
+    if (!c.review) return '';
+    var st = c.counts.filter(function (k) { return k.stands; })[0];
+    var desc, dargs = { np: np(st.observed) };
+    if (st.crossed.length) {
+      var x = eventOf(st.crossed[0]) || {};
+      desc = x.type === 'move' ? 'pp.count.review.move' : x.type === 'weaned' ? 'pp.count.review.weaned' : 'pp.count.review.death';
+      dargs.who = st.who; dargs.t = U.time(x.at || st.at); dargs.by = x.who || '';
+    } else {
+      var o = eventOf(st.order[0]) || {};
+      desc = 'pp.count.review.order'; dargs.who = o.who || ''; dargs.t = U.time(o.at || st.at);
+    }
+    return UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.review.title', desc: desc, descArgs: dargs }));
   }
-  /* The receipt owns the change this Save made (Status line, ADR 0002): colour sits on the numeral only (the totals stay
-     in the record). A body saved from this page's doors comes back with the dead drawer's own receipt. */
-  function tok(id, args, tone) { return { text: PP.t(id, args), strs: { text: id }, args: args ? { text: args } : undefined, tone: tone || '' }; }
-  function receiptLine() {
-    if (S.deadRcpt) return UI.statusLine(S.deadRcpt.map(function (p) { return tok(p.id, p.args, p.tone); }), { live: true, id: 'ct-receipt' });
-    var r = S.receipt;
-    if (!r) return '';
-    var n = Math.abs(r.diff), toks = [tok('receipt.saved')];
-    function part(id, tone) { return [tok(id), tok('pp.count.rcpt.n', { n: n }, tone), tok(pl('pp.count.rcpt.unit', n))]; }
-    if (r.kind === 'loss') toks.push(part('pp.count.rcpt.loss', 'red'));
-    else if (r.kind === 'gain') { toks.push(part('pp.count.rcpt.gain', 'progress')); toks.push(tok('pp.count.rcpt.check')); }
-    else toks.push(tok('pp.count.rcpt.match'));
-    return UI.statusLine(toks, { live: true, sep: 'dot', tight: PP.lang === 'zh', id: 'ct-receipt' });
+  // R1-20: two counts that saw the same crate, net of a change one phone had not seen: one observation, nothing to settle
+  function agreeRow(c) {
+    var k = c.counts.filter(function (x) { return x.agreesNet; })[0];
+    if (!k) return '';
+    return UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.agree.title', titleArgs: { np: np(k.observed) },
+      desc: 'pp.count.c.agrees', descArgs: { who: (eventOf(k.agreesWith[0]) || {}).who || '' } }));
   }
-  /* The same body recorded twice (RULINGS round 3): the second allocation of one missing piglet is held — Dead and
-     Alive stay — until a worker answers one body (the duplicate is withdrawn) or two (a second death). */
-  function heldOpen() { return (L().held || []).filter(function (h) { return !h.resolved; }); }
-  function heldSection() {
-    var x = L(), held = heldOpen();
-    if (!held.length) return '';
-    return held.map(function (h) {
-      var first = null;
-      x.deaths.forEach(function (d) { if (!first && d.id !== h.event && d.fromMissing > 0) first = d; });
-      var ev = eventOf(h.event) || {};
-      var head = UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.held.title', description: 'pp.count.held.desc' },
-        args: { description: { a: first ? first.who : '', b: h.who, t: U.time(ev.syncedAt || h.at), dp: np(x.dead.total), ap: np(x.alive) } } });
-      var rows = row({ action: 'resolve', value: h.event + '|one', title: 'pp.count.held.one', desc: 'pp.count.held.one_meta', descArgs: { ap: np(x.alive) }, wrap: true }) +
-        row({ action: 'resolve', value: h.event + '|two', title: 'pp.count.held.two', desc: 'pp.count.held.two_meta', descArgs: { ap: np(Math.max(0, x.alive - h.n)) }, wrap: true });
-      return '<section class="ct-group" data-target="held">' + head + UI.rowGroup(rows) + '</section>';
-    }).join('');
-  }
-  function hostHtml(inert) {
-    var c = store.select.counts(store.derived, crate);
-    // a held body or a count under sync review leads: the next act is to answer it, or to count again
-    var body = hostFacts() + U.tools(crate) + keptRow() + heldSection() + (c && c.review ? countsSection() + openSection() : openSection() + countsSection());
-    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (inert ? ' inert' : '') + '>' + hostHead() +
-      '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
-      '<footer class="sheet-footer ct-bar">' + receiptLine() + button('secondary', 'back', 'act.back') + '</footer></section>';
+  function hostSheet() {
+    var c = store.select.counts(store.derived, crate) || { counts: [] };
+    var body = receiptLine() + hostFacts() + keptRow() + heldRow() + settleRow(c) + agreeRow(c) + openSection();
+    return K.drawer({ size: 'long', view: 'host', title: s('pp.count.c.title'), subtitle: subtitleOf(), close: { action: 'dismiss' },
+      body: '<div class="ct-body">' + body + '</div>',
+      footer: K.footer({ back: { action: 'back' }, primary: { label: s('pp.count.title'), action: 'open-count', value: crate } }),
+      scrim: { action: 'dismiss' } });
   }
 
   /* ---- the Set count drawer: a staged assertion (Back keeps the draft, Clear discards it, Save writes one stamped count) ---- */
@@ -285,18 +275,24 @@
     return { id: 'pp.count.hint.' + d.kind, args: { k: Math.abs(d.diff), kp: np(Math.abs(d.diff)) } };
   }
   // R1-9: below Alive on a litter with tags, the count may name which tagged piglets are missing — required only when the
-  // untagged cannot cover the difference; a named piglet's body later closes its own line
-  function rosterSection(d) {
+  // untagged cannot cover the difference; a named piglet's body later closes its own line. One row here; the list one level down.
+  function rosterRow(d) {
     if (!d.roster.length || (d.kind !== 'loss' && !S.rows.length)) return '';
+    var must = d.needRows > 0, n = S.rows.length;
+    return '<div data-target="roster">' + UI.rowGroup(row({ action: 'sub', value: 'roster', title: must ? pl('pp.count.named.title', d.needRows) : 'pp.count.named.title_opt',
+      desc: n ? pl('pp.count.named.picked', n) : null, descArgs: { n: n } })) + '</div>';
+  }
+  function rosterView(d) {
     var must = d.needRows > 0;
-    var h = UI.heading({ title: '', description: '', kind: 'section', level: 3,
-      strs: { title: must ? pl('pp.count.named.title', d.needRows) : 'pp.count.named.title_opt', description: must ? pl('pp.count.named.desc', d.needRows) : 'pp.count.named.desc_opt' },
-      args: { description: { up: np(d.untagged), kp: np(d.maxRows), n: d.needRows } } });
     var rows = UI.choiceGroup(d.roster.map(function (r) {
       var l = rowLabel(r);
       return UI.choiceRow({ label: '', mode: 'multi', action: 'pick-row', value: r.rowId, selected: S.rows.indexOf(r.rowId) >= 0, mono: true, strs: { label: l.id }, args: { label: l.args } });
     }));
-    return '<section class="ct-group" data-target="roster">' + h + rows + '</section>';
+    var p = pointer(d);
+    return K.drawer({ size: 'long', height: 'full', view: 'roster', title: s(must ? pl('pp.count.named.title', d.needRows) : 'pp.count.named.title_opt'),
+      subtitle: [s(must ? pl('pp.count.named.desc', d.needRows) : 'pp.count.named.desc_opt', { up: np(d.untagged), kp: np(d.maxRows), n: d.needRows })], close: { action: 'sub-dismiss' },
+      body: '<div class="ct-body" data-target="roster-list">' + rows + '</div>',
+      footer: saveFooter(p, !d.event || !!stale() || S.failed || !!sanity(d), 'save', 'act.save', null, 'sub-back'), scrim: { action: 'sub-dismiss' } });
   }
   function pointer(d) {
     if (S.failed) return { id: 'pp.count.why.failed' };
@@ -323,101 +319,81 @@
   // 0 seen: moved or weaned? A Move is recorded as a Move (it never writes missing piglets); weaning is recorded at weaning.
   function zeroSection(d) {
     if (sanity(d) !== 'zero') return '';
-    return '<section class="ct-group" data-target="zero">' + UI.heading({ title: '', description: '', kind: 'section', level: 3,
-      strs: { title: 'pp.count.zero.title', description: 'pp.count.zero.desc' }, args: { title: { code: crate }, description: { ap: np(d.base) } } }) +
+    return '<section class="ct-group" data-target="zero">' + UI.heading({ title: '', kind: 'group', level: 3, strs: { title: 'pp.count.zero.title' }, args: { title: { code: crate } } }) +
       UI.rowGroup(row({ action: 'open-move', value: crate, title: 'pp.count.zero.move', titleArgs: { code: crate }, desc: 'pp.count.zero.move_desc' })) + '</section>';
   }
-  function endedPanel() {
-    var E = store.derived.ended;
-    if (!E || !E.event || !L().inTask) return '';
-    return UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.ended.title', description: 'pp.count.ended.desc' },
-      args: { title: { date: U.date(E.at) } } });
-  }
-  function countDrawer() {
-    var d = draft(), h = hint(d), p = pointer(d), x = L();
+  function countSheet() {
+    var d = draft(), h = hint(d), p = pointer(d);
     var hero = UI.stepper({ label: '', value: S.observed, min: 0, key: 'observed', variant: 'hero', draft: dirty(), hint: '', reserveHint: true,
       strs: { label: 'pp.count.seen', value: 'ds.field.figure', hint: h.id, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { label: { code: crate }, hint: h.args } });
-    // the size is reserved once the count is below alive on a litter with tagged piglets, so the roster never makes it jump
-    var long = (d.roster.length && S.observed < d.base) || sanity(d) === 'zero' || heldOpen().length > 0;
-    var size = long ? ' data-size="long"' : ' data-size="medium" data-sizing="content"';
-    var sub = d.open.loss || d.open.gain ? span(pl('pp.count.sub_open', x.alive), { code: crate, ap: np(x.alive), op: np(d.open.loss || d.open.gain), what: PP.t(d.open.loss ? 'pp.count.sub_missing' : 'pp.count.sub_extra') })
-      : span('pp.count.sub', { code: crate, ap: np(x.alive), day: x.dayAge });
-    return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Sheet" data-st-context="drawer"' + size + ' role="dialog" aria-modal="true">' +
-      '<header class="utility-header ct-head"><div class="pp-hdr-title"><h3 data-str="pp.count.title">' + U.esc(PP.t('pp.count.title')) + '</h3><p>' + sub + '</p></div>' +
-      (dirty() ? textAction('clear', 'act.clear') : '') + '</header>' +
-      // a held body is answered here too, above the number (R1-22): the drawer never hides the question under it
-      '<div class="sheet-body"><div class="ct-body">' + heldSection() + hero + endedPanel() + zeroSection(d) + rosterSection(d) + '</div></div>' +
-      '<footer class="sheet-footer ct-bar">' + saveBar(p, !d.event || !!stale() || S.failed || !!sanity(d)) + '</footer></section>';
+    // a held body is answered here too, above the number (R1-22): the drawer never hides the question under it
+    return K.drawer({ size: 'long', view: 'count', title: s('pp.count.title'), subtitle: subtitleOf(),
+      aside: dirty() ? UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '', close: { action: 'dismiss' },
+      body: '<div class="ct-body">' + heldRow() + hero + sureAct(p) + zeroSection(d) + rosterRow(d) + '</div>',
+      footer: saveFooter(p, !d.event || !!stale() || S.failed || !!sanity(d)), scrim: { action: 'dismiss' } });
   }
 
   /* ---- where the ledger does not take a count, the door says why: before the lock the count is the farrowing sheet's (hand-off);
      a weaned-out litter has nothing to count ---- */
-  function refusedDrawer(why) {
+  function refusedSheet(why) {
     var x = L(), body, sub;
     if (why === 'farrowing_open') {
       var ev = x.lastEvent;
-      sub = span('pp.count.pre.why', { code: crate });
+      sub = s('pp.count.pre.sub', { code: crate });
       body = UI.rowGroup(row({ action: 'open-farrowing', value: crate, title: 'pp.count.pre.door', titleArgs: { code: crate },
         desc: 'pp.count.pre.door_desc', descArgs: { bp: np(x.born), ago: U.ago(ev.at, store.now()), who: ev.who } }));
     } else {
       var w = store.events.filter(function (e) { return e.type === 'weaned' && e.litter === crate; }).pop() || {};
-      sub = span('pp.count.weaned', { code: crate, date: w.at ? U.date(w.at) : '', np: np(x.weaned) });
+      sub = s('pp.count.weaned.sub', { code: crate, date: w.at ? U.date(w.at) : '', np: np(x.weaned) });
       body = UI.rowGroup(row({ action: 'open-move', value: crate, title: 'pp.count.weaned_move', desc: 'pp.count.weaned_move_desc', descArgs: { code: crate } }));
     }
-    return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="short" data-sizing="content" role="dialog" aria-modal="true">' +
-      '<header class="utility-header"><div class="pp-hdr-title"><h3 data-str="pp.count.title">' + U.esc(PP.t('pp.count.title')) + '</h3><p>' + sub + '</p></div></header>' +
-      '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
-      '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + '</footer></section>';
+    return K.drawer({ size: 'short', view: 'refused', title: s('pp.count.title'), subtitle: [sub], close: { action: 'dismiss' },
+      body: body, footer: K.footer({ back: { action: 'back' } }), scrim: { action: 'dismiss' } });
   }
 
   /* ---- Explain: the open lines one by one (a litter, or the unit from its drift strip), each with its doors ---- */
-  function effect(s) {
-    var l = s.left;
+  function effect(sg) {
+    var l = sg.left;
     if (!l.loss && !l.gain) return PP.t('pp.count.sug.both');
     return l.loss ? PP.t('pp.count.sug.gain_closes', { kp: np(l.loss) }) : PP.t('pp.count.sug.loss_closes', { kp: np(l.gain) });
   }
   // how far apart the two counts were: the rail word of a suggestion (`5 min`, `2h`)
   function gap(m) { return m == null ? null : m < 60 ? ['pp.count.sug.gap_min', { m: m }] : ['pp.count.sug.gap_h', { h: Math.round(m / 60) }]; }
-  function suggestionRow(l, s) {
-    var cross = s.room !== l.room, g = gap(s.gapMin);
-    var t = (s.kind === 'gain' ? 'pp.count.sug.gained' : 'pp.count.sug.lost') + (cross ? '_unit' : '');
-    return row({ action: 'suggest', value: l.id + '|' + s.id, title: t, titleArgs: { code: s.litter, np: np(s.open), u: s.room },
-      desc: 'pp.count.sug.desc', descArgs: { effect: effect(s) }, trail: g && g[0], trailArgs: g && g[1] });
+  function suggestionRow(l, sg) {
+    var cross = sg.room !== l.room, g = gap(sg.gapMin);
+    var t = (sg.kind === 'gain' ? 'pp.count.sug.gained' : 'pp.count.sug.lost') + (cross ? '_unit' : '');
+    return row({ action: 'suggest', value: l.id + '|' + sg.id, title: t, titleArgs: { code: sg.litter, np: np(sg.open), u: sg.room },
+      desc: 'pp.count.sug.desc', descArgs: { effect: effect(sg) }, trail: g && g[0], trailArgs: g && g[1] });
   }
+  // One line: its title and stamp, then its doors — the Moves the app suggests (ranked, never proof), a body, a new count
+  // (a new observation: it never closes the line) and Edit for a wrong count. One headline per door.
   function lineSection(l, withCode) {
     var t = lineTitle(l, withCode), st = lineStamp(l), rows = [];
     var all = S.more[l.id] ? l.suggestions : l.suggestions.slice(0, 3);
-    all.forEach(function (s) { rows.push(suggestionRow(l, s)); });
+    all.forEach(function (sg) { rows.push(suggestionRow(l, sg)); });
     var more = l.suggestions.length - all.length;
     if (more > 0) rows.push(row({ action: 'more', value: l.id, title: pl('pp.count.sug.more', more), titleArgs: { n: more } }));
-    if (l.kind === 'gain') rows.push(row({ action: 'move-in', value: l.id, title: 'pp.count.ex.move_in', desc: 'pp.count.ex.move_in_desc', descArgs: { code: l.litter } }));
-    if (l.death) rows.push(row({ action: 'open-dead', value: l.litter, title: 'act.record_dead', desc: pl('pp.count.ex.dead_desc', l.open), descArgs: { np: np(l.open) } }));
-    rows.push(row({ action: 'open-count', value: l.litter, title: 'pp.count.title', desc: 'pp.count.ex.again_desc', descArgs: { code: l.litter } }));
+    if (l.kind === 'gain') rows.push(row({ action: 'move-in', value: l.id, title: 'pp.count.ex.move_in' }));
+    if (l.death) rows.push(row({ action: 'open-dead', value: l.litter, title: 'pp.dead.title.record' }));
+    rows.push(row({ action: 'open-count', value: l.litter, title: 'pp.count.review.again', titleArgs: { code: l.litter } }));
     // a mistaken count is corrected through Edit (RULINGS round 3): withdrawn or set, stamped, its line goes
-    rows.push(row({ action: 'edit-count', value: l.litter + '|' + l.id, title: 'pointer.wrong_count', desc: 'pp.count.ex.wrong_desc', descArgs: { op: np(l.observed) } }));
-    var none = l.suggestions.length ? '' : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: l.kind === 'loss' ? 'pp.count.ex.none_loss' : 'pp.count.ex.none_gain' } });
+    rows.push(row({ action: 'edit-count', value: l.litter + '|' + l.id, title: 'pointer.wrong_count' }));
     // round 4: a counted gain owes nothing new — the litter's recorded treatments stand; the worker checks on the pig
     var g = l.kind === 'gain' ? L(l.litter).unexplained.gains.filter(function (x) { return x.id === l.id; })[0] : null;
-    if (g && g.check) none = UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.line.check', description: 'pp.count.line.check_desc' } }) + none;
-    var review = l.review ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.review.line' } }) : '';
+    var note = g && g.check ? 'pp.count.line.check' : l.review ? 'pp.count.review.line' : '';
     return '<section class="ct-group">' +
       UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: t.id, description: st.id }, args: { title: t.args, description: st.args } }) +
-      review + none + UI.rowGroup(rows.join('')) + '</section>';
+      (note ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: note } }) : '') + UI.rowGroup(rows.join('')) + '</section>';
   }
-  function explainHtml(inert) {
-    var x = explain(), head;
-    var sub = { lp: np(x.openLoss), gp: np(x.openGain) };
-    if (S.room) head = UI.heading({ title: '', description: '', kind: 'page', level: 2, strs: { title: 'pp.count.ex.title_room', description: 'pp.count.ex.sub' }, args: { title: { u: S.room }, description: sub } });
-    else head = UI.heading({ title: '', description: '', kind: 'page', level: 2, strs: { title: 'pp.count.ex.title', description: 'pp.count.ex.sub' }, args: { title: { code: crate }, description: sub } });
+  function explainPage(inert) {
+    var x = explain(), sub = { lp: np(x.openLoss), gp: np(x.openGain) };
+    var title = S.room ? s('pp.count.ex.title_room', { u: S.room }) : s('pp.count.ex.title', { code: crate });
     // R1-8: a body found loose in the room — say whose missing piglet it is (the dead drawer lists the unit's open losses)
     var found = S.room && x.openLoss ? UI.rowGroup(row({ action: 'found-body', value: String(S.room), title: 'pp.count.ex.found', desc: 'pp.count.ex.found_desc' })) : '';
-    var body = (S.room ? '' : heldSection()) + found + (x.lines.length ? x.lines.map(function (l) { return lineSection(l, !!S.room); }).join('')
+    var body = receiptLine() + (S.room ? '' : heldRow()) + found + (x.lines.length ? x.lines.map(function (l) { return lineSection(l, !!S.room); }).join('')
       : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.ex.empty' } }));
-    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (inert ? ' inert' : '') + '>' +
-      '<header class="utility-header">' + head + '</header>' +
-      '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
-      '<footer class="sheet-footer ct-bar">' + receiptLine() + button('secondary', 'back', 'act.back') + '</footer></section>';
+    return K.page({ inert: !!inert, title: title, description: s('pp.count.ex.sub', sub), body: '<div class="ct-body">' + body + '</div>', footer: K.footer({ back: { action: 'back' } }) });
   }
   /* The suggestion, side by side: both counts (who, when, where), what saving it as a Move closes and leaves open, and the door
      to the Move sheet. A suggestion is never proof; nothing pairs until the worker saves the Move. */
@@ -427,62 +403,74 @@
     return out;
   }
   function suggestion() {
-    var l = lineOf(S.line), s = null;
-    if (l) l.suggestions.forEach(function (b) { if (b.id === S.pick) s = b; });
-    return l && s ? { l: l, s: s } : null;
+    var l = lineOf(S.line), sg = null;
+    if (l) l.suggestions.forEach(function (b) { if (b.id === S.pick) sg = b; });
+    return l && sg ? { l: l, s: sg } : null;
   }
-  function suggestDrawer() {
+  function moveOf(sg) { return sg.pickFrom ? Object.assign({}, sg.move, { rows: S.pickRows.slice() }) : sg.move; }
+  function suggestSheet() {
     var p = suggestion();
     if (!p) { S.view = 'explain'; return ''; }
-    var l = p.l, s = p.s, m = moveOf(s), loss = l.kind === 'loss' ? l : s, gain = l.kind === 'loss' ? s : l;
-    var picked = !s.pickFrom || S.pickRows.length === m.n;
+    var l = p.l, sg = p.s, m = moveOf(sg), loss = l.kind === 'loss' ? l : sg, gain = l.kind === 'loss' ? sg : l;
+    var picked = !sg.pickFrom || S.pickRows.length === m.n;
     // before the pick, the figures are the replay's with the first named rows (Alive after does not depend on which)
-    var mv = store.select.moveDraft(store.derived, picked ? m : Object.assign({}, m, { rows: s.pickFrom.slice(0, m.n) }), { who: window.PPFixtures.ME });
+    var mv = store.select.moveDraft(store.derived, picked ? m : Object.assign({}, m, { rows: sg.pickFrom.slice(0, m.n) }), { who: window.PPFixtures.ME });
     var cross = loss.room !== gain.room;
     var side = function (y, kind) {
       return fact(cross ? 'pp.count.sg.side_unit' : 'pp.count.sg.side', { code: y.litter, u: y.room },
         'pp.count.line.' + kind, { np: np(y.open) }, 'pp.count.sg.stamp', { op: np(y.observed), stamp: stamp(y.at, y.who) }, kind === 'loss' ? 'red' : 'blue');
     };
-    var t = (l.kind === 'loss' ? 'pp.count.sug.gained' : 'pp.count.sug.lost') + (s.room !== l.room ? '_unit' : '');
+    var t = (l.kind === 'loss' ? 'pp.count.sug.gained' : 'pp.count.sug.lost') + (sg.room !== l.room ? '_unit' : '');
     var body = UI.facts([side(loss, 'loss'), side(gain, 'gain')], { columns: 2 }) +
       UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.sg.if', description: 'pp.count.sg.alive' },
-        args: { title: { np: np(m.n), effect: effect(s) }, description: { a: m.from, xp: mv.delta ? np(mv.delta.from[1]) : '', b: m.to, yp: mv.delta ? np(mv.delta.to[1]) : '' } } });
+        args: { title: { np: np(m.n), effect: effect(sg) }, description: { a: m.from, xp: mv.delta ? np(mv.delta.from[1]) : '', b: m.to, yp: mv.delta ? np(mv.delta.to[1]) : '' } } });
     // more named missing piglets than the Move carries: the worker picks which (never the app)
-    if (s.pickFrom) {
+    if (sg.pickFrom) {
       var rows = L(loss.litter).identity.rows;
-      body += '<section class="ct-group" data-target="pick">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: pl('pp.count.sg.pick', m.n) }, args: { title: { n: m.n, code: loss.litter } } }) +
-        UI.choiceGroup(s.pickFrom.map(function (id) {
+      body += '<section class="ct-group" data-target="pick">' + UI.heading({ title: '', kind: 'group', level: 3, strs: { title: pl('pp.count.sg.pick', m.n) }, args: { title: { n: m.n, code: loss.litter } } }) +
+        UI.choiceGroup(sg.pickFrom.map(function (id) {
           var r = rows.filter(function (x) { return x.rowId === id; })[0] || { tag: id }, lb = rowLabel(r);
           return UI.choiceRow({ label: '', mode: 'multi', action: 'pick-named', value: id, selected: S.pickRows.indexOf(id) >= 0, strs: { label: lb.id }, args: { label: lb.args } });
         })) + '</section>';
     }
-    var p = picked ? null : { id: pl('pp.count.why.pick', m.n), args: { n: m.n } };
-    return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Sheet" data-st-context="drawer"' + (s.pickFrom ? ' data-size="long"' : ' data-size="medium" data-sizing="content"') + ' role="dialog" aria-modal="true">' +
-      '<header class="utility-header"><div class="pp-hdr-title"><h3>' + span(t, { code: s.litter, np: np(s.open), u: s.room }) + '</h3><p>' + span('pp.count.sg.sub') + '</p></div></header>' +
-      '<div class="sheet-body"><div class="ct-body">' + body + '</div></div>' +
-      '<footer class="sheet-footer ct-bar">' + saveBar(p, !picked || !mv.event, 'open-move', 'pp.count.sg.move', { n: m.n, from: m.from, to: m.to }) + '</footer></section>';
+    var why = picked ? null : { id: pl('pp.count.why.pick', m.n), args: { n: m.n } };
+    return K.drawer({ size: 'long', view: 'suggest', title: s(t, { code: sg.litter, np: np(sg.open), u: sg.room }), subtitle: [s('pp.count.sg.sub')], close: { action: 'dismiss' },
+      body: '<div class="ct-body">' + body + '</div>',
+      footer: saveFooter(why, !picked || !mv.event, 'open-move', 'pp.count.sg.move', { n: m.n, from: m.from, to: m.to }), scrim: { action: 'dismiss' } });
   }
-  function moveOf(s) { return s.pickFrom ? Object.assign({}, s.move, { rows: S.pickRows.slice() }) : s.move; }
 
+  function behind() {
+    var src = PP.href('room.html', { state: 'room', unit: L() && L().room !== 7 ? L().room : '', data: store.name !== 'base' ? store.name : '' });
+    return '<iframe class="ct-behind" src="' + U.esc(src) + '" title="" aria-hidden="true" tabindex="-1" inert></iframe>';
+  }
   function render() {
-    var html;
-    if (S.view === 'count') { var w = draft().why; html = hostHtml(true) + (w === 'farrowing_open' || w === 'weaned' ? refusedDrawer(w) : countDrawer()); }
-    else if (S.view === 'explain') html = explainHtml(false);
-    else if (S.view === 'suggest') { var dr = suggestDrawer(); html = explainHtml(!!dr) + dr; }
-    else html = hostHtml(false);
+    var html, over = '';
+    if (S.view === 'count') {
+      var w = draft().why;
+      html = w === 'farrowing_open' || w === 'weaned' ? refusedSheet(w) : S.sub === 'roster' ? rosterView(draft()) : countSheet();
+      if (S.sub === 'held') over = heldDialog();
+    }
+    else if (S.view === 'explain') { html = explainPage(); if (S.sub === 'held') over = heldDialog(); }
+    else if (S.view === 'suggest') { var dr = suggestSheet(); html = dr ? explainPage(true) + dr : explainPage(); }
+    else { html = hostSheet(); if (S.sub === 'held') over = heldDialog(); }
+    if (over) html = '<div inert>' + html + '</div>' + over;
     var root = document.getElementById('screen');
-    var body = root.querySelector('[role="dialog"] .sheet-body'), top = body ? body.scrollTop : 0;
-    root.innerHTML = html;
+    var body = root.querySelector('.tk-sheet .tk-sheet-body, .tk-page .tk-page-body'), top = body ? body.scrollTop : 0, view = S.view + ':' + S.sub;
+    // the phone and the room behind are drawn once and stay (an iframe reloads when re-inserted); the sheets re-render
+    if (!root.querySelector('#ct-over')) root.innerHTML = K.phone('<div id="ct-over" class="ct-over"></div>', { bar: false, label: s('pp.count.title') });
+    if (S.view !== 'explain' && !root.querySelector('.ct-behind')) root.querySelector('#ct-over').insertAdjacentHTML('beforebegin', behind());
+    root.querySelector('#ct-over').innerHTML = html;
     PP.apply(root);
     UI.liveFill(root, { then: function (el) { PP.apply(el); } });      // live regions mount empty, then fill (Status)
-    var nb = root.querySelector('[role="dialog"] .sheet-body'); if (nb) nb.scrollTop = top;
+    var nb = root.querySelector('.tk-sheet .tk-sheet-body, .tk-page .tk-page-body'); if (nb && view === S.lastView) nb.scrollTop = top;
+    S.lastView = view;
   }
 
   /* ---- acts ---- */
   // The variant always travels (`data=base` too): a page whose state names its own variant must not fall back to it.
   function nav(page, params) { location.href = PP.href(page, Object.assign({ data: store.name }, params)); }
   function here() { return location.pathname + location.search; }
-  // the way back to this view (the dead drawer returns here, with its receipt): Explain for the room or a litter, or the litter host
+  // the way back to this view (the dead drawer returns here, with its receipt): Explain for the room or a litter, or the litter's counts
   function backHere() {
     if (S.view === 'explain' || S.view === 'suggest') return PP.href('count.html', S.room ? { state: 'explain', unit: S.room, data: store.name } : { state: 'explain', crate: crate, unit: qs.get('unit'), data: store.name });
     return PP.href('count.html', { state: 'host', crate: crate, unit: qs.get('unit'), data: store.name });
@@ -491,7 +479,7 @@
     if (c && c !== crate) { nav('count.html', { state: 'count', crate: c }); return; }
     var k = keptDraft();
     S.rows = k ? k.rows.slice() : []; S.at = k ? k.at : null; S.obsMs = k ? k.obsMs : 0; S.seen = k ? k.seen : null;
-    S.failed = false; S.view = 'count'; S.receipt = null; S.deadRcpt = null; S.sure = null;
+    S.failed = false; S.view = 'count'; S.sub = ''; S.receipt = null; S.deadRcpt = null; S.sure = null;
     S.observed = k ? k.observed : draft().base;
   }
   // any change to the count is a fresh observation: its time (the stamp Save writes; this phone's clock for staleness)
@@ -503,29 +491,33 @@
     var r = store.commit(Object.assign({}, d.event, { at: S.at || store.now() }));
     if (!r.ok) { S.failed = true; return false; }
     S.receipt = { kind: d.kind, diff: d.diff };
-    dropDraft(); S.rows = []; S.at = null; S.view = 'host'; lastTap = Date.now();
+    dropDraft(); S.rows = []; S.at = null; S.view = 'host'; S.sub = ''; lastTap = Date.now();
     return true;
   }
   function back() {
+    if (S.sub) { var from = S.sub; S.sub = ''; S.focus = '[data-action="sub"][data-value="' + from + '"]'; return; }
     if (S.view === 'count') { keepDraft(); S.view = 'host'; return; }
     if (S.view === 'suggest') { S.view = 'explain'; return; }
     if (S.view === 'explain' && S.from === 'host') { S.view = 'host'; S.from = ''; return; }
     if (S.view === 'explain' && S.room) { nav('room.html', { state: 'room', unit: S.room !== 7 ? S.room : '' }); return 'nav'; }
-    nav('litter.html', { state: 'litter', crate: crate, unit: qs.get('unit') });
+    // the litter drawer over the room: where the litter's counts were opened. Transition: while the litter is still its
+    // own page (litter.html, being folded into the room as a drawer), counts opened from that page return to it.
+    nav(fromLitterPage() ? 'litter.html' : 'room.html', { state: 'litter', crate: crate, unit: qs.get('unit') });
     return 'nav';
   }
+  function fromLitterPage() { try { return /\/litter\.html$/.test(new URL(document.referrer).pathname); } catch (e) { return false; } }
   function goTo(target) {
     var t = document.querySelector('[data-target="' + target + '"]');
     if (t) { t.scrollIntoView({ block: 'center' }); var f = t.querySelector('input, button'); if (f) f.focus({ preventScroll: true }); }
   }
   document.getElementById('screen').addEventListener('click', function (ev) {
-    var b0 = ev.target.closest('[data-action]');
+    var b = ev.target.closest('[data-action]');
     // a double tap after Save lands nowhere — except on stepper keys, where a double tap is two steps
-    if (Date.now() - lastTap < 400 && !(b0 && b0.dataset.action === 'step')) return;
-    if (ev.target.closest('[data-dismiss]')) { back(); render(); return; }      // the scrim is Back
-    var b = b0;
+    if (Date.now() - lastTap < 400 && !(b && b.dataset.action === 'step')) return;
     if (!b) return;
     var a = b.dataset.action, v = b.dataset.value;
+    if (a === 'dismiss' || a === 'sub-dismiss') a = 'back';                    // the ✕ and the scrim are Back
+    if (a === 'sub-back') a = 'back';
     if (a === 'pick-row' || a === 'pick-named') v = b.value;
     if (a === 'step') {
       if (b.getAttribute('aria-disabled') === 'true') return;
@@ -537,10 +529,16 @@
     else if (a === 'clear') { dropDraft(); S.observed = draft().base; S.rows = []; S.at = null; S.obsMs = 0; S.seen = null; S.failed = false; }
     else if (a === 'save') {
       // a waiting Save answers the tap (the reason flashes and re-announces) and points at the step
-      if (UI.guard(b)) { var dw = draft(); if (dw.why === 'name_the_rows' || dw.why === 'too_many_rows') goTo('roster'); else if (sanity(dw) === 'zero') goTo('zero'); return; }
+      if (UI.guard(b)) {
+        var dw = draft();
+        if (dw.why === 'name_the_rows' || dw.why === 'too_many_rows') { if (S.sub !== 'roster') { S.sub = 'roster'; render(); } goTo('roster-list'); }
+        else if (sanity(dw) === 'zero') { if (S.sub) { S.sub = ''; render(); } goTo('zero'); }
+        return;
+      }
       save();
     }
     else if (a === 'back') { if (back() === 'nav') return; }
+    else if (a === 'sub') { S.sub = v; }
     else if (a === 'open-count') openCount(v);
     else if (a === 'open-explain') { S.view = 'explain'; S.from = 'host'; S.room = 0; }
     else if (a === 'suggest') { var p = v.split('|'); S.line = p[0]; S.pick = p[1]; S.pickRows = []; S.view = 'suggest'; }
@@ -553,6 +551,7 @@
     else if (a === 'resolve') {
       var rv = v.split('|'), r = store.commit({ type: 'resolve', litter: crate, held: rv[0], answer: rv[1] });
       if (!r.ok) S.failed = true;
+      S.sub = '';
     }
     else if (a === 'open-dead') { nav('dead.html', { state: 'dead', crate: v || crate, unit: qs.get('unit'), back: backHere() }); return; }
     else if (a === 'found-body') { nav('dead.html', { state: 'dead-found', unit: v, back: backHere() }); return; }
@@ -574,18 +573,25 @@
       location.href = '/ux/system/farrowing-astra-concept.html?' + new URLSearchParams({ state: 'farrowing', unit: L().room, crate: crate, sow: sow().sow, back: here() }).toString() + (PP.lang === 'zh' ? '&lang=zh' : '');
       return;
     }
-    else if (a === 'open-sow') { document.documentElement.setAttribute('data-door', 'open-sow:' + (v || '')); return; }
     else { document.documentElement.setAttribute('data-door', a + ':' + (v || '')); return; }
     render();
+    if (S.focus) { var f = document.querySelector(S.focus); S.focus = ''; if (f) f.focus({ preventScroll: true }); }
   });
+  // Swipe down on a sheet's grab or head = Back.
+  var grab = null;
+  document.getElementById('screen').addEventListener('pointerdown', function (ev) { if (ev.target.closest('.tk-grab, .tk-sheet-head')) grab = ev.clientY; }, true);
+  document.getElementById('screen').addEventListener('pointerup', function (ev) {
+    if (grab != null && ev.clientY - grab > 100) { if (back() !== 'nav') render(); }
+    grab = null;
+  }, true);
 
   PP.ready.then(function () {
     store = PP.open(spec.data || 'base', spec.save != null || spec.dead ? { session: false } : null);
     TODAY = store.today;                   // the clock is the store's (R1-15): store.now() advances with every record
     crate = qs.get('crate') || spec.crate || '';
     var room = +(qs.get('unit') || spec.room || 0);
-    S = { view: spec.view, observed: 0, rows: [], at: null, obsMs: 0, seen: null, pickRows: [], failed: false, receipt: null, deadRcpt: null, sure: null, more: {},
-      room: spec.view === 'explain' && !qs.get('crate') ? room : 0, line: spec.line || '', pick: spec.pick || '', from: '' };
+    S = { view: spec.view, sub: '', observed: 0, rows: [], at: null, obsMs: 0, seen: null, pickRows: [], failed: false, receipt: null, deadRcpt: null, sure: null, more: {},
+      room: spec.view === 'explain' && !qs.get('crate') ? room : 0, line: spec.line || '', pick: spec.pick || '', from: '', focus: '', lastView: '' };
     if (!L()) crate = 'A02';
     if (spec.kept) {
       var kk = spec.kept;
@@ -596,6 +602,7 @@
       if (spec.observed != null) { S.observed = spec.observed; touch(); }
       if (spec.rows) S.rows = spec.rows.slice();
     }
+    if (spec.sub) S.sub = spec.sub;
     // back from the dead drawer (Save): its receipt, handed over on this phone
     if (qs.get('saved') === 'dead') {
       try { var hr = JSON.parse(sessionStorage.getItem('pp-receipt:dead') || 'null'); sessionStorage.removeItem('pp-receipt:dead'); if (hr) S.deadRcpt = hr.parts; } catch (e) {}

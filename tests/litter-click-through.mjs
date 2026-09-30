@@ -243,7 +243,7 @@ try {
   await page.waitForURL(/count\.html/); await ready(page);
   await page.click('[data-action="step"][data-step="-1"]');
   await page.click('[data-st-context="drawer"] [data-action="back"]');      // the count drawer, then the count face
-  await page.waitForSelector('[data-st-context="drawer"]', { state: 'detached' });
+  await page.waitForSelector('[data-st-context="drawer"][data-view="count"]', { state: 'detached' });
   await page.waitForTimeout(450);
   await page.click('[data-action="back"]');
   await page.waitForURL(/state=litter/); await ready(page);
