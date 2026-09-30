@@ -217,6 +217,8 @@ label.tk-row { cursor: pointer; }
 .tk-footer-status[data-tone="red"] { color: var(--red); }
 .tk-footer-status + .tk-footer { border-top: 0; }
 .tk-footer-status.st-visually-hidden + .tk-footer { border-top: 1px solid var(--line); }
+/* The hidden status keeps the utility's 1px box (the slot's own padding and edge must not win) at its surface's corner. */
+.tk-footer-status.st-visually-hidden { top: 0; left: 0; width: 1px; height: 1px; padding: 0; border: 0; white-space: normal; }
 .tk-page > .tk-footer-status { padding-left: var(--space-gutter); padding-right: var(--space-gutter); }
 /* TaskHold's caption: farrowing's face (owner round 5: match farrowing): 9px/500 capitals, 0.07em apart, at 80%. */
 .tk-footer > .st-hold .st-hold-caption { font: 500 var(--type-hold-caption-size)/1.3 var(--font-sans); letter-spacing: 0.07em; text-transform: uppercase;

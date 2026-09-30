@@ -347,7 +347,9 @@
       const id = status.id || 'tk-footer-status';
       // Farrowing draws no line above a footer: the status is read (role=status, the primary's / hold's description) but
       // visually hidden, unless the page opts in (`visible: true`, e.g. after a tap on the waiting primary).
-      const vis = !!status.visible, hid = vis ? '' : ' st-visually-hidden';
+      // A line that carries a text action (`17 is right`) is shown unless the page says `visible: false`: its act must be
+      // reachable.
+      const vis = status.visible != null ? !!status.visible : !!status.action, hid = vis ? '' : ' st-visually-hidden';
       const act = vis && status.action ? button(Object.assign({ register: 'text' }, status.action)) : '';
       if (!vis) s = `<p class="tk-footer-status${hid}" id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>`;
       else s = act
