@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Task skeleton</title>
+<link rel="stylesheet" href="/ux/design-system/tokens.css">
+<link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="/ux/design-system/components/task-skeleton.css">
+<style>
+/* Gallery layout only: each pair is farrowing's screen (a 390×844 capture) beside the same screen built from the parts. */
+.tk-gallery { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--font-sans); }
+.tk-gallery-head { padding: var(--space-section) var(--space-gutter) 0; max-width: 812px; margin: 0 auto; }
+.tk-gallery-head h1 { margin: 0; font: 500 var(--type-page-title-size)/1.3 var(--font-sans); letter-spacing: -0.5px; }
+.tk-gallery-head p { margin: 6px 0 0; font: var(--type-description-size)/1.6 var(--font-sans); color: var(--muted); }
+.tk-pair { margin: var(--space-action-section) 0 0; }
+.tk-pair > h2 { margin: 0 auto var(--space-heading); padding: 0 var(--space-gutter); max-width: 812px; font: 500 var(--type-section-title-size)/1.5 var(--font-sans); }
+.tk-pair-grid { display: grid; gap: var(--space-section); }
+.tk-pair-col > h3 { margin: 0 0 8px; padding: 0 var(--space-gutter); font: 500 var(--type-group-label-size)/1.5 var(--font-sans); color: var(--muted); }
+.tk-pair-col > img { display: block; width: 100%; height: auto; }
+@media (min-width: 431px) {
+  .tk-pair-grid { grid-template-columns: repeat(2, var(--phone-width)); justify-content: center; gap: var(--space-action-section); }
+  .tk-pair-col > h3 { padding: 0; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="/ux/design-system/components/bundle.js"></script>
+<script src="/ux/design-system/components/task-skeleton.js"></script>
+<script>
+(function () {
+  'use strict';
+  var K = window.SentriTask, UI = window.SentriUI;
+  var q = new URLSearchParams(location.search), only = q.get('screen') || '';
+  var s = function (str, text, args) { return { text: text, str: str, args: args }; };
+  var n = function (v) { return s('tk.demo.n', String(v), { n: v }); };
+
+  // ---- the room list (farrowing's "Room list" preset) ----
+  function room(inert) {
+    var r = function (o) { return K.row(o); };
+    var groups = [
+      K.group({ title: s('tk.demo.pen', 'B1', { pen: 'B1' }), meta: s('tk.demo.sows.one', '· 1 sow'), door: { action: 'pen', value: 'B1', label: s('tk.demo.pen.aria', 'Pen B1, view details', { pen: 'B1' }) },
+        rows: r({ id: s('tk.demo.id', '000418', { id: '000418' }), chip: { text: 'Active', str: 'tk.demo.lens.active', tone: 'green' }, headline: s('tk.demo.alive_dead', '9 alive · 5 dead', { a: 9, d: 5 }), meta: s('tk.demo.meta.418', 'born 14 · 1h ago · G.H'), value: '000418' }) }),
+      K.group({ title: s('tk.demo.pen', 'B2', { pen: 'B2' }), meta: s('tk.demo.sows.one', '· 1 sow'), door: { action: 'pen', value: 'B2', label: s('tk.demo.pen.aria', 'Pen B2, view details', { pen: 'B2' }) },
+        rows: r({ id: s('tk.demo.id', '000392', { id: '000392' }), headline: s('tk.demo.due.tomorrow', 'Due tomorrow'), tone: 'forecast', meta: s('tk.demo.meta.392', 'parity 5 · 11 born last'), value: '000392' }) }),
+      K.group({ title: s('tk.demo.pen', 'B3', { pen: 'B3' }), meta: s('tk.demo.sows.many', '· 2 sows', { n: 2 }), door: { action: 'pen', value: 'B3', label: s('tk.demo.pen.aria', 'Pen B3, view details', { pen: 'B3' }) },
+        rows: [r({ id: s('tk.demo.id', '000406', { id: '000406' }), chip: { text: 'Done', str: 'tk.demo.lens.done' }, headline: s('tk.demo.alive_dead', '11 alive · 2 dead', { a: 11, d: 2 }), meta: s('tk.demo.meta.406', 'born 13 · final 05:58 · G.H'), trail: 'edit', value: '000406' }),
+          r({ id: s('tk.demo.id', '000399', { id: '000399' }), chip: { text: 'Sow died', str: 'tk.demo.chip.died', tone: 'red' }, headline: s('tk.demo.alive_dead', '7 alive · 3 dead', { a: 7, d: 3 }), meta: s('tk.demo.meta.399', 'born 10 · yesterday · L.M'), value: '000399' })] }),
+      K.group({ title: s('tk.demo.pen', 'B4', { pen: 'B4' }), meta: s('tk.demo.sows.many', '· 3 sows', { n: 3 }), door: { action: 'pen', value: 'B4', label: s('tk.demo.pen.aria', 'Pen B4, view details', { pen: 'B4' }) },
+        rows: [r({ id: s('tk.demo.id', '000455', { id: '000455' }), headline: s('tk.demo.due.today', 'Due today'), meta: s('tk.demo.meta.455', 'parity 2 · 12 born last'), value: '000455' }),
+          r({ id: s('tk.demo.id', '000431', { id: '000431' }), headline: [s('tk.demo.overdue', 'Overdue'), { sep: true }, { text: '3 days', str: 'tk.demo.days3', tone: 'red' }], meta: s('tk.demo.meta.431', 'parity 6 · 9 born last'), value: '000431' }),
+          r({ id: s('tk.demo.id', '000467', { id: '000467' }), headline: s('tk.demo.due.in2', 'Due in 2 days'), tone: 'forecast', meta: s('tk.demo.meta.467', 'parity 5 · 10 born last'), value: '000467' })] })
+    ];
+    var body = K.latest({ lead: s('tk.demo.latest.lead', 'Last record'), value: s('tk.demo.latest.time', '08:41'), rest: s('tk.demo.latest.who', '· G. Hansen') }) +
+      K.summary({
+        unit: { icon: 'grid', heading: s('tk.demo.unit', 'Unit 7'), value: n(10), description: s('tk.demo.unit.desc', 'Live / litter'), support: s('tk.demo.unit.target', 'Target 12'), supportTone: 'amber' },
+        task: { icon: 'record', heading: s('tk.demo.overview', 'Task overview'), count: n(7), of: s('tk.demo.of', '/ 18', { n: 18 }), description: s('tk.demo.farrowed', 'Farrowed'), scope: s('tk.demo.scope', '· all units'),
+          segments: [{ tone: 'done', share: 7 / 18 * 100 }, { tone: 'active', share: 2 / 18 * 100 }, { tone: 'rest', share: 9 / 18 * 100 }], max: 18, now: 7,
+          support: s('tk.demo.support', '2 active · 9 awaiting'), label: s('tk.demo.overview.aria', 'Task overview, all units, 7 of 18 farrowed'), action: 'task-overview' }
+      }) +
+      K.lens({ action: 'lens', filter: { action: 'filter', label: s('tk.demo.filter', 'Filter sows') }, tabs: [
+        { text: s('tk.demo.lens.awaiting', 'Awaiting'), count: n(4), value: 'awaiting' },
+        { text: s('tk.demo.lens.active', 'Active'), count: n(1), value: 'active' },
+        { text: s('tk.demo.lens.done', 'Done'), count: n(2), value: 'done' },
+        { text: s('tk.demo.lens.all', 'All'), count: n(7), value: 'all', pressed: true }] }) +
+      K.list(groups);
+    var tools = [{ icon: 'search', action: 'search', label: s('tk.demo.search', 'Search ear tag') }]; tools.label = s('tk.demo.tools', 'Farrowing tools');
+    return K.screen({ inert: inert, label: s('tk.demo.room', 'Unit 7 farrowing sows'),
+      header: K.header({ title: s('tk.demo.task', 'Farrowing'), back: { action: 'home' } }),
+      body: body,
+      dock: K.dock({ primary: { icon: 'scan', label: s('act.scan', 'Scan ear tag'), action: 'scan' }, tools: tools }) });
+  }
+
+  function stepper(key, str, text, v) {
+    return UI.stepper({ label: text, value: v, key: key, action: 'step',
+      strs: { label: str, value: 'tk.demo.n', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' } });
+  }
+
+  // ---- Finish farrowing: a drawer sized to its content, closed by a hold ----
+  function finish() {
+    var facts = UI.facts([
+      { label: 'Born', value: 14, strs: { label: 'tk.demo.born', value: 'tk.demo.n' }, args: { value: { n: 14 } } },
+      { label: 'Alive', value: 9, strs: { label: 'tk.demo.alive', value: 'tk.demo.n' }, args: { value: { n: 9 } } },
+      { label: 'Dead', value: 5, strs: { label: 'tk.demo.dead', value: 'tk.demo.n' }, args: { value: { n: 5 } } }], { columns: 3 });
+    return K.drawer({ size: 'long', view: 'finish',
+      title: s('tk.demo.finish', 'Finish farrowing'), subtitle: s('tk.demo.finish.sub', '000418 · B1 · Parity 3'),
+      body: facts + stepper('weak', 'tk.demo.weak', 'Weak', 1) + stepper('deformed', 'tk.demo.deformed', 'Deformed', 1),
+      footer: K.footer({ back: { action: 'back' }, hold: { label: s('tk.demo.finish', 'Finish farrowing'), caption: s('tk.demo.finish.hold', 'Hold to finish'), action: 'finish', tone: 'primary' } }) });
+  }
+
+  // ---- Dead: a drawer held at full height (its content grows as the worker taps) ----
+  function dead() {
+    var causes = [['stillborn', 'tk.demo.c.stillborn', 'Stillborn', 1], ['mummified', 'tk.demo.c.mummified', 'Mummified', 1], ['crushed', 'tk.demo.c.crushed', 'Crushed', 3],
+      ['scours', 'tk.demo.c.scours', 'Scours', 0], ['starve', 'tk.demo.c.starve', 'Starve-out', 0], ['other', 'tk.demo.c.other', 'Other', 1]];
+    return K.drawer({ size: 'long', height: 'full', view: 'dead',
+      title: s('tk.demo.dead.title', 'Dead 6', { n: 6 }), subtitle: [s('tk.demo.dead.sub', 'Born dead or died'), { sep: true }, { text: '1 unsaved', str: 'tk.demo.dead.unsaved', tone: 'green' }],
+      aside: UI.button({ label: 'Clear', register: 'text', action: 'clear', strs: { label: 'act.clear' } }),
+      body: UI.segment({ action: 'dead-mode', active: 'piglets', ariaLabel: 'Who died', options: [['piglets', '', { strs: { label: 'tk.demo.piglets' } }], ['sow', '', { strs: { label: 'tk.demo.sow' } }]] }) +
+        causes.map(function (c) { return stepper(c[0], c[1], c[2], c[3]); }).join(''),
+      footer: K.footer({ back: { action: 'back' }, primary: { label: s('act.save', 'Save'), action: 'save' } }) });
+  }
+
+  // ---- The record page ----
+  function page() {
+    var e = function (t, m, d) { var x = { title: '', meta: '', strs: { title: t, meta: m } }; if (d) { x.detail = ''; x.strs.detail = d; } return x; };
+    var log = UI.log([
+      { label: '', strs: { label: 'tk.demo.log.d1' }, entries: [e('tk.demo.log.e1', 'tk.demo.log.e1m')] },
+      { label: '', strs: { label: 'tk.demo.log.d2' }, entries: [e('tk.demo.log.e2', 'tk.demo.log.e2m')] },
+      { label: '', strs: { label: 'tk.demo.log.d3' }, entries: [e('tk.demo.log.e3', 'tk.demo.log.e3m'), e('tk.demo.log.e4', 'tk.demo.log.e4m', 'tk.demo.log.e4d')] }]);
+    return K.page({ title: s('tk.demo.log', 'Farrowing log'), description: s('tk.demo.log.sub', 'B1 · 000418 · born 14 · 8 alive now'), body: log, footer: K.footer({ back: { action: 'back' } }) });
+  }
+
+  // ---- A dialog over a drawer ----
+  function dialog() {
+    var under = K.drawer({ size: 'long', height: 'full', title: s('tk.demo.edit', 'Edit record'), subtitle: s('tk.demo.edit.sub', '000418 · B1'),
+      body: stepper('stillborn', 'tk.demo.c.stillborn', 'Stillborn', 1) + stepper('crushed', 'tk.demo.c.crushed', 'Crushed', 2),
+      footer: K.footer({ back: { action: 'back' }, primary: { label: s('act.save', 'Save'), action: 'save' } }) });
+    var what = UI.segment({ action: 'born-mode', active: 'more', ariaLabel: 'What changed', options: [['more', '', { strs: { label: 'tk.demo.born.more' } }], ['wrong', '', { strs: { label: 'tk.demo.born.wrong' } }]] }) +
+      stepper('born-add', 'tk.demo.born.add', 'Additional born', 1);
+    return '<div inert>' + under + '</div>' + K.dialog({ icon: 'edit', title: s('tk.demo.born.title', 'Born 14 · correct it'), description: s('tk.demo.born.desc', 'Choose what changed.'),
+      body: what, footer: K.footer({ back: { action: 'back' }, primary: { label: s('tk.demo.apply', 'Apply'), action: 'apply' } }) });
+  }
+
+  var screens = {
+    room: function () { return K.phone(room(false)); },
+    sheet: function () { return K.phone(room(true) + finish()); },
+    full: function () { return K.phone(room(true) + dead()); },
+    page: function () { return K.phone(room(true) + page()); },
+    dialog: function () { return K.phone(room(true) + dialog()); }
+  };
+  var refs = { room: 'room', sheet: 'finish', full: 'draft', page: 'history', dialog: 'born' };
+  var el = document.getElementById('root');
+  if (screens[only]) {
+    // One screen, on the harness: framed 390×844 on a wide window, full-bleed on a phone.
+    document.body.className = 'tk-stage';
+    el.outerHTML = screens[only]();
+  } else {
+    document.body.className = 'tk-gallery';
+    var h = function (tag, str, text) { return '<' + tag + ' data-str="' + str + '">' + text + '</' + tag + '>'; };
+    el.outerHTML = '<header class="tk-gallery-head">' + h('h1', 'tk.demo.title', 'Task skeleton') + h('p', 'tk.demo.lead', '') + '</header>' +
+      Object.keys(screens).map(function (k) {
+        return '<section class="tk-pair">' + h('h2', 'tk.demo.pair.' + k, '') + '<div class="tk-pair-grid">' +
+          '<div class="tk-pair-col">' + h('h3', 'tk.demo.col.ref', '') + '<img src="/ux/design-system/assets/task-skeleton/farrowing-' + refs[k] + '.png" width="390" height="844" alt=""></div>' +
+          '<div class="tk-pair-col">' + h('h3', 'tk.demo.col.parts', '') + screens[k]() + '</div></div></section>';
+      }).join('');
+  }
+  // Live: lens tabs toggle; the hold runs (nothing is recorded).
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest('.tk-lens-tab');
+    if (!b) return;
+    b.parentNode.querySelectorAll('.tk-lens-tab').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+  });
+  var t = function (id) { return window.PP ? window.PP.t(id) : id; };
+  var holds = UI.holdBind(document.body, { t: t, onCommit: function (x) { setTimeout(function () { holds.settle(x, 'done'); }, 600); } });
+})();
+</script>
+<script src="/ux/tasks/piglet-processing/shell.js"></script>
+</body>
+</html>
