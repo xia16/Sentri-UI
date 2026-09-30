@@ -259,7 +259,7 @@
   }
   function reviewRow(r) {
     var t = reviewTitle(r), d = reviewDesc(r);
-    return UI.row({ title: '', description: '', action: 'open-review', value: r.id, strs: { title: t[0], description: d[0] }, args: { title: t[1], description: d[1] } });
+    return K.door({ title: P(t[0], t[1]), description: P(d[0], d[1]), action: 'open-review', value: r.id });
   }
   // The receipt's review list: the items End froze; answered since, they move to Since End.
   function frozenReviews() { var R = store.select.reviews(D()), open = {}; R.items.forEach(function (x) { open[x.id] = 1; }); return (fig(true).reviews || []).filter(function (r) { return open[r.id]; }); }
@@ -313,11 +313,11 @@
       return K.group({ face: 'word', title: P('pp.end.row', { r: r }), meta: P(one('pp.end.row.meta', g[r].length), { n: g[r].length }), rows: g[r].map(rowFn) });
     }).join('');
   }
-  // A door row (Row card): one title, one description line.
+  // A non-animal door (TaskRow door, farrowing's disclosure): one title, one description line, a chevron.
   function door(action, titleId, titleArgs, descId, descArgs, value) {
-    return UI.row({ title: '', description: descId ? '' : undefined, action: action, value: value || '', strs: Object.assign({ title: titleId }, descId ? { description: descId } : {}), args: { title: titleArgs, description: descArgs } });
+    return K.door({ title: P(titleId, titleArgs), description: descId ? P(descId, descArgs) : '', action: action, value: value || '' });
   }
-  function doors(list) { return UI.rowGroup(list.join('')); }
+  function doors(list) { return '<div class="en-doors">' + list.join('') + '</div>'; }
   function sec(o) { return h(Object.assign({ kind: 'section', level: 3 }, o)); }
 
   /* ---- farrowing's task-overview parts: the whole-task progress card, the metrics ---- */
@@ -357,7 +357,7 @@
   function reviewsBlock(list, frozenAtEnd) {
     if (!list.length) return '';
     return '<div class="en-block">' + sec({ strs: { title: frozenAtEnd ? 'pp.end.rev.frozen' : 'pp.end.rev.open', meta: one('pp.end.v.items', list.length) }, args: { meta: { n: list.length } } }) +
-      rows(list.map(reviewRow).join('')) + '</div>';
+      doors(list.map(reviewRow)) + '</div>';
   }
   // Already ended (a second End, or the overview after End): who ended it and when, before any hold (R1-13).
   function alreadyBlock(al) {
@@ -395,7 +395,7 @@
   /* ---- the pages (TaskPage): each a full page over the room, head, body, footer ---- */
   function behind() { return K.screen({ inert: true, header: K.header({ title: P('pp.common.task'), back: { action: 'noop' } }) }); }
   function page(titleId, titleArgs, descId, descArgs, body, footer) {
-    return K.page({ title: P(titleId, titleArgs), description: descId ? P(descId, descArgs) : '', body: '<div class="en-body">' + body + '</div>', footer: footer });
+    return K.page({ view: S.sheet || (S.ended ? 'ended' : 'overview'), title: P(titleId, titleArgs), description: descId ? P(descId, descArgs) : '', body: '<div class="en-body">' + body + '</div>', footer: footer });
   }
   function backOnly(action) { return K.footer({ back: { action: action || 'close-sheet' } }); }
 
@@ -530,7 +530,7 @@
     var body = d.order.map(function (who) {
       var list = d.by[who].slice().sort(function (a, b) { return a.at < b.at ? 1 : -1; });
       return '<div class="en-block">' + h({ kind: 'group', strs: { title: 'pp.end.day.who', meta: one('pp.end.day.n', list.length) }, args: { title: { who: who }, meta: { n: list.length } } }) +
-        rows(list.map(function (e) { var w = words(e); return UI.row({ title: '', description: '', action: 'open-record', value: e.litter || e.from, strs: { title: w[0], description: 'pp.end.day.at' }, args: { title: w[1], description: { t: time(e.at) } } }); }).join('')) + '</div>';
+        doors(list.map(function (e) { var w = words(e); return door('open-record', w[0], w[1], 'pp.end.day.at', { t: time(e.at) }, e.litter || e.from); })) + '</div>';
     }).join('');
     return page('pp.end.day.title', null, 'pp.end.day.desc', null, body, backOnly());
   }
@@ -563,9 +563,9 @@
     });
     atEnd.forEach(function (l) { arrivalsNotDone(l).forEach(function (a) { add('owed', a.k, a.n, l.code); }); });
     var ndTotal = sum(groups, function (g) { return g.n; });
-    var nd = groups.map(function (g) {
-      return UI.row({ title: '', action: 'open-litter', value: g.codes[0], strs: { title: g.kind === 'missed' ? 'pp.end.u.missed' : 'pp.end.w.u.' + g.kind, description: g.since ? 'pp.end.w.since' : 'pp.end.codes' }, args: { title: { name: name(g.k), n: g.n }, description: { list: g.codes.join(' ') } } });
-    }).join('');
+    var nd = groups.length && groups.map(function (g) {
+      return door('open-litter', g.kind === 'missed' ? 'pp.end.u.missed' : 'pp.end.w.u.' + g.kind, { name: name(g.k), n: g.n }, g.since ? 'pp.end.w.since' : 'pp.end.codes', { list: g.codes.join(' ') }, g.codes[0]);
+    });
     var weighed = litters(false).filter(function (l) { return store.weights(l.code).some(function (x) { return x.day === WEIGH_DAY; }); }).length;
     var weighAhead = litters(false).filter(function (l) { return !store.weights(l.code).some(function (x) { return x.day === WEIGH_DAY; }) && l.day < WEIGH_DAY; }).length;
     var body = UI.facts([
@@ -574,7 +574,7 @@
       { label: '', strs: { label: 'pp.end.w.weights', value: 'pp.end.v.litters_of', meta: weighAhead ? one('pp.end.w.weights.ahead', weighAhead) : undefined }, args: { value: { n: weighed, k: now.litters }, meta: { n: weighAhead, day: WEIGH_DAY } } },
       { label: '', strs: { label: 'pp.end.out.loss', value: 'pp.end.out.open', meta: loss.loss ? 'pp.end.codes' : undefined }, args: { value: { n: loss.loss }, meta: { list: loss.lossC.join(' ') } } }
     ], { columns: 2 }) +
-      (nd ? '<div class="en-block">' + sec({ strs: { title: 'pp.end.nd.title', meta: pd(ndTotal) }, args: { meta: { n: ndTotal } } }) + rows(nd) + '</div>' : '') +
+      (nd ? '<div class="en-block">' + sec({ strs: { title: 'pp.end.nd.title', meta: pd(ndTotal) }, args: { meta: { n: ndTotal } } }) + doors(nd) + '</div>' : '') +
       reviewsBlock(frozenReviews(), true) +
       '<div class="en-block">' + sec({ strs: { title: 'pp.end.w.litters', meta: one('pp.end.v.litters', now.litters) }, args: { meta: { n: now.litters } } }) + groupsOf(byRow(litters(false), perLitter)) + '</div>';
     return page('pp.end.w.title', null, 'pp.end.w.desc', { n: UNIT }, body, backOnly());
