@@ -42,7 +42,8 @@
      down (roster: the tagged piglets a count names missing · held: the held-body question). ---- */
   var STATES = {
     'count':           { view: 'count', crate: 'A02' },
-    'host':            { view: 'host', crate: 'A02' },
+    // the litter's counts are the litter drawer's (round 5): these states forward there (`litter`), after what they record
+    'host':            { view: 'litter', crate: 'A02' },
     // R1-27: a count far above Alive asks before it saves; 0 asks "moved or weaned?"; a kept 0 asks again (never a stale 0 ready)
     'count-high':      { view: 'count', crate: 'A02', observed: 42 },
     'count-zero':      { view: 'count', crate: 'A02', observed: 0 },
@@ -54,30 +55,30 @@
     'count-held':      { view: 'count', crate: 'A07', data: 'held-body' },
     'count-held-ask':  { view: 'count', crate: 'A07', data: 'held-body', sub: 'held' },
     // R1-20: a concurrent count that agrees net of a death its phone had not seen
-    'count-agree':     { view: 'host', crate: 'A07', data: 'count-agree' },
+    'count-agree':     { view: 'count', crate: 'A07', data: 'count-agree' },
     // round 4: a counted gain owes nothing new — "check on the pig"; a body never explains a gain
     'explain-gain':    { view: 'explain', crate: 'B08', data: 'explain' },
     // R1-26: back on Explain after a body found from its line: the dead drawer's receipt, `all missing found`
     'found-saved':     { view: 'explain', crate: 'D03', dead: { lines: [{ cause: 'crushed', n: 2 }], fromMissing: 2 } },
-    'count-match':     { view: 'host', crate: 'A02', save: 12 },
-    'count-loss':      { view: 'host', crate: 'A02', save: 10 },
-    'count-gain':      { view: 'host', crate: 'A02', save: 13 },
+    'count-match':     { view: 'litter', crate: 'A02', save: 12 },
+    'count-loss':      { view: 'litter', crate: 'A02', save: 10 },
+    'count-gain':      { view: 'litter', crate: 'A02', save: 13 },
     'count-recount':   { view: 'count', crate: 'D03', observed: 13 },
     'count-named':     { view: 'count', crate: 'B06', observed: 8 },
     'count-named-list': { view: 'count', crate: 'B06', observed: 8, sub: 'roster' },
-    'count-kept':      { view: 'host', crate: 'A02', kept: { observed: 10, rows: [], at: '2026-09-29T06:00', ageMin: 270 } },
+    'count-kept':      { view: 'litter', crate: 'A02', kept: { observed: 10, rows: [], at: '2026-09-29T06:00', ageMin: 270 } },
     'count-kept-newer': { view: 'count', crate: 'A02', data: 'drift', kept: { observed: 10, rows: [], at: '2026-09-29T08:50', ageMin: 20, seen: [] } },
     'count-prelock':   { view: 'count', crate: 'D01' },
     'count-weaned':    { view: 'count', crate: 'D02' },
     'count-ended':     { view: 'count', crate: 'A02', data: 'ended' },
-    'count-conflict':  { view: 'host', crate: 'A07', data: 'count-offline' },
+    'count-conflict':  { view: 'count', crate: 'A07', data: 'count-offline' },
     'explain':         { view: 'explain', crate: 'B06', data: 'explain' },
     'explain-suggest': { view: 'suggest', crate: 'B06', data: 'explain', line: 'C-B06-loss', pick: 'C-B08-gain' },
     'explain-pick':    { view: 'suggest', crate: 'B06', data: 'explain-named', line: 'C-B06-named', pick: 'C-B08-gain' },
     'explain-open':    { view: 'explain', crate: 'D03' },
     'explain-room':    { view: 'explain', room: 7, data: 'explain' },
     // RULINGS round 3: the same body recorded twice is held for review until a worker answers one body or two
-    'held-body':       { view: 'host', crate: 'A07', data: 'held-body' }
+    'held-body':       { view: 'count', crate: 'A07', data: 'held-body', sub: 'held' }
   };
   var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'count';
@@ -111,7 +112,7 @@
   /* ---- the draft stays on this phone with its observation time and the counts it had seen, saved on every change
      (sessionStorage); a state that shows a kept draft holds it in memory only ---- */
   var DKEY = function () { return 'pp-count-draft:' + store.name + ':' + crate; };
-  var mem = spec.kept ? { d: null } : null;
+  var mem = spec.kept && spec.view !== 'litter' ? { d: null } : null;
   function keepDraft() {
     var d = dirty() ? { observed: S.observed, rows: S.rows.slice(), at: S.at, obsMs: S.obsMs, seen: S.seen } : null;
     if (mem) { mem.d = d; return; }
@@ -173,15 +174,16 @@
      in the record). A body saved from this page's doors comes back with the dead drawer's own receipt. ---- */
   function tok(id, args, tone) { return { text: PP.t(id, args), strs: { text: id }, args: args ? { text: args } : undefined, tone: tone || '' }; }
   function receiptLine() {
-    if (S.deadRcpt) return UI.statusLine(S.deadRcpt.map(function (p) { return tok(p.id, p.args, p.tone); }), { live: true, id: 'ct-receipt' });
-    var r = S.receipt;
-    if (!r) return '';
-    var n = Math.abs(r.diff), toks = [tok('receipt.saved')];
-    function part(id, tone) { return [tok(id), tok('pp.count.rcpt.n', { n: n }, tone), tok(pl('pp.count.rcpt.unit', n))]; }
-    if (r.kind === 'loss') toks.push(part('pp.count.rcpt.loss', 'red'));
-    else if (r.kind === 'gain') { toks.push(part('pp.count.rcpt.gain', 'progress')); toks.push(tok('pp.count.rcpt.check')); }
-    else toks.push(tok('pp.count.rcpt.match'));
-    return UI.statusLine(toks, { live: true, sep: 'dot', tight: PP.lang === 'zh', id: 'ct-receipt' });
+    if (!S.deadRcpt) return '';
+    return UI.statusLine(S.deadRcpt.map(function (p) { return tok(p.id, p.args, p.tone); }), { live: true, id: 'ct-receipt' });
+  }
+  // What Save wrote, handed to the litter drawer it returns to (`pp-receipt:count`, parts as the dead drawer's)
+  function receiptParts(kind, diff) {
+    var k = Math.abs(diff), parts = [{ id: 'receipt.saved' }];
+    if (kind === 'loss') parts.push({ id: 'pp.count.rcpt.loss_line', args: { kp: np(k) }, tone: 'red' });
+    else if (kind === 'gain') parts.push({ id: 'pp.count.rcpt.gain_line', args: { kp: np(k) }, tone: 'blue' }, { id: 'pp.count.rcpt.check_line' });
+    else parts.push({ id: 'pp.count.rcpt.match_line' });
+    return parts;
   }
 
   /* ---- The same body recorded twice (RULINGS round 3): the second allocation of one missing piglet is held — Dead and
@@ -198,47 +200,23 @@
     if (!h) return '';
     var first = null;
     x.deaths.forEach(function (d) { if (!first && d.id !== h.event && d.fromMissing > 0) first = d; });
-    var body = UI.rowGroup(row({ action: 'resolve', value: h.event + '|one', title: 'pp.count.held.one', desc: 'pp.count.held.one_short', descArgs: { ap: np(x.alive) } }) +
-      row({ action: 'resolve', value: h.event + '|two', title: 'pp.count.held.two', desc: 'pp.count.held.two_short', descArgs: { ap: np(Math.max(0, x.alive - h.n)) } }));
+    // farrowing's dialog: one question, the answers as radios, Back + Apply (Apply waits until an answer is picked)
+    var pick = S.heldPick || '';
+    var body = UI.choiceRadios({ label: '', layout: 'rows', action: 'held-pick', key: 'held', selected: pick, id: 'held-answer', options: [
+      { value: 'one', label: '', strs: { label: 'pp.count.held.one', meta: 'pp.count.held.one_short' }, args: { meta: { ap: np(x.alive) } }, meta: '' },
+      { value: 'two', label: '', strs: { label: 'pp.count.held.two', meta: 'pp.count.held.two_short' }, args: { meta: { ap: np(Math.max(0, x.alive - h.n)) } }, meta: '' }] });
+    var apply = { label: s('pp.count.held.apply'), action: 'resolve', value: pick ? h.event + '|' + pick : '', waiting: !pick };
     return K.dialog({ title: s('pp.count.held.title'), description: s('pp.count.held.ask', { a: first ? first.who : '', b: h.who }), body: body,
-      footer: K.footer({ back: { action: 'sub-back' } }) });
+      footer: K.footer({ back: { action: 'sub-back' }, primary: apply }) });
   }
 
-  /* ---- The litter's counts (where Save lands): what the count wrote, the litter's figures, a kept draft, a held body, a
-     count to settle, and the open lines with their doors. Back returns to the litter drawer; Set count counts again. ---- */
-  function hostFacts() {
-    var x = L(), items = [];
-    if (x.phase === 'locked') items.push(fact('label.born', null, pigs(x.born).id, pigs(x.born).args));
-    items.push(fact('label.alive', null, pigs(x.alive).id, pigs(x.alive).args));
-    items.push(fact('label.dead', null, pigs(x.dead.total).id, pigs(x.dead.total).args));
-    return UI.facts(items, { columns: items.length });
-  }
-  // A kept draft shows its age: the observation it holds, when it was counted, and what the record says now.
-  function keptRow() {
-    var k = keptDraft();
-    if (!k) return '';
-    return UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.kept.title', titleArgs: { np: np(k.observed) },
-      desc: 'pp.count.kept.desc', descArgs: { t: when(k.at), rp: np(L().alive) } }));
-  }
-  function explain0() { return store.select.explain(store.derived, { litter: crate }, { who: window.PPFixtures.ME }).lines; }
-  // One open line opens its doors right here; several lead to Explain.
-  function openSection() {
-    var lines = explain0();
-    if (!lines.length) return '';
-    if (lines.length === 1) return lineSection(lines[0], false);
-    var rows = lines.map(function (l) {
-      var t = lineTitle(l), st = lineStamp(l);
-      return row({ action: 'open-explain', value: crate, title: t.id, titleArgs: t.args, desc: st.id, descArgs: st.args, trail: 'pp.count.act.explain' });
-    }).join('');
-    return '<section class="ct-group">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.count.open.title' } }) + UI.rowGroup(rows) + '</section>';
-  }
   /* Two counts to settle: disagreeing (neither saw the other: neither stands) or under sync review (one missed a change).
-     One row; the counts themselves are said in its meta, and a new count settles it. */
+     One still row above the number: the counts are said in its meta, and this count settles it. */
   function settleRow(c) {
     if (c.conflict) {
       var list = c.counts.filter(function (k) { return c.disputed.indexOf(k.id) >= 0; })
         .map(function (k) { return PP.t('pp.count.review.one', { who: k.who, np: np(k.observed) }); }).join(' · ');
-      return UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.review.conflict', desc: 'pp.count.review.conflict_row', descArgs: { list: list } }));
+      return UI.rowGroup(row({ action: '', value: '', title: 'pp.count.review.conflict', desc: 'pp.count.review.conflict_row', descArgs: { list: list } }));
     }
     if (!c.review) return '';
     var st = c.counts.filter(function (k) { return k.stands; })[0];
@@ -251,24 +229,15 @@
       var o = eventOf(st.order[0]) || {};
       desc = 'pp.count.review.order'; dargs.who = o.who || ''; dargs.t = U.time(o.at || st.at);
     }
-    return UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.review.title', desc: desc, descArgs: dargs }));
+    return UI.rowGroup(row({ action: '', value: '', title: 'pp.count.review.title', desc: desc, descArgs: dargs }));
   }
   // R1-20: two counts that saw the same crate, net of a change one phone had not seen: one observation, nothing to settle
   function agreeRow(c) {
     var k = c.counts.filter(function (x) { return x.agreesNet; })[0];
     if (!k) return '';
-    return UI.rowGroup(row({ action: 'open-count', value: crate, title: 'pp.count.agree.title', titleArgs: { np: np(k.observed) },
+    return UI.rowGroup(row({ action: '', value: '', title: 'pp.count.agree.title', titleArgs: { np: np(k.observed) },
       desc: 'pp.count.c.agrees', descArgs: { who: (eventOf(k.agreesWith[0]) || {}).who || '' } }));
   }
-  function hostSheet() {
-    var c = store.select.counts(store.derived, crate) || { counts: [] };
-    var body = receiptLine() + hostFacts() + keptRow() + heldRow() + settleRow(c) + agreeRow(c) + openSection();
-    return K.drawer({ size: 'long', view: 'host', title: s('pp.count.c.title'), subtitle: subtitleOf(), close: { action: 'dismiss' },
-      body: '<div class="ct-body">' + body + '</div>',
-      footer: K.footer({ back: { action: 'back' }, primary: { label: s('pp.count.title'), action: 'open-count', value: crate } }),
-      scrim: { action: 'dismiss' } });
-  }
-
   /* ---- the Set count drawer: a staged assertion (Back keeps the draft, Clear discards it, Save writes one stamped count) ---- */
   function hint(d) {
     if (d.kind === 'match') return { id: 'pp.count.hint.match' };
@@ -322,6 +291,7 @@
     return '<section class="ct-group" data-target="zero">' + UI.heading({ title: '', kind: 'group', level: 3, strs: { title: 'pp.count.zero.title' }, args: { title: { code: crate } } }) +
       UI.rowGroup(row({ action: 'open-move', value: crate, title: 'pp.count.zero.move', titleArgs: { code: crate }, desc: 'pp.count.zero.move_desc' })) + '</section>';
   }
+  function settleRows() { var c = store.select.counts(store.derived, crate) || { counts: [] }; return settleRow(c) + agreeRow(c); }
   function countSheet() {
     var d = draft(), h = hint(d), p = pointer(d);
     var hero = UI.stepper({ label: '', value: S.observed, min: 0, key: 'observed', variant: 'hero', draft: dirty(), hint: '', reserveHint: true,
@@ -330,7 +300,7 @@
     // a held body is answered here too, above the number (R1-22): the drawer never hides the question under it
     return K.drawer({ size: 'long', view: 'count', title: s('pp.count.title'), subtitle: subtitleOf(),
       aside: dirty() ? UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '', close: { action: 'dismiss' },
-      body: '<div class="ct-body">' + heldRow() + hero + sureAct(p) + zeroSection(d) + rosterRow(d) + '</div>',
+      body: '<div class="ct-body">' + heldRow() + settleRows() + hero + sureAct(p) + zeroSection(d) + rosterRow(d) + '</div>',
       footer: saveFooter(p, !d.event || !!stale() || S.failed || !!sanity(d)), scrim: { action: 'dismiss' } });
   }
 
@@ -452,7 +422,6 @@
     }
     else if (S.view === 'explain') { html = explainPage(); if (S.sub === 'held') over = heldDialog(); }
     else if (S.view === 'suggest') { var dr = suggestSheet(); html = dr ? explainPage(true) + dr : explainPage(); }
-    else { html = hostSheet(); if (S.sub === 'held') over = heldDialog(); }
     if (over) html = '<div inert>' + html + '</div>' + over;
     var root = document.getElementById('screen');
     var body = root.querySelector('.tk-sheet .tk-sheet-body, .tk-page .tk-page-body'), top = body ? body.scrollTop : 0, view = S.view + ':' + S.sub;
@@ -470,10 +439,9 @@
   // The variant always travels (`data=base` too): a page whose state names its own variant must not fall back to it.
   function nav(page, params) { location.href = PP.href(page, Object.assign({ data: store.name }, params)); }
   function here() { return location.pathname + location.search; }
-  // the way back to this view (the dead drawer returns here, with its receipt): Explain for the room or a litter, or the litter's counts
+  // the way back to Explain (the dead drawer returns here, with its receipt), for the room or a litter
   function backHere() {
-    if (S.view === 'explain' || S.view === 'suggest') return PP.href('count.html', S.room ? { state: 'explain', unit: S.room, data: store.name } : { state: 'explain', crate: crate, unit: qs.get('unit'), data: store.name });
-    return PP.href('count.html', { state: 'host', crate: crate, unit: qs.get('unit'), data: store.name });
+    return PP.href('count.html', S.room ? { state: 'explain', unit: S.room, data: store.name } : { state: 'explain', crate: crate, unit: qs.get('unit'), data: store.name });
   }
   function openCount(c) {
     if (c && c !== crate) { nav('count.html', { state: 'count', crate: c }); return; }
@@ -490,22 +458,20 @@
     if (!d.event) return false;
     var r = store.commit(Object.assign({}, d.event, { at: S.at || store.now() }));
     if (!r.ok) { S.failed = true; return false; }
-    S.receipt = { kind: d.kind, diff: d.diff };
-    dropDraft(); S.rows = []; S.at = null; S.view = 'host'; S.sub = ''; lastTap = Date.now();
+    try { sessionStorage.setItem('pp-receipt:count', JSON.stringify({ parts: receiptParts(d.kind, d.diff), litter: crate, event: r.event.id })); } catch (e) {}
+    dropDraft(); S.rows = []; S.at = null; lastTap = Date.now();
     return true;
   }
   function back() {
     if (S.sub) { var from = S.sub; S.sub = ''; S.focus = '[data-action="sub"][data-value="' + from + '"]'; return; }
-    if (S.view === 'count') { keepDraft(); S.view = 'host'; return; }
+    if (S.view === 'count') keepDraft();
     if (S.view === 'suggest') { S.view = 'explain'; return; }
-    if (S.view === 'explain' && S.from === 'host') { S.view = 'host'; S.from = ''; return; }
     if (S.view === 'explain' && S.room) { nav('room.html', { state: 'room', unit: S.room !== 7 ? S.room : '' }); return 'nav'; }
-    // the litter drawer over the room: where the litter's counts were opened. Transition: while the litter is still its
-    // own page (litter.html, being folded into the room as a drawer), counts opened from that page return to it.
-    nav(fromLitterPage() ? 'litter.html' : 'room.html', { state: 'litter', crate: crate, unit: qs.get('unit') });
+    toLitter('');
     return 'nav';
   }
-  function fromLitterPage() { try { return /\/litter\.html$/.test(new URL(document.referrer).pathname); } catch (e) { return false; } }
+  // the litter drawer over the room: where Set count and Explain were opened (with `saved=count`, the count's receipt)
+  function toLitter(saved) { nav('room.html', { state: 'litter', crate: crate, unit: qs.get('unit'), saved: saved }); }
   function goTo(target) {
     var t = document.querySelector('[data-target="' + target + '"]');
     if (t) { t.scrollIntoView({ block: 'center' }); var f = t.querySelector('input, button'); if (f) f.focus({ preventScroll: true }); }
@@ -535,12 +501,11 @@
         else if (sanity(dw) === 'zero') { if (S.sub) { S.sub = ''; render(); } goTo('zero'); }
         return;
       }
-      save();
+      if (save()) { toLitter('count'); return; }
     }
     else if (a === 'back') { if (back() === 'nav') return; }
     else if (a === 'sub') { S.sub = v; }
     else if (a === 'open-count') openCount(v);
-    else if (a === 'open-explain') { S.view = 'explain'; S.from = 'host'; S.room = 0; }
     else if (a === 'suggest') { var p = v.split('|'); S.line = p[0]; S.pick = p[1]; S.pickRows = []; S.view = 'suggest'; }
     else if (a === 'pick-named') {
       var sgn = suggestion(), j = S.pickRows.indexOf(v);
@@ -548,7 +513,10 @@
     }
     else if (a === 'more') { S.more[v] = true; }
     else if (a === 'edit-count') { var ec = v.split('|'); nav('edit.html', { state: 'edit', crate: ec[0], count: ec[1], from: 'count' }); return; }
+    else if (a === 'held-pick') { S.heldPick = v; }
     else if (a === 'resolve') {
+      if (UI.guard(b) || !v) return;
+      S.heldPick = '';
       var rv = v.split('|'), r = store.commit({ type: 'resolve', litter: crate, held: rv[0], answer: rv[1] });
       if (!r.ok) S.failed = true;
       S.sub = '';
@@ -586,16 +554,23 @@
   }, true);
 
   PP.ready.then(function () {
-    store = PP.open(spec.data || 'base', spec.save != null || spec.dead ? { session: false } : null);
+    store = PP.open(spec.data || 'base', spec.dead ? { session: false } : null);
     TODAY = store.today;                   // the clock is the store's (R1-15): store.now() advances with every record
     crate = qs.get('crate') || spec.crate || '';
     var room = +(qs.get('unit') || spec.room || 0);
     S = { view: spec.view, sub: '', observed: 0, rows: [], at: null, obsMs: 0, seen: null, pickRows: [], failed: false, receipt: null, deadRcpt: null, sure: null, more: {},
-      room: spec.view === 'explain' && !qs.get('crate') ? room : 0, line: spec.line || '', pick: spec.pick || '', from: '', focus: '', lastView: '' };
+      room: spec.view === 'explain' && !qs.get('crate') ? room : 0, line: spec.line || '', pick: spec.pick || '', focus: '', lastView: '' };
     if (!L()) crate = 'A02';
     if (spec.kept) {
-      var kk = spec.kept;
-      mem.d = { observed: kk.observed, rows: kk.rows || [], at: kk.at, obsMs: Date.now() - (kk.ageMin || 0) * 60000, seen: kk.seen || countIds() };
+      var kk = spec.kept, kd = { observed: kk.observed, rows: kk.rows || [], at: kk.at, obsMs: Date.now() - (kk.ageMin || 0) * 60000, seen: kk.seen || countIds() };
+      if (mem) mem.d = kd; else try { sessionStorage.setItem(DKEY(), JSON.stringify(kd)); } catch (e) {}
+    }
+    // a state of the litter's counts: the litter drawer shows them (after what the state records: a kept draft, a Save)
+    if (spec.view === 'litter') {
+      var saved = '';
+      if (spec.save != null) { openCount(); S.observed = spec.save; touch(); if (save()) saved = 'count'; }
+      location.replace(PP.href('room.html', { state: 'litter', crate: crate, unit: qs.get('unit'), data: store.name, saved: saved }));
+      return;
     }
     if (S.view === 'count') {
       openCount();
@@ -613,10 +588,10 @@
       if (dr.ok) S.deadRcpt = [{ id: 'receipt.saved' }].concat(spec.dead.lines.map(function (l) { return { id: 'ds.dead.receipt.line', args: { n: l.n, cause: PP.t('dead.' + l.cause) }, tone: 'green' }; }))
         .concat(L().unexplained.openLoss ? [{ id: 'ds.dead.receipt.missing', args: { n: L().unexplained.openLoss } }] : [{ id: 'pp.dead.rcpt.all_found' }]);
     }
-    if (spec.save != null) { openCount(); S.observed = spec.save; touch(); save(); lastTap = 0; }
     render();
     // staleness is read from this phone's clock at every check: re-check while the drawer is open
     setInterval(function () { if (S.view === 'count') render(); }, 30000);
+    UI.radioBind(document.getElementById('screen'), { onChange: function (field, value) { if (field === 'held') { S.heldPick = value; render(); } } });
   });
 })();
 </script>

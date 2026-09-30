@@ -37,7 +37,7 @@ try {
   assert.match(after, /Dock tail/);
   console.log('ok 1 room → litter → record iron → room:', before, '⇒', after);
 
-  // 2. room → litter → Record dead → Save → room: alive drops.
+  // 2. room → litter → Record death → Save → room: alive drops.
   await page.click('[data-action="open-litter"][data-value="A02"]');
   await page.waitForURL(/state=litter/); await ready(page);
   assert.match(await text(page, '.lt-summary'), /Alive 12/);
@@ -52,7 +52,7 @@ try {
   await page.waitForURL(/room\.html/); await ready(page);
   const dead = await rowText(page, 'A02');
   assert.match(dead, /11 piglets/);
-  console.log('ok 2 room → litter → Record dead → Save → room:', dead);
+  console.log('ok 2 room → litter → Record death → Save → room:', dead);
 
   // 3. room → filter iron → Record for several litters → tick 4 → review → Record → room: the four leave the iron filter.
   await page.goto(base + 'room.html?state=room&fresh=1'); await ready(page);

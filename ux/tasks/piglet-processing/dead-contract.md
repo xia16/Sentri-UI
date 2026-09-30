@@ -114,7 +114,7 @@ opened on>`; `route` is the litter a found body is being recorded on.
 - **Restore trims to changed truth and says so**: a picked row that died elsewhere, or tallies above
   a lowered cap, are dropped on reopen with one line naming what was dropped.
 - The host says a draft waits in words: `1 unsaved` (piglets, `pp.dead.unsaved`: `1头未保存`), `sow cause unsaved`
-  (sow). The host is the page the drawer was opened from (the litter's `Record dead` door); the drawer page has no
+  (sow). The host is the page the drawer was opened from (the litter's `Record death` door); the drawer page has no
   host of its own.
 
 ## Merge (per RULINGS' draft merge contract)
@@ -123,7 +123,7 @@ Allocations apply in log order until a loss is spent (aggregated per loss; each 
 reserved once). **The same body recorded twice is held for review (RULINGS round 3):** a body allocated
 to a loss already spent — two offline deaths for one missing piglet — is **not applied**: Dead and Alive
 stay (`Dead 1, Alive 9`), the death carries `held`, and it is flagged `sync review` (`held_body`) on the
-litter's count host and Explain (`count.html?state=held-body`), the record page and the console, until a
+litter drawer (a review row), the Set count drawer and Explain (`count.html?state=held-body`), the record page and the console, until a
 worker answers:
 
 ```
@@ -144,14 +144,14 @@ It is never silently a second death. Two deaths for one `rowId` keep the earlies
   body names the missing step (`Pick a cause for 271004`, `How many were missing?`); tapping the gray
   Save scrolls to that step, opening the tagged piglets when the step is there. An empty draft names itself only when Save is tapped.
 - Re-rendering keeps the body's scroll position and the focused control.
-- **Save and Back return to where the worker came from (R1-26)**: the page named by `back` (Explain, the count
-  host), else the litter drawer over the room (`room.html?state=litter&crate=A02`). There is no host stub and no extra Back. Save hands its receipt over on the phone
+- **Save and Back return to where the worker came from (R1-26)**: the page named by `back` (Explain), else the litter drawer over the room (`room.html?state=litter&crate=A02`). There is no host stub and no extra Back. Save hands its receipt over on the phone
   (`sessionStorage` `pp-receipt:dead` = `{ parts: [{ id, args, tone }], litter, from, event }`, and `saved=dead` on
   the URL); the page it returns to shows it (`Saved · +1 crushed · 1 missing still open`) and ignores taps for
   ~400 ms. Back from a drawer opened on Explain returns to Explain.
 - **A held body is shown where the next body is recorded (R1-22)**: the drawer leads with one row `Same body recorded
   twice? · G.H · 09:55 · held until you answer` when the litter has one unanswered; it opens the question as a dialog
-  (`L.M and G.H each took a body from the one missing piglet`) with its two answers (One body / Two bodies). The Set
+  (`L.M and G.H each took a body from the one missing piglet`) in farrowing's dialog form: the two answers as radios
+  (One body / Two bodies), Back + Apply (Apply waits until one is picked). The Set
   count drawer does the same above its number.
 - The sow's Save is hold-to-commit (Button `holdButton` + `holdBind`, ADR 0002: 850 ms, the card's slop, repeat
   guard and 400 ms arm floor): a plain tap says `Keep holding to save`, the status line beside the bar reports start
