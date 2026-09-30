@@ -50,9 +50,9 @@ try {
   // 3. Back to the room: the strip and B06's row show the open loss, beside B08's gain (never netted).
   await page.waitForTimeout(450);
   await page.click('[data-action="back"]');
-  // the litter drawer over the room (rebuilt in parallel), then the room
-  await page.waitForURL(/room\.html\?.*state=litter.*crate=B06/); await ready(page);
-  await page.goto(base + 'room.html?state=room&lens=all&data=gain-b08'); await ready(page);
+  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.click('[data-action="close"]');
+  await page.waitForURL(/room\.html/); await ready(page);
   const strip1 = await text(page, '[data-action="explain"]');
   assert.match(strip1, /Unexplained loss 3 B06 D03/); assert.match(strip1, /Unexplained gain 1 B08/); assert.match(strip1, /Net drift −2 piglets/);
   console.log('ok 3 room shows the open loss:', strip1);

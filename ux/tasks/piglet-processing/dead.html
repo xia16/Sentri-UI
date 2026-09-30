@@ -414,9 +414,14 @@
     if (surface === 'farrowing') return '/ux/system/farrowing-astra-concept.html';
     var b = qs.get('back');
     if (b && /^[a-z-]+\.html(\?[^#]*)?$/.test(b)) return b;
+    var p = { state: 'litter', crate: crate, unit: qs.get('unit'), data: store.name !== 'base' ? store.name : '' };
+    // Transition: while the litter is still its own page (litter.html, being folded into the room as a drawer), a drawer
+    // opened from that page returns to it. Delete this line when litter.html goes.
+    if (fromLitterPage()) return PP.href('litter.html', p);
     // the litter drawer over the room: where Record death was opened
-    return PP.href('room.html', { state: 'litter', crate: crate, unit: qs.get('unit'), data: store.name !== 'base' ? store.name : '' });
+    return PP.href('room.html', p);
   }
+  function fromLitterPage() { try { return /\/litter\.html$/.test(new URL(document.referrer).pathname); } catch (e) { return false; } }
   function leave(saved) {
     var u = backUrl();
     if (saved) u += (u.indexOf('?') >= 0 ? '&' : '?') + 'saved=' + saved;

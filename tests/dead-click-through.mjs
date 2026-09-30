@@ -18,13 +18,8 @@ const dialog = async (p) => (await p.locator('[role="dialog"]').last().innerText
 const log = (p, v) => p.evaluate((k) => JSON.parse(sessionStorage.getItem('pp-log:' + k) || '[]'), v);
 const stepValue = (p, cause) => p.locator(`[data-ds="Stepper"][data-field="${cause}"] [role="spinbutton"]`).innerText();
 
-// The dead drawer returns to the litter drawer over the room (`room.html?state=litter`, rebuilt in parallel): what the
-// litter shows after a Save is read from the ledger the room page opened (the same tab's store).
-const litterOf = (p, code, data) => p.evaluate(([c, v]) => { const L = PP.open(v).derived.litters[c]; return { alive: L.alive, dead: L.dead.total }; }, [code, data || 'base']);
-const toRoom = async (p, data) => { await p.goto(base + `room.html?state=room&lens=all${data ? '&data=' + data : ''}`); await ready(p); };
-
-async function toDead(page, code, data, keep) {
-  await page.goto(base + `room.html?state=room&lens=all${keep ? '' : '&fresh=1'}${data ? '&data=' + data : ''}`); await ready(page);
+async function toDead(page, code, data) {
+  await page.goto(base + `room.html?state=room&lens=all&fresh=1${data ? '&data=' + data : ''}`); await ready(page);
   await page.click(`[data-action="open-litter"][data-value="${code}"]`);
   await page.waitForURL(/litter\.html/); await ready(page);
   await page.click('[data-action="open-dead"]');
@@ -54,23 +49,25 @@ try {
   await page.click('[data-action="photo-undo"]');
   assert.match(await text(page, '[data-ds="Photos"]'), /2 attached/);
   await page.click('[data-action="save"]');
-  await page.waitForURL(/room\.html\?.*state=litter.*crate=A02.*saved=dead/); await ready(page);
-  assert.deepEqual(await litterOf(page, 'A02'), { alive: 11, dead: 2 });
+  await page.waitForURL(/litter\.html\?.*saved=dead/); await ready(page);
+  assert.match(await text(page, '[data-action="open-record"]'), /Alive 11 · Dead 2/);
   const ev1 = (await log(page, 'base')).pop();
   assert.equal(ev1.type, 'death'); assert.equal(ev1.photos.length, 2);
-  console.log('ok 1 steppers from 0, photos kept on the event, Save → the litter drawer:', JSON.stringify(await litterOf(page, 'A02')));
+  console.log('ok 1 steppers from 0, photos kept on the event, Save → litter:', await text(page, '[data-action="open-record"]'));
 
   // 2. R1-26: Back keeps the draft on this phone and returns to the litter; reopening restores it. `Other` asks for a note.
-  await toDead(page, 'A02', '', true);
+  await page.click('[data-action="open-dead"]');
+  await page.waitForURL(/dead\.html/); await ready(page);
   await page.click('[data-ds="Stepper"][data-field="other"] [data-step="1"]');
   await page.fill('input[data-field="pigNote"]', 'leg caught in the slats');
   await page.click('[data-action="back"]');
-  await page.waitForURL(/room\.html\?.*state=litter.*crate=A02/); await ready(page);
-  await toDead(page, 'A02', '', true);
+  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.click('[data-action="open-dead"]');
+  await page.waitForURL(/dead\.html/); await ready(page);
   assert.equal(await stepValue(page, 'other'), '1');
   assert.equal(await page.inputValue('input[data-field="pigNote"]'), 'leg caught in the slats');
   await page.click('[data-action="save"]');
-  await page.waitForURL(/room\.html\?.*state=litter.*crate=A02/); await ready(page);
+  await page.waitForURL(/litter\.html/); await ready(page);
   const ev2 = (await log(page, 'base')).pop();
   assert.equal(ev2.note, 'leg caught in the slats'); assert.equal(ev2.lines[0].note, 'leg caught in the slats');
   console.log('ok 2 Back keeps the draft; Other carries its note:', ev2.lines[0].cause, ev2.note);
@@ -85,9 +82,10 @@ try {
   assert.match(routed, /Record death D03/); assert.match(routed, /Recording in D03 · found in A02/);
   assert.match(routed, /From the 2 missing 1 alive stays 11 · 1 missing still open/);
   await page.click('[data-action="save"]');
-  await page.waitForURL(/room\.html\?.*state=litter.*crate=A02/); await ready(page);
-  assert.equal((await litterOf(page, 'A02')).alive, 12);
-  await toRoom(page);
+  await page.waitForURL(/litter\.html\?.*crate=A02/); await ready(page);
+  assert.match(await text(page, '[data-action="open-record"]'), /Alive 12/);
+  await page.click('[data-action="close"]');
+  await page.waitForURL(/room\.html/); await ready(page);
   assert.match(await text(page, '[data-action="explain"]'), /Unexplained loss 1 D03/);
   console.log('ok 3 neighbour crate → D03\'s loss:', await text(page, '[data-action="explain"]'));
 

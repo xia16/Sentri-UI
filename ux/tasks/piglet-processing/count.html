@@ -501,10 +501,12 @@
     if (S.view === 'suggest') { S.view = 'explain'; return; }
     if (S.view === 'explain' && S.from === 'host') { S.view = 'host'; S.from = ''; return; }
     if (S.view === 'explain' && S.room) { nav('room.html', { state: 'room', unit: S.room !== 7 ? S.room : '' }); return 'nav'; }
-    // the litter drawer over the room: where the litter's counts were opened
-    nav('room.html', { state: 'litter', crate: crate, unit: qs.get('unit') });
+    // the litter drawer over the room: where the litter's counts were opened. Transition: while the litter is still its
+    // own page (litter.html, being folded into the room as a drawer), counts opened from that page return to it.
+    nav(fromLitterPage() ? 'litter.html' : 'room.html', { state: 'litter', crate: crate, unit: qs.get('unit') });
     return 'nav';
   }
+  function fromLitterPage() { try { return /\/litter\.html$/.test(new URL(document.referrer).pathname); } catch (e) { return false; } }
   function goTo(target) {
     var t = document.querySelector('[data-target="' + target + '"]');
     if (t) { t.scrollIntoView({ block: 'center' }); var f = t.querySelector('input, button'); if (f) f.focus({ preventScroll: true }); }
