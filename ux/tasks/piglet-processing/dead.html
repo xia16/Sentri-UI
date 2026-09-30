@@ -15,6 +15,8 @@
    question. The body is cards: Segment, Stepper, ChoiceList, Row, TaskRadios, TaskPhotos, TaskWarning. */
 /* The room behind the drawer: the page the worker returns to, drawn by its own page (inert, never focusable). */
 .dd-over { display: contents; }
+/* farrowing's entry rows end on a line: the divider under the last cause */
+.dd-tallies { border-bottom: 1px solid var(--line); }
 .dd-behind { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--app-background); pointer-events: none; }
 /* The sheet body is one column of sections, farrowing's rhythm. */
 .dd-body { display: flex; flex-direction: column; gap: var(--space-heading); }
@@ -271,11 +273,12 @@
   }
   // Why Save waits: the footer's status line, directly above Back + Save (it is Save's description)
   function status() {
-    var w = why(), show = w && (!w.quiet || S.why);
+    // a waiting Save stands alone (farrowing): the reason shows once Save is tapped (the guard), then stays while it applies
+    var w = why(), show = w && S.why;
     return show ? { text: PP.t(w.id, w.args), str: w.id, args: w.args, id: 'dd-why' } : null;
   }
   function piglets() {
-    var out = [heldRow(), '<div data-target="tallies">' + causes().map(tallyRow).join('') + lossStepper() + '</div>'];
+    var out = [heldRow(), '<div class="dd-tallies" data-target="tallies">' + causes().map(tallyRow).join('') + lossStepper() + '</div>'];
     if (S.pig.tallies.other > 0 || picks().some(function (r) { return S.pig.picks[r] === 'other'; })) out.push(noteField('pigNote'));
     out.push(neighbourRow(), taggedRow(), photoField('pig', pigN() > 0));
     return out.join('');
@@ -293,7 +296,7 @@
     var w = why(), gray = !!w, st = status();
     if (S.mode === 'sow') {
       // the hold's progress line is the same status slot (empty until a cue or a reason)
-      return K.footer({ back: { action: 'back' }, status: st || { text: '', id: 'dd-why' }, hold: { label: s('act.save'), caption: s('pp.dead.hold'), action: 'hold-save', tone: 'primary', waiting: gray, describedby: gray ? 'dd-why' : '' } });
+      return K.footer({ back: { action: 'back' }, status: st, hold: { label: s('act.save'), caption: s('pp.dead.hold'), action: 'hold-save', tone: 'primary', waiting: gray, describedby: gray ? 'dd-why' : '' } });
     }
     return K.footer({ back: { action: back || 'back' }, status: st, primary: { label: s('act.save'), action: 'save', waiting: gray } });
   }
@@ -303,7 +306,10 @@
     var sub = sow ? [s('ds.dead.sub.sow')] : [s(locked() ? 'pp.dead.sub.locked' : 'pp.dead.sub.open', { pen: tgt(), alive: alive(), d: Lx().dead.total })];
     if (n && !sow) sub.push({ sep: true }, { text: PP.t('pp.dead.unsaved', { n: n }), str: 'pp.dead.unsaved', args: { n: n }, tone: 'green' });
     if (S.trim) sub.push({ sep: true }, s(S.trim.id, S.trim.args));
-    return { title: s(sow ? 'ds.dead.title.sow' : 'pp.dead.title.record'), subtitle: sub, aside: dirty ? textAct('clear', 'act.clear') : '' };
+    // farrowing's head: `Dead 2` (this entry's count; `Dead` at 0) or `Sow died`, and Clear, greyed while there is nothing to clear
+    var title = sow ? s('ds.dead.title.sow') : n ? s('ds.dead.title.total', { n: n }) : s('pp.dead.title');
+    var clear = UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', waiting: !dirty, strs: { label: 'act.clear' } });
+    return { title: title, subtitle: sub, aside: clear };
   }
   function drawer() {
     var h = head();
@@ -501,6 +507,7 @@
     if (!b) return;
     var a = b.dataset.action, v = b.dataset.value, gray = b.getAttribute('aria-disabled') === 'true';
     if (/-?dismiss$/.test(a)) a = a === 'dismiss' ? 'back' : a.replace('dismiss', 'back');    // the ✕ and the scrim are Back
+    if (a === 'hold-save' && gray) { S.why = true; render(); return; }     // a waiting hold says why once tapped
     if (a === 'hold-save' || a === 'pick') return;                   // the hold binds itself; the checkbox's change event handles a pick
     if (a === 'dead-step') {
       var step = +b.dataset.step, d = S.pig.tallies[v] || 0;
@@ -526,7 +533,7 @@
     else if (a === 'resolve') { if (UI.guard(b) || !v) return; var rv = v.split('|'); S.heldPick = ''; store.commit({ type: 'resolve', litter: tgt(), held: rv[0], answer: rv[1] }); S.sub = ''; }
     else if (a === 'mode') S.mode = v;
     else if (a === 'sow-cause') { S.sow.cause = v; keep(); }
-    else if (a === 'clear') clearMode();
+    else if (a === 'clear') { if (gray) return; clearMode(); }
     else if (a === 'back') { keep(); leave(''); return; }             // Back, ✕ and the scrim keep both drafts on the device
     else if (a === 'photo-add') {
       var key = v;
