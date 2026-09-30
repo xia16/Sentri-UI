@@ -35,3 +35,15 @@
 @media (prefers-reduced-motion: reduce) { .pp-litter { transition: none; } }
 /* A mark's evidence line (shell-ui.js markLine): each part wraps as a whole, so a wrapped part never lies under another. */
 .pp-mark > span { display: inline-block; max-width: 100%; }
+
+/* Candidate:ToolRow — farrowing's in-sheet tool row (`Edit · Record death · More actions`, record-inline-actions): outlined
+   tools under the litter summary, sized to their words, each with its glyph; a draft waiting on this phone is a small line
+   inside its tool. The task skeleton has no part for it (ADR 0003 gap, reported). Tokens only. */
+.pp-toolrow { display: flex; gap: 6px; margin: 0; }
+.pp-toolrow .pp-tool { flex: 1 1 auto; min-width: var(--touch-min);min-height: var(--touch-min); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; column-gap: 5px;
+  margin: 0; padding: 8px 5px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--paper); color: var(--ink);
+  font: 500 var(--type-identifier-size)/1.3 var(--font-sans); white-space: nowrap; }
+.pp-toolrow .pp-tool:active { background: var(--press); }
+.pp-toolrow .pp-tool svg { flex: none; width: 16px; height: 16px; }
+.pp-toolrow .pp-tool small { flex-basis: 100%; white-space: normal;font-size: var(--type-meta-size); line-height: 1.4; color: var(--green); text-align: center; }
+@media (max-width: 370px) { .pp-toolrow .pp-tool svg { display: none; } }

@@ -14,6 +14,9 @@ const server = spawn(process.execPath, ['scripts/serve-ux.cjs', String(port)], {
 const base = `http://localhost:${port}/ux/tasks/piglet-processing/`;
 const ready = (p) => p.waitForSelector('html[data-ready]');
 const text = async (p, sel) => (await p.locator(sel).first().innerText()).replace(/\s+/g, ' ');
+// round 5: the room's review and drift doors are one row (`reviews`); its sheet holds the drift door (`explain`)
+async function drift(p) { await p.click('[data-action="reviews"]'); const t = await text(p, '[data-action="explain"]'); await p.click('.tk-sheet [data-action="close-sheet"]'); await p.waitForSelector('.tk-sheet', { state: 'detached' }); return t; }
+async function explain(p) { await p.click('[data-action="reviews"]'); await p.click('[data-action="explain"]'); }
 const dialog = async (p) => (await p.locator('[role="dialog"]').last().innerText()).replace(/\s+/g, ' ');
 const log = (p, v) => p.evaluate((k) => JSON.parse(sessionStorage.getItem('pp-log:' + k) || '[]'), v);
 const stepValue = (p, cause) => p.locator(`[data-ds="Stepper"][data-field="${cause}"] [role="spinbutton"]`).innerText();
@@ -21,7 +24,7 @@ const stepValue = (p, cause) => p.locator(`[data-ds="Stepper"][data-field="${cau
 async function toDead(page, code, data) {
   await page.goto(base + `room.html?state=room&lens=all&fresh=1${data ? '&data=' + data : ''}`); await ready(page);
   await page.click(`[data-action="open-litter"][data-value="${code}"]`);
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await page.click('[data-action="open-dead"]');
   await page.waitForURL(/dead\.html/); await ready(page);
 }
@@ -49,11 +52,11 @@ try {
   await page.click('[data-action="photo-undo"]');
   assert.match(await text(page, '[data-ds="Photos"]'), /2 attached/);
   await page.click('[data-action="save"]');
-  await page.waitForURL(/litter\.html\?.*saved=dead/); await ready(page);
-  assert.match(await text(page, '[data-action="open-record"]'), /Alive 11 · Dead 2/);
+  await page.waitForURL(/state=litter.*saved=dead/); await ready(page);
+  assert.match(await text(page, '.lt-summary'), /Alive 11 Dead 2/);
   const ev1 = (await log(page, 'base')).pop();
   assert.equal(ev1.type, 'death'); assert.equal(ev1.photos.length, 2);
-  console.log('ok 1 steppers from 0, photos kept on the event, Save → litter:', await text(page, '[data-action="open-record"]'));
+  console.log('ok 1 steppers from 0, photos kept on the event, Save → litter:', await text(page, '.lt-summary'));
 
   // 2. R1-26: Back keeps the draft on this phone and returns to the litter; reopening restores it. `Other` asks for a note.
   await page.click('[data-action="open-dead"]');
@@ -61,13 +64,13 @@ try {
   await page.click('[data-ds="Stepper"][data-field="other"] [data-step="1"]');
   await page.fill('input[data-field="pigNote"]', 'leg caught in the slats');
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await page.click('[data-action="open-dead"]');
   await page.waitForURL(/dead\.html/); await ready(page);
   assert.equal(await stepValue(page, 'other'), '1');
   assert.equal(await page.inputValue('input[data-field="pigNote"]'), 'leg caught in the slats');
   await page.click('[data-action="save"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   const ev2 = (await log(page, 'base')).pop();
   assert.equal(ev2.note, 'leg caught in the slats'); assert.equal(ev2.lines[0].note, 'leg caught in the slats');
   console.log('ok 2 Back keeps the draft; Other carries its note:', ev2.lines[0].cause, ev2.note);
@@ -82,16 +85,16 @@ try {
   assert.match(routed, /Record death D03/); assert.match(routed, /Recording in D03 · found in A02/);
   assert.match(routed, /From the 2 missing 1 alive stays 11 · 1 missing still open/);
   await page.click('[data-action="save"]');
-  await page.waitForURL(/litter\.html\?.*crate=A02/); await ready(page);
-  assert.match(await text(page, '[data-action="open-record"]'), /Alive 12/);
+  await page.waitForURL(/state=litter.*crate=A02/); await ready(page);
+  assert.match(await text(page, '.lt-summary'), /Alive 12/);
   await page.click('[data-action="close"]');
   await page.waitForURL(/room\.html/); await ready(page);
-  assert.match(await text(page, '[data-action="explain"]'), /Unexplained loss 1 D03/);
-  console.log('ok 3 neighbour crate → D03\'s loss:', await text(page, '[data-action="explain"]'));
+  assert.match(await drift(page), /Unexplained loss 1 D03/);
+  console.log('ok 3 neighbour crate → D03\'s loss:', await drift(page));
 
   // 4. R1-8 room-level: the drift strip → the room's open lines → `Found a body?` → whose? D03 → Save: back on Explain with
   // the receipt `all missing found`; D03's line is gone.
-  await page.click('[data-action="explain"]');
+  await explain(page);
   await page.waitForURL(/count\.html\?state=explain/); await ready(page);
   await page.click('[data-action="found-body"]');
   await page.waitForURL(/dead\.html\?.*state=dead-found/); await ready(page);
@@ -108,7 +111,7 @@ try {
 
   // 5. R1-26: Back from a drawer opened on Explain returns to Explain (not to a host or the litter).
   await page.goto(base + 'room.html?state=room&lens=all&data=explain&fresh=1'); await ready(page);
-  await page.click('[data-action="explain"]');
+  await explain(page);
   await page.waitForURL(/count\.html\?state=explain/); await ready(page);
   await page.click('[data-action="open-dead"][data-value="B06"]');
   await page.waitForURL(/dead\.html/); await ready(page);
