@@ -219,9 +219,6 @@
   }
 
   /* ---- strings ---- */
-  function span(id, args, cls, tone) { return U.span(id, args, { cls: cls, tone: tone }); }
-  // a Row's typed trailing word: colour on the word (Row card, ADR 0002)
-  function word(id, args, tone) { return { text: '', strs: { text: id }, args: args ? { text: args } : undefined, tone: tone }; }
   var sexWord = function (s) { return PP.t('pp.common.sex.' + (s === 'b' ? 'boar' : 'gilt')); };
   var kg = function (w) { return PP.t('pp.common.kg', { w: w }); };
   function stamp(r) { return U.stamp(r.at, r.who, store.today); }
@@ -244,16 +241,17 @@
   // The run's head line: the litter and how far it is (identified of alive, amber when records pass alive; keepers so far).
   // The sow's number is on the records page; here the line keeps to what the worker needs piglet by piglet.
   function runDesc() {
-    var k = distinct().length, id, args, tone;
+    var k = distinct().length, id, args;
     if (keepers) { id = closed ? 'pp.id.prog.keep_done' : 'pp.id.prog.keep'; args = { k: closed ? closed.k : k, n: alive() }; }
-    else if (over()) { id = 'pp.id.prog.over'; args = { k: k, n: alive() }; tone = 'amber'; }
+    else if (over()) { id = 'pp.id.prog.over'; args = { k: k, n: alive() }; }
     else { id = 'pp.id.prog.k_of_n'; args = { k: k, n: alive() }; }
-    var p = s(id, args); if (tone) p.tone = tone;
-    return [s('pp.id.hdr.title_day', { crate: crate, n: L.dayAge }), { sep: true }, p];
+    return [s('pp.id.hdr.title_day', { crate: crate, n: L.dayAge }), { sep: true }, s(id, args)];
   }
   function taskScreen() { return K.screen({ inert: true, header: K.header({ title: s('pp.common.task'), back: { action: 'home' } }), body: '' }); }
-  // The skeleton's page takes no data-view; the host names its surfaces so tests and the lint can find them.
-  function named(html, view) { return html.replace(/^(\s*<section class="tk-page")/, '$1 data-view="' + view + '"'); }
+  // A door row (TaskRow door, farrowing's .disclosure): a title, one muted line (parts may carry colour), a chevron.
+  function door(titleId, titleArgs, desc, action, value) {
+    return K.door({ title: s(titleId, titleArgs || undefined), description: desc || '', action: action, value: value });
+  }
 
   /* ---- the sex field: ChoiceList radio, inline and optional (a visible Clear, never a re-tap clear) ---- */
   function radio(sex) {
@@ -396,8 +394,8 @@
   function runPage() {
     var p = primary();
     var body = '<div class="id-run">' + radio(run.sex) + weightField() + pad() + '</div>';
-    return named(K.page({ title: s('pp.id.run.title'), description: runDesc(), body: body, inert: !!(drawer || confirm),
-      footer: K.footer({ back: { action: 'to-table' }, primary: p ? { label: s(p[0], p[1] || undefined), action: 'record' } : null }) }), 'run');
+    return K.page({ view: 'run', title: s('pp.id.run.title'), description: runDesc(), descriptionTone: !keepers && over() ? 'amber' : '', body: body, inert: !!(drawer || confirm),
+      footer: K.footer({ back: { action: 'to-table' }, primary: p ? { label: s(p[0], p[1] || undefined), action: 'record' } : null }) });
   }
 
   /* ---- the table face: the litter's identified piglets, viewable and editable (through S8's Edit) forever ---- */
@@ -424,15 +422,13 @@
     var o = over(), p = pairs();
     if (!o && !p) return '';
     var title = o ? [PP.one('pp.id.over.title', o), { k: o }] : ['pp.id.over.pair_title', { p: p }];
-    return UI.rowGroup(UI.row({ title: '', description: '', trailing: word('pp.id.over.check', null, 'amber'), action: 'open-over', value: crate,
-      strs: { title: title[0], description: p ? 'pp.id.over.line_pair' : 'pp.id.over.line' },
-      args: { title: title[1], description: { n: alive(), rows: living().length, p: p } } }));
+    return door(title[0], title[1], [s(p ? 'pp.id.over.line_pair' : 'pp.id.over.line', { n: alive(), rows: living().length, p: p }), { sep: true },
+      Object.assign(s('pp.id.over.check'), { tone: 'amber' })], 'open-over', crate);
   }
   function keepersBlock() {
     if (!keepers) return '';
     if (closed) {                  // the closing count and stamp, not a live count; Edit (S8) reopens it to add a keeper, stamped
-      return UI.rowGroup(UI.row({ title: '', description: '', action: 'edit-done', value: crate, strs: { title: 'pp.id.done.title', description: 'pp.id.done.line' },
-        args: { title: { k: closed.k }, description: { k: closed.k, stamp: stamp(closed), r: Math.max(0, alive() - closed.k) } } }));
+      return door('pp.id.done.title', { k: closed.k }, s('pp.id.done.line', { k: closed.k, stamp: stamp(closed), r: Math.max(0, alive() - closed.k) }), 'edit-done', crate);
     }
     if (over() || pairs()) return UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.id.close.wait' } });
     return UI.button({ label: '', register: 'tool', action: 'close-set', strs: { label: 'pp.id.act.done' }, args: { label: { k: distinct().length } } });
@@ -445,20 +441,18 @@
       // two phones weighed the same day without seeing each other: both show until one is corrected
       if (x.conflicts.length) {
         var c = x.conflicts[0];
-        return UI.row({ title: '', description: '', trailing: word('pp.id.lw.check', null, 'amber'), action: 'edit-weight', value: String(x.day),
-          strs: { title: 'pp.id.lw.rec', description: 'pp.id.lw.value_conflict' }, args: { title: { day: x.day }, description: { w: x.w, w2: c.w } } });
+        return door('pp.id.lw.rec', { day: x.day }, [s('pp.id.lw.value_conflict', { w: x.w, w2: c.w }), { sep: true }, Object.assign(s('pp.id.lw.check'), { tone: 'amber' })], 'edit-weight', String(x.day));
       }
-      return UI.row({ title: '', description: '', action: x.day === L.dayAge ? 'open-weight' : 'edit-weight', value: String(x.day),
-        strs: { title: 'pp.id.lw.rec', description: 'pp.common.kg' }, args: { title: { day: x.day }, description: { w: x.w } } });
+      return door('pp.id.lw.rec', { day: x.day }, s('pp.common.kg', { w: x.w }), x.day === L.dayAge ? 'open-weight' : 'edit-weight', String(x.day));
     }).join('');
     if (!todays) {
-      var tr = drawerKept && drawerDirty(drawerKept) ? word('status.unsaved', { n: 1 }, 'green') : span('ds.field.optional');
-      rowsHtml = UI.row({ title: '', trailing: tr, action: 'open-weight', value: String(L.dayAge), strs: { title: 'pp.id.lw.rec' }, args: { title: { day: L.dayAge } } }) + rowsHtml;
+      var tr = drawerKept && drawerDirty(drawerKept) ? Object.assign(s('status.unsaved', { n: 1 }), { tone: 'green' }) : s('ds.field.optional');
+      rowsHtml = door('pp.id.lw.rec', { day: L.dayAge }, tr, 'open-weight', String(L.dayAge)) + rowsHtml;
     }
     // the receipt of a save is the section's one status line (it agrees with the Boars and Gilts facts above)
     var h = UI.heading({ title: '', kind: 'section', level: 3, description: receipt ? '' : undefined,
       strs: Object.assign({ title: 'pp.id.sec.weigh' }, receipt ? { description: receipt[0] } : {}), args: receipt ? { description: receipt[1] } : undefined });
-    return '<section class="id-group" role="status" aria-live="polite">' + h + UI.rowGroup(rowsHtml) + '</section>';
+    return '<section class="id-group" role="status" aria-live="polite">' + h + '<div>' + rowsHtml + '</div></section>';
   }
   /* A piglet row (TaskRow, farrowing's piglet roster): the tag or notch, at most one flag as its chip, what is known as the
      headline. Colour lives on the flag: dead red; a double-issued tag, a same-tag pair, a tag also on another crate and a
@@ -492,8 +486,8 @@
     var p = draftDirty() ? ['pp.id.act.record_resume', { n: 1 }] : ['pp.id.act.record', null];
     // A closed candidate set takes no records until Edit reopens it: Back alone.
     var primary = keepers && closed ? null : { label: s(p[0], p[1] || undefined), action: 'open-run' };
-    return named(K.page({ title: s('pp.id.table.title'), description: tableDesc(), body: body, inert: !!(drawer || confirm),
-      footer: K.footer({ back: { action: 'leave' }, primary: primary }) }), 'table');
+    return K.page({ view: 'table', title: s('pp.id.table.title'), description: tableDesc(), body: body, inert: !!(drawer || confirm),
+      footer: K.footer({ back: { action: 'leave' }, primary: primary }) });
   }
 
   /* ---- the weigh-day drawer: today's litter weight + boar/gilt counts for piglets not identified. Staged: Back keeps, Clear discards, Save commits ---- */
@@ -525,7 +519,7 @@
     if (rem > 0) {
       var step = function (k, label, desc, v, other, fromRows) {
         var cap = rem - other, ceil = drawer.ceil === k && v >= cap;
-        return UI.stepper({ label: '', description: '', value: v, min: 0, max: cap, key: k, action: 'count', draft: v > (L.sexCounts.saved || { boars: 0, gilts: 0 })[k], hint: ceil ? '' : undefined,
+        return K.stepper({ face: 'row', label: '', description: '', value: v, min: 0, max: cap, key: k, action: 'count', draft: v > (L.sexCounts.saved || { boars: 0, gilts: 0 })[k], hint: ceil ? '' : undefined,
           strs: Object.assign({ label: label, description: desc, value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
             ceil ? { hint: 'pp.id.lw.ceiling' } : {}),
           args: { description: { t: v + fromRows, k: fromRows }, hint: { r: rem } } });
