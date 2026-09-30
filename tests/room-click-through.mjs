@@ -48,7 +48,7 @@ try {
   assert.match(page.url(), /filter=iron/);
   assert.equal(await has(page, row('A02')), false);
   await lens(page, 'done');
-  assert.match(await rowText(page, 'A02'), /Iron done recorded just now/);
+  assert.match(await rowText(page, 'A02'), /Iron done just now/);
   await page.click('[data-action="filter"]');
   await page.click('.tk-sheet [data-action="clear-filter"]');
   await page.click('[data-action="close-sheet"]');
@@ -87,7 +87,7 @@ try {
   await page.click('[data-view="litter"] [data-action="close"]');
   await page.goto(base + 'room.html?state=room&data=all-done&fresh=1'); await ready(page);
   await lens(page, 'done');
-  assert.match(await rowText(page, 'B01'), /All done recorded .*done 2 days late/);
+  assert.match(await rowText(page, 'B01'), /All done \d+ min ago.*done 2 days late/);
   console.log('ok 4 deferred and done-late:', a02, '|', await rowText(page, 'B01'));
 
   // 5. N4 / R1-22: the review list from the header; the held body opens where it is answered; the row carries the marker.

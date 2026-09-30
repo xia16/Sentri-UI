@@ -14,8 +14,8 @@
 /* The room on the task skeleton (ADR 0003): farrowing's room list — TaskHeader, TaskLatest, TaskSummary, TaskLens, rows
    grouped by crate row (TaskGroup + TaskRow), TaskDock — and its sheets and the litter drawer (TaskSheet). Layout only,
    tokens from tokens.css. Candidate:ScanFrame stays task-level. */
-.pp-answers { margin: 0 var(--space-panel) 10px; }
-.pp-filtered { margin: 0 var(--space-panel) var(--space-heading); }
+.pp-answers { margin: 0 var(--space-panel) var(--space-panel); }
+.pp-filtered { margin: 0 var(--space-panel) 6px; }
 .pp-filtered > * + * { margin-top: var(--space-heading); }
 .pp-after { padding: 0 var(--space-panel) var(--space-gutter); }
 .pp-after > * + * { margin-top: var(--space-heading); }
@@ -289,7 +289,8 @@
     });
     return late ? P(PP.one('pp.room.tok.done_late', late), { n: late }, 'amber') : null;
   }
-  function recMeta(f, only) { return [P('pp.room.tok.recorded', { when: U.ago(f.lastRecord.at, now()) }), doneLate(f, only), pig(f.alive)]; }
+  // One meta line (retro 30): when it was recorded, then either how late it was done or how many piglets.
+  function recMeta(f, only) { var late = doneLate(f, only); return [P('pp.room.latest.when', { when: U.ago(f.lastRecord.at, now()) }), late || pig(f.alive)]; }
   function dayMeta(f) { return [P('pp.common.unit.day', { n: f.day }), pig(f.alive)]; }
   function nextHead(nx) { return nx.inDays === 1 ? P('pp.room.l1.tomorrow', { doses: names(nx.doses) }) : P('pp.room.l1.next', { doses: names(nx.doses), n: nx.inDays }); }
   function owesSpec(f, s) {
@@ -319,7 +320,7 @@
     else if (mode === 'missed' || f.kind === 'missed') {
       var seen = {};
       s.head = P('pp.room.l1.missed', { doses: f.missed.map(function (o) { return name(o.tx); }).join(' · ') });
-      s.meta = dayMeta(f).concat(f.missed.filter(function (o) { if (seen[o.last]) return false; seen[o.last] = 1; return true; }).map(function (o) { return P('pp.room.tok.window', { n: o.last }, 'amber'); }));
+      s.meta = [P('pp.common.unit.day', { n: f.day })].concat(f.missed.filter(function (o) { if (seen[o.last]) return false; seen[o.last] = 1; return true; }).map(function (o) { return P('pp.room.tok.window', { n: o.last }, 'amber'); }));
     }
     else if (f.closed) { s.head = P('pp.room.l1.closed'); s.meta = [P('pp.common.unit.day', { n: f.day }), P('pp.room.tok.closed')]; }
     else if (f.kind === 'owes') owesSpec(f, s);
@@ -638,7 +639,7 @@
     var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-action]');
     var fk = f ? [f.dataset.action, f.dataset.value || '', f.dataset.step || ''] : null;
     var header = K.header({ title: P('pp.common.task'), back: { action: 'back' }, backLabel: P('pp.room.aria.back') });
-    var body = S.error ? errorView() : latest() + summaryCard() + answersRow() + lensBar() + filteredBlock() + list();
+    var body = S.error ? errorView() : latest() + summaryCard() + answersRow() + filteredBlock() + lensBar() + list();
     var overlay = S.error ? '' : LD.view ? LD.html() : roomSheet();
     phone.innerHTML = K.statusbar() + K.screen({ header: header, body: body, dock: S.error ? '' : dock(), inert: !!overlay, label: P('pp.room.aria.list', { n: ROOM }) }) + overlay;
     var sc2 = phone.querySelector('.tk-scroll'); if (sc2) sc2.scrollTop = top;
