@@ -153,7 +153,7 @@ try {
   await openLitter(page, 'A05');
   await page.click('[data-action="open-review"]');
   await page.waitForURL(/edit\.html\?.*double=/); await ready(page);
-  assert.match(await text(page, '#screen'), /Possible double treatment · Iron · day 3 .*What happened\?/);
+  assert.match(await text(page, '#screen'), /Possible double · Iron .*What happened\?/);
   await page.click('[data-action="back"]');
   await page.waitForURL(/state=litter/); await ready(page);
 

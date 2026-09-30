@@ -515,15 +515,16 @@
       // after End a lowered mark is a fact (not done), never owed: no reason choice. Castration takes Q16's reasons.
       if (!e.ended) {
         if (m.castration) {
-          rows.push(choice('mark-why', m.id + ':hernia', 'pp.litter.reason.hernia', null, mode === 'hernia'),
-            choice('mark-why', m.id + ':cryptorchid', 'pp.litter.reason.cryptorchid', null, mode === 'cryptorchid'),
-            choice('mark-why', m.id + ':deferred', 'pp.litter.reason.deferred', null, mode === 'deferred'),
-            choice('mark-why', m.id + ':kept', 'pp.litter.reason.kept', null, mode === 'kept'));
+          // Q16: these reasons differ in what the litter owes, so each says it in one short phrase (owner, round 5)
+          rows.push(choice('mark-why', m.id + ':hernia', 'pp.litter.reason.hernia', 'pp.edit.why.leaves', mode === 'hernia'),
+            choice('mark-why', m.id + ':cryptorchid', 'pp.litter.reason.cryptorchid', 'pp.edit.why.leaves', mode === 'cryptorchid'),
+            choice('mark-why', m.id + ':deferred', 'pp.litter.reason.deferred', 'pp.edit.why.owed', mode === 'deferred'),
+            choice('mark-why', m.id + ':kept', 'pp.litter.reason.kept', 'pp.edit.why.leaves', mode === 'kept'));
         } else rows.push(choice('mark-why', m.id + ':weak', 'pp.litter.reason.weak', null, mode === 'weak'), choice('mark-why', m.id + ':sick', 'pp.litter.reason.sick', null, mode === 'sick'));
       }
       // a mark in a possible double is not "recorded by mistake · stays owed": the double has its own answer (round 4)
       if (dp) rows.push(choice('open-double', m.dose, 'pp.edit.dbl.same', null, false));
-      else rows.push(choice('mark-why', m.id + ':void', 'pp.edit.why.mistake', null, mode === 'void'));
+      else rows.push(choice('mark-why', m.id + ':void', 'pp.edit.why.mistake', m.castration && !e.ended ? 'pp.edit.why.owed' : null, mode === 'void'));
       rows.push(choice('mark-why', m.id + ':to', 'pp.edit.why.other', null, mode === 'to'));
       // castration splits by reason (Q16): the question is about the piglets this change leaves not castrated
       var n = x.void || x.to !== undefined ? m.whole : m.castration ? m.n - v : rest;
@@ -830,7 +831,7 @@
       body += UI.rowGroup(UI.row({ title: '', action: 'open-record', strs: { title: 'pp.edit.log.title' } }));
     }
     return K.drawer({ view: 'double', size: 'long', close: { action: 'back' }, subtitle: subtitle(),
-      title: p ? S_('pp.edit.dbl.title', { tx: txText(p.dose) }) : S_('pp.edit.dbl.sub'),
+      title: p ? S_('pp.edit.dbl.title', { tx: PP.t('pp.common.tx.' + doseCfg(p.dose).tx) }) : S_('pp.edit.dbl.sub'),
       body: '<div class="ed-body">' + body + '</div>',
       footer: p ? bar(w, can) : K.footer({ back: { action: 'back' } }) });
   }
