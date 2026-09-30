@@ -4,7 +4,7 @@
 
 One animal or litter in a [group](../TaskGroup/README.md). **Budget: the mono id with at most one chip under it, one headline, one meta line, one trailing mark.** Nothing else. The row points at the animal's sheet; it never summarises it (retro 30).
 
-**Anatomy** (`.tk-row`, `data-ds="TaskRow"`, a button)
+**Anatomy** (`.tk-row`, `data-ds="TaskRow"`, a button; a `<label>` with the tick trail; a `<div>` when `still`)
 - `animal-row-min` (76px), padded `space-animal-row-y space-row-x` (13 × 14), 10px gaps, aligned centre; a 1px `line` above every row but the first.
 - **Identity** (`.tk-row-identity`, `animal-id-col` 59px min): the id in 13px/600 mono, −0.6px (`000418`, `A02`); 7px under it, the **chip**.
 - **Chip** (`.tk-chip`): `meta` 10px/600, padded `3px 6px`, `radius-chip`, 1px border, one line, `row-chip-max` wide at most. Tones:
@@ -15,14 +15,16 @@ One animal or litter in a [group](../TaskGroup/README.md). **Budget: the mono id
 - **Detail** (`.tk-row-detail`), 5px between its lines:
   - **Headline:** 14px/500/1.45 `ink`: the figure the task is about (`9 alive · 5 dead`, `12 owed`). `tone: 'forecast'` prints it `muted` (`Due tomorrow`). A part can carry colour (`Overdue · 3 days` with `3 days` red).
   - **Meta:** `meta` 10px/1.6 mono `muted`, tokens separated by `·` (`born 14 · 1h ago · G.H`).
+- **Parts wrap whole:** every part of the headline and meta (each `{ text, str, args, tone }`, and the `·` between them) is an inline block, so a line that wraps breaks between parts and a wrapped part never lies under the next one.
 - **Trail:** a 14px `muted` glyph: chevron (opens), edit (done: opens its record), or none.
+  - **Tick** (`trail: 'tick'`): the selection of a bulk act. The row is a `<label>` around ChoiceList's multi trail (`.tk-row-tick.st-choice-trail`, a 20px checkbox in `ink`); the whole row is the target. The checkbox carries `data-action` (default `toggle`) and `value`; the host listens for `change`.
 
 **States**
 - Pressed: `press`. Focus: the global ring. Disabled: never drawn; a row that cannot be acted on is absent or says why in its meta.
 - Done: the chip `Done` and the edit trail. Never grey.
 
 **Component contract**
-- **Props:** `SentriTask.row({ id, chip: { text, str, args, tone }, headline, tone, meta, trail: 'chevron' | 'edit' | '', action = 'open', value, label })`.
+- **Props:** `SentriTask.row({ id, chip: { text, str, args, tone }, headline, tone, meta, trail: 'chevron' | 'edit' | 'tick' | '', action = 'open', value, label, tick: { action = 'toggle', value = value, checked, label }, still, data })`. `still: true` draws a row with no action (a `<div>`: a row holding its place after a record). `data: { flash: '' }` adds `data-flash` (and the like) for the host's motion.
 - **Events:** `<button data-action=action data-value=value>`.
 - **Slots:** `id` (text slot); `headline` and `meta` take a text slot or a list of parts `[{ text, str, args, tone }, { sep: true }, …]`; `{ sep: true }` is the shared `·` (`ds.sep`), a real text node.
 - **Port note:** a pressable row, left column fixed width so every headline starts on one edge.

@@ -64,37 +64,38 @@ try {
   await page.waitForURL(/bulk\.html/); await ready(page);
   // ticks are a draft on this phone: Close keeps them, the room door says so, reopening restores them
   for (const c of ['A02', 'A04']) await page.check(`input[data-action="toggle"][value="${c}"]`);
-  await page.click('.bk-bar [data-action="close"]');
+  await page.click('[data-action="leave"]');
   await page.waitForURL(/room\.html/); await ready(page);
   assert.match(await text(page, '[data-action="open-bulk"]'), /2 ticked · not recorded/);
   await page.click('[data-action="open-bulk"]');
   await page.waitForURL(/bulk\.html/); await ready(page);
   assert.ok(await page.isChecked('input[data-action="toggle"][value="A04"]'));
   for (const c of ['B06', 'B10']) await page.check(`input[data-action="toggle"][value="${c}"]`);
-  assert.match(await text(page, '.bk-bar .pp-receipt'), /4 litters · 46 piglets · not recorded yet/);
-  // a double tap on Review: the second tap lands on Record at the same spot and is swallowed, Record wearing its pressed face
-  const rv = await page.locator('.bk-bar [data-action="review"]').boundingBox();
+  assert.match(await text(page, '.tk-page-desc'), /4 litters · 46 piglets · not recorded yet/);
+  // a double tap on Review: the second tap lands on Record (a hold, TaskHold) at the same spot and records nothing
+  const rv = await page.locator('[data-action="review"]').boundingBox();
   const at = [rv.x + rv.width / 2, rv.y + rv.height / 2];
   await page.mouse.click(...at); await page.mouse.click(...at);
   assert.equal(await page.locator('[data-st-context="drawer"]').count(), 1);
-  assert.equal(await page.getAttribute('[data-action="record"]', 'aria-busy'), 'true');
+  assert.equal(await page.getAttribute('[data-action="record"]', 'data-phase'), 'idle');
+  assert.equal(await page.locator('#bk-receipt').count(), 0);
   const review = await text(page, '[data-st-context="drawer"]');
-  assert.match(review, /A02 12 piglets · A04 11 piglets · B06 12 piglets · B10 11 piglets/);
-  await page.waitForTimeout(400);                                    // a deliberate tap after the guard records at once
-  assert.equal(await page.getAttribute('[data-action="record"]', 'aria-busy'), null);
+  assert.match(review, /A02 12 piglets A04 11 piglets B06 12 piglets B10 11 piglets/);
+  // a deliberate hold records every ticked litter at once…
   const rc = await page.locator('[data-action="record"]').boundingBox();
   const at2 = [rc.x + rc.width / 2, rc.y + rc.height / 2];
-  await page.mouse.click(...at2); await page.mouse.click(...at2);   // …and its double tap never lands on Close
-  await page.waitForSelector('.bk-bar [data-action="close"]');
+  await page.mouse.move(...at2); await page.mouse.down(); await page.waitForTimeout(1000); await page.mouse.up();
+  await page.mouse.click(...at2);                                   // …and a tap after it at the same spot never leaves the page
+  await page.waitForSelector('#bk-receipt');
   assert.match(page.url(), /bulk\.html/);
   await page.waitForTimeout(300);
-  const receipt = await text(page, '.bk-bar');
+  const receipt = await text(page, '#bk-receipt');
   assert.match(receipt, /Saved · iron · day 3 · 4 litters · 46 piglets/);
   // hold, then depart: the finished row keeps its place, then leaves for Done today (a door to its sheet)
   assert.equal(await page.locator('[data-action="open-litter"][data-value="A02"]').count(), 0);
   await page.waitForTimeout(1300);
   assert.equal(await page.locator('[data-action="open-litter"][data-value="A02"]').count(), 1);
-  await page.click('.bk-bar [data-action="close"]');
+  await page.click('[data-action="leave"]');
   await page.waitForURL(/room\.html/); await ready(page);
   for (const c of ['A02', 'A04', 'B06', 'B10']) assert.equal(await page.locator(`[data-action="open-litter"][data-value="${c}"]`).count(), 0);
   assert.match(await rowText(page, 'A07'), /Iron/);
@@ -109,12 +110,12 @@ try {
   await page.goto(base + 'bulk.html?state=bulk-review&tx=iron&fresh=1'); await ready(page);
   await page.evaluate(() => PP.sync({ type: 'move', from: 'B09', to: 'A02', n: 1, rows: ['B09-r10'], answers: { iron3: 'no' } }));
   const frozen = await text(page, '[data-st-context="drawer"]');
-  assert.match(frozen, /A04 11 piglets · B06 12 piglets · B10 11 piglets/);
+  assert.match(frozen, /A04 11 piglets B06 12 piglets B10 11 piglets/);
   assert.match(frozen, /Record for 34 piglets/);
-  await page.waitForTimeout(400);
-  await page.click('[data-action="record"]');
-  await page.waitForSelector('.bk-bar:not([inert]) [data-action="close"]');
-  const changed = await text(page, '.bk-bar:not([inert])');
+  const rh = await page.locator('[data-action="record"]').boundingBox();
+  await page.mouse.move(rh.x + rh.width / 2, rh.y + rh.height / 2); await page.mouse.down(); await page.waitForTimeout(1000); await page.mouse.up();
+  await page.waitForSelector('#bk-receipt');
+  const changed = await text(page, '#bk-receipt');
   assert.match(changed, /A02 · changed since review · 13 piglets now · record on its sheet/);
   assert.match(changed, /3 litters · 34 piglets/);
   console.log('ok 4 review frozen → sync moves 1 into A02 → Record:', changed);
