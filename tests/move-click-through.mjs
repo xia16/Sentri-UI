@@ -14,9 +14,10 @@ const server = spawn(process.execPath, ['scripts/serve-ux.cjs', String(port)], {
 const base = `http://localhost:${port}/ux/tasks/piglet-processing/`;
 const ready = (p) => p.waitForSelector('html[data-ready]');
 const text = async (p, sel) => (await p.locator(sel).first().innerText()).replace(/\s+/g, ' ');
-const drawer = (p) => text(p, '[data-st-context="drawer"]');
+// the surface on top: the Move page, or a sheet (the receipt) over the litter's Moves page
+const drawer = (p) => text(p, '.tk-sheet, .tk-page[data-view="move"]');
 
-// room → the litter's sheet → its Move door
+// room → the litter (its drawer over the room, or its own page) → its Move door
 async function openMove(page, crate, fresh) {
   await page.goto(base + 'room.html?state=room' + (fresh ? '&fresh=1' : '')); await ready(page);
   const row = page.locator(`[data-action="open-litter"][data-value="${crate}"]`);
@@ -25,7 +26,7 @@ async function openMove(page, crate, fresh) {
   await page.waitForURL(/state=litter/); await ready(page);
   await page.click(`[data-action="open-move"]`);
   await page.waitForURL(/move\.html/); await ready(page);
-  await page.waitForSelector('[data-st-context="drawer"]');
+  await page.waitForSelector('.tk-page[data-view="move"]');
 }
 async function find(page, q) {
   const box = page.locator('[data-role="crate-q"]');
@@ -50,7 +51,7 @@ try {
   console.log('ok 1 search across units → A03 · Unit 8:', d.slice(0, 80));
 
   // 2. R1-31: typing this crate's own code says why; R1-5: scan fills the search with the crate card read.
-  await page.click('[data-action="close"]');
+  await page.click('.tk-sheet [data-action="back"]');
   await page.click('[data-action="open-move"]');
   await find(page, 'B06');
   assert.match(await drawer(page), /B06 is this crate/);
@@ -75,8 +76,8 @@ try {
   assert.match(await text(page, '[data-action="save-move"]'), /Move 2 to B02 · Iron unknown/);
   await page.click('[data-action="save-move"]');
   assert.match(await drawer(page), /Saved · 2 piglets moved to B02/);
-  await page.click('[data-action="close"]');
-  const face = await text(page, '.sheet');
+  await page.click('.tk-sheet [data-action="back"]');
+  const face = await text(page, '.tk-page[data-view="face"]');
   assert.match(face, /Owed after a move — check on the pig/);
   assert.match(face, /Iron 0–2 of 8 owe · 2 to B02 unknown/);
   console.log('ok 3 ask waits → Move 2 to B02 · Iron unknown → B09 owes 0–2 of 8');
@@ -103,6 +104,12 @@ try {
   assert.match(d, /B08 will have 17 piglets/);
   assert.equal(await page.locator('[data-action="save-move"]').isDisabled(), false);
   console.log('ok 5 crowded warning:', d.match(/B08 will have[^.]*\./)[0]);
+
+  // 6. Back from the Move page lands on the litter's drawer over the room, its Move door there again.
+  await page.click('.tk-page[data-view="move"] .tk-footer [data-action="back"]');
+  await page.waitForURL(/room\.html\?.*state=litter.*crate=C05/); await ready(page);
+  await page.locator('[data-action="open-move"]').first().waitFor();
+  console.log('ok 6 Back → the litter drawer');
 
   await browser.close();
 } finally {

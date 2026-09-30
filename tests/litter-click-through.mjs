@@ -79,7 +79,7 @@ try {
   assert.match(page.url(), /state=litter/);
   await page.click('[data-action="open-move"]');
   await page.waitForURL(/move\.html/); await ready(page);
-  await page.waitForSelector('[data-st-context="drawer"]');
+  await page.waitForSelector('.tk-page[data-view="move"]');
   const box = page.locator('[data-role="crate-q"]'); await box.click(); await box.type('A02');
   await page.click('[data-action="pick-crate"][data-value="A02"]');
   await page.click('[data-action="step"][data-value="n"][data-step="1"]');
@@ -252,7 +252,9 @@ try {
   await page.waitForURL(/id\.html/); await ready(page);
   await page.click('[data-action="open-run"]');
   for (const k of '0043') await page.click(`[data-action="numpad"][data-value="tag"][data-key="${k}"]`);
-  await page.click('[data-action="close"]');
+  // Back from the run (to the litter's records), Back from the records (to the litter's drawer over the room)
+  await page.click('[data-view="run"] [data-action="to-table"]');
+  await page.click('[data-view="table"] [data-action="leave"]');
   await page.waitForURL(/state=litter/); await ready(page);
   assert.match(await face(page), /Record identity a piglet in hand · not saved/);
   console.log('ok 16 drafts on the doors: dead 2 unsaved · Set count 10 · identity in hand');

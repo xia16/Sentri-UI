@@ -20,7 +20,22 @@ const status = (p) => text(p, '#id-pad .st-numpad-hint');
 // scrim) would take it instead
 const tap = async (p, sel) => { const l = p.locator(sel).first(); await l.evaluate((e) => e.scrollIntoView({ block: 'center' })); const b = await l.boundingBox(); assert.ok(b, 'nothing to tap: ' + sel); await p.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await p.waitForTimeout(80); };
 const keys = async (p, digits, field = 'tag') => { for (const k of digits) await tap(p, `[data-action="numpad"][data-value="${field}"][data-key="${k === '<' ? 'back' : k}"]`); };
-const record = async (p) => { await tap(p, '.sheet-footer [data-action="record"]'); await p.waitForTimeout(650); };   // repeat taps inside 600ms are ignored
+const record = async (p) => { await tap(p, '.tk-footer [data-action="record"]'); await p.waitForTimeout(650); };   // repeat taps inside 600ms are ignored
+// the run (Piglet identity) and the table (Piglet records) are pages; the run's head line carries the litter's progress
+const progress = (p) => text(p, '[data-view="run"] .tk-page-desc');
+const toTable = (p) => tap(p, '[data-view="run"] .tk-footer [data-action="to-table"]');
+const leave = (p) => tap(p, '[data-view="table"] .tk-footer [data-action="leave"]');
+// the room → the litter's drawer (room.html?state=litter) → Record identity
+async function openIdentity(p, crate) {
+  await tap(p, `[data-action="open-litter"][data-value="${crate}"]`);
+  await drawerIdentity(p, crate);
+}
+// on the litter's drawer (where Back from the records lands): Record identity
+async function drawerIdentity(p, crate) {
+  await p.waitForURL(new RegExp(`room\\.html\\?.*state=litter.*crate=${crate}`)); await ready(p);
+  await tap(p, '[data-action="open-identity"]');
+  await p.waitForURL(/id\.html/); await ready(p);
+}
 
 try {
   await new Promise((r) => setTimeout(r, 400));
@@ -30,11 +45,8 @@ try {
 
   // 1. room → A02 → Record identity → the table → Record identity → three piglets by tap → Close → the litter says 3 of 12.
   await page.goto(base + 'room.html?state=room&fresh=1'); await ready(page);
-  await tap(page, '[data-action="open-litter"][data-value="A02"]');
-  await page.waitForURL(/state=litter/); await ready(page);
-  await tap(page, '[data-action="open-identity"]');
-  await page.waitForURL(/id\.html/); await ready(page);
-  assert.match(await text(page, '.utility-header'), /A02/);
+  await openIdentity(page, 'A02');
+  assert.match(await text(page, '[data-view="table"] .tk-page-desc'), /A02/);
   await tap(page, '[data-action="open-run"]');
   // piglet 1: typed tag, boar, weight typed on the weight pad
   await keys(page, '004301');
@@ -61,33 +73,33 @@ try {
   await tap(page, '[data-action="scan"]');
   assert.match(await text(page, '.st-numpad-readout'), /004303/);
   await record(page);
-  assert.match(await text(page, '.id-door'), /3 of 12 piglets identified/);
+  assert.match(await progress(page), /3 of 12 piglets identified/);
   // Undo takes the last one back onto the pad; Record puts it back
   await tap(page, '[data-action="undo"]');
   assert.match(await status(page), /Withdrew 004303/);
   await record(page);
-  assert.match(await text(page, '.id-door'), /3 of 12/);
+  assert.match(await progress(page), /3 of 12/);
   console.log('ok 1 room → litter → Record identity → 3 piglets:', await status(page));
 
   // 2. the same tag as a piglet here: caught again is the primary, a different piglet is offered beside it.
   await keys(page, '004301');
   assert.match(await status(page), /004301 is piglet 1 Different piglet\?/);
-  assert.match(await text(page, '.sheet-footer [data-action="record"]'), /Record · same piglet 1/);
+  assert.match(await text(page, '.tk-footer [data-action="record"]'), /Record · same piglet 1/);
   await tap(page, '[data-action="twin"][data-value="other"]');
   assert.match(await status(page), /A second piglet with tag 004301 · retag one later Same piglet 1/);
-  assert.match(await text(page, '.sheet-footer [data-action="record"]'), /Record · second 004301/);
+  assert.match(await text(page, '.tk-footer [data-action="record"]'), /Record · second 004301/);
   assert.match(await text(page, '[data-ds="Measure"][data-field="weight"]'), /Piglet 4 of 12/);
   await tap(page, '[data-action="twin"][data-value="same"]');
   await record(page);
   assert.match(await status(page), /Piglet 1 · kept boar · kept 1\.42 kg|Piglet 1 · nothing new/);
-  assert.match(await text(page, '.id-door'), /3 of 12/);
+  assert.match(await progress(page), /3 of 12/);
   // …and a double-issued tag: a second piglet with 004302 gets its own row, amber on both
   await keys(page, '004302');
   await tap(page, '[data-action="twin"][data-value="other"]');
   await record(page);
   assert.match(await status(page), /Last 004302 · a second piglet with this tag · retag one/);
-  assert.match(await text(page, '.id-door'), /4 of 12/);
-  await tap(page, '.id-door');
+  assert.match(await progress(page), /4 of 12/);
+  await toTable(page);
   assert.equal(await page.locator('[data-action="edit-row"]', { hasText: 'tag issued twice' }).count(), 2);
   console.log('ok 2 same tag: caught again, or a second piglet (double-issued tag) → 4 of 12, both rows amber');
 
@@ -95,21 +107,20 @@ try {
   await tap(page, '[data-action="open-run"]');
   await keys(page, '004305');
   await tap(page, '#id-sex [data-value="g"]');
-  await tap(page, '.sheet-footer [data-action="close"]');
-  await page.waitForURL(/state=litter/); await ready(page);
-  await tap(page, '[data-action="open-identity"]');
-  await page.waitForURL(/id\.html/); await ready(page);
+  await toTable(page);
+  await leave(page);
+  await drawerIdentity(page, 'A02');
   assert.match(await text(page, '[data-action="open-run"]'), /Record identity · 1 unsaved/);
   await tap(page, '[data-action="open-run"]');
   assert.match(await status(page), /004305 kept on this phone · not recorded yet/);
   assert.equal(await page.getAttribute('#id-sex [data-value="g"]', 'aria-checked'), 'true');
   await record(page);
-  assert.match(await text(page, '.id-door'), /5 of 12/);
+  assert.match(await progress(page), /5 of 12/);
   console.log('ok 3 piglet in hand → Close → reopen → kept → Record');
 
   // 4. the litter weight: three whole digits, a plausibility refusal, the counts the pad covered, a receipt that agrees
   //    with the tiles; an unsaved weight survives Close too.
-  await tap(page, '.id-door');
+  await toTable(page);
   await tap(page, '[data-action="open-weight"]');
   await keys(page, '168', 'lw');
   await tap(page, '[data-action="numpad"][data-value="lw"][data-key="5"]');
@@ -124,10 +135,8 @@ try {
   // Close with the drawer open keeps the weight on this phone
   await tap(page, '[data-st-context="drawer"] [data-action="back"]');
   assert.match(await text(page, '[data-action="open-weight"]'), /1 unsaved/);
-  await tap(page, '.sheet-footer [data-action="close"]');
-  await page.waitForURL(/state=litter/); await ready(page);
-  await tap(page, '[data-action="open-identity"]');
-  await page.waitForURL(/id\.html/); await ready(page);
+  await leave(page);
+  await drawerIdentity(page, 'A02');
   assert.match(await text(page, '[data-action="open-weight"]'), /1 unsaved/);
   await tap(page, '[data-action="open-weight"]');
   assert.match(await text(page, '[data-ds="Measure"][data-field="lw"]'), /16\.8/);
@@ -140,22 +149,26 @@ try {
 
   // 5. every alive piglet identified: no suggestion, no Record, Close is the way on.
   await page.goto(base + 'id.html?state=id-all&fresh=1'); await ready(page);
-  assert.equal(await page.locator('.sheet-footer [data-action="record"]').count(), 0);
-  assert.equal(await page.getAttribute('.sheet-footer [data-action="close"]', 'data-register'), 'primary');
+  assert.equal(await page.locator('.tk-footer [data-action="record"]').count(), 0);
+  assert.equal(await page.locator('[data-view="run"] .tk-footer > *').count(), 1);
+  const inked = await page.$eval('[data-view="run"] .tk-footer [data-action="to-table"]', (b) => {
+    const probe = document.createElement('i'); probe.style.color = 'var(--ink)'; document.body.append(probe);
+    const ink = getComputedStyle(probe).color; probe.remove();
+    return getComputedStyle(b).backgroundColor === ink;
+  });
+  assert.equal(inked, true);
   assert.match(await status(page), /All 12 alive identified/);
-  await tap(page, '.sheet-footer [data-action="close"]');
-  await page.waitForURL(/state=litter/);
-  console.log('ok 5 all identified → Close');
+  await toTable(page);
+  await leave(page);
+  await page.waitForURL(/room\.html\?.*state=litter.*crate=A02/);
+  console.log('ok 5 all identified → Back');
 
   // 6. keepers farm: tag two, close the set, the closed set never says "so far" and says how to add a keeper.
   await page.goto(base + 'room.html?state=room&data=keepers&fresh=1'); await ready(page);
-  await tap(page, '[data-action="open-litter"][data-value="A07"]');
-  await page.waitForURL(/state=litter/); await ready(page);
-  await tap(page, '[data-action="open-identity"]');
-  await page.waitForURL(/id\.html/); await ready(page);
+  await openIdentity(page, 'A07');
   await tap(page, '[data-action="open-run"]');
   await record(page);
-  await tap(page, '.id-door');
+  await toTable(page);
   assert.match(await text(page, '[data-ds="Facts"]'), /Tagged so far 10/);
   await tap(page, '[data-action="close-set"]');
   await tap(page, '[data-action="confirm-close"]');
@@ -167,10 +180,7 @@ try {
 
   // 7. notch farm: 99 is the last number (the next suggestion is the lowest free one), 0 is refused with the reason.
   await page.goto(base + 'room.html?state=room&data=notch&fresh=1'); await ready(page);
-  await tap(page, '[data-action="open-litter"][data-value="A04"]');
-  await page.waitForURL(/state=litter/); await ready(page);
-  await tap(page, '[data-action="open-identity"]');
-  await page.waitForURL(/id\.html/); await ready(page);
+  await openIdentity(page, 'A04');
   await tap(page, '[data-action="open-run"]');
   await keys(page, '99');
   await record(page);
