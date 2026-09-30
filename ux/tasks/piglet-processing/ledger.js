@@ -1608,6 +1608,8 @@ function view(ctx, L, corrections, today) {
       notDoneAfterEnd,
       owedFrom,
       treated: D.treated,
+      // R1-21: an open possible double is two records of one act until answered: it counts once (the smaller comes out)
+      treatedOnce: D.treated - openPairs.reduce((s2, p) => s2 + Math.min(...p.map((id) => { const r = D.records.find((x) => x.id === id); return r ? r.n || 0 : 0; })), 0),
       deferred,
       deferReason: deferred ? fi.reason : null,
       deferBy,                                       // N12: { weak, sick } when the untreated were split by reason; else null
@@ -2273,7 +2275,7 @@ function endFigures(cfg, litterViews, opts) {
     const t = { done: 0, owed: 0, unknown: 0, missed: 0, notDue: 0, malesUncounted: false, onTime: { n: 0, k: 0 }, excluded: 0, unfinished: false };
     const age = o.closing && o.endDay != null && L.birthDay != null ? o.endDay - L.birthDay : L.dayAge;
     for (const D of Object.values(L.doses).sort(order)) {
-      t.done += D.treated;
+      t.done += D.treatedOnce != null ? D.treatedOnce : D.treated;
       const kind = D.status === 'later' ? 'not_due' : D.status === 'missed' ? 'missed' : 'owed';
       const owed = D.owed == null ? 0 : D.owed, unk = D.unknownAfterMove;
       if (D.owed == null) {
@@ -2579,10 +2581,19 @@ function editSelect(derived, id, draft, stamp) {
       const reason = x.reason || (rest > 0 && ended ? 'not_done' : null) || (rest > 0 && m.deferReason) || null;
       if (rest > 0 && !reason) need({ why: 'reason', mark: m.id, n: rest });
       let set;
-      if (m.castration) set = { castration: Object.assign({}, m.castration, { castrated: x.n, deferred: rest || 0 }, rest > 0 ? { deferReason: reason } : {}) };
+      let exempt = 0;
+      if (m.castration && EXEMPT_REASONS.includes(reason)) {
+        // Q16: hernia, cryptorchid and kept boar leave the task (Q15) — their own field; the deferred stay as they were
+        const was = m.castration;
+        exempt = Math.max(0, rest - (was.deferred || 0));
+        const c = Object.assign({}, was, { castrated: x.n });
+        c[reason] = (was[reason] || 0) + exempt;
+        if (!was.deferred) { delete c.deferred; delete c.deferReason; }
+        set = { castration: c };
+      } else if (m.castration) set = { castration: Object.assign({}, m.castration, { castrated: x.n, deferred: rest || 0 }, rest > 0 ? { deferReason: reason } : {}) };
       else set = { n: x.n, deferred: rest > 0 ? { n: rest, reason } : null };
       list.push({ target: m.id, set });
-      changes.push({ kind: 'mark', mark: m.id, dose: m.dose, from: m.n, to: x.n, rest: Math.max(0, rest), reason, afterEnd: ended });
+      changes.push(Object.assign({ kind: 'mark', mark: m.id, dose: m.dose, from: m.n, to: x.n, rest: Math.max(0, rest), reason, afterEnd: ended }, exempt ? { exempt } : {}));
     }
   }
   for (const m of moves) {

@@ -639,7 +639,10 @@ export const VARIANTS = {
   'ended-after-end': V((b) => { late(b); end(b); POST.afterEnd(b); }, '2026-10-17'),
   'ended-correct': V((b) => { late(b); end(b); POST.correct(b); }, '2026-10-18'),
   'ended-moves': V((b) => { late(b); end(b); POST.moves(b); }, '2026-10-18'),
-  'ended-after': V((b) => { late(b); end(b); POST.correct(b); POST.moves(b); }, '2026-10-18')
+  'ended-after': V((b) => { late(b); end(b); POST.correct(b); POST.moves(b); }, '2026-10-18'),
+  // round 4: End froze A05's possible double as unresolved at End; answered the next morning (`twice`: a double dose for the
+  // vet, counted once) — the receipt lists it under what changed since End
+  'ended-answered': V((b) => { late(b); end(b); b.push({ type: 'double', litter: 'A05', dose: 'iron3', records: ['T-A05-lm', 'T-A05-gh'], answer: 'twice', at: oct(18, '08:40'), who: 'L.M' }, 'DB-A05'); }, '2026-10-18')
 };
 
 // ---------------------------------------------------------------------------------------------

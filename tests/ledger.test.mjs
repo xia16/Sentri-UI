@@ -2576,3 +2576,31 @@ test('N12 a split deferral carries its by-reason counts onto the record and the 
   assert.deepEqual(d.litters.A.doses.iron3.deferBy, { weak: 1, sick: 1 });
   assert.ok(t);
 });
+
+test('R1-21 an open possible double counts once toward End\'s Done (both records kept)', () => {
+  const b = book();
+  b.farrowed('A', 11);
+  const seen = b.ev.map((e) => e.id);
+  b.treat('A', 'iron3', 11, { seen }); b.treat('A', 'iron3', 10, { seen, deferred: { n: 1, reason: 'weak' } });
+  const d = run(b, R1T(['A']));
+  assert.equal(d.litters.A.doses.iron3.treated, 21);                 // the records, as written
+  assert.equal(d.litters.A.doses.iron3.treatedOnce, 11);             // the act, counted once: the smaller record comes out
+  const e = select.end(d);
+  assert.equal(e.now.litters.A.done, 11);
+  assert.equal(e.now.progress.done, 11);
+});
+
+test('R1-28 Q16 on a corrected castration: hernia, cryptorchid and kept boar leave the task, only deferred stays owed', () => {
+  const b = book();
+  b.farrowed('A', 12, {}, bornOn(-2));                              // day 5 on on(3)
+  const c = b.castrate('A', { castrated: 5, deferred: 1, deferReason: 'weak' });
+  const d = run(b, R1);
+  const ed = select.edit(d, 'A', { marks: { [c.id]: { n: 3, reason: 'hernia' } } });
+  assert.equal(ed.why, null);
+  assert.deepEqual(ed.events[0].changes[0].set.castration, { castrated: 3, deferred: 1, deferReason: 'weak', hernia: 2 });
+  assert.deepEqual(ed.changes[0].exempt, 2);
+  assert.deepEqual(ed.after.owed.castrate, 1);                      // the weak one only
+  const dr = select.edit(d, 'A', { marks: { [c.id]: { n: 4, reason: 'sick' } } });
+  assert.deepEqual(dr.events[0].changes[0].set.castration, { castrated: 4, deferred: 2, deferReason: 'sick' });
+  assert.deepEqual(dr.after.owed.castrate, 2);
+});

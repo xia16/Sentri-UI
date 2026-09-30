@@ -126,7 +126,7 @@
   function L(c) { return store.derived.litters[c || crate]; }
   function stamp() { return { id: 'edit-draft', at: null, who: ME }; }
   var memo = { k: '', v: null };
-  function E() { var k = JSON.stringify(draft) + store.events.length; if (memo.k !== k) memo = { k: k, v: exemptCastration(store.select.edit(store.derived, crate, draft, stamp())) }; return memo.v; }
+  function E() { var k = JSON.stringify(draft) + store.events.length; if (memo.k !== k) memo = { k: k, v: store.select.edit(store.derived, crate, draft, stamp()) }; return memo.v; }
   function doseCfg(id) { return CFG.doses.filter(function (d) { return d.id === id; })[0]; }
   function mark(e, id) { return e.marks.filter(function (m) { return m.id === id; })[0]; }
   function row(e, id) { return e.rows.filter(function (r) { return r.rowId === id; })[0]; }
@@ -135,29 +135,7 @@
   function deathOf(e, id) { return e.deaths.filter(function (x) { return x.id === id; })[0]; }
   function changeOf(e, key, val) { return e.changes.filter(function (c) { return c[key] === val; })[0]; }
   function eventOf(id) { return store.events.filter(function (x) { return x.id === id; })[0] || null; }
-  var EXEMPT = ['hernia', 'cryptorchid', 'kept'];
-  /* Q16 on a corrected castration: select.edit files every not-castrated piglet of a lowered castration as deferred with
-     the reason given. Hernia, cryptorchid and kept boar leave the task (Q15), so the page moves them to their own field and
-     replays the event through append (store.trial) — the ledger still decides. Logged for the ledger worker. */
-  function exemptCastration(e) {
-    if (!e || !e.events || !e.events.length) return e;
-    var list = e.events[0].changes, touched = false;
-    e.changes.forEach(function (c) {
-      if (c.kind !== 'mark' || EXEMPT.indexOf(c.reason) < 0) return;
-      var m = mark(e, c.mark); if (!m || !m.castration) return;
-      var ch = list.filter(function (x) { return x.target === m.id && x.set && x.set.castration; })[0]; if (!ch) return;
-      var was = m.castration, k = c.rest - (was.deferred || 0); if (k <= 0) return;
-      var set = Object.assign({}, was, { castrated: c.to });
-      set[c.reason] = (was[c.reason] || 0) + k;
-      if (!was.deferred) { delete set.deferred; delete set.deferReason; }
-      ch.set = { castration: set };
-      c.exempt = k; touched = true;
-    });
-    if (!touched) return e;
-    var r = store.trial(e.events[0]);
-    if (!r.ok) { e.why = r.reason === 'correction_invalid' && r.detail ? r.detail.reason : r.reason; e.whyDetail = r.detail; e.events = null; }
-    return e;
-  }
+  // Q16 on a corrected castration (R1-28): select.edit files hernia, cryptorchid and kept boar as leaving the task (`exempt`).
   // Open possible doubles on this litter, and the answered ones (round 4).
   function pairs(c) { var out = []; var X = L(c); if (!X) return out; Object.keys(X.doses).forEach(function (k) { X.doses[k].possibleDoubleTreatment.forEach(function (p) { out.push({ dose: k, records: p.slice() }); }); }); return out; }
   function answered(c) { var out = []; var X = L(c); if (!X) return out; Object.keys(X.doses).forEach(function (k) { X.doses[k].doubles.forEach(function (x) { out.push(Object.assign({ dose: k }, x)); }); }); return out; }
