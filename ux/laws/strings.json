@@ -435,6 +435,7 @@
     "pp.count.sug.gained_unit": {"en": "{code} · Unit {u} gained {np}", "zh": "{u}单元{code}多了{np}", "kind": "title"},
     "pp.count.sug.lost_unit": {"en": "{code} · Unit {u} lost {np}", "zh": "{u}单元{code}少了{np}", "kind": "title"},
     "pp.count.sug.desc": {"en": "{effect}", "zh": "{effect}", "kind": "body"},
+    "pp.count.sug.desc_gap": {"en": "{effect} · {gap}", "zh": "{effect} · {gap}", "kind": "body"},
     "pp.count.sug.both": {"en": "both lines close", "zh": "两条都结清", "kind": "body"},
     "pp.count.sug.gain_closes": {"en": "gain closes · loss {kp} stays open", "zh": "增加结清 · 减少{kp}仍未解释", "kind": "body"},
     "pp.count.sug.loss_closes": {"en": "loss closes · gain {kp} stays open", "zh": "减少结清 · 增加{kp}仍未解释", "kind": "body"},
