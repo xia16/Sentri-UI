@@ -3,54 +3,49 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dead picker</title>
+<title>Record death</title>
 <link rel="stylesheet" href="/ux/design-system/tokens.css">
 <link rel="stylesheet" href="/ux/design-system/components/bundle.css">
-<link rel="stylesheet" href="shell.css">
+<link rel="stylesheet" href="/ux/design-system/components/task-skeleton.css">
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* Layout only, tokens from tokens.css. The drawer is a composition of cards (DeadDrawer stays a task pattern, ADR 0002):
-   ChoiceList radios, Photos, Banner, Status, Button's text register, its waiting face and hold. */
-.dd-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
-.dd-phone .scrim { inset: 0; }
-.dd-stack { display: flex; flex-direction: column; gap: var(--space-section); }
-.dd-stack > * { margin: 0; }
-.dd-rows { display: flex; flex-direction: column; }
-.dd-group > * + * { margin-top: var(--space-heading); }
-.dd-group > .st-heading { margin-bottom: 0; }
-.dd-bar { flex-wrap: wrap; justify-content: space-between; column-gap: var(--space-section); }
-.dd-bar > .primary, .dd-bar > .danger { flex: 1; }
-.dd-pointer { display: flex; flex-direction: column; align-items: flex-start; }
-/* the drawer header: Clear sits centred on the title block — clear of the litter face's day line behind it (360) and of the segment below */
-.dd-grab .st-heading-aside { max-width: none; align-self: center; }
-.dd-grab .st-heading-description .st-status { margin-left: var(--space-row-y); }
+/* Layout only, tokens from tokens.css. The page is the task skeleton (ADR 0003): TaskPhone, TaskSheet (grab, title,
+   subtitle, ✕ or Clear, divider, body, footer with Back + Save), TaskGroup/TaskRow for crates, TaskDialog for one
+   question. The body is cards: Segment, Stepper, ChoiceList, Row, Photos, Banner, Button's reason line. */
+/* The room behind the drawer: the page the worker returns to, drawn by its own page (inert, never focusable). */
+.dd-over { display: contents; }
+.dd-behind { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--app-background); pointer-events: none; }
+/* The sheet body is one column of sections, farrowing's rhythm. */
+.dd-body { display: flex; flex-direction: column; gap: var(--space-heading); }
+.dd-body > * { margin: 0; }
+.dd-body > .st-segment { margin-bottom: 2px; }
+.dd-body .st-button-reason:empty { display: none; }
+.tk-sheet .tk-group-head { position: static; }
 /* the photo viewer: one photo, full width (a stand-in frame: the prototype has no camera) */
 .dd-photo { display: grid; place-items: center; width: 100%; aspect-ratio: 3 / 4; border-radius: var(--radius-inset); background: var(--well); color: var(--muted); font-family: var(--font-mono); font-size: var(--type-button-size); }
-.dd-viewer-bar { column-gap: var(--space-section); }
-.dd-viewer-bar > .button { flex: 1; }
 </style>
 </head>
-<body>
-<main class="inspection-phone dd-phone" data-st-context="page">
-  <div id="screen"></div>
-</main>
+<body class="tk-stage">
+<div id="screen"></div>
 <script src="/ux/design-system/components/bundle.js"></script>
+<script src="/ux/design-system/components/task-skeleton.js"></script>
 <script src="shell.js"></script>
 <script src="shell-ui.js"></script>
 <script>
 (function () {
-  var UI = window.SentriUI, U = window.PPUI;
+  var UI = window.SentriUI, U = window.PPUI, K = window.SentriTask;
 
   /* ---- The drawer forks on the litter's phase (open · locked), never on the task or the surface. Every figure is the
      ledger's (select.deathDraft over the shared fixture): causes by phase, the roster (alive and counted-missing tagged
      piglets), the cap, the from-the-missing range, why Save waits and Alive after. Save commits through append and returns
-     to where the worker came from (`back`, else the litter) with the receipt; Back keeps the draft on this phone and returns
-     the same way. The page behind the drawer is only the litter face it was opened over (inert): there is no host stub. ---- */
+     to where the worker came from (`back`, else the litter drawer over the room) with the receipt; Back keeps the draft on
+     this phone and returns the same way. Behind the drawer: the room, as its own page draws it. ---- */
   var SOW = { open: ['farrowing', 'prolapse', 'found', 'other'], locked: ['prolapse', 'found', 'other'] };
   var KEY = function (c) { return c.replace('-', '_'); };            // the ledger's `starve-out` is the registry's `starve_out`
   // state → crate, data, the draft shown (pig: tallies, picks {rowId: cause}, miss {rowId: yes|no}, k, photos n, note, route;
-  // sow cause), kept (a draft restored from this phone), view (a photo open), found (the room's `Found a body`)
+  // sow cause), kept (a draft restored from this phone), view (a photo open), found (the room's `Found a body`), sub (a
+  // view inside the drawer: tagged · nb · held)
   var STATES = {
     'dead':                   { crate: 'A02' },
     'dead-tallied':           { crate: 'A02', pig: { tallies: { crushed: 1 } } },
@@ -61,20 +56,25 @@
     'dead-photo-deleted':     { crate: 'A02', pig: { tallies: { crushed: 1 }, photos: 2 }, deleteAt: 2 },
     'dead-other':             { crate: 'A02', pig: { tallies: { other: 1 } } },
     'dead-routed':            { crate: 'A02', pig: { tallies: { crushed: 1 }, route: 'D03' } },
+    'dead-neighbours':        { crate: 'A02', data: 'explain', pig: { tallies: { crushed: 1 } } },
+    'dead-neighbours-list':   { crate: 'A02', data: 'explain', pig: { tallies: { crushed: 1 } }, sub: 'nb' },
     'dead-found':             { unit: 7, data: 'explain', found: true },
     'dead-tagged':            { crate: 'B06' },
-    'dead-tagged-picked':     { crate: 'B06', pig: { tallies: { scours: 1 }, picks: { 'B06-r4': 'crushed', 'B06-r9': 'crushed' } } },
-    'dead-tagged-nocause':    { crate: 'B06', pig: { picks: { 'B06-r4': '' } } },
-    'dead-tagged-second':     { crate: 'B06', pig: { picks: { 'B06-r4': 'crushed', 'B06-r9': '' } } },
-    'dead-tagged-missing':    { crate: 'B06', data: 'explain', pig: { picks: { 'B06-r4': 'crushed' } } },
-    'dead-tagged-missing-yes':{ crate: 'B06', data: 'explain', pig: { picks: { 'B06-r4': 'crushed' }, miss: { 'B06-r4': 'yes' } } },
-    'dead-tagged-named':      { crate: 'B06', data: 'explain-named', pig: { picks: { 'B06-r4': 'crushed' } } },
+    'dead-tagged-list':       { crate: 'B06', sub: 'tagged' },
+    'dead-tagged-picked':     { crate: 'B06', sub: 'tagged', pig: { tallies: { scours: 1 }, picks: { 'B06-r4': 'crushed', 'B06-r9': 'crushed' } } },
+    'dead-tagged-nocause':    { crate: 'B06', sub: 'tagged', pig: { picks: { 'B06-r4': '' } } },
+    'dead-tagged-second':     { crate: 'B06', sub: 'tagged', pig: { picks: { 'B06-r4': 'crushed', 'B06-r9': '' } } },
+    'dead-tagged-missing':    { crate: 'B06', sub: 'tagged', data: 'explain', pig: { picks: { 'B06-r4': 'crushed' } } },
+    'dead-tagged-missing-yes':{ crate: 'B06', sub: 'tagged', data: 'explain', pig: { picks: { 'B06-r4': 'crushed' }, miss: { 'B06-r4': 'yes' } } },
+    'dead-tagged-named':      { crate: 'B06', sub: 'tagged', data: 'explain-named', pig: { picks: { 'B06-r4': 'crushed' } } },
+    'dead-tagged-back':       { crate: 'B06', data: 'explain', pig: { picks: { 'B06-r4': 'crushed' }, miss: { 'B06-r4': 'yes' } } },
     'dead-open-loss':         { crate: 'D03', pig: { tallies: { crushed: 1 } } },
     'dead-open-loss-yes':     { crate: 'D03', pig: { tallies: { crushed: 1 }, k: 1 } },
     'dead-open-loss-no':      { crate: 'D03', pig: { tallies: { crushed: 1 }, k: 0 } },
     'dead-open-loss-split':   { crate: 'D03', pig: { tallies: { crushed: 2 }, k: 1 } },
     'dead-open-loss-floor':   { crate: 'D03', pig: { tallies: { crushed: 12 }, k: 2 } },
     'dead-held':              { crate: 'A07', data: 'held-body' },
+    'dead-held-ask':          { crate: 'A07', data: 'held-body', sub: 'held' },
     'dead-sow':               { crate: 'A02', mode: 'sow', sow: { cause: 'prolapse' } },
     'dead-sow-other':         { crate: 'A02', mode: 'sow', sow: { cause: 'other' } },
     'dead-sow-recorded':      { crate: 'B01' },
@@ -122,7 +122,6 @@
   var locked = function () { return Lx().phase === 'locked'; };
   var causes = function () { return draft().causes.map(KEY); };
   var alive = function () { return Lx().alive; };
-  var bornDead = function () { var c = Lx().dead.byCause; return (c.stillborn || 0) + (c.mummified || 0); };
   var rows = function () { return Lx().identity.rows; };
   // the roster: alive tagged piglets and those a count named missing (a named missing piglet's body closes its own loss)
   var rosterOf = function () { var m = {}; draft().roster.forEach(function (r) { m[r.rowId] = r; }); return m; };
@@ -158,63 +157,52 @@
     }
     var d = draft(), bare = picks().filter(function (r) { return !S.pig.picks[r]; });
     if (d.why === 'empty') return { id: 'ds.dead.why.empty', to: 'tallies', quiet: true };
-    if (d.why === 'cause_one') return { id: 'ds.dead.why.cause_one', args: { id: idText(rowOf(bare[0])) }, to: 'pick-cause' };
-    if (d.why === 'cause_many') return { id: 'ds.dead.why.cause_many', args: { n: bare.length }, to: 'pick-cause' };
+    if (d.why === 'cause_one') return { id: 'ds.dead.why.cause_one', args: { id: idText(rowOf(bare[0])) }, to: 'pick-cause', sub: 'tagged' };
+    if (d.why === 'cause_many') return { id: 'ds.dead.why.cause_many', args: { n: bare.length }, to: 'pick-cause', sub: 'tagged' };
     if (d.why === 'over_cap') return { id: 'ds.dead.hint.cap', args: { n: d.cap }, to: 'tallies' };
     if (d.why === 'missing') return { id: 'ds.dead.why.missing', to: 'loss' };
     var open = askMiss().filter(function (r) { return !S.pig.miss[r]; });
-    if (open.length) return { id: 'pp.dead.why.row_missing', args: { id: idText(rowOf(open[0])) }, to: 'miss-' + open[0] };
+    if (open.length) return { id: 'pp.dead.why.row_missing', args: { id: idText(rowOf(open[0])) }, to: 'miss-' + open[0], sub: 'tagged' };
     if (d.why) return { id: 'ds.dead.why.check', to: 'tallies' };
     return null;
   }
 
   // ---- Helpers ------------------------------------------------------------------------------
   function span(id, args, cls) { return U.span(id, args, { cls: cls }); }
-  var unit = function (n) { return { id: pl('pp.common.unit.piglet', n), args: { n: n } }; };
-  function fact(label, n) { var u = unit(n); return { label: '', value: '', strs: { label: label, value: u.id }, args: { value: u.args } }; }
+  var s = function (id, args) { return { text: PP.t(id, args), str: id, args: args }; };       // a skeleton text slot
   function textAct(action, id, args, value) { return UI.button({ label: PP.t(id, args), register: 'text', action: action, value: value || '', strs: { label: id }, args: args ? { label: args } : undefined }); }
   function btn(action, id, register, o) {
     o = o || {};
-    return UI.button({ label: PP.t(id), register: register, action: action, waiting: !!o.waiting, describedby: o.describedby || '', strs: { label: id } });
+    return UI.button({ label: PP.t(id), register: register, action: action, value: o.value || '', waiting: !!o.waiting, describedby: o.describedby || '', strs: { label: id } });
   }
   function radios(action, key, options, selected, labelId, labelArgs) {
     return UI.choiceRadios({ label: '', layout: 'rows', action: action, key: key, selected: selected || '', id: 'dd-' + key.replace(/[^\w-]/g, ''),
       strs: labelId ? { label: labelId } : undefined, args: labelArgs ? { label: labelArgs } : undefined,
       options: options.map(function (o) { return { value: o.v, label: '', strs: { label: o.id }, args: o.args ? { label: o.args } : undefined }; }) });
   }
-
-  // ---- The litter face behind the drawer (inert: the drawer always leads; Back and Save leave the page) --------------
-  function backdrop() {
-    if (!crate) return '<section class="sheet" data-ds="Sheet" data-presentation="page" inert><header class="utility-header">' +
-      UI.heading({ title: '', kind: 'page', level: 2, strs: { title: 'pp.count.ex.title_room' }, args: { title: { u: S.unit } } }) + '</header></section>';
-    var H = Hx(), sw = store.sow(crate) || { sow: '', parity: 0 };
-    return '<section class="sheet" data-ds="Sheet" data-presentation="page" inert>' +
-      U.litterHeader({ crate: crate, sow: sw.sow, parity: sw.parity, day: H.dayAge }) +
-      '<div class="sheet-body"><div class="dd-stack">' + UI.facts([fact('label.born', H.born), fact('label.alive', H.alive), fact('label.dead', H.dead.total)], { columns: 3 }) +
-      '</div></div></section>';
+  // A door row (Row card): one title, at most one meta line, a chevron.
+  function door(action, value, title, titleArgs, desc, descArgs, trailing) {
+    var strs = { title: title }, args = { title: titleArgs };
+    if (desc) { strs.description = desc; args.description = descArgs; }
+    if (trailing) { strs.trailing = trailing; }
+    return UI.row({ title: '', description: desc ? '' : undefined, trailing: trailing ? '' : undefined, action: action, value: value || '', strs: strs, args: args });
   }
 
-  // ---- The drawer ------------------------------------------------------------------------------
-  function header() {
-    var sow = S.mode === 'sow', n = pigN();
-    var dr = sow ? sowDirty() : pigDirty();
-    var clear = dr ? textAct('clear', 'act.clear') : '';
-    // this entry leads; the litter's running total is said apart (`1 dead so far`), never prefilled into the steppers
-    var h = UI.heading({ title: '', description: '', action: clear, kind: 'page', level: 3,
-      strs: { title: sow ? 'ds.dead.title.sow' : 'act.record_dead', description: sow ? 'ds.dead.sub.sow' : locked() ? 'pp.dead.sub.locked' : 'pp.dead.sub.open' },
-      args: { description: { pen: tgt(), alive: alive(), bd: bornDead(), d: Lx().dead.total } } });
-    if (n && !sow) h = h.replace('</p></div>', ' ' + UI.status({ text: '', tone: 'green', strs: { text: 'pp.dead.unsaved' }, args: { text: { n: n } } }) + '</p></div>');
-    return '<header class="utility-header dd-grab" data-grab>' + h + '</header>';
+  // ---- The room behind the drawer: the room page itself, inert (the drawer always leads; Back and Save leave the page) ----
+  function behind() {
+    var src = PP.href('room.html', { state: 'room', unit: S.unit !== 7 ? S.unit : '', data: store.name !== 'base' ? store.name : '' });
+    return '<iframe class="dd-behind" src="' + U.esc(src) + '" title="" aria-hidden="true" tabindex="-1" inert></iframe>';
   }
+
+  // ---- The drawer: piglets ------------------------------------------------------------------
   function tallyRow(c) {
-    var posted = Lx().dead.byCause[c] || Lx().dead.byCause[c.replace('_', '-')] || 0, d = S.pig.tallies[c] || 0, full = bodies() >= draft().cap;
+    var d = S.pig.tallies[c] || 0, full = bodies() >= draft().cap;
     var cause = PP.t('ds.dead.cause.' + c);
-    return UI.stepper({ label: '', description: posted ? '' : undefined, value: d, min: 0, max: full ? d : null, key: c, action: 'dead-step',
+    return UI.stepper({ label: '', value: d, min: 0, max: full ? d : null, key: c, action: 'dead-step',
       draft: d > 0, reserveHint: S.hint === c, hint: S.hint === c ? ' ' : '',
       strs: Object.assign({ label: 'ds.dead.cause.' + c, value: 'ds.field.figure', decrease: 'pp.dead.aria.less', increase: 'pp.dead.aria.more' },
-        posted ? { description: 'pp.dead.so_far' } : {},
         S.hint === c ? { hint: roster().length ? 'ds.dead.hint.cap_identified' : 'ds.dead.hint.cap' } : {}),
-      args: { hint: { n: draft().cap }, description: { n: posted }, decrease: { cause: cause }, increase: { cause: cause } } });
+      args: { hint: { n: draft().cap }, decrease: { cause: cause }, increase: { cause: cause } } });
   }
   function lossStepper() {
     var d = draft();
@@ -229,113 +217,70 @@
         : { id: 'ds.dead.loss.move', args: { a: a, b: after, left: left } };
     } else hint = { id: 'ds.dead.loss.ask' };
     // `None were missing` is an explicit answer (a text action), so the floor-gray minus keeps its one meaning.
-    var none = b && k == null && !d.kMin ? textAct('loss-none', 'ds.dead.loss.none') : '';
-    return '<div data-target="loss">' + UI.stepper({ label: '', value: k || 0, min: k == null ? 0 : d.kMin, max: d.kMax, key: 'k', action: 'loss-step', hint: ' ',
+    var none = b && k == null && !d.kMin ? [{ label: PP.t('ds.dead.loss.none'), action: 'loss-none', strs: { label: 'ds.dead.loss.none' } }] : [];
+    return '<div data-target="loss">' + UI.stepper({ label: '', value: k || 0, min: k == null ? 0 : d.kMin, max: d.kMax, key: 'k', action: 'loss-step', hint: ' ', pointers: none,
       strs: { label: 'ds.dead.loss.label', value: 'ds.field.figure', hint: hint.id, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
-      args: { label: { m: m }, hint: hint.args } }) + none + '</div>';
+      args: { label: { m: m }, hint: hint.args } }) + '</div>';
   }
   /* A body found outside its crate (R1-8): other litters in this room with a piglet missing. Tapping one records the
      draft there, from that litter's open loss (the app never pairs by itself: the worker says whose it is). */
   function neighbours() {
-    if (surface !== 'processing' || !locked() || !crate) return [];
+    if (surface !== 'processing' || !crate || !Hx() || Hx().phase !== 'locked') return [];
     var room = Hx().room, out = [], all = store.derived.litters;
     Object.keys(all).sort().forEach(function (id) {
       var L = all[id];
-      if (id === tgt() || L.room !== room || L.phase !== 'locked' || !L.unexplained.openLoss) return;
+      if (id === crate || L.room !== room || L.phase !== 'locked' || !L.unexplained.openLoss) return;
       var d = store.select.deathDraft(store.derived, id, { tallies: { crushed: 1 } });
       if (!d.asksLoss) return;
       out.push({ id: id, m: d.openLoss - d.roster.filter(function (r) { return r.status === 'missing'; }).length, loss: d.losses[0] });
     });
     return out;
   }
-  function neighbourBlock() {
-    if (S.pig.route) {
-      // routed: which litter this body is recorded on, and the way back
-      return '<div class="dd-group" data-target="route">' + UI.heading({ title: '', description: '', kind: 'panel', level: 4,
-        strs: { title: 'pp.dead.route.title', description: 'pp.dead.route.desc' },
-        args: { title: { code: tgt(), from: crate }, description: { code: tgt(), from: crate, a: Hx().alive } } }) +
-        textAct('route', 'pp.dead.route.undo', { from: crate }, crate) + '</div>';
-    }
+  // One compact row, shown once a body is counted: routed (tap = record it here instead), one neighbour (tap = record it
+  // there), or several (tap = the list, one level down).
+  function neighbourRow() {
+    if (S.pig.route) return '<div data-target="route">' + UI.rowGroup(door('route', crate, 'pp.dead.route.title', { code: tgt(), from: crate }, null, null, 'ds.c2.undo')) + '</div>';
+    if (!bodies()) return '';
     var list = neighbours();
-    if (!list.length || S.mode === 'sow') return '';
-    var rs = list.map(function (x) {
-      return UI.row({ title: '', description: '', action: 'route', value: x.id, wrap: true,
-        strs: { title: pl('pp.dead.nb.row', x.m), description: 'pp.dead.nb.desc' },
-        args: { title: { code: x.id, m: x.m }, description: { code: x.id, stamp: U.stamp(x.loss.at, x.loss.who, store.today) } } });
-    }).join('');
-    return '<div class="dd-group">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.dead.nb.title' } }) + UI.rowGroup(rs) + '</div>';
+    if (!list.length) return '';
+    if (list.length === 1) return UI.rowGroup(door('route', list[0].id, pl('pp.dead.nb.row', list[0].m), { code: list[0].id, m: list[0].m }));
+    return UI.rowGroup(door('sub', 'nb', 'pp.dead.nb.title', null, pl('pp.dead.nb.some', list.length), { n: list.length }));
   }
-  function pigMeta(p) {
-    if (p.status === 'missing') { var x = lossOfRow(p.rowId); return ['pp.dead.row.missing', { t: x ? U.time(x.at) : '' }]; }
-    var sex = p.sex ? PP.t('pp.common.sex.' + (p.sex === 'b' ? 'boar' : 'gilt')) : '';
-    return sex && p.weight != null ? ['pp.common.pig.sw', { sex: sex, w: p.weight }] : sex ? ['pp.common.pig.s', { sex: sex }] : p.weight != null ? ['pp.common.pig.w', { w: p.weight }] : null;
-  }
-  function identifiedBlock() {
+  // The litter's tagged piglets (Q9: the shared picker shows them when there are any): one row here, the list one level down.
+  function taggedRow() {
     var rs = roster();
     if (!rs.length) return '';
-    var list = UI.choiceGroup(rs.map(function (p) {
-      var l = idLabel(p), meta = pigMeta(p);
-      return UI.choiceRow({ label: '', meta: '', mode: 'multi', action: 'pick', value: p.rowId, selected: p.rowId in S.pig.picks, mono: true,
-        strs: Object.assign({ label: l.id }, meta ? { meta: meta[0] } : {}), args: { label: l.args, meta: meta ? meta[1] : null } });
-    }), {});
-    var out = '<div class="dd-group">' + UI.heading({ title: '', kind: 'group', level: 4, action: textAct('scan', 'act.scan'), strs: { title: 'ds.dead.identified' }, args: { title: { n: rs.length } } }) + list + '</div>';
-    // One cause control for everything picked, below the roster: ticking never moves a row under the thumb.
-    var ps = picks();
-    if (ps.length) {
-      var shared = ps.every(function (r) { return S.pig.picks[r] && S.pig.picks[r] === S.pig.picks[ps[0]]; }) ? S.pig.picks[ps[0]] : '';
-      var title = ps.length === 1 ? { id: 'ds.dead.cause_for_one', args: { id: idText(rowOf(ps[0])) } } : { id: 'ds.dead.cause_for_many', args: { n: ps.length } };
-      out += '<div class="dd-group" data-target="pick-cause">' + radios('pick-cause', 'pick-cause',
-        draft().causes.filter(function (c) { return c !== 'stillborn' && c !== 'mummified'; }).map(function (c) { return { v: KEY(c), id: 'ds.dead.cause.' + KEY(c) }; }),
-        shared, title.id, title.args) + '</div>';
-    }
-    // R1-9: a picked tagged piglet may be the one a count found missing — the worker says; a yes closes that loss, Alive stays
-    askMiss().forEach(function (r) {
-      var m = draft().openLoss, a = alive(), id = idText(rowOf(r));
-      out += '<div class="dd-group" data-target="miss-' + r + '">' + radios('miss', r, [
-        { v: 'yes', id: 'pp.dead.miss.yes', args: { a: a } },
-        { v: 'no', id: 'pp.dead.miss.no', args: { a: a, b: a - 1 } }], S.pig.miss[r], pl('pp.dead.miss.title', m), { id: id, m: m }) + '</div>';
-    });
-    return out;
+    var n = picks().length;
+    return '<div data-target="tagged">' + UI.rowGroup(door('sub', 'tagged', 'ds.dead.identified', { n: rs.length }, n ? pl('pp.dead.tagged.picked', n) : null, { n: n })) + '</div>';
+  }
+  // The same body recorded twice (RULINGS round 3), shown where the next body is recorded (R1-22): one row, answered
+  // in a dialog over the drawer.
+  function heldRow() {
+    return heldOpen().map(function (h) {
+      return '<div data-target="held">' + UI.rowGroup(door('sub', 'held', 'pp.count.held.title', null, 'pp.count.held.row', { b: h.who, t: U.time(h.at) })) + '</div>';
+    }).join('');
   }
   // Photos ride this Save: kept on the event, previewed and removable before Save (the viewer), shown in the record.
   function photoField(key, active) {
     var list = S[key].photos, del = S.deleted && S.deleted.key === key;
     var hint = del ? 'ds.c2.photos.deleted' : S.photoHint[key] || '';
-    var f = UI.photos({ label: '', optional: '', key: key, id: 'dd-photos-' + key, active: active, items: list.map(function (p) { return { id: p.id }; }),
+    return UI.photos({ label: '', optional: '', key: key, id: 'dd-photos-' + key, active: active, items: list.map(function (p) { return { id: p.id }; }),
       count: list.length ? { text: '', strs: { text: 'ds.c2.photos.attached' }, args: { text: { n: list.length } } } : null, hint: hint ? ' ' : '',
       strs: Object.assign({ label: 'ds.dead.photos', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera', thumb: 'ds.c2.aria.thumb', index: 'ds.c2.photos.index' }, hint ? { hint: hint } : {}),
-      args: { hint: { n: 12 } } });
-    return f + (del ? '<div class="dd-pointer">' + textAct('photo-undo', 'ds.c2.undo', null, key) + '</div>' : '');
-  }
-  // The same body recorded twice (RULINGS round 3), shown where the next body is recorded (R1-22): answered right here.
-  function heldBlock() {
-    var x = Lx();
-    return heldOpen().map(function (h) {
-      var first = null;
-      x.deaths.forEach(function (d) { if (!first && d.id !== h.event && d.fromMissing > 0) first = d; });
-      var ev = store.events.filter(function (e) { return e.id === h.event; })[0] || {};
-      return '<div class="dd-group" data-target="held">' + UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: 'pp.count.held.title', description: 'pp.count.held.desc' },
-        args: { description: { a: first ? first.who : '', b: h.who, t: U.time(ev.syncedAt || h.at), dp: np(x.dead.total), ap: np(x.alive) } } }) +
-        UI.rowGroup(UI.row({ title: '', description: '', action: 'resolve', value: h.event + '|one', wrap: true, strs: { title: 'pp.count.held.one', description: 'pp.count.held.one_meta' }, args: { description: { ap: np(x.alive) } } }) +
-          UI.row({ title: '', description: '', action: 'resolve', value: h.event + '|two', wrap: true, strs: { title: 'pp.count.held.two', description: 'pp.count.held.two_meta' }, args: { description: { ap: np(Math.max(0, x.alive - h.n)) } } })) + '</div>';
-    }).join('');
+      args: { hint: { n: 12 } } }) + (del ? textAct('photo-undo', 'ds.c2.undo', null, key) : '');
   }
   function noteField(key) {
     return UI.field({ label: span(key === 'pigNote' ? 'pp.dead.other_note' : 'ds.dead.sow.other_label'),
       control: '<input type="text" data-field="' + key + '" value="' + U.esc(key === 'pigNote' ? S.pig.note : S.sow.note) + '">', ds: 'Field' });
   }
+  function reason() {
+    var w = why(), show = w && (!w.quiet || S.why);
+    return UI.buttonReason({ id: 'dd-why', text: show ? PP.t(w.id, w.args) : '', strs: show ? { text: w.id } : undefined, args: show && w.args ? { text: w.args } : undefined });
+  }
   function piglets() {
-    var out = [heldBlock()], rs = causes().map(tallyRow).join('');
-    var lead = roster().length && pigN() ? '<p class="dd-pointer">' + span('ds.dead.hint.identified', null, 'st-field-hint') + '</p>' : '';
-    var group = roster().length
-      ? '<div class="dd-group" data-target="tallies">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'ds.dead.unidentified' }, args: { title: { n: draft().unidentified } } }) + lead + '<div class="dd-rows">' + rs + lossStepper() + '</div></div>'
-      : '<div class="dd-rows" data-target="tallies">' + rs + lossStepper() + '</div>';
-    out.push(group);
+    var out = [heldRow(), '<div data-target="tallies">' + causes().map(tallyRow).join('') + lossStepper() + '</div>'];
     if (S.pig.tallies.other > 0 || picks().some(function (r) { return S.pig.picks[r] === 'other'; })) out.push(noteField('pigNote'));
-    out.push(neighbourBlock());
-    if (locked()) out.push('<div class="dd-pointer">' + textAct('farrowing-edit', 'ds.dead.born_dead') + '</div>');
-    out.push(identifiedBlock());
-    out.push(photoField('pig', pigN() > 0));
+    out.push(neighbourRow(), taggedRow(), photoField('pig', pigN() > 0));
     return out.join('');
   }
   function sowMode() {
@@ -348,56 +293,115 @@
     return out.join('');
   }
   function footer() {
-    var w = why(), gray = !!w, show = w && (!w.quiet || S.why);
-    var reason = UI.buttonReason({ id: 'dd-why', text: show ? PP.t(w.id, w.args) : '', strs: show ? { text: w.id } : undefined, args: show && w.args ? { text: w.args } : undefined });
-    var back = btn('back', 'act.back', 'secondary');
+    var w = why(), gray = !!w;
     if (S.mode === 'sow') {
-      return '<footer class="sheet-footer dd-bar">' + reason + back +
-        UI.holdButton({ label: PP.t('act.save'), caption: PP.t('ds.dead.hold'), action: 'hold-save', tone: 'danger', waiting: gray, describedby: gray ? 'dd-why' : '', statusId: gray ? '' : 'dd-why', id: 'dd-hold',
-          strs: { label: 'act.save', caption: 'ds.dead.hold' } }) + '</footer>';
+      return K.footer({ back: { action: 'back' }, hold: { label: s('act.save'), caption: s('pp.dead.hold'), action: 'hold-save', tone: 'primary', waiting: gray, describedby: gray ? 'dd-why' : '', statusId: gray ? '' : 'dd-why' } });
     }
-    return '<footer class="sheet-footer dd-bar">' + reason + back + btn('save', 'act.save', 'primary', { waiting: gray, describedby: 'dd-why' }) + '</footer>';
+    return K.footer({ back: { action: 'back' }, primary: { label: s('act.save'), action: 'save', waiting: gray, describedby: 'dd-why' } });
   }
-  // The room's `Found a body` (R1-8): whose missing piglet is it? Every open loss in the unit, oldest first.
-  function foundPicker() {
-    var lines = store.select.explain(store.derived, { room: S.unit }, {}).lines.filter(function (l) { return l.kind === 'loss' && l.open > 0; });
-    var body = lines.length ? UI.rowGroup(lines.map(function (l) {
-      return UI.row({ title: '', description: '', action: 'found-pick', value: l.litter,
-        strs: { title: 'pp.dead.found.row', description: 'pp.dead.found.row_desc' },
-        args: { title: { code: l.litter, np: np(l.open) }, description: { stamp: U.stamp(l.at, l.who, store.today) } } });
-    }).join('')) + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.dead.found.none' } })
-      : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.dead.found.empty' }, args: { title: { u: S.unit } } });
-    return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="medium" data-sizing="content" role="dialog" aria-modal="true">' +
-      '<header class="utility-header">' + UI.heading({ title: '', description: '', kind: 'page', level: 3, strs: { title: 'pp.dead.found.title', description: 'pp.dead.found.sub' }, args: { description: { u: S.unit } } }) + '</header>' +
-      '<div class="sheet-body"><div class="dd-stack">' + body + '</div></div>' +
-      '<footer class="sheet-footer dd-bar">' + btn('back', 'act.back', 'secondary') + '</footer></section>';
+  function head() {
+    var sow = S.mode === 'sow', n = pigN(), dirty = sow ? sowDirty() : pigDirty();
+    // this entry leads; the litter's running total is said apart (`1 dead so far`), never prefilled into the steppers
+    var sub = sow ? [s('ds.dead.sub.sow')] : [s(locked() ? 'pp.dead.sub.locked' : 'pp.dead.sub.open', { pen: tgt(), alive: alive(), d: Lx().dead.total })];
+    if (n && !sow) sub.push({ sep: true }, { text: PP.t('pp.dead.unsaved', { n: n }), str: 'pp.dead.unsaved', args: { n: n }, tone: 'green' });
+    if (S.trim) sub.push({ sep: true }, s(S.trim.id, S.trim.args));
+    return { title: s(sow ? 'ds.dead.title.sow' : 'pp.dead.title.record'), subtitle: sub, aside: dirty ? textAct('clear', 'act.clear') : '' };
   }
   function drawer() {
+    var h = head();
     var segs = modes().length > 1 ? UI.segment({ options: [['piglets', 'Piglets', { strs: { label: 'label.piglets' } }], ['sow', 'The sow', { strs: { label: 'ds.dead.seg.sow' } }]],
       active: S.mode, action: 'mode', ariaLabel: PP.lang === 'zh' ? '记录死亡对象' : 'Record death for' }) : '';
-    var trim = S.trim ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: S.trim.id }, args: { title: S.trim.args } }) : '';
-    return '<div class="scrim" data-dismiss></div><section class="sheet" data-ds="Sheet" data-phase="' + (locked() ? 'locked' : 'open') + '" data-surface="' + surface +
-      '" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true"' + (S.viewer ? ' inert' : '') + '>' +
-      header() + '<div class="sheet-body"><div class="dd-stack">' + trim + segs + (S.mode === 'sow' ? sowMode() : piglets()) + '</div></div>' + footer() + '</section>';
+    return K.drawer({ size: 'long', height: 'full', view: 'dead', title: h.title, subtitle: h.subtitle, aside: h.aside, close: { action: 'dismiss' },
+      body: '<div class="dd-body" data-phase="' + (locked() ? 'locked' : 'open') + '" data-surface="' + surface + '">' + segs + (S.mode === 'sow' ? sowMode() : piglets()) + reason() + '</div>',
+      footer: footer(), scrim: { action: 'dismiss' } });
   }
-  // The photo viewer: one photo; Delete only while drafting (always, here: nothing saved is shown on this page), 24px from Back.
+
+  // ---- One level down, in the same drawer (Back returns) ------------------------------------------
+  function pigMeta(p) {
+    if (p.status === 'missing') { var x = lossOfRow(p.rowId); return ['pp.dead.row.missing', { t: x ? U.time(x.at) : '' }]; }
+    var sex = p.sex ? PP.t('pp.common.sex.' + (p.sex === 'b' ? 'boar' : 'gilt')) : '';
+    return sex && p.weight != null ? ['pp.common.pig.sw', { sex: sex, w: p.weight }] : sex ? ['pp.common.pig.s', { sex: sex }] : p.weight != null ? ['pp.common.pig.w', { w: p.weight }] : null;
+  }
+  // The tagged piglets: tick the ones that died, one cause for all ticked (below the list: ticking never moves a row under
+  // the thumb), and for a tick that may be the one a count found missing, the worker says (R1-9: a yes closes that loss).
+  function taggedView() {
+    var rs = roster(), ps = picks();
+    var list = UI.choiceGroup(rs.map(function (p) {
+      var l = idLabel(p), meta = pigMeta(p);
+      return UI.choiceRow({ label: '', meta: '', mode: 'multi', action: 'pick', value: p.rowId, selected: p.rowId in S.pig.picks, mono: true,
+        strs: Object.assign({ label: l.id }, meta ? { meta: meta[0] } : {}), args: { label: l.args, meta: meta ? meta[1] : null } });
+    }), { aside: textAct('scan', 'act.scan') });
+    var out = list;
+    if (ps.length) {
+      var shared = ps.every(function (r) { return S.pig.picks[r] && S.pig.picks[r] === S.pig.picks[ps[0]]; }) ? S.pig.picks[ps[0]] : '';
+      var title = ps.length === 1 ? { id: 'ds.dead.cause_for_one', args: { id: idText(rowOf(ps[0])) } } : { id: 'ds.dead.cause_for_many', args: { n: ps.length } };
+      out += '<div data-target="pick-cause">' + radios('pick-cause', 'pick-cause',
+        draft().causes.filter(function (c) { return c !== 'stillborn' && c !== 'mummified'; }).map(function (c) { return { v: KEY(c), id: 'ds.dead.cause.' + KEY(c) }; }),
+        shared, title.id, title.args) + '</div>';
+    }
+    askMiss().forEach(function (r) {
+      var m = draft().openLoss, a = alive(), id = idText(rowOf(r));
+      out += '<div data-target="miss-' + r + '">' + radios('miss', r, [
+        { v: 'yes', id: 'pp.dead.miss.yes', args: { a: a } },
+        { v: 'no', id: 'pp.dead.miss.no', args: { a: a, b: a - 1 } }], S.pig.miss[r], pl('pp.dead.miss.title', m), { id: id, m: m }) + '</div>';
+    });
+    var n = pigN(), sub = [s('pp.dead.tagged.sub', { pen: tgt(), n: rs.length })];
+    if (n) sub.push({ sep: true }, { text: PP.t('pp.dead.unsaved', { n: n }), str: 'pp.dead.unsaved', args: { n: n }, tone: 'green' });
+    return K.drawer({ size: 'long', height: 'full', view: 'tagged', title: s('pp.dead.tagged.title'), subtitle: sub, close: { action: 'sub-dismiss' },
+      body: '<div class="dd-body">' + out + reason() + '</div>', footer: K.footer({ back: { action: 'sub-back' }, primary: { label: s('act.save'), action: 'save', waiting: !!why(), describedby: 'dd-why' } }),
+      scrim: { action: 'sub-dismiss' } });
+  }
+  // Several neighbours with a piglet missing: the list (the same crate rows as the room).
+  function nbView() {
+    var rs = neighbours().map(function (x) {
+      return K.row({ id: s('pp.count.sg.side', { code: x.id }), headline: s(pl('pp.dead.found.missing', x.m), { np: np(x.m) }), meta: s('pp.dead.found.row_desc', { stamp: U.stamp(x.loss.at, x.loss.who, store.today) }), action: 'route', value: x.id });
+    });
+    return K.drawer({ size: 'medium', view: 'nb', title: s('pp.dead.nb.title'), subtitle: [s('pp.dead.nb.sub', { code: crate })], close: { action: 'sub-dismiss' },
+      body: K.group({ title: s('pp.dead.nb.group', { u: Hx().room }), meta: s(pl('pp.dead.nb.crates', rs.length), { n: rs.length }), rows: rs }), footer: K.footer({ back: { action: 'sub-back' } }), scrim: { action: 'sub-dismiss' } });
+  }
+  // The held body: one question over the drawer (farrowing's dialog anatomy), two answers.
+  function heldDialog() {
+    var x = Lx(), h = heldOpen()[0];
+    if (!h) return '';
+    var first = null;
+    x.deaths.forEach(function (d) { if (!first && d.id !== h.event && d.fromMissing > 0) first = d; });
+    var body = UI.rowGroup(door('resolve', h.event + '|one', 'pp.count.held.one', null, 'pp.count.held.one_short', { ap: np(x.alive) }) +
+      door('resolve', h.event + '|two', 'pp.count.held.two', null, 'pp.count.held.two_short', { ap: np(Math.max(0, x.alive - h.n)) }));
+    return K.dialog({ title: s('pp.count.held.title'), description: s('pp.count.held.ask', { a: first ? first.who : '', b: h.who }),
+      body: '<div class="dd-body">' + body + '</div>', footer: K.footer({ back: { action: 'sub-back' } }) });
+  }
+  // The room's `Found a body` (R1-8): whose missing piglet is it? Every open loss in the unit, oldest first, as crate rows.
+  function foundPicker() {
+    var lines = store.select.explain(store.derived, { room: S.unit }, {}).lines.filter(function (l) { return l.kind === 'loss' && l.open > 0; });
+    var body = lines.length ? K.group({ title: s('pp.dead.nb.group', { u: S.unit }), meta: s(pl('pp.dead.nb.crates', lines.length), { n: lines.length }), rows: lines.map(function (l) {
+      return K.row({ id: s('pp.count.sg.side', { code: l.litter }), headline: s(pl('pp.dead.found.missing', l.open), { np: np(l.open) }), meta: s('pp.dead.found.row_desc', { stamp: U.stamp(l.at, l.who, store.today) }), action: 'found-pick', value: l.litter });
+    }) }) : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.dead.found.empty' }, args: { title: { u: S.unit } } });
+    return K.drawer({ size: 'medium', view: 'found', title: s('pp.dead.found.title'), subtitle: [s('pp.dead.found.sub', { u: S.unit })], close: { action: 'dismiss' },
+      body: body, footer: K.footer({ back: { action: 'back' } }), scrim: { action: 'dismiss' } });
+  }
+  // The photo viewer: one photo; Delete only while drafting (always, here: nothing saved is shown on this page).
   function viewer() {
     var v = S.viewer, list = S[v.key].photos, i = list.map(function (p) { return p.id; }).indexOf(v.id);
-    return '<div class="scrim" data-dismiss-viewer></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
-      '<header class="utility-header">' + UI.heading({ title: '', description: '', kind: 'page', level: 3, strs: { title: 'pp.dead.photo.title', description: 'pp.dead.photo.sub' }, args: { title: { n: i + 1, m: list.length } } }) + '</header>' +
-      '<div class="sheet-body"><div class="dd-photo" role="img" data-str-attr="aria-label:ds.c2.aria.thumb" data-args=\'{"n":' + (i + 1) + '}\' aria-label="' + U.esc(PP.t('ds.c2.aria.thumb', { n: i + 1 })) + '">' + span('ds.c2.photos.index', { n: i + 1 }) + '</div></div>' +
-      '<footer class="sheet-footer dd-viewer-bar">' + btn('viewer-back', 'act.back', 'secondary') + btn('photo-delete', 'pp.dead.photo.delete', 'danger') + '</footer></section>';
+    var ph = '<div class="dd-photo" role="img" data-str-attr="aria-label:ds.c2.aria.thumb" data-args=\'{"n":' + (i + 1) + '}\' aria-label="' + U.esc(PP.t('ds.c2.aria.thumb', { n: i + 1 })) + '">' + span('ds.c2.photos.index', { n: i + 1 }) + '</div>';
+    return K.drawer({ size: 'long', view: 'photo', title: s('pp.dead.photo.title', { n: i + 1, m: list.length }), subtitle: [s('pp.dead.photo.sub')], close: { action: 'viewer-dismiss' },
+      body: ph, footer: K.footer({ back: { action: 'viewer-back' }, primary: { label: s('pp.dead.photo.delete'), action: 'photo-delete', register: 'danger' } }), scrim: { action: 'viewer-dismiss' } });
   }
   // Re-render keeps the body's scroll and the focused control (a requirement of the shared component).
   function render() {
-    var root = document.getElementById('screen'), body = root.querySelector('[role="dialog"] .sheet-body');
-    var top = body ? body.scrollTop : 0, f = document.activeElement, key = null;
+    var root = document.getElementById('screen'), body = root.querySelector('.tk-sheet .tk-sheet-body');
+    var top = body ? body.scrollTop : 0, f = document.activeElement, key = null, view = S.picking ? 'found' : S.sub || 'dead';
     if (f && root.contains(f) && f.dataset && f.dataset.action) key = [f.dataset.action, f.dataset.value || '', f.dataset.step || ''];
-    root.innerHTML = backdrop() + (S.picking ? foundPicker() : drawer() + (S.viewer ? viewer() : ''));
+    var sheet = S.picking ? foundPicker() : S.sub === 'tagged' ? taggedView() : S.sub === 'nb' ? nbView() : drawer();
+    var over = S.sub === 'held' ? heldDialog() : S.viewer ? viewer() : '';
+    if (over) sheet = '<div inert>' + sheet + '</div>';
+    // the phone and the room behind are drawn once and stay (an iframe reloads when re-inserted); the drawer re-renders
+    if (!root.querySelector('#dd-over')) root.innerHTML = K.phone(behind() + '<div id="dd-over" class="dd-over"></div>', { bar: false, label: s('pp.dead.title.record') });
+    root.querySelector('#dd-over').innerHTML = sheet + over;
     PP.apply(root);
     UI.liveFill(root, { then: function (el) { PP.apply(el); } });
-    var nb = root.querySelector('[role="dialog"] .sheet-body');
-    if (nb && !S.viewer) nb.scrollTop = top;
+    var nb = root.querySelector('.tk-sheet .tk-sheet-body');
+    if (nb && !over && view === S.lastView) nb.scrollTop = top;
+    S.lastView = view;
     if (S.focus) { var t = root.querySelector(S.focus); S.focus = ''; if (t) { t.focus({ preventScroll: true }); return; } }
     if (key) {
       var sel = '[data-action="' + key[0] + '"]' + (key[1] ? '[data-value="' + key[1] + '"]' : '') + (key[2] ? '[data-step="' + key[2] + '"]' : '');
@@ -410,7 +414,8 @@
     if (surface === 'farrowing') return '/ux/system/farrowing-astra-concept.html';
     var b = qs.get('back');
     if (b && /^[a-z-]+\.html(\?[^#]*)?$/.test(b)) return b;
-    return PP.href('litter.html', { state: 'litter', crate: crate, unit: qs.get('unit'), data: store.name !== 'base' ? store.name : '' });
+    // the litter drawer over the room: where Record death was opened
+    return PP.href('room.html', { state: 'litter', crate: crate, unit: qs.get('unit'), data: store.name !== 'base' ? store.name : '' });
   }
   function leave(saved) {
     var u = backUrl();
@@ -423,7 +428,7 @@
   function clearMode() {
     if (S.mode === 'sow') S.sow = emptySow();
     else { S.pig = emptyPig(); S.presume = S.found; S.kTouched = false; }
-    S.hint = ''; S.why = false; S.deleted = null; S.photoHint = {};
+    S.hint = ''; S.why = false; S.deleted = null; S.photoHint = {}; S.trim = null;
     keep();
   }
   function savePiglets() {
@@ -463,10 +468,14 @@
     S.sow = emptySow(); keep();
     return true;
   }
+  // A waiting Save points at the missing step: in this view, or one level down (the tagged list) when the step is there.
   function goTo(w) {
-    S.why = true; render();
+    S.why = true;
+    if (w && w.to === 'mode-piglets') { S.mode = 'piglets'; S.sub = ''; }
+    else if (w && w.sub) S.sub = w.sub;
+    else if (w && S.sub) S.sub = '';
+    render();
     if (!w) return;
-    if (w.to === 'mode-piglets') { S.mode = 'piglets'; render(); return; }
     var t = document.querySelector('[data-target="' + w.to + '"]');
     if (t) { t.scrollIntoView({ block: 'center' }); var f = t.querySelector('button, input'); if (f) f.focus({ preventScroll: true }); }
   }
@@ -474,17 +483,21 @@
     S.pig.route = to && to !== crate ? to : '';
     S.pig.picks = {}; S.pig.miss = {};                 // tagged piglets belong to their own litter
     S.presume = !!S.pig.route || S.found; S.kTouched = false; S.pig.k = null;
+    S.sub = '';
     settleK(); keep();
     S.focus = '[data-target="' + (S.pig.route ? 'route' : 'tallies') + '"] button';
+  }
+  function subBack() {
+    var from = S.sub; S.sub = '';
+    if (from) S.focus = '[data-action="sub"][data-value="' + from + '"]';
   }
 
   var screen = document.getElementById('screen');
   screen.addEventListener('click', function (ev) {
-    if (ev.target.closest('[data-dismiss-viewer]')) { var v0 = S.viewer; S.viewer = null; if (v0) S.focus = '[data-action="photo-view"][data-value="' + v0.id + '"]'; render(); return; }
-    if (ev.target.closest('[data-dismiss]')) { if (S.picking || !S.viewer) { keep(); leave(''); } return; }   // scrim = Back
     var b = ev.target.closest('[data-action]');
     if (!b) return;
     var a = b.dataset.action, v = b.dataset.value, gray = b.getAttribute('aria-disabled') === 'true';
+    if (/-?dismiss$/.test(a)) a = a === 'dismiss' ? 'back' : a.replace('dismiss', 'back');    // the ✕ and the scrim are Back
     if (a === 'hold-save' || a === 'pick') return;                   // the hold binds itself; the checkbox's change event handles a pick
     if (a === 'dead-step') {
       var step = +b.dataset.step, d = S.pig.tallies[v] || 0;
@@ -493,28 +506,30 @@
       S.hint = ''; settleK(); keep();
     }
     else if (a === 'loss-step') {
-      var s = +b.dataset.step, dd = draft();
+      var st = +b.dataset.step, dd = draft();
       if (!bodies() || gray) return;
       S.kTouched = true;
-      if (S.pig.k == null) S.pig.k = s > 0 ? Math.max(1, dd.kMin) : 0;
-      else S.pig.k = Math.max(dd.kMin, Math.min(dd.kMax, S.pig.k + s));
+      if (S.pig.k == null) S.pig.k = st > 0 ? Math.max(1, dd.kMin) : 0;
+      else S.pig.k = Math.max(dd.kMin, Math.min(dd.kMax, S.pig.k + st));
     }
     else if (a === 'loss-none') { if (bodies() && !draft().kMin) { S.pig.k = 0; S.kTouched = true; } }
     else if (a === 'pick-cause') { picks().forEach(function (r) { S.pig.picks[r] = v; }); keep(); }
     else if (a === 'miss') { S.pig.miss[b.dataset.field] = v; keep(); }
     else if (a === 'route') route(v);
+    else if (a === 'sub') { S.sub = v; }
+    else if (a === 'sub-back') subBack();
     else if (a === 'found-pick') { crate = v; S.picking = false; S.presume = true; S.pig = emptyPig(); var k0 = kept(); if (k0 && k0.pig) restore(k0); }
-    else if (a === 'resolve') { var rv = v.split('|'); store.commit({ type: 'resolve', litter: tgt(), held: rv[0], answer: rv[1] }); }
+    else if (a === 'resolve') { var rv = v.split('|'); store.commit({ type: 'resolve', litter: tgt(), held: rv[0], answer: rv[1] }); S.sub = ''; }
     else if (a === 'mode') S.mode = v;
     else if (a === 'sow-cause') { S.sow.cause = v; keep(); }
     else if (a === 'clear') clearMode();
-    else if (a === 'back') { keep(); leave(''); return; }             // keeps both drafts on the device
+    else if (a === 'back') { keep(); leave(''); return; }             // Back, ✕ and the scrim keep both drafts on the device
     else if (a === 'photo-add') {
       var key = v;
       if (gray) S.photoHint[key] = b.dataset.reason === 'full' ? 'ds.c2.photos.full' : 'ds.c2.photos.inactive';
       else { S[key].photos.push(shots(1)[0]); S.photoHint[key] = ''; S.deleted = null; keep(); S.focus = '#dd-photos-' + key + '-camera'; }
     }
-    else if (a === 'photo-view') { var pk = b.closest('[data-field]').getAttribute('data-field'); S.viewer = { key: pk, id: v }; S.focus = '[data-action="viewer-back"].button'; }
+    else if (a === 'photo-view') { var pk = b.closest('[data-field]').getAttribute('data-field'); S.viewer = { key: pk, id: v }; S.focus = '.tk-back[data-action="viewer-back"]'; }
     else if (a === 'viewer-back') { var vv = S.viewer; S.viewer = null; if (vv) S.focus = '[data-action="photo-view"][data-value="' + vv.id + '"]'; }
     else if (a === 'photo-delete') {
       var vw = S.viewer, list = S[vw.key].photos, idx = list.map(function (p) { return p.id; }).indexOf(vw.id);
@@ -525,7 +540,7 @@
     }
     else if (a === 'photo-undo') { var dl = S.deleted; if (dl) { S[dl.key].photos.splice(dl.at, 0, dl.item); S.deleted = null; clearTimeout(S.undoTimer); keep(); S.focus = '[data-action="photo-view"][data-value="' + dl.item.id + '"]'; } }
     else if (a === 'save') { if (UI.guard(b)) { goTo(why()); return; } savePiglets(); return; }
-    else if (a === 'farrowing-edit' || a === 'scan') { document.documentElement.setAttribute('data-door', a + ':' + tgt()); return; }
+    else if (a === 'scan') { document.documentElement.setAttribute('data-door', a + ':' + tgt()); return; }
     else return;
     render();
   });
@@ -541,10 +556,13 @@
     if (f === 'sowNote') { S.sow.note = ev.target.value; keep(); }
     if (f === 'pigNote') { S.pig.note = ev.target.value; keep(); }
   });
-  // Swipe down on the drawer's header = Back.
+  // Swipe down on the drawer's grab or head = Back (one level down: back to the drawer).
   var grab = null;
-  screen.addEventListener('pointerdown', function (ev) { if (ev.target.closest('[data-grab]')) grab = ev.clientY; }, true);
-  screen.addEventListener('pointerup', function (ev) { if (grab != null && ev.clientY - grab > 100) { keep(); leave(''); } grab = null; }, true);
+  screen.addEventListener('pointerdown', function (ev) { if (ev.target.closest('.tk-grab, .tk-sheet-head')) grab = ev.clientY; }, true);
+  screen.addEventListener('pointerup', function (ev) {
+    if (grab != null && ev.clientY - grab > 100) { if (S.sub || S.viewer) { S.viewer = null; subBack(); render(); } else { keep(); leave(''); } }
+    grab = null;
+  }, true);
 
   /* Restore trims to changed truth and says so: a picked row that died elsewhere, or tallies above a lowered cap. */
   function restore(k) {
@@ -569,8 +587,9 @@
     var drafted = !!(spec.pig || spec.sow || spec.kept);
     if (drafted) mem = { d: null };
     S = { mode: 'piglets', pig: emptyPig(), sow: emptySow(), hint: '', why: false, saving: false, presume: !!spec.found, kTouched: false, found: !!spec.found,
-      picking: !!spec.found, unit: +(qs.get('unit') || spec.unit || 7), photoHint: {}, deleted: null, viewer: null, trim: null, focus: '' };
+      picking: !!spec.found, unit: +(qs.get('unit') || spec.unit || 7), photoHint: {}, deleted: null, viewer: null, trim: null, focus: '', sub: '', lastView: '' };
     if (crate && !store.derived.litters[crate]) crate = 'A02';
+    if (crate) S.unit = +(qs.get('unit') || store.derived.litters[crate].room || S.unit);
     if (spec.kept) { mem.d = { pig: spec.kept.pig || null, sow: spec.kept.sow || null }; }
     if (spec.pig) { S.pig = Object.assign(emptyPig(), spec.pig, { photos: shots(spec.pig.photos) }); if (spec.pig.k == null) S.pig.k = null; }
     if (spec.sow) S.sow = Object.assign(emptySow(), spec.sow);
@@ -581,6 +600,7 @@
       // the drawer opens in the mode holding the draft (piglets when both do)
       S.mode = spec.mode || (pigDirty() || !sowDirty() ? 'piglets' : 'sow');
       if (spec.pig && spec.pig.k != null) { S.pig.k = spec.pig.k; S.kTouched = true; } else settleK();
+      if (spec.sub) S.sub = spec.sub;
     }
     if (spec.view) S.viewer = { key: 'pig', id: S.pig.photos[spec.view - 1].id };
     if (spec.deleteAt) { var it = S.pig.photos.splice(spec.deleteAt - 1, 1)[0]; S.deleted = { key: 'pig', item: it, at: spec.deleteAt - 1 }; }
