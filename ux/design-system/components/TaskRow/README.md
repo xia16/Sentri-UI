@@ -25,6 +25,8 @@ One animal or litter in a [group](../TaskGroup/README.md). **Budget: the mono id
 
 **Door variant (no id column)** — farrowing's `.disclosure`: `SentriTask.door({ title, description, action, value, label, trail: 'chevron' | 'edit' | '' })` (`.tk-door`, `data-ds="TaskRow"`, `data-variant="door"`). A non-animal door inside a sheet or a page: at least 62px, padded 15px 0, a 1px `line` under it; the title 13px/600, one description line 10px/1.7 `muted` 5px under it; a 16px chevron.
 
+**Doors as a list** — `SentriTask.doors({ card, title, icon, items: [{ title, description, icon, action, value, label }], label })`. `card: false` (default): flat door rows (`door`). `card: true`: farrowing's Pen page / sow-actions list — an optional section title with its icon, then one card of the design system's Rows, each with a 34px tinted icon tile, a title (13px/500), one description line (11px `muted`) and a chevron.
+
 **The id column holds its width** (`animal-id-col`): a chip wider than it ellipses under the id, so every headline in a group starts on one edge.
 
 **Component contract**

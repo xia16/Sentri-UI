@@ -75,6 +75,8 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "ds-task-skeleton-overview", "url": "ux/design-system/components/task-skeleton-demo.html?screen=overview", "strict": true },
     { "name": "ds-task-skeleton-foster", "url": "ux/design-system/components/task-skeleton-demo.html?screen=foster", "strict": true },
     { "name": "ds-task-skeleton-count", "url": "ux/design-system/components/task-skeleton-demo.html?screen=count", "strict": true },
+    { "name": "ds-task-skeleton-sow", "url": "ux/design-system/components/task-skeleton-demo.html?screen=sow", "strict": true },
+    { "name": "ds-task-skeleton-pen", "url": "ux/design-system/components/task-skeleton-demo.html?screen=pen", "strict": true },
     { "name": "ds-task-skeleton-wide", "url": "ux/design-system/components/task-skeleton-demo.html?screen=room", "strict": true, "locales": ["en"],
       "viewports": [{ "name": "studio", "width": 1440, "height": 900 }] },
     { "name": "pp-dead-dead", "url": "ux/tasks/piglet-processing/dead.html?state=dead", "strict": true },

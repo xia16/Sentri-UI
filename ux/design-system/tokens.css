@@ -46,6 +46,7 @@
   --chip-red-border: #f0d6cd;
   --progress-active: #9daa87;
   --task-key-border: #919a8c;
+  --danger-border: #edc8c0;
   --choice-pressed-border: #8ea88a;
   --space-gutter: 18px;
   --space-gutter-sheet: 21px;
@@ -145,6 +146,10 @@
   --type-figure-denominator-size: 15px;
   --type-figure-total-size: 23px;
   --type-hold-caption-size: 9px;
+  --type-table-heading-size: 9px;
+  --type-table-figure-size: 15px;
+  --type-metric-size: 28px;
+  --type-metric-total-size: 17px;
   --type-step-value-size: 18px;
   --type-figure-well-size: 28px;
 }

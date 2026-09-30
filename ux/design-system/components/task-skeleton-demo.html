@@ -21,6 +21,10 @@
 /* Host layout of the demo's own screens: the stack gaps between the parts (farrowing's page body gap 18). */
 .tk-page[data-view="foster"] .tk-page-body > * + * { margin-top: 18px; }
 .tk-demo-section { display: flex; flex-direction: column; gap: 10px; }
+.tk-page[data-view="overview"] .tk-page-body > * + * { margin-top: var(--space-section); }
+.tk-demo-stack { display: flex; flex-direction: column; }
+.tk-demo-stack > .st-segment { margin: 0 0 4px; }
+.tk-demo-stack > .tk-warning { margin: 17px 0; }
 .tk-demo-section > * { margin: 0; }
 .tk-sheet[data-view="count"] .tk-sheet-body > * + * { margin-top: var(--space-heading); }
 @media (min-width: 431px) {
@@ -157,9 +161,41 @@
       barLabel: s('tk.demo.progress.aria', '7 of 18 farrowed'),
       counts: [{ value: n(7), label: s('tk.demo.farrowed', 'Farrowed'), tone: 'done' }, { value: n(2), label: s('tk.demo.lens.active', 'Active'), tone: 'active' },
         { value: n(9), label: s('tk.demo.lens.awaiting', 'Awaiting'), tone: 'rest' }] });
-    return K.page({ title: s('tk.demo.overview', 'Task overview'), description: s('tk.demo.overview.sub', 'Farrowing · All 3 units'), body: prog,
+    var units = [['6', 4, 1, 3], ['7', 1, 1, 4], ['8', 2, 0, 2]];
+    var tbl = K.table({ title: s('tk.demo.table.title', 'Choose a unit'), icon: 'grid', nameColumn: s('tk.demo.table.unit', 'Unit'),
+      columns: [s('tk.demo.farrowed', 'Farrowed'), s('tk.demo.lens.active', 'Active'), s('tk.demo.lens.awaiting', 'Awaiting')],
+      rows: units.map(function (u) { return { name: s('tk.demo.unit.n', 'Unit ' + u[0], { n: u[0] }), sub: u[0] === '7' ? s('tk.demo.table.current', 'Current unit') : '', current: u[0] === '7',
+        values: [n(u[1]), n(u[2]), n(u[3])], action: 'unit', value: u[0], label: s('tk.demo.table.aria', 'Open unit ' + u[0], { n: u[0] }) }; }) });
+    var met = K.metrics({ title: s('tk.demo.metrics.title', 'Performance metrics'), icon: 'chart', meta: s('tk.demo.metrics.meta', '7 finished litters', { n: 7 }),
+      measures: [{ label: s('tk.demo.metrics.bal', 'Born alive / litter'), value: s('tk.demo.metrics.bal.v', '12.0'), sub: s('tk.demo.unit.target', 'Target 12') },
+        { label: s('tk.demo.metrics.sb', 'Stillborn rate'), value: s('tk.demo.metrics.sb.v', '7.2'), unit: s('tk.demo.metrics.pct', '%'), sub: s('tk.demo.metrics.sb.sub', '7 stillborn / 97 born') }],
+      totals: [{ label: s('tk.demo.born', 'Born'), value: n(97) }, { label: s('tk.demo.metrics.alive', 'Alive now'), value: n(59) }, { label: s('tk.demo.metrics.deaths', 'Piglet deaths'), value: n(38) }] });
+    return K.page({ title: s('tk.demo.overview', 'Task overview'), description: s('tk.demo.overview.sub', 'Farrowing · All 3 units'), view: 'overview', body: prog + tbl + met,
       footer: K.footer({ back: { action: 'back' }, primary: { label: s('tk.demo.end_early', 'End task early'), action: 'end', register: 'end-early', waiting: true },
         status: { text: 'Save or clear the 2 drafts on this phone to end', str: 'ds.c2.demo.hold_reason', id: 'tk-demo-end-reason', tone: 'amber' } }) });
+  }
+
+  // ---- The sow died: flat radio rows, the photo line, the danger band; a waiting hold ----
+  function sow() {
+    var causes = [['farrowing', 'tk.demo.sow.c1', 'Farrowing'], ['prolapse', 'tk.demo.sow.c2', 'Prolapse'], ['found', 'tk.demo.sow.c3', 'Found dead'], ['other', 'tk.demo.sow.c4', 'Other']];
+    var band = K.warning({ text: s('tk.demo.sow.warn', 'Save or clear the pending piglet deaths before ending.'),
+      actions: UI.button({ label: 'Review piglet deaths', register: 'text', action: 'review', strs: { label: 'tk.demo.sow.review' } }) + '<strong data-str="tk.demo.sow.ends">Saving ends farrowing</strong>',
+      detail: s('tk.demo.sow.detail', '9 alive stay under piglet care') });
+    return K.drawer({ size: 'long', height: 'full', view: 'sow', title: s('tk.demo.sow.title', 'Sow died'), subtitle: s('tk.demo.sow.sub', 'Choose the cause'),
+      aside: UI.button({ label: 'Clear', register: 'text', action: 'clear', strs: { label: 'act.clear' } }),
+      body: '<div class="tk-demo-stack">' + UI.segment({ action: 'dead-mode', active: 'sow', ariaLabel: 'Who died', options: [['piglets', '', { strs: { label: 'tk.demo.piglets' } }], ['sow', '', { strs: { label: 'tk.demo.sow' } }]] }) +
+        K.radios({ label: '', action: 'cause', key: 'cause', options: causes.map(function (c) { return { value: c[0], label: c[2], strs: { label: c[1] } }; }) }) +
+        K.photos({ label: 'Photos', optional: 'Optional', key: 'photos', strs: { label: 'ds.c2.photos.label', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera' } }) + band + '</div>',
+      footer: K.footer({ back: { action: 'back' }, hold: { label: s('act.save', 'Save'), caption: s('tk.demo.sow.hold', 'HOLD TO SAVE'), action: 'save', tone: 'primary', waiting: true } }) });
+  }
+
+  // ---- The pen page: a section title with its icon over one card of icon doors; Back alone ----
+  function pen() {
+    var items = [['feed', 'feed', 'tk.demo.pen.feed'], ['fault', 'wrench', 'tk.demo.pen.fault'], ['note', 'record', 'tk.demo.pen.note'], ['log', 'clock', 'tk.demo.pen.log']].map(function (x) {
+      return { title: s(x[2], ''), description: s(x[2] + '.sub', ''), icon: x[1], action: 'pen-' + x[0] };
+    });
+    return K.page({ title: s('tk.demo.pen.title', 'Pen B1'), description: s('tk.demo.pen.sub', '1 sow · Unit 7'), view: 'pen',
+      body: K.doors({ card: true, title: s('tk.demo.pen.info', 'Pen information'), icon: 'grid', items: items }), footer: K.footer({ back: { action: 'back' } }) });
   }
 
   var screens = {
@@ -170,9 +206,11 @@
     dialog: function () { return K.phone(room(true) + dialog()); },
     overview: function () { return K.phone(room(true) + overview()); },
     foster: function () { return K.phone(room(true) + foster()); },
-    count: function () { return K.phone(room(true) + count()); }
+    count: function () { return K.phone(room(true) + count()); },
+    sow: function () { return K.phone(room(true) + sow()); },
+    pen: function () { return K.phone(room(true) + pen()); }
   };
-  var refs = { room: 'room', sheet: 'finish', full: 'draft', page: 'history', dialog: 'born', overview: 'overview', foster: 'foster', count: 'count' };
+  var refs = { room: 'room', sheet: 'finish', full: 'draft', page: 'history', dialog: 'born', overview: 'overview', foster: 'foster', count: 'count', sow: 'sow', pen: 'pen' };
   var el = document.getElementById('root');
   if (screens[only]) {
     // One screen, on the harness: framed 390×844 on a wide window, full-bleed on a phone.

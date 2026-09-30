@@ -173,6 +173,65 @@
     return `<div class="tk-choice" data-ds="TaskChoice" role="group" data-count="${options.length}"${L(label)}>${b}</div>`;
   }
 
+  /* ---- TaskRadios: farrowing's flat radio rows (.radio-row: 60px, a line under each, a 14px label, the radio at the
+     right). The design system's ChoiceList radio field (SentriUI.choiceRadios: role=radio buttons, roving tab stop,
+     radioBind, an optional Clear) in farrowing's face. Every prop is choiceRadios'; layout is always 'rows'. ---- */
+  function radios(props = {}) {
+    const UI = root.SentriUI;
+    const html = UI.choiceRadios(Object.assign({}, props, { layout: 'rows', className: `tk-radios${props.className ? ' ' + props.className : ''}` }));
+    return html.replace('data-ds="ChoiceList"', 'data-ds="ChoiceList" data-face="flat"');
+  }
+
+  /* ---- TaskWarning: farrowing's danger band (.danger-band): a pale red box, the warning in 12px red, then (optional)
+     text actions, then one 10px muted consequence line. tone: 'red' (default) | 'amber'. ---- */
+  function warning({ text, actions = '', detail, tone = 'red', label } = {}) {
+    return `<div class="tk-warning" data-ds="TaskWarning" data-tone="${esc(tone === 'amber' ? 'amber' : 'red')}" role="note"${L(label)}>${text ? `<p class="tk-warning-text">${parts(text)}</p>` : ''}${actions ? `<div class="tk-warning-actions">${actions}</div>` : ''}${detail ? `<small class="tk-warning-detail">${parts(detail)}</small>` : ''}</div>`;
+  }
+
+  /* ---- TaskDoors: a list of doors. card: false (default) — flat door rows (SentriTask.door, no id column).
+     card: true — farrowing's Pen page / sow-actions list: an optional section title with its icon, then the doors in one
+     card, each with a 34px tinted icon tile, a title and one description line, a chevron (the design system's Row).
+     items: [{ title, description, icon, action, value, label }] (text slots); title / icon: the section's. ---- */
+  function doors({ card = false, title, icon = '', items = [], label } = {}) {
+    if (!card) return `<div class="tk-doors" data-ds="TaskDoors"${L(label)}>${items.map(door).join('')}</div>`;
+    const UI = root.SentriUI, u = v => obj(v == null ? '' : v);
+    const st = (slot, key, out) => { const o = u(slot); if (o.str) { out.strs[key] = o.str; if (o.args) out.args[key] = o.args; } return o.text ?? ''; };
+    const head = sectionHead(title, icon);
+    const rows = items.map(i => { const r = { strs: {}, args: {} }; const t = st(i.title, 'title', r); const d = i.description != null ? st(i.description, 'description', r) : undefined;
+      return UI.row(Object.assign({ title: t, icon: i.icon ? glyph(i.icon) : undefined, action: i.action || 'open', value: i.value || '', strs: r.strs, args: r.args }, d !== undefined ? { description: d } : {})); }).join('');
+    return `<section class="tk-doors" data-ds="TaskDoors" data-card=""${L(label)}>${head}${UI.rowGroup(rows)}</section>`;
+  }
+
+  /* A section heading (SentriUI.heading, kind 'section') from text slots: title, meta and a glyph name. */
+  function sectionHead(title, icon, meta) {
+    if (!title) return '';
+    const UI = root.SentriUI, h = { strs: {}, args: {} };
+    const slot = (v, k) => { const o = obj(v); if (o.str) { h.strs[k] = o.str; if (o.args) h.args[k] = o.args; } return o.text ?? ''; };
+    const t = slot(title, 'title'), m = meta ? slot(meta, 'meta') : undefined;
+    return UI.heading(Object.assign({ title: t, icon: icon ? glyph(icon) : '', kind: 'section', level: 3, strs: h.strs, args: h.args }, m !== undefined ? { meta: m } : {}));
+  }
+
+  /* ---- TaskTable: farrowing's comparison table (Task overview · Choose a unit): a section heading, then one card —
+     a column-heading line (9px, as farrowing) and one door row per place: its name (and a 9px subline), a mono figure per
+     column, a green chevron. columns: [text slots]; rows: [{ name, sub, values: [text slots], action, value, label,
+     current }]. ---- */
+  function table({ title, icon = '', meta, nameColumn = '', columns = [], rows = [], label } = {}) {
+    const n = columns.length;
+    const cols = `<div class="tk-table-columns" aria-hidden="true"><span>${T(nameColumn)}</span>${columns.map(c => `<span>${T(c)}</span>`).join('')}<span></span></div>`;
+    const body = rows.map(r => `<div role="listitem"><button type="button" class="tk-table-row"${A(r.action || 'open', r.value)}${L(r.label)}${r.current ? ' aria-current="true"' : ''}>
+      <span class="tk-table-name"><strong>${T(r.name)}</strong>${r.sub ? `<small>${T(r.sub)}</small>` : ''}</span>${(r.values || []).map(v => `<span class="tk-table-figure">${T(v)}</span>`).join('')}${glyph('chevron')}</button></div>`).join('');
+    return `<section class="tk-table" data-ds="TaskTable" style="--tk-cols:${n}"${L(label ?? title)}>${sectionHead(title, icon, meta)}<div class="tk-table-surface">${cols}<div role="list">${body}</div></div></section>`;
+  }
+
+  /* ---- TaskMetrics: farrowing's performance card (Task overview · Performance metrics): a section heading, then one
+     card — two headline measures (label, a 28px mono figure with an optional unit, a subline; subTone 'amber' when below
+     target), a rule, then small totals. measures: [{ label, value, unit, sub, subTone }]; totals: [{ label, value }]. ---- */
+  function metrics({ title, icon = '', meta, measures = [], totals: tt = [], label } = {}) {
+    const m = measures.map(x => `<div><span>${T(x.label)}</span><strong>${T(x.value)}${x.unit ? `<small>${T(x.unit)}</small>` : ''}</strong>${x.sub ? `<small${x.subTone ? ` data-tone="${esc(x.subTone)}"` : ''}>${T(x.sub)}</small>` : ''}</div>`).join('');
+    const t = tt.length ? `<dl class="tk-metrics-totals">${tt.map(x => `<div><dt>${T(x.label)}</dt><dd>${T(x.value)}</dd></div>`).join('')}</dl>` : '';
+    return `<section class="tk-metrics" data-ds="TaskMetrics"${L(label ?? title)}>${sectionHead(title, icon, meta)}<div class="tk-metrics-surface"><div class="tk-metrics-pair">${m}</div>${t}</div></section>`;
+  }
+
   /* ---- TaskTotals: the few figures a sheet commits, at farrowing's Finish size (Born 14 · Alive 9 · Dead 5) ----
      items: [{ label, value }] (text slots); columns: 2 | 3 (default 3). */
   function totals(items = [], { columns = 3, label } = {}) {
@@ -246,7 +305,7 @@
       <div class="tk-dialog-body"><h2 class="tk-dialog-title">${icon ? glyph(icon) : ''}${T(title)}</h2>${description ? `<p class="tk-dialog-desc">${parts(description)}</p>` : ''}${body}</div>${f}</div></div>`;
   }
 
-  const api = { T, statusbar, phone, screen, header, latest, summary, progress, lens, list, group, row, door, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
+  const api = { T, statusbar, phone, screen, header, latest, summary, progress, lens, list, group, row, door, doors, radios, warning, table, metrics, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
   root.SentriTask = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);
