@@ -14,7 +14,8 @@
 /* The room on the task skeleton (ADR 0003): farrowing's room list — TaskHeader, TaskLatest, TaskSummary, TaskLens, rows
    grouped by crate row (TaskGroup + TaskRow), TaskDock — and its sheets and the litter drawer (TaskSheet). Layout only,
    tokens from tokens.css. Candidate:ScanFrame stays task-level. */
-.pp-answers { margin: 0 var(--space-panel) var(--space-panel); }
+.pp-answers { margin: 0 var(--space-panel) 6px; }
+.pp-answers + .pp-filtered { margin-top: var(--space-heading); }
 .pp-filtered { margin: 0 var(--space-panel) 6px; }
 .pp-filtered > * + * { margin-top: var(--space-heading); }
 .pp-after { padding: 0 var(--space-panel) var(--space-gutter); }
@@ -425,13 +426,14 @@
     var xs = reviews(), h = R().rows.strip, d = driftOpen();
     if (!xs.length && !d) return '';
     var head = [];
-    if (xs.length) head.push([word('pp.room.rev.title'), fig(xs.length, 'amber')]);
-    if (d) head.push([word('pp.room.strip.title'), fig((h.openLoss || 0) + (h.openGain || 0), 'red')]);
+    if (xs.length) head.push(P('pp.room.answers.rev', { n: xs.length }));
+    if (d) head.push(P('pp.room.answers.drift', { n: (h.openLoss || 0) + (h.openGain || 0) }));
     var codes = {}; xs.forEach(function (x) { codes[x.litter] = 1; }); (h.lossLitters || []).concat(h.gainLitters || []).forEach(function (c) { codes[c] = 1; });
+    var list = Object.keys(codes).sort().join(' ');
     var unresolved = xs.some(function (x) { return x.status === 'unresolved_at_end'; });
-    var title = head.reduce(function (acc, t, i) { return i ? acc.concat([[word('pp.common.sep')]], [t]) : [t]; }, []);
-    return '<div class="pp-answers">' + UI.rowGroup(UI.row({ title: title, description: [[codesPart(Object.keys(codes).sort())]], action: 'reviews', id: 'pp-reviews', mono: true,
-      chip: unresolved ? { text: PP.t('pp.room.rev.unresolved'), tone: 'amber', strs: { text: 'pp.room.rev.unresolved' } } : null })) + '</div>';
+    // farrowing's disclosure row (TaskRow door), not a card: one title, one line under it
+    return '<div class="pp-answers">' + K.door({ title: joined(head), description: joined([P('pp.room.codes', { list: list }), unresolved ? P('pp.room.rev.unresolved', null, 'amber') : null]),
+      action: 'reviews' }) + '</div>';
   }
 
   /* ---- lenses and filter; the filtered line and the bulk door under them ---- */
@@ -475,8 +477,7 @@
     if (!best || best.k < 2) return '';
     var owe = owedCount();
     var desc = ticked ? ['pp.bulk.door_ticked', { k: ticked }] : best.k < owe ? ['pp.room.bulk.some', { k: best.k, n: owe }] : [PP.one('pp.bulk.door_desc', best.k), { k: best.k }];
-    return UI.rowGroup(UI.row({ title: '', description: '', action: 'open-bulk', value: tx,
-      strs: { title: 'pp.bulk.door', description: desc[0] }, args: { title: { tx: PP.lang === 'zh' ? name(tx) : name(tx).toLowerCase() }, description: desc[1] } }));
+    return K.door({ title: P('pp.bulk.door', { tx: PP.lang === 'zh' ? name(tx) : name(tx).toLowerCase() }), description: P(desc[0], desc[1]), action: 'open-bulk', value: tx });
   }
   function roomTx() {
     var seen = {}, order = CFG.doses.map(function (d) { return d.tx; }).concat(['identity']);
@@ -494,7 +495,7 @@
     if (S.missed || ended() || (lens !== 'owed' && lens !== 'later')) return '';
     var n = facts().filter(function (f) { return f.lens && !f.closed && f.missed.length && (!filtering() || filterLens(f, S.filter) != null); }).length;
     if (!n) return '';
-    return UI.rowGroup(UI.row({ title: '', description: '', action: 'show-missed', strs: { title: PP.one('pp.room.missed', n), description: 'pp.room.missed.short' }, args: { title: { n: n } } }));
+    return K.door({ title: P(PP.one('pp.room.missed', n), { n: n }), description: P('pp.room.missed.short'), action: 'show-missed' });
   }
   function empty(id) { return UI.panel(UI.choiceEmpty('', { strs: { text: id } })); }
   function list() {
@@ -533,16 +534,14 @@
   // The review list (N4, R1-22) and the unit's unexplained drift: each a door to where it is answered.
   var REV_ID = { double: 'pp.room.rev.double', count: 'pp.room.rev.count', held: 'pp.room.rev.held', correction: 'pp.room.rev.correction' };
   var WHERE = { double: 'pp.room.rev.where.litter', count: 'pp.room.rev.where.count', held: 'pp.room.rev.where.count', correction: 'pp.room.rev.where.record' };
-  function word(id, args, tone) { return { text: PP.t(id, args), tone: tone, strs: { text: id }, args: { text: args || {} } }; }
-  function fig(n, tone) { return { text: String(n), tone: tone, strs: { text: 'pp.room.lead.figure' }, args: { text: { n: n } } }; }
-  function codesPart(list) { return { text: list.join(' '), mono: true, strs: { text: 'pp.room.codes' }, args: { text: { list: list.join(' ') } } }; }
+  // The unit's drift door (farrowing's disclosure row): open loss and gain, each with its crates, beside the net.
   function driftRow() {
     var h = R().rows.strip; if (!h.openLoss && !h.openGain) return '';
     var d = [];
-    if (h.openLoss) d.push([word('pp.room.strip.loss'), fig(h.openLoss, 'red'), codesPart(h.lossLitters)]);
-    if (h.openGain) d.push([word('pp.room.strip.gain'), fig(h.openGain, 'progress'), codesPart(h.gainLitters)]);
-    if (h.showNet) d.push([word(Math.abs(h.netDrift) === 1 && PP.lang === 'en' ? 'pp.room.drift.one' : 'pp.room.drift', { n: signed(h.netDrift) })]);
-    return UI.rowGroup(UI.row({ title: [[word('pp.room.strip.title')]], description: d, action: 'explain', wrap: true, id: 'pp-drift' }));
+    if (h.openLoss) d.push(P('pp.room.drift.loss_line', { n: h.openLoss, list: h.lossLitters.join(' ') }, 'red'));
+    if (h.openGain) d.push(P('pp.room.drift.gain_line', { n: h.openGain, list: h.gainLitters.join(' ') }));
+    if (h.showNet) d.push(P(Math.abs(h.netDrift) === 1 && PP.lang === 'en' ? 'pp.room.drift.one' : 'pp.room.drift', { n: signed(h.netDrift) }));
+    return '<div class="pp-doors">' + K.door({ title: P('pp.room.strip.title'), description: joined(d), action: 'explain' }) + '</div>';
   }
   function reviewsSheet() {
     var xs = reviews(), n = xs.length + (driftOpen() ? 1 : 0);
@@ -568,16 +567,17 @@
     return Object.keys(seen).map(Number).sort(function (a, b) { return a - b; });
   }
   function unitsSheet() {
-    var body = UI.rowGroup(units().map(function (u) {
+    var body = '<div class="pp-doors">' + units().map(function (u) {
       var rs = store.select.room(store.derived, { room: u, lens: 'all', identity: true }).rows, k = rs.length;
       var inT = rs.filter(function (f) { return !!f.lens; }).length, owe = rs.filter(function (f) { return f.lens === 'owed' && !f.closed; }).length;
       var ids = {}; rs.forEach(function (f) { var L = store.derived.litters[f.litter]; if (L && L.task) ids[L.task] = 1; });
       var over = (store.derived.tasks || []).some(function (t) { return ids[t.id] && t.ended; });
       var desc = !k ? ['pp.room.units.empty', {}] : !inT ? [PP.one('pp.room.units.notask', k), { k: k }] : over ? [PP.one('pp.room.units.ended', k), { k: k }]
         : owe ? [PP.one('pp.room.units.owe', owe), { k: k, n: owe }] : [PP.one('pp.room.units.none', k), { k: k }];
-      return UI.row({ title: '', description: '', action: 'open-unit', value: String(u), attrs: u === ROOM ? { 'aria-current': 'location' } : {},
-        strs: { title: 'pp.room.unit', description: desc[0] }, args: { title: { n: u }, description: desc[1] } });
-    }).join(''));
+      // the unit you stand in: no chevron, and it says so
+      return K.door({ title: joined([P('pp.room.unit', { n: u }), u === ROOM ? P('pp.room.units.here', null, 'green') : null]), description: P(desc[0], desc[1]),
+        action: 'open-unit', value: String(u), trail: u === ROOM ? '' : 'chevron' });
+    }).join('') + '</div>';
     return sheet({ title: P('pp.room.units.title'), subtitle: P('pp.common.task'), view: 'units', body: body });
   }
 
@@ -604,7 +604,7 @@
     var here = h.room === ROOM ? facts().filter(function (f) { return f.litter === h.litter; })[0] : null, body;
     if (h.kind === 'piglet' && h.status === 'weaned') body = UI.rowGroup(UI.row({ title: '', strs: { title: 'pp.room.scan.weaned' } }));
     else if (here) body = UI.rowGroup(row(here));
-    else body = UI.rowGroup(UI.row({ title: '', action: 'open-litter', value: h.litter, attrs: { 'data-unit': h.room }, strs: { title: 'pp.room.scan.in_unit' }, args: { title: { n: h.room, code: h.litter } } }));
+    else body = K.door({ title: P('pp.room.scan.in_unit', { n: h.room, code: h.litter }), action: 'open-litter', value: h.litter + '@' + h.room });
     return '<div>' + head + body + '</div>';
   }
   function findResults() {
@@ -744,7 +744,8 @@
     if (a === 'dismiss') { if (Date.now() - S.opened < 300) return; closeSheet(); return; }
     if (UI.guard(b)) return;
     if (a === 'back' || a === 'overview') { go(PP.href('end.html', { state: ended() ? 'ended' : 'overview', unit: ROOM !== 7 ? ROOM : '', data: dataParam() })); return; }
-    if (a === 'open-litter') { openLitter(v, b.dataset.unit); return; }
+    // a Find hit in another unit carries its unit: `F02@8`
+    if (a === 'open-litter') { var at = String(v).split('@'); openLitter(at[0], at[1] || b.dataset.unit); return; }
     if (a === 'explain') { go(PP.href('count.html', { state: 'explain', unit: ROOM, data: store.name })); return; }
     if (a === 'receipt') { go(PP.href('end.html', { state: 'receipt', data: store.name })); return; }
     if (a === 'open-review') {
