@@ -149,14 +149,13 @@
   var pl = PP.one;
   // A skeleton text slot: the registered string, filled now and by PP.apply.
   function s(id, args) { var o = { text: PP.t(id, args), str: id }; if (args) o.args = args; return o; }
-  // The skeleton's page takes no data-view; the host names its surfaces so tests and the lint can find them.
-  function named(html, view) { return html.replace(/^(\s*<section class="tk-(?:page|sheet)")/, '$1 data-view="' + view + '"'); }
+  // A door row (TaskRow door, farrowing's .disclosure): a title, one muted line, a chevron (or ✎ for an Edit door).
   function row(o) {
-    var strs = { title: o.title }, args = { title: o.titleArgs };
-    if (o.desc) { strs.description = o.desc; args.description = o.descArgs; }
-    if (o.trail) { strs.trailing = o.trail; args.trailing = o.trailArgs; }
-    return UI.row({ title: '', description: o.desc ? '' : undefined, trailing: o.trail ? '' : undefined, trail: o.glyph || 'auto', action: o.action, value: o.value, strs: strs, args: args });
+    return K.door({ title: s(o.title, o.titleArgs), description: o.desc ? s(o.desc, o.descArgs) : '', action: o.action || '', value: o.value || '',
+      trail: o.action ? o.glyph || 'chevron' : '' });
   }
+  // a titled run of door rows on a page or sheet body
+  function doors(titleId, rows) { return '<section class="mv-section">' + (titleId ? heading(titleId) : '') + '<div>' + rows + '</div></section>'; }
   function fact(label, labelArgs, value, valueArgs, meta, metaArgs) {
     var f = { label: '', value: '', strs: { label: label, value: value }, args: { label: labelArgs, value: valueArgs } };
     if (meta) { f.meta = ''; f.strs.meta = meta; f.args.meta = metaArgs; }
@@ -220,7 +219,7 @@
       rows.push(row({ action: 'record', value: d.id, title: 'pp.common.tx.' + d.tx, desc: 'pp.move.range.row',
         descArgs: { lo: D.owedLo, hi: D.owed, of: x.alive, moves: D.doubt.map(function (g) { return PP.t('pp.move.range.move', { n: g.n, to: g.to }); }).join(' · ') } }));
     });
-    return rows.length ? UI.rowGroup(rows.join(''), { title: '', strs: { title: 'pp.move.range.title' } }) : '';
+    return rows.length ? doors('pp.move.range.title', rows.join('')) : '';
   }
   // One age group of arrivals that owe (R1-4): where they came from, their own day-age and when the dose is theirs.
   function groupText(g) {
@@ -233,7 +232,7 @@
   function movesGroup(c) {
     var ms = L(c).moves.slice().sort(function (a, b) { return a.at < b.at ? 1 : -1; });
     if (!ms.length) return '';
-    return UI.rowGroup(ms.map(function (m) {
+    return doors('', ms.map(function (m) {
       var inn = m.dir === 'in', t = where(m.other) ? (inn ? 'pp.move.moves.in_unit' : 'pp.move.moves.out_unit') : (inn ? 'pp.move.moves.in' : 'pp.move.moves.out');
       var ex = m.explains && (m.explains[0] || m.explains[1]);
       return row({ action: 'edit-move', value: m.id, title: pl(t, m.n), titleArgs: { n: m.n, code: m.other, u: unitOf(m.other) }, desc: ex ? 'pp.move.moves.explained' : '', glyph: 'edit' });
@@ -271,15 +270,15 @@
         title: 'pp.common.tx.' + d.tx, desc: 'pp.move.owed.line', descArgs: { text: parts.join(' · ') } }));
     });
     if (!rows.length) return '';
-    return UI.rowGroup(rows.join(''), { title: '', strs: { title: 'pp.move.owed.title' } });
+    return doors('pp.move.owed.title', rows.join(''));
   }
   function facePage(c, inert) {
     var body = ledgerFacts(c) + doubtRows(c) + arrivalRows(c) + movesGroup(c);
     var canMove = canSource(c) || canReceive(c);
     // Move is the page's one act; a kept draft says so on the button (Back from the Move page keeps it).
     var primary = canMove ? { label: S.kept ? s('pp.move.act.resume', { n: 1 }) : s('pp.move.sheet.title'), action: 'open-move', value: c } : null;
-    return named(K.page({ title: s('pp.move.moves.title'), description: faceDesc(c), body: '<div class="mv-stack">' + body + '</div>', inert: inert,
-      footer: K.footer({ back: { action: 'back' }, primary: primary }) }), 'face');
+    return K.page({ view: 'face', title: s('pp.move.moves.title'), description: faceDesc(c), body: '<div class="mv-stack">' + body + '</div>', inert: inert,
+      footer: K.footer({ back: { action: 'back' }, primary: primary }) });
   }
 
   /* ---- the Move page (farrowing's Foster piglets): direction, the other crate, the count, the questions, before → after ---- */
@@ -322,9 +321,9 @@
   // Farrowing's Send | Receive: only the directions this litter can take; an explaining Move is locked.
   function directionSection() {
     if (S.explains || !canSource(S.face) || !canReceive(S.face)) return '';
-    return UI.segment({ action: 'dir', active: S.dir, ariaLabel: PP.t('pp.move.dir.aria'), options: [
-      ['out', '', { strs: { label: 'pp.move.dir.out' }, args: { label: { code: S.face } } }],
-      ['in', '', { strs: { label: 'pp.move.dir.in' }, args: { label: { code: S.face } } }]] });
+    return K.choice({ action: 'dir', label: s('pp.move.dir.aria'), options: [
+      { value: 'out', icon: 'transfer', label: s('pp.move.dir.out', { code: S.face }), pressed: S.dir === 'out' },
+      { value: 'in', icon: 'transfer', label: s('pp.move.dir.in', { code: S.face }), pressed: S.dir === 'in' }] });
   }
   /* Find a crate (R1-5): the crate code or the sow's number, across rows and units. Every litter that matches is listed with
      what it is: one that can take part is a row to pick; this crate, a farrowing one or one that cannot says why. */
@@ -385,7 +384,7 @@
     if (!src) return '';
     var a = alive(src), ids = liveRows(src), small = a <= 8 || L(src).sowDied;
     if (S.explains && !gainOnly()) {                         // locked: the count the loss and gain already wrote
-      return UI.stepper({ label: '', description: '', value: count(), min: count(), max: count(), key: 'n',
+      return K.stepper({ variant: 'hero', face: 'well', label: '', description: '', value: count(), min: count(), max: count(), key: 'n',
         strs: { label: 'label.piglets', description: pl('pp.move.count.of', a), value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
         args: { description: { n: a, code: src } } });
     }
@@ -400,18 +399,18 @@
           return UI.choiceRow({ label: '', mode: 'multi', mono: true, action: 'pick-row', value: r.rowId, selected: S.rows.indexOf(r.rowId) >= 0,
             strs: { label: r.tag ? 'pp.move.rows.tag' : 'pp.move.rows.notch' }, args: { label: r.tag ? { tag: r.tag } : { notch: r.notch } } });
         })) +
-        (rem ? UI.stepper({ label: '', description: '', value: S.untagged, min: 0, max: rem, key: 'untagged', hint: '', reserveHint: S.untagged >= rem,
+        (rem ? K.stepper({ face: 'row', label: '', description: '', value: S.untagged, min: 0, max: rem, key: 'untagged', hint: '', reserveHint: S.untagged >= rem,
           strs: { label: 'pp.move.rows.untagged', description: pl('pp.move.rows.untagged_of', rem), value: 'ds.field.figure', hint: S.untagged >= rem ? pl('pp.move.rows.untagged_ceiling', rem) : undefined,
                   decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' }, args: { description: { n: rem }, hint: { n: rem } } }) : '') +
         '</section>';
     }
     if (gainOnly()) {                                        // at most the gain: a larger move is a plain Move of its own
       var g = gainOpen(), mx = Math.min(a, g), capHint = S.n >= mx ? (mx === g ? pl('pp.move.explain.gain_cap', g) : pl('pp.move.count.ceiling', a)) : undefined;
-      return UI.stepper({ label: '', description: '', value: S.n, min: 1, max: mx, key: 'n', hint: '', reserveHint: true,
+      return K.stepper({ variant: 'hero', face: 'well', label: '', description: '', value: S.n, min: 1, max: mx, key: 'n', hint: '', reserveHint: true,
         strs: { label: 'label.piglets', description: pl('pp.move.count.of', a), value: 'ds.field.figure', hint: capHint, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
         args: { description: { n: a, code: src }, hint: { n: mx === g ? g : a, code: src, to: receiver() } } });
     }
-    return UI.stepper({ label: '', description: '', value: S.n, min: 1, max: a, key: 'n', hint: '', pointers: ptr, reserveHint: ptr.length > 0 || S.n >= a,
+    return K.stepper({ variant: 'hero', face: 'well', label: '', description: '', value: S.n, min: 1, max: a, key: 'n', hint: '', pointers: ptr, reserveHint: ptr.length > 0 || S.n >= a,
       strs: { label: 'label.piglets', description: pl('pp.move.count.of', a), value: 'ds.field.figure', hint: S.n >= a && !ptr.length ? pl('pp.move.count.ceiling', a) : undefined,
               decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { description: { n: a, code: src }, hint: { n: a, code: src } } });
@@ -514,8 +513,8 @@
     var body = explain + directionSection() + crateSection() + pairSection() + ask + countSection() + review(dr);
     // Clear drops the draft (and an explaining link) while there is one to drop
     var clear = draftExists() || S.explains ? UI.button({ label: '', register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '';
-    return named(K.page({ title: s('pp.move.sheet.title'), description: sub, aside: clear, body: '<div class="mv-stack">' + body + '</div>',
-      footer: K.footer({ back: { action: 'back' }, primary: primarySpec(dr, ready), status: reason }) }), 'move');
+    return K.page({ view: 'move', title: s('pp.move.sheet.title'), description: sub, aside: clear, body: '<div class="mv-stack">' + body + '</div>',
+      footer: K.footer({ back: { action: 'back' }, primary: primarySpec(dr, ready), status: reason }) });
   }
 
   /* ---- the receipt: the posted record, read back from the ledger, over the Moves page ---- */
@@ -547,7 +546,7 @@
   }
   function resolveDrawer() {
     var r = resolving(), n = r.n, had = Math.max(0, Math.min(S.had || 0, n)), rest = n - had, visible = doseCfg(r.dose).visible;
-    var body = UI.stepper({ label: '', description: '', value: had, min: 0, max: n, key: 'had', hint: '', reserveHint: had >= n,
+    var body = K.stepper({ face: 'row', label: '', description: '', value: had, min: 0, max: n, key: 'had', hint: '', reserveHint: had >= n,
       strs: { label: 'pp.move.res.had', description: pl('pp.move.res.of', n), value: 'ds.field.figure', hint: had >= n ? pl('pp.move.res.ceiling', n) : undefined, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { description: { n: n }, hint: { n: n } } });
     if (rest) body += radios('rest', [{ value: 'record', id: pl('pp.move.res.record', rest), args: { tx: txName(r.dose), n: rest } },
@@ -561,7 +560,7 @@
   /* ---- move-prelock: the door to the farrowing sheet ---- */
   function prelockDrawer() {
     var x = L(S.face);
-    var door = UI.rowGroup(row({ action: 'open-farrowing', value: S.face, title: 'pp.move.pre.door', titleArgs: { code: S.face },
+    var door = doors('', row({ action: 'open-farrowing', value: S.face, title: 'pp.move.pre.door', titleArgs: { code: S.face },
       desc: 'pp.move.pre.door_meta', descArgs: { n: x.born } }));   // who and when are on the farrowing sheet
     return K.drawer({ view: 'prelock', size: 'short', title: s('pp.move.sheet.title'), subtitle: s('pp.move.pre.why', { code: S.face }),
       body: door, footer: K.footer({ back: { action: 'back' } }) });
