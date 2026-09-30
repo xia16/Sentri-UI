@@ -253,6 +253,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-edit-record-page-corrected", "url": "ux/tasks/piglet-processing/edit.html?state=record-page-corrected", "strict": true },
     { "name": "pp-edit-edit", "url": "ux/tasks/piglet-processing/edit.html?state=edit", "strict": true },
     { "name": "pp-edit-edit-changed", "url": "ux/tasks/piglet-processing/edit.html?state=edit-changed", "strict": true },
+    { "name": "pp-edit-edit-other", "url": "ux/tasks/piglet-processing/edit.html?state=edit-other", "strict": true },
     { "name": "pp-edit-edit-unrecord", "url": "ux/tasks/piglet-processing/edit.html?state=edit-unrecord", "strict": true },
     { "name": "pp-edit-wrong-litter", "url": "ux/tasks/piglet-processing/edit.html?state=wrong-litter", "strict": true },
     { "name": "pp-edit-wrong-litter-there", "url": "ux/tasks/piglet-processing/edit.html?state=wrong-litter-there", "strict": true },
