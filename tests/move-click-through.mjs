@@ -70,8 +70,12 @@ try {
   await page.locator('input[data-action="pick-row"][value="B09-r10"]').check();
   d = await drawer(page);
   assert.match(d, /Iron: did all 2 piglets have it\?/);
-  assert.match(d, /Answer Iron first/);
   assert.equal(await page.locator('[data-action="save-move"]').isDisabled(), true);
+  // the waiting Move stands alone; a tap on it says why (the guard answers, the reason line appears above the footer)
+  assert.doesNotMatch(d, /Answer Iron first/);
+  await page.locator('[data-action="save-move"]').dispatchEvent('click');
+  await page.waitForFunction(() => ((document.getElementById('mv-reason') || {}).textContent || '').trim().length > 0);   // announced: cleared, then set
+  assert.match(await drawer(page), /Answer Iron first/);
   await page.click('[data-action="answer"][data-value="iron3:unknown"]');
   assert.match(await text(page, '[data-action="save-move"]'), /Move 2 to B02 · Iron unknown/);
   await page.click('[data-action="save-move"]');
