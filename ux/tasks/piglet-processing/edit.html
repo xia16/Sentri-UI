@@ -19,6 +19,9 @@
 .ed-body > * { margin: 0; }
 .ed-group { display: flex; flex-direction: column; gap: var(--space-heading); }
 .ed-group > * { margin: 0; }
+/* A live region the eye never sees (parity round 2, item 11): farrowing shows no line above its footer; a screen reader
+   still hears it, and a tap on the waiting primary (or the hold) says it again through the Button guard. */
+.ed-live { position: absolute; width: 1px; height: 1px; margin: 0; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 /* one rule between stacked records, as between farrowing's Edit rows */
 .ed-group[data-mark] + .ed-group[data-mark], .ed-group[data-count] + .ed-group[data-count], .ed-group[data-death] + .ed-group[data-death] { padding-top: var(--space-heading); border-top: 1px solid var(--line); }
 .ed-pad { flex: none; padding: var(--space-row-y) var(--space-gutter-sheet); background: var(--paper); border-top: 1px solid var(--line); }
@@ -156,9 +159,8 @@
   function stampPart(iso, who) { var s = stampStrs(iso, who); return part(s[0], s[1]); }
   function sexWord(s) { return PP.t(s === 'b' ? 'pp.common.sex.boar' : 'pp.common.sex.gilt'); }
   function causeText(byCause) { return Object.keys(byCause || {}).map(function (c) { return PP.t('pp.edit.rec.death_part', { n: byCause[c], cause: PP.t('dead.' + c.replace('-', '_')) }); }).join(' · '); }
-  // The log names people in full (farrowing's `G. Hansen`); the fixture's hands by initials. Unknown initials stay as they are.
-  var FULL = { 'G.H': 'G. Hansen', 'L.M': 'L. Madsen', 'A.K': 'A. Karlsen' };
-  function fullName(w) { return FULL[w] || w; }
+  // The log names people in full (farrowing's `G. Hansen`): the ledger's people (config, else the fixture's map).
+  function fullName(w) { return window.PPLedger.person(w, store); }
   // Record-page day headers: today, yesterday, then the date.
   function dayWord(date) {
     var a = Date.UTC(+date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10)), b = Date.UTC(+TODAY.slice(0, 4), +TODAY.slice(5, 7) - 1, +TODAY.slice(8, 10));
@@ -739,9 +741,9 @@
   // The footer: Back and Save; Save waits (present, quiet) with its reason in one status line right above the footer
   // (ADR 0002), on the drawer's bottom edge. The footer is the drawer's last child (TaskSheet).
   function bar(w, can, saveId) {
-    // the footer's status slot (TaskSheet): why Save waits, one line right above the footer, only while it waits for a reason
-    return K.footer({ back: { action: 'back' }, status: w ? { id: 'ed-why', text: PP.t(w[0], w[1]), str: w[0], args: w[1] || undefined } : undefined,
-      primary: button('primary', 'save', saveId || 'act.save', { waiting: !can, describedby: w ? 'ed-why' : '' }) });
+    // why Save waits: a visually hidden live region (no line above the footer, as farrowing); the guard says it on a tap
+    var why = '<p class="ed-live" id="ed-why" role="status" aria-live="polite">' + (w ? span(w[0], w[1]) : '') + '</p>';
+    return why + K.footer({ back: { action: 'back' }, primary: button('primary', 'save', saveId || 'act.save', { waiting: !can, describedby: 'ed-why' }) });
   }
   /* R1-28: a correction says what it did. The receipt of a saved correction: every figure it moved, on every litter it
      touched (the ledger replayed without it, against the ledger with it). */

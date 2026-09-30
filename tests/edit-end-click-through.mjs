@@ -18,8 +18,9 @@ const ready = (p) => p.waitForSelector('html[data-ready]');
 const text = async (p, sel) => (await p.locator(sel).first().innerText()).replace(/\s*·\s*/g, ' · ').replace(/\s+/g, ' ');
 // A live status region mounts empty and is filled a moment later (ADR 0002): wait for it.
 async function live(p, sel, re) {
-  await p.waitForFunction(([s, src]) => { const el = document.querySelector(s); return !!el && new RegExp(src).test(el.innerText.replace(/\s*·\s*/g, ' · ').replace(/\s+/g, ' ')); }, [sel, re.source], { timeout: 4000 });
-  return text(p, sel);
+  // (a region may be visually hidden, item 11: read its textContent)
+  await p.waitForFunction(([s, src]) => { const el = document.querySelector(s); return !!el && new RegExp(src).test(el.textContent.replace(/\s*·\s*/g, ' · ').replace(/\s+/g, ' ')); }, [sel, re.source], { timeout: 4000 });
+  return (await p.locator(sel).first().textContent()).replace(/\s*·\s*/g, ' · ').replace(/\s+/g, ' ');
 }
 // room → a litter's sheet (the All lens when the litter isn't owed now)
 async function openLitter(page, crate, data, fresh = true) {
