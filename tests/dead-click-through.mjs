@@ -53,7 +53,7 @@ try {
   assert.match(await text(page, '[data-ds="Photos"]'), /2 attached/);
   await page.click('[data-action="save"]');
   await page.waitForURL(/state=litter.*saved=dead/); await ready(page);
-  assert.match(await text(page, '.lt-summary'), /Alive 11 Dead 2/);
+  assert.match(await text(page, '.lt-summary'), /Alive now 11 Dead 2/);
   const ev1 = (await log(page, 'base')).pop();
   assert.equal(ev1.type, 'death'); assert.equal(ev1.photos.length, 2);
   console.log('ok 1 steppers from 0, photos kept on the event, Save → litter:', await text(page, '.lt-summary'));
@@ -86,7 +86,7 @@ try {
   assert.match(routed, /From the 2 missing 1 alive stays 11 · 1 missing still open/);
   await page.click('[data-action="save"]');
   await page.waitForURL(/state=litter.*crate=A02/); await ready(page);
-  assert.match(await text(page, '.lt-summary'), /Alive 12/);
+  assert.match(await text(page, '.lt-summary'), /Alive now 12/);
   await page.click('[data-action="close"]');
   await page.waitForURL(/room\.html/); await ready(page);
   assert.match(await drift(page), /Unexplained loss 1 D03/);

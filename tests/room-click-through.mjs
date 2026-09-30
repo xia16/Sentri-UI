@@ -36,7 +36,7 @@ try {
   await page.click('[data-action="close"]');
   await page.waitForURL(/room\.html/); await ready(page);
   const last = await text(page, '.tk-latest');
-  assert.match(last, /Last record just now · Iron · A02 · G\.H/);
+  assert.match(last, /Last record \d\d:\d\d · G\.H/);
   console.log('ok 1 identity owed; a new record reads just now:', last);
 
   // 2. R1-16: filter iron → the headline says so; A02, just done for iron, is in Done under the filter; Clear from the

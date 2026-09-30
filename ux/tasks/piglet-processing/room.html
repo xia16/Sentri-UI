@@ -37,6 +37,12 @@
 .lt-face { display: flex; flex-direction: column; gap: var(--space-heading); }
 .lt-face > .pp-group { margin-top: var(--space-heading); }
 .lt-summary > * + * { margin-top: 8px; }
+/* a fact that is not a figure: one full-width line at the panel's foot, label then value (farrowing's `Litter weight 12.6 kg`) */
+.lt-summary .lt-fact-line { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 8px; }
+.lt-summary .lt-fact-line > dd { margin: 0; }
+/* the birth-weight view: no reserved hint line between the field and its keypad (it appears when there is a hint) */
+.lt-stack .st-measure-hint:empty, .lt-stack .st-numpad-feedback { display: none; }
+.lt-stack > .st-numpad.st-numpad { margin-top: var(--space-heading); }
 /* a treatment's entry rows sit together like farrowing's (the row face draws the line between them); one section gap
    before a group label such as `Not castrated` */
 .lt-stack { display: flex; flex-direction: column; }
@@ -391,7 +397,10 @@
   function latest() {
     var best = R().rows.lastRecord;
     if (!best) return '';
-    return K.latest({ lead: P('pp.room.latest.lead'), value: P('pp.room.latest.when', { when: U.ago(best.at, now()) }), rest: P('pp.room.latest.rest', { what: evWhat(best), code: best.litter, who: best.who }) });
+    // farrowing's line: the clock time and who (`Last record 10:25 · G.H`); what was recorded is on the litter's log
+    var today = String(best.at).slice(0, 10) === String(store.today).slice(0, 10);
+    return K.latest({ lead: P('pp.room.latest.lead'), value: P('pp.room.latest.when', { when: today ? U.time(best.at) : U.date(best.at) + ' · ' + U.time(best.at) }),
+      rest: P('pp.room.latest.who', { who: best.who }) });
   }
 
   /* ---- the summary card: this unit | the task overview. Before End: the litters that owe today (under a filter, the
@@ -434,7 +443,8 @@
     var xs = reviews(), h = R().rows.strip, d = driftOpen();
     if (!xs.length && !d) return '';
     // one compact line under the summary card (parity review 4): the counts only; the crates are in the review sheet
-    var r = xs.length, u = (h.openLoss || 0) + (h.openGain || 0);
+    // counts are items to answer: review items, and open unexplained lines (never piglets)
+    var r = xs.length, u = d;
     var unresolved = xs.some(function (x) { return x.status === 'unresolved_at_end'; });
     var id = r && d ? (unresolved ? 'pp.room.answers.both_end' : 'pp.room.answers.both') : r ? (unresolved ? 'pp.room.answers.rev_end' : 'pp.room.answers.rev') : 'pp.room.answers.drift';
     var args = { n: r || u, r: r, d: u };
@@ -540,9 +550,19 @@
   }
   // The review list (N4, R1-22) and the unit's unexplained drift: each a door to where it is answered.
   var REV_ID = { double: 'pp.room.rev.double', count: 'pp.room.rev.count', held: 'pp.room.rev.held', correction: 'pp.room.rev.correction' };
-  function stampP(at, who) {
-    var today = String(at).slice(0, 10) === String(store.today).slice(0, 10);
-    return today ? P('pp.common.stamp.today', { t: U.time(at), who: who }) : P('pp.common.stamp.date', { date: U.date(at), t: U.time(at), who: who });
+  // One review-label format everywhere (parity review 2, item 9): `Possible double · Iron · day 3`, and its provenance
+  // `08:40 · L.M, 08:52 · G.H` (each record's stamp; one stamp for a held body or a count).
+  function revTx(x) {
+    var d = x.dose ? doseCfg(x.dose) : null;
+    if (d) return d.tx === 'iron' ? PP.t('pp.litter.tx_day', { tx: name('iron'), d: d.due }) : name(d.tx);
+    return x.tx ? name(x.tx) : '';
+  }
+  function provenance(x) {
+    var stamp = function (at, who) { var today = String(at).slice(0, 10) === String(store.today).slice(0, 10); return (today ? '' : U.date(at) + ' · ') + U.time(at) + ' · ' + who; };
+    var L = store.derived.litters[x.litter], recs = [];
+    if (x.records && x.dose && L && L.doses[x.dose]) recs = L.doses[x.dose].records.filter(function (r) { return x.records.indexOf(r.id) >= 0; });
+    var list = recs.length ? recs.map(function (r) { return stamp(r.at, r.who); }) : x.at ? [stamp(x.at, [].concat(x.who || []).join(' · '))] : [];
+    return list.length ? [P('pp.room.codes', { list: list.join(', ') })] : null;
   }
   // The unit's drift door (farrowing's disclosure row): open loss and gain, each with its crates, beside the net.
   function driftRow() {
@@ -554,11 +574,11 @@
     return '<div class="pp-doors">' + K.door({ title: P('pp.room.strip.title'), description: joined(d), action: 'explain' }) + '</div>';
   }
   function reviewsSheet() {
-    var xs = reviews(), n = xs.length + (driftOpen() ? 1 : 0);
+    var xs = reviews(), n = xs.length + driftOpen();
     var rows = xs.map(function (x) {
       return K.row({ id: P('pp.room.code', { code: x.litter }), chip: x.status === 'unresolved_at_end' ? P('pp.room.rev.unresolved', null, 'amber') : null,
         // provenance, not directions (parity review 17): who recorded it and when
-        headline: [P(REV_ID[x.kind], { tx: x.tx ? name(x.tx) : '' })], meta: x.at ? [stampP(x.at, [].concat(x.who || []).join(' · '))] : null, action: 'open-review', value: x.id });
+        headline: [P(REV_ID[x.kind], { tx: revTx(x) })], meta: provenance(x), action: 'open-review', value: x.id });
     }).join('');
     var body = driftRow() + (rows ? UI.rowGroup(rows) : '');
     return sheet({ title: P('pp.room.rev.sheet'), subtitle: ended() ? P('pp.room.rev.after_end') : P(PP.one('pp.room.rev.sub', n), { u: ROOM, n: n }), view: 'reviews', size: 'long',

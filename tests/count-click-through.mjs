@@ -174,7 +174,7 @@ try {
   await page.waitForURL(/state=litter.*crate=B06.*saved=dead/); await ready(page);
   await page.waitForSelector('#lt-receipt span');
   assert.match(await text(page, '#lt-receipt'), /271004 crushed\s*·\s*all missing found/);
-  assert.match(await text(page, '[data-ds="Facts"]'), /Alive 11/);
+  assert.match(await text(page, '[data-ds="Facts"]'), /Alive now 11/);
   console.log('ok 10 a named missing piglet body closes its line:', await text(page, '#lt-receipt'));
 
   // 11. R1-22: a held body is answered in the Set count drawer, above the number (never under the sheet).
