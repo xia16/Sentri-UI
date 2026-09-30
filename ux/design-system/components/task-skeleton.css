@@ -47,7 +47,10 @@
 
 /* ---- TaskSummary: the unit figure | the task-overview progress ---- */
 .tk-summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); margin: 0 var(--space-panel) 10px;
-  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); overflow: hidden; box-shadow: var(--shadow-card); }
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); box-shadow: var(--shadow-card); }
+/* No clip on the card (a clip reads as hiding the task half's last pixel on a room too short to scroll): the task half
+   keeps the card's right corners with its own radius, so its pressed wash never spills. */
+.tk-summary-task { border-radius: 0 var(--radius-panel) var(--radius-panel) 0; }
 .tk-summary-half { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; padding: var(--space-heading) var(--space-card-x);
   margin: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
 .tk-summary-task { position: relative; cursor: pointer; }
@@ -301,7 +304,15 @@ label.tk-row { cursor: pointer; }
 .tk-door-copy { flex: 1; min-width: 0; }
 .tk-door-copy > strong { display: block; font: 600 var(--type-row-title-size)/1.4 var(--font-sans); }
 .tk-door-copy > small { display: block; margin-top: 5px; font: var(--type-meta-size)/1.7 var(--font-sans); color: var(--muted); }
-.tk-door > svg { flex: none; width: 16px; height: 16px; color: var(--ink); }
+.tk-door > svg, .tk-door-main > svg { flex: none; width: 16px; height: 16px; color: var(--ink); }
+/* A door with a one-tap at its end (`Record 12`): the door is the copy (and its chevron), the button sits beside it. */
+.tk-door[data-act] { padding: 0; gap: var(--space-row-y); }
+.tk-door[data-act]:active { background: transparent; }
+.tk-door-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 62px; margin: 0; padding: 15px 0;
+  border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
+.tk-door-main:active { background: var(--press); }
+.tk-door[data-act] > .button { flex: none; min-height: var(--touch-min); margin: 0; padding: 0 var(--space-row-x); border-radius: var(--radius-control);
+  font: 500 var(--type-button-size)/1.3 var(--font-sans); }
 
 /* TaskChoice: farrowing's choice tiles (Foster: Send / Receive). */
 .tk-choice { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -332,9 +343,70 @@ label.tk-row { cursor: pointer; }
 :is(.tk-page-desc, .tk-sheet-subtitle)[data-tone="red"] { color: var(--red); }
 :is(.tk-page-desc, .tk-sheet-subtitle)[data-tone="green"] { color: var(--green); }
 
+/* ---- Skeleton 3 ---- */
+
+/* TaskRadios: farrowing's flat radio rows — no panel; 60px rows, a line under each, a 14px/400 label, the radio right. */
+.tk-radios .st-choice-panel { background: transparent; border: 0; border-radius: 0; }
+.tk-radios .st-choice-row.st-choice-row { min-height: var(--radio-row-min); padding: 0; gap: 10px; border-bottom: 1px solid var(--line); }
+.tk-radios .st-choice-row.st-choice-row + .st-choice-row { border-top: 0; }
+.tk-radios .st-choice-label, .tk-radios .st-choice-row[data-mode="radio"][aria-checked="true"] .st-choice-label { font: 400 var(--type-button-size)/1.4 var(--font-sans); }
+.tk-radios .st-choice-row .st-radio { order: 2; margin-left: auto; border-width: var(--ring-width-fine); border-color: var(--muted); }
+.tk-radios .st-choice-row[aria-checked="true"] .st-radio { border-color: var(--ink); }
+
+/* TaskWarning: farrowing's danger band — pale red, 12px red text, text actions, a 10px muted consequence line. */
+.tk-warning { margin: 0; padding: var(--space-row-y); border: 1px solid var(--danger-border); border-radius: var(--radius-control); background: var(--red-wash); color: var(--red);
+  font: var(--type-choice-meta-size)/1.6 var(--font-sans); }
+.tk-warning[data-tone="amber"] { border-color: var(--pending-border); background: var(--amber-wash); color: var(--amber); }
+.tk-warning-text { margin: 0; }
+.tk-warning-actions { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--space-row-y); margin-top: 4px; }
+.tk-warning-actions > .st-text-action { color: inherit; }
+.tk-warning-detail { display: block; margin-top: 4px; font: var(--type-meta-size)/1.6 var(--font-sans); color: var(--muted); }
+
+/* TaskTable: farrowing's comparison table (Choose a unit). Column headings and sublines are 9px, as farrowing
+   (`table-heading`, below the 10px floor by the owner's round-5 ruling, like the hold caption). */
+.tk-table, .tk-metrics { display: flex; flex-direction: column; }
+.tk-table > .st-heading, .tk-metrics > .st-heading { margin: 0 0 var(--space-heading); }
+.tk-table-surface { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
+.tk-table-columns, .tk-table-row { display: grid; grid-template-columns: minmax(78px, 1.5fr) repeat(var(--tk-cols, 3), minmax(0, 1fr)) 18px; column-gap: 8px; align-items: center; }
+.tk-table-columns { padding: var(--space-row-y) var(--space-row-x); background: var(--surface); border-bottom: 1px solid var(--line);
+  font: var(--type-table-heading-size)/1.3 var(--font-sans); color: var(--muted); }
+.tk-table-columns > span:not(:first-child) { text-align: center; }
+.tk-table-surface [role="listitem"] + [role="listitem"] { border-top: 1px solid var(--rule); }
+.tk-table-row { width: 100%; min-height: var(--animal-row-min); margin: 0; padding: var(--space-row-x); border: 0; background: var(--paper); color: var(--ink);
+  font: 500 var(--type-button-size) var(--font-sans); text-align: left; }
+.tk-table-row:active { background: var(--green-wash); }
+.tk-table-name { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; min-width: 0; }
+.tk-table-name > :is(strong, small) { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tk-table-name > strong { font: 500 var(--type-button-size)/1.3 var(--font-sans); }
+.tk-table-name > small { font: 400 var(--type-table-heading-size)/1.3 var(--font-sans); color: var(--muted); }
+.tk-table-figure { font: 400 var(--type-table-figure-size)/1.3 var(--font-mono); text-align: center; font-variant-numeric: tabular-nums; }
+.tk-table-row > svg { width: 18px; height: 18px; color: var(--green); }
+
+/* TaskMetrics: farrowing's performance card — two headline measures, a rule, small totals. */
+.tk-metrics-surface { padding: var(--space-panel); border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
+.tk-metrics-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.tk-metrics-pair > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tk-metrics-pair > div > span { font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+.tk-metrics-pair strong { font: 500 var(--type-metric-size)/1.2 var(--font-mono); letter-spacing: -1px; color: var(--ink); }
+.tk-metrics-pair strong > small { margin-left: 2px; font-size: var(--type-figure-denominator-size); }
+.tk-metrics-pair > div > small { font: var(--type-meta-size)/1.5 var(--font-sans); color: var(--muted); }
+.tk-metrics-pair > div > small[data-tone="amber"] { color: var(--amber); }
+.tk-metrics-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: var(--space-panel) 0 0; padding-top: var(--space-row-x); border-top: 1px solid var(--line); }
+.tk-metrics-totals > div { min-width: 0; }
+.tk-metrics-totals dt { font: var(--type-meta-size)/1.5 var(--font-sans); color: var(--muted); }
+.tk-metrics-totals dd { margin: 2px 0 0; font: 500 var(--type-metric-total-size)/1.5 var(--font-mono); color: var(--ink); }
 @media (max-width: 370px) {
-  .tk-sheet-head, .tk-sheet-body, .tk-footer, .tk-page-head, .tk-page-body, .tk-page > .tk-footer, .tk-dialog-body, .tk-footer-status, .tk-page > .tk-footer-status { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); }
+  .tk-table-columns, .tk-table-row { column-gap: 5px; grid-template-columns: minmax(65px, 1.35fr) repeat(var(--tk-cols, 3), minmax(0, 1fr)) 16px; padding-left: var(--space-row-y); padding-right: var(--space-row-y); }
+  .tk-table-name > strong { font-size: var(--type-row-title-size); }
+}
+
+/* TaskDoors: flat door rows, or (card) a section title with its icon and one card of icon doors (the Pen page). */
+.tk-doors[data-card] { display: flex; flex-direction: column; gap: var(--space-heading); }
+.tk-doors[data-card] > * { margin: 0; }
+
+/* Narrow phones keep farrowing's gutters (21 in drawers, 18 on pages; parity review 16, ruling): no 12px override.
+   Only the footer's gap narrows, as farrowing's (.sheet-footer gap 10 at 370px and below). */
+@media (max-width: 370px) {
   .tk-footer { gap: 10px; }
-  .tk-dialog > .tk-footer { margin-left: var(--space-gutter-narrow); margin-right: var(--space-gutter-narrow); padding-left: 0; padding-right: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .tk-summary-task, .tk-row { transition: none; } }
