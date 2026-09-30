@@ -19,33 +19,6 @@
 .en-body > * { margin: 0; }
 .en-block > .st-heading { margin: 0 0 var(--space-key-gap); }
 .en-groups { display: flex; flex-direction: column; gap: var(--space-heading); }
-/* Candidate:TaskTable — farrowing's Choose a unit table (task-overview-routing): the column headings once, then one
-   door per crate row with its figures in columns. Candidate:TaskMetrics — farrowing's Performance metrics card: the two
-   headline measures large, the totals under a rule. Neither is a skeleton part yet (reported). */
-.en-table { overflow: hidden; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); }
-.en-table-cols, .en-table-row { display: grid; grid-template-columns: minmax(72px, 1.5fr) repeat(3, minmax(0, 1fr)) 18px; column-gap: var(--space-key-gap); align-items: center; }
-.en-table-cols { padding: var(--space-row-y) var(--space-row-x); background: var(--surface); border-bottom: 1px solid var(--line); font: var(--type-meta-size)/1.3 var(--font-sans); color: var(--muted); }
-.en-table-cols > span:not(:first-child) { text-align: center; }
-.en-table-row { width: 100%; min-height: var(--animal-row-min); margin: 0; padding: var(--space-row-x); border: 0; background: var(--paper); color: var(--ink); font: inherit; text-align: left; }
-.en-table-row + .en-table-row { border-top: 1px solid var(--line); }
-.en-table-row:active { background: var(--press); }
-.en-table-name { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.en-table-name > strong { font: 500 var(--type-button-size)/1.3 var(--font-sans); }
-.en-table-name > small { font: var(--type-meta-size)/1.3 var(--font-sans); color: var(--muted); }
-.en-table-n { font: 400 var(--type-figure-denominator-size) var(--font-mono); text-align: center; font-variant-numeric: tabular-nums; }
-.en-table-n[data-tone="red"] { color: var(--red); }
-.en-table-row > svg { width: 18px; height: 18px; color: var(--green); }
-.en-metrics.st-panel { padding: var(--space-panel); }
-.en-kpi { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-heading); }
-.en-kpi > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.en-kpi > div > span, .en-kpi > div > small { font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
-.en-kpi > div > small { font-size: var(--type-meta-size); }
-.en-kpi strong { font: 500 var(--type-figure-total-size)/1.2 var(--font-mono); letter-spacing: -1px; color: var(--ink); }
-.en-kpi strong > small { margin-left: 2px; font-size: var(--type-figure-denominator-size); letter-spacing: 0; color: var(--muted); }
-.en-totals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-key-gap); margin: var(--space-panel) 0 0; padding: var(--space-row-x) 0 0; border-top: 1px solid var(--line); }
-.en-totals > div { min-width: 0; }
-.en-totals dt { font: var(--type-meta-size)/1.5 var(--font-sans); color: var(--muted); }
-.en-totals dd { margin: 2px 0 0; font: 500 var(--type-step-value-size)/1.5 var(--font-mono); color: var(--ink); }
 </style>
 </head>
 <body class="tk-stage">
@@ -360,29 +333,22 @@
   // Choose a crate row: each row of crates with its figures, a door to the room (farrowing: Choose a unit).
   function cratesCard(ls) {
     var g = {}, order = [];
-    ls.forEach(function (l) { var r = l.code.charAt(0); if (!g[r]) { g[r] = { done: 0, owed: 0, ahead: 0, n: 0, late: false }; order.push(r); } var x = g[r]; x.done += l.done; x.owed += l.owed; x.ahead += l.ahead; x.n++; x.late = x.late || l.late; });
-    var num = function (n, tone) { return '<span class="en-table-n"' + (tone ? ' data-tone="' + tone + '"' : '') + '>' + K.T(P('pp.end.tok.n', { n: n })) + '</span>'; };
-    var rows = order.sort().map(function (r) {
-      var x = g[r];
-      return '<button type="button" class="en-table-row" data-action="open-room" data-value="' + esc(r) + '" data-str-attr="aria-label:pp.end.ov.row.aria" data-args=\'' + esc(JSON.stringify({ r: r, d: x.done, o: x.owed, a: x.ahead })) + '\' aria-label="' + esc(PP.t('pp.end.ov.row.aria', { r: r, d: x.done, o: x.owed, a: x.ahead })) + '">' +
-        '<span class="en-table-name"><strong>' + K.T(P('pp.end.row', { r: r })) + '</strong><small>' + K.T(P(one('pp.end.v.litters', x.n), { n: x.n })) + '</small></span>' +
-        num(x.done) + num(x.owed, x.late ? 'red' : '') + num(x.ahead) + K.glyph('chevron') + '</button>';
-    }).join('');
-    var head = '<div class="en-table-cols" aria-hidden="true"><span>' + K.T(P('pp.end.ov.col.row')) + '</span><span>' + K.T(P('pp.end.f.done')) + '</span><span>' + K.T(P('pp.end.f.owed')) + '</span><span>' + K.T(P('pp.end.f.ahead')) + '</span><span></span></div>';
-    return sec({ icon: I('grid'), strs: { title: 'pp.end.ov.rows' } }) + '<div class="en-table" data-ds="Candidate:TaskTable">' + head + '<div role="list">' + rows + '</div></div>';
+    ls.forEach(function (l) { var r = l.code.charAt(0); if (!g[r]) { g[r] = { done: 0, owed: 0, ahead: 0, n: 0 }; order.push(r); } var x = g[r]; x.done += l.done; x.owed += l.owed; x.ahead += l.ahead; x.n++; });
+    // farrowing's comparison table (Choose a unit): crate rows x the task's three measures, the headings once
+    return K.table({ title: P('pp.end.ov.rows'), icon: 'grid', nameColumn: P('pp.end.ov.col.row'), columns: [P('pp.end.f.done'), P('pp.end.f.owed'), P('pp.end.f.ahead')],
+      rows: order.sort().map(function (r) { var x = g[r];
+        return { name: P('pp.end.row', { r: r }), sub: P(one('pp.end.v.litters', x.n), { n: x.n }), values: [P('pp.end.tok.n', { n: x.done }), P('pp.end.tok.n', { n: x.owed }), P('pp.end.tok.n', { n: x.ahead })],
+          action: 'open-room', value: r, label: P('pp.end.ov.row.aria', { r: r, d: x.done, o: x.owed, a: x.ahead }) }; }) });
   }
   // Performance metrics: on time and identity, then what happened to piglets and sows (now, or frozen at End).
   function metrics(t, atEnd) {
     var o = outcomes(atEnd && S.ended), moved = sum(o.moves, function (m) { return m.n; });
-    var kpi = function (labelId, value, small, metaId, metaArgs) {
-      return '<div><span>' + K.T(P(labelId)) + '</span><strong>' + K.T(value) + (small ? '<small>' + K.T(small) + '</small>' : '') + '</strong>' + (metaId ? '<small>' + K.T(P(metaId, metaArgs)) + '</small>' : '') + '</div>';
-    };
-    var tot = function (labelId, n) { return '<div><dt>' + K.T(P(labelId)) + '</dt><dd>' + K.T(P('pp.end.tok.n', { n: n })) + '</dd></div>'; };
-    return sec({ icon: I('chart'), strs: { title: 'pp.end.pm.title', meta: atEnd ? 'pp.end.pm.meta.end' : 'pp.end.pm.meta' }, args: { meta: { n: t.ontime, k: t.due } } }) +
-      '<div class="st-panel en-metrics" data-ds="Candidate:TaskMetrics"><div class="en-kpi">' +
-        kpi('pp.end.ot.label', t.pct == null ? P('pp.end.pm.none') : P('pp.end.tok.n', { n: t.pct }), t.pct == null ? null : P('pp.end.pm.pct'), 'pp.end.ot.late.m', { n: t.due - t.ontime }) +
-        kpi('pp.end.f.identity', P('pp.end.tok.n', { n: t.idDone }), P('pp.end.pm.of', { k: t.litters }), 'pp.end.pm.id.m') + '</div>' +
-      '<dl class="en-totals">' + tot('pp.end.out.deaths', o.deaths.length) + tot('pp.end.out.moved', moved) + tot('pp.end.pm.loss', o.loss) + tot('pp.end.out.sow', o.sows.length) + '</dl></div>';
+    // farrowing's performance card: the two headline measures, then the totals under a rule
+    return K.metrics({ title: P('pp.end.pm.title'), icon: 'chart', meta: P(atEnd ? 'pp.end.pm.meta.end' : 'pp.end.pm.meta', { n: t.ontime, k: t.due }),
+      measures: [{ label: P('pp.end.ot.label'), value: t.pct == null ? P('pp.end.pm.none') : P('pp.end.tok.n', { n: t.pct }), unit: t.pct == null ? null : P('pp.end.pm.pct'), sub: P('pp.end.ot.late.m', { n: t.due - t.ontime }) },
+        { label: P('pp.end.f.identity'), value: P('pp.end.tok.n', { n: t.idDone }), unit: P('pp.end.pm.of', { k: t.litters }), sub: P('pp.end.pm.id.m') }],
+      totals: [{ label: P('pp.end.out.deaths'), value: P('pp.end.tok.n', { n: o.deaths.length }) }, { label: P('pp.end.out.moved'), value: P('pp.end.tok.n', { n: moved }) },
+        { label: P('pp.end.pm.loss'), value: P('pp.end.tok.n', { n: o.loss }) }] });
   }
   function reviewsBlock(list, frozenAtEnd) {
     if (!list.length) return '';
@@ -452,28 +418,26 @@
       // farrowing opens here. The figures collapse to one line.
       why.forEach(function (w) {
         if (w.kind !== 'farrowing') return;
-        body += UI.banner({ tone: 'danger', headline: PP.t('pp.end.rv.blocked'), consequence: PP.t('pp.end.rv.blocked.where', { units: units, code: active.join(' ') }),
-          strs: { headline: 'pp.end.rv.blocked', consequence: 'pp.end.rv.blocked.where' }, args: { consequence: { units: units, code: active.join(' ') } } });
+        body += K.warning({ text: P('pp.end.rv.blocked'), detail: P('pp.end.rv.blocked.where', { units: units, code: active.join(' ') }) });
         body += K.group({ face: 'word', title: P('pp.end.unit', { n: UNIT }), meta: P(one('pp.end.row.meta', active.length), { n: active.length }),
           rows: active.map(function (c) { return litterRow(litter(c, false), [P('pp.end.rv.farrowing.h')], null); }) });
       });
       var dr = why.filter(function (w) { return w.kind !== 'farrowing'; });
       if (dr.length) {
-        body += UI.banner({ tone: 'danger', headline: PP.t(one('pp.end.rv.drafts', dr.length), { n: dr.length }), consequence: PP.t('pp.end.rv.drafts.why'),
-          strs: { headline: one('pp.end.rv.drafts', dr.length), consequence: 'pp.end.rv.drafts.why' }, args: { headline: { n: dr.length } } });
+        body += K.warning({ text: P(one('pp.end.rv.drafts', dr.length), { n: dr.length }), detail: P('pp.end.rv.drafts.why') });
         body += doors(dr.map(function (w) { return door(w.kind === 'draft-death' ? 'open-dead' : 'open-litter', 'pp.end.code', { code: w.code }, w.kind === 'draft-death' ? 'pp.end.rv.draft.death' : 'pp.end.rv.draft.edit', null, w.code); }));
       }
       // R1-21: doses not yet due are not unfinished work; they are said apart
       body += rows(UI.row({ title: '', description: '', wrap: true, strs: { title: one('pp.end.rv.work', t.work), description: 'pp.end.rv.collapsed.split' }, args: { title: { n: t.work }, description: { o: t.owed, a: t.ahead } } }));
       foot = backOnly();
     } else {
-      if (S.unconfirmed) body += UI.banner({ tone: 'danger', headline: PP.t('pp.end.rv.unconfirmed'), consequence: PP.t('pp.end.rv.unconfirmed.why'), strs: { headline: 'pp.end.rv.unconfirmed', consequence: 'pp.end.rv.unconfirmed.why' } }) +
+      if (S.unconfirmed) body += K.warning({ text: P('pp.end.rv.unconfirmed'), detail: P('pp.end.rv.unconfirmed.why') }) +
         doors([door('check-ended', 'pp.end.rv.check')]);
-      if (S.offline) body += UI.banner({ tone: 'danger', headline: PP.t('pp.end.rv.offline'), consequence: PP.t('pp.end.rv.offline.why'), strs: { headline: 'pp.end.rv.offline', consequence: 'pp.end.rv.offline.why' } });
+      if (S.offline) body += K.warning({ text: P('pp.end.rv.offline'), detail: P('pp.end.rv.offline.why') });
       if (S.changed) {
         // The record the recheck found: the newest treat of this variant, by another hand.
         var ch = store.events.filter(function (e) { return e.type === 'treat' && e.who !== window.PPFixtures.ME; }).pop(), ca = { code: ch.litter, name: name(ch.dose), n: amount(ch), who: ch.who };
-        body += UI.banner({ tone: 'danger', headline: PP.t('pp.end.rv.changed'), consequence: PP.t('pp.end.rv.changed.why', ca), strs: { headline: 'pp.end.rv.changed', consequence: 'pp.end.rv.changed.why' }, args: { consequence: ca } });
+        body += K.warning({ text: P('pp.end.rv.changed'), detail: P('pp.end.rv.changed.why', ca) });
       }
       if (!S.unconfirmed) {
         var n = t.unf.length;
@@ -482,7 +446,7 @@
           var head = t.ahead ? [one('pp.end.rv.drops', t.ahead), { n: t.ahead }] : [one(S.mandatory ? 'pp.end.rv.unf.m' : 'pp.end.rv.unf', n), { n: n }];
           var cons = [t.ahead ? one(S.mandatory ? 'pp.end.rv.cons.m' : 'pp.end.rv.cons', n) : S.mandatory ? 'pp.end.rv.unf.desc.m' : 'pp.end.rv.unf.desc', { n: n, o: t.owed, a: t.ahead }];
           if (!t.ahead) cons[1].n = t.owed + t.ahead;
-          body += UI.banner({ tone: 'danger', headline: PP.t(head[0], head[1]), consequence: PP.t(cons[0], cons[1]), strs: { headline: head[0], consequence: cons[0] }, args: { headline: head[1], consequence: cons[1] } });
+          body += K.warning({ text: P(head[0], head[1]), detail: P(cons[0], cons[1]) });
           body += doors([door('litters', 'pp.end.rv.list', null, 'pp.end.rv.list.d', { w: t.work, a: n - t.work })]);
         } else body += UI.panel(h({ strs: { title: 'pp.end.rv.none', description: 'pp.end.rv.after.desc' }, args: { title: { n: t.litters } } }));
         body += reviewsBlock(fig(false).reviews || [], false);
