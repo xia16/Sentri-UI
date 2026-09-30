@@ -14,11 +14,6 @@
 /* The room on the task skeleton (ADR 0003): farrowing's room list — TaskHeader, TaskLatest, TaskSummary, TaskLens, rows
    grouped by crate row (TaskGroup + TaskRow), TaskDock — and its sheets and the litter drawer (TaskSheet). Layout only,
    tokens from tokens.css. Candidate:ScanFrame stays task-level. */
-/* TaskSummary clips its halves (overflow: hidden) so the task half's pressed wash keeps the card's corners; on a room
-   short enough not to scroll, the lint reads that clip as hiding the button's last pixel (geo-control-offscreen, 1px,
-   the card's border). The corners are kept by the half's own radius instead. Reported for the skeleton. */
-.tk-summary { overflow: visible; }
-.tk-summary-task { border-radius: 0 var(--radius-panel) var(--radius-panel) 0; }
 /* the review / unexplained counts: one compact line, the summary card's footer line (a text action) */
 .pp-answers { display: flex; margin: -6px var(--space-panel) 4px; }
 .pp-answers + .pp-filtered { margin-top: var(--space-heading); }
@@ -48,12 +43,6 @@
 .lt-stack > * + * { margin-top: var(--space-heading); }
 .lt-stack > .tk-stepper + .tk-stepper { margin-top: 0; }
 .lt-stack > .st-heading + .tk-stepper { margin-top: 0; }
-/* Narrow phones keep farrowing's gutters (21 in drawers, 18 on the room): the skeleton's 12px narrow override is undone
-   for this task (parity review 16; reported for the skeleton) */
-@media (max-width: 370px) {
-  .tk-sheet-head, .tk-sheet-body, .tk-footer, .tk-footer-status { padding-left: var(--space-gutter-sheet); padding-right: var(--space-gutter-sheet); }
-  .tk-footer { gap: var(--space-row-x); }
-}
 .lt-receipt, .lt-confirm { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--space-footer-gap); }
 .lt-actions { display: flex; gap: var(--space-footer-gap); }
 .lt-actions .button { flex: 1; }
