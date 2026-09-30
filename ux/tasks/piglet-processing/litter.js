@@ -101,7 +101,31 @@
     function evidenceRow(r) {
       var tag = recTag(r), desc = evidence(r);
       if (tag) desc.push(tag);
-      return UI.row({ title: txTok(r.dose), description: desc, wrap: true, trail: 'edit', action: 'open-edit', value: r.id });
+      return cdoor({ title: txTok(r.dose), description: desc, wrap: true, trail: 'edit', action: 'open-edit', value: r.id });
+    }
+    /* A care row is the skeleton's door (TaskRow door, skeleton 3): the treatment, one line under it, a chevron or ✎, and
+       the ruled one-tap as its trailing act. Takes the row-token lists this file builds ({ text, strs, args, tone }; a
+       nested list is one token of several words) and hands the door its text slots. */
+    function toParts(list) {
+      var out = [];
+      (list || []).forEach(function (x, i) {
+        if (i) out.push({ sep: true });
+        (Array.isArray(x) ? x : [x]).forEach(function (p, j) {
+          if (j) out.push({ text: ' ' });
+          out.push({ text: p.text, str: p.strs && p.strs.text, args: p.args && p.args.text, tone: p.tone });
+        });
+      });
+      return out;
+    }
+    var shownN = {};                        // the one-tap count the worker saw, per dose (the act's label)
+    function cdoor(o) {
+      var act = null;
+      if (o.act) {
+        if (o.act.action === 'record') shownN[o.act.value] = +o.act.attrs['data-n'];
+        act = { label: { text: o.act.label, str: o.act.strs && o.act.strs.label, args: o.act.args && o.act.args.label }, action: o.act.action, value: o.act.value };
+      }
+      return K.door({ title: toParts(o.title), description: o.description && o.description.length ? toParts(o.description) : null, action: o.action || '', value: o.value || '',
+        trail: o.trail === 'edit' ? 'edit' : o.action ? 'chevron' : '', act: act, id: o.id || '' });
     }
     /* In a day group the header states the day once (farrowing's Piglet processing care page): the row names the treatment. */
     function txTok(id) { return [P('pp.common.tx.' + doseCfg(id).tx)]; }
@@ -122,12 +146,14 @@
           var gs = order.map(function (k) { return by[k]; }).sort(function (a, b) {
             return GROUP_RANK[a.kind] - GROUP_RANK[b.kind] || (a.kind === 'later' ? a.arg - b.arg : a.day - b.day);
           });
-          return K.list(gs.map(function (g) {
-            var meta = g.kind === 'today' ? S('pp.litter.gm.today') : g.kind === 'late' ? S(one('pp.litter.gm.late', g.arg), { k: g.arg })
-              : g.kind === 'missed' ? S('pp.litter.gm.missed', { d: g.arg }) : g.kind === 'recorded' ? S('pp.litter.gm.recorded')
-              : g.arg === 1 ? S('pp.litter.gm.tomorrow') : S(one('pp.litter.gm.in', g.arg), { n: g.arg });
-            return K.group({ face: 'word', title: S('pp.litter.gm.day', { d: g.day }), meta: meta, rows: g.rows });
-          }));
+          // each day: a section heading (`Day 3` · `Due today` at its end), then its care rows as flat doors
+          return gs.map(function (g) {
+            var meta = g.kind === 'today' ? ['pp.litter.gm.today'] : g.kind === 'late' ? [one('pp.litter.gm.late', g.arg), { k: g.arg }]
+              : g.kind === 'missed' ? ['pp.litter.gm.missed', { d: g.arg }] : g.kind === 'recorded' ? ['pp.litter.gm.recorded']
+              : g.arg === 1 ? ['pp.litter.gm.tomorrow'] : [one('pp.litter.gm.in', g.arg), { n: g.arg }];
+            return '<section class="pp-group lt-day" data-ds="Section">' + UI.heading({ title: '', meta: '', kind: 'section', level: 3, strs: { title: 'pp.litter.gm.day', meta: meta[0] },
+              args: { title: { d: g.day }, meta: meta[1] } }) + '<div class="tk-doors" data-ds="TaskDoors">' + g.rows.join('') + '</div></section>';
+          }).join('');
         }
       };
     }
@@ -236,14 +262,14 @@
     function txRow(o) {
       var n = tapN(o);
       // A litter outside the task records no treatment: what it owes is a fact, never a door (Q18).
-      if (!L().recordable) return UI.row({ title: titleTok(o.dose), description: [P('pp.litter.notask.owed', { n: o.owed })], wrap: true });
+      if (!L().recordable) return cdoor({ title: titleTok(o.dose), description: [P('pp.litter.notask.owed', { n: o.owed })], wrap: true });
       if (o.males === 'uncounted' || o.status === 'missed' || o.range || !n) {
-        return UI.row({ title: txTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose, trailing: hasDraft(o.dose) ? resumeWord() : '' });
+        return cdoor({ title: txTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose, trailing: hasDraft(o.dose) ? resumeWord() : '' });
       }
       var act = hasDraft(o.dose) ? { label: PP.t('pp.litter.act.resume'), action: 'open-dose', value: o.dose, strs: { label: 'pp.litter.act.resume' } }
         : { label: PP.t(one('pp.litter.act.record_n', n), { n: n }), action: 'record', value: o.dose, attrs: { 'data-n': n }, strs: { label: one('pp.litter.act.record_n', n) }, args: { label: { n: n } } };
       // the one-tap record stays the row's trailing action, compact (farrowing's care row + the ruled one-tap)
-      return UI.rowAction({ id: 'lt-tx-' + o.dose, title: txTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose, act: act });
+      return cdoor({ id: 'lt-tx-' + o.dose, title: txTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose, act: act });
     }
     function unknownRows(id, o) {
       var d = doseCfg(id);
@@ -251,7 +277,7 @@
         var key = 'res:' + g.id + ':' + id, tags = (g.rows || []).map(tagOf).filter(Boolean);
         var who = tags.length && tags.length <= 3 ? P('pp.litter.grp.from_tags', { k: g.n, code: g.from, tags: tags.join(', ') }) : P('pp.litter.grp.from', { k: g.n, code: g.from });
         var desc = drafts[key] ? [P('status.unsaved', { n: 1 }, 'green')] : [who, d.visible ? P('pp.litter.arr.check', null, 'amber') : P('pp.litter.arr.unknown', null, 'amber')];
-        return UI.row({ title: txTok(id), description: desc, wrap: true, action: 'open-resolve', value: g.id + ':' + id, trailing: drafts[key] ? resumeWord() : '' });
+        return cdoor({ title: txTok(id), description: desc, wrap: true, action: 'open-resolve', value: g.id + ':' + id, trailing: drafts[key] ? resumeWord() : '' });
       }).join('');
     }
     function identityRow() {
@@ -260,7 +286,7 @@
       var scheme = PP.t('pp.litter.id.scheme.' + x.scheme), t = [];
       if (x.who === 'candidates') t.push(P('pp.litter.id.keepers', { k: x.identified }));
       else t.push(P('pp.litter.id.owed', { n: x.owed }));
-      return UI.row({ title: [P('pp.litter.id.title', { scheme: scheme })], description: t, wrap: true, action: 'open-identity', value: crate });
+      return cdoor({ title: [P('pp.litter.id.title', { scheme: scheme })], description: t, wrap: true, action: 'open-identity', value: crate });
     }
     /* What is owed now, into its day groups. Nothing moves under the thumb: a dose recorded this visit keeps its place (its
        group) and turns into its stamp. */
@@ -282,7 +308,8 @@
       // a litter outside the task: what it owes is a fact (not done), one list
       if (!L().recordable) {
         var rows = v.owed.filter(function (o) { return o.owed; }).map(txRow).join('');
-        return rows ? section('pp.edge.section.owed', rows) : '';
+        return rows ? '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.edge.section.owed' } }) +
+          '<div class="tk-doors" data-ds="TaskDoors">' + rows + '</div></section>' : '';
       }
       if (!left && !missed && !identityRow()) {
         var next = laterItems()[0];
@@ -399,7 +426,7 @@
       if (x.status !== 'done' && x.status !== 'later' && x.who !== 'candidates') return '';
       var scheme = PP.t('pp.litter.id.scheme.' + x.scheme);
       var d = x.who === 'candidates' ? (I.closed ? P('pp.litter.id.closed', { k: x.identified }) : P('pp.litter.id.keepers', { k: x.identified })) : P('pp.litter.id.done', { k: x.identified, n: x.of });
-      return UI.row({ title: [P('pp.litter.id.title', { scheme: scheme })], description: [d], wrap: true, action: 'open-identity', value: crate });
+      return cdoor({ title: [P('pp.litter.id.title', { scheme: scheme })], description: [d], wrap: true, action: 'open-identity', value: crate });
     }
     /* Recorded: one row per record, never merged, newest first, under its treatment's day (`Day 1 · Recorded`). */
     function recordedInto(c) {
@@ -410,7 +437,7 @@
       var idRow = identityDoneRow();
       if (idRow) c.put(view().identityDue.day, 'recorded', null, idRow);
       view().recorded.forEach(function (g) { (g.doubleDoses || []).forEach(function (x) {
-        c.put(doseCfg(g.dose).due, 'recorded', null, UI.row({ title: txTok(g.dose), description: [P('pp.litter.twice.line', { stamp: stampText(x.at, x.who) }, 'amber')], wrap: true }));
+        c.put(doseCfg(g.dose).due, 'recorded', null, cdoor({ title: txTok(g.dose), description: [P('pp.litter.twice.line', { stamp: stampText(x.at, x.who) }, 'amber')], wrap: true }));
       }); });
     }
     function notesSection() {
@@ -441,7 +468,7 @@
     function laterInto(c) {
       if (!L().recordable) return;
       laterItems().forEach(function (x) {
-        if (x.identity) { c.put(x.due, 'later', x.inDays, UI.row({ title: [P('pp.litter.id.title', { scheme: PP.t('pp.litter.id.scheme.' + view().identityDue.scheme) })], action: 'open-identity', value: crate })); return; }
+        if (x.identity) { c.put(x.due, 'later', x.inDays, cdoor({ title: [P('pp.litter.id.title', { scheme: PP.t('pp.litter.id.scheme.' + view().identityDue.scheme) })], action: 'open-identity', value: crate })); return; }
         var Dx = D(x.dose), t = [];
         if (drafts[x.dose]) t.push(P('status.unsaved', { n: 1 }, 'green'));
         else if (Dx.groups && agesDiffer(Dx.groups)) Dx.groups.forEach(function (g) { t = t.concat(groupToks(g)); });
@@ -449,7 +476,7 @@
           if (Dx.records.length && Dx.owed && !arrivalToks(Dx.groups || []).length) t.push(P(doseCfg(x.dose).castration ? one('pp.litter.castr.owed', Dx.owed) : 'pp.litter.owed', { n: Dx.owed }));
           t = t.concat(arrivalToks(Dx.groups || []));
         }
-        c.put(x.due, 'later', x.inDays, UI.row({ title: txTok(x.dose), description: t.length ? t : undefined, wrap: true, action: 'open-dose', value: x.dose }));
+        c.put(x.due, 'later', x.inDays, cdoor({ title: txTok(x.dose), description: t.length ? t : undefined, wrap: true, action: 'open-dose', value: x.dose }));
       });
     }
     /* ---- the Record group: identity (its page) and the birth litter weight while it is missing ---- */
@@ -490,7 +517,8 @@
         args: Object.assign({}, desc ? { description: descArgs } : {}, atCeil ? { hint: ceilArgs } : {}) });
     }
     function radios(key, label, labelArgs, options, selected, lead) {
-      return UI.choiceRadios({ label: PP.t(label, labelArgs), layout: 'rows', action: 'radio', key: key, id: 'lt-' + key, selected: selected || '', lead: lead || '',
+      // farrowing's flat radio rows (TaskRadios)
+      return K.radios({ label: PP.t(label, labelArgs), action: 'radio', key: key, id: 'lt-' + key, selected: selected || '', lead: lead || '',
         options: options.map(function (o) { return { value: o[0], label: PP.t(o[1], o[2]), meta: o[3] ? PP.t(o[3], o[4]) : '', strs: Object.assign({ label: o[1] }, o[3] ? { meta: o[3] } : {}), args: { label: o[2], meta: o[4] } }; }),
         strs: { label: label }, args: { label: labelArgs } });
     }
@@ -851,7 +879,7 @@
           return 'render';
         }
         if (UI.guard(b)) return 'guarded';
-        if (a === 'record') { if (now - lastCommit < 600) return 'guarded'; tap(v, +b.dataset.n); return 'render'; }
+        if (a === 'record') { if (now - lastCommit < 600) return 'guarded'; tap(v, b.dataset.n != null ? +b.dataset.n : shownN[v]); return 'render'; }
         if (a === 'undo') { undo(v); return 'render'; }
         if (a === 'open-dose') return openDose(v) ? 'push' : 'guarded';
         if (a === 'open-resolve') return openResolve(v) ? 'push' : 'guarded';
