@@ -89,7 +89,7 @@ try {
   assert.match(await status(page), /004301 is piglet 1 Different piglet\?/);
   assert.match(await text(page, '.tk-footer [data-action="record"]'), /Record · same piglet 1/);
   await tap(page, '[data-action="twin"][data-value="other"]');
-  assert.match(await status(page), /A second piglet with tag 004301 · retag one later Same piglet 1/);
+  assert.match(await status(page), /A second piglet tagged 004301 Same piglet 1/);
   assert.match(await text(page, '.tk-footer [data-action="record"]'), /Record · second 004301/);
   assert.match(await progress(page), /Piglet 4 of 12/);
   await tap(page, '[data-action="twin"][data-value="same"]');
@@ -100,7 +100,7 @@ try {
   await keys(page, '004302');
   await tap(page, '[data-action="twin"][data-value="other"]');
   await record(page);
-  assert.match(await status(page), /Last 004302 · a second piglet with this tag · retag one/);
+  assert.match(await status(page), /Last 004302 · a second piglet with this tag/);
   assert.match(await progress(page), /Piglet 5 of 12/);
   await toTable(page);
   assert.equal(await page.locator('[data-action="edit-row"]', { hasText: 'tag issued twice' }).count(), 2);
