@@ -1,7 +1,10 @@
-# Dead picker — data contract (slice 9, candidate; scenario round 1 fixes)
+# Dead picker — data contract (slice 9, candidate; scenario round 1 fixes; round 5 look and feel)
 
-The one shared dead drawer (the DeadDrawer composition, page `dead.html`: a task pattern built from cards —
-ChoiceList radios, Photos, Banner, Status, Button's text register, waiting face and hold; ADR 0002). Farrowing, the farrowing
+The one shared dead drawer (the DeadDrawer composition, page `dead.html`), drawn on the task skeleton (ADR 0003): a
+TaskSheet over the room — grab, title `Record death`, subtitle `A02 · 12 alive · 1 dead so far`, ✕ (Clear while a draft
+exists), divider, body, footer with Back + Save — and cards in the body (Segment, Stepper, Row, ChoiceList radios, Photos,
+Banner, Button's reason line, waiting face and hold; ADR 0002). What is needed only sometimes sits one level down, in the
+same drawer (Back returns): the tagged piglets, the neighbours' losses, and the held-body question (a TaskDialog). Farrowing, the farrowing
 record, check-in and processing all open this component. It forks on **litter facts**, never on the
 task or the surface; the surface chooses copy only. Binds with RULINGS *Surfaces & entrances*,
 *Starting and ending a session*, and *Piglet processing* round 2 (the ledger).
@@ -25,8 +28,9 @@ Phase rules:
 - `locked`: untagged tallies are capped at `unidentified alive + Σ open loss`, so a body that was
   already counted missing can be recorded even at 0 alive. Each body leaves Alive unless it is drawn
   from an open loss.
-- A stillborn or mummified body found after the lock is not offered. The pointer
-  `Born dead? Correct farrowing · Edit` routes it to Born's correction; it is never a processing death.
+- A stillborn or mummified body found after the lock is not offered: it is Born's correction, reached from the
+  litter's Edit (round 5 moved the `Born dead? Correct farrowing · Edit` pointer out of the drawer); it is never a
+  processing death.
 
 ## Events
 
@@ -54,11 +58,13 @@ sow_died { litterId, cause, note?, photos: [ photoRef ] }   // never batched wit
   not move). An alive tagged piglet picked while a loss has an unnamed part (`canBeMissing`) is asked
   `Was 271004 one of the 2 missing?` — `One of the missing · alive stays 11` (`fromLoss`: its body takes that
   loss's unnamed share) or `Died here · alive 11 → 10`. There is no default: Save waits until it is answered.
-- **A body found in another crate (R1-8).** In processing, after the lock, the drawer lists the other litters of
-  the room with an open loss (`One of D03's 2 missing?`, with the count's stamp). Tapping one records the draft
+- **A body found in another crate (R1-8).** In processing, after the lock, once a body is counted the drawer offers
+  the other litters of the room with an open loss in one row: `One of D03's 2 missing?` when there is one, or
+  `Found outside its crate? · 2 crates have piglets missing`, whose list (crate rows: `D03 · 2 piglets missing ·
+  counted 10:25 · G.H`) is one level down. Tapping a litter records the draft
   **there**: the untagged bodies are presumed from that loss (the answer is preset to what is open and stays
-  editable); tagged picks are dropped (they belong to their own litter); the header reads
-  `Recording in D03 · found in A02` with `Record in A02 instead`. The app never pairs by itself. From the room's
+  editable); tagged picks are dropped (they belong to their own litter); the subtitle names the litter and one row
+  reads `Recording in D03 · found in A02` with `Undo` (records it in A02 again). The app never pairs by itself. From the room's
   Explain page, `Found a body?` opens the same drawer on a picker of the unit's open losses (`dead-found`).
 - **Alive** after a locked batch: `alive − (untagged bodies − allocated) − identified piglets not from a loss`
   (a named-missing or `fromLoss` piglet was already taken off Alive by its count). It can never go
@@ -73,8 +79,8 @@ sow_died { litterId, cause, note?, photos: [ photoRef ] }   // never batched wit
   (`Photo 2 of 2`, Back and Delete, 24px apart); Delete returns to the drawer with `Photo deleted · Undo` for 5 s.
   The record page shows the event's photos (Back only: no Delete from History).
 - **This entry, not the litter's total (R1-26).** Every stepper starts at 0: it counts this Save's bodies. The
-  litter's running total is said apart (`12 alive · 1 dead so far` in the header, `3 recorded before` under a
-  cause), never prefilled. The stepper keys name the cause (`Crushed · one more`). The unsaved words are one unit
+  litter's running total is said apart (`12 alive · 1 dead so far` in the subtitle), never prefilled; the
+  per-cause history is the record page's (round 5 removed `3 recorded before` from the stepper rows). The stepper keys name the cause (`Crushed · one more`). The unsaved words are one unit
   everywhere: `1 unsaved` / `1头未保存` (`pp.dead.unsaved`).
 - **`Other` has a note** (`What happened · optional`), kept on the event and on its line.
 - **The receipt says when the missing are all found**: `Saved · +1 crushed · all missing found` when this Save
@@ -131,24 +137,29 @@ It is never silently a second death. Two deaths for one `rowId` keep the earlies
 
 ## Interaction requirements of the shared component
 
-- Staged: `Back`, the scrim tap and a swipe down on the header all keep the draft; `Clear` discards the
+- Staged: `Back`, the ✕, the scrim tap and a swipe down on the grab or head all keep the draft (one level down, they
+  return to the drawer); `Clear` discards the
   mode on screen; `Save` commits.
-- Save is gray (`aria-disabled`, still focusable) whenever it cannot commit, and a pointer above the
-  bar names the missing step (`Pick a cause for 271004`, `How many were missing?`); tapping the gray
-  Save scrolls to that step. An empty draft names itself only when Save is tapped.
+- Save is gray (`aria-disabled`, still focusable) whenever it cannot commit, and the reason line that closes the
+  body names the missing step (`Pick a cause for 271004`, `How many were missing?`); tapping the gray
+  Save scrolls to that step, opening the tagged piglets when the step is there. An empty draft names itself only when Save is tapped.
 - Re-rendering keeps the body's scroll position and the focused control.
 - **Save and Back return to where the worker came from (R1-26)**: the page named by `back` (Explain, the count
-  host), else the litter. There is no host stub and no extra Back. Save hands its receipt over on the phone
+  host), else the litter drawer over the room (`room.html?state=litter&crate=A02`). There is no host stub and no extra Back. Save hands its receipt over on the phone
   (`sessionStorage` `pp-receipt:dead` = `{ parts: [{ id, args, tone }], litter, from, event }`, and `saved=dead` on
   the URL); the page it returns to shows it (`Saved · +1 crushed · 1 missing still open`) and ignores taps for
   ~400 ms. Back from a drawer opened on Explain returns to Explain.
-- **A held body is shown where the next body is recorded (R1-22)**: the drawer leads with `Same body recorded
-  twice?` and its two answers (One body / Two bodies) when the litter has one unanswered; the Set count drawer does
-  the same above its number.
+- **A held body is shown where the next body is recorded (R1-22)**: the drawer leads with one row `Same body recorded
+  twice? · G.H · 09:55 · held until you answer` when the litter has one unanswered; it opens the question as a dialog
+  (`L.M and G.H each took a body from the one missing piglet`) with its two answers (One body / Two bodies). The Set
+  count drawer does the same above its number.
 - The sow's Save is hold-to-commit (Button `holdButton` + `holdBind`, ADR 0002: 850 ms, the card's slop, repeat
   guard and 400 ms arm floor): a plain tap says `Keep holding to save`, the status line beside the bar reports start
   and cancel, and keyboard or switch access uses the card's two-step (`Press Save again`), disarmed after 5 s or on
   blur. When the hold completes the page rechecks what Save needs before it commits (`settle(el, 'failed')`
-  otherwise). The warning above it is a `danger` Banner (live).
-- Identified piglets: picked from the roster or by `Scan ear tag`; one cause control for everything
-  picked sits below the roster, so ticking never moves a row under the thumb.
+  otherwise). The warning above it is a `danger` Banner (live). The hold is in the primary's ink, as farrowing's
+  (`Save · Hold to save`).
+- Identified piglets: one row in the drawer (`Identified · 9`, `2 picked`); one level down (`Identified piglets`,
+  with Back + Save) they are picked from the roster or by `Scan ear tag`; one cause control for everything
+  picked sits below the roster, so ticking never moves a row under the thumb; the `Was 271004 one of the missing?`
+  question sits under it.
