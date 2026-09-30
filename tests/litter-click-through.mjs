@@ -40,7 +40,7 @@ try {
   //    the other recorded now. Visible tail reads `check on the pig`.
   await openLitter(page, 'B02', 'moved-unknown', true);
   f = await face(page);
-  assert.match(f, /Iron · day 3 2 from B09 · 004229, 004230\s*·?\s*unknown — check spray mark/);
+  assert.match(f, /Day 3 · 1 day late Iron 2 from B09 · 004229, 004230\s*·?\s*unknown — check spray mark/);
   assert.match(f, /Dock tail 2 from B09 · 004229, 004230\s*·?\s*check on the pig/);
   assert.doesNotMatch(f, /0 owed/);
   await page.click('[data-action="open-resolve"][data-value$=":iron3"]');
@@ -60,7 +60,7 @@ try {
   // 2. R1-3: after a Don't-know move out the source owes a range, with no one-tap; a check on the pig settles it.
   await openLitter(page, 'A07', 'move-doubt', true);
   f = await face(page);
-  assert.match(f, /Iron · day 3 due day 3\s*·?\s*0–2 of 11 owed · check\s*·?\s*3 moved to A04, not known/);
+  assert.match(f, /Day 3 · \S.* Iron 0–2 of 11 owed · check\s*·?\s*3 moved to A04, not known/);
   assert.equal(await page.locator('[data-action="record"][data-value="iron3"]').count(), 0);
   await row(page, 'open-dose', 'iron3').click();
   await page.click('[data-action="step"][data-value="still"][data-step="-1"]');
@@ -88,13 +88,13 @@ try {
   await openLitter(page, 'A02', null, false);
   f = await face(page);
   assert.match(f, /Born 13 Alive 14 Dead 1 Moved in 2/);
-  assert.match(f, /Iron · day 3 12 owed now of 14\s*·?\s*12 of its own\s*·?\s*day 3\s*·?\s*due today\s*·?\s*2 from D06\s*·?\s*day 1\s*·?\s*due in 2 days/);
+  assert.match(f, /Day 3 · Due today Iron 12 owed now of 14\s*·?\s*12 of its own\s*·?\s*day 3\s*·?\s*due today\s*·?\s*2 from D06\s*·?\s*day 1\s*·?\s*due in 2 days/);
   await page.click('[data-action="record"][data-value="iron3"]');
   assert.match(await bar(page), /Saved · iron · day 3 · 12 piglets · 2 not due yet, back on their day/);
   await page.waitForTimeout(700);
   f = await face(page);
-  assert.match(f, /Recorded.*Iron · day 3 \d\d:\d\d · G\.H\s*·?\s*12 piglets\s*·?\s*2 deferred: not due yet/);
-  assert.match(f, /Later.*Iron · day 3 2 from D06\s*·?\s*due day 3 · in 2 days/);
+  assert.match(f, /Day 3 · Recorded.*Iron \d\d:\d\d · G\.H\s*·?\s*12 piglets\s*·?\s*2 deferred: not due yet/);
+  assert.match(f, /Day 3 · In 2 days Iron 2 from D06/);
   console.log('ok 3 arrivals by their own age: Record 12, 2 not due · header balances');
 
   // 4. R1-25: one-tap Record has Undo on its receipt; the owed comes back.
@@ -132,7 +132,7 @@ try {
   await page.waitForSelector(DOSE, { state: 'detached' });
   f = await face(page);
   assert.match(f, /Recorded.*Dock tail \d\d:\d\d · G\.H\s*·?\s*12 piglets\s*·?\s*2 deferred: 1 weak, 1 sick/);
-  assert.match(f, /Dock tail due day 3\s*·?\s*2 owed · deferred: weak, sick/);
+  assert.match(f, /Dock tail 2 owed · deferred: weak, sick/);
   console.log('ok 6 waiting Save says why → split 1 weak, 1 sick → in Recorded at once');
 
   // 7. R1-25: 0 treated + all deferred records the deferral, never `0 piglets`.
@@ -163,12 +163,12 @@ try {
   // 9. R1-13: after End the litter never reads actionable: `not done at End`, no Owed today, no Later, no one-tap.
   await openLitter(page, 'B01', 'ended', true);
   f = await face(page);
-  assert.match(f, /Not done at End Task ended · 16:20 · G\.H Castrate 1 not done at End · can no longer be recorded/);
+  assert.match(f, /Not done at end Task ended · 16:20 · G\.H Castrate 1 not done at end · can no longer be recorded/);
   assert.doesNotMatch(f, /Owed today|treatments left|Later/);
   assert.equal(await page.locator('[data-action="record"]').count(), 0);
   // …and a review open at End reads `unresolved at End`, still answerable (round 4)
   await openLitter(page, 'A05', 'ended', false);
-  assert.match(await face(page), /Possible double treatment · Iron · day 3.*unresolved at End · still answerable/);
+  assert.match(await face(page), /Possible double treatment · Iron · day 3.*unresolved at end · still answerable/);
   console.log('ok 9 ended: not done at End · unresolved at End');
 
   // 10. R1-19: a litter emptied by moves reads closed.
@@ -181,7 +181,7 @@ try {
 
   // 11. R1-17: identity owed on its day, a door to the identity page.
   await openLitter(page, 'C05', null, true);
-  assert.match(await face(page), /Identity · tag 8 to identify\s*·?\s*late 1 day/);
+  assert.match(await face(page), /Day 3 · 1 day late .*Identity · tag 8 to identify/);
   await page.click('[data-ds="Row"][data-action="open-identity"] >> nth=0');
   await page.waitForURL(/id\.html/);
   console.log('ok 11 identity owed on its day → id.html');

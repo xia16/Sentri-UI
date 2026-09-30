@@ -8,6 +8,12 @@
    At phone width the task fills the screen (full-bleed). Wider than a phone, it sits in farrowing's
    390×844 frame, centred on the studio ground. */
 .tk-stage { margin: 0; background: var(--app-background); }
+/* The font stack with a Chinese sans-serif fallback (parity review 7): Chinese labels never fall to a serif system face.
+   Set on the stage and the phone so every part and card inside (var(--font-sans), the bundle's var(--sans)) takes it. */
+.tk-stage, .tk-phone {
+  --font-sans: "Plus Jakarta Sans", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", monospace;
+  --sans: var(--font-sans); --mono: var(--font-mono); }
 .tk-phone { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column;
   box-sizing: border-box; width: 100%; height: 100vh; height: 100dvh;
   background: var(--app-background); color: var(--ink); font: 14px var(--font-sans); -webkit-font-smoothing: antialiased; }
