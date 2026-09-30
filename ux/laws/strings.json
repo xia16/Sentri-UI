@@ -840,6 +840,7 @@
     "pp.end.lit.owed": {"en": "{name}", "zh": "{name}", "kind": "body"},
     "pp.end.lit.missed": {"en": "{name} missed", "zh": "{name} 已错过", "kind": "body"},
     "pp.end.lit.finished": {"en": "All treatments done", "zh": "全部处理已完成", "kind": "body"},
+    "pp.end.lit.notdone": {"en": "{n} not done", "zh": "{n}未做", "kind": "body"},
     "pp.end.lit.sub": {"en": "{n} litters · {o} owed · {a} not yet due", "zh": "{n}窝 · 欠{o} · 未到期{a}", "kind": "body"},
     "pp.end.rv.farrowing.title": {"en": "Still farrowing", "zh": "仍在分娩", "kind": "title"},
     "pp.end.rv.farrowing.h": {"en": "Farrowing not finished", "zh": "分娩未结束", "kind": "body"},

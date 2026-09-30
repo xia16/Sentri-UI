@@ -19,6 +19,8 @@
 .en-body > * { margin: 0; }
 .en-block > .st-heading { margin: 0 0 var(--space-key-gap); }
 .en-groups { display: flex; flex-direction: column; gap: var(--space-heading); }
+/* a row's parts wrap whole, so a wrapped part never lies under the next (TaskRow wraps inside a part) */
+.en-body .tk-row-headline > span, .en-body .tk-row-meta > span { display: inline-block; max-width: 100%; }
 /* the whole-task progress card: the bar under its heading, the three counts under the bar (Facts, flat in the card) */
 .en-progress > .tk-progress { margin: var(--space-heading) 0 0; }
 .en-progress > .st-facts.st-facts.st-facts { margin: var(--space-heading) 0 0; padding: 0; border: 0; border-radius: 0; background: none; }
@@ -386,11 +388,12 @@
   }
   // After End: not done, frozen at End, except piglets that left the task; what happened since, as one token each.
   function endedRow(l) {
-    var head = [], now = litter(l.code, false), toks = [T('pp.common.unit.day', { n: now.day })];
+    var head = [], now = litter(l.code, false), toks = [T('pp.common.unit.day', { n: now.day })], nd = 0;
     var add = function (id, args) { if (head.length) head.push({ sep: true }); head.push(P(id, args)); };
-    l.list.forEach(function (e) { add('pp.end.u.notdone', { name: name(e.dose), n: notDone(l, e) }); });
-    arrivalsNotDone(l).forEach(function (a) { add('pp.end.u.notdone', { name: name(a.k), n: a.n }); });
-    if (!now.idDone) add('pp.end.u.unid', { n: now.alive - now.identified });
+    l.list.forEach(function (e) { add('pp.end.lit.owed', { name: name(e.dose) }); nd += notDone(l, e); });
+    arrivalsNotDone(l).forEach(function (a) { add('pp.end.lit.owed', { name: name(a.k) }); nd += a.n; });
+    if (nd) toks.push(T('pp.end.lit.notdone', { n: nd }));
+    if (!now.idDone) { if (head.length) toks.push(T('pp.end.u.unid', { n: now.alive - now.identified })); else add('pp.end.u.unid', { n: now.alive - now.identified }); }
     if (!head.length) add('pp.end.lit.finished');
     postOf(l.code, 'in').forEach(function (e) { toks.push(T('pp.end.tok.in_after', { n: e.n })); });
     toks = toks.concat(postToks(l, 'face'));
@@ -429,7 +432,7 @@
         if (w.kind !== 'farrowing') return;
         body += UI.banner({ tone: 'danger', headline: PP.t('pp.end.rv.blocked'), consequence: PP.t('pp.end.rv.blocked.where', { units: units, code: active.join(' ') }),
           strs: { headline: 'pp.end.rv.blocked', consequence: 'pp.end.rv.blocked.where' }, args: { consequence: { units: units, code: active.join(' ') } } });
-        body += K.group({ title: P('pp.end.rv.farrowing.title'), meta: P(one('pp.end.row.meta', active.length), { n: active.length }),
+        body += K.group({ title: P('pp.end.unit', { n: UNIT }), meta: P(one('pp.end.row.meta', active.length), { n: active.length }),
           rows: active.map(function (c) { return litterRow(litter(c, false), [P('pp.end.rv.farrowing.h')], null); }) });
       });
       var dr = why.filter(function (w) { return w.kind !== 'farrowing'; });
@@ -439,7 +442,7 @@
         body += doors(dr.map(function (w) { return door(w.kind === 'draft-death' ? 'open-dead' : 'open-litter', 'pp.end.code', { code: w.code }, w.kind === 'draft-death' ? 'pp.end.rv.draft.death' : 'pp.end.rv.draft.edit', null, w.code); }));
       }
       // R1-21: doses not yet due are not unfinished work; they are said apart
-      body += rows(UI.row({ title: '', description: '', strs: { title: one('pp.end.rv.work', t.work), description: 'pp.end.rv.collapsed.split' }, args: { title: { n: t.work }, description: { o: t.owed, a: t.ahead } } }));
+      body += rows(UI.row({ title: '', description: '', wrap: true, strs: { title: one('pp.end.rv.work', t.work), description: 'pp.end.rv.collapsed.split' }, args: { title: { n: t.work }, description: { o: t.owed, a: t.ahead } } }));
       foot = backOnly();
     } else {
       if (S.unconfirmed) body += UI.banner({ tone: 'danger', headline: PP.t('pp.end.rv.unconfirmed'), consequence: PP.t('pp.end.rv.unconfirmed.why'), strs: { headline: 'pp.end.rv.unconfirmed', consequence: 'pp.end.rv.unconfirmed.why' } }) +

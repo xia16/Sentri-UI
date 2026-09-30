@@ -562,7 +562,7 @@
     if (!e.moves.length) return '';
     var blocks = e.moves.map(function (m) {
       var x = draft.moves[m.id] || {}, n = x.rows ? null : x.n == null ? m.n : x.n, other = x.to || m.other, tagged = m.rows && m.rows.length, s = stampStrs(m.at, m.who);
-      var head = UI.heading({ title: '', kind: 'group', level: 4, description: '',
+      var head = UI.heading({ title: '', kind: 'section', level: 4, description: '',
         strs: { title: m.dir === 'out' ? 'pp.edit.move.out' : 'pp.edit.move.in', description: s[0] }, args: { title: { code: m.other }, description: s[1] } });
       var out = head;
       if (!x.void) {
@@ -595,7 +595,7 @@
     var blocks = list.map(function (x) {
       var y = draft.deaths[x.id] || {}, s = stampStrs(x.at, x.who), ev = eventOf(x.id) || {};
       var rows = (ev.lines || []).filter(function (l) { return l.rowId; }).map(function (l) { var r = L().identity.rows.filter(function (q) { return q.rowId === l.rowId; })[0]; return idOf(r) || l.rowId; });
-      var out = UI.heading({ title: '', kind: 'group', level: 4, description: '', strs: { title: 'pp.edit.ch.death', description: s[0] },
+      var out = UI.heading({ title: '', kind: 'section', level: 4, description: '', strs: { title: 'pp.edit.ch.death', description: s[0] },
         args: { title: { list: causeText(x.held ? heldCauses(x.id) : x.byCause) }, description: s[1] } });
       var facts = [];
       if (x.fromMissing) facts.push(part('pp.edit.rec.death.missing', { k: x.fromMissing }));
@@ -683,7 +683,7 @@
     var blocks = list.map(function (c) {
       var x = draft.counts[c.id] || {}, v = x.observed == null ? c.observed : x.observed, s = stampStrs(c.at, c.who), out = '';
       if (!x.void) out += stepper('count:' + c.id, 'count-step', 'pp.edit.count.label', null, s[0], s[1], v, 0, null, v !== c.observed || c.corrected);
-      else out += UI.heading({ title: '', kind: 'group', level: 4, description: '', strs: { title: 'pp.edit.count.label', description: s[0] }, args: { description: s[1] } });
+      else out += UI.heading({ title: '', kind: 'section', level: 4, description: '', strs: { title: 'pp.edit.count.label', description: s[0] }, args: { description: s[1] } });
       out += UI.choiceGroup(choice('count-void', c.id, 'pp.edit.why.mistake', null, !!x.void));
       return '<div class="ed-group" data-count="' + U.esc(c.id) + '">' + out + '</div>';
     }).join('');
