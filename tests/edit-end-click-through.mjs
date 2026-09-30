@@ -83,7 +83,7 @@ try {
   await page.waitForURL(/state=litter/); await ready(page);
   await openEdit(page);
   await page.locator('[data-action="death-to"]').last().click();
-  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.ed-over')).zIndex > getComputedStyle(document.querySelector('[data-view="edit"]')).zIndex), true);   // R1-28: Edit sits under the picker's scrim
+  assert.equal(await page.evaluate(() => +getComputedStyle(document.querySelector('[data-view="picker"]')).zIndex > +getComputedStyle(document.querySelector('[data-view="edit"]')).zIndex), true);   // R1-28: Edit sits under the picker's scrim
   await page.click('[data-action="pick"][data-value="A04"]');
   await page.click('[data-action="save"]');
   rc = await live(page, '#ed-saved', /Correction saved/);
@@ -200,7 +200,7 @@ try {
   assert.match(await text(page, '[data-ds="TaskPage"]'), /Today's records, by hand .*L\.M 4 records B03 · Castrate · 1 15:40/);
   await page.click('[data-action="close-sheet"]');
   await hold(page, '[data-action="hold"]', 300);                             // released early: not ended
-  assert.match(await live(page, '#pp-hold-status', /Keep|Released/), /Keep holding to end|Released · not ended/);
+  assert.match(await live(page, '#pp-hold-status', /KEEP|RELEASED/), /KEEP HOLDING TO END|RELEASED · NOT ENDED/);
   await hold(page, '[data-action="hold"]');
   await page.waitForFunction(() => /state=receipt/.test(location.search), null, { timeout: 4000 });
   const receipt = await text(page, '[data-ds="TaskPage"]');

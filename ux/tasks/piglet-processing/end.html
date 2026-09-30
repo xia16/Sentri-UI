@@ -19,14 +19,6 @@
 .en-body > * { margin: 0; }
 .en-block > .st-heading { margin: 0 0 var(--space-key-gap); }
 .en-groups { display: flex; flex-direction: column; gap: var(--space-heading); }
-/* a row's parts wrap whole, so a wrapped part never lies under the next (TaskRow wraps inside a part) */
-.en-body .tk-row-headline > span, .en-body .tk-row-meta > span { display: inline-block; max-width: 100%; }
-/* the whole-task progress card: the bar under its heading, the three counts under the bar (Facts, flat in the card) */
-.en-progress > .tk-progress { margin: var(--space-heading) 0 0; }
-.en-progress > .st-facts.st-facts.st-facts { margin: var(--space-heading) 0 0; padding: 0; border: 0; border-radius: 0; background: none; }
-/* the hold's status line, right above the footer (Button · buttonReason); absent while it has nothing to say */
-.en-why { flex: none; padding: var(--space-key-gap) var(--space-gutter) 0; background: var(--app-background); }
-.en-why:has(> .st-button-reason:empty) { display: none; }
 </style>
 </head>
 <body class="tk-stage">
@@ -318,7 +310,7 @@
     var g = {}, order = [];
     ls.forEach(function (l) { var r = l.code.charAt(0); if (!g[r]) { g[r] = []; order.push(r); } g[r].push(l); });
     return order.sort().map(function (r) {
-      return K.group({ title: P('pp.end.row', { r: r }), meta: P(one('pp.end.row.meta', g[r].length), { n: g[r].length }), rows: g[r].map(rowFn) });
+      return K.group({ face: 'word', title: P('pp.end.row', { r: r }), meta: P(one('pp.end.row.meta', g[r].length), { n: g[r].length }), rows: g[r].map(rowFn) });
     }).join('');
   }
   // A door row (Row card): one title, one description line.
@@ -331,14 +323,12 @@
   /* ---- farrowing's task-overview parts: the whole-task progress card, the metrics ---- */
   function progressCard(t) {
     var share = function (n) { return t.total ? n / t.total * 100 : 0; };
-    var seg = [['done', t.done], ['active', t.owed], ['rest', t.ahead]].map(function (x) { return '<i data-tone="' + x[0] + '" style="width:' + share(x[1]) + '%"></i>'; }).join('');
-    var bar = '<span class="tk-progress" role="progressbar" aria-valuemin="0" aria-valuemax="' + t.total + '" aria-valuenow="' + t.done + '" data-str-attr="aria-label:pp.end.ov.bar" data-args=\'' + esc(JSON.stringify({ d: t.done, n: t.total })) + '\' aria-label="' + esc(PP.t('pp.end.ov.bar', { d: t.done, n: t.total })) + '">' + seg + '</span>';
-    return UI.panel(h({ kind: 'panel', strs: { title: 'pp.end.ov.progress', meta: 'pp.end.ov.progress.meta' }, args: { meta: { n: t.total } } }) + bar +
-      UI.facts([
-        { label: '', strs: { label: 'pp.end.f.done', value: 'pp.end.tok.n' }, args: { value: { n: t.done } } },
-        { label: '', strs: { label: 'pp.end.f.owed', value: 'pp.end.tok.n' }, args: { value: { n: t.owed } } },
-        { label: '', strs: { label: 'pp.end.f.ahead', value: 'pp.end.tok.n' }, args: { value: { n: t.ahead } } }
-      ], { columns: 3, className: 'en-counts' }), { className: 'en-progress' });
+    return K.progress({ title: P('pp.end.ov.progress'), meta: P('pp.end.ov.progress.meta', { n: t.total }), max: t.total, now: t.done,
+      barLabel: P('pp.end.ov.bar', { d: t.done, n: t.total }),
+      segments: [{ tone: 'done', share: share(t.done) }, { tone: 'active', share: share(t.owed) }, { tone: 'rest', share: share(t.ahead) }],
+      counts: [{ value: P('pp.end.tok.n', { n: t.done }), label: P('pp.end.f.done'), tone: 'done' },
+        { value: P('pp.end.tok.n', { n: t.owed }), label: P('pp.end.f.owed'), tone: 'active' },
+        { value: P('pp.end.tok.n', { n: t.ahead }), label: P('pp.end.f.ahead'), tone: 'rest' }] });
   }
   // Choose a crate row: each row of crates with its figures, a door to the room (farrowing: Choose a unit).
   function cratesCard(ls) {
@@ -349,7 +339,7 @@
       return K.row({ id: P('pp.end.row', { r: r }), headline: [P('pp.end.ov.h.done', { n: x.done }), { sep: true }, P('pp.end.ov.h.owed', { n: x.owed }, x.late ? 'red' : '')],
         meta: [P(one('pp.end.v.litters', x.n), { n: x.n }), { sep: true }, P('pp.end.ov.h.ahead', { n: x.ahead })], action: 'open-room', value: r });
     });
-    return sec({ icon: I('grid'), strs: { title: 'pp.end.ov.rows' } }) + K.group({ title: P('pp.end.unit', { n: UNIT }), meta: P(one('pp.end.row.meta', ls.length), { n: ls.length }), rows: rows });
+    return sec({ icon: I('grid'), strs: { title: 'pp.end.ov.rows' } }) + K.group({ face: 'word', title: P('pp.end.unit', { n: UNIT }), meta: P(one('pp.end.row.meta', ls.length), { n: ls.length }), rows: rows });
   }
   // Performance metrics: on time and identity, then what happened to piglets and sows (now, or frozen at End).
   function metrics(t, atEnd) {
@@ -408,7 +398,6 @@
     return K.page({ title: P(titleId, titleArgs), description: descId ? P(descId, descArgs) : '', body: '<div class="en-body">' + body + '</div>', footer: footer });
   }
   function backOnly(action) { return K.footer({ back: { action: action || 'close-sheet' } }); }
-  function holdLine() { return '<div class="en-why">' + UI.buttonReason({ id: 'pp-hold-status' }) + '</div>'; }
 
   // farrowing's Task overview: progress card, choose a crate row, performance metrics; Back + End task.
   function overviewPage() {
@@ -432,7 +421,7 @@
         if (w.kind !== 'farrowing') return;
         body += UI.banner({ tone: 'danger', headline: PP.t('pp.end.rv.blocked'), consequence: PP.t('pp.end.rv.blocked.where', { units: units, code: active.join(' ') }),
           strs: { headline: 'pp.end.rv.blocked', consequence: 'pp.end.rv.blocked.where' }, args: { consequence: { units: units, code: active.join(' ') } } });
-        body += K.group({ title: P('pp.end.unit', { n: UNIT }), meta: P(one('pp.end.row.meta', active.length), { n: active.length }),
+        body += K.group({ face: 'word', title: P('pp.end.unit', { n: UNIT }), meta: P(one('pp.end.row.meta', active.length), { n: active.length }),
           rows: active.map(function (c) { return litterRow(litter(c, false), [P('pp.end.rv.farrowing.h')], null); }) });
       });
       var dr = why.filter(function (w) { return w.kind !== 'farrowing'; });
@@ -469,7 +458,8 @@
         body += '<div class="en-block">' + metrics(t, true) + '</div>';
       }
       var phase = S.unconfirmed ? 'unknown' : S.pending ? 'pending' : S.holding ? 'holding' : 'idle';
-      foot = holdLine() + K.footer({ back: { action: 'close-sheet' }, hold: { label: P('pp.end.act.end'), caption: P(capId(phase)), action: 'hold', tone: 'danger', phase: phase, statusId: 'pp-hold-status' } })
+      // the hold's progress line is the footer's status slot (empty until the hold has something to say)
+      foot = K.footer({ back: { action: 'close-sheet' }, status: { id: 'pp-hold-status', text: '' }, hold: { label: P('pp.end.act.end'), caption: P(capId(phase)), action: 'hold', tone: 'danger', phase: phase } })
         .replace('data-phase="holding"', S.holding === 'static' ? 'data-phase="holding" data-preview="still"' : 'data-phase="holding"');
     }
     return page('pp.end.title', null, 'pp.end.rv.scope', { n: UNIT, k: t.litters }, body, foot);

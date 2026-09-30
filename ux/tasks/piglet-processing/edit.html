@@ -21,12 +21,6 @@
 .ed-group > * { margin: 0; }
 /* one rule between stacked records, as between farrowing's Edit rows */
 .ed-group[data-mark] + .ed-group[data-mark], .ed-group[data-count] + .ed-group[data-count], .ed-group[data-death] + .ed-group[data-death] { padding-top: var(--space-heading); border-top: 1px solid var(--line); }
-/* a drawer over a drawer or a page (the crate picker, the photo): its own layer, above the surface it answers */
-.ed-over { position: absolute; inset: 0; z-index: 6; }
-/* why Save waits, on the bottom edge of the body, right above the footer (Button · buttonReason) */
-.ed-why { flex: none; padding: var(--space-key-gap) var(--space-gutter-sheet) 0; background: var(--paper); }
-.ed-why > .st-button-reason:empty { display: none; }
-.ed-why:has(> .st-button-reason:empty) { display: none; }
 .ed-pad { flex: none; padding: var(--space-row-y) var(--space-gutter-sheet); background: var(--paper); border-top: 1px solid var(--line); }
 /* A record-page entry's change lines, moved right under its title (see logHtml): colour on the value, the words ink. */
 .ed-delta { margin: 0; font-size: var(--type-description-size); line-height: 1.5; color: var(--ink); }
@@ -279,7 +273,7 @@
   }
   function photoViewer() {
     var p = photo.split('|'), n = photosOf(p[0]), i = +p[1], ev = eventOf(p[0]) || {}, st0 = stampStrs(ev.at, ev.who);
-    return K.drawer({ view: 'photo', size: 'long', scrim: { action: 'photo-back' }, close: { action: 'photo-back' },
+    return K.drawer({ view: 'photo', size: 'long', layer: 1, scrim: { action: 'photo-back' }, close: { action: 'photo-back' },
       title: S_('pp.dead.photo.title', { n: i, m: n }), subtitle: S_(st0[0], st0[1]),
       body: '<div class="ed-photo" role="img" data-str-attr="aria-label:ds.c2.aria.thumb" data-args=\'{"n":' + i + '}\' aria-label="' + U.esc(PP.t('ds.c2.aria.thumb', { n: i })) + '">' + span('ds.c2.photos.index', { n: i }) + '</div>',
       footer: K.footer({ back: { action: 'photo-back' } }) });
@@ -394,7 +388,7 @@
         entries: g.entries.map(function (x) { return entry(x, g); }) };
     });
     // farrowing's log: title, one description line, the log, a lone Back (Edit is on the litter's tool row)
-    return K.page({ title: S_('pp.edit.log.title'), description: S_('pp.edit.log.sub', { code: crate, sow: SOW.sow, born: X.born, alive: X.alive }),
+    return K.page({ inert: !!photo, title: S_('pp.edit.log.title'), description: S_('pp.edit.log.sub', { code: crate, sow: SOW.sow, born: X.born, alive: X.alive }),
       body: logHtml(groups), footer: K.footer({ back: { action: 'back' } }) });
   }
 
@@ -724,8 +718,9 @@
   // The footer: Back and Save; Save waits (present, quiet) with its reason in one status line right above the footer
   // (ADR 0002), on the drawer's bottom edge. The footer is the drawer's last child (TaskSheet).
   function bar(w, can, saveId) {
-    return '<div class="ed-why">' + UI.buttonReason({ id: 'ed-why', text: w ? PP.t(w[0], w[1]) : '', strs: w ? { text: w[0] } : undefined, args: w ? { text: w[1] } : undefined }) + '</div>' +
-      K.footer({ back: { action: 'back' }, primary: button('primary', 'save', saveId || 'act.save', { waiting: !can, describedby: 'ed-why' }) });
+    // the footer's status slot (TaskSheet): why Save waits, one line right above the footer, only while it waits for a reason
+    return K.footer({ back: { action: 'back' }, status: w ? { id: 'ed-why', text: PP.t(w[0], w[1]), str: w[0], args: w[1] || undefined } : undefined,
+      primary: button('primary', 'save', saveId || 'act.save', { waiting: !can, describedby: w ? 'ed-why' : '' }) });
   }
   /* R1-28: a correction says what it did. The receipt of a saved correction: every figure it moved, on every litter it
      touched (the ledger replayed without it, against the ledger with it). */
@@ -868,7 +863,7 @@
       title = [mv.dir === 'out' ? 'pp.edit.move.to' : 'pp.edit.move.from', null];
       opts = e.crates().filter(function (c) { return mv.dir === 'in' || !c.sowDied; }).map(crateOpt);
     }
-    return K.drawer({ view: 'picker', size: 'long', scrim: { action: 'picker-back' }, close: { action: 'picker-back' }, title: S_(title[0], title[1]),
+    return K.drawer({ view: 'picker', size: 'long', layer: 1, scrim: { action: 'picker-back' }, close: { action: 'picker-back' }, title: S_(title[0], title[1]),
       body: UI.chooserList(UI.pickerOptions({ options: opts, selected: sel, action: 'pick' }), { tone: 'inset', ds: 'PickerField' }),
       footer: K.footer({ back: { action: 'picker-back' } }) });
   }
@@ -922,9 +917,10 @@
     var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-action]');
     var fk = f ? [f.dataset.action, f.dataset.value || '', f.dataset.step || '', f.dataset.key || ''] : null;
     var html;
-    if (view === 'record') html = recordPage().replace('data-ds="TaskPage"', 'data-ds="TaskPage"' + (photo ? ' inert' : '')) + (photo ? '<div class="ed-over">' + photoViewer() + '</div>' : '');
+    // a drawer over Edit or over the log rises one overlay layer (the skeleton's layer model)
+    if (view === 'record') html = recordPage() + (photo ? photoViewer() : '');
     else if (view === 'double') html = doubleSheet();
-    else { var e = E(); html = (picker ? '<div inert>' + editSheet(e) + '</div><div class="ed-over">' + pickerDrawer(e) + '</div>' : editSheet(e)); }
+    else { var e = E(); html = (picker ? '<div inert>' + editSheet(e) + '</div>' + pickerDrawer(e) : editSheet(e)); }
     scr.innerHTML = K.phone(behind() + html, { label: S_('pp.common.task') });
     PP.apply(scr);
     UI.liveFill(scr, { then: function (el) { PP.apply(el); } });
