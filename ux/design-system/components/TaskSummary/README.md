@@ -14,6 +14,8 @@ The one card under the last-record line: **left, this unit's figure; right, the 
 - **The task half** is a button (the whole half). A 1px `line` divider on its left, inset 14px top and bottom. The heading ends in a chevron. The value adds `/ n` in `figure-denominator` (15px mono `muted`); the description adds a `muted` 10px scope (`· all units`).
 - **Progress bar:** 5px, 10px under the description, 1px gaps, 6px radius, on `line`. Segments: `done` in `current-marker`, `active` in `progress-active`, `rest` in `handle`. Its support line sits 7px under it.
 
+- **No clip:** the card does not clip its halves (a clip read as hiding the task half's last pixel on a room too short to scroll); the task half keeps the card's right corners with its own `radius-panel`, so its pressed wash stays inside.
+
 **States**
 - Pressed (task half): `green-wash`. Focus: the global ring. Disabled: not drawn.
 - Empty: a half with no figure prints the heading and `—`; the card is never absent from a task's first screen.

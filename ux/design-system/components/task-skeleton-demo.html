@@ -127,7 +127,9 @@
   function count() {
     return K.drawer({ size: 'long', view: 'count', title: s('tk.demo.id', '000418', { id: '000418' }), subtitle: s('tk.demo.count.sub', 'B1 / Parity 3 · Farrowing'),
       body: stepper('alive', 'tk.demo.alive', 'Alive', 9, { variant: 'hero', face: 'count', min: 5 }) +
-        K.door({ title: s('tk.demo.count.log', 'Farrowing log'), description: s('tk.demo.count.log.sub', 'Born 14 · Dead 5'), action: 'log' }),
+        K.door({ title: s('tk.demo.count.log', 'Farrowing log'), description: s('tk.demo.count.log.sub', 'Born 14 · Dead 5'), action: 'log' }) +
+        K.door({ title: s('tk.demo.care.title', 'Iron · day 3'), description: s('tk.demo.care.sub', '12 owed · due today'), action: 'open-dose', value: 'iron3', trail: '',
+          act: { label: s('tk.demo.care.act', 'Record 12', { n: 12 }), action: 'record', value: 'iron3' } }),
       footer: K.footer({ back: { action: 'back' }, primary: { label: s('tk.demo.finish', 'Finish farrowing'), action: 'finish' },
         status: { text: 'Record says 10 · counted 9', str: 'tk.demo.count.status', id: 'tk-demo-count-status', tone: 'amber',
           action: { label: s('tk.demo.count.right', '9 is right'), action: 'count-right' } } }) });

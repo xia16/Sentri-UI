@@ -162,7 +162,19 @@
 
   /* ---- TaskRow door: a row with no id column (farrowing's .disclosure): a title, one muted description line, a chevron.
      For a non-animal door inside a sheet or a page (`Record here › Move piglets`). ---- */
-  function door({ title, description, action = 'open', value = '', label, trail = 'chevron' } = {}) {
+  let doorSeq = 0;
+  function door({ title, description, action = 'open', value = '', label, trail = 'chevron', act, id = '' } = {}) {
+    /* act: a Button spec ({ label, action, value, register = 'secondary', waiting, busy }) — the row's one-tap at its end
+       (`Record 12`), beside the door; its accessible name is its label plus the row's title. */
+    if (act) {
+      const rid = id || `tk-door-${++doorSeq}`, tid = rid + '-title', aid = rid + '-act';
+      const g = trail === 'chevron' ? glyph('chevron') : trail === 'edit' ? glyph('edit') : '';
+      const main = `<button type="button" class="tk-door-main"${A(action, value)}${L(label)}><span class="tk-door-copy"><strong id="${esc(tid)}">${parts(title)}</strong>${description ? `<small>${parts(description)}</small>` : ''}</span>${g}</button>`;
+      const UI = root.SentriUI, l = obj(act.label);
+      const props = { label: l.text ?? '', register: act.register || 'secondary', action: act.action || 'act', value: act.value ?? value, waiting: !!act.waiting, busy: !!act.busy, id: aid, labelledby: `${aid} ${tid}` };
+      if (l.str) { props.strs = { label: l.str }; if (l.args) props.args = { label: l.args }; }
+      return `<div class="tk-door" data-ds="TaskRow" data-variant="door" data-act="" id="${esc(rid)}">${main}${UI.button(props)}</div>`;
+    }
     return `<button type="button" class="tk-door" data-ds="TaskRow" data-variant="door"${A(action, value)}${L(label)}><span class="tk-door-copy"><strong>${parts(title)}</strong>${description ? `<small>${parts(description)}</small>` : ''}</span>${trail === 'chevron' ? glyph('chevron') : trail === 'edit' ? glyph('edit') : ''}</button>`;
   }
 

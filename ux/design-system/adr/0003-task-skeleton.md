@@ -77,6 +77,9 @@ Additive. Farrowing's remaining own faces, so dead, count and end can drop their
 - **`SentriTask.doors({ card })`** (TaskRow README): flat door rows, or the Pen page's card of icon doors.
 - **[TaskTable](../components/TaskTable/README.md)** (`SentriTask.table`): the Choose-a-unit comparison table, its column headings and sublines at farrowing's **9px** (`table-heading`, below the floor by the owner's ruling, like the hold caption).
 - **[TaskMetrics](../components/TaskMetrics/README.md)** (`SentriTask.metrics`): the performance card (`metric` 28px, `metric-total` 17px mono; `table-figure` 15px mono for the table).
+- **Door with a one-tap** (`door({ act })`): care rows leave `SentriUI.rowAction`.
+- **Narrow gutters:** the 12px override at 370px and below is gone; drawers keep 21, pages 18 (farrowing, ruling 16); the footer's gap is 10 there, as farrowing's.
+- **TaskSummary no longer clips** its halves; the task half carries the right corners itself.
 - Demo pairs: `?screen=sow` (radios, photos, warning beside the sow-death drawer), `?screen=pen` (card doors beside the Pen page), `?screen=overview` (progress, table, metrics beside the Task overview).
 
 ## Candidate tokens
