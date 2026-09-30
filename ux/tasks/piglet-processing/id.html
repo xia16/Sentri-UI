@@ -18,15 +18,15 @@
 .id-stack > * { margin: 0; }
 .id-group { display: flex; flex-direction: column; gap: var(--space-heading); }
 .id-group > * { margin: 0; }
-/* The run: the piglet's fields and the pad share one column anchored at the bottom, so the keys sit at one place for
-   every piglet. */
+/* The run: the piglet's fields scroll in the page body; the pad is pinned whole under them, above the footer, so every
+   key is always on screen at one place (farrowing's entry) — at 360 × 740 the fields scroll, never the keys. */
 .id-run { min-height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-row-y); }
+.id-pad-dock { flex: none; padding: var(--space-row-y) var(--space-gutter); background: var(--app-background); border-top: 1px solid var(--line); }
 .id-run > * { margin: 0; }
 /* the ear-tag readout and its Scan control on one line (the Numpad card has no slot beside its readout) */
 .id-tag-line { display: flex; align-items: center; gap: var(--space-footer-gap); }
 .id-tag-line > .st-measure-box { flex: 1; min-width: 0; }
 .id-dock { flex: none; padding: var(--space-row-y) var(--space-gutter-sheet); background: var(--paper); border-top: 1px solid var(--line); }
-@media (max-width: 370px) { .id-dock { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
 </style>
 </head>
 <body class="tk-stage">
@@ -403,9 +403,10 @@
   // Every alive piglet identified: nothing to record, Back alone (filled, the page's one way on).
   function runPage() {
     var p = primary();
-    var body = '<div class="id-run">' + radio(run.sex) + weightField() + pad() + '</div>';
+    var body = '<div class="id-run">' + radio(run.sex) + weightField() + '</div>';
     return K.page({ view: 'run', title: s('pp.id.run.title'), description: runDesc(), descriptionTone: !keepers && over() ? 'amber' : '', body: body, inert: !!(drawer || confirm),
-      footer: K.footer({ back: { action: 'to-table' }, primary: p ? { label: s(p[0], p[1] || undefined), action: 'record' } : null }) });
+      // the pad docks between the body and the footer; the footer stays the page's last child
+      footer: '<div class="id-pad-dock">' + pad() + '</div>' + K.footer({ back: { action: 'to-table' }, primary: p ? { label: s(p[0], p[1] || undefined), action: 'record' } : null }) });
   }
 
   /* ---- the table face: the litter's identified piglets, viewable and editable (through S8's Edit) forever ---- */
