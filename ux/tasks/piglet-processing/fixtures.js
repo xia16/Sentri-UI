@@ -37,7 +37,7 @@
    boar/gilt counts and birth weights recorded in processing are ledger events. Not in the ledger:
    the notch litter number a notch farm cuts (farm config) and drafts held on this phone. */
 
-import { derive, append, select, dayNumber } from './ledger.js';
+import { derive, append, select, dayNumber, definePeople } from './ledger.js';
 
 // ---------------------------------------------------------------------------------------------
 // config
@@ -45,6 +45,9 @@ import { derive, append, select, dayNumber } from './ledger.js';
 export const TODAY = '2026-09-29';
 export const NOW = '2026-09-29T10:30';
 export const ME = 'G.H';
+/* The farm's people: events carry initials, pages show the full name (farrowing's names: `G. Hansen`). */
+export const PEOPLE = { 'G.H': 'G. Hansen', 'L.M': 'L. Madsen', 'A.K': 'A. Karlsen' };
+definePeople(PEOPLE);
 
 const TASK7 = ['A02', 'A04', 'A05', 'A07', 'B01', 'B02', 'B03', 'B04', 'B06', 'B08', 'B09', 'B10', 'C02', 'C03', 'C04', 'C05', 'D01', 'D03', 'D05', 'D06'];
 
@@ -66,6 +69,7 @@ export const CONFIG = {
     { id: 'health', tx: 'health', due: 21 }
   ],
   identity: FARMS.tag,
+  people: PEOPLE,
   task: { id: 'PP-U7-0926', litters: TASK7, farrowingTask: 'open' }
 };
 
@@ -737,6 +741,6 @@ export function piglets(derived) {
   return out;
 }
 
-export const PPFixtures = { CONFIG, FARMS, DEVICE_DRAFTS, VARIANTS, TODAY, NOW, ME, open, piglets };
+export const PPFixtures = { CONFIG, FARMS, DEVICE_DRAFTS, VARIANTS, TODAY, NOW, ME, PEOPLE, open, piglets };
 export default PPFixtures;
 if (typeof window !== 'undefined') window.PPFixtures = PPFixtures;
