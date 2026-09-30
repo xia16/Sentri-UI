@@ -66,9 +66,9 @@ try {
   assert.match(await text(page, '[role="dialog"]'), /Alive stays 11 piglets in B06 and 10 piglets in B08/);
   await page.click('[data-action="open-move"]');
   await page.waitForURL(/move\.html\?.*state=move-explain/); await ready(page);
-  assert.match(await text(page, '[role="dialog"]'), /Closes 1 unexplained loss and 1 gain/);
+  assert.match(await text(page, '.tk-page[data-view="move"]'), /Closes 1 unexplained loss and 1 gain/);
   await page.click('[data-action="save-move"]');
-  console.log('ok 4 explain via the move suggestion: saved', await text(page, '[role="dialog"] h3'));
+  console.log('ok 4 explain via the move suggestion: saved', await text(page, '.tk-sheet .tk-sheet-title'));
 
   // 5. The room after: both lines closed; D03's loss (nothing to pair) stays open.
   await page.goto(base + 'room.html?state=room&lens=all&data=gain-b08'); await ready(page);
@@ -85,7 +85,7 @@ try {
   assert.match((await b06.innerText()).replace(/\s+/g, ' '), /loss 1 open/);
   await b06.click();
   await page.click('[data-action="pair-loss"]');
-  assert.match(await text(page, '[role="dialog"]'), /Closes 1 unexplained loss and 1 gain/);
+  assert.match(await text(page, '.tk-page[data-view="move"]'), /Closes 1 unexplained loss and 1 gain/);
   await page.click('[data-action="save-move"]');
   await page.goto(base + 'room.html?state=room&lens=all&data=explain'); await ready(page);
   const strip3 = await text(page, '[data-action="explain"]');
