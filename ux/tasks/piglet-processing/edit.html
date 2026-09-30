@@ -506,24 +506,23 @@
     // the why appears only once the hand lowers the mark (a record's own deferral is not a question)
     if (lowered) {
       var mode = x.to !== undefined ? 'to' : x.void ? 'void' : x.reason || '';
-      var rows = [];
+      // the why is one radio list (TaskRadios, farrowing's flat rows): each reason, then by mistake, then another crate
+      var opts = [], ro = function (k, label, meta) { var o = { value: m.id + ':' + k, label: PP.t(label), strs: { label: label } }; if (meta) { o.meta = PP.t(meta); o.strs.meta = meta; } opts.push(o); };
       // after End a lowered mark is a fact (not done), never owed: no reason choice. Castration takes Q16's reasons.
       if (!e.ended) {
         if (m.castration) {
           // Q16: these reasons differ in what the litter owes, so each says it in one short phrase (owner, round 5)
-          rows.push(choice('mark-why', m.id + ':hernia', 'pp.litter.reason.hernia', 'pp.edit.why.leaves', mode === 'hernia'),
-            choice('mark-why', m.id + ':cryptorchid', 'pp.litter.reason.cryptorchid', 'pp.edit.why.leaves', mode === 'cryptorchid'),
-            choice('mark-why', m.id + ':deferred', 'pp.litter.reason.deferred', 'pp.edit.why.owed', mode === 'deferred'),
-            choice('mark-why', m.id + ':kept', 'pp.litter.reason.kept', 'pp.edit.why.leaves', mode === 'kept'));
-        } else rows.push(choice('mark-why', m.id + ':weak', 'pp.litter.reason.weak', null, mode === 'weak'), choice('mark-why', m.id + ':sick', 'pp.litter.reason.sick', null, mode === 'sick'));
+          ro('hernia', 'pp.litter.reason.hernia', 'pp.edit.why.leaves'); ro('cryptorchid', 'pp.litter.reason.cryptorchid', 'pp.edit.why.leaves');
+          ro('deferred', 'pp.litter.reason.deferred', 'pp.edit.why.owed'); ro('kept', 'pp.litter.reason.kept', 'pp.edit.why.leaves');
+        } else { ro('weak', 'pp.litter.reason.weak'); ro('sick', 'pp.litter.reason.sick'); }
       }
-      // a mark in a possible double is not "recorded by mistake · stays owed": the double has its own answer (round 4)
-      if (dp) rows.push(choice('open-double', m.dose, 'pp.edit.dbl.same', null, false));
-      else rows.push(choice('mark-why', m.id + ':void', 'pp.edit.why.mistake', m.castration && !e.ended ? 'pp.edit.why.owed' : null, mode === 'void'));
-      rows.push(choice('mark-why', m.id + ':to', 'pp.edit.why.other', null, mode === 'to'));
+      // a mark in a possible double is not "recorded by mistake · stays owed": the double has its own answer (round 4), a door
+      if (!dp) ro('void', 'pp.edit.why.mistake', m.castration && !e.ended ? 'pp.edit.why.owed' : null);
+      ro('to', 'pp.edit.why.other');
       // castration splits by reason (Q16): the question is about the piglets this change leaves not castrated
-      var n = x.void || x.to !== undefined ? m.whole : m.castration ? m.n - v : rest;
-      out += UI.choiceGroup(rows, { title: '', strs: { title: e.ended ? 'pp.edit.rest.title_end' : m.castration ? 'pp.edit.rest.title_castr' : 'pp.edit.rest.title' }, args: { title: { n: n } } });
+      var n = x.void || x.to !== undefined ? m.whole : m.castration ? m.n - v : rest, qid = e.ended ? 'pp.edit.rest.title_end' : m.castration ? 'pp.edit.rest.title_castr' : 'pp.edit.rest.title';
+      out += K.radios({ label: PP.t(qid, { n: n }), strs: { label: qid }, args: { label: { n: n } }, action: 'mark-why', key: m.id, selected: mode ? m.id + ':' + mode : '', options: opts });
+      if (dp) out += K.door({ title: S_('pp.edit.dbl.same'), action: 'open-double', value: m.dose });
       if (x.to !== undefined) out += wrongBlock(m, e, x);
     }
     return '<div class="ed-group" data-mark="' + U.esc(m.id) + '">' + out + '</div>';
@@ -536,8 +535,9 @@
       var cap = c.owedThere == null ? m.whole : c.owedThere;
       out += stepper('to:' + m.id, 'to-step', 'pp.edit.to.n', { code: x.to }, 'pp.edit.to.n_desc', { t: U.time(m.at), who: m.who, n: cap }, c.n, 1, cap, true, 'pp.edit.to.ceil', { code: x.to, n: cap });
       var restThere = cap - c.n;
-      if (restThere > 0 && !m.castration) out += UI.choiceGroup([choice('to-why', m.id + ':weak', 'pp.litter.reason.weak', null, c.reason === 'weak'),
-        choice('to-why', m.id + ':sick', 'pp.litter.reason.sick', null, c.reason === 'sick')], { title: '', strs: { title: 'pp.edit.to.rest' }, args: { title: { n: restThere, code: x.to } } });
+      if (restThere > 0 && !m.castration) out += K.radios({ label: PP.t('pp.edit.to.rest', { n: restThere, code: x.to }), strs: { label: 'pp.edit.to.rest' }, args: { label: { n: restThere, code: x.to } },
+        action: 'to-why', key: 'to:' + m.id, selected: c.reason ? m.id + ':' + c.reason : '',
+        options: [{ value: m.id + ':weak', label: PP.t('pp.litter.reason.weak'), strs: { label: 'pp.litter.reason.weak' } }, { value: m.id + ':sick', label: PP.t('pp.litter.reason.sick'), strs: { label: 'pp.litter.reason.sick' } }] });
     }
     return out;
   }
@@ -655,7 +655,8 @@
       out += sline([part(w.here ? 'pp.edit.warn.here' : 'pp.edit.warn.there', { id: w.value, code: w.litter }, 'amber')]);
     });
     var sex = current(r, 'sex');
-    out += UI.choiceGroup([choice('row-sex', 'b', 'pp.common.sex.boar_l', null, sex === 'b'), choice('row-sex', 'g', 'pp.common.sex.gilt_l', null, sex === 'g')], { title: '', strs: { title: 'pp.common.sex.label' } });
+    out += K.radios({ label: PP.t('pp.common.sex.label'), strs: { label: 'pp.common.sex.label' }, action: 'row-sex', key: 'sex', selected: sex || '',
+      options: [{ value: 'b', label: PP.t('pp.common.sex.boar_l'), strs: { label: 'pp.common.sex.boar_l' } }, { value: 'g', label: PP.t('pp.common.sex.gilt_l'), strs: { label: 'pp.common.sex.gilt_l' } }] });
     var w = pad === 'weight' ? typed.weight : current(r, 'weight'), wAmber = amberField(r, 'weight');
     var changedNow = d.set && 'weight' in d.set;
     out += UI.measure({ label: '', optional: '', value: w == null ? '' : String(w), unit: 'kg', key: 'weight', active: pad === 'weight', controls: 'ed-pad', changed: wAmber, note: changedNow ? ' ' : '',
@@ -819,11 +820,11 @@
     if (p) {
       var recs = p.records.map(eventOf);
       body += UI.rowGroup(recs.map(function (r) { var s = stampStrs(r.at, r.who); return UI.row({ title: '', description: '', strs: { title: 'pp.edit.dbl.rec', description: s[0] }, args: { title: { what: recTitle(r) }, description: s[1] } }); }).join(''));
-      body += UI.choiceRadios({ label: PP.t('pp.edit.dbl.q'), layout: 'rows', action: 'dbl-answer', key: 'answer', selected: dbl.answer || '', strs: { label: 'pp.edit.dbl.q' },
+      body += K.radios({ label: PP.t('pp.edit.dbl.q'), action: 'dbl-answer', key: 'answer', selected: dbl.answer || '', strs: { label: 'pp.edit.dbl.q' },
         options: [{ value: 'same', label: PP.t('pp.edit.dbl.same'), meta: PP.t('pp.edit.dbl.same_short'), strs: { label: 'pp.edit.dbl.same', meta: 'pp.edit.dbl.same_short' } },
           { value: 'twice', label: PP.t('pp.edit.dbl.twice'), meta: PP.t('pp.edit.dbl.twice_short'), strs: { label: 'pp.edit.dbl.twice', meta: 'pp.edit.dbl.twice_short' } }] });
       if (dbl.answer === 'same') {
-        body += UI.choiceRadios({ label: PP.t('pp.edit.dbl.which'), layout: 'rows', action: 'dbl-withdraw', key: 'withdraw', selected: dbl.withdraw || '', strs: { label: 'pp.edit.dbl.which' },
+        body += K.radios({ label: PP.t('pp.edit.dbl.which'), action: 'dbl-withdraw', key: 'withdraw', selected: dbl.withdraw || '', strs: { label: 'pp.edit.dbl.which' },
           options: recs.map(function (r) { var s = stampStrs(r.at, r.who); return { value: r.id, label: PP.t(s[0], s[1]), strs: { label: s[0] }, args: { label: s[1] } }; }) });
       }
       if (!dbl.answer) w = ['pp.edit.dbl.wait.answer', null];
