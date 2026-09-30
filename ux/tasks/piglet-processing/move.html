@@ -19,9 +19,6 @@
 .mv-section > * { margin: 0; }
 .mv-find { display: flex; align-items: center; gap: var(--space-footer-gap); }
 .mv-find > .field { flex: 1; min-width: 0; margin: 0; }
-/* A drawer over a page (the receipt, an arrival's check, the pre-lock door): the page below drops under the drawer's
-   layers. The skeleton stacks page (z 5) over drawer (z 2–3), so the page is lifted into its own layer at z 1. */
-.mv-under { position: absolute; inset: 0; z-index: 1; }
 </style>
 </head>
 <body class="tk-stage">
@@ -276,12 +273,12 @@
     if (!rows.length) return '';
     return UI.rowGroup(rows.join(''), { title: '', strs: { title: 'pp.move.owed.title' } });
   }
-  function facePage(c) {
+  function facePage(c, inert) {
     var body = ledgerFacts(c) + doubtRows(c) + arrivalRows(c) + movesGroup(c);
     var canMove = canSource(c) || canReceive(c);
     // Move is the page's one act; a kept draft says so on the button (Back from the Move page keeps it).
     var primary = canMove ? { label: S.kept ? s('pp.move.act.resume', { n: 1 }) : s('pp.move.sheet.title'), action: 'open-move', value: c } : null;
-    return named(K.page({ title: s('pp.move.moves.title'), description: faceDesc(c), body: '<div class="mv-stack">' + body + '</div>',
+    return named(K.page({ title: s('pp.move.moves.title'), description: faceDesc(c), body: '<div class="mv-stack">' + body + '</div>', inert: inert,
       footer: K.footer({ back: { action: 'back' }, primary: primary }) }), 'face');
   }
 
@@ -500,7 +497,7 @@
   function reviewRec(dr) { return { from: source(), to: receiver(), n: dr.n, rows: [], packets: dr.carry, aliveBefore: alive(source()), joins: dr.joins }; }
   // The Move button says what it will record (R1-18): the count and crates, and each answer given for a partly done source.
   function primarySpec(dr, ready) {
-    if (!ready) return { label: s('pp.move.act.move_bare'), action: 'save-move', waiting: true, describedby: 'mv-reason' };
+    if (!ready) return { label: s('pp.move.act.move_bare'), action: 'save-move', waiting: true };
     var asks = dr.asks || [];
     if (!asks.length) return { label: s('pp.move.act.move', { n: dr.n, from: source(), to: receiver() }), action: 'save-move' };
     var what = asks.map(function (id) { return PP.t('pp.move.act.ans.' + S.answers[id], { tx: txName(id) }); }).join(' · ');
@@ -512,10 +509,13 @@
     var explain = S.explains ? heading(gainOnly() ? 'pp.move.explain.title_gain' : 'pp.move.explain.title', { code: receiver(), n: gainOnly() ? S.n : count() }) : '';
     // the question sits right under the crate, above the count and the rows (R1-31: never below the fold)
     var ask = S.other && dr.event ? askSection(dr) : '';
-    var reason = p ? UI.buttonReason({ id: 'mv-reason', text: '', strs: { text: p.id }, args: p.args ? { text: p.args } : undefined }) : '';
-    var body = explain + directionSection() + crateSection() + pairSection() + ask + countSection() + review(dr) + reason;
-    return named(K.page({ title: s('pp.move.sheet.title'), description: sub, body: '<div class="mv-stack">' + body + '</div>',
-      footer: K.footer({ back: { action: 'back' }, primary: primarySpec(dr, ready) }) }), 'move');
+    // why Move waits: the footer's status line, directly above the button it describes
+    var reason = p ? Object.assign({ id: 'mv-reason' }, s(p.id, p.args)) : null;
+    var body = explain + directionSection() + crateSection() + pairSection() + ask + countSection() + review(dr);
+    // Clear drops the draft (and an explaining link) while there is one to drop
+    var clear = draftExists() || S.explains ? UI.button({ label: '', register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '';
+    return named(K.page({ title: s('pp.move.sheet.title'), description: sub, aside: clear, body: '<div class="mv-stack">' + body + '</div>',
+      footer: K.footer({ back: { action: 'back' }, primary: primarySpec(dr, ready), status: reason }) }), 'move');
   }
 
   /* ---- the receipt: the posted record, read back from the ledger, over the Moves page ---- */
@@ -573,7 +573,7 @@
     if (S.view === 'move') under = movePage();
     else {
       over = S.view === 'receipt' ? receiptDrawer(S.saved) : S.view === 'prelock' ? prelockDrawer() : S.view === 'face' && S.drawer ? resolveDrawer() : '';
-      under = over ? '<div class="mv-under" inert>' + facePage(S.face) + '</div>' : facePage(S.face);
+      under = facePage(S.face, !!over);   // a sheet after the page stacks above it (the skeleton's layers)
     }
     document.getElementById('screen').innerHTML = K.phone(taskScreen() + under + over, { label: s('pp.common.task') });
     PP.apply(document.getElementById('screen'));
@@ -616,6 +616,7 @@
     else if (a === 'pick-row') { var i = S.rows.indexOf(v); if (i >= 0) S.rows.splice(i, 1); else S.rows.push(v); render(); }
     else if (a === 'pair-loss') { S.explains[0] = S.explains[0] === v ? null : v; render(); }   // the worker pairs; the app never does
     else if (a === 'answer') { var p = v.split(':'); S.answers[p[0]] = p[1]; render(); }
+    else if (a === 'clear') { var keep = { view: 'move', face: S.face, fromFace: S.fromFace }; S = Object.assign(JSON.parse(DEFAULT), keep); render(); }   // Clear also drops an explaining link
     // Back from the Move page: to the Moves page it was opened from (the draft kept there), else to the litter it came from.
     else if (a === 'back' && S.view === 'move') {
       if (S.fromFace) { S.view = 'face'; S.kept = draftExists(); render(); }

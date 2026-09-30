@@ -22,9 +22,6 @@
    every piglet. */
 .id-run { min-height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-row-y); }
 .id-run > * { margin: 0; }
-/* A drawer over a page: the page is lifted into its own layer at z 1, under the drawer's scrim (z 2) and sheet (z 3);
-   the skeleton otherwise stacks a page (z 5) over a drawer. */
-.id-layer { position: absolute; inset: 0; z-index: 1; }
 .id-dock { flex: none; padding: var(--space-row-y) var(--space-gutter-sheet); background: var(--paper); border-top: 1px solid var(--line); }
 @media (max-width: 370px) { .id-dock { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
 </style>
@@ -399,7 +396,7 @@
   function runPage() {
     var p = primary();
     var body = '<div class="id-run">' + radio(run.sex) + weightField() + pad() + '</div>';
-    return named(K.page({ title: s('pp.id.run.title'), description: runDesc(), body: body,
+    return named(K.page({ title: s('pp.id.run.title'), description: runDesc(), body: body, inert: !!(drawer || confirm),
       footer: K.footer({ back: { action: 'to-table' }, primary: p ? { label: s(p[0], p[1] || undefined), action: 'record' } : null }) }), 'run');
   }
 
@@ -485,11 +482,9 @@
     var cur = current();
     if (!cur.length) return '';
     var dead = cur.filter(function (r) { return r.dead; }).length;
-    var edit = UI.button({ label: '', register: 'text', action: 'open-edit', value: crate, strs: { label: 'act.edit' } });
-    var h = UI.heading({ title: '', kind: 'section', level: 3, meta: '', action: edit,
-      strs: { title: 'pp.id.sec.rows', meta: dead ? 'pp.id.sec.rows_meta_dead' : 'pp.id.sec.rows_meta' }, args: { meta: { n: cur.length, d: dead } } });
-    // the rows sit in the skeleton's group card; its header is the section heading above (a crate code is not the title here)
-    return '<section class="id-group">' + h + '<div class="tk-group" data-ds="TaskGroup">' + cur.map(tableRow).join('') + '</div></section>';
+    // one card, farrowing's pen card with a word for its title; its header is the door to the litter's identity Edit
+    return K.group({ face: 'word', title: s('pp.id.sec.rows'), meta: s(dead ? 'pp.id.sec.rows_meta_dead' : 'pp.id.sec.rows_meta', { n: cur.length, d: dead }),
+      door: { action: 'open-edit', value: crate }, rows: cur.map(tableRow) });
   }
   // Farrowing's Piglet records page: the facts, what needs a look, the weigh day, the identified piglets; Record identity.
   function tablePage() {
@@ -497,7 +492,7 @@
     var p = draftDirty() ? ['pp.id.act.record_resume', { n: 1 }] : ['pp.id.act.record', null];
     // A closed candidate set takes no records until Edit reopens it: Back alone.
     var primary = keepers && closed ? null : { label: s(p[0], p[1] || undefined), action: 'open-run' };
-    return named(K.page({ title: s('pp.id.table.title'), description: tableDesc(), body: body,
+    return named(K.page({ title: s('pp.id.table.title'), description: tableDesc(), body: body, inert: !!(drawer || confirm),
       footer: K.footer({ back: { action: 'leave' }, primary: primary }) }), 'table');
   }
 
@@ -587,8 +582,9 @@
   function render() {
     var screen = document.getElementById('screen');
     var t = document.createElement('div');
-    // the page in its layer (inert under the weigh drawer or the closing question), then the drawer or the dialog over it
-    t.innerHTML = K.phone(taskScreen() + '<div class="id-layer"' + (drawer || confirm ? ' inert' : '') + '>' + (face === 'run' ? runPage() : tablePage()) + '</div>' +
+    // the page (inert under the weigh drawer or the closing question), then the drawer or the dialog: after a page, the
+    // skeleton stacks them above it
+    t.innerHTML = K.phone(taskScreen() + (face === 'run' ? runPage() : tablePage()) +
       (drawer ? weightDrawer() : '') + (confirm ? confirmDialog() : ''), { label: s('pp.common.task') });
     PP.apply(t);
     morph(screen, (function () { var w = screen.cloneNode(false); while (t.firstChild) w.appendChild(t.firstChild); return w; })());
