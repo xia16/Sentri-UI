@@ -65,7 +65,7 @@ try {
   let rc = await live(page, '#ed-saved', /Correction saved/);
   assert.match(rc, /Correction saved · A02 · alive 11 → 12 · dead 2 → 1/);
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   assert.match(await text(page, '[data-action="open-record"]'), /Alive 12/);
   console.log('ok 1 R1-7 room → A02 → dead → Edit → withdraw the death → Save:', rc);
 
@@ -80,17 +80,17 @@ try {
   await page.click('[data-st-context="drawer"] [data-action="photo-back"]');
   await page.waitForTimeout(400);
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await openEdit(page);
   await page.locator('[data-action="death-to"]').last().click();
-  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.scrim')).zIndex > getComputedStyle(document.querySelector('[data-presentation="page"]')).zIndex), true);   // R1-28: the page sits under the picker's scrim
+  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.ed-over')).zIndex > getComputedStyle(document.querySelector('[data-view="edit"]')).zIndex), true);   // R1-28: Edit sits under the picker's scrim
   await page.click('[data-action="pick"][data-value="A04"]');
   await page.click('[data-action="save"]');
   rc = await live(page, '#ed-saved', /Correction saved/);
   assert.match(rc, /A02 · alive 11 → 12 · dead 2 → 1 .*A04 · alive 11 → 10 · dead 1 → 2/);
   await page.waitForTimeout(400);                                            // Back right after a drawer closes is a ghost tap
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await page.click('[data-action="open-record"]');
   await page.waitForURL(/state=record-page/); await ready(page);
   assert.match(await text(page, '[data-ds="Log"]'), /\+1 crushed moved to A04/);
@@ -122,7 +122,7 @@ try {
   await page.click('[data-action="save"]');
   rc = await live(page, '#ed-saved', /Correction saved/);
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await page.click('[data-action="open-record"]');
   await page.waitForURL(/state=record-page/); await ready(page);
   assert.match(await text(page, '[data-ds="Log"]'), /Castrate 3 → 2 piglets · not castrated: hernia 2, weak 2 · the record of 09:20/);
@@ -155,7 +155,7 @@ try {
   await page.waitForURL(/edit\.html\?.*double=/); await ready(page);
   assert.match(await text(page, '#screen'), /Possible double treatment · Iron · day 3 .*What happened\?/);
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
 
   // 6b. "Same injection, recorded twice" asks which record, withdraws it (kept, stamped).
   await openEdit(page);
@@ -171,7 +171,7 @@ try {
   rc = await live(page, '#ed-saved', /Answer saved/);
   assert.match(rc, /Same injection, recorded twice · 08:40 · L\.M withdrawn, kept · Iron · day 3 counted once · 11 piglets/);
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   console.log('ok 6 R1-29 Same injection → which record → Save:', rc);
 
   // 7. R1-14: a held body reads held; the count it explained reads explained, with a door to the death.
@@ -190,23 +190,25 @@ try {
   await page.goto(base + 'room.html?state=room&data=late&fresh=1'); await ready(page);
   await page.click('.task-return');                                           // the room's Back opens the task overview
   await page.waitForURL(/end\.html/); await ready(page);
-  const ov = await text(page, '[data-st-context="drawer"]');
+  const ov = await text(page, '[data-ds="TaskPage"]');
   assert.match(ov, /Piglet deaths .*4 piglets/);
   await page.click('[data-action="review"]');
-  const rv = await text(page, '[data-st-context="drawer"]');
+  const rv = await text(page, '[data-ds="TaskPage"]');
   assert.match(rv, /Ending now drops 28 scheduled piglet-doses/);
   assert.match(rv, /Open for review .*A05 · possible double · Iron d3/);
-  assert.match(rv, /Today's records, by hand .*L\.M 4 records B03 · Castrate · 1 15:40/);
+  await page.click('[data-action="day"]');                                   // one level down (round 5)
+  assert.match(await text(page, '[data-ds="TaskPage"]'), /Today's records, by hand .*L\.M 4 records B03 · Castrate · 1 15:40/);
+  await page.click('[data-action="close-sheet"]');
   await hold(page, '[data-action="hold"]', 300);                             // released early: not ended
   assert.match(await live(page, '#pp-hold-status', /Keep|Released/), /Keep holding to end|Released · not ended/);
   await hold(page, '[data-action="hold"]');
   await page.waitForFunction(() => /state=receipt/.test(location.search), null, { timeout: 4000 });
-  const receipt = await text(page, '[data-st-context="drawer"]');
+  const receipt = await text(page, '[data-ds="TaskPage"]');
   assert.match(receipt, /Unresolved at End .*A05 · possible double · Iron d3/);
   assert.match(receipt, /Figures as at End\. What happened since is under Since End\./);
   await page.click('[data-action="close-sheet"]');
   assert.match(await text(page, '#screen'), /No new treatments\. Piglets moved in after End keep their doses as not done\./);
-  await page.click('.task-return');
+  await page.click('[data-ds="TaskPage"] [data-action="back"]');
   await page.waitForURL(/room\.html/); await ready(page);
   console.log('ok 8 room → overview → End (review open, day by hand, drops) → hold → receipt → Back → room');
 
@@ -216,16 +218,16 @@ try {
   await page.waitForURL(/end\.html\?.*state=ended/); await ready(page);
   assert.equal(await page.locator('[data-action="review"], [data-action="hold"]').count(), 0);
   await page.goto(base + 'end.html?state=end-review&data=late'); await ready(page);
-  const again = await text(page, '[data-st-context="drawer"]');
+  const again = await text(page, '[data-ds="TaskPage"]');
   assert.match(again, /Already ended by G\.H/);
   assert.equal(await page.locator('[data-action="hold"]').count(), 0);
-  await page.click('[data-st-context="drawer"] [data-action="receipt"]');
-  assert.match(await text(page, '[data-st-context="drawer"]'), /Unresolved at End/);
+  await page.click('[data-ds="TaskPage"] [data-action="receipt"]');
+  assert.match(await text(page, '[data-ds="TaskPage"]'), /Unresolved at End/);
   console.log('ok 9 R1-13 after End: the ended task, no End; a second End names G.H before any hold');
 
   // 10. Round 4: the review End froze stays answerable: receipt row → the double → Given twice → Save → back to the
   //     ended task: Since End says it was answered; the frozen list no longer holds it.
-  await page.click('[data-st-context="drawer"] [data-action="open-review"]');
+  await page.click('[data-ds="TaskPage"] [data-action="open-review"]');
   await page.waitForURL(/state=double/); await ready(page);
   await page.click('[data-action="dbl-answer"][data-value="twice"]');
   await page.click('[data-action="save"]');
@@ -242,21 +244,21 @@ try {
   await page.click('.task-return');                                           // the room's Back opens the task overview
   await page.waitForURL(/end\.html/); await ready(page);
   await page.click('[data-action="review"]');
-  const bl = await text(page, '[data-st-context="drawer"]');
+  const bl = await text(page, '[data-ds="TaskPage"]');
   assert.match(bl, /End it in the Farrowing task on the Tasks list/);
   assert.match(bl, /litters with work left .* not yet due/);
   await page.click('[data-action="open-litter"][data-value="D01"]');
-  await page.waitForURL(/litter\.html\?.*crate=D01/); await ready(page);
+  await page.waitForURL(/state=litter&crate=D01/); await ready(page);
   console.log('ok 11 R1-30 End blocked → D01 litter');
 
   // 12. The handoff: rows open their litter; weights say their day; not-reached doses are "not given in this task".
   await page.goto(base + 'end.html?state=weaning-handoff'); await ready(page);
-  const ho = await text(page, '[data-st-context="drawer"]');
+  const ho = await text(page, '[data-ds="TaskPage"]');
   assert.match(ho, /day-21 weight 66\.0 kg/);
   assert.match(ho, /Health shot · 28 not given in this task/);
   assert.match(ho, /Castrate · 4 not done at End/);
-  await page.click('[data-st-context="drawer"] [data-action="open-litter"][data-value="A02"]');
-  await page.waitForURL(/litter\.html\?.*crate=A02/); await ready(page);
+  await page.click('[data-ds="TaskPage"] [data-action="open-litter"][data-value="A02"]');
+  await page.waitForURL(/state=litter&crate=A02/); await ready(page);
   console.log('ok 12 handoff wording, weights by day, rows open their litter');
 
   await browser.close();

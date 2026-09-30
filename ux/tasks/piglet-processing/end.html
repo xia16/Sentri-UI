@@ -6,47 +6,36 @@
 <title>Piglet processing · End task</title>
 <link rel="stylesheet" href="/ux/design-system/tokens.css">
 <link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="/ux/design-system/components/task-skeleton.css">
 <link rel="stylesheet" href="shell.css">
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* End task, the ended task and the handoff to weaning: layout only, from tokens.css.
-   Candidate:LitterRow is the shell's (shell-ui.js). Cards (ADR 0002): Button's hold (holdButton + holdBind) with its
-   progress line (buttonReason) above the bar, Button registers, the danger Banner, Status lines. */
-#screen { display: flex; flex-direction: column; gap: var(--space-section); }
-.pp-head { display: flex; align-items: flex-start; gap: var(--space-footer-gap); }
-.pp-head > .pp-title { flex: 1; min-width: 0; }
-.pp-head .st-heading { margin: 0; }
-.pp-head .pp-title > .st-heading + .st-heading { margin-top: 4px; }
-.pp-block > .st-heading { margin-bottom: 8px; }
-.pp-locked { position: relative; height: 100vh; overflow: hidden; }
-.pp-layer .scrim { inset: 0; }
-/* Overview and End share farrowing's tallest drawer: 32px of the phone stays above it; title and footer stay put, the body scrolls. */
-.pp-layer .sheet { height: calc(100% - 32px); max-height: calc(100% - 32px); }
-.pp-layer .sheet-body { flex: 1; display: flex; flex-direction: column; gap: var(--space-section); padding-bottom: var(--space-panel); }
-.pp-layer .sheet-body > * { flex: none; }
-.pp-layer .utility-header { padding: var(--space-gutter) var(--space-gutter) 8px; }
-.pp-layer .utility-header .st-heading { margin: 0; }
-.pp-layer .sheet-footer { flex-wrap: wrap; column-gap: var(--space-section); row-gap: var(--space-row-y); }
-.pp-layer .sheet-footer .button { flex: 1; }
-.pp-layer .sheet-footer .button.secondary { flex: none; min-width: var(--back-width); }
-.pp-layer .sheet-footer .button.secondary:only-child { flex: 1; }
-.pp-layer .sheet-footer .st-button-reason:empty { display: none; }
-.pp-layer .sheet-body > .st-banner { margin: 0; }
-
-/* Candidate:LitterRow lives in shell.css (shared with the room). */
+/* End task, the ended task and the handoff to weaning: layout only, from tokens.css. Built on the task skeleton (ADR 0003,
+   SentriTask): every surface is a TaskPage over the room, as farrowing's Task overview and End task early; litters are
+   TaskRows in TaskGroups by crate row. Cards (ADR 0002): Button's hold (holdButton + holdBind) with its status line
+   (buttonReason) right above the footer, the danger Banner, Facts, Row doors, Status lines, Log. */
+.en-body { --tk-sticky: 0px; display: flex; flex-direction: column; gap: var(--space-section); }
+.en-body > * { margin: 0; }
+.en-block > .st-heading { margin: 0 0 var(--space-key-gap); }
+.en-groups { display: flex; flex-direction: column; gap: var(--space-heading); }
+/* the whole-task progress card: the bar under its heading, the three counts under the bar (Facts, flat in the card) */
+.en-progress > .tk-progress { margin: var(--space-heading) 0 0; }
+.en-progress > .st-facts.st-facts.st-facts { margin: var(--space-heading) 0 0; padding: 0; border: 0; border-radius: 0; background: none; }
+/* the hold's status line, right above the footer (Button · buttonReason); absent while it has nothing to say */
+.en-why { flex: none; padding: var(--space-key-gap) var(--space-gutter) 0; background: var(--app-background); }
+.en-why:has(> .st-button-reason:empty) { display: none; }
 </style>
 </head>
-<body>
-<main class="phone inspection-phone" data-st-context="page" id="phone">
-  <div id="screen"></div>
-</main>
+<body class="tk-stage">
+<div id="screen"></div>
 <script src="/ux/design-system/components/bundle.js"></script>
+<script src="/ux/design-system/components/task-skeleton.js"></script>
 <script src="shell.js"></script>
 <script src="shell-ui.js"></script>
 <script>
 (function () {
-  var UI = window.SentriUI, I = window.SentriIcons.icon, U = window.PPUI;
+  var UI = window.SentriUI, I = window.SentriIcons.icon, U = window.PPUI, K = window.SentriTask;
   var qs = PP.q;
 
   /* ---- states: a variant of the shared fixture + UI state. The figures are the ledger's End selector (select.end: `now`
@@ -72,7 +61,11 @@
     'ended': { data: 'ended', ended: true },
     'ended-correct': { data: 'ended-correct', ended: true },
     'ended-moves': { data: 'ended-moves', ended: true },
-    'weaning-handoff': { data: 'ended', ended: true, sheet: 'handoff' }
+    'weaning-handoff': { data: 'ended', ended: true, sheet: 'handoff' },
+    // one level down (round 5): the unfinished litters and today's records by hand, from the review; not done at End
+    'end-litters': { data: 'late', sheet: 'litters' },
+    'end-day': { data: 'late', sheet: 'day' },
+    'ended-litters': { data: 'ended', ended: true, sheet: 'litters' }
   };
   var ALIAS = { 'late-after': 'ended-after' };            // ?data= names the pages used before the shared fixture
   var start = STATES[PP.state] || STATES.overview;
@@ -213,47 +206,9 @@
 
   /* ---- tokens: [wordId, args, valueId?, tone?] — the word stays ink, the value carries the colour ---- */
   var T = U.tok;
-  function dayTok(l) { return T('pp.common.unit.day', { n: l.day }); }
-  function pigTok(n) { return T(one('pp.common.unit.piglet', n), { n: n }); }
-  function lateTok(n) { return T('pp.end.tok.overdue', { n: n }, one('pp.end.tok.days', n), 'red'); }
-  function windowTok(n) { return T('pp.end.tok.window', { n: n }, 'pp.end.tok.window.v', 'amber'); }
   function lossTok(n) { return T('pp.end.tok.loss', { n: n }, 'pp.end.tok.n', 'red'); }
-  function row(l, l1, toks, opts) {
-    opts = opts || {};
-    return U.litterRow({ code: l.code, l1: l1, toks: toks, static: opts.static, chip: l.sowDied ? ['red', 'sowdied'] : l.unlocked && !S.ended ? ['amber', 'unlocked'] : null });
-  }
   function rows(html) { return UI.rowGroup(html); }
 
-  // Overview row: what the litter owes now, then its piglet-doses done · owed · missed · not yet due; an identity gap is a token.
-  function overviewRow(l) {
-    var owedNames = l.list.filter(function (e) { return e.kind !== 'not_due'; }).map(function (e) { return name(e.dose); });
-    var l1 = owedNames.length ? [T('pp.room.l1.owes', { doses: owedNames.join(' · ') })] : l.ahead ? [T('pp.end.l1.nothing')] : [T('pp.room.l1.finished')];
-    var toks = [dayTok(l), T('pp.end.tok.done', { n: l.done }, 'pp.end.tok.n')];
-    if (l.owed) toks.push(T('pp.end.tok.owed', { n: l.owed }, 'pp.end.tok.n', l.late ? 'red' : ''));
-    if (l.missed) toks.push(T('pp.end.tok.missed', { n: l.missed }, 'pp.end.tok.n', 'amber'));
-    if (l.ahead) toks.push(T('pp.end.tok.ahead', { n: l.ahead }, 'pp.end.tok.n'));
-    if (l.unid) toks.push(T('pp.end.tok.unid', { n: l.unid }));
-    if (l.loss) toks.push(lossTok(l.loss));
-    return row(l, l1, toks);
-  }
-  // Review and receipt row: what End leaves (or left) not done, in numbers. Doses not yet due fold into one item from two.
-  function entryWord(e, word) { return e.males === 'uncounted' ? T('pp.end.u.males', { name: name(e.dose) }) : T(word, { name: name(e.dose), n: e.n }); }
-  function unfinishedParts(l) {
-    var l1 = [], toks = [dayTok(l)], late = -1, win = null, today = false;
-    var ahead = l.list.filter(function (e) { return e.kind === 'not_due'; });
-    l.list.forEach(function (e) {
-      var d = doseCfg(e.dose);
-      if (e.kind === 'missed') { l1.push(entryWord(e, 'pp.end.u.missed')); if (win == null) win = d.last; }
-      else if (e.kind === 'owed') { l1.push(entryWord(e, 'pp.end.u.owed')); if (l.day > d.due) late = Math.max(late, l.day - d.due); else today = true; }
-    });
-    if (ahead.length === 1) l1.push(entryWord(ahead[0], 'pp.end.u.ahead'));
-    else if (ahead.length) l1.push(T('pp.end.u.ahead_many', { n: sum(ahead, function (e) { return e.n; }) }));
-    if (!l.idDone) l1.push(T('pp.end.u.unid', { n: l.alive - l.identified }));
-    if (late > 0) toks.push(lateTok(late)); else if (today) toks.push(T('pp.room.tok.due_today'));
-    if (win != null) toks.push(windowTok(win));
-    if (ahead.length) toks.push(T('pp.end.tok.dueday', { n: doseCfg(ahead[0].dose).due }));
-    return { l1: l1, toks: toks };
-  }
   // Post-End facts about one litter, as tokens (the ended face and the handoff; never the receipt's frozen rows).
   function postToks(l, where) {
     var out = [];
@@ -277,48 +232,8 @@
     postOf(l.code, 'in').forEach(function (e) { e.owes.forEach(function (k) { by[k] = (by[k] || 0) + e.n; }); });
     return Object.keys(by).map(function (k) { return { k: k, n: by[k] }; });
   }
-  // The ended face: the same items, final — not done, frozen at End, except piglets that left the task.
-  function endedRow(l) {
-    var l1 = [], why = {}, now = litter(l.code, false);
-    l.list.forEach(function (e) {
-      l1.push(T('pp.end.u.notdone', { name: name(e.dose), n: notDone(l, e) }));
-      if (e.kind === 'missed') why.w = doseCfg(e.dose).last; else if (e.kind === 'not_due') why.a = 1; else why.o = 1;
-    });
-    arrivalsNotDone(l).forEach(function (a) { l1.push(T('pp.end.u.notdone', { name: name(a.k), n: a.n })); });
-    if (!now.idDone) l1.push(T('pp.end.u.unid', { n: now.alive - now.identified }));
-    if (!l1.length) l1 = [T('pp.room.l1.finished')];
-    var toks = [dayTok(now), pigTok(now.alive)];
-    if (why.o) toks.push(T('pp.end.tok.owed_end'));
-    if (why.w != null) toks.push(windowTok(why.w));
-    if (why.a) toks.push(T('pp.end.tok.notdue_end'));
-    postOf(l.code, 'in').forEach(function (e) { toks.push(T('pp.end.tok.in_after', { n: e.n })); });
-    toks = toks.concat(postToks(l, 'face'));
-    if (now.loss) toks.push(lossTok(now.loss));
-    return row(now, l1, toks);
-  }
-
   /* ---- shared blocks ---- */
   function pd(n) { return one('pp.end.v.pd', n); }
-  function progressBlock(t) {
-    return '<div class="pp-block">' + h({ strs: { title: 'pp.end.ov.progress', meta: 'pp.end.ov.progress.meta' }, args: { meta: { n: t.total } } }) +
-      UI.facts([
-        { label: '', strs: { label: 'pp.end.f.done', value: pd(t.done) }, args: { value: { n: t.done } } },
-        { label: '', strs: { label: 'pp.end.f.owed', value: pd(t.owed), meta: t.missed ? 'pp.end.f.missed' : undefined }, args: { value: { n: t.owed }, meta: { n: t.missed } } },
-        { label: '', strs: { label: 'pp.end.f.ahead', value: pd(t.ahead) }, args: { value: { n: t.ahead } } },
-        { label: '', strs: { label: 'pp.end.f.identity', value: 'pp.end.v.litters_of' }, args: { value: { n: t.idDone, k: t.litters } } }
-      ], { columns: 2 }) + '</div>';
-  }
-  function ontimeBlock(t, atEnd) {
-    return '<div class="pp-block">' + h({ strs: { title: 'pp.end.ot.title', description: atEnd ? 'pp.end.ot.rule.end' : 'pp.end.ot.rule' } }) +
-      UI.facts([
-        { label: '', strs: { label: 'pp.end.ot.label', value: 'pp.end.ot.pct', meta: atEnd ? 'pp.end.ot.of.end' : 'pp.end.ot.of' }, args: { value: { n: t.pct }, meta: { n: t.ontime, k: t.due } } },
-        { label: '', strs: { label: 'pp.end.ot.late', value: one('pp.end.v.treatments', t.due - t.ontime), meta: t.excluded ? (atEnd ? 'pp.end.ot.excluded' : 'pp.end.ot.excluded.now') : undefined }, args: { value: { n: t.due - t.ontime }, meta: { n: t.excluded } } }
-      ], { columns: 2 }) + '</div>';
-  }
-  function outcomeRow(titleId, n, trailId, codes) {
-    return UI.row({ title: '', description: '', trailing: '', strs: Object.assign({ title: titleId, trailing: trailId }, codes ? { description: 'pp.end.codes' } : {}),
-      args: { trailing: { n: n }, description: codes ? { list: codes } : undefined } });
-  }
   /* Deaths recorded in processing (a body that explained a missing piglet included, R1-21), Moves inside the task, open
      unexplained items and sow deaths — now, or frozen at End (the ledger replayed to End) on the receipt. */
   function outcomes(toEnd) {
@@ -333,29 +248,6 @@
       if (x.sowDied) sows.push(id);
     });
     return { deaths: deaths, moves: moves.map(function (s) { var p = s.split('|'); return { n: +p[0], from: p[1], to: p[2] }; }), loss: loss, lossC: lossC, gain: gain, sows: sows };
-  }
-  function outcomesBlock(toEnd) {
-    var o = outcomes(toEnd), moved = sum(o.moves, function (m) { return m.n; });
-    return '<div class="pp-block">' + h({ strs: { title: 'pp.end.out.title' } }) + rows(
-      outcomeRow('pp.end.out.deaths', o.deaths.length, one('pp.common.unit.piglet', o.deaths.length), o.deaths.filter(function (c, i, a) { return a.indexOf(c) === i; }).join(' ')) +
-      outcomeRow('pp.end.out.moved', moved, one('pp.common.unit.piglet', moved), o.moves.map(function (m) { return PP.t('pp.end.out.move', { from: m.from, to: m.to }); }).join(' ')) +
-      outcomeRow('pp.end.out.loss', o.loss, o.loss ? 'pp.end.out.open' : one('pp.common.unit.piglet', 0), o.lossC.join(' ')) +
-      outcomeRow('pp.end.out.gain', o.gain, o.gain ? 'pp.end.out.open' : one('pp.common.unit.piglet', 0), '') +
-      outcomeRow('pp.end.out.sow', o.sows.length, one('pp.end.v.sows', o.sows.length), o.sows.join(' '))
-    ) + '</div>';
-  }
-  function notDoneFacts(t) {
-    return UI.facts([
-      { label: '', strs: { label: 'pp.end.f.work', value: one('pp.end.v.litters', t.work) }, args: { value: { n: t.work } } },
-      { label: '', strs: { label: 'pp.end.f.onlyahead', value: one('pp.end.v.litters', t.unf.length - t.work) }, args: { value: { n: t.unf.length - t.work } } },
-      { label: '', strs: { label: 'pp.end.f.owed', value: pd(t.owed), meta: t.missed ? 'pp.end.f.missed' : undefined }, args: { value: { n: t.owed }, meta: { n: t.missed } } },
-      { label: '', strs: { label: 'pp.end.f.ahead', value: pd(t.ahead) }, args: { value: { n: t.ahead } } }
-    ], { columns: 2 });
-  }
-  function unfinishedBlock(t, isStatic) {
-    if (!t.unf.length) return '';
-    return '<div class="pp-block">' + h({ strs: { title: isStatic ? 'pp.end.nd.title' : 'pp.end.rv.list', meta: one('pp.end.v.litters', t.unf.length) }, args: { meta: { n: t.unf.length } } }) +
-      rows(t.unf.map(function (l) { var p = unfinishedParts(l); return row(l, p.l1, p.toks, { static: isStatic }); }).join('')) + '</div>';
   }
   /* Review items (round 4): End never waits for them. Before End they are listed open; End freezes them as "unresolved at
      End" on the receipt and the handoff; each stays answerable after, as a correction (the row opens its answer). */
@@ -375,46 +267,8 @@
     var t = reviewTitle(r), d = reviewDesc(r);
     return UI.row({ title: '', description: '', action: 'open-review', value: r.id, strs: { title: t[0], description: d[0] }, args: { title: t[1], description: d[1] } });
   }
-  function reviewsBlock(list, frozenAtEnd) {
-    if (!list.length) return '';
-    return '<div class="pp-block">' + h({ strs: { title: frozenAtEnd ? 'pp.end.rev.frozen' : 'pp.end.rev.open', description: frozenAtEnd ? 'pp.end.rev.frozen.desc' : 'pp.end.rev.open.desc', meta: one('pp.end.v.items', list.length) }, args: { meta: { n: list.length } } }) +
-      rows(list.map(reviewRow).join('')) + '</div>';
-  }
   // The receipt's review list: the items End froze; answered since, they move to Since End.
   function frozenReviews() { var R = store.select.reviews(D()), open = {}; R.items.forEach(function (x) { open[x.id] = 1; }); return (fig(true).reviews || []).filter(function (r) { return open[r.id]; }); }
-  /* N5: the day's records by hand, so a mark on the wrong litter is findable before End: each opens its litter's record. */
-  function dayBlock() {
-    var today = store.today, by = {}, order = [];
-    store.events.forEach(function (e) {
-      if (String(e.at).slice(0, 10) !== today || rejected(e.id) || ['treat', 'death', 'count', 'move'].indexOf(e.type) < 0) return;
-      var code = e.litter || e.from; if (!inTask(code) && !inTask(e.to)) return;
-      if (!by[e.who]) { by[e.who] = []; order.push(e.who); }
-      by[e.who].push(e);
-    });
-    if (!order.length) return '';
-    var words = function (e) {
-      if (e.type === 'treat') return ['pp.end.day.treat', { code: e.litter, name: name(e.dose), n: amount(e) }];
-      if (e.type === 'death') return ['pp.end.day.death', { code: e.litter, n: lineCount(e) }];
-      if (e.type === 'count') return ['pp.end.day.count', { code: e.litter, n: e.observed }];
-      return ['pp.end.day.move', { n: e.n, from: e.from, to: e.to }];
-    };
-    return '<div class="pp-block">' + h({ strs: { title: 'pp.end.day.title', description: 'pp.end.day.desc' } }) + order.map(function (who) {
-      var list = by[who].slice().sort(function (a, b) { return a.at < b.at ? 1 : -1; });
-      return '<div class="pp-block">' + h({ kind: 'group', strs: { title: 'pp.end.day.who', meta: one('pp.end.day.n', list.length) }, args: { title: { who: who }, meta: { n: list.length } } }) +
-        rows(list.map(function (e) { var w = words(e); return UI.row({ title: '', description: '', action: 'open-record', value: e.litter || e.from, strs: { title: w[0], description: 'pp.end.day.at' }, args: { title: w[1], description: { t: time(e.at) } } }); }).join('')) + '</div>';
-    }).join('') + '</div>';
-  }
-
-  /* ---- the page behind the drawers, and the ended face ---- */
-  function header(titleId, titleArgs, descId, descArgs, back, groupId, groupArgs) {
-    return '<header class="task-header pp-head">' +
-      (back ? UI.iconButton({ action: 'back', icon: I('back'), label: 'Back', className: 'task-return' }) : '') +
-      '<div class="pp-title">' +
-      h({ kind: 'group', level: 3, strs: { title: groupId || 'pp.common.task' }, args: { title: groupArgs } }) +
-      h({ kind: 'page', level: 2, strs: { title: titleId, description: descId }, args: { title: titleArgs, description: descArgs } }) +
-      '</div></header>';
-  }
-  function backdrop() { return header('pp.room.unit', { n: UNIT }, '', null, false); }
   function sinceEntries() {
     return post().slice().sort(function (a, b) { return a.at < b.at ? 1 : a.at > b.at ? -1 : 0; }).map(function (e) {
       var m = { meta: 'pp.end.stamp' }, a = { meta: stamp(e.at, e.who) };
@@ -437,106 +291,255 @@
     if (!ev.length) return '';
     return '<div class="pp-block">' + UI.log([bare ? { entries: ev } : { label: '', strs: { label: 'pp.end.since.title' }, entries: ev }]) + '</div>';
   }
+  function groupsOf(html) { return '<div class="en-groups">' + html + '</div>'; }
+
+  /* ---- the skeleton's text slots and parts (SentriTask): a registered string as { text, str, args, tone } ---- */
+  function P(id, args, tone) { return { text: PP.t(id, args), str: id, args: args || undefined, tone: tone || undefined }; }
+  // A shell token [word, args, value?, tone?, after?, tight?] as skeleton parts (the value carries the colour).
+  function tparts(list) {
+    var out = [];
+    list.forEach(function (t, i) {
+      if (i) out.push({ sep: true });
+      var sp = t[5] ? '' : ' ';
+      if (t[2]) { if (t[0]) out.push(P(t[0], t[1]), sp); out.push(P(t[2], t[1], t[3])); if (t[4]) out.push(sp, P(t[4], t[1])); }
+      else out.push(P(t[0], t[1], t[3]));
+    });
+    return out;
+  }
+  function chipOf(l) { return l.sowDied ? { text: PP.t('pp.end.chip.sowdied'), str: 'pp.end.chip.sowdied', tone: 'red' } : l.unlocked && !S.ended ? { text: PP.t('pp.end.chip.farrowing'), str: 'pp.end.chip.farrowing', tone: 'amber' } : null; }
+  // A litter as farrowing's sow row: id + one chip, one headline, one meta line; it opens the litter drawer.
+  function litterRow(l, headline, meta, tone) {
+    return K.row({ id: P('pp.end.code', { code: l.code }), chip: chipOf(l), headline: headline, tone: tone, meta: meta, action: 'open-litter', value: l.code });
+  }
+  // Litters grouped by crate row, as the room groups them (TaskGroup).
+  function byRow(ls, rowFn) {
+    var g = {}, order = [];
+    ls.forEach(function (l) { var r = l.code.charAt(0); if (!g[r]) { g[r] = []; order.push(r); } g[r].push(l); });
+    return order.sort().map(function (r) {
+      return K.group({ title: P('pp.end.row', { r: r }), meta: P(one('pp.end.row.meta', g[r].length), { n: g[r].length }), rows: g[r].map(rowFn) });
+    }).join('');
+  }
+  // A door row (Row card): one title, one description line.
+  function door(action, titleId, titleArgs, descId, descArgs, value) {
+    return UI.row({ title: '', description: descId ? '' : undefined, action: action, value: value || '', strs: Object.assign({ title: titleId }, descId ? { description: descId } : {}), args: { title: titleArgs, description: descArgs } });
+  }
+  function doors(list) { return UI.rowGroup(list.join('')); }
+  function sec(o) { return h(Object.assign({ kind: 'section', level: 3 }, o)); }
+
+  /* ---- farrowing's task-overview parts: the whole-task progress card, the metrics ---- */
+  function progressCard(t) {
+    var share = function (n) { return t.total ? n / t.total * 100 : 0; };
+    var seg = [['done', t.done], ['active', t.owed], ['rest', t.ahead]].map(function (x) { return '<i data-tone="' + x[0] + '" style="width:' + share(x[1]) + '%"></i>'; }).join('');
+    var bar = '<span class="tk-progress" role="progressbar" aria-valuemin="0" aria-valuemax="' + t.total + '" aria-valuenow="' + t.done + '" data-str-attr="aria-label:pp.end.ov.bar" data-args=\'' + esc(JSON.stringify({ d: t.done, n: t.total })) + '\' aria-label="' + esc(PP.t('pp.end.ov.bar', { d: t.done, n: t.total })) + '">' + seg + '</span>';
+    return UI.panel(h({ kind: 'panel', strs: { title: 'pp.end.ov.progress', meta: 'pp.end.ov.progress.meta' }, args: { meta: { n: t.total } } }) + bar +
+      UI.facts([
+        { label: '', strs: { label: 'pp.end.f.done', value: 'pp.end.tok.n' }, args: { value: { n: t.done } } },
+        { label: '', strs: { label: 'pp.end.f.owed', value: 'pp.end.tok.n' }, args: { value: { n: t.owed } } },
+        { label: '', strs: { label: 'pp.end.f.ahead', value: 'pp.end.tok.n' }, args: { value: { n: t.ahead } } }
+      ], { columns: 3, className: 'en-counts' }), { className: 'en-progress' });
+  }
+  // Choose a crate row: each row of crates with its figures, a door to the room (farrowing: Choose a unit).
+  function cratesCard(ls) {
+    var g = {}, order = [];
+    ls.forEach(function (l) { var r = l.code.charAt(0); if (!g[r]) { g[r] = { done: 0, owed: 0, ahead: 0, n: 0, late: false }; order.push(r); } var x = g[r]; x.done += l.done; x.owed += l.owed; x.ahead += l.ahead; x.n++; x.late = x.late || l.late; });
+    var rows = order.sort().map(function (r) {
+      var x = g[r];
+      return K.row({ id: P('pp.end.row', { r: r }), headline: [P('pp.end.ov.h.done', { n: x.done }), { sep: true }, P('pp.end.ov.h.owed', { n: x.owed }, x.late ? 'red' : '')],
+        meta: [P(one('pp.end.v.litters', x.n), { n: x.n }), { sep: true }, P('pp.end.ov.h.ahead', { n: x.ahead })], action: 'open-room', value: r });
+    });
+    return sec({ icon: I('grid'), strs: { title: 'pp.end.ov.rows' } }) + K.group({ title: P('pp.end.unit', { n: UNIT }), meta: P(one('pp.end.row.meta', ls.length), { n: ls.length }), rows: rows });
+  }
+  // Performance metrics: on time and identity, then what happened to piglets and sows (now, or frozen at End).
+  function metrics(t, atEnd) {
+    var o = outcomes(atEnd && S.ended), moved = sum(o.moves, function (m) { return m.n; });
+    return sec({ icon: I('chart'), strs: { title: 'pp.end.pm.title', meta: atEnd ? 'pp.end.pm.meta.end' : 'pp.end.pm.meta' }, args: { meta: { n: t.ontime, k: t.due } } }) +
+      UI.facts([
+        { label: '', strs: { label: 'pp.end.ot.label', value: 'pp.end.ot.pct', meta: 'pp.end.ot.late.m' }, args: { value: { n: t.pct }, meta: { n: t.due - t.ontime } } },
+        { label: '', strs: { label: 'pp.end.f.identity', value: 'pp.end.v.litters_of' }, args: { value: { n: t.idDone, k: t.litters } } },
+        { label: '', strs: { label: 'pp.end.out.deaths', value: one('pp.common.unit.piglet', o.deaths.length) }, args: { value: { n: o.deaths.length } } },
+        { label: '', strs: { label: 'pp.end.out.moved', value: one('pp.common.unit.piglet', moved) }, args: { value: { n: moved } } },
+        { label: '', strs: { label: 'pp.end.out.loss', value: one('pp.common.unit.piglet', o.loss) }, args: { value: { n: o.loss } } },
+        { label: '', strs: { label: 'pp.end.out.sow', value: one('pp.end.v.sows', o.sows.length) }, args: { value: { n: o.sows.length } } }
+      ], { columns: 2 });
+  }
+  function reviewsBlock(list, frozenAtEnd) {
+    if (!list.length) return '';
+    return '<div class="en-block">' + sec({ strs: { title: frozenAtEnd ? 'pp.end.rev.frozen' : 'pp.end.rev.open', meta: one('pp.end.v.items', list.length) }, args: { meta: { n: list.length } } }) +
+      rows(list.map(reviewRow).join('')) + '</div>';
+  }
   // Already ended (a second End, or the overview after End): who ended it and when, before any hold (R1-13).
   function alreadyBlock(al) {
-    return UI.panel(h({ strs: { title: 'pp.end.rv.already', description: 'pp.end.rv.already.why' }, args: { title: { who: al.who, date: date(al.at), time: time(al.at) } } })) +
-      rows(UI.row({ title: '', action: S.ended ? 'receipt' : 'already-receipt', strs: { title: 'pp.end.ended.receipt', description: 'pp.end.stamp' }, args: { description: stamp(al.at, al.who) } }));
-  }
-  function endedFace() {
-    var ls = litters(true), unf = ls.filter(function (l) { return l.unfinished; }), fin = ls.filter(function (l) { return !l.unfinished; }), en = ended();
-    return header('pp.end.rc.title', {}, 'pp.end.ended.stamp', stamp(en.at, en.who), true, 'pp.end.scope.short', { n: UNIT }) +
-      UI.panel(h({ strs: { title: 'pp.end.ended.head', description: 'pp.end.ended.desc' } })) +
-      rows(UI.row({ title: '', action: 'receipt', strs: { title: 'pp.end.ended.receipt', description: one('pp.end.ended.receipt.desc', unf.length) }, args: { description: { n: unf.length } } }) +
-        UI.row({ title: '', action: 'handoff', strs: { title: 'pp.end.w.title', description: 'pp.end.w.row' }, args: { description: { n: totals(false).alive } } })) +
-      reviewsBlock(frozenReviews(), true) + sinceLog() +
-      (unf.length ? '<div class="pp-block">' + h({ strs: { title: 'pp.end.nd.title', description: 'pp.end.nd.frozen', meta: one('pp.end.v.litters', unf.length) }, args: { meta: { n: unf.length } } }) + rows(unf.map(endedRow).join('')) + '</div>' : '') +
-      (fin.length ? '<div class="pp-block">' + h({ strs: { title: 'pp.end.fin.title', meta: one('pp.end.v.litters', fin.length) }, args: { meta: { n: fin.length } } }) + rows(fin.map(endedRow).join('')) + '</div>' : '');
+    return doors([door(S.ended ? 'receipt' : 'already-receipt', 'pp.end.rv.already', { who: al.who, date: date(al.at), time: time(al.at) }, 'pp.end.ended.receipt')]);
   }
 
-  /* ---- drawers ---- */
-  function sheetFrame(titleId, titleArgs, descId, descArgs, body, footer) {
-    return '<div class="pp-layer" data-ds="Sheet"><div class="scrim" data-action="scrim"></div>' +
-      '<section class="sheet" data-st-context="drawer" data-size="long" role="dialog">' +
-      '<header class="utility-header">' + h({ kind: 'page', level: 3, strs: { title: titleId, description: descId }, args: { title: titleArgs, description: descArgs } }) + '</header>' +
-      '<div class="sheet-body">' + body + '</div>' + footer + '</section></div>';
+  /* ---- litters, one level down (the review's and the ended task's door) ---- */
+  // Before End: what each unfinished litter owes now — the doses by name, then the day and the figures.
+  function unfinishedRow(l) {
+    var names = l.list.filter(function (e) { return e.kind !== 'not_due'; }).map(function (e) { return P(e.kind === 'missed' ? 'pp.end.lit.missed' : 'pp.end.lit.owed', { name: name(e.dose) }, e.kind === 'missed' ? 'amber' : ''); });
+    var head = [], tone = '';
+    names.forEach(function (x, i) { if (i) head.push({ sep: true }); head.push(x); });
+    if (!head.length) { head = [P(l.idDone ? 'pp.end.f.onlyahead' : 'pp.end.u.unid', { n: l.alive - l.identified })]; tone = l.idDone ? 'forecast' : ''; }
+    var meta = [P('pp.common.unit.day', { n: l.day })];
+    if (l.owed) meta.push({ sep: true }, P('pp.end.ov.h.owed', { n: l.owed }, l.late ? 'red' : ''));
+    if (l.ahead) meta.push({ sep: true }, P('pp.end.ov.h.ahead', { n: l.ahead }));
+    return litterRow(l, head, meta, tone);
   }
-  function btn(register, action, id) { return UI.button({ label: PP.t(id), register: register, action: action, strs: { label: id } }); }
-  function overviewSheet() {
-    var t = totals(false), out = outside(), en = ended();
-    var lit = '<div class="pp-block">' + h({ strs: { title: 'pp.end.lit.title', description: out.length ? one('pp.end.lit.desc.outside', out.length) : 'pp.end.lit.desc' }, args: { description: { code: out.join(' ') } } }) +
-      rows(litters(false).map(overviewRow).join('')) + '</div>';
-    // After End the overview never offers End again: it says who ended it and opens the receipt (R1-13)
-    return sheetFrame('pp.end.ov.title', {}, 'pp.end.scope', { n: UNIT, k: t.litters },
-      (en ? alreadyBlock(en) : '') + progressBlock(t) + ontimeBlock(t, false) + lit + outcomesBlock(false),
-      '<footer class="sheet-footer">' + btn('secondary', 'back', 'act.back') + (en ? '' : btn('end-early', 'review', 'pp.end.act.end')) + '</footer>');
+  // After End: not done, frozen at End, except piglets that left the task; what happened since, as one token each.
+  function endedRow(l) {
+    var head = [], now = litter(l.code, false), toks = [T('pp.common.unit.day', { n: now.day })];
+    var add = function (id, args) { if (head.length) head.push({ sep: true }); head.push(P(id, args)); };
+    l.list.forEach(function (e) { add('pp.end.u.notdone', { name: name(e.dose), n: notDone(l, e) }); });
+    arrivalsNotDone(l).forEach(function (a) { add('pp.end.u.notdone', { name: name(a.k), n: a.n }); });
+    if (!now.idDone) add('pp.end.u.unid', { n: now.alive - now.identified });
+    if (!head.length) add('pp.end.lit.finished');
+    postOf(l.code, 'in').forEach(function (e) { toks.push(T('pp.end.tok.in_after', { n: e.n })); });
+    toks = toks.concat(postToks(l, 'face'));
+    if (now.loss) toks.push(lossTok(now.loss));
+    return litterRow(now, head, tparts(toks));
   }
-  function reviewSheet() {
-    var t = totals(false), why = blocked(), body = '', units = String(UNIT), active = farrowingNow();
+  function endedLitters() { return litters(true).filter(function (l) { return l.unfinished || arrivalsNotDone(l).length; }); }
+
+  /* ---- the pages (TaskPage): each a full page over the room, head, body, footer ---- */
+  function behind() { return K.screen({ inert: true, header: K.header({ title: P('pp.common.task'), back: { action: 'noop' } }) }); }
+  function page(titleId, titleArgs, descId, descArgs, body, footer) {
+    return K.page({ title: P(titleId, titleArgs), description: descId ? P(descId, descArgs) : '', body: '<div class="en-body">' + body + '</div>', footer: footer });
+  }
+  function backOnly(action) { return K.footer({ back: { action: action || 'close-sheet' } }); }
+  function holdLine() { return '<div class="en-why">' + UI.buttonReason({ id: 'pp-hold-status' }) + '</div>'; }
+
+  // farrowing's Task overview: progress card, choose a crate row, performance metrics; Back + End task.
+  function overviewPage() {
+    var t = totals(false), en = ended(), ls = litters(false);
+    var body = (en ? alreadyBlock(en) : '') + progressCard(t) + '<div class="en-block">' + cratesCard(ls) + '</div>' + '<div class="en-block">' + metrics(t, false) + '</div>';
+    var foot = en ? backOnly('back') : K.footer({ back: { action: 'back' }, primary: UI.button({ label: PP.t('pp.end.act.end'), register: 'end-early', action: 'review', strs: { label: 'pp.end.act.end' } }) });
+    return page('pp.end.ov.title', null, 'pp.end.scope.short', { n: UNIT }, body, foot);
+  }
+  // farrowing's End task early: one warning (what ending drops), the door to the unfinished litters, what is open for
+  // review, today's records by hand (a door), the metrics; Back + the hold.
+  function reviewPage() {
+    var t = totals(false), why = blocked(), body = '', units = String(UNIT), active = farrowingNow(), foot;
     var al = ended() || (S.already ? window.PPFixtures.open('ended-by-other', { session: false }).derived.ended : null);
     if (al) {
-      // A second End finds the task ended before any hold: the real ender, and their receipt (R1-13)
       body += alreadyBlock(al);
+      foot = backOnly();
     } else if (why.length) {
-      // Blocked: the reason leads, with where to act; the figures collapse to one line.
+      // Blocked: the reason leads, with where to act (R1-30: this app cannot open the farrowing task); each litter still
+      // farrowing opens here. The figures collapse to one line.
       why.forEach(function (w) {
         if (w.kind !== 'farrowing') return;
-        // R1-30: this app cannot open the farrowing task; it says where to end it, and each litter still farrowing opens here
-        body += '<div class="pp-block">' + UI.panel(h({ strs: { title: 'pp.end.rv.blocked', description: 'pp.end.rv.blocked.where' }, args: { description: { units: units, code: active.join(' ') } } })) + '</div>' +
-          rows(active.map(function (c) { return UI.row({ title: '', description: '', action: 'open-litter', value: c, strs: { title: 'pp.end.rv.farrowing.litter', description: 'pp.end.rv.farrowing.litter.d' }, args: { title: { code: c } } }); }).join(''));
+        body += UI.banner({ tone: 'danger', headline: PP.t('pp.end.rv.blocked'), consequence: PP.t('pp.end.rv.blocked.where', { units: units, code: active.join(' ') }),
+          strs: { headline: 'pp.end.rv.blocked', consequence: 'pp.end.rv.blocked.where' }, args: { consequence: { units: units, code: active.join(' ') } } });
+        body += K.group({ title: P('pp.end.rv.farrowing.title'), meta: P(one('pp.end.row.meta', active.length), { n: active.length }),
+          rows: active.map(function (c) { return litterRow(litter(c, false), [P('pp.end.rv.farrowing.h')], null); }) });
       });
       var dr = why.filter(function (w) { return w.kind !== 'farrowing'; });
-      if (dr.length) body += '<div class="pp-block">' + UI.panel(h({ strs: { title: one('pp.end.rv.drafts', dr.length), description: 'pp.end.rv.drafts.why' }, args: { title: { n: dr.length } } })) + '</div>' +
-        rows(dr.map(function (w) { return UI.row({ title: '', action: w.kind === 'draft-death' ? 'open-dead' : 'open-litter', value: w.code, strs: { title: 'pp.room.code', description: w.kind === 'draft-death' ? 'pp.end.rv.draft.death' : 'pp.end.rv.draft.edit' }, args: { title: { code: w.code } } }); }).join(''));
+      if (dr.length) {
+        body += UI.banner({ tone: 'danger', headline: PP.t(one('pp.end.rv.drafts', dr.length), { n: dr.length }), consequence: PP.t('pp.end.rv.drafts.why'),
+          strs: { headline: one('pp.end.rv.drafts', dr.length), consequence: 'pp.end.rv.drafts.why' }, args: { headline: { n: dr.length } } });
+        body += doors(dr.map(function (w) { return door(w.kind === 'draft-death' ? 'open-dead' : 'open-litter', 'pp.end.code', { code: w.code }, w.kind === 'draft-death' ? 'pp.end.rv.draft.death' : 'pp.end.rv.draft.edit', null, w.code); }));
+      }
       // R1-21: doses not yet due are not unfinished work; they are said apart
-      body += rows(UI.row({ title: '', strs: { title: one('pp.end.rv.work', t.work), description: 'pp.end.rv.collapsed.split' }, args: { title: { n: t.work }, description: { o: t.owed, a: t.ahead } } }));
+      body += rows(UI.row({ title: '', description: '', strs: { title: one('pp.end.rv.work', t.work), description: 'pp.end.rv.collapsed.split' }, args: { title: { n: t.work }, description: { o: t.owed, a: t.ahead } } }));
+      foot = backOnly();
     } else {
-      if (S.unconfirmed) body += UI.panel(h({ strs: { title: 'pp.end.rv.unconfirmed', description: 'pp.end.rv.unconfirmed.why' } })) +
-        rows(UI.row({ title: '', action: 'check-ended', strs: { title: 'pp.end.rv.check', description: 'pp.end.rv.check.desc' } }));
-      if (S.offline) body += UI.panel(h({ strs: { title: 'pp.end.rv.offline', description: 'pp.end.rv.offline.why' } }));
+      if (S.unconfirmed) body += UI.banner({ tone: 'danger', headline: PP.t('pp.end.rv.unconfirmed'), consequence: PP.t('pp.end.rv.unconfirmed.why'), strs: { headline: 'pp.end.rv.unconfirmed', consequence: 'pp.end.rv.unconfirmed.why' } }) +
+        doors([door('check-ended', 'pp.end.rv.check')]);
+      if (S.offline) body += UI.banner({ tone: 'danger', headline: PP.t('pp.end.rv.offline'), consequence: PP.t('pp.end.rv.offline.why'), strs: { headline: 'pp.end.rv.offline', consequence: 'pp.end.rv.offline.why' } });
       if (S.changed) {
         // The record the recheck found: the newest treat of this variant, by another hand.
-        var ch = store.events.filter(function (e) { return e.type === 'treat' && e.who !== window.PPFixtures.ME; }).pop();
-        body += UI.panel(h({ strs: { title: 'pp.end.rv.changed', description: 'pp.end.rv.changed.why' }, args: { description: { code: ch.litter, name: name(ch.dose), n: amount(ch) } } }));
+        var ch = store.events.filter(function (e) { return e.type === 'treat' && e.who !== window.PPFixtures.ME; }).pop(), ca = { code: ch.litter, name: name(ch.dose), n: amount(ch), who: ch.who };
+        body += UI.banner({ tone: 'danger', headline: PP.t('pp.end.rv.changed'), consequence: PP.t('pp.end.rv.changed.why', ca), strs: { headline: 'pp.end.rv.changed', consequence: 'pp.end.rv.changed.why' }, args: { consequence: ca } });
       }
-      var n = t.unf.length, pdn = t.owed + t.ahead;
-      var headId = !n ? 'pp.end.rv.none' : one(S.mandatory ? 'pp.end.rv.unf.m' : 'pp.end.rv.unf', n);
-      // N6: doses scheduled after today are dropped by ending now — said on the review, in the danger register, above the hold
-      var drops = t.ahead ? UI.banner({ tone: 'danger', headline: PP.t(pd(t.ahead).replace('pp.end.v.pd', 'pp.end.rv.drops'), { n: t.ahead }), consequence: PP.t(one('pp.end.rv.drops.why', t.aheadLitters), { k: t.aheadLitters }),
-        strs: { headline: pd(t.ahead).replace('pp.end.v.pd', 'pp.end.rv.drops'), consequence: one('pp.end.rv.drops.why', t.aheadLitters) }, args: { headline: { n: t.ahead }, consequence: { k: t.aheadLitters } } }) : '';
-      if (!S.unconfirmed) body += UI.panel(h({ strs: { title: headId, description: n ? (S.mandatory ? 'pp.end.rv.unf.desc.m' : 'pp.end.rv.unf.desc') : 'pp.end.rv.after.desc' }, args: { title: { n: n || t.litters }, description: { n: pdn, o: t.owed, a: t.ahead } } })) +
-        drops + (n ? notDoneFacts(t) : '') + reviewsBlock(fig(false).reviews || [], false) + unfinishedBlock(t, false) + dayBlock() + ontimeBlock(t, true) + outcomesBlock(false);
+      if (!S.unconfirmed) {
+        var n = t.unf.length;
+        if (n) {
+          // N6 + Q5: the one warning. Doses scheduled after today are dropped by ending now; the unfinished litters in numbers.
+          var head = t.ahead ? [one('pp.end.rv.drops', t.ahead), { n: t.ahead }] : [one(S.mandatory ? 'pp.end.rv.unf.m' : 'pp.end.rv.unf', n), { n: n }];
+          var cons = [t.ahead ? one(S.mandatory ? 'pp.end.rv.cons.m' : 'pp.end.rv.cons', n) : S.mandatory ? 'pp.end.rv.unf.desc.m' : 'pp.end.rv.unf.desc', { n: n, o: t.owed, a: t.ahead }];
+          if (!t.ahead) cons[1].n = t.owed + t.ahead;
+          body += UI.banner({ tone: 'danger', headline: PP.t(head[0], head[1]), consequence: PP.t(cons[0], cons[1]), strs: { headline: head[0], consequence: cons[0] }, args: { headline: head[1], consequence: cons[1] } });
+          body += doors([door('litters', 'pp.end.rv.list', null, 'pp.end.rv.list.d', { w: t.work, a: n - t.work })]);
+        } else body += UI.panel(h({ strs: { title: 'pp.end.rv.none', description: 'pp.end.rv.after.desc' }, args: { title: { n: t.litters } } }));
+        body += reviewsBlock(fig(false).reviews || [], false);
+        var day = dayRecords();
+        if (day.n) body += doors([door('day', 'pp.end.day.title', null, one('pp.end.day.d', day.n), { n: day.n, who: day.order.join(' · ') })]);
+        body += '<div class="en-block">' + metrics(t, true) + '</div>';
+      }
+      var phase = S.unconfirmed ? 'unknown' : S.pending ? 'pending' : S.holding ? 'holding' : 'idle';
+      foot = holdLine() + K.footer({ back: { action: 'close-sheet' }, hold: { label: P('pp.end.act.end'), caption: P(capId(phase)), action: 'hold', tone: 'danger', phase: phase, statusId: 'pp-hold-status' } })
+        .replace('data-phase="holding"', S.holding === 'static' ? 'data-phase="holding" data-preview="still"' : 'data-phase="holding"');
     }
-    var phase = S.unconfirmed ? 'unknown' : S.pending ? 'pending' : S.holding ? 'holding' : 'idle';
-    var hold = why.length || al ? '' : UI.holdButton({ label: PP.t('pp.end.act.end'), caption: PP.t(capId(phase)), action: 'hold', tone: 'danger', phase: phase, statusId: 'pp-hold-status', id: 'pp-hold',
-      strs: { label: 'pp.end.act.end', caption: capId(phase) } }).replace('data-phase="holding"', S.holding === 'static' ? 'data-phase="holding" data-preview="still"' : 'data-phase="holding"');
-    var foot = '<footer class="sheet-footer">' + (hold ? UI.buttonReason({ id: 'pp-hold-status' }) : '') + btn('secondary', 'close-sheet', 'act.back') + hold + '</footer>';
-    return sheetFrame('pp.end.title', {}, 'pp.end.rv.scope', { n: UNIT, k: t.litters }, body, foot);
+    return page('pp.end.title', null, 'pp.end.rv.scope', { n: UNIT, k: t.litters }, body, foot);
   }
   function capId(phase) { return phase === 'unknown' ? 'ds.c2.hold.unknown' : phase === 'pending' ? 'pp.end.hold.pending' : phase === 'holding' ? 'pp.end.hold.keep' : 'pp.end.hold.caption'; }
-  function closeFooter() { return '<footer class="sheet-footer">' + btn('secondary', 'close-sheet', 'act.close') + '</footer>'; }
   // A treatment physically done after End (from an offline phone): kept, stamped, flagged; the frozen figures do not change.
   function afterEndFlag() {
     var ae = post().filter(function (e) { return e.kind === 'afterend'; });
     if (!ae.length) return '';
     return UI.panel(h({ strs: { title: one('pp.end.rc.afterend', ae.length), description: 'pp.end.rc.afterend.why' }, args: { title: { n: ae.length }, description: { code: ae[0].code, name: name(ae[0].k), n: ae[0].n, date: date(ae[0].stamped), time: time(ae[0].stamped) } } }));
   }
-  /* The receipt: frozen at End from top to the Since End section (R1-21) — figures, not-done rows, the review items End
-     froze, outcomes (the ledger replayed to End). Everything since End is in its own section below, and only there. */
-  function receiptSheet() {
+  /* The receipt: frozen at End from top to Since End (R1-21) — the figures, the door to what was not done, the review
+     items End froze, the metrics at End. Everything since End is in its own section below, and only there. */
+  function receiptPage() {
     var t = totals(true), n = t.unf.length, late = post().filter(function (e) { return e.kind === 'late'; }), en = ended();
     var headId = !n ? 'pp.end.rc.none' : one(S.mandatory ? 'pp.end.rc.head.m' : 'pp.end.rc.head', n);
-    var atEndReviews = fig(true).reviews || [];
     var body = UI.panel(h({ strs: { title: headId, description: 'pp.end.rc.desc' }, args: { title: { n: n || t.litters } } })) +
       UI.facts([
         { label: '', strs: { label: 'pp.end.f.finished', value: 'pp.end.v.litters_of' }, args: { value: { n: t.litters - n, k: t.litters } } },
-        { label: '', strs: { label: 'pp.end.f.unfinished', value: one('pp.end.v.litters', n) }, args: { value: { n: n } } }
+        { label: '', strs: { label: 'pp.end.f.unfinished', value: one('pp.end.v.litters', n) }, args: { value: { n: n } } },
+        { label: '', strs: { label: 'pp.end.f.owed', value: pd(t.owed), meta: t.missed ? 'pp.end.f.missed' : undefined }, args: { value: { n: t.owed }, meta: { n: t.missed } } },
+        { label: '', strs: { label: 'pp.end.f.ahead', value: pd(t.ahead) }, args: { value: { n: t.ahead } } }
       ], { columns: 2 }) +
-      (n ? notDoneFacts(t) : '') + unfinishedBlock(t, true) + reviewsBlock(atEndReviews, true) + ontimeBlock(t, true) + outcomesBlock(true);
+      (n ? doors([door('litters', 'pp.end.nd.title', null, one('pp.end.v.litters', n), { n: n })]) : '') +
+      reviewsBlock(fig(true).reviews || [], true) + '<div class="en-block">' + metrics(t, true) + '</div>';
     var since = (late.length ? UI.panel(h({ strs: { title: one('pp.end.rc.late', late.length), description: 'pp.end.rc.late.why' }, args: { title: { n: late.length }, description: { code: late.map(function (e) { return e.code; }).join(' ') } } })) : '') +
-      afterEndFlag() + sinceLog(true) +
-      rows(UI.row({ title: '', action: 'handoff', strs: { title: 'pp.end.w.title', description: 'pp.end.w.row_now' } }));
-    body += '<div class="pp-block">' + h({ kind: 'section', level: 3, strs: { title: 'pp.end.since.title', description: 'pp.end.since.desc' } }) + since + '</div>';
-    return sheetFrame('pp.end.rc.title', {}, 'pp.end.ended.stamp', stamp(en.at, en.who), body, closeFooter());
+      afterEndFlag() + sinceLog(true) + doors([door('handoff', 'pp.end.w.title', null, 'pp.end.w.row_now')]);
+    body += '<div class="en-block">' + sec({ strs: { title: 'pp.end.since.title', description: 'pp.end.since.desc' } }) + since + '</div>';
+    return page('pp.end.rc.title', null, 'pp.end.ended.stamp', stamp(en.at, en.who), body, backOnly());
+  }
+  // The ended task (the room's Back after End): what still writes, the receipt, the handoff, what End froze, since End.
+  function endedPage() {
+    var unf = endedLitters(), en = ended(), atEnd = litters(true).filter(function (l) { return l.unfinished; }).length;
+    var body = UI.panel(h({ strs: { title: 'pp.end.ended.head', description: 'pp.end.ended.desc' } })) +
+      doors([door('receipt', 'pp.end.ended.receipt', null, one('pp.end.ended.receipt.desc', atEnd), { n: atEnd }),
+        door('handoff', 'pp.end.w.title', null, 'pp.end.w.row', { n: totals(false).alive })].concat(unf.length ? [door('litters', 'pp.end.nd.title', null, one('pp.end.v.litters', unf.length), { n: unf.length })] : [])) +
+      reviewsBlock(frozenReviews(), true) + sinceLog();
+    return page('pp.end.rc.title', null, 'pp.end.ended.stamp', stamp(en.at, en.who), body, backOnly('back'));
+  }
+  // One level down from the review (unfinished now) or the ended task (not done at End): the litters, by crate row.
+  function littersPage() {
+    if (S.ended) {
+      var ls = endedLitters();
+      return page('pp.end.nd.title', null, 'pp.end.nd.frozen', null, groupsOf(byRow(ls, endedRow)), backOnly());
+    }
+    var t = totals(false);
+    return page('pp.end.rv.list', null, 'pp.end.lit.sub', { n: t.unf.length, o: t.owed, a: t.ahead }, groupsOf(byRow(t.unf, unfinishedRow)), backOnly());
+  }
+  /* N5: the day's records by hand, so a mark on the wrong litter is findable before End: each opens its litter's log. */
+  function dayRecords() {
+    var today = store.today, by = {}, order = [], n = 0;
+    store.events.forEach(function (e) {
+      if (String(e.at).slice(0, 10) !== today || rejected(e.id) || ['treat', 'death', 'count', 'move'].indexOf(e.type) < 0) return;
+      var code = e.litter || e.from; if (!inTask(code) && !inTask(e.to)) return;
+      if (!by[e.who]) { by[e.who] = []; order.push(e.who); }
+      by[e.who].push(e); n++;
+    });
+    return { by: by, order: order, n: n };
+  }
+  function dayPage() {
+    var d = dayRecords();
+    var words = function (e) {
+      if (e.type === 'treat') return ['pp.end.day.treat', { code: e.litter, name: name(e.dose), n: amount(e) }];
+      if (e.type === 'death') return ['pp.end.day.death', { code: e.litter, n: lineCount(e) }];
+      if (e.type === 'count') return ['pp.end.day.count', { code: e.litter, n: e.observed }];
+      return ['pp.end.day.move', { n: e.n, from: e.from, to: e.to }];
+    };
+    var body = d.order.map(function (who) {
+      var list = d.by[who].slice().sort(function (a, b) { return a.at < b.at ? 1 : -1; });
+      return '<div class="en-block">' + h({ kind: 'group', strs: { title: 'pp.end.day.who', meta: one('pp.end.day.n', list.length) }, args: { title: { who: who }, meta: { n: list.length } } }) +
+        rows(list.map(function (e) { var w = words(e); return UI.row({ title: '', description: '', action: 'open-record', value: e.litter || e.from, strs: { title: w[0], description: 'pp.end.day.at' }, args: { title: w[1], description: { t: time(e.at) } } }); }).join('')) + '</div>';
+    }).join('');
+    return page('pp.end.day.title', null, 'pp.end.day.desc', null, body, backOnly());
   }
   /* The handoff to weaning: as it stands now. Every row opens its litter; weights say their day; doses not reached are
      "not given in this task", owed ones "not done at End" (R1-21); the review items End froze are listed. */
@@ -545,15 +548,14 @@
     if (w) return T('pp.end.w.l.kg_day', { kg: w.kg, n: w.day });
     return l.day < WEIGH_DAY ? T('pp.end.w.l.weigh_ahead', { n: WEIGH_DAY }) : T('pp.end.w.l.noweight');
   }
-  function handoffSheet() {
+  function handoffPage() {
     var now = totals(false), atEnd = litters(true), loss = outcomes(false);
-    var perLitter = litters(false).map(function (l) {
-      var l1 = [T('pp.end.w.l.alive', { n: l.alive }), T('pp.end.w.l.identified', { n: l.identified })];
-      var toks = [dayTok(l), weightTok(l)];
+    var perLitter = function (l) {
+      var toks = [weightTok(l)];
       if (l.loss) toks.push(lossTok(l.loss));
       if (gone(l.code)) toks = toks.concat(postToks(l, 'handoff').filter(function (x) { return /died_after|out_after/.test(x[0]); }));
-      return row(l, l1, toks);
-    }).join('');
+      return litterRow(l, [P('pp.end.w.l.alive', { n: l.alive }), { sep: true }, P('pp.end.w.l.identified', { n: l.identified })], tparts(toks));
+    };
     var groups = [];
     function add(kind, k, n, code) {
       if (!n) return;
@@ -574,37 +576,42 @@
     var weighed = litters(false).filter(function (l) { return store.weights(l.code).some(function (x) { return x.day === WEIGH_DAY; }); }).length;
     var weighAhead = litters(false).filter(function (l) { return !store.weights(l.code).some(function (x) { return x.day === WEIGH_DAY; }) && l.day < WEIGH_DAY; }).length;
     var body = UI.facts([
-      { label: '', strs: { label: 'pp.end.w.alive', value: one('pp.common.unit.piglet', now.alive), meta: 'pp.end.w.alive.meta' }, args: { value: { n: now.alive } } },
+      { label: '', strs: { label: 'pp.end.w.alive', value: one('pp.common.unit.piglet', now.alive) }, args: { value: { n: now.alive } } },
       { label: '', strs: { label: 'pp.end.w.identified', value: 'pp.end.v.piglets_of' }, args: { value: { n: now.identified, k: now.alive } } },
       { label: '', strs: { label: 'pp.end.w.weights', value: 'pp.end.v.litters_of', meta: weighAhead ? one('pp.end.w.weights.ahead', weighAhead) : undefined }, args: { value: { n: weighed, k: now.litters }, meta: { n: weighAhead, day: WEIGH_DAY } } },
       { label: '', strs: { label: 'pp.end.out.loss', value: 'pp.end.out.open', meta: loss.loss ? 'pp.end.codes' : undefined }, args: { value: { n: loss.loss }, meta: { list: loss.lossC.join(' ') } } }
     ], { columns: 2 }) +
-      '<div class="pp-block">' + h({ strs: { title: 'pp.end.w.litters', meta: one('pp.end.v.litters', now.litters) }, args: { meta: { n: now.litters } } }) + rows(perLitter) + '</div>' +
-      (nd ? '<div class="pp-block">' + h({ strs: { title: 'pp.end.nd.title', meta: pd(ndTotal) }, args: { meta: { n: ndTotal } } }) + rows(nd) + '</div>' : '') +
+      (nd ? '<div class="en-block">' + sec({ strs: { title: 'pp.end.nd.title', meta: pd(ndTotal) }, args: { meta: { n: ndTotal } } }) + rows(nd) + '</div>' : '') +
       reviewsBlock(frozenReviews(), true) +
-      UI.panel(h({ strs: { title: 'pp.end.w.note' } }));
-    return sheetFrame('pp.end.w.title', {}, 'pp.end.w.desc', { n: UNIT }, body, closeFooter());
+      '<div class="en-block">' + sec({ strs: { title: 'pp.end.w.litters', meta: one('pp.end.v.litters', now.litters) }, args: { meta: { n: now.litters } } }) + groupsOf(byRow(litters(false), perLitter)) + '</div>';
+    return page('pp.end.w.title', null, 'pp.end.w.desc', { n: UNIT }, body, backOnly());
   }
 
-  /* ---- render ---- */
-  var screen = document.getElementById('screen'), phone = document.getElementById('phone');
+  /* ---- render: the active page over the room (one page at a time) ---- */
+  var screen = document.getElementById('screen');
   function render() {
+    var scroll = screen.querySelector('.tk-page-body'), top = scroll ? scroll.scrollTop : 0, was = S.shown;
+    var inner;
     if (!TASK) {
       // A unit with no processing task: nothing to end here; its litters record deaths, counts and moves (Q18)
-      screen.innerHTML = header('pp.room.unit', { n: UNIT }, '', null, true) + UI.panel(h({ strs: { title: 'pp.end.none.title', description: 'pp.end.none.desc' }, args: { title: { n: UNIT } } }));
-      PP.apply(screen); return;
+      inner = page('pp.end.none.title', { n: UNIT }, 'pp.end.none.desc', null, '', backOnly('back'));
+    } else {
+      var sh = S.sheet;
+      inner = sh === 'overview' ? overviewPage() : sh === 'review' ? reviewPage() : sh === 'receipt' ? receiptPage() : sh === 'handoff' ? handoffPage()
+        : sh === 'litters' ? littersPage() : sh === 'day' ? dayPage() : S.ended ? endedPage() : overviewPage();
     }
-    var sh =S.sheet === 'overview' ? overviewSheet() : S.sheet === 'review' ? reviewSheet() : S.sheet === 'receipt' ? receiptSheet() : S.sheet === 'handoff' ? handoffSheet() : '';
-    screen.innerHTML = (S.ended ? endedFace() : backdrop()) + sh;
-    phone.classList.toggle('pp-locked', !!S.sheet);
-    var b = screen.querySelector('.task-return'); if (b) b.setAttribute('data-str-attr', 'aria-label:act.back');
+    screen.innerHTML = K.phone(behind() + inner, { label: P('pp.common.task') });
     PP.apply(screen);
     UI.liveFill(screen, { then: function (el) { PP.apply(el); } });
-    if (S.sheet === 'overview') { var body = screen.querySelector('.sheet-body'); if (body) body.scrollTop = S.ovScroll; }
+    S.shown = S.sheet + (S.ended ? ':e' : '');
+    var nb = screen.querySelector('.tk-page-body');
+    if (nb) nb.scrollTop = S.shown === was ? top : S.sheet === 'overview' ? S.ovScroll : 0;
   }
 
   /* ---- URL and history: every view is a state; the review is one history entry above the overview ---- */
   function stateName() {
+    if (S.sheet === 'litters') return S.ended ? 'ended-litters' : 'end-litters';
+    if (S.sheet === 'day') return 'end-day';
     if (S.ended) return S.sheet === 'receipt' ? (S.data === 'ended-late-mark' ? 'receipt-late-mark' : S.data === 'ended-after-end' ? 'receipt-after-end-mark' : S.data === 'ended-after' ? 'receipt-since' : 'receipt') : S.sheet === 'handoff' ? 'weaning-handoff' : S.sheet === 'overview' ? 'overview-ended' : S.sheet === 'review' ? 'end-again' : S.data === 'ended-correct' ? 'ended-correct' : S.data === 'ended-moves' ? 'ended-moves' : 'ended';
     if (S.sheet === 'review') return blocked().length ? (S.drafts ? 'end-blocked-draft' : 'end-blocked') : S.offline ? 'end-offline' : S.already ? 'end-already' : S.unconfirmed ? 'end-unconfirmed' : S.changed ? 'end-changed' : S.pending ? 'end-pending' : 'end-review';
     return 'overview';
@@ -616,14 +623,14 @@
     try { history[push ? 'pushState' : 'replaceState'](st || {}, '', location.pathname + '?' + p.toString()); } catch (e) {}
   }
   function openSheet(n) {
-    if (S.sheet === 'overview') { var b = screen.querySelector('.sheet-body'); if (b) S.ovScroll = b.scrollTop; }
+    if (S.sheet === 'overview') { var b = screen.querySelector('.tk-page-body'); if (b) S.ovScroll = b.scrollTop; }
     var from = S.sheet; S.sheet = n; S.opened = Date.now(); setUrl(true, { sheet: n, from: from }); render();
   }
   function closeSheet() {
     S.holding = ''; var st = history.state;
     if (st && st.sheet && !st.deep) { history.back(); return; }
-    // Deep-linked: the review returns to the overview; the others to the page beneath.
-    S.sheet = S.sheet === 'review' && !S.ended ? 'overview' : ''; S.pending = S.changed = S.offline = S.already = S.unconfirmed = false; setUrl(false); render();
+    // Deep-linked: the review returns to the overview, a page one level down to the review; the others to the page beneath.
+    S.sheet = S.ended ? '' : S.sheet === 'review' ? 'overview' : S.sheet === 'litters' || S.sheet === 'day' ? 'review' : ''; S.pending = S.changed = S.offline = S.already = S.unconfirmed = false; setUrl(false); render();
   }
   window.addEventListener('popstate', function (ev) {
     S.holding = ''; S.pending = S.changed = S.offline = S.already = S.unconfirmed = false;
@@ -639,7 +646,8 @@
     var sow = store.sow(code) || {};
     return PP.href(page, Object.assign({ state: state, crate: code, unit: UNIT, sow: sow.sow, task: S.ended ? 'ended' : '', data: store.name !== 'base' ? store.name : '' }, extra || {}));
   }
-  function roomHref() { return PP.href('room.html', { state: 'room', unit: UNIT, data: store.name !== 'base' ? store.name : '' }); }
+  function roomHref() { return PP.href('room.html', { unit: UNIT !== 7 ? UNIT : '', data: store.name !== 'base' ? store.name : '' }); }
+  function litterHref(code) { return PP.href('room.html', { state: 'litter', crate: code, unit: UNIT !== 7 ? UNIT : '', task: S.ended ? 'ended' : '', data: store.name !== 'base' ? store.name : '' }); }
 
   /* ---- hold to End (Button's hold, ADR 0002): 850ms, released early it says so; the keyboard is a two-step. On commit the
      server rechecks every litter; the hold is then settled done (the receipt), failed (the reason, the review again) or
@@ -681,14 +689,16 @@
     var b = ev.target.closest('[data-action]'); if (!b) return;
     var a = b.dataset.action, v = b.dataset.value;
     if (a === 'hold') return;
-    if (a === 'scrim') { if (Date.now() - S.opened < 300) return; if (S.sheet === 'overview') { location.href = roomHref(); return; } closeSheet(); return; }
     if (a === 'close-sheet') { closeSheet(); return; }
     // R1-30: Back from the ended face (and its receipt) returns to the room, not the designer index
     if (a === 'back') { location.href = roomHref(); return; }
     if (a === 'review') { openSheet('review'); return; }
     if (a === 'receipt') { if (S.sheet === 'overview' || S.sheet === 'review') { S.sheet = 'receipt'; setUrl(false, { sheet: 'receipt', deep: true, ended: true }); render(); return; } openSheet('receipt'); return; }
     if (a === 'handoff') { openSheet('handoff'); return; }
-    if (a === 'open-litter') { location.href = route('litter.html', 'litter', v, { stay: 1 }); return; }
+    if (a === 'litters') { openSheet('litters'); return; }
+    if (a === 'day') { openSheet('day'); return; }
+    if (a === 'open-room') { location.href = roomHref(); return; }
+    if (a === 'open-litter') { location.href = litterHref(v); return; }
     if (a === 'open-record') { location.href = PP.href('edit.html', { state: 'record-page', crate: v, data: store.name !== 'base' ? store.name : '' }); return; }
     if (a === 'open-review') {
       var r = (fig(!!ended()).reviews || []).concat(fig(false).reviews || []).filter(function (x) { return x.id === v; })[0];

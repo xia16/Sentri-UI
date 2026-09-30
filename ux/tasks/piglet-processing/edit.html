@@ -6,33 +6,34 @@
 <title>Edit and the litter record</title>
 <link rel="stylesheet" href="/ux/design-system/tokens.css">
 <link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="/ux/design-system/components/task-skeleton.css">
 <link rel="stylesheet" href="shell.css">
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* Layout only, tokens from tokens.css. Cards (ADR 0002): the correction Banner, Status lines for every receipt and
-   warning, Button's text register and waiting face (buttonReason + guard). WellTray stays a task-level composition
-   (ADR 0002: one consumer). The litter header and stamp words come from the shell (shell-ui.js, shell.css). */
-.ed-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
-.ed-phone .scrim { inset: 0; }
-/* The page sits under the scrim of a drawer opened over it (R1-28: the crate picker had no visible scrim). */
-.ed-phone .sheet[data-presentation="page"] { z-index: 1; }
+/* Layout only, tokens from tokens.css. Built on the task skeleton (ADR 0003, SentriTask): Edit is a drawer over the room
+   (farrowing's Edit record), the record page a page (farrowing's log), the double's answer a drawer; a picker or a photo
+   rises over them in their own layer. Cards (ADR 0002): the correction Banner, Status lines, Stepper (its pointer is the
+   `Done on another crate` door), Button's text register and waiting face. WellTray stays a task-level composition. */
 .ed-body { display: flex; flex-direction: column; gap: var(--space-section); }
 .ed-body > * { margin: 0; }
 .ed-group { display: flex; flex-direction: column; gap: var(--space-heading); }
 .ed-group > * { margin: 0; }
-.ed-pad { flex: none; padding: var(--space-row-y) var(--space-gutter); background: var(--paper); border-top: 1px solid var(--line); }
-.ed-phone .sheet-footer > .button { flex: 1; }
-.ed-phone .sheet-footer { flex-wrap: wrap; row-gap: var(--space-row-y); }
+/* one rule between stacked records, as between farrowing's Edit rows */
+.ed-group[data-mark] + .ed-group[data-mark], .ed-group[data-count] + .ed-group[data-count], .ed-group[data-death] + .ed-group[data-death] { padding-top: var(--space-heading); border-top: 1px solid var(--line); }
+/* a drawer over a drawer or a page (the crate picker, the photo): its own layer, above the surface it answers */
+.ed-over { position: absolute; inset: 0; z-index: 6; }
+/* why Save waits, on the bottom edge of the body, right above the footer (Button · buttonReason) */
+.ed-why { flex: none; padding: var(--space-key-gap) var(--space-gutter-sheet) 0; background: var(--paper); }
+.ed-why > .st-button-reason:empty { display: none; }
+.ed-why:has(> .st-button-reason:empty) { display: none; }
+.ed-pad { flex: none; padding: var(--space-row-y) var(--space-gutter-sheet); background: var(--paper); border-top: 1px solid var(--line); }
 /* A record-page entry's change lines, moved right under its title (see logHtml): colour on the value, the words ink. */
 .ed-delta { margin: 0; font-size: var(--type-description-size); line-height: 1.5; color: var(--ink); }
 .ed-delta + .ed-delta { margin-top: var(--space-key-gap); }
-/* Each part of a change line wraps as a whole, so a wrapped part never lies under another. */
 .ed-delta > span, .ed-line > span { display: inline-block; max-width: 100%; }
 .ed-line { margin: 0; font-size: var(--type-row-title-size); line-height: 1.5; color: var(--ink); }
-/* A text action on its own line, right-aligned under the thing it acts on (Button text register). */
-.ed-act { display: flex; justify-content: flex-end; }
-.ed-act > .st-text-action, .ed-later-row > .st-text-action { flex: none; min-width: var(--touch-min); justify-content: flex-end; padding: 0; }
+.ed-later-row > .st-text-action { flex: none; min-width: var(--touch-min); justify-content: flex-end; padding: 0; }
 /* The records a change would drop: each named, each with its door. */
 .ed-later { display: flex; flex-direction: column; gap: var(--space-key-gap); }
 .ed-later-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-footer-gap); }
@@ -42,24 +43,23 @@
 .st-log-extra:has(> .ed-anchor:only-child) { display: none; }
 .st-log-entry[data-flash] { background: var(--amber-wash); }
 .st-log-extra .st-photos-items { padding: var(--space-key-gap) 0 0; }
-/* the photo viewer (the dead sheet's, History face: Back only): one photo, full width — a stand-in frame, no camera here */
-.ed-photo { display: grid; place-items: center; width: 100%; aspect-ratio: 3 / 4; border-radius: var(--radius-inset); background: var(--well); color: var(--muted); font-family: var(--font-mono); font-size: var(--type-button-size); }
+/* the photo viewer (History face: Back only): one photo, full width — a stand-in frame, no camera here */
+.ed-photo { display: grid; place-items: center; width: 100%; aspect-ratio: 3 / 4; max-height: 52vh; border-radius: var(--radius-inset); background: var(--well); color: var(--muted); font-family: var(--font-mono); font-size: var(--type-button-size); }
 /* Candidate:WellTray — farrowing's At-finish tray: a row expands in place into a well whose fields edit within the one
-   Edit screen (no drawer, no second Save). */
+   Edit drawer (no second drawer, no second Save). */
 .ed-tray { display: flex; flex-direction: column; gap: var(--space-row-y); padding: var(--space-row-y) var(--space-panel) var(--space-panel); background: var(--well); border-radius: var(--radius-inset); }
 .ed-tray > * { margin: 0; }
 </style>
 </head>
-<body>
-<main class="inspection-phone ed-phone" data-st-context="page">
-  <div id="screen"></div>
-</main>
+<body class="tk-stage">
+<div id="screen"></div>
 <script src="/ux/design-system/components/bundle.js"></script>
+<script src="/ux/design-system/components/task-skeleton.js"></script>
 <script src="shell.js"></script>
 <script src="shell-ui.js"></script>
 <script>
 (function () {
-  var UI = window.SentriUI, U = window.PPUI, ICON = window.SentriIcons;
+  var UI = window.SentriUI, U = window.PPUI, ICON = window.SentriIcons, K = window.SentriTask;
 
   /* ---- states: a variant of the shared fixture + the crate + the Edit draft. What can be corrected, the change summary,
      the records a change would drop, why Save waits and the effect of Save are the ledger's (select.edit: the draft is ONE
@@ -168,7 +168,12 @@
   // Button's text register (ADR 0002): a bare word, right-aligned on what it acts on.
   function textAction(action, id, args, value) { return UI.button({ label: PP.t(id, args), register: 'text', action: action, value: value == null ? '' : value, strs: { label: id }, args: args ? { label: args } : undefined }); }
   function button(register, action, id, o) { o = o || {}; return UI.button({ label: PP.t(id), register: register, action: action, waiting: !!o.waiting, describedby: o.describedby || '', strs: { label: id } }); }
-  function header(sub, args) { return U.litterHeader({ crate: crate, sow: SOW.sow, parity: SOW.parity, sub: span(sub, args) }); }
+  // The skeleton's text slots: a registered string, as { text, str, args }.
+  function S_(id, args) { return { text: PP.t(id, args), str: id, args: args || undefined }; }
+  // The room behind every drawer and page (inert): the task's header, as farrowing's Edit record shows it blurred.
+  function behind() { return K.screen({ inert: true, header: K.header({ title: S_('pp.common.task'), back: { action: 'noop' } }) }); }
+  // A drawer's subtitle: the litter it acts on (farrowing: `000418 · B1`).
+  function subtitle() { return S_('pp.edit.sub', { code: crate, sow: SOW.sow }); }
   // A changed value, amber, with its unit: `12 → 10 piglets`.
   function dPigs(a, b) { return span(PP.one('pp.edit.delta_pigs', b), { a: a, b: b }, 'amber'); }
   function dText(a, b) { return span('pp.edit.delta', { a: a, b: b }, 'amber'); }
@@ -273,11 +278,11 @@
     return '<ul class="st-photos-items" data-ds="Photos">' + out + '</ul>';
   }
   function photoViewer() {
-    var p = photo.split('|'), n = photosOf(p[0]), i = +p[1], ev = eventOf(p[0]) || {};
-    return '<div class="scrim" data-ds="Sheet" data-action="photo-back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
-      '<header class="utility-header">' + UI.heading({ title: '', description: '', kind: 'page', level: 3, strs: { title: 'pp.dead.photo.title', description: stampStrs(ev.at, ev.who)[0] }, args: { title: { n: i, m: n }, description: stampStrs(ev.at, ev.who)[1] } }) + '</header>' +
-      '<div class="sheet-body"><div class="ed-photo" role="img" data-str-attr="aria-label:ds.c2.aria.thumb" data-args=\'{"n":' + i + '}\' aria-label="' + U.esc(PP.t('ds.c2.aria.thumb', { n: i })) + '">' + span('ds.c2.photos.index', { n: i }) + '</div></div>' +
-      '<footer class="sheet-footer">' + button('secondary', 'photo-back', 'act.back') + '</footer></section>';
+    var p = photo.split('|'), n = photosOf(p[0]), i = +p[1], ev = eventOf(p[0]) || {}, st0 = stampStrs(ev.at, ev.who);
+    return K.drawer({ view: 'photo', size: 'long', scrim: { action: 'photo-back' }, close: { action: 'photo-back' },
+      title: S_('pp.dead.photo.title', { n: i, m: n }), subtitle: S_(st0[0], st0[1]),
+      body: '<div class="ed-photo" role="img" data-str-attr="aria-label:ds.c2.aria.thumb" data-args=\'{"n":' + i + '}\' aria-label="' + U.esc(PP.t('ds.c2.aria.thumb', { n: i })) + '">' + span('ds.c2.photos.index', { n: i }) + '</div>',
+      footer: K.footer({ back: { action: 'photo-back' } }) });
   }
   function anchor(id) { return '<span class="ed-anchor" data-entry="' + U.esc(id) + '"></span>'; }
   function entry(x, g) {
@@ -383,14 +388,14 @@
     });
   }
   function recordPage() {
-    var R = store.select.record(store.derived, crate);
+    var R = store.select.record(store.derived, crate), X = L();
     var groups = R.days.map(function (g) {
       return { label: '', strs: { label: g.who ? 'pp.edit.rec.day' : 'pp.edit.rec.day_bare' }, args: { label: { day: dayWord(g.date), who: g.who } },
         entries: g.entries.map(function (x) { return entry(x, g); }) };
     });
-    return '<section class="sheet" data-ds="Sheet" data-presentation="page">' + header('pp.edit.rec.title') +
-      '<div class="sheet-body"><div class="ed-body">' + logHtml(groups) + '</div></div>' +
-      '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + button('secondary', 'open-edit', 'act.edit') + '</footer></section>';
+    // farrowing's log: title, one description line, the log, a lone Back (Edit is on the litter's tool row)
+    return K.page({ title: S_('pp.edit.log.title'), description: S_('pp.edit.log.sub', { code: crate, sow: SOW.sow, born: X.born, alive: X.alive }),
+      body: logHtml(groups), footer: K.footer({ back: { action: 'back' } }) });
   }
 
   /* =====================================================================================================
@@ -464,7 +469,7 @@
     var tokens = [];
     e.changes.forEach(function (c) { tokens = tokens.concat(changeTokens(c, e)); });
     var out = UI.banner({ tone: 'correction', id: 'ed-banner', headline: PP.t('pp.edit.banner.head'), consequence: PP.t('pp.edit.banner.as', { who: ME }), summary: tokens,
-      actions: [{ label: PP.t('act.clear'), action: 'clear', strs: { label: 'act.clear' } }], strs: { headline: 'pp.edit.banner.head', consequence: 'pp.edit.banner.as' }, args: { consequence: { who: ME } } });
+      actions: [], strs: { headline: 'pp.edit.banner.head', consequence: 'pp.edit.banner.as' }, args: { consequence: { who: ME } } });
     if (e.ended) out += sline([part(e.flags.some(function (f) { return f.reason === 'correction_after_end'; }) ? 'pp.edit.after_end_flag' : 'pp.edit.after_end', null, 'amber')]);
     return out + laterBlock(e);
   }
@@ -490,19 +495,19 @@
     return UI.choiceRow({ label: '', meta: meta ? '' : undefined, mode: 'single', action: action, value: value, selected: on,
       strs: Object.assign({ label: label }, meta ? { meta: meta } : {}), args: args ? { label: args, meta: args } : undefined });
   }
-  function stepper(key, action, labelId, labelArgs, desc, descArgs, value, min, max, changed, hintId, hintArgs) {
+  function stepper(key, action, labelId, labelArgs, desc, descArgs, value, min, max, changed, hintId, hintArgs, pointers) {
     var atCeil = ceilTap === key && max != null && value >= max;
-    return UI.stepper({ label: '', description: desc ? '' : undefined, value: value, min: min, max: max, key: key, action: action, changed: changed, hint: atCeil ? '' : undefined,
+    return UI.stepper({ label: '', description: desc ? '' : undefined, value: value, min: min, max: max, key: key, action: action, changed: changed, hint: atCeil ? '' : undefined, pointers: pointers || [],
       strs: Object.assign({ label: labelId, value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' }, desc ? { description: desc } : {}, atCeil ? { hint: hintId } : {}),
       args: { label: labelArgs, description: descArgs, hint: hintArgs } });
   }
   function markBlock(m, e) {
     var x = draft.marks[m.id] || {}, v = markValue(m), t = tx(m.dose), rest = m.whole - v, s = stampStrs(m.at, m.who), dp = pairOf(m.id);
-    var out = stepper(m.id, 'mark-step', t[0], t[1], s[0], s[1], v, 0, m.whole, v !== m.n || m.corrected || !!x.void || x.to !== undefined || !!x.back, 'pp.edit.ceil', { n: m.whole });
-    if (m.viaCorrection) out += UI.choiceGroup(choice('mark-back', m.id, 'pp.edit.back', 'pp.edit.back_meta', !!x.back, { code: m.from }));
     var lowered = !x.back && (v < m.n || x.void || x.to !== undefined);
-    // R1-28: the wrong-litter door is there from the start, not behind −
-    if (!lowered && !x.back) out += '<div class="ed-act">' + textAction('mark-why', 'pp.edit.why.other', null, m.id + ':to') + '</div>';
+    // R1-28: the wrong-litter door is there from the start, not behind −: the stepper's pointer (a text action in its line)
+    var door = !lowered && !x.back ? [{ label: PP.t('pp.edit.why.other'), action: 'mark-why', value: m.id + ':to', strs: { label: 'pp.edit.why.other' } }] : [];
+    var out = stepper(m.id, 'mark-step', t[0], t[1], s[0], s[1], v, 0, m.whole, v !== m.n || m.corrected || !!x.void || x.to !== undefined || !!x.back, 'pp.edit.ceil', { n: m.whole }, door);
+    if (m.viaCorrection) out += UI.choiceGroup(choice('mark-back', m.id, 'pp.edit.back', null, !!x.back, { code: m.from }));
     // the why appears only once the hand lowers the mark (a record's own deferral is not a question)
     if (lowered) {
       var mode = x.to !== undefined ? 'to' : x.void ? 'void' : x.reason || '';
@@ -510,16 +515,16 @@
       // after End a lowered mark is a fact (not done), never owed: no reason choice. Castration takes Q16's reasons.
       if (!e.ended) {
         if (m.castration) {
-          rows.push(choice('mark-why', m.id + ':hernia', 'pp.litter.reason.hernia', 'pp.litter.reason.leaves_note', mode === 'hernia'),
-            choice('mark-why', m.id + ':cryptorchid', 'pp.litter.reason.cryptorchid', 'pp.litter.reason.leaves_note', mode === 'cryptorchid'),
-            choice('mark-why', m.id + ':deferred', 'pp.litter.reason.deferred', 'pp.litter.reason.stays', mode === 'deferred'),
-            choice('mark-why', m.id + ':kept', 'pp.litter.reason.kept', 'pp.litter.reason.leaves', mode === 'kept'));
-        } else rows.push(choice('mark-why', m.id + ':weak', 'pp.litter.reason.weak', 'pp.litter.reason.stays', mode === 'weak'), choice('mark-why', m.id + ':sick', 'pp.litter.reason.sick', 'pp.litter.reason.stays', mode === 'sick'));
+          rows.push(choice('mark-why', m.id + ':hernia', 'pp.litter.reason.hernia', null, mode === 'hernia'),
+            choice('mark-why', m.id + ':cryptorchid', 'pp.litter.reason.cryptorchid', null, mode === 'cryptorchid'),
+            choice('mark-why', m.id + ':deferred', 'pp.litter.reason.deferred', null, mode === 'deferred'),
+            choice('mark-why', m.id + ':kept', 'pp.litter.reason.kept', null, mode === 'kept'));
+        } else rows.push(choice('mark-why', m.id + ':weak', 'pp.litter.reason.weak', null, mode === 'weak'), choice('mark-why', m.id + ':sick', 'pp.litter.reason.sick', null, mode === 'sick'));
       }
       // a mark in a possible double is not "recorded by mistake · stays owed": the double has its own answer (round 4)
-      if (dp) rows.push(choice('open-double', m.dose, 'pp.edit.dbl.same', 'pp.edit.dbl.door_meta', false));
-      else rows.push(choice('mark-why', m.id + ':void', 'pp.edit.why.mistake', e.ended ? 'pp.edit.why.mistake_meta_end' : 'pp.edit.why.mistake_meta', mode === 'void'));
-      rows.push(choice('mark-why', m.id + ':to', 'pp.edit.why.other', 'pp.edit.why.other_meta', mode === 'to'));
+      if (dp) rows.push(choice('open-double', m.dose, 'pp.edit.dbl.same', null, false));
+      else rows.push(choice('mark-why', m.id + ':void', 'pp.edit.why.mistake', null, mode === 'void'));
+      rows.push(choice('mark-why', m.id + ':to', 'pp.edit.why.other', null, mode === 'to'));
       // castration splits by reason (Q16): the question is about the piglets this change leaves not castrated
       var n = x.void || x.to !== undefined ? m.whole : m.castration ? m.n - v : rest;
       out += UI.choiceGroup(rows, { title: '', strs: { title: e.ended ? 'pp.edit.rest.title_end' : m.castration ? 'pp.edit.rest.title_castr' : 'pp.edit.rest.title' }, args: { title: { n: n } } });
@@ -535,8 +540,8 @@
       var cap = c.owedThere == null ? m.whole : c.owedThere;
       out += stepper('to:' + m.id, 'to-step', 'pp.edit.to.n', { code: x.to }, 'pp.edit.to.n_desc', { t: U.time(m.at), who: m.who, n: cap }, c.n, 1, cap, true, 'pp.edit.to.ceil', { code: x.to, n: cap });
       var restThere = cap - c.n;
-      if (restThere > 0 && !m.castration) out += UI.choiceGroup([choice('to-why', m.id + ':weak', 'pp.litter.reason.weak', 'pp.litter.reason.stays', c.reason === 'weak'),
-        choice('to-why', m.id + ':sick', 'pp.litter.reason.sick', 'pp.litter.reason.stays', c.reason === 'sick')], { title: '', strs: { title: 'pp.edit.to.rest' }, args: { title: { n: restThere, code: x.to } } });
+      if (restThere > 0 && !m.castration) out += UI.choiceGroup([choice('to-why', m.id + ':weak', 'pp.litter.reason.weak', null, c.reason === 'weak'),
+        choice('to-why', m.id + ':sick', 'pp.litter.reason.sick', null, c.reason === 'sick')], { title: '', strs: { title: 'pp.edit.to.rest' }, args: { title: { n: restThere, code: x.to } } });
     }
     return out;
   }
@@ -566,7 +571,7 @@
         if (tagged) out += moveRows(m, x);
         else out += stepper(m.id, 'move-step', 'label.piglets', null, null, null, n, 1, null, n !== m.n || m.corrected);
       }
-      out += UI.choiceGroup(choice('move-void', m.id, 'pp.edit.why.mistake', 'pp.edit.move.void_meta', !!x.void));
+      out += UI.choiceGroup(choice('move-void', m.id, 'pp.edit.why.mistake', null, !!x.void));
       return '<div class="ed-group">' + out + '</div>';
     }).join('');
     return '<section class="ed-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.edit.sec.moves' } }) + blocks + '</section>';
@@ -597,8 +602,8 @@
       if (x.held) facts.push(part('pp.edit.death.held', null, 'amber'));
       if (rows.length) facts.push(part('pp.edit.death.names', { id: rows.join(' ') }));
       if (facts.length) out += sline(facts);
-      var opts = [choice('death-void', x.id, 'pp.edit.why.mistake', rows.length ? 'pp.edit.death.void_row' : x.fromMissing ? 'pp.edit.death.void_missing' : 'pp.edit.death.void_meta', !!y.void, { id: rows.join(' ') })];
-      if (x.movable) opts.push(choice('death-to', x.id, 'pp.edit.death.other', 'pp.edit.death.other_meta', y.to !== undefined));
+      var opts = [choice('death-void', x.id, 'pp.edit.why.mistake', null, !!y.void)];
+      if (x.movable) opts.push(choice('death-to', x.id, 'pp.edit.death.other', null, y.to !== undefined));
       out += UI.choiceGroup(opts);
       if (!x.movable && rows.length) out += sline([part('pp.edit.death.tagged_only')]);
       if (y.to !== undefined) out += UI.pickerField({ label: '', display: y.to || '', placeholder: '', action: 'pick-death', key: x.id,
@@ -648,7 +653,7 @@
     out += UI.measure({ label: '', optional: '', value: w == null ? '' : String(w), unit: 'kg', key: 'weight', active: pad === 'weight', controls: 'ed-pad', changed: wAmber, note: changedNow ? ' ' : '',
       strs: Object.assign({ label: 'pp.edit.f.weight', optional: 'ds.field.optional', value: 'ds.field.figure', unit: 'ds.field.unit.kg', placeholder: 'ds.field.placeholder' }, changedNow ? { note: r.weight == null ? 'pp.edit.f.was_none' : 'ds.field.measure.was' } : {}),
       args: { value: { n: w == null ? '' : w }, note: { v: r.weight } } });
-    out += UI.choiceGroup(choice('row-withdraw', r.rowId, 'pp.edit.why.mistake', 'pp.edit.withdraw_meta', !!d.withdraw));
+    out += UI.choiceGroup(choice('row-withdraw', r.rowId, 'pp.edit.why.mistake', null, !!d.withdraw));
     if (d.withdraw && r.status === 'dead') {
       out += '<div class="ed-later-row">' + sline([part('pp.edit.wait.row_dead', { id: idOf(r) }, 'amber')]) + textAction('lead-deaths', 'pp.edit.door.death') + '</div>';
     }
@@ -679,7 +684,7 @@
       var x = draft.counts[c.id] || {}, v = x.observed == null ? c.observed : x.observed, s = stampStrs(c.at, c.who), out = '';
       if (!x.void) out += stepper('count:' + c.id, 'count-step', 'pp.edit.count.label', null, s[0], s[1], v, 0, null, v !== c.observed || c.corrected);
       else out += UI.heading({ title: '', kind: 'group', level: 4, description: '', strs: { title: 'pp.edit.count.label', description: s[0] }, args: { description: s[1] } });
-      out += UI.choiceGroup(choice('count-void', c.id, 'pp.edit.why.mistake', 'pp.edit.count.void_meta', !!x.void));
+      out += UI.choiceGroup(choice('count-void', c.id, 'pp.edit.why.mistake', null, !!x.void));
       return '<div class="ed-group" data-count="' + U.esc(c.id) + '">' + out + '</div>';
     }).join('');
     return '<section class="ed-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.edit.sec.counts' } }) + blocks + '</section>';
@@ -715,10 +720,11 @@
     }
   }
   function dirty() { return !!(Object.keys(draft.marks).length || Object.keys(draft.moves).length || Object.keys(draft.rows).length || Object.keys(draft.counts || {}).length || Object.keys(draft.deaths || {}).length || draft.reopen); }
-  // The bar: Back and Save; Save waits (present, quiet) with its reason in one status line beside the bar (ADR 0002).
+  // The footer: Back and Save; Save waits (present, quiet) with its reason in one status line right above the footer
+  // (ADR 0002), on the drawer's bottom edge. The footer is the drawer's last child (TaskSheet).
   function bar(w, can, saveId) {
-    return '<footer class="sheet-footer">' + UI.buttonReason({ id: 'ed-why', text: w ? PP.t(w[0], w[1]) : '', strs: w ? { text: w[0] } : undefined, args: w ? { text: w[1] } : undefined }) +
-      button('secondary', 'back', 'act.back') + button('primary', 'save', saveId || 'act.save', { waiting: !can, describedby: 'ed-why' }) + '</footer>';
+    return '<div class="ed-why">' + UI.buttonReason({ id: 'ed-why', text: w ? PP.t(w[0], w[1]) : '', strs: w ? { text: w[0] } : undefined, args: w ? { text: w[1] } : undefined }) + '</div>' +
+      K.footer({ back: { action: 'back' }, primary: button('primary', 'save', saveId || 'act.save', { waiting: !can, describedby: 'ed-why' }) });
   }
   /* R1-28: a correction says what it did. The receipt of a saved correction: every figure it moved, on every litter it
      touched (the ledger replayed without it, against the ledger with it). */
@@ -766,7 +772,9 @@
     else fx.forEach(function (f) { tokens.push(part('pp.room.code', { code: f.code })); tokens = tokens.concat(f.tokens); });
     return sline(tokens, { live: true, id: 'ed-saved' });
   }
-  function editPage(e) {
+  // farrowing's Edit record: a drawer over the room, `Edit record` over `A02 · 000231`, Clear where the close sits while a
+  // draft exists, the fields, Back + Save on the bottom edge. Held at full height (the draft grows as the worker taps).
+  function editSheet(e) {
     var w = dirty() ? waiting(e) : null, can = !!e.events && !waiting(e);
     var restored = notices.map(function (n) { return sline([part(n[0], n[1], 'amber')]); }).join('');
     var padHtml = '';
@@ -776,8 +784,10 @@
         strs: Object.assign({ digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad' }, isW ? {} : { label: 'pp.edit.f.' + pad, value: 'ds.field.figure' }),
         args: { value: { n: typed[pad] || '' } } }) + '</div>';
     }
-    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (picker ? ' inert' : '') + '>' + header('pp.edit.title') +
-      '<div class="sheet-body"><div class="ed-body">' + (dirty() || cleared ? '' : savedLine()) + restored + banner(e) + sections(e) + '</div></div>' + padHtml + bar(w, can) + '</section>';
+    return K.drawer({ view: 'edit', size: 'long', height: 'full', title: S_('pp.edit.title'), subtitle: subtitle(),
+      aside: dirty() ? textAction('clear', 'act.clear') : '', close: { action: 'back' },
+      body: '<div class="ed-body">' + (dirty() || cleared ? '' : savedLine()) + restored + banner(e) + sections(e) + '</div>',
+      footer: padHtml + bar(w, can) });
   }
 
   /* =====================================================================================================
@@ -792,31 +802,37 @@
   }
   function dblDraft(p) { return store.select.doubleDraft(store.derived, { litter: crate, dose: p.dose, records: p.records, answer: dbl.answer || null, withdraw: dbl.withdraw || undefined }, stamp()); }
   function recTitle(r) { return r.castration ? PP.t('pp.common.mark.castrated', { c: r.castration.castrated || 0 }) : pigsText(r.n); }
-  function doublePage() {
+  // One question over the room: the two records, what happened, which record; Back + Save. Answered, it says what it
+  // did and opens the litter's log.
+  function doubleSheet() {
     var p = dblPair(), body = '', w = null, can = false;
     if (dblSaved) body += dblReceipt(dblSaved);
     if (p) {
       var recs = p.records.map(eventOf);
-      body += UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: 'pp.edit.dbl.title', description: 'pp.edit.dbl.desc' }, args: { title: { tx: txText(p.dose) } } });
       body += UI.rowGroup(recs.map(function (r) { var s = stampStrs(r.at, r.who); return UI.row({ title: '', description: '', strs: { title: 'pp.edit.dbl.rec', description: s[0] }, args: { title: { what: recTitle(r) }, description: s[1] } }); }).join(''));
       body += UI.choiceRadios({ label: PP.t('pp.edit.dbl.q'), layout: 'rows', action: 'dbl-answer', key: 'answer', selected: dbl.answer || '', strs: { label: 'pp.edit.dbl.q' },
-        options: [{ value: 'same', label: PP.t('pp.edit.dbl.same'), meta: PP.t('pp.edit.dbl.same_meta'), strs: { label: 'pp.edit.dbl.same', meta: 'pp.edit.dbl.same_meta' } },
-          { value: 'twice', label: PP.t('pp.edit.dbl.twice'), meta: PP.t('pp.edit.dbl.twice_meta'), strs: { label: 'pp.edit.dbl.twice', meta: 'pp.edit.dbl.twice_meta' } }] });
+        options: [{ value: 'same', label: PP.t('pp.edit.dbl.same'), meta: PP.t('pp.edit.dbl.same_short'), strs: { label: 'pp.edit.dbl.same', meta: 'pp.edit.dbl.same_short' } },
+          { value: 'twice', label: PP.t('pp.edit.dbl.twice'), meta: PP.t('pp.edit.dbl.twice_short'), strs: { label: 'pp.edit.dbl.twice', meta: 'pp.edit.dbl.twice_short' } }] });
       if (dbl.answer === 'same') {
         body += UI.choiceRadios({ label: PP.t('pp.edit.dbl.which'), layout: 'rows', action: 'dbl-withdraw', key: 'withdraw', selected: dbl.withdraw || '', strs: { label: 'pp.edit.dbl.which' },
-          options: recs.map(function (r) { var s = stampStrs(r.at, r.who); return { value: r.id, label: PP.t(s[0], s[1]), meta: PP.t('pp.edit.dbl.which_meta', { what: recTitle(r) }), strs: { label: s[0], meta: 'pp.edit.dbl.which_meta' }, args: { label: s[1], meta: { what: recTitle(r) } } }; }) });
+          options: recs.map(function (r) { var s = stampStrs(r.at, r.who); return { value: r.id, label: PP.t(s[0], s[1]), strs: { label: s[0] }, args: { label: s[1] } }; }) });
       }
       if (!dbl.answer) w = ['pp.edit.dbl.wait.answer', null];
       else if (dbl.answer === 'same' && !dbl.withdraw) w = ['pp.edit.dbl.wait.which', null];
       else { var r0 = dblDraft(p); if (r0.why) w = ['pp.edit.wait.refused', { code: crate }]; else can = true; }
       if (L().task && store.derived.tasks.some(function (T) { return T.id === L().task && T.ended && T.ended.event; })) body += sline([part('pp.edit.dbl.after_end', null, 'amber')]);
-    } else if (!dblSaved) {
-      var done = answered();
-      body += UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: done.length ? 'pp.edit.dbl.done_title' : 'pp.edit.dbl.none', description: done.length ? 'pp.edit.dbl.done_desc' : 'pp.edit.dbl.none_desc' } });
-      done.forEach(function (x) { body += dblReceipt(x, true); });
+    } else {
+      if (!dblSaved) {
+        var done = answered();
+        body += UI.heading({ title: '', kind: 'section', level: 3, strs: { title: done.length ? 'pp.edit.dbl.done_title' : 'pp.edit.dbl.none' } });
+        done.forEach(function (x) { body += dblReceipt(x, true); });
+      }
+      body += UI.rowGroup(UI.row({ title: '', action: 'open-record', strs: { title: 'pp.edit.log.title' } }));
     }
-    return '<section class="sheet" data-ds="Sheet" data-presentation="page">' + header('pp.edit.dbl.sub') + '<div class="sheet-body"><div class="ed-body">' + body + '</div></div>' +
-      (p ? bar(w, can) : '<footer class="sheet-footer">' + button('secondary', 'back', 'act.back') + button('secondary', 'open-record', 'pp.edit.rec.title') + '</footer>') + '</section>';
+    return K.drawer({ view: 'double', size: 'long', close: { action: 'back' }, subtitle: subtitle(),
+      title: p ? S_('pp.edit.dbl.title', { tx: txText(p.dose) }) : S_('pp.edit.dbl.sub'),
+      body: '<div class="ed-body">' + body + '</div>',
+      footer: p ? bar(w, can) : K.footer({ back: { action: 'back' } }) });
   }
   // What an answer did: which record was withdrawn (kept, stamped) or that a double dose is on record for the vet; counted once.
   function dblReceipt(x, past) {
@@ -851,10 +867,9 @@
       title = [mv.dir === 'out' ? 'pp.edit.move.to' : 'pp.edit.move.from', null];
       opts = e.crates().filter(function (c) { return mv.dir === 'in' || !c.sowDied; }).map(crateOpt);
     }
-    return '<div class="scrim" data-ds="Sheet" data-action="picker-back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
-      '<header class="utility-header">' + UI.heading({ title: '', kind: 'page', level: 3, strs: { title: title[0] }, args: { title: title[1] } }) + '</header>' +
-      '<div class="sheet-body">' + UI.chooserList(UI.pickerOptions({ options: opts, selected: sel, action: 'pick' }), { tone: 'inset', ds: 'PickerField' }) + '</div>' +
-      '<footer class="sheet-footer">' + button('secondary', 'picker-back', 'act.back') + '</footer></section>';
+    return K.drawer({ view: 'picker', size: 'long', scrim: { action: 'picker-back' }, close: { action: 'picker-back' }, title: S_(title[0], title[1]),
+      body: UI.chooserList(UI.pickerOptions({ options: opts, selected: sel, action: 'pick' }), { tone: 'inset', ds: 'PickerField' }),
+      footer: K.footer({ back: { action: 'picker-back' } }) });
   }
 
   /* ---- drafts live on this phone (localStorage: they survive a locked phone); each carries the values it was drawn on ---- */
@@ -902,15 +917,17 @@
   /* ---- render: keeps scroll and focus; live regions mount empty and are filled after (ADR 0002) ---- */
   function render() {
     var scr = document.getElementById('screen');
-    var body = scr.querySelector('[data-presentation="page"] .sheet-body'), top = body ? body.scrollTop : 0;
+    var body = scr.querySelector('[data-view="' + view + '"] .tk-sheet-body, .tk-page-body'), top = body ? body.scrollTop : 0;
     var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-action]');
     var fk = f ? [f.dataset.action, f.dataset.value || '', f.dataset.step || '', f.dataset.key || ''] : null;
-    if (view === 'record') scr.innerHTML = recordPage().replace('data-presentation="page">', 'data-presentation="page"' + (photo ? ' inert' : '') + '>') + (photo ? photoViewer() : '');
-    else if (view === 'double') scr.innerHTML = doublePage();
-    else { var e = E(); scr.innerHTML = editPage(e) + (picker ? pickerDrawer(e) : ''); }
+    var html;
+    if (view === 'record') html = recordPage().replace('data-ds="TaskPage"', 'data-ds="TaskPage"' + (photo ? ' inert' : '')) + (photo ? '<div class="ed-over">' + photoViewer() + '</div>' : '');
+    else if (view === 'double') html = doubleSheet();
+    else { var e = E(); html = (picker ? '<div inert>' + editSheet(e) + '</div><div class="ed-over">' + pickerDrawer(e) + '</div>' : editSheet(e)); }
+    scr.innerHTML = K.phone(behind() + html, { label: S_('pp.common.task') });
     PP.apply(scr);
     UI.liveFill(scr, { then: function (el) { PP.apply(el); } });
-    var nb = scr.querySelector('[data-presentation="page"] .sheet-body'); if (nb) nb.scrollTop = top;
+    var nb = scr.querySelector('[data-view="' + view + '"] .tk-sheet-body, .tk-page-body'); if (nb) nb.scrollTop = top;
     // The pad rule: the host scrolls the active field into view above the docked pad.
     var act = pad && scr.querySelector('.ed-tray [data-field="' + pad + '"], .ed-tray [data-action="open-pad"][data-value="' + pad + '"]');
     if (act) act.scrollIntoView({ block: 'nearest' });
@@ -930,12 +947,13 @@
     if (from === 'record') return PP.href('edit.html', { state: 'record-page', crate: crate, data: store.name });
     if (from === 'id') return PP.href('id.html', { state: 'id-table', crate: crate, data: data });
     if (from === 'count') return PP.href('count.html', { state: 'explain', crate: crate, data: store.name });
-    if (from === 'room') return PP.href('room.html', { state: 'room', unit: L().room, data: data });
+    if (from === 'room') return PP.href('room.html', { unit: L().room, data: data });
     if (from === 'end') {
       var over = (store.derived.tasks || []).some(function (T) { return T.id === L().task && T.ended && T.ended.event; });
       return PP.href('end.html', { state: over ? 'ended' : 'end-review', unit: qs.get('unit') || '', data: data });
     }
-    return PP.href('litter.html', Object.assign({ state: 'litter', crate: crate, stay: 1, data: data }, extra || {}));
+    // the litter opens as a drawer over the room (RULINGS round 5)
+    return PP.href('room.html', Object.assign({ state: 'litter', crate: crate, data: data }, extra || {}));
   }
   function commitRowTyping() {
     if (!rowOpen || !pad) return;
@@ -957,7 +975,7 @@
     try { localStorage.removeItem(key()); } catch (err) {}
     setUrl('edit-saved', { saved: saved.id });
     render();
-    var sb = document.querySelector('[data-presentation="page"] .sheet-body'); if (sb) sb.scrollTop = 0;
+    var sb = document.querySelector('[data-view="edit"] .tk-sheet-body'); if (sb) sb.scrollTop = 0;
   }
   function saveDouble() {
     var p = dblPair(); if (!p) return;
@@ -1085,17 +1103,17 @@
       var un = document.querySelector('#ed-banner [data-action="undo-clear"]'); if (un) un.focus();
       clearTimeout(clearTimer);
       clearTimer = setTimeout(function () {
-        var bn = document.getElementById('ed-banner'), first = document.querySelector('.ed-body [data-action]:not(#ed-banner *)');
+        var bn = document.getElementById('ed-banner'), first = document.querySelector('[data-view="edit"] .ed-body [data-action]:not(#ed-banner *)');
         if (bn) UI.handFocus(bn, first); cleared = null; render();
       }, 5000);
     } else if (a === 'undo-clear') {
       clearTimeout(clearTimer); if (cleared) draft = cleared.draft; cleared = null; render();
-      var cl = document.querySelector('#ed-banner [data-action="clear"]'); if (cl) cl.focus();
+      var cl = document.querySelector('[data-view="edit"] .tk-sheet-head [data-action="clear"]'); if (cl) cl.focus();
     } else if (a === 'save') {
       if (now - lastSave < 600) { render(); return; }
       lastSave = now;
       if (view === 'double') saveDouble(); else save();
-    } else if (a === 'back') {
+    } else if (a === 'back' || a === 'dismiss') {
       if (now - drawerClosedAt < 400) return;
       if (pad) { commitRowTyping(); pad = null; render(); return; }  // Back closes the pad first; the typed value is kept
       if (view === 'double' && qs.get('from') === 'edit') { location.href = PP.href('edit.html', { state: 'edit', crate: crate, data: store.name !== 'base' ? store.name : '', from: 'litter' }); return; }
