@@ -119,7 +119,8 @@
   }
   function row(r, how) {
     return K.row({ id: s('pp.bulk.code', { code: r.litter }), chip: chip(r), headline: headline(r), tone: r.kind === 'not_due' ? 'forecast' : '',
-      meta: s('pp.common.unit.day', { n: r.day }), value: r.litter,
+      // The title says the dose's day (`Iron · day 3`): the litter's age shows only where it differs from it.
+      meta: r.day !== doseCfg(DOSE).due ? s('pp.common.unit.day', { n: r.day }) : '', value: r.litter,
       trail: how === 'select' ? 'tick' : how === 'door' ? 'chevron' : '', action: how === 'door' ? 'open-litter' : '', still: how === 'static',
       tick: how === 'select' ? { action: 'toggle', checked: S.sel.indexOf(r.litter) >= 0 } : null,
       data: S.flash && S.held.indexOf(r.litter) >= 0 ? { flash: '' } : null });
