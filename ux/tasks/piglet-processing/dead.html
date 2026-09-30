@@ -179,12 +179,9 @@
       strs: labelId ? { label: labelId } : undefined, args: labelArgs ? { label: labelArgs } : undefined,
       options: options.map(function (o) { return { value: o.v, label: '', strs: { label: o.id }, args: o.args ? { label: o.args } : undefined }; }) });
   }
-  // A door row (Row card): one title, at most one meta line, a chevron.
-  function door(action, value, title, titleArgs, desc, descArgs, trailing) {
-    var strs = { title: title }, args = { title: titleArgs };
-    if (desc) { strs.description = desc; args.description = descArgs; }
-    if (trailing) { strs.trailing = trailing; }
-    return UI.row({ title: '', description: desc ? '' : undefined, trailing: trailing ? '' : undefined, action: action, value: value || '', strs: strs, args: args });
+  // A door row (TaskRow door: farrowing's disclosure row): one title, at most one meta line, a chevron.
+  function door(action, value, title, titleArgs, desc, descArgs) {
+    return K.door({ title: s(title, titleArgs), description: desc ? s(desc, descArgs) : null, action: action, value: value || '' });
   }
 
   // ---- The room behind the drawer: the room page itself, inert (the drawer always leads; Back and Save leave the page) ----
@@ -197,7 +194,7 @@
   function tallyRow(c) {
     var d = S.pig.tallies[c] || 0, full = bodies() >= draft().cap;
     var cause = PP.t('ds.dead.cause.' + c);
-    return UI.stepper({ label: '', value: d, min: 0, max: full ? d : null, key: c, action: 'dead-step',
+    return K.stepper({ face: 'row', label: '', value: d, min: 0, max: full ? d : null, key: c, action: 'dead-step',
       draft: d > 0, reserveHint: S.hint === c, hint: S.hint === c ? ' ' : '',
       strs: Object.assign({ label: 'ds.dead.cause.' + c, value: 'ds.field.figure', decrease: 'pp.dead.aria.less', increase: 'pp.dead.aria.more' },
         S.hint === c ? { hint: roster().length ? 'ds.dead.hint.cap_identified' : 'ds.dead.hint.cap' } : {}),
@@ -217,7 +214,7 @@
     } else hint = { id: 'ds.dead.loss.ask' };
     // `None were missing` is an explicit answer (a text action), so the floor-gray minus keeps its one meaning.
     var none = b && k == null && !d.kMin ? [{ label: PP.t('ds.dead.loss.none'), action: 'loss-none', strs: { label: 'ds.dead.loss.none' } }] : [];
-    return '<div data-target="loss">' + UI.stepper({ label: '', value: k || 0, min: k == null ? 0 : d.kMin, max: d.kMax, key: 'k', action: 'loss-step', hint: ' ', pointers: none,
+    return '<div data-target="loss">' + K.stepper({ face: 'row', label: '', value: k || 0, min: k == null ? 0 : d.kMin, max: d.kMax, key: 'k', action: 'loss-step', hint: ' ', pointers: none,
       strs: { label: 'ds.dead.loss.label', value: 'ds.field.figure', hint: hint.id, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { label: { m: m }, hint: hint.args } }) + '</div>';
   }
@@ -238,32 +235,32 @@
   // One compact row, shown once a body is counted: routed (tap = record it here instead), one neighbour (tap = record it
   // there), or several (tap = the list, one level down).
   function neighbourRow() {
-    if (S.pig.route) return '<div data-target="route">' + UI.rowGroup(door('route', crate, 'pp.dead.route.title', { code: tgt(), from: crate }, null, null, 'ds.c2.undo')) + '</div>';
+    if (S.pig.route) return '<div data-target="route">' + door('route', crate, 'pp.dead.route.title', { code: tgt(), from: crate }, 'pp.dead.route.undo', { from: crate }) + '</div>';
     if (!bodies()) return '';
     var list = neighbours();
     if (!list.length) return '';
-    if (list.length === 1) return UI.rowGroup(door('route', list[0].id, pl('pp.dead.nb.row', list[0].m), { code: list[0].id, m: list[0].m }));
-    return UI.rowGroup(door('sub', 'nb', 'pp.dead.nb.title', null, pl('pp.dead.nb.some', list.length), { n: list.length }));
+    if (list.length === 1) return door('route', list[0].id, pl('pp.dead.nb.row', list[0].m), { code: list[0].id, m: list[0].m });
+    return door('sub', 'nb', 'pp.dead.nb.title', null, pl('pp.dead.nb.some', list.length), { n: list.length });
   }
   // The litter's tagged piglets (Q9: the shared picker shows them when there are any): one row here, the list one level down.
   function taggedRow() {
     var rs = roster();
     if (!rs.length) return '';
     var n = picks().length;
-    return '<div data-target="tagged">' + UI.rowGroup(door('sub', 'tagged', 'ds.dead.identified', { n: rs.length }, n ? pl('pp.dead.tagged.picked', n) : null, { n: n })) + '</div>';
+    return '<div data-target="tagged">' + door('sub', 'tagged', 'ds.dead.identified', { n: rs.length }, n ? pl('pp.dead.tagged.picked', n) : null, { n: n }) + '</div>';
   }
   // The same body recorded twice (RULINGS round 3), shown where the next body is recorded (R1-22): one row, answered
   // in a dialog over the drawer.
   function heldRow() {
     return heldOpen().map(function (h) {
-      return '<div data-target="held">' + UI.rowGroup(door('sub', 'held', 'pp.count.held.title', null, 'pp.count.held.row', { b: h.who, t: U.time(h.at) })) + '</div>';
+      return '<div data-target="held">' + door('sub', 'held', 'pp.count.held.title', null, 'pp.count.held.row', { b: h.who, t: U.time(h.at) }) + '</div>';
     }).join('');
   }
   // Photos ride this Save: kept on the event, previewed and removable before Save (the viewer), shown in the record.
   function photoField(key, active) {
     var list = S[key].photos, del = S.deleted && S.deleted.key === key;
     var hint = del ? 'ds.c2.photos.deleted' : S.photoHint[key] || '';
-    return UI.photos({ label: '', optional: '', key: key, id: 'dd-photos-' + key, active: active, items: list.map(function (p) { return { id: p.id }; }),
+    return K.photos({ label: '', optional: '', key: key, id: 'dd-photos-' + key, active: active, items: list.map(function (p) { return { id: p.id }; }),
       count: list.length ? { text: '', strs: { text: 'ds.c2.photos.attached' }, args: { text: { n: list.length } } } : null, hint: hint ? ' ' : '',
       strs: Object.assign({ label: 'ds.dead.photos', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera', thumb: 'ds.c2.aria.thumb', index: 'ds.c2.photos.index' }, hint ? { hint: hint } : {}),
       args: { hint: { n: 12 } } }) + (del ? textAct('photo-undo', 'ds.c2.undo', null, key) : '');
