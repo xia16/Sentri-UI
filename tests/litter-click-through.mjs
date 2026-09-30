@@ -47,6 +47,8 @@ try {
   d = await drawer(page);
   assert.match(d, /Already had it/);
   await page.click('[data-action="step"][data-value="had"][data-step="1"]');
+  // round 2 (item 11): no hint line above the footer — the waiting Save says why when tapped
+  await page.click('[data-action="save"]', { force: true });
   assert.match(await drawer(page), /Say what to do with the other piglet/);
   await page.click('[data-action="radio"][data-value="record"]');
   await page.click('[data-action="save"]');
@@ -87,7 +89,7 @@ try {
   assert.match(await text(page, '[data-st-context="drawer"]'), /Saved · 2 piglets moved to A02/);   // move.html's own drawer
   await openLitter(page, 'A02', null, false);
   f = await face(page);
-  assert.match(f, /Born 13 Alive 14 Dead 1 Moved in 2/);
+  assert.match(f, /Born 13 Alive now 14 Dead 1 Moved in 2/);
   assert.match(f, /Day 3 Due today Iron 12 owed now of 14\s*·?\s*12 of its own\s*·?\s*day 3\s*·?\s*due today\s*·?\s*2 from D06\s*·?\s*day 1\s*·?\s*due in 2 days/);
   await page.click('[data-action="record"][data-value="iron3"]');
   assert.match(await bar(page), /Saved · iron · day 3 · 12 piglets · 2 not due yet, back on their day/);
@@ -168,13 +170,13 @@ try {
   assert.equal(await page.locator('[data-action="record"]').count(), 0);
   // …and a review open at End reads `unresolved at End`, still answerable (round 4)
   await openLitter(page, 'A05', 'ended', false);
-  assert.match(await face(page), /Possible double treatment · Iron · day 3.*unresolved at end · still answerable/);
+  assert.match(await face(page), /Possible double · Iron · day 3.*unresolved at end · still answerable/);
   console.log('ok 9 ended: not done at End · unresolved at End');
 
   // 10. R1-19: a litter emptied by moves reads closed.
   await openLitter(page, 'C05', 'emptied', true);
   f = await face(page);
-  assert.match(f, /Born 9 Alive 0 Dead 1 Moved out 8/);
+  assert.match(f, /Born 9 Alive now 0 Dead 1 Moved out 8/);
   assert.match(f, /Litter closed No piglets left · nothing owed/);
   assert.doesNotMatch(f, /Owed today|Later/);
   console.log('ok 10 emptied → Litter closed');
@@ -188,12 +190,12 @@ try {
 
   // 12. R1-22: a held body and a possible double are on the sheet, each with its door to the answer.
   await openLitter(page, 'A07', 'held-body', true);
-  assert.match(await face(page), /Needs an answer 1 held for review Same body recorded twice\?/);
+  assert.match(await face(page), /Needs an answer 1 held for review Body held · recorded twice\?/);
   await page.click('[data-action="open-review"]');
   await page.waitForURL(/count\.html/); await ready(page);
   assert.match(await text(page, '#screen'), /Same body recorded twice\?/);
   await openLitter(page, 'A05', null, true);
-  assert.match(await face(page), /Possible double treatment · Iron · day 3 08:40 · L\.M · 11 piglets\s*·?\s*08:52 · G\.H · 11 piglets\s*·?\s*same injection recorded twice, or given twice\?/);
+  assert.match(await face(page), /Possible double · Iron · day 3 08:40 · L\.M, 08:52 · G\.H\s*·?\s*same injection recorded twice, or given twice\?/);
   await page.click('[data-action="open-review"]');
   await page.waitForURL(/edit\.html\?.*double=T-A05-lm%2BT-A05-gh/);
   console.log('ok 12 held body → count host; possible double → Edit');
@@ -202,7 +204,7 @@ try {
   await openLitter(page, 'D02', 'moved-orphan', true);
   f = await face(page);
   assert.match(page.url(), /state=litter/);
-  assert.match(f, /Alive 13 Dead 0 Moved in 13/);
+  assert.match(f, /Alive now 13 Dead 0 Moved in 13/);
   assert.match(f, /Nurse sow from B01/);
   assert.match(f, /Her earlier litter born 12 · dead 1 · weaned 11/);
   assert.equal(await page.locator('[data-action="record"][data-value="iron3"]').count(), 1);
@@ -226,7 +228,7 @@ try {
   await page.click('[data-action="save"]');
   await page.waitForURL(/state=litter.*saved=dead/); await ready(page);
   assert.match(await bar(page), /Saved · \+1 crushed/);
-  assert.match(await face(page), /Alive 11 Dead 2/);
+  assert.match(await face(page), /Alive now 11 Dead 2/);
   await page.reload(); await ready(page);
   assert.doesNotMatch(await bar(page), /crushed/);              // handed over once, then dropped
   console.log('ok 15 dead Save → litter receipt:', (await bar(page)).slice(0, 40), '(once)');

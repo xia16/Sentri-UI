@@ -181,20 +181,27 @@
       var n = function (v) { return ['ds.field.figure', { n: v }]; };
       // Before the lock Born is not final: Alive and Dead only (farrowing owns the count).
       if (locked() && (b.born || !b.earlier)) items.push(f(['label.born'], n(b.born), x.endedBySowDeath ? ['pp.edge.born.derived'] : null));
-      items.push(f(['label.alive'], n(b.alive)));
+      items.push(f(['pp.litter.fact.alive_now'], n(b.alive)));      // farrowing's `Alive now`
       items.push(f(['label.dead'], n(b.dead)));
       if (b.movedIn) items.push(f(['pp.edge.fact.in'], n(b.movedIn)));
       if (b.movedOut) items.push(f(['pp.edge.fact.out'], n(b.movedOut)));
       if (b.weaned) items.push(f(['pp.edge.fact.weaned'], n(b.weaned)));
       if (b.loss) items.push(f(['pp.edge.fact.loss'], n(b.loss)));
       if (b.gain) items.push(f(['pp.edge.fact.gain'], n(b.gain)));
-      var nu = view().nurse, e = view().earlier;
-      if (nu) items.push(f(['pp.litter.fact.nurse'], ['pp.litter.fact.nurse_from', { code: nu.from }]));
-      if (e) items.push(f(['pp.litter.nurse.earlier'], ['pp.litter.fact.earlier', { b: e.born, d: e.dead, w: e.weaned }]));
-      if (SOW.weight) items.push(f(['pp.common.weight.title'], ['pp.common.kg', { w: SOW.weight.kg }]));
+      // Facts that are not a figure sit on their own full-width line at the panel's foot, as farrowing's
+      // `Litter weight 12.6 kg` does (never a wrapping grid cell).
+      var inline = [], nu = view().nurse, e = view().earlier;
+      if (nu) inline.push(f(['pp.litter.fact.nurse'], ['pp.litter.fact.nurse_from', { code: nu.from }]));
+      if (e) inline.push(f(['pp.litter.nurse.earlier'], ['pp.litter.fact.earlier', { b: e.born, d: e.dead, w: e.weaned }]));
+      if (SOW.weight) inline.push(f(['pp.litter.fact.weight'], ['pp.common.kg', { w: SOW.weight.kg }]));
+      var panel = UI.facts(items, { columns: 3 });
+      if (inline.length) {
+        var lines = inline.map(function (it) { return UI.facts([it], { columns: 1 }).replace(/^<dl[^>]*>/, '').replace(/<\/dl>$/, '').replace('class="st-fact"', 'class="st-fact lt-fact-line"'); }).join('');
+        panel = panel.replace(/<\/dl>$/, lines + '</dl>');
+      }
       var log = '<button type="button" class="st-heading-link" data-action="open-record" data-value="' + U.esc(crate) + '">' + U.span('pp.litter.view_log') + window.SentriIcons.icon('chevron') + '</button>';
       return '<section class="lt-summary">' + UI.heading({ title: '', kind: 'section', level: 3, icon: window.SentriIcons.icon('record'), action: log, strs: { title: 'pp.litter.summary' } }) +
-        UI.facts(items, { columns: 3 }) + '</section>';
+        panel + '</section>';
     }
 
     /* ---- the tools (farrowing's tool row): Edit · Record dead · Set count · Move. Before the lock the farrowing sheet owns
@@ -215,9 +222,21 @@
       var ck = kept('count'), list = [];
       if (L().recordable || hasRecords()) list.push({ action: 'open-edit', value: crate, icon: 'edit', label: 'act.edit' });
       list.push({ action: 'open-dead', value: crate, icon: 'alert', label: 'act.record_dead', kept: deadKept() });
-      list.push({ action: 'open-count', value: crate, icon: 'check', label: 'pp.count.title', kept: ck && ck.observed != null ? ['pp.litter.tool.count_n', { n: ck.observed }] : null });
-      list.push({ action: 'open-move', value: crate, icon: 'transfer', label: 'pp.move.title' });
+      list.push({ action: 'open-count', value: crate, icon: 'check', label: 'pp.count.title', kept: countKept(), fold: 'wide' });
+      list.push({ action: 'open-move', value: crate, icon: 'transfer', label: 'pp.move.title', fold: 'wide' });
+      // at narrow widths Set count and Move fold into farrowing's More actions (a view in this drawer)
+      list.push({ action: 'open-more', value: crate, icon: 'more', label: 'pp.litter.more', fold: 'narrow' });
       return U.toolRow(list, { label: 'pp.litter.tools' });
+    }
+    function countKept() { var ck = kept('count'); return ck && ck.observed != null ? ['pp.litter.tool.count_n', { n: ck.observed }] : null; }
+    /* More actions (farrowing's sow actions): the tools the narrow row folds, as doors. */
+    var moreView = false;
+    function moreSheet() {
+      var ck = countKept();
+      return K.sheet({ title: S('pp.litter.more'), subtitle: S('pp.room.code', { code: crate }), close: null, size: 'long', view: 'more',
+        body: K.doors({ items: [{ title: S('pp.count.title'), description: ck ? S(ck[0], ck[1]) : null, action: 'open-count', value: crate },
+          { title: S('pp.move.title'), description: S('pp.common.record.move_desc'), action: 'open-move', value: crate }] }),
+        footer: K.footer({ back: { action: 'back' } }) });
     }
     function prelockDoor() {
       return '<div class="lt-doors">' + K.door({ title: S('pp.edge.prelock.door'), description: S('pp.edge.prelock.door_desc'), action: 'open-farrowing', value: SOW.sow }) + '</div>';
@@ -338,7 +357,8 @@
       if (x.kind === 'double') {
         var recs = x.records.map(recordOf).filter(Boolean);
         t = [P('pp.litter.review.double', { tx: titleText(x.dose) })];
-        recs.forEach(function (r) { d.push(P('pp.litter.review.rec', { stamp: stampText(r.at, r.who), pigs: pigs(r.n) })); });
+        // one review-label format everywhere: provenance `08:40 · L.M, 08:52 · G.H` (the room's review sheet says the same)
+        if (recs.length) d.push(P('pp.room.codes', { list: recs.map(function (r) { return stampText(r.at, r.who); }).join(', ') }));
         d.push(P('pp.litter.review.double_q'));
       } else if (x.kind === 'held') {
         t = [P('pp.litter.review.held')];
@@ -568,12 +588,16 @@
     function clearAside(show) { return show ? btn({ id: 'act.clear', register: 'text', action: 'clear' }) : ''; }
     /* A treatment in the drawer: its title, one subtitle line (the crate and what is owed), the body, and Back + Save. The
        reason Save waits for is the footer's status line (TaskSheet's status slot); a tap on the waiting Save flashes it. */
+    /* No hint line stands above the footer (parity review 2, item 11): a waiting Save stands alone, and a tap on it says
+       why — the reason line appears then (answered), and goes with the next change to the draft. */
+    var whyShown = false;
     function doseSheet(titleSlot, sub, body, aside) {
       var w = waiting();
-      return K.sheet({ title: titleSlot, subtitle: [S('pp.room.code', { code: crate }), { sep: true }].concat(sub), close: null, aside: aside, size: 'long', view: 'dose',
+      var html = K.sheet({ title: titleSlot, subtitle: [S('pp.room.code', { code: crate }), { sep: true }].concat(sub), close: null, aside: aside, size: 'long', view: 'dose',
         body: '<div class="lt-stack">' + body + '</div>',
-        footer: K.footer({ back: { action: 'back' }, status: w ? Object.assign(S(w[0], w[1]), { id: 'lt-why' }) : null,
-          primary: { label: S('act.save'), register: 'primary', action: 'save', waiting: !!w, describedby: w ? 'lt-why' : '' } }) });
+        footer: K.footer({ back: { action: 'back' }, status: w && whyShown ? Object.assign(S(w[0], w[1]), { id: 'lt-why' }) : null,
+          primary: { label: S('act.save'), register: 'primary', action: 'save', waiting: !!w, describedby: w && whyShown ? 'lt-why' : '' } }) });
+      return w && whyShown ? html.replace('id="lt-why"', 'id="lt-why" data-answer=""') : html;
     }
     function doseDrawer() {
       var id = drawer.dose, x = D(id), t = title(id), d = doseCfg(id);
@@ -679,7 +703,7 @@
       saveDrafts(); drawer = null;
     }
     /* The URL key of the open view: the dose id, `res:<group>:<dose>` for arrivals, `range:<dose>` never (a range is its dose). */
-    function viewKey() { return weightView ? 'weight' : drawer ? (drawer.kind === 'resolve' ? drawer.key : drawer.dose) : ''; }
+    function viewKey() { return moreView ? 'more' : weightView ? 'weight' : drawer ? (drawer.kind === 'resolve' ? drawer.key : drawer.dose) : ''; }
 
     /* ---- the birth litter weight (only when missing; a concurrent second is kept as a conflict) ---- */
     function liveBorn() { var c = L().dead.byCause; return L().born - (c.stillborn || 0) - (c.mummified || 0); }
@@ -705,12 +729,14 @@
       if (conflict && SOW.weight) body += UI.facts([{ label: '', value: '', meta: '', strs: { label: 'pp.edge.weight.conflict_label', value: 'pp.common.kg', meta: 'pp.edge.data.stamp' },
           args: { value: { w: SOW.weight.kg }, meta: { stamp: U.stamp(SOW.weight.at, SOW.weight.who, TODAY) } } }], { columns: 1 }) +
         '<div class="lt-actions">' + btn({ id: 'pp.edge.weight.keep_theirs', register: 'secondary', action: 'keep-theirs' }) + btn({ id: 'act.edit', register: 'secondary', action: 'open-farrowing-edit', value: 'birth-weight' }) + '</div>';
-      if (W.pad) body += UI.numpad({ decimals: 1, intLength: 2, value: draft, key: 'bw', id: 'bw-pad', hint: W.hint ? ' ' : '',
-        strs: Object.assign({ digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad' }, W.hint ? { hint: W.hint } : {}) });
+      if (W.pad) body += UI.numpad({ decimals: 1, intLength: 2, value: draft, key: 'bw', id: 'bw-pad', hint: '',
+        strs: Object.assign({ digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad' }) });   // the keypad reserves no hint line (the field sits on its keys); a dead key's answer is the footer's status
       var ok = has && num > 0 && !refused && !conflict;
-      return K.sheet({ title: S('pp.common.weight.title'), subtitle: [S('pp.room.code', { code: crate }), { sep: true }, S('pp.edge.weight.pop', { n: n })], close: null, size: 'long', view: 'weight',
+      // farrowing's counting sheets carry Clear in the head (greyed while there is nothing to clear), not ✕
+      var clear = btn({ id: 'act.clear', register: 'text', action: 'clear-weight', waiting: !draft || !!conflict });
+      return K.sheet({ title: S('pp.common.weight.title'), subtitle: [S('pp.room.code', { code: crate }), { sep: true }, S('pp.edge.weight.pop', { n: n })], close: null, aside: clear, size: 'long', view: 'weight',
         body: '<div class="lt-stack">' + body + '</div>',
-        footer: K.footer({ back: { action: 'back' }, primary: btn({ id: 'act.save', register: 'primary', action: 'save-weight', waiting: !ok }) }) });
+        footer: K.footer({ back: { action: 'back' }, status: W.hint ? { text: PP.t(W.hint), str: W.hint, id: 'bw-why', tone: 'amber' } : null, primary: btn({ id: 'act.save', register: 'primary', action: 'save-weight', waiting: !ok }) }) });
     }
     function padKey(k) {
       var r = UI.numpadInput({ value: weightView.draft }, k, { decimals: 1, intLength: 2 });
@@ -781,23 +807,24 @@
     }
     function openKey(k) {
       if (!k) return false;
+      if (k === 'more') { moreView = true; return true; }
       if (k === 'weight') { if (SOW.weight && !conflict) return false; weightView = weightView || { draft: '', pad: true, hint: '' }; return true; }
       if (k.indexOf('res:') === 0) return openResolve(k.slice(4));
       if (!doseCfg(k)) return false;
       return openDose(k);
     }
     /* Back from a view to the litter: the draft is kept (Resume brings it back). */
-    function closeView() { if (drawer) keepAndClose(); if (weightView) { weightView = null; } }
+    function closeView() { moreView = false; whyShown = false; if (drawer) keepAndClose(); if (weightView) { weightView = null; } }
 
     var api = {
       get crate() { return crate; },
-      get view() { return !crate ? '' : weightView ? 'weight' : drawer ? 'dose' : 'litter'; },
+      get view() { return !crate ? '' : moreView ? 'more' : weightView ? 'weight' : drawer ? 'dose' : 'litter'; },
       viewKey: viewKey,
       /* Open the drawer on a litter (fresh state per litter); `o.preset` carries a litter state's fixture moment. */
       open: function (c, o) {
         o = o || {};
         store = host.store(); CFG = store.config; TODAY = store.today; PP.me = window.PPFixtures.ME;
-        if (c !== crate) { visit = {}; receipt = null; drawer = null; weightView = null; conflict = null; }
+        if (c !== crate) { visit = {}; receipt = null; drawer = null; weightView = null; conflict = null; moreView = false; }
         crate = c;
         SOW = store.sow(crate) || { sow: '', parity: 0, unit: 7, weight: null };
         if (!L()) { crate = ''; return false; }
@@ -856,17 +883,18 @@
       html: function () {
         if (!crate) return '';
         store = host.store();
-        var sheet = weightView ? weightSheet() : drawer ? (drawer.kind === 'resolve' ? resolveDrawer() : drawer.kind === 'range' ? rangeDrawer() : doseDrawer())
+        var sheet = moreView ? moreSheet() : weightView ? weightSheet() : drawer ? (drawer.kind === 'resolve' ? resolveDrawer() : drawer.kind === 'range' ? rangeDrawer() : doseDrawer())
           : K.sheet({ title: S('pp.room.code', { code: crate }), subtitle: subtitle(), close: { action: 'close' }, size: 'long', view: 'litter', label: S('pp.litter.aria', { code: crate }),
             body: faceBody(), footer: K.footer({ back: { action: 'close' } }) });
         return K.scrim({ action: 'scrim' }) + sheet;
       },
-      radio: function (field, value) { setRadio(field, value); },
+      radio: function (field, value) { whyShown = false; setRadio(field, value); },
       /* A click in the drawer. Returns 'render' (state changed), 'push' (a view opened: the host adds a history entry),
          'pop' (Back from a view), 'close' (the drawer closes), or '' (not the drawer's). */
       click: function (a, v, b) {
         var now = Date.now();
         if (a === 'step') {
+          whyShown = false;
           if (!drawer) return '';
           if (b.getAttribute('aria-disabled') === 'true') { ceilTap = +b.dataset.step > 0 ? v : ''; return 'render'; }
           ceilTap = '';
@@ -878,11 +906,15 @@
           else { drawer.n += step; if (drawer.n === owedOf(drawer.dose)) drawer.reason = ''; if (drawer.weak > restOf()) drawer.weak = restOf(); }
           return 'render';
         }
+        // a tap on the waiting Save shows why (the line appears answered); any other act clears it
+        if (a === 'save' && b.getAttribute('aria-disabled') === 'true') { whyShown = true; return 'render'; }
         if (UI.guard(b)) return 'guarded';
+        if (a !== 'save') whyShown = false;
         if (a === 'record') { if (now - lastCommit < 600) return 'guarded'; tap(v, b.dataset.n != null ? +b.dataset.n : shownN[v]); return 'render'; }
         if (a === 'undo') { undo(v); return 'render'; }
         if (a === 'open-dose') return openDose(v) ? 'push' : 'guarded';
         if (a === 'open-resolve') return openResolve(v) ? 'push' : 'guarded';
+        if (a === 'open-more') { moreView = true; return 'push'; }
         if (a === 'open-weight') { weightView = { draft: '', pad: true, hint: '' }; return 'push'; }
         if (a === 'radio') { setRadio(b.closest('[data-field]') ? b.closest('[data-field]').dataset.field : '', v); return 'render'; }
         if (a === 'no-males') {
@@ -920,6 +952,7 @@
         }
         // the birth litter weight
         if (a === 'numpad' && weightView) { padKey(b.dataset.key); return 'render'; }
+        if (a === 'clear-weight' && weightView) { weightView.draft = ''; weightView.pad = true; weightView.hint = ''; return 'render'; }
         if (a === 'open-numpad' && weightView) { if (!weightView.pad) { weightView.pad = true; weightView.hint = ''; } return 'render'; }
         if (a === 'save-weight') {
           var val = UI.numpadCommit(weightView.draft, { decimals: 1 });

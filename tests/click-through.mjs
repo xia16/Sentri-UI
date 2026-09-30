@@ -40,14 +40,14 @@ try {
   // 2. room → litter → Record death → Save → room: alive drops.
   await page.click('[data-action="open-litter"][data-value="A02"]');
   await page.waitForURL(/state=litter/); await ready(page);
-  assert.match(await text(page, '.lt-summary'), /Alive 12/);
+  assert.match(await text(page, '.lt-summary'), /Alive now 12/);
   await page.click('[data-action="open-dead"]');
   await page.waitForURL(/dead\.html/); await ready(page);
   await page.click('[data-action="dead-step"][data-value="crushed"][data-step="1"]');
   // Save returns to the litter it was opened from (no host stub, R1-26)
   await page.click('[data-action="save"]');
   await page.waitForURL(/state=litter/); await ready(page);
-  assert.match(await text(page, '.lt-summary'), /Alive 11 Dead 2/);
+  assert.match(await text(page, '.lt-summary'), /Alive now 11 Dead 2/);
   await page.click('[data-action="close"]');
   await page.waitForURL(/room\.html/); await ready(page);
   const dead = await rowText(page, 'A02');

@@ -57,7 +57,7 @@ try {
   //    says alive and dead went back; the litter reads Alive 12 again.
   await openLitter(page, 'A02');
   await recordDead(page, 0);
-  assert.match(await text(page, '.lt-summary'), /Alive 11/);
+  assert.match(await text(page, '.lt-summary'), /Alive now 11/);
   await openEdit(page);
   const death = page.locator('[data-action="death-void"]').last();
   await death.click();
@@ -67,7 +67,7 @@ try {
   assert.match(rc, /Correction saved · A02 · alive 11 → 12 · dead 2 → 1/);
   await page.click('[data-action="back"]');
   await page.waitForURL(/state=litter/); await ready(page);
-  assert.match(await text(page, '.lt-summary'), /Alive 12/);
+  assert.match(await text(page, '.lt-summary'), /Alive now 12/);
   console.log('ok 1 R1-7 room → A02 → dead → Edit → withdraw the death → Save:', rc);
 
   // 2. R1-7: a death on the wrong litter moves: Edit → On another litter → A04 → Save → both litters' alive in the receipt;

@@ -72,7 +72,8 @@
     o = o || {};
     return '<div class="pp-toolrow pp-tools" role="group" data-ds="Candidate:ToolRow"' + (o.label ? ' data-str-attr="aria-label:' + o.label + '" aria-label="' + esc(PP.t(o.label)) + '"' : '') + '>' +
       list.map(function (t) {
-        return '<button type="button" class="pp-tool" data-action="' + esc(t.action) + '" data-value="' + esc(t.value || '') + '">' + (t.icon ? ICON.icon(t.icon) : '') +
+        // fold: 'wide' — shown at 390, folded into More actions at narrow widths; 'narrow' — the More actions tool itself
+        return '<button type="button" class="pp-tool" data-action="' + esc(t.action) + '" data-value="' + esc(t.value || '') + '"' + (t.fold ? ' data-fold="' + esc(t.fold) + '"' : '') + '>' + (t.icon ? ICON.icon(t.icon) : '') +
           U.span(t.label) + (t.kept ? '<small>' + U.span(t.kept[0], t.kept[1]) + '</small>' : '') + '</button>';
       }).join('') + '</div>';
   };
