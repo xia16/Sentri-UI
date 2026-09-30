@@ -26,7 +26,7 @@ try {
   const before = await rowText(page, 'A02');
   assert.match(before, /Iron · Dock tail/);
   await page.click('[data-action="open-litter"][data-value="A02"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await page.click('[data-action="record"][data-value="iron3"]');
   assert.match(await text(page, '.pp-receipt'), /Saved · iron · day 3 · 12 piglets/);
   await page.waitForTimeout(700);
@@ -39,15 +39,15 @@ try {
 
   // 2. room → litter → Record dead → Save → room: alive drops.
   await page.click('[data-action="open-litter"][data-value="A02"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
-  assert.match(await text(page, '[data-action="open-record"]'), /Alive 12/);
+  await page.waitForURL(/state=litter/); await ready(page);
+  assert.match(await text(page, '.lt-summary'), /Alive 12/);
   await page.click('[data-action="open-dead"]');
   await page.waitForURL(/dead\.html/); await ready(page);
   await page.click('[data-action="dead-step"][data-value="crushed"][data-step="1"]');
   // Save returns to the litter it was opened from (no host stub, R1-26)
   await page.click('[data-action="save"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
-  assert.match(await text(page, '[data-action="open-record"]'), /Alive 11 · Dead 2/);
+  await page.waitForURL(/state=litter/); await ready(page);
+  assert.match(await text(page, '.lt-summary'), /Alive 11 Dead 2/);
   await page.click('[data-action="close"]');
   await page.waitForURL(/room\.html/); await ready(page);
   const dead = await rowText(page, 'A02');
@@ -135,11 +135,11 @@ try {
   assert.equal(await page.locator('[data-action="save"][aria-disabled="true"]').count(), 1);   // Save waits for the reason
   await page.click('[data-action="mark-why"][data-value$=":weak"]');
   await page.click('[data-action="save"]');
-  // Save stays on Edit and says what the correction did (R1-28); Back returns to the litter
+  // Save stays on Edit and says what the correction did (R1-28); Back returns to the litter (a drawer over the room)
   await page.waitForFunction(() => /Correction saved/.test((document.querySelector('#ed-saved') || {}).innerText || ''));
   assert.match((await text(page, '#ed-saved')).replace(/\s*·\s*/g, ' · '), /Correction saved · A02 · Iron · day 3 owed 0 → 2/);
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   // the evidence row is Row (ADR 0002): its tap opens Edit (✎); a corrected figure is amber and says what it was (R1-28)
   const rec = page.locator('[data-ds="Row"][data-action="open-edit"]', { hasText: 'Iron · day 3' }).first();
   assert.match((await rec.innerText()).replace(/\s+/g, ' '), /10 piglets\s*·?\s*2 deferred: weak.*was 12 · corrected/);

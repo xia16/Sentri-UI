@@ -23,6 +23,7 @@ async function openMove(page, crate, fresh) {
   const row = page.locator(`[data-action="open-litter"][data-value="${crate}"]`);
   if (!(await row.count())) await page.click('[data-action="lens"][data-value="all"]');
   await page.click(`[data-action="open-litter"][data-value="${crate}"]`);
+  await page.waitForURL(/state=litter/); await ready(page);
   await page.click(`[data-action="open-move"]`);
   await page.waitForURL(/move\.html/); await ready(page);
   await page.waitForSelector('.tk-page[data-view="move"]');
@@ -103,6 +104,12 @@ try {
   assert.match(d, /B08 will have 17 piglets/);
   assert.equal(await page.locator('[data-action="save-move"]').isDisabled(), false);
   console.log('ok 5 crowded warning:', d.match(/B08 will have[^.]*\./)[0]);
+
+  // 6. Back from the Move page lands on the litter's drawer over the room, its Move door there again.
+  await page.click('.tk-page[data-view="move"] .tk-footer [data-action="back"]');
+  await page.waitForURL(/room\.html\?.*state=litter.*crate=C05/); await ready(page);
+  await page.locator('[data-action="open-move"]').first().waitFor();
+  console.log('ok 6 Back → the litter drawer');
 
   await browser.close();
 } finally {

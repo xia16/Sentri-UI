@@ -762,7 +762,7 @@
     else if (a === 'save') { saveWeight(); render(); }
     // Back from the records: to the litter's drawer over the room. A piglet in hand and an unsaved weight stay on this phone
     // (saved on every change); reopening restores them.
-    else if (a === 'leave') { if (drawer) drawerKept = drawerDirty(drawer) ? drawer : null; saveDraft(); location.href = PP.href('room.html', { state: 'litter', crate: crate, data: store.name !== 'base' ? store.name : '' }); }
+    else if (a === 'leave') { if (drawer) drawerKept = drawerDirty(drawer) ? drawer : null; saveDraft(); location.href = PP.href('room.html', { state: 'litter', crate: crate, unit: L.room !== 7 ? L.room : '', data: store.name !== 'base' ? store.name : '' }); }
     // Edit (ticket #12): a row opens its correction drawer; Edit and the closed set open the litter's one Edit screen.
     else if (a === 'edit-row' || a === 'open-edit' || a === 'edit-done') {
       var row = a === 'edit-row' ? living().concat(rows).filter(function (x) { return key(x) === v; })[0] : null;

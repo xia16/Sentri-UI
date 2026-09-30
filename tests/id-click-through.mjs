@@ -25,11 +25,14 @@ const record = async (p) => { await tap(p, '.tk-footer [data-action="record"]');
 const progress = (p) => text(p, '[data-view="run"] .tk-page-desc');
 const toTable = (p) => tap(p, '[data-view="run"] .tk-footer [data-action="to-table"]');
 const leave = (p) => tap(p, '[data-view="table"] .tk-footer [data-action="leave"]');
-// the litter: its drawer over the room (or its own page); from there, Record identity
+// the room → the litter's drawer (room.html?state=litter) → Record identity
 async function openIdentity(p, crate) {
-  await p.waitForURL(/room\.html|litter\.html/); await ready(p);
-  if (!(await p.locator('[data-action="open-identity"]').count())) await tap(p, `[data-action="open-litter"][data-value="${crate}"]`);
-  await p.locator('[data-action="open-identity"]').first().waitFor(); await ready(p);
+  await tap(p, `[data-action="open-litter"][data-value="${crate}"]`);
+  await drawerIdentity(p, crate);
+}
+// on the litter's drawer (where Back from the records lands): Record identity
+async function drawerIdentity(p, crate) {
+  await p.waitForURL(new RegExp(`room\\.html\\?.*state=litter.*crate=${crate}`)); await ready(p);
   await tap(p, '[data-action="open-identity"]');
   await p.waitForURL(/id\.html/); await ready(p);
 }
@@ -106,7 +109,7 @@ try {
   await tap(page, '#id-sex [data-value="g"]');
   await toTable(page);
   await leave(page);
-  await openIdentity(page, 'A02');
+  await drawerIdentity(page, 'A02');
   assert.match(await text(page, '[data-action="open-run"]'), /Record identity · 1 unsaved/);
   await tap(page, '[data-action="open-run"]');
   assert.match(await status(page), /004305 kept on this phone · not recorded yet/);
@@ -133,7 +136,7 @@ try {
   await tap(page, '[data-st-context="drawer"] [data-action="back"]');
   assert.match(await text(page, '[data-action="open-weight"]'), /1 unsaved/);
   await leave(page);
-  await openIdentity(page, 'A02');
+  await drawerIdentity(page, 'A02');
   assert.match(await text(page, '[data-action="open-weight"]'), /1 unsaved/);
   await tap(page, '[data-action="open-weight"]');
   assert.match(await text(page, '[data-ds="Measure"][data-field="lw"]'), /16\.8/);
@@ -157,7 +160,7 @@ try {
   assert.match(await status(page), /All 12 alive identified/);
   await toTable(page);
   await leave(page);
-  await page.waitForURL(/room\.html|litter\.html/);
+  await page.waitForURL(/room\.html\?.*state=litter.*crate=A02/);
   console.log('ok 5 all identified → Back');
 
   // 6. keepers farm: tag two, close the set, the closed set never says "so far" and says how to add a keeper.

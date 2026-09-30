@@ -178,7 +178,7 @@
   }
   function heading(id, args, action) { return UI.heading({ title: '', kind: 'section', level: 3, strs: { title: id }, args: args ? { title: args } : undefined, action: action || '' }); }
   function rowLabel(r) { return r.tag ? PP.t('pp.move.rows.tag', { tag: r.tag }) : PP.t('pp.move.rows.notch', { notch: r.notch }); }
-  function litterHref(c) { return PP.href('room.html', { state: 'litter', crate: c, data: store.name !== 'base' ? store.name : '' }); }
+  function litterHref(c) { return PP.href('room.html', { state: 'litter', crate: c, unit: L(c) && L(c).room !== 7 ? L(c).room : '', data: store.name !== 'base' ? store.name : '' }); }
   // The task under every surface: the room's header, inert (the Move and Moves pages cover it).
   function taskScreen() { return K.screen({ inert: true, header: K.header({ title: s('pp.common.task'), back: { action: 'home' } }), body: '' }); }
 
