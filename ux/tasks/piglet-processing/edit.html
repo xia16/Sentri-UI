@@ -19,6 +19,9 @@
 .ed-body > * { margin: 0; }
 .ed-group { display: flex; flex-direction: column; gap: var(--space-heading); }
 .ed-group > * { margin: 0; }
+/* A live region the eye never sees (parity round 2, item 11): farrowing shows no line above its footer; a screen reader
+   still hears it, and a tap on the waiting primary (or the hold) says it again through the Button guard. */
+.ed-live { position: absolute; width: 1px; height: 1px; margin: 0; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 /* one rule between stacked records, as between farrowing's Edit rows */
 .ed-group[data-mark] + .ed-group[data-mark], .ed-group[data-count] + .ed-group[data-count], .ed-group[data-death] + .ed-group[data-death] { padding-top: var(--space-heading); border-top: 1px solid var(--line); }
 .ed-pad { flex: none; padding: var(--space-row-y) var(--space-gutter-sheet); background: var(--paper); border-top: 1px solid var(--line); }
@@ -739,9 +742,9 @@
   // The footer: Back and Save; Save waits (present, quiet) with its reason in one status line right above the footer
   // (ADR 0002), on the drawer's bottom edge. The footer is the drawer's last child (TaskSheet).
   function bar(w, can, saveId) {
-    // the footer's status slot (TaskSheet): why Save waits, one line right above the footer, only while it waits for a reason
-    return K.footer({ back: { action: 'back' }, status: w ? { id: 'ed-why', text: PP.t(w[0], w[1]), str: w[0], args: w[1] || undefined } : undefined,
-      primary: button('primary', 'save', saveId || 'act.save', { waiting: !can, describedby: w ? 'ed-why' : '' }) });
+    // why Save waits: a visually hidden live region (no line above the footer, as farrowing); the guard says it on a tap
+    var why = '<p class="ed-live" id="ed-why" role="status" aria-live="polite">' + (w ? span(w[0], w[1]) : '') + '</p>';
+    return why + K.footer({ back: { action: 'back' }, primary: button('primary', 'save', saveId || 'act.save', { waiting: !can, describedby: 'ed-why' }) });
   }
   /* R1-28: a correction says what it did. The receipt of a saved correction: every figure it moved, on every litter it
      touched (the ledger replayed without it, against the ledger with it). */

@@ -17,6 +17,9 @@
    (buttonReason) right above the footer, the danger Banner, Facts, Row doors, Status lines, Log. */
 .en-body { --tk-sticky: 0px; display: flex; flex-direction: column; gap: var(--space-section); }
 .en-body > * { margin: 0; }
+/* A live region the eye never sees (parity round 2, item 11): farrowing shows no line above its footer; a screen reader
+   still hears it, and a tap on the waiting primary (or the hold) says it again through the Button guard. */
+.en-live { position: absolute; width: 1px; height: 1px; margin: 0; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .en-block > .st-heading { margin: 0 0 var(--space-key-gap); }
 .en-groups { display: flex; flex-direction: column; gap: var(--space-heading); }
 </style>
@@ -455,7 +458,9 @@
       }
       var phase = S.unconfirmed ? 'unknown' : S.pending ? 'pending' : S.holding ? 'holding' : 'idle';
       // the hold's progress line is the footer's status slot (empty until the hold has something to say)
-      foot = K.footer({ back: { action: 'close-sheet' }, status: { id: 'pp-hold-status', text: '' }, hold: { label: P('pp.end.act.end'), caption: P(capId(phase)), action: 'hold', tone: 'danger', phase: phase } })
+      // the hold's progress line is heard, not seen (farrowing shows only the caption)
+      foot = '<p class="en-live" id="pp-hold-status" role="status" aria-live="polite"></p>' +
+        K.footer({ back: { action: 'close-sheet' }, hold: { label: P('pp.end.act.end'), caption: P(capId(phase)), action: 'hold', tone: 'danger', phase: phase, statusId: 'pp-hold-status' } })
         .replace('data-phase="holding"', S.holding === 'static' ? 'data-phase="holding" data-preview="still"' : 'data-phase="holding"');
     }
     return page('pp.end.title', null, 'pp.end.rv.scope', { n: UNIT, k: t.litters }, body, foot);
