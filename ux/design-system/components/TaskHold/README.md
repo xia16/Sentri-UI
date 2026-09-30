@@ -14,7 +14,7 @@ A commit that cannot be undone from the sheet (Finish farrowing, End task) is a 
 
 **Component contract**
 - **Props:** `SentriTask.footer({ back, hold: { label, caption, action, value, tone, phase, statusId, waiting, describedby } })`. Labels take text slots; they become the Button card's `strs`.
-- **Events:** bind with `SentriUI.holdBind(root, { onCommit, cues, t })`; commit is the host's.
+- **Events:** bind with **`SentriTask.holdBind(root, { onCommit, cues, t, … })`** (the same options and return as `SentriUI.holdBind`): as farrowing, **the caption stays as it is through the hold** (`HOLD TO END` never becomes `Keep holding`); the cues still reach the hold's status line when it has one (`statusId`, e.g. the footer's `status` slot). The unknown phase keeps the Button card's message. Commit is the host's.
 - **Port note:** a long-press with visible progress; the keyboard path is press twice.
 
 **Don'ts**
