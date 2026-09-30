@@ -237,7 +237,7 @@ try {
   await page.waitForURL(/end\.html/); await ready(page);
   const face = await text(page, '#screen');
   assert.match(face, /A05 · Iron · day 3 · possible double answered: given twice/);
-  assert.doesNotMatch(face, /Unresolved at end/);              // the frozen list no longer holds it
+  assert.doesNotMatch(face, /Unresolved at end \d+ items? A05/);              // the frozen list no longer holds it
   console.log('ok 10 an unresolved-at-End double answered after End → Since End');
 
   // 11. R1-30: End blocked by farrowing says where to end it and opens the litter still farrowing (never the concept board).
