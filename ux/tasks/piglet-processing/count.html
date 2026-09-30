@@ -15,15 +15,12 @@
    Explain; TaskDialog for one question. The body is cards: Stepper (hero), Facts, Row, ChoiceList, Heading, Status and
    Button's reason line. */
 .ct-over { display: contents; }
-/* a sheet over the Explain page: the page sits under the sheet's scrim */
-.ct-under > .tk-page { z-index: 1; }
 /* The room behind the sheets: the page the worker returns to, drawn by its own page (inert, never focusable). */
 .ct-behind { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--app-background); pointer-events: none; }
 .ct-body { display: flex; flex-direction: column; gap: var(--space-section); }
 .ct-body > * { margin: 0; }
 .ct-group { display: flex; flex-direction: column; gap: var(--space-heading); }
 .ct-group > * { margin: 0; }
-.ct-body .st-button-reason:empty { display: none; }
 .ct-body .st-status-line { margin: 0; }
 </style>
 </head>
@@ -154,13 +151,15 @@
   function lineStamp(l) {
     return { id: 'pp.count.line.stamp', args: { op: np(l.observed), stamp: stamp(l.at, l.who), wp: np(l.sizedAgainst) } };
   }
-  // Save (or the step's primary), and the reason it waits (Button's waiting face, ADR 0002): the reason line closes the body
-  function reason(p) {
-    return UI.buttonReason({ id: 'ct-why', text: p ? PP.t(p.id, p.args) : '', strs: p ? { text: p.id } : undefined, args: p && p.args ? { text: p.args } : undefined,
-      actions: p && p.act ? [{ label: PP.t(p.act.id, p.act.args), action: p.act.action, value: String(S.observed), strs: { label: p.act.id }, args: p.act.args ? { label: p.act.args } : undefined }] : [] });
+  // Save (or the step's primary), and the reason it waits (Button's waiting face, ADR 0002): the footer's status line
+  function saveFooter(p, waiting, action, id, args, backAction) {
+    return K.footer({ back: { action: backAction || 'back' }, status: p ? { text: PP.t(p.id, p.args), str: p.id, args: p.args, id: 'ct-why' } : null,
+      primary: { label: s(id || 'act.save', args), action: action || 'save', waiting: waiting } });
   }
-  function saveFooter(waiting, action, id, args, backAction) {
-    return K.footer({ back: { action: backAction || 'back' }, primary: { label: s(id || 'act.save', args), action: action || 'save', waiting: waiting, describedby: 'ct-why' } });
+  // the answer a sanity question takes (`17 is right`, `None are there`): a text action under the number it questions
+  function sureAct(p) {
+    if (!p || !p.act) return '';
+    return UI.button({ label: PP.t(p.act.id, p.act.args), register: 'text', action: p.act.action, value: String(S.observed), strs: { label: p.act.id }, args: p.act.args ? { label: p.act.args } : undefined });
   }
   function subtitleOf() {
     var x = L(), d = draft(), sub = [s('pp.count.sub.alive', { code: crate, a: x.alive })];
@@ -292,8 +291,8 @@
     var p = pointer(d);
     return K.drawer({ size: 'long', height: 'full', view: 'roster', title: s(must ? pl('pp.count.named.title', d.needRows) : 'pp.count.named.title_opt'),
       subtitle: [s(must ? pl('pp.count.named.desc', d.needRows) : 'pp.count.named.desc_opt', { up: np(d.untagged), kp: np(d.maxRows), n: d.needRows })], close: { action: 'sub-dismiss' },
-      body: '<div class="ct-body" data-target="roster-list">' + rows + reason(p) + '</div>',
-      footer: saveFooter(!d.event || !!stale() || S.failed || !!sanity(d), 'save', 'act.save', null, 'sub-back'), scrim: { action: 'sub-dismiss' } });
+      body: '<div class="ct-body" data-target="roster-list">' + rows + '</div>',
+      footer: saveFooter(p, !d.event || !!stale() || S.failed || !!sanity(d), 'save', 'act.save', null, 'sub-back'), scrim: { action: 'sub-dismiss' } });
   }
   function pointer(d) {
     if (S.failed) return { id: 'pp.count.why.failed' };
@@ -331,8 +330,8 @@
     // a held body is answered here too, above the number (R1-22): the drawer never hides the question under it
     return K.drawer({ size: 'long', view: 'count', title: s('pp.count.title'), subtitle: subtitleOf(),
       aside: dirty() ? UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '', close: { action: 'dismiss' },
-      body: '<div class="ct-body">' + heldRow() + hero + zeroSection(d) + rosterRow(d) + reason(p) + '</div>',
-      footer: saveFooter(!d.event || !!stale() || S.failed || !!sanity(d)), scrim: { action: 'dismiss' } });
+      body: '<div class="ct-body">' + heldRow() + hero + sureAct(p) + zeroSection(d) + rosterRow(d) + '</div>',
+      footer: saveFooter(p, !d.event || !!stale() || S.failed || !!sanity(d)), scrim: { action: 'dismiss' } });
   }
 
   /* ---- where the ledger does not take a count, the door says why: before the lock the count is the farrowing sheet's (hand-off);
@@ -387,14 +386,14 @@
       UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: t.id, description: st.id }, args: { title: t.args, description: st.args } }) +
       (note ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: note } }) : '') + UI.rowGroup(rows.join('')) + '</section>';
   }
-  function explainPage() {
+  function explainPage(inert) {
     var x = explain(), sub = { lp: np(x.openLoss), gp: np(x.openGain) };
     var title = S.room ? s('pp.count.ex.title_room', { u: S.room }) : s('pp.count.ex.title', { code: crate });
     // R1-8: a body found loose in the room — say whose missing piglet it is (the dead drawer lists the unit's open losses)
     var found = S.room && x.openLoss ? UI.rowGroup(row({ action: 'found-body', value: String(S.room), title: 'pp.count.ex.found', desc: 'pp.count.ex.found_desc' })) : '';
     var body = receiptLine() + (S.room ? '' : heldRow()) + found + (x.lines.length ? x.lines.map(function (l) { return lineSection(l, !!S.room); }).join('')
       : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.ex.empty' } }));
-    return K.page({ title: title, description: s('pp.count.ex.sub', sub), body: '<div class="ct-body">' + body + '</div>', footer: K.footer({ back: { action: 'back' } }) });
+    return K.page({ inert: !!inert, title: title, description: s('pp.count.ex.sub', sub), body: '<div class="ct-body">' + body + '</div>', footer: K.footer({ back: { action: 'back' } }) });
   }
   /* The suggestion, side by side: both counts (who, when, where), what saving it as a Move closes and leaves open, and the door
      to the Move sheet. A suggestion is never proof; nothing pairs until the worker saves the Move. */
@@ -436,8 +435,8 @@
     }
     var why = picked ? null : { id: pl('pp.count.why.pick', m.n), args: { n: m.n } };
     return K.drawer({ size: 'long', view: 'suggest', title: s(t, { code: sg.litter, np: np(sg.open), u: sg.room }), subtitle: [s('pp.count.sg.sub')], close: { action: 'dismiss' },
-      body: '<div class="ct-body">' + body + reason(why) + '</div>',
-      footer: saveFooter(!picked || !mv.event, 'open-move', 'pp.count.sg.move', { n: m.n, from: m.from, to: m.to }), scrim: { action: 'dismiss' } });
+      body: '<div class="ct-body">' + body + '</div>',
+      footer: saveFooter(why, !picked || !mv.event, 'open-move', 'pp.count.sg.move', { n: m.n, from: m.from, to: m.to }), scrim: { action: 'dismiss' } });
   }
 
   function behind() {
@@ -452,7 +451,7 @@
       if (S.sub === 'held') over = heldDialog();
     }
     else if (S.view === 'explain') { html = explainPage(); if (S.sub === 'held') over = heldDialog(); }
-    else if (S.view === 'suggest') { var dr = suggestSheet(); html = '<div class="ct-under" inert>' + explainPage() + '</div>' + dr; if (!dr) html = explainPage(); }
+    else if (S.view === 'suggest') { var dr = suggestSheet(); html = dr ? explainPage(true) + dr : explainPage(); }
     else { html = hostSheet(); if (S.sub === 'held') over = heldDialog(); }
     if (over) html = '<div inert>' + html + '</div>' + over;
     var root = document.getElementById('screen');

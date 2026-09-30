@@ -20,7 +20,6 @@
 .dd-body { display: flex; flex-direction: column; gap: var(--space-heading); }
 .dd-body > * { margin: 0; }
 .dd-body > .st-segment { margin-bottom: 2px; }
-.dd-body .st-button-reason:empty { display: none; }
 .tk-sheet .tk-group-head { position: static; }
 /* the photo viewer: one photo, full width (a stand-in frame: the prototype has no camera) */
 .dd-photo { display: grid; place-items: center; width: 100%; aspect-ratio: 3 / 4; border-radius: var(--radius-inset); background: var(--well); color: var(--muted); font-family: var(--font-mono); font-size: var(--type-button-size); }
@@ -273,9 +272,10 @@
     return UI.field({ label: span(key === 'pigNote' ? 'pp.dead.other_note' : 'ds.dead.sow.other_label'),
       control: '<input type="text" data-field="' + key + '" value="' + U.esc(key === 'pigNote' ? S.pig.note : S.sow.note) + '">', ds: 'Field' });
   }
-  function reason() {
+  // Why Save waits: the footer's status line, directly above Back + Save (it is Save's description)
+  function status() {
     var w = why(), show = w && (!w.quiet || S.why);
-    return UI.buttonReason({ id: 'dd-why', text: show ? PP.t(w.id, w.args) : '', strs: show ? { text: w.id } : undefined, args: show && w.args ? { text: w.args } : undefined });
+    return show ? { text: PP.t(w.id, w.args), str: w.id, args: w.args, id: 'dd-why' } : null;
   }
   function piglets() {
     var out = [heldRow(), '<div data-target="tallies">' + causes().map(tallyRow).join('') + lossStepper() + '</div>'];
@@ -292,12 +292,13 @@
     out.push(UI.banner({ tone: 'danger', headline: '', consequence: '', live: true, id: 'dd-sow-warn', strs: { headline: 'ds.dead.sow.warn_' + phase, consequence: stay }, args: { consequence: { n: alive() } } }));
     return out.join('');
   }
-  function footer() {
-    var w = why(), gray = !!w;
+  function footer(back) {
+    var w = why(), gray = !!w, st = status();
     if (S.mode === 'sow') {
-      return K.footer({ back: { action: 'back' }, hold: { label: s('act.save'), caption: s('pp.dead.hold'), action: 'hold-save', tone: 'primary', waiting: gray, describedby: gray ? 'dd-why' : '', statusId: gray ? '' : 'dd-why' } });
+      // the hold's progress line is the same status slot (empty until a cue or a reason)
+      return K.footer({ back: { action: 'back' }, status: st || { text: '', id: 'dd-why' }, hold: { label: s('act.save'), caption: s('pp.dead.hold'), action: 'hold-save', tone: 'primary', waiting: gray, describedby: gray ? 'dd-why' : '' } });
     }
-    return K.footer({ back: { action: 'back' }, primary: { label: s('act.save'), action: 'save', waiting: gray, describedby: 'dd-why' } });
+    return K.footer({ back: { action: back || 'back' }, status: st, primary: { label: s('act.save'), action: 'save', waiting: gray } });
   }
   function head() {
     var sow = S.mode === 'sow', n = pigN(), dirty = sow ? sowDirty() : pigDirty();
@@ -312,7 +313,7 @@
     var segs = modes().length > 1 ? UI.segment({ options: [['piglets', 'Piglets', { strs: { label: 'label.piglets' } }], ['sow', 'The sow', { strs: { label: 'ds.dead.seg.sow' } }]],
       active: S.mode, action: 'mode', ariaLabel: PP.lang === 'zh' ? '记录死亡对象' : 'Record death for' }) : '';
     return K.drawer({ size: 'long', height: 'full', view: 'dead', title: h.title, subtitle: h.subtitle, aside: h.aside, close: { action: 'dismiss' },
-      body: '<div class="dd-body" data-phase="' + (locked() ? 'locked' : 'open') + '" data-surface="' + surface + '">' + segs + (S.mode === 'sow' ? sowMode() : piglets()) + reason() + '</div>',
+      body: '<div class="dd-body" data-phase="' + (locked() ? 'locked' : 'open') + '" data-surface="' + surface + '">' + segs + (S.mode === 'sow' ? sowMode() : piglets()) + '</div>',
       footer: footer(), scrim: { action: 'dismiss' } });
   }
 
@@ -348,7 +349,7 @@
     var n = pigN(), sub = [s('pp.dead.tagged.sub', { pen: tgt(), n: rs.length })];
     if (n) sub.push({ sep: true }, { text: PP.t('pp.dead.unsaved', { n: n }), str: 'pp.dead.unsaved', args: { n: n }, tone: 'green' });
     return K.drawer({ size: 'long', height: 'full', view: 'tagged', title: s('pp.dead.tagged.title'), subtitle: sub, close: { action: 'sub-dismiss' },
-      body: '<div class="dd-body">' + out + reason() + '</div>', footer: K.footer({ back: { action: 'sub-back' }, primary: { label: s('act.save'), action: 'save', waiting: !!why(), describedby: 'dd-why' } }),
+      body: '<div class="dd-body">' + out + '</div>', footer: footer('sub-back'),
       scrim: { action: 'sub-dismiss' } });
   }
   // Several neighbours with a piglet missing: the list (the same crate rows as the room).
@@ -357,7 +358,7 @@
       return K.row({ id: s('pp.count.sg.side', { code: x.id }), headline: s(pl('pp.dead.found.missing', x.m), { np: np(x.m) }), meta: s('pp.dead.found.row_desc', { stamp: U.stamp(x.loss.at, x.loss.who, store.today) }), action: 'route', value: x.id });
     });
     return K.drawer({ size: 'medium', view: 'nb', title: s('pp.dead.nb.title'), subtitle: [s('pp.dead.nb.sub', { code: crate })], close: { action: 'sub-dismiss' },
-      body: K.group({ title: s('pp.dead.nb.group', { u: Hx().room }), meta: s(pl('pp.dead.nb.crates', rs.length), { n: rs.length }), rows: rs }), footer: K.footer({ back: { action: 'sub-back' } }), scrim: { action: 'sub-dismiss' } });
+      body: K.group({ face: 'word', title: s('pp.dead.nb.group', { u: Hx().room }), meta: s(pl('pp.dead.nb.crates', rs.length), { n: rs.length }), rows: rs }), footer: K.footer({ back: { action: 'sub-back' } }), scrim: { action: 'sub-dismiss' } });
   }
   // The held body: one question over the drawer (farrowing's dialog anatomy), two answers.
   function heldDialog() {
@@ -368,12 +369,12 @@
     var body = UI.rowGroup(door('resolve', h.event + '|one', 'pp.count.held.one', null, 'pp.count.held.one_short', { ap: np(x.alive) }) +
       door('resolve', h.event + '|two', 'pp.count.held.two', null, 'pp.count.held.two_short', { ap: np(Math.max(0, x.alive - h.n)) }));
     return K.dialog({ title: s('pp.count.held.title'), description: s('pp.count.held.ask', { a: first ? first.who : '', b: h.who }),
-      body: '<div class="dd-body">' + body + '</div>', footer: K.footer({ back: { action: 'sub-back' } }) });
+      body: '<div class="dd-body">' + body + '</div>', footer: K.footer({ back: { action: 'sub-back' } }), layer: 1 });
   }
   // The room's `Found a body` (R1-8): whose missing piglet is it? Every open loss in the unit, oldest first, as crate rows.
   function foundPicker() {
     var lines = store.select.explain(store.derived, { room: S.unit }, {}).lines.filter(function (l) { return l.kind === 'loss' && l.open > 0; });
-    var body = lines.length ? K.group({ title: s('pp.dead.nb.group', { u: S.unit }), meta: s(pl('pp.dead.nb.crates', lines.length), { n: lines.length }), rows: lines.map(function (l) {
+    var body = lines.length ? K.group({ face: 'word', title: s('pp.dead.nb.group', { u: S.unit }), meta: s(pl('pp.dead.nb.crates', lines.length), { n: lines.length }), rows: lines.map(function (l) {
       return K.row({ id: s('pp.count.sg.side', { code: l.litter }), headline: s(pl('pp.dead.found.missing', l.open), { np: np(l.open) }), meta: s('pp.dead.found.row_desc', { stamp: U.stamp(l.at, l.who, store.today) }), action: 'found-pick', value: l.litter });
     }) }) : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.dead.found.empty' }, args: { title: { u: S.unit } } });
     return K.drawer({ size: 'medium', view: 'found', title: s('pp.dead.found.title'), subtitle: [s('pp.dead.found.sub', { u: S.unit })], close: { action: 'dismiss' },
@@ -384,7 +385,7 @@
     var v = S.viewer, list = S[v.key].photos, i = list.map(function (p) { return p.id; }).indexOf(v.id);
     var ph = '<div class="dd-photo" role="img" data-str-attr="aria-label:ds.c2.aria.thumb" data-args=\'{"n":' + (i + 1) + '}\' aria-label="' + U.esc(PP.t('ds.c2.aria.thumb', { n: i + 1 })) + '">' + span('ds.c2.photos.index', { n: i + 1 }) + '</div>';
     return K.drawer({ size: 'long', view: 'photo', title: s('pp.dead.photo.title', { n: i + 1, m: list.length }), subtitle: [s('pp.dead.photo.sub')], close: { action: 'viewer-dismiss' },
-      body: ph, footer: K.footer({ back: { action: 'viewer-back' }, primary: { label: s('pp.dead.photo.delete'), action: 'photo-delete', register: 'danger' } }), scrim: { action: 'viewer-dismiss' } });
+      body: ph, footer: K.footer({ back: { action: 'viewer-back' }, primary: { label: s('pp.dead.photo.delete'), action: 'photo-delete', register: 'danger' } }), scrim: { action: 'viewer-dismiss' }, layer: 1 });
   }
   // Re-render keeps the body's scroll and the focused control (a requirement of the shared component).
   function render() {
@@ -612,7 +613,7 @@
     render();
     // the sow's Save is hold-to-commit (Button hold): the card owns the phases, caption and status line
     var holds = UI.holdBind(screen, { t: function (id) { return PP.t(id); },
-      cues: { keep: 'ds.dead.hold.start', tap: 'ds.dead.hold.keep', released: 'ds.dead.hold.cancel', disarmed: 'ds.dead.hold.cancel', again: 'ds.dead.hold.armed', early: 'ds.dead.hold.armed' },
+      cues: { keep: 'pp.dead.hold.start', tap: 'pp.dead.hold.keep', released: 'pp.dead.hold.cancel', disarmed: 'pp.dead.hold.cancel', again: 'pp.dead.hold.armed', early: 'pp.dead.hold.armed' },
       onCommit: function (el) {
         // the hold completed: recheck what Save needs, then commit
         if (!saveSow()) { holds.settle(el, 'failed'); render(); return; }
