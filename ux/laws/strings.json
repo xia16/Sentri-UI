@@ -853,6 +853,8 @@
     "pp.end.hold.caption": {"en": "HOLD TO END", "zh": "长按结束", "kind": "pointer"},
     "pp.end.hold.keep": {"en": "KEEP HOLDING", "zh": "继续按住", "kind": "pointer"},
     "pp.end.hold.pending": {"en": "CHECKING EVERY LITTER", "zh": "正在核对各窝", "kind": "status"},
+    "pp.end.hold.unknown": {"en": "NO ANSWER · IT MAY HAVE ENDED; CHECK BEFORE TRYING AGAIN", "zh": "无响应 · 可能已结束，请先核对再重试", "kind": "status"},
+    "pp.end.hold.again": {"en": "PRESS AGAIN TO END", "zh": "再按一次以结束", "kind": "pointer"},
     "pp.end.lit.desc.outside": {"en": "Counts in piglet-doses · {code} is not in this task", "zh": "单位：头次 · {code}不在本任务内", "kind": "body"},
     "pp.end.none.desc": {"en": "Nothing to end here. Litters in this unit still record deaths, counts and moves.", "zh": "此处无需结束。本单元各窝仍可记录死亡、点数和转移。", "kind": "body"},
     "pp.end.none.title": {"en": "No piglet-processing task in Unit {n}", "zh": "{n}单元没有仔猪处理任务", "kind": "title"},

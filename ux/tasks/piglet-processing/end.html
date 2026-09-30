@@ -464,7 +464,7 @@
     }
     return page('pp.end.title', null, 'pp.end.rv.scope', { n: UNIT, k: t.litters }, body, foot);
   }
-  function capId(phase) { return phase === 'unknown' ? 'ds.c2.hold.unknown' : phase === 'pending' ? 'pp.end.hold.pending' : phase === 'holding' ? 'pp.end.hold.keep' : 'pp.end.hold.caption'; }
+  function capId(phase) { return phase === 'unknown' ? 'pp.end.hold.unknown' : phase === 'pending' ? 'pp.end.hold.pending' : phase === 'holding' ? 'pp.end.hold.keep' : 'pp.end.hold.caption'; }
   // A treatment physically done after End (from an offline phone): kept, stamped, flagged; the frozen figures do not change.
   function afterEndFlag() {
     var ae = post().filter(function (e) { return e.kind === 'afterend'; });
@@ -671,7 +671,7 @@
     setUrl(false, { sheet: sheet || undefined, deep: true, ended: true }); render();
   }
   holds = UI.holdBind(screen, { t: function (id) { return PP.t(id); },
-    cues: { keep: 'pp.end.hold.keep', tap: 'pp.end.hold.tap', released: 'pp.end.hold.released', disarmed: 'pp.end.hold.released', again: 'ds.c2.hold.again', early: 'ds.c2.hold.again', pending: 'pp.end.hold.pending', failed: 'pp.end.hold.failed', unknown: 'ds.c2.hold.unknown' },
+    cues: { keep: 'pp.end.hold.keep', tap: 'pp.end.hold.tap', released: 'pp.end.hold.released', disarmed: 'pp.end.hold.released', again: 'pp.end.hold.again', early: 'pp.end.hold.again', pending: 'pp.end.hold.pending', failed: 'pp.end.hold.failed', unknown: 'pp.end.hold.unknown' },
     onCommit: function (el) { commitEnd(el); } });
   screen.addEventListener('keydown', function (ev) {
     if (ev.defaultPrevented) return;                                  // the hold took Escape (it disarmed)
