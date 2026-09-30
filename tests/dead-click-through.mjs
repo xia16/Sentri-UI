@@ -54,7 +54,7 @@ try {
   await page.click('[data-action="photo-undo"]');
   assert.match(await text(page, '[data-ds="Photos"]'), /2 attached/);
   await page.click('[data-action="save"]');
-  await page.waitForURL(/room\.html\?state=litter&crate=A02.*saved=dead/); await ready(page);
+  await page.waitForURL(/room\.html\?.*state=litter.*crate=A02.*saved=dead/); await ready(page);
   assert.deepEqual(await litterOf(page, 'A02'), { alive: 11, dead: 2 });
   const ev1 = (await log(page, 'base')).pop();
   assert.equal(ev1.type, 'death'); assert.equal(ev1.photos.length, 2);
@@ -65,12 +65,12 @@ try {
   await page.click('[data-ds="Stepper"][data-field="other"] [data-step="1"]');
   await page.fill('input[data-field="pigNote"]', 'leg caught in the slats');
   await page.click('[data-action="back"]');
-  await page.waitForURL(/room\.html\?state=litter&crate=A02/); await ready(page);
+  await page.waitForURL(/room\.html\?.*state=litter.*crate=A02/); await ready(page);
   await toDead(page, 'A02', '', true);
   assert.equal(await stepValue(page, 'other'), '1');
   assert.equal(await page.inputValue('input[data-field="pigNote"]'), 'leg caught in the slats');
   await page.click('[data-action="save"]');
-  await page.waitForURL(/room\.html\?state=litter&crate=A02/); await ready(page);
+  await page.waitForURL(/room\.html\?.*state=litter.*crate=A02/); await ready(page);
   const ev2 = (await log(page, 'base')).pop();
   assert.equal(ev2.note, 'leg caught in the slats'); assert.equal(ev2.lines[0].note, 'leg caught in the slats');
   console.log('ok 2 Back keeps the draft; Other carries its note:', ev2.lines[0].cause, ev2.note);
@@ -85,7 +85,7 @@ try {
   assert.match(routed, /Record death D03/); assert.match(routed, /Recording in D03 · found in A02/);
   assert.match(routed, /From the 2 missing 1 alive stays 11 · 1 missing still open/);
   await page.click('[data-action="save"]');
-  await page.waitForURL(/room\.html\?state=litter&crate=A02/); await ready(page);
+  await page.waitForURL(/room\.html\?.*state=litter.*crate=A02/); await ready(page);
   assert.equal((await litterOf(page, 'A02')).alive, 12);
   await toRoom(page);
   assert.match(await text(page, '[data-action="explain"]'), /Unexplained loss 1 D03/);
