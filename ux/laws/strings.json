@@ -419,6 +419,8 @@
     "pp.count.ex.title": {"en": "Unexplained · {code}", "zh": "不明增减 · {code}", "kind": "title"},
     "pp.count.ex.title_room": {"en": "Unexplained · Unit {u}", "zh": "不明增减 · {u}单元", "kind": "title"},
     "pp.count.ex.sub": {"en": "Open now · {lp} lost · {gp} extra", "zh": "当前未解释 · 少了{lp} · 多了{gp}", "kind": "body"},
+    "pp.count.ex.sub_loss": {"en": "Open now · {lp} lost", "zh": "当前未解释 · 少了{lp}", "kind": "body"},
+    "pp.count.ex.sub_gain": {"en": "Open now · {gp} extra", "zh": "当前未解释 · 多了{gp}", "kind": "body"},
     "pp.count.ex.empty": {"en": "Nothing unexplained here.", "zh": "这里没有不明增减。", "kind": "status"},
     "pp.count.ex.dead_desc.one": {"en": "found the body? it can be the missing one", "zh": "找到尸体？可以记为少了的仔猪", "kind": "body"},
     "pp.count.ex.dead_desc.many": {"en": "found a body? it can be one of the {np} missing", "zh": "找到尸体？可以记为少了的仔猪", "kind": "body"},

@@ -15,6 +15,13 @@
    Explain; TaskDialog for one question. The body is cards: Stepper (hero), Facts, Row, ChoiceList, Heading, Status and
    Button's reason line. */
 .ct-over { display: contents; }
+/* farrowing's radio rows (flat, divided, 60px) and danger band (a pale red edge, a sans consequence): the ChoiceList and
+   Banner cards in farrowing's face. The skeleton has no radio-row or warning part yet (reported); tokens only. */
+.ct-flat .st-choice-panel { background: transparent; border: 0; border-radius: 0; }
+.ct-flat .st-choice-row.st-choice-row { min-height: var(--radio-row-min); padding: 0; border-bottom: 1px solid var(--line); }
+.ct-flat .st-choice-row.st-choice-row + .st-choice-row { border-top: 0; }
+.ct-flat .st-choice-label, .ct-flat .st-choice-row[data-mode="radio"][aria-checked="true"] .st-choice-label { font-size: var(--type-button-size); font-weight: 400; }
+
 /* The room behind the sheets: the page the worker returns to, drawn by its own page (inert, never focusable). */
 .ct-behind { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--app-background); pointer-events: none; }
 .ct-body { display: flex; flex-direction: column; gap: var(--space-section); }
@@ -202,7 +209,7 @@
     x.deaths.forEach(function (d) { if (!first && d.id !== h.event && d.fromMissing > 0) first = d; });
     // farrowing's dialog: one question, the answers as radios, Back + Apply (Apply waits until an answer is picked)
     var pick = S.heldPick || '';
-    var body = UI.choiceRadios({ label: '', layout: 'rows', action: 'held-pick', key: 'held', selected: pick, id: 'held-answer', options: [
+    var body = UI.choiceRadios({ label: '', layout: 'rows', action: 'held-pick', key: 'held', selected: pick, id: 'held-answer', className: 'ct-flat', options: [
       { value: 'one', label: '', strs: { label: 'pp.count.held.one', meta: 'pp.count.held.one_short' }, args: { meta: { ap: np(x.alive) } }, meta: '' },
       { value: 'two', label: '', strs: { label: 'pp.count.held.two', meta: 'pp.count.held.two_short' }, args: { meta: { ap: np(Math.max(0, x.alive - h.n)) } }, meta: '' }] });
     var apply = { label: s('pp.count.held.apply'), action: 'resolve', value: pick ? h.event + '|' + pick : '', waiting: !pick };
@@ -258,7 +265,7 @@
       return UI.choiceRow({ label: '', mode: 'multi', action: 'pick-row', value: r.rowId, selected: S.rows.indexOf(r.rowId) >= 0, mono: true, strs: { label: l.id }, args: { label: l.args } });
     }));
     var p = pointer(d);
-    return K.drawer({ size: 'long', height: 'full', view: 'roster', title: s(must ? pl('pp.count.named.title', d.needRows) : 'pp.count.named.title_opt'),
+    return K.drawer({ size: 'long', view: 'roster', title: s(must ? pl('pp.count.named.title', d.needRows) : 'pp.count.named.title_opt'),
       subtitle: [s(must ? pl('pp.count.named.desc', d.needRows) : 'pp.count.named.desc_opt', { up: np(d.untagged), kp: np(d.maxRows), n: d.needRows })], close: { action: 'sub-dismiss' },
       body: '<div class="ct-body" data-target="roster-list">' + rows + '</div>',
       footer: saveFooter(p, !d.event || !!stale() || S.failed || !!sanity(d), 'save', 'act.save', null, 'sub-back'), scrim: { action: 'sub-dismiss' } });
@@ -338,7 +345,8 @@
   }
   // One line: its title and stamp, then its doors — the Moves the app suggests (ranked, never proof), a body, a new count
   // (a new observation: it never closes the line) and Edit for a wrong count. One headline per door.
-  function lineSection(l, withCode) {
+  // alone: the page's head already is the line (its size and its count), so the section is its doors only
+  function lineSection(l, withCode, alone) {
     var t = lineTitle(l, withCode), st = lineStamp(l), rows = [];
     var all = S.more[l.id] ? l.suggestions : l.suggestions.slice(0, 3);
     all.forEach(function (sg) { rows.push(suggestionRow(l, sg)); });
@@ -353,17 +361,22 @@
     var g = l.kind === 'gain' ? L(l.litter).unexplained.gains.filter(function (x) { return x.id === l.id; })[0] : null;
     var note = g && g.check ? 'pp.count.line.check' : l.review ? 'pp.count.review.line' : '';
     return '<section class="ct-group">' +
-      UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: t.id, description: st.id }, args: { title: t.args, description: st.args } }) +
+      (alone ? '' : UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: t.id, description: st.id }, args: { title: t.args, description: st.args } })) +
       (note ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: note } }) : '') + doors(rows.join('')) + '</section>';
   }
   function explainPage(inert) {
     var x = explain(), sub = { lp: np(x.openLoss), gp: np(x.openGain) };
     var title = S.room ? s('pp.count.ex.title_room', { u: S.room }) : s('pp.count.ex.title', { code: crate });
+    // one heading per amount: a litter with one open line takes the line as its head (the size, then the count that wrote
+    // it); otherwise the head says what is open, never a zero
+    var one = !S.room && x.lines.length === 1 ? x.lines[0] : null;
+    var desc = x.openLoss && x.openGain ? s('pp.count.ex.sub', sub) : x.openLoss ? s('pp.count.ex.sub_loss', sub) : x.openGain ? s('pp.count.ex.sub_gain', sub) : null;
+    if (one) { var lt = lineTitle(one, true), ls = lineStamp(one); title = s(lt.id, lt.args); desc = s(ls.id, ls.args); }
     // R1-8: a body found loose in the room — say whose missing piglet it is (the dead drawer lists the unit's open losses)
     var found = S.room && x.openLoss ? doors(row({ action: 'found-body', value: String(S.room), title: 'pp.count.ex.found', desc: 'pp.count.ex.found_desc' })) : '';
-    var body = receiptLine() + (S.room ? '' : heldRow()) + found + (x.lines.length ? x.lines.map(function (l) { return lineSection(l, !!S.room); }).join('')
+    var body = receiptLine() + (S.room ? '' : heldRow()) + found + (x.lines.length ? x.lines.map(function (l) { return lineSection(l, !!S.room, !!one); }).join('')
       : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.ex.empty' } }));
-    return K.page({ inert: !!inert, title: title, description: s('pp.count.ex.sub', sub), body: '<div class="ct-body">' + body + '</div>', footer: K.footer({ back: { action: 'back' } }) });
+    return K.page({ inert: !!inert, title: title, description: desc, body: '<div class="ct-body">' + body + '</div>', footer: K.footer({ back: { action: 'back' } }) });
   }
   /* The suggestion, side by side: both counts (who, when, where), what saving it as a Move closes and leaves open, and the door
      to the Move sheet. A suggestion is never proof; nothing pairs until the worker saves the Move. */
