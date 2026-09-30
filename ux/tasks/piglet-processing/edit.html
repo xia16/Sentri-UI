@@ -159,9 +159,8 @@
   function stampPart(iso, who) { var s = stampStrs(iso, who); return part(s[0], s[1]); }
   function sexWord(s) { return PP.t(s === 'b' ? 'pp.common.sex.boar' : 'pp.common.sex.gilt'); }
   function causeText(byCause) { return Object.keys(byCause || {}).map(function (c) { return PP.t('pp.edit.rec.death_part', { n: byCause[c], cause: PP.t('dead.' + c.replace('-', '_')) }); }).join(' · '); }
-  // The log names people in full (farrowing's `G. Hansen`); the fixture's hands by initials. Unknown initials stay as they are.
-  var FULL = { 'G.H': 'G. Hansen', 'L.M': 'L. Madsen', 'A.K': 'A. Karlsen' };
-  function fullName(w) { return FULL[w] || w; }
+  // The log names people in full (farrowing's `G. Hansen`): the ledger's people (config, else the fixture's map).
+  function fullName(w) { return window.PPLedger.person(w, store); }
   // Record-page day headers: today, yesterday, then the date.
   function dayWord(date) {
     var a = Date.UTC(+date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10)), b = Date.UTC(+TODAY.slice(0, 4), +TODAY.slice(5, 7) - 1, +TODAY.slice(8, 10));
