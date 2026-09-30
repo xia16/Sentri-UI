@@ -101,8 +101,37 @@
     function evidenceRow(r) {
       var tag = recTag(r), desc = evidence(r);
       if (tag) desc.push(tag);
-      return UI.row({ title: titleTok(r.dose), description: desc, wrap: true, trail: 'edit', action: 'open-edit', value: r.id });
+      return UI.row({ title: txTok(r.dose), description: desc, wrap: true, trail: 'edit', action: 'open-edit', value: r.id });
     }
+    /* In a day group the header states the day once (farrowing's Piglet processing care page): the row names the treatment. */
+    function txTok(id) { return [P('pp.common.tx.' + doseCfg(id).tx)]; }
+    /* ---- the care groups: every treatment row sits under its day and status, stated once in the header
+       (`Day 3 · Due today`, `Day 3 · 2 days late`, `Day 1 · Recorded`, `Day 14 · In 11 days`) ---- */
+    var GROUP_RANK = { late: 0, today: 1, missed: 2, recorded: 3, later: 4 };
+    function care() {
+      var by = {}, order = [];
+      return {
+        put: function (day, kind, arg, html) {
+          if (!html) return;
+          var k = kind + ':' + day + ':' + (arg == null ? '' : arg);
+          if (!by[k]) { by[k] = { day: day, kind: kind, arg: arg, rows: [] }; order.push(k); }
+          by[k].rows.push(html);
+        },
+        html: function () {
+          if (!order.length) return '';
+          var gs = order.map(function (k) { return by[k]; }).sort(function (a, b) {
+            return GROUP_RANK[a.kind] - GROUP_RANK[b.kind] || (a.kind === 'later' ? a.arg - b.arg : a.day - b.day);
+          });
+          return K.list(gs.map(function (g) {
+            var meta = g.kind === 'today' ? S('pp.litter.gm.today') : g.kind === 'late' ? S(one('pp.litter.gm.late', g.arg), { k: g.arg })
+              : g.kind === 'missed' ? S('pp.litter.gm.missed', { d: g.arg }) : g.kind === 'recorded' ? S('pp.litter.gm.recorded')
+              : g.arg === 1 ? S('pp.litter.gm.tomorrow') : S(one('pp.litter.gm.in', g.arg), { n: g.arg });
+            return K.group({ face: 'word', title: S('pp.litter.gm.day', { d: g.day }), meta: meta, rows: g.rows });
+          }));
+        }
+      };
+    }
+    function statusKind(s, lateBy, missedAfter) { return s === 'late' ? ['late', lateBy] : s === 'missed' ? ['missed', missedAfter] : ['today', null]; }
 
     /* ---- the drawer head: the crate, then who the litter is (the sow, parity, day) and the one status that changes what
        it can record (sow died · farrowing not locked · not in the task · task ended) ---- */
@@ -188,9 +217,7 @@
     function owedToks(o) {
       var t = [], castrate = doseCfg(o.dose).castration;
       if (hasDraft(o.dose)) return [P('status.unsaved', { n: 1 }, 'green')];
-      if (o.status === 'due' && !showGroups(o)) t.push(P('pp.litter.due', { d: o.due }));
-      if (o.status === 'late' && !showGroups(o)) t.push([P('pp.litter.tag.late'), P(one('pp.litter.days', o.lateBy), { k: o.lateBy }, 'red')]);
-      if (o.status === 'missed') t.push([P('pp.litter.missed_word'), P('pp.litter.missed_day', { d: o.missedAfter }, 'red')]);
+      // due, late and missed are the group header's (the day stated once); a row says only what it owes
       if (o.range) {
         t.push(P('pp.litter.range', { lo: o.range.lo, hi: o.range.hi, of: o.range.of }, 'amber'));
         o.range.doubt.forEach(function (x) { t.push(P('pp.litter.range.doubt', { n: x.n, to: x.to })); });
@@ -211,11 +238,12 @@
       // A litter outside the task records no treatment: what it owes is a fact, never a door (Q18).
       if (!L().recordable) return UI.row({ title: titleTok(o.dose), description: [P('pp.litter.notask.owed', { n: o.owed })], wrap: true });
       if (o.males === 'uncounted' || o.status === 'missed' || o.range || !n) {
-        return UI.row({ title: titleTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose, trailing: hasDraft(o.dose) ? resumeWord() : '' });
+        return UI.row({ title: txTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose, trailing: hasDraft(o.dose) ? resumeWord() : '' });
       }
       var act = hasDraft(o.dose) ? { label: PP.t('pp.litter.act.resume'), action: 'open-dose', value: o.dose, strs: { label: 'pp.litter.act.resume' } }
         : { label: PP.t(one('pp.litter.act.record_n', n), { n: n }), action: 'record', value: o.dose, attrs: { 'data-n': n }, strs: { label: one('pp.litter.act.record_n', n) }, args: { label: { n: n } } };
-      return UI.rowAction({ id: 'lt-tx-' + o.dose, title: titleTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose, act: act });
+      // the one-tap record stays the row's trailing action, compact (farrowing's care row + the ruled one-tap)
+      return UI.rowAction({ id: 'lt-tx-' + o.dose, title: txTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose, act: act });
     }
     function unknownRows(id, o) {
       var d = doseCfg(id);
@@ -223,8 +251,7 @@
         var key = 'res:' + g.id + ':' + id, tags = (g.rows || []).map(tagOf).filter(Boolean);
         var who = tags.length && tags.length <= 3 ? P('pp.litter.grp.from_tags', { k: g.n, code: g.from, tags: tags.join(', ') }) : P('pp.litter.grp.from', { k: g.n, code: g.from });
         var desc = drafts[key] ? [P('status.unsaved', { n: 1 }, 'green')] : [who, d.visible ? P('pp.litter.arr.check', null, 'amber') : P('pp.litter.arr.unknown', null, 'amber')];
-        if (o && o.status === 'late' && !drafts[key]) desc.push([P('pp.litter.tag.late'), P(one('pp.litter.days', o.lateBy), { k: o.lateBy }, 'red')]);
-        return UI.row({ title: titleTok(id), description: desc, wrap: true, action: 'open-resolve', value: g.id + ':' + id, trailing: drafts[key] ? resumeWord() : '' });
+        return UI.row({ title: txTok(id), description: desc, wrap: true, action: 'open-resolve', value: g.id + ':' + id, trailing: drafts[key] ? resumeWord() : '' });
       }).join('');
     }
     function identityRow() {
@@ -233,32 +260,35 @@
       var scheme = PP.t('pp.litter.id.scheme.' + x.scheme), t = [];
       if (x.who === 'candidates') t.push(P('pp.litter.id.keepers', { k: x.identified }));
       else t.push(P('pp.litter.id.owed', { n: x.owed }));
-      if (x.status === 'due') t.push(P('pp.litter.due', { d: x.day }));
-      else t.push([P('pp.litter.tag.late'), P(one('pp.litter.days', x.lateBy), { k: x.lateBy }, 'red')]);
       return UI.row({ title: [P('pp.litter.id.title', { scheme: scheme })], description: t, wrap: true, action: 'open-identity', value: crate });
     }
-    function owedRows() {
+    /* What is owed now, into its day groups. Nothing moves under the thumb: a dose recorded this visit keeps its place (its
+       group) and turns into its stamp. */
+    function owedInto(c) {
       var v = view(), byDose = {};
       v.owed.forEach(function (o) { byDose[o.dose] = o; });
-      // Nothing moves under the thumb: a dose recorded this visit keeps its place and turns into its stamp.
-      return CFG.doses.filter(function (d) { return D(d.id).status && D(d.id).status !== 'later'; }).map(function (d) {
-        var r = visitRec(d.id);
-        if (r && isDone(d.id)) return evidenceRow(r);
-        var o = byDose[d.id], only = o && o.owed === 0 && !o.range && unknownGroups(d.id).length;
-        if (!L().recordable && (!o || !o.owed)) return '';
-        return (o && !only ? txRow(o) : '') + (L().recordable ? unknownRows(d.id, only ? o : null) : '');
-      }).join('') + (L().recordable ? identityRow() : '');
+      CFG.doses.filter(function (d) { return D(d.id).status && D(d.id).status !== 'later'; }).forEach(function (d) {
+        var r = visitRec(d.id), o = byDose[d.id];
+        if (r && isDone(d.id)) { c.put(d.due, 'today', null, evidenceRow(r)); return; }
+        if (!o) return;
+        var k = statusKind(o.status, o.lateBy, o.missedAfter), only = o.owed === 0 && !o.range && unknownGroups(d.id).length;
+        c.put(o.due, k[0], k[1], (!only ? txRow(o) : '') + unknownRows(d.id, only ? o : null));
+      });
+      var x = view().identityDue;
+      if (x.status === 'due' || x.status === 'late') c.put(x.day, x.status === 'late' ? 'late' : 'today', x.status === 'late' ? x.lateBy : null, identityRow());
     }
     function owedSection() {
       var v = view(), left = v.dosesLeft.left, missed = v.unfinished.missed;
-      var rows = owedRows();
-      if (!L().recordable) return rows ? section('pp.edge.section.owed', rows) : '';
-      var meta = left ? (missed ? 'pp.litter.owed.meta_missed' : 'pp.litter.owed.meta') : missed ? 'pp.litter.owed.missed_only' : null;
+      // a litter outside the task: what it owes is a fact (not done), one list
+      if (!L().recordable) {
+        var rows = v.owed.filter(function (o) { return o.owed; }).map(txRow).join('');
+        return rows ? section('pp.edge.section.owed', rows) : '';
+      }
       if (!left && !missed && !identityRow()) {
         var next = laterItems()[0];
-        rows += UI.row({ title: [P('pp.litter.owed.none')], description: next ? [P(next.inDays === 1 ? 'pp.litter.next.tomorrow' : 'pp.litter.next.in', { tx: lower(next.label), k: next.inDays })] : '' });
+        return UI.rowGroup(UI.row({ title: [P('pp.litter.owed.none')], description: next ? [P(next.inDays === 1 ? 'pp.litter.next.tomorrow' : 'pp.litter.next.in', { tx: lower(next.label), k: next.inDays })] : '' }));
       }
-      return section('pp.litter.section.owed', rows, { metaId: meta, metaArgs: { left: left, total: v.dosesLeft.total, m: missed } });
+      return '';
     }
     function closedSection() {
       var b = view().balance;
@@ -371,17 +401,17 @@
       var d = x.who === 'candidates' ? (I.closed ? P('pp.litter.id.closed', { k: x.identified }) : P('pp.litter.id.keepers', { k: x.identified })) : P('pp.litter.id.done', { k: x.identified, n: x.of });
       return UI.row({ title: [P('pp.litter.id.title', { scheme: scheme })], description: [d], wrap: true, action: 'open-identity', value: crate });
     }
-    function recordedSection() {
+    /* Recorded: one row per record, never merged, newest first, under its treatment's day (`Day 1 · Recorded`). */
+    function recordedInto(c) {
       var all = [];
       view().recorded.forEach(function (g) { g.records.forEach(function (r) { all.push(r); }); });
+      all.filter(function (r) { return !inPlace(r); }).sort(function (a, b) { return a.at < b.at ? 1 : a.at > b.at ? -1 : 0; })
+        .forEach(function (r) { c.put(doseCfg(r.dose).due, 'recorded', null, evidenceRow(r)); });
       var idRow = identityDoneRow();
-      if (!all.length && !idRow) return '';
-      var xs = all.filter(function (r) { return !inPlace(r); }).sort(function (a, b) { return a.at < b.at ? 1 : a.at > b.at ? -1 : 0; });
-      var rows = xs.map(evidenceRow).join('') + idRow;
+      if (idRow) c.put(view().identityDue.day, 'recorded', null, idRow);
       view().recorded.forEach(function (g) { (g.doubleDoses || []).forEach(function (x) {
-        rows += UI.row({ title: titleTok(g.dose), description: [P('pp.litter.twice.line', { stamp: stampText(x.at, x.who) }, 'amber')], wrap: true });
+        c.put(doseCfg(g.dose).due, 'recorded', null, UI.row({ title: txTok(g.dose), description: [P('pp.litter.twice.line', { stamp: stampText(x.at, x.who) }, 'amber')], wrap: true }));
       }); });
-      return rows ? section('pp.litter.section.recorded', rows) : '';
     }
     function notesSection() {
       var rows = view().notes.map(function (n) {
@@ -407,22 +437,20 @@
       if (id.status === 'later') out.push({ identity: true, due: id.day, inDays: id.inDays, label: PP.t('pp.litter.id.title', { scheme: PP.t('pp.litter.id.scheme.' + id.scheme) }) });
       return out.sort(function (a, b) { return a.inDays - b.inDays; });
     }
-    function laterSection() {
-      var xs = laterItems();
-      if (!xs.length || !L().recordable) return '';
-      var rows = xs.map(function (x) {
-        if (x.identity) return UI.row({ title: [P('pp.litter.id.title', { scheme: PP.t('pp.litter.id.scheme.' + view().identityDue.scheme) })], description: [P(x.inDays === 1 ? 'pp.litter.later.tomorrow' : 'pp.litter.later.in', { d: x.due, k: x.inDays })], action: 'open-identity', value: crate });
+    /* Later: each dose under its day and when it comes (`Day 14 · In 11 days`); early is deliberate (open, then Save). */
+    function laterInto(c) {
+      if (!L().recordable) return;
+      laterItems().forEach(function (x) {
+        if (x.identity) { c.put(x.due, 'later', x.inDays, UI.row({ title: [P('pp.litter.id.title', { scheme: PP.t('pp.litter.id.scheme.' + view().identityDue.scheme) })], action: 'open-identity', value: crate })); return; }
         var Dx = D(x.dose), t = [];
         if (drafts[x.dose]) t.push(P('status.unsaved', { n: 1 }, 'green'));
         else if (Dx.groups && agesDiffer(Dx.groups)) Dx.groups.forEach(function (g) { t = t.concat(groupToks(g)); });
         else {
           if (Dx.records.length && Dx.owed && !arrivalToks(Dx.groups || []).length) t.push(P(doseCfg(x.dose).castration ? one('pp.litter.castr.owed', Dx.owed) : 'pp.litter.owed', { n: Dx.owed }));
           t = t.concat(arrivalToks(Dx.groups || []));
-          t.push(P(x.inDays === 1 ? 'pp.litter.later.tomorrow' : 'pp.litter.later.in', { d: x.due, k: x.inDays }));
         }
-        return UI.row({ title: titleTok(x.dose), description: t, wrap: true, action: 'open-dose', value: x.dose });
+        c.put(x.due, 'later', x.inDays, UI.row({ title: txTok(x.dose), description: t.length ? t : undefined, wrap: true, action: 'open-dose', value: x.dose }));
       });
-      return section('pp.litter.section.later', rows.join(''));
     }
     /* ---- the Record group: identity (its page) and the birth litter weight while it is missing ---- */
     function recordGroup() {
@@ -444,8 +472,13 @@
     function faceBody() {
       var T = endedTask(), v = view(), x = L();
       var main = T ? endedSection(T) + reviewSection() + unexplainedSection() : v.closed ? closedSection() + reviewSection() + unexplainedSection() : reviewSection() + unexplainedSection() + owedSection();
-      return '<div class="lt-face">' + receiptLine() + summary() + (x.phase === 'open' ? prelockDoor() : tools()) + main + afterEndSection() + recordedSection() + notesSection() +
-        (T || v.closed ? '' : laterSection()) + recordGroup() + '</div>';
+      // the care groups (farrowing's Piglet processing page): owed now, recorded, later — each under its day, stated once
+      var c = care();
+      if (!T && !v.closed && L().recordable) owedInto(c);
+      recordedInto(c);
+      if (!T && !v.closed) laterInto(c);
+      return '<div class="lt-face">' + receiptLine() + summary() + (x.phase === 'open' ? prelockDoor() : tools()) + main + c.html() + afterEndSection() + notesSection() +
+        recordGroup() + '</div>';
     }
 
     /* ---- the treatment views (staged: Back keeps the draft, Clear discards it, Save commits; a waiting Save says why) ---- */
@@ -567,11 +600,13 @@
     function resolveDrawer() {
       var r = resolving(), n = r.n, had = Math.max(0, Math.min(drawer.had || 0, n)), rest = n - had, visible = doseCfg(r.dose).visible;
       var tx = lower(titleText(r.dose));
-      var body = stepperRow('had', 'pp.move.res.had', one('pp.move.res.of', n), { n: n }, had, n, one('pp.move.res.ceiling', n), { n: n });
+      // the treatment is the title; the arrivals and their crate the subtitle; the check (spray mark, or on the pig) sits
+      // beside the answer it decides
+      var body = stepperRow('had', 'pp.move.res.had', visible ? 'pp.litter.res.sub_check' : 'pp.litter.res.sub_unknown', null, had, n, one('pp.move.res.ceiling', n), { n: n });
       if (rest) body += radios('rest', one('pp.move.res.rest', rest), { n: rest },
         [['record', one('pp.move.res.record', rest), { tx: tx, n: rest }], ['owed', one('pp.move.res.owed', rest), { n: rest }]], drawer.rest);
-      return doseSheet(S(one('pp.move.res.title', n), { tx: titleText(r.dose), n: n, code: r.from }), [S(visible ? 'pp.litter.res.sub_check' : 'pp.litter.res.sub_unknown')],
-        body, clearAside(drawer.had || drawer.rest));
+      var t = title(r.dose);
+      return doseSheet(S(t[0], t[1]), [S(one('pp.litter.res.from', n), { n: n, code: r.from })], body, clearAside(drawer.had || drawer.rest));
     }
     function rangeEvents() {
       var id = drawer.dose;

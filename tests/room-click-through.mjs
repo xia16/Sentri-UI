@@ -79,7 +79,7 @@ try {
   const a02 = await rowText(page, 'A02');
   assert.equal(await page.locator(`${row('B09')} [data-tone="red"]`).count(), 0);
   await page.click(row('A02'));
-  assert.match(await text(page, '[data-action="open-dose"][data-value="iron3"]'), /Iron · day 3 .*2 owed · deferred: weak/);
+  assert.match(await text(page, '[data-action="open-dose"][data-value="iron3"]'), /Iron .*2 owed · deferred: weak/);
   await page.click('[data-view="litter"] [data-action="close"]');
   await page.click(row('B09'));
   assert.match(await text(page, '[data-action="open-dose"][data-value="iron3"]'), /2 owed · deferred: weak/);
@@ -95,7 +95,7 @@ try {
   assert.match(await rowText(page, 'A07'), /Check/);
   assert.match(await text(page, '[data-action="reviews"]'), /To review 2/);
   await page.click('[data-action="reviews"]');
-  assert.match(await text(page, '[role="dialog"]'), /A07 Body held · recorded twice\? .*Answer on Set count/);
+  assert.match(await text(page, '[role="dialog"]'), /A07 Body held · recorded twice\?/);
   await page.click('[data-action="open-review"][data-value^="held:"]');
   await page.waitForURL(/count\.html\?.*state=held-body/); await ready(page);
   assert.match(page.url(), /crate=A07/);

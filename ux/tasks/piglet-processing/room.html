@@ -14,7 +14,8 @@
 /* The room on the task skeleton (ADR 0003): farrowing's room list — TaskHeader, TaskLatest, TaskSummary, TaskLens, rows
    grouped by crate row (TaskGroup + TaskRow), TaskDock — and its sheets and the litter drawer (TaskSheet). Layout only,
    tokens from tokens.css. Candidate:ScanFrame stays task-level. */
-.pp-answers { margin: 0 var(--space-panel) 6px; }
+/* the review / unexplained counts: one compact line, the summary card's footer line (a text action) */
+.pp-answers { display: flex; margin: -6px var(--space-panel) 4px; }
 .pp-answers + .pp-filtered { margin-top: var(--space-heading); }
 .pp-filtered { margin: 0 var(--space-panel) 6px; }
 .pp-filtered > * + * { margin-top: var(--space-heading); }
@@ -27,14 +28,27 @@
 .pp-wide { width: 100%; }
 .pp-findbar .field { margin: 0; }
 .pp-results > * + * { margin-top: var(--space-heading); }
-.pp-results .st-heading { margin-bottom: 8px; }
+.pp-results .st-heading { margin-bottom: 4px; }
+/* Find's result is the room's row, flat and divided (farrowing's finder), on the sheet's column */
+.pp-results .tk-row { padding-left: 0; padding-right: 0; border-bottom: 1px solid var(--line); }
+/* Filter's footer: Back · Reset · Show (farrowing's Filter sows); Reset is Back's width */
+.tk-footer > .button.pp-reset { flex: none; width: var(--back-width); min-width: 0; padding-left: 8px; padding-right: 8px; }
 /* the litter drawer (litter.js) */
 .lt-face { display: flex; flex-direction: column; gap: var(--space-heading); }
 .lt-face > .pp-group { margin-top: var(--space-heading); }
 .lt-summary > * + * { margin-top: 8px; }
-.lt-stack { display: flex; flex-direction: column; gap: var(--space-row-y); }
-/* One left edge in the drawer (rule 4): ChoiceList's group label sits on the drawer's column, not inset to its rows. */
-.lt-stack .st-choice-heading.st-choice-heading { padding-left: 0; padding-right: 0; }
+/* a treatment's entry rows sit together like farrowing's (the row face draws the line between them); one section gap
+   before a group label such as `Not castrated` */
+.lt-stack { display: flex; flex-direction: column; }
+.lt-stack > * + * { margin-top: var(--space-heading); }
+.lt-stack > .tk-stepper + .tk-stepper { margin-top: 0; }
+.lt-stack > .st-heading + .tk-stepper { margin-top: 0; }
+/* Narrow phones keep farrowing's gutters (21 in drawers, 18 on the room): the skeleton's 12px narrow override is undone
+   for this task (parity review 16; reported for the skeleton) */
+@media (max-width: 370px) {
+  .tk-sheet-head, .tk-sheet-body, .tk-footer, .tk-footer-status { padding-left: var(--space-gutter-sheet); padding-right: var(--space-gutter-sheet); }
+  .tk-footer { gap: var(--space-row-x); }
+}
 .lt-receipt, .lt-confirm { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--space-footer-gap); }
 .lt-actions { display: flex; gap: var(--space-footer-gap); }
 .lt-actions .button { flex: 1; }
@@ -425,15 +439,12 @@
   function answersRow() {
     var xs = reviews(), h = R().rows.strip, d = driftOpen();
     if (!xs.length && !d) return '';
-    var head = [];
-    if (xs.length) head.push(P('pp.room.answers.rev', { n: xs.length }));
-    if (d) head.push(P('pp.room.answers.drift', { n: (h.openLoss || 0) + (h.openGain || 0) }));
-    var codes = {}; xs.forEach(function (x) { codes[x.litter] = 1; }); (h.lossLitters || []).concat(h.gainLitters || []).forEach(function (c) { codes[c] = 1; });
-    var list = Object.keys(codes).sort().join(' ');
+    // one compact line under the summary card (parity review 4): the counts only; the crates are in the review sheet
+    var r = xs.length, u = (h.openLoss || 0) + (h.openGain || 0);
     var unresolved = xs.some(function (x) { return x.status === 'unresolved_at_end'; });
-    // farrowing's disclosure row (TaskRow door), not a card: one title, one line under it
-    return '<div class="pp-answers">' + K.door({ title: joined(head), description: joined([P('pp.room.codes', { list: list }), unresolved ? P('pp.room.rev.unresolved', null, 'amber') : null]),
-      action: 'reviews' }) + '</div>';
+    var id = r && d ? (unresolved ? 'pp.room.answers.both_end' : 'pp.room.answers.both') : r ? (unresolved ? 'pp.room.answers.rev_end' : 'pp.room.answers.rev') : 'pp.room.answers.drift';
+    var args = { n: r || u, r: r, d: u };
+    return '<div class="pp-answers">' + UI.button({ label: PP.t(id, args), register: 'text', action: 'reviews', strs: { label: id }, args: { label: args } }) + '</div>';
   }
 
   /* ---- lenses and filter; the filtered line and the bulk door under them ---- */
@@ -526,14 +537,19 @@
         strs: { label: txId(tx), meta: PP.one('pp.room.filter.n', n) }, args: { meta: { n: n } } });
     });
     var shown = lensOf(lens).length;
+    // farrowing's Filter sows: ✕ in the head; Back · Reset · Show N in the footer
+    var reset = UI.button({ label: PP.t('pp.room.filter.reset'), register: 'secondary', action: 'clear-filter', className: 'pp-reset', strs: { label: 'pp.room.filter.reset' } });
+    var show = UI.button({ label: PP.t(PP.one('pp.room.filter.show', shown), { n: shown }), register: 'primary', action: 'close-sheet', strs: { label: PP.one('pp.room.filter.show', shown) }, args: { label: { n: shown } } });
     return sheet({ title: P('pp.room.filter.title'), subtitle: P('pp.room.unit', { n: ROOM }), view: 'filter',
-      aside: S.filter.length ? UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear-filter', strs: { label: 'act.clear' } }) : '',
       body: UI.choiceGroup(rowsH.join(''), {}),
-      footer: K.footer({ back: { action: 'close-sheet' }, primary: { label: P(PP.one('pp.room.filter.show', shown), { n: shown }), action: 'close-sheet', register: 'primary' } }) });
+      footer: K.footer({ back: { action: 'close-sheet' }, primary: reset + show }) });
   }
   // The review list (N4, R1-22) and the unit's unexplained drift: each a door to where it is answered.
   var REV_ID = { double: 'pp.room.rev.double', count: 'pp.room.rev.count', held: 'pp.room.rev.held', correction: 'pp.room.rev.correction' };
-  var WHERE = { double: 'pp.room.rev.where.litter', count: 'pp.room.rev.where.count', held: 'pp.room.rev.where.count', correction: 'pp.room.rev.where.record' };
+  function stampP(at, who) {
+    var today = String(at).slice(0, 10) === String(store.today).slice(0, 10);
+    return today ? P('pp.common.stamp.today', { t: U.time(at), who: who }) : P('pp.common.stamp.date', { date: U.date(at), t: U.time(at), who: who });
+  }
   // The unit's drift door (farrowing's disclosure row): open loss and gain, each with its crates, beside the net.
   function driftRow() {
     var h = R().rows.strip; if (!h.openLoss && !h.openGain) return '';
@@ -547,7 +563,8 @@
     var xs = reviews(), n = xs.length + (driftOpen() ? 1 : 0);
     var rows = xs.map(function (x) {
       return K.row({ id: P('pp.room.code', { code: x.litter }), chip: x.status === 'unresolved_at_end' ? P('pp.room.rev.unresolved', null, 'amber') : null,
-        headline: [P(REV_ID[x.kind], { tx: x.tx ? name(x.tx) : '' })], meta: [P(WHERE[x.kind])], action: 'open-review', value: x.id });
+        // provenance, not directions (parity review 17): who recorded it and when
+        headline: [P(REV_ID[x.kind], { tx: x.tx ? name(x.tx) : '' })], meta: x.at ? [stampP(x.at, [].concat(x.who || []).join(' · '))] : null, action: 'open-review', value: x.id });
     }).join('');
     var body = driftRow() + (rows ? UI.rowGroup(rows) : '');
     return sheet({ title: P('pp.room.rev.sheet'), subtitle: ended() ? P('pp.room.rev.after_end') : P(PP.one('pp.room.rev.sub', n), { u: ROOM, n: n }), view: 'reviews', size: 'long',
@@ -603,7 +620,7 @@
     var head = UI.heading({ title: '', kind: 'group', level: 4, strs: { title: ids[0] }, args: { title: ids[1] } });
     var here = h.room === ROOM ? facts().filter(function (f) { return f.litter === h.litter; })[0] : null, body;
     if (h.kind === 'piglet' && h.status === 'weaned') body = UI.rowGroup(UI.row({ title: '', strs: { title: 'pp.room.scan.weaned' } }));
-    else if (here) body = UI.rowGroup(row(here));
+    else if (here) body = row(here);
     else body = K.door({ title: P('pp.room.scan.in_unit', { n: h.room, code: h.litter }), action: 'open-litter', value: h.litter + '@' + h.room });
     return '<div>' + head + body + '</div>';
   }
@@ -622,7 +639,7 @@
     var body = '<div class="pp-findbar">' +
       UI.choiceSearch({ label: 'Find', placeholder: 'Find', value: S.q, attrs: { 'data-role': 'q', inputmode: 'text', 'data-str-attr': 'aria-label:pp.room.scan.placeholder;placeholder:pp.room.scan.placeholder' } }) +
       '</div><div id="scan-results">' + findResults() + '</div>';
-    return sheet({ title: P('pp.room.scan.title'), subtitle: P('pp.room.find.sub'), view: 'find', size: 'long', height: 'full', body: '<div class="pp-sheet-stack">' + body + '</div>' });
+    return sheet({ title: P('pp.room.scan.title'), subtitle: P('pp.room.find.sub'), view: 'find', size: 'long', body: '<div class="pp-sheet-stack">' + body + '</div>' });
   }
   function errorView() {
     return '<div class="pp-after">' + UI.panel(UI.choiceEmpty('', { strs: { text: 'pp.room.err.title' } }) + UI.choiceEmpty('', { strs: { text: 'pp.room.err.why' } }) +
