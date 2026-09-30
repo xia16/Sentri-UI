@@ -454,24 +454,27 @@
       strs: Object.assign({ title: 'pp.id.sec.weigh' }, receipt ? { description: receipt[0] } : {}), args: receipt ? { description: receipt[1] } : undefined });
     return '<section class="id-group" role="status" aria-live="polite">' + h + '<div>' + rowsHtml + '</div></section>';
   }
-  /* A piglet row (TaskRow, farrowing's piglet roster): the tag or notch, at most one flag as its chip, what is known as the
-     headline. Colour lives on the flag: dead red; a double-issued tag, a same-tag pair, a tag also on another crate and a
-     corrected row amber — each stays until Edit resolves it. A second flag reads on the meta line; the stamp is on the
-     record (Edit), one level down. */
+  /* A piglet row (TaskRow, farrowing's piglet roster): the tag or notch, one short chip, what is known as the headline.
+     The chip is one word, never cut: dead (red), Check (amber) for any tag doubt — a double-issued tag, a same-tag pair, a
+     tag also on another crate — or corrected (amber). The fact itself reads whole on the meta line, amber, until Edit
+     resolves it; the stamp is on the record (Edit), one level down. */
   function tableRow(r) {
-    var flags = [];
-    if (r.dead) flags.push({ text: PP.t('pp.id.chip.dead'), str: 'pp.id.chip.dead', tone: 'red' });
-    else if (twinGroup(r)) flags.push({ text: PP.t('pp.id.chip.twin'), str: 'pp.id.chip.twin', tone: 'amber' });
-    else if (r.pair || (notch && living().filter(function (x) { return key(x) === key(r); }).length > 1)) flags.push({ text: PP.t('pp.id.row.pair'), str: 'pp.id.row.pair', tone: 'amber' });
-    if (r.dup) flags.push({ text: PP.t('pp.id.row.dup', { crate: r.dup }), str: 'pp.id.row.dup', args: { crate: r.dup }, tone: 'amber' });
-    if (r.corrected) flags.push({ text: PP.t('pp.id.row.corrected'), str: 'pp.id.row.corrected', tone: 'amber' });
+    var amber = function (id, args) { return Object.assign(s(id, args), { tone: 'amber' }); };
+    var facts = [];
+    if (twinGroup(r)) facts.push(amber('pp.id.chip.twin'));
+    else if (r.pair || (notch && living().filter(function (x) { return key(x) === key(r); }).length > 1)) facts.push(amber('pp.id.row.pair'));
+    if (r.dup) facts.push(amber('pp.id.row.dup', { crate: r.dup }));
+    var chip = r.dead ? Object.assign(s('pp.id.chip.dead'), { tone: 'red' }) : facts.length ? Object.assign(s('pp.id.chip.check'), { tone: 'amber' })
+      : r.corrected ? Object.assign(s('pp.id.row.corrected'), { tone: 'amber' }) : null;
+    if (r.corrected && (r.dead || facts.length)) facts.push(amber('pp.id.row.corrected'));
     var meta = [];
     if (r.dead) meta.push(s('pp.id.row.dead_meta', { cause: PP.t('dead.' + r.dead.cause), date: U.date(r.dead.at) }));
-    flags.slice(1).forEach(function (f) { if (meta.length) meta.push({ sep: true }); meta.push(f); });
+    facts.forEach(function (x) { if (meta.length) meta.push({ sep: true }); meta.push(x); });
     var what = shape(r), head = s('pp.id.row.h.' + what, { sex: r.sex ? sexWord(r.sex) : '', w: r.w || '' });
-    return K.row({ id: s('pp.id.row.id', { id: idText(r) }), chip: flags[0] || null, headline: head, tone: what === 'n' ? 'forecast' : '',
+    return K.row({ id: s('pp.id.row.id', { id: idText(r) }), chip: chip, headline: head, tone: what === 'n' ? 'forecast' : '',
       meta: meta.length ? meta : '', action: 'edit-row', value: key(r) });
   }
+
   function rowsSection() {
     var cur = current();
     if (!cur.length) return '';
