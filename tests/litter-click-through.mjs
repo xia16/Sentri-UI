@@ -229,14 +229,14 @@ try {
   assert.doesNotMatch(await bar(page), /crushed/);              // handed over once, then dropped
   console.log('ok 15 dead Save → litter receipt:', (await bar(page)).slice(0, 40), '(once)');
 
-  // 16. Drafts other pages keep on this phone show on their doors: Record dead, Set count, identity.
+  // 16. Drafts other pages keep on this phone show on their doors: Record death, Set count, identity.
   await page.click('[data-action="open-dead"]');
   await page.waitForURL(/dead\.html/); await ready(page);
   await page.click('[data-action="dead-step"][data-value="crushed"][data-step="1"]');
   await page.click('[data-action="dead-step"][data-value="crushed"][data-step="1"]');
   await page.click('[data-action="back"]');
   await page.waitForURL(/litter\.html/); await ready(page);
-  assert.match(await text(page, '.pp-tools'), /Record dead Set count 2 unsaved/);
+  assert.match(await text(page, '.pp-tools'), /Record death Set count 2 unsaved/);
   await page.click('[data-action="open-count"]');
   await page.waitForURL(/count\.html/); await ready(page);
   await page.click('[data-action="step"][data-step="-1"]');
@@ -245,7 +245,7 @@ try {
   await page.waitForTimeout(450);
   await page.click('[data-action="back"]');
   await page.waitForURL(/litter\.html/); await ready(page);
-  assert.match(await text(page, '.pp-tools'), /Record dead Set count 2 unsaved 10 counted · not saved/);
+  assert.match(await text(page, '.pp-tools'), /Record death Set count 2 unsaved 10 counted · not saved/);
   await page.click('[data-ds="Row"][data-action="open-identity"] >> nth=-1');
   await page.waitForURL(/id\.html/); await ready(page);
   await page.click('[data-action="open-run"]');
@@ -255,7 +255,7 @@ try {
   assert.match(await face(page), /Record identity a piglet in hand · not saved/);
   console.log('ok 16 drafts on the doors: dead 2 unsaved · Set count 10 · identity in hand');
 
-  // 17. edge: Record dead from a litter outside the task comes back to its own face, with the receipt.
+  // 17. edge: Record death from a litter outside the task comes back to its own face, with the receipt.
   await openLitter(page, 'E01', null, true);
   assert.match(page.url(), /edge\.html/);
   await page.click('[data-action="open-dead"]');
@@ -264,7 +264,7 @@ try {
   await page.click('[data-action="save"]');
   await page.waitForURL(/edge\.html\?.*saved=dead/); await ready(page);
   assert.match(await text(page, '#screen'), /Saved · \+1 crushed/);
-  console.log('ok 17 edge → Record dead → Save → back on edge with the receipt');
+  console.log('ok 17 edge → Record death → Save → back on edge with the receipt');
 
   await browser.close();
 } finally {

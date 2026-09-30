@@ -366,10 +366,14 @@
     if (!h) return '';
     var first = null;
     x.deaths.forEach(function (d) { if (!first && d.id !== h.event && d.fromMissing > 0) first = d; });
-    var body = UI.rowGroup(door('resolve', h.event + '|one', 'pp.count.held.one', null, 'pp.count.held.one_short', { ap: np(x.alive) }) +
-      door('resolve', h.event + '|two', 'pp.count.held.two', null, 'pp.count.held.two_short', { ap: np(Math.max(0, x.alive - h.n)) }));
+    // farrowing's dialog: one question, the answers as radios, Back + Apply (Apply waits until an answer is picked)
+    var pick = S.heldPick || '';
+    var body = UI.choiceRadios({ label: '', layout: 'rows', action: 'held-pick', key: 'held', selected: pick, id: 'held-answer', options: [
+      { value: 'one', label: '', strs: { label: 'pp.count.held.one', meta: 'pp.count.held.one_short' }, args: { meta: { ap: np(x.alive) } }, meta: '' },
+      { value: 'two', label: '', strs: { label: 'pp.count.held.two', meta: 'pp.count.held.two_short' }, args: { meta: { ap: np(Math.max(0, x.alive - h.n)) } }, meta: '' }] });
+    var apply = { label: s('pp.count.held.apply'), action: 'resolve', value: pick ? h.event + '|' + pick : '', waiting: !pick };
     return K.dialog({ title: s('pp.count.held.title'), description: s('pp.count.held.ask', { a: first ? first.who : '', b: h.who }),
-      body: '<div class="dd-body">' + body + '</div>', footer: K.footer({ back: { action: 'sub-back' } }), layer: 1 });
+      body: '<div class="dd-body">' + body + '</div>', footer: K.footer({ back: { action: 'sub-back' }, primary: apply }), layer: 1 });
   }
   // The room's `Found a body` (R1-8): whose missing piglet is it? Every open loss in the unit, oldest first, as crate rows.
   function foundPicker() {
@@ -525,7 +529,8 @@
     else if (a === 'sub') { S.sub = v; }
     else if (a === 'sub-back') subBack();
     else if (a === 'found-pick') { crate = v; S.picking = false; S.presume = true; S.pig = emptyPig(); var k0 = kept(); if (k0 && k0.pig) restore(k0); }
-    else if (a === 'resolve') { var rv = v.split('|'); store.commit({ type: 'resolve', litter: tgt(), held: rv[0], answer: rv[1] }); S.sub = ''; }
+    else if (a === 'held-pick') { S.heldPick = v; }
+    else if (a === 'resolve') { if (UI.guard(b) || !v) return; var rv = v.split('|'); S.heldPick = ''; store.commit({ type: 'resolve', litter: tgt(), held: rv[0], answer: rv[1] }); S.sub = ''; }
     else if (a === 'mode') S.mode = v;
     else if (a === 'sow-cause') { S.sow.cause = v; keep(); }
     else if (a === 'clear') clearMode();
@@ -622,6 +627,7 @@
     UI.radioBind(screen, { onChange: function (field, value) {
       if (field === 'pick-cause') picks().forEach(function (r) { S.pig.picks[r] = value; });
       else if (field === 'sow-cause') S.sow.cause = value;
+      else if (field === 'held') S.heldPick = value;
       else S.pig.miss[field] = value;
       keep(); render();
     } });

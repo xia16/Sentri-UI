@@ -142,7 +142,7 @@ try {
   console.log('ok 9 0 asks moved or weaned; the kept 0 still asks; the Move door opens');
 
   // 10. R1-9: Set count names the tagged piglet it knows is missing (optional: the untagged could cover it); the line then
-  // carries 271004, and its body (Record dead from the line) closes it — Alive stays.
+  // carries 271004, and its body (Record death from the line) closes it — Alive stays.
   await toCount('B06');
   await step(-1, 1);
   assert.match(await text(page, '[data-target="roster"]'), /Which tagged piglets are missing\? · optional/);
@@ -169,6 +169,7 @@ try {
   const drawerText = await text(page, '[role="dialog"]');
   assert.ok(drawerText.indexOf('Same body recorded twice?') >= 0 && drawerText.indexOf('Same body recorded twice?') < drawerText.indexOf('Seen in A07'));
   await page.click('[data-action="sub"][data-value="held"]');
+  await page.click('[role="dialog"] [data-action="held-pick"][data-value="two"]');
   await page.click('[role="dialog"] [data-action="resolve"][data-value$="|two"]');
   assert.doesNotMatch(await text(page, '#screen'), /Same body recorded twice\?/);
   console.log('ok 11 held body answered in the Set count drawer: Two bodies');

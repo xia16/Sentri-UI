@@ -198,10 +198,14 @@
     if (!h) return '';
     var first = null;
     x.deaths.forEach(function (d) { if (!first && d.id !== h.event && d.fromMissing > 0) first = d; });
-    var body = UI.rowGroup(row({ action: 'resolve', value: h.event + '|one', title: 'pp.count.held.one', desc: 'pp.count.held.one_short', descArgs: { ap: np(x.alive) } }) +
-      row({ action: 'resolve', value: h.event + '|two', title: 'pp.count.held.two', desc: 'pp.count.held.two_short', descArgs: { ap: np(Math.max(0, x.alive - h.n)) } }));
+    // farrowing's dialog: one question, the answers as radios, Back + Apply (Apply waits until an answer is picked)
+    var pick = S.heldPick || '';
+    var body = UI.choiceRadios({ label: '', layout: 'rows', action: 'held-pick', key: 'held', selected: pick, id: 'held-answer', options: [
+      { value: 'one', label: '', strs: { label: 'pp.count.held.one', meta: 'pp.count.held.one_short' }, args: { meta: { ap: np(x.alive) } }, meta: '' },
+      { value: 'two', label: '', strs: { label: 'pp.count.held.two', meta: 'pp.count.held.two_short' }, args: { meta: { ap: np(Math.max(0, x.alive - h.n)) } }, meta: '' }] });
+    var apply = { label: s('pp.count.held.apply'), action: 'resolve', value: pick ? h.event + '|' + pick : '', waiting: !pick };
     return K.dialog({ title: s('pp.count.held.title'), description: s('pp.count.held.ask', { a: first ? first.who : '', b: h.who }), body: body,
-      footer: K.footer({ back: { action: 'sub-back' } }) });
+      footer: K.footer({ back: { action: 'sub-back' }, primary: apply }) });
   }
 
   /* ---- The litter's counts (where Save lands): what the count wrote, the litter's figures, a kept draft, a held body, a
@@ -548,7 +552,10 @@
     }
     else if (a === 'more') { S.more[v] = true; }
     else if (a === 'edit-count') { var ec = v.split('|'); nav('edit.html', { state: 'edit', crate: ec[0], count: ec[1], from: 'count' }); return; }
+    else if (a === 'held-pick') { S.heldPick = v; }
     else if (a === 'resolve') {
+      if (UI.guard(b) || !v) return;
+      S.heldPick = '';
       var rv = v.split('|'), r = store.commit({ type: 'resolve', litter: crate, held: rv[0], answer: rv[1] });
       if (!r.ok) S.failed = true;
       S.sub = '';
@@ -617,6 +624,7 @@
     render();
     // staleness is read from this phone's clock at every check: re-check while the drawer is open
     setInterval(function () { if (S.view === 'count') render(); }, 30000);
+    UI.radioBind(document.getElementById('screen'), { onChange: function (field, value) { if (field === 'held') { S.heldPick = value; render(); } } });
   });
 })();
 </script>

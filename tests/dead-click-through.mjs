@@ -31,7 +31,7 @@ try {
   const browser = await chromium.launch();
   const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
 
-  // 1. R1-26: room → A02 → Record dead. The steppers start at 0 for this entry (A02's 1 dead is said apart); the stepper keys
+  // 1. R1-26: room → A02 → Record death. The steppers start at 0 for this entry (A02's 1 dead is said apart); the stepper keys
   // name the cause; photos are previewed, deleted, restored and ride the Save; Save returns to the litter (no host stub).
   await toDead(page, 'A02');
   assert.match(await dialog(page), /Record death A02 · 12 alive · 1 dead so far/);
@@ -114,7 +114,7 @@ try {
   await page.waitForURL(/dead\.html/); await ready(page);
   await page.click('[data-action="back"]');
   await page.waitForURL(/count\.html\?state=explain/); await ready(page);
-  console.log('ok 5 Back from Explain\'s Record dead returns to Explain:', new URL(page.url()).search);
+  console.log('ok 5 Back from Explain\'s Record death returns to Explain:', new URL(page.url()).search);
 
   // 6. R1-9: B06 counted 11 (one missing, unnamed). Its body carries tag 271004: the drawer asks whether it was the missing
   // one; yes closes the loss and Alive stays 11.
@@ -138,6 +138,7 @@ try {
   await toDead(page, 'A07', 'held-body');
   assert.match(await dialog(page), /Same body recorded twice\?/);
   await page.click('[data-action="sub"][data-value="held"]');
+  await page.click('[data-action="held-pick"][data-value="one"]');
   await page.click('[data-action="resolve"][data-value$="|one"]');
   assert.doesNotMatch(await dialog(page), /Same body recorded twice\?/);
   assert.match(await dialog(page), /Record death A07 · 13 alive/);

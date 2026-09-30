@@ -32,7 +32,7 @@ async function openEdit(page) {
   await page.click('[data-action="open-edit"]');
   await page.waitForURL(/edit\.html/); await ready(page);
 }
-// litter → Record dead: one crushed (with photos), Save returns to the litter
+// litter → Record death: one crushed (with photos), Save returns to the litter
 async function recordDead(page, photos) {
   await page.click('[data-action="open-dead"]');
   await page.waitForURL(/dead\.html/); await ready(page);
@@ -52,7 +52,7 @@ try {
   const browser = await chromium.launch();
   const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
 
-  // 1. R1-7: room → A02 → Record dead (+1 crushed) → Edit lists the death → Recorded by mistake → Save → the receipt
+  // 1. R1-7: room → A02 → Record death (+1 crushed) → Edit lists the death → Recorded by mistake → Save → the receipt
   //    says alive and dead went back; the litter reads Alive 12 again.
   await openLitter(page, 'A02');
   await recordDead(page, 0);
