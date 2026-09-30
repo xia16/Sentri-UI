@@ -107,13 +107,29 @@
       : `<span class="tk-group-door">${inner}</span>`;
     return `<section class="tk-group" data-ds="TaskGroup"><header class="tk-group-head">${head}</header>${Array.isArray(rows) ? rows.join('') : rows}</section>`;
   }
-  /* ---- TaskRow: id + chip | headline + meta | chevron or edit ---- */
-  function row({ id, chip, headline, tone, meta, trail = 'chevron', action = 'open', value = '', label } = {}) {
+  /* ---- TaskRow: id + chip | headline + meta | chevron, edit or tick ----
+     trail 'tick' (with tick: { action = 'toggle', value, checked, label }): the row is a <label> around ChoiceList's multi
+     trail, a checkbox (the selection of a bulk act); the whole row is the target. still: a row with no action (a <div>,
+     e.g. one that holds its place after a record). data: { name: value } becomes data-name="value" on the row. */
+  function row({ id, chip, headline, tone, meta, trail = 'chevron', action = 'open', value = '', label, tick, still = false, data } = {}) {
     const c = chip ? `<span class="tk-chip"${chip.tone ? ` data-tone="${esc(chip.tone)}"` : ''}>${T(chip)}</span>` : '';
     const g = trail === 'edit' ? glyph('edit') : trail === 'chevron' ? glyph('chevron') : '';
-    return `<button type="button" class="tk-row" data-ds="TaskRow"${A(action, value)}${L(label)}>
+    const d = data ? Object.keys(data).map(k => ` data-${esc(k)}="${esc(data[k])}"`).join('') : '';
+    const inner = `
       <span class="tk-row-identity"><span class="tk-row-id">${T(id)}</span>${c}</span>
-      <span class="tk-row-detail"><span class="tk-row-headline"${tone ? ` data-tone="${esc(tone)}"` : ''}>${parts(headline)}</span>${meta ? `<span class="tk-row-meta">${parts(meta)}</span>` : ''}</span>${g}</button>`;
+      <span class="tk-row-detail"><span class="tk-row-headline"${tone ? ` data-tone="${esc(tone)}"` : ''}>${parts(headline)}</span>${meta ? `<span class="tk-row-meta">${parts(meta)}</span>` : ''}</span>`;
+    if (trail === 'tick') {
+      const t = tick || {};
+      return `<label class="tk-row" data-ds="TaskRow" data-trail="tick"${d}>${inner}<span class="tk-row-tick st-choice-trail"><input type="checkbox" data-action="${esc(t.action || 'toggle')}" value="${esc(t.value ?? value)}"${t.checked ? ' checked' : ''}${L(t.label)}></span></label>`;
+    }
+    if (still) return `<div class="tk-row" data-ds="TaskRow"${d}>${inner}${g}</div>`;
+    return `<button type="button" class="tk-row" data-ds="TaskRow"${A(action, value)}${L(label)}${d}>${inner}${g}</button>`;
+  }
+
+  /* ---- TaskTotals: the few figures a sheet commits, at farrowing's Finish size (Born 14 · Alive 9 · Dead 5) ----
+     items: [{ label, value }] (text slots); columns: 2 | 3 (default 3). */
+  function totals(items = [], { columns = 3, label } = {}) {
+    return `<dl class="st-panel tk-totals" data-ds="TaskTotals" data-columns="${columns === 2 ? 2 : 3}"${L(label)}>${items.map(i => `<div class="tk-total"><dt>${T(i.label)}</dt><dd>${T(i.value)}</dd></div>`).join('')}</dl>`;
   }
 
   /* ---- TaskDock ---- */
@@ -147,10 +163,13 @@
   }
   function drawer(o = {}) { return scrim(o.scrim) + sheet(o); }
 
-  /* ---- TaskPage: the record page ---- */
-  function page({ title, description, body = '', footer: f = '', label, bar = true } = {}) {
-    return `<section class="tk-page" data-ds="TaskPage" role="region" tabindex="-1" data-st-context="page"${L(label ?? title)}>${bar ? statusbar() : ''}
-      <header class="tk-page-head"><h2 class="tk-page-title">${T(title)}</h2>${description ? `<p class="tk-page-desc">${parts(description)}</p>` : ''}</header>
+  /* ---- TaskPage: the record page ----
+     aside: raw HTML at the right end of the title line (text actions such as Clear), as a sheet's aside.
+     inert: while a drawer or dialog is over the page. */
+  function page({ title, description, body = '', footer: f = '', label, bar = true, aside = '', inert = false } = {}) {
+    const t = `<h2 class="tk-page-title">${T(title)}</h2>`;
+    return `<section class="tk-page" data-ds="TaskPage" role="region" tabindex="-1" data-st-context="page"${inert ? ' inert' : ''}${L(label ?? title)}>${bar ? statusbar() : ''}
+      <header class="tk-page-head"${aside ? ' data-aside' : ''}>${aside ? `<div class="tk-page-titleline">${t}<div class="tk-page-aside">${aside}</div></div>` : t}${description ? `<p class="tk-page-desc">${parts(description)}</p>` : ''}</header>
       <div class="tk-page-body">${body}</div>${f || footer({})}</section>`;
   }
 
@@ -160,7 +179,7 @@
       <div class="tk-dialog-body"><h2 class="tk-dialog-title">${icon ? glyph(icon) : ''}${T(title)}</h2>${description ? `<p class="tk-dialog-desc">${parts(description)}</p>` : ''}${body}</div>${f}</div></div>`;
   }
 
-  const api = { T, statusbar, phone, screen, header, latest, summary, lens, list, group, row, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
+  const api = { T, statusbar, phone, screen, header, latest, summary, lens, list, group, row, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
   root.SentriTask = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);

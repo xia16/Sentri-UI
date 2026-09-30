@@ -11,25 +11,15 @@
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* Built from the task skeleton (ADR 0003): TaskPhone › TaskPage (head, body, footer: Back + Review) with TaskGroups of
-   TaskRows by crate row; the review is a TaskSheet over the page, closed by a TaskHold. A tickable row is a TaskRow whose
-   trail is ChoiceList's multi trail (a checkbox), so the row is a <label>. Layout and motion only, tokens only. */
+/* Built from the task skeleton (ADR 0003): TaskPhone › TaskPage (head with the tick actions as its aside; body; footer:
+   Back + Review) with TaskGroups of TaskRows by crate row (a tick trail where one tap records); the review is a TaskSheet
+   over the page (TaskTotals, then each litter), closed by a TaskHold. Stacking and motion only, tokens only. */
 .bk-body { display: flex; flex-direction: column; gap: var(--space-heading); }
 .bk-body > * { margin: 0; }
-.bk-body .tk-list { padding: 0; }
-.bk-body .tk-group-head { position: static; }
-/* The text actions on the ticks, at the right edge. */
-.bk-acts { display: flex; justify-content: flex-end; gap: var(--space-key-gap); margin-bottom: calc(-1 * var(--space-key-gap)); }
 .bk-receipt { display: flex; flex-direction: column; gap: var(--space-key-gap); }
-/* A tickable row: the TaskRow's trail is the checkbox; the row is the target. */
-label.tk-row { cursor: pointer; }
-label.tk-row > .st-choice-trail { flex: none; }
-/* The review: facts, then one line per litter that differs, then the rule. */
+/* The review: totals, each litter, one line per litter that differs, then the rule. */
 .bk-review { display: flex; flex-direction: column; gap: var(--space-heading); }
 .bk-review > * { margin: 0; }
-/* The review rises over the page (TaskPage sits at z 5; the skeleton's drawer layers are for the task screen). */
-.tk-phone > .tk-scrim { z-index: 6; }
-.tk-phone > .tk-sheet { z-index: 7; }
 /* A row this record finished holds its place (flash), then settles into its door. */
 .tk-row[data-flash] { background: var(--green-wash); }
 .tk-row { transition: background 1100ms ease-out; }
@@ -128,16 +118,11 @@ label.tk-row > .st-choice-trail { flex: none; }
       : r.why === 'unknown' ? s('pp.bulk.l1.unknown', { n: r.n }) : s('pp.bulk.l1.castration')];
   }
   function row(r, how) {
-    var html = K.row({ id: s('pp.bulk.code', { code: r.litter }), chip: chip(r), headline: headline(r), tone: r.kind === 'not_due' ? 'forecast' : '',
-      meta: s('pp.common.unit.day', { n: r.day }), trail: how === 'door' ? 'chevron' : '', action: how === 'door' ? 'open-litter' : '', value: how === 'door' ? r.litter : '' });
-    var flash = S.flash && S.held.indexOf(r.litter) >= 0 ? ' data-flash' : '';
-    var close = html.lastIndexOf('</button>');
-    if (how === 'select') {
-      var box = '<span class="st-choice-trail"><input type="checkbox" data-action="toggle" value="' + U.esc(r.litter) + '"' + (S.sel.indexOf(r.litter) >= 0 ? ' checked' : '') + '></span>';
-      return html.slice(0, close).replace('<button type="button" class="tk-row"', '<label class="tk-row"' + flash) + box + '</label>';
-    }
-    if (how === 'static') return html.slice(0, close).replace('<button type="button" class="tk-row"', '<div class="tk-row"' + flash) + '</div>';
-    return html;
+    return K.row({ id: s('pp.bulk.code', { code: r.litter }), chip: chip(r), headline: headline(r), tone: r.kind === 'not_due' ? 'forecast' : '',
+      meta: s('pp.common.unit.day', { n: r.day }), value: r.litter,
+      trail: how === 'select' ? 'tick' : how === 'door' ? 'chevron' : '', action: how === 'door' ? 'open-litter' : '', still: how === 'static',
+      tick: how === 'select' ? { action: 'toggle', checked: S.sel.indexOf(r.litter) >= 0 } : null,
+      data: S.flash && S.held.indexOf(r.litter) >= 0 ? { flash: '' } : null });
   }
   /* Rows grouped by crate row (A, B, C…), the room's grouping; a tick where one tap records, a door everywhere else. */
   function how(r) {
@@ -181,31 +166,30 @@ label.tk-row > .st-choice-trail { flex: none; }
     }).join('');
     return UI.panel('<div class="bk-receipt" id="bk-receipt">' + head + outcomeLines(R.outcomes.filter(function (x) { return x.outcome !== 'record'; }), false) + dbl + '</div>');
   }
-  /* The two text actions on the ticks (farrowing's Clear, at the right edge): untick all, tick every litter one tap records. */
+  /* The text actions on the ticks, the page head's aside (farrowing's Clear): untick all, tick every litter one tap records. */
   function tickActions(b) {
     var free = b.rows.filter(function (r) { return tickable(r) && S.sel.indexOf(r.litter) < 0; }).length;
-    var acts = (S.sel.length ? UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '') +
+    return (S.sel.length ? UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '') +
       (free ? UI.button({ label: PP.t('pp.bulk.act.tick_all'), register: 'text', action: 'tick-all', strs: { label: 'pp.bulk.act.tick_all' } }) : '');
-    return acts ? '<div class="bk-acts">' + acts + '</div>' : '';
   }
   function page(opts) {
     var b = bulk(), owe = b.rows.filter(function (r) { return r.kind === 'record' || r.kind === 'sheet'; }).length;
     // The head says the unit and, once litters are ticked, what Review will hold (`Unit 7 · 4 litters · 46 piglets · not recorded yet`).
     var desc = S.sel.length && b.plan.litters ? s(one('pp.bulk.desc.ticked', b.plan.litters), { u: ROOM, k: b.plan.litters, pigs: pigs(b.plan.piglets) })
       : owe ? s(one('pp.bulk.desc', owe), { u: ROOM, k: owe }) : s('pp.bulk.desc.zero', { u: ROOM });
-    var body, foot;
+    var body, foot, aside = '';
     if (!b.rows.length) {
       body = UI.panel(UI.choiceEmpty('', { strs: { text: b.ended ? 'pp.bulk.empty_ended' : 'pp.bulk.empty' }, args: { text: { tx: txLower() } } }));
       foot = K.footer({ back: { action: 'leave' } });
     } else {
-      body = receiptPanel() + (b.ended ? '' : tickActions(b)) + groups(b.rows);
+      aside = b.ended ? '' : tickActions(b);
+      body = receiptPanel() + groups(b.rows);
       var p = b.plan;
       foot = K.footer({ back: { action: 'leave' }, primary: S.sel.length && p.litters
         ? { label: s(one('pp.bulk.act.review', p.litters), { k: p.litters }), action: 'review' }
         : { label: s('pp.bulk.act.review_none'), action: 'review', waiting: true } });
     }
-    var html = K.page({ title: s('pp.bulk.head', title()), description: desc, body: '<div class="bk-body">' + body + '</div>', footer: foot });
-    return S.review ? html.replace('<section class="tk-page"', '<section class="tk-page" inert') : html;
+    return K.page({ title: s('pp.bulk.head', title()), description: desc, aside: aside, inert: S.review, body: '<div class="bk-body">' + body + '</div>', footer: foot });
   }
 
   /* ---- the review (TaskSheet): the counts, each litter's piglets (the contract), the litters that differ; a hold ---- */
@@ -214,12 +198,11 @@ label.tk-row > .st-choice-trail { flex: none; }
     var b = bulk(null, null, S.contract), p = b.plan, d = doseCfg(DOSE);
     var sub = d.product ? s('pp.bulk.rv.prod', { prod: PP.t('pp.litter.product.' + d.product) }) : s('pp.bulk.rv.all');
     var late = lateCount(p.record);
-    var n = function (v) { return { label: '', value: '', strs: { value: 'pp.bulk.n' }, args: { value: { n: v } } }; };
-    var sum = [Object.assign(n(p.litters), { strs: { label: 'pp.bulk.rv.f.litters', value: 'pp.bulk.n' } }), Object.assign(n(p.piglets), { strs: { label: 'pp.bulk.rv.f.piglets', value: 'pp.bulk.n' } })];
-    if (late) sum.push(Object.assign(n(late), { strs: { label: 'pp.bulk.rv.f.late', value: 'pp.bulk.n' } }));
+    var sum = [{ label: s('pp.bulk.rv.f.litters'), value: s('pp.bulk.n', { n: p.litters }) }, { label: s('pp.bulk.rv.f.piglets'), value: s('pp.bulk.n', { n: p.piglets }) }];
+    if (late) sum.push({ label: s('pp.bulk.rv.f.late'), value: s('pp.bulk.n', { n: late }) });
     var each = p.record.map(function (x) { return { label: '', value: '', strs: { label: 'pp.bulk.code', value: one('pp.common.unit.piglet', x.n) }, args: { label: { code: x.litter }, value: { n: x.n } } }; });
     var differ = p.outcomes.filter(function (x) { return x.outcome !== 'record'; });
-    var content = (p.litters ? UI.facts(sum, { columns: 3 }) + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.bulk.rv.each' } }) + UI.facts(each, { columns: 3 }) : '') +
+    var content = (p.litters ? K.totals(sum, { columns: 3 }) + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.bulk.rv.each' } }) + UI.facts(each, { columns: 3 }) : '') +
       (differ.length ? '<div class="bk-receipt">' + outcomeLines(differ, true) + '</div>' : '') +
       (S.failed ? U.receipt([{ id: 'pp.bulk.rv.failed' }, { id: why(S.failed), tone: 'amber' }]) : '') +
       (p.litters ? UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.bulk.rv.pointer' } }) : '');

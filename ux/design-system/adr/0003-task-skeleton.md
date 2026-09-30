@@ -2,7 +2,7 @@
 
 - **Status:** candidate, on `fix/skeleton` (from `map/3-piglet-processing`). Not approved. No task page adopts it yet; piglet processing is rebuilt on it page by page, next.
 - **Map:** [Piglet processing design map, issue #3](https://github.com/xia16/Sentri-UI/issues/3). Retro entries 29–32 (`ux/tasks/piglet-processing/retro.md`).
-- **Parts:** [TaskPhone](../components/TaskPhone/README.md) · [TaskHeader](../components/TaskHeader/README.md) · [TaskSummary](../components/TaskSummary/README.md) · [TaskLens](../components/TaskLens/README.md) · [TaskGroup](../components/TaskGroup/README.md) · [TaskRow](../components/TaskRow/README.md) · [TaskDock](../components/TaskDock/README.md) · [TaskSheet](../components/TaskSheet/README.md) · [TaskHold](../components/TaskHold/README.md) · [TaskPage](../components/TaskPage/README.md) · [TaskDialog](../components/TaskDialog/README.md).
+- **Parts:** [TaskPhone](../components/TaskPhone/README.md) · [TaskHeader](../components/TaskHeader/README.md) · [TaskSummary](../components/TaskSummary/README.md) · [TaskLens](../components/TaskLens/README.md) · [TaskGroup](../components/TaskGroup/README.md) · [TaskRow](../components/TaskRow/README.md) · [TaskDock](../components/TaskDock/README.md) · [TaskSheet](../components/TaskSheet/README.md) · [TaskHold](../components/TaskHold/README.md) · [TaskTotals](../components/TaskTotals/README.md) · [TaskPage](../components/TaskPage/README.md) · [TaskDialog](../components/TaskDialog/README.md).
 - **Code:** `components/task-skeleton.css` and `components/task-skeleton.js` (`window.SentriTask`), loaded after `tokens.css` and the bundle.
 - **Demo:** `components/task-skeleton-demo.html`: each screen built from the parts beside farrowing's original at 390×844. `?screen=room|sheet|full|page|dialog` shows one screen on the harness (framed on a wide window, full-bleed on a phone). Strict lint pages `ds-task-skeleton`, `ds-task-skeleton-{room,sheet,full,page,dialog}` (phone and narrow, en and zh) and `ds-task-skeleton-wide` (1440×900): clean.
 - **Parity inventory:** `ux/tasks/piglet-processing/parity.md`.
@@ -35,17 +35,28 @@ Extract farrowing's task anatomy into shared parts, **pixel-faithful to the refe
 1. **Footers never float.** A drawer is as tall as its content; only `data-height="full"` fixes its height, and then its body, not the space under the footer, takes the slack.
 2. **One left edge per surface.** Farrowing's drawer head is at 18px over a 21px body; its page head is at 21px over an 18px body. The skeleton puts the drawer at 21 throughout and the page at 18 throughout (the room's edge).
 3. **Colours snap to the palette** where farrowing's value is a near-duplicate of a token: `#394432` → `ink-2`; `#6e7965`, `#738069`, `#748068`, `#69765e` → `muted`; `#8a672c` → `amber`; `#24613a` → `green`, `#e4f1e6` → `green-wash`; `#596351` → `muted`, `#eef1e9` → `well`, `#dde3d5` → `line`; `#914032` → `red`, `#fbede8` → `red-wash`; `#e2e6dc` → `line`; `#57724e` → `current-marker`; `#dce2d4` → `handle`; the grab bar `#bac1b2` → `back-border`. The step is visible side by side only on the chips.
-4. **The hold uses the ruled face** (ADR 0002: 11px/700 sentence-case caption), not farrowing's 9px capitals.
+4. ~~**The hold uses the ruled face** (ADR 0002: 11px/700 sentence-case caption), not farrowing's 9px capitals.~~ **Superseded by owner round 5 (match farrowing exactly):** a task footer's hold caption is farrowing's face, `hold-caption` 9px/500 capitals, `0.07em` apart, at `task-hold-caption-opacity` (80%). The skeleton uppercases it; English caption and cue strings are written in capitals so the strict lint matches. See *Round 5 additions* below.
 5. **The room header is 60px** (farrowing's height, which comes from an unnamed 46px inner height), the lens bar 68px (a 1px transparent edge), the dock's bottom padding 24px (farrowing 25px, not a token: the dock is 1px shorter).
 6. **The dock has no "Go to pen" tool.** It is farrowing's own; the dock takes any icon tools.
 
 **What the skeleton does not decide.** Content inside a sheet (steppers, facts, fields, numpads) stays with the existing cards (ADR 0001, 0002). The demo uses them as they are, which is why the demo's steppers are the DS Stepper (filled +), not farrowing's outlined keys.
 
+## Round 5 additions (rebuild, `rebuild/bulkfarrow`)
+
+Additive only: no class or API renamed. Found while composing bulk (no farrowing counterpart) on the parts.
+- **TaskHold caption:** farrowing's face (decision 4 above).
+- **[TaskTotals](../components/TaskTotals/README.md)** (`SentriTask.totals`): the two or three figures a sheet commits, at farrowing's Finish size (`figure-total` 23px/600 sans, label 11px `muted`, a 3-column Panel).
+- **TaskRow tick trail** (`trail: 'tick'`, `tick: { action, value, checked, label }`): the row becomes a `<label>` around ChoiceList's checkbox, the whole row the target. Plus `still` (a row with no action, a `<div>`) and `data` (host data attributes such as `data-flash`).
+- **TaskPage `aside`** (text actions at the right end of the title line) and **`inert`**.
+- **A TaskSheet over a TaskPage** stacks above it (scrim z 6, sheet z 7; the dialog stays at 8).
+- **TaskGroup headers stick only under a lens bar** (`.tk-lens ~ .tk-list`); a list in a page or sheet body drops its own gutter.
+
 ## Candidate tokens
 
 In `tokens.json` with usage "Candidate (task skeleton, fix/skeleton, ADR 0003) — not approved", generated into `tokens.css`. They carry farrowing's measured values that no token held.
 - **colour:** `frame-border` #c7d0bd (device chrome), `chip-green-border` #c9e2cf, `chip-red-border` #f0d6cd, `progress-active` #9daa87.
-- **type (Figures):** `figure-card` 31px/600 mono −1.4px, `figure-denominator` 15px/400 mono −0.5px.
+- **type (Figures):** `figure-card` 31px/600 mono −1.4px, `figure-denominator` 15px/400 mono −0.5px, `figure-total` 23px/600 sans (TaskTotals, round 5), `hold-caption` 9px/500 sans 0.07em (TaskHold, round 5; below the 10px floor by the owner's ruling).
+- **opacity:** `task-hold-caption-opacity` 0.8 (TaskHold, round 5).
 - **spacing:** `space-card-x` 15px, `space-animal-row-y` 13px.
 - **radius:** `radius-tab` 7px, `radius-chip` 6px, `radius-device` 34px (device chrome).
 - **size:** `phone-width` 390px, `phone-height` 844px, `statusbar-height` 42px, `animal-row-min` 76px, `animal-id-col` 59px, `grab-height` 24px.

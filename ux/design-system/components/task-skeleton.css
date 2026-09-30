@@ -80,13 +80,17 @@
 /* ---- TaskGroup: a pen / crate-row card, its header and its rows ---- */
 .tk-list { display: flex; flex-direction: column; gap: var(--space-heading); padding: 1px var(--space-panel) var(--space-gutter); }
 .tk-group { flex-shrink: 0; overflow: clip; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); box-shadow: 0 2px 8px #20291f0a; }
-.tk-group-head { position: sticky; top: var(--tk-sticky, 68px); z-index: 1; display: flex; align-items: center; gap: 10px; padding: 2px var(--space-row-x);
+.tk-group-head { display: flex; align-items: center; gap: 10px; padding: 2px var(--space-row-x);
   background: var(--surface); border-bottom: 1px solid var(--line); font: var(--type-description-size) var(--font-sans); color: var(--muted); }
 .tk-group-door { flex: 1; min-width: 0; display: flex; align-items: center; gap: 5px; min-height: var(--touch-min); padding: 0; margin: 0;
   border: 0; border-radius: 6px; background: transparent; color: var(--muted); font: inherit; text-align: left; }
 .tk-group-title { font: 600 var(--type-row-title-size) var(--font-mono); color: var(--ink); }
 .tk-group-meta { font: var(--type-meta-size) var(--font-sans); color: var(--muted); }
 .tk-group-door svg { width: 12px; height: 12px; color: var(--muted); }
+/* The header sticks under the lens bar only; a list with no lens above it (a page, a sheet) scrolls its headers away. */
+.tk-lens ~ .tk-list .tk-group-head { position: sticky; top: var(--tk-sticky, 68px); z-index: 1; }
+/* A list on a page or in a sheet: the surface's body already carries the gutter. */
+:is(.tk-page-body, .tk-sheet-body) .tk-list { padding: 0; }
 
 /* ---- TaskRow: mono id + chip under it | one headline, one meta line | trailing chevron or edit ---- */
 .tk-row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: var(--animal-row-min); margin: 0;
@@ -109,6 +113,16 @@
 .tk-tone[data-tone="amber"] { color: var(--amber); }
 .tk-tone[data-tone="green"] { color: var(--green); }
 .tk-row > svg { flex: none; width: var(--glyph-key); height: var(--glyph-key); color: var(--muted); }
+/* The tick trail: the row is a <label> around ChoiceList's checkbox; the whole row is the target. */
+label.tk-row { cursor: pointer; }
+.tk-row-tick { flex: none; }
+
+/* ---- TaskTotals: the figures a sheet commits, at farrowing's Finish size (a panel of label over figure) ---- */
+.tk-totals.st-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-heading); margin: 0; padding: var(--space-row-x); }
+.tk-totals[data-columns="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tk-total { min-width: 0; margin: 0; }
+.tk-total > dt { margin: 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+.tk-total > dd { margin: 4px 0 0; font: 600 var(--type-figure-total-size)/1.3 var(--font-sans); color: var(--ink); font-variant-numeric: tabular-nums; }
 
 /* ---- TaskDock: the room's bottom tools ---- */
 .tk-dock { flex: none; position: relative; display: flex; align-items: center; gap: 9px; padding: var(--space-heading) var(--space-panel) var(--space-section);
@@ -160,12 +174,23 @@
 .tk-back:active { background: var(--press); }
 /* A surface with nothing to commit: Back alone fills the bar, in the primary's face (farrowing's record page). */
 .tk-back:only-child { flex: 1; width: auto; background: var(--ink); border-color: var(--ink); color: var(--paper); font-weight: 600; }
+/* TaskHold's caption: farrowing's face (owner round 5: match farrowing): 9px/500 capitals, 0.07em apart, at 80%. */
+.tk-footer > .st-hold .st-hold-caption { font: 500 var(--type-hold-caption-size)/1.3 var(--font-sans); letter-spacing: 0.07em; text-transform: uppercase;
+  opacity: var(--task-hold-caption-opacity); }
+.tk-footer > .st-hold[data-phase="unknown"] .st-hold-caption { opacity: 1; }
 .tk-footer > .button { flex: 1; min-width: 0; min-height: var(--control-height); margin: 0; padding: 10px 17px; border-radius: var(--radius-control);
   font: 500 var(--type-button-size)/1.3 var(--font-sans); }
 
 /* ---- TaskPage: the record page (a full page over the task, with its own status bar) ---- */
 .tk-page { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; background: var(--app-background); }
 .tk-page-head { flex: none; padding: 8px var(--space-gutter) 18px; border-bottom: 1px solid var(--line); }
+/* aside: text actions at the right end of the title line (a sheet's aside, on a page). */
+.tk-page-titleline { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tk-page-titleline > .tk-page-title { flex: 1; min-width: 0; }
+.tk-page-aside { flex: none; display: flex; align-items: center; }
+/* A drawer opened over a page rises above it (the page sits at z 5; a dialog stays on top at 8). */
+.tk-page ~ .tk-scrim { z-index: 6; }
+.tk-page ~ .tk-sheet { z-index: 7; }
 .tk-page-title { margin: 0; font: 500 var(--type-page-title-size)/1.3 var(--font-sans); letter-spacing: -0.5px; color: var(--ink); }
 .tk-page-desc { margin: 6px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
 .tk-page-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 20px var(--space-gutter) var(--space-section); }

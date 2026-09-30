@@ -79,10 +79,7 @@
 
   // ---- Finish farrowing: a drawer sized to its content, closed by a hold ----
   function finish() {
-    var facts = UI.facts([
-      { label: 'Born', value: 14, strs: { label: 'tk.demo.born', value: 'tk.demo.n' }, args: { value: { n: 14 } } },
-      { label: 'Alive', value: 9, strs: { label: 'tk.demo.alive', value: 'tk.demo.n' }, args: { value: { n: 9 } } },
-      { label: 'Dead', value: 5, strs: { label: 'tk.demo.dead', value: 'tk.demo.n' }, args: { value: { n: 5 } } }], { columns: 3 });
+    var facts = K.totals([{ label: s('tk.demo.born', 'Born'), value: n(14) }, { label: s('tk.demo.alive', 'Alive'), value: n(9) }, { label: s('tk.demo.dead', 'Dead'), value: n(5) }]);
     return K.drawer({ size: 'long', view: 'finish',
       title: s('tk.demo.finish', 'Finish farrowing'), subtitle: s('tk.demo.finish.sub', '000418 · B1 · Parity 3'),
       body: facts + stepper('weak', 'tk.demo.weak', 'Weak', 1) + stepper('deformed', 'tk.demo.deformed', 'Deformed', 1),

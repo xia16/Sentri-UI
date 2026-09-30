@@ -7,6 +7,7 @@ A full page over the task: **status bar, a page head (title + one description li
 **Anatomy** (`.tk-page`, `data-ds="TaskPage"`, `role="region"`)
 - Absolute over the whole phone (z 5), `app-background`, a flex column; its own [status bar](../TaskPhone/README.md).
 - **Head** (`.tk-page-head`): padded `8px space-gutter 18px`, a 1px `line` under it.
+  - **Aside** (optional, `aside`): text actions at the right end of the title line (`Clear`, `Tick all owed`), as a sheet's aside; the description runs the full width under it.
   - **Title:** `page-title` 22px/500/1.3, −0.5px, `ink`.
   - **Description:** 6px under it, `description` 11px/1.5 `muted`. Parts may carry colour.
 - **Body** (`.tk-page-body`): flex 1, scrolls, padded `20px space-gutter space-section`. Panels on it are `paper`.
@@ -18,7 +19,9 @@ A full page over the task: **status bar, a page head (title + one description li
 - Default only. The page takes no focus ring (`tabindex="-1"` for focus hand-off).
 
 **Component contract**
-- **Props:** `SentriTask.page({ title, description, body, footer, label, bar = true })`. `footer` defaults to Back alone.
+- **Props:** `SentriTask.page({ title, description, body, footer, label, bar = true, aside, inert })`. `footer` defaults to Back alone. `inert: true` while a drawer or dialog is over the page.
+- **Over a page:** a [drawer](../TaskSheet/README.md) placed after the page in the phone rises above it (scrim z 6, sheet z 7; a dialog stays on top at 8).
+- **A list on a page:** `SentriTask.list` in the body drops its own gutter (the body has it), and its headers do not stick (no lens above them).
 - **Events:** the footer's.
 - **Slots:** `title` (text slot), `description` (text slot or parts), `body`, `footer` (HTML).
 - **Port note:** a pushed screen with a bottom action bar; no navigation bar back button (Back is in the footer).

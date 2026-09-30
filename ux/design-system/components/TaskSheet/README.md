@@ -27,6 +27,7 @@ Every drawer in a task: **grab, title, subtitle, ✕, divider, scrolling body, f
 - Error, loading: not drawn. Empty: the body holds the empty line of what it contains.
 
 **Component contract**
+- **Over a page:** a drawer after a [TaskPage](../TaskPage/README.md) in the phone stacks above it (scrim z 6, sheet z 7); pass `inert: true` to the page.
 - **Props:** `SentriTask.drawer({ …sheet, scrim })` = `scrim({ action, label })` + `sheet({ title, subtitle, close: { action, value, label } | false, aside, body, footer, size, height: 'content' | 'full', label, view })`. `SentriTask.footer({ back: { action, value, label } | false, primary: { label, action, value, register, waiting, describedby } | html, hold })`; `SentriTask.back({ action, value, label })`.
 - **Events:** the scrim and ✕ emit `data-action` (`dismiss` by default); Back emits `back`; the primary its own.
 - **Slots:** `title` (text slot), `subtitle` (text slot or parts), `body` (HTML), `aside` (HTML), `footer` (HTML).

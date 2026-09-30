@@ -7,7 +7,7 @@ The task's list is **grouped by where the animals are**: one card per pen or cra
 **Anatomy**
 - **List** (`.tk-list`): padded `1px space-panel space-gutter`, a column with `space-heading` (12px) between cards.
 - **Card** (`.tk-group`, `data-ds="TaskGroup"`): `paper`, 1px `line`, `radius-panel`, a soft `0 2px 8px` shadow, clipped (`overflow: clip`, so the header can stick).
-- **Header** (`.tk-group-head`): `surface`, 1px `line` under it, padded `2px space-row-x`; sticky under the lens bar (`--tk-sticky`, default 68px).
+- **Header** (`.tk-group-head`): `surface`, 1px `line` under it, padded `2px space-row-x`; sticky under the lens bar (`--tk-sticky`, default 68px) **only when a lens bar is above the list** (`.tk-lens ~ .tk-list`); on a page or in a sheet the headers scroll with their cards, and the list drops its gutter (the body carries it).
   - **Door** (`.tk-group-door`): the whole header is one button, `touch-min` tall: the pen code in 13px/600 mono `ink`, 5px, the count in `meta` 10px `muted` (`· 2 sows`), 5px, a 12px chevron. It opens the pen's page.
 - Rows follow the header, a 1px `line` between rows.
 
