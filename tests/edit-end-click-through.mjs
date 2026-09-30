@@ -26,7 +26,7 @@ async function openLitter(page, crate, data, fresh = true) {
   await page.goto(base + 'room.html?state=room' + (data ? '&data=' + data : '') + (fresh ? '&fresh=1' : '')); await ready(page);
   if (!(await page.locator(`[data-action="open-litter"][data-value="${crate}"]`).count())) await page.click('[data-action="lens"][data-value="all"]');
   await page.click(`[data-action="open-litter"][data-value="${crate}"]`);
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
 }
 async function openEdit(page) {
   await page.click('[data-action="open-edit"]');
@@ -39,7 +39,7 @@ async function recordDead(page, photos) {
   await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
   for (let i = 0; i < photos; i++) await page.click('[data-action="photo-add"]');
   await page.click('[data-action="save"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
 }
 async function hold(page, sel, ms = 1100) {
   const b = await page.locator(sel).boundingBox();
@@ -56,7 +56,7 @@ try {
   //    says alive and dead went back; the litter reads Alive 12 again.
   await openLitter(page, 'A02');
   await recordDead(page, 0);
-  assert.match(await text(page, '[data-action="open-record"]'), /Alive 11/);
+  assert.match(await text(page, '.lt-summary'), /Alive 11/);
   await openEdit(page);
   const death = page.locator('[data-action="death-void"]').last();
   await death.click();
@@ -65,8 +65,8 @@ try {
   let rc = await live(page, '#ed-saved', /Correction saved/);
   assert.match(rc, /Correction saved · A02 · alive 11 → 12 · dead 2 → 1/);
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
-  assert.match(await text(page, '[data-action="open-record"]'), /Alive 12/);
+  await page.waitForURL(/state=litter/); await ready(page);
+  assert.match(await text(page, '.lt-summary'), /Alive 12/);
   console.log('ok 1 R1-7 room → A02 → dead → Edit → withdraw the death → Save:', rc);
 
   // 2. R1-7: a death on the wrong litter moves: Edit → On another litter → A04 → Save → both litters' alive in the receipt;
@@ -80,7 +80,7 @@ try {
   await page.click('[data-st-context="drawer"] [data-action="photo-back"]');
   await page.waitForTimeout(400);
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await openEdit(page);
   await page.locator('[data-action="death-to"]').last().click();
   assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.scrim')).zIndex > getComputedStyle(document.querySelector('[data-presentation="page"]')).zIndex), true);   // R1-28: the page sits under the picker's scrim
@@ -90,7 +90,7 @@ try {
   assert.match(rc, /A02 · alive 11 → 12 · dead 2 → 1 .*A04 · alive 11 → 10 · dead 1 → 2/);
   await page.waitForTimeout(400);                                            // Back right after a drawer closes is a ghost tap
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await page.click('[data-action="open-record"]');
   await page.waitForURL(/state=record-page/); await ready(page);
   assert.match(await text(page, '[data-ds="Log"]'), /\+1 crushed moved to A04/);
@@ -122,7 +122,7 @@ try {
   await page.click('[data-action="save"]');
   rc = await live(page, '#ed-saved', /Correction saved/);
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await page.click('[data-action="open-record"]');
   await page.waitForURL(/state=record-page/); await ready(page);
   assert.match(await text(page, '[data-ds="Log"]'), /Castrate 3 → 2 piglets · not castrated: hernia 2, weak 2 · the record of 09:20/);
@@ -155,7 +155,7 @@ try {
   await page.waitForURL(/edit\.html\?.*double=/); await ready(page);
   assert.match(await text(page, '#screen'), /Possible double treatment · Iron · day 3 .*What happened\?/);
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
 
   // 6b. "Same injection, recorded twice" asks which record, withdraws it (kept, stamped).
   await openEdit(page);
@@ -171,7 +171,7 @@ try {
   rc = await live(page, '#ed-saved', /Answer saved/);
   assert.match(rc, /Same injection, recorded twice · 08:40 · L\.M withdrawn, kept · Iron · day 3 counted once · 11 piglets/);
   await page.click('[data-action="back"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   console.log('ok 6 R1-29 Same injection → which record → Save:', rc);
 
   // 7. R1-14: a held body reads held; the count it explained reads explained, with a door to the death.
@@ -188,7 +188,7 @@ try {
   //    possible double, the day's records by hand and the doses ending drops → hold → the receipt freezes the double as
   //    unresolved at End; Back returns to the room (R1-30).
   await page.goto(base + 'room.html?state=room&data=late&fresh=1'); await ready(page);
-  await page.click('.task-return');                                           // the room's Back opens the task overview
+  await page.click('.tk-header-back');                                           // the room's Back opens the task overview
   await page.waitForURL(/end\.html/); await ready(page);
   const ov = await text(page, '[data-st-context="drawer"]');
   assert.match(ov, /Piglet deaths .*4 piglets/);
@@ -212,7 +212,7 @@ try {
 
   // 9. R1-13: after End the room's Back lands on the ended task (no End anywhere); an overview or End review opened after
   //    End names the real ender before any hold, and opens the receipt.
-  await page.click('.task-return');
+  await page.click('.tk-header-back');
   await page.waitForURL(/end\.html\?.*state=ended/); await ready(page);
   assert.equal(await page.locator('[data-action="review"], [data-action="hold"]').count(), 0);
   await page.goto(base + 'end.html?state=end-review&data=late'); await ready(page);
@@ -239,14 +239,14 @@ try {
 
   // 11. R1-30: End blocked by farrowing says where to end it and opens the litter still farrowing (never the concept board).
   await page.goto(base + 'room.html?state=room&fresh=1'); await ready(page);
-  await page.click('.task-return');                                           // the room's Back opens the task overview
+  await page.click('.tk-header-back');                                           // the room's Back opens the task overview
   await page.waitForURL(/end\.html/); await ready(page);
   await page.click('[data-action="review"]');
   const bl = await text(page, '[data-st-context="drawer"]');
   assert.match(bl, /End it in the Farrowing task on the Tasks list/);
   assert.match(bl, /litters with work left .* not yet due/);
   await page.click('[data-action="open-litter"][data-value="D01"]');
-  await page.waitForURL(/litter\.html\?.*crate=D01/); await ready(page);
+  await page.waitForURL(/state=litter.*crate=D01/); await ready(page);
   console.log('ok 11 R1-30 End blocked → D01 litter');
 
   // 12. The handoff: rows open their litter; weights say their day; not-reached doses are "not given in this task".
@@ -256,7 +256,7 @@ try {
   assert.match(ho, /Health shot · 28 not given in this task/);
   assert.match(ho, /Castrate · 4 not done at End/);
   await page.click('[data-st-context="drawer"] [data-action="open-litter"][data-value="A02"]');
-  await page.waitForURL(/litter\.html\?.*crate=A02/); await ready(page);
+  await page.waitForURL(/state=litter.*crate=A02/); await ready(page);
   console.log('ok 12 handoff wording, weights by day, rows open their litter');
 
   await browser.close();

@@ -6,6 +6,7 @@
      weightRow     the birth-litter-weight row, missing or set
      litterRow     Candidate:LitterRow — the room's row law (room, End)
      receipt       Candidate:Receipt — one body line, colour on the value only
+     toolRow       Candidate:ToolRow — farrowing's in-sheet tools (Edit · Record dead · Set count · Move), skeleton pages
    Plus the words every page stamps with: span, stamp, date, ago. Needs window.SentriUI and PP. */
 (function () {
   var UI = window.SentriUI, ICON = window.SentriIcons;
@@ -62,6 +63,18 @@
       return UI.button({ label: PP.t(id), register: 'tool', action: action, value: crate, strs: { label: id } });
     }
     return '<div class="pp-tools">' + tool('open-dead', 'act.record_dead') + tool('open-count', 'pp.count.title') + '</div>';
+  };
+
+  /* ---- Candidate:ToolRow: farrowing's in-sheet tool row under the litter summary (shell.css). A draft this phone keeps for
+     a tool is a small line inside it (farrowing's `Record death · Unsaved`).
+     list: [{ action, value, icon, label: stringId, kept: [stringId, args] | null }] ---- */
+  U.toolRow = function (list, o) {
+    o = o || {};
+    return '<div class="pp-toolrow pp-tools" role="group" data-ds="Candidate:ToolRow"' + (o.label ? ' data-str-attr="aria-label:' + o.label + '" aria-label="' + esc(PP.t(o.label)) + '"' : '') + '>' +
+      list.map(function (t) {
+        return '<button type="button" class="pp-tool" data-action="' + esc(t.action) + '" data-value="' + esc(t.value || '') + '">' + (t.icon ? ICON.icon(t.icon) : '') +
+          U.span(t.label) + (t.kept ? '<small>' + U.span(t.kept[0], t.kept[1]) + '</small>' : '') + '</button>';
+      }).join('') + '</div>';
   };
 
   /* ---- the birth litter weight row: missing (optional, a door to record it) or set (value and who set it) ---- */

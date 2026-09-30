@@ -22,7 +22,7 @@ async function openMove(page, crate, fresh) {
   const row = page.locator(`[data-action="open-litter"][data-value="${crate}"]`);
   if (!(await row.count())) await page.click('[data-action="lens"][data-value="all"]');
   await page.click(`[data-action="open-litter"][data-value="${crate}"]`);
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await page.click(`[data-action="open-move"]`);
   await page.waitForURL(/move\.html/); await ready(page);
   await page.waitForSelector('[data-st-context="drawer"]');
