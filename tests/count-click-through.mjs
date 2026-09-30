@@ -71,7 +71,7 @@ try {
   await explain(page);
   await page.waitForURL(/count\.html\?state=explain/); await ready(page);
   const sug = page.locator('[data-action="suggest"][data-value$="|C-B08-gain"]').first();
-  assert.match((await sug.innerText()).replace(/\s+/g, ' '), /B08 gained 1 piglet both lines close \d+ min/);
+  assert.match((await sug.innerText()).replace(/\s+/g, ' '), /B08 gained 1 piglet both lines close\s*·\s*\d+ min/);
   await sug.click();
   assert.match(await text(page, '[role="dialog"]'), /Alive stays 11 piglets in B06 and 10 piglets in B08/);
   await page.click('[data-action="open-move"]');

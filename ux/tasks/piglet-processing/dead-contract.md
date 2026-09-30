@@ -2,8 +2,9 @@
 
 The one shared dead drawer (the DeadDrawer composition, page `dead.html`), drawn on the task skeleton (ADR 0003): a
 TaskSheet over the room — grab, title `Record death`, subtitle `A02 · 12 alive · 1 dead so far`, ✕ (Clear while a draft
-exists), divider, body, footer with Back + Save — and cards in the body (Segment, Stepper, Row, ChoiceList radios, Photos,
-Banner, Button's reason line, waiting face and hold; ADR 0002). What is needed only sometimes sits one level down, in the
+exists), divider, body, footer with Back + Save — and in the body farrowing's faces from the skeleton (TaskStepper row
+face for the causes and the `From the missing` answer, TaskPhotos, TaskRow door rows) beside the cards it keeps (Segment,
+ChoiceList radios, Banner; the footer status slot for why Save waits; the hold; ADR 0002/0003). What is needed only sometimes sits one level down, in the
 same drawer (Back returns): the tagged piglets, the neighbours' losses, and the held-body question (a TaskDialog). Farrowing, the farrowing
 record, check-in and processing all open this component. It forks on **litter facts**, never on the
 task or the surface; the surface chooses copy only. Binds with RULINGS *Surfaces & entrances*,
@@ -64,7 +65,7 @@ sow_died { litterId, cause, note?, photos: [ photoRef ] }   // never batched wit
   counted 10:25 · G.H`) is one level down. Tapping a litter records the draft
   **there**: the untagged bodies are presumed from that loss (the answer is preset to what is open and stays
   editable); tagged picks are dropped (they belong to their own litter); the subtitle names the litter and one row
-  reads `Recording in D03 · found in A02` with `Undo` (records it in A02 again). The app never pairs by itself. From the room's
+  reads `Recording in D03 · found in A02` over `Record in A02 instead` (a tap records it in A02 again). The app never pairs by itself. From the room's
   Explain page, `Found a body?` opens the same drawer on a picker of the unit's open losses (`dead-found`).
 - **Alive** after a locked batch: `alive − (untagged bodies − allocated) − identified piglets not from a loss`
   (a named-missing or `fromLoss` piglet was already taken off Alive by its count). It can never go

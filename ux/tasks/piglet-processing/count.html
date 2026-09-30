@@ -135,13 +135,16 @@
     if (meta) { f.meta = ''; f.strs.meta = meta; f.args.meta = metaArgs; }
     return f;
   }
-  // A door row (Row card): one title, at most one meta line, a chevron or a trailing word.
+  // A door row (TaskRow door: farrowing's disclosure row): one title, at most one meta line (a trailing word joins it),
+  // a chevron. A row with nothing to open is a still panel line (a heading), never a dead button.
   function row(o) {
-    var strs = { title: o.title }, args = { title: o.titleArgs };
-    if (o.desc) { strs.description = o.desc; args.description = o.descArgs; }
-    if (o.trail) { strs.trailing = o.trail; args.trailing = o.trailArgs; }
-    return UI.row({ title: '', description: o.desc ? '' : undefined, trailing: o.trail ? '' : undefined, action: o.action, value: o.value, strs: strs, args: args });
+    var d = o.desc ? [s(o.desc, o.descArgs)] : [];
+    if (o.trail) d.push({ sep: true }, s(o.trail, o.trailArgs));
+    if (!o.action) return UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: o.title, description: o.desc }, args: { title: o.titleArgs, description: o.descArgs } });
+    return K.door({ title: s(o.title, o.titleArgs), description: d.length ? d : null, action: o.action, value: o.value });
   }
+  // the doors of one place, one column (farrowing's disclosure rows sit straight in the body)
+  function doors(html) { return '<div class="ct-doors">' + html + '</div>'; }
   function rowLabel(r) { return r.tag ? { id: 'pp.count.row.tag', args: { tag: r.tag } } : { id: 'pp.count.row.notch', args: { notch: r.notch } }; }
   function eventOf(id) { return store.events.filter(function (e) { return e.id === id; })[0] || null; }
   function lineTitle(l, withCode) {
@@ -153,14 +156,11 @@
     return { id: 'pp.count.line.stamp', args: { op: np(l.observed), stamp: stamp(l.at, l.who), wp: np(l.sizedAgainst) } };
   }
   // Save (or the step's primary), and the reason it waits (Button's waiting face, ADR 0002): the footer's status line
+  // the answer a sanity question takes (`17 is right`, `None are there`) is the status line's text action
   function saveFooter(p, waiting, action, id, args, backAction) {
-    return K.footer({ back: { action: backAction || 'back' }, status: p ? { text: PP.t(p.id, p.args), str: p.id, args: p.args, id: 'ct-why' } : null,
-      primary: { label: s(id || 'act.save', args), action: action || 'save', waiting: waiting } });
-  }
-  // the answer a sanity question takes (`17 is right`, `None are there`): a text action under the number it questions
-  function sureAct(p) {
-    if (!p || !p.act) return '';
-    return UI.button({ label: PP.t(p.act.id, p.act.args), register: 'text', action: p.act.action, value: String(S.observed), strs: { label: p.act.id }, args: p.act.args ? { label: p.act.args } : undefined });
+    var st = p ? { text: PP.t(p.id, p.args), str: p.id, args: p.args, id: 'ct-why' } : null;
+    if (st && p.act) st.action = { label: s(p.act.id, p.act.args), action: p.act.action, value: String(S.observed) };
+    return K.footer({ back: { action: backAction || 'back' }, status: st, primary: { label: s(id || 'act.save', args), action: action || 'save', waiting: waiting } });
   }
   function subtitleOf() {
     var x = L(), d = draft(), sub = [s('pp.count.sub.alive', { code: crate, a: x.alive })];
@@ -192,7 +192,7 @@
   function heldOpen() { return (L().held || []).filter(function (h) { return !h.resolved; }); }
   function heldRow() {
     return heldOpen().map(function (h) {
-      return '<div data-target="held">' + UI.rowGroup(row({ action: 'sub', value: 'held', title: 'pp.count.held.title', desc: 'pp.count.held.row', descArgs: { b: h.who, t: U.time(h.at) } })) + '</div>';
+      return '<div data-target="held">' + doors(row({ action: 'sub', value: 'held', title: 'pp.count.held.title', desc: 'pp.count.held.row', descArgs: { b: h.who, t: U.time(h.at) } })) + '</div>';
     }).join('');
   }
   function heldDialog() {
@@ -216,7 +216,7 @@
     if (c.conflict) {
       var list = c.counts.filter(function (k) { return c.disputed.indexOf(k.id) >= 0; })
         .map(function (k) { return PP.t('pp.count.review.one', { who: k.who, np: np(k.observed) }); }).join(' · ');
-      return UI.rowGroup(row({ action: '', value: '', title: 'pp.count.review.conflict', desc: 'pp.count.review.conflict_row', descArgs: { list: list } }));
+      return doors(row({ action: '', value: '', title: 'pp.count.review.conflict', desc: 'pp.count.review.conflict_row', descArgs: { list: list } }));
     }
     if (!c.review) return '';
     var st = c.counts.filter(function (k) { return k.stands; })[0];
@@ -229,13 +229,13 @@
       var o = eventOf(st.order[0]) || {};
       desc = 'pp.count.review.order'; dargs.who = o.who || ''; dargs.t = U.time(o.at || st.at);
     }
-    return UI.rowGroup(row({ action: '', value: '', title: 'pp.count.review.title', desc: desc, descArgs: dargs }));
+    return doors(row({ action: '', value: '', title: 'pp.count.review.title', desc: desc, descArgs: dargs }));
   }
   // R1-20: two counts that saw the same crate, net of a change one phone had not seen: one observation, nothing to settle
   function agreeRow(c) {
     var k = c.counts.filter(function (x) { return x.agreesNet; })[0];
     if (!k) return '';
-    return UI.rowGroup(row({ action: '', value: '', title: 'pp.count.agree.title', titleArgs: { np: np(k.observed) },
+    return doors(row({ action: '', value: '', title: 'pp.count.agree.title', titleArgs: { np: np(k.observed) },
       desc: 'pp.count.c.agrees', descArgs: { who: (eventOf(k.agreesWith[0]) || {}).who || '' } }));
   }
   /* ---- the Set count drawer: a staged assertion (Back keeps the draft, Clear discards it, Save writes one stamped count) ---- */
@@ -248,7 +248,7 @@
   function rosterRow(d) {
     if (!d.roster.length || (d.kind !== 'loss' && !S.rows.length)) return '';
     var must = d.needRows > 0, n = S.rows.length;
-    return '<div data-target="roster">' + UI.rowGroup(row({ action: 'sub', value: 'roster', title: must ? pl('pp.count.named.title', d.needRows) : 'pp.count.named.title_opt',
+    return '<div data-target="roster">' + doors(row({ action: 'sub', value: 'roster', title: must ? pl('pp.count.named.title', d.needRows) : 'pp.count.named.title_opt',
       desc: n ? pl('pp.count.named.picked', n) : null, descArgs: { n: n } })) + '</div>';
   }
   function rosterView(d) {
@@ -289,18 +289,18 @@
   function zeroSection(d) {
     if (sanity(d) !== 'zero') return '';
     return '<section class="ct-group" data-target="zero">' + UI.heading({ title: '', kind: 'group', level: 3, strs: { title: 'pp.count.zero.title' }, args: { title: { code: crate } } }) +
-      UI.rowGroup(row({ action: 'open-move', value: crate, title: 'pp.count.zero.move', titleArgs: { code: crate }, desc: 'pp.count.zero.move_desc' })) + '</section>';
+      doors(row({ action: 'open-move', value: crate, title: 'pp.count.zero.move', titleArgs: { code: crate }, desc: 'pp.count.zero.move_desc' })) + '</section>';
   }
   function settleRows() { var c = store.select.counts(store.derived, crate) || { counts: [] }; return settleRow(c) + agreeRow(c); }
   function countSheet() {
     var d = draft(), h = hint(d), p = pointer(d);
-    var hero = UI.stepper({ label: '', value: S.observed, min: 0, key: 'observed', variant: 'hero', draft: dirty(), hint: '', reserveHint: true,
+    var hero = K.stepper({ face: 'count', label: '', value: S.observed, min: 0, key: 'observed', variant: 'hero', draft: dirty(), hint: '', reserveHint: true,
       strs: { label: 'pp.count.seen', value: 'ds.field.figure', hint: h.id, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { label: { code: crate }, hint: h.args } });
     // a held body is answered here too, above the number (R1-22): the drawer never hides the question under it
     return K.drawer({ size: 'long', view: 'count', title: s('pp.count.title'), subtitle: subtitleOf(),
       aside: dirty() ? UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '', close: { action: 'dismiss' },
-      body: '<div class="ct-body">' + heldRow() + settleRows() + hero + sureAct(p) + zeroSection(d) + rosterRow(d) + '</div>',
+      body: '<div class="ct-body">' + heldRow() + settleRows() + hero + zeroSection(d) + rosterRow(d) + '</div>',
       footer: saveFooter(p, !d.event || !!stale() || S.failed || !!sanity(d)), scrim: { action: 'dismiss' } });
   }
 
@@ -311,12 +311,12 @@
     if (why === 'farrowing_open') {
       var ev = x.lastEvent;
       sub = s('pp.count.pre.sub', { code: crate });
-      body = UI.rowGroup(row({ action: 'open-farrowing', value: crate, title: 'pp.count.pre.door', titleArgs: { code: crate },
+      body = doors(row({ action: 'open-farrowing', value: crate, title: 'pp.count.pre.door', titleArgs: { code: crate },
         desc: 'pp.count.pre.door_desc', descArgs: { bp: np(x.born), ago: U.ago(ev.at, store.now()), who: ev.who } }));
     } else {
       var w = store.events.filter(function (e) { return e.type === 'weaned' && e.litter === crate; }).pop() || {};
       sub = s('pp.count.weaned.sub', { code: crate, date: w.at ? U.date(w.at) : '', np: np(x.weaned) });
-      body = UI.rowGroup(row({ action: 'open-move', value: crate, title: 'pp.count.weaned_move', desc: 'pp.count.weaned_move_desc', descArgs: { code: crate } }));
+      body = doors(row({ action: 'open-move', value: crate, title: 'pp.count.weaned_move', desc: 'pp.count.weaned_move_desc', descArgs: { code: crate } }));
     }
     return K.drawer({ size: 'short', view: 'refused', title: s('pp.count.title'), subtitle: [sub], close: { action: 'dismiss' },
       body: body, footer: K.footer({ back: { action: 'back' } }), scrim: { action: 'dismiss' } });
@@ -354,13 +354,13 @@
     var note = g && g.check ? 'pp.count.line.check' : l.review ? 'pp.count.review.line' : '';
     return '<section class="ct-group">' +
       UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: t.id, description: st.id }, args: { title: t.args, description: st.args } }) +
-      (note ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: note } }) : '') + UI.rowGroup(rows.join('')) + '</section>';
+      (note ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: note } }) : '') + doors(rows.join('')) + '</section>';
   }
   function explainPage(inert) {
     var x = explain(), sub = { lp: np(x.openLoss), gp: np(x.openGain) };
     var title = S.room ? s('pp.count.ex.title_room', { u: S.room }) : s('pp.count.ex.title', { code: crate });
     // R1-8: a body found loose in the room — say whose missing piglet it is (the dead drawer lists the unit's open losses)
-    var found = S.room && x.openLoss ? UI.rowGroup(row({ action: 'found-body', value: String(S.room), title: 'pp.count.ex.found', desc: 'pp.count.ex.found_desc' })) : '';
+    var found = S.room && x.openLoss ? doors(row({ action: 'found-body', value: String(S.room), title: 'pp.count.ex.found', desc: 'pp.count.ex.found_desc' })) : '';
     var body = receiptLine() + (S.room ? '' : heldRow()) + found + (x.lines.length ? x.lines.map(function (l) { return lineSection(l, !!S.room); }).join('')
       : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.ex.empty' } }));
     return K.page({ inert: !!inert, title: title, description: s('pp.count.ex.sub', sub), body: '<div class="ct-body">' + body + '</div>', footer: K.footer({ back: { action: 'back' } }) });
