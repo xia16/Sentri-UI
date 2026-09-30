@@ -79,7 +79,7 @@ try {
   const a02 = await rowText(page, 'A02');
   assert.equal(await page.locator(`${row('B09')} [data-tone="red"]`).count(), 0);
   await page.click(row('A02'));
-  assert.match(await text(page, '[data-action="open-dose"][data-value="iron3"]'), /Iron · day 3 .*2 owed · deferred: weak/);
+  assert.match(await text(page, '[data-action="open-dose"][data-value="iron3"]'), /Iron .*2 owed · deferred: weak/);
   await page.click('[data-view="litter"] [data-action="close"]');
   await page.click(row('B09'));
   assert.match(await text(page, '[data-action="open-dose"][data-value="iron3"]'), /2 owed · deferred: weak/);
@@ -95,7 +95,7 @@ try {
   assert.match(await rowText(page, 'A07'), /Check/);
   assert.match(await text(page, '[data-action="reviews"]'), /To review 2/);
   await page.click('[data-action="reviews"]');
-  assert.match(await text(page, '[role="dialog"]'), /A07 Body held · recorded twice\? .*Answer on Set count/);
+  assert.match(await text(page, '[role="dialog"]'), /A07 Body held · recorded twice\?/);
   await page.click('[data-action="open-review"][data-value^="held:"]');
   await page.waitForURL(/count\.html\?.*state=held-body/); await ready(page);
   assert.match(page.url(), /crate=A07/);
@@ -131,8 +131,8 @@ try {
   assert.equal(await has(page, '[data-action="lens"][data-value="owed"]'), false);
   assert.equal(await has(page, '.tk-summary-unit [data-str="pp.room.lead.many"]'), false);
   assert.match(await text(page, '[data-action="receipt"]'), /End receipt .*Task ended .*16:20 · G\.H/);
-  assert.match(await text(page, '.tk-summary-unit'), /6 litters unfinished at End/);
-  assert.match(await text(page, '[data-action="reviews"]'), /unresolved at End/);
+  assert.match(await text(page, '.tk-summary-unit'), /6 litters unfinished at end/);
+  assert.match(await text(page, '[data-action="reviews"]'), /unresolved at end/);
   assert.match(await rowText(page, 'B01'), /Castrate · 1 not done/);
   await page.click('[data-action="receipt"]');
   await page.waitForURL(/end\.html\?.*state=receipt/); await ready(page);

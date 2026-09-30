@@ -19,6 +19,33 @@
 .en-body > * { margin: 0; }
 .en-block > .st-heading { margin: 0 0 var(--space-key-gap); }
 .en-groups { display: flex; flex-direction: column; gap: var(--space-heading); }
+/* Candidate:TaskTable — farrowing's Choose a unit table (task-overview-routing): the column headings once, then one
+   door per crate row with its figures in columns. Candidate:TaskMetrics — farrowing's Performance metrics card: the two
+   headline measures large, the totals under a rule. Neither is a skeleton part yet (reported). */
+.en-table { overflow: hidden; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); }
+.en-table-cols, .en-table-row { display: grid; grid-template-columns: minmax(72px, 1.5fr) repeat(3, minmax(0, 1fr)) 18px; column-gap: var(--space-key-gap); align-items: center; }
+.en-table-cols { padding: var(--space-row-y) var(--space-row-x); background: var(--surface); border-bottom: 1px solid var(--line); font: var(--type-meta-size)/1.3 var(--font-sans); color: var(--muted); }
+.en-table-cols > span:not(:first-child) { text-align: center; }
+.en-table-row { width: 100%; min-height: var(--animal-row-min); margin: 0; padding: var(--space-row-x); border: 0; background: var(--paper); color: var(--ink); font: inherit; text-align: left; }
+.en-table-row + .en-table-row { border-top: 1px solid var(--line); }
+.en-table-row:active { background: var(--press); }
+.en-table-name { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.en-table-name > strong { font: 500 var(--type-button-size)/1.3 var(--font-sans); }
+.en-table-name > small { font: var(--type-meta-size)/1.3 var(--font-sans); color: var(--muted); }
+.en-table-n { font: 400 var(--type-figure-denominator-size) var(--font-mono); text-align: center; font-variant-numeric: tabular-nums; }
+.en-table-n[data-tone="red"] { color: var(--red); }
+.en-table-row > svg { width: 18px; height: 18px; color: var(--green); }
+.en-metrics.st-panel { padding: var(--space-panel); }
+.en-kpi { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-heading); }
+.en-kpi > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.en-kpi > div > span, .en-kpi > div > small { font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+.en-kpi > div > small { font-size: var(--type-meta-size); }
+.en-kpi strong { font: 500 var(--type-figure-total-size)/1.2 var(--font-mono); letter-spacing: -1px; color: var(--ink); }
+.en-kpi strong > small { margin-left: 2px; font-size: var(--type-figure-denominator-size); letter-spacing: 0; color: var(--muted); }
+.en-totals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-key-gap); margin: var(--space-panel) 0 0; padding: var(--space-row-x) 0 0; border-top: 1px solid var(--line); }
+.en-totals > div { min-width: 0; }
+.en-totals dt { font: var(--type-meta-size)/1.5 var(--font-sans); color: var(--muted); }
+.en-totals dd { margin: 2px 0 0; font: 500 var(--type-step-value-size)/1.5 var(--font-mono); color: var(--ink); }
 </style>
 </head>
 <body class="tk-stage">
@@ -100,7 +127,7 @@
   function doseCfg(id) { return CFG.doses.filter(function (d) { return d.id === id; })[0]; }
   function name(id) {
     var d = doseCfg(id), same = CFG.doses.filter(function (x) { return x.tx === d.tx; }).length > 1;
-    return same ? PP.t('pp.room.dose.withday', { name: PP.t('pp.common.tx.' + d.tx), n: d.due }) : PP.t('pp.common.tx.' + d.tx);
+    return same ? PP.t('pp.end.dose.withday', { name: PP.t('pp.common.tx.' + d.tx), n: d.due }) : PP.t('pp.common.tx.' + d.tx);
   }
   function sum(xs, f) { return xs.reduce(function (a, x) { return a + (f(x) || 0); }, 0); }
   function eventOf(id) { return store.events.filter(function (x) { return x.id === id; })[0] || null; }
@@ -334,25 +361,28 @@
   function cratesCard(ls) {
     var g = {}, order = [];
     ls.forEach(function (l) { var r = l.code.charAt(0); if (!g[r]) { g[r] = { done: 0, owed: 0, ahead: 0, n: 0, late: false }; order.push(r); } var x = g[r]; x.done += l.done; x.owed += l.owed; x.ahead += l.ahead; x.n++; x.late = x.late || l.late; });
+    var num = function (n, tone) { return '<span class="en-table-n"' + (tone ? ' data-tone="' + tone + '"' : '') + '>' + K.T(P('pp.end.tok.n', { n: n })) + '</span>'; };
     var rows = order.sort().map(function (r) {
       var x = g[r];
-      return K.row({ id: P('pp.end.row', { r: r }), headline: [P('pp.end.ov.h.done', { n: x.done }), { sep: true }, P('pp.end.ov.h.owed', { n: x.owed }, x.late ? 'red' : '')],
-        meta: [P(one('pp.end.v.litters', x.n), { n: x.n }), { sep: true }, P('pp.end.ov.h.ahead', { n: x.ahead })], action: 'open-room', value: r });
-    });
-    return sec({ icon: I('grid'), strs: { title: 'pp.end.ov.rows' } }) + K.group({ face: 'word', title: P('pp.end.unit', { n: UNIT }), meta: P(one('pp.end.row.meta', ls.length), { n: ls.length }), rows: rows });
+      return '<button type="button" class="en-table-row" data-action="open-room" data-value="' + esc(r) + '" data-str-attr="aria-label:pp.end.ov.row.aria" data-args=\'' + esc(JSON.stringify({ r: r, d: x.done, o: x.owed, a: x.ahead })) + '\' aria-label="' + esc(PP.t('pp.end.ov.row.aria', { r: r, d: x.done, o: x.owed, a: x.ahead })) + '">' +
+        '<span class="en-table-name"><strong>' + K.T(P('pp.end.row', { r: r })) + '</strong><small>' + K.T(P(one('pp.end.v.litters', x.n), { n: x.n })) + '</small></span>' +
+        num(x.done) + num(x.owed, x.late ? 'red' : '') + num(x.ahead) + K.glyph('chevron') + '</button>';
+    }).join('');
+    var head = '<div class="en-table-cols" aria-hidden="true"><span>' + K.T(P('pp.end.ov.col.row')) + '</span><span>' + K.T(P('pp.end.f.done')) + '</span><span>' + K.T(P('pp.end.f.owed')) + '</span><span>' + K.T(P('pp.end.f.ahead')) + '</span><span></span></div>';
+    return sec({ icon: I('grid'), strs: { title: 'pp.end.ov.rows' } }) + '<div class="en-table" data-ds="Candidate:TaskTable">' + head + '<div role="list">' + rows + '</div></div>';
   }
   // Performance metrics: on time and identity, then what happened to piglets and sows (now, or frozen at End).
   function metrics(t, atEnd) {
     var o = outcomes(atEnd && S.ended), moved = sum(o.moves, function (m) { return m.n; });
+    var kpi = function (labelId, value, small, metaId, metaArgs) {
+      return '<div><span>' + K.T(P(labelId)) + '</span><strong>' + K.T(value) + (small ? '<small>' + K.T(small) + '</small>' : '') + '</strong>' + (metaId ? '<small>' + K.T(P(metaId, metaArgs)) + '</small>' : '') + '</div>';
+    };
+    var tot = function (labelId, n) { return '<div><dt>' + K.T(P(labelId)) + '</dt><dd>' + K.T(P('pp.end.tok.n', { n: n })) + '</dd></div>'; };
     return sec({ icon: I('chart'), strs: { title: 'pp.end.pm.title', meta: atEnd ? 'pp.end.pm.meta.end' : 'pp.end.pm.meta' }, args: { meta: { n: t.ontime, k: t.due } } }) +
-      UI.facts([
-        { label: '', strs: { label: 'pp.end.ot.label', value: 'pp.end.ot.pct', meta: 'pp.end.ot.late.m' }, args: { value: { n: t.pct }, meta: { n: t.due - t.ontime } } },
-        { label: '', strs: { label: 'pp.end.f.identity', value: 'pp.end.v.litters_of' }, args: { value: { n: t.idDone, k: t.litters } } },
-        { label: '', strs: { label: 'pp.end.out.deaths', value: one('pp.common.unit.piglet', o.deaths.length) }, args: { value: { n: o.deaths.length } } },
-        { label: '', strs: { label: 'pp.end.out.moved', value: one('pp.common.unit.piglet', moved) }, args: { value: { n: moved } } },
-        { label: '', strs: { label: 'pp.end.out.loss', value: one('pp.common.unit.piglet', o.loss) }, args: { value: { n: o.loss } } },
-        { label: '', strs: { label: 'pp.end.out.sow', value: one('pp.end.v.sows', o.sows.length) }, args: { value: { n: o.sows.length } } }
-      ], { columns: 2 });
+      '<div class="st-panel en-metrics" data-ds="Candidate:TaskMetrics"><div class="en-kpi">' +
+        kpi('pp.end.ot.label', t.pct == null ? P('pp.end.pm.none') : P('pp.end.tok.n', { n: t.pct }), t.pct == null ? null : P('pp.end.pm.pct'), 'pp.end.ot.late.m', { n: t.due - t.ontime }) +
+        kpi('pp.end.f.identity', P('pp.end.tok.n', { n: t.idDone }), P('pp.end.pm.of', { k: t.litters }), 'pp.end.pm.id.m') + '</div>' +
+      '<dl class="en-totals">' + tot('pp.end.out.deaths', o.deaths.length) + tot('pp.end.out.moved', moved) + tot('pp.end.pm.loss', o.loss) + tot('pp.end.out.sow', o.sows.length) + '</dl></div>';
   }
   function reviewsBlock(list, frozenAtEnd) {
     if (!list.length) return '';
@@ -402,7 +432,10 @@
   // farrowing's Task overview: progress card, choose a crate row, performance metrics; Back + End task.
   function overviewPage() {
     var t = totals(false), en = ended(), ls = litters(false);
-    var body = (en ? alreadyBlock(en) : '') + progressCard(t) + '<div class="en-block">' + cratesCard(ls) + '</div>' + '<div class="en-block">' + metrics(t, false) + '</div>';
+    var day = dayRecords();
+    var body = (en ? alreadyBlock(en) : '') + progressCard(t) + '<div class="en-block">' + cratesCard(ls) + '</div>' +
+      (day.n ? doors([door('day', 'pp.end.day.title', null, one('pp.end.day.d', day.n), { n: day.n, who: day.order.join(' · ') })]) : '') +
+      '<div class="en-block">' + metrics(t, false) + '</div>';
     var foot = en ? backOnly('back') : K.footer({ back: { action: 'back' }, primary: UI.button({ label: PP.t('pp.end.act.end'), register: 'end-early', action: 'review', strs: { label: 'pp.end.act.end' } }) });
     return page('pp.end.ov.title', null, 'pp.end.scope.short', { n: UNIT }, body, foot);
   }
@@ -453,8 +486,6 @@
           body += doors([door('litters', 'pp.end.rv.list', null, 'pp.end.rv.list.d', { w: t.work, a: n - t.work })]);
         } else body += UI.panel(h({ strs: { title: 'pp.end.rv.none', description: 'pp.end.rv.after.desc' }, args: { title: { n: t.litters } } }));
         body += reviewsBlock(fig(false).reviews || [], false);
-        var day = dayRecords();
-        if (day.n) body += doors([door('day', 'pp.end.day.title', null, one('pp.end.day.d', day.n), { n: day.n, who: day.order.join(' · ') })]);
         body += '<div class="en-block">' + metrics(t, true) + '</div>';
       }
       var phase = S.unconfirmed ? 'unknown' : S.pending ? 'pending' : S.holding ? 'holding' : 'idle';
@@ -476,14 +507,10 @@
   function receiptPage() {
     var t = totals(true), n = t.unf.length, late = post().filter(function (e) { return e.kind === 'late'; }), en = ended();
     var headId = !n ? 'pp.end.rc.none' : one(S.mandatory ? 'pp.end.rc.head.m' : 'pp.end.rc.head', n);
-    var body = UI.panel(h({ strs: { title: headId, description: 'pp.end.rc.desc' }, args: { title: { n: n || t.litters } } })) +
-      UI.facts([
-        { label: '', strs: { label: 'pp.end.f.finished', value: 'pp.end.v.litters_of' }, args: { value: { n: t.litters - n, k: t.litters } } },
-        { label: '', strs: { label: 'pp.end.f.unfinished', value: one('pp.end.v.litters', n) }, args: { value: { n: n } } },
-        { label: '', strs: { label: 'pp.end.f.owed', value: pd(t.owed), meta: t.missed ? 'pp.end.f.missed' : undefined }, args: { value: { n: t.owed }, meta: { n: t.missed } } },
-        { label: '', strs: { label: 'pp.end.f.ahead', value: pd(t.ahead) }, args: { value: { n: t.ahead } } }
-      ], { columns: 2 }) +
-      (n ? doors([door('litters', 'pp.end.nd.title', null, one('pp.end.v.litters', n), { n: n })]) : '') +
+    var line = UI.statusLine([part(headId, { n: n || t.litters }, n ? '' : 'green')], { sep: 'dot' });
+    var body = line + K.totals([{ label: P('pp.end.f.finished'), value: P('pp.end.tok.n', { n: t.litters - n }) }, { label: P('pp.end.f.unfinished'), value: P('pp.end.tok.n', { n: n }) },
+        { label: P('pp.end.f.owed'), value: P('pp.end.tok.n', { n: t.owed }) }]) +
+      (n ? doors([door('litters', 'pp.end.nd.title', null, 'pp.end.nd.frozen', null)]) : '') +
       reviewsBlock(fig(true).reviews || [], true) + '<div class="en-block">' + metrics(t, true) + '</div>';
     var since = (late.length ? UI.panel(h({ strs: { title: one('pp.end.rc.late', late.length), description: 'pp.end.rc.late.why' }, args: { title: { n: late.length }, description: { code: late.map(function (e) { return e.code; }).join(' ') } } })) : '') +
       afterEndFlag() + sinceLog(true) + doors([door('handoff', 'pp.end.w.title', null, 'pp.end.w.row_now')]);
@@ -623,7 +650,7 @@
     S.holding = ''; var st = history.state;
     if (st && st.sheet && !st.deep) { history.back(); return; }
     // Deep-linked: the review returns to the overview, a page one level down to the review; the others to the page beneath.
-    S.sheet = S.ended ? '' : S.sheet === 'review' ? 'overview' : S.sheet === 'litters' || S.sheet === 'day' ? 'review' : ''; S.pending = S.changed = S.offline = S.already = S.unconfirmed = false; setUrl(false); render();
+    S.sheet = S.ended ? '' : S.sheet === 'review' ? 'overview' : S.sheet === 'litters' ? 'review' : S.sheet === 'day' ? 'overview' : ''; S.pending = S.changed = S.offline = S.already = S.unconfirmed = false; setUrl(false); render();
   }
   window.addEventListener('popstate', function (ev) {
     S.holding = ''; S.pending = S.changed = S.offline = S.already = S.unconfirmed = false;

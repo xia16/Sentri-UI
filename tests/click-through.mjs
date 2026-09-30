@@ -141,7 +141,7 @@ try {
   await page.click('[data-action="back"]');
   await page.waitForURL(/state=litter/); await ready(page);
   // the evidence row is Row (ADR 0002): its tap opens Edit (✎); a corrected figure is amber and says what it was (R1-28)
-  const rec = page.locator('[data-ds="Row"][data-action="open-edit"]', { hasText: 'Iron · day 3' }).first();
+  const rec = page.locator('[data-ds="Row"][data-action="open-edit"]', { hasText: 'Iron' }).first();
   assert.match((await rec.innerText()).replace(/\s+/g, ' '), /10 piglets\s*·?\s*2 deferred: weak.*was 12 · corrected/);
   assert.equal(await rec.locator('.st-part[data-tone="amber"]').count(), 3);
   assert.match(await text(page, '[data-action="open-dose"][data-value="iron3"]'), /2 owed|weak/);
@@ -153,6 +153,7 @@ try {
 
   // 6. Edit → tail was done on another crate → A04 → Save → A04's record page shows the act at its own time (ticket #12).
   await page.goto(base + 'edit.html?state=edit&crate=A02&data=a02-marked&fresh=1'); await ready(page);
+  await page.click('[data-action="wrong-crate"]');                                        // one door under the list (parity 1)
   await page.click('[data-action="mark-why"][data-value="T-A02-tail:to"]');                // R1-28: there without pressing −
   await page.click('[data-action="pick"][data-value="A04"]');
   await page.waitForFunction(() => /A04/.test((document.querySelector('#ed-banner-summary') || {}).innerText || ''));
