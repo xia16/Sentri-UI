@@ -139,6 +139,40 @@
     return `<button type="button" class="tk-row" data-ds="TaskRow"${A(action, value)}${L(label)}${d}>${inner}${g}</button>`;
   }
 
+  /* ---- TaskStepper: the design system's Stepper card (its behaviour, strings and a11y) in farrowing's face ----
+     Every prop is SentriUI.stepper's. face: 'row' (default for variant 'row': farrowing's entry row, outlined keys) |
+     'well' (default for variant 'hero': the Foster / Reconcile stepper on a well, its label as the section title above) |
+     'count' (the count sheet's hero on the green area: a filled green +). */
+  function stepper(props = {}) {
+    const UI = root.SentriUI;
+    const face = props.face || (props.variant === 'hero' ? 'well' : 'row');
+    // Farrowing reserves no hint line: a stepper with no hint and no pointers takes no space under its keys.
+    const quiet = props.reserveHint == null && !props.hint && !(props.strs && props.strs.hint) && !(props.pointers && props.pointers.length);
+    const html = UI.stepper(Object.assign({}, props, quiet ? { reserveHint: false } : {}, { className: `tk-stepper${props.className ? ' ' + props.className : ''}` }));
+    return html.replace('data-ds="Stepper"', `data-ds="Stepper" data-face="${esc(face)}"`);
+  }
+
+  /* ---- TaskPhotos: the design system's Photos card in farrowing's face (a line, not a well: a camera glyph, the label,
+     `Optional`, and an outlined camera key at the right; 50px thumbnails under it). Every prop is SentriUI.photos'. ---- */
+  function photos(props = {}) {
+    const UI = root.SentriUI;
+    const html = UI.photos(Object.assign({}, props, { className: `tk-photos${props.className ? ' ' + props.className : ''}` }));
+    return html.replace(/(<span class="st-photos-label"[^>]*>)/, `$1<span class="tk-photos-glyph">${glyph('camera')}</span>`);
+  }
+
+  /* ---- TaskRow door: a row with no id column (farrowing's .disclosure): a title, one muted description line, a chevron.
+     For a non-animal door inside a sheet or a page (`Record here › Move piglets`). ---- */
+  function door({ title, description, action = 'open', value = '', label, trail = 'chevron' } = {}) {
+    return `<button type="button" class="tk-door" data-ds="TaskRow" data-variant="door"${A(action, value)}${L(label)}><span class="tk-door-copy"><strong>${parts(title)}</strong>${description ? `<small>${parts(description)}</small>` : ''}</span>${trail === 'chevron' ? glyph('chevron') : trail === 'edit' ? glyph('edit') : ''}</button>`;
+  }
+
+  /* ---- TaskChoice: farrowing's choice tiles (Foster piglets: Send / Receive): two (or three) big outlined tiles, an icon
+     over the label; the chosen one on green-wash. options: [{ value, label, icon, pressed }]; one action for all. ---- */
+  function choice({ options = [], action = 'choose', label } = {}) {
+    const b = options.map(o => `<button type="button" class="tk-choice-tile" aria-pressed="${o.pressed ? 'true' : 'false'}"${A(action, o.value)}${L(o.aria)}>${o.icon ? glyph(o.icon) : ''}<span>${T(o.label)}</span></button>`).join('');
+    return `<div class="tk-choice" data-ds="TaskChoice" role="group" data-count="${options.length}"${L(label)}>${b}</div>`;
+  }
+
   /* ---- TaskTotals: the few figures a sheet commits, at farrowing's Finish size (Born 14 · Alive 9 · Dead 5) ----
      items: [{ label, value }] (text slots); columns: 2 | 3 (default 3). */
   function totals(items = [], { columns = 3, label } = {}) {
@@ -156,13 +190,17 @@
   function back({ action = 'back', value = '', label = { text: 'Back', str: 'act.back' } } = {}) {
     return `<button type="button" class="tk-back"${A(action, value)}>${glyph('back-chevron')}<span>${T(label)}</span></button>`;
   }
-  /* status: { text, str, args, id, tone } — one status line directly above the footer (the reason a waiting primary waits,
-     or the hold's progress line); it is wired as the primary's aria-describedby / the hold's statusId. */
+  /* status: { text, str, args, id, tone, action } — one status line directly above the footer (the reason a waiting primary
+     waits, or the hold's progress line); it is wired as the primary's aria-describedby / the hold's statusId. action:
+     { label, action, value } adds one text action at the line's end (`42 is right`). */
   function footer({ back: b = {}, primary, hold: h, status } = {}) {
     let s = '';
     if (status) {
       const id = status.id || 'tk-footer-status';
-      s = `<p class="tk-footer-status" id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>`;
+      const act = status.action ? button(Object.assign({ register: 'text' }, status.action)) : '';
+      s = act
+        ? `<div class="tk-footer-status" data-action-slot><p id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>${act}</div>`
+        : `<p class="tk-footer-status" id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>`;
       if (h && !h.statusId) h = Object.assign({}, h, { statusId: id });
       if (primary && typeof primary === 'object' && !primary.describedby) primary = Object.assign({}, primary, { describedby: id });
     }
@@ -181,9 +219,9 @@
   }
   /* size: compact | short | medium | long (the max height). height: 'content' (default) | 'full'.
      close: { action, label } draws the ✕; aside: raw HTML in its place (a text action such as Clear). */
-  function sheet({ title, subtitle, close = { action: 'dismiss' }, aside = '', body = '', footer: f = '', size = 'medium', height = 'content', label, view = '', layer = 0, inert = false } = {}) {
+  function sheet({ title, subtitle, subtitleTone = '', close = { action: 'dismiss' }, aside = '', body = '', footer: f = '', size = 'medium', height = 'content', label, view = '', layer = 0, inert = false } = {}) {
     const x = aside || (close ? `<button type="button" class="tk-sheet-close"${A(close.action || 'dismiss', close.value)}${L(close.label, { text: 'Close', str: 'act.close' })}>${glyph('close')}</button>` : '');
-    const sub = subtitle ? `<p class="tk-sheet-subtitle">${parts(subtitle)}</p>` : '';
+    const sub = subtitle ? `<p class="tk-sheet-subtitle"${subtitleTone ? ` data-tone="${esc(subtitleTone)}"` : ''}>${parts(subtitle)}</p>` : '';
     return `<section class="tk-sheet" data-ds="TaskSheet" role="dialog" aria-modal="true" tabindex="-1" data-st-context="drawer"${LY(layer)}${inert ? ' inert' : ''} data-size="${esc(size)}"${height === 'full' ? ' data-height="full"' : ''}${view ? ` data-view="${esc(view)}"` : ''}${L(label ?? title)}>
       <div class="tk-grab" aria-hidden="true"></div>
       <header class="tk-sheet-head"><div class="tk-sheet-titles"><h2 class="tk-sheet-title">${T(title)}</h2>${sub}</div>${x}</header>
@@ -193,11 +231,12 @@
 
   /* ---- TaskPage: the record page ----
      aside: raw HTML at the right end of the title line (text actions such as Clear), as a sheet's aside.
-     inert: while a drawer or dialog is over the page. */
-  function page({ title, description, body = '', footer: f = '', label, bar = true, aside = '', inert = false, layer = 0 } = {}) {
+     inert: while a drawer or dialog is over the page. view: data-view (the host's state name). descriptionTone: 'amber' |
+     'red' | 'green' colours the whole description line (a part can still carry its own tone). */
+  function page({ title, description, descriptionTone = '', body = '', footer: f = '', label, bar = true, aside = '', inert = false, layer = 0, view = '' } = {}) {
     const t = `<h2 class="tk-page-title">${T(title)}</h2>`;
-    return `<section class="tk-page" data-ds="TaskPage" role="region" tabindex="-1" data-st-context="page"${LY(layer)}${inert ? ' inert' : ''}${L(label ?? title)}>${bar ? statusbar() : ''}
-      <header class="tk-page-head"${aside ? ' data-aside' : ''}>${aside ? `<div class="tk-page-titleline">${t}<div class="tk-page-aside">${aside}</div></div>` : t}${description ? `<p class="tk-page-desc">${parts(description)}</p>` : ''}</header>
+    return `<section class="tk-page" data-ds="TaskPage" role="region" tabindex="-1" data-st-context="page"${LY(layer)}${view ? ` data-view="${esc(view)}"` : ''}${inert ? ' inert' : ''}${L(label ?? title)}>${bar ? statusbar() : ''}
+      <header class="tk-page-head"${aside ? ' data-aside' : ''}>${aside ? `<div class="tk-page-titleline">${t}<div class="tk-page-aside">${aside}</div></div>` : t}${description ? `<p class="tk-page-desc"${descriptionTone ? ` data-tone="${esc(descriptionTone)}"` : ''}>${parts(description)}</p>` : ''}</header>
       <div class="tk-page-body">${body}</div>${f || footer({})}</section>`;
   }
 
@@ -207,7 +246,7 @@
       <div class="tk-dialog-body"><h2 class="tk-dialog-title">${icon ? glyph(icon) : ''}${T(title)}</h2>${description ? `<p class="tk-dialog-desc">${parts(description)}</p>` : ''}${body}</div>${f}</div></div>`;
   }
 
-  const api = { T, statusbar, phone, screen, header, latest, summary, progress, lens, list, group, row, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
+  const api = { T, statusbar, phone, screen, header, latest, summary, progress, lens, list, group, row, door, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
   root.SentriTask = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);

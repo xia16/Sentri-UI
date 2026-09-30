@@ -23,6 +23,10 @@ One animal or litter in a [group](../TaskGroup/README.md). **Budget: the mono id
 - Pressed: `press`. Focus: the global ring. Disabled: never drawn; a row that cannot be acted on is absent or says why in its meta.
 - Done: the chip `Done` and the edit trail. Never grey.
 
+**Door variant (no id column)** — farrowing's `.disclosure`: `SentriTask.door({ title, description, action, value, label, trail: 'chevron' | 'edit' | '' })` (`.tk-door`, `data-ds="TaskRow"`, `data-variant="door"`). A non-animal door inside a sheet or a page: at least 62px, padded 15px 0, a 1px `line` under it; the title 13px/600, one description line 10px/1.7 `muted` 5px under it; a 16px chevron.
+
+**The id column holds its width** (`animal-id-col`): a chip wider than it ellipses under the id, so every headline in a group starts on one edge.
+
 **Component contract**
 - **Props:** `SentriTask.row({ id, chip: { text, str, args, tone }, headline, tone, meta, trail: 'chevron' | 'edit' | 'tick' | '', action = 'open', value, label, tick: { action = 'toggle', value = value, checked, label }, still, data })`. `still: true` draws a row with no action (a `<div>`: a row holding its place after a record). `data: { flash: '' }` adds `data-flash` (and the like) for the host's motion.
 - **Events:** `<button data-action=action data-value=value>`.
