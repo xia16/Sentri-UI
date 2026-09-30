@@ -16,7 +16,7 @@ The task's list is **grouped by where the animals are**: one card per pen or cra
 - Empty: a group with no rows in the current lens is absent. A lens with no rows at all shows one line in the list's place (the host's).
 
 **Component contract**
-- **Props:** `SentriTask.list(groups)`; `SentriTask.group({ title, meta, door: { action, value, label } | null, rows })`.
+- **Props:** `SentriTask.list(groups)`; `SentriTask.group({ title, meta, door: { action, value, label } | null, rows, face: 'code' | 'word' })`. `face: 'word'` sets the title in the sans face for a word (`Row A`, `Arrivals`); the default `code` is a place code in mono (`B1`).
 - **Events:** the door is `<button data-action=door.action data-value=door.value>`. Without `door` the header is plain text.
 - **Slots:** `title`, `meta` (text slots); `rows` (HTML from `SentriTask.row`).
 - **Port note:** a section list with sticky section headers; each section is a card.

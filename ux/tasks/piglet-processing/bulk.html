@@ -133,7 +133,7 @@
     var by = {}, order = [];
     rows.forEach(function (r) { var k = r.litter.charAt(0); if (!by[k]) { by[k] = []; order.push(k); } by[k].push(r); });
     return K.list(order.map(function (k) {
-      return K.group({ title: s('pp.bulk.grp.row', { r: k }), meta: s(one('pp.bulk.grp.n', by[k].length), { k: by[k].length }), rows: by[k].map(function (r) { return row(r, how(r)); }) });
+      return K.group({ face: 'word', title: s('pp.bulk.grp.row', { r: k }), meta: s(one('pp.bulk.grp.n', by[k].length), { k: by[k].length }), rows: by[k].map(function (r) { return row(r, how(r)); }) });
     }));
   }
 

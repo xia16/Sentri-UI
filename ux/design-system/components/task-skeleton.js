@@ -91,6 +91,18 @@
     return `<section class="tk-summary" data-ds="TaskSummary"${L(unit.label)}>${u}${t}</section>`;
   }
 
+  /* ---- TaskProgress: farrowing's Whole-task progress card (Task overview): a panel head (title, meta), the segmented
+     bar, then one count per segment (figure over a dotted label). segments: [{ tone: done|active|rest, share }];
+     counts: [{ value, label, tone }] (text slots; tone draws the label's dot in its segment's colour). ---- */
+  function progress({ title, meta, segments = [], max, now, barLabel, counts = [], label } = {}) {
+    const seg = segments.map(s => `<i data-tone="${esc(s.tone)}" style="width:${Math.max(0, Math.min(100, +s.share || 0))}%"></i>`).join('');
+    const c = counts.map(x => `<div class="tk-progress-count"><strong>${T(x.value)}</strong><span>${x.tone ? `<i class="tk-progress-dot" data-tone="${esc(x.tone)}" aria-hidden="true"></i>` : ''}${T(x.label)}</span></div>`).join('');
+    return `<section class="st-panel tk-progress-card" data-ds="TaskProgress"${L(label ?? title)}>
+      <header class="tk-progress-head"><h3 class="tk-progress-title">${T(title)}</h3>${meta ? `<span class="tk-progress-meta">${T(meta)}</span>` : ''}</header>
+      <span class="tk-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${esc(max ?? 100)}" aria-valuenow="${esc(now ?? 0)}"${L(barLabel)}>${seg}</span>
+      ${counts.length ? `<div class="tk-progress-counts" style="--tk-count:${counts.length}">${c}</div>` : ''}</section>`;
+  }
+
   /* ---- TaskLens: tabs, the count under each label; the filter at the end ---- */
   function lens({ tabs = [], action = 'lens', filter } = {}) {
     const b = tabs.map(t => `<button type="button" class="tk-lens-tab" aria-pressed="${t.pressed ? 'true' : 'false'}"${A(action, t.value)}${L(t.label)}><span>${T(t.text)}</span><span class="tk-lens-count">${T(t.count)}</span></button>`).join('');
@@ -100,8 +112,9 @@
 
   /* ---- TaskGroup: a pen / crate-row card ---- */
   function list(groups) { return `<div class="tk-list">${Array.isArray(groups) ? groups.join('') : groups || ''}</div>`; }
-  function group({ title, meta, door, rows = '' } = {}) {
-    const inner = `<strong class="tk-group-title">${T(title)}</strong>${meta ? `<small class="tk-group-meta">${T(meta)}</small>` : ''}`;
+  /* face: 'code' (default: a place code in mono, `B1`) | 'word' (a word in the sans face, `Row A`, `Arrivals`). */
+  function group({ title, meta, door, rows = '', face = 'code' } = {}) {
+    const inner = `<strong class="tk-group-title"${face === 'word' ? ' data-face="word"' : ''}>${T(title)}</strong>${meta ? `<small class="tk-group-meta">${T(meta)}</small>` : ''}`;
     const head = door
       ? `<button type="button" class="tk-group-door"${A(door.action, door.value)}${L(door.label)}>${inner}${glyph('chevron')}</button>`
       : `<span class="tk-group-door">${inner}</span>`;
@@ -143,43 +156,58 @@
   function back({ action = 'back', value = '', label = { text: 'Back', str: 'act.back' } } = {}) {
     return `<button type="button" class="tk-back"${A(action, value)}>${glyph('back-chevron')}<span>${T(label)}</span></button>`;
   }
-  function footer({ back: b = {}, primary, hold: h } = {}) {
-    return `<div class="tk-footer" data-ds="TaskFooter">${b ? back(b) : ''}${h ? hold(h) : button(primary)}</div>`;
+  /* status: { text, str, args, id, tone } — one status line directly above the footer (the reason a waiting primary waits,
+     or the hold's progress line); it is wired as the primary's aria-describedby / the hold's statusId. */
+  function footer({ back: b = {}, primary, hold: h, status } = {}) {
+    let s = '';
+    if (status) {
+      const id = status.id || 'tk-footer-status';
+      s = `<p class="tk-footer-status" id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>`;
+      if (h && !h.statusId) h = Object.assign({}, h, { statusId: id });
+      if (primary && typeof primary === 'object' && !primary.describedby) primary = Object.assign({}, primary, { describedby: id });
+    }
+    return `${s}<div class="tk-footer" data-ds="TaskFooter">${b ? back(b) : ''}${h ? hold(h) : button(primary)}</div>`;
   }
 
+  /* ---- The overlay layer model ----
+     Every overlay (scrim, sheet, page, dialog) sits on a layer: z = base + 10 × layer (scrim 2, sheet 3, page 5, dialog 8).
+     Layer 0 is over the task screen. An overlay placed after a page or a sheet in the phone rises one layer on its own
+     (CSS); `layer: n` sets it explicitly for deeper stacks (a sheet over a sheet over a page: layer 2). */
+  const LY = n => (n ? ` data-layer="${esc(n)}"` : '');
+
   /* ---- TaskSheet: the drawer ---- */
-  function scrim({ action = 'dismiss', label = { text: 'Dismiss sheet', str: 'tk.sheet.dismiss' } } = {}) {
-    return `<button type="button" class="tk-scrim" data-ds="TaskSheet"${A(action)}${L(label)}></button>`;
+  function scrim({ action = 'dismiss', label = { text: 'Dismiss sheet', str: 'tk.sheet.dismiss' }, layer = 0 } = {}) {
+    return `<button type="button" class="tk-scrim" data-ds="TaskSheet"${LY(layer)}${A(action)}${L(label)}></button>`;
   }
   /* size: compact | short | medium | long (the max height). height: 'content' (default) | 'full'.
      close: { action, label } draws the ✕; aside: raw HTML in its place (a text action such as Clear). */
-  function sheet({ title, subtitle, close = { action: 'dismiss' }, aside = '', body = '', footer: f = '', size = 'medium', height = 'content', label, view = '' } = {}) {
+  function sheet({ title, subtitle, close = { action: 'dismiss' }, aside = '', body = '', footer: f = '', size = 'medium', height = 'content', label, view = '', layer = 0, inert = false } = {}) {
     const x = aside || (close ? `<button type="button" class="tk-sheet-close"${A(close.action || 'dismiss', close.value)}${L(close.label, { text: 'Close', str: 'act.close' })}>${glyph('close')}</button>` : '');
     const sub = subtitle ? `<p class="tk-sheet-subtitle">${parts(subtitle)}</p>` : '';
-    return `<section class="tk-sheet" data-ds="TaskSheet" role="dialog" aria-modal="true" tabindex="-1" data-st-context="drawer" data-size="${esc(size)}"${height === 'full' ? ' data-height="full"' : ''}${view ? ` data-view="${esc(view)}"` : ''}${L(label ?? title)}>
+    return `<section class="tk-sheet" data-ds="TaskSheet" role="dialog" aria-modal="true" tabindex="-1" data-st-context="drawer"${LY(layer)}${inert ? ' inert' : ''} data-size="${esc(size)}"${height === 'full' ? ' data-height="full"' : ''}${view ? ` data-view="${esc(view)}"` : ''}${L(label ?? title)}>
       <div class="tk-grab" aria-hidden="true"></div>
       <header class="tk-sheet-head"><div class="tk-sheet-titles"><h2 class="tk-sheet-title">${T(title)}</h2>${sub}</div>${x}</header>
       <div class="tk-sheet-body">${body}</div>${f}</section>`;
   }
-  function drawer(o = {}) { return scrim(o.scrim) + sheet(o); }
+  function drawer(o = {}) { return scrim(Object.assign({ layer: o.layer || 0 }, o.scrim)) + sheet(o); }
 
   /* ---- TaskPage: the record page ----
      aside: raw HTML at the right end of the title line (text actions such as Clear), as a sheet's aside.
      inert: while a drawer or dialog is over the page. */
-  function page({ title, description, body = '', footer: f = '', label, bar = true, aside = '', inert = false } = {}) {
+  function page({ title, description, body = '', footer: f = '', label, bar = true, aside = '', inert = false, layer = 0 } = {}) {
     const t = `<h2 class="tk-page-title">${T(title)}</h2>`;
-    return `<section class="tk-page" data-ds="TaskPage" role="region" tabindex="-1" data-st-context="page"${inert ? ' inert' : ''}${L(label ?? title)}>${bar ? statusbar() : ''}
+    return `<section class="tk-page" data-ds="TaskPage" role="region" tabindex="-1" data-st-context="page"${LY(layer)}${inert ? ' inert' : ''}${L(label ?? title)}>${bar ? statusbar() : ''}
       <header class="tk-page-head"${aside ? ' data-aside' : ''}>${aside ? `<div class="tk-page-titleline">${t}<div class="tk-page-aside">${aside}</div></div>` : t}${description ? `<p class="tk-page-desc">${parts(description)}</p>` : ''}</header>
       <div class="tk-page-body">${body}</div>${f || footer({})}</section>`;
   }
 
   /* ---- TaskDialog ---- */
-  function dialog({ title, icon = '', description, body = '', footer: f = '', label } = {}) {
-    return `<div class="tk-dialog-backdrop" data-ds="TaskDialog"><div class="tk-dialog" role="dialog" aria-modal="true"${L(label ?? title)}>
+  function dialog({ title, icon = '', description, body = '', footer: f = '', label, layer = 0 } = {}) {
+    return `<div class="tk-dialog-backdrop" data-ds="TaskDialog"${LY(layer)}><div class="tk-dialog" role="dialog" aria-modal="true"${L(label ?? title)}>
       <div class="tk-dialog-body"><h2 class="tk-dialog-title">${icon ? glyph(icon) : ''}${T(title)}</h2>${description ? `<p class="tk-dialog-desc">${parts(description)}</p>` : ''}${body}</div>${f}</div></div>`;
   }
 
-  const api = { T, statusbar, phone, screen, header, latest, summary, lens, list, group, row, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
+  const api = { T, statusbar, phone, screen, header, latest, summary, progress, lens, list, group, row, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
   root.SentriTask = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);

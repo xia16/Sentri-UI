@@ -2,7 +2,7 @@
 
 - **Status:** candidate, on `fix/skeleton` (from `map/3-piglet-processing`). Not approved. No task page adopts it yet; piglet processing is rebuilt on it page by page, next.
 - **Map:** [Piglet processing design map, issue #3](https://github.com/xia16/Sentri-UI/issues/3). Retro entries 29–32 (`ux/tasks/piglet-processing/retro.md`).
-- **Parts:** [TaskPhone](../components/TaskPhone/README.md) · [TaskHeader](../components/TaskHeader/README.md) · [TaskSummary](../components/TaskSummary/README.md) · [TaskLens](../components/TaskLens/README.md) · [TaskGroup](../components/TaskGroup/README.md) · [TaskRow](../components/TaskRow/README.md) · [TaskDock](../components/TaskDock/README.md) · [TaskSheet](../components/TaskSheet/README.md) · [TaskHold](../components/TaskHold/README.md) · [TaskTotals](../components/TaskTotals/README.md) · [TaskPage](../components/TaskPage/README.md) · [TaskDialog](../components/TaskDialog/README.md).
+- **Parts:** [TaskPhone](../components/TaskPhone/README.md) · [TaskHeader](../components/TaskHeader/README.md) · [TaskSummary](../components/TaskSummary/README.md) · [TaskLens](../components/TaskLens/README.md) · [TaskGroup](../components/TaskGroup/README.md) · [TaskRow](../components/TaskRow/README.md) · [TaskDock](../components/TaskDock/README.md) · [TaskSheet](../components/TaskSheet/README.md) · [TaskHold](../components/TaskHold/README.md) · [TaskTotals](../components/TaskTotals/README.md) · [TaskProgress](../components/TaskProgress/README.md) · [TaskPage](../components/TaskPage/README.md) · [TaskDialog](../components/TaskDialog/README.md).
 - **Code:** `components/task-skeleton.css` and `components/task-skeleton.js` (`window.SentriTask`), loaded after `tokens.css` and the bundle.
 - **Demo:** `components/task-skeleton-demo.html`: each screen built from the parts beside farrowing's original at 390×844. `?screen=room|sheet|full|page|dialog` shows one screen on the harness (framed on a wide window, full-bleed on a phone). Strict lint pages `ds-task-skeleton`, `ds-task-skeleton-{room,sheet,full,page,dialog}` (phone and narrow, en and zh) and `ds-task-skeleton-wide` (1440×900): clean.
 - **Parity inventory:** `ux/tasks/piglet-processing/parity.md`.
@@ -48,7 +48,11 @@ Additive only: no class or API renamed. Found while composing bulk (no farrowing
 - **[TaskTotals](../components/TaskTotals/README.md)** (`SentriTask.totals`): the two or three figures a sheet commits, at farrowing's Finish size (`figure-total` 23px/600 sans, label 11px `muted`, a 3-column Panel).
 - **TaskRow tick trail** (`trail: 'tick'`, `tick: { action, value, checked, label }`): the row becomes a `<label>` around ChoiceList's checkbox, the whole row the target. Plus `still` (a row with no action, a `<div>`) and `data` (host data attributes such as `data-flash`).
 - **TaskPage `aside`** (text actions at the right end of the title line) and **`inert`**.
-- **A TaskSheet over a TaskPage** stacks above it (scrim z 6, sheet z 7; the dialog stays at 8).
+- **One overlay layer model:** z = base + 10 × layer (scrim 2, sheet 3, page 5, dialog 8); every page or sheet before an overlay in the phone raises it one layer (up to 3), so a sheet, page or dialog opened over a sheet or a page stacks above it; `layer: n` sets it explicitly.
+- **[TaskProgress](../components/TaskProgress/README.md)** (`SentriTask.progress`): farrowing's Whole-task progress card (Task overview) as its own part: head, an 8px segmented bar, one count per segment.
+- **Footer status slot** (`footer({ status })`): one line directly above a sheet's or page's footer for a waiting reason or a hold's progress line.
+- **TaskGroup `face: 'word'`** for a title that is a word, not a place code.
+- **TaskRow parts wrap whole** (each headline/meta part is an inline block).
 - **TaskGroup headers stick only under a lens bar** (`.tk-lens ~ .tk-list`); a list in a page or sheet body drops its own gutter.
 
 ## Candidate tokens

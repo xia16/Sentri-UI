@@ -15,6 +15,7 @@ One animal or litter in a [group](../TaskGroup/README.md). **Budget: the mono id
 - **Detail** (`.tk-row-detail`), 5px between its lines:
   - **Headline:** 14px/500/1.45 `ink`: the figure the task is about (`9 alive · 5 dead`, `12 owed`). `tone: 'forecast'` prints it `muted` (`Due tomorrow`). A part can carry colour (`Overdue · 3 days` with `3 days` red).
   - **Meta:** `meta` 10px/1.6 mono `muted`, tokens separated by `·` (`born 14 · 1h ago · G.H`).
+- **Parts wrap whole:** every part of the headline and meta (each `{ text, str, args, tone }`, and the `·` between them) is an inline block, so a line that wraps breaks between parts and a wrapped part never lies under the next one.
 - **Trail:** a 14px `muted` glyph: chevron (opens), edit (done: opens its record), or none.
   - **Tick** (`trail: 'tick'`): the selection of a bulk act. The row is a `<label>` around ChoiceList's multi trail (`.tk-row-tick.st-choice-trail`, a 20px checkbox in `ink`); the whole row is the target. The checkbox carries `data-action` (default `toggle`) and `value`; the host listens for `change`.
 

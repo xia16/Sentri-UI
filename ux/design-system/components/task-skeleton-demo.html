@@ -119,14 +119,27 @@
       body: what, footer: K.footer({ back: { action: 'back' }, primary: { label: s('tk.demo.apply', 'Apply'), action: 'apply' } }) });
   }
 
+  // ---- The task overview page: the progress card; a waiting primary whose reason sits in the footer's status slot ----
+  function overview() {
+    var prog = K.progress({ title: s('tk.demo.progress.title', 'Whole-task progress'), meta: s('tk.demo.progress.meta', '18 sows', { n: 18 }),
+      segments: [{ tone: 'done', share: 7 / 18 * 100 }, { tone: 'active', share: 2 / 18 * 100 }, { tone: 'rest', share: 9 / 18 * 100 }], max: 18, now: 7,
+      barLabel: s('tk.demo.progress.aria', '7 of 18 farrowed'),
+      counts: [{ value: n(7), label: s('tk.demo.farrowed', 'Farrowed'), tone: 'done' }, { value: n(2), label: s('tk.demo.lens.active', 'Active'), tone: 'active' },
+        { value: n(9), label: s('tk.demo.lens.awaiting', 'Awaiting'), tone: 'rest' }] });
+    return K.page({ title: s('tk.demo.overview', 'Task overview'), description: s('tk.demo.overview.sub', 'Farrowing · All 3 units'), body: prog,
+      footer: K.footer({ back: { action: 'back' }, primary: { label: s('tk.demo.end_early', 'End task early'), action: 'end', register: 'end-early', waiting: true },
+        status: { text: 'Save or clear the 2 drafts on this phone to end', str: 'ds.c2.demo.hold_reason', id: 'tk-demo-end-reason', tone: 'amber' } }) });
+  }
+
   var screens = {
     room: function () { return K.phone(room(false)); },
     sheet: function () { return K.phone(room(true) + finish()); },
     full: function () { return K.phone(room(true) + dead()); },
     page: function () { return K.phone(room(true) + page()); },
-    dialog: function () { return K.phone(room(true) + dialog()); }
+    dialog: function () { return K.phone(room(true) + dialog()); },
+    overview: function () { return K.phone(room(true) + overview()); }
   };
-  var refs = { room: 'room', sheet: 'finish', full: 'draft', page: 'history', dialog: 'born' };
+  var refs = { room: 'room', sheet: 'finish', full: 'draft', page: 'history', dialog: 'born', overview: 'overview' };
   var el = document.getElementById('root');
   if (screens[only]) {
     // One screen, on the harness: framed 390×844 on a wide window, full-bleed on a phone.
