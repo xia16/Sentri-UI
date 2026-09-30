@@ -41,6 +41,10 @@
   --amber-wash-strong: #f6e7bf;
   --scrim: #37402c24;
   --dialog-backdrop: #20271f55;
+  --frame-border: #c7d0bd;
+  --chip-green-border: #c9e2cf;
+  --chip-red-border: #f0d6cd;
+  --progress-active: #9daa87;
   --space-gutter: 18px;
   --space-gutter-sheet: 21px;
   --space-gutter-narrow: 12px;
@@ -53,12 +57,17 @@
   --space-action-section: 32px;
   --space-footer-bottom: 28px;
   --space-key-gap: 8px;
+  --space-card-x: 15px;
+  --space-animal-row-y: 13px;
   --radius-panel: 18px;
   --radius-inset: 14px;
   --radius-control: 12px;
   --radius-segment: 10px;
   --radius-sheet: 28px;
   --radius-dialog: 22px;
+  --radius-tab: 7px;
+  --radius-chip: 6px;
+  --radius-device: 34px;
   --shadow-card: 0 3px 12px #26351e04;
   --shadow-sheet: 0 -10px 40px #27351d0b;
   --shadow-dialog: 0 -15px 55px #17290d30;
@@ -84,6 +93,12 @@
   --photo-tile: 56px;
   --row-code-min: 40px;
   --row-chip-max: 96px;
+  --phone-width: 390px;
+  --phone-height: 844px;
+  --statusbar-height: 42px;
+  --animal-row-min: 76px;
+  --animal-id-col: 59px;
+  --grab-height: 24px;
   --type-weight-strong: 700;
   --hold-sweep-opacity: 0.35;
   --hold-caption-opacity: 0.85;
@@ -115,4 +130,6 @@
   --type-identifier-size: 12px;
   --type-identifier-strong-size: 12px;
   --type-overline-size: 10px;
+  --type-figure-card-size: 31px;
+  --type-figure-denominator-size: 15px;
 }
