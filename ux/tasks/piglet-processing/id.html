@@ -6,44 +6,38 @@
 <title>Identity and weigh</title>
 <link rel="stylesheet" href="/ux/design-system/tokens.css">
 <link rel="stylesheet" href="/ux/design-system/components/bundle.css">
-<link rel="stylesheet" href="shell.css">
+<link rel="stylesheet" href="/ux/design-system/components/task-skeleton.css">
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* Layout only, tokens from tokens.css. Cards (ADR 0002): ChoiceList `choiceRadios` inline (the sex field), Numpad
-   `compact` (the run with its running list folded into the status line), Button `tool` (closing the candidate set),
-   plus coloured status words. */
-.id-phone { position: relative; max-width: 390px; height: 100vh; min-height: 640px; margin: 0 auto; overflow: hidden; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
-.id-phone .scrim { inset: 0; }
-.id-body { display: flex; flex-direction: column; gap: var(--space-section); }
-.id-body > * { margin: 0; }
-.id-group > * + * { margin-top: var(--space-heading); }
-/* The run has no scrolling body: the piglet's fields and the pad share one column anchored at the bottom,
-   so the keys sit at one place for every piglet and the whole piglet fits a 360 × 740 phone. */
-.id-run { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-row-y); padding: 0 var(--space-gutter-sheet) var(--space-row-y); background: var(--paper); overflow-y: auto; }
-.id-run-fields { display: flex; flex-direction: column; }
-.id-dock { flex: none; display: flex; flex-direction: column; justify-content: flex-end; padding: var(--space-row-y) var(--space-gutter-sheet); background: var(--paper); border-top: 1px solid var(--line); }
-.id-drawer-body { display: flex; flex-direction: column; gap: var(--space-row-y); }
-@media (max-width: 370px) { .id-run, .id-dock { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
-/* The header's progress door: a text action on the title row, colour on the value when it is over alive. */
-.id-door { display: inline-flex; align-items: center; gap: 4px; }
-.id-door svg { width: 15px; height: 15px; flex: none; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-/* Status words: colour lives on the value (dead red, a sync duplicate or an over count amber). */
-.id-tone[data-tone="red"] { color: var(--red); }
-.id-tone[data-tone="amber"] { color: var(--amber); }
-.id-tone[data-tone="green"] { color: var(--green); }
+/* Layout only, tokens from tokens.css. Built on the task skeleton (ADR 0003): the run is farrowing's Piglet identity page
+   and the table its Piglet records page (TaskPage); the weigh day is a TaskSheet, closing the candidate set a TaskDialog.
+   Content is the design system's cards: ChoiceList `choiceRadios` inline (the sex field), Measure, Numpad `compact`,
+   Facts, Row, Heading, Button `tool`, and TaskRow for the identified piglets. */
+.id-stack { display: flex; flex-direction: column; gap: var(--space-panel); }
+.id-stack > * { margin: 0; }
+.id-group { display: flex; flex-direction: column; gap: var(--space-heading); }
+.id-group > * { margin: 0; }
+/* The run: the piglet's fields and the pad share one column anchored at the bottom, so the keys sit at one place for
+   every piglet. */
+.id-run { min-height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-row-y); }
+.id-run > * { margin: 0; }
+/* A drawer over a page: the page is lifted into its own layer at z 1, under the drawer's scrim (z 2) and sheet (z 3);
+   the skeleton otherwise stacks a page (z 5) over a drawer. */
+.id-layer { position: absolute; inset: 0; z-index: 1; }
+.id-dock { flex: none; padding: var(--space-row-y) var(--space-gutter-sheet); background: var(--paper); border-top: 1px solid var(--line); }
+@media (max-width: 370px) { .id-dock { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
 </style>
 </head>
-<body>
-<main class="inspection-phone id-phone" data-st-context="page">
-  <div id="screen"></div>
-</main>
+<body class="tk-stage">
+<div id="screen"></div>
 <script src="/ux/design-system/components/bundle.js"></script>
+<script src="/ux/design-system/components/task-skeleton.js"></script>
 <script src="shell.js"></script>
 <script src="shell-ui.js"></script>
 <script>
 (function () {
-  var UI = window.SentriUI, ICON = window.SentriIcons, U = window.PPUI;
+  var UI = window.SentriUI, ICON = window.SentriIcons, U = window.PPUI, K = window.SentriTask;
   var ME = 'G.H';
 
   /* ---- states: a variant of the shared fixture (fixtures.js) + the crate + UI state. The identity rows, Alive, the day-age,
@@ -228,12 +222,9 @@
   }
 
   /* ---- strings ---- */
-  function esc(s) { return U.esc(s); }
   function span(id, args, cls, tone) { return U.span(id, args, { cls: cls, tone: tone }); }
-  function button(register, action, id, args) {       // 'secondary surface-back': the register, then any extra class
-    var r = register.split(' ');
-    return UI.button({ label: '', register: r[0], className: r.slice(1).join(' '), action: action, strs: { label: id }, args: args ? { label: args } : undefined });
-  }
+  // a Row's typed trailing word: colour on the word (Row card, ADR 0002)
+  function word(id, args, tone) { return { text: '', strs: { text: id }, args: args ? { text: args } : undefined, tone: tone }; }
   var sexWord = function (s) { return PP.t('pp.common.sex.' + (s === 'b' ? 'boar' : 'gilt')); };
   var kg = function (w) { return PP.t('pp.common.kg', { w: w }); };
   function stamp(r) { return U.stamp(r.at, r.who, store.today); }
@@ -245,25 +236,27 @@
     return m >= 60 ? PP.t('time.hours_ago', { n: Math.floor(m / 60) }) : PP.t('pp.id.ago.min', { n: Math.max(1, m) });
   }
 
-  /* ---- header: the litter, the farm's scheme, and the progress door (the fact line is the door to the table) ---- */
-  function progressDoor() {
+  /* ---- the page heads: the litter (crate · sow · day) under the page's name; the table adds the farm's scheme ---- */
+  function s(id, args) { var o = { text: PP.t(id, args), str: id }; if (args) o.args = args; return o; }
+  function litterDesc() { return s('pp.id.desc', { crate: crate, tag: F.sow || '', n: L.dayAge }); }
+  function tableDesc() {
+    var sch = store.config.identity, out = [litterDesc(), { sep: true }, s(notch ? 'pp.id.scheme.notch_all' : keepers ? 'pp.id.scheme.tag_keep' : 'pp.id.scheme.tag_all')];
+    if (L.dayAge < sch.day) out.push({ sep: true }, s('pp.id.scheme.due', { due: sch.day }));
+    return out;
+  }
+  // The run's head line: the litter and how far it is (identified of alive, amber when records pass alive; keepers so far).
+  // The sow's number is on the records page; here the line keeps to what the worker needs piglet by piglet.
+  function runDesc() {
     var k = distinct().length, id, args, tone;
     if (keepers) { id = closed ? 'pp.id.prog.keep_done' : 'pp.id.prog.keep'; args = { k: closed ? closed.k : k, n: alive() }; }
     else if (over()) { id = 'pp.id.prog.over'; args = { k: k, n: alive() }; tone = 'amber'; }
     else { id = 'pp.id.prog.k_of_n'; args = { k: k, n: alive() }; }
-    return '<button type="button" class="id-door" data-action="open-table" data-value="' + crate + '">' + span(id, args, '', tone) + ICON.icon('chevron') + '</button>';
+    var p = s(id, args); if (tone) p.tone = tone;
+    return [s('pp.id.hdr.title_day', { crate: crate, n: L.dayAge }), { sep: true }, p];
   }
-  function header(onRun) {
-    var sch = store.config.identity, d = (notch ? 'pp.id.hdr.notch_all' : keepers ? 'pp.id.hdr.tag_keep' : 'pp.id.hdr.tag_all') + (L.dayAge < sch.day ? '_early' : '');
-    // On the run the header is one line (crate · day, the progress door, scan) so the whole piglet fits 360 × 740;
-    // the scheme is spoken by the readout label (ear tag · notch · keeper) and printed on the table face.
-    var h = onRun
-      ? UI.heading({ title: '', kind: 'page', level: 1, action: progressDoor(), strs: { title: 'pp.id.hdr.title_day' }, args: { title: { crate: crate, n: L.dayAge } } })
-      : UI.heading({ title: '', kind: 'page', level: 1, description: '', strs: { title: 'pp.id.hdr.title', description: d }, args: { title: { crate: crate }, description: { n: L.dayAge, due: sch.day } } });
-    var scan = onRun && !notch ? UI.iconButton({ action: 'scan', icon: ICON.icon('scan'), label: PP.t('act.scan'), className: 'room-filter-button' })
-      .replace('aria-label=', 'data-str-attr="aria-label:act.scan" aria-label=') : '';
-    return '<header class="utility-header">' + h + scan + '</header>';
-  }
+  function taskScreen() { return K.screen({ inert: true, header: K.header({ title: s('pp.common.task'), back: { action: 'home' } }), body: '' }); }
+  // The skeleton's page takes no data-view; the host names its surfaces so tests and the lint can find them.
+  function named(html, view) { return html.replace(/^(\s*<section class="tk-page")/, '$1 data-view="' + view + '"'); }
 
   /* ---- the sex field: ChoiceList radio, inline and optional (a visible Clear, never a re-tap clear) ---- */
   function radio(sex) {
@@ -387,6 +380,8 @@
     if (run.active === 'tag' && !run.tag.value && run.tag.suggestion && !(s && s.actions && s.actions.length)) {
       o.actions = [{ label: '', action: 'numpad-suggestion', strs: { label: 'ds.field.numpad.use_suggestion' }, args: { label: { tag: idOf(run.tag.suggestion) } } }];
     }
+    // Scan reads the tag in hand (the camera): the tag pad's last status action on a tag farm, always there.
+    if (run.active === 'tag' && !notch) o.actions = (o.actions || []).concat([{ label: '', action: 'scan', strs: { label: 'pp.id.ptr.scan' } }]);
     return UI.numpad(o);
   }
   function primary() {             // the one commit; null when there is nothing this sheet can record
@@ -399,12 +394,13 @@
     if (allIn()) return null;
     return [keepers ? 'pp.id.act.record_next_keeper' : 'pp.id.act.record_next', null];
   }
-  function runFace() {
+  // Farrowing's Piglet identity page: the litter's progress, the piglet's fields, the pad; Back returns to the records.
+  // Every alive piglet identified: nothing to record, Back alone (filled, the page's one way on).
+  function runPage() {
     var p = primary();
-    var bar = p ? button('secondary', 'close', 'act.close') + button('primary', 'record', p[0], p[1]) : button('primary', 'close', 'act.close');
-    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (drawer || confirm ? ' inert' : '') + '>' + header(true) +
-      '<div class="id-run"><div class="id-run-fields">' + radio(run.sex) + weightField() + '</div>' + pad() + '</div>' +
-      '<footer class="sheet-footer">' + bar + '</footer></section>';
+    var body = '<div class="id-run">' + radio(run.sex) + weightField() + pad() + '</div>';
+    return named(K.page({ title: s('pp.id.run.title'), description: runDesc(), body: body,
+      footer: K.footer({ back: { action: 'to-table' }, primary: p ? { label: s(p[0], p[1] || undefined), action: 'record' } : null }) }), 'run');
   }
 
   /* ---- the table face: the litter's identified piglets, viewable and editable (through S8's Edit) forever ---- */
@@ -431,7 +427,7 @@
     var o = over(), p = pairs();
     if (!o && !p) return '';
     var title = o ? [PP.one('pp.id.over.title', o), { k: o }] : ['pp.id.over.pair_title', { p: p }];
-    return UI.rowGroup(UI.row({ title: '', description: '', trailing: span('pp.id.over.check', null, 'id-tone', 'amber'), action: 'open-over', value: crate,
+    return UI.rowGroup(UI.row({ title: '', description: '', trailing: word('pp.id.over.check', null, 'amber'), action: 'open-over', value: crate,
       strs: { title: title[0], description: p ? 'pp.id.over.line_pair' : 'pp.id.over.line' },
       args: { title: title[1], description: { n: alive(), rows: living().length, p: p } } }));
   }
@@ -446,55 +442,63 @@
   }
   function weighSection() {
     // A weigh-day record is keyed by the day-age it was weighed at (day 3, day 21 at weaning …), not by the clock date.
+    // A row says the weight; who weighed it and when are on the record (Edit), one level down.
     var todays = todayRec();
     var rowsHtml = lwRecs.slice().reverse().map(function (x) {
       // two phones weighed the same day without seeing each other: both show until one is corrected
       if (x.conflicts.length) {
         var c = x.conflicts[0];
-        return UI.row({ title: '', description: '', trailing: span('pp.id.lw.check', null, 'id-tone', 'amber'), action: 'edit-weight', value: String(x.day),
-          strs: { title: 'pp.id.lw.rec', description: 'pp.id.lw.line_conflict' }, args: { title: { day: x.day }, description: { w: x.w, stamp: stamp(x), w2: c.w, stamp2: stamp(c) } } });
+        return UI.row({ title: '', description: '', trailing: word('pp.id.lw.check', null, 'amber'), action: 'edit-weight', value: String(x.day),
+          strs: { title: 'pp.id.lw.rec', description: 'pp.id.lw.value_conflict' }, args: { title: { day: x.day }, description: { w: x.w, w2: c.w } } });
       }
       return UI.row({ title: '', description: '', action: x.day === L.dayAge ? 'open-weight' : 'edit-weight', value: String(x.day),
-        strs: { title: 'pp.id.lw.rec', description: 'pp.id.lw.line' }, args: { title: { day: x.day }, description: { w: x.w, stamp: stamp(x) } } });
+        strs: { title: 'pp.id.lw.rec', description: 'pp.common.kg' }, args: { title: { day: x.day }, description: { w: x.w } } });
     }).join('');
     if (!todays) {
-      var tr = drawerKept && drawerDirty(drawerKept) ? span('status.unsaved', { n: 1 }, 'id-tone', 'green') : span('ds.field.optional');
+      var tr = drawerKept && drawerDirty(drawerKept) ? word('status.unsaved', { n: 1 }, 'green') : span('ds.field.optional');
       rowsHtml = UI.row({ title: '', trailing: tr, action: 'open-weight', value: String(L.dayAge), strs: { title: 'pp.id.lw.rec' }, args: { title: { day: L.dayAge } } }) + rowsHtml;
     }
+    // the receipt of a save is the section's one status line (it agrees with the Boars and Gilts facts above)
     var h = UI.heading({ title: '', kind: 'section', level: 3, description: receipt ? '' : undefined,
       strs: Object.assign({ title: 'pp.id.sec.weigh' }, receipt ? { description: receipt[0] } : {}), args: receipt ? { description: receipt[1] } : undefined });
     return '<section class="id-group" role="status" aria-live="polite">' + h + UI.rowGroup(rowsHtml) + '</section>';
   }
+  /* A piglet row (TaskRow, farrowing's piglet roster): the tag or notch, at most one flag as its chip, what is known as the
+     headline. Colour lives on the flag: dead red; a double-issued tag, a same-tag pair, a tag also on another crate and a
+     corrected row amber — each stays until Edit resolves it. A second flag reads on the meta line; the stamp is on the
+     record (Edit), one level down. */
   function tableRow(r) {
-    // Colour lives on the value: dead red; a double-issued tag, a same-tag pair, a tag also on another crate and a
-    // corrected row amber — each flag stays on the row until Edit resolves it.
     var flags = [];
-    if (r.dead) flags.push(span('pp.id.row.dead', { cause: PP.t('dead.' + r.dead.cause), date: U.date(r.dead.at) }, 'id-tone', 'red'));
-    else if (twinGroup(r)) flags.push(span('pp.id.row.twin', null, 'id-tone', 'amber'));
-    else if (r.pair || (notch && living().filter(function (x) { return key(x) === key(r); }).length > 1)) flags.push(span('pp.id.row.pair', null, 'id-tone', 'amber'));
-    if (r.dup) flags.push(span('pp.id.row.dup', { crate: r.dup }, 'id-tone', 'amber'));
-    if (r.corrected) flags.push(span('pp.id.row.corrected', null, 'id-tone', 'amber'));
-    return UI.row({ title: '', description: '', trailing: flags.join(' ' + span('pp.common.sep') + ' '), action: 'edit-row', value: key(r),
-      strs: { title: 'pp.id.row.id', description: 'pp.id.row.' + shape(r) },
-      args: { title: { id: idText(r) }, description: { sex: r.sex ? sexWord(r.sex) : '', w: r.w || '', stamp: stamp(r) } } });
+    if (r.dead) flags.push({ text: PP.t('pp.id.chip.dead'), str: 'pp.id.chip.dead', tone: 'red' });
+    else if (twinGroup(r)) flags.push({ text: PP.t('pp.id.chip.twin'), str: 'pp.id.chip.twin', tone: 'amber' });
+    else if (r.pair || (notch && living().filter(function (x) { return key(x) === key(r); }).length > 1)) flags.push({ text: PP.t('pp.id.row.pair'), str: 'pp.id.row.pair', tone: 'amber' });
+    if (r.dup) flags.push({ text: PP.t('pp.id.row.dup', { crate: r.dup }), str: 'pp.id.row.dup', args: { crate: r.dup }, tone: 'amber' });
+    if (r.corrected) flags.push({ text: PP.t('pp.id.row.corrected'), str: 'pp.id.row.corrected', tone: 'amber' });
+    var meta = [];
+    if (r.dead) meta.push(s('pp.id.row.dead_meta', { cause: PP.t('dead.' + r.dead.cause), date: U.date(r.dead.at) }));
+    flags.slice(1).forEach(function (f) { if (meta.length) meta.push({ sep: true }); meta.push(f); });
+    var what = shape(r), head = s('pp.id.row.h.' + what, { sex: r.sex ? sexWord(r.sex) : '', w: r.w || '' });
+    return K.row({ id: s('pp.id.row.id', { id: idText(r) }), chip: flags[0] || null, headline: head, tone: what === 'n' ? 'forecast' : '',
+      meta: meta.length ? meta : '', action: 'edit-row', value: key(r) });
   }
   function rowsSection() {
     var cur = current();
     if (!cur.length) return '';
     var dead = cur.filter(function (r) { return r.dead; }).length;
-    var edit = '<button type="button" data-action="open-edit" data-value="' + crate + '" data-str="act.edit">' + esc(PP.t('act.edit')) + '</button>';
+    var edit = UI.button({ label: '', register: 'text', action: 'open-edit', value: crate, strs: { label: 'act.edit' } });
     var h = UI.heading({ title: '', kind: 'section', level: 3, meta: '', action: edit,
       strs: { title: 'pp.id.sec.rows', meta: dead ? 'pp.id.sec.rows_meta_dead' : 'pp.id.sec.rows_meta' }, args: { meta: { n: cur.length, d: dead } } });
-    return '<section class="id-group">' + h + UI.rowGroup(cur.map(tableRow).join('')) + '</section>';
+    // the rows sit in the skeleton's group card; its header is the section heading above (a crate code is not the title here)
+    return '<section class="id-group">' + h + '<div class="tk-group" data-ds="TaskGroup">' + cur.map(tableRow).join('') + '</div></section>';
   }
-  function tableFace() {
-    var body = '<div class="id-body">' + factsBlock() + overStrip() + keepersBlock() + weighSection() + rowsSection() + '</div>';
+  // Farrowing's Piglet records page: the facts, what needs a look, the weigh day, the identified piglets; Record identity.
+  function tablePage() {
+    var body = '<div class="id-stack">' + factsBlock() + overStrip() + keepersBlock() + weighSection() + rowsSection() + '</div>';
     var p = draftDirty() ? ['pp.id.act.record_resume', { n: 1 }] : ['pp.id.act.record', null];
-    // A closed candidate set takes no records until Edit reopens it.
-    var bar = keepers && closed ? button('secondary', 'close', 'act.close') : button('secondary', 'close', 'act.close') + button('primary', 'open-run', p[0], p[1]);
-    return '<section class="sheet" data-ds="Sheet" data-presentation="page"' + (drawer || confirm ? ' inert' : '') + '>' + header(false) +
-      '<div class="sheet-body">' + body + '</div>' +
-      '<footer class="sheet-footer">' + bar + '</footer></section>';
+    // A closed candidate set takes no records until Edit reopens it: Back alone.
+    var primary = keepers && closed ? null : { label: s(p[0], p[1] || undefined), action: 'open-run' };
+    return named(K.page({ title: s('pp.id.table.title'), description: tableDesc(), body: body,
+      footer: K.footer({ back: { action: 'leave' }, primary: primary }) }), 'table');
   }
 
   /* ---- the weigh-day drawer: today's litter weight + boar/gilt counts for piglets not identified. Staged: Back keeps, Clear discards, Save commits ---- */
@@ -515,11 +519,11 @@
   function countsChange(d) { var p = posted(); return d.boars !== p.boars || d.gilts !== p.gilts; }
   function drawerDirty(d) { return !!wChange(d) || countsChange(d); }
   function weightDrawer() {
-    var rng = drawerRange(), s = drawerState(drawer), t = tally(), rem = t.rem;
+    var rng = drawerRange(), state = drawerState(drawer), t = tally(), rem = t.rem;
     var o = { label: '', optional: 'Optional', value: drawer.w, unit: 'kg', key: 'lw', controls: 'id-lw-pad', active: drawer.active,
       strs: Object.assign({ label: 'pp.id.lw.row' }, measureStrs), args: {} };
-    if (s === 'warn') { o.range = rng; o.hint = ''; o.strs.hint = 'ds.field.measure.range'; o.args.hint = { min: rng[0].toFixed(1), max: rng[1].toFixed(1), v: kg(drawer.w) }; }
-    if (s === 'refused') { o.tone = 'refused'; o.hint = ''; o.strs.hint = 'ds.field.measure.refused'; o.args.hint = { max: hardKg() * alive(), n: alive() }; }
+    if (state === 'warn') { o.range = rng; o.hint = ''; o.strs.hint = 'ds.field.measure.range'; o.args.hint = { min: rng[0].toFixed(1), max: rng[1].toFixed(1), v: kg(drawer.w) }; }
+    if (state === 'refused') { o.tone = 'refused'; o.hint = ''; o.strs.hint = 'ds.field.measure.refused'; o.args.hint = { max: hardKg() * alive(), n: alive() }; }
     var cleared = drawer.w === '' && posted().w;       // removing a posted weight is a correction: Edit, not Save
     if (cleared && !drawer.active) { o.hint = ''; o.strs.hint = 'pp.id.lw.clear_edit'; o.args.hint = { w: posted().w }; }
     var body = UI.measure(o);
@@ -536,38 +540,26 @@
         step('gilts', 'pp.id.lw.gilts', 'pp.id.lw.gilts_all', drawer.gilts, drawer.boars, t.rg) + '</div>';
     }
     var dirty = drawerDirty(drawer);
-    var clear = dirty ? '<button type="button" data-action="clear" data-str="act.clear">' + esc(PP.t('act.clear')) + '</button>' : '';
-    var head = UI.heading({ title: '', kind: 'page', level: 2, description: '', action: clear,
-      strs: { title: 'pp.id.sec.weigh', description: 'pp.id.lw.sub' }, args: { description: { n: alive(), d: L.dayAge } } });
     // The pad's status line: why a key did nothing, the way to the counts it covers (the keys never hide them for good),
     // or the correction a cleared weight needs.
     var padActs = cleared ? [{ label: '', action: 'edit-weight', value: String(L.dayAge), strs: { label: 'pp.id.lw.edit_ptr' }, args: { label: { w: posted().w } } }]
       : rem > 0 ? [{ label: '', action: 'to-counts', strs: { label: 'pp.id.lw.to_counts' }, args: { label: { r: rem } } }] : [];
     var po = { id: 'id-lw-pad', key: 'lw', value: drawer.w, decimals: 1, intLength: LWINT, actions: padActs, strs: Object.assign({}, padStrs), args: {} };
     if (drawer.note) { po.hint = ''; po.strs.hint = drawer.note.id; po.args.hint = drawer.note.args || null; }
+    // The pad docks between the body and the footer while the weight is typed; the footer stays the sheet's last child.
     var dock = drawer.active ? '<div class="id-dock">' + UI.numpad(po) + '</div>' : '';
     // Save is withheld (not greyed) while nothing changed or the value is refused; the reason sits beside the value.
-    var save = dirty && s !== 'refused' ? button('primary', 'save', 'act.save') : '';
-    return '<div class="scrim" data-ds="Sheet" data-action="back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" data-sizing="content" role="dialog" aria-modal="true">' +
-      '<header class="utility-header">' + head + '</header>' +
-      '<div class="sheet-body"><div class="id-drawer-body">' + body + '</div></div>' + dock +
-      '<footer class="sheet-footer">' + button('secondary surface-back', 'back', 'act.back') + save + '</footer></section>';
+    var save = dirty && state !== 'refused' ? { label: s('act.save'), action: 'save' } : null;
+    return K.drawer({ view: 'weigh', size: 'long', scrim: { action: 'back' }, close: { action: 'back' },
+      aside: dirty ? UI.button({ label: '', register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '',
+      title: s('pp.id.sec.weigh'), subtitle: s('pp.id.lw.sub', { n: alive(), d: L.dayAge }),
+      body: '<div class="id-group">' + body + '</div>', footer: dock + K.footer({ back: { action: 'back' }, primary: save }) });
   }
-  /* ---- closing the candidate set: a confirm step (stamped; Edit reopens it) ---- */
-  function confirmDrawer() {
+  /* ---- closing the candidate set: one question (stamped; Edit reopens it) ---- */
+  function confirmDialog() {
     var k = distinct().length, r = Math.max(0, alive() - k);
-    var head = UI.heading({ title: '', kind: 'page', level: 2, description: '', strs: { title: 'pp.id.close.title', description: 'pp.id.close.sub' },
-      args: { description: { k: k, r: r } } });
-    return '<div class="scrim" data-ds="Sheet" data-action="confirm-back"></div><section class="sheet" data-ds="Sheet" data-st-context="drawer" data-size="long" role="dialog" aria-modal="true">' +
-      '<header class="utility-header">' + head + '</header>' +
-      '<div class="sheet-body"><div class="id-drawer-body">' + UI.facts([
-        { label: '', value: '', strs: { label: 'pp.id.close.tagged', value: 'ds.field.figure' }, args: { value: { n: k } } },
-        { label: '', value: '', strs: { label: 'pp.id.close.none', value: 'ds.field.figure' }, args: { value: { n: r } } }
-      ], { columns: 2 }) + '<div class="id-group">' + UI.rowGroup(distinct().map(function (x) {
-        return UI.row({ title: '', description: '', strs: { title: 'pp.id.row.id', description: 'pp.id.row.' + shape(x) },
-          args: { title: { id: idText(x) }, description: { sex: x.sex ? sexWord(x.sex) : '', w: x.w || '', stamp: stamp(x) } } });
-      }).join('')) + '</div></div></div>' +
-      '<footer class="sheet-footer">' + button('secondary surface-back', 'confirm-back', 'act.back') + button('primary', 'confirm-close', 'pp.id.act.done', { k: k }) + '</footer></section>';
+    return K.dialog({ title: s('pp.id.close.title'), description: s('pp.id.close.sub', { k: k, r: r }),
+      footer: K.footer({ back: { action: 'confirm-back' }, primary: { label: s('pp.id.act.done_short', { k: k }), action: 'confirm-close' } }) });
   }
 
   /* ---- drafts on this phone: the piglet in hand and an unsaved litter weight survive Close, a call, a crash ---- */
@@ -595,7 +587,9 @@
   function render() {
     var screen = document.getElementById('screen');
     var t = document.createElement('div');
-    t.innerHTML = (face === 'run' ? runFace() : tableFace()) + (drawer ? weightDrawer() : '') + (confirm ? confirmDrawer() : '');
+    // the page in its layer (inert under the weigh drawer or the closing question), then the drawer or the dialog over it
+    t.innerHTML = K.phone(taskScreen() + '<div class="id-layer"' + (drawer || confirm ? ' inert' : '') + '>' + (face === 'run' ? runPage() : tablePage()) + '</div>' +
+      (drawer ? weightDrawer() : '') + (confirm ? confirmDialog() : ''), { label: s('pp.common.task') });
     PP.apply(t);
     morph(screen, (function () { var w = screen.cloneNode(false); while (t.firstChild) w.appendChild(t.firstChild); return w; })());
     saveDraft();
@@ -754,7 +748,8 @@
     else if (a === 'close-set') { if (!over() && !pairs()) { confirm = true; render(); } }
     else if (a === 'confirm-back') { confirm = false; render(); }
     else if (a === 'confirm-close') { if (commit({ op: 'close' }).ok) confirm = false; render(); }
-    else if (a === 'open-table') { face = 'table'; receipt = null; render(); }
+    // Back from the run: to the litter's records (farrowing's Piglet identity → Piglet records); a piglet in hand is kept
+    else if (a === 'to-table') { face = 'table'; receipt = null; render(); }
     else if (a === 'open-run') { if (keepers && closed) return; face = 'run'; if (!draftDirty()) freshPiglet(); render(); }   // an unfinished piglet resumes
     else if (a === 'open-weight') { openWeight(); render(); }
     else if (a === 'to-counts') {                     // the pad steps aside so the counts it covered are in view
@@ -769,8 +764,9 @@
     else if (a === 'back') { drawer.active = false; drawer.note = null; drawerKept = drawerDirty(drawer) ? drawer : null; drawer = null; render(); }
     else if (a === 'clear') { var tr = todayRec(), tc = tally(); drawer = { w: tr ? tr.w : '', active: false, boars: tc.cb, gilts: tc.cg }; drawerKept = null; render(); }
     else if (a === 'save') { saveWeight(); render(); }
-    // Close keeps a piglet in hand and an unsaved weight on this phone (saved on every change); reopening restores them.
-    else if (a === 'close') { if (drawer) drawerKept = drawerDirty(drawer) ? drawer : null; saveDraft(); location.href = PP.href('litter.html', { state: 'litter', crate: crate, data: store.name !== 'base' ? store.name : '' }); }
+    // Back from the records: to the litter's drawer over the room. A piglet in hand and an unsaved weight stay on this phone
+    // (saved on every change); reopening restores them.
+    else if (a === 'leave') { if (drawer) drawerKept = drawerDirty(drawer) ? drawer : null; saveDraft(); location.href = PP.href('room.html', { state: 'litter', crate: crate, data: store.name !== 'base' ? store.name : '' }); }
     // Edit (ticket #12): a row opens its correction drawer; Edit and the closed set open the litter's one Edit screen.
     else if (a === 'edit-row' || a === 'open-edit' || a === 'edit-done') {
       var row = a === 'edit-row' ? living().concat(rows).filter(function (x) { return key(x) === v; })[0] : null;
