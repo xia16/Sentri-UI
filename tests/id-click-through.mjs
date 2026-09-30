@@ -22,6 +22,7 @@ const tap = async (p, sel) => { const l = p.locator(sel).first(); await l.evalua
 const keys = async (p, digits, field = 'tag') => { for (const k of digits) await tap(p, `[data-action="numpad"][data-value="${field}"][data-key="${k === '<' ? 'back' : k}"]`); };
 const record = async (p) => { await tap(p, '.tk-footer [data-action="record"]'); await p.waitForTimeout(650); };   // repeat taps inside 600ms are ignored
 // the run (Piglet identity) and the table (Piglet records) are pages; the run's head line carries the litter's progress
+// the run's head line names the piglet in hand (`Piglet 4 of 12`: three identified), or the litter's count when all are in
 const progress = (p) => text(p, '[data-view="run"] .tk-page-desc');
 const toTable = (p) => tap(p, '[data-view="run"] .tk-footer [data-action="to-table"]');
 const leave = (p) => tap(p, '[data-view="table"] .tk-footer [data-action="leave"]');
@@ -57,7 +58,9 @@ try {
   await tap(page, '#id-sex [data-value="b"]');
   assert.equal(await page.getAttribute('#id-sex [data-value="b"]', 'aria-checked'), 'true');
   await tap(page, '[data-action="open-numpad"][data-value="weight"]');
-  assert.match(await text(page, '[data-ds="Measure"][data-field="weight"]'), /Piglet 1 of 12 · weight/);
+  // the piglet in hand is named once, in the head line (three identified: piglet 4); the weight field is plain Weight
+  assert.match(await progress(page), /Piglet 1 of 12/);
+  assert.match(await text(page, '[data-ds="Measure"][data-field="weight"]'), /Weight/);
   await keys(page, '1.42', 'weight');
   await record(page);
   assert.match(await status(page), /Last 004301 · boar · 1\.42 kg/);
@@ -73,12 +76,12 @@ try {
   await tap(page, '[data-action="scan"]');
   assert.match(await text(page, '.st-numpad-readout'), /004303/);
   await record(page);
-  assert.match(await progress(page), /3 of 12 piglets identified/);
+  assert.match(await progress(page), /Piglet 4 of 12/);
   // Undo takes the last one back onto the pad; Record puts it back
   await tap(page, '[data-action="undo"]');
   assert.match(await status(page), /Withdrew 004303/);
   await record(page);
-  assert.match(await progress(page), /3 of 12/);
+  assert.match(await progress(page), /Piglet 4 of 12/);
   console.log('ok 1 room → litter → Record identity → 3 piglets:', await status(page));
 
   // 2. the same tag as a piglet here: caught again is the primary, a different piglet is offered beside it.
@@ -88,17 +91,17 @@ try {
   await tap(page, '[data-action="twin"][data-value="other"]');
   assert.match(await status(page), /A second piglet with tag 004301 · retag one later Same piglet 1/);
   assert.match(await text(page, '.tk-footer [data-action="record"]'), /Record · second 004301/);
-  assert.match(await text(page, '[data-ds="Measure"][data-field="weight"]'), /Piglet 4 of 12/);
+  assert.match(await progress(page), /Piglet 4 of 12/);
   await tap(page, '[data-action="twin"][data-value="same"]');
   await record(page);
   assert.match(await status(page), /Piglet 1 · kept boar · kept 1\.42 kg|Piglet 1 · nothing new/);
-  assert.match(await progress(page), /3 of 12/);
+  assert.match(await progress(page), /Piglet 4 of 12/);
   // …and a double-issued tag: a second piglet with 004302 gets its own row, amber on both
   await keys(page, '004302');
   await tap(page, '[data-action="twin"][data-value="other"]');
   await record(page);
   assert.match(await status(page), /Last 004302 · a second piglet with this tag · retag one/);
-  assert.match(await progress(page), /4 of 12/);
+  assert.match(await progress(page), /Piglet 5 of 12/);
   await toTable(page);
   assert.equal(await page.locator('[data-action="edit-row"]', { hasText: 'tag issued twice' }).count(), 2);
   console.log('ok 2 same tag: caught again, or a second piglet (double-issued tag) → 4 of 12, both rows amber');
@@ -115,7 +118,7 @@ try {
   assert.match(await status(page), /004305 kept on this phone · not recorded yet/);
   assert.equal(await page.getAttribute('#id-sex [data-value="g"]', 'aria-checked'), 'true');
   await record(page);
-  assert.match(await progress(page), /5 of 12/);
+  assert.match(await progress(page), /Piglet 6 of 12/);
   console.log('ok 3 piglet in hand → Close → reopen → kept → Record');
 
   // 4. the litter weight: three whole digits, a plausibility refusal, the counts the pad covered, a receipt that agrees
