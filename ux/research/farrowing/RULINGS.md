@@ -535,3 +535,10 @@ investigation and not yet ruled.
 - **Possible double treatment has two answers.** "Same injection, recorded twice" withdraws one record (kept, stamped). "Given twice" keeps both and records a double dose for the vet; it counts once toward done.
 - **A nurse sow outside every task joins the task when task piglets are moved onto her.** Her litter is added to the task; the arrivals keep their own schedule and can be treated there. Her own earlier facts stay on her earlier litter. (Supersedes round 2 Q18 for this case only; a litter with no task piglets still records deaths, counts and moves only.)
 - **End is allowed with review items open.** The End review lists them; ending freezes them as "unresolved at End" on the receipt and handoff; they stay answerable afterwards as corrections.
+
+### Round 5 (owner, 2026-09-30, look and feel)
+
+- **All tasks look the same; only the information differs.** Piglet processing is rebuilt on farrowing's task skeleton (ADR 0003), at farrowing's density: a list row is id + one chip, one headline, one meta line; everything else moves down a level. Prototypes are shown to the owner only inside the 390×844 phone frame.
+- **A litter opens as a drawer over the room, like a sow in farrowing.** The drawer holds the litter summary, what it owes as rows and the tools (Record dead, Set count, Move, Edit); a treatment opens in the same drawer and Back returns.
+- **Match farrowing exactly where it departs from the design-system README** (filled status chips, a lone Back filled in ink, the hold caption's style). The README rules are revisited later for both tasks together.
+- **Farrowing's true bugs are fixed in farrowing too** (floating footers over dead space, reversed left edges, the live scrim behind a dialog, the banned word "complete"); nothing else about farrowing changes. The exit word is always **Back**.
