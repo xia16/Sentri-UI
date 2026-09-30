@@ -400,7 +400,7 @@
     // farrowing's line: the clock time and who (`Last record 10:25 · G.H`); what was recorded is on the litter's log
     var today = String(best.at).slice(0, 10) === String(store.today).slice(0, 10);
     return K.latest({ lead: P('pp.room.latest.lead'), value: P('pp.room.latest.when', { when: today ? U.time(best.at) : U.date(best.at) + ' · ' + U.time(best.at) }),
-      rest: P('pp.room.latest.who', { who: best.who }) });
+      rest: P('pp.room.latest.who', { who: best.whoName || best.who }) });
   }
 
   /* ---- the summary card: this unit | the task overview. Before End: the litters that owe today (under a filter, the
