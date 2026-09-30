@@ -251,7 +251,7 @@
     "pp.bulk.rv.all": {"en": "Every owed piglet", "zh": "全部待处理仔猪", "kind": "body"},
     "pp.bulk.rv.will_record": {"en": "will record {pigs}", "zh": "将记录{pigs}", "kind": "status"},
     "pp.bulk.rv.failed": {"en": "Not recorded ·", "zh": "未记录 ·", "kind": "status"},
-    "pp.bulk.rv.pointer": {"en": "Left piglets out of a litter? Untick it and record it on its own sheet.", "zh": "某窝有仔猪未处理？取消勾选，在本窝页面记录。", "kind": "pointer"},
+    "pp.bulk.rv.pointer": {"en": "Left piglets out of a litter? Back, then untick the litter and record it on its own sheet.", "zh": "某窝有仔猪未处理？返回，取消勾选该窝，在本窝页面记录。", "kind": "pointer"},
     "pp.bulk.rcpt.saved": {"en": "Saved · {tx} ·", "zh": "已保存 · {tx} ·", "kind": "status"},
     "pp.bulk.rcpt.late.one": {"en": "· {k} litter counts late", "zh": "· {k}窝计为迟做", "kind": "status"},
     "pp.bulk.rcpt.late.many": {"en": "· {k} litters count late", "zh": "· {k}窝计为迟做", "kind": "status"},
