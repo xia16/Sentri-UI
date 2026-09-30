@@ -64,6 +64,7 @@
     'record-page-corrected':  { view: 'record', data: 'a02-corrected', crate: 'A02' },
     'record-page-concurrent': { view: 'record', data: 'a02-concurrent', crate: 'A02' },
     'edit':                   { view: 'edit', data: 'a02-marked', crate: 'A02' },
+    'edit-other':             { view: 'edit', data: 'a02-marked', crate: 'A02', which: true },   // which treatment was on another crate
     'edit-changed':           { view: 'edit', data: 'a02-marked', crate: 'A02', draft: { marks: { 'T-A02-visit': { n: 10, reason: 'weak' } } } },
     'edit-unrecord':          { view: 'edit', data: 'a02-marked', crate: 'A02', draft: { marks: { 'T-A02-tail': { void: true } } } },
     'edit-gated':             { view: 'edit', data: 'a02-followup', crate: 'A02', draft: { marks: { 'T-A02-visit': { n: 12 } } } },
@@ -113,7 +114,7 @@
   var view = st.view;
   var EMPTY = function () { return { marks: {}, moves: {}, rows: {}, counts: {}, deaths: {}, reopen: false }; };
   var draft = EMPTY();
-  var lead = '', rowOpen = null, pad = null, typed = {}, picker = null, pickerBefore = null, ceilTap = '', drawerClosedAt = 0, lastSave = 0, notices = [];
+  var lead = '', rowOpen = null, pad = null, typed = {}, which = false, picker = null, pickerBefore = null, ceilTap = '', drawerClosedAt = 0, lastSave = 0, notices = [];
   var photo = null, cleared = null, clearTimer = 0, saved = null, dbl = { answer: '', withdraw: '' }, dblSaved = null;
 
   /* ---- the ledger ---- */
@@ -500,8 +501,7 @@
     var x = draft.marks[m.id] || {}, v = markValue(m), t = tx(m.dose), rest = m.whole - v, s = stampStrs(m.at, m.who), dp = pairOf(m.id);
     var lowered = !x.back && (v < m.n || x.void || x.to !== undefined);
     // R1-28: the wrong-litter door is there from the start, not behind −: the stepper's pointer (a text action in its line)
-    var door = !lowered && !x.back ? [{ label: PP.t('pp.edit.why.other'), action: 'mark-why', value: m.id + ':to', strs: { label: 'pp.edit.why.other' } }] : [];
-    var out = stepper(m.id, 'mark-step', t[0], t[1], s[0], s[1], v, 0, m.whole, v !== m.n || m.corrected || !!x.void || x.to !== undefined || !!x.back, 'pp.edit.ceil', { n: m.whole }, door);
+    var out = stepper(m.id, 'mark-step', t[0], t[1], s[0], s[1], v, 0, m.whole, v !== m.n || m.corrected || !!x.void || x.to !== undefined || !!x.back, 'pp.edit.ceil', { n: m.whole });
     if (m.viaCorrection) out += UI.choiceGroup(choice('mark-back', m.id, 'pp.edit.back', null, !!x.back, { code: m.from }));
     // the why appears only once the hand lowers the mark (a record's own deferral is not a question)
     if (lowered) {
@@ -552,7 +552,19 @@
   function marksSection(e) {
     if (!e.marks.length) return '';
     return '<section class="ed-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.edit.sec.marks' } }) + doubleBlock(e) +
-      e.marks.map(function (m) { return markBlock(m, e); }).join('') + '</section>';
+      e.marks.map(function (m) { return markBlock(m, e); }).join('') + otherDoor(e) + '</section>';
+  }
+  // R1-28 + parity round: the wrong-crate door is there from the start, once, under the list; it asks which treatment
+  // (the marks not already lowered), then the crate.
+  function otherMarks(e) { return e.marks.filter(function (m) { var x = draft.marks[m.id] || {}; return !x.back && !x.void && x.to === undefined && markValue(m) === m.n; }); }
+  function otherDoor(e) {
+    if (e.ended || !otherMarks(e).length) return '';
+    return K.door({ title: S_('pp.edit.other.door'), description: S_('pp.edit.other.door_d'), action: 'wrong-crate' });
+  }
+  function whichDrawer(e) {
+    return K.drawer({ view: 'which', size: 'long', layer: 1, scrim: { action: 'which-back' }, close: { action: 'which-back' }, title: S_('pp.edit.other.door'), subtitle: subtitle(),
+      body: otherMarks(e).map(function (m) { var t = tx(m.dose), st0 = stampStrs(m.at, m.who); return K.door({ title: S_(t[0], t[1]), description: S_(st0[0], st0[1]), action: 'mark-why', value: m.id + ':to' }); }).join(''),
+      footer: K.footer({ back: { action: 'which-back' } }) });
   }
   function movesSection(e) {
     if (!e.moves.length) return '';
@@ -921,7 +933,7 @@
     // a drawer over Edit or over the log rises one overlay layer (the skeleton's layer model)
     if (view === 'record') html = recordPage() + (photo ? photoViewer() : '');
     else if (view === 'double') html = doubleSheet();
-    else { var e = E(); html = (picker ? '<div inert>' + editSheet(e) + '</div>' + pickerDrawer(e) : editSheet(e)); }
+    else { var e = E(); html = (picker ? '<div inert>' + editSheet(e) + '</div>' + pickerDrawer(e) : which ? '<div inert>' + editSheet(e) + '</div>' + whichDrawer(e) : editSheet(e)); }
     scr.innerHTML = K.phone(behind() + html, { label: S_('pp.common.task') });
     PP.apply(scr);
     UI.liveFill(scr, { then: function (el) { PP.apply(el); } });
@@ -1011,7 +1023,7 @@
     } else if (a === 'mark-why') {
       var p = v.split(':'), mm = mark(e, p[0]), y = draft.marks[p[0]] || {};
       if (p[1] === 'void') draft.marks[p[0]] = { void: true };
-      else if (p[1] === 'to') { draft.marks[p[0]] = { to: y.to || '' }; openPicker({ kind: 'mark', id: p[0] }); }
+      else if (p[1] === 'to') { which = false; draft.marks[p[0]] = { to: y.to || '' }; openPicker({ kind: 'mark', id: p[0] }); }
       else draft.marks[p[0]] = { n: y.void || y.to !== undefined ? mm.whole - 1 : (y.n == null ? mm.n : y.n), reason: p[1] };
       cleared = null; render();
     } else if (a === 'mark-back') { var z0 = draft.marks[v]; if (z0 && z0.back) delete draft.marks[v]; else draft.marks[v] = { back: true }; render();
@@ -1111,6 +1123,8 @@
       if (now - lastSave < 600) { render(); return; }
       lastSave = now;
       if (view === 'double') saveDouble(); else save();
+    } else if (a === 'wrong-crate') { which = true; render();
+    } else if (a === 'which-back') { which = false; drawerClosedAt = now; render();
     } else if (a === 'back' || a === 'dismiss') {
       if (now - drawerClosedAt < 400) return;
       if (pad) { commitRowTyping(); pad = null; render(); return; }  // Back closes the pad first; the typed value is kept
@@ -1168,6 +1182,7 @@
     // Arriving on a row (the identity table's row, ?row= its tag, notch or id): it opens in place.
     var want = qs.get('row') || (own ? st.row : null);
     if (want) { var hit = L().identity.rows.filter(function (r) { return r.rowId === want || r.tag === want || r.notch === want; })[0]; if (hit) rowOpen = hit.rowId; }
+    if (own && st.which) which = true;
     if (own && st.pad && rowOpen) { pad = st.pad; typed = Object.assign({}, st.typed || {}); commitRowTyping(); }
     lead = qs.get('count') || qs.get('from') === 'count' ? 'counts' : qs.get('move') || qs.get('from') === 'move' ? 'moves' : qs.get('death') || qs.get('from') === 'dead' ? 'deaths' : qs.get('from') === 'id' || qs.get('row') ? 'rows' : own ? st.lead || '' : '';
     // A recorded row's door (?record=<id>) opens Edit on that record: its section leads, and it is scrolled to and focused

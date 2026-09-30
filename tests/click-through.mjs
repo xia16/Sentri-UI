@@ -153,6 +153,7 @@ try {
 
   // 6. Edit → tail was done on another crate → A04 → Save → A04's record page shows the act at its own time (ticket #12).
   await page.goto(base + 'edit.html?state=edit&crate=A02&data=a02-marked&fresh=1'); await ready(page);
+  await page.click('[data-action="wrong-crate"]');                                        // one door under the list (parity 1)
   await page.click('[data-action="mark-why"][data-value="T-A02-tail:to"]');                // R1-28: there without pressing −
   await page.click('[data-action="pick"][data-value="A04"]');
   await page.waitForFunction(() => /A04/.test((document.querySelector('#ed-banner-summary') || {}).innerText || ''));

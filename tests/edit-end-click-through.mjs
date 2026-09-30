@@ -101,6 +101,7 @@ try {
   await page.click('[data-action="record"][data-value="tail"]');
   await page.waitForTimeout(700);
   await openEdit(page);
+  await page.click('[data-action="wrong-crate"]');
   await page.click('[data-action="mark-why"][data-value$=":to"]');
   await page.click('[data-action="pick"][data-value="A04"]');
   assert.match(await live(page, '#ed-banner-summary', /A04/), /Dock tail 12 → 0 piglets · done on A04 11 piglets/);
@@ -191,23 +192,23 @@ try {
   await page.click('.tk-header-back');                                           // the room's Back opens the task overview
   await page.waitForURL(/end\.html/); await ready(page);
   const ov = await text(page, '[data-ds="TaskPage"]');
-  assert.match(ov, /Piglet deaths .*4 piglets/);
+  assert.match(ov, /Piglet deaths .*4/);
+  await page.click('[data-action="day"]');                                   // a door on the overview (parity 15)
+  assert.match(await text(page, '[data-ds="TaskPage"]'), /Today's records, by hand .*L\.M 4 records B03 · Castrate · 1 15:40/);
+  await page.click('[data-action="close-sheet"]');
   await page.click('[data-action="review"]');
   const rv = await text(page, '[data-ds="TaskPage"]');
   assert.match(rv, /Ending now drops 28 scheduled piglet-doses/);
-  assert.match(rv, /Open for review .*A05 · possible double · Iron d3/);
-  await page.click('[data-action="day"]');                                   // one level down (round 5)
-  assert.match(await text(page, '[data-ds="TaskPage"]'), /Today's records, by hand .*L\.M 4 records B03 · Castrate · 1 15:40/);
-  await page.click('[data-action="close-sheet"]');
+  assert.match(rv, /Open for review .*A05 · possible double · Iron · day 3/);
   await hold(page, '[data-action="hold"]', 300);                             // released early: not ended
   assert.match(await live(page, '#pp-hold-status', /KEEP|RELEASED/), /KEEP HOLDING TO END|RELEASED · NOT ENDED/);
   await hold(page, '[data-action="hold"]');
   await page.waitForFunction(() => /state=receipt/.test(location.search), null, { timeout: 4000 });
   const receipt = await text(page, '[data-ds="TaskPage"]');
-  assert.match(receipt, /Unresolved at End .*A05 · possible double · Iron d3/);
-  assert.match(receipt, /Figures as at End\. What happened since is under Since End\./);
+  assert.match(receipt, /Unresolved at end .*A05 · possible double · Iron · day 3/);
+  assert.match(receipt, /Since end Kept and stamped; the figures above stay as at end/);
   await page.click('[data-action="close-sheet"]');
-  assert.match(await text(page, '#screen'), /No new treatments\. Piglets moved in after End keep their doses as not done\./);
+  assert.match(await text(page, '#screen'), /No new treatments\. Piglets moved in after end keep their doses as not done\./);
   await page.click('[data-ds="TaskPage"] [data-action="back"]');
   await page.waitForURL(/room\.html/); await ready(page);
   console.log('ok 8 room → overview → End (review open, day by hand, drops) → hold → receipt → Back → room');
@@ -222,7 +223,7 @@ try {
   assert.match(again, /Already ended by G\.H/);
   assert.equal(await page.locator('[data-action="hold"]').count(), 0);
   await page.click('[data-ds="TaskPage"] [data-action="receipt"]');
-  assert.match(await text(page, '[data-ds="TaskPage"]'), /Unresolved at End/);
+  assert.match(await text(page, '[data-ds="TaskPage"]'), /Unresolved at end/);
   console.log('ok 9 R1-13 after End: the ended task, no End; a second End names G.H before any hold');
 
   // 10. Round 4: the review End froze stays answerable: receipt row → the double → Given twice → Save → back to the
@@ -235,8 +236,8 @@ try {
   await page.click('[data-action="back"]');
   await page.waitForURL(/end\.html/); await ready(page);
   const face = await text(page, '#screen');
-  assert.match(face, /A05 · Iron d3 · possible double answered: given twice/);
-  assert.doesNotMatch(face, /Unresolved at End Frozen at End/);              // the frozen list no longer holds it
+  assert.match(face, /A05 · Iron · day 3 · possible double answered: given twice/);
+  assert.doesNotMatch(face, /Unresolved at end/);              // the frozen list no longer holds it
   console.log('ok 10 an unresolved-at-End double answered after End → Since End');
 
   // 11. R1-30: End blocked by farrowing says where to end it and opens the litter still farrowing (never the concept board).
@@ -256,7 +257,7 @@ try {
   const ho = await text(page, '[data-ds="TaskPage"]');
   assert.match(ho, /day-21 weight 66\.0 kg/);
   assert.match(ho, /Health shot · 28 not given in this task/);
-  assert.match(ho, /Castrate · 4 not done at End/);
+  assert.match(ho, /Castrate · 4 not done at end/);
   await page.click('[data-ds="TaskPage"] [data-action="open-litter"][data-value="A02"]');
   await page.waitForURL(/state=litter.*crate=A02/); await ready(page);
   console.log('ok 12 handoff wording, weights by day, rows open their litter');
