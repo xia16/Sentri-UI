@@ -31,7 +31,7 @@ try {
   // 1. room → A02 → Record identity → the table → Record identity → three piglets by tap → Close → the litter says 3 of 12.
   await page.goto(base + 'room.html?state=room&fresh=1'); await ready(page);
   await tap(page, '[data-action="open-litter"][data-value="A02"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await tap(page, '[data-action="open-identity"]');
   await page.waitForURL(/id\.html/); await ready(page);
   assert.match(await text(page, '.utility-header'), /A02/);
@@ -96,7 +96,7 @@ try {
   await keys(page, '004305');
   await tap(page, '#id-sex [data-value="g"]');
   await tap(page, '.sheet-footer [data-action="close"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await tap(page, '[data-action="open-identity"]');
   await page.waitForURL(/id\.html/); await ready(page);
   assert.match(await text(page, '[data-action="open-run"]'), /Record identity · 1 unsaved/);
@@ -125,7 +125,7 @@ try {
   await tap(page, '[data-st-context="drawer"] [data-action="back"]');
   assert.match(await text(page, '[data-action="open-weight"]'), /1 unsaved/);
   await tap(page, '.sheet-footer [data-action="close"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await tap(page, '[data-action="open-identity"]');
   await page.waitForURL(/id\.html/); await ready(page);
   assert.match(await text(page, '[data-action="open-weight"]'), /1 unsaved/);
@@ -144,13 +144,13 @@ try {
   assert.equal(await page.getAttribute('.sheet-footer [data-action="close"]', 'data-register'), 'primary');
   assert.match(await status(page), /All 12 alive identified/);
   await tap(page, '.sheet-footer [data-action="close"]');
-  await page.waitForURL(/litter\.html/);
+  await page.waitForURL(/state=litter/);
   console.log('ok 5 all identified → Close');
 
   // 6. keepers farm: tag two, close the set, the closed set never says "so far" and says how to add a keeper.
   await page.goto(base + 'room.html?state=room&data=keepers&fresh=1'); await ready(page);
   await tap(page, '[data-action="open-litter"][data-value="A07"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await tap(page, '[data-action="open-identity"]');
   await page.waitForURL(/id\.html/); await ready(page);
   await tap(page, '[data-action="open-run"]');
@@ -168,7 +168,7 @@ try {
   // 7. notch farm: 99 is the last number (the next suggestion is the lowest free one), 0 is refused with the reason.
   await page.goto(base + 'room.html?state=room&data=notch&fresh=1'); await ready(page);
   await tap(page, '[data-action="open-litter"][data-value="A04"]');
-  await page.waitForURL(/litter\.html/); await ready(page);
+  await page.waitForURL(/state=litter/); await ready(page);
   await tap(page, '[data-action="open-identity"]');
   await page.waitForURL(/id\.html/); await ready(page);
   await tap(page, '[data-action="open-run"]');
