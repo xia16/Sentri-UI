@@ -180,8 +180,8 @@ try {
   await page.click('[data-action="open-record"]');
   await page.waitForURL(/state=record-page/); await ready(page);
   const held = await text(page, '[data-ds="Log"]');
-  assert.match(held, /\+1 crushed held for review · maybe the same body as 09:50 · L\.M/);
-  assert.match(held, /Count 13 1 missing · explained explained by a death · \+1 crushed · 09:50 · L\.M See the death/);
+  assert.match(held, /\+1 crushed held for review · maybe the same body as 09:50 · L\. Madsen/);
+  assert.match(held, /Count 13 1 missing · explained explained by a death · \+1 crushed · 09:50 · L\. Madsen See the death/);
   await page.click('[data-action="goto-entry"]');
   console.log('ok 7 R1-14 held body and explained count on the record page');
 
@@ -199,13 +199,13 @@ try {
   await page.click('[data-action="review"]');
   const rv = await text(page, '[data-ds="TaskPage"]');
   assert.match(rv, /Ending now drops 28 scheduled piglet-doses/);
-  assert.match(rv, /Open for review .*A05 · possible double · Iron · day 3/);
+  assert.match(rv, /Open for review .*A05 Possible double · Iron · day 3 08:40 · L\.M, 08:52 · G\.H/);
   await hold(page, '[data-action="hold"]', 300);                             // released early: not ended
   assert.match(await live(page, '#pp-hold-status', /KEEP|RELEASED/), /KEEP HOLDING TO END|RELEASED · NOT ENDED/);
   await hold(page, '[data-action="hold"]');
   await page.waitForFunction(() => /state=receipt/.test(location.search), null, { timeout: 4000 });
   const receipt = await text(page, '[data-ds="TaskPage"]');
-  assert.match(receipt, /Unresolved at end .*A05 · possible double · Iron · day 3/);
+  assert.match(receipt, /Unresolved at end .*A05 Possible double · Iron · day 3/);
   assert.match(receipt, /Since end Kept and stamped; the figures above stay as at end/);
   await page.click('[data-action="close-sheet"]');
   assert.match(await text(page, '#screen'), /No new treatments\. Piglets moved in after end keep their doses as not done\./);
@@ -252,11 +252,11 @@ try {
   await page.waitForURL(/state=litter.*crate=D01/); await ready(page);
   console.log('ok 11 R1-30 End blocked → D01 litter');
 
-  // 12. The handoff: rows open their litter; weights say their day; not-reached doses are "not given in this task".
+  // 12. The handoff: rows open their litter; weights say their day; not-reached doses are "not done at end", one phrase.
   await page.goto(base + 'end.html?state=weaning-handoff'); await ready(page);
   const ho = await text(page, '[data-ds="TaskPage"]');
   assert.match(ho, /day-21 weight 66\.0 kg/);
-  assert.match(ho, /Health shot · 28 not given in this task/);
+  assert.match(ho, /Health shot · 28 not done at end/);
   assert.match(ho, /Castrate · 4 not done at end/);
   await page.click('[data-ds="TaskPage"] [data-action="open-litter"][data-value="A02"]');
   await page.waitForURL(/state=litter.*crate=A02/); await ready(page);

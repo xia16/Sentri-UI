@@ -253,13 +253,14 @@
   }
   function reviewDesc(r) {
     if (r.kind === 'double') { var a = eventOf(r.records[0]) || {}, b = eventOf(r.records[1]) || {}; return ['pp.end.rev.double.d', { a: time(a.at) + ' · ' + a.who, b: time(b.at) + ' · ' + b.who }]; }
+    if (r.kind === 'held' && r.at) return ['pp.end.rev.at', { t: time(r.at), who: r.who }];
     if (r.kind === 'count') return ['pp.end.rev.count.d', { list: r.counts.map(function (c) { return c.observed; }).join(' · ') }];
     if (r.kind === 'held') return ['pp.end.rev.held.d', { n: r.n }];
     return ['pp.end.rev.correction.d', null];
   }
   function reviewRow(r) {
     var t = reviewTitle(r), d = reviewDesc(r);
-    return K.door({ title: P(t[0], t[1]), description: P(d[0], d[1]), action: 'open-review', value: r.id });
+    return K.row({ id: P('pp.end.code', { code: r.litter }), headline: [P(t[0], t[1])], meta: [P(d[0], d[1])], action: 'open-review', value: r.id });
   }
   // The receipt's review list: the items End froze; answered since, they move to Since End.
   function frozenReviews() { var R = store.select.reviews(D()), open = {}; R.items.forEach(function (x) { open[x.id] = 1; }); return (fig(true).reviews || []).filter(function (r) { return open[r.id]; }); }
@@ -353,7 +354,7 @@
   function reviewsBlock(list, frozenAtEnd) {
     if (!list.length) return '';
     return '<div class="en-block">' + sec({ strs: { title: frozenAtEnd ? 'pp.end.rev.frozen' : 'pp.end.rev.open', meta: one('pp.end.v.items', list.length) }, args: { meta: { n: list.length } } }) +
-      doors(list.map(reviewRow)) + '</div>';
+      UI.rowGroup(list.map(reviewRow).join('')) + '</div>';
   }
   // Already ended (a second End, or the overview after End): who ended it and when, before any hold (R1-13).
   function alreadyBlock(al) {
@@ -543,7 +544,7 @@
     var groups = [];
     function add(kind, k, n, code) {
       if (!n) return;
-      var g = groups.filter(function (x) { return x.k === k && x.kind === kind; })[0];
+      var g = groups.filter(function (x) { return x.k === k; })[0];
       if (!g) { g = { k: k, kind: kind, n: 0, codes: [], since: false }; groups.push(g); }
       g.n += n; if (g.codes.indexOf(code) < 0) g.codes.push(code);
       // A mark stamped before End, a correction or an after-End treatment on this litter and dose.
@@ -555,7 +556,7 @@
     atEnd.forEach(function (l) { arrivalsNotDone(l).forEach(function (a) { add('owed', a.k, a.n, l.code); }); });
     var ndTotal = sum(groups, function (g) { return g.n; });
     var nd = groups.length && groups.map(function (g) {
-      return door('open-litter', g.kind === 'missed' ? 'pp.end.u.missed' : 'pp.end.w.u.' + g.kind, { name: name(g.k), n: g.n }, g.since ? 'pp.end.w.since' : 'pp.end.codes', { list: g.codes.join(' ') }, g.codes[0]);
+      return door('open-litter', 'pp.end.w.u.owed', { name: name(g.k), n: g.n }, g.since ? 'pp.end.w.since' : 'pp.end.codes', { list: g.codes.join(' ') }, g.codes[0]);
     });
     var weighed = litters(false).filter(function (l) { return store.weights(l.code).some(function (x) { return x.day === WEIGH_DAY; }); }).length;
     var weighAhead = litters(false).filter(function (l) { return !store.weights(l.code).some(function (x) { return x.day === WEIGH_DAY; }) && l.day < WEIGH_DAY; }).length;
