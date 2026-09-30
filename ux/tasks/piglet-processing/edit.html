@@ -149,16 +149,21 @@
   function pigsPart(n, tone) { var p = pigs(n); return part(p[0], p[1], tone); }
   function why(k) { return PP.t(k === 'not_done' ? 'pp.edit.why.not_done_word' : 'pp.litter.why.' + k); }
   function idOf(r) { return (r && (r.tag || r.notch)) || ''; }
-  function stampText(iso, who) { return U.stamp(iso, who, TODAY); }
-  function stampStrs(iso, who) { return ['pp.common.stamp.' + (String(iso).slice(0, 10) === TODAY ? 'today' : 'date'), { t: U.time(iso), who: who, date: U.date(iso) }]; }
+  // Inside the log every hand is named in full (farrowing's log); elsewhere the stamp keeps initials.
+  var inLog = false;
+  function stampText(iso, who) { return U.stamp(iso, inLog ? fullName(who) : who, TODAY); }
+  function stampStrs(iso, who) { return ['pp.common.stamp.' + (String(iso).slice(0, 10) === TODAY ? 'today' : 'date'), { t: U.time(iso), who: inLog ? fullName(who) : who, date: U.date(iso) }]; }
   function stampPart(iso, who) { var s = stampStrs(iso, who); return part(s[0], s[1]); }
   function sexWord(s) { return PP.t(s === 'b' ? 'pp.common.sex.boar' : 'pp.common.sex.gilt'); }
   function causeText(byCause) { return Object.keys(byCause || {}).map(function (c) { return PP.t('pp.edit.rec.death_part', { n: byCause[c], cause: PP.t('dead.' + c.replace('-', '_')) }); }).join(' · '); }
+  // The log names people in full (farrowing's `G. Hansen`); the fixture's hands by initials. Unknown initials stay as they are.
+  var FULL = { 'G.H': 'G. Hansen', 'L.M': 'L. Madsen', 'A.K': 'A. Karlsen' };
+  function fullName(w) { return FULL[w] || w; }
   // Record-page day headers: today, yesterday, then the date.
   function dayWord(date) {
     var a = Date.UTC(+date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10)), b = Date.UTC(+TODAY.slice(0, 4), +TODAY.slice(5, 7) - 1, +TODAY.slice(8, 10));
     var k = Math.round((b - a) / 86400000);
-    return k === 0 ? PP.t('time.today') : k === 1 ? PP.t('time.yesterday') : U.date(date);
+    return k === 0 ? PP.t('pp.edit.rec.today') : k === 1 ? PP.t('pp.edit.rec.yesterday') : k < 7 ? PP.t('pp.edit.rec.days_ago', { n: k }) : U.date(date);
   }
   // Button's text register (ADR 0002): a bare word, right-aligned on what it acts on.
   function textAction(action, id, args, value) { return UI.button({ label: PP.t(id, args), register: 'text', action: action, value: value == null ? '' : value, strs: { label: id }, args: args ? { label: args } : undefined }); }
@@ -281,7 +286,7 @@
   }
   function anchor(id) { return '<span class="ed-anchor" data-entry="' + U.esc(id) + '"></span>'; }
   function entry(x, g) {
-    var meta = g.who ? ['pp.edit.rec.t', { t: U.time(x.at) }] : ['pp.common.stamp.today', { t: U.time(x.at), who: x.who }];
+    var meta = g.who ? ['pp.edit.rec.t', { t: U.time(x.at) }] : ['pp.common.stamp.today', { t: U.time(x.at), who: fullName(x.who) }];
     var e = { title: '', strs: { meta: meta[0] }, args: { meta: meta[1] } }, title, detail = null, extra = '';
     switch (x.kind) {
       case 'farrowed':
@@ -384,10 +389,12 @@
   }
   function recordPage() {
     var R = store.select.record(store.derived, crate), X = L();
+    inLog = true;
     var groups = R.days.map(function (g) {
-      return { label: '', strs: { label: g.who ? 'pp.edit.rec.day' : 'pp.edit.rec.day_bare' }, args: { label: { day: dayWord(g.date), who: g.who } },
+      return { label: '', strs: { label: g.who ? 'pp.edit.rec.day' : 'pp.edit.rec.day_bare' }, args: { label: { day: dayWord(g.date), who: fullName(g.who) } },
         entries: g.entries.map(function (x) { return entry(x, g); }) };
     });
+    inLog = false;
     // farrowing's log: title, one description line, the log, a lone Back (Edit is on the litter's tool row)
     return K.page({ view: 'record', inert: !!photo, title: S_('pp.edit.log.title'), description: S_('pp.edit.log.sub', { code: crate, sow: SOW.sow, born: X.born, alive: X.alive }),
       body: logHtml(groups), footer: K.footer({ back: { action: 'back' } }) });
@@ -795,7 +802,7 @@
         args: { value: { n: typed[pad] || '' } } }) + '</div>';
     }
     return K.drawer({ view: 'edit', size: 'long', height: 'full', title: S_('pp.edit.title'), subtitle: subtitle(),
-      aside: dirty() ? textAction('clear', 'act.clear') : '', close: { action: 'back' },
+      aside: UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', waiting: !dirty(), strs: { label: 'act.clear' } }), close: false,
       body: '<div class="ed-body">' + (dirty() || cleared ? '' : savedLine()) + restored + banner(e) + sections(e) + '</div>',
       footer: padHtml + bar(w, can) });
   }
@@ -1109,6 +1116,7 @@
     } else if (a === 'dbl-answer') { dbl.answer = v; if (v !== 'same') dbl.withdraw = ''; dblSaved = null; render();
     } else if (a === 'dbl-withdraw') { dbl.withdraw = v; render();
     } else if (a === 'clear') {
+      if (!dirty()) return;                                          // greyed: nothing to clear
       // Clear discards the draft, with Undo for 5 seconds (Banner)
       cleared = { draft: JSON.parse(JSON.stringify(draft)) }; draft = EMPTY(); typed = {}; notices = []; render();
       var un = document.querySelector('#ed-banner [data-action="undo-clear"]'); if (un) un.focus();

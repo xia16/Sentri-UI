@@ -162,7 +162,7 @@ try {
   await page.waitForFunction(() => /Correction saved/.test((document.querySelector('#ed-saved') || {}).innerText || ''));
   await page.goto(base + 'edit.html?state=record-page&crate=A04&data=a02-marked'); await ready(page);
   const there = await text(page, '[data-ds="Log"]');
-  assert.match(there, /Correction Dock tail 11 piglets · was on A02 · 08:40 · L\.M/);
+  assert.match(there, /Correction Dock tail 11 piglets · was on A02 · 08:40 · L\. Madsen/);
   console.log('ok 6 Edit → wrong litter → A04 → Save → A04 record page:', there.slice(0, 100));
 
   await browser.close();
