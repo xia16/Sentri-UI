@@ -135,7 +135,7 @@ try {
   assert.equal(await page.locator('[data-action="save"][aria-disabled="true"]').count(), 1);   // Save waits for the reason
   await page.click('[data-action="mark-why"][data-value$=":weak"]');
   await page.click('[data-action="save"]');
-  // Save stays on Edit and says what the correction did (R1-28); Back returns to the litter
+  // Save stays on Edit and says what the correction did (R1-28); Back returns to the litter (a drawer over the room)
   await page.waitForFunction(() => /Correction saved/.test((document.querySelector('#ed-saved') || {}).innerText || ''));
   assert.match((await text(page, '#ed-saved')).replace(/\s*·\s*/g, ' · '), /Correction saved · A02 · Iron · day 3 owed 0 → 2/);
   await page.click('[data-action="back"]');
