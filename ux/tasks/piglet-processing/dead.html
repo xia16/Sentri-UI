@@ -15,6 +15,14 @@
    question. The body is cards: Segment, Stepper, ChoiceList, Row, Photos, Banner, Button's reason line. */
 /* The room behind the drawer: the page the worker returns to, drawn by its own page (inert, never focusable). */
 .dd-over { display: contents; }
+/* farrowing's radio rows (flat, divided, 60px) and danger band (a pale red edge, a sans consequence): the ChoiceList and
+   Banner cards in farrowing's face. The skeleton has no radio-row or warning part yet (reported); tokens only. */
+.dd-flat .st-choice-panel { background: transparent; border: 0; border-radius: 0; }
+.dd-flat .st-choice-row.st-choice-row { min-height: var(--radio-row-min); padding: 0; border-bottom: 1px solid var(--line); }
+.dd-flat .st-choice-row.st-choice-row + .st-choice-row { border-top: 0; }
+.dd-flat .st-choice-label, .dd-flat .st-choice-row[data-mode="radio"][aria-checked="true"] .st-choice-label { font-size: var(--type-button-size); font-weight: 400; }
+.dd-body .st-banner { border-color: var(--chip-red-border); padding: var(--space-row-y); }
+.dd-body .st-banner-consequence { font: var(--type-meta-size)/1.6 var(--font-sans); }
 .dd-behind { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--app-background); pointer-events: none; }
 /* The sheet body is one column of sections, farrowing's rhythm. */
 .dd-body { display: flex; flex-direction: column; gap: var(--space-heading); }
@@ -175,7 +183,7 @@
     return UI.button({ label: PP.t(id), register: register, action: action, value: o.value || '', waiting: !!o.waiting, describedby: o.describedby || '', strs: { label: id } });
   }
   function radios(action, key, options, selected, labelId, labelArgs) {
-    return UI.choiceRadios({ label: '', layout: 'rows', action: action, key: key, selected: selected || '', id: 'dd-' + key.replace(/[^\w-]/g, ''),
+    return UI.choiceRadios({ label: '', layout: 'rows', action: action, key: key, selected: selected || '', id: 'dd-' + key.replace(/[^\w-]/g, ''), className: 'dd-flat',
       strs: labelId ? { label: labelId } : undefined, args: labelArgs ? { label: labelArgs } : undefined,
       options: options.map(function (o) { return { value: o.v, label: '', strs: { label: o.id }, args: o.args ? { label: o.args } : undefined }; }) });
   }
@@ -309,7 +317,7 @@
     var h = head();
     var segs = modes().length > 1 ? UI.segment({ options: [['piglets', 'Piglets', { strs: { label: 'label.piglets' } }], ['sow', 'The sow', { strs: { label: 'ds.dead.seg.sow' } }]],
       active: S.mode, action: 'mode', ariaLabel: PP.lang === 'zh' ? '记录死亡对象' : 'Record death for' }) : '';
-    return K.drawer({ size: 'long', height: 'full', view: 'dead', title: h.title, subtitle: h.subtitle, aside: h.aside, close: { action: 'dismiss' },
+    return K.drawer({ size: 'long', view: 'dead', title: h.title, subtitle: h.subtitle, aside: h.aside, close: { action: 'dismiss' },
       body: '<div class="dd-body" data-phase="' + (locked() ? 'locked' : 'open') + '" data-surface="' + surface + '">' + segs + (S.mode === 'sow' ? sowMode() : piglets()) + '</div>',
       footer: footer(), scrim: { action: 'dismiss' } });
   }
@@ -345,7 +353,7 @@
     });
     var n = pigN(), sub = [s('pp.dead.tagged.sub', { pen: tgt(), n: rs.length })];
     if (n) sub.push({ sep: true }, { text: PP.t('pp.dead.unsaved', { n: n }), str: 'pp.dead.unsaved', args: { n: n }, tone: 'green' });
-    return K.drawer({ size: 'long', height: 'full', view: 'tagged', title: s('pp.dead.tagged.title'), subtitle: sub, close: { action: 'sub-dismiss' },
+    return K.drawer({ size: 'long', view: 'tagged', title: s('pp.dead.tagged.title'), subtitle: sub, close: { action: 'sub-dismiss' },
       body: '<div class="dd-body">' + out + '</div>', footer: footer('sub-back'),
       scrim: { action: 'sub-dismiss' } });
   }
@@ -365,7 +373,7 @@
     x.deaths.forEach(function (d) { if (!first && d.id !== h.event && d.fromMissing > 0) first = d; });
     // farrowing's dialog: one question, the answers as radios, Back + Apply (Apply waits until an answer is picked)
     var pick = S.heldPick || '';
-    var body = UI.choiceRadios({ label: '', layout: 'rows', action: 'held-pick', key: 'held', selected: pick, id: 'held-answer', options: [
+    var body = UI.choiceRadios({ label: '', layout: 'rows', action: 'held-pick', key: 'held', selected: pick, id: 'held-answer', className: 'dd-flat', options: [
       { value: 'one', label: '', strs: { label: 'pp.count.held.one', meta: 'pp.count.held.one_short' }, args: { meta: { ap: np(x.alive) } }, meta: '' },
       { value: 'two', label: '', strs: { label: 'pp.count.held.two', meta: 'pp.count.held.two_short' }, args: { meta: { ap: np(Math.max(0, x.alive - h.n)) } }, meta: '' }] });
     var apply = { label: s('pp.count.held.apply'), action: 'resolve', value: pick ? h.event + '|' + pick : '', waiting: !pick };
