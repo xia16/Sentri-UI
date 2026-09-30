@@ -12,15 +12,9 @@
 <style>
 /* Layout only, tokens from tokens.css. The page is the task skeleton (ADR 0003): TaskPhone; TaskSheet for Set count and
    the litter's counts (grab, title, subtitle, ✕ or Clear, divider, body, footer with Back + the primary); TaskPage for
-   Explain; TaskDialog for one question. The body is cards: Stepper (hero), Facts, Row, ChoiceList, Heading, Status and
-   Button's reason line. */
+   Explain; TaskDialog for one question. The body is cards: Stepper (hero), Facts, Row, TaskRadios, TaskDoors, Heading and
+   Status. */
 .ct-over { display: contents; }
-/* farrowing's radio rows (flat, divided, 60px) and danger band (a pale red edge, a sans consequence): the ChoiceList and
-   Banner cards in farrowing's face. The skeleton has no radio-row or warning part yet (reported); tokens only. */
-.ct-flat .st-choice-panel { background: transparent; border: 0; border-radius: 0; }
-.ct-flat .st-choice-row.st-choice-row { min-height: var(--radio-row-min); padding: 0; border-bottom: 1px solid var(--line); }
-.ct-flat .st-choice-row.st-choice-row + .st-choice-row { border-top: 0; }
-.ct-flat .st-choice-label, .ct-flat .st-choice-row[data-mode="radio"][aria-checked="true"] .st-choice-label { font-size: var(--type-button-size); font-weight: 400; }
 
 /* The room behind the sheets: the page the worker returns to, drawn by its own page (inert, never focusable). */
 .ct-behind { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--app-background); pointer-events: none; }
@@ -142,11 +136,10 @@
     if (meta) { f.meta = ''; f.strs.meta = meta; f.args.meta = metaArgs; }
     return f;
   }
-  // A door row (TaskRow door: farrowing's disclosure row): one title, at most one meta line (a trailing word joins it),
+  // A door row (TaskRow door: farrowing's disclosure row): one title, at most one meta line,
   // a chevron. A row with nothing to open is a still panel line (a heading), never a dead button.
   function row(o) {
     var d = o.desc ? [s(o.desc, o.descArgs)] : [];
-    if (o.trail) d.push({ sep: true }, s(o.trail, o.trailArgs));
     if (!o.action) return UI.heading({ title: '', description: '', kind: 'panel', level: 4, strs: { title: o.title, description: o.desc }, args: { title: o.titleArgs, description: o.descArgs } });
     return K.door({ title: s(o.title, o.titleArgs), description: d.length ? d : null, action: o.action, value: o.value });
   }
@@ -209,7 +202,7 @@
     x.deaths.forEach(function (d) { if (!first && d.id !== h.event && d.fromMissing > 0) first = d; });
     // farrowing's dialog: one question, the answers as radios, Back + Apply (Apply waits until an answer is picked)
     var pick = S.heldPick || '';
-    var body = UI.choiceRadios({ label: '', layout: 'rows', action: 'held-pick', key: 'held', selected: pick, id: 'held-answer', className: 'ct-flat', options: [
+    var body = K.radios({ label: '', action: 'held-pick', key: 'held', selected: pick, id: 'held-answer', options: [
       { value: 'one', label: '', strs: { label: 'pp.count.held.one', meta: 'pp.count.held.one_short' }, args: { meta: { ap: np(x.alive) } }, meta: '' },
       { value: 'two', label: '', strs: { label: 'pp.count.held.two', meta: 'pp.count.held.two_short' }, args: { meta: { ap: np(Math.max(0, x.alive - h.n)) } }, meta: '' }] });
     var apply = { label: s('pp.count.held.apply'), action: 'resolve', value: pick ? h.event + '|' + pick : '', waiting: !pick };
@@ -337,11 +330,15 @@
   }
   // how far apart the two counts were: the rail word of a suggestion (`5 min`, `2h`)
   function gap(m) { return m == null ? null : m < 60 ? ['pp.count.sug.gap_min', { m: m }] : ['pp.count.sug.gap_h', { h: Math.round(m / 60) }]; }
+  // A door on Explain: farrowing's Pen-page card row (an icon tile, a title, one description line)
+  function item(icon, action, value, title, titleArgs, desc, descArgs) {
+    return { icon: icon, action: action, value: value, title: s(title, titleArgs), description: desc ? s(desc, descArgs) : undefined };
+  }
   function suggestionRow(l, sg) {
     var cross = sg.room !== l.room, g = gap(sg.gapMin);
     var t = (sg.kind === 'gain' ? 'pp.count.sug.gained' : 'pp.count.sug.lost') + (cross ? '_unit' : '');
-    return row({ action: 'suggest', value: l.id + '|' + sg.id, title: t, titleArgs: { code: sg.litter, np: np(sg.open), u: sg.room },
-      desc: 'pp.count.sug.desc', descArgs: { effect: effect(sg) }, trail: g && g[0], trailArgs: g && g[1] });
+    return item('transfer', 'suggest', l.id + '|' + sg.id, t, { code: sg.litter, np: np(sg.open), u: sg.room },
+      g ? 'pp.count.sug.desc_gap' : 'pp.count.sug.desc', { effect: effect(sg), gap: g ? PP.t(g[0], g[1]) : '' });
   }
   // One line: its title and stamp, then its doors — the Moves the app suggests (ranked, never proof), a body, a new count
   // (a new observation: it never closes the line) and Edit for a wrong count. One headline per door.
@@ -351,18 +348,18 @@
     var all = S.more[l.id] ? l.suggestions : l.suggestions.slice(0, 3);
     all.forEach(function (sg) { rows.push(suggestionRow(l, sg)); });
     var more = l.suggestions.length - all.length;
-    if (more > 0) rows.push(row({ action: 'more', value: l.id, title: pl('pp.count.sug.more', more), titleArgs: { n: more } }));
-    if (l.kind === 'gain') rows.push(row({ action: 'move-in', value: l.id, title: 'pp.count.ex.move_in' }));
-    if (l.death) rows.push(row({ action: 'open-dead', value: l.litter, title: 'pp.dead.title.record' }));
-    rows.push(row({ action: 'open-count', value: l.litter, title: 'pp.count.review.again', titleArgs: { code: l.litter } }));
+    if (more > 0) rows.push(item('more', 'more', l.id, pl('pp.count.sug.more', more), { n: more }));
+    if (l.kind === 'gain') rows.push(item('send', 'move-in', l.id, 'pp.count.ex.move_in'));
+    if (l.death) rows.push(item('alert', 'open-dead', l.litter, 'pp.dead.title.record'));
+    rows.push(item('check', 'open-count', l.litter, 'pp.count.review.again', { code: l.litter }));
     // a mistaken count is corrected through Edit (RULINGS round 3): withdrawn or set, stamped, its line goes
-    rows.push(row({ action: 'edit-count', value: l.litter + '|' + l.id, title: 'pointer.wrong_count' }));
+    rows.push(item('edit', 'edit-count', l.litter + '|' + l.id, 'pointer.wrong_count'));
     // round 4: a counted gain owes nothing new — the litter's recorded treatments stand; the worker checks on the pig
     var g = l.kind === 'gain' ? L(l.litter).unexplained.gains.filter(function (x) { return x.id === l.id; })[0] : null;
     var note = g && g.check ? 'pp.count.line.check' : l.review ? 'pp.count.review.line' : '';
     return '<section class="ct-group">' +
       (alone ? '' : UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: t.id, description: st.id }, args: { title: t.args, description: st.args } })) +
-      (note ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: note } }) : '') + doors(rows.join('')) + '</section>';
+      (note ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: note } }) : '') + K.doors({ card: true, items: rows }) + '</section>';
   }
   function explainPage(inert) {
     var x = explain(), sub = { lp: np(x.openLoss), gp: np(x.openGain) };
@@ -373,7 +370,7 @@
     var desc = x.openLoss && x.openGain ? s('pp.count.ex.sub', sub) : x.openLoss ? s('pp.count.ex.sub_loss', sub) : x.openGain ? s('pp.count.ex.sub_gain', sub) : null;
     if (one) { var lt = lineTitle(one, true), ls = lineStamp(one); title = s(lt.id, lt.args); desc = s(ls.id, ls.args); }
     // R1-8: a body found loose in the room — say whose missing piglet it is (the dead drawer lists the unit's open losses)
-    var found = S.room && x.openLoss ? doors(row({ action: 'found-body', value: String(S.room), title: 'pp.count.ex.found', desc: 'pp.count.ex.found_desc' })) : '';
+    var found = S.room && x.openLoss ? K.doors({ card: true, items: [item('search', 'found-body', String(S.room), 'pp.count.ex.found', null, 'pp.count.ex.found_desc')] }) : '';
     var body = receiptLine() + (S.room ? '' : heldRow()) + found + (x.lines.length ? x.lines.map(function (l) { return lineSection(l, !!S.room, !!one); }).join('')
       : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.ex.empty' } }));
     return K.page({ inert: !!inert, title: title, description: desc, body: '<div class="ct-body">' + body + '</div>', footer: K.footer({ back: { action: 'back' } }) });

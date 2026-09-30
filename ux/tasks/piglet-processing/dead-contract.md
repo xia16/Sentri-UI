@@ -3,8 +3,7 @@
 The one shared dead drawer (the DeadDrawer composition, page `dead.html`), drawn on the task skeleton (ADR 0003): a
 TaskSheet over the room — grab, title `Record death`, subtitle `A02 · 12 alive · 1 dead so far`, ✕ (Clear while a draft
 exists), divider, body, footer with Back + Save — and in the body farrowing's faces from the skeleton (TaskStepper row
-face for the causes and the `From the missing` answer, TaskPhotos, TaskRow door rows) beside the cards it keeps (Segment,
-ChoiceList radios, Banner; the footer status slot for why Save waits; the hold; ADR 0002/0003). What is needed only sometimes sits one level down, in the
+face for the causes and the `From the missing` answer, TaskPhotos, TaskRow door rows) and TaskRadios, TaskWarning beside the cards it keeps (Segment; the footer status slot for why Save waits; the hold; ADR 0002/0003). What is needed only sometimes sits one level down, in the
 same drawer (Back returns): the tagged piglets, the neighbours' losses, and the held-body question (a TaskDialog). Farrowing, the farrowing
 record, check-in and processing all open this component. It forks on **litter facts**, never on the
 task or the surface; the surface chooses copy only. Binds with RULINGS *Surfaces & entrances*,
@@ -158,7 +157,7 @@ It is never silently a second death. Two deaths for one `rowId` keep the earlies
   guard and 400 ms arm floor): a plain tap says `Keep holding to save`, the status line beside the bar reports start
   and cancel, and keyboard or switch access uses the card's two-step (`Press Save again`), disarmed after 5 s or on
   blur. When the hold completes the page rechecks what Save needs before it commits (`settle(el, 'failed')`
-  otherwise). The warning above it is a `danger` Banner (live). The hold is in the primary's ink, as farrowing's
+  otherwise). The warning above it is farrowing's danger band (TaskWarning). The hold is in the primary's ink, as farrowing's
   (`Save · Hold to save`).
 - Identified piglets: one row in the drawer (`Identified · 9`, `2 picked`); one level down (`Identified piglets`,
   with Back + Save) they are picked from the roster or by `Scan ear tag`; one cause control for everything
