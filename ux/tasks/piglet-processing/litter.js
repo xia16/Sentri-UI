@@ -165,7 +165,7 @@
       return U.toolRow(list, { label: 'pp.litter.tools' });
     }
     function prelockDoor() {
-      return UI.rowGroup(UI.row({ title: '', description: '', action: 'open-farrowing', value: SOW.sow, strs: { title: 'pp.edge.prelock.door', description: 'pp.edge.prelock.door_desc' } }));
+      return '<div class="lt-doors">' + K.door({ title: S('pp.edge.prelock.door'), description: S('pp.edge.prelock.door_desc'), action: 'open-farrowing', value: SOW.sow }) + '</div>';
     }
 
     /* ---- owed today ---- */
@@ -433,10 +433,12 @@
           : ['pp.common.record.id_line.' + idc.scheme, { k: id.identified, n: L().alive }];
         var ik = kept('id');
         if (ik && (ik.run || ik.lw)) line = [ik.run ? 'pp.litter.id.draft_run' : 'pp.litter.id.draft_lw', null];
-        rows += UI.row({ title: '', description: '', action: 'open-identity', value: crate, strs: { title: 'pp.common.record.identity', description: line[0] }, args: { description: line[1] } });
+        rows += K.door({ title: S('pp.common.record.identity'), description: S(line[0], line[1]), action: 'open-identity', value: crate });
       }
-      if (!SOW.weight) rows += U.weightRow(null, crate, TODAY);
-      return rows ? section('pp.common.record.title', rows) : '';
+      // missing only (no nag): farrowing's disclosure row, `optional` on its line
+      if (!SOW.weight) rows += K.door({ title: S('pp.common.weight.record'), description: S('pp.common.weight.optional'), action: 'open-weight', value: crate });
+      // non-animal doors: farrowing's disclosure rows (TaskRow door), no card
+      return rows ? '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.common.record.title' } }) + '<div class="lt-doors">' + rows + '</div></section>' : '';
     }
 
     function faceBody() {
@@ -449,7 +451,8 @@
     /* ---- the treatment views (staged: Back keeps the draft, Clear discards it, Save commits; a waiting Save says why) ---- */
     function stepperRow(key, label, desc, descArgs, value, max, ceilId, ceilArgs, min) {
       var atCeil = ceilTap === key && max != null && value >= max;
-      return UI.stepper({ label: '', description: desc ? '' : undefined, value: value, min: min || 0, max: max, key: key, hint: atCeil ? '' : undefined,
+      // farrowing's entry row (TaskStepper row face): outlined keys, 15px label, 18px mono value
+      return K.stepper({ face: 'row', label: '', description: desc ? '' : undefined, value: value, min: min || 0, max: max, key: key, hint: atCeil ? '' : undefined,
         strs: Object.assign({ label: label, value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' }, desc ? { description: desc } : {}, atCeil ? { hint: ceilId } : {}),
         args: Object.assign({}, desc ? { description: descArgs } : {}, atCeil ? { hint: ceilArgs } : {}) });
     }
