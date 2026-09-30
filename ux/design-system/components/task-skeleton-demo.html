@@ -18,6 +18,11 @@
 .tk-pair-grid { display: grid; gap: var(--space-section); }
 .tk-pair-col > h3 { margin: 0 0 8px; padding: 0 var(--space-gutter); font: 500 var(--type-group-label-size)/1.5 var(--font-sans); color: var(--muted); }
 .tk-pair-col > img { display: block; width: 100%; height: auto; }
+/* Host layout of the demo's own screens: the stack gaps between the parts (farrowing's page body gap 18). */
+.tk-page[data-view="foster"] .tk-page-body > * + * { margin-top: 18px; }
+.tk-demo-section { display: flex; flex-direction: column; gap: 10px; }
+.tk-demo-section > * { margin: 0; }
+.tk-sheet[data-view="count"] .tk-sheet-body > * + * { margin-top: var(--space-heading); }
 @media (min-width: 431px) {
   .tk-pair-grid { grid-template-columns: repeat(2, var(--phone-width)); justify-content: center; gap: var(--space-action-section); }
   .tk-pair-col > h3 { padding: 0; }
@@ -72,9 +77,10 @@
       dock: K.dock({ primary: { icon: 'scan', label: s('act.scan', 'Scan ear tag'), action: 'scan' }, tools: tools }) });
   }
 
-  function stepper(key, str, text, v) {
-    return UI.stepper({ label: text, value: v, key: key, action: 'step',
-      strs: { label: str, value: 'tk.demo.n', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' } });
+  // TaskStepper: the Stepper card in farrowing's face (row: outlined keys, 15px label, 18px mono value).
+  function stepper(key, str, text, v, more) {
+    return K.stepper(Object.assign({ label: text, value: v, key: key, action: 'step',
+      strs: { label: str, value: 'tk.demo.n', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' } }, more || {}));
   }
 
   // ---- Finish farrowing: a drawer sized to its content, closed by a hold ----
@@ -94,8 +100,33 @@
       title: s('tk.demo.dead.title', 'Dead 6', { n: 6 }), subtitle: [s('tk.demo.dead.sub', 'Born dead or died'), { sep: true }, { text: '1 unsaved', str: 'tk.demo.dead.unsaved', tone: 'green' }],
       aside: UI.button({ label: 'Clear', register: 'text', action: 'clear', strs: { label: 'act.clear' } }),
       body: UI.segment({ action: 'dead-mode', active: 'piglets', ariaLabel: 'Who died', options: [['piglets', '', { strs: { label: 'tk.demo.piglets' } }], ['sow', '', { strs: { label: 'tk.demo.sow' } }]] }) +
-        causes.map(function (c) { return stepper(c[0], c[1], c[2], c[3]); }).join(''),
+        causes.map(function (c) { return stepper(c[0], c[1], c[2], c[3], c[0] === 'crushed' ? { draft: true, min: 2 } : { min: c[3] }); }).join('') +
+        K.photos({ label: 'Photos', optional: 'Optional', key: 'photos', strs: { label: 'ds.c2.photos.label', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera' } }),
       footer: K.footer({ back: { action: 'back' }, primary: { label: s('act.save', 'Save'), action: 'save' } }) });
+  }
+
+  // ---- Foster piglets: a page with the choice tiles, the other litter as door rows, a stepper on a well ----
+  function foster() {
+    var sows = [['000601', 'tk.demo.foster.s1'], ['000605', 'tk.demo.foster.s2']].map(function (x) {
+      return K.door({ title: s('tk.demo.id', x[0], { id: x[0] }), description: s(x[1], ''), action: 'target', value: x[0] });
+    }).join('');
+    var body = K.choice({ action: 'direction', label: s('tk.demo.foster.dir', 'Direction'), options: [
+        { value: 'out', icon: 'transfer', label: s('tk.demo.foster.send', 'Send piglets'), pressed: true },
+        { value: 'in', icon: 'transfer', label: s('tk.demo.foster.receive', 'Receive piglets') }] }) +
+      '<section class="tk-demo-section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'tk.demo.foster.other' } }) + sows + '</section>' +
+      stepper('count', 'tk.demo.foster.number', 'Number of piglets', 1, { variant: 'hero', min: 1, hint: '', strs: { label: 'tk.demo.foster.number', value: 'tk.demo.n', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase', hint: 'tk.demo.foster.rule' } });
+    return K.page({ title: s('tk.demo.foster', 'Foster piglets'), description: s('tk.demo.foster.sub', 'B1 · sow 000418'), view: 'foster', body: body,
+      footer: K.footer({ back: { action: 'back' }, primary: { label: s('tk.demo.foster.save', 'Send 1 piglet', { n: 1 }), action: 'save' } }) });
+  }
+
+  // ---- The count sheet: the hero on the green area; a status line above the footer with one text action ----
+  function count() {
+    return K.drawer({ size: 'long', view: 'count', title: s('tk.demo.id', '000418', { id: '000418' }), subtitle: s('tk.demo.count.sub', 'B1 / Parity 3 · Farrowing'),
+      body: stepper('alive', 'tk.demo.alive', 'Alive', 9, { variant: 'hero', face: 'count', min: 5 }) +
+        K.door({ title: s('tk.demo.count.log', 'Farrowing log'), description: s('tk.demo.count.log.sub', 'Born 14 · Dead 5'), action: 'log' }),
+      footer: K.footer({ back: { action: 'back' }, primary: { label: s('tk.demo.finish', 'Finish farrowing'), action: 'finish' },
+        status: { text: 'Record says 10 · counted 9', str: 'tk.demo.count.status', id: 'tk-demo-count-status', tone: 'amber',
+          action: { label: s('tk.demo.count.right', '9 is right'), action: 'count-right' } } }) });
   }
 
   // ---- The record page ----
@@ -137,9 +168,11 @@
     full: function () { return K.phone(room(true) + dead()); },
     page: function () { return K.phone(room(true) + page()); },
     dialog: function () { return K.phone(room(true) + dialog()); },
-    overview: function () { return K.phone(room(true) + overview()); }
+    overview: function () { return K.phone(room(true) + overview()); },
+    foster: function () { return K.phone(room(true) + foster()); },
+    count: function () { return K.phone(room(true) + count()); }
   };
-  var refs = { room: 'room', sheet: 'finish', full: 'draft', page: 'history', dialog: 'born', overview: 'overview' };
+  var refs = { room: 'room', sheet: 'finish', full: 'draft', page: 'history', dialog: 'born', overview: 'overview', foster: 'foster', count: 'count' };
   var el = document.getElementById('root');
   if (screens[only]) {
     // One screen, on the harness: framed 390×844 on a wide window, full-bleed on a phone.

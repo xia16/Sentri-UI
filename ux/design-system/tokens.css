@@ -45,6 +45,8 @@
   --chip-green-border: #c9e2cf;
   --chip-red-border: #f0d6cd;
   --progress-active: #9daa87;
+  --task-key-border: #919a8c;
+  --choice-pressed-border: #8ea88a;
   --space-gutter: 18px;
   --space-gutter-sheet: 21px;
   --space-gutter-narrow: 12px;
@@ -68,6 +70,8 @@
   --radius-tab: 7px;
   --radius-chip: 6px;
   --radius-device: 34px;
+  --radius-count: 16px;
+  --radius-hero-key: 15px;
   --shadow-card: 0 3px 12px #26351e04;
   --shadow-sheet: 0 -10px 40px #27351d0b;
   --shadow-dialog: 0 -15px 55px #17290d30;
@@ -99,6 +103,11 @@
   --animal-row-min: 76px;
   --animal-id-col: 59px;
   --grab-height: 24px;
+  --entry-row-min: 66px;
+  --glyph-key-task: 17px;
+  --glyph-key-count: 22px;
+  --photo-thumb-task: 50px;
+  --choice-tile-min: 92px;
   --type-weight-strong: 700;
   --hold-sweep-opacity: 0.35;
   --task-hold-caption-opacity: 0.8;
@@ -125,6 +134,7 @@
   --type-choice-meta-size: 12px;
   --type-description-size: 11px;
   --type-meta-size: 10px;
+  --type-entry-label-size: 15px;
   --type-hero-count-size: 68px;
   --type-figure-lg-size: 27px;
   --type-figure-size: 21px;
@@ -135,4 +145,6 @@
   --type-figure-denominator-size: 15px;
   --type-figure-total-size: 23px;
   --type-hold-caption-size: 9px;
+  --type-step-value-size: 18px;
+  --type-figure-well-size: 28px;
 }

@@ -2,7 +2,7 @@
 
 - **Status:** candidate, on `fix/skeleton` (from `map/3-piglet-processing`). Not approved. No task page adopts it yet; piglet processing is rebuilt on it page by page, next.
 - **Map:** [Piglet processing design map, issue #3](https://github.com/xia16/Sentri-UI/issues/3). Retro entries 29–32 (`ux/tasks/piglet-processing/retro.md`).
-- **Parts:** [TaskPhone](../components/TaskPhone/README.md) · [TaskHeader](../components/TaskHeader/README.md) · [TaskSummary](../components/TaskSummary/README.md) · [TaskLens](../components/TaskLens/README.md) · [TaskGroup](../components/TaskGroup/README.md) · [TaskRow](../components/TaskRow/README.md) · [TaskDock](../components/TaskDock/README.md) · [TaskSheet](../components/TaskSheet/README.md) · [TaskHold](../components/TaskHold/README.md) · [TaskTotals](../components/TaskTotals/README.md) · [TaskProgress](../components/TaskProgress/README.md) · [TaskPage](../components/TaskPage/README.md) · [TaskDialog](../components/TaskDialog/README.md).
+- **Parts:** [TaskPhone](../components/TaskPhone/README.md) · [TaskHeader](../components/TaskHeader/README.md) · [TaskSummary](../components/TaskSummary/README.md) · [TaskLens](../components/TaskLens/README.md) · [TaskGroup](../components/TaskGroup/README.md) · [TaskRow](../components/TaskRow/README.md) · [TaskDock](../components/TaskDock/README.md) · [TaskSheet](../components/TaskSheet/README.md) · [TaskHold](../components/TaskHold/README.md) · [TaskTotals](../components/TaskTotals/README.md) · [TaskProgress](../components/TaskProgress/README.md) · [TaskStepper](../components/TaskStepper/README.md) · [TaskPhotos](../components/TaskPhotos/README.md) · [TaskChoice](../components/TaskChoice/README.md) · [TaskPage](../components/TaskPage/README.md) · [TaskDialog](../components/TaskDialog/README.md).
 - **Code:** `components/task-skeleton.css` and `components/task-skeleton.js` (`window.SentriTask`), loaded after `tokens.css` and the bundle.
 - **Demo:** `components/task-skeleton-demo.html`: each screen built from the parts beside farrowing's original at 390×844. `?screen=room|sheet|full|page|dialog` shows one screen on the harness (framed on a wide window, full-bleed on a phone). Strict lint pages `ds-task-skeleton`, `ds-task-skeleton-{room,sheet,full,page,dialog}` (phone and narrow, en and zh) and `ds-task-skeleton-wide` (1440×900): clean.
 - **Parity inventory:** `ux/tasks/piglet-processing/parity.md`.
@@ -54,6 +54,20 @@ Additive only: no class or API renamed. Found while composing bulk (no farrowing
 - **TaskGroup `face: 'word'`** for a title that is a word, not a place code.
 - **TaskRow parts wrap whole** (each headline/meta part is an inline block).
 - **TaskGroup headers stick only under a lens bar** (`.tk-lens ~ .tk-list`); a list in a page or sheet body drops its own gutter.
+
+## Skeleton 2 (rebuild/skeleton-2): the design system's own faces replaced by farrowing's
+
+Round 5 is "match farrowing exactly"; page workers found four places the design system still drew its own face, and four skeleton gaps. Additive only.
+- **[TaskStepper](../components/TaskStepper/README.md)** (`SentriTask.stepper`, faces `row` · `well` · `count`): the Stepper card with farrowing's outlined keys (pressed: ink), 15px label, 18px mono value; the well and the green count area.
+- **[TaskPhotos](../components/TaskPhotos/README.md)** (`SentriTask.photos`): farrowing's photo line with an outlined camera key.
+- **TaskRow door** (`SentriTask.door`): farrowing's `.disclosure` row, no id column.
+- **[TaskChoice](../components/TaskChoice/README.md)** (`SentriTask.choice`): the Foster Send / Receive tiles.
+- **`footer({ status: { …, action } })`**: one text action on the status line.
+- **One left edge:** ChoiceList group titles inside a page/sheet body lose their 17px inset.
+- **TaskRow id column holds its width**; a wide chip ellipses under the id.
+- **`page({ view, descriptionTone })`, `sheet({ subtitleTone })`.**
+- Candidate tokens: colour `task-key-border` #919a8c, `choice-pressed-border` #8ea88a; type `entry-label` 15px/500, `step-value` 18px/600 mono, `figure-well` 28px/600 mono; radius `radius-count` 16px, `radius-hero-key` 15px; size `entry-row-min` 66px, `glyph-key-task` 17px, `glyph-key-count` 22px, `photo-thumb-task` 50px, `choice-tile-min` 92px. Snapped to existing tokens: the disabled key (`well` / `line` / `disabled-ink` for #f1f2ed / #d9ddd3 / #92998d), the count sheet's green keys (`chip-green-border`, `green` for #c3d6c7, #345841, #28734b).
+- Demo pairs: `?screen=full` (TaskStepper row + TaskPhotos beside Death entry), `?screen=foster` (TaskChoice, door rows, well stepper beside Foster piglets), `?screen=count` (count face, a door, a status with a text action beside Counting).
 
 ## Candidate tokens
 
