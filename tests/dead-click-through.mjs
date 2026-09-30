@@ -37,7 +37,7 @@ try {
   // 1. R1-26: room → A02 → Record death. The steppers start at 0 for this entry (A02's 1 dead is said apart); the stepper keys
   // name the cause; photos are previewed, deleted, restored and ride the Save; Save returns to the litter (no host stub).
   await toDead(page, 'A02');
-  assert.match(await dialog(page), /Record death A02 · 12 alive · 1 dead so far/);
+  assert.match(await dialog(page), /Dead A02 · 12 alive · 1 dead so far/);
   for (const c of ['crushed', 'scours', 'starve_out', 'other']) assert.equal(await stepValue(page, c), '0');
   const inc = page.locator('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
   assert.match(await inc.evaluate((el) => el.getAttribute('aria-label')), /Crushed · one more/);
@@ -82,7 +82,7 @@ try {
   assert.match(await dialog(page), /One of D03's 2 missing\?/);
   await page.click('[data-action="route"][data-value="D03"]');
   const routed = await dialog(page);
-  assert.match(routed, /Record death D03/); assert.match(routed, /Recording in D03 · found in A02/);
+  assert.match(routed, /Dead 1 D03/); assert.match(routed, /Recording in D03 · found in A02/);
   assert.match(routed, /From the 2 missing 1 alive stays 11 · 1 missing still open/);
   await page.click('[data-action="save"]');
   await page.waitForURL(/state=litter.*crate=A02/); await ready(page);
@@ -126,8 +126,8 @@ try {
   await page.click('[data-action="sub"][data-value="tagged"]');
   await page.check('input[data-action="pick"][value="B06-r4"]');
   await page.click('[data-action="pick-cause"][data-value="crushed"]');
-  assert.match(await text(page, '#dd-why'), /Was 271004 one of the missing\? Answer to save/);
   await page.click('[data-action="save"]', { force: true });                       // waiting: answered, nothing saved
+  assert.match(await text(page, '#dd-why'), /Was 271004 one of the missing\? Answer to save/);
   assert.match(page.url(), /dead\.html/);
   await page.click('[data-action="miss"][data-value="yes"]');
   await page.click('[data-action="save"]');
@@ -144,7 +144,7 @@ try {
   await page.click('[data-action="held-pick"][data-value="one"]');
   await page.click('[data-action="resolve"][data-value$="|one"]');
   assert.doesNotMatch(await dialog(page), /Same body recorded twice\?/);
-  assert.match(await dialog(page), /Record death A07 · 13 alive/);
+  assert.match(await dialog(page), /Dead A07 · 13 alive/);
   console.log('ok 7 held body answered in the dead drawer: One body');
 
   // 8. At 360 the drawer header's Clear never overlaps the title line.

@@ -158,7 +158,8 @@
   // Save (or the step's primary), and the reason it waits (Button's waiting face, ADR 0002): the footer's status line
   // the answer a sanity question takes (`17 is right`, `None are there`) is the status line's text action
   function saveFooter(p, waiting, action, id, args, backAction) {
-    var st = p ? { text: PP.t(p.id, p.args), str: p.id, args: p.args, id: 'ct-why' } : null;
+    // a waiting primary stands alone (farrowing): its reason shows once it is tapped (the guard), then stays while it applies
+    var st = p && S.why ? { text: PP.t(p.id, p.args), str: p.id, args: p.args, id: 'ct-why' } : null;
     if (st && p.act) st.action = { label: s(p.act.id, p.act.args), action: p.act.action, value: String(S.observed) };
     return K.footer({ back: { action: backAction || 'back' }, status: st, primary: { label: s(id || 'act.save', args), action: action || 'save', waiting: waiting } });
   }
@@ -348,12 +349,13 @@
     var all = S.more[l.id] ? l.suggestions : l.suggestions.slice(0, 3);
     all.forEach(function (sg) { rows.push(suggestionRow(l, sg)); });
     var more = l.suggestions.length - all.length;
-    if (more > 0) rows.push(item('more', 'more', l.id, pl('pp.count.sug.more', more), { n: more }));
-    if (l.kind === 'gain') rows.push(item('send', 'move-in', l.id, 'pp.count.ex.move_in'));
-    if (l.death) rows.push(item('alert', 'open-dead', l.litter, 'pp.dead.title.record'));
-    rows.push(item('check', 'open-count', l.litter, 'pp.count.review.again', { code: l.litter }));
+    // every door carries one description line (farrowing's Pen page)
+    if (more > 0) rows.push(item('more', 'more', l.id, pl('pp.count.sug.more', more), { n: more }, 'pp.count.ex.more_desc'));
+    if (l.kind === 'gain') rows.push(item('send', 'move-in', l.id, 'pp.count.ex.move_in', null, 'pp.count.ex.move_in_desc'));
+    if (l.death) rows.push(item('alert', 'open-dead', l.litter, 'pp.dead.title.record', null, pl('pp.count.ex.dead_desc', l.open), { np: np(l.open) }));
+    rows.push(item('check', 'open-count', l.litter, 'pp.count.review.again', { code: l.litter }, 'pp.count.ex.again_short'));
     // a mistaken count is corrected through Edit (RULINGS round 3): withdrawn or set, stamped, its line goes
-    rows.push(item('edit', 'edit-count', l.litter + '|' + l.id, 'pointer.wrong_count'));
+    rows.push(item('edit', 'edit-count', l.litter + '|' + l.id, 'pointer.wrong_count', null, 'pp.count.ex.wrong_short', { op: np(l.observed) }));
     // round 4: a counted gain owes nothing new — the litter's recorded treatments stand; the worker checks on the pig
     var g = l.kind === 'gain' ? L(l.litter).unexplained.gains.filter(function (x) { return x.id === l.id; })[0] : null;
     var note = g && g.check ? 'pp.count.line.check' : l.review ? 'pp.count.review.line' : '';
@@ -457,7 +459,7 @@
     if (c && c !== crate) { nav('count.html', { state: 'count', crate: c }); return; }
     var k = keptDraft();
     S.rows = k ? k.rows.slice() : []; S.at = k ? k.at : null; S.obsMs = k ? k.obsMs : 0; S.seen = k ? k.seen : null;
-    S.failed = false; S.view = 'count'; S.sub = ''; S.receipt = null; S.deadRcpt = null; S.sure = null;
+    S.failed = false; S.view = 'count'; S.sub = ''; S.receipt = null; S.deadRcpt = null; S.sure = null; S.why = false;
     S.observed = k ? k.observed : draft().base;
   }
   // any change to the count is a fresh observation: its time (the stamp Save writes; this phone's clock for staleness)
@@ -506,6 +508,7 @@
     else if (a === 'save') {
       // a waiting Save answers the tap (the reason flashes and re-announces) and points at the step
       if (UI.guard(b)) {
+        S.why = true; render();
         var dw = draft();
         if (dw.why === 'name_the_rows' || dw.why === 'too_many_rows') { if (S.sub !== 'roster') { S.sub = 'roster'; render(); } goTo('roster-list'); }
         else if (sanity(dw) === 'zero') { if (S.sub) { S.sub = ''; render(); } goTo('zero'); }
@@ -540,7 +543,7 @@
     }
     else if (a === 'open-move' && S.view === 'suggest') {
       var sg = suggestion(); if (!sg) return;
-      if (UI.guard(b)) { if (sg.s.pickFrom) goTo('pick'); return; }
+      if (UI.guard(b)) { S.why = true; render(); if (sg.s.pickFrom) goTo('pick'); return; }
       var m = moveOf(sg.s);
       nav('move.html', { state: 'move-explain', crate: m.from, other: m.to, n: m.n, rows: m.rows.join(','), explains: m.explains.join(',') });
       return;
