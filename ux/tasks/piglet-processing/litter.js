@@ -483,13 +483,13 @@
     }
     function clearAside(show) { return show ? btn({ id: 'act.clear', register: 'text', action: 'clear' }) : ''; }
     /* A treatment in the drawer: its title, one subtitle line (the crate and what is owed), the body, and Back + Save. The
-       reason Save waits for is the body's last line, just above the bar. */
+       reason Save waits for is the footer's status line (TaskSheet's status slot); a tap on the waiting Save flashes it. */
     function doseSheet(titleSlot, sub, body, aside) {
       var w = waiting();
-      var reason = UI.buttonReason({ id: 'lt-why', text: w ? PP.t(w[0], w[1]) : '', strs: w ? { text: w[0] } : undefined, args: w ? { text: w[1] } : undefined });
       return K.sheet({ title: titleSlot, subtitle: [S('pp.room.code', { code: crate }), { sep: true }].concat(sub), close: null, aside: aside, size: 'long', view: 'dose',
-        body: '<div class="lt-stack">' + body + reason + '</div>',
-        footer: K.footer({ back: { action: 'back' }, primary: btn({ id: 'act.save', register: 'primary', action: 'save', waiting: !!w, describedby: 'lt-why' }) }) });
+        body: '<div class="lt-stack">' + body + '</div>',
+        footer: K.footer({ back: { action: 'back' }, status: w ? Object.assign(S(w[0], w[1]), { id: 'lt-why' }) : null,
+          primary: { label: S('act.save'), register: 'primary', action: 'save', waiting: !!w, describedby: w ? 'lt-why' : '' } }) });
     }
     function doseDrawer() {
       var id = drawer.dose, x = D(id), t = title(id), d = doseCfg(id);

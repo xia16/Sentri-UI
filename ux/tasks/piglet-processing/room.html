@@ -357,7 +357,7 @@
     var by = {}, order = [];
     xs.forEach(function (f) { var r = f.litter.charAt(0); if (!by[r]) { by[r] = []; order.push(r); } by[r].push(f); });
     return K.list(order.sort().map(function (r) {
-      return K.group({ title: P('pp.room.group.row', { r: r }), meta: P(PP.one('pp.room.group.n', by[r].length), { n: by[r].length }), rows: by[r].map(function (f) { return row(f, mode); }) });
+      return K.group({ face: 'word', title: P('pp.room.group.row', { r: r }), meta: P(PP.one('pp.room.group.n', by[r].length), { n: by[r].length }), rows: by[r].map(function (f) { return row(f, mode); }) });
     }));
   }
   function dataParam() { return store.name !== 'base' ? store.name : ''; }
@@ -488,7 +488,7 @@
     if (!xs.length) return '';
     var min = Math.min.apply(null, xs.map(function (f) { return f.next.inDays; }));
     xs = xs.filter(function (f) { return f.next.inDays === min; }).sort(byCode);
-    return UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.room.next' } }) + grouped(xs, 'next');
+    return '<div class="pp-after pp-tail">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.room.next' } }) + '</div>' + grouped(xs, 'next');
   }
   function missedLine(lens) {
     if (S.missed || ended() || (lens !== 'owed' && lens !== 'later')) return '';
@@ -504,7 +504,7 @@
     var anyDone = facts().some(function (f) { return naturalLens(f) === 'done'; });
     var id = (filtering() || S.missed) ? 'pp.room.empty.filter' : lens === 'owed' ? (anyDone ? 'pp.room.empty.alldone' : 'pp.room.empty.owed') : 'pp.room.empty.' + lens;
     var up = lens === 'owed' && !filtering() ? comingUp() : '';
-    return '<div class="pp-after">' + empty(id) + missedLine(lens) + '</div>' + (up ? '<div class="pp-after pp-tail">' + up + '</div>' : '');
+    return '<div class="pp-after">' + empty(id) + missedLine(lens) + '</div>' + up;
   }
   function dock() {
     var tools = [{ icon: 'grid', action: 'units', label: P('pp.room.units.act') }, { icon: 'search', action: 'find', label: P('pp.room.aria.find') }];
