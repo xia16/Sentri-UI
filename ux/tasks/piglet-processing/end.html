@@ -68,6 +68,7 @@
     'receipt': { data: 'ended', ended: true, sheet: 'receipt' },
     'receipt-late-mark': { data: 'ended-late-mark', ended: true, sheet: 'receipt' },
     'receipt-since': { data: 'ended-after', ended: true, sheet: 'receipt' },
+    'receipt-answered': { data: 'ended-answered', ended: true, sheet: 'receipt' },   // round 4: a review answered after End
     'ended': { data: 'ended', ended: true },
     'ended-correct': { data: 'ended-correct', ended: true },
     'ended-moves': { data: 'ended-moves', ended: true },
@@ -117,13 +118,7 @@
   function sum(xs, f) { return xs.reduce(function (a, x) { return a + (f(x) || 0); }, 0); }
   function eventOf(id) { return store.events.filter(function (x) { return x.id === id; })[0] || null; }
   function amount(e) { return !e ? 0 : e.castration ? e.castration.castrated || 0 : e.n || 0; }
-  /* An open possible double is two records of one act until someone answers: it counts once toward Done, never twice
-     (R1-21). The ledger's `treated` sums both; the page takes the smaller record back out. Logged for the ledger worker. */
-  function dupN(id, atEnd) {
-    return (fig(atEnd).reviews || []).filter(function (r) { return r.kind === 'double' && r.litter === id; }).reduce(function (s, r) {
-      return s + Math.min.apply(null, r.records.map(function (rid) { return amount(eventOf(rid)); }));
-    }, 0);
-  }
+  // An open possible double counts once toward Done: the ledger's `treatedOnce` (R1-21) feeds progress and per-litter done.
   // One litter as End reads it: the selector's per-dose list and per-litter totals (atEnd frozen, or now), and the litter's facts.
   // At End, the litter's own facts (day, alive, identity, loss) are the ledger's as it stood at End too.
   function litter(id, atEnd) {
@@ -131,7 +126,7 @@
     var idDay = x.dayAge >= (CFG.identity.day || 0);
     return {
       code: id, day: x.dayAge, alive: x.alive, sowDied: !!x.sowDied, unlocked: x.phase === 'open', loss: x.unexplained.openLoss,
-      list: list, done: t.done - dupN(id, atEnd), owed: t.owed + t.unknown, missed: t.missed, ahead: t.notDue, excluded: t.excluded,
+      list: list, done: t.done, owed: t.owed + t.unknown, missed: t.missed, ahead: t.notDue, excluded: t.excluded,
       late: list.some(function (e) { return e.kind === 'owed' && x.doses[e.dose].status === 'late'; }),
       idDone: x.identity.done !== false, idAhead: !idDay, identified: x.identity.identified, unid: x.identity.done === false && idDay ? x.alive - x.identity.identified : 0,
       unfinished: fig(atEnd).unfinishedLitters.indexOf(id) >= 0
@@ -140,8 +135,8 @@
   function litters(atEnd) { return taskIds().map(function (id) { return litter(id, atEnd); }); }
   function workLeft(l) { return l.list.some(function (e) { return e.kind !== 'not_due'; }) || !l.idDone; }
   function totals(atEnd) {
-    var f = fig(atEnd), ls = litters(atEnd), unf = ls.filter(function (l) { return l.unfinished; }), dup = sum(taskIds(), function (id) { return dupN(id, atEnd); });
-    return { done: f.progress.done - dup, owed: f.progress.owed + f.progress.unknown, missed: f.progress.missed, ahead: f.progress.ahead, total: f.progress.total - dup,
+    var f = fig(atEnd), ls = litters(atEnd), unf = ls.filter(function (l) { return l.unfinished; });
+    return { done: f.progress.done, owed: f.progress.owed + f.progress.unknown, missed: f.progress.missed, ahead: f.progress.ahead, total: f.progress.total,
       ontime: f.onTime.n, due: f.onTime.k, excluded: sum(ls, function (l) { return l.excluded; }), pct: f.onTime.k ? Math.round(100 * f.onTime.n / f.onTime.k) : null,
       idDone: f.identityDone.n, litters: f.identityDone.k, unf: unf, work: unf.filter(workLeft).length,
       aheadLitters: ls.filter(function (l) { return l.ahead > 0; }).length,
