@@ -22,6 +22,9 @@
    every piglet. */
 .id-run { min-height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-row-y); }
 .id-run > * { margin: 0; }
+/* the ear-tag readout and its Scan control on one line (the Numpad card has no slot beside its readout) */
+.id-tag-line { display: flex; align-items: center; gap: var(--space-footer-gap); }
+.id-tag-line > .st-measure-box { flex: 1; min-width: 0; }
 .id-dock { flex: none; padding: var(--space-row-y) var(--space-gutter-sheet); background: var(--paper); border-top: 1px solid var(--line); }
 @media (max-width: 370px) { .id-dock { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
 </style>
@@ -245,7 +248,9 @@
     if (keepers) { id = closed ? 'pp.id.prog.keep_done' : 'pp.id.prog.keep'; args = { k: closed ? closed.k : k, n: alive() }; }
     else if (over()) { id = 'pp.id.prog.over'; args = { k: k, n: alive() }; }
     else { id = 'pp.id.prog.k_of_n'; args = { k: k, n: alive() }; }
-    return [s('pp.id.hdr.title_day', { crate: crate, n: L.dayAge }), { sep: true }, s(id, args)];
+    // the piglet in hand, said once (`Piglet 4 of 12`: three are in); records past alive or every piglet in say the litter's count
+    var h = over() ? null : runLabels().head;
+    return [s('pp.id.hdr.title_day', { crate: crate, n: L.dayAge }), { sep: true }, h ? s(h[0], h[1]) : s(id, args)];
   }
   function taskScreen() { return K.screen({ inert: true, header: K.header({ title: s('pp.common.task'), back: { action: 'home' } }), body: '' }); }
   // A door row (TaskRow door, farrowing's .disclosure): a title, one muted line (parts may carry colour), a chevron.
@@ -261,7 +266,6 @@
   }
   var measureStrs = { optional: 'ds.field.optional', value: 'ds.field.figure', unit: 'ds.field.unit.kg', placeholder: 'ds.field.placeholder' };
   function weightField() {
-    // The weight is named by the piglet it belongs to, as the readout names it (`Piglet 4 of 12 · weight`), never by the tag.
     var lab = runLabels().weight;
     // Weight warnings speak in the pad's status line (the pad stays on weight), so the field never changes height.
     return UI.measure({ label: '', optional: 'Optional', value: run.weight, unit: 'kg', key: 'weight', controls: 'id-pad', active: run.active === 'weight',
@@ -345,14 +349,15 @@
 
   /* ---- the docked run: Numpad compact (readout + status line + keys; the last record lives in the status line) ---- */
   var padStrs = { digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad', recent: 'ds.field.aria.recent', value: 'ds.field.figure', placeholder: 'ds.field.placeholder' };
-  function runLabels() {           // the readout's label and the weight's, both naming the same piglet
+  // The piglet in hand, said once in the page's head line (`Piglet 4 of 12`); the fields keep plain names (Weight, Ear tag).
+  function runLabels() {
     var hit = hitNow();
     var i = hit && !hit.r.dead && !run.twin ? hit.i + 1 : distinct().length + 1;
-    if (!hit && allIn()) return { tag: ['pp.id.run.tag_plain', null], weight: ['pp.id.weight', null] };
-    if (notch) return { tag: ['pp.id.run.notch', { i: i, n: alive(), litter: F.notchLitter }], weight: ['ds.field.numpad.weight_label', { i: i, n: alive() }] };
-    if (keepers) return { tag: ['pp.id.run.keeper', { i: i }], weight: ['pp.id.run.keeper_weight', { i: i }] };
-    if (i > alive()) return { tag: ['pp.id.run.tag_open', { i: i }], weight: ['pp.id.run.weight_open', { i: i }] };
-    return { tag: ['ds.field.numpad.tag_label', { i: i, n: alive() }], weight: ['ds.field.numpad.weight_label', { i: i, n: alive() }] };
+    var tag = notch ? ['pp.id.run.notch_plain', { litter: F.notchLitter }] : ['pp.id.run.tag_plain', null], weight = ['pp.id.weight', null];
+    if (!hit && allIn()) return { head: null, tag: tag, weight: weight };
+    if (keepers) return { head: ['pp.id.run.head_keeper', { i: i }], tag: tag, weight: weight };
+    if (i > alive()) return { head: ['pp.id.run.head_open', { i: i }], tag: tag, weight: weight };
+    return { head: ['pp.id.run.head', { i: i, n: alive() }], tag: tag, weight: weight };
   }
   function pad() {
     var o = { id: 'id-pad', compact: true, strs: Object.assign({}, padStrs), args: {} };
@@ -376,8 +381,13 @@
       o.actions = [{ label: '', action: 'numpad-suggestion', strs: { label: 'ds.field.numpad.use_suggestion' }, args: { label: { tag: idOf(run.tag.suggestion) } } }];
     }
     // Scan reads the tag in hand (the camera): the tag pad's last status action on a tag farm, always there.
-    if (run.active === 'tag' && !notch) o.actions = (o.actions || []).concat([{ label: '', action: 'scan', strs: { label: 'pp.id.ptr.scan' } }]);
-    return UI.numpad(o);
+    var html = UI.numpad(o);
+    // Scan: its own control beside the ear-tag readout (farrowing's Scan tag), never a word in the status line.
+    if (run.active === 'tag' && !notch) {
+      var scan = UI.iconButton({ action: 'scan', icon: ICON.icon('scan'), label: PP.t('act.scan') }).replace('aria-label=', 'data-str-attr="aria-label:act.scan" aria-label=');
+      html = html.replace(/(<div class="st-measure-box"[\s\S]*?<\/div>)/, '<div class="id-tag-line">$1' + scan + '</div>');
+    }
+    return html;
   }
   function primary() {             // the one commit; null when there is nothing this sheet can record
     var hit = hitNow();
@@ -450,8 +460,7 @@
       rowsHtml = door('pp.id.lw.rec', { day: L.dayAge }, tr, 'open-weight', String(L.dayAge)) + rowsHtml;
     }
     // the receipt of a save is the section's one status line (it agrees with the Boars and Gilts facts above)
-    var h = UI.heading({ title: '', kind: 'section', level: 3, description: receipt ? '' : undefined,
-      strs: Object.assign({ title: 'pp.id.sec.weigh' }, receipt ? { description: receipt[0] } : {}), args: receipt ? { description: receipt[1] } : undefined });
+    var h = receipt ? UI.heading({ title: '', kind: 'group', level: 4, strs: { title: receipt[0] }, args: { title: receipt[1] } }) : '';
     return '<section class="id-group" role="status" aria-live="polite">' + h + '<div>' + rowsHtml + '</div></section>';
   }
   /* A piglet row (TaskRow, farrowing's piglet roster): the tag or notch, one short chip, what is known as the headline.
