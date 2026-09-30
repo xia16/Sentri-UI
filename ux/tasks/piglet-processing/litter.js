@@ -139,7 +139,7 @@
       var x = L(), parts = [S('pp.litter.sub', { sow: SOW.sow, p: SOW.parity, d: x.dayAge })];
       var st = null;
       if (x.sowDied) st = S('pp.room.chip.sowdied', null, 'red');
-      else if (x.phase === 'open') st = S('pp.room.chip.unlocked', null, 'amber');
+      else if (x.phase === 'open') st = S('pp.litter.st.unlocked', null, 'amber');   // short: the subtitle stays one line at 360
       else if (!x.recordable) st = S('pp.room.l1.none');
       else if (endedTask()) st = S('pp.room.ended.title');
       if (st) parts.push({ sep: true }, st);

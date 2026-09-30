@@ -163,12 +163,12 @@ try {
   // 9. R1-13: after End the litter never reads actionable: `not done at End`, no Owed today, no Later, no one-tap.
   await openLitter(page, 'B01', 'ended', true);
   f = await face(page);
-  assert.match(f, /Not done at End Task ended · 16:20 · G\.H Castrate 1 not done at End · can no longer be recorded/);
+  assert.match(f, /Not done at end Task ended · 16:20 · G\.H Castrate 1 not done at end · can no longer be recorded/);
   assert.doesNotMatch(f, /Owed today|treatments left|Later/);
   assert.equal(await page.locator('[data-action="record"]').count(), 0);
   // …and a review open at End reads `unresolved at End`, still answerable (round 4)
   await openLitter(page, 'A05', 'ended', false);
-  assert.match(await face(page), /Possible double treatment · Iron · day 3.*unresolved at End · still answerable/);
+  assert.match(await face(page), /Possible double treatment · Iron · day 3.*unresolved at end · still answerable/);
   console.log('ok 9 ended: not done at End · unresolved at End');
 
   // 10. R1-19: a litter emptied by moves reads closed.
