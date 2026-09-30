@@ -21,5 +21,18 @@ html[data-input-mode="pointer"] .phone button:focus{outline:none}
 .phone .button.task-end-confirm:not(:disabled){background:var(--red);border-color:var(--red);color:#fff}
 /* Mobile dialogs use the same reachable bottom-sheet geometry as drawers. */
 .farrowing-phone .dialog-backdrop{align-items:end;padding:0}
-.farrowing-phone .dialog{max-height:calc(100% - 24px);border-radius:22px 22px 0 0;padding:21px 21px 28px;box-shadow:0 -15px 55px #17290d30}
+/* Round 5 (owner): the dialog's footer is its last edge; the 28px under the buttons is the footer's own padding, not the dialog's. */
+.farrowing-phone .dialog{max-height:calc(100% - 24px);border-radius:22px 22px 0 0;padding:21px 21px 0;box-shadow:0 -15px 55px #17290d30}
+.farrowing-phone .dialog>.sheet-footer{padding-bottom:28px}
+
+/* Round 5 (owner): farrowing's true layout bugs, fixed here and nothing else.
+   A drawer that is sized to its content keeps its footer on its bottom edge: Finish farrowing and Filter sows were held at
+   85% / 76% with a body that does not grow, which floated Finish's footer 144px up and left 148px of dead space in Filter. */
+.farrowing-phone .sheet[data-st-context="drawer"][data-size][data-view="finish"],
+.farrowing-phone .sheet[data-st-context="drawer"][data-size].room-filter-sheet{height:auto}
+.farrowing-phone .sheet[data-st-context="drawer"][data-size].room-filter-sheet>.sheet-body{flex:0 1 auto}
+/* One left edge per surface: a drawer's head sits on its body's edge (21, 18 on a phone-width window), a page's head on
+   its body's edge (18; 12 below 371px, where the pages already agree). */
+@media(min-width:721px){.phone.farrowing-phone .sheet:not([data-presentation="page"])>.utility-header{padding-left:21px;padding-right:21px}}
+@media(min-width:371px){.phone.farrowing-phone .sheet[data-presentation="page"]>.utility-header{padding-left:18px;padding-right:18px}}
 
