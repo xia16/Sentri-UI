@@ -20,9 +20,12 @@
 .id-group > * { margin: 0; }
 /* The run: the piglet's fields scroll in the page body; the pad is pinned whole under them, above the footer, so every
    key is always on screen at one place (farrowing's entry) — at 360 × 740 the fields scroll, never the keys. */
-.id-run { min-height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-row-y); }
+.id-run { display: flex; flex-direction: column; gap: var(--space-row-y); }
 .id-pad-dock { flex: none; padding: var(--space-row-y) var(--space-gutter); background: var(--app-background); border-top: 1px solid var(--line); }
 .id-run > * { margin: 0; }
+/* Sex on one line, as farrowing's fields: the label (and its Clear while a sex is chosen) on the row the radios sit on,
+   never the label above them with the radios dropped below its reserved Clear slot. */
+.id-sex .st-choice-inline-label { flex-direction: row; align-items: center; justify-content: flex-start; gap: var(--space-key-gap); }
 /* the ear-tag readout and its Scan control on one line (the Numpad card has no slot beside its readout) */
 .id-tag-line { display: flex; align-items: center; gap: var(--space-footer-gap); }
 .id-tag-line > .st-measure-box { flex: 1; min-width: 0; }
@@ -260,7 +263,7 @@
 
   /* ---- the sex field: ChoiceList radio, inline and optional (a visible Clear, never a re-tap clear) ---- */
   function radio(sex) {
-    return UI.choiceRadios({ label: '', optional: 'Optional', layout: 'inline', action: 'sex', key: 'sex', id: 'id-sex', selected: sex || '',
+    return UI.choiceRadios({ label: '', optional: 'Optional', layout: 'inline', action: 'sex', key: 'sex', id: 'id-sex', className: 'id-sex', selected: sex || '',
       options: [{ value: 'b', label: '', strs: { label: 'pp.common.sex.boar_l' } }, { value: 'g', label: '', strs: { label: 'pp.common.sex.gilt_l' } }],
       strs: { label: 'pp.common.sex.label', optional: 'ds.field.optional', clear: 'act.clear' } });
   }
@@ -465,8 +468,8 @@
     return '<section class="id-group" role="status" aria-live="polite">' + h + '<div>' + rowsHtml + '</div></section>';
   }
   /* A piglet row (TaskRow, farrowing's piglet roster): the tag or notch, one short chip, what is known as the headline.
-     The chip is one word, never cut: dead (red), Check (amber) for any tag doubt — a double-issued tag, a same-tag pair, a
-     tag also on another crate — or corrected (amber). The fact itself reads whole on the meta line, amber, until Edit
+     The chip is one word in sentence case, never cut: Dead (red), Check (amber) for any tag doubt — a double-issued tag, a same-tag pair, a
+     tag also on another crate — or Corrected (amber). The fact itself reads whole on the meta line, amber, until Edit
      resolves it; the stamp is on the record (Edit), one level down. */
   function tableRow(r) {
     var amber = function (id, args) { return Object.assign(s(id, args), { tone: 'amber' }); };
@@ -475,7 +478,7 @@
     else if (r.pair || (notch && living().filter(function (x) { return key(x) === key(r); }).length > 1)) facts.push(amber('pp.id.row.pair'));
     if (r.dup) facts.push(amber('pp.id.row.dup', { crate: r.dup }));
     var chip = r.dead ? Object.assign(s('pp.id.chip.dead'), { tone: 'red' }) : facts.length ? Object.assign(s('pp.id.chip.check'), { tone: 'amber' })
-      : r.corrected ? Object.assign(s('pp.id.row.corrected'), { tone: 'amber' }) : null;
+      : r.corrected ? Object.assign(s('pp.id.chip.corrected'), { tone: 'amber' }) : null;
     if (r.corrected && (r.dead || facts.length)) facts.push(amber('pp.id.row.corrected'));
     var meta = [];
     if (r.dead) meta.push(s('pp.id.row.dead_meta', { cause: PP.t('dead.' + r.dead.cause), date: U.date(r.dead.at) }));
