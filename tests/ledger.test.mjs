@@ -2604,3 +2604,25 @@ test('R1-28 Q16 on a corrected castration: hernia, cryptorchid and kept boar lea
   assert.deepEqual(dr.events[0].changes[0].set.castration, { castrated: 4, deferred: 2, deferReason: 'sick' });
   assert.deepEqual(dr.after.owed.castrate, 2);
 });
+
+test('names: people are shown in full (farrowing\'s names) — person(), config.people, whoName on the last record', async () => {
+  const cfg = Object.assign({}, R1, { people: { 'G.H': 'G. Hansen', 'L.M': 'L. Madsen' } });
+  assert.equal(LG.person('G.H', cfg), 'G. Hansen');
+  assert.equal(LG.person('X.Y', cfg), 'X.Y');                       // unknown initials stay as they are
+  assert.equal(LG.person(null, cfg), null);
+  const b = book();
+  b.farrowed('A', 11); b.treat('A', 'iron3', 11, { who: 'L.M' });
+  const d = run(b, cfg);
+  assert.equal(LG.person('G.H', d), 'G. Hansen');                    // a derived ledger carries its config's people
+  assert.equal(d.litters.A.lastEvent.whoName, 'L. Madsen');
+  assert.equal(d.litters.A.lastRecord.whoName, 'L. Madsen');
+  const last = select.room(d, { lens: 'all' }).lastRecord;
+  assert.equal(last.whoName, 'L. Madsen');
+  // the fixture farm names its people; with nothing passed, person() uses the people the fixtures defined
+  const F = await import('../ux/tasks/piglet-processing/fixtures.js');
+  assert.deepEqual(F.PEOPLE, { 'G.H': 'G. Hansen', 'L.M': 'L. Madsen', 'A.K': 'A. Karlsen' });
+  assert.equal(LG.person('A.K'), 'A. Karlsen');
+  assert.equal(LG.PPLedger.person('G.H'), 'G. Hansen');
+  const v = F.VARIANTS.base();
+  assert.equal(derive(v.events, v.config, { today: v.today }).config.people['L.M'], 'L. Madsen');
+});
