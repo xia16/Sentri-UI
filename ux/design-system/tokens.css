@@ -101,6 +101,7 @@
   --grab-height: 24px;
   --type-weight-strong: 700;
   --hold-sweep-opacity: 0.35;
+  --task-hold-caption-opacity: 0.8;
   --hold-caption-opacity: 0.85;
   --hold-commit: 850ms;
   --hold-arm: 5000ms;
@@ -132,4 +133,6 @@
   --type-overline-size: 10px;
   --type-figure-card-size: 31px;
   --type-figure-denominator-size: 15px;
+  --type-figure-total-size: 23px;
+  --type-hold-caption-size: 9px;
 }
