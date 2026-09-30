@@ -14,6 +14,7 @@ const { chromium } = require('playwright');
 const server = spawn(process.execPath, ['scripts/serve-ux.cjs', String(port)], { stdio: 'ignore' });
 const base = `http://localhost:${port}/ux/tasks/piglet-processing/`;
 const ready = (p) => p.waitForSelector('html[data-ready]');
+const log = (p, v) => p.evaluate((k) => JSON.parse(sessionStorage.getItem('pp-log:' + k) || '[]'), v);
 const text = async (p, sel) => (await p.locator(sel).first().innerText()).replace(/\s+/g, ' ');
 // round 5: the room's review and drift doors are one row (`reviews`); its sheet holds the drift door (`explain`)
 async function drift(p) { await p.click('[data-action="reviews"]'); const t = await text(p, '[data-action="explain"]'); await p.click('.tk-sheet [data-action="close-sheet"]'); await p.waitForSelector('.tk-sheet', { state: 'detached' }); return t; }
@@ -41,14 +42,20 @@ try {
   await page.click('[data-action="step"][data-step="-1"]');
   assert.match(await text(page, '[data-ds="Stepper"]'), /1 fewer · Save writes unexplained loss 1 piglet/);
   await page.click('[data-action="save"]');
-  await page.waitForSelector('#ct-receipt span');
-  assert.match(await text(page, '#ct-receipt'), /Saved\s*·\s*unexplained loss 1 piglet/);
-  // a double tap right after Save lands nowhere
-  await page.click('[data-action="back"]');
-  assert.match(page.url(), /count\.html/);
-  // one open line: its doors are right on the litter (no extra hop)
+  // Save returns straight to the litter drawer with the count's receipt
+  await page.waitForURL(/room\.html\?.*state=litter.*crate=B06.*saved=count/); await ready(page);
+  await page.waitForSelector('#lt-receipt span');
+  assert.match(await text(page, '#lt-receipt'), /Saved\s*·\s*unexplained loss 1 piglet/);
+  // Save writes one count (a double tap never writes a second)
+  assert.equal((await log(page, 'gain-b08')).filter((e) => e.type === 'count' && e.litter === 'B06').length, 1);
+  // the open line is on the litter, with the Move the app ranks first; its doors are one level down, on Explain
+  assert.match(await text(page, '[data-action="open-explain"]'), /Unexplained loss 1 piglet B08 gained 1 piglet/);
+  const rcpt2 = await text(page, '#lt-receipt');
+  await page.waitForTimeout(450);
+  await page.click('[data-action="open-explain"]');
+  await page.waitForURL(/count\.html\?.*state=explain/); await ready(page);
   assert.match((await page.locator('[data-action="suggest"]').first().innerText()).replace(/\s+/g, ' '), /B08 gained 1 piglet/);
-  console.log('ok 2 litter Set count 11:', await text(page, '#ct-receipt'));
+  console.log('ok 2 litter Set count 11:', rcpt2);
 
   // 3. Back to the room: the strip and B06's row show the open loss, beside B08's gain (never netted).
   await page.waitForTimeout(450);
@@ -98,12 +105,11 @@ try {
   // 7. Two offline counts that never saw each other: neither stands; the litter asks for a new count, which settles it.
   await page.goto(base + 'count.html?state=count-conflict&fresh=1'); await ready(page);
   assert.match(await text(page, '#screen'), /Two counts disagree/);
-  await page.click('[data-action="open-count"][data-value="A07"]');
   await page.click('[data-action="save"]');
-  await page.waitForTimeout(450);
-  assert.doesNotMatch(await text(page, '#screen'), /Two counts disagree/);
-  await page.waitForSelector('#ct-receipt span');
-  console.log('ok 7 two counts disagree → count again settles it:', await text(page, '#ct-receipt'));
+  await page.waitForURL(/state=litter.*saved=count/); await ready(page);
+  assert.doesNotMatch(await text(page, '.tk-sheet'), /Two counts disagree|Counts disagree/);
+  await page.waitForSelector('#lt-receipt span');
+  console.log('ok 7 two counts disagree → count again settles it:', await text(page, '#lt-receipt'));
 
   const toCount = async (code, data) => {
     await page.goto(base + `room.html?state=room&lens=all&fresh=1${data ? '&data=' + data : ''}`); await ready(page);
@@ -124,10 +130,11 @@ try {
   assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
   await page.click('[data-action="sure"]');
   await page.click('[data-action="save"]');
-  await page.waitForSelector('#ct-receipt span');
-  assert.match(await text(page, '#ct-receipt'), /unexplained gain 5 piglets\s*·\s*check on the pig/);
-  assert.match(await text(page, '#screen'), /Check on the pig · it owes nothing new/);
-  console.log('ok 8 a count far above Alive asks first; the gain owes nothing new:', await text(page, '#ct-receipt'));
+  await page.waitForURL(/state=litter.*saved=count/); await ready(page);
+  await page.waitForSelector('#lt-receipt span');
+  assert.match(await text(page, '#lt-receipt'), /unexplained gain 5 piglets\s*·\s*check on the pig/);
+  assert.match(await text(page, '.tk-sheet'), /Check on the pig · it owes nothing new/);
+  console.log('ok 8 a count far above Alive asks first; the gain owes nothing new:', await text(page, '#lt-receipt'));
 
   // 9. R1-27: 0 asks "moved or weaned?" (the Move door is right there); the draft kept on Back is never a stale 0 ready to Save.
   await toCount('B10');
@@ -135,8 +142,10 @@ try {
   assert.match(await text(page, '[data-target="zero"]'), /None seen in B10 · moved or weaned\? Record a Move from B10/);
   assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
   await page.click('[role="dialog"] [data-action="back"]');
-  assert.match(await text(page, '#screen'), /Set count 0 piglets counted \d\d:\d\d · not saved/);
-  await page.click('[data-action="open-count"][data-value="B10"]');
+  await page.waitForURL(/state=litter.*crate=B10/); await ready(page);
+  assert.match(await text(page, '.pp-tools'), /Set count 0 counted · not saved/);
+  await page.click('[data-action="open-count"]');
+  await page.waitForURL(/count\.html/); await ready(page);
   assert.equal(await page.locator('[role="spinbutton"]').first().innerText(), '0');
   assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
   assert.match(await text(page, '#ct-why'), /0 writes all 11 piglets as missing/);
@@ -152,20 +161,21 @@ try {
   await page.click('[data-action="sub"][data-value="roster"]');
   await page.check('input[data-action="pick-row"][value="B06-r4"]');
   await page.click('[data-action="save"]');
-  await page.waitForSelector('#ct-receipt span');
+  await page.waitForURL(/state=litter.*saved=count/); await ready(page);
+  await page.waitForSelector('#lt-receipt span');
   await page.waitForTimeout(450);
-  await page.click('[data-action="open-dead"][data-value="B06"]');
+  await page.click('[data-action="open-dead"]');
   await page.waitForURL(/dead\.html/); await ready(page);
   await page.click('[data-action="sub"][data-value="tagged"]');
   assert.match(await text(page, '[data-ds="ChoiceList"]'), /271004 counted missing/);
   await page.check('input[data-action="pick"][value="B06-r4"]');
   await page.click('[data-action="pick-cause"][data-value="crushed"]');
   await page.click('[data-action="save"]');
-  await page.waitForURL(/count\.html\?state=host.*saved=dead/); await ready(page);
-  await page.waitForSelector('#ct-receipt span');
-  assert.match(await text(page, '#ct-receipt'), /271004 crushed\s*·\s*all missing found/);
-  assert.match(await text(page, '[data-ds="Facts"]'), /Alive 11 piglets/);
-  console.log('ok 10 a named missing piglet body closes its line:', await text(page, '#ct-receipt'));
+  await page.waitForURL(/state=litter.*crate=B06.*saved=dead/); await ready(page);
+  await page.waitForSelector('#lt-receipt span');
+  assert.match(await text(page, '#lt-receipt'), /271004 crushed\s*·\s*all missing found/);
+  assert.match(await text(page, '[data-ds="Facts"]'), /Alive 11/);
+  console.log('ok 10 a named missing piglet body closes its line:', await text(page, '#lt-receipt'));
 
   // 11. R1-22: a held body is answered in the Set count drawer, above the number (never under the sheet).
   await toCount('A07', 'held-body');

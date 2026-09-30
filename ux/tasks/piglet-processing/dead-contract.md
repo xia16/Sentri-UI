@@ -123,7 +123,7 @@ Allocations apply in log order until a loss is spent (aggregated per loss; each 
 reserved once). **The same body recorded twice is held for review (RULINGS round 3):** a body allocated
 to a loss already spent — two offline deaths for one missing piglet — is **not applied**: Dead and Alive
 stay (`Dead 1, Alive 9`), the death carries `held`, and it is flagged `sync review` (`held_body`) on the
-litter's count host and Explain (`count.html?state=held-body`), the record page and the console, until a
+litter drawer (a review row), the Set count drawer and Explain (`count.html?state=held-body`), the record page and the console, until a
 worker answers:
 
 ```
@@ -144,8 +144,7 @@ It is never silently a second death. Two deaths for one `rowId` keep the earlies
   body names the missing step (`Pick a cause for 271004`, `How many were missing?`); tapping the gray
   Save scrolls to that step, opening the tagged piglets when the step is there. An empty draft names itself only when Save is tapped.
 - Re-rendering keeps the body's scroll position and the focused control.
-- **Save and Back return to where the worker came from (R1-26)**: the page named by `back` (Explain, the count
-  host), else the litter drawer over the room (`room.html?state=litter&crate=A02`). There is no host stub and no extra Back. Save hands its receipt over on the phone
+- **Save and Back return to where the worker came from (R1-26)**: the page named by `back` (Explain), else the litter drawer over the room (`room.html?state=litter&crate=A02`). There is no host stub and no extra Back. Save hands its receipt over on the phone
   (`sessionStorage` `pp-receipt:dead` = `{ parts: [{ id, args, tone }], litter, from, event }`, and `saved=dead` on
   the URL); the page it returns to shows it (`Saved · +1 crushed · 1 missing still open`) and ignores taps for
   ~400 ms. Back from a drawer opened on Explain returns to Explain.

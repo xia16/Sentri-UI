@@ -242,10 +242,7 @@ try {
   await page.click('[data-action="open-count"]');
   await page.waitForURL(/count\.html/); await ready(page);
   await page.click('[data-action="step"][data-step="-1"]');
-  await page.click('[data-st-context="drawer"] [data-action="back"]');      // the count drawer, then the count face
-  await page.waitForSelector('[data-st-context="drawer"][data-view="count"]', { state: 'detached' });
-  await page.waitForTimeout(450);
-  await page.click('[data-action="back"]');
+  await page.click('[data-st-context="drawer"] [data-action="back"]');      // Set count's Back: straight to the litter drawer
   await page.waitForURL(/state=litter/); await ready(page);
   assert.match(await text(page, '.pp-tools'), /Record death 2 unsaved Set count 10 counted · not saved/);
   await page.click('[data-ds="Row"][data-action="open-identity"] >> nth=-1');

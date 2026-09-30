@@ -303,6 +303,26 @@
       return section('pp.litter.section.review', xs.map(reviewRow).join(''), { metaId: 'pp.litter.review.meta', metaArgs: { n: xs.length } });
     }
 
+    /* ---- what a count left open (RULINGS round 2: every open gain or loss stays open, one by one, until a body or a Move):
+       one row per line — its size, and the Move the app ranks first (a suggestion, never proof) or the count's stamp;
+       the doors (the suggestions, a body, a new count, Edit) are one level down, on Explain ---- */
+    function unexplainedSection() {
+      var lines = store.select.explain(store.derived, { litter: crate }, { who: PP.me }).lines;
+      if (!lines.length) return '';
+      var rows = lines.map(function (l) {
+        var t = [P('pp.count.line.' + l.kind + (l.open < l.qty ? '_part' : ''), { np: pigs(l.open), qp: pigs(l.qty) })], d, sg = l.suggestions[0];
+        // round 4: a counted gain owes nothing new — the worker checks on the pig
+        var g = l.kind === 'gain' ? L().unexplained.gains.filter(function (x) { return x.id === l.id; })[0] : null;
+        if (g && g.check) d = [P('pp.count.line.check')];
+        else if (sg) {
+          var left = sg.left, eff = !left.loss && !left.gain ? PP.t('pp.count.sug.both') : left.loss ? PP.t('pp.count.sug.gain_closes', { kp: pigs(left.loss) }) : PP.t('pp.count.sug.loss_closes', { kp: pigs(left.gain) });
+          d = [P((sg.kind === 'gain' ? 'pp.count.sug.gained' : 'pp.count.sug.lost') + (sg.room !== l.room ? '_unit' : ''), { code: sg.litter, np: pigs(sg.open), u: sg.room }), P('pp.count.sug.desc', { effect: eff })];
+        } else d = [P('pp.count.line.stamp', { op: pigs(l.observed), stamp: stampText(l.at, l.who), wp: pigs(l.sizedAgainst) })];
+        return UI.row({ title: t, description: d, wrap: true, action: 'open-explain', value: crate });
+      });
+      return section('pp.count.open.title', rows.join(''));
+    }
+
     /* ---- the receipt: what the last record on this phone changed, one line at the top of the drawer (Undo on a one-tap) ---- */
     function receiptLine() {
       if (!receipt) return '';
@@ -421,7 +441,7 @@
 
     function faceBody() {
       var T = endedTask(), v = view(), x = L();
-      var main = T ? endedSection(T) + reviewSection() : v.closed ? closedSection() + reviewSection() : reviewSection() + owedSection();
+      var main = T ? endedSection(T) + reviewSection() + unexplainedSection() : v.closed ? closedSection() + reviewSection() + unexplainedSection() : reviewSection() + unexplainedSection() + owedSection();
       return '<div class="lt-face">' + receiptLine() + summary() + (x.phase === 'open' ? prelockDoor() : tools()) + main + afterEndSection() + recordedSection() + notesSection() +
         (T || v.closed ? '' : laterSection()) + recordGroup() + '</div>';
     }
@@ -723,6 +743,10 @@
         (st.visit || []).forEach(function (id) { visit[id] = true; });
         if (st.receipt) { var r0 = recordOf(st.visit[0]); receipt = { kind: 'saved', dose: r0.dose, rec: r0 }; }
         if (o.saved === 'correction') receipt = { kind: 'correction' };
+        // back from Set count (Save): the count's receipt, handed over on this phone
+        if (o.saved === 'count') {
+          try { var hc = JSON.parse(sessionStorage.getItem('pp-receipt:count') || 'null'); sessionStorage.removeItem('pp-receipt:count'); if (hc && hc.parts && hc.litter === crate) receipt = { kind: 'handoff', parts: hc.parts }; } catch (e) {}
+        }
         if (o.saved === 'dead' || o.saved === 'sow' || st.saved) {
           var hr = st.handoff || null;
           try { hr = hr || JSON.parse(sessionStorage.getItem('pp-receipt:dead') || 'null'); sessionStorage.removeItem('pp-receipt:dead'); } catch (e) {}
@@ -851,6 +875,7 @@
         // doors to other pages; each comes back to this drawer
         if (a === 'open-review') { reviewDoor(v); return 'gone'; }
         if (a === 'open-dead') { nav('dead.html', { state: 'dead', crate: crate, unit: host.unitParam() }); return 'gone'; }
+        if (a === 'open-explain') { nav('count.html', { state: 'explain', crate: crate, unit: host.unitParam(), data: store.name }); return 'gone'; }
         if (a === 'open-count') { nav('count.html', { state: 'count', crate: crate, unit: host.unitParam(), data: store.name }); return 'gone'; }
         if (a === 'open-move') { nav('move.html', { state: 'move', crate: crate }); return 'gone'; }
         if (a === 'open-identity') { nav('id.html', { state: 'id-table', crate: crate }); return 'gone'; }
