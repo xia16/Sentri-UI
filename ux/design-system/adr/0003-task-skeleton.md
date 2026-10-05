@@ -2,7 +2,7 @@
 
 - **Status:** candidate, on `fix/skeleton` (from `map/3-piglet-processing`). Not approved. No task page adopts it yet; piglet processing is rebuilt on it page by page, next.
 - **Map:** [Piglet processing design map, issue #3](https://github.com/xia16/Sentri-UI/issues/3). Retro entries 29–32 (`ux/tasks/piglet-processing/retro.md`).
-- **Parts:** [TaskPhone](../components/TaskPhone/README.md) · [TaskHeader](../components/TaskHeader/README.md) · [TaskSummary](../components/TaskSummary/README.md) · [TaskLens](../components/TaskLens/README.md) · [TaskGroup](../components/TaskGroup/README.md) · [TaskRow](../components/TaskRow/README.md) · [TaskDock](../components/TaskDock/README.md) · [TaskSheet](../components/TaskSheet/README.md) · [TaskHold](../components/TaskHold/README.md) · [TaskTotals](../components/TaskTotals/README.md) · [TaskProgress](../components/TaskProgress/README.md) · [TaskStepper](../components/TaskStepper/README.md) · [TaskPhotos](../components/TaskPhotos/README.md) · [TaskChoice](../components/TaskChoice/README.md) · [TaskRadios](../components/TaskRadios/README.md) · [TaskWarning](../components/TaskWarning/README.md) · [TaskTable](../components/TaskTable/README.md) · [TaskMetrics](../components/TaskMetrics/README.md) · [TaskPage](../components/TaskPage/README.md) · [TaskDialog](../components/TaskDialog/README.md).
+- **Parts:** [TaskPhone](../components/TaskPhone/README.md) · [TaskHeader](../components/TaskHeader/README.md) · [TaskSummary](../components/TaskSummary/README.md) · [TaskLens](../components/TaskLens/README.md) · [TaskGroup](../components/TaskGroup/README.md) · [TaskRow](../components/TaskRow/README.md) · [TaskDock](../components/TaskDock/README.md) · [TaskSheet](../components/TaskSheet/README.md) · [TaskHold](../components/TaskHold/README.md) · [TaskTotals](../components/TaskTotals/README.md) · [TaskProgress](../components/TaskProgress/README.md) · [TaskStepper](../components/TaskStepper/README.md) · [TaskPhotos](../components/TaskPhotos/README.md) · [TaskChoice](../components/TaskChoice/README.md) · [TaskRadios](../components/TaskRadios/README.md) · [TaskWarning](../components/TaskWarning/README.md) · [TaskTable](../components/TaskTable/README.md) · [TaskMetrics](../components/TaskMetrics/README.md) · [TaskSection](../components/TaskSection/README.md) · [TaskReceipt](../components/TaskReceipt/README.md) · [TaskDay](../components/TaskDay/README.md) · [TaskPage](../components/TaskPage/README.md) · [TaskDialog](../components/TaskDialog/README.md).
 - **Code:** `components/task-skeleton.css` and `components/task-skeleton.js` (`window.SentriTask`), loaded after `tokens.css` and the bundle.
 - **Demo:** `components/task-skeleton-demo.html`: each screen built from the parts beside farrowing's original at 390×844. `?screen=room|sheet|full|page|dialog` shows one screen on the harness (framed on a wide window, full-bleed on a phone). Strict lint pages `ds-task-skeleton`, `ds-task-skeleton-{room,sheet,full,page,dialog}` (phone and narrow, en and zh) and `ds-task-skeleton-wide` (1440×900): clean.
 - **Parity inventory:** `ux/tasks/piglet-processing/parity.md`.
@@ -81,6 +81,20 @@ Additive. Farrowing's remaining own faces, so dead, count and end can drop their
 - **Narrow gutters:** the 12px override at 370px and below is gone; drawers keep 21, pages 18 (farrowing, ruling 16); the footer's gap is 10 there, as farrowing's.
 - **TaskSummary no longer clips** its halves; the task half carries the right corners itself.
 - Demo pairs: `?screen=sow` (radios, photos, warning beside the sow-death drawer), `?screen=pen` (card doors beside the Pen page), `?screen=overview` (progress, table, metrics beside the Task overview).
+
+## Skeleton 4 (rebuild/skeleton-4)
+
+Parity review round 2 (fix-brief-2, items 2–7). Additive, except that TaskWarning's `amber` tone now draws farrowing's End banner colours.
+- **TaskWarning** gains `title` (bold, item 4) and the End banner (`icon`, `door`: a chevron, the whole band one button; item 2).
+- **[TaskSection](../components/TaskSection/README.md)** (`SentriTask.section`): the icon-headed card section (Task outcomes list, or Other outcomes rows; item 2).
+- **[TaskDay](../components/TaskDay/README.md)** (`SentriTask.day`): the day card — band, door rows with a mark and a mono meta, an optional trailing act, no chevron (item 3).
+- **[TaskReceipt](../components/TaskReceipt/README.md)** (`SentriTask.receipt`): the ✓ receipt row (item 5).
+- **`SentriTask.holdBind`**: the hold's caption stays unchanged through the hold, as farrowing (item 6).
+- **`dock({ unit })`**: the dock's labelled place control, `B1 / Go to pen` (item 7).
+- **`radios({ layout: 'row' })`**: farrowing's inline field (label, Optional tag and Clear on one row with the option pills); id's sex field can drop its page CSS.
+- **The footer's status slot is visually hidden by default** (a new design-system utility `.st-visually-hidden` in bundle.css); `status.visible` shows it. With `SentriTask.holdBind`, the hold's caption never changes, so the progress goes only to that hidden status.
+- Candidate tokens: `banner-wash` #fff5df, `banner-border` #efdbb0, `dock-caption` 9px (below the floor by ruling).
+- Demo pairs: `?screen=end`, `?screen=receipt`, `?screen=care`; the room screen's dock now carries the place control.
 
 ## Candidate tokens
 

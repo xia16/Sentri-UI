@@ -11,5 +11,9 @@ A consequence the worker must see before a commit: a pale red box with the warni
 - `tone: 'amber'`: `amber-wash`, `pending-border`, `amber`.
 - The host sets the band's outer margin (farrowing: 17px above and below).
 
+**Title** (`title`): a bold first line, 12px/600 (farrowing's banners and bands lead with it); the text under it is 11px/1.6.
+
+**End banner** (`icon` and/or `door`): farrowing's `.task-warning-card` (⚠ `9 sows will be removed from this batch` / `These sows have not farrowed.` ›): a flex row at least 80px, the 16px icon at the top left (2px down), the copy (4px between lines), a 14px chevron; with `door: { action, value, label }` the whole band is one button. `tone: 'amber'` is the banner's colours: `banner-wash` #fff5df, 1px `banner-border` #efdbb0, `amber` text (candidates).
+
 **Component contract**
-- **Props:** `SentriTask.warning({ text, actions, detail, tone = 'red', label })`. `text`, `detail`: text slots or parts; `actions`: HTML (text-register Buttons).
+- **Props:** `SentriTask.warning({ title, text, actions, detail, tone = 'red' | 'amber', icon, door: { action, value, label }, label })`. `text`, `detail`: text slots or parts; `actions`: HTML (text-register Buttons).

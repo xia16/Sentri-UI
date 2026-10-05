@@ -9,6 +9,8 @@ The room's bottom bar: **one primary tool (Scan ear tag) and icon tools**. It is
 - **Primary** (`.tk-dock-primary`): flex 1, `touch-min` tall, `ink` with a `paper` label, `radius-control`, the glyph 8px before a 12px/500 label.
 - **Tool** (`.tk-dock-tool`): 48 × 50, `paper`, 1px `line`, `radius-control`, one glyph, an aria-label.
 
+- **Place control** (`unit`, optional, first): farrowing's `B1 / Go to pen` — no frame, `paper`, at least 50px, padded `0 3px`, 9px between: an 18px icon, then the place in 13px/600 mono over its caption in `dock-caption` 9px `muted` (farrowing's size, below the floor by the owner's ruling). Props: `dock({ unit: { icon = 'grid', label, caption, action, value, aria }, primary, tools })`.
+
 **States**
 - Pressed: the Button press (darken, 1px down) is not drawn yet. Focus: the global ring. Disabled: never.
 

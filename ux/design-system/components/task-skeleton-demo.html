@@ -22,6 +22,8 @@
 .tk-page[data-view="foster"] .tk-page-body > * + * { margin-top: 18px; }
 .tk-demo-section { display: flex; flex-direction: column; gap: 10px; }
 .tk-page[data-view="overview"] .tk-page-body > * + * { margin-top: var(--space-section); }
+.tk-page:is([data-view="end"], [data-view="receipt"]) .tk-page-body { display: flex; flex-direction: column; gap: 16px; }
+.tk-page[data-view="care"] .tk-page-body { display: flex; flex-direction: column; gap: var(--space-heading); }
 .tk-demo-stack { display: flex; flex-direction: column; }
 .tk-demo-stack > .st-segment { margin: 0 0 4px; }
 .tk-demo-stack > .tk-warning { margin: 17px 0; }
@@ -78,7 +80,7 @@
     return K.screen({ inert: inert, label: s('tk.demo.room', 'Unit 7 farrowing sows'),
       header: K.header({ title: s('tk.demo.task', 'Farrowing'), back: { action: 'home' } }),
       body: body,
-      dock: K.dock({ primary: { icon: 'scan', label: s('act.scan', 'Scan ear tag'), action: 'scan' }, tools: tools }) });
+      dock: K.dock({ unit: { icon: 'grid', label: s('tk.demo.pen', 'B1', { pen: 'B1' }), caption: s('tk.demo.dock.goto', 'Go to pen'), action: 'go-pen', aria: s('tk.demo.dock.goto', 'Go to pen') }, primary: { icon: 'scan', label: s('act.scan', 'Scan ear tag'), action: 'scan' }, tools: tools }) });
   }
 
   // TaskStepper: the Stepper card in farrowing's face (row: outlined keys, 15px label, 18px mono value).
@@ -88,11 +90,14 @@
   }
 
   // ---- Finish farrowing: a drawer sized to its content, closed by a hold ----
-  function finish() {
+  function finish(assist) {
     var facts = K.totals([{ label: s('tk.demo.born', 'Born'), value: n(14) }, { label: s('tk.demo.alive', 'Alive'), value: n(9) }, { label: s('tk.demo.dead', 'Dead'), value: n(5) }]);
     return K.drawer({ size: 'long', view: 'finish',
       title: s('tk.demo.finish', 'Finish farrowing'), subtitle: s('tk.demo.finish.sub', '000418 · B1 · Parity 3'),
-      body: facts + stepper('weak', 'tk.demo.weak', 'Weak', 1) + stepper('deformed', 'tk.demo.deformed', 'Deformed', 1),
+      body: facts + stepper('weak', 'tk.demo.weak', 'Weak', 1) + stepper('deformed', 'tk.demo.deformed', 'Deformed', 1) +
+        (assist ? K.radios({ layout: 'row', label: 'Assisted farrowing', optional: 'Optional', action: 'assisted', key: 'assisted', selected: 'yes', id: 'tk-demo-assisted',
+          options: [{ value: 'no', label: 'No', strs: { label: 'tk.demo.assist.no' } }, { value: 'yes', label: 'Yes', strs: { label: 'tk.demo.assist.yes' } }],
+          strs: { label: 'tk.demo.assist', optional: 'ds.field.optional', clear: 'act.clear' } }) : ''),
       footer: K.footer({ back: { action: 'back' }, hold: { label: s('tk.demo.finish', 'Finish farrowing'), caption: s('tk.demo.finish.hold', 'Hold to finish'), action: 'finish', tone: 'primary' } }) });
   }
 
@@ -131,7 +136,7 @@
         K.door({ title: s('tk.demo.care.title', 'Iron · day 3'), description: s('tk.demo.care.sub', '12 owed · due today'), action: 'open-dose', value: 'iron3', trail: '',
           act: { label: s('tk.demo.care.act', 'Record 12', { n: 12 }), action: 'record', value: 'iron3' } }),
       footer: K.footer({ back: { action: 'back' }, primary: { label: s('tk.demo.finish', 'Finish farrowing'), action: 'finish' },
-        status: { text: 'Record says 10 · counted 9', str: 'tk.demo.count.status', id: 'tk-demo-count-status', tone: 'amber',
+        status: { text: 'Record says 10 · counted 9', str: 'tk.demo.count.status', id: 'tk-demo-count-status', tone: 'amber', visible: true,
           action: { label: s('tk.demo.count.right', '9 is right'), action: 'count-right' } } }) });
   }
 
@@ -200,6 +205,42 @@
       body: K.doors({ card: true, title: s('tk.demo.pen.info', 'Pen information'), icon: 'grid', items: items }), footer: K.footer({ back: { action: 'back' } }) });
   }
 
+  function perf(meta, bal, sb, sbSub, born, alive, deaths) {
+    return K.metrics({ title: s('tk.demo.metrics.title', 'Performance metrics'), icon: 'chart', meta: meta,
+      measures: [{ label: s('tk.demo.metrics.bal', 'Born alive / litter'), value: s('tk.demo.metrics.bal.v', bal), sub: s('tk.demo.unit.target', 'Target 12') },
+        { label: s('tk.demo.metrics.sb', 'Stillborn rate'), value: s('tk.demo.metrics.sb.v', sb), unit: s('tk.demo.metrics.pct', '%'), sub: sbSub }],
+      totals: [{ label: s('tk.demo.born', 'Born'), value: n(born) }, { label: s('tk.demo.metrics.alive', 'Alive now'), value: n(alive) }, { label: s('tk.demo.metrics.deaths', 'Piglet deaths'), value: n(deaths) }] });
+  }
+  // ---- End task early: the banner (icon, bold title, a door), metrics, an icon-headed outcomes section; the red hold ----
+  function endEarly() {
+    var banner = K.warning({ tone: 'amber', icon: 'alert', title: s('tk.demo.end.banner', '9 sows will be removed from this batch', { n: 9 }),
+      text: s('tk.demo.end.banner.sub', 'These sows have not farrowed.'), door: { action: 'removed', label: s('tk.demo.end.banner', '9 sows will be removed from this batch', { n: 9 }) } });
+    var outcomes = K.section({ title: s('tk.demo.end.outcomes', 'Task outcomes'), icon: 'record', meta: s('tk.demo.end.sows', '19 sows', { n: 19 }),
+      items: [{ label: s('tk.demo.end.finished', 'Finished farrowing'), value: n(9) }, { label: s('tk.demo.end.awaiting', 'Awaiting farrowing'), value: n(9) }, { label: s('tk.demo.end.sowdeaths', 'Sow deaths'), value: n(1) }] });
+    return K.page({ title: s('tk.demo.end_early', 'End task early'), description: s('tk.demo.overview.sub', 'Farrowing · All 3 units'), view: 'end',
+      body: banner + perf(s('tk.demo.metrics.meta', '9 finished litters', { n: 9 }), '12.0', '7.2', s('tk.demo.end.sb.sub', '9 stillborn / 125 born'), 125, 77, 48) + outcomes,
+      footer: K.footer({ back: { action: 'back' }, hold: { label: s('tk.demo.end_early', 'End task early'), caption: s('tk.demo.end.hold', 'HOLD TO END EARLY'), action: 'end', tone: 'danger' } }) });
+  }
+  // ---- The end receipt: the ✓ receipt row, then the task's figures; Back alone ----
+  function endReceipt() {
+    return K.page({ title: s('tk.demo.receipt.title', 'Task ended'), description: s('tk.demo.overview.sub', 'Farrowing · All 3 units'), view: 'receipt',
+      body: K.receipt({ title: s('tk.demo.receipt.row', 'Farrowing task ended'), meta: s('tk.demo.receipt.meta', '30 Sept, 23:09 · G. Hansen') }) +
+        perf(s('tk.demo.metrics.meta', '18 finished litters', { n: 18 }), '12.0', '3.9', s('tk.demo.receipt.sb.sub', '9 stillborn / 233 born'), 233, 185, 48),
+      footer: K.footer({ back: { action: 'back' } }) });
+  }
+  // ---- Piglet processing care: day cards; a due row with its one-tap ----
+  function care() {
+    var d1 = K.day({ title: s('tk.demo.care.d1', 'Day 1', { n: 1 }), status: s('tk.demo.care.recorded', 'Recorded'), items: [
+      { title: s('tk.demo.care.dry', 'Dry and warm'), meta: s('tk.demo.care.dry.m', 'Aug 26 · 07:18 · G. Hansen'), mark: 'done', action: 'item', value: 'dry' },
+      { title: s('tk.demo.care.navel', 'Disinfect navel'), meta: s('tk.demo.care.navel.m', 'Aug 26 · 07:24 · G. Hansen'), mark: 'done', action: 'item', value: 'navel' }] });
+    var d3 = K.day({ title: s('tk.demo.care.d1', 'Day 3', { n: 3 }), status: s('tk.demo.care.due', 'Due today'), items: [
+      { title: s('tk.demo.care.iron', 'Iron supplement'), meta: s('tk.demo.care.due', 'Due today'), mark: 'due', action: 'item', value: 'iron',
+        act: { label: s('tk.demo.care.act', 'Record 9', { n: 9 }), action: 'record', value: 'iron' } },
+      { title: s('tk.demo.care.id', 'Ear tag, notch and weight'), meta: s('tk.demo.care.id.m', '3 identified · 6 without identity'), mark: 'due', action: 'item', value: 'id' }] });
+    return K.page({ title: s('tk.demo.care.page', 'Piglet processing'), description: s('tk.demo.care.page.sub', 'B1 · sow 000418 · 8 alive'), view: 'care', body: d1 + d3,
+      footer: K.footer({ back: { action: 'back' }, primary: { label: s('tk.demo.care.save', 'Save care updates'), action: 'save', waiting: true } }) });
+  }
+
   var screens = {
     room: function () { return K.phone(room(false)); },
     sheet: function () { return K.phone(room(true) + finish()); },
@@ -210,9 +251,13 @@
     foster: function () { return K.phone(room(true) + foster()); },
     count: function () { return K.phone(room(true) + count()); },
     sow: function () { return K.phone(room(true) + sow()); },
-    pen: function () { return K.phone(room(true) + pen()); }
+    pen: function () { return K.phone(room(true) + pen()); },
+    assisted: function () { return K.phone(room(true) + finish(true)); },
+    end: function () { return K.phone(room(true) + endEarly()); },
+    receipt: function () { return K.phone(room(true) + endReceipt()); },
+    care: function () { return K.phone(room(true) + care()); }
   };
-  var refs = { room: 'room', sheet: 'finish', full: 'draft', page: 'history', dialog: 'born', overview: 'overview', foster: 'foster', count: 'count', sow: 'sow', pen: 'pen' };
+  var refs = { room: 'room', sheet: 'finish', full: 'draft', page: 'history', dialog: 'born', overview: 'overview', foster: 'foster', count: 'count', sow: 'sow', pen: 'pen', assisted: 'assisted', end: 'end', receipt: 'receipt', care: 'care' };
   var el = document.getElementById('root');
   if (screens[only]) {
     // One screen, on the harness: framed 390×844 on a wide window, full-bleed on a phone.
@@ -235,7 +280,7 @@
     b.parentNode.querySelectorAll('.tk-lens-tab').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
   });
   var t = function (id) { return window.PP ? window.PP.t(id) : id; };
-  var holds = UI.holdBind(document.body, { t: t, onCommit: function (x) { setTimeout(function () { holds.settle(x, 'done'); }, 600); } });
+  var holds = K.holdBind(document.body, { t: t, onCommit: function (x) { setTimeout(function () { holds.settle(x, 'done'); }, 600); } });
 })();
 </script>
 <script src="/ux/tasks/piglet-processing/shell.js"></script>

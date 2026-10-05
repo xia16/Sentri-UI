@@ -532,3 +532,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 /* Numpad compact: the run without its running list (the host speaks the last record in the status line) */
 .st-numpad-feedback[data-compact]{gap:0}
 @media (prefers-reduced-motion:reduce){.st-hold[data-phase="holding"]::before{transition:none;transform:scaleX(.5)}.st-button-reason{transition:none}}
+
+/* Utility: visually hidden, still read (a live status line, a label for assistive tech only). */
+.st-visually-hidden { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }

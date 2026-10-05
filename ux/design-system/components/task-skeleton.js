@@ -188,16 +188,90 @@
   /* ---- TaskRadios: farrowing's flat radio rows (.radio-row: 60px, a line under each, a 14px label, the radio at the
      right). The design system's ChoiceList radio field (SentriUI.choiceRadios: role=radio buttons, roving tab stop,
      radioBind, an optional Clear) in farrowing's face. Every prop is choiceRadios'; layout is always 'rows'. ---- */
+  /* layout 'row': farrowing's inline field (Finish · Assisted farrowing: No | Yes): the label (with its Optional tag and
+     Clear) left, the options as two 44px outlined pills right, all on one row (the ChoiceList's 'inline' layout). */
   function radios(props = {}) {
-    const UI = root.SentriUI;
-    const html = UI.choiceRadios(Object.assign({}, props, { layout: 'rows', className: `tk-radios${props.className ? ' ' + props.className : ''}` }));
-    return html.replace('data-ds="ChoiceList"', 'data-ds="ChoiceList" data-face="flat"');
+    const UI = root.SentriUI, row = props.layout === 'row';
+    const html = UI.choiceRadios(Object.assign({}, props, { layout: row ? 'inline' : 'rows', className: `tk-radios${props.className ? ' ' + props.className : ''}` }));
+    return html.replace('data-ds="ChoiceList"', `data-ds="ChoiceList" data-face="${row ? 'row' : 'flat'}"`);
   }
 
   /* ---- TaskWarning: farrowing's danger band (.danger-band): a pale red box, the warning in 12px red, then (optional)
      text actions, then one 10px muted consequence line. tone: 'red' (default) | 'amber'. ---- */
-  function warning({ text, actions = '', detail, tone = 'red', label } = {}) {
-    return `<div class="tk-warning" data-ds="TaskWarning" data-tone="${esc(tone === 'amber' ? 'amber' : 'red')}" role="note"${L(label)}>${text ? `<p class="tk-warning-text">${parts(text)}</p>` : ''}${actions ? `<div class="tk-warning-actions">${actions}</div>` : ''}${detail ? `<small class="tk-warning-detail">${parts(detail)}</small>` : ''}</div>`;
+  /* title: a bold first line (farrowing's banners and bands lead with it; the text under it drops to 11px).
+     icon + door: farrowing's End banner (⚠ `9 sows will be removed from this batch` ›): the icon left, the copy, a chevron;
+     with door ({ action, value, label }) the whole band is one button. tone 'amber' is the banner's colours. */
+  function warning({ title, text, actions = '', detail, tone = 'red', icon = '', door: d, label } = {}) {
+    const copy = `${title ? `<strong class="tk-warning-title">${parts(title)}</strong>` : ''}${text ? `<p class="tk-warning-text">${parts(text)}</p>` : ''}${actions ? `<div class="tk-warning-actions">${actions}</div>` : ''}${detail ? `<small class="tk-warning-detail">${parts(detail)}</small>` : ''}`;
+    const t = esc(tone === 'amber' ? 'amber' : 'red');
+    if (!icon && !d) return `<div class="tk-warning" data-ds="TaskWarning" data-tone="${t}" role="note"${L(label)}>${copy}</div>`;
+    const inner = `${icon ? `<span class="tk-warning-icon">${glyph(icon)}</span>` : ''}<span class="tk-warning-copy">${copy}</span>${d ? `<span class="tk-warning-go">${glyph('chevron')}</span>` : ''}`;
+    return d
+      ? `<button type="button" class="tk-warning" data-ds="TaskWarning" data-tone="${t}" data-banner=""${A(d.action || 'open', d.value)}${L(d.label ?? label)}>${inner}</button>`
+      : `<div class="tk-warning" data-ds="TaskWarning" data-tone="${t}" data-banner="" role="note"${L(label)}>${inner}</div>`;
+  }
+
+  /* ---- TaskSection: farrowing's icon-headed card section (Task outcomes, Other outcomes): a section heading with its
+     icon and meta, then one card. body: HTML for the card, or items (below). items: [{ label, value, action, value2 }] —
+     rows: false (default) farrowing's outcomes list (label 12px left, 14px mono figure right); rows: true the design
+     system's Rows (label 13px/500, the figure as trailing muted text, a chevron when the row has an action). ---- */
+  function section({ title, icon = '', meta, body, items = [], rows = false, label } = {}) {
+    const UI = root.SentriUI;
+    let card = body || '';
+    if (!body && items.length && !rows) card = `<dl class="st-panel tk-outcomes">${items.map(i => `<div><dt>${T(i.label)}</dt><dd>${T(i.value)}</dd></div>`).join('')}</dl>`;
+    if (!body && items.length && rows) {
+      card = UI.rowGroup(items.map(i => {
+        const o = obj(i.label), v = obj(i.value == null ? '' : i.value), strs = {}, args = {};
+        if (o.str) { strs.title = o.str; if (o.args) args.title = o.args; }
+        if (v.str) { strs.trailing = v.str; if (v.args) args.trailing = v.args; }
+        return UI.row(Object.assign({ title: o.text ?? '', trailing: v.text ?? '', strs, args }, i.action ? { action: i.action, value: i.target || '' } : {}));
+      }).join(''));
+    }
+    return `<section class="tk-section" data-ds="TaskSection"${L(label ?? title)}>${sectionHead(title, icon, meta)}${card}</section>`;
+  }
+
+  /* ---- TaskReceipt: farrowing's ✓ receipt row (Farrowing task ended · 30 Sept, 23:09 · G. Hansen): a 36px green-wash
+     disc with a check, a 14px/600 title, an 11px muted meta line. ---- */
+  function receipt({ title, meta, icon = 'check', label } = {}) {
+    return `<div class="tk-receipt" data-ds="TaskReceipt" role="status"${L(label)}><span class="tk-receipt-mark">${glyph(icon)}</span><div><h3 class="tk-receipt-title">${parts(title)}</h3>${meta ? `<p class="tk-receipt-meta">${parts(meta)}</p>` : ''}</div></div>`;
+  }
+
+  /* ---- TaskDay: farrowing's day card (Piglet processing · Care): a tinted header band (bold `Day 3`, a mono status right),
+     then one row per item — the whole row is the door (a mark left: 'done' a check disc, 'due' an open ring, '' none; a
+     12px/700 title; a 10px mono meta line); act: an optional trailing one-tap (Record 12), beside the door. No chevron.
+     items: [{ title, meta, mark, action, value, label, act, id }]. ---- */
+  let daySeq = 0;
+  function day({ title, status, items = [], label } = {}) {
+    const UI = root.SentriUI;
+    const rows = items.map(i => {
+      const mark = i.mark === 'done' ? `<span class="tk-day-mark" data-mark="done">${glyph('check')}</span>` : i.mark === 'due' ? '<span class="tk-day-mark" data-mark="due"></span>' : '';
+      const rid = i.id || `tk-day-${++daySeq}`, tid = rid + '-title';
+      const main = `<button type="button" class="tk-day-door"${A(i.action || 'open', i.value)}${L(i.label)}>${mark}<span class="tk-day-copy"><strong id="${esc(tid)}">${parts(i.title)}</strong>${i.meta ? `<small>${parts(i.meta)}</small>` : ''}</span></button>`;
+      if (!i.act) return `<div class="tk-day-row"${i.mark === 'done' ? ' data-done=""' : ''}>${main}</div>`;
+      const a = i.act, l = obj(a.label), aid = rid + '-act';
+      const props = { label: l.text ?? '', register: a.register || 'secondary', action: a.action || 'act', value: a.value ?? i.value ?? '', waiting: !!a.waiting, busy: !!a.busy, id: aid, labelledby: `${aid} ${tid}` };
+      if (l.str) { props.strs = { label: l.str }; if (l.args) props.args = { label: l.args }; }
+      return `<div class="tk-day-row" data-act=""${i.mark === 'done' ? ' data-done=""' : ''}>${main}${UI.button(props)}</div>`;
+    }).join('');
+    return `<section class="tk-day" data-ds="TaskDay"${L(label ?? title)}><header class="tk-day-head"><strong>${parts(title)}</strong>${status ? `<span>${parts(status)}</span>` : ''}</header>${rows}</section>`;
+  }
+
+  /* ---- TaskHold binding: SentriUI.holdBind, with farrowing's caption — the caption (`HOLD TO END`) stays as it is through
+     the hold (farrowing shows only the sweep); the cues still reach the hold's status line (statusId) when there is one.
+     The unknown phase keeps the Button card's message. Same options and return as SentriUI.holdBind. ---- */
+  function holdBind(scope, opts = {}) {
+    const UI = root.SentriUI, sel = opts.selector || '.st-hold', idle = new WeakMap();
+    const keep = b => { const c = b && b.querySelector('.st-hold-caption'); if (c && b.getAttribute('data-phase') === 'idle') idle.set(b, c.outerHTML); };
+    scope.querySelectorAll(sel).forEach(keep);
+    const early = e => { const b = e.target.closest && e.target.closest(sel); if (b) keep(b); };
+    scope.addEventListener('pointerdown', early, true);
+    scope.addEventListener('keydown', early, true);
+    const onPhase = opts.onPhase;
+    return UI.holdBind(scope, Object.assign({}, opts, { onPhase(b, phase, cue) {
+      const c = b.querySelector('.st-hold-caption');
+      if (phase !== 'unknown' && c && idle.has(b) && c.outerHTML !== idle.get(b)) c.outerHTML = idle.get(b);
+      if (onPhase) onPhase(b, phase, cue);
+    } }));
   }
 
   /* ---- TaskDoors: a list of doors. card: false (default) — flat door rows (SentriTask.door, no id column).
@@ -251,8 +325,11 @@
   }
 
   /* ---- TaskDock ---- */
-  function dock({ primary, tools = [] } = {}) {
-    const p = primary ? `<button type="button" class="tk-dock-primary"${A(primary.action, primary.value)}>${primary.icon ? glyph(primary.icon) : ''}<span>${T(primary.label)}</span></button>` : '';
+  /* unit: farrowing's labelled place control at the dock's start (B1 / Go to pen): { icon = 'grid', label, caption, action,
+     value, aria } — the place in 13px/600 mono over a 9px caption, the icon left, no frame. */
+  function dock({ primary, tools = [], unit } = {}) {
+    const u = unit ? `<button type="button" class="tk-dock-unit"${A(unit.action || 'unit', unit.value)}${L(unit.aria)}>${glyph(unit.icon || 'grid')}<span><strong>${T(unit.label)}</strong>${unit.caption ? `<small>${T(unit.caption)}</small>` : ''}</span></button>` : '';
+    const p = u + (primary ? `<button type="button" class="tk-dock-primary"${A(primary.action, primary.value)}>${primary.icon ? glyph(primary.icon) : ''}<span>${T(primary.label)}</span></button>` : '');
     const t = tools.map(x => `<button type="button" class="tk-dock-tool"${A(x.action, x.value)}${L(x.label)}>${glyph(x.icon)}</button>`).join('');
     return `<nav class="tk-dock" data-ds="TaskDock"${L(tools.label)}>${p}${t}</nav>`;
   }
@@ -268,8 +345,14 @@
     let s = '';
     if (status) {
       const id = status.id || 'tk-footer-status';
-      const act = status.action ? button(Object.assign({ register: 'text' }, status.action)) : '';
-      s = act
+      // Farrowing draws no line above a footer: the status is read (role=status, the primary's / hold's description) but
+      // visually hidden, unless the page opts in (`visible: true`, e.g. after a tap on the waiting primary).
+      // A line that carries a text action (`17 is right`) is shown unless the page says `visible: false`: its act must be
+      // reachable.
+      const vis = status.visible != null ? !!status.visible : !!status.action, hid = vis ? '' : ' st-visually-hidden';
+      const act = vis && status.action ? button(Object.assign({ register: 'text' }, status.action)) : '';
+      if (!vis) s = `<p class="tk-footer-status${hid}" id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>`;
+      else s = act
         ? `<div class="tk-footer-status" data-action-slot><p id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>${act}</div>`
         : `<p class="tk-footer-status" id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>`;
       if (h && !h.statusId) h = Object.assign({}, h, { statusId: id });
@@ -317,7 +400,7 @@
       <div class="tk-dialog-body"><h2 class="tk-dialog-title">${icon ? glyph(icon) : ''}${T(title)}</h2>${description ? `<p class="tk-dialog-desc">${parts(description)}</p>` : ''}${body}</div>${f}</div></div>`;
   }
 
-  const api = { T, statusbar, phone, screen, header, latest, summary, progress, lens, list, group, row, door, doors, radios, warning, table, metrics, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
+  const api = { T, statusbar, phone, screen, header, latest, summary, progress, lens, list, group, row, door, doors, radios, warning, section, receipt, day, holdBind, table, metrics, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
   root.SentriTask = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);

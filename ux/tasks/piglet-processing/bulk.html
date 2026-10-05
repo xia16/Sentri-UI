@@ -96,7 +96,7 @@
      how: 'select' (a tick), 'door' (its sheet), 'static' (held after the record, no action). */
   function chip(r) {
     if (r.sowDied) return s('pp.bulk.chip.sowdied', null, 'red');
-    if (r.kind === 'done') return s('pp.bulk.chip.done');
+    if (r.kind === 'done') return r.collided ? s('pp.bulk.chip.check', null, 'amber') : s('pp.bulk.chip.done');
     if (r.phase === 'open') return s('pp.bulk.chip.open', null, 'amber');
     return null;
   }
@@ -108,7 +108,7 @@
       return h;
     }
     if (r.kind === 'done') {
-      if (r.collided) return [s('pp.room.tok.collide', { n: r.records.length }, 'amber')];
+      if (r.collided) return [s('pp.bulk.row.collide', { n: r.records.length }, 'amber')];
       var n = r.records.reduce(function (a, x) { return a + x.n; }, 0);
       return [s(one('pp.common.unit.piglet', n), { n: n })];
     }
@@ -328,7 +328,7 @@
     }
     render();
     // The review closes with a hold (TaskHold): the record is one act for every ticked litter.
-    holds = UI.holdBind(scr, { t: function (id) { return PP.t(id); },
+    holds = K.holdBind(scr, { t: function (id) { return PP.t(id); },
       cues: { keep: 'pp.bulk.hold.keep', tap: 'pp.bulk.hold.tap', released: 'pp.bulk.hold.released', disarmed: 'pp.bulk.hold.released', again: 'pp.bulk.hold.again', early: 'pp.bulk.hold.again' },
       onCommit: function (el) {
         holds.settle(el, 'done');
