@@ -66,6 +66,12 @@ try {
   assert.match(await status(page), /Last 004301 · boar · 1\.42 kg/);
   // piglet 2: the suggestion (004302), a gilt, then the visible Clear takes the sex back to missing, then gilt again
   assert.match(await text(page, '.st-numpad-readout'), /004302/);
+  // R2-1: the greyed next tag is never recorded by an empty Record: it refuses, visibly, and "Use 004302" is the explicit tap
+  await record(page);
+  assert.match(await status(page), /No tag yet/);
+  assert.match(await progress(page), /Piglet 2 of 12/);
+  await tap(page, '[data-action="numpad-suggestion"]');
+  assert.match(await text(page, '.st-numpad-readout'), /004302/);
   await tap(page, '#id-sex [data-value="g"]');
   await tap(page, '[data-action="sex-clear"]');
   assert.equal(await page.locator('#id-sex [aria-checked="true"]').count(), 0);
@@ -126,9 +132,15 @@ try {
   await toTable(page);
   await tap(page, '[data-action="open-weight"]');
   await keys(page, '168', 'lw');
+  // R2-27: the pad is up and the boar/gilt counts are on its status line, above the keys, in view (never covered)
+  const cb = await page.locator('[data-action="to-counts"]').boundingBox(), pb = await page.locator('#id-lw-pad .st-numpad-key').first().boundingBox();
+  assert.ok(cb && pb && cb.y + cb.height <= pb.y + 1, 'the counts sit above the pad');
+  assert.match(await text(page, '[data-action="to-counts"]'), /Boars 0 · Gilts 0 · \d+ not identified/);
   await tap(page, '[data-action="numpad"][data-value="lw"][data-key="5"]');
   assert.match(await text(page, '#id-lw-pad .st-numpad-hint'), /3 digits before the point at most/);
-  await tap(page, '[data-action="to-counts"]');                                   // the pad steps aside: the counts are in view
+  const cb2 = await page.locator('[data-action="to-counts"]').boundingBox();         // still in view beside the note
+  assert.ok(cb2 && cb2.y + cb2.height <= pb.y + 1, 'the counts pointer stays above the keys beside a note');
+  await tap(page, '[data-action="to-counts"]');                                      // a tap steps the pad aside
   assert.equal(await page.locator('#id-lw-pad').count(), 0);
   assert.match(await text(page, '[data-ds="Measure"][data-field="lw"]'), /Not recorded · over 72 kg for 12 piglets/);
   assert.equal(await page.locator('[data-st-context="drawer"] [data-action="save"]').count(), 0);
@@ -145,7 +157,7 @@ try {
   assert.match(await text(page, '[data-ds="Measure"][data-field="lw"]'), /16\.8/);
   await tap(page, '[data-st-context="drawer"] [data-action="save"]');
   const tiles = await text(page, '[data-ds="Facts"]');
-  const [, boars, gilts] = tiles.match(/Boars (\d+) Gilts (\d+)/);
+  const [, boars, gilts] = tiles.match(/All boars (\d+) All gilts (\d+)/);
   const rc = await text(page, '.id-group[role="status"]');
   assert.match(rc, new RegExp(`Saved · 16\\.8 kg · ${boars} boars? · ${gilts} gilts? in all`));
   console.log('ok 4 litter weight: 168 refused, counts reachable, kept through Close, saved:', rc.slice(0, 60), '| tiles', tiles);
@@ -161,15 +173,53 @@ try {
   });
   assert.equal(inked, true);
   assert.match(await status(page), /All 12 alive identified/);
+  // R2-27: all identified — the pad's keys are dead (no tag readout, no Scan), the table offers no Record
+  assert.equal(await page.locator('#id-pad [data-action="numpad"]:not([aria-disabled="true"])').count(), 0);
+  assert.equal(await page.locator('[data-action="scan"]').count(), 0);
+  await tap(page, '#id-pad [data-action="numpad"][data-key="5"]');
+  assert.equal(await page.locator('#id-pad .st-numpad-readout').count(), 0);
+  await toTable(page);
+  assert.equal(await page.locator('[data-view="table"] [data-action="open-run"]').count(), 0);
+  assert.match(await text(page, '[data-ds="Facts"]'), /Identified 12 of 12 .*All boars .*All gilts/);
+  await tap(page, '[data-view="table"] .tk-footer [data-action="leave"]');
+  await page.goto(base + 'id.html?state=id-all&fresh=1'); await ready(page);
+  // R2-9: "More than 12? Set count" opens Set count for this litter
+  await tap(page, '[data-action="set-count"]');
+  await page.waitForURL(/count\.html\?.*crate=A02/); await ready(page);
+  assert.match(await text(page, '#screen'), /Set count/);
+  await page.goto(base + 'id.html?state=id-all&fresh=1'); await ready(page);
   await toTable(page);
   await leave(page);
   await page.waitForURL(/room\.html\?.*state=litter.*crate=A02/);
   console.log('ok 5 all identified → Back');
 
+  // R2-9: a re-catch with a different sex/weight says before the tap what is not applied; R2-27: weigh-first keeps a way
+  // back to the tag, and a swallowed fast second tap says so.
+  await page.goto(base + 'id.html?state=id-entry&fresh=1'); await ready(page);
+  await tap(page, '#id-sex [data-value="g"]');
+  await tap(page, '[data-action="open-numpad"][data-value="weight"]');
+  await keys(page, '1.7', 'weight');
+  assert.equal(await page.locator('#id-pad [data-action="to-tag"]').count(), 1);   // weigh-first: the way back to the tag
+  await tap(page, '#id-pad [data-action="to-tag"]');
+  await keys(page, '004302');
+  assert.match(await status(page), /Piglet 2 · gilt not applied Different piglet\?/);
+  await tap(page, '.tk-footer [data-action="record"]');
+  await page.waitForTimeout(650);
+  await page.goto(base + 'id.html?state=id-entry&fresh=1'); await ready(page);
+  await tap(page, '[data-action="open-numpad"][data-value="weight"]');
+  assert.match(await text(page, '#id-pad'), /Back to tag|Back to ear tag/);
+  await tap(page, '#id-pad [data-action="to-tag"]');
+  await keys(page, '004399');
+  await tap(page, '.tk-footer [data-action="record"]');
+  await tap(page, '.tk-footer [data-action="record"]');                           // inside 600 ms: swallowed, and it says so
+  assert.match(await status(page), /Just recorded · tap Record again/);
+  console.log('ok R2 re-catch wording, weigh-first way back, swallowed tap cue, Set count');
+
   // 6. keepers farm: tag two, close the set, the closed set never says "so far" and says how to add a keeper.
   await page.goto(base + 'room.html?state=room&data=keepers&fresh=1'); await ready(page);
   await openIdentity(page, 'A07');
   await tap(page, '[data-action="open-run"]');
+  await tap(page, '[data-action="numpad-suggestion"]');
   await record(page);
   await toTable(page);
   assert.match(await text(page, '[data-ds="Facts"]'), /Tagged so far 10/);

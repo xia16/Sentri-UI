@@ -51,6 +51,10 @@
   var STATES = {
     'id-empty':           { data: 'base', l: 'A02' },
     'id-no-tag':          { data: 'base', l: 'A02', press: 'record' },
+    // R2-1: an empty tag field with the greyed next tag (never recorded): Record refuses, and "Use 004303" is the explicit tap
+    'id-ghost-refused':   { data: 'a02-tags-gh', l: 'A02', press: 'record' },
+    // R2-27: the weigh-first order (Weight tapped with no tag yet): the way back to the tag stays on the pad
+    'id-weight-first':    { data: 'base', l: 'A02', active: 'weight' },
     'id-entry':           { data: 'a02-tags-gh', l: 'A02' },
     'id-weight':          { data: 'a02-tags-gh', l: 'A02', sex: 'g', weight: '1.4', active: 'weight' },
     'id-warned':          { data: 'a02-tags-gh', l: 'A02', tag: '00430', sex: 'g', weight: '0.62', press: 'record' },
@@ -297,16 +301,22 @@
   }
   function signature() { return [run.tag.value, run.sex, run.weight, run.twin].join('|'); }
   function againPlan(hit) {        // a piglet caught again: posted facts stand, only missing ones are added
-    var r = hit.r, parts = [], differs = false, w = run.weight ? SentriUI.numpadCommit(run.weight, { decimals: 2 }) : null;
+    var r = hit.r, parts = [], skipped = [], added = [], differs = false, w = run.weight ? SentriUI.numpadCommit(run.weight, { decimals: 2 }) : null;
     if (r.sex) {
-      if (run.sex && run.sex !== r.sex) { parts.push(['pp.id.again.stays', { v: sexWord(r.sex) }]); differs = true; }
+      if (run.sex && run.sex !== r.sex) { parts.push(['pp.id.again.stays', { v: sexWord(r.sex) }]); skipped.push(sexWord(run.sex)); differs = true; }
       else parts.push(['pp.id.again.kept', { v: sexWord(r.sex) }]);
-    } else if (run.sex) parts.push(['pp.id.again.adds', { v: sexWord(run.sex) }]);
+    } else if (run.sex) { parts.push(['pp.id.again.adds', { v: sexWord(run.sex) }]); added.push(sexWord(run.sex)); }
     if (r.w) {
-      if (w && +w !== +r.w) { parts.push(['pp.id.again.stays', { v: kg(r.w) }]); differs = true; }
+      if (w && +w !== +r.w) { parts.push(['pp.id.again.stays', { v: kg(r.w) }]); skipped.push(kg(w)); differs = true; }
       else parts.push(['pp.id.again.kept', { v: kg(r.w) }]);
-    } else if (w) parts.push(['pp.id.again.adds', { v: kg(w) }]);
-    return { parts: parts, differs: differs, adds: parts.filter(function (p) { return p[0] === 'pp.id.again.adds'; }).length };
+    } else if (w) { parts.push(['pp.id.again.adds', { v: kg(w) }]); added.push(kg(w)); }
+    return { parts: parts, differs: differs, skipped: skipped, added: added, adds: added.length };
+  }
+  // The two doors of a caught-again tag: back to this piglet's facts, or the other one (Different piglet). Said before the tap.
+  function againHere(hit) {
+    // One short line (the pad's status holds a line and its pointer): what entered will not be applied, else what it adds.
+    var p = againPlan(hit), a = { tag: idText(hit.r), i: hit.i + 1, what: (p.skipped.length ? p.skipped : p.added).join(', ') };
+    return { id: p.skipped.length ? 'pp.id.hint.again_here_not' : p.adds ? 'pp.id.hint.again_here_adds' : 'pp.id.hint.again_here', args: a };
   }
   var joinParts = function (parts) { return parts.map(function (p) { return PP.t(p[0], p[1]); }).join(' · '); };
   var setCount = function () { return { label: '', action: 'set-count', strs: { label: 'pp.id.ptr.set_count' }, args: { label: { n: alive() } } }; };
@@ -326,8 +336,8 @@
     if (hit) {
       // Caught again is the primary; a different piglet with the same printed tag is offered beside it, on the same line
       // (the fields show what the record holds; after Record the line says what was added and what stayed).
-      if (canTwin(hit)) return { id: 'pp.id.hint.again_here', args: { tag: idText(hit.r), i: hit.i + 1 }, tone: 'warn',
-        actions: [{ label: '', action: 'twin', value: 'other', strs: { label: 'pp.id.ptr.twin' } }] };
+      if (canTwin(hit)) { var ah = againHere(hit); return { id: ah.id, args: ah.args, tone: 'warn',
+        actions: [{ label: '', action: 'twin', value: 'other', strs: { label: 'pp.id.ptr.twin' } }] }; }
       var p = againPlan(hit);
       return { id: 'pp.id.hint.again', args: { tag: idText(hit.r), i: hit.i + 1, what: joinParts(p.parts) }, tone: 'warn',
         actions: p.differs ? [{ label: '', action: 'edit-row', value: key(hit.r), strs: { label: 'pp.id.ptr.edit_piglet' }, args: { label: { i: hit.i + 1 } } }] : [] };
@@ -343,7 +353,7 @@
       var mine = log.length > visitStart && r.who === ME && !last.again && !r.gone && !draftDirty();   // Undo never overwrites a draft
       return { id: base, args: a, tone: r.dup || tw ? 'warn' : '', actions: mine ? [{ label: '', action: 'undo', strs: { label: 'pp.id.ptr.undo' } }] : [] };
     }
-    if (run.tag.suggested) return { id: notch ? 'pp.id.hint.next_notch' : 'ds.field.numpad.suggested' };
+    if (run.tag.suggested) return { id: notch ? 'pp.id.hint.next_notch' : 'pp.id.hint.next_tag' };
     return null;
   }
 
@@ -359,13 +369,26 @@
     if (i > alive()) return { head: ['pp.id.run.head_open', { i: i }], tag: tag, weight: weight };
     return { head: ['pp.id.run.head', { i: i, n: alive() }], tag: tag, weight: weight };
   }
+  // Every alive piglet identified, nothing in hand: the pad has nothing to take (its keys are dead, no tag readout, no Scan);
+  // the status line keeps the one way on (Set count).
+  function idle() { return allIn() && !hitNow() && !draftDirty(); }
   function pad() {
     var o = { id: 'id-pad', compact: true, strs: Object.assign({}, padStrs), args: {} };
+    if (face === 'run' && idle() && run.active === 'tag') {
+      Object.assign(o, { key: 'tag', value: '', maxLength: 0 });
+      var si = status();
+      if (si && si.id) { o.hint = ''; o.strs.hint = si.id; o.args.hint = si.args || null; }
+      if (si && si.actions) o.actions = si.actions;
+      return UI.numpad(o).replace(/class="st-numpad-key"/g, 'class="st-numpad-key" aria-disabled="true"');
+    }
     var s;
     if (run.active === 'weight') {
       Object.assign(o, { key: 'weight', value: run.weight, decimals: 2, intLength: 2 });
       s = run.note || (run.armed ? status() : null);
-      if (!s && run.tag.value) s = { actions: [{ label: '', action: 'to-tag', strs: { label: 'pp.id.ptr.back_tag' }, args: { label: { tag: idOf(run.tag.value) } } }] };
+      // weigh-first: the way back to the tag is always on the pad, with or without a tag typed yet
+      // (a warning on the line is the answer to its own Record; beside a short note the pointer shortens)
+      if (!run.armed && (!s || !s.actions)) s = Object.assign({}, s, { actions: [run.note ? { label: '', action: 'to-tag', strs: { label: notch ? 'pp.id.ptr.back_notch_short' : 'pp.id.ptr.back_tag_short' } } : run.tag.value && !run.tag.suggested ? { label: '', action: 'to-tag', strs: { label: 'pp.id.ptr.back_tag' }, args: { label: { tag: idOf(run.tag.value) } } }
+        : { label: '', action: 'to-tag', strs: { label: notch ? 'pp.id.ptr.back_notch_none' : 'pp.id.ptr.back_tag_none' } }] });
     } else {
       var lab = runLabels().tag;
       Object.assign(o, { key: 'tag', label: '', value: run.tag.value, suggested: run.tag.suggested, maxLength: notch ? NOTCHLEN : TAGLEN });
@@ -377,8 +400,9 @@
       if (s.tone) o.tone = s.tone;
       if (s.actions) o.actions = s.actions;
     }
-    if (run.active === 'tag' && !run.tag.value && run.tag.suggestion && !(s && s.actions && s.actions.length)) {
-      o.actions = [{ label: '', action: 'numpad-suggestion', strs: { label: 'ds.field.numpad.use_suggestion' }, args: { label: { tag: idOf(run.tag.suggestion) } } }];
+    // The greyed next tag is never recorded on its own: "Use 004303" is the explicit tap, beside whatever else the line offers.
+    if (run.active === 'tag' && !run.note && (!run.tag.value || run.tag.suggested) && run.tag.suggestion && !(s && s.actions && s.actions.some(function (x) { return x.action === 'numpad-suggestion'; }))) {
+      o.actions = (o.actions || []).concat([{ label: '', action: 'numpad-suggestion', strs: { label: 'ds.field.numpad.use_suggestion' }, args: { label: { tag: idOf(run.tag.suggestion) } } }]);
     }
     // Scan reads the tag in hand (the camera): the tag pad's last status action on a tag farm, always there.
     var html = UI.numpad(o);
@@ -498,7 +522,8 @@
     var body = '<div class="id-stack">' + factsBlock() + overStrip() + keepersBlock() + weighSection() + rowsSection() + '</div>';
     var p = draftDirty() ? ['pp.id.act.record_resume', { n: 1 }] : ['pp.id.act.record', null];
     // A closed candidate set takes no records until Edit reopens it: Back alone.
-    var primary = keepers && closed ? null : { label: s(p[0], p[1] || undefined), action: 'open-run' };
+    // every alive piglet identified (and none in hand) leaves nothing to record: Back alone
+    var primary = keepers && closed || idle() ? null : { label: s(p[0], p[1] || undefined), action: 'open-run' };
     return K.page({ view: 'table', title: s('pp.id.table.title'), description: tableDesc(), body: body, inert: !!(drawer || confirm),
       footer: K.footer({ back: { action: 'leave' }, primary: primary }) });
   }
@@ -528,8 +553,10 @@
     if (state === 'refused') { o.tone = 'refused'; o.hint = ''; o.strs.hint = 'ds.field.measure.refused'; o.args.hint = { max: hardKg() * alive(), n: alive() }; }
     var cleared = drawer.w === '' && posted().w;       // removing a posted weight is a correction: Edit, not Save
     if (cleared && !drawer.active) { o.hint = ''; o.strs.hint = 'pp.id.lw.clear_edit'; o.args.hint = { w: posted().w }; }
-    var body = UI.measure(o);
-    if (rem > 0) {
+    var weightBox = UI.measure(o), counts = '';
+    // While the weight is typed the pad takes the sheet's lower half, so the counts move onto the pad's status line (their
+    // values in view, never covered; a tap steps the pad aside to change them). Otherwise the full steppers, above the weight.
+    if (rem > 0 && !drawer.active) {
       var step = function (k, label, desc, v, other, fromRows) {
         var cap = rem - other, ceil = drawer.ceil === k && v >= cap;
         return K.stepper({ face: 'row', label: '', description: '', value: v, min: 0, max: cap, key: k, action: 'count', draft: v > (L.sexCounts.saved || { boars: 0, gilts: 0 })[k], hint: ceil ? '' : undefined,
@@ -537,15 +564,16 @@
             ceil ? { hint: 'pp.id.lw.ceiling' } : {}),
           args: { description: { t: v + fromRows, k: fromRows }, hint: { r: rem } } });
       };
-      body += '<div class="id-group" id="id-lw-counts">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.id.lw.counts' }, args: { title: { r: rem } } }) +
+      counts = '<div class="id-group" id="id-lw-counts">' + UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.id.lw.counts' }, args: { title: { r: rem } } }) +
         step('boars', 'pp.id.lw.boars', 'pp.id.lw.boars_all', drawer.boars, drawer.gilts, t.rb) +
         step('gilts', 'pp.id.lw.gilts', 'pp.id.lw.gilts_all', drawer.gilts, drawer.boars, t.rg) + '</div>';
     }
+    // The boar and gilt counters sit above the weight, so the pad docked under the weight never covers them (R2-27).
+    var body = counts + weightBox;
     var dirty = drawerDirty(drawer);
-    // The pad's status line: why a key did nothing, the way to the counts it covers (the keys never hide them for good),
-    // or the correction a cleared weight needs.
+    // The pad's status line: why a key did nothing, or the correction a cleared weight needs (the counts are above, in view).
     var padActs = cleared ? [{ label: '', action: 'edit-weight', value: String(L.dayAge), strs: { label: 'pp.id.lw.edit_ptr' }, args: { label: { w: posted().w } } }]
-      : rem > 0 ? [{ label: '', action: 'to-counts', strs: { label: 'pp.id.lw.to_counts' }, args: { label: { r: rem } } }] : [];
+      : rem > 0 ? [{ label: '', action: 'to-counts', strs: { label: drawer.note ? 'pp.id.lw.counts_ptr' : 'pp.id.lw.counts_sum' }, args: { label: { b: drawer.boars, g: drawer.gilts, r: rem } } }] : [];
     var po = { id: 'id-lw-pad', key: 'lw', value: drawer.w, decimals: 1, intLength: LWINT, actions: padActs, strs: Object.assign({}, padStrs), args: {} };
     if (drawer.note) { po.hint = ''; po.strs.hint = drawer.note.id; po.args.hint = drawer.note.args || null; }
     // The pad docks between the body and the footer while the weight is typed; the footer stays the sheet's last child.
@@ -610,7 +638,8 @@
     }
     var r = SentriUI.numpadInput(run.tag, k, { maxLength: notch ? NOTCHLEN : TAGLEN });
     if (r.value !== run.tag.value) run.twin = false;
-    run.tag = { value: r.value, suggested: r.suggested, suggestion: r.suggestion };
+    // "Use 004303" is the worker's explicit tap: from then on it is the tag, not a ghost
+    run.tag = { value: r.value, suggested: k === 'suggestion' ? false : r.suggested, suggestion: r.suggestion };
     if (r.dead === 'empty') run.note = { id: 'ds.field.numpad.dead_empty' };
     // a digit past a full tag says why, once, on the tap (a full tag on its own says nothing)
     else if (r.dead === 'full') run.note = notch ? { id: 'pp.id.hint.notch_full', args: { n: NOTCHLEN } } : { id: 'ds.field.numpad.dead_full', args: { n: TAGLEN } };
@@ -641,10 +670,17 @@
   function rowById(id) { return rows.filter(function (r) { return r.rowId === id; })[0]; }
   function record() {
     var now = Date.now();
-    if (now - lastCommit < 600 || (run.armed && now - run.armedAt < 600)) return;   // repeat taps and the warning's first 600ms are ignored
-    var raw = run.tag.value, v = notch ? (raw ? String(+raw) : '') : raw;
+    // Repeat taps and the warning's first 600ms are ignored; a repeat right after a record says so (the warning stays in view itself).
+    if (run.armed && now - run.armedAt < 600) return;
+    if (now - lastCommit < 600) { if (!run.armed) { run.note = { id: 'pp.id.hint.wait_tap', tone: 'warn' }; render(); } return; }
+    // The greyed next tag is a suggestion, never a record: an empty field refuses, and "Use 004303" is the explicit tap.
+    var raw = run.tag.suggested ? '' : run.tag.value, v = notch ? (raw ? String(+raw) : '') : raw;
     // A row needs its identity: a tag on a tag farm, a notch number on a notch farm. Sex and weight never block.
-    if (!v) { run.active = 'tag'; run.note = { id: notch ? 'pp.id.hint.no_notch' : 'pp.id.hint.no_tag', tone: 'warn' }; render(); return; }
+    if (!v) {
+      run.active = 'tag'; run.note = { id: notch ? 'pp.id.hint.no_notch' : 'pp.id.hint.no_tag', tone: 'warn' };
+      if (run.tag.suggestion) run.note.actions = [{ label: '', action: 'numpad-suggestion', strs: { label: 'ds.field.numpad.use_suggestion' }, args: { label: { tag: idOf(run.tag.suggestion) } } }];
+      render(); return;
+    }
     // A notch number runs 1–99: 0 is not one, and the page says so instead of refusing in silence.
     if (notch && (+v < 1 || +v > NOTCHMAX)) { run.active = 'tag'; run.note = { id: 'pp.id.hint.notch_range', args: { id: idOf(v), max: NOTCHMAX }, tone: 'warn' }; render(); return; }
     var hit = find(v);
@@ -715,7 +751,7 @@
   }
 
   var scanner = SentriUI.numpadScanner({
-    onKey: function (k) { if (store && face === 'run' && !drawer && !confirm) { typeKey(k); render(); } },
+    onKey: function (k) { if (store && face === 'run' && !drawer && !confirm && !idle()) { typeKey(k); render(); } },
     onScan: function (d) { if (store && face === 'run' && !drawer && !confirm) { scanTag(d); render(); } }
   });
   document.addEventListener('keydown', function (ev) { if (store && face === 'run' && !drawer && !confirm && scanner.handle(ev)) ev.preventDefault(); });
@@ -731,7 +767,7 @@
         drawer.note = r.dead === 'empty' ? { id: 'ds.field.numpad.dead_empty' } : r.dead === 'full' && drawer.w.indexOf('.') < 0 ? { id: 'pp.id.lw.dead_int', args: { n: LWINT } }
           : r.dead ? { id: 'ds.field.numpad.dead_places', args: { n: 1 } } : null;
       }
-      else typeKey(b.dataset.key);
+      else if (!idle()) typeKey(b.dataset.key);
       render();
     } else if (a === 'numpad-suggestion') { typeKey('suggestion'); render(); }
     else if (a === 'scan') { scanTag(st.scan || run.tag.suggestion || BAG[crate] || ''); render(); }
@@ -747,6 +783,7 @@
     }
     else if (a === 'twin') { run.twin = v === 'other'; run.armed = ''; run.note = null; afterTag(); render(); }
     else if (a === 'record') record();
+    else if (a === 'set-count') { saveDraft(); location.href = PP.href('count.html', { state: 'count', crate: crate, data: store.name !== 'base' ? store.name : '' }); }
     else if (a === 'undo') { undo(); render(); }
     else if (a === 'close-set') { if (!over() && !pairs()) { confirm = true; render(); } }
     else if (a === 'confirm-back') { confirm = false; render(); }
