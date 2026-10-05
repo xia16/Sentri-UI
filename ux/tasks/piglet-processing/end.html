@@ -307,7 +307,7 @@
       if (e.kind === 'lower') return { title: '', strs: Object.assign({ title: 'pp.end.since.lower', detail: 'pp.end.since.void.detail' }, m), args: Object.assign({ title: { code: e.code, name: name(e.k), a: e.a, b: e.b } }, a) };
       if (e.kind === 'afterend') return { title: '', strs: Object.assign({ title: 'pp.end.since.afterend', detail: 'pp.end.since.afterend.detail' }, m), args: Object.assign({ title: { code: e.code, name: name(e.k), n: e.n }, detail: { date: date(e.stamped), time: time(e.stamped) } }, a) };
       if (e.kind === 'out') return { title: '', strs: Object.assign({ title: 'pp.end.since.move', detail: 'pp.end.since.out.detail' }, m), args: Object.assign({ title: { n: e.n, from: e.code, to: e.to }, detail: { unit: e.unit, n: e.n } }, a) };
-      return { title: '', strs: Object.assign({ title: 'pp.end.since.move', detail: 'pp.end.since.in.detail' }, m), args: Object.assign({ title: { n: e.n, from: e.from, to: e.code }, detail: { unit: e.unit, name: e.owes.map(name).join(' · ') } }, a) };
+      return { title: '', strs: Object.assign({ title: 'pp.end.since.move', detail: e.owes.length ? 'pp.end.since.in.detail' : 'pp.end.since.in.detail_plain' }, m), args: Object.assign({ title: { n: e.n, from: e.from, to: e.code }, detail: { unit: e.unit, name: e.owes.map(name).join(' · ') } }, a) };
     });
   }
   function sinceLog(bare) {

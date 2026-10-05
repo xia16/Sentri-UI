@@ -1003,6 +1003,7 @@
     "pp.end.since.edit.detail": {"en": "Edited · not castrated 1: cryptorchid", "zh": "修改 · 未阉割1头：隐睾", "kind": "body"},
     "pp.end.since.id.many": {"en": "{code} · {n} identity rows added", "zh": "{code} · 新增{n}条标识", "kind": "body"},
     "pp.end.since.id.one": {"en": "{code} · {n} identity row added", "zh": "{code} · 新增{n}条标识", "kind": "body"},
+    "pp.end.since.in.detail_plain": {"en": "From Unit {unit} · no marks after end", "zh": "来自{unit}单元 · 结束后不再记录", "kind": "body"},
     "pp.end.since.in.detail": {"en": "From Unit {unit} · {name} not done · no marks after end", "zh": "来自{unit}单元 · {name}未做 · 结束后不再记录", "kind": "body"},
     "pp.end.since.late": {"en": "{code} · {name} {n} · arrived after end", "zh": "{code} · {name}{n}头 · 结束后到达", "kind": "body"},
     "pp.end.since.late.detail": {"en": "Stamped {date} · {time}, before end · accepted", "zh": "记录时间{date} {time}，早于结束 · 已接受", "kind": "body"},
