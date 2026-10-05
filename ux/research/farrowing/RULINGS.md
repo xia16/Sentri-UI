@@ -547,3 +547,10 @@ investigation and not yet ruled.
 
 - **A sow outside the task who still has her own piglets joins the task as a whole when task piglets are moved onto her.** Her own piglets owe their doses on their own schedule too (often already late). The Move preview says so before the move is saved: "E01's own 7 piglets join too · owe Cut cord, Nasal drops (2 days late)".
 - **A possible double treatment gets a third answer: "Different piglets · both stand".** Both records count in full (e.g. 6 + 6 = 12 of 12), stamped with who answered. The other two answers are unchanged.
+
+### Round 7 (owner, 2026-10-05, after scenario round 3)
+
+- **Tagging follows each farm's own standard.** Some farms don't tag at all (e.g. fatteners handled as a batch); others notch, tag all, or tag keepers. Identity is owed only where the farm's scheme requires it, and then it counts like any other step the farm requires — so on a tagging farm a litter still owes today until it is tagged. A farm whose scheme is "no identity" owes no tagging and shows none. (Driver's reading: one combined "owe today", with the row saying what is left, e.g. "Treatments done · Tag 12 left"; a "none" identity scheme is added to the farm config.)
+- **Missed doses count as owed at End.** The room keeps them out of today's owed (Q15: past the last day, not overdue); at End, on the receipt and on the weaning handoff, a missed dose counts as owed / not done.
+- **Two phones recording one untagged death each on the same litter, neither seeing the other, with no open loss: soft-flagged for review** ("Same body recorded twice?") when the cause matches and they are within 30 minutes. Both count until answered.
+- **A correction may settle other litters' debts** (e.g. arrivals from the corrected litter), and the correction message always lists every litter whose owed figure moved.
