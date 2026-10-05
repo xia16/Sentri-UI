@@ -1,0 +1,72 @@
+/* Simple piglet processing: layout only, tokens from tokens.css. Everything else is the task skeleton. */
+
+/* the stack inside a sheet or a page body */
+.tk-sheet-body > * + *, .tk-page-body > * + * { margin-top: var(--space-heading); }
+.tk-sheet-body > .tk-stepper + .tk-stepper { margin-top: 0; }
+.tk-sheet-body > .tk-day + .tk-day { margin-top: var(--space-heading); }
+
+/* the receipt line after a save, with Undo */
+.sp-flash { display: flex; align-items: center; justify-content: space-between; gap: var(--space-footer-gap); min-height: var(--touch-min);
+  color: var(--green); font: 500 var(--type-row-title-size)/1.4 var(--font-sans); }
+.tk-scroll > .sp-flash { margin: 0 var(--space-gutter) 4px; }
+.sp-flash > span { min-width: 0; }
+
+/* a two-phone note on the list */
+.sp-note { margin: 0 var(--space-gutter) var(--space-heading); }
+
+/* plain lines under the Born / Alive / Dead panel */
+.sp-lines { margin: 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+.sp-lines > span + span { margin-left: 4px; }
+.sp-lines [data-tone="red"] { color: var(--red); }
+.sp-lines [data-tone="amber"] { color: var(--amber); }
+.sp-quiet { margin: 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+.sp-empty { margin: var(--space-section) var(--space-gutter); font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); text-align: center; }
+
+/* farrowing's in-sheet tool row (Record death · Move · Set count): outlined tools sharing the width */
+.sp-toolrow { display: flex; gap: 8px; }
+.sp-tool { flex: 1 1 0; min-width: 0; min-height: var(--touch-min); display: flex; align-items: center; justify-content: center; gap: 5px;
+  margin: 0; padding: 8px 6px; border: 1px solid var(--line); border-radius: var(--radius-segment); background: var(--paper); color: var(--ink);
+  font: 500 var(--type-identifier-size)/1.3 var(--font-sans); white-space: nowrap; cursor: pointer; }
+.sp-tool:active { background: var(--press); }
+.sp-tool svg { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 370px) { .sp-tool svg { display: none; } }
+
+/* a footer of two buttons (Cancel · Record anyway; Undo · Done) */
+.tk-footer.sp-two > * { flex: 1 1 0; min-width: 0; }
+
+/* ---- outside the phone: the demo controls ----
+   Wide window: a card beside (or under) the framed phone. Phone width: a small "Demo" pill on the status bar's empty
+   middle that opens the same card over the phone, so the page itself never scrolls. */
+.sp-demo { box-sizing: border-box; font: 13px/1.5 var(--font-sans); color: var(--ink); }
+.sp-demo button { font: inherit; color: inherit; cursor: pointer; }
+.sp-demo-panel { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.sp-demo-toggle { display: none; }
+@media (min-width: 431px) {
+  .sp-demo { width: 100%; max-width: var(--phone-width); margin: 0 auto; padding: var(--space-section) 0; }
+}
+@media (min-width: 900px) {
+  .sp-demo { position: fixed; top: var(--space-section); left: var(--space-section); width: 240px; margin: 0; padding: 16px;
+    border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
+}
+@media (max-width: 430px) {
+  .sp-demo { position: fixed; top: 6px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; align-items: center; }
+  .sp-demo-toggle { display: block; min-height: 30px; padding: 3px 14px; border: 1px solid var(--control-border); border-radius: 999px; background: var(--paper); font-size: 12px; }
+  .sp-demo[data-open="false"] .sp-demo-panel { display: none; }
+  .sp-demo-panel { width: min(300px, calc(100vw - 32px)); margin-top: 6px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-panel);
+    background: var(--paper); box-shadow: var(--shadow-dialog); }
+}
+.sp-demo-lang { display: flex; border: 1px solid var(--line); border-radius: var(--radius-segment); overflow: hidden; background: var(--paper); }
+.sp-demo-lang button { min-width: 56px; min-height: 36px; border: 0; background: transparent; }
+.sp-demo-lang button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.sp-demo-btn { min-height: 40px; padding: 8px 12px; border: 1px solid var(--control-border); border-radius: var(--radius-segment); background: var(--paper); text-align: left; }
+.sp-demo-tip, .sp-demo-msg { margin: 0; color: var(--muted); font-size: 12px; }
+.sp-demo-msg { color: var(--amber); }
+.sp-demo-link { padding: 0; border: 0; background: none; text-decoration: underline; color: var(--muted); }
+
+/* Move: the other pens as tiles, four to a line */
+.sp-pick > .st-heading { margin-bottom: 8px; }
+.tk-page-body > .sp-pick + * { margin-top: var(--space-section); }
+.tk-choice.sp-pens { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.sp-pens .tk-choice-tile { min-height: 60px; gap: 2px; padding: 8px 4px; }
+.sp-pens .tk-choice-tile strong { font: 600 var(--type-identifier-strong-size)/1.2 var(--font-mono); }
+.sp-pens .tk-choice-tile small { font-size: var(--type-meta-size); color: var(--muted); }
