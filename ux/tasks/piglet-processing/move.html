@@ -508,8 +508,8 @@
     var explain = S.explains ? heading(gainOnly() ? 'pp.move.explain.title_gain' : 'pp.move.explain.title', { code: receiver(), n: gainOnly() ? S.n : count() }) : '';
     // the question sits right under the crate, above the count and the rows (R1-31: never below the fold)
     var ask = S.other && dr.event ? askSection(dr) : '';
-    // why Move waits: the footer's status line, directly above the button it describes
-    var reason = p ? Object.assign({ id: 'mv-reason' }, s(p.id, p.args)) : null;
+    // why Move waits is said only when the worker taps it (a disabled primary stands alone above the footer, as farrowing's)
+    var reason = p && S.why ? Object.assign({ id: 'mv-reason' }, s(p.id, p.args)) : null;
     var body = explain + directionSection() + crateSection() + pairSection() + ask + countSection() + review(dr);
     // Clear drops the draft (and an explaining link) while there is one to drop
     var clear = draftExists() || S.explains ? UI.button({ label: '', register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '';
@@ -594,6 +594,7 @@
     var b = ev.target.closest('[data-action]');
     if (!b) return;
     var a = b.dataset.action, v = b.dataset.value;
+    if (a !== 'save-move') S.why = false;                      // any other act takes the answered reason away
     if (a === 'pick-row' || a === 'pair-loss') v = b.value;  // a multi row's checkbox carries its id as value
     if (a === 'pick-crate') {
       S.other = v; S.query = ''; S.scanned = ''; S.rows = []; S.untagged = 0; S.answers = {};
@@ -624,7 +625,11 @@
     else if ((a === 'back' || a === 'dismiss') && S.view === 'receipt') { S.view = 'face'; render(); }
     else if (a === 'back' || a === 'dismiss') { location.href = litterHref(S.face); }
     else if (a === 'open-move') { S.view = 'move'; S.fromFace = true; S.kept = false; render(); }
-    else if (a === 'save-move') { if (waiting(b)) return; post(); render(); }
+    // a tap on a waiting Move says why: the reason line appears above the footer and is announced
+    else if (a === 'save-move') {
+      if (b.getAttribute('aria-disabled') === 'true') { S.why = true; render(); UI.guard(document.querySelector('[data-action="save-move"]')); return; }
+      post(); render();
+    }
     else if (a === 'open-resolve') { S.drawer = v; var kept = resolveDrafts[v]; S.had = kept ? kept.had : 0; S.rest = kept ? kept.rest : ''; render(); }
     else if (a === 'rest') { S.rest = v; render(); }
     else if (a === 'close-resolve') { resolveDrafts[S.drawer] = { had: S.had || 0, rest: S.rest }; S.drawer = ''; render(); }

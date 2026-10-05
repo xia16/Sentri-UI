@@ -1,8 +1,9 @@
 # Dead picker — data contract (slice 9, candidate; scenario round 1 fixes; round 5 look and feel)
 
 The one shared dead drawer (the DeadDrawer composition, page `dead.html`), drawn on the task skeleton (ADR 0003): a
-TaskSheet over the room — grab, title `Record death`, subtitle `A02 · 12 alive · 1 dead so far`, ✕ (Clear while a draft
-exists), divider, body, footer with Back + Save — and in the body farrowing's faces from the skeleton (TaskStepper row
+TaskSheet over the room — grab, title `Dead 2` as farrowing's (this entry's count; `Dead` at 0; `Sow died` on the sow
+tab; the door that opens it stays `Record death`), subtitle `A02 · 12 alive · 1 dead so far`, Clear (greyed while there is
+nothing to clear), divider, body, footer with Back + Save — and in the body farrowing's faces from the skeleton (TaskStepper row
 face for the causes and the `From the missing` answer, TaskPhotos, TaskRow door rows) and TaskRadios, TaskWarning beside the cards it keeps (Segment; the footer status slot for why Save waits; the hold; ADR 0002/0003). What is needed only sometimes sits one level down, in the
 same drawer (Back returns): the tagged piglets, the neighbours' losses, and the held-body question (a TaskDialog). Farrowing, the farrowing
 record, check-in and processing all open this component. It forks on **litter facts**, never on the
@@ -140,8 +141,8 @@ It is never silently a second death. Two deaths for one `rowId` keep the earlies
 - Staged: `Back`, the ✕, the scrim tap and a swipe down on the grab or head all keep the draft (one level down, they
   return to the drawer); `Clear` discards the
   mode on screen; `Save` commits.
-- Save is gray (`aria-disabled`, still focusable) whenever it cannot commit, and the reason line that closes the
-  body names the missing step (`Pick a cause for 271004`, `How many were missing?`); tapping the gray
+- Save is gray (`aria-disabled`, still focusable) whenever it cannot commit, and, once Save is tapped (the guard), the
+  footer's status line names the missing step (`Pick a cause for 271004`, `How many were missing?`); tapping the gray
   Save scrolls to that step, opening the tagged piglets when the step is there. An empty draft names itself only when Save is tapped.
 - Re-rendering keeps the body's scroll position and the focused control.
 - **Save and Back return to where the worker came from (R1-26)**: the page named by `back` (Explain), else the litter drawer over the room (`room.html?state=litter&crate=A02`). There is no host stub and no extra Back. Save hands its receipt over on the phone

@@ -77,11 +77,25 @@
                                        open|unresolved_at_end, … }], n, answeredAfterEnd }
      select.end(d).atEnd.reviews       round 4 review items frozen `unresolved_at_end` (End is never blocked by them)
      select.doubleDraft(d, draft)      round 4 { litter, dose, records, answer: same|twice, withdraw? } → { why, event, after }
+   People (farrowing's names): person(who, derived|config?) → `G. Hansen` for `G.H` (config.people, else definePeople's
+     map — the fixtures define theirs; unknown initials stay); lastEvent.whoName, lastRecord.whoName and the room's
+     lastRecord.whoName carry it. PPLedger.person / PPLedger.definePeople in the browser.
    New events: `double { litter, dose, records, answer, withdraw? }` · `check { litter, dose, owed }` (settle a range) ·
    death lines `{ cause, rowId, fromLoss }` · corrections on a death: `{ target, void }` | `{ target, set: { litter } }`.
 */
 
 const DAY_MS = 86400000;
+
+/* People (farrowing's names): events carry a hand's initials (`who: 'G.H'`); pages show the full name (`G. Hansen`). The farm's
+   people come from config (`people: { 'G.H': 'G. Hansen' }`), or from `definePeople` (the fixtures define theirs). Unknown
+   initials stay as they are. */
+let definedPeople = {};
+export function definePeople(map) { definedPeople = Object.assign({}, map || {}); }
+export function person(who, from) {
+  if (who == null || who === '') return who == null ? null : who;
+  const map = from && from.config && from.config.people ? from.config.people : from && from.people ? from.people : definedPeople;
+  return map[who] || definedPeople[who] || who;
+}
 const CROWDED = 16;                   // a sow nurses about 14; more than 16 in one crate is worth a second look (R1-31)
 
 // ---------------------------------------------------------------------------------------------
@@ -340,6 +354,7 @@ function normalizeConfig(config) {
       product: d.product == null ? null : d.product, amount: d.amount == null ? null : d.amount
     })),
     identity: Object.assign({ scheme: 'none', who: 'all', day: null }, c.identity || {}),
+    people: Object.assign({}, definedPeople, c.people || {}),
     tasks, task: tasks[0] || null
   };
 }
@@ -533,6 +548,7 @@ function replay(log, effective, fresh, cfg, causal, today) {
         L.lastEvent = { id: e.id, type: e.type, at: (via && via.at) || e.at || null, who: (via && via.who) || e.who || null, actAt: e.at || null, dose: e.dose || null, tx: dc ? dc.tx : null,
           n: e.type === 'treat' ? (e.castration ? e.castration.castrated || 0 : e.n) : e.type === 'move' ? e.n : e.type === 'death' ? (e.lines || []).reduce((s, l) => s + (l.rowId ? 1 : l.n || 0), 0) : e.type === 'weaned' ? e.n : null,
           observed: e.type === 'count' ? e.observed : null, via: e.viaCorrection || null };
+        L.lastEvent.whoName = person(L.lastEvent.who, ctx.cfg);          // the full name (farrowing's names)
       }
     } catch (err) {
       if (!(err instanceof Reject)) throw err;
@@ -1356,7 +1372,7 @@ function record(ctx, L, d, e, fields) {
     dayAge, timing, onTime: timing === 'early' || timing === 'on_time',
     at: e.at || null, who: e.who || null, device: e.device || null, viaCorrection: e.viaCorrection || null, from: e.viaCorrection ? e.from || null : null
   }, fields);
-  L.lastRecord = { id: e.id, dose: d.id, at: e.at || null, who: e.who || null, day: dayNumber(e.at) };
+  L.lastRecord = { id: e.id, dose: d.id, at: e.at || null, who: e.who || null, whoName: person(e.who || null, ctx.cfg), day: dayNumber(e.at) };
   return rec;
 }
 
@@ -2808,6 +2824,6 @@ function doubleDraftSelect(derived, draft, stamp) {
 }
 
 export const select = { doubleDraft: doubleDraftSelect, balance: balanceSelect, identityDue: identityDueSelect, reviews: reviewsSelect, findId, room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect, bulkDraft: bulkDraftSelect, countDraft: countDraftSelect, explain: explainSelect, counts: countsSelect, record: recordSelect, edit: editSelect };
-export const PPLedger = { derive, append, balances, dayNumber, select };
+export const PPLedger = { derive, append, balances, dayNumber, select, person, definePeople };
 export default PPLedger;
 if (typeof window !== 'undefined') window.PPLedger = PPLedger;

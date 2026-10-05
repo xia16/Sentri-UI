@@ -124,9 +124,9 @@ try {
   // it save. R1-11: the gain says "check on the pig" (it owes nothing new).
   await toCount('A02');
   await step(1, 5);
-  assert.match(await text(page, '#ct-why'), /17 piglets is 5 more than the record's 12 piglets · count again, or say it's right/);
   assert.match(await text(page, '[data-ds="Stepper"]'), /recorded treatments stand · check on the pig/);
-  await page.click('[data-action="save"]', { force: true });
+  await page.click('[data-action="save"]', { force: true });                      // a waiting Save says why once tapped
+  assert.match(await text(page, '#ct-why'), /17 piglets is 5 more than the record's 12 piglets · count again, or say it's right/);
   assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
   await page.click('[data-action="sure"]');
   await page.click('[data-action="save"]');
@@ -148,6 +148,7 @@ try {
   await page.waitForURL(/count\.html/); await ready(page);
   assert.equal(await page.locator('[role="spinbutton"]').first().innerText(), '0');
   assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
+  await page.click('[data-action="save"]', { force: true });
   assert.match(await text(page, '#ct-why'), /0 writes all 11 piglets as missing/);
   await page.click('[data-target="zero"] [data-action="open-move"]');
   await page.waitForURL(/move\.html\?.*crate=B10/);
@@ -174,7 +175,7 @@ try {
   await page.waitForURL(/state=litter.*crate=B06.*saved=dead/); await ready(page);
   await page.waitForSelector('#lt-receipt span');
   assert.match(await text(page, '#lt-receipt'), /271004 crushed\s*·\s*all missing found/);
-  assert.match(await text(page, '[data-ds="Facts"]'), /Alive 11/);
+  assert.match(await text(page, '[data-ds="Facts"]'), /Alive now 11/);
   console.log('ok 10 a named missing piglet body closes its line:', await text(page, '#lt-receipt'));
 
   // 11. R1-22: a held body is answered in the Set count drawer, above the number (never under the sheet).
