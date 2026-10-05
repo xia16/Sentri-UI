@@ -526,6 +526,16 @@
         c.put(doseCfg(g.dose).due, 'recorded', null, citem({ title: txTok(g.dose), description: [P('pp.litter.twice.line', { stamp: stampText(x.at, x.who) }, 'amber')], mark: 'done' }));
       }); });
     }
+    /* Moves of this litter, one door each to Edit that Move (R2-22: the old Moves page lives in the drawer) */
+    function movesSection() {
+      var ms = (L().moves || []).slice().sort(function (a, b) { return a.at < b.at ? 1 : a.at > b.at ? -1 : 0; });
+      if (!ms.length) return '';
+      var rows = ms.map(function (m) {
+        var stamp = P('pp.common.stamp.' + (m.at && m.at.slice(0, 10) === TODAY.slice(0, 10) ? 'today' : 'date'), { date: U.date(m.at), t: U.time(m.at), who: m.who });
+        return cdoor({ title: [P('pp.move.title')], description: [P(m.dir === 'out' ? 'pp.edit.rec.move_out' : 'pp.edit.rec.move_in', { pigs: pigs(m.n), code: m.other }), stamp], action: 'open-edit', value: m.id, trail: 'edit' });
+      }).join('');
+      return '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.move.title' } }) + '<div class="lt-doors">' + rows + '</div></section>';
+    }
     function notesSection() {
       var rows = view().notes.map(function (n) {
         var r = recordOf(n.event) || { at: n.at, who: '' };
@@ -589,7 +599,7 @@
       if (!T && !v.closed && L().recordable) owedInto(c);
       recordedInto(c);
       if (!T && !v.closed) laterInto(c);
-      return '<div class="lt-face">' + receiptLine() + summary() + (x.phase === 'open' ? prelockDoor() : tools()) + main + c.html() + afterEndSection() + notesSection() +
+      return '<div class="lt-face">' + receiptLine() + summary() + (x.phase === 'open' ? prelockDoor() : tools()) + main + c.html() + movesSection() + afterEndSection() + notesSection() +
         recordGroup() + '</div>';
     }
 
