@@ -131,7 +131,7 @@ try {
   assert.equal(await has(page, '[data-action="lens"][data-value="owed"]'), false);
   assert.equal(await has(page, '.tk-summary-unit [data-str="pp.room.lead.many"]'), false);
   assert.match(await text(page, '[data-action="receipt"]'), /End receipt .*Task ended .*16:20 · G\.H/);
-  assert.match(await text(page, '.tk-summary-unit'), /6 litters unfinished at end/);
+  assert.match(await text(page, '.tk-summary-unit'), /4 litters unfinished at end/);
   assert.match(await text(page, '[data-action="reviews"]'), /unresolved at end/);
   assert.match(await rowText(page, 'B01'), /Castrate · 1 not done/);
   await page.click('[data-action="receipt"]');
