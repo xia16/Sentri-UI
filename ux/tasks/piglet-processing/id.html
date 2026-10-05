@@ -21,8 +21,19 @@
 /* The run: the piglet's fields scroll in the page body; the pad is pinned whole under them, above the footer, so every
    key is always on screen at one place (farrowing's entry) — at 360 × 740 the fields scroll, never the keys. */
 .id-run { display: flex; flex-direction: column; gap: var(--space-row-y); }
+.id-none-line { color: var(--muted); font-size: var(--type-choice-meta-size); }
+.id-dock > .st-button, .id-dock > button { width: 100%; margin-bottom: var(--space-row-y); }
 .id-pad-dock { flex: none; padding: var(--space-row-y) var(--space-gutter); background: var(--app-background); border-top: 1px solid var(--line); }
 .id-run > * { margin: 0; }
+/* R3-18: on a short phone (360 x 740) the pad compacts, so the Weight field above it is whole on screen, not under the pad. */
+@media (max-height: 800px) {
+  .id-pad-dock { padding-top: 6px; padding-bottom: 6px; }
+  .id-pad-dock .st-numpad-key.st-numpad-key, .id-dock .st-numpad-key.st-numpad-key { height: 44px; }
+  .id-pad-dock .st-numpad-keys, .id-dock .st-numpad-keys { gap: 6px; }
+  .id-dock { padding-top: 6px; padding-bottom: 6px; }
+  .id-dock > .st-button, .id-dock > button { margin-bottom: 6px; }
+  .id-run { gap: 8px; }
+}
 /* the ear-tag readout and its Scan control on one line (the Numpad card has no slot beside its readout) */
 .id-tag-line { display: flex; align-items: center; gap: var(--space-footer-gap); }
 .id-tag-line > .st-measure-box { flex: 1; min-width: 0; }
@@ -68,6 +79,12 @@
     'id-recatch':         { data: 'a02-tags-gh', l: 'A02', scan: '004302', weight: '1.4' },
     'id-recatch-edit':    { data: 'a02-tags-gh', l: 'A02', scan: '004301', sex: 'b' },
     'id-all':             { data: 'a02-tags-all', l: 'A02' },
+    // a farm whose standard is no identity (round 7): the page says so and records nothing
+    'id-none':            { data: 'base', l: 'A02', scheme: 'none' },
+    // a second weigh on a day that has one asks first; the old value stays on the record
+    'litter-weight-replace': { data: 'a02-tags-gh', l: 'A02', face: 'table', pre: [{ id: 'PRE-A02-lw1', type: 'litter_weight', litter: 'A02', kg: '18.6', day: 3 }], drawer: { w: '16.8', boars: 0, gilts: 0 }, press: 'save' },
+    // after Replace: today's row shows the new weight and, amber, the one it replaced
+    'litter-weight-replaced': { data: 'a02-tags-gh', l: 'A02', face: 'table', pre: [{ id: 'PRE-A02-lw1', type: 'litter_weight', litter: 'A02', kg: '18.6', day: 3 }, { id: 'PRE-A02-lw2', type: 'litter_weight', litter: 'A02', kg: '16.8', day: 3 }] },
     'id-over':            { data: 'a02-tags-over', l: 'A02', face: 'table' },
     'id-early':           { data: 'base', l: 'C02' },
     'id-candidates':      { data: 'keepers', l: 'A07' },
@@ -107,7 +124,7 @@
   var qs = PP.q;
   var name = STATES[PP.state] ? PP.state : 'id-empty';
   var st = STATES[name];
-  var store, crate, F, L, notch, keepers, NOW;
+  var store, crate, F, L, notch, keepers, none, NOW;
   var rows = [];                          // this litter's identity rows (the ledger's), in the page's shape
   var twins = {};                         // rowId → the row it shares a printed tag with (recorded as a different piglet)
   var log = [];                           // every Record this visit and before, in order; the status line shows the newest
@@ -149,8 +166,9 @@
     }
   }
   function loadWeights() {
-    lwRecs = store.weights(crate).filter(function (x) { return x.at; }).map(function (x) {
-      return { w: x.kg, day: x.day, at: x.at, who: x.who,
+    // The derived litter keeps the values a re-weigh replaced (`replaced`); the store's `weights()` view does not carry them.
+    lwRecs = (store.derived.litters[crate].weights || []).filter(function (x) { return x.at; }).map(function (x) {
+      return { w: x.kg, day: x.day, at: x.at, who: x.who, was: (x.replaced || []).length ? x.replaced[x.replaced.length - 1].kg : '',
         conflicts: (x.conflicts || []).map(function (c) { return { w: c.kg, at: c.at, who: c.who }; }) };
     });
   }
@@ -247,7 +265,7 @@
   // The sow's number is on the records page; here the line keeps to what the worker needs piglet by piglet.
   function runDesc() {
     var k = distinct().length, id, args;
-    if (keepers) { id = closed ? 'pp.id.prog.keep_done' : 'pp.id.prog.keep'; args = { k: closed ? closed.k : k, n: alive() }; }
+    if (keepers) { id = closed ? PP.one('pp.id.prog.keep_done', closed.k) : 'pp.id.prog.keep'; args = { k: closed ? closed.k : k, n: alive() }; }
     else if (over()) { id = 'pp.id.prog.over'; args = { k: k, n: alive() }; }
     else { id = 'pp.id.prog.k_of_n'; args = { k: k, n: alive() }; }
     // the piglet in hand, said once (`Piglet 4 of 12`: three are in); records past alive or every piglet in say the litter's count
@@ -427,6 +445,13 @@
   // Every alive piglet identified: nothing to record, Back alone (filled, the page's one way on).
   function runPage() {
     var p = primary();
+    // R3-18: every alive piglet identified, none in hand: no pad, no sex, no weight to type into (a weight typed there
+    // would be swallowed). One door row says so and offers Set count; Back is the page's way out.
+    if (idle() && run.active === 'tag') {
+      return K.page({ view: 'run', title: s('pp.id.run.title'), description: runDesc(), descriptionTone: '',
+        body: '<div class="id-run">' + door('pp.id.hint.all', { n: alive() }, s('pp.id.ptr.set_count', { n: alive() }), 'set-count') + '</div>', inert: !!(drawer || confirm),
+        footer: K.footer({ back: { action: 'to-table' }, primary: null }) });
+    }
     var body = '<div class="id-run">' + radio(run.sex) + weightField() + '</div>';
     return K.page({ view: 'run', title: s('pp.id.run.title'), description: runDesc(), descriptionTone: !keepers && over() ? 'amber' : '', body: body, inert: !!(drawer || confirm),
       // the pad docks between the body and the footer; the footer stays the page's last child
@@ -442,15 +467,16 @@
   }
   function factsBlock() {
     var k = distinct().length, t = tally(), hide = over() ? 'pp.id.fact.over' : t.unresolved ? 'pp.id.fact.unresolved' : '';
-    var idf = keepers && !closed ? { label: 'pp.id.fact.so_far', value: 'pp.id.fact.so_far_v', args: { k: k } }
+    var idf = keepers && closed ? { label: 'pp.id.fact.keepers', value: 'pp.id.fact.so_far_v', args: { k: closed.k } }
+      : keepers ? { label: 'pp.id.fact.so_far', value: 'pp.id.fact.so_far_v', args: { k: k } }
       : { label: 'pp.id.fact.identified', value: 'pp.id.fact.k_of_n', args: { k: Math.min(k, alive()), n: alive() } };
     return UI.facts([
       { label: '', value: '', meta: t.u ? '' : undefined, strs: Object.assign({ label: idf.label, value: idf.value }, t.u ? { meta: 'pp.id.fact.unsexed' } : {}), args: { value: idf.args, meta: { n: t.u } } },
       // Over alive the records cannot all be piglets, so the sex split is not printed until Edit resolves them (never past Alive).
       hide ? { label: '', value: '', meta: '', strs: { label: 'pp.id.fact.boars', value: 'ds.field.placeholder', meta: hide } } :
-      { label: '', value: '', strs: { label: 'pp.id.fact.boars', value: 'ds.field.figure' }, args: { value: { n: t.b } } },
+      { label: '', value: '', meta: t.cb ? '' : undefined, strs: Object.assign({ label: 'pp.id.fact.boars', value: 'ds.field.figure' }, t.cb ? { meta: 'pp.id.fact.not_id' } : {}), args: { value: { n: t.b }, meta: { n: t.cb } } },
       hide ? { label: '', value: '', meta: '', strs: { label: 'pp.id.fact.gilts', value: 'ds.field.placeholder', meta: hide } } :
-      { label: '', value: '', strs: { label: 'pp.id.fact.gilts', value: 'ds.field.figure' }, args: { value: { n: t.g } } }
+      { label: '', value: '', meta: t.cg ? '' : undefined, strs: Object.assign({ label: 'pp.id.fact.gilts', value: 'ds.field.figure' }, t.cg ? { meta: 'pp.id.fact.not_id' } : {}), args: { value: { n: t.g }, meta: { n: t.cg } } }
     ], { columns: 3 });
   }
   function overStrip() {             // records over alive, and any same-tag pair even when not over
@@ -463,7 +489,7 @@
   function keepersBlock() {
     if (!keepers) return '';
     if (closed) {                  // the closing count and stamp, not a live count; Edit (S8) reopens it to add a keeper, stamped
-      return door('pp.id.done.title', { k: closed.k }, s('pp.id.done.line', { k: closed.k, stamp: stamp(closed), r: Math.max(0, alive() - closed.k) }), 'edit-done', crate);
+      return door(PP.one('pp.id.done.title', closed.k), { k: closed.k }, s('pp.id.done.line', { k: closed.k, stamp: stamp(closed), r: Math.max(0, alive() - closed.k) }), 'edit-done', crate);
     }
     if (over() || pairs()) return UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.id.close.wait' } });
     return UI.button({ label: '', register: 'tool', action: 'close-set', strs: { label: 'pp.id.act.done' }, args: { label: { k: distinct().length } } });
@@ -478,7 +504,8 @@
         var c = x.conflicts[0];
         return door('pp.id.lw.rec', { day: x.day }, [s('pp.id.lw.value_conflict', { w: x.w, w2: c.w }), { sep: true }, Object.assign(s('pp.id.lw.check'), { tone: 'amber' })], 'edit-weight', String(x.day));
       }
-      return door('pp.id.lw.rec', { day: x.day }, s('pp.common.kg', { w: x.w }), x.day === L.dayAge ? 'open-weight' : 'edit-weight', String(x.day));
+      var kgLine = x.was ? [s('pp.common.kg', { w: x.w }), { sep: true }, Object.assign(s('pp.id.lw.was', { w: x.was }), { tone: 'amber' })] : s('pp.common.kg', { w: x.w });
+      return door('pp.id.lw.rec', { day: x.day }, kgLine, x.day === L.dayAge ? 'open-weight' : 'edit-weight', String(x.day));
     }).join('');
     if (!todays) {
       var tr = drawerKept && drawerDirty(drawerKept) ? Object.assign(s('status.unsaved', { n: 1 }), { tone: 'green' }) : s('ds.field.optional');
@@ -514,10 +541,16 @@
     if (!cur.length) return '';
     var dead = cur.filter(function (r) { return r.dead; }).length;
     // one card, farrowing's pen card with a word for its title; its header is the door to the litter's identity Edit
-    return K.group({ face: 'word', title: s('pp.id.sec.rows'), meta: s(dead ? 'pp.id.sec.rows_meta_dead' : 'pp.id.sec.rows_meta', { n: cur.length, d: dead }),
+    return K.group({ face: 'word', title: s('pp.id.sec.rows'), meta: s(PP.one(dead ? 'pp.id.sec.rows_meta_dead' : 'pp.id.sec.rows_meta', cur.length), { n: cur.length, d: dead }),
       door: { action: 'open-edit', value: crate }, rows: cur.map(tableRow) });
   }
   // Farrowing's Piglet records page: the facts, what needs a look, the weigh day, the identified piglets; Record identity.
+  // A farm whose standard is no identity (round 7): nothing is tagged or notched, so there is nothing to record here.
+  function nonePage() {
+    return K.page({ view: 'none', title: s('pp.id.table.title'), description: [litterDesc()],
+      body: '<div class="id-stack">' + UI.heading({ title: '', kind: 'group', level: 3, strs: { title: 'pp.id.none.title' } }) + '<p class="id-none-line" data-str="pp.id.none.line">' + PP.t('pp.id.none.line') + '</p></div>',
+      footer: K.footer({ back: { action: 'leave' }, primary: null }) });
+  }
   function tablePage() {
     var body = '<div class="id-stack">' + factsBlock() + overStrip() + keepersBlock() + weighSection() + rowsSection() + '</div>';
     var p = draftDirty() ? ['pp.id.act.record_resume', { n: 1 }] : ['pp.id.act.record', null];
@@ -573,17 +606,24 @@
     var dirty = drawerDirty(drawer);
     // The pad's status line: why a key did nothing, or the correction a cleared weight needs (the counts are above, in view).
     var padActs = cleared ? [{ label: '', action: 'edit-weight', value: String(L.dayAge), strs: { label: 'pp.id.lw.edit_ptr' }, args: { label: { w: posted().w } } }]
-      : rem > 0 ? [{ label: '', action: 'to-counts', strs: { label: drawer.note ? 'pp.id.lw.counts_ptr' : 'pp.id.lw.counts_sum' }, args: { label: { b: drawer.boars, g: drawer.gilts, r: rem } } }] : [];
+      : [];
     var po = { id: 'id-lw-pad', key: 'lw', value: drawer.w, decimals: 1, intLength: LWINT, actions: padActs, strs: Object.assign({}, padStrs), args: {} };
     if (drawer.note) { po.hint = ''; po.strs.hint = drawer.note.id; po.args.hint = drawer.note.args || null; }
     // The pad docks between the body and the footer while the weight is typed; the footer stays the sheet's last child.
-    var dock = drawer.active ? '<div class="id-dock">' + UI.numpad(po) + '</div>' : '';
+    // While the weight is typed the counters are one real button above the keys (a tap steps the pad aside onto them).
+    var countsBtn = rem > 0 ? UI.button({ label: '', register: 'tool', action: 'to-counts', strs: { label: 'pp.id.lw.counts' }, args: { label: { r: rem } } }) : '';
+    var dock = drawer.active ? '<div class="id-dock">' + countsBtn + UI.numpad(po) + '</div>' : '';
     // Save is withheld (not greyed) while nothing changed or the value is refused; the reason sits beside the value.
     var save = dirty && state !== 'refused' ? { label: s('act.save'), action: 'save' } : null;
+    // A second weight on the same day asks first (the old value stays on the record, stamped): the question is on the line
+    // above the footer, where the thumb is, and the primary becomes the answer.
+    var ask = drawer.replace && save && todayRec() ? todayRec() : null;
+    var status = ask ? { visible: true, str: 'pp.id.lw.replace', text: PP.t('pp.id.lw.replace', { w: ask.w }), args: { w: ask.w }, tone: 'amber', id: 'id-lw-replace' } : null;
+    if (ask) save = { label: s('pp.id.lw.replace_act'), action: 'save' };
     return K.drawer({ view: 'weigh', size: 'long', scrim: { action: 'back' }, close: { action: 'back' },
       aside: dirty ? UI.button({ label: '', register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '',
       title: s('pp.id.sec.weigh'), subtitle: s('pp.id.lw.sub', { n: alive(), d: L.dayAge }),
-      body: '<div class="id-group">' + body + '</div>', footer: dock + K.footer({ back: { action: 'back' }, primary: save }) });
+      body: '<div class="id-group">' + body + '</div>', footer: dock + K.footer({ back: { action: 'back' }, primary: save, status: status }) });
   }
   /* ---- closing the candidate set: one question (stamped; Edit reopens it) ---- */
   function confirmDialog() {
@@ -619,7 +659,7 @@
     var t = document.createElement('div');
     // the page (inert under the weigh drawer or the closing question), then the drawer or the dialog: after a page, the
     // skeleton stacks them above it
-    t.innerHTML = K.phone(taskScreen() + (face === 'run' ? runPage() : tablePage()) +
+    t.innerHTML = K.phone(taskScreen() + (none ? nonePage() : face === 'run' ? runPage() : tablePage()) +
       (drawer ? weightDrawer() : '') + (confirm ? confirmDialog() : ''), { label: s('pp.common.task') });
     PP.apply(t);
     morph(screen, (function () { var w = screen.cloneNode(false); while (t.firstChild) w.appendChild(t.firstChild); return w; })());
@@ -731,11 +771,13 @@
   }
   function openWeight() {
     var t = todayRec(), c = tally();              // opens clamped: counts already consumed by records are not offered again
-    drawer = drawerKept ? Object.assign({}, drawerKept, { active: false }) : { w: t ? t.w : '', active: !t, boars: c.cb, gilts: c.cg };
+    drawer = drawerKept ? Object.assign({}, drawerKept, { active: false, replace: false }) : { w: t ? t.w : '', active: !t, boars: c.cb, gilts: c.cg };
   }
   function saveWeight() {
     drawer.active = false; drawer.note = null;
     if (drawerState(drawer) === 'refused' || !drawerDirty(drawer)) return;
+    // a different weight on a day that already has one: ask before replacing it (the counts alone never ask)
+    if (wChange(drawer) && todayRec() && !drawer.replace) { drawer.replace = true; return; }
     // Only what changed is saved. One record per weigh day: a second weighing today replaces today's value
     // (the later stamp stands; the record keeps both).
     var w = wChange(drawer), cb = countsChange(drawer), evs = [];
@@ -763,7 +805,7 @@
     if (a === 'numpad') {
       if (v === 'lw') {
         var r = SentriUI.numpadInput({ value: drawer.w }, b.dataset.key, { decimals: 1, intLength: LWINT });
-        drawer.w = r.value;
+        drawer.w = r.value; drawer.replace = false;
         drawer.note = r.dead === 'empty' ? { id: 'ds.field.numpad.dead_empty' } : r.dead === 'full' && drawer.w.indexOf('.') < 0 ? { id: 'pp.id.lw.dead_int', args: { n: LWINT } }
           : r.dead ? { id: 'ds.field.numpad.dead_places', args: { n: 1 } } : null;
       }
@@ -772,7 +814,7 @@
     } else if (a === 'numpad-suggestion') { typeKey('suggestion'); render(); }
     else if (a === 'scan') { scanTag(st.scan || run.tag.suggestion || BAG[crate] || ''); render(); }
     else if (a === 'open-numpad') {
-      if (v === 'lw') { if (!drawer.active) { drawer.active = true; render(); } return; }
+      if (v === 'lw') { if (!drawer.active) { drawer.active = true; drawer.replace = false; render(); } return; }
       if (run.active !== 'weight') { run.active = 'weight'; run.note = null; render(); }
     }
     else if (a === 'to-tag') { run.active = 'tag'; render(); }
@@ -799,10 +841,10 @@
     else if (a === 'count') {
       drawer.active = false; drawer.note = null;
       if (b.getAttribute('aria-disabled') === 'true') { drawer.ceil = +b.dataset.step > 0 ? v : ''; render(); return; }
-      drawer.ceil = ''; drawer[v] += +b.dataset.step; render();
+      drawer.ceil = ''; drawer.replace = false; drawer[v] += +b.dataset.step; render();
     }
-    else if (a === 'back') { drawer.active = false; drawer.note = null; drawerKept = drawerDirty(drawer) ? drawer : null; drawer = null; render(); }
-    else if (a === 'clear') { var tr = todayRec(), tc = tally(); drawer = { w: tr ? tr.w : '', active: false, boars: tc.cb, gilts: tc.cg }; drawerKept = null; render(); }
+    else if (a === 'back') { drawer.active = false; drawer.replace = false; drawer.note = null; drawerKept = drawerDirty(drawer) ? drawer : null; drawer = null; render(); }
+    else if (a === 'clear') { drawer && (drawer.replace = false); var tr = todayRec(), tc = tally(); drawer = { w: tr ? tr.w : '', active: false, boars: tc.cb, gilts: tc.cg }; drawerKept = null; render(); }
     else if (a === 'save') { saveWeight(); render(); }
     // Back from the records: to the litter's drawer over the room. A piglet in hand and an unsaved weight stay on this phone
     // (saved on every change); reopening restores them.
@@ -821,6 +863,9 @@
     crate = qs.get('crate') || st.l;
     if (qs.get('sow')) crate = store.crateOfSow(qs.get('sow')) || crate;
     F = store.sow(crate) || {};
+    // the farm's standard may be no identity (a `scheme=none` state shows it until the shared fixtures carry one)
+    if (st.scheme === 'none' || qs.get('scheme') === 'none') store.config.identity = Object.assign({}, store.config.identity, { scheme: 'none', who: 'all', day: null });
+    none = store.config.identity.scheme === 'none';
     notch = store.config.identity.scheme === 'notch'; keepers = store.config.identity.who === 'candidates';
     NOW = store.today + 'T10:30';
     // A state's own records (a row flagged, a row corrected), committed once per tab.
