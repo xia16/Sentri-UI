@@ -113,6 +113,11 @@
                                        litters[id].deaths[i].foundIn, select.record death entries `foundIn`
      done rows' lateness                 R2-28 bulkDraft rows kind `done` keep `lateBy` (today's records done late, from
                                        their own day-age); select.room rows `doneLate`
+     treat { cohort }                    R2-16 a group-targeted record: `cohort: 'own' | '<from>@<birthDay>'` (= doses[d].groups[i].id)
+                                       accounts for that group only (`unknown_group` if none; more/less than the group:
+                                       more_than_owed / reason_missing); the other groups stay owed on their own age, never a
+                                       deferral; its own deferral stays in its group. select.litter drafts { cohort } → owed =
+                                       the group's n, event carries `cohort`
    People (farrowing's names): person(who, derived|config?) → `G. Hansen` for `G.H` (config.people, else definePeople's
      map — the fixtures define theirs; unknown initials stay); lastEvent.whoName, lastRecord.whoName and the room's
      lastRecord.whoName carry it. PPLedger.person / PPLedger.definePeople in the browser.
@@ -1382,25 +1387,40 @@ function applyTreat(ctx, e) {
 
   const t = readTreat(d, e);
   const accounted = t.treated + t.deferN + t.exemptN + t.females;
+  // a group-targeted record (R2-16, `cohort: 'own' | '<from>@<birthDay>'`): it accounts for that age group only; the other
+  // groups stay owed as they were, each on its own age — never a deferral
+  const ck = !d.castration ? e.cohort || (e.target !== 'unknown' ? e.group : null) || null : null;
+  let cohortOf = null;
+  if (ck) {
+    const gs = sh ? cohorts(ctx, L, D, d, sh, dayNumber(e.at) ?? ctx.today) : [];
+    const g = gs.find((x) => x.id === ck);
+    if (!g) throw new Reject('unknown_group', { group: ck });
+    cohortOf = { g, others: gs.filter((x) => x !== g) };
+  }
   // a range (R1-3): the writer counted on the pig; any figure within it is the truth it saw
-  const ranged = activeDoubt(D).some((g) => seen(g.id));
-  const lo = ranged ? owedLoShown(L, D) : sh;
+  const ranged = !cohortOf && activeDoubt(D).some((g) => seen(g.id));
+  const top = cohortOf ? cohortOf.g.n : sh;
+  const lo = ranged ? owedLoShown(L, D) : top;
   if (!collided.length && !isStale) {
     if (sh == null) {                                    // castration's first record: males are counted now
       if (t.treated + t.deferN + t.exemptN > L.alive) throw new Reject('more_than_alive');
-    } else if (accounted > sh || accounted < lo) {
-      throw new Reject(accounted > sh ? 'more_than_owed' : 'reason_missing', { owed: sh, lo, accounted });
+    } else if (accounted > top || accounted < lo) {
+      throw new Reject(accounted > top ? 'more_than_owed' : 'reason_missing', { owed: top, lo, accounted });
     } else if (accounted === 0) throw new Reject('empty');
   } else if (accounted === 0 && sh !== null) {
     throw new Reject('empty');
   }
 
   // what this record left, in its writer's view
-  const left = V == null || ranged ? t.deferN : Math.max(0, Math.min(V, aliveView(ctx, L, e)) - t.treated - t.exemptN - t.females);
+  const left = cohortOf ? cohortOf.others.reduce((s2, x) => s2 + x.n, 0) + t.deferN
+    : V == null || ranged ? t.deferN : Math.max(0, Math.min(V, aliveView(ctx, L, e)) - t.treated - t.exemptN - t.females);
+  // what the record leaves owed, by age group: the other groups as they were, and its own deferral in its own group
+  const carry = cohortOf ? cohortOf.others.map((x) => ({ kind: x.kind, from: x.from, birthDay: x.birthDay, n: x.n, rows: x.rows, move: x.moves[0] || null }))
+    .concat(t.deferN ? [{ kind: cohortOf.g.kind, from: cohortOf.g.from, birthDay: cohortOf.g.birthDay, n: t.deferN, rows: null, move: cohortOf.g.moves[0] || null }] : []) : null;
   // deferred as not yet due (R1-4): which age groups they are, as the writer saw them
   const notDue = t.deferReason === 'not_due' && t.deferN ? cohortsNotDue(ctx, L, D, d, dayNumber(e.at), t.deferN) : null;
   if (ranged) settleDoubt(ctx, D, e, d, accounted);
-  D.recs.push({ event: e.id, index: ctx.index, left, deferN: t.deferN, deferReason: t.deferReason, deferBy: t.deferBy, notDue });
+  D.recs.push({ event: e.id, index: ctx.index, left, deferN: t.deferN, deferReason: t.deferReason, deferBy: t.deferBy, notDue, carry });
   D.uncounted = [];                                  // the first castration record counts the males present, arrivals included
   refresh(ctx, L, D);
   D.treated += t.treated;
@@ -1619,6 +1639,9 @@ function cohorts(ctx, L, D, d, owed, today) {
     if (f) { f.n += g.n; if (g.rows && f.rows) f.rows = f.rows.concat(g.rows); else f.rows = null; if (g.move && !f.moves.includes(g.move)) f.moves.push(g.move); }
     else list.push({ key, kind: g.kind, from: g.from || null, birthDay: g.birthDay, n: g.n, rows: g.rows ? g.rows.slice() : null, moves: g.move ? [g.move] : [] });
   };
+  // a group-targeted record (R2-16) left the other groups owed as they were
+  const carried = fi.frontier.filter((r) => r.carry).sort((a, b) => b.index - a.index)[0];
+  if (carried) for (const c of carried.carry) add(Object.assign({}, c));
   const best = fi.frontier.filter((r) => r.notDue && r.deferN).sort((a, b) => b.index - a.index)[0];
   if (best) {
     let k = Math.min(fi.deferred, best.deferN);
@@ -1638,6 +1661,7 @@ function cohorts(ctx, L, D, d, owed, today) {
     g.status = statusAt(d, g.dayAge);
     g.lateBy = g.status === 'late' || g.status === 'missed' ? g.dayAge - d.due : 0;
     g.inDays = g.status === 'later' ? d.due - g.dayAge : 0;
+    g.id = g.key;                                    // 'own' or '<from>@<birthDay>': what `treat { cohort }` names (R2-16)
     delete g.key;
   }
   return out.sort((a, b) => (STATUS_RANK[a.status] ?? 9) - (STATUS_RANK[b.status] ?? 9) || (b.dayAge || 0) - (a.dayAge || 0) || (a.kind === 'own' ? -1 : 1));
@@ -2038,11 +2062,14 @@ function treatDraft(derived, L, D, draft, stamp) {
     out = { owed: D.owed, males, why: null, event: null };
     ev = { type: 'treat', litter: L.id, dose: D.dose, castration: Object.assign({ castrated: 0 }, c) };
   } else {
-    const owed = D.owed;
+    // a group-targeted draft (R2-16): the group's piglets are what it owes
+    const g = dr.cohort ? (D.groups || []).find((x) => x.id === dr.cohort) : null;
+    const owed = dr.cohort ? (g ? g.n : 0) : D.owed;
     const n = dr.n == null ? owed : dr.n;
     const k = (dr.deferred && dr.deferred.n) || 0, x = (dr.exempt && dr.exempt.n) || 0;
     out = { owed, treated: n, notTreated: Math.max(0, (owed || 0) - n - k - x), why: null, event: null };
     ev = { type: 'treat', litter: L.id, dose: D.dose, n };
+    if (dr.cohort) ev.cohort = dr.cohort;
     if (k) ev.deferred = Object.assign({}, dr.deferred);
     if (x) ev.exempt = Object.assign({}, dr.exempt);
   }
