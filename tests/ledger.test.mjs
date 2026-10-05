@@ -2893,3 +2893,42 @@ test('R2-28 a done row keeps its lateness after reload (bulk and room)', () => {
   assert.equal(f.doneLate, 2);
   assert.ok(b && cfg);
 });
+
+test('R2-16 a group-targeted record touches only its group; the other keeps its own age, never a deferral', () => {
+  const mk = () => {
+    const b = book();
+    b.farrowed('R', 11);                                                // day 3: iron due today (own 11)
+    b.farrowed('O', 9, {}, bornOn(-2));                                 // day 5, nothing done
+    b.move('O', 'R', 3);                                                // 3 day-5 arrivals: iron 2 days late
+    return b;
+  };
+  let b = mk();
+  let D = run(b, R1).litters.R.doses.iron3;
+  const arr = D.groups.find((g) => g.kind === 'arrival');
+  assert.equal(arr.id, 'O@' + arr.birthDay); assert.equal(D.groups.find((g) => g.kind === 'own').id, 'own');
+  // record the own 11 first: the 3 arrivals stay 2 days late, from O — not relabelled, not deferred
+  b.treat('R', 'iron3', 11, { cohort: 'own' });
+  let d = run(b, R1);
+  D = d.litters.R.doses.iron3;
+  assert.deepEqual(d.rejected, []);
+  assert.deepEqual([D.owed, D.deferred], [3, 0]);
+  assert.deepEqual(D.groups.map((g) => [g.id, g.n, g.status, g.lateBy]), [[arr.id, 3, 'late', 2]]);
+  // then the arrivals: done
+  b.treat('R', 'iron3', 3, { cohort: arr.id });
+  assert.equal(run(b, R1).litters.R.doses.iron3.done, true);
+  // the arrivals first, one weak deferred: the own 11 stay due today, the weak one stays an arrival
+  b = mk();
+  b.treat('R', 'iron3', 2, { cohort: arr.id, deferred: { n: 1, reason: 'weak' } });
+  D = run(b, R1).litters.R.doses.iron3;
+  assert.deepEqual([D.owed, D.deferred], [12, 1]);
+  assert.deepEqual(D.groups.map((g) => [g.id, g.n, g.status]), [[arr.id, 1, 'late'], ['own', 11, 'due']]);
+  // a group's record must account for that group only
+  const bad = b.treat('R', 'iron3', 12, { cohort: 'own' });
+  assert.equal(rejectedReason(run(b, R1), bad), 'more_than_owed');
+  const unk = b.treat('R', 'iron3', 1, { cohort: 'X@1' });
+  assert.equal(rejectedReason(run(b, R1), unk), 'unknown_group');
+  // the draft knows the group's number
+  b = mk();
+  const dr = select.litter(run(b, R1), 'R', { drafts: { iron3: { cohort: 'own' } } }).drafts.iron3;
+  assert.equal(dr.owed, 11); assert.equal(dr.event.cohort, 'own'); assert.equal(dr.why, null);
+});
