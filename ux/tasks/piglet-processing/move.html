@@ -18,6 +18,8 @@
 .mv-stack > * { margin: 0; }
 .mv-section { display: flex; flex-direction: column; gap: var(--space-heading); }
 .mv-section > * { margin: 0; }
+.mv-behind { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--app-background); pointer-events: none; }
+.mv-over { display: contents; }
 .mv-find { display: flex; align-items: center; gap: var(--space-footer-gap); }
 .mv-find > .field { flex: 1; min-width: 0; margin: 0; }
 </style>
@@ -189,8 +191,10 @@
   function heading(id, args, action) { return UI.heading({ title: '', kind: 'section', level: 3, strs: { title: id }, args: args ? { title: args } : undefined, action: action || '' }); }
   function rowLabel(r) { return r.tag ? PP.t('pp.move.rows.tag', { tag: r.tag }) : PP.t('pp.move.rows.notch', { notch: r.notch }); }
   function litterHref(c) { return PP.href('room.html', { state: 'litter', crate: c, unit: L(c) && L(c).room !== 7 ? L(c).room : '', data: store.name !== 'base' ? store.name : '' }); }
-  // The task under the sheet: the room's header, inert (the litter drawer's own room is room.html's).
-  function taskScreen() { return K.screen({ inert: true, header: K.header({ title: s('pp.common.task'), back: { action: 'home' } }), body: '' }); }
+  // The litter drawer behind the sheet: the real page, inert (as Record death's room); Back, ✕ and Save leave to it.
+  function behind() {
+    return '<iframe class="mv-behind" src="' + litterHref(S.face).replace(/&/g, '&amp;') + '" title="" aria-hidden="true" tabindex="-1" inert></iframe>';
+  }
 
   /* ---- the Move page (farrowing's Foster piglets): direction, the other crate, the count, the questions, before → after ---- */
   // The picker's word for a crate, truthful (R1-31): outside every task, a missed dose, nothing due yet — never "all done" for those.
@@ -459,7 +463,7 @@
     var body = explain + directionSection() + crateSection() + pairSection() + ask + countSection() + closesSection(dr) + review(dr);
     // Clear (as the dead sheet's): greyed while there is no draft to drop; it drops an explaining link too
     var clear = UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', waiting: !(draftExists() || S.explains), strs: { label: 'act.clear' } });
-    return K.drawer({ view: 'move', size: 'long', height: 'full', title: s('pp.move.sheet.title'), subtitle: sub, aside: clear, close: { action: 'dismiss' }, scrim: { action: 'dismiss' },
+    return K.drawer({ view: 'move', size: 'long', title: s('pp.move.sheet.title'), subtitle: sub, aside: clear, close: { action: 'dismiss' }, scrim: { action: 'dismiss' },
       body: '<div class="mv-stack">' + body + '</div>',
       footer: K.footer({ back: { action: 'back' }, primary: primarySpec(dr, ready), status: reason }) });
   }
@@ -476,8 +480,11 @@
   function render() {
     normalize();
     var over = S.view === 'prelock' ? prelockDrawer() : moveSheet();
-    document.getElementById('screen').innerHTML = K.phone(taskScreen() + over, { label: s('pp.common.task') });
-    PP.apply(document.getElementById('screen'));
+    var root = document.getElementById('screen');
+    // the phone and the litter behind are drawn once (an iframe reloads when re-inserted); the sheet re-renders
+    if (!root.querySelector('#mv-over')) root.innerHTML = K.phone(behind() + '<div id="mv-over" class="mv-over"></div>', { bar: false, label: s('pp.move.sheet.title') });
+    root.querySelector('#mv-over').innerHTML = over;
+    PP.apply(root);
   }
   // Save: the one record goes through append; the litter drawer it returns to shows the receipt (`pp-receipt:dead`, the parts the
   // dead and count sheets hand over; litter.js reads it for `saved=dead`). One Back, never a Moves page (R2-22).
