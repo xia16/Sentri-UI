@@ -83,11 +83,15 @@
 
   /* ---- the ledger ---- */
   function D() { return store.derived; }
-  function E() { return store.select.end(D(), { task: TASK.id }); }
+  var endMemo = { k: '', v: null };
+  function E() { var k = store.name + ':' + store.events.length + ':' + TASK.id; if (endMemo.k !== k) endMemo = { k: k, v: store.select.end(D(), { task: TASK.id }) }; return endMemo.v; }
   function fig(atEnd) { var e = E(); return atEnd && e.atEnd ? e.atEnd : e.now; }
   function ended() { var T0 = (D().tasks || []).filter(function (t) { return t.id === TASK.id; })[0]; return T0 && T0.ended && T0.ended.event ? T0.ended : null; }
-  function inTask(c) { return TASK.litters.indexOf(c) >= 0; }
-  function taskIds() { return TASK.litters.filter(function (id) { return D().litters[id]; }); }
+  function inTask(c) { return E().litters.indexOf(c) >= 0; }
+  // the task's litters, a joined nurse included (the ledger's End list, R2-26)
+  function taskIds() { return E().litters.filter(function (id) { return D().litters[id]; }); }
+  // what was not done at End and still is (an accepted late mark drops out), per litter, with the not-yet-due doses apart
+  function still(c, withAhead) { return ((E().stillNotDone || {})[c] || []).filter(function (x) { return withAhead || x.kind !== 'not_due'; }); }
   function Lx(id) { return D().litters[id]; }
   /* The ledger as it stood at End (the log up to end_task, replayed): the receipt's outcomes are frozen from it, never
      read live (R1-21). */
@@ -128,7 +132,7 @@
     var f = fig(atEnd), ls = litters(atEnd), unf = ls.filter(function (l) { return l.unfinished; });
     return { done: f.progress.done, owed: f.progress.owed + f.progress.unknown, missed: f.progress.missed, ahead: f.progress.ahead, total: f.progress.total,
       ontime: f.onTime.n, due: f.onTime.k, excluded: sum(ls, function (l) { return l.excluded; }), pct: f.onTime.k ? Math.round(100 * f.onTime.n / f.onTime.k) : null,
-      idDone: f.identityDone.n, litters: f.identityDone.k, unf: unf, work: unf.filter(workLeft).length,
+      idDone: f.identityDone.n, litters: f.identityDone.k, unf: unf, work: store.select.oweToday(D(), { task: TASK.id }).n,
       aheadLitters: ls.filter(function (l) { return l.ahead > 0; }).length,
       alive: sum(ls, function (l) { return l.alive; }), identified: sum(ls, function (l) { return l.identified; }) };
   }
@@ -244,7 +248,7 @@
     return out;
   }
   // Not done for one litter × dose on the ended face: frozen at End, less the piglets gone since (the live figure when lower).
-  function notDone(l, e) { var now = (fig(false).byLitter[l.code] || []).filter(function (x) { return x.dose === e.dose; })[0]; return now ? Math.min(e.n || 0, now.n || 0) : 0; }
+  function notDone(l, e) { return e.n || 0; }
   // Piglets moved in after End: their owed doses stay not done (RULINGS round 3), per dose.
   function arrivalsNotDone(l) {
     var by = {};
@@ -401,7 +405,7 @@
   function endedRow(l) {
     var head = [], now = litter(l.code, false), toks = [T('pp.common.unit.day', { n: now.day })], nd = 0;
     var add = function (id, args) { if (head.length) head.push({ sep: true }); head.push(P(id, args)); };
-    l.list.forEach(function (e) { add('pp.end.lit.owed', { name: name(e.dose) }); nd += notDone(l, e); });
+    still(l.code).forEach(function (e) { add('pp.end.lit.owed', { name: name(e.dose) }); nd += e.n || 0; });
     arrivalsNotDone(l).forEach(function (a) { add('pp.end.lit.owed', { name: name(a.k) }); nd += a.n; });
     if (nd) toks.push(T('pp.end.lit.notdone', { n: nd }));
     if (!now.idDone) { if (head.length) toks.push(T('pp.end.u.unid', { n: now.alive - now.identified })); else add('pp.end.u.unid', { n: now.alive - now.identified }); }
@@ -411,7 +415,9 @@
     if (now.loss) toks.push(lossTok(now.loss));
     return litterRow(now, head, tparts(toks));
   }
-  function endedLitters() { return litters(true).filter(function (l) { return l.unfinished || arrivalsNotDone(l).length; }); }
+  // after End: the litters still not done (an accepted late mark drops out), then the ones that only had doses not yet due
+  function endedLitters() { return litters(true).filter(function (l) { return (l.unfinished && (still(l.code).length || !litter(l.code, false).idDone)) || arrivalsNotDone(l).length; }); }
+  function notYetDueLitters() { return litters(true).filter(function (l) { return fig(true).notYetDueOnly.indexOf(l.code) >= 0 && still(l.code, true).length; }); }
 
   /* ---- the pages (TaskPage): each a full page over the room, head, body, footer ---- */
   function behind() { return K.screen({ inert: true, header: K.header({ title: P('pp.common.task'), back: { action: 'noop' } }) }); }
@@ -505,7 +511,7 @@
     var body = rec + note + K.totals([{ label: P('pp.end.f.finished'), value: P('pp.end.tok.n', { n: t.litters - n }) }, { label: P('pp.end.f.unfinished'), value: P('pp.end.tok.n', { n: n }) },
         { label: P('pp.end.f.owed'), value: P('pp.end.tok.n', { n: t.owed }) }]) +
       (n ? K.section({ title: P('pp.end.nd.title'), icon: 'record', rows: true, items: [{ label: P(one('pp.end.v.litters', n), { n: n }), action: 'litters' }] }) : '') +
-      reviewsBlock(fig(true).reviews || [], true) + '<div class="en-block">' + metrics(t, true) + '</div>';
+      reviewsBlock(fig(true).reviews || [], true) + orphansBlock() + '<div class="en-block">' + metrics(t, true) + '</div>';
     var since = (late.length ? UI.panel(h({ strs: { title: one('pp.end.rc.late', late.length), description: 'pp.end.rc.late.why' }, args: { title: { n: late.length }, description: { code: late.map(function (e) { return e.code; }).join(' ') } } })) : '') +
       afterEndFlag() + sinceLog(true) + doors([door('handoff', 'pp.end.w.title', null, 'pp.end.w.row_now')]);
     body += '<div class="en-block">' + sec({ strs: { title: 'pp.end.since.title', description: 'pp.end.since.desc' } }) + since + '</div>';
@@ -521,13 +527,30 @@
     return page('pp.end.rc.title', null, 'pp.end.ended.stamp', stamp(en.at, en.who), body, backOnly('back'));
   }
   // One level down from the review (unfinished now) or the ended task (not done at End): the litters, by crate row.
+  // Litters whose only open doses are not yet due: not unfinished, listed apart (R2-26)
+  function notYetBlock(ls, rowFn) {
+    if (!ls.length) return '';
+    return '<div class="en-block">' + sec({ strs: { title: 'pp.end.lit.ahead_title', meta: one('pp.end.v.litters', ls.length) }, args: { meta: { n: ls.length } } }) + groupsOf(byRow(ls, rowFn)) + '</div>';
+  }
+  // Orphaned litters (the sow died) and where their piglets went (R2-N5)
+  function orphansBlock() {
+    var o = E().orphans || [];
+    if (!o.length) return '';
+    var rowsHtml = o.map(function (x) {
+      var l = litter(x.litter, false), meta = x.moved.map(function (m, i) { return P('pp.end.orph.moved', { n: m.n, to: m.to }); }), parts = [];
+      meta.forEach(function (p, i) { if (i) parts.push({ sep: true }); parts.push(p); });
+      return K.row({ id: P('pp.end.code', { code: x.litter }), chip: chipOf(l), headline: [P('pp.end.orph.h', { alive: x.alive, dead: x.dead })], meta: parts.length ? parts : [P('pp.end.orph.none')], action: 'open-litter', value: x.litter });
+    }).join('');
+    return K.section({ title: P('pp.end.orph.title'), icon: 'note', meta: P(one('pp.end.v.litters', o.length), { n: o.length }), body: UI.rowGroup(rowsHtml) });
+  }
   function littersPage() {
     if (S.ended) {
       var ls = endedLitters();
-      return page('pp.end.nd.title', null, 'pp.end.nd.frozen', null, groupsOf(byRow(ls, endedRow)), backOnly());
+      var ny = notYetDueLitters();
+      return page('pp.end.nd.title', null, 'pp.end.nd.frozen', null, groupsOf(byRow(ls, endedRow)) + notYetBlock(ny, endedRow), backOnly());
     }
-    var t = totals(false);
-    return page('pp.end.rv.list', null, 'pp.end.lit.sub', { n: t.unf.length, o: t.owed, a: t.ahead }, groupsOf(byRow(t.unf, unfinishedRow)), backOnly());
+    var t = totals(false), ahead = litters(false).filter(function (l) { return fig(false).notYetDueOnly.indexOf(l.code) >= 0; });
+    return page('pp.end.rv.list', null, 'pp.end.lit.sub', { n: t.unf.length, o: t.owed, a: t.ahead }, groupsOf(byRow(t.unf, unfinishedRow)) + notYetBlock(ahead, unfinishedRow), backOnly());
   }
   /* N5: the day's records by hand, so a mark on the wrong litter is findable before End: each opens its litter's log. */
   function dayRecords() {
@@ -581,8 +604,8 @@
       // A mark stamped before End, a correction or an after-End treatment on this litter and dose.
       if (postOf(code).some(function (e) { return e.k === k && /late|wrong|void|lower|afterend/.test(e.kind); })) g.since = true;
     }
-    atEnd.filter(function (l) { return l.unfinished; }).forEach(function (l) {
-      l.list.forEach(function (e) { add(e.kind === 'missed' ? 'missed' : e.kind === 'not_due' ? 'ahead' : 'owed', e.dose, notDone(l, e), l.code); });
+    atEnd.forEach(function (l) {
+      still(l.code, true).forEach(function (e) { add(e.kind === 'missed' ? 'missed' : e.kind === 'not_due' ? 'ahead' : 'owed', e.dose, e.n || 0, l.code); });
     });
     atEnd.forEach(function (l) { arrivalsNotDone(l).forEach(function (a) { add('owed', a.k, a.n, l.code); }); });
     return groups;
@@ -618,7 +641,7 @@
       { label: '', strs: { label: 'pp.end.out.loss', value: 'pp.end.out.open', meta: loss.loss ? 'pp.end.codes' : undefined }, args: { value: { n: loss.loss }, meta: { list: loss.lossC.join(' ') } } }
     ], { columns: 2 }) +
       (nd ? '<div class="en-block">' + sec({ strs: { title: 'pp.end.nd.title', meta: pd(ndTotal) }, args: { meta: { n: ndTotal } } }) + doors(nd) + '</div>' : '') +
-      reviewsBlock(frozenReviews(), true) +
+      reviewsBlock(frozenReviews(), true) + orphansBlock() +
       '<div class="en-block">' + sec({ strs: { title: 'pp.end.w.litters', meta: one('pp.end.v.litters', now.litters) }, args: { meta: { n: now.litters } } }) + groupsOf(byRow(litters(false), perLitter)) + '</div>';
     return page('pp.end.w.title', null, 'pp.end.w.desc', { n: UNIT }, body, backOnly());
   }

@@ -108,7 +108,10 @@
     'double-same':            { view: 'double', data: 'base', crate: 'A05', answer: { answer: 'same' } },
     'double-same-picked':     { view: 'double', data: 'base', crate: 'A05', answer: { answer: 'same', withdraw: 'T-A05-lm' } },
     'double-twice':           { view: 'double', data: 'base', crate: 'A05', answer: { answer: 'twice' } },
-    'double-different':       { view: 'double', data: 'base', crate: 'A05', answer: { answer: 'different' } },     // owner round 6
+    // owner round 6: two hands each did a different half · "Different piglets · both stand", both counting in full
+    'double-different':       { view: 'double', data: 'double-halves', crate: 'A02', answer: { answer: 'different' } },
+    'double-different-answered': { view: 'double', data: 'double-different', crate: 'A02' },
+    'record-page-double-different': { view: 'record', data: 'double-different', crate: 'A02' },
     'double-answered':        { view: 'double', data: 'double-same', crate: 'A05' },
     // R1-14: the record page tells one truthful story
     'record-page-held':       { view: 'record', data: 'held-body', crate: 'A07' },
@@ -275,7 +278,7 @@
   function lineOf(id) {
     var U0 = L().unexplained, x = U0.losses.filter(function (y) { return y.id === id; })[0], kind = 'loss';
     if (!x) { x = U0.gains.filter(function (y) { return y.id === id; })[0]; kind = 'gain'; }
-    return x ? { kind: kind, qty: x.qty, open: x.open, by: x.explainedBy || [] } : null;
+    return x ? { kind: kind, qty: x.qty, open: x.open, explained: x.explained || 0, held: x.held || 0, by: x.explainedBy || [] } : null;
   }
   function explainedBy(by) {
     return by.map(function (b) {
@@ -360,12 +363,16 @@
         var c0 = L().counts.filter(function (y) { return y.id === x.id; })[0], ln = lineOf(x.id);
         if (!c0 && x.corrected && x.corrected.length) detail = ['pp.edit.rec.count.withdrawn', { stamp: withdrawnBy(x) }];
         else if (x.corrected && x.corrected.length) detail = ['pp.edit.rec.superseded', { stamp: withdrawnBy(x) }];
-        else if (c0 && c0.disputed && !c0.settledBy) detail = ['pp.edit.rec.count.disputed', null];
+        // R2-6: the ledger says what the count is (`status`) and what its line is (explained, held, open); the page computes neither
+        else if (x.status === 'disputed') detail = ['pp.edit.rec.count.disputed', null];
         else if (ln) {
-          var k = ln.qty, ex = ln.qty - ln.open, w = ln.kind === 'loss' ? 'loss' : 'gain';
-          detail = !ex ? ['pp.edit.rec.count.' + w, { k: k }] : !ln.open ? ['pp.edit.rec.count.' + w + '_explained', { k: k }] : ['pp.edit.rec.count.' + w + '_part', { k: k, e: ex, o: ln.open }];
+          var k = ln.qty, ex = ln.explained, w = ln.kind === 'loss' ? 'loss' : 'gain';
+          if (ln.held) detail = ['pp.edit.rec.count.' + w + '_held', { k: k }];
+          else detail = !ex ? ['pp.edit.rec.count.' + w, { k: k }] : !ln.open ? ['pp.edit.rec.count.' + w + '_explained', { k: k }] : ['pp.edit.rec.count.' + w + '_part', { k: k, e: ex, o: ln.open }];
           if (ex) extra = explainedBy(ln.by);
-        } else detail = x.wrote < 0 ? ['pp.edit.rec.count.loss', { k: -x.wrote }] : x.wrote > 0 ? ['pp.edit.rec.count.gain', { k: x.wrote }] : ['pp.edit.rec.count.same', null];
+        } else if (x.status === 'settled') detail = ['pp.edit.rec.count.settled', null];
+        else if (x.status === 'match') detail = ['pp.edit.rec.count.same', null];
+        else detail = x.wrote < 0 ? ['pp.edit.rec.count.loss', { k: -x.wrote }] : x.wrote > 0 ? ['pp.edit.rec.count.gain', { k: x.wrote }] : null;
         break;
       case 'move':
         title = [x.dir === 'out' ? 'pp.edit.rec.move_out' : 'pp.edit.rec.move_in', { pigs: pigsText(x.n), code: x.other }];
