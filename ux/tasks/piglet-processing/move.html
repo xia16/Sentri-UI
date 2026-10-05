@@ -78,6 +78,9 @@
   var S = JSON.parse(JSON.stringify(STATES[name]));
   if (PP.state === 'move-prelock' && qs.get('data') === 'other') S = { view: 'move', face: 'B06', query: 'D01' };
   if (qs.get('crate') && name === 'move') S.face = qs.get('crate');
+  // Opened from a loss line on count.html (the missing piglet is in another crate): this litter sends n, the open loss paired (`closesLoss`),
+  // the worker picks the crate; the source then keeps its alive (11 → 11).
+  if (name === 'move' && qs.get('closesLoss') === '1') { S.closesLoss = true; S.dir = 'out'; S.n = +qs.get('n') || 1; }
   // Opened from a suggestion on count.html (Explain): the pair it names, pre-filled — from, to, n, the missing rows and `explains`.
   if (name === 'move-explain' && qs.get('explains')) {
     S.face = qs.get('crate'); S.other = qs.get('other'); S.n = +qs.get('n') || 1; S.explains = qs.get('explains').split(',');
