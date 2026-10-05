@@ -10,9 +10,10 @@
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* Layout only, tokens from tokens.css. Built on the task skeleton (ADR 0003): Move is farrowing's Foster piglets page
-   (TaskPage), the litter's Moves record is a TaskPage, the receipt, the arrivals' check and the pre-lock door are
-   TaskSheets over it. Content inside is the design system's cards (Segment, ChoiceList, Stepper, Facts, Row, Banner). */
+/* Layout only, tokens from tokens.css. Built on the task skeleton (ADR 0003): Move is a TaskSheet that opens from the litter
+   drawer like the dead and count sheets (title, subtitle, Clear, pinned footer with Back); Save and Back return to the litter
+   drawer, Save with its receipt (R2-22: one Back, never a Moves page). The pre-lock door is a TaskSheet too. Content inside is
+   the design system's cards (Segment, ChoiceList, Stepper, Facts, Row, Banner). */
 .mv-stack { display: flex; flex-direction: column; gap: var(--space-panel); }
 .mv-stack > * { margin: 0; }
 .mv-section { display: flex; flex-direction: column; gap: var(--space-heading); }
@@ -46,12 +47,12 @@
     'move-cross':        { view: 'move', face: 'B06', other: 'A03', n: 1 },
     'move-prelock':      { view: 'prelock', face: 'D01' },
     'move-receipt':      { view: 'receipt', face: 'B06', other: 'B08', n: 2 },
-    'move-draft-kept':   { view: 'face', face: 'B06', other: 'B08', n: 2, kept: true },
+    'move-draft-kept':   { view: 'move', face: 'B06', other: 'B08', n: 2 },                     // R2-22: Back leaves; the draft is the review
     'move-orphan-saved': { view: 'face', face: 'B01', data: 'moved-orphan' },
-    'nurse-arrived':     { view: 'face', face: 'D02', data: 'moved-orphan' },
+    'nurse-arrived':     { view: 'face', face: 'D02', data: 'moved-orphan', fwd: 'nurse' },
     'owed-from-move':    { view: 'face', face: 'B08', data: 'moved-b06-b08' },
     'owed-arrived-done': { view: 'face', face: 'C05', data: 'moved-to-c05' },
-    'unknown-check':     { view: 'face', face: 'B02', drawer: 'MV-0929-05:iron3', had: 1, rest: 'record', data: 'moved-unknown' },
+    'unknown-check':     { view: 'face', face: 'B02', data: 'moved-unknown', fwd: 'arrived-resolve' },
     // scenario round 1
     'move-search':       { view: 'move', face: 'B06', query: 'A0' },                         // R1-5: other rows and other units by code
     'move-search-self':  { view: 'move', face: 'B06', query: 'B06' },                        // R1-31: this crate says why
@@ -59,15 +60,27 @@
     'move-answered':     { view: 'move', face: 'B09', other: 'B02', rows: ['B09-r9', 'B09-r10'], answers: { iron3: 'unknown' } },   // R1-18: Move says what it records
     'move-crowded':      { view: 'move', face: 'C05', other: 'B08', n: 8 },                  // R1-31: past a sane litter size
     'move-orphan-receipt': { view: 'receipt', face: 'B01', other: 'D02', allRows: true },    // round 4: the nurse sow joins the task
-    'move-doubt':        { view: 'face', face: 'A07', data: 'move-doubt' },                  // R1-3: the source owes a range
-    'move-young':        { view: 'face', face: 'D03', data: 'move-young' },                  // R1-4: arrivals keep their own age
-    'move-emptied':      { view: 'face', face: 'C05', data: 'emptied' }                      // R1-19: a litter emptied by moves closes
+    'move-doubt':        { view: 'face', face: 'A07', data: 'move-doubt', fwd: 'range' },                  // R1-3: the source owes a range
+    'move-young':        { view: 'face', face: 'D03', data: 'move-young', fwd: 'arrivals-young' },                  // R1-4: arrivals keep their own age
+    'move-own':          { view: 'move', face: 'A02', other: 'E01', n: 1 },                  // round 6: the receiver's own piglets join too, said before Save
+    'move-emptied':      { view: 'face', face: 'C05', data: 'emptied', fwd: 'closed' }       // R1-19: a litter emptied by moves closes
   };
+  /* R2-22: what the old Moves page showed (the balance, what arrivals owe, a range to check, the Move list) is the litter
+     drawer's own; the states that were that page forward to the drawer showing the same data. */
   var qs = PP.q;
+  if (STATES[PP.state] && STATES[PP.state].view === 'face') {
+    var F0 = STATES[PP.state], fp = { state: F0.fwd || 'litter' };
+    if (!F0.fwd) { fp.crate = F0.face; fp.data = F0.data; }
+    location.replace(PP.href('room.html', fp));
+    return;
+  }
   var name = STATES[PP.state] ? PP.state : 'move';
   var S = JSON.parse(JSON.stringify(STATES[name]));
   if (PP.state === 'move-prelock' && qs.get('data') === 'other') S = { view: 'move', face: 'B06', query: 'D01' };
   if (qs.get('crate') && name === 'move') S.face = qs.get('crate');
+  // Opened from a loss line on count.html (the missing piglet is in another crate): this litter sends n, the open loss paired (`closesLoss`),
+  // the worker picks the crate; the source then keeps its alive (11 → 11).
+  if (name === 'move' && qs.get('closesLoss') === '1') { S.closesLoss = true; S.dir = 'out'; S.n = +qs.get('n') || 1; }
   // Opened from a suggestion on count.html (Explain): the pair it names, pre-filled — from, to, n, the missing rows and `explains`.
   if (name === 'move-explain' && qs.get('explains')) {
     S.face = qs.get('crate'); S.other = qs.get('other'); S.n = +qs.get('n') || 1; S.explains = qs.get('explains').split(',');
@@ -85,10 +98,8 @@
   function openLossOf(c) { return L(c).unexplained.losses.filter(function (x) { return x.open > 0; })[0] || null; }
   S.dir = S.dir || 'out'; S.answers = S.answers || {}; S.rows = S.rows || []; S.untagged = S.untagged || 0;
   if (S.n == null) S.n = 1;
-  // A kept draft (Back from the Move page to the Moves page) reopens the Move where it was.
-  if (S.kept) S.fromFace = true;
-  var DEFAULT = JSON.stringify({ other: '', n: 1, rows: [], untagged: 0, answers: {}, dir: 'out' });
-  var store, CFG, TODAY, UNIT, resolveDrafts = {};
+  var DEFAULT = JSON.stringify({ other: '', n: 1, rows: [], untagged: 0, answers: {}, dir: 'out', closesLoss: false });
+  var store, CFG, TODAY, UNIT;
 
   /* ---- the ledger ---- */
   function L(c) { return store.derived.litters[c]; }
@@ -109,7 +120,7 @@
   function hasRows(c) { return liveRows(c).length > 0; }
   function count() { return hasRows(source()) ? S.rows.length + S.untagged : S.n; }
   function draftInput() {
-    return { from: source(), to: receiver(), n: count(), rows: hasRows(source()) ? S.rows.slice() : [], answers: Object.assign({}, S.answers), explains: S.explains || undefined };
+    return { from: source(), to: receiver(), n: count(), rows: hasRows(source()) ? S.rows.slice() : [], answers: Object.assign({}, S.answers), explains: S.explains || undefined, closesLoss: S.closesLoss || undefined };
   }
   var memo = { key: '', val: null };
   function draft() {
@@ -143,7 +154,7 @@
       if (S.explains[0] && (!lo || lo.id !== S.explains[0])) S.explains[0] = null;   // the pairing belongs to the source picked
     }
   }
-  function draftExists() { return JSON.stringify({ other: S.other || '', n: S.n, rows: S.rows, untagged: S.untagged, answers: S.answers, dir: S.dir }) !== DEFAULT; }
+  function draftExists() { return JSON.stringify({ other: S.other || '', n: S.n, rows: S.rows, untagged: S.untagged, answers: S.answers, dir: S.dir, closesLoss: !!S.closesLoss }) !== DEFAULT; }
 
   /* ---- helpers ---- */
   var pl = PP.one;
@@ -178,108 +189,8 @@
   function heading(id, args, action) { return UI.heading({ title: '', kind: 'section', level: 3, strs: { title: id }, args: args ? { title: args } : undefined, action: action || '' }); }
   function rowLabel(r) { return r.tag ? PP.t('pp.move.rows.tag', { tag: r.tag }) : PP.t('pp.move.rows.notch', { notch: r.notch }); }
   function litterHref(c) { return PP.href('room.html', { state: 'litter', crate: c, unit: L(c) && L(c).room !== 7 ? L(c).room : '', data: store.name !== 'base' ? store.name : '' }); }
-  // The task under every surface: the room's header, inert (the Move and Moves pages cover it).
+  // The task under the sheet: the room's header, inert (the litter drawer's own room is room.html's).
   function taskScreen() { return K.screen({ inert: true, header: K.header({ title: s('pp.common.task'), back: { action: 'home' } }), body: '' }); }
-
-  /* ---- the Moves page: the litter's balance, what arrivals owe here, its moves (each the Edit door), and Move ---- */
-  function faceDesc(c) {
-    var x = L(c), inn = x.moves.filter(function (m) { return m.dir === 'in'; }), a = { code: c, tag: tag(c), day: x.dayAge };
-    if (farrowing(c)) return s('pp.move.face.d_farrowing', a);
-    if (x.sowDied) return [s('pp.move.face.d', a), { sep: true }, { text: PP.t('pp.move.face.died'), str: 'pp.move.face.died', tone: 'red' }];
-    if (x.alive === 0) return s('pp.move.face.d_empty', a);
-    // a nurse sow that joined the task with these piglets (round 4): her piglets keep the age of the crate they came from
-    if (x.nurse && L(x.nurse.from)) return s('pp.move.face.d_nurse', { code: c, tag: tag(c), day: x.dayAge, from: x.nurse.from });
-    if (x.weaned && inn.length) return s('pp.move.face.d_nurse', { code: c, tag: tag(c), day: L(inn[0].other).dayAge, from: inn[0].other });
-    return s('pp.move.face.d', a);
-  }
-  // The ledger's balance (R1-10, select.balance): every term that is not zero, so born + in − out − dead − weaned ± open = alive
-  // reads off the card; a nurse sow's earlier litter is its own line, never mixed in (round 4).
-  function ledgerFacts(c) {
-    var x = L(c), B = store.select.balance(store.derived, c), items = [];
-    if (x.phase === 'locked' && (B.born || !x.nurse)) items.push(fact('label.born', null, pigs(B.born).id, pigs(B.born).args));
-    if (B.movedIn) items.push(fact('pp.move.label.moved_in', null, pigs(B.movedIn).id, pigs(B.movedIn).args));
-    if (B.movedOut) items.push(fact('pp.move.label.moved_out', null, pigs(B.movedOut).id, pigs(B.movedOut).args));
-    if (B.dead || !x.nurse) items.push(fact('label.dead', null, pigs(B.dead).id, pigs(B.dead).args));
-    if (B.weaned) items.push(fact('pp.move.label.weaned', null, pigs(B.weaned).id, pigs(B.weaned).args));
-    if (B.loss) items.push(fact('pp.move.label.loss', null, pigs(B.loss).id, pigs(B.loss).args, 'pp.move.fact.open'));
-    if (B.gain) items.push(fact('pp.move.label.gain', null, pigs(B.gain).id, pigs(B.gain).args, 'pp.move.fact.open'));
-    items.push(fact('label.alive', null, pigs(B.alive).id, pigs(B.alive).args));
-    var out = UI.facts(items, { columns: items.length === 3 || items.length > 4 ? 3 : 2 });
-    if (B.earlier) out += UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.move.face.earlier' },
-      args: { title: { born: B.earlier.born, dead: B.earlier.dead, weaned: B.earlier.weaned, day: B.earlier.dayAge } } });
-    return out;
-  }
-  // After a Don't-know move out, what this litter owes is a range (R1-3): `lo–hi of alive`, never a one-tap number; the row
-  // goes to the litter, where the worker counts on the pig.
-  function doubtRows(c) {
-    var x = L(c), rows = [];
-    CFG.doses.forEach(function (d) {
-      var D = x.doses[d.id];
-      if (!D || !D.range) return;
-      rows.push(row({ action: 'record', value: d.id, title: 'pp.common.tx.' + d.tx, desc: 'pp.move.range.row',
-        descArgs: { lo: D.owedLo, hi: D.owed, of: x.alive, moves: D.doubt.map(function (g) { return PP.t('pp.move.range.move', { n: g.n, to: g.to }); }).join(' · ') } }));
-    });
-    return rows.length ? doors('pp.move.range.title', rows.join('')) : '';
-  }
-  // One age group of arrivals that owe (R1-4): where they came from, their own day-age and when the dose is theirs.
-  function groupText(g) {
-    var when = g.status === 'later' ? PP.t(pl('pp.move.frag.when.later', g.inDays), { n: g.inDays }) : g.status === 'late' ? PP.t(pl('pp.move.frag.when.late', g.lateBy), { n: g.lateBy })
-      : g.status === 'missed' ? PP.t('pp.move.frag.when.missed') : PP.t('pp.move.frag.when.due');
-    if (g.kind === 'own') return PP.t('pp.move.frag.own', { k: g.n, day: g.dayAge, when: when });
-    return PP.t('pp.move.frag.group', { k: g.n, code: g.from, day: g.dayAge, when: when });
-  }
-  // One row per Move, newest first; each is the Edit door for that record (who and when are on the record, one level down).
-  function movesGroup(c) {
-    var ms = L(c).moves.slice().sort(function (a, b) { return a.at < b.at ? 1 : -1; });
-    if (!ms.length) return '';
-    return doors('', ms.map(function (m) {
-      var inn = m.dir === 'in', t = where(m.other) ? (inn ? 'pp.move.moves.in_unit' : 'pp.move.moves.out_unit') : (inn ? 'pp.move.moves.in' : 'pp.move.moves.out');
-      var ex = m.explains && (m.explains[0] || m.explains[1]);
-      return row({ action: 'edit-move', value: m.id, title: pl(t, m.n), titleArgs: { n: m.n, code: m.other, u: unitOf(m.other) }, desc: ex ? 'pp.move.moves.explained' : '', glyph: 'edit' });
-    }).join(''));   // the page is the litter's Moves: the list needs no title of its own
-  }
-  // What the arrivals owe here, one row per dose: the headline is what is owed, the meta line where it came from.
-  function arrivalRows(c) {
-    var x = L(c), ins = x.moves.filter(function (m) { return m.dir === 'in'; });
-    if (!ins.length) return '';
-    var rows = [];
-    CFG.doses.forEach(function (d) {
-      var D = x.doses[d.id];
-      var arrivals = (D.groups || []).filter(function (g) { return g.kind === 'arrival'; });
-      // a dose not yet due for anyone here is left for later; one due for this litter shows when arrivals owe it on their own day (R1-4)
-      if (D.status == null || (D.status === 'later' && (!arrivals.length || x.dayAge < d.due))) return;
-      var arrOwed = (D.owedFrom.filter(function (f) { return f.kind === 'arrival'; })[0] || {}).n || 0;
-      var owedSrc = ins.filter(function (m) { return m.packets[d.id] === 'owed'; });
-      var groups = D.unknownGroups.filter(function (g) { return g.kind === 'move'; });
-      if (!arrOwed && !groups.length && !D.carriedFromMove && !owedSrc.length && !arrivals.length) return;
-      var parts = [];
-      if (d.castration && owedSrc.length) owedSrc.forEach(function (m) { parts.push(PP.t('pp.move.frag.males', { k: m.n, code: m.other })); });
-      else if (D.owed) {
-        // The ledger's owed, and which arrivals owe it: their crate and their own age (R1-4, R1-18)
-        parts.push(PP.t('pp.move.frag.owed', { n: D.owed }));
-        if (arrivals.length) D.groups.forEach(function (g) { parts.push(groupText(g)); });
-        else owedSrc.forEach(function (m) { parts.push(PP.t('pp.move.frag.from', { k: m.n, code: m.other })); });
-      }
-      if (D.carriedFromMove) parts.push(PP.t('pp.move.frag.arrived_done', { k: D.carriedFromMove }));
-      groups.forEach(function (g) { parts.push(d.visible ? PP.t('pp.move.frag.check', { k: g.n, code: g.from }) : PP.t('pp.move.frag.unknown', { k: g.n })); });
-      if (!parts.length) return;
-      var g0 = groups[0];
-      // a litter with no task (a nurse sow from a previous batch) records no treatments (RULINGS round 2, Q18): not done
-      if (!x.inTask) { parts.push(PP.t('pp.edge.notask.why')); rows.push(row({ title: 'pp.common.tx.' + d.tx, desc: 'pp.move.owed.line', descArgs: { text: parts.join(' · ') } })); return; }
-      rows.push(row({ action: g0 ? 'open-resolve' : D.owed ? 'record' : 'open-dose', value: g0 ? g0.id + ':' + d.id : d.id,
-        title: 'pp.common.tx.' + d.tx, desc: 'pp.move.owed.line', descArgs: { text: parts.join(' · ') } }));
-    });
-    if (!rows.length) return '';
-    return doors('pp.move.owed.title', rows.join(''));
-  }
-  function facePage(c, inert) {
-    var body = ledgerFacts(c) + doubtRows(c) + arrivalRows(c) + movesGroup(c);
-    var canMove = canSource(c) || canReceive(c);
-    // Move is the page's one act; a kept draft says so on the button (Back from the Move page keeps it).
-    var primary = canMove ? { label: S.kept ? s('pp.move.act.resume', { n: 1 }) : s('pp.move.sheet.title'), action: 'open-move', value: c } : null;
-    return K.page({ view: 'face', title: s('pp.move.moves.title'), description: faceDesc(c), body: '<div class="mv-stack">' + body + '</div>', inert: inert,
-      footer: K.footer({ back: { action: 'back' }, primary: primary }) });
-  }
 
   /* ---- the Move page (farrowing's Foster piglets): direction, the other crate, the count, the questions, before → after ---- */
   // The picker's word for a crate, truthful (R1-31): outside every task, a missed dose, nothing due yet — never "all done" for those.
@@ -306,17 +217,25 @@
     return UI.choiceRow({ label: '', meta: '', mode: 'single', mono: true, action: 'pick-crate', value: c, selected: S.other === c,
       strs: { label: 'pp.move.crate.code', meta: m.id }, args: { label: { code: c }, meta: m.args } });
   }
+  /* The suggestions (R2-22): the likely crates first — about the same age (within 2 days), the smallest litters leading, from any
+     row of this unit — then this row nearest age first; sows with no piglets last. The search finds the rest. */
+  var LIKELY_DAYS = 2, LIKELY_MAX = 4;
   function candidates() {
-    var near = [], empty = [], me = L(S.face);
+    var near = [], empty = [], likely = [], me = L(S.face);
+    var age = function (c) { return Math.abs(L(c).dayAge - me.dayAge); };
     Object.keys(store.derived.litters).forEach(function (c) {
       var x = L(c);
       if (c === S.face || farrowing(c) || x.room !== me.room) return;
-      if (x.alive > 0 && c.charAt(0) !== S.face.charAt(0)) return;          // this row of crates; the search finds the rest
       if (S.dir === 'out' ? !canReceive(c) : !canSource(c)) return;
-      (x.alive === 0 ? empty : near).push(c);
+      if (x.alive === 0) { if (c.charAt(0) === S.face.charAt(0)) empty.push(c); return; }
+      if (age(c) <= LIKELY_DAYS && !x.nurse) likely.push(c);
+      if (c.charAt(0) === S.face.charAt(0)) near.push(c);
     });
-    near.sort(function (a, b) { return Math.abs(L(a).dayAge - me.dayAge) - Math.abs(L(b).dayAge - me.dayAge) || (a < b ? -1 : 1); });
-    return { near: near, empty: empty.sort() };
+    likely.sort(function (a, b) { return alive(a) - alive(b) || age(a) - age(b) || (a < b ? -1 : 1); });
+    likely = likely.slice(0, LIKELY_MAX);
+    near = near.filter(function (c) { return likely.indexOf(c) < 0; });
+    near.sort(function (a, b) { return age(a) - age(b) || (a < b ? -1 : 1); });
+    return { likely: likely, near: near, empty: empty.sort() };
   }
   // Farrowing's Send | Receive: only the directions this litter can take; an explaining Move is locked.
   function directionSection() {
@@ -327,11 +246,16 @@
   }
   /* Find a crate (R1-5): the crate code or the sow's number, across rows and units. Every litter that matches is listed with
      what it is: one that can take part is a row to pick; this crate, a farrowing one or one that cannot says why. */
+  /* Forgiving (R2-22): spaces, dashes and dots are ignored, a missing zero is added (`a4`, `A 04`, `A-04` are A04) and the
+     number alone finds that crate in every row (`04`); three or more digits also find a sow's tag. */
+  function norm(query) { return String(query || '').toUpperCase().replace(/[\s\-_.]/g, ''); }
   function searchHits(query) {
-    var q = String(query || '').trim().toUpperCase();
+    var q = norm(query);
     if (!q) return [];
+    var m = /^([A-Z]?)(\d{1,2})$/.exec(q), num = m ? +m[2] : -1;
     return Object.keys(store.derived.litters).filter(function (c) {
-      return c.indexOf(q) === 0 || (q.length >= 3 && /^\d+$/.test(q) && tag(c).indexOf(q) >= 0);
+      var cm = /^([A-Z])(\d+)$/.exec(c);
+      return c.indexOf(q) === 0 || (m && cm && +cm[2] === num && (!m[1] || m[1] === cm[1])) || (q.length >= 3 && /^\d+$/.test(q) && tag(c).indexOf(q) >= 0);
     }).sort(function (a, b) { return (a === q ? 0 : 1) - (b === q ? 0 : 1) || (unitOf(a) === UNIT ? 0 : 1) - (unitOf(b) === UNIT ? 0 : 1) || (a < b ? -1 : 1); }).slice(0, 8);
   }
   function crateLists() {
@@ -348,8 +272,8 @@
       return (rows.length ? UI.choiceGroup(rows.join(''), { title: '', strs: { title: 'pp.move.list.found' }, args: { title: { q: S.query.toUpperCase() } } }) : '') + notes.join('');
     }
     var C = candidates();
-    // this row of crates, nearest age first (the order says it; the search finds the rest)
-    return UI.choiceGroup(C.near.map(crateRow)) +
+    return (C.likely.length ? UI.choiceGroup(C.likely.map(crateRow), { title: '', strs: { title: 'pp.move.list.likely' } }) : '') +
+      (C.near.length ? UI.choiceGroup(C.near.map(crateRow), C.likely.length ? { title: '', strs: { title: 'pp.move.list.near' }, args: { title: { row: S.face.charAt(0) } } } : undefined) : '') +
       (C.empty.length ? UI.choiceGroup(C.empty.map(crateRow), { title: '', strs: { title: 'pp.move.list.empty' } }) : '');
   }
   function crateSection() {
@@ -454,7 +378,7 @@
     // (Into a litter with no task and no task piglets arriving, what they owe is not done — RULINGS round 2, Q18.)
     var noTask = L(rec.to) && !L(rec.to).inTask && !rec.joins;
     var oweKey = noTask ? 'owe_notask' : endedTo ? 'owe_ended' : 'owe';
-    if (rec.joins) items.push(fact('pp.move.carry.l.joins', null, rec.joins.earlier ? 'pp.move.carry.joins_earlier' : 'pp.move.carry.joins', { to: rec.to }));
+    if (rec.joins && !rec.said) items.push(fact('pp.move.carry.l.joins', null, rec.joins.earlier ? 'pp.move.carry.joins_earlier' : 'pp.move.carry.joins', { to: rec.to }));
     ['owe', 'unknown', 'check', 'done'].forEach(function (k) { if (groups[k].length) items.push(fact('pp.move.carry.l.' + (k === 'owe' ? oweKey : k), null, 'pp.move.carry.doses', { doses: txList(groups[k]) })); });
     var cid = CFG.doses.filter(function (d) { return d.castration; })[0].id;
     if (dueAt(rec.from, cid) && KIND[rec.packets[cid]]) {
@@ -477,7 +401,8 @@
   }
   // Why Move waits, one rule line under the form (farrowing's hint); the waiting button is described by it.
   function pointer(dr) {
-    if (S.query && L(S.query.toUpperCase()) && farrowing(S.query.toUpperCase())) return { id: 'pp.move.pointer.farrowing', args: { code: S.query.toUpperCase() } };
+    var uh = S.query ? searchHits(S.query) : [];
+    if (uh.length === 1 && farrowing(uh[0])) return { id: 'pp.move.pointer.farrowing', args: { code: uh[0] } };
     if (!S.other) return { id: 'pp.move.pointer.choose' };
     if (count() < 1) return { id: 'pp.move.pointer.pick' };
     if (dr.why) return { id: dr.why === 'name_the_rows' ? 'pp.move.pointer.rows' : 'pp.move.pointer.check' };
@@ -485,15 +410,36 @@
     if (dr.unanswered) { var q = (dr.asks || []).filter(function (id) { return !S.answers[id]; })[0]; return { id: 'pp.move.pointer.answer', args: { tx: txName(q) } }; }
     return null;
   }
+  /* Round 6: a receiver outside the task that still has her own piglets joins whole; they owe on their own schedule. Said before
+     Save, from the ledger's own replay of this Move (store.trial): "E01's own 7 piglets join too · owe Cut cord, Nasal drops
+     (2 days late)". Wanted from the ledger worker: `moveDraft.joins.own { n, owes: [{ dose, lateBy }] }` (derived here until then). */
+  function ownJoin(dr) {
+    var o = dr.joins && dr.joins.own, to = receiver();
+    if (!o) return '';
+    var owes = o.owes.filter(function (x) { return x.status === 'due' || x.status === 'late'; }), late = 0;
+    owes.forEach(function (x) { if (x.status === 'late') late = Math.max(late, x.lateBy); });
+    var txs = owes.map(function (x) { return PP.t('pp.common.tx.' + x.tx); }).join(PP.lang === 'zh' ? '、' : ', ');
+    var text = [s(pl('pp.move.own.join', o.n), { to: to, n: o.n })];
+    if (owes.length) text.push({ sep: true }, late ? s(pl('pp.move.own.owe_late', late), { txs: txs, k: late }) : s('pp.move.own.owe', { txs: txs }));
+    return K.warning({ tone: 'amber', title: text });
+  }
+  /* R2-3: a source with an open loss may say this Move is the missing piglet: the line closes and the source keeps its alive. */
+  function closesSection(dr) {
+    if (S.explains || !S.other || !dr.event || (!dr.openLoss && !S.closesLoss) || S.dir !== 'out') return '';
+    var lo = dr.openLoss || openLossOf(source());
+    return UI.choiceGroup(UI.choiceRow({ label: '', meta: '', mode: 'multi', action: 'closes-loss', value: 'y', selected: !!S.closesLoss,
+      strs: { label: 'pp.move.closes.label', meta: 'pp.move.closes.meta' }, args: { label: { code: source(), n: lo ? lo.open : 1 }, meta: { code: source() } } }));
+  }
   function review(dr) {
     if (!S.other || !dr.event) return '';
     // past a sane litter size: a second look, never a block (R1-31)
     var crowd = dr.crowded ? K.warning({ tone: 'amber', title: s('pp.move.warn.crowded', { to: receiver(), n: dr.crowded.alive }), text: s('pp.move.warn.crowded_text') }) : '';
     var ex = S.explains ? UI.heading({ title: '', kind: 'group', level: 4, strs: { title: gainOnly() && !S.explains[0] ? 'pp.move.explain.closes_gain' : 'pp.move.explain.closes' }, args: { title: { to: receiver() } } }) : '';
-    return '<section class="mv-section">' + deltas(source(), receiver(), dr.delta) + carryFacts(reviewRec(dr), dr.asks || []) + ex + '</section>' + crowd;
+    var own = ownJoin(dr);   // the warning says the join (and the receiver's own piglets): the facts do not say it twice
+    return '<section class="mv-section">' + deltas(source(), receiver(), dr.delta) + carryFacts(reviewRec(dr, !!own), dr.asks || []) + ex + '</section>' + own + crowd;
   }
   // the ticked identity rows are on the page above: the review does not list them again (the receipt does)
-  function reviewRec(dr) { return { from: source(), to: receiver(), n: dr.n, rows: [], packets: dr.carry, aliveBefore: alive(source()), joins: dr.joins }; }
+  function reviewRec(dr, said) { return { from: source(), to: receiver(), n: dr.n, rows: [], packets: dr.carry, aliveBefore: alive(source()), joins: dr.joins, said: said }; }
   // The Move button says what it will record (R1-18): the count and crates, and each answer given for a partly done source.
   function primarySpec(dr, ready) {
     if (!ready) return { label: s('pp.move.act.move_bare'), action: 'save-move', waiting: true };
@@ -502,7 +448,7 @@
     var what = asks.map(function (id) { return PP.t('pp.move.act.ans.' + S.answers[id], { tx: txName(id) }); }).join(' · ');
     return { label: s('pp.move.act.move_with', { n: dr.n, to: receiver(), what: what }), action: 'save-move' };
   }
-  function movePage() {
+  function moveSheet() {
     var f = S.face, dr = S.other ? draft() : { why: 'no_receiver' }, p = pointer(dr), ready = !p && !!dr.event;
     var sub = alive(f) > 0 ? s('pp.move.sheet.sub', { code: f, n: alive(f), day: L(f).dayAge }) : s('pp.move.sheet.sub_empty', { code: f });
     var explain = S.explains ? heading(gainOnly() ? 'pp.move.explain.title_gain' : 'pp.move.explain.title', { code: receiver(), n: gainOnly() ? S.n : count() }) : '';
@@ -510,51 +456,12 @@
     var ask = S.other && dr.event ? askSection(dr) : '';
     // why Move waits is said only when the worker taps it (a disabled primary stands alone above the footer, as farrowing's)
     var reason = p ? Object.assign({ id: 'mv-reason', visible: !!S.why }, s(p.id, p.args)) : null;
-    var body = explain + directionSection() + crateSection() + pairSection() + ask + countSection() + review(dr);
-    // Clear drops the draft (and an explaining link) while there is one to drop
-    var clear = draftExists() || S.explains ? UI.button({ label: '', register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '';
-    return K.page({ view: 'move', title: s('pp.move.sheet.title'), description: sub, aside: clear, body: '<div class="mv-stack">' + body + '</div>',
+    var body = explain + directionSection() + crateSection() + pairSection() + ask + countSection() + closesSection(dr) + review(dr);
+    // Clear (as the dead sheet's): greyed while there is no draft to drop; it drops an explaining link too
+    var clear = UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', waiting: !(draftExists() || S.explains), strs: { label: 'act.clear' } });
+    return K.drawer({ view: 'move', size: 'long', height: 'full', title: s('pp.move.sheet.title'), subtitle: sub, aside: clear, close: { action: 'dismiss' }, scrim: { action: 'dismiss' },
+      body: '<div class="mv-stack">' + body + '</div>',
       footer: K.footer({ back: { action: 'back' }, primary: primarySpec(dr, ready), status: reason }) });
-  }
-
-  /* ---- the receipt: the posted record, read back from the ledger, over the Moves page ---- */
-  function receiptDrawer(sv) {
-    var m = L(sv.to).moves.filter(function (x) { return x.id === sv.id; })[0];
-    var T = L(sv.to), joined = T.nurse && T.nurse.since === m.id ? { task: T.task, earlier: !!T.earlier } : null;   // round 4
-    var rec = { from: sv.from, to: sv.to, n: m.n, rows: m.rows, packets: m.packets, aliveBefore: sv.delta.from[0], joins: joined };
-    var body = '<div class="mv-stack">' + deltas(sv.from, sv.to, { from: [sv.delta.from[0], alive(sv.from)], to: [sv.delta.to[0], alive(sv.to)] }) +
-      '<section class="mv-section">' + heading('pp.move.receipt.carry', null, textAction('edit-move', 'act.edit')) + carryFacts(rec) + '</section></div>';
-    return K.drawer({ view: 'receipt', size: 'long', title: s(pl('pp.move.receipt.spray', m.n), { n: m.n }),
-      subtitle: s(pl(where(sv.to) ? 'pp.move.receipt.title_unit' : 'pp.move.receipt.title', m.n), { n: m.n, to: sv.to, u: unitOf(sv.to), time: U.time(m.at), who: m.who }),
-      body: body, footer: K.footer({ back: { action: 'back' } }) });
-  }
-
-  /* ---- resolving an arrival: how many already had it (unknown or check-on-the-pig). Save writes the stamped check and the
-     records together (append, all or nothing): an obligation is never cleared without a record. Back keeps the draft. ---- */
-  function resolving() {
-    var p = S.drawer.split(':'), g = L(S.face).doses[p[1]].unknownGroups.filter(function (x) { return x.id === p[0]; })[0];
-    return { group: p[0], dose: p[1], n: g ? g.n : 0, from: g ? g.from : '' };
-  }
-  function resolveEvents() {
-    var r = resolving(), had = Math.max(0, Math.min(S.had || 0, r.n)), rest = r.n - had, out = [];
-    if (S.rest === 'owed') out.push({ type: 'check', litter: S.face, dose: r.dose, had: had, lacks: rest, group: r.group });
-    else {
-      if (had) out.push({ type: 'check', litter: S.face, dose: r.dose, had: had, group: r.group });
-      if (rest) out.push({ type: 'treat', litter: S.face, dose: r.dose, n: rest, target: 'unknown', group: r.group });
-    }
-    return out;
-  }
-  function resolveDrawer() {
-    var r = resolving(), n = r.n, had = Math.max(0, Math.min(S.had || 0, n)), rest = n - had, visible = doseCfg(r.dose).visible;
-    var body = K.stepper({ face: 'row', label: '', description: '', value: had, min: 0, max: n, key: 'had', hint: '', reserveHint: had >= n,
-      strs: { label: 'pp.move.res.had', description: pl('pp.move.res.of', n), value: 'ds.field.figure', hint: had >= n ? pl('pp.move.res.ceiling', n) : undefined, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
-      args: { description: { n: n }, hint: { n: n } } });
-    if (rest) body += radios('rest', [{ value: 'record', id: pl('pp.move.res.record', rest), args: { tx: txName(r.dose), n: rest } },
-                      { value: 'owed', id: pl('pp.move.res.owed', rest), args: { n: rest } }], S.rest || '', pl('pp.move.res.rest', rest), { n: rest }, 'rest');
-    var save = { label: s('act.save'), action: 'save-resolve', waiting: !!rest && !S.rest };
-    return K.drawer({ view: 'resolve', size: 'long', scrim: { action: 'close-resolve' }, close: { action: 'close-resolve' },
-      title: s(pl('pp.move.res.title', n), { tx: txName(r.dose), n: n, code: r.from }), subtitle: s(visible ? 'pp.move.res.sub_check' : 'pp.move.res.sub_unknown', { tx: txName(r.dose) }),
-      body: '<div class="mv-stack">' + body + '</div>', footer: K.footer({ back: { action: 'close-resolve' }, primary: save }) });
   }
 
   /* ---- move-prelock: the door to the farrowing sheet ---- */
@@ -568,24 +475,23 @@
 
   function render() {
     normalize();
-    var over = '', under;
-    if (S.view === 'move') under = movePage();
-    else {
-      over = S.view === 'receipt' ? receiptDrawer(S.saved) : S.view === 'prelock' ? prelockDrawer() : S.view === 'face' && S.drawer ? resolveDrawer() : '';
-      under = facePage(S.face, !!over);   // a sheet after the page stacks above it (the skeleton's layers)
-    }
-    document.getElementById('screen').innerHTML = K.phone(taskScreen() + under + over, { label: s('pp.common.task') });
+    var over = S.view === 'prelock' ? prelockDrawer() : moveSheet();
+    document.getElementById('screen').innerHTML = K.phone(taskScreen() + over, { label: s('pp.common.task') });
     PP.apply(document.getElementById('screen'));
   }
-  // Save: the one record goes through append; the receipt reads it back. The draft resets (moved identity rows have left the source).
+  // Save: the one record goes through append; the litter drawer it returns to shows the receipt (`pp-receipt:dead`, the parts the
+  // dead and count sheets hand over; litter.js reads it for `saved=dead`). One Back, never a Moves page (R2-22).
   function post() {
     var dr = draft();
     if (!dr.event) return false;
-    var before = { from: source(), to: receiver(), delta: dr.delta, sourceAfter: dr.sourceAfter };
+    var from = source(), to = receiver(), n = dr.n, joined = !!dr.joins;
     var r = store.commit(dr.event);
     if (!r.ok) return false;
-    S.saved = Object.assign({ id: r.event.id }, before);
-    S = Object.assign(JSON.parse(DEFAULT), { view: 'receipt', face: S.face, saved: S.saved, kept: false });
+    var parts = [{ id: 'receipt.saved' }, { id: pl(where(to) ? 'pp.move.rcpt.line_unit' : 'pp.move.rcpt.line', n), args: { n: n, to: to, u: unitOf(to) }, tone: 'green' },
+      { id: pl('pp.move.rcpt.spray', n), args: { n: n } }];
+    if (joined) parts.push({ id: 'pp.move.rcpt.joins', args: { to: to } });
+    try { sessionStorage.setItem('pp-receipt:dead', JSON.stringify({ parts: parts, litter: S.face, from: S.face, event: r.event.id })); } catch (e) {}
+    location.href = litterHref(S.face) + '&saved=dead';
     return true;
   }
   function waiting(b) { return b.getAttribute('aria-disabled') === 'true' && (UI.guard(b), true); }
@@ -597,17 +503,17 @@
     if (a !== 'save-move') S.why = false;                      // any other act takes the answered reason away
     if (a === 'pick-row' || a === 'pair-loss') v = b.value;  // a multi row's checkbox carries its id as value
     if (a === 'pick-crate') {
-      S.other = v; S.query = ''; S.scanned = ''; S.rows = []; S.untagged = 0; S.answers = {};
+      S.other = v; S.query = ''; S.scanned = ''; S.rows = []; S.untagged = 0; S.answers = {}; S.closesLoss = false;
       // explaining a gain from a tagged source: the stray starts as untagged (a tag, if it has one, is picked instead)
       if (gainOnly() && S.dir === 'in' && hasRows(v)) S.untagged = Math.min(S.n, remainder(v));
       render();
     }
-    else if (a === 'change-crate') { if (S.explains && !gainOnly()) return; S.other = ''; S.rows = []; S.untagged = 0; S.answers = {}; render(); }
-    else if (a === 'dir') { if (S.dir !== v) { S.dir = v; S.rows = []; S.untagged = 0; S.answers = {}; } render(); }
+    else if (a === 'change-crate') { if (S.explains && !gainOnly()) return; S.other = ''; S.rows = []; S.untagged = 0; S.answers = {}; S.closesLoss = false; render(); }
+    else if (a === 'dir') { if (S.dir !== v) { S.dir = v; S.rows = []; S.untagged = 0; S.answers = {}; S.closesLoss = false; } render(); }
     else if (a === 'step') {
       if (b.getAttribute('aria-disabled') === 'true') return;
       var k = b.dataset.value, st = +b.dataset.step;
-      if (k === 'n' && (!S.explains || gainOnly())) S.n += st; else if (k === 'untagged') S.untagged += st; else if (k === 'had') S.had = (S.had || 0) + st;
+      if (k === 'n' && (!S.explains || gainOnly())) S.n += st; else if (k === 'untagged') S.untagged += st;
       render();
     }
     else if (a === 'all') { S.n = +v; render(); }
@@ -615,33 +521,16 @@
     else if (a === 'scan') { var code = scanCode(); S.query = code; S.scanned = code; render(); }   // the crate card's code fills the search (R1-5)
     else if (a === 'pick-row') { var i = S.rows.indexOf(v); if (i >= 0) S.rows.splice(i, 1); else S.rows.push(v); render(); }
     else if (a === 'pair-loss') { S.explains[0] = S.explains[0] === v ? null : v; render(); }   // the worker pairs; the app never does
+    else if (a === 'closes-loss') { S.closesLoss = !S.closesLoss; render(); }
     else if (a === 'answer') { var p = v.split(':'); S.answers[p[0]] = p[1]; render(); }
-    else if (a === 'clear') { var keep = { view: 'move', face: S.face, fromFace: S.fromFace }; S = Object.assign(JSON.parse(DEFAULT), keep); render(); }   // Clear also drops an explaining link
-    // Back from the Move page: to the Moves page it was opened from (the draft kept there), else to the litter it came from.
-    else if (a === 'back' && S.view === 'move') {
-      if (S.fromFace) { S.view = 'face'; S.kept = draftExists(); render(); }
-      else location.href = litterHref(S.face);
-    }
-    else if ((a === 'back' || a === 'dismiss') && S.view === 'receipt') { S.view = 'face'; render(); }
+    else if (a === 'clear') { if (b.getAttribute('aria-disabled') === 'true') return; var keep = { view: 'move', face: S.face }; S = Object.assign(JSON.parse(DEFAULT), keep); render(); }   // Clear also drops an explaining link
+    // Back, the ✕ and the scrim leave for the litter drawer the Move was opened from (the one Back).
     else if (a === 'back' || a === 'dismiss') { location.href = litterHref(S.face); }
-    else if (a === 'open-move') { S.view = 'move'; S.fromFace = true; S.kept = false; render(); }
     // a tap on a waiting Move says why: the reason line appears above the footer and is announced
     else if (a === 'save-move') {
       if (b.getAttribute('aria-disabled') === 'true') { S.why = true; render(); UI.guard(document.querySelector('[data-action="save-move"]')); return; }
-      post(); render();
+      if (!post()) render();
     }
-    else if (a === 'open-resolve') { S.drawer = v; var kept = resolveDrafts[v]; S.had = kept ? kept.had : 0; S.rest = kept ? kept.rest : ''; render(); }
-    else if (a === 'rest') { S.rest = v; render(); }
-    else if (a === 'close-resolve') { resolveDrafts[S.drawer] = { had: S.had || 0, rest: S.rest }; S.drawer = ''; render(); }
-    else if (a === 'save-resolve') {
-      if (waiting(b)) return;
-      var res = store.commitAll(resolveEvents());
-      if (!res.ok) { document.documentElement.setAttribute('data-door', 'refused:' + res.reason); return; }
-      delete resolveDrafts[S.drawer]; S.drawer = ''; render();
-    }
-    else if (a === 'record' || a === 'open-dose') { location.href = litterHref(S.face); }
-    // Edit (ticket #12) corrects a Move by id: its crate or count, one stamped correction that re-routes both legs.
-    else if (a === 'edit-move') { var mvs = L(S.face).moves; location.href = PP.href('edit.html', { state: 'edit', crate: S.face, move: v || (mvs[mvs.length - 1] || {}).id, from: 'move', data: store.name }); }
     else document.documentElement.setAttribute('data-door', a + ':' + (v || ''));
   });
   // Find a crate (R1-5): typing filters the list in place (the field keeps focus); Enter picks the one crate that can take part.
@@ -657,7 +546,7 @@
     if (picks.length === 1) picks[0].click(); else ev.target.blur();
   });
   PP.ready.then(function () {
-    store = PP.open(S.data || 'base', STATES[name].view === 'receipt' ? { session: false } : null);
+    store = PP.open(S.data || 'base', STATES[name].view === 'receipt' ? { fresh: true } : null);     // a receipt state saves for real, from a clean log, and lands in the drawer
     CFG = store.config; TODAY = store.today; UNIT = L(S.face).room;
     if (S.allRows) S.rows = liveRows(S.face).map(function (r) { return r.rowId; });
     // A count on a source with tagged piglets is the untagged ones (the rest are picked by their tags).

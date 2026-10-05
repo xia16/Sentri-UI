@@ -327,6 +327,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-move-move-doubt", "url": "ux/tasks/piglet-processing/move.html?state=move-doubt", "strict": true },
     { "name": "pp-move-move-young", "url": "ux/tasks/piglet-processing/move.html?state=move-young", "strict": true },
     { "name": "pp-move-move-emptied", "url": "ux/tasks/piglet-processing/move.html?state=move-emptied", "strict": true },
+    { "name": "pp-move-move-own", "url": "ux/tasks/piglet-processing/move.html?state=move-own", "strict": true },
     { "name": "pp-count-count-conflict", "url": "ux/tasks/piglet-processing/count.html?state=count-conflict", "strict": true },
     { "name": "pp-count-explain", "url": "ux/tasks/piglet-processing/count.html?state=explain", "strict": true },
     { "name": "pp-count-explain-suggest", "url": "ux/tasks/piglet-processing/count.html?state=explain-suggest", "strict": true },
