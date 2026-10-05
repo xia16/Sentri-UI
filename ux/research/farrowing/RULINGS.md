@@ -554,3 +554,9 @@ investigation and not yet ruled.
 - **Missed doses count as owed at End.** The room keeps them out of today's owed (Q15: past the last day, not overdue); at End, on the receipt and on the weaning handoff, a missed dose counts as owed / not done.
 - **Two phones recording one untagged death each on the same litter, neither seeing the other, with no open loss: soft-flagged for review** ("Same body recorded twice?") when the cause matches and they are within 30 minutes. Both count until answered.
 - **A correction may settle other litters' debts** (e.g. arrivals from the corrected litter), and the correction message always lists every litter whose owed figure moved.
+
+### Round 8 (owner, 2026-10-05, simplification)
+
+- **Users are farmers, not tech-savvy, used to paper.** Avoid complex status changes; prefer rules that simplify even if they restrict (retro 34). The owner will judge the simplified workflow in a working app before the seven simplification proposals are settled.
+- **Bulk recording stays** — walking the pens and treating them is how farms work.
+- **Bulk respects each treatment's time window.** Pens inside the window are ready to record; pens too early or past the window are shown apart and need a manual override with a clear alert ("B03 is day 6. Iron is given on day 2–4. Record anyway? It will be marked late."), and the record carries the early/late mark.
