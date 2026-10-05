@@ -165,8 +165,12 @@
     var open = askMiss().filter(function (r) { return !S.pig.miss[r]; });
     if (open.length) return { id: 'pp.dead.why.row_missing', args: { id: idText(rowOf(open[0])) }, to: 'miss-' + open[0], sub: 'tagged' };
     if (d.why) return { id: 'ds.dead.why.check', to: 'tallies' };
+    // R2-8: an entry that would leave nothing alive is asked once, in words, before it is saved
+    if (d.after && d.after.alive === 0 && alive() > 0 && S.sure !== sig())
+      return { id: 'pp.dead.why.all', args: { n: alive(), code: tgt() }, to: 'tallies', act: { id: 'pp.dead.all.yes', args: { n: alive() }, action: 'sure' } };
     return null;
   }
+  function sig() { return JSON.stringify([tgt(), S.pig.tallies, S.pig.picks, S.pig.k]); }
 
   // ---- Helpers ------------------------------------------------------------------------------
   function span(id, args, cls) { return U.span(id, args, { cls: cls }); }
@@ -202,23 +206,39 @@
         S.hint === c ? { hint: roster().length ? 'ds.dead.hint.cap_identified' : 'ds.dead.hint.cap' } : {}),
       args: { hint: { n: draft().cap }, decrease: { cause: cause }, increase: { cause: cause } } });
   }
-  function lossStepper() {
+  /* R2-23: were these bodies among the missing? Its own group, two choices side by side (a choice, never a fifth cause):
+     `From the missing` / `None were missing`; a count of how many only when more than one could be. The stepper never carries
+     the answer alone, so `None` is not a floor-gray minus. A floor (`at least n`) leaves only the count. */
+  function lossGroup() {
     var d = draft();
     if (!d.asksLoss) return '';
-    var m = d.openLoss, a = alive(), b = bodies(), k = S.pig.k, hint;
-    if (!b) hint = { id: 'ds.dead.loss.open', args: { m: m } };
-    else if (k == null) hint = { id: 'ds.dead.loss.ask' };
-    else if (d.kMin > 0 && k === d.kMin) hint = { id: 'ds.dead.loss.atleast', args: { n: d.kMin } };
-    else if (d.after) {
-      var after = d.after.alive, left = d.after.openLoss;
-      hint = a === after ? (left ? { id: 'ds.dead.loss.stay', args: { a: a, left: left } } : { id: 'ds.dead.loss.closed', args: { a: a } })
-        : { id: 'ds.dead.loss.move', args: { a: a, b: after, left: left } };
-    } else hint = { id: 'ds.dead.loss.ask' };
-    // `None were missing` is an explicit answer (a text action), so the floor-gray minus keeps its one meaning.
-    var none = b && k == null && !d.kMin ? [{ label: PP.t('ds.dead.loss.none'), action: 'loss-none', strs: { label: 'ds.dead.loss.none' } }] : [];
-    return '<div data-target="loss">' + K.stepper({ face: 'row', label: '', value: k || 0, min: k == null ? 0 : d.kMin, max: d.kMax, key: 'k', action: 'loss-step', hint: ' ', pointers: none,
-      strs: { label: 'ds.dead.loss.label', value: 'ds.field.figure', hint: hint.id, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
-      args: { label: { m: m }, hint: hint.args } }) + '</div>';
+    var m = d.openLoss, a = alive(), b = bodies(), k = S.pig.k, hint = null;
+    if (!b) return '<section class="dd-group" data-target="loss">' + UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'ds.dead.loss.open' }, args: { title: { m: m } } }) + '</section>';
+    if (k != null) {
+      if (d.kMin > 0 && k === d.kMin) hint = { id: 'ds.dead.loss.atleast', args: { n: d.kMin } };
+      else if (d.after) {
+        var after = d.after.alive, left = d.after.openLoss;
+        hint = a === after ? (left ? { id: 'ds.dead.loss.stay', args: { a: a, left: left } } : { id: 'ds.dead.loss.closed', args: { a: a } })
+          : { id: 'ds.dead.loss.move', args: { a: a, b: after, left: left } };
+      }
+    }
+    var head = UI.heading({ title: '', kind: 'group', level: 3, strs: { title: 'pp.dead.loss.title' }, args: { title: { m: m } } });
+    var many = d.kMax > 1, out = head;
+    if (d.kMin === 0) {
+      var sel = k == null ? '' : k > 0 ? 'some' : 'none', shown = function (v) { return sel === v && hint && !(v === 'some' && many) ? hint : null; };
+      var opt = function (v, id, args) {
+        var h = shown(v);
+        return { value: v, label: '', strs: Object.assign({ label: id }, h ? { meta: h.id } : {}), args: Object.assign({ label: args }, h ? { meta: h.args } : {}), meta: '' };
+      };
+      out += K.radios({ label: '', action: 'loss-pick', key: 'loss', selected: sel, id: 'dd-loss',
+        options: [opt('some', pl('pp.dead.loss.some', m), { m: m }), opt('none', 'ds.dead.loss.none')] });
+    }
+    if (k > 0 && (many || d.kMin > 0)) {
+      out += K.stepper({ face: 'row', label: '', value: k, min: Math.max(1, d.kMin), max: d.kMax, key: 'k', action: 'loss-step', hint: ' ',
+        strs: { label: 'pp.dead.loss.howmany', value: 'ds.field.figure', hint: hint ? hint.id : 'ds.dead.loss.ask', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
+        args: { hint: hint ? hint.args : null } });
+    }
+    return '<section class="dd-group" data-target="loss">' + out + '</section>';
   }
   /* A body found outside its crate (R1-8): other litters in this room with a piglet missing. Tapping one records the
      draft there, from that litter's open loss (the app never pairs by itself: the worker says whose it is). */
@@ -238,10 +258,9 @@
   // there), or several (tap = the list, one level down).
   function neighbourRow() {
     if (S.pig.route) return '<div data-target="route">' + door('route', crate, 'pp.dead.route.title', { code: tgt(), from: crate }, 'pp.dead.route.undo', { from: crate }) + '</div>';
-    if (!bodies()) return '';
-    var list = neighbours();
+    var list = neighbours();       // R2-23: offered before any count (a body in hand in an all-tagged crate has nothing to tap)
     if (!list.length) return '';
-    if (list.length === 1) return door('route', list[0].id, pl('pp.dead.nb.row', list[0].m), { code: list[0].id, m: list[0].m });
+    if (list.length === 1) return door('route', list[0].id, 'pp.dead.nb.title', null, pl('pp.dead.nb.row', list[0].m), { code: list[0].id, m: list[0].m });
     return door('sub', 'nb', 'pp.dead.nb.title', null, pl('pp.dead.nb.some', list.length), { n: list.length });
   }
   // The litter's tagged piglets (Q9: the shared picker shows them when there are any): one row here, the list one level down.
@@ -277,10 +296,13 @@
     // The line is always in the footer (read, visually hidden); a tap on the waiting Save shows it. The sow's hold writes its progress here too.
     var w = why();
     if (!w) return S.mode === 'sow' ? { text: '', id: 'dd-why' } : null;
-    return { text: PP.t(w.id, w.args), str: w.id, args: w.args, id: 'dd-why', visible: !!S.why };
+    // R2-23: a reason with an answer, or one that names a step one level down, is visible where the worker looks
+    var st = { text: PP.t(w.id, w.args), str: w.id, args: w.args, id: 'dd-why', visible: !!S.why || !!w.act || w.sub === 'tagged' };
+    if (w.act) st.action = { label: s(w.act.id, w.act.args), action: w.act.action, value: '' };
+    return st;
   }
   function piglets() {
-    var out = [heldRow(), '<div class="dd-tallies" data-target="tallies">' + causes().map(tallyRow).join('') + lossStepper() + '</div>'];
+    var out = [heldRow(), '<div class="dd-tallies" data-target="tallies">' + causes().map(tallyRow).join('') + '</div>', lossGroup()];
     if (S.pig.tallies.other > 0 || picks().some(function (r) { return S.pig.picks[r] === 'other'; })) out.push(noteField('pigNote'));
     out.push(neighbourRow(), taggedRow(), photoField('pig', pigN() > 0));
     return out.join('');
@@ -431,7 +453,7 @@
   function leave(saved) {
     var u = backUrl();
     if (saved) u += (u.indexOf('?') >= 0 ? '&' : '?') + 'saved=' + saved;
-    location.href = u;
+    location.replace(u);
   }
   function handOff(parts, litter, event) {
     try { sessionStorage.setItem('pp-receipt:dead', JSON.stringify({ parts: parts, litter: litter, from: crate, event: event })); } catch (e) {}
@@ -522,9 +544,11 @@
       if (!bodies() || gray) return;
       S.kTouched = true;
       if (S.pig.k == null) S.pig.k = st > 0 ? Math.max(1, dd.kMin) : 0;
-      else S.pig.k = Math.max(dd.kMin, Math.min(dd.kMax, S.pig.k + st));
+      else S.pig.k = Math.max(Math.max(1, dd.kMin), Math.min(dd.kMax, S.pig.k + st));
     }
     else if (a === 'loss-none') { if (bodies() && !draft().kMin) { S.pig.k = 0; S.kTouched = true; } }
+    else if (a === 'sure') { S.sure = sig(); }
+    else if (a === 'loss-pick') { S.kTouched = true; S.pig.k = v === 'none' ? 0 : Math.max(1, draft().kMin); }
     else if (a === 'pick-cause') { picks().forEach(function (r) { S.pig.picks[r] = v; }); keep(); }
     else if (a === 'miss') { S.pig.miss[b.dataset.field] = v; keep(); }
     else if (a === 'route') route(v);
@@ -630,6 +654,7 @@
       if (field === 'pick-cause') picks().forEach(function (r) { S.pig.picks[r] = value; });
       else if (field === 'sow-cause') S.sow.cause = value;
       else if (field === 'held') S.heldPick = value;
+      else if (field === 'loss') { S.kTouched = true; S.pig.k = value === 'none' ? 0 : Math.max(1, draft().kMin); }
       else S.pig.miss[field] = value;
       keep(); render();
     } });

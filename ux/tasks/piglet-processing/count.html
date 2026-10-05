@@ -98,12 +98,17 @@
   }
   function explain() { return store.select.explain(store.derived, S.room ? { room: S.room } : { litter: crate }, { who: window.PPFixtures.ME }); }
   function dirty() { return S.observed !== draft().base || S.rows.length > 0; }
+  function countsNow() { return store.select.counts(store.derived, crate) || { counts: [] }; }
+  function conflictNow() { return countsNow().conflict; }
+  // a count that matches the record writes nothing new — unless it settles two counts that disagreed or crossed a change
+  function settling() { var c = countsNow(); return !!(c.conflict || c.review); }
   function countIds() { return L().counts.map(function (c) { return c.id; }); }
   /* A kept count is stale when a newer count reached this phone after it was observed (same-device order: the counts it had
      seen, never clocks between devices), or when this phone's own clock, read now, says it is older than a visit. Once stale,
      Save waits until the count is touched again (a fresh observation). */
   function stale() {
     if (!S.at) return null;
+    if (S.baseAlive != null && S.baseAlive !== L().alive) return { kind: 'moved' };
     var newer = L().counts.filter(function (c) { return (S.seen || []).indexOf(c.id) < 0; });
     if (newer.length) return { kind: 'newer', c: newer[newer.length - 1] };
     if (Date.now() - (S.obsMs || 0) > STALE_MIN * 60000) return { kind: 'old' };
@@ -115,7 +120,7 @@
   var DKEY = function () { return 'pp-count-draft:' + store.name + ':' + crate; };
   var mem = spec.kept && spec.view !== 'litter' ? { d: null } : null;
   function keepDraft() {
-    var d = dirty() ? { observed: S.observed, rows: S.rows.slice(), at: S.at, obsMs: S.obsMs, seen: S.seen } : null;
+    var d = dirty() ? { observed: S.observed, rows: S.rows.slice(), at: S.at, obsMs: S.obsMs, seen: S.seen, baseAlive: S.baseAlive } : null;
     if (mem) { mem.d = d; return; }
     try { if (d) sessionStorage.setItem(DKEY(), JSON.stringify(d)); else sessionStorage.removeItem(DKEY()); } catch (e) {}
   }
@@ -159,7 +164,7 @@
   // the answer a sanity question takes (`17 is right`, `None are there`) is the status line's text action
   function saveFooter(p, waiting, action, id, args, backAction) {
     // a waiting primary stands alone (farrowing): its reason shows once it is tapped (the guard), then stays while it applies
-    var st = p ? { text: PP.t(p.id, p.args), str: p.id, args: p.args, id: 'ct-why', visible: !!S.why } : null;
+    var st = p ? { text: PP.t(p.id, p.args), str: p.id, args: p.args, id: 'ct-why', visible: !!S.why || !!p.act || !!p.block } : null;
     if (st && p.act) st.action = { label: s(p.act.id, p.act.args), action: p.act.action, value: String(S.observed) };
     return K.footer({ back: { action: backAction || 'back' }, status: st, primary: { label: s(id || 'act.save', args), action: action || 'save', waiting: waiting } });
   }
@@ -241,7 +246,8 @@
   }
   /* ---- the Set count drawer: a staged assertion (Back keeps the draft, Clear discards it, Save writes one stamped count) ---- */
   function hint(d) {
-    if (d.kind === 'match') return { id: 'pp.count.hint.match' };
+    if (S.blank) return { id: 'pp.count.hint.blank' };
+    if (d.kind === 'match') return { id: settling() ? 'pp.count.hint.match_settle' : 'pp.count.hint.match' };
     return { id: 'pp.count.hint.' + d.kind, args: { k: Math.abs(d.diff), kp: np(Math.abs(d.diff)) } };
   }
   // R1-9: below Alive on a litter with tags, the count may name which tagged piglets are missing — required only when the
@@ -265,10 +271,12 @@
       footer: saveFooter(p, !d.event || !!stale() || S.failed || !!sanity(d), 'save', 'act.save', null, 'sub-back'), scrim: { action: 'sub-dismiss' } });
   }
   function pointer(d) {
-    if (S.failed) return { id: 'pp.count.why.failed' };
+    if (S.failed) return { id: 'pp.count.why.failed', block: true };
+    if (S.blank) return { id: 'pp.count.why.blank' };
     var st = stale();
-    if (st && st.kind === 'newer') return { id: 'pp.count.why.newer', args: { who: st.c.who, np: np(st.c.observed), t: when(st.c.at) } };
-    if (st) return { id: 'pp.count.why.stale', args: { t: when(S.at) } };
+    if (st && st.kind === 'newer') return { id: 'pp.count.why.newer', args: { who: st.c.who, np: np(st.c.observed), t: when(st.c.at) }, block: true };
+    if (st && st.kind === 'moved') return { id: 'pp.count.why.moved', args: { a: np(L().alive) }, block: true };
+    if (st) return { id: 'pp.count.why.stale', args: { t: when(S.at) }, block: true };
     if (d.why === 'name_the_rows') return { id: pl('pp.count.why.rows', d.needRows - d.picked.length), args: { n: d.needRows - d.picked.length } };
     if (d.why === 'too_many_rows') return { id: pl('pp.count.why.too_many', d.maxRows), args: { n: d.maxRows } };
     if (d.why) return { id: 'pp.count.why.check' };
@@ -292,17 +300,18 @@
     return '<section class="ct-group" data-target="zero">' + UI.heading({ title: '', kind: 'group', level: 3, strs: { title: 'pp.count.zero.title' }, args: { title: { code: crate } } }) +
       doors(row({ action: 'open-move', value: crate, title: 'pp.count.zero.move', titleArgs: { code: crate }, desc: 'pp.count.zero.move_desc' })) + '</section>';
   }
-  function settleRows() { var c = store.select.counts(store.derived, crate) || { counts: [] }; return settleRow(c) + agreeRow(c); }
+  function settleRows() { var c = countsNow(); return settleRow(c) + agreeRow(c); }
   function countSheet() {
     var d = draft(), h = hint(d), p = pointer(d);
     var hero = K.stepper({ face: 'count', label: '', value: S.observed, min: 0, key: 'observed', variant: 'hero', draft: dirty(), hint: '', reserveHint: true,
       strs: { label: 'pp.count.seen', value: 'ds.field.figure', hint: h.id, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { label: { code: crate }, hint: h.args } });
+    if (S.blank) hero = hero.replace(/(<span class="st-stepper-value"[^>]*?)\s+data-str="[^"]*"(?:\s+data-args="[^"]*")?([^>]*>)\d+(<\/span>)/, '$1$2–$3').replace(' data-zero=""', '');
     // a held body is answered here too, above the number (R1-22): the drawer never hides the question under it
     return K.drawer({ size: 'long', view: 'count', title: s('pp.count.title'), subtitle: subtitleOf(),
       aside: dirty() ? UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '', close: { action: 'dismiss' },
       body: '<div class="ct-body">' + heldRow() + settleRows() + hero + zeroSection(d) + rosterRow(d) + '</div>',
-      footer: saveFooter(p, !d.event || !!stale() || S.failed || !!sanity(d)), scrim: { action: 'dismiss' } });
+      footer: saveFooter(p, !d.event || !!stale() || S.failed || S.blank || !!sanity(d)), scrim: { action: 'dismiss' } });
   }
 
   /* ---- where the ledger does not take a count, the door says why: before the lock the count is the farrowing sheet's (hand-off);
@@ -330,7 +339,7 @@
     return l.loss ? PP.t('pp.count.sug.gain_closes', { kp: np(l.loss) }) : PP.t('pp.count.sug.loss_closes', { kp: np(l.gain) });
   }
   // how far apart the two counts were: the rail word of a suggestion (`5 min`, `2h`)
-  function gap(m) { return m == null ? null : m < 60 ? ['pp.count.sug.gap_min', { m: m }] : ['pp.count.sug.gap_h', { h: Math.round(m / 60) }]; }
+  function gap(m) { return m == null ? null : m < 1 ? ['pp.count.sug.gap_now', {}] : m < 60 ? ['pp.count.sug.gap_min', { m: m }] : ['pp.count.sug.gap_h', { h: Math.round(m / 60) }]; }
   // A door on Explain: farrowing's Pen-page card row (an icon tile, a title, one description line)
   function item(icon, action, value, title, titleArgs, desc, descArgs) {
     return { icon: icon, action: action, value: value, title: s(title, titleArgs), description: desc ? s(desc, descArgs) : undefined };
@@ -352,6 +361,8 @@
     // every door carries one description line (farrowing's Pen page)
     if (more > 0) rows.push(item('more', 'more', l.id, pl('pp.count.sug.more', more), { n: more }, 'pp.count.ex.more_desc'));
     if (l.kind === 'gain') rows.push(item('send', 'move-in', l.id, 'pp.count.ex.move_in', null, 'pp.count.ex.move_in_desc'));
+    // R2-3: the piglet may be in another crate — the Move out of this litter that explains this line (move.html reads `pair`)
+    if (l.kind === 'loss') rows.push(item('send', 'move-out', l.id, 'pp.count.ex.move_out', null, 'pp.count.ex.move_out_desc'));
     if (l.death) rows.push(item('alert', 'open-dead', l.litter, 'pp.dead.title.record', null, pl('pp.count.ex.dead_desc', l.open), { np: np(l.open) }));
     rows.push(item('check', 'open-count', l.litter, 'pp.count.review.again', { code: l.litter }, 'pp.count.ex.again_short'));
     // a mistaken count is corrected through Edit (RULINGS round 3): withdrawn or set, stamped, its line goes
@@ -359,9 +370,15 @@
     // round 4: a counted gain owes nothing new — the litter's recorded treatments stand; the worker checks on the pig
     var g = l.kind === 'gain' ? L(l.litter).unexplained.gains.filter(function (x) { return x.id === l.id; })[0] : null;
     var note = g && g.check ? 'pp.count.line.check' : l.review ? 'pp.count.review.line' : '';
+    // R2-24: a tagged piglet a count named missing is named here, not only in the dead picker
+    var named = l.kind === 'loss' ? (l.rows || []).map(function (id) {
+      var r = L(l.litter).identity.rows.filter(function (x) { return x.rowId === id; })[0]; if (!r) return '';
+      var lb = rowLabel(r); return PP.t(lb.id, lb.args);
+    }).filter(Boolean) : [];
     return '<section class="ct-group">' +
       (alone ? '' : UI.heading({ title: '', description: '', kind: 'section', level: 3, strs: { title: t.id, description: st.id }, args: { title: t.args, description: st.args } })) +
-      (note ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: note } }) : '') + K.doors({ card: true, items: rows }) + '</section>';
+      (note ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: note } }) : '') +
+      (named.length ? UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.count.line.named' }, args: { title: { ids: named.join(', ') } } }) : '') + K.doors({ card: true, items: rows }) + '</section>';
   }
   function explainPage(inert) {
     var x = explain(), sub = { lp: np(x.openLoss), gp: np(x.openGain) };
@@ -430,7 +447,8 @@
     if (S.view === 'count') {
       var w = draft().why;
       html = w === 'farrowing_open' || w === 'weaned' ? refusedSheet(w) : S.sub === 'roster' ? rosterView(draft()) : countSheet();
-      if (S.sub === 'held') over = heldDialog();
+      // R2-7: a held body is its own question — the Set count sheet is not drawn under it (its number would go stale)
+      if (S.sub === 'held') { html = ''; over = heldDialog(); }
     }
     else if (S.view === 'explain') { html = explainPage(); if (S.sub === 'held') over = heldDialog(); }
     else if (S.view === 'suggest') { var dr = suggestSheet(); html = dr ? explainPage(true) + dr : explainPage(); }
@@ -458,23 +476,35 @@
   function openCount(c) {
     if (c && c !== crate) { nav('count.html', { state: 'count', crate: c }); return; }
     var k = keptDraft();
-    S.rows = k ? k.rows.slice() : []; S.at = k ? k.at : null; S.obsMs = k ? k.obsMs : 0; S.seen = k ? k.seen : null;
+    S.rows = k ? k.rows.slice() : []; S.at = k ? k.at : null; S.obsMs = k ? k.obsMs : 0; S.seen = k ? k.seen : null; S.baseAlive = k ? k.baseAlive : null;
     S.failed = false; S.view = 'count'; S.sub = ''; S.receipt = null; S.deadRcpt = null; S.sure = null; S.why = false;
     S.observed = k ? k.observed : draft().base;
+    S.blank = !k && !!conflictNow();     // two counts disagree: nobody has the number yet (s8), the stepper starts blank
   }
   // any change to the count is a fresh observation: its time (the stamp Save writes; this phone's clock for staleness)
   // and the counts this phone had at that moment
-  function touch() { S.at = store.now(); S.obsMs = Date.now(); S.seen = countIds(); S.failed = false; S.sure = null; }
+  function touch() { S.at = store.now(); S.obsMs = Date.now(); S.seen = countIds(); S.baseAlive = L().alive; S.failed = false; S.sure = null; S.blank = false; }
+  // what this page did, handed to the litter drawer it returns to (`pp-receipt:count`)
+  function handOff(parts, event) {
+    try { sessionStorage.setItem('pp-receipt:count', JSON.stringify({ parts: parts, litter: crate, event: event })); } catch (e) {}
+  }
   function save() {
     var d = draft();
     if (!d.event) return false;
+    // R2-24: a count equal to the record is said so and writes nothing — the log does not fill with no-op counts
+    if (d.kind === 'match' && !settling()) {
+      handOff([{ id: 'pp.count.rcpt.same' }], '');
+      dropDraft(); S.rows = []; S.at = null; lastTap = Date.now();
+      return true;
+    }
     var r = store.commit(Object.assign({}, d.event, { at: S.at || store.now() }));
     if (!r.ok) { S.failed = true; return false; }
-    try { sessionStorage.setItem('pp-receipt:count', JSON.stringify({ parts: receiptParts(d.kind, d.diff), litter: crate, event: r.event.id })); } catch (e) {}
+    handOff(receiptParts(d.kind, d.diff), r.event.id);
     dropDraft(); S.rows = []; S.at = null; lastTap = Date.now();
     return true;
   }
   function back() {
+    if (S.sub === 'held' && S.heldUrl) { toLitter(''); return 'nav'; }
     if (S.sub) { var from = S.sub; S.sub = ''; S.focus = '[data-action="sub"][data-value="' + from + '"]'; return; }
     if (S.view === 'count') keepDraft();
     if (S.view === 'suggest') { S.view = 'explain'; return; }
@@ -483,7 +513,8 @@
     return 'nav';
   }
   // the litter drawer over the room: where Set count and Explain were opened (with `saved=count`, the count's receipt)
-  function toLitter(saved) { nav('room.html', { state: 'litter', crate: crate, unit: qs.get('unit'), saved: saved }); }
+  // the page is replaced, never stacked: Back from the litter lands before this count, not on it (R2-24)
+  function toLitter(saved) { location.replace(PP.href('room.html', { state: 'litter', crate: crate, unit: qs.get('unit'), saved: saved, data: store.name })); }
   function goTo(target) {
     var t = document.querySelector('[data-target="' + target + '"]');
     if (t) { t.scrollIntoView({ block: 'center' }); var f = t.querySelector('input, button'); if (f) f.focus({ preventScroll: true }); }
@@ -504,7 +535,7 @@
       keepDraft();
     }
     else if (a === 'pick-row') { var i = S.rows.indexOf(v); if (i >= 0) S.rows.splice(i, 1); else S.rows.push(v); touch(); keepDraft(); }
-    else if (a === 'clear') { dropDraft(); S.observed = draft().base; S.rows = []; S.at = null; S.obsMs = 0; S.seen = null; S.failed = false; }
+    else if (a === 'clear') { dropDraft(); S.observed = draft().base; S.rows = []; S.at = null; S.obsMs = 0; S.seen = null; S.baseAlive = null; S.failed = false; S.blank = !!conflictNow(); }
     else if (a === 'save') {
       // a waiting Save answers the tap (the reason flashes and re-announces) and points at the step
       if (UI.guard(b)) {
@@ -531,12 +562,24 @@
       if (UI.guard(b) || !v) return;
       S.heldPick = '';
       var rv = v.split('|'), r = store.commit({ type: 'resolve', litter: crate, held: rv[0], answer: rv[1] });
-      if (!r.ok) S.failed = true;
       S.sub = '';
+      if (!r.ok) S.failed = true;
+      else {
+        // the number in the stepper was taken against an Alive that has just changed: start again from the record, keep nothing
+        dropDraft(); S.rows = []; S.at = null; S.obsMs = 0; S.seen = null; S.baseAlive = null; S.failed = false; S.sure = null;
+        S.observed = draft().base; S.blank = !!conflictNow();
+        var hp = [{ id: 'receipt.saved' }, { id: rv[1] === 'one' ? 'pp.count.rcpt.held_one' : 'pp.count.rcpt.held_two', args: { ap: np(L().alive) } }];
+        if (S.view === 'explain') S.deadRcpt = hp;
+        else { handOff(hp, r.event ? r.event.id : ''); lastTap = Date.now(); toLitter('count'); return; }
+      }
     }
     else if (a === 'open-dead') { nav('dead.html', { state: 'dead', crate: v || crate, unit: qs.get('unit'), back: backHere() }); return; }
     else if (a === 'found-body') { nav('dead.html', { state: 'dead-found', unit: v, back: backHere() }); return; }
     else if (a === 'sure') { S.sure = S.observed; }
+    else if (a === 'move-out') {
+      var ml = lineOf(v); if (!ml) return;
+      nav('move.html', { state: 'move', crate: ml.litter, n: ml.open, pair: ml.id }); return;
+    }
     else if (a === 'move-in') {
       var gl = lineOf(v); if (!gl) return;
       nav('move.html', { state: 'move', crate: gl.litter, dir: 'in', n: gl.open, explains: ',' + gl.id }); return;
@@ -591,6 +634,7 @@
       if (spec.rows) S.rows = spec.rows.slice();
     }
     if (spec.sub) S.sub = spec.sub;
+    S.heldUrl = spec.sub === 'held';            // opened straight on the question (from the litter or the room): Back returns there
     // back from the dead drawer (Save): its receipt, handed over on this phone
     if (qs.get('saved') === 'dead') {
       try { var hr = JSON.parse(sessionStorage.getItem('pp-receipt:dead') || 'null'); sessionStorage.removeItem('pp-receipt:dead'); if (hr) S.deadRcpt = hr.parts; } catch (e) {}
