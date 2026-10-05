@@ -51,8 +51,6 @@
   var STATES = {
     'id-empty':           { data: 'base', l: 'A02' },
     'id-no-tag':          { data: 'base', l: 'A02', press: 'record' },
-    // R2-1: an empty tag field with the greyed next tag (never recorded): Record refuses, and "Use 004303" is the explicit tap
-    'id-ghost-refused':   { data: 'a02-tags-gh', l: 'A02', press: 'record' },
     // R2-27: the weigh-first order (Weight tapped with no tag yet): the way back to the tag stays on the pad
     'id-weight-first':    { data: 'base', l: 'A02', active: 'weight' },
     'id-entry':           { data: 'a02-tags-gh', l: 'A02' },
@@ -401,7 +399,7 @@
       if (s.actions) o.actions = s.actions;
     }
     // The greyed next tag is never recorded on its own: "Use 004303" is the explicit tap, beside whatever else the line offers.
-    if (run.active === 'tag' && !run.note && (!run.tag.value || run.tag.suggested) && run.tag.suggestion && !(s && s.actions && s.actions.some(function (x) { return x.action === 'numpad-suggestion'; }))) {
+    if (run.active === 'tag' && !run.note && !run.tag.value && run.tag.suggestion && !(s && s.actions && s.actions.some(function (x) { return x.action === 'numpad-suggestion'; }))) {
       o.actions = (o.actions || []).concat([{ label: '', action: 'numpad-suggestion', strs: { label: 'ds.field.numpad.use_suggestion' }, args: { label: { tag: idOf(run.tag.suggestion) } } }]);
     }
     // Scan reads the tag in hand (the camera): the tag pad's last status action on a tag farm, always there.
@@ -421,6 +419,8 @@
     // Every alive piglet identified and no piglet of this litter on the pad: Record has nothing to do (the status line
     // offers Set count), so Close is the sheet's one way on.
     if (allIn()) return null;
+    // the field holds only the suggestion: the button names it, so recording it is never silent
+    if (run.tag.suggested && run.tag.suggestion) return ['pp.id.act.record_tag', { tag: idOf(run.tag.suggestion) }];
     return [keepers ? 'pp.id.act.record_next_keeper' : 'pp.id.act.record_next', null];
   }
   // Farrowing's Piglet identity page: the litter's progress, the piglet's fields, the pad; Back returns to the records.
@@ -673,12 +673,12 @@
     // Repeat taps and the warning's first 600ms are ignored; a repeat right after a record says so (the warning stays in view itself).
     if (run.armed && now - run.armedAt < 600) return;
     if (now - lastCommit < 600) { if (!run.armed) { run.note = { id: 'pp.id.hint.wait_tap', tone: 'warn' }; render(); } return; }
-    // The greyed next tag is a suggestion, never a record: an empty field refuses, and "Use 004303" is the explicit tap.
-    var raw = run.tag.suggested ? '' : run.tag.value, v = notch ? (raw ? String(+raw) : '') : raw;
+    // The greyed next tag is recorded only because the button names it ("Record · 004304"); a field with no suggestion refuses.
+    var raw = run.tag.value, v = notch ? (raw ? String(+raw) : '') : raw;
     // A row needs its identity: a tag on a tag farm, a notch number on a notch farm. Sex and weight never block.
     if (!v) {
       run.active = 'tag'; run.note = { id: notch ? 'pp.id.hint.no_notch' : 'pp.id.hint.no_tag', tone: 'warn' };
-      if (run.tag.suggestion) run.note.actions = [{ label: '', action: 'numpad-suggestion', strs: { label: 'ds.field.numpad.use_suggestion' }, args: { label: { tag: idOf(run.tag.suggestion) } } }];
+      if (run.tag.suggestion && !run.tag.suggested) run.note.actions = [{ label: '', action: 'numpad-suggestion', strs: { label: 'ds.field.numpad.use_suggestion' }, args: { label: { tag: idOf(run.tag.suggestion) } } }];
       render(); return;
     }
     // A notch number runs 1–99: 0 is not one, and the page says so instead of refusing in silence.

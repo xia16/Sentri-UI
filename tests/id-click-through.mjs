@@ -66,10 +66,11 @@ try {
   assert.match(await status(page), /Last 004301 · boar · 1\.42 kg/);
   // piglet 2: the suggestion (004302), a gilt, then the visible Clear takes the sex back to missing, then gilt again
   assert.match(await text(page, '.st-numpad-readout'), /004302/);
-  // R2-1: the greyed next tag is never recorded by an empty Record: it refuses, visibly, and "Use 004302" is the explicit tap
-  await record(page);
-  assert.match(await status(page), /No tag yet/);
-  assert.match(await progress(page), /Piglet 2 of 12/);
+  // R2-1: with only the suggestion in the field the button names it, so recording it is never silent
+  assert.match(await text(page, '.tk-footer [data-action="record"]'), /^Record · 004302$/);
+  await keys(page, '9');
+  assert.match(await text(page, '.tk-footer [data-action="record"]'), /Record · next piglet/);
+  await keys(page, '<');
   await tap(page, '[data-action="numpad-suggestion"]');
   assert.match(await text(page, '.st-numpad-readout'), /004302/);
   await tap(page, '#id-sex [data-value="g"]');
@@ -219,7 +220,6 @@ try {
   await page.goto(base + 'room.html?state=room&data=keepers&fresh=1'); await ready(page);
   await openIdentity(page, 'A07');
   await tap(page, '[data-action="open-run"]');
-  await tap(page, '[data-action="numpad-suggestion"]');
   await record(page);
   await toTable(page);
   assert.match(await text(page, '[data-ds="Facts"]'), /Tagged so far 10/);
