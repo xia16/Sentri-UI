@@ -140,3 +140,45 @@ Same nine walks (Sonnet), each also asked to flag anything unlike farrowing or c
 | R2-N3 | The offline worker's own phone (not synced / held / kept but not counted) — still undesigned (R1 N3). [s7, s8] | new slice |
 | R2-N4 | Where the vet sees "double dose recorded for the vet". [s8] | out of scope → Not yet specified |
 | R2-N5 | Orphaned litters and where their piglets went, at End. [s6] | change a slice · `end.html` |
+
+## Round 3 — 2026-10-05, map `7fbd551`
+
+Nine walks (Sonnet); condensed notes `scratchpad/walk/r3/*.md`. **Round 3 is not clean**, but every walk's core path now works and the look was not questioned. Confirmed fixed this round: R2-1, 2, 8, 9, 10 (drafts gate), 14, 17, 19, 20, 21, 22, 23 (mostly), 24 ("0 min"), 25 (dup-tag, receipts), 28; R1-24, 25, 27; N7.
+
+### Blockers (wrong facts)
+
+| # | Finding | Class |
+|---|---|---|
+| R3-1 | "Different piglets · both stand" accepts impossible totals (11+11 → 22 of 22 on 11 alive); the overview counts them. [s8, breaker] | change a slice · ledger, `edit.html` double |
+| R3-2 | Double-tapping Move records the move twice. [breaker] | change a slice · `move.html` |
+| R3-3 | "In another crate" opens the Move with the closes-loss box unticked; the preview says 11 → 10 and saving double-subtracts. [s5] | change a slice · `move.html` |
+| R3-4 | Receiver accepts "had it 0 · record 3" when the source had only 2 untreated → a double dose. [s4] | change a slice · ledger, litter drawer |
+| R3-5 | A tagged missing piglet is never offered under "Found outside its crate?"; a lone candidate crate is auto-picked, so a body can close the wrong litter's loss. [s3] | change a slice · `dead.html` |
+| R3-6 | Arrivals' ages: the receiver's own castration disappears once arrivals are castrated; arrivals' due castration saves "early"; 2-days-late iron saves "early, counts on time"; future rows use the receiver's age; a day-2 nurse's own piglets read "1 day late". [s4, s6] | change a slice · ledger (cohorts for castration and lateness) |
+| R3-7 | Phantom drafts: End lists the fixture's seeded drafts in a real flow. [breaker] | change a slice · `end.html` |
+
+### Numbers that disagree (owner)
+
+| # | Finding | Class |
+|---|---|---|
+| R3-8 | The room headline counts tagging, so it never drops after the day's treatments; Done 0 vs "4 / 20 finished"; units sheet 22 vs 20; keepers farm "19 owe". [s1, s7, breaker, s2] | **owner** (Q-G) + `room.html` |
+| R3-9 | Missed doses: the room says "not owed, not overdue" (Q15) but End, the receipt and the handoff count B04's 10 missed as owed; "drops 28 doses" not on the receipt; never-due counted as "not done at end". [s7, breaker] | **owner** (Q-H) + `end.html`, ledger |
+| R3-10 | A correction cleared a third litter's arrivals' castration debt; the message named only two litters. [s7] | **owner** (Q-I) + `edit.html` message |
+| R3-11 | Two phones record the same untagged body with no open loss: counted twice, no cue. A tagged piglet recorded dead twice: counted once but the log shows two deaths. [s8] | **owner** (Q-J) + ledger, log |
+
+### Smaller (change a slice)
+
+R3-12 End receipt orphan death counts wrong (birth deaths dropped); raw "{n}" after End; accepted late mark still in "Not done at end" [s6, s7] · `end.html`, drawer.
+R3-13 Disputed Alive still shown as fact with one-tap Record (R2-18) [s8] · drawer.
+R3-14 Drawer: stale after completing a deferral (tail row vanishes); deferred count ignores the treatment; done-late marker lost; recorded row under "Due today"; "10 of 10" summaries mixing old/arrived/moved; source-first strips receiver context; castrate sheet doesn't say which piglets and accepts more males than sexes allow; birth weight replaced by the weigh-day weight; nurse names only her first source [s1, s4, s6, breaker, s2] · drawer, ledger.
+R3-15 Edit: "Recorded by mistake" wipes a one-body pick; withdrawn body still offered; Sow-died targets include weaned/dead sows; amber card under the header [s3, s7, breaker] · `edit.html`.
+R3-16 Dead: cause chips below a long tag list; stale tagged-count copy [s3] · `dead.html`, `count.html`.
+R3-17 Move: own-piglets warning below the fold; "Likely" list mislabeled; draft lost on Back; impossible "5–3 males" preview; chips without names [s4, s6, breaker] · `move.html`.
+R3-18 Identity: 360 hides Weight; pad live after the last piglet; weigh-day counters behind a line that doesn't look tappable; re-weigh overwrites without a trace; keepers "10 of 14" after closing; the weigh day missing from the log [s2] · `id.html`, `edit.html`.
+R3-19 Room/Find: dead tagged piglet unfindable; numeric keypad for Find; row meta counts off by group [breaker, s6] · `room.html`.
+R3-20 Explain/count: two "Move 1" confirms; "15 is right" gives no acknowledgement; "5 min" vs "just now" [s5] · `count.html`.
+
+### New scenarios
+- R3-N1 Per-treatment progress for the day's job ("Iron · tail: 7 of 8 done") — folds into Q-G.
+- R3-N2 Bulk Undo for a whole bulk record [s1] · `bulk.html`.
+- R2-N3 (offline worker's own phone) still undesigned.
