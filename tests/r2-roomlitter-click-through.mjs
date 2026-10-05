@@ -150,6 +150,23 @@ try {
   assert.equal(await has(page, '[data-action="open-more"]'), false);
   console.log('ok 10 four tools at 360');
 
+  // 11. R2-22: forgiving Find; the drawer lists its Moves, each with an Edit door.
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const q of ['a4', 'A 04', 'A-04']) {
+    await go('room.html?state=room-find&fresh=1&q=' + encodeURIComponent(q));
+    assert.equal(await page.locator('#scan-results [data-action="open-litter"]').count(), 1, q);
+    assert.match(await text(page, '#scan-results'), /A04/);
+  }
+  await go('room.html?state=room-find&fresh=1&q=04');
+  assert.ok((await page.locator('#scan-results [data-action="open-litter"]').count()) >= 2);
+  await go('room.html?state=room-find&fresh=1&q=0354');
+  assert.ok((await page.locator('#scan-results [data-action="open-litter"], #scan-results .tk-row').count()) >= 1);
+  await go('room.html?state=litter&crate=A02&data=moved-to-c05&fresh=1');
+  await go('room.html?state=litter&crate=C05&data=moved-to-c05&fresh=1');
+  assert.match(await face(page), /Move 3 piglets moved in from|Move.*moved in from B06/);
+  assert.ok(await has(page, '[data-view="litter"] [data-action="open-edit"][data-value^="MV-"]'));
+  console.log('ok 11 forgiving Find; per-Move list with Edit doors');
+
   assert.deepEqual(errors, []);
   console.log('r2 room+litter click-through: all ok');
   await browser.close();

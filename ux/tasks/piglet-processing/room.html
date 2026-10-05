@@ -671,7 +671,12 @@
     var litter = function (id) { var L = Ls[id]; return { kind: 'litter', litter: id, room: L.room, sow: L.sow ? L.sow.tag : '' }; };
     var piglet = function (p) { return Object.assign({ kind: 'piglet' }, p); };
     if (/^\d{6}$/.test(q)) return { q: q, hits: Pg.filter(function (p) { return p.tag === q; }).map(piglet).concat(codes.filter(function (id) { return Ls[id].sow && Ls[id].sow.tag === q; }).map(litter)) };
-    if (/^\d{4}$/.test(q)) return { q: q, hits: Pg.filter(function (p) { return p.tag && p.tag.slice(-4) === q; }).map(piglet) };
+    // the last 3–5 digits of a tag or a sow's number list every match (R2-22)
+    if (/^\d{3,5}$/.test(q)) return { q: q, hits: Pg.filter(function (p) { return p.tag && p.tag.slice(-q.length) === q; }).map(piglet).concat(codes.filter(function (id) { return Ls[id].sow && Ls[id].sow.tag && Ls[id].sow.tag.slice(-q.length) === q; }).map(litter)) };
+    // forgiving crate lookup: `a4`, `A 04`, `A-04` → A04; `04` (or `4`) → every crate numbered 04
+    var cm = q.match(/^([a-z])-?0*(\d{1,2})$/i);
+    if (cm) { var cc = cm[1].toUpperCase() + ('0' + cm[2]).slice(-2); return { q: cc, hits: codes.filter(function (id) { return id === cc; }).map(litter) }; }
+    if (/^\d{1,2}$/.test(q)) { var nn = ('0' + q).slice(-2); return { q: nn, hits: codes.filter(function (id) { return id.slice(1) === nn; }).map(litter) }; }
     if (/^\d+-\d+$/.test(q)) return { q: q, hits: Pg.filter(function (p) { return p.notch === q; }).map(piglet) };
     if (/^[a-z]\d{2}$/i.test(q)) { var c = q.toUpperCase(); return { q: c, hits: codes.filter(function (id) { return id === c; }).map(litter) }; }
     if (/^\d{1,5}$/.test(q) || /^\d+-$/.test(q) || /^[a-z]\d?$/i.test(q)) return null;
