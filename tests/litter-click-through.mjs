@@ -63,7 +63,7 @@ try {
   await openLitter(page, 'A07', 'move-doubt', true);
   f = await face(page);
   assert.match(f, /Day 3 \S.* Iron 0–2 of 11 owed · check\s*·?\s*3 moved to A04, not known/);
-  assert.equal(await page.locator('[data-action="record"][data-value="iron3"]').count(), 0);
+  assert.equal(await page.locator('[data-action="record"][data-value^="iron3"]').count(), 0);
   await row(page, 'open-dose', 'iron3').click();
   await page.click('[data-action="step"][data-value="still"][data-step="-1"]');
   await page.click('[data-action="step"][data-value="still"][data-step="-1"]');
@@ -90,22 +90,23 @@ try {
   await openLitter(page, 'A02', null, false);
   f = await face(page);
   assert.match(f, /Born 13 Alive now 14 Dead 1 Moved in 2/);
-  assert.match(f, /Day 3 Due today Iron 12 owed now of 14\s*·?\s*12 of its own\s*·?\s*day 3\s*·?\s*due today\s*·?\s*2 from D06\s*·?\s*day 1\s*·?\s*due in 2 days/);
-  await page.click('[data-action="record"][data-value="iron3"]');
+  assert.match(f, /Day 3 Due today Iron 12 of its owns*·?s*day 3 Record 12 Dock tail/);   // R2-16: the litter's own piglets and the arrivals of another age are separate rows
+  assert.match(f, /Day 3 In 2 days Iron 2 from D06s*·?s*day 1s*·?s*due in 2 days/);
+  await page.click('[data-action="record"][data-value^="iron3"]');
   assert.match(await bar(page), /Saved · iron · day 3 · 12 piglets · 2 not due yet, back on their day/);
   await page.waitForTimeout(700);
   f = await face(page);
   assert.match(f, /Day 3 Recorded.*Iron \d\d:\d\d · G\.H\s*·?\s*12 piglets\s*·?\s*2 deferred: not due yet/);
-  assert.match(f, /Day 3 In 2 days Iron 2 from D06/);
+  assert.match(f, /Day 3 In 2 days.*Iron 2 from D06/);
   console.log('ok 3 arrivals by their own age: Record 12, 2 not due · header balances');
 
   // 4. R1-25: one-tap Record has Undo on its receipt; the owed comes back.
-  await page.click('[data-action="record"][data-value="tail"]');
+  await page.click('[data-action="record"][data-value^="tail"]');
   assert.match(await bar(page), /Saved · dock tail · 12 piglets.*Undo/);
   await page.waitForTimeout(700);
   await page.click('[data-action="undo"]');
   assert.match(await bar(page), /Undone · dock tail · 12 piglets owed again/);
-  assert.equal(await page.locator('[data-action="record"][data-value="tail"]').count(), 1);
+  assert.equal(await page.locator('[data-action="record"][data-value^="tail"]').count(), 1);
   console.log('ok 4 one-tap → Undo → owed again');
 
   // 5. R1-24: the phone's Back with a drawer open closes the drawer and keeps the draft; Resume brings it back.
@@ -207,7 +208,7 @@ try {
   assert.match(f, /Alive now 13 Dead 0 Moved in 13/);
   assert.match(f, /Nurse sow from B01/);
   assert.match(f, /Her earlier litter born 12 · dead 1 · weaned 11/);
-  assert.equal(await page.locator('[data-action="record"][data-value="iron3"]').count(), 1);
+  assert.equal(await page.locator('[data-action="record"][data-value^="iron3"]').count(), 1);
   console.log('ok 13 nurse sow: one sheet, earlier litter on its own line');
 
   // 14. edge: the birth-weight drawer closes on the phone's Back and keeps the page.

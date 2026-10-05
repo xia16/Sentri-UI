@@ -77,7 +77,10 @@ try {
   await page.goto(base + 'room.html?state=room&data=a02-short&fresh=1'); await ready(page);
   // round 5: a deferral is the litter drawer's fact (the row keeps one meta line), never red on the row
   const a02 = await rowText(page, 'A02');
-  assert.equal(await page.locator(`${row('B09')} [data-tone="red"]`).count(), 0);
+  // R2-12: a late litter keeps its late word (red) and the deferral beside it is never red
+  assert.match(await rowText(page, 'B09'), /deferred/);
+  assert.equal(await page.locator(`${row('B09')} [data-tone="red"]`).count(), 1);
+  assert.match(await text(page, `${row('B09')} [data-tone="red"]`), /^due /);
   await page.click(row('A02'));
   assert.match(await text(page, '[data-action="open-dose"][data-value="iron3"]'), /Iron .*2 owed · deferred: weak/);
   await page.click('[data-view="litter"] [data-action="close"]');

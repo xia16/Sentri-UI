@@ -15,6 +15,8 @@
    grouped by crate row (TaskGroup + TaskRow), TaskDock — and its sheets and the litter drawer (TaskSheet). Layout only,
    tokens from tokens.css. Candidate:ScanFrame stays task-level. */
 /* the review / unexplained counts: one compact line, the summary card's footer line (a text action) */
+/* a unit outside every task: the unit's card alone (no overview of another unit's task) */
+.tk-summary.pp-solo { grid-template-columns: minmax(0, 1fr); }
 .pp-answers { display: flex; margin: -6px var(--space-panel) 4px; }
 .pp-answers + .pp-filtered { margin-top: var(--space-heading); }
 .pp-filtered { margin: 0 var(--space-panel) 6px; }
@@ -97,7 +99,10 @@
     'room-reviews': { data: 'held-body', sheet: 'reviews' },
     'room-review-count': { data: 'count-offline' },
     'room-ended-reviews': { data: 'ended', sheet: 'reviews' },
-    'room-units': { data: 'base', sheet: 'units' }
+    'room-units': { data: 'base', sheet: 'units' },
+    'room-notask': { data: 'base', room: 8 },
+    'room-id-left': { data: 'a02-all-done' },
+    'room-drafts': { data: 'base', drafts: true }
   };
   /* The litter drawer's states (litter.html and edge.html forward here under the same names): [variant, crate, preset].
      A preset is the fixture moment the drawer opens on — records made at load (`pre`, a one-tap `tap`), this visit's
@@ -142,6 +147,15 @@
     'identity-late':      ['base', 'C05'],
     'keepers-closed':     ['keepers-closed', 'A07'],
     'one-tap-saved':      ['base', 'A02', { tap: { dose: 'iron3', n: 12 } }],
+    // round 2 (R2-8, 16, 17, 18, 19, 20, 27, round 6)
+    'mixed-source':       ['moved-to-c05', 'C05'],
+    'record-ask':         ['held-body', 'A07', { ask: { dose: 'iron3' } }],
+    'castrate-early':     ['base', 'A02', { drawer: { dose: 'castrate' } }],
+    'arrival-caution':    ['move-doubt', 'A04', { resolve: { dose: 'iron3', had: 0, rest: 'owed' } }],
+    'closed-dead':        ['killed', 'A02'],
+    'sow-died':           ['base', 'B01'],
+    'weigh-weight':       ['base', 'B04'],
+    'deferral-completed': ['a02-short', 'A02', { tap: { dose: 'iron3', n: 2 } }],
     'no-males-confirm':   ['a02-castrate', 'A02', { drawer: { dose: 'castrate', castr: { castrated: 3, hernia: 1, cryptorchid: 0, kept: 0, deferred: 0, deferReason: '' }, confirmNone: true } }],
     'split-reasons':      ['base', 'A02', { drawer: { dose: 'iron3', n: 10, reason: 'split', weak: 1 } }],
     'all-deferred':       ['base', 'A02', { drawer: { dose: 'iron3', n: 0, reason: 'weak' } }],
@@ -269,10 +283,7 @@
   }
   var byCode = function (a, b) { return a.litter < b.litter ? -1 : a.litter > b.litter ? 1 : 0; };
   function sorter(lens) {
-    if (lens === 'owed') {
-      var rank = function (f) { return lateOf(f) ? 0 : f.partly ? 2 : 1; };
-      return function (a, b) { return rank(a) - rank(b) || (rank(a) === 0 ? lateOf(b) - lateOf(a) : 0) || byCode(a, b); };
-    }
+    // R2-14: rows keep crate order within their crate-row group — a record never moves a row under the thumb
     if (lens === 'later') return function (a, b) { return (a.next ? a.next.inDays : 999) - (b.next ? b.next.inDays : 999) || byCode(a, b); };
     return byCode;
   }
@@ -280,14 +291,22 @@
   function lensOf(lens) {
     var xs = viewRows(lens);
     // Hold, then depart: a row a record or a sync moved out of this lens stays put until the hand is idle.
-    Object.keys(held).forEach(function (c) { if (held[c].lens === lens && !xs.some(function (x) { return x.litter === c; })) xs.push(held[c].f); });
-    return xs;
+    var added = false;
+    Object.keys(held).forEach(function (c) { if (held[c].lens === lens && !xs.some(function (x) { return x.litter === c; })) { xs.push(held[c].f); added = true; } });
+    return added ? xs.sort(sorter(S.missed ? 'all' : lens)) : xs;
   }
+  /* R2-11: the headline is the ledger's one "owe today" (select.oweToday), the same figure as the Owed tab; under a filter it is
+     the litters owing the filtered treatment. A row a record just moved out of Owed stays counted while it is held. */
   function owedCount() {
-    var n = facts().filter(function (f) { return lensOfF(f) === 'owed'; }).length;
-    return n + Object.keys(held).filter(function (c) { return held[c].lens === 'owed' && !facts().some(function (f) { return f.litter === c && lensOfF(f) === 'owed'; }); }).length;
+    var n, ids;
+    if (filtering()) { ids = facts().filter(function (f) { return lensOfF(f) === 'owed'; }).map(function (f) { return f.litter; }); }
+    else ids = store.select.oweToday(store.derived, { room: ROOM }).litters.slice();
+    n = ids.length;
+    return n + Object.keys(held).filter(function (c) { return held[c].lens === 'owed' && ids.indexOf(c) < 0; }).length;
   }
-  function curLens() { var ks = lensKeys(); return ks.indexOf(S.lens) >= 0 ? S.lens : ks[0]; }
+  /* R2-15: a unit none of whose litters is in a processing task has no overview, no tabs: its litters, as they are. */
+  function noTask() { var xs = facts(); return xs.length > 0 && !xs.some(function (f) { return !!f.lens; }); }
+  function curLens() { if (noTask()) return 'all'; var ks = lensKeys(); return ks.indexOf(S.lens) >= 0 ? S.lens : ks[0]; }
 
   function reviews() { return R().rev.items; }
   function reviewsOf(code) { return reviews().filter(function (x) { return x.litter === code; }); }
@@ -309,15 +328,26 @@
   function recMeta(f, only) { var late = doneLate(f, only); return [P('pp.room.latest.when', { when: U.ago(f.lastRecord.at, now()) }), late || pig(f.alive)]; }
   function dayMeta(f) { return [P('pp.common.unit.day', { n: f.day }), pig(f.alive)]; }
   function nextHead(nx) { return nx.inDays === 1 ? P('pp.room.l1.tomorrow', { doses: names(nx.doses) }) : P('pp.room.l1.next', { doses: names(nx.doses), n: nx.inDays }); }
+  /* R2-12/13: what the row says it owes comes from the ledger's row fields — the piglets owing now (not the litter's size),
+     the deferred among them (weak, sick: a hold for another group or an unripe age is not a deferral the worker made),
+     the late days, and whether only the tagging is left. One headline, one meta line. */
+  var HOLDS = { not_due: 1, other_group: 1 };
+  function deferredOf(f) { return Math.max.apply(null, [0].concat(owedItems(f).filter(function (x) { return x.tx !== 'identity' && !HOLDS[x.reason]; }).map(function (x) { return x.deferred || 0; }))); }
   function owesSpec(f, s) {
     var items = owedItems(f), live = items.filter(function (x) { return !x.deferredAll; });
-    var late = lateOf(f);
+    var late = Math.max.apply(null, [0].concat(items.map(function (x) { return x.lateBy || 0; })));
+    var due = late ? dueTok(late) : live.length ? Object.assign(dueTok(0), { soft: true }) : null;
+    if (!f.doses.length && idLive(f)) {
+      // treatments done, tagging left: `Tag · 12 left` — and that the treatments are done stays visible
+      s.head = f.identity.owed != null ? [P('pp.room.l1.id_left', { name: name('identity'), n: f.identity.owed })] : P('pp.room.l1.owes', { doses: doseList(items) });
+      s.meta = [P('pp.room.meta.tx_done'), due];
+      return;
+    }
     s.head = P('pp.room.l1.owes', { doses: doseList(items) });
-    // Deferred piglets (weak, sick) stay due and show on the next visit: their counts and reasons are in the drawer.
-    var still = live.filter(function (o) { return o.n != null; });
-    var same = still.length && still.every(function (o) { return o.n === still[0].n; });
-    if (f.partly && f.lastRecord && same && still[0].n < f.alive) s.meta = [P('pp.room.meta.still', { n: still[0].n }), live.length ? dueTok(late) : null];
-    else s.meta = [live.length ? dueTok(late) : null, pig(f.alive)];
+    var def = deferredOf(f), owed = f.owedNow;
+    var toks = def && def >= owed ? [P('pp.room.tok.deferred_k', { n: def })] : [owed > 0 ? P('pp.litter.owed', { n: owed }) : null, def ? P('pp.room.tok.deferred_k', { n: def }) : null];
+    s.meta = toks.concat([due]);
+    if (!s.meta.some(Boolean)) s.meta = [pig(f.alive)];
   }
   function endedSpec(f, s) {
     var E = ended().atEnd, list = E.byLitter[f.litter] || [];
@@ -359,13 +389,20 @@
   function chip(f) {
     if (f.chip === 'sowdied') return P('pp.room.chip.sowdied', null, 'red');
     if (f.chip === 'unlocked') return P('pp.room.chip.unlocked', null, 'amber');
-    if (!ended() && f.lens && (f.collide || reviewsOf(f.litter).length || f.doses.some(function (o) { return o.unknown > 0; }))) return P('pp.room.chip.check', null, 'amber');
+    if (!ended() && f.lens && (f.collide || f.open.any || reviewsOf(f.litter).length || f.doses.some(function (o) { return o.unknown > 0; }))) return P('pp.room.chip.check', null, 'amber');
     if (ended() && reviewsOf(f.litter).length) return P('pp.room.chip.check', null, 'amber');
     return null;
   }
+  /* A draft this phone keeps for the litter (a treatment, a death, a count, a tagging run) is a word on its row (R2-12). */
+  function drafted(f) { return !!(store && window.PPLitter.drafted(store.name, f.litter)); }
   function row(f, mode) {
-    var s = spec(f, mode === undefined ? modeFor(f) : mode);
-    return K.row({ id: P('pp.room.code', { code: f.litter }), chip: chip(f), headline: Array.isArray(s.head) ? s.head : [s.head], tone: s.tone, meta: joined(s.meta),
+    var s = spec(f, mode === undefined ? modeFor(f) : mode), c = chip(f), meta = s.meta.filter(Boolean);
+    // the chip is the one reason to look first; when sow-died or not-locked holds it, an open loss or gain is a meta word (one chip per row)
+    if (!ended() && f.lens && f.open.any && c && (f.chip === 'sowdied' || f.chip === 'unlocked')) meta.push(f.open.loss ? P('pp.room.tok.loss', { k: f.open.loss }, 'amber') : P('pp.room.tok.gain', { k: f.open.gain }, 'amber'));
+    if (!ended() && f.lens && drafted(f)) meta.push(P('pp.room.tok.draft', null, 'green'));
+    // meta stays one line: with more than three words the plain `due today` (the Owed tab already says it) goes
+    if (meta.length > 3) meta = meta.filter(function (m) { return !m.soft; });
+    return K.row({ id: P('pp.room.code', { code: f.litter }), chip: c, headline: Array.isArray(s.head) ? s.head : [s.head], tone: s.tone, meta: joined(meta),
       trail: s.trail, action: 'open-litter', value: f.litter });
   }
   // Rows grouped by crate row (farrowing's pen cards): `Row A · 3 litters`.
@@ -411,10 +448,18 @@
     facts().forEach(function (f) { var L = store.derived.litters[f.litter]; if (L && L.task && !tid) tid = L.task; });
     var e = store.select.end(store.derived, tid ? { task: tid } : {}), F = e.atEnd && ended() ? e.atEnd : e.now;
     var fin = F.finishedLitters.length, unf = F.unfinishedLitters, total = fin + unf.length;
-    var owe = unf.filter(function (id) { var t = F.litters[id]; return t && t.owed + t.unknown > 0; }).length;
+    // R2-11: before End, "owe today" is the ledger's one rule (the headline's too); the rest of the unfinished are later
+    var owe = ended() ? unf.filter(function (id) { var t = F.litters[id]; return t && t.owed + t.unknown > 0; }).length
+      : Math.min(unf.length, store.select.oweToday(store.derived, tid ? { task: tid } : {}).n);
     return { fin: fin, total: total, owe: owe, later: unf.length - owe };
   }
   function summaryCard() {
+    // R2-15: a unit outside every task has its own litters and no overview of someone else's task
+    if (noTask()) {
+      var k = facts().length;
+      var solo = K.summary({ unit: { icon: 'grid', heading: P('pp.room.unit', { n: ROOM }), value: P('pp.room.lead.figure', { n: k }), description: P(PP.one('pp.room.sum.litters', k)), support: P('pp.room.sum.notask') }, task: { heading: '' } });
+      return solo.replace(/<button type="button" class="tk-summary-half tk-summary-task"[\s\S]*?<\/button>/, '').replace('class="tk-summary"', 'class="tk-summary pp-solo"');
+    }
     var T = taskFigures(), E = ended();
     var seg = [{ tone: 'done', share: T.total ? T.fin / T.total * 100 : 0 }, { tone: 'active', share: T.total ? T.owe / T.total * 100 : 0 }, { tone: 'rest', share: T.total ? T.later / T.total * 100 : 0 }];
     var unit = { icon: 'grid', heading: P('pp.room.unit', { n: ROOM }) }, task;
@@ -439,7 +484,8 @@
 
   /* ---- one row for what waits for an answer in this unit: review items (N4) and unexplained drift (round 2), each
      answered in the sheet it opens ---- */
-  function driftOpen() { var h = R().rows.strip; return (h.lossLitters || []).length + (h.gainLitters || []).length; }
+  /* R2-11: one unit — items to answer: review items and open unexplained lines (select.reviews().toAnswer); the strip and the sheet both count it */
+  function driftOpen() { return R().rev.lines.length; }
   function answersRow() {
     var xs = reviews(), h = R().rows.strip, d = driftOpen();
     if (!xs.length && !d) return '';
@@ -454,7 +500,7 @@
 
   /* ---- lenses and filter; the filtered line and the bulk door under them ---- */
   function lensBar() {
-    if (S.missed && !ended()) return '';
+    if ((S.missed && !ended()) || noTask()) return '';
     var ks = lensKeys(), lens = curLens();
     var tabs = ks.map(function (k) {
       var n = lensOf(k).length;
@@ -851,6 +897,13 @@
     // a state that records at load (`pre`, a one-tap) shows the moment after, kept out of the tab's log
     store = PP.open(start.data, pre && (pre.pre || pre.tap) ? { session: false } : null);
     CFG = store.config;
+    // room-drafts: this phone keeps an unsaved Iron entry for A04 and a count for A07 (their rows say so)
+    if (start.drafts) {
+      try {
+        sessionStorage.setItem('pp-drafts:' + store.name + ':A04', JSON.stringify({ iron3: { kind: 'dose', key: 'iron3', dose: 'iron3', n: 9, reason: 'weak', owed: 11 } }));
+        sessionStorage.setItem('pp-count-draft:' + store.name + ':A07', JSON.stringify({ observed: 13, rows: [], at: '2026-09-29T10:20', obsMs: 0, seen: [] }));
+      } catch (e) {}
+    }
     if (start.ticks) { try { sessionStorage.setItem('pp-bulk-ticks:' + store.name + ':' + ROOM + ':' + start.ticks.dose, JSON.stringify(start.ticks.sel)); } catch (e) {} }
     if (LS) {
       var c = qs.get('crate') || LS[1] || 'A02';
