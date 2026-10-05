@@ -488,7 +488,7 @@
   function review(dr) {
     if (!S.other || !dr.event) return '';
     // past a sane litter size: a second look, never a block (R1-31)
-    var crowd = dr.crowded ? UI.banner({ tone: 'correction', headline: '', strs: { headline: 'pp.move.warn.crowded' }, args: { headline: { to: receiver(), n: dr.crowded.alive } } }) : '';
+    var crowd = dr.crowded ? K.warning({ tone: 'amber', title: s('pp.move.warn.crowded', { to: receiver(), n: dr.crowded.alive }), text: s('pp.move.warn.crowded_text') }) : '';
     var ex = S.explains ? UI.heading({ title: '', kind: 'group', level: 4, strs: { title: gainOnly() && !S.explains[0] ? 'pp.move.explain.closes_gain' : 'pp.move.explain.closes' }, args: { title: { to: receiver() } } }) : '';
     return '<section class="mv-section">' + deltas(source(), receiver(), dr.delta) + carryFacts(reviewRec(dr), dr.asks || []) + ex + '</section>' + crowd;
   }
@@ -509,7 +509,7 @@
     // the question sits right under the crate, above the count and the rows (R1-31: never below the fold)
     var ask = S.other && dr.event ? askSection(dr) : '';
     // why Move waits is said only when the worker taps it (a disabled primary stands alone above the footer, as farrowing's)
-    var reason = p && S.why ? Object.assign({ id: 'mv-reason' }, s(p.id, p.args)) : null;
+    var reason = p ? Object.assign({ id: 'mv-reason', visible: !!S.why }, s(p.id, p.args)) : null;
     var body = explain + directionSection() + crateSection() + pairSection() + ask + countSection() + review(dr);
     // Clear drops the draft (and an explaining link) while there is one to drop
     var clear = draftExists() || S.explains ? UI.button({ label: '', register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '';

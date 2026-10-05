@@ -23,9 +23,6 @@
 .id-run { display: flex; flex-direction: column; gap: var(--space-row-y); }
 .id-pad-dock { flex: none; padding: var(--space-row-y) var(--space-gutter); background: var(--app-background); border-top: 1px solid var(--line); }
 .id-run > * { margin: 0; }
-/* Sex on one line, as farrowing's fields: the label (and its Clear while a sex is chosen) on the row the radios sit on,
-   never the label above them with the radios dropped below its reserved Clear slot. */
-.id-sex .st-choice-inline-label { flex-direction: row; align-items: center; justify-content: flex-start; gap: var(--space-key-gap); }
 /* the ear-tag readout and its Scan control on one line (the Numpad card has no slot beside its readout) */
 .id-tag-line { display: flex; align-items: center; gap: var(--space-footer-gap); }
 .id-tag-line > .st-measure-box { flex: 1; min-width: 0; }
@@ -263,7 +260,7 @@
 
   /* ---- the sex field: ChoiceList radio, inline and optional (a visible Clear, never a re-tap clear) ---- */
   function radio(sex) {
-    return UI.choiceRadios({ label: '', optional: 'Optional', layout: 'inline', action: 'sex', key: 'sex', id: 'id-sex', className: 'id-sex', selected: sex || '',
+    return K.radios({ label: '', optional: 'Optional', layout: 'row', action: 'sex', key: 'sex', id: 'id-sex', selected: sex || '',
       options: [{ value: 'b', label: '', strs: { label: 'pp.common.sex.boar_l' } }, { value: 'g', label: '', strs: { label: 'pp.common.sex.gilt_l' } }],
       strs: { label: 'pp.common.sex.label', optional: 'ds.field.optional', clear: 'act.clear' } });
   }
