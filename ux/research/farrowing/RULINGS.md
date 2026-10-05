@@ -542,3 +542,8 @@ investigation and not yet ruled.
 - **A litter opens as a drawer over the room, like a sow in farrowing.** The drawer holds the litter summary, what it owes as rows and the tools (Record dead, Set count, Move, Edit); a treatment opens in the same drawer and Back returns.
 - **Match farrowing exactly where it departs from the design-system README** (filled status chips, a lone Back filled in ink, the hold caption's style). The README rules are revisited later for both tasks together.
 - **Farrowing's true bugs are fixed in farrowing too** (floating footers over dead space, reversed left edges, the live scrim behind a dialog, the banned word "complete"); nothing else about farrowing changes. The exit word is always **Back**.
+
+### Round 6 (owner, 2026-10-05, after scenario round 2)
+
+- **A sow outside the task who still has her own piglets joins the task as a whole when task piglets are moved onto her.** Her own piglets owe their doses on their own schedule too (often already late). The Move preview says so before the move is saved: "E01's own 7 piglets join too · owe Cut cord, Nasal drops (2 days late)".
+- **A possible double treatment gets a third answer: "Different piglets · both stand".** Both records count in full (e.g. 6 + 6 = 12 of 12), stamped with who answered. The other two answers are unchanged.
