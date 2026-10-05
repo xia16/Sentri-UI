@@ -51,7 +51,7 @@ try {
   await page.click('[data-action="close"]');
   await page.waitForURL(/room\.html/); await ready(page);
   const dead = await rowText(page, 'A02');
-  assert.match(dead, /11 piglets/);
+  assert.match(dead, /11 owed/);
   console.log('ok 2 room → litter → Record death → Save → room:', dead);
 
   // 3. room → filter iron → Record for several litters → tick 4 → review → Record → room: the four leave the iron filter.

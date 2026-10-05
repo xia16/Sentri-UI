@@ -52,9 +52,9 @@
 .pp-toolrow .pp-tool:active { background: var(--press); }
 .pp-toolrow .pp-tool svg { flex: none; width: 16px; height: 16px; }
 .pp-toolrow .pp-tool small { flex-basis: 100%; white-space: normal; font-size: var(--type-meta-size); line-height: 1.4; color: var(--muted); text-align: center; }
-/* Narrow phones keep every glyph; the tools marked `wide` (Set count, Move) fold into farrowing's More actions there. */
-.pp-toolrow .pp-tool[data-fold="narrow"] { display: none; }
+/* R2-21: all four tools at every width. Narrow phones (360) give the words the room: the glyphs drop, the labels stay. */
 @media (max-width: 370px) {
-  .pp-toolrow .pp-tool[data-fold="wide"] { display: none; }
-  .pp-toolrow .pp-tool[data-fold="narrow"] { display: flex; }
+  .pp-toolrow { gap: 4px; }
+  .pp-toolrow .pp-tool { padding-left: 4px; padding-right: 4px; }
+  .pp-toolrow .pp-tool svg { display: none; }
 }

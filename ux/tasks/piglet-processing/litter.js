@@ -177,7 +177,7 @@
       var st = null;
       if (x.sowDied) st = S('pp.room.chip.sowdied', null, 'red');
       else if (x.phase === 'open') st = S('pp.litter.st.unlocked', null, 'amber');   // short: the subtitle stays one line at 360
-      else if (!x.recordable) st = S('pp.room.l1.none');
+      // outside every task: the body says so once (R2-15), not the head too
       else if (endedTask()) st = S('pp.room.ended.title');
       if (st) parts.push({ sep: true }, st);
       return parts;
@@ -204,7 +204,16 @@
       var inline = [], nu = view().nurse, e = view().earlier;
       if (nu) inline.push(f(['pp.litter.fact.nurse'], ['pp.litter.fact.nurse_from', { code: nu.from }]));
       if (e) inline.push(f(['pp.litter.nurse.earlier'], ['pp.litter.fact.earlier', { b: e.born, d: e.dead, w: e.weaned }]));
-      if (SOW.weight) inline.push(f(['pp.litter.fact.weight'], ['pp.common.kg', { w: SOW.weight.kg }]));
+      // the sow's death and its cause (R2-20): what happened to her, not only the chip
+      if (x.sowDied) {
+        var sd = x.sowDied, who = window.PPLedger && sd.who ? window.PPLedger.person(sd.who, store.derived) : sd.who;
+        var cause = sd.cause ? PP.t('ds.dead.sow.' + sd.cause) : '';
+        inline.push(f(['pp.room.chip.sowdied'], [cause ? 'pp.litter.fact.sowdied_c' : 'pp.litter.fact.sowdied_n', { cause: cause, stamp: sd.at ? stampText(sd.at, who) : '' }]));
+      }
+      // the weight line is the latest weigh-day litter weight with its day (R2-27); the birth litter weight only until one is taken
+      var ws = L().weights || [], wl = ws.length ? ws[ws.length - 1] : null;
+      if (wl) inline.push(f(['pp.litter.fact.weight'], wl.day == null ? ['pp.common.kg', { w: wl.kg }] : ['pp.litter.weight_day', { w: wl.kg, d: wl.day }]));
+      else if (SOW.weight) inline.push(f(['pp.litter.fact.birth_weight'], ['pp.common.kg', { w: SOW.weight.kg }]));
       var panel = UI.facts(items, { columns: 3 });
       if (inline.length) {
         var lines = inline.map(function (it) { return UI.facts([it], { columns: 1 }).replace(/^<dl[^>]*>/, '').replace(/<\/dl>$/, '').replace('class="st-fact"', 'class="st-fact lt-fact-line"'); }).join('');
@@ -233,22 +242,12 @@
       var ck = kept('count'), list = [];
       if (L().recordable || hasRecords()) list.push({ action: 'open-edit', value: crate, icon: 'edit', label: 'act.edit' });
       list.push({ action: 'open-dead', value: crate, icon: 'alert', label: 'act.record_dead', kept: deadKept() });
-      list.push({ action: 'open-count', value: crate, icon: 'check', label: 'pp.count.title', kept: countKept(), fold: 'wide' });
-      list.push({ action: 'open-move', value: crate, icon: 'transfer', label: 'pp.move.title', fold: 'wide' });
-      // at narrow widths Set count and Move fold into farrowing's More actions (a view in this drawer)
-      list.push({ action: 'open-more', value: crate, icon: 'more', label: 'pp.litter.more', fold: 'narrow' });
+      // R2-21: all four tools at every width (no More actions fold: it cost the core action); narrow phones drop the glyphs
+      list.push({ action: 'open-count', value: crate, icon: 'check', label: 'pp.count.title', kept: countKept() });
+      list.push({ action: 'open-move', value: crate, icon: 'transfer', label: 'pp.move.title' });
       return U.toolRow(list, { label: 'pp.litter.tools' });
     }
     function countKept() { var ck = kept('count'); return ck && ck.observed != null ? ['pp.litter.tool.count_n', { n: ck.observed }] : null; }
-    /* More actions (farrowing's sow actions): the tools the narrow row folds, as doors. */
-    var moreView = false;
-    function moreSheet() {
-      var ck = countKept();
-      return K.sheet({ title: S('pp.litter.more'), subtitle: S('pp.room.code', { code: crate }), close: null, size: 'long', view: 'more',
-        body: K.doors({ items: [{ title: S('pp.count.title'), description: ck ? S(ck[0], ck[1]) : null, action: 'open-count', value: crate },
-          { title: S('pp.move.title'), description: S('pp.common.record.move_desc'), action: 'open-move', value: crate }] }),
-        footer: K.footer({ back: { action: 'back' } }) });
-    }
     function prelockDoor() {
       return '<div class="lt-doors">' + K.door({ title: S('pp.edge.prelock.door'), description: S('pp.edge.prelock.door_desc'), action: 'open-farrowing', value: SOW.sow }) + '</div>';
     }
@@ -265,6 +264,7 @@
       var who = g.kind === 'own' ? P('pp.litter.grp.own', { k: g.n }) : tags.length && tags.length <= 3 ? P('pp.litter.grp.from_tags', { k: g.n, code: g.from, tags: tags.join(', ') }) : P('pp.litter.grp.from', { k: g.n, code: g.from });
       return [who, P('pp.litter.grp.day', { d: g.dayAge }), whenTok(g)];
     }
+    var HOLDS = { not_due: 1, other_group: 1 };   // a hold for the other group or an unripe age: not a deferral the worker made
     function agesDiffer(gs) { return gs.some(function (g) { return g.dayAge !== gs[0].dayAge; }); }
     function hasDraft(id) { return !!(drafts[id] || drafts['range:' + id]); }
     function showGroups(o) { return agesDiffer(o.groups); }
@@ -279,12 +279,12 @@
         o.range.doubt.forEach(function (x) { t.push(P('pp.litter.range.doubt', { n: x.n, to: x.to })); });
         return t;
       }
-      if (o.owed && o.deferred && o.deferReason && o.deferReason !== 'not_due') t.push(P(castrate ? one('pp.litter.owed_males_reason', o.owed) : 'pp.litter.owed_reason', { n: o.owed, reason: reasonName(o.deferReason) }));
+      if (o.owed && o.deferred && o.deferReason && !HOLDS[o.deferReason]) t.push(P(castrate ? one('pp.litter.owed_males_reason', o.owed) : 'pp.litter.owed_reason', { n: o.owed, reason: reasonName(o.deferReason) }));
       else if (o.males === 'uncounted') t.push(P('pp.common.males_uncounted'));
       else if (splitNow(o)) t.push(P('pp.litter.owed_now', { n: o.owedNow, of: o.owed }));
-      else if (o.owed != null) t.push(P(castrate ? one('pp.litter.castr.owed', o.owed) : 'pp.litter.owed', { n: o.owed }));
-      if (showGroups(o)) o.groups.forEach(function (g) { t = t.concat(groupToks(g)); });
-      else t = t.concat(arrivalToks(o.groups));
+      else if (o.owed != null && !(o.groups || []).length || (o.owed != null && (o.groups || []).some(function (g) { return g.kind === 'own'; }))) t.push(P(castrate ? one('pp.litter.castr.owed', o.owed) : 'pp.litter.owed', { n: o.owed }));   // all owed from arrivals: the arrivals' words say it
+      // a row says where arrivals came from; their ages and dates are on the split rows (R2-16)
+      t = t.concat(arrivalToks(o.groups));
       return t;
     }
     function tapN(o) { return splitNow(o) ? o.owedNow : o.oneTap; }
@@ -299,6 +299,23 @@
         : { label: PP.t(one('pp.litter.act.record_n', n), { n: n }), action: 'record', value: o.dose, attrs: { 'data-n': n }, strs: { label: one('pp.litter.act.record_n', n) }, args: { label: { n: n } } };
       // the one-tap record stays the row's trailing action, compact (farrowing's care row + the ruled one-tap)
       return citem({ id: 'lt-tx-' + o.dose, title: txTok(o.dose), description: owedToks(o), mark: 'due', action: 'open-dose', value: o.dose, act: act });
+    }
+    /* R2-16: a treatment owed by piglets of different ages (the litter's own and arrivals) is a row per group, each under its
+       own day status and each its own Record; the meta is one line: who and which day. A group's key is its source and birth day. */
+    function gkey(g) { return g.kind === 'own' ? 'own' : g.from + '@' + g.birthDay; }
+    function groupsOf(o) { return (o.groups || []).filter(function (g) { return g.n > 0; }); }
+    function mixedGroups(o) {
+      var gs = groupsOf(o);
+      return !doseCfg(o.dose).castration && o.owed != null && !o.range && o.males !== 'uncounted' && gs.length > 1 && agesDiffer(gs) && (!o.deferred || HOLDS[o.deferReason]);
+    }
+    function groupRow(o, g, i) {
+      var tags = (g.rows || []).map(tagOf).filter(Boolean);
+      var who = g.kind === 'own' ? P('pp.litter.grp.own', { k: g.n }) : tags.length === 1 ? P('pp.litter.grp.from_tags', { k: g.n, code: g.from, tags: tags[0] }) : P('pp.litter.grp.from', { k: g.n, code: g.from });
+      var desc = [who, P('pp.litter.grp.day', { d: g.dayAge })], val = o.dose + '#' + gkey(g);
+      if (g.status === 'later') return citem({ title: txTok(o.dose), description: desc.concat(whenTok(g)), mark: 'due', action: 'open-dose', value: o.dose });
+      if (g.status === 'missed' || hasDraft(o.dose)) return citem({ title: txTok(o.dose), description: hasDraft(o.dose) ? [P('status.unsaved', { n: 1 }, 'green')] : desc, mark: 'due', action: 'open-dose', value: o.dose, trailing: hasDraft(o.dose) ? resumeWord() : '' });
+      var act = { label: PP.t(one('pp.litter.act.record_n', g.n), { n: g.n }), action: 'record', value: val, attrs: { 'data-n': g.n }, strs: { label: one('pp.litter.act.record_n', g.n) }, args: { label: { n: g.n } } };
+      return citem({ id: 'lt-tx-' + o.dose + '-' + i, title: txTok(o.dose), description: desc, mark: 'due', action: 'open-dose', value: o.dose, act: act });
     }
     function unknownRows(id, o) {
       var d = doseCfg(id);
@@ -324,9 +341,17 @@
       v.owed.forEach(function (o) { byDose[o.dose] = o; });
       CFG.doses.filter(function (d) { return D(d.id).status && D(d.id).status !== 'later'; }).forEach(function (d) {
         var r = visitRec(d.id), o = byDose[d.id];
-        if (r && isDone(d.id)) { c.put(d.due, 'today', null, evidenceRow(r)); return; }
+        if (r && isDone(d.id)) { c.put(d.due, 'today', null, doneRow(d.id, r)); return; }
         if (!o) return;
         var k = statusKind(o.status, o.lateBy, o.missedAfter), only = o.owed === 0 && !o.range && unknownGroups(d.id).length;
+        if (!only && mixedGroups(o)) {
+          groupsOf(o).forEach(function (g, i) {
+            var gk = g.status === 'later' ? ['later', g.inDays] : statusKind(g.status, g.lateBy, o.missedAfter);
+            c.put(o.due, gk[0], gk[1], groupRow(o, g, i));
+          });
+          c.put(o.due, k[0], k[1], unknownRows(d.id, null));
+          return;
+        }
         c.put(o.due, k[0], k[1], (only ? [] : [txRow(o)]).concat(unknownRows(d.id, only ? o : null)));
       });
       var x = view().identityDue;
@@ -334,12 +359,8 @@
     }
     function owedSection() {
       var v = view(), left = v.dosesLeft.left, missed = v.unfinished.missed;
-      // a litter outside the task: what it owes is a fact (not done), one list
-      if (!L().recordable) {
-        var rows = v.owed.filter(function (o) { return o.owed; }).map(function (o) { return cdoor({ title: titleTok(o.dose), description: [P('pp.litter.notask.owed', { n: o.owed })], wrap: true }); }).join('');
-        return rows ? '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.edge.section.owed' } }) +
-          '<div class="tk-doors" data-ds="TaskDoors">' + rows + '</div></section>' : '';
-      }
+      // a litter outside every task owes nothing and shows no Owed list (R2-15): one line says why, once
+      if (!L().recordable) return UI.rowGroup(UI.row({ title: [P('pp.room.sum.notask')] }));
       if (!left && !missed && !identityRow()) {
         var next = laterItems()[0];
         return UI.rowGroup(UI.row({ title: [P('pp.litter.owed.none')], description: next ? [P(next.inDays === 1 ? 'pp.litter.next.tomorrow' : 'pp.litter.next.in', { tx: lower(next.label), k: next.inDays })] : '' }));
@@ -347,8 +368,17 @@
       return '';
     }
     function closedSection() {
-      var b = view().balance;
-      return section('pp.litter.section.closed', UI.row({ title: [P('pp.litter.closed.title')], description: [P('pp.litter.closed.desc', { out: b.movedOut, w: b.weaned })], wrap: true }));
+      // R2-8: why it closed, from the ledger's closedBy (All 12 died · All 12 moved out · …), then what stays
+      var x = L(), c = x.closedCounts || { dead: 0, movedOut: 0, weaned: 0 }, by = x.closedBy, why;
+      if (by === 'dead') why = P('pp.litter.closed.by_dead', { n: c.dead });
+      else if (by === 'moved') why = P('pp.litter.closed.by_moved', { n: c.movedOut });
+      else if (by === 'weaned') why = P('pp.litter.closed.by_weaned', { n: c.weaned });
+      else if (by === 'missing') why = P('pp.litter.closed.by_missing');
+      else {
+        var parts = [c.dead && P('pp.litter.closed.p_dead', { n: c.dead }), c.movedOut && P('pp.litter.closed.p_out', { n: c.movedOut }), c.weaned && P('pp.litter.closed.p_weaned', { n: c.weaned })].filter(Boolean);
+        why = parts.length ? parts : P('pp.litter.closed.by_missing');
+      }
+      return section('pp.litter.section.closed', UI.row({ title: [P('pp.litter.closed.title')], description: [].concat(why, P('pp.litter.closed.stay')), wrap: true }));
     }
     function endedSection(T) {
       var items = ((T.ended.snapshot || {}).byLitter || {})[crate] || [];
@@ -411,6 +441,16 @@
     }
 
     /* ---- the receipt: what the last record on this phone changed, one line at the top of the drawer (Undo on a one-tap) ---- */
+    /* R2-18: Alive is in question while a body is held or two counts disagree — one tap on Record asks before it writes. */
+    var ask = null;                         // { value, n }: the Record the worker tapped while Alive was in question
+    function inQuestion() { return reviewItems().some(function (x) { return x.kind === 'held' || x.kind === 'count'; }); }
+    /* the question stands in the footer (pinned, where the thumb is): its reason, Not now, and the Record it asks about */
+    function litterFooter() {
+      if (!ask) return K.footer({ back: { action: 'close' } });
+      return K.footer({ back: { action: 'close' },
+        status: Object.assign(S('pp.litter.ask.alive', { n: ask.n }, 'amber'), { id: 'lt-ask', visible: true, action: { label: S('pp.litter.ask.no'), action: 'record-no' } }),
+        primary: { label: S(one('pp.litter.act.record_n', ask.n), { n: ask.n }), register: 'primary', action: 'record-yes', value: ask.value } });
+    }
     function receiptLine() {
       if (!receipt) return '';
       var parts;
@@ -454,16 +494,32 @@
       var x = view().identityDue, I = L().identity;
       if (x.scheme === 'none' || (!x.identified && !I.closed)) return '';
       if (x.status !== 'done' && x.status !== 'later' && x.who !== 'candidates') return '';
+      // keepers: while the set is open and the step is due, the owed row says it — not a second Recorded row (R2-27)
+      if (x.who === 'candidates' && !I.closed && (x.status === 'due' || x.status === 'late')) return '';
       var scheme = PP.t('pp.litter.id.scheme.' + x.scheme);
       var d = x.who === 'candidates' ? (I.closed ? P('pp.litter.id.closed', { k: x.identified }) : P('pp.litter.id.keepers', { k: x.identified })) : P('pp.litter.id.done', { k: x.identified, n: x.of });
       return citem({ title: [P('pp.litter.id.title', { scheme: scheme })], description: [d], mark: 'done', action: 'open-identity', value: crate });
     }
     /* Recorded: one row per record, never merged, newest first, under its treatment's day (`Day 1 · Recorded`). */
+    /* R2-17: a treatment completed across several records (a deferral finished later, a possible double answered `different
+       piglets`) is ONE recorded row — `12 of 12` and when it was finished; each record stays in the log. */
+    function recordedOf(id) { return view().recorded.filter(function (g) { return g.dose === id; })[0] || null; }
+    function merged(g) { return !!g && !doseCfg(g.dose).castration && g.records.length > 1 && g.whole && g.whole.complete && !g.records.some(function (r) { return r.target === 'unknown'; }); }
+    function mergedRow(g) {
+      var last = g.records[g.records.length - 1], tag = recTag(last), desc = [P(last.at && last.at.slice(0, 10) === TODAY.slice(0, 10) ? 'pp.common.stamp.today' : 'pp.common.stamp.date', { date: U.date(last.at), t: U.time(last.at), who: last.who }),
+        P('pp.litter.whole', { n: g.whole.n, of: g.whole.of })];
+      if (tag) desc.push(tag);
+      return citem({ title: txTok(g.dose), description: desc, mark: 'done', action: 'open-edit', value: last.id });
+    }
+    function doneRow(id, r) { var g = recordedOf(id); return merged(g) ? mergedRow(g) : evidenceRow(r); }
     function recordedInto(c) {
       var all = [];
-      view().recorded.forEach(function (g) { g.records.forEach(function (r) { all.push(r); }); });
-      all.filter(function (r) { return !inPlace(r); }).sort(function (a, b) { return a.at < b.at ? 1 : a.at > b.at ? -1 : 0; })
-        .forEach(function (r) { c.put(doseCfg(r.dose).due, 'recorded', null, evidenceRow(r)); });
+      view().recorded.forEach(function (g) {
+        if (merged(g)) { if (!visitRec(g.dose) || !isDone(g.dose) || D(g.dose).status === 'later') all.push({ at: g.records[g.records.length - 1].at, dose: g.dose, row: mergedRow(g) }); return; }
+        g.records.forEach(function (r) { if (!inPlace(r)) all.push({ at: r.at, dose: r.dose, row: evidenceRow(r) }); });
+      });
+      all.sort(function (a, b) { return a.at < b.at ? 1 : a.at > b.at ? -1 : 0; })
+        .forEach(function (x) { c.put(doseCfg(x.dose).due, 'recorded', null, x.row); });
       var idRow = identityDoneRow();
       if (idRow) c.put(view().identityDue.day, 'recorded', null, idRow);
       view().recorded.forEach(function (g) { (g.doubleDoses || []).forEach(function (x) {
@@ -501,7 +557,6 @@
         if (x.identity) { c.put(x.due, 'later', x.inDays, citem({ title: [P('pp.litter.id.title', { scheme: PP.t('pp.litter.id.scheme.' + view().identityDue.scheme) })], action: 'open-identity', value: crate })); return; }
         var Dx = D(x.dose), t = [];
         if (drafts[x.dose]) t.push(P('status.unsaved', { n: 1 }, 'green'));
-        else if (Dx.groups && agesDiffer(Dx.groups)) Dx.groups.forEach(function (g) { t = t.concat(groupToks(g)); });
         else {
           if (Dx.records.length && Dx.owed && !arrivalToks(Dx.groups || []).length) t.push(P(doseCfg(x.dose).castration ? one('pp.litter.castr.owed', Dx.owed) : 'pp.litter.owed', { n: Dx.owed }));
           t = t.concat(arrivalToks(Dx.groups || []));
@@ -557,6 +612,8 @@
       if (!castr && rest > 1) opts.push(['split', 'pp.litter.reason.split']);
       return radios('reason', castr ? 'pp.litter.castr.why' : one('pp.litter.rest.why', rest), { n: rest }, opts, chosen);
     }
+    /* The reason the worker already gave for deferring this treatment (weak or sick, at an earlier record) is not asked again (R2-19). */
+    function priorReason(id) { var r = D(id).deferReason; return r === 'weak' || r === 'sick' ? r : ''; }
     var ZERO = { castrated: 0, hernia: 0, cryptorchid: 0, kept: 0, deferred: 0, deferReason: '' };
     function csum(c) { return c.castrated + c.hernia + c.cryptorchid + c.kept + c.deferred; }
     function restOf() { return owedOf(drawer.dose) - drawer.n; }
@@ -618,6 +675,8 @@
         var cap = function (k) { return total - sum + c[k]; };
         var ceil = o == null ? ['pp.litter.ceil.alive', { n: L().alive }] : [one('pp.litter.ceil.owed', o), { n: o }];
         sub = o == null ? S(one('pp.litter.castr.males', sum), { n: sum }) : S(one('pp.litter.castr.owed', o), { n: o });
+        // not yet due (or late, or missed): the same status line a treatment's drawer carries — `Early · due day 5` (R2-19)
+        if (x.status && x.status !== 'due') body += UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.litter.drawer.' + x.status }, args: { title: { d: x.status === 'missed' ? d.last : d.due } } });
         // One label per stepper (farrowing's dead causes): what each reason does is on the record, not repeated here.
         body += stepperRow('castrated', 'pp.litter.castr.castrated', null, null, c.castrated, cap('castrated'), ceil[0], ceil[1]) +
           UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.litter.castr.not' } }) +
@@ -627,8 +686,10 @@
           stepperRow('kept', 'pp.litter.reason.kept', null, null, c.kept, cap('kept'), ceil[0], ceil[1]);
         if (c.deferred) body += reasonGroup(c.deferred, c.deferReason, true);
         if (o == null) {
-          body += UI.chooserList(UI.choiceRow({ mode: 'radio', label: PP.t('pp.litter.castr.none'), meta: PP.t('pp.litter.castr.none_meta'), action: 'no-males', value: 'none', selected: !!c.none,
-            strs: { label: 'pp.litter.castr.none', meta: 'pp.litter.castr.none_meta' } }), { tone: 'inset', ds: 'ChoiceList' });
+          // its sublabel (`castrated 0 · nothing owed`) is true only while no male is counted — never stale beside counts (R2-19)
+          var noneMeta = !sum || c.none;
+          body += UI.chooserList(UI.choiceRow({ mode: 'radio', label: PP.t('pp.litter.castr.none'), meta: noneMeta ? PP.t('pp.litter.castr.none_meta') : '', action: 'no-males', value: 'none', selected: !!c.none,
+            strs: Object.assign({ label: 'pp.litter.castr.none' }, noneMeta ? { meta: 'pp.litter.castr.none_meta' } : {}) }), { tone: 'inset', ds: 'ChoiceList' });
           if (drawer.confirmNone) body += '<div class="lt-confirm">' + U.receipt([{ id: one('pp.litter.castr.none_confirm', sum), args: { n: sum }, tone: 'amber' }]) +
             btn({ id: 'pp.litter.castr.none_yes', register: 'text', action: 'no-males-yes' }) + btn({ id: 'pp.litter.castr.none_keep', register: 'text', action: 'no-males-keep' }) + '</div>';
         }
@@ -659,6 +720,14 @@
       }
       return out;
     }
+    /* After a Don't-know move the source's owed is a range `lo–hi`; the leavers it moved to this crate can have been untreated
+       only up to the range's width. null when the source has settled it (or moved piglets elsewhere too). */
+    function untreatedCap(r) {
+      var S0 = store.derived.litters[r.from]; if (!S0) return null;
+      var o = store.select.litter(store.derived, r.from).owed.filter(function (x) { return x.dose === r.dose; })[0];
+      var rg = o && o.range;
+      return rg && rg.doubt.length === 1 && rg.doubt[0].to === crate ? rg.hi - rg.lo : null;
+    }
     function resolveDrawer() {
       var r = resolving(), n = r.n, had = Math.max(0, Math.min(drawer.had || 0, n)), rest = n - had, visible = doseCfg(r.dose).visible;
       var tx = lower(titleText(r.dose));
@@ -667,6 +736,9 @@
       var body = stepperRow('had', 'pp.move.res.had', visible ? 'pp.litter.res.sub_check' : 'pp.litter.res.sub_unknown', null, had, n, one('pp.move.res.ceiling', n), { n: n });
       if (rest) body += radios('rest', one('pp.move.res.rest', rest), { n: rest },
         [['record', one('pp.move.res.record', rest), { tx: tx, n: rest }], ['owed', one('pp.move.res.owed', rest), { n: rest }]], drawer.rest);
+      // an answer the source's own records cannot allow gets one caution line (R2-19): the source can have left only so many untreated
+      var cap = untreatedCap(r);
+      if (rest && drawer.rest && cap != null && rest > cap) body += U.receipt([{ id: 'pp.litter.caution.untreated', args: { k: cap }, tone: 'amber' }]);
       var t = title(r.dose);
       return doseSheet(S(t[0], t[1]), [S(one('pp.litter.res.from', n), { n: n, code: r.from })], body, clearAside(drawer.had || drawer.rest));
     }
@@ -713,7 +785,7 @@
       saveDrafts(); drawer = null;
     }
     /* The URL key of the open view: the dose id, `res:<group>:<dose>` for arrivals, `range:<dose>` never (a range is its dose). */
-    function viewKey() { return moreView ? 'more' : weightView ? 'weight' : drawer ? (drawer.kind === 'resolve' ? drawer.key : drawer.dose) : ''; }
+    function viewKey() { return weightView ? 'weight' : drawer ? (drawer.kind === 'resolve' ? drawer.key : drawer.dose) : ''; }
 
     /* ---- the birth litter weight (only when missing; a concurrent second is kept as a conflict) ---- */
     function liveBorn() { var c = L().dead.byCause; return L().born - (c.stillborn || 0) - (c.mummified || 0); }
@@ -766,12 +838,22 @@
       return r;
     }
     function otherRecord(id) { var rs = D(id).records.filter(function (r) { return !visit[r.id]; }); return rs[rs.length - 1] || null; }
-    function tap(id, label) {
-      var o = view().owed.filter(function (x) { return x.dose === id; })[0], n = o ? tapN(o) : 0;
+    /* A split row's Record (`<dose>#<group>`) records that group's piglets; the others stay owed, held as `not_due` when they are
+       all of an age not yet due, else as `other_group` (the ledger has no per-group record: the other group is relabelled the
+       litter's own once this one is recorded — reported). */
+    function groupTap(o, gk) {
+      var g = groupsOf(o).filter(function (x) { return gkey(x) === gk; })[0];
+      if (!g) return { n: 0 };
+      var rest = o.owed - g.n, later = groupsOf(o).filter(function (x) { return x.status === 'later'; }).reduce(function (s, x) { return s + x.n; }, 0);
+      return { n: g.n, rest: rest, reason: rest && rest === later ? 'not_due' : 'other_group' };
+    }
+    function tap(id, label, gk) {
+      var o = view().owed.filter(function (x) { return x.dose === id; })[0], gt = o && gk ? groupTap(o, gk) : null, n = o ? (gt ? gt.n : tapN(o)) : 0;
       if (label !== n) { receipt = { kind: n ? 'stale' : 'already', dose: id, other: otherRecord(id), now: owedOf(id) }; return; }
       if (!n) return;
       var ev = doseCfg(id).castration ? { dose: id, castration: { castrated: n } } : { dose: id, n: n };
-      if (splitNow(o)) ev.deferred = { n: o.owed - n, reason: 'not_due' };
+      if (gt && gt.rest) ev.deferred = { n: gt.rest, reason: gt.reason };
+      else if (splitNow(o)) ev.deferred = { n: o.owed - n, reason: 'not_due' };
       var r = commit(ev);
       if (!r.ok) receipt = { kind: r.reason === 'nothing_owed' ? 'already' : 'stale', dose: id, other: otherRecord(id), now: owedOf(id) };
       else receipt.undo = r.event.id;
@@ -817,30 +899,29 @@
     }
     function openKey(k) {
       if (!k) return false;
-      if (k === 'more') { moreView = true; return true; }
       if (k === 'weight') { if (SOW.weight && !conflict) return false; weightView = weightView || { draft: '', pad: true, hint: '' }; return true; }
       if (k.indexOf('res:') === 0) return openResolve(k.slice(4));
       if (!doseCfg(k)) return false;
       return openDose(k);
     }
     /* Back from a view to the litter: the draft is kept (Resume brings it back). */
-    function closeView() { moreView = false; whyShown = false; if (drawer) keepAndClose(); if (weightView) { weightView = null; } }
+    function closeView() { whyShown = false; if (drawer) keepAndClose(); if (weightView) { weightView = null; } }
 
     var api = {
       get crate() { return crate; },
-      get view() { return !crate ? '' : moreView ? 'more' : weightView ? 'weight' : drawer ? 'dose' : 'litter'; },
+      get view() { return !crate ? '' : weightView ? 'weight' : drawer ? 'dose' : 'litter'; },
       viewKey: viewKey,
       /* Open the drawer on a litter (fresh state per litter); `o.preset` carries a litter state's fixture moment. */
       open: function (c, o) {
         o = o || {};
         store = host.store(); CFG = store.config; TODAY = store.today; PP.me = window.PPFixtures.ME;
-        if (c !== crate) { visit = {}; receipt = null; drawer = null; weightView = null; conflict = null; moreView = false; }
+        if (c !== crate) { visit = {}; receipt = null; ask = null; drawer = null; weightView = null; conflict = null; }
         crate = c;
         SOW = store.sow(crate) || { sow: '', parity: 0, unit: 7, weight: null };
         if (!L()) { crate = ''; return false; }
         try { drafts = JSON.parse(sessionStorage.getItem('pp-drafts:' + store.name + ':' + crate) || 'null') || {}; } catch (e) { drafts = {}; }
         var st = o.preset || {};
-        if (st.drafts) drafts = JSON.parse(JSON.stringify(st.drafts));
+        if (st.drafts) { drafts = JSON.parse(JSON.stringify(st.drafts)); saveDrafts(); }
         (st.pre || []).forEach(function (e) { var r = store.commit(e); if (r.ok && st.preVisit) { visit[r.event.id] = true; receipt = { kind: 'saved', dose: e.dose, rec: recordOf(r.event.id) }; } });
         SOW = store.sow(crate) || SOW;
         (st.visit || []).forEach(function (id) { visit[id] = true; });
@@ -866,6 +947,7 @@
         readWeight();
         if (st.weightSaved && SOW.weight) { var u0 = usual(liveBorn()); receipt = { kind: 'weight', w: SOW.weight.kg, out: +SOW.weight.kg < +u0[0] || +SOW.weight.kg > +u0[1], min: u0[0], max: u0[1] }; }
         if (st.tap) tap(st.tap.dose, st.tap.n);
+        if (st.ask) ask = { value: st.ask.dose, n: owedOf(st.ask.dose) };
         if (st.drawer) {
           var dr = freshDraft(st.drawer.dose);
           ['n', 'reason', 'weak', 'confirmNone'].forEach(function (k) { if (st.drawer[k] != null) dr[k] = st.drawer[k]; });
@@ -893,9 +975,9 @@
       html: function () {
         if (!crate) return '';
         store = host.store();
-        var sheet = moreView ? moreSheet() : weightView ? weightSheet() : drawer ? (drawer.kind === 'resolve' ? resolveDrawer() : drawer.kind === 'range' ? rangeDrawer() : doseDrawer())
+        var sheet = weightView ? weightSheet() : drawer ? (drawer.kind === 'resolve' ? resolveDrawer() : drawer.kind === 'range' ? rangeDrawer() : doseDrawer())
           : K.sheet({ title: S('pp.room.code', { code: crate }), subtitle: subtitle(), close: { action: 'close' }, size: 'long', view: 'litter', label: S('pp.litter.aria', { code: crate }),
-            body: faceBody(), footer: K.footer({ back: { action: 'close' } }) });
+            body: faceBody(), footer: litterFooter() });
         return K.scrim({ action: 'scrim' }) + sheet;
       },
       radio: function (field, value) { whyShown = false; setRadio(field, value); },
@@ -911,20 +993,33 @@
           var step = +b.dataset.step;
           if (drawer.kind === 'resolve') drawer.had = (drawer.had || 0) + step;
           else if (drawer.kind === 'range') { drawer.still += step; if (!drawer.still) drawer.rest = ''; }
-          else if (drawer.castr) { drawer.castr[v] += step; drawer.castr.none = false; drawer.confirmNone = false; if (!drawer.castr.deferred) drawer.castr.deferReason = ''; }
+          else if (drawer.castr) {
+            drawer.castr[v] += step; drawer.castr.none = false; drawer.confirmNone = false;
+            if (!drawer.castr.deferred) drawer.castr.deferReason = ''; else if (!drawer.castr.deferReason) drawer.castr.deferReason = priorReason(drawer.dose);
+          }
           else if (v === 'weak') drawer.weak = (drawer.weak || 0) + step;
-          else { drawer.n += step; if (drawer.n === owedOf(drawer.dose)) drawer.reason = ''; if (drawer.weak > restOf()) drawer.weak = restOf(); }
+          else {
+            drawer.n += step; if (drawer.n === owedOf(drawer.dose)) drawer.reason = ''; else if (!drawer.reason) drawer.reason = priorReason(drawer.dose);
+            if (drawer.weak > restOf()) drawer.weak = restOf();
+          }
           return 'render';
         }
         // a tap on the waiting Save shows why (the line appears answered); any other act clears it
         if (a === 'save' && b.getAttribute('aria-disabled') === 'true') { whyShown = true; return 'render'; }
         if (UI.guard(b)) return 'guarded';
         if (a !== 'save') whyShown = false;
-        if (a === 'record') { if (now - lastCommit < 600) return 'guarded'; tap(v, b.dataset.n != null ? +b.dataset.n : shownN[v]); return 'render'; }
+        if (a !== 'record' && a !== 'record-yes') ask = null;
+        if (a === 'record' || a === 'record-yes') {
+          if (now - lastCommit < 600) return 'guarded';
+          var pv = String(v).split('#'), lab = a === 'record-yes' && ask ? ask.n : b.dataset.n != null ? +b.dataset.n : shownN[v];
+          // R2-18: while the litter's Alive is in question (a held body, two counts that disagree) the one-tap asks first
+          if (a === 'record' && inQuestion()) { ask = { value: v, n: lab }; return 'render'; }
+          ask = null; tap(pv[0], lab, pv[1]); return 'render';
+        }
+        if (a === 'record-no') { ask = null; return 'render'; }
         if (a === 'undo') { undo(v); return 'render'; }
         if (a === 'open-dose') return openDose(v) ? 'push' : 'guarded';
         if (a === 'open-resolve') return openResolve(v) ? 'push' : 'guarded';
-        if (a === 'open-more') { moreView = true; return 'push'; }
         if (a === 'open-weight') { weightView = { draft: '', pad: true, hint: '' }; return 'push'; }
         if (a === 'radio') { setRadio(b.closest('[data-field]') ? b.closest('[data-field]').dataset.field : '', v); return 'render'; }
         if (a === 'no-males') {
@@ -995,5 +1090,14 @@
       }
     };
     return api;
+  };
+  /* A litter's draft on this phone (the room's row says so, R2-12): a treatment entry, a death, a count, a tagging run. */
+  window.PPLitter.drafted = function (name, code) {
+    function get(k) { try { return JSON.parse(sessionStorage.getItem('pp-' + k + ':' + name + ':' + code) || 'null'); } catch (e) { return null; } }
+    var t = get('drafts'), d = get('dead-draft'), c = get('count-draft'), i = get('id-draft');
+    if (t && Object.keys(t).length) return true;
+    if (d && ((d.pig && (Object.keys(d.pig.picks || {}).length || Object.keys(d.pig.tallies || {}).some(function (k) { return d.pig.tallies[k]; }))) || (d.sow && d.sow.cause))) return true;
+    if (c && c.observed != null) return true;
+    return !!(i && (i.run || i.lw));
   };
 })();
