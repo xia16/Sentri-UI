@@ -141,7 +141,7 @@ try {
   await page.click('[data-action="back"]');
   await page.waitForURL(/state=litter/); await ready(page);
   // the evidence row is Row (ADR 0002): its tap opens Edit (✎); a corrected figure is amber and says what it was (R1-28)
-  const rec = page.locator('[data-ds="TaskRow"][data-action="open-edit"]', { hasText: 'Iron' }).first();
+  const rec = page.locator('.tk-day-door[data-action="open-edit"]', { hasText: 'Iron' }).first();
   assert.match((await rec.innerText()).replace(/\s+/g, ' '), /10 piglets\s*·?\s*2 deferred: weak.*was 12 · corrected/);
   assert.equal(await rec.locator('.tk-tone[data-tone="amber"]').count(), 3);
   assert.match(await text(page, '[data-action="open-dose"][data-value="iron3"]'), /2 owed|weak/);
