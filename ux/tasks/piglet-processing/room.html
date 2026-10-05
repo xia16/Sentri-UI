@@ -316,7 +316,7 @@
      losses, who and when live in the litter drawer. ---- */
   function dueTok(late) { return late === 0 ? P('pp.room.tok.due_today') : late === 1 ? P('pp.room.tok.due_yest', null, 'red') : P('pp.room.tok.due_ago', { n: late }, 'red'); }
   function doneLate(f, only) {
-    var late = 0;
+    var late = only ? 0 : f.doneLate || 0;   // the ledger's row field survives a reload (R2-28)
     f.doneToday.forEach(function (id) {
       if (only && only.indexOf(txOf(id)) < 0) return;
       var D = dose(f, id);

@@ -494,6 +494,8 @@
       var x = view().identityDue, I = L().identity;
       if (x.scheme === 'none' || (!x.identified && !I.closed)) return '';
       if (x.status !== 'done' && x.status !== 'later' && x.who !== 'candidates') return '';
+      // keepers: while the set is open and the step is due, the owed row says it — not a second Recorded row (R2-27)
+      if (x.who === 'candidates' && !I.closed && (x.status === 'due' || x.status === 'late')) return '';
       var scheme = PP.t('pp.litter.id.scheme.' + x.scheme);
       var d = x.who === 'candidates' ? (I.closed ? P('pp.litter.id.closed', { k: x.identified }) : P('pp.litter.id.keepers', { k: x.identified })) : P('pp.litter.id.done', { k: x.identified, n: x.of });
       return citem({ title: [P('pp.litter.id.title', { scheme: scheme })], description: [d], mark: 'done', action: 'open-identity', value: crate });
