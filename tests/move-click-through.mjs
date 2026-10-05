@@ -158,6 +158,46 @@ try {
   assert.match(await drawer(page), /From D03\s*11 → 11/);
   console.log('ok 9 missing piglet moved: the source keeps its alive');
 
+  // 10. R3-3: opened from a loss line (closesLoss=1), "This is the missing piglet" is ticked once the crate is picked and the
+  //     preview reads 11 → 11; saving writes one Move that closes the loss (the button never contradicts the preview).
+  await page.goto(base + 'move.html?state=move&crate=D03&closesLoss=1&n=1&fresh=1'); await ready(page);
+  await find(page, 'A02');
+  await page.click('[data-action="pick-crate"][data-value="A02"]');
+  assert.equal(await page.locator('[data-action="closes-loss"]').isChecked(), true);
+  assert.match(await drawer(page), /From D03\s*11 → 11/);
+  assert.match(await text(page, '[data-action="save-move"]'), /Move 1/);
+  await page.click('[data-action="save-move"]');
+  await back(page);
+  console.log('ok 10 loss line → Move: the missing-piglet box starts ticked, 11 → 11');
+
+  // 11. R3-2: a double tap on Move writes one move (the button is spent on the first tap).
+  await page.evaluate(() => sessionStorage.clear());      // drafts of earlier flows are kept per crate (R3-17)
+  await openMove(page, 'B06', true);
+  await find(page, 'A03');
+  await page.click('[data-action="pick-crate"][data-value="A03"]');
+  await page.click('[data-action="step"][data-value="untagged"][data-step="1"]');
+  await page.evaluate(() => { for (let i = 0; i < 3; i++) { const b = document.querySelector('[data-action="save-move"]'); if (b) b.click(); } });   // taps in the same breath
+  await back(page);
+  assert.match(await drawer(page), /Saved · 1 piglet moved to A03/);
+  const moves = await page.evaluate(() => Object.keys(sessionStorage).filter((k) => k.startsWith('pp-log:')).reduce((n, k) => n + JSON.parse(sessionStorage.getItem(k)).filter((e) => e.type === 'move' && e.from === 'B06').length, 0));
+  assert.equal(moves, 1, 'one move written');
+  console.log('ok 11 double tap on Move writes one move');
+
+  // 12. R3-17: the draft survives phone Back; piglet chips carry names; the own-piglets warning sits above the counts.
+  await page.evaluate(() => sessionStorage.clear());
+  await openMove(page, 'A02', true);
+  await find(page, 'E01');
+  await page.click('[data-action="pick-crate"][data-value="E01"]');
+  d = await drawer(page);
+  assert.ok(d.indexOf("E01's own 7 piglets join too") >= 0 && d.indexOf("E01's own 7 piglets join too") < d.indexOf('Piglets'), 'warning above the count');
+  await page.goBack(); await ready(page);
+  await page.goForward(); await ready(page);
+  await page.waitForSelector('.tk-sheet[data-view="move"]');
+  assert.match(await drawer(page), /To crate\s*E01/);
+  await page.goto(base + 'move.html?state=move-tagged'); await ready(page);
+  assert.ok(await page.getByRole('checkbox', { name: '000301' }).count() >= 1, 'chip has its name');
+  console.log('ok 12 draft kept over Back, warning above the count, chips named');
+
   await browser.close();
 } finally {
   server.kill();
