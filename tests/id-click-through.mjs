@@ -136,7 +136,7 @@ try {
   // R2-27: the pad is up and the boar/gilt counts are on its status line, above the keys, in view (never covered)
   const cb = await page.locator('[data-action="to-counts"]').boundingBox(), pb = await page.locator('#id-lw-pad .st-numpad-key').first().boundingBox();
   assert.ok(cb && pb && cb.y + cb.height <= pb.y + 1, 'the counts sit above the pad');
-  assert.match(await text(page, '[data-action="to-counts"]'), /Boars 0 · Gilts 0 · \d+ not identified/);
+  assert.match(await text(page, '[data-action="to-counts"]'), /Boars and gilts · \d+ not identified/);
   await tap(page, '[data-action="numpad"][data-value="lw"][data-key="5"]');
   assert.match(await text(page, '#id-lw-pad .st-numpad-hint'), /3 digits before the point at most/);
   const cb2 = await page.locator('[data-action="to-counts"]').boundingBox();         // still in view beside the note
@@ -158,10 +158,43 @@ try {
   assert.match(await text(page, '[data-ds="Measure"][data-field="lw"]'), /16\.8/);
   await tap(page, '[data-st-context="drawer"] [data-action="save"]');
   const tiles = await text(page, '[data-ds="Facts"]');
-  const [, boars, gilts] = tiles.match(/All boars (\d+) All gilts (\d+)/);
+  const [, boars, gilts] = tiles.match(/Boars (\d+)(?: \d+ not identified)? Gilts (\d+)/);
   const rc = await text(page, '.id-group[role="status"]');
   assert.match(rc, new RegExp(`Saved · 16\\.8 kg · ${boars} boars? · ${gilts} gilts? in all`));
   console.log('ok 4 litter weight: 168 refused, counts reachable, kept through Close, saved:', rc.slice(0, 60), '| tiles', tiles);
+
+  // R3-18: at 360 x 740 the Weight field is whole on screen above the pad; a second litter weight on the same day asks
+  // "Replace 18.6 kg?" first and keeps the old value amber on the row; a farm with no identity says so.
+  {
+    const small = await (await browser.newContext({ viewport: { width: 360, height: 740 } })).newPage();
+    const smallErrors = []; small.on('pageerror', (e) => smallErrors.push(e.message));
+    await small.goto(base + 'id.html?state=id-entry&fresh=1'); await ready(small);
+    const wb = await small.locator('[data-ds="Measure"][data-field="weight"] .st-measure-box').boundingBox(), dock = await small.locator('.id-pad-dock').boundingBox();
+    assert.ok(wb && dock && wb.y >= 100 && wb.y + wb.height <= dock.y + 1, 'Weight is whole, above the pad');
+    await tap(small, '[data-action="open-numpad"][data-value="weight"]');
+    await keys(small, '1.4', 'weight');
+    assert.match(await text(small, '[data-ds="Measure"][data-field="weight"]'), /1\.4/);
+    await small.goto(base + 'id.html?state=litter-weight-replace&fresh=1'); await ready(small);
+    assert.match(await text(small, '.tk-footer-status'), /Replace 18\.6 kg\?/);
+    await tap(small, '[data-st-context="drawer"] [data-action="save"]');
+    const rowTxt = await text(small, '[data-action="open-weight"]');
+    assert.match(rowTxt, /16\.8 kg.*was 18\.6 kg/);
+    await small.goto(base + 'id.html?state=litter-weight-typing&fresh=1'); await ready(small);
+    await tap(small, '[data-action="open-numpad"][data-value="lw"]');
+    await keys(small, '9', 'lw');
+    const w2 = await small.locator('[data-ds="Measure"][data-field="lw"]').boundingBox(), cbtn = await small.locator('[data-action="to-counts"]').boundingBox();
+    assert.ok(w2 && w2.height > 30 && cbtn && cbtn.height > 30, 'weight and the counters button are both visible while typing');
+    await tap(small, '[data-action="to-counts"]');
+    assert.ok(await small.locator('[data-action="count"]').count() > 0, 'the counters open behind the button');
+    await small.goto(base + 'id.html?state=id-none&fresh=1'); await ready(small);
+    assert.match(await text(small, '[data-view="none"]'), /Identity is not recorded on this farm/);
+    assert.equal(await small.locator('[data-action="open-run"]').count(), 0);
+    await small.goto(base + 'id.html?state=id-candidates-done&fresh=1'); await ready(small);
+    assert.match(await text(small, '[data-view="table"]'), /Identity done · 9 keepers/);
+    assert.doesNotMatch(await text(small, '[data-view="table"]'), /9 of 14/);
+    assert.deepEqual(smallErrors, []);
+    console.log('ok R3-18 360 x 740: weight reachable, replace asks and stamps, counters button, all-in state, no-identity farm, keepers closed');
+  }
 
   // 5. every alive piglet identified: no suggestion, no Record, Close is the way on.
   await page.goto(base + 'id.html?state=id-all&fresh=1'); await ready(page);
@@ -173,15 +206,12 @@ try {
     return getComputedStyle(b).backgroundColor === ink;
   });
   assert.equal(inked, true);
-  assert.match(await status(page), /All 12 alive identified/);
-  // R2-27: all identified — the pad's keys are dead (no tag readout, no Scan), the table offers no Record
-  assert.equal(await page.locator('#id-pad [data-action="numpad"]:not([aria-disabled="true"])').count(), 0);
-  assert.equal(await page.locator('[data-action="scan"]').count(), 0);
-  await tap(page, '#id-pad [data-action="numpad"][data-key="5"]');
-  assert.equal(await page.locator('#id-pad .st-numpad-readout').count(), 0);
+  // R3-18: all identified — no pad, no sex, no weight to type into (nothing to swallow); one door row says so, Back is the way out
+  assert.match(await text(page, '[data-view="run"] .tk-page-body'), /All 12 alive identified.*More than 12\? Set count/);
+  assert.equal(await page.locator('#id-pad, #id-sex, [data-action="scan"], [data-action="numpad"]').count(), 0);
   await toTable(page);
   assert.equal(await page.locator('[data-view="table"] [data-action="open-run"]').count(), 0);
-  assert.match(await text(page, '[data-ds="Facts"]'), /Identified 12 of 12 .*All boars .*All gilts/);
+  assert.match(await text(page, '[data-ds="Facts"]'), /Identified 12 of 12 .*Boars .*Gilts/);
   await tap(page, '[data-view="table"] .tk-footer [data-action="leave"]');
   await page.goto(base + 'id.html?state=id-all&fresh=1'); await ready(page);
   // R2-9: "More than 12? Set count" opens Set count for this litter
