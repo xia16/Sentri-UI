@@ -274,8 +274,10 @@
   // Why Save waits: the footer's status line, directly above Back + Save (it is Save's description)
   function status() {
     // a waiting Save stands alone (farrowing): the reason shows once Save is tapped (the guard), then stays while it applies
-    var w = why(), show = w && S.why;
-    return show ? { text: PP.t(w.id, w.args), str: w.id, args: w.args, id: 'dd-why' } : null;
+    // The line is always in the footer (read, visually hidden); a tap on the waiting Save shows it. The sow's hold writes its progress here too.
+    var w = why();
+    if (!w) return S.mode === 'sow' ? { text: '', id: 'dd-why' } : null;
+    return { text: PP.t(w.id, w.args), str: w.id, args: w.args, id: 'dd-why', visible: !!S.why };
   }
   function piglets() {
     var out = [heldRow(), '<div class="dd-tallies" data-target="tallies">' + causes().map(tallyRow).join('') + lossStepper() + '</div>'];
@@ -289,7 +291,7 @@
     if (S.sow.cause === 'other') out.push(noteField('sowNote'));
     out.push(photoField('sow', !!S.sow.cause));
     var stay = surface === 'processing' ? 'pp.dead.sow.stay' : 'ds.dead.sow.stay_' + phase;
-    out.push(K.warning({ text: s('ds.dead.sow.warn_' + phase), detail: s(stay, { n: alive() }) }));
+    out.push(K.warning({ title: s('ds.dead.sow.warn_' + phase), text: s(stay, { n: alive() }) }));
     return out.join('');
   }
   function footer(back) {

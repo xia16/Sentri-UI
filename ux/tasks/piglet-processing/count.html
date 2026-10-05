@@ -159,7 +159,7 @@
   // the answer a sanity question takes (`17 is right`, `None are there`) is the status line's text action
   function saveFooter(p, waiting, action, id, args, backAction) {
     // a waiting primary stands alone (farrowing): its reason shows once it is tapped (the guard), then stays while it applies
-    var st = p && S.why ? { text: PP.t(p.id, p.args), str: p.id, args: p.args, id: 'ct-why' } : null;
+    var st = p ? { text: PP.t(p.id, p.args), str: p.id, args: p.args, id: 'ct-why', visible: !!S.why } : null;
     if (st && p.act) st.action = { label: s(p.act.id, p.act.args), action: p.act.action, value: String(S.observed) };
     return K.footer({ back: { action: backAction || 'back' }, status: st, primary: { label: s(id || 'act.save', args), action: action || 'save', waiting: waiting } });
   }

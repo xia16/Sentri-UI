@@ -142,7 +142,7 @@ It is never silently a second death. Two deaths for one `rowId` keep the earlies
   return to the drawer); `Clear` discards the
   mode on screen; `Save` commits.
 - Save is gray (`aria-disabled`, still focusable) whenever it cannot commit, and, once Save is tapped (the guard), the
-  footer's status line names the missing step (`Pick a cause for 271004`, `How many were missing?`); tapping the gray
+  footer's status line (`footer({status})`, in the footer and read from the start but visually hidden until that tap) names the missing step (`Pick a cause for 271004`, `How many were missing?`); tapping the gray
   Save scrolls to that step, opening the tagged piglets when the step is there. An empty draft names itself only when Save is tapped.
 - Re-rendering keeps the body's scroll position and the focused control.
 - **Save and Back return to where the worker came from (R1-26)**: the page named by `back` (Explain), else the litter drawer over the room (`room.html?state=litter&crate=A02`). There is no host stub and no extra Back. Save hands its receipt over on the phone
@@ -158,7 +158,7 @@ It is never silently a second death. Two deaths for one `rowId` keep the earlies
   guard and 400 ms arm floor): a plain tap says `Keep holding to save`, the status line beside the bar reports start
   and cancel, and keyboard or switch access uses the card's two-step (`Press Save again`), disarmed after 5 s or on
   blur. When the hold completes the page rechecks what Save needs before it commits (`settle(el, 'failed')`
-  otherwise). The warning above it is farrowing's danger band (TaskWarning). The hold is in the primary's ink, as farrowing's
+  otherwise). The warning above it is farrowing's danger band (`warning({ title, text })`: title `Saving records her death`, text the consequence). The hold is in the primary's ink, as farrowing's
   (`Save · Hold to save`).
 - Identified piglets: one row in the drawer (`Identified · 9`, `2 picked`); one level down (`Identified piglets`,
   with Back + Save) they are picked from the roster or by `Scan ear tag`; one cause control for everything
