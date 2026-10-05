@@ -20,7 +20,11 @@
 .ed-group { display: flex; flex-direction: column; gap: var(--space-heading); }
 .ed-group > * { margin: 0; }
 /* one rule between stacked records, as between farrowing's Edit rows */
-.ed-group[data-mark] + .ed-group[data-mark], .ed-group[data-count] + .ed-group[data-count], .ed-group[data-death] + .ed-group[data-death] { padding-top: var(--space-heading); border-top: 1px solid var(--line); }
+.ed-group[data-count] + .ed-group[data-count], .ed-group[data-death] + .ed-group[data-death] { padding-top: var(--space-heading); border-top: 1px solid var(--line); }
+/* Treatment rows sit flush like farrowing's Edit record rows: the rule is the only break (the section's gap and a top pad are
+   cancelled), and the row is that Edit row's height, so label + stamp fit the compact row (pitch 71, was 91). */
+.ed-group[data-mark] + .ed-group[data-mark] { margin-top: calc(-1 * var(--space-heading)); border-top: 1px solid var(--line); }
+.ed-group[data-mark] > .tk-stepper[data-face="row"] { min-height: calc(var(--entry-row-min) + var(--space-key-gap) / 2); }
 .ed-pad { flex: none; padding: var(--space-row-y) var(--space-gutter-sheet); background: var(--paper); border-top: 1px solid var(--line); }
 /* A record-page entry's change lines, moved right under its title (see logHtml): colour on the value, the words ink. */
 .ed-delta { margin: 0; font-size: var(--type-description-size); line-height: 1.5; color: var(--ink); }

@@ -11,8 +11,8 @@
 /* The font stack with a Chinese sans-serif fallback (parity review 7): Chinese labels never fall to a serif system face.
    Set on the stage and the phone so every part and card inside (var(--font-sans), the bundle's var(--sans)) takes it. */
 .tk-stage, .tk-phone {
-  --font-sans: "Plus Jakarta Sans", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", monospace;
+  --font-sans: "Plus Jakarta Sans", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", monospace;
   --sans: var(--font-sans); --mono: var(--font-mono); }
 .tk-phone { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column;
   box-sizing: border-box; width: 100%; height: 100vh; height: 100dvh;
@@ -418,6 +418,10 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .tk-warning-copy > .tk-warning-title + .tk-warning-text { margin-top: 0; line-height: 1.6; }
 .tk-warning-go { flex: none; display: grid; place-items: center; }
 .tk-warning-go svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+/* The red band's hierarchy is farrowing's .danger-band: the headline is <strong> (bold, red), the consequence line a <small> (muted, 10px,
+   4px under). The amber band and the End banner (data-banner) keep their own look: amber text throughout, as their reference. */
+.tk-warning:not([data-tone="amber"]) .tk-warning-title { font-weight: 700; line-height: 1.6; }
+.tk-warning:not([data-tone="amber"]):not([data-banner]) .tk-warning-title + .tk-warning-text { margin-top: 4px; font-size: var(--type-meta-size); color: var(--muted); }
 
 /* TaskRadios layout 'row': farrowing's inline field — label (Optional tag, Clear) left, outlined option pills right. */
 .st-choice-inline.tk-radios[data-face="row"] { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); min-height: 64px; }

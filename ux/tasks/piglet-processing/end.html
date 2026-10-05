@@ -453,13 +453,14 @@
       }
       var phase = S.unconfirmed ? 'unknown' : S.pending ? 'pending' : S.holding ? 'holding' : 'idle';
       // the hold's progress line is the footer's status: hidden by default (farrowing shows only the caption), still heard
-      foot = K.footer({ back: { action: 'close-sheet' }, status: { id: 'pp-hold-status', text: '' },
+      // the visible caption is HOLD TO END in every phase (farrowing keeps it steady); the progress words (keep holding, ending…) are the hidden status
+      foot = K.footer({ back: { action: 'close-sheet' }, status: Object.assign({ id: 'pp-hold-status', text: '' }, phase === 'holding' ? P('pp.end.hold.keep') : phase === 'pending' ? P('pp.end.hold.pending') : {}),
         hold: { label: P('pp.end.act.end'), caption: P(capId(phase)), action: 'hold', tone: 'danger', phase: phase } })
         .replace('data-phase="holding"', S.holding === 'static' ? 'data-phase="holding" data-preview="still"' : 'data-phase="holding"');
     }
     return page('pp.end.title', null, 'pp.end.rv.scope', { n: UNIT, k: t.litters }, body, foot);
   }
-  function capId(phase) { return phase === 'unknown' ? 'pp.end.hold.unknown' : phase === 'pending' ? 'pp.end.hold.pending' : phase === 'holding' ? 'pp.end.hold.keep' : 'pp.end.hold.caption'; }
+  function capId(phase) { return phase === 'unknown' ? 'pp.end.hold.unknown' : 'pp.end.hold.caption'; }
   // A treatment physically done after End (from an offline phone): kept, stamped, flagged; the frozen figures do not change.
   function afterEndFlag() {
     var ae = post().filter(function (e) { return e.kind === 'afterend'; });

@@ -1,7 +1,7 @@
 /* Piglet processing screen frame: the page gutter and section gap only, read from tokens.css. */
 /* the task's font stack, with a Chinese sans-serif fallback (parity review 7; the skeleton's .tk-phone carries the same) */
-.phone { --font-sans: "Plus Jakarta Sans", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", monospace; --sans: var(--font-sans); --mono: var(--font-mono); }
+.phone { --font-sans: "Plus Jakarta Sans", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", monospace; --sans: var(--font-sans); --mono: var(--font-mono); }
 .phone { max-width: 390px; margin: 0 auto; padding: 20px var(--space-gutter); min-height: 100vh; background: var(--app-background); color: var(--ink); font-family: var(--font-sans); }
 .phone > * + * { margin-top: var(--space-section); }
 @media (max-width: 370px) { .phone { padding-left: var(--space-gutter-narrow); padding-right: var(--space-gutter-narrow); } }
