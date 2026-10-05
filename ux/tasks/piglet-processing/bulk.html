@@ -66,7 +66,7 @@
   var ROOM = +(qs.get('unit') || 7);
   var TX = qs.get('tx') || 'iron';
   var store, CFG, DOSE, TICKS, holds;
-  var S = { sel: [], review: false, contract: {}, receipt: null, held: [], flash: false, failed: null, late: {} };
+  var S = { sel: [], review: false, contract: {}, receipt: null, held: [], flash: false, failed: null };
   var holdTimer = 0;
 
   /* ---- the ledger ---- */
@@ -120,12 +120,12 @@
       : r.why === 'unknown' ? s('pp.bulk.l1.unknown', { n: r.n }) : s('pp.bulk.l1.castration')];
   }
   /* The meta line: the litter's age (only where it differs from the dose's day), and what the one chip had no room for. A
-     done row's lateness is what this record made up (read when it was written), kept for the page's life. */
+     done row's lateness is the ledger's (`lateBy`: what this record made up, from its own day-age), so a reload keeps it. */
   function meta(r) {
     var m = [];
     if (r.kind === 'done' && r.sowDied && !r.collided) m.push(s('pp.bulk.chip.done'));
     if (r.day !== doseCfg(DOSE).due) m.push(s('pp.common.unit.day', { n: r.day }));
-    if (r.kind === 'done' && S.late[r.litter]) m.push(s(one('pp.bulk.row.late', S.late[r.litter]), { n: S.late[r.litter] }, 'red'));
+    if (r.kind === 'done' && r.lateBy > 0) m.push(s(one('pp.bulk.row.late', r.lateBy), { n: r.lateBy }, 'red'));
     var out = [];
     m.forEach(function (x, i) { if (i) out.push(SEP); out.push(x); });
     return out.length ? out : '';
@@ -259,7 +259,6 @@
     S.receipt = { outcomes: b.plan.outcomes, litters: b.plan.litters, piglets: b.plan.piglets, late: lateCount(b.plan.record),
       changed: b.plan.changed.slice(), double: [], mine: res.events.map(function (e) { return e.id; }) };
     recheck();
-    b.plan.record.forEach(function (x) { if (x.lateBy > 0) S.late[x.litter] = x.lateBy; });
     S.held = b.plan.outcomes.filter(function (x) { return x.outcome === 'record' || x.outcome === 'died' || x.outcome === 'nothing'; }).map(function (x) { return x.litter; });
     S.sel = []; S.review = false; saveTicks();
     return true;

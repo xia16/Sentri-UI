@@ -115,7 +115,11 @@
   function fromLoss() { var o = {}; Object.keys(S.pig.miss).forEach(function (r) { if (S.pig.miss[r] === 'yes' && r in S.pig.picks) o[r] = true; }); return o; }
   function draft() {
     var t = {}; Object.keys(S.pig.tallies).forEach(function (c) { if (S.pig.tallies[c]) t[c] = S.pig.tallies[c]; });
-    var dr = { tallies: t, picks: S.pig.picks, k: S.pig.k, fromLoss: fromLoss() }, key = tgt() + JSON.stringify(dr) + store.events.length;
+    var dr = { tallies: t, picks: S.pig.picks, k: S.pig.k, fromLoss: fromLoss() };
+    // R2-23: a body recorded on another crate says where it was found: the crate the drawer was opened on
+    if (S.pig.route && S.pig.route !== crate) dr.foundIn = crate;
+    var key = tgt() + JSON.stringify(dr) + store.events.length;
+
     if (memo.key !== key) memo = { key: key, val: store.select.deathDraft(store.derived, tgt(), dr, { who: window.PPFixtures.ME }) };
     return memo.val;
   }

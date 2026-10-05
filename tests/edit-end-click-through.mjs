@@ -323,6 +323,64 @@ try {
   assert.match(await live(page, '#ed-saved', /Answer saved/), /Different piglets · both stand, each counted in full/);
   console.log('ok 16 round 6 Different piglets · both stand');
 
+  // 17. R2-25: a death of several bodies withdraws one body: tick it, the receipt says what changed, the other stays.
+  await openLitter(page, 'A02');
+  await page.click('[data-action="open-dead"]');
+  await page.waitForURL(/dead\.html/); await ready(page);
+  await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/state=litter/); await ready(page);
+  assert.match(await text(page, '.lt-summary'), /Alive now 10/);
+  await openEdit(page);
+  assert.equal(await page.locator('[data-action="death-piece"]').count(), 2);
+  await page.locator('[data-action="death-piece"]').last().click();
+  assert.match(await live(page, '#ed-banner-summary', /withdrawn/), /Death \+2 crushed 1 withdrawn · 1 stays · recorded by mistake · A02 alive 10 → 11/);
+  await page.click('[data-action="save"]');
+  rc = await live(page, '#ed-saved', /Correction saved/);
+  assert.match(rc, /A02 · alive 10 → 11 · dead 3 → 2/);
+  await page.waitForTimeout(400);
+  await page.click('[data-action="back"]');
+  await page.waitForURL(/state=litter/); await ready(page);
+  assert.match(await text(page, '.lt-summary'), /Alive now 11/);
+  await page.click('[data-action="open-record"]');
+  await page.waitForURL(/state=record-page/); await ready(page);
+  assert.match(await text(page, '[data-ds="Log"]'), /Death \+2 crushed 1 withdrawn · 1 stays/);
+  console.log('ok 17 R2-25 two bodies recorded → withdraw one → Save → alive 10 → 11:', rc);
+
+  // 18. R2-20: a Sow died mark recorded by mistake is withdrawn from Edit (own row); the litter's sow farrows on.
+  await openLitter(page, 'B01');
+  await openEdit(page);
+  assert.match(await text(page, '[data-sow]'), /Sow died .*prolapse|Sow died .*Sep 28/);
+  await page.click('[data-action="sow-void"]');
+  assert.match(await live(page, '#ed-banner-summary', /Sow died withdrawn/), /Sow died withdrawn · recorded by mistake/);
+  await page.click('[data-action="save"]');
+  rc = await live(page, '#ed-saved', /Correction saved/);
+  assert.equal(await page.locator('[data-sow]').count(), 0);
+  console.log('ok 18 R2-20 Sow died → Recorded by mistake → Save:', rc);
+
+  // 19. R2-20: a Sow died mark on the wrong crate moves through the crate picker; Save waits for the crate.
+  await openLitter(page, 'B01');
+  await openEdit(page);
+  await page.click('[data-action="sow-to"]');
+  await page.locator('[data-view="picker"] [data-action="picker-back"]').last().click();
+  await page.waitForTimeout(400);
+  await page.click('[data-action="sow-to"]');
+  assert.equal(await page.locator('[data-view="picker"] [data-action="pick"][data-value="B01"]').count(), 0);
+  await page.click('[data-view="picker"] [data-action="pick"][data-value="B02"]');
+  assert.match(await live(page, '#ed-banner-summary', /Sow died moved to B02/), /Sow died moved to B02/);
+  await page.waitForTimeout(450);                                            // a tap right after a drawer closes is a ghost tap
+  await page.click('[data-action="save"]');
+  rc = await live(page, '#ed-saved', /Correction saved/);
+  assert.equal(await page.locator('[data-sow]').count(), 0);                // the mark left this litter
+  await page.waitForTimeout(400);
+  await page.click('[data-action="back"]');
+  await page.waitForURL(/state=litter/); await ready(page);
+  await page.click('[data-action="open-record"]');
+  await page.waitForURL(/state=record-page/); await ready(page);
+  assert.match(await text(page, '[data-ds="Log"]'), /Sow died moved to B02/);
+  console.log('ok 19 R2-20 Sow died → On another litter → B02 → Save');
+
   await browser.close();
 } finally {
   server.kill();

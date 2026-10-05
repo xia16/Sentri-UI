@@ -198,6 +198,17 @@ try {
   assert.match(await text(page, '#screen'), /Found outside its crate\? One of D03's 2 missing\?/);
   console.log('ok 10 loss choice, visible cause reason, outside-crate door before a count');
 
+  // 11. R2-23: a body recorded on another crate says where it was found: D03's log reads "found in A02" (the crate the drawer
+  // was opened on), and its own record names the body once.
+  await toDead(page, 'A02');
+  await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  await page.click('[data-action="route"][data-value="D03"]');
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/state=litter.*crate=A02/); await ready(page);
+  await page.goto(base + 'edit.html?state=record-page&crate=D03&data=base'); await ready(page);
+  assert.match(await text(page, '[data-ds="Log"]'), /found in A02/);
+  console.log('ok 11 R2-23 body found in A02 → recorded on D03 → D03\'s log: found in A02');
+
   await browser.close();
 } finally {
   server.kill();
