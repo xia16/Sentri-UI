@@ -105,6 +105,10 @@ try {
   // 7. Two offline counts that never saw each other: neither stands; the litter asks for a new count, which settles it.
   await page.goto(base + 'count.html?state=count-conflict&fresh=1'); await ready(page);
   assert.match(await text(page, '#screen'), /Two counts disagree/);
+  // s8 #4: the stepper starts blank and Save waits (nobody has the number yet); the worker counts, then saves
+  assert.equal(await page.locator('[role="spinbutton"]').first().innerText(), '–');
+  assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
+  await page.click('[data-action="step"][data-step="-1"]'); await page.click('[data-action="step"][data-step="1"]');
   await page.click('[data-action="save"]');
   await page.waitForURL(/state=litter.*saved=count/); await ready(page);
   assert.doesNotMatch(await text(page, '.tk-sheet'), /Two counts disagree|Counts disagree/);
@@ -125,6 +129,8 @@ try {
   await toCount('A02');
   await step(1, 5);
   assert.match(await text(page, '[data-ds="Stepper"]'), /recorded treatments stand · check on the pig/);
+  // R2-2: the reason and its answer are on screen as soon as the number is entered, before any tap on Save
+  assert.ok(await page.locator('#ct-why').isVisible() && await page.locator('#ct-why ~ [data-action="sure"], [data-action="sure"]').first().isVisible());
   await page.click('[data-action="save"]', { force: true });                      // a waiting Save says why once tapped
   assert.match(await text(page, '#ct-why'), /17 piglets is 5 more than the record's 12 piglets · count again, or say it's right/);
   assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
@@ -178,15 +184,39 @@ try {
   assert.match(await text(page, '[data-ds="Facts"]'), /Alive now 11/);
   console.log('ok 10 a named missing piglet body closes its line:', await text(page, '#lt-receipt'));
 
-  // 11. R1-22: a held body is answered in the Set count drawer, above the number (never under the sheet).
+  // 11. R2-7: a held body is asked in its own dialog (the Set count sheet is not under it); the answer comes back with a receipt on
+  // the litter, and no stale count can be saved: Set count starts again from the new Alive.
   await toCount('A07', 'held-body');
   const drawerText = await text(page, '[role="dialog"]');
   assert.ok(drawerText.indexOf('Same body recorded twice?') >= 0 && drawerText.indexOf('Same body recorded twice?') < drawerText.indexOf('Seen in A07'));
   await page.click('[data-action="sub"][data-value="held"]');
+  assert.doesNotMatch(await text(page, '#screen'), /Seen in A07/);
+  await page.click('[data-action="sub-back"]');
+  assert.match(await text(page, '#screen'), /Seen in A07/);
+  await page.click('[data-action="sub"][data-value="held"]');
   await page.click('[role="dialog"] [data-action="held-pick"][data-value="two"]');
   await page.click('[role="dialog"] [data-action="resolve"][data-value$="|two"]');
-  assert.doesNotMatch(await text(page, '#screen'), /Same body recorded twice\?/);
-  console.log('ok 11 held body answered in the Set count drawer: Two bodies');
+  await page.waitForURL(/state=litter.*saved=count/); await ready(page);
+  await page.waitForSelector('#lt-receipt span');
+  assert.match(await text(page, '#lt-receipt'), /Saved\s*·\s*two bodies\s*·\s*Alive 12 piglets/);
+  await page.waitForTimeout(450);
+  await page.click('[data-action="open-count"]');
+  await page.waitForURL(/count\.html/); await ready(page);
+  assert.equal(await page.locator('[role="spinbutton"]').first().innerText(), '12');
+  assert.match(await text(page, '[data-ds="Stepper"]'), /Same as the record/);
+  console.log('ok 11 held body answered in its own dialog, receipt, stepper reset: Two bodies');
+
+  // 12. R2-24: a count equal to the record writes nothing; Back after a saved count returns to the litter.
+  await toCount('A02');
+  assert.match(await text(page, '[data-ds="Stepper"]'), /Same as the record · Save writes nothing new/);
+  const before = (await log(page, 'base')).length;
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/state=litter.*saved=count/); await ready(page);
+  assert.equal((await log(page, 'base')).length, before);
+  assert.match(await text(page, '#lt-receipt'), /Same as the record/);
+  await page.goBack(); await ready(page);
+  assert.doesNotMatch(page.url(), /count\.html/);
+  console.log('ok 12 same-as-record writes nothing, Back skips the count page');
 
   await browser.close();
 } finally {

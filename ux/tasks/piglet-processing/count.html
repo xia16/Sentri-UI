@@ -306,7 +306,7 @@
     var hero = K.stepper({ face: 'count', label: '', value: S.observed, min: 0, key: 'observed', variant: 'hero', draft: dirty(), hint: '', reserveHint: true,
       strs: { label: 'pp.count.seen', value: 'ds.field.figure', hint: h.id, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { label: { code: crate }, hint: h.args } });
-    if (S.blank) hero = hero.replace(/(<span class="st-stepper-value"[^>]*?)\s+data-str="[^"]*"(?:\s+data-args="[^"]*")?([^>]*>)\d+(<\/span>)/, '$1$2–$3').replace(' data-zero=""', '');
+    if (S.blank) hero = hero.replace(/(<span class="st-stepper-value"[^>]*?)\s+data-str="[^"]*"(?:\s+data-args="[^"]*")?([^>]*>)\d+(<\/span>)/, '$1 data-str="pp.count.blank"$2–$3').replace(' data-zero=""', '');
     // a held body is answered here too, above the number (R1-22): the drawer never hides the question under it
     return K.drawer({ size: 'long', view: 'count', title: s('pp.count.title'), subtitle: subtitleOf(),
       aside: dirty() ? UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '', close: { action: 'dismiss' },
@@ -362,7 +362,7 @@
     if (more > 0) rows.push(item('more', 'more', l.id, pl('pp.count.sug.more', more), { n: more }, 'pp.count.ex.more_desc'));
     if (l.kind === 'gain') rows.push(item('send', 'move-in', l.id, 'pp.count.ex.move_in', null, 'pp.count.ex.move_in_desc'));
     // R2-3: the piglet may be in another crate — the Move out of this litter that explains this line (move.html reads `pair`)
-    if (l.kind === 'loss') rows.push(item('send', 'move-out', l.id, 'pp.count.ex.move_out', null, 'pp.count.ex.move_out_desc'));
+    if (l.elsewhere) rows.push(item('send', 'move-out', l.id, 'pp.count.ex.move_out', null, 'pp.count.ex.move_out_desc'));
     if (l.death) rows.push(item('alert', 'open-dead', l.litter, 'pp.dead.title.record', null, pl('pp.count.ex.dead_desc', l.open), { np: np(l.open) }));
     rows.push(item('check', 'open-count', l.litter, 'pp.count.review.again', { code: l.litter }, 'pp.count.ex.again_short'));
     // a mistaken count is corrected through Edit (RULINGS round 3): withdrawn or set, stamped, its line goes
@@ -578,7 +578,7 @@
     else if (a === 'sure') { S.sure = S.observed; }
     else if (a === 'move-out') {
       var ml = lineOf(v); if (!ml) return;
-      nav('move.html', { state: 'move', crate: ml.litter, n: ml.open, pair: ml.id }); return;
+      var ew = ml.elsewhere || {}; nav('move.html', { state: 'move', crate: ew.from || ml.litter, n: ew.n || ml.open, closesLoss: ew.closesLoss ? 1 : '', pair: ml.id }); return;
     }
     else if (a === 'move-in') {
       var gl = lineOf(v); if (!gl) return;

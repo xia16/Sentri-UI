@@ -595,6 +595,7 @@
     "pp.dead.tagged.picked.one": {"en": "{n} picked", "zh": "已选{n}头", "kind": "status"},
     "pp.dead.tagged.picked.many": {"en": "{n} picked", "zh": "已选{n}头", "kind": "status"},
     "pp.count.held.row": {"en": "{b} · {t} · held until you answer", "zh": "{b} · {t} · 待你确认", "kind": "status"},
+    "pp.count.blank": {"en": "–", "zh": "–", "kind": "figure"},
     "pp.count.sug.gap_now": {"en": "just now", "zh": "刚刚", "kind": "label"},
     "pp.count.hint.match_settle": {"en": "Same as the record · Save settles the counts", "zh": "与记录相同 · 保存后两次清点即告一致", "kind": "status"},
     "pp.count.hint.blank": {"en": "Count the litter · neither count stands", "zh": "请重新清点 · 两次清点都不作数", "kind": "status"},
