@@ -362,6 +362,12 @@ function late(b) {
   return b;
 }
 
+function halves(b) {
+  const seen = b.ids();
+  b.treat('A02', 'iron3', sep(29, '09:10'), 'L.M', 6, { seen, device: 'P-LM', id: 'T-A02-h1', deferred: { n: 6, reason: 'weak' } });
+  b.treat('A02', 'iron3', sep(29, '09:12'), ME, 6, { seen, device: 'P-GH', id: 'T-A02-h2', deferred: { n: 6, reason: 'weak' } });
+}
+
 /* Every dose owed today recorded, walk order (the room's `all done`). */
 function recordAllOwed(b, date, hour) {
   const D = derive(b.events, CONFIG, { today: date });
@@ -597,6 +603,14 @@ export const VARIANTS = {
   'move-young': V((b) => { base(b); b.move('D06', 'D03', 2, sep(29, '10:27'), ME, { id: 'MV-0929-07', answers: {} }); }),
   // R1-19: C05 emptied by a move (all 8 to B08, now 17 — past a sane litter size): C05 closes, nothing owed
   'emptied': V((b) => { base(b); b.move('C05', 'B08', 8, sep(29, '09:30'), ME, { id: 'MV-0929-08', answers: {} }); }),
+  // round 6: D06's orphan onto E01 — a sow outside the task with her own 7 piglets: she joins whole, her own owe on their own day
+  'nurse-own': V((b) => { base(b); b.move('D06', 'E01', 1, sep(29, '10:27'), ME, { id: 'MV-0929-09', answers: {} }); }),
+  // round 6 / R2-N2: two offline phones each did a different half of A02's iron (6 + 6, the rest deferred) — a possible double…
+  'double-halves': V((b) => { base(b); halves(b); }),
+  // …answered "Different piglets · both stand": both count in full, 12 of 12
+  'double-different': V((b) => { base(b); halves(b); b.push({ type: 'double', litter: 'A02', dose: 'iron3', records: ['T-A02-h1', 'T-A02-h2'], answer: 'different', at: sep(29, '10:28'), who: ME }, 'DB-A02'); }),
+  // R2-8: a whole litter killed (A02: 12 crushed) — closed by deaths, not by moves
+  'killed': V((b) => { base(b); b.death('A02', sep(29, '10:27'), ME, [{ cause: 'crushed', n: 12 }], { id: 'D-A02-all' }); }),
 
   // identity and weigh (S4)
   'a02-tags-gh': V((b) => { base(b); a02(b, A02_GH, sep(29, '09:14'), ME); }),
