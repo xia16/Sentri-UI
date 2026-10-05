@@ -165,6 +165,27 @@ try {
   assert.match(there, /Correction Dock tail 11 piglets · was on A02 · 08:40 · L\. Madsen/);
   console.log('ok 6 Edit → wrong litter → A04 → Save → A04 record page:', there.slice(0, 100));
 
+  // 7. bulk: a tickable row still opens its litter from the id (the row elsewhere ticks); a Sow-died row keeps Done and
+  //    its lateness after the record (chip Sow died, Done · late on the meta line) — R2-28.
+  await page.goto(base + 'bulk.html?state=bulk&tx=iron&fresh=1'); await ready(page);
+  await page.click('[data-action="open-litter"][data-value="B01"]');
+  await page.waitForURL(/litter\.html/);
+  assert.match(page.url(), /crate=B01/);
+  await page.goto(base + 'bulk.html?state=bulk&tx=iron&fresh=1'); await ready(page);
+  await page.locator('label.tk-row:has(input[value="B01"]) .tk-row-headline').scrollIntoViewIfNeeded();
+  const hl = await page.locator('label.tk-row:has(input[value="B01"]) .tk-row-headline').boundingBox();
+  await page.mouse.click(hl.x + hl.width / 2, hl.y + hl.height / 2);
+  assert.ok(await page.isChecked('input[data-action="toggle"][value="B01"]'));
+  await page.click('[data-action="review"]');
+  const rb = await page.locator('[data-action="record"]').boundingBox();
+  await page.mouse.move(rb.x + rb.width / 2, rb.y + rb.height / 2); await page.mouse.down(); await page.waitForTimeout(1000); await page.mouse.up();
+  await page.waitForSelector('#bk-receipt');
+  const b01 = (await page.locator('.tk-row:has-text("B01")').first().innerText()).replace(/\s+/g, ' ');
+  assert.match(b01, /Sow died/);
+  assert.match(b01, /Done/);
+  assert.match(b01, /2 days late/);
+  console.log('ok 7 bulk: id opens the litter, row ticks; Sow died row keeps Done + late:', b01);
+
   await browser.close();
 } finally {
   server.kill();

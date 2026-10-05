@@ -164,3 +164,17 @@ It is never silently a second death. Two deaths for one `rowId` keep the earlies
   with Back + Save) they are picked from the roster or by `Scan ear tag`; one cause control for everything
   picked sits below the roster, so ticking never moves a row under the thumb; the `Was 271004 one of the missing?`
   question sits under it.
+
+## Scenario round 2 (fix/r2-deadcount)
+
+- **R2-23 visible reason.** A reason that names a step one level down (`Pick a cause for 271004`) or carries an answer is visible in
+  the footer status from the moment it applies (`status.visible`); other reasons stay read-only until Save is tapped.
+- **R2-23 the loss question** is its own group `Were any of them missing?` with two choices, `From the {m} missing` and
+  `None were missing` (radios, never a floor-gray minus, never a fifth cause row); the stepper `How many were missing` appears
+  only when more than one could be (or at an `at least n` floor, where the radios are omitted). The chosen choice carries what it
+  does (`alive stays 11 · 1 missing still open`).
+- **R2-23 outside its crate.** `Found outside its crate?` is offered before any count whenever a crate in the room has an open
+  loss. After a found-elsewhere Save the receipt on the origin litter reads `Saved · Recorded on B06 · +1 crushed`.
+- **R2-8 whole litter.** An entry that would leave nothing alive asks once in the footer, with its answer
+  (`All 12 dead? Nothing is left alive in A02` · `Yes, all 12 dead`); the answer holds for that exact entry only.
+- Back and Save replace the page in history (`location.replace`), so the browser Back lands before the drawer.
