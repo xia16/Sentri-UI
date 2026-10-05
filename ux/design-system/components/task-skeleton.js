@@ -400,7 +400,18 @@
       <div class="tk-dialog-body"><h2 class="tk-dialog-title">${icon ? glyph(icon) : ''}${T(title)}</h2>${description ? `<p class="tk-dialog-desc">${parts(description)}</p>` : ''}${body}</div>${f}</div></div>`;
   }
 
-  const api = { T, statusbar, phone, screen, header, latest, summary, progress, lens, list, group, row, door, doors, radios, warning, section, receipt, day, holdBind, table, metrics, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
+  /* ---- TaskChips (candidate): one row of filter chips over a task list — `All · Iron 4 · Castrate 6 · Done 3`. One is
+     chosen at a time (a radio group: role=radiogroup, each chip role=radio with aria-checked and a roving tab stop; wire the
+     arrow keys with SentriUI.radioBind). The row scrolls sideways; its end keeps a gutter so the last chip is never cut.
+     items: [{ value, label, count, checked, aria }] (label and count are text slots; count is drawn in mono inside the
+     chip). action: the one data-action for every chip. key: the group's data-field (radioBind's field). ---- */
+  function chips({ items = [], action = 'chip', key = 'chips', label } = {}) {
+    const on = items.some(i => i.checked) ? items.find(i => i.checked).value : (items[0] && items[0].value);
+    const b = items.map(i => `<button type="button" class="tk-chips-chip" role="radio" aria-checked="${i.value === on ? 'true' : 'false'}" tabindex="${i.value === on ? 0 : -1}"${A(action, i.value)}${L(i.aria)}><span class="tk-chips-label">${T(i.label)}</span>${i.count != null && i.count !== '' ? `<span class="tk-chips-count">${T(i.count)}</span>` : ''}</button>`).join('');
+    return `<div class="tk-chips" data-ds="TaskChips" data-field="${esc(key)}"><div class="tk-chips-track" role="radiogroup"${L(label)}>${b}</div></div>`;
+  }
+
+  const api = { T, statusbar, phone, screen, header, latest, summary, progress, lens, chips, list, group, row, door, doors, radios, warning, section, receipt, day, holdBind, table, metrics, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
   root.SentriTask = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);

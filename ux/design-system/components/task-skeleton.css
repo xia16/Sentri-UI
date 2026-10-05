@@ -490,3 +490,38 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   .tk-footer { gap: 10px; }
 }
 @media (prefers-reduced-motion: reduce) { .tk-summary-task, .tk-row { transition: none; } }
+
+/* ---- TaskChips (candidate): one row of filter chips over a task list (README: TaskChips/README.md) ----
+   Farrowing's segment faces on separate chips: a `well` chip with a 1px `line`, `radius-segment`; the chosen chip is the
+   pressed segment (`paper`, `ink` 500, the segment shadow). 44px targets; the count in mono inside the chip. The track
+   scrolls sideways; a trailing spacer the gutter's width keeps the last chip clear of the edge fade. */
+.tk-chips { padding: 6px 0 9px; background: var(--app-background); }
+.tk-chips-track { display: flex; gap: var(--space-key-gap); overflow-x: auto; padding: 0 0 0 var(--space-gutter); scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--space-gutter)), transparent); mask-image: linear-gradient(to right, #000 calc(100% - var(--space-gutter)), transparent); }
+.tk-chips-track::-webkit-scrollbar { display: none; }
+.tk-chips-track::after { content: ""; flex: none; width: var(--space-gutter); }
+.tk-chips-chip { flex: none; display: inline-flex; align-items: center; gap: var(--space-key-gap); min-height: var(--touch-min); margin: 0; padding: 0 var(--space-row-x);
+  border: 1px solid var(--line); border-radius: var(--radius-segment); background: var(--well); color: var(--tab-ink);
+  font: 400 var(--type-row-title-size)/1.2 var(--font-sans); white-space: nowrap; cursor: pointer; }
+.tk-chips-chip[aria-checked="true"] { background: var(--paper); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px #20271f0d; }
+.tk-chips-count { font: 500 var(--type-meta-size)/1 var(--font-mono); color: var(--muted); }
+.tk-chips-chip:active { background: var(--press); }
+
+/* ---- Sheet and page motion (candidate): a sheet rises from the bottom edge and a page slides in from the side when they
+   open; they leave the same way. The host sets data-enter on an overlay only on the render that opens it, and data-leave
+   before it removes it. Farrowing's easing (its arrival curve, cubic-bezier(.22,1,.36,1)). ---- */
+@keyframes tk-sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes tk-sheet-out { from { transform: none; } to { transform: translateY(100%); } }
+@keyframes tk-page-in { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes tk-page-out { from { transform: none; } to { transform: translateX(100%); } }
+@keyframes tk-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tk-fade-out { from { opacity: 1; } to { opacity: 0; } }
+.tk-sheet[data-enter] { animation: tk-sheet-in 240ms cubic-bezier(.22,1,.36,1); }
+.tk-sheet[data-leave] { animation: tk-sheet-out 180ms ease-in forwards; }
+.tk-page[data-enter] { animation: tk-page-in 240ms cubic-bezier(.22,1,.36,1); }
+.tk-page[data-leave] { animation: tk-page-out 180ms ease-in forwards; }
+:is(.tk-scrim, .tk-dialog-backdrop)[data-enter] { animation: tk-fade-in 200ms ease-out; }
+:is(.tk-scrim, .tk-dialog-backdrop)[data-leave] { animation: tk-fade-out 180ms ease-in forwards; }
+@media (prefers-reduced-motion: reduce) {
+  :is(.tk-sheet, .tk-page, .tk-scrim, .tk-dialog-backdrop):is([data-enter], [data-leave]) { animation: none; }
+}

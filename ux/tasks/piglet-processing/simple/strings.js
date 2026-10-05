@@ -2,6 +2,8 @@
 (function (root) {
   'use strict';
   var EN = {
+    'fig': '{v}', 'of': '/ {n}', 'last.who': '· {who}', 'code': '{c}', 'chips.done': 'Done', 'late.day': 'late · day {d}',
+    'recorded.tick': 'Recorded ✓', 'recorded.undo': 'Recorded · Undo', 'ended.at': '{t} · {who}', 'chip.aria': '{name}, {n} pens', 'chip.aria.1': '{name}, 1 pen',
     'tr.id.tag': 'Tag piglets', 'tr.id.notch': 'Notch piglets', 'tr.id.breeders': 'Pick breeders',
     'trl.id.tag': 'tagging', 'trl.id.notch': 'notching', 'trl.id.breeders': 'breeder picking',
     'chip.id.tag': 'Tag', 'chip.id.notch': 'Notch', 'chip.id.breeders': 'Breeders', 'chips.all': 'All', 'chips.label': 'Show pens that need',
@@ -31,7 +33,7 @@
     'batch': 'Batch {b}',
     'tr.iron': 'Iron', 'tr.tail': 'Dock tail', 'tr.castrate': 'Castrate', 'tr.cocci': 'Coccidiosis',
     'trl.iron': 'iron', 'trl.tail': 'tail docking', 'trl.castrate': 'castration', 'trl.cocci': 'coccidiosis',
-    'sum.due': '{Tr} due today', 'sum.notdone': 'Not done', 'sum.none': 'Due today', 'sum.pens': 'pens', 'sum.pens.1': 'pen', 'sum.nothing': 'nothing due',
+    'sum.due': '{Tr} to do today', 'sum.notdone': 'Not done', 'sum.none': 'Due today', 'sum.pens': 'pens', 'sum.pens.1': 'pen', 'sum.nothing': 'nothing due',
     'sum.task': 'Task', 'sum.done': 'pens done', 'sum.end': 'Tap to end the task', 'sum.ended': 'Task ended',
     'lens.todo': 'To do', 'lens.done': 'Done', 'lens.all': 'All',
     'row': 'Row {r}', 'row.pens': '· {n} pens', 'row.pens.1': '· 1 pen',
@@ -80,6 +82,8 @@
     'yesterday': 'yesterday'
   };
   var ZH = {
+    'fig': '{v}', 'of': '/ {n}', 'last.who': '· {who}', 'code': '{c}', 'chips.done': '做完', 'late.day': '晚了 · 第{d}天',
+    'recorded.tick': '已记录 ✓', 'recorded.undo': '已记录 · 撤销', 'ended.at': '{t} · {who}', 'chip.aria': '{name}，{n}栏',
     'tr.id.tag': '打耳标', 'tr.id.notch': '剪耳号', 'tr.id.breeders': '选种猪',
     'trl.id.tag': '打耳标', 'trl.id.notch': '剪耳号', 'trl.id.breeders': '选种猪',
     'chip.id.tag': '耳标', 'chip.id.notch': '耳号', 'chip.id.breeders': '种猪', 'chips.all': '全部', 'chips.label': '只看要做的栏',
@@ -159,12 +163,20 @@
   };
   var DICT = { en: EN, zh: ZH }, lang = 'en';
   try { lang = localStorage.getItem('pp-simple-lang') === 'zh' ? 'zh' : 'en'; } catch (e) { /* default en */ }
-  function t(key, a) {
-    var d = DICT[lang], n = a && a.n;
-    var s = (n === 1 || n === '1') && d[key + '.1'] != null ? d[key + '.1'] : (n === 0 || n === '0') && d[key + '.0'] != null ? d[key + '.0'] : d[key];
-    if (s == null) s = EN[key] != null ? EN[key] : key;
+  try { var q = new URLSearchParams(location.search).get('lang'); if (q) lang = q === 'zh' ? 'zh' : 'en'; } catch (e) { /* no URL */ }
+  /* the key actually used for these args (a '.1' or '.0' variant when there is one) */
+  function key(k, a) {
+    var n = a && a.n;
+    if ((n === 1 || n === '1') && (EN[k + '.1'] != null || ZH[k + '.1'] != null)) return k + '.1';
+    if ((n === 0 || n === '0') && (EN[k + '.0'] != null || ZH[k + '.0'] != null)) return k + '.0';
+    return k;
+  }
+  function t(k0, a) {
+    var d = DICT[lang], k = key(k0, a);
+    var s = d[k] != null ? d[k] : d[k0];
+    if (s == null) s = EN[k] != null ? EN[k] : EN[k0] != null ? EN[k0] : k0;
     return s.replace(/\{(\w+)\}/g, function (m, k) { return a && a[k] != null ? a[k] : m; });
   }
   function setLang(l) { lang = l === 'zh' ? 'zh' : 'en'; try { localStorage.setItem('pp-simple-lang', lang); } catch (e) { /* not kept */ } }
-  root.PPT = { t: t, setLang: setLang, get lang() { return lang; }, EN: EN, ZH: ZH };
+  root.PPT = { t: t, key: key, setLang: setLang, get lang() { return lang; }, EN: EN, ZH: ZH };
 })(globalThis);

@@ -150,9 +150,22 @@
     S = JSON.parse(S.undo.before); S.undo = null; save();
     return true;
   }
+  /* Take back treatment records by id (the in-place "Recorded · Undo"): each one's piglets come off, the reason before it
+     comes back. Works for any of this phone's records, not only the last change. */
+  function unrecord(ids) {
+    if (S.ended) return;
+    [].concat(ids).forEach(function (id) {
+      var r = S.records.filter(function (x) { return x.id === id; })[0];
+      if (!r || !S.pens[r.pen].tr[r.tr]) return;
+      var t = S.pens[r.pen].tr[r.tr];
+      t.got = Math.max(0, t.got - r.n); t.why = r.prevWhy || '';
+      S.records.splice(S.records.indexOf(r), 1);
+    });
+    S.undo = null; save();
+  }
   function record(code, k, n, opts) {
     opts = opts || {};
-    var p = S.pens[code], r = { id: 'r' + (++S.seq), pen: code, tr: k, n: n, at: Date.now(), day: p.age, who: ME, mark: opts.mark || '' };
+    var p = S.pens[code], r = { id: 'r' + (++S.seq), pen: code, tr: k, n: n, at: Date.now(), day: p.age, who: ME, mark: opts.mark || '', prevWhy: p.tr[k].why };
     S.records.push(r);
     p.tr[k].got += n;
     p.tr[k].why = need(p, k) > 0 ? (opts.why || p.tr[k].why || '') : '';
@@ -263,7 +276,7 @@
     get s() { return S; },
     hasId: hasId, steps: steps, plan: plan, need: need, idCount: idCount, breeders: breeders, recs: recs, status: status, todo: todo, coming: coming,
     pens: pens, last: last, bulkPlace: bulkPlace, sameBatch: sameBatch, nextNo: nextNo, taken: taken,
-    treat: treat, bulk: bulk, identify: identify, donePicking: donePicking, death: death, move: move, setCount: setCount, end: end, undo: undo,
+    treat: treat, bulk: bulk, unrecord: unrecord, identify: identify, donePicking: donePicking, death: death, move: move, setCount: setCount, end: end, undo: undo,
     otherPhone: otherPhone, seeNote: seeNote, reset: reset, setScheme: setScheme
   };
 })(globalThis);
