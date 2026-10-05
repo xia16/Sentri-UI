@@ -81,12 +81,13 @@ try {
   assert.match(page.url(), /state=litter/);
   await page.click('[data-action="open-move"]');
   await page.waitForURL(/move\.html/); await ready(page);
-  await page.waitForSelector('.tk-page[data-view="move"]');
+  await page.waitForSelector('.tk-sheet[data-view="move"]');
   const box = page.locator('[data-role="crate-q"]'); await box.click(); await box.type('A02');
   await page.click('[data-action="pick-crate"][data-value="A02"]');
   await page.click('[data-action="step"][data-value="n"][data-step="1"]');
   await page.click('[data-action="save-move"]');
-  assert.match(await text(page, '[data-st-context="drawer"]'), /Saved · 2 piglets moved to A02/);   // move.html's own drawer
+  await page.waitForURL(/room\.html\?.*state=litter.*crate=D06/); await ready(page);                  // R2-22: back in D06's drawer, one Back
+  assert.match(await text(page, '[data-st-context="drawer"]'), /Saved · 2 piglets moved to A02/);   // the receipt is the litter drawer's
   await openLitter(page, 'A02', null, false);
   f = await face(page);
   assert.match(f, /Born 13 Alive now 14 Dead 1 Moved in 2/);
