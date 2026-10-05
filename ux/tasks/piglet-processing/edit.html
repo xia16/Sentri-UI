@@ -98,6 +98,11 @@
     'edit-death-void':        { view: 'edit', data: 'count-offline', crate: 'A07', lead: 'deaths', draft: { deaths: { 'D-A07-gh': { void: true } } } },
     'edit-death-move':        { view: 'edit', data: 'count-offline', crate: 'A07', lead: 'deaths', draft: { deaths: { 'D-A07-gh': { to: 'A05' } } } },
     'edit-death-tagged':      { view: 'edit', data: 'base', crate: 'B04', lead: 'deaths', draft: { deaths: { '@first': { void: true } } } },
+    // R2-25: one body of a death withdrawn (named piglets by tag) · R2-20: a Sow died mark corrected, as its own row
+    'edit-death-pieces':      { view: 'edit', data: 'ended-moves', crate: 'C02', lead: 'deaths', draft: { deaths: { 'D-C02-426': { voidPieces: ['row:C02-r12'] } } } },
+    'edit-sow':               { view: 'edit', data: 'base', crate: 'B01', lead: 'sow' },
+    'edit-sow-void':          { view: 'edit', data: 'base', crate: 'B01', lead: 'sow', draft: { sow: { void: true } } },
+    'edit-sow-move':          { view: 'edit', data: 'base', crate: 'B01', lead: 'sow', draft: { sow: { to: 'B02' } } },
     // R1-28: castration's not-castrated reasons are Q16's (hernia · cryptorchid · deferred · kept boar)
     'edit-castration':        { view: 'edit', data: 'a02-castrated', crate: 'A02', draft: { marks: { 'T-A02-visit': { n: 2, reason: 'hernia' } } } },
     // R1-28: Save says what the correction did (the receipt of the newest correction on this litter)
@@ -124,7 +129,7 @@
   var st = STATES[name];
   var store, CFG, TODAY, SOW, crate, ME;
   var view = st.view;
-  var EMPTY = function () { return { marks: {}, moves: {}, rows: {}, counts: {}, deaths: {}, reopen: false }; };
+  var EMPTY = function () { return { marks: {}, moves: {}, rows: {}, counts: {}, deaths: {}, sow: null, reopen: false }; };
   var draft = EMPTY();
   var lead = '', rowOpen = null, pad = null, typed = {}, which = false, picker = null, pickerBefore = null, ceilTap = '', drawerClosedAt = 0, lastSave = 0, notices = [];
   var photo = null, cleared = null, clearTimer = 0, saved = null, dbl = { answer: '', withdraw: '' }, dblSaved = null;
@@ -227,6 +232,14 @@
   function recChange(ch) {
     var b = ch.before, a = ch.after, T = ch.target || {};
     var of = T.at ? SEP() + span('pp.edit.rec.of', { stamp: stampText(T.at, T.who) }) : '';
+    // a Sow died mark corrected (R2-20): the ledger files it as a mark / void on a `sow_died` target
+    if (T.type === 'sow_died') {
+      if (!a) return span('pp.edit.rec.sow_died') + ' ' + span('pp.edit.ch.withdrawn', null, 'amber') + SEP() + span('pp.edit.rec.by_mistake') + of;
+      if (a.litter === crate && b && b.litter !== crate) return span('pp.edit.rec.sow_died') + ' ' + span('pp.edit.rec.death.moved_in', { code: b.litter }, 'amber') + of;
+      return span('pp.edit.rec.sow_died') + ' ' + span('pp.edit.ch.death_to', { code: a.litter }, 'amber') + of;
+    }
+    // some bodies of a death withdrawn (R2-25): the same death, fewer bodies
+    if (ch.kind === 'death_move' && a && b && a.litter === b.litter) return span('pp.edit.ch.death', { list: deathList(b) }) + ' ' + span('pp.edit.ch.death_pieces', { n: b.n - a.n, left: a.n }, 'amber') + SEP() + span('pp.edit.rec.by_mistake') + of;
     switch (ch.kind) {
       case 'mark':
         var rest = a.castration ? (castrText(a.castration) ? SEP() + span('pp.edit.rec.castr_rest', { rest: castrText(a.castration) }, 'amber') : '')
@@ -486,6 +499,14 @@
       t.push([part('pp.edit.ch.count'), dPigsPart(c.from, c.to)]);
     } else if (c.kind === 'count_void') {
       t.push([part('pp.edit.ch.count'), pigsPart(c.from), part('pp.edit.ch.count_void', null, 'amber')], part('pp.edit.count.line_goes'));
+    } else if (c.kind === 'death_pieces') {
+      var xp = deathOf(e, c.death);
+      t.push([part('pp.edit.ch.death', { list: causeText(xp ? xp.byCause : {}) }), part('pp.edit.ch.death_pieces', { n: c.n, left: c.left }, 'amber')], part('pp.edit.rec.by_mistake'));
+      t = t.concat(fxParts(e, function () { return true; }));
+    } else if (c.kind === 'sow_void' || c.kind === 'sow_move') {
+      t.push([part('pp.edit.rec.sow_died'), c.kind === 'sow_void' ? part('pp.edit.ch.withdrawn', null, 'amber') : part('pp.edit.ch.death_to', { code: c.to }, 'amber')]);
+      if (c.kind === 'sow_void') t.push(part('pp.edit.rec.by_mistake'));
+      t = t.concat(fxParts(e, function () { return true; }));
     } else if (c.kind === 'death_void' || c.kind === 'death_move') {
       var x0 = deathOf(e, c.death);
       t.push([part('pp.edit.ch.death', { list: causeText(x0 ? (x0.held ? heldCauses(x0.id) : x0.byCause) : {}) }), c.kind === 'death_void' ? part('pp.edit.ch.withdrawn', null, 'amber') : part('pp.edit.ch.death_to', { code: c.to }, 'amber')]);
@@ -654,12 +675,32 @@
       var opts = [choice('death-void', x.id, 'pp.edit.why.mistake', null, !!y.void)];
       if (x.movable) opts.push(choice('death-to', x.id, 'pp.edit.death.other', null, y.to !== undefined));
       out += UI.choiceGroup(opts);
+      // R2-25: a death of several bodies lets the worker pick the ones recorded by mistake (named piglets by tag); the rest stand
+      if (x.pieces && x.pieces.length > 1 && !y.void && y.to === undefined) {
+        var gone = y.voidPieces || [];
+        out += UI.choiceGroup(x.pieces.map(function (p) {
+          var named = p.tag || p.notch;
+          return UI.choiceRow({ label: '', mode: 'multi', action: 'death-piece', value: x.id + '|' + p.key, selected: gone.indexOf(p.key) >= 0,
+            strs: { label: named ? 'pp.edit.death.piece_named' : 'pp.edit.death.piece' }, args: { label: { cause: PP.t('dead.' + String(p.cause).replace('-', '_')), id: named || '' } } });
+        }), { title: '', strs: { title: 'pp.edit.death.pieces' }, args: { title: { n: gone.length } } });
+      }
       if (!x.movable && rows.length) out += sline([part('pp.edit.death.tagged_only')]);
       if (y.to !== undefined) out += UI.pickerField({ label: '', display: y.to || '', placeholder: '', action: 'pick-death', key: x.id,
         strs: { label: 'pp.edit.death.to', display: 'pp.room.code', placeholder: 'pp.edit.select' }, args: { display: { code: y.to } } });
       return '<div class="ed-group" data-death="' + U.esc(x.id) + '">' + out + '</div>';
     }).join('');
     return '<section class="ed-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.edit.sec.deaths' } }) + blocks + '</section>';
+  }
+
+  /* Sow died (R2-20): the mark is a record like any other; recorded by mistake withdraws it (the sow farrows on), on another litter moves it. */
+  function sowSection(e) {
+    var sw = e.sow; if (!sw) return '';
+    var y = draft.sow || {}, s = stampStrs(sw.at, sw.who);
+    var out = UI.heading({ title: '', kind: 'section', level: 4, description: '', strs: { title: 'pp.edit.rec.sow_died', description: s[0] }, args: { description: s[1] } });
+    out += UI.choiceGroup([choice('sow-void', sw.id, 'pp.edit.why.mistake', null, !!y.void), choice('sow-to', sw.id, 'pp.edit.death.other', null, y.to !== undefined)]);
+    if (y.to !== undefined) out += UI.pickerField({ label: '', display: y.to || '', placeholder: '', action: 'pick-sow', key: sw.id,
+      strs: { label: 'pp.edit.death.to', display: 'pp.room.code', placeholder: 'pp.edit.select' }, args: { display: { code: y.to } } });
+    return '<section class="ed-group" data-ds="Section" data-sow="' + U.esc(sw.id) + '">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.edit.sec.sow' } }) + '<div class="ed-group">' + out + '</div></section>';
   }
 
   /* ---- identity: rows expand in place into a well tray; one banner, one summary, one Save ---- */
@@ -742,8 +783,8 @@
   }
   // The section the entrance came for leads (a Move → Moves, the identity table → Identity, a count → Counts, a death → Deaths).
   function sections(e) {
-    var s = { marks: marksSection(e), moves: movesSection(e), rows: idSection(e), counts: countsSection(e), deaths: deathsSection(e) };
-    var rest = ['marks', 'deaths', 'moves', 'rows', 'counts'];
+    var s = { marks: marksSection(e), moves: movesSection(e), rows: idSection(e), counts: countsSection(e), deaths: deathsSection(e), sow: sowSection(e) };
+    var rest = ['marks', 'deaths', 'sow', 'moves', 'rows', 'counts'];
     var order = lead && s[lead] !== undefined ? [lead].concat(rest.filter(function (k) { return k !== lead; })) : rest;
     return order.map(function (k) { return s[k]; }).join('');
   }
@@ -755,7 +796,7 @@
     switch (e.why) {
       case 'reason': return [PP.one('pp.edit.wait.reason', d.n), { n: d.n }];
       case 'reason_there': return [PP.one('pp.edit.wait.reason_there', d.n), { n: d.n, code: d.litter }];
-      case 'crate': return [d.death ? 'pp.edit.wait.death_crate' : 'pp.edit.wait.crate', null];
+      case 'crate': return [d.death ? 'pp.edit.wait.death_crate' : d.sow ? 'pp.edit.wait.sow_crate' : 'pp.edit.wait.crate', null];
       case 'row_death': return ['pp.edit.wait.row_death', null];
       case 'changes_later': return [PP.one('pp.edit.later.title', e.later.length), { n: e.later.length }];
       case 'row_dead': return ['pp.edit.wait.row_dead', { id: d.tag || d.notch || '' }];
@@ -770,7 +811,7 @@
       default: return ['pp.edit.wait.refused', { code: crate }];
     }
   }
-  function dirty() { return !!(Object.keys(draft.marks).length || Object.keys(draft.moves).length || Object.keys(draft.rows).length || Object.keys(draft.counts || {}).length || Object.keys(draft.deaths || {}).length || draft.reopen); }
+  function dirty() { return !!(Object.keys(draft.marks).length || Object.keys(draft.moves).length || Object.keys(draft.rows).length || Object.keys(draft.counts || {}).length || Object.keys(draft.deaths || {}).length || draft.sow || draft.reopen); }
   // The footer: Back and Save; Save waits (present, quiet) with its reason in one status line right above the footer
   // (ADR 0002), on the drawer's bottom edge. The footer is the drawer's last child (TaskSheet).
   function bar(w, can, saveId, quiet) {
@@ -807,7 +848,7 @@
     R.days.forEach(function (g) { g.entries.forEach(function (y) { if (y.id === id) x = y; }); });
     if (!x || x.kind !== 'correction') return out;
     x.changes.forEach(function (ch) {
-      if (ch.kind === 'mark' && ch.before && ch.after) {
+      if (ch.kind === 'mark' && ch.before && ch.after && !(ch.target && ch.target.type === 'sow_died')) {
         out.push([txPart(ch.target.dose), dPigsPart(amountOf(ch.before), amountOf(ch.after))]);
         var a = ch.after.castration || {}, b = ch.before.castration || {};
         ['hernia', 'cryptorchid', 'kept', 'deferred'].forEach(function (k) { if ((a[k] || 0) !== (b[k] || 0)) out.push([part('pp.litter.why.' + k), dTextPart(b[k] || 0, a[k] || 0)]); });
@@ -923,6 +964,10 @@
       sel = (draft.deaths[picker.id] || {}).to || '';
       title = ['pp.edit.death.to_title', null];
       opts = e.crates().map(crateOpt);
+    } else if (picker.kind === 'sow') {
+      sel = (draft.sow || {}).to || '';
+      title = ['pp.edit.sow.to_title', null];
+      opts = e.crates().filter(function (c) { return c.litter !== crate; }).map(crateOpt);
     } else {
       var mv = move(e, picker.id);
       sel = (draft.moves[mv.id] || {}).to || mv.other;
@@ -940,6 +985,7 @@
     var b = { marks: {}, moves: {}, rows: {}, counts: {}, deaths: {}, closed: e.closed ? e.closed.id : null };
     Object.keys(draft.counts || {}).forEach(function (k) { var c = countOf(e, k); if (c) b.counts[k] = c.observed; });
     Object.keys(draft.deaths || {}).forEach(function (k) { var x = deathOf(e, k); if (x) b.deaths[k] = x.n; });
+    if (draft.sow && e.sow) b.sow = e.sow.id;
     Object.keys(draft.marks).forEach(function (k) { var m = mark(e, k); if (m) b.marks[k] = m.n; });
     Object.keys(draft.moves).forEach(function (k) { var m = move(e, k); if (m) b.moves[k] = m.n + ':' + m.other; });
     Object.keys(draft.rows).forEach(function (k) { var r = row(e, k); if (r) b.rows[k] = JSON.stringify([r.tag, r.notch, r.sex, r.weight]); });
@@ -973,6 +1019,7 @@
       var x = deathOf(e0, k);
       if (!x || (b.deaths && b.deaths[k] != null && b.deaths[k] !== x.n)) { notices.push(['pp.edit.restored.death', null]); delete draft.deaths[k]; }
     });
+    if (draft.sow && (!e0.sow || (b.sow && b.sow !== e0.sow.id))) { notices.push(['pp.edit.restored.sow', null]); draft.sow = null; }
     if (draft.reopen && (!e0.closed || (b.closed && b.closed !== e0.closed.id))) { notices.push(['pp.edit.restored.reopen', null]); draft.reopen = false; }
   }
 
@@ -1067,7 +1114,7 @@
   document.getElementById('screen').addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-action]');
     if (!b) return;
-    var a = b.dataset.action, v = b.dataset.value, now = Date.now();
+    var a = b.dataset.action, v = b.dataset.value != null ? b.dataset.value : b.value, now = Date.now();   // a tick row (choiceRow multi) carries its value on the checkbox
     // A waiting Save answers its tap: the reason beside the bar flashes and is said again (Button · guard).
     if (a === 'save' && UI.guard(b)) return;
     var e = view === 'edit' ? E() : null;
@@ -1096,9 +1143,11 @@
     } else if (a === 'pick-crate') { openPicker({ kind: 'mark', id: b.dataset.pickerKey }); render();
     } else if (a === 'pick-move') { openPicker({ kind: 'move', id: b.dataset.pickerKey }); render();
     } else if (a === 'pick-death') { openPicker({ kind: 'death', id: b.dataset.pickerKey }); render();
+    } else if (a === 'pick-sow') { openPicker({ kind: 'sow', id: b.dataset.pickerKey }); render();
     } else if (a === 'pick') {
       if (picker.kind === 'mark') { var old = draft.marks[picker.id] || {}; draft.marks[picker.id] = { to: v }; if (old.to === v) draft.marks[picker.id] = old; }
       else if (picker.kind === 'death') draft.deaths[picker.id] = { to: v };
+      else if (picker.kind === 'sow') draft.sow = { to: v };
       else { var mv = move(e, picker.id), zz = draft.moves[mv.id] || {}; zz.to = v; if (v === mv.other) delete zz.to; if (Object.keys(zz).length) draft.moves[mv.id] = zz; else delete draft.moves[mv.id]; }
       picker = null; pickerBefore = null; drawerClosedAt = now; render();
     } else if (a === 'picker-back') {
@@ -1120,6 +1169,15 @@
       render();
     } else if (a === 'move-void') { var mv0 = draft.moves[v]; if (mv0 && mv0.void) delete draft.moves[v]; else draft.moves[v] = { void: true }; render();
     } else if (a === 'death-void') { var dv = draft.deaths[v]; if (dv && dv.void) delete draft.deaths[v]; else draft.deaths[v] = { void: true }; cleared = null; render();
+    } else if (a === 'death-piece') {
+      var pp = v.split('|'), dpc = draft.deaths[pp[0]] || {}, gl = (dpc.voidPieces || []).slice(), gi = gl.indexOf(pp[1]);
+      if (gi >= 0) gl.splice(gi, 1); else gl.push(pp[1]);
+      if (gl.length) draft.deaths[pp[0]] = { voidPieces: gl }; else delete draft.deaths[pp[0]];
+      cleared = null; render();
+    } else if (a === 'sow-void') { if (draft.sow && draft.sow.void) draft.sow = null; else draft.sow = { void: true }; cleared = null; render();
+    } else if (a === 'sow-to') {
+      if (draft.sow && draft.sow.to !== undefined) { draft.sow = null; render(); return; }
+      draft.sow = { to: '' }; openPicker({ kind: 'sow' }); cleared = null; render();
     } else if (a === 'death-to') {
       var dt = draft.deaths[v];
       if (dt && dt.to !== undefined) { delete draft.deaths[v]; render(); return; }
@@ -1200,6 +1258,7 @@
     var bm = JSON.parse(JSON.stringify(draft));
     if (p.kind === 'mark') { var pm = bm.marks[p.id]; if (pm && pm.to === '') delete bm.marks[p.id]; }
     if (p.kind === 'death') { var pd = bm.deaths[p.id]; if (pd && pd.to === '') delete bm.deaths[p.id]; }
+    if (p.kind === 'sow' && bm.sow && bm.sow.to === '') bm.sow = null;
     pickerBefore = JSON.stringify(bm); picker = p;
   }
 

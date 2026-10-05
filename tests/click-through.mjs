@@ -184,7 +184,11 @@ try {
   assert.match(b01, /Sow died/);
   assert.match(b01, /Done/);
   assert.match(b01, /2 days late/);
-  console.log('ok 7 bulk: id opens the litter, row ticks; Sow died row keeps Done + late:', b01);
+  // a reload keeps the lateness: it is the ledger's (`lateBy`), not the page's memory
+  await page.goto(base + 'bulk.html?state=bulk&tx=iron'); await ready(page);
+  const b01r = (await page.locator('.tk-row:has-text("B01")').first().innerText()).replace(/\s+/g, ' ');
+  assert.match(b01r, /Done/); assert.match(b01r, /2 days late/);
+  console.log('ok 7 bulk: id opens the litter, row ticks; Sow died row keeps Done + late, also after a reload:', b01r);
 
   await browser.close();
 } finally {
