@@ -17,9 +17,6 @@
    (buttonReason) right above the footer, the danger Banner, Facts, Row doors, Status lines, Log. */
 .en-body { --tk-sticky: 0px; display: flex; flex-direction: column; gap: var(--space-section); }
 .en-body > * { margin: 0; }
-/* A live region the eye never sees (parity round 2, item 11): farrowing shows no line above its footer; a screen reader
-   still hears it, and a tap on the waiting primary (or the hold) says it again through the Button guard. */
-.en-live { position: absolute; width: 1px; height: 1px; margin: 0; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .en-block > .st-heading { margin: 0 0 var(--space-key-gap); }
 .en-groups { display: flex; flex-direction: column; gap: var(--space-heading); }
 </style>
@@ -199,7 +196,6 @@
   function time(iso) { return U.time(iso); }
   function stamp(iso, who) { return { date: date(iso), time: time(iso), who: who }; }
   function h(o) { return UI.heading(Object.assign({ title: '', kind: 'section', level: 4 }, o)); }
-  function part(id, args, tone) { return { text: PP.t(id, args), strs: { text: id }, args: args ? { text: args } : undefined, tone: tone || undefined }; }
 
   /* ---- tokens: [wordId, args, valueId?, tone?] — the word stays ink, the value carries the colour ---- */
   var T = U.tok;
@@ -356,8 +352,7 @@
   }
   function reviewsBlock(list, frozenAtEnd) {
     if (!list.length) return '';
-    return '<div class="en-block">' + sec({ strs: { title: frozenAtEnd ? 'pp.end.rev.frozen' : 'pp.end.rev.open', meta: one('pp.end.v.items', list.length) }, args: { meta: { n: list.length } } }) +
-      UI.rowGroup(list.map(reviewRow).join('')) + '</div>';
+    return K.section({ title: P(frozenAtEnd ? 'pp.end.rev.frozen' : 'pp.end.rev.open'), icon: 'note', meta: P(one('pp.end.v.items', list.length), { n: list.length }), body: UI.rowGroup(list.map(reviewRow).join('')) });
   }
   // Already ended (a second End, or the overview after End): who ended it and when, before any hold (R1-13).
   function alreadyBlock(al) {
@@ -404,8 +399,8 @@
     var t = totals(false), en = ended(), ls = litters(false);
     var day = dayRecords();
     var body = (en ? alreadyBlock(en) : '') + progressCard(t) + '<div class="en-block">' + cratesCard(ls) + '</div>' +
-      (day.n ? doors([door('day', 'pp.end.day.title', null, one('pp.end.day.d', day.n), { n: day.n, who: day.order.join(' · ') })]) : '') +
-      '<div class="en-block">' + metrics(t, false) + '</div>';
+      '<div class="en-block">' + metrics(t, false) + '</div>' +
+      (day.n ? K.section({ title: P('pp.end.day.title'), icon: 'details', rows: true, items: [{ label: P(one('pp.end.day.d', day.n), { n: day.n, who: day.order.join(' · ') }), action: 'day' }] }) : '');
     var foot = en ? backOnly('back') : K.footer({ back: { action: 'back' }, primary: UI.button({ label: PP.t('pp.end.act.end'), register: 'end-early', action: 'review', strs: { label: 'pp.end.act.end' } }) });
     return page('pp.end.ov.title', null, 'pp.end.scope.short', { n: UNIT }, body, foot);
   }
@@ -450,17 +445,16 @@
           var head = t.ahead ? [one('pp.end.rv.drops', t.ahead), { n: t.ahead }] : [one(S.mandatory ? 'pp.end.rv.unf.m' : 'pp.end.rv.unf', n), { n: n }];
           var cons = [t.ahead ? one(S.mandatory ? 'pp.end.rv.cons.m' : 'pp.end.rv.cons', n) : S.mandatory ? 'pp.end.rv.unf.desc.m' : 'pp.end.rv.unf.desc', { n: n, o: t.owed, a: t.ahead }];
           if (!t.ahead) cons[1].n = t.owed + t.ahead;
-          body += K.warning({ text: P(head[0], head[1]), detail: P(cons[0], cons[1]) });
-          body += doors([door('litters', 'pp.end.rv.list', null, 'pp.end.rv.list.d', { w: t.work, a: n - t.work })]);
+          // farrowing's End banner: the warning icon, the bold title, the consequence under it; the whole band is the door to the unfinished litters
+          body += K.warning({ tone: 'amber', icon: 'alert', title: P(head[0], head[1]), text: P(cons[0], cons[1]), door: { action: 'litters', label: P('pp.end.rv.list') } });
         } else body += UI.panel(h({ strs: { title: 'pp.end.rv.none', description: 'pp.end.rv.after.desc' }, args: { title: { n: t.litters } } }));
         body += reviewsBlock(fig(false).reviews || [], false);
         body += '<div class="en-block">' + metrics(t, true) + '</div>';
       }
       var phase = S.unconfirmed ? 'unknown' : S.pending ? 'pending' : S.holding ? 'holding' : 'idle';
-      // the hold's progress line is the footer's status slot (empty until the hold has something to say)
-      // the hold's progress line is heard, not seen (farrowing shows only the caption)
-      foot = '<p class="en-live" id="pp-hold-status" role="status" aria-live="polite"></p>' +
-        K.footer({ back: { action: 'close-sheet' }, hold: { label: P('pp.end.act.end'), caption: P(capId(phase)), action: 'hold', tone: 'danger', phase: phase, statusId: 'pp-hold-status' } })
+      // the hold's progress line is the footer's status: hidden by default (farrowing shows only the caption), still heard
+      foot = K.footer({ back: { action: 'close-sheet' }, status: { id: 'pp-hold-status', text: '' },
+        hold: { label: P('pp.end.act.end'), caption: P(capId(phase)), action: 'hold', tone: 'danger', phase: phase } })
         .replace('data-phase="holding"', S.holding === 'static' ? 'data-phase="holding" data-preview="still"' : 'data-phase="holding"');
     }
     return page('pp.end.title', null, 'pp.end.rv.scope', { n: UNIT, k: t.litters }, body, foot);
@@ -476,16 +470,18 @@
      items End froze, the metrics at End. Everything since End is in its own section below, and only there. */
   function receiptPage() {
     var t = totals(true), n = t.unf.length, late = post().filter(function (e) { return e.kind === 'late'; }), en = ended();
-    var headId = !n ? 'pp.end.rc.none' : one(S.mandatory ? 'pp.end.rc.head.m' : 'pp.end.rc.head', n);
-    var line = UI.statusLine([part(headId, { n: n || t.litters }, n ? '' : 'green')], { sep: 'dot' });
-    var body = line + K.totals([{ label: P('pp.end.f.finished'), value: P('pp.end.tok.n', { n: t.litters - n }) }, { label: P('pp.end.f.unfinished'), value: P('pp.end.tok.n', { n: n }) },
+    // farrowing's receipt row opens it: what ended, when and by whom (the ledger's ended-at and PPLedger.person)
+    var rec = K.receipt({ title: P('pp.end.rc.receipt'), meta: P('pp.end.rc.receipt.meta', { date: date(en.at), time: time(en.at), who: window.PPLedger.person(en.who, CFG) }) });
+    // a mandatory task ended with litters unfinished is reported to the farm: that one fact stays, as a note
+    var note = n && S.mandatory ? K.warning({ tone: 'amber', text: P(one('pp.end.rc.head.m', n), { n: n }) }) : '';
+    var body = rec + note + K.totals([{ label: P('pp.end.f.finished'), value: P('pp.end.tok.n', { n: t.litters - n }) }, { label: P('pp.end.f.unfinished'), value: P('pp.end.tok.n', { n: n }) },
         { label: P('pp.end.f.owed'), value: P('pp.end.tok.n', { n: t.owed }) }]) +
-      (n ? doors([door('litters', 'pp.end.nd.title', null, 'pp.end.nd.frozen', null)]) : '') +
+      (n ? K.section({ title: P('pp.end.nd.title'), icon: 'record', rows: true, items: [{ label: P(one('pp.end.v.litters', n), { n: n }), action: 'litters' }] }) : '') +
       reviewsBlock(fig(true).reviews || [], true) + '<div class="en-block">' + metrics(t, true) + '</div>';
     var since = (late.length ? UI.panel(h({ strs: { title: one('pp.end.rc.late', late.length), description: 'pp.end.rc.late.why' }, args: { title: { n: late.length }, description: { code: late.map(function (e) { return e.code; }).join(' ') } } })) : '') +
       afterEndFlag() + sinceLog(true) + doors([door('handoff', 'pp.end.w.title', null, 'pp.end.w.row_now')]);
     body += '<div class="en-block">' + sec({ strs: { title: 'pp.end.since.title', description: 'pp.end.since.desc' } }) + since + '</div>';
-    return page('pp.end.rc.title', null, 'pp.end.ended.stamp', stamp(en.at, en.who), body, backOnly());
+    return page('pp.end.rc.title', null, 'pp.end.scope.short', { n: UNIT }, body, backOnly());
   }
   // The ended task (the room's Back after End): what still writes, the receipt, the handoff, what End froze, since End.
   function endedPage() {
@@ -667,7 +663,7 @@
     S.ended = true; S.pending = S.already = S.unconfirmed = false; S.sheet = sheet;
     setUrl(false, { sheet: sheet || undefined, deep: true, ended: true }); render();
   }
-  holds = UI.holdBind(screen, { t: function (id) { return PP.t(id); },
+  holds = K.holdBind(screen, { t: function (id) { return PP.t(id); },
     cues: { keep: 'pp.end.hold.keep', tap: 'pp.end.hold.tap', released: 'pp.end.hold.released', disarmed: 'pp.end.hold.released', again: 'pp.end.hold.again', early: 'pp.end.hold.again', pending: 'pp.end.hold.pending', failed: 'pp.end.hold.failed', unknown: 'pp.end.hold.unknown' },
     onCommit: function (el) { commitEnd(el); } });
   screen.addEventListener('keydown', function (ev) {
