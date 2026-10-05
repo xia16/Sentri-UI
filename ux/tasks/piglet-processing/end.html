@@ -48,6 +48,7 @@
     'receipt-after-end-mark': { data: 'ended-after-end', ended: true, sheet: 'receipt' },
     'end-blocked': { data: 'base', sheet: 'review' },
     'end-blocked-draft': { data: 'late', sheet: 'review', drafts: true },
+    'end-blocked-farrowing': { data: 'base', sheet: 'review', stub: 'D01' },     // the farrowing door, tapped: where it would go
     'receipt': { data: 'ended', ended: true, sheet: 'receipt' },
     'receipt-late-mark': { data: 'ended-late-mark', ended: true, sheet: 'receipt' },
     'receipt-since': { data: 'ended-after', ended: true, sheet: 'receipt' },
@@ -59,13 +60,15 @@
     // one level down (round 5): the unfinished litters and today's records by hand, from the review; not done at End
     'end-litters': { data: 'late', sheet: 'litters' },
     'end-day': { data: 'late', sheet: 'day' },
-    'ended-litters': { data: 'ended', ended: true, sheet: 'litters' }
+    'ended-litters': { data: 'ended', ended: true, sheet: 'litters' },
+    // one level down from the handoff (R2-26): a treatment not done on several crates lists them
+    'weaning-handoff-dose': { data: 'ended', ended: true, sheet: 'dose' }
   };
   var ALIAS = { 'late-after': 'ended-after' };            // ?data= names the pages used before the shared fixture
   var start = STATES[PP.state] || STATES.overview;
   var S = {
     data: start.data,
-    sheet: start.sheet || '', ended: !!start.ended, drafts: !!start.drafts,
+    sheet: start.sheet || '', ended: !!start.ended, drafts: !!start.drafts, stub: start.stub || '',
     holding: start.holding || '', pending: !!start.pending, changed: !!start.changed, offline: !!start.offline,
     already: !!start.already, unconfirmed: !!start.unconfirmed,
     mandatory: qs.get('mandatory') === '1', opened: 0, ovScroll: 0
@@ -136,8 +139,31 @@
     var why = [], key = store.name + store.events.length;
     if (gate.key !== key) gate = { key: key, open: !ended() && store.trial({ type: 'end_task', task: TASK.id }).reason === 'farrowing_task_open' };
     if (gate.open) why.push({ kind: 'farrowing' });
-    if (S.drafts) window.PPFixtures.DEVICE_DRAFTS.forEach(function (d) { why.push({ kind: d.kind === 'death' ? 'draft-death' : 'draft-edit', code: d.litter }); });
+    deviceDrafts().forEach(function (d) { why.push({ kind: 'draft', draft: d.kind, code: d.code }); });
     return why;
+  }
+  /* Drafts actually on this phone (R2-10): the keys the pages keep in this tab (the dead drawer, Set count, the identity run,
+     the litter drawer's treatment drawers in sessionStorage; Edit in localStorage) for this task's litters, read each time,
+     so saving or clearing one clears it here. A page that holds a draft in memory only (a design state) never counts. */
+  function deviceDrafts() {
+    var out = [], kinds = [['dead', 'pp-dead-draft'], ['count', 'pp-count-draft'], ['id', 'pp-id-draft']];
+    function get(st, k) { try { return JSON.parse(st.getItem(k) || 'null'); } catch (e) { return null; } }
+    taskIds().sort().forEach(function (c) {
+      kinds.forEach(function (kd) { var v = get(sessionStorage, kd[1] + ':' + store.name + ':' + c); if (v && (kd[0] !== 'id' || v.run || v.lw)) out.push({ kind: kd[0], code: c }); });
+      var t = get(sessionStorage, 'pp-drafts:' + store.name + ':' + c); if (t && Object.keys(t).length) out.push({ kind: 'treat', code: c });
+      var e = get(localStorage, 'pp-edit:' + store.name + ':' + c); if (e && e.draft) out.push({ kind: 'edit', code: c });
+    });
+    return out;
+  }
+  /* The design state `end-blocked-draft` puts two drafts on this phone, once per tab, so the page reads them like real ones. */
+  function seedDrafts() {
+    var flag = 'pp-end-seeded:' + store.name;
+    try {
+      if (sessionStorage.getItem(flag)) return;
+      sessionStorage.setItem(flag, '1');
+      sessionStorage.setItem('pp-dead-draft:' + store.name + ':D03', JSON.stringify({ pig: { tallies: { crushed: 1 }, picks: {}, miss: {}, photos: [], note: '', route: '' }, sow: null }));
+      sessionStorage.setItem('pp-count-draft:' + store.name + ':A05', JSON.stringify({ observed: 10, rows: [], at: null, obsMs: Date.now(), seen: [] }));
+    } catch (e) { /* private mode: no design drafts */ }
   }
   function farrowingNow() { return Object.keys(D().litters).filter(function (id) { return Lx(id).phase === 'open' && inTask(id); }).sort(); }
 
@@ -270,7 +296,7 @@
       if (e.kind === 'id') return { title: '', strs: Object.assign({ title: one('pp.end.since.id', e.n) }, m), args: Object.assign({ title: { code: e.code, n: e.n } }, a) };
       if (e.kind === 'death') return { title: '', strs: Object.assign({ title: 'pp.end.since.death' }, m), args: Object.assign({ title: { code: e.code, n: e.n } }, a) };
       if (e.kind === 'count') return { title: '', strs: Object.assign({ title: 'pp.end.since.count' }, m), args: Object.assign({ title: { code: e.code, n: e.n } }, a) };
-      if (e.kind === 'double') return { title: '', strs: Object.assign({ title: e.answer === 'twice' ? 'pp.end.since.dbl_twice' : 'pp.end.since.dbl_same', detail: 'pp.end.since.dbl.detail' }, m), args: Object.assign({ title: { code: e.code, name: name(e.k) } }, a) };
+      if (e.kind === 'double') return { title: '', strs: Object.assign({ title: e.answer === 'twice' ? 'pp.end.since.dbl_twice' : e.answer === 'different' ? 'pp.end.since.dbl_different' : 'pp.end.since.dbl_same', detail: 'pp.end.since.dbl.detail' }, m), args: Object.assign({ title: { code: e.code, name: name(e.k) } }, a) };
       if (e.kind === 'wrong') return { title: '', strs: Object.assign({ title: 'pp.end.since.wrong', detail: 'pp.end.since.wrong.detail' }, m), args: Object.assign({ title: { code: e.code, name: name(e.k), n: e.n }, detail: { from: e.from } }, a) };
       if (e.kind === 'late') return { title: '', strs: Object.assign({ title: 'pp.end.since.late', detail: 'pp.end.since.late.detail' }, m), args: Object.assign({ title: { code: e.code, name: name(e.k), n: e.n }, detail: { date: date(e.stamped), time: time(e.stamped) } }, a) };
       if (e.kind === 'void') return { title: '', strs: Object.assign({ title: 'pp.end.since.void', detail: 'pp.end.since.void.detail' }, m), args: Object.assign({ title: { code: e.code, name: name(e.k), n: e.n } }, a) };
@@ -419,16 +445,17 @@
         if (w.kind !== 'farrowing') return;
         body += K.warning({ text: P('pp.end.rv.blocked'), detail: P('pp.end.rv.blocked.where', { units: units, code: active.join(' ') }) });
         body += K.group({ face: 'word', title: P('pp.end.unit', { n: UNIT }), meta: P(one('pp.end.row.meta', active.length), { n: active.length }),
-          rows: active.map(function (c) { return litterRow(litter(c, false), [P('pp.end.rv.farrowing.h')], null); }) });
+          rows: active.map(function (c) { return K.row({ id: P('pp.end.code', { code: c }), chip: chipOf(litter(c, false)), headline: [P('pp.end.rv.farrowing.h')], action: 'open-farrowing', value: c }); }) });
       });
-      var dr = why.filter(function (w) { return w.kind !== 'farrowing'; });
+      var dr = why.filter(function (w) { return w.kind === 'draft'; });
       if (dr.length) {
         body += K.warning({ text: P(one('pp.end.rv.drafts', dr.length), { n: dr.length }), detail: P('pp.end.rv.drafts.why') });
-        body += doors(dr.map(function (w) { return door(w.kind === 'draft-death' ? 'open-dead' : 'open-litter', 'pp.end.code', { code: w.code }, w.kind === 'draft-death' ? 'pp.end.rv.draft.death' : 'pp.end.rv.draft.edit', null, w.code); }));
+        body += doors(dr.map(function (w) { return door('open-draft', 'pp.end.code', { code: w.code }, 'pp.end.rv.draft.' + (w.draft === 'dead' ? 'death' : w.draft), null, w.draft + ':' + w.code); }));
       }
       // R1-21: doses not yet due are not unfinished work; they are said apart
       body += rows(UI.row({ title: '', description: '', wrap: true, strs: { title: one('pp.end.rv.work', t.work), description: 'pp.end.rv.collapsed.split' }, args: { title: { n: t.work }, description: { o: t.owed, a: t.ahead } } }));
-      foot = backOnly();
+      // the farrowing door is a host stub in the prototype: it says where it would go, where the worker looks (the footer)
+      foot = S.stub ? K.footer({ back: { action: 'close-sheet' }, status: Object.assign({ id: 'pp-stub', visible: true }, P('pp.end.rv.opens_farrowing', { code: S.stub })) }) : backOnly();
     } else {
       if (S.unconfirmed) body += K.warning({ text: P('pp.end.rv.unconfirmed'), detail: P('pp.end.rv.unconfirmed.why') }) +
         doors([door('check-ended', 'pp.end.rv.check')]);
@@ -504,12 +531,18 @@
   }
   /* N5: the day's records by hand, so a mark on the wrong litter is findable before End: each opens its litter's log. */
   function dayRecords() {
-    var today = store.today, by = {}, order = [], n = 0;
+    var today = store.today, by = {}, order = [], n = 0, corr = D().corrections || {};
     store.events.forEach(function (e) {
-      if (String(e.at).slice(0, 10) !== today || rejected(e.id) || ['treat', 'death', 'count', 'move'].indexOf(e.type) < 0) return;
-      var code = e.litter || e.from; if (!inTask(code) && !inTask(e.to)) return;
+      if (String(e.at).slice(0, 10) !== today || rejected(e.id) || ['treat', 'death', 'count', 'move', 'correction'].indexOf(e.type) < 0) return;
+      var code = e.litter || e.from;
+      // a correction is listed too (R2-26), under the litter of the record it corrected, as its hand's own act
+      if (e.type === 'correction') {
+        var ch = (e.changes || [{ target: e.target, fresh: e.fresh }]).filter(function (c) { return c.target; })[0], t0 = ch ? eventOf(ch.target) : null;
+        code = t0 ? t0.litter || t0.from : null;
+        if (!code || (!inTask(code) && !(ch.fresh && inTask(ch.fresh.litter)))) return;
+      } else if (!inTask(code) && !inTask(e.to)) return;
       if (!by[e.who]) { by[e.who] = []; order.push(e.who); }
-      by[e.who].push(e); n++;
+      by[e.who].push(Object.assign({}, e, { litterCode: code, corrected: !!(corr[e.id] && corr[e.id].length) })); n++;
     });
     return { by: by, order: order, n: n };
   }
@@ -519,12 +552,13 @@
       if (e.type === 'treat') return ['pp.end.day.treat', { code: e.litter, name: name(e.dose), n: amount(e) }];
       if (e.type === 'death') return ['pp.end.day.death', { code: e.litter, n: lineCount(e) }];
       if (e.type === 'count') return ['pp.end.day.count', { code: e.litter, n: e.observed }];
+      if (e.type === 'correction') return ['pp.end.day.correction', { code: e.litterCode }];
       return ['pp.end.day.move', { n: e.n, from: e.from, to: e.to }];
     };
     var body = d.order.map(function (who) {
       var list = d.by[who].slice().sort(function (a, b) { return a.at < b.at ? 1 : -1; });
       return '<div class="en-block">' + h({ kind: 'group', strs: { title: 'pp.end.day.who', meta: one('pp.end.day.n', list.length) }, args: { title: { who: who }, meta: { n: list.length } } }) +
-        doors(list.map(function (e) { var w = words(e); return door('open-record', w[0], w[1], 'pp.end.day.at', { t: time(e.at) }, e.litter || e.from); })) + '</div>';
+        doors(list.map(function (e) { var w = words(e); return door('open-record', w[0], w[1], e.corrected ? 'pp.end.day.at_corrected' : 'pp.end.day.at', { t: time(e.at) }, e.litterCode || e.litter || e.from); })) + '</div>';
     }).join('');
     return page('pp.end.day.title', null, 'pp.end.day.desc', null, body, backOnly());
   }
@@ -535,20 +569,15 @@
     if (w) return T('pp.end.w.l.kg_day', { kg: w.kg, n: w.day });
     return l.day < WEIGH_DAY ? T('pp.end.w.l.weigh_ahead', { n: WEIGH_DAY }) : T('pp.end.w.l.noweight');
   }
-  function handoffPage() {
-    var now = totals(false), atEnd = litters(true), loss = outcomes(false);
-    var perLitter = function (l) {
-      var toks = [weightTok(l)];
-      if (l.loss) toks.push(lossTok(l.loss));
-      if (gone(l.code)) toks = toks.concat(postToks(l, 'handoff').filter(function (x) { return /died_after|out_after/.test(x[0]); }));
-      return litterRow(l, [P('pp.end.w.l.alive', { n: l.alive }), { sep: true }, P('pp.end.w.l.identified', { n: l.identified })], tparts(toks));
-    };
-    var groups = [];
+  // What was not done at End, per treatment: the piglets and the crates (frozen at End, less what left the task since).
+  function handoffGroups() {
+    var groups = [], atEnd = litters(true);
     function add(kind, k, n, code) {
       if (!n) return;
       var g = groups.filter(function (x) { return x.k === k; })[0];
-      if (!g) { g = { k: k, kind: kind, n: 0, codes: [], since: false }; groups.push(g); }
+      if (!g) { g = { k: k, kind: kind, n: 0, codes: [], by: {}, since: false }; groups.push(g); }
       g.n += n; if (g.codes.indexOf(code) < 0) g.codes.push(code);
+      g.by[code] = (g.by[code] || 0) + n;
       // A mark stamped before End, a correction or an after-End treatment on this litter and dose.
       if (postOf(code).some(function (e) { return e.k === k && /late|wrong|void|lower|afterend/.test(e.kind); })) g.since = true;
     }
@@ -556,9 +585,29 @@
       l.list.forEach(function (e) { add(e.kind === 'missed' ? 'missed' : e.kind === 'not_due' ? 'ahead' : 'owed', e.dose, notDone(l, e), l.code); });
     });
     atEnd.forEach(function (l) { arrivalsNotDone(l).forEach(function (a) { add('owed', a.k, a.n, l.code); }); });
+    return groups;
+  }
+  // One level down from the handoff (R2-26): a treatment not done on several crates opens the list of them, each its litter.
+  function dosePage() {
+    var k = qs.get('dose') || S.dose, g = handoffGroups().filter(function (x) { return x.k === k; })[0] || handoffGroups().filter(function (x) { return x.codes.length > 1; })[0];
+    if (!g) return page('pp.end.w.title', null, 'pp.end.w.desc', { n: UNIT }, '', backOnly());
+    var ls = g.codes.map(function (c) { return litter(c, false); });
+    var row = function (l) { return litterRow(l, [P('pp.end.w.u.owed', { name: name(g.k), n: g.by[l.code] })], null); };
+    return page('pp.end.w.u.dose', { name: name(g.k) }, 'pp.end.w.u.dose.d', { n: g.n, k: g.codes.length }, groupsOf(byRow(ls, row)), backOnly());
+  }
+  function handoffPage() {
+    var now = totals(false), loss = outcomes(false);
+    var perLitter = function (l) {
+      var toks = [weightTok(l)];
+      if (l.loss) toks.push(lossTok(l.loss));
+      if (gone(l.code)) toks = toks.concat(postToks(l, 'handoff').filter(function (x) { return /died_after|out_after/.test(x[0]); }));
+      return litterRow(l, [P('pp.end.w.l.alive', { n: l.alive }), { sep: true }, P('pp.end.w.l.identified', { n: l.identified })], tparts(toks));
+    };
+    var groups = handoffGroups();
     var ndTotal = sum(groups, function (g) { return g.n; });
     var nd = groups.length && groups.map(function (g) {
-      return door('open-litter', 'pp.end.w.u.owed', { name: name(g.k), n: g.n }, g.since ? 'pp.end.w.since' : 'pp.end.codes', { list: g.codes.join(' ') }, g.codes[0]);
+      var many = g.codes.length > 1;
+      return door(many ? 'open-dose' : 'open-litter', 'pp.end.w.u.owed', { name: name(g.k), n: g.n }, g.since ? 'pp.end.w.since' : 'pp.end.codes', { list: g.codes.join(' ') }, many ? g.k : g.codes[0]);
     });
     var weighed = litters(false).filter(function (l) { return store.weights(l.code).some(function (x) { return x.day === WEIGH_DAY; }); }).length;
     var weighAhead = litters(false).filter(function (l) { return !store.weights(l.code).some(function (x) { return x.day === WEIGH_DAY; }) && l.day < WEIGH_DAY; }).length;
@@ -585,7 +634,7 @@
     } else {
       var sh = S.sheet;
       inner = sh === 'overview' ? overviewPage() : sh === 'review' ? reviewPage() : sh === 'receipt' ? receiptPage() : sh === 'handoff' ? handoffPage()
-        : sh === 'litters' ? littersPage() : sh === 'day' ? dayPage() : S.ended ? endedPage() : overviewPage();
+        : sh === 'litters' ? littersPage() : sh === 'dose' ? dosePage() : sh === 'day' ? dayPage() : S.ended ? endedPage() : overviewPage();
     }
     screen.innerHTML = K.phone(behind() + inner, { label: P('pp.common.task') });
     PP.apply(screen);
@@ -599,14 +648,16 @@
   function stateName() {
     if (S.sheet === 'litters') return S.ended ? 'ended-litters' : 'end-litters';
     if (S.sheet === 'day') return 'end-day';
+    if (S.sheet === 'dose') return 'weaning-handoff-dose';
     if (S.ended) return S.sheet === 'receipt' ? (S.data === 'ended-late-mark' ? 'receipt-late-mark' : S.data === 'ended-after-end' ? 'receipt-after-end-mark' : S.data === 'ended-after' ? 'receipt-since' : 'receipt') : S.sheet === 'handoff' ? 'weaning-handoff' : S.sheet === 'overview' ? 'overview-ended' : S.sheet === 'review' ? 'end-again' : S.data === 'ended-correct' ? 'ended-correct' : S.data === 'ended-moves' ? 'ended-moves' : 'ended';
-    if (S.sheet === 'review') return blocked().length ? (S.drafts ? 'end-blocked-draft' : 'end-blocked') : S.offline ? 'end-offline' : S.already ? 'end-already' : S.unconfirmed ? 'end-unconfirmed' : S.changed ? 'end-changed' : S.pending ? 'end-pending' : 'end-review';
+    if (S.sheet === 'review') return blocked().length ? (blocked().some(function (w) { return w.kind === 'draft'; }) ? 'end-blocked-draft' : S.stub ? 'end-blocked-farrowing' : 'end-blocked') : S.offline ? 'end-offline' : S.already ? 'end-already' : S.unconfirmed ? 'end-unconfirmed' : S.changed ? 'end-changed' : S.pending ? 'end-pending' : 'end-review';
     return 'overview';
   }
   function setUrl(push, st) {
     var p = new URLSearchParams(location.search), sn = stateName(); p.set('state', sn);
     if (S.data !== (STATES[sn] || {}).data && store.name === S.data) p.set('data', S.data); else p.delete('data');
     ['offline', 'recheck', 'fresh'].forEach(function (k) { p.delete(k); });
+    if (S.sheet === 'dose' && S.dose) p.set('dose', S.dose); else p.delete('dose');
     try { history[push ? 'pushState' : 'replaceState'](st || {}, '', location.pathname + '?' + p.toString()); } catch (e) {}
   }
   function openSheet(n) {
@@ -617,7 +668,7 @@
     S.holding = ''; var st = history.state;
     if (st && st.sheet && !st.deep) { history.back(); return; }
     // Deep-linked: the review returns to the overview, a page one level down to the review; the others to the page beneath.
-    S.sheet = S.ended ? '' : S.sheet === 'review' ? 'overview' : S.sheet === 'litters' ? 'review' : S.sheet === 'day' ? 'overview' : ''; S.pending = S.changed = S.offline = S.already = S.unconfirmed = false; setUrl(false); render();
+    S.sheet = S.sheet === 'dose' ? 'handoff' : S.ended ? '' : S.sheet === 'review' ? 'overview' : S.sheet === 'litters' ? 'review' : S.sheet === 'day' ? 'overview' : S.sheet === 'dose' ? 'handoff' : ''; S.pending = S.changed = S.offline = S.already = S.unconfirmed = false; setUrl(false); render();
   }
   window.addEventListener('popstate', function (ev) {
     S.holding = ''; S.pending = S.changed = S.offline = S.already = S.unconfirmed = false;
@@ -684,6 +735,7 @@
     if (a === 'handoff') { openSheet('handoff'); return; }
     if (a === 'litters') { openSheet('litters'); return; }
     if (a === 'day') { openSheet('day'); return; }
+    if (a === 'open-dose') { S.dose = v; openSheet('dose'); return; }
     if (a === 'open-room') { location.href = roomHref(); return; }
     if (a === 'open-litter') { location.href = litterHref(v); return; }
     if (a === 'open-record') { location.href = PP.href('edit.html', { state: 'record-page', crate: v, data: store.name !== 'base' ? store.name : '' }); return; }
@@ -701,8 +753,17 @@
     }
     if (a === 'already-receipt') { finishEnded('receipt', 'ended-by-other'); return; }
     if (a === 'check-ended') { finishEnded('', 'ended'); return; }
-    // the dead sheet's Save and Back return here (its `back`: this page, as it stands)
-    if (a === 'open-dead') { location.href = route('dead.html', 'dead-draft', v, { back: 'end.html' + location.search }); return; }
+    // a draft on this phone opens in the page that keeps it. The dead sheet's Save and Back return here (its `back`: this page,
+    // as it stands); Edit's Back returns here (`from=end`); the others are shown by the litter drawer, in their tool.
+    if (a === 'open-draft') {
+      var dp = v.split(':'), dk = dp[0], dc = dp[1];
+      if (dk === 'dead') location.href = route('dead.html', 'dead', dc, { back: 'end.html' + location.search });
+      else if (dk === 'edit') location.href = route('edit.html', 'edit', dc, { from: 'end' });
+      else location.href = litterHref(dc);
+      return;
+    }
+    // Host door: the Farrowing task is another task of the app. The prototype can't open it, so the tap says where it goes.
+    if (a === 'open-farrowing') { S.stub = v; document.documentElement.setAttribute('data-door', 'farrowing:' + v); render(); return; }
   });
 
   var boot = PP.ready.then(function () {
@@ -710,6 +771,7 @@
     load(ALIAS[q] || (window.PPFixtures.VARIANTS[q] ? q : start.data));
     // Ended already (here or on another phone): the task opens as ended; the review never offers End again (R1-13)
     if (TASK && ended()) S.ended = true;
+    if (start.drafts && TASK) seedDrafts();
     render();
   });
   // The one registry exception: when the registry itself failed to load there is nothing to look strings up in.
