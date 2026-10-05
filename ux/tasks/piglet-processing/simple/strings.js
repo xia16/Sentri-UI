@@ -2,6 +2,30 @@
 (function (root) {
   'use strict';
   var EN = {
+    'tr.id.tag': 'Tag piglets', 'tr.id.notch': 'Notch piglets', 'tr.id.breeders': 'Pick breeders',
+    'trl.id.tag': 'tagging', 'trl.id.notch': 'notching', 'trl.id.breeders': 'breeder picking',
+    'chip.id.tag': 'Tag', 'chip.id.notch': 'Notch', 'chip.id.breeders': 'Breeders', 'chips.all': 'All', 'chips.label': 'Show pens that need',
+    'id.of.tag': '{n} of {m} tagged', 'id.of.notch': '{n} of {m} notched', 'id.picked': '{n} breeders picked', 'id.picked.1': '1 breeder picked',
+    'breeders.n': '{n} breeders', 'breeders.n.1': '1 breeder', 'breeder': 'Breeder',
+    'tool.id': 'ID',
+    'id.no.tag': 'Tag number', 'id.no.notch': 'Ear notch', 'id.use': 'Use {no}', 'id.taken': '{no} is already used.',
+    'id.sex': 'Boar or gilt', 'boar': 'Boar', 'gilt': 'Gilt',
+    'id.kg': 'Weight (kg)', 'optional': 'Optional', 'kg': '{w} kg',
+    'id.keep': 'Keep for breeding',
+    'id.save': 'Record · next piglet', 'id.recorded': '{no} recorded',
+    'id.done.pick': 'Done picking · {n} breeders', 'id.done.pick.1': 'Done picking · 1 breeder', 'id.done.pick.0': 'Done picking · no breeders',
+    'id.list': 'In this pen', 'id.none.yet': 'No piglet has an ID yet.',
+    'id.act.tag': 'Tag', 'id.act.notch': 'Notch', 'id.act.breeders': 'Pick',
+    'id.page.sub': '{pen} · day {d} · {what}',
+    'tl.today': 'Today · Day {d}', 'tl.day': 'Day {d}', 'tl.done': '{n} done', 'tl.born': 'Born · {n} piglets', 'tl.given': '{n} given',
+    'tl.open': 'Show', 'tl.close': 'Hide',
+    'move.hadid.tag': 'Have tags?', 'move.hadid.notch': 'Notched?',
+    'chip.done.in': 'Already done in {n} pens.', 'chip.done.in.1': 'Already done in 1 pen.',
+    'chip.id.tip': 'IDs go in one piglet at a time. Tap a pen to start.',
+    'chip.none': 'No pen needs this now.',
+    'flash.bulk': '{Tr} recorded · {p} · {n}', 'flash.pick': 'Breeders picked · {n}',
+    'demo.farm': 'Farm ID setting', 'scheme.tag': 'Tag every piglet', 'scheme.notch': 'Notch every piglet', 'scheme.breeders': 'Tag breeders only', 'scheme.none': 'No ID (fatteners)',
+    'demo.farm.note': 'Switching the setting starts the demo again.',
     'task': 'Piglet processing',
     'last': 'Last record', 'last.none': 'Nothing recorded yet',
     'batch': 'Batch {b}',
@@ -56,6 +80,30 @@
     'yesterday': 'yesterday'
   };
   var ZH = {
+    'tr.id.tag': '打耳标', 'tr.id.notch': '剪耳号', 'tr.id.breeders': '选种猪',
+    'trl.id.tag': '打耳标', 'trl.id.notch': '剪耳号', 'trl.id.breeders': '选种猪',
+    'chip.id.tag': '耳标', 'chip.id.notch': '耳号', 'chip.id.breeders': '种猪', 'chips.all': '全部', 'chips.label': '只看要做的栏',
+    'id.of.tag': '已打{n}/{m}头', 'id.of.notch': '已剪{n}/{m}头', 'id.picked': '已选{n}头种猪', 'id.picked.1': '已选1头种猪',
+    'breeders.n': '{n}头种猪', 'breeders.n.1': '1头种猪', 'breeder': '种猪',
+    'tool.id': '编号',
+    'id.no.tag': '耳标号', 'id.no.notch': '耳号', 'id.use': '用{no}', 'id.taken': '{no}已经用过了。',
+    'id.sex': '公还是母', 'boar': '公', 'gilt': '母',
+    'id.kg': '体重（公斤）', 'optional': '可不填', 'kg': '{w}公斤',
+    'id.keep': '留作种猪',
+    'id.save': '记录 · 下一头', 'id.recorded': '{no}已记录',
+    'id.done.pick': '选完了 · {n}头种猪', 'id.done.pick.1': '选完了 · 1头种猪', 'id.done.pick.0': '选完了 · 没有种猪',
+    'id.list': '这一栏', 'id.none.yet': '还没有编号的仔猪。',
+    'id.act.tag': '打标', 'id.act.notch': '剪号', 'id.act.breeders': '去选',
+    'id.page.sub': '{pen} · 第{d}天 · {what}',
+    'tl.today': '今天 · 第{d}天', 'tl.day': '第{d}天', 'tl.done': '{n}项做完', 'tl.born': '出生 · {n}头', 'tl.given': '已做{n}头',
+    'tl.open': '展开', 'tl.close': '收起',
+    'move.hadid.tag': '打了耳标吗？', 'move.hadid.notch': '剪了耳号吗？',
+    'chip.done.in': '已有{n}栏做完。', 'chip.done.in.1': '已有1栏做完。',
+    'chip.id.tip': '编号要一头一头记。点一个栏开始。',
+    'chip.none': '现在没有栏要做这个。',
+    'flash.bulk': '已记录{tr} · {p} · {n}', 'flash.pick': '种猪选好了 · {n}',
+    'demo.farm': '猪场编号方式', 'scheme.tag': '每头打耳标', 'scheme.notch': '每头剪耳号', 'scheme.breeders': '只给种猪打耳标', 'scheme.none': '不编号（育肥猪）',
+    'demo.farm.note': '切换后演示重新开始。',
     'task': '仔猪处理',
     'last': '最近记录', 'last.none': '还没有记录',
     'batch': '第{b}批',
@@ -113,7 +161,7 @@
   try { lang = localStorage.getItem('pp-simple-lang') === 'zh' ? 'zh' : 'en'; } catch (e) { /* default en */ }
   function t(key, a) {
     var d = DICT[lang], n = a && a.n;
-    var s = (n === 1 || n === '1') && d[key + '.1'] != null ? d[key + '.1'] : d[key];
+    var s = (n === 1 || n === '1') && d[key + '.1'] != null ? d[key + '.1'] : (n === 0 || n === '0') && d[key + '.0'] != null ? d[key + '.0'] : d[key];
     if (s == null) s = EN[key] != null ? EN[key] : key;
     return s.replace(/\{(\w+)\}/g, function (m, k) { return a && a[k] != null ? a[k] : m; });
   }

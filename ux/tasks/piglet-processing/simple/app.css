@@ -70,3 +70,88 @@
 .sp-pens .tk-choice-tile { min-height: 60px; gap: 2px; padding: 8px 4px; }
 .sp-pens .tk-choice-tile strong { font: 600 var(--type-identifier-strong-size)/1.2 var(--font-mono); }
 .sp-pens .tk-choice-tile small { font-size: var(--type-meta-size); color: var(--muted); }
+
+/* ---- the filter chips under the summary card: one per step due today, with how many pens ---- */
+.sp-chips { display: flex; gap: 8px; overflow-x: auto; margin: 0 0 var(--space-heading); padding: 2px var(--space-gutter) 4px; scrollbar-width: none; }
+.sp-chips::-webkit-scrollbar { display: none; }
+.sp-chip { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: var(--touch-min); margin: 0; padding: 0 14px;
+  border: 1px solid var(--control-border); border-radius: 999px; background: var(--paper); color: var(--ink);
+  font: 500 var(--type-row-title-size)/1 var(--font-sans); white-space: nowrap; cursor: pointer; }
+.sp-chip-n { font: 600 var(--type-identifier-size)/1 var(--font-mono); color: var(--muted); }
+.sp-chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.sp-chip[aria-pressed="true"] .sp-chip-n { color: var(--paper); opacity: .8; }
+.sp-chip-head { margin: 4px var(--space-gutter) 8px; font: 600 var(--type-row-title-size)/1.4 var(--font-sans); color: var(--ink); }
+.sp-chip-tip { margin: -4px var(--space-gutter) 10px; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+/* a pen under a chip: the row opens the pen, the tick at its end selects it */
+.sp-tickrow { display: flex; align-items: stretch; }
+.sp-tickrow + .sp-tickrow, .tk-row + .sp-tickrow, .sp-tickrow + .tk-row { border-top: 1px solid var(--line); }
+.sp-tickrow > .tk-row { flex: 1; min-width: 0; padding-right: 4px; }
+.sp-tick { flex: none; display: grid; place-items: center; width: 60px; cursor: pointer; }
+.sp-tick input { width: 24px; height: 24px; margin: 0; accent-color: var(--ink); cursor: pointer; }
+/* the footer that appears under a chip's list (hold to record, then the receipt with Undo) */
+.tk-screen > .tk-footer, .tk-screen > .tk-footer-status { padding-left: var(--space-panel); padding-right: var(--space-panel); }
+.tk-screen > .tk-footer { background: var(--paper); border-top: 1px solid var(--line); }
+.sp-foot-receipt { flex: none; margin: 0; padding: var(--space-row-y) var(--space-panel) 0; background: var(--paper); border-top: 1px solid var(--line);
+  color: var(--green); font: 500 var(--type-row-title-size)/1.4 var(--font-sans); }
+.sp-foot-receipt + .tk-footer { border-top: 0; }
+
+/* four tools at 390: a little tighter */
+.sp-toolrow[data-count="4"] { gap: 6px; }
+.sp-toolrow[data-count="4"] .sp-tool { padding-left: 4px; padding-right: 4px; }
+@media (max-width: 400px) { .sp-toolrow[data-count="4"] .sp-tool svg { display: none; } }
+
+/* ---- the pen's timeline: one node per day, today marked ---- */
+.sp-tl { list-style: none; margin: var(--space-heading) 0 0; padding: 0 0 0 26px; position: relative; }
+.sp-tl::before { content: ""; position: absolute; left: 7px; top: 10px; bottom: 10px; width: 2px; background: var(--line); }
+.sp-tl-node { position: relative; padding: 0 0 18px; }
+.sp-tl-node::before { content: ""; position: absolute; left: -24px; top: 5px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--line); background: var(--paper); box-sizing: border-box; }
+.sp-tl-node[data-when="past"]::before { background: var(--current-marker); border-color: var(--current-marker); }
+.sp-tl-node[data-when="today"]::before { left: -27px; top: 2px; width: 18px; height: 18px; border: 4px solid var(--green-wash); background: var(--green); box-shadow: 0 0 0 1px var(--chip-green-border); }
+.sp-tl-head { min-height: 22px; display: flex; align-items: center; }
+.sp-tl-day { font: 600 var(--type-identifier-size)/1.4 var(--font-sans); color: var(--muted); }
+.sp-tl-today { font: 700 var(--type-row-title-size)/1.4 var(--font-sans); color: var(--green); }
+.sp-tl-line { margin: 2px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+.sp-tl-node[data-when="future"] .sp-tl-day { color: var(--disabled-ink); }
+/* today's open steps: one card, each with its one-tap */
+.sp-steps { margin-top: 8px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); overflow: hidden; }
+.sp-step { display: flex; align-items: center; gap: 8px; padding-right: 12px; }
+.sp-step + .sp-step { border-top: 1px solid var(--line); }
+.sp-step-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 64px; margin: 0; padding: 10px 0 10px 14px; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; }
+.sp-step-main:active { background: var(--press); }
+.sp-ring { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--muted); }
+.sp-step-copy { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.sp-step-copy strong { font: 700 13px/1.3 var(--font-sans); }
+.sp-step-copy small, .sp-tl-list small, .sp-tl-later small { font: var(--type-meta-size)/1.5 var(--font-mono); color: var(--muted); }
+.sp-step > .button { flex: none; }
+/* done steps of a day: one line, tap to see them */
+.sp-tl-done { display: flex; align-items: center; gap: 8px; width: 100%; min-height: var(--touch-min); margin: 4px 0 0; padding: 0 4px 0 0; border: 0; background: none;
+  color: var(--ink); font: 500 var(--type-description-size)/1.3 var(--font-sans); text-align: left; cursor: pointer; }
+.sp-tick-disc { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--green-wash); color: var(--green); }
+.sp-tick-disc svg, .sp-tl-done > svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.sp-tl-names { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.sp-tl-done > svg { flex: none; color: var(--muted); transition: transform .15s; }
+.sp-tl-done[aria-expanded="true"] > svg { transform: rotate(90deg); }
+.sp-tl-list, .sp-tl-later { list-style: none; margin: 4px 0 0; padding: 0; }
+.sp-tl-list li, .sp-tl-later li { display: flex; flex-direction: column; gap: 2px; padding: 6px 0 6px 30px; }
+.sp-tl-list strong { font: 600 13px/1.3 var(--font-sans); }
+.sp-tl-later li { padding-left: 0; }
+.sp-tl-later strong { font: 500 13px/1.3 var(--font-sans); color: var(--disabled-ink); }
+.sp-tl-later small { color: var(--disabled-ink); }
+
+/* ---- ID entry ---- */
+.tk-page[data-view="id"] .field { margin: 0; }
+.sp-idno { display: flex; align-items: flex-end; gap: 10px; }
+.sp-idno > .field { flex: 1; min-width: 0; }
+.sp-idno > .button { flex: none; min-height: 46px; }
+.sp-idno input { font: 600 20px/1.2 var(--font-mono); letter-spacing: .02em; }
+.sp-idno input[aria-invalid="true"] { border-color: var(--amber); }
+.sp-kg small { font-weight: 400; color: var(--muted); margin-left: 4px; }
+.tk-page-body > .sp-warn { margin: 6px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--amber); }
+.button.sp-wide { width: 100%; }
+
+/* the farm setting in the demo panel */
+.sp-demo-farm { display: flex; flex-direction: column; align-items: stretch; gap: 2px; width: 100%; }
+.sp-demo-label { margin: 0 0 2px; font-weight: 600; }
+.sp-demo-farm button { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0; border: 0; background: none; text-align: left; }
+.sp-demo-dot { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--muted); box-sizing: border-box; }
+.sp-demo-farm button[aria-checked="true"] .sp-demo-dot { border: 5px solid var(--ink); }

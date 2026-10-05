@@ -1275,6 +1275,91 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .sp-pens .tk-choice-tile strong { font: 600 var(--type-identifier-strong-size)/1.2 var(--font-mono); }
 .sp-pens .tk-choice-tile small { font-size: var(--type-meta-size); color: var(--muted); }
 
+/* ---- the filter chips under the summary card: one per step due today, with how many pens ---- */
+.sp-chips { display: flex; gap: 8px; overflow-x: auto; margin: 0 0 var(--space-heading); padding: 2px var(--space-gutter) 4px; scrollbar-width: none; }
+.sp-chips::-webkit-scrollbar { display: none; }
+.sp-chip { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: var(--touch-min); margin: 0; padding: 0 14px;
+  border: 1px solid var(--control-border); border-radius: 999px; background: var(--paper); color: var(--ink);
+  font: 500 var(--type-row-title-size)/1 var(--font-sans); white-space: nowrap; cursor: pointer; }
+.sp-chip-n { font: 600 var(--type-identifier-size)/1 var(--font-mono); color: var(--muted); }
+.sp-chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.sp-chip[aria-pressed="true"] .sp-chip-n { color: var(--paper); opacity: .8; }
+.sp-chip-head { margin: 4px var(--space-gutter) 8px; font: 600 var(--type-row-title-size)/1.4 var(--font-sans); color: var(--ink); }
+.sp-chip-tip { margin: -4px var(--space-gutter) 10px; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+/* a pen under a chip: the row opens the pen, the tick at its end selects it */
+.sp-tickrow { display: flex; align-items: stretch; }
+.sp-tickrow + .sp-tickrow, .tk-row + .sp-tickrow, .sp-tickrow + .tk-row { border-top: 1px solid var(--line); }
+.sp-tickrow > .tk-row { flex: 1; min-width: 0; padding-right: 4px; }
+.sp-tick { flex: none; display: grid; place-items: center; width: 60px; cursor: pointer; }
+.sp-tick input { width: 24px; height: 24px; margin: 0; accent-color: var(--ink); cursor: pointer; }
+/* the footer that appears under a chip's list (hold to record, then the receipt with Undo) */
+.tk-screen > .tk-footer, .tk-screen > .tk-footer-status { padding-left: var(--space-panel); padding-right: var(--space-panel); }
+.tk-screen > .tk-footer { background: var(--paper); border-top: 1px solid var(--line); }
+.sp-foot-receipt { flex: none; margin: 0; padding: var(--space-row-y) var(--space-panel) 0; background: var(--paper); border-top: 1px solid var(--line);
+  color: var(--green); font: 500 var(--type-row-title-size)/1.4 var(--font-sans); }
+.sp-foot-receipt + .tk-footer { border-top: 0; }
+
+/* four tools at 390: a little tighter */
+.sp-toolrow[data-count="4"] { gap: 6px; }
+.sp-toolrow[data-count="4"] .sp-tool { padding-left: 4px; padding-right: 4px; }
+@media (max-width: 400px) { .sp-toolrow[data-count="4"] .sp-tool svg { display: none; } }
+
+/* ---- the pen's timeline: one node per day, today marked ---- */
+.sp-tl { list-style: none; margin: var(--space-heading) 0 0; padding: 0 0 0 26px; position: relative; }
+.sp-tl::before { content: ""; position: absolute; left: 7px; top: 10px; bottom: 10px; width: 2px; background: var(--line); }
+.sp-tl-node { position: relative; padding: 0 0 18px; }
+.sp-tl-node::before { content: ""; position: absolute; left: -24px; top: 5px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--line); background: var(--paper); box-sizing: border-box; }
+.sp-tl-node[data-when="past"]::before { background: var(--current-marker); border-color: var(--current-marker); }
+.sp-tl-node[data-when="today"]::before { left: -27px; top: 2px; width: 18px; height: 18px; border: 4px solid var(--green-wash); background: var(--green); box-shadow: 0 0 0 1px var(--chip-green-border); }
+.sp-tl-head { min-height: 22px; display: flex; align-items: center; }
+.sp-tl-day { font: 600 var(--type-identifier-size)/1.4 var(--font-sans); color: var(--muted); }
+.sp-tl-today { font: 700 var(--type-row-title-size)/1.4 var(--font-sans); color: var(--green); }
+.sp-tl-line { margin: 2px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+.sp-tl-node[data-when="future"] .sp-tl-day { color: var(--disabled-ink); }
+/* today's open steps: one card, each with its one-tap */
+.sp-steps { margin-top: 8px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); overflow: hidden; }
+.sp-step { display: flex; align-items: center; gap: 8px; padding-right: 12px; }
+.sp-step + .sp-step { border-top: 1px solid var(--line); }
+.sp-step-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 64px; margin: 0; padding: 10px 0 10px 14px; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; }
+.sp-step-main:active { background: var(--press); }
+.sp-ring { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--muted); }
+.sp-step-copy { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.sp-step-copy strong { font: 700 13px/1.3 var(--font-sans); }
+.sp-step-copy small, .sp-tl-list small, .sp-tl-later small { font: var(--type-meta-size)/1.5 var(--font-mono); color: var(--muted); }
+.sp-step > .button { flex: none; }
+/* done steps of a day: one line, tap to see them */
+.sp-tl-done { display: flex; align-items: center; gap: 8px; width: 100%; min-height: var(--touch-min); margin: 4px 0 0; padding: 0 4px 0 0; border: 0; background: none;
+  color: var(--ink); font: 500 var(--type-description-size)/1.3 var(--font-sans); text-align: left; cursor: pointer; }
+.sp-tick-disc { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--green-wash); color: var(--green); }
+.sp-tick-disc svg, .sp-tl-done > svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.sp-tl-names { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.sp-tl-done > svg { flex: none; color: var(--muted); transition: transform .15s; }
+.sp-tl-done[aria-expanded="true"] > svg { transform: rotate(90deg); }
+.sp-tl-list, .sp-tl-later { list-style: none; margin: 4px 0 0; padding: 0; }
+.sp-tl-list li, .sp-tl-later li { display: flex; flex-direction: column; gap: 2px; padding: 6px 0 6px 30px; }
+.sp-tl-list strong { font: 600 13px/1.3 var(--font-sans); }
+.sp-tl-later li { padding-left: 0; }
+.sp-tl-later strong { font: 500 13px/1.3 var(--font-sans); color: var(--disabled-ink); }
+.sp-tl-later small { color: var(--disabled-ink); }
+
+/* ---- ID entry ---- */
+.tk-page[data-view="id"] .field { margin: 0; }
+.sp-idno { display: flex; align-items: flex-end; gap: 10px; }
+.sp-idno > .field { flex: 1; min-width: 0; }
+.sp-idno > .button { flex: none; min-height: 46px; }
+.sp-idno input { font: 600 20px/1.2 var(--font-mono); letter-spacing: .02em; }
+.sp-idno input[aria-invalid="true"] { border-color: var(--amber); }
+.sp-kg small { font-weight: 400; color: var(--muted); margin-left: 4px; }
+.tk-page-body > .sp-warn { margin: 6px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--amber); }
+.button.sp-wide { width: 100%; }
+
+/* the farm setting in the demo panel */
+.sp-demo-farm { display: flex; flex-direction: column; align-items: stretch; gap: 2px; width: 100%; }
+.sp-demo-label { margin: 0 0 2px; font-weight: 600; }
+.sp-demo-farm button { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0; border: 0; background: none; text-align: left; }
+.sp-demo-dot { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--muted); box-sizing: border-box; }
+.sp-demo-farm button[aria-checked="true"] .sp-demo-dot { border: 5px solid var(--ink); }
+
 </style>
 </head>
 <body class="tk-stage">
@@ -2380,6 +2465,30 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 (function (root) {
   'use strict';
   var EN = {
+    'tr.id.tag': 'Tag piglets', 'tr.id.notch': 'Notch piglets', 'tr.id.breeders': 'Pick breeders',
+    'trl.id.tag': 'tagging', 'trl.id.notch': 'notching', 'trl.id.breeders': 'breeder picking',
+    'chip.id.tag': 'Tag', 'chip.id.notch': 'Notch', 'chip.id.breeders': 'Breeders', 'chips.all': 'All', 'chips.label': 'Show pens that need',
+    'id.of.tag': '{n} of {m} tagged', 'id.of.notch': '{n} of {m} notched', 'id.picked': '{n} breeders picked', 'id.picked.1': '1 breeder picked',
+    'breeders.n': '{n} breeders', 'breeders.n.1': '1 breeder', 'breeder': 'Breeder',
+    'tool.id': 'ID',
+    'id.no.tag': 'Tag number', 'id.no.notch': 'Ear notch', 'id.use': 'Use {no}', 'id.taken': '{no} is already used.',
+    'id.sex': 'Boar or gilt', 'boar': 'Boar', 'gilt': 'Gilt',
+    'id.kg': 'Weight (kg)', 'optional': 'Optional', 'kg': '{w} kg',
+    'id.keep': 'Keep for breeding',
+    'id.save': 'Record · next piglet', 'id.recorded': '{no} recorded',
+    'id.done.pick': 'Done picking · {n} breeders', 'id.done.pick.1': 'Done picking · 1 breeder', 'id.done.pick.0': 'Done picking · no breeders',
+    'id.list': 'In this pen', 'id.none.yet': 'No piglet has an ID yet.',
+    'id.act.tag': 'Tag', 'id.act.notch': 'Notch', 'id.act.breeders': 'Pick',
+    'id.page.sub': '{pen} · day {d} · {what}',
+    'tl.today': 'Today · Day {d}', 'tl.day': 'Day {d}', 'tl.done': '{n} done', 'tl.born': 'Born · {n} piglets', 'tl.given': '{n} given',
+    'tl.open': 'Show', 'tl.close': 'Hide',
+    'move.hadid.tag': 'Have tags?', 'move.hadid.notch': 'Notched?',
+    'chip.done.in': 'Already done in {n} pens.', 'chip.done.in.1': 'Already done in 1 pen.',
+    'chip.id.tip': 'IDs go in one piglet at a time. Tap a pen to start.',
+    'chip.none': 'No pen needs this now.',
+    'flash.bulk': '{Tr} recorded · {p} · {n}', 'flash.pick': 'Breeders picked · {n}',
+    'demo.farm': 'Farm ID setting', 'scheme.tag': 'Tag every piglet', 'scheme.notch': 'Notch every piglet', 'scheme.breeders': 'Tag breeders only', 'scheme.none': 'No ID (fatteners)',
+    'demo.farm.note': 'Switching the setting starts the demo again.',
     'task': 'Piglet processing',
     'last': 'Last record', 'last.none': 'Nothing recorded yet',
     'batch': 'Batch {b}',
@@ -2434,6 +2543,30 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'yesterday': 'yesterday'
   };
   var ZH = {
+    'tr.id.tag': '打耳标', 'tr.id.notch': '剪耳号', 'tr.id.breeders': '选种猪',
+    'trl.id.tag': '打耳标', 'trl.id.notch': '剪耳号', 'trl.id.breeders': '选种猪',
+    'chip.id.tag': '耳标', 'chip.id.notch': '耳号', 'chip.id.breeders': '种猪', 'chips.all': '全部', 'chips.label': '只看要做的栏',
+    'id.of.tag': '已打{n}/{m}头', 'id.of.notch': '已剪{n}/{m}头', 'id.picked': '已选{n}头种猪', 'id.picked.1': '已选1头种猪',
+    'breeders.n': '{n}头种猪', 'breeders.n.1': '1头种猪', 'breeder': '种猪',
+    'tool.id': '编号',
+    'id.no.tag': '耳标号', 'id.no.notch': '耳号', 'id.use': '用{no}', 'id.taken': '{no}已经用过了。',
+    'id.sex': '公还是母', 'boar': '公', 'gilt': '母',
+    'id.kg': '体重（公斤）', 'optional': '可不填', 'kg': '{w}公斤',
+    'id.keep': '留作种猪',
+    'id.save': '记录 · 下一头', 'id.recorded': '{no}已记录',
+    'id.done.pick': '选完了 · {n}头种猪', 'id.done.pick.1': '选完了 · 1头种猪', 'id.done.pick.0': '选完了 · 没有种猪',
+    'id.list': '这一栏', 'id.none.yet': '还没有编号的仔猪。',
+    'id.act.tag': '打标', 'id.act.notch': '剪号', 'id.act.breeders': '去选',
+    'id.page.sub': '{pen} · 第{d}天 · {what}',
+    'tl.today': '今天 · 第{d}天', 'tl.day': '第{d}天', 'tl.done': '{n}项做完', 'tl.born': '出生 · {n}头', 'tl.given': '已做{n}头',
+    'tl.open': '展开', 'tl.close': '收起',
+    'move.hadid.tag': '打了耳标吗？', 'move.hadid.notch': '剪了耳号吗？',
+    'chip.done.in': '已有{n}栏做完。', 'chip.done.in.1': '已有1栏做完。',
+    'chip.id.tip': '编号要一头一头记。点一个栏开始。',
+    'chip.none': '现在没有栏要做这个。',
+    'flash.bulk': '已记录{tr} · {p} · {n}', 'flash.pick': '种猪选好了 · {n}',
+    'demo.farm': '猪场编号方式', 'scheme.tag': '每头打耳标', 'scheme.notch': '每头剪耳号', 'scheme.breeders': '只给种猪打耳标', 'scheme.none': '不编号（育肥猪）',
+    'demo.farm.note': '切换后演示重新开始。',
     'task': '仔猪处理',
     'last': '最近记录', 'last.none': '还没有记录',
     'batch': '第{b}批',
@@ -2491,7 +2624,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   try { lang = localStorage.getItem('pp-simple-lang') === 'zh' ? 'zh' : 'en'; } catch (e) { /* default en */ }
   function t(key, a) {
     var d = DICT[lang], n = a && a.n;
-    var s = (n === 1 || n === '1') && d[key + '.1'] != null ? d[key + '.1'] : d[key];
+    var s = (n === 1 || n === '1') && d[key + '.1'] != null ? d[key + '.1'] : (n === 0 || n === '0') && d[key + '.0'] != null ? d[key + '.0'] : d[key];
     if (s == null) s = EN[key] != null ? EN[key] : key;
     return s.replace(/\{(\w+)\}/g, function (m, k) { return a && a[k] != null ? a[k] : m; });
   }
@@ -2502,12 +2635,13 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 </script>
 <script>/* state.js */
 /* Simple piglet processing: the whole state model. Plain JS, kept in sessionStorage.
-   A pen is a litter. Each treatment on the farm's plan has a window in days of the pen's age.
-   For every pen and treatment we keep `got`: how many of the piglets alive now have had it.
-   Piglets still to do = alive − got. Nothing else is tracked. */
+   A pen is a litter. Each step on the farm's plan (a treatment, or the ID step) has a window in days of the pen's age.
+   Treatments: for every pen we keep `got`, how many of the piglets alive now have had it; still to do = alive − got.
+   Identity: the farm's scheme says who gets an ID — 'tag' or 'notch' every piglet, 'breeders' (tag only the piglets kept
+   for breeding), or 'none' (fatteners raised as a batch: no ID step at all). */
 (function (root) {
   'use strict';
-  var KEY = 'pp-simple-v1';
+  var KEY = 'pp-simple-v2';
   var ME = 'G. Hansen', OTHER = 'L. Madsen';
   var PLAN = [
     { key: 'iron', from: 2, to: 4 },
@@ -2515,27 +2649,42 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     { key: 'castrate', from: 3, to: 7 },
     { key: 'cocci', from: 3, to: 5 }
   ];
+  var ID = { key: 'id', from: 3, to: 7 };   // the farm's ID day: day 3, until day 7
+  var SCHEMES = ['tag', 'notch', 'breeders', 'none'];
   var BATCH = { name: '40', firstDay: 1, lastDay: 6 };   // the batch farrowed over these pen ages
+  var FIRST_TAG = 4201;
 
   function todayAt(h, m) { var d = new Date(); d.setHours(h, m, 0, 0); return d.getTime(); }
   function daysAgoAt(n, h, m) { return todayAt(h, m) - n * 864e5; }
 
   /* ---- sample farm: 12 pens in two rows of one batch, day 1–6 ---- */
-  function seed() {
-    var pens = {}, records = [], seq = 0;
+  function seed(scheme) {
+    scheme = SCHEMES.indexOf(scheme) >= 0 ? scheme : 'tag';
+    var pens = {}, records = [], seq = 0, litter = 21;
     function pen(code, age, born, dead, extra) {
-      var p = { code: code, row: code[0], age: age, born: born, alive: born - dead, dead: dead, missing: 0, sowDied: false, movedIn: 0, movedOut: 0, tr: {} };
+      var p = { code: code, row: code[0], age: age, born: born, alive: born - dead, dead: dead, missing: 0, sowDied: false, movedIn: 0, movedOut: 0,
+        litter: litter++, ids: [], idIn: 0, idOut: 0, picked: null, tr: {} };
       PLAN.forEach(function (t) { p.tr[t.key] = { got: 0, why: '' }; });
       Object.assign(p, extra || {});
       pens[code] = p;
       return p;
     }
-    // give(pen, tr, n, daysAgo, h, m, who, mark)
     function give(code, tr, n, ago, h, m, who, mark, why) {
       var p = pens[code];
       records.push({ id: 'r' + (++seq), pen: code, tr: tr, n: n, at: daysAgoAt(ago, h, m), day: p.age - ago, who: who || ME, mark: mark || '' });
       p.tr[tr].got += n;
       if (why) p.tr[tr].why = why;
+    }
+    var tagNo = FIRST_TAG;
+    function ident(code, count, ago, h, m, breeders, who) {
+      var p = pens[code];
+      for (var i = 0; i < count; i++) {
+        var keep = breeders.indexOf(i) >= 0;
+        var no = scheme === 'notch' ? p.litter + '-' + (p.ids.length + 1) : String(tagNo++);
+        var at = daysAgoAt(ago, h, m + i);
+        p.ids.push({ no: no, sex: i % 2 ? 'boar' : 'gilt', kg: i === 0 ? 1.6 : null, keep: keep, at: at, who: who || ME });
+        records.push({ id: 'r' + (++seq), pen: code, tr: 'id', n: 1, no: no, at: at, day: p.age - ago, who: who || ME, mark: '' });
+      }
     }
     pen('A01', 6, 13, 1); pen('A02', 5, 12, 0); pen('A03', 4, 13, 1); pen('A04', 3, 11, 0); pen('A05', 3, 12, 0); pen('A06', 2, 14, 1);
     pen('B01', 6, 12, 1); pen('B02', 5, 12, 1, { sowDied: true }); pen('B03', 4, 13, 0); pen('B04', 2, 12, 1); pen('B05', 1, 11, 0); pen('B06', 1, 13, 0);
@@ -2553,44 +2702,75 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     give('B02', 'iron', 11, 2, 9, 20); give('B02', 'tail', 11, 2, 9, 24);
     // B03: iron this morning
     give('B03', 'iron', 13, 0, 7, 52);
-    return { pens: pens, records: records, notes: [], ended: null, seq: seq, undo: null };
+    // identity: A01 all done; A02 four of twelve so far, one kept for breeding
+    if (scheme === 'tag' || scheme === 'notch') { ident('A01', 12, 2, 10, 0, []); ident('A02', 4, 0, 7, 30, [1]); }
+    if (scheme === 'breeders') {
+      ident('A01', 1, 2, 10, 0, [0]); pens.A01.picked = { at: daysAgoAt(2, 10, 5), who: ME };
+      ident('A02', 1, 0, 7, 30, [0]);
+    }
+    return { scheme: scheme, pens: pens, records: records, notes: [], ended: null, seq: seq, undo: null };
   }
 
   var S;
   function load() {
     try { S = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) { S = null; }
-    if (!S || !S.pens) S = seed();
+    if (!S || !S.pens) S = seed('tag');
   }
   function save() { try { sessionStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* private window: the demo still runs */ } }
-  function reset() { S = seed(); save(); }
+  function reset() { S = seed(S ? S.scheme : 'tag'); save(); }
+  /* A different farm: switching the scheme starts the demo again on that farm */
+  function setScheme(s) { S = seed(s); save(); }
 
   /* ---- reading ---- */
-  function plan(k) { return PLAN.filter(function (t) { return t.key === k; })[0]; }
-  function need(p, k) { return Math.max(0, p.alive - p.tr[k].got); }
+  function hasId() { return S.scheme !== 'none'; }
+  function steps() { return PLAN.map(function (t) { return t.key; }).concat(hasId() ? ['id'] : []); }
+  function plan(k) { return k === 'id' ? (hasId() ? ID : null) : PLAN.filter(function (t) { return t.key === k; })[0] || null; }
+  function idCount(p) { return Math.max(0, Math.min(p.alive, p.ids.length - p.idOut + p.idIn)); }
+  function breeders(p) { return p.ids.filter(function (x) { return x.keep; }).length; }
+  function need(p, k) {
+    if (k === 'id') return S.scheme === 'breeders' ? 0 : Math.max(0, p.alive - idCount(p));
+    return Math.max(0, p.alive - p.tr[k].got);
+  }
   function recs(code, k) { return S.records.filter(function (r) { return r.pen === code && (!k || r.tr === k); }); }
-  /* One treatment in one pen: 'done' | 'left' (given, some still to do) | 'due' | 'late' | 'coming' */
+  /* One step in one pen: 'done' | 'left' (given, some held back for later) | 'due' | 'late' | 'coming' */
   function status(p, k) {
-    var t = plan(k), n = need(p, k), given = recs(p.code, k).length > 0;
+    var t = plan(k);
+    var window = p.age < t.from ? 'coming' : p.age > t.to ? 'late' : 'due';
+    if (k === 'id') {
+      if (S.scheme === 'breeders') return p.picked ? 'done' : window;
+      return need(p, k) === 0 ? 'done' : window;
+    }
+    var n = need(p, k), given = recs(p.code, k).length > 0;
     if (n === 0) return given || p.tr[k].got > 0 ? 'done' : (p.age < t.from ? 'coming' : 'done');
     if (given) return 'left';
-    if (p.age < t.from) return 'coming';
-    if (p.age > t.to) return 'late';
-    return 'due';
+    return window;
   }
-  function todo(p) { return PLAN.filter(function (t) { var s = status(p, t.key); return s === 'due' || s === 'late' || s === 'left'; }).map(function (t) { return t.key; }); }
-  function coming(p) { return PLAN.filter(function (t) { return status(p, t.key) === 'coming'; }).map(function (t) { return t.key; }); }
+  function todo(p) { return steps().filter(function (k) { var s = status(p, k); return s === 'due' || s === 'late' || s === 'left'; }); }
+  function coming(p) { return steps().filter(function (k) { return status(p, k) === 'coming'; }); }
   function pens() { return Object.keys(S.pens).sort().map(function (c) { return S.pens[c]; }); }
   function last() { var r = S.records.slice().sort(function (a, b) { return b.at - a.at; })[0]; return r || null; }
-  /* Bulk: where a pen sits for one treatment */
+  /* Several pens at once: where a pen sits for one step — 'now' (inside the window, or left from before), 'early', 'late', 'done' */
   function bulkPlace(p, k) {
-    var s = status(p, k), t = plan(k);
+    var s = status(p, k);
     if (s === 'done') return 'done';
-    if (s === 'left') return 'now';
-    if (p.age < t.from) return 'early';
-    if (p.age > t.to) return 'late';
-    return 'now';
+    if (s === 'left' || s === 'due') return 'now';
+    return s === 'coming' ? 'early' : 'late';
   }
   function sameBatch(a, b) { return a.code !== b.code && b.age >= BATCH.firstDay && b.age <= BATCH.lastDay; }
+  /* The next ID to suggest: the farm's next tag number, or this litter's next notch */
+  function nextNo(code) {
+    var p = S.pens[code];
+    if (S.scheme === 'notch') {
+      var used = p.ids.map(function (x) { return +String(x.no).split('-')[1] || 0; });
+      return p.litter + '-' + ((used.length ? Math.max.apply(null, used) : 0) + 1);
+    }
+    var max = FIRST_TAG - 1;
+    Object.keys(S.pens).forEach(function (c) { S.pens[c].ids.forEach(function (x) { if (+x.no > max) max = +x.no; }); });
+    return String(max + 1);
+  }
+  function taken(no) {
+    return Object.keys(S.pens).some(function (c) { return S.pens[c].ids.some(function (x) { return String(x.no) === String(no); }); });
+  }
 
   /* ---- writing: every change keeps the state before it, so the last one can be undone ---- */
   function change(kind, fn) {
@@ -2625,6 +2805,25 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       return picks.map(function (x) { return record(x.pen, k, need(S.pens[x.pen], k), { mark: x.mark || '' }); });
     });
   }
+  /* One piglet's ID: { no, sex: 'boar'|'gilt', kg (or null), keep } */
+  function identify(code, pig) {
+    return change('id', function () {
+      var p = S.pens[code], st = status(p, 'id');
+      var x = { no: String(pig.no), sex: pig.sex, kg: pig.kg == null || pig.kg === '' ? null : +pig.kg, keep: !!pig.keep, at: Date.now(), who: ME };
+      p.ids.push(x);
+      S.records.push({ id: 'r' + (++S.seq), pen: code, tr: 'id', n: 1, no: x.no, at: x.at, day: p.age, who: ME, mark: st === 'late' ? 'late' : '' });
+      return x;
+    });
+  }
+  /* Breeders-only farm: the worker says this litter's breeders are all picked */
+  function donePicking(code) {
+    return change('pick', function () {
+      var p = S.pens[code];
+      p.picked = { at: Date.now(), who: ME };
+      S.records.push({ id: 'r' + (++S.seq), pen: code, tr: 'pick', n: breeders(p), at: Date.now(), day: p.age, who: ME, mark: '' });
+      return breeders(p);
+    });
+  }
   function clamp(p) { PLAN.forEach(function (t) { p.tr[t.key].got = Math.min(p.tr[t.key].got, p.alive); if (need(p, t.key) === 0) p.tr[t.key].why = ''; }); }
   /* Deaths: { crushed, scours, starve, other }; fromMissing: the dead were among the missing ones */
   function death(code, causes, fromMissing) {
@@ -2638,7 +2837,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       return k;
     });
   }
-  /* Move n piglets; had: { treatmentKey: true|false } for what was given in the pen they leave */
+  /* Move n piglets; had: { stepKey: true|false } for what was given (or the ID) in the pen they leave */
   function move(from, to, n, had) {
     return change('move', function () {
       var a = S.pens[from], b = S.pens[to];
@@ -2648,6 +2847,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
         if (had[k]) { a.tr[k].got = Math.max(0, a.tr[k].got - n); b.tr[k].got += n; }
         if (!had[k] && need(b, k) > 0 && recs(to, k).length) b.tr[k].why = 'moved';
       });
+      if (had.id) { a.idOut += n; b.idIn += n; }
       clamp(a); clamp(b);
       S.records.push({ id: 'r' + (++S.seq), pen: from, tr: 'move', n: n, to: to, at: Date.now(), day: a.age, who: ME, mark: '' });
       return n;
@@ -2695,10 +2895,12 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 
   load();
   root.PPS = {
-    PLAN: PLAN, BATCH: BATCH, ME: ME, OTHER: OTHER,
+    PLAN: PLAN, ID: ID, SCHEMES: SCHEMES, BATCH: BATCH, ME: ME, OTHER: OTHER,
     get s() { return S; },
-    plan: plan, need: need, recs: recs, status: status, todo: todo, coming: coming, pens: pens, last: last, bulkPlace: bulkPlace, sameBatch: sameBatch,
-    treat: treat, bulk: bulk, death: death, move: move, setCount: setCount, end: end, undo: undo, otherPhone: otherPhone, seeNote: seeNote, reset: reset
+    hasId: hasId, steps: steps, plan: plan, need: need, idCount: idCount, breeders: breeders, recs: recs, status: status, todo: todo, coming: coming,
+    pens: pens, last: last, bulkPlace: bulkPlace, sameBatch: sameBatch, nextNo: nextNo, taken: taken,
+    treat: treat, bulk: bulk, identify: identify, donePicking: donePicking, death: death, move: move, setCount: setCount, end: end, undo: undo,
+    otherPhone: otherPhone, seeNote: seeNote, reset: reset, setScheme: setScheme
   };
 })(globalThis);
 
@@ -2714,7 +2916,11 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   var SEP = { sep: true };
 
   /* What is open on the phone (not kept: a reload starts on the pen list) */
-  var V = { lens: 'todo', pen: null, over: null, treat: null, death: null, move: null, count: null, bulk: null, confirm: null, end: null, flash: null };
+  function fresh(keep) {
+    return { lens: 'todo', chip: '', sel: {}, chipDone: null, pen: null, over: null, treat: null, death: null, move: null, count: null, idf: null,
+      confirm: null, end: null, flash: null, open: {}, demoOpen: keep ? keep.demoOpen : false };
+  }
+  var V = fresh();
 
   /* ---- small helpers ---- */
   var pad = function (n) { return (n < 10 ? '0' : '') + n; };
@@ -2722,33 +2928,42 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function sameDay(ms) { return new Date(ms).toDateString() === new Date().toDateString(); }
   function when(r) { return sameDay(r.at) ? hm(r.at) : T('day.n', { d: r.day }); }
   function short(who) { var p = who.split(/[.\s]+/).filter(Boolean); return p.length > 1 ? p[0] + '.' + p[p.length - 1][0] : who; }
-  var tr = function (k) { return T('tr.' + k); }, trl = function (k) { return T('trl.' + k); };
+  var scheme = function () { return P.s.scheme; };
+  var tr = function (k) { return k === 'id' ? T('tr.id.' + scheme()) : T('tr.' + k); };
+  var trl = function (k) { return k === 'id' ? T('trl.id.' + scheme()) : T('trl.' + k); };
+  var chipName = function (k) { return k === 'id' ? T('chip.id.' + scheme()) : T('tr.' + k); };
   var pigs = function (n) { return T('piglets', { n: n }); };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   function pen() { return P.s.pens[V.pen]; }
-  function treatRecs(code) { return P.recs(code).filter(function (r) { return !!P.plan(r.tr); }); }
   function newest(list) { return list.slice().sort(function (a, b) { return b.at - a.at; })[0]; }
+  /* the ID step in words: `4 of 12 tagged`, `1 breeder picked` */
+  function idWhat(p) { return scheme() === 'breeders' ? T('id.picked', { n: P.breeders(p) }) : T('id.of.' + scheme(), { n: P.idCount(p), m: p.alive }); }
+  function stepAmount(p, k) { return k === 'id' ? idWhat(p) : pigs(P.need(p, k)); }
 
   /* ================= the pen list ================= */
   /* the meta line for a pen with something to do: `due today · 12 piglets`, `late · day 6 · 11 piglets`, `2 left · weak` */
   function todoMeta(p) {
     var td = P.todo(p), sts = td.map(function (k) { return P.status(p, k); });
-    var n = Math.max.apply(null, td.map(function (k) { return P.need(p, k); }));
-    if (sts.every(function (s) { return s === 'left'; })) return [T('left', { n: P.need(p, td[0]) }), SEP, T('why.' + (p.tr[td[0]].why || 'weak'))];
-    return [sts.indexOf('late') >= 0 ? { text: T('late') + ' · ' + T('day.n', { d: p.age }), tone: 'amber' } : T('due.today'), SEP, pigs(n)];
+    var tk = td.filter(function (k) { return k !== 'id'; });
+    if (tk.length && tk.every(function (k) { return P.status(p, k) === 'left'; }) && td.length === tk.length) return [T('left', { n: P.need(p, tk[0]) }), SEP, T('why.' + (p.tr[tk[0]].why || 'weak'))];
+    var amount = tk.length ? pigs(Math.max.apply(null, tk.map(function (k) { return P.need(p, k); }))) : idWhat(p);
+    return [sts.indexOf('late') >= 0 ? { text: T('late') + ' · ' + T('day.n', { d: p.age }), tone: 'amber' } : T('due.today'), SEP, amount];
+  }
+  function penChip(p) {
+    var sts = P.todo(p).map(function (k) { return P.status(p, k); });
+    if (!P.s.ended && sts.indexOf('late') >= 0) return { text: T('chip.late'), tone: 'amber' };
+    if (p.missing) return { text: T('chip.missing', { n: p.missing }), tone: 'amber' };
+    if (p.sowDied) return { text: T('chip.sow'), tone: 'red' };
+    return null;
   }
   function penRow(p) {
-    var ended = !!P.s.ended, td = P.todo(p), sts = td.map(function (k) { return P.status(p, k); });
-    var late = sts.indexOf('late') >= 0, chip = null, headline, meta, tone = '';
-    if (!ended && late) chip = { text: T('chip.late'), tone: 'amber' };
-    else if (p.missing) chip = { text: T('chip.missing', { n: p.missing }), tone: 'amber' };
-    else if (p.sowDied) chip = { text: T('chip.sow'), tone: 'red' };
-    var lastR = newest(treatRecs(p.code)), c = P.coming(p);
+    var ended = !!P.s.ended, td = P.todo(p), headline, meta, tone = '';
+    var lastR = newest(P.recs(p.code).filter(function (r) { return !!P.plan(r.tr); })), c = P.coming(p);
     if (ended) {
       headline = T('ended.row'); tone = 'forecast';
       meta = td.concat(c).length ? T('not.given.list', { list: td.concat(c).map(tr).join(', ') }) : T('all.given');
     } else if (td.length) {
-      headline = td.map(tr).join(' · ');
+      headline = td.map(chipName).join(' · ');
       meta = todoMeta(p);
     } else if (c.length) {
       headline = T('nothing.due'); tone = 'forecast';
@@ -2758,12 +2973,67 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       headline = T('all.given');
       meta = lastR ? T('done.at', { t: when(lastR) }) : '';
     }
-    return K.row({ id: p.code, chip: chip, headline: headline, tone: tone, meta: meta, action: 'pen', value: p.code });
+    return K.row({ id: p.code, chip: penChip(p), headline: headline, tone: tone, meta: meta, action: 'pen', value: p.code });
   }
   function isDone(p) { return P.todo(p).length === 0; }
+  function groupsBy(list, rowFn) {
+    return ['A', 'B'].map(function (r) {
+      var rows = list.filter(function (p) { return p.row === r; });
+      if (!rows.length) return '';
+      return K.group({ title: T('row', { r: r }), face: 'word', meta: T('row.pens', { n: rows.length }), rows: rows.map(rowFn) });
+    }).join('');
+  }
+  /* the filter chips: one per step due or late today, with how many pens need it */
+  function chipCounts() {
+    var all = P.pens();
+    return P.steps().map(function (k) {
+      return { k: k, n: all.filter(function (p) { var s = P.status(p, k); return s === 'due' || s === 'late' || s === 'left'; }).length };
+    }).filter(function (c) { return c.n > 0; });
+  }
+  function chipsRow() {
+    var list = chipCounts();
+    var b = function (val, label, n) {
+      return '<button type="button" class="sp-chip" aria-pressed="' + (V.chip === val) + '" data-action="chip" data-value="' + val + '"><span>' + esc(label) + '</span>' +
+        (n != null ? '<span class="sp-chip-n">' + n + '</span>' : '') + '</button>';
+    };
+    return '<div class="sp-chips" role="group" aria-label="' + esc(T('chips.label')) + '">' + b('', T('chips.all')) +
+      list.map(function (c) { return b(c.k, chipName(c.k), c.n); }).join('') + '</div>';
+  }
+  function chipStart(k) {
+    V.chip = k; V.sel = {}; V.chipDone = null;
+    if (k && k !== 'id') P.pens().forEach(function (p) { if (P.status(p, k) === 'due') V.sel[p.code] = ''; });
+  }
+  function chipTotals() {
+    var codes = Object.keys(V.sel), n = 0;
+    codes.forEach(function (c) { n += P.need(P.s.pens[c], V.chip); });
+    return { pens: codes.length, n: n };
+  }
+  /* a pen under a chip: the row opens the pen; a treatment chip adds a tick at the end */
+  function chipRow(p) {
+    var k = V.chip, place = P.bulkPlace(p, k), st = P.status(p, k), amber = place === 'early' || place === 'late' ? place : '';
+    var meta = st === 'left' ? T('bulk.left', { n: P.need(p, k), why: T('why.' + (p.tr[k].why || 'weak')) })
+      : amber ? [{ text: T('day.n', { d: p.age }), tone: 'amber' }] : T('day.n', { d: p.age });
+    var chip = amber ? { text: T(amber === 'late' ? 'Late' : 'Early'), tone: 'amber' } : penChip(p);
+    var row = K.row({ id: p.code, chip: chip, headline: stepAmount(p, k), meta: meta, action: 'pen', value: p.code, trail: k === 'id' ? 'chevron' : '' });
+    if (k === 'id' || P.s.ended) return row;
+    var on = V.sel[p.code] != null;
+    return '<div class="sp-tickrow">' + row + '<label class="sp-tick"><input type="checkbox" data-action="tick" value="' + p.code + '"' + (on ? ' checked' : '') +
+      ' aria-label="' + esc(p.code) + '"></label></div>';
+  }
+  function chipFooter() {
+    if (V.chipDone) {
+      var undo = P.s.undo && P.s.undo.kind === 'bulk' ? UI.button({ label: T('undo'), register: 'secondary', action: 'chip-undo' }) : '';
+      return '<p class="sp-foot-receipt" role="status">' + esc(V.chipDone) + '</p><div class="tk-footer sp-two">' + undo +
+        UI.button({ label: T('done.btn'), register: 'primary', action: 'chip', value: '' }) + '</div>';
+    }
+    var tot = chipTotals();
+    var label = T('bulk.hold', { tr: trl(V.chip), p: T('pens.n', { n: tot.pens }), n: pigs(tot.n) });
+    return K.footer({ back: null, hold: { label: label, caption: T('bulk.caption'), action: 'bulk-commit', tone: 'primary', waiting: tot.pens === 0 },
+      status: { text: tot.pens ? label : T('bulk.none'), id: 'sp-bulk-status' } });
+  }
   function listScreen(inert) {
-    var all = P.pens(), done = all.filter(isDone), todo = all.filter(function (p) { return !isDone(p); });
-    var shown = V.lens === 'todo' ? todo : V.lens === 'done' ? done : all;
+    var all = P.pens(), done = all.filter(isDone), todo = all.filter(function (p) { return !isDone(p); }), ended = P.s.ended;
+    if (V.chip && !chipCounts().some(function (c) { return c.k === V.chip; }) && !V.chipDone) V.chip = '';
     var last = P.last();
     var body = K.latest(last ? { lead: T('last'), value: hm(last.at), rest: '· ' + last.who } : { lead: T('last.none') });
     if (V.flash && !V.pen) body += flashLine();
@@ -2772,13 +3042,12 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       body += '<div class="sp-note">' + K.warning({ tone: 'amber', text: T('note.clash', { Tr: tr(n.tr), pen: n.pen, who: n.who, t: hm(n.at) }),
         actions: UI.button({ label: T('ok'), register: 'text', action: 'note-ok', value: String(i) }) }) + '</div>';
     });
-    // the summary card: the treatment most pens need today | the task (pens done), the door to End
+    // the summary card: the first step on the plan with pens due today | the task (pens done), the door to End
     var best = { k: '', n: 0 };
-    P.PLAN.forEach(function (t) {
-      var n = all.filter(function (p) { return P.status(p, t.key) === 'due'; }).length;
-      if (n && !best.n) best = { k: t.key, n: n };
+    P.steps().forEach(function (k) {
+      var n = all.filter(function (p) { return P.status(p, k) === 'due'; }).length;
+      if (n && !best.n) best = { k: k, n: n };
     });
-    var ended = P.s.ended;
     var unit = ended ? { icon: 'treat', heading: T('sum.notdone'), value: String(todo.length), description: T('sum.pens', { n: todo.length }), support: T('batch', { b: P.BATCH.name }) }
       : { icon: 'treat', heading: best.n ? T('sum.due', { Tr: tr(best.k) }) : T('sum.none'), value: String(best.n),
         description: best.n ? T('sum.pens', { n: best.n }) : T('sum.nothing'), support: T('batch', { b: P.BATCH.name }) };
@@ -2788,18 +3057,30 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
         segments: [{ tone: 'done', share: done.length / all.length * 100 }, { tone: 'rest', share: 100 - done.length / all.length * 100 }], max: all.length, now: done.length,
         support: ended ? hm(ended.at) + ' · ' + ended.who : T('sum.end'), action: 'end', label: T('end.title') }
     });
-    body += K.lens({ action: 'lens', tabs: [
-      { text: T('lens.todo'), count: String(todo.length), value: 'todo', pressed: V.lens === 'todo' },
-      { text: T('lens.done'), count: String(done.length), value: 'done', pressed: V.lens === 'done' },
-      { text: T('lens.all'), count: String(all.length), value: 'all', pressed: V.lens === 'all' }] });
-    var groups = ['A', 'B'].map(function (r) {
-      var rows = shown.filter(function (p) { return p.row === r; });
-      if (!rows.length) return '';
-      return K.group({ title: T('row', { r: r }), face: 'word', meta: T('row.pens', { n: rows.length }), rows: rows.map(penRow) });
-    }).join('');
-    body += groups ? K.list(groups) : '<p class="sp-empty">' + esc(T(V.lens === 'done' ? 'empty.done' : 'empty.todo')) + '</p>';
-    var dock = ended ? '' : K.dock({ primary: { icon: 'treat', label: T('dock.bulk'), action: 'bulk' } });
-    return K.screen({ inert: inert, label: T('task'), header: K.header({ title: T('task'), back: null }), body: body, dock: dock });
+    var foot = '';
+    if (!ended) body += chipsRow();
+    if (V.chip && !ended) {
+      // the list filtered to the pens that need this step: inside the window first, then too early, then late
+      var order = { now: 0, early: 1, late: 2 };
+      var need = all.filter(function (p) { return P.bulkPlace(p, V.chip) !== 'done'; })
+        .sort(function (a, b) { return order[P.bulkPlace(a, V.chip)] - order[P.bulkPlace(b, V.chip)] || (a.code < b.code ? -1 : 1); });
+      var t = P.plan(V.chip);
+      body += '<p class="sp-chip-head">' + esc(tr(V.chip) + ' · ' + T('given.days', { a: t.from, b: t.to })) + '</p>';
+      if (V.chip === 'id') body += '<p class="sp-chip-tip">' + esc(T('chip.id.tip')) + '</p>';
+      body += need.length ? K.list(groupsBy(need, chipRow)) : '<p class="sp-empty">' + esc(T('chip.none')) + '</p>';
+      var nd = all.length - need.length;
+      if (nd) body += '<p class="sp-empty">' + esc(T('chip.done.in', { n: nd })) + '</p>';
+      if (V.chip !== 'id') foot = chipFooter();
+    } else {
+      var shown = V.lens === 'todo' ? todo : V.lens === 'done' ? done : all;
+      body += K.lens({ action: 'lens', tabs: [
+        { text: T('lens.todo'), count: String(todo.length), value: 'todo', pressed: V.lens === 'todo' },
+        { text: T('lens.done'), count: String(done.length), value: 'done', pressed: V.lens === 'done' },
+        { text: T('lens.all'), count: String(all.length), value: 'all', pressed: V.lens === 'all' }] });
+      var groups = groupsBy(shown, penRow);
+      body += groups ? K.list(groups) : '<p class="sp-empty">' + esc(T(V.lens === 'done' ? 'empty.done' : 'empty.todo')) + '</p>';
+    }
+    return K.screen({ inert: inert, label: T('task'), header: K.header({ title: T('task'), back: null }), body: body, dock: foot });
   }
 
   /* The receipt line after a save: what was recorded, and Undo while it is the last change */
@@ -2809,7 +3090,67 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     return '<div class="sp-flash" role="status"><span>' + esc(f.text) + '</span>' + undo + '</div>';
   }
 
-  /* ================= the pen sheet ================= */
+  /* ================= the pen sheet: facts, tools, and the pen's timeline by day ================= */
+  function doneLine(p, k) {
+    if (k === 'id') {
+      var r = newest(P.recs(p.code, scheme() === 'breeders' ? 'pick' : 'id'));
+      var what = scheme() === 'breeders' ? T('breeders.n', { n: P.breeders(p) }) : idWhat(p);
+      return { title: tr(k), meta: r ? [T('done.meta', { t: when(r), who: short(r.who), n: what })] : [what] };
+    }
+    var rs = P.recs(p.code, k), r2 = newest(rs), n = rs.reduce(function (s, x) { return s + x.n; }, 0);
+    var meta = r2 ? [T('done.meta', { t: when(r2), who: short(r2.who), n: pigs(n || p.tr[k].got) })] : [pigs(p.tr[k].got)];
+    if (rs.some(function (x) { return x.mark; })) meta.push(SEP, { text: T(rs.filter(function (x) { return x.mark; })[0].mark), tone: 'amber' });
+    var note = P.s.notes.filter(function (x) { return x.pen === p.code && x.tr === k; })[0];
+    if (note) meta.push(SEP, T('kept.note') + ' (' + hm(note.mine.at) + ')');
+    return { title: tr(k), meta: meta };
+  }
+  function openStep(p, k, ended) {
+    var st = P.status(p, k), t = P.plan(k), n = P.need(p, k), win = T('given.days', { a: t.from, b: t.to });
+    var meta;
+    if (k === 'id') meta = st === 'late' ? [{ text: T('late'), tone: 'amber' }, SEP, win, SEP, idWhat(p)] : [win, SEP, idWhat(p)];
+    else if (st === 'left') meta = [T('tl.given', { n: p.tr[k].got }), SEP, T('left', { n: n }), SEP, T('why.' + (p.tr[k].why || 'weak'))];
+    else meta = st === 'late' ? [{ text: T('late'), tone: 'amber' }, SEP, win, SEP, pigs(n)] : [win, SEP, pigs(n)];
+    var act = ended ? '' : k === 'id' ? UI.button({ label: T('id.act.' + scheme()), register: 'secondary', action: 'id-open', value: 'id' })
+      : UI.button({ label: T('record.n', { n: n }), register: 'secondary', action: 'one', value: k });
+    return '<div class="sp-step">' + '<button type="button" class="sp-step-main" data-action="' + (ended ? 'noop' : k === 'id' ? 'id-open' : 'treat') + '" data-value="' + k + '">' +
+      '<span class="sp-ring" aria-hidden="true"></span><span class="sp-step-copy"><strong>' + esc(tr(k)) + '</strong><small>' + metaHtml(meta) + '</small></span></button>' + act + '</div>';
+  }
+  function metaHtml(parts) {
+    return parts.map(function (x) {
+      if (x.sep) return '<span class="tk-sep">·</span>';
+      if (typeof x === 'object') return '<span class="tk-tone" data-tone="' + esc(x.tone) + '">' + esc(x.text) + '</span>';
+      return esc(x);
+    }).join('');
+  }
+  function timeline(p) {
+    var ended = !!P.s.ended, today = p.age, nodes = {};
+    var node = function (d) { return nodes[d] || (nodes[d] = { d: d, open: [], done: [], later: [] }); };
+    node(today); node(1);
+    P.steps().forEach(function (k) {
+      var st = P.status(p, k), d0 = P.plan(k).from;
+      if (st === 'done') node(d0).done.push(k);
+      else if (st === 'coming') node(d0).later.push(k);
+      else node(today).open.push(k);
+    });
+    var days = Object.keys(nodes).map(Number).sort(function (a, b) { return a - b; });
+    var html = days.map(function (d) {
+      var n = nodes[d], isToday = d === today, part = '';
+      var head = isToday ? '<span class="sp-tl-today">' + esc(T('tl.today', { d: d })) + '</span>' : '<span class="sp-tl-day">' + esc(T('tl.day', { d: d })) + '</span>';
+      if (d === 1) part += '<p class="sp-tl-line">' + esc(T('tl.born', { n: p.born })) + '</p>';
+      if (n.open.length) part += '<div class="sp-steps">' + n.open.map(function (k) { return openStep(p, k, ended); }).join('') + '</div>';
+      if (n.done.length) {
+        var exp = !!V.open[d];
+        part += '<button type="button" class="sp-tl-done" data-action="tl-toggle" data-value="' + d + '" aria-expanded="' + exp + '">' +
+          '<span class="sp-tick-disc" aria-hidden="true">' + I('check') + '</span><span>' + esc(T('tl.done', { n: n.done.length })) + '</span>' +
+          '<span class="sp-tl-names">' + esc(n.done.map(tr).join(' · ')) + '</span>' + I('chevron') + '</button>';
+        if (exp) part += '<ul class="sp-tl-list">' + n.done.map(function (k) { var x = doneLine(p, k); return '<li><strong>' + esc(x.title) + '</strong><small>' + metaHtml(x.meta) + '</small></li>'; }).join('') + '</ul>';
+      }
+      if (n.later.length) part += '<ul class="sp-tl-later">' + n.later.map(function (k) { var t = P.plan(k); return '<li><strong>' + esc(tr(k)) + '</strong><small>' + esc(T('given.days', { a: t.from, b: t.to })) + '</small></li>'; }).join('') + '</ul>';
+      var w = isToday ? 'today' : d < today ? 'past' : 'future';
+      return '<li class="sp-tl-node" data-when="' + w + '"><div class="sp-tl-head">' + head + '</div>' + part + '</li>';
+    }).join('');
+    return '<ol class="sp-tl" aria-label="' + esc(T('task')) + '">' + html + '</ol>';
+  }
   function penSheet(inert) {
     var p = pen(), ended = !!P.s.ended, body = '';
     if (V.flash && V.flash.pen === p.code) body += flashLine();
@@ -2822,41 +3163,16 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     if (p.movedIn) lines.push('<span>' + esc(T('line.in', { n: p.movedIn })) + '</span>');
     if (lines.length) body += '<p class="sp-lines">' + lines.join(' ') + '</p>';
     if (!ended) {
-      body += '<div class="sp-toolrow">' + [['death', 'alert', 'tool.death'], ['move', 'transfer', 'tool.move'], ['count', 'edit', 'tool.count']].map(function (x) {
-        return '<button type="button" class="sp-tool" data-action="tool" data-value="' + x[0] + '">' + I(x[1]) + '<span>' + esc(T(x[2])) + '</span></button>';
+      var tools = [['death', 'alert', 'tool.death'], ['move', 'transfer', 'tool.move'], ['count', 'edit', 'tool.count']];
+      if (P.hasId()) tools.push(['id', 'bookmark', 'tool.id']);
+      body += '<div class="sp-toolrow" data-count="' + tools.length + '">' + tools.map(function (x) {
+        return '<button type="button" class="sp-tool" data-action="' + (x[0] === 'id' ? 'id-open' : 'tool') + '" data-value="' + x[0] + '">' + I(x[1]) + '<span>' + esc(T(x[2])) + '</span></button>';
       }).join('') + '</div>';
     }
-    // Today: what is due now, late, or left from before — each with its one-tap
-    var td = P.todo(p);
-    if (td.length) {
-      body += K.day({ title: T(ended ? 'sec.notgiven' : 'sec.today'), status: T('sec.today.status', { d: p.age }), items: td.map(function (k) {
-        var st = P.status(p, k), t = P.plan(k), n = P.need(p, k);
-        var meta = st === 'left' ? [T('left', { n: n }), SEP, T('why.' + (p.tr[k].why || 'weak'))]
-          : st === 'late' ? [{ text: T('late'), tone: 'amber' }, SEP, T('given.days', { a: t.from, b: t.to }), SEP, pigs(n)]
-          : [T('given.days', { a: t.from, b: t.to }), SEP, pigs(n)];
-        return { title: tr(k), meta: meta, mark: 'due', action: ended ? 'noop' : 'treat', value: k, id: 'sp-' + p.code + '-' + k,
-          act: ended ? null : { label: T('record.n', { n: n }), action: 'one', value: k } };
-      }) });
-    }
-    // Done: a tick with time and who
-    var given = treatRecs(p.code).sort(function (a, b) { return a.at - b.at; });
-    if (given.length) {
-      body += K.day({ title: T('sec.done'), items: given.map(function (r) {
-        var meta = [T('done.meta', { t: when(r), who: short(r.who), n: pigs(r.n) })];
-        if (r.mark) meta.push(SEP, { text: T(r.mark), tone: 'amber' });
-        var note = P.s.notes.filter(function (n) { return n.pen === r.pen && n.tr === r.tr; })[0];
-        if (note) meta.push(SEP, T('kept.note') + ' (' + hm(note.mine.at) + ')');
-        return { title: tr(r.tr), meta: meta, mark: 'done', action: 'noop', value: r.id };
-      }) });
-    }
-    var c = P.coming(p);
-    if (c.length) {
-      body += K.day({ title: T('sec.coming'), items: c.map(function (k) {
-        var t = P.plan(k);
-        return { title: tr(k), meta: [T('coming.meta', { d: t.from }), SEP, T('given.days', { a: t.from, b: t.to })], mark: '', action: 'noop', value: k };
-      }) });
-    }
-    return K.drawer({ title: p.code, subtitle: T('sheet.sub', { d: p.age, r: p.row }), size: 'long', height: 'full', view: 'pen', inert: inert, close: null,
+    body += timeline(p);
+    var sub = [T('sheet.sub', { d: p.age, r: p.row })];
+    if (P.hasId() && P.breeders(p)) sub.push(SEP, { text: T('breeders.n', { n: P.breeders(p) }), tone: 'green' });
+    return K.drawer({ title: p.code, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: null,
       body: body, footer: K.footer({ back: { action: 'back', label: T('back') } }) });
   }
 
@@ -2877,6 +3193,33 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('record.n', { n: d.n }), action: 'treat-save', register: 'primary', waiting: !ready } }) });
   }
 
+  /* ---- ID: one piglet at a time — number (the next one suggested), boar or gilt, weight, keep for breeding ---- */
+  function idPage() {
+    var p = pen(), f = V.idf, br = scheme() === 'breeders', next = P.nextNo(p.code), body = '';
+    if (f.flash) {
+      var undo = P.s.undo && P.s.undo.kind === 'id' ? UI.button({ label: T('undo'), register: 'text', action: 'id-undo' }) : '';
+      body += '<div class="sp-flash" role="status"><span>' + esc(f.flash) + '</span>' + undo + '</div>';
+    }
+    var used = f.no && P.taken(f.no);
+    body += '<div class="sp-idno"><label class="field"><span>' + esc(T(scheme() === 'notch' ? 'id.no.notch' : 'id.no.tag')) + '</span>' +
+      '<input id="sp-id-no" inputmode="' + (scheme() === 'notch' ? 'text' : 'numeric') + '" autocomplete="off" value="' + esc(f.no) + '"' + (used ? ' aria-invalid="true" aria-describedby="sp-id-used"' : '') + '></label>' +
+      (f.no === next ? '' : UI.button({ label: T('id.use', { no: next }), register: 'secondary', action: 'id-use', value: next })) + '</div>';
+    if (used) body += '<p class="sp-warn" id="sp-id-used">' + esc(T('id.taken', { no: f.no })) + '</p>';
+    body += K.radios({ layout: 'row', label: T('id.sex'), action: 'id-sex', key: 'sex', selected: f.sex, options: [{ value: 'boar', label: T('boar') }, { value: 'gilt', label: T('gilt') }] });
+    body += '<label class="field sp-kg"><span>' + esc(T('id.kg')) + ' <small>' + esc(T('optional')) + '</small></span><input id="sp-id-kg" inputmode="decimal" autocomplete="off" value="' + esc(f.kg) + '"></label>';
+    if (!br) body += K.radios({ layout: 'row', label: T('id.keep'), action: 'id-keep', key: 'keep', selected: f.keep ? 'yes' : 'no', options: [{ value: 'no', label: T('no') }, { value: 'yes', label: T('yes') }] });
+    if (br && !p.picked) body += UI.button({ label: T('id.done.pick', { n: P.breeders(p) }), register: 'secondary', action: 'pick-done', className: 'sp-wide' });
+    // the piglets with an ID in this pen, newest first; breeders carry a chip
+    var rows = p.ids.slice().reverse().map(function (x) {
+      return K.row({ id: x.no, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
+        meta: (sameDay(x.at) ? hm(x.at) : '') + (sameDay(x.at) ? ' · ' : '') + short(x.who), still: true, trail: '' });
+    });
+    body += K.list([K.group({ title: T('id.list'), face: 'word', meta: '· ' + idWhat(p), rows: rows.length ? rows : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>' })]);
+    var ready = f.no && !used && f.sex;
+    return K.page({ title: tr('id'), description: T('id.page.sub', { pen: p.code, d: p.age, what: idWhat(p) }), view: 'id', body: body,
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('id.save'), action: 'id-save', register: 'primary', waiting: !ready } }) });
+  }
+
   /* ---- record death ---- */
   var CAUSES = ['crushed', 'scours', 'starve', 'other'];
   function deathSheet() {
@@ -2892,6 +3235,11 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   }
 
   /* ---- move piglets: the other pen (same batch), how many, and for what was given here: had it? ---- */
+  function moveAsks(p) {
+    var ks = P.PLAN.filter(function (t) { return p.tr[t.key].got > 0; }).map(function (t) { return t.key; });
+    if ((scheme() === 'tag' || scheme() === 'notch') && P.idCount(p) > 0) ks.push('id');
+    return ks;
+  }
   function movePage() {
     var p = pen(), d = V.move;
     var others = P.pens().filter(function (o) { return P.sameBatch(p, o); });
@@ -2901,14 +3249,12 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
           '<strong>' + o.code + '</strong><small>' + esc(T('day.n', { d: o.age })) + '</small></button>';
       }).join('') + '</div></section>';
     body += stepper('move', T('move.how'), d.n, { min: 1, max: p.alive, variant: 'hero', hint: '' });
-    P.PLAN.forEach(function (t) {
-      if (p.tr[t.key].got > 0) {
-        body += K.radios({ layout: 'row', label: T('move.had', { tr: trl(t.key) }), action: 'had', key: t.key, selected: d.had[t.key] == null ? '' : d.had[t.key] ? 'yes' : 'no',
-          options: [{ value: 'no', label: T('no') }, { value: 'yes', label: T('yes') }] });
-      }
+    var asks = moveAsks(p);
+    asks.forEach(function (k) {
+      body += K.radios({ layout: 'row', label: k === 'id' ? T('move.hadid.' + scheme()) : T('move.had', { tr: trl(k) }), action: 'had', key: k,
+        selected: d.had[k] == null ? '' : d.had[k] ? 'yes' : 'no', options: [{ value: 'no', label: T('no') }, { value: 'yes', label: T('yes') }] });
     });
-    var asked = P.PLAN.filter(function (t) { return p.tr[t.key].got > 0; });
-    var ready = d.to && d.n > 0 && asked.every(function (t) { return d.had[t.key] != null; });
+    var ready = d.to && d.n > 0 && asks.every(function (k) { return d.had[k] != null; });
     return K.page({ title: T('move.title'), description: T('move.sub', { pen: p.code, n: p.alive }), view: 'move', body: body,
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('move.save', { n: pigs(d.n) }), action: 'move-save', register: 'primary', waiting: !ready } }) });
   }
@@ -2925,68 +3271,13 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'count-save', register: 'primary', waiting: d.n === p.alive } }) });
   }
 
-  /* ================= bulk: one treatment over several pens ================= */
-  function bulkPick() {
-    var items = P.PLAN.map(function (t) {
-      var n = P.pens().filter(function (p) { return P.status(p, t.key) === 'due'; }).length;
-      return { title: tr(t.key), description: n ? T('bulk.pens.now', { n: n }) : T('bulk.pens.none'), action: 'bulk-tr', value: t.key };
-    });
-    return K.drawer({ title: T('bulk.title'), subtitle: T('bulk.pick'), size: 'long', view: 'bulk-pick', close: null, body: K.doors({ items: items }),
-      footer: K.footer({ back: { action: 'back', label: T('back') } }) });
-  }
-  function bulkStart(k) {
-    var sel = {};
-    P.pens().forEach(function (p) { if (P.status(p, k) === 'due') sel[p.code] = ''; });
-    V.bulk = { step: 'list', k: k, sel: sel };
-  }
-  function bulkTotals() {
-    var b = V.bulk, codes = Object.keys(b.sel), n = 0;
-    codes.forEach(function (c) { n += P.need(P.s.pens[c], b.k); });
-    return { pens: codes.length, n: n };
-  }
-  function bulkPage() {
-    var b = V.bulk, k = b.k, t = P.plan(k), place = { now: [], early: [], late: [], done: [] };
-    P.pens().forEach(function (p) { place[P.bulkPlace(p, k)].push(p); });
-    function tick(p, amber) {
-      var on = b.sel[p.code] != null, st = P.status(p, k), n = P.need(p, k);
-      var meta = st === 'left' ? T('bulk.left', { n: n, why: T('why.' + (p.tr[k].why || 'weak')) }) : amber ? [{ text: T('day.n', { d: p.age }), tone: 'amber' }] : T('day.n', { d: p.age });
-      return K.row({ id: p.code, chip: amber ? { text: T(amber === 'late' ? 'Late' : 'Early'), tone: 'amber' } : null, headline: pigs(n), meta: meta,
-        trail: 'tick', tick: { action: 'tick', value: p.code, checked: on, label: p.code } });
-    }
-    function done(p) {
-      var r = newest(P.recs(p.code, k));
-      return K.row({ id: p.code, chip: { text: T('g.done'), tone: 'green' }, headline: r ? T('done.at', { t: when(r) }) : T('all.given'), tone: 'forecast',
-        meta: r ? short(r.who) + ' · ' + pigs(r.n) : '', still: true, trail: '' });
-    }
-    var g = function (key, rows) { return rows.length ? K.group({ title: T('g.' + key), face: 'word', meta: T('row.pens', { n: rows.length }), rows: rows }) : ''; };
-    var body = K.list([
-      g('now', place.now.map(function (p) { return tick(p, ''); })),
-      g('early', place.early.map(function (p) { return tick(p, 'early'); })),
-      g('late', place.late.map(function (p) { return tick(p, 'late'); })),
-      g('done', place.done.map(done))]);
-    var tot = bulkTotals();
-    var label = T('bulk.hold', { tr: trl(k), p: T('pens.n', { n: tot.pens }), n: pigs(tot.n) });
-    return K.page({ title: T('bulk.page', { tr: tr(k) }), description: T('bulk.window', { a: t.from, b: t.to }), view: 'bulk', body: body, inert: !!V.confirm,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, hold: { label: label, caption: T('bulk.caption'), action: 'bulk-commit', tone: 'primary', waiting: tot.pens === 0 },
-        status: { text: tot.pens ? label : T('bulk.none'), id: 'sp-bulk-status' } }) });
-  }
+  /* ---- ticking a pen outside the window asks once ---- */
   function confirmDialog() {
-    var c = V.confirm, p = P.s.pens[c.pen], t = P.plan(V.bulk.k);
+    var c = V.confirm, p = P.s.pens[c.pen], t = P.plan(V.chip);
     return K.dialog({ icon: 'alert', title: T('confirm.title'),
       description: T('confirm.text', { pen: p.code, d: p.age, Tr: tr(t.key), a: t.from, b: t.to, mark: T(c.mark) }),
       footer: '<div class="tk-footer sp-two">' + UI.button({ label: T('cancel'), register: 'secondary', action: 'confirm-no' }) +
         UI.button({ label: T('confirm.ok'), register: 'primary', action: 'confirm-yes' }) + '</div>' });
-  }
-  function bulkReceipt() {
-    var b = V.bulk, n = b.recs.reduce(function (s, r) { return s + r.n; }, 0);
-    var rows = b.recs.map(function (r) {
-      return K.row({ id: r.pen, chip: r.mark ? { text: T(r.mark === 'late' ? 'Late' : 'Early'), tone: 'amber' } : null, headline: pigs(r.n), meta: T('day.n', { d: r.day }), still: true, trail: '' });
-    });
-    var body = K.receipt({ title: T('receipt.title', { Tr: tr(b.k) }), meta: [T('receipt.line', { p: T('pens.n', { n: b.recs.length }), n: pigs(n) }), SEP, T('receipt.meta', { t: hm(b.at), who: P.ME })] }) +
-      K.list([K.group({ title: tr(b.k), face: 'word', meta: T('row.pens', { n: rows.length }), rows: rows })]);
-    var undo = P.s.undo && P.s.undo.kind === 'bulk' ? UI.button({ label: T('undo'), register: 'secondary', action: 'bulk-undo' }) : '';
-    return K.page({ title: T('receipt.title', { Tr: tr(b.k) }), view: 'bulk-receipt', body: body,
-      footer: '<div class="tk-footer sp-two">' + undo + UI.button({ label: T('done.btn'), register: 'primary', action: 'bulk-close' }) + '</div>' });
   }
 
   /* ================= End task (the supervisor) ================= */
@@ -2998,7 +3289,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       segments: [{ tone: 'done', share: d / all.length * 100 }, { tone: 'rest', share: notDone.length / all.length * 100 }], max: all.length, now: d });
     if (notDone.length) {
       body += K.list([K.group({ title: T(ended ? 'sec.notgiven' : 'end.notdone'), face: 'word', meta: T('row.pens', { n: notDone.length }), rows: notDone.map(function (p) {
-        return K.row({ id: p.code, headline: P.todo(p).map(tr).join(' · '), meta: ended ? '' : todoMeta(p), still: true, trail: '' });
+        return K.row({ id: p.code, headline: P.todo(p).map(chipName).join(' · '), meta: ended ? '' : todoMeta(p), still: true, trail: '' });
       }) })]);
     }
     var soon = all.filter(function (p) { return P.coming(p).length; });
@@ -3020,21 +3311,21 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     phone.querySelectorAll('.tk-scroll, .tk-sheet-body, .tk-page-body').forEach(function (el) {
       var host = el.closest('[data-view]'); keep[(host ? host.getAttribute('data-view') : 'list') + el.className] = el.scrollTop;
     });
-    var focusSel = null, a = document.activeElement;
+    var focusSel = null, a = document.activeElement, caret = null;
     if (a && phone.contains(a)) {
       if (a.id) focusSel = '#' + CSS.escape(a.id);
       else if (a.getAttribute('data-action')) focusSel = '[data-action="' + a.getAttribute('data-action') + '"][data-value="' + (a.getAttribute('data-value') || '') + '"]';
+      if (a.tagName === 'INPUT' && a.type !== 'checkbox') caret = a.selectionStart;
     }
-    var over = !!(V.pen || V.bulk || V.end);
+    var over = !!(V.pen || V.end || V.confirm);
     var html = K.statusbar() + listScreen(over);
-    if (V.pen) html += penSheet(!!(V.over || V.bulk || V.end));
+    if (V.confirm) html += confirmDialog();
+    if (V.pen) html += penSheet(!!(V.over || V.end));
     if (V.pen && V.over === 'treat') html += treatSheet();
     if (V.pen && V.over === 'death') html += deathSheet();
     if (V.pen && V.over === 'count') html += countSheet();
     if (V.pen && V.over === 'move') html += movePage();
-    if (V.bulk && V.bulk.step === 'pick') html += bulkPick();
-    if (V.bulk && V.bulk.step === 'list') html += bulkPage() + (V.confirm ? confirmDialog() : '');
-    if (V.bulk && V.bulk.step === 'receipt') html += bulkReceipt();
+    if (V.pen && V.over === 'id') html += idPage();
     if (V.end) html += endPage();
     phone.innerHTML = html;
     phone.querySelectorAll('.tk-scroll, .tk-sheet-body, .tk-page-body').forEach(function (el) {
@@ -3043,17 +3334,24 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     });
     if (V.pageTop) { phone.querySelectorAll('.tk-page-body').forEach(function (x) { x.scrollTop = 0; }); V.pageTop = false; }
     if (V.toTop) { var sc = phone.querySelector('.tk-scroll'); if (sc) sc.scrollTop = 0; V.toTop = false; }
-    if (focusSel) { var f = phone.querySelector(focusSel); if (f && f.focus) f.focus({ preventScroll: true }); }
+    if (focusSel) {
+      var f = phone.querySelector(focusSel);
+      if (f && f.focus) { f.focus({ preventScroll: true }); if (caret != null && f.setSelectionRange) try { f.setSelectionRange(caret, caret); } catch (e) { /* not a text input */ } }
+    }
     renderDemo();
   }
 
-  /* ---- outside the phone: language, reset, the other phone ---- */
+  /* ---- outside the phone: the farm's ID setting, language, the other phone, reset ---- */
   function renderDemo() {
     demo.setAttribute('data-open', V.demoOpen ? 'true' : 'false');
     demo.innerHTML = '<button type="button" class="sp-demo-toggle" data-demo="toggle" aria-expanded="' + !!V.demoOpen + '">' + esc(T('demo.open')) + '</button>' +
       '<div class="sp-demo-panel"><div class="sp-demo-lang" role="group" aria-label="' + esc(T('demo.lang')) + '">' +
       '<button type="button" data-demo="lang" data-value="en" aria-pressed="' + (L.lang === 'en') + '">en</button>' +
       '<button type="button" data-demo="lang" data-value="zh" aria-pressed="' + (L.lang === 'zh') + '">中文</button></div>' +
+      '<div class="sp-demo-farm" role="radiogroup" aria-label="' + esc(T('demo.farm')) + '"><p class="sp-demo-label">' + esc(T('demo.farm')) + '</p>' +
+      P.SCHEMES.map(function (s) {
+        return '<button type="button" role="radio" data-demo="scheme" data-value="' + s + '" aria-checked="' + (scheme() === s) + '"><span class="sp-demo-dot" aria-hidden="true"></span>' + esc(T('scheme.' + s)) + '</button>';
+      }).join('') + '<p class="sp-demo-tip">' + esc(T('demo.farm.note')) + '</p></div>' +
       '<button type="button" class="sp-demo-btn" data-demo="other">' + esc(T('demo.other')) + '</button>' +
       '<p class="sp-demo-tip">' + esc(T('demo.tip')) + '</p>' +
       (V.demoMsg ? '<p class="sp-demo-msg" role="status">' + esc(V.demoMsg) + '</p>' : '') +
@@ -3065,7 +3363,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     V.demoMsg = '';
     if (w === 'toggle') { V.demoOpen = !V.demoOpen; renderDemo(); return; }
     if (w === 'lang') L.setLang(b.getAttribute('data-value'));
-    if (w === 'reset') { P.reset(); V = { lens: 'todo', pen: null, over: null, bulk: null, confirm: null, end: null, flash: null, demoOpen: V.demoOpen }; }
+    if (w === 'reset') { P.reset(); V = fresh(V); }
+    if (w === 'scheme') { P.setScheme(b.getAttribute('data-value')); V = fresh(V); }
     if (w === 'other') {
       var r = P.otherPhone();
       if (r.kind === 'arrived') { V.flash = { text: T('note.arrived', { who: P.OTHER, tr: trl('iron'), pen: 'A05', t: hm(r.at) }) }; if (V.pen) V.flash.pen = V.pen; }
@@ -3080,33 +3379,33 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   /* ================= what a tap does ================= */
   function closeTop() {
     if (V.confirm) V.confirm = null;
-    else if (V.bulk) V.bulk = V.bulk.step === 'list' ? { step: 'pick' } : null;
     else if (V.end) V.end = null;
     else if (V.over) V.over = null;
-    else if (V.pen) { V.pen = null; V.flash = null; }
+    else if (V.pen) { V.pen = null; V.flash = null; V.open = {}; }
   }
   function saved(text) { V.flash = { pen: V.pen, text: text, undo: true }; }
+  function idBlank(f) { return { no: '', sex: '', kg: '', keep: scheme() === 'breeders', flash: f || '' }; }
   function act(a, v, el) {
     var p = V.pen ? pen() : null;
     switch (a) {
       case 'lens': V.lens = v; break;
-      case 'pen': V.pen = v; V.flash = null; break;
+      case 'chip': chipStart(V.chip === v && v ? '' : v); V.toTop = false; break;
+      case 'pen': V.pen = v; V.flash = null; V.open = {}; break;
       case 'dismiss': case 'back': closeTop(); break;
       case 'noop': return;
       case 'end': V.end = true; break;
-      case 'bulk': V.bulk = { step: 'pick' }; break;
-      case 'bulk-tr': bulkStart(v); break;
       case 'tick': {
-        var place = P.bulkPlace(P.s.pens[v], V.bulk.k);
-        if (V.bulk.sel[v] != null) delete V.bulk.sel[v];
+        var place = P.bulkPlace(P.s.pens[v], V.chip);
+        V.chipDone = null;
+        if (V.sel[v] != null) delete V.sel[v];
         else if (place === 'early' || place === 'late') { el.checked = false; V.confirm = { pen: v, mark: place }; }
-        else V.bulk.sel[v] = '';
+        else V.sel[v] = '';
         break;
       }
-      case 'confirm-yes': V.bulk.sel[V.confirm.pen] = V.confirm.mark; V.confirm = null; break;
+      case 'confirm-yes': V.sel[V.confirm.pen] = V.confirm.mark; V.confirm = null; break;
       case 'confirm-no': V.confirm = null; break;
-      case 'bulk-undo': P.undo(); V.bulk = null; V.flash = { text: T('undone') }; break;
-      case 'bulk-close': V.bulk = null; break;
+      case 'chip-undo': P.undo(); V.chipDone = null; chipStart(V.chip); break;
+      case 'tl-toggle': V.open[v] = !V.open[v]; break;
       case 'one': {
         var n1 = P.need(p, v);
         P.treat(p.code, v, n1);
@@ -3135,6 +3434,21 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
         if (v === 'move') V.move = { to: '', n: 1, had: {} };
         if (v === 'count') V.count = { n: p.alive, why: 'unsure' };
         break;
+      case 'id-open': V.over = 'id'; V.idf = idBlank(); V.pageTop = true; break;
+      case 'id-use': V.idf.no = v; break;
+      case 'id-sex': V.idf.sex = v; break;
+      case 'id-keep': V.idf.keep = v === 'yes'; break;
+      case 'id-save': {
+        var f = V.idf, x = P.identify(p.code, { no: f.no, sex: f.sex, kg: f.kg, keep: f.keep });
+        V.idf = idBlank(T('id.recorded', { no: x.no }) + (x.keep ? ' · ' + T('breeder') : ''));
+        break;
+      }
+      case 'id-undo': P.undo(); V.idf = idBlank(T('undone')); break;
+      case 'pick-done': {
+        var nb = P.donePicking(p.code);
+        V.over = null; saved(T('flash.pick', { n: T('breeders.n', { n: nb }) }));
+        break;
+      }
       case 'miss': V.death.miss = v; break;
       case 'death-save': {
         var k = P.death(p.code, V.death.c, V.death.miss === 'yes');
@@ -3142,7 +3456,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
         break;
       }
       case 'move-to': V.move.to = v; break;
-      case 'had': { var f = el.closest('[data-field]'); V.move.had[f.getAttribute('data-field')] = v === 'yes'; break; }
+      case 'had': { var fl = el.closest('[data-field]'); V.move.had[fl.getAttribute('data-field')] = v === 'yes'; break; }
       case 'move-save': {
         var m = V.move;
         P.move(p.code, m.to, m.n, m.had);
@@ -3168,19 +3482,26 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     if (UI.guard(el)) return;
     act(el.getAttribute('data-action'), el.getAttribute('data-value') != null ? el.getAttribute('data-value') : el.value, el);
   });
+  // typing in the ID fields
+  phone.addEventListener('input', function (e) {
+    if (!V.idf) return;
+    if (e.target.id === 'sp-id-no') { V.idf.no = e.target.value.trim(); render(); }
+    if (e.target.id === 'sp-id-kg') { V.idf.kg = e.target.value.replace(',', '.').replace(/[^0-9.]/g, ''); }
+  });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && (V.pen || V.bulk || V.end)) { closeTop(); render(); }
+    if (e.key === 'Escape' && (V.pen || V.end || V.confirm)) { closeTop(); render(); }
   });
   var holds = K.holdBind(phone, { onCommit: function (b) {
     var a = b.getAttribute('data-action');
     setTimeout(function () {
       holds.settle(b, 'done');
       if (a === 'bulk-commit') {
-        var bk = V.bulk, picks = Object.keys(bk.sel).sort().map(function (c) { return { pen: c, mark: bk.sel[c] }; });
-        var recs = P.bulk(bk.k, picks);
-        V.bulk = { step: 'receipt', k: bk.k, recs: recs || [], at: Date.now() };
+        var picks = Object.keys(V.sel).sort().map(function (c) { return { pen: c, mark: V.sel[c] }; });
+        var recs = P.bulk(V.chip, picks) || [], n = recs.reduce(function (s, r) { return s + r.n; }, 0);
+        V.sel = {};
+        V.chipDone = T('flash.bulk', { Tr: tr(V.chip), tr: trl(V.chip), p: T('pens.n', { n: recs.length }), n: pigs(n) });
       }
-      if (a === 'end-commit') { P.end(); V.pageTop = true; }
+      if (a === 'end-commit') { P.end(); V.pageTop = true; V.chip = ''; }
       render();
     }, 250);
   } });
