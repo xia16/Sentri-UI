@@ -117,14 +117,19 @@ The design lint (`.claude/skills/design-drive/scripts/design_lint.mjs`, outside 
 
 On the reference they report: Finish farrowing (footer 144px above the edge, 144px dead space), Filter sows (148px dead space), Correct born (footer inside 28px of padding; the scrim live under the dialog). On processing today: the room's dock over the list, and every drawer page whose background is not inert.
 
-## Open questions (owner)
+## Owner questions
 
-1. **Litter as a drawer or a page?** Farrowing opens a sow as a drawer over the room; processing opens a litter as its own page with a litter header, and every drawer rises over that page. The skeleton supports both (TaskSheet, TaskPage). Parity says drawer; processing's litter carries more (treatments by day), and farrowing's own *Piglet processing* page is a page. Which anchors the litter?
-2. **Chips or status words?** Farrowing's rows carry filled, bordered chips (`Active`, `Done`, `Sow died`); the README says status words are coloured text with a 4px dot, never filled badges. The skeleton draws farrowing's chip. Keep it (and amend the law), or draw the Status word?
-3. **A lone Back:** farrowing fills it in `ink` (the primary's face). Keep, or outline it like every other Back?
-4. **Hold caption:** the ruled 11px/700 sentence case (skeleton) or farrowing's 9px capitals?
+Answered by owner round 5 (RULINGS, *Piglet processing · Round 5*, 2026-09-30):
+
+1. **Litter as a drawer or a page?** A drawer over the room, like a sow in farrowing; a treatment opens in the same drawer.
+2. **Chips or status words?** Farrowing's filled chips. The README law is revisited later for both tasks together.
+3. **A lone Back:** filled in `ink`, as farrowing.
+4. **Hold caption:** farrowing's 9px capitals (see decision 4 and *Round 5 additions*).
+
+Still open, for the review page at close:
+
 5. **The candidate tokens** above, and the colour snaps in *Decision 3*.
-6. **Full-bleed status bar:** the simulated status bar stays at phone width (so a phone screenshot matches the frame pixel for pixel). A real phone has its own; drop it at phone width?
+6. **Full-bleed status bar:** kept at phone width (driver's default, so phone screenshots match the frame); a real phone has its own.
 
 ## Adoption
 
