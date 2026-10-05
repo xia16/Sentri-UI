@@ -96,6 +96,13 @@ Parity review round 2 (fix-brief-2, items 2–7). Additive, except that TaskWarn
 - Candidate tokens: `banner-wash` #fff5df, `banner-border` #efdbb0, `dock-caption` 9px (below the floor by ruling).
 - Demo pairs: `?screen=end`, `?screen=receipt`, `?screen=care`; the room screen's dock now carries the place control.
 
+## Chips round (proto/simple)
+
+The simple piglet-processing prototype (`ux/tasks/piglet-processing/simple/`, owner feedback round 2) filters its pen list by the job due today instead of by lens tabs. Farrowing has no chips, so this is a **new pattern**, built only from farrowing's faces. Additive.
+- **[TaskChips](../components/TaskChips/README.md)** (`SentriTask.chips`): one scrolling row of single-choice chips, `All · Iron 4 · … · Done 3`. The chip is farrowing's segment (`well`, 1px `line`, `radius-segment`), and the chosen chip is its pressed segment (`paper`, `ink` 500, the segment shadow). Each chip is a 44px target with the count inside it in mono. The row is a `radiogroup`: one tab stop, arrow keys through `SentriUI.radioBind`. A trailing gutter spacer and an edge fade mean the last chip is never cut. Tokens only (no new token).
+- **Sheet and page motion:** `data-enter` / `data-leave` on a sheet (rises from the bottom edge), a page (slides in from the right), a scrim or a dialog backdrop (fades). The duration is 240ms in and 180ms out. Farrowing's reference has no sheet animation to measure, so the curve is farrowing's own arrival curve, `cubic-bezier(.22,1,.36,1)`. Off under `prefers-reduced-motion`. The host sets `data-enter` only on the render that opens an overlay, so a re-render never replays it.
+- Open for the owner: chips vs. lens tabs as the room's filter in farrowing too (decided per task for now).
+
 ## Candidate tokens
 
 In `tokens.json` with usage "Candidate (task skeleton, fix/skeleton, ADR 0003) — not approved", generated into `tokens.css`. They carry farrowing's measured values that no token held.
