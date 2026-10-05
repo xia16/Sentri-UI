@@ -28,6 +28,8 @@
    cancelled), and the row is that Edit row's height, so label + stamp fit the compact row (pitch 71, was 91). */
 .ed-group[data-mark] + .ed-group[data-mark] { margin-top: calc(-1 * var(--space-heading)); border-top: 1px solid var(--line); }
 .ed-group[data-mark] > .tk-stepper[data-face="row"] { min-height: calc(var(--entry-row-min) + var(--space-key-gap) / 2); }
+/* the correction card pins under the sheet's header and takes the body's top gutter with it, so rows never show above it */
+.ed-sticky { position: sticky; top: -18px; z-index: 3; margin: -18px calc(-1 * var(--space-gutter-sheet)) 0; padding: 18px var(--space-gutter-sheet) var(--space-heading); background: var(--paper); }
 .ed-pad .st-status-line { margin: 0 0 var(--space-key-gap); }
 .ed-pad { flex: none; padding: var(--space-row-y) var(--space-gutter-sheet); background: var(--paper); border-top: 1px solid var(--line); }
 /* A record-page entry's change lines, moved right under its title (see logHtml): colour on the value, the words ink. */
@@ -93,6 +95,8 @@
     // RULINGS round 3: a mistaken count is corrected through Edit (withdrawn here); the record page shows the correction
     'edit-count':             { view: 'edit', data: 'explain', crate: 'B06', lead: 'counts', draft: { counts: { 'C-B06-loss': { void: true } } } },
     'record-page-count':      { view: 'record', data: 'b06-count-corrected', crate: 'B06' },
+    // R3-18: the weigh-day litter weight is a record of the litter, on its day
+    'record-page-weight':     { view: 'record', data: 'base', crate: 'B04' },
     // R1-7: deaths are listed; one recorded by mistake is withdrawn, one on the wrong litter moves; a tagged one only withdraws
     'edit-deaths':            { view: 'edit', data: 'held-body', crate: 'A07', lead: 'deaths' },
     'edit-death-void':        { view: 'edit', data: 'count-offline', crate: 'A07', lead: 'deaths', draft: { deaths: { 'D-A07-gh': { void: true } } } },
@@ -138,7 +142,53 @@
   function L(c) { return store.derived.litters[c || crate]; }
   function stamp() { return { id: 'edit-draft', at: null, who: ME }; }
   var memo = { k: '', v: null };
-  function E() { var k = JSON.stringify(draft) + store.events.length; if (memo.k !== k) memo = { k: k, v: store.select.edit(store.derived, crate, draft, stamp()) }; return memo.v; }
+  function E() {
+    var k = JSON.stringify(draft) + store.events.length;
+    if (memo.k !== k) { var e = store.select.edit(store.derived, crate, ledgerDraft(), stamp()); liveDeaths(e); memo = { k: k, v: e }; }
+    return memo.v;
+  }
+  /* Deaths whose bodies were partly withdrawn (R3-15): select.edit lists a death's pieces from the event as first recorded, so
+     a withdrawn body would be offered again. The page keeps the bodies that still stand: a tagged one while its piglet is
+     dead, an untagged one while the death's per-cause count still holds it. `x.gone` = the keys already withdrawn; a new
+     pick is sent with them (the ledger rewrites the death's lines from the event, so they must stay out). */
+  function liveDeaths(e) {
+    var rows = L().identity.rows;
+    e.deaths.forEach(function (x) {
+      x.all = x.pieces; x.gone = [];
+      if (x.held || !x.pieces || !x.pieces.length) return;
+      var left = {}; Object.keys(x.byCause || {}).forEach(function (c) { left[c] = x.byCause[c]; });
+      var live = [];
+      x.pieces.forEach(function (p) {
+        if (!p.rowId) return;
+        var r = rows.filter(function (q) { return q.rowId === p.rowId; })[0];
+        if (r && r.status !== 'dead' && r.status !== 'missing') return;              // its death was withdrawn
+        live.push(p); left[p.cause] = (left[p.cause] || 0) - 1;
+      });
+      x.pieces.forEach(function (p) {
+        if (p.rowId) return;
+        if ((left[p.cause] || 0) > 0) { left[p.cause]--; live.push(p); }
+      });
+      x.gone = x.pieces.filter(function (p) { return live.indexOf(p) < 0; }).map(function (p) { return p.key; });
+      x.pieces = x.pieces.filter(function (p) { return live.indexOf(p) >= 0; });
+    });
+  }
+  // the draft as the ledger reads it: a death's picked bodies join the ones already withdrawn
+  function ledgerDraft() {
+    var ids = Object.keys(draft.deaths || {}).filter(function (k) { return (draft.deaths[k] || {}).voidPieces; });
+    if (!ids.length) return draft;
+    var base = baseEdit(), out = Object.assign({}, draft, { deaths: Object.assign({}, draft.deaths) });
+    ids.forEach(function (k) {
+      var x = deathOf(base, k), pick = draft.deaths[k].voidPieces;
+      out.deaths[k] = { voidPieces: pick.concat(x ? x.gone.filter(function (g) { return pick.indexOf(g) < 0; }) : []) };
+    });
+    return out;
+  }
+  var baseMemo = { k: '', v: null };
+  function baseEdit() {
+    var k = store.name + ':' + store.events.length + ':' + crate;
+    if (baseMemo.k !== k) { var e = store.select.edit(store.derived, crate, EMPTY(), stamp()); liveDeaths(e); baseMemo = { k: k, v: e }; }
+    return baseMemo.v;
+  }
   function doseCfg(id) { return CFG.doses.filter(function (d) { return d.id === id; })[0]; }
   function mark(e, id) { return e.marks.filter(function (m) { return m.id === id; })[0]; }
   function row(e, id) { return e.rows.filter(function (r) { return r.rowId === id; })[0]; }
@@ -402,6 +452,10 @@
       case 'closed': title = ['pp.edit.rec.closed', null]; break;
       case 'sow_died': title = ['pp.edit.rec.sow_died', null]; break;
       case 'weaned': title = ['pp.edit.rec.weaned', { pigs: pigsText(x.n) }]; break;
+      case 'weight':
+        title = ['pp.id.lw.rec', { day: x.day == null ? '' : x.day }];
+        detail = x.by != null ? ['pp.edit.rec.weight_replaced', { w: x.kg, by: x.by }] : x.was != null ? ['pp.edit.rec.weight_re', { w: x.kg, was: x.was }] : ['pp.common.kg', { w: x.kg }];
+        break;
       case 'end_task': title = ['pp.edit.rec.end', null]; break;
       case 'resolve': title = [x.answer === 'two' ? 'pp.edit.rec.resolve_two' : 'pp.edit.rec.resolve_one', null]; break;
       case 'double':
@@ -434,10 +488,36 @@
       return /class="ed-delta"/.test(m[4]) ? m[1] + m[4] + m[2] + (m[3] || '') + m[5] : m[1] + m[2] + m[4] + (m[3] || '') + m[5];
     });
   }
+  /* The weigh-day litter weight is a record of the litter (R3-18): the log lists it on its day, with the weights it replaced
+     (each its own entry, kept). select.record has no kind for it, so the page adds them from the ledger's `weights`; when the
+     ledger sends `weight` entries itself, those are used and nothing is added. */
+  function withWeights(R) {
+    if (R.days.some(function (g) { return g.entries.some(function (x) { return x.kind === 'weight'; }); })) return R.days;
+    var ws = [];
+    (L().weights || []).forEach(function (w) {
+      var old = w.replaced || [];
+      ws.push({ kind: 'weight', id: w.event, at: w.at, who: w.who, day: w.day, kg: w.kg, was: old.length ? old[old.length - 1].kg : null });
+      old.forEach(function (o, i) { ws.push({ kind: 'weight', id: o.event, at: o.at, who: o.who, day: w.day, kg: o.kg, by: (old[i + 1] || w).kg }); });
+    });
+    if (!ws.length) return R.days;
+    var days = R.days.map(function (g) { return { date: g.date, who: g.who, entries: g.entries.slice() }; });
+    ws.forEach(function (x) {
+      var d = String(x.at).slice(0, 10), g = days.filter(function (y) { return y.date === d; })[0];
+      if (!g) { g = { date: d, who: null, entries: [] }; days.push(g); }
+      g.entries.push(x);
+    });
+    days.sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+    days.forEach(function (g) {
+      g.entries.sort(function (a, b) { return a.at < b.at ? 1 : a.at > b.at ? -1 : 0; });
+      var hands = {}; g.entries.forEach(function (x) { hands[x.who] = 1; });
+      g.who = Object.keys(hands).length === 1 ? g.entries[0].who : null;
+    });
+    return days;
+  }
   function recordPage() {
     var R = store.select.record(store.derived, crate), X = L();
     inLog = true;
-    var groups = R.days.map(function (g) {
+    var groups = withWeights(R).map(function (g) {
       return { label: '', strs: { label: g.who ? 'pp.edit.rec.day' : 'pp.edit.rec.day_bare' }, args: { label: { day: dayWord(g.date), who: fullName(g.who) } },
         entries: g.entries.map(function (x) { return entry(x, g); }) };
     });
@@ -501,7 +581,7 @@
       t.push([part('pp.edit.ch.count'), pigsPart(c.from), part('pp.edit.ch.count_void', null, 'amber')], part('pp.edit.count.line_goes'));
     } else if (c.kind === 'death_pieces') {
       var xp = deathOf(e, c.death);
-      t.push([part('pp.edit.ch.death', { list: causeText(xp ? xp.byCause : {}) }), part('pp.edit.ch.death_pieces', { n: c.n, left: c.left }, 'amber')], part('pp.edit.rec.by_mistake'));
+      t.push([part('pp.edit.ch.death', { list: causeText(xp ? xp.byCause : {}) }), part('pp.edit.ch.death_pieces', { n: ((draft.deaths[c.death] || {}).voidPieces || []).length || c.n, left: c.left }, 'amber')], part('pp.edit.rec.by_mistake'));
       t = t.concat(fxParts(e, function () { return true; }));
     } else if (c.kind === 'sow_void' || c.kind === 'sow_move') {
       t.push([part('pp.edit.rec.sow_died'), c.kind === 'sow_void' ? part('pp.edit.ch.withdrawn', null, 'amber') : part('pp.edit.ch.death_to', { code: c.to }, 'amber')]);
@@ -516,19 +596,34 @@
     return t;
   }
   function heldCauses(id) { var h = L().held.filter(function (y) { return y.event === id; })[0]; return h ? h.causes : {}; }
+  // The card stays under the sheet's header while the list scrolls (R3-15): a change far down the list shows what it does.
+  function sticky(html) { return pad ? html : '<div class="ed-sticky">' + html + '</div>'; }   // with the keypad open the card stays in the flow: the pad already takes the screen
+  /* A correction can move other litters' owed figures (owner round 7): every litter whose owed moved is listed, with the dose
+     and the figures. The ledger's select.edit supplies `owedMoved: [{ litter, dose, from, to }]` (assumed shape; the page
+     renders it when present and says nothing when the ledger sends none). */
+  function cascadeBlock(e) {
+    var list = (e.owedMoved || []).filter(function (x) { return x && x.from != null && x.to != null && x.from !== x.to; });
+    if (!list.length) return '';
+    var by = {}, order = [];
+    list.forEach(function (x) { if (!by[x.litter]) { by[x.litter] = []; order.push(x.litter); } by[x.litter].push(x); });
+    return '<div class="ed-later">' + sline([part(PP.one('pp.edit.cascade.title', order.length), { n: order.length }, 'amber')]) +
+      order.map(function (c) {
+        return sline([part('pp.room.code', { code: c })].concat(by[c].map(function (x) { return [txPart(x.dose), part('pp.edit.fx.owed_w'), dTextPart(x.from, x.to)]; })));
+      }).join('') + '</div>';
+  }
   // The correction Banner (ADR 0002): headline over the hand it is logged as; the summary is its one live region.
   function banner(e) {
     if (cleared) {
-      return UI.banner({ tone: 'correction', id: 'ed-banner', headline: PP.t('pp.edit.banner.head'), consequence: PP.t('pp.edit.banner.as', { who: ME }), summary: [part('ds.c2.demo.cleared')],
-        actions: [{ label: PP.t('ds.c2.undo'), action: 'undo-clear', strs: { label: 'ds.c2.undo' } }], strs: { headline: 'pp.edit.banner.head', consequence: 'pp.edit.banner.as' }, args: { consequence: { who: ME } } });
+      return sticky(UI.banner({ tone: 'correction', id: 'ed-banner', headline: PP.t('pp.edit.banner.head'), consequence: PP.t('pp.edit.banner.as', { who: ME }), summary: [part('ds.c2.demo.cleared')],
+        actions: [{ label: PP.t('ds.c2.undo'), action: 'undo-clear', strs: { label: 'ds.c2.undo' } }], strs: { headline: 'pp.edit.banner.head', consequence: 'pp.edit.banner.as' }, args: { consequence: { who: ME } } }));
     }
     if (!e.changes.length) return '';
     var tokens = [];
     e.changes.forEach(function (c) { tokens = tokens.concat(changeTokens(c, e)); });
-    var out = UI.banner({ tone: 'correction', id: 'ed-banner', headline: PP.t('pp.edit.banner.head'), consequence: PP.t('pp.edit.banner.as', { who: ME }), summary: tokens,
-      actions: [], strs: { headline: 'pp.edit.banner.head', consequence: 'pp.edit.banner.as' }, args: { consequence: { who: ME } } });
+    var out = sticky(UI.banner({ tone: 'correction', id: 'ed-banner', headline: PP.t('pp.edit.banner.head'), consequence: PP.t('pp.edit.banner.as', { who: ME }), summary: tokens,
+      actions: [], strs: { headline: 'pp.edit.banner.head', consequence: 'pp.edit.banner.as' }, args: { consequence: { who: ME } } }));
     if (e.ended) out += sline([part(e.flags.some(function (f) { return f.reason === 'correction_after_end'; }) ? 'pp.edit.after_end_flag' : 'pp.edit.after_end', null, 'amber')]);
-    return out + laterBlock(e);
+    return out + cascadeBlock(e) + laterBlock(e);
   }
   // A change that would drop or invalidate later records names each, with its door; Save waits until they are fixed.
   function laterTokens(r) {
@@ -547,6 +642,10 @@
   }
   function markValue(m) {
     var x = draft.marks[m.id]; if (!x) return m.n; if (x.void || x.to !== undefined || x.back) return 0; return x.n == null ? m.n : x.n;
+  }
+  // One reason among several (a death, the Sow row): a radio row, so the chosen one shows its ring (R3-15)
+  function reason(action, value, label, on) {
+    return UI.choiceRow({ label: '', mode: 'radio', action: action, value: value, selected: !!on, tabindex: 0, strs: { label: label } });
   }
   function choice(action, value, label, meta, on, args) {
     return UI.choiceRow({ label: '', meta: meta ? '' : undefined, mode: 'single', action: action, value: value, selected: on,
@@ -614,7 +713,8 @@
   function marksSection(e) {
     if (!e.marks.length) return '';
     return '<section class="ed-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.edit.sec.marks' } }) + doubleBlock(e) +
-      e.marks.map(function (m) { return markBlock(m, e); }).join('') + otherDoor(e) + '</section>';
+      // the wrong-crate door leads the list: with many treatments it was below the fold (R3-15)
+      otherDoor(e) + e.marks.map(function (m) { return markBlock(m, e); }).join('') + '</section>';
   }
   // R1-28 + parity round: the wrong-crate door is there from the start, once, under the list; it asks which treatment
   // (the marks not already lowered), then the crate.
@@ -672,17 +772,21 @@
       if (x.held) facts.push(part('pp.edit.death.held', null, 'amber'));
       if (rows.length) facts.push(part('pp.edit.death.names', { id: rows.join(' ') }));
       if (facts.length) out += sline(facts);
-      var opts = [choice('death-void', x.id, 'pp.edit.why.mistake', null, !!y.void)];
-      if (x.movable) opts.push(choice('death-to', x.id, 'pp.edit.death.other', null, y.to !== undefined));
-      out += UI.choiceGroup(opts);
+      // the reasons are a radio list, each showing whether it is chosen (R3-15). Several bodies: the picked ones are the
+      // one-body route, so a partial pick shows "Recorded by mistake" chosen and tapping it never wipes the pick; tapping it with
+      // nothing picked picks them all (the whole death), tapping it with all picked clears.
+      var multi = !!(x.pieces && x.pieces.length > 1), picked = y.void ? x.pieces.map(function (p) { return p.key; }) : (y.voidPieces || []);
+      var mistake = !!y.void || picked.length > 0;
+      var opts = [reason('death-void', x.id, 'pp.edit.why.mistake', mistake)];
+      if (x.movable) opts.push(reason('death-to', x.id, 'pp.edit.death.other', y.to !== undefined));
+      out += UI.choiceGroup(opts, { radio: true });
       // R2-25: a death of several bodies lets the worker pick the ones recorded by mistake (named piglets by tag); the rest stand
-      if (x.pieces && x.pieces.length > 1 && !y.void && y.to === undefined) {
-        var gone = y.voidPieces || [];
+      if (multi && y.to === undefined) {
         out += UI.choiceGroup(x.pieces.map(function (p) {
           var named = p.tag || p.notch;
-          return UI.choiceRow({ label: '', mode: 'multi', action: 'death-piece', value: x.id + '|' + p.key, selected: gone.indexOf(p.key) >= 0,
+          return UI.choiceRow({ label: '', mode: 'multi', action: 'death-piece', value: x.id + '|' + p.key, selected: picked.indexOf(p.key) >= 0,
             strs: { label: named ? 'pp.edit.death.piece_named' : 'pp.edit.death.piece' }, args: { label: { cause: PP.t('dead.' + String(p.cause).replace('-', '_')), id: named || '' } } });
-        }), { title: '', strs: { title: 'pp.edit.death.pieces' }, args: { title: { n: gone.length } } });
+        }), { title: '', strs: { title: picked.length === x.pieces.length ? 'pp.edit.death.pieces_all' : 'pp.edit.death.pieces' }, args: { title: { n: picked.length, k: x.pieces.length } } });
       }
       if (!x.movable && rows.length) out += sline([part('pp.edit.death.tagged_only')]);
       if (y.to !== undefined) out += UI.pickerField({ label: '', display: y.to || '', placeholder: '', action: 'pick-death', key: x.id,
@@ -696,8 +800,11 @@
   function sowSection(e) {
     var sw = e.sow; if (!sw) return '';
     var y = draft.sow || {}, s = stampStrs(sw.at, sw.who);
-    var out = UI.heading({ title: '', kind: 'section', level: 4, description: '', strs: { title: 'pp.edit.rec.sow_died', description: s[0] }, args: { description: s[1] } });
-    out += UI.choiceGroup([choice('sow-void', sw.id, 'pp.edit.why.mistake', null, !!y.void), choice('sow-to', sw.id, 'pp.edit.death.other', null, y.to !== undefined)]);
+    // the row names her cause (R3-15): `Sow died · Prolapse`
+    var cz = sw.cause && /^(farrowing|prolapse|found|other)$/.test(sw.cause) ? sw.cause : '';
+    var out = UI.heading({ title: '', kind: 'section', level: 4, description: '', strs: { title: cz ? 'pp.edit.sow.row' : 'pp.edit.rec.sow_died', description: s[0] },
+      args: { title: cz ? { cause: PP.t('ds.dead.sow.' + cz) } : undefined, description: s[1] } });
+    out += UI.choiceGroup([reason('sow-void', sw.id, 'pp.edit.why.mistake', !!y.void), reason('sow-to', sw.id, 'pp.edit.death.other', y.to !== undefined)], { radio: true });
     if (y.to !== undefined) out += UI.pickerField({ label: '', display: y.to || '', placeholder: '', action: 'pick-sow', key: sw.id,
       strs: { label: 'pp.edit.death.to', display: 'pp.room.code', placeholder: 'pp.edit.select' }, args: { display: { code: y.to } } });
     return '<section class="ed-group" data-ds="Section" data-sow="' + U.esc(sw.id) + '">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.edit.sec.sow' } }) + '<div class="ed-group">' + out + '</div></section>';
@@ -967,7 +1074,8 @@
     } else if (picker.kind === 'sow') {
       sel = (draft.sow || {}).to || '';
       title = ['pp.edit.sow.to_title', null];
-      opts = e.crates().filter(function (c) { return c.litter !== crate; }).map(crateOpt);
+      // the right litter for a Sow died mark: one whose sow is still there — not weaned out, not already marked dead (R3-15)
+      opts = e.crates().filter(function (c) { return c.litter !== crate && !c.sowDied && c.alive > 0; }).map(crateOpt);
     } else {
       var mv = move(e, picker.id);
       sel = (draft.moves[mv.id] || {}).to || mv.other;
@@ -1044,6 +1152,8 @@
     PP.apply(scr);
     UI.liveFill(scr, { then: function (el) { PP.apply(el); } });
     var nb = scr.querySelector('[data-view="' + view + '"] .tk-sheet-body, .tk-page-body'); if (nb) nb.scrollTop = top;
+    // the pinned correction card covers the top of the list: anything scrolled into view stops below it (R3-15)
+    var pin = nb && nb.querySelector('.ed-sticky'); if (nb) nb.style.scrollPaddingTop = pin ? (pin.offsetHeight - 18 + 8) + 'px' : '';
     // The pad rule: the host scrolls the active field into view above the docked pad.
     var act = pad && scr.querySelector('.ed-tray [data-field="' + pad + '"], .ed-tray [data-action="open-pad"][data-value="' + pad + '"]');
     if (act) act.scrollIntoView({ block: 'nearest' });
@@ -1168,9 +1278,16 @@
       if (Object.keys(wr).length) draft.moves[pr[0]] = wr; else delete draft.moves[pr[0]];
       render();
     } else if (a === 'move-void') { var mv0 = draft.moves[v]; if (mv0 && mv0.void) delete draft.moves[v]; else draft.moves[v] = { void: true }; render();
-    } else if (a === 'death-void') { var dv = draft.deaths[v]; if (dv && dv.void) delete draft.deaths[v]; else draft.deaths[v] = { void: true }; cleared = null; render();
+    } else if (a === 'death-void') {
+      var dv = draft.deaths[v], dx = deathOf(e, v), dl = dx && dx.pieces ? dx.pieces.map(function (p) { return p.key; }) : [];
+      if (dl.length < 2) { if (dv && dv.void) delete draft.deaths[v]; else draft.deaths[v] = { void: true }; }
+      // several bodies: nothing picked → all of them (the whole death); all picked → none; a partial pick stays as it is (R3-15)
+      else if (!dv || dv.to !== undefined) draft.deaths[v] = { voidPieces: dl };
+      else if (dv.void || (dv.voidPieces || []).length === dl.length) delete draft.deaths[v];
+      cleared = null; render();
     } else if (a === 'death-piece') {
-      var pp = v.split('|'), dpc = draft.deaths[pp[0]] || {}, gl = (dpc.voidPieces || []).slice(), gi = gl.indexOf(pp[1]);
+      var pp = v.split('|'), dpc = draft.deaths[pp[0]] || {}, dxp = deathOf(e, pp[0]);
+      var gl = dpc.void ? dxp.pieces.map(function (p) { return p.key; }) : (dpc.voidPieces || []).slice(), gi = gl.indexOf(pp[1]);
       if (gi >= 0) gl.splice(gi, 1); else gl.push(pp[1]);
       if (gl.length) draft.deaths[pp[0]] = { voidPieces: gl }; else delete draft.deaths[pp[0]];
       cleared = null; render();
@@ -1234,6 +1351,8 @@
       clearTimer = setTimeout(function () {
         var bn = document.getElementById('ed-banner'), first = document.querySelector('[data-view="edit"] .ed-body [data-action]:not(#ed-banner *)');
         if (bn) UI.handFocus(bn, first); cleared = null; render();
+        // a draft reached from End: once Clear can no longer be undone, the worker is back at End (R3-7)
+        if (qs.get('from') === 'end' && !dirty()) location.href = home();
       }, 5000);
     } else if (a === 'undo-clear') {
       clearTimeout(clearTimer); if (cleared) draft = cleared.draft; cleared = null; render();

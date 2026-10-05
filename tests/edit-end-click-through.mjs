@@ -381,6 +381,131 @@ try {
   assert.match(await text(page, '[data-ds="Log"]'), /Sow died moved to B02/);
   console.log('ok 19 R2-20 Sow died → On another litter → B02 → Save');
 
+  // 20. R3-7 (blocker): a real draft left from a page, read at End, then Saved or Cleared, brings the worker back to End —
+  //     and End never lists the design state's two drafts (D03 death, A05 count) in a real flow.
+  const ctx3 = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const p3 = await ctx3.newPage();
+  const draftDoors = (p) => p.locator('[data-action="open-draft"]').evaluateAll((els) => els.map((e) => e.dataset.value));
+  await p3.goto(base + 'dead.html?state=dead&crate=D03&data=late'); await ready(p3);
+  await p3.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  await p3.click('[data-action="back"]'); await p3.waitForURL(/room\.html/); await ready(p3);
+  await p3.goto(base + 'end.html?state=overview&data=late'); await ready(p3);
+  await p3.click('[data-action="review"]');
+  await p3.waitForURL(/state=end-blocked(&|$)/);                              // a real draft never names the design state
+  assert.deepEqual(await draftDoors(p3), ['dead:D03']);
+  await p3.click('[data-action="open-draft"]'); await p3.waitForURL(/dead\.html/); await ready(p3);
+  await p3.click('[data-action="save"]'); await p3.waitForURL(/end\.html/); await ready(p3);
+  assert.deepEqual(await draftDoors(p3), []);                                   // saved: nothing left, no phantom A05/D03
+  assert.equal(await p3.locator('[data-action="hold"]').count(), 1);
+  // Clear on the dead page returns to End
+  await p3.goto(base + 'dead.html?state=dead&crate=D03&data=late'); await ready(p3);
+  await p3.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  await p3.click('[data-action="back"]'); await p3.waitForURL(/room\.html/); await ready(p3);
+  await p3.goto(base + 'end.html?state=overview&data=late'); await ready(p3);
+  await p3.click('[data-action="review"]');
+  await p3.click('[data-action="open-draft"]'); await p3.waitForURL(/dead\.html/); await ready(p3);
+  await p3.click('[data-action="clear"]'); await p3.waitForURL(/end\.html/); await ready(p3);
+  assert.deepEqual(await draftDoors(p3), []);
+  // a count draft: End → the draft opens Set count → Clear (and Save) return to End
+  await p3.goto(base + 'count.html?state=count&crate=A02&data=late'); await ready(p3);
+  await p3.click('[data-ds="Stepper"] [data-step="-1"]');
+  await p3.click('[data-action="back"]'); await p3.waitForURL(/room\.html/); await ready(p3);
+  await p3.goto(base + 'end.html?state=overview&data=late'); await ready(p3);
+  await p3.click('[data-action="review"]');
+  assert.deepEqual(await draftDoors(p3), ['count:A02']);
+  await p3.click('[data-action="open-draft"]'); await p3.waitForURL(/count\.html/); await ready(p3);
+  await p3.click('[data-action="clear"]'); await p3.waitForURL(/end\.html/); await ready(p3);
+  assert.deepEqual(await draftDoors(p3), []);
+  // an Edit draft: End → Edit (from=end) → Clear → after the Undo window, End
+  await p3.goto(base + 'edit.html?state=edit&crate=A02&data=late&from=litter'); await ready(p3);
+  await p3.click('[data-action="mark-step"][data-step="-1"]');
+  await p3.click('[data-action="back"]'); await p3.waitForURL(/room\.html/); await ready(p3);
+  await p3.goto(base + 'end.html?state=overview&data=late'); await ready(p3);
+  await p3.click('[data-action="review"]');
+  assert.deepEqual(await draftDoors(p3), ['edit:A02']);
+  await p3.click('[data-action="open-draft"]'); await p3.waitForURL(/edit\.html/); await ready(p3);
+  await p3.click('[data-action="clear"]');
+  await p3.waitForURL(/end\.html/, { timeout: 8000 }); await ready(p3);
+  assert.deepEqual(await draftDoors(p3), []);
+  await ctx3.close();
+  console.log('ok 20 R3-7 a real draft read at End: saved or cleared, back at End with none left (no design drafts planted)');
+
+  // 21. R3-15: a death of several bodies. The reasons are a radio (the chosen one shows); one pick is the one-body route and
+  //     tapping "Recorded by mistake" does not wipe it; a withdrawn body is no longer offered, and a second withdrawal
+  //     does not bring the first back.
+  await openLitter(page, 'A02');
+  await page.click('[data-action="open-dead"]');
+  await page.waitForURL(/dead\.html/); await ready(page);
+  for (let i = 0; i < 3; i++) await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/state=litter/); await ready(page);
+  await openEdit(page);
+  const dth = '[data-death]', dvoid = `${dth} [data-action="death-void"]`;
+  assert.equal(await page.locator(`${dth} [data-mode="radio"]`).count(), 2);
+  assert.equal(await page.locator(dvoid).getAttribute('aria-checked'), 'false');
+  assert.equal(await page.locator(`${dth} [data-action="death-piece"]`).count(), 3);
+  await page.locator(`${dth} [data-action="death-piece"]`).first().click();
+  assert.equal(await page.locator(dvoid).getAttribute('aria-checked'), 'true');          // one picked: "Recorded by mistake" shows chosen
+  await page.click(dvoid);
+  assert.equal(await page.locator(dvoid).getAttribute('aria-checked'), 'true');          // tapping it keeps the one-body pick
+  assert.equal(await page.locator(`${dth} [data-action="death-piece"]:checked`).count(), 1);
+  assert.match(await live(page, '#ed-banner-summary', /withdrawn/), /Death \+3 crushed 1 withdrawn · 2 stay/);
+  await page.click('[data-action="save"]');
+  rc = await live(page, '#ed-saved', /Correction saved/);
+  assert.match(rc, /dead 4 → 3/);
+  assert.equal(await page.locator(`${dth} [data-action="death-piece"]`).count(), 2);  // the withdrawn body is not offered again
+  await page.click(dvoid);                                                               // nothing picked → the whole death: both bodies
+  assert.equal(await page.locator(`${dth} [data-action="death-piece"]:checked`).count(), 2);
+  assert.match(await text(page, dth), /all 2/);
+  await page.locator(`${dth} [data-action="death-piece"]`).first().click();           // narrow to one
+  await page.waitForTimeout(650);                                                      // (a Save right after a Save is a double tap)
+  await page.click('[data-action="save"]');
+  rc = await live(page, '#ed-saved', /Correction saved/);
+  assert.match(rc, /dead 3 → 2/);                                                     // the first body stayed withdrawn
+  console.log('ok 21 R3-15 radio reasons · one-body pick kept · a withdrawn body is not offered again:', rc);
+
+  // 22. R3-15: Sow died shows her cause; the move picker leaves out litters whose sow is already dead.
+  await openLitter(page, 'B01');
+  await openEdit(page);
+  assert.match(await text(page, '[data-sow]'), /Sow died · Prolapse/);
+  assert.equal(await page.locator('[data-sow] [data-mode="radio"]').count(), 2);
+  await page.click('[data-action="sow-to"]');
+  assert.equal(await page.locator('[data-view="picker"] [data-action="pick"][data-value="D06"]').count(), 0);   // her sow died too
+  assert.equal(await page.locator('[data-view="picker"] [data-action="pick"][data-value="B02"]').count(), 1);
+  console.log('ok 22 R3-15 Sow died · cause on the row · the picker leaves out dead sows');
+
+  // 23. R3-15: the amber correction card stays under the sheet header while the list scrolls; "Done on another crate" leads
+  //     the treatments, in view on a long list.
+  await page.goto(base + 'room.html?state=litter&crate=B03&data=late&fresh=1'); await ready(page);
+  await openEdit(page);
+  const bodyBox = await page.locator('[data-view="edit"] .tk-sheet-body').boundingBox();
+  const doorBox = await page.locator('[data-action="wrong-crate"]').boundingBox();
+  assert.ok(doorBox.y - bodyBox.y < 160, 'the wrong-crate door is at the top of the treatments, not below the fold');
+  await page.locator('[data-action="mark-step"][data-step="-1"]').first().click();
+  await page.evaluate(() => { document.querySelector('[data-view="edit"] .tk-sheet-body').scrollTop = 500; });
+  const cardBox = await page.locator('#ed-banner').boundingBox();
+  assert.ok(Math.abs(cardBox.y - bodyBox.y) < 24, 'the card is pinned under the header');
+  console.log('ok 23 R3-15 correction card pinned under the header · wrong-crate door leads');
+
+  // 24. R3-18 (page part): the weigh-day litter weight is in the litter log, on its day.
+  await page.goto(base + 'edit.html?state=record-page&crate=B04&data=base'); await ready(page);
+  assert.match(await text(page, '[data-ds="Log"]'), /Litter weight · day 3 15\.9 kg 08:40 · L\. Madsen/);
+  console.log('ok 24 R3-18 the weigh-day litter weight is in the log');
+
+  // 25. Owner round 7: a correction lists every litter whose owed moved (the ledger's `owedMoved`; the page renders it —
+  //     here a stand-in for the ledger worker's field).
+  const ctx4 = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await ctx4.route('**/piglet-processing/ledger.js', async (route) => {
+    const res = await route.fetch(); const body = await res.text();
+    await route.fulfill({ response: res, body: body + `\nselect.edit = ((o) => (d, id, dr, st) => { const r = o(d, id, dr, st); if (r && r.changes.length) r.owedMoved = [{ litter: 'C04', dose: 'castrate', from: 3, to: 0 }, { litter: 'B03', dose: 'castrate', from: 2, to: 1 }]; return r; })(select.edit);\n` });
+  });
+  const p4 = await ctx4.newPage();
+  await p4.goto(base + 'edit.html?state=edit-changed'); await ready(p4);
+  const cas = await text(p4, '.ed-later');
+  assert.match(cas, /Owed moves on 2 litters C04 · Castrate owed 3 → 0 B03 · Castrate owed 2 → 1/);
+  await ctx4.close();
+  console.log('ok 25 round 7 the correction lists every litter whose owed moved:', cas);
+
   await browser.close();
 } finally {
   server.kill();

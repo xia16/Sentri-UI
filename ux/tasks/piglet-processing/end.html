@@ -68,7 +68,7 @@
   var start = STATES[PP.state] || STATES.overview;
   var S = {
     data: start.data,
-    sheet: start.sheet || '', ended: !!start.ended, drafts: !!start.drafts, stub: start.stub || '',
+    sheet: start.sheet || '', ended: !!start.ended, drafts: !!start.drafts && PP.state === 'end-blocked-draft', stub: start.stub || '',
     holding: start.holding || '', pending: !!start.pending, changed: !!start.changed, offline: !!start.offline,
     already: !!start.already, unconfirmed: !!start.unconfirmed,
     mandatory: qs.get('mandatory') === '1', opened: 0, ovScroll: 0
@@ -183,7 +183,7 @@
       var at = e.syncedAt || e.at;
       if (e.type !== 'identity') idRun = null;
       if (e.type === 'treat') {
-        var n = e.castration ? e.castration.castrated : e.n;
+        var n = amount(e);
         // done after End on a phone that had not seen it: kept, stamped, flagged — never counted (RULINGS round 3)
         if (flagged(e.id, 'after_end')) out.push({ kind: 'afterend', code: e.litter, k: e.dose, n: n, stamped: e.at, at: at, who: e.who });
         else if (flagged(e.id, 'arrived_after_end')) out.push({ kind: 'late', code: e.litter, k: e.dose, n: n, stamped: e.at, at: at, who: e.who });
@@ -193,24 +193,24 @@
         list.forEach(function (ch) {
           if (ch.identity) return;
           var t = eventOf(ch.target) || {};
-          if (ch.fresh) out.push({ kind: 'wrong', code: ch.fresh.litter, from: t.litter, k: ch.fresh.dose, n: ch.fresh.castration ? ch.fresh.castration.castrated : ch.fresh.n, at: at, who: e.who });
+          if (ch.fresh) out.push({ kind: 'wrong', code: ch.fresh.litter, from: t.litter, k: ch.fresh.dose, n: amount(ch.fresh), at: at, who: e.who });
           else if (t.type !== 'treat') return;
-          else if (ch.void) out.push({ kind: 'void', code: t.litter, k: t.dose, n: t.castration ? t.castration.castrated : t.n, at: at, who: e.who });
-          else if (ch.set && ch.set.castration) out.push({ kind: 'edit', code: t.litter, a: (t.castration || {}).castrated, b: ch.set.castration.castrated, at: at, who: e.who });
-          else if (ch.set && ch.set.n != null) out.push({ kind: 'lower', code: t.litter, k: t.dose, a: t.n, b: ch.set.n, at: at, who: e.who });
+          else if (ch.void) out.push({ kind: 'void', code: t.litter, k: t.dose, n: amount(t), at: at, who: e.who });
+          else if (ch.set && ch.set.castration) out.push({ kind: 'edit', code: t.litter, a: amount(t), b: ch.set.castration.castrated || 0, at: at, who: e.who });
+          else if (ch.set && ch.set.n != null) out.push({ kind: 'lower', code: t.litter, k: t.dose, a: t.n || 0, b: ch.set.n || 0, at: at, who: e.who });
         });
       } else if (e.type === 'double') out.push({ kind: 'double', code: e.litter, k: e.dose, answer: e.answer, at: at, who: e.who });
       else if (e.type === 'identity' && e.op === 'add') {
         if (idRun && idRun.code === e.litter) idRun.n++; else { idRun = { kind: 'id', code: e.litter, n: 1, at: at, who: e.who }; out.push(idRun); }
       } else if (e.type === 'death') out.push({ kind: 'death', code: e.litter, n: lineCount(e), at: at, who: e.who });
-      else if (e.type === 'count') out.push({ kind: 'count', code: e.litter, n: e.observed, at: at, who: e.who });
+      else if (e.type === 'count') out.push({ kind: 'count', code: e.litter, n: e.observed || 0, at: at, who: e.who });
       else if (e.type === 'move') {
         var inT = inTask;
         // arrivals owe their doses as not done: no marks after End (RULINGS round 3)
         var owes = (Lx(e.to).moves.filter(function (m) { return m.id === e.id; })[0] || { packets: {} }).packets;
         var owed = Object.keys(owes).filter(function (k) { return owes[k] === 'owed' && Lx(e.to).doses[k].status !== 'later'; });
-        if (inT(e.from)) out.push({ kind: 'out', code: e.from, to: e.to, unit: Lx(e.to).room, n: e.n, at: at, who: e.who });
-        if (inT(e.to)) out.push({ kind: 'in', code: e.to, from: e.from, unit: Lx(e.from).room, n: e.n, owes: owed, at: at, who: e.who });
+        if (inT(e.from)) out.push({ kind: 'out', code: e.from, to: e.to, unit: Lx(e.to).room, n: e.n || 0, at: at, who: e.who });
+        if (inT(e.to)) out.push({ kind: 'in', code: e.to, from: e.from, unit: Lx(e.from).room, n: e.n || 0, owes: owed, at: at, who: e.who });
       }
     });
     return out;
@@ -673,7 +673,7 @@
     if (S.sheet === 'day') return 'end-day';
     if (S.sheet === 'dose') return 'weaning-handoff-dose';
     if (S.ended) return S.sheet === 'receipt' ? (S.data === 'ended-late-mark' ? 'receipt-late-mark' : S.data === 'ended-after-end' ? 'receipt-after-end-mark' : S.data === 'ended-after' ? 'receipt-since' : 'receipt') : S.sheet === 'handoff' ? 'weaning-handoff' : S.sheet === 'overview' ? 'overview-ended' : S.sheet === 'review' ? 'end-again' : S.data === 'ended-correct' ? 'ended-correct' : S.data === 'ended-moves' ? 'ended-moves' : 'ended';
-    if (S.sheet === 'review') return blocked().length ? (blocked().some(function (w) { return w.kind === 'draft'; }) ? 'end-blocked-draft' : S.stub ? 'end-blocked-farrowing' : 'end-blocked') : S.offline ? 'end-offline' : S.already ? 'end-already' : S.unconfirmed ? 'end-unconfirmed' : S.changed ? 'end-changed' : S.pending ? 'end-pending' : 'end-review';
+    if (S.sheet === 'review') return blocked().length ? (S.drafts && blocked().some(function (w) { return w.kind === 'draft'; }) ? 'end-blocked-draft' : S.stub ? 'end-blocked-farrowing' : 'end-blocked') : S.offline ? 'end-offline' : S.already ? 'end-already' : S.unconfirmed ? 'end-unconfirmed' : S.changed ? 'end-changed' : S.pending ? 'end-pending' : 'end-review';
     return 'overview';
   }
   function setUrl(push, st) {
@@ -781,6 +781,7 @@
     if (a === 'open-draft') {
       var dp = v.split(':'), dk = dp[0], dc = dp[1];
       if (dk === 'dead') location.href = route('dead.html', 'dead', dc, { back: 'end.html' + location.search });
+      else if (dk === 'count') location.href = route('count.html', 'count', dc, { back: 'end.html' + location.search });
       else if (dk === 'edit') location.href = route('edit.html', 'edit', dc, { from: 'end' });
       else location.href = litterHref(dc);
       return;
@@ -794,7 +795,9 @@
     load(ALIAS[q] || (window.PPFixtures.VARIANTS[q] ? q : start.data));
     // Ended already (here or on another phone): the task opens as ended; the review never offers End again (R1-13)
     if (TASK && ended()) S.ended = true;
-    if (start.drafts && TASK) seedDrafts();
+    // Only the explicit design state `end-blocked-draft` seeds drafts. A real flow whose drafts are on this phone names itself
+    // `end-blocked` (stateName), so coming back from the page that keeps a draft can never plant the design's two (R3-7).
+    if (S.drafts && TASK) seedDrafts();
     render();
   });
   // The one registry exception: when the registry itself failed to load there is nothing to look strings up in.

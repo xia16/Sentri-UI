@@ -299,6 +299,7 @@ the plugin's `design_doctor.py` and `design_lint.mjs`; keep it valid JSON.
     { "name": "pp-edit-edit-restored", "url": "ux/tasks/piglet-processing/edit.html?state=edit-restored", "strict": true },
     { "name": "pp-edit-edit-count", "url": "ux/tasks/piglet-processing/edit.html?state=edit-count", "strict": true },
     { "name": "pp-edit-record-page-count", "url": "ux/tasks/piglet-processing/edit.html?state=record-page-count", "strict": true },
+    { "name": "pp-edit-record-page-weight", "url": "ux/tasks/piglet-processing/edit.html?state=record-page-weight", "strict": true },
     { "name": "pp-edit-edit-deaths", "url": "ux/tasks/piglet-processing/edit.html?state=edit-deaths", "strict": true },
     { "name": "pp-edit-edit-death-void", "url": "ux/tasks/piglet-processing/edit.html?state=edit-death-void", "strict": true },
     { "name": "pp-edit-edit-death-move", "url": "ux/tasks/piglet-processing/edit.html?state=edit-death-move", "strict": true },
