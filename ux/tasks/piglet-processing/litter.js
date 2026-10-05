@@ -101,7 +101,7 @@
     function evidenceRow(r) {
       var tag = recTag(r), desc = evidence(r);
       if (tag) desc.push(tag);
-      return cdoor({ title: txTok(r.dose), description: desc, wrap: true, trail: 'edit', action: 'open-edit', value: r.id });
+      return citem({ title: txTok(r.dose), description: desc, mark: 'done', action: 'open-edit', value: r.id });
     }
     /* A care row is the skeleton's door (TaskRow door, skeleton 3): the treatment, one line under it, a chevron or ✎, and
        the ruled one-tap as its trailing act. Takes the row-token lists this file builds ({ text, strs, args, tone }; a
@@ -118,6 +118,17 @@
       return out;
     }
     var shownN = {};                        // the one-tap count the worker saw, per dose (the act's label)
+    /* The same row as a day card's item (TaskDay): the door, with a mark and the one-tap act. */
+    function citem(o) {
+      var act = null;
+      if (o.act) {
+        if (o.act.action === 'record') shownN[o.act.value] = +o.act.attrs['data-n'];
+        act = { label: { text: o.act.label, str: o.act.strs && o.act.strs.label, args: o.act.args && o.act.args.label }, action: o.act.action, value: o.act.value };
+      } else if (o.trailing) {
+        act = { label: { text: o.trailing.text, str: o.trailing.strs && o.trailing.strs.text }, action: o.action, value: o.value };
+      }
+      return { title: toParts(o.title), meta: o.description && o.description.length ? toParts(o.description) : null, mark: o.mark || '', action: o.action || '', value: o.value || '', act: act, id: o.id || '' };
+    }
     function cdoor(o) {
       var act = null;
       if (o.act) {
@@ -136,23 +147,23 @@
       var by = {}, order = [];
       return {
         put: function (day, kind, arg, html) {
-          if (!html) return;
+          var items = [].concat(html).filter(Boolean);
+          if (!items.length) return;
           var k = kind + ':' + day + ':' + (arg == null ? '' : arg);
           if (!by[k]) { by[k] = { day: day, kind: kind, arg: arg, rows: [] }; order.push(k); }
-          by[k].rows.push(html);
+          by[k].rows = by[k].rows.concat(items);
         },
         html: function () {
           if (!order.length) return '';
           var gs = order.map(function (k) { return by[k]; }).sort(function (a, b) {
             return GROUP_RANK[a.kind] - GROUP_RANK[b.kind] || (a.kind === 'later' ? a.arg - b.arg : a.day - b.day);
           });
-          // each day: a section heading (`Day 3` · `Due today` at its end), then its care rows as flat doors
+          // each day: farrowing's day card (the band `Day 3` · `Due today`, then its care rows as doors)
           return gs.map(function (g) {
             var meta = g.kind === 'today' ? ['pp.litter.gm.today'] : g.kind === 'late' ? [one('pp.litter.gm.late', g.arg), { k: g.arg }]
               : g.kind === 'missed' ? ['pp.litter.gm.missed', { d: g.arg }] : g.kind === 'recorded' ? ['pp.litter.gm.recorded']
               : g.arg === 1 ? ['pp.litter.gm.tomorrow'] : [one('pp.litter.gm.in', g.arg), { n: g.arg }];
-            return '<section class="pp-group lt-day" data-ds="Section">' + UI.heading({ title: '', meta: '', kind: 'section', level: 3, strs: { title: 'pp.litter.gm.day', meta: meta[0] },
-              args: { title: { d: g.day }, meta: meta[1] } }) + '<div class="tk-doors" data-ds="TaskDoors">' + g.rows.join('') + '</div></section>';
+            return K.day({ title: toParts([P('pp.litter.gm.day', { d: g.day })]), status: toParts([P(meta[0], meta[1])]), items: g.rows });
           }).join('');
         }
       };
@@ -281,14 +292,13 @@
     function txRow(o) {
       var n = tapN(o);
       // A litter outside the task records no treatment: what it owes is a fact, never a door (Q18).
-      if (!L().recordable) return cdoor({ title: titleTok(o.dose), description: [P('pp.litter.notask.owed', { n: o.owed })], wrap: true });
       if (o.males === 'uncounted' || o.status === 'missed' || o.range || !n) {
-        return cdoor({ title: txTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose, trailing: hasDraft(o.dose) ? resumeWord() : '' });
+        return citem({ title: txTok(o.dose), description: owedToks(o), mark: 'due', action: 'open-dose', value: o.dose, trailing: hasDraft(o.dose) ? resumeWord() : '' });
       }
       var act = hasDraft(o.dose) ? { label: PP.t('pp.litter.act.resume'), action: 'open-dose', value: o.dose, strs: { label: 'pp.litter.act.resume' } }
         : { label: PP.t(one('pp.litter.act.record_n', n), { n: n }), action: 'record', value: o.dose, attrs: { 'data-n': n }, strs: { label: one('pp.litter.act.record_n', n) }, args: { label: { n: n } } };
       // the one-tap record stays the row's trailing action, compact (farrowing's care row + the ruled one-tap)
-      return cdoor({ id: 'lt-tx-' + o.dose, title: txTok(o.dose), description: owedToks(o), wrap: true, action: 'open-dose', value: o.dose, act: act });
+      return citem({ id: 'lt-tx-' + o.dose, title: txTok(o.dose), description: owedToks(o), mark: 'due', action: 'open-dose', value: o.dose, act: act });
     }
     function unknownRows(id, o) {
       var d = doseCfg(id);
@@ -296,8 +306,8 @@
         var key = 'res:' + g.id + ':' + id, tags = (g.rows || []).map(tagOf).filter(Boolean);
         var who = tags.length && tags.length <= 3 ? P('pp.litter.grp.from_tags', { k: g.n, code: g.from, tags: tags.join(', ') }) : P('pp.litter.grp.from', { k: g.n, code: g.from });
         var desc = drafts[key] ? [P('status.unsaved', { n: 1 }, 'green')] : [who, d.visible ? P('pp.litter.arr.check', null, 'amber') : P('pp.litter.arr.unknown', null, 'amber')];
-        return cdoor({ title: txTok(id), description: desc, wrap: true, action: 'open-resolve', value: g.id + ':' + id, trailing: drafts[key] ? resumeWord() : '' });
-      }).join('');
+        return citem({ title: txTok(id), description: desc, mark: 'due', action: 'open-resolve', value: g.id + ':' + id, trailing: drafts[key] ? resumeWord() : '' });
+      });
     }
     function identityRow() {
       var x = view().identityDue;
@@ -305,7 +315,7 @@
       var scheme = PP.t('pp.litter.id.scheme.' + x.scheme), t = [];
       if (x.who === 'candidates') t.push(P('pp.litter.id.keepers', { k: x.identified }));
       else t.push(P('pp.litter.id.owed', { n: x.owed }));
-      return cdoor({ title: [P('pp.litter.id.title', { scheme: scheme })], description: t, wrap: true, action: 'open-identity', value: crate });
+      return citem({ title: [P('pp.litter.id.title', { scheme: scheme })], description: t, mark: 'due', action: 'open-identity', value: crate });
     }
     /* What is owed now, into its day groups. Nothing moves under the thumb: a dose recorded this visit keeps its place (its
        group) and turns into its stamp. */
@@ -317,7 +327,7 @@
         if (r && isDone(d.id)) { c.put(d.due, 'today', null, evidenceRow(r)); return; }
         if (!o) return;
         var k = statusKind(o.status, o.lateBy, o.missedAfter), only = o.owed === 0 && !o.range && unknownGroups(d.id).length;
-        c.put(o.due, k[0], k[1], (!only ? txRow(o) : '') + unknownRows(d.id, only ? o : null));
+        c.put(o.due, k[0], k[1], (only ? [] : [txRow(o)]).concat(unknownRows(d.id, only ? o : null)));
       });
       var x = view().identityDue;
       if (x.status === 'due' || x.status === 'late') c.put(x.day, x.status === 'late' ? 'late' : 'today', x.status === 'late' ? x.lateBy : null, identityRow());
@@ -326,7 +336,7 @@
       var v = view(), left = v.dosesLeft.left, missed = v.unfinished.missed;
       // a litter outside the task: what it owes is a fact (not done), one list
       if (!L().recordable) {
-        var rows = v.owed.filter(function (o) { return o.owed; }).map(txRow).join('');
+        var rows = v.owed.filter(function (o) { return o.owed; }).map(function (o) { return cdoor({ title: titleTok(o.dose), description: [P('pp.litter.notask.owed', { n: o.owed })], wrap: true }); }).join('');
         return rows ? '<section class="pp-group" data-ds="Section">' + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.edge.section.owed' } }) +
           '<div class="tk-doors" data-ds="TaskDoors">' + rows + '</div></section>' : '';
       }
@@ -446,7 +456,7 @@
       if (x.status !== 'done' && x.status !== 'later' && x.who !== 'candidates') return '';
       var scheme = PP.t('pp.litter.id.scheme.' + x.scheme);
       var d = x.who === 'candidates' ? (I.closed ? P('pp.litter.id.closed', { k: x.identified }) : P('pp.litter.id.keepers', { k: x.identified })) : P('pp.litter.id.done', { k: x.identified, n: x.of });
-      return cdoor({ title: [P('pp.litter.id.title', { scheme: scheme })], description: [d], wrap: true, action: 'open-identity', value: crate });
+      return citem({ title: [P('pp.litter.id.title', { scheme: scheme })], description: [d], mark: 'done', action: 'open-identity', value: crate });
     }
     /* Recorded: one row per record, never merged, newest first, under its treatment's day (`Day 1 · Recorded`). */
     function recordedInto(c) {
@@ -457,7 +467,7 @@
       var idRow = identityDoneRow();
       if (idRow) c.put(view().identityDue.day, 'recorded', null, idRow);
       view().recorded.forEach(function (g) { (g.doubleDoses || []).forEach(function (x) {
-        c.put(doseCfg(g.dose).due, 'recorded', null, cdoor({ title: txTok(g.dose), description: [P('pp.litter.twice.line', { stamp: stampText(x.at, x.who) }, 'amber')], wrap: true }));
+        c.put(doseCfg(g.dose).due, 'recorded', null, citem({ title: txTok(g.dose), description: [P('pp.litter.twice.line', { stamp: stampText(x.at, x.who) }, 'amber')], mark: 'done' }));
       }); });
     }
     function notesSection() {
@@ -488,7 +498,7 @@
     function laterInto(c) {
       if (!L().recordable) return;
       laterItems().forEach(function (x) {
-        if (x.identity) { c.put(x.due, 'later', x.inDays, cdoor({ title: [P('pp.litter.id.title', { scheme: PP.t('pp.litter.id.scheme.' + view().identityDue.scheme) })], action: 'open-identity', value: crate })); return; }
+        if (x.identity) { c.put(x.due, 'later', x.inDays, citem({ title: [P('pp.litter.id.title', { scheme: PP.t('pp.litter.id.scheme.' + view().identityDue.scheme) })], action: 'open-identity', value: crate })); return; }
         var Dx = D(x.dose), t = [];
         if (drafts[x.dose]) t.push(P('status.unsaved', { n: 1 }, 'green'));
         else if (Dx.groups && agesDiffer(Dx.groups)) Dx.groups.forEach(function (g) { t = t.concat(groupToks(g)); });
@@ -496,7 +506,7 @@
           if (Dx.records.length && Dx.owed && !arrivalToks(Dx.groups || []).length) t.push(P(doseCfg(x.dose).castration ? one('pp.litter.castr.owed', Dx.owed) : 'pp.litter.owed', { n: Dx.owed }));
           t = t.concat(arrivalToks(Dx.groups || []));
         }
-        c.put(x.due, 'later', x.inDays, cdoor({ title: txTok(x.dose), description: t.length ? t : undefined, wrap: true, action: 'open-dose', value: x.dose }));
+        c.put(x.due, 'later', x.inDays, citem({ title: txTok(x.dose), description: t.length ? t : undefined, action: 'open-dose', value: x.dose }));
       });
     }
     /* ---- the Record group: identity (its page) and the birth litter weight while it is missing ---- */
@@ -595,7 +605,7 @@
       var w = waiting();
       var html = K.sheet({ title: titleSlot, subtitle: [S('pp.room.code', { code: crate }), { sep: true }].concat(sub), close: null, aside: aside, size: 'long', view: 'dose',
         body: '<div class="lt-stack">' + body + '</div>',
-        footer: K.footer({ back: { action: 'back' }, status: w && whyShown ? Object.assign(S(w[0], w[1]), { id: 'lt-why' }) : null,
+        footer: K.footer({ back: { action: 'back' }, status: w ? Object.assign(S(w[0], w[1]), { id: 'lt-why', visible: whyShown }) : null,
           primary: { label: S('act.save'), register: 'primary', action: 'save', waiting: !!w, describedby: w && whyShown ? 'lt-why' : '' } }) });
       return w && whyShown ? html.replace('id="lt-why"', 'id="lt-why" data-answer=""') : html;
     }
