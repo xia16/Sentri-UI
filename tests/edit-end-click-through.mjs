@@ -249,9 +249,12 @@ try {
   const bl = await text(page, '[data-ds="TaskPage"]');
   assert.match(bl, /End it in the Farrowing task on the Tasks list/);
   assert.match(bl, /litters with work left .* not yet due/);
-  await page.click('[data-action="open-litter"][data-value="D01"]');
-  await page.waitForURL(/state=litter.*crate=D01/); await ready(page);
-  console.log('ok 11 R1-30 End blocked → D01 litter');
+  // R2-10: the farrowing door is a host door in the prototype: it says where it would go, visibly, and stays on the page
+  await page.click('[data-action="open-farrowing"][data-value="D01"]');
+  assert.equal(await page.locator('#pp-stub').isVisible(), true);
+  assert.match(await text(page, '#pp-stub'), /Opens Farrowing · D01/);
+  assert.match(page.url(), /end\.html/);
+  console.log('ok 11 R1-30 / R2-10 End blocked → the farrowing door says "Opens Farrowing · D01"');
 
   // 12. The handoff: rows open their litter; weights say their day; not-reached doses are "not done at end", one phrase.
   await page.goto(base + 'end.html?state=weaning-handoff'); await ready(page);
@@ -262,6 +265,63 @@ try {
   await page.click('[data-ds="TaskPage"] [data-action="open-litter"][data-value="A02"]');
   await page.waitForURL(/state=litter.*crate=A02/); await ready(page);
   console.log('ok 12 handoff wording, weights by day, rows open their litter');
+
+  // 13. R2-10: the drafts blocker reads the drafts on this phone and clears when one is saved or cleared. A fresh tab: a Set
+  //     count draft left with Back gates End; End shows it; the design state's two drafts clear one by one.
+  const ctx2 = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const p2 = await ctx2.newPage();
+  await p2.goto(base + 'end.html?state=end-review&data=late'); await ready(p2);
+  assert.equal(await p2.locator('[data-action="hold"]').count(), 1);               // nothing on this phone: End is open
+  await openLitter(p2, 'A02', 'late', false);
+  await p2.click('[data-action="open-count"]'); await p2.waitForURL(/count\.html/); await ready(p2);
+  await p2.click('[data-ds="Stepper"] [data-step="-1"]');
+  await p2.click('[data-action="back"]'); await p2.waitForURL(/room\.html/); await ready(p2);
+  await p2.goto(base + 'end.html?state=end-review&data=late'); await ready(p2);
+  assert.equal(await p2.locator('[data-action="hold"]').count(), 0);
+  assert.match(await text(p2, '[data-ds="TaskPage"]'), /1 unsaved draft on this phone .*A02 Count draft · unsaved/);
+  await p2.goto(base + 'end.html?state=end-blocked-draft'); await ready(p2);
+  assert.match(await text(p2, '[data-ds="TaskPage"]'), /3 unsaved drafts on this phone/);
+  await p2.click('[data-action="open-draft"][data-value="dead:D03"]');
+  await p2.waitForURL(/dead\.html/); await ready(p2);
+  await p2.click('[data-action="save"]');
+  await p2.waitForURL(/end\.html/); await ready(p2);                                 // Save returns to End
+  const left = await text(p2, '[data-ds="TaskPage"]');
+  assert.match(left, /2 unsaved drafts on this phone/);
+  assert.doesNotMatch(left, /D03 Death draft/);
+  console.log('ok 13 R2-10 End reads the drafts on this phone; saving one returns to End with it cleared');
+
+  // 14. R2-25: a Save that waits says why where the worker looks; a duplicate tag warns above the pad and the receipt keeps
+  //     the before value; Back to the litter shows the correction receipt.
+  await page.goto(base + 'edit.html?state=edit-gated&fresh=1'); await ready(page);
+  assert.equal(await page.locator('#ed-why').isVisible(), true);
+  await page.goto(base + 'edit.html?state=edit-row-dup&fresh=1'); await ready(page);
+  const padTop = (await page.locator('.ed-pad').boundingBox()).y;
+  const warn = await page.locator('.ed-pad .st-status-line').boundingBox();
+  assert.ok(warn && warn.y >= padTop && warn.y + warn.height <= 844, 'the duplicate-tag warning is on screen, in the pad');
+  assert.match(await text(page, '.ed-pad'), /Tag 004305 is already on this litter/);
+  await page.click('[data-action="save"]');
+  assert.match(await live(page, '#ed-saved', /Correction saved/), /tag 004304 → 004305/);
+  await page.click('[data-action="back"]');
+  await page.waitForURL(/state=litter/); await ready(page);
+  assert.match(await text(page, 'body'), /Saved · correction/);
+  console.log('ok 14 R2-25 Save-waits reason visible · duplicate-tag warning above the pad · receipt "tag 004304 → 004305" · litter shows the correction receipt');
+
+  // 15. R2-26: today's records list a correction; a treatment not done on several crates opens the list of them.
+  await page.goto(base + 'end.html?state=end-day&data=ended-correct'); await ready(page);
+  assert.match(await text(page, '[data-ds="TaskPage"]'), /B03 · Correction .*corrected|A05 · Correction/);
+  await page.goto(base + 'end.html?state=weaning-handoff'); await ready(page);
+  await page.click('[data-action="open-dose"]');
+  assert.match(await text(page, '[data-ds="TaskPage"]'), /Castrate · not done .*4 piglets on 2 crates .*B01 .*C04/);
+  await page.click('[data-action="open-litter"][data-value="C04"]');
+  await page.waitForURL(/state=litter.*crate=C04/); await ready(page);
+  console.log('ok 15 R2-26 today’s records show the correction · the handoff dose opens its crates');
+
+  // 16. Round 6: the third answer to a possible double, "Different piglets", is an option of the sheet (both stand).
+  await page.goto(base + 'edit.html?state=double&data=double-halves&crate=A02'); await ready(page);
+  await page.click('[data-action="dbl-answer"][data-value="different"]');
+  await page.click('[data-action="save"]');
+  assert.match(await live(page, '#ed-saved', /Answer saved/), /Different piglets · both stand, each counted in full/);
+  console.log('ok 16 round 6 Different piglets · both stand');
 
   await browser.close();
 } finally {

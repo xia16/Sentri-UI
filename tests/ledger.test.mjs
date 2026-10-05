@@ -2832,3 +2832,64 @@ test('R2-N5 End lists orphaned litters and where their piglets went', () => {
   const e = select.end(run(b, R1T(['O', 'R', 'N'])));
   assert.deepEqual(e.orphans, [{ litter: 'O', sowDied: { at: on(2), cause: 'prolapse' }, alive: 0, dead: 0, moved: [{ to: 'R', n: 4, at: on(3, '09:00') }, { to: 'N', n: 2, at: on(3, '09:10') }] }]);
 });
+
+test('R2-25 a death is withdrawn piece by piece: select.edit deaths[i].pieces, draft deaths[id].voidPieces', () => {
+  const b = book();
+  b.farrowed('A', 12);
+  b.identity('A', 'add', { rowId: 'r1', tag: '004101' });
+  const dth = b.death('A', [{ cause: 'crushed', n: 2 }, { cause: 'scours', rowId: 'r1' }]);
+  const d = run(b, R1);
+  const x = select.edit(d, 'A').deaths.find((y) => y.id === dth.id);
+  assert.deepEqual(x.pieces.map((p) => [p.key, p.cause, p.rowId || null]), [['0:1', 'crushed', null], ['0:2', 'crushed', null], ['row:r1', 'scours', 'r1']]);
+  const ed = select.edit(d, 'A', { deaths: { [dth.id]: { voidPieces: ['0:2', 'row:r1'] } } });
+  assert.equal(ed.why, null);
+  assert.deepEqual(ed.events[0].changes[0], { target: dth.id, set: { lines: [{ cause: 'crushed', n: 1 }] } });
+  assert.deepEqual(ed.changes[0], { kind: 'death_pieces', death: dth.id, n: 2, left: 1 });
+  assert.deepEqual(ed.effects.A, [9, 11]);
+  // every piece withdrawn is the whole death withdrawn
+  const all = select.edit(d, 'A', { deaths: { [dth.id]: { voidPieces: ['0:1', '0:2', 'row:r1'] } } });
+  assert.deepEqual(all.events[0].changes[0], { target: dth.id, void: true });
+});
+
+test('R2-20 a Sow died mark is correctable: select.edit sow, draft.sow { void } | { to }', () => {
+  const b = book();
+  b.farrowed('A', 12); b.farrowed('B', 10);
+  const sd = b.sowDied('A', { at: on(3, '06:20'), who: 'L.M' });
+  const d = run(b, R1);
+  assert.deepEqual(select.edit(d, 'A').sow, { id: sd.id, cause: 'prolapse', at: on(3, '06:20'), who: 'L.M' });
+  assert.equal(select.edit(d, 'B').sow, null);
+  const v = select.edit(d, 'A', { sow: { void: true } });
+  assert.deepEqual(v.events[0].changes[0], { target: sd.id, void: true });
+  assert.deepEqual(v.changes[0], { kind: 'sow_void', sow: sd.id });
+  const m = select.edit(d, 'A', { sow: { to: 'B' } });
+  assert.deepEqual(m.events[0].changes[0], { target: sd.id, set: { litter: 'B' } });
+  assert.deepEqual(m.changes[0], { kind: 'sow_move', sow: sd.id, to: 'B' });
+  b.ev.push(Object.assign({ id: 'X', at: on(3, '11:00'), who: 'G.H' }, m.events[0]));
+  const d2 = run(b, R1);
+  assert.equal(d2.litters.A.sowDied, null); assert.equal(d2.litters.B.sowDied.cause, 'prolapse');
+});
+
+test('R2-23 a body found in another crate: deathDraft foundIn, the death carries it', () => {
+  const b = book();
+  b.farrowed('A', 12);
+  let d = run(b, R1);
+  const dd = select.deathDraft(d, 'A', { tallies: { crushed: 1 }, foundIn: 'B10' });
+  assert.equal(dd.event.foundIn, 'B10');
+  b.ev.push(Object.assign({ id: 'dth', at: on(3, '10:00'), who: 'G.H' }, dd.event));
+  d = run(b, R1);
+  assert.equal(d.litters.A.deaths[0].foundIn, 'B10');
+  assert.equal(select.record(d, 'A').days[0].entries.find((x) => x.kind === 'death').foundIn, 'B10');
+});
+
+test('R2-28 a done row keeps its lateness after reload (bulk and room)', () => {
+  const { b, cfg } = roomBook();
+  const late = book();
+  late.farrowed('L', 9, {}, bornOn(-2));                                // day 5 on on(3): iron due day 3 → 2 days late
+  late.treat('L', 'iron3', 9, { at: on(3, '08:00') });
+  const d = run(late, R1);
+  const row = select.bulkDraft(d, { dose: 'iron3' }).rows.find((r) => r.litter === 'L');
+  assert.equal(row.kind, 'done'); assert.equal(row.lateBy, 2);
+  const f = select.room(d, { lens: 'all' }).rows.find((r) => r.litter === 'L');
+  assert.equal(f.doneLate, 2);
+  assert.ok(b && cfg);
+});
