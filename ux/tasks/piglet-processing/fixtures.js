@@ -54,7 +54,8 @@ const TASK7 = ['A02', 'A04', 'A05', 'A07', 'B01', 'B02', 'B03', 'B04', 'B06', 'B
 export const FARMS = {
   tag: { scheme: 'tag', who: 'all', day: 3 },
   keepers: { scheme: 'tag', who: 'candidates', day: 3 },
-  notch: { scheme: 'notch', who: 'all', day: 3 }
+  notch: { scheme: 'notch', who: 'all', day: 3 },
+  none: { scheme: 'none' }                  // round 7: a farm that does not tag (e.g. fatteners handled as a batch)
 };
 
 export const CONFIG = {
@@ -634,6 +635,8 @@ export const VARIANTS = {
     b.push({ type: 'sex_counts', litter: 'A02', boars: 4, gilts: 3, at: sep(29, '08:30'), who: 'L.M' }, 'SC-A02');
     a02(b, [['004306', 'b', 1.44], ['004307', 'b', 1.52]], sep(29, '09:15'), ME, 6);
   }),
+  // round 7: the same unit on a farm with no identity scheme — identity is never owed and never shown
+  'no-identity': V(base, TODAY, { identity: FARMS.none }),
   keepers: V((b) => {
     base(b);
     b.rows('A07', sep(29, '09:00'), ME, tags('A07', 4601, 9, 1, (i) => ({ sex: i === 4 ? 'b' : 'g', weight: [1.62, 1.58, 1.66, 1.71, 1.8, 1.59, 1.64, 1.69, 1.57][i] })));

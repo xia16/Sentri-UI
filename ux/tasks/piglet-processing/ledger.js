@@ -118,6 +118,16 @@
                                        more_than_owed / reason_missing); the other groups stay owed on their own age, never a
                                        deferral; its own deferral stays in its group. select.litter drafts { cohort } → owed =
                                        the group's n, event carries `cohort`
+   Scenario round 3 + owner round 7 (fix/r3-ledger):
+     `double` answer `different`         R3-1 refused `not_different` { sum, cap } when the two records' piglets add up to
+                                       more than were owed before either (alive with nothing owed yet).
+                                       select.doubleAnswers(d, { litter, dose, records }) → { same, twice, different }:
+                                       { ok, why, detail } each, so the sheet can disable an answer with its reason
+     unknownGroups[i].maxLacking/minHad  R3-4 how many moved piglets can have lacked the dose (the source's bound); a check or
+                                       record on the group past it is refused `more_than_untreated` { max }
+     select.end().orphans[i].dead        R3-12 every death, those at birth included (= the drawer's Dead)
+     identity scheme 'none'              round 7 FARMS.none; fixture variant `no-identity`: identity never owed
+                                       (identityDue status 'none', identity.done null, rows' left.identity 0)
    People (farrowing's names): person(who, derived|config?) → `G. Hansen` for `G.H` (config.people, else definePeople's
      map — the fixtures define theirs; unknown initials stay); lastEvent.whoName, lastRecord.whoName and the room's
      lastRecord.whoName carry it. PPLedger.person / PPLedger.definePeople in the browser.
@@ -338,6 +348,21 @@ function cover(D, e, kind, n, rows, from) {
 function unknownGroup(D, e, kind, n, rows, from, birthDay) {
   if (n <= 0) return;
   D.unknowns.push({ id: e.id, kind, n, rows: rows ? rows.slice() : null, from: from || null, at: e.at || null, birthDay: birthDay == null ? null : birthDay });
+}
+/* R3-4: before a receiver resolves moved piglets, the source bounds how many can have been untreated (hi0, less what was
+   already found lacking): answering more lacking than that would mean a double dose. Simulates the take, mutates nothing. */
+function checkUntreatedCap(ctx, D, doseId, n, groupId, had, lacks) {
+  let left = n, h = had, l = lacks;
+  for (const g of D.unknowns) {
+    if (!left) break;
+    if (groupId && g.id !== groupId) continue;
+    const t = Math.min(left, g.n); left -= t;
+    const hh = Math.min(h, t); h -= hh;
+    const ll = Math.min(l, t - hh); l -= ll;
+    if (g.kind !== 'move' || !g.from || !ll) continue;
+    const S = ctx.litters.get(g.from), sg = S && S.doses[doseId] ? S.doses[doseId].doubt.find((x) => x.id === g.id) : null;
+    if (sg && sg.lacks + ll > sg.hi0) throw new Reject('more_than_untreated', { max: Math.max(0, sg.hi0 - sg.lacks), group: g.id });
+  }
 }
 /* Takes n from the unknown groups (one group, or in order); returns what it took from each: [{ id, kind, from, n }]. */
 function takeUnknown(D, n, groupId) {
@@ -852,6 +877,12 @@ function applyDouble(ctx, e) {
     const recs = ids.map((id) => D.records.find((r) => r.id === id));
     if (recs.some((r) => !r)) throw new Reject('unknown_record');
     if (!D.collisions.some((p) => p.includes(ids[0]) && p.includes(ids[1]))) throw new Reject('not_a_double');
+    // R3-1: different piglets only if they can be: together no more than were owed before either record (else alive)
+    const both = (id) => ids.every((r) => ctx.causal.saw(r, id)) && !ids.includes(id);
+    const before = owedAt(ctx, L, D, both);
+    const cap = before == null ? L.alive : before;
+    const together = recs.reduce((s2, r) => s2 + (r.n || 0), 0);
+    if (together > cap) throw new Reject('not_different', { sum: together, cap });
     const lefts = ids.map((id) => (D.recs.find((r) => r.event === id) || { left: 0 }).left);
     const done = (r) => (r.n || 0) + (r.exempt || 0) + (r.females || 0);
     const left = Math.max(0, Math.min(lefts[0] - done(recs[1]), lefts[1] - done(recs[0])));
@@ -1487,6 +1518,7 @@ function applyTreatUnknown(ctx, e) {
   const collided = mine.filter((r) => ctx.causal.concurrent(r.id, e.id));
   const avail = Math.min(e.group ? total(D.unknowns.filter((g) => g.id === e.group)) : total(D.unknowns), L.alive);
   if (!collided.length && e.n > avail) throw new Reject('more_than_unknown', { unknown: avail });
+  checkUntreatedCap(ctx, D, d.id, Math.min(e.n, avail), e.group, 0, Math.min(e.n, avail));
   const took = takeUnknown(D, Math.min(e.n, avail), e.group);
   narrowSource(ctx, d.id, took, 0, Math.min(e.n, avail));      // recorded as lacking it: they were untreated at the source
   D.treated += e.n;
@@ -1531,6 +1563,7 @@ function applyCheck(ctx, e) {
   if (!isCount(had) || !isCount(lacks) || had + lacks === 0) throw new Reject('bad_numbers');
   const avail = e.group ? total(D.unknowns.filter((g) => g.id === e.group)) : total(D.unknowns);
   if (had + lacks > Math.min(avail, L.alive)) throw new Reject('more_than_unknown', { unknown: avail });
+  checkUntreatedCap(ctx, D, d.id, had + lacks, e.group, had, lacks);
   const took = takeUnknown(D, had + lacks, e.group);
   narrowSource(ctx, d.id, took, had, lacks);
   cover(D, e, 'had', had, null, null);
@@ -1727,6 +1760,11 @@ function view(ctx, L, corrections, today) {
       x.status = statusAt(d, x.dayAge);
       x.lateBy = x.status === 'late' || x.status === 'missed' ? x.dayAge - d.due : 0;
       x.inDays = x.status === 'later' ? d.due - x.dayAge : 0;
+      // R3-4: how many of them can have lacked it (the source's bound) — "already had it" floors at minHad
+      const S0 = g.kind === 'move' && g.from ? ctx.litters.get(g.from) : null;
+      const sg = S0 && S0.doses[d.id] ? S0.doses[d.id].doubt.find((y) => y.id === g.id) : null;
+      x.maxLacking = sg ? Math.min(g.n, Math.max(0, sg.hi0 - sg.lacks)) : g.n;
+      x.minHad = g.n - x.maxLacking;
       return x;
     });
     // the dose's status is its most urgent owing group's (owed or unknown; an arrival's own age decides for it)
@@ -2548,7 +2586,7 @@ function endSelect(derived, opts) {
   // R2-N5: orphaned litters (the sow died) and where their piglets went
   const orphans = ids.map((id) => derived.litters[id]).filter((L) => L.sowDied).map((L) => ({
     litter: L.id, sowDied: { at: L.sowDied.at, cause: L.sowDied.cause }, alive: L.alive,
-    dead: L.deaths.filter((x) => x.phase === 'locked').reduce((s2, x) => s2 + sum(x.byCause), 0),
+    dead: L.dead.total,                              // every death, those at birth included (R3-12: the drawer's Dead)
     moved: L.moves.filter((m) => m.dir === 'out').map((m) => ({ to: m.other, n: m.n, at: m.at }))
   }));
   return {
@@ -3095,12 +3133,23 @@ function doubleDraftSelect(derived, draft, stamp) {
   const ev = { type: 'double', litter: dr.litter, dose: dr.dose, records: (dr.records || []).slice(), answer: dr.answer };
   if (dr.answer === 'same') ev.withdraw = dr.withdraw || ev.records[1];
   const r = trial(derived, ev, stamp);
-  if (!r.ok) return { why: r.reason, event: null, after: null };
+  if (!r.ok) return { why: r.reason, detail: r.detail, event: null, after: null };
   const D = r.derived.litters[dr.litter].doses[dr.dose];
   return { why: null, event: ev, after: { treated: D.treated, owed: D.owed, doubleDoses: D.doubleDoses.length } };
 }
 
-export const select = { oweToday: oweTodaySelect, doubleDraft: doubleDraftSelect, balance: balanceSelect, identityDue: identityDueSelect, reviews: reviewsSelect, findId, room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect, bulkDraft: bulkDraftSelect, countDraft: countDraftSelect, explain: explainSelect, counts: countsSelect, record: recordSelect, edit: editSelect };
+/* R3-1: which answers a possible double can take — each tried by the same replay `append` runs, so the sheet can disable
+   one with its reason (`different` refused `not_different` { sum, cap } when the records cannot be different piglets). */
+function doubleAnswersSelect(derived, draft, stamp) {
+  const out = {};
+  for (const answer of ['same', 'twice', 'different']) {
+    const r = doubleDraftSelect(derived, Object.assign({}, draft, { answer }), stamp);
+    out[answer] = { ok: !r.why, why: r.why, detail: r.detail || null };
+  }
+  return out;
+}
+
+export const select = { doubleAnswers: doubleAnswersSelect, oweToday: oweTodaySelect, doubleDraft: doubleDraftSelect, balance: balanceSelect, identityDue: identityDueSelect, reviews: reviewsSelect, findId, room: roomSelect, litter: litterSelect, deathDraft: deathDraftSelect, moveDraft: moveDraftSelect, end: endSelect, bulkDraft: bulkDraftSelect, countDraft: countDraftSelect, explain: explainSelect, counts: countsSelect, record: recordSelect, edit: editSelect };
 export const PPLedger = { derive, append, balances, dayNumber, select, person, definePeople };
 export default PPLedger;
 if (typeof window !== 'undefined') window.PPLedger = PPLedger;

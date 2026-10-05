@@ -2932,3 +2932,73 @@ test('R2-16 a group-targeted record touches only its group; the other keeps its 
   const dr = select.litter(run(b, R1), 'R', { drafts: { iron3: { cohort: 'own' } } }).drafts.iron3;
   assert.equal(dr.owed, 11); assert.equal(dr.event.cohort, 'own'); assert.equal(dr.why, null);
 });
+
+// ---- scenario round 3 (R3-n) and owner round 7 -----------------------------------------------
+
+test('R3-1 "different piglets" only when the two records can be different piglets; the selector says why not', () => {
+  const mk = (n1, n2, alive = 11) => {
+    const b = book();
+    b.farrowed('A', alive);
+    const seen = b.ev.map((e) => e.id);
+    const p1 = b.treat('A', 'iron3', n1, Object.assign({ seen, who: 'G.H' }, n1 < alive ? { deferred: { n: alive - n1, reason: 'weak' } } : {}));
+    const p2 = b.treat('A', 'iron3', n2, Object.assign({ seen, who: 'L.M' }, n2 < alive ? { deferred: { n: alive - n2, reason: 'weak' } } : {}));
+    return { b, recs: [p1.id, p2.id] };
+  };
+  let { b, recs } = mk(11, 11);                                        // 11 + 11 on 11 alive: cannot be different piglets
+  let a = select.doubleAnswers(run(b, R1), { litter: 'A', dose: 'iron3', records: recs });
+  assert.deepEqual([a.same.ok, a.twice.ok, a.different.ok, a.different.why], [true, true, false, 'not_different']);
+  assert.deepEqual(a.different.detail, { sum: 22, cap: 11 });
+  b.ev.push({ id: 'dbl', type: 'double', litter: 'A', dose: 'iron3', records: recs, answer: 'different', at: on(3, '11:00'), who: 'G.H' });
+  assert.equal(rejectedReason(run(b, R1), { id: 'dbl' }), 'not_different');
+  ({ b, recs } = mk(6, 5));                                            // 6 + 5 on 11: can be
+  a = select.doubleAnswers(run(b, R1), { litter: 'A', dose: 'iron3', records: recs });
+  assert.equal(a.different.ok, true);
+});
+
+test('R3-4 a receiver\'s "already had it" floors at moved − still owed at the source', () => {
+  const b = book();
+  b.farrowed('S', 14); b.farrowed('R', 8);
+  b.treat('S', 'iron3', 12, { deferred: { n: 2, reason: 'weak' } });
+  b.treat('R', 'iron3', 8);
+  const mv = b.move('S', 'R', 3, { answers: { iron3: 'unknown' } });
+  let d = run(b, R1);
+  const g = d.litters.R.doses.iron3.unknownGroups[0];
+  assert.deepEqual([g.n, g.maxLacking, g.minHad], [3, 2, 1]);         // at most 2 of the 3 were untreated
+  const bad = b.check('R', 'iron3', 0, 3, { group: mv.id });           // had 0, lacking 3: impossible
+  assert.equal(rejectedReason(run(b, R1), bad), 'more_than_untreated');
+  b.ev.pop();
+  const rec = b.treat('R', 'iron3', 3, { target: 'unknown', group: mv.id });   // record now for all 3: a double dose
+  assert.equal(rejectedReason(run(b, R1), rec), 'more_than_untreated');
+  b.ev.pop();
+  b.check('R', 'iron3', 1, 0, { group: mv.id });
+  b.treat('R', 'iron3', 2, { target: 'unknown', group: mv.id });
+  d = run(b, R1);
+  assert.deepEqual(d.rejected, []);
+  assert.equal(d.litters.R.doses.iron3.done, true);
+});
+
+test('R3-12 End\'s orphan line counts every death, those at birth included (the drawer\'s Dead)', () => {
+  const b = book();
+  b.farrowed('O', 8, { stillborn: 2 }); b.farrowed('R', 8);
+  b.death('O', [{ cause: 'crushed', n: 1 }]);
+  b.sowDied('O', { at: on(2) });
+  b.move('O', 'R', 5, { at: on(3, '09:00') });
+  const o = select.end(run(b, R1T(['O', 'R']))).orphans[0];
+  assert.equal(o.dead, 3); assert.equal(o.dead, run(b, R1T(['O', 'R'])).litters.O.dead.total);
+});
+
+test('round 7 a farm with no identity scheme owes no tagging and shows none (fixture no-identity)', async () => {
+  const F = await import('../ux/tasks/piglet-processing/fixtures.js');
+  assert.deepEqual(F.FARMS.none, { scheme: 'none' });
+  const v = F.VARIANTS['no-identity']();
+  assert.equal(v.config.identity.scheme, 'none');
+  const d = derive(v.events, v.config, { today: v.today });
+  assert.deepEqual(d.rejected, []);
+  for (const L of Object.values(d.litters)) {
+    assert.equal(select.identityDue(d, L.id).status, 'none', L.id);
+    assert.equal(L.identity.done, null, L.id);
+  }
+  const room = select.room(d, { lens: 'all', identity: true });
+  assert.equal(room.rows.every((r) => r.identity.status === 'none' && r.left.identity === 0), true);
+  assert.equal(select.end(d).now.unfinishedLitters.every((id) => d.litters[id].identity.done !== false), true);
+});
