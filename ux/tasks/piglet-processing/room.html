@@ -331,7 +331,7 @@
   /* R2-12/13: what the row says it owes comes from the ledger's row fields — the piglets owing now (not the litter's size),
      the deferred among them (weak, sick: a hold for another group or an unripe age is not a deferral the worker made),
      the late days, and whether only the tagging is left. One headline, one meta line. */
-  var HOLDS = { not_due: 1, other_group: 1 };
+  var HOLDS = { not_due: 1 };
   function deferredOf(f) { return Math.max.apply(null, [0].concat(owedItems(f).filter(function (x) { return x.tx !== 'identity' && !HOLDS[x.reason]; }).map(function (x) { return x.deferred || 0; }))); }
   function owesSpec(f, s) {
     var items = owedItems(f), live = items.filter(function (x) { return !x.deferredAll; });

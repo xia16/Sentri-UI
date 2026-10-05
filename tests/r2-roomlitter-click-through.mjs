@@ -87,7 +87,13 @@ try {
   await page.waitForTimeout(700);
   assert.match(await face(page), /Saved · iron · day 3 · 8 piglets/);
   assert.equal(await page.locator('[data-action="record"][data-value^="iron3"]').count(), 1);
-  console.log('ok 5 split rows: own 8 recorded, the arrival stays its own row');
+  // group-targeted: the arrival keeps its own age and status (Due today), the litter's own stay 1 day late
+  assert.match(await text(page, '.tk-day:has-text("Due today")'), /Due today/);
+  await go('room.html?state=litter&crate=C05&data=moved-to-c05&fresh=1');
+  await page.click('[data-action="record"][data-value^="iron3#B06"]');
+  await page.waitForTimeout(700);
+  assert.match(await text(page, ".tk-day:has-text(\"1 day late\")"), /1 day late.*Dock tail 8 of its own/s);
+  console.log('ok 5 split rows: either group first, the other keeps its own age and status');
   await page.goto(base + 'room.html?state=litter&crate=C05&data=moved-to-c05&fresh=1&lang=zh'); await ready(page);
   assert.match(await face(page), /来自 B06 · 1头/);
 
