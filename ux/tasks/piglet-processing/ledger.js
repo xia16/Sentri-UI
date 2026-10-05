@@ -105,6 +105,14 @@
      select.end()                        R2-26 litters (joined nurses included) · stillNotDone (not done at End and still not
                                        done: an accepted late mark clears it) · atEnd/now.notYetDueOnly (unfinished leaves them
                                        out) · R2-N5 orphans [{ litter, sowDied, alive, dead, moved: [{ to, n, at }] }]
+     select.edit(d, id, draft)           R2-25 deaths[i].pieces [{ key ('<line>:<k>' | 'row:<rowId>'), cause, rowId?, tag?,
+                                       notch? }]; draft.deaths[id].voidPieces [keys] → `{ target, set: { lines } }` (all
+                                       pieces → void), change `death_pieces { death, n, left }`. R2-20 `sow { id, cause, at,
+                                       who }` | null; draft.sow { void } → `sow_void` | { to } → `sow_move` (set litter)
+     select.deathDraft(…, { foundIn })   R2-23 the death event carries `foundIn` (a body found in another crate);
+                                       litters[id].deaths[i].foundIn, select.record death entries `foundIn`
+     done rows' lateness                 R2-28 bulkDraft rows kind `done` keep `lateBy` (today's records done late, from
+                                       their own day-age); select.room rows `doneLate`
    People (farrowing's names): person(who, derived|config?) → `G. Hansen` for `G.H` (config.people, else definePeople's
      map — the fixtures define theirs; unknown initials stay); lastEvent.whoName, lastRecord.whoName and the room's
      lastRecord.whoName carry it. PPLedger.person / PPLedger.definePeople in the browser.
@@ -1166,7 +1174,8 @@ function applyDeath(ctx, e) {
     flag(ctx, L, 'sync_review', 'held_body', [e.id], { held: heldN });
   }
   const fromLoss = [...take.values()].reduce((s, v) => s + v, 0);
-  L.deaths.push({ id: e.id, byCause, plain: locked ? plain : untagged, rows: aliveRowDeaths.length + (locked ? appliedRows.length : missingRowDeaths.length), fromMissing: fromLoss, held: heldN, excess: heldN, at: e.at || null, who: e.who || null, phase: L.phase });
+  L.deaths.push({ id: e.id, byCause, plain: locked ? plain : untagged, rows: aliveRowDeaths.length + (locked ? appliedRows.length : missingRowDeaths.length), fromMissing: fromLoss, held: heldN, excess: heldN, at: e.at || null, who: e.who || null, phase: L.phase,
+    foundIn: e.foundIn || null });                    // a body found in another crate (R2-23): where it lay
   return [L];
 }
 
@@ -1906,6 +1915,10 @@ function trial(derived, event, stamp) {
 }
 
 /* One litter as the room sees it (room glossary, slice S1). */
+/* How late today's records of a dose were (0 if on time or early): the latest record's day-age past the due day. */
+function doneLateOf(D, today) {
+  return Math.max(0, ...D.records.filter((r) => dayNumber(r.at) === today && r.timing === 'late' && r.dayAge != null).map((r) => r.dayAge - D.due));
+}
 function roomFacts(derived, L, o) {
   const cfg = derived.config, order = doseOrder(cfg), today = derived.today;
   const Ds = Object.values(L.doses);
@@ -1954,6 +1967,7 @@ function roomFacts(derived, L, o) {
     open: { loss: L.unexplained.openLoss, gain: L.unexplained.openGain, any: L.unexplained.openLoss + L.unexplained.openGain > 0 },
     left: { treatments: live.length, identity: idd.status === 'due' || idd.status === 'late' ? idd.owed || 0 : 0 },
     lateDays: lateBy,
+    doneLate: Math.max(0, ...Ds.filter((D) => D.done).map((D) => doneLateOf(D, today))),   // R2-28: today's records done late
     unfinished: { n: live.length + lapsed.length + (idLive ? 1 : 0), missed: lapsed.length },
     doses: live.map(doseRow), lateBy, partly: lens === 'owed' && !!recToday,
     missed: lapsed.map((D) => ({ dose: D.dose, tx: D.tx, last: D.last, n: D.owed })),
@@ -2115,7 +2129,7 @@ function deathDraftSelect(derived, litterId, draft, stamp) {
   const fromLoss = dr.fromLoss || {};
   const lines = Object.entries(tallies).filter(([, n]) => n > 0).map(([cause, n]) => ({ cause, n }))
     .concat(pickIds.map((rowId) => Object.assign({ cause: picks[rowId], rowId }, fromLoss[rowId] ? { fromLoss: fromLoss[rowId] } : {})));
-  const ev = Object.assign({ type: 'death', litter: L.id, lines }, locked && bodies && k ? { fromMissing: k } : {});
+  const ev = Object.assign({ type: 'death', litter: L.id, lines }, locked && bodies && k ? { fromMissing: k } : {}, dr.foundIn ? { foundIn: dr.foundIn } : {});
   let after = null;
   if (!why) {
     const r = trial(derived, ev, stamp);
@@ -2372,7 +2386,11 @@ function bulkDraftSelect(derived, opts) {
     const last = todays.length ? todays[todays.length - 1] : null;
     if (E) continue;                                     // after End no new marks (RULINGS round 3): no rows
     if (D.status === 'later') Object.assign(row, { kind: 'not_due', inDays: D.due - L.dayAge });
-    else if (D.done) { if (!todays.length) continue; Object.assign(row, { kind: 'done', records: todays, collided: todays.some((r) => r.collided) }); }
+    else if (D.done) {
+      if (!todays.length) continue;
+      // done late keeps its lateness (R2-28): from the records' own day-age, so a reload reads the same
+      Object.assign(row, { kind: 'done', records: todays, collided: todays.some((r) => r.collided), lateBy: doneLateOf(D, today) });
+    }
     else if (D.isCastration) Object.assign(row, { kind: 'sheet', why: 'castration', n: D.owed });
     else if (D.status === 'missed') Object.assign(row, { kind: 'sheet', why: 'missed', n: D.owed, last: D.last });
     else if (D.deferred > 0) Object.assign(row, { kind: 'sheet', why: 'deferred', n: D.owed, reason: D.deferReason, last });
@@ -2642,7 +2660,7 @@ function recordSelect(derived, id) {
       const d = L.deaths.find((x) => x.id === e.id);
       const byCause = {};
       for (const l of e.lines || []) byCause[l.cause] = (byCause[l.cause] || 0) + (l.rowId ? 1 : l.n || 0);
-      out.push(Object.assign(base, { kind: 'death', byCause, n: sum(byCause), fromMissing: d ? d.fromMissing : 0, rows: (e.lines || []).filter((l) => l.rowId).map((l) => rowLabel(l.rowId)),
+      out.push(Object.assign(base, { kind: 'death', byCause, n: sum(byCause), fromMissing: d ? d.fromMissing : 0, foundIn: e.foundIn || null, rows: (e.lines || []).filter((l) => l.rowId).map((l) => rowLabel(l.rowId)),
         corrected, withdrawn: !d && corrected.length > 0, held: d ? d.held : 0 }));
     } else if (e.type === 'count') {
       const c = L.counts.find((x) => x.id === e.id);
@@ -2736,9 +2754,17 @@ function editSelect(derived, id, draft, stamp) {
   const deaths = L.deaths.map((x) => {
     const ev = events.find((e) => e.id === x.id) || {};
     const tagged = (ev.lines || []).some((l) => l.rowId);
+    // pieces (R2-25): one per body, so one can be withdrawn alone — `<line>:<k>` for a tally, `row:<rowId>` for a named piglet
+    const pieces = [];
+    (ev.lines || []).forEach((l, i) => {
+      if (l.rowId) { const r = L.identity.rows.find((y) => y.rowId === l.rowId) || {}; pieces.push({ key: 'row:' + l.rowId, cause: l.cause, rowId: l.rowId, tag: r.tag || null, notch: r.notch || null }); }
+      else for (let k = 1; k <= (l.n || 0); k++) pieces.push({ key: i + ':' + k, cause: l.cause });
+    });
     return { id: x.id, n: sum(x.byCause) + (x.held || 0), byCause: Object.assign({}, x.byCause), fromMissing: x.fromMissing, held: x.held || 0, at: x.at, who: x.who,
-      phase: x.phase, movable: !tagged && x.phase === 'locked', corrected: !!(derived.corrections && derived.corrections[x.id]) };
+      phase: x.phase, movable: !tagged && x.phase === 'locked', corrected: !!(derived.corrections && derived.corrections[x.id]), pieces, foundIn: x.foundIn || null };
   });
+  // the Sow died mark (R2-20): withdrawn, or moved to the right litter
+  const sow = L.sowDied && L.sowDied.event ? { id: L.sowDied.event, cause: L.sowDied.cause, at: L.sowDied.at, who: L.sowDied.who } : null;
   const changes = [], list = [];
   let step = null;                                     // the draft's own step still missing (Save waits)
   const need = (s) => { if (!step) step = s; };
@@ -2842,12 +2868,40 @@ function editSelect(derived, id, draft, stamp) {
     const y = (dr.deaths || {})[x.id];
     if (!y) continue;
     if (y.void) { list.push({ target: x.id, void: true }); changes.push({ kind: 'death_void', death: x.id, n: x.n }); continue; }
+    if (Array.isArray(y.voidPieces) && y.voidPieces.length) {
+      const gone = new Set(y.voidPieces.filter((k) => x.pieces.some((p) => p.key === k)));
+      if (gone.size === x.pieces.length) { list.push({ target: x.id, void: true }); changes.push({ kind: 'death_void', death: x.id, n: x.n }); continue; }
+      const ev = events.find((e) => e.id === x.id) || {};
+      const lines = [];
+      (ev.lines || []).forEach((l, i) => {
+        if (l.rowId) { if (!gone.has('row:' + l.rowId)) lines.push(Object.assign({}, l)); return; }
+        let k = 0; for (let j = 1; j <= (l.n || 0); j++) if (!gone.has(i + ':' + j)) k++;
+        if (k) lines.push(Object.assign({}, l, { n: k }));
+      });
+      const set = { lines };
+      // the bodies left can be drawn from the missing at most as many as there are untagged ones left
+      const untaggedLeft = lines.filter((l) => !l.rowId).reduce((s2, l) => s2 + l.n, 0);
+      if (ev.fromMissing && ev.fromMissing > untaggedLeft) set.fromMissing = untaggedLeft || null;
+      if (Array.isArray(ev.lossAlloc) && ev.lossAlloc.reduce((s2, a) => s2 + a.qty, 0) > untaggedLeft) {
+        let k = untaggedLeft; set.lossAlloc = ev.lossAlloc.map((a) => { const t = Math.min(a.qty, k); k -= t; return { lossId: a.lossId, qty: t }; }).filter((a) => a.qty);
+      }
+      list.push({ target: x.id, set });
+      changes.push({ kind: 'death_pieces', death: x.id, n: gone.size, left: x.pieces.length - gone.size });
+      continue;
+    }
     if (y.to !== undefined) {
       if (!y.to) { need({ why: 'crate', death: x.id }); continue; }
       if (!x.movable) { need({ why: 'row_death', death: x.id }); continue; }
       // the body is a plain death on the right litter: its link to this litter's missing piglets does not travel
       list.push({ target: x.id, set: { litter: y.to, lossAlloc: null, fromMissing: null } });
       changes.push({ kind: 'death_move', death: x.id, n: x.n, to: y.to });
+    }
+  }
+  if (dr.sow && sow) {
+    if (dr.sow.void) { list.push({ target: sow.id, void: true }); changes.push({ kind: 'sow_void', sow: sow.id }); }
+    else if (dr.sow.to !== undefined) {
+      if (!dr.sow.to) need({ why: 'crate', sow: sow.id });
+      else { list.push({ target: sow.id, set: { litter: dr.sow.to } }); changes.push({ kind: 'sow_move', sow: sow.id, to: dr.sow.to }); }
     }
   }
   if (dr.reopen && closed) {
@@ -2880,7 +2934,7 @@ function editSelect(derived, id, draft, stamp) {
   }
   const A = after ? after.litters[id] : null;
   return {
-    litter: id, marks, rows, moves, counts, deaths, closed, targets, crates, ended,
+    litter: id, marks, rows, moves, counts, deaths, sow, closed, targets, crates, ended,
     changes, step, why, whyDetail, later, warnings,
     events: why || !event ? null : [event],
     afterEnd: ended && !!event,
