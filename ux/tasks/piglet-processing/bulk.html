@@ -21,6 +21,8 @@
 .bk-review { display: flex; flex-direction: column; gap: var(--space-heading); }
 .bk-review > * { margin: 0; }
 /* A row this record finished holds its place (flash), then settles into its door. */
+.bk-row-open { appearance: none; background: none; border: 0; margin: -21px -10px -7px; padding: 21px 10px 7px; min-height: 44px; min-width: 44px; box-sizing: border-box; cursor: pointer; text-align: left; }
+.bk-row-open:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; border-radius: 6px; }
 .tk-row[data-flash] { background: var(--green-wash); }
 .tk-row { transition: background 1100ms ease-out; }
 @media (prefers-reduced-motion: reduce) { .tk-row { transition: none; } }
@@ -64,7 +66,7 @@
   var ROOM = +(qs.get('unit') || 7);
   var TX = qs.get('tx') || 'iron';
   var store, CFG, DOSE, TICKS, holds;
-  var S = { sel: [], review: false, contract: {}, receipt: null, held: [], flash: false, failed: null };
+  var S = { sel: [], review: false, contract: {}, receipt: null, held: [], flash: false, failed: null, late: {} };
   var holdTimer = 0;
 
   /* ---- the ledger ---- */
@@ -117,13 +119,30 @@
       : r.why === 'missed' ? s('pp.bulk.l1.missed', { n: r.n, d: r.last })
       : r.why === 'unknown' ? s('pp.bulk.l1.unknown', { n: r.n }) : s('pp.bulk.l1.castration')];
   }
+  /* The meta line: the litter's age (only where it differs from the dose's day), and what the one chip had no room for. A
+     done row's lateness is what this record made up (read when it was written), kept for the page's life. */
+  function meta(r) {
+    var m = [];
+    if (r.kind === 'done' && r.sowDied && !r.collided) m.push(s('pp.bulk.chip.done'));
+    if (r.day !== doseCfg(DOSE).due) m.push(s('pp.common.unit.day', { n: r.day }));
+    if (r.kind === 'done' && S.late[r.litter]) m.push(s(one('pp.bulk.row.late', S.late[r.litter]), { n: S.late[r.litter] }, 'red'));
+    var out = [];
+    m.forEach(function (x, i) { if (i) out.push(SEP); out.push(x); });
+    return out.length ? out : '';
+  }
   function row(r, how) {
-    return K.row({ id: s('pp.bulk.code', { code: r.litter }), chip: chip(r), headline: headline(r), tone: r.kind === 'not_due' ? 'forecast' : '',
+    var html = K.row({ id: s('pp.bulk.code', { code: r.litter }), chip: chip(r), headline: headline(r), tone: r.kind === 'not_due' ? 'forecast' : '',
       // The title says the dose's day (`Iron · day 3`): the litter's age shows only where it differs from it.
-      meta: r.day !== doseCfg(DOSE).due ? s('pp.common.unit.day', { n: r.day }) : '', value: r.litter,
+      meta: meta(r), value: r.litter,
       trail: how === 'select' ? 'tick' : how === 'door' ? 'chevron' : '', action: how === 'door' ? 'open-litter' : '', still: how === 'static',
       tick: how === 'select' ? { action: 'toggle', checked: S.sel.indexOf(r.litter) >= 0 } : null,
       data: S.flash && S.held.indexOf(r.litter) >= 0 ? { flash: '' } : null });
+    // A tickable row is one tap to tick (the whole row); its id is its own target and opens the litter.
+    // (A button inside a label would be the label's control: `for` keeps the tick the row's.)
+    if (how === 'select') html = html.replace('<label class="tk-row"', '<label for="bk-tick-' + r.litter + '" class="tk-row"').replace('<input type="checkbox"', '<input id="bk-tick-' + r.litter + '" type="checkbox"').replace(/<span class="tk-row-id">(<span [^>]*>[^<]*<\/span>)<\/span>/, function (m, inner) {
+      return '<button type="button" class="tk-row-id bk-row-open" data-action="open-litter" data-value="' + r.litter + '">' + inner + '</button>';
+    });
+    return html;
   }
   /* Rows grouped by crate row (A, B, C…), the room's grouping; a tick where one tap records, a door everywhere else. */
   function how(r) {
@@ -240,6 +259,7 @@
     S.receipt = { outcomes: b.plan.outcomes, litters: b.plan.litters, piglets: b.plan.piglets, late: lateCount(b.plan.record),
       changed: b.plan.changed.slice(), double: [], mine: res.events.map(function (e) { return e.id; }) };
     recheck();
+    b.plan.record.forEach(function (x) { if (x.lateBy > 0) S.late[x.litter] = x.lateBy; });
     S.held = b.plan.outcomes.filter(function (x) { return x.outcome === 'record' || x.outcome === 'died' || x.outcome === 'nothing'; }).map(function (x) { return x.litter; });
     S.sel = []; S.review = false; saveTicks();
     return true;
