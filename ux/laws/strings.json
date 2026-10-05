@@ -1410,6 +1410,8 @@
     "pp.move.rcpt.spray.one": {"en": "· spray-mark the piglet", "zh": "· 给这头仔猪喷漆标记", "kind": "status"},
     "pp.move.rcpt.spray.many": {"en": "· spray-mark the {n} piglets", "zh": "· 给这{n}头仔猪喷漆标记", "kind": "status"},
     "pp.move.rcpt.joins": {"en": "· {to} joins this task", "zh": "· {to}加入本任务", "kind": "status"},
+    "pp.move.closes.label": {"en": "This is the missing piglet from {code}", "zh": "这就是{code}不明减少的{n}头", "kind": "label"},
+    "pp.move.closes.meta": {"en": "{code} keeps its alive · the loss line closes", "zh": "{code}存活数不变 · 不明减少记录关闭", "kind": "body"},
     "pp.move.list.empty": {"en": "Sows with no piglets", "zh": "无仔猪的母猪", "kind": "title"},
     "pp.move.list.near": {"en": "Row {row} · nearest age first", "zh": "{row}排 · 日龄相近优先", "kind": "title"},
     "pp.move.moves.in.many": {"en": "{n} piglets from {code}", "zh": "从{code}转入{n}头", "kind": "label"},

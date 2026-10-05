@@ -143,11 +143,20 @@ try {
   await find(page, 'E01');
   await page.click('[data-action="pick-crate"][data-value="E01"]');
   d = await drawer(page);
-  assert.match(d, /E01's own 7 piglets join too · owe Cut cord, Nasal drops \(2 days late\)/);
+  assert.match(d, /E01's own 7 piglets join too.*owe Cut cord, Nasal drops \(2 days late\)/);
   await page.click('[data-action="save-move"]');
   await back(page);
   assert.match(await drawer(page), /Saved · 1 piglet moved to E01/);
   console.log('ok 8 own piglets join too: preview before Save, receipt in the drawer');
+  // 9. R2-3: a source with an open loss offers "this is the missing piglet": the line closes, the source keeps its alive.
+  await openMove(page, 'D03', true);
+  await find(page, 'A02');
+  await page.click('[data-action="pick-crate"][data-value="A02"]');
+  await page.click('[data-action="step"][data-value="untagged"][data-step="1"]');
+  assert.match(await drawer(page), /From D03\s*11 → 10/);
+  await page.click('[data-action="closes-loss"]');
+  assert.match(await drawer(page), /From D03\s*11 → 11/);
+  console.log('ok 9 missing piglet moved: the source keeps its alive');
 
   await browser.close();
 } finally {
