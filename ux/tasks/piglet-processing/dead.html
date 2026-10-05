@@ -563,7 +563,7 @@
     else if (a === 'resolve') { if (UI.guard(b) || !v) return; var rv = v.split('|'); S.heldPick = ''; store.commit({ type: 'resolve', litter: tgt(), held: rv[0], answer: rv[1] }); S.sub = ''; }
     else if (a === 'mode') S.mode = v;
     else if (a === 'sow-cause') { S.sow.cause = v; keep(); }
-    else if (a === 'clear') { if (gray) return; clearMode(); }
+    else if (a === 'clear') { if (gray) return; clearMode(); if (!mem && !pigDirty() && !sowDirty() && /^end\.html/.test(qs.get('back') || '')) { leave(''); return; } }   // a draft reached from End: Clear returns there (R3-7)
     else if (a === 'back') { keep(); leave(''); return; }             // Back, ✕ and the scrim keep both drafts on the device
     else if (a === 'photo-add') {
       var key = v;

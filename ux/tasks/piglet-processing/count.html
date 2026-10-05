@@ -514,7 +514,9 @@
   }
   // the litter drawer over the room: where Set count and Explain were opened (with `saved=count`, the count's receipt)
   // the page is replaced, never stacked: Back from the litter lands before this count, not on it (R2-24)
-  function toLitter(saved) { location.replace(PP.href('room.html', { state: 'litter', crate: crate, unit: qs.get('unit'), saved: saved, data: store.name })); }
+  // a draft reached from End (`back=end.html…`) returns there after Save, Back or Clear (R3-7)
+  function fromEnd() { var b = qs.get('back') || ''; return /^end\.html(\?[^#]*)?$/.test(b) ? b : ''; }
+  function toLitter(saved) { if (fromEnd()) { location.replace(fromEnd()); return; } location.replace(PP.href('room.html', { state: 'litter', crate: crate, unit: qs.get('unit'), saved: saved, data: store.name })); }
   function goTo(target) {
     var t = document.querySelector('[data-target="' + target + '"]');
     if (t) { t.scrollIntoView({ block: 'center' }); var f = t.querySelector('input, button'); if (f) f.focus({ preventScroll: true }); }
@@ -535,7 +537,7 @@
       keepDraft();
     }
     else if (a === 'pick-row') { var i = S.rows.indexOf(v); if (i >= 0) S.rows.splice(i, 1); else S.rows.push(v); touch(); keepDraft(); }
-    else if (a === 'clear') { dropDraft(); S.observed = draft().base; S.rows = []; S.at = null; S.obsMs = 0; S.seen = null; S.baseAlive = null; S.failed = false; S.blank = !!conflictNow(); }
+    else if (a === 'clear') { dropDraft(); S.observed = draft().base; S.rows = []; S.at = null; S.obsMs = 0; S.seen = null; S.baseAlive = null; S.failed = false; S.blank = !!conflictNow(); if (fromEnd()) { location.replace(fromEnd()); return; } }
     else if (a === 'save') {
       // a waiting Save answers the tap (the reason flashes and re-announces) and points at the step
       if (UI.guard(b)) {
