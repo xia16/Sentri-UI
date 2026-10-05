@@ -264,7 +264,7 @@
       var who = g.kind === 'own' ? P('pp.litter.grp.own', { k: g.n }) : tags.length && tags.length <= 3 ? P('pp.litter.grp.from_tags', { k: g.n, code: g.from, tags: tags.join(', ') }) : P('pp.litter.grp.from', { k: g.n, code: g.from });
       return [who, P('pp.litter.grp.day', { d: g.dayAge }), whenTok(g)];
     }
-    var HOLDS = { not_due: 1, other_group: 1 };   // a hold for the other group or an unripe age: not a deferral the worker made
+    var HOLDS = { not_due: 1 };   // a hold for an unripe age: not a deferral the worker made
     function agesDiffer(gs) { return gs.some(function (g) { return g.dayAge !== gs[0].dayAge; }); }
     function hasDraft(id) { return !!(drafts[id] || drafts['range:' + id]); }
     function showGroups(o) { return agesDiffer(o.groups); }
@@ -848,21 +848,19 @@
       return r;
     }
     function otherRecord(id) { var rs = D(id).records.filter(function (r) { return !visit[r.id]; }); return rs[rs.length - 1] || null; }
-    /* A split row's Record (`<dose>#<group>`) records that group's piglets; the others stay owed, held as `not_due` when they are
-       all of an age not yet due, else as `other_group` (the ledger has no per-group record: the other group is relabelled the
-       litter's own once this one is recorded — reported). */
+    /* A split row's Record (`<dose>#<group>`) is a group-targeted record: `cohort` names the age group; the ledger leaves the
+       others owed on their own age and status. */
     function groupTap(o, gk) {
       var g = groupsOf(o).filter(function (x) { return gkey(x) === gk; })[0];
-      if (!g) return { n: 0 };
-      var rest = o.owed - g.n, later = groupsOf(o).filter(function (x) { return x.status === 'later'; }).reduce(function (s, x) { return s + x.n; }, 0);
-      return { n: g.n, rest: rest, reason: rest && rest === later ? 'not_due' : 'other_group' };
+      return { n: g ? g.n : 0 };
     }
     function tap(id, label, gk) {
       var o = view().owed.filter(function (x) { return x.dose === id; })[0], gt = o && gk ? groupTap(o, gk) : null, n = o ? (gt ? gt.n : tapN(o)) : 0;
       if (label !== n) { receipt = { kind: n ? 'stale' : 'already', dose: id, other: otherRecord(id), now: owedOf(id) }; return; }
       if (!n) return;
       var ev = doseCfg(id).castration ? { dose: id, castration: { castrated: n } } : { dose: id, n: n };
-      if (gt && gt.rest) ev.deferred = { n: gt.rest, reason: gt.reason };
+      // other groups due now: a group-targeted record. Only later groups left: the not-due deferral (they come back on their day)
+      if (gt && groupsOf(o).some(function (x) { return gkey(x) !== gk && x.status !== 'later'; })) ev.cohort = gk;
       else if (splitNow(o)) ev.deferred = { n: o.owed - n, reason: 'not_due' };
       var r = commit(ev);
       if (!r.ok) receipt = { kind: r.reason === 'nothing_owed' ? 'already' : 'stale', dose: id, other: otherRecord(id), now: owedOf(id) };
