@@ -209,6 +209,35 @@ try {
   assert.match(await text(page, '[data-ds="Log"]'), /found in A02/);
   console.log('ok 11 R2-23 body found in A02 → recorded on D03 → D03\'s log: found in A02');
 
+  // 12. R3-5: a loss that names tagged piglets (B06: 271002 and 271004 counted missing) is listed under `Found outside its crate?`
+  // with D03's; nothing is auto-picked (two candidates, then a lone one is still a tap); routing there lets the worker tick the
+  // named tag, and R3-16: the cause choice is in view right after the tick (small phone, long list).
+  const small = await (await browser.newContext({ viewport: { width: 360, height: 640 } })).newPage();
+  await toDead(small, 'A02', 'explain-named');
+  assert.match(await text(small, '#screen'), /Found outside its crate\? 2 crates have piglets missing/);
+  await small.click('[data-action="sub"][data-value="nb"]');
+  assert.match(await dialog(small), /B06 2 piglets missing.*D03 2 piglets missing/);
+  await small.click('[data-action="route"][data-value="B06"]');
+  assert.match(await dialog(small), /Dead B06.*Recording in B06 · found in A02/);
+  await small.click('[data-action="sub"][data-value="tagged"]');
+  await small.check('input[data-action="pick"][value="B06-r2"]');
+  const inView = async () => {
+    const c = await small.locator('[data-target="pick-cause"] [data-action="pick-cause"]').first().boundingBox();
+    const body = await small.locator('.tk-sheet .tk-sheet-body').boundingBox();
+    return c && c.y >= body.y - 1 && c.y + c.height <= body.y + body.height + 1;
+  };
+  assert.ok(await inView(), 'the cause choice is not in view after the tick');
+  await small.click('[data-action="pick-cause"][data-value="crushed"]');
+  await small.click('[data-action="save"]');
+  await small.waitForURL(/state=litter.*crate=A02/); await ready(small);
+  const ev12 = (await log(small, 'explain-named')).pop();
+  assert.equal(ev12.litter, 'B06'); assert.equal(ev12.foundIn, 'A02');
+  assert.deepEqual(ev12.lines.map((l) => l.rowId), ['B06-r2']);
+  // D03 is the lone candidate once B06 is explained away; B06 still has 271004 missing, so it stays listed
+  await small.click('[data-action="open-dead"]'); await small.waitForURL(/dead\.html/); await ready(small);
+  assert.match(await text(small, '#screen'), /Found outside its crate\? 2 crates have piglets missing/);
+  console.log('ok 12 R3-5 a tagged loss is offered outside-its-crate; the worker ticks the named tag; cause in view');
+
   await browser.close();
 } finally {
   server.kill();

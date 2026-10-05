@@ -60,6 +60,9 @@
     'dead-neighbours':        { crate: 'A02', data: 'explain', pig: { tallies: { crushed: 1 } } },
     'dead-neighbours-list':   { crate: 'A02', data: 'explain', pig: { tallies: { crushed: 1 } }, sub: 'nb' },
     'dead-found':             { unit: 7, data: 'explain', found: true },
+    'dead-neighbours-named':  { crate: 'A02', data: 'explain-named', sub: 'nb' },
+    'dead-routed-named':      { crate: 'A02', data: 'explain-named', pig: { route: 'B06' } },
+    'dead-routed-named-list': { crate: 'A02', data: 'explain-named', pig: { route: 'B06' }, sub: 'tagged' },
     'dead-tagged':            { crate: 'B06' },
     'dead-tagged-list':       { crate: 'B06', sub: 'tagged' },
     'dead-tagged-picked':     { crate: 'B06', sub: 'tagged', pig: { tallies: { scours: 1 }, picks: { 'B06-r4': 'crushed', 'B06-r9': 'crushed' } } },
@@ -252,9 +255,11 @@
     Object.keys(all).sort().forEach(function (id) {
       var L = all[id];
       if (id === crate || L.room !== room || L.phase !== 'locked' || !L.unexplained.openLoss) return;
-      var d = store.select.deathDraft(store.derived, id, { tallies: { crushed: 1 } });
-      if (!d.asksLoss) return;
-      out.push({ id: id, m: d.openLoss - d.roster.filter(function (r) { return r.status === 'missing'; }).length, loss: d.losses[0] });
+      // R3-5: every crate with an open loss, including one whose loss names tagged piglets (the body is one of those: the
+      // worker ticks it once routed). m counts everything that litter is missing.
+      var d = store.select.deathDraft(store.derived, id, {});
+      if (!d.losses.length) return;
+      out.push({ id: id, m: d.openLoss, loss: d.losses[0] });
     });
     return out;
   }
@@ -590,6 +595,11 @@
     if (t.dataset.action === 'pick') {
       if (t.checked) S.pig.picks[t.value] = ''; else { delete S.pig.picks[t.value]; delete S.pig.miss[t.value]; }
       keep(); render();
+      // R3-16: a ticked piglet with no cause yet: the cause choice (below the long list) scrolls into view, by the least it takes
+      if (picks().some(function (r) { return !S.pig.picks[r]; })) {
+        var pc = screen.querySelector('[data-target="pick-cause"]');
+        if (pc) pc.scrollIntoView({ block: 'nearest' });
+      }
     }
   });
   screen.addEventListener('input', function (ev) {

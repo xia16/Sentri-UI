@@ -48,10 +48,15 @@
     // R1-27: a count far above Alive asks before it saves; 0 asks "moved or weaned?"; a kept 0 asks again (never a stale 0 ready)
     'count-high':      { view: 'count', crate: 'A02', observed: 42 },
     'count-zero':      { view: 'count', crate: 'A02', observed: 0 },
+    'count-high-said': { view: 'count', crate: 'A02', observed: 42, sure: 42 },
+    'count-zero-said': { view: 'count', crate: 'A02', observed: 0, sure: 0 },
     'count-kept-zero': { view: 'count', crate: 'A02', kept: { observed: 0, rows: [], at: '2026-09-29T10:20', ageMin: 10 } },
     // R1-9: a count below Alive on a litter with tags may name which tagged piglets are missing (optional when untagged cover it)
     'count-name-optional': { view: 'count', crate: 'B06', observed: 11, rows: ['B06-r4'] },
     'count-name-list': { view: 'count', crate: 'B06', observed: 11, rows: ['B06-r4'], sub: 'roster' },
+    'count-name-need': { view: 'count', crate: 'B06', observed: 5, rows: [], sub: 'roster' },
+    'count-name-need-some': { view: 'count', crate: 'B06', observed: 5, rows: ['B06-r4'], sub: 'roster' },
+    'count-name-need-done': { view: 'count', crate: 'B06', observed: 5, rows: ['B06-r1', 'B06-r2', 'B06-r3', 'B06-r4'], sub: 'roster' },
     // R1-22: a held body is answered in the Set count drawer too, above the number
     'count-held':      { view: 'count', crate: 'A07', data: 'held-body' },
     'count-held-ask':  { view: 'count', crate: 'A07', data: 'held-body', sub: 'held' },
@@ -265,8 +270,13 @@
       return UI.choiceRow({ label: '', mode: 'multi', action: 'pick-row', value: r.rowId, selected: S.rows.indexOf(r.rowId) >= 0, mono: true, strs: { label: l.id }, args: { label: l.args } });
     }));
     var p = pointer(d);
+    // R3-16: the line counts down as piglets are ticked (what is still needed, then that it is enough), in plain words
+    var left = Math.max(0, d.needRows - d.picked.length), sd;
+    if (!must) sd = 'pp.count.named.desc_opt';
+    else if (left > 0) sd = pl(d.untagged > 0 ? 'pp.count.named.desc' : 'pp.count.named.desc_all', left);
+    else sd = 'pp.count.named.desc_done';
     return K.drawer({ size: 'long', view: 'roster', title: s(must ? pl('pp.count.named.title', d.needRows) : 'pp.count.named.title_opt'),
-      subtitle: [s(must ? pl('pp.count.named.desc', d.needRows) : 'pp.count.named.desc_opt', { up: np(d.untagged), kp: np(d.maxRows), n: d.needRows })], close: { action: 'sub-dismiss' },
+      subtitle: [s(sd, { up: np(d.untagged), kp: np(d.maxRows), n: must && left === 0 ? d.picked.length : left })], close: { action: 'sub-dismiss' },
       body: '<div class="ct-body" data-target="roster-list">' + rows + '</div>',
       footer: saveFooter(p, !d.event || !!stale() || S.failed || !!sanity(d), 'save', 'act.save', null, 'sub-back'), scrim: { action: 'sub-dismiss' } });
   }
@@ -283,6 +293,11 @@
     var ask = sanity(d);
     if (ask === 'zero') return { id: 'pp.count.why.zero', args: { ap: np(d.base) }, act: { action: 'sure', id: 'pp.count.zero.yes' } };
     if (ask === 'far') return { id: 'pp.count.why.far', args: { np: np(S.observed), k: d.diff, ap: np(d.base) }, act: { action: 'sure', id: 'pp.count.far.yes', args: { n: S.observed } } };
+    // R3-20: the worker's answer to the sanity question is said back, where Save waits (never silent)
+    if (S.sure != null && S.sure === S.observed) {
+      if (S.observed === 0 && d.base > 0) return { id: 'pp.count.zero.said', block: true };
+      if (d.kind === 'gain' && d.diff >= FAR) return { id: 'pp.count.far.said', args: { n: S.observed }, block: true };
+    }
     return null;
   }
   /* R1-27: a count far above Alive, or 0 on a litter with piglets, is asked before Save (`sure` is never kept with the draft,
@@ -614,7 +629,7 @@
     TODAY = store.today;                   // the clock is the store's (R1-15): store.now() advances with every record
     crate = qs.get('crate') || spec.crate || '';
     var room = +(qs.get('unit') || spec.room || 0);
-    S = { view: spec.view, sub: '', observed: 0, rows: [], at: null, obsMs: 0, seen: null, pickRows: [], failed: false, receipt: null, deadRcpt: null, sure: null, more: {},
+    S = { view: spec.view, sub: '', observed: 0, rows: [], at: null, obsMs: 0, seen: null, pickRows: [], failed: false, receipt: null, deadRcpt: null, sure: spec.sure == null ? null : spec.sure, more: {},
       room: spec.view === 'explain' && !qs.get('crate') ? room : 0, line: spec.line || '', pick: spec.pick || '', focus: '', lastView: '' };
     if (!L()) crate = 'A02';
     if (spec.kept) {
@@ -630,7 +645,7 @@
     }
     if (S.view === 'count') {
       openCount();
-      if (spec.observed != null) { S.observed = spec.observed; touch(); }
+      if (spec.observed != null) { S.observed = spec.observed; touch(); if (spec.sure != null) S.sure = spec.sure; }
       if (spec.rows) S.rows = spec.rows.slice();
     }
     if (spec.sub) S.sub = spec.sub;

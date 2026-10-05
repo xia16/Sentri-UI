@@ -178,3 +178,12 @@ It is never silently a second death. Two deaths for one `rowId` keep the earlies
 - **R2-8 whole litter.** An entry that would leave nothing alive asks once in the footer, with its answer
   (`All 12 dead? Nothing is left alive in A02` · `Yes, all 12 dead`); the answer holds for that exact entry only.
 - Back and Save replace the page in history (`location.replace`), so the browser Back lands before the drawer.
+
+## Scenario round 3 (fix/r3-deadcount)
+
+- **R3-5 outside its crate lists every open loss.** The list is every other locked crate in the room with an open loss, including a
+  loss that names tagged piglets (`B06 · 2 piglets missing`). It is never narrowed or auto-picked: a lone candidate is still a row the
+  worker taps. Routing to a crate whose loss names tags drops the picks and shows that crate's roster; the worker ticks the named
+  tag (`counted missing 09:50` on its row), whose body closes its own loss. Only the worker pairs a body with a loss.
+- **R3-16 the cause of a ticked piglet.** Ticking an identified piglet that has no cause yet scrolls the cause choice into view by the
+  least it takes (`scrollIntoView({block: 'nearest'})`), so it is visible without scrolling by hand whatever the list's length.

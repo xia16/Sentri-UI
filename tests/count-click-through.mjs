@@ -71,9 +71,10 @@ try {
   await explain(page);
   await page.waitForURL(/count\.html\?state=explain/); await ready(page);
   const sug = page.locator('[data-action="suggest"][data-value$="|C-B08-gain"]').first();
-  assert.match((await sug.innerText()).replace(/\s+/g, ' '), /B08 gained 1 piglet both lines close\s*·\s*\d+ min/);
+  assert.match((await sug.innerText()).replace(/\s+/g, ' '), /B08 gained 1 piglet both lines close\s*·\s*counted \d+ min apart/);
   await sug.click();
   assert.match(await text(page, '[role="dialog"]'), /Alive stays 11 piglets in B06 and 10 piglets in B08/);
+  assert.match(await text(page, '[data-action="open-move"]'), /^Review move$/);                     // R3-20: only the Move sheet saves
   await page.click('[data-action="open-move"]');
   await page.waitForURL(/move\.html\?.*state=move-explain/); await ready(page);
   assert.match(await text(page, '.tk-sheet[data-view="move"]'), /Closes 1 unexplained loss and 1 gain/);
@@ -137,6 +138,7 @@ try {
   assert.match(await text(page, '#ct-why'), /17 piglets is 5 more than the record's 12 piglets · count again, or say it's right/);
   assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
   await page.click('[data-action="sure"]');
+  assert.match(await text(page, '#ct-why'), /You said 17 is right/);                       // R3-20: the answer is said back
   await page.click('[data-action="save"]');
   await page.waitForURL(/state=litter.*saved=count/); await ready(page);
   await page.waitForSelector('#lt-receipt span');
@@ -219,6 +221,16 @@ try {
   await page.goBack(); await ready(page);
   assert.doesNotMatch(page.url(), /count\.html/);
   console.log('ok 12 same-as-record writes nothing, Back skips the count page');
+
+  // 13. R3-16: the tagged-missing picker's line counts down as piglets are ticked and never says "0 untagged can't cover".
+  await page.goto(base + 'count.html?state=count-name-need&fresh=1'); await ready(page);
+  const sub13 = () => text(page, '.tk-sheet .tk-sheet-subtitle, .tk-sheet-head');
+  assert.match(await sub13(), /7 piglets missing · 3 piglets untagged · tick 4 more by tag/);
+  await page.check('input[data-action="pick-row"][value="B06-r1"]');
+  assert.match(await sub13(), /tick 3 more by tag/);
+  for (const r of ['B06-r2', 'B06-r3', 'B06-r4']) await page.check(`input[data-action="pick-row"][value="${r}"]`);
+  assert.match(await sub13(), /4 ticked · enough, the rest were untagged/);
+  console.log('ok 13 R3-16 the named-missing picker counts down as piglets are ticked');
 
   await browser.close();
 } finally {
