@@ -1,0 +1,17 @@
+colleague: family=openai model=gpt-6-astra effort=medium session=01a0f226-e990-78e3-be98-a16f319ce743 status=ok cached-tokens=2016384 roster-checked=2026-09-24
+
+**Not GREEN.** I inspected all 34 round-3 PNGs, treating the fix briefs and accepted trade-offs as authoritative. Five findings remain, ranked by visual impact:
+
+1. **`17-edit.png` — treatment rows remain too tall.** Removing the repeated wrong-crate actions helped, but stepper centers are still about **91px apart**, versus roughly **71px** in farrowing. Four treatments consume almost the reference’s six-row height. **Fix:** remove the extra inter-group gap/top padding; fit the label and stamp within the reference’s compact row. Keep the single wrong-crate door.
+
+2. **`zh-room.png`, `zh-litter.png`, `zh-dead.png` — Chinese still visibly renders with serif-style strokes.** This remains apparent in the room title, treatment names and death causes. The fallback stack exists in CSS, but the captures do not demonstrate the intended sans face. **Fix:** ensure a Chinese sans font actually loads in the rendering environment; verify the rendered glyphs rather than just the declared stack.
+
+3. **`18b-end-overview-metrics.png`, `19-end-review.png`, `20-end-hold.png`, `21-end-receipt.png` — headline metric numerals have a different face.** Processing’s `82`, `92` and `19` show serif-style numeral shapes unlike farrowing’s monospaced figures. The card hierarchy is fixed; the typography is not visually equivalent. **Fix:** make metric values and their nested string elements render with the same loaded numeral font as farrowing.
+
+4. **`10-dead-sow.png` — warning hierarchy still differs.** “Saving records her death” lacks the reference headline’s bold emphasis, and the consequence is red instead of muted. **Fix:** apply the reference’s bold red headline and muted smaller consequence. The current warning’s `text` path inherits red; use the detail styling for the consequence.
+
+5. **`20-end-hold.png` — the caption still changes to `KEEP HOLDING`.** Round-2 ruling 6 explicitly requires steady `HOLD TO END`; the reference retains it during the hold. **Fix:** preserve that caption in both the static preview and live holding phase. The current `capId()` still selects `pp.end.hold.keep`, whose English string is `KEEP HOLDING`.
+
+Sound: the remaining visible fixes—including content-sized drawers, day cards, filter footer, review labels, receipt row, narrow gutters/tools and birth-weight spacing—are substantially resolved.
+
+**Not probed:** live interactions, scrolling reachability, focus/inert behavior, font availability outside the capture environment, or states absent from these PNGs.
