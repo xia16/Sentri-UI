@@ -3,36 +3,108 @@
 /* the stack inside a sheet or a page body */
 .tk-sheet-body > * + *, .tk-page-body > * + * { margin-top: var(--space-heading); }
 .tk-sheet-body > .tk-stepper + .tk-stepper { margin-top: 0; }
-.tk-sheet-body > .tk-day + .tk-day { margin-top: var(--space-heading); }
 
 /* the receipt line after a save, with Undo */
 .sp-flash { display: flex; align-items: center; justify-content: space-between; gap: var(--space-footer-gap); min-height: var(--touch-min);
   color: var(--green); font: 500 var(--type-row-title-size)/1.4 var(--font-sans); }
 .tk-scroll > .sp-flash { margin: 0 var(--space-gutter) 4px; }
 .sp-flash > span { min-width: 0; }
-
-/* a two-phone note on the list */
 .sp-note { margin: 0 var(--space-gutter) var(--space-heading); }
-
-/* plain lines under the Born / Alive / Dead panel */
-.sp-lines { margin: 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
-.sp-lines > span + span { margin-left: 4px; }
-.sp-lines [data-tone="red"] { color: var(--red); }
-.sp-lines [data-tone="amber"] { color: var(--amber); }
 .sp-quiet { margin: 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
 .sp-empty { margin: var(--space-section) var(--space-gutter); font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); text-align: center; }
-
-/* farrowing's in-sheet tool row (Record death · Move · Set count): outlined tools sharing the width */
-.sp-toolrow { display: flex; gap: 8px; }
-.sp-tool { flex: 1 1 0; min-width: 0; min-height: var(--touch-min); display: flex; align-items: center; justify-content: center; gap: 5px;
-  margin: 0; padding: 8px 6px; border: 1px solid var(--line); border-radius: var(--radius-segment); background: var(--paper); color: var(--ink);
-  font: 500 var(--type-identifier-size)/1.3 var(--font-sans); white-space: nowrap; cursor: pointer; }
-.sp-tool:active { background: var(--press); }
-.sp-tool svg { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-@media (max-width: 370px) { .sp-tool svg { display: none; } }
-
-/* a footer of two buttons (Cancel · Record anyway; Undo · Done) */
+.sp-warn { margin: 6px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--amber); }
 .tk-footer.sp-two > * { flex: 1 1 0; min-width: 0; }
+@keyframes sp-tick-in { from { transform: scale(.7); background: var(--paper); border-color: var(--muted); } to { transform: none; } }
+@keyframes sp-tick-draw { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: none; } }
+
+/* ---- inside a pen: Processing | Piglets (farrowing's segment), [⋯] beside the footer's one action ---- */
+.sp-tabs.st-segment { margin: 0; }
+.tk-footer > .button.sp-more { flex: none; width: var(--control-height); min-width: 0; padding: 0; }
+.sp-more svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+
+/* Processing: one card per age-day. Done days fold; today's are open; later days are grey but can be done early. */
+.sp-days { display: flex; flex-direction: column; gap: var(--space-key-gap); }
+.sp-day { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); overflow: hidden; }
+.sp-day-head { display: flex; align-items: center; gap: 10px; width: 100%; min-height: var(--touch-min); margin: 0; padding: 0 var(--space-row-x); border: 0; background: none;
+  color: var(--ink); text-align: left; cursor: pointer; font: inherit; }
+.sp-day-head strong { flex: 1; min-width: 0; font: 600 var(--type-row-title-size)/1.3 var(--font-sans); }
+.sp-day-head > svg { flex: none; width: 14px; height: 14px; fill: none; stroke: var(--muted); stroke-width: 2; transition: transform .15s; }
+.sp-day-head[aria-expanded="true"] > svg { transform: rotate(90deg); }
+.sp-day-mark { flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; }
+.sp-day-mark svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.sp-day-mark[data-state="done"] { background: var(--well); color: var(--muted); }
+.sp-day-mark[data-state="todo"] { background: var(--green); color: var(--paper); }
+.sp-day-mark[data-state="future"] { color: var(--muted); }
+.sp-day[data-state="done"] .sp-day-head strong { color: var(--muted); font-weight: 500; }
+.sp-day[data-state="future"] .sp-day-head strong { color: var(--muted); }
+.sp-day-sub { margin: -6px 0 6px; padding: 0 var(--space-row-x) 0 44px; font: var(--type-meta-size)/1.5 var(--font-sans); color: var(--muted); }
+.sp-items { border-top: 1px solid var(--line); }
+/* an item: one checkbox row (the whole row ticks); ticked, its count shows as a small button for fewer piglets */
+.sp-item { display: flex; align-items: center; gap: var(--space-key-gap); width: 100%; min-height: 60px; margin: 0; padding: 0 var(--space-row-x) 0 0;
+  border: 0; background: none; color: var(--ink); text-align: left; font: inherit; }
+.sp-item + .sp-item { border-top: 1px solid var(--line); }
+button.sp-item { cursor: pointer; padding-left: var(--space-row-x); }
+div.sp-item[data-state="done"] { padding-left: var(--space-row-x); }
+.sp-item-main { flex: 1; min-width: 0; display: flex; align-items: center; align-self: stretch; margin: 0; padding: 10px 0 10px var(--space-row-x); border: 0; background: none;
+  color: inherit; text-align: left; font: inherit; cursor: pointer; }
+.sp-item-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.sp-item-copy strong { font: 600 var(--type-row-title-size)/1.3 var(--font-sans); }
+.sp-item-copy small { font: var(--type-meta-size)/1.5 var(--font-mono); color: var(--muted); }
+.sp-item > svg { flex: none; width: 15px; height: 15px; fill: none; stroke: var(--muted); stroke-width: 2; }
+.sp-item[data-state="ticked"] { background: var(--green-wash); }
+.sp-item[data-state="done"] .sp-item-copy strong { color: var(--muted); font-weight: 500; }
+.sp-day[data-state="future"] .sp-item[data-state="todo"] .sp-item-copy strong { color: var(--muted); }
+.sp-box { flex: none; display: grid; place-items: center; width: var(--touch-min); height: var(--touch-min); margin: 0; padding: 0; border: 0; background: none; color: transparent; cursor: pointer; }
+.sp-box::before { content: ""; grid-area: 1 / 1; width: 22px; height: 22px; border: 1.5px solid var(--muted); border-radius: 6px; background: var(--paper); box-sizing: border-box; }
+.sp-box svg { grid-area: 1 / 1; position: relative; width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.sp-box[aria-checked="true"] { color: var(--paper); }
+.sp-box[aria-checked="true"]::before { background: var(--green); border-color: var(--green); }
+.sp-item[data-fresh] .sp-box::before, .sp-item[data-fresh] .sp-done-mark { animation: sp-tick-in 200ms ease-out; }
+.sp-item[data-fresh] .sp-box svg, .sp-item[data-fresh] .sp-done-mark svg { animation: sp-tick-draw 200ms ease-out; }
+.sp-count { flex: none; display: inline-flex; align-items: center; gap: 4px; min-height: 36px; margin: 0; padding: 0 10px; border: 1px solid var(--chip-green-border); border-radius: var(--radius-segment);
+  background: var(--paper); color: var(--green); font: 500 var(--type-identifier-size)/1 var(--font-sans); cursor: pointer; }
+.sp-count svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; }
+.sp-done-mark { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--well); color: var(--muted); margin-right: 4px; }
+.sp-done-mark svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.sp-ring { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1.5px dashed var(--muted); margin-right: 4px; }
+@media (prefers-reduced-motion: reduce) { .sp-item[data-fresh] .sp-box::before, .sp-item[data-fresh] .sp-done-mark, .sp-item[data-fresh] .sp-box svg, .sp-item[data-fresh] .sp-done-mark svg, .sp-day-head > svg { animation: none; transition: none; } }
+
+/* Piglets: what is in the pen now; then the identified piglets with Scan tag · Choose notch · Add manually */
+.sp-ids > .st-heading { margin-bottom: 8px; }
+.sp-ids-card { padding: 0; overflow: hidden; }
+.sp-ids-card > .tk-row + .tk-row { border-top: 1px solid var(--line); }
+.sp-ids-card > .sp-warn { padding: 0 var(--space-row-x) 8px; }
+.sp-id-acts { display: flex; border-top: 1px solid var(--line); }
+.sp-id-act { flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 5px; min-height: var(--touch-min); margin: 0; padding: 0 4px; border: 0; background: none;
+  color: var(--green); font: 500 var(--type-identifier-size)/1.2 var(--font-sans); cursor: pointer; }
+.sp-id-act svg { flex: none; width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sp-id-act:active { background: var(--press); }
+
+/* the ID form: litter weight, boars · gilts, and one row per identified piglet (tag · notch · sex · kg · ✕) */
+.tk-page[data-view="id"] .field, .tk-sheet[data-view="weight"] .field { margin: 0; }
+.sp-idf-card { padding: var(--space-row-y) var(--space-row-x); }
+.sp-idf-card > .tk-stepper + .tk-stepper { border-top: 1px solid var(--line); }
+.sp-kg-box { display: flex; align-items: center; gap: 6px; }
+.sp-kg-box input { flex: 1; min-width: 0; font: 500 var(--type-button-size)/1.2 var(--font-mono); }
+.sp-kg-box small { font-size: var(--type-description-size); color: var(--muted); font-weight: 400; }
+.sp-idrow { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, .8fr) var(--touch-min); align-items: center; gap: 6px;
+  padding: 8px 0 8px var(--space-row-x); border-bottom: 1px solid var(--line); }
+.sp-idrow input, .sp-idrow select { width: 100%; min-width: 0; height: var(--touch-min); padding: 0 8px; border: 1px solid var(--line); border-radius: var(--radius-segment);
+  background: var(--well); color: var(--ink); font: 500 var(--type-identifier-size)/1 var(--font-mono); box-sizing: border-box; }
+.sp-idrow select { font-family: var(--font-sans); }
+.sp-idrow[data-bad] input, .sp-idrow[data-bad] select { border-color: var(--danger-border); background: var(--red-wash); }
+.sp-idrow-x { display: grid; place-items: center; width: var(--touch-min); height: var(--touch-min); margin: 0; padding: 0; border: 0; background: none; color: var(--muted); cursor: pointer; }
+.sp-idrow-x svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.sp-keep { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; min-height: 32px; font: var(--type-description-size)/1.3 var(--font-sans); color: var(--ink); }
+.sp-keep input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); }
+
+/* Move: the other pens as tiles, four to a line */
+.sp-pick > .st-heading { margin-bottom: 8px; }
+.tk-page-body > .sp-pick + * { margin-top: var(--space-section); }
+.tk-choice.sp-pens { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.sp-pens .tk-choice-tile { min-height: 60px; gap: 2px; padding: 8px 4px; }
+.sp-pens .tk-choice-tile strong { font: 600 var(--type-identifier-strong-size)/1.2 var(--font-mono); }
+.sp-pens .tk-choice-tile small { font-size: var(--type-meta-size); color: var(--muted); }
 
 /* ---- outside the phone: the demo controls ----
    Wide window: a card beside (or under) the framed phone. Phone width: a small "Demo" pill on the status bar's empty
@@ -62,97 +134,6 @@
 .sp-demo-tip, .sp-demo-msg { margin: 0; color: var(--muted); font-size: 12px; }
 .sp-demo-msg { color: var(--amber); }
 .sp-demo-link { padding: 0; border: 0; background: none; text-decoration: underline; color: var(--muted); }
-
-/* Move: the other pens as tiles, four to a line */
-.sp-pick > .st-heading { margin-bottom: 8px; }
-.tk-page-body > .sp-pick + * { margin-top: var(--space-section); }
-.tk-choice.sp-pens { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.sp-pens .tk-choice-tile { min-height: 60px; gap: 2px; padding: 8px 4px; }
-.sp-pens .tk-choice-tile strong { font: 600 var(--type-identifier-strong-size)/1.2 var(--font-mono); }
-.sp-pens .tk-choice-tile small { font-size: var(--type-meta-size); color: var(--muted); }
-
-/* ---- the list under a job chip (the chips are SentriTask.chips) ---- */
-.sp-chip-head { margin: 4px var(--space-gutter) 8px; font: 600 var(--type-row-title-size)/1.4 var(--font-sans); color: var(--ink); }
-.sp-chip-tip { margin: -4px var(--space-gutter) 10px; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
-/* a pen under a chip: the row opens the pen, the tick at its end selects it */
-/* a row under a job chip: All's row with the tick circle where the chevron was; the whole row is the target */
-.tk-row > .sp-ring { margin-left: 4px; }
-.tk-row[aria-pressed="true"], .tk-row[data-ticked] { background: var(--green-wash); }
-.tk-row[data-ticked] > .sp-ring { background: var(--green); border-color: var(--green); color: var(--paper); }
-.tk-row[data-fresh] > .sp-ring { animation: sp-tick-in 200ms ease-out; }
-.tk-row[data-fresh] > .sp-ring svg { animation: sp-tick-draw 200ms ease-out; }
-/* the footer that appears under a chip's list (hold to record, then the receipt with Undo) */
-.tk-screen > .tk-footer, .tk-screen > .tk-footer-status { padding-left: var(--space-panel); padding-right: var(--space-panel); }
-.tk-screen > .tk-footer { background: var(--paper); border-top: 1px solid var(--line); }
-.sp-foot-receipt { flex: none; margin: 0; padding: var(--space-row-y) var(--space-panel) 0; background: var(--paper); border-top: 1px solid var(--line);
-  color: var(--green); font: 500 var(--type-row-title-size)/1.4 var(--font-sans); }
-.sp-foot-receipt + .tk-footer { border-top: 0; }
-
-/* four tools at 390: a little tighter */
-.sp-toolrow[data-count="4"] { gap: 6px; }
-.sp-toolrow[data-count="4"] .sp-tool { padding-left: 4px; padding-right: 4px; }
-@media (max-width: 400px) { .sp-toolrow[data-count="4"] .sp-tool svg { display: none; } }
-
-/* ---- the pen's timeline: one node per day, today marked ---- */
-.sp-tl { list-style: none; margin: var(--space-heading) 0 0; padding: 0 0 0 26px; position: relative; }
-.sp-tl::before { content: ""; position: absolute; left: 7px; top: 10px; bottom: 10px; width: 2px; background: var(--line); }
-.sp-tl-node { position: relative; padding: 0 0 18px; }
-.sp-tl-node::before { content: ""; position: absolute; left: -24px; top: 5px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--line); background: var(--paper); box-sizing: border-box; }
-.sp-tl-node[data-when="past"]::before { background: var(--current-marker); border-color: var(--current-marker); }
-.sp-tl-node[data-when="today"]::before { left: -27px; top: 2px; width: 18px; height: 18px; border: 4px solid var(--green-wash); background: var(--green); box-shadow: 0 0 0 1px var(--chip-green-border); }
-.sp-tl-head { min-height: 22px; display: flex; align-items: center; }
-.sp-tl-day { font: 600 var(--type-identifier-size)/1.4 var(--font-sans); color: var(--muted); }
-.sp-tl-today { font: 700 var(--type-row-title-size)/1.4 var(--font-sans); color: var(--green); }
-.sp-tl-line { margin: 2px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
-.sp-tl-node[data-when="future"] .sp-tl-day { color: var(--disabled-ink); }
-/* today's open steps: one card, each with its one-tap */
-.sp-steps { margin-top: 8px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); overflow: hidden; }
-.sp-step { display: flex; align-items: center; gap: 8px; padding-right: 12px; }
-.sp-step + .sp-step { border-top: 1px solid var(--line); }
-.sp-step-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 64px; margin: 0; padding: 10px 0 10px 14px; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; }
-.sp-step-main:active { background: var(--press); }
-.sp-ring { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--muted); color: transparent; }
-.sp-ring svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-/* recorded on this visit: the circle fills with a tick in place (a short ease); the row stays until the worker leaves */
-.sp-step[data-recorded] .sp-ring { background: var(--green); border-color: var(--green); color: var(--paper); }
-.sp-step[data-recorded] .sp-step-copy strong { color: var(--green); }
-.sp-step[data-fresh] .sp-ring { animation: sp-tick-in 200ms ease-out; }
-.sp-step[data-fresh] .sp-ring svg { animation: sp-tick-draw 200ms ease-out; }
-@keyframes sp-tick-in { from { transform: scale(.7); background: var(--paper); border-color: var(--muted); } to { transform: none; } }
-@keyframes sp-tick-draw { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: none; } }
-.button.sp-recorded-btn { color: var(--green); border-color: var(--chip-green-border); background: var(--green-wash); }
-@media (prefers-reduced-motion: reduce) { .sp-step[data-fresh] .sp-ring, .sp-step[data-fresh] .sp-ring svg, .tk-row[data-fresh] > .sp-ring, .tk-row[data-fresh] > .sp-ring svg { animation: none; } }
-.sp-step-copy { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.sp-step-copy strong { font: 700 13px/1.3 var(--font-sans); }
-.sp-step-copy small, .sp-tl-list small, .sp-tl-later small { font: var(--type-meta-size)/1.5 var(--font-mono); color: var(--muted); }
-.sp-step > .button { flex: none; }
-/* done steps of a day: one line, tap to see them */
-.sp-tl-done { display: flex; align-items: center; gap: 8px; width: 100%; min-height: var(--touch-min); margin: 4px 0 0; padding: 0 4px 0 0; border: 0; background: none;
-  color: var(--ink); font: 500 var(--type-description-size)/1.3 var(--font-sans); text-align: left; cursor: pointer; }
-.sp-tick-disc { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--green-wash); color: var(--green); }
-.sp-tick-disc svg, .sp-tl-done > svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-.sp-tl-names { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
-.sp-tl-done > svg { flex: none; color: var(--muted); transition: transform .15s; }
-.sp-tl-done[aria-expanded="true"] > svg { transform: rotate(90deg); }
-.sp-tl-list, .sp-tl-later { list-style: none; margin: 4px 0 0; padding: 0; }
-.sp-tl-list li, .sp-tl-later li { display: flex; flex-direction: column; gap: 2px; padding: 6px 0 6px 30px; }
-.sp-tl-list strong { font: 600 13px/1.3 var(--font-sans); }
-.sp-tl-later li { padding-left: 0; }
-.sp-tl-later strong { font: 500 13px/1.3 var(--font-sans); color: var(--disabled-ink); }
-.sp-tl-later small { color: var(--disabled-ink); }
-
-/* ---- ID entry ---- */
-.tk-page[data-view="id"] .field { margin: 0; }
-.sp-idno { display: flex; align-items: flex-end; gap: 10px; }
-.sp-idno > .field { flex: 1; min-width: 0; }
-.sp-idno > .button { flex: none; min-height: 46px; }
-.sp-idno input { font: 600 20px/1.2 var(--font-mono); letter-spacing: .02em; }
-.sp-idno input[aria-invalid="true"] { border-color: var(--amber); }
-.sp-kg small { font-weight: 400; color: var(--muted); margin-left: 4px; }
-.tk-page-body > .sp-warn { margin: 6px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--amber); }
-.button.sp-wide { width: 100%; }
-
-/* the farm setting in the demo panel */
 .sp-demo-farm { display: flex; flex-direction: column; align-items: stretch; gap: 2px; width: 100%; }
 .sp-demo-label { margin: 0 0 2px; font-weight: 600; }
 .sp-demo-farm button { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0; border: 0; background: none; text-align: left; }

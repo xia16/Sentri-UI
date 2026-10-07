@@ -5,7 +5,7 @@
    for breeding), or 'none' (fatteners raised as a batch: no ID step at all). */
 (function (root) {
   'use strict';
-  var KEY = 'pp-simple-v3';
+  var KEY = 'pp-simple-v4';
   var ME = 'G. Hansen', OTHER = 'L. Madsen';
   var PLAN = [
     { key: 'iron', from: 2, to: 4 },
@@ -26,8 +26,9 @@
     scheme = SCHEMES.indexOf(scheme) >= 0 ? scheme : 'tag';
     var pens = {}, records = [], seq = 0, litter = 21;
     function pen(code, age, born, dead, extra) {
+      var i = Object.keys(pens).length;
       var p = { code: code, row: code[0], age: age, born: born, alive: born - dead, dead: dead, sowDied: false, movedIn: 0, movedOut: 0,
-        litter: litter++, ids: [], idIn: 0, idOut: 0, picked: null, tr: {} };
+        sow: '000' + (231 + i * 7), parity: 1 + (i * 5) % 6, litter: litter++, ids: [], idIn: 0, idOut: 0, picked: null, sex: null, weights: [], tr: {} };
       PLAN.forEach(function (t) { p.tr[t.key] = { got: 0, why: '' }; });
       Object.assign(p, extra || {});
       pens[code] = p;
@@ -46,7 +47,7 @@
         var keep = breeders.indexOf(i) >= 0;
         var no = scheme === 'notch' ? p.litter + '-' + (p.ids.length + 1) : String(tagNo++);
         var at = daysAgoAt(ago, h, m + i);
-        p.ids.push({ no: no, sex: i % 2 ? 'boar' : 'gilt', kg: i === 0 ? 1.6 : null, keep: keep, at: at, who: who || ME });
+        p.ids.push({ no: no, tag: scheme === 'notch' ? '' : no, notch: scheme === 'notch' ? no : '', sex: i % 2 ? 'boar' : 'gilt', kg: i === 0 ? 1.6 : null, keep: keep, at: at, who: who || ME });
         records.push({ id: 'r' + (++seq), pen: code, tr: 'id', n: 1, no: no, at: at, day: p.age - ago, who: who || ME, mark: '' });
       }
     }
@@ -66,6 +67,9 @@
     give('B02', 'iron', 11, 2, 9, 20); give('B02', 'tail', 11, 2, 9, 24);
     // B03: iron this morning
     give('B03', 'iron', 13, 0, 7, 52);
+    // litter weights: birth weights on a few litters, A01 weighed again on its ID day
+    ['A01', 'A02', 'B03'].forEach(function (c, i) { pens[c].weights.push({ kg: [15.2, 14.1, 16.8][i], day: 0 }); });
+    pens.A01.weights.push({ kg: 24.6, day: 4 }); pens.A01.sex = { boar: 6, gilt: 6 };
     // identity: A01 all done; A02 four of twelve so far, one kept for breeding
     if (scheme === 'tag' || scheme === 'notch') { ident('A01', 12, 2, 10, 0, []); ident('A02', 4, 0, 7, 30, [1]); }
     if (scheme === 'breeders') {
@@ -125,15 +129,15 @@
   function nextNo(code) {
     var p = S.pens[code];
     if (S.scheme === 'notch') {
-      var used = p.ids.map(function (x) { return +String(x.no).split('-')[1] || 0; });
+      var used = p.ids.filter(function (x) { return x.notch; }).map(function (x) { return +String(x.notch).split('-')[1] || 0; });
       return p.litter + '-' + ((used.length ? Math.max.apply(null, used) : 0) + 1);
     }
     var max = FIRST_TAG - 1;
-    Object.keys(S.pens).forEach(function (c) { S.pens[c].ids.forEach(function (x) { if (+x.no > max) max = +x.no; }); });
+    Object.keys(S.pens).forEach(function (c) { S.pens[c].ids.forEach(function (x) { if (x.tag && +x.tag > max) max = +x.tag; }); });
     return String(max + 1);
   }
   function taken(no) {
-    return Object.keys(S.pens).some(function (c) { return S.pens[c].ids.some(function (x) { return String(x.no) === String(no); }); });
+    return Object.keys(S.pens).some(function (c) { return S.pens[c].ids.some(function (x) { return x.tag === String(no) || x.notch === String(no); }); });
   }
 
   /* ---- writing: every change keeps the state before it, so the last one can be undone ---- */
@@ -174,8 +178,39 @@
   function treat(code, k, n, why) {
     return change('treat', function () {
       var p = S.pens[code], st = status(p, k);
-      return record(code, k, n, { why: why, mark: st === 'late' ? 'late' : '' });
+      return record(code, k, n, { why: why, mark: st === 'late' ? 'late' : p.age < plan(k).from ? 'early' : '' });
     });
+  }
+  /* The pen's checklist: the worker ticks what they did and submits once. items: [{ k, n, why }] */
+  function submit(code, items) {
+    return change('submit', function () {
+      var p = S.pens[code];
+      return items.map(function (x) {
+        var st = status(p, x.k);
+        return record(code, x.k, x.n, { why: x.n < need(p, x.k) ? x.why : '', mark: st === 'late' ? 'late' : p.age < plan(x.k).from ? 'early' : '' });
+      });
+    });
+  }
+  /* The ID form (tag / notch / weigh): the litter's total weight and boar/gilt counts, and any number of identified piglets
+     (rows: { tag, notch, sex, kg, keep }). On a breeders-only farm a submit closes the pick. */
+  function identifyForm(code, form) {
+    return change('id', function () {
+      var p = S.pens[code], now = Date.now(), st = status(p, 'id');
+      if (form.kg != null && form.kg !== '') p.weights.push({ kg: +form.kg, day: p.age, at: now });
+      if (form.boar != null && (form.boar || form.gilt)) p.sex = { boar: form.boar, gilt: form.gilt };
+      (form.rows || []).forEach(function (r) {
+        var keep = S.scheme === 'breeders' ? true : !!r.keep;
+        var x = { no: r.tag || r.notch, tag: r.tag || '', notch: r.notch || '', sex: r.sex, kg: r.kg == null || r.kg === '' ? null : +r.kg, keep: keep, at: now, who: ME };
+        p.ids.push(x);
+        S.records.push({ id: 'r' + (++S.seq), pen: code, tr: 'id', n: 1, no: x.no, at: now, day: p.age, who: ME, mark: st === 'late' ? 'late' : '' });
+      });
+      if (S.scheme === 'breeders') p.picked = { at: now, who: ME };
+      return (form.rows || []).length;
+    });
+  }
+  /* The litter's weight from the Piglets tab (a birth weight backfill or a weigh day) */
+  function setWeight(code, kg) {
+    return change('weight', function () { var p = S.pens[code]; p.weights.push({ kg: +kg, day: p.age, at: Date.now() }); return kg; });
   }
   function bulk(k, picks) {   // picks: [{ pen, mark }]
     return change('bulk', function () {
@@ -277,7 +312,7 @@
     get s() { return S; },
     hasId: hasId, steps: steps, plan: plan, need: need, idCount: idCount, breeders: breeders, recs: recs, status: status, todo: todo, coming: coming,
     pens: pens, last: last, bulkPlace: bulkPlace, sameBatch: sameBatch, nextNo: nextNo, taken: taken,
-    treat: treat, bulk: bulk, unrecord: unrecord, identify: identify, donePicking: donePicking, death: death, move: move, setCount: setCount, end: end, undo: undo,
+    treat: treat, submit: submit, identifyForm: identifyForm, setWeight: setWeight, unrecord: unrecord, identify: identify, donePicking: donePicking, death: death, move: move, setCount: setCount, end: end, undo: undo,
     otherPhone: otherPhone, seeNote: seeNote, reset: reset, setScheme: setScheme
   };
 })(globalThis);
