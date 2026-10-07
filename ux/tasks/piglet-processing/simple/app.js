@@ -1,5 +1,8 @@
 /* Simple piglet processing: the screens. Built from the task skeleton (window.SentriTask) and the design-system cards
-   (window.SentriUI); the data is state.js (window.PPS), the words strings.js (window.PPT). One render() draws the phone. */
+   (window.SentriUI); the data is state.js (window.PPS), the words strings.js (window.PPT). One render() draws the phone.
+   Structure and flow follow the farm's existing design (Figma 生产任务 · 仔猪处理, research/inventory.md §2): a list by pen,
+   and inside a pen two tabs — Processing (a checklist by age-day, one tick per item, one Submit) and Piglets (what is in
+   the pen now, and the identified piglets) — with [⋯] More for Move · Record death · Set count. */
 (function () {
   'use strict';
   var K = window.SentriTask, UI = window.SentriUI, P = window.PPS, L = window.PPT, I = window.SentriIcons.icon;
@@ -9,16 +12,17 @@
 
   /* What is open on the phone (not kept: a reload starts on the pen list) */
   function fresh(keep) {
-    return { chip: '', sel: {}, chipRec: null, pen: null, over: null, treat: null, death: null, move: null, count: null, idf: null,
-      confirm: null, end: null, flash: null, open: {}, pin: {}, justRec: '', demoOpen: keep ? keep.demoOpen : false };
+    return { chip: '', pen: null, tab: 'proc', draft: {}, over: null, adj: null, death: null, move: null, count: null, weight: null, idf: null,
+      end: null, flash: null, open: {}, keepOpen: {}, justRec: [], demoOpen: keep ? keep.demoOpen : false };
   }
   var V = fresh();
 
   /* ---- small helpers ---- */
   var pad = function (n) { return (n < 10 ? '0' : '') + n; };
   function hm(ms) { var d = new Date(ms); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function md(ms) { var d = new Date(ms); return pad(d.getMonth() + 1) + '/' + pad(d.getDate()); }
   function sameDay(ms) { return new Date(ms).toDateString() === new Date().toDateString(); }
-  function when(r) { return sameDay(r.at) ? hm(r.at) : T('day.n', { d: r.day }); }
+  function when(r) { return sameDay(r.at) ? hm(r.at) : md(r.at) + ' ' + hm(r.at); }
   function short(who) { var p = who.split(/[.\s]+/).filter(Boolean); return p.length > 1 ? p[0] + '.' + p[p.length - 1][0] : who; }
   var scheme = function () { return P.s.scheme; };
   var tr = function (k) { return k === 'id' ? T('tr.id.' + scheme()) : T('tr.' + k); };
@@ -27,11 +31,10 @@
   var pigs = function (n) { return T('piglets', { n: n }); };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   /* The same words with their registry id (ux/laws/strings.json, `sp.<key>`): S for a skeleton text slot, H for raw HTML,
-     btn for a design-system Button. The strict design lint checks every visible string through these. */
+     btn for a design-system Button. The strict design lint checks every visible string on the list through these. */
   function S(k, a, tone) { var o = { text: T(k, a), str: 'sp.' + L.key(k, a), args: a || undefined }; if (tone) o.tone = tone; return o; }
   function H(k, a) { return '<span data-str="sp.' + esc(L.key(k, a)) + '">' + esc(T(k, a)) + '</span>'; }
   function btn(k, a, o) { return UI.button(Object.assign({ label: T(k, a), strs: { label: 'sp.' + L.key(k, a) } }, o || {})); }
-  var stepKey = function (k) { return k === 'id' ? 'tr.id.' + scheme() : 'tr.' + k; };
   var chipKey = function (k) { return k === 'id' ? 'chip.id.' + scheme() : 'tr.' + k; };
   function pen() { return P.s.pens[V.pen]; }
   function newest(list) { return list.slice().sort(function (a, b) { return b.at - a.at; })[0]; }
@@ -39,14 +42,14 @@
   function idKey(p) { return scheme() === 'breeders' ? ['id.picked', { n: P.breeders(p) }] : ['id.of.' + scheme(), { n: P.idCount(p), m: p.alive }]; }
   function idWhat(p) { var x = idKey(p); return T(x[0], x[1]); }
   function idS(p) { var x = idKey(p); return S(x[0], x[1]); }
-  function stepAmount(p, k) { return k === 'id' ? idS(p) : S('piglets', { n: P.need(p, k) }); }
   var reduced = function () { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; };
+  function lastWeight(p) { return p.weights.length ? p.weights[p.weights.length - 1] : null; }
 
-  /* ================= the pen list ================= */
+  /* ================= the pen list: one row per pen ================= */
   /* One rule for "needs it today": the step is due, late, or has piglets left from before. The summary card, the chip's
      count and the chip's list all use it. */
   function needsToday(p, k) { var s = P.status(p, k); return s === 'due' || s === 'late' || s === 'left'; }
-  /* the meta line for a pen with something to do: `due today · 12 piglets`, `late · day 6 · 11 piglets`, `2 left · weak` */
+  /* `due today · 12 piglets`, `late · day 6 · 11 piglets`, `2 left · weak` (the End page's not-done list) */
   function todoMeta(p) {
     var td = P.todo(p), sts = td.map(function (k) { return P.status(p, k); });
     var tk = td.filter(function (k) { return k !== 'id'; });
@@ -61,39 +64,23 @@
     return null;
   }
   function names(keys) { return keys.reduce(function (acc, k, i) { return (i ? acc.concat([SEP]) : acc).concat([S(chipKey(k))]); }, []); }
-  /* One pen's row, as the All list draws it: id, at most one chip, the headline, the meta line. */
-  function penParts(p) {
-    var ended = !!P.s.ended, td = P.todo(p), headline, meta, tone = '';
-    var lastR = newest(P.recs(p.code).filter(function (r) { return !!P.plan(r.tr); })), c = P.coming(p);
-    if (ended) {
-      headline = [S('ended.row')]; tone = 'forecast';
-      meta = td.concat(c).length ? [S('not.given.list', { list: td.concat(c).map(tr).join(', ') })] : [S('all.given')];
-    } else if (td.length) {
-      headline = names(td);
-      meta = todoMeta(p);
-    } else if (c.length) {
-      headline = [S('nothing.due')]; tone = 'forecast';
-      var next = S('from.day', { tr: trl(c[0]), d: P.plan(c[0]).from });
-      meta = lastR ? [S('done.at', { t: when(lastR) }), SEP, next] : [next];
-    } else {
-      headline = [S('all.given')];
-      meta = lastR ? [S('done.at', { t: when(lastR) })] : '';
-    }
-    return { id: S('code', { c: p.code }), chip: penChip(p), headline: headline, tone: tone, meta: meta };
+  /* the row: pen code (and a chip) · one status with what it needs · `Sow 000231 · 12 piglets · day 3` */
+  function penRow(p) {
+    var td = P.todo(p), c = P.coming(p), headline, tone = '';
+    if (P.s.ended) { headline = [S('ended.row')]; tone = 'forecast'; }
+    else if (td.length) headline = [S('st.todo'), SEP].concat(names(td));
+    else if (c.length) {
+      var next = Math.min.apply(null, c.map(function (k) { return P.plan(k).from; }));
+      headline = [S('st.next', { n: next - p.age }), SEP].concat(names(c.filter(function (k) { return P.plan(k).from === next; }))); tone = 'forecast';
+    } else { headline = [S('st.done')]; tone = 'forecast'; }
+    var meta = [S('sow', { tag: p.sow }), SEP, S('piglets', { n: p.alive }), SEP, S('day.n', { d: p.age })];
+    return K.row({ id: S('code', { c: p.code }), chip: penChip(p), headline: headline, tone: tone, meta: meta, action: 'pen', value: p.code });
   }
-  function penRow(p) { return K.row(Object.assign(penParts(p), { action: 'pen', value: p.code })); }
   function isDone(p) { return P.todo(p).length === 0; }
-  function groupsBy(list, rowFn) {
-    return ['A', 'B'].map(function (r) {
-      var rows = list.filter(function (p) { return p.row === r; });
-      if (!rows.length) return '';
-      return K.group({ title: S('row', { r: r }), face: 'word', meta: S('row.pens', { n: rows.length }), rows: rows.map(rowFn) });
-    }).join('');
-  }
-  /* the chips: All · one per job that pens need today (with how many) · Done */
+  /* the chips: All · one per job that pens need today (with how many) · Done. A chip only filters the pens. */
   function chipCounts() {
     var all = P.pens();
-    if (P.s.ended) return [];   // nothing can be recorded: All and Done only
+    if (P.s.ended) return [];
     return P.steps().map(function (k) { return { k: k, n: all.filter(function (p) { return needsToday(p, k); }).length }; })
       .filter(function (c) { return c.n > 0 || c.k === V.chip; });
   }
@@ -103,44 +90,6 @@
       .concat(chipCounts().map(function (c) { return { value: c.k, label: S(chipKey(c.k)), count: S('fig', { v: c.n }), checked: V.chip === c.k, aria: T('chip.aria', { name: chipName(c.k), n: c.n }) }; }))
       .concat([{ value: 'done', label: S('chips.done'), count: S('fig', { v: done }), checked: V.chip === 'done', aria: T('chips.done') }]);
     return K.chips({ items: items, action: 'chip', key: 'chips', label: T('chips.label') });
-  }
-  function chipStart(k) { V.chip = k; V.sel = {}; V.chipRec = null; V.justTick = ''; }   // round 9: nothing is pre-ticked
-  function chipTotals() {
-    var codes = Object.keys(V.sel), n = 0;
-    codes.forEach(function (c) { n += P.need(P.s.pens[c], V.chip); });
-    return { pens: codes.length, n: n, of: P.pens().filter(function (p) { return needsToday(p, V.chip); }).length };
-  }
-  /* A pen under a job chip is the same row as in All, filtered. The one difference: its trailing chevron is the tick
-     circle, and tapping the row ticks it as the worker treats the pen (the circle fills in place; tap again to take it
-     off). A too-early or late pen asks Record anyway first. To open a pen, the worker goes back to All. After Finish, a
-     recorded pen keeps its row as it was, with a filled circle and "Recorded ✓" for its meta, until the chip changes.
-     The ID chip has nothing to tick: its rows are All's rows and open the pen. */
-  function chipRow(p) {
-    var k = V.chip, rec = V.chipRec && V.chipRec[p.code];
-    if (k === 'id' || P.s.ended) return penRow(p);
-    var ring = '<span class="sp-ring" aria-hidden="true">' + I('check') + '</span>';
-    var amberChip = function (m) { return S(m === 'late' ? 'Late' : 'Early', null, 'amber'); };
-    if (rec) {
-      var x = rec.snap;
-      return K.row(Object.assign({}, x, { chip: rec.mark ? amberChip(rec.mark) : x.chip, meta: [S('recorded.tick', null, 'green')], still: true, trail: '',
-        data: V.justRec === 'bulk' ? { ticked: '', fresh: '' } : { ticked: '' } })).replace(/<\/div>$/, ring + '</div>');
-    }
-    var on = V.sel[p.code] != null, parts = penParts(p), data = {};
-    if (on) data.ticked = '';
-    if (V.justTick === p.code) data.fresh = '';
-    return K.row(Object.assign(parts, { chip: on && V.sel[p.code] ? amberChip(V.sel[p.code]) : parts.chip, action: 'tick', value: p.code, trail: '',
-      label: T(on ? 'untick.pen' : 'tick.pen', { pen: p.code }), data: data }))
-      .replace('data-ds="TaskRow"', 'data-ds="TaskRow" aria-pressed="' + on + '"').replace(/<\/button>$/, ring + '</button>');
-  }
-  function chipFooter() {
-    if (V.chipRec) {
-      var r = V.chipRec._sum;
-      return '<p class="sp-foot-receipt" role="status">' + H('flash.bulk', { Tr: tr(V.chip), tr: trl(V.chip), p: T('pens.n', { n: r.pens }), n: pigs(r.n) }) + '</p>' +
-        '<div class="tk-footer sp-two" data-ds="TaskFooter">' + btn('undo', null, { register: 'secondary', action: 'chip-undo' }) + btn('done.btn', null, { register: 'primary', action: 'chip', value: '' }) + '</div>';
-    }
-    var tot = chipTotals(), a = { tr: trl(V.chip), k: tot.pens, m: tot.of };
-    return K.footer({ back: null, hold: { label: S('bulk.finish', a), caption: S('bulk.finish.caption'), action: 'bulk-commit', tone: 'primary', waiting: tot.pens === 0 },
-      status: Object.assign(tot.pens ? S('bulk.finish', a) : S('bulk.none'), { id: 'sp-bulk-status' }) });
   }
   /* the task's overall checker: piglets the records cannot account for (set counts lower than the record), batch level only */
   function batchLine() { var u = P.s.unaccounted || 0; return u > 0 ? S('batch.unacc', { b: P.BATCH.name, n: u }) : S('batch', { b: P.BATCH.name }); }
@@ -169,74 +118,21 @@
         segments: [{ tone: 'done', share: done.length / all.length * 100 }, { tone: 'rest', share: 100 - done.length / all.length * 100 }], max: all.length, now: done.length,
         support: ended ? S('ended.at', { t: hm(ended.at), who: ended.who }) : S('sum.end'), action: 'end', label: T('end.title') }
     });
-    var foot = '';
     body += chipsRow();
-    var job = V.chip && V.chip !== 'done';
-    if (job) {
-      // the pens that need this job today, plus the too-early ones (amber), plus the ones just recorded (they stay put)
-      var order = { now: 0, early: 1, late: 2, done: 3 };
-      var list = all.filter(function (p) { return P.bulkPlace(p, V.chip) !== 'done' || (V.chipRec && V.chipRec[p.code]); })
-        .sort(function (a, b) { return order[P.bulkPlace(a, V.chip)] - order[P.bulkPlace(b, V.chip)] || (a.code < b.code ? -1 : 1); });
-      if (V.chipRec) list.sort(function (a, b) { return a.code < b.code ? -1 : 1; });
-      var t = P.plan(V.chip);
-      body += '<p class="sp-chip-head">' + H(stepKey(V.chip)) + '<span class="tk-sep" data-str="ds.sep">·</span>' + H('given.days', { a: t.from, b: t.to }) + '</p>';
-      body += '<p class="sp-chip-tip">' + H(V.chip === 'id' ? 'chip.id.tip' : 'bulk.none') + '</p>';
-      body += list.length ? K.list(groupsBy(list, chipRow)) : '<p class="sp-empty">' + H('chip.none') + '</p>';
-      var nd = all.length - list.length;
-      if (nd) body += '<p class="sp-empty">' + H('chip.done.in', { n: nd }) + '</p>';
-      if (V.chip !== 'id' && !ended) foot = chipFooter();
-    } else {
-      var shown = V.chip === 'done' ? done : all;
-      var groups = groupsBy(shown, penRow);
-      body += groups ? K.list(groups) : '<p class="sp-empty">' + H('empty.done') + '</p>';
-    }
-    return K.screen({ inert: inert, label: T('task'), header: K.header({ title: S('task'), back: null }), body: body, dock: foot });
+    var shown = !V.chip ? all : V.chip === 'done' ? done : all.filter(function (p) { return needsToday(p, V.chip); });
+    body += shown.length ? K.list([K.group({ title: S('pens.n', { n: shown.length }), face: 'word', rows: shown.map(penRow) })])
+      : '<p class="sp-empty">' + H(V.chip === 'done' ? 'empty.done' : 'chip.none') + '</p>';
+    return K.screen({ inert: inert, label: T('task'), header: K.header({ title: S('task'), back: null }), body: body });
   }
 
-  /* The receipt line after a save: what was recorded, and Undo while it is the last change */
+  /* The receipt line after a save: what was saved, and Undo while it can still be taken back */
   function flashLine() {
     var f = V.flash;
-    var undo = f.undo && P.s.undo ? btn('undo', null, { register: 'text', action: 'undo' }) : '';
+    var undo = f.undoIds ? btn('undo', null, { register: 'text', action: 'undo-items' }) : f.undo && P.s.undo ? btn('undo', null, { register: 'text', action: 'undo' }) : '';
     return '<div class="sp-flash" role="status"><span>' + (f.key ? H(f.key, f.args) : esc(f.text)) + '</span>' + undo + '</div>';
   }
 
-  /* ================= the pen sheet: facts, tools, and the pen's timeline by day ================= */
-  function doneLine(p, k) {
-    if (k === 'id') {
-      var r = newest(P.recs(p.code, scheme() === 'breeders' ? 'pick' : 'id'));
-      var what = scheme() === 'breeders' ? T('breeders.n', { n: P.breeders(p) }) : idWhat(p);
-      return { title: tr(k), meta: r ? [T('done.meta', { t: when(r), who: short(r.who), n: what })] : [what] };
-    }
-    var rs = P.recs(p.code, k), r2 = newest(rs), n = rs.reduce(function (s, x) { return s + x.n; }, 0);
-    var meta = r2 ? [T('done.meta', { t: when(r2), who: short(r2.who), n: pigs(n || p.tr[k].got) })] : [pigs(p.tr[k].got)];
-    if (rs.some(function (x) { return x.mark; })) meta.push(SEP, { text: T(rs.filter(function (x) { return x.mark; })[0].mark), tone: 'amber' });
-    var note = P.s.notes.filter(function (x) { return x.pen === p.code && x.tr === k; })[0];
-    if (note) meta.push(SEP, T('kept.note') + ' (' + hm(note.mine.at) + ')');
-    return { title: tr(k), meta: meta };
-  }
-  /* One step in today's card. A step recorded on this visit stays here (pinned): its circle fills with a tick and its
-     button becomes "Recorded · Undo" in place; it moves to its day's done line when the worker leaves the sheet or after
-     a few seconds idle. */
-  function openStep(p, k, ended) {
-    var pinId = V.pin[k], st = P.status(p, k), t = P.plan(k), n = P.need(p, k), win = T('given.days', { a: t.from, b: t.to });
-    var meta, act;
-    if (pinId) {
-      var r = P.s.records.filter(function (x) { return x.id === pinId; })[0];
-      meta = [win, SEP, pigs(r ? r.n : 0)];
-      if (r && r.mark) meta.push(SEP, { text: T(r.mark), tone: 'amber' });
-      act = UI.button({ label: T('recorded.undo'), register: 'secondary', action: 'unrecord', value: k, className: 'sp-recorded-btn' });
-    } else {
-      if (k === 'id') meta = st === 'late' ? [{ text: T('late'), tone: 'amber' }, SEP, win, SEP, idWhat(p)] : [win, SEP, idWhat(p)];
-      else if (st === 'left') meta = [T('tl.given', { n: p.tr[k].got }), SEP, T('left', { n: n }), SEP, T('why.' + (p.tr[k].why || 'weak'))];
-      else meta = st === 'late' ? [{ text: T('late'), tone: 'amber' }, SEP, win, SEP, pigs(n)] : [win, SEP, pigs(n)];
-      act = ended ? '' : k === 'id' ? UI.button({ label: T('id.act.' + scheme()), register: 'secondary', action: 'id-open', value: 'id' })
-        : UI.button({ label: T('record.n', { n: n }), register: 'secondary', action: 'one', value: k });
-    }
-    var main = pinId || ended ? 'noop' : k === 'id' ? 'id-open' : 'treat';
-    return '<div class="sp-step"' + (pinId ? ' data-recorded=""' : '') + (pinId && V.justRec === pinId ? ' data-fresh=""' : '') + '>' +
-      '<button type="button" class="sp-step-main" data-action="' + main + '" data-value="' + k + '">' +
-      '<span class="sp-ring" aria-hidden="true">' + I('check') + '</span><span class="sp-step-copy"><strong>' + esc(tr(k)) + '</strong><small>' + metaHtml(meta) + '</small></span></button>' + act + '</div>';
-  }
+  /* ================= inside a pen: Processing | Piglets ================= */
   function metaHtml(parts) {
     return parts.map(function (x) {
       if (x.sep) return '<span class="tk-sep">·</span>';
@@ -244,102 +140,188 @@
       return esc(x);
     }).join('');
   }
-  function timeline(p) {
-    var ended = !!P.s.ended, today = p.age, nodes = {};
-    var node = function (d) { return nodes[d] || (nodes[d] = { d: d, open: [], done: [], later: [] }); };
-    node(today); node(1);
-    P.steps().forEach(function (k) {
-      var st = P.status(p, k), d0 = P.plan(k).from;
-      if (V.pin[k]) node(today).open.push(k);
-      else if (st === 'done') node(d0).done.push(k);
-      else if (st === 'coming') node(d0).later.push(k);
-      else node(today).open.push(k);
-    });
-    var days = Object.keys(nodes).map(Number).sort(function (a, b) { return a - b; });
-    var html = days.map(function (d) {
-      var n = nodes[d], isToday = d === today, part = '';
-      var head = isToday ? '<span class="sp-tl-today">' + esc(T('tl.today', { d: d })) + '</span>' : '<span class="sp-tl-day">' + esc(T('tl.day', { d: d })) + '</span>';
-      if (d === 1) part += '<p class="sp-tl-line">' + esc(T('tl.born', { n: p.born })) + '</p>';
-      if (n.open.length) part += '<div class="sp-steps">' + n.open.map(function (k) { return openStep(p, k, ended); }).join('') + '</div>';
-      if (n.done.length) {
-        var exp = !!V.open[d];
-        part += '<button type="button" class="sp-tl-done" data-action="tl-toggle" data-value="' + d + '" aria-expanded="' + exp + '">' +
-          '<span class="sp-tick-disc" aria-hidden="true">' + I('check') + '</span><span>' + esc(T('tl.done', { n: n.done.length })) + '</span>' +
-          '<span class="sp-tl-names">' + esc(n.done.map(tr).join(' · ')) + '</span>' + I('chevron') + '</button>';
-        if (exp) part += '<ul class="sp-tl-list">' + n.done.map(function (k) { var x = doneLine(p, k); return '<li><strong>' + esc(x.title) + '</strong><small>' + metaHtml(x.meta) + '</small></li>'; }).join('') + '</ul>';
-      }
-      if (n.later.length) part += '<ul class="sp-tl-later">' + n.later.map(function (k) { var t = P.plan(k); return '<li><strong>' + esc(tr(k)) + '</strong><small>' + esc(T('given.days', { a: t.from, b: t.to })) + '</small></li>'; }).join('') + '</ul>';
-      var w = isToday ? 'today' : d < today ? 'past' : 'future';
-      return '<li class="sp-tl-node" data-when="' + w + '"><div class="sp-tl-head">' + head + '</div>' + part + '</li>';
-    }).join('');
-    return '<ol class="sp-tl" aria-label="' + esc(T('task')) + '">' + html + '</ol>';
+  var dayDate = function (p, d) { return md(Date.now() - (p.age - d) * 864e5); };
+  /* A done item: grey tick, who and when, how many (and an early / late mark). Rows saved on this visit fill in place. */
+  function doneItem(p, k) {
+    var meta;
+    if (k === 'id') {
+      var r = newest(P.recs(p.code, 'id').concat(P.recs(p.code, 'pick')));
+      meta = r ? [short(r.who) + ' ' + when(r), SEP, idWhat(p)] : [idWhat(p)];
+      return '<button type="button" class="sp-item" data-state="done" data-action="id-open" data-value="id"><span class="sp-done-mark" aria-hidden="true">' + I('check') + '</span>' +
+        '<span class="sp-item-copy"><strong>' + esc(tr(k)) + '</strong><small>' + metaHtml(meta) + '</small></span>' + I('chevron') + '</button>';
+    }
+    var rs = P.recs(p.code, k), r2 = newest(rs), n = rs.reduce(function (s, x) { return s + x.n; }, 0);
+    meta = r2 ? [short(r2.who) + ' ' + when(r2), SEP, pigs(n || p.tr[k].got)] : [pigs(p.tr[k].got)];
+    var mk = rs.filter(function (x) { return x.mark; })[0];
+    if (mk) meta.push(SEP, { text: T(mk.mark === 'early' ? 'item.early' : mk.mark), tone: 'amber' });
+    var note = P.s.notes.filter(function (x) { return x.pen === p.code && x.tr === k; })[0];
+    if (note) meta.push(SEP, T('kept.note') + ' (' + hm(note.mine.at) + ')');
+    var fresh = r2 && V.justRec.indexOf(r2.id) >= 0;
+    return '<div class="sp-item" data-state="done"' + (fresh ? ' data-fresh=""' : '') + '><span class="sp-done-mark" aria-hidden="true">' + I('check') + '</span>' +
+      '<span class="sp-item-copy"><strong>' + esc(tr(k)) + '</strong><small>' + metaHtml(meta) + '</small></span></div>';
+  }
+  /* An item still to do: ONE checkbox row. Ticked, it shows its count as a small button (fewer piglets: tap it). The
+     identity item is a chevron row to the ID form instead. */
+  function todoItem(p, k, ended, future) {
+    var t = P.plan(k), st = P.status(p, k), n = P.need(p, k);
+    if (k === 'id') {
+      var filled = scheme() === 'breeders' ? !!p.picked : P.recs(p.code, 'id').length > 0;
+      var meta = [{ text: T(filled ? 'item.filled' : 'item.notfilled'), tone: filled ? 'green' : 'amber' }, SEP, idWhat(p)];
+      if (st === 'late') meta.push(SEP, { text: T('late'), tone: 'amber' });
+      return '<button type="button" class="sp-item" data-state="door" data-action="' + (ended ? 'noop' : 'id-open') + '" data-value="id"><span class="sp-ring" aria-hidden="true"></span>' +
+        '<span class="sp-item-copy"><strong>' + esc(tr(k)) + '</strong><small>' + metaHtml(meta) + '</small></span>' + I('chevron') + '</button>';
+    }
+    var d = V.draft[k], on = !!d;
+    var meta2 = st === 'left' ? [T('tl.given', { n: p.tr[k].got }), SEP, T('left', { n: n }), SEP, T('why.' + (p.tr[k].why || 'weak'))]
+      : [T('given.days', { a: t.from, b: t.to })];
+    if (st === 'late') meta2.push(SEP, { text: T('late'), tone: 'amber' });
+    if (future && on) meta2.push(SEP, { text: T('item.early'), tone: 'amber' });
+    if (on && d.n < n) meta2.push(SEP, { text: T('left', { n: n - d.n }) + ' · ' + T('why.' + (d.why || 'weak')), tone: 'amber' });
+    var count = on ? '<button type="button" class="sp-count" data-action="adjust" data-value="' + k + '" aria-label="' + esc(T('treat.given') + ': ' + d.n) + '">' + esc(pigs(d.n)) + I('chevron') + '</button>' : '';
+    var box = '<button type="button" class="sp-box" role="checkbox" aria-checked="' + on + '" data-action="' + (ended ? 'noop' : 'item') + '" data-value="' + k + '" aria-label="' + esc(tr(k)) + '">' + I('check') + '</button>';
+    return '<div class="sp-item" data-state="' + (on ? 'ticked' : 'todo') + '"' + (V.justTick === k ? ' data-fresh=""' : '') + '>' +
+      '<button type="button" class="sp-item-main" data-action="' + (ended ? 'noop' : 'item') + '" data-value="' + k + '" tabindex="-1"><span class="sp-item-copy"><strong>' + esc(tr(k)) + '</strong><small>' + metaHtml(meta2) + '</small></span></button>' +
+      count + box + '</div>';
+  }
+  /* Processing: one section per age-day on the plan. A day with everything done folds to one line (it stays open while
+     rows saved on this visit are fresh); today's and overdue days are open; later days are grey but can be done early. */
+  function processing(p) {
+    var ended = !!P.s.ended, days = {};
+    P.steps().forEach(function (k) { var d = P.plan(k).from; (days[d] = days[d] || []).push(k); });
+    return '<div class="sp-days">' + Object.keys(days).map(Number).sort(function (a, b) { return a - b; }).map(function (d) {
+      var ks = days[d], done = ks.filter(function (k) { return P.status(p, k) === 'done'; }), todo = ks.filter(function (k) { return P.status(p, k) !== 'done'; });
+      var future = d > p.age, allDone = !todo.length;
+      var open = allDone ? (!!V.open[d] || !!V.keepOpen[d]) : true;
+      var state = allDone ? 'done' : future ? 'future' : 'todo';
+      var head = '<button type="button" class="sp-day-head" data-action="day" data-value="' + d + '" aria-expanded="' + open + '"' + (allDone ? '' : ' tabindex="-1"') + '>' +
+        '<span class="sp-day-mark" data-state="' + state + '" aria-hidden="true">' + I(state === 'done' ? 'check' : state === 'future' ? 'clock' : 'chevron') + '</span>' +
+        '<strong>' + esc(allDone ? T('day.done', { d: d }) : T('day.open', { d: d })) + '</strong>' + (allDone ? I('chevron') : '') + '</button>';
+      var sub = allDone ? '' : '<p class="sp-day-sub">' + esc(future ? T('day.early') : T('day.plan', { date: dayDate(p, d) })) + '</p>';
+      var items = open ? '<div class="sp-items">' + todo.map(function (k) { return todoItem(p, k, ended, future); }).join('') + done.map(function (k) { return doneItem(p, k); }).join('') + '</div>' : '';
+      return '<section class="sp-day" data-state="' + state + '"' + (allDone && open ? ' data-open=""' : '') + '>' + head + sub + items + '</section>';
+    }).join('') + '</div>';
+  }
+  /* Piglets: what is in the pen now, then the identified piglets. Born and deaths are history: they live in the pen log. */
+  function piglets(p) {
+    var w = lastWeight(p), items = [
+      { label: T('pg.now'), value: pigs(p.alive), action: P.s.ended ? '' : 'count-open' },
+      { label: T('pg.age'), value: T('pg.agev', { d: p.age }) }];
+    if (p.sex) items.push({ label: T('pg.sex'), value: T('pg.sexv', { b: p.sex.boar, g: p.sex.gilt }) });
+    if (P.hasId() && p.ids.length) items.push({ label: T('pg.ident'), value: idWhat(p) });
+    if (P.hasId() && P.breeders(p)) items.push({ label: T('pg.breeders'), value: String(P.breeders(p)) });
+    items.push({ label: T('pg.weight'), value: w ? T('pg.weightv', { w: w.kg, d: w.day }) : T('pg.noweight'), action: P.s.ended ? '' : 'weight-open' });
+    var body = K.section({ title: T('pg.summary'), rows: true, items: items });
+    if (!w) body += '<p class="sp-warn">' + esc(T('pg.weight.hint')) + '</p>';
+    if (P.hasId()) {
+      var rows = p.ids.slice().reverse().map(function (x) {
+        var id = [x.tag, x.notch].filter(Boolean).join(' · ');
+        return K.row({ id: id, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
+          meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), still: true, trail: '' });
+      });
+      var acts = P.s.ended ? '' : '<div class="sp-id-acts">' + [['scan', 'scan', 'pg.scan'], ['notch', 'edit', 'pg.notch'], ['manual', 'plus', 'pg.manual']].map(function (a) {
+        return '<button type="button" class="sp-id-act" data-action="id-add" data-value="' + a[0] + '">' + I(a[1]) + '<span>' + esc(T(a[2])) + '</span></button>';
+      }).join('') + '</div>';
+      body += '<section class="sp-ids">' + UI.heading({ title: T('pg.ids'), meta: idWhat(p), kind: 'section', level: 3 }) +
+        '<div class="st-panel sp-ids-card">' + (rows.length ? rows.join('') : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>') + acts + '</div></section>';
+    }
+    body += K.doors({ items: [{ title: T('pg.log'), description: T('pg.log.sub'), action: 'log-open' }] });
+    return body;
   }
   function penSheet(inert) {
     var p = pen(), ended = !!P.s.ended, body = '';
+    body += UI.segment({ options: [['proc', esc(T('tab.proc'))], ['pig', esc(T('tab.pig'))]], active: V.tab, action: 'tab', ariaLabel: T('tabs.label'), className: 'sp-tabs' });
     if (V.flash && V.flash.pen === p.code) body += flashLine();
     if (ended) body += K.warning({ tone: 'amber', text: T('ended.note') });
-    body += UI.facts([{ label: T('born'), value: String(p.born) }, { label: T('alive'), value: String(p.alive) }, { label: T('dead'), value: String(p.dead) }], { columns: 3 });
-    var lines = [];
-    if (p.sowDied) lines.push('<span data-tone="red">' + esc(T('line.sow')) + '</span>');
-    if (p.movedOut) lines.push('<span>' + esc(T('line.out', { n: p.movedOut })) + '</span>');
-    if (p.movedIn) lines.push('<span>' + esc(T('line.in', { n: p.movedIn })) + '</span>');
-    if (lines.length) body += '<p class="sp-lines">' + lines.join(' ') + '</p>';
-    if (!ended) {
-      var tools = [['death', 'alert', 'tool.death'], ['move', 'transfer', 'tool.move'], ['count', 'edit', 'tool.count']];
-      if (P.hasId()) tools.push(['id', 'bookmark', 'tool.id']);
-      body += '<div class="sp-toolrow" data-count="' + tools.length + '">' + tools.map(function (x) {
-        return '<button type="button" class="sp-tool" data-action="' + (x[0] === 'id' ? 'id-open' : 'tool') + '" data-value="' + x[0] + '">' + I(x[1]) + '<span>' + esc(T(x[2])) + '</span></button>';
-      }).join('') + '</div>';
-    }
-    body += timeline(p);
-    var sub = [T('sheet.sub', { d: p.age, r: p.row })];
-    if (P.hasId() && P.breeders(p)) sub.push(SEP, { text: T('breeders.n', { n: P.breeders(p) }), tone: 'green' });
-    return K.drawer({ title: p.code, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: null,
-      body: body, footer: K.footer({ back: { action: 'back', label: T('back') } }) });
+    body += V.tab === 'pig' ? piglets(p) : processing(p);
+    var n = Object.keys(V.draft).length;
+    var more = '<button type="button" class="button secondary sp-more" data-ds="Button" data-action="more" data-value="" aria-label="' + esc(T('more.title')) + '">' + I('more') + '</button>';
+    var main = V.tab === 'pig' || ended ? UI.button({ label: T('back'), register: 'secondary', action: 'back' })
+      : UI.button({ label: T('submit.n', { n: n }), register: 'primary', action: 'submit', waiting: !n });
+    var sub = [T('sheet.sow', { tag: p.sow, p: p.parity }), SEP, T('piglets', { n: p.alive }), SEP, T('day.n', { d: p.age })];
+    return K.drawer({ title: p.code, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back', label: T('back') },
+      body: body, footer: '<div class="tk-footer" data-ds="TaskFooter">' + (ended ? '' : more) + main + '</div>' });
   }
 
-  /* ---- treating fewer: a stepper; a shortfall asks one reason ---- */
+  /* ---- More: Move piglets · Record death · Set count ---- */
+  function moreSheet() {
+    return K.drawer({ title: T('more.title'), size: 'medium', view: 'more', close: null,
+      body: K.doors({ items: [{ title: T('move.title'), action: 'tool', value: 'move' }, { title: T('tool.death'), action: 'tool', value: 'death' }, { title: T('tool.count'), action: 'tool', value: 'count' }] }),
+      footer: K.footer({ back: { action: 'back', label: T('back') } }) });
+  }
+  /* ---- fewer piglets for one ticked item: a stepper; a shortfall asks one reason ---- */
   function stepper(key, label, value, o) {
     return K.stepper(Object.assign({ label: label, value: value, key: key, action: 'step', min: 0 }, o || {}));
   }
-  function treatSheet() {
-    var p = pen(), d = V.treat, n = P.need(p, d.k), less = d.n < n;
-    var body = stepper('treat', T('treat.given'), d.n, { max: n });
+  function adjustSheet() {
+    var p = pen(), d = V.adj, n = P.need(p, d.k), less = d.n < n;
+    var body = stepper('adj', T('treat.given'), d.n, { max: n, min: 1 });
     if (less) {
       body += K.radios({ label: T('treat.why'), action: 'why', key: 'why', selected: d.why, options: [
         { value: 'weak', label: T('treat.weak') }, { value: 'sick', label: T('treat.sick') }] });
       body += '<p class="sp-quiet">' + esc(T('treat.later', { n: n - d.n })) + '</p>';
     }
-    var ready = d.n > 0 && (!less || d.why);
-    return K.drawer({ title: tr(d.k), subtitle: T('treat.sub', { pen: p.code, d: p.age, n: n }), size: 'long', view: 'treat', close: null, body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('record.n', { n: d.n }), action: 'treat-save', register: 'primary', waiting: !ready } }) });
+    return K.drawer({ title: tr(d.k), subtitle: T('adj.sub', { pen: p.code, n: n }), size: 'long', view: 'adjust', close: null, body: body,
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('adj.use', { n: d.n }), action: 'adjust-use', register: 'primary', waiting: less && !d.why } }) });
   }
 
-  /* ---- ID: one piglet at a time — number (the next one suggested), boar or gilt, weight, keep for breeding ---- */
+  /* ---- the ID form (tag / notch / weigh): litter weight, boars and gilts, and the identified piglets as rows ---- */
+  function nextNumbers(p) {
+    var f = V.idf, tag = +P.nextNo(p.code), notchBase = String(p.litter), notchN = 0;
+    if (scheme() === 'notch') notchN = +P.nextNo(p.code).split('-')[1];
+    else { var used = p.ids.filter(function (x) { return x.notch; }).map(function (x) { return +String(x.notch).split('-')[1] || 0; }); notchN = (used.length ? Math.max.apply(null, used) : 0) + 1; }
+    f.rows.forEach(function (r) { if (r.tag && +r.tag >= tag) tag = +r.tag + 1; if (r.notch) { var m = +String(r.notch).split('-')[1] || 0; if (m >= notchN) notchN = m + 1; } });
+    return { tag: String(tag), notch: notchBase + '-' + notchN };
+  }
+  var rowOk = function (r) { return (r.tag || r.notch) && r.sex && !(r.tag && P.taken(r.tag)) && !(r.notch && P.taken(r.notch)); };
+  var rowEmpty = function (r) { return !r.tag && !r.notch && !r.sex && !r.kg; };
   function idPage() {
-    var p = pen(), f = V.idf, br = scheme() === 'breeders', next = P.nextNo(p.code), body = '';
-    if (f.flash) {
-      var undo = P.s.undo && P.s.undo.kind === 'id' ? UI.button({ label: T('undo'), register: 'text', action: 'id-undo' }) : '';
-      body += '<div class="sp-flash" role="status"><span>' + esc(f.flash) + '</span>' + undo + '</div>';
-    }
-    var used = f.no && P.taken(f.no);
-    body += '<div class="sp-idno"><label class="field"><span>' + esc(T(scheme() === 'notch' ? 'id.no.notch' : 'id.no.tag')) + '</span>' +
-      '<input id="sp-id-no" inputmode="' + (scheme() === 'notch' ? 'text' : 'numeric') + '" autocomplete="off" value="' + esc(f.no) + '"' + (used ? ' aria-invalid="true" aria-describedby="sp-id-used"' : '') + '></label>' +
-      (f.no === next ? '' : UI.button({ label: T('id.use', { no: next }), register: 'secondary', action: 'id-use', value: next })) + '</div>';
-    if (used) body += '<p class="sp-warn" id="sp-id-used">' + esc(T('id.taken', { no: f.no })) + '</p>';
-    body += K.radios({ layout: 'row', label: T('id.sex'), action: 'id-sex', key: 'sex', selected: f.sex, options: [{ value: 'boar', label: T('boar') }, { value: 'gilt', label: T('gilt') }] });
-    body += '<label class="field sp-kg"><span>' + esc(T('id.kg')) + ' <small>' + esc(T('optional')) + '</small></span><input id="sp-id-kg" inputmode="decimal" autocomplete="off" value="' + esc(f.kg) + '"></label>';
-    if (!br) body += K.radios({ layout: 'row', label: T('id.keep'), action: 'id-keep', key: 'keep', selected: f.keep ? 'yes' : 'no', options: [{ value: 'no', label: T('no') }, { value: 'yes', label: T('yes') }] });
-    if (br && !p.picked) body += UI.button({ label: T('id.done.pick', { n: P.breeders(p) }), register: 'secondary', action: 'pick-done', className: 'sp-wide' });
-    // the piglets with an ID in this pen, newest first; breeders carry a chip
-    var rows = p.ids.slice().reverse().map(function (x) {
-      return K.row({ id: x.no, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
-        meta: (sameDay(x.at) ? hm(x.at) : '') + (sameDay(x.at) ? ' · ' : '') + short(x.who), still: true, trail: '' });
-    });
-    body += K.list([K.group({ title: T('id.list'), face: 'word', meta: '· ' + idWhat(p), rows: rows.length ? rows : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>' })]);
-    var ready = f.no && !used && f.sex;
-    return K.page({ title: tr('id'), description: T('id.page.sub', { pen: p.code, d: p.age, what: idWhat(p) }), view: 'id', body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('id.save'), action: 'id-save', register: 'primary', waiting: !ready } }) });
+    var p = pen(), f = V.idf, br = scheme() === 'breeders', body = '';
+    body += '<section class="st-panel sp-idf-card"><label class="field sp-idf-kg"><span>' + esc(T('idf.kg')) + '</span><span class="sp-kg-box"><input id="sp-idf-kg" inputmode="decimal" autocomplete="off" value="' + esc(f.kg) + '"><small>kg</small></span></label>' +
+      (f.kg ? '' : '<p class="sp-warn">' + esc(T('pg.weight.hint')) + '</p>') + '</section>';
+    body += '<section class="st-panel sp-idf-card">' + stepper('boar', T('idf.boars'), f.boar) + stepper('gilt', T('idf.gilts'), f.gilt) + '</section>';
+    var rows = f.rows.map(function (r, i) {
+      var bad = f.tried && !rowOk(r) && !rowEmpty(r);
+      return '<div class="sp-idrow"' + (bad ? ' data-bad=""' : '') + '>' +
+        '<input id="sp-r' + i + '-tag" data-row="' + i + '" data-f="tag" inputmode="numeric" autocomplete="off" placeholder="' + esc(T('idf.tag')) + '" aria-label="' + esc(T('idf.tag')) + '" value="' + esc(r.tag) + '">' +
+        '<input id="sp-r' + i + '-notch" data-row="' + i + '" data-f="notch" autocomplete="off" placeholder="' + esc(T('idf.notch')) + '" aria-label="' + esc(T('idf.notch')) + '" value="' + esc(r.notch) + '">' +
+        '<select id="sp-r' + i + '-sex" data-row="' + i + '" data-f="sex" aria-label="' + esc(T('idf.sex')) + '"><option value="">' + esc(T('idf.sex')) + '</option><option value="boar"' + (r.sex === 'boar' ? ' selected' : '') + '>' + esc(T('boar')) + '</option><option value="gilt"' + (r.sex === 'gilt' ? ' selected' : '') + '>' + esc(T('gilt')) + '</option></select>' +
+        '<input id="sp-r' + i + '-kg" data-row="' + i + '" data-f="kg" inputmode="decimal" autocomplete="off" placeholder="kg" aria-label="' + esc(T('id.kg')) + '" value="' + esc(r.kg) + '">' +
+        '<button type="button" class="sp-idrow-x" data-action="id-del" data-value="' + i + '" aria-label="' + esc(T('idf.remove', { n: i + 1 })) + '">' + I('close') + '</button>' +
+        (br ? '' : '<label class="sp-keep"><input type="checkbox" data-row="' + i + '" data-f="keep"' + (r.keep ? ' checked' : '') + '> ' + esc(T('id.keep')) + '</label>') + '</div>';
+    }).join('');
+    var bad = f.rows.some(function (r) { return !rowOk(r) && !rowEmpty(r); });
+    body += '<section class="sp-ids">' + UI.heading({ title: T('pg.ids'), kind: 'section', level: 3 }) +
+      '<div class="st-panel sp-ids-card">' + (rows || '<p class="sp-empty">' + esc(T('idf.add')) + '</p>') +
+      (f.tried && bad ? '<p class="sp-warn">' + esc(T('idf.row')) + '</p>' : '') +
+      '<div class="sp-id-acts">' + [['scan', 'scan', 'pg.scan'], ['notch', 'edit', 'pg.notch'], ['manual', 'plus', 'pg.manual']].map(function (a) {
+        return '<button type="button" class="sp-id-act" data-action="id-add" data-value="' + a[0] + '">' + I(a[1]) + '<span>' + esc(T(a[2])) + '</span></button>';
+      }).join('') + '</div></div></section>';
+    var n = f.rows.filter(rowOk).length, something = n || f.kg || f.boar !== f.boar0 || f.gilt !== f.gilt0;
+    return K.page({ title: T('idf.title'), description: T('id.page.sub', { pen: p.code, d: p.age, what: idWhat(p) }), view: 'id', body: body,
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('idf.submit', { n: n }), action: 'id-submit', register: 'primary', waiting: !something } }) });
+  }
+  function weightSheet() {
+    var p = pen();
+    return K.drawer({ title: T('w.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'short', view: 'weight', close: null,
+      body: '<label class="field sp-idf-kg"><span>' + esc(T('w.kg')) + '</span><span class="sp-kg-box"><input id="sp-w-kg" inputmode="decimal" autocomplete="off" value="' + esc(V.weight.kg) + '"><small>kg</small></span></label>',
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'weight-save', register: 'primary', waiting: !(+V.weight.kg > 0) } }) });
+  }
+  /* ---- the pen log: born, deaths, moves, counts, treatments, IDs — the history, newest first ---- */
+  function logPage() {
+    var p = pen(), recs = P.recs(p.code).slice().sort(function (a, b) { return b.at - a.at; });
+    var line = function (r) {
+      var what = r.tr === 'death' ? T('log.death', { n: r.n }) : r.tr === 'move' ? T('log.move', { n: pigs(r.n), to: r.to }) : r.tr === 'count' ? T('log.count', { n: r.n })
+        : r.tr === 'id' ? T('log.id', { no: r.no }) : r.tr === 'pick' ? T('log.pick') : T('log.treat', { tr: tr(r.tr), n: pigs(r.n) });
+      return K.row({ id: T('day.n', { d: r.day }), headline: what, meta: short(r.who) + ' · ' + when(r), still: true, trail: '' });
+    };
+    var ent = recs.map(function (r) { return { day: r.day, at: r.at, html: line(r) }; });
+    p.weights.forEach(function (w, i) { if (w.day > 0) ent.push({ day: w.day, at: w.at || i, html: K.row({ id: T('day.n', { d: w.day }), headline: T('log.weight', { w: w.kg }), meta: '', still: true, trail: '' }) }); });
+    ent.sort(function (a, b) { return b.day - a.day || b.at - a.at; });
+    var rows = ent.map(function (e) { return e.html; });
+    var bw = p.weights.filter(function (w) { return w.day === 0; })[0];
+    if (bw) rows.push(K.row({ id: T('day.n', { d: 0 }), headline: T('log.weight', { w: bw.kg }), meta: '', still: true, trail: '' }));
+    rows.push(K.row({ id: T('day.n', { d: 0 }), headline: T('log.born', { n: p.born }), meta: p.dead && !recs.some(function (r) { return r.tr === 'death'; }) ? T('log.dead.birth', { n: p.dead }) : '', still: true, trail: '' }));
+    return K.page({ title: T('log.title'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'log', body: K.list([K.group({ title: p.code, rows: rows })]) });
   }
 
   /* ---- record death ---- */
@@ -347,12 +329,10 @@
   function deathSheet() {
     var p = pen(), d = V.death, k = CAUSES.reduce(function (s, c) { return s + d.c[c]; }, 0);
     var body = CAUSES.map(function (c) { return stepper(c, T('c.' + c), d.c[c], { max: p.alive }); }).join('');
-    var ready = k > 0;
     return K.drawer({ title: T('death.title'), subtitle: T('death.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'death', close: null, body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'death-save', register: 'primary', waiting: !ready } }) });
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'death-save', register: 'primary', waiting: !k } }) });
   }
-
-  /* ---- move piglets: the other pen (same batch), how many, and for what was given here: had it? ---- */
+  /* ---- move piglets: only the other pens of this batch (there is nowhere else); for what was given here: had it? ---- */
   function moveAsks(p) {
     var ks = P.PLAN.filter(function (t) { return p.tr[t.key].got > 0; }).map(function (t) { return t.key; });
     if ((scheme() === 'tag' || scheme() === 'notch') && P.idCount(p) > 0) ks.push('id');
@@ -376,22 +356,12 @@
     return K.page({ title: T('move.title'), description: T('move.sub', { pen: p.code, n: p.alive }), view: 'move', body: body,
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('move.save', { n: pigs(d.n) }), action: 'move-save', register: 'primary', waiting: !ready } }) });
   }
-
-  /* ---- set count: a big stepper from Alive; lower asks one quiet choice ---- */
+  /* ---- set count: the record becomes what is there now ---- */
   function countSheet() {
     var p = pen(), d = V.count;
-    var body = stepper('count', T('count.label'), d.n, { variant: 'hero', face: 'count', min: 0, hint: '' });
-    return K.drawer({ title: T('count.title'), subtitle: T('count.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'count', close: null, body: body,
+    return K.drawer({ title: T('count.title'), subtitle: T('count.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'count', close: null,
+      body: stepper('count', T('count.label'), d.n, { variant: 'hero', face: 'count', min: 0, hint: '' }),
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'count-save', register: 'primary', waiting: d.n === p.alive } }) });
-  }
-
-  /* ---- ticking a pen outside the window asks once ---- */
-  function confirmDialog() {
-    var c = V.confirm, p = P.s.pens[c.pen], t = P.plan(V.chip);
-    return K.dialog({ icon: 'alert', title: T('confirm.title'),
-      description: T('confirm.text', { pen: p.code, d: p.age, Tr: tr(t.key), a: t.from, b: t.to, mark: T(c.mark) }),
-      footer: '<div class="tk-footer sp-two">' + UI.button({ label: T('cancel'), register: 'secondary', action: 'confirm-no' }) +
-        UI.button({ label: T('confirm.ok'), register: 'primary', action: 'confirm-yes' }) + '</div>' });
   }
 
   /* ================= End task (the supervisor) ================= */
@@ -408,8 +378,8 @@
     }
     var soon = all.filter(function (p) { return P.coming(p).length; });
     if (soon.length && !ended) {
-      var names = []; soon.forEach(function (p) { P.coming(p).forEach(function (k) { if (names.indexOf(tr(k)) < 0) names.push(tr(k)); }); });
-      body += '<p class="sp-quiet">' + esc(T('end.coming', { n: soon.length, list: names.join(', ') })) + '</p>';
+      var nm = []; soon.forEach(function (p) { P.coming(p).forEach(function (k) { if (nm.indexOf(tr(k)) < 0) nm.push(tr(k)); }); });
+      body += '<p class="sp-quiet">' + esc(T('end.coming', { n: soon.length, list: nm.join(', ') })) + '</p>';
     }
     if ((P.s.unaccounted || 0) > 0) body += '<p class="sp-quiet">' + esc(T('end.unacc', { n: P.s.unaccounted })) + '</p>';
     var f = ended ? K.footer({ back: { action: 'back', label: T('back') } })
@@ -418,8 +388,8 @@
   }
 
   /* ================= render ================= */
-  /* Each overlay on the phone has a key (its data-view, or 'dialog'). An overlay that is new on this render slides in
-     (data-enter); one that is gone slides out first (data-leave), then the phone is redrawn. A re-render never replays. */
+  /* Each overlay on the phone has a key (its data-view). An overlay that is new on this render slides in (data-enter); one
+     that is gone slides out first (data-leave), then the phone is redrawn. A re-render never replays. */
   var shownKeys = [], leaving = false;
   function overlays(root) {
     return Array.prototype.filter.call(root.children, function (el) { return el.matches('.tk-sheet, .tk-page, .tk-dialog-backdrop'); });
@@ -429,15 +399,17 @@
     if (leaving) return;
     document.documentElement.lang = L.lang === 'zh' ? 'zh-CN' : 'en';
     document.title = T('task');
-    var over = !!(V.pen || V.end || V.confirm);
-    var html = K.statusbar() + listScreen(over);
-    if (V.confirm) html += confirmDialog();
+    var html = K.statusbar() + listScreen(!!(V.pen || V.end));
     if (V.pen) html += penSheet(!!(V.over || V.end));
-    if (V.pen && V.over === 'treat') html += treatSheet();
-    if (V.pen && V.over === 'death') html += deathSheet();
-    if (V.pen && V.over === 'count') html += countSheet();
-    if (V.pen && V.over === 'move') html += movePage();
-    if (V.pen && V.over === 'id') html += idPage();
+    var o = V.pen && V.over;
+    if (o === 'more') html += moreSheet();
+    if (o === 'adjust') html += adjustSheet();
+    if (o === 'death') html += deathSheet();
+    if (o === 'count') html += countSheet();
+    if (o === 'weight') html += weightSheet();
+    if (o === 'move') html += movePage();
+    if (o === 'id') html += idPage();
+    if (o === 'log') html += logPage();
     if (V.end) html += endPage();
     var tmp = document.createElement('div'); tmp.innerHTML = html;
     var next = overlays(tmp).map(keyOf);
@@ -456,7 +428,6 @@
     paint(html, next);
   }
   function paint(html, next) {
-    // keep each scroller where it was when the same surface is drawn again
     var keep = {};
     phone.querySelectorAll('.tk-scroll, .tk-sheet-body, .tk-page-body').forEach(function (el) {
       var host = el.closest('[data-view]'); keep[(host ? host.getAttribute('data-view') : 'list') + el.className] = el.scrollTop;
@@ -480,13 +451,13 @@
       if (keep[k] != null) el.scrollTop = keep[k];
     });
     var ct = phone.querySelector('.tk-chips-track'); if (ct) ct.scrollLeft = cx;
-    if (V.pageTop) { phone.querySelectorAll('.tk-page-body').forEach(function (x) { x.scrollTop = 0; }); V.pageTop = false; }
+    if (V.pageTop) { phone.querySelectorAll('.tk-page-body, .tk-sheet-body').forEach(function (x) { x.scrollTop = 0; }); V.pageTop = false; }
     if (V.toTop) { var sc = phone.querySelector('.tk-scroll'); if (sc) sc.scrollTop = 0; V.toTop = false; }
     if (focusSel) {
       var f = phone.querySelector(focusSel);
       if (f && f.focus) { f.focus({ preventScroll: true }); if (caret != null && f.setSelectionRange) try { f.setSelectionRange(caret, caret); } catch (e) { /* not a text input */ } }
     }
-    V.justRec = ''; V.justTick = '';
+    V.justTick = ''; V.justRec = [];
     renderDemo();
   }
 
@@ -526,61 +497,63 @@
   });
 
   /* ================= what a tap does ================= */
-  /* Steps recorded on this visit stay in today's card until the worker leaves the sheet or a few seconds pass idle. */
-  var pinTimer = 0;
-  function unpinSoon() {
-    clearTimeout(pinTimer);
-    if (!Object.keys(V.pin).length) return;
-    pinTimer = setTimeout(function () { if (V.over || V.end) { unpinSoon(); return; } V.pin = {}; render(); }, 4000);
+  /* After Submit the ticked rows turn done where they are; a day that became all done stays open a few seconds. */
+  var openTimer = 0;
+  function keepOpenSoon() {
+    clearTimeout(openTimer);
+    if (!Object.keys(V.keepOpen).length) return;
+    openTimer = setTimeout(function () { if (V.over || V.end) { keepOpenSoon(); return; } V.keepOpen = {}; render(); }, 4000);
   }
+  function closePen() { V.pen = null; V.flash = null; V.open = {}; V.keepOpen = {}; V.draft = {}; V.tab = 'proc'; clearTimeout(openTimer); }
   function closeTop() {
-    if (V.confirm) V.confirm = null;
-    else if (V.end) V.end = null;
+    if (V.end) V.end = null;
     else if (V.over) V.over = null;
-    else if (V.pen) { V.pen = null; V.flash = null; V.open = {}; V.pin = {}; clearTimeout(pinTimer); }
+    else if (V.pen) closePen();
   }
   function saved(key, args) { V.flash = { pen: V.pen, key: key, args: args, undo: true }; }
-  function pinned(k, rec) { if (!rec) return; V.pin[k] = rec.id; V.justRec = rec.id; V.flash = null; unpinSoon(); }
-  function idBlank(f) { return { no: '', sex: '', kg: '', keep: scheme() === 'breeders', flash: f || '' }; }
+  function idBlank(p) { return { kg: '', boar: p.sex ? p.sex.boar : 0, gilt: p.sex ? p.sex.gilt : 0, boar0: p.sex ? p.sex.boar : 0, gilt0: p.sex ? p.sex.gilt : 0, rows: [], tried: false }; }
+  function addRow(kind) {
+    var p = pen(), nx = nextNumbers(p), r = { tag: '', notch: '', sex: '', kg: '', keep: false };
+    if (kind === 'scan') r.tag = nx.tag;          // a scan reads the next tag in the box (demo)
+    if (kind === 'notch') r.notch = nx.notch;     // the notch picker offers this litter's next notch
+    V.idf.rows.push(r);
+  }
   function act(a, v, el) {
     var p = V.pen ? pen() : null;
     switch (a) {
-      case 'chip': if (v === V.chip && !V.chipRec) return; chipStart(v); break;
-      case 'pen': V.pen = v; V.flash = null; V.open = {}; V.pin = {}; break;
+      case 'chip': if (v === V.chip) return; V.chip = v; break;
+      case 'pen': V.pen = v; V.flash = null; V.open = {}; V.draft = {}; V.tab = 'proc'; break;
+      case 'tab': V.tab = v; V.pageTop = true; break;
       case 'dismiss': case 'back': closeTop(); break;
       case 'noop': return;
       case 'end': V.end = true; break;
-      case 'tick': {
-        var place = P.bulkPlace(P.s.pens[v], V.chip);
-        if (V.sel[v] != null) delete V.sel[v];
-        else if (place === 'early' || place === 'late') V.confirm = { pen: v, mark: place };
-        else { V.sel[v] = ''; V.justTick = v; }
+      case 'day': V.open[v] = !V.open[v]; break;
+      case 'item':
+        if (V.draft[v]) delete V.draft[v];
+        else { V.draft[v] = { n: P.need(p, v), why: '' }; V.justTick = v; }
+        break;
+      case 'adjust': V.over = 'adjust'; V.adj = { k: v, n: V.draft[v].n, why: V.draft[v].why }; break;
+      case 'adjust-use': V.draft[V.adj.k] = { n: V.adj.n, why: V.adj.n < P.need(p, V.adj.k) ? V.adj.why : '' }; V.over = null; break;
+      case 'why': V.adj.why = v; break;
+      case 'submit': {
+        var items = Object.keys(V.draft).map(function (k) { return { k: k, n: V.draft[k].n, why: V.draft[k].why }; });
+        var recs = P.submit(p.code, items) || [];
+        recs.forEach(function (r) { V.keepOpen[P.plan(r.tr).from] = true; });
+        V.justRec = recs.map(function (r) { return r.id; });
+        V.draft = {};
+        V.flash = { pen: p.code, key: 'flash.items', args: { n: recs.length }, undoIds: V.justRec.slice() };
+        keepOpenSoon();
         break;
       }
-      case 'confirm-yes': V.sel[V.confirm.pen] = V.confirm.mark; V.justTick = V.confirm.pen; V.confirm = null; break;
-      case 'confirm-no': V.confirm = null; break;
-      case 'chip-undo': {
-        var ids = Object.keys(V.chipRec).filter(function (c) { return c !== '_sum'; }).map(function (c) { return V.chipRec[c].id; });
-        P.unrecord(ids); chipStart(V.chip); break;
-      }
-      case 'tl-toggle': V.open[v] = !V.open[v]; break;
-      case 'one': pinned(v, P.treat(p.code, v, P.need(p, v))); break;
-      case 'unrecord': P.unrecord(V.pin[v]); delete V.pin[v]; unpinSoon(); break;
-      case 'treat': V.over = 'treat'; V.treat = { k: v, n: P.need(p, v), why: '' }; break;
+      case 'undo-items': P.unrecord(V.flash.undoIds); V.flash = { pen: V.pen, key: 'undone' }; break;
+      case 'more': V.over = 'more'; break;
       case 'step': {
         var d = +el.getAttribute('data-step');
-        if (V.over === 'treat') V.treat.n = Math.max(0, Math.min(P.need(p, V.treat.k), V.treat.n + d));
+        if (V.over === 'adjust') V.adj.n = Math.max(1, Math.min(P.need(p, V.adj.k), V.adj.n + d));
         if (V.over === 'death') V.death.c[v] = Math.max(0, V.death.c[v] + d);
         if (V.over === 'count') V.count.n = Math.max(0, V.count.n + d);
         if (V.over === 'move') V.move.n = Math.max(1, Math.min(p.alive, V.move.n + d));
-        break;
-      }
-      case 'why': V.treat.why = v; break;
-      case 'treat-save': {
-        var t = V.treat, all = t.n >= P.need(p, t.k);
-        var rec = P.treat(p.code, t.k, t.n, all ? '' : t.why);
-        V.over = null;
-        if (all) pinned(t.k, rec); else saved('flash.treat', { tr: tr(t.k), n: pigs(t.n) });
+        if (V.over === 'id') V.idf[v] = Math.max(0, V.idf[v] + d);
         break;
       }
       case 'tool':
@@ -589,19 +562,21 @@
         if (v === 'move') V.move = { to: '', n: 1, had: {} };
         if (v === 'count') V.count = { n: p.alive };
         break;
-      case 'id-open': V.over = 'id'; V.idf = idBlank(); V.pageTop = true; break;
-      case 'id-use': V.idf.no = v; break;
-      case 'id-sex': V.idf.sex = v; break;
-      case 'id-keep': V.idf.keep = v === 'yes'; break;
-      case 'id-save': {
-        var f = V.idf, x = P.identify(p.code, { no: f.no, sex: f.sex, kg: f.kg, keep: f.keep });
-        V.idf = idBlank(T('id.recorded', { no: x.no }) + (x.keep ? ' · ' + T('breeder') : ''));
+      case 'count-open': V.over = 'count'; V.count = { n: p.alive }; break;
+      case 'weight-open': V.over = 'weight'; V.weight = { kg: '' }; break;
+      case 'weight-save': P.setWeight(p.code, V.weight.kg); V.over = null; saved('log.weight', { w: V.weight.kg }); break;
+      case 'log-open': V.over = 'log'; V.pageTop = true; break;
+      case 'id-open': V.over = 'id'; V.idf = idBlank(p); V.pageTop = true; break;
+      case 'id-add':
+        if (V.over !== 'id') { V.over = 'id'; V.idf = idBlank(p); V.pageTop = true; }
+        addRow(v);
         break;
-      }
-      case 'id-undo': P.undo(); V.idf = idBlank(T('undone')); break;
-      case 'pick-done': {
-        var nb = P.donePicking(p.code);
-        V.over = null; saved('flash.pick', { n: T('breeders.n', { n: nb }) });
+      case 'id-del': V.idf.rows.splice(+v, 1); break;
+      case 'id-submit': {
+        var f = V.idf, bad = f.rows.some(function (r) { return !rowOk(r) && !rowEmpty(r); });
+        if (bad) { f.tried = true; break; }
+        var n = P.identifyForm(p.code, { kg: f.kg, boar: f.boar !== f.boar0 || f.gilt !== f.gilt0 ? f.boar : null, gilt: f.gilt, rows: f.rows.filter(rowOk) });
+        V.over = null; V.tab = 'pig'; saved('idf.saved', { n: n });
         break;
       }
       case 'death-save': {
@@ -631,7 +606,7 @@
   }
   phone.addEventListener('click', function (e) {
     if (leaving) return;
-    if (V.pen && Object.keys(V.pin).length) unpinSoon();   // the worker is still busy here: the pinned rows wait
+    if (V.pen && Object.keys(V.keepOpen).length) keepOpenSoon();   // still busy here: a fresh day stays open
     var el = e.target.closest('[data-action]');
     if (!el || !phone.contains(el) || el.classList.contains('st-hold')) return;
     if (UI.guard(el)) return;
@@ -639,37 +614,37 @@
   });
   // the chips are one radio group: arrow keys, Home and End move the choice
   UI.radioBind(phone, { onChange: function (field, value) { if (field === 'chips') act('chip', value); } });
-  // typing in the ID fields
+  // typing in the ID form and the weight sheet
   phone.addEventListener('input', function (e) {
+    var t = e.target, num = function (s) { return s.replace(',', '.').replace(/[^0-9.]/g, ''); };
+    if (t.id === 'sp-w-kg') { V.weight.kg = num(t.value); render(); return; }
     if (!V.idf) return;
-    if (e.target.id === 'sp-id-no') { V.idf.no = e.target.value.trim(); render(); }
-    if (e.target.id === 'sp-id-kg') { V.idf.kg = e.target.value.replace(',', '.').replace(/[^0-9.]/g, ''); }
+    if (t.id === 'sp-idf-kg') { V.idf.kg = num(t.value); render(); return; }
+    var i = t.getAttribute('data-row'), f = t.getAttribute('data-f');
+    if (i == null) return;
+    var r = V.idf.rows[+i];
+    if (f === 'keep') r.keep = t.checked; else if (f === 'kg') r.kg = num(t.value); else r[f] = t.value.trim();
+    render();
   });
+  phone.addEventListener('change', function (e) { if (e.target.tagName === 'SELECT' && V.idf) { var r = V.idf.rows[+e.target.getAttribute('data-row')]; r.sex = e.target.value; render(); } });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && (V.pen || V.end || V.confirm)) { closeTop(); render(); }
+    if (e.key === 'Escape' && (V.pen || V.end)) { closeTop(); render(); }
   });
   var holds = K.holdBind(phone, { onCommit: function (b) {
     var a = b.getAttribute('data-action');
     setTimeout(function () {
       holds.settle(b, 'done');
-      if (a === 'bulk-commit') {
-        var picks = Object.keys(V.sel).sort().map(function (c) { return { pen: c, mark: V.sel[c] }; });
-        var snaps = {}; picks.forEach(function (x) { snaps[x.pen] = penParts(P.s.pens[x.pen]); });   // the rows as the worker saw them
-        var recs = P.bulk(V.chip, picks) || [];
-        V.sel = {}; V.chipRec = { _sum: { pens: recs.length, n: recs.reduce(function (s, r) { return s + r.n; }, 0) } };
-        recs.forEach(function (r) { V.chipRec[r.pen] = Object.assign({ snap: snaps[r.pen] }, r); });
-        V.justRec = 'bulk';
-      }
-      if (a === 'end-commit') { P.end(); V.pageTop = true; V.chip = ''; V.chipRec = null; }
+      if (a === 'end-commit') { P.end(); V.pageTop = true; V.chip = ''; }
       render();
     }, 250);
   } });
 
-  /* a link can open a state: ?chip=iron|done|id, ?scheme=tag|notch|breeders|none (the design lint's pages) */
+  /* a link can open a state: ?chip=iron|done|id, ?scheme=tag|notch|breeders|none, ?pen=A03&tab=pig (the design lint's pages) */
   (function () {
     var q = new URLSearchParams(location.search);
     var s = q.get('scheme'); if (s && P.SCHEMES.indexOf(s) >= 0 && s !== scheme()) P.setScheme(s);
-    var c = q.get('chip'); if (c) chipStart(c);
+    var c = q.get('chip'); if (c) V.chip = c;
+    var pn = q.get('pen'); if (pn && P.s.pens[pn]) { V.pen = pn; V.tab = q.get('tab') === 'pig' ? 'pig' : 'proc'; }
   })();
   render();
 })();
