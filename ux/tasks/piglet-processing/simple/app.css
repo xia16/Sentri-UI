@@ -19,66 +19,23 @@
 
 /* ---- inside a pen: Processing | Piglets (farrowing's segment), [⋯] beside the footer's one action ---- */
 .sp-tabs.st-segment { margin: 0; }
-.tk-footer > .button.sp-more { flex: none; width: var(--control-height); min-width: 0; padding: 0; }
+.tk-footer > .sp-more { flex: none; display: grid; place-items: center; width: var(--control-height); min-height: var(--control-height); margin: 0; padding: 0;
+  border: 1px solid var(--control-border); border-radius: var(--radius-control); background: var(--paper); color: var(--ink); }
 .sp-more svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 
-/* Processing: one card per age-day. Done days fold; today's are open; later days are grey but can be done early. */
-.sp-days { display: flex; flex-direction: column; gap: var(--space-key-gap); }
-.sp-day { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); overflow: hidden; }
-.sp-day-head { display: flex; align-items: center; gap: 10px; width: 100%; min-height: var(--touch-min); margin: 0; padding: 0 var(--space-row-x); border: 0; background: none;
-  color: var(--ink); text-align: left; cursor: pointer; font: inherit; }
-.sp-day-head strong { flex: 1; min-width: 0; font: 600 var(--type-row-title-size)/1.3 var(--font-sans); }
-.sp-day-head > svg { flex: none; width: 14px; height: 14px; fill: none; stroke: var(--muted); stroke-width: 2; transition: transform .15s; }
-.sp-day-head[aria-expanded="true"] > svg { transform: rotate(90deg); }
-.sp-day-mark { flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; }
-.sp-day-mark svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.sp-day-mark[data-state="done"] { background: var(--well); color: var(--muted); }
-.sp-day-mark[data-state="todo"] { background: var(--green); color: var(--paper); }
-.sp-day-mark[data-state="future"] { color: var(--muted); }
-.sp-day[data-state="done"] .sp-day-head strong { color: var(--muted); font-weight: 500; }
-.sp-day[data-state="future"] .sp-day-head strong { color: var(--muted); }
-.sp-day-sub { margin: -6px 0 6px; padding: 0 var(--space-row-x) 0 44px; font: var(--type-meta-size)/1.5 var(--font-sans); color: var(--muted); }
-.sp-items { border-top: 1px solid var(--line); }
-/* an item: one checkbox row (the whole row ticks); ticked, its count shows as a small button for fewer piglets */
-.sp-item { display: flex; align-items: center; gap: var(--space-key-gap); width: 100%; min-height: 60px; margin: 0; padding: 0 var(--space-row-x) 0 0;
-  border: 0; background: none; color: var(--ink); text-align: left; font: inherit; }
-.sp-item + .sp-item { border-top: 1px solid var(--line); }
-button.sp-item { cursor: pointer; padding-left: var(--space-row-x); }
-div.sp-item[data-state="done"] { padding-left: var(--space-row-x); }
-.sp-item-main { flex: 1; min-width: 0; display: flex; align-items: center; align-self: stretch; margin: 0; padding: 10px 0 10px var(--space-row-x); border: 0; background: none;
-  color: inherit; text-align: left; font: inherit; cursor: pointer; }
-.sp-item-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.sp-item-copy strong { font: 600 var(--type-row-title-size)/1.3 var(--font-sans); }
-.sp-item-copy small { font: var(--type-meta-size)/1.5 var(--font-mono); color: var(--muted); }
-.sp-item > svg { flex: none; width: 15px; height: 15px; fill: none; stroke: var(--muted); stroke-width: 2; }
-.sp-item[data-state="ticked"] { background: var(--green-wash); }
-.sp-item[data-state="done"] .sp-item-copy strong { color: var(--muted); font-weight: 500; }
-.sp-day[data-state="future"] .sp-item[data-state="todo"] .sp-item-copy strong { color: var(--muted); }
-.sp-box { flex: none; display: grid; place-items: center; width: var(--touch-min); height: var(--touch-min); margin: 0; padding: 0; border: 0; background: none; color: transparent; cursor: pointer; }
-.sp-box::before { content: ""; grid-area: 1 / 1; width: 22px; height: 22px; border: 1.5px solid var(--muted); border-radius: 6px; background: var(--paper); box-sizing: border-box; }
-.sp-box svg { grid-area: 1 / 1; position: relative; width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
-.sp-box[aria-checked="true"] { color: var(--paper); }
-.sp-box[aria-checked="true"]::before { background: var(--green); border-color: var(--green); }
-.sp-item[data-fresh] .sp-box::before, .sp-item[data-fresh] .sp-done-mark { animation: sp-tick-in 200ms ease-out; }
-.sp-item[data-fresh] .sp-box svg, .sp-item[data-fresh] .sp-done-mark svg { animation: sp-tick-draw 200ms ease-out; }
-.sp-count { flex: none; display: inline-flex; align-items: center; gap: 4px; min-height: 36px; margin: 0; padding: 0 10px; border: 1px solid var(--chip-green-border); border-radius: var(--radius-segment);
-  background: var(--paper); color: var(--green); font: 500 var(--type-identifier-size)/1 var(--font-sans); cursor: pointer; }
-.sp-count svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; }
-.sp-done-mark { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--well); color: var(--muted); margin-right: 4px; }
-.sp-done-mark svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.sp-ring { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1.5px dashed var(--muted); margin-right: 4px; }
-@media (prefers-reduced-motion: reduce) { .sp-item[data-fresh] .sp-box::before, .sp-item[data-fresh] .sp-done-mark, .sp-item[data-fresh] .sp-box svg, .sp-item[data-fresh] .sp-done-mark svg, .sp-day-head > svg { animation: none; transition: none; } }
+/* Processing: one TaskDay card per age-day (the skeleton's day card). A ticked, not yet submitted item is not a done
+   row: it stays in ink on the green wash; a row saved on this visit fills its check in place; later days are muted. */
+.tk-sheet-body > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
+.tk-day-row:has([data-ticked]) { background: var(--green-wash); }
+.tk-day-row:has([data-ticked]) .tk-day-copy > strong { color: var(--ink); }
+.tk-day-row:has([data-ticked]) .tk-day-mark, .tk-day-row:has([data-fresh]) .tk-day-mark { animation: sp-tick-in 200ms ease-out; }
+.tk-day[data-when="future"] .tk-day-head > strong, .tk-day[data-when="future"] .tk-day-copy > strong { color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .tk-day-row .tk-day-mark { animation: none !important; } }
 
-/* Piglets: what is in the pen now; then the identified piglets with Scan tag · Choose notch · Add manually */
-.sp-ids > .st-heading { margin-bottom: 8px; }
-.sp-ids-card { padding: 0; overflow: hidden; }
-.sp-ids-card > .tk-row + .tk-row { border-top: 1px solid var(--line); }
-.sp-ids-card > .sp-warn { padding: 0 var(--space-row-x) 8px; }
-.sp-id-acts { display: flex; border-top: 1px solid var(--line); }
-.sp-id-act { flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 5px; min-height: var(--touch-min); margin: 0; padding: 0 4px; border: 0; background: none;
-  color: var(--green); font: 500 var(--type-identifier-size)/1.2 var(--font-sans); cursor: pointer; }
-.sp-id-act svg { flex: none; width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.sp-id-act:active { background: var(--press); }
+/* Piglets: Scan tag · Choose notch · Add manually — three tool Buttons in a line */
+.sp-adds { display: flex; gap: var(--space-key-gap); }
+.sp-adds > .button { flex: 1 1 0; min-width: 0; }
+.tk-sheet-body > .tk-list, .tk-page-body > .tk-list { margin: 0; }
 
 /* the ID form: litter weight, boars · gilts, and one row per identified piglet (tag · notch · sex · kg · ✕) */
 .tk-page[data-view="id"] .field, .tk-sheet[data-view="weight"] .field { margin: 0; }

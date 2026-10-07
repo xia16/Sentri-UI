@@ -2,6 +2,7 @@
 (function (root) {
   'use strict';
   var EN = {
+    'st.in': '{tr} in {n} days', 'st.in.1': '{tr} tomorrow', 'sows.one': '· 1 sow', 'pen.aria': 'Pen {pen}', 'sheet.pen': '{pen} · parity {p}', 'day.done.s': 'Done',
     'st.todo': 'To do', 'st.next': 'Next in {n} days', 'st.next.1': 'Next tomorrow', 'st.done': 'All done', 'sow': 'Sow {tag}',
     'sheet.sow': 'Sow {tag} · parity {p}', 'tab.proc': 'Processing', 'tab.pig': 'Piglets', 'tabs.label': 'Pen views',
     'day.done': 'Day {d} · done', 'day.plan': 'Planned {date}', 'day.early': 'Not due yet · can be done early', 'day.open': 'Day {d}',
@@ -102,6 +103,7 @@
     'yesterday': 'yesterday'
   };
   var ZH = {
+    'st.in': '{n}天后{tr}', 'st.in.1': '明天{tr}', 'sows.one': '· 1头母猪', 'pen.aria': '{pen}栏', 'sheet.pen': '{pen} · {p}胎', 'day.done.s': '已完成',
     'st.todo': '需处理', 'st.next': '下次处理：{n}天后', 'st.next.1': '下次处理：明天', 'st.done': '已完成所有处理', 'sow': '母猪 {tag}',
     'sheet.sow': '母猪 {tag} · {p}胎', 'tab.proc': '仔猪处理', 'tab.pig': '仔猪信息', 'tabs.label': '栏位页面',
     'day.done': '第{d}天 · 已完成', 'day.plan': '计划 {date} 处理', 'day.early': '未到时间 · 可提前填', 'day.open': '第{d}天',

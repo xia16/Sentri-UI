@@ -57,24 +57,42 @@
     var amount = tk.length ? S('piglets', { n: Math.max.apply(null, tk.map(function (k) { return P.need(p, k); })) }) : idS(p);
     return [sts.indexOf('late') >= 0 ? S('late.day', { d: p.age }, 'amber') : S('due.today'), SEP, amount];
   }
-  function penChip(p) {
+  function penChip(p) {   // the End page's rows
     var sts = P.todo(p).map(function (k) { return P.status(p, k); });
     if (!P.s.ended && sts.indexOf('late') >= 0) return S('chip.late', null, 'amber');
     if (p.sowDied) return S('chip.sow', null, 'red');
     return null;
   }
   function names(keys) { return keys.reduce(function (acc, k, i) { return (i ? acc.concat([SEP]) : acc).concat([S(chipKey(k))]); }, []); }
-  /* the row: pen code (and a chip) · one status with what it needs · `Sow 000231 · 12 piglets · day 3` */
-  function penRow(p) {
-    var td = P.todo(p), c = P.coming(p), headline, tone = '';
+  /* One status chip under the sow ID, in farrowing's chip style (its Active / Done / Sow died): Late, Sow died, To do,
+     Done — one at most. */
+  function sowChip(p) {
+    var sts = P.todo(p).map(function (k) { return P.status(p, k); });
+    if (P.s.ended) return null;
+    if (sts.indexOf('late') >= 0) return S('chip.late', null, 'amber');
+    if (p.sowDied) return S('chip.sow', null, 'red');
+    if (sts.length) return S('st.todo', null, 'green');
+    return P.coming(p).length ? null : S('chips.done');
+  }
+  /* The pen's card, exactly farrowing's room list: the pen header (`A03 · 1 sow ›`, TaskGroup) and the sow's row under it
+     (TaskRow): mono sow ID with its one chip; the headline is what is due (or, with nothing due, farrowing's figure:
+     `12 piglets`, or the forecast `Iron in 2 days` as farrowing's `Due tomorrow`); the meta is one mono line,
+     `12 piglets · day 4 · 08:20 · G.H` (farrowing's `born 14 · 1h ago · G.H`). Done rows end in farrowing's edit pencil. */
+  function penCard(p) {
+    var td = P.todo(p), c = P.coming(p), headline, tone = '', figure = false;
+    var lastR = newest(P.recs(p.code));
     if (P.s.ended) { headline = [S('ended.row')]; tone = 'forecast'; }
-    else if (td.length) headline = [S('st.todo'), SEP].concat(names(td));
+    else if (td.length) headline = names(td);
     else if (c.length) {
       var next = Math.min.apply(null, c.map(function (k) { return P.plan(k).from; }));
-      headline = [S('st.next', { n: next - p.age }), SEP].concat(names(c.filter(function (k) { return P.plan(k).from === next; }))); tone = 'forecast';
-    } else { headline = [S('st.done')]; tone = 'forecast'; }
-    var meta = [S('sow', { tag: p.sow }), SEP, S('piglets', { n: p.alive }), SEP, S('day.n', { d: p.age })];
-    return K.row({ id: S('code', { c: p.code }), chip: penChip(p), headline: headline, tone: tone, meta: meta, action: 'pen', value: p.code });
+      headline = [S('st.in', { tr: chipName(c.filter(function (k) { return P.plan(k).from === next; })[0]), n: next - p.age })]; tone = 'forecast';
+    } else { headline = [S('piglets', { n: p.alive })]; figure = true; }
+    var meta = figure ? [] : [S('piglets', { n: p.alive }), SEP];
+    meta.push(S('day.n', { d: p.age }));
+    if (lastR) meta.push(SEP, S('fig', { v: sameDay(lastR.at) ? hm(lastR.at) : md(lastR.at) }), SEP, S('fig', { v: short(lastR.who) }));
+    var done = !P.s.ended && !td.length && !c.length;
+    var row = K.row({ id: S('code', { c: p.sow }), chip: sowChip(p), headline: headline, tone: tone, meta: meta, action: 'pen', value: p.code, trail: done ? 'edit' : 'chevron' });
+    return K.group({ title: S('code', { c: p.code }), meta: S('sows.one'), door: { action: 'pen', value: p.code, label: T('pen.aria', { pen: p.code }) }, rows: row });
   }
   function isDone(p) { return P.todo(p).length === 0; }
   /* the chips: All · one per job that pens need today (with how many) · Done. A chip only filters the pens. */
@@ -120,7 +138,7 @@
     });
     body += chipsRow();
     var shown = !V.chip ? all : V.chip === 'done' ? done : all.filter(function (p) { return needsToday(p, V.chip); });
-    body += shown.length ? K.list([K.group({ title: S('pens.n', { n: shown.length }), face: 'word', rows: shown.map(penRow) })])
+    body += shown.length ? K.list(shown.map(penCard))
       : '<p class="sp-empty">' + H(V.chip === 'done' ? 'empty.done' : 'chip.none') + '</p>';
     return K.screen({ inert: inert, label: T('task'), header: K.header({ title: S('task'), back: null }), body: body });
   }
@@ -141,65 +159,58 @@
     }).join('');
   }
   var dayDate = function (p, d) { return md(Date.now() - (p.age - d) * 864e5); };
-  /* A done item: grey tick, who and when, how many (and an early / late mark). Rows saved on this visit fill in place. */
-  function doneItem(p, k) {
-    var meta;
+  /* Processing: one TaskDay card per age-day (the skeleton's day card, farrowing's Piglet processing · Care). Each item is
+     one row of that card — its whole row ticks it: the open ring becomes the check disc; Submit saves the ticked ones. A
+     ticked item carries its count as the card's one-tap slot (fewer piglets: tap it). A day with everything done folds to
+     one row (`2 done · Iron · Dock tail`); tap it to open. Later days say they can be done early. The ID item opens the
+     ID form. */
+  var dayDate = function (p, d) { return md(Date.now() - (p.age - d) * 864e5); };
+  function doneMeta(p, k) {
     if (k === 'id') {
       var r = newest(P.recs(p.code, 'id').concat(P.recs(p.code, 'pick')));
-      meta = r ? [short(r.who) + ' ' + when(r), SEP, idWhat(p)] : [idWhat(p)];
-      return '<button type="button" class="sp-item" data-state="done" data-action="id-open" data-value="id"><span class="sp-done-mark" aria-hidden="true">' + I('check') + '</span>' +
-        '<span class="sp-item-copy"><strong>' + esc(tr(k)) + '</strong><small>' + metaHtml(meta) + '</small></span>' + I('chevron') + '</button>';
+      return r ? [short(r.who) + ' ' + when(r), SEP, idWhat(p)] : [idWhat(p)];
     }
-    var rs = P.recs(p.code, k), r2 = newest(rs), n = rs.reduce(function (s, x) { return s + x.n; }, 0);
-    meta = r2 ? [short(r2.who) + ' ' + when(r2), SEP, pigs(n || p.tr[k].got)] : [pigs(p.tr[k].got)];
+    var rs = P.recs(p.code, k), r2 = newest(rs), n = rs.reduce(function (s2, x) { return s2 + x.n; }, 0);
+    var meta = r2 ? [short(r2.who) + ' ' + when(r2), SEP, pigs(n || p.tr[k].got)] : [pigs(p.tr[k].got)];
     var mk = rs.filter(function (x) { return x.mark; })[0];
     if (mk) meta.push(SEP, { text: T(mk.mark === 'early' ? 'item.early' : mk.mark), tone: 'amber' });
     var note = P.s.notes.filter(function (x) { return x.pen === p.code && x.tr === k; })[0];
     if (note) meta.push(SEP, T('kept.note') + ' (' + hm(note.mine.at) + ')');
-    var fresh = r2 && V.justRec.indexOf(r2.id) >= 0;
-    return '<div class="sp-item" data-state="done"' + (fresh ? ' data-fresh=""' : '') + '><span class="sp-done-mark" aria-hidden="true">' + I('check') + '</span>' +
-      '<span class="sp-item-copy"><strong>' + esc(tr(k)) + '</strong><small>' + metaHtml(meta) + '</small></span></div>';
+    return meta;
   }
-  /* An item still to do: ONE checkbox row. Ticked, it shows its count as a small button (fewer piglets: tap it). The
-     identity item is a chevron row to the ID form instead. */
-  function todoItem(p, k, ended, future) {
+  function dayItem(p, k, ended, future) {
     var t = P.plan(k), st = P.status(p, k), n = P.need(p, k);
+    if (st === 'done') return { title: tr(k), meta: doneMeta(p, k), mark: 'done', action: k === 'id' ? 'id-open' : 'noop', value: k, id: 'sp-done-' + k };
     if (k === 'id') {
       var filled = scheme() === 'breeders' ? !!p.picked : P.recs(p.code, 'id').length > 0;
-      var meta = [{ text: T(filled ? 'item.filled' : 'item.notfilled'), tone: filled ? 'green' : 'amber' }, SEP, idWhat(p)];
-      if (st === 'late') meta.push(SEP, { text: T('late'), tone: 'amber' });
-      return '<button type="button" class="sp-item" data-state="door" data-action="' + (ended ? 'noop' : 'id-open') + '" data-value="id"><span class="sp-ring" aria-hidden="true"></span>' +
-        '<span class="sp-item-copy"><strong>' + esc(tr(k)) + '</strong><small>' + metaHtml(meta) + '</small></span>' + I('chevron') + '</button>';
+      var m = [{ text: T(filled ? 'item.filled' : 'item.notfilled'), tone: filled ? 'green' : 'amber' }, SEP, idWhat(p)];
+      if (st === 'late') m.push(SEP, { text: T('late'), tone: 'amber' });
+      return { title: tr(k), meta: m, mark: 'due', action: ended ? 'noop' : 'id-open', value: 'id', id: 'sp-id-' + k };
     }
-    var d = V.draft[k], on = !!d;
-    var meta2 = st === 'left' ? [T('tl.given', { n: p.tr[k].got }), SEP, T('left', { n: n }), SEP, T('why.' + (p.tr[k].why || 'weak'))]
+    var dft = V.draft[k], meta = st === 'left' ? [T('tl.given', { n: p.tr[k].got }), SEP, T('left', { n: n }), SEP, T('why.' + (p.tr[k].why || 'weak'))]
       : [T('given.days', { a: t.from, b: t.to })];
-    if (st === 'late') meta2.push(SEP, { text: T('late'), tone: 'amber' });
-    if (future && on) meta2.push(SEP, { text: T('item.early'), tone: 'amber' });
-    if (on && d.n < n) meta2.push(SEP, { text: T('left', { n: n - d.n }) + ' · ' + T('why.' + (d.why || 'weak')), tone: 'amber' });
-    var count = on ? '<button type="button" class="sp-count" data-action="adjust" data-value="' + k + '" aria-label="' + esc(T('treat.given') + ': ' + d.n) + '">' + esc(pigs(d.n)) + I('chevron') + '</button>' : '';
-    var box = '<button type="button" class="sp-box" role="checkbox" aria-checked="' + on + '" data-action="' + (ended ? 'noop' : 'item') + '" data-value="' + k + '" aria-label="' + esc(tr(k)) + '">' + I('check') + '</button>';
-    return '<div class="sp-item" data-state="' + (on ? 'ticked' : 'todo') + '"' + (V.justTick === k ? ' data-fresh=""' : '') + '>' +
-      '<button type="button" class="sp-item-main" data-action="' + (ended ? 'noop' : 'item') + '" data-value="' + k + '" tabindex="-1"><span class="sp-item-copy"><strong>' + esc(tr(k)) + '</strong><small>' + metaHtml(meta2) + '</small></span></button>' +
-      count + box + '</div>';
+    if (st === 'late') meta.push(SEP, { text: T('late'), tone: 'amber' });
+    if (future && dft) meta.push(SEP, { text: T('item.early'), tone: 'amber' });
+    if (dft && dft.n < n) meta.push(SEP, { text: T('left', { n: n - dft.n }) + ' · ' + T('why.' + (dft.why || 'weak')), tone: 'amber' });
+    return { title: tr(k), meta: meta, mark: dft ? 'done' : 'due', action: ended ? 'noop' : 'item', value: k, id: 'sp-tk-' + k, label: tr(k),
+      act: dft ? { label: pigs(dft.n), action: 'adjust', value: k } : null };
   }
-  /* Processing: one section per age-day on the plan. A day with everything done folds to one line (it stays open while
-     rows saved on this visit are fresh); today's and overdue days are open; later days are grey but can be done early. */
   function processing(p) {
     var ended = !!P.s.ended, days = {};
     P.steps().forEach(function (k) { var d = P.plan(k).from; (days[d] = days[d] || []).push(k); });
-    return '<div class="sp-days">' + Object.keys(days).map(Number).sort(function (a, b) { return a - b; }).map(function (d) {
-      var ks = days[d], done = ks.filter(function (k) { return P.status(p, k) === 'done'; }), todo = ks.filter(function (k) { return P.status(p, k) !== 'done'; });
-      var future = d > p.age, allDone = !todo.length;
-      var open = allDone ? (!!V.open[d] || !!V.keepOpen[d]) : true;
-      var state = allDone ? 'done' : future ? 'future' : 'todo';
-      var head = '<button type="button" class="sp-day-head" data-action="day" data-value="' + d + '" aria-expanded="' + open + '"' + (allDone ? '' : ' tabindex="-1"') + '>' +
-        '<span class="sp-day-mark" data-state="' + state + '" aria-hidden="true">' + I(state === 'done' ? 'check' : state === 'future' ? 'clock' : 'chevron') + '</span>' +
-        '<strong>' + esc(allDone ? T('day.done', { d: d }) : T('day.open', { d: d })) + '</strong>' + (allDone ? I('chevron') : '') + '</button>';
-      var sub = allDone ? '' : '<p class="sp-day-sub">' + esc(future ? T('day.early') : T('day.plan', { date: dayDate(p, d) })) + '</p>';
-      var items = open ? '<div class="sp-items">' + todo.map(function (k) { return todoItem(p, k, ended, future); }).join('') + done.map(function (k) { return doneItem(p, k); }).join('') + '</div>' : '';
-      return '<section class="sp-day" data-state="' + state + '"' + (allDone && open ? ' data-open=""' : '') + '>' + head + sub + items + '</section>';
-    }).join('') + '</div>';
+    return Object.keys(days).map(Number).sort(function (a, b) { return a - b; }).map(function (d) {
+      var ks = days[d], todo = ks.filter(function (k) { return P.status(p, k) !== 'done'; }), done = ks.filter(function (k) { return P.status(p, k) === 'done'; });
+      var future = d > p.age, allDone = !todo.length, open = !allDone || V.open[d] || V.keepOpen[d];
+      var status = allDone ? T('day.done.s') : future ? T('day.early') : T('day.plan', { date: dayDate(p, d) });
+      var items = open ? todo.concat(done).map(function (k) { return dayItem(p, k, ended, future); })
+        : [{ title: T('tl.done', { n: done.length }) + ' · ' + done.map(tr).join(' · '), meta: [T('tl.open')], mark: 'done', action: 'day', value: String(d), id: 'sp-fold-' + d }];
+      if (allDone && open && !V.keepOpen[d]) items.push({ title: T('tl.close'), mark: '', action: 'day', value: String(d), id: 'sp-unfold-' + d });
+      var html = K.day({ title: T('day.open', { d: d }), status: status, items: items });
+      // a ticked (not yet submitted) row is not a done row: keep it in ink; a just-saved row fills in place
+      todo.forEach(function (k) { if (V.draft[k]) html = html.replace('id="sp-tk-' + k + '-title"', 'id="sp-tk-' + k + '-title" data-ticked=""'); });
+      V.justRec.forEach(function (id) { var r = P.s.records.filter(function (x) { return x.id === id; })[0]; if (r) html = html.replace('id="sp-done-' + r.tr + '-title"', 'id="sp-done-' + r.tr + '-title" data-fresh=""'); });
+      return html.replace('class="tk-day"', 'class="tk-day" data-when="' + (allDone ? 'done' : future ? 'future' : 'today') + '"');
+    }).join('');
   }
   /* Piglets: what is in the pen now, then the identified piglets. Born and deaths are history: they live in the pen log. */
   function piglets(p) {
@@ -218,14 +229,17 @@
         return K.row({ id: id, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
           meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), still: true, trail: '' });
       });
-      var acts = P.s.ended ? '' : '<div class="sp-id-acts">' + [['scan', 'scan', 'pg.scan'], ['notch', 'edit', 'pg.notch'], ['manual', 'plus', 'pg.manual']].map(function (a) {
-        return '<button type="button" class="sp-id-act" data-action="id-add" data-value="' + a[0] + '">' + I(a[1]) + '<span>' + esc(T(a[2])) + '</span></button>';
-      }).join('') + '</div>';
-      body += '<section class="sp-ids">' + UI.heading({ title: T('pg.ids'), meta: idWhat(p), kind: 'section', level: 3 }) +
-        '<div class="st-panel sp-ids-card">' + (rows.length ? rows.join('') : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>') + acts + '</div></section>';
+      body += K.list([K.group({ title: T('pg.ids'), face: 'word', meta: '· ' + idWhat(p), rows: rows.length ? rows : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>' })]);
+      if (!P.s.ended) body += idAdds();
     }
     body += K.doors({ items: [{ title: T('pg.log'), description: T('pg.log.sub'), action: 'log-open' }] });
     return body;
+  }
+  /* Scan tag · Choose notch · Add manually: three design-system Buttons (tool register) in one line */
+  function idAdds() {
+    return '<div class="sp-adds">' + [['scan', 'pg.scan'], ['notch', 'pg.notch'], ['manual', 'pg.manual']].map(function (a) {
+      return UI.button({ label: T(a[1]), register: 'tool', action: 'id-add', value: a[0] });
+    }).join('') + '</div>';
   }
   function penSheet(inert) {
     var p = pen(), ended = !!P.s.ended, body = '';
@@ -234,18 +248,18 @@
     if (ended) body += K.warning({ tone: 'amber', text: T('ended.note') });
     body += V.tab === 'pig' ? piglets(p) : processing(p);
     var n = Object.keys(V.draft).length;
-    var more = '<button type="button" class="button secondary sp-more" data-ds="Button" data-action="more" data-value="" aria-label="' + esc(T('more.title')) + '">' + I('more') + '</button>';
+    var more = UI.iconButton({ action: 'more', icon: I('more'), label: T('more.title'), className: 'sp-more' });
     var main = V.tab === 'pig' || ended ? UI.button({ label: T('back'), register: 'secondary', action: 'back' })
       : UI.button({ label: T('submit.n', { n: n }), register: 'primary', action: 'submit', waiting: !n });
-    var sub = [T('sheet.sow', { tag: p.sow, p: p.parity }), SEP, T('piglets', { n: p.alive }), SEP, T('day.n', { d: p.age })];
-    return K.drawer({ title: p.code, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back', label: T('back') },
+    var sub = [T('sheet.pen', { pen: p.code, p: p.parity }), SEP, T('piglets', { n: p.alive }), SEP, T('day.n', { d: p.age })];
+    return K.drawer({ title: p.sow, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back', label: T('back') },
       body: body, footer: '<div class="tk-footer" data-ds="TaskFooter">' + (ended ? '' : more) + main + '</div>' });
   }
 
   /* ---- More: Move piglets · Record death · Set count ---- */
   function moreSheet() {
     return K.drawer({ title: T('more.title'), size: 'medium', view: 'more', close: null,
-      body: K.doors({ items: [{ title: T('move.title'), action: 'tool', value: 'move' }, { title: T('tool.death'), action: 'tool', value: 'death' }, { title: T('tool.count'), action: 'tool', value: 'count' }] }),
+      body: K.doors({ card: true, items: [{ title: T('move.title'), icon: 'transfer', action: 'tool', value: 'move' }, { title: T('tool.death'), icon: 'alert', action: 'tool', value: 'death' }, { title: T('tool.count'), icon: 'edit', action: 'tool', value: 'count' }] }),
       footer: K.footer({ back: { action: 'back', label: T('back') } }) });
   }
   /* ---- fewer piglets for one ticked item: a stepper; a shortfall asks one reason ---- */
@@ -293,9 +307,7 @@
     body += '<section class="sp-ids">' + UI.heading({ title: T('pg.ids'), kind: 'section', level: 3 }) +
       '<div class="st-panel sp-ids-card">' + (rows || '<p class="sp-empty">' + esc(T('idf.add')) + '</p>') +
       (f.tried && bad ? '<p class="sp-warn">' + esc(T('idf.row')) + '</p>' : '') +
-      '<div class="sp-id-acts">' + [['scan', 'scan', 'pg.scan'], ['notch', 'edit', 'pg.notch'], ['manual', 'plus', 'pg.manual']].map(function (a) {
-        return '<button type="button" class="sp-id-act" data-action="id-add" data-value="' + a[0] + '">' + I(a[1]) + '<span>' + esc(T(a[2])) + '</span></button>';
-      }).join('') + '</div></div></section>';
+      '</div></section>' + idAdds();
     var n = f.rows.filter(rowOk).length, something = n || f.kg || f.boar !== f.boar0 || f.gilt !== f.gilt0;
     return K.page({ title: T('idf.title'), description: T('id.page.sub', { pen: p.code, d: p.age, what: idWhat(p) }), view: 'id', body: body,
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('idf.submit', { n: n }), action: 'id-submit', register: 'primary', waiting: !something } }) });
@@ -308,20 +320,19 @@
   }
   /* ---- the pen log: born, deaths, moves, counts, treatments, IDs — the history, newest first ---- */
   function logPage() {
-    var p = pen(), recs = P.recs(p.code).slice().sort(function (a, b) { return b.at - a.at; });
-    var line = function (r) {
+    var p = pen(), byDay = {};
+    var add = function (day, at, title, meta) { (byDay[day] = byDay[day] || []).push({ at: at, title: title, meta: meta }); };
+    P.recs(p.code).forEach(function (r) {
       var what = r.tr === 'death' ? T('log.death', { n: r.n }) : r.tr === 'move' ? T('log.move', { n: pigs(r.n), to: r.to }) : r.tr === 'count' ? T('log.count', { n: r.n })
         : r.tr === 'id' ? T('log.id', { no: r.no }) : r.tr === 'pick' ? T('log.pick') : T('log.treat', { tr: tr(r.tr), n: pigs(r.n) });
-      return K.row({ id: T('day.n', { d: r.day }), headline: what, meta: short(r.who) + ' · ' + when(r), still: true, trail: '' });
-    };
-    var ent = recs.map(function (r) { return { day: r.day, at: r.at, html: line(r) }; });
-    p.weights.forEach(function (w, i) { if (w.day > 0) ent.push({ day: w.day, at: w.at || i, html: K.row({ id: T('day.n', { d: w.day }), headline: T('log.weight', { w: w.kg }), meta: '', still: true, trail: '' }) }); });
-    ent.sort(function (a, b) { return b.day - a.day || b.at - a.at; });
-    var rows = ent.map(function (e) { return e.html; });
-    var bw = p.weights.filter(function (w) { return w.day === 0; })[0];
-    if (bw) rows.push(K.row({ id: T('day.n', { d: 0 }), headline: T('log.weight', { w: bw.kg }), meta: '', still: true, trail: '' }));
-    rows.push(K.row({ id: T('day.n', { d: 0 }), headline: T('log.born', { n: p.born }), meta: p.dead && !recs.some(function (r) { return r.tr === 'death'; }) ? T('log.dead.birth', { n: p.dead }) : '', still: true, trail: '' }));
-    return K.page({ title: T('log.title'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'log', body: K.list([K.group({ title: p.code, rows: rows })]) });
+      add(r.day, r.at, what, short(r.who) + ' · ' + when(r));
+    });
+    p.weights.forEach(function (w, i) { add(w.day, w.at || i, T('log.weight', { w: w.kg }), ''); });
+    add(0, -1, T('log.born', { n: p.born }), p.dead ? T('log.dead.birth', { n: p.dead }) : '');
+    var groups = Object.keys(byDay).map(Number).sort(function (a, b) { return b - a; }).map(function (d) {
+      return { label: T('day.n', { d: d }), entries: byDay[d].sort(function (a, b) { return b.at - a.at; }).map(function (e) { return { title: e.title, meta: e.meta }; }) };
+    });
+    return K.page({ title: T('log.title'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'log', body: UI.log(groups) });
   }
 
   /* ---- record death ---- */
