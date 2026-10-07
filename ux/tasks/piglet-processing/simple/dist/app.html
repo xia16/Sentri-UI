@@ -1314,18 +1314,12 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .sp-chip-head { margin: 4px var(--space-gutter) 8px; font: 600 var(--type-row-title-size)/1.4 var(--font-sans); color: var(--ink); }
 .sp-chip-tip { margin: -4px var(--space-gutter) 10px; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
 /* a pen under a chip: the row opens the pen, the tick at its end selects it */
-.sp-tickrow { display: flex; align-items: stretch; }
-.sp-tickrow + .sp-tickrow, .tk-row + .sp-tickrow, .sp-tickrow + .tk-row { border-top: 1px solid var(--line); }
-.sp-tickrow > .tk-row { flex: 1; min-width: 0; padding-right: 4px; }
-/* the whole row is the tick target: its circle fills when the pen is treated; the chevron beside it opens the pen */
-.sp-tickrow .tk-row > .sp-ring { margin-left: 4px; }
-.sp-tickrow .tk-row[aria-pressed="true"] { background: var(--green-wash); }
-.sp-tickrow[data-ticked] .sp-ring { background: var(--green); border-color: var(--green); color: var(--paper); }
-.sp-tickrow[data-fresh] .sp-ring { animation: sp-tick-in 200ms ease-out; }
-.sp-tickrow[data-fresh] .sp-ring svg { animation: sp-tick-draw 200ms ease-out; }
-.sp-open { flex: none; display: grid; place-items: center; width: var(--touch-min); margin: 0; padding: 0; border: 0; border-left: 1px solid var(--line); background: none; color: var(--muted); cursor: pointer; }
-.sp-open svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.sp-open:active { background: var(--press); }
+/* a row under a job chip: All's row with the tick circle where the chevron was; the whole row is the target */
+.tk-row > .sp-ring { margin-left: 4px; }
+.tk-row[aria-pressed="true"], .tk-row[data-ticked] { background: var(--green-wash); }
+.tk-row[data-ticked] > .sp-ring { background: var(--green); border-color: var(--green); color: var(--paper); }
+.tk-row[data-fresh] > .sp-ring { animation: sp-tick-in 200ms ease-out; }
+.tk-row[data-fresh] > .sp-ring svg { animation: sp-tick-draw 200ms ease-out; }
 /* the footer that appears under a chip's list (hold to record, then the receipt with Undo) */
 .tk-screen > .tk-footer, .tk-screen > .tk-footer-status { padding-left: var(--space-panel); padding-right: var(--space-panel); }
 .tk-screen > .tk-footer { background: var(--paper); border-top: 1px solid var(--line); }
@@ -1366,10 +1360,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 @keyframes sp-tick-in { from { transform: scale(.7); background: var(--paper); border-color: var(--muted); } to { transform: none; } }
 @keyframes sp-tick-draw { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: none; } }
 .button.sp-recorded-btn { color: var(--green); border-color: var(--chip-green-border); background: var(--green-wash); }
-/* a pen recorded under a chip: "Recorded ✓" in place of its tick */
-.sp-recorded { flex: none; display: grid; place-items: center; padding: 0 var(--space-row-x) 0 0; color: var(--green); font: 500 var(--type-description-size)/1.3 var(--font-sans); white-space: nowrap; }
-.sp-tickrow[data-fresh] .sp-recorded { animation: sp-tick-draw 200ms ease-out; }
-@media (prefers-reduced-motion: reduce) { .sp-step[data-fresh] .sp-ring, .sp-step[data-fresh] .sp-ring svg, .sp-tickrow[data-fresh] .sp-recorded, .sp-tickrow[data-fresh] .sp-ring, .sp-tickrow[data-fresh] .sp-ring svg { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .sp-step[data-fresh] .sp-ring, .sp-step[data-fresh] .sp-ring svg, .tk-row[data-fresh] > .sp-ring, .tk-row[data-fresh] > .sp-ring svg { animation: none; } }
 .sp-step-copy { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .sp-step-copy strong { font: 700 13px/1.3 var(--font-sans); }
 .sp-step-copy small, .sp-tl-list small, .sp-tl-later small { font: var(--type-meta-size)/1.5 var(--font-mono); color: var(--muted); }
@@ -2523,7 +2514,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 (function (root) {
   'use strict';
   var EN = {
-    'bulk.finish': 'Finish {tr} treatment · {k} of {m} pens', 'bulk.finish.1': 'Finish {tr} treatment · {k} of 1 pen', 'bulk.finish.caption': 'HOLD TO FINISH',
+    'bulk.finish': 'Finish {tr} · {k} of {m} pens', 'bulk.finish.1': 'Finish {tr} · {k} of 1 pen', 'bulk.finish.caption': 'HOLD TO FINISH',
     'batch.unacc': 'Batch {b} · {n} piglets unaccounted', 'batch.unacc.1': 'Batch {b} · 1 piglet unaccounted',
     'end.unacc': '{n} piglets unaccounted in this batch: counts came in lower than the records.', 'end.unacc.1': '1 piglet unaccounted in this batch: a count came in lower than the record.',
     'open.pen': 'Open {pen}', 'tick.pen': '{pen}: tap when treated', 'untick.pen': '{pen}: treated, tap to take it off', 'move.batch': 'Pens in batch {b}',
@@ -3059,7 +3050,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     return null;
   }
   function names(keys) { return keys.reduce(function (acc, k, i) { return (i ? acc.concat([SEP]) : acc).concat([S(chipKey(k))]); }, []); }
-  function penRow(p) {
+  /* One pen's row, as the All list draws it: id, at most one chip, the headline, the meta line. */
+  function penParts(p) {
     var ended = !!P.s.ended, td = P.todo(p), headline, meta, tone = '';
     var lastR = newest(P.recs(p.code).filter(function (r) { return !!P.plan(r.tr); })), c = P.coming(p);
     if (ended) {
@@ -3076,8 +3068,9 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       headline = [S('all.given')];
       meta = lastR ? [S('done.at', { t: when(lastR) })] : '';
     }
-    return K.row({ id: S('code', { c: p.code }), chip: penChip(p), headline: headline, tone: tone, meta: meta, action: 'pen', value: p.code });
+    return { id: S('code', { c: p.code }), chip: penChip(p), headline: headline, tone: tone, meta: meta };
   }
+  function penRow(p) { return K.row(Object.assign(penParts(p), { action: 'pen', value: p.code })); }
   function isDone(p) { return P.todo(p).length === 0; }
   function groupsBy(list, rowFn) {
     return ['A', 'B'].map(function (r) {
@@ -3106,31 +3099,27 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     codes.forEach(function (c) { n += P.need(P.s.pens[c], V.chip); });
     return { pens: codes.length, n: n, of: P.pens().filter(function (p) { return needsToday(p, V.chip); }).length };
   }
-  /* A pen under a job chip. The worker walks the pens and taps each row as they treat it: the circle at its end fills with
-     a tick in place (tap again to take it off). The small chevron beside it still opens the pen. After Finish, a recorded
-     pen stays where it is and says "Recorded ✓" until the chip changes. */
-  var openPen = function (p) {
-    return '<button type="button" class="sp-open" data-action="pen" data-value="' + p.code + '" aria-label="' + esc(T('open.pen', { pen: p.code })) + '">' + I('chevron') + '</button>';
-  };
+  /* A pen under a job chip is the same row as in All, filtered. The one difference: its trailing chevron is the tick
+     circle, and tapping the row ticks it as the worker treats the pen (the circle fills in place; tap again to take it
+     off). A too-early or late pen asks Record anyway first. To open a pen, the worker goes back to All. After Finish, a
+     recorded pen keeps its row as it was, with a filled circle and "Recorded ✓" for its meta, until the chip changes.
+     The ID chip has nothing to tick: its rows are All's rows and open the pen. */
   function chipRow(p) {
     var k = V.chip, rec = V.chipRec && V.chipRec[p.code];
-    var place = P.bulkPlace(p, k), st = P.status(p, k), amber = !rec && (place === 'early' || place === 'late') ? place : '';
-    var meta = rec ? [S('day.n', { d: p.age })] : st === 'left' ? [S('bulk.left', { n: P.need(p, k), why: T('why.' + (p.tr[k].why || 'weak')) })]
-      : amber ? [S('day.n', { d: p.age }, 'amber')] : [S('day.n', { d: p.age })];
-    var on = V.sel[p.code] != null, mark = on && V.sel[p.code];
-    var chip = amber ? S(amber === 'late' ? 'Late' : 'Early', null, 'amber') : penChip(p);
-    var amount = rec ? S('piglets', { n: rec.n }) : stepAmount(p, k);
-    if (k === 'id' || P.s.ended) return K.row({ id: S('code', { c: p.code }), chip: chip, headline: [amount], meta: meta, action: 'pen', value: p.code, trail: 'chevron' });
+    if (k === 'id' || P.s.ended) return penRow(p);
     var ring = '<span class="sp-ring" aria-hidden="true">' + I('check') + '</span>';
+    var amberChip = function (m) { return S(m === 'late' ? 'Late' : 'Early', null, 'amber'); };
     if (rec) {
-      return '<div class="sp-tickrow" data-ds="TaskRow" data-ticked=""' + (V.justRec === 'bulk' ? ' data-fresh=""' : '') + '>' +
-        K.row({ id: S('code', { c: p.code }), chip: rec.mark ? S(rec.mark === 'late' ? 'Late' : 'Early', null, 'amber') : chip, headline: [amount], meta: meta, still: true, trail: '' })
-          .replace(/<\/div>$/, '<span class="sp-recorded">' + H('recorded.tick') + '</span></div>') + openPen(p) + '</div>';
+      var x = rec.snap;
+      return K.row(Object.assign({}, x, { chip: rec.mark ? amberChip(rec.mark) : x.chip, meta: [S('recorded.tick', null, 'green')], still: true, trail: '',
+        data: V.justRec === 'bulk' ? { ticked: '', fresh: '' } : { ticked: '' } })).replace(/<\/div>$/, ring + '</div>');
     }
-    var row = K.row({ id: S('code', { c: p.code }), chip: mark ? S(mark === 'late' ? 'Late' : 'Early', null, 'amber') : chip, headline: [amount], meta: meta,
-      action: 'tick', value: p.code, trail: '', label: T(on ? 'untick.pen' : 'tick.pen', { pen: p.code }) });
-    row = row.replace('data-ds="TaskRow"', 'data-ds="TaskRow" aria-pressed="' + on + '"').replace(/<\/button>$/, ring + '</button>');
-    return '<div class="sp-tickrow" data-ds="TaskRow"' + (on ? ' data-ticked=""' : '') + (V.justTick === p.code ? ' data-fresh=""' : '') + '>' + row + openPen(p) + '</div>';
+    var on = V.sel[p.code] != null, parts = penParts(p), data = {};
+    if (on) data.ticked = '';
+    if (V.justTick === p.code) data.fresh = '';
+    return K.row(Object.assign(parts, { chip: on && V.sel[p.code] ? amberChip(V.sel[p.code]) : parts.chip, action: 'tick', value: p.code, trail: '',
+      label: T(on ? 'untick.pen' : 'tick.pen', { pen: p.code }), data: data }))
+      .replace('data-ds="TaskRow"', 'data-ds="TaskRow" aria-pressed="' + on + '"').replace(/<\/button>$/, ring + '</button>');
   }
   function chipFooter() {
     if (V.chipRec) {
@@ -3654,9 +3643,10 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       holds.settle(b, 'done');
       if (a === 'bulk-commit') {
         var picks = Object.keys(V.sel).sort().map(function (c) { return { pen: c, mark: V.sel[c] }; });
+        var snaps = {}; picks.forEach(function (x) { snaps[x.pen] = penParts(P.s.pens[x.pen]); });   // the rows as the worker saw them
         var recs = P.bulk(V.chip, picks) || [];
         V.sel = {}; V.chipRec = { _sum: { pens: recs.length, n: recs.reduce(function (s, r) { return s + r.n; }, 0) } };
-        recs.forEach(function (r) { V.chipRec[r.pen] = r; });
+        recs.forEach(function (r) { V.chipRec[r.pen] = Object.assign({ snap: snaps[r.pen] }, r); });
         V.justRec = 'bulk';
       }
       if (a === 'end-commit') { P.end(); V.pageTop = true; V.chip = ''; V.chipRec = null; }

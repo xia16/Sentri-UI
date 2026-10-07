@@ -61,7 +61,8 @@
     return null;
   }
   function names(keys) { return keys.reduce(function (acc, k, i) { return (i ? acc.concat([SEP]) : acc).concat([S(chipKey(k))]); }, []); }
-  function penRow(p) {
+  /* One pen's row, as the All list draws it: id, at most one chip, the headline, the meta line. */
+  function penParts(p) {
     var ended = !!P.s.ended, td = P.todo(p), headline, meta, tone = '';
     var lastR = newest(P.recs(p.code).filter(function (r) { return !!P.plan(r.tr); })), c = P.coming(p);
     if (ended) {
@@ -78,8 +79,9 @@
       headline = [S('all.given')];
       meta = lastR ? [S('done.at', { t: when(lastR) })] : '';
     }
-    return K.row({ id: S('code', { c: p.code }), chip: penChip(p), headline: headline, tone: tone, meta: meta, action: 'pen', value: p.code });
+    return { id: S('code', { c: p.code }), chip: penChip(p), headline: headline, tone: tone, meta: meta };
   }
+  function penRow(p) { return K.row(Object.assign(penParts(p), { action: 'pen', value: p.code })); }
   function isDone(p) { return P.todo(p).length === 0; }
   function groupsBy(list, rowFn) {
     return ['A', 'B'].map(function (r) {
@@ -108,31 +110,27 @@
     codes.forEach(function (c) { n += P.need(P.s.pens[c], V.chip); });
     return { pens: codes.length, n: n, of: P.pens().filter(function (p) { return needsToday(p, V.chip); }).length };
   }
-  /* A pen under a job chip. The worker walks the pens and taps each row as they treat it: the circle at its end fills with
-     a tick in place (tap again to take it off). The small chevron beside it still opens the pen. After Finish, a recorded
-     pen stays where it is and says "Recorded ✓" until the chip changes. */
-  var openPen = function (p) {
-    return '<button type="button" class="sp-open" data-action="pen" data-value="' + p.code + '" aria-label="' + esc(T('open.pen', { pen: p.code })) + '">' + I('chevron') + '</button>';
-  };
+  /* A pen under a job chip is the same row as in All, filtered. The one difference: its trailing chevron is the tick
+     circle, and tapping the row ticks it as the worker treats the pen (the circle fills in place; tap again to take it
+     off). A too-early or late pen asks Record anyway first. To open a pen, the worker goes back to All. After Finish, a
+     recorded pen keeps its row as it was, with a filled circle and "Recorded ✓" for its meta, until the chip changes.
+     The ID chip has nothing to tick: its rows are All's rows and open the pen. */
   function chipRow(p) {
     var k = V.chip, rec = V.chipRec && V.chipRec[p.code];
-    var place = P.bulkPlace(p, k), st = P.status(p, k), amber = !rec && (place === 'early' || place === 'late') ? place : '';
-    var meta = rec ? [S('day.n', { d: p.age })] : st === 'left' ? [S('bulk.left', { n: P.need(p, k), why: T('why.' + (p.tr[k].why || 'weak')) })]
-      : amber ? [S('day.n', { d: p.age }, 'amber')] : [S('day.n', { d: p.age })];
-    var on = V.sel[p.code] != null, mark = on && V.sel[p.code];
-    var chip = amber ? S(amber === 'late' ? 'Late' : 'Early', null, 'amber') : penChip(p);
-    var amount = rec ? S('piglets', { n: rec.n }) : stepAmount(p, k);
-    if (k === 'id' || P.s.ended) return K.row({ id: S('code', { c: p.code }), chip: chip, headline: [amount], meta: meta, action: 'pen', value: p.code, trail: 'chevron' });
+    if (k === 'id' || P.s.ended) return penRow(p);
     var ring = '<span class="sp-ring" aria-hidden="true">' + I('check') + '</span>';
+    var amberChip = function (m) { return S(m === 'late' ? 'Late' : 'Early', null, 'amber'); };
     if (rec) {
-      return '<div class="sp-tickrow" data-ds="TaskRow" data-ticked=""' + (V.justRec === 'bulk' ? ' data-fresh=""' : '') + '>' +
-        K.row({ id: S('code', { c: p.code }), chip: rec.mark ? S(rec.mark === 'late' ? 'Late' : 'Early', null, 'amber') : chip, headline: [amount], meta: meta, still: true, trail: '' })
-          .replace(/<\/div>$/, '<span class="sp-recorded">' + H('recorded.tick') + '</span></div>') + openPen(p) + '</div>';
+      var x = rec.snap;
+      return K.row(Object.assign({}, x, { chip: rec.mark ? amberChip(rec.mark) : x.chip, meta: [S('recorded.tick', null, 'green')], still: true, trail: '',
+        data: V.justRec === 'bulk' ? { ticked: '', fresh: '' } : { ticked: '' } })).replace(/<\/div>$/, ring + '</div>');
     }
-    var row = K.row({ id: S('code', { c: p.code }), chip: mark ? S(mark === 'late' ? 'Late' : 'Early', null, 'amber') : chip, headline: [amount], meta: meta,
-      action: 'tick', value: p.code, trail: '', label: T(on ? 'untick.pen' : 'tick.pen', { pen: p.code }) });
-    row = row.replace('data-ds="TaskRow"', 'data-ds="TaskRow" aria-pressed="' + on + '"').replace(/<\/button>$/, ring + '</button>');
-    return '<div class="sp-tickrow" data-ds="TaskRow"' + (on ? ' data-ticked=""' : '') + (V.justTick === p.code ? ' data-fresh=""' : '') + '>' + row + openPen(p) + '</div>';
+    var on = V.sel[p.code] != null, parts = penParts(p), data = {};
+    if (on) data.ticked = '';
+    if (V.justTick === p.code) data.fresh = '';
+    return K.row(Object.assign(parts, { chip: on && V.sel[p.code] ? amberChip(V.sel[p.code]) : parts.chip, action: 'tick', value: p.code, trail: '',
+      label: T(on ? 'untick.pen' : 'tick.pen', { pen: p.code }), data: data }))
+      .replace('data-ds="TaskRow"', 'data-ds="TaskRow" aria-pressed="' + on + '"').replace(/<\/button>$/, ring + '</button>');
   }
   function chipFooter() {
     if (V.chipRec) {
@@ -656,9 +654,10 @@
       holds.settle(b, 'done');
       if (a === 'bulk-commit') {
         var picks = Object.keys(V.sel).sort().map(function (c) { return { pen: c, mark: V.sel[c] }; });
+        var snaps = {}; picks.forEach(function (x) { snaps[x.pen] = penParts(P.s.pens[x.pen]); });   // the rows as the worker saw them
         var recs = P.bulk(V.chip, picks) || [];
         V.sel = {}; V.chipRec = { _sum: { pens: recs.length, n: recs.reduce(function (s, r) { return s + r.n; }, 0) } };
-        recs.forEach(function (r) { V.chipRec[r.pen] = r; });
+        recs.forEach(function (r) { V.chipRec[r.pen] = Object.assign({ snap: snaps[r.pen] }, r); });
         V.justRec = 'bulk';
       }
       if (a === 'end-commit') { P.end(); V.pageTop = true; V.chip = ''; V.chipRec = null; }

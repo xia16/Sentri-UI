@@ -2,7 +2,7 @@
 (function (root) {
   'use strict';
   var EN = {
-    'bulk.finish': 'Finish {tr} treatment · {k} of {m} pens', 'bulk.finish.1': 'Finish {tr} treatment · {k} of 1 pen', 'bulk.finish.caption': 'HOLD TO FINISH',
+    'bulk.finish': 'Finish {tr} · {k} of {m} pens', 'bulk.finish.1': 'Finish {tr} · {k} of 1 pen', 'bulk.finish.caption': 'HOLD TO FINISH',
     'batch.unacc': 'Batch {b} · {n} piglets unaccounted', 'batch.unacc.1': 'Batch {b} · 1 piglet unaccounted',
     'end.unacc': '{n} piglets unaccounted in this batch: counts came in lower than the records.', 'end.unacc.1': '1 piglet unaccounted in this batch: a count came in lower than the record.',
     'open.pen': 'Open {pen}', 'tick.pen': '{pen}: tap when treated', 'untick.pen': '{pen}: treated, tap to take it off', 'move.batch': 'Pens in batch {b}',

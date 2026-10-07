@@ -75,18 +75,12 @@
 .sp-chip-head { margin: 4px var(--space-gutter) 8px; font: 600 var(--type-row-title-size)/1.4 var(--font-sans); color: var(--ink); }
 .sp-chip-tip { margin: -4px var(--space-gutter) 10px; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
 /* a pen under a chip: the row opens the pen, the tick at its end selects it */
-.sp-tickrow { display: flex; align-items: stretch; }
-.sp-tickrow + .sp-tickrow, .tk-row + .sp-tickrow, .sp-tickrow + .tk-row { border-top: 1px solid var(--line); }
-.sp-tickrow > .tk-row { flex: 1; min-width: 0; padding-right: 4px; }
-/* the whole row is the tick target: its circle fills when the pen is treated; the chevron beside it opens the pen */
-.sp-tickrow .tk-row > .sp-ring { margin-left: 4px; }
-.sp-tickrow .tk-row[aria-pressed="true"] { background: var(--green-wash); }
-.sp-tickrow[data-ticked] .sp-ring { background: var(--green); border-color: var(--green); color: var(--paper); }
-.sp-tickrow[data-fresh] .sp-ring { animation: sp-tick-in 200ms ease-out; }
-.sp-tickrow[data-fresh] .sp-ring svg { animation: sp-tick-draw 200ms ease-out; }
-.sp-open { flex: none; display: grid; place-items: center; width: var(--touch-min); margin: 0; padding: 0; border: 0; border-left: 1px solid var(--line); background: none; color: var(--muted); cursor: pointer; }
-.sp-open svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.sp-open:active { background: var(--press); }
+/* a row under a job chip: All's row with the tick circle where the chevron was; the whole row is the target */
+.tk-row > .sp-ring { margin-left: 4px; }
+.tk-row[aria-pressed="true"], .tk-row[data-ticked] { background: var(--green-wash); }
+.tk-row[data-ticked] > .sp-ring { background: var(--green); border-color: var(--green); color: var(--paper); }
+.tk-row[data-fresh] > .sp-ring { animation: sp-tick-in 200ms ease-out; }
+.tk-row[data-fresh] > .sp-ring svg { animation: sp-tick-draw 200ms ease-out; }
 /* the footer that appears under a chip's list (hold to record, then the receipt with Undo) */
 .tk-screen > .tk-footer, .tk-screen > .tk-footer-status { padding-left: var(--space-panel); padding-right: var(--space-panel); }
 .tk-screen > .tk-footer { background: var(--paper); border-top: 1px solid var(--line); }
@@ -127,10 +121,7 @@
 @keyframes sp-tick-in { from { transform: scale(.7); background: var(--paper); border-color: var(--muted); } to { transform: none; } }
 @keyframes sp-tick-draw { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: none; } }
 .button.sp-recorded-btn { color: var(--green); border-color: var(--chip-green-border); background: var(--green-wash); }
-/* a pen recorded under a chip: "Recorded ✓" in place of its tick */
-.sp-recorded { flex: none; display: grid; place-items: center; padding: 0 var(--space-row-x) 0 0; color: var(--green); font: 500 var(--type-description-size)/1.3 var(--font-sans); white-space: nowrap; }
-.sp-tickrow[data-fresh] .sp-recorded { animation: sp-tick-draw 200ms ease-out; }
-@media (prefers-reduced-motion: reduce) { .sp-step[data-fresh] .sp-ring, .sp-step[data-fresh] .sp-ring svg, .sp-tickrow[data-fresh] .sp-recorded, .sp-tickrow[data-fresh] .sp-ring, .sp-tickrow[data-fresh] .sp-ring svg { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .sp-step[data-fresh] .sp-ring, .sp-step[data-fresh] .sp-ring svg, .tk-row[data-fresh] > .sp-ring, .tk-row[data-fresh] > .sp-ring svg { animation: none; } }
 .sp-step-copy { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .sp-step-copy strong { font: 700 13px/1.3 var(--font-sans); }
 .sp-step-copy small, .sp-tl-list small, .sp-tl-later small { font: var(--type-meta-size)/1.5 var(--font-mono); color: var(--muted); }
