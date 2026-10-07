@@ -560,3 +560,9 @@ investigation and not yet ruled.
 - **Users are farmers, not tech-savvy, used to paper.** Avoid complex status changes; prefer rules that simplify even if they restrict (retro 34). The owner will judge the simplified workflow in a working app before the seven simplification proposals are settled.
 - **Bulk recording stays** — walking the pens and treating them is how farms work.
 - **Bulk respects each treatment's time window.** Pens inside the window are ready to record; pens too early or past the window are shown apart and need a manual override with a clear alert ("B03 is day 6. Iron is given on day 2–4. Record anyway? It will be marked late."), and the record carries the early/late mark.
+
+### Round 9 (owner, 2026-10-07, simplification decisions)
+
+- **Set count just adjusts the pen's record to what is there now.** No "1 missing" on the pen, no reason question, no follow-up "one of the missing?". The piglet is assumed gone for whatever reason. The difference is kept only in the overall checker (batch / task level: "N piglets unaccounted"), not as a pen status.
+- **No nurse sows outside the task.** All pigs follow the batch → task structure; Move only offers pens in the task (and batch).
+- **Bulk = chips.** Tap a job chip (e.g. Iron): every pen that needs it is listed; the worker taps through the pens as they treat them, then "Finish iron treatment" saves them together. Time-window override stays (round 8).
