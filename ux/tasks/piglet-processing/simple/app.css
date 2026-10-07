@@ -116,3 +116,12 @@
 .sp-demo-farm button { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0; border: 0; background: none; text-align: left; }
 .sp-demo-dot { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--muted); box-sizing: border-box; }
 .sp-demo-farm button[aria-checked="true"] .sp-demo-dot { border: 5px solid var(--ink); }
+
+/* a piglet on the Piglets page: the row (tap to fix) and its breeder flag beside it */
+.sp-pigrow { display: flex; align-items: center; padding-right: 6px; }
+.sp-pigrow + .sp-pigrow { border-top: 1px solid var(--line); }
+.sp-pigrow > .tk-row { flex: 1; min-width: 0; }
+/* Processing: a section title like the Piglets card's; the Done section sits last */
+.sp-proc > .st-heading { margin-bottom: 8px; }
+.sp-proc > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
+.tk-day[data-when="done"] .tk-day-head > strong { color: var(--muted); }

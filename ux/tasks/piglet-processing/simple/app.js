@@ -196,21 +196,30 @@
       act: dft ? { label: pigs(dft.n), action: 'adjust', value: k } : null };
   }
   function processing(p) {
-    var ended = !!P.s.ended, days = {};
-    P.steps().forEach(function (k) { var d = P.plan(k).from; (days[d] = days[d] || []).push(k); });
-    return Object.keys(days).map(Number).sort(function (a, b) { return a - b; }).map(function (d) {
-      var ks = days[d], todo = ks.filter(function (k) { return P.status(p, k) !== 'done'; }), done = ks.filter(function (k) { return P.status(p, k) === 'done'; });
-      var future = d > p.age, allDone = !todo.length, open = !allDone || V.open[d] || V.keepOpen[d];
-      var status = allDone ? T('day.done.s') : future ? T('day.early') : T('day.plan', { date: dayDate(p, d) });
-      var items = open ? todo.concat(done).map(function (k) { return dayItem(p, k, ended, future); })
-        : [{ title: T('tl.done', { n: done.length }) + ' · ' + done.map(tr).join(' · '), meta: [T('tl.open')], mark: 'done', action: 'day', value: String(d), id: 'sp-fold-' + d }];
-      if (allDone && open && !V.keepOpen[d]) items.push({ title: T('tl.close'), mark: '', action: 'day', value: String(d), id: 'sp-unfold-' + d });
-      var html = K.day({ title: T('day.open', { d: d }), status: status, items: items });
-      // a ticked (not yet submitted) row is not a done row: keep it in ink; a just-saved row fills in place
-      todo.forEach(function (k) { if (V.draft[k]) html = html.replace('id="sp-tk-' + k + '-title"', 'id="sp-tk-' + k + '-title" data-ticked=""'); });
-      V.justRec.forEach(function (id) { var r = P.s.records.filter(function (x) { return x.id === id; })[0]; if (r) html = html.replace('id="sp-done-' + r.tr + '-title"', 'id="sp-done-' + r.tr + '-title" data-fresh=""'); });
-      return html.replace('class="tk-day"', 'class="tk-day" data-when="' + (allDone ? 'done' : future ? 'future' : 'today') + '"');
+    var ended = !!P.s.ended, days = {}, doneKs = [];
+    P.steps().forEach(function (k) {
+      var st = P.status(p, k), d = P.plan(k).from;
+      // a step saved on this visit stays in its day card a few seconds (in place), then goes to Done
+      if (st === 'done' && !V.keepOpen[k]) doneKs.push(k);
+      else (days[d] = days[d] || []).push(k);
+    });
+    var html = UI.heading({ title: T('proc.title'), kind: 'section', level: 3, icon: I('treat') });
+    html += Object.keys(days).map(Number).sort(function (a, b) { return a - b; }).map(function (d) {
+      var future = d > p.age;
+      var items = days[d].map(function (k) { return dayItem(p, k, ended, future); });
+      var day = K.day({ title: T('day.open', { d: d }), status: future ? T('day.early') : T('day.plan', { date: dayDate(p, d) }), items: items });
+      days[d].forEach(function (k) { if (V.draft[k]) day = day.replace('id="sp-tk-' + k + '-title"', 'id="sp-tk-' + k + '-title" data-ticked=""'); });
+      V.justRec.forEach(function (id) { var r = P.s.records.filter(function (x) { return x.id === id; })[0]; if (r) day = day.replace('id="sp-done-' + r.tr + '-title"', 'id="sp-done-' + r.tr + '-title" data-fresh=""'); });
+      return day.replace('class="tk-day"', 'class="tk-day" data-when="' + (future ? 'future' : 'today') + '"');
     }).join('');
+    if (!Object.keys(days).length) html += '<p class="sp-quiet">' + esc(T('proc.nothing')) + '</p>';
+    if (doneKs.length) {
+      var open = !!V.open.done;
+      var rows = open ? doneKs.map(function (k) { var x = dayItem(p, k, ended, false); x.meta = [T('day.n', { d: P.plan(k).from }), SEP].concat(x.meta); return x; }) : [];
+      rows.push({ title: T(open ? 'tl.close' : 'tl.open'), meta: open ? '' : [doneKs.map(tr).join(' · ')], mark: '', action: 'day', value: 'done', id: 'sp-done-toggle' });
+      html += K.day({ title: T('proc.done'), status: T('proc.done.n', { n: doneKs.length }), items: rows }).replace('class="tk-day"', 'class="tk-day" data-when="done"');
+    }
+    return '<section class="sp-proc">' + html + '</section>';
   }
   /* Piglets: what is in the pen now, then the identified piglets. Born and deaths are history: they live in the pen log. */
   /* The Piglets card: farrowing's "Litter summary · View log ›" — a section heading with its link, then the facts. Each
@@ -224,16 +233,15 @@
     var w = lastWeight(p), every = P.hasId() && scheme() !== 'breeders' && P.idCount(p) >= p.alive && p.alive > 0;
     var sex = every ? { boar: p.ids.filter(function (x) { return x.sex === 'boar'; }).length, gilt: p.ids.filter(function (x) { return x.sex === 'gilt'; }).length } : p.sex;
     var items = [
-      { label: T('pg.now'), valueHtml: factBtn('count-open', T('pc.nowv', { n: p.alive, d: p.age })) },
       { label: T('pg.sex'), valueHtml: factBtn('counts-open', sex ? T('pg.sexv', { b: sex.boar, g: sex.gilt }) : '—', !sex) },
-      { label: T('pg.weight'), valueHtml: factBtn('weight-open', w ? T('pg.weightv', { w: w.kg, d: w.day }) : '—', !w) }];
+      { label: T('pg.weight'), valueHtml: factBtn('weight-open', w ? T('kg', { w: w.kg }) : '—', !w) }];
     if (P.hasId()) {
       items.push({ label: T(scheme() === 'notch' ? 'pc.notched' : 'pc.tagged'), valueHtml: factBtn('tagged-open', T('pc.of', { n: P.idCount(p), m: p.alive })) });
       items.push({ label: T('pg.breeders'), valueHtml: factBtn('tagged-open', String(P.breeders(p))) });
     }
     var log = '<button type="button" data-action="log-open" data-value="">' + esc(T('pc.log')) + I('chevron') + '</button>';
     return '<section class="sp-pcard">' + UI.heading({ title: T('pc.title'), kind: 'section', level: 3, icon: I('record'), action: log }) +
-      UI.facts(items, { columns: 3, className: 'sp-pfacts' }) + (w ? '' : '<p class="sp-warn">' + esc(T('pg.weight.hint')) + '</p>') + '</section>';
+      UI.facts(items, { columns: items.length === 4 ? 2 : items.length, className: 'sp-pfacts' }) + (w ? '' : '<p class="sp-warn">' + esc(T('pg.weight.hint')) + '</p>') + '</section>';
   }
   /* The tool row, as farrowing's (Edit · Record death · More actions): Tag piglets (per farm scheme; none on a no-ID farm) ·
      Record death · More */
@@ -253,12 +261,10 @@
     if (!ended) body += toolRow();
     body += processing(p);
     var n = Object.keys(V.draft).length;
-    var more = UI.iconButton({ action: 'more', icon: I('more'), label: T('more.title'), className: 'sp-more' });
-    var main = ended ? UI.button({ label: T('back'), register: 'secondary', action: 'back' })
-      : UI.button({ label: T('submit.n', { n: n }), register: 'primary', action: 'submit', waiting: !n });
+    var foot = K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('submit.n', { n: n }), action: 'submit', register: 'primary', waiting: !n } });
     var sub = [T('sheet.pen', { pen: p.code, p: p.parity }), SEP, T('piglets', { n: p.alive }), SEP, T('day.n', { d: p.age })];
     return K.drawer({ title: p.sow, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back', label: T('back') },
-      body: body, footer: '<div class="tk-footer" data-ds="TaskFooter">' + (ended ? '' : more) + main + '</div>' });
+      body: body, footer: foot });
   }
   /* ---- boars · gilts: two steppers ---- */
   function countsSheet() {
@@ -267,20 +273,24 @@
       body: stepper('boar', T('idf.boars'), c.boar) + stepper('gilt', T('idf.gilts'), c.gilt),
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'counts-save', register: 'primary' } }) });
   }
-  /* ---- the identified piglets: one row each, a breeder mark (44px) at its end: tap to keep for breeding, again to unmark ---- */
+  /* ---- Piglets: the pen's identified piglets (tag/notch · sex · weight), each with its breeder flag; tap a row to fix it;
+     one primary "Tag a piglet" opens the one-piglet run, which comes back here ---- */
   function taggedPage() {
     var p = pen(), ended = !!P.s.ended;
     var rows = p.ids.slice().reverse().map(function (x) {
       var id = [x.tag, x.notch].filter(Boolean).join(' · ');
       var mark = UI.iconButton({ action: ended ? 'noop' : 'breeder', value: x.no, icon: I('bookmark'), label: T(x.keep ? 'mark.off' : 'mark.on', { no: x.no }), className: 'sp-mark' })
         .replace('class="icon-button', 'aria-pressed="' + !!x.keep + '" class="icon-button');
-      return K.row({ id: id, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
-        meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), still: true, trail: '' }).replace(/<\/div>$/, mark + '</div>');
+      var row = K.row({ id: id, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
+        meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), action: ended ? '' : 'give-fix', value: x.no, trail: '', still: ended, label: T('fix.aria', { no: x.no }) });
+      return '<div class="sp-pigrow" data-ds="TaskRow">' + row + mark + '</div>';
     });
-    var body = (P.hasId() && !ended && p.ids.length ? '<p class="sp-quiet">' + esc(T('tagged.hint')) + '</p>' : '') +
-      K.list([K.group({ title: T('pg.ids'), face: 'word', meta: '· ' + idWhat(p) + ' · ' + T('breeders.n', { n: P.breeders(p) }), rows: rows.length ? rows : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>' })]);
-    return K.page({ title: T('pg.ids'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'tagged', body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('tr.id.' + scheme()), action: 'id-open', register: 'secondary' } }) });
+    var body = (!ended && p.ids.length ? '<p class="sp-quiet">' + esc(T('tagged.hint')) + '</p>' : '') +
+      K.list([K.group({ title: T(scheme() === 'notch' ? 'pc.notched' : 'pc.tagged'), face: 'word', meta: '· ' + idWhat(p) + ' · ' + T('breeders.n', { n: P.breeders(p) }),
+        rows: rows.length ? rows : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>' })]);
+    if (scheme() === 'breeders' && !p.picked && !ended) body += UI.button({ label: T('id.done.pick', { n: P.breeders(p) }), register: 'secondary', action: 'pick-done', className: 'sp-wide' });
+    return K.page({ title: T('pl.title'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'tagged', body: body,
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('add.' + scheme()), action: 'give-new', register: 'primary' } }) });
   }
 
   /* ---- More: Move piglets · Record death · Set count ---- */
@@ -329,7 +339,7 @@
   }
   function givePage() {
     var p = pen(), g = V.give, br = scheme() === 'breeders', ended = !!P.s.ended, body = '';
-    var left = Math.max(0, p.alive - P.idCount(p)), allDone = !br && left === 0 && !g.edit;
+    var left = Math.max(0, p.alive - P.idCount(p)), allDone = false;
     if (g.last) body += '<div class="sp-flash" role="status"><span>' + esc(T('give.last', { no: g.last.no, sex: T(g.last.sex), kg: g.last.kg != null ? ' · ' + T('kg', { w: g.last.kg }) : '' })) + '</span>' +
       UI.button({ label: T('undo'), register: 'text', action: 'give-undo' }) + '</div>';
     if (!allDone && !ended) {
@@ -341,34 +351,11 @@
       body += K.choice({ action: 'give-sex', label: T('id.sex'), options: [{ value: 'boar', label: T('boar'), pressed: g.sex === 'boar' }, { value: 'gilt', label: T('gilt'), pressed: g.sex === 'gilt' }] });
       body += UI.measure({ label: T('give.kg'), optional: T('optional'), value: g.kg, unit: 'kg', placeholder: '—', action: 'give-field', key: 'kg', active: g.field === 'kg', className: 'sp-give-measure' });
     }
-    // after the last piglet: the litter
-    if (allDone || br) body += givelitter(p);
-    // the recorded piglets, newest first; tap one to fix it
-    var rows = p.ids.slice().reverse().map(function (x) {
-      var id = [x.tag, x.notch].filter(Boolean).join(' · ');
-      return K.row({ id: id, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
-        meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), action: ended ? '' : 'give-fix', value: x.no, trail: ended ? '' : 'edit', still: ended });
-    });
-    body += K.list([K.group({ title: T('pg.ids'), face: 'word', meta: '· ' + idWhat(p), rows: rows.length ? rows : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>' })]);
-    if (br && !p.picked && !ended) body += UI.button({ label: T('id.done.pick', { n: P.breeders(p) }), register: 'secondary', action: 'pick-done', className: 'sp-wide' });
     var ready = !giveUsed(p) && giveNo(p) && g.sex;
-    var primary = allDone ? { label: T('give.litter.save'), action: 'give-litter', register: 'primary', waiting: !(g.litterKg || (g.boar + g.gilt)) }
-      : { label: T(g.edit ? 'give.fix' : 'give.save'), action: 'give-save', register: 'primary', waiting: !ready };
+    var primary = { label: T(g.edit ? 'give.fix' : 'give.save'), action: 'give-save', register: 'primary', waiting: !ready };
     var sub = T('give.sub', { pen: p.code, sow: p.sow, n: left });
     return K.page({ title: T(br ? 'tr.id.breeders' : 'give.title'), description: g.edit ? T('give.fixing', { no: g.edit }) : sub, view: 'give', body: body,
       footer: givePad() + K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : primary }) });
-  }
-  function givelitter(p) {
-    var g = V.give, every = P.idCount(p) >= p.alive && p.alive > 0;
-    var html = UI.heading({ title: T('give.litter'), meta: every ? T('give.all') : '', kind: 'section', level: 3 });
-    html += UI.measure({ label: T('idf.kg'), value: g.litterKg, unit: 'kg', placeholder: '—', action: 'give-field', key: 'litter', active: g.field === 'litter', className: 'sp-give-measure' });
-    if (every) {
-      var b = p.ids.filter(function (x) { return x.sex === 'boar'; }).length;
-      html += K.totals([{ label: T('idf.boars'), value: String(b) }, { label: T('idf.gilts'), value: String(p.ids.length - b) }], { columns: 2 });
-    } else {
-      html += stepper('boar', T('idf.boars'), g.boar) + stepper('gilt', T('idf.gilts'), g.gilt);
-    }
-    return '<section class="sp-give-litter">' + html + '</section>';
   }
   /* the litter weight from the Piglets tab: one Measure on the same Numpad */
   function weightSheet() {
@@ -479,9 +466,9 @@
     if (o === 'count') html += countSheet();
     if (o === 'weight') html += weightSheet();
     if (o === 'move') html += movePage();
-    if (o === 'give') html += givePage();
     if (o === 'counts') html += countsSheet();
     if (o === 'tagged') html += taggedPage();
+    if (o === 'tagged' && V.sub === 'give') html += givePage();
     if (o === 'log') html += logPage();
     if (V.end) html += endPage();
     var tmp = document.createElement('div'); tmp.innerHTML = html;
@@ -530,7 +517,7 @@
       var f = phone.querySelector(focusSel);
       if (f && f.focus) { f.focus({ preventScroll: true }); if (caret != null && f.setSelectionRange) try { f.setSelectionRange(caret, caret); } catch (e) { /* not a text input */ } }
     }
-    if (V.over === 'give' && V.give.field) { var m = phone.querySelector('[data-action="give-field"][data-value="' + V.give.field + '"]'); if (m && m.scrollIntoView) m.scrollIntoView({ block: 'nearest' }); }
+    if (V.sub === 'give' && V.give && V.give.field) { var m = phone.querySelector('[data-action="give-field"][data-value="' + V.give.field + '"]'); if (m && m.scrollIntoView) m.scrollIntoView({ block: 'nearest' }); }
     V.justTick = ''; V.justRec = [];
     renderDemo();
   }
@@ -578,9 +565,10 @@
     if (!Object.keys(V.keepOpen).length) return;
     openTimer = setTimeout(function () { if (V.over || V.end) { keepOpenSoon(); return; } V.keepOpen = {}; render(); }, 4000);
   }
-  function closePen() { V.pen = null; V.flash = null; V.open = {}; V.keepOpen = {}; V.draft = {}; V.tab = 'proc'; clearTimeout(openTimer); }
+  function closePen() { V.sub = null; V.pen = null; V.flash = null; V.open = {}; V.keepOpen = {}; V.draft = {}; V.tab = 'proc'; clearTimeout(openTimer); }
   function closeTop() {
     if (V.end) V.end = null;
+    else if (V.sub) V.sub = null;
     else if (V.over) V.over = null;
     else if (V.pen) closePen();
   }
@@ -604,7 +592,7 @@
       case 'submit': {
         var items = Object.keys(V.draft).map(function (k) { return { k: k, n: V.draft[k].n, why: V.draft[k].why }; });
         var recs = P.submit(p.code, items) || [];
-        recs.forEach(function (r) { V.keepOpen[P.plan(r.tr).from] = true; });
+        recs.forEach(function (r) { V.keepOpen[r.tr] = true; });
         V.justRec = recs.map(function (r) { return r.id; });
         V.draft = {};
         V.flash = { pen: p.code, key: 'flash.items', args: { n: recs.length }, undoIds: V.justRec.slice() };
@@ -619,7 +607,6 @@
         if (V.over === 'death') V.death.c[v] = Math.max(0, V.death.c[v] + d);
         if (V.over === 'count') V.count.n = Math.max(0, V.count.n + d);
         if (V.over === 'move') V.move.n = Math.max(1, Math.min(p.alive, V.move.n + d));
-        if (V.over === 'give') V.give[v] = Math.max(0, V.give[v] + d);
         if (V.over === 'counts') V.counts[v] = Math.max(0, V.counts[v] + d);
         break;
       }
@@ -638,7 +625,9 @@
       case 'counts-save': P.setLitter(p.code, { boar: V.counts.boar, gilt: V.counts.gilt }); V.over = null; saved('flash.counts', { b: V.counts.boar, g: V.counts.gilt }); break;
       case 'tagged-open': V.over = 'tagged'; V.pageTop = true; break;
       case 'breeder': P.toggleBreeder(p.code, v); break;
-      case 'id-open': V.over = 'give'; V.give = giveBlank(p); V.pageTop = true; break;
+      case 'pick-done': { var nb = P.donePicking(p.code); V.flash = { pen: p.code, key: 'flash.pick', args: { n: T('breeders.n', { n: nb }) } }; V.over = null; break; }
+      case 'id-open': V.over = 'tagged'; V.sub = null; V.pageTop = true; break;
+      case 'give-new': V.sub = 'give'; V.give = giveBlank(p); V.pageTop = true; break;
       case 'give-field': V.give.field = V.give.field === v ? '' : v; break;
       case 'pad': padKey(v, el.getAttribute('data-key')); break;
       case 'give-scan': {   // a scan reads the tag in the ear (the demo reads the next one on the strip): it replaces what is there
@@ -649,7 +638,7 @@
       case 'give-keep': V.give.keep = !!el.checked; break;
       case 'give-save': {
         var g = V.give, no = giveNo(p), pig = { tag: notch() ? '' : no, notch: notch() ? no : '', sex: g.sex, kg: UI.numpadCommit(g.kg, { decimals: 1 }), keep: g.edit ? (p.ids.filter(function (z) { return z.no === g.edit; })[0] || {}).keep : false };
-        if (g.edit) { P.fixPig(p.code, g.edit, pig); V.give = giveBlank(p); }
+        if (g.edit) { P.fixPig(p.code, g.edit, pig); V.sub = null; V.give = null; break; }   // a fix goes back to the list
         else { var x = P.givePig(p.code, pig); V.give = giveBlank(p, x); }
         V.pageTop = true;   // the next piglet's tag readout is back at the top
         break;
@@ -658,14 +647,8 @@
       case 'give-fix': {
         var y = p.ids.filter(function (z) { return z.no === v; })[0]; if (!y) break;
         var idv = notch() ? String(y.notch).split('-')[1] : y.tag;
-        V.give = Object.assign(giveBlank(p), { id: { value: idv, suggested: false, suggestion: idv }, sex: y.sex, kg: y.kg == null ? '' : String(y.kg), keep: y.keep, edit: y.no });
+        V.give = Object.assign(giveBlank(p), { id: { value: idv, suggested: false, suggestion: idv }, sex: y.sex, kg: y.kg == null ? '' : String(y.kg), keep: y.keep, edit: y.no }); V.sub = 'give';
         V.pageTop = true;
-        break;
-      }
-      case 'give-litter': {
-        var gl = V.give, every = P.idCount(p) >= p.alive;
-        P.setLitter(p.code, { kg: UI.numpadCommit(gl.litterKg, { decimals: 1 }), boar: every ? null : gl.boar, gilt: gl.gilt });
-        V.over = null; saved('give.litter.saved');
         break;
       }
       case 'death-save': {
@@ -712,7 +695,7 @@
     if (field === 'litter') g.litterKg = UI.numpadInput({ value: g.litterKg }, k, PADS.litter()).value;
   }
   document.addEventListener('keydown', function (e) {
-    var k = UI.numpadKey(e), f = V.over === 'give' ? V.give.field : V.over === 'weight' ? 'w' : '';
+    var k = UI.numpadKey(e), f = V.sub === 'give' && V.give ? V.give.field : V.over === 'weight' ? 'w' : '';
     if (!k || k === 'enter' || !f) return;
     e.preventDefault(); padKey(f, k); render();
   });
