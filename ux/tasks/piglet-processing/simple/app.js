@@ -57,7 +57,6 @@
   function penChip(p) {
     var sts = P.todo(p).map(function (k) { return P.status(p, k); });
     if (!P.s.ended && sts.indexOf('late') >= 0) return S('chip.late', null, 'amber');
-    if (p.missing) return S('chip.missing', { n: p.missing }, 'amber');
     if (p.sowDied) return S('chip.sow', null, 'red');
     return null;
   }
@@ -103,30 +102,37 @@
       .concat([{ value: 'done', label: S('chips.done'), count: S('fig', { v: done }), checked: V.chip === 'done', aria: T('chips.done') }]);
     return K.chips({ items: items, action: 'chip', key: 'chips', label: T('chips.label') });
   }
-  function chipStart(k) {
-    V.chip = k; V.sel = {}; V.chipRec = null;
-    if (k && k !== 'id' && k !== 'done') P.pens().forEach(function (p) { if (P.status(p, k) === 'due') V.sel[p.code] = ''; });
-  }
+  function chipStart(k) { V.chip = k; V.sel = {}; V.chipRec = null; V.justTick = ''; }   // round 9: nothing is pre-ticked
   function chipTotals() {
     var codes = Object.keys(V.sel), n = 0;
     codes.forEach(function (c) { n += P.need(P.s.pens[c], V.chip); });
-    return { pens: codes.length, n: n };
+    return { pens: codes.length, n: n, of: P.pens().filter(function (p) { return needsToday(p, V.chip); }).length };
   }
-  /* a pen under a job chip: the row opens the pen; a treatment chip adds a tick at the end. After the hold, a recorded pen
-     stays where it is and says "Recorded ✓" until the chip changes. */
+  /* A pen under a job chip. The worker walks the pens and taps each row as they treat it: the circle at its end fills with
+     a tick in place (tap again to take it off). The small chevron beside it still opens the pen. After Finish, a recorded
+     pen stays where it is and says "Recorded ✓" until the chip changes. */
+  var openPen = function (p) {
+    return '<button type="button" class="sp-open" data-action="pen" data-value="' + p.code + '" aria-label="' + esc(T('open.pen', { pen: p.code })) + '">' + I('chevron') + '</button>';
+  };
   function chipRow(p) {
     var k = V.chip, rec = V.chipRec && V.chipRec[p.code];
     var place = P.bulkPlace(p, k), st = P.status(p, k), amber = !rec && (place === 'early' || place === 'late') ? place : '';
     var meta = rec ? [S('day.n', { d: p.age })] : st === 'left' ? [S('bulk.left', { n: P.need(p, k), why: T('why.' + (p.tr[k].why || 'weak')) })]
       : amber ? [S('day.n', { d: p.age }, 'amber')] : [S('day.n', { d: p.age })];
+    var on = V.sel[p.code] != null, mark = on && V.sel[p.code];
     var chip = amber ? S(amber === 'late' ? 'Late' : 'Early', null, 'amber') : penChip(p);
     var amount = rec ? S('piglets', { n: rec.n }) : stepAmount(p, k);
-    var row = K.row({ id: S('code', { c: p.code }), chip: chip, headline: [amount], meta: meta, action: 'pen', value: p.code, trail: k === 'id' ? 'chevron' : '' });
-    if (k === 'id' || P.s.ended) return row;
-    if (rec) return '<div class="sp-tickrow" data-ds="TaskRow"' + (V.justRec === 'bulk' ? ' data-fresh=""' : '') + '>' + row + '<span class="sp-recorded">' + H('recorded.tick') + '</span></div>';
-    var on = V.sel[p.code] != null;
-    return '<div class="sp-tickrow" data-ds="TaskRow">' + row + '<label class="sp-tick"><input type="checkbox" data-action="tick" value="' + p.code + '"' + (on ? ' checked' : '') +
-      ' aria-label="' + esc(p.code) + '"></label></div>';
+    if (k === 'id' || P.s.ended) return K.row({ id: S('code', { c: p.code }), chip: chip, headline: [amount], meta: meta, action: 'pen', value: p.code, trail: 'chevron' });
+    var ring = '<span class="sp-ring" aria-hidden="true">' + I('check') + '</span>';
+    if (rec) {
+      return '<div class="sp-tickrow" data-ds="TaskRow" data-ticked=""' + (V.justRec === 'bulk' ? ' data-fresh=""' : '') + '>' +
+        K.row({ id: S('code', { c: p.code }), chip: rec.mark ? S(rec.mark === 'late' ? 'Late' : 'Early', null, 'amber') : chip, headline: [amount], meta: meta, still: true, trail: '' })
+          .replace(/<\/div>$/, '<span class="sp-recorded">' + H('recorded.tick') + '</span></div>') + openPen(p) + '</div>';
+    }
+    var row = K.row({ id: S('code', { c: p.code }), chip: mark ? S(mark === 'late' ? 'Late' : 'Early', null, 'amber') : chip, headline: [amount], meta: meta,
+      action: 'tick', value: p.code, trail: '', label: T(on ? 'untick.pen' : 'tick.pen', { pen: p.code }) });
+    row = row.replace('data-ds="TaskRow"', 'data-ds="TaskRow" aria-pressed="' + on + '"').replace(/<\/button>$/, ring + '</button>');
+    return '<div class="sp-tickrow" data-ds="TaskRow"' + (on ? ' data-ticked=""' : '') + (V.justTick === p.code ? ' data-fresh=""' : '') + '>' + row + openPen(p) + '</div>';
   }
   function chipFooter() {
     if (V.chipRec) {
@@ -134,10 +140,12 @@
       return '<p class="sp-foot-receipt" role="status">' + H('flash.bulk', { Tr: tr(V.chip), tr: trl(V.chip), p: T('pens.n', { n: r.pens }), n: pigs(r.n) }) + '</p>' +
         '<div class="tk-footer sp-two" data-ds="TaskFooter">' + btn('undo', null, { register: 'secondary', action: 'chip-undo' }) + btn('done.btn', null, { register: 'primary', action: 'chip', value: '' }) + '</div>';
     }
-    var tot = chipTotals(), a = { tr: trl(V.chip), p: T('pens.n', { n: tot.pens }), n: pigs(tot.n) };
-    return K.footer({ back: null, hold: { label: S('bulk.hold', a), caption: S('bulk.caption'), action: 'bulk-commit', tone: 'primary', waiting: tot.pens === 0 },
-      status: Object.assign(tot.pens ? S('bulk.hold', a) : S('bulk.none'), { id: 'sp-bulk-status' }) });
+    var tot = chipTotals(), a = { tr: trl(V.chip), k: tot.pens, m: tot.of };
+    return K.footer({ back: null, hold: { label: S('bulk.finish', a), caption: S('bulk.finish.caption'), action: 'bulk-commit', tone: 'primary', waiting: tot.pens === 0 },
+      status: Object.assign(tot.pens ? S('bulk.finish', a) : S('bulk.none'), { id: 'sp-bulk-status' }) });
   }
+  /* the task's overall checker: piglets the records cannot account for (set counts lower than the record), batch level only */
+  function batchLine() { var u = P.s.unaccounted || 0; return u > 0 ? S('batch.unacc', { b: P.BATCH.name, n: u }) : S('batch', { b: P.BATCH.name }); }
   function listScreen(inert) {
     var all = P.pens(), done = all.filter(isDone), todo = all.filter(function (p) { return !isDone(p); }), ended = P.s.ended;
     var last = P.last();
@@ -154,9 +162,9 @@
       var n = all.filter(function (p) { return needsToday(p, k); }).length;
       if (n && !best.n) best = { k: k, n: n };
     });
-    var unit = ended ? { icon: 'treat', heading: S('sum.notdone'), value: S('fig', { v: todo.length }), description: S('sum.pens', { n: todo.length }), support: S('batch', { b: P.BATCH.name }) }
+    var unit = ended ? { icon: 'treat', heading: S('sum.notdone'), value: S('fig', { v: todo.length }), description: S('sum.pens', { n: todo.length }), support: batchLine() }
       : { icon: 'treat', heading: best.n ? S('sum.due', { Tr: tr(best.k) }) : S('sum.none'), value: S('fig', { v: best.n }),
-        description: best.n ? S('sum.pens', { n: best.n }) : S('sum.nothing'), support: S('batch', { b: P.BATCH.name }) };
+        description: best.n ? S('sum.pens', { n: best.n }) : S('sum.nothing'), support: batchLine() };
     body += K.summary({
       unit: unit,
       task: { icon: 'record', heading: ended ? S('sum.ended') : S('sum.task'), count: S('fig', { v: done.length }), of: S('of', { n: all.length }), description: S('sum.done'),
@@ -174,7 +182,7 @@
       if (V.chipRec) list.sort(function (a, b) { return a.code < b.code ? -1 : 1; });
       var t = P.plan(V.chip);
       body += '<p class="sp-chip-head">' + H(stepKey(V.chip)) + '<span class="tk-sep" data-str="ds.sep">·</span>' + H('given.days', { a: t.from, b: t.to }) + '</p>';
-      if (V.chip === 'id') body += '<p class="sp-chip-tip">' + H('chip.id.tip') + '</p>';
+      body += '<p class="sp-chip-tip">' + H(V.chip === 'id' ? 'chip.id.tip' : 'bulk.none') + '</p>';
       body += list.length ? K.list(groupsBy(list, chipRow)) : '<p class="sp-empty">' + H('chip.none') + '</p>';
       var nd = all.length - list.length;
       if (nd) body += '<p class="sp-empty">' + H('chip.done.in', { n: nd }) + '</p>';
@@ -275,7 +283,6 @@
     body += UI.facts([{ label: T('born'), value: String(p.born) }, { label: T('alive'), value: String(p.alive) }, { label: T('dead'), value: String(p.dead) }], { columns: 3 });
     var lines = [];
     if (p.sowDied) lines.push('<span data-tone="red">' + esc(T('line.sow')) + '</span>');
-    if (p.missing) lines.push('<span data-tone="amber">' + esc(T('line.missing', { n: p.missing })) + '</span>');
     if (p.movedOut) lines.push('<span>' + esc(T('line.out', { n: p.movedOut })) + '</span>');
     if (p.movedIn) lines.push('<span>' + esc(T('line.in', { n: p.movedIn })) + '</span>');
     if (lines.length) body += '<p class="sp-lines">' + lines.join(' ') + '</p>';
@@ -341,12 +348,8 @@
   var CAUSES = ['crushed', 'scours', 'starve', 'other'];
   function deathSheet() {
     var p = pen(), d = V.death, k = CAUSES.reduce(function (s, c) { return s + d.c[c]; }, 0);
-    var body = CAUSES.map(function (c) { return stepper(c, T('c.' + c), d.c[c], { max: p.alive + p.missing }); }).join('');
-    if (p.missing && k > 0) {
-      body += K.radios({ layout: 'row', label: T(k === 1 ? 'death.missing' : 'death.missing.n'), action: 'miss', key: 'miss', selected: d.miss,
-        options: [{ value: 'no', label: T('no') }, { value: 'yes', label: T('yes') }] });
-    }
-    var ready = k > 0 && (!p.missing || d.miss);
+    var body = CAUSES.map(function (c) { return stepper(c, T('c.' + c), d.c[c], { max: p.alive }); }).join('');
+    var ready = k > 0;
     return K.drawer({ title: T('death.title'), subtitle: T('death.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'death', close: null, body: body,
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'death-save', register: 'primary', waiting: !ready } }) });
   }
@@ -360,7 +363,7 @@
   function movePage() {
     var p = pen(), d = V.move;
     var others = P.pens().filter(function (o) { return P.sameBatch(p, o); });
-    var body = '<section class="sp-pick">' + UI.heading({ title: T('move.to'), kind: 'section', level: 3 }) +
+    var body = '<section class="sp-pick">' + UI.heading({ title: T('move.to'), meta: T('move.batch', { b: P.BATCH.name }), kind: 'section', level: 3 }) +
       '<div class="tk-choice sp-pens" role="group" aria-label="' + esc(T('move.to')) + '">' + others.map(function (o) {
         return '<button type="button" class="tk-choice-tile" aria-pressed="' + (d.to === o.code) + '" data-action="move-to" data-value="' + o.code + '">' +
           '<strong>' + o.code + '</strong><small>' + esc(T('day.n', { d: o.age })) + '</small></button>';
@@ -380,10 +383,6 @@
   function countSheet() {
     var p = pen(), d = V.count;
     var body = stepper('count', T('count.label'), d.n, { variant: 'hero', face: 'count', min: 0, hint: '' });
-    if (d.n < p.alive) {
-      body += K.radios({ label: '', action: 'count-why', key: 'cwhy', selected: d.why, options: [
-        { value: 'unsure', label: T('count.unsure') }, { value: 'wrong', label: T('count.wrong') }] });
-    }
     return K.drawer({ title: T('count.title'), subtitle: T('count.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'count', close: null, body: body,
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'count-save', register: 'primary', waiting: d.n === p.alive } }) });
   }
@@ -414,6 +413,7 @@
       var names = []; soon.forEach(function (p) { P.coming(p).forEach(function (k) { if (names.indexOf(tr(k)) < 0) names.push(tr(k)); }); });
       body += '<p class="sp-quiet">' + esc(T('end.coming', { n: soon.length, list: names.join(', ') })) + '</p>';
     }
+    if ((P.s.unaccounted || 0) > 0) body += '<p class="sp-quiet">' + esc(T('end.unacc', { n: P.s.unaccounted })) + '</p>';
     var f = ended ? K.footer({ back: { action: 'back', label: T('back') } })
       : K.footer({ back: { action: 'back', label: T('back') }, hold: { label: T('end.hold'), caption: T('end.caption'), action: 'end-commit', tone: 'danger' } });
     return K.page({ title: ended ? T('end.done.title') : T('end.title'), description: T('end.sub', { b: P.BATCH.name }), view: 'end', body: body, footer: f });
@@ -488,7 +488,7 @@
       var f = phone.querySelector(focusSel);
       if (f && f.focus) { f.focus({ preventScroll: true }); if (caret != null && f.setSelectionRange) try { f.setSelectionRange(caret, caret); } catch (e) { /* not a text input */ } }
     }
-    V.justRec = '';
+    V.justRec = ''; V.justTick = '';
     renderDemo();
   }
 
@@ -555,11 +555,11 @@
       case 'tick': {
         var place = P.bulkPlace(P.s.pens[v], V.chip);
         if (V.sel[v] != null) delete V.sel[v];
-        else if (place === 'early' || place === 'late') { el.checked = false; V.confirm = { pen: v, mark: place }; }
-        else V.sel[v] = '';
+        else if (place === 'early' || place === 'late') V.confirm = { pen: v, mark: place };
+        else { V.sel[v] = ''; V.justTick = v; }
         break;
       }
-      case 'confirm-yes': V.sel[V.confirm.pen] = V.confirm.mark; V.confirm = null; break;
+      case 'confirm-yes': V.sel[V.confirm.pen] = V.confirm.mark; V.justTick = V.confirm.pen; V.confirm = null; break;
       case 'confirm-no': V.confirm = null; break;
       case 'chip-undo': {
         var ids = Object.keys(V.chipRec).filter(function (c) { return c !== '_sum'; }).map(function (c) { return V.chipRec[c].id; });
@@ -587,9 +587,9 @@
       }
       case 'tool':
         V.over = v;
-        if (v === 'death') V.death = { c: { crushed: 0, scours: 0, starve: 0, other: 0 }, miss: '' };
+        if (v === 'death') V.death = { c: { crushed: 0, scours: 0, starve: 0, other: 0 } };
         if (v === 'move') V.move = { to: '', n: 1, had: {} };
-        if (v === 'count') V.count = { n: p.alive, why: 'unsure' };
+        if (v === 'count') V.count = { n: p.alive };
         break;
       case 'id-open': V.over = 'id'; V.idf = idBlank(); V.pageTop = true; break;
       case 'id-use': V.idf.no = v; break;
@@ -606,9 +606,8 @@
         V.over = null; saved('flash.pick', { n: T('breeders.n', { n: nb }) });
         break;
       }
-      case 'miss': V.death.miss = v; break;
       case 'death-save': {
-        var k = P.death(p.code, V.death.c, V.death.miss === 'yes');
+        var k = P.death(p.code, V.death.c);
         V.over = null; saved('flash.death', { n: pigs(k) });
         break;
       }
@@ -620,10 +619,9 @@
         V.over = null; saved('flash.move', { n: pigs(m.n), to: m.to });
         break;
       }
-      case 'count-why': V.count.why = v; break;
       case 'count-save': {
         var c = V.count;
-        P.setCount(p.code, c.n, c.n < p.alive ? c.why : 'wrong');
+        P.setCount(p.code, c.n);
         V.over = null; saved('flash.count', { n: c.n });
         break;
       }

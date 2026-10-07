@@ -5,7 +5,7 @@
    for breeding), or 'none' (fatteners raised as a batch: no ID step at all). */
 (function (root) {
   'use strict';
-  var KEY = 'pp-simple-v2';
+  var KEY = 'pp-simple-v3';
   var ME = 'G. Hansen', OTHER = 'L. Madsen';
   var PLAN = [
     { key: 'iron', from: 2, to: 4 },
@@ -26,7 +26,7 @@
     scheme = SCHEMES.indexOf(scheme) >= 0 ? scheme : 'tag';
     var pens = {}, records = [], seq = 0, litter = 21;
     function pen(code, age, born, dead, extra) {
-      var p = { code: code, row: code[0], age: age, born: born, alive: born - dead, dead: dead, missing: 0, sowDied: false, movedIn: 0, movedOut: 0,
+      var p = { code: code, row: code[0], age: age, born: born, alive: born - dead, dead: dead, sowDied: false, movedIn: 0, movedOut: 0,
         litter: litter++, ids: [], idIn: 0, idOut: 0, picked: null, tr: {} };
       PLAN.forEach(function (t) { p.tr[t.key] = { got: 0, why: '' }; });
       Object.assign(p, extra || {});
@@ -72,7 +72,7 @@
       ident('A01', 1, 2, 10, 0, [0]); pens.A01.picked = { at: daysAgoAt(2, 10, 5), who: ME };
       ident('A02', 1, 0, 7, 30, [0]);
     }
-    return { scheme: scheme, pens: pens, records: records, notes: [], ended: null, seq: seq, undo: null };
+    return { scheme: scheme, pens: pens, records: records, notes: [], ended: null, seq: seq, undo: null, unaccounted: 0 };
   }
 
   var S;
@@ -202,13 +202,12 @@
     });
   }
   function clamp(p) { PLAN.forEach(function (t) { p.tr[t.key].got = Math.min(p.tr[t.key].got, p.alive); if (need(p, t.key) === 0) p.tr[t.key].why = ''; }); }
-  /* Deaths: { crushed, scours, starve, other }; fromMissing: the dead were among the missing ones */
-  function death(code, causes, fromMissing) {
+  /* Deaths: { crushed, scours, starve, other } */
+  function death(code, causes) {
     return change('death', function () {
       var p = S.pens[code], k = 0;
       Object.keys(causes).forEach(function (c) { k += causes[c] || 0; });
-      var m = fromMissing ? Math.min(k, p.missing) : 0;
-      p.missing -= m; p.alive = Math.max(0, p.alive - (k - m)); p.dead += k;
+      p.alive = Math.max(0, p.alive - k); p.dead += k;
       clamp(p);
       S.records.push({ id: 'r' + (++S.seq), pen: code, tr: 'death', n: k, at: Date.now(), day: p.age, who: ME, mark: '' });
       return k;
@@ -230,15 +229,17 @@
       return n;
     });
   }
-  /* Set count. why: 'unsure' (the difference is missing) | 'wrong' (just correct it). More than before: just correct. */
-  function setCount(code, n, why) {
+  /* Set count: the pen's record becomes what is there now (round 9). No reason is asked and the pen shows no status; the
+     difference goes only to the task's overall checker (S.unaccounted: piglets the records cannot account for; a count
+     higher than the record takes piglets back off it). */
+  function setCount(code, n) {
     return change('count', function () {
       var p = S.pens[code], diff = p.alive - n;
       // treatments that were all given stay all given when the count is corrected
       var full = PLAN.filter(function (t) { return need(p, t.key) === 0 && recs(code, t.key).length; }).map(function (t) { return t.key; });
-      if (diff > 0 && why === 'unsure') p.missing += diff;
+      S.unaccounted = (S.unaccounted || 0) + diff;
       p.alive = n;
-      if (why === 'wrong' || diff < 0) full.forEach(function (k) { p.tr[k].got = n; });
+      full.forEach(function (k) { p.tr[k].got = n; });
       clamp(p);
       S.records.push({ id: 'r' + (++S.seq), pen: code, tr: 'count', n: n, at: Date.now(), day: p.age, who: ME, mark: '' });
       return n;
