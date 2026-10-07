@@ -1276,23 +1276,23 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .sp-adds > .button { flex: 1 1 0; min-width: 0; }
 .tk-sheet-body > .tk-list, .tk-page-body > .tk-list { margin: 0; }
 
-/* the ID form: litter weight, boars · gilts, and one row per identified piglet (tag · notch · sex · kg · ✕) */
-.tk-page[data-view="id"] .field, .tk-sheet[data-view="weight"] .field { margin: 0; }
-.sp-idf-card { padding: var(--space-row-y) var(--space-row-x); }
-.sp-idf-card > .tk-stepper + .tk-stepper { border-top: 1px solid var(--line); }
-.sp-kg-box { display: flex; align-items: center; gap: 6px; }
-.sp-kg-box input { flex: 1; min-width: 0; font: 500 var(--type-button-size)/1.2 var(--font-mono); }
-.sp-kg-box small { font-size: var(--type-description-size); color: var(--muted); font-weight: 400; }
-.sp-idrow { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, .8fr) var(--touch-min); align-items: center; gap: 6px;
-  padding: 8px 0 8px var(--space-row-x); border-bottom: 1px solid var(--line); }
-.sp-idrow input, .sp-idrow select { width: 100%; min-width: 0; height: var(--touch-min); padding: 0 8px; border: 1px solid var(--line); border-radius: var(--radius-segment);
-  background: var(--well); color: var(--ink); font: 500 var(--type-identifier-size)/1 var(--font-mono); box-sizing: border-box; }
-.sp-idrow select { font-family: var(--font-sans); }
-.sp-idrow[data-bad] input, .sp-idrow[data-bad] select { border-color: var(--danger-border); background: var(--red-wash); }
-.sp-idrow-x { display: grid; place-items: center; width: var(--touch-min); height: var(--touch-min); margin: 0; padding: 0; border: 0; background: none; color: var(--muted); cursor: pointer; }
-.sp-idrow-x svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-.sp-keep { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; min-height: 32px; font: var(--type-description-size)/1.3 var(--font-sans); color: var(--ink); }
-.sp-keep input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); }
+/* Give IDs: one piglet at a time — big readouts (Measure) on the skeleton's Numpad, Boar · Gilt as TaskChoice tiles */
+.sp-give-id { display: flex; align-items: flex-start; gap: var(--space-key-gap); }
+.sp-give-id > .sp-give-scan { margin-top: 30px; }
+.sp-keep-row > .tk-row-identity { display: none; }
+.sp-give-id > .st-measure { flex: 1; min-width: 0; }
+.sp-give-scan.icon-button { flex: none; width: var(--control-height); height: var(--control-height); border: 1px solid var(--control-border); border-radius: var(--radius-control); background: var(--paper); }
+.sp-give-scan svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sp-give-measure .st-measure-value { font-size: var(--type-figure-well-size); }
+.sp-give-measure .st-measure-box.st-measure-box { min-height: 64px; }
+.sp-give-measure:has(.st-measure-hint) { margin-bottom: 0; }
+.sp-give-litter { display: flex; flex-direction: column; gap: var(--space-heading); }
+.sp-give-litter > .tk-stepper + .tk-stepper { margin-top: calc(-1 * var(--space-heading)); }
+/* the pad docks above the footer, out of the scroller */
+:is(.tk-page, .tk-sheet) > .st-numpad { flex: none; padding: var(--space-row-y) var(--space-gutter); background: var(--paper); border-top: 1px solid var(--line); }
+:is(.tk-page, .tk-sheet) > .st-numpad + .tk-footer { border-top: 0; }
+.tk-page-body > .tk-row[data-trail="tick"] { border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
+.button.sp-wide { width: 100%; }
 
 /* Move: the other pens as tiles, four to a line */
 .sp-pick > .st-heading { margin-bottom: 8px; }
@@ -2452,6 +2452,9 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 (function (root) {
   'use strict';
   var EN = {
+    'give.title': 'Give IDs', 'give.tag': 'Tag', 'give.notch': 'Ear notch', 'give.kg': 'Weight', 'give.use': 'Use {no} · or scan', 'give.use.n': 'Use {no}', 'give.keep.sub': 'This gilt stays as a breeder',
+    'give.save': 'Record · next piglet', 'give.fix': 'Save change', 'give.fixing': 'Fixing {no}', 'give.sub': '{pen} · sow {sow} · {n} without ID', 'give.last': 'Last {no} · {sex}{kg}',
+    'give.litter': 'Litter', 'give.all': 'Every piglet has an ID', 'give.litter.save': 'Save litter', 'give.litter.saved': 'Litter saved', 'pg.give.sub': '{n} without ID',
     'st.in': '{tr} in {n} days', 'st.in.1': '{tr} tomorrow', 'sows.one': '· 1 sow', 'pen.aria': 'Pen {pen}', 'sheet.pen': '{pen} · parity {p}', 'day.done.s': 'Done',
     'st.todo': 'To do', 'st.next': 'Next in {n} days', 'st.next.1': 'Next tomorrow', 'st.done': 'All done', 'sow': 'Sow {tag}',
     'sheet.sow': 'Sow {tag} · parity {p}', 'tab.proc': 'Processing', 'tab.pig': 'Piglets', 'tabs.label': 'Pen views',
@@ -2553,6 +2556,9 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'yesterday': 'yesterday'
   };
   var ZH = {
+    'give.title': '给仔猪编号', 'give.tag': '耳标号', 'give.notch': '耳缺号', 'give.kg': '体重', 'give.use': '用{no} · 或扫描', 'give.use.n': '用{no}', 'give.keep.sub': '这头母猪留作种猪',
+    'give.save': '记录 · 下一头', 'give.fix': '保存修改', 'give.fixing': '正在修改{no}', 'give.sub': '{pen} · 母猪{sow} · {n}头没编号', 'give.last': '刚记录 {no} · {sex}{kg}',
+    'give.litter': '整窝', 'give.all': '每头都有编号', 'give.litter.save': '保存整窝', 'give.litter.saved': '整窝已保存', 'pg.give.sub': '{n}头没编号',
     'st.in': '{n}天后{tr}', 'st.in.1': '明天{tr}', 'sows.one': '· 1头母猪', 'pen.aria': '{pen}栏', 'sheet.pen': '{pen} · {p}胎', 'day.done.s': '已完成',
     'st.todo': '需处理', 'st.next': '下次处理：{n}天后', 'st.next.1': '下次处理：明天', 'st.done': '已完成所有处理', 'sow': '母猪 {tag}',
     'sheet.sow': '母猪 {tag} · {p}胎', 'tab.proc': '仔猪处理', 'tab.pig': '仔猪信息', 'tabs.label': '栏位页面',
@@ -2682,7 +2688,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
    for breeding), or 'none' (fatteners raised as a batch: no ID step at all). */
 (function (root) {
   'use strict';
-  var KEY = 'pp-simple-v4';
+  var KEY = 'pp-simple-v5';
   var ME = 'G. Hansen', OTHER = 'L. Madsen';
   var PLAN = [
     { key: 'iron', from: 2, to: 4 },
@@ -2693,7 +2699,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   var ID = { key: 'id', from: 3, to: 7 };   // the farm's ID day: day 3, until day 7
   var SCHEMES = ['tag', 'notch', 'breeders', 'none'];
   var BATCH = { name: '40', firstDay: 1, lastDay: 6 };   // the batch farrowed over these pen ages
-  var FIRST_TAG = 4201;
+  var FIRST_TAG = 1201;   // tags come on pre-printed strips of six-digit numbers: 001201, 001202, …
+  var tag6 = function (n) { return ('000000' + n).slice(-6); };
 
   function todayAt(h, m) { var d = new Date(); d.setHours(h, m, 0, 0); return d.getTime(); }
   function daysAgoAt(n, h, m) { return todayAt(h, m) - n * 864e5; }
@@ -2722,7 +2729,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       var p = pens[code];
       for (var i = 0; i < count; i++) {
         var keep = breeders.indexOf(i) >= 0;
-        var no = scheme === 'notch' ? p.litter + '-' + (p.ids.length + 1) : String(tagNo++);
+        var no = scheme === 'notch' ? p.litter + '-' + (p.ids.length + 1) : tag6(tagNo++);
         var at = daysAgoAt(ago, h, m + i);
         p.ids.push({ no: no, tag: scheme === 'notch' ? '' : no, notch: scheme === 'notch' ? no : '', sex: i % 2 ? 'boar' : 'gilt', kg: i === 0 ? 1.6 : null, keep: keep, at: at, who: who || ME });
         records.push({ id: 'r' + (++seq), pen: code, tr: 'id', n: 1, no: no, at: at, day: p.age - ago, who: who || ME, mark: '' });
@@ -2811,7 +2818,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     }
     var max = FIRST_TAG - 1;
     Object.keys(S.pens).forEach(function (c) { S.pens[c].ids.forEach(function (x) { if (x.tag && +x.tag > max) max = +x.tag; }); });
-    return String(max + 1);
+    return tag6(max + 1);
   }
   function taken(no) {
     return Object.keys(S.pens).some(function (c) { return S.pens[c].ids.some(function (x) { return x.tag === String(no) || x.notch === String(no); }); });
@@ -2904,6 +2911,44 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       return x;
     });
   }
+  /* Give IDs, one piglet at a time: { tag, notch, sex, kg, keep } is saved at once (nothing waits for a submit) */
+  function givePig(code, pig) {
+    return change('id', function () {
+      var p = S.pens[code], st = status(p, 'id');
+      var x = { no: pig.tag || pig.notch, tag: pig.tag || '', notch: pig.notch || '', sex: pig.sex, kg: pig.kg == null || pig.kg === '' ? null : +pig.kg,
+        keep: S.scheme === 'breeders' ? true : !!pig.keep, at: Date.now(), who: ME };
+      p.ids.push(x);
+      S.records.push({ id: 'r' + (++S.seq), pen: code, tr: 'id', n: 1, no: x.no, at: x.at, day: p.age, who: ME, mark: st === 'late' ? 'late' : '' });
+      return x;
+    });
+  }
+  /* Fix one piglet's record (tap its row): the record is replaced, stamped again */
+  function fixPig(code, no, pig) {
+    return change('id-fix', function () {
+      var p = S.pens[code], x = p.ids.filter(function (y) { return y.no === no; })[0];
+      if (!x) return null;
+      x.tag = pig.tag || ''; x.notch = pig.notch || ''; x.no = x.tag || x.notch; x.sex = pig.sex;
+      x.kg = pig.kg == null || pig.kg === '' ? null : +pig.kg; x.keep = S.scheme === 'breeders' ? true : !!pig.keep; x.at = Date.now(); x.who = ME;
+      S.records.forEach(function (r) { if (r.pen === code && r.tr === 'id' && r.no === no) r.no = x.no; });
+      return x;
+    });
+  }
+  /* Take back one piglet's ID (the "Last … · Undo" line) */
+  function removePig(code, no) {
+    var p = S.pens[code];
+    p.ids = p.ids.filter(function (y) { return y.no !== no; });
+    S.records = S.records.filter(function (r) { return !(r.pen === code && r.tr === 'id' && r.no === no); });
+    S.undo = null; save();
+  }
+  /* The litter, after the last piglet: its total weight, and boar / gilt counts when some piglets have no ID */
+  function setLitter(code, litter) {
+    return change('litter', function () {
+      var p = S.pens[code];
+      if (litter.kg != null && litter.kg !== '') p.weights.push({ kg: +litter.kg, day: p.age, at: Date.now() });
+      if (litter.boar != null) p.sex = { boar: litter.boar, gilt: litter.gilt };
+      return true;
+    });
+  }
   /* Breeders-only farm: the worker says this litter's breeders are all picked */
   function donePicking(code) {
     return change('pick', function () {
@@ -2989,7 +3034,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     get s() { return S; },
     hasId: hasId, steps: steps, plan: plan, need: need, idCount: idCount, breeders: breeders, recs: recs, status: status, todo: todo, coming: coming,
     pens: pens, last: last, bulkPlace: bulkPlace, sameBatch: sameBatch, nextNo: nextNo, taken: taken,
-    treat: treat, submit: submit, identifyForm: identifyForm, setWeight: setWeight, unrecord: unrecord, identify: identify, donePicking: donePicking, death: death, move: move, setCount: setCount, end: end, undo: undo,
+    treat: treat, submit: submit, givePig: givePig, fixPig: fixPig, removePig: removePig, setLitter: setLitter, identifyForm: identifyForm, setWeight: setWeight, unrecord: unrecord, identify: identify, donePicking: donePicking, death: death, move: move, setCount: setCount, end: end, undo: undo,
     otherPhone: otherPhone, seeNote: seeNote, reset: reset, setScheme: setScheme
   };
 })(globalThis);
@@ -3010,7 +3055,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 
   /* What is open on the phone (not kept: a reload starts on the pen list) */
   function fresh(keep) {
-    return { chip: '', pen: null, tab: 'proc', draft: {}, over: null, adj: null, death: null, move: null, count: null, weight: null, idf: null,
+    return { chip: '', pen: null, tab: 'proc', draft: {}, over: null, adj: null, death: null, move: null, count: null, weight: null, give: null,
       end: null, flash: null, open: {}, keepOpen: {}, justRec: [], demoOpen: keep ? keep.demoOpen : false };
   }
   var V = fresh();
@@ -3180,7 +3225,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     var t = P.plan(k), st = P.status(p, k), n = P.need(p, k);
     if (st === 'done') return { title: tr(k), meta: doneMeta(p, k), mark: 'done', action: k === 'id' ? 'id-open' : 'noop', value: k, id: 'sp-done-' + k };
     if (k === 'id') {
-      var filled = scheme() === 'breeders' ? !!p.picked : P.recs(p.code, 'id').length > 0;
+      var filled = scheme() === 'breeders' ? !!p.picked : P.recs(p.code, 'id').length > 0;   // opens Give IDs
       var m = [{ text: T(filled ? 'item.filled' : 'item.notfilled'), tone: filled ? 'green' : 'amber' }, SEP, idWhat(p)];
       if (st === 'late') m.push(SEP, { text: T('late'), tone: 'amber' });
       return { title: tr(k), meta: m, mark: 'due', action: ended ? 'noop' : 'id-open', value: 'id', id: 'sp-id-' + k };
@@ -3228,16 +3273,10 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
           meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), still: true, trail: '' });
       });
       body += K.list([K.group({ title: T('pg.ids'), face: 'word', meta: '· ' + idWhat(p), rows: rows.length ? rows : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>' })]);
-      if (!P.s.ended) body += idAdds();
+      if (!P.s.ended) body += K.doors({ items: [{ title: T(scheme() === 'breeders' ? 'tr.id.breeders' : 'give.title'), description: scheme() === 'breeders' ? T('id.picked', { n: P.breeders(p) }) : T('pg.give.sub', { n: Math.max(0, p.alive - P.idCount(p)) }), action: 'id-open' }] });
     }
     body += K.doors({ items: [{ title: T('pg.log'), description: T('pg.log.sub'), action: 'log-open' }] });
     return body;
-  }
-  /* Scan tag · Choose notch · Add manually: three design-system Buttons (tool register) in one line */
-  function idAdds() {
-    return '<div class="sp-adds">' + [['scan', 'pg.scan'], ['notch', 'pg.notch'], ['manual', 'pg.manual']].map(function (a) {
-      return UI.button({ label: T(a[1]), register: 'tool', action: 'id-add', value: a[0] });
-    }).join('') + '</div>';
   }
   function penSheet(inert) {
     var p = pen(), ended = !!P.s.ended, body = '';
@@ -3276,45 +3315,79 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('adj.use', { n: d.n }), action: 'adjust-use', register: 'primary', waiting: less && !d.why } }) });
   }
 
-  /* ---- the ID form (tag / notch / weigh): litter weight, boars and gilts, and the identified piglets as rows ---- */
-  function nextNumbers(p) {
-    var f = V.idf, tag = +P.nextNo(p.code), notchBase = String(p.litter), notchN = 0;
-    if (scheme() === 'notch') notchN = +P.nextNo(p.code).split('-')[1];
-    else { var used = p.ids.filter(function (x) { return x.notch; }).map(function (x) { return +String(x.notch).split('-')[1] || 0; }); notchN = (used.length ? Math.max.apply(null, used) : 0) + 1; }
-    f.rows.forEach(function (r) { if (r.tag && +r.tag >= tag) tag = +r.tag + 1; if (r.notch) { var m = +String(r.notch).split('-')[1] || 0; if (m >= notchN) notchN = m + 1; } });
-    return { tag: String(tag), notch: notchBase + '-' + notchN };
+  /* ---- Give IDs: one piglet at a time (farrowing's identity pattern, research/per-piglet-proposal.md flow a) ----
+     The tag readout holds the next number on the strip ("Use 001237"); a scan replaces it; the digits are editable on the
+     skeleton's Numpad. Boar · Gilt are two big tiles. Weight is optional, on the same pad. Gilts can be kept for breeding
+     where the farm picks breeders here. "Record · next piglet" saves this piglet now and moves to the next number. The
+     recorded piglets are listed under it; tap one to fix it. After the last, the litter's weight (and its boar/gilt
+     counts, from the rows — steppers only when some piglets have no ID). */
+  var notch = function () { return scheme() === 'notch'; };
+  function giveBlank(p, last) {
+    var nx = P.nextNo(p.code);
+    return { field: '', id: { value: notch() ? nx.split('-')[1] : nx, suggested: true, suggestion: notch() ? nx.split('-')[1] : nx }, kg: '', sex: '', keep: scheme() === 'breeders',
+      last: last || null, edit: '', litterKg: '', boar: p.sex ? p.sex.boar : 0, gilt: p.sex ? p.sex.gilt : 0, litterSaved: false };
   }
-  var rowOk = function (r) { return (r.tag || r.notch) && r.sex && !(r.tag && P.taken(r.tag)) && !(r.notch && P.taken(r.notch)); };
-  var rowEmpty = function (r) { return !r.tag && !r.notch && !r.sex && !r.kg; };
-  function idPage() {
-    var p = pen(), f = V.idf, br = scheme() === 'breeders', body = '';
-    body += '<section class="st-panel sp-idf-card"><label class="field sp-idf-kg"><span>' + esc(T('idf.kg')) + '</span><span class="sp-kg-box"><input id="sp-idf-kg" inputmode="decimal" autocomplete="off" value="' + esc(f.kg) + '"><small>kg</small></span></label>' +
-      (f.kg ? '' : '<p class="sp-warn">' + esc(T('pg.weight.hint')) + '</p>') + '</section>';
-    body += '<section class="st-panel sp-idf-card">' + stepper('boar', T('idf.boars'), f.boar) + stepper('gilt', T('idf.gilts'), f.gilt) + '</section>';
-    var rows = f.rows.map(function (r, i) {
-      var bad = f.tried && !rowOk(r) && !rowEmpty(r);
-      return '<div class="sp-idrow"' + (bad ? ' data-bad=""' : '') + '>' +
-        '<input id="sp-r' + i + '-tag" data-row="' + i + '" data-f="tag" inputmode="numeric" autocomplete="off" placeholder="' + esc(T('idf.tag')) + '" aria-label="' + esc(T('idf.tag')) + '" value="' + esc(r.tag) + '">' +
-        '<input id="sp-r' + i + '-notch" data-row="' + i + '" data-f="notch" autocomplete="off" placeholder="' + esc(T('idf.notch')) + '" aria-label="' + esc(T('idf.notch')) + '" value="' + esc(r.notch) + '">' +
-        '<select id="sp-r' + i + '-sex" data-row="' + i + '" data-f="sex" aria-label="' + esc(T('idf.sex')) + '"><option value="">' + esc(T('idf.sex')) + '</option><option value="boar"' + (r.sex === 'boar' ? ' selected' : '') + '>' + esc(T('boar')) + '</option><option value="gilt"' + (r.sex === 'gilt' ? ' selected' : '') + '>' + esc(T('gilt')) + '</option></select>' +
-        '<input id="sp-r' + i + '-kg" data-row="' + i + '" data-f="kg" inputmode="decimal" autocomplete="off" placeholder="kg" aria-label="' + esc(T('id.kg')) + '" value="' + esc(r.kg) + '">' +
-        '<button type="button" class="sp-idrow-x" data-action="id-del" data-value="' + i + '" aria-label="' + esc(T('idf.remove', { n: i + 1 })) + '">' + I('close') + '</button>' +
-        (br ? '' : '<label class="sp-keep"><input type="checkbox" data-row="' + i + '" data-f="keep"' + (r.keep ? ' checked' : '') + '> ' + esc(T('id.keep')) + '</label>') + '</div>';
-    }).join('');
-    var bad = f.rows.some(function (r) { return !rowOk(r) && !rowEmpty(r); });
-    body += '<section class="sp-ids">' + UI.heading({ title: T('pg.ids'), kind: 'section', level: 3 }) +
-      '<div class="st-panel sp-ids-card">' + (rows || '<p class="sp-empty">' + esc(T('idf.add')) + '</p>') +
-      (f.tried && bad ? '<p class="sp-warn">' + esc(T('idf.row')) + '</p>' : '') +
-      '</div></section>' + idAdds();
-    var n = f.rows.filter(rowOk).length, something = n || f.kg || f.boar !== f.boar0 || f.gilt !== f.gilt0;
-    return K.page({ title: T('idf.title'), description: T('id.page.sub', { pen: p.code, d: p.age, what: idWhat(p) }), view: 'id', body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('idf.submit', { n: n }), action: 'id-submit', register: 'primary', waiting: !something } }) });
+  function giveNo(p) { var g = V.give, v = UI.numpadCommit(g.id.value); return v == null ? '' : notch() ? p.litter + '-' + v : v; }
+  function giveUsed(p) { var g = V.give, no = giveNo(p); return no && no !== g.edit && P.taken(no) ? no : ''; }
+  var PADS = { id: function () { return notch() ? { maxLength: 2 } : { maxLength: 6 }; }, kg: function () { return { decimals: 1, intLength: 2 }; }, litter: function () { return { decimals: 1, intLength: 3 }; } };
+  function givePad() {
+    var g = V.give, f = g.field;
+    if (!f) return '';
+    var st = f === 'id' ? g.id : { value: f === 'kg' ? g.kg : g.litterKg, suggested: false };
+    return UI.numpad(Object.assign({ value: st.value, suggested: !!st.suggested, unit: f === 'id' ? '' : 'kg', action: 'pad', key: f, compact: true,
+      hint: f === 'id' && giveUsed(pen()) ? T('id.taken', { no: giveUsed(pen()) }) : '', tone: f === 'id' && giveUsed(pen()) ? 'warn' : '' }, PADS[f]()));
   }
+  function givePage() {
+    var p = pen(), g = V.give, br = scheme() === 'breeders', ended = !!P.s.ended, body = '';
+    var left = Math.max(0, p.alive - P.idCount(p)), allDone = !br && left === 0 && !g.edit;
+    if (g.last) body += '<div class="sp-flash" role="status"><span>' + esc(T('give.last', { no: g.last.no, sex: T(g.last.sex), kg: g.last.kg != null ? ' · ' + T('kg', { w: g.last.kg }) : '' })) + '</span>' +
+      UI.button({ label: T('undo'), register: 'text', action: 'give-undo' }) + '</div>';
+    if (!allDone && !ended) {
+      var used = giveUsed(p), no = giveNo(p);
+      var idLabel = T(notch() ? 'give.notch' : 'give.tag');
+      body += '<div class="sp-give-id">' + UI.measure({ label: idLabel, value: no || '', placeholder: '—', action: 'give-field', key: 'id', active: g.field === 'id',
+        tone: used ? 'refused' : '', hint: used ? T('id.taken', { no: used }) : g.id.suggested ? T(notch() ? 'give.use.n' : 'give.use', { no: no }) : '', className: 'sp-give-measure' }) +
+        (notch() ? '' : UI.iconButton({ action: 'give-scan', icon: I('scan'), label: T('pg.scan'), className: 'sp-give-scan' })) + '</div>';
+      body += K.choice({ action: 'give-sex', label: T('id.sex'), options: [{ value: 'boar', label: T('boar'), pressed: g.sex === 'boar' }, { value: 'gilt', label: T('gilt'), pressed: g.sex === 'gilt' }] });
+      body += UI.measure({ label: T('give.kg'), optional: T('optional'), value: g.kg, unit: 'kg', placeholder: '—', action: 'give-field', key: 'kg', active: g.field === 'kg', className: 'sp-give-measure' });
+      if (!br && g.sex === 'gilt') body += K.row({ id: '', headline: T('id.keep'), meta: T('give.keep.sub'), trail: 'tick', tick: { action: 'give-keep', value: 'keep', checked: g.keep, label: T('id.keep') } }).replace('class="tk-row"', 'class="tk-row sp-keep-row"');
+    }
+    // after the last piglet: the litter
+    if (allDone || br) body += givelitter(p);
+    // the recorded piglets, newest first; tap one to fix it
+    var rows = p.ids.slice().reverse().map(function (x) {
+      var id = [x.tag, x.notch].filter(Boolean).join(' · ');
+      return K.row({ id: id, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
+        meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), action: ended ? '' : 'give-fix', value: x.no, trail: ended ? '' : 'edit', still: ended });
+    });
+    body += K.list([K.group({ title: T('pg.ids'), face: 'word', meta: '· ' + idWhat(p), rows: rows.length ? rows : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>' })]);
+    if (br && !p.picked && !ended) body += UI.button({ label: T('id.done.pick', { n: P.breeders(p) }), register: 'secondary', action: 'pick-done', className: 'sp-wide' });
+    var ready = !giveUsed(p) && giveNo(p) && g.sex;
+    var primary = allDone ? { label: T('give.litter.save'), action: 'give-litter', register: 'primary', waiting: !(g.litterKg || (g.boar + g.gilt)) }
+      : { label: T(g.edit ? 'give.fix' : 'give.save'), action: 'give-save', register: 'primary', waiting: !ready };
+    var sub = T('give.sub', { pen: p.code, sow: p.sow, n: left });
+    return K.page({ title: T(br ? 'tr.id.breeders' : 'give.title'), description: g.edit ? T('give.fixing', { no: g.edit }) : sub, view: 'give', body: body,
+      footer: givePad() + K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : primary }) });
+  }
+  function givelitter(p) {
+    var g = V.give, every = P.idCount(p) >= p.alive && p.alive > 0;
+    var html = UI.heading({ title: T('give.litter'), meta: every ? T('give.all') : '', kind: 'section', level: 3 });
+    html += UI.measure({ label: T('idf.kg'), value: g.litterKg, unit: 'kg', placeholder: '—', action: 'give-field', key: 'litter', active: g.field === 'litter', className: 'sp-give-measure' });
+    if (every) {
+      var b = p.ids.filter(function (x) { return x.sex === 'boar'; }).length;
+      html += K.totals([{ label: T('idf.boars'), value: String(b) }, { label: T('idf.gilts'), value: String(p.ids.length - b) }], { columns: 2 });
+    } else {
+      html += stepper('boar', T('idf.boars'), g.boar) + stepper('gilt', T('idf.gilts'), g.gilt);
+    }
+    return '<section class="sp-give-litter">' + html + '</section>';
+  }
+  /* the litter weight from the Piglets tab: one Measure on the same Numpad */
   function weightSheet() {
-    var p = pen();
-    return K.drawer({ title: T('w.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'short', view: 'weight', close: null,
-      body: '<label class="field sp-idf-kg"><span>' + esc(T('w.kg')) + '</span><span class="sp-kg-box"><input id="sp-w-kg" inputmode="decimal" autocomplete="off" value="' + esc(V.weight.kg) + '"><small>kg</small></span></label>',
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'weight-save', register: 'primary', waiting: !(+V.weight.kg > 0) } }) });
+    var p = pen(), w = V.weight;
+    return K.drawer({ title: T('w.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'weight', close: null,
+      body: UI.measure({ label: T('w.kg'), value: w.kg, unit: 'kg', placeholder: '—', active: true, action: 'noop', key: 'w', className: 'sp-give-measure' }),
+      footer: UI.numpad({ value: w.kg, unit: 'kg', action: 'pad', key: 'w', compact: true, decimals: 1, intLength: 3 }) +
+        K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) } }) });
   }
   /* ---- the pen log: born, deaths, moves, counts, treatments, IDs — the history, newest first ---- */
   function logPage() {
@@ -3417,7 +3490,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     if (o === 'count') html += countSheet();
     if (o === 'weight') html += weightSheet();
     if (o === 'move') html += movePage();
-    if (o === 'id') html += idPage();
+    if (o === 'give') html += givePage();
     if (o === 'log') html += logPage();
     if (V.end) html += endPage();
     var tmp = document.createElement('div'); tmp.innerHTML = html;
@@ -3466,6 +3539,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       var f = phone.querySelector(focusSel);
       if (f && f.focus) { f.focus({ preventScroll: true }); if (caret != null && f.setSelectionRange) try { f.setSelectionRange(caret, caret); } catch (e) { /* not a text input */ } }
     }
+    if (V.over === 'give' && V.give.field) { var m = phone.querySelector('[data-action="give-field"][data-value="' + V.give.field + '"]'); if (m && m.scrollIntoView) m.scrollIntoView({ block: 'nearest' }); }
     V.justTick = ''; V.justRec = [];
     renderDemo();
   }
@@ -3520,13 +3594,6 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     else if (V.pen) closePen();
   }
   function saved(key, args) { V.flash = { pen: V.pen, key: key, args: args, undo: true }; }
-  function idBlank(p) { return { kg: '', boar: p.sex ? p.sex.boar : 0, gilt: p.sex ? p.sex.gilt : 0, boar0: p.sex ? p.sex.boar : 0, gilt0: p.sex ? p.sex.gilt : 0, rows: [], tried: false }; }
-  function addRow(kind) {
-    var p = pen(), nx = nextNumbers(p), r = { tag: '', notch: '', sex: '', kg: '', keep: false };
-    if (kind === 'scan') r.tag = nx.tag;          // a scan reads the next tag in the box (demo)
-    if (kind === 'notch') r.notch = nx.notch;     // the notch picker offers this litter's next notch
-    V.idf.rows.push(r);
-  }
   function act(a, v, el) {
     var p = V.pen ? pen() : null;
     switch (a) {
@@ -3562,7 +3629,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
         if (V.over === 'death') V.death.c[v] = Math.max(0, V.death.c[v] + d);
         if (V.over === 'count') V.count.n = Math.max(0, V.count.n + d);
         if (V.over === 'move') V.move.n = Math.max(1, Math.min(p.alive, V.move.n + d));
-        if (V.over === 'id') V.idf[v] = Math.max(0, V.idf[v] + d);
+        if (V.over === 'give') V.give[v] = Math.max(0, V.give[v] + d);
         break;
       }
       case 'tool':
@@ -3573,19 +3640,36 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
         break;
       case 'count-open': V.over = 'count'; V.count = { n: p.alive }; break;
       case 'weight-open': V.over = 'weight'; V.weight = { kg: '' }; break;
-      case 'weight-save': P.setWeight(p.code, V.weight.kg); V.over = null; saved('log.weight', { w: V.weight.kg }); break;
+      case 'weight-save': P.setWeight(p.code, UI.numpadCommit(V.weight.kg, { decimals: 1 })); V.over = null; saved('log.weight', { w: UI.numpadCommit(V.weight.kg, { decimals: 1 }) }); break;
       case 'log-open': V.over = 'log'; V.pageTop = true; break;
-      case 'id-open': V.over = 'id'; V.idf = idBlank(p); V.pageTop = true; break;
-      case 'id-add':
-        if (V.over !== 'id') { V.over = 'id'; V.idf = idBlank(p); V.pageTop = true; }
-        addRow(v);
+      case 'id-open': V.over = 'give'; V.give = giveBlank(p); V.pageTop = true; break;
+      case 'give-field': V.give.field = V.give.field === v ? '' : v; break;
+      case 'pad': padKey(v, el.getAttribute('data-key')); break;
+      case 'give-scan': {   // a scan reads the tag in the ear (the demo reads the next one on the strip): it replaces what is there
+        var sc = UI.numpadScan(V.give.id, V.give.id.suggestion, { maxLength: 6 }); V.give.id = { value: sc.value, suggested: false, suggestion: sc.suggestion }; V.give.field = '';
         break;
-      case 'id-del': V.idf.rows.splice(+v, 1); break;
-      case 'id-submit': {
-        var f = V.idf, bad = f.rows.some(function (r) { return !rowOk(r) && !rowEmpty(r); });
-        if (bad) { f.tried = true; break; }
-        var n = P.identifyForm(p.code, { kg: f.kg, boar: f.boar !== f.boar0 || f.gilt !== f.gilt0 ? f.boar : null, gilt: f.gilt, rows: f.rows.filter(rowOk) });
-        V.over = null; V.tab = 'pig'; saved('idf.saved', { n: n });
+      }
+      case 'give-sex': V.give.sex = v; if (v === 'boar' && scheme() !== 'breeders') V.give.keep = false; break;
+      case 'give-keep': V.give.keep = !!el.checked; break;
+      case 'give-save': {
+        var g = V.give, no = giveNo(p), pig = { tag: notch() ? '' : no, notch: notch() ? no : '', sex: g.sex, kg: UI.numpadCommit(g.kg, { decimals: 1 }), keep: g.sex === 'gilt' && g.keep };
+        if (g.edit) { P.fixPig(p.code, g.edit, pig); V.give = giveBlank(p); }
+        else { var x = P.givePig(p.code, pig); V.give = giveBlank(p, x); }
+        V.pageTop = true;   // the next piglet's tag readout is back at the top
+        break;
+      }
+      case 'give-undo': P.removePig(p.code, V.give.last.no); V.give = giveBlank(p); V.pageTop = true; break;
+      case 'give-fix': {
+        var y = p.ids.filter(function (z) { return z.no === v; })[0]; if (!y) break;
+        var idv = notch() ? String(y.notch).split('-')[1] : y.tag;
+        V.give = Object.assign(giveBlank(p), { id: { value: idv, suggested: false, suggestion: idv }, sex: y.sex, kg: y.kg == null ? '' : String(y.kg), keep: y.keep, edit: y.no });
+        V.pageTop = true;
+        break;
+      }
+      case 'give-litter': {
+        var gl = V.give, every = P.idCount(p) >= p.alive;
+        P.setLitter(p.code, { kg: UI.numpadCommit(gl.litterKg, { decimals: 1 }), boar: every ? null : gl.boar, gilt: gl.gilt });
+        V.over = null; V.tab = 'pig'; saved('give.litter.saved');
         break;
       }
       case 'death-save': {
@@ -3623,19 +3707,19 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   });
   // the chips are one radio group: arrow keys, Home and End move the choice
   UI.radioBind(phone, { onChange: function (field, value) { if (field === 'chips') act('chip', value); } });
-  // typing in the ID form and the weight sheet
-  phone.addEventListener('input', function (e) {
-    var t = e.target, num = function (s) { return s.replace(',', '.').replace(/[^0-9.]/g, ''); };
-    if (t.id === 'sp-w-kg') { V.weight.kg = num(t.value); render(); return; }
-    if (!V.idf) return;
-    if (t.id === 'sp-idf-kg') { V.idf.kg = num(t.value); render(); return; }
-    var i = t.getAttribute('data-row'), f = t.getAttribute('data-f');
-    if (i == null) return;
-    var r = V.idf.rows[+i];
-    if (f === 'keep') r.keep = t.checked; else if (f === 'kg') r.kg = num(t.value); else r[f] = t.value.trim();
-    render();
+  /* The Numpad's keys (and a hardware keyboard's digits) type into the open readout */
+  function padKey(field, k) {
+    var g = V.give;
+    if (field === 'w') { V.weight.kg = UI.numpadInput({ value: V.weight.kg }, k, { decimals: 1, intLength: 3 }).value; return; }
+    if (field === 'id') { var r = UI.numpadInput(g.id, k, PADS.id()); g.id = { value: r.value, suggested: r.suggested, suggestion: r.suggestion }; return; }
+    if (field === 'kg') g.kg = UI.numpadInput({ value: g.kg }, k, PADS.kg()).value;
+    if (field === 'litter') g.litterKg = UI.numpadInput({ value: g.litterKg }, k, PADS.litter()).value;
+  }
+  document.addEventListener('keydown', function (e) {
+    var k = UI.numpadKey(e), f = V.over === 'give' ? V.give.field : V.over === 'weight' ? 'w' : '';
+    if (!k || k === 'enter' || !f) return;
+    e.preventDefault(); padKey(f, k); render();
   });
-  phone.addEventListener('change', function (e) { if (e.target.tagName === 'SELECT' && V.idf) { var r = V.idf.rows[+e.target.getAttribute('data-row')]; r.sex = e.target.value; render(); } });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && (V.pen || V.end)) { closeTop(); render(); }
   });

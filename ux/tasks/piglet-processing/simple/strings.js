@@ -2,6 +2,9 @@
 (function (root) {
   'use strict';
   var EN = {
+    'give.title': 'Give IDs', 'give.tag': 'Tag', 'give.notch': 'Ear notch', 'give.kg': 'Weight', 'give.use': 'Use {no} · or scan', 'give.use.n': 'Use {no}', 'give.keep.sub': 'This gilt stays as a breeder',
+    'give.save': 'Record · next piglet', 'give.fix': 'Save change', 'give.fixing': 'Fixing {no}', 'give.sub': '{pen} · sow {sow} · {n} without ID', 'give.last': 'Last {no} · {sex}{kg}',
+    'give.litter': 'Litter', 'give.all': 'Every piglet has an ID', 'give.litter.save': 'Save litter', 'give.litter.saved': 'Litter saved', 'pg.give.sub': '{n} without ID',
     'st.in': '{tr} in {n} days', 'st.in.1': '{tr} tomorrow', 'sows.one': '· 1 sow', 'pen.aria': 'Pen {pen}', 'sheet.pen': '{pen} · parity {p}', 'day.done.s': 'Done',
     'st.todo': 'To do', 'st.next': 'Next in {n} days', 'st.next.1': 'Next tomorrow', 'st.done': 'All done', 'sow': 'Sow {tag}',
     'sheet.sow': 'Sow {tag} · parity {p}', 'tab.proc': 'Processing', 'tab.pig': 'Piglets', 'tabs.label': 'Pen views',
@@ -103,6 +106,9 @@
     'yesterday': 'yesterday'
   };
   var ZH = {
+    'give.title': '给仔猪编号', 'give.tag': '耳标号', 'give.notch': '耳缺号', 'give.kg': '体重', 'give.use': '用{no} · 或扫描', 'give.use.n': '用{no}', 'give.keep.sub': '这头母猪留作种猪',
+    'give.save': '记录 · 下一头', 'give.fix': '保存修改', 'give.fixing': '正在修改{no}', 'give.sub': '{pen} · 母猪{sow} · {n}头没编号', 'give.last': '刚记录 {no} · {sex}{kg}',
+    'give.litter': '整窝', 'give.all': '每头都有编号', 'give.litter.save': '保存整窝', 'give.litter.saved': '整窝已保存', 'pg.give.sub': '{n}头没编号',
     'st.in': '{n}天后{tr}', 'st.in.1': '明天{tr}', 'sows.one': '· 1头母猪', 'pen.aria': '{pen}栏', 'sheet.pen': '{pen} · {p}胎', 'day.done.s': '已完成',
     'st.todo': '需处理', 'st.next': '下次处理：{n}天后', 'st.next.1': '下次处理：明天', 'st.done': '已完成所有处理', 'sow': '母猪 {tag}',
     'sheet.sow': '母猪 {tag} · {p}胎', 'tab.proc': '仔猪处理', 'tab.pig': '仔猪信息', 'tabs.label': '栏位页面',

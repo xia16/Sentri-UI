@@ -5,7 +5,7 @@
    for breeding), or 'none' (fatteners raised as a batch: no ID step at all). */
 (function (root) {
   'use strict';
-  var KEY = 'pp-simple-v4';
+  var KEY = 'pp-simple-v5';
   var ME = 'G. Hansen', OTHER = 'L. Madsen';
   var PLAN = [
     { key: 'iron', from: 2, to: 4 },
@@ -16,7 +16,8 @@
   var ID = { key: 'id', from: 3, to: 7 };   // the farm's ID day: day 3, until day 7
   var SCHEMES = ['tag', 'notch', 'breeders', 'none'];
   var BATCH = { name: '40', firstDay: 1, lastDay: 6 };   // the batch farrowed over these pen ages
-  var FIRST_TAG = 4201;
+  var FIRST_TAG = 1201;   // tags come on pre-printed strips of six-digit numbers: 001201, 001202, …
+  var tag6 = function (n) { return ('000000' + n).slice(-6); };
 
   function todayAt(h, m) { var d = new Date(); d.setHours(h, m, 0, 0); return d.getTime(); }
   function daysAgoAt(n, h, m) { return todayAt(h, m) - n * 864e5; }
@@ -45,7 +46,7 @@
       var p = pens[code];
       for (var i = 0; i < count; i++) {
         var keep = breeders.indexOf(i) >= 0;
-        var no = scheme === 'notch' ? p.litter + '-' + (p.ids.length + 1) : String(tagNo++);
+        var no = scheme === 'notch' ? p.litter + '-' + (p.ids.length + 1) : tag6(tagNo++);
         var at = daysAgoAt(ago, h, m + i);
         p.ids.push({ no: no, tag: scheme === 'notch' ? '' : no, notch: scheme === 'notch' ? no : '', sex: i % 2 ? 'boar' : 'gilt', kg: i === 0 ? 1.6 : null, keep: keep, at: at, who: who || ME });
         records.push({ id: 'r' + (++seq), pen: code, tr: 'id', n: 1, no: no, at: at, day: p.age - ago, who: who || ME, mark: '' });
@@ -134,7 +135,7 @@
     }
     var max = FIRST_TAG - 1;
     Object.keys(S.pens).forEach(function (c) { S.pens[c].ids.forEach(function (x) { if (x.tag && +x.tag > max) max = +x.tag; }); });
-    return String(max + 1);
+    return tag6(max + 1);
   }
   function taken(no) {
     return Object.keys(S.pens).some(function (c) { return S.pens[c].ids.some(function (x) { return x.tag === String(no) || x.notch === String(no); }); });
@@ -227,6 +228,44 @@
       return x;
     });
   }
+  /* Give IDs, one piglet at a time: { tag, notch, sex, kg, keep } is saved at once (nothing waits for a submit) */
+  function givePig(code, pig) {
+    return change('id', function () {
+      var p = S.pens[code], st = status(p, 'id');
+      var x = { no: pig.tag || pig.notch, tag: pig.tag || '', notch: pig.notch || '', sex: pig.sex, kg: pig.kg == null || pig.kg === '' ? null : +pig.kg,
+        keep: S.scheme === 'breeders' ? true : !!pig.keep, at: Date.now(), who: ME };
+      p.ids.push(x);
+      S.records.push({ id: 'r' + (++S.seq), pen: code, tr: 'id', n: 1, no: x.no, at: x.at, day: p.age, who: ME, mark: st === 'late' ? 'late' : '' });
+      return x;
+    });
+  }
+  /* Fix one piglet's record (tap its row): the record is replaced, stamped again */
+  function fixPig(code, no, pig) {
+    return change('id-fix', function () {
+      var p = S.pens[code], x = p.ids.filter(function (y) { return y.no === no; })[0];
+      if (!x) return null;
+      x.tag = pig.tag || ''; x.notch = pig.notch || ''; x.no = x.tag || x.notch; x.sex = pig.sex;
+      x.kg = pig.kg == null || pig.kg === '' ? null : +pig.kg; x.keep = S.scheme === 'breeders' ? true : !!pig.keep; x.at = Date.now(); x.who = ME;
+      S.records.forEach(function (r) { if (r.pen === code && r.tr === 'id' && r.no === no) r.no = x.no; });
+      return x;
+    });
+  }
+  /* Take back one piglet's ID (the "Last … · Undo" line) */
+  function removePig(code, no) {
+    var p = S.pens[code];
+    p.ids = p.ids.filter(function (y) { return y.no !== no; });
+    S.records = S.records.filter(function (r) { return !(r.pen === code && r.tr === 'id' && r.no === no); });
+    S.undo = null; save();
+  }
+  /* The litter, after the last piglet: its total weight, and boar / gilt counts when some piglets have no ID */
+  function setLitter(code, litter) {
+    return change('litter', function () {
+      var p = S.pens[code];
+      if (litter.kg != null && litter.kg !== '') p.weights.push({ kg: +litter.kg, day: p.age, at: Date.now() });
+      if (litter.boar != null) p.sex = { boar: litter.boar, gilt: litter.gilt };
+      return true;
+    });
+  }
   /* Breeders-only farm: the worker says this litter's breeders are all picked */
   function donePicking(code) {
     return change('pick', function () {
@@ -312,7 +351,7 @@
     get s() { return S; },
     hasId: hasId, steps: steps, plan: plan, need: need, idCount: idCount, breeders: breeders, recs: recs, status: status, todo: todo, coming: coming,
     pens: pens, last: last, bulkPlace: bulkPlace, sameBatch: sameBatch, nextNo: nextNo, taken: taken,
-    treat: treat, submit: submit, identifyForm: identifyForm, setWeight: setWeight, unrecord: unrecord, identify: identify, donePicking: donePicking, death: death, move: move, setCount: setCount, end: end, undo: undo,
+    treat: treat, submit: submit, givePig: givePig, fixPig: fixPig, removePig: removePig, setLitter: setLitter, identifyForm: identifyForm, setWeight: setWeight, unrecord: unrecord, identify: identify, donePicking: donePicking, death: death, move: move, setCount: setCount, end: end, undo: undo,
     otherPhone: otherPhone, seeNote: seeNote, reset: reset, setScheme: setScheme
   };
 })(globalThis);
