@@ -2,6 +2,9 @@
 (function (root) {
   'use strict';
   var EN = {
+    'pc.title': 'Piglets', 'pc.log': 'View log', 'pc.nowv': '{n} · day {d}', 'pc.tagged': 'Tagged', 'pc.notched': 'Notched', 'pc.of': '{n} of {m}',
+    'cnt.title': 'Boars and gilts', 'flash.counts': 'Boars {b} · gilts {g}', 'mark.on': 'Keep {no} for breeding', 'mark.off': '{no} is kept for breeding: tap to unmark',
+    'tagged.hint': 'Tap the flag to keep a piglet for breeding.', 'log.breeder': 'Breeder {no}', 'log.notbreeder': 'Not a breeder · {no}',
     'give.title': 'Give IDs', 'give.tag': 'Tag', 'give.notch': 'Ear notch', 'give.kg': 'Weight', 'give.use': 'Use {no} · or scan', 'give.use.n': 'Use {no}', 'give.keep.sub': 'This gilt stays as a breeder',
     'give.save': 'Record · next piglet', 'give.fix': 'Save change', 'give.fixing': 'Fixing {no}', 'give.sub': '{pen} · sow {sow} · {n} without ID', 'give.last': 'Last {no} · {sex}{kg}',
     'give.litter': 'Litter', 'give.all': 'Every piglet has an ID', 'give.litter.save': 'Save litter', 'give.litter.saved': 'Litter saved', 'pg.give.sub': '{n} without ID',
@@ -106,6 +109,9 @@
     'yesterday': 'yesterday'
   };
   var ZH = {
+    'pc.title': '仔猪', 'pc.log': '查看记录', 'pc.nowv': '{n}头 · 第{d}天', 'pc.tagged': '已打耳标', 'pc.notched': '已剪耳缺', 'pc.of': '{n}/{m}',
+    'cnt.title': '公母头数', 'flash.counts': '公猪{b} · 母猪{g}', 'mark.on': '把{no}留作种猪', 'mark.off': '{no}已留种，再点取消',
+    'tagged.hint': '点旗子把仔猪留作种猪。', 'log.breeder': '留种 {no}', 'log.notbreeder': '取消留种 · {no}',
     'give.title': '给仔猪编号', 'give.tag': '耳标号', 'give.notch': '耳缺号', 'give.kg': '体重', 'give.use': '用{no} · 或扫描', 'give.use.n': '用{no}', 'give.keep.sub': '这头母猪留作种猪',
     'give.save': '记录 · 下一头', 'give.fix': '保存修改', 'give.fixing': '正在修改{no}', 'give.sub': '{pen} · 母猪{sow} · {n}头没编号', 'give.last': '刚记录 {no} · {sex}{kg}',
     'give.litter': '整窝', 'give.all': '每头都有编号', 'give.litter.save': '保存整窝', 'give.litter.saved': '整窝已保存', 'pg.give.sub': '{n}头没编号',

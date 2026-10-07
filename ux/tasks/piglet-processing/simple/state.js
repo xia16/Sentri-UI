@@ -250,6 +250,14 @@
       return x;
     });
   }
+  /* Mark or unmark one identified piglet as a breeder (the mark on the identified piglets list) */
+  function toggleBreeder(code, no) {
+    return change('breeder', function () {
+      var x = S.pens[code].ids.filter(function (y) { return y.no === no; })[0];
+      if (x) { x.keep = !x.keep; S.records.push({ id: 'r' + (++S.seq), pen: code, tr: 'breeder', n: x.keep ? 1 : 0, no: no, at: Date.now(), day: S.pens[code].age, who: ME, mark: '' }); }
+      return x;
+    });
+  }
   /* Take back one piglet's ID (the "Last … · Undo" line) */
   function removePig(code, no) {
     var p = S.pens[code];
@@ -351,7 +359,7 @@
     get s() { return S; },
     hasId: hasId, steps: steps, plan: plan, need: need, idCount: idCount, breeders: breeders, recs: recs, status: status, todo: todo, coming: coming,
     pens: pens, last: last, bulkPlace: bulkPlace, sameBatch: sameBatch, nextNo: nextNo, taken: taken,
-    treat: treat, submit: submit, givePig: givePig, fixPig: fixPig, removePig: removePig, setLitter: setLitter, identifyForm: identifyForm, setWeight: setWeight, unrecord: unrecord, identify: identify, donePicking: donePicking, death: death, move: move, setCount: setCount, end: end, undo: undo,
+    treat: treat, submit: submit, toggleBreeder: toggleBreeder, givePig: givePig, fixPig: fixPig, removePig: removePig, setLitter: setLitter, identifyForm: identifyForm, setWeight: setWeight, unrecord: unrecord, identify: identify, donePicking: donePicking, death: death, move: move, setCount: setCount, end: end, undo: undo,
     otherPhone: otherPhone, seeNote: seeNote, reset: reset, setScheme: setScheme
   };
 })(globalThis);

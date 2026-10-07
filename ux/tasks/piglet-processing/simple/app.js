@@ -213,47 +213,80 @@
     }).join('');
   }
   /* Piglets: what is in the pen now, then the identified piglets. Born and deaths are history: they live in the pen log. */
-  function piglets(p) {
-    var w = lastWeight(p), items = [
-      { label: T('pg.now'), value: pigs(p.alive), action: P.s.ended ? '' : 'count-open' },
-      { label: T('pg.age'), value: T('pg.agev', { d: p.age }) }];
-    if (p.sex) items.push({ label: T('pg.sex'), value: T('pg.sexv', { b: p.sex.boar, g: p.sex.gilt }) });
-    if (P.hasId() && p.ids.length) items.push({ label: T('pg.ident'), value: idWhat(p) });
-    if (P.hasId() && P.breeders(p)) items.push({ label: T('pg.breeders'), value: String(P.breeders(p)) });
-    items.push({ label: T('pg.weight'), value: w ? T('pg.weightv', { w: w.kg, d: w.day }) : T('pg.noweight'), action: P.s.ended ? '' : 'weight-open' });
-    var body = K.section({ title: T('pg.summary'), rows: true, items: items });
-    if (!w) body += '<p class="sp-warn">' + esc(T('pg.weight.hint')) + '</p>';
+  /* The Piglets card: farrowing's "Litter summary · View log ›" — a section heading with its link, then the facts. Each
+     figure acts on itself: piglets now → Set count; boars · gilts → the counts; litter weight → the weight pad; tagged
+     and breeders → the identified piglets (where breeders are marked). */
+  function factBtn(action, value, empty) {
+    return '<button type="button" class="sp-fact-act" data-action="' + action + '" data-value=""' + (P.s.ended ? ' aria-disabled="true"' : '') + '>' +
+      '<span' + (empty ? ' data-empty=""' : '') + '>' + esc(value) + '</span>' + I('chevron') + '</button>';
+  }
+  function pigletsCard(p) {
+    var w = lastWeight(p), every = P.hasId() && scheme() !== 'breeders' && P.idCount(p) >= p.alive && p.alive > 0;
+    var sex = every ? { boar: p.ids.filter(function (x) { return x.sex === 'boar'; }).length, gilt: p.ids.filter(function (x) { return x.sex === 'gilt'; }).length } : p.sex;
+    var items = [
+      { label: T('pg.now'), valueHtml: factBtn('count-open', T('pc.nowv', { n: p.alive, d: p.age })) },
+      { label: T('pg.sex'), valueHtml: factBtn('counts-open', sex ? T('pg.sexv', { b: sex.boar, g: sex.gilt }) : '—', !sex) },
+      { label: T('pg.weight'), valueHtml: factBtn('weight-open', w ? T('pg.weightv', { w: w.kg, d: w.day }) : '—', !w) }];
     if (P.hasId()) {
-      var rows = p.ids.slice().reverse().map(function (x) {
-        var id = [x.tag, x.notch].filter(Boolean).join(' · ');
-        return K.row({ id: id, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
-          meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), still: true, trail: '' });
-      });
-      body += K.list([K.group({ title: T('pg.ids'), face: 'word', meta: '· ' + idWhat(p), rows: rows.length ? rows : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>' })]);
-      if (!P.s.ended) body += K.doors({ items: [{ title: T(scheme() === 'breeders' ? 'tr.id.breeders' : 'give.title'), description: scheme() === 'breeders' ? T('id.picked', { n: P.breeders(p) }) : T('pg.give.sub', { n: Math.max(0, p.alive - P.idCount(p)) }), action: 'id-open' }] });
+      items.push({ label: T(scheme() === 'notch' ? 'pc.notched' : 'pc.tagged'), valueHtml: factBtn('tagged-open', T('pc.of', { n: P.idCount(p), m: p.alive })) });
+      items.push({ label: T('pg.breeders'), valueHtml: factBtn('tagged-open', String(P.breeders(p))) });
     }
-    body += K.doors({ items: [{ title: T('pg.log'), description: T('pg.log.sub'), action: 'log-open' }] });
-    return body;
+    var log = '<button type="button" data-action="log-open" data-value="">' + esc(T('pc.log')) + I('chevron') + '</button>';
+    return '<section class="sp-pcard">' + UI.heading({ title: T('pc.title'), kind: 'section', level: 3, icon: I('record'), action: log }) +
+      UI.facts(items, { columns: 3, className: 'sp-pfacts' }) + (w ? '' : '<p class="sp-warn">' + esc(T('pg.weight.hint')) + '</p>') + '</section>';
+  }
+  /* The tool row, as farrowing's (Edit · Record death · More actions): Tag piglets (per farm scheme; none on a no-ID farm) ·
+     Record death · More */
+  function toolRow() {
+    var tools = [];
+    if (P.hasId()) tools.push(['id-open', 'scan', T('tr.id.' + scheme())]);
+    tools.push(['tool-death', 'alert', T('tool.death')], ['more', 'more', T('more.title')]);
+    return '<div class="sp-toolrow" data-count="' + tools.length + '">' + tools.map(function (x) {
+      return '<button type="button" class="sp-tool" data-action="' + x[0] + '" data-value="">' + I(x[1]) + '<span>' + esc(x[2]) + '</span></button>';
+    }).join('') + '</div>';
   }
   function penSheet(inert) {
     var p = pen(), ended = !!P.s.ended, body = '';
-    body += UI.segment({ options: [['proc', esc(T('tab.proc'))], ['pig', esc(T('tab.pig'))]], active: V.tab, action: 'tab', ariaLabel: T('tabs.label'), className: 'sp-tabs' });
     if (V.flash && V.flash.pen === p.code) body += flashLine();
     if (ended) body += K.warning({ tone: 'amber', text: T('ended.note') });
-    body += V.tab === 'pig' ? piglets(p) : processing(p);
+    body += pigletsCard(p);
+    if (!ended) body += toolRow();
+    body += processing(p);
     var n = Object.keys(V.draft).length;
     var more = UI.iconButton({ action: 'more', icon: I('more'), label: T('more.title'), className: 'sp-more' });
-    var main = V.tab === 'pig' || ended ? UI.button({ label: T('back'), register: 'secondary', action: 'back' })
+    var main = ended ? UI.button({ label: T('back'), register: 'secondary', action: 'back' })
       : UI.button({ label: T('submit.n', { n: n }), register: 'primary', action: 'submit', waiting: !n });
     var sub = [T('sheet.pen', { pen: p.code, p: p.parity }), SEP, T('piglets', { n: p.alive }), SEP, T('day.n', { d: p.age })];
     return K.drawer({ title: p.sow, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back', label: T('back') },
       body: body, footer: '<div class="tk-footer" data-ds="TaskFooter">' + (ended ? '' : more) + main + '</div>' });
   }
+  /* ---- boars · gilts: two steppers ---- */
+  function countsSheet() {
+    var p = pen(), c = V.counts;
+    return K.drawer({ title: T('cnt.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'counts', close: null,
+      body: stepper('boar', T('idf.boars'), c.boar) + stepper('gilt', T('idf.gilts'), c.gilt),
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'counts-save', register: 'primary' } }) });
+  }
+  /* ---- the identified piglets: one row each, a breeder mark (44px) at its end: tap to keep for breeding, again to unmark ---- */
+  function taggedPage() {
+    var p = pen(), ended = !!P.s.ended;
+    var rows = p.ids.slice().reverse().map(function (x) {
+      var id = [x.tag, x.notch].filter(Boolean).join(' · ');
+      var mark = UI.iconButton({ action: ended ? 'noop' : 'breeder', value: x.no, icon: I('bookmark'), label: T(x.keep ? 'mark.off' : 'mark.on', { no: x.no }), className: 'sp-mark' })
+        .replace('class="icon-button', 'aria-pressed="' + !!x.keep + '" class="icon-button');
+      return K.row({ id: id, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
+        meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), still: true, trail: '' }).replace(/<\/div>$/, mark + '</div>');
+    });
+    var body = (P.hasId() && !ended && p.ids.length ? '<p class="sp-quiet">' + esc(T('tagged.hint')) + '</p>' : '') +
+      K.list([K.group({ title: T('pg.ids'), face: 'word', meta: '· ' + idWhat(p) + ' · ' + T('breeders.n', { n: P.breeders(p) }), rows: rows.length ? rows : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>' })]);
+    return K.page({ title: T('pg.ids'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'tagged', body: body,
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('tr.id.' + scheme()), action: 'id-open', register: 'secondary' } }) });
+  }
 
   /* ---- More: Move piglets · Record death · Set count ---- */
   function moreSheet() {
     return K.drawer({ title: T('more.title'), size: 'medium', view: 'more', close: null,
-      body: K.doors({ card: true, items: [{ title: T('move.title'), icon: 'transfer', action: 'tool', value: 'move' }, { title: T('tool.death'), icon: 'alert', action: 'tool', value: 'death' }, { title: T('tool.count'), icon: 'edit', action: 'tool', value: 'count' }] }),
+      body: K.doors({ card: true, items: [{ title: T('move.title'), icon: 'transfer', action: 'tool', value: 'move' }, { title: T('tool.count'), icon: 'edit', action: 'tool', value: 'count' }] }),
       footer: K.footer({ back: { action: 'back', label: T('back') } }) });
   }
   /* ---- fewer piglets for one ticked item: a stepper; a shortfall asks one reason ---- */
@@ -307,7 +340,6 @@
         (notch() ? '' : UI.iconButton({ action: 'give-scan', icon: I('scan'), label: T('pg.scan'), className: 'sp-give-scan' })) + '</div>';
       body += K.choice({ action: 'give-sex', label: T('id.sex'), options: [{ value: 'boar', label: T('boar'), pressed: g.sex === 'boar' }, { value: 'gilt', label: T('gilt'), pressed: g.sex === 'gilt' }] });
       body += UI.measure({ label: T('give.kg'), optional: T('optional'), value: g.kg, unit: 'kg', placeholder: '—', action: 'give-field', key: 'kg', active: g.field === 'kg', className: 'sp-give-measure' });
-      if (!br && g.sex === 'gilt') body += K.row({ id: '', headline: T('id.keep'), meta: T('give.keep.sub'), trail: 'tick', tick: { action: 'give-keep', value: 'keep', checked: g.keep, label: T('id.keep') } }).replace('class="tk-row"', 'class="tk-row sp-keep-row"');
     }
     // after the last piglet: the litter
     if (allDone || br) body += givelitter(p);
@@ -352,7 +384,7 @@
     var add = function (day, at, title, meta) { (byDay[day] = byDay[day] || []).push({ at: at, title: title, meta: meta }); };
     P.recs(p.code).forEach(function (r) {
       var what = r.tr === 'death' ? T('log.death', { n: r.n }) : r.tr === 'move' ? T('log.move', { n: pigs(r.n), to: r.to }) : r.tr === 'count' ? T('log.count', { n: r.n })
-        : r.tr === 'id' ? T('log.id', { no: r.no }) : r.tr === 'pick' ? T('log.pick') : T('log.treat', { tr: tr(r.tr), n: pigs(r.n) });
+        : r.tr === 'id' ? T('log.id', { no: r.no }) : r.tr === 'pick' ? T('log.pick') : r.tr === 'breeder' ? T(r.n ? 'log.breeder' : 'log.notbreeder', { no: r.no }) : T('log.treat', { tr: tr(r.tr), n: pigs(r.n) });
       add(r.day, r.at, what, short(r.who) + ' · ' + when(r));
     });
     p.weights.forEach(function (w, i) { add(w.day, w.at || i, T('log.weight', { w: w.kg }), ''); });
@@ -448,6 +480,8 @@
     if (o === 'weight') html += weightSheet();
     if (o === 'move') html += movePage();
     if (o === 'give') html += givePage();
+    if (o === 'counts') html += countsSheet();
+    if (o === 'tagged') html += taggedPage();
     if (o === 'log') html += logPage();
     if (V.end) html += endPage();
     var tmp = document.createElement('div'); tmp.innerHTML = html;
@@ -556,7 +590,6 @@
     switch (a) {
       case 'chip': if (v === V.chip) return; V.chip = v; break;
       case 'pen': V.pen = v; V.flash = null; V.open = {}; V.draft = {}; V.tab = 'proc'; break;
-      case 'tab': V.tab = v; V.pageTop = true; break;
       case 'dismiss': case 'back': closeTop(); break;
       case 'noop': return;
       case 'end': V.end = true; break;
@@ -587,6 +620,7 @@
         if (V.over === 'count') V.count.n = Math.max(0, V.count.n + d);
         if (V.over === 'move') V.move.n = Math.max(1, Math.min(p.alive, V.move.n + d));
         if (V.over === 'give') V.give[v] = Math.max(0, V.give[v] + d);
+        if (V.over === 'counts') V.counts[v] = Math.max(0, V.counts[v] + d);
         break;
       }
       case 'tool':
@@ -599,6 +633,11 @@
       case 'weight-open': V.over = 'weight'; V.weight = { kg: '' }; break;
       case 'weight-save': P.setWeight(p.code, UI.numpadCommit(V.weight.kg, { decimals: 1 })); V.over = null; saved('log.weight', { w: UI.numpadCommit(V.weight.kg, { decimals: 1 }) }); break;
       case 'log-open': V.over = 'log'; V.pageTop = true; break;
+      case 'tool-death': V.over = 'death'; V.death = { c: { crushed: 0, scours: 0, starve: 0, other: 0 } }; break;
+      case 'counts-open': { var sx = p.sex || { boar: 0, gilt: 0 }; if (P.hasId() && scheme() !== 'breeders' && P.idCount(p) >= p.alive) sx = { boar: p.ids.filter(function (x) { return x.sex === 'boar'; }).length, gilt: p.ids.filter(function (x) { return x.sex === 'gilt'; }).length }; V.over = 'counts'; V.counts = { boar: sx.boar, gilt: sx.gilt }; break; }
+      case 'counts-save': P.setLitter(p.code, { boar: V.counts.boar, gilt: V.counts.gilt }); V.over = null; saved('flash.counts', { b: V.counts.boar, g: V.counts.gilt }); break;
+      case 'tagged-open': V.over = 'tagged'; V.pageTop = true; break;
+      case 'breeder': P.toggleBreeder(p.code, v); break;
       case 'id-open': V.over = 'give'; V.give = giveBlank(p); V.pageTop = true; break;
       case 'give-field': V.give.field = V.give.field === v ? '' : v; break;
       case 'pad': padKey(v, el.getAttribute('data-key')); break;
@@ -609,7 +648,7 @@
       case 'give-sex': V.give.sex = v; if (v === 'boar' && scheme() !== 'breeders') V.give.keep = false; break;
       case 'give-keep': V.give.keep = !!el.checked; break;
       case 'give-save': {
-        var g = V.give, no = giveNo(p), pig = { tag: notch() ? '' : no, notch: notch() ? no : '', sex: g.sex, kg: UI.numpadCommit(g.kg, { decimals: 1 }), keep: g.sex === 'gilt' && g.keep };
+        var g = V.give, no = giveNo(p), pig = { tag: notch() ? '' : no, notch: notch() ? no : '', sex: g.sex, kg: UI.numpadCommit(g.kg, { decimals: 1 }), keep: g.edit ? (p.ids.filter(function (z) { return z.no === g.edit; })[0] || {}).keep : false };
         if (g.edit) { P.fixPig(p.code, g.edit, pig); V.give = giveBlank(p); }
         else { var x = P.givePig(p.code, pig); V.give = giveBlank(p, x); }
         V.pageTop = true;   // the next piglet's tag readout is back at the top
@@ -626,7 +665,7 @@
       case 'give-litter': {
         var gl = V.give, every = P.idCount(p) >= p.alive;
         P.setLitter(p.code, { kg: UI.numpadCommit(gl.litterKg, { decimals: 1 }), boar: every ? null : gl.boar, gilt: gl.gilt });
-        V.over = null; V.tab = 'pig'; saved('give.litter.saved');
+        V.over = null; saved('give.litter.saved');
         break;
       }
       case 'death-save': {
