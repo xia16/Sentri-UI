@@ -566,3 +566,9 @@ investigation and not yet ruled.
 - **Set count just adjusts the pen's record to what is there now.** No "1 missing" on the pen, no reason question, no follow-up "one of the missing?". The piglet is assumed gone for whatever reason. The difference is kept only in the overall checker (batch / task level: "N piglets unaccounted"), not as a pen status.
 - **No nurse sows outside the task.** All pigs follow the batch → task structure; Move only offers pens in the task (and batch).
 - **Bulk = chips.** Tap a job chip (e.g. Iron): every pen that needs it is listed; the worker taps through the pens as they treat them, then "Finish iron treatment" saves them together. Time-window override stays (round 8).
+
+### Round 10 (owner, 2026-10-07, per-piglet work and breeders — direction only)
+
+- **Per-piglet work (ID by tag/notch, weighing, sex, breeder selection) may be universal features, not owned by the piglet-processing task** — usable from any task or inspection, wherever a pig is in hand. To be researched against how farms work and how other inspection tasks in the product handle per-animal properties; a proposal comes before any decision.
+- **Breeder ranking: placeholder UI only.** The ranking algorithm is out of scope for design.
+- **Moved piglets:** a piglet identified before it moved keeps its known mother; untagged piglets moved in are "mother unknown" and left out of mother-based suggestions; the pen warns "has N piglets from other pens · suggestions may be off".
