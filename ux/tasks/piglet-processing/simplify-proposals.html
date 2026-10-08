@@ -1,0 +1,266 @@
+<title>Piglet Processing Simplified</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; each decision is a block with Today | Proposed flows side by side, collapsing to one column on phones. */
+:root{
+  --ground:#f4f5ef; --paper:#ffffff; --ink:#1f2a1d; --muted:#5f6b5a; --line:#d9ded2;
+  --green:#3f6b3a; --green-wash:#e7efe2; --amber:#8a5a12; --amber-wash:#fbf1dc; --red:#9a3b2c;
+  --sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#151a14; --paper:#1d241b; --ink:#e7ecdf; --muted:#a3ae9c; --line:#344031;
+  --green:#8fc184; --green-wash:#22331f; --amber:#e3b469; --amber-wash:#352a16; --red:#e58b79; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ground:#151a14; --paper:#1d241b; --ink:#e7ecdf; --muted:#a3ae9c; --line:#344031;
+  --green:#8fc184; --green-wash:#22331f; --amber:#e3b469; --amber-wash:#352a16; --red:#e58b79; color-scheme:dark}
+body{background:var(--ground);color:var(--ink);font:15px/1.6 var(--sans);padding-inline:16px}
+.wrap{max-width:980px;margin:0 auto;padding-block:40px 64px;display:grid;gap:40px}
+h1{font-size:30px;line-height:1.2;letter-spacing:-.6px;margin:0;text-wrap:balance}
+h2{font-size:21px;line-height:1.3;letter-spacing:-.3px;margin:0;text-wrap:balance}
+h3{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0;font-weight:600}
+p{margin:0;max-width:68ch}
+.lede{display:grid;gap:12px}
+.lede p{color:var(--muted)}
+.rules{display:grid;gap:8px;padding:16px 18px;background:var(--paper);border:1px solid var(--line);border-radius:12px}
+.rules li{margin-left:18px}
+.rules ul{margin:0;padding:0;display:grid;gap:6px}
+section{display:grid;gap:16px}
+.head{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline}
+.tag{font:500 11px/1 var(--mono);letter-spacing:.04em;padding:5px 8px;border-radius:6px;white-space:nowrap}
+.tag.yes{background:var(--green-wash);color:var(--green)}
+.tag.keep{background:var(--amber-wash);color:var(--amber)}
+.why{color:var(--muted)}
+.compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.flow{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;gap:10px;min-width:0}
+.flow.new{border-color:var(--green)}
+.flow ol{margin:0;padding-left:20px;display:grid;gap:7px}
+.flow li{padding-left:2px}
+.count{font:500 11px/1 var(--mono);color:var(--muted)}
+.screen{font:13px/1.5 var(--mono);background:var(--ground);border-radius:8px;padding:10px 12px;color:var(--ink);overflow-x:auto;white-space:pre}
+.lose{display:grid;gap:4px;padding:12px 16px;border-left:3px solid var(--amber);background:var(--amber-wash);border-radius:0 8px 8px 0}
+.lose strong{color:var(--amber);font-weight:600}
+code,.m{font-family:var(--mono);font-size:.92em}
+.git{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:6px;min-width:0}
+.card .k{font:600 13px/1.3 var(--sans)}
+.card .v{color:var(--muted);font-size:14px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tbl{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:12px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+.ask{background:var(--paper);border:1px solid var(--green);border-radius:12px;padding:16px 18px;display:grid;gap:8px}
+hr{border:0;border-top:1px solid var(--line);margin:0}
+</style>
+
+<div class="wrap">
+  <header class="lede">
+    <h3>Piglet processing · design review</h3>
+    <h1>Seven ways to make it simpler</h1>
+    <p>Three rounds of walk-throughs kept finding edge cases, and each fix added another screen, question or number. This page shows, for each source of that complexity, what a worker does today and what they would do under a simpler rule. Each rule is stricter, and each one removes whole screens.</p>
+    <div class="rules">
+      <h3>The rules behind every proposal</h3>
+      <ul>
+        <li>One way to do each thing. Record death, Move and Set count are the only ways the number of piglets changes.</li>
+        <li>The app settles conflicts itself. No worker is ever asked to resolve another phone's record.</li>
+        <li>One schedule per litter. A piglet that moves follows its new litter's day.</li>
+        <li>Ask only what the worker knows at that moment, with Yes / No answers.</li>
+        <li>After End, nothing records.</li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- 1 MOVES -->
+  <section id="moves">
+    <div class="head"><h2>1 · Moving piglets</h2><span class="tag yes">Recommend: simplify</span></div>
+    <p class="why">By “cohorts” I didn't mean the farm's batch. I meant piglets of <em>different ages living in one crate</em> after a foster, which today each keep their own schedule. If fostering stays inside the batch (sows that farrowed within the same few days), every piglet in a crate can follow that crate's day.</p>
+    <div class="compare">
+      <div class="flow">
+        <h3>Today</h3>
+        <ol>
+          <li>B09 → Move → pick B02 (any litter, any age) → pick 3 piglets.</li>
+          <li>“Iron: did all 3 have it?” <span class="m">Yes / No / Don't know</span>.</li>
+          <li>With Don't know, B09 loses its one-tap and shows a range.</li>
+          <li>B02 shows the arrivals as their own group with their own day.</li>
+          <li>Someone later opens B02, checks spray marks, answers “already had 1 · record 2”, which narrows B09.</li>
+        </ol>
+        <div class="screen">B09  Iron · 0–2 of 7 owed · check
+B02  Iron · 11 of its own · day 3
+     Iron · 3 from B09 · day 4 · unknown</div>
+      </div>
+      <div class="flow new">
+        <h3>Proposed</h3>
+        <ol>
+          <li>B09 → Move → pick B02 (only litters in the same batch are listed) → pick 3 piglets.</li>
+          <li>“Iron: had it?” <span class="m">Yes / No</span> — the spray mark from treatment tells the worker.</li>
+          <li>Save. The 3 piglets now follow B02's day; any “No” is owed in B02's normal Iron row.</li>
+        </ol>
+        <div class="screen">B09  Iron · 2 owed · Record 2
+B02  Iron · 14 owed · Record 14</div>
+      </div>
+    </div>
+    <div class="lose"><strong>What you give up</strong><span>Fostering across batches, and moving piglets without knowing what they had. Workers must spray-mark at treatment so the move question is always answerable.</span></div>
+  </section>
+
+  <hr>
+
+  <!-- 2 COUNTS -->
+  <section id="counts">
+    <div class="head"><h2>2 · When the count doesn't match</h2><span class="tag yes">Recommend: your idea, below</span></div>
+    <p class="why">Your suggestion: Move and Record death are explicit buttons, and a count difference is a quick report that doesn't interrupt the work.</p>
+    <div class="compare">
+      <div class="flow">
+        <h3>Today</h3>
+        <ol>
+          <li>Set count 11 (record says 12) → Save writes an “unexplained loss” line.</li>
+          <li>The room shows “Not yet explained”; the litter gets a Check chip.</li>
+          <li>An Explain page lists suggestions (“A04 gained 1 · both lines close”), a Review move, a Move sheet, and “in another crate”.</li>
+          <li>Losses and gains stay open until paired, recounted through Edit, or explained by a death.</li>
+        </ol>
+      </div>
+      <div class="flow new">
+        <h3>Proposed</h3>
+        <ol>
+          <li>Set count 11 → one quiet choice under the number: <span class="m">Not sure why</span> (default) · <span class="m">Count was wrong</span>.</li>
+          <li><em>Count was wrong</em> just corrects the number. <em>Not sure why</em> saves and the litter row says “1 missing”.</li>
+          <li>Later, Record death on that litter asks one thing: “One of the missing?” Move from it asks the same, already ticked.</li>
+          <li>A high count raises Alive and says “check on the pig”. No pairing, no explain page.</li>
+        </ol>
+        <div class="screen">A02  Iron · Tail · 11 owed · 1 missing</div>
+      </div>
+    </div>
+    <div class="lose"><strong>What you give up</strong><span>The app no longer suggests that one litter's loss is another's gain. If a piglet jumped next door, the worker records it as a Move.</span></div>
+  </section>
+
+  <hr>
+
+  <!-- 3 COLLISIONS -->
+  <section id="sync">
+    <div class="head"><h2>3 · Two phones, same thing (offline)</h2><span class="tag yes">Recommend: first in wins</span></div>
+    <p class="why">Your idea fits. Here is how git does it, and why our case is easier.</p>
+    <div class="git">
+      <div class="card"><span class="k">How git works</span><span class="v">Each person works on a branch. Merging combines both. Changes to different lines merge automatically; only the same line changed two ways is a conflict, and git stops and asks a person, because it can't guess code.</span></div>
+      <div class="card"><span class="k">Why ours is easier</span><span class="v">Each record is a fact added to a log, like a commit. Almost nothing conflicts: two deaths, a move and a treatment simply all apply. Real conflicts are rare and the app can settle them by rule.</span></div>
+      <div class="card"><span class="k">The rule</span><span class="v">For the same thing recorded twice, the first record to reach the farm counts. The second is kept as a note, never counted, and its author's phone says so. Nobody is asked to answer anything.</span></div>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th>Collision</th><th>Today</th><th>Proposed (automatic)</th></tr></thead>
+      <tbody>
+        <tr><td>Iron recorded twice for A05</td><td>Review item with 3 answers (same / given twice / different piglets)</td><td>First counts. Second phone: “Iron for A05 was already recorded by L. Madsen at 08:40 · yours kept as a note.”</td></tr>
+        <tr><td>Same tagged piglet recorded dead twice</td><td>Collapsed silently</td><td>First counts. Second kept as a note.</td></tr>
+        <tr><td>Two counts disagree</td><td>“Counts disagree · neither stands” until recounted</td><td>The later count stands (it is the newer look at the crate); the earlier stays in the log.</td></tr>
+        <tr><td>Two untagged deaths</td><td>Held body / soft flag</td><td>Both count. Two bodies are two bodies; Edit fixes a mistake.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="lose"><strong>What you give up</strong><span>If two workers really did inject the same piglets, the second injection is only a note. The note says “If you also injected, tell the vet.” The review queue, held bodies, disputed counts and soft flags all disappear.</span></div>
+  </section>
+
+  <hr>
+
+  <!-- 4 NURSE -->
+  <section id="nurse">
+    <div class="head"><h2>4 · A nurse sow outside the task</h2><span class="tag yes">Recommend: cut</span></div>
+    <div class="compare">
+      <div class="flow">
+        <h3>Today</h3>
+        <ol>
+          <li>A sow dies; Move her piglets to E01, a sow that isn't in the processing task.</li>
+          <li>The preview warns “E01's own 7 piglets join too · owe Cut cord, Nasal drops (2 days late)”.</li>
+          <li>E01 joins the task; her own piglets now owe everything on their own day; her earlier litter's facts sit on a separate line.</li>
+        </ol>
+      </div>
+      <div class="flow new">
+        <h3>Proposed</h3>
+        <ol>
+          <li>Move lists only litters already in this task.</li>
+          <li>To use E01, the supervisor adds her litter to the task first (one step in the task overview). Then she is an ordinary litter.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="lose"><strong>What you give up</strong><span>A worker can't foster onto a sow outside the task on the spot; it takes the supervisor's one step.</span></div>
+  </section>
+
+  <hr>
+
+  <!-- 5 AFTER END -->
+  <section id="after-end">
+    <div class="head"><h2>5 · Records that arrive after End</h2><span class="tag yes">Recommend: cut</span></div>
+    <div class="compare">
+      <div class="flow">
+        <h3>Today</h3>
+        <ol>
+          <li>The supervisor ends the task at 16:20.</li>
+          <li>An offline phone syncs a treatment done at 17:05.</li>
+          <li>It is kept, flagged “after end · not counted”, and listed in a “Since end” section on the receipt and the litter.</li>
+          <li>A mark stamped before End but synced after is “accepted”, and the receipt explains it.</li>
+        </ol>
+      </div>
+      <div class="flow new">
+        <h3>Proposed</h3>
+        <ol>
+          <li>After End, nothing records.</li>
+          <li>A phone that syncs late shows its author: “Not saved · the task ended at 16:20.”</li>
+          <li>Receipt and handoff stay frozen; no Since-end section.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="lose"><strong>What you give up</strong><span>The record of work done after End. A worker whose late record was refused tells the supervisor.</span></div>
+  </section>
+
+  <hr>
+
+  <!-- 6 CORRECTIONS -->
+  <section id="edit">
+    <div class="head"><h2>6 · Fine-grained corrections</h2><span class="tag yes">Recommend: cut</span></div>
+    <div class="compare">
+      <div class="flow">
+        <h3>Today</h3>
+        <ol>
+          <li>A death of 2 bodies → Edit → tick which body was a mistake.</li>
+          <li>A short treatment → “Some weak, some sick” → split the count between reasons.</li>
+          <li>A castration → hernia / cryptorchid / deferred / kept boar, each with its own count.</li>
+        </ol>
+      </div>
+      <div class="flow new">
+        <h3>Proposed</h3>
+        <ol>
+          <li>Edit withdraws or moves a whole record, then the worker records the right one again.</li>
+          <li>A short treatment takes one reason: <span class="m">Weak</span> or <span class="m">Sick</span>.</li>
+          <li>Castration keeps its reasons (your ruling), one reason per record.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="lose"><strong>What you give up</strong><span>Fixing half a record in one step; it becomes withdraw and re-record (two steps, rarely needed).</span></div>
+  </section>
+
+  <hr>
+
+  <!-- 7 BULK -->
+  <section id="bulk">
+    <div class="head"><h2>7 · Recording several litters at once</h2><span class="tag keep">Recommend: keep</span></div>
+    <div class="compare">
+      <div class="flow">
+        <h3>Today</h3>
+        <ol>
+          <li>Room → filter Iron → “Record iron for several litters”.</li>
+          <li>Tick litters (litters already done, deferred or not due are left out).</li>
+          <li>Review → hold to record 46 piglets.</li>
+        </ol>
+      </div>
+      <div class="flow new">
+        <h3>If cut</h3>
+        <ol>
+          <li>Open each litter and tap its one-tap Record.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="lose"><strong>Why keep it</strong><span>It is one screen, it saves the most time on a day-3 round, and walk-throughs found it safe. The only change: add Undo after the hold, like the one-tap Record.</span></div>
+  </section>
+
+  <div class="ask">
+    <h3>What I need from you</h3>
+    <p>A yes or no on each of the seven. With your yes, I'll cut the screens and rules listed under “Proposed”, then run the walk-throughs again on the simpler task.</p>
+  </div>
+</div>

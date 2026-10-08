@@ -1,0 +1,15 @@
+<!-- @dsCard group="Choosers" height=420 subtitle="Label over a text control" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<body>
+<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="a"></div><div id="b"></div><div id="c"></div><div id="d"></div></div>
+<script>
+const UI = window.SentriUI;
+a.innerHTML = UI.field({ ds: 'Field', label: 'Weight (kg)', control: '<input type="text" inputmode="decimal" placeholder="0.0">' });
+b.innerHTML = UI.field({ ds: 'Field', label: 'Weight (kg)', control: '<input type="text" inputmode="decimal" value="1.4">' });
+c.innerHTML = UI.field({ ds: 'Field', className: 'error', label: 'Weight (kg), enter a number', control: '<input type="text" inputmode="decimal" value="x">' });
+d.innerHTML = UI.field({ ds: 'Field', label: 'Note', control: '<textarea placeholder="Optional"></textarea>' });
+</script>
+</body>
+</html>

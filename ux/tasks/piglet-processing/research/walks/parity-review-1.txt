@@ -1,0 +1,47 @@
+colleague: family=openai model=gpt-6-astra effort=high session=01a0f226-e990-78e3-be98-a16f319ce743 status=ok cached-tokens=662016 roster-checked=2026-09-24
+
+The shell is recognizably shared, but **“at farrowing’s density, with no plain UI bugs” does not hold**. I inspected all 33 PNGs. I treated round 5 and the pictured reference as authoritative; ordinary content continuing below a scrolling viewport is not counted as clipping.
+
+Findings ranked by how strongly they break parity:
+
+1. **`17-edit.png` — treatment rows are almost twice the reference’s height.** Each repeats a stamp and a separate “Done on another crate” action; only four treatments fit where farrowing fits seven figures. **Fix:** retain the compact label/stamp beside the stepper; expose the wrong-crate action when that treatment is selected for correction.
+
+2. **`05-litter.png`, `05b-litter.png`, `narrow-litter.png`, `zh-litter.png` — treatment grouping still differs from the supplied care reference.** “Owed today,” a progress sentence, individual “Record 12” buttons, and repeated due-day metadata replace the reference’s shared day headers and compact care rows. Iron prints day 3 twice. **Fix:** group by day/status, state the day once, and use the reference’s care-row anatomy while preserving the ruled recording behavior.
+
+3. **`03-room-find.png`, `09-dead.png`, `10-dead-sow.png`, `zh-dead.png` — unnecessarily tall drawers.** Find leaves roughly 350px between its single result and footer; Record death leaves about 100px below Photos; sow death leaves substantial space below its warning. **Fix:** content-size these states, with a maximum height and scrolling when needed. The source explicitly forces the death drawer to `height: 'full'`.
+
+4. **`01-room.png`, `narrow-room.png`, `wide-room.png`, `zh-room.png` — review information consumes an extra row before the tabs.** The large review door, crate-code subline and divider push the litter list substantially lower than farrowing’s. On the narrow capture, only two whole litter rows remain visible. **Fix:** preserve the required review/unexplained counts in one compact header line; move `A05 D03` into the review destination.
+
+5. **`10-dead-sow.png` — the shared death picker has a different cause-list face.** Processing encloses its radio rows in a rounded well; farrowing uses flat, divided rows. Its warning also gains a stronger red border and monospaced consequence. Different causes and consequences justify different words, not different components. **Fix:** reuse farrowing’s cause rows and warning typography.
+
+6. **`06-drawer-castrate.png` — excess vertical spacing in the cause list.** The “Not castrated” group opening and roughly 80px reason rows make the deferred-reason choices fall below the initial viewport; the reference’s counting rows are substantially tighter. **Fix:** use the reference’s row spacing and one normal section gap before “Not castrated.”
+
+7. **`zh-room.png`, `zh-litter.png`, `zh-dead.png` — Chinese typography changes the app’s character.** Chinese labels visibly render with serif-like strokes while Latin labels retain the geometric sans face. **Fix:** supply an explicit Chinese sans-serif fallback in the shared font stack and verify headings, buttons and small metadata together.
+
+8. **`18-end-overview.png` — “Choose a crate row” abandons the reference’s comparison table.** Each row repeats “done,” “owed,” “litters” and “not yet due”; the equivalent farrowing surface uses column headings once. **Fix:** reuse that compact table, substituting crate rows and processing measures. This would also bring Performance metrics farther into view.
+
+9. **`19-end-review.png`, `20-end-hold.png`, `21-end-receipt.png` — Performance metrics lose their reference hierarchy.** Processing presents headline measures such as `92%` as ordinary small facts; farrowing gives its headline measures prominent numerals. **Fix:** reuse the reference’s metric-card hierarchy for the corresponding processing measures.
+
+10. **`08-drawer-arrived.png` — the title carries too much information.** “Iron · day 3 · 2 piglets from crate B09” wraps, leaving `B09` alone on the second line beside Clear. **Fix:** title it “Iron · day 3”; put arrival count and source crate in the subtitle, with the spray-mark instruction beside the answer controls.
+
+11. **`03-room-find.png` — the result gets a new container.** Processing wraps the result in a rounded tinted card; farrowing shows the same flat result-row anatomy used throughout its finder. **Fix:** retain the matched tag/notch context but render the result as the reference’s divided row.
+
+12. **`02-room-filter.png` — reset changes name and location.** Processing puts “Clear” in the header; farrowing uses “Reset” between Back and Show. A worker switching tasks encounters two grammars for the same operation. **Fix:** use the reference’s footer Reset and header dismiss control.
+
+13. **`14-id.png` — current-entry labels and scan action are poorly grouped.** “Piglet 4 of 12” repeats over weight and ear tag, while “Scan” runs directly after the previous piglet’s `1.38 kg`, making it read like receipt text. **Fix:** state the current piglet once; use simple field labels; place a distinct scan control beside ear-tag input.
+
+14. **`21-end-receipt.png` — receipt scaffolding repeats itself.** “Ended with 6 litters unfinished,” “Unfinished litters 6,” and “Not done at End — 6 litters” appear in three separate blocks before the metrics. **Fix:** use the reference’s compact receipt line and one outcome summary with a detail door. Remove the navigation explanation about “Since End” from the leading card.
+
+15. **`19-end-review.png`, `20-end-hold.png` — an unrelated audit door interrupts the end review.** “Today’s records, by hand” takes another full row between unresolved work and Performance metrics. **Fix:** move it to the overview/log; keep this review focused on the end consequences and unresolved items.
+
+16. **`narrow-litter.png` — the drawer gutter changes from 21px to 12px.** Head, body and footer become much wider than their standard-width counterparts, although the room retains a different inset. The shared CSS confirms this breakpoint override. **Fix:** preserve the ruled drawer gutter; use the existing More actions pattern if the four-tool row needs room.
+
+17. **`04-room-reviews.solo.png`, `12-explain.solo.png` — metadata explains navigation or repeats the headline.** “Answer on Set count” and “Answer on the litter” add implementation-oriented directions beneath already actionable review rows. Explain repeats “1 piglet lost” and “Unexplained loss 1 piglet,” plus a zero-extra count. **Fix:** use review provenance where useful; consolidate the loss amount into one heading and its count-event subtitle.
+
+18. **`15-id-table.png`, `23-bulk.solo.png` — repeated labels add avoidable density.** “Weigh day” sits above two already self-describing litter-weight rows. Bulk repeats `day 3` beneath ordinary rows although the page title already establishes it. **Fix:** remove those repetitions; retain differing age, lateness or exception information.
+
+19. **`21-end-receipt.png`, `22-handoff.solo.png`, `23-bulk.solo.png`, `24-bulk-review.png` — terminology and capitalization drift.** Examples include capitalized “End” inside sentences, `Iron d3` versus `Iron · day 3`, and “Untick it” where the selection screen says “Clear”/“Tick all owed.” **Fix:** standardize treatment labels and sentence case; make the bulk instruction explicitly say “Back, then untick the litter.”
+
+Sound: the wide phone frame, general header/footer construction, Back vocabulary, outlined counting keys and record-page skeleton now match closely.
+
+**Not probed:** live scrolling, focus/inert behavior, touch targets, hold timing, keyboard behavior, transitions, unsupplied states, or ledger correctness. No clipping or interaction failure is asserted solely because content continues below a footer.

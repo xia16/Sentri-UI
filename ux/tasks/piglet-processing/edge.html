@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Litter</title>
+<script>
+/* One drawer for every litter (RULINGS round 5): a litter outside the task, before the farrowing lock, an orphan, a nurse
+   sow and the birth litter weight are the litter drawer over the room. These addresses forward there under the same state
+   names (`nurse-arrivals` is the nurse sow's drawer); `back` is dropped — every page returns to the litter drawer. */
+(function () {
+  var q = new URLSearchParams(location.search), p = new URLSearchParams();
+  var st = q.get('state') || 'no-task';
+  p.set('state', st === 'nurse-arrivals' ? 'nurse' : st);
+  q.forEach(function (v, k) { if (k !== 'state' && k !== 'stay' && k !== 'back') p.append(k, v); });
+  location.replace('room.html?' + p.toString());
+})();
+</script>
+</head>
+<body></body>
+</html>

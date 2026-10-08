@@ -1,0 +1,527 @@
+/* Task skeleton (candidate, ADR 0003): farrowing's task anatomy as shared parts.
+   Every value is measured from ux/system/farrowing-astra-concept.html at 390×844 and read from tokens.css.
+   Load after tokens.css and bundle.css. Classes are tk-* so the bundle's .sheet / .phone rules never reach them.
+   Parts: TaskPhone (frame + status bar), TaskHeader, TaskLatest, TaskSummary, TaskLens, TaskGroup, TaskRow,
+   TaskDock, TaskSheet (scrim, grab, head, body, footer), TaskBack, TaskPage, TaskDialog. */
+
+/* ---- TaskPhone: the phone frame harness ----
+   At phone width the task fills the screen (full-bleed). Wider than a phone, it sits in farrowing's
+   390×844 frame, centred on the studio ground. */
+.tk-stage { margin: 0; background: var(--app-background); }
+/* The font stack with a Chinese sans-serif fallback (parity review 7): Chinese labels never fall to a serif system face.
+   Set on the stage and the phone so every part and card inside (var(--font-sans), the bundle's var(--sans)) takes it. */
+.tk-stage, .tk-phone {
+  --font-sans: "Plus Jakarta Sans", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", monospace;
+  --sans: var(--font-sans); --mono: var(--font-mono); }
+.tk-phone { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column;
+  box-sizing: border-box; width: 100%; height: 100vh; height: 100dvh;
+  background: var(--app-background); color: var(--ink); font: 14px var(--font-sans); -webkit-font-smoothing: antialiased; }
+.tk-phone *, .tk-phone *::before, .tk-phone *::after { box-sizing: border-box; }
+@media (min-width: 431px) {
+  .tk-stage { background: var(--ground); padding: var(--space-section) 0; }
+  .tk-phone { width: var(--phone-width); height: var(--phone-height); margin: 0 auto;
+    border: 1px solid var(--frame-border); border-radius: var(--radius-device);
+    box-shadow: 0 18px 45px -32px #26352080, 0 2px 4px #26352009; }
+}
+.tk-statusbar { flex: none; height: var(--statusbar-height); display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 24px 5px; background: var(--app-background); font: 700 var(--type-panel-title-size) var(--font-sans); }
+.tk-statusbar-icons { display: flex; gap: 6px; align-items: center; }
+.tk-statusbar-icons svg { width: 16px; height: 16px; stroke-width: 2; }
+/* The task surface under the status bar: header, the one scroller, and the dock. */
+.tk-screen { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.tk-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; background: var(--app-background); }
+
+/* ---- TaskHeader: back + the task's name ---- */
+.tk-header { flex: none; min-height: 60px; display: flex; align-items: center; gap: var(--space-heading); padding: 4px var(--space-gutter) 10px; background: var(--app-background); }
+.tk-header-back { flex: none; display: grid; place-items: center; width: var(--touch-min); height: var(--touch-min); padding: 0;
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink); }
+.tk-header-back svg { width: 18px; height: 18px; }
+.tk-header-title { flex: 1; min-width: 0; margin: 0; font: 500 var(--type-page-title-size)/1.25 var(--font-sans); letter-spacing: -0.6px; color: var(--ink); }
+
+/* ---- TaskLatest: the last-record line ---- */
+.tk-latest { display: flex; align-items: center; min-height: var(--touch-min); margin: 0; padding: 0 var(--space-gutter) 8px;
+  font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+.tk-latest > p { margin: 0; }
+.tk-latest strong { font-weight: 500; color: var(--ink); }
+
+/* ---- TaskSummary: the unit figure | the task-overview progress ---- */
+.tk-summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); margin: 0 var(--space-panel) 10px;
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); box-shadow: var(--shadow-card); }
+/* No clip on the card (a clip reads as hiding the task half's last pixel on a room too short to scroll): the task half
+   keeps the card's right corners with its own radius, so its pressed wash never spills. */
+.tk-summary-task { border-radius: 0 var(--radius-panel) var(--radius-panel) 0; }
+.tk-summary-half { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; padding: var(--space-heading) var(--space-card-x);
+  margin: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
+.tk-summary-task { position: relative; cursor: pointer; }
+.tk-summary-task::before { content: ""; position: absolute; left: 0; top: var(--space-row-x); bottom: var(--space-row-x); width: 1px; background: var(--line); pointer-events: none; }
+.tk-summary-task:active { background: var(--green-wash); }
+.tk-summary-heading { display: flex; align-items: center; gap: 6px; width: 100%; min-height: 19px;
+  font: 500 var(--type-description-size)/1.4 var(--font-sans); color: var(--muted); }
+.tk-summary-heading svg { width: var(--glyph-key); height: var(--glyph-key); stroke-width: 1.7; }
+.tk-summary-heading .tk-summary-go { margin-left: auto; }
+.tk-summary-value { display: flex; align-items: baseline; gap: 5px; margin-top: 5px; min-height: 35px; white-space: nowrap; }
+.tk-summary-value strong { font: 600 var(--type-figure-card-size)/1.15 var(--font-mono); letter-spacing: -1.4px; font-variant-numeric: tabular-nums; color: var(--ink); }
+.tk-summary-of { font: 400 var(--type-figure-denominator-size) var(--font-mono); letter-spacing: -0.5px; color: var(--muted); }
+.tk-summary-desc { margin-top: 2px; font: 500 var(--type-description-size)/1.5 var(--font-sans); color: var(--ink-2); }
+.tk-summary-scope { font: 400 var(--type-meta-size) var(--font-sans); color: var(--muted); white-space: nowrap; }
+.tk-summary-support { margin-top: 6px; font: var(--type-meta-size)/1.6 var(--font-sans); color: var(--muted); }
+.tk-summary-support[data-tone="amber"] { color: var(--amber); }
+.tk-progress { display: flex; gap: 1px; width: 100%; height: 5px; margin-top: 10px; overflow: hidden; border-radius: 6px; background: var(--line); }
+.tk-progress > i { display: block; height: 100%; flex-shrink: 1; }
+.tk-progress > i[data-tone="done"] { background: var(--current-marker); }
+.tk-progress > i[data-tone="active"] { background: var(--progress-active); }
+.tk-progress > i[data-tone="rest"] { background: var(--handle); }
+.tk-progress + .tk-summary-support { margin-top: 7px; }
+
+/* ---- TaskProgress: farrowing's Whole-task progress card (Task overview): head, an 8px segmented bar, one count per segment ---- */
+.tk-progress-card.st-panel { margin: 0; padding: var(--space-row-x) var(--space-panel); }
+.tk-progress-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-heading); margin: 0 0 var(--space-heading); }
+.tk-progress-title { margin: 0; min-width: 0; font: 500 var(--type-panel-title-size)/1.5 var(--font-sans); color: var(--ink); }
+.tk-progress-meta { flex: none; font: var(--type-meta-size)/1.5 var(--font-sans); color: var(--muted); }
+.tk-progress-card > .tk-progress { height: 8px; gap: 2px; margin-top: 0; }
+.tk-progress-counts { display: grid; grid-template-columns: repeat(var(--tk-count, 3), minmax(0, 1fr)); gap: 10px; margin-top: var(--space-heading); }
+.tk-progress-count { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tk-progress-count > strong { font: 500 var(--type-figure-total-size)/1.25 var(--font-mono); letter-spacing: -1px; font-variant-numeric: tabular-nums; color: var(--ink); }
+.tk-progress-count > span { display: flex; align-items: center; font: var(--type-meta-size)/1.2 var(--font-sans); color: var(--muted); }
+.tk-progress-dot { flex: none; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: var(--handle); }
+.tk-progress-dot[data-tone="done"] { background: var(--current-marker); }
+.tk-progress-dot[data-tone="active"] { background: var(--progress-active); }
+
+/* ---- TaskLens: tabs with the count under the label, and the filter ---- */
+.tk-lens { position: sticky; top: 0; z-index: 2; padding: 6px 0 9px; border-bottom: 1px solid transparent; background: var(--app-background); }
+.tk-lens-bar { display: flex; gap: 7px; margin: 0 var(--space-panel); }
+.tk-lens-tabs { flex: 1; min-width: 0; display: flex; gap: 1px; padding: 3px; background: var(--well); border: 1px solid var(--line); border-radius: var(--radius-segment); }
+.tk-lens-tab { flex: 1; min-width: 0; min-height: var(--touch-min); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  padding: 4px 6px; border: 0; border-radius: var(--radius-tab); background: transparent; color: var(--muted); font: 400 var(--type-description-size) var(--font-sans); }
+.tk-lens-tab[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px #20271f0d; }
+.tk-lens-count { font: 500 var(--type-meta-size) var(--font-mono); color: var(--muted); }
+.tk-lens-filter { flex: none; display: grid; place-items: center; width: var(--control-height); height: var(--control-height); padding: 0;
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink); }
+.tk-lens-filter svg { width: 17px; height: 17px; }
+
+/* ---- TaskGroup: a pen / crate-row card, its header and its rows ---- */
+.tk-list { display: flex; flex-direction: column; gap: var(--space-heading); padding: 1px var(--space-panel) var(--space-gutter); }
+.tk-group { flex-shrink: 0; overflow: clip; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); box-shadow: 0 2px 8px #20291f0a; }
+.tk-group-head { display: flex; align-items: center; gap: 10px; padding: 2px var(--space-row-x);
+  background: var(--surface); border-bottom: 1px solid var(--line); font: var(--type-description-size) var(--font-sans); color: var(--muted); }
+.tk-group-door { flex: 1; min-width: 0; display: flex; align-items: center; gap: 5px; min-height: var(--touch-min); padding: 0; margin: 0;
+  border: 0; border-radius: 6px; background: transparent; color: var(--muted); font: inherit; text-align: left; }
+.tk-group-title { font: 600 var(--type-row-title-size) var(--font-mono); color: var(--ink); }
+.tk-group-title[data-face="word"] { font-family: var(--font-sans); }
+.tk-group-meta { font: var(--type-meta-size) var(--font-sans); color: var(--muted); }
+.tk-group-door svg { width: 12px; height: 12px; color: var(--muted); }
+/* The header sticks under the lens bar only; a list with no lens above it (a page, a sheet) scrolls its headers away. */
+.tk-lens ~ .tk-list .tk-group-head { position: sticky; top: var(--tk-sticky, 68px); z-index: 1; }
+/* A list on a page or in a sheet: the surface's body already carries the gutter. */
+:is(.tk-page-body, .tk-sheet-body) .tk-list { padding: 0; }
+
+/* ---- TaskRow: mono id + chip under it | one headline, one meta line | trailing chevron or edit ---- */
+.tk-row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: var(--animal-row-min); margin: 0;
+  padding: var(--space-animal-row-y) var(--space-row-x); border: 0; background: transparent; color: var(--ink); font: inherit; text-align: left; }
+.tk-row + .tk-row { border-top: 1px solid var(--line); }
+.tk-row:active { background: var(--press); }
+.tk-row-identity { flex: none; min-width: var(--animal-id-col); display: flex; flex-direction: column; align-items: flex-start; gap: 7px; }
+.tk-row-id { font: 600 var(--type-row-title-size) var(--font-mono); letter-spacing: -0.6px; color: var(--ink); }
+.tk-chip { display: inline-flex; align-items: center; max-width: var(--row-chip-max); padding: 3px 6px; border: 1px solid var(--line); border-radius: var(--radius-chip);
+  background: var(--well); color: var(--muted); font: 600 var(--type-meta-size)/1.2 var(--font-sans); white-space: nowrap; }
+.tk-chip[data-tone="green"] { color: var(--green); background: var(--green-wash); border-color: var(--chip-green-border); }
+.tk-chip[data-tone="red"] { color: var(--red); background: var(--red-wash); border-color: var(--chip-red-border); }
+.tk-chip[data-tone="amber"] { color: var(--amber); background: var(--amber-wash); border-color: var(--pending-border); }
+.tk-row-detail { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.tk-row-headline { font: 500 var(--type-button-size)/1.45 var(--font-sans); color: var(--ink); }
+.tk-row-headline[data-tone="forecast"] { color: var(--muted); }
+.tk-row-meta { font: var(--type-meta-size)/1.6 var(--font-mono); color: var(--muted); }
+.tk-sep { margin: 0 var(--status-dot); }
+/* A headline or meta part wraps as a whole: a wrapped part never lies under the next one. */
+:is(.tk-row-headline, .tk-row-meta) > * { display: inline-block; max-width: 100%; }
+.tk-tone[data-tone="red"] { color: var(--red); }
+.tk-tone[data-tone="amber"] { color: var(--amber); }
+.tk-tone[data-tone="green"] { color: var(--green); }
+.tk-row > svg { flex: none; width: var(--glyph-key); height: var(--glyph-key); color: var(--muted); }
+/* The tick trail: the row is a <label> around ChoiceList's checkbox; the whole row is the target. */
+label.tk-row { cursor: pointer; }
+.tk-row-tick { flex: none; }
+
+/* ---- TaskTotals: the figures a sheet commits, at farrowing's Finish size (a panel of label over figure) ---- */
+.tk-totals.st-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-heading); margin: 0; padding: var(--space-row-x); }
+.tk-totals[data-columns="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tk-total { min-width: 0; margin: 0; }
+.tk-total > dt { margin: 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+.tk-total > dd { margin: 4px 0 0; font: 600 var(--type-figure-total-size)/1.3 var(--font-sans); color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* ---- TaskDock: the room's bottom tools ---- */
+.tk-dock { flex: none; position: relative; display: flex; align-items: center; gap: 9px; padding: var(--space-heading) var(--space-panel) var(--space-section);
+  background: var(--paper); border-top: 1px solid var(--line); }
+.tk-dock-primary { flex: 1; display: flex; align-items: center; justify-content: center; gap: var(--space-key-gap); min-height: var(--touch-min); padding: 10px var(--space-heading);
+  background: var(--ink); border: 1px solid var(--ink); border-radius: var(--radius-control); color: var(--paper); font: 500 var(--type-panel-title-size)/1.3 var(--font-sans); }
+.tk-dock-tool { flex: none; display: grid; place-items: center; width: var(--control-height); min-height: 50px; padding: 0;
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink); }
+
+/* The handle bar: the bottom edge of every surface that reaches the bottom of the phone. */
+.tk-dock::after, .tk-footer::after { content: ""; position: absolute; bottom: 8px; left: calc(50% - 46px); width: 92px; height: 4px; border-radius: 4px; background: var(--handle); pointer-events: none; }
+
+/* ---- TaskSheet: scrim, drawer, grab, head (title, subtitle, ✕), divider, body, footer ----
+   A drawer is as tall as its content, up to its size's max; the footer is always its last child, so it
+   always sits on the drawer's bottom edge. data-height="full" holds the drawer at its max (for a sheet whose
+   content grows as the worker taps); its body then takes the spare height, never the space under the footer. */
+.tk-scrim { position: absolute; top: var(--statusbar-height); left: 0; right: 0; bottom: 0; z-index: calc(2 + 10 * var(--tk-layer, 0)); width: 100%; padding: 0; margin: 0;
+  border: 0; background: var(--scrim); backdrop-filter: blur(1.4px); }
+.tk-sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: calc(3 + 10 * var(--tk-layer, 0)); display: flex; flex-direction: column; overflow: hidden;
+  max-height: calc(100% - 80px); background: var(--paper); color: var(--ink); border-radius: var(--radius-sheet) var(--radius-sheet) 0 0; box-shadow: var(--shadow-sheet); }
+.tk-sheet[data-size="compact"] { max-height: var(--drawer-compact-max); }
+.tk-sheet[data-size="short"] { max-height: var(--drawer-short-max); }
+.tk-sheet[data-size="medium"] { max-height: var(--drawer-medium-max); }
+.tk-sheet[data-size="long"] { max-height: var(--drawer-long-max); }
+.tk-sheet[data-height="full"] { height: calc(100% - 80px); }
+.tk-sheet[data-height="full"][data-size="compact"] { height: var(--drawer-compact-max); }
+.tk-sheet[data-height="full"][data-size="short"] { height: var(--drawer-short-max); }
+.tk-sheet[data-height="full"][data-size="medium"] { height: var(--drawer-medium-max); }
+.tk-sheet[data-height="full"][data-size="long"] { height: var(--drawer-long-max); }
+.tk-sheet:focus { outline: none; }
+/* ---- The overlay layer model: z = base + 10 × layer (scrim 2, sheet 3, page 5, dialog 8). Layer 0 is over the task
+   screen. Each page or sheet placed before an overlay in the phone raises it one layer by itself (up to 3), so a sheet or
+   dialog opened over a sheet or a page, in DOM order, always stacks above it; data-layer (the factories' `layer: n`)
+   sets it explicitly. ---- */
+:is(.tk-page, .tk-sheet) ~ :is(.tk-scrim, .tk-sheet, .tk-page, .tk-dialog-backdrop):not([data-layer]) { --tk-layer: 1; }
+:is(.tk-page, .tk-sheet) ~ :is(.tk-page, .tk-sheet) ~ :is(.tk-scrim, .tk-sheet, .tk-page, .tk-dialog-backdrop):not([data-layer]) { --tk-layer: 2; }
+:is(.tk-page, .tk-sheet) ~ :is(.tk-page, .tk-sheet) ~ :is(.tk-page, .tk-sheet) ~ :is(.tk-scrim, .tk-sheet, .tk-page, .tk-dialog-backdrop):not([data-layer]) { --tk-layer: 3; }
+[data-layer="1"] { --tk-layer: 1; }
+[data-layer="2"] { --tk-layer: 2; }
+[data-layer="3"] { --tk-layer: 3; }
+.tk-grab { flex: none; position: relative; height: var(--grab-height); touch-action: none; cursor: grab; }
+.tk-grab::before { content: ""; position: absolute; top: 10px; left: calc(50% - 21px); width: 42px; height: 4px; border-radius: 3px; background: var(--back-border); }
+.tk-sheet-head { flex: none; display: flex; align-items: flex-start; gap: 10px; padding: 5px var(--space-gutter-sheet) 17px; border-bottom: 1px solid var(--line); }
+.tk-sheet-titles { flex: 1; min-width: 0; }
+.tk-sheet-title { margin: 0; font: 500 var(--type-sheet-title-size)/1.3 var(--font-sans); letter-spacing: -0.4px; color: var(--ink); }
+.tk-sheet-subtitle { margin: 6px 0 0; font: var(--type-description-size)/1.6 var(--font-sans); color: var(--muted); }
+.tk-sheet-close { flex: none; display: grid; place-items: center; width: var(--touch-min); height: var(--touch-min); padding: 0; margin: 0;
+  border: 0; border-radius: var(--radius-segment); background: transparent; color: var(--ink); }
+.tk-sheet-close svg { width: var(--glyph-pad); height: var(--glyph-pad); }
+.tk-sheet-body { flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 18px var(--space-gutter-sheet) var(--space-panel); }
+.tk-sheet[data-height="full"] > .tk-sheet-body { flex: 1 1 auto; }
+
+/* ---- Footer: Back + the primary (or a hold), pinned to the bottom of its surface ---- */
+.tk-footer { flex: none; position: relative; display: flex; align-items: stretch; gap: var(--space-row-x); margin: 0;
+  padding: var(--space-row-x) var(--space-gutter-sheet) var(--space-footer-bottom); background: var(--paper); border-top: 1px solid var(--line); }
+.tk-back { flex: none; display: flex; align-items: center; justify-content: center; gap: 4px; width: var(--back-width); min-height: var(--control-height); margin: 0; padding: 8px;
+  background: var(--paper); border: 1px solid var(--back-border); border-radius: var(--radius-control); color: var(--ink); font: 500 var(--type-button-size) var(--font-sans); white-space: nowrap; }
+.tk-back svg { width: 16px; height: 16px; }
+.tk-back:active { background: var(--press); }
+/* A surface with nothing to commit: Back alone fills the bar, in the primary's face (farrowing's record page). */
+.tk-back:only-child { flex: 1; width: auto; background: var(--ink); border-color: var(--ink); color: var(--paper); font-weight: 600; }
+/* The status slot: one line directly above the footer (a waiting reason, a hold's progress line). */
+.tk-footer-status { flex: none; margin: 0; padding: var(--space-row-y) var(--space-gutter-sheet) 0; background: var(--paper); border-top: 1px solid var(--line);
+  font: 500 var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+.tk-footer-status[data-tone="amber"] { color: var(--amber); }
+.tk-footer-status[data-tone="red"] { color: var(--red); }
+.tk-footer-status + .tk-footer { border-top: 0; }
+.tk-footer-status.st-visually-hidden + .tk-footer { border-top: 1px solid var(--line); }
+/* The hidden status keeps the utility's 1px box (the slot's own padding and edge must not win) at its surface's corner. */
+.tk-footer-status.st-visually-hidden { top: 0; left: 0; width: 1px; height: 1px; padding: 0; border: 0; white-space: normal; }
+.tk-page > .tk-footer-status { padding-left: var(--space-gutter); padding-right: var(--space-gutter); }
+/* TaskHold's caption: farrowing's face (owner round 5: match farrowing): 9px/500 capitals, 0.07em apart, at 80%. */
+.tk-footer > .st-hold .st-hold-caption { font: 500 var(--type-hold-caption-size)/1.3 var(--font-sans); letter-spacing: 0.07em; text-transform: uppercase;
+  opacity: var(--task-hold-caption-opacity); }
+.tk-footer > .st-hold[data-phase="unknown"] .st-hold-caption { opacity: 1; }
+.tk-footer > .button { flex: 1; min-width: 0; min-height: var(--control-height); margin: 0; padding: 10px 17px; border-radius: var(--radius-control);
+  font: 500 var(--type-button-size)/1.3 var(--font-sans); }
+
+/* ---- TaskPage: the record page (a full page over the task, with its own status bar) ---- */
+.tk-page { position: absolute; inset: 0; z-index: calc(5 + 10 * var(--tk-layer, 0)); display: flex; flex-direction: column; background: var(--app-background); }
+.tk-page-head { flex: none; padding: 8px var(--space-gutter) 18px; border-bottom: 1px solid var(--line); }
+/* aside: text actions at the right end of the title line (a sheet's aside, on a page). */
+.tk-page-titleline { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tk-page-titleline > .tk-page-title { flex: 1; min-width: 0; }
+.tk-page-aside { flex: none; display: flex; align-items: center; }
+.tk-page-title { margin: 0; font: 500 var(--type-page-title-size)/1.3 var(--font-sans); letter-spacing: -0.5px; color: var(--ink); }
+.tk-page-desc { margin: 6px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+.tk-page-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 20px var(--space-gutter) var(--space-section); }
+.tk-page > .tk-footer { padding-left: var(--space-gutter); padding-right: var(--space-gutter); }
+
+/* ---- TaskDialog: one question over a sheet, rising from the bottom ---- */
+.tk-dialog-backdrop { position: absolute; inset: 0; z-index: calc(8 + 10 * var(--tk-layer, 0)); display: flex; flex-direction: column; justify-content: flex-end; background: var(--dialog-backdrop); }
+.tk-dialog { display: flex; flex-direction: column; overflow: hidden; max-height: calc(100% - 24px); background: var(--paper);
+  border-radius: var(--radius-dialog) var(--radius-dialog) 0 0; box-shadow: var(--shadow-dialog); }
+.tk-dialog-body { flex: 0 1 auto; min-height: 0; overflow-y: auto; padding: var(--space-gutter-sheet) var(--space-gutter-sheet) 0; }
+.tk-dialog-title { display: flex; align-items: center; gap: 7px; margin: 0; font: 500 var(--type-sheet-title-size)/1.3 var(--font-sans); letter-spacing: -0.4px; color: var(--ink); }
+.tk-dialog-title svg { width: 16px; height: 16px; }
+.tk-dialog-desc { margin: 10px 0 0; font: var(--type-description-size)/1.7 var(--font-sans); color: var(--muted); }
+.tk-dialog > .tk-footer { margin: 15px var(--space-gutter-sheet) 0; padding: 18px 0 var(--space-footer-bottom); }
+.tk-dialog > .tk-footer::after { display: none; }
+
+/* ---- Skeleton 2 (owner round 5: match farrowing) ---- */
+
+/* TaskStepper · row face: farrowing's entry row — the label 15px/500, outlined keys (both), a mono 18px value; pressed ink. */
+.st-stepper.tk-stepper[data-face="row"] { min-height: var(--entry-row-min); column-gap: var(--space-key-gap); }
+.st-stepper.tk-stepper[data-face="row"] + .st-stepper.tk-stepper[data-face="row"] { border-top: 1px solid var(--line); }
+.tk-stepper[data-face="row"] .st-stepper-label { font: 500 var(--type-entry-label-size)/1.4 var(--font-sans); }
+.tk-stepper[data-face="row"] .st-stepper-key { width: var(--touch-min); min-height: var(--entry-row-min); }
+.tk-stepper:is([data-face="row"], [data-face="well"]) .st-stepper-face { width: var(--touch-min); height: var(--touch-min); border: 1px solid var(--task-key-border);
+  border-radius: var(--radius-control); background: var(--paper); color: var(--ink); }
+.tk-stepper[data-face="well"] .st-stepper-face { width: var(--field-height); height: var(--field-height); }
+.tk-stepper:is([data-face="row"], [data-face="well"]) .st-stepper-key:not([data-step^="-"]):not([aria-disabled="true"]) .st-stepper-face { background: var(--paper); border-color: var(--task-key-border); color: var(--ink); }
+.tk-stepper:is([data-face="row"], [data-face="well"]) .st-stepper-face svg { width: var(--glyph-key-task); height: var(--glyph-key-task); stroke-width: 2.2; }
+.tk-stepper .st-stepper-key[aria-disabled="true"] .st-stepper-face { background: var(--well); border-color: var(--line); color: var(--disabled-ink); }
+.tk-stepper.tk-stepper .st-stepper-key.st-stepper-key:not([aria-disabled="true"]):is(:active, [data-preview~="pressed"]) .st-stepper-face { background: var(--ink); border-color: var(--ink); color: var(--paper); filter: none; }
+.tk-stepper[data-face="row"] .st-stepper-value { min-width: 3ch; font: 600 var(--type-step-value-size)/1.3 var(--font-mono); }
+.tk-stepper[data-face="row"][data-zero] .st-stepper-value { color: var(--ink); }
+/* TaskStepper · well face: the label as a section title, then the keys and value on a well (Foster, Reconcile). */
+.st-stepper.tk-stepper[data-face="well"] { row-gap: 10px; }
+.tk-stepper[data-face="well"] .st-stepper-copy { align-items: flex-start; text-align: left; }
+.tk-stepper[data-face="well"] .st-stepper-label { font: 500 var(--type-section-title-size)/1.5 var(--font-sans); color: var(--ink); }
+.tk-stepper[data-face="well"] .st-stepper-keys { padding: var(--space-row-y); border-radius: var(--radius-inset); background: var(--well); }
+.tk-stepper[data-face="well"] .st-stepper-key { width: var(--field-height); min-height: var(--field-height); }
+.tk-stepper[data-face="well"] .st-stepper-value { font: 600 var(--type-figure-well-size)/1.3 var(--font-mono); letter-spacing: 0; color: var(--ink); }
+.tk-stepper[data-face="well"][data-zero] .st-stepper-value { color: var(--ink); }
+.tk-stepper[data-face="well"] .st-stepper-hint.st-stepper-hint { justify-content: flex-start; text-align: left; font-size: var(--type-description-size); line-height: 1.6; }
+/* TaskStepper · count face: the count sheet's hero on the green area; − outlined green, + filled green. */
+.st-stepper.tk-stepper[data-face="count"] { padding: var(--space-panel) var(--space-row-y) 10px; border-radius: var(--radius-count); background: var(--green-wash); }
+.tk-stepper[data-face="count"] .st-stepper-label { font: 500 var(--type-row-title-size)/1.3 var(--font-sans); color: var(--green); }
+.tk-stepper[data-face="count"] .st-stepper-keys { gap: var(--space-heading); min-height: 86px; }
+.tk-stepper[data-face="count"] .st-stepper-face { width: var(--hero-key); height: var(--hero-key); border: 1px solid var(--chip-green-border); border-radius: var(--radius-hero-key);
+  background: var(--paper); color: var(--green); }
+.tk-stepper[data-face="count"] .st-stepper-face svg { width: var(--glyph-key-count); height: var(--glyph-key-count); }
+.tk-stepper[data-face="count"] .st-stepper-key:not([data-step^="-"]):not([aria-disabled="true"]) .st-stepper-face { background: var(--green); border-color: var(--green); color: var(--paper);
+  box-shadow: 0 3px 8px #225d3520; }
+.tk-stepper[data-face="count"] .st-stepper-key[aria-disabled="true"] .st-stepper-face { background: var(--paper); border-color: var(--chip-green-border); color: var(--disabled-ink); box-shadow: none; }
+.tk-stepper[data-face="count"] .st-stepper-value { color: var(--count-ink); }
+
+/* TaskPhotos: farrowing's photo line — no well; a camera glyph, the label 13px, `Optional` 10px; an outlined camera key. */
+.st-photos.tk-photos { padding: 0; border-radius: 0; background: transparent; }
+* + .st-photos.tk-photos { margin-top: var(--space-section); }
+.tk-photos .st-photos-head { gap: 6px; }
+.tk-photos .st-photos-label { align-items: center; column-gap: 7px; font: 500 var(--type-row-title-size)/1.4 var(--font-sans); }
+.tk-photos .st-photos-label small { font: var(--type-meta-size)/1.4 var(--font-sans); color: var(--muted); }
+.tk-photos-glyph { display: inline-flex; }
+.tk-photos-glyph svg { width: var(--glyph-key); height: var(--glyph-key); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tk-photos .st-photos-camera.st-photos-camera { border: 1px solid var(--task-key-border); border-radius: var(--radius-segment); background: var(--paper); }
+.tk-photos .st-photos-items { gap: var(--space-key-gap); padding: var(--space-key-gap) 0; }
+.tk-photos .st-photos-thumb.st-photos-thumb { width: var(--photo-thumb-task); height: var(--photo-thumb-task); border: 0; border-radius: 8px; }
+.tk-photos .st-photos-hint.st-photos-hint { padding-right: 0; }
+
+/* TaskRow door: farrowing's .disclosure — a title 13px/600, one muted line, a chevron; a line under each. */
+.tk-door { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 62px; margin: 0; padding: 15px 0;
+  border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; text-align: left; }
+.tk-door:active { background: var(--press); }
+.tk-door-copy { flex: 1; min-width: 0; }
+.tk-door-copy > strong { display: block; font: 600 var(--type-row-title-size)/1.4 var(--font-sans); }
+.tk-door-copy > small { display: block; margin-top: 5px; font: var(--type-meta-size)/1.7 var(--font-sans); color: var(--muted); }
+.tk-door > svg, .tk-door-main > svg { flex: none; width: 16px; height: 16px; color: var(--ink); }
+/* A door with a one-tap at its end (`Record 12`): the door is the copy (and its chevron), the button sits beside it. */
+.tk-door[data-act] { padding: 0; gap: var(--space-row-y); }
+.tk-door[data-act]:active { background: transparent; }
+.tk-door-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 62px; margin: 0; padding: 15px 0;
+  border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
+.tk-door-main:active { background: var(--press); }
+.tk-door[data-act] > .button { flex: none; min-height: var(--touch-min); margin: 0; padding: 0 var(--space-row-x); border-radius: var(--radius-control);
+  font: 500 var(--type-button-size)/1.3 var(--font-sans); }
+
+/* TaskChoice: farrowing's choice tiles (Foster: Send / Receive). */
+.tk-choice { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.tk-choice[data-count="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.tk-choice-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: var(--choice-tile-min); margin: 0; padding: var(--space-row-y);
+  border: 1px solid var(--task-key-border); border-radius: var(--radius-inset); background: var(--paper); color: var(--muted); font: 600 var(--type-button-size)/1.3 var(--font-sans); text-align: center; }
+.tk-choice-tile svg { width: 24px; height: 24px; }
+.tk-choice-tile[aria-pressed="true"] { background: var(--green-wash); border-color: var(--choice-pressed-border); color: var(--ink); }
+.tk-choice-tile:active { background: var(--press); }
+
+/* The status slot with one text action at its end. */
+.tk-footer-status[data-action-slot] { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); padding-top: 4px; }
+.tk-footer-status[data-action-slot] > p { flex: 1; min-width: 0; margin: 0; }
+.tk-footer-status > p[data-tone="amber"] { color: var(--amber); }
+.tk-footer-status > p[data-tone="red"] { color: var(--red); }
+.tk-footer-status[data-action-slot] > .st-text-action { flex: none; }
+
+/* One left edge per surface: a ChoiceList's group title inside a page or sheet sits on the body's edge, not 17px in. */
+:is(.tk-page-body, .tk-sheet-body) .st-choice-heading.st-choice-heading { padding-left: 0; padding-right: 0; }
+:is(.tk-page-body, .tk-sheet-body) .st-choice-heading-row { padding-right: 0; }
+
+/* TaskRow: the id column holds its width; a chip wider than it ellipses under the id, so every headline lines up. */
+.tk-row-identity { width: var(--animal-id-col); min-width: var(--animal-id-col); }
+.tk-row-identity > .tk-chip { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+
+/* A page description or sheet subtitle toned as a whole line. */
+:is(.tk-page-desc, .tk-sheet-subtitle)[data-tone="amber"] { color: var(--amber); }
+:is(.tk-page-desc, .tk-sheet-subtitle)[data-tone="red"] { color: var(--red); }
+:is(.tk-page-desc, .tk-sheet-subtitle)[data-tone="green"] { color: var(--green); }
+
+/* ---- Skeleton 3 ---- */
+
+/* TaskRadios: farrowing's flat radio rows — no panel; 60px rows, a line under each, a 14px/400 label, the radio right. */
+.tk-radios .st-choice-panel { background: transparent; border: 0; border-radius: 0; }
+.tk-radios .st-choice-row.st-choice-row { min-height: var(--radio-row-min); padding: 0; gap: 10px; border-bottom: 1px solid var(--line); }
+.tk-radios .st-choice-row.st-choice-row + .st-choice-row { border-top: 0; }
+.tk-radios .st-choice-label, .tk-radios .st-choice-row[data-mode="radio"][aria-checked="true"] .st-choice-label { font: 400 var(--type-button-size)/1.4 var(--font-sans); }
+.tk-radios .st-choice-row .st-radio { order: 2; margin-left: auto; border-width: var(--ring-width-fine); border-color: var(--muted); }
+.tk-radios .st-choice-row[aria-checked="true"] .st-radio { border-color: var(--ink); }
+
+/* TaskWarning: farrowing's danger band — pale red, 12px red text, text actions, a 10px muted consequence line. */
+.tk-warning { margin: 0; padding: var(--space-row-y); border: 1px solid var(--danger-border); border-radius: var(--radius-control); background: var(--red-wash); color: var(--red);
+  font: var(--type-choice-meta-size)/1.6 var(--font-sans); }
+.tk-warning[data-tone="amber"] { border-color: var(--pending-border); background: var(--amber-wash); color: var(--amber); }
+.tk-warning-text { margin: 0; }
+.tk-warning-actions { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--space-row-y); margin-top: 4px; }
+.tk-warning-actions > .st-text-action { color: inherit; }
+.tk-warning-detail { display: block; margin-top: 4px; font: var(--type-meta-size)/1.6 var(--font-sans); color: var(--muted); }
+
+/* TaskTable: farrowing's comparison table (Choose a unit). Column headings and sublines are 9px, as farrowing
+   (`table-heading`, below the 10px floor by the owner's round-5 ruling, like the hold caption). */
+.tk-table, .tk-metrics { display: flex; flex-direction: column; }
+.tk-table > .st-heading, .tk-metrics > .st-heading { margin: 0 0 var(--space-heading); }
+.tk-table-surface { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
+.tk-table-columns, .tk-table-row { display: grid; grid-template-columns: minmax(78px, 1.5fr) repeat(var(--tk-cols, 3), minmax(0, 1fr)) 18px; column-gap: 8px; align-items: center; }
+.tk-table-columns { padding: var(--space-row-y) var(--space-row-x); background: var(--surface); border-bottom: 1px solid var(--line);
+  font: var(--type-table-heading-size)/1.3 var(--font-sans); color: var(--muted); }
+.tk-table-columns > span:not(:first-child) { text-align: center; }
+.tk-table-surface [role="listitem"] + [role="listitem"] { border-top: 1px solid var(--rule); }
+.tk-table-row { width: 100%; min-height: var(--animal-row-min); margin: 0; padding: var(--space-row-x); border: 0; background: var(--paper); color: var(--ink);
+  font: 500 var(--type-button-size) var(--font-sans); text-align: left; }
+.tk-table-row:active { background: var(--green-wash); }
+.tk-table-name { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; min-width: 0; }
+.tk-table-name > :is(strong, small) { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tk-table-name > strong { font: 500 var(--type-button-size)/1.3 var(--font-sans); }
+.tk-table-name > small { font: 400 var(--type-table-heading-size)/1.3 var(--font-sans); color: var(--muted); }
+.tk-table-figure { font: 400 var(--type-table-figure-size)/1.3 var(--font-mono); text-align: center; font-variant-numeric: tabular-nums; }
+.tk-table-row > svg { width: 18px; height: 18px; color: var(--green); }
+
+/* TaskMetrics: farrowing's performance card — two headline measures, a rule, small totals. */
+.tk-metrics-surface { padding: var(--space-panel); border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
+.tk-metrics-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.tk-metrics-pair > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tk-metrics-pair > div > span { font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
+.tk-metrics-pair strong { font: 500 var(--type-metric-size)/1.2 var(--font-mono); letter-spacing: -1px; color: var(--ink); }
+.tk-metrics-pair strong > small { margin-left: 2px; font-size: var(--type-figure-denominator-size); }
+.tk-metrics-pair > div > small { font: var(--type-meta-size)/1.5 var(--font-sans); color: var(--muted); }
+.tk-metrics-pair > div > small[data-tone="amber"] { color: var(--amber); }
+.tk-metrics-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: var(--space-panel) 0 0; padding-top: var(--space-row-x); border-top: 1px solid var(--line); }
+.tk-metrics-totals > div { min-width: 0; }
+.tk-metrics-totals dt { font: var(--type-meta-size)/1.5 var(--font-sans); color: var(--muted); }
+.tk-metrics-totals dd { margin: 2px 0 0; font: 500 var(--type-metric-total-size)/1.5 var(--font-mono); color: var(--ink); }
+@media (max-width: 370px) {
+  .tk-table-columns, .tk-table-row { column-gap: 5px; grid-template-columns: minmax(65px, 1.35fr) repeat(var(--tk-cols, 3), minmax(0, 1fr)) 16px; padding-left: var(--space-row-y); padding-right: var(--space-row-y); }
+  .tk-table-name > strong { font-size: var(--type-row-title-size); }
+}
+
+/* ---- Skeleton 4 ---- */
+
+/* TaskWarning title (bold, as farrowing), and the End banner (⚠ icon, copy, chevron; the whole band a door). */
+.tk-warning-title { display: block; font: 600 var(--type-choice-meta-size)/1.5 var(--font-sans); }
+.tk-warning-title + .tk-warning-text { margin-top: 4px; font-size: var(--type-description-size); }
+.tk-warning[data-tone="amber"] { border-color: var(--banner-border); background: var(--banner-wash); color: var(--amber); }
+.tk-warning[data-banner] { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 80px; text-align: left; }
+button.tk-warning[data-banner] { margin: 0; cursor: pointer; }
+button.tk-warning[data-banner]:active { filter: brightness(.97); }
+.tk-warning-icon { flex: none; align-self: flex-start; display: grid; place-items: center; width: 16px; margin-top: 2px; }
+.tk-warning-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tk-warning-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.tk-warning-copy > .tk-warning-title + .tk-warning-text { margin-top: 0; line-height: 1.6; }
+.tk-warning-go { flex: none; display: grid; place-items: center; }
+.tk-warning-go svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+/* The red band's hierarchy is farrowing's .danger-band: the headline is <strong> (bold, red), the consequence line a <small> (muted, 10px,
+   4px under). The amber band and the End banner (data-banner) keep their own look: amber text throughout, as their reference. */
+.tk-warning:not([data-tone="amber"]) .tk-warning-title { font-weight: 700; line-height: 1.6; }
+.tk-warning:not([data-tone="amber"]):not([data-banner]) .tk-warning-title + .tk-warning-text { margin-top: 4px; font-size: var(--type-meta-size); color: var(--muted); }
+
+/* TaskRadios layout 'row': farrowing's inline field — label (Optional tag, Clear) left, outlined option pills right. */
+.st-choice-inline.tk-radios[data-face="row"] { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); min-height: 64px; }
+.tk-radios[data-face="row"] .st-choice-inline-label { flex: 1; min-width: 0; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start; column-gap: var(--space-key-gap);
+  font: 500 var(--type-entry-label-size)/1.4 var(--font-sans); }
+.tk-radios[data-face="row"] .st-choice-inline-label small { font: 400 var(--type-meta-size)/1.4 var(--font-sans); }
+.tk-radios[data-face="row"] .st-choice-inline-clear { min-height: var(--touch-min); }
+.tk-radios[data-face="row"] .st-choice-inline-opts { flex: none; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(66px, 1fr); gap: 6px; align-self: center; }
+.tk-radios[data-face="row"] .st-choice-inline-opt.st-choice-inline-opt { justify-content: center; gap: 5px; min-width: 0; min-height: var(--touch-min); padding: 0 var(--space-row-y);
+  border: 1px solid var(--control-border); border-radius: 11px; font: 500 var(--type-row-title-size)/1.3 var(--font-sans); }
+.tk-radios[data-face="row"] .st-choice-inline-opt[aria-checked="true"] { border-color: var(--ink); background: var(--press); font-weight: 500; }
+.tk-radios[data-face="row"] .st-radio { width: 14px; height: 14px; border-width: var(--ring-width-fine); border-color: var(--muted); }
+.tk-radios[data-face="row"] .st-radio::after { width: 8px; height: 8px; }
+.tk-radios[data-face="row"] [aria-checked="true"] .st-radio { border-color: var(--ink); }
+
+/* TaskSection: an icon-headed card section; the outcomes list (label 12px, figure 14px/500 mono right). */
+.tk-section { display: flex; flex-direction: column; }
+.tk-section > .st-heading { margin: 0 0 var(--space-heading); }
+.tk-outcomes.st-panel { margin: 0; padding: var(--space-panel); }
+.tk-outcomes > div { display: flex; align-items: center; justify-content: space-between; gap: var(--space-panel); min-height: 27px; }
+.tk-outcomes dt { margin: 0; font: var(--type-choice-meta-size)/1.5 var(--font-sans); color: var(--ink); }
+.tk-outcomes dd { margin: 0; font: 500 var(--type-button-size) var(--font-mono); color: var(--ink); }
+
+/* TaskReceipt: the ✓ receipt row. */
+.tk-receipt { display: flex; align-items: center; gap: var(--space-row-y); padding: 6px 0 10px; }
+.tk-receipt-mark { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--green-wash); color: var(--green); }
+.tk-receipt-mark svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tk-receipt-title { margin: 0; font: 600 var(--type-button-size)/1.5 var(--font-sans); color: var(--ink); }
+.tk-receipt-meta { margin: 5px 0 0; font: var(--type-description-size)/1.2 var(--font-sans); color: var(--muted); }
+
+/* TaskDay: the day card — a tinted band (bold day, mono status), rows that are doors (mark, title, mono meta), an act. */
+.tk-day { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-inset); background: var(--paper); }
+.tk-day-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); padding: var(--space-row-y) var(--space-row-x); background: var(--surface); }
+.tk-day-head > strong { font: 700 var(--type-row-title-size)/1.25 var(--font-sans); color: var(--ink); }
+.tk-day-head > span { font: var(--type-meta-size)/1.3 var(--font-mono); color: var(--muted); }
+.tk-day-row { display: flex; align-items: center; gap: var(--space-row-y); padding-right: var(--space-row-x); border-top: 1px solid var(--line); background: var(--paper); }
+.tk-day-door { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--space-row-y); min-height: 62px; margin: 0; padding: 10px 0 10px var(--space-row-x);
+  border: 0; background: transparent; color: var(--ink); font: inherit; text-align: left; }
+.tk-day-row:not([data-act]) > .tk-day-door { margin-right: calc(-1 * var(--space-row-x)); padding-right: var(--space-row-x); }
+.tk-day-door:active { background: var(--press); }
+.tk-day-mark { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; }
+.tk-day-mark[data-mark="due"] { border: 1px solid var(--task-key-border); background: var(--paper); }
+.tk-day-mark[data-mark="done"] { background: var(--green-wash); color: var(--current-marker); }
+.tk-day-mark svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tk-day-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.tk-day-copy > strong { font: 700 var(--type-choice-meta-size)/1.25 var(--font-sans); }
+.tk-day-copy > small { font: var(--type-meta-size)/1.3 var(--font-mono); color: var(--muted); }
+.tk-day-copy > small > * { display: inline-block; max-width: 100%; }
+.tk-day-row[data-done] .tk-day-copy > strong { color: var(--muted); }
+.tk-day-row > .button { flex: none; min-height: var(--touch-min); margin: 0; padding: 0 var(--space-row-x); border-radius: var(--radius-control); font: 500 var(--type-button-size)/1.3 var(--font-sans); }
+
+/* TaskDock unit: the labelled place control (B1 / Go to pen). */
+.tk-dock-unit { flex: none; display: flex; align-items: center; gap: 9px; min-height: 50px; margin: 0; padding: 0 3px; border: 0; background: var(--paper); color: var(--ink); text-align: left; }
+.tk-dock-unit > svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tk-dock-unit > span { display: flex; flex-direction: column; gap: 4px; }
+.tk-dock-unit strong { font: 600 var(--type-row-title-size)/1.2 var(--font-mono); }
+.tk-dock-unit small { font: var(--type-dock-caption-size)/1.2 var(--font-sans); color: var(--muted); }
+
+/* TaskDoors: flat door rows, or (card) a section title with its icon and one card of icon doors (the Pen page). */
+.tk-doors[data-card] { display: flex; flex-direction: column; gap: var(--space-heading); }
+.tk-doors[data-card] > * { margin: 0; }
+
+/* Narrow phones keep farrowing's gutters (21 in drawers, 18 on pages; parity review 16, ruling): no 12px override.
+   Only the footer's gap narrows, as farrowing's (.sheet-footer gap 10 at 370px and below). */
+@media (max-width: 370px) {
+  .tk-footer { gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .tk-summary-task, .tk-row { transition: none; } }
+
+/* ---- TaskChips (candidate): one row of filter chips over a task list (README: TaskChips/README.md) ----
+   Farrowing's segment faces on separate chips: a `well` chip with a 1px `line`, `radius-segment`; the chosen chip is the
+   pressed segment (`paper`, `ink` 500, the segment shadow). 44px targets; the count in mono inside the chip. The track
+   scrolls sideways; a trailing spacer the gutter's width keeps the last chip clear of the edge fade. */
+.tk-chips { padding: 6px 0 9px; background: var(--app-background); }
+.tk-chips-track { display: flex; gap: var(--space-key-gap); overflow-x: auto; padding: 0 0 0 var(--space-gutter); scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--space-gutter)), transparent); mask-image: linear-gradient(to right, #000 calc(100% - var(--space-gutter)), transparent); }
+.tk-chips-track::-webkit-scrollbar { display: none; }
+.tk-chips-track::after { content: ""; flex: none; width: var(--space-gutter); }
+.tk-chips-chip { flex: none; display: inline-flex; align-items: center; gap: var(--space-key-gap); min-height: var(--touch-min); margin: 0; padding: 0 var(--space-row-x);
+  border: 1px solid var(--line); border-radius: var(--radius-segment); background: var(--well); color: var(--tab-ink);
+  font: 400 var(--type-row-title-size)/1.2 var(--font-sans); white-space: nowrap; cursor: pointer; }
+.tk-chips-chip[aria-checked="true"] { background: var(--paper); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px #20271f0d; }
+.tk-chips-count { font: 500 var(--type-meta-size)/1 var(--font-mono); color: var(--muted); }
+.tk-chips-chip:active { background: var(--press); }
+
+/* ---- Sheet and page motion (candidate): a sheet rises from the bottom edge and a page slides in from the side when they
+   open; they leave the same way. The host sets data-enter on an overlay only on the render that opens it, and data-leave
+   before it removes it. Farrowing's easing (its arrival curve, cubic-bezier(.22,1,.36,1)). ---- */
+@keyframes tk-sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes tk-sheet-out { from { transform: none; } to { transform: translateY(100%); } }
+@keyframes tk-page-in { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes tk-page-out { from { transform: none; } to { transform: translateX(100%); } }
+@keyframes tk-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tk-fade-out { from { opacity: 1; } to { opacity: 0; } }
+.tk-sheet[data-enter] { animation: tk-sheet-in 240ms cubic-bezier(.22,1,.36,1); }
+.tk-sheet[data-leave] { animation: tk-sheet-out 180ms ease-in forwards; }
+.tk-page[data-enter] { animation: tk-page-in 240ms cubic-bezier(.22,1,.36,1); }
+.tk-page[data-leave] { animation: tk-page-out 180ms ease-in forwards; }
+:is(.tk-scrim, .tk-dialog-backdrop)[data-enter] { animation: tk-fade-in 200ms ease-out; }
+:is(.tk-scrim, .tk-dialog-backdrop)[data-leave] { animation: tk-fade-out 180ms ease-in forwards; }
+@media (prefers-reduced-motion: reduce) {
+  :is(.tk-sheet, .tk-page, .tk-scrim, .tk-dialog-backdrop):is([data-enter], [data-leave]) { animation: none; }
+}

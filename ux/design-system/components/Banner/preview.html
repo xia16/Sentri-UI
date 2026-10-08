@@ -1,0 +1,17 @@
+<!-- @dsCard group="Status" height=420 subtitle="Candidate · danger and correction" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<body>
+<div class="inspection-phone" data-st-context="drawer" style="max-width:390px;padding:16px;background:var(--paper);font-family:var(--sans);color:var(--ink);display:flex;flex-direction:column;gap:24px"><div id="danger"></div><div id="terminal"></div><div id="correction"></div></div>
+<script>
+const UI = window.SentriUI;
+danger.innerHTML = UI.banner({ tone: 'danger', headline: 'Saving ends farrowing', consequence: '7 alive stay under piglet care', live: true });
+terminal.innerHTML = UI.banner({ tone: 'danger', headline: 'Sow died · prolapse', consequence: 'aug 25 · 06:20 · L.M' });
+correction.innerHTML = UI.banner({ tone: 'correction', headline: 'Correcting a past record', consequence: 'logged as G.H',
+  summary: [[{ text: 'stillborn 1 →' }, { text: '0', tone: 'amber' }], [{ text: 'alive 10 →' }, { text: '11', tone: 'amber' }]],
+  actions: [{ label: 'Clear', action: 'clear' }] });
+UI.liveFill(document.body, { delay: 0 });
+</script>
+</body>
+</html>
