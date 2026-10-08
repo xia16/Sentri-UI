@@ -50,7 +50,6 @@
 /* Feed overview, feed editor and optional record steps. */
 .inspection-phone .feed-facts,
 .inspection-phone .feed-breakdown{min-width:0;}
-.inspection-phone .feed-pig-rows,.inspection-phone .feed-inline-pigs{border:1px solid #e8eddf;border-radius:12px;overflow:hidden;background:#fff;}
 .inspection-phone .feed-pig-row{min-height:64px;padding:8px 12px;border-bottom:1px solid #e8eddf;}
 .inspection-phone .feed-pig-row:last-child{border-bottom:0;}
 .inspection-phone .feed-reading{font:500 12px var(--mono);}
@@ -115,3 +114,97 @@
 /* Keep compact controls reachable on touch screens without changing desktop study chrome. */
 .inspection-phone :is(.catalog-search input,.stage-legend button,.record-tabs button,.inspection-filter-summary .text-button,.unit-summary-heading .text-button,.profile-details-link,.dock-selection-summary .selection-review,.feed-percent-control input[type="number"],.feed-range-labels .text-button,.feed-amount-fields input[type="range"],.log-results .text-button,.instruction-detail .text-button,.bulk-reading input){min-height:44px;}
 .inspection-phone .bulk-controls :is(input,select,textarea){min-height:44px;}
+
+/* Bulk records: the pigs are the page; details float over the list as a card.
+   The list keeps the full page height and scrolls behind the panel; its bottom
+   padding (--details-space, measured from the panel by dockBulkDetails) lets the
+   last row scroll clear of the card. No band sits behind the card — the list
+   shows around it. A short list isn't stretched to fill the page: it sizes to
+   its own content, with the card resting at the foot of the page. */
+.inspection-phone .sheet.bulk-action-sheet[data-presentation="page"]>.sheet-body{padding:0;margin:0;display:flex;min-height:0;overflow:hidden;position:relative;isolation:isolate}
+.inspection-phone .bulk-action-layout{display:flex;flex-direction:column;min-height:0;width:100%;position:relative}
+.inspection-phone .bulk-pigs{display:flex;flex-direction:column;flex:1;min-height:0;border:0;border-radius:0;background:var(--surface);overflow:hidden}
+.inspection-phone .bulk-pigs .pig-review-heading{padding:12px 18px;flex-shrink:0}
+.inspection-phone .bulk-pigs .bulk-pig-list{flex:1;min-height:0;overflow:auto;scrollbar-gutter:auto;scrollbar-width:none;padding-bottom:var(--details-space,0px)}
+.inspection-phone .bulk-pig-list::-webkit-scrollbar,.inspection-phone .bulk-details-overlay::-webkit-scrollbar{display:none}
+.inspection-phone .bulk-details-overlay.facts-surface{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;margin:0;max-height:min(340px,55vh);box-sizing:border-box;border:1px solid #cdd5c5;border-radius:18px;background:var(--surface,#f7f8f2);box-shadow:0 -6px 16px #2633210f;padding:8px 18px 16px;overflow:auto;overscroll-behavior:contain;scrollbar-width:none}
+.inspection-phone .bulk-details-overlay.is-collapsed{padding-bottom:8px}
+.inspection-phone .bulk-controls-toggle{flex-shrink:0}
+.inspection-phone .bulk-action-layout.is-short{align-self:flex-start;width:100%}
+.inspection-phone .bulk-action-layout.is-short .bulk-pigs{flex:none;border:1px solid #dce1d6;border-radius:12px;background:#fff}
+.inspection-phone .bulk-action-layout.is-short .bulk-pig-list{flex:none;overflow:visible;padding-bottom:0}
+/* A short list can't be covered, so the card follows it directly instead of floating at the foot. */
+.inspection-phone .bulk-action-layout.is-short .bulk-details-overlay.facts-surface{position:relative;left:auto;right:auto;bottom:auto;margin:12px}
+.inspection-phone .bulk-pig-row{grid-template-columns:24px minmax(0,1fr) minmax(84px,112px);padding:12px 18px;gap:8px}
+.inspection-phone .bulk-pig-change .feed-pig-values{align-items:center;justify-content:flex-end;width:100%}
+.inspection-phone .bulk-reading{display:flex;flex-direction:column;align-items:stretch;gap:4px}
+.inspection-phone .bulk-reading small{text-align:center}
+.inspection-phone .bulk-reading input{width:56px;min-height:44px;text-align:center;appearance:textfield}
+.inspection-phone .bulk-reading input::-webkit-inner-spin-button{appearance:none}
+.inspection-phone .bulk-control-grid{align-items:start}
+.inspection-phone .bulk-controls .bulk-control-grid .field>input,.inspection-phone .bulk-controls .bulk-control-grid .st-picker-trigger{height:48px;min-height:48px}
+.inspection-phone .bulk-control-fields{min-height:0}
+@media(max-width:360px){.inspection-phone .bulk-pig-row{padding-left:12px;padding-right:12px;gap:6px}.inspection-phone .bulk-details-overlay.facts-surface{padding-left:12px;padding-right:12px}}
+
+/* A quiet edge separates standalone record cards from the page as well. */
+.inspection-phone .single-action-sheet .bulk-controls.facts-surface{border:1px solid #dce2d5;box-shadow:0 2px 8px #26332106}
+
+/* Override the shared page inset, without changing other record pages. */
+.inspection-phone .bulk-action-sheet .bulk-pigs .pig-review-heading{padding:8px 18px;min-height:40px;box-sizing:border-box}
+.inspection-phone .bulk-action-sheet .bulk-pig-row{min-height:64px;padding-top:8px;padding-bottom:8px}
+.inspection-phone .bulk-action-sheet .feed-change-state[hidden]{display:none}
+.inspection-phone .bulk-action-sheet .bulk-pig-change{gap:0}
+.inspection-phone .bulk-action-sheet .bulk-pig-change:has(.feed-change-state:not([hidden])){gap:4px}
+.inspection-phone .bulk-action-sheet .bulk-reading input{height:44px;min-height:44px;padding:6px}
+.inspection-phone .bulk-action-sheet .bulk-details-overlay.is-collapsed{padding-top:4px;padding-bottom:4px}
+
+/* Treatment has one numeric column, not the three-column measurement comparison. */
+.inspection-phone [data-bulk-kind="treatment"]{--dose-column:64px;--pig-row-inset:18px}
+.inspection-phone .bulk-action-sheet [data-bulk-kind="treatment"] .pig-review-heading,
+.inspection-phone .bulk-action-sheet [data-bulk-kind="treatment"] .bulk-pig-row{display:grid;grid-template-columns:24px minmax(0,1fr) var(--dose-column);column-gap:8px;padding-left:var(--pig-row-inset);padding-right:var(--pig-row-inset)}
+.inspection-phone [data-bulk-kind="treatment"] .pig-review-heading>span{grid-column:1 / 3;min-width:0}
+.inspection-phone [data-bulk-kind="treatment"] .pig-review-heading>strong{grid-column:3;text-align:center;width:100%}
+.inspection-phone [data-bulk-kind="treatment"] .bulk-pig-change{width:100%;align-items:stretch}
+.inspection-phone [data-bulk-kind="treatment"] .feed-pig-values{display:flex;justify-content:center;gap:0;width:100%}
+.inspection-phone [data-bulk-kind="treatment"] .bulk-reading{width:100%;min-width:0}
+.inspection-phone .bulk-action-sheet [data-bulk-kind="treatment"] .bulk-reading input{width:100%;box-sizing:border-box}
+.inspection-phone [data-bulk-kind="treatment"] .feed-change-state{max-width:100%;text-align:center}
+@media(max-width:360px){.inspection-phone [data-bulk-kind="treatment"]{--pig-row-inset:12px}}
+
+/* One chooser language: grouped navigation, distinct selection, quiet category headers. */
+.inspection-phone .chooser-background .bulk-details-overlay{visibility:hidden;pointer-events:none}
+.inspection-phone .chooser-background .scrim{display:none}
+.inspection-phone .picker-step .sheet-body{gap:12px;padding:16px 18px}
+.inspection-phone .picker-step .catalog-search{margin:0}
+.inspection-phone .picker-step .catalog-search input{min-height:48px;font-size:14px;font-weight:400}
+.inspection-phone .picker-step :is(.health-catalog,.medicine-results,.st-picker-options){scrollbar-width:none;overscroll-behavior:contain}
+.inspection-phone .picker-step :is(.health-catalog,.medicine-results,.st-picker-options)::-webkit-scrollbar{display:none}
+.inspection-phone .picker-step :is(.catalog-categories,.catalog-items,.chooser-options,.st-picker-options){border:1px solid var(--st-rule,#dce2d5);border-radius:14px;background:var(--st-paper,#fff);overflow:hidden}
+.inspection-phone .picker-step .catalog-categories{gap:0}
+.inspection-phone .picker-step :is(.catalog-category,.catalog-item,.medicine-option,.st-picker-option){box-sizing:border-box;min-height:52px;padding:12px 14px;margin:0;border:0;border-bottom:1px solid var(--st-rule,#dce2d5);border-radius:0;background:transparent}
+.inspection-phone .picker-step :is(.catalog-category,.catalog-item,.medicine-option,.st-picker-option):last-child{border-bottom:0}
+.inspection-phone .picker-step :is(.catalog-item:has(input:checked),.medicine-option[aria-pressed="true"],.st-picker-option[aria-selected="true"]){background:#edf2e7}
+.inspection-phone .picker-step :is(.catalog-category strong,.catalog-item strong,.medicine-option strong,.st-picker-option strong){font-size:14px;font-weight:500;line-height:1.45}
+.inspection-phone .picker-step :is(.catalog-category small,.catalog-item small,.medicine-option small){font-size:11px;line-height:1.4;color:var(--st-muted,#68745d)}
+.inspection-phone .picker-step .catalog-path{position:static;min-height:44px;padding:0 0 12px;border:0;background:transparent}
+.inspection-phone .picker-step .catalog-path strong{font-size:14px;font-weight:600}
+.inspection-phone .picker-step .catalog-path-back{width:44px;height:44px;flex:none}
+.inspection-phone .picker-step .catalog-group h5{padding:16px 4px 8px;font:600 12px/1.4 var(--sans);letter-spacing:0;text-transform:none;color:var(--st-muted,#68745d)}
+.inspection-phone .picker-step .catalog-items{padding-bottom:0}
+.inspection-phone .picker-step .chooser-selection{display:grid;place-items:center;width:22px;height:22px;flex:none;border:1px solid #b7c1ad;border-radius:50%;color:#486141}
+.inspection-phone .picker-step .chooser-selection svg{width:15px;height:15px}
+.inspection-phone .picker-step .chooser-selected{flex:none;max-height:160px;overflow:auto;font-size:12px;color:var(--st-ink,#293525)}
+.inspection-phone .picker-step .chooser-selected summary{padding:10px 4px;cursor:pointer;min-height:44px;box-sizing:border-box}
+.inspection-phone .option-picker-step>.sheet-body{overflow-y:auto;flex:0 1 auto}
+.inspection-phone .option-picker-step .st-picker-options{flex:none}
+.inspection-phone .single-action-sheet .bulk-condition-button span{white-space:normal;overflow-wrap:anywhere}
+
+/* Short, immediate choices: the sheet itself is the only container. */
+.inspection-phone .sheet.option-picker-step[data-st-context="drawer"]{height:auto;max-height:calc(100% - 32px)}
+.inspection-phone .sheet.option-picker-step>.sheet-body{flex:0 1 auto;padding:8px 18px 24px;gap:0;overflow-y:auto}
+.inspection-phone .option-picker-step .st-picker-options{border:0;border-radius:0;background:transparent;overflow:visible}
+.inspection-phone .option-picker-step .st-picker-option{min-height:52px;padding:12px 4px;border:0;border-radius:0;background:transparent}
+.inspection-phone .option-picker-step .st-picker-option[aria-selected="true"]{background:transparent;color:#486141}
+.inspection-phone .option-picker-step .st-picker-option[aria-selected="true"] strong{font-weight:600}
+.inspection-phone .option-picker-step .st-picker-option:active{background:#f0f4eb}
+.inspection-phone .option-picker-step .st-picker-option>svg{margin-right:4px;color:#486141}

@@ -1,0 +1,400 @@
+{
+  "v": 3,
+  "layout": "files",
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-09-24T13:19:39Z"
+  },
+  "title": "Sentri",
+  "namespace": "SentriUI",
+  "libraries": [],
+  "sections": {},
+  "groups": [
+    "Icons"
+  ],
+  "assetGroups": {
+    "Icons": {
+      "name": "Icons",
+      "tile": "xs",
+      "order": [
+        "air.svg",
+        "alert.svg",
+        "arrow.svg",
+        "back.svg",
+        "barn.svg",
+        "battery.svg",
+        "bookmark.svg",
+        "calendar.svg",
+        "camera.svg",
+        "chart.svg",
+        "check.svg",
+        "chevron.svg",
+        "clock.svg",
+        "close.svg",
+        "condition.svg",
+        "details.svg",
+        "down.svg",
+        "edit.svg",
+        "farrow.svg",
+        "feed.svg",
+        "filter.svg",
+        "grid.svg",
+        "health.svg",
+        "heat.svg",
+        "home.svg",
+        "hospital.svg",
+        "humidity.svg",
+        "link.svg",
+        "minus.svg",
+        "monitor.svg",
+        "more.svg",
+        "note.svg",
+        "offline.svg",
+        "origin.svg",
+        "place.svg",
+        "plus.svg",
+        "pregnancy.svg",
+        "profile.svg",
+        "record.svg",
+        "return.svg",
+        "scan.svg",
+        "search.svg",
+        "send.svg",
+        "signal.svg",
+        "spark.svg",
+        "temperature.svg",
+        "toolbox.svg",
+        "transfer.svg",
+        "treat.svg",
+        "upload.svg",
+        "weight.svg",
+        "wrench.svg"
+      ],
+      "files": {
+        "air.svg": {
+          "name": "air.svg",
+          "blob": "b53fe5a68b29246d80bf00f2a33919c2",
+          "size": 247,
+          "type": "image/svg+xml"
+        },
+        "alert.svg": {
+          "name": "alert.svg",
+          "blob": "4e1129aceef1281050512130d47e3fa7",
+          "size": 226,
+          "type": "image/svg+xml"
+        },
+        "arrow.svg": {
+          "name": "arrow.svg",
+          "blob": "efe87ea1df9e532087fe56051c221112",
+          "size": 209,
+          "type": "image/svg+xml"
+        },
+        "back.svg": {
+          "name": "back.svg",
+          "blob": "1ac523dd62fad6891b695e2f14fb7682",
+          "size": 219,
+          "type": "image/svg+xml"
+        },
+        "barn.svg": {
+          "name": "barn.svg",
+          "blob": "99fb7800a7ea67cb437743cfdfbbf4f3",
+          "size": 235,
+          "type": "image/svg+xml"
+        },
+        "battery.svg": {
+          "name": "battery.svg",
+          "blob": "f6dd2f98b4a5a6ad6e8fe212cee99c66",
+          "size": 230,
+          "type": "image/svg+xml"
+        },
+        "bookmark.svg": {
+          "name": "bookmark.svg",
+          "blob": "8991d0fb9d536f409faa4684cedd001f",
+          "size": 217,
+          "type": "image/svg+xml"
+        },
+        "calendar.svg": {
+          "name": "calendar.svg",
+          "blob": "ae612204aa86e138dfad0521f617ed06",
+          "size": 231,
+          "type": "image/svg+xml"
+        },
+        "camera.svg": {
+          "name": "camera.svg",
+          "blob": "6fe5dc5fcb7f690f154a73113971253c",
+          "size": 255,
+          "type": "image/svg+xml"
+        },
+        "chart.svg": {
+          "name": "chart.svg",
+          "blob": "0cc46cc6e7df4bb3d5de5b6862899dc5",
+          "size": 222,
+          "type": "image/svg+xml"
+        },
+        "check.svg": {
+          "name": "check.svg",
+          "blob": "078251c175be318b3c66768642f3a028",
+          "size": 211,
+          "type": "image/svg+xml"
+        },
+        "chevron.svg": {
+          "name": "chevron.svg",
+          "blob": "7e58a5d954040fcd890863dd6c36f4ef",
+          "size": 209,
+          "type": "image/svg+xml"
+        },
+        "clock.svg": {
+          "name": "clock.svg",
+          "blob": "0814b60a737e9639cf2e523c199ad57d",
+          "size": 244,
+          "type": "image/svg+xml"
+        },
+        "close.svg": {
+          "name": "close.svg",
+          "blob": "2768062f43d7ab11a2d133134d400fa1",
+          "size": 217,
+          "type": "image/svg+xml"
+        },
+        "condition.svg": {
+          "name": "condition.svg",
+          "blob": "0cbe58d1d799b61f09a7364f7761246b",
+          "size": 213,
+          "type": "image/svg+xml"
+        },
+        "details.svg": {
+          "name": "details.svg",
+          "blob": "1b3ca6f050a51906ebaf28891535d97c",
+          "size": 241,
+          "type": "image/svg+xml"
+        },
+        "down.svg": {
+          "name": "down.svg",
+          "blob": "03ad462a2a9800e9bb5d5dae78e2b438",
+          "size": 209,
+          "type": "image/svg+xml"
+        },
+        "edit.svg": {
+          "name": "edit.svg",
+          "blob": "12e09afcdd0c7befd07f8fca9d5a68a5",
+          "size": 231,
+          "type": "image/svg+xml"
+        },
+        "farrow.svg": {
+          "name": "farrow.svg",
+          "blob": "6ea4480402016c25ad1692804e6c6fd1",
+          "size": 219,
+          "type": "image/svg+xml"
+        },
+        "feed.svg": {
+          "name": "feed.svg",
+          "blob": "c05c27f3d6ccd0d4d6bc7cfa2d8c442c",
+          "size": 266,
+          "type": "image/svg+xml"
+        },
+        "filter.svg": {
+          "name": "filter.svg",
+          "blob": "7a0d84bdfd9215f4badd28cb607bebda",
+          "size": 220,
+          "type": "image/svg+xml"
+        },
+        "grid.svg": {
+          "name": "grid.svg",
+          "blob": "0bff2cec78814b88ab7e9a8dcf3f9c39",
+          "size": 245,
+          "type": "image/svg+xml"
+        },
+        "health.svg": {
+          "name": "health.svg",
+          "blob": "50523438270c3e3a814e0b70260efdd4",
+          "size": 312,
+          "type": "image/svg+xml"
+        },
+        "heat.svg": {
+          "name": "heat.svg",
+          "blob": "d99b1d88d5deed6fdcd20491dc6671ad",
+          "size": 279,
+          "type": "image/svg+xml"
+        },
+        "home.svg": {
+          "name": "home.svg",
+          "blob": "96566bb86729ce5f9ab46c3c5dd2801d",
+          "size": 226,
+          "type": "image/svg+xml"
+        },
+        "hospital.svg": {
+          "name": "hospital.svg",
+          "blob": "5dde0cabc935512e29376ffa607edfec",
+          "size": 253,
+          "type": "image/svg+xml"
+        },
+        "humidity.svg": {
+          "name": "humidity.svg",
+          "blob": "c5c3460151f6bf701a1376cc172ea220",
+          "size": 242,
+          "type": "image/svg+xml"
+        },
+        "link.svg": {
+          "name": "link.svg",
+          "blob": "37644be6b3340a8b4144b2683a750f9c",
+          "size": 283,
+          "type": "image/svg+xml"
+        },
+        "minus.svg": {
+          "name": "minus.svg",
+          "blob": "fb546f3c57dbe36688380a59fd87577d",
+          "size": 205,
+          "type": "image/svg+xml"
+        },
+        "monitor.svg": {
+          "name": "monitor.svg",
+          "blob": "66f44fdadcaba37a656970e678c57a8f",
+          "size": 277,
+          "type": "image/svg+xml"
+        },
+        "more.svg": {
+          "name": "more.svg",
+          "blob": "a2b06df41e33869b93c19c4ceda3bfd3",
+          "size": 226,
+          "type": "image/svg+xml"
+        },
+        "note.svg": {
+          "name": "note.svg",
+          "blob": "006df983c521c38e498c6ede91776590",
+          "size": 230,
+          "type": "image/svg+xml"
+        },
+        "offline.svg": {
+          "name": "offline.svg",
+          "blob": "186c58650dfb633677f7bef7d88f5ab1",
+          "size": 318,
+          "type": "image/svg+xml"
+        },
+        "origin.svg": {
+          "name": "origin.svg",
+          "blob": "133f01f8da9937e04df30f990d3b38f4",
+          "size": 276,
+          "type": "image/svg+xml"
+        },
+        "place.svg": {
+          "name": "place.svg",
+          "blob": "06678ba20ff798a256ab424ffcc72c35",
+          "size": 276,
+          "type": "image/svg+xml"
+        },
+        "plus.svg": {
+          "name": "plus.svg",
+          "blob": "ae8937ca38edeaeb1f17d6bd50b1a4cb",
+          "size": 213,
+          "type": "image/svg+xml"
+        },
+        "pregnancy.svg": {
+          "name": "pregnancy.svg",
+          "blob": "ecc1658c8425dc1b755a862c2d551952",
+          "size": 226,
+          "type": "image/svg+xml"
+        },
+        "profile.svg": {
+          "name": "profile.svg",
+          "blob": "8a4998f959345e7d2eacb1cc88a60a44",
+          "size": 255,
+          "type": "image/svg+xml"
+        },
+        "record.svg": {
+          "name": "record.svg",
+          "blob": "1f2f93dfe836b00f069c3a6b7ebbbbef",
+          "size": 230,
+          "type": "image/svg+xml"
+        },
+        "return.svg": {
+          "name": "return.svg",
+          "blob": "2444fdb878976b20a5b1cbb2dbca6352",
+          "size": 234,
+          "type": "image/svg+xml"
+        },
+        "scan.svg": {
+          "name": "scan.svg",
+          "blob": "63d189da180433b41941343d633aecf0",
+          "size": 243,
+          "type": "image/svg+xml"
+        },
+        "search.svg": {
+          "name": "search.svg",
+          "blob": "fa7f82c6412491d8c067f84c66ca0579",
+          "size": 242,
+          "type": "image/svg+xml"
+        },
+        "send.svg": {
+          "name": "send.svg",
+          "blob": "98b7144b3cbbaef0805c0eea8f6ccca2",
+          "size": 218,
+          "type": "image/svg+xml"
+        },
+        "signal.svg": {
+          "name": "signal.svg",
+          "blob": "b8af770e75d4da4016f1aed4192cfa7d",
+          "size": 229,
+          "type": "image/svg+xml"
+        },
+        "spark.svg": {
+          "name": "spark.svg",
+          "blob": "8cd740b9fe0203ae1b0a3e102f42a215",
+          "size": 254,
+          "type": "image/svg+xml"
+        },
+        "temperature.svg": {
+          "name": "temperature.svg",
+          "blob": "68a33d9bf30eb114d22e56b51bb0fdff",
+          "size": 242,
+          "type": "image/svg+xml"
+        },
+        "toolbox.svg": {
+          "name": "toolbox.svg",
+          "blob": "f22f8a236d0c7bc676264dbaf0dd2229",
+          "size": 241,
+          "type": "image/svg+xml"
+        },
+        "transfer.svg": {
+          "name": "transfer.svg",
+          "blob": "d3f65025367e7807d34443684f8b151d",
+          "size": 240,
+          "type": "image/svg+xml"
+        },
+        "treat.svg": {
+          "name": "treat.svg",
+          "blob": "f6169345caa4396945d5da65601ba7dd",
+          "size": 281,
+          "type": "image/svg+xml"
+        },
+        "upload.svg": {
+          "name": "upload.svg",
+          "blob": "1d81a21c9dea131c1b709266216c0f81",
+          "size": 231,
+          "type": "image/svg+xml"
+        },
+        "weight.svg": {
+          "name": "weight.svg",
+          "blob": "dfd8280e7f6f698a5feacc42d4dd8b84",
+          "size": 238,
+          "type": "image/svg+xml"
+        },
+        "wrench.svg": {
+          "name": "wrench.svg",
+          "blob": "102a9725375ad97c59bedf64ec7e93d0",
+          "size": 267,
+          "type": "image/svg+xml"
+        }
+      }
+    }
+  },
+  "blobs": {},
+  "docs": {
+    "readme": "project/README.md",
+    "sections": []
+  },
+  "lastChange": {
+    "by": "xia16",
+    "at": "2026-09-24T13:19:39Z",
+    "via": "Claude Code",
+    "note": "Built from ux/system (Astra palette, SentriUI, SentriIcons) at a8c87fc: tokens, brand book, 13 component cards, 52 icons."
+  }
+}

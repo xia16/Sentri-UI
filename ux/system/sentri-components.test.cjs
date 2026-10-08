@@ -43,3 +43,17 @@ test('category footer preserves navigation actions and one current category', ()
   assert.equal((result.match(/<span>Back<\/span>/g)||[]).length,1);
   assert.match(ui.categoryFooter({categories:[{id:'first',label:'First'}],active:'missing'}),/data-value="first" aria-current="location"/);
 });
+
+test('chooser groups remain flat and expose meaningful accessible subtitles', () => {
+ const html=ui.pickerOptions({options:[['mL','mL','Millilitres','Liquid'],['mg','mg','Milligrams','Weight'],['g','g','Grams','Weight']],selected:'mg'});
+ assert.match(html,/data-chooser-tone="flat"/);
+ assert.equal((html.match(/role="group"/g)||[]).length,2);
+ assert.match(html,/aria-label="Liquid"/);assert.match(html,/aria-label="Weight"/);
+ assert.equal((html.match(/role="option"/g)||[]).length,3);
+ assert.equal((html.match(/aria-selected="true"/g)||[]).length,1);
+ assert.doesNotMatch(html,/open-picker|chevron/);
+});
+test('short choices use the shared muted surface and catalogues use flat surfaces', () => {
+ assert.match(ui.pickerOptions({options:[['a','First'],['b','Second','Supporting detail']]}),/data-chooser-tone="inset"/);
+ assert.match(ui.chooserList('<button>Medicine</button>'),/data-chooser-tone="flat"/);
+});

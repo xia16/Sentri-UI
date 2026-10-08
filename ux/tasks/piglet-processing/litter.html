@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Litter</title>
+<script>
+/* A litter opens as a drawer over the room (RULINGS round 5): room.html?state=litter&crate=<X>[&unit][&data][&dose].
+   This address forwards there, keeping its state name (every litter state is a room.html state) and its parameters. */
+(function () {
+  var q = new URLSearchParams(location.search), p = new URLSearchParams();
+  p.set('state', q.get('state') || 'litter');
+  q.forEach(function (v, k) { if (k !== 'state' && k !== 'stay') p.append(k, v); });
+  location.replace('room.html?' + p.toString());
+})();
+</script>
+</head>
+<body></body>
+</html>

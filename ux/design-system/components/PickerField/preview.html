@@ -1,0 +1,19 @@
+<!-- @dsCard group="Choosers" height=440 subtitle="Trigger and its option sheet" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<body>
+<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="a"></div><div id="b" style="margin-top:6px"></div><div style="margin-top:24px" id="c"></div></div>
+<script>
+const UI = window.SentriUI, I = window.SentriIcons.icon;
+a.innerHTML = UI.pickerField({ label: 'Cause of death', placeholder: 'Select', key: 'cause' });
+b.innerHTML = UI.pickerField({ label: 'Pen', value: 'B4', display: 'B4 · 12 piglets', key: 'pen' });
+c.innerHTML = UI.pickerOptions({ selected: 'crushed', options: [
+  ['crushed', 'Crushed by sow', 'Most common this week'],
+  ['weak', 'Weak at birth'],
+  ['scours', 'Scours'],
+  ['unknown', 'Unknown']
+] });
+</script>
+</body>
+</html>

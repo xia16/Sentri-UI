@@ -138,3 +138,67 @@ button.st-row[aria-current="location"]{background:#eaf2e5;box-shadow:inset 3px 0
 .device :is(.app-scroll,.drawer-body){scrollbar-width:none;-webkit-overflow-scrolling:touch}
 :is(.farrowing-phone,.inspection-phone) .sheet[data-st-context]>.sheet-body::-webkit-scrollbar,
 .device :is(.app-scroll,.drawer-body)::-webkit-scrollbar{display:none;width:0;height:0}
+
+/* Shared chooser: catalogue = flat; short ungrouped choices = one muted inset.
+   A second text line never changes selection behavior or adds a nested card. */
+.inspection-phone .sheet.picker-step :is(.catalog-categories,.catalog-items,.chooser-options){border:0;border-radius:0;background:transparent;overflow:visible}
+.inspection-phone .sheet.picker-step:is(.medicine-picker-step,.health-picker-step)>.sheet-body{background:var(--st-paper)}
+.inspection-phone .sheet.picker-step .st-chooser-list{border:0;border-radius:0;background:transparent;min-width:0;flex:none}
+.inspection-phone .sheet.picker-step .st-chooser-list[data-chooser-tone="inset"]{background:var(--st-inset);border-radius:14px;padding:4px 10px}
+.inspection-phone .sheet.picker-step .st-chooser-list .st-picker-options{border:0;border-radius:0;background:transparent;overflow:visible}
+.inspection-phone .sheet.picker-step :is(.st-picker-option,.medicine-option,.catalog-item,.catalog-category){display:flex;align-items:center;gap:12px;min-height:52px;padding:12px 8px;box-sizing:border-box;border:0;border-radius:0;background:transparent}
+.inspection-phone .sheet.picker-step :is(.st-picker-option,.medicine-option,.catalog-item,.catalog-category)+:is(.st-picker-option,.medicine-option,.catalog-item,.catalog-category){border-top:1px solid var(--st-rule)}
+.inspection-phone .sheet.picker-step :is(.st-picker-option[aria-selected="true"],.medicine-option[aria-pressed="true"],.catalog-item:has(input:checked)){background:transparent;color:var(--st-ink)}
+.inspection-phone .sheet.picker-step :is(.st-picker-option,.medicine-option,.catalog-category):active{background:#eaf0e2}
+.inspection-phone .sheet.picker-step .chooser-selection{border:0;border-radius:0;background:transparent;width:22px;height:22px;flex:none}
+.inspection-phone .sheet.picker-step .st-chooser-subtitle{margin:0;padding:16px 8px 6px;font:600 12px/1.4 var(--sans);color:var(--st-muted)}
+.inspection-phone .sheet.picker-step .st-picker-option-copy{flex:1;min-width:0}
+.inspection-phone .sheet.picker-step :is(.st-picker-option strong,.medicine-option strong,.catalog-item strong){overflow-wrap:anywhere}
+.inspection-phone .sheet.picker-step .st-picker-option small{font:400 11px/1.4 var(--sans);color:var(--st-muted)}
+.inspection-phone .sheet.picker-step .catalog-path{background:transparent}
+
+/* Drawer convention: white canvas, contextual tinted panels; rules only between rows. */
+.inspection-phone .sheet.picker-step :is(.catalog-categories,.catalog-items,.chooser-options){background:var(--st-panel-bg,var(--st-inset));border:1px solid var(--st-line);border-radius:var(--st-radius);overflow:hidden;padding:0}
+.inspection-phone .sheet.picker-step :is(.catalog-category,.catalog-item,.medicine-option){padding:14px;min-height:56px}
+.inspection-phone .sheet.picker-step :is(.health-catalog,.medicine-results){border:0;padding-top:0}
+.inspection-phone .sheet.picker-step :is(.health-catalog,.medicine-results)::before{display:none}
+.inspection-phone .sheet.picker-step .catalog-group h5{border:0}
+.inspection-phone .sheet.picker-step .chooser-header-back{width:44px;height:44px;min-width:44px;padding:12px;border:0;background:transparent;box-shadow:none;border-radius:50%;margin:0}
+.inspection-phone .sheet.picker-step .chooser-header-back svg{width:20px;height:20px}
+
+/* Selection is a check, not an extra rectangle inside the contextual panel. */
+.inspection-phone .sheet.picker-step .st-chooser-section+.st-chooser-section{margin-top:18px}
+.inspection-phone .sheet.picker-step .st-chooser-section .st-chooser-subtitle{padding:0 4px 8px;color:var(--st-ink);font-size:13px;font-weight:600}
+.inspection-phone .sheet.picker-step .st-chooser-section-options{background:var(--st-panel-bg,var(--st-inset));border:1px solid var(--st-line);border-radius:var(--st-radius);overflow:hidden}
+.inspection-phone .sheet.picker-step .st-chooser-section-options .st-picker-option{padding:12px 14px}
+.inspection-phone .sheet.picker-step .st-chooser-section-options .st-picker-option-copy{display:flex;flex-direction:row;align-items:baseline;gap:12px}
+.inspection-phone .sheet.picker-step .st-chooser-section-options .st-picker-option-copy strong{min-width:28px}
+.inspection-phone .sheet.picker-step .medicine-category-row>span{display:flex;flex-direction:row;align-items:baseline;justify-content:space-between;gap:12px;min-width:0}
+.inspection-phone .sheet.picker-step .medicine-category-row small{flex:none;white-space:nowrap}
+.inspection-phone .sheet.picker-step .medicine-category-row strong{min-width:0;overflow-wrap:anywhere}
+
+.inspection-phone .sheet.record-optional-editor[data-size="short"],.inspection-phone .sheet.brand-picker-step[data-size="short"]{min-height:min(360px,58%);max-height:58%}
+.inspection-phone .sheet.record-optional-editor>.sheet-body{flex:1;display:flex;flex-direction:column;min-height:0}
+.inspection-phone .sheet.record-optional-editor textarea.notes-input{flex:1;width:100%;height:auto;min-height:120px;box-sizing:border-box;resize:none;padding:14px;font:400 14px/1.5 var(--sans);color:var(--st-ink);background:var(--st-inset)}
+
+
+/* Chooser: one row geometry for every level and shape (flat, sectioned, nested).
+   Headings and row text share one left edge; the trailing slot is always 24px on the right. */
+.st-choice-group.st-choice-group{margin:0 0 20px;padding:0;border:0;background:transparent}
+.st-choice-group:last-child{margin-bottom:0}
+.st-choice-heading.st-choice-heading{margin:0;padding:0 17px 8px;border:0;font:600 12px/1.4 var(--sans,'Plus Jakarta Sans',sans-serif);letter-spacing:0;text-transform:none;color:var(--st-muted)}
+.st-choice-panel{background:var(--st-panel-bg,var(--st-inset));border:1px solid var(--st-line);border-radius:var(--st-radius);overflow:hidden}
+.st-choice-row.st-choice-row{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;margin:0;padding:10px 16px;box-sizing:border-box;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--st-ink);font:inherit;text-align:left;cursor:pointer}
+.st-choice-row.st-choice-row+.st-choice-row{border-top:1px solid var(--st-rule)}
+.st-choice-row.st-choice-row:active{background:#eaf0e2}
+.st-choice-copy{display:flex;flex:1;flex-direction:column;gap:2px;min-width:0}
+.st-choice-label{font:500 14px/1.4 var(--sans,'Plus Jakarta Sans',sans-serif);color:var(--st-ink);overflow-wrap:anywhere}
+.st-choice-meta{font:400 12px/1.4 var(--sans,'Plus Jakarta Sans',sans-serif);color:var(--st-muted)}
+.st-choice-row[aria-pressed="true"] .st-choice-label{font-weight:600}
+.st-choice-trail{display:grid;place-items:center;flex:none;width:24px;height:24px;color:var(--st-ink)}
+.st-choice-trail svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.st-choice-row[data-mode="navigate"] .st-choice-trail{color:var(--st-muted)}
+.st-choice-row[data-mode="navigate"] .st-choice-trail svg{width:18px;height:18px}
+.st-choice-trail input[type="checkbox"]{width:20px;height:20px;margin:0;accent-color:var(--st-ink)}
+.st-choice-search.st-choice-search{margin:0 0 20px}
+.st-choice-empty{margin:0;padding:24px 17px;font:400 13px/1.5 var(--sans,'Plus Jakarta Sans',sans-serif);color:var(--st-muted)}

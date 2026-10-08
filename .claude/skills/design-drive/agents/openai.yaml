@@ -1,0 +1,5 @@
+interface:
+  display_name: "Design drive"
+  short_description: "Run a feature's product and UI design to a developer handoff"
+policy:
+  allow_implicit_invocation: false

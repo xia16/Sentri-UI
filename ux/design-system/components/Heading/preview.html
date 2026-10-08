@@ -1,0 +1,15 @@
+<!-- @dsCard group="Structure" height=300 subtitle="page · section · panel · group" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<body>
+<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="a"></div><div id="b" style="margin-top:22px"></div><div id="c" style="margin-top:22px"></div><div id="d" style="margin-top:22px"></div></div>
+<script>
+const UI = window.SentriUI, I = window.SentriIcons.icon;
+a.innerHTML = UI.heading({ title: 'Farrowing room 3', kind: 'page', level: 2, description: '12 sows · 4 farrowed today' });
+b.innerHTML = UI.heading({ title: 'Feed', icon: I('feed'), description: 'Last changed 2 days ago · G.H', action: '<button type="button">Edit</button>' });
+c.innerHTML = UI.heading({ title: 'Sow details', kind: 'panel', meta: 'Mon 09:42' });
+d.innerHTML = UI.heading({ title: 'This week', kind: 'group' });
+</script>
+</body>
+</html>

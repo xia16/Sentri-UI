@@ -1,0 +1,49 @@
+<!-- @dsCard height=300 -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  html,body{margin:0;background:var(--app-background)}
+  .cover{position:relative;width:960px;height:300px;overflow:hidden;background:var(--app-background)}
+  .cover svg{position:absolute;inset:0;width:960px;height:300px;stroke:none}
+  .ink{fill:var(--ink)}
+  .green{fill:var(--green)}
+  .sage{fill:var(--log-dot)}
+  .stone{fill:var(--control-border)}
+  .amber{fill:var(--amber)}
+  .panel{rx:var(--radius-panel);ry:var(--radius-panel)}
+  .tile{rx:var(--radius-segment);ry:var(--radius-segment)}
+  .rule{stroke:var(--line);stroke-width:1}
+  .text{position:absolute;left:48px;bottom:40px;max-width:440px}
+  .name{margin:0;font:800 120px/.92 var(--font-sans);letter-spacing:-.05em;color:var(--ink)}
+  .tag{margin:16px 0 0;font:400 14px/1.5 var(--font-sans);color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="cover">
+  <svg viewBox="0 0 960 300" aria-hidden="true">
+    <!--
+      blocks: ink slab 180 wide (full height, bleeds off the bottom) · green 168×168 · log-dot sage 120 tall bleeding off the bottom ·
+              control-border stone 120 wide bleeding off the right · one amber tile at row-icon size (34), the only state colour.
+      arrangement: one tall slab with satellites, set on a 12px gap (space-row-y), from x = 492.
+      pattern: row rules — "rules only between rows, never above the first": three `line` hairlines at the 68px row pitch (row-min),
+               crossing every block, because Sentri's whole grammar is the two-line row stacked in a bordered panel.
+      scales: gaps 12 (space-row-y), top inset 24 (space-section), pitch 68 (row-min); corners radius-panel 18, radius-segment 10.
+    -->
+    <rect class="ink panel" x="492" y="24" width="180" height="300"/>
+    <rect class="green panel" x="684" y="24" width="168" height="168"/>
+    <rect class="sage panel" x="684" y="204" width="168" height="120"/>
+    <rect class="stone panel" x="864" y="24" width="120" height="300"/>
+    <rect class="amber tile" x="907" y="227" width="34" height="34"/>
+    <line class="rule" x1="492" y1="92" x2="960" y2="92"/>
+    <line class="rule" x1="492" y1="160" x2="960" y2="160"/>
+    <line class="rule" x1="492" y1="228" x2="880" y2="228"/>
+  </svg>
+  <div class="text">
+    <h1 class="name">Sentri</h1>
+    <p class="tag">What to do, where, and how much — for the people working the barn.</p>
+  </div>
+</div>
+</body>
+</html>

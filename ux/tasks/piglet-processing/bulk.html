@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Record for several litters</title>
+<link rel="stylesheet" href="/ux/design-system/tokens.css">
+<link rel="stylesheet" href="/ux/design-system/components/bundle.css">
+<link rel="stylesheet" href="/ux/design-system/components/task-skeleton.css">
+<link rel="stylesheet" href="shell.css">
+<script type="module" src="ledger.js"></script>
+<script type="module" src="fixtures.js"></script>
+<style>
+/* Built from the task skeleton (ADR 0003): TaskPhone › TaskPage (head with the tick actions as its aside; body; footer:
+   Back + Review) with TaskGroups of TaskRows by crate row (a tick trail where one tap records); the review is a TaskSheet
+   over the page (TaskTotals, then each litter), closed by a TaskHold. Stacking and motion only, tokens only. */
+.bk-body { display: flex; flex-direction: column; gap: var(--space-heading); }
+.bk-body > * { margin: 0; }
+.bk-receipt { display: flex; flex-direction: column; gap: var(--space-key-gap); }
+/* The review: totals, each litter, one line per litter that differs, then the rule. */
+.bk-review { display: flex; flex-direction: column; gap: var(--space-heading); }
+.bk-review > * { margin: 0; }
+/* A row this record finished holds its place (flash), then settles into its door. */
+.bk-row-open { appearance: none; background: none; border: 0; margin: -21px -10px -7px; padding: 21px 10px 7px; min-height: 44px; min-width: 44px; box-sizing: border-box; cursor: pointer; text-align: left; }
+.bk-row-open:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; border-radius: 6px; }
+.tk-row[data-flash] { background: var(--green-wash); }
+.tk-row { transition: background 1100ms ease-out; }
+@media (prefers-reduced-motion: reduce) { .tk-row { transition: none; } }
+</style>
+</head>
+<body class="tk-stage">
+<div id="screen"></div>
+<script src="/ux/design-system/components/bundle.js"></script>
+<script src="/ux/design-system/components/task-skeleton.js"></script>
+<script src="shell.js"></script>
+<script src="shell-ui.js"></script>
+<script>
+(function () {
+  var K = window.SentriTask, UI = window.SentriUI, U = window.PPUI;
+  var zh = PP.lang === 'zh';
+
+  /* ---- states: a fixture variant + the ticks + UI state. Every row and figure is the ledger's (select.bulkDraft over the
+     shared log); the commit goes through the store's commitAll, with the review as its contract.
+     meantime: other phones' records that arrive after the review was read (they land with the commit).
+     offline: this phone records with the log it had; another phone's record of the same litter syncs after. ---- */
+  var FOUR = ['A02', 'A04', 'B06', 'B10'];
+  var LM = function (e) { return Object.assign({ who: 'L.M', device: 'P-LM' }, e); };
+  var STATES = {
+    'bulk':                   { data: 'base' },
+    'bulk-select':            { data: 'base', sel: FOUR },
+    'bulk-review':            { data: 'base', sel: FOUR, review: true },
+    'bulk-deferred':          { data: 'base', sel: FOUR, review: true, meantime: [LM({ type: 'treat', litter: 'B06', dose: 'iron3', n: 10, deferred: { n: 2, reason: 'weak' }, at: '2026-09-29T10:20' })], before: true },
+    'bulk-deferred-saved':    { data: 'base', sel: FOUR, review: true, commit: true, meantime: [LM({ type: 'treat', litter: 'B06', dose: 'iron3', n: 10, deferred: { n: 2, reason: 'weak' }, at: '2026-09-29T10:20' })], before: true },
+    'bulk-receipt':           { data: 'base', sel: FOUR, review: true, meantime: [LM({ type: 'treat', litter: 'B06', dose: 'iron3', n: 12, at: '2026-09-29T10:30' })], commit: true },
+    'bulk-changed':           { data: 'base', sel: FOUR, review: true, commit: true, meantime: [
+      LM({ type: 'death', litter: 'B06', lines: [{ cause: 'crushed', n: 2 }], at: '2026-09-29T10:30' }),
+      LM({ type: 'move', from: 'B09', to: 'A02', n: 1, rows: ['B09-r10'], answers: { iron3: 'no' }, at: '2026-09-29T10:30' }),
+      LM({ type: 'move', from: 'B10', to: 'D02', n: 11, answers: {}, at: '2026-09-29T10:30' })] },
+    'bulk-offline-collision': { data: 'base', sel: FOUR, offline: { litter: 'B06', n: 10, at: '2026-09-29T10:26' }, commit: true },
+    // after End no new marks (RULINGS round 3): no rows, and the room omits the bulk door
+    'bulk-ended':             { data: 'ended-moves' }
+  };
+  var name = STATES[PP.state] ? PP.state : 'bulk';
+  var st = STATES[name];
+  var qs = PP.q;
+  var ROOM = +(qs.get('unit') || 7);
+  var TX = qs.get('tx') || 'iron';
+  var store, CFG, DOSE, TICKS, holds;
+  var S = { sel: [], review: false, contract: {}, receipt: null, held: [], flash: false, failed: null };
+  var holdTimer = 0;
+
+  /* ---- the ledger ---- */
+  function bulk(sel, stamp, reviewed) {
+    return store.select.bulkDraft(store.derived, { room: ROOM, dose: DOSE, selected: sel || S.sel, stamp: stamp || { who: PP.me }, reviewed: reviewed || null });
+  }
+  function doseCfg(id) { return CFG.doses.filter(function (d) { return d.id === id; })[0]; }
+  function pickDose() {
+    if (qs.get('dose') && doseCfg(qs.get('dose'))) return qs.get('dose');
+    var ids = CFG.doses.filter(function (d) { return d.tx === TX; }).map(function (d) { return d.id; });
+    var has = function (kinds) { return ids.filter(function (id) { return store.select.bulkDraft(store.derived, { room: ROOM, dose: id }).rows.some(function (r) { return kinds.indexOf(r.kind) >= 0; }); })[0]; };
+    return has(['record', 'sheet']) || has(['done']) || ids[0] || CFG.doses[0].id;
+  }
+  /* Ticks are a draft on this phone: kept on every change, restored on reopen, cleared by the commit. */
+  function saveTicks() { try { if (S.sel.length) sessionStorage.setItem(TICKS, JSON.stringify(S.sel)); else sessionStorage.removeItem(TICKS); } catch (e) {} }
+  function loadTicks() { try { return JSON.parse(sessionStorage.getItem(TICKS) || '[]') || []; } catch (e) { return []; } }
+  function isChanged(id) { return !!(S.receipt && S.receipt.changed.indexOf(id) >= 0); }
+  function tickable(r) { return r.kind === 'record' && !r.outside && !isChanged(r.litter); }
+
+  /* ---- words: a skeleton text slot is { text, str, args } ---- */
+  var one = PP.one;
+  function s(id, args, tone) { var o = { text: PP.t(id, args), str: id, args: args }; if (tone) o.tone = tone; return o; }
+  var SEP = { sep: true };
+  function pigs(n) { return PP.tn('pp.common.unit.piglet', n); }
+  function title() { var d = doseCfg(DOSE); return { tx: PP.t('pp.common.tx.' + d.tx), d: d.due }; }
+  function txLower() { var t = PP.t('pp.bulk.tx', title()); return zh ? t : t.charAt(0).toLowerCase() + t.slice(1); }
+
+  /* ---- a litter row (TaskRow): crate + one chip | one headline | the litter's age ----
+     how: 'select' (a tick), 'door' (its sheet), 'static' (held after the record, no action). */
+  function chip(r) {
+    if (r.sowDied) return s('pp.bulk.chip.sowdied', null, 'red');
+    if (r.kind === 'done') return r.collided ? s('pp.bulk.chip.check', null, 'amber') : s('pp.bulk.chip.done');
+    if (r.phase === 'open') return s('pp.bulk.chip.open', null, 'amber');
+    return null;
+  }
+  function headline(r) {
+    if (r.kind === 'record') {
+      var h = [s(one('pp.bulk.row.owed', r.n), { n: r.n })];
+      if (isChanged(r.litter)) h.push(SEP, s('pp.bulk.tok.changed', null, 'amber'));
+      else if (r.lateBy) h.push(SEP, s(one('pp.bulk.row.late', r.lateBy), { n: r.lateBy }, 'red'));
+      return h;
+    }
+    if (r.kind === 'done') {
+      if (r.collided) return [s('pp.bulk.row.collide', { n: r.records.length }, 'amber')];
+      var n = r.records.reduce(function (a, x) { return a + x.n; }, 0);
+      return [s(one('pp.common.unit.piglet', n), { n: n })];
+    }
+    if (r.kind === 'not_due') return [s(r.inDays === 1 ? 'pp.bulk.l1.tomorrow' : 'pp.bulk.l1.in', { n: r.inDays })];
+    return [r.why === 'deferred' ? s('pp.bulk.l1.deferred', { n: r.n, reason: PP.t('pp.litter.why.' + (r.reason || 'deferred')) })
+      : r.why === 'missed' ? s('pp.bulk.l1.missed', { n: r.n, d: r.last })
+      : r.why === 'unknown' ? s('pp.bulk.l1.unknown', { n: r.n }) : s('pp.bulk.l1.castration')];
+  }
+  /* The meta line: the litter's age (only where it differs from the dose's day), and what the one chip had no room for. A
+     done row's lateness is the ledger's (`lateBy`: what this record made up, from its own day-age), so a reload keeps it. */
+  function meta(r) {
+    var m = [];
+    if (r.kind === 'done' && r.sowDied && !r.collided) m.push(s('pp.bulk.chip.done'));
+    if (r.day !== doseCfg(DOSE).due) m.push(s('pp.common.unit.day', { n: r.day }));
+    if (r.kind === 'done' && r.lateBy > 0) m.push(s(one('pp.bulk.row.late', r.lateBy), { n: r.lateBy }, 'red'));
+    var out = [];
+    m.forEach(function (x, i) { if (i) out.push(SEP); out.push(x); });
+    return out.length ? out : '';
+  }
+  function row(r, how) {
+    var html = K.row({ id: s('pp.bulk.code', { code: r.litter }), chip: chip(r), headline: headline(r), tone: r.kind === 'not_due' ? 'forecast' : '',
+      // The title says the dose's day (`Iron · day 3`): the litter's age shows only where it differs from it.
+      meta: meta(r), value: r.litter,
+      trail: how === 'select' ? 'tick' : how === 'door' ? 'chevron' : '', action: how === 'door' ? 'open-litter' : '', still: how === 'static',
+      tick: how === 'select' ? { action: 'toggle', checked: S.sel.indexOf(r.litter) >= 0 } : null,
+      data: S.flash && S.held.indexOf(r.litter) >= 0 ? { flash: '' } : null });
+    // A tickable row is one tap to tick (the whole row); its id is its own target and opens the litter.
+    // (A button inside a label would be the label's control: `for` keeps the tick the row's.)
+    if (how === 'select') html = html.replace('<label class="tk-row"', '<label for="bk-tick-' + r.litter + '" class="tk-row"').replace('<input type="checkbox"', '<input id="bk-tick-' + r.litter + '" type="checkbox"').replace(/<span class="tk-row-id">(<span [^>]*>[^<]*<\/span>)<\/span>/, function (m, inner) {
+      return '<button type="button" class="tk-row-id bk-row-open" data-action="open-litter" data-value="' + r.litter + '">' + inner + '</button>';
+    });
+    return html;
+  }
+  /* Rows grouped by crate row (A, B, C…), the room's grouping; a tick where one tap records, a door everywhere else. */
+  function how(r) {
+    if (S.held.indexOf(r.litter) >= 0) return 'static';
+    return tickable(r) ? 'select' : 'door';
+  }
+  function groups(rows) {
+    var by = {}, order = [];
+    rows.forEach(function (r) { var k = r.litter.charAt(0); if (!by[k]) { by[k] = []; order.push(k); } by[k].push(r); });
+    return K.list(order.map(function (k) {
+      return K.group({ face: 'word', title: s('pp.bulk.grp.row', { r: k }), meta: s(one('pp.bulk.grp.n', by[k].length), { k: by[k].length }), rows: by[k].map(function (r) { return row(r, how(r)); }) });
+    }));
+  }
+
+  /* ---- outcome lines (Candidate:Receipt): one line per litter the record did not write as ticked ---- */
+  function outcomeLines(outcomes, review) {
+    return outcomes.map(function (x) {
+      var c = x.litter;
+      if (x.outcome === 'died') return U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: c } }, { id: one('pp.bulk.rcpt.died', x.died), args: { k: x.died }, tone: 'red' }, { id: review ? 'pp.bulk.rv.will_record' : 'pp.bulk.rcpt.recorded', args: { pigs: pigs(x.n) } }]);
+      if (x.outcome === 'changed') return U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: c } }, { id: 'pp.bulk.rcpt.changed', tone: 'amber' }, { id: 'pp.bulk.rcpt.changed_now', args: { pigs: pigs(x.n) } }]);
+      if ((x.outcome === 'gone' || x.outcome === 'nothing' || x.outcome === 'done') && x.other) return U.receipt([{ id: 'pp.bulk.rcpt.meantime', args: { code: c, t: U.time(x.other.at), who: x.other.who, pigs: pigs(x.other.n) } }, { id: 'pp.bulk.rcpt.nothing', tone: 'amber' }]);
+      if (x.outcome === 'gone') return U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: c } }, { id: 'pp.bulk.rcpt.gone', tone: 'amber' }]);
+      if (x.outcome === 'sheet' && x.other) return U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: c } }, { id: 'pp.bulk.rcpt.sheet_by', args: { who: x.other.who, m: x.other.n, n: x.n }, tone: 'amber' }]);
+      if (x.outcome === 'sheet' || x.outcome === 'not_due') return U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: c } }, { id: 'pp.bulk.rcpt.sheet', tone: 'amber' }]);
+      if (x.outcome === 'refused') return U.receipt([{ id: 'pp.bulk.rcpt.code', args: { code: c } }, { id: 'pp.bulk.rcpt.refused' }, { id: why(x.why), tone: 'amber' }]);
+      return '';
+    }).join('');
+  }
+  var WHY = ['task_ended', 'no_task', 'nothing_owed', 'more_than_owed', 'reason_missing', 'empty'];
+  function why(r) { return 'pp.bulk.why.' + (WHY.indexOf(r) >= 0 ? r : 'other'); }
+  // `counts late` is a schedule word (bulk lists only litters in the task, before End: RULINGS round 3, Q18).
+  function lateCount(list) { return list.filter(function (x) { return x.lateBy > 0; }).length; }
+
+  /* ---- the page (TaskPage): title the dose, the unit in the description; the ticks line; the crate rows ---- */
+  function receiptPanel() {
+    var R = S.receipt; if (!R) return '';
+    var head = R.litters ? U.receipt([{ id: 'pp.bulk.rcpt.saved', args: { tx: txLower() } }, { id: one('pp.bulk.part.litters', R.litters), args: { k: R.litters } },
+      { id: one('pp.common.unit.piglet', R.piglets), args: { n: R.piglets }, tone: 'green' }].concat(R.late ? [{ id: one('pp.bulk.rcpt.late', R.late), args: { k: R.late } }] : [])) : '';
+    var dbl = R.double.map(function (x) {
+      return U.receipt([{ id: 'pp.bulk.rcpt.double', args: { code: x.litter, t: U.time(x.other.at), who: x.other.who, pigs: pigs(x.other.n) } }, { id: 'pp.bulk.rcpt.double_flag', tone: 'amber' }]);
+    }).join('');
+    return UI.panel('<div class="bk-receipt" id="bk-receipt">' + head + outcomeLines(R.outcomes.filter(function (x) { return x.outcome !== 'record'; }), false) + dbl + '</div>');
+  }
+  /* The text actions on the ticks, the page head's aside (farrowing's Clear): untick all, tick every litter one tap records. */
+  function tickActions(b) {
+    var free = b.rows.filter(function (r) { return tickable(r) && S.sel.indexOf(r.litter) < 0; }).length;
+    return (S.sel.length ? UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '') +
+      (free ? UI.button({ label: PP.t('pp.bulk.act.tick_all'), register: 'text', action: 'tick-all', strs: { label: 'pp.bulk.act.tick_all' } }) : '');
+  }
+  function page(opts) {
+    var b = bulk(), owe = b.rows.filter(function (r) { return r.kind === 'record' || r.kind === 'sheet'; }).length;
+    // The head says the unit and, once litters are ticked, what Review will hold (`Unit 7 · 4 litters · 46 piglets · not recorded yet`).
+    var desc = S.sel.length && b.plan.litters ? s(one('pp.bulk.desc.ticked', b.plan.litters), { u: ROOM, k: b.plan.litters, pigs: pigs(b.plan.piglets) })
+      : owe ? s(one('pp.bulk.desc', owe), { u: ROOM, k: owe }) : s('pp.bulk.desc.zero', { u: ROOM });
+    var body, foot, aside = '';
+    if (!b.rows.length) {
+      body = UI.panel(UI.choiceEmpty('', { strs: { text: b.ended ? 'pp.bulk.empty_ended' : 'pp.bulk.empty' }, args: { text: { tx: txLower() } } }));
+      foot = K.footer({ back: { action: 'leave' } });
+    } else {
+      aside = b.ended ? '' : tickActions(b);
+      body = receiptPanel() + groups(b.rows);
+      var p = b.plan;
+      foot = K.footer({ back: { action: 'leave' }, primary: S.sel.length && p.litters
+        ? { label: s(one('pp.bulk.act.review', p.litters), { k: p.litters }), action: 'review' }
+        : { label: s('pp.bulk.act.review_none'), action: 'review', waiting: true } });
+    }
+    return K.page({ title: s('pp.bulk.head', title()), description: desc, aside: aside, inert: S.review, body: '<div class="bk-body">' + body + '</div>', footer: foot });
+  }
+
+  /* ---- the review (TaskSheet): the counts, each litter's piglets (the contract), the litters that differ; a hold ---- */
+  function review() {
+    // Judged against the contract frozen when Review opened: a sync re-renders this drawer but never rebases it.
+    var b = bulk(null, null, S.contract), p = b.plan, d = doseCfg(DOSE);
+    var sub = d.product ? s('pp.bulk.rv.prod', { prod: PP.t('pp.litter.product.' + d.product) }) : s('pp.bulk.rv.all');
+    var late = lateCount(p.record);
+    var sum = [{ label: s('pp.bulk.rv.f.litters'), value: s('pp.bulk.n', { n: p.litters }) }, { label: s('pp.bulk.rv.f.piglets'), value: s('pp.bulk.n', { n: p.piglets }) }];
+    if (late) sum.push({ label: s('pp.bulk.rv.f.late'), value: s('pp.bulk.n', { n: late }) });
+    var each = p.record.map(function (x) { return { label: '', value: '', strs: { label: 'pp.bulk.code', value: one('pp.common.unit.piglet', x.n) }, args: { label: { code: x.litter }, value: { n: x.n } } }; });
+    var differ = p.outcomes.filter(function (x) { return x.outcome !== 'record'; });
+    var content = (p.litters ? K.totals(sum, { columns: 3 }) + UI.heading({ title: '', kind: 'section', level: 3, strs: { title: 'pp.bulk.rv.each' } }) + UI.facts(each, { columns: 3 }) : '') +
+      (differ.length ? '<div class="bk-receipt">' + outcomeLines(differ, true) + '</div>' : '') +
+      (S.failed ? U.receipt([{ id: 'pp.bulk.rv.failed' }, { id: why(S.failed), tone: 'amber' }]) : '') +
+      (p.litters ? UI.heading({ title: '', kind: 'group', level: 4, strs: { title: 'pp.bulk.rv.pointer' } }) : '');
+    return K.drawer({ size: 'medium', view: 'bulk-review', title: s('pp.bulk.rv.title', { tx: txLower() }), subtitle: sub, close: { action: 'back' },
+      scrim: { action: 'back' }, body: '<div class="bk-review">' + content + '</div>',
+      footer: K.footer({ back: { action: 'back' }, hold: p.litters ? { label: s(one('pp.bulk.act.record', p.piglets), { n: p.piglets }), caption: s('pp.bulk.hold.caption'), action: 'record', tone: 'primary' } : null }) });
+  }
+
+  /* ---- render: keeps scroll and focus ---- */
+  var scr = document.getElementById('screen');
+  function render() {
+    var pb = scr.querySelector('.tk-page-body'), top = pb ? pb.scrollTop : 0;
+    var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-action]');
+    var fk = f ? [f.dataset.action, f.value || f.dataset.value || ''] : null;
+    scr.innerHTML = K.phone(page() + (S.review ? review() : ''), { bar: false });
+    PP.apply(scr);
+    var nb = scr.querySelector('.tk-page-body'); if (nb) nb.scrollTop = top;
+    if (fk) {
+      var t = Array.prototype.filter.call(scr.querySelectorAll('[data-action]'), function (e) { return e.dataset.action === fk[0] && (e.value || e.dataset.value || '') === fk[1] && !e.closest('[inert]'); })[0];
+      if (t) t.focus({ preventScroll: true });
+    }
+  }
+
+  /* ---- commit: the review's contract, re-read against the log as it is now, written as one act (commitAll, one stamp).
+     A litter whose numbers moved since the review is not written; every reviewed litter gets its own line. ---- */
+  function commit(seen) {
+    var st0 = store.stamp(), stamp = { at: st0.at, who: PP.me };
+    if (seen) stamp.seen = seen;
+    var b = bulk(S.sel, stamp, S.contract);
+    var evs = b.plan.events.map(function (e) { return Object.assign({ at: stamp.at }, seen ? { seen: seen } : {}, e); });
+    var res = evs.length ? store.commitAll(evs) : { ok: true, events: [] };
+    if (!res.ok) { S.failed = res.reason; S.review = true; return false; }
+    S.failed = null;
+    S.receipt = { outcomes: b.plan.outcomes, litters: b.plan.litters, piglets: b.plan.piglets, late: lateCount(b.plan.record),
+      changed: b.plan.changed.slice(), double: [], mine: res.events.map(function (e) { return e.id; }) };
+    recheck();
+    S.held = b.plan.outcomes.filter(function (x) { return x.outcome === 'record' || x.outcome === 'died' || x.outcome === 'nothing'; }).map(function (x) { return x.litter; });
+    S.sel = []; S.review = false; saveTicks();
+    return true;
+  }
+  /* After a sync: a record of ours that another phone's record collides with is flagged, both kept. */
+  function recheck() {
+    var R = S.receipt; if (!R) return;
+    R.double = [];
+    bulk([]).rows.forEach(function (r) {
+      if (r.kind !== 'done' || !r.records.some(function (x) { return R.mine.indexOf(x.id) >= 0 && x.collided; })) return;
+      r.records.forEach(function (x) { if (x.collided && R.mine.indexOf(x.id) < 0) R.double.push({ litter: r.litter, other: x }); });
+    });
+  }
+  /* Another hand's record arrives through the ledger (PP.sync({ type: 'treat', litter: 'B06', dose: 'iron3', n: 12 })). */
+  PP.sync = function (event, quiet) {
+    var r = store.commit(Object.assign({ who: 'L.M', device: 'P-LM' }, event));
+    if (r.ok) { recheck(); if (!quiet) render(); }
+    return r;
+  };
+
+  /* ---- hold, then settle: a finished row keeps its face (flash, no action) for 800ms of idle (any touch resets it), then
+     becomes its door; scrolled past, it settles now ---- */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function settle() { clearTimeout(holdTimer); S.held = []; S.flash = false; render(); }
+  function armHold() {
+    clearTimeout(holdTimer);
+    if (S.held.length) holdTimer = setTimeout(settle, 800);
+  }
+  ['pointerdown', 'touchstart'].forEach(function (e) { window.addEventListener(e, armHold, { passive: true, capture: true }); });
+  window.addEventListener('scroll', function () {
+    if (!S.held.length) return;
+    var pb = scr.querySelector('.tk-page-body'); if (!pb) return;
+    var topY = pb.getBoundingClientRect().top;
+    var els = Array.prototype.filter.call(scr.querySelectorAll('.tk-page .tk-row[data-flash]'), function (e) { return true; });
+    if (els.length && els.every(function (e) { return e.getBoundingClientRect().bottom <= topY; })) settle(); else armHold();
+  }, { passive: true, capture: true });
+
+  function nav(page, params) { location.href = PP.href(page, Object.assign({ data: store.name !== 'base' ? store.name : '' }, params)); }
+  scr.addEventListener('change', function (ev) {
+    var t = ev.target; if (!t.matches('input[data-action="toggle"]')) return;
+    var i = S.sel.indexOf(t.value);
+    if (t.checked && i < 0) S.sel.push(t.value); else if (!t.checked && i >= 0) S.sel.splice(i, 1);
+    saveTicks(); render();
+  });
+  scr.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-action]'); if (!b || b.matches('input') || b.closest('.st-hold')) return;
+    if (UI.guard(b)) return;                                                // a waiting Review answers, never opens
+    var a = b.dataset.action, v = b.dataset.value;
+    if (a === 'clear') { S.sel = []; saveTicks(); render(); }
+    else if (a === 'tick-all') {
+      bulk().rows.forEach(function (r) { if (tickable(r) && S.sel.indexOf(r.litter) < 0) S.sel.push(r.litter); });
+      saveTicks(); render();
+    }
+    else if (a === 'review') { S.review = true; S.failed = null; freeze(); render(); focusSheet(); }
+    else if (a === 'back') { S.review = false; S.contract = {}; render(); }
+    else if (a === 'leave') nav('room.html', { state: 'room', filter: doseCfg(DOSE).tx, unit: ROOM !== 7 ? ROOM : '' });
+    else if (a === 'open-litter') nav('litter.html', { state: 'litter', crate: v, unit: ROOM !== 7 ? ROOM : '' });
+  });
+  function focusSheet() { var sh = scr.querySelector('.tk-sheet'); if (sh) sh.focus({ preventScroll: true }); }
+  /* The contract: what the review shows for each ticked litter, frozen when Review opens (piglets, alive, dead, moves, counts). */
+  function freeze() {
+    S.contract = {};
+    bulk().rows.forEach(function (r) { if (S.sel.indexOf(r.litter) >= 0 && r.kind === 'record') S.contract[r.litter] = { n: r.n, alive: r.alive, dead: r.dead, moved: r.moved, counted: r.counted }; });
+  }
+
+  PP.ready.then(function () {
+    PP.me = window.PPFixtures.ME;
+    // A state that writes on boot keeps its records out of this tab's log, so every other state opens clean.
+    store = PP.open(st.data, (st.commit || st.meantime) ? { session: false } : {});
+    CFG = store.config;
+    DOSE = pickDose();
+    TICKS = 'pp-bulk-ticks:' + store.name + ':' + ROOM + ':' + DOSE;
+    var rec = bulk([]).rows.filter(function (r) { return r.kind === 'record'; }).map(function (r) { return r.litter; });
+    // Ticks stay true: only litters that can still be recorded, written back so the room's door never claims more.
+    S.sel = (st.sel || loadTicks()).filter(function (id) { return rec.indexOf(id) >= 0; });
+    if (!st.sel) saveTicks();
+    if (qs.get('crate') && rec.indexOf(qs.get('crate')) >= 0 && S.sel.indexOf(qs.get('crate')) < 0) S.sel.push(qs.get('crate'));
+    if (st.meantime && st.before) st.meantime.forEach(function (e) { PP.sync(e, true); });
+    if (st.review) { S.review = true; freeze(); }
+    if (st.meantime && !st.before) st.meantime.forEach(function (e) { PP.sync(e, true); });
+    if (st.commit) {
+      var seen = st.offline ? store.events.map(function (e) { return e.id; }) : null;
+      commit(seen);
+      if (st.offline) PP.sync({ type: 'treat', litter: st.offline.litter, dose: DOSE, n: st.offline.n, deferred: { n: 12 - st.offline.n, reason: 'weak' }, at: st.offline.at, seen: seen }, true);
+      S.held = []; S.flash = false;
+    }
+    render();
+    // The review closes with a hold (TaskHold): the record is one act for every ticked litter.
+    holds = K.holdBind(scr, { t: function (id) { return PP.t(id); },
+      cues: { keep: 'pp.bulk.hold.keep', tap: 'pp.bulk.hold.tap', released: 'pp.bulk.hold.released', disarmed: 'pp.bulk.hold.released', again: 'pp.bulk.hold.again', early: 'pp.bulk.hold.again' },
+      onCommit: function (el) {
+        holds.settle(el, 'done');
+        if (!commit()) { render(); return; }
+        S.flash = !reduce; render(); armHold();
+        var lv = scr.querySelector('[data-action="leave"]'); if (lv) lv.focus({ preventScroll: true });
+      } });
+  });
+})();
+</script>
+</body>
+</html>

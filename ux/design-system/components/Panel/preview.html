@@ -1,0 +1,14 @@
+<!-- @dsCard group="Structure" height=330 subtitle="Page context vs drawer context" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<body>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:720px"><div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:18px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="a"></div></div><div class="inspection-phone" data-st-context="drawer" style="max-width:390px;padding:18px;background:var(--paper);font-family:var(--sans);color:var(--ink)"><div id="b"></div></div></div>
+<script>
+const UI = window.SentriUI, I = window.SentriIcons.icon;
+const body = UI.heading({ title: 'Litter', kind: 'panel' }) + '<p style="margin:0;font-size:13px;line-height:1.5">11 born alive · 1 stillborn. Fostering closes at 48 hours.</p>';
+a.innerHTML = UI.heading({ title: 'On a page' }) + UI.panel(body);
+b.innerHTML = UI.heading({ title: 'In a drawer' }) + UI.panel(body);
+</script>
+</body>
+</html>

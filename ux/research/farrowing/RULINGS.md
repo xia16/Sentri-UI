@@ -413,3 +413,162 @@ history lives in git.
   day, `yesterday` for the ended sow, the date from seven days. (The ended sow's death
   moved to aug 25 so the room, whose today is aug 26, no longer shows a death in its
   own future.)
+
+## Piglet processing (仔猪处理) — grilling, 2026-09-29
+
+Owner answers from the design-drive grilling. They bind the piglet-processing
+map; where one touches farrowing's own law it says so. **Open** lines are under
+investigation and not yet ruled.
+
+- **The mark carries the configured product and dose (Q2, owner):** the console's
+  product + dose for that treatment is snapshotted onto the mark automatically; the
+  worker enters nothing extra. Actual-use deviations (substitutions) are v2.
+- **Identity schemes differ by farm (Q3, owner):** some farms notch every piglet, some
+  notch only piglets with breeding potential and tag them later, some tag all, some tag
+  only and never notch. The design must serve every scheme; tag **or** notch identifies.
+  **Sex and weight are optional** and never block a row. National (防疫) tags are out of
+  scope. *Open:* how a farm's scheme is expressed (config) and what "identity work done"
+  means for a keepers-only farm.
+- **Count differences are unexplained gain / unexplained loss (Q4, owner):** a high count
+  is NOT routed to More born; both directions are one stamped unexplained adjustment.
+  *Open — owner asked for an elegant, balanced model:* recount, added piglets, adoption
+  (fostering), a piglet that jumped into another pen, a body found after an unexplained
+  loss — "in the end the whole thing should balance out".
+- **End task mirrors farrowing's (Q5, owner, agreed as recommended):** manual only, never
+  auto-closes at window end; review shows unfinished litters and treatments in numbers;
+  hold-to-commit with receipt; cannot end while the batch's farrowing task is open (reason
+  shown); the mandatory flag changes wording only, never blocks; after End no new marks,
+  while corrections and identity rows stay writable, stamped.
+- **Late and early (Q6, owner):** late stays due until done or task end, carries its real
+  date, counts late; no clinical cut-off in v1. Early is allowed for any scheduled item
+  actually done, counts on time. **Plus: a worker may explicitly skip piglets for a
+  reason** (e.g. weak piglets skip iron). *Open:* what a skip does to the obligation
+  (catch-up vs permanent) per treatment, and a better castration interaction than a bare
+  "done".
+- **Corrections (Q7, owner, agreed as recommended):** anyone may un-record or change a mark
+  through Edit — stamped, original kept, corrected value amber. Identity rows stay
+  viewable and editable after entry and after End; withdrawing a mistaken row is a stamped
+  act, not a deletion. Wrong litter = correction here + fresh record there.
+  提交后不可再查看 is a form artefact, not a compliance lock.
+- **Double treatment (Q8, owner, agreed as recommended):** a done treatment shows who and
+  when and a second tap does nothing; offline collisions keep both records, flagged as a
+  possible double treatment, never merged. No claiming of litters in v1.
+- **Deaths from processing (Q9, owner):** a worker in processing who sees dead piglets marks
+  them dead quickly, through **one shared dead picker** — the same one farrowing uses. The
+  only difference is that when the litter has tagged piglets, the picker shows them too.
+  (A change to the shared dead drawer; owner-approved in principle, drawn in its slice.)
+- **Fostering / adoption reopened for investigation (Q9–Q10, owner):** the owner asks how
+  farms handle a piglet moved from an unprocessed litter into a processed one (or the
+  reverse) and how the record reminds them. Parking stands for farrowing until this
+  investigation reports; not yet ruled for processing.
+- **Multi-sow pens (Q10):** out of scope if farrowing is individually housed in practice;
+  owner asked for the scenario check before ruling. *Open.*
+- **Verbs (Q11, owner, provisional):** Record (commit an act or observation) · Edit
+  (correct posted) · Set count · End task; Back / Clear / Save / Close as farrowing; no
+  Mark; Submit / Confirm / Complete banned. Provisional — may change if a better verb
+  appears.
+
+### Round 2 (owner agreed all as recommended, 2026-09-29)
+
+- **The litter ledger (Q12):** every litter balances at all times —
+  `Alive = Born − Dead − Moved out + Moved in ± Unexplained − Weaned`; Born never moves here.
+  Three records: **Count** (the worker records the number seen; the difference is written as
+  an unexplained gain or loss, stamped); **Move** (one record changes both litters at once,
+  n piglets from crate A to crate B — fosters, nurse sows, strays, across rooms too);
+  **Explain** (each open gain/loss stays open, one by one, never netted, until explained by a
+  death — the dead picker asks "one of the 2 missing?" and takes the body from the open loss —
+  or by a move the app suggests and the worker confirms; unexplained stays open as a room-header
+  line and a console anomaly). The app never pairs by itself. Two offline counts of one crate
+  are two observations: the later stands, differences are never summed. This supersedes
+  "Gone · no body" wording only in processing; farrowing's pre-lock grammar is unchanged.
+- **Moves in processing v1 (Q13):** Move opens only on litters whose farrowing is locked
+  (before the lock the farrowing sheet owns the count). Farrowing's own foster door stays parked.
+- **What moved piglets owe (Q14):** source all done / none done → the moved piglets carry it
+  (a done crate goes back to due for them: `iron · tail · castrate — 1 owed · from crate 14`).
+  Source partly done → the Move asks per invisible treatment (iron, toltrazuril, vaccines, 保健):
+  `Had iron? Yes / No / Don't know`. Don't know → receiving litter shows `1 arrived · iron
+  unknown — check spray mark`, resolved by recording or "already had". The Move receipt says to
+  spray-mark moved piglets. Visible treatments (teeth, tail, castration, ID) are checked on the pig.
+- **Skips carry a reason, and the reason decides (Q15):** Deferred (weak, sick) → stays due,
+  shows next visit. Exempt (hernia, cryptorchid, kept boar …) → leaves the task; hernia and
+  cryptorchid become a litter note. Lapsed → past the treatment's optional console "last
+  age-day" (e.g. teeth d7, toltrazuril d7; iron has none) it shows as **missed**, not overdue.
+  This amends round 1's "no clinical cut-off" for window-bound treatments only.
+- **Castration record (Q16):** `castrated 5 · not castrated 1: hernia`; not-castrated split by
+  reason (hernia · cryptorchid · deferred · kept boar); the two together give the male count;
+  only deferred stays due. Every treatment: one tap records all live piglets; lowering the
+  number asks a reason for the rest.
+- **Identity schemes are farm config (Q17):** scheme (none · notch · tag · notch-then-tag), who
+  (all · candidates), which age-day, and the done rule (all alive, or the worker closes the
+  candidate set — `9 of 20 identified — done` is complete, the 11 are not overdue). Processing
+  holds only the processing-day identity step; tagging a notched candidate later is selection
+  (留种), out of this map.
+- **Scope (Q18):** multi-sow pens out of v1. Birth litter weight is farrowing's; processing may
+  record it only when missing, no nag. Postpartum check stays a separate task. A sow's death
+  leaves her litter on its schedule in the task. A litter with no task: deaths, counts and moves
+  recordable; treatments not.
+- **Decided for the owner (driver):** each scheduled dose is its own obligation (iron d3 and
+  iron d14 are two items); move suggestions are ranked by time and room, never proof; open
+  gains and losses show separately on the room header beside the net drift.
+
+### Round 3 (owner, 2026-09-30 — four provisional calls that contradicted standing rulings)
+
+- **Orphans of a mid-farrowing sow death can be moved (Q13 amended):** Move opens once her
+  farrowing session is over — locked, **or ended by the sow's death**. (Confirms the provisional.)
+- **After End, no new treatment marks — kept as flagged evidence (Q5 clarified):** piglets moved
+  into an ended litter keep their owed doses as **not done** (never recordable as catch-up), and a
+  treatment done after End that syncs later is **kept on the record, stamped and flagged `after
+  End`, but never counted** as a task treatment; neither reopens the task. (Replaces the
+  provisional catch-up and after-End-apply lines.)
+- **A recount never closes a line (Q12 kept):** unexplained lines close only by a death or a
+  confirmed Move. A **mistaken count is corrected through Edit** (stamped, original kept), which
+  removes its line. A later count is an observation like any other. (Replaces the provisional
+  "recount supersedes".)
+- **The same body recorded twice is held for review (merge contract applied):** when two offline
+  deaths allocate one missing piglet, the second allocation is held as a sync-review conflict (Dead
+  1, Alive 9) until a worker confirms one body or two — never silently a second death. (Replaces the
+  driver's "excess becomes a plain death".)
+
+### Round 4 (owner, 2026-09-29, after scenario round 1)
+
+- **A counted gain owes nothing new.** A count that finds more piglets than Alive changes Alive only; the litter's recorded treatments stand and the gain line reads "check on the pig". When the gain is later explained as a Move, the Move's rules apply to those piglets.
+- **Possible double treatment has two answers.** "Same injection, recorded twice" withdraws one record (kept, stamped). "Given twice" keeps both and records a double dose for the vet; it counts once toward done.
+- **A nurse sow outside every task joins the task when task piglets are moved onto her.** Her litter is added to the task; the arrivals keep their own schedule and can be treated there. Her own earlier facts stay on her earlier litter. (Supersedes round 2 Q18 for this case only; a litter with no task piglets still records deaths, counts and moves only.)
+- **End is allowed with review items open.** The End review lists them; ending freezes them as "unresolved at End" on the receipt and handoff; they stay answerable afterwards as corrections.
+
+### Round 5 (owner, 2026-09-30, look and feel)
+
+- **All tasks look the same; only the information differs.** Piglet processing is rebuilt on farrowing's task skeleton (ADR 0003), at farrowing's density: a list row is id + one chip, one headline, one meta line; everything else moves down a level. Prototypes are shown to the owner only inside the 390×844 phone frame.
+- **A litter opens as a drawer over the room, like a sow in farrowing.** The drawer holds the litter summary, what it owes as rows and the tools (Record dead, Set count, Move, Edit); a treatment opens in the same drawer and Back returns.
+- **Match farrowing exactly where it departs from the design-system README** (filled status chips, a lone Back filled in ink, the hold caption's style). The README rules are revisited later for both tasks together.
+- **Farrowing's true bugs are fixed in farrowing too** (floating footers over dead space, reversed left edges, the live scrim behind a dialog, the banned word "complete"); nothing else about farrowing changes. The exit word is always **Back**.
+
+### Round 6 (owner, 2026-10-05, after scenario round 2)
+
+- **A sow outside the task who still has her own piglets joins the task as a whole when task piglets are moved onto her.** Her own piglets owe their doses on their own schedule too (often already late). The Move preview says so before the move is saved: "E01's own 7 piglets join too · owe Cut cord, Nasal drops (2 days late)".
+- **A possible double treatment gets a third answer: "Different piglets · both stand".** Both records count in full (e.g. 6 + 6 = 12 of 12), stamped with who answered. The other two answers are unchanged.
+
+### Round 7 (owner, 2026-10-05, after scenario round 3)
+
+- **Tagging follows each farm's own standard.** Some farms don't tag at all (e.g. fatteners handled as a batch); others notch, tag all, or tag keepers. Identity is owed only where the farm's scheme requires it, and then it counts like any other step the farm requires — so on a tagging farm a litter still owes today until it is tagged. A farm whose scheme is "no identity" owes no tagging and shows none. (Driver's reading: one combined "owe today", with the row saying what is left, e.g. "Treatments done · Tag 12 left"; a "none" identity scheme is added to the farm config.)
+- **Missed doses count as owed at End.** The room keeps them out of today's owed (Q15: past the last day, not overdue); at End, on the receipt and on the weaning handoff, a missed dose counts as owed / not done.
+- **Two phones recording one untagged death each on the same litter, neither seeing the other, with no open loss: soft-flagged for review** ("Same body recorded twice?") when the cause matches and they are within 30 minutes. Both count until answered.
+- **A correction may settle other litters' debts** (e.g. arrivals from the corrected litter), and the correction message always lists every litter whose owed figure moved.
+
+### Round 8 (owner, 2026-10-05, simplification)
+
+- **Users are farmers, not tech-savvy, used to paper.** Avoid complex status changes; prefer rules that simplify even if they restrict (retro 34). The owner will judge the simplified workflow in a working app before the seven simplification proposals are settled.
+- **Bulk recording stays** — walking the pens and treating them is how farms work.
+- **Bulk respects each treatment's time window.** Pens inside the window are ready to record; pens too early or past the window are shown apart and need a manual override with a clear alert ("B03 is day 6. Iron is given on day 2–4. Record anyway? It will be marked late."), and the record carries the early/late mark.
+
+### Round 9 (owner, 2026-10-07, simplification decisions)
+
+- **Set count just adjusts the pen's record to what is there now.** No "1 missing" on the pen, no reason question, no follow-up "one of the missing?". The piglet is assumed gone for whatever reason. The difference is kept only in the overall checker (batch / task level: "N piglets unaccounted"), not as a pen status.
+- **No nurse sows outside the task.** All pigs follow the batch → task structure; Move only offers pens in the task (and batch).
+- **Bulk = chips.** Tap a job chip (e.g. Iron): every pen that needs it is listed; the worker taps through the pens as they treat them, then "Finish iron treatment" saves them together. Time-window override stays (round 8).
+
+### Round 10 (owner, 2026-10-07, per-piglet work and breeders — direction only)
+
+- **Per-piglet work (ID by tag/notch, weighing, sex, breeder selection) may be universal features, not owned by the piglet-processing task** — usable from any task or inspection, wherever a pig is in hand. To be researched against how farms work and how other inspection tasks in the product handle per-animal properties; a proposal comes before any decision.
+- **Breeder ranking: placeholder UI only.** The ranking algorithm is out of scope for design.
+- **Moved piglets:** a piglet identified before it moved keeps its known mother; untagged piglets moved in are "mother unknown" and left out of mother-based suggestions; the pen warns "has N piglets from other pens · suggestions may be off".

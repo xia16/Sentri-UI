@@ -1,0 +1,244 @@
+// Dead drawer click-through (scenario round 1: R1-8, R1-9, R1-22, R1-26): real taps from the room, one ledger, one fixture.
+// Run: node tests/dead-click-through.mjs [port]
+// Uses the Playwright the design lint installs (~/.cache/adam-design/playwright-<v>).
+import { spawn } from 'node:child_process';
+import { createRequire } from 'node:module';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
+import assert from 'node:assert/strict';
+
+const port = Number(process.argv[2]) || 4633;
+const require = createRequire(join(homedir(), '.cache', 'adam-design', 'playwright-1.63.0', 'package.json'));
+const { chromium } = require('playwright');
+const server = spawn(process.execPath, ['scripts/serve-ux.cjs', String(port)], { stdio: 'ignore' });
+const base = `http://localhost:${port}/ux/tasks/piglet-processing/`;
+const ready = (p) => p.waitForSelector('html[data-ready]');
+const text = async (p, sel) => (await p.locator(sel).first().innerText()).replace(/\s+/g, ' ');
+// round 5: the room's review and drift doors are one row (`reviews`); its sheet holds the drift door (`explain`)
+async function drift(p) { await p.click('[data-action="reviews"]'); const t = await text(p, '[data-action="explain"]'); await p.click('.tk-sheet [data-action="close-sheet"]'); await p.waitForSelector('.tk-sheet', { state: 'detached' }); return t; }
+async function explain(p) { await p.click('[data-action="reviews"]'); await p.click('[data-action="explain"]'); }
+const dialog = async (p) => (await p.locator('[role="dialog"]').last().innerText()).replace(/\s+/g, ' ');
+const log = (p, v) => p.evaluate((k) => JSON.parse(sessionStorage.getItem('pp-log:' + k) || '[]'), v);
+const stepValue = (p, cause) => p.locator(`[data-ds="Stepper"][data-field="${cause}"] [role="spinbutton"]`).innerText();
+
+async function toDead(page, code, data) {
+  await page.goto(base + `room.html?state=room&lens=all&fresh=1${data ? '&data=' + data : ''}`); await ready(page);
+  await page.click(`[data-action="open-litter"][data-value="${code}"]`);
+  await page.waitForURL(/state=litter/); await ready(page);
+  await page.click('[data-action="open-dead"]');
+  await page.waitForURL(/dead\.html/); await ready(page);
+}
+
+try {
+  await new Promise((r) => setTimeout(r, 400));
+  const browser = await chromium.launch();
+  const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+
+  // 1. R1-26: room → A02 → Record death. The steppers start at 0 for this entry (A02's 1 dead is said apart); the stepper keys
+  // name the cause; photos are previewed, deleted, restored and ride the Save; Save returns to the litter (no host stub).
+  await toDead(page, 'A02');
+  assert.match(await dialog(page), /Dead A02 · 12 alive · 1 dead so far/);
+  for (const c of ['crushed', 'scours', 'starve_out', 'other']) assert.equal(await stepValue(page, c), '0');
+  const inc = page.locator('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  assert.match(await inc.evaluate((el) => el.getAttribute('aria-label')), /Crushed · one more/);
+  await inc.click();
+  assert.match(await dialog(page), /1 unsaved/);
+  await page.click('[data-action="photo-add"]'); await page.click('[data-action="photo-add"]');
+  assert.match(await text(page, '[data-ds="Photos"]'), /2 attached/);
+  await page.click('[data-action="photo-view"][data-value="ph-2"]');
+  assert.match(await dialog(page), /Photo 2 of 2/);
+  await page.click('[data-action="photo-delete"]');
+  assert.match(await text(page, '[data-ds="Photos"]'), /1 attached.*Photo deleted/);
+  await page.click('[data-action="photo-undo"]');
+  assert.match(await text(page, '[data-ds="Photos"]'), /2 attached/);
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/state=litter.*saved=dead/); await ready(page);
+  assert.match(await text(page, '.lt-summary'), /Alive now 11 Dead 2/);
+  const ev1 = (await log(page, 'base')).pop();
+  assert.equal(ev1.type, 'death'); assert.equal(ev1.photos.length, 2);
+  console.log('ok 1 steppers from 0, photos kept on the event, Save → litter:', await text(page, '.lt-summary'));
+
+  // 2. R1-26: Back keeps the draft on this phone and returns to the litter; reopening restores it. `Other` asks for a note.
+  await page.click('[data-action="open-dead"]');
+  await page.waitForURL(/dead\.html/); await ready(page);
+  await page.click('[data-ds="Stepper"][data-field="other"] [data-step="1"]');
+  await page.fill('input[data-field="pigNote"]', 'leg caught in the slats');
+  await page.click('[data-action="back"]');
+  await page.waitForURL(/state=litter/); await ready(page);
+  await page.click('[data-action="open-dead"]');
+  await page.waitForURL(/dead\.html/); await ready(page);
+  assert.equal(await stepValue(page, 'other'), '1');
+  assert.equal(await page.inputValue('input[data-field="pigNote"]'), 'leg caught in the slats');
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/state=litter/); await ready(page);
+  const ev2 = (await log(page, 'base')).pop();
+  assert.equal(ev2.note, 'leg caught in the slats'); assert.equal(ev2.lines[0].note, 'leg caught in the slats');
+  console.log('ok 2 Back keeps the draft; Other carries its note:', ev2.lines[0].cause, ev2.note);
+
+  // 3. R1-8: a body found in A02 that is one of D03's missing: the drawer offers D03's open loss and records it there.
+  // A02's Alive does not move; D03's line drops to 1.
+  await toDead(page, 'A02');
+  await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  assert.match(await dialog(page), /One of D03's 2 missing\?/);
+  await page.click('[data-action="route"][data-value="D03"]');
+  const routed = await dialog(page);
+  assert.match(routed, /Dead 1 D03/); assert.match(routed, /Recording in D03 · found in A02/);
+  assert.match(routed, /From the 2 missing alive stays 11 · 1 missing still open/);
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/state=litter.*crate=A02/); await ready(page);
+  assert.match(await text(page, '.lt-summary'), /Alive now 12/);
+  await page.click('[data-action="close"]');
+  await page.waitForURL(/room\.html/); await ready(page);
+  assert.match(await drift(page), /Unexplained loss 1 D03/);
+  console.log('ok 3 neighbour crate → D03\'s loss:', await drift(page));
+
+  // 4. R1-8 room-level: the drift strip → the room's open lines → `Found a body?` → whose? D03 → Save: back on Explain with
+  // the receipt `all missing found`; D03's line is gone.
+  await explain(page);
+  await page.waitForURL(/count\.html\?state=explain/); await ready(page);
+  await page.click('[data-action="found-body"]');
+  await page.waitForURL(/dead\.html\?.*state=dead-found/); await ready(page);
+  assert.match(await dialog(page), /Found a body Unit 7 · whose missing piglet is it\? Unit 7 · 1 crate D03 1 piglet missing/);
+  await page.click('[data-action="found-pick"][data-value="D03"]');
+  await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  assert.match(await dialog(page), /alive stays 11 · none missing now/);
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/count\.html\?.*state=explain.*saved=dead/); await ready(page);
+  await page.waitForSelector('#ct-receipt span');
+  assert.match(await text(page, '#ct-receipt'), /Saved\s*·\s*Recorded on D03\s*·\s*\+1 crushed\s*·\s*all missing found/);
+  assert.match(await text(page, '#screen'), /Nothing unexplained here/);
+  console.log('ok 4 room `Found a body` → D03 → back on Explain:', await text(page, '#ct-receipt'));
+
+  // 5. R1-26: Back from a drawer opened on Explain returns to Explain (not to a host or the litter).
+  await page.goto(base + 'room.html?state=room&lens=all&data=explain&fresh=1'); await ready(page);
+  await explain(page);
+  await page.waitForURL(/count\.html\?state=explain/); await ready(page);
+  await page.click('[data-action="open-dead"][data-value="B06"]');
+  await page.waitForURL(/dead\.html/); await ready(page);
+  await page.click('[data-action="back"]');
+  await page.waitForURL(/count\.html\?state=explain/); await ready(page);
+  console.log('ok 5 Back from Explain\'s Record death returns to Explain:', new URL(page.url()).search);
+
+  // 6. R1-9: B06 counted 11 (one missing, unnamed). Its body carries tag 271004: the drawer asks whether it was the missing
+  // one; yes closes the loss and Alive stays 11.
+  await page.click('[data-action="open-dead"][data-value="B06"]');
+  await page.waitForURL(/dead\.html/); await ready(page);
+  await page.click('[data-action="sub"][data-value="tagged"]');
+  await page.check('input[data-action="pick"][value="B06-r4"]');
+  await page.click('[data-action="pick-cause"][data-value="crushed"]');
+  await page.click('[data-action="save"]', { force: true });                       // waiting: answered, nothing saved
+  assert.match(await text(page, '#dd-why'), /Was 271004 one of the missing\? Answer to save/);
+  assert.match(page.url(), /dead\.html/);
+  await page.click('[data-action="miss"][data-value="yes"]');
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/count\.html\?state=explain/); await ready(page);
+  await page.waitForSelector('#ct-receipt span');
+  assert.match(await text(page, '#ct-receipt'), /271004 crushed\s*·\s*all missing found/);
+  assert.doesNotMatch(await text(page, '#screen'), /B06 · Unexplained loss/);
+  console.log('ok 6 a tagged body closes the loss a count left unnamed:', await text(page, '#ct-receipt'));
+
+  // 7. R1-22: a held body (the same body recorded twice offline) is shown in the dead drawer and answered there.
+  await toDead(page, 'A07', 'held-body');
+  assert.match(await dialog(page), /Same body recorded twice\?/);
+  await page.click('[data-action="sub"][data-value="held"]');
+  await page.click('[data-action="held-pick"][data-value="one"]');
+  await page.click('[data-action="resolve"][data-value$="|one"]');
+  assert.doesNotMatch(await dialog(page), /Same body recorded twice\?/);
+  assert.match(await dialog(page), /Dead A07 · 13 alive/);
+  console.log('ok 7 held body answered in the dead drawer: One body');
+
+  // 8. At 360 the drawer header's Clear never overlaps the title line.
+  await page.setViewportSize({ width: 360, height: 740 });
+  await toDead(page, 'A02');
+  await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  const clear = await page.locator('[data-action="clear"]').boundingBox();
+  const title = await page.locator('.tk-sheet-titles').boundingBox();
+  assert.ok(clear.x >= title.x + title.width - 1 || clear.y >= title.y + title.height - 1, 'Clear overlaps the title');
+  console.log('ok 8 360: Clear clear of the title');
+
+  // 9. R2-8: a count that empties the litter asks "All 12 dead?" before it saves, in the footer where the worker looks.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await toDead(page, 'A02');
+  const plus = page.locator('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  while ((await plus.getAttribute('aria-disabled')) !== 'true') await plus.click();       // every piglet alive (earlier steps recorded some)
+  const alive0 = (await text(page, '.tk-sheet-head')).match(/A02 · (\d+) alive/)[1];
+  assert.ok(await page.locator('#dd-why').isVisible(), 'the confirm is not visible');
+  assert.match(await text(page, '#dd-why'), new RegExp('All ' + alive0 + ' dead\\? Nothing is left alive in A02'));
+  assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
+  await page.click('[data-action="sure"]');
+  assert.notEqual(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
+  await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="-1"]');         // changing the entry asks nothing more
+  assert.equal(await page.locator('#dd-why [data-action="sure"]').count(), 0);
+  await page.click('[data-ds="Stepper"][data-field="scours"] [data-step="1"]');            // a different entry that still empties it: asked again
+  await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]').catch(() => {});
+  assert.match(await text(page, '#dd-why'), /All \d+ dead\?/);
+  await page.click('[data-action="sure"]'); await page.click('[data-action="save"]');
+  await page.waitForURL(/state=litter.*saved=dead/); await ready(page);
+  assert.match(await text(page, '.lt-summary'), /Alive now 0/);
+  console.log('ok 9 all the litter dead is confirmed once, in the footer');
+
+  // 10. R2-23: the loss question is a choice beside "None were missing"; the identified sheet says what it waits for;
+  // "Found outside its crate?" is offered before any count.
+  await toDead(page, 'D03');
+  await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  assert.match(await text(page, '[data-target="loss"]'), /Were any of them missing\?\s*From the 2 missing\s*None were missing/);
+  assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
+  await page.click('[data-target="loss"] [role="radio"]:has-text("None were missing")');
+  assert.match(await text(page, '[data-target="loss"]'), /None were missing alive 11 → 10/);
+  assert.notEqual(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
+  await page.click('[data-target="loss"] [role="radio"]:has-text("From the 2 missing")');
+  assert.match(await text(page, '[data-target="loss"]'), /alive stays 11 · 1 missing still open/);
+  await toDead(page, 'B06');
+  await page.click('[data-action="sub"][data-value="tagged"]');
+  await page.check('input[data-action="pick"][value="B06-r4"]');
+  assert.ok(await page.locator('#dd-why').isVisible(), 'the reason is not visible');
+  assert.match(await text(page, '#dd-why'), /Pick a cause for 271004/);
+  await toDead(page, 'A02');
+  assert.match(await text(page, '[data-target="route"], .tk-door'), /Found outside its crate\?/);          // before any count
+  assert.match(await text(page, '#screen'), /Found outside its crate\? One of D03's 2 missing\?/);
+  console.log('ok 10 loss choice, visible cause reason, outside-crate door before a count');
+
+  // 11. R2-23: a body recorded on another crate says where it was found: D03's log reads "found in A02" (the crate the drawer
+  // was opened on), and its own record names the body once.
+  await toDead(page, 'A02');
+  await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
+  await page.click('[data-action="route"][data-value="D03"]');
+  await page.click('[data-action="save"]');
+  await page.waitForURL(/state=litter.*crate=A02/); await ready(page);
+  await page.goto(base + 'edit.html?state=record-page&crate=D03&data=base'); await ready(page);
+  assert.match(await text(page, '[data-ds="Log"]'), /found in A02/);
+  console.log('ok 11 R2-23 body found in A02 → recorded on D03 → D03\'s log: found in A02');
+
+  // 12. R3-5: a loss that names tagged piglets (B06: 271002 and 271004 counted missing) is listed under `Found outside its crate?`
+  // with D03's; nothing is auto-picked (two candidates, then a lone one is still a tap); routing there lets the worker tick the
+  // named tag, and R3-16: the cause choice is in view right after the tick (small phone, long list).
+  const small = await (await browser.newContext({ viewport: { width: 360, height: 640 } })).newPage();
+  await toDead(small, 'A02', 'explain-named');
+  assert.match(await text(small, '#screen'), /Found outside its crate\? 2 crates have piglets missing/);
+  await small.click('[data-action="sub"][data-value="nb"]');
+  assert.match(await dialog(small), /B06 2 piglets missing.*D03 2 piglets missing/);
+  await small.click('[data-action="route"][data-value="B06"]');
+  assert.match(await dialog(small), /Dead B06.*Recording in B06 · found in A02/);
+  await small.click('[data-action="sub"][data-value="tagged"]');
+  await small.check('input[data-action="pick"][value="B06-r2"]');
+  const inView = async () => {
+    const c = await small.locator('[data-target="pick-cause"] [data-action="pick-cause"]').first().boundingBox();
+    const body = await small.locator('.tk-sheet .tk-sheet-body').boundingBox();
+    return c && c.y >= body.y - 1 && c.y + c.height <= body.y + body.height + 1;
+  };
+  assert.ok(await inView(), 'the cause choice is not in view after the tick');
+  await small.click('[data-action="pick-cause"][data-value="crushed"]');
+  await small.click('[data-action="save"]');
+  await small.waitForURL(/state=litter.*crate=A02/); await ready(small);
+  const ev12 = (await log(small, 'explain-named')).pop();
+  assert.equal(ev12.litter, 'B06'); assert.equal(ev12.foundIn, 'A02');
+  assert.deepEqual(ev12.lines.map((l) => l.rowId), ['B06-r2']);
+  // D03 is the lone candidate once B06 is explained away; B06 still has 271004 missing, so it stays listed
+  await small.click('[data-action="open-dead"]'); await small.waitForURL(/dead\.html/); await ready(small);
+  assert.match(await text(small, '#screen'), /Found outside its crate\? 2 crates have piglets missing/);
+  console.log('ok 12 R3-5 a tagged loss is offered outside-its-crate; the worker ticks the named tag; cause in view');
+
+  await browser.close();
+} finally {
+  server.kill();
+}

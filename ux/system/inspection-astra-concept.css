@@ -525,13 +525,12 @@
 .feed-percent-control input:disabled{opacity:.45}
 .feed-unavailable{font:12px/1.6 var(--sans)}
 .inspection-phone .feed-editor-sheet>.sheet-body{display:flex;min-height:0;overflow:hidden;padding:14px 21px 8px;scrollbar-gutter:auto}
-.feed-fixed-form{display:flex;flex:1;min-height:0;flex-direction:column;gap:10px}
-.feed-fixed-form> :not(.feed-inline-pigs){flex-shrink:0}
+.feed-fixed-form{flex:1;min-height:0;gap:10px}
 .feed-adjustment-line{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .feed-adjustment-line .field{flex-direction:row;align-items:center;gap:12px;flex:1}
 .feed-adjustment-line .field input{width:88px;min-width:0}
 .feed-adjustment-line .feed-reset{font-size:11px;min-height:44px;white-space:nowrap}
-.pig-review-card,.feed-inline-pigs{display:flex;flex-direction:column;flex:1;min-height:66px;overflow:hidden;border:1px solid #dce1d6;border-radius:12px;background:#fff}
+.pig-review-card{display:flex;flex-direction:column;flex:1;min-height:66px;overflow:hidden;border:1px solid #dce1d6;border-radius:12px;background:#fff}
 .pig-review-heading,.feed-pigs-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid #e2e6dd;background:#f7f8f4}
 .feed-pigs-heading>span{display:flex;align-items:baseline;gap:7px}
 .feed-pigs-heading h4{font-size:12px;margin:0}
@@ -563,14 +562,11 @@
 .feed-pig-title{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
 .inspection-phone .feed-pig-title .recorded-tag{min-height:24px;font-size:10px;padding:3px 6px;gap:4px}
 .inspection-phone .feed-pig-title .recorded-tag svg{width:12px;height:12px}
-.feed-action-panel{display:flex;flex-direction:column;gap:10px;padding:12px;margin:auto 0 0}
+.feed-action-panel{display:flex;flex-direction:column;gap:10px}
 .feed-control-caption{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .feed-control-caption>small{font:10px/1.4 var(--sans);color:#68745d;max-width:55%}
 .feed-control-caption .feed-reset{font:600 11px var(--sans);min-height:36px;white-space:nowrap}
 .feed-action-panel [data-feed-edit="percent"]:not([type="range"]){font-weight:600;font-variant-numeric:tabular-nums}
-.inspection-phone .feed-action-panel.facts-surface{padding:12px}
-.inspection-phone .feed-editor-sheet .feed-action-panel.bulk-controls{max-height:none;overflow:visible;gap:8px}
-.inspection-phone .feed-editor-sheet .feed-action-panel.is-collapsed{padding-top:6px;padding-bottom:6px}
 .feed-action-panel .field{min-width:0}
 .feed-action-panel .field input,.feed-action-panel .field select{min-width:0;width:100%;box-sizing:border-box}
 .feed-main-fields .field>span,.feed-adjustment-heading{display:flex;align-items:center;min-height:28px}
@@ -595,9 +591,6 @@
  .feed-pig-preview{grid-template-columns:minmax(0,1fr) 112px;gap:8px}
 }
 .inspection-phone .feed-action-panel .feed-amount-fields{padding:0;background:transparent}
-.feed-editor-sheet .feed-inline-pigs{min-height:120px}
-.feed-editor-sheet .feed-inline-pigs.is-short{flex:none;min-height:0}
-.feed-inline-pigs.is-short .feed-pig-rows{flex:none;overflow:visible}
 .feed-editor-sheet .feed-pig-rows{scrollbar-gutter:stable}
 .feed-fixed-form .field{margin:0;gap:5px;font:11px var(--sans)}
 .feed-fixed-form .plan-meta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin:0}
@@ -808,8 +801,6 @@
 .bulk-reading input:focus-visible,.bulk-pig-check input:focus-visible{outline:2px solid #416b95;outline-offset:2px}
 .inspection-phone .single-action-sheet>.sheet-body{padding:16px 21px}
 .inspection-phone .single-action-sheet .bulk-controls{max-height:none;overflow:visible}
-.single-feed-sheet .feed-inline-pigs{flex:none}
-.single-feed-sheet .feed-fixed-form{justify-content:space-between}
 
 /* Catalogue selections and optional records reuse the feed editor controls. */
 .medicine-field{min-height:44px}

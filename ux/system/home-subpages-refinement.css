@@ -8,15 +8,15 @@
 
 /* Shared leaf rhythm and readable secondary copy. */
 .device .unit-hub-unified{background:#f1f6e8;border:1px solid #c8d7b7;border-radius:18px;overflow:hidden;margin-bottom:24px}
-.device .unit-hub-unified .unit-hub-inspect{border:0;border-radius:0;background:transparent;padding:16px;gap:12px}
-.device .unit-hub-unified .unit-hub-inspect>svg:first-child{align-self:center;width:38px;height:38px;padding:9px;border-radius:11px;background:#2d6841;color:#fff;flex:none}
-.device .unit-hub-unified .unit-hub-inspect>span{font-size:15px;color:#244b30}
-.device .unit-hub-unified .unit-hub-inspect>svg:last-child{color:#2d6841}
-.device .unit-hub-unified .unit-hub-inspect small{font-size:11px;margin-top:5px}
-.device .unit-hub-unified .unit-hub-inspect .unit-last-check{font-size:10px;margin-top:7px}
-.device .unit-check-row{display:flex;align-items:center;gap:8px;margin:-3px 16px 13px}
-.device .unit-check-row>small{font-size:10px;line-height:1.4;color:var(--muted)}
-.device .unit-attention{padding:0 16px 15px}
+.device .unit-hub-unified .unit-hub-inspect{border:0;border-radius:0;background:transparent;padding:16px;gap:0;align-items:stretch}
+.device .unit-hub-unified .unit-hub-inspect .uhi-head{display:flex;align-items:center;gap:12px}
+.device .unit-hub-unified .unit-hub-inspect .uhi-head>svg:first-child{align-self:center;width:38px;height:38px;padding:9px;border-radius:11px;background:#2d6841;color:#fff;flex:none}
+.device .unit-hub-unified .unit-hub-inspect .uhi-title{font-size:15px;color:#244b30;flex:1}
+.device .unit-hub-unified .unit-hub-inspect .uhi-head>svg:last-child{color:#2d6841;flex:none}
+.device .unit-hub-unified .unit-hub-inspect .uhi-title small{font-size:11px;margin-top:5px}
+.device .unit-hub-inspect .unit-check-row{display:flex;align-items:center;gap:8px;margin:8px 0 0;padding:0}
+.device .unit-hub-inspect .unit-check-row>small{font-size:10px;line-height:1.4;color:var(--muted)}
+.device .unit-hub-inspect .unit-attention{padding:0;margin-top:10px}
 .device .unit-attention-chips{display:flex;flex-wrap:wrap;gap:7px}
 .device .unit-attention-chip{display:inline-flex;align-items:center;gap:5px;max-width:100%;justify-content:center;padding:6px 8px;background:#fffefb;border:1px solid #d3dfc3;border-radius:8px;line-height:1.4;color:#36563d}
 .device .unit-attention-chip>svg{width:14px;height:14px;flex:none;color:#527c39}
