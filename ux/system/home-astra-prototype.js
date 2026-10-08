@@ -238,6 +238,7 @@
   }
   function openTask(id,unit=null){
     if(id==='farrow28'){openDesigned('farrowing-astra-concept.html',unit,unit?'unit':'overview');return;}
+    if(id==='piglet27'){openDesigned('../tasks/piglet-processing/simple/index.html',unit,unit?'unit':'overview');return;}
     push('placeholder',{task:id,workUnit:unit});
   }
   function placeholder(){
