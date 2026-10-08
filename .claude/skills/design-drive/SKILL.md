@@ -72,15 +72,25 @@ before design starts.
    irreversible actions; permissions; scope; any change to a component a
    finished task uses; and, on a repo's first map, the verb set's meanings.
    Record each answer in the repo's rulings file as it is given.
-3. **Chart the map** with Matt's `wayfinder`: one ticket per design slice (a
-   sub-flow that can be designed and reviewed alone), each linking the map.
-   The Notes carry: the design-system version, *Waiting on you*, *Decided
-   for you*, the **provisional** ledger (see *Deciding*), and
-   `Stage: working` once the user agrees the map.
+3. **Chart the map** with Matt's `wayfinder`. His map holds decisions only
+   (`wayfinder:` labels, nothing else), so the slices hang off a **design
+   brief**: one issue, the map's spec, linking the rulings file, the
+   research folder and the evaluation set, linked from the map's Notes. Each
+   design slice (a sub-flow that can be designed and reviewed alone) is a
+   sub-issue of the brief, linking the map. The Notes carry: the brief, the
+   design-system version, *Waiting on you*, *Decided for you*, the
+   **provisional** ledger (see *Deciding*), and `Stage: working` once the
+   user agrees the map. A map charted before October 2026 holds its slices
+   as its own children: move each under a brief once, in one call so it is
+   never left under neither (`gh api --method POST
+   repos/<owner>/<repo>/issues/<brief>/sub_issues -F sub_issue_id=<db id> -F
+   replace_parent=true`); its labels, assignee and edges stay.
 
 ## Slices
 
-Work the map's frontier. Slices that touch different screens run in parallel.
+Work the frontier of the brief's slices (Matt's frontier query, run on the
+brief's sub-issues), and the map's own decision tickets as `wayfinder` does.
+Slices that touch different screens run in parallel.
 
 1. **Brief a designer** (a subagent; its model from `dispatch.py plan` in
    `drive`'s scripts, tier by the slice). The brief: the slice ticket, the
@@ -109,7 +119,7 @@ Scenarios surface from the design as much as from planning. After slices
 land, send **walk-through** agents — one per scenario, playing the worker —
 through the whole task in a real browser, plus one **breaker** with no script.
 Each new scenario goes to `scenarios.md` and is classified: already handled ·
-change a slice · new slice (a ticket) · new module (simple: spec it and add
+change a slice · new slice (a sub-issue of the brief) · new module (simple: spec it and add
 slices; complex: *Waiting on you*). The task is **settled** after two
 consecutive whole-task rounds find nothing that changes the design.
 
