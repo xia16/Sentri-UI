@@ -1,7 +1,7 @@
 {
   "extraKnownMarketplaces": {
     "mattpocock": {
-      "source": { "source": "git", "url": "https://github.com/mattpocock/skills.git" }
+      "source": { "source": "git", "url": "https://github.com/xia16/adam-agent-workflow.git", "ref": "pocock-pristine" }
     }
   },
   "enabledPlugins": {
