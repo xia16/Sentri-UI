@@ -10,6 +10,8 @@
    - Putting the page in the state: the screen's `preset` goes through the page's select.scenario; pages driven by their own
      URL params (Home, Piglet processing) already carry them in the screen's url.
    - Ready: parent.postMessage({ atlasReady: id }).
+   - Screens only a tap reaches: the screen's `steps` (ordered; each a string or { tap, hold }) are replayed after the preset.
+     A step is visible text, an aria-label / title, or a CSS selector (starts with [ . #), matched inside the phone.
    - The flow follows the demo: a page calls AtlasBare.watch(fn) after every render, fn() returns the screen id of the
      state it is in (or null); when that changes, parent.postMessage({ atlasScreen: id }).
    One convention for every prototype: new pages include this script in <head> and call AtlasBare.watch where they can.
@@ -63,6 +65,46 @@
     phone.classList.add('atlas-phone');
   }
 
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function frames() { return new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); }); }
+  function shown(el) { return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length); }
+  function norm(t) { return (t || '').replace(/\s+/g, ' ').trim().toLowerCase(); }
+  var TAPPABLE = 'button,a,[data-action],[role=button],label,summary,[tabindex]';
+  function findStep(phone, key) {
+    var k = String(key), want = norm(k), el, list, i;
+    if (/^[\[.#]/.test(k)) { list = phone.querySelectorAll(k); for (i = 0; i < list.length; i++) if (shown(list[i])) return list[i]; return null; }
+    var all = Array.prototype.filter.call(phone.querySelectorAll('*'), shown), best = null;
+    for (i = 0; i < all.length; i++) {   // smallest visible element whose text is the step, then its nearest control
+      el = all[i];
+      if (norm(el.textContent) === want && (!best || best.contains(el))) best = el;
+    }
+    if (best) return best.closest(TAPPABLE) && phone.contains(best.closest(TAPPABLE)) ? best.closest(TAPPABLE) : best;
+    for (i = 0; i < all.length; i++) {   // a control whose text begins with the step (its other words are a hint line)
+      el = all[i];
+      if (el.matches(TAPPABLE) && norm(el.textContent).indexOf(want) === 0 && (!best || best.contains(el))) best = el;
+    }
+    if (best) return best;
+    for (i = 0; i < all.length; i++) if (norm(all[i].getAttribute('aria-label')) === want || norm(all[i].getAttribute('title')) === want) return all[i];
+    return null;
+  }
+  function replay(phone, steps) {
+    var chain = Promise.resolve();
+    steps.forEach(function (st) {
+      chain = chain.then(function () {
+        var key = typeof st === 'string' ? st : st.tap, hold = typeof st === 'object' && st.hold;
+        var el = findStep(phone, key);
+        if (!el) { console.error('atlas-bare: step not found: ' + key); return; }
+        if (hold) {
+          var o = { bubbles: true, cancelable: true, button: 0, pointerId: 1, pointerType: 'mouse', isPrimary: true };
+          el.dispatchEvent(new PointerEvent('pointerdown', o));
+          return wait(hold).then(function () { el.dispatchEvent(new PointerEvent('pointerup', o)); });
+        }
+        el.click();
+      }).then(frames).then(function () { return wait(60); });
+    });
+    return chain;
+  }
+
   function check() {
     if (!ready || !fn) return;
     var sid = null; try { sid = fn(AB.screens); } catch (e) { return; }
@@ -71,6 +113,7 @@
     if (sid) parent.postMessage({ atlasScreen: sid }, '*');
   }
   AB.watch = function (f) { fn = f; check(); };
+  AB.current = function () { try { return fn ? fn(AB.screens) : null; } catch (e) { return null; } };   // the screen the page is on now (for checks)
 
   function start() {
     data.then(function (d) {
@@ -84,6 +127,8 @@
         else if (sel.value !== preset) { sel.value = preset; sel.dispatchEvent(new Event('change', { bubbles: true })); }
       }
       if (!AB.screen) console.warn('atlas-bare: unknown screen ' + id);
+      var steps = (AB.screen && AB.screen.steps) || [];
+      (steps.length ? frames().then(function () { return replay(phone, steps); }) : Promise.resolve()).then(function () {
       hideAround(phone);
       var fonts = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 250); })]) : Promise.resolve();
       fonts.then(function () { requestAnimationFrame(function () { requestAnimationFrame(function () {
@@ -91,6 +136,7 @@
         if (fn) { try { prev = fn(AB.screens); } catch (e) { prev = null; } }   // the state the screen opens in is not a change
         parent.postMessage({ atlasReady: id }, '*');
       }); }); });
+      });
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
@@ -798,6 +844,23 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 
 /* Utility: visually hidden, still read (a live status line, a label for assistive tech only). */
 .st-visually-hidden { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+/* OptionalRow: the one look of every optional input: label (row-title) · muted "Optional" · trailing icon action. See Field/README. */
+.st-optional-row{display:flex;align-items:center;gap:12px;width:100%;min-height:var(--touch-min);margin:12px 0 0;padding:0 0 0 var(--space-row-x);border:0;border-radius:var(--radius-control);background:var(--well);text-align:left;font-family:var(--font-sans);color:var(--ink);touch-action:manipulation}
+.st-optional-row:active{background:var(--press)}
+.st-optional-row:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.st-optional-row:disabled{opacity:.5}
+.st-optional-copy{display:flex;flex-direction:column;flex:1;min-width:0;padding:7px 0}
+.st-optional-head{display:flex;align-items:baseline;gap:8px;min-width:0}
+.st-optional-label{font:500 var(--type-row-title-size)/1.4 var(--font-sans);color:var(--ink)}
+.st-optional-word{font:400 var(--type-description-size,11px)/1.4 var(--font-sans);color:var(--muted)}
+.st-optional-answer{font:400 12px/1.5 var(--font-sans);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-optional-answer:empty{display:none}
+.st-optional-act{display:grid;place-items:center;flex:none;width:var(--touch-min);height:var(--touch-min);color:var(--ink)}
+.st-optional-act svg{box-sizing:content-box;width:16px;height:16px;padding:6px;border:var(--ring-width-fine) solid var(--muted);border-radius:50%;background:var(--paper);fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.st-optional-body{margin:8px 0 0}
+.st-optional-body[hidden]{display:none}
+.st-optional-body .field{margin-top:0}
 
 </style>
 <style>/* ../../../design-system/components/task-skeleton.css */
@@ -2144,7 +2207,24 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     scope.addEventListener('keydown',key);
     return {destroy(){scope.removeEventListener('keydown',key);}};
   }
-  const api=Object.freeze({heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind});
+  /* Optional row: the one look and behaviour of every optional input. Label (row-title 13/500), the word "Optional" (muted),
+     a trailing icon action. Empty it shows `icon`; filled it shows the value as its answer line and `editIcon`.
+     Host mode: `action` makes the row a button that asks the host to open the editor (picker, note page, camera).
+     Inline mode: `inline` (the field's own markup) is revealed under the row on tap; the row tracks its value as the answer line. */
+  function optionalRow({label='',value='',icon='',editIcon='',action='',key='',inline='',open=false,optionalWord='Optional',editLabel='Edit',disabled=false,className='',attrs={}}={}){
+    const filled=value!=null&&String(value).trim()!=='',glyph=filled?(editIcon||icon):icon,extra=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
+    const copy=`<span class="st-optional-copy"><span class="st-optional-head"><span class="st-optional-label">${esc(label)}</span><small class="st-optional-word">${esc(optionalWord)}</small></span><span class="st-optional-answer" role="status">${filled&&!(inline&&open)?esc(value):''}</span></span><span class="st-optional-act" aria-hidden="true">${glyph}</span>`;
+    const aria=` aria-label="${esc(filled?`${editLabel} ${label.toLowerCase()}, ${value}`:`${label}, ${optionalWord.toLowerCase()}`)}"`;
+    if(!inline)return `<button type="button" data-ds="OptionalRow" class="st-optional-row ${esc(className)}" data-filled="${filled}" data-action="${esc(action)}" data-value="${esc(key)}"${disabled?' disabled':''}${aria}${extra}>${copy}</button>`;
+    return `<div data-ds="OptionalRow" class="st-optional ${esc(className)}" data-open="${open}" data-filled="${filled}"><button type="button" class="st-optional-row" data-filled="${filled}" data-st-optional aria-expanded="${open}"${aria}${extra}>${copy}</button><div class="st-optional-body"${open?'':' hidden'}>${inline}</div></div>`;
+  }
+  if(typeof document!=='undefined'){
+    const sync=box=>{const field=box.querySelector('.st-optional-body :is(input,textarea)'),v=field?field.value.trim():'',row=box.querySelector('.st-optional-row'),open=box.dataset.open==='true';
+      box.dataset.filled=row.dataset.filled=String(!!v);box.querySelector('.st-optional-answer').textContent=open?'':v;};
+    document.addEventListener('click',e=>{const row=e.target.closest('[data-st-optional]');if(!row)return;const box=row.closest('.st-optional'),open=box.dataset.open!=='true';
+      box.dataset.open=String(open);row.setAttribute('aria-expanded',String(open));box.querySelector('.st-optional-body').hidden=!open;sync(box);if(open)box.querySelector('.st-optional-body :is(input,textarea,select)')?.focus();},true);
+  }
+  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
@@ -3533,7 +3613,9 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
         tone: used ? 'refused' : '', hint: used ? T('id.taken', { no: used }) : g.id.suggested ? T(notch() ? 'give.use.n' : 'give.use', { no: no }) : '', className: 'sp-give-measure' }) +
         (notch() ? '' : UI.iconButton({ action: 'give-scan', icon: I('scan'), label: T('pg.scan'), className: 'sp-give-scan' })) + '</div>';
       body += K.choice({ action: 'give-sex', label: T('id.sex'), options: [{ value: 'boar', label: T('boar'), pressed: g.sex === 'boar' }, { value: 'gilt', label: T('gilt'), pressed: g.sex === 'gilt' }] });
-      body += UI.measure({ label: T('give.kg'), optional: T('optional'), value: g.kg, unit: 'kg', placeholder: '—', action: 'give-field', key: 'kg', active: g.field === 'kg', className: 'sp-give-measure' });
+      /* weight is optional: the optional row until it is being typed, then the Measure on the Numpad */
+      body += g.field === 'kg' ? UI.measure({ label: T('give.kg'), optional: T('optional'), value: g.kg, unit: 'kg', placeholder: '—', action: 'give-field', key: 'kg', active: true, className: 'sp-give-measure' })
+        : UI.optionalRow({ label: T('give.kg'), optionalWord: T('optional'), value: g.kg ? T('kg', { w: g.kg }) : '', icon: I('plus'), editIcon: I('edit'), action: 'give-field', key: 'kg' });
     }
     var ready = !giveUsed(p) && giveNo(p) && g.sex;
     var primary = { label: T(g.edit ? 'give.fix' : 'give.save'), action: 'give-save', register: 'primary', waiting: !ready };

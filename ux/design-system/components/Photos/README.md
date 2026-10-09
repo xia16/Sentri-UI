@@ -6,6 +6,8 @@ The record sheet's photo field: up to 12 photos attached to the event. It is the
 
 Call `SentriUI.photos({ label, optional, count, active, items, max, action, viewAction, key, hint, error, id })`.
 
+Photos is the optional row ([Field](../Field/README.md)) with the camera as its action; a prototype without this card draws the same row with `optionalRow`.
+
 **Anatomy**
 - **Card:** a `well` fill with **no outline**. This is the owner's craft-pass ruling: the emptiest element must not have the strongest border.
   - `radius-control`, `space-row-x` padding on the left.

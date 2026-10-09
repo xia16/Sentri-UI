@@ -677,7 +677,24 @@
     scope.addEventListener('keydown',key);
     return {destroy(){scope.removeEventListener('keydown',key);}};
   }
-  const api=Object.freeze({heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind});
+  /* Optional row: the one look and behaviour of every optional input. Label (row-title 13/500), the word "Optional" (muted),
+     a trailing icon action. Empty it shows `icon`; filled it shows the value as its answer line and `editIcon`.
+     Host mode: `action` makes the row a button that asks the host to open the editor (picker, note page, camera).
+     Inline mode: `inline` (the field's own markup) is revealed under the row on tap; the row tracks its value as the answer line. */
+  function optionalRow({label='',value='',icon='',editIcon='',action='',key='',inline='',open=false,optionalWord='Optional',editLabel='Edit',disabled=false,className='',attrs={}}={}){
+    const filled=value!=null&&String(value).trim()!=='',glyph=filled?(editIcon||icon):icon,extra=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
+    const copy=`<span class="st-optional-copy"><span class="st-optional-head"><span class="st-optional-label">${esc(label)}</span><small class="st-optional-word">${esc(optionalWord)}</small></span><span class="st-optional-answer" role="status">${filled&&!(inline&&open)?esc(value):''}</span></span><span class="st-optional-act" aria-hidden="true">${glyph}</span>`;
+    const aria=` aria-label="${esc(filled?`${editLabel} ${label.toLowerCase()}, ${value}`:`${label}, ${optionalWord.toLowerCase()}`)}"`;
+    if(!inline)return `<button type="button" data-ds="OptionalRow" class="st-optional-row ${esc(className)}" data-filled="${filled}" data-action="${esc(action)}" data-value="${esc(key)}"${disabled?' disabled':''}${aria}${extra}>${copy}</button>`;
+    return `<div data-ds="OptionalRow" class="st-optional ${esc(className)}" data-open="${open}" data-filled="${filled}"><button type="button" class="st-optional-row" data-filled="${filled}" data-st-optional aria-expanded="${open}"${aria}${extra}>${copy}</button><div class="st-optional-body"${open?'':' hidden'}>${inline}</div></div>`;
+  }
+  if(typeof document!=='undefined'){
+    const sync=box=>{const field=box.querySelector('.st-optional-body :is(input,textarea)'),v=field?field.value.trim():'',row=box.querySelector('.st-optional-row'),open=box.dataset.open==='true';
+      box.dataset.filled=row.dataset.filled=String(!!v);box.querySelector('.st-optional-answer').textContent=open?'':v;};
+    document.addEventListener('click',e=>{const row=e.target.closest('[data-st-optional]');if(!row)return;const box=row.closest('.st-optional'),open=box.dataset.open!=='true';
+      box.dataset.open=String(open);row.setAttribute('aria-expanded',String(open));box.querySelector('.st-optional-body').hidden=!open;sync(box);if(open)box.querySelector('.st-optional-body :is(input,textarea,select)')?.focus();},true);
+  }
+  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

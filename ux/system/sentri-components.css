@@ -201,4 +201,23 @@ button.st-row[aria-current="location"]{background:#eaf2e5;box-shadow:inset 3px 0
 .st-choice-row[data-mode="navigate"] .st-choice-trail svg{width:18px;height:18px}
 .st-choice-trail input[type="checkbox"]{width:20px;height:20px;margin:0;accent-color:var(--st-ink)}
 .st-choice-search.st-choice-search{margin:0 0 20px}
-.st-choice-empty{margin:0;padding:24px 17px;font:400 13px/1.5 var(--sans,'Plus Jakarta Sans',sans-serif);color:var(--st-muted)}
+.st-choice-empty{margin:0;padding:24px 17px;font:400 13px/1.5 var(--sans,'Plus Jakarta Sans',sans-serif);color:var(--st-muted)}/* Optional row: label (row-title 13/500) · muted "Optional" · trailing icon action. The one look for every optional input. */
+.st-optional-row{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;margin:12px 0 0;padding:0 0 0 14px;border:0;border-radius:10px;background:var(--st-inset,#f6f8f1);text-align:left;font-family:var(--sans,'Plus Jakarta Sans',sans-serif);color:var(--st-ink,#20291f);touch-action:manipulation}
+.st-optional-row:focus-visible{outline:3px solid #3e6890;outline-offset:2px}
+.st-optional-row:active{background:#ebeee3}
+.st-optional-row:disabled{opacity:.5}
+.st-optional-copy{display:flex;flex-direction:column;flex:1;min-width:0;padding:7px 0}
+.st-optional-head{display:flex;align-items:baseline;gap:8px;min-width:0}
+.st-optional-label{font:500 13px/1.5 var(--sans,'Plus Jakarta Sans',sans-serif);color:var(--st-ink,#20291f)}
+.st-optional-word{font:400 11px/1.5 var(--sans,'Plus Jakarta Sans',sans-serif);color:var(--st-muted,#657060)}
+.st-optional-answer{font:400 12px/1.5 var(--sans,'Plus Jakarta Sans',sans-serif);color:var(--st-ink,#20291f);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-optional-answer:empty{display:none}
+.st-optional-act{display:grid;place-items:center;flex:none;width:44px;height:44px;color:var(--st-ink,#20291f)}
+.st-optional-act svg{box-sizing:content-box;width:16px;height:16px;padding:6px;border:1.5px solid var(--st-muted,#657060);border-radius:50%;background:var(--st-paper,#fff);fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.st-optional-body{margin:8px 0 0}
+.st-optional-body[hidden]{display:none}
+.st-optional-body .field{margin-top:0}
+.st-optional-body textarea{height:90px;min-height:90px}
+.st-optional-list{display:block}
+.farrowing-phone .finish-extras>.st-optional-row:first-child{margin-top:0}
+.farrowing-phone .finish-field-answer{justify-content:flex-end;min-height:54px}

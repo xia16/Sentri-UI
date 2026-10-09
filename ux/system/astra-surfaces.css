@@ -30,7 +30,6 @@
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .bulk-controls{padding:16px;gap:20px}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .field{font-size:13px;gap:8px}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet :is(.field input,.field select,.bulk-condition-button){min-height:48px;font-size:14px;padding:12px}
-.inspection-phone .sheet[data-presentation="page"].single-action-sheet .feed-optional-open{min-height:44px}
 
 /* A lone return action owns the footer; paired Back remains secondary. */
 :is(.farrowing-phone,.inspection-phone) .sheet-footer>.surface-back:only-child{width:100%;min-width:0;flex:1 1 auto;grid-column:1/-1;background:var(--ink,#20291e);border-color:var(--ink,#20291e);color:#fff;font-weight:600}

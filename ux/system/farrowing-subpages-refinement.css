@@ -115,9 +115,4 @@
 .farrowing-phone .piglet-row-main>span,.farrowing-phone .task-warning-copy>span,.farrowing-phone .feature-door :is(strong,small){display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* Optional finish details follow the same add-detail button convention as treatment. */
-.finish-optional-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.finish-optional-button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px;border:1px solid #e5eadc;border-radius:12px;background:#f8f9f3;color:#68745d;font:inherit;font-size:12px;text-align:center}
-.finish-optional-button svg{width:16px;height:16px;flex:none}
-.finish-optional-button[aria-expanded="true"]{border-color:#aebba3;background:#edf1e7;color:#293525}
-.finish-optional-button:focus-visible{outline:2px solid #416b95;outline-offset:2px}
 .finish-extras>.finish-field{margin-top:12px}
