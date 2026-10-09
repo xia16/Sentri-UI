@@ -80,7 +80,7 @@ A chip is the reason this row needs you first — an escalated measurement (`LAS
 
 ### Segments (lenses)
 
-First segment is the working pile, second the finished pile, All always last. Four states is the ceiling. Copy budget: 12 characters at three segments, 8 at four; when space runs out, inactive segments drop their counts first.
+First segment is the working pile, second the finished pile, All always last. A fixed 2–5 states is the ceiling; view switches have 2–3 subjects. Dynamic tags use FilterChips. Copy budget: 12 characters at three segments, 8 at four or five; when space runs out, inactive segments drop their counts first.
 
 ### The record sheet
 

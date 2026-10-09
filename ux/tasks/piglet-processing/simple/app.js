@@ -12,7 +12,7 @@
 
   /* What is open on the phone (not kept: a reload starts on the pen list) */
   function fresh(keep) {
-    return { chip: '', pen: null, tab: 'proc', draft: {}, over: null, adj: null, death: null, move: null, count: null, weight: null, give: null,
+    return { lens: 'todo', chip: '', pen: null, tab: 'proc', draft: {}, over: null, adj: null, death: null, move: null, count: null, weight: null, give: null,
       end: null, flash: null, open: {}, keepOpen: {}, justRec: [], demoOpen: keep ? keep.demoOpen : false };
   }
   var V = fresh();
@@ -95,19 +95,19 @@
     return K.group({ title: S('code', { c: p.code }), meta: S('sows.one'), door: { action: 'pen', value: p.code, label: T('pen.aria', { pen: p.code }) }, rows: row });
   }
   function isDone(p) { return P.todo(p).length === 0; }
-  /* the chips: All · one per job that pens need today (with how many) · Done. A chip only filters the pens. */
+  /* The lens selects To do / Done; tags narrow jobs within To do. */
   function chipCounts() {
-    var all = P.pens();
+    var all = P.pens().filter(function(p){return !isDone(p);});
     if (P.s.ended) return [];
     return P.steps().map(function (k) { return { k: k, n: all.filter(function (p) { return needsToday(p, k); }).length }; })
       .filter(function (c) { return c.n > 0 || c.k === V.chip; });
   }
   function chipsRow() {
     var all = P.pens(), done = all.filter(isDone).length;
-    var items = [{ value: '', label: S('chips.all'), count: S('fig', { v: all.length }), checked: V.chip === '', aria: T('chips.all') }]
+    var items = [{ value: '', label: S('chips.all'), checked: V.chip === '', aria: T('chips.all') }]
       .concat(chipCounts().map(function (c) { return { value: c.k, label: S(chipKey(c.k)), count: S('fig', { v: c.n }), checked: V.chip === c.k, aria: T('chip.aria', { name: chipName(c.k), n: c.n }) }; }))
-      .concat([{ value: 'done', label: S('chips.done'), count: S('fig', { v: done }), checked: V.chip === 'done', aria: T('chips.done') }]);
-    return K.chips({ items: items, action: 'chip', key: 'chips', label: T('chips.label') });
+      ;
+    return '<div class="sp-list-lens">'+UI.segment({options:[['todo',K.T(S('lens.todo')),{count:all.length-done}],['done',K.T(S('lens.done')),{count:done}]],active:V.lens,action:'list-lens',ariaLabel:T('chips.label')})+'</div>' + (V.lens==='todo'?K.chips({ items: items, action: 'chip', key: 'chips', label: T('chips.label') }):'');
   }
   /* the task's overall checker: piglets the records cannot account for (set counts lower than the record), batch level only */
   function batchLine() { var u = P.s.unaccounted || 0; return u > 0 ? S('batch.unacc', { b: P.BATCH.name, n: u }) : S('batch', { b: P.BATCH.name }); }
@@ -137,9 +137,9 @@
         support: ended ? S('ended.at', { t: hm(ended.at), who: ended.who }) : S('sum.end'), action: 'end', label: T('end.title') }
     });
     body += chipsRow();
-    var shown = !V.chip ? all : V.chip === 'done' ? done : all.filter(function (p) { return needsToday(p, V.chip); });
+    var shown = V.lens === 'done' ? done : todo.filter(function (p) { return !V.chip || needsToday(p, V.chip); });
     body += shown.length ? K.list(shown.map(penCard))
-      : '<p class="sp-empty">' + H(V.chip === 'done' ? 'empty.done' : 'chip.none') + '</p>';
+      : '<p class="sp-empty">' + H(V.lens === 'done' ? 'empty.done' : 'chip.none') + '</p>';
     return K.screen({ inert: inert, label: T('task'), header: K.header({ title: S('task'), back: null }), body: body });
   }
 
@@ -495,7 +495,7 @@
     phone.querySelectorAll('.tk-scroll, .tk-sheet-body, .tk-page-body').forEach(function (el) {
       var host = el.closest('[data-view]'); keep[(host ? host.getAttribute('data-view') : 'list') + el.className] = el.scrollTop;
     });
-    var chipsX = phone.querySelector('.tk-chips-track'), cx = chipsX ? chipsX.scrollLeft : 0;
+    var chipsX = phone.querySelector('.st-filter-chips-track'), cx = chipsX ? chipsX.scrollLeft : 0;
     var focusSel = null, a = document.activeElement, caret = null;
     if (a && phone.contains(a)) {
       if (a.id) focusSel = '#' + CSS.escape(a.id);
@@ -513,7 +513,7 @@
       var host = el.closest('[data-view]'), k = (host ? host.getAttribute('data-view') : 'list') + el.className;
       if (keep[k] != null) el.scrollTop = keep[k];
     });
-    var ct = phone.querySelector('.tk-chips-track'); if (ct) ct.scrollLeft = cx;
+    var ct = phone.querySelector('.st-filter-chips-track'); if (ct) ct.scrollLeft = cx;
     if (V.pageTop) { phone.querySelectorAll('.tk-page-body, .tk-sheet-body').forEach(function (x) { x.scrollTop = 0; }); V.pageTop = false; }
     if (V.toTop) { var sc = phone.querySelector('.tk-scroll'); if (sc) sc.scrollTop = 0; V.toTop = false; }
     if (focusSel) {
@@ -579,6 +579,7 @@
   function act(a, v, el) {
     var p = V.pen ? pen() : null;
     switch (a) {
+      case 'list-lens': V.lens = v; break;
       case 'chip': if (v === V.chip) return; V.chip = v; break;
       case 'pen': V.pen = v; V.flash = null; V.open = {}; V.draft = {}; V.tab = 'proc'; break;
       case 'dismiss': case 'back': closeTop(); break;
@@ -718,7 +719,7 @@
   (function () {
     var q = new URLSearchParams(location.search);
     var s = q.get('scheme'); if (s && P.SCHEMES.indexOf(s) >= 0 && s !== scheme()) P.setScheme(s);
-    var c = q.get('chip'); if (c) V.chip = c;
+    var c = q.get('chip'); if (c === 'done') V.lens = 'done'; else if(c) V.chip = c;
     var pn = q.get('pen'); if (pn && P.s.pens[pn]) { V.pen = pn; V.tab = q.get('tab') === 'pig' ? 'pig' : 'proc'; }
   })();
   /* the atlas (?screen=): a bare screen is reached by the taps a worker would make, and the screen the state is in is announced back */
@@ -730,7 +731,7 @@
   function atlasScreen(screens) {
     var b = 'piglet-processing.';
     if (V.end) return b + 'end-task';
-    if (!V.pen) return P.s.ended ? b + 'list-ended' : V.chip === 'done' ? b + 'chip-done' : V.chip ? b + 'job-chip' : scheme() === 'none' ? b + 'list-no-id' : b + 'pen-list';
+    if (!V.pen) return P.s.ended ? b + 'list-ended' : V.lens === 'done' ? b + 'chip-done' : V.chip ? b + 'job-chip' : scheme() === 'none' ? b + 'list-no-id' : b + 'pen-list';
     if (V.sub === 'give') return b + 'give-ids';
     var by = { tagged: 'tagged-list', log: 'pen-log', adjust: 'adjust-count', counts: 'counts', weight: 'weight', more: 'more-actions', death: 'record-death', move: 'move-piglets', count: 'set-count' };
     if (V.over) return by[V.over] ? b + by[V.over] : null;

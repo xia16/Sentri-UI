@@ -91,15 +91,6 @@
 /* ---- TaskLens: tabs with the count under the label, and the filter ---- */
 .tk-lens { position: sticky; top: 0; z-index: 2; padding: 6px 0 9px; border-bottom: 1px solid transparent; background: var(--app-background); }
 .tk-lens-bar { display: flex; gap: 7px; margin: 0 var(--space-panel); }
-.tk-lens-tabs { flex: 1; min-width: 0; display: flex; gap: 1px; padding: 3px; background: var(--well); border: 1px solid var(--line); border-radius: var(--radius-segment); }
-.tk-lens-tab { flex: 1; min-width: 0; min-height: var(--tap-min); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-  padding: 4px 6px; border: 0; border-radius: var(--radius-tab); background: transparent; color: var(--muted); font: 400 var(--type-description-size) var(--font-sans); }
-.tk-lens-tab[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px #20271f0d; }
-.tk-lens-count { font: 500 var(--type-meta-size) var(--font-mono); color: var(--muted); }
-.tk-lens-filter { flex: none; display: grid; place-items: center; width: var(--control-height); height: var(--control-height); padding: 0;
-  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink); }
-.tk-lens-filter svg { width: 17px; height: 17px; }
-
 /* ---- TaskGroup: a pen / crate-row card, its header and its rows ---- */
 .tk-list { display: flex; flex-direction: column; gap: var(--space-heading); padding: 1px var(--space-panel) var(--space-gutter); }
 .tk-group { flex-shrink: 0; overflow: clip; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); box-shadow: 0 2px 8px #20291f0a; }
@@ -495,17 +486,6 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
    Farrowing's segment faces on separate chips: a `well` chip with a 1px `line`, `radius-segment`; the chosen chip is the
    pressed segment (`paper`, `ink` 500, the segment shadow). 48px targets; the count in mono inside the chip. The track
    scrolls sideways; a trailing spacer the gutter's width keeps the last chip clear of the edge fade. */
-.tk-chips { padding: 6px 0 9px; background: var(--app-background); }
-.tk-chips-track { display: flex; gap: var(--space-key-gap); overflow-x: auto; padding: 0 0 0 var(--space-gutter); scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--space-gutter)), transparent); mask-image: linear-gradient(to right, #000 calc(100% - var(--space-gutter)), transparent); }
-.tk-chips-track::-webkit-scrollbar { display: none; }
-.tk-chips-track::after { content: ""; flex: none; width: var(--space-gutter); }
-.tk-chips-chip { flex: none; display: inline-flex; align-items: center; gap: var(--space-key-gap); min-height: var(--tap-min); margin: 0; padding: 0 var(--space-row-x);
-  border: 1px solid var(--line); border-radius: var(--radius-segment); background: var(--well); color: var(--tab-ink);
-  font: 400 var(--type-row-title-size)/1.2 var(--font-sans); white-space: nowrap; cursor: pointer; }
-.tk-chips-chip[aria-checked="true"] { background: var(--paper); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px #20271f0d; }
-.tk-chips-count { font: 500 var(--type-meta-size)/1 var(--font-mono); color: var(--muted); }
-.tk-chips-chip:active { background: var(--press); }
 
 /* ---- Sheet and page motion (candidate): a sheet rises from the bottom edge and a page slides in from the side when they
    open; they leave the same way. The host sets data-enter on an overlay only on the render that opens it, and data-leave

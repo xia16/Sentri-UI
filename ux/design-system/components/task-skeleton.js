@@ -105,9 +105,9 @@
 
   /* ---- TaskLens: tabs, the count under each label; the filter at the end ---- */
   function lens({ tabs = [], action = 'lens', filter } = {}) {
-    const b = tabs.map(t => `<button type="button" class="tk-lens-tab" aria-pressed="${t.pressed ? 'true' : 'false'}"${A(action, t.value)}${L(t.label)}><span>${T(t.text)}</span><span class="tk-lens-count">${T(t.count)}</span></button>`).join('');
-    const f = filter ? `<button type="button" class="tk-lens-filter"${A(filter.action || 'filter', filter.value)}${L(filter.label)}>${glyph('filter')}</button>` : '';
-    return `<div class="tk-lens" data-ds="TaskLens"><div class="tk-lens-bar"><div class="tk-lens-tabs" role="group"${L(tabs.label)}>${b}</div>${f}</div></div>`;
+    const control=window.SentriUI.segment({variant:'two-line-lens',options:tabs.map(t=>[t.value,T(t.text),{count:T(t.count),ariaLabel:t.label}]),active:tabs.find(t=>t.pressed)?.value,action,ariaLabel:tabs.label||'List state'});
+    const f=filter?window.SentriUI.iconButton({action:filter.action||'filter',value:filter.value,icon:glyph('filter'),label:filter.label||'Filter list'}):'';
+    return `<div class="tk-lens"><div class="tk-lens-bar">${control}${f}</div></div>`;
   }
 
   /* ---- TaskGroup: a pen / crate-row card ---- */
@@ -406,9 +406,7 @@
      items: [{ value, label, count, checked, aria }] (label and count are text slots; count is drawn in mono inside the
      chip). action: the one data-action for every chip. key: the group's data-field (radioBind's field). ---- */
   function chips({ items = [], action = 'chip', key = 'chips', label } = {}) {
-    const on = items.some(i => i.checked) ? items.find(i => i.checked).value : (items[0] && items[0].value);
-    const b = items.map(i => `<button type="button" class="tk-chips-chip" role="radio" aria-checked="${i.value === on ? 'true' : 'false'}" tabindex="${i.value === on ? 0 : -1}"${A(action, i.value)}${L(i.aria)}><span class="tk-chips-label">${T(i.label)}</span>${i.count != null && i.count !== '' ? `<span class="tk-chips-count">${T(i.count)}</span>` : ''}</button>`).join('');
-    return `<div class="tk-chips" data-ds="TaskChips" data-field="${esc(key)}"><div class="tk-chips-track" role="radiogroup"${L(label)}>${b}</div></div>`;
+    return window.SentriUI.filterChips({items:items.map(i=>({...i,label:T(i.label),count:i.count==null?null:T(i.count)})),action,key,label});
   }
 
   const api = { T, statusbar, phone, screen, header, latest, summary, progress, lens, chips, list, group, row, door, doors, radios, warning, section, receipt, day, holdBind, table, metrics, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };

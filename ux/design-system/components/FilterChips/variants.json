@@ -1,0 +1,16 @@
+[
+  {
+    "id": "tags",
+    "name": "Tags",
+    "use": "Use for narrowing a list by changing job or category tags.",
+    "notUse": "Not for list states — use Segment",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Focus",
+      "Long-label"
+    ]
+  }
+]

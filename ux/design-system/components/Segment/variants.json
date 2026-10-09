@@ -1,0 +1,58 @@
+[
+  {
+    "id": "lens",
+    "name": "Lens",
+    "use": "Use for states of one list with inline counts.",
+    "notUse": "Not for dynamic tags — use FilterChips",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Focus",
+      "Long-label"
+    ]
+  },
+  {
+    "id": "two-line-lens",
+    "name": "Two-line lens",
+    "use": "Use for states of one list with counts beneath labels.",
+    "notUse": "Not for dynamic tags — use FilterChips",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Focus",
+      "Long-label"
+    ]
+  },
+  {
+    "id": "view-switch",
+    "name": "View switch",
+    "use": "Use for 2–3 subjects of one sheet.",
+    "notUse": "Not for dynamic tags — use FilterChips",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Focus",
+      "Long-label"
+    ]
+  },
+  {
+    "id": "facet",
+    "name": "Facet",
+    "use": "Use for one fixed single-choice filter in a filter sheet.",
+    "notUse": "Not for dynamic tags — use FilterChips",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Focus",
+      "Long-label"
+    ]
+  }
+]

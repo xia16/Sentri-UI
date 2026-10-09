@@ -33,9 +33,6 @@
 .inspection-phone .pig-detail-footer{position:sticky;bottom:0;z-index:2;}
 .inspection-phone .pig-current-tasks{padding:0;border:0;background:transparent;}
 .inspection-phone .record-tabs{margin-left:0;margin-right:0;}
-
-/* Health and condition catalogs keep the selected state visible without changing meaning. */
-.inspection-phone .health-tabs{margin-bottom:10px;}
 .inspection-phone .health-catalog{border-top:1px solid #e8eddf;}
 .inspection-phone .catalog-group h5{padding-top:12px;}
 .inspection-phone .catalog-item{min-height:58px;padding:9px 0;}

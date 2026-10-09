@@ -10,9 +10,6 @@
 .inspection-phone .task-activity strong{font-weight:500}
 .inspection-phone .task-history{color:var(--muted);min-height:var(--tap-min);padding-right:2px}
 .inspection-phone .inspect-controls{background:#f6f7f1;padding:4px 18px 12px;height:66px;gap:8px}
-.inspection-phone .inspect-controls .room-tabs{background:var(--well);border:1px solid var(--line);border-radius:12px;padding:3px;min-width:0}
-.inspection-phone .inspect-controls .room-tabs button{flex-direction:row;gap:7px;min-height:var(--tap-min);font-size:11px;font-weight:400;border-radius:9px}
-.inspection-phone .inspect-controls .room-tabs button[aria-pressed=true]{font-weight:500;background:#fff;box-shadow:0 1px 4px #26351e09}
 .inspection-phone .inspect-controls .lens-count{font-size:10px;font-weight:400;color:var(--muted);margin:0}
 .inspection-phone .inspect-controls .room-filter-button{height:52px;min-width:48px;border:1px solid var(--line);border-radius:12px;background:#fff;color:#53634b}
 .inspection-phone .inspect-list{padding:0 18px 20px;gap:12px}
@@ -37,5 +34,4 @@
  .inspection-phone .task-header>.finish-walk{padding:0 10px}
  .inspection-phone .inspect-controls,.inspection-phone .inspect-list{padding-left:12px;padding-right:12px}
  .inspection-phone .task-activity{padding-left:12px;padding-right:12px}
- .inspection-phone .inspect-controls .room-tabs button{gap:5px}
 }
