@@ -1,180 +1,41 @@
 {
-  "status": "in-design",
-  "judged": "2026-10-09",
-  "commit": "3e3f835",
+  "status": "agent-checked",
+  "round": 3,
+  "judged": "2026-10-10",
+  "commit": "ec40759",
   "model": "claude-opus-5-5",
-  "scores": {
-    "clarity": 8,
-    "budget": 8,
-    "hierarchy": 7,
-    "spacing": 6,
-    "broken": 5
-  },
-  "lowest": 5,
+  "scores": { "clarity": 9, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 9 },
+  "lowest": 8,
   "checklist": [
-    {
-      "line": 1,
-      "pass": false,
-      "why": "Purpose stated, but no \"use X instead\" sibling (TaskPhotos, Note)"
-    },
-    {
-      "line": 2,
-      "pass": false,
-      "why": "No when-not section naming an alternative"
-    },
-    {
-      "line": 3,
-      "pass": true,
-      "why": "Card, header row, camera, answer line and thumbnails named; demo shows them"
-    },
-    {
-      "line": 4,
-      "pass": false,
-      "why": "No atlas screen uses the Photos card; farrowing.death uses its own photo line (the TaskPhotos face)"
-    },
-    {
-      "line": 5,
-      "pass": false,
-      "why": "Errors (denied, too-large), pressed and focus are specified but not rendered"
-    },
-    {
-      "line": 6,
-      "pass": false,
-      "why": "Camera button measures 44x44 (< 48)"
-    },
-    {
-      "line": 7,
-      "pass": true,
-      "why": "Max 12 stated and shown in the full state"
-    },
-    {
-      "line": 8,
-      "pass": true,
-      "why": "Inactive/full camera loses its ring (shape) as well as colour, and the answer line says why"
-    },
-    {
-      "line": 9,
-      "pass": false,
-      "why": "No label or answer-line length cap; no long/zh example"
-    },
-    {
-      "line": 10,
-      "pass": true,
-      "why": "Spoken labels, capture-first, viewer focus return specified"
-    },
-    {
-      "line": 11,
-      "pass": false,
-      "why": "Raw px (20px offset, 8/4/3/2/1px) and no CSS-variable list"
-    },
-    {
-      "line": 12,
-      "pass": true,
-      "why": "Label visible; errors say what is wrong and how to fix it"
-    },
-    {
-      "line": 13,
-      "pass": true,
-      "why": "Viewer has a visible Back; Delete only while drafting"
-    },
-    {
-      "line": 14,
-      "pass": false,
-      "why": "No classification and no link to TaskPhotos, which redraws it"
-    },
-    {
-      "line": 15,
-      "pass": false,
-      "why": "At 375px the camera circle sits flush on the card's top, right and bottom edges; error states have no proof"
-    }
+    { "line": 1, "pass": true, "why": "Job stated; Note named as the alternative" },
+    { "line": 2, "pass": true, "why": "When / when not; Note and Measure named" },
+    { "line": 3, "pass": true, "why": "Optional row, label, Optional word, count, camera, answer line, thumbnails named and rendered" },
+    { "line": 4, "pass": true, "why": "One face (line), used by farrowing.death" },
+    { "line": 5, "pass": true, "why": "13 states render in the atlas tab, none empty; Empty folded into Default (README says so); Cancelled shows two kept photos" },
+    { "line": 6, "pass": true, "why": "Row 348x48, camera 48x48, thumbs 56x56; nothing under 48 in any cell or on farrowing.death" },
+    { "line": 7, "pass": true, "why": "12 maximum stated and shown" },
+    { "line": 8, "pass": true, "why": "Disabled has a reason line; adding/disabled/full dash only the camera ring; errors are words" },
+    { "line": 9, "pass": true, "why": "zh example wraps without clipping" },
+    { "line": 10, "pass": true, "why": "Native buttons; capture->camera focus and viewer->thumb focus return asserted by the check script" },
+    { "line": 11, "pass": true, "why": "Photos CSS uses border-width and type-weight-semibold; README token list now matches" },
+    { "line": 12, "pass": true, "why": "Visible label; errors say what and how to fix" },
+    { "line": 13, "pass": true, "why": "Viewer is a Sheet with Back" },
+    { "line": 14, "pass": true, "why": "Links Field, Sheet, Button, TaskPhotos; optionalRow deferral noted" },
+    { "line": 15, "pass": true, "why": "Re-rendered all 13 states myself: every proof PNG byte-identical to current output; line-empty.png removed" }
   ],
   "classification": "component",
+  "previous": [
+    { "finding": "proof/*.png stale", "fixed": true, "note": "13 proofs byte-identical to a fresh render; bordered thumbs, ring-only dashing" },
+    { "finding": "README token list names size-1, omits border-width/type-weight-semibold", "fixed": true, "note": "List corrected" },
+    { "finding": "optionalRow raw 600/400 weights and stroke-width 1.7", "fixed": false, "note": "Not changed; it lives in the shared optionalRow (sentri-components) used by other optional rows, so it is the optional row's debt, not a Photos fail. Kept as a low note" },
+    { "finding": "Default/Empty/Cancelled identical; tile digits repeat the count", "fixed": true, "note": "Empty cell removed, Cancelled shows two kept photos, tiles carry no digits" }
+  ],
   "variants": [
-    {
-      "name": "Card (well + ringed circle)",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {
-        "clarity": 8,
-        "budget": 8,
-        "hierarchy": 7,
-        "spacing": 6,
-        "broken": 5
-      },
-      "findings": [
-        "Camera is 44px and tangent to the card edge",
-        "No atlas screen uses it"
-      ]
-    },
-    {
-      "name": "Line (TaskPhotos: no well, outlined squircle key)",
-      "usedBy": [
-        "farrowing.death"
-      ],
-      "status": "in-design",
-      "scores": {
-        "clarity": 7,
-        "budget": 8,
-        "hierarchy": 7,
-        "spacing": 8,
-        "broken": 5
-      },
-      "findings": [
-        "Uses the key squircle that Photos says the camera must never be",
-        "Camera key is 44px"
-      ]
-    }
+    { "name": "line", "usedBy": ["farrowing.death"], "status": "agent-checked",
+      "scores": { "clarity": 9, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 9 }, "findings": [] }
   ],
   "findings": [
-    {
-      "severity": "high",
-      "text": "As the reference for the optional row, Photos and its only shipped face disagree: Photos rules a ringed circle \"deliberately not the keys' squircle\"; TaskPhotos (farrowing.death) draws an outlined squircle key with a leading camera glyph and no well. Two looks, one job.",
-      "fix": "Pick one face for the optional row (the farrowing line is the one in use), make the other a documented variant or retire it, and update the Photos rule to match."
-    },
-    {
-      "severity": "high",
-      "text": "The camera is 44x44 in both faces, under the 48px glove floor, and it is the row's only target.",
-      "fix": "Set the camera to var(--control-height) (48px) and the empty row min-height to 48px."
-    },
-    {
-      "severity": "medium",
-      "text": "The camera circle fills the 44px row exactly, so its ring touches the card's top, right and bottom edges (no inner padding on the right).",
-      "fix": "Pad the card space-row-y vertically and space-row-x on the right so the camera sits inside the well."
-    },
-    {
-      "severity": "medium",
-      "text": "The optional row is not generalised: Measure renders an optional weight as a full field on Give IDs, and farrowing uses \"+ Litter weight\" pills. The label scale also differs (Photos 13/500, Measure 14/600).",
-      "fix": "Write the optional row once (label at choice-label 14/600, \"Optional\" muted, the action at the right, 48px) and have Photos, Measure and Note use it."
-    },
-    {
-      "severity": "medium",
-      "text": "The denied / too-large errors, pressed and focus are specified but not rendered.",
-      "fix": "Add them to preview.html."
-    },
-    {
-      "severity": "low",
-      "text": "Raw px, no CSS-variable list, no when-not section.",
-      "fix": "Tokenise, list the variables, add \"When not: a fact that needs words, use Note\"."
-    }
+    { "severity": "low", "text": "The shared optionalRow (ux/system/sentri-components.css) still uses raw font weights and stroke-width:1.7; Photos inherits them. Belongs to the optional row, not Photos.", "fix": "When OptionalRow gets its own page, move its weights to type-weight tokens and its stroke to an icon-stroke token." }
   ],
-  "proposals": [
-    {
-      "kind": "merge",
-      "name": "Photos + TaskPhotos",
-      "why": "Same field, two faces with contradicting rules; one should be a variant of the other",
-      "seenIn": [
-        "farrowing.death"
-      ]
-    },
-    {
-      "kind": "new-component",
-      "name": "OptionalRow (section pattern)",
-      "why": "The collapsed optional input (label · Optional · action) recurs in Photos, the Give IDs weight and farrowing's + Litter weight",
-      "seenIn": [
-        "farrowing.death",
-        "farrowing.blocked",
-        "piglet-processing.give-ids"
-      ]
-    }
-  ]
+  "proposals": []
 }
