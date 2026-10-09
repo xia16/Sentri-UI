@@ -42,8 +42,19 @@ _Avoid_: Way in (on screen only), entrance
 An addition one feature makes to another feature's screen (farrowing's actions in Pig profile's More actions); owned and documented by the feature that adds it.
 
 **Component**:
-A reusable part of a platform's design system (a button, a pig row with its sow id and states), designed and checked with the same care as a feature.
-_Avoid_: Widget, element
+A generic control or block that knows nothing about farm data, or anything used by two or more sections; it lives in the platform's design system with its variants, one implementation.
+_Avoid_: Widget, element, task part
+
+**Variant**:
+A named use case of a component with its own preview, states and status; the same job with a different look is a variant, never a new component.
+_Avoid_: Copy, custom version
+
+**Section pattern**:
+A recurring arrangement of components inside one section, documented in that section (the Task skeleton, the Home task card).
+_Avoid_: Template, layout component
+
+**Feature block**:
+Something only one feature uses, documented in that feature's notes; promoted to a component when a second feature or section needs it.
 
 ## Status
 
@@ -81,7 +92,7 @@ What happens to the touched screens of a frozen feature when anything changes th
 A screen whose rendering, behaviour, navigation or product rules changed; a screenshot baseline shows only the first, so the others are judged by the gates' walk-throughs and by what the change edited.
 
 **Set**:
-A component approved with the first feature that froze using it.
+A component variant approved with the first feature that froze using it; a component is as ready as its weakest variant.
 _Avoid_: Stable, released
 
 **Needs rework**:
