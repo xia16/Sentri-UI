@@ -423,7 +423,7 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 @media(prefers-reduced-motion:reduce){.button:active{transform:none}}
 }
 
-/* 3 · Sheet: drawer | page | dialog. The one implementation (SentriUI.sheet); it replaces astra-surfaces.css and the
+/* 3 · Sheet: drawer | page | dialog. The one implementation (SentriUI.sheet); it replaces the old per-prototype drawer and page styles and the
    TaskSheet / TaskPage / TaskDialog styles. Every value is a token. A sheet is sized by its nearest positioned ancestor
    (the phone root): see Sheet/README.md. */
 .scrim{position:absolute;top:var(--statusbar-height);left:0;right:0;bottom:0;z-index:calc(2 + 10 * var(--sheet-layer,0));width:100%;padding:0;margin:0;border:0;background:var(--scrim);backdrop-filter:blur(var(--blur-scrim))}
@@ -2670,14 +2670,14 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'cnt.title': 'Boars and gilts', 'flash.counts': 'Boars {b} · gilts {g}', 'mark.on': 'Keep {no} for breeding', 'mark.off': '{no} is kept for breeding: tap to unmark',
     'tagged.hint': 'Tap a piglet to fix it. Tap the flag to keep it for breeding.', 'log.breeder': 'Breeder {no}', 'log.notbreeder': 'Not a breeder · {no}',
     'give.title': 'Give IDs', 'give.tag': 'Tag', 'give.notch': 'Ear notch', 'give.kg': 'Weight', 'give.use': 'Use {no} · or scan', 'give.use.n': 'Use {no}', 'give.keep.sub': 'This gilt stays as a breeder',
-    'give.save': 'Record · next piglet', 'give.fix': 'Save change', 'give.fixing': 'Fixing {no}', 'give.sub': '{pen} · sow {sow} · {n} without ID', 'give.last': 'Last {no} · {sex}{kg}',
+    'give.save': 'Record · next piglet', 'give.fix': 'Save correction', 'give.fixing': 'Fixing {no}', 'give.sub': '{pen} · sow {sow} · {n} without ID', 'give.last': 'Last {no} · {sex}{kg}',
     'give.litter': 'Litter', 'give.all': 'Every piglet has an ID', 'give.litter.save': 'Save litter', 'give.litter.saved': 'Litter saved', 'pg.give.sub': '{n} without ID',
     'st.in': '{tr} in {n} days', 'st.in.1': '{tr} tomorrow', 'sows.one': '· 1 sow', 'pen.aria': 'Pen {pen}', 'sheet.pen': '{pen} · parity {p}', 'day.done.s': 'Done',
     'st.todo': 'To do', 'st.next': 'Next in {n} days', 'st.next.1': 'Next tomorrow', 'st.done': 'All done', 'sow': 'Sow {tag}',
     'sheet.sow': 'Sow {tag} · parity {p}', 'tab.proc': 'Processing', 'tab.pig': 'Piglets', 'tabs.label': 'Pen views',
     'day.done': 'Day {d} · done', 'day.plan': 'Planned {date}', 'day.early': 'Not due yet · can be done early', 'day.open': 'Day {d}',
     'item.filled': 'Filled', 'item.notfilled': 'Not filled', 'item.early': 'early',
-    'submit.n': 'Submit · {n} items', 'submit.n.1': 'Submit · 1 item', 'submit.n.0': 'Submit',
+    'submit.n': 'Record {n} items', 'submit.n.1': 'Record 1 item', 'submit.n.0': 'Record items', 'rec.counts': 'Record counts', 'rec.weight': 'Record weight', 'rec.death': 'Record {n} deaths', 'rec.death.1': 'Record 1 death', 'rec.death.0': 'Record deaths', 'rec.count': 'Record {n} piglets', 'rec.count.1': 'Record 1 piglet',
     'more': 'More', 'more.title': 'More actions', 'flash.items': '{n} items saved', 'flash.items.1': '1 item saved',
     'adj.use': 'Use {n}', 'adj.sub': '{pen} · {n} to do',
     'pg.now': 'Piglets now', 'pg.age': 'Age', 'pg.agev': 'day {d}', 'pg.sex': 'Boars · gilts', 'pg.sexv': '{b} · {g}', 'pg.ident': 'Identified',
@@ -2685,7 +2685,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'pg.weight.hint': 'Weigh the litter: growth figures need it.', 'pg.ids': 'Identified piglets', 'pg.scan': 'Scan tag', 'pg.notch': 'Choose notch',
     'pg.manual': 'Add manually', 'pg.log': 'Pen log', 'pg.log.sub': 'Born, deaths, moves and counts', 'pg.summary': 'In the pen now',
     'idf.title': 'Tag · notch · weigh', 'idf.kg': 'Litter total weight', 'idf.boars': 'Boars', 'idf.gilts': 'Gilts', 'idf.tag': 'Tag no.',
-    'idf.notch': 'Notch', 'idf.sex': 'Sex', 'idf.submit': 'Submit · {n} piglets', 'idf.submit.1': 'Submit · 1 piglet', 'idf.submit.0': 'Submit',
+    'idf.notch': 'Notch', 'idf.sex': 'Sex', 'idf.submit': 'Record {n} piglets', 'idf.submit.1': 'Record 1 piglet', 'idf.submit.0': 'Record piglets',
     'idf.add': 'Add the piglets that get an ID.', 'idf.remove': 'Remove row {n}', 'idf.saved': '{n} piglets saved', 'idf.saved.1': '1 piglet saved', 'idf.saved.0': 'Litter saved',
     'idf.row': 'Fill in the number and the sex.', 'w.title': 'Litter weight', 'w.sub': '{pen} · day {d}', 'w.kg': 'Weight (kg)',
     'log.title': 'Pen log', 'log.born': 'Born {n}', 'log.dead.birth': '{n} dead at birth', 'log.death': 'Died · {n}', 'log.move': '{n} moved to {to}',
@@ -2779,14 +2779,14 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'cnt.title': '公母头数', 'flash.counts': '公猪{b} · 母猪{g}', 'mark.on': '把{no}留作种猪', 'mark.off': '{no}已留种，再点取消',
     'tagged.hint': '点仔猪可以修改；点旗子留作种猪。', 'log.breeder': '留种 {no}', 'log.notbreeder': '取消留种 · {no}',
     'give.title': '给仔猪编号', 'give.tag': '耳标号', 'give.notch': '耳缺号', 'give.kg': '体重', 'give.use': '用{no} · 或扫描', 'give.use.n': '用{no}', 'give.keep.sub': '这头母猪留作种猪',
-    'give.save': '记录 · 下一头', 'give.fix': '保存修改', 'give.fixing': '正在修改{no}', 'give.sub': '{pen} · 母猪{sow} · {n}头没编号', 'give.last': '刚记录 {no} · {sex}{kg}',
+    'give.save': '记录 · 下一头', 'give.fix': '保存更正', 'give.fixing': '正在修改{no}', 'give.sub': '{pen} · 母猪{sow} · {n}头没编号', 'give.last': '刚记录 {no} · {sex}{kg}',
     'give.litter': '整窝', 'give.all': '每头都有编号', 'give.litter.save': '保存整窝', 'give.litter.saved': '整窝已保存', 'pg.give.sub': '{n}头没编号',
     'st.in': '{n}天后{tr}', 'st.in.1': '明天{tr}', 'sows.one': '· 1头母猪', 'pen.aria': '{pen}栏', 'sheet.pen': '{pen} · {p}胎', 'day.done.s': '已完成',
     'st.todo': '需处理', 'st.next': '下次处理：{n}天后', 'st.next.1': '下次处理：明天', 'st.done': '已完成所有处理', 'sow': '母猪 {tag}',
     'sheet.sow': '母猪 {tag} · {p}胎', 'tab.proc': '仔猪处理', 'tab.pig': '仔猪信息', 'tabs.label': '栏位页面',
     'day.done': '第{d}天 · 已完成', 'day.plan': '计划 {date} 处理', 'day.early': '未到时间 · 可提前填', 'day.open': '第{d}天',
     'item.filled': '已填写', 'item.notfilled': '未填写', 'item.early': '提前',
-    'submit.n': '提交结果 · {n}项', 'submit.n.0': '提交结果',
+    'submit.n': '记录{n}项', 'submit.n.0': '记录项目', 'rec.counts': '记录头数', 'rec.weight': '记录体重', 'rec.death': '记录死亡{n}头', 'rec.death.0': '记录死亡', 'rec.count': '记录{n}头',
     'more': '更多', 'more.title': '更多操作', 'flash.items': '已提交{n}项',
     'adj.use': '用{n}头', 'adj.sub': '{pen} · 要做{n}头',
     'pg.now': '仔猪数量', 'pg.age': '仔猪日龄', 'pg.agev': '{d}天', 'pg.sex': '公猪 · 母猪', 'pg.sexv': '{b} · {g}', 'pg.ident': '有身份',
@@ -2794,7 +2794,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'pg.weight.hint': '请填写仔猪总体重，否则将会影响后期生长效益的计算。', 'pg.ids': '有身份仔猪', 'pg.scan': '扫描耳标', 'pg.notch': '选择耳缺',
     'pg.manual': '手动添加', 'pg.log': '本栏记录', 'pg.log.sub': '出生、死亡、转栏、清点', 'pg.summary': '现在栏里',
     'idf.title': '耳标/耳缺/体重', 'idf.kg': '仔猪总体重', 'idf.boars': '公猪数量', 'idf.gilts': '母猪数量', 'idf.tag': '耳标号',
-    'idf.notch': '耳缺', 'idf.sex': '性别', 'idf.submit': '提交（{n}头仔猪）', 'idf.submit.0': '提交',
+    'idf.notch': '耳缺', 'idf.sex': '性别', 'idf.submit': '记录{n}头仔猪', 'idf.submit.0': '记录仔猪',
     'idf.add': '请添加仔猪信息。', 'idf.remove': '删除第{n}行', 'idf.saved': '已提交{n}头', 'idf.saved.0': '已提交整窝信息',
     'idf.row': '请填写编号和性别。', 'w.title': '整窝体重', 'w.sub': '{pen} · 第{d}天', 'w.kg': '体重（公斤）',
     'log.title': '本栏记录', 'log.born': '出生{n}头', 'log.dead.birth': '出生时死亡{n}头', 'log.death': '死亡{n}头', 'log.move': '{n}转到{to}',
@@ -3544,7 +3544,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     var p = pen(), c = V.counts;
     return K.drawer({ title: T('cnt.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'counts',
       body: stepper('boar', T('idf.boars'), c.boar) + stepper('gilt', T('idf.gilts'), c.gilt),
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'counts-save', register: 'primary' } }) });
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.counts'), action: 'counts-save', register: 'primary' } }) });
   }
   /* ---- Piglets: the pen's identified piglets (tag/notch · sex · weight), each with its breeder flag; tap a row to fix it;
      one primary "Tag a piglet" opens the one-piglet run, which comes back here ---- */
@@ -3638,7 +3638,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     return K.drawer({ title: T('w.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'weight',
       body: UI.measure({ label: T('w.kg'), value: w.kg, unit: 'kg', placeholder: '—', active: true, action: 'noop', key: 'w', className: 'sp-give-measure' }),
       footer: UI.numpad({ value: w.kg, unit: 'kg', action: 'pad', key: 'w', compact: true, decimals: 1, intLength: 3 }) +
-        K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) }, status: !(+w.kg > 0) ? T('sr.kg') : null }) });
+        K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.weight'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) }, status: !(+w.kg > 0) ? T('sr.kg') : null }) });
   }
   /* ---- the pen log: born, deaths, moves, counts, treatments, IDs — the history, newest first ---- */
   function logPage() {
@@ -3663,7 +3663,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     var p = pen(), d = V.death, k = CAUSES.reduce(function (s, c) { return s + d.c[c]; }, 0);
     var body = CAUSES.map(function (c) { return stepper(c, T('c.' + c), d.c[c], { max: p.alive }); }).join('');
     return K.drawer({ title: T('death.title'), subtitle: T('death.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'death', body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'death-save', register: 'primary', waiting: !k }, status: !k ? T('sr.dead') : null }) });
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.death', { n: k }), action: 'death-save', register: 'primary', waiting: !k }, status: !k ? T('sr.dead') : null }) });
   }
   /* ---- move piglets: only the other pens of this batch (there is nowhere else); for what was given here: had it? ---- */
   function moveAsks(p) {
@@ -3694,7 +3694,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     var p = pen(), d = V.count;
     return K.drawer({ title: T('count.title'), subtitle: T('count.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'count',
       body: stepper('count', T('count.label'), d.n, { variant: 'hero', face: 'count', min: 0, hint: '' }),
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'count-save', register: 'primary', waiting: d.n === p.alive }, status: d.n === p.alive ? T('sr.count') : null }) });
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.count', { n: d.n }), action: 'count-save', register: 'primary', waiting: d.n === p.alive }, status: d.n === p.alive ? T('sr.count') : null }) });
   }
 
   /* ================= End task (the supervisor) ================= */
@@ -3734,7 +3734,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     document.title = T('task');
     if (window.AtlasBare) AtlasBare.watch(atlasScreen);
     var html = K.statusbar() + listScreen(!!(V.pen || V.end));
-    if (V.pen) html += penSheet(!!(V.over || V.end));
+    if (V.pen && !V.over && !V.end) html += penSheet(false);   // a second sheet replaces the pen sheet (its state stays in V.pen and comes back on Back)
     var o = V.pen && V.over;
     if (o === 'more') html += moreSheet();
     if (o === 'adjust') html += adjustSheet();

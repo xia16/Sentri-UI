@@ -6,7 +6,7 @@
 .farrowing-phone .section-title>svg{width:15px;height:15px;color:#69765e;stroke-width:1.7}
 .farrowing-phone .sow-title-link{display:inline-flex;align-items:center;gap:8px;background:transparent;min-height:var(--tap-min);padding:8px 4px;margin:-8px -4px;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left}
 .farrowing-phone .sow-title-link>svg{width:16px;height:16px;color:var(--muted);stroke-width:1.8}
-.farrowing-phone .sheet-aside .text-button{min-height:var(--tap-min);padding:0 12px;border:1px solid var(--line);border-radius:12px;font-size:13px;color:var(--ink);font-weight:600;white-space:nowrap}
+
 .farrowing-phone .sheet-body>.segment:first-child{margin-top:0}
 .farrowing-phone .edit-body .change-summary{margin:0 0 4px;padding:6px 12px;font-size:11px;line-height:1.5}
 .farrowing-phone .edit-body .change-list{font:10px/1.5 var(--sans);gap:2px 12px}

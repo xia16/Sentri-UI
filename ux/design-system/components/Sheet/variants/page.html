@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sheet · page</title><style>
 .ph{position:relative;height:640px;max-width:390px;margin:0 auto;overflow:hidden;background:var(--app-background);font-family:var(--sans);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius-device)}
-.ph .bg{padding:var(--space-gutter)}
+.ph .bg{padding:0 var(--space-gutter)}
 .ph .bar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
 .ph[data-pressed] .surface-back{background:var(--back-press)}
 .ph[data-pressed] .sheet-close{background:var(--press)}
@@ -17,7 +17,7 @@
 <div class="ph" data-state="Drawer over a page" data-demo="page-over"><div class="bg"></div><div class="over"></div></div>
 <script>
 const UI=window.SentriUI,esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const bg=()=>UI.heading({title:'Pen B4',kind:'page',description:'Sow 000254 \u00b7 11 piglets'})+UI.panel(UI.row({title:'Litter',description:'11 alive \u00b7 day 2'}),{className:'st-row-group'});
+const bg=()=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+UI.heading({title:'Pen B4',kind:'page',description:'Sow 000254 \u00b7 11 piglets'})+UI.panel(UI.row({title:'Litter',description:'11 alive \u00b7 day 2'}),{className:'st-row-group'});
 const bar='<div class="bar" aria-hidden="true"><span>9:41</span></div>';
 const note=(l,v)=>UI.field({label:l,control:'<textarea rows="3" placeholder="'+esc(v||'')+'"></textarea>'});
 const rows=(n,t)=>UI.panel(Array.from({length:n},(_,i)=>UI.row({title:(t||'Piglet')+' '+(i+1),description:'Day 2 \u00b7 B4',action:'x'})).join(''),{className:'st-row-group'});

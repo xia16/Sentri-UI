@@ -208,7 +208,7 @@
   function showSync(){
     const n=sync.pending.length,busy=sync.status==='uploading',offline=sync.connection==='offline';
     drawer('Saved work',`<div class="sync-summary ${n?'pending':''}">${icon(n?(offline?'offline':'upload'):'check')}<div><strong>${n?n+' records waiting to upload':'Everything is uploaded'}</strong><p>${n?'Saved on this device. Your team will see these changes after upload.':'There are no records waiting on this device.'}</p></div></div><p class="sync-connection">${offline?'No connection · check Wi-Fi or mobile signal':'Connection available'}</p><div class="sync-records">${sync.pending.map(r=>`<div class="sync-record"><div><span>${r.title}</span><small>${r.context}</small></div><time>${r.time}</time></div>`).join('')}</div><p class="sync-message" role="status" aria-live="polite">${busy?'Uploading saved records…':esc(sync.message)}</p>${n?btn('upload',busy?'Uploading…':sync.status==='failed'?'Retry upload':'Upload '+n+' records','primary','',busy?'disabled':''):btn('close','Done','primary')}`);
-    overlay.querySelector('.sheet').classList.add('sync-drawer');
+    overlay.querySelector('.sheet,.dialog').classList.add('sync-drawer');
   }
   function renderSync(){const top=app.querySelector('.app-scroll')?.scrollTop||0;render();const scroller=app.querySelector('.app-scroll');if(scroller)scroller.scrollTop=top;}
   function uploadPending(){
@@ -255,7 +255,7 @@
   const pages={home,sections:sectionChooser,placeholder,environment,maintenance,assistant,finding,toolbox,records:recordLog};
   // The atlas follows the demo (?screen=): the screen whose url holds this scope (view, section, unit, work, attention), else null.
   function atlasScreen(screens){
-    const dr=overlay.querySelector('.sheet');
+    const dr=overlay.querySelector('.sheet,.dialog');
     if(dr){
       if(dr.classList.contains('unit-picker'))return 'workbench.choose-unit';
       if(dr.classList.contains('sync-drawer'))return 'workbench.saved-work';
@@ -271,7 +271,8 @@
   function render(){app.innerHTML=(pages[state.page]||home)();window.AtlasBare&&AtlasBare.watch(atlasScreen);document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));}
   if(window.AtlasBare&&AtlasBare.bare)new MutationObserver(()=>AtlasBare.watch(atlasScreen)).observe(overlay,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
   function closeDrawer(){overlay.innerHTML='';state.overlay=null;app.inert=false;if(returnFocus?.isConnected)returnFocus.focus();}
-  function drawer(title,body,{size='medium',sizing='content'}={}){returnFocus=document.activeElement;app.inert=true;overlay.innerHTML=SentriUI.sheet({title,body,size,sizing,label:title,close:{action:'close',label:'Close dialog'},scrim:{action:'close',label:'Close dialog'},footer:SentriUI.sheetFooter({back:{action:'close'}})});const primary=overlay.querySelector('.sheet-body .primary, .sheet-body [data-drawer-primary]');if(primary){const form=primary.closest('form');if(form)primary.setAttribute('form',form.id);overlay.querySelector('.sheet-footer').append(primary);}overlay.querySelector('.sheet')?.focus({preventScroll:true});}
+  function dialog(title,description,primary){returnFocus=document.activeElement;app.inert=true;overlay.innerHTML=SentriUI.sheet({variant:'dialog',title,icon:'alert',subtitle:description,label:title,footer:SentriUI.sheetFooter({back:{action:'close'},primary:{label:primary.label,action:primary.action,register:'danger'}})});overlay.querySelector('.dialog')?.focus({preventScroll:true});}
+  function drawer(title,body,{size='medium',sizing='content'}={}){returnFocus=document.activeElement;app.inert=true;overlay.innerHTML=SentriUI.sheet({title,body,size,sizing,label:title,close:{action:'close',label:'Close dialog'},scrim:{action:'close',label:'Close dialog'},footer:SentriUI.sheetFooter({back:{action:'close'}})});const primary=overlay.querySelector('.sheet-body .primary, .sheet-body [data-drawer-primary]');if(primary){const form=primary.closest('form');if(form)primary.setAttribute('form',form.id);overlay.querySelector('.sheet-footer').append(primary);}overlay.querySelector('.sheet,.dialog')?.focus({preventScroll:true});}
   function unitChoices(){
     const all=section().units;
     const list=overlay.querySelector('#unit-options');
@@ -282,7 +283,7 @@
   }
   function showUnits(){
     drawer(section().name+' units',`<p class="unit-picker-count">All ${section().units.length} units</p><div id="unit-options" class="unit-options st-panel st-row-group" role="group" aria-label="Units"></div>`);
-    overlay.querySelector('.sheet').classList.add('unit-picker');unitChoices();
+    overlay.querySelector('.sheet,.dialog').classList.add('unit-picker');unitChoices();
   }
   function selectScope(unit){
     state.unit=unit;state.workUnit=null;
@@ -301,7 +302,7 @@
     if(a==='sync'){showSync();return;}
     if(a==='upload'){uploadPending();return;}
     if(a==='complete-task'){if(taskModel(task()).state!=='ready')return;task().completedAt='Today · just now';goHome();return;}
-    if(a==='end-task-early'){drawer('End task early?','<p>Unfinished work will remain incomplete. Existing records are kept.</p>'+btn('confirm-end-task','End task early','secondary danger','','data-drawer-primary'),{size:'compact'});return;}
+    if(a==='end-task-early'){dialog('End task early?','Unfinished work will remain incomplete. Existing records are kept.',{label:'End task early',action:'confirm-end-task'});return;}
     if(a==='confirm-end-task'){task().terminatedAt='Today · just now';closeDrawer();goHome();return;}
     if(a==='back'){back();return;}
     if(a==='home'){goHome();return;}
@@ -342,7 +343,7 @@
     if(e.target.id==='answer-form'){const answer=String(data.get('answer')).trim();if(!answer)return;state.answered=true;state.answer=answer;state.log.unshift({title:'Movement clarification received',context:'Unit 7 · Pen A2 · '+answer});render();toast('Clarification saved in this preview');}
     if(e.target.id==='lookup-form')lookup(String(data.get('tag')));
   });
-  document.addEventListener('keydown',e=>{if(!overlay.children.length)return;if(e.key==='Escape'){closeDrawer();return;}if(e.key==='Tab'){const focusable=[...overlay.querySelectorAll('.sheet button,.sheet input,.sheet textarea,.sheet a[href]')].filter(el=>!el.disabled);const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&(document.activeElement===first||document.activeElement===overlay.querySelector('.sheet'))){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}});
+  document.addEventListener('keydown',e=>{if(!overlay.children.length)return;if(e.key==='Escape'){closeDrawer();return;}if(e.key==='Tab'){const focusable=[...overlay.querySelectorAll('.sheet button,.sheet input,.sheet textarea,.sheet a[href],.dialog button')].filter(el=>!el.disabled);const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&(document.activeElement===first||document.activeElement===overlay.querySelector('.sheet,.dialog'))){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}});
   $('#sync-demo').addEventListener('change',e=>{
     sync.attempt++;sync.connection=e.target.value;sync.pending=e.target.value==='synced'?[]:[...pendingExamples];sync.status=e.target.value==='synced'?'synced':'waiting';sync.message='';
     const open=!!overlay.querySelector('.sync-drawer');renderSync();if(open)showSync();

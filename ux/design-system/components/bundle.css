@@ -37,7 +37,7 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 @media(prefers-reduced-motion:reduce){.button:active{transform:none}}
 }
 
-/* 3 · Sheet: drawer | page | dialog. The one implementation (SentriUI.sheet); it replaces astra-surfaces.css and the
+/* 3 · Sheet: drawer | page | dialog. The one implementation (SentriUI.sheet); it replaces the old per-prototype drawer and page styles and the
    TaskSheet / TaskPage / TaskDialog styles. Every value is a token. A sheet is sized by its nearest positioned ancestor
    (the phone root): see Sheet/README.md. */
 .scrim{position:absolute;top:var(--statusbar-height);left:0;right:0;bottom:0;z-index:calc(2 + 10 * var(--sheet-layer,0));width:100%;padding:0;margin:0;border:0;background:var(--scrim);backdrop-filter:blur(var(--blur-scrim))}
