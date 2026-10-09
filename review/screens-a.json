@@ -24,18 +24,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-a-3",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.task-blocked"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Room dock shows through below the End task footer",
-  "detail": "On all four End task pages the room's dark Scan pill, search button and a second handle bar show beneath the footer, in the live demo too. Fix: the page must cover the dock, with its footer on the phone's bottom edge.",
-  "source": "screen-review"
- },
- {
   "id": "screens-a-4",
   "target": {
    "kind": "screen",
