@@ -80,138 +80,103 @@
       "figma": "",
       "notes": {
         "purpose": "Shows one unit's sensor readings with a short history and lets the worker see and set the ventilation fan.",
-        "states": [
-          "How to reach: open a unit that has sensors (Gestation 7-9, Nursery 12-13) and tap the Environment & devices card. No URL param opens the page. The Farrowing and Breeding units have no environment context, so the card is absent there.",
-          "Offline (the page default): \"Sample readings · offline, showing last available values\", Devices \"Offline\", mode buttons and Apply disabled.",
-          "Connected (Connection preview select outside the phone): \"Connected\", controls enabled.",
-          "Chart period Today or 7 days; sensor tab Temperature, Humidity or Ammonia."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Page title",
-            "shows": "Environment & devices · Unit 7",
-            "logic": "Heading with the unit as subtitle.",
-            "source": "environment()"
+            "name": "Sensor tabs and reading",
+            "shows": "Temperature · Humidity · Ammonia · 22.4 °C · Last reading 09:40",
+            "states": [
+              {
+                "state": "Sensor present",
+                "when": "The unit has a finite numeric reading for it",
+                "shows": "A tab with the value and unit (°C, %, ppm NH₃); the first tab is selected on entry"
+              },
+              {
+                "state": "Sensor missing",
+                "when": "Reading missing or not a finite number",
+                "shows": "The tab is omitted, never shown as 0"
+              },
+              {
+                "state": "No readings",
+                "when": "None of the three has a value",
+                "shows": "No tabs, chart or history; only the Devices section, if any"
+              }
+            ],
+            "logic": "Sample figures per unit (Unit 7: 22.4 °C, 64 %, 8 ppm). \"Last reading\" is unitContext[N].updated, one fixed sample time for every sensor.",
+            "source": "availableSensors(); unitContext[N].readings, .updated",
+            "at": "Last reading"
           },
           {
-            "name": "Badge",
-            "shows": "PREVIEW",
-            "logic": "Marks the page as a design preview; sample data, no equipment connected.",
-            "source": "environment()"
+            "name": "Chart, Low / High and history",
+            "shows": "Today · 7 days · Low 21.9 °C · High 22.8 °C",
+            "states": [
+              {
+                "state": "Today",
+                "when": "Period toggle on Today",
+                "shows": "8 points from 00:00 to the last reading time"
+              },
+              {
+                "state": "7 days",
+                "when": "Period toggle on 7 days",
+                "shows": "7 daily points (6d ago … Today)"
+              }
+            ],
+            "logic": "Not real history: series = current value plus fixed offsets scaled by sensor (temperature ×1, humidity ×6, ammonia ×2); y range = min/max ± padding. Low and High are the min and max of the plotted points; \"Reading history\" lists the same points as Time and value.",
+            "source": "sensorHistory(), sensorChart()",
+            "at": "Low 21.9 °C"
           },
           {
-            "name": "Sensor tabs",
-            "shows": "Temperature · Humidity · Ammonia",
-            "logic": "One chip per sensor with a numeric reading for the unit; readings that are missing or not finite are omitted. The first sensor is selected on entry. With no readings the tabs and detail are absent.",
-            "source": "availableSensors(); unitContext[N].readings = [temperature, humidity, ammonia]"
+            "name": "Connection",
+            "shows": "Sample readings · offline, showing last available values · Devices · Offline",
+            "states": [
+              {
+                "state": "Offline",
+                "when": "Page default (the \"Connection preview\" select outside the phone)",
+                "shows": "Readings are the last available values; Devices tag \"Offline\"; Auto/Manual and Apply disabled; helper \"Reconnect to change device settings.\""
+              },
+              {
+                "state": "Connected",
+                "when": "Connection preview set to Connected",
+                "shows": "Note reads \"connected\"; tag \"Connected\"; controls enabled; helper \"Preview controls only · no command is sent to equipment.\""
+              }
+            ],
+            "source": "environment(); sync.connection",
+            "at": "Sample readings · offline, showing last available values"
           },
           {
-            "name": "Reading",
-            "shows": "22.4 °C",
-            "logic": "The current value and unit of the chosen sensor. Units: °C, %, ppm NH₃. Sample figures per unit (Unit 7: 22.4, 64, 8).",
-            "source": "unitContext{}"
-          },
-          {
-            "name": "Last reading",
-            "shows": "Last reading 09:40",
-            "logic": "unitContext[N].updated, fixed sample time for every sensor.",
-            "source": "unitContext{}"
-          },
-          {
-            "name": "Period toggle",
-            "shows": "Today · 7 days",
-            "logic": "Switches the sample history: Today = 8 points from 00:00 to the last reading time; 7 days = 7 daily points (6d ago … Today).",
-            "source": "sensorHistory()"
-          },
-          {
-            "name": "Chart",
-            "shows": "trend line with 3 y labels and first/middle/last x labels",
-            "logic": "Sample series = current value + fixed offsets scaled by sensor (temperature ×1, humidity ×6, ammonia ×2); y range = min/max ± padding. Not real history.",
-            "source": "sensorChart()"
-          },
-          {
-            "name": "Low / High",
-            "shows": "Low 21.9 °C · High 22.8 °C",
-            "logic": "Minimum and maximum of the plotted sample points.",
-            "source": "sensorChart()"
-          },
-          {
-            "name": "Reading history",
-            "shows": "Reading history (disclosure)",
-            "logic": "Table of the plotted points: Time and value.",
-            "source": "sensorChart()"
-          },
-          {
-            "name": "Connection note",
-            "shows": "Sample readings · offline, showing last available values",
-            "logic": "\"connected\" when sync.connection is not offline.",
-            "source": "environment()"
-          },
-          {
-            "name": "Devices heading",
-            "shows": "Devices · Offline",
-            "logic": "Section only when the unit has a controllable device (devices includes \"fan\"); the tag shows Offline or Connected.",
-            "source": "unitDevices()"
-          },
-          {
-            "name": "Fan card",
+            "name": "Ventilation fan card",
             "shows": "Ventilation fan · Auto · following unit schedule",
-            "logic": "Status line: \"Auto · following unit schedule\" or \"Manual · N% speed\" for the applied mode and speed (initial speed 45).",
-            "source": "unitDevices()"
-          },
-          {
-            "name": "Mode buttons",
-            "shows": "Auto · Manual",
-            "logic": "Segmented; the pressed one is the draft mode. Disabled offline.",
-            "source": "fan-mode handler"
-          },
-          {
-            "name": "Apply",
-            "shows": "Apply preview setting",
-            "logic": "Disabled offline and whenever the draft equals the applied mode and speed.",
-            "source": "apply-device handler"
-          },
-          {
-            "name": "Helper",
-            "shows": "Reconnect to change device settings. / Preview controls only · no command is sent to equipment.",
-            "logic": "Offline vs connected.",
-            "source": "environment()"
+            "states": [
+              {
+                "state": "Auto",
+                "when": "Applied mode is Auto",
+                "shows": "\"Auto · following unit schedule\""
+              },
+              {
+                "state": "Manual",
+                "when": "Applied mode is Manual",
+                "shows": "\"Manual · N% speed\" (initial speed 45)"
+              },
+              {
+                "state": "No device",
+                "when": "The unit has no controllable device (devices lacks \"fan\")",
+                "shows": "The whole Devices section is absent; only sensors show"
+              }
+            ],
+            "logic": "Controllable devices are independent of readings: a unit can have devices with no readings (the unit card then says \"N devices\") or readings with no device.",
+            "rule": "Apply is disabled offline and whenever the draft mode and speed equal the applied ones. Nothing is sent to equipment; the setting lives in memory only.",
+            "source": "unitDevices(); fan-mode and apply-device handlers",
+            "at": "Auto · following unit schedule"
           }
         ],
-        "controls": [
-          {
-            "control": "Sensor tab",
-            "does": "switches the sensor",
-            "goesTo": "environment.page"
-          },
-          {
-            "control": "Today / 7 days",
-            "does": "switches the chart period",
-            "goesTo": "environment.page"
-          },
-          {
-            "control": "Auto / Manual",
-            "does": "changes the draft fan mode (connected only)",
-            "goesTo": "environment.fan-manual"
-          },
-          {
-            "control": "Back",
-            "does": "returns to the unit",
-            "goesTo": "workbench.unit"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) every string is literal in home-astra-prototype.js; the registry has no environment ids"
         ],
         "edge": [
-          "A unit with devices but no readings shows only the Devices section (the unit card then says \"N devices\").",
-          "A unit with readings but no device shows only the sensors.",
-          "Missing readings are omitted, never shown as 0."
+          "A unit with neither readings nor devices has no environment entrance on its Home screen."
         ],
-        "rules": [
-          "\"Sensor readings with no numeric data are omitted entirely. A unit without readings or devices has no environment entrance. Controllable devices are independent of readings.\"",
-          "Device changes are disabled offline; no command is sent to equipment."
-        ],
+        "rules": [],
         "issues": [
           "The \"Last reading\" time is a fixed 09:40 on all sensors while the status bar reads 9:41.",
           "The offline note appears three times: the chart helper, the Devices tag and the fan helper.",
@@ -230,52 +195,39 @@
       "figma": "",
       "notes": {
         "purpose": "Lets the worker set a fixed fan speed instead of the unit schedule.",
-        "states": [
-          "How to reach: set \"Connection preview\" (outside the phone) to Connected, open Environment & devices, press Manual. A slider appears; Apply becomes enabled once the draft differs.",
-          "After Apply: status \"Manual · 70% speed\", note \"Preview setting applied · just now\", toast \"Sample setting saved · no equipment command sent\"."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Fan speed",
-            "shows": "Fan speed 45%",
-            "logic": "Range input 0-100 in steps of 5, with a live value; the draft is not applied until Apply.",
-            "source": "fan-speed input"
-          },
-          {
-            "name": "Apply",
-            "shows": "Apply preview setting",
-            "logic": "Copies the draft mode and speed into the device.",
-            "source": "apply-device handler"
-          },
-          {
-            "name": "Updated line",
-            "shows": "Preview setting applied · just now",
-            "logic": "Shown after the first Apply; static wording.",
-            "source": "d.updated"
+            "name": "Fan speed and Apply",
+            "shows": "Fan speed 45% · Apply preview setting",
+            "states": [
+              {
+                "state": "Draft",
+                "when": "Manual pressed, speed moved, not applied",
+                "shows": "Slider 0-100 in steps of 5 with a live value; Apply enabled once the draft differs from the applied setting"
+              },
+              {
+                "state": "Applied",
+                "when": "After Apply",
+                "shows": "Status \"Manual · 70% speed\", note \"Preview setting applied · just now\", toast \"Sample setting saved · no equipment command sent\""
+              },
+              {
+                "state": "Back to Auto",
+                "when": "Auto pressed",
+                "shows": "The slider goes away; a draft equal to the applied state keeps Apply disabled"
+              }
+            ],
+            "rule": "The draft is not applied until Apply; everything is disabled offline. Preview only: no command is sent to equipment.",
+            "source": "fan-speed input, apply-device handler, d.updated",
+            "at": "Fan speed"
           }
         ],
-        "controls": [
-          {
-            "control": "Auto",
-            "does": "back to the unit schedule (draft)",
-            "goesTo": "environment.page"
-          },
-          {
-            "control": "Apply preview setting",
-            "does": "saves in memory only",
-            "goesTo": "environment.fan-manual"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
-        "edge": [
-          "Switching to Auto drops the slider; a draft equal to the applied state keeps Apply disabled.",
-          "Offline disables everything."
-        ],
-        "rules": [
-          "\"Preview controls only · no command is sent to equipment.\""
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "No confirmation or safety limit for speed 0; unclear whether 0% is allowed on a real fan."
         ]
@@ -291,83 +243,52 @@
       "figma": "",
       "notes": {
         "purpose": "Lists the unit's equipment issues and lets the worker report one.",
-        "states": [
-          "How to reach: pick a unit, bottom bar Toolbox › Maintenance (the row appears only when a unit is chosen). Unit 7 starts with one open issue. The `attention` param hides it (clear, health, feed) or adds a default one in other units (maintenance, busy)."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Page title",
-            "shows": "Maintenance · Unit 7",
-            "logic": "Heading with the unit; PREVIEW badge.",
-            "source": "maintenance()"
+            "name": "Issue card",
+            "shows": "Drinking station · Open · Pen C2 · Leaking valve at the east end. · G. Hansen · 06:40",
+            "states": [
+              {
+                "state": "Open",
+                "when": "Not yet resolved",
+                "shows": "Equipment name, \"Open\", location, note, reporter and time"
+              },
+              {
+                "state": "Resolved",
+                "when": "Marked resolved in the session",
+                "shows": "Dimmed with \"Resolved\"; stays in the list"
+              },
+              {
+                "state": "Added now",
+                "when": "Reported in this session",
+                "shows": "Reporter reads \"G. Hansen · just now\", at the top of the list"
+              }
+            ],
+            "logic": "Location and note are free text typed by the reporter.",
+            "source": "maintenanceCache; fault.pen/.note/.by",
+            "at": "Leaking valve at the east end."
           },
           {
             "name": "Open count",
             "shows": "1 open issue",
-            "logic": "Count of records not resolved, singular/plural.",
-            "source": "maintenanceRecords()"
-          },
-          {
-            "name": "Report issue",
-            "shows": "Report issue",
-            "logic": "Text button opening the report drawer.",
-            "source": "report-fault"
-          },
-          {
-            "name": "Issue card · equipment",
-            "shows": "Drinking station · Open",
-            "logic": "Equipment name and Open/Resolved status.",
-            "source": "maintenanceCache"
-          },
-          {
-            "name": "Issue card · location",
-            "shows": "Pen C2",
-            "logic": "Free-text location in the unit.",
-            "source": "fault.pen"
-          },
-          {
-            "name": "Issue card · note",
-            "shows": "Leaking valve at the east end.",
-            "logic": "Free-text description.",
-            "source": "fault.note"
-          },
-          {
-            "name": "Issue card · reporter",
-            "shows": "G. Hansen · 06:40",
-            "logic": "Name and time of the report; \"just now\" for issues added in the session.",
-            "source": "fault.by"
+            "logic": "Records not resolved, singular or plural. The same count feeds the Maintenance chip on the unit screen. Unit 7 starts with one open issue; the `attention` param hides it (clear, health, feed) or adds a default one in other units (maintenance, busy).",
+            "rule": "Only reachable once a unit is chosen: the Toolbox row exists only in a unit scope. Issues are unit-scoped.",
+            "source": "maintenanceRecords()",
+            "at": "1 open issue"
           }
         ],
-        "controls": [
-          {
-            "control": "Report issue",
-            "does": "opens the report form",
-            "goesTo": "environment.report-issue"
-          },
-          {
-            "control": "An issue card",
-            "does": "opens its detail",
-            "goesTo": "environment.issue-detail"
-          },
-          {
-            "control": "Back",
-            "does": "returns to Toolbox",
-            "goesTo": "workbench.unit"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
         "edge": [
-          "Resolved issues stay listed with a dim style and \"Resolved\".",
-          "The count feeds the Maintenance chip on the unit screen."
+          "Resolved issues stay listed, so the list is not empty after the only issue is resolved."
         ],
-        "rules": [
-          "\"Maintenance offers unit-scoped issue cards, reporting with a pen/location and resolving an issue.\""
-        ],
+        "rules": [],
         "issues": [
-          "The path to this page is Toolbox, two taps from the unit; the unit screen's Maintenance chip does not link here.",
-          "No photo, no priority, no assignee, no history of who resolved it."
+          "The path here is Toolbox, two taps from the unit; the unit screen's Maintenance chip does not link here.",
+          "No photo, priority, assignee, or history of who resolved it."
         ]
       }
     },
@@ -381,36 +302,32 @@
       "figma": "",
       "notes": {
         "purpose": "The empty state when the unit has no issue.",
-        "states": [
-          "How to reach: Unit 8 (or any other unit), Toolbox › Maintenance."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Empty state",
-            "shows": "No open issues — Report equipment that needs attention in this unit.",
-            "logic": "Shown when there are no records at all (resolved issues keep the list non-empty).",
-            "source": "maintenance()"
-          },
-          {
-            "name": "Count",
-            "shows": "0 open issues",
-            "logic": "Plural for zero.",
-            "source": "maintenance()"
+            "name": "Empty state and count",
+            "shows": "No open issues · 0 open issues",
+            "states": [
+              {
+                "state": "Empty",
+                "when": "The unit has no records at all (Unit 8)",
+                "shows": "\"No open issues — Report equipment that needs attention in this unit.\" and \"0 open issues\""
+              },
+              {
+                "state": "Only resolved",
+                "when": "Every record is resolved",
+                "shows": "Not this state: the resolved cards stay listed with \"0 open issues\""
+              }
+            ],
+            "source": "maintenance()",
+            "at": "No open issues"
           }
         ],
-        "controls": [
-          {
-            "control": "Report issue",
-            "does": "opens the report form",
-            "goesTo": "environment.report-issue"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
-        "edge": [
-          "After the only issue is resolved the list shows it as Resolved, not this empty state."
-        ],
+        "edge": [],
         "rules": [],
         "issues": []
       }
@@ -425,53 +342,22 @@
       "figma": "",
       "notes": {
         "purpose": "Captures a new equipment issue in three fields.",
-        "states": [
-          "How to reach: Maintenance › Report issue. Drawer \"Report equipment issue\". Save is a form submit; blank (whitespace) values are ignored."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Equipment",
-            "shows": "Equipment · e.g. Drinking station",
-            "logic": "Required text, max 80.",
-            "source": "fault-device"
-          },
-          {
-            "name": "Location",
-            "shows": "Location in Unit 7 · e.g. Pen C2",
-            "logic": "Required text, max 80; the label names the unit.",
-            "source": "fault-location"
-          },
-          {
-            "name": "Note",
-            "shows": "What needs attention?",
-            "logic": "Required textarea, max 500.",
-            "source": "fault-note"
-          },
-          {
-            "name": "Save",
-            "shows": "Save sample issue",
-            "logic": "Adds an open record at the top with reporter \"G. Hansen · just now\", closes the drawer, toast \"Issue saved in this preview\".",
-            "source": "fault-form submit"
+            "name": "Form and Save",
+            "shows": "Equipment · Location in Unit 7 · What needs attention? · Save sample issue",
+            "logic": "Equipment (max 80) and Location (max 80, label names the unit) are free text; Note is a textarea (max 500). Save adds an open record at the top with reporter \"G. Hansen · just now\", closes the drawer and toasts \"Issue saved in this preview\".",
+            "rule": "All three fields are required; whitespace-only values are ignored.",
+            "source": "fault-device, fault-location, fault-note; fault-form submit",
+            "at": "Save sample issue"
           }
         ],
-        "controls": [
-          {
-            "control": "Save sample issue",
-            "does": "adds the issue",
-            "goesTo": "environment.maintenance"
-          },
-          {
-            "control": "Back",
-            "does": "closes the drawer",
-            "goesTo": "environment.maintenance"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
-        "edge": [
-          "All three fields required."
-        ],
+        "edge": [],
         "rules": [],
         "issues": [
           "Equipment and location are free text; no list of the unit's devices or pens is offered."
@@ -488,29 +374,18 @@
       "figma": "",
       "notes": {
         "purpose": "Shows one issue and lets the worker mark it resolved.",
-        "states": [
-          "How to reach: Maintenance › tap an open issue. Drawer titled with the equipment, \"Pen C2 · Open\", the note and reporter in an evidence box, primary \"Mark resolved\"."
-        ],
+        "states": [],
         "elements": [
           {
             "name": "Mark resolved",
             "shows": "Mark resolved",
-            "logic": "Sets resolved on the record, closes the drawer, toast \"Issue resolved in this preview\"; the open count drops.",
-            "source": "resolve-fault handler"
+            "logic": "Sets resolved on the record, closes the drawer and toasts \"Issue resolved in this preview\"; the open count drops.",
+            "rule": "No note is asked and no resolver or time is recorded.",
+            "source": "resolve-fault handler",
+            "at": "Mark resolved"
           }
         ],
-        "controls": [
-          {
-            "control": "Mark resolved",
-            "does": "resolves the issue",
-            "goesTo": "environment.issue-resolved"
-          },
-          {
-            "control": "Back",
-            "does": "closes the drawer",
-            "goesTo": "environment.maintenance"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
@@ -531,24 +406,24 @@
       "figma": "",
       "notes": {
         "purpose": "Shows a resolved issue read-only.",
-        "states": [
-          "How to reach: after resolving, tap the dimmed card. Drawer shows \"Pen C2 · Resolved\", the note, and \"Resolved in this preview.\" with no action."
-        ],
+        "states": [],
         "elements": [
           {
             "name": "Resolved line",
-            "shows": "Resolved in this preview.",
-            "logic": "Replaces the Mark resolved button.",
-            "source": "faultDetail()"
+            "shows": "Pen C2 · Resolved · Resolved in this preview.",
+            "states": [
+              {
+                "state": "Resolved",
+                "when": "The record is resolved",
+                "shows": "The Mark resolved button is replaced by a static line; no action is offered"
+              }
+            ],
+            "rule": "A resolved issue cannot be reopened.",
+            "source": "faultDetail()",
+            "at": "Resolved in this preview."
           }
         ],
-        "controls": [
-          {
-            "control": "Back",
-            "does": "closes the drawer",
-            "goesTo": "environment.maintenance"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],

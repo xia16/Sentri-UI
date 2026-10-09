@@ -176,108 +176,122 @@
       "figma": "",
       "notes": {
         "purpose": "One row per pen (a pen is one sow with her litter) so the worker sees what each pen still needs and walks the pens.",
-        "states": [
-          "The prototype keeps no screen in the URL beyond the params named here; every other state is reached by tapping, and the data lives in sessionStorage (key pp-simple-v5), so a reload keeps records but starts on the pen list.",
-          "Params the app reads: `chip` (iron | tail | castrate | cocci | id | done), `scheme` (tag | notch | breeders | none), `pen` (a pen code), `lang` (en | zh). Home forwards layout, from, section, entry, unit and returnUnit; the app reads none of them.",
-          "Mixed day on first load: 12 pens, one batch (Batch 40), pens aged day 1 to 6; A01 done, B01 late, B02 sow died, B05/B06 coming.",
-          "Chips show only the jobs that at least one pen needs today (the selected chip stays even at 0).",
-          "The farm setting (Tag every piglet, Notch every piglet, Tag breeders only, No ID) and the language sit in a Demo panel outside the phone; switching the setting restarts the demo."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Header",
-            "shows": "Piglet processing",
-            "logic": "Task name; no Back button (nothing to go back to inside the prototype).",
-            "source": "sp.task"
-          },
-          {
-            "name": "Latest line",
-            "shows": "Last record 08:20 · G. Hansen",
-            "logic": "The newest record of any kind on any pen (treatment, ID, death, move, count), its clock time and who. \"Nothing recorded yet\" when none. Shows the time only, never the date.",
-            "source": "PPS.last(); sp.last, sp.fig, sp.last.who, sp.last.none"
+            "name": "Pen row",
+            "shows": "000245 · To do · Iron · Castrate · Coccidiosis · Tag · 12 piglets · day 4 · 08:20 · G.H",
+            "states": [
+              {
+                "state": "Coming",
+                "when": "Every step is still ahead (B05, B06)",
+                "shows": "No chip; headline is the forecast \"Iron tomorrow\" / \"Castrate in 2 days\" (nearest start day)"
+              },
+              {
+                "state": "To do",
+                "when": "Something is due and nothing is late",
+                "shows": "Green \"To do\"; headline lists the steps still to do in plan order"
+              },
+              {
+                "state": "Late",
+                "when": "Any step is past its window",
+                "shows": "Amber \"Late\" (wins over the other chips); same headline"
+              },
+              {
+                "state": "Sow died",
+                "when": "The sow died and no step is late",
+                "shows": "Red \"Sow died\"; the pen stays on its schedule"
+              },
+              {
+                "state": "Done",
+                "when": "Nothing due and nothing ahead",
+                "shows": "Green \"Done\"; headline \"12 piglets\"; a pencil instead of the chevron"
+              },
+              {
+                "state": "Ended",
+                "when": "After End task",
+                "shows": "No chip; headline \"Task ended\""
+              }
+            ],
+            "logic": "Meta = piglets alive now · pen age in days · time (mm/dd if not today) of the pen's newest record · that worker as initial.surname-initial; the count is dropped when it is already the headline; pens with no record show just count and day. Plan order: Iron, Dock tail, Castrate, Coccidiosis, then the ID step.",
+            "rule": "One chip at most, one headline, one meta line (looks like farrowing's room list). Identity is owed only where the farm scheme requires it.",
+            "source": "penCard(); sowChip(); state.js status(), todo(), coming()",
+            "at": "To do"
           },
           {
             "name": "Summary card · left half",
-            "shows": "Iron to do today · 6 · pens",
-            "logic": "The first job on the plan order (Iron, Dock tail, Castrate, Coccidiosis, then the ID step) that any pen needs today, and how many pens need it; \"needs today\" = the step is due, late, or has piglets left from an earlier save. When nothing is due: \"Due today · 0 · nothing due\". The support line is \"Batch 40\", or \"Batch 40 · 3 piglets unaccounted\" when Set count has lowered counts.",
-            "source": "listScreen(); needsToday(); sp.sum.due, sp.sum.pens, sp.sum.none, sp.sum.nothing, sp.batch, sp.batch.unacc"
+            "shows": "Iron to do today · 6 · pens · Batch 40",
+            "states": [
+              {
+                "state": "Job due",
+                "when": "Any pen needs a job today",
+                "shows": "The first job in plan order that any pen needs, and how many pens need it"
+              },
+              {
+                "state": "Nothing due",
+                "when": "No pen needs any job",
+                "shows": "\"Due today · 0 · nothing due\""
+              },
+              {
+                "state": "Unaccounted",
+                "when": "Set count lowered some counts (task total above 0)",
+                "shows": "Support line \"Batch 40 · 3 piglets unaccounted\""
+              },
+              {
+                "state": "Ended",
+                "when": "After End task",
+                "shows": "Heading \"Not done\", the number of not-done pens, \"pens\""
+              }
+            ],
+            "logic": "\"Needs today\" = the step is due, late, or has piglets left from an earlier save. Only the first job is named even when other jobs have more pens.",
+            "source": "listScreen(); needsToday()",
+            "at": "Iron to do today"
           },
           {
             "name": "Summary card · right half",
             "shows": "Task · 3 / 12 · pens done · Tap to end the task",
-            "logic": "Pens done over all pens, with a bar. A pen counts as done when it has nothing left to do today, which includes pens whose steps are all still ahead (B05, B06). Tapping the half opens End task.",
-            "source": "isDone(); sp.sum.task, sp.sum.done, sp.sum.end"
+            "logic": "Pens done over all pens, with a bar. A pen is done when it has nothing left to do today, which includes pens whose steps are all still ahead (B05, B06), so the figure overstates progress.",
+            "source": "isDone(); sp.sum.*",
+            "at": "Tap to end the task"
           },
           {
             "name": "Chips row",
             "shows": "All 12 · Iron 6 · Dock tail 4 · Castrate 6 · Coccidiosis 6 · Tag 7 · Done 3",
-            "logic": "One radio group that only filters the list. Each count = pens where that step is due, late or has some left. The Tag chip is named by the scheme (Tag, Notch, Breeders) and absent on a No-ID farm. Done = pens with nothing left to do.",
-            "source": "chipsRow(); sp.chips.all, sp.tr.*, sp.chip.id.*, sp.chips.done"
+            "states": [
+              {
+                "state": "Job chip",
+                "when": "At least one pen needs the job today",
+                "shows": "Shown with its pen count (due, late or some left)"
+              },
+              {
+                "state": "Job chip hidden",
+                "when": "No pen needs the job",
+                "shows": "Not drawn, unless it is the selected chip, which stays at 0"
+              },
+              {
+                "state": "ID chip",
+                "when": "Farm has an ID step",
+                "shows": "Named by the scheme (Tag, Notch, Breeders); absent on a No ID farm"
+              },
+              {
+                "state": "Ended",
+                "when": "After End task",
+                "shows": "Job chips are gone; All and Done remain"
+              }
+            ],
+            "rule": "One radio group that only filters the list; bulk recording is not built.",
+            "source": "chipsRow()",
+            "at": "Dock tail"
           },
           {
-            "name": "Pen header",
-            "shows": "A03 · 1 sow",
-            "logic": "Pen code and a fixed \"1 sow\" (one sow per pen); tapping the header opens the pen.",
-            "source": "penCard(); sp.sows.one"
-          },
-          {
-            "name": "Pen row · sow ID",
-            "shows": "000245",
-            "logic": "The sow's ear tag, mono.",
-            "source": "sp.code"
-          },
-          {
-            "name": "Pen row · chip",
-            "shows": "To do",
-            "logic": "One chip at most: amber Late if any step is late; red Sow died if the sow died; green To do if anything is due; Done when nothing is due and nothing is ahead; no chip when every step is still ahead. Chips disappear after End.",
-            "source": "sowChip(); sp.chip.late, sp.chip.sow, sp.st.todo, sp.chips.done"
-          },
-          {
-            "name": "Pen row · headline",
-            "shows": "Iron · Castrate · Coccidiosis · Tag",
-            "logic": "The steps still to do, in plan order. With nothing to do and steps ahead: the forecast \"Iron tomorrow\" / \"Castrate in 2 days\" (the nearest start day). With everything done: the piglet count (\"12 piglets\"). After End: \"Task ended\".",
-            "source": "penCard(); sp.st.in, sp.piglets, sp.ended.row"
-          },
-          {
-            "name": "Pen row · meta",
-            "shows": "12 piglets · day 4 · 08:20 · G.H",
-            "logic": "Piglets alive now · pen age in days · time (or mm/dd if not today) of the pen's newest record · that record's worker as initial.surname-initial. The piglet count is dropped when it is already the headline. Pens with no record show just count and day.",
-            "source": "penCard(); sp.piglets, sp.day.n, sp.fig"
-          },
-          {
-            "name": "Pen row · trailing",
-            "shows": "›",
-            "logic": "Chevron; a pencil on done pens (an edit cue). Tapping anywhere opens the pen sheet.",
-            "source": "K.row trail"
+            "name": "Latest line",
+            "shows": "Last record 08:20 · G. Hansen",
+            "logic": "The newest record of any kind on any pen (treatment, ID, death, move, count), its clock time and who; \"Nothing recorded yet\" when none. The time only, never the date.",
+            "source": "PPS.last()",
+            "at": "Last record"
           }
         ],
-        "controls": [
-          {
-            "control": "A pen row or header",
-            "does": "opens that pen's sheet",
-            "goesTo": "piglet-processing.sheet-todo"
-          },
-          {
-            "control": "A job chip",
-            "does": "filters the list to pens that need the job",
-            "goesTo": "piglet-processing.job-chip"
-          },
-          {
-            "control": "Done chip",
-            "does": "filters to done pens",
-            "goesTo": "piglet-processing.chip-done"
-          },
-          {
-            "control": "Task half of the summary card",
-            "does": "opens End task",
-            "goesTo": "piglet-processing.end-task"
-          },
-          {
-            "control": "OK on the amber note",
-            "does": "dismisses the two-phones note",
-            "goesTo": "piglet-processing.pen-list"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.task",
           "sp.last",
@@ -319,22 +333,16 @@
           "sp.chip.aria"
         ],
         "edge": [
-          "A pen whose sow died stays on its schedule (Round 2 Q18); the chip is red Sow died unless a step is late.",
           "An empty filter prints \"No pen needs this now.\" or \"No pen is done yet.\"",
-          "Singular forms: \"1 piglet\", \"Iron tomorrow\".",
           "Unseen two-phone notes appear as amber warnings under the latest line."
         ],
-        "rules": [
-          "Round 5: list row = id + one chip, one headline, one meta line; \"look like farrowing\".",
-          "Round 9: \"Bulk = chips.\"",
-          "Round 7: identity is owed only where the farm's scheme requires it; a \"none\" scheme shows none."
-        ],
+        "rules": [],
         "issues": [
-          "\"Done\" pens include pens that have not started (B05, B06 count as done), so \"3 / 12 pens done\" overstates progress. (Open item 2 in HANDOFF.)",
-          "The summary card names only the first job (Iron 6) while the chips show larger ones (Tag 7); the card and chips disagree about what is \"today's\" number.",
-          "The Tag chip filters only; the Round 9 ruling and HANDOFF describe chips with tick-through pens and a \"Finish iron treatment\" hold, and the strings (sp.bulk.*) and PPS.bulk() remain, but no bulk screen exists in app.js.",
-          "The latest line shows a time without a date, so \"Last record 08:20\" can be yesterday's.",
-          "The pen header shows \"1 sow\" on every pen; the pen code and sow ID are shown twice (header and row).",
+          "\"Done\" pens include pens that have not started, so \"3 / 12 pens done\" overstates progress (HANDOFF open item 2).",
+          "The summary card names only the first job (Iron 6) while the chips show larger ones (Tag 7).",
+          "Chips only filter; the Round 9 ruling and HANDOFF describe tick-through pens and a hold, which are not built.",
+          "\"Last record 08:20\" has no date and can be yesterday's.",
+          "Pen code and sow ID are shown twice (header and row); the header says \"1 sow\" on every pen.",
           "Home says Batch 27 / 8 pens / care due tomorrow; this list is Batch 40 / 12 pens / 6 pens due today.",
           "No way back to Home."
         ]
@@ -350,44 +358,39 @@
       "figma": "",
       "notes": {
         "purpose": "Shows only the pens that need one job today, so the worker can walk them with the treatment in hand.",
-        "states": [
-          "`?chip=iron` (also tail, castrate, cocci, id). The chip is selected; counts stay.",
-          "Selecting the Tag chip adds the note that IDs go in one piglet at a time (sp.chip.id.tip exists in strings; not shown in the current screen)."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Filtered rows",
+            "name": "Filtered list",
             "shows": "A03 · A04 · A05 · A06 · B01 · B04",
-            "logic": "Pens where the step is due, late or has some left (same rule as the chip count). Rows are unchanged.",
-            "source": "listScreen(); needsToday(pen, chip)"
+            "states": [
+              {
+                "state": "Pens listed",
+                "when": "The selected job is due, late or has some left on a pen",
+                "shows": "Those pens, rows unchanged"
+              },
+              {
+                "state": "Empty",
+                "when": "The selected chip has count 0",
+                "shows": "The chip stays visible and the list says \"No pen needs this now.\""
+              }
+            ],
+            "logic": "Same rule as the chip count. The Tag chip has a tip string (sp.chip.id.tip) that is not shown.",
+            "source": "listScreen(); needsToday(pen, chip)",
+            "at": "A03"
           }
         ],
-        "controls": [
-          {
-            "control": "A pen row",
-            "does": "opens the pen",
-            "goesTo": "piglet-processing.sheet-todo"
-          },
-          {
-            "control": "All chip",
-            "does": "clears the filter",
-            "goesTo": "piglet-processing.pen-list"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.chips.all",
           "sp.tr.iron",
           "sp.chip.none",
           "sp.chip.aria"
         ],
-        "edge": [
-          "A selected chip with count 0 stays visible and shows \"No pen needs this now.\""
-        ],
-        "rules": [
-          "Round 9: tap a job chip and every pen that needs it is listed."
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
-          "The list is only a filter; the pens still have to be opened one at a time to record (no tick-through)."
+          "The list is only a filter; each pen still has to be opened to record (no tick-through)."
         ]
       }
     },
@@ -401,31 +404,39 @@
       "figma": "",
       "notes": {
         "purpose": "Lists pens with nothing left to do.",
-        "states": [
-          "`?chip=done`: A01 (all done), B05 and B06 (nothing due yet) in the sample."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Rows",
+            "name": "Done rows",
             "shows": "A01 · Done · 12 piglets; B05 · Iron tomorrow",
-            "logic": "Pens with an empty to-do list. Done pens end in an edit pencil instead of a chevron.",
-            "source": "isDone(); penCard()"
+            "states": [
+              {
+                "state": "Finished",
+                "when": "Every step is recorded",
+                "shows": "Green \"Done\", \"12 piglets\", pencil"
+              },
+              {
+                "state": "Not started",
+                "when": "Nothing due yet (B05, B06)",
+                "shows": "No chip, forecast headline \"Iron tomorrow\""
+              },
+              {
+                "state": "Empty",
+                "when": "No pen qualifies",
+                "shows": "\"No pen is done yet.\""
+              }
+            ],
+            "logic": "A pen is done when its to-do list is empty, so pens that have not started appear here.",
+            "source": "isDone(); penCard()",
+            "at": "Iron tomorrow"
           }
         ],
-        "controls": [
-          {
-            "control": "A pen row",
-            "does": "opens the pen",
-            "goesTo": "piglet-processing.sheet-done"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.chips.done",
           "sp.empty.done"
         ],
-        "edge": [
-          "Empty: \"No pen is done yet.\""
-        ],
+        "edge": [],
         "rules": [],
         "issues": [
           "Pens that have not started appear under Done."
@@ -442,29 +453,46 @@
       "figma": "",
       "notes": {
         "purpose": "Shows the list for fatteners raised as a batch, where no piglet gets an ID.",
-        "states": [
-          "`?scheme=none`: no ID step, no Tag chip, no tagged facts; other schemes via `scheme=tag|notch|breeders`."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Missing parts",
-            "shows": "no Tag chip · no \"Tag\" in the headlines · no tool",
-            "logic": "The plan has four treatments only; the Piglets card shows only Boars · gilts and Litter weight.",
-            "source": "PPS.hasId()"
+            "name": "Farm ID scheme",
+            "shows": "Tag every piglet · Notch every piglet · Tag breeders only · No ID",
+            "states": [
+              {
+                "state": "Tag every piglet",
+                "when": "Scheme tag",
+                "shows": "ID step \"Tag piglets\"; chip Tag; \"n of m tagged\"; 6-digit tag from the farm strip"
+              },
+              {
+                "state": "Notch every piglet",
+                "when": "Scheme notch",
+                "shows": "Step \"Notch piglets\"; chip Notch; \"n of m notched\"; ID is litter-number-piglet"
+              },
+              {
+                "state": "Tag breeders only",
+                "when": "Scheme breeders",
+                "shows": "Step \"Pick breeders\"; chip Breeders; done when the worker closes the pick; facts show breeders"
+              },
+              {
+                "state": "No ID",
+                "when": "Scheme none",
+                "shows": "Four treatments only: no ID step, no Tag chip, no tool, no tagged facts; the Piglets card shows only Boars · gilts and Litter weight"
+              }
+            ],
+            "rule": "A farm whose scheme is no identity owes no tagging and shows none. Switching the setting in the Demo panel restarts the demo.",
+            "source": "PPS.hasId(); SCHEMES in state.js",
+            "at": "Coccidiosis"
           }
         ],
         "controls": [],
         "copy": [
           "sp.scheme.none"
         ],
-        "edge": [
-          "Switching the setting restarts the demo with that farm's data."
-        ],
-        "rules": [
-          "Round 7: \"A farm whose scheme is no identity owes no tagging and shows none.\""
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
-          "The scheme is a demo switch outside the phone; unclear how a farm's scheme is set in the real product (open in Round 1 Q3)."
+          "The scheme is a demo switch outside the phone; how a farm's scheme is set in the real product is open (Round 1 Q3)."
         ]
       }
     },
@@ -478,37 +506,42 @@
       "figma": "",
       "notes": {
         "purpose": "Shows what the worker sees when another phone recorded the same treatment first.",
-        "states": [
-          "How to reach: record Iron on A05 on this phone, then press \"Demo: another phone recorded iron on A05\" in the Demo panel. The list shows an amber note; the A05 sheet shows the other worker's record in Done and \"yours kept as a note\"."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Note",
+            "name": "Clash note",
             "shows": "Iron for A05 was already recorded by L. Madsen at 08:40. Yours is kept as a note.",
-            "logic": "First record in wins; the second is kept as a note, both stamped. Dismiss with OK.",
-            "source": "state.js otherPhone(); sp.note.clash"
+            "states": [
+              {
+                "state": "Other phone second",
+                "when": "Your phone recorded first, then the other phone's record arrives",
+                "shows": "Amber note on the list; the pen sheet shows the other worker's record in Done"
+              },
+              {
+                "state": "Other phone first",
+                "when": "The other phone's record arrived before yours",
+                "shows": "Pen sheet says \"L. Madsen's phone recorded Iron on A05 at 08:40.\""
+              },
+              {
+                "state": "Yours kept",
+                "when": "Both recorded",
+                "shows": "Done row shows \"yours kept as a note (hh:mm)\""
+              }
+            ],
+            "rule": "First record in wins; the second is kept as a note, both stamped, never merged. Offline collisions are kept (Round 1 Q8), simplified here to first-in-wins. After End the demo says the task has ended.",
+            "source": "state.js otherPhone(); sp.note.clash",
+            "at": "Iron for A05 was already recorded by L. Madsen at 08:40."
           }
         ],
-        "controls": [
-          {
-            "control": "OK",
-            "does": "dismisses the note",
-            "goesTo": "piglet-processing.pen-list"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.note.clash",
           "sp.ok",
           "sp.kept.note",
           "sp.note.arrived"
         ],
-        "edge": [
-          "If the other phone's record arrives before this phone recorded, the sheet says \"L. Madsen's phone recorded Iron on A05 at 08:40.\"",
-          "After End the demo says the task has ended."
-        ],
-        "rules": [
-          "Round 1 Q8: offline collisions are kept, never merged (simplified here to first-in-wins; HANDOFF open item 1)."
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "Two same-record collision answers from Round 4/6 (\"Given twice\", \"Different piglets\") are dropped in this prototype."
         ]
@@ -524,77 +557,35 @@
       "figma": "",
       "notes": {
         "purpose": "The pen sheet for a day-1 pen whose treatments start tomorrow.",
-        "states": [
-          "`?pen=B05` (day 1) or B06. All steps are \"coming\" (Iron and Dock tail from day 2; others from day 3); the list shows \"Iron tomorrow\" and no chip.",
-          "Items of later days can still be ticked early and are marked early."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Sheet title",
-            "shows": "000245",
-            "logic": "The pen's sow ID (p.sow). The pen code is in the subtitle.",
-            "source": "penSheet(); state.js seed (sow = 000231 + 7 per pen)"
-          },
-          {
-            "name": "Sheet subtitle",
-            "shows": "A03 · parity 3 · 12 piglets · day 4",
-            "logic": "Pen code and the sow's parity, piglets alive now (born − dead, adjusted by deaths, moves and Set count), pen age in days (day 1 = born). Parity is sample data.",
-            "source": "sp.sheet.pen, sp.piglets, sp.day.n"
-          },
-          {
-            "name": "Piglets card",
-            "shows": "Piglets · View log › · Boars · gilts 6 · 6 · Litter weight 24.6 kg · Tagged 4 of 12 · Breeders kept 1",
-            "logic": "Heading with the \"View log ›\" link, then up to four facts, each a button into its own sheet. Boars · gilts = the litter's saved split, or counted from the IDs once every alive piglet has one; \"—\" when unknown. Litter weight = the last weight saved (kg), \"—\" when none, with the hint \"Weigh the litter: growth figures need it.\" Tagged/Notched \"n of m\" = piglets with an ID over alive; Breeders kept = IDs flagged as breeders. The two ID facts appear only on a farm that has an ID step (not \"No ID\"). There is no separate piglets-alive figure: it is in the subtitle.",
-            "source": "pigletsCard(); sp.pc.title, sp.pc.log, sp.pg.sex, sp.pg.weight, sp.pc.tagged, sp.pg.breeders, sp.pg.weight.hint"
-          },
-          {
-            "name": "Tool row",
-            "shows": "Tag piglets · Record death · More",
-            "logic": "Three tools as farrowing's row. Tag piglets is named by the farm scheme (Tag piglets, Notch piglets, Pick breeders) and is absent on a \"No ID\" farm; the row is hidden after End task.",
-            "source": "toolRow(); sp.tr.id.*, sp.tool.death, sp.more.title"
-          },
-          {
-            "name": "Processing heading",
-            "shows": "Processing",
-            "logic": "Section heading above the age-day cards.",
-            "source": "sp.proc.title"
-          },
-          {
             "name": "Age-day card",
-            "shows": "Day 2 · Planned 10/07",
-            "logic": "One card per plan day: Iron and Dock tail on day 2; Castrate, Coccidiosis and the ID step on day 3. The status line is \"Planned mm/dd\" (today minus the gap between the pen's age and that day) for days up to today, or \"Not due yet · can be done early\" for later days. A card disappears once all its items are done.",
-            "source": "processing(); sp.day.open, sp.day.plan, sp.day.early"
-          },
-          {
-            "name": "Item row · coming",
-            "shows": "Iron · day 2–4 · Not due yet · can be done early",
-            "logic": "Not-yet-due days carry the early status; a tick is allowed and saved with an early mark.",
-            "source": "processing() future branch"
-          },
-          {
-            "name": "Footer",
-            "shows": "Back · Submit · 2 items",
-            "logic": "Back closes the sheet and drops the unsaved ticks. Submit saves every ticked item as a stamped record (who, when, count; marked early or late if outside its window) and is disabled at 0 ticks; it is absent after End task. After saving, a line \"2 items saved · Undo\" appears; Undo takes those records back.",
-            "source": "penSheet(); sp.back, sp.submit.n, sp.flash.items, sp.undo"
+            "shows": "Day 2 · Planned 10/07 · Not due yet · can be done early",
+            "states": [
+              {
+                "state": "Planned",
+                "when": "The day is today or earlier",
+                "shows": "\"Planned mm/dd\" (today minus the gap between pen age and that day)"
+              },
+              {
+                "state": "Not due yet",
+                "when": "A later day (all of B05)",
+                "shows": "\"Not due yet · can be done early\""
+              },
+              {
+                "state": "Gone",
+                "when": "All its items are done",
+                "shows": "The card disappears"
+              }
+            ],
+            "logic": "One card per plan day: Iron and Dock tail day 2; Castrate, Coccidiosis and the ID step day 3.",
+            "rule": "Early is allowed for any scheduled item actually done and counts on time; the record is marked early.",
+            "source": "processing(); sp.day.*",
+            "at": "Not due yet · can be done early"
           }
         ],
-        "controls": [
-          {
-            "control": "An item row",
-            "does": "ticks or unticks it",
-            "goesTo": "piglet-processing.sheet-coming"
-          },
-          {
-            "control": "Submit",
-            "does": "saves the ticked items",
-            "goesTo": "piglet-processing.pen-list"
-          },
-          {
-            "control": "Back",
-            "does": "closes the sheet",
-            "goesTo": "piglet-processing.pen-list"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.sheet.pen",
           "sp.day.open",
@@ -604,12 +595,8 @@
           "sp.submit.n",
           "sp.back"
         ],
-        "edge": [
-          "No Done card yet."
-        ],
-        "rules": [
-          "Round 1 Q6: \"Early is allowed for any scheduled item actually done, counts on time.\""
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "Everything is greyed as not due yet but nothing says when the first item opens except the list headline."
         ]
@@ -625,132 +612,160 @@
       "figma": "",
       "notes": {
         "purpose": "Where the worker records a pen: tick what was done, adjust the count, submit once.",
-        "states": [
-          "`?pen=A03` (day 4): Iron 10 of 12 given with 2 left (weak); Dock tail done; Castrate and Coccidiosis due; ID due.",
-          "Ticked: a row shows the check disc and its piglet count; Submit shows the count of ticked items.",
-          "Saved: the receipt line \"N items saved · Undo\", the rows turn done in place for about four seconds, then fold into Done.",
-          "The prototype keeps no screen in the URL beyond the params named here; every other state is reached by tapping, and the data lives in sessionStorage (key pp-simple-v5), so a reload keeps records but starts on the pen list."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Sheet title",
-            "shows": "000245",
-            "logic": "The pen's sow ID (p.sow). The pen code is in the subtitle.",
-            "source": "penSheet(); state.js seed (sow = 000231 + 7 per pen)"
-          },
-          {
-            "name": "Sheet subtitle",
-            "shows": "A03 · parity 3 · 12 piglets · day 4",
-            "logic": "Pen code and the sow's parity, piglets alive now (born − dead, adjusted by deaths, moves and Set count), pen age in days (day 1 = born). Parity is sample data.",
-            "source": "sp.sheet.pen, sp.piglets, sp.day.n"
-          },
-          {
-            "name": "Piglets card",
-            "shows": "Piglets · View log › · Boars · gilts 6 · 6 · Litter weight 24.6 kg · Tagged 4 of 12 · Breeders kept 1",
-            "logic": "Heading with the \"View log ›\" link, then up to four facts, each a button into its own sheet. Boars · gilts = the litter's saved split, or counted from the IDs once every alive piglet has one; \"—\" when unknown. Litter weight = the last weight saved (kg), \"—\" when none, with the hint \"Weigh the litter: growth figures need it.\" Tagged/Notched \"n of m\" = piglets with an ID over alive; Breeders kept = IDs flagged as breeders. The two ID facts appear only on a farm that has an ID step (not \"No ID\"). There is no separate piglets-alive figure: it is in the subtitle.",
-            "source": "pigletsCard(); sp.pc.title, sp.pc.log, sp.pg.sex, sp.pg.weight, sp.pc.tagged, sp.pg.breeders, sp.pg.weight.hint"
-          },
-          {
-            "name": "Tool row",
-            "shows": "Tag piglets · Record death · More",
-            "logic": "Three tools as farrowing's row. Tag piglets is named by the farm scheme (Tag piglets, Notch piglets, Pick breeders) and is absent on a \"No ID\" farm; the row is hidden after End task.",
-            "source": "toolRow(); sp.tr.id.*, sp.tool.death, sp.more.title"
-          },
-          {
-            "name": "Processing heading",
-            "shows": "Processing",
-            "logic": "Section heading above the age-day cards.",
-            "source": "sp.proc.title"
+            "name": "Item row",
+            "shows": "Iron · day 2-4 · Castrate · Coccidiosis · Tag piglets · Not filled · 4 of 12 tagged",
+            "states": [
+              {
+                "state": "Due",
+                "when": "Pen age is inside the step's window (Iron and Dock tail days 2-4, Castrate 3-7, Coccidiosis 3-5, ID step 3-7)",
+                "shows": "Open tick row with the window \"day 2-4\""
+              },
+              {
+                "state": "Late",
+                "when": "Pen age is past the window end",
+                "shows": "Same row plus amber \"late\"; still tickable; the saved record carries the late mark"
+              },
+              {
+                "state": "Coming",
+                "when": "Pen age is before the window start",
+                "shows": "Row under \"Not due yet · can be done early\"; a tick is allowed and the record is marked early"
+              },
+              {
+                "state": "Ticked",
+                "when": "Tapped, not yet submitted",
+                "shows": "Check disc and the piglet count (\"12 piglets\" = alive minus already given) as a button into the count sheet; amber \"early\" if the day is later than pen age; amber \"N left · reason\" if the count was lowered; nothing is saved until Submit"
+              },
+              {
+                "state": "Some left",
+                "when": "A treatment was saved for fewer piglets than alive",
+                "shows": "The rest stay on the list: \"Iron · 10 given · 2 left · weak\" (reason weak, sick, or \"moved in\" for arrivals)"
+              },
+              {
+                "state": "ID step",
+                "when": "The farm has an ID step",
+                "shows": "Not ticked; opens the Piglets list. Meta amber \"Not filled\" / \"Filled\" (Filled once any ID exists; on a breeders-only farm once the pick is closed), progress words from the scheme (\"4 of 12 tagged\", \"1 breeder picked\"), \"late\" after day 7"
+              },
+              {
+                "state": "Done",
+                "when": "Nothing owed for the step",
+                "shows": "Stays in its day card about four seconds after Submit, then folds into the Done card"
+              }
+            ],
+            "logic": "Windows are in pen-age days (day 1 = born). Status per step: done when nothing is owed and it was given; left when some were given and some are owed; otherwise coming, due or late by pen age against the window. A death or Set count lowers alive; treatments given are capped at alive.",
+            "rule": "Late stays due, carries its real date and counts late. After End the ticks and Submit are gone and the sheet warns \"Task ended. Nothing more can be recorded.\"",
+            "source": "dayItem(); state.js PLAN, status(), need(); sp.given.days, sp.late, sp.item.*",
+            "at": "day 3–7"
           },
           {
             "name": "Age-day card",
             "shows": "Day 2 · Planned 10/07",
-            "logic": "One card per plan day: Iron and Dock tail on day 2; Castrate, Coccidiosis and the ID step on day 3. The status line is \"Planned mm/dd\" (today minus the gap between the pen's age and that day) for days up to today, or \"Not due yet · can be done early\" for later days. A card disappears once all its items are done.",
-            "source": "processing(); sp.day.open, sp.day.plan, sp.day.early"
+            "states": [
+              {
+                "state": "Planned",
+                "when": "The day is today or earlier",
+                "shows": "\"Planned mm/dd\" (today minus the gap between pen age and that day)"
+              },
+              {
+                "state": "Not due yet",
+                "when": "A later day",
+                "shows": "\"Not due yet · can be done early\""
+              },
+              {
+                "state": "Gone",
+                "when": "All its items are done",
+                "shows": "The card disappears"
+              }
+            ],
+            "source": "processing(); sp.day.*",
+            "at": "Planned 10/07"
           },
           {
-            "name": "Item row · due",
-            "shows": "Iron · day 2–4",
-            "logic": "One tick per treatment. Meta = the window in pen-age days from PLAN (Iron 2-4, Dock tail 2-4, Castrate 3-7, Coccidiosis 3-5; the ID step 3-7). Tapping ticks it into a draft (nothing is saved until Submit); a ticked row shows the piglet count (\"12 piglets\" = alive minus already given) as a button that opens the count sheet. Late items add an amber \"late\"; ticking an item of a later day adds an amber \"early\".",
-            "source": "dayItem(); state.js PLAN; sp.given.days, sp.late, sp.item.early"
+            "name": "Piglets card",
+            "shows": "Boars · gilts 6 · 6 · Litter weight 24.6 kg · Tagged 4 of 12 · Breeders kept 1",
+            "states": [
+              {
+                "state": "Boars · gilts from IDs",
+                "when": "Tag or notch farm and every alive piglet has an ID",
+                "shows": "Counted from the IDs"
+              },
+              {
+                "state": "Boars · gilts saved",
+                "when": "Otherwise, a split was saved on the pen (Boars · gilts sheet)",
+                "shows": "The saved split"
+              },
+              {
+                "state": "Boars · gilts unknown",
+                "when": "Neither",
+                "shows": "\"—\""
+              },
+              {
+                "state": "Weight known",
+                "when": "A litter weight was saved",
+                "shows": "The latest kg"
+              },
+              {
+                "state": "Weight unknown",
+                "when": "No weight saved",
+                "shows": "\"—\" and the hint \"Weigh the litter: growth figures need it.\""
+              },
+              {
+                "state": "Notch farm",
+                "when": "Scheme notch",
+                "shows": "The fact is labelled \"Notched n of m\""
+              },
+              {
+                "state": "No ID step",
+                "when": "Farm scheme is No ID",
+                "shows": "Tagged and Breeders kept are not drawn; two facts remain"
+              }
+            ],
+            "logic": "Each fact is a button into its own sheet. \"n of m\" = piglets with an ID over piglets alive; Breeders kept = IDs flagged as breeders. There is no separate piglets-alive figure: it is in the subtitle (born − dead, adjusted by deaths, moves and Set count).",
+            "source": "pigletsCard(); sp.pg.*, sp.pc.*",
+            "at": "Litter weight"
           },
           {
-            "name": "Item row · some left",
-            "shows": "Iron · 10 given · 2 left · weak",
-            "logic": "A treatment saved for fewer piglets than alive keeps the rest on the list with the reason given (weak, sick, or \"moved in\" for arrivals).",
-            "source": "dayItem(); sp.tl.given, sp.left, sp.why.*"
-          },
-          {
-            "name": "Item row · ID step",
-            "shows": "Tag piglets · Not filled · 4 of 12 tagged",
-            "logic": "The ID step is not ticked; it opens the Piglets list. Meta: amber \"Filled\"/\"Not filled\" (Filled when any ID is recorded; on a breeders-only farm when the pick is done), then progress words from the farm scheme (\"4 of 12 tagged\", \"4 of 12 notched\", \"1 breeder picked\"), plus \"late\" when past day 7.",
-            "source": "dayItem(), idWhat(); sp.item.filled, sp.item.notfilled, sp.id.of.*"
+            "name": "Tool row",
+            "shows": "Tag piglets · Record death · More",
+            "logic": "Three tools as farrowing's row. The first is named by the farm scheme (Tag piglets, Notch piglets, Pick breeders) and is absent on a No ID farm; the whole row is hidden after End task.",
+            "source": "toolRow(); sp.tr.id.*",
+            "at": "Record death"
           },
           {
             "name": "Done card",
             "shows": "Done · 2 items · Show",
-            "logic": "Treatments and the ID step already done sit folded in one card at the bottom (\"Done · N items\") with the names (\"Iron · Dock tail\") and a Show/Hide row. Opened, each row shows \"day 2 · G.H 10/05 08:05 · 12 piglets\", an amber early/late mark and, if another phone got there first, \"yours kept as a note (hh:mm)\". A step saved in this visit stays in its day card about four seconds before moving here.",
-            "source": "processing(); sp.proc.done, sp.proc.done.n, sp.tl.open, sp.tl.close, sp.kept.note"
+            "states": [
+              {
+                "state": "Folded",
+                "when": "Default",
+                "shows": "\"Done · N items\" and the names (\"Iron · Dock tail\")"
+              },
+              {
+                "state": "Opened",
+                "when": "Show pressed",
+                "shows": "Each row: \"day 2 · G.H 10/05 08:05 · 12 piglets\", amber early/late mark, and \"yours kept as a note (hh:mm)\" if another phone recorded first"
+              },
+              {
+                "state": "Just saved",
+                "when": "Saved in this visit",
+                "shows": "Stays in its day card about four seconds before moving here"
+              }
+            ],
+            "source": "processing(); sp.proc.done, sp.tl.*, sp.kept.note",
+            "at": "1 item"
           },
           {
-            "name": "Footer",
+            "name": "Submit and Back",
             "shows": "Back · Submit · 2 items",
-            "logic": "Back closes the sheet and drops the unsaved ticks. Submit saves every ticked item as a stamped record (who, when, count; marked early or late if outside its window) and is disabled at 0 ticks; it is absent after End task. After saving, a line \"2 items saved · Undo\" appears; Undo takes those records back.",
-            "source": "penSheet(); sp.back, sp.submit.n, sp.flash.items, sp.undo"
+            "logic": "Submit saves every ticked item as one stamped record (who, when, count; marked early or late if outside its window), stays on the sheet, and shows \"2 items saved · Undo\" which takes those records back. Back drops unsaved ticks.",
+            "rule": "Submit is disabled at 0 ticks and absent after End task. Every treatment is one tap for all live piglets; lowering the number asks a reason for the rest.",
+            "source": "penSheet(); sp.submit.n, sp.flash.items, sp.undo",
+            "at": "Submit"
           }
         ],
-        "controls": [
-          {
-            "control": "An item row",
-            "does": "ticks or unticks the item (the ID row opens the Piglets list)",
-            "goesTo": "piglet-processing.sheet-todo"
-          },
-          {
-            "control": "Piglet count on a ticked item",
-            "does": "opens the count for that item",
-            "goesTo": "piglet-processing.adjust-count"
-          },
-          {
-            "control": "Boars · gilts fact",
-            "does": "opens the counts",
-            "goesTo": "piglet-processing.counts"
-          },
-          {
-            "control": "Litter weight fact",
-            "does": "opens the weight pad",
-            "goesTo": "piglet-processing.weight"
-          },
-          {
-            "control": "Tagged / Breeders kept facts, Tag piglets tool, ID row",
-            "does": "opens the Piglets list",
-            "goesTo": "piglet-processing.tagged-list"
-          },
-          {
-            "control": "View log",
-            "does": "opens the pen log",
-            "goesTo": "piglet-processing.pen-log"
-          },
-          {
-            "control": "Record death",
-            "does": "opens the death sheet",
-            "goesTo": "piglet-processing.record-death"
-          },
-          {
-            "control": "More",
-            "does": "opens More actions",
-            "goesTo": "piglet-processing.more-actions"
-          },
-          {
-            "control": "Submit",
-            "does": "saves ticked items and stays on the sheet",
-            "goesTo": "piglet-processing.sheet-todo"
-          },
-          {
-            "control": "Back",
-            "does": "closes the sheet",
-            "goesTo": "piglet-processing.pen-list"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.sheet.pen",
           "sp.pc.title",
@@ -788,21 +803,13 @@
           "sp.back"
         ],
         "edge": [
-          "Submit with 0 ticks is disabled.",
-          "After End task: warning \"Task ended. Nothing more can be recorded.\" and the tool row, Submit and ticks are gone.",
-          "A death or Set count lowers alive; treatments given are capped at alive.",
           "When another phone recorded the same item, the Done row says \"yours kept as a note\"."
         ],
-        "rules": [
-          "Round 2 Q16: \"Every treatment: one tap records all live piglets; lowering the number asks a reason for the rest.\"",
-          "Round 1 Q6: late stays due, carries its real date, counts late.",
-          "Round 5: the litter opens as a drawer over the list \"like a sow in farrowing\"."
-        ],
+        "rules": [],
         "issues": [
           "The ticked count button (\"12 piglets\") looks like a value, not a control.",
-          "Dates in the day cards (\"Planned 10/07\") are computed from the pen's age, not from a farrowing date.",
-          "The pen's sow ID is the sheet title but the sow is not shown as a tappable record (no link to Farrowing).",
-          "The Piglets card has four facts that are each a button; the weight and the boar/gilt split open different sheets from one card."
+          "Dates in the day cards (\"Planned 10/07\") come from the pen's age, not from a farrowing date.",
+          "The Piglets card has four facts that are each a button into different sheets."
         ]
       }
     },
@@ -816,36 +823,30 @@
       "figma": "",
       "notes": {
         "purpose": "The same sheet when the farm tags only the piglets kept for breeding.",
-        "states": [
-          "`?scheme=breeders&pen=A02`: the ID step is \"Pick breeders\", progress words are \"1 breeder picked\", and it is done only when the worker taps Done picking on the Piglets list."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Tool",
-            "shows": "Pick breeders",
-            "logic": "Replaces Tag piglets.",
-            "source": "sp.tr.id.breeders"
-          },
-          {
-            "name": "ID item",
+            "name": "Pick breeders step",
             "shows": "Pick breeders · Filled · 1 breeder picked",
-            "logic": "Filled once the pick is closed (p.picked).",
-            "source": "dayItem()"
-          },
-          {
-            "name": "Piglets card",
-            "shows": "Boars · gilts · Litter weight · Tagged x of y · Breeders kept",
-            "logic": "On this scheme \"n of m\" is not counted; the facts show breeders.",
-            "source": "pigletsCard()"
+            "states": [
+              {
+                "state": "Not filled",
+                "when": "The pick is still open",
+                "shows": "Amber \"Not filled\"; the step stays on the list"
+              },
+              {
+                "state": "Filled",
+                "when": "The worker closed the pick with Done picking (p.picked), even with no breeders",
+                "shows": "Done; progress words \"1 breeder picked\""
+              }
+            ],
+            "logic": "Replaces the Tag piglets step and tool. The step's progress words are \"N breeder(s) picked\" instead of \"n of m tagged\"; the Piglets card is unchanged.",
+            "rule": "Identity follows each farm's standard.",
+            "source": "dayItem(); pigletsCard(); sp.id.picked",
+            "at": "Pick breeders"
           }
         ],
-        "controls": [
-          {
-            "control": "Pick breeders",
-            "does": "opens the Piglets list",
-            "goesTo": "piglet-processing.tagged-list"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.tr.id.breeders",
           "sp.id.picked",
@@ -855,9 +856,7 @@
         "edge": [
           "A pick can close with no breeders (\"Done picking · no breeders\")."
         ],
-        "rules": [
-          "Round 7: identity follows each farm's standard."
-        ],
+        "rules": [],
         "issues": []
       }
     },
@@ -871,46 +870,41 @@
       "figma": "",
       "notes": {
         "purpose": "A pen that missed a treatment window.",
-        "states": [
-          "`?pen=B01` (day 6): Iron was never given (window 2-4); the row is amber \"late\". Saving it carries the mark late. The list shows the amber Late chip and \"late · day 6\" on the End page."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Item row · late",
-            "shows": "Iron · day 2–4 · late",
-            "logic": "Past the window end (pen age > to): status late, still tickable.",
-            "source": "state.js status()"
-          },
-          {
-            "name": "Record mark",
-            "shows": "late",
-            "logic": "A record made outside the window is stamped late automatically; early is the mirror. No question is asked.",
-            "source": "state.js record()"
+            "name": "Late item and record mark",
+            "shows": "Iron · day 2-4 · late",
+            "states": [
+              {
+                "state": "Late",
+                "when": "Pen age is past the window end (B01, day 6)",
+                "shows": "Amber \"late\" on the row, Late chip on the list, \"late · day 6\" on the End page; still tickable"
+              },
+              {
+                "state": "Saved late",
+                "when": "Ticked and submitted",
+                "shows": "The record is stamped late automatically; early is the mirror. No question is asked"
+              },
+              {
+                "state": "ID step",
+                "when": "Past day 7",
+                "shows": "Turns late"
+              }
+            ],
+            "rule": "Late stays due until done or task end and counts late; no clinical cut-off in v1.",
+            "source": "state.js status(), record()",
+            "at": "late"
           }
         ],
-        "controls": [
-          {
-            "control": "Iron row",
-            "does": "ticks it",
-            "goesTo": "piglet-processing.sheet-late"
-          },
-          {
-            "control": "Submit",
-            "does": "saves with a late mark",
-            "goesTo": "piglet-processing.sheet-late"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.late",
           "sp.chip.late",
           "sp.late.day"
         ],
-        "edge": [
-          "The ID step turns late after day 7."
-        ],
-        "rules": [
-          "Round 1 Q6: \"late stays due until done or task end … counts late; no clinical cut-off in v1\" (amended by Round 2 Q15 for window-bound treatments: missed; not modelled here)."
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "The \"missed\" state of Round 2 Q15 is not shown; everything past its window is \"late\" forever."
         ]
@@ -926,53 +920,51 @@
       "figma": "",
       "notes": {
         "purpose": "A pen with every step recorded.",
-        "states": [
-          "`?pen=A01`: four treatments given and 12 of 12 tagged. No day cards; only the Done card, folded (\"5 items · Iron · Dock tail · Castrate · Coccidiosis · Tag piglets\"), plus the Piglets card with 6 boars · 6 gilts."
-        ],
+        "states": [],
         "elements": [
-          {
-            "name": "Sheet title",
-            "shows": "000245",
-            "logic": "The pen's sow ID (p.sow). The pen code is in the subtitle.",
-            "source": "penSheet(); state.js seed (sow = 000231 + 7 per pen)"
-          },
-          {
-            "name": "Sheet subtitle",
-            "shows": "A03 · parity 3 · 12 piglets · day 4",
-            "logic": "Pen code and the sow's parity, piglets alive now (born − dead, adjusted by deaths, moves and Set count), pen age in days (day 1 = born). Parity is sample data.",
-            "source": "sp.sheet.pen, sp.piglets, sp.day.n"
-          },
-          {
-            "name": "Piglets card",
-            "shows": "Piglets · View log › · Boars · gilts 6 · 6 · Litter weight 24.6 kg · Tagged 4 of 12 · Breeders kept 1",
-            "logic": "Heading with the \"View log ›\" link, then up to four facts, each a button into its own sheet. Boars · gilts = the litter's saved split, or counted from the IDs once every alive piglet has one; \"—\" when unknown. Litter weight = the last weight saved (kg), \"—\" when none, with the hint \"Weigh the litter: growth figures need it.\" Tagged/Notched \"n of m\" = piglets with an ID over alive; Breeders kept = IDs flagged as breeders. The two ID facts appear only on a farm that has an ID step (not \"No ID\"). There is no separate piglets-alive figure: it is in the subtitle.",
-            "source": "pigletsCard(); sp.pc.title, sp.pc.log, sp.pg.sex, sp.pg.weight, sp.pc.tagged, sp.pg.breeders, sp.pg.weight.hint"
-          },
           {
             "name": "Done card",
             "shows": "Done · 2 items · Show",
-            "logic": "Treatments and the ID step already done sit folded in one card at the bottom (\"Done · N items\") with the names (\"Iron · Dock tail\") and a Show/Hide row. Opened, each row shows \"day 2 · G.H 10/05 08:05 · 12 piglets\", an amber early/late mark and, if another phone got there first, \"yours kept as a note (hh:mm)\". A step saved in this visit stays in its day card about four seconds before moving here.",
-            "source": "processing(); sp.proc.done, sp.proc.done.n, sp.tl.open, sp.tl.close, sp.kept.note"
+            "states": [
+              {
+                "state": "Folded",
+                "when": "Default",
+                "shows": "\"Done · N items\" and the names (\"Iron · Dock tail\")"
+              },
+              {
+                "state": "Opened",
+                "when": "Show pressed",
+                "shows": "Each row: \"day 2 · G.H 10/05 08:05 · 12 piglets\", amber early/late mark, and \"yours kept as a note (hh:mm)\" if another phone recorded first"
+              },
+              {
+                "state": "Just saved",
+                "when": "Saved in this visit",
+                "shows": "Stays in its day card about four seconds before moving here"
+              }
+            ],
+            "source": "processing(); sp.proc.done, sp.tl.*, sp.kept.note",
+            "at": "5 items"
           },
           {
             "name": "Empty line",
             "shows": "Nothing left to do in this pen.",
-            "logic": "Shown only when there are neither day cards nor done items.",
-            "source": "sp.proc.nothing"
+            "states": [
+              {
+                "state": "Shown",
+                "when": "The pen has no day card left, whether or not it has done items (A01)",
+                "shows": "The line, then the folded Done card"
+              },
+              {
+                "state": "Hidden",
+                "when": "At least one step is still open or saved this visit",
+                "shows": "Not drawn"
+              }
+            ],
+            "source": "sp.proc.nothing",
+            "at": "Nothing left to do in this pen."
           }
         ],
-        "controls": [
-          {
-            "control": "Show",
-            "does": "unfolds the done items",
-            "goesTo": "piglet-processing.sheet-done"
-          },
-          {
-            "control": "Back",
-            "does": "closes the sheet",
-            "goesTo": "piglet-processing.pen-list"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.proc.done",
           "sp.proc.done.n",
@@ -983,7 +975,7 @@
         ],
         "rules": [],
         "issues": [
-          "Done items cannot be corrected here except by Undo within the visit; fixing a treatment later has no door (Edit was cut in the simplification; HANDOFF open item 1)."
+          "Done items cannot be corrected here except by Undo within the visit; Edit was cut in the simplification (HANDOFF open item 1)."
         ]
       }
     },
@@ -997,35 +989,35 @@
       "figma": "",
       "notes": {
         "purpose": "Records that a treatment was given to fewer piglets than are alive in the pen.",
-        "states": [
-          "How to reach: on a pen sheet tick an item, then tap its piglet count. A long sheet: title = the treatment, subtitle \"A03 · 10 to do\", a stepper \"Piglets given\" from 1 to the number still to do; when fewer, a radio \"Why fewer?\" (Weak, Sick) and the line \"The other 2 stay on the list for later.\", primary \"Use 8\" disabled until a reason is chosen."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Stepper",
-            "shows": "Piglets given",
-            "logic": "Starts at the number still owed (alive minus given), min 1.",
-            "source": "adjustSheet()"
-          },
-          {
-            "name": "Why fewer",
-            "shows": "Weak · Sick",
-            "logic": "Required only when the count is lower; becomes the reason shown on the item (\"2 left · weak\").",
-            "source": "sp.treat.why, sp.treat.weak, sp.treat.sick"
+            "name": "Piglets given and reason",
+            "shows": "Piglets given · Why fewer? Weak · Sick · Use 8",
+            "states": [
+              {
+                "state": "All",
+                "when": "Count equals the number still to do",
+                "shows": "No reason asked; \"Use N\" is enabled"
+              },
+              {
+                "state": "Fewer",
+                "when": "Count is lower",
+                "shows": "\"Why fewer?\" (Weak, Sick) and \"The other 2 stay on the list for later.\"; \"Use N\" stays disabled until a reason is chosen"
+              },
+              {
+                "state": "Moved in",
+                "when": "The pen received piglets by a move",
+                "shows": "The reason shown on the item is \"moved in\""
+              }
+            ],
+            "logic": "The stepper starts at the number still owed (alive minus given), minimum 1. The reason becomes the one shown on the item (\"2 left · weak\").",
+            "rule": "A skip carries a reason; deferred piglets stay due.",
+            "source": "adjustSheet(); sp.treat.*",
+            "at": "Piglets given"
           }
         ],
-        "controls": [
-          {
-            "control": "Use N",
-            "does": "keeps the count on the draft",
-            "goesTo": "piglet-processing.sheet-todo"
-          },
-          {
-            "control": "Back",
-            "does": "closes without change",
-            "goesTo": "piglet-processing.sheet-todo"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.adj.sub",
           "sp.treat.given",
@@ -1037,14 +1029,10 @@
           "sp.adj.use",
           "sp.back"
         ],
-        "edge": [
-          "A moved-in pen shows the reason \"moved in\"."
-        ],
-        "rules": [
-          "Round 2 Q15/Q16: a skip carries a reason; deferred ones stay due."
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
-          "Only two reasons (weak, sick); hernia, cryptorchid and \"kept boar\" exempt reasons from Round 2 are gone (simplification)."
+          "Only two reasons (weak, sick); hernia, cryptorchid and \"kept boar\" exempt reasons from Round 2 are gone."
         ]
       }
     },
@@ -1058,82 +1046,60 @@
       "figma": "",
       "notes": {
         "purpose": "Shows the pen's identified piglets and starts giving IDs.",
-        "states": [
-          "How to reach: on a pen sheet tap Tag piglets, the ID item, or the Tagged or Breeders kept fact. Title \"Piglets\", description \"A02 · Sow 000238\". Sample A02: 4 of 12 tagged.",
-          "Empty: \"No piglet has an ID yet.\" On a breeders-only farm a secondary button \"Done picking · N breeders\" closes the pick."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Hint",
-            "shows": "Tap a piglet to fix it. Tap the flag to keep it for breeding.",
-            "logic": "Shown when at least one piglet has an ID and the task is open.",
-            "source": "sp.tagged.hint"
-          },
-          {
-            "name": "Group header",
-            "shows": "Tagged · 4 of 12 tagged · 1 breeder",
-            "logic": "Scheme word, progress, breeders count.",
-            "source": "taggedPage(); sp.pc.tagged, sp.id.of.tag, sp.breeders.n"
-          },
-          {
-            "name": "Row · ID",
-            "shows": "001201",
-            "logic": "Tag number, or notch number (litter-number-piglet) on a notch farm; both if both exist.",
-            "source": "p.ids[].tag/notch"
-          },
-          {
-            "name": "Row · chip",
-            "shows": "Breeder",
-            "logic": "Green chip when the piglet is flagged for breeding.",
-            "source": "sp.breeder"
-          },
-          {
-            "name": "Row · headline",
-            "shows": "Boar · 1.6 kg",
-            "logic": "Sex and optional weight.",
-            "source": "sp.boar, sp.gilt, sp.kg"
-          },
-          {
-            "name": "Row · meta",
-            "shows": "07:30 · G.H",
-            "logic": "Time (only for today) and the worker who tagged it.",
-            "source": "taggedPage()"
+            "name": "Piglet row",
+            "shows": "001201 · Breeder · Boar · 1.6 kg · 07:30 · G.H",
+            "states": [
+              {
+                "state": "Breeder",
+                "when": "The piglet is flagged for breeding",
+                "shows": "Green \"Breeder\" chip"
+              },
+              {
+                "state": "Tag / notch",
+                "when": "By farm scheme",
+                "shows": "Tag number, or notch number (litter-number-piglet); both if both exist"
+              }
+            ],
+            "logic": "Headline is sex and optional weight; meta is time (only for today) and who tagged it. The group header reads \"Tagged · 4 of 12 tagged · 1 breeder\" (\"Notched\" on a notch farm).",
+            "source": "taggedPage(); p.ids[]",
+            "at": "001214"
           },
           {
             "name": "Flag button",
             "shows": "bookmark",
-            "logic": "Toggles breeder; stamps a record.",
-            "source": "sp.mark.on, sp.mark.off"
+            "rule": "Toggles breeder and stamps a record. Breeder selection may become a universal per-pig feature (Round 10); ranking is a placeholder.",
+            "source": "sp.mark.on, sp.mark.off",
+            "at": "Tap the flag to keep it for breeding."
           },
           {
-            "name": "Primary",
-            "shows": "Tag a piglet",
-            "logic": "Per scheme: Tag a piglet, Notch a piglet, Tag a breeder. Absent after End.",
-            "source": "sp.add.*"
+            "name": "Empty and primary",
+            "shows": "No piglet has an ID yet. · Tag a piglet",
+            "states": [
+              {
+                "state": "Empty",
+                "when": "No piglet has an ID",
+                "shows": "\"No piglet has an ID yet.\"; the hint is hidden"
+              },
+              {
+                "state": "Breeders farm",
+                "when": "Scheme is Tag breeders only",
+                "shows": "Secondary button \"Done picking · N breeders\" closes the pick; primary reads \"Tag a breeder\""
+              },
+              {
+                "state": "Ended",
+                "when": "After End",
+                "shows": "No flag, no primary, rows not tappable"
+              }
+            ],
+            "logic": "Primary is named by scheme: Tag a piglet, Notch a piglet, Tag a breeder. The hint \"Tap a piglet to fix it. Tap the flag to keep it for breeding.\" appears when at least one piglet has an ID and the task is open.",
+            "source": "sp.add.*, sp.id.none.yet, sp.id.done.pick",
+            "at": "Tag a piglet"
           }
         ],
-        "controls": [
-          {
-            "control": "Tag a piglet",
-            "does": "starts Give IDs",
-            "goesTo": "piglet-processing.give-ids"
-          },
-          {
-            "control": "A piglet row",
-            "does": "opens it in Give IDs to fix",
-            "goesTo": "piglet-processing.give-ids"
-          },
-          {
-            "control": "Flag",
-            "does": "marks or unmarks as breeder",
-            "goesTo": "piglet-processing.tagged-list"
-          },
-          {
-            "control": "Back",
-            "does": "returns to the pen sheet",
-            "goesTo": "piglet-processing.sheet-todo"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.pl.title",
           "sp.sow",
@@ -1154,13 +1120,8 @@
           "sp.id.done.pick",
           "sp.fix.aria"
         ],
-        "edge": [
-          "On a notch farm the group says \"Notched\".",
-          "After End: no flag, no primary, rows not tappable."
-        ],
-        "rules": [
-          "Round 10: breeder selection may become a universal per-pig feature; ranking is a placeholder."
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "\"Tagged x of y\" appears in the group, the Piglets card and the ID item meta: three places for one figure."
         ]
@@ -1176,60 +1137,53 @@
       "figma": "",
       "notes": {
         "purpose": "Records one piglet's tag or notch, its sex and optionally its weight, then moves to the next.",
-        "states": [
-          "How to reach: Piglets list › Tag a piglet (or a piglet row to fix it). Title \"Give IDs\" (\"Pick breeders\" on a breeders farm), description \"A02 · sow 000238 · 8 without ID\", or \"Fixing 001201\".",
-          "The Numpad opens when a readout is tapped; it closes by tapping the readout again."
-        ],
+        "states": [],
         "elements": [
-          {
-            "name": "Last line",
-            "shows": "Last 001204 · Boar · 1.6 kg · Undo",
-            "logic": "Receipt of the previous piglet; Undo removes it.",
-            "source": "sp.give.last, sp.undo"
-          },
           {
             "name": "Tag readout",
             "shows": "Tag · 001205 · Use 001205 · or scan",
-            "logic": "Prefilled with the next number on the strip (farm-wide highest tag + 1; strip starts at 001201). Typing replaces it, up to 6 digits; on a notch farm the readout is the pen's next piglet number (max 2 digits) and the saved ID is litter-number-piglet. A scan button reads the next tag (demo).",
-            "source": "givePage(); state.js nextNo()"
+            "logic": "Prefilled with the next number on the strip (farm-wide highest tag + 1; strip starts at 001201). Typing replaces it, up to 6 digits. On a notch farm it is the pen's next piglet number (max 2 digits) and the saved ID is litter-number-piglet. Scan reads the next tag (demo). A cleared readout shows \"—\".",
+            "rule": "Record is blocked while the number is already on any pen of the farm (\"001204 is already used.\", refused tone).",
+            "source": "givePage(); state.js nextNo(), taken()",
+            "at": "Use 001217 · or scan"
           },
           {
-            "name": "Duplicate guard",
-            "shows": "001204 is already used.",
-            "logic": "Refused tone; blocks Record when the number is on any pen of the farm.",
-            "source": "state.js taken(); sp.id.taken"
+            "name": "Sex and weight",
+            "shows": "Boar · Gilt · Weight (optional)",
+            "rule": "Sex is required: Record stays disabled until one is chosen. Weight is optional, kg with one decimal, up to two integer digits.",
+            "source": "sp.id.sex, sp.give.kg",
+            "at": "Optional"
           },
           {
-            "name": "Sex tiles",
-            "shows": "Boar · Gilt",
-            "logic": "Required (Record stays disabled until one is chosen).",
-            "source": "sp.id.sex"
-          },
-          {
-            "name": "Weight",
-            "shows": "Weight (optional)",
-            "logic": "kg, one decimal, up to two integer digits.",
-            "source": "sp.give.kg, sp.optional"
-          },
-          {
-            "name": "Primary",
+            "name": "Record · next piglet",
             "shows": "Record · next piglet",
-            "logic": "Saves at once (nothing waits for Submit) and returns a fresh form at the next number; in fix mode \"Save change\". Breeders farm: the piglet is a breeder automatically.",
-            "source": "sp.give.save, sp.give.fix"
+            "states": [
+              {
+                "state": "New piglet",
+                "when": "Default",
+                "shows": "Saves at once (nothing waits for Submit) and returns a fresh form at the next number; \"Last 001204 · Boar · 1.6 kg · Undo\" shows the receipt"
+              },
+              {
+                "state": "Fixing",
+                "when": "Opened from a piglet row",
+                "shows": "\"Save change\"; description \"Fixing 001201\""
+              },
+              {
+                "state": "Breeders farm",
+                "when": "Scheme is Tag breeders only",
+                "shows": "The piglet is a breeder automatically; title \"Pick breeders\""
+              },
+              {
+                "state": "Ended",
+                "when": "After End",
+                "shows": "No primary"
+              }
+            ],
+            "source": "sp.give.save, sp.give.fix, sp.undo",
+            "at": "Record · next piglet"
           }
         ],
-        "controls": [
-          {
-            "control": "Record · next piglet",
-            "does": "saves and opens the next",
-            "goesTo": "piglet-processing.give-ids"
-          },
-          {
-            "control": "Back",
-            "does": "returns to the Piglets list",
-            "goesTo": "piglet-processing.tagged-list"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.give.title",
           "sp.give.sub",
@@ -1251,14 +1205,8 @@
           "sp.undo",
           "sp.back"
         ],
-        "edge": [
-          "Number already used on the farm.",
-          "A cleared readout shows \"—\".",
-          "After End: no primary."
-        ],
-        "rules": [
-          "Round 10: per-piglet work as a universal feature (direction only); the shape is farrowing's identity pattern."
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "No stop: after the last piglet the form keeps offering another; the number left (\"8 without ID\") is only in the description.",
           "Sex is required here but the Round 1 Q3 ruling says sex and weight never block a row."
@@ -1275,35 +1223,18 @@
       "figma": "",
       "notes": {
         "purpose": "Saves the litter's boar and gilt counts when not every piglet is identified.",
-        "states": [
-          "How to reach: pen sheet › Boars · gilts. Two steppers (Boars, Gilts), subtitle \"A03 · day 4\"; Save. Starting values are the saved split, or counted from IDs when every piglet has one."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Steppers",
+            "name": "Boars and Gilts steppers",
             "shows": "Boars · Gilts",
-            "logic": "Whole numbers from 0; no check against the alive count.",
-            "source": "countsSheet(); sp.idf.boars, sp.idf.gilts"
-          },
-          {
-            "name": "Receipt",
-            "shows": "Boars 6 · gilts 6",
-            "logic": "The flash line after Save.",
-            "source": "sp.flash.counts"
+            "logic": "Starting values are the saved split, or counted from IDs when every piglet has one. Whole numbers from 0.",
+            "rule": "The sum is not checked against piglets alive.",
+            "source": "countsSheet()",
+            "at": "Boars and gilts"
           }
         ],
-        "controls": [
-          {
-            "control": "Save",
-            "does": "saves the split",
-            "goesTo": "piglet-processing.sheet-todo"
-          },
-          {
-            "control": "Back",
-            "does": "closes",
-            "goesTo": "piglet-processing.sheet-todo"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.cnt.title",
           "sp.w.sub",
@@ -1329,29 +1260,18 @@
       "figma": "",
       "notes": {
         "purpose": "Records the weight of the whole litter on the day.",
-        "states": [
-          "How to reach: pen sheet › Litter weight. One readout \"Weight (kg)\" on the Numpad (one decimal, up to 3 integer digits); Save disabled until above zero."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Readout",
+            "name": "Weight readout",
             "shows": "Weight (kg)",
-            "logic": "Appended as a new weigh (kept with its pen age); the Piglets card shows the latest.",
-            "source": "weightSheet(); state.js setWeight()"
+            "logic": "Numpad, one decimal, up to 3 integer digits. Each save is appended as a new weigh kept with its pen age; the Piglets card shows the latest.",
+            "rule": "Save is disabled until the value is above zero.",
+            "source": "weightSheet(); state.js setWeight()",
+            "at": "Weight (kg)"
           }
         ],
-        "controls": [
-          {
-            "control": "Save",
-            "does": "stores the weight",
-            "goesTo": "piglet-processing.sheet-todo"
-          },
-          {
-            "control": "Back",
-            "does": "closes",
-            "goesTo": "piglet-processing.sheet-todo"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.w.title",
           "sp.w.sub",
@@ -1360,9 +1280,7 @@
           "sp.log.weight"
         ],
         "edge": [],
-        "rules": [
-          "Glossary: litter weight is one record per weigh day."
-        ],
+        "rules": [],
         "issues": [
           "A second weighing on the same day is appended, not replaced as the glossary says.",
           "No plausibility check (the glossary refuses over 6 kg per piglet)."
@@ -1378,35 +1296,10 @@
       "preset": "",
       "figma": "",
       "notes": {
-        "purpose": "Holds the two rarer tools.",
-        "states": [
-          "How to reach: pen sheet › More. Medium sheet with two doors: Move piglets, Set count."
-        ],
-        "elements": [
-          {
-            "name": "Doors",
-            "shows": "Move piglets · Set count",
-            "logic": "Two rows with icons.",
-            "source": "moreSheet(); sp.move.title, sp.tool.count"
-          }
-        ],
-        "controls": [
-          {
-            "control": "Move piglets",
-            "does": "opens Move",
-            "goesTo": "piglet-processing.move-piglets"
-          },
-          {
-            "control": "Set count",
-            "does": "opens Set count",
-            "goesTo": "piglet-processing.set-count"
-          },
-          {
-            "control": "Back",
-            "does": "closes",
-            "goesTo": "piglet-processing.sheet-todo"
-          }
-        ],
+        "purpose": "Holds the two rarer tools: Move piglets and Set count.",
+        "states": [],
+        "elements": [],
+        "controls": [],
         "copy": [
           "sp.more.title",
           "sp.move.title",
@@ -1428,29 +1321,18 @@
       "figma": "",
       "notes": {
         "purpose": "Records piglets that died, by cause.",
-        "states": [
-          "How to reach: pen sheet › Record death. Four steppers (Crushed, Scours, Starve-out, Other), each capped at alive; subtitle \"A03 · 12 alive\"; Save disabled at 0."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Result",
-            "shows": "3 piglets died",
-            "logic": "Alive drops by the total, Dead rises, treatments given are capped at alive; log line \"Died · 3\".",
-            "source": "state.js death(); sp.flash.death, sp.log.death"
+            "name": "Cause steppers and Save",
+            "shows": "Crushed · Scours · Starve-out · Other · 3 piglets died",
+            "logic": "Each stepper is capped at the piglets alive; Save is disabled at a total of 0. Saving drops Alive by the total, raises Dead, caps treatments given at alive, and writes the log line \"Died · 3\".",
+            "rule": "Processing marks deaths through one shared dead picker that also lists tagged piglets (Round 1 Q9); this sheet is a count by cause and does not, so tagged piglets stay on the Piglets list.",
+            "source": "state.js death(); sp.flash.death, sp.log.death",
+            "at": "Starve-out"
           }
         ],
-        "controls": [
-          {
-            "control": "Save",
-            "does": "records the deaths",
-            "goesTo": "piglet-processing.sheet-todo"
-          },
-          {
-            "control": "Back",
-            "does": "closes",
-            "goesTo": "piglet-processing.sheet-todo"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.death.title",
           "sp.death.sub",
@@ -1464,11 +1346,9 @@
         "edge": [
           "Individual tagged piglets are not picked as dead."
         ],
-        "rules": [
-          "Round 1 Q9: processing marks deaths through the one shared dead picker, which also lists tagged piglets (not built here)."
-        ],
+        "rules": [],
         "issues": [
-          "This is a count-by-cause sheet, not the shared dead picker the ruling requires; tagged piglets stay on the Piglets list after a death."
+          "This is a count-by-cause sheet, not the shared dead picker the ruling requires."
         ]
       }
     },
@@ -1482,47 +1362,44 @@
       "figma": "",
       "notes": {
         "purpose": "Moves piglets to another pen of the batch and carries what they already had.",
-        "states": [
-          "How to reach: pen sheet › More › Move piglets. Page \"Move piglets\", description \"From A03 · 12 alive\"."
-        ],
+        "states": [],
         "elements": [
           {
             "name": "To pen",
             "shows": "A01 · day 6",
             "logic": "One tile per other pen of the batch (pen age 1-6; here every other pen) with its day.",
-            "source": "movePage(); state.js sameBatch(); sp.move.to, sp.move.batch"
-          },
-          {
-            "name": "How many",
-            "shows": "How many",
-            "logic": "Hero stepper 1 to alive.",
-            "source": "sp.move.how"
+            "rule": "Move only offers pens in the task (and batch); no other room.",
+            "source": "movePage(); state.js sameBatch()",
+            "at": "Pens in batch 40"
           },
           {
             "name": "Had treatment?",
             "shows": "Had Iron? No · Yes",
-            "logic": "One Yes/No per treatment already given in the source pen; with a tag or notch farm and IDs on the pen: \"Have tags?\" / \"Notched?\". All must be answered.",
-            "source": "moveAsks(); sp.move.had, sp.move.hadid.*"
+            "states": [
+              {
+                "state": "Per treatment",
+                "when": "The source pen already gave a treatment",
+                "shows": "One Yes/No per treatment; all must be answered before the primary enables"
+              },
+              {
+                "state": "ID question",
+                "when": "Tag or notch farm and the pen has IDs",
+                "shows": "\"Have tags?\" / \"Notched?\""
+              }
+            ],
+            "logic": "\"Don't know\" of Round 2 Q14 is cut.",
+            "source": "moveAsks(); sp.move.had, sp.move.hadid.*",
+            "at": "Had iron?"
           },
           {
-            "name": "Primary",
-            "shows": "Move 3 piglets",
-            "logic": "Moves them; \"had\" answers shift the given count to the other pen; otherwise the receiving pen marks the owed piglets \"moved in\".",
-            "source": "state.js move(); sp.move.save"
+            "name": "Move N piglets",
+            "shows": "How many · Move 3 piglets",
+            "logic": "How many is a stepper from 1 to alive. A \"had\" answer shifts the given count to the receiving pen; otherwise the receiving pen marks the owed piglets \"moved in\".",
+            "source": "state.js move(); sp.move.save",
+            "at": "Move 1 piglet"
           }
         ],
-        "controls": [
-          {
-            "control": "Move N",
-            "does": "saves the move",
-            "goesTo": "piglet-processing.sheet-todo"
-          },
-          {
-            "control": "Back",
-            "does": "closes",
-            "goesTo": "piglet-processing.more-actions"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.move.title",
           "sp.move.sub",
@@ -1537,16 +1414,11 @@
           "sp.flash.move",
           "sp.why.moved"
         ],
-        "edge": [
-          "Only pens of this batch are offered; no other room.",
-          "The answer \"Don't know\" of Round 2 Q14 is cut."
-        ],
-        "rules": [
-          "Round 9: \"Move only offers pens in the task (and batch).\""
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "The Move does not suggest the receiving pen from time and room (Round 2 suggestion is cut).",
-          "Piglets identified before the move keep their tags but do not move their IDs to the new pen (the count shifts only)."
+          "Piglets identified before the move keep their tags but their IDs do not move to the new pen."
         ]
       }
     },
@@ -1560,29 +1432,18 @@
       "figma": "",
       "notes": {
         "purpose": "Corrects the pen's piglet count to what is really there now.",
-        "states": [
-          "How to reach: pen sheet › More › Set count. Hero stepper \"Piglets alive\", subtitle \"A03 · was 12\". Save disabled while unchanged. No reason is asked."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Batch checker",
-            "shows": "Batch 40 · 3 piglets unaccounted",
-            "logic": "The drop (old minus new) is added to a task-level total; a higher count lowers it. Shown on the list summary and in End task. Not a pen status.",
-            "source": "state.js setCount(); sp.batch.unacc, sp.end.unacc"
+            "name": "Piglets alive",
+            "shows": "Piglets alive · was 12 · Batch 40 · 3 piglets unaccounted",
+            "logic": "The drop (old minus new) is added to a task-level total shown as \"N piglets unaccounted\" on the list summary and in End task; a higher count lowers it. It is a batch checker, not a pen status. A treatment fully given stays fully given at the new count.",
+            "rule": "Set count just adjusts the pen's record to what is there now. No reason is asked and Save is disabled while unchanged.",
+            "source": "state.js setCount(); sp.batch.unacc, sp.end.unacc",
+            "at": "Piglets alive"
           }
         ],
-        "controls": [
-          {
-            "control": "Save",
-            "does": "sets the count",
-            "goesTo": "piglet-processing.sheet-todo"
-          },
-          {
-            "control": "Back",
-            "does": "closes",
-            "goesTo": "piglet-processing.more-actions"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.count.title",
           "sp.count.sub",
@@ -1593,12 +1454,8 @@
           "sp.batch.unacc",
           "sp.end.unacc"
         ],
-        "edge": [
-          "A treatment fully given stays fully given at the new count."
-        ],
-        "rules": [
-          "Round 9: \"Set count just adjusts the pen's record to what is there now. No reason question … kept only in the overall checker.\""
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "The unaccounted figure never shows which pen it came from."
         ]
@@ -1614,24 +1471,18 @@
       "figma": "",
       "notes": {
         "purpose": "Shows every record of the pen as history, newest first by day.",
-        "states": [
-          "How to reach: pen sheet › View log. Groups \"day 6 … day 0\"; day 0 holds \"Born 13\" and \"1 dead at birth\"."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Entries",
+            "name": "Log entries",
             "shows": "Iron · 12 piglets · G.H 10/05 08:05",
-            "logic": "Treatments, deaths, moves, counts, IDs, breeder picks and weights, with who and when (time if today, else mm/dd + time).",
-            "source": "logPage(); sp.log.*"
+            "logic": "Treatments, deaths, moves, counts, IDs, breeder picks and weights grouped by pen day (day 0 holds \"Born 13\" and \"1 dead at birth\"), with who and when (time if today, else mm/dd + time). Weight lines show no actor.",
+            "rule": "Stamped history; no deletion.",
+            "source": "logPage(); sp.log.*",
+            "at": "Litter weighed · 24.6 kg"
           }
         ],
-        "controls": [
-          {
-            "control": "Back",
-            "does": "returns to the pen sheet",
-            "goesTo": "piglet-processing.sheet-done"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.log.title",
           "sp.log.born",
@@ -1647,12 +1498,8 @@
           "sp.log.notbreeder",
           "sp.day.n"
         ],
-        "edge": [
-          "Weights show no actor."
-        ],
-        "rules": [
-          "Round 1 Q7: stamped history; no deletion."
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "Born is farrowing's number and cannot be seen or corrected from here; weight lines show no who or when."
         ]
@@ -1668,53 +1515,70 @@
       "figma": "",
       "notes": {
         "purpose": "Reviews what is not done and ends the task by a hold.",
-        "states": [
-          "How to reach: pen list › the Task half of the summary card. Description \"Piglet processing · Batch 40\"."
-        ],
+        "states": [],
         "elements": [
-          {
-            "name": "Progress",
-            "shows": "3 of 12 pens done · 9 pens not done",
-            "logic": "Same done rule as the list (includes pens not yet started). \"All pens done\" when none are left.",
-            "source": "endPage(); sp.end.count, sp.end.not, sp.end.all"
-          },
           {
             "name": "Not done list",
             "shows": "A02 · Castrate · Coccidiosis · Tag · due today · 12 piglets",
-            "logic": "Pens with something to do; the second line is the first treatment's count with \"due today\" or \"late · day 6\", or \"2 left · weak\" when only partials remain; chips for Late and Sow died.",
-            "source": "todoMeta(); sp.end.notdone, sp.due.today, sp.late.day, sp.left"
+            "states": [
+              {
+                "state": "Due today",
+                "when": "The pen has steps to do and none is late",
+                "shows": "Headline the steps; meta \"due today\" and the largest owed piglet count among the treatments (the ID progress words if only the ID step is left)"
+              },
+              {
+                "state": "Late",
+                "when": "Any step in the pen is late",
+                "shows": "Meta amber \"late · day 6\" with the same count"
+              },
+              {
+                "state": "Some left",
+                "when": "Every step left is a partial treatment (status left) and no ID step",
+                "shows": "Meta \"2 left · weak\" (or the reason given)"
+              },
+              {
+                "state": "Not given (after End)",
+                "when": "Task ended",
+                "shows": "Group titled \"Not given\"; rows show the steps only, no meta"
+              },
+              {
+                "state": "All done",
+                "when": "No pen has anything to do",
+                "shows": "Progress meta \"All pens done\" and no list"
+              }
+            ],
+            "logic": "No chips here (Late and Sow died appear on the pen list only). \"3 of 12 pens done · 9 pens not done\" uses the same done rule as the list, so pens not yet started count as done.",
+            "source": "endPage(); todoMeta(), penChip(); sp.end.*",
+            "at": "Not done"
           },
           {
-            "name": "Not due yet",
-            "shows": "Not due yet in 2 pens: Iron, Dock tail. Ending the task stops these too.",
-            "logic": "Pens with steps still ahead, with the step names.",
-            "source": "sp.end.coming"
+            "name": "Not due yet and Unaccounted",
+            "shows": "Not due yet in 2 pens: Iron, Dock tail. Ending the task stops these too. · 3 piglets unaccounted in this batch",
+            "states": [
+              {
+                "state": "Not due yet",
+                "when": "Some pens have steps still ahead and the task is open",
+                "shows": "Count of pens and the step names; hidden after End"
+              },
+              {
+                "state": "Unaccounted",
+                "when": "Set count lowered counts so the total is above zero",
+                "shows": "\"N piglets unaccounted in this batch: counts came in lower than the records.\""
+              }
+            ],
+            "source": "sp.end.coming, sp.end.unacc",
+            "at": "Ending the task stops these too."
           },
           {
-            "name": "Unaccounted",
-            "shows": "3 piglets unaccounted in this batch: counts came in lower than the records.",
-            "logic": "Only when above zero.",
-            "source": "sp.end.unacc"
-          },
-          {
-            "name": "Hold button",
+            "name": "Hold to end",
             "shows": "End task · HOLD TO END",
-            "logic": "Danger hold; on completion the task is ended.",
-            "source": "sp.end.hold, sp.end.caption"
+            "logic": "Danger hold: the commit fires when the hold timer elapses, about 0.85 s (token --hold-commit, default 850 ms). Releasing, leaving the button, blur or Escape before that returns to idle without committing (holdStep in the design-system bundle). On commit the task is ended and the list becomes read-only.",
+            "rule": "Manual only, review in numbers, hold-to-commit (Round 1 Q5). End is allowed with review items open (Round 4). Ending should be blocked while the batch's farrowing task is open; that is not built.",
+            "source": "sp.end.hold; K.holdBind",
+            "at": "HOLD TO END"
           }
         ],
-        "controls": [
-          {
-            "control": "Hold End task",
-            "does": "ends the task",
-            "goesTo": "piglet-processing.list-ended"
-          },
-          {
-            "control": "Back",
-            "does": "returns to the list",
-            "goesTo": "piglet-processing.pen-list"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.end.title",
           "sp.end.sub",
@@ -1733,15 +1597,12 @@
           "sp.back"
         ],
         "edge": [
-          "Always available; there is no check that the batch's farrowing is closed."
+          "Always available: nothing checks that the batch's farrowing is closed."
         ],
-        "rules": [
-          "Round 1 Q5: manual only, review in numbers, hold-to-commit, cannot end while the batch's farrowing task is open.",
-          "Round 4: End is allowed with review items open."
-        ],
+        "rules": [],
         "issues": [
           "The ruling that End is blocked while farrowing is open is not built.",
-          "Not-yet-started pens are counted done and also listed under \"Not due yet\": the same pens are counted twice in opposite ways.",
+          "Not-yet-started pens are counted done and also listed under \"Not due yet\".",
           "unclear: who may end (the code comment says the supervisor; no role check)."
         ]
       }
@@ -1756,24 +1617,39 @@
       "figma": "",
       "notes": {
         "purpose": "The same list after End: read-only.",
-        "states": [
-          "How to reach: hold End task. Summary left half \"Not done · N · pens\", right half \"Task ended · hh:mm · name\". Rows read \"Task ended\"; chips gone; End page shows a receipt \"Piglet processing ended · 08:20 · G. Hansen\" and the \"Not given\" group."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Pen sheet banner",
-            "shows": "Task ended. Nothing more can be recorded.",
-            "logic": "Amber warning; tool row, ticks and Submit are removed.",
-            "source": "sp.ended.note"
+            "name": "After End",
+            "shows": "Task ended · hh:mm · name · Not done · N · pens",
+            "states": [
+              {
+                "state": "Summary",
+                "when": "Task ended",
+                "shows": "Left half \"Not done · N · pens\", right half \"Task ended · hh:mm · name\""
+              },
+              {
+                "state": "Pen row",
+                "when": "Task ended",
+                "shows": "Headline \"Task ended\"; chips gone"
+              },
+              {
+                "state": "Pen sheet",
+                "when": "Task ended",
+                "shows": "Amber \"Task ended. Nothing more can be recorded.\"; tool row, ticks and Submit removed; pens open read-only"
+              },
+              {
+                "state": "End page",
+                "when": "Task ended",
+                "shows": "Receipt \"Piglet processing ended · 08:20 · G. Hansen\" and a \"Not given\" group"
+              }
+            ],
+            "rule": "After End no new treatment marks (Round 3). Round 1 Q7 allowed corrections and ID rows to stay writable; the prototype blocks all writes. The other-phone demo says the task has ended.",
+            "source": "sp.ended.*; sp.end.done.*",
+            "at": "Task ended"
           }
         ],
-        "controls": [
-          {
-            "control": "A pen",
-            "does": "opens it read-only",
-            "goesTo": "piglet-processing.sheet-done"
-          }
-        ],
+        "controls": [],
         "copy": [
           "sp.sum.notdone",
           "sp.sum.ended",
@@ -1784,12 +1660,8 @@
           "sp.sec.notgiven",
           "sp.ended.note"
         ],
-        "edge": [
-          "After End the other-phone demo says the task has ended."
-        ],
-        "rules": [
-          "Round 3: after End no new treatment marks; Round 1 Q7 allowed corrections and ID rows stay writable (the prototype blocks all writes)."
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "Nothing can be corrected after End, against Round 1 Q7 (corrections stay writable, stamped)."
         ]

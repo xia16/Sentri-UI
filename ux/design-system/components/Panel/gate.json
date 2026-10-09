@@ -1,0 +1,199 @@
+{
+  "status": "in-design",
+  "judged": "2026-10-09",
+  "commit": "3e3f835",
+  "model": "claude-opus-5-5",
+  "scores": {
+    "clarity": 5,
+    "budget": 7,
+    "hierarchy": 7,
+    "spacing": 8,
+    "broken": 7
+  },
+  "lowest": 5,
+  "checklist": [
+    {
+      "line": 1,
+      "pass": false,
+      "why": "\"The one container surface\" - no use-X-instead (TaskGroup card, Row group, Facts)."
+    },
+    {
+      "line": 2,
+      "pass": false,
+      "why": "Only \"do not nest\"; no when-not naming an alternative."
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "Border, radius, padding and context background named."
+    },
+    {
+      "line": 4,
+      "pass": false,
+      "why": "The real variants (padded content, row list with 0 padding, facts dl, log) are not listed; they live in other cards."
+    },
+    {
+      "line": 5,
+      "pass": true,
+      "why": "Static; empty is absent (stated)."
+    },
+    {
+      "line": 6,
+      "pass": true,
+      "why": "Not tappable."
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "n/a"
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "n/a"
+    },
+    {
+      "line": 9,
+      "pass": true,
+      "why": "No copy."
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "The tag option allows section/dl; no role needed."
+    },
+    {
+      "line": 11,
+      "pass": false,
+      "why": "Uses a parallel --st-* namespace with raw hex roots (--st-line:#dfe4d8, --st-inset:#f6f8f1) and raw 16/12px padding instead of the tokens.css names."
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "n/a"
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "n/a"
+    },
+    {
+      "line": 14,
+      "pass": false,
+      "why": "Does not link Facts, Row group, Log, TaskTotals or TaskProgress, which are all built on it."
+    },
+    {
+      "line": 15,
+      "pass": true,
+      "why": "The 375 preview renders both contexts without overflow (cramped at about 187px each)."
+    }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "content (padded)",
+      "usedBy": [
+        "farrowing.finish",
+        "farrowing.task-ready"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Raw --st-* tokens."
+      ]
+    },
+    {
+      "name": "list (st-row-group, padding 0)",
+      "usedBy": [
+        "inspection.pen"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Documented only in Row."
+      ]
+    },
+    {
+      "name": "facts (st-facts)",
+      "usedBy": [
+        "farrowing.finish",
+        "piglet-processing.sheet-todo"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Documented in Facts."
+      ]
+    },
+    {
+      "name": "log (st-log)",
+      "usedBy": [
+        "farrowing.history",
+        "piglet-processing.pen-log"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Documented in Log."
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "text": "Its job is unclear: screens almost never call panel() directly - it is the surface under Facts, Row group, Log, TaskTotals, TaskProgress and TaskSection. The card reads like a component you pick, so the owner cannot tell what it is for.",
+      "fix": "Rewrite the purpose: \"The surface every grouped block sits on; you rarely call it - use Facts, Row group or Log\", and list those as its variants."
+    },
+    {
+      "severity": "high",
+      "text": "Three look-alikes skip it: the TaskGroup card (paper, line, radius-panel plus a 0 2px 8px shadow, against \"panels are not shadowed\"), ChoiceList .st-choice-panel, and the chooser .catalog-* lists.",
+      "fix": "Build TaskGroup and .st-choice-panel on .st-panel; drop the TaskGroup shadow or name it the one sanctioned exception."
+    },
+    {
+      "severity": "medium",
+      "text": "A parallel token namespace (--st-line, --st-inset, --st-radius) with raw hex roots duplicates tokens.css.",
+      "fix": "Point --st-* at tokens (--st-line: var(--line), and so on) or use the tokens directly."
+    },
+    {
+      "severity": "low",
+      "text": "The preview shows a paragraph in a panel - a use no screen has.",
+      "fix": "Preview the real variants: a Facts block and a Row group, page vs drawer."
+    }
+  ],
+  "proposals": [
+    {
+      "kind": "merge",
+      "name": "TaskGroup card + ChoiceList panel -> Panel",
+      "why": "Same surface job; one implementation.",
+      "seenIn": [
+        "farrowing.room",
+        "piglet-processing.pen-list",
+        "inspection.filters"
+      ]
+    }
+  ]
+}

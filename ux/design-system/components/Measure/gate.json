@@ -1,0 +1,176 @@
+{
+  "status": "in-design",
+  "judged": "2026-10-09",
+  "commit": "3e3f835",
+  "model": "claude-opus-5-5",
+  "scores": {
+    "clarity": 8,
+    "budget": 6,
+    "hierarchy": 8,
+    "spacing": 8,
+    "broken": 7
+  },
+  "lowest": 6,
+  "checklist": [
+    {
+      "line": 1,
+      "pass": true,
+      "why": "Purpose stated; names Stepper (counts) and the Numpad run (sequences) instead"
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "Don'ts give the alternatives, Stepper and the Numpad run"
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "Label, box, value, unit, status region and note named; demo shows all"
+    },
+    {
+      "line": 4,
+      "pass": true,
+      "why": "No variant claimed; the base field is used by piglet-processing.weight and give-ids"
+    },
+    {
+      "line": 5,
+      "pass": true,
+      "why": "Default, empty, pressed, active, focus, warn, refused and corrected rendered; disabled ruled out with a reason"
+    },
+    {
+      "line": 6,
+      "pass": true,
+      "why": "Box is 50px+ tall at 375px; no target below 48"
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "Single value; no choice set"
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "Warn has a dot and words, refused is struck through, corrected carries a \"was\" note"
+    },
+    {
+      "line": 9,
+      "pass": false,
+      "why": "No label length cap or long-label truncation example"
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "aria-describedby, live value, focus ring, no gesture-only action"
+    },
+    {
+      "line": 11,
+      "pass": false,
+      "why": "Raw px in CSS (1/2/3/6/8px), and the README lists no CSS variables"
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Visible label, persistent hint, refusal says why, no system keyboard"
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay"
+    },
+    {
+      "line": 14,
+      "pass": false,
+      "why": "Does not say whether it is a component, variant or pattern; related parts named only in prose"
+    },
+    {
+      "line": 15,
+      "pass": true,
+      "why": "Every state rendered at 375px, no overflow or clipping"
+    }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "Value field (unit always)",
+      "usedBy": [
+        "piglet-processing.weight",
+        "piglet-processing.give-ids"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 6,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "On the weight sheet the label \"Weight (kg)\" and the box unit \"kg\" say the unit twice"
+      ]
+    },
+    {
+      "name": "Identifier readout (no unit), misuse",
+      "usedBy": [
+        "piglet-processing.give-ids"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 5,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 5
+      },
+      "findings": [
+        "The Tag field is a Measure with no unit, which its own README forbids (an ear tag is typed in the Numpad's readout)",
+        "A duplicate tag is drawn with tone \"refused\" (blocks), but Numpad rules a duplicate tag is a warning that still records"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "text": "Give IDs builds the ear-tag field as a Measure with no unit and marks a duplicate tag \"refused\", breaking both the Measure rule (no unit = not a Measure) and the Numpad rule (a duplicate tag warns and records).",
+      "fix": "Either add an \"identifier\" variant to Measure (mono, no unit, warn-only tone) and document it, or render the tag as the Numpad readout; switch the duplicate to tone \"warn\"."
+    },
+    {
+      "severity": "medium",
+      "text": "The weight sheet says the unit twice: label \"Weight (kg)\" over a box that writes \"kg\".",
+      "fix": "Label the field \"Litter weight\" (or \"Weight\") and keep the unit only in the box; add a README line: the label never carries the unit."
+    },
+    {
+      "severity": "medium",
+      "text": "An optional Measure renders as a full 62px field (\"Weight · Optional\" on Give IDs), while the optional-input rule and farrowing use a collapsed \"+ Litter weight\" row.",
+      "fix": "Add a collapsed optional state: one row of label + \"Optional\" + an Add door, expanding to the box on tap (match the Photos header row)."
+    },
+    {
+      "severity": "low",
+      "text": "CSS uses raw px for borders, gaps and the unit gap, and the README lists no CSS variables.",
+      "fix": "Map 1/2/3/6/8px to existing tokens (caret-width, status-dot, space-key-gap) and add a CSS-variables list to the README."
+    },
+    {
+      "severity": "low",
+      "text": "No label-length rule or long-label example; zh labels are untested in the preview.",
+      "fix": "State a label cap and add one long en and one zh label to the preview."
+    }
+  ],
+  "proposals": [
+    {
+      "kind": "new-variant",
+      "name": "Measure · identifier (tag)",
+      "why": "Give IDs needs a pad-set mono value with no unit and a warn-only duplicate tone; today it is a Measure that breaks its own rules",
+      "seenIn": [
+        "piglet-processing.give-ids"
+      ]
+    },
+    {
+      "kind": "new-variant",
+      "name": "Measure · optional row (collapsed)",
+      "why": "Optional values (litter weight, piglet weight) should be one row until opened, like Photos and farrowing's + Litter weight",
+      "seenIn": [
+        "piglet-processing.give-ids",
+        "farrowing.blocked"
+      ]
+    }
+  ]
+}

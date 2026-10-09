@@ -3,6 +3,100 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>/* ../../../system/atlas-bare.js */
+/* Bare screens: open any built prototype page with ?screen=<stable id> (ids are atlas/atlas.json's) and it shows only
+   that screen: the phone's content at 390 x 844 in the page's top-left, no study chrome and no phone frame (the atlas
+   draws the frame). Without the param this file does nothing, so the study page works as before.
+   - Putting the page in the state: the screen's `preset` goes through the page's select.scenario; pages driven by their own
+     URL params (Home, Piglet processing) already carry them in the screen's url.
+   - Ready: parent.postMessage({ atlasReady: id }).
+   - The flow follows the demo: a page calls AtlasBare.watch(fn) after every render, fn() returns the screen id of the
+     state it is in (or null); when that changes, parent.postMessage({ atlasScreen: id }).
+   One convention for every prototype: new pages include this script in <head> and call AtlasBare.watch where they can.
+   Entry markers live in the pages' own markup: data-entry="<feature id>" (space-separated for several) on a control that
+   is a way into that feature; the atlas outlines it. */
+(function () {
+  'use strict';
+  var q = new URLSearchParams(location.search), id = q.get('screen');
+  var AB = window.AtlasBare = { id: id || null, screen: null, screens: [], bare: !!id, watch: function () {} };
+  if (!id) return;
+
+  var root = document.documentElement, ready = false, fn = null, prev = null;
+  root.classList.add('atlas-bare');
+  var css = document.createElement('style');
+  css.textContent =
+    'html.atlas-bare,html.atlas-bare body{margin:0!important;padding:0!important;width:390px!important;height:844px!important;overflow:hidden!important;background:#fff!important}' +
+    'html.atlas-bare:not(.atlas-ready) body{opacity:0}' +
+    'html.atlas-bare [data-atlas-hide]{display:none!important}' +
+    'html.atlas-bare .atlas-path{display:block!important;position:static!important;margin:0!important;padding:0!important;border:0!important;width:auto!important;height:auto!important;min-height:0!important;max-width:none!important;' +
+    'overflow:visible!important;transform:none!important;filter:none!important;background:none!important;box-shadow:none!important;border-radius:0!important;contain:none!important;opacity:1!important}' +
+    'html.atlas-bare .atlas-phone{position:fixed!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;width:390px!important;height:844px!important;min-width:0!important;max-width:none!important;min-height:0!important;max-height:none!important;' +
+    'margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;transform:none!important;overflow:hidden!important;z-index:1}' +
+    'html.atlas-bare *,html.atlas-bare *::before,html.atlas-bare *::after{animation-duration:0s!important;animation-delay:0s!important;transition-duration:0s!important;transition-delay:0s!important;caret-color:transparent}' +
+    'html.atlas-bare *,html.atlas-bare *::before,html.atlas-bare *::after{animation-duration:0s!important;animation-delay:0s!important;transition-duration:0s!important;transition-delay:0s!important;caret-color:transparent}' +
+    'html.atlas-bare .atlas-phone::before,html.atlas-bare .atlas-phone::after{box-shadow:none!important}';
+  document.head.appendChild(css);
+
+  /* the atlas data starts loading at once */
+  var here = document.currentScript && document.currentScript.src;
+  var dataUrl = here ? new URL('../../atlas/atlas.json', here).href : '/atlas/atlas.json';
+  var data = fetch(dataUrl).then(function (r) { return r.json(); }).catch(function () { return null; });
+
+  function findScreen(d) {
+    var found = null, path = location.pathname;
+    if (!d) return;
+    d.platforms.forEach(function (p) { p.sections.forEach(function (s) { s.features.forEach(function (f) { f.screens.forEach(function (c) {
+      if (c.id === id) found = c;
+      if (c.url && c.url.split('?')[0] === path) AB.screens.push(c);
+    }); }); }); });
+    AB.screen = found;
+  }
+
+  function hideAround(phone) {
+    for (var el = phone; el && el !== document.body; el = el.parentElement) {
+      var par = el.parentElement; if (!par) break;
+      Array.prototype.forEach.call(par.children, function (sib) {
+        if (sib !== el && !/^(SCRIPT|STYLE|LINK|TEMPLATE)$/.test(sib.tagName)) sib.setAttribute('data-atlas-hide', '');
+      });
+      if (par !== document.body) par.classList.add('atlas-path');
+    }
+    phone.classList.add('atlas-phone');
+  }
+
+  function check() {
+    if (!ready || !fn) return;
+    var sid = null; try { sid = fn(AB.screens); } catch (e) { return; }
+    if (sid === prev) return;
+    prev = sid;
+    if (sid) parent.postMessage({ atlasScreen: sid }, '*');
+  }
+  AB.watch = function (f) { fn = f; check(); };
+
+  function start() {
+    data.then(function (d) {
+      findScreen(d);
+      var sel = document.querySelector('select.scenario');
+      var phone = (sel && sel.closest('.spec') && sel.closest('.spec').querySelector('.phone')) || document.querySelector('.phone, section.device, .tk-phone');
+      if (!phone) { console.error('atlas-bare: no phone found'); return; }
+      var preset = AB.screen && AB.screen.preset;
+      if (preset && sel) {
+        if (![].some.call(sel.options, function (o) { return o.value === preset; })) console.warn('atlas-bare: preset "' + preset + '" is not in the page');
+        else if (sel.value !== preset) { sel.value = preset; sel.dispatchEvent(new Event('change', { bubbles: true })); }
+      }
+      if (!AB.screen) console.warn('atlas-bare: unknown screen ' + id);
+      hideAround(phone);
+      var fonts = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 250); })]) : Promise.resolve();
+      fonts.then(function () { requestAnimationFrame(function () { requestAnimationFrame(function () {
+        root.classList.add('atlas-ready'); ready = true;
+        if (fn) { try { prev = fn(AB.screens); } catch (e) { prev = null; } }   // the state the screen opens in is not a change
+        parent.postMessage({ atlasReady: id }, '*');
+      }); }); });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <title>Piglet processing</title>
 <style>/* ../../../design-system/tokens.css */
@@ -2804,10 +2898,10 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 
   var S;
   function load() {
-    try { S = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) { S = null; }
+    try { S = (window.AtlasBare && window.AtlasBare.bare) ? null : JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) { S = null; }   // a bare atlas screen starts from the sample and keeps nothing
     if (!S || !S.pens) S = seed('tag');
   }
-  function save() { try { sessionStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* private window: the demo still runs */ } }
+  function save() { if (window.AtlasBare && window.AtlasBare.bare) return; try { sessionStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* private window: the demo still runs */ } }
   function reset() { S = seed(S ? S.scheme : 'tag'); save(); }
   /* A different farm: switching the scheme starts the demo again on that farm */
   function setScheme(s) { S = seed(s); save(); }
@@ -3132,7 +3226,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function idKey(p) { return scheme() === 'breeders' ? ['id.picked', { n: P.breeders(p) }] : ['id.of.' + scheme(), { n: P.idCount(p), m: p.alive }]; }
   function idWhat(p) { var x = idKey(p); return T(x[0], x[1]); }
   function idS(p) { var x = idKey(p); return S(x[0], x[1]); }
-  var reduced = function () { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; };
+  var reduced = function () { return (window.AtlasBare && window.AtlasBare.bare) || window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; };
   function lastWeight(p) { return p.weights.length ? p.weights[p.weights.length - 1] : null; }
 
   /* ================= the pen list: one row per pen ================= */
@@ -3547,6 +3641,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     if (leaving) return;
     document.documentElement.lang = L.lang === 'zh' ? 'zh-CN' : 'en';
     document.title = T('task');
+    if (window.AtlasBare) AtlasBare.watch(atlasScreen);
     var html = K.statusbar() + listScreen(!!(V.pen || V.end));
     if (V.pen) html += penSheet(!!(V.over || V.end));
     var o = V.pen && V.over;
@@ -3808,6 +3903,31 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     var c = q.get('chip'); if (c) V.chip = c;
     var pn = q.get('pen'); if (pn && P.s.pens[pn]) { V.pen = pn; V.tab = q.get('tab') === 'pig' ? 'pig' : 'proc'; }
   })();
+  /* the atlas (?screen=): a bare screen is reached by the taps a worker would make, and the screen the state is in is announced back */
+  var ATLAS_STEPS = {
+    'adjust-count': [['pen', 'A03'], ['item', 'iron'], ['adjust', 'iron']], 'tagged-list': [['pen', 'A02'], ['tagged-open']], 'give-ids': [['pen', 'A02'], ['tagged-open'], ['give-new']],
+    'counts': [['pen', 'A03'], ['counts-open']], 'weight': [['pen', 'A03'], ['weight-open']], 'more-actions': [['pen', 'A03'], ['more']], 'record-death': [['pen', 'A03'], ['tool-death']],
+    'move-piglets': [['pen', 'A03'], ['more'], ['tool', 'move']], 'set-count': [['pen', 'A03'], ['more'], ['tool', 'count']], 'pen-log': [['pen', 'A01'], ['log-open']], 'end-task': [['end']]
+  };
+  function atlasScreen(screens) {
+    var b = 'piglet-processing.';
+    if (V.end) return b + 'end-task';
+    if (!V.pen) return P.s.ended ? b + 'list-ended' : V.chip === 'done' ? b + 'chip-done' : V.chip ? b + 'job-chip' : scheme() === 'none' ? b + 'list-no-id' : b + 'pen-list';
+    if (V.sub === 'give') return b + 'give-ids';
+    var by = { tagged: 'tagged-list', log: 'pen-log', adjust: 'adjust-count', counts: 'counts', weight: 'weight', more: 'more-actions', death: 'record-death', move: 'move-piglets', count: 'set-count' };
+    if (V.over) return by[V.over] ? b + by[V.over] : null;
+    var hit = (screens || []).filter(function (c) {
+      var u = new URL(c.url, location.href).searchParams;
+      return c.id.indexOf(b + 'sheet-') === 0 && u.get('pen') === V.pen && (u.get('scheme') || 'tag') === scheme();
+    })[0];
+    return hit ? hit.id : null;
+  }
+  if (window.AtlasBare && AtlasBare.bare) {
+    var sid = AtlasBare.id.replace('piglet-processing.', '');
+    if (sid === 'list-ended') P.end();
+    if (sid === 'phone-clash') { P.submit('A05', [{ k: 'iron', n: P.need(P.s.pens.A05, 'iron'), why: '' }]); P.otherPhone(); }
+    (ATLAS_STEPS[sid] || []).forEach(function (s) { act(s[0], s[1]); });
+  }
   render();
 })();
 

@@ -1,0 +1,152 @@
+{
+  "status": "in-design",
+  "judged": "2026-10-09",
+  "commit": "3e3f835",
+  "model": "claude-opus-5-5",
+  "scores": {
+    "clarity": 8,
+    "budget": 8,
+    "hierarchy": 8,
+    "spacing": 8,
+    "broken": 6
+  },
+  "lowest": 6,
+  "checklist": [
+    {
+      "line": 1,
+      "pass": true,
+      "why": "One type-to-set pad; names Stepper for counts"
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "Don'ts name Stepper; under-Measure vs run use stated"
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "Keys, decimal slot, readout, status line, running list named; run demo shows them"
+    },
+    {
+      "line": 4,
+      "pass": false,
+      "why": "The run variant (running list) is used by no atlas screen; the compact variant the screens use is not in the preview"
+    },
+    {
+      "line": 5,
+      "pass": true,
+      "why": "Default, empty, suggested, cleared, full, pressed, floor-gray, warn and scan failure rendered"
+    },
+    {
+      "line": 6,
+      "pass": false,
+      "why": "Status-line text action \"Use 000258\" is 44px tall (< 48)"
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "Fixed 12-key grid; running list capped at 3"
+    },
+    {
+      "line": 8,
+      "pass": false,
+      "why": "Floor-gray keys differ only by colour until tapped (owner-ruled exception, but no non-colour cue)"
+    },
+    {
+      "line": 9,
+      "pass": true,
+      "why": "Status line sized for two lines of the longest en/zh warning"
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "Spoken labels, live value, hardware keys mapped, Enter never commits"
+    },
+    {
+      "line": 11,
+      "pass": false,
+      "why": "Raw px (1/2/3/4/6/8px) in CSS; no CSS-variable list"
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "No system keyboard; dead taps answered in words"
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "A docked pad, not an overlay; Back closes it"
+    },
+    {
+      "line": 14,
+      "pass": false,
+      "why": "No classification line; related parts only in prose"
+    },
+    {
+      "line": 15,
+      "pass": true,
+      "why": "All run states rendered at 375px; keys measured not to move"
+    }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "Under a Measure (compact)",
+      "usedBy": [
+        "piglet-processing.weight",
+        "piglet-processing.give-ids"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 7,
+        "broken": 7
+      },
+      "findings": [
+        "Not rendered in the Numpad preview, though it is the only variant in atlas screens",
+        "On the weight sheet the empty reserved status line leaves a ~70px dead band between the Measure and the keys"
+      ]
+    },
+    {
+      "name": "Run (readout + running list)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 6
+      },
+      "findings": [
+        "No atlas screen uses it (only the archived id.html slice)",
+        "\"Use 000258\" text action is 44px"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "text": "The run variant with the three-line list has no atlas screen, while the compact variant every screen uses (weight sheet, Give IDs) is missing from the preview.",
+      "fix": "Add compact examples (empty, typing, warn) to preview.html; mark the run variant unused or drop it until a screen needs it."
+    },
+    {
+      "severity": "medium",
+      "text": "Status-line text actions (\"Use 000258\") measure 86x44, under the 48px glove floor.",
+      "fix": "Give .st-text-action min-height: var(--control-height) inside the pad's status line, and reserve 48px for the line."
+    },
+    {
+      "severity": "medium",
+      "text": "Floor-gray keys can be told apart only by colour until tapped.",
+      "fix": "Keep the colour but also drop the key border (a shape change), as Photos does for its inactive camera."
+    },
+    {
+      "severity": "low",
+      "text": "Raw px in CSS and no CSS-variable list.",
+      "fix": "Map to space-key-gap / caret-width tokens and list the variables in the README."
+    }
+  ],
+  "proposals": []
+}

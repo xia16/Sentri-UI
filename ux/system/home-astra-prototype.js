@@ -100,10 +100,10 @@
   function push(page,patch={}) {navStack.push({page:state.page,unit:state.unit,task:state.task,workUnit:state.workUnit,section:state.section,scroll:app.querySelector('.app-scroll')?.scrollTop||0});Object.assign(state,patch,{page});render();}
   function back(){const prior=navStack.pop();if(prior){Object.assign(state,prior);render();const scroll=app.querySelector('.app-scroll');if(scroll)scroll.scrollTop=prior.scroll||0;}else{state.page='home';render();}}
   function goHome(){state.page='home';navStack=[];render();}
-  function nav(active='home'){return `<nav class="bottom-nav" aria-label="Main navigation">${btn('home',icon('home')+'Home',active==='home'?'active':'')}${btn('scan',icon('scan')+'Scan','scan-button')}${btn('toolbox',icon('toolbox')+'Toolbox',active==='toolbox'?'active':'')}</nav>`;}
+  function nav(active='home'){return `<nav class="bottom-nav" aria-label="Main navigation">${btn('home',icon('home')+'Home',active==='home'?'active':'')}${btn('scan',icon('scan')+'Scan','scan-button')}${btn('toolbox',icon('toolbox')+'Toolbox',active==='toolbox'?'active':'','',state.unit?'data-entry="environment" data-entry-via="toolbox"':'')}</nav>`;}
   function head(title,sub='',extra='',showBack=true){return `<header class="page-head">${showBack?ib('back','back','Back'):''}<div class="head-copy">${SentriUI.heading({title,description:sub,kind:'page',level:2})}</div>${extra}</header>`;}
   function header(){return `<header class="app-header">${btn('sections',`<span class="farm-label">GREEN VALLEY FARM</span><strong>${section().name}${icon('down')}</strong>`,'section-trigger','','aria-label="Change section, '+section().name+'"')}${btn('assistant',`${icon('spark')}Assistant`,'assistant-door','','aria-label="Assistant"')}</header>`;}
-  function scopeRail(){return `<nav class="scope-switch" aria-label="Work scope">${btn('scope','Overview','scope-overview','',`aria-pressed="${!state.unit}"`)}${btn('units',`<span>${state.unit?'Unit '+state.unit:'Choose unit'}<small>${section().units.length} units</small></span>${icon('down')}`,'scope-unit','',`aria-haspopup="dialog" aria-label="${state.unit?'Change unit, Unit '+state.unit:'Choose unit'}, ${section().units.length} units" aria-pressed="${!!state.unit}"`)}</nav>`;}
+  function scopeRail(){return `<nav class="scope-switch" aria-label="Work scope">${btn('scope','Overview','scope-overview','',`aria-pressed="${!state.unit}"`)}${btn('units',`<span>${state.unit?'Unit '+state.unit:'Choose unit'}<small>${section().units.length} units</small></span>${icon('down')}`,'scope-unit','',`${state.section==='farrowing'?'data-entry="farrowing" data-entry-via="choose-unit" ':''}aria-haspopup="dialog" aria-label="${state.unit?'Change unit, Unit '+state.unit:'Choose unit'}, ${section().units.length} units" aria-pressed="${!!state.unit}"`)}</nav>`;}
   // Illustrative task windows. Unit selection changes counts, not batch time.
   const cardFields = {
     preg31:{context:'First check',day:1,days:3,label:'Checks recorded',verb:'sows ready to check',due:{7:2,8:2,9:1},nextAt:1440},
@@ -132,7 +132,7 @@
     if(['waiting','round-complete'].includes(current)){facts.due=0;facts.live=0;facts.roundComplete=current==='round-complete';}
     if(workPreview==='ready'&&p&&p.kind!=='outcome'){p.value=p.total;facts.due=0;facts.live=0;facts.readyToComplete=true;}
     const resolved=window.SentriHomeTaskCard.attention(kind,facts);
-    return {id:t.id,...resolved,identity:{title:t.type,context:t.batch+' · '+f.context,icon:'production'},progress:p,
+    return {id:t.id,entry:({farrowing:'farrowing',piglet:'piglet-processing'})[kind],...resolved,identity:{title:t.type,context:t.batch+' · '+f.context,icon:'production'},progress:p,
       status:{label:resolved.state==='active'?'Due now':'Waiting',tone:resolved.state==='active'?'blue':''},
       timing:{elapsed:f.days===1?'Today':'Day '+f.day+' of '+f.days},scope};
   }
@@ -145,12 +145,12 @@
     const active=signals.filter(s=>Number.isFinite(s.count)&&s.count>0),unavailable=signals.some(s=>s.count===null);
     const inspectLabel = `Inspect unit, ${u.pigs} pigs, ${u.pens} pens`;
     return `<section class="unit-hub unit-hub-unified" aria-label="Unit ${state.unit} status">
-      <button type="button" class="unit-hub-inspect" data-action="inspect" aria-label="${esc(inspectLabel)}">
+      <button type="button" class="unit-hub-inspect" data-action="inspect" data-entry="inspection" aria-label="${esc(inspectLabel)}">
         <span class="uhi-head">${icon('grid')}<span class="uhi-title">Inspect unit<small>${u.pigs} pigs · ${u.pens} pens</small></span>${icon('arrow')}</span>
         <span class="unit-check-row"><small>Checked ${esc(u.checked.split(' · ')[0])}</small></span>
         <span class="unit-attention" aria-label="Unit attention">${active.length?`<span class="unit-attention-chips">${active.map(s=>`<span class="unit-attention-chip" role="img" aria-label="${s.label}: ${s.count} ${s.unit}${s.count===1?'':'s'} needing attention" title="${s.label}: ${s.count} ${s.unit}${s.count===1?'':'s'} needing attention">${icon(s.icon)}<span aria-hidden="true">${s.label}</span><strong aria-hidden="true">${s.count}</strong></span>`).join('')}</span>`:!unavailable?`<span class="unit-attention-clear">${icon('check')}No flagged items</span>`:''}${unavailable?'<span class="unit-attention-unknown">Health and feed summary unavailable</span>':''}</span>
       </button>
-      ${sensors.length||devices.length?btn('environment',`<span class="unit-environment-label">Environment & devices</span><span class="unit-environment-bottom">${sensors.length?`<span class="unit-live-readings">${sensors.map(s=>`<span>${icon(s.icon)}${s.value}<small>${s.unit}</small></span>`).join('')}</span>`:`<span class="unit-device-count">${devices.length} ${devices.length===1?'device':'devices'}</span>`}${icon('arrow')}</span>`,'unit-hub-environment'):''}
+      ${sensors.length||devices.length?btn('environment',`<span class="unit-environment-label">Environment & devices</span><span class="unit-environment-bottom">${sensors.length?`<span class="unit-live-readings">${sensors.map(s=>`<span>${icon(s.icon)}${s.value}<small>${s.unit}</small></span>`).join('')}</span>`:`<span class="unit-device-count">${devices.length} ${devices.length===1?'device':'devices'}</span>`}${icon('arrow')}</span>`,'unit-hub-environment','','data-entry="environment"'):''}
     </section>`;
   }
   const sensorKinds=[{name:'Temperature',unit:'°C',icon:'temperature'},{name:'Humidity',unit:'%',icon:'humidity'},{name:'Ammonia',unit:'ppm NH₃',icon:'air'}];
@@ -253,7 +253,23 @@
   function toolbox(){const rows=[...(state.unit?[{action:'maintenance',icon:icon('wrench'),title:'Maintenance',description:'Unit '+state.unit+' · equipment issues'}]:[]),{action:'search',icon:icon('search'),title:'Find a pig or pen',description:'Search by ear tag or pen code'},{action:'records',icon:icon('note'),title:'Records',description:'Updates made in this preview'},{action:'sections',icon:icon('barn'),title:'Sections & units',description:'Browse the farm'},{action:'assistant',icon:icon('spark'),title:'Assistant',description:'Questions, findings and decisions'}];return head('Toolbox','Find records and specific tools')+'<div class="app-scroll screen-enter">'+SentriUI.panel(rows.map(r=>SentriUI.row(r)).join(''),{className:'st-row-group'})+'<a class="tool-row gallery-tool-link" href="sentri-components-study.html">Shared component study ↗</a><a class="tool-row gallery-tool-link" href="task-cards-astra-prototype.html">Task card gallery ↗</a></div>'+nav('toolbox');}
   function recordLog(){return head('Records','Updates in this prototype')+'<div class="app-scroll screen-enter">'+SentriUI.log([{label:'Today',entries:state.log.map(l=>({title:l.title,detail:l.context,meta:'G. Hansen · just now'}))}],{empty:'No new records yet. Answers to overnight findings will appear here.'})+'</div>'+nav('toolbox');}
   const pages={home,sections:sectionChooser,placeholder,environment,maintenance,assistant,finding,toolbox,records:recordLog};
-  function render(){app.innerHTML=(pages[state.page]||home)();document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));}
+  // The atlas follows the demo (?screen=): the screen whose url holds this scope (view, section, unit, work, attention), else null.
+  function atlasScreen(screens){
+    const dr=overlay.querySelector('.drawer');
+    if(dr){
+      if(dr.classList.contains('unit-picker'))return 'workbench.choose-unit';
+      if(dr.classList.contains('sync-drawer'))return 'workbench.saved-work';
+      return state.page==='placeholder'&&dr.querySelector('[data-action="confirm-end-task"]')?'workbench.end-task-early':null;
+    }
+    if(state.page==='placeholder'){const t=task();return t.completedAt||t.terminatedAt?'workbench.closed-task':taskModel(t).state==='ready'?'workbench.task-ready':'workbench.task-preview';}
+    if(!['home','sections'].includes(state.page))return null;
+    const view=state.page==='sections'?'sections':state.unit?'unit':'';
+    const hit=(screens||[]).find(c=>{const u=new URL(c.url,location.href).searchParams;
+      return (u.get('view')||'')===view&&(view==='sections'||(u.get('section')||'gestation')===state.section)&&(view!=='unit'||u.get('unit')===String(state.unit))&&(u.get('work')||'mixed')===workPreview&&(u.get('attention')||'current')===attentionPreview;});
+    return hit?hit.id:null;
+  }
+  function render(){app.innerHTML=(pages[state.page]||home)();window.AtlasBare&&AtlasBare.watch(atlasScreen);document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));}
+  if(window.AtlasBare&&AtlasBare.bare)new MutationObserver(()=>AtlasBare.watch(atlasScreen)).observe(overlay,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
   function closeDrawer(){overlay.innerHTML='';state.overlay=null;app.inert=false;if(returnFocus?.isConnected)returnFocus.focus();}
   function drawer(title,body,{size='medium',sizing='content'}={}){returnFocus=document.activeElement;app.inert=true;overlay.innerHTML=`<button class="scrim" data-action="close" aria-label="Close dialog"></button><section class="drawer" data-st-context="drawer" data-size="${size}" data-sizing="${sizing}" role="dialog" aria-modal="true" aria-labelledby="drawer-title" tabindex="-1"><div class="drawer-handle"></div><header class="drawer-head">${SentriUI.heading({title,kind:'page',level:2}).replace('<h2','<h2 id="drawer-title"')}${ib('close','close','Close dialog')}</header><div class="drawer-body">${body}</div><footer class="st-home-drawer-footer">${btn('close',icon('back')+'<span>Back</span>','st-home-back')}</footer></section>`;const primary=overlay.querySelector('.drawer-body .primary, .drawer-body [data-drawer-primary]');if(primary){const form=primary.closest('form');if(form)primary.setAttribute('form',form.id);overlay.querySelector('.st-home-drawer-footer').append(primary);}overlay.querySelector('.drawer')?.focus({preventScroll:true});}
   function unitChoices(){

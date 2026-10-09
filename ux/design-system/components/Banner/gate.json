@@ -1,0 +1,174 @@
+{
+  "status": "in-design",
+  "judged": "2026-10-09",
+  "commit": "3e3f835",
+  "model": "claude-opus-5-5",
+  "scores": {
+    "clarity": 7,
+    "budget": 7,
+    "hierarchy": 8,
+    "spacing": 8,
+    "broken": 5
+  },
+  "lowest": 5,
+  "checklist": [
+    {
+      "line": 1,
+      "pass": false,
+      "why": "Purpose stated but names no sibling to use instead (TaskWarning, a field status line)"
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "Don'ts say when not (a warning that still records goes to the field status line)"
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "Box, headline, consequence, summary and Clear named and shown"
+    },
+    {
+      "line": 4,
+      "pass": false,
+      "why": "Neither tone is used by any atlas screen; farrowing and piglet-processing use TaskWarning or their own CSS"
+    },
+    {
+      "line": 5,
+      "pass": false,
+      "why": "The Cleared + Undo state is not rendered in the preview"
+    },
+    {
+      "line": 6,
+      "pass": false,
+      "why": "Clear text action measures 46x44 (< 48)"
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "One banner at a time stated"
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "Tones differ by headline words and weight, not colour alone"
+    },
+    {
+      "line": 9,
+      "pass": false,
+      "why": "No headline length cap or long/zh example"
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "One live region; focus return via handFocus specified"
+    },
+    {
+      "line": 11,
+      "pass": false,
+      "why": "Raw px (1px border, 4px gaps); no CSS-variable list"
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field"
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay"
+    },
+    {
+      "line": 14,
+      "pass": false,
+      "why": "Does not link TaskWarning or state the relation (variant or duplicate)"
+    },
+    {
+      "line": 15,
+      "pass": false,
+      "why": "Danger and correction render cleanly at 375px, but the Cleared/Undo state has no proof"
+    }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "danger",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 6
+      },
+      "findings": [
+        "Same job and nearly the same face as TaskWarning red (farrowing's danger band); no screen uses Banner for it"
+      ]
+    },
+    {
+      "name": "correction",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 7,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 5
+      },
+      "findings": [
+        "farrowing.edit shows no banner in its captured state; the archived edit.html slice is the only user",
+        "Clear is 44px tall; Cleared/Undo not rendered"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "text": "Banner and TaskWarning do the same job (a consequence above a commit, on a wash, with optional text actions) with two implementations: Banner danger is red-wash/red border with a 14/700 headline; TaskWarning red is red-wash/danger-border with a 12/700 title. Only TaskWarning is used (piglet-processing.phone-clash, farrowing.blocked).",
+      "fix": "Merge them: one Banner with tones danger / correction / notice, built once; TaskWarning becomes Banner at the skeleton's 12px size (a size property), not a second component."
+    },
+    {
+      "severity": "high",
+      "text": "The Home offline banner (\"3 records saved on this device · No connection · waiting to upload\", workbench.today) is a third look-alike: amber wash, a leading icon, the whole box a door with ›. Banner forbids icons; TaskWarning's amber door banner matches it.",
+      "fix": "Make it the merged Banner's notice tone with the door property (icon optional, the whole box one button at least 48px), and render Home with it."
+    },
+    {
+      "severity": "medium",
+      "text": "Clear (46x44) is under the 48px glove floor.",
+      "fix": "Give banner text actions min-height: var(--control-height) and make the summary row 48px."
+    },
+    {
+      "severity": "medium",
+      "text": "Cleared + Undo (5s) is specified but not rendered in the preview.",
+      "fix": "Add a Cleared/Undo example to preview.html."
+    },
+    {
+      "severity": "low",
+      "text": "Raw px, no CSS-variable list, no headline length cap.",
+      "fix": "Tokenise the 1px/4px values, list the variables, cap the headline at one line with a zh example."
+    }
+  ],
+  "proposals": [
+    {
+      "kind": "merge",
+      "name": "Banner + TaskWarning",
+      "why": "Same job (a consequence before a commit, or a pending notice), two implementations; only TaskWarning ships in screens",
+      "seenIn": [
+        "farrowing.blocked",
+        "piglet-processing.phone-clash",
+        "piglet-processing.list-ended"
+      ]
+    },
+    {
+      "kind": "new-variant",
+      "name": "Banner · notice (door)",
+      "why": "The Home offline/upload banner and farrowing's \"Save your correction first · Review ›\" are an amber notice that opens something",
+      "seenIn": [
+        "workbench.today",
+        "workbench.saved-work",
+        "farrowing.blocked"
+      ]
+    }
+  ]
+}

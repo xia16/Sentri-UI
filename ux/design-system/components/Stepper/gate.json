@@ -1,0 +1,200 @@
+{
+  "status": "in-design",
+  "judged": "2026-10-09",
+  "commit": "3e3f835",
+  "model": "claude-opus-5-5",
+  "scores": {
+    "clarity": 8,
+    "budget": 7,
+    "hierarchy": 8,
+    "spacing": 6,
+    "broken": 6
+  },
+  "lowest": 6,
+  "checklist": [
+    {
+      "line": 1,
+      "pass": true,
+      "why": "Counting animals; Measure named for measured values"
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "The don'ts name Measure and forbid typing a count"
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "Label, description, keys, value and status line named"
+    },
+    {
+      "line": 4,
+      "pass": false,
+      "why": "The DS row and hero faces are used by no screen; screens use the TaskStepper faces (row, well, count)"
+    },
+    {
+      "line": 5,
+      "pass": true,
+      "why": "Default, empty, pressed, floor-gray, focus, corrected and draft rendered"
+    },
+    {
+      "line": 6,
+      "pass": false,
+      "why": "Keys 46 wide (DS), 44 wide (TaskStepper row), 44x44 in the farrowing forks; pointer text actions 44 tall"
+    },
+    {
+      "line": 7,
+      "pass": false,
+      "why": "No cap on stacked steppers per sheet"
+    },
+    {
+      "line": 8,
+      "pass": false,
+      "why": "Draft (green) and corrected (amber) differ by colour only"
+    },
+    {
+      "line": 9,
+      "pass": true,
+      "why": "Label of 14 characters or fewer stated"
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "spinbutton, aria-valuenow/min/max, status region, arrow keys"
+    },
+    {
+      "line": 11,
+      "pass": true,
+      "why": "Tokens throughout; only 1-3px borders and offsets are raw"
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Not a text field; no typed counts"
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay"
+    },
+    {
+      "line": 14,
+      "pass": true,
+      "why": "Candidate status and ADR link; TaskStepper links back"
+    },
+    {
+      "line": 15,
+      "pass": true,
+      "why": "375 render of every state, no overflow"
+    }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "row (DS face, filled ink +)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 6,
+        "hierarchy": 8,
+        "spacing": 5,
+        "broken": 5
+      },
+      "findings": [
+        "No screen uses it",
+        "The reserved 44px hint line leaves uneven gaps under the first rows of a stack"
+      ]
+    },
+    {
+      "name": "hero (DS face)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 7
+      },
+      "findings": [
+        "No screen uses it; farrowing.count hand-rolls .hero-stepper"
+      ]
+    },
+    {
+      "name": "TaskStepper row face",
+      "usedBy": [
+        "piglet-processing.counts",
+        "piglet-processing.record-death",
+        "piglet-processing.adjust-count"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 6
+      },
+      "findings": [
+        "Keys are 44px wide, below the 48 floor"
+      ]
+    },
+    {
+      "name": "TaskStepper well/count faces",
+      "usedBy": [
+        "piglet-processing.move-piglets",
+        "piglet-processing.set-count"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 7
+      },
+      "findings": [
+        "The count face colours + green, which the Stepper README forbids until the owner decides"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "text": "Key widths are below the glove floor: 46px (DS face), 44px (TaskStepper row face), 44x44 (farrowing .row-stepper forks). Pointer text actions are 44px tall.",
+      "fix": "Set the key face to 48px (control-height) in every face, and text actions to min-height 48."
+    },
+    {
+      "severity": "medium",
+      "text": "Farrowing still hand-rolls three look-alikes (.row-stepper on death and edit, .hero-stepper on count, .feature-stepper on foster and reconcile) instead of SentriTask.stepper.",
+      "fix": "Swap them for the SentriTask.stepper faces row, count and well, and delete the forks."
+    },
+    {
+      "severity": "medium",
+      "text": "No screen uses the DS faces (filled ink +); task pages use other faces. Two looks for one job, with no stated rule.",
+      "fix": "List the faces (row, well, count) as this card's variants, and retire the filled-ink face or name a screen that needs it."
+    },
+    {
+      "severity": "medium",
+      "text": "Draft (green value) and corrected (amber value) are colour-only.",
+      "fix": "Add a word in the status line (\"+1 unsaved\", \"corrected\") alongside the colour."
+    },
+    {
+      "severity": "low",
+      "text": "The reserved 44px hint line opens uneven gaps in a stack where only some rows can show pointers.",
+      "fix": "Reserve per sheet, not per row: in a stack, rows without pointers take reserveHint:false."
+    }
+  ],
+  "proposals": [
+    {
+      "kind": "merge",
+      "name": "TaskStepper faces into Stepper variants",
+      "why": "Same job, different look = variant; one implementation, with the face as the variant",
+      "seenIn": [
+        "piglet-processing.counts",
+        "farrowing.count"
+      ]
+    }
+  ]
+}

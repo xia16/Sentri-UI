@@ -1,0 +1,225 @@
+{
+  "status": "in-design",
+  "judged": "2026-10-09",
+  "commit": "3e3f835",
+  "model": "claude-opus-5-5",
+  "scores": {
+    "clarity": 7,
+    "budget": 7,
+    "hierarchy": 8,
+    "spacing": 8,
+    "broken": 5
+  },
+  "lowest": 5,
+  "checklist": [
+    {
+      "line": 1,
+      "pass": true,
+      "why": "One-line job (the chooser); PickerField named for the trigger"
+    },
+    {
+      "line": 2,
+      "pass": false,
+      "why": "No explicit when-not; Segment, TaskChoice and the filter chips are not named as alternatives"
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "Row parts named (label, meta, 24px trailing slot); search, empty and lead named"
+    },
+    {
+      "line": 4,
+      "pass": false,
+      "why": "multi mode has no preview and no screen; radio rows and inline Choice ship on screens only in the TaskRadios face"
+    },
+    {
+      "line": 5,
+      "pass": false,
+      "why": "States listed, but multi, pressed and empty are not rendered; disabled has a reason pattern (omit)"
+    },
+    {
+      "line": 6,
+      "pass": false,
+      "why": "Rows 58-60px pass; the Clear text action is 44x44"
+    },
+    {
+      "line": 7,
+      "pass": false,
+      "why": "No cap on rows per group or on when search must appear"
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "Check, checkbox and ring plus 600/700 weight, not colour only"
+    },
+    {
+      "line": 9,
+      "pass": false,
+      "why": "No label length or truncation rule; no long-label example"
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "role=radio/radiogroup, roving tab stop, arrows via radioBind, focus ring stated"
+    },
+    {
+      "line": 11,
+      "pass": false,
+      "why": "Raw px throughout and #eaf0e2 press fill; no CSS variable list"
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Not a text field; search has an aria-label"
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay itself"
+    },
+    {
+      "line": 14,
+      "pass": false,
+      "why": "No related links; classification not stated on the page"
+    },
+    {
+      "line": 15,
+      "pass": false,
+      "why": "375px render has no multi, empty or pressed state"
+    }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "navigate",
+      "usedBy": [
+        "health-record.medicine-picker",
+        "health-record.condition-picker"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 6
+      },
+      "findings": [
+        "The condition picker draws its own .catalog-category door rows instead of choiceRow navigate; its meta sits under the label while the medicine picker puts it right of the label"
+      ]
+    },
+    {
+      "name": "single",
+      "usedBy": [
+        "health-record.edit-finding (link condition)"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 6
+      },
+      "findings": [
+        "PickerField.pickerOptions draws the same single-select row again (st-picker-option, green check) beside choiceRow single (ink check): two implementations of one row"
+      ]
+    },
+    {
+      "name": "multi",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+        "clarity": 6,
+        "budget": 7,
+        "hierarchy": 7,
+        "spacing": 7,
+        "broken": 3
+      },
+      "findings": [
+        "No screen uses choiceRow multi; the only multi chooser (condition picker) hand-rolls .catalog-item with the checkbox on the LEFT, breaking the trailing-slot rule",
+        "No preview"
+      ]
+    },
+    {
+      "name": "radio rows (candidate; TaskRadios face)",
+      "usedBy": [
+        "piglet-processing.adjust-count"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 7
+      },
+      "findings": [
+        "Two faces of one radio row (DS panel rows vs TaskRadios flat rows) with different chosen weight (700 vs 400)"
+      ]
+    },
+    {
+      "name": "inline Choice (candidate)",
+      "usedBy": [
+        "piglet-processing.move-piglets"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 7,
+        "hierarchy": 7,
+        "spacing": 7,
+        "broken": 6
+      },
+      "findings": [
+        "Clear is 44x44, below the 48px glove floor"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "text": "The multi-select chooser on real screens (condition picker) does not use ChoiceList: it hand-rolls checkbox rows with the box on the left, and door rows with their own meta layout.",
+      "fix": "Render the condition picker with choiceRow({mode:\"multi\"}) and choiceRow({mode:\"navigate\", meta:\"10 symptoms · 1 selected\"}); delete the .catalog-item and .catalog-category styles."
+    },
+    {
+      "severity": "high",
+      "text": "Single-select rows exist twice: choiceRow single (ink check) and pickerOptions (st-picker-option, green check).",
+      "fix": "Make pickerOptions a thin wrapper that returns choiceGroup(choiceRow single ...) and delete the st-picker-option CSS."
+    },
+    {
+      "severity": "medium",
+      "text": "multi mode, the empty state and the pressed state are missing from the preview, so the 375px proof does not cover the component.",
+      "fix": "Add to preview.html a multi group with one checked row, a choiceEmpty line and a row forced into its pressed fill."
+    },
+    {
+      "severity": "medium",
+      "text": "The Clear text action measures 44x44, below the 48px glove floor.",
+      "fix": "Set .st-text-action min-height and min-width to control-height (48px)."
+    },
+    {
+      "severity": "low",
+      "text": "No when-not, no row cap, no label-length rule; raw px and #eaf0e2 instead of tokens.",
+      "fix": "Add \"Use Segment for 2-5 fixed short options in a filter; use TaskChoice for a choice that changes the page\"; cap a group at about 8 rows before search; map the press fill to choice-press."
+    }
+  ],
+  "proposals": [
+    {
+      "kind": "merge",
+      "name": "pickerOptions into ChoiceList single",
+      "why": "Same job, same row, two implementations with different check colours",
+      "seenIn": [
+        "farrowing.death",
+        "health-record.edit-finding"
+      ]
+    },
+    {
+      "kind": "new-variant",
+      "name": "Segment: facet (filter choice Any · 0 · 1 · 2–5 · 6+)",
+      "why": "Parity is a fixed set of 5 or fewer short tokens that narrows a list; it is not an outcome being recorded. M3 and Apple call that a segmented control, not a list. It is not a ChoiceList variant: ChoiceList draws vertical rows, and the record-sheet Choice caps at 4 outcomes. On one screen it does not earn a new Choice chips component. Today the options are 66x44, below the floor; inspection.filters uses PickerFields for the same kind of facet.",
+      "seenIn": [
+        "farrowing.room (Filter sows)"
+      ]
+    }
+  ]
+}

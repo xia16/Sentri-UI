@@ -1,0 +1,213 @@
+{
+  "status": "in-design",
+  "judged": "2026-10-09",
+  "commit": "3e3f835",
+  "model": "claude-opus-5-5",
+  "scores": {
+    "clarity": 4,
+    "budget": 4,
+    "hierarchy": 7,
+    "spacing": 5,
+    "broken": 4
+  },
+  "lowest": 4,
+  "checklist": [
+    {
+      "line": 1,
+      "pass": true,
+      "why": "\"The two ways a surface is presented\" - drawer vs page."
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "Choosing between them: a drawer holds about five fields; a page form has Back."
+    },
+    {
+      "line": 3,
+      "pass": false,
+      "why": "Grab, close, subtitle, aside and the status line are not named here (only in TaskSheet)."
+    },
+    {
+      "line": 4,
+      "pass": false,
+      "why": "Four sizes plus page, but dialog is a separate card and TaskSheet/TaskPage duplicate the drawer and page."
+    },
+    {
+      "line": 5,
+      "pass": true,
+      "why": "Static container; states belong to the contents (stated)."
+    },
+    {
+      "line": 6,
+      "pass": false,
+      "why": "Preview footer buttons are 44px; the drawer close is 44x44 in farrowing and piglet processing."
+    },
+    {
+      "line": 7,
+      "pass": false,
+      "why": "Max two footer actions stated, but inspection.filters renders three (Back, Reset, Show pigs)."
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "n/a (no selected/error state)."
+    },
+    {
+      "line": 9,
+      "pass": false,
+      "why": "No title copy rules; the preview uses \"Close\", which TaskSheet bans."
+    },
+    {
+      "line": 10,
+      "pass": false,
+      "why": "No role=dialog/aria-modal or focus rule in this card; inspection drawers have only a grab bar (a gesture) plus Back, no close."
+    },
+    {
+      "line": 11,
+      "pass": false,
+      "why": "Raw #dce0d4 handle, #fff/white page, #b6c0ad Back border, 28px radius, raw padding."
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "n/a"
+    },
+    {
+      "line": 13,
+      "pass": false,
+      "why": "Piglet processing stacks a drawer on a drawer (record-death over the pen sheet); no unsaved-change exit rule."
+    },
+    {
+      "line": 14,
+      "pass": false,
+      "why": "Does not link TaskSheet/TaskPage/TaskDialog or say which is canonical."
+    },
+    {
+      "line": 15,
+      "pass": false,
+      "why": "The 375 preview shows one short drawer only; no page, no sizes, no dialog."
+    }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "drawer (compact/short/medium/long, content-sized)",
+      "usedBy": [
+        "farrowing.death",
+        "farrowing.finish",
+        "inspection.filters",
+        "inspection.review-selected",
+        "piglet-processing.sheet-todo",
+        "piglet-processing.record-death"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 5,
+        "budget": 4,
+        "hierarchy": 7,
+        "spacing": 4,
+        "broken": 4
+      },
+      "findings": [
+        "Two implementations (.sheet in farrowing/inspection, .tk-sheet in piglet processing).",
+        "Inspection drawers are a fixed medium height with half of it empty; the footer pads 12/18 so the buttons end at 832px, on the handle bar (832-836).",
+        "Left edges disagree: inspection body 21 / footer 18; farrowing sow drawer body 18 / footer 21.",
+        "Close present in farrowing and piglet processing, absent in inspection."
+      ]
+    },
+    {
+      "name": "page (full canvas, Back footer)",
+      "usedBy": [
+        "farrowing.history",
+        "farrowing.task-ready",
+        "inspection.pen",
+        "inspection.walk-log",
+        "piglet-processing.pen-log",
+        "piglet-processing.end-task"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 5,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 7
+      },
+      "findings": [
+        "Renders the same across all three features, but through two implementations (.sheet[data-presentation=page] and TaskPage .tk-page)."
+      ]
+    },
+    {
+      "name": "dialog (one question over a drawer)",
+      "usedBy": [
+        "farrowing.death",
+        "farrowing.history"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 7,
+        "hierarchy": 7,
+        "spacing": 7,
+        "broken": 7
+      },
+      "findings": [
+        "Lives only in TaskDialog and farrowing CSS; not documented on Sheet."
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "text": "One job, two implementations: Sheet (.sheet, farrowing + inspection) and TaskSheet/TaskPage (.tk-*, piglet processing) draw the same drawer and page with different gutters, heights and close rules.",
+      "fix": "Make Sheet the one card with variants drawer | page | dialog, implemented by the TaskSheet/TaskPage/TaskDialog code (the fixed one); port farrowing and inspection to it."
+    },
+    {
+      "severity": "high",
+      "text": "Inspection drawer footers pad 12px 18px: the buttons end at y=832, on the 92x4 handle bar (832-836).",
+      "fix": "Use the footer padding 14/21/28 on every sheet footer (TaskSheet already does)."
+    },
+    {
+      "severity": "high",
+      "text": "The inspection.filters footer holds three actions (Back, Reset, Show pigs), breaking the two-action law.",
+      "fix": "Move Reset to a text action in the drawer head (aside), leaving Back + Show pigs."
+    },
+    {
+      "severity": "medium",
+      "text": "Fixed-height drawers with dead space and a distant footer (inspection.review-selected, inspection.filters).",
+      "fix": "Content-sized by default (data-sizing=content / TaskSheet height:\"content\")."
+    },
+    {
+      "severity": "medium",
+      "text": "The exit is inconsistent: the Sheet preview says \"Close\"; inspection drawers have no close; the farrowing Dead drawer swaps the close for Clear; TaskSheet bans Close.",
+      "fix": "One rule on Sheet: the footer exit is Back; drawers also carry the close IconButton; aside text actions sit left of it and never replace it."
+    },
+    {
+      "severity": "medium",
+      "text": "A drawer stacked on a drawer (piglet-processing.record-death over the pen sheet), against one overlay at a time.",
+      "fix": "Replace the pen drawer content in place (push), or use the dialog variant for a single question."
+    }
+  ],
+  "proposals": [
+    {
+      "kind": "merge",
+      "name": "TaskSheet + TaskPage + TaskDialog -> Sheet (drawer | page | dialog)",
+      "why": "Same job, two code paths; one card with three presentations.",
+      "seenIn": [
+        "farrowing.death",
+        "inspection.filters",
+        "piglet-processing.sheet-todo",
+        "piglet-processing.pen-log"
+      ]
+    },
+    {
+      "kind": "merge",
+      "name": "TaskHold -> Sheet footer + Button hold",
+      "why": "It is only the footer placement of the Button hold.",
+      "seenIn": [
+        "farrowing.finish",
+        "piglet-processing.end-task"
+      ]
+    }
+  ]
+}

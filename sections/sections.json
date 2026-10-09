@@ -8,13 +8,32 @@
           "id": "home",
           "name": "Home",
           "zh": "首页",
-          "shared": "Home is the workbench, not a statistics page: it shows what needs doing now. A section chooser summarises each section's workload; a section's Overview groups work by task type with timing and progress; picking a unit narrows the counts. Scan and Toolbox stay in reach, and the Assistant opens from the header."
+          "shared": "Home is the workbench, not a statistics page: it shows what needs doing now. A section chooser summarises each section's workload; a section's Overview groups work by task type with timing and progress; picking a unit narrows the counts. Scan and Toolbox stay in reach, and the Assistant opens from the header.",
+          "patterns": [
+            {
+              "name": "Home task card",
+              "screens": [
+                "workbench.today"
+              ],
+              "note": "The card that summarises one task type on Overview: its name, progress and timing, and the way into the task."
+            }
+          ]
         },
         {
           "id": "tasks",
           "name": "Tasks",
           "zh": "生产任务",
-          "shared": "All tasks look the same and only the information differs. Each task page is built from the same task skeleton: a header naming the task, a summary card, a lens bar with the count under each label, rows grouped by pen, a dock as the last row, and sheets and pages made of the same parts."
+          "shared": "All tasks look the same and only the information differs. Each task page is built from the same task skeleton: a header naming the task, a summary card, a lens bar with the count under each label, rows grouped by pen, a dock as the last row, and sheets and pages made of the same parts.",
+          "patterns": [
+            {
+              "name": "Task skeleton",
+              "screens": [
+                "farrowing.room",
+                "piglet-processing.pen-list"
+              ],
+              "note": "Every task opens on the same page: header, last record, summary card (TaskSummary), lens tabs, rows grouped by pen, a dock. Only the information differs."
+            }
+          ]
         },
         {
           "id": "inspection",

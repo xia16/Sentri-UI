@@ -1,0 +1,202 @@
+{
+  "status": "in-design",
+  "judged": "2026-10-09",
+  "commit": "3e3f835",
+  "model": "claude-opus-5-5",
+  "scores": {
+    "clarity": 7,
+    "budget": 8,
+    "hierarchy": 7,
+    "spacing": 8,
+    "broken": 4
+  },
+  "lowest": 4,
+  "checklist": [
+    {
+      "line": 1,
+      "pass": true,
+      "why": "\"How a state is said\"; points to Row/Button for a status that acts"
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "Don'ts and placement rules present"
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "Dot, word, line, tokens, separator named and shown"
+    },
+    {
+      "line": 4,
+      "pass": false,
+      "why": "The Word variant is used by no atlas screen; real state chips are filled badges from TaskRow, farrowing and health tags"
+    },
+    {
+      "line": 5,
+      "pass": true,
+      "why": "States declared none (text only) with reasons; default and live shown"
+    },
+    {
+      "line": 6,
+      "pass": true,
+      "why": "No tap targets"
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "One chip per row stated"
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "Every tone carries a word; colour never alone"
+    },
+    {
+      "line": 9,
+      "pass": false,
+      "why": "No length cap for a status word; no long or zh example"
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "Live region mounted empty and filled; port notes given"
+    },
+    {
+      "line": 11,
+      "pass": false,
+      "why": "Raw 4px separator margin; no CSS-variable list"
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field"
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay"
+    },
+    {
+      "line": 14,
+      "pass": false,
+      "why": "No classification line; no table of related look-alikes (Row chip, health tag)"
+    },
+    {
+      "line": 15,
+      "pass": true,
+      "why": "All tones and lines render at 375px without overflow"
+    }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "Word (dot + word)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 7,
+        "spacing": 8,
+        "broken": 3
+      },
+      "findings": [
+        "No screen renders it; every live status chip is a filled badge instead"
+      ]
+    },
+    {
+      "name": "Line (coloured values)",
+      "usedBy": [
+        "piglet-processing.sheet-late",
+        "farrowing.room"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 6
+      },
+      "findings": [
+        "The look-alikes are hand-built (TaskDay .tk-tone \"late\", farrowing \"Overdue · 3 days\" row text), not statusLine()"
+      ]
+    },
+    {
+      "name": "Chip (filled, as built in screens), undocumented",
+      "usedBy": [
+        "piglet-processing.pen-list",
+        "piglet-processing.sheet-late",
+        "farrowing.room",
+        "farrowing.count"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 6,
+        "budget": 8,
+        "hierarchy": 7,
+        "spacing": 8,
+        "broken": 3
+      },
+      "findings": [
+        "Three implementations: TaskRow .tk-chip (To do / Done / Late) and farrowing .state-word / .done-word (Active / Done)",
+        "\"To do\" is green on green-wash, but green means done/recorded; the README forbids filled badges"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "text": "Status is not what the product uses. Every state chip in the atlas is a filled badge built outside it: TaskRow .tk-chip (To do / Done / Late on piglet-processing.pen-list) and farrowing .state-word / .done-word (Active / Done on farrowing.room). The README says \"never a filled badge\".",
+      "fix": "Decide one face. Either add a \"chip\" variant to Status (filled wash, 10px/600, 20px tall) and have TaskRow and farrowing call SentriUI.status({ variant: \"chip\" }), or move those screens to the dot-word. Do not keep both."
+    },
+    {
+      "severity": "high",
+      "text": "\"To do\" is drawn green (rgb 39,102,64 on green-wash) on the pen list, so pens not yet done wear the \"done\" colour, while \"Done\" is grey.",
+      "fix": "Map To do to muted (or amber when due now), Done to green, Late to amber, through Status tones rather than per-feature CSS."
+    },
+    {
+      "severity": "medium",
+      "text": "Health tags (Thin, Fever, Arthritis) do a different job: they name a recorded condition with a care level, not a workflow state. They are .recorded-tag pills with their own amber/orange tones.",
+      "fix": "Keep them out of Status; give them their own component (ConditionTag) with care-level tones, and link it from Status's Related list."
+    },
+    {
+      "severity": "medium",
+      "text": "Status-line look-alikes are hand-built: TaskDay's mono \"late\" (.tk-tone) and farrowing's \"Overdue · 3 days\" row text.",
+      "fix": "Render them with SentriUI.statusLine([...], { mono: true }) so the tone rule (colour on the value, word in ink) holds."
+    },
+    {
+      "severity": "low",
+      "text": "\"Due tomorrow\" on farrowing rows is a forecast in muted 14/500 with no dot. It is fine as text, but the README does not say a forecast is not a Status.",
+      "fix": "Add one line: forecasts (\"Due tomorrow\", \"Expected in 5 days\") are row text, not a Status word."
+    },
+    {
+      "severity": "low",
+      "text": "No word-length cap or zh example; raw 4px separator margin.",
+      "fix": "Cap the word length, add a zh example, and tokenise the separator margin."
+    }
+  ],
+  "proposals": [
+    {
+      "kind": "new-variant",
+      "name": "Status · chip (filled)",
+      "why": "The filled state chip is the de-facto Status on four screens, with three implementations",
+      "seenIn": [
+        "piglet-processing.pen-list",
+        "farrowing.room",
+        "farrowing.count"
+      ]
+    },
+    {
+      "kind": "new-component",
+      "name": "ConditionTag (health tag)",
+      "why": "Thin / Fever / Arthritis label a recorded condition with a care level, a different job from a workflow state",
+      "seenIn": [
+        "health-record.mixed",
+        "pig-profile.full",
+        "inspection.walk"
+      ]
+    }
+  ]
+}

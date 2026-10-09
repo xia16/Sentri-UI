@@ -34,12 +34,12 @@ function render() {
 }
 
 /* ---------- pan and zoom, shared by the board and the flow. A drag never clicks or selects. ---------- */
-function panzoom(wrap, plane, fitFn) {
+function panzoom(wrap, plane, fitFn, opts = {}) {
   const t = { x: 0, y: 0, k: 1 }, MIN = 0.25, MAX = 1.8;
   const apply = () => { plane.style.transform = `translate(${t.x}px,${t.y}px) scale(${t.k})`; };
   let start = null;
   wrap.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0 || e.target.closest('.zoom')) return;
+    if (e.button !== 0 || e.target.closest('.zoom, .edgechip')) return;
     e.preventDefault(); start = { x: e.clientX, y: e.clientY, tx: t.x, ty: t.y, id: e.pointerId }; wrap.dataset.moved = '';
   });
   wrap.addEventListener('pointermove', (e) => {
@@ -52,6 +52,12 @@ function panzoom(wrap, plane, fitFn) {
   wrap.addEventListener('pointerup', end); wrap.addEventListener('pointercancel', end);
   wrap.addEventListener('wheel', (e) => {
     e.preventDefault();
+    if (opts.scroll && !(e.ctrlKey || e.metaKey)) { // a plain wheel scrolls; ctrl/cmd + wheel zooms
+      const sz = opts.size(), r = wrap.getBoundingClientRect(), pad = 14;
+      t.y = Math.max(Math.min(pad, r.height - sz.height * t.k), Math.min(pad, t.y - e.deltaY));
+      if (sz.width * t.k > r.width - 2 * pad) t.x = Math.max(r.width - sz.width * t.k - pad, Math.min(pad, t.x - e.deltaX));
+      apply(); return;
+    }
     const k = Math.min(MAX, Math.max(MIN, t.k * Math.exp(-e.deltaY * 0.0015)));
     const r = wrap.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
     t.x = mx - (mx - t.x) * (k / t.k); t.y = my - (my - t.y) * (k / t.k); t.k = k; apply();
@@ -65,7 +71,7 @@ function panzoom(wrap, plane, fitFn) {
     if (b.left < r.left + m) dx = r.left + m - b.left; else if (b.right > r.right - m) dx = r.right - m - b.right;
     if (b.top < r.top + m) dy = r.top + m - b.top; else if (b.bottom > r.bottom - m) dy = r.bottom - m - b.bottom;
     t.x += dx; t.y += dy; apply(); };
-  return { fit, step, reveal, state: t };
+  return { fit, step, reveal, pan: (dx, dy) => { t.x += dx; t.y += dy; apply(); }, state: t };
 }
 /* scale that fits a (w x h) drawing into a wrapper, centred */
 function fitTo(wrap, w, h, maxK = 1, pad = 24, minK = 0.25) {
@@ -114,6 +120,22 @@ function md(src, opts = {}) {
 }
 
 /* ---------- board ---------- */
+const FEATURE_ICON = { farrowing: 'farrow', 'farrowing-record': 'record', 'piglet-processing': 'spark', inspection: 'monitor', 'pig-list': 'grid', 'pig-profile': 'profile', disease: 'alert', 'health-record': 'health', prescriptions: 'treat', triage: 'hospital', treat: 'treat', 'report-death': 'alert', abortion: 'alert', 'feed-plan': 'feed', 'data-sync': 'upload', sampling: 'details', environment: 'temperature', workbench: 'home', breeding: 'heat', 'heat-check': 'heat', heat: 'heat', pregnancy: 'pregnancy', 'return-heat': 'return', 'post-farrowing': 'farrow', weaning: 'calendar', wean: 'calendar', weight: 'weight', backfat: 'chart', temperature: 'temperature', move: 'transfer', missing: 'place', 'keep-breeding': 'bookmark', 'unexpected-pregnancy': 'pregnancy', fostering: 'link', 'end-finishing': 'check', 'end-nursery': 'check' };
+const hasPrd = (f) => !!(f.prd && f.prd.trim() && !/not designed yet/i.test(f.prd));
+function renderPattern(sec, pt) {
+  const main = document.getElementById('main'); main.innerHTML = '';
+  header(`<a href="#" id="pat-back">${esc(sec.name)}</a> / <b>${esc(pt.name)}</b> <span class="zh">Pattern</span>`);
+  document.getElementById('pat-back').onclick = (e) => { e.preventDefault(); render(); };
+  const idx = screenIndex(), page = el(`<div class="patternpage"><h2>${esc(pt.name)}</h2>${pt.note ? `<p class="muted">${esc(pt.note)}</p>` : ''}<div class="phones"></div></div>`);
+  const row = page.querySelector('.phones');
+  (pt.screens || []).forEach((id) => {
+    const s = idx[id]; if (!s) return;
+    const cell = el(`<figure><figcaption>${dot(s.status)}<a href="#">${esc(s.feature.name)} · ${esc(s.name)}</a></figcaption></figure>`);
+    cell.querySelector('a').onclick = (e) => { e.preventDefault(); openFeature(s.feature.id, s.id); };
+    cell.append(shot(s, { height: 640 })); row.append(cell);
+  });
+  main.append(page);
+}
 function renderBoard() {
   const main = document.getElementById('main'); main.innerHTML = '';
   const pl = platform();
@@ -122,11 +144,12 @@ function renderBoard() {
   const plane = board.querySelector('.plane'); main.append(board);
   let x = 40, y = 40, rowH = 0, maxX = 0; const ROW = 1500;
   pl.sections.forEach((s) => {
-    const r = el(`<section class="region"><h2 ${s.shared ? `title="${esc(s.shared)}"` : ''}>${esc(s.name)} <small>${esc(s.zh)}</small></h2><div class="cards"></div></section>`);
+    const r = el(`<section class="region"><h2 ${s.shared ? `title="${esc(s.shared)}"` : ''}>${esc(s.name)} <small>${esc(s.zh)}</small></h2>${(s.patterns || []).length ? `<div class="patterns">Patterns ${(s.patterns || []).map((p, i) => `<button data-p="${i}">${esc(p.name)}</button>`).join('')}</div>` : ''}<div class="cards"></div></section>`);
+    r.querySelectorAll('[data-p]').forEach((b) => { b.onclick = (e) => { e.stopPropagation(); renderPattern(s, s.patterns[+b.dataset.p]); }; });
     r.querySelector('.cards').style.gridTemplateColumns = `repeat(${Math.min(3, s.features.length)}, 200px)`;
     s.features.forEach((f) => {
       const n = f.screens.length, ph = f.screens.filter((z) => z.status === 'placeholder').length;
-      const c = el(`<button class="card ${f.status === 'placeholder' ? 'placeholder' : ''}"><div class="name">${dot(f.status)}${esc(f.name)}</div><div class="zh">${esc(f.zh || '')}</div><div class="size">${plural(n, 'screen')}${ph && ph < n ? ` · ${ph} placeholder` : ''}</div></button>`);
+      const c = el(`<button class="card ${f.status === 'placeholder' ? 'placeholder' : ''}"><div class="name">${dot(f.status)}<span class="ico" data-i="${esc(FEATURE_ICON[f.id] || '')}"></span>${esc(f.name)}</div><div class="zh">${esc(f.zh || '')}</div><div class="size">${plural(n, 'screen')}${ph && ph < n ? ` · ${ph} placeholder` : ''}${hasPrd(f) ? '<span class="prdtag">PRD</span>' : ''}</div></button>`);
       c.onclick = () => openFeature(f.id); r.querySelector('.cards').append(c);
     });
     plane.append(r);
@@ -134,6 +157,7 @@ function renderBoard() {
     if (x > 40 && x + rw > ROW) { x = 40; y += rowH + 32; rowH = 0; }
     r.style.left = x + 'px'; r.style.top = y + 'px'; x += rw + 32; rowH = Math.max(rowH, rh); maxX = Math.max(maxX, x);
   });
+  loadIconPaths().then((paths) => plane.querySelectorAll('.ico').forEach((n) => { const p = paths[n.dataset.i]; n.innerHTML = p ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="${esc(p)}"/></svg>` : '<i class="neutral"></i>'; }));
   const W = maxX + 8, H = y + rowH + 40;
   const pz = panzoom(board, plane, () => { const t = fitTo(board, W, H, 1, 0, 0.9); return { k: t.k, x: 0, y: 0 }; });
   board.querySelectorAll('[data-z]').forEach((b) => { b.onclick = () => { const z = +b.dataset.z; z ? pz.step(z > 0 ? 1.2 : 1 / 1.2) : pz.fit(); }; });

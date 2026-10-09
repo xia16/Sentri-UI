@@ -42,7 +42,12 @@ for (const f of features) {
     if (!STATUSES.includes(s.status)) problems.push(`${where}: ${s.id} has status "${s.status}"`);
     if (s.status === 'placeholder' && s.url) problems.push(`${where}: ${s.id} is a placeholder with a url`);
     if (s.status !== 'placeholder' && !s.url) problems.push(`${where}: ${s.id} is ${s.status} but has no url`);
+    if (s.steps && (!Array.isArray(s.steps) || !s.steps.every((t) => typeof t === 'string' || (t && typeof t.tap === 'string')))) problems.push(`${where}: ${s.id} steps must be a list of strings or { tap, hold }`);
+    if (s.steps && !s.url) problems.push(`${where}: ${s.id} has steps but no url`);
     if (!s.id.startsWith(f.id + '.')) problems.push(`${where}: ${s.id} does not start with "${f.id}."`);
+    for (const e of s.notes?.elements || []) {
+      if (!(e.states?.length || e.logic || e.rule)) problems.push(`${where}: ${s.id} element "${e.name}" has no states, logic or rule — the demo shows it; drop it (SCHEMA.md, screen notes)`);
+    }
   }
   // each screen sits in exactly one place of the layout
   const placed = [];
@@ -81,6 +86,33 @@ if (problems.length) {
   process.exit(1);
 }
 
+// components: the mobile design system's parts (group, status from the gate result), plus the proposed ones not built yet
+const GROUPS = [
+  ['Base', ['Button', 'IconButton', 'Icon', 'Heading', 'Row', 'Panel', 'Facts', 'Log', 'Sheet', 'Segment', 'ChoiceList', 'CategoryFooter']],
+  ['Fields', ['Field', 'PickerField', 'Stepper', 'Measure', 'Numpad']],
+  ['Status and feedback', ['Status', 'Banner', 'Photos']],
+  ['Task skeleton', ['TaskPhone', 'TaskHeader', 'TaskSummary', 'TaskLens', 'TaskGroup', 'TaskRow', 'TaskDock', 'TaskSheet', 'TaskHold', 'TaskTotals', 'TaskProgress', 'TaskStepper', 'TaskPhotos', 'TaskChoice', 'TaskRadios', 'TaskWarning', 'TaskTable', 'TaskMetrics', 'TaskSection', 'TaskReceipt', 'TaskDay', 'TaskPage', 'TaskDialog', 'TaskChips']],
+];
+const components = [];
+for (const [group, names] of GROUPS) for (const name of names) {
+  const gp = join(root, 'ux/design-system/components', name, 'gate.json');
+  let gate = null;
+  if (existsSync(gp)) { try { gate = JSON.parse(readFileSync(gp, 'utf8')); } catch (e) { problems.push(`components/${name}/gate.json: ${e.message}`); } }
+  if (gate && !['in-design', 'agent-checked', 'approved'].includes(gate.status)) problems.push(`components/${name}/gate.json: status "${gate.status}"`);
+  components.push({ name, group, status: gate?.status || 'in-design', gate });
+}
+const proposedPath = join(root, 'ux/design-system/components/_proposed.json');
+if (existsSync(proposedPath)) for (const c of read('ux/design-system/components/_proposed.json')) {
+  for (const id of c.seenIn || []) if (!owner[id]) problems.push(`components/_proposed.json: ${c.name} is seen in ${id}, which no feature has`);
+  components.push({ name: c.name, group: c.group, status: 'placeholder', seenIn: c.seenIn || [], note: c.note || '' });
+}
+for (const p of sections.platforms) for (const s of p.sections) for (const pt of s.patterns || []) for (const id of pt.screens || []) if (!owner[id]) problems.push(`sections.json: pattern "${pt.name}" names ${id}, which no feature has`);
+
+if (problems.length) {
+  console.error(`atlas: ${problems.length} problem(s), atlas.json not written:\n  - ` + problems.join('\n  - '));
+  process.exit(1);
+}
+
 let commit = '';
 try { commit = execSync('git rev-parse --short HEAD', { cwd: root }).toString().trim(); } catch {}
 const atlas = {
@@ -90,6 +122,7 @@ const atlas = {
     id: p.id, name: p.name,
     sections: p.sections.map((s) => ({ ...s, features: features.filter((f) => f.platform === p.id && f.section === s.id).map((f) => ({ ...f, status: statusOf(f) })) })),
   })),
+  components,
   oldUi,
 };
 const counts = features.reduce((c, f) => ((c[statusOf(f)] = (c[statusOf(f)] || 0) + 1), c), {});
