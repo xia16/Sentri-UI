@@ -228,18 +228,6 @@
   "source": "sweep"
  },
  {
-  "id": "home-and-placeholders-16",
-  "target": {
-   "kind": "screen",
-   "id": "workbench.unit"
-  },
-  "kind": "design",
-  "severity": "low",
-  "title": "Unit hub 'Checked Yesterday' drops who and when",
-  "detail": "The strip keeps only the first segment of the check stamp; the direction doc asks for last-check time.",
-  "source": "notes"
- },
- {
   "id": "home-and-placeholders-17",
   "target": {
    "kind": "screen",
@@ -309,18 +297,6 @@
   "severity": "medium",
   "title": "'Task types ready' counts waiting tasks as ready",
   "detail": "The chooser says '2 task types ready' when tasks may only be waiting; the unit sheet's '2 tasks' counts unrecorded rows, not due work. Farrowing also reads 19 pigs here but 18 sows on its Overview.",
-  "source": "notes"
- },
- {
-  "id": "home-and-placeholders-23",
-  "target": {
-   "kind": "screen",
-   "id": "workbench.choose-unit"
-  },
-  "kind": "design",
-  "severity": "low",
-  "title": "Current unit row has no tint or check",
-  "detail": "The direction doc asks for a tint and check; the code only sets aria-current, so a worker cannot see which unit is chosen.",
   "source": "notes"
  },
  {

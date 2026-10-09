@@ -1,0 +1,265 @@
+[
+ {
+  "id": "screens-c-1",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.production-task"
+  },
+  "kind": "broken",
+  "severity": "high",
+  "title": "Pregnancy outcomes unstyled; the chosen outcome is invisible",
+  "detail": "Each outcome runs title into description, a tick sits under every option, and tapping Not in pig changes nothing visible before Save and complete enables. A mis-tap removes the sow from her batch unseen. Fix: render the outcomes with ChoiceList (radio) so one selected state shows.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-2",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.treatment"
+  },
+  "kind": "broken",
+  "severity": "high",
+  "title": "Treatment form trapped in a 260px scroll box",
+  "detail": "The page's body scroller is 260px tall inside a full-height page: Dose and Unit are cut off at y=380, the lower half is empty, and the hint line floats mid-page. Fix: let the sheet body fill the space down to the footer.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-3",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.condition-picker"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Fever is not in the condition catalogue",
+  "detail": "Searching 'fever' finds only swine fever diseases; recording a fever needs Add, then a category (five taps). Seeded 'Poor appetite' is 'Reduced appetite' in the catalogue, so seeded findings match no catalogue item.",
+  "options": [
+   "Add Fever as a symptom under General appearance and rename seeds to catalogue names",
+   "Keep the catalogue; change the seeds to existing items",
+   "Treat fever as a temperature reading, not a symptom"
+  ],
+  "recommendation": "Add Fever under General appearance and make seed names match the catalogue.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-4",
+  "target": {
+   "kind": "feature",
+   "id": "health-record"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Required-fields hint sits at the screen edge, outside the gutter",
+  "detail": "'Complete the required fields first' starts at x=0 on Record health, Care instructions, Resolve conditions, Treatment, weight, body condition, note, miscarriage, batch membership. On Record weight it stays after Save enables. Fix: the Button waiting status line inside the footer gutter, naming the missing field, gone once valid.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-5",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.tasks"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Current tasks scroll sideways; the second task is hidden",
+  "detail": "With 2 tasks (000254, 000306) the second card is a sliver past the right edge; only '2 tasks' hints it exists, so a gloved worker misses it. Fix: stack task rows vertically; they are few.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-6",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.many"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Ongoing conditions on the record cannot be opened",
+  "detail": "Arthritis, Lameness, Coughing are plain text in the General details Health fact; nothing opens their finding to edit, treat or resolve, though the flow says 'tap the Arthritis tag'. Fix: list ongoing conditions as rows under the attention rows, each opening its finding.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-7",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.empty"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Next task says Pregnancy check while Vaccination is due today",
+  "detail": "On 000306 Sow cycle's Next task reads 'Pregnancy check · in 1 day' while Current tasks leads with Vaccination due today. 'Next' counts only production tasks, so it contradicts the card above. Fix: drop Next task (Current tasks already shows it) or say what it counts.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-8",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.pen-log"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Date filter box is 90px tall and unlabelled beside Activity",
+  "detail": "The 'All dates' trigger measures 186x90 with no label, next to the labelled 160x48 Activity picker; the row is misaligned. Same on pig-profile.log. Fix: use the PickerField trigger with a 'Dates' label at field height.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-9",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.condition-picker"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Pickers hand-build their footer: wrong Back, 12px bottom, 'Done · 0'",
+  "detail": "Select conditions and Select medicine use two equal 168px buttons, Back without chevron, 12px bottom padding (law: 86px Back, 28px bottom) and 'Done · 0' (counts only from 2). Fix: use the Sheet footer; Done shows a count from 2.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-10",
+  "target": {
+   "kind": "feature",
+   "id": "inspection"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "No Chinese: inspection, pig and health copy is hard-coded English",
+  "detail": "The inspection prototype (also pig-profile and health-record) has no zh strings or language switch, so Chinese fit cannot be checked and verbs bypass ux/laws/strings.json. Piglet processing already does this. Fix: route copy through the strings registry with zh.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-11",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.record-health"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Form fields boxed in a tinted card, with the Note box inside",
+  "detail": "Record health, Care instructions, Resolve conditions, Treatment and the measure, body and note forms wrap fields in a bordered inset card, with the Note row a second tinted box inside it. Edit finding and Pen note have no wrapper. Fix: drop the wrapper; fields sit on the drawer.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-12",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.measure"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Weight entry is a native number box, not the Numpad",
+  "detail": "Record weight, temperature and backfat use a browser number input with tiny spinner arrows and the phone keyboard, while the Numpad component exists for weights. Fix: use the compact Numpad with the unit on the field.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-13",
+  "target": {
+   "kind": "feature",
+   "id": "pig-profile"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "Is 'Save' an allowed verb? README bans it, strings.json defines it",
+  "detail": "The DS README says never 'Save' or 'Complete'; strings.json defines Save. Forms say Save, Save note, Save changes, Save outcome and 'Save and complete' (Complete is banned).",
+  "options": [
+   "Save is allowed for staged drafts (strings.json wins); drop 'and complete'",
+   "Name the act on every button (Record weight, Record outcome, Update note)"
+  ],
+  "recommendation": "Name the act (Record outcome, Record weight); keep Save only for edits of a posted record.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-14",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.actions"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Measurements row text truncates; two rows use a chevron as icon",
+  "detail": "'Body condition, weight, temperature and back…' ends in an ellipsis, and Measurements & condition and Record backfat show a bare › as their icon tile. Fix: shorter description ('Weight, backfat, temperature, body') and real glyphs.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-15",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.go-to-pen"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "20 of 24 pen tiles say 'Not in unit'",
+  "detail": "The pen map repeats 'Not in unit' on every greyed tile, burying the four live pens; the caption 'Pen layout · only pens…' is hidden under the footer. Fix: leave non-unit tiles blank and pad the caption above the footer.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-16",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.find-pig"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Sample-tag button touches the field label; result tags not mono",
+  "detail": "'Try sample tag 000306' ends at y=392 where the 'Ear tag or pen' label starts: no gap. Results set ear tags in Plus Jakarta while the walk uses mono. Fix: section gap above the label; identifier type for tags.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-17",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.full"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Pig record title sets the ear tag in sans, not mono",
+  "detail": "The record heading '000267' renders in Plus Jakarta Sans; the walk and selected sheet set the same tag in IBM Plex Mono. Law: IDs are set in mono. Fix: identifier type on the title.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-18",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.tasks"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Task type shown as filled badges",
+  "detail": "Task cards carry filled 'Health' (amber wash) and 'Production' (grey) pills. Law: status words are coloured text with a dot, never filled badges; amber means due now. Fix: drop the pill; the icon tile already marks type.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-19",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.condition-picker"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Picker hides the pig: walk shows behind, no subject line",
+  "detail": "Opened from 000267's Record health, Select conditions shows the Inspection walk behind it and has no subtitle, so the worker loses which pig they are recording. Fix: keep the form behind and add '000267 · C1' under the title.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-20",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.unavailable-actions"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Blocked actions keep chevrons and read as doors",
+  "detail": "Resolve conditions and Care instructions show a › and row press though they open nothing. Fix: drop the chevron; keep the reason line.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-c-21",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.pen"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Pen note stamp uses full name, not initials",
+  "detail": "The note card reads 'G. Hansen · today · 06:40'. Law: people are initials on records (G.H), full name only on a check-in stamp; the pen log shows the same note as G.H. Fix: '06:40 · G.H'.",
+  "source": "screen-review"
+ }
+]

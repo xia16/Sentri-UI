@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T19:25:43.802Z",
- "commit": "105662c",
+ "generated": "2026-10-09T19:36:38.278Z",
+ "commit": "2991a72",
  "platforms": [
   {
    "id": "mobile",
@@ -16556,18 +16556,6 @@
   {
    "severity": "low",
    "source": "notes",
-   "id": "home-and-placeholders-16",
-   "target": {
-    "kind": "screen",
-    "id": "workbench.unit"
-   },
-   "kind": "design",
-   "title": "Unit hub 'Checked Yesterday' drops who and when",
-   "detail": "The strip keeps only the first segment of the check stamp; the direction doc asks for last-check time."
-  },
-  {
-   "severity": "low",
-   "source": "notes",
    "id": "home-and-placeholders-17",
    "target": {
     "kind": "screen",
@@ -16636,18 +16624,6 @@
    "kind": "design",
    "title": "'Task types ready' counts waiting tasks as ready",
    "detail": "The chooser says '2 task types ready' when tasks may only be waiting; the unit sheet's '2 tasks' counts unrecorded rows, not due work. Farrowing also reads 19 pigs here but 18 sows on its Overview."
-  },
-  {
-   "severity": "low",
-   "source": "notes",
-   "id": "home-and-placeholders-23",
-   "target": {
-    "kind": "screen",
-    "id": "workbench.choose-unit"
-   },
-   "kind": "design",
-   "title": "Current unit row has no tint or check",
-   "detail": "The direction doc asks for a tint and check; the code only sets aria-current, so a worker cannot see which unit is chosen."
   },
   {
    "severity": "low",
@@ -17321,30 +17297,6 @@
    "kind": "broken",
    "title": "Sow 000306 reads 'Gestation · 40 days' here, '—' on the walk",
    "detail": "The record header shows 40 days, but the walk and pig-profile.empty show 'Gestation · —' (no stage start). Same pig, two stage readings."
-  },
-  {
-   "severity": "low",
-   "source": "sweep",
-   "id": "inspection-group-9",
-   "target": {
-    "kind": "screen",
-    "id": "health-record.ongoing"
-   },
-   "kind": "broken",
-   "title": "Sow 000281 has different age and breed on two health screens",
-   "detail": "health-record.ongoing shows 1080 days and breed '—'; health-record.many shows 1280 days and Yorkshire. Same ear tag, conflicting data."
-  },
-  {
-   "severity": "low",
-   "source": "sweep",
-   "id": "inspection-group-10",
-   "target": {
-    "kind": "screen",
-    "id": "pig-profile.production-task"
-   },
-   "kind": "broken",
-   "title": "Last outcome card is clipped at the sheet edge",
-   "detail": "Recheck later is cut off at the bottom of the outcome list, with its border and radius cropped before the Note field."
   },
   {
    "severity": "medium",
@@ -18051,18 +18003,6 @@
   {
    "severity": "medium",
    "source": "notes",
-   "id": "inspection-group-56",
-   "target": {
-    "kind": "screen",
-    "id": "health-record.many"
-   },
-   "kind": "design",
-   "title": "Sideways scrolling hides the oldest ongoing conditions",
-   "detail": "Lameness and Coughing are cut off in a scrolling row; the longest-running conditions are the least visible."
-  },
-  {
-   "severity": "medium",
-   "source": "notes",
    "id": "inspection-group-57",
    "target": {
     "kind": "screen",
@@ -18095,18 +18035,6 @@
    "kind": "design",
    "title": "Log wording differs: 'Record corrected' vs 'Finding entered in error'",
    "detail": "Bulk and single forms log the same outcome with two phrases. One wording per outcome."
-  },
-  {
-   "severity": "low",
-   "source": "notes",
-   "id": "inspection-group-60",
-   "target": {
-    "kind": "screen",
-    "id": "health-record.record-health"
-   },
-   "kind": "design",
-   "title": "Save reads 'Save · 0 pigs' while disabled",
-   "detail": "A disabled button should say Save, not a count of zero."
   },
   {
    "severity": "low",
@@ -18541,6 +18469,777 @@
    "detail": "Thirteen placeholder screens render the plain walk, with no note saying who removes or draws them. A developer may build them from the notes."
   },
   {
+   "severity": "high",
+   "source": "screen-review",
+   "id": "screens-a-1",
+   "target": {
+    "kind": "screen",
+    "id": "farrowing.before"
+   },
+   "kind": "broken",
+   "title": "Sheets collapse whenever a waiting reason line shows",
+   "detail": "Before first count, Edit record (both), Lock blocked and End task (active sows): the body clips mid-row, the hint overlaps Litter summary, tiles are cut, and the reason line sits flush at x=0. Fix: put the reason in the footer's status slot, not the scrolling body."
+  },
+  {
+   "severity": "high",
+   "source": "screen-review",
+   "id": "screens-a-2",
+   "target": {
+    "kind": "screen",
+    "id": "environment.report-issue"
+   },
+   "kind": "broken",
+   "title": "Report issue primary button label is invisible",
+   "detail": "'Save sample issue' computes ink text on ink fill, so the drawer's only commit reads as a blank black block. The form is hand-built (raw form, inputs, button.primary) instead of SentriUI Field and Button. Fix: build it from the DS parts."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-a-3",
+   "target": {
+    "kind": "screen",
+    "id": "farrowing.task-blocked"
+   },
+   "kind": "broken",
+   "title": "Room dock shows through below the End task footer",
+   "detail": "On all four End task pages the room's dark Scan pill, search button and a second handle bar show beneath the footer, in the live demo too. Fix: the page must cover the dock, with its footer on the phone's bottom edge."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-a-4",
+   "target": {
+    "kind": "screen",
+    "id": "workbench.unit"
+   },
+   "kind": "broken",
+   "title": "Unit hub figures disagree with the Inspection page they open",
+   "detail": "Gestation Unit 7 hub says 'Checked Yesterday, 16:10' and Health 3; tapping it opens Inspection with 'Last check-in 06:40 · G. Hansen' and Health 4. Fix: read both from one source."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-a-5",
+   "target": {
+    "kind": "screen",
+    "id": "workbench.today"
+   },
+   "kind": "broken",
+   "title": "Progress label says 'complete' over a 1 of 8 bar",
+   "detail": "Piglet processing reads 'All scheduled items complete · 1 / 8 pens' (work-due adds '4 litters with care due' above it); Breeding reads 'Service sequences complete · 1 / 8 sows'. Fix: name what the bar counts ('Pens done')."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-a-6",
+   "target": {
+    "kind": "screen",
+    "id": "farrowing.edit-finished"
+   },
+   "kind": "broken",
+   "title": "Atlas 'Edit record (finished litter)' shows the locked record",
+   "detail": "The step 'Edit' hits the room row's Edit behind the sheet, which reopens the same locked record, so the screenshot equals farrowing.locked. Fix: step '[data-action=\"edit\"].tool'."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-a-7",
+   "target": {
+    "kind": "feature",
+    "id": "workbench"
+   },
+   "kind": "design",
+   "title": "Home uses the banned verb Complete for ending tasks",
+   "detail": "'Review & complete task' opens 'Ready to complete … Complete the task', whose button says End task; closed cards read 'Completed', the receipt 'Task complete'. strings.json bans Complete: tasks are ended. Fix: 'End task', 'Ready to end', 'Ended · Today'."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-a-8",
+   "target": {
+    "kind": "screen",
+    "id": "farrowing.before"
+   },
+   "kind": "design",
+   "title": "Waiting reason is one generic sentence that fits nothing",
+   "detail": "Before first count, Edit record and the empty death drawer all say 'Complete the required fields first'; none has required fields, and 'Complete' is banned. Fix: say the one step that makes the button live ('Count the first piglet', 'Change a count to save', 'Add a death')."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-a-9",
+   "target": {
+    "kind": "feature",
+    "id": "environment"
+   },
+   "kind": "design",
+   "title": "Prototype disclaimers are written into the product copy",
+   "detail": "PREVIEW badges, 'Apply preview setting', 'Save sample issue', 'Issue resolved in this preview', 'Sample readings · …' sit inside the phone. As the spec, these become shipped strings. Fix: product verbs inside the phone; keep the demo disclaimer outside it."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-a-10",
+   "target": {
+    "kind": "screen",
+    "id": "environment.fan-manual"
+   },
+   "kind": "design",
+   "title": "Fan speed is a thin slider, hard with gloves",
+   "detail": "A 0-100 range slider in steps of 5 needs a precise drag; it is not one of the DS fields. Fix: a Stepper (−/+ 5%, 48px keys) with the value in mono."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-a-11",
+   "target": {
+    "kind": "screen",
+    "id": "environment.fan-manual"
+   },
+   "kind": "broken",
+   "title": "Apply is drawn as plain text, not a button",
+   "detail": "'Apply preview setting' is a secondary with no border or fill, so it reads as a caption; live and waiting differ only by text tone. Fix: control-border secondary, or the ink primary, as it is the device's only commit."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-a-12",
+   "target": {
+    "kind": "screen",
+    "id": "farrowing.room"
+   },
+   "kind": "broken",
+   "title": "'Awaiting' lens label breaks mid-word below 390px",
+   "detail": "In the demo page at 390 and 360 viewports the phone is 344-360 wide and the lens reads 'Awaitin / g'. Fix: apply the Segments copy budget (drop counts first) or let the filter button shrink; never break a word."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-a-13",
+   "target": {
+    "kind": "feature",
+    "id": "farrowing"
+   },
+   "kind": "unclear",
+   "title": "No Chinese rendering, so zh fit cannot be checked",
+   "detail": "Farrowing, Home and Environment prototypes render English only; no lang switch exists, though strings.json holds zh. Long zh labels on lenses, tiles and hold captions are untested. Fix: a ?lang=zh switch on each prototype."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-a-14",
+   "target": {
+    "kind": "screen",
+    "id": "farrowing.task-receipt"
+   },
+   "kind": "decision",
+   "title": "Receipt has two exits and an off-format stamp",
+   "detail": "Footer holds 'Back' and 'Back to Today' (Home's tab is 'Home'); the stamp '10 Oct, 03:23 · G. Hansen' uses the device clock and a third date format beside 'Aug 27 at 08:12' and 'Thu, 8 Jul'.",
+   "options": [
+    "One exit 'Back', ruled stamp 'Oct 10 · 03:23 · G.H'",
+    "One exit 'Home', same stamp"
+   ],
+   "recommendation": "One exit 'Back' and the ruled stamp; the receipt is a dead end either way."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-a-15",
+   "target": {
+    "kind": "feature",
+    "id": "farrowing"
+   },
+   "kind": "decision",
+   "title": "Is End task red or ink?",
+   "detail": "The README says 'End task' is red-filled; farrowing's all-finished End task and Home's Ready to complete draw it ink, while End task early is red. One verb, two colours.",
+   "options": [
+    "Red for every task ending",
+    "Red only for End early; ink for a normal end (update README)"
+   ],
+   "recommendation": "Red only for End early: a normal end loses nothing; update the README line."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-a-16",
+   "target": {
+    "kind": "screen",
+    "id": "workbench.today"
+   },
+   "kind": "design",
+   "title": "Today's date is amber with no meaning",
+   "detail": "'Thu, 8 Jul' beside Today's work is amber on every Home view; amber means due now or waiting to upload. Fix: muted."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-a-17",
+   "target": {
+    "kind": "screen",
+    "id": "farrowing.overview"
+   },
+   "kind": "design",
+   "title": "Active is light green on the bar, blue on rows",
+   "detail": "Whole-task progress draws Active as pale green, but the row chip uses the progress blue; green means done. 'Current unit' under Unit 7 is 9px, below the 10px floor. Fix: progress colour for Active; meta size for the note."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-a-18",
+   "target": {
+    "kind": "screen",
+    "id": "workbench.today"
+   },
+   "kind": "design",
+   "title": "Home and Farrowing name the same states differently",
+   "detail": "Home's card says '2 sows farrowing' and 'Farrowings recorded 7 / 18'; one tap later the task says '2 active' and '7 / 18 Farrowed'. Fix: Home uses the task's words (Active, Farrowed)."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-a-19",
+   "target": {
+    "kind": "screen",
+    "id": "workbench.choose-unit"
+   },
+   "kind": "design",
+   "title": "A lone Back is drawn as the ink primary",
+   "detail": "Choose unit and the resolved issue drawer show a full-width ink 'Back' beside the head ✕. Ink fill is for the act; Back takes back-border. Fix: secondary Back, or the ✕ alone."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-a-20",
+   "target": {
+    "kind": "feature",
+    "id": "workbench"
+   },
+   "kind": "design",
+   "title": "Toolbox and Scan carry study links and demo text",
+   "detail": "Toolbox lists 'Shared component study ↗', 'Task card gallery ↗' and 'Records · Updates made in this preview'; Scan says 'Scanner preview… Use a sample tag'. Fix: move study links and disclaimers outside the phone."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-a-21",
+   "target": {
+    "kind": "screen",
+    "id": "farrowing.room"
+   },
+   "kind": "design",
+   "title": "Equipment faults reported from two doors under two names",
+   "detail": "The farrowing pen sheet offers 'Report equipment fault'; Environment offers 'Report issue' / 'Report equipment issue' for the same record. Fix: one noun ('issue') and one drawer, reached from both."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-a-22",
+   "target": {
+    "kind": "screen",
+    "id": "workbench.unit"
+   },
+   "kind": "design",
+   "title": "Environment strip units are 9px, below the floor",
+   "detail": "On the unit hub '°C', '%' and 'ppm NH₃' render at 9px; meta at 10px is the floor and units must always be readable. Fix: 10px or larger."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-a-23",
+   "target": {
+    "kind": "screen",
+    "id": "environment.page"
+   },
+   "kind": "design",
+   "title": "Temperature named twice above one value",
+   "detail": "The selected tab says Temperature and the card repeats 'Temperature' over 22.4 °C. Fix: drop the card label; the tab names it."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-a-24",
+   "target": {
+    "kind": "screen",
+    "id": "environment.issue-resolved"
+   },
+   "kind": "broken",
+   "title": "Resolve toast covers the issue's reporter line",
+   "detail": "After Mark resolved, the toast 'Issue resolved in this preview' sits over the evidence card, hiding 'G. Hansen · 06:40'. Fix: show the toast above the footer without covering content, or drop it since the status already reads Resolved."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-a-25",
+   "target": {
+    "kind": "screen",
+    "id": "workbench.end-task-early"
+   },
+   "kind": "design",
+   "title": "Hold caption differs from Farrowing's for the same act",
+   "detail": "Home's End task early button is captioned 'HOLD TO END'; Farrowing's is 'HOLD TO END EARLY'. Fix: one caption per verb from strings.json."
+  },
+  {
+   "severity": "high",
+   "source": "screen-review",
+   "id": "screens-b-1",
+   "target": {
+    "kind": "screen",
+    "id": "feed-plan.editor"
+   },
+   "kind": "broken",
+   "title": "Adjust feed hides its controls; Save can never be enabled",
+   "detail": "From Pen feeding, Adjust feed shows only the pig table. The Adjustment panel (mode, %, end date, note) sits below a 297px sheet body with overflow hidden; \"Complete the required fields first\" floats unpadded at the left edge. Fix: let the sheet body grow or scroll to the panel."
+  },
+  {
+   "severity": "high",
+   "source": "screen-review",
+   "id": "screens-b-2",
+   "target": {
+    "kind": "screen",
+    "id": "piglet-processing.chip-done"
+   },
+   "kind": "broken",
+   "title": "\"Edit\" on a done pen opens a sheet with nothing editable",
+   "detail": "A01's row trails \"Edit\" (verb: correct a posted record). Tapping it opens the pen sheet: \"Nothing left to do\", a disabled Record items, no correction. Fix: show the plain chevron until the correction decision (tasks-built-79) is made."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-b-3",
+   "target": {
+    "kind": "screen",
+    "id": "piglet-processing.sheet-todo"
+   },
+   "kind": "broken",
+   "title": "Chinese \"公猪·母猪\" calls piglets boars and sows",
+   "detail": "Boars · gilts reads 公猪·母猪 on the Piglets card and counts sheet; 母猪 is also the pen header's word for the sow (1头母猪). A farmer reads breeding boars and sows. Fix: 小公猪·小母猪 in strings.js."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-b-4",
+   "target": {
+    "kind": "feature",
+    "id": "feed-plan"
+   },
+   "kind": "broken",
+   "title": "Feed plan screens have no Chinese",
+   "detail": "inspection-astra-concept has no zh strings or language switch, so Pen feeding, Adjust feed and Feed plan are English-only and Chinese fit cannot be checked. Fix: move feed copy into the strings registry with zh."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-b-5",
+   "target": {
+    "kind": "feature",
+    "id": "piglet-processing"
+   },
+   "kind": "design",
+   "title": "Every drawer has both a header X and a footer Back",
+   "detail": "Pen sheet, fewer piglets, death, boars and gilts, weight, set count and More actions each show X and Back that do the same thing. Two controls, one act; the verbs give Back and Close different meanings. Fix: keep the footer Back only."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-b-6",
+   "target": {
+    "kind": "screen",
+    "id": "piglet-processing.move-piglets"
+   },
+   "kind": "design",
+   "title": "Move asks about treatments the pen record already answers",
+   "detail": "Moving from A03, where Dock tail is done for all 12, still asks \"Had tail docking? No / Yes\". Fix: ask only about treatments partly given in the source pen; fill the rest from the record."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-b-7",
+   "target": {
+    "kind": "screen",
+    "id": "piglet-processing.sheet-breeders"
+   },
+   "kind": "design",
+   "title": "\"Tagged 1 of 12\" on a breeders-only farm implies 11 owed",
+   "detail": "On a farm that tags breeders only, the Piglets card still reads Tagged 1 of 12 next to Breeders kept 1. The fraction suggests 11 untagged piglets. Fix: under the breeders scheme drop the Tagged fact; Breeders kept says it."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-b-8",
+   "target": {
+    "kind": "screen",
+    "id": "piglet-processing.sheet-todo"
+   },
+   "kind": "design",
+   "title": "Tag piglets is both a tool button and a day item",
+   "detail": "A03's sheet offers Tag piglets in the tool row and as the Day 3 item (\"Not filled · 0 of 12 tagged\"); both open the same list. Fix: show the tool only once the ID item is done or absent."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-b-9",
+   "target": {
+    "kind": "screen",
+    "id": "piglet-processing.end-task"
+   },
+   "kind": "design",
+   "title": "End task states \"9 not done\" three times",
+   "detail": "Summary says \"3 of 12 pens done\" and \"9 pens not done\"; the group header repeats \"Not done · 9 pens\". Fix: keep \"3 of 12 pens done\" and the group title; drop the other two counts."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-b-10",
+   "target": {
+    "kind": "screen",
+    "id": "feed-plan.pig"
+   },
+   "kind": "design",
+   "title": "Three phrasings for one pen-allocated feed state",
+   "detail": "Pen feeding row: \"Follow curve\"; pig Feed plan: \"Included in pen allocation\"; walk tag: \"Included in daily feed\". One state, three words. Fix: one string used on all three screens."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-b-11",
+   "target": {
+    "kind": "screen",
+    "id": "feed-plan.editor"
+   },
+   "kind": "design",
+   "title": "\"Unchanged\" filled badge on every row before any change",
+   "detail": "Each pig row shows Current → New with identical values and a filled \"Unchanged\" badge; the law says status words are coloured text with a dot, never filled badges. Fix: show New and its status only once a change exists."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-b-12",
+   "target": {
+    "kind": "screen",
+    "id": "feed-plan.adlib"
+   },
+   "kind": "design",
+   "title": "\"Ad-lib\" said twice in one card",
+   "detail": "The Grower 1 card shows Ad-lib as the meta on the right and again as the Daily feed value. Fix: drop the meta; the value says it."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-b-13",
+   "target": {
+    "kind": "screen",
+    "id": "piglet-processing.pen-log"
+   },
+   "kind": "design",
+   "title": "Dates appear in three formats across one pen",
+   "detail": "Pen log groups by weekday (Thu, Wed, Sun), day cards say \"Planned 10/08\", the list says \"10/09\" or a bare time. The worker cannot match a log line to a day card. Fix: one format, weekday plus date."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-b-14",
+   "target": {
+    "kind": "screen",
+    "id": "piglet-processing.pen-list"
+   },
+   "kind": "design",
+   "title": "Pen header and pen row are two doors to one sheet",
+   "detail": "Each pen is a group whose header (\"A02 · 1 sow ›\") and only row both open the same sheet: two targets, two chevrons per pen. Fix: one row per pen, carrying the pen code."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-b-15",
+   "target": {
+    "kind": "screen",
+    "id": "piglet-processing.give-ids"
+   },
+   "kind": "design",
+   "title": "Hint asks for a number that is already filled",
+   "detail": "The tag is prefilled (001217) yet the disabled reason reads \"Add the number and the sex\". Only sex is missing. Fix: the hint names only what is missing (\"Pick boar or gilt\")."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-b-16",
+   "target": {
+    "kind": "screen",
+    "id": "piglet-processing.adjust-count"
+   },
+   "kind": "decision",
+   "title": "\"Use 12\" is not a registered verb",
+   "detail": "The fewer-piglets sheet's primary reads \"Use N\"; strings.json has no Use, and nothing is recorded until the pen's Record. Which word?",
+   "options": [
+    "Register \"Use\" as stage-a-count",
+    "\"Tick 12\" (Tick: choose subjects, nothing recorded until Record)",
+    "\"Back\" carrying the count, no primary"
+   ],
+   "recommendation": "\"Tick 12\": an existing verb with exactly this meaning."
+  },
+  {
+   "severity": "high",
+   "source": "screen-review",
+   "id": "screens-c-1",
+   "target": {
+    "kind": "screen",
+    "id": "pig-profile.production-task"
+   },
+   "kind": "broken",
+   "title": "Pregnancy outcomes unstyled; the chosen outcome is invisible",
+   "detail": "Each outcome runs title into description, a tick sits under every option, and tapping Not in pig changes nothing visible before Save and complete enables. A mis-tap removes the sow from her batch unseen. Fix: render the outcomes with ChoiceList (radio) so one selected state shows."
+  },
+  {
+   "severity": "high",
+   "source": "screen-review",
+   "id": "screens-c-2",
+   "target": {
+    "kind": "screen",
+    "id": "health-record.treatment"
+   },
+   "kind": "broken",
+   "title": "Treatment form trapped in a 260px scroll box",
+   "detail": "The page's body scroller is 260px tall inside a full-height page: Dose and Unit are cut off at y=380, the lower half is empty, and the hint line floats mid-page. Fix: let the sheet body fill the space down to the footer."
+  },
+  {
+   "severity": "high",
+   "source": "screen-review",
+   "id": "screens-c-3",
+   "target": {
+    "kind": "screen",
+    "id": "health-record.condition-picker"
+   },
+   "kind": "decision",
+   "title": "Fever is not in the condition catalogue",
+   "detail": "Searching 'fever' finds only swine fever diseases; recording a fever needs Add, then a category (five taps). Seeded 'Poor appetite' is 'Reduced appetite' in the catalogue, so seeded findings match no catalogue item.",
+   "options": [
+    "Add Fever as a symptom under General appearance and rename seeds to catalogue names",
+    "Keep the catalogue; change the seeds to existing items",
+    "Treat fever as a temperature reading, not a symptom"
+   ],
+   "recommendation": "Add Fever under General appearance and make seed names match the catalogue."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-c-4",
+   "target": {
+    "kind": "feature",
+    "id": "health-record"
+   },
+   "kind": "broken",
+   "title": "Required-fields hint sits at the screen edge, outside the gutter",
+   "detail": "'Complete the required fields first' starts at x=0 on Record health, Care instructions, Resolve conditions, Treatment, weight, body condition, note, miscarriage, batch membership. On Record weight it stays after Save enables. Fix: the Button waiting status line inside the footer gutter, naming the missing field, gone once valid."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-c-5",
+   "target": {
+    "kind": "screen",
+    "id": "pig-profile.tasks"
+   },
+   "kind": "design",
+   "title": "Current tasks scroll sideways; the second task is hidden",
+   "detail": "With 2 tasks (000254, 000306) the second card is a sliver past the right edge; only '2 tasks' hints it exists, so a gloved worker misses it. Fix: stack task rows vertically; they are few."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-c-6",
+   "target": {
+    "kind": "screen",
+    "id": "health-record.many"
+   },
+   "kind": "broken",
+   "title": "Ongoing conditions on the record cannot be opened",
+   "detail": "Arthritis, Lameness, Coughing are plain text in the General details Health fact; nothing opens their finding to edit, treat or resolve, though the flow says 'tap the Arthritis tag'. Fix: list ongoing conditions as rows under the attention rows, each opening its finding."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-c-7",
+   "target": {
+    "kind": "screen",
+    "id": "pig-profile.empty"
+   },
+   "kind": "unclear",
+   "title": "Next task says Pregnancy check while Vaccination is due today",
+   "detail": "On 000306 Sow cycle's Next task reads 'Pregnancy check · in 1 day' while Current tasks leads with Vaccination due today. 'Next' counts only production tasks, so it contradicts the card above. Fix: drop Next task (Current tasks already shows it) or say what it counts."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-c-8",
+   "target": {
+    "kind": "screen",
+    "id": "inspection.pen-log"
+   },
+   "kind": "broken",
+   "title": "Date filter box is 90px tall and unlabelled beside Activity",
+   "detail": "The 'All dates' trigger measures 186x90 with no label, next to the labelled 160x48 Activity picker; the row is misaligned. Same on pig-profile.log. Fix: use the PickerField trigger with a 'Dates' label at field height."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-c-9",
+   "target": {
+    "kind": "screen",
+    "id": "health-record.condition-picker"
+   },
+   "kind": "design",
+   "title": "Pickers hand-build their footer: wrong Back, 12px bottom, 'Done · 0'",
+   "detail": "Select conditions and Select medicine use two equal 168px buttons, Back without chevron, 12px bottom padding (law: 86px Back, 28px bottom) and 'Done · 0' (counts only from 2). Fix: use the Sheet footer; Done shows a count from 2."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-c-10",
+   "target": {
+    "kind": "feature",
+    "id": "inspection"
+   },
+   "kind": "design",
+   "title": "No Chinese: inspection, pig and health copy is hard-coded English",
+   "detail": "The inspection prototype (also pig-profile and health-record) has no zh strings or language switch, so Chinese fit cannot be checked and verbs bypass ux/laws/strings.json. Piglet processing already does this. Fix: route copy through the strings registry with zh."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-c-11",
+   "target": {
+    "kind": "screen",
+    "id": "health-record.record-health"
+   },
+   "kind": "design",
+   "title": "Form fields boxed in a tinted card, with the Note box inside",
+   "detail": "Record health, Care instructions, Resolve conditions, Treatment and the measure, body and note forms wrap fields in a bordered inset card, with the Note row a second tinted box inside it. Edit finding and Pen note have no wrapper. Fix: drop the wrapper; fields sit on the drawer."
+  },
+  {
+   "severity": "medium",
+   "source": "screen-review",
+   "id": "screens-c-12",
+   "target": {
+    "kind": "screen",
+    "id": "pig-profile.measure"
+   },
+   "kind": "design",
+   "title": "Weight entry is a native number box, not the Numpad",
+   "detail": "Record weight, temperature and backfat use a browser number input with tiny spinner arrows and the phone keyboard, while the Numpad component exists for weights. Fix: use the compact Numpad with the unit on the field."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-c-13",
+   "target": {
+    "kind": "feature",
+    "id": "pig-profile"
+   },
+   "kind": "decision",
+   "title": "Is 'Save' an allowed verb? README bans it, strings.json defines it",
+   "detail": "The DS README says never 'Save' or 'Complete'; strings.json defines Save. Forms say Save, Save note, Save changes, Save outcome and 'Save and complete' (Complete is banned).",
+   "options": [
+    "Save is allowed for staged drafts (strings.json wins); drop 'and complete'",
+    "Name the act on every button (Record weight, Record outcome, Update note)"
+   ],
+   "recommendation": "Name the act (Record outcome, Record weight); keep Save only for edits of a posted record."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-c-14",
+   "target": {
+    "kind": "screen",
+    "id": "pig-profile.actions"
+   },
+   "kind": "design",
+   "title": "Measurements row text truncates; two rows use a chevron as icon",
+   "detail": "'Body condition, weight, temperature and back…' ends in an ellipsis, and Measurements & condition and Record backfat show a bare › as their icon tile. Fix: shorter description ('Weight, backfat, temperature, body') and real glyphs."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-c-15",
+   "target": {
+    "kind": "screen",
+    "id": "inspection.go-to-pen"
+   },
+   "kind": "design",
+   "title": "20 of 24 pen tiles say 'Not in unit'",
+   "detail": "The pen map repeats 'Not in unit' on every greyed tile, burying the four live pens; the caption 'Pen layout · only pens…' is hidden under the footer. Fix: leave non-unit tiles blank and pad the caption above the footer."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-c-16",
+   "target": {
+    "kind": "screen",
+    "id": "inspection.find-pig"
+   },
+   "kind": "broken",
+   "title": "Sample-tag button touches the field label; result tags not mono",
+   "detail": "'Try sample tag 000306' ends at y=392 where the 'Ear tag or pen' label starts: no gap. Results set ear tags in Plus Jakarta while the walk uses mono. Fix: section gap above the label; identifier type for tags."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-c-17",
+   "target": {
+    "kind": "screen",
+    "id": "pig-profile.full"
+   },
+   "kind": "design",
+   "title": "Pig record title sets the ear tag in sans, not mono",
+   "detail": "The record heading '000267' renders in Plus Jakarta Sans; the walk and selected sheet set the same tag in IBM Plex Mono. Law: IDs are set in mono. Fix: identifier type on the title."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-c-18",
+   "target": {
+    "kind": "screen",
+    "id": "pig-profile.tasks"
+   },
+   "kind": "design",
+   "title": "Task type shown as filled badges",
+   "detail": "Task cards carry filled 'Health' (amber wash) and 'Production' (grey) pills. Law: status words are coloured text with a dot, never filled badges; amber means due now. Fix: drop the pill; the icon tile already marks type."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-c-19",
+   "target": {
+    "kind": "screen",
+    "id": "health-record.condition-picker"
+   },
+   "kind": "design",
+   "title": "Picker hides the pig: walk shows behind, no subject line",
+   "detail": "Opened from 000267's Record health, Select conditions shows the Inspection walk behind it and has no subtitle, so the worker loses which pig they are recording. Fix: keep the form behind and add '000267 · C1' under the title."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-c-20",
+   "target": {
+    "kind": "screen",
+    "id": "pig-profile.unavailable-actions"
+   },
+   "kind": "design",
+   "title": "Blocked actions keep chevrons and read as doors",
+   "detail": "Resolve conditions and Care instructions show a › and row press though they open nothing. Fix: drop the chevron; keep the reason line."
+  },
+  {
+   "severity": "low",
+   "source": "screen-review",
+   "id": "screens-c-21",
+   "target": {
+    "kind": "screen",
+    "id": "inspection.pen"
+   },
+   "kind": "design",
+   "title": "Pen note stamp uses full name, not initials",
+   "detail": "The note card reads 'G. Hansen · today · 06:40'. Law: people are initials on records (G.H), full name only on a check-in stamp; the pen log shows the same note as G.H. Fix: '06:40 · G.H'."
+  },
+  {
    "severity": "medium",
    "source": "notes",
    "id": "tasks-built-1",
@@ -18659,30 +19358,6 @@
    "kind": "design",
    "title": "Unit card never shows its neutral Target state",
    "detail": "The prototype hard-codes the amber below-target flag, so the neutral state (figure meets target) is never drawn or testable."
-  },
-  {
-   "severity": "medium",
-   "source": "sweep",
-   "id": "tasks-built-10",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.room"
-   },
-   "kind": "design",
-   "title": "Row meta lines render at 9px, below the 10px floor",
-   "detail": "Core row facts (\"born 14 · 1h ago · G.H\", \"parity 5 · 11 born last\") and the Target line measure 9-9.5px. Owner exemptions cover only hold caption, table heading and dock caption, not row text. Hard to read in a barn."
-  },
-  {
-   "severity": "low",
-   "source": "sweep",
-   "id": "tasks-built-11",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.room"
-   },
-   "kind": "broken",
-   "title": "Farrowing page is a fixed 390px frame; scrolls sideways at 360px",
-   "detail": "At a 360px viewport the page width stays 390 (horizontal scroll). TaskPhone says the page fills the screen at phone width; farrowing's own .phone does not, unlike the piglet prototype."
   },
   {
    "severity": "medium",
@@ -19007,18 +19682,6 @@
    "detail": "Prototype pushes a separate \"Edit finish details\" page, the ruling expands the row. PRD also calls it \"At finish\", the screen \"Finish details\"."
   },
   {
-   "severity": "medium",
-   "source": "notes",
-   "id": "tasks-built-37",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.history"
-   },
-   "kind": "broken",
-   "title": "Log not newest-first; finish entry repeats \"Farrowing finished\"",
-   "detail": "Groups run \"5 days ago\", \"Aug 27\", \"Aug 26\" (mixed relative and absolute). The finish entry prints its title and detail identically, and every row repeats the hand's full name."
-  },
-  {
    "severity": "low",
    "source": "gate",
    "id": "tasks-built-38",
@@ -19085,18 +19748,6 @@
    "detail": "End review header and outcomes list 19 sows (e.g. Finished 18 + Sow deaths 1), but the overview denominator is 18. A sow that died after finishing is counted in Farrowed and again in Sow deaths."
   },
   {
-   "severity": "low",
-   "source": "notes",
-   "id": "tasks-built-43",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.task-blocked"
-   },
-   "kind": "design",
-   "title": "Primary button dimmed while disabled, no reason",
-   "detail": "The blocked End button is dim-as-disabled, with the reason only in cards above. Show the reason beside the button."
-  },
-  {
    "severity": "medium",
    "source": "notes",
    "id": "tasks-built-44",
@@ -19149,18 +19800,6 @@
    "kind": "design",
    "title": "Miscarriage and \"Not in pig\" entry forms are not designed",
    "detail": "Outcomes appear in counts, but the Record miscarriage, Mark not in pig and Edit litter record rows on the pig Actions sheet (in PRD scope) have no screen; atlas shows pig-profile addsTo as not added."
-  },
-  {
-   "severity": "medium",
-   "source": "sweep",
-   "id": "tasks-built-48",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.overview"
-   },
-   "kind": "design",
-   "title": "Red \"End task early\" outline only opens review, looks committing",
-   "detail": "On the overview the bar button is a red-washed outline that only opens the review; on the review the same words are a solid red hold. Two looks for one verb; a tap should not wear the danger colour."
   },
   {
    "severity": "low",
@@ -19470,23 +20109,6 @@
   },
   {
    "severity": "medium",
-   "source": "gate",
-   "id": "tasks-built-72",
-   "target": {
-    "kind": "screen",
-    "id": "piglet-processing.sheet-todo"
-   },
-   "kind": "decision",
-   "title": "Rename \"Submit\"? Verb rule bans it",
-   "detail": "Q11 bans Submit, Confirm and Complete; the sheet, PRD and strings use Submit. Gate flags it on Button. The button also reads greyed with no reason at 0 ticks.",
-   "options": [
-    "Record N items",
-    "Submit (as built; amend Q11)"
-   ],
-   "recommendation": "Record 2 items - matches Record in Q11 and counts what is saved."
-  },
-  {
-   "severity": "medium",
    "source": "notes",
    "id": "tasks-built-73",
    "target": {
@@ -19496,18 +20118,6 @@
    "kind": "design",
    "title": "Piglets card: four facts, four doors, plus a weigh nag",
    "detail": "Boars/gilts, Litter weight, Tagged and Breeders kept each open a different sheet, with a weigh hint above the tool row. Q18 says processing records weight \"only when missing, no nag\"."
-  },
-  {
-   "severity": "low",
-   "source": "notes",
-   "id": "tasks-built-74",
-   "target": {
-    "kind": "screen",
-    "id": "piglet-processing.sheet-todo"
-   },
-   "kind": "design",
-   "title": "Ticked count \"12 piglets\" reads as a value, not a button",
-   "detail": "After a tick the count to adjust is plain mono text. Make the control state obvious or move it to an explicit row action."
   },
   {
    "severity": "medium",
@@ -19659,18 +20269,6 @@
   },
   {
    "severity": "low",
-   "source": "gate",
-   "id": "tasks-built-85",
-   "target": {
-    "kind": "screen",
-    "id": "piglet-processing.give-ids"
-   },
-   "kind": "design",
-   "title": "Optional weight is a full field, not a collapsed row",
-   "detail": "Weight renders as a full 62px field; farrowing's optional facts are \"+ Litter weight\" rows."
-  },
-  {
-   "severity": "low",
    "source": "notes",
    "id": "tasks-built-86",
    "target": {
@@ -19753,18 +20351,6 @@
    "recommendation": "Use the farrowing dead drawer component by cause; picking tagged piglets is later."
   },
   {
-   "severity": "low",
-   "source": "gate",
-   "id": "tasks-built-92",
-   "target": {
-    "kind": "screen",
-    "id": "piglet-processing.record-death"
-   },
-   "kind": "design",
-   "title": "Dead sheet opens over the pen sheet: stacked drawers",
-   "detail": "Gate: a drawer stacked on a drawer, against one overlay at a time. Save also reads greyed with no reason."
-  },
-  {
    "severity": "medium",
    "source": "notes",
    "id": "tasks-built-93",
@@ -19823,18 +20409,6 @@
     "Supervisor must acknowledge at End"
    ],
    "recommendation": "Tap opens the pens whose counts came in lower; still non-blocking."
-  },
-  {
-   "severity": "medium",
-   "source": "notes",
-   "id": "tasks-built-97",
-   "target": {
-    "kind": "screen",
-    "id": "piglet-processing.pen-log"
-   },
-   "kind": "design",
-   "title": "Pen log writes one entry per piglet ID",
-   "detail": "Twelve \"ID 0012xx\" lines bury everything else. Group one act into one entry (\"12 IDs · 001201-001212\"). Gate raises the same issue; weight lines show no actor."
   },
   {
    "severity": "low",
