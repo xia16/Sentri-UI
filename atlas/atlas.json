@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T19:52:55.144Z",
- "commit": "2081f3c",
+ "generated": "2026-10-09T20:11:38.048Z",
+ "commit": "de7cc22",
  "platforms": [
   {
    "id": "mobile",
@@ -206,14 +206,17 @@
            "Only a ventilation fan exists; the concept names \"devices\" in general.",
            "unclear: alert thresholds, who is told when a reading is out of range, and where real data comes from; none are in the code."
           ]
-         }
+         },
+         "steps": [
+          "[data-action=\"environment\"]"
+         ]
         },
         {
          "id": "environment.fan-manual",
          "name": "Fan in Manual mode",
          "zh": "风机手动模式",
          "status": "in-design",
-         "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7&connection=online",
          "preset": "",
          "figma": "",
          "notes": {
@@ -254,7 +257,11 @@
           "issues": [
            "No confirmation or safety limit for speed 0; unclear whether 0% is allowed on a real fan."
           ]
-         }
+         },
+         "steps": [
+          "[data-action=\"environment\"]",
+          "[data-action=\"fan-mode\"][data-value=\"manual\"]"
+         ]
         },
         {
          "id": "environment.maintenance",
@@ -313,7 +320,11 @@
            "The path here is Toolbox, two taps from the unit; the unit screen's Maintenance chip does not link here.",
            "No photo, priority, assignee, or history of who resolved it."
           ]
-         }
+         },
+         "steps": [
+          "Toolbox",
+          "Maintenance"
+         ]
         },
         {
          "id": "environment.maintenance-empty",
@@ -353,7 +364,11 @@
           "edge": [],
           "rules": [],
           "issues": []
-         }
+         },
+         "steps": [
+          "Toolbox",
+          "Maintenance"
+         ]
         },
         {
          "id": "environment.report-issue",
@@ -385,7 +400,12 @@
           "issues": [
            "Equipment and location are free text; no list of the unit's devices or pens is offered."
           ]
-         }
+         },
+         "steps": [
+          "Toolbox",
+          "Maintenance",
+          "Report issue"
+         ]
         },
         {
          "id": "environment.issue-detail",
@@ -417,7 +437,12 @@
           "issues": [
            "Resolving needs no note and records no resolver or time."
           ]
-         }
+         },
+         "steps": [
+          "Toolbox",
+          "Maintenance",
+          "[data-action=\"fault-detail\"]"
+         ]
         },
         {
          "id": "environment.issue-resolved",
@@ -455,7 +480,13 @@
           "issues": [
            "Cannot reopen an issue."
           ]
-         }
+         },
+         "steps": [
+          "Toolbox",
+          "Maintenance",
+          "[data-action=\"fault-detail\"]",
+          "Mark resolved"
+         ]
         }
        ],
        "prd": "# Environment & devices 环境与设备\r\n\r\n## Problem\r\n\r\nA worker in a unit needs to see whether the room is right (temperature, humidity, ammonia), to set the ventilation fan, and to report and close equipment faults, without leaving the unit. The old UI has no such place; faults and sensors were scattered across Inspection.\r\n\r\n## Who\r\n\r\nFloor workers and supervisors responsible for a unit.\r\n\r\n## Anchor\r\n\r\nNone. Two groups: Sensors and devices; Maintenance. The only lifecycle is an issue: open, then resolved.\r\n\r\n## Rules\r\n\r\n- Environment lives at the unit, one tap from Home. Inspection no longer carries sensors, batch tracker or maintenance.\r\n- A sensor with no numeric reading is omitted, never shown as 0. A unit with neither readings nor devices has no entrance. A controllable device is independent of readings.\r\n- Readings: Temperature °C, Humidity %, Ammonia ppm NH₃, each with last-reading time, a Today or 7-day trend, low and high, and a reading-history table.\r\n- Fan: Auto (follows the unit schedule) or Manual with a speed 0-100 in steps of 5; an explicit Apply; everything disabled offline with \"Reconnect to change device settings.\"\r\n- Maintenance is unit-scoped: open-issue count; Report issue (equipment, location in the unit, note, all required); issue detail with Mark resolved. The open count feeds the Maintenance chip on the unit hub.\r\n- All data is sample; no command is sent to equipment (PREVIEW badges).\r\n\r\n## Scope\r\n\r\nIn: sensors, fan, maintenance list, report and resolve.\r\n\r\nOut: real sensor feeds, alerts and thresholds, photos or assignees on issues, devices other than the fan, cross-unit views.\r\n\r\n## Decisions\r\n\r\n- Decided (ASTRA-HOME-DIRECTION): environment and maintenance belong to unit Home; Inspection does not repeat them.\r\n- Open: alert thresholds and who is told; whether the Maintenance chip should link to the list (today it is reached only through Toolbox); whether issues get priority, photo, assignee and a resolver stamp; which other devices are controllable; whether Farrowing and Breeding units get an entrance (the sample has none).\r\n",
@@ -3671,7 +3702,7 @@
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "locked",
          "steps": [
-          "Edit"
+          "[data-action=\"edit\"].tool"
          ],
          "figma": "",
          "notes": {
@@ -6377,7 +6408,11 @@
            "A pen-total preview (feedPreview) and a Feed breakdown sheet exist in code but are not drawn or opened.",
            "The screen carries too much: mode, percent, slider, chips and a per-pig table all state one decision."
           ]
-         }
+         },
+         "preset": "feed",
+         "steps": [
+          "[data-action=\"feed-edit-pen\"].primary"
+         ]
         },
         {
          "id": "feed-plan.end-date",
@@ -6404,7 +6439,12 @@
           "issues": [
            "The end date is held on the pig as a plain date; when it passes, nothing returns the pig to the curve."
           ]
-         }
+         },
+         "preset": "feed",
+         "steps": [
+          "[data-action=\"feed-edit-pen\"].primary",
+          "[data-action=\"feed-optional-open\"][data-value=\"until\"]"
+         ]
         },
         {
          "id": "feed-plan.pig",
@@ -6460,7 +6500,11 @@
            "Supplier, brand, energy, protein and lysine proposed in ASTRA-FEED-PLAN-FIELDS are not shown.",
            "The Feeding block repeats the one on the pig record."
           ]
-         }
+         },
+         "preset": "feed",
+         "steps": [
+          "[data-action=\"pig-feed\"][data-value=\"000267\"]"
+         ]
         },
         {
          "id": "feed-plan.pen-up",
@@ -8949,7 +8993,7 @@
           "elements": [
            {
             "name": "Outcome choices and Save",
-            "shows": "Pregnant · Not in pig · Recheck later; Save and complete",
+            "shows": "Pregnant · Not in pig · Recheck later; Save",
             "states": [
              {
               "state": "Pregnancy check",
@@ -8974,7 +9018,7 @@
           "controls": [],
           "copy": [
            "Record outcome (raw)",
-           "Save and complete (raw)",
+           "Save (raw)",
            "Save follow-up (raw)"
           ],
           "issues": [
@@ -10265,7 +10309,7 @@
              {
               "state": "From a vaccination task",
               "when": "Health task",
-              "shows": "Titled \"Record vaccination\", vaccine list only, no condition chip, Save reads \"Save and complete task\""
+              "shows": "Titled \"Record vaccination\", vaccine list only, no condition chip, Save reads \"Save\""
              }
             ],
             "at": "Record treatment"
@@ -10300,7 +10344,7 @@
            },
            {
             "name": "Save",
-            "shows": "Save · N pigs / Save and complete task",
+            "shows": "Save · N pigs / Save",
             "rule": "Disabled until medicine, method, unit and a dose above 0 are set. One treatment record per included pig; logs \"Treatment recorded\" or \"Vaccination recorded\"; a task completes on Save. Dead sows are excluded. Returns to the list, the finding, or the pig record.",
             "at": "Save"
            }
@@ -16732,18 +16776,6 @@
   {
    "severity": "high",
    "source": "sweep",
-   "id": "home-and-placeholders-1",
-   "target": {
-    "kind": "feature",
-    "id": "environment"
-   },
-   "kind": "broken",
-   "title": "All 7 environment screens open the unit hub, not their own screen",
-   "detail": "None of the environment screens has steps or a preset, so each opens the Home unit page instead of the sensors, fan, maintenance or issue views. The atlas shows the wrong picture for the whole feature."
-  },
-  {
-   "severity": "high",
-   "source": "sweep",
    "id": "home-and-placeholders-2",
    "target": {
     "kind": "feature",
@@ -18873,78 +18905,6 @@
    "detail": "Thirteen placeholder screens render the plain walk, with no note saying who removes or draws them. A developer may build them from the notes."
   },
   {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-a-1",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.before"
-   },
-   "kind": "broken",
-   "title": "Sheets collapse whenever a waiting reason line shows",
-   "detail": "Before first count, Edit record (both), Lock blocked and End task (active sows): the body clips mid-row, the hint overlaps Litter summary, tiles are cut, and the reason line sits flush at x=0. Fix: put the reason in the footer's status slot, not the scrolling body."
-  },
-  {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-a-2",
-   "target": {
-    "kind": "screen",
-    "id": "environment.report-issue"
-   },
-   "kind": "broken",
-   "title": "Report issue primary button label is invisible",
-   "detail": "'Save sample issue' computes ink text on ink fill, so the drawer's only commit reads as a blank black block. The form is hand-built (raw form, inputs, button.primary) instead of SentriUI Field and Button. Fix: build it from the DS parts."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-3",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.task-blocked"
-   },
-   "kind": "broken",
-   "title": "Room dock shows through below the End task footer",
-   "detail": "On all four End task pages the room's dark Scan pill, search button and a second handle bar show beneath the footer, in the live demo too. Fix: the page must cover the dock, with its footer on the phone's bottom edge."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-4",
-   "target": {
-    "kind": "screen",
-    "id": "workbench.unit"
-   },
-   "kind": "broken",
-   "title": "Unit hub figures disagree with the Inspection page they open",
-   "detail": "Gestation Unit 7 hub says 'Checked Yesterday, 16:10' and Health 3; tapping it opens Inspection with 'Last check-in 06:40 · G. Hansen' and Health 4. Fix: read both from one source."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-5",
-   "target": {
-    "kind": "screen",
-    "id": "workbench.today"
-   },
-   "kind": "broken",
-   "title": "Progress label says 'complete' over a 1 of 8 bar",
-   "detail": "Piglet processing reads 'All scheduled items complete · 1 / 8 pens' (work-due adds '4 litters with care due' above it); Breeding reads 'Service sequences complete · 1 / 8 sows'. Fix: name what the bar counts ('Pens done')."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-6",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.edit-finished"
-   },
-   "kind": "broken",
-   "title": "Atlas 'Edit record (finished litter)' shows the locked record",
-   "detail": "The step 'Edit' hits the room row's Edit behind the sheet, which reopens the same locked record, so the screenshot equals farrowing.locked. Fix: step '[data-action=\"edit\"].tool'."
-  },
-  {
    "severity": "medium",
    "source": "screen-review",
    "id": "screens-a-7",
@@ -18991,30 +18951,6 @@
    "kind": "design",
    "title": "Fan speed is a thin slider, hard with gloves",
    "detail": "A 0-100 range slider in steps of 5 needs a precise drag; it is not one of the DS fields. Fix: a Stepper (−/+ 5%, 48px keys) with the value in mono."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-11",
-   "target": {
-    "kind": "screen",
-    "id": "environment.fan-manual"
-   },
-   "kind": "broken",
-   "title": "Apply is drawn as plain text, not a button",
-   "detail": "'Apply preview setting' is a secondary with no border or fill, so it reads as a caption; live and waiting differ only by text tone. Fix: control-border secondary, or the ink primary, as it is the device's only commit."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-12",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.room"
-   },
-   "kind": "broken",
-   "title": "'Awaiting' lens label breaks mid-word below 390px",
-   "detail": "In the demo page at 390 and 360 viewports the phone is 344-360 wide and the lens reads 'Awaitin / g'. Fix: apply the Segments copy budget (drop counts first) or let the filter button shrink; never break a word."
   },
   {
    "severity": "medium",
@@ -19161,18 +19097,6 @@
   {
    "severity": "low",
    "source": "screen-review",
-   "id": "screens-a-24",
-   "target": {
-    "kind": "screen",
-    "id": "environment.issue-resolved"
-   },
-   "kind": "broken",
-   "title": "Resolve toast covers the issue's reporter line",
-   "detail": "After Mark resolved, the toast 'Issue resolved in this preview' sits over the evidence card, hiding 'G. Hansen · 06:40'. Fix: show the toast above the footer without covering content, or drop it since the status already reads Resolved."
-  },
-  {
-   "severity": "low",
-   "source": "screen-review",
    "id": "screens-a-25",
    "target": {
     "kind": "screen",
@@ -19181,54 +19105,6 @@
    "kind": "design",
    "title": "Hold caption differs from Farrowing's for the same act",
    "detail": "Home's End task early button is captioned 'HOLD TO END'; Farrowing's is 'HOLD TO END EARLY'. Fix: one caption per verb from strings.json."
-  },
-  {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-b-1",
-   "target": {
-    "kind": "screen",
-    "id": "feed-plan.editor"
-   },
-   "kind": "broken",
-   "title": "Adjust feed hides its controls; Save can never be enabled",
-   "detail": "From Pen feeding, Adjust feed shows only the pig table. The Adjustment panel (mode, %, end date, note) sits below a 297px sheet body with overflow hidden; \"Complete the required fields first\" floats unpadded at the left edge. Fix: let the sheet body grow or scroll to the panel."
-  },
-  {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-b-2",
-   "target": {
-    "kind": "screen",
-    "id": "piglet-processing.chip-done"
-   },
-   "kind": "broken",
-   "title": "\"Edit\" on a done pen opens a sheet with nothing editable",
-   "detail": "A01's row trails \"Edit\" (verb: correct a posted record). Tapping it opens the pen sheet: \"Nothing left to do\", a disabled Record items, no correction. Fix: show the plain chevron until the correction decision (tasks-built-79) is made."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-b-3",
-   "target": {
-    "kind": "screen",
-    "id": "piglet-processing.sheet-todo"
-   },
-   "kind": "broken",
-   "title": "Chinese \"公猪·母猪\" calls piglets boars and sows",
-   "detail": "Boars · gilts reads 公猪·母猪 on the Piglets card and counts sheet; 母猪 is also the pen header's word for the sow (1头母猪). A farmer reads breeding boars and sows. Fix: 小公猪·小母猪 in strings.js."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-b-4",
-   "target": {
-    "kind": "feature",
-    "id": "feed-plan"
-   },
-   "kind": "broken",
-   "title": "Feed plan screens have no Chinese",
-   "detail": "inspection-astra-concept has no zh strings or language switch, so Pen feeding, Adjust feed and Feed plan are English-only and Chinese fit cannot be checked. Fix: move feed copy into the strings registry with zh."
   },
   {
    "severity": "medium",
@@ -19383,30 +19259,6 @@
   {
    "severity": "high",
    "source": "screen-review",
-   "id": "screens-c-1",
-   "target": {
-    "kind": "screen",
-    "id": "pig-profile.production-task"
-   },
-   "kind": "broken",
-   "title": "Pregnancy outcomes unstyled; the chosen outcome is invisible",
-   "detail": "Each outcome runs title into description, a tick sits under every option, and tapping Not in pig changes nothing visible before Save and complete enables. A mis-tap removes the sow from her batch unseen. Fix: render the outcomes with ChoiceList (radio) so one selected state shows."
-  },
-  {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-c-2",
-   "target": {
-    "kind": "screen",
-    "id": "health-record.treatment"
-   },
-   "kind": "broken",
-   "title": "Treatment form trapped in a 260px scroll box",
-   "detail": "The page's body scroller is 260px tall inside a full-height page: Dose and Unit are cut off at y=380, the lower half is empty, and the hint line floats mid-page. Fix: let the sheet body fill the space down to the footer."
-  },
-  {
-   "severity": "high",
-   "source": "screen-review",
    "id": "screens-c-3",
    "target": {
     "kind": "screen",
@@ -19425,18 +19277,6 @@
   {
    "severity": "medium",
    "source": "screen-review",
-   "id": "screens-c-4",
-   "target": {
-    "kind": "feature",
-    "id": "health-record"
-   },
-   "kind": "broken",
-   "title": "Required-fields hint sits at the screen edge, outside the gutter",
-   "detail": "'Complete the required fields first' starts at x=0 on Record health, Care instructions, Resolve conditions, Treatment, weight, body condition, note, miscarriage, batch membership. On Record weight it stays after Save enables. Fix: the Button waiting status line inside the footer gutter, naming the missing field, gone once valid."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
    "id": "screens-c-5",
    "target": {
     "kind": "screen",
@@ -19449,18 +19289,6 @@
   {
    "severity": "medium",
    "source": "screen-review",
-   "id": "screens-c-6",
-   "target": {
-    "kind": "screen",
-    "id": "health-record.many"
-   },
-   "kind": "broken",
-   "title": "Ongoing conditions on the record cannot be opened",
-   "detail": "Arthritis, Lameness, Coughing are plain text in the General details Health fact; nothing opens their finding to edit, treat or resolve, though the flow says 'tap the Arthritis tag'. Fix: list ongoing conditions as rows under the attention rows, each opening its finding."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
    "id": "screens-c-7",
    "target": {
     "kind": "screen",
@@ -19469,18 +19297,6 @@
    "kind": "unclear",
    "title": "Next task says Pregnancy check while Vaccination is due today",
    "detail": "On 000306 Sow cycle's Next task reads 'Pregnancy check · in 1 day' while Current tasks leads with Vaccination due today. 'Next' counts only production tasks, so it contradicts the card above. Fix: drop Next task (Current tasks already shows it) or say what it counts."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-c-8",
-   "target": {
-    "kind": "screen",
-    "id": "inspection.pen-log"
-   },
-   "kind": "broken",
-   "title": "Date filter box is 90px tall and unlabelled beside Activity",
-   "detail": "The 'All dates' trigger measures 186x90 with no label, next to the labelled 160x48 Activity picker; the row is misaligned. Same on pig-profile.log. Fix: use the PickerField trigger with a 'Dates' label at field height."
   },
   {
    "severity": "medium",
@@ -19570,18 +19386,6 @@
    "kind": "design",
    "title": "20 of 24 pen tiles say 'Not in unit'",
    "detail": "The pen map repeats 'Not in unit' on every greyed tile, burying the four live pens; the caption 'Pen layout · only pens…' is hidden under the footer. Fix: leave non-unit tiles blank and pad the caption above the footer."
-  },
-  {
-   "severity": "low",
-   "source": "screen-review",
-   "id": "screens-c-16",
-   "target": {
-    "kind": "screen",
-    "id": "inspection.find-pig"
-   },
-   "kind": "broken",
-   "title": "Sample-tag button touches the field label; result tags not mono",
-   "detail": "'Try sample tag 000306' ends at y=392 where the 'Ear tag or pen' label starts: no gap. Results set ear tags in Plus Jakarta while the walk uses mono. Fix: section gap above the label; identifier type for tags."
   },
   {
    "severity": "low",

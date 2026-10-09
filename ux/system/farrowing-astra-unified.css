@@ -197,7 +197,7 @@
 .task-overview-sheet .task-overview-content .task-performance-totals{margin-top:16px;padding-top:14px}
 .task-other-surface{padding:6px 16px;background:#f6f7f2;border-radius:12px}@media(max-width:420px){
  .task-warning-card{padding:9px 10px;gap:8px;min-height:76px}
- .farrowing-phone .task-end-sheet.task-end-expanded{height:calc(100% - 32px);max-height:calc(100% - 32px)}
+ .farrowing-phone .task-end-sheet.task-end-expanded[data-presentation="page"]{height:100%;max-height:100%;bottom:0}
  .farrowing-phone .task-end-sheet[data-size="medium"]{height:var(--drawer-long)}
  .task-end-sheet .task-performance-surface{padding:10px 12px}
  .task-end-sheet .task-kpi-pair{gap:12px}

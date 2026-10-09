@@ -828,7 +828,7 @@
               {
                 "state": "From a vaccination task",
                 "when": "Health task",
-                "shows": "Titled \"Record vaccination\", vaccine list only, no condition chip, Save reads \"Save and complete task\""
+                "shows": "Titled \"Record vaccination\", vaccine list only, no condition chip, Save reads \"Save\""
               }
             ],
             "at": "Record treatment"
@@ -863,7 +863,7 @@
           },
           {
             "name": "Save",
-            "shows": "Save · N pigs / Save and complete task",
+            "shows": "Save · N pigs / Save",
             "rule": "Disabled until medicine, method, unit and a dose above 0 are set. One treatment record per included pig; logs \"Treatment recorded\" or \"Vaccination recorded\"; a task completes on Save. Dead sows are excluded. Returns to the list, the finding, or the pig record.",
             "at": "Save"
           }
