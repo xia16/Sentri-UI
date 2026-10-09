@@ -1,85 +1,73 @@
 {
   "status": "in-design",
-  "round": 2,
+  "round": 3,
   "judged": "2026-10-10",
-  "commit": "c1508ba",
+  "commit": "058561c",
   "model": "claude-opus-5-5",
-  "scores": { "clarity": 7, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+  "scores": { "clarity": 8, "budget": 7, "hierarchy": 8, "spacing": 8, "broken": 8 },
   "lowest": 7,
   "checklist": [
     { "line": 1, "pass": true, "why": "Workflow-state job; names ConditionTag, Banner and row text for a forecast" },
     { "line": 2, "pass": true, "why": "Both lists present; alternatives exist in the library" },
-    { "line": 3, "pass": true, "why": "Chip, word, dot, line anatomy named and drawn" },
-    { "line": 4, "pass": false, "why": "Word and Dot are used by no screen (Dot's README says so)" },
+    { "line": 3, "pass": true, "why": "Chip, word, line anatomy named and drawn" },
+    { "line": 4, "pass": true, "why": "Chip on Farrowing, pen list and Home; Word on Farrowing's Go-to-pen map; Line on the pen list; Dot removed" },
     { "line": 5, "pass": true, "why": "States table per variant; none-states give reasons" },
-    { "line": 6, "pass": true, "why": "Not a target; host rows measure 76-88px" },
+    { "line": 6, "pass": true, "why": "Not a target; host rows 76-88px, pen cells 78x65" },
     { "line": 7, "pass": true, "why": "One chip per row; urgency order stated" },
-    { "line": 8, "pass": true, "why": "Chip, word and line always carry the word; the colour-only Dot is gated (see variant)" },
+    { "line": 8, "pass": true, "why": "Every chip and word carries its word; no colour-only variant remains" },
     { "line": 9, "pass": true, "why": "12 / 6 character cap, wrap not ellipsis, long and zh examples" },
-    { "line": 10, "pass": true, "why": "Live region rule, aria-hidden icon, port notes" },
-    { "line": 11, "pass": true, "why": "Separator now var(--space-4); CSS-variable list given; only a 1px hairline is raw" },
+    { "line": 10, "pass": true, "why": "Live region rule, aria-hidden icon, pen cells aria-labelled" },
+    { "line": 11, "pass": true, "why": "Tokens throughout; CSS-variable list given" },
     { "line": 12, "pass": true, "why": "Not a field" },
     { "line": 13, "pass": true, "why": "Not an overlay" },
     { "line": 14, "pass": true, "why": "Related table and Classification section present" },
-    { "line": 15, "pass": true, "why": "All kinds and variants render at 375px with no overflow (scrollWidth 375)" }
+    { "line": 15, "pass": true, "why": "Real screens at 390 have scrollWidth 390; Status itself never clips" }
   ],
   "classification": "component",
   "variants": [
     {
       "name": "Chip",
-      "usedBy": ["farrowing.room", "farrowing.count", "piglet-processing.pen-list", "piglet-processing.sheet-late", "workbench.today", "workbench.work-due"],
+      "usedBy": ["farrowing.room", "farrowing.count", "piglet-processing.pen-list", "piglet-processing.sheet-late", "task-cards (state=overdue)"],
       "status": "in-design",
-      "scores": { "clarity": 7, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "scores": { "clarity": 8, "budget": 7, "hierarchy": 8, "spacing": 8, "broken": 8 },
       "findings": [
-        "Map holds on Farrowing (Active blue, Done green+check, Sow died red) and the pen list (To do muted, Late amber+clock, Done green+check); every chip carries its word",
-        "Home passes a timing count ('Day 2 of 7') with icon 'clock', which the map reserves for Late; the README says a count is not a Status",
-        "The tagged-piglets page uses the chip for 'Breeder', an attribute, not a state"
+        "Map holds: Active blue, Done green, Sow died red, Overdue red, To do muted; every chip says its word",
+        "Home's overdue card says it twice: chip 'Overdue' and meta 'Batch 28 · farrowing window · 2 days overdue', which truncates to '2 days ov...'"
       ]
     },
     {
       "name": "Word",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 4 },
-      "findings": ["No screen uses it; Farrowing's Go-to-pen map still hand-colours its state words (.pen-cell.active green)"]
-    },
-    {
-      "name": "Dot",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": { "clarity": 7, "budget": 8, "hierarchy": 7, "spacing": 8, "broken": 3 },
-      "findings": ["No screen uses it", "Done, Late, Overdue and Sow died are all solid dots: same shape, only colour differs"]
+      "usedBy": ["farrowing.room (Go to pen sheet)"],
+      "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": ["B1 'Active' blue and B4 'Overdue' red render from status({variant:'word'}); by-hand pen colours gone. Done cell is a hand check glyph + '23 born'"]
     },
     {
       "name": "Line",
-      "usedBy": ["piglet-processing.pen-list", "piglet-processing.sheet-late", "farrowing.room"],
-      "status": "in-design",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 7 },
-      "findings": ["Farrowing builds 'Overdue · 3 days' by regex-injecting <span class=\"st-part\" data-tone=\"red\"> (farrowing-astra-concept.js:236) instead of calling statusLine()"]
+      "usedBy": ["piglet-processing.pen-list", "piglet-processing.sheet-late"],
+      "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": ["Farrowing no longer hand-writes line markup: overdue is a chip plus row text 'Due 3 days ago'"]
     }
   ],
   "findings": [
-    { "severity": "medium", "text": "Farrowing's Go-to-pen map paints pen states by hand and off the map: .pen-cell.active small is green (map: active = progress blue), .late red, .due amber; penFact() codes 'Overdue' as kind 'late' (farrowing-astra-room.css:10, farrowing-astra-concept.js:248).", "fix": "Render the pen-cell state with SentriUI.status({ variant: 'word', kind }) and map Overdue to kind 'overdue'; delete the .pen-cell.<kind> small colours." },
-    { "severity": "medium", "text": "Home's task card puts a timing count in a Status chip with the Late clock icon ('Day 2 of 7' blue, 'Day 3 of 7' muted), so the clock means two things.", "fix": "Drop icon:'clock' at astra-home-task-card.js:24, or make the timing plain meta text; a count is not a Status." },
-    { "severity": "medium", "text": "Word and Dot still have no screen (line 4); Dot tells Done/Late/Overdue/Died apart by colour alone.", "fix": "Put Word on the pen map (first finding) and remove Dot from the library until a screen needs it." },
-    { "severity": "low", "text": "Farrowing's overdue line hand-writes the statusLine markup via regex.", "fix": "Build it with SentriUI.statusLine([[{ text: 'Overdue' }, { text: '3 days', tone: 'red' }]])." },
-    { "severity": "low", "text": "'Breeder' on the tagged-piglets row is an attribute shown as a state chip.", "fix": "Show it as row meta or by the bookmark state it already has; keep the chip for workflow states." }
+    { "severity": "medium", "text": "Home's overdue task card states overdue twice (chip 'Overdue' + meta '2 days overdue'), and the repeat pushes the meta into an ellipsis ('2 days ov...') (astra-home-task-card.js:22-24).", "fix": "For state 'overdue', make the meta timing the count only ('2 days') or drop it; the chip already says Overdue." },
+    { "severity": "low", "text": "Farrowing's Go-to-pen Done cell draws its own check glyph instead of the Status done mark.", "fix": "Render it with status({ variant: 'word', kind: 'done', text: f.text }) like Active and Overdue, or leave the count plain without the hand glyph." }
   ],
   "previous": {
-    "round": 1,
-    "commit": "3e3f835",
-    "lowest": 4,
+    "round": 2,
+    "commit": "c1508ba",
+    "lowest": 7,
     "verdicts": [
-      { "finding": "Status used by no screen; three hand-built chip implementations", "result": "fixed", "note": "TaskRow, Farrowing and Home call status({ variant: 'chip' }); .tk-chip, .state-word/.done-word/.ended-word, .hc-status deleted. Residual: Farrowing pen-map colours." },
-      { "finding": "'To do' drawn green", "result": "fixed", "note": "To do is awaiting/muted rgb(101,112,96) on the pen list and sheet" },
-      { "finding": "Health tags are a different job", "result": "fixed", "note": "Moved to ConditionTag, linked from Related" },
-      { "finding": "Status-line look-alikes hand-built", "result": "partly fixed", "note": "TaskDay .tk-tone gone; Farrowing overdue still regex-injected" },
-      { "finding": "Forecast not covered by README", "result": "fixed" },
-      { "finding": "No length cap, zh example, raw 4px separator", "result": "fixed" }
+      { "finding": "Farrowing pen map paints states by hand, off the map", "result": "fixed", "note": "Active/Overdue cells use the Word variant (blue/red); .pen-cell.<kind> colours deleted; Overdue maps to 'overdue'" },
+      { "finding": "Home timing count in a Status chip with the Late clock", "result": "fixed", "note": "Timing is meta text; chip only for Overdue. New residual: overdue said twice on that card" },
+      { "finding": "Word and Dot used by no screen; Dot colour-only", "result": "fixed", "note": "Word on the pen map; Dot removed from code, preview and README" },
+      { "finding": "Farrowing overdue line regex-injected", "result": "fixed", "note": "Overdue chip + plain 'Due N days ago'; the day count is still parsed from the due string, but no markup injection" },
+      { "finding": "Breeder shown as a state chip", "result": "fixed", "note": "Chip removed from the tagged-piglets row" },
+      { "finding": "Chip variant: clock icon means two things", "result": "fixed" },
+      { "finding": "Dot variant: Done/Late/Overdue/Died same solid shape", "result": "fixed", "note": "Variant deleted" }
     ],
     "reversed": "none"
   },
-  "proposals": [
-    { "kind": "merge", "name": "Farrowing pen-map state words into Status word", "why": "A fourth hand-built state colouring, off the map (Active green)", "seenIn": ["farrowing.room"] }
-  ]
+  "proposals": []
 }

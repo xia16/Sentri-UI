@@ -1,40 +1,43 @@
 {
-  "status": "in-design",
-  "round": 1,
+  "status": "agent-checked",
+  "round": 2,
   "judged": "2026-10-10",
-  "commit": "c1508ba",
+  "commit": "058561c",
   "model": "claude-opus-5-5",
-  "scores": { "clarity": 8, "budget": 8, "hierarchy": 7, "spacing": 8, "broken": 3 },
-  "lowest": 3,
+  "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+  "lowest": 8,
   "checklist": [
     { "line": 1, "pass": true, "why": "Recorded-condition job; names Status, Banner, TaskChips instead" },
     { "line": 2, "pass": true, "why": "Both lists present with library alternatives" },
-    { "line": 3, "pass": true, "why": "Tag and detail parts named; day and note optional" },
-    { "line": 4, "pass": true, "why": "Tag on walk/profile/health-record, Detail on the finding page" },
-    { "line": 5, "pass": true, "why": "Care levels drawn; interaction states none, with reasons" },
-    { "line": 6, "pass": true, "why": "Never a target; host rows 76px" },
+    { "line": 3, "pass": true, "why": "Tag, detail and mark parts named; day, level word and note optional" },
+    { "line": 4, "pass": true, "why": "Tag on walk/profile/health-record, Mark on the attention rows, Detail on the finding page" },
+    { "line": 5, "pass": true, "why": "Care levels and pending drawn; interaction states none, with reasons" },
+    { "line": 6, "pass": true, "why": "Never a target; attention rows 51px, pig rows 76px, log filters now 48px" },
     { "line": 7, "pass": true, "why": "Overflow folds into +N via fitRecordedTags" },
-    { "line": 8, "pass": true, "why": "Each care level has its own icon and an announced care word" },
-    { "line": 9, "pass": true, "why": "Name and care caps, ellipsis demo, zh example" },
-    { "line": 10, "pass": true, "why": "Text semantics, aria-hidden icon, row aria-label" },
-    { "line": 11, "pass": true, "why": "Component CSS is all tokens and lists its variables" },
+    { "line": 8, "pass": true, "why": "Monitor eye; Treat syringe + visible 'Treat'; Hospital red + visible 'Hospital'" },
+    { "line": 9, "pass": true, "why": "Name and care caps, ellipsis demo, zh example; Hospital tag 154px fits its row" },
+    { "line": 10, "pass": true, "why": "Text semantics; Mark is role=img labelled with the care word" },
+    { "line": 11, "pass": true, "why": "Component CSS is tokens; pending look lives in the component" },
     { "line": 12, "pass": true, "why": "Not a field" },
     { "line": 13, "pass": true, "why": "Not an overlay" },
     { "line": 14, "pass": true, "why": "Related table and Classification present" },
-    { "line": 15, "pass": true, "why": "Preview and variants render at 375px, no overflow, no clipped names" }
+    { "line": 15, "pass": true, "why": "Real screens at 390: scrollWidth 390, no clipped names" }
   ],
   "classification": "component",
   "variants": [
     {
       "name": "Tag",
       "usedBy": ["inspection.walk", "inspection.walk-log", "pig-profile.full", "health-record.mixed", "health-record.care-states"],
-      "status": "in-design",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 7, "spacing": 8, "broken": 6 },
-      "findings": [
-        "Monitor and Treat in place are the same amber; on screen they differ only by a 12px icon (the care word is visually hidden)",
-        "Inspection recolours the tag per screen for a pending feed (.pending-feed-tag .st-condition)",
-        "'No feed' is coded care attention/monitor, though it is a standing instruction (notice)"
-      ]
+      "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": ["'Fever Day 2 | Treat' tells Treat from Monitor without the icon; No feed passes care 'notice'; pending feed drawn by data-pending"]
+    },
+    {
+      "name": "Mark",
+      "usedBy": ["health-record.mixed", "health-record.finding", "pig-profile.full"],
+      "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": ["34px care tile in the attention row's icon slot; old .attention-row.care-* tints deleted"]
     },
     {
       "name": "Detail",
@@ -45,13 +48,20 @@
     }
   ],
   "findings": [
-    { "severity": "high", "text": "The migration left an unclosed comment at ux/system/inspection-astra-concept.css:684 ('/* Care state belongs to its finding{width:...'), which swallows every rule up to line 728. Dead: attention-row care tints (monitor and treatment now identical rgb 252,244,229), the pen-feed stopped state, and the log filter controls (pig-profile.log: category trigger 20px, date trigger 40px tall, below the 48px floor).", "fix": "Restore '/* Care state belongs to its finding, rather than a second duplicate badge. */' on its own line and put the attention-row rules back on the lines after it." },
-    { "severity": "medium", "text": "Monitor and Treat in place share amber; on the pig list the care level shows only as a 12px eye vs syringe icon.", "fix": "Keep amber for both but show the care word visibly for Treat and Hospital, or give Treat its own token if the farm needs it at a glance." },
-    { "severity": "medium", "text": "The profile and health-record 'attention-row' is a hand-built look-alike with its own care colours (care-treatment orange #924514): a second care map.", "fix": "Build it as a Row whose icon slot is the ConditionTag mark (st-condition-mark with data-care/level); delete the .attention-row.care-* tints." },
-    { "severity": "low", "text": "Per-screen recolouring of a pending feed tag breaks 'never choose a colour per screen'.", "fix": "Draw the pending look inside the component (notice with a struck name), or drop the override." },
-    { "severity": "low", "text": "'No feed' is passed as attention/monitor with careText '0.0 kg/day'.", "fix": "Pass care:'notice'; use amber only if it needs action, and say so in the care word." }
+    { "severity": "low", "text": "The attention row keeps one raw amber background (#fcf4e5, inspection-astra-concept.css:651) for every care level: outside the tokens, and it tints rows the Mark already colours.", "fix": "Give .attention-row a neutral token background (var(--surface) or var(--well)) and let the Mark carry the care colour." }
   ],
-  "proposals": [
-    { "kind": "merge", "name": "attention-row into Row + ConditionTag mark", "why": "Same job (a condition with its care level) with its own colour map", "seenIn": ["pig-profile.full", "health-record.mixed", "health-record.finding"] }
-  ]
+  "previous": {
+    "round": 1,
+    "commit": "c1508ba",
+    "lowest": 3,
+    "verdicts": [
+      { "finding": "Unclosed comment in inspection-astra-concept.css swallowing rules", "result": "fixed", "note": "Comment closed; pig-profile.log filters measure 160x48 and 186x48" },
+      { "finding": "Monitor and Treat share amber, differ only by a 12px icon", "result": "fixed", "note": "Treat and Hospital print a visible level word beside the icon" },
+      { "finding": "attention-row is a second care colour map", "result": "fixed", "note": "Row icon slot is the new Mark variant; care tints deleted (one shared row background remains, see finding)" },
+      { "finding": "Per-screen recolouring of the pending feed tag", "result": "fixed", "note": "pending prop draws well/line/muted with a struck name inside the component" },
+      { "finding": "'No feed' coded attention/monitor", "result": "fixed", "note": "care:'notice'" }
+    ],
+    "reversed": "none"
+  },
+  "proposals": []
 }
