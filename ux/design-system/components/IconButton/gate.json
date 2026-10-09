@@ -1,197 +1,53 @@
 {
   "status": "in-design",
-  "judged": "2026-10-09",
-  "commit": "3e3f835",
+  "round": 3,
+  "judged": "2026-10-10",
+  "commit": "bfd0fa8",
   "model": "claude-opus-5-5",
-  "scores": {
-    "clarity": 7,
-    "budget": 7,
-    "hierarchy": 7,
-    "spacing": 5,
-    "broken": 4
+  "previous": {
+    "round": 2,
+    "judged": "2026-10-10",
+    "commit": "40bb120",
+    "lowest": 7,
+    "status": "in-design",
+    "findings": [
+      { "severity": "medium", "text": "README copied Button rows (hold, Escape, labels wrap, one primary per bar).", "result": "fixed: README rewritten for IconButton; no hold/Escape/wrap/primary rows remain." },
+      { "severity": "low", "text": "Raw radius fork .photo-title .icon-button{border-radius:10px}.", "result": "fixed: rule deleted; every IconButton measured computes 12px (radius-control)." },
+      { "severity": "low", "text": "Piglet sheet close labelled just \"Close\".", "result": "fixed: \"Close pen sheet\" / zh \"关闭猪栏页\", 48x48." }
+    ]
   },
-  "lowest": 4,
+  "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 5 },
+  "lowest": 5,
   "checklist": [
-    {
-      "line": 1,
-      "pass": true,
-      "why": "A square icon-only tool; \"every verb gets a labelled button or tile\" names the alternative."
-    },
-    {
-      "line": 2,
-      "pass": true,
-      "why": "Do/do-not: universal glyphs only; verbs get Button."
-    },
-    {
-      "line": 3,
-      "pass": false,
-      "why": "No anatomy section; the badge is not marked optional; container variants are hidden in a className."
-    },
-    {
-      "line": 4,
-      "pass": false,
-      "why": "Real variants (bordered toolbar, header return, plain close/mark) are undocumented; the 44px header return is not described at all."
-    },
-    {
-      "line": 5,
-      "pass": false,
-      "why": "Pressed is \"not drawn\"; no disabled or focus example is rendered."
-    },
-    {
-      "line": 6,
-      "pass": false,
-      "why": "Default 44x44: task-return, sheet close (dismiss), sp-mark, more; inspection forks go to 32/36px wide."
-    },
-    {
-      "line": 7,
-      "pass": true,
-      "why": "Not a choice set."
-    },
-    {
-      "line": 8,
-      "pass": false,
-      "why": "Disabled differs by grey only."
-    },
-    {
-      "line": 9,
-      "pass": true,
-      "why": "aria-label examples given (\"Filter, 2 applied\")."
-    },
-    {
-      "line": 10,
-      "pass": true,
-      "why": "aria-label required; global focus ring."
-    },
-    {
-      "line": 11,
-      "pass": false,
-      "why": "Raw 10px radius in the bundle; screen forks use #cbd3c1, 11/13px radii, 46/52px heights."
-    },
-    {
-      "line": 12,
-      "pass": true,
-      "why": "Not a field."
-    },
-    {
-      "line": 13,
-      "pass": true,
-      "why": "Not an overlay."
-    },
-    {
-      "line": 14,
-      "pass": false,
-      "why": "No related links (Button, Icon, the TaskSheet close) and no classification."
-    },
-    {
-      "line": 15,
-      "pass": false,
-      "why": "The 375px preview shows default + badge only; no other states."
-    }
+    { "line": 1, "pass": true, "why": "One sentence; Button named for verbs." },
+    { "line": 2, "pass": true, "why": "When / when not; Button and ChoiceList named." },
+    { "line": 3, "pass": true, "why": "48 container, glyph, label, badge, selected check, reason line." },
+    { "line": 4, "pass": true, "why": "Bordered and plain, each with a use line and real screens." },
+    { "line": 5, "pass": true, "why": "Pressed fills var(--press) and moves 2px." },
+    { "line": 6, "pass": true, "why": "Every IconButton on Farrowing, Inspection walk/filters, the Piglet pen sheet and the preview is 48x48." },
+    { "line": 7, "pass": true, "why": "At most three toolbar tools stated." },
+    { "line": 8, "pass": true, "why": "Selected adds a check and aria-pressed; disabled has a reason line." },
+    { "line": 9, "pass": true, "why": "Accessible names name the subject (Close pen sheet, Close Filter pigs)." },
+    { "line": 10, "pass": true, "why": "aria-label required, focus ring, aria-disabled focusable; no stray Button rows." },
+    { "line": 11, "pass": true, "why": "Radius fork gone; CSS on tokens. README lists undefined space-1 (low)." },
+    { "line": 12, "pass": true, "why": "Not a field." },
+    { "line": 13, "pass": true, "why": "Not an overlay." },
+    { "line": 14, "pass": true, "why": "Related table and classification present (first row links IconButton to itself)." },
+    { "line": 15, "pass": false, "why": "Standalone preview clean at 375, but the atlas component Overview renders nothing: \"Failed to construct 'URL': Invalid URL\"." }
   ],
   "classification": "component",
   "variants": [
-    {
-      "name": "bordered (toolbar / dock: room-filter-button)",
-      "usedBy": [
-        "farrowing.room",
-        "inspection.walk",
-        "piglet-processing.give-ids"
-      ],
-      "status": "in-design",
-      "scores": {
-        "clarity": 8,
-        "budget": 8,
-        "hierarchy": 8,
-        "spacing": 6,
-        "broken": 7
-      },
-      "findings": [
-        "inspection.walk renders it 48x52 (not square); the give-ids scan button uses control-border instead of line."
-      ]
-    },
-    {
-      "name": "header return (task-return)",
-      "usedBy": [
-        "farrowing.room",
-        "inspection.walk"
-      ],
-      "status": "in-design",
-      "scores": {
-        "clarity": 7,
-        "budget": 8,
-        "hierarchy": 8,
-        "spacing": 7,
-        "broken": 4
-      },
-      "findings": [
-        "Bordered like the toolbar variant but 44x44, under the floor; undocumented."
-      ]
-    },
-    {
-      "name": "plain (close, more, breeder mark)",
-      "usedBy": [
-        "farrowing.finish",
-        "piglet-processing.tagged-list"
-      ],
-      "status": "in-design",
-      "scores": {
-        "clarity": 7,
-        "budget": 7,
-        "hierarchy": 7,
-        "spacing": 7,
-        "broken": 4
-      },
-      "findings": [
-        "44x44; the TaskSheet close is a separate .tk-sheet-close implementation of the same thing."
-      ]
-    }
+    { "name": "bordered (header return, filter, search, scan)", "usedBy": ["farrowing.room", "farrowing.finish", "inspection.walk", "piglet-processing.give-ids"], "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": [] },
+    { "name": "plain (sheet close, clear selection, breeder mark)", "usedBy": ["farrowing.finish", "piglet-processing.sheet-todo", "inspection.filters", "piglet-processing.give-ids"], "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": ["Every sheet close measured now names its sheet."] }
   ],
   "findings": [
-    {
-      "severity": "high",
-      "text": "The default target is 44x44 (bundle .icon-button height:44px); header return, sheet close and breeder marks all measure 44.",
-      "fix": "Set .icon-button to var(--control-height) (48) square; keep the glyph size."
-    },
-    {
-      "severity": "high",
-      "text": "No pressed state for a gloved tap.",
-      "fix": "Add the shared press: background var(--press) and translateY(1px) on :active, as Button has."
-    },
-    {
-      "severity": "medium",
-      "text": "Variants live as screen forks: inspection 46px / 48x52 / #cbd3c1, dock clear 36px wide, feed-optional 32px wide, home 48px with radius 13.",
-      "fix": "Add variant: \"bordered\" | \"plain\" to iconButton() and delete the per-screen overrides."
-    },
-    {
-      "severity": "medium",
-      "text": "The TaskSheet close (.tk-sheet-close) and the farrowing dismiss are two implementations of the plain variant.",
-      "fix": "Render the sheet close with SentriUI.iconButton({ variant: \"plain\" })."
-    },
-    {
-      "severity": "low",
-      "text": "The header return variant is undocumented.",
-      "fix": "Document it as the bordered variant at 48 in the header."
-    }
+    { "severity": "high", "text": "Atlas component page Overview for IconButton renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render). Broken since round 1 (033fa58).", "fix": "Same fix as Button: resolve bundle.js and variants/<id>.html against a real base (parent.location.href when location is about:srcdoc), or use plain iframes src=variants/<id>.html." },
+    { "severity": "low", "text": "README tokens list space-1, which tokens.css does not define.", "fix": "Replace space-1 with border-width in README line 65." },
+    { "severity": "low", "text": "Related table's first row links Button / IconButton from IconButton's own README.", "fix": "Make the row just Button: labelled acts, used when the act needs a visible verb." }
   ],
-  "proposals": [
-    {
-      "kind": "new-variant",
-      "name": "IconButton bordered / plain",
-      "why": "Two looks already in every task; today a className plus forks.",
-      "seenIn": [
-        "farrowing.room",
-        "inspection.walk",
-        "farrowing.finish"
-      ]
-    },
-    {
-      "kind": "merge",
-      "name": "TaskSheet close -> IconButton plain",
-      "why": "Same job, separate code.",
-      "seenIn": [
-        "piglet-processing.sheet-todo",
-        "farrowing.finish"
-      ]
-    }
-  ]
+  "proposals": []
 }

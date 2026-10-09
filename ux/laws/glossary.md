@@ -205,6 +205,12 @@ Buttons name the act. The register is `ux/laws/strings.json` (`verbs`); an actio
 | **Scan** 扫描 | read an ear tag with the camera |
 | **Review** 核对 | open what an act will write, per subject, before it is recorded; commits nothing (`Review 4 litters`) |
 | **Tick** 勾选 | choose subjects for one act on several; nothing is recorded until Record (`Tick all owed`) |
+| **Untick** 取消勾选 | take one subject out of a selection; the subject is not deleted |
+| **Delete** 删除 | erase an attachment (a photo) for good; destructive, red, asks first |
+| **End walk** 结束巡查 | end an inspection walk and list what it recorded; the walk is not a task |
+| **More actions** 更多操作 | open the sheet of the other acts for the subject; lists acts, records nothing |
+| **Show** 显示 | apply the filter and return to the list; commits nothing |
+| **Tag** 打耳标 / **Notch** 剪耳号 | give a piglet (Tag also a breeder) an ear-tag or ear-notch ID |
 
 Banned: **Submit**, **Confirm**, **Complete**. The design system README's "Confirm & next" example is superseded by the rulings.
 

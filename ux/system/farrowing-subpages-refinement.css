@@ -6,7 +6,6 @@
 /* Room list, pen groups, search, scan, and filter entry points. */
 .farrowing-phone .room-scroll{background:var(--app-background,#f6f7f1)}
 .farrowing-phone .room-controls{background:var(--app-background,#f6f7f1);border-bottom:1px solid transparent}
-.farrowing-phone .room-filter-button,.farrowing-phone .dock-search{border-color:var(--line);background:var(--paper,#fff)}
 .farrowing-phone .room-list{gap:12px;padding-bottom:22px}
 .farrowing-phone .pen-card{border-color:var(--line);border-radius:var(--subpage-radius);box-shadow:0 2px 8px rgba(32,41,31,.04)}
 .farrowing-phone .room-list .pen-top{background:var(--surface,#f8faf5);border-color:var(--line);padding-left:14px;padding-right:14px}
@@ -39,7 +38,7 @@
 .farrowing-phone .pen-notice{border-color:var(--line);border-radius:12px;background:var(--surface,#f8faf5)}
 .farrowing-phone .pen-notice-fault{background:#fff8ea;border-color:#ead9b8}
 .farrowing-phone .pen-detail-copy{font-size:13px;line-height:1.7}
-.farrowing-phone .pen-detail-meta{font-family:var(--mono);font-size:10px}
+.farrowing-phone .pen-detail-meta{font-family:var(--font-mono);font-size:10px}
 .farrowing-phone .pen-field{gap:8px}
 .farrowing-phone .pen-field :is(input,select,textarea){border-color:#bdc7b6}
 
@@ -48,7 +47,6 @@
 .farrowing-phone .sheet[data-view=count] .count-label{color:#356547;font-weight:500}
 .farrowing-phone .sheet[data-view=count] .hero-value{color:#203d2b}
 .farrowing-phone .sheet[data-view=count] .hero-stepper .key[data-value="1"]{background:var(--green);border-color:var(--green)}
-.farrowing-phone .sheet[data-view=count] .record-inline-actions .record-toolbar-action{border-color:var(--line);font-weight:500}
 .farrowing-phone .sheet[data-view=finish] .finish-body{padding-top:18px}
 .farrowing-phone .sheet[data-view=locked] .completed-record-body{padding-top:6px}
 .farrowing-phone .sheet[data-view=finish] .finish-totals,.farrowing-phone .sheet[data-view=locked] .facts-surface{padding:14px}
@@ -64,7 +62,7 @@
 .farrowing-phone .death-breakdown-facts{margin:0;border:1px solid var(--line);border-radius:var(--subpage-radius);background:var(--surface,#f8faf5);padding:4px 14px}
 .farrowing-phone .death-breakdown-facts>div{display:flex;justify-content:space-between;align-items:center;min-height:48px;border-bottom:1px solid var(--line)}
 .farrowing-phone .death-breakdown-facts>div:last-child{border-bottom:0}
-.farrowing-phone .death-breakdown-facts dd{font:500 15px var(--mono);margin:0}
+.farrowing-phone .death-breakdown-facts dd{font:500 15px var(--font-mono);margin:0}
 
 /* Linked piglet care, identity, foster, mortality, marker, and reconciliation pages. */
 .farrowing-phone .feature-page>.sheet-body{gap:18px}

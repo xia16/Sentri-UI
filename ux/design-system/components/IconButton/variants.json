@@ -1,0 +1,32 @@
+[
+  {
+    "id": "bordered",
+    "name": "Bordered",
+    "use": "Use for header returns and toolbar Search, Filter or Scan.",
+    "notUse": "Not for recording an act — use Button.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Disabled",
+      "Long / Chinese",
+      "Selected",
+      "Badge"
+    ]
+  },
+  {
+    "id": "plain",
+    "name": "Plain",
+    "use": "Use for sheet Close, More actions or a breeder mark.",
+    "notUse": "Not for an unfamiliar verb — use Button.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Disabled",
+      "Long / Chinese",
+      "Selected",
+      "Badge"
+    ]
+  }
+]

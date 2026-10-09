@@ -10,13 +10,13 @@
 .unit-routing-columns,.unit-route{display:grid;grid-template-columns:minmax(78px,1.5fr) repeat(3,minmax(0,1fr)) 18px;column-gap:8px;align-items:center}
 .unit-routing-columns{padding:12px 14px;background:var(--surface);font-size:9px;color:var(--muted);border-bottom:1px solid var(--line)}
 .unit-routing-columns>span:not(:first-child){text-align:center}
-.unit-route{width:100%;min-height:76px;padding:14px;background:#fff;border:0;text-align:left;font:500 14px var(--sans);color:var(--ink);cursor:pointer}
+.unit-route{width:100%;min-height:76px;padding:14px;background:#fff;border:0;text-align:left;font:500 14px var(--font-sans);color:var(--ink);cursor:pointer}
 .unit-routing-surface>div[role=list]>div+div{border-top:1px solid #e8eddf}
 .unit-route-name{display:flex;flex-direction:column;gap:5px;align-items:flex-start;min-width:0}
 .unit-route-name :is(strong,small){display:block;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .unit-route-name strong{font-size:14px;font-weight:500}
 .unit-route-name small{font-size:9px;color:var(--muted);font-weight:400}
-.unit-route-number{font:400 15px var(--mono);text-align:center}
+.unit-route-number{font:400 15px var(--font-mono);text-align:center}
 .unit-route>svg{width:18px;height:18px;stroke:var(--green)}
 .unit-route:hover{background:#f3f7ef}
 .unit-route:active{background:#eaf2e5}

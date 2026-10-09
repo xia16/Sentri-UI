@@ -248,7 +248,7 @@
     if (P.hasId()) tools.push(['id-open', 'scan', T('tr.id.' + scheme())]);
     tools.push(['tool-death', 'alert', T('tool.death')], ['more', 'more', T('more.title')]);
     return '<div class="sp-toolrow" data-count="' + tools.length + '">' + tools.map(function (x) {
-      return '<button type="button" class="sp-tool" data-action="' + x[0] + '" data-value="">' + I(x[1]) + '<span>' + esc(x[2]) + '</span></button>';
+      return UI.button({register: 'tool', action: x[0], label: x[2]});  /* label only: icon + 'Record death' will not fit on one line at 111px */
     }).join('') + '</div>';
   }
   function penSheet(inert) {
@@ -261,7 +261,7 @@
     var n = Object.keys(V.draft).length;
     var foot = K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('submit.n', { n: n }), action: 'submit', register: 'primary', waiting: !n }, status: !n ? T('sr.items') : null });
     var sub = [T('sheet.pen', { pen: p.code, p: p.parity }), SEP, T('piglets', { n: p.alive }), SEP, T('day.n', { d: p.age })];
-    return K.drawer({ title: p.sow, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back' },
+    return K.drawer({ title: p.sow, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back', label: T('close.pen') },
       body: body, footer: foot });
   }
   /* ---- boars · gilts: two steppers ---- */
@@ -277,8 +277,7 @@
     var p = pen(), ended = !!P.s.ended;
     var rows = p.ids.slice().reverse().map(function (x) {
       var id = [x.tag, x.notch].filter(Boolean).join(' · ');
-      var mark = UI.iconButton({ action: ended ? 'noop' : 'breeder', value: x.no, icon: I('bookmark'), label: T(x.keep ? 'mark.off' : 'mark.on', { no: x.no }), className: 'sp-mark' })
-        .replace('class="icon-button', 'aria-pressed="' + !!x.keep + '" class="icon-button');
+      var mark = UI.iconButton({ action: ended ? 'noop' : 'breeder', value: x.no, icon: I('bookmark'), label: T(x.keep ? 'mark.off' : 'mark.on', { no: x.no }), variant: 'plain', selected: !!x.keep, className: 'sp-mark' });
       var row = K.row({ id: id, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
         meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), action: ended ? '' : 'give-fix', value: x.no, trail: '', still: ended, label: T('fix.aria', { no: x.no }) });
       return '<div class="sp-pigrow" data-ds="TaskRow">' + row + mark + '</div>';
@@ -718,7 +717,7 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && (V.pen || V.end)) { closeTop(); render(); }
   });
-  var holds = K.holdBind(phone, { onCommit: function (b) {
+  var holds = UI.holdBind(phone, { onCommit: function (b) {
     var a = b.getAttribute('data-action');
     setTimeout(function () {
       holds.settle(b, 'done');
