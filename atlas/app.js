@@ -120,6 +120,22 @@ function md(src, opts = {}) {
 }
 
 /* ---------- board ---------- */
+const FEATURE_ICON = { farrowing: 'farrow', 'farrowing-record': 'record', 'piglet-processing': 'spark', inspection: 'monitor', 'pig-list': 'grid', 'pig-profile': 'profile', disease: 'alert', 'health-record': 'health', prescriptions: 'treat', triage: 'hospital', treat: 'treat', 'report-death': 'alert', abortion: 'alert', 'feed-plan': 'feed', 'data-sync': 'upload', sampling: 'details', environment: 'temperature', workbench: 'home', breeding: 'heat', 'heat-check': 'heat', heat: 'heat', pregnancy: 'pregnancy', 'return-heat': 'return', 'post-farrowing': 'farrow', weaning: 'calendar', wean: 'calendar', weight: 'weight', backfat: 'chart', temperature: 'temperature', move: 'transfer', missing: 'place', 'keep-breeding': 'bookmark', 'unexpected-pregnancy': 'pregnancy', fostering: 'link', 'end-finishing': 'check', 'end-nursery': 'check' };
+const hasPrd = (f) => !!(f.prd && f.prd.trim() && !/not designed yet/i.test(f.prd));
+function renderPattern(sec, pt) {
+  const main = document.getElementById('main'); main.innerHTML = '';
+  header(`<a href="#" id="pat-back">${esc(sec.name)}</a> / <b>${esc(pt.name)}</b> <span class="zh">Pattern</span>`);
+  document.getElementById('pat-back').onclick = (e) => { e.preventDefault(); render(); };
+  const idx = screenIndex(), page = el(`<div class="patternpage"><h2>${esc(pt.name)}</h2>${pt.note ? `<p class="muted">${esc(pt.note)}</p>` : ''}<div class="phones"></div></div>`);
+  const row = page.querySelector('.phones');
+  (pt.screens || []).forEach((id) => {
+    const s = idx[id]; if (!s) return;
+    const cell = el(`<figure><figcaption>${dot(s.status)}<a href="#">${esc(s.feature.name)} · ${esc(s.name)}</a></figcaption></figure>`);
+    cell.querySelector('a').onclick = (e) => { e.preventDefault(); openFeature(s.feature.id, s.id); };
+    cell.append(shot(s, { height: 640 })); row.append(cell);
+  });
+  main.append(page);
+}
 function renderBoard() {
   const main = document.getElementById('main'); main.innerHTML = '';
   const pl = platform();
@@ -128,11 +144,12 @@ function renderBoard() {
   const plane = board.querySelector('.plane'); main.append(board);
   let x = 40, y = 40, rowH = 0, maxX = 0; const ROW = 1500;
   pl.sections.forEach((s) => {
-    const r = el(`<section class="region"><h2 ${s.shared ? `title="${esc(s.shared)}"` : ''}>${esc(s.name)} <small>${esc(s.zh)}</small></h2><div class="cards"></div></section>`);
+    const r = el(`<section class="region"><h2 ${s.shared ? `title="${esc(s.shared)}"` : ''}>${esc(s.name)} <small>${esc(s.zh)}</small></h2>${(s.patterns || []).length ? `<div class="patterns">Patterns ${(s.patterns || []).map((p, i) => `<button data-p="${i}">${esc(p.name)}</button>`).join('')}</div>` : ''}<div class="cards"></div></section>`);
+    r.querySelectorAll('[data-p]').forEach((b) => { b.onclick = (e) => { e.stopPropagation(); renderPattern(s, s.patterns[+b.dataset.p]); }; });
     r.querySelector('.cards').style.gridTemplateColumns = `repeat(${Math.min(3, s.features.length)}, 200px)`;
     s.features.forEach((f) => {
       const n = f.screens.length, ph = f.screens.filter((z) => z.status === 'placeholder').length;
-      const c = el(`<button class="card ${f.status === 'placeholder' ? 'placeholder' : ''}"><div class="name">${dot(f.status)}${esc(f.name)}</div><div class="zh">${esc(f.zh || '')}</div><div class="size">${plural(n, 'screen')}${ph && ph < n ? ` · ${ph} placeholder` : ''}</div></button>`);
+      const c = el(`<button class="card ${f.status === 'placeholder' ? 'placeholder' : ''}"><div class="name">${dot(f.status)}<span class="ico" data-i="${esc(FEATURE_ICON[f.id] || '')}"></span>${esc(f.name)}</div><div class="zh">${esc(f.zh || '')}</div><div class="size">${plural(n, 'screen')}${ph && ph < n ? ` · ${ph} placeholder` : ''}${hasPrd(f) ? '<span class="prdtag">PRD</span>' : ''}</div></button>`);
       c.onclick = () => openFeature(f.id); r.querySelector('.cards').append(c);
     });
     plane.append(r);
@@ -140,6 +157,7 @@ function renderBoard() {
     if (x > 40 && x + rw > ROW) { x = 40; y += rowH + 32; rowH = 0; }
     r.style.left = x + 'px'; r.style.top = y + 'px'; x += rw + 32; rowH = Math.max(rowH, rh); maxX = Math.max(maxX, x);
   });
+  loadIconPaths().then((paths) => plane.querySelectorAll('.ico').forEach((n) => { const p = paths[n.dataset.i]; n.innerHTML = p ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="${esc(p)}"/></svg>` : '<i class="neutral"></i>'; }));
   const W = maxX + 8, H = y + rowH + 40;
   const pz = panzoom(board, plane, () => { const t = fitTo(board, W, H, 1, 0, 0.9); return { k: t.k, x: 0, y: 0 }; });
   board.querySelectorAll('[data-z]').forEach((b) => { b.onclick = () => { const z = +b.dataset.z; z ? pz.step(z > 0 ? 1.2 : 1 / 1.2) : pz.fit(); }; });

@@ -338,3 +338,24 @@ table.copy td.id { font:11.5px var(--mono); overflow-wrap:anywhere }
 .notes .foreign { margin:10px 20px 0; padding:7px 10px; font-size:12px; color:var(--muted); border-left:2px solid var(--line) }
 
 .nopreview { border:1.5px dashed #c9cfc2; border-radius:14px; padding:26px 20px; margin:0 0 14px; text-align:center; color:var(--muted); font-size:13px }
+
+/* component gate */
+.gate { max-width:640px; margin:0 0 18px; padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:var(--paper) }
+.gate .gh { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); display:flex; gap:10px; margin-bottom:8px } .gate .gh span { text-transform:none; letter-spacing:0; font-weight:500 }
+.gbar { display:grid; grid-template-columns:84px 1fr 24px; gap:10px; align-items:center; font-size:12px; margin:5px 0 }
+.gbar .k { color:var(--muted); text-transform:capitalize } .gbar b { font:600 12px var(--mono); text-align:right }
+.gbar .tr { position:relative; height:8px; border-radius:4px; background:var(--wash) } .gbar .tr i { position:absolute; left:0; top:0; bottom:0; border-radius:4px; background:#2f6fb0 } .gbar .tr u { position:absolute; top:-3px; bottom:-3px; width:1.5px; background:var(--muted) }
+.gbar.low .tr i { background:var(--hl) } .gbar.low .k, .gbar.low b { color:var(--amber); font-weight:700 } .gbar.fail .tr i { background:#c0702a }
+.gfind { margin:10px 0 0; padding:0; list-style:none; font-size:12.5px } .gfind li { padding:6px 0; border-top:1px solid var(--line) } .gfind em { color:var(--muted); font-style:normal }
+.sev { display:inline-block; margin-right:8px; padding:0 6px; border-radius:5px; background:var(--amber-wash); color:var(--amber); font-size:10.5px; font-weight:700; text-transform:uppercase }
+.gvar { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px } .vchip { display:inline-flex; gap:6px; align-items:center; padding:2px 9px; border:1px solid var(--line); border-radius:999px; font-size:12px }
+
+/* board: card icons, PRD tag, patterns */
+.card .ico { display:inline-flex; width:16px; height:16px; align-items:center; justify-content:center; color:var(--muted); flex:none }
+.card .ico .neutral { width:6px; height:6px; border-radius:50%; background:#c9cfc2 }
+.card .name { align-items:flex-start } .card .name .dot { margin-top:4px }
+.prdtag { margin-left:8px; padding:0 6px; border:1px solid var(--line); border-radius:5px; font-size:10.5px; font-weight:700; letter-spacing:.05em; color:var(--muted) }
+.region .patterns { display:flex; gap:8px; align-items:center; margin:-8px 0 12px; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted) }
+.region .patterns button { text-transform:none; letter-spacing:0; font-size:12px; font-weight:600; color:var(--green); border:1px solid var(--line); border-radius:999px; padding:1px 10px; background:var(--paper) } .region .patterns button:hover { background:var(--green-wash) }
+.patternpage { position:absolute; inset:0; overflow:auto; padding:28px 36px 60px } .patternpage h2 { margin:0 0 6px; font-size:24px; letter-spacing:-.02em } .patternpage > p { max-width:640px; margin:0 0 20px }
+.patternpage .phones { display:flex; flex-wrap:wrap; gap:28px; align-items:flex-start } .patternpage figure { margin:0 } .patternpage figcaption { display:flex; gap:8px; align-items:center; margin:0 0 10px; font-size:13px; font-weight:600 }

@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T13:44:55.903Z",
- "commit": "0ab63ae",
+ "generated": "2026-10-09T14:34:47.393Z",
+ "commit": "918e0a3",
  "platforms": [
   {
    "id": "mobile",
@@ -11,6 +11,15 @@
      "name": "Home",
      "zh": "首页",
      "shared": "Home is the workbench, not a statistics page: it shows what needs doing now. A section chooser summarises each section's workload; a section's Overview groups work by task type with timing and progress; picking a unit narrows the counts. Scan and Toolbox stay in reach, and the Assistant opens from the header.",
+     "patterns": [
+      {
+       "name": "Home task card",
+       "screens": [
+        "workbench.today"
+       ],
+       "note": "The card that summarises one task type on Overview: its name, progress and timing, and the way into the task."
+      }
+     ],
      "features": [
       {
        "id": "environment",
@@ -1489,6 +1498,16 @@
      "name": "Tasks",
      "zh": "生产任务",
      "shared": "All tasks look the same and only the information differs. Each task page is built from the same task skeleton: a header naming the task, a summary card, a lens bar with the count under each label, rows grouped by pen, a dock as the last row, and sheets and pages made of the same parts.",
+     "patterns": [
+      {
+       "name": "Task skeleton",
+       "screens": [
+        "farrowing.room",
+        "piglet-processing.pen-list"
+       ],
+       "note": "Every task opens on the same page: header, last record, summary card (TaskSummary), lens tabs, rows grouped by pen, a dock. Only the information differs."
+      }
+     ],
      "features": [
       {
        "id": "breeding",
@@ -11352,6 +11371,299 @@
    "id": "web",
    "name": "Web",
    "sections": []
+  }
+ ],
+ "components": [
+  {
+   "name": "Button",
+   "group": "Base",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "IconButton",
+   "group": "Base",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Icon",
+   "group": "Base",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Heading",
+   "group": "Base",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Row",
+   "group": "Base",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Panel",
+   "group": "Base",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Facts",
+   "group": "Base",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Log",
+   "group": "Base",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Sheet",
+   "group": "Base",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Segment",
+   "group": "Base",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "ChoiceList",
+   "group": "Base",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "CategoryFooter",
+   "group": "Base",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Field",
+   "group": "Fields",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "PickerField",
+   "group": "Fields",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Stepper",
+   "group": "Fields",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Measure",
+   "group": "Fields",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Numpad",
+   "group": "Fields",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Status",
+   "group": "Status and feedback",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Banner",
+   "group": "Status and feedback",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Photos",
+   "group": "Status and feedback",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskPhone",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskHeader",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskSummary",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskLens",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskGroup",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskRow",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskDock",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskSheet",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskHold",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskTotals",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskProgress",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskStepper",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskPhotos",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskChoice",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskRadios",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskWarning",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskTable",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskMetrics",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskSection",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskReceipt",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskDay",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskPage",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskDialog",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "TaskChips",
+   "group": "Task skeleton",
+   "status": "in-design",
+   "gate": null
+  },
+  {
+   "name": "Filter sheet",
+   "group": "Inputs and filters",
+   "status": "placeholder",
+   "seenIn": [
+    "farrowing.room"
+   ],
+   "note": "A sheet that narrows a list by due range and parity, with Back, Reset and a Show-n-sows button."
+  },
+  {
+   "name": "Range slider",
+   "group": "Inputs and filters",
+   "status": "placeholder",
+   "seenIn": [
+    "farrowing.room"
+   ],
+   "note": "A two-handle slider for a due-date range, with its end labels."
+  },
+  {
+   "name": "Choice chips",
+   "group": "Inputs and filters",
+   "status": "placeholder",
+   "seenIn": [
+    "farrowing.room"
+   ],
+   "note": "A row of single-choice chips (Any, 0, 1, 2-5, 6+)."
   }
  ],
  "oldUi": [

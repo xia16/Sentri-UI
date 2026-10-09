@@ -11,6 +11,8 @@ Words are the design workflow's ([glossary](../docs/design-workflow/GLOSSARY.md)
 | `sections/sections.json` | every platform's sections in board order: `{ "platforms": [{ "id", "name", "sections": [{ "id", "name", "zh", "shared": "what the section's features share, one paragraph" }] }] }` |
 | `features/<id>/feature.json` | one feature (below) |
 | `features/<id>/PRD.md` | the feature's PRD, prose: Problem · Who · Anchor · Rules · Scope · Decisions |
+| `ux/design-system/components/<Name>/gate.json` | a component's gate result (below); optional |
+| `ux/design-system/components/_proposed.json` | components seen in screens but not in the design system yet: `[{ name, group, seenIn: [screenId], note }]` |
 | `references/figma/index.json` | the old UI in Figma: `[{ "file", "key", "screens", "flows": [[name, screens, nodeId]] }]` |
 
 ## `features/<id>/feature.json`
@@ -78,8 +80,17 @@ Never annotated: static labels and headings, the app bar and back, the phone's s
 
 Element shape: `{ "name", "at"?, "shows", "states"?: [{ "state", "when", "shows" }], "logic"?, "rule"?, "source"? }` — at least one of `states`, `logic`, `rule`. `at` is text visible inside the element on that screen (a string or list); the atlas finds the element by it first (smallest visible element with that text, then its nearest card/row/button) and falls back to `shows` / `name`. An `at` that starts with `[`, `.` or `#` is a CSS selector inside the screen (for icon-only controls, e.g. `[aria-label="Filter"]`); otherwise it is visible text, then an `aria-label` / `title` equal to it. Aim for under ~8 elements per screen; a screen that needs more is a sign the screen itself is overloaded (record that in `issues`).
 
+## Sections: patterns
+
+A section in `sections/sections.json` may list `patterns: [{ "name", "screens": [screen ids], "note" }]`: a way of building screens that several features share (Tasks: the task skeleton). Every screen id must exist. The board shows them under the section title; a pattern page shows the listed screens as live phones.
+
+## Component gate results
+
+`ux/design-system/components/<Name>/gate.json`, written by a component's gate run:
+`{ "status": "in-design" | "agent-checked" | "approved", "judged": "<date>", "commit", "model", "scores": { clarity, budget, hierarchy, spacing, broken } (0-10), "lowest", "findings": [{ severity, text, fix }], "variants"?: [{ name, status, scores?, findings? }] }`. Pass mark 8.
+
 ## Generated `atlas/atlas.json`
 
-`{ "generated", "commit", "platforms": [{ id, name, sections: [{ id, name, zh, shared, features: [<feature.json> + "status" derived from its screens + "prd" (the PRD.md text)] }] }], "oldUi": <references/figma/index.json> }`
+`{ "generated", "commit", "components": [{ name, group, status (gate.json's, else "in-design"; "placeholder" for proposed ones), gate (the gate.json or null), seenIn?, note? }], "platforms": [{ id, name, sections: [{ id, name, zh, shared, features: [<feature.json> + "status" derived from its screens + "prd" (the PRD.md text)] }] }], "oldUi": <references/figma/index.json> }`
 
 Feature status: `placeholder` when every screen is a placeholder; `in-design` when any screen is below agent-checked; `agent-checked` when all are agent-checked or approved; `frozen` when all are approved (and there is at least one).

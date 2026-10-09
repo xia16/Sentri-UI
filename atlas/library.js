@@ -22,7 +22,7 @@ const navItem = (nav, key, html, count, onclick) => {
 };
 
 /* ---------- Components ---------- */
-const COMPONENT_GROUPS = [
+let COMPONENT_GROUPS = [
   ['Base', ['Button', 'IconButton', 'Icon', 'Heading', 'Row', 'Panel', 'Facts', 'Log', 'Sheet', 'Segment', 'ChoiceList', 'CategoryFooter']],
   ['Fields', ['Field', 'PickerField', 'Stepper', 'Measure', 'Numpad']],
   ['Status and feedback', ['Status', 'Banner', 'Photos']],
@@ -58,7 +58,25 @@ function usedBy(name) {
   return Object.values(screenIndex()).filter((s) => s.notes && re.test(JSON.stringify([s.notes.elements, s.notes.controls])));
 }
 
+const SCORE_KEYS = ['clarity', 'budget', 'hierarchy', 'spacing', 'broken'], PASS = 8;
+function gateBlock(g) {
+  if (!g) return '<div class="gate"><div class="gh">Gate <span>Not gated yet</span></div></div>';
+  const sc = g.scores || {}, low = SCORE_KEYS.reduce((m, k) => (sc[k] != null && (m == null || sc[k] < sc[m]) ? k : m), null);
+  const bars = SCORE_KEYS.filter((k) => sc[k] != null).map((k) => `<div class="gbar${k === low ? ' low' : ''}${sc[k] < PASS ? ' fail' : ''}"><span class="k">${k}</span><span class="tr"><i style="width:${sc[k] * 10}%"></i><u style="left:${PASS * 10}%"></u></span><b>${sc[k]}</b></div>`).join('');
+  const fs = (g.findings || []).map((f) => `<li><span class="sev">${esc(f.severity)}</span>${esc(f.text)}${f.fix ? ` <em>Fix: ${esc(f.fix)}</em>` : ''}</li>`).join('');
+  const vs = (g.variants || []).map((v) => `<span class="vchip">${dot(v.status)}${esc(v.name)}</span>`).join('');
+  return `<div class="gate"><div class="gh">Gate <span>${esc([g.judged, g.model].filter(Boolean).join(' · '))} · pass mark ${PASS}</span></div><div class="gbars">${bars}</div>${fs ? `<ul class="gfind">${fs}</ul>` : ''}${vs ? `<div class="gvar">${vs}</div>` : ''}</div>`;
+}
+
 async function renderComponents() {
+  const CI = {};
+  if (S.data.components) {
+    S.data.components.forEach((c) => { CI[c.name] = c; });
+    const order = [], by = {};
+    S.data.components.forEach((c) => { if (!by[c.group]) { by[c.group] = []; order.push(c.group); } by[c.group].push(c.name); });
+    COMPONENT_GROUPS = order.map((g) => [g, by[g]]);
+  }
+  const stOf = (n) => (CI[n] && CI[n].status) || 'in-design';
   const { pane, nav } = libShell('Components', 'The mobile design system. A component is set when the first feature that uses it freezes.');
   const count = COMPONENT_GROUPS.reduce((n, g) => n + g[1].length, 0) + 1;
   let ds = {}; try { ds = await getJson(`${DS}/design-system.json`); } catch (_) {}
@@ -73,7 +91,7 @@ async function renderComponents() {
   Object.entries(pages).forEach(([k, n]) => navItem(nav, k, n, null, () => go(k)));
   COMPONENT_GROUPS.filter((g) => g[0] !== 'Task skeleton').forEach(([g, names]) => {
     nav.append(el(`<h5>${esc(g)}</h5>`));
-    names.forEach((n) => navItem(nav, n, `${dot('in-design')}${esc(n)}`, null, () => go(n)));
+    names.forEach((n) => navItem(nav, n, `${dot(stOf(n))}${esc(n)}`, null, () => go(n)));
   });
   nav.append(el('<h5>Task skeleton</h5>'));
   navItem(nav, '_task', `${dot('in-design')}Task skeleton (to be organised)`, null, () => go('_task'));
@@ -128,7 +146,16 @@ async function renderComponents() {
   async function pageComponent(name) {
     const group = (COMPONENT_GROUPS.find((g) => g[1].includes(name)) || [''])[0];
     const head = el(`<h2>${esc(name)}</h2>`); pane.append(head);
-    const meta = el(`<div class="cmeta">${dot('in-design')}<span class="t">${esc(STATUS['in-design'])} · ${esc(group)}</span></div>`); pane.append(meta);
+    const st = stOf(name), meta = el(`<div class="cmeta">${dot(st)}<span class="t">${esc(STATUS[st] || st)} · ${esc(group)}</span></div>`); pane.append(meta);
+    if (st === 'placeholder') {
+      const c = CI[name], idx2 = screenIndex();
+      const links = (c.seenIn || []).map((id) => idx2[id] ? `<a href="?feature=${esc(idx2[id].feature.id)}&screen=${esc(id)}" data-sid="${esc(id)}">${esc(idx2[id].feature.name)} · ${esc(idx2[id].name)}</a>` : '').filter(Boolean).join(', ');
+      pane.append(el(`<div class="nopreview">Not in the design system yet — seen in ${links || 'a screen'}.</div>`));
+      if (c.note) pane.append(el(`<p class="muted" style="max-width:640px">${esc(c.note)}</p>`));
+      pane.querySelectorAll('a[data-sid]').forEach((a) => { a.onclick = (e) => { e.preventDefault(); const s = idx2[a.dataset.sid]; openFeature(s.feature.id, s.id); }; });
+      return;
+    }
+    pane.append(el(gateBlock(CI[name] && CI[name].gate)));
     pane.append(el('<p class="muted" style="margin:-6px 0 14px;font-size:12px">Variants and their states are written in the component pass.</p>'));
     let readme = ''; try { readme = await getText(`${DS}/components/${name}/README.md`); } catch (_) {}
     const cand = /candidate/i.test(readme.slice(0, 300)), adr = (readme.slice(0, 400).match(/ADR (\d{4})/) || [])[1];
