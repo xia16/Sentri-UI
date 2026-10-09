@@ -1,67 +1,30 @@
 {
-  "status": "in-design",
-  "round": 1,
+  "status": "agent-checked",
+  "round": 2,
   "judged": "2026-10-10",
-  "commit": "7f47b7b",
+  "commit": "9a1315c",
   "model": "claude-opus-5-5",
   "scores": {
     "clarity": 8,
     "budget": 8,
     "hierarchy": 8,
     "spacing": 8,
-    "broken": 7
+    "broken": 8
   },
-  "lowest": 7,
+  "lowest": 8,
   "previous": [
     {
-      "finding": "Duplicate glyphs: origin = place, arrow = chevron, condition ~ plus.",
-      "fixed": "partly",
-      "note": "bundle.js: non-enumerable aliases, 51 canonical glyphs. But ux/system/sentri-icons.js still holds all three duplicates and the atlas Icons page renders from it."
-    },
-    {
-      "finding": "Unknown names silently draw a chevron.",
+      "finding": "The old registry ux/system/sentri-icons.js was not removed: it still has the broken grid, the 0.01px More dots, the chev...",
       "fixed": true,
-      "note": "Empty svg + console.warn (seen for unknown-demo); no empty svg on any of 115 screens."
+      "note": "atlas/library.js loadIcons() reads bundle.js SentriIcons; ux/system/sentri-icons.js deleted; no request to it from the atlas or 5 screens. Atlas Icons page: 51 glyphs, no duplicates, grid M3 3h7v7H3z..., more = three r=1.5 circles, aliases (origin/arrow/condition) listed separately."
     },
     {
-      "finding": "Grid path closes to x=3.",
+      "finding": "IMPLEMENTATIONS.md still says the icon registries are '52 glyphs identical'.",
       "fixed": "partly",
-      "note": "Fixed in bundle; every screen scanned draws the corrected grid. The stale registry still has M14 3h7v7H3z and the atlas Icons page shows it."
-    },
-    {
-      "finding": "'more' is three 0.01px dots.",
-      "fixed": "partly",
-      "note": "Bundle draws three r=1.5 filled circles (farrowing.count, .before, .locked, .ended, .edit-finished). The atlas Icons page still shows the old h.01 path."
-    },
-    {
-      "finding": "README glyph count 52 vs 54 rendered.",
-      "fixed": true,
-      "note": "Preview derives the count from Object.keys(paths): 51."
-    },
-    {
-      "finding": "Global svg stroke 1.8 contradicts 1.6.",
-      "fixed": true,
-      "note": "svg and host rules use --icon-stroke 1.6; key/pad strokes tokenised."
+      "note": "Row 37 updated; row 9 still lists sentri-icons.js as a live old-UI JS file."
     }
   ],
-  "previousChecklistFails": [
-    {
-      "line": 1,
-      "fixed": true
-    },
-    {
-      "line": 2,
-      "fixed": true
-    },
-    {
-      "line": 11,
-      "fixed": true
-    },
-    {
-      "line": 14,
-      "fixed": true
-    }
-  ],
+  "previousChecklistFails": [],
   "checklist": [
     {
       "line": 1,
@@ -76,7 +39,7 @@
     {
       "line": 3,
       "pass": true,
-      "why": "One open-stroke path on 24 grid; More's filled-dot exception named."
+      "why": "One open-stroke path on 24 grid; More filled-dot exception named and rendered."
     },
     {
       "line": 4,
@@ -86,12 +49,12 @@
     {
       "line": 5,
       "pass": true,
-      "why": "Default and Unknown rendered; host owns interactive states."
+      "why": "Default and Unknown (empty svg + console.warn) rendered; host owns interactive states."
     },
     {
       "line": 6,
       "pass": true,
-      "why": "Not tappable; hosts measured 48px+ (More actions tile 111x74)."
+      "why": "Not tappable; icon hosts on 5 screens all >= 48px."
     },
     {
       "line": 7,
@@ -101,22 +64,22 @@
     {
       "line": 8,
       "pass": true,
-      "why": "Icons always paired with a word (stated)."
+      "why": "Icons always paired with a word."
     },
     {
       "line": 9,
       "pass": true,
-      "why": "One lowercase name per glyph; labels from host."
+      "why": "One lowercase name per glyph; aliases are names only."
     },
     {
       "line": 10,
       "pass": true,
-      "why": "aria-hidden + focusable=false documented and emitted."
+      "why": "aria-hidden + focusable=false emitted."
     },
     {
       "line": 11,
       "pass": true,
-      "why": "icon-stroke, icon-key-stroke, icon-pad-stroke, glyph-* tokens."
+      "why": "Component CSS uses icon-stroke / icon-key-stroke / icon-pad-stroke / glyph-* tokens (host drift noted as a finding)."
     },
     {
       "line": 12,
@@ -136,7 +99,7 @@
     {
       "line": 15,
       "pass": true,
-      "why": "51 glyphs render at 375 with no overflow."
+      "why": "51 glyphs + Key render at 375 with no overflow (scrollWidth 375)."
     }
   ],
   "classification": "component",
@@ -145,20 +108,21 @@
       "name": "Standard (icon-stroke 1.6)",
       "usedBy": [
         "farrowing.room",
-        "farrowing.overview",
         "inspection.walk",
-        "pig-profile.actions"
+        "pig-profile.actions",
+        "piglet-processing.more-actions",
+        "health-record.treatment"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
         "clarity": 8,
         "budget": 8,
         "hierarchy": 8,
         "spacing": 8,
-        "broken": 7
+        "broken": 8
       },
       "findings": [
-        "The atlas Icons catalogue still draws the stale registry (broken grid, h.01 more, origin/arrow/condition duplicates, 52 entries)."
+        "Hosts restroke the glyph: 1.7 (tc-heading, tk-summary-heading, section-title), 1.8 (pen-name, st-condition, dock), 2 (status bar); 4 strokes on one screen."
       ]
     },
     {
@@ -181,13 +145,13 @@
   "findings": [
     {
       "severity": "medium",
-      "text": "The old registry ux/system/sentri-icons.js was not removed: it still has the broken grid, the 0.01px More dots, the chevron fallback and the origin/arrow/condition duplicates, and atlas/library.js loadIconPaths() reads it, so the atlas Icons page (and the atlas .ico glyphs) show the bugs this pass fixed.",
-      "fix": "Point loadIconPaths at /ux/design-system/components/bundle.js (SentriIcons.paths), then delete ux/system/sentri-icons.js (and the stale ux/system/sentri-components.js copy)."
+      "text": "In use the Standard glyph is drawn at 1.6, 1.7, 1.8 and 2 on the same screen (farrowing.room, inspection.walk): raw stroke-width in task-skeleton.css (.tk-summary-heading 1.7, .tk-warning-* 1.8, .tk-dock-unit 1.8, .tk-receipt-mark 2), astra-task-overview.css .tc-heading 1.7, inspection/farrowing .section-title 1.7, piglet-processing simple/app.css .sp-more 2.4 / .sp-give-scan 1.8. Pre-existing, not from this PR.",
+      "fix": "Replace those raw stroke-width values with var(--icon-stroke) (or --icon-key-stroke where a heavier key is meant); add a css-vars test that bans raw stroke-width on svg rules."
     },
     {
       "severity": "low",
-      "text": "IMPLEMENTATIONS.md still says the icon registries are '52 glyphs identical'.",
-      "fix": "Update the row to: one registry (bundle.js), count derived, legacy file retired."
+      "text": "Stale references to the retired file: IMPLEMENTATIONS.md row 9, assets/Icons/README.md line 21 (\"not yet in ux/system/sentri-icons.js\"), bundle.js line 2 header comment.",
+      "fix": "Drop sentri-icons.js from those three lines (leave ADR 0001 as history)."
     }
   ],
   "proposals": []
