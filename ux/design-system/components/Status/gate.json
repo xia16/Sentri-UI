@@ -1,73 +1,199 @@
 {
-  "status": "in-design",
-  "round": 3,
+  "status": "agent-checked",
+  "round": 4,
+  "regate": "cleanup pass, PR #72",
   "judged": "2026-10-10",
-  "commit": "058561c",
+  "commit": "ce52431",
   "model": "claude-opus-5-5",
-  "scores": { "clarity": 8, "budget": 7, "hierarchy": 8, "spacing": 8, "broken": 8 },
-  "lowest": 7,
+  "scores": {
+    "clarity": 8,
+    "budget": 8,
+    "hierarchy": 8,
+    "spacing": 8,
+    "broken": 8
+  },
+  "lowest": 8,
   "checklist": [
-    { "line": 1, "pass": true, "why": "Workflow-state job; names ConditionTag, Banner and row text for a forecast" },
-    { "line": 2, "pass": true, "why": "Both lists present; alternatives exist in the library" },
-    { "line": 3, "pass": true, "why": "Chip, word, line anatomy named and drawn" },
-    { "line": 4, "pass": true, "why": "Chip on Farrowing, pen list and Home; Word on Farrowing's Go-to-pen map; Line on the pen list; Dot removed" },
-    { "line": 5, "pass": true, "why": "States table per variant; none-states give reasons" },
-    { "line": 6, "pass": true, "why": "Not a target; host rows 76-88px, pen cells 78x65" },
-    { "line": 7, "pass": true, "why": "One chip per row; urgency order stated" },
-    { "line": 8, "pass": true, "why": "Every chip and word carries its word; no colour-only variant remains" },
-    { "line": 9, "pass": true, "why": "12 / 6 character cap, wrap not ellipsis, long and zh examples" },
-    { "line": 10, "pass": true, "why": "Live region rule, aria-hidden icon, pen cells aria-labelled" },
-    { "line": 11, "pass": true, "why": "Tokens throughout; CSS-variable list given" },
-    { "line": 12, "pass": true, "why": "Not a field" },
-    { "line": 13, "pass": true, "why": "Not an overlay" },
-    { "line": 14, "pass": true, "why": "Related table and Classification section present" },
-    { "line": 15, "pass": true, "why": "Real screens at 390 have scrollWidth 390; Status itself never clips" }
+    {
+      "line": 1,
+      "pass": true,
+      "why": "Workflow-state job; names ConditionTag, Banner and row text for a forecast"
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "Both lists present; alternatives exist in the library"
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "Chip, word, line anatomy named and drawn"
+    },
+    {
+      "line": 4,
+      "pass": true,
+      "why": "Chip on Farrowing, pen list and Home; Word on Farrowing's Go-to-pen map; Line on the pen list; Dot removed"
+    },
+    {
+      "line": 5,
+      "pass": true,
+      "why": "States table per variant; none-states give reasons"
+    },
+    {
+      "line": 6,
+      "pass": true,
+      "why": "Not a target; host rows 76-88px, pen cells 78x65"
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "One chip per row; urgency order stated"
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "Every chip and word carries its word; no colour-only variant remains"
+    },
+    {
+      "line": 9,
+      "pass": true,
+      "why": "12 / 6 character cap, wrap not ellipsis, long and zh examples"
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "Live region rule, aria-hidden icon, pen cells aria-labelled"
+    },
+    {
+      "line": 11,
+      "pass": true,
+      "why": "Tokens throughout; CSS-variable list given"
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field"
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay"
+    },
+    {
+      "line": 14,
+      "pass": true,
+      "why": "Related table and Classification section present"
+    },
+    {
+      "line": 15,
+      "pass": true,
+      "why": "Pen map, piglet list, Home today at 390: scrollWidth 390, no clipping; variant tabs Chip 8 / Word 8 / Line 6 cells render, console clean"
+    }
   ],
   "classification": "component",
   "variants": [
     {
       "name": "Chip",
-      "usedBy": ["farrowing.room", "farrowing.count", "piglet-processing.pen-list", "piglet-processing.sheet-late", "task-cards (state=overdue)"],
-      "status": "in-design",
-      "scores": { "clarity": 8, "budget": 7, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "usedBy": [
+        "farrowing.room",
+        "farrowing.count",
+        "piglet-processing.pen-list",
+        "piglet-processing.sheet-late",
+        "task-cards (state=overdue)"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
       "findings": [
-        "Map holds: Active blue, Done green, Sow died red, Overdue red, To do muted; every chip says its word",
-        "Home's overdue card says it twice: chip 'Overdue' and meta 'Batch 28 · farrowing window · 2 days overdue', which truncates to '2 days ov...'"
+        "Fixed: overdue task card meta timing is the count only (\"... · 2 days\") beside the Overdue chip; no repeat, no ellipsis"
       ]
     },
     {
       "name": "Word",
-      "usedBy": ["farrowing.room (Go to pen sheet)"],
+      "usedBy": [
+        "farrowing.room (Go to pen sheet)"
+      ],
       "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
-      "findings": ["B1 'Active' blue and B4 'Overdue' red render from status({variant:'word'}); by-hand pen colours gone. Done cell is a hand check glyph + '23 born'"]
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Fixed: B3 Done cell renders status({variant:\"word\",kind:\"done\"}) \"23 born\" green with the dot; hand check glyph gone. B1 Active and B4 Overdue unchanged"
+      ]
     },
     {
       "name": "Line",
-      "usedBy": ["piglet-processing.pen-list", "piglet-processing.sheet-late"],
+      "usedBy": [
+        "piglet-processing.pen-list",
+        "piglet-processing.sheet-late"
+      ],
       "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
-      "findings": ["Farrowing no longer hand-writes line markup: overdue is a chip plus row text 'Due 3 days ago'"]
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Farrowing no longer hand-writes line markup: overdue is a chip plus row text 'Due 3 days ago'"
+      ]
     }
   ],
   "findings": [
-    { "severity": "medium", "text": "Home's overdue task card states overdue twice (chip 'Overdue' + meta '2 days overdue'), and the repeat pushes the meta into an ellipsis ('2 days ov...') (astra-home-task-card.js:22-24).", "fix": "For state 'overdue', make the meta timing the count only ('2 days') or drop it; the chip already says Overdue." },
-    { "severity": "low", "text": "Farrowing's Go-to-pen Done cell draws its own check glyph instead of the Status done mark.", "fix": "Render it with status({ variant: 'word', kind: 'done', text: f.text }) like Active and Overdue, or leave the count plain without the hand glyph." }
+    {
+      "severity": "low",
+      "text": "Done pen cell aria-label reads \"Pen B3, 23 born\": with the check (aria-label Done) gone, the Done state is not named for a screen reader.",
+      "fix": "Label done cells \"Pen B3, Done, 23 born\" in farrowing-astra-concept.js roomGrid."
+    },
+    {
+      "severity": "low",
+      "text": "Home overdue state verified in the card model and DOM text (\"Batch 28 · farrowing window · 2 days\"), not on a rendered bare screen: no atlas screen shows an overdue task card.",
+      "fix": "Add an atlas screen for task-cards state=overdue so the overdue card is judged in use."
+    }
+  ],
+  "proposals": [],
+  "verdicts": [
+    {
+      "finding": "Home overdue card states overdue twice and truncates",
+      "result": "fixed",
+      "note": "Meta \"2 days\"; the chip says Overdue"
+    },
+    {
+      "finding": "Pen-map Done cell draws its own check glyph",
+      "result": "fixed",
+      "note": "Done via the Status word variant"
+    },
+    {
+      "finding": "Sheet subtitle tone class",
+      "result": "fixed",
+      "note": "sParts emits .st-part; bundle.css rules renamed; no .st-tone left"
+    }
   ],
   "previous": {
-    "round": 2,
-    "commit": "c1508ba",
+    "round": 3,
+    "commit": "058561c",
+    "status": "in-design",
     "lowest": 7,
-    "verdicts": [
-      { "finding": "Farrowing pen map paints states by hand, off the map", "result": "fixed", "note": "Active/Overdue cells use the Word variant (blue/red); .pen-cell.<kind> colours deleted; Overdue maps to 'overdue'" },
-      { "finding": "Home timing count in a Status chip with the Late clock", "result": "fixed", "note": "Timing is meta text; chip only for Overdue. New residual: overdue said twice on that card" },
-      { "finding": "Word and Dot used by no screen; Dot colour-only", "result": "fixed", "note": "Word on the pen map; Dot removed from code, preview and README" },
-      { "finding": "Farrowing overdue line regex-injected", "result": "fixed", "note": "Overdue chip + plain 'Due N days ago'; the day count is still parsed from the due string, but no markup injection" },
-      { "finding": "Breeder shown as a state chip", "result": "fixed", "note": "Chip removed from the tagged-piglets row" },
-      { "finding": "Chip variant: clock icon means two things", "result": "fixed" },
-      { "finding": "Dot variant: Done/Late/Overdue/Died same solid shape", "result": "fixed", "note": "Variant deleted" }
-    ],
-    "reversed": "none"
-  },
-  "proposals": []
+    "scores": {
+      "clarity": 8,
+      "budget": 7,
+      "hierarchy": 8,
+      "spacing": 8,
+      "broken": 8
+    },
+    "findings": [
+      "Home's overdue task card states overdue twice (chip 'Overdue' + meta '2 days overdue'), and the repeat pushes the meta into an ellipsis ('2 days ov...') (astra-home-task-card.js:22-24).",
+      "Farrowing's Go-to-pen Done cell draws its own check glyph instead of the Status done mark."
+    ]
+  }
 }

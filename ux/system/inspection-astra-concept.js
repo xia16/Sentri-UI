@@ -474,16 +474,17 @@ function measurementAge(p,key){
 function overviewNextTask(p,c){
  const batch=c?.batches?.find(b=>b.id===p.batchId&&b.pigIds.includes(p.id)),name=batch?.next;
  const days=daysFromWalk(batch?.nextDate),timing=days===null?'':days===0?'Today':days<0?'In '+(-days)+' '+(days===-1?'day':'days'):(days===1?'1 day':days+' days')+' overdue';
- return '<div class="overview-fact'+(!name?' is-empty':'')+'"><span class="overview-fact-label">Next task</span><strong>'+esc(name||'—')+'</strong>'+(name&&timing?'<small>'+esc(timing)+'</small>':'')+'</div>';
+ return {label:'Next task',value:name||null,meta:name&&timing?timing:''};
 }
+// One fact for Facts: an empty value draws the em dash and no trail.
+function factItem(label,value,unit='',meta='',mono=false){const has=hasRecordValue(value);return {label,value:has?value+(unit?(unit==='%'?'':' ')+unit:''):null,meta:has?meta:'',mono};}
 function overviewDetails(p,c){
- const facts=[],ongoing=cases(p).filter(k=>!needsHealthAttention(k)),r=p.registry||{};
- const fact=(label,value,unit='',meta='')=>'<div class="overview-fact'+(!hasRecordValue(value)?' is-empty':'')+'"><span class="overview-fact-label">'+esc(label)+'</span><strong>'+recordValue(value,unit)+'</strong>'+(hasRecordValue(value)&&meta?'<small>'+esc(meta)+'</small>':'')+'</div>';
- const health='<div class="overview-health-row'+(!ongoing.length?' is-empty':'')+'"><span class="overview-fact-label">Health</span><div class="overview-health-list"'+(ongoing.length?' role="region" aria-label="Persistent health conditions" tabindex="0"':'')+'>'+(ongoing.length?ongoing.map(k=>button('finding',recordedTag({label:k.name,day:Number.isFinite(k.day)?k.day+' days':'',...careAppearance(k)}),'overview-health-value',p.id+'|'+k.name).replace('<button','<button aria-label="'+esc(k.name+' · '+(Number.isFinite(k.day)?k.day+' days':'Duration unknown')+' · View condition')+'"')).join(''):'<span class="overview-health-empty">—</span>')+'</div></div>';
- facts.push(fact('Age',p.age??daysFromWalk(r.birthDate),'days'),fact('Type',animalType(p)),fact('Breed',r.breed),fact('Batch',p.batchId));
- for(const [key,label,unit] of [['weight','Weight','kg'],['temperature','Temperature','°C']])facts.push(fact(label,p[key],unit,measurementAge(p,key)));
- facts.push(fact('On farm',r.onFarm===undefined?null:r.onFarm?'Yes':'No'));
- return stPanel('<div class="overview-details-grid">'+facts.join('')+health+'</div>',{className:'facts-surface'});
+ const r=p.registry||{},facts=[factItem('Age',p.age??daysFromWalk(r.birthDate),'days'),factItem('Type',animalType(p)),factItem('Breed',r.breed),factItem('Batch',p.batchId)];
+ for(const [key,label,unit] of [['weight','Weight','kg'],['temperature','Temperature','°C']])facts.push(factItem(label,p[key],unit,measurementAge(p,key)));
+ facts.push(factItem('On farm',r.onFarm===undefined?null:r.onFarm?'Yes':'No'));
+ const other=cases(p).filter(k=>!needsHealthAttention(k));   // the banner above shows the attention cases; this row adds only what it does not
+ if(other.length)facts.push(factItem('Health',other.map(k=>k.name).join(' · ')));
+ return stFacts(facts);
 }
 function typeDetails(p,c){
  const r=p.registry||{},type=animalType(p);let title='',items=[];
@@ -496,7 +497,7 @@ function typeDetails(p,c){
  else if(['Grower','Finisher','Weaner'].includes(type)){title='Growth';items=[['Entry weight',r.entryWeight,'kg'],['Entry date',r.growthEntryDate]];}
  if(!title)return '';
  const titleHeading=stHeading({title,icon:icon(type==='Sow'||type==='Gilt'?'clock':type==='Boar'?'profile':'weight'),kind:'section',level:4});
- return '<section class="detail-section reading-section animal-type-section">'+titleHeading+'<div class="overview-details-grid facts-surface st-panel">'+items.map(([label,value,unit,meta])=>'<div class="overview-fact'+(!hasRecordValue(value)?' is-empty':'')+'"><span class="overview-fact-label">'+label+'</span><strong>'+recordValue(value,unit)+'</strong>'+(hasRecordValue(value)&&meta?'<small>'+esc(meta)+'</small>':'')+'</div>').join('')+overviewNextTask(p,c)+(['Sow','Gilt'].includes(type)?'<div class="overview-fact'+(!hasRecordValue(p.parity)?' is-empty':'')+'"><span class="overview-fact-label">Parity</span><strong>'+recordValue(p.parity)+'</strong></div>':'')+'</div></section>';
+ return '<section class="detail-section reading-section animal-type-section">'+titleHeading+stFacts([...items.map(([label,value,unit,meta,mono])=>factItem(label,value,unit,meta,mono)),overviewNextTask(p,c),...(['Sow','Gilt'].includes(type)?[factItem('Parity',p.parity)]:[])])+'</section>';
 }
 function measurementDateAge(date){const days=daysFromWalk(date);return days===null?'':days===0?'Today':days>0?days+' days ago':'';}
 function dueDateLabel(date){const days=daysFromWalk(date);return days===null?'':days===0?'Today':days<0?'In '+(-days)+' days':days+' days past expected';}
@@ -645,7 +646,7 @@ const medicineCatalogue=[
 ];
 function medicineTree(c){return [...new Set(medicineCatalogue.filter(m=>c.form.taskId!=='vaccination'||m.category==='Vaccines').map(m=>m.category))].map(category=>({value:category,label:category,children:medicineCatalogue.filter(m=>m.category===category).map(m=>({value:m.id,label:m.name,meta:m.detail.replace(' · Sample product','')}))}));}
 function medicineResults(c){return SentriUI.pickerBody({variant:'cascade',items:medicineTree(c),path:c.form.medicineCategory?[c.form.medicineCategory]:[],selected:[c.form.medicineId],query:c.form.medicineSearch||'',action:'medicine-select',stepAction:'medicine-step',searchAttrs:{'data-medicine-search':''}});}
-function medicinePicker(c){return sheet(c,'Select medicine','','<div class="medicine-results">'+medicineResults(c)+'</div>',footer(back(),'')).replace('class="sheet"','class="sheet picker-step medicine-picker-step"');}
+function medicinePicker(c){return sheet(c,'Select medicine','','<div class="medicine-results">'+medicineResults(c)+'</div>',SentriUI.pickerFooter({multi:false})).replace('class="sheet"','class="sheet picker-step medicine-picker-step"');}
 function optionalFieldControls(items,openAction){return '<div class="st-optional-list">'+items.map(({key,label,value})=>stOptionalRow({label:label.replace(/^Add /,'').replace(/^./,m=>m.toUpperCase()),value,icon:icon('plus'),editIcon:icon('edit'),action:openAction,key})).join('')+'</div>';}
 function optNote(label,field,value){return stOptionalRow({label,value,icon:icon('plus'),editIcon:icon('edit'),inline:field});}
 function optionalSelect(c,label,key,items,value,target='form'){pickerEntry(c,key,{items,label,target,value});const hit=value===''||value==null?'':(items.find(([v])=>v===value)||[])[1]??'';return stOptionalRow({label,value:hit,icon:icon('plus'),editIcon:icon('edit'),action:'open-picker',key,attrs:{'data-picker-key':key}});}
@@ -957,7 +958,7 @@ function recordValue(value,unit=''){return hasRecordValue(value)?esc(value)+(uni
 function profileFacts(title,items){
  const symbol={'Basic information':'profile','Sow & cycle':'clock','Body & cycle':'weight','Production totals & averages':'chart','Origin & dates':'origin','Identity records':'profile'}[title];
  const heading=stHeading({title,icon:symbol?icon(symbol):'',kind:'section',level:4});
- return '<section class="profile-section">'+heading+stFacts(items.map(([label,value,unit])=>({label,value:hasRecordValue(value)?value+(unit?(unit==='%'?'':' ')+unit:''):null,mono:/^(Ear tag|Tag|ID)\b/i.test(label)})))+'</section>';
+ return '<section class="profile-section">'+heading+stFacts(items.map(([label,value,unit,mono])=>({label,value:hasRecordValue(value)?value+(unit?(unit==='%'?'':' ')+unit:''):null,mono:!!mono})))+'</section>';
 }
 function filterLogEntries(events,category){return category==='All'?events:events.filter(e=>eventCategory(e)===category);}
 function pigLogEntries(c){const p=pig(c,c.pigId);return [...c.events.filter(e=>e.subjects.includes(p.id)).map(e=>({...e,time:'Today · '+e.time})),...(p.initialRecords||[])];}
@@ -1054,16 +1055,16 @@ function pigRecordPage(c){
  if(tab==='details')body=
   (b?'<section class="profile-next-card"><span>Next task · Batch '+esc(b.id)+'</span><strong>'+esc(b.next)+'</strong><small>'+esc(b.when)+'</small></section>':'')+
   profileFacts('Basic information',[
-   ['Ear tag',p.id],['Type',animalType(p)],['Breed',r.breed],['Location',unitName(c)+' · '+pe.id],['Age',p.age??daysFromWalk(r.birthDate),'days'],['Parity',p.parity],['Weight',p.weight,'kg'],['Temperature',p.temperature,'°C'],['Stage',p.stage],['Batch ID',p.batchId],['On farm',r.onFarm===undefined?null:r.onFarm?'Yes':'No']
+   ['Ear tag',p.id,'',true],['Type',animalType(p)],['Breed',r.breed],['Location',unitName(c)+' · '+pe.id],['Age',p.age??daysFromWalk(r.birthDate),'days'],['Parity',p.parity],['Weight',p.weight,'kg'],['Temperature',p.temperature,'°C'],['Stage',p.stage],['Batch ID',p.batchId],['On farm',r.onFarm===undefined?null:r.onFarm?'Yes':'No']
   ])+
   typeDetails(p,c);
  if(tab==='production')body=productionOverview(c,p);
  if(tab==='provenance')body=
   profileFacts('Origin & dates',[
-   ['Entry type',r.entryType],['Birth date',r.birthDate],['Arrival date',r.arrivalDate],['First heat',r.firstHeat],['Birth farm',r.birthFarm],['Genetic line',r.geneticLine],['Dam',r.dam],['Sire',r.sire]
+   ['Entry type',r.entryType],['Birth date',r.birthDate],['Arrival date',r.arrivalDate],['First heat',r.firstHeat],['Birth farm',r.birthFarm],['Genetic line',r.geneticLine],['Dam',r.dam,'',true],['Sire',r.sire,'',true]
   ])+
   profileFacts('Identity records',[
-   ['Current ear tag',p.id],['Breeding number',r.breedingId],['Other ear tag',r.otherTag]
+   ['Current ear tag',p.id,'',true],['Breeding number',r.breedingId,'',true],['Other ear tag',r.otherTag,'',true]
   ])+
   (r.identities?.length?'<details class="detail-disclosure profile-identities"><summary><span>Other identities <small>'+r.identities.length+'</small></span>'+icon('chevron')+'</summary><dl class="identity-list">'+r.identities.map(x=>'<div><dt>'+esc(x.type)+'</dt><dd>'+esc(x.value)+'</dd></div>').join('')+'</dl></details>':'<div class="profile-empty-row"><span>Other identities</span><span>—</span></div>');
  if(tab==='log')body=categorizedLog(c,pigLogEntries(c),'pig');
@@ -1179,7 +1180,7 @@ function handleRecordAction(c,a,v){
  }
  if(a==='bulk-toggle-controls'){c.form.controlsCollapsed=!c.form.controlsCollapsed;return true;}
  if(a==='bulk-save'){if(c.actionEntry)c.returnAfterActionSave=true;saveBulkAction(c);return true;}
- if(a==='medicine-open'){c.form.medicineSearch='';c.form.medicineCategory='';c.view='medicine-picker';return true;}
+ if(a==='medicine-open'){c.form.medicineSearch='';c.form.medicineCategory=c.form.medicineId?(c.form.medicinePath||[])[0]||'':'';c.view='medicine-picker';return true;}
  if(a==='medicine-category'){c.form.medicineCategory=v;return true;}
  if(a==='medicine-root'){c.form.medicineCategory='';return true;}
  if(a==='medicine-cancel'){c.view='treatment';return true;}

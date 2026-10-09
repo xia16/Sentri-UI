@@ -59,7 +59,7 @@ Named role=group; buttons expose aria-pressed. Every target is at least tap-min 
 
 ## API and tokens
 
-`SentriUI.segment({ options: [[value, trustedLabelHTML, {count, disabled, strs, args}]], active, action, ariaLabel, variant, state, disabled, reason, className })`. Existing calls remain valid; default variant is lens.
+`SentriUI.segment({ options: [[value, trustedLabelHTML, {count, disabled, strs, args}]], active, action, ariaLabel, variant, state, disabled, reason, className })`. Existing calls remain valid; default variant is two-line-lens.
 
 CSS uses tap-min, well, line, paper, ink, muted, press, focus, control-border, radius-segment, radius-control, radius-8, space-2/3/4/6, space-key-gap, space-row-x, space-gutter, size-16, type-row-title-size, type-description-size, type-meta-size, font-sans and font-mono. No prototype scope is required.
 

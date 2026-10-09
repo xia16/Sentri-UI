@@ -1,5 +1,20 @@
-<div data-state="Default" id="navigation-state-0"><script>document.getElementById('navigation-state-0').innerHTML=SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow')}));</script></div>
-<div data-state="Pressed" id="navigation-state-1"><script>document.getElementById('navigation-state-1').innerHTML=SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {"data-preview": "pressed"}, "icon": SentriIcons.icon('farrow')}));</script></div>
-<div data-state="Focus" id="navigation-state-2"><script>document.getElementById('navigation-state-2').innerHTML=SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {"data-preview": "focus"}, "icon": SentriIcons.icon('farrow')}));</script></div>
-<div data-state="Long label / Chinese" id="navigation-state-3"><script>document.getElementById('navigation-state-3').innerHTML=SentriUI.rowGroup(SentriUI.row({"title": "检查待处理的母猪与仔猪记录", "description": "记录时间 09:41 · 饲养员张伟 · 长文字完整换行", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow')}));</script></div>
-<div data-state="Disabled" id="navigation-state-4"><script>document.getElementById('navigation-state-4').innerHTML=SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow'), "disabled": true, "reason": "Unavailable — unit is closed"}));</script></div>
+<div data-state="Default" id="navigation-state-0"></div>
+<div data-state="Pressed" id="navigation-state-1"></div>
+<div data-state="Focus" id="navigation-state-2"></div>
+<div data-state="Long label / Chinese" id="navigation-state-3"></div>
+<div data-state="Disabled" id="navigation-state-4"></div>
+<script>
+// Each state renders in its own iframe in the atlas: draw only the states present.
+var UI = window.SentriUI;
+var RENDER = {
+  "navigation-state-0": () => SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow')})),
+  "navigation-state-1": () => SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {"data-preview": "pressed"}, "icon": SentriIcons.icon('farrow')})),
+  "navigation-state-2": () => SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {"data-preview": "focus"}, "icon": SentriIcons.icon('farrow')})),
+  "navigation-state-3": () => SentriUI.rowGroup(SentriUI.row({"title": "检查待处理的母猪与仔猪记录", "description": "记录时间 09:41 · 饲养员张伟 · 长文字完整换行", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow')})),
+  "navigation-state-4": () => SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow'), "disabled": true, "reason": "Unavailable — unit is closed"}))
+};
+document.querySelectorAll('[data-state]').forEach(function (s) {
+  var t = RENDER[s.id] ? s : s.querySelector('[id]');
+  if (t && RENDER[t.id]) t.innerHTML = RENDER[t.id]();
+});
+</script>

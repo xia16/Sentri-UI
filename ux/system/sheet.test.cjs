@@ -39,6 +39,6 @@ test('sheet footer: Back alone fills the bar; two controls at most', () => {
 test('sheet slots: string registry twin and trusted html', () => {
   const html = UI.sheet({ variant: 'page', title: { text: 'Pen log', str: 'log.title' }, subtitle: [{ text: 'B4' }, { sep: true }, { text: '2 open', tone: 'amber' }] });
   assert.match(html, /<span data-str="log.title">Pen log<\/span>/);
-  assert.match(html, /st-tone" data-tone="amber"/);
+  assert.match(html, /st-part" data-tone="amber"/);
   assert.match(UI.sheet({ title: { html: '<a>x</a>' } }), /<h2 class="sheet-title"><a>x<\/a>/);
 });

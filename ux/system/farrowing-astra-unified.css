@@ -37,12 +37,7 @@
 .farrowing-phone .sheet[data-view="locked"] .completed-record-body{padding-bottom:16px}
 .farrowing-phone .sheet[data-view="locked"] .finish-record{margin:0}
 .farrowing-phone .finish-record .facts-surface{padding:16px;background:#f6f7f2;border-radius:10px}
-.farrowing-phone .death-breakdown-facts{margin:0;padding:2px 14px;background:#f6f7f2;border-radius:10px}
-.farrowing-phone .death-breakdown-facts>div{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:9px 0;font-size:13px;line-height:1.5}
-.farrowing-phone .death-breakdown-facts dt{color:var(--muted)}
-.farrowing-phone .death-breakdown-facts dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums}
-.farrowing-phone .death-breakdown-facts .death-breakdown-total{padding-top:16px;font-weight:600}
-.farrowing-phone .death-breakdown-total dt{color:var(--ink)}@media(max-width:370px){
+@media(max-width:370px){
  .farrowing-phone .finish-record .facts-surface{padding:14px}}
 .farrowing-phone .optional{background:transparent;padding:0;margin:24px 0}
 .farrowing-phone .photo-field{background:transparent;padding:0;margin:24px 0 20px}

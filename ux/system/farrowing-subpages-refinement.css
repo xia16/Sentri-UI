@@ -59,10 +59,6 @@
 .farrowing-phone .sheet[data-view=locked] .record-inline-actions{padding-top:4px}
 
 /* History and death breakdown pages. */
-.farrowing-phone .death-breakdown-facts{margin:0;border:1px solid var(--line);border-radius:var(--subpage-radius);background:var(--surface,#f8faf5);padding:4px 14px}
-.farrowing-phone .death-breakdown-facts>div{display:flex;justify-content:space-between;align-items:center;min-height:48px;border-bottom:1px solid var(--line)}
-.farrowing-phone .death-breakdown-facts>div:last-child{border-bottom:0}
-.farrowing-phone .death-breakdown-facts dd{font:500 15px var(--font-mono);margin:0}
 
 /* Linked piglet care, identity, foster, mortality, marker, and reconciliation pages. */
 .farrowing-phone .feature-page>.sheet-body{gap:18px}

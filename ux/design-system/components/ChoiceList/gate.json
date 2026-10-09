@@ -1,92 +1,228 @@
 {
-  "round": 3,
-  "status": "in-design",
+  "status": "agent-checked",
+  "round": 4,
+  "regate": "cleanup pass, PR #72",
   "judged": "2026-10-10",
-  "commit": "8e198e7",
+  "commit": "ce52431",
   "model": "claude-opus-5-5",
-  "scores": { "clarity": 8, "budget": 7, "hierarchy": 8, "spacing": 8, "broken": 7 },
-  "lowest": 7,
+  "scores": {
+    "clarity": 8,
+    "budget": 8,
+    "hierarchy": 8,
+    "spacing": 8,
+    "broken": 8
+  },
+  "lowest": 8,
   "checklist": [
-    { "line": 1, "pass": true, "why": "One-line job; Segment and PickerField named" },
-    { "line": 2, "pass": true, "why": "When-not names Segment, Field, PickerField, optional rows, TaskChoice" },
-    { "line": 3, "pass": true, "why": "Row anatomy only: heading, lead, label, meta, trailing mark, search, empty, Clear, removal" },
-    { "line": 4, "pass": true, "why": "navigate, single, multi, radio, inline, each with use / not-use and an atlas tab" },
-    { "line": 5, "pass": true, "why": "Eight states per variant; one focus ring on inline; disabled keeps ink text and a reason" },
-    { "line": 6, "pass": true, "why": "Rows 56-58 on condition and medicine pickers; inline options >= 48; no sub-48 control in the variant demos" },
-    { "line": 7, "pass": true, "why": "Eight rows before search" },
-    { "line": 8, "pass": true, "why": "Check, checkbox, ring plus weight" },
-    { "line": 9, "pass": true, "why": "No zero or \"1 options\" meta; README forbids both" },
-    { "line": 10, "pass": true, "why": "radio roles, roving tabindex, native checkboxes, aria-pressed single" },
-    { "line": 11, "pass": true, "why": "Tokens only; but labelHidden emits an undefined class (see findings)" },
-    { "line": 12, "pass": true, "why": "Search labelled; not a validated field" },
-    { "line": 13, "pass": true, "why": "Not an overlay" },
-    { "line": 14, "pass": true, "why": "README rewritten for rows; sheets, steps and Back / Done linked to PickerField" },
-    { "line": 15, "pass": true, "why": "Condition picker multi / navigate rows and medicine single rows tapped end to end; ticks persist, meta correct" }
+    {
+      "line": 1,
+      "pass": true,
+      "why": "One-line job; Segment and PickerField named"
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "When-not names Segment, Field, PickerField, optional rows, TaskChoice"
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "Row anatomy only: heading, lead, label, meta, trailing mark, search, empty, Clear, removal"
+    },
+    {
+      "line": 4,
+      "pass": true,
+      "why": "navigate, single, multi, radio, inline, each with use / not-use and an atlas tab"
+    },
+    {
+      "line": 5,
+      "pass": true,
+      "why": "Eight states per variant; one focus ring on inline; disabled keeps ink text and a reason"
+    },
+    {
+      "line": 6,
+      "pass": true,
+      "why": "Rows 56-58 on condition and medicine pickers; inline options >= 48; no sub-48 control in the variant demos"
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "Eight rows before search"
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "Check, checkbox, ring plus weight"
+    },
+    {
+      "line": 9,
+      "pass": true,
+      "why": "No zero or \"1 options\" meta; README forbids both"
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "radio roles, roving tabindex, native checkboxes, aria-pressed single"
+    },
+    {
+      "line": 11,
+      "pass": true,
+      "why": "Tokens only; but labelHidden emits an undefined class (see findings)"
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Search labelled; not a validated field"
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay"
+    },
+    {
+      "line": 14,
+      "pass": true,
+      "why": "README rewritten for rows; sheets, steps and Back / Done linked to PickerField"
+    },
+    {
+      "line": 15,
+      "pass": true,
+      "why": "Condition picker multi / navigate rows and medicine single rows tapped end to end; ticks persist, meta correct"
+    }
   ],
   "classification": "component",
   "variants": [
     {
       "name": "navigate",
-      "usedBy": ["health-record.condition-picker", "health-record.medicine-picker"],
+      "usedBy": [
+        "health-record.condition-picker",
+        "health-record.medicine-picker"
+      ],
       "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
-      "findings": ["Fixed: meta only \"2 selected\" on chosen groups; medicine categories bare"]
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Fixed: meta only \"2 selected\" on chosen groups; medicine categories bare"
+      ]
     },
     {
       "name": "single",
-      "usedBy": ["health-record.medicine-picker", "health-record.edit-finding", "farrowing.death"],
+      "usedBy": [
+        "health-record.medicine-picker",
+        "health-record.edit-finding",
+        "farrowing.death"
+      ],
       "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
       "findings": []
     },
     {
       "name": "multi",
-      "usedBy": ["health-record.condition-picker"],
+      "usedBy": [
+        "health-record.condition-picker"
+      ],
       "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
       "findings": []
     },
     {
       "name": "radio",
-      "usedBy": ["farrowing born-correction / sow cause"],
+      "usedBy": [
+        "farrowing born-correction / sow cause"
+      ],
       "status": "in-design",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
-      "findings": ["Candidate under ADR 0002 (owner approval pending); usedBy still to be refreshed"]
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Candidate under ADR 0002 (owner approval pending); usedBy still to be refreshed"
+      ]
     },
     {
       "name": "inline",
-      "usedBy": ["piglet-processing (optional sex)"],
-      "status": "in-design",
-      "scores": { "clarity": 8, "budget": 7, "hierarchy": 8, "spacing": 8, "broken": 7 },
+      "usedBy": [
+        "piglet-processing (optional sex)"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
       "findings": [
-        "Fixed: demo is required Outcome (Kept / Sold) plus Sex in an optional row; one focus ring; disabled text is ink",
-        "Open optional Sex row prints \"Sex\" twice: labelHidden adds class visually-hidden, which bundle.css does not define (it defines st-visually-hidden)",
-        "Pressed state presses both options at once"
+        "Fixed: optional Sex row says \"Sex Optional\" once (st-visually-hidden); Pressed shades Kept only"
       ]
     }
   ],
   "findings": [
     {
-      "severity": "medium",
-      "text": "labelHidden does not hide: choiceRadios writes class=\"visually-hidden\" (bundle.js:674) but the bundle only defines .st-visually-hidden, so the open optional row reads \"Sex Optional\" then \"Sex  Female  Male\".",
-      "fix": "In choiceRadios use class=\"st-visually-hidden\" for labelHidden."
+      "severity": "low",
+      "text": "Radio variant usedBy still names \"farrowing born-correction / sow cause\" as an ADR 0002 candidate, not screen ids.",
+      "fix": "Refresh usedBy with real screen ids once the owner rules on ADR 0002."
     },
     {
       "severity": "low",
-      "text": "Inline Pressed state shades both options, so it shows two pressed targets at once.",
-      "fix": "Apply pressed to the first option only (as Focus now does)."
-    },
-    {
-      "severity": "low",
-      "text": "Atlas Overview shows \"No options match your search.\" under two rows with no search field.",
-      "fix": "Drop choiceEmpty from the overview, or show it under a search field with a query that matches nothing."
+      "text": "Inline Disabled options sit on a filled wash each, unlike Default; reads as a second surface.",
+      "fix": "Keep Disabled options on the row background; the reason line carries the state."
     }
   ],
   "proposals": [],
-  "previous": [
-    { "finding": "ChoiceList README is a verbatim copy of PickerField's", "fixed": true, "note": "Rewritten for rows; Behaviour, API, tokens and do/don't are row-only; links PickerField for sheets" },
-    { "finding": "Navigate rows always carry \"0 selected\" / \"1 options\" meta", "fixed": true, "note": "Verified on Symptoms (no zero meta), All (\"2 selected\" each) and medicine categories (none)" },
-    { "finding": "Inline Choice demoed as an always-visible optional field", "fixed": true, "note": "Required Outcome plus optional Sex row; but the hidden label shows (new finding)" },
-    { "finding": "Inline Focus rings both options; Disabled greys text", "fixed": true, "note": "One ring on the first option; ink text with reason line" }
-  ]
+  "verdicts": [
+    {
+      "finding": "labelHidden emits undefined .visually-hidden",
+      "result": "fixed",
+      "note": "Now st-visually-hidden; also clears Farrowing assisted row"
+    },
+    {
+      "finding": "Inline Pressed shades both options",
+      "result": "fixed",
+      "note": "First option only"
+    },
+    {
+      "finding": "Overview empty message under rows with no search",
+      "result": "fixed",
+      "note": "choiceEmpty removed from the overview"
+    }
+  ],
+  "previous": {
+    "round": 3,
+    "commit": "8e198e7",
+    "status": "in-design",
+    "lowest": 7,
+    "scores": {
+      "clarity": 8,
+      "budget": 7,
+      "hierarchy": 8,
+      "spacing": 8,
+      "broken": 7
+    },
+    "findings": [
+      "labelHidden does not hide: choiceRadios writes class=\"visually-hidden\" (bundle.js:674) but the bundle only defines .st-visually-hidden, so the open optional row reads \"Sex Optional\" then \"Sex  Female  Male\".",
+      "Inline Pressed state shades both options, so it shows two pressed targets at once.",
+      "Atlas Overview shows \"No options match your search.\" under two rows with no search field."
+    ]
+  }
 }

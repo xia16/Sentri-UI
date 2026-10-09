@@ -389,8 +389,8 @@
     });
     // a record known only by its day of life carries a date, no clock time
     var ymd = function (daysAgo) { var d = new Date(Date.now() - daysAgo * 864e5), z = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); };
-    p.weights.forEach(function (w) { list.push({ title: T('log.weight', { w: w.kg }), at: w.at || ymd(p.age - w.day) }); });
-    list.push({ title: T('log.born', { n: p.born }), detail: p.dead ? T('log.dead.birth', { n: p.dead }) : '', at: ymd(p.age) });
+    p.weights.forEach(function (w) { list.push({ title: T('log.weight', { w: w.kg }), at: w.at || ymd(p.age - w.day), by: w.who ? short(w.who) : undefined }); });
+    list.push({ title: T('log.born', { n: p.born }), detail: p.dead ? T('log.dead.birth', { n: p.dead }) : '', at: p.bornAt || ymd(p.age), by: p.bornWho ? short(p.bornWho) : undefined });
     var groups = UI.logGroups(list, { lang: L.lang === 'zh' ? 'zh-CN' : 'en', today: T('sec.today'), yesterday: T('log.yest') });
     return K.page({ title: T('log.title'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'log', body: UI.log(groups, { empty: T('log.none') }) });
   }

@@ -398,7 +398,7 @@
    4. sentri-visual-foundation.css (its :root palette now comes from tokens.css)
    Section 2 sits in a cascade layer (sentri-base): any page stylesheet wins over it in any load order, so Home, Farrowing
    and Inspection keep their own base. Sections 3-5 are unlayered and load after the page CSS.
-   5. sentri-components.css (the SentriUI parts), verbatim.
+   5. the SentriUI parts.
    Screens scope the foundation to a phone root: wrap content in .inspection-phone or .farrowing-phone
    and mark the container data-st-context="page" or "drawer". */
 :root{--sans:var(--font-sans);--mono:var(--font-mono);--wash:var(--well)}
@@ -467,9 +467,9 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .sheet-subtitle[data-tone="amber"]{color:var(--amber)}
 .sheet-subtitle[data-tone="red"]{color:var(--red)}
 .sheet-subtitle[data-tone="green"]{color:var(--green)}
-.sheet-subtitle .st-tone[data-tone="red"]{color:var(--red)}
-.sheet-subtitle .st-tone[data-tone="amber"]{color:var(--amber)}
-.sheet-subtitle .st-tone[data-tone="green"]{color:var(--green)}
+.sheet-subtitle .st-part[data-tone="red"]{color:var(--red)}
+.sheet-subtitle .st-part[data-tone="amber"]{color:var(--amber)}
+.sheet-subtitle .st-part[data-tone="green"]{color:var(--green)}
 .sheet-subtitle .st-sep{margin:0 var(--status-dot)}
 .sheet-aside .text-button,.sheet-aside .st-text-action{min-width:var(--tap-min)}
 .sheet-aside{flex:none;display:flex;align-items:center;align-self:flex-start;gap:var(--space-6)}
@@ -1005,9 +1005,11 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-choice-row[data-mode="multi"]:has(:checked) .st-choice-label{font-weight:var(--type-weight-strong)}
 .st-picker-steps{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-4)}
 .st-picker-sep{color:var(--muted);font:var(--font-size-14)/1 var(--font-sans)}
-.st-picker-value.is-names{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;white-space:normal;overflow-wrap:anywhere}
+.st-picker-value.is-names{display:flex;align-items:baseline;gap:var(--space-6);white-space:normal;overflow:visible}
+.st-picker-names{min-width:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+.st-picker-more{flex:none;color:var(--muted);font-weight:600}
 .st-picker-steps button,.st-picker-footer button{min-height:var(--tap-min);min-width:var(--tap-min);padding:var(--space-8);font:inherit}
-.st-picker-footer{display:flex;justify-content:space-between;gap:var(--space-12);padding:var(--space-12) 0}
+.st-picker-footer{display:flex;justify-content:space-between;gap:var(--space-12);padding-block:var(--space-12)}
 .st-choice-search input{min-height:var(--tap-min)}
 
 [data-state="Focus"] :is(.st-picker-trigger,.st-choice-row,.st-choice-inline-opt:first-child){outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
@@ -1035,6 +1037,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-selection-count{font:500 var(--type-meta-size)/1.4 var(--font-mono);color:var(--muted)}
 .st-segment button[aria-pressed=true]{background:var(--paper);font-weight:500;box-shadow:inset 0 calc(-1 * var(--space-3)) var(--ink)}
 .st-segment[data-variant=two-line-lens] button{flex-direction:column}
+.st-segment[data-variant=two-line-lens] .st-selection-count:empty{min-height:1.4em}
 .st-segment button:not([aria-pressed=true]):not(:disabled):active,.st-filter-chips button:not([aria-checked=true]):not(:disabled):active,[data-state=Pressed].st-segment button:nth-child(2),[data-state=Pressed].st-filter-chips button:nth-child(2){background:var(--handle)}
 .st-segment button:focus-visible,.st-filter-chips button:focus-visible,[data-state=Focus] button:first-child{outline:var(--space-3) solid var(--focus);outline-offset:var(--space-2)}
 .st-segment button:disabled,.st-filter-chips button:disabled{cursor:default;border:1px dashed var(--control-border)}
@@ -1042,7 +1045,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-filter-chips{min-width:0;padding:var(--space-6) 0}
 .st-filter-chips-track{display:flex;gap:var(--space-key-gap);overflow-x:auto;padding:var(--space-4) var(--space-gutter);scrollbar-width:thin}
 .st-filter-chips button{flex:none;max-width:100%;padding:var(--space-6) calc(var(--space-row-x) + (var(--size-16) + var(--space-3)) / 2);border:1px solid var(--line);border-radius:var(--radius-control);background:var(--well)}
-.st-filter-chips button[aria-checked=true]{background:var(--paper);font-weight:500}
+.st-filter-chips button[aria-checked=true]{background:var(--paper);font-weight:500;padding-inline:var(--space-row-x)}
 .st-chip-check{display:flex;width:var(--size-16);flex:none}
 .st-chip-check svg{width:var(--size-16);height:var(--size-16)}
 
@@ -1548,7 +1551,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 <aside class="sp-demo" id="demo"></aside>
 <script>/* ../../../design-system/components/bundle.js */
 /* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
-/* SentriIcons (sentri-icons.js) and SentriUI (sentri-components.js), verbatim. */
+/* SentriIcons (sentri-icons.js) and the SentriUI parts, in one file. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
 (function(root){
@@ -1799,9 +1802,10 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
      strs: label (raw label wrapped in a span), display or value (the shown value), placeholder. */
   function pickerField({label='',value='',display='',placeholder='Select',action='open-picker',key='',disabled=false,reason='',error='',loading=false,variant='single',selected=[],names=[],path=[],pressed=false,active=false,ariaLabel='',className='',strs,args}={}){
     const multi=variant.includes('multi'), named=multi&&names.length>0;
-    const text=named?names.slice(0,3).join(' · ')+(names.length>3?' · +'+(names.length-3):''):multi?(selected.length?selected.length+' selected':'None'):path.length?path.join(' / '):display||value;
+    const text=named?names.slice(0,3).join(' · ')+(names.length>3?' · +'+(names.length-3):''):multi?(selected.length?selected.length+' selected':'None'):path.length?path.join(' › '):display||value;
+    const more=named&&names.length>3?'+'+(names.length-3):'';
     const shown=text!==''&&text!=null, id=fieldId('st-picker'), hint=error||reason||(loading?'Loading options…':'');
-    return `<div class="field st-picker-field ${esc(className)}" data-ds="PickerField" data-variant="${esc(variant)}"><span id="${id}-label">${tx(label,{strs,args},'label')}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value${named?' is-names':''}"${named?'':sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
+    return `<div class="field st-picker-field ${esc(className)}" data-ds="PickerField" data-variant="${esc(variant)}"><span id="${id}-label">${tx(label,{strs,args},'label')}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value${named?' is-names':''}"${named?'':sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${named?`<span class="st-picker-names">${esc(names.slice(0,3).join(' · '))}</span>${more?`<span class="st-picker-more">${esc(more)}</span>`:''}`:esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
   }
   // Shared chooser surface: flat catalogue lists or a muted inset for short choices.
   function chooserList(content,{className='',tone='flat',ds='ChoiceList'}={}){
@@ -1824,7 +1828,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     const visible=q?leaves(items).filter(n=>[n.label,n.group||'',...n.trail,...(n.aliases||[])].join(' ').toLocaleLowerCase().includes(q)):cascade?nodes:leaves(items);
     const count=n=>leaves([n]).filter(x=>selected.includes(x.value)).length;
     const rows=visible.map(n=>{
-      const row=choiceRow({label:n.label,meta:n.children?(multi&&count(n)?count(n)+' selected':''):q?n.trail.join(' / '):n.meta||'',mode:n.children?'navigate':multi?'multi':'single',action:n.children||!multi?action:'',value:n.value,selected:selected.includes(n.value),disabled:!!n.disabled,reason:n.reason||'',attrs:n.attrs||{},strs:{...n.strs,...(n.children&&multi&&count(n)?{meta:'ds.picker.selected'}:{})},args:{...n.args,...(n.children&&multi&&count(n)?{meta:{n:count(n)}}:{})}});
+      const row=choiceRow({label:n.label,meta:n.children?(multi&&count(n)?count(n)+' selected':''):q?n.trail.join(' › '):n.meta||'',mode:n.children?'navigate':multi?'multi':'single',action:n.children||!multi?action:'',value:n.value,selected:selected.includes(n.value),disabled:!!n.disabled,reason:n.reason||'',attrs:n.attrs||{},strs:{...n.strs,...(n.children&&multi&&count(n)?{meta:'ds.picker.selected'}:{})},args:{...n.args,...(n.children&&multi&&count(n)?{meta:{n:count(n)}}:{})}});
       const extra=n.secondaryAction?`<div class="st-choice-extra">${button({label:n.secondaryAction.label,action:n.secondaryAction.action,value:n.value,register:'text',attrs:{'aria-label':n.secondaryAction.label+' '+n.label}})}</div>`:'';
       return row+extra;
     });
@@ -1832,7 +1836,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     const sep='<span class="st-picker-sep" aria-hidden="true">›</span>';
     const trail=cascade?`<nav class="st-picker-steps" aria-label="Chosen levels"><button type="button" data-action="${esc(stepAction)}" data-value="0">${tx('All',{strs:{all:strs.all||'ds.picker.all'}},'all')}</button>${steps.map((n,i)=>sep+`<button type="button" data-action="${esc(stepAction)}" data-value="${i+1}"${i===steps.length-1?' aria-current="step"':''}>${tx(n.label,n,'label')}</button>`).join('')}</nav>`:'';
     const groups=[];
-    visible.forEach((n,i)=>{const title=n.group||n.trail?.join(' / ')||'';let group=groups.find(g=>g.title===title);if(!group){group={title,rows:[]};groups.push(group);}group.rows.push(rows[i]);});
+    visible.forEach((n,i)=>{const title=n.group||n.trail?.join(' › ')||'';let group=groups.find(g=>g.title===title);if(!group){group={title,rows:[]};groups.push(group);}group.rows.push(rows[i]);});
     const list=!cascade&&!q?groups.map(g=>choiceGroup(g.rows,{title:g.title})).join(''):choiceGroup(rows);
     const content=loading||error?choiceEmpty(loading?'Loading options…':error,{strs:{text:loading?strs.loading||'ds.picker.loading':strs.error}}):visible.length?list:choiceEmpty(q?'No options match “'+query+'”.':'No options available.',{strs:{text:q?strs.noMatch||'ds.picker.no_match':strs.empty||'ds.picker.empty'},args:{text:{query}}});
     return `<div class="st-picker-body" data-ds="PickerField" data-variant="${esc(variant)}">${search}${trail}${content}</div>`;
@@ -1876,9 +1880,9 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   }
   function choiceEmpty(text,{strs,args}={}){return `<p class="st-choice-empty" data-ds="ChoiceList" role="status">${tx(text,{strs,args},'text')}</p>`;}
   /* options: [value,label,{strs:{label},args:{label}}?]; label is raw HTML, kept as the span's fallback. */
-  function segment({options=[],active='',action='',className='',ariaLabel='',variant='lens',state='Default',disabled=false,reason=''}={}){
+  function segment({options=[],active='',action='',className='',ariaLabel='',variant='two-line-lens',state='Default',disabled=false,reason=''}={}){
     if(!options.length)return '';
-    return `<div class="st-selection"><div class="st-segment ${esc(className)}" data-ds="Segment" data-variant="${esc(variant)}" data-state="${esc(state)}" role="group" aria-label="${esc(ariaLabel)}">${options.map(([v,label,x={}])=>{const blocked=disabled||x.disabled;return `<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}"${x.ariaLabel?` aria-label="${esc(x.ariaLabel)}"`:""}${blocked?' disabled':''}><span class="st-selection-label"${has(x,'label')?sa(x.strs.label,x.args&&x.args.label):''}>${label}</span>${x.count!=null?`<span class="st-selection-count">${x.count}</span>`:''}</button>`;}).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
+    return `<div class="st-selection"><div class="st-segment ${esc(className)}" data-ds="Segment" data-variant="${esc(variant)}" data-state="${esc(state)}" role="group" aria-label="${esc(ariaLabel)}">${options.map(([v,label,x={}])=>{const blocked=disabled||x.disabled;return `<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}"${x.ariaLabel?` aria-label="${esc(x.ariaLabel)}"`:""}${blocked?' disabled':''}><span class="st-selection-label"${has(x,'label')?sa(x.strs.label,x.args&&x.args.label):''}>${label}</span>${x.count!=null?`<span class="st-selection-count">${x.count}</span>`:variant==='two-line-lens'?'<span class="st-selection-count" aria-hidden="true"></span>':''}</button>`;}).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
   }
   function filterChips({items=[],action='chip',key='chips',label='',state='Default',reason=''}={}){
     if(!items.length)return '';
@@ -2353,8 +2357,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       return choiceGroup(rows,{title:label,lead,radio:true,aside:clearBtn,id:rid,className,strs:s.label?{title:s.label}:undefined,args:a.label?{title:a.label}:undefined});
     }
     const lid=rid+'-label';
-    const opt=x=>`<button type="button" class="st-choice-inline-opt"${disabled?' aria-disabled="true"':''}${pressed?' data-preview="pressed"':''} role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}"><span class="st-radio" aria-hidden="true"></span><span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span></button>`;
-    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio" id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
+    const opt=x=>`<button type="button" class="st-choice-inline-opt"${disabled?' aria-disabled="true"':''}${pressed&&x===options[0]?' data-preview="pressed"':''} role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}"><span class="st-radio" aria-hidden="true"></span><span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span></button>`;
+    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio" id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="st-visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
   }
   /* The radio keyboard model, pure: ArrowDown/ArrowRight → next, ArrowUp/ArrowLeft → previous (both wrap), Home → first,
      End → last. Returns the value to select and focus, or null for any other key. */
@@ -2418,7 +2422,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   const sPaths={'back-chevron':'M15 5l-7 7 7 7'};
   const sGlyph=k=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${sPaths[k]||(root.SentriIcons&&root.SentriIcons.paths&&root.SentriIcons.paths[k])||''}"/></svg>`;
   /* A line of parts, each a text slot with an optional tone: [{ text, str, args, tone }]; { sep: true } is the shared separator. */
-  const sParts=v=>Array.isArray(v)?v.map(p=>{const o=sObj(p);if(o.sep)return SEP;return o.tone?`<span class="st-tone" data-tone="${esc(o.tone)}">${sT(o)}</span>`:sT(o);}).join(''):sT(v);
+  const sParts=v=>Array.isArray(v)?v.map(p=>{const o=sObj(p);if(o.sep)return SEP;return o.tone?`<span class="st-part" data-tone="${esc(o.tone)}">${sT(o)}</span>`:sT(o);}).join(''):sT(v);
   /* Back: the footer's exit, the same on every sheet (a 16px chevron + the word). Alone in a footer it fills the bar. */
   function backButton({action='back',value='',label={text:'Back',str:'act.back'},className=''}={}){
     return button({register:'secondary',action,value,label:'',className:'surface-back'+(className?' '+className:'')}).replace('<span class="st-button-label"></span>',sGlyph('back-chevron')+'<span>'+sT(label)+'</span>');
@@ -2821,7 +2825,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'adj.use': 'Use {n}', 'adj.sub': '{pen} · {n} to do',
     'pg.now': 'Piglets now', 'pg.age': 'Age', 'pg.agev': 'day {d}', 'pg.sex': 'Boars · gilts', 'pg.sexv': '{b} · {g}', 'pg.ident': 'Identified',
     'pg.breeders': 'Breeders kept', 'pg.weight': 'Litter weight', 'pg.weightv': '{w} kg · day {d}', 'pg.noweight': 'Not weighed',
-    'pg.weight.hint': 'Weigh the litter: growth figures need it.', 'pg.ids': 'Identified piglets', 'pg.scan': 'Scan tag', 'pg.notch': 'Choose notch',
+    'pg.weight.hint': 'Weigh the litter', 'pg.ids': 'Identified piglets', 'pg.scan': 'Scan tag', 'pg.notch': 'Choose notch',
     'pg.manual': 'Add manually', 'pg.log': 'Pen log', 'pg.log.sub': 'Born, deaths, moves and counts', 'pg.summary': 'In the pen now',
     'idf.title': 'Tag · notch · weigh', 'idf.kg': 'Litter total weight', 'idf.boars': 'Boars', 'idf.gilts': 'Gilts', 'idf.tag': 'Tag no.',
     'idf.notch': 'Notch', 'idf.sex': 'Sex', 'idf.submit': 'Record {n} piglets', 'idf.submit.1': 'Record 1 piglet', 'idf.submit.0': 'Record piglets',
@@ -2930,7 +2934,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'adj.use': '用{n}头', 'adj.sub': '{pen} · 要做{n}头',
     'pg.now': '仔猪数量', 'pg.age': '仔猪日龄', 'pg.agev': '{d}天', 'pg.sex': '公猪 · 母猪', 'pg.sexv': '{b} · {g}', 'pg.ident': '有身份',
     'pg.breeders': '留种', 'pg.weight': '整窝体重', 'pg.weightv': '{w}公斤 · 第{d}天', 'pg.noweight': '无',
-    'pg.weight.hint': '请填写仔猪总体重，否则将会影响后期生长效益的计算。', 'pg.ids': '有身份仔猪', 'pg.scan': '扫描耳标', 'pg.notch': '选择耳缺',
+    'pg.weight.hint': '称窝重', 'pg.ids': '有身份仔猪', 'pg.scan': '扫描耳标', 'pg.notch': '选择耳缺',
     'pg.manual': '手动添加', 'pg.log': '本栏记录', 'pg.log.sub': '出生、死亡、转栏、清点', 'pg.summary': '现在栏里',
     'idf.title': '耳标/耳缺/体重', 'idf.kg': '仔猪总体重', 'idf.boars': '公猪数量', 'idf.gilts': '母猪数量', 'idf.tag': '耳标号',
     'idf.notch': '耳缺', 'idf.sex': '性别', 'idf.submit': '记录{n}头仔猪', 'idf.submit.0': '记录仔猪',
@@ -3073,7 +3077,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     function pen(code, age, born, dead, extra) {
       var i = Object.keys(pens).length;
       var p = { code: code, row: code[0], age: age, born: born, alive: born - dead, dead: dead, sowDied: false, movedIn: 0, movedOut: 0,
-        sow: '000' + (231 + i * 7), parity: 1 + (i * 5) % 6, litter: litter++, ids: [], idIn: 0, idOut: 0, picked: null, sex: null, weights: [], tr: {} };
+        sow: '000' + (231 + i * 7), parity: 1 + (i * 5) % 6, litter: litter++, ids: [], idIn: 0, idOut: 0, picked: null, sex: null, weights: [], tr: {}, bornAt: daysAgoAt(age, 7, 10), bornWho: OTHER };
       PLAN.forEach(function (t) { p.tr[t.key] = { got: 0, why: '' }; });
       Object.assign(p, extra || {});
       pens[code] = p;
@@ -3113,8 +3117,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     // B03: iron this morning
     give('B03', 'iron', 13, 0, 7, 52);
     // litter weights: birth weights on a few litters, A01 weighed again on its ID day
-    ['A01', 'A02', 'B03'].forEach(function (c, i) { pens[c].weights.push({ kg: [15.2, 14.1, 16.8][i], day: 0 }); });
-    pens.A01.weights.push({ kg: 24.6, day: 4 }); pens.A01.sex = { boar: 6, gilt: 6 };
+    ['A01', 'A02', 'B03'].forEach(function (c, i) { pens[c].weights.push({ kg: [15.2, 14.1, 16.8][i], day: 0, at: daysAgoAt(pens[c].age, 8, 0), who: OTHER }); });
+    pens.A01.weights.push({ kg: 24.6, day: 4, at: daysAgoAt(pens.A01.age - 4, 9, 15), who: ME }); pens.A01.sex = { boar: 6, gilt: 6 };
     // identity: A01 all done; A02 four of twelve so far, one kept for breeding
     if (scheme === 'tag' || scheme === 'notch') { ident('A01', 12, 2, 10, 0, []); ident('A02', 4, 0, 7, 30, [1]); }
     if (scheme === 'breeders') {
@@ -3255,7 +3259,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   }
   /* The litter's weight from the Piglets tab (a birth weight backfill or a weigh day) */
   function setWeight(code, kg) {
-    return change('weight', function () { var p = S.pens[code]; p.weights.push({ kg: +kg, day: p.age, at: Date.now() }); return kg; });
+    return change('weight', function () { var p = S.pens[code]; p.weights.push({ kg: +kg, day: p.age, at: Date.now(), who: ME }); return kg; });
   }
   function bulk(k, picks) {   // picks: [{ pen, mark }]
     return change('bulk', function () {
@@ -3801,8 +3805,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     });
     // a record known only by its day of life carries a date, no clock time
     var ymd = function (daysAgo) { var d = new Date(Date.now() - daysAgo * 864e5), z = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); };
-    p.weights.forEach(function (w) { list.push({ title: T('log.weight', { w: w.kg }), at: w.at || ymd(p.age - w.day) }); });
-    list.push({ title: T('log.born', { n: p.born }), detail: p.dead ? T('log.dead.birth', { n: p.dead }) : '', at: ymd(p.age) });
+    p.weights.forEach(function (w) { list.push({ title: T('log.weight', { w: w.kg }), at: w.at || ymd(p.age - w.day), by: w.who ? short(w.who) : undefined }); });
+    list.push({ title: T('log.born', { n: p.born }), detail: p.dead ? T('log.dead.birth', { n: p.dead }) : '', at: p.bornAt || ymd(p.age), by: p.bornWho ? short(p.bornWho) : undefined });
     var groups = UI.logGroups(list, { lang: L.lang === 'zh' ? 'zh-CN' : 'en', today: T('sec.today'), yesterday: T('log.yest') });
     return K.page({ title: T('log.title'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'log', body: UI.log(groups, { empty: T('log.none') }) });
   }

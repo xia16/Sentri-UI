@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T18:32:44.571Z",
- "commit": "0c7bee2",
+ "generated": "2026-10-09T19:12:35.601Z",
+ "commit": "dfc548b",
  "platforms": [
   {
    "id": "mobile",
@@ -11637,6 +11637,17 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "destructive",
+     "hold",
+     "primary",
+     "secondary",
+     "text",
+     "tool"
+    ]
    }
   },
   {
@@ -11817,6 +11828,13 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "bordered",
+     "plain"
+    ]
    }
   },
   {
@@ -11994,6 +12012,10 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -12202,6 +12224,14 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "group",
+     "page",
+     "section"
+    ]
    }
   },
   {
@@ -12512,6 +12542,19 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "animal",
+     "door-act",
+     "navigation",
+     "record",
+     "scope",
+     "select-door",
+     "summary-count",
+     "tick"
+    ]
    }
   },
   {
@@ -12716,6 +12759,10 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -12917,6 +12964,13 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "three-column",
+     "two-column"
+    ]
    }
   },
   {
@@ -13104,6 +13158,13 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "categorised",
+     "day"
+    ]
    }
   },
   {
@@ -13334,72 +13395,35 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "dialog",
+     "drawer",
+     "page"
+    ]
    }
   },
   {
    "name": "Segment",
    "group": "Base",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "round": 3,
-    "previous": {
-     "round": 2,
-     "commit": "d5aa6fa",
-     "judged": "2026-10-10",
-     "lowest": 6,
-     "scores": {
-      "clarity": 7,
-      "budget": 7,
-      "hierarchy": 8,
-      "spacing": 7,
-      "broken": 6
-     }
-    },
+    "status": "agent-checked",
+    "round": 4,
+    "regate": "cleanup pass, PR #72",
     "judged": "2026-10-10",
-    "commit": "0cde753",
+    "commit": "ce52431",
     "model": "claude-opus-5-5",
     "scores": {
      "clarity": 8,
      "budget": 8,
      "hierarchy": 8,
-     "spacing": 7,
+     "spacing": 8,
      "broken": 8
     },
-    "lowest": 7,
-    "roundTwoFindings": [
-     {
-      "finding": ".st-selection{flex:1} stretched in column flex (Choose conditions ~160px gap)",
-      "fixed": true,
-      "note": "Wrapper is flex:none; the Diseases/Symptoms wrapper measures 354x56 and Search follows 12px below."
-     },
-     {
-      "finding": "Press feedback imperceptible",
-      "fixed": true,
-      "note": "An unselected option presses to --handle #dce0d4 (measured on Piglet's Done); the selected option keeps its paper face; the demo presses the second option."
-     },
-     {
-      "finding": "Lens vs two-line lens differ only in look",
-      "fixed": true,
-      "note": "README and variants.json state the rule; Piglet, Farrowing and Inspection all render the two-line lens. No screen uses the inline lens now."
-     },
-     {
-      "finding": "Piglet: Done count repeats the card; To do pills on rows",
-      "fixed": true,
-      "note": "Done has no count; rows carry no To do / Done pill (only Late / Sow died)."
-     },
-     {
-      "finding": "Environment: sensor switch flush on card; period tagged lens; fan .device-mode hand-built",
-      "fixed": "partly",
-      "note": "Period and Fan mode are Segment view switch, .device-mode CSS deleted, the fan switch has a 12px gap. The Sensor switch still ends exactly where the sensor card begins (bottom 173 = top 173)."
-     },
-     {
-      "finding": "Dead copies (sentri-components.js segment(), foundation .scope-tabs/.health-tabs/.room-tabs)",
-      "fixed": false,
-      "note": "Both still present; not loaded."
-     }
-    ],
-    "reversals": "None. Owner rulings stand: a lens above chips is allowed; Done as a lens state is accepted.",
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
@@ -13487,16 +13511,16 @@
        "inspection.walk",
        "feed-plan.bulk"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
-       "spacing": 7,
+       "spacing": 8,
        "broken": 8
       },
       "findings": [
-       "Piglet: To do has a count line and Done has none, so the two labels sit at different heights (To do about 8px higher than Done)."
+       "Fixed: Piglet To do 9 / Done labels share one top (313) via an empty aria-hidden count line; Farrowing four options aligned (317), 72x48"
       ]
      },
      {
@@ -13511,7 +13535,7 @@
        "broken": 8
       },
       "findings": [
-       "No screen uses it now. The Overview preview and the bundle.js default (variant='lens') still show it as To do 18 / Done 3, the task-list case the README now forbids for it."
+       "Overview and bundle default are now two-line lens; the Lens tab still demos To do 18 / Done 3, the case its own NOT FOR line forbids. No screen uses it."
       ]
      },
      {
@@ -13525,16 +13549,16 @@
        "environment.page",
        "environment.fan-manual"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
-       "spacing": 7,
+       "spacing": 8,
        "broken": 8
       },
       "findings": [
-       "Environment: the Sensor switch touches the sensor card below (0px gap); the period and fan switches are fine."
+       "Fixed: Environment sensor switch ends at 173, the card starts at 185 (12px)"
       ]
      },
      {
@@ -13555,83 +13579,87 @@
     ],
     "findings": [
      {
-      "severity": "medium",
-      "text": "A two-line lens with a count on some options only (Piglet: To do 9 / Done) misaligns the labels: the countless option centres a single line.",
-      "fix": "In two-line-lens always render the count line (empty, aria-hidden, same line height) so every label shares one baseline."
+      "severity": "low",
+      "text": "Lens variant tab demos To do 18 / Done 3, the task-list case the variant's NOT FOR line sends to Two-line lens.",
+      "fix": "variants/lens.html: demo a 2-state card-header split (e.g. Today / 7 days, no counts)."
      },
      {
       "severity": "low",
-      "text": "The Overview preview and the bundle.js default variant ('lens') present the inline lens as To do / Done with counts, contradicting the new rule.",
-      "fix": "Default the variant to 'two-line-lens' and show the Overview with it; demo the inline lens as a 2-state card-header split."
-     },
-     {
-      "severity": "low",
-      "text": "Environment: the Sensor view switch sits flush on the sensor card (0px gap).",
-      "fix": "Add .environment-page>.st-selection{margin-bottom:var(--space-12)}, as was done for .device-control."
-     },
-     {
-      "severity": "low",
-      "text": "Dead copies remain: ux/system/sentri-components.js segment(); sentri-visual-foundation.css .room-tabs/.scope-tabs/.health-tabs.",
-      "fix": "Delete them."
+      "text": "Lens (inline count) has no screen; it survives only as a documented option.",
+      "fix": "Remove it at the next pass if no screen adopts it."
      }
     ],
-    "proposals": []
+    "proposals": [],
+    "verdicts": [
+     {
+      "finding": "Two-line lens misaligns when only some options have a count",
+      "result": "fixed"
+     },
+     {
+      "finding": "Overview and bundle default present the inline lens",
+      "result": "fixed",
+      "note": "Default two-line-lens; Overview two-line; Lens tab demo unchanged (low)"
+     },
+     {
+      "finding": "Environment sensor switch flush on card",
+      "result": "fixed",
+      "note": "12px gap"
+     },
+     {
+      "finding": "Dead segment() and .scope-tabs/.health-tabs/.room-tabs",
+      "result": "fixed",
+      "note": "sentri-components.js/.css deleted; only comments mention them"
+     }
+    ],
+    "previous": {
+     "round": 3,
+     "commit": "0cde753",
+     "status": "in-design",
+     "lowest": 7,
+     "scores": {
+      "clarity": 8,
+      "budget": 8,
+      "hierarchy": 8,
+      "spacing": 7,
+      "broken": 8
+     },
+     "findings": [
+      "A two-line lens with a count on some options only (Piglet: To do 9 / Done) misaligns the labels: the countless option centres a single line.",
+      "The Overview preview and the bundle.js default variant ('lens') present the inline lens as To do / Done with counts, contradicting the new rule.",
+      "Environment: the Sensor view switch sits flush on the sensor card (0px gap).",
+      "Dead copies remain: ux/system/sentri-components.js segment(); sentri-visual-foundation.css .room-tabs/.scope-tabs/.health-tabs."
+     ]
+    }
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "facet",
+     "lens",
+     "two-line-lens",
+     "view-switch"
+    ]
    }
   },
   {
    "name": "FilterChips",
    "group": "Base",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "round": 3,
-    "previous": {
-     "round": 2,
-     "commit": "d5aa6fa",
-     "judged": "2026-10-10",
-     "lowest": 7,
-     "scores": {
-      "clarity": 7,
-      "budget": 8,
-      "hierarchy": 8,
-      "spacing": 7,
-      "broken": 7
-     }
-    },
+    "status": "agent-checked",
+    "round": 4,
+    "regate": "cleanup pass, PR #72",
     "judged": "2026-10-10",
-    "commit": "0cde753",
+    "commit": "ce52431",
     "model": "claude-opus-5-5",
     "scores": {
      "clarity": 8,
      "budget": 8,
      "hierarchy": 8,
-     "spacing": 7,
-     "broken": 7
+     "spacing": 8,
+     "broken": 8
     },
-    "lowest": 7,
-    "roundTwoFindings": [
-     {
-      "finding": "Press feedback invisible",
-      "fixed": true,
-      "note": "An unselected chip presses to --handle #dce0d4 (measured on Dock tail); the selected chip keeps paper; the demo presses chip 2."
-     },
-     {
-      "finding": "Hidden check slot offsets labels",
-      "fixed": "partly",
-      "note": "The check is rendered only on the selected chip and unselected labels are centred, but the width is not stable: selecting Iron grows it 82->101px and All shrinks 83->63px, shifting every chip after it. The README claims the width stays the same."
-     },
-     {
-      "finding": "Content rules copied from Segment",
-      "fixed": true,
-      "note": "Chip-specific rules: 1-2 word job names, 12/6 character cap, one count, All first without a count, the dynamic set scrolls."
-     },
-     {
-      "finding": "Demo data incoherent (All 2)",
-      "fixed": "partly",
-      "note": "variants/tags.html drops All's count; the Overview preview on the atlas page still shows All 2 beside Iron 3 / Dock tail 4."
-     }
-    ],
-    "reversals": "None.",
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
@@ -13717,52 +13745,83 @@
        "piglet-processing.pen-list",
        "piglet-processing.job-chip"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
-       "spacing": 7,
-       "broken": 7
+       "spacing": 8,
+       "broken": 8
       },
       "findings": [
-       "Selecting a chip changes its width by about 19px (check + gap), so the scroll track reflows under the finger."
+       "Fixed: Piglet list, select Iron: All 64->63, Iron 82->82, others unchanged; 48 tall"
       ]
      }
     ],
     "findings": [
      {
-      "severity": "medium",
-      "text": "Width is not stable on select: the padding that reserves the check stays on the selected chip too, so it grows by the check width (Iron 82->101, All 83->63 at 390), contradicting the README.",
-      "fix": "Give the selected chip the plain padding: .st-filter-chips button[aria-checked=true]{padding-inline:var(--space-row-x)}."
-     },
-     {
       "severity": "low",
-      "text": "The atlas Overview preview still shows All with a count (All 2 beside Iron 3), against the new 'All has no count' rule; only variants/tags.html was updated.",
-      "fix": "Drop All's count in FilterChips/preview.html as in variants/tags.html."
+      "text": "All moves 1px on deselect (64 -> 63) from rounding of the reserved check slot; not visible.",
+      "fix": "None needed."
      }
     ],
-    "proposals": []
+    "proposals": [],
+    "verdicts": [
+     {
+      "finding": "Width not stable on select",
+      "result": "fixed",
+      "note": "Selected chip uses plain padding"
+     },
+     {
+      "finding": "Overview All has a count",
+      "result": "fixed",
+      "note": "Overview shows All without a count"
+     }
+    ],
+    "previous": {
+     "round": 3,
+     "commit": "0cde753",
+     "status": "in-design",
+     "lowest": 7,
+     "scores": {
+      "clarity": 8,
+      "budget": 8,
+      "hierarchy": 8,
+      "spacing": 7,
+      "broken": 7
+     },
+     "findings": [
+      "Width is not stable on select: the padding that reserves the check stays on the selected chip too, so it grows by the check width (Iron 82->101, All 83->63 at 390), contradicting the README.",
+      "The atlas Overview preview still shows All with a count (All 2 beside Iron 3), against the new 'All has no count' rule; only variants/tags.html was updated."
+     ]
+    }
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "tags"
+    ]
    }
   },
   {
    "name": "ChoiceList",
    "group": "Base",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "round": 3,
-    "status": "in-design",
+    "status": "agent-checked",
+    "round": 4,
+    "regate": "cleanup pass, PR #72",
     "judged": "2026-10-10",
-    "commit": "8e198e7",
+    "commit": "ce52431",
     "model": "claude-opus-5-5",
     "scores": {
      "clarity": 8,
-     "budget": 7,
+     "budget": 8,
      "hierarchy": 8,
      "spacing": 8,
-     "broken": 7
+     "broken": 8
     },
-    "lowest": 7,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
@@ -13914,60 +13973,76 @@
       "usedBy": [
        "piglet-processing (optional sex)"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
-       "budget": 7,
+       "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
-       "broken": 7
+       "broken": 8
       },
       "findings": [
-       "Fixed: demo is required Outcome (Kept / Sold) plus Sex in an optional row; one focus ring; disabled text is ink",
-       "Open optional Sex row prints \"Sex\" twice: labelHidden adds class visually-hidden, which bundle.css does not define (it defines st-visually-hidden)",
-       "Pressed state presses both options at once"
+       "Fixed: optional Sex row says \"Sex Optional\" once (st-visually-hidden); Pressed shades Kept only"
       ]
      }
     ],
     "findings": [
      {
-      "severity": "medium",
-      "text": "labelHidden does not hide: choiceRadios writes class=\"visually-hidden\" (bundle.js:674) but the bundle only defines .st-visually-hidden, so the open optional row reads \"Sex Optional\" then \"Sex  Female  Male\".",
-      "fix": "In choiceRadios use class=\"st-visually-hidden\" for labelHidden."
+      "severity": "low",
+      "text": "Radio variant usedBy still names \"farrowing born-correction / sow cause\" as an ADR 0002 candidate, not screen ids.",
+      "fix": "Refresh usedBy with real screen ids once the owner rules on ADR 0002."
      },
      {
       "severity": "low",
-      "text": "Inline Pressed state shades both options, so it shows two pressed targets at once.",
-      "fix": "Apply pressed to the first option only (as Focus now does)."
-     },
-     {
-      "severity": "low",
-      "text": "Atlas Overview shows \"No options match your search.\" under two rows with no search field.",
-      "fix": "Drop choiceEmpty from the overview, or show it under a search field with a query that matches nothing."
+      "text": "Inline Disabled options sit on a filled wash each, unlike Default; reads as a second surface.",
+      "fix": "Keep Disabled options on the row background; the reason line carries the state."
      }
     ],
     "proposals": [],
-    "previous": [
+    "verdicts": [
      {
-      "finding": "ChoiceList README is a verbatim copy of PickerField's",
-      "fixed": true,
-      "note": "Rewritten for rows; Behaviour, API, tokens and do/don't are row-only; links PickerField for sheets"
+      "finding": "labelHidden emits undefined .visually-hidden",
+      "result": "fixed",
+      "note": "Now st-visually-hidden; also clears Farrowing assisted row"
      },
      {
-      "finding": "Navigate rows always carry \"0 selected\" / \"1 options\" meta",
-      "fixed": true,
-      "note": "Verified on Symptoms (no zero meta), All (\"2 selected\" each) and medicine categories (none)"
+      "finding": "Inline Pressed shades both options",
+      "result": "fixed",
+      "note": "First option only"
      },
      {
-      "finding": "Inline Choice demoed as an always-visible optional field",
-      "fixed": true,
-      "note": "Required Outcome plus optional Sex row; but the hidden label shows (new finding)"
-     },
-     {
-      "finding": "Inline Focus rings both options; Disabled greys text",
-      "fixed": true,
-      "note": "One ring on the first option; ink text with reason line"
+      "finding": "Overview empty message under rows with no search",
+      "result": "fixed",
+      "note": "choiceEmpty removed from the overview"
      }
+    ],
+    "previous": {
+     "round": 3,
+     "commit": "8e198e7",
+     "status": "in-design",
+     "lowest": 7,
+     "scores": {
+      "clarity": 8,
+      "budget": 7,
+      "hierarchy": 8,
+      "spacing": 8,
+      "broken": 7
+     },
+     "findings": [
+      "labelHidden does not hide: choiceRadios writes class=\"visually-hidden\" (bundle.js:674) but the bundle only defines .st-visually-hidden, so the open optional row reads \"Sex Optional\" then \"Sex  Female  Male\".",
+      "Inline Pressed state shades both options, so it shows two pressed targets at once.",
+      "Atlas Overview shows \"No options match your search.\" under two rows with no search field."
+     ]
+    }
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "inline",
+     "multi",
+     "navigate",
+     "radio",
+     "single"
     ]
    }
   },
@@ -14109,6 +14184,10 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -14282,6 +14361,10 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -14289,17 +14372,18 @@
    "group": "Fields",
    "status": "in-design",
    "gate": {
-    "round": 3,
     "status": "in-design",
+    "round": 4,
+    "regate": "cleanup pass, PR #72",
     "judged": "2026-10-10",
-    "commit": "8e198e7",
+    "commit": "ce52431",
     "model": "claude-opus-5-5",
     "scores": {
      "clarity": 8,
      "budget": 8,
-     "hierarchy": 7,
-     "spacing": 8,
-     "broken": 7
+     "hierarchy": 8,
+     "spacing": 7,
+     "broken": 8
     },
     "lowest": 7,
     "checklist": [
@@ -14376,7 +14460,7 @@
      {
       "line": 15,
       "pass": true,
-      "why": "Tapped condition picker: 4 ticks across Symptoms and Diseases, steps, Done, reopen, 5th tick, Back, search, Escape; medicine pick writes the path. Works; two display defects below"
+      "why": "Ticked 4 conditions, Done, Record health shows names +1; medicine pick, reopen keeps path and tick; one footer spacing defect"
      }
     ],
     "classification": "component",
@@ -14426,15 +14510,14 @@
       "scores": {
        "clarity": 8,
        "budget": 8,
-       "hierarchy": 7,
-       "spacing": 8,
+       "hierarchy": 8,
+       "spacing": 7,
        "broken": 8
       },
       "findings": [
-       "Fixed: no \"1 options\" meta; step row reads All › Antibiotics; pick commits and writes the path",
-       "Not fixed: the medicine sheet's only footer action, Back, is still the full-width filled primary (host footer, not pickerFooter)",
-       "Trigger path uses \" / \" (Antibiotics / Antibiotic B) while the sheet uses ›; reopening starts at All with no check on the current medicine",
-       "Atlas cascade demo labels the field Medicine but browses Symptoms"
+       "Fixed: Back is the secondary pickerFooter Back; trigger path \"Antibiotics › Antibiotic B\"; reopening opens All › Antibiotics with Antibiotic B ticked",
+       "New: the picker footer has no side gutter (Back 390 wide, edge to edge, corners cut)",
+       "Not fixed: atlas cascade demo labels Medicine but browses Symptoms"
       ]
      },
      {
@@ -14448,79 +14531,87 @@
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
-       "spacing": 8,
-       "broken": 7
+       "spacing": 7,
+       "broken": 8
       },
       "findings": [
-       "Fixed: › separated steps with the last step current; \"2 selected\" only on chosen groups; Record health shows names",
-       "Record health trigger with 4 conditions clamps at 2 lines and cuts \"· +1\" off (\"…Porcine reproductive and…\"; scrollHeight 59 > clientHeight 39): the worker cannot see that more are chosen"
+       "Fixed: Record health with 4 conditions shows two clamped lines of names plus an unclamped \"+1\" inside the 65px trigger",
+       "New: Select conditions footer Back / Done · 4 run to the screen edges (no gutter)"
       ]
      }
     ],
     "findings": [
      {
       "severity": "medium",
-      "text": "Record-form names are line-clamped after \"+n\" is appended, so with long names the \"+n\" is the part that gets cut (Record health, 4 conditions: \"Weakness or unsteady stance · Reduced appetite · Porcine reproductive and…\").",
-      "fix": "Render \"+n\" in its own unclamped span after the clamped names span in pickerField, so the count is always visible."
-     },
-     {
-      "severity": "medium",
-      "text": "Medicine picker's sole Back is still drawn as the full-width filled primary button; everywhere else Back is secondary (round-2 finding, not fixed).",
-      "fix": "Render the medicine sheet footer with SentriUI.pickerFooter({multi:false}) instead of the host footer, which gives a secondary Back."
+      "text": ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on Select conditions (Back / Done · 4) and Select medicine (Back, 390px wide) the buttons touch the screen edges and their rounded corners are cut. Moving the medicine sheet onto pickerFooter spread it.",
+      "fix": "bundle.css: .st-picker-footer{padding-block:var(--space-12)} (no inline 0) so the sheet footer keeps its gutter."
      },
      {
       "severity": "low",
-      "text": "Path written two ways: trigger \"Antibiotics / Antibiotic B\", sheet \"All › Antibiotics\".",
-      "fix": "pickerField: join path with \" › \" to match the step row."
+      "text": "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path [Antibiotics, Conditions] (round 3, not fixed).",
+      "fix": "variants/cascade.html: use medicine categories and a medicine leaf."
      },
      {
       "severity": "low",
-      "text": "Reopening the medicine picker starts at All with nothing marked, so the current pick is not shown.",
-      "fix": "Host opens at the stored path's parent level with the chosen leaf selected."
-     },
-     {
-      "severity": "low",
-      "text": "Atlas Overview demos Conditions (a record form) as \"1 selected\", and the cascade demo browses Symptoms under a Medicine label.",
-      "fix": "Overview: pass names:[\"Low appetite\"]; cascade.html: use medicine categories for items."
+      "text": "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed).",
+      "fix": "preview.html: pass names:[\"Low appetite\"]."
      }
     ],
     "proposals": [],
-    "previous": [
+    "verdicts": [
      {
-      "finding": "Back and Done in the multi footer do the same thing",
-      "fixed": true,
-      "note": "Reversed: no longer a defect. Back = leave and keep the draft is the repo's verb law; Done · n confirms; README says so. Verified Back after a 5th tick keeps it on the trigger"
+      "finding": "+n clipped by the 2-line clamp",
+      "result": "fixed",
+      "note": ".st-picker-more outside .st-picker-names; \"+1\" visible"
      },
      {
-      "finding": "Record health shows \"4 selected\" instead of the chosen names",
-      "fixed": true,
-      "note": "Names joined by · on the trigger, filters keep the count; but the +n is clipped by the 2-line clamp (new finding)"
+      "finding": "Medicine Back drawn as filled primary",
+      "result": "fixed",
+      "note": "pickerFooter({multi:false}) gives a secondary Back; but no gutter (new finding)"
      },
      {
-      "finding": "pickerBody prints \"0 selected\" / \"1 options\" branch meta",
-      "fixed": true,
-      "note": "Symptoms list has no zero meta; \"2 selected\" on chosen groups only; medicine categories have no meta"
+      "finding": "Path joined with \" / \" on the trigger",
+      "result": "fixed",
+      "note": "\" › \" on trigger, search meta and group titles"
      },
      {
-      "finding": "Single shows Back + Done and Active renders the label as value",
-      "fixed": true,
-      "note": "Single footer is Back only; Active shows Low appetite; demo label is Cause"
+      "finding": "Reopen starts at All with nothing marked",
+      "result": "fixed",
+      "note": "Opens at the category with the current medicine ticked"
      },
      {
-      "finding": "Step row has no separator",
-      "fixed": true,
-      "note": "All › Symptoms › General appearance, last step bold with aria-current"
-     },
-     {
-      "finding": "inspection-subpages-refinement.css pins the trigger height",
-      "fixed": true,
-      "note": "Selector removed"
-     },
-     {
-      "finding": "cascade variant: Back drawn as filled primary on the medicine sheet",
-      "fixed": false,
-      "note": "Still the host's filled primary Back"
+      "finding": "Overview \"1 selected\"; cascade demo browses Symptoms under Medicine",
+      "result": "not fixed"
      }
+    ],
+    "previous": {
+     "round": 3,
+     "commit": "8e198e7",
+     "status": "in-design",
+     "lowest": 7,
+     "scores": {
+      "clarity": 8,
+      "budget": 8,
+      "hierarchy": 7,
+      "spacing": 8,
+      "broken": 7
+     },
+     "findings": [
+      "Record-form names are line-clamped after \"+n\" is appended, so with long names the \"+n\" is the part that gets cut (Record health, 4 conditions: \"Weakness or unsteady stance · Reduced appetite · Porcine reproductive and…\").",
+      "Medicine picker's sole Back is still drawn as the full-width filled primary button; everywhere else Back is secondary (round-2 finding, not fixed).",
+      "Path written two ways: trigger \"Antibiotics / Antibiotic B\", sheet \"All › Antibiotics\".",
+      "Reopening the medicine picker starts at All with nothing marked, so the current pick is not shown.",
+      "Atlas Overview demos Conditions (a record form) as \"1 selected\", and the cascade demo browses Symptoms under a Medicine label."
+     ]
+    }
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "cascade",
+     "cascade-multi",
+     "multi",
+     "single"
     ]
    }
   },
@@ -14727,6 +14818,10 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -14908,6 +15003,10 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -15065,26 +15164,31 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
    "name": "Status",
    "group": "Status and feedback",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "round": 3,
+    "status": "agent-checked",
+    "round": 4,
+    "regate": "cleanup pass, PR #72",
     "judged": "2026-10-10",
-    "commit": "058561c",
+    "commit": "ce52431",
     "model": "claude-opus-5-5",
     "scores": {
      "clarity": 8,
-     "budget": 7,
+     "budget": 8,
      "hierarchy": 8,
      "spacing": 8,
      "broken": 8
     },
-    "lowest": 7,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
@@ -15159,7 +15263,7 @@
      {
       "line": 15,
       "pass": true,
-      "why": "Real screens at 390 have scrollWidth 390; Status itself never clips"
+      "why": "Pen map, piglet list, Home today at 390: scrollWidth 390, no clipping; variant tabs Chip 8 / Word 8 / Line 6 cells render, console clean"
      }
     ],
     "classification": "component",
@@ -15173,17 +15277,16 @@
        "piglet-processing.sheet-late",
        "task-cards (state=overdue)"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
-       "budget": 7,
+       "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
        "broken": 8
       },
       "findings": [
-       "Map holds: Active blue, Done green, Sow died red, Overdue red, To do muted; every chip says its word",
-       "Home's overdue card says it twice: chip 'Overdue' and meta 'Batch 28 · farrowing window · 2 days overdue', which truncates to '2 days ov...'"
+       "Fixed: overdue task card meta timing is the count only (\"... · 2 days\") beside the Overdue chip; no repeat, no ellipsis"
       ]
      },
      {
@@ -15200,7 +15303,7 @@
        "broken": 8
       },
       "findings": [
-       "B1 'Active' blue and B4 'Overdue' red render from status({variant:'word'}); by-hand pen colours gone. Done cell is a hand check glyph + '23 born'"
+       "Fixed: B3 Done cell renders status({variant:\"word\",kind:\"done\"}) \"23 born\" green with the dot; hand check glyph gone. B1 Active and B4 Overdue unchanged"
       ]
      },
      {
@@ -15224,59 +15327,59 @@
     ],
     "findings": [
      {
-      "severity": "medium",
-      "text": "Home's overdue task card states overdue twice (chip 'Overdue' + meta '2 days overdue'), and the repeat pushes the meta into an ellipsis ('2 days ov...') (astra-home-task-card.js:22-24).",
-      "fix": "For state 'overdue', make the meta timing the count only ('2 days') or drop it; the chip already says Overdue."
+      "severity": "low",
+      "text": "Done pen cell aria-label reads \"Pen B3, 23 born\": with the check (aria-label Done) gone, the Done state is not named for a screen reader.",
+      "fix": "Label done cells \"Pen B3, Done, 23 born\" in farrowing-astra-concept.js roomGrid."
      },
      {
       "severity": "low",
-      "text": "Farrowing's Go-to-pen Done cell draws its own check glyph instead of the Status done mark.",
-      "fix": "Render it with status({ variant: 'word', kind: 'done', text: f.text }) like Active and Overdue, or leave the count plain without the hand glyph."
+      "text": "Home overdue state verified in the card model and DOM text (\"Batch 28 · farrowing window · 2 days\"), not on a rendered bare screen: no atlas screen shows an overdue task card.",
+      "fix": "Add an atlas screen for task-cards state=overdue so the overdue card is judged in use."
+     }
+    ],
+    "proposals": [],
+    "verdicts": [
+     {
+      "finding": "Home overdue card states overdue twice and truncates",
+      "result": "fixed",
+      "note": "Meta \"2 days\"; the chip says Overdue"
+     },
+     {
+      "finding": "Pen-map Done cell draws its own check glyph",
+      "result": "fixed",
+      "note": "Done via the Status word variant"
+     },
+     {
+      "finding": "Sheet subtitle tone class",
+      "result": "fixed",
+      "note": "sParts emits .st-part; bundle.css rules renamed; no .st-tone left"
      }
     ],
     "previous": {
-     "round": 2,
-     "commit": "c1508ba",
+     "round": 3,
+     "commit": "058561c",
+     "status": "in-design",
      "lowest": 7,
-     "verdicts": [
-      {
-       "finding": "Farrowing pen map paints states by hand, off the map",
-       "result": "fixed",
-       "note": "Active/Overdue cells use the Word variant (blue/red); .pen-cell.<kind> colours deleted; Overdue maps to 'overdue'"
-      },
-      {
-       "finding": "Home timing count in a Status chip with the Late clock",
-       "result": "fixed",
-       "note": "Timing is meta text; chip only for Overdue. New residual: overdue said twice on that card"
-      },
-      {
-       "finding": "Word and Dot used by no screen; Dot colour-only",
-       "result": "fixed",
-       "note": "Word on the pen map; Dot removed from code, preview and README"
-      },
-      {
-       "finding": "Farrowing overdue line regex-injected",
-       "result": "fixed",
-       "note": "Overdue chip + plain 'Due N days ago'; the day count is still parsed from the due string, but no markup injection"
-      },
-      {
-       "finding": "Breeder shown as a state chip",
-       "result": "fixed",
-       "note": "Chip removed from the tagged-piglets row"
-      },
-      {
-       "finding": "Chip variant: clock icon means two things",
-       "result": "fixed"
-      },
-      {
-       "finding": "Dot variant: Done/Late/Overdue/Died same solid shape",
-       "result": "fixed",
-       "note": "Variant deleted"
-      }
-     ],
-     "reversed": "none"
-    },
-    "proposals": []
+     "scores": {
+      "clarity": 8,
+      "budget": 7,
+      "hierarchy": 8,
+      "spacing": 8,
+      "broken": 8
+     },
+     "findings": [
+      "Home's overdue task card states overdue twice (chip 'Overdue' + meta '2 days overdue'), and the repeat pushes the meta into an ellipsis ('2 days ov...') (astra-home-task-card.js:22-24).",
+      "Farrowing's Go-to-pen Done cell draws its own check glyph instead of the Status done mark."
+     ]
+    }
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "chip",
+     "line",
+     "word"
+    ]
    }
   },
   {
@@ -15475,6 +15578,14 @@
      "reversed": "none"
     },
     "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "detail",
+     "mark",
+     "tag"
+    ]
    }
   },
   {
@@ -15654,6 +15765,10 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -15839,127 +15954,211 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
    "name": "TaskPhone",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskHeader",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskSummary",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskLens",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskGroup",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskDock",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskHold",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskTotals",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskProgress",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskStepper",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskPhotos",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskChoice",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskRadios",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskWarning",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskTable",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskMetrics",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskSection",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskReceipt",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskDay",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskChips",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "Filter sheet",
@@ -20286,9 +20485,9 @@
     "id": "Segment"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "A two-line lens with a count on some options only (Piglet: To do 9 / Done) misaligns the labels:…",
-   "detail": "A two-line lens with a count on some options only (Piglet: To do 9 / Done) misaligns the labels: the countless option centres a single line.\nFix: In two-line-lens always render the count line (empty, aria-hidden, same line height) so every label shares one baseline.",
+   "severity": "low",
+   "title": "Lens variant tab demos To do 18 / Done 3, the task-list case the variant's NOT FOR line sends to…",
+   "detail": "Lens variant tab demos To do 18 / Done 3, the task-list case the variant's NOT FOR line sends to Two-line lens.\nFix: variants/lens.html: demo a 2-state card-header split (e.g. Today / 7 days, no counts).",
    "source": "gate"
   },
   {
@@ -20299,32 +20498,8 @@
    },
    "kind": "design",
    "severity": "low",
-   "title": "The Overview preview and the bundle.js default variant ('lens') present the inline lens as To do…",
-   "detail": "The Overview preview and the bundle.js default variant ('lens') present the inline lens as To do / Done with counts, contradicting the new rule.\nFix: Default the variant to 'two-line-lens' and show the Overview with it; demo the inline lens as a 2-state card-header split.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Segment:2",
-   "target": {
-    "kind": "component",
-    "id": "Segment"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "Environment: the Sensor view switch sits flush on the sensor card (0px gap).",
-   "detail": "Environment: the Sensor view switch sits flush on the sensor card (0px gap).\nFix: Add .environment-page>.st-selection{margin-bottom:var(--space-12)}, as was done for .device-control.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Segment:3",
-   "target": {
-    "kind": "component",
-    "id": "Segment"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "Dead copies remain: ux/system/sentri-components.js segment(); sentri-visual-foundation.css…",
-   "detail": "Dead copies remain: ux/system/sentri-components.js segment(); sentri-visual-foundation.css .room-tabs/.scope-tabs/.health-tabs.\nFix: Delete them.",
+   "title": "Lens (inline count) has no screen; it survives only as a documented option.",
+   "detail": "Lens (inline count) has no screen; it survives only as a documented option.\nFix: Remove it at the next pass if no screen adopts it.",
    "source": "gate"
   },
   {
@@ -20334,21 +20509,9 @@
     "id": "FilterChips"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "Width is not stable on select: the padding that reserves the check stays on the selected chip…",
-   "detail": "Width is not stable on select: the padding that reserves the check stays on the selected chip too, so it grows by the check width (Iron 82->101, All 83->63 at 390), contradicting the README.\nFix: Give the selected chip the plain padding: .st-filter-chips button[aria-checked=true]{padding-inline:var(--space-row-x)}.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:FilterChips:1",
-   "target": {
-    "kind": "component",
-    "id": "FilterChips"
-   },
-   "kind": "design",
    "severity": "low",
-   "title": "The atlas Overview preview still shows All with a count (All 2 beside Iron 3), against the new…",
-   "detail": "The atlas Overview preview still shows All with a count (All 2 beside Iron 3), against the new 'All has no count' rule; only variants/tags.html was updated.\nFix: Drop All's count in FilterChips/preview.html as in variants/tags.html.",
+   "title": "All moves 1px on deselect (64 -> 63) from rounding of the reserved check slot; not visible.",
+   "detail": "All moves 1px on deselect (64 -> 63) from rounding of the reserved check slot; not visible.\nFix: None needed.",
    "source": "gate"
   },
   {
@@ -20358,9 +20521,9 @@
     "id": "ChoiceList"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "labelHidden does not hide: choiceRadios writes class=\"visually-hidden\" (bundle.js:674) but the…",
-   "detail": "labelHidden does not hide: choiceRadios writes class=\"visually-hidden\" (bundle.js:674) but the bundle only defines .st-visually-hidden, so the open optional row reads \"Sex Optional\" then \"Sex  Female  Male\".\nFix: In choiceRadios use class=\"st-visually-hidden\" for labelHidden.",
+   "severity": "low",
+   "title": "Radio variant usedBy still names \"farrowing born-correction / sow cause\" as an ADR 0002…",
+   "detail": "Radio variant usedBy still names \"farrowing born-correction / sow cause\" as an ADR 0002 candidate, not screen ids.\nFix: Refresh usedBy with real screen ids once the owner rules on ADR 0002.",
    "source": "gate"
   },
   {
@@ -20369,22 +20532,10 @@
     "kind": "component",
     "id": "ChoiceList"
    },
-   "kind": "broken",
-   "severity": "low",
-   "title": "Inline Pressed state shades both options, so it shows two pressed targets at once.",
-   "detail": "Inline Pressed state shades both options, so it shows two pressed targets at once.\nFix: Apply pressed to the first option only (as Focus now does).",
-   "source": "gate"
-  },
-  {
-   "id": "gate:ChoiceList:2",
-   "target": {
-    "kind": "component",
-    "id": "ChoiceList"
-   },
    "kind": "design",
    "severity": "low",
-   "title": "Atlas Overview shows \"No options match your search.\" under two rows with no search field.",
-   "detail": "Atlas Overview shows \"No options match your search.\" under two rows with no search field.\nFix: Drop choiceEmpty from the overview, or show it under a search field with a query that matches nothing.",
+   "title": "Inline Disabled options sit on a filled wash each, unlike Default; reads as a second surface.",
+   "detail": "Inline Disabled options sit on a filled wash each, unlike Default; reads as a second surface.\nFix: Keep Disabled options on the row background; the reason line carries the state.",
    "source": "gate"
   },
   {
@@ -20515,8 +20666,8 @@
    },
    "kind": "design",
    "severity": "medium",
-   "title": "Record-form names are line-clamped after \"+n\" is appended, so with long names the \"+n\" is the…",
-   "detail": "Record-form names are line-clamped after \"+n\" is appended, so with long names the \"+n\" is the part that gets cut (Record health, 4 conditions: \"Weakness or unsteady stance · Reduced appetite · Porcine reproductive and…\").\nFix: Render \"+n\" in its own unclamped span after the clamped names span in pickerField, so the count is always visible.",
+   "title": ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on…",
+   "detail": ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on Select conditions (Back / Done · 4) and Select medicine (Back, 390px wide) the buttons touch the screen edges and their rounded corners are cut. Moving the medicine sheet onto pickerFooter spread it.\nFix: bundle.css: .st-picker-footer{padding-block:var(--space-12)} (no inline 0) so the sheet footer keeps its gutter.",
    "source": "gate"
   },
   {
@@ -20526,9 +20677,9 @@
     "id": "PickerField"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "Medicine picker's sole Back is still drawn as the full-width filled primary button; everywhere…",
-   "detail": "Medicine picker's sole Back is still drawn as the full-width filled primary button; everywhere else Back is secondary (round-2 finding, not fixed).\nFix: Render the medicine sheet footer with SentriUI.pickerFooter({multi:false}) instead of the host footer, which gives a secondary Back.",
+   "severity": "low",
+   "title": "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path…",
+   "detail": "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path [Antibiotics, Conditions] (round 3, not fixed).\nFix: variants/cascade.html: use medicine categories and a medicine leaf.",
    "source": "gate"
   },
   {
@@ -20539,32 +20690,8 @@
    },
    "kind": "design",
    "severity": "low",
-   "title": "Path written two ways: trigger \"Antibiotics / Antibiotic B\", sheet \"All › Antibiotics\".",
-   "detail": "Path written two ways: trigger \"Antibiotics / Antibiotic B\", sheet \"All › Antibiotics\".\nFix: pickerField: join path with \" › \" to match the step row.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:PickerField:3",
-   "target": {
-    "kind": "component",
-    "id": "PickerField"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "Reopening the medicine picker starts at All with nothing marked, so the current pick is not shown.",
-   "detail": "Reopening the medicine picker starts at All with nothing marked, so the current pick is not shown.\nFix: Host opens at the stored path's parent level with the chosen leaf selected.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:PickerField:4",
-   "target": {
-    "kind": "component",
-    "id": "PickerField"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "Atlas Overview demos Conditions (a record form) as \"1 selected\", and the cascade demo browses…",
-   "detail": "Atlas Overview demos Conditions (a record form) as \"1 selected\", and the cascade demo browses Symptoms under a Medicine label.\nFix: Overview: pass names:[\"Low appetite\"]; cascade.html: use medicine categories for items.",
+   "title": "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed).",
+   "detail": "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed).\nFix: preview.html: pass names:[\"Low appetite\"].",
    "source": "gate"
   },
   {
@@ -20778,9 +20905,9 @@
     "id": "Status"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "Home's overdue task card states overdue twice (chip 'Overdue' + meta '2 days overdue'), and the…",
-   "detail": "Home's overdue task card states overdue twice (chip 'Overdue' + meta '2 days overdue'), and the repeat pushes the meta into an ellipsis ('2 days ov...') (astra-home-task-card.js:22-24).\nFix: For state 'overdue', make the meta timing the count only ('2 days') or drop it; the chip already says Overdue.",
+   "severity": "low",
+   "title": "Done pen cell aria-label reads \"Pen B3, 23 born\": with the check (aria-label Done) gone, the…",
+   "detail": "Done pen cell aria-label reads \"Pen B3, 23 born\": with the check (aria-label Done) gone, the Done state is not named for a screen reader.\nFix: Label done cells \"Pen B3, Done, 23 born\" in farrowing-astra-concept.js roomGrid.",
    "source": "gate"
   },
   {
@@ -20791,8 +20918,8 @@
    },
    "kind": "design",
    "severity": "low",
-   "title": "Farrowing's Go-to-pen Done cell draws its own check glyph instead of the Status done mark.",
-   "detail": "Farrowing's Go-to-pen Done cell draws its own check glyph instead of the Status done mark.\nFix: Render it with status({ variant: 'word', kind: 'done', text: f.text }) like Active and Overdue, or leave the count plain without the hand glyph.",
+   "title": "Home overdue state verified in the card model and DOM text (\"Batch 28 · farrowing window · 2…",
+   "detail": "Home overdue state verified in the card model and DOM text (\"Batch 28 · farrowing window · 2 days\"), not on a rendered bare screen: no atlas screen shows an overdue task card.\nFix: Add an atlas screen for task-cards state=overdue so the overdue card is judged in use.",
    "source": "gate"
   },
   {

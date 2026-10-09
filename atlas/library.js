@@ -198,12 +198,13 @@ async function renderComponents() {
     const cand = /candidate/i.test(readme.slice(0, 300)), adr = (readme.slice(0, 400).match(/ADR (\d{4})/) || [])[1];
     if (cand) meta.querySelector('.t').textContent += ` · candidate${adr ? ' (ADR ' + adr + ')' : ''}`;
     /* variants: variants.json (the component pass) wins; else the gate's own list. A variant gets a tab only when its states are drawn. */
-    let vj = null; try { vj = await getJson(`${DS}/components/${name}/variants.json`); } catch (_) {}
+    const have = (CI[name] && CI[name].files) || null;   // what exists on disk (atlas.json); asking only for those keeps the console free of 404s
+    let vj = null; if (!have || have.variantsJson) { try { vj = await getJson(`${DS}/components/${name}/variants.json`); } catch (_) {} }
     const fromGate = ((gate && gate.variants) || []).map((v) => ({ id: slug(v.name), name: String(v.name).split(' (')[0], status: v.status, scores: v.scores, findings: v.findings, usedBy: v.usedBy || [] }));
     const variants = vj && vj.length ? vj.map((v) => Object.assign({ usedBy: [] }, fromGate.find((g) => g.id === v.id || g.id === slug(v.name)) || {}, v)) : fromGate;
     const dirOf = `${DS}/components/${name}/`;
     const drawn = {};
-    await Promise.all(variants.map(async (v) => { drawn[v.id] = await stateGridAt(dirOf, v.id); }));
+    await Promise.all(variants.map(async (v) => { drawn[v.id] = !have || have.variants.includes(v.id) ? await stateGridAt(dirOf, v.id) : null; }));
     const withStates = variants.filter((v) => drawn[v.id]), without = variants.filter((v) => !drawn[v.id]);
     const tabs = [{ id: 'overview', name: 'Overview' }, ...withStates];
     const want = initialVariant; initialVariant = null;

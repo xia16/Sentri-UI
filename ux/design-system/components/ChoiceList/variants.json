@@ -49,6 +49,7 @@
   {
     "id": "radio",
     "name": "Radio rows",
+    "usedBy": ["farrowing.born"],
     "use": "Use for two to four recorded outcomes with visible rings.",
     "notUse": "Not for PickerField for five or more outcomes.",
     "states": [

@@ -35,5 +35,5 @@ const R={
 "drawer-lead":()=>UI.sheet({title:'Skin',subtitle:'Symptoms \u00b7 6',size:'long',lead:UI.iconButton({action:'up',icon:window.SentriIcons.icon('back'),label:'Back to categories',className:'chooser-header-back'}),above:'<div style="padding:var(--space-12) var(--space-gutter-sheet) 0">'+UI.choiceSearch({label:'Search symptoms',placeholder:'Search symptoms'})+'</div>',body:rows(4,'Symptom'),footer:foot({primary:{label:'Done',action:'done'}})}),
 "drawer-full":()=>UI.sheet({title:'Count piglets',subtitle:'B4 \u00b7 was 12',size:'medium',sizing:'full',body:rows(5),footer:foot({primary:{label:'Record count',action:'save'}})})
 };
-document.querySelectorAll('[data-demo]').forEach(el=>{const k=el.getAttribute('data-demo'),r=R[k];el.querySelector('.bg').innerHTML=bg();if(r)el.querySelector('.over').innerHTML=r();});
+document.querySelectorAll('[data-state]').forEach(el=>{const k=el.getAttribute('data-demo'),r=R[k];el.querySelector('.bg').innerHTML=bg();if(r)el.querySelector('.over').innerHTML=r();});
 </script></body></html>
