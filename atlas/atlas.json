@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T18:32:44.571Z",
- "commit": "0c7bee2",
+ "generated": "2026-10-09T18:56:43.115Z",
+ "commit": "336445d",
  "platforms": [
   {
    "id": "mobile",
@@ -11637,6 +11637,17 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "destructive",
+     "hold",
+     "primary",
+     "secondary",
+     "text",
+     "tool"
+    ]
    }
   },
   {
@@ -11817,6 +11828,13 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "bordered",
+     "plain"
+    ]
    }
   },
   {
@@ -11994,6 +12012,10 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -12202,6 +12224,14 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "group",
+     "page",
+     "section"
+    ]
    }
   },
   {
@@ -12512,6 +12542,19 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "animal",
+     "door-act",
+     "navigation",
+     "record",
+     "scope",
+     "select-door",
+     "summary-count",
+     "tick"
+    ]
    }
   },
   {
@@ -12716,6 +12759,10 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -12917,6 +12964,13 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "three-column",
+     "two-column"
+    ]
    }
   },
   {
@@ -13104,6 +13158,13 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "categorised",
+     "day"
+    ]
    }
   },
   {
@@ -13333,6 +13394,14 @@
        "piglet-processing.end-task"
       ]
      }
+    ]
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "dialog",
+     "drawer",
+     "page"
     ]
    }
   },
@@ -13576,6 +13645,15 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "facet",
+     "lens",
+     "two-line-lens",
+     "view-switch"
+    ]
    }
   },
   {
@@ -13743,6 +13821,12 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "tags"
+    ]
    }
   },
   {
@@ -13969,6 +14053,16 @@
       "note": "One ring on the first option; ink text with reason line"
      }
     ]
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "inline",
+     "multi",
+     "navigate",
+     "radio",
+     "single"
+    ]
    }
   },
   {
@@ -14109,6 +14203,10 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -14282,6 +14380,10 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -14522,6 +14624,15 @@
       "note": "Still the host's filled primary Back"
      }
     ]
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "cascade",
+     "cascade-multi",
+     "multi",
+     "single"
+    ]
    }
   },
   {
@@ -14727,6 +14838,10 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -14908,6 +15023,10 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -15065,6 +15184,10 @@
      }
     ],
     "proposals": []
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -15277,6 +15400,14 @@
      "reversed": "none"
     },
     "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "chip",
+     "line",
+     "word"
+    ]
    }
   },
   {
@@ -15475,6 +15606,14 @@
      "reversed": "none"
     },
     "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "detail",
+     "mark",
+     "tag"
+    ]
    }
   },
   {
@@ -15654,6 +15793,10 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
@@ -15839,127 +15982,211 @@
       ]
      }
     ]
+   },
+   "files": {
+    "variantsJson": false,
+    "variants": []
    }
   },
   {
    "name": "TaskPhone",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskHeader",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskSummary",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskLens",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskGroup",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskDock",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskHold",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskTotals",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskProgress",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskStepper",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskPhotos",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskChoice",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskRadios",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskWarning",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskTable",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskMetrics",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskSection",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskReceipt",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskDay",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "TaskChips",
    "group": "Task skeleton",
    "status": "in-design",
-   "gate": null
+   "gate": null,
+   "files": {
+    "variantsJson": false,
+    "variants": []
+   }
   },
   {
    "name": "Filter sheet",
