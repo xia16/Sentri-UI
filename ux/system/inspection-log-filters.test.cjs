@@ -70,28 +70,28 @@ test('new records retain machine-readable dates and legacy display dates still w
   assert.equal(model.logEntryDate({ time: 'Before this walk' }), null);
 });
 
-test('legacy display labels group by supplied day and retain clock metadata', () => {
+test('legacy display labels group by day: one label format, the stamp is time and initials', () => {
   const previous = globalThis.SentriUI;
   const groups = [];
-  globalThis.SentriUI = { log(value) { groups.push(value); return 'rendered'; } };
+  globalThis.SentriUI = Object.assign({}, previous, { log(value) { groups.push(value); return 'rendered'; } });
   try {
     const html = model.categorizedLog({}, [
-      { title: 'Later legacy event', category: 'Health', time: 'Aug 26 · 08:41', who: 'Walk' },
-      { title: 'Earlier legacy event', category: 'Feed', time: 'Aug 26 · 08:20', who: 'Walk' },
-      { title: 'Relative legacy event', category: 'Health', time: '5 days ago · 07:10', who: 'Walk' },
+      { title: 'Later legacy event', category: 'Health', time: 'Aug 26 · 08:41', who: 'G. Walker' },
+      { title: 'Earlier legacy event', category: 'Feed', time: 'Aug 26 · 08:20', who: 'G. Walker' },
+      { title: 'Relative legacy event', category: 'Health', time: '5 days ago · 07:10', who: '' },
+      { title: 'Undated event', category: 'Health', time: 'Before this walk', who: '' },
     ], 'pig');
     assert.equal(html, 'rendered');
     assert.deepEqual(groups[0].map(group => ({
       label: group.label,
-      entries: group.entries.map(entry => ({ title: entry.title, meta: entry.meta })),
+      entries: group.entries.map(entry => ({ title: entry.title, at: entry.at, by: entry.by })),
     })), [
+      { label: 'Mon', entries: [{ title: 'Relative legacy event', at: '07:10', by: '' }] },
       { label: 'Aug 26', entries: [
-        { title: 'Later legacy event', meta: '08:41 · Walk' },
-        { title: 'Earlier legacy event', meta: '08:20 · Walk' },
+        { title: 'Later legacy event', at: '08:41', by: 'G. Walker' },
+        { title: 'Earlier legacy event', at: '08:20', by: 'G. Walker' },
       ] },
-      { label: '5 days ago', entries: [
-        { title: 'Relative legacy event', meta: '07:10 · Walk' },
-      ] },
+      { label: 'Earlier', entries: [{ title: 'Undated event', at: '', by: '' }] },
     ]);
   } finally {
     globalThis.SentriUI = previous;

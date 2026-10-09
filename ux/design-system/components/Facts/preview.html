@@ -1,19 +1,21 @@
-<!-- @dsCard group="Structure" height=250 -->
+<!-- @dsCard group="Structure" height=300 subtitle="two-column · three-column" -->
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}.stack>*+*{margin-top:var(--space-24)}</style></head>
 <body>
-<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="a"></div></div>
+<div data-st-context="page" style="max-width:390px;padding:var(--space-16);background:var(--app-background);font-family:var(--font-sans);color:var(--ink)"><div class="stack" id="root"></div></div>
 <script>
-const UI = window.SentriUI, I = window.SentriIcons.icon;
-a.innerHTML = UI.facts([
-  { label: 'Ear tag', valueHtml: '<span style="font-family:var(--mono)">000254</span>' },
-  { label: 'Pen', value: 'B4' },
-  { label: 'Parity', value: 4 },
-  { label: 'Farrowed', value: '2 days ago', meta: 'Jul 8 · 07:14 · G.H' },
-  { label: 'Born alive', value: '11' },
-  { label: 'Weaning weight', value: null }
-]);
+/* The previews expect a host that preloads tokens.css, bundle.css and bundle.js (the atlas does). */
+(function () {
+  var UI = window.SentriUI, I = window.SentriIcons && window.SentriIcons.icon, root = document.getElementById('root');
+  if (!UI) { root.textContent = 'Load tokens.css, bundle.css and bundle.js before this preview.'; return; }
+  var parts = [];
+  parts.push(UI.facts([
+    { label: 'Ear tag', value: '000254', mono: true }, { label: 'Pen', value: 'B4', mono: true }, { label: 'Parity', value: 4 },
+    { label: 'Farrowed', value: '2 days ago', meta: 'Jul 8 · 07:14 · G.H' }, { label: 'Born alive', value: '11' }, { label: 'Weaning weight', value: null }]));
+  parts.push(UI.facts([{ label: 'Alive litter', value: 11 }, { label: 'Identified', value: 8 }, { label: 'Without identity', value: 3 }], { columns: 3 }));
+  root.innerHTML = parts.map(function (h) { return '<div>' + h + '</div>'; }).join('');
+})();
 </script>
 </body>
 </html>

@@ -37,23 +37,13 @@
 .farrowing-phone .sheet[data-view="locked"] .completed-record-body{padding-bottom:16px}
 .farrowing-phone .sheet[data-view="locked"] .finish-record{margin:0}
 .farrowing-phone .finish-record .facts-surface{padding:16px;background:#f6f7f2;border-radius:10px}
-.farrowing-phone .completed-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 16px;margin:0}
-.farrowing-phone .completed-facts .completed-weight{grid-column:1/-1;display:flex;align-items:baseline;gap:12px;padding-top:2px}
-.farrowing-phone .completed-weight dt{margin:0}
-.farrowing-phone .completed-facts dt{display:flex;align-items:center;min-height:16px;font-size:11px;line-height:1.4;color:#77816e;margin-bottom:5px}
-.farrowing-phone .completed-facts dd{margin:0;font-size:14px;font-weight:500;line-height:1.4;color:var(--ink);font-variant-numeric:tabular-nums}
-.farrowing-phone .completed-facts small{display:block;margin-top:5px;font-size:10px;font-weight:400;line-height:1.5;color:#77816e;overflow-wrap:anywhere}
-.farrowing-phone .death-breakdown-link{display:flex;align-items:center;gap:4px;min-height:var(--tap-min);min-width:var(--tap-min);margin:-10px 0;padding:0;background:transparent;font:inherit;color:inherit;white-space:nowrap}
-.farrowing-phone .death-breakdown-link svg{width:12px;height:12px;color:var(--muted)}
 .farrowing-phone .death-breakdown-facts{margin:0;padding:2px 14px;background:#f6f7f2;border-radius:10px}
 .farrowing-phone .death-breakdown-facts>div{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:9px 0;font-size:13px;line-height:1.5}
 .farrowing-phone .death-breakdown-facts dt{color:var(--muted)}
 .farrowing-phone .death-breakdown-facts dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums}
 .farrowing-phone .death-breakdown-facts .death-breakdown-total{padding-top:16px;font-weight:600}
 .farrowing-phone .death-breakdown-total dt{color:var(--ink)}@media(max-width:370px){
- .farrowing-phone .finish-record .facts-surface{padding:14px}
- .farrowing-phone .completed-facts{gap:16px 10px}
- .farrowing-phone .completed-facts dd{font-size:13px}}
+ .farrowing-phone .finish-record .facts-surface{padding:14px}}
 .farrowing-phone .optional{background:transparent;padding:0;margin:24px 0}
 .farrowing-phone .photo-field{background:transparent;padding:0;margin:24px 0 20px}
 .farrowing-phone .photo-title{font-size:13px}
@@ -283,9 +273,6 @@
 .farrowing-phone .sheet[data-view="count"]>.sheet-body{display:flex;flex-direction:column;padding-bottom:16px}
 .farrowing-phone .sheet[data-view="count"] .count-area{display:flex;flex-direction:column;justify-content:center;flex:1 1 auto;min-height:0}
 .farrowing-phone .sheet[data-view="count"] .count-record{flex:none;padding-bottom:0}
-.farrowing-phone .litter-log-link{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-height:44px;padding:0;background:transparent;color:var(--ink);font-size:12px;font-weight:500;border-radius:6px;white-space:nowrap}
-.farrowing-phone .litter-log-link>svg{width:14px;height:14px;color:var(--muted)}
-.farrowing-phone .litter-log-link:disabled{background:transparent;color:var(--muted);opacity:.5}
 .farrowing-phone .sheet[data-view="locked"] .litter-heading+.summary{margin-top:0}
 
 /* Record provenance belongs to the identity header in every completed state. */

@@ -32,7 +32,7 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
 
 ### Type
 
-- **Plus Jakarta Sans** for everything a person reads as language, at 400, 500 and 600. Headings are 500, not bold: `page-title` 22px, `sheet-title` 20px, `section-title` 13px, `panel-title` 12px, `group-label` 11px in `muted`.
+- **Plus Jakarta Sans** for everything a person reads as language, at 400, 500 and 600. Headings are 500, not bold: `page-title` 22px, `sheet-title` 20px, `section-title` 13px, `group-label` 11px in `muted`. (`panel-title` 12px is retired: a title inside a panel is a group label; Heading has three kinds, page, section and group.)
 - **IBM Plex Mono** for everything a person reads off the barn: ear tags and pen codes (`identifier`), counts and measurements (`figure`, `figure-lg`, `hero-count`), badge numbers and overlines. Use tabular numerals for counts that tick.
 - Body text in rows is 13px (`row-title`) over 11px (`description`); fields and choices are 14px. `meta` at 10px is the floor.
 - Headings take slight negative tracking (−0.5px at 22px, −0.4px at 20px); everything at 13px and below tracks at 0.

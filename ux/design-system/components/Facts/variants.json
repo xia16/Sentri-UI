@@ -1,0 +1,28 @@
+[
+  {
+    "id": "two-column",
+    "name": "Two-column",
+    "use": "read a detail: label over value, two to a row (a pen sheet, a feed formula, a sow record)",
+    "notUse": "a figure the worker taps or edits (use Row, or a link below the facts); facts never act. Short counts, three across: use Three-column",
+    "states": [
+      "Default",
+      "With a trail",
+      "ID in mono",
+      "Missing value",
+      "Long value wraps",
+      "Chinese"
+    ]
+  },
+  {
+    "id": "three-column",
+    "name": "Three-column",
+    "use": "three short counts side by side (alive, identified, without identity)",
+    "notUse": "values longer than a few characters or four or more facts (use Two-column)",
+    "states": [
+      "Default",
+      "Zero is not missing",
+      "Long label wraps",
+      "Chinese"
+    ]
+  }
+]

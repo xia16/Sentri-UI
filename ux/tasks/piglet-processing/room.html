@@ -516,7 +516,7 @@
   }
   function filteredBlock() {
     if (!(filtering() || (S.missed && !ended()))) return '';
-    return '<div class="pp-filtered">' + UI.heading({ title: '', kind: 'group', level: 4, description: S.missed ? '' : undefined,
+    return '<div class="pp-filtered">' + UI.heading({ title: '', kind: 'section', level: 4, description: S.missed ? '' : undefined,
       action: UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear-filter', strs: { label: 'act.clear' } }),
       strs: Object.assign({ title: 'pp.room.filtered' }, S.missed ? { description: 'pp.room.missed.desc' } : {}), args: { title: { what: filterWhat() } } }) + bulkDoor() + '</div>';
   }

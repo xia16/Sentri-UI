@@ -1,0 +1,31 @@
+[
+  {
+    "id": "day",
+    "name": "Day log",
+    "use": "read what was recorded on one pen, litter or task, grouped by day (Farrowing log, pen log, the walk log)",
+    "notUse": "a log that mixes kinds of event with a kind filter (use Categorised) or an editable record (use Row)",
+    "states": [
+      "Default",
+      "One entry for a run of acts",
+      "Corrected entry",
+      "With a photo",
+      "Missing author is left out",
+      "Empty",
+      "Long entry wraps",
+      "Chinese"
+    ]
+  },
+  {
+    "id": "categorised",
+    "name": "Categorised",
+    "use": "a log that mixes kinds of event (Health, Feed, Movement, Notes) and can be filtered by kind and date: the pig log and the pen log on a walk",
+    "notUse": "a log of one kind of act (use Day log); the kind word is one word, never a sentence",
+    "states": [
+      "Default",
+      "Corrected entry",
+      "Filter matches nothing",
+      "Empty",
+      "Chinese"
+    ]
+  }
+]

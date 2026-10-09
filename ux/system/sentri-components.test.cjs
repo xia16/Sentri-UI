@@ -13,11 +13,39 @@ test('titles escape supplied text while preserving a caller-owned action', () =>
   assert.match(result,/data-action="history"/);
   assert.doesNotMatch(result,/<tag>/);
 });
-test('facts distinguish zero from unknown and preserve caller-owned links', () => {
-  const result = ui.facts([{label:'Known',value:0},{label:'Unknown',value:null},{label:'Link',valueHtml:'<a href="#record">Record</a>'}]);
+test('facts distinguish zero from unknown, keep markup, and refuse a control in a value', () => {
+  const result = ui.facts([{label:'Known',value:0},{label:'Unknown',value:null},{label:'Tag',valueHtml:'<span class="id">000254</span>'},{label:'Act',valueHtml:'<a href="#record">Record</a>'},{label:'Id',value:'000254',mono:true}]);
   assert.match(result,/<dd>0<\/dd>/);
   assert.match(result,/<dd>—<\/dd>/);
-  assert.match(result,/<a href="#record">Record<\/a>/);
+  assert.match(result,/<span class="id">000254<\/span>/);
+  assert.match(result,/st-fact-id/);
+  assert.doesNotMatch(result,/<a href|<button/);
+});
+test('heading: page and group carry no icon, meta or action; panel reads as section; the action link is a standard text button', () => {
+  const page = ui.heading({title:'Room',kind:'page',icon:'<svg></svg>',meta:'x',action:'<button>y</button>',description:'d'});
+  assert.match(page,/data-kind="page"/);
+  assert.doesNotMatch(page,/<svg|st-heading-meta|<button/);
+  assert.match(ui.heading({title:'T',kind:'panel'}),/data-kind="section"/);
+  const link = ui.heading({title:'Litter',action:{label:'View log',action:'history',ariaLabel:'Open the log'}});
+  assert.match(link,/class="st-text-action/);
+  assert.match(link,/data-action="history"/);
+  assert.match(link,/aria-label="Open the log"/);
+});
+test('log: day labels, one stamp, no repeated words, corrected entries show the original', () => {
+  const now = '2026-10-10T12:00';
+  assert.equal(ui.logDay('2026-10-10T08:00',{now}),'Today');
+  assert.equal(ui.logDay('2026-10-09',{now}),'Yesterday');
+  assert.equal(ui.logDay('2026-10-06',{now}),'Tue');
+  assert.equal(ui.logDay('2026-07-08',{now}),'Jul 8');
+  assert.equal(ui.logStamp('2026-10-10T07:14','G. Hansen'),'07:14 · G.H');
+  assert.equal(ui.logStamp('2026-10-10','')  ,'');
+  const html = ui.log([{label:'Today',entries:[{title:'Farrowing finished',detail:'farrowing finished'},{title:'Alive 9 → 8',corrected:true,was:'Alive 9',at:'09:41',by:'G.H'}]}]);
+  assert.equal((html.match(/Farrowing finished/g)||[]).length,1);
+  assert.match(html,/data-corrected/);
+  assert.match(html,/Alive 9<\/p>/);
+  assert.match(html,/09:41 · G\.H/);
+  const groups = ui.logGroups([{title:'a',at:'2026-10-10T07:00'},{title:'b',at:'2026-10-10T09:00'},{title:'c',at:'2026-10-09T10:00'},{title:'u'}],{now});
+  assert.equal(groups.map(g=>g.label+':'+g.entries.map(e=>e.title).join('')).join('|'),'Today:ba|Yesterday:c|Earlier:u');
 });
 test('informational rows do not claim navigation; disabled actions retain semantics', () => {
   const info = ui.row({title:'Miscarriages',trailing:'0'});

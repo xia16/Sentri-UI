@@ -12,20 +12,13 @@
 .sp-note { margin: 0 var(--space-gutter) var(--space-heading); }
 .sp-quiet { margin: 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
 .sp-empty { margin: var(--space-section) var(--space-gutter); font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); text-align: center; }
-.sp-warn { margin: 6px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--amber); }
+.sp-weigh.sp-weigh { margin-top: var(--space-4); font-size: var(--type-description-size); font-weight: 400; color: var(--amber); }
 .sheet-footer.sp-two > * { flex: 1 1 0; min-width: 0; }
 @keyframes sp-tick-in { from { transform: scale(.7); background: var(--paper); border-color: var(--muted); } to { transform: none; } }
 @keyframes sp-tick-draw { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: none; } }
 
 /* ---- inside a pen, as farrowing's sow sheet: the Piglets card (Litter summary · View log ›), the tool row, the day
    cards; [⋯] beside the footer's one action ---- */
-.sp-pcard > .st-heading { margin-bottom: 8px; }
-.sp-pfacts .st-fact dd { margin: 0; }
-/* a figure that acts on itself: the fact's value as a button (the value, a small chevron) */
-.sp-fact-act { display: inline-flex; align-items: center; gap: 4px; min-height: var(--tap-min); min-width: var(--tap-min); margin: -12px 0; padding: 0; border: 0; background: none;
-  color: var(--ink); font: 500 var(--type-button-size)/1.3 var(--font-sans); text-align: left; cursor: pointer; }
-.sp-fact-act [data-empty] { color: var(--muted); }
-.sp-fact-act svg { flex: none; width: 12px; height: 12px; fill: none; stroke: var(--muted); stroke-width: 2; }
 /* farrowing's in-sheet tool row (Edit · Record death · More actions): outlined tools sharing the width */
 .sp-toolrow { display: flex; gap: var(--space-key-gap); }
 .sp-tool { flex: 1 1 0; min-width: 0; min-height: var(--tap-min); display: flex; align-items: center; justify-content: center; gap: 5px;
@@ -76,7 +69,6 @@
 .button.sp-wide { width: 100%; }
 
 /* Move: the other pens as tiles, four to a line */
-.sp-pick > .st-heading { margin-bottom: 8px; }
 .sheet-body > .sp-pick + * { margin-top: var(--space-section); }
 
 /* ---- outside the phone: the demo controls ----
@@ -118,7 +110,6 @@
 .sp-pigrow + .sp-pigrow { border-top: 1px solid var(--line); }
 .sp-pigrow > .tk-row { flex: 1; min-width: 0; }
 /* Processing: a section title like the Piglets card's; the Done section sits last */
-.sp-proc > .st-heading { margin-bottom: 8px; }
 .sp-proc > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
 .tk-day[data-when="done"] .tk-day-head > strong { color: var(--muted); }
 

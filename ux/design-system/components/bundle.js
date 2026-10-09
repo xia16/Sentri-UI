@@ -76,18 +76,42 @@
   const tx=(text,o,key)=>{const id=o&&o.strs&&o.strs[key];return id?`<span${sa(id,o.args&&o.args[key])}>${esc(text)}</span>`:esc(text);};
   const has=(o,key)=>!!(o&&o.strs&&o.strs[key]);
   const arrow='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
+  /* Heading: three kinds. page = the title of a screen or sheet (title + description only). section = the title of a block,
+     above its panel (the only kind with icon, meta and action). group = labels a run of rows or log entries inside one
+     panel (muted; title + description only). "panel" is retired: it reads as section. A slot the kind does not carry is
+     dropped with a dev warning. action is raw HTML, or { label, action, value, ariaLabel, disabled } for the standard
+     text link with its › (48px). */
+  function headingAction(a){
+    if(!a||typeof a==='string')return a||'';
+    const attrs=a.ariaLabel?{'aria-label':a.ariaLabel}:{};
+    return button({label:a.label,register:'text',action:a.action,value:a.value||'',waiting:!!a.disabled,attrs,strs:a.strs,args:a.args}).replace(/<\/button>$/,arrow+'</button>');
+  }
   function heading({title,icon='',description='',meta='',action='',kind='section',level=4,className='',strs,args}={}){
     const o={strs,args};
-    const k=['page','section','group','panel'].includes(kind)?kind:'section',h=Math.max(1,Math.min(6,Number(level)||4));
+    const k=oneOf('Heading','kind',kind==='panel'?'section':kind,['page','section','group'],'section'),h=Math.max(1,Math.min(6,Number(level)||4));
+    if(k!=='section'&&(icon||meta||action||has(o,'meta'))){warn('Heading',`${k}: icon, meta and action belong to a section heading; dropped`);icon='';meta='';action='';}
+    const act=headingAction(action);
     const showDesc=description||has(o,'description'),showMeta=meta||has(o,'meta');
-    return `<div class="st-heading ${esc(className)}" data-ds="Heading" data-kind="${k}"${icon?' data-has-icon="true"':''}><div class="st-heading-main"><h${h} class="st-heading-title">${icon?`<span class="st-heading-icon">${icon}</span>`:''}<span${sa(strs&&strs.title,args&&args.title)}>${esc(title)}</span></h${h}>${showDesc?`<p class="st-heading-description">${tx(description,o,'description')}</p>`:''}</div>${showMeta||action?`<div class="st-heading-aside">${showMeta?`<span class="st-heading-meta">${tx(meta,o,'meta')}</span>`:''}${action?`<span class="st-heading-action">${action}</span>`:''}</div>`:''}</div>`;
+    return `<div class="st-heading ${esc(className)}" data-ds="Heading" data-kind="${k}"${icon?' data-has-icon="true"':''}><div class="st-heading-main"><h${h} class="st-heading-title">${icon?`<span class="st-heading-icon">${icon}</span>`:''}<span${sa(strs&&strs.title,args&&args.title)}>${esc(title)}</span></h${h}>${showDesc?`<p class="st-heading-description">${tx(description,o,'description')}</p>`:''}</div>${showMeta||act?`<div class="st-heading-aside">${showMeta?`<span class="st-heading-meta">${tx(meta,o,'meta')}</span>`:''}${act?`<span class="st-heading-action">${act}</span>`:''}</div>`:''}</div>`;
   }
   function panel(content,{className='',tag='div',ds='Panel'}={}){
     const t=['div','section','article','aside','dl'].includes(tag)?tag:'div';
     return `<${t} class="st-panel ${esc(className)}" data-ds="${esc(ds)}">${content}</${t}>`;
   }
+  /* Facts: read-only label–value pairs. They never act: no button or link in a value (valueHtml is for markup such as an
+     ID in mono, and is refused when it holds a control). columns: 2 (default), 3 (short counts) or 1 (a long value that needs the full width). mono: true sets an ID. */
   function facts(items,{className='',columns=2}={}){
-    return `<dl class="st-panel st-facts ${esc(className)}" data-ds="Facts" data-columns="${columns===3?3:columns===1?1:2}">${items.map(i=>`<div class="st-fact"><dt>${tx(i.label,i,'label')}</dt><dd>${i.valueHtml!=null?i.valueHtml:has(i,'value')?tx(i.value,i,'value'):esc(i.value==null||i.value===''?'—':i.value)}</dd>${i.meta||has(i,'meta')?`<small>${tx(i.meta,i,'meta')}</small>`:''}</div>`).join('')}</dl>`;
+    const cols=columns===3?3:columns===1?1:2;
+    const valueOf=i=>{
+      if(i.valueHtml!=null){
+        if(/<(button|a)[\s>]|role=["']?button/i.test(i.valueHtml)){warn('Facts','valueHtml holds a control; facts never act, so it was dropped. Put the action in a Row or a link below.');return esc(i.value==null||i.value===''?'—':i.value);}
+        return i.valueHtml;
+      }
+      if(has(i,'value'))return tx(i.value,i,'value');
+      const v=i.value==null||i.value===''?'—':i.value;
+      return i.mono?`<span class="st-fact-id">${esc(v)}</span>`:esc(v);
+    };
+    return `<dl class="st-panel st-facts ${esc(className)}" data-ds="Facts" data-columns="${cols}">${items.map(i=>`<div class="st-fact"><dt>${tx(i.label,i,'label')}</dt><dd>${valueOf(i)}</dd>${i.meta||has(i,'meta')?`<small>${tx(i.meta,i,'meta')}</small>`:''}</div>`).join('')}</dl>`;
   }
   function rowGroup(content,{title='',level=5,className='',strs,args}={}){
     return panel((title||has({strs},'title')?heading({title,kind:'group',level,className:'st-row-group-label',strs,args}):'')+content,{className:'st-row-group '+className,ds:'Row'});
@@ -140,11 +164,66 @@
     const btn=button(Object.assign({register:'secondary'},act,{id:aid,labelledby:`${aid} ${tid}`}));
     return `<div class="st-row ${esc(className)}" data-ds="Row" data-act="" id="${esc(rid)}"${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${door}${rowChip(chip,'','Row')}${btn}</div>`;
   }
-  /* groups: [{label, strs:{label}, args:{label}, entries:[{category,title,detail,meta,strs:{…},args:{…}}]}]; options.strs.empty for the empty line. */
-  function log(groups,{className='',empty='No activity recorded yet',strs,args}={}){
+  /* Log: the history tail. One entry per recorded act; the group label carries the day; an entry's stamp is "time · who"
+     with an absent part left out. Two variants: day (default) and categorised (a kind word above each title, with a kind
+     filter above the panel).
+     groups: [{label, description, strs, args, entries:[{title, detail, meta | at+by, category, corrected, was, extraHtml, strs, args}]}]
+     options: empty, kind ('day' | 'categorised'), correctedLabel, strs.empty. */
+  const pad2=n=>String(n).padStart(2,'0');
+  /* at: a Date, epoch ms, 'HH:MM' (today), or 'YYYY-MM-DD' / 'YYYY-MM-DDTHH:MM' (read as local time). Returns {date, timed} or null. */
+  function logWhen(at){
+    if(at==null||at==='')return null;
+    if(at instanceof Date)return isNaN(at)?null:{date:at,timed:true};
+    if(typeof at==='number')return {date:new Date(at),timed:true};
+    const t=String(at).match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+    if(t){const d=new Date();d.setHours(+t[1],+t[2],0,0);return {date:d,timed:true};}
+    const m=String(at).match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/);
+    return m?{date:new Date(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0)),timed:!!m[4]}:null;
+  }
+  /* The stamp on an entry: "07:14 · G.H". A missing time or author is left out, never printed as a placeholder. A full
+     name ("G. Hansen") is written as initials: records carry initials. */
+  const initialsOf=n=>{const p=String(n||'').trim().split(/\s+/).filter(Boolean);return p.length>1?`${p[0][0]}.${p[p.length-1][0]}`:p[0]||'';};
+  function logStamp(at,by=''){
+    const w=logWhen(at);
+    return [w&&w.timed?`${pad2(w.date.getHours())}:${pad2(w.date.getMinutes())}`:'',initialsOf(by)].filter(Boolean).join(' · ');
+  }
+  /* The group label for a day: Today, Yesterday, the weekday within the past week, then "Jul 8" (with the year when it
+     is not this year). lang picks the weekday and month names; today and yesterday are the caller's words. */
+  function logDay(at,{now=new Date(),lang='en',today='Today',yesterday='Yesterday'}={}){
+    const w=logWhen(at),n=logWhen(now);if(!w||!n)return '';
+    const day=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate()),diff=Math.round((day(n.date)-day(w.date))/864e5);
+    if(diff===0)return today;
+    if(diff===1)return yesterday;
+    if(diff>1&&diff<7)return w.date.toLocaleDateString(lang,{weekday:'short'});
+    return w.date.toLocaleDateString(lang,Object.assign({month:'short',day:'numeric'},w.date.getFullYear()!==n.date.getFullYear()?{year:'numeric'}:{}));
+  }
+  /* Flat entries with an `at` become newest-first day groups; entries with no date go last under `earlier`. */
+  function logGroups(entries,{now=new Date(),lang='en',today='Today',yesterday='Yesterday',earlier='Earlier'}={}){
+    const dated=[],undated=[];
+    entries.forEach((e,i)=>{const w=logWhen(e.at);(w?dated:undated).push({e,i,t:w?w.date.getTime():0});});
+    dated.sort((a,b)=>b.t-a.t||a.i-b.i);
+    const groups=[];
+    const add=(label,e)=>{const g=groups[groups.length-1];if(g&&g.label===label)g.entries.push(e);else groups.push({label,entries:[e]});};
+    dated.forEach(x=>add(logDay(x.e.at,{now,lang,today,yesterday}),x.e));
+    undated.forEach(x=>add(earlier,x.e));
+    return groups;
+  }
+  function log(groups,{className='',empty='No activity recorded yet',kind='day',correctedLabel='Corrected',strs,args}={}){
+    const k=oneOf('Log','kind',kind,['day','categorised'],'day');
     const nonempty=groups.filter(g=>g.entries?.length);
-    if(!nonempty.length)return panel(`<p class="st-empty">${tx(empty,{strs,args},'empty')}</p>`,{className:'st-log '+className,ds:'Log'});
-    return panel(nonempty.map(g=>`<section class="st-log-group">${g.label||has(g,'label')?heading({title:g.label,kind:'group',description:g.description||'',strs:has(g,'label')||has(g,'description')?{title:g.strs.label,description:g.strs.description}:undefined,args:g.args&&(g.args.label||g.args.description)?{title:g.args.label,description:g.args.description}:undefined}):''}<div class="st-log-entries">${g.entries.map(e=>`<article class="st-log-entry">${e.category||has(e,'category')?`<span class="st-log-category">${tx(e.category,e,'category')}</span>`:''}<strong class="st-log-title">${tx(e.title,e,'title')}</strong>${e.detail||has(e,'detail')?`<p>${tx(e.detail,e,'detail')}</p>`:''}${e.meta||has(e,'meta')?`<small>${tx(e.meta,e,'meta')}</small>`:''}${e.extraHtml?`<div class="st-log-extra">${e.extraHtml}</div>`:''}</article>`).join('')}</div></section>`).join(''),{className:'st-log '+className,ds:'Log'});
+    const mark=h=>h.replace('class="st-panel',`data-kind="${k}" class="st-panel`);
+    if(!nonempty.length)return mark(panel(`<p class="st-empty">${tx(empty,{strs,args},'empty')}</p>`,{className:'st-log '+className,ds:'Log'}));
+    const same=(a,b)=>String(a).trim().toLowerCase()===String(b).trim().toLowerCase();
+    const entry=e=>{
+      let detail=e.detail;
+      if(detail&&same(detail,e.title)){warn('Log',`detail repeats the title ("${e.title}"); dropped`);detail='';}
+      if(k==='day'&&e.category)warn('Log','category belongs to the categorised variant; dropped');
+      const meta=e.meta||(e.at!=null||e.by?logStamp(e.at,e.by):'');
+      const word=k==='categorised'&&(e.category||has(e,'category'))?tx(e.category,e,'category'):'';
+      const fixed=e.corrected||e.was?esc(correctedLabel):'';
+      return `<li class="st-log-entry"${fixed?' data-corrected=""':''}>${word||fixed?`<span class="st-log-category">${[word,fixed].filter(Boolean).join(' · ')}</span>`:''}<strong class="st-log-title">${tx(e.title,e,'title')}</strong>${detail||has(e,'detail')?`<p>${tx(detail,e,'detail')}</p>`:''}${e.was?`<p class="st-log-was">${esc(e.was)}</p>`:''}${meta||has(e,'meta')?`<small>${tx(meta,e,'meta')}</small>`:''}${e.extraHtml?`<div class="st-log-extra">${e.extraHtml}</div>`:''}</li>`;
+    };
+    return mark(panel(nonempty.map(g=>`<section class="st-log-group">${g.label||has(g,'label')?heading({title:g.label,kind:'group',description:g.description||'',strs:has(g,'label')||has(g,'description')?{title:g.strs.label,description:g.strs.description}:undefined,args:g.args&&(g.args.label||g.args.description)?{title:g.args.label,description:g.args.description}:undefined}):''}<ol class="st-log-entries">${g.entries.map(entry).join('')}</ol></section>`).join(''),{className:'st-log '+className,ds:'Log'}));
   }
   /* strs.back = the Back text; categories[i].strs.label = each tab. The nav aria-label stays plain text. */
   function categoryFooter({categories=[],active='',backAction='back',categoryAction='action-category',label='Action categories',className='',strs,args}={}){
@@ -844,7 +923,7 @@
     e.preventDefault();e.stopImmediatePropagation();const target=buttons.find(x=>x.dataset.value===next);target.click();
     const fresh=Array.from(host.querySelectorAll('[data-ds="Segment"] button,[data-ds="FilterChips"] button')).find(x=>x.dataset.action===b.dataset.action&&x.dataset.value===next);fresh?.focus();fresh?.scrollIntoView({block:'nearest',inline:'nearest'});
   },true);
-  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
