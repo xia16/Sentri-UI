@@ -12,18 +12,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-a-4",
-  "target": {
-   "kind": "screen",
-   "id": "workbench.unit"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Unit hub figures disagree with the Inspection page they open",
-  "detail": "Gestation Unit 7 hub says 'Checked Yesterday, 16:10' and Health 3; tapping it opens Inspection with 'Last check-in 06:40 · G. Hansen' and Health 4. Fix: read both from one source.",
-  "source": "screen-review"
- },
- {
   "id": "screens-a-7",
   "target": {
    "kind": "feature",

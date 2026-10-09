@@ -41,7 +41,7 @@
   const units = {
     1:{pigs:48,pens:6,checked:'Today, 08:20 · M. Chen'},2:{pigs:46,pens:6,checked:'Yesterday, 16:10 · G. Hansen'},3:{pigs:44,pens:6,checked:'Today, 08:45 · M. Chen'},4:{pigs:46,pens:6,checked:'Yesterday, 15:40 · G. Hansen'},
     6:{pigs:8,pens:4,checked:'Today, 08:15 · G. Hansen'},
-    7:{pigs:86,pens:8,checked:'Yesterday, 16:10 · G. Hansen'},8:{pigs:74,pens:7,checked:'Today, 08:35 · M. Chen'},9:{pigs:86,pens:8,checked:'Yesterday, 16:40 · G. Hansen'},
+    7:{pigs:86,pens:8,checked:SentriUnitSnapshot.checkIn.time+' · '+SentriUnitSnapshot.checkIn.who},8:{pigs:74,pens:7,checked:'Today, 08:35 · M. Chen'},9:{pigs:86,pens:8,checked:'Yesterday, 16:40 · G. Hansen'},
     10:{pigs:24,pens:24,checked:'Today, 08:15 · G. Hansen'},11:{pigs:24,pens:24,checked:'Yesterday, 17:00 · M. Chen'},12:{pigs:180,pens:6,checked:'Today, 08:30 · M. Chen'},13:{pigs:180,pens:6,checked:'Today, 08:50 · M. Chen'}
   };
   // Unit context belongs at the entrance; values remain sample data for this study.
@@ -144,7 +144,7 @@
     const u=unitInfo(state.unit),sensors=availableSensors(),devices=unitDevices(),faults=maintenanceRecords().filter(f=>!f.resolved);
     // Attention is distinct from all recorded findings: exclude no-action-needed conditions.
     // Counts are fictional snapshot values; null means unavailable, never zero.
-    const care=attentionPreview==='unknown'?{health:null,feed:null}:attentionPreview==='busy'?{health:24,feed:13}:attentionPreview==='clear'||attentionPreview==='maintenance'?{health:0,feed:0}:attentionPreview==='health'?{health:3,feed:0}:attentionPreview==='feed'?{health:0,feed:3}:{health:3,feed:3};
+    const care=attentionPreview==='unknown'?{health:null,feed:null}:attentionPreview==='busy'?{health:24,feed:13}:attentionPreview==='clear'||attentionPreview==='maintenance'?{health:0,feed:0}:attentionPreview==='health'?{health:SentriUnitSnapshot.health,feed:0}:attentionPreview==='feed'?{health:0,feed:3}:{health:SentriUnitSnapshot.health,feed:SentriUnitSnapshot.feed};
     const signals=[{label:'Health',count:care.health,unit:'pig',icon:'health'},{label:'Feed',count:care.feed,unit:'pig',icon:'feed'},{label:'Maintenance',count:faults.length,unit:'issue',icon:'wrench'}];
     const active=signals.filter(s=>Number.isFinite(s.count)&&s.count>0),unavailable=signals.some(s=>s.count===null);
     const inspectLabel = `Inspect unit, ${u.pigs} pigs, ${u.pens} pens`;
