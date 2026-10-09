@@ -878,7 +878,7 @@
   /* A Button from a { label, action, value, register, waiting, describedby } spec (a string is already HTML). */
   function sButton(b){
     if(!b)return '';if(typeof b==='string')return b;
-    const l=sObj(b.label),props={label:l.text??'',register:b.register||'primary',action:b.action||'',value:b.value||'',waiting:!!b.waiting,busy:!!b.busy,describedby:b.describedby||'',className:b.className||'',attrs:b.attrs||{}};
+    const l=sObj(b.label),props={label:l.text??'',register:b.register||'primary',action:b.action||'',value:b.value||'',waiting:!!b.waiting,disabled:!!b.disabled,busy:!!b.busy,describedby:b.describedby||'',className:b.className||'',attrs:b.attrs||{}};
     if(l.str){props.strs={label:l.str};if(l.args)props.args={label:l.args};}
     return button(props);
   }
@@ -939,7 +939,30 @@
     e.preventDefault();e.stopImmediatePropagation();const target=buttons.find(x=>x.dataset.value===next);target.click();
     const fresh=Array.from(host.querySelectorAll('[data-ds="Segment"] button,[data-ds="FilterChips"] button')).find(x=>x.dataset.action===b.dataset.action&&x.dataset.value===next);fresh?.focus();fresh?.scrollIntoView({block:'nearest',inline:'nearest'});
   },true);
-  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  function rangeSlider({min=0,max=10,step=1,value=[min,max],label='Range',unit='',key='range',state='Default',disabled=false,reason='',error=''}={}){
+    if(!(max>min&&step>0))throw new RangeError('RangeSlider requires max > min and step > 0');
+    const v=value.map(x=>Math.max(min,Math.min(max,min+Math.round((Number(x)-min)/step)*step))).sort((a,b)=>a-b),id=fieldId('st-range'),fmt=x=>x+(unit?' '+unit:'');
+    return `<div class="st-range" data-ds="RangeSlider" data-state="${esc(state)}" data-key="${esc(key)}" data-min="${min}" data-max="${max}" data-step="${step}" data-unit="${esc(unit)}"><p id="${id}">${esc(label)} <output>${v[0]}–${v[1]}${unit?' '+esc(unit):''}</output></p><div class="st-range-rail">${v.map((x,i)=>`<button type="button" class="st-range-handle" role="slider" aria-label="${esc(label)} ${i?'maximum':'minimum'}" aria-valuemin="${min}" aria-valuemax="${max}" aria-valuenow="${x}" aria-valuetext="${esc(fmt(x))}" data-handle="${i}" style="left:${(x-min)/(max-min)*100}%"${disabled?' disabled':''}${reason||error?` aria-describedby="${id}-reason"`:''}>${i?'›':'‹'}</button>`).join('')}</div><div class="st-range-ends"><span>${esc(fmt(min))}</span><span>${esc(fmt(max))}</span></div>${reason||error?`<p id="${id}-reason" role="status">${esc(error||reason)}</p>`:''}</div>`;
+  }
+  function filterSheet({title='Filter',subtitle='',groups=[],count=0,noun='items',emptyReason='No items match',backAction='filter-back',clearAction='filter-clear',applyAction='filter-apply',state='Default',loading=false,error='',className='',scrim=true}={}){
+    const blocked=count===0||loading||!!error,reason=error||(loading?'Counting results…':count===0?emptyReason:'');
+    return sheet({title,subtitle,className:'st-filter-sheet '+className,close:{action:backAction},scrim:scrim?{action:backAction}:false,aside:button({label:'Clear',register:'text',action:clearAction,strs:{label:'act.clear'}}),body:`<div data-ds="FilterSheet" data-state="${esc(state)}">${groups.map(g=>`<section class="st-filter-group">${g.label?`<h3>${esc(g.label)}</h3>`:''}${g.content}${g.help?`<p>${esc(g.help)}</p>`:''}</section>`).join('')}</div>`,footer:sheetFooter({back:{action:backAction},primary:{label:loading?'Counting results…':`Show ${count} ${noun}`,action:applyAction,disabled:blocked,attrs:{'aria-live':'polite','aria-atomic':'true'}},status:{text:reason,id:fieldId('st-filter-status'),visible:!!reason}})});
+  }
+  if(typeof document!=='undefined'){
+    const update=(root,handle,n)=>{
+      const hs=[...root.querySelectorAll('[role="slider"]')],min=+root.dataset.min,max=+root.dataset.max,step=+root.dataset.step,i=+handle.dataset.handle;
+      n=Math.max(min,Math.min(max,min+Math.round((n-min)/step)*step));n=i?Math.max(n,+hs[0].getAttribute('aria-valuenow')):Math.min(n,+hs[1].getAttribute('aria-valuenow'));
+      handle.setAttribute('aria-valuenow',n);handle.setAttribute('aria-valuetext',n+(root.dataset.unit?' '+root.dataset.unit:''));handle.style.left=(n-min)/(max-min)*100+'%';
+      const value=hs.map(h=>+h.getAttribute('aria-valuenow'));root.querySelector('output').textContent=value.join('–')+(root.dataset.unit?' '+root.dataset.unit:'');
+      root.dispatchEvent(new CustomEvent('sentri-range-change',{bubbles:true,detail:{key:root.dataset.key,value}}));
+    };
+    document.addEventListener('keydown',e=>{const h=e.target.closest?.('.st-range-handle');if(!h||h.disabled)return;const r=h.closest('.st-range'),n=+h.getAttribute('aria-valuenow'),step=+r.dataset.step;const v={ArrowLeft:n-step,ArrowDown:n-step,ArrowRight:n+step,ArrowUp:n+step,Home:+r.dataset.min,End:+r.dataset.max}[e.key];if(v==null)return;e.preventDefault();update(r,h,v);});
+    let drag;
+    document.addEventListener('pointerdown',e=>{const rail=e.target.closest?.('.st-range-rail');if(!rail||e.button!==0)return;const r=rail.closest('.st-range'),hs=[...rail.querySelectorAll('button')];if(hs[0].disabled)return;e.preventDefault();const rect=rail.getBoundingClientRect(),n=+r.dataset.min+(e.clientX-rect.left)/rect.width*(r.dataset.max-r.dataset.min),h=e.target.closest('.st-range-handle')||hs.reduce((a,b)=>Math.abs(n-a.getAttribute('aria-valuenow'))<=Math.abs(n-b.getAttribute('aria-valuenow'))?a:b);drag={r,h,rect};rail.setPointerCapture(e.pointerId);r.dataset.dragging='true';h.focus();update(r,h,n);});
+    document.addEventListener('pointermove',e=>{if(drag){const {r,h,rect}=drag;update(r,h,+r.dataset.min+(e.clientX-rect.left)/rect.width*(r.dataset.max-r.dataset.min));}});
+    const end=()=>{if(drag)delete drag.r.dataset.dragging;drag=null;};document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);window.addEventListener('blur',end);
+  }
+  const api=Object.freeze({rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

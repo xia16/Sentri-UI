@@ -25,6 +25,7 @@ const navItem = (nav, key, html, count, onclick) => {
 let initialVariant = new URLSearchParams(location.search).get('variant');
 let COMPONENT_GROUPS = [
   ['Base', ['Button', 'IconButton', 'Icon', 'Heading', 'Row', 'Panel', 'Facts', 'Log', 'Sheet', 'Segment', 'ChoiceList', 'CategoryFooter']],
+  ['Inputs and filters', ['FilterSheet', 'RangeSlider']],
   ['Fields', ['Field', 'PickerField', 'Stepper', 'Measure', 'Numpad']],
   ['Status and feedback', ['Status', 'ConditionTag', 'Banner', 'Photos']],
   ['Task skeleton', ['TaskPhone', 'TaskHeader', 'TaskSummary', 'TaskLens', 'TaskGroup', 'TaskDock', 'TaskHold', 'TaskTotals', 'TaskProgress', 'TaskStepper', 'TaskPhotos', 'TaskChoice', 'TaskRadios', 'TaskWarning', 'TaskTable', 'TaskMetrics', 'TaskSection', 'TaskReceipt', 'TaskDay', 'TaskChips']],
