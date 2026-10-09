@@ -1,56 +1,92 @@
-**Status: candidate.** Consolidated from the piglet-processing slices' StatusWord and Receipt compositions and revised after the design panel ([ADR 0002](../../adr/0002-candidates-2.md)). It is not approved.
+**Status: in design.** One implementation of "how a state is said", rebuilt from the hand-built chips (TaskRow `.tk-chip`, Farrowing `.state-word` / `.done-word` / `.ended-word`, Home's card status) and the candidate word and line (ADR 0002).
 
 # Status
 
-How a state is said. There are two placements, and one rule under both: **colour lives on the value, the word stays ink** (RULINGS, 2026-09-03).
+Status says the **workflow state** of one item on one line: Awaiting, Active, Done, Late, Overdue, Sow died. Use [ConditionTag](../ConditionTag/README.md) instead for a recorded health condition with a care level, [Banner](../Banner/README.md) for a message that needs the worker's attention, and plain row text for a forecast (`Due tomorrow`, `Expected in 5 days`): a forecast is not a state.
 
-- **Word**: `SentriUI.status({ text, tone })`. A state word with a 4px dot: `due now`, `in progress`, `done`, `sow died`. It is the Row's one chip and a heading's trailing word. It is never a filled badge.
-- **Line**: `SentriUI.statusLine(tokens, { live, sep, mono, tight })`. A body line whose values carry the colour: the receipt `Saved · +4 this visit`, `Overdue · 3 days`, a row's mono line 2 `parity 3 · owed 4`.
+## When to use / when not
+- **Use** when a row, a heading or a line must say where an item stands in the task.
+- **Don't** use for a health condition (ConditionTag), a count or a measure (Row, Measure), an action (Button), or a forecast (text in `muted`).
+- A status that opens something sits inside a Row or a Button, which owns the tap.
 
-**Anatomy**
-- **Word:** an inline row of the `status-dot` dot (4px, `currentColor`) and the word, `status-dot` apart, at `description` (11px/500). The whole word takes the tone.
-- **Line:** `row-title` (13px/400) in `ink`, or IBM Plex Mono with `mono`. Only the parts that carry a `tone` are coloured, **at 600**; the words around them stay `ink` at 400.
-- **Tokens and parts:** a line is a list of tokens. A token is one part, or a word and its value (`[{ text: 'Overdue' }, { text: '3 days', tone: 'red' }]`). With `sep: 'dot'` the line puts a `muted` `·` between tokens.
-  - The `·` is a **real text node** (`<span class="st-sep" data-str="ds.sep">·</span>`), styled with 4px on each side, so it copies, reads and wraps like text. The copy never carries separators of its own.
-  - Parts in a token join with a space. `tight` joins them without one, for zh strings that carry none.
+## The colour map (the one definition)
+Every status, in every variant and every screen, takes its colour from this table. Tokens are in `tokens.json`.
 
-**Tones**
-- `amber`: due now, waiting to upload, a warning that still records, a corrected figure.
-- `progress`: in progress.
-- `green`: done, recorded, synced, a draft addition (the number is the receipt).
-- `red`: a terminal fact (`sow died`) or a number that is overdue. Not for errors on the worker's input: those are amber and never block.
-- `muted`: waiting. This is the default. An unknown tone warns in development and falls back to `muted`.
+| Kind | Means | Tone | Chip colours | Icon (chip) |
+|---|---|---|---|---|
+| `awaiting` | not started yet (`Awaiting`, `To do`) | `muted` | `muted` on `well`, `line` | none |
+| `active` | in progress (`Active`) | `progress` | `progress` on `progress-wash`, `chip-progress-border` | none |
+| `done` | recorded, finished (`Done`) | `green` | `green` on `green-wash`, `chip-green-border` | check |
+| `late` | past its time, still records (`Late`) | `amber` | `amber` on `amber-wash`, `pending-border` | clock |
+| `overdue` | past its due date by days (`Overdue`) | `red` | `red` on `red-wash`, `chip-red-border` | alert |
+| `died` | a terminal fact (`Sow died`) | `red` | `red` on `red-wash`, `chip-red-border` | none |
 
-**States**
-- **Default:** the word in its tone with its dot, and the line in `ink` with coloured values.
-- **Live:** a `live` line is a persistent `role="status"` region with `aria-atomic`.
-  - It is **mounted empty**, because content inserted together with its region is not announced. The card writes the content into a `<template>` inside the region.
-  - The host calls `SentriUI.liveFill(scope)` once after inserting the markup: it clears the region, then sets it.
-  - To change it later, call `SentriUI.announce(el, SentriUI.statusText(tokens))`, which clears and then sets after 60ms. `announce` keeps the latest message per region and cancels a superseded one, so two calls in quick succession land the second, never an empty region. Its `then` (the host's localization) is kept with the message, and a replay through `guard` runs it again.
-- **Pressed, disabled, focus:** none. Status is text and holds no action. A status that opens something sits inside a Row or a Button, which owns those states.
-- **Error, loading:** not drawn. There is no spinner word: a pending upload is the amber word `waiting to upload`.
-- **Empty:** absent. A row with nothing to flag has no chip; an empty slot stays empty.
+Green means done and nothing else: a pending item is never green. `To do` is `awaiting`.
 
-**Component contract**
-- **Props:**
-  - `status({ text, tone, id, className, strs, args })`.
-  - `statusLine(tokens, { live, sep: 'dot' | '', mono, tight, id, className })`.
-  - `statusText(tokens, { sep, tight })` returns the line's inner HTML.
-  - `announce(el, html, { delay = 60, then })` and `liveFill(scope, { delay, then })`.
-- **Events:** none. Status emits nothing.
-- **Slots:** the text (word) or the tokens (line). There are no child slots.
-- **Ids:** `id` is written on the root, so a host can hold the region and announce into it.
-- **Port note (Vue / React Native):**
-  - A live line is a view whose `accessibilityLiveRegion="polite"` (Android) or an `AccessibilityInfo.announceForAccessibility` call (iOS) fires after mount, never with it.
-  - The separator is a text child, not a decoration.
+## Anatomy
+- **Chip:** optional icon (`glyph-tag` 12px) + text, one badge. 10px/600 (`meta`), padding `space-3` `space-6`, `radius-chip`, 1px border, `row-chip-max` wide at most. It wraps; it never ends in an ellipsis.
+- **Word:** a `status-dot` (4px) dot and the word, `status-dot` apart, 11px/500 (`description`). The whole word takes the tone.
+- **Dot:** a `dot-size` (10px) shape: a ring for `awaiting`, half-filled for `active`, solid for the rest. The text is the accessible name and the `title`; it is not drawn.
+- **Line:** a body line (13px, `ink`) whose values carry the colour at 600; the words around them stay `ink`. Tokens join with a real `·` text node.
 
-**Don'ts**
-- Don't colour the word when the value can carry it: `Overdue` stays ink, `3 days` is red.
-- Don't put an icon in place of a word. Status is a word or a colour register, never an icon (RULINGS, Names and glyphs).
-- Don't fill a badge, and don't put an ellipsis on a status word.
-- Don't put more than one chip on a row.
-- Don't insert a live region with its content already in it.
+## Variants
+- **Chip** (`variant: 'chip'`): a state on a list row, one per row, under the ID. Used by TaskRow (Piglet processing), Farrowing's room list and Home's task card.
+- **Word** (`variant: 'word'`, the default): a state in a heading or meta line, and the Row's `chip` slot.
+- **Dot** (`variant: 'dot'`): the compact marker for a list that already names the state elsewhere (a lens, a header). No screen uses it yet; the atlas draws its own dot the same way.
+- **Line** (`statusLine`): coloured values in a body line: the receipt `Saved · +4 this visit`, `Overdue · 3 days`, a row's mono line 2.
 
-**Strings**
-- `status` takes `strs: { text }` and `args`. Every part takes its own `strs: { text }` and `args: { text }`. Without `strs` the output is unchanged text.
-- The separator is `ds.sep` (`·` in every locale).
+## States
+Status is text and holds no action, so most interaction states do not apply.
+
+| State | Chip | Word | Dot | Line |
+|---|---|---|---|---|
+| Default (one per kind) | drawn, 6 kinds | drawn, 6 kinds | drawn, 6 kinds | drawn |
+| Pressed, focus | none: the Row or Button around it owns them | same | same | same |
+| Selected | none | none | none | none |
+| Disabled | none: a state is a fact, not a control | same | same | same |
+| Error, loading | none: a pending upload is the amber word `waiting to upload` | same | same | same |
+| Empty | absent: a row with nothing to flag has no chip | same | same | same |
+| Long label | wraps within `row-chip-max` | wraps | n/a (text not drawn) | wraps |
+| Chinese | `母猪死了` fits one line | fits | n/a | fits |
+| Live | n/a | n/a | n/a | a `live` line is a persistent `role="status"` region (below) |
+
+## Behaviour
+- `kind` picks the tone, and for a chip the icon. `tone` alone still works for a word (`status({ text, tone })`); a `kind` with a `tone` uses the tone.
+- A live line is mounted **empty**: its content waits in a `<template>` and the host calls `SentriUI.liveFill(scope)` once after inserting the markup. To change it later call `SentriUI.announce(el, SentriUI.statusText(tokens))`, which clears and then sets after 60ms and keeps only the latest message per region.
+- **Props:** `status({ text, kind, tone, variant, icon, id, className, strs, args })`; `statusLine(tokens, { live, sep: 'dot' | '', mono, tight, id, className })`; `statusText(tokens, { sep, tight })`; `announce(el, html, { delay, then })`; `liveFill(scope, { delay, then })`. TaskRow takes `chip: { text, str, args, kind }`.
+- **Events:** none. **Slots:** the text (chip, word, dot) or the tokens (line). **Ids:** `id` is written on the root.
+- **Port note (Vue / React Native):** a live line is a view with `accessibilityLiveRegion="polite"` (Android) or an `announceForAccessibility` call (iOS) that fires after mount; the separator is a text child.
+
+## Content rules
+- Sentence case, one to two words: `Active`, `Done`, `Late`, `Overdue`, `Sow died`, `To do`. At most **12 characters** in English and **6** in Chinese; a longer state is a sentence in a Banner or a line.
+- Never an ellipsis on a status word; a chip wraps instead. Never "Unchecked", exclamation marks or emoji.
+- One chip per row. If two things are true, the more urgent state wins (`Late` over `To do`; `Sow died` over everything).
+- Colour lives on the value: `Overdue` stays `ink` in a line and `3 days` is red.
+
+## Accessibility
+- Chip and word are plain text: the state is read in order with the row. The chip's icon is `aria-hidden`; the word is always there, so colour and icon are never the only cue.
+- The dot carries its text in a visually hidden span and in `title`; it is read as text, not as an image. Because a bare shape is weak for a glove-in-glare reader, a dot is only used where the state is also said in words nearby.
+- A live line is `role="status"`, `aria-live="polite"`, `aria-atomic`. Status takes no focus and has no keyboard behaviour.
+- Contrast: every tone holds 4.5:1 or more on its wash. Nothing here is a tap target; the 48px floor belongs to the Row that carries it.
+
+## Do / Don't
+- Do take every status colour from the map above, in every screen.
+- Do put the chip under the ID in a list row and the word in a heading.
+- Don't colour a pending item green, fill a badge with a colour that isn't in the map, or draw a chip by hand.
+- Don't put an icon in place of a word.
+- Don't put more than one chip on a row, and don't insert a live region with its content already in it.
+
+## CSS variables
+`--ink`, `--muted`, `--line`, `--well`, `--green`, `--green-wash`, `--chip-green-border`, `--amber`, `--amber-wash`, `--pending-border`, `--red`, `--red-wash`, `--chip-red-border`, `--progress`, `--progress-wash`, `--chip-progress-border`, `--radius-chip`, `--row-chip-max`, `--glyph-tag`, `--dot-size`, `--status-dot`, `--ring-width`, `--space-3|4|6`, `--type-meta-size`, `--type-description-size`.
+
+## Related
+| Component | Use it for |
+|---|---|
+| [ConditionTag](../ConditionTag/README.md) | a recorded health condition and its care level |
+| [Row](../Row/README.md) | the `chip` slot takes a Status word; the row owns the tap |
+| [TaskRow](../TaskRow/README.md) | the animal row; its chip is a Status chip |
+| [Banner](../Banner/README.md) | a message the worker must read |
+| [TaskProgress](../TaskProgress/README.md) | how much of the task is done |
+
+## Classification
+**Component** (generic, used by three sections). `chip`, `word`, `dot` and `line` are its **variants**. `Due tomorrow` is not a status; it is text.

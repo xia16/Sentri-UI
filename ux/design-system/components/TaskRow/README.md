@@ -7,11 +7,7 @@ One animal or litter in a [group](../TaskGroup/README.md). **Budget: the mono id
 **Anatomy** (`.tk-row`, `data-ds="TaskRow"`, a button; a `<label>` with the tick trail; a `<div>` when `still`)
 - `animal-row-min` (76px), padded `space-animal-row-y space-row-x` (13 × 14), 10px gaps, aligned centre; a 1px `line` above every row but the first.
 - **Identity** (`.tk-row-identity`, `animal-id-col` 59px min): the id in 13px/600 mono, −0.6px (`000418`, `A02`); 7px under it, the **chip**.
-- **Chip** (`.tk-chip`): `meta` 10px/600, padded `3px 6px`, `radius-chip`, 1px border, one line, `row-chip-max` wide at most. Tones:
-  - `green` (in progress: `Active`): `green` on `green-wash`, `chip-green-border`.
-  - none (done: `Done`): `muted` on `well`, `line`.
-  - `red` (a terminal fact: `Sow died`): `red` on `red-wash`, `chip-red-border`.
-  - `amber` (waiting on the worker): `amber` on `amber-wash`, `pending-border`.
+- **Chip:** the [Status](../Status/README.md) `chip` variant, drawn by `SentriUI.status({ variant: 'chip', kind })`. The row has no chip code of its own. Kinds and colours are Status's one map (`awaiting` muted, `active` progress, `done` green, `late` amber, `overdue` / `died` red); `row-chip-max` wide at most, wrapping, never an ellipsis.
 - **Detail** (`.tk-row-detail`), 5px between its lines:
   - **Headline:** 14px/500/1.45 `ink`: the figure the task is about (`9 alive · 5 dead`, `12 owed`). `tone: 'forecast'` prints it `muted` (`Due tomorrow`). A part can carry colour (`Overdue · 3 days` with `3 days` red).
   - **Meta:** `meta` 10px/1.6 mono `muted`, tokens separated by `·` (`born 14 · 1h ago · G.H`).
@@ -21,7 +17,7 @@ One animal or litter in a [group](../TaskGroup/README.md). **Budget: the mono id
 
 **States**
 - Pressed: `press`. Focus: the global ring. Disabled: never drawn; a row that cannot be acted on is absent or says why in its meta.
-- Done: the chip `Done` and the edit trail. Never grey.
+- Done: the green `done` chip and the edit trail.
 
 **Door variant (no id column)** — farrowing's `.disclosure`: `SentriTask.door({ title, description, action, value, label, trail: 'chevron' | 'edit' | '' })` (`.tk-door`, `data-ds="TaskRow"`, `data-variant="door"`). A non-animal door inside a sheet or a page: at least 62px, padded 15px 0, a 1px `line` under it; the title 13px/600, one description line 10px/1.7 `muted` 5px under it; a 16px chevron.
 
@@ -29,10 +25,10 @@ One animal or litter in a [group](../TaskGroup/README.md). **Budget: the mono id
 
 **Doors as a list** — `SentriTask.doors({ card, title, icon, items: [{ title, description, icon, action, value, label }], label })`. `card: false` (default): flat door rows (`door`). `card: true`: farrowing's Pen page / sow-actions list — an optional section title with its icon, then one card of the design system's Rows, each with a 34px tinted icon tile, a title (13px/500), one description line (11px `muted`) and a chevron.
 
-**The id column holds its width** (`animal-id-col`): a chip wider than it ellipses under the id, so every headline in a group starts on one edge.
+**The id column holds its width** (`animal-id-col`): a chip wider than it wraps under the id, so every headline in a group starts on one edge.
 
 **Component contract**
-- **Props:** `SentriTask.row({ id, chip: { text, str, args, tone }, headline, tone, meta, trail: 'chevron' | 'edit' | 'tick' | '', action = 'open', value, label, tick: { action = 'toggle', value = value, checked, label }, still, data })`. `still: true` draws a row with no action (a `<div>`: a row holding its place after a record). `data: { flash: '' }` adds `data-flash` (and the like) for the host's motion.
+- **Props:** `SentriTask.row({ id, chip: { text, str, args, kind }, headline, tone, meta, trail: 'chevron' | 'edit' | 'tick' | '', action = 'open', value, label, tick: { action = 'toggle', value = value, checked, label }, still, data })`. `still: true` draws a row with no action (a `<div>`: a row holding its place after a record). `data: { flash: '' }` adds `data-flash` (and the like) for the host's motion.
 - **Events:** `<button data-action=action data-value=value>`.
 - **Slots:** `id` (text slot); `headline` and `meta` take a text slot or a list of parts `[{ text, str, args, tone }, { sep: true }, …]`; `{ sep: true }` is the shared `·` (`ds.sep`), a real text node.
 - **Port note:** a pressable row, left column fixed width so every headline starts on one edge.

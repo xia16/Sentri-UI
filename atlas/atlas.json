@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T17:14:19.236Z",
- "commit": "65212a6",
+ "generated": "2026-10-09T17:24:45.138Z",
+ "commit": "5838678",
  "platforms": [
   {
    "id": "mobile",
@@ -15034,6 +15034,12 @@
      }
     ]
    }
+  },
+  {
+   "name": "ConditionTag",
+   "group": "Status and feedback",
+   "status": "in-design",
+   "gate": null
   },
   {
    "name": "Banner",

@@ -1,0 +1,33 @@
+[
+  {
+    "id": "tag",
+    "name": "Tag",
+    "use": "use for a recorded condition on a list row (pig list, pig profile): its name, day count and care level, never colour alone.",
+    "notUse": "not for a workflow state like Active or Done — use Status; not for a filter choice — use TaskChips.",
+    "states": [
+      "Needs attention · Monitor",
+      "Needs attention · Treat in place",
+      "Needs attention · Hospital pen",
+      "Ongoing",
+      "Resolved",
+      "Notice (standing instruction)",
+      "Long name (ellipsis)",
+      "Chinese"
+    ]
+  },
+  {
+    "id": "detail",
+    "name": "Detail",
+    "use": "use at the head of a condition's record page: the care-level word, the day count and any note.",
+    "notUse": "not in a list row — use the tag; not to edit the care level — use a Choice field.",
+    "states": [
+      "Needs attention · Monitor",
+      "Needs attention · Treat in place",
+      "Needs attention · Hospital pen",
+      "Ongoing",
+      "Resolved",
+      "Long note (wraps)",
+      "Chinese"
+    ]
+  }
+]

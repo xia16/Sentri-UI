@@ -1,15 +1,15 @@
-<!-- @dsCard group="Status" height=260 subtitle="Candidate · words with a dot, lines with colour on the value" -->
+<!-- @dsCard group="Status" height=340 subtitle="Chip, word, dot and line, one colour map" -->
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}.r{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:14px}</style></head>
 <body>
-<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="words" style="display:flex;flex-wrap:wrap;gap:12px"></div><div id="lines" style="margin-top:24px;display:flex;flex-direction:column;gap:8px"></div></div>
+<div data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--font-sans);color:var(--ink)">
+<div class="r" id="chips"></div><div class="r" id="words"></div><div class="r" id="dots"></div><div id="lines" style="display:flex;flex-direction:column;gap:8px"></div></div>
 <script>
 const UI = window.SentriUI;
-// Words: one per tone. Lines: the receipt, an overdue value, the row law's mono line 2.
-words.innerHTML = [['due now', 'amber'], ['in progress', 'progress'], ['done', 'green'], ['waiting', 'muted'], ['sow died', 'red']]
-  .map(([text, tone]) => UI.status({ text, tone })).join('');
-lines.innerHTML =
+const kinds = [['awaiting', 'To do'], ['active', 'Active'], ['done', 'Done'], ['late', 'Late'], ['overdue', 'Overdue'], ['died', 'Sow died']];
+for (const [id, v] of [['chips', 'chip'], ['words', 'word'], ['dots', 'dot']]) document.getElementById(id).innerHTML = kinds.map(([kind, text]) => UI.status({ variant: v, kind, text })).join('');
+document.getElementById('lines').innerHTML =
   UI.statusLine(['Saved', { text: '+4 this visit', tone: 'green' }], { sep: 'dot', live: true }) +
   UI.statusLine([[{ text: 'Overdue' }, { text: '3 days', tone: 'red' }]]) +
   UI.statusLine(['parity 3', [{ text: 'owed' }, { text: '4', tone: 'amber' }]], { sep: 'dot', mono: true });

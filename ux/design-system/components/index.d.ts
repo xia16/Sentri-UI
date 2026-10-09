@@ -318,8 +318,25 @@ export type Tone = 'amber' | 'progress' | 'green' | 'red' | 'muted';
 export type Part = string | { text: string; tone?: Tone; mono?: boolean; strs?: Strs<'text'>; args?: StrArgs<'text'> };
 /** A token: one part, or a word and its value as a list of parts. Tokens with sep 'dot' are joined by a real `·` text node. */
 export type Token = Part | Part[];
-/** Status · word: a coloured state word with a 4px dot. */
-export interface StatusProps { text: string; tone?: Tone; id?: string; className?: string; strs?: Strs<'text'>; args?: StrArgs<'text'> }
+/** The status kinds: one colour map (awaiting muted, active progress, done green, late amber, overdue red, died red). */
+export type StatusKind = 'awaiting' | 'active' | 'done' | 'late' | 'overdue' | 'died';
+/** Status: `word` (dot and word, inline), `chip` (filled badge in a row) or `dot` (shape alone; text is its name). `kind` picks tone and icon; `tone` alone still works. */
+export interface StatusProps { text: string; kind?: StatusKind; tone?: Tone; variant?: 'word' | 'chip' | 'dot'; /** chip only: a registry icon name, default from kind */ icon?: string; id?: string; className?: string; strs?: Strs<'text'>; args?: StrArgs<'text'> }
+/** ConditionTag: a recorded health condition with its care level. */
+export interface ConditionTagProps {
+  name?: string;
+  /** `Day 3` or `12 days` */
+  day?: string;
+  care?: 'attention' | 'ongoing' | 'resolved' | 'notice';
+  /** care 'attention' only; default monitor */
+  level?: 'monitor' | 'treat' | 'hospital';
+  /** the care-level word, localized by the caller */
+  careText?: string;
+  /** detail only */
+  note?: string;
+  icon?: string; variant?: 'tag' | 'detail'; id?: string; className?: string;
+  strs?: Strs<'name' | 'day' | 'careText' | 'note'>; args?: StrArgs<'name' | 'day' | 'careText' | 'note'>;
+}
 export interface StatusLineOptions {
   /** A persistent role=status region, mounted empty: its content waits in a <template> until liveFill() or announce(). */
   live?: boolean;
@@ -495,6 +512,7 @@ export interface RowActionProps extends RowCopyProps {
 
 export interface SentriUI {
   status(props: StatusProps): string;
+  conditionTag(props: ConditionTagProps): string;
   statusLine(tokens: Token[], options?: StatusLineOptions): string;
   /** The tokens as HTML, for announce() into a region the host holds. */
   statusText(tokens: Token[], options?: { sep?: 'dot' | ''; tight?: boolean }): string;

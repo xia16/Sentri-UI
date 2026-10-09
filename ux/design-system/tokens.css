@@ -21,6 +21,8 @@
   --red: #a13a2d;
   --red-wash: #fff1ee;
   --progress: #466888;
+  --progress-wash: #e9f0f6;
+  --chip-progress-border: #cddbe7;
   --focus: #577fa6;
   --current-marker: #526847;
   --tab-ink: #68745d;
@@ -129,6 +131,9 @@
   --glyph-pad: 20px;
   --caret-width: 2px;
   --status-dot: 4px;
+  --glyph-tag: 12px;
+  --tag-height: 24px;
+  --dot-size: 10px;
   --radio-size: 20px;
   --radio-dot: 10px;
   --ring-width: 2px;

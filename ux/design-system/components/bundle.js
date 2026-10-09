@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"Banner"},{"name":"Photos"}]} */
+/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
 /* SentriIcons (sentri-icons.js) and SentriUI (sentri-components.js), verbatim. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
@@ -431,9 +431,49 @@
       if(tpl)announce(el,tpl.innerHTML,{delay,then});
     });
   }
-  /* Status · word: a coloured state word with a 4px dot (`due now`, `sow died`) — never a filled badge. */
-  function status({text='',tone='muted',id='',className='',strs,args}={}){
-    return `<span class="st-status ${esc(className)}" data-ds="Status"${id?` id="${esc(id)}"`:''} data-tone="${toneOf(tone)||'muted'}">${tx(text,{strs,args},'text')}</span>`;
+  /* Status: how a state is said. One colour map for every status, here and in the README:
+       awaiting muted · active progress · done green · late amber · overdue red · died red
+     `kind` picks a row of the map (tone, and the icon a chip carries); `tone` alone is the old word call and still works.
+     variant: 'word' (a 4px dot and the word, inline) · 'chip' (a filled badge in a row) · 'dot' (the shape alone; its text is
+     the accessible name and the title). Text is always given: colour and shape never carry a state alone. */
+  const KINDS={awaiting:{tone:'muted',icon:''},active:{tone:'progress',icon:''},done:{tone:'green',icon:'check'},late:{tone:'amber',icon:'clock'},overdue:{tone:'red',icon:'alert'},died:{tone:'red',icon:''}};
+  const STATUS_VARIANTS=['word','chip','dot'];
+  function status({text='',tone,kind='',variant='word',icon,id='',className='',strs,args}={}){
+    const k=kind?oneOf('Status','kind',kind,Object.keys(KINDS),''):'';
+    const t=toneOf(tone)||(k&&KINDS[k].tone)||'muted';
+    const v=oneOf('Status','variant',variant,STATUS_VARIANTS,'word');
+    const o={strs,args};
+    const attrs=`class="st-status ${esc(className)}" data-ds="Status" data-variant="${v}"${id?` id="${esc(id)}"`:''} data-tone="${t}"${k?` data-kind="${k}"`:''}`;
+    if(v==='dot'){
+      const tid=has(o,'text')?` data-str-attr="title:${esc(strs.text)}"`:'';
+      return `<span ${attrs} title="${esc(text)}"${tid}><span class="st-visually-hidden">${tx(text,o,'text')}</span></span>`;
+    }
+    const g=v==='chip'?(icon!=null?icon:(k?KINDS[k].icon:'')):'';
+    return `<span ${attrs}>${g?glyph(g):''}${tx(text,o,'text')}</span>`;
+  }
+  /* ConditionTag: a recorded health condition with its care level, never colour-only.
+       care  attention (needs action: level monitor · treat · hospital) · ongoing (recorded, no action) · resolved ·
+             notice (a standing instruction on the animal, e.g. Feed held — not a condition)
+     variant 'tag' (in a row: icon, name, day count) · 'detail' (in a record header: the care-level word, the day, a note).
+     careText is the care-level word (the caller localizes it); the tag keeps it for assistive tech, the detail prints it. */
+  const CARES=['attention','ongoing','resolved','notice'];
+  const LEVELS={monitor:{icon:'monitor',text:'Monitor'},treat:{icon:'treat',text:'Treat in place'},hospital:{icon:'hospital',text:'Hospital pen'}};
+  const CARE_ICON={ongoing:'note',resolved:'check',notice:'note'};
+  const CARE_TEXT={attention:'Needs attention',ongoing:'Ongoing',resolved:'Resolved',notice:''};
+  function conditionTag({name='',day='',care='ongoing',level='',careText,note='',icon,variant='tag',id='',className='',strs,args}={}){
+    const c=oneOf('ConditionTag','care',care,CARES,'ongoing');
+    const lv=c==='attention'?oneOf('ConditionTag','level',level||'monitor',Object.keys(LEVELS),'monitor'):'';
+    const v=oneOf('ConditionTag','variant',variant,['tag','detail'],'tag');
+    const o={strs,args};
+    const word=careText!=null?careText:(c==='attention'?LEVELS[lv].text:CARE_TEXT[c]);
+    const g=icon!=null?icon:(c==='attention'?LEVELS[lv].icon:CARE_ICON[c]);
+    const attrs=`class="st-condition ${esc(className)}" data-ds="ConditionTag" data-variant="${v}" data-care="${c}"${lv?` data-level="${lv}"`:''}${id?` id="${esc(id)}"`:''}`;
+    const dayHtml=day?`<small class="st-condition-day">${tx(day,o,'day')}</small>`:'';
+    if(v==='detail'){
+      return `<div ${attrs}><span class="st-condition-mark">${g?glyph(g):''}</span><span class="st-condition-copy"><strong class="st-condition-level">${tx(word,o,'careText')}</strong>${name||day?`<span class="st-condition-meta">${name?tx(name,o,'name'):''}${name&&day?' · ':''}${day?tx(day,o,'day'):''}</span>`:''}${note?`<span class="st-condition-note">${tx(note,o,'note')}</span>`:''}</span></div>`;
+    }
+    const title=[name,day,word].filter(Boolean).join(' · ');
+    return `<span ${attrs} title="${esc(title)}">${g?glyph(g):''}<span class="st-condition-name">${tx(name,o,'name')}</span>${dayHtml}${word?`<span class="st-visually-hidden"> · ${tx(word,o,'careText')}</span>`:''}</span>`;
   }
   /* The tokens as HTML, for announce() into a region the host already holds. */
   function statusText(tokens,{sep='',tight=false}={}){return toks(tokens,{tight,dot:sep==='dot'});}
@@ -767,7 +807,7 @@
     const scrimHtml=sc===false?'':scrim(Object.assign({layer},sc));
     return `${scrimHtml}<section class="sheet${cls}" ${common} role="dialog" aria-modal="true" data-st-context="drawer" data-size="${sz}"${sizing==='full'?' data-sizing="full"':' data-sizing="content"'}><div class="grab" aria-hidden="true"></div>${main}</section>`;
   }
-  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
