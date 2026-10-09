@@ -1,0 +1,20 @@
+<!-- @dsCard group="Status" height=300 subtitle="Tag and detail, one look per care level" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}.r{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}</style></head>
+<body>
+<div data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--font-sans);color:var(--ink)">
+<div class="r" id="tags"></div><div id="details" style="display:flex;flex-direction:column;gap:14px"></div></div>
+<script>
+const UI = window.SentriUI;
+document.getElementById('tags').innerHTML = [
+  { name: 'Thin', day: 'Day 3', care: 'attention', level: 'monitor' }, { name: 'Fever', day: 'Day 2', care: 'attention', level: 'treat' },
+  { name: 'Arthritis', day: 'Day 5', care: 'attention', level: 'hospital' }, { name: 'Arthritis', day: '12 days', care: 'ongoing' },
+  { name: 'Poor appetite', day: '4 days', care: 'resolved' }, { name: 'Feed held', care: 'notice', icon: 'feed', careText: '1.8 kg/day' }
+].map(UI.conditionTag).join('');
+document.getElementById('details').innerHTML =
+  UI.conditionTag({ variant: 'detail', day: 'Day 2', care: 'attention', level: 'treat', careText: 'Treat in place', note: 'Penicillin, 2 ml, once a day' }) +
+  UI.conditionTag({ variant: 'detail', day: '12 days', care: 'ongoing', careText: 'No action needed' });
+</script>
+</body>
+</html>

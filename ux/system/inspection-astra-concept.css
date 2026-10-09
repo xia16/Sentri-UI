@@ -140,9 +140,6 @@
 .inspection-phone .roster-top{display:flex;align-items:flex-start;gap:10px;min-width:0}
 .inspection-phone .roster-id{font:600 12px/24px var(--mono);letter-spacing:-.3px;flex-shrink:0}
 .inspection-phone .recorded-tags{display:flex;align-items:center;flex-wrap:wrap;gap:4px;min-width:0}
-.inspection-phone .recorded-tag{display:inline-flex;align-items:baseline;gap:5px;padding:3px 6px;border:1px solid #e5cfaa;border-radius:6px;background:#fbf1dc;color:#765018;font-size:10px;font-weight:600;line-height:1.5}
-.inspection-phone .recorded-tag small{font-size:8px;font-weight:400;color:inherit;white-space:nowrap}
-.inspection-phone .recorded-tag.feed-tag{color:#4f6145;border-color:#ced9c4;background:#edf2e7}
 .inspection-phone .roster-meta{font-size:10px;line-height:1.5;color:var(--muted)}
 .inspection-phone .roster-note{font-size:11px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink);display:block}
 .inspection-phone .roster-pig .pig-open>svg{width:12px;height:12px;flex:0 0 12px;color:var(--muted)}
@@ -150,7 +147,7 @@
 .inspection-phone .pen-note-indicator svg{width:14px;height:14px}
 .inspection-phone .pen-note-indicator span{font-size:9px}
 .inspection-phone .pen-note-body{margin:0;font-size:14px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
-@media(max-width:370px){.inspection-phone .roster-top{gap:7px}.inspection-phone .recorded-tag{padding:3px 5px;font-size:9px}.inspection-phone .roster-meta{font-size:9px}.inspection-phone .roster-pig .check-target{width:var(--tap-min);min-width:var(--tap-min)}}
+@media(max-width:370px){.inspection-phone .roster-top{gap:7px}.inspection-phone .roster-meta{font-size:9px}.inspection-phone .roster-pig .check-target{width:var(--tap-min);min-width:var(--tap-min)}}
 /* Two-line roster: permanent identity/context, then one bounded status line. */
 .inspection-phone .roster-top{align-items:center;gap:8px;min-width:0;white-space:nowrap}
 .inspection-phone .roster-top .roster-meta{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
@@ -160,9 +157,6 @@
 .inspection-phone .roster-pig .pig-open>.roster-content{gap:6px}
 .inspection-phone .roster-second{display:flex;align-items:center;gap:7px;min-width:0;height:26px;overflow:hidden}
 .inspection-phone .recorded-tags{flex:1;min-width:0;display:flex;flex-wrap:nowrap;gap:4px;overflow:hidden;height:24px;align-items:center}
-.inspection-phone .recorded-tag{flex:0 0 auto;min-width:0;max-width:100%;white-space:nowrap;box-sizing:border-box}
-.inspection-phone .recorded-tag .tag-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.inspection-phone .recorded-tag small{flex-shrink:0}
 .inspection-phone .recorded-tags>[hidden]{display:none!important}
 .inspection-phone .tag-more{flex:0 0 auto;padding:3px 5px;border:1px solid #d7dccf;border-radius:6px;font:500 10px/15px var(--mono);color:var(--muted);background:#f4f5f0}
 /* Match farrowing's default tools; keep selection context in the bottom bar. */
@@ -323,9 +317,7 @@
 .inspection-phone .pig-feed-curve figcaption{font-size:10px;line-height:1.5;color:#59644f;padding:3px}
 .inspection-phone .pig-plan-curve{margin-top:24px}
 .inspection-phone .pig-plan-curve-panel .pig-feed-curve{margin:0;padding:0;border:0;background:transparent}
-.inspection-phone .finding-summary{display:flex;align-items:center;gap:10px;background:#fcf7ee;border:1px solid #eadfc9;padding:12px;border-radius:10px;margin-bottom:16px;flex-wrap:wrap}
-.inspection-phone .finding-summary>strong{font-size:14px;font-weight:600}
-.inspection-phone .finding-summary p{width:100%;font-size:12px;line-height:1.5;margin:0}
+.inspection-phone .finding-summary{margin-bottom:var(--space-16)}
 .inspection-phone button.record-card{text-align:left;width:100%;cursor:pointer}
 .inspection-phone button.record-card:hover{border-color:#b9aa8f}
 /* A finding stays two lines: identity first, context and care together below. */
@@ -547,14 +539,7 @@
 .feed-pig-preview.is-changed .feed-change-state{background:#e7efe1;color:#44613f;font-weight:600}
 .feed-pig-preview.is-blocked .feed-change-state{white-space:normal;text-align:right;background:#f0f2ec}
 .feed-pig-badge{display:flex;align-items:center;justify-content:flex-start;min-width:0;margin-top:3px}
-.inspection-phone .feed-pig-badge .recorded-tag{align-items:center;gap:4px;min-height:24px;font-size:10px;padding:3px 6px}
-.inspection-phone .feed-pig-badge .recorded-tag svg{width:12px;height:12px;flex:none}
-.pending-feed-tag{text-decoration:none}
-.inspection-phone .feed-pig-badge .pending-feed-tag .recorded-tag{background:#eff0ed;border-color:#d9dcd5;color:#747d6b}
-.pending-feed-tag .tag-label{text-decoration:line-through;text-decoration-thickness:1.5px}
 .feed-pig-title{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
-.inspection-phone .feed-pig-title .recorded-tag{min-height:24px;font-size:10px;padding:3px 6px;gap:4px}
-.inspection-phone .feed-pig-title .recorded-tag svg{width:12px;height:12px}
 .feed-action-panel{display:flex;flex-direction:column;gap:10px}
 .feed-control-caption{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .feed-control-caption>small{font:10px/1.4 var(--sans);color:#68745d;max-width:55%}
@@ -682,18 +667,11 @@
 /* The label stays fixed; only the bounded tag rail scrolls. */
 .inspection-phone .overview-health-list{display:flex;flex-flow:row nowrap;align-items:center;gap:8px;width:100%;min-width:0;max-width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#b7c1ad transparent}
 .inspection-phone .overview-health-value{display:flex;flex:0 0 auto;align-items:center;min-height:var(--tap-min);margin:0;padding:0;border:0;background:none;text-align:left}
-.inspection-phone .overview-health-value .recorded-tag{font-size:11px;padding:4px 7px;white-space:nowrap}
 .inspection-phone .overview-health-value:focus-visible{outline:2px solid #526c45;outline-offset:-2px;border-radius:6px}
 .inspection-phone .overview-health-empty{display:flex;align-items:center;min-height:44px;font-size:13px;color:#959b8e}
 .inspection-phone .overview-health-row.is-empty>.overview-fact-label{color:#959b8e}
 
-/* Care state belongs to its finding, rather than a second duplicate badge. */
-.inspection-phone .recorded-tag>svg{width:12px;height:12px;flex-shrink:0;align-self:center}
-.inspection-phone .recorded-tag.care-ongoing{background:#eff0ed;border-color:#d9dcd5;color:#61695b}
-.inspection-phone .recorded-tag.care-monitor,.inspection-phone .attention-row.care-monitor{background:#fff3d8;border-color:#e7cd92;color:#765615}
-.inspection-phone .recorded-tag.care-treatment,.inspection-phone .attention-row.care-treatment{background:#fff0e5;border-color:#e9bf9f;color:#924514}
-.inspection-phone .recorded-tag.care-hospital,.inspection-phone .attention-row.care-hospital{background:#fbe8e6;border-color:#e3aaa5;color:#992f2a}
-.inspection-phone .recorded-tag.care-attention,.inspection-phone .attention-row.care-attention{background:#f5f0df;border-color:#ded1ae;color:#726026}
+/* Care state belongs to its finding, rather than a second duplicate badge: the care mark (ConditionTag) carries it. */
 
 
 
@@ -702,12 +680,6 @@
 .inspection-phone .attention-row.feed-tag{background:#edf2e7;color:#4f6145}
 .inspection-phone .attention-row.feed-tag .attention-type{color:#4f6145}
 
-.inspection-phone .attention-row[class*="care-"] .attention-type{color:inherit}
-
-/* A feed task asks for work; an adjustment notice reports the existing plan. */
-.inspection-phone .recorded-tag.feed-task,.inspection-phone .attention-row.feed-task{background:#e2ead8;border-color:#becdb0;color:#405534}
-.inspection-phone .recorded-tag.feed-notice{background:transparent;border-color:#d5ddd1;color:#68745d;font-weight:500}
-.inspection-phone .recorded-tag.feed-stopped{background:#fff3d8;border-color:#e7cd92;color:#765615}
 .inspection-phone .pen-feed.is-stopped .pen-feed-value{color:#765615}
 .inspection-phone .pen-feed.is-stopped .pen-feed-state{padding:2px 6px;border-radius:5px;background:#fff3d8;color:#765615}
 .inspection-phone .attention-row.feed-task .attention-type{color:#405534}
@@ -892,3 +864,8 @@
 .bulk-controls .field .st-picker-trigger{box-sizing:border-box;min-width:0;width:100%;min-height:var(--tap-min);padding:8px;font:12px var(--sans)}
 .feed-fixed-form .field .st-picker-trigger,.feed-action-panel .field .st-picker-trigger{box-sizing:border-box;min-width:0;width:100%;min-height:44px;padding:8px 10px;font:12px var(--sans);border-radius:8px}
 .plan-meta .field .st-picker-trigger{font-size:12px}
+
+/* ConditionTag in the pig list: the line lays the tags out (and fitRecordedTags folds the overflow into +N); the tag itself is SentriUI's. */
+.inspection-phone .recorded-tags .st-condition{flex:0 0 auto}
+
+.inspection-phone .attention-row>.st-condition[data-variant="mark"]{flex:none}

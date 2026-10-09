@@ -1,0 +1,11 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Status word</title>
+<div data-state="Awaiting"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.status({ variant: "word", kind: "awaiting", text: "To do" }))</script></div>
+<div data-state="Active"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.status({ variant: "word", kind: "active", text: "Active" }))</script></div>
+<div data-state="Done"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.status({ variant: "word", kind: "done", text: "Done" }))</script></div>
+<div data-state="Late"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.status({ variant: "word", kind: "late", text: "Late" }))</script></div>
+<div data-state="Overdue"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.status({ variant: "word", kind: "overdue", text: "Overdue" }))</script></div>
+<div data-state="Sow died"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.status({ variant: "word", kind: "died", text: "Sow died" }))</script></div>
+<div data-state="Long label (wraps)" style="width:200px"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.status({ variant: "word", kind: "late", text: "Waiting for a second check" }))</script></div>
+<div data-state="Chinese"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.status({ variant: "word", kind: "died", text: "母猪死了" }))</script></div>

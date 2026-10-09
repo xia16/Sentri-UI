@@ -123,11 +123,6 @@
 .tk-row:active { background: var(--press); }
 .tk-row-identity { flex: none; min-width: var(--animal-id-col); display: flex; flex-direction: column; align-items: flex-start; gap: 7px; }
 .tk-row-id { font: 600 var(--type-row-title-size) var(--font-mono); letter-spacing: -0.6px; color: var(--ink); }
-.tk-chip { display: inline-flex; align-items: center; max-width: var(--row-chip-max); padding: 3px 6px; border: 1px solid var(--line); border-radius: var(--radius-chip);
-  background: var(--well); color: var(--muted); font: 600 var(--type-meta-size)/1.2 var(--font-sans); white-space: nowrap; }
-.tk-chip[data-tone="green"] { color: var(--green); background: var(--green-wash); border-color: var(--chip-green-border); }
-.tk-chip[data-tone="red"] { color: var(--red); background: var(--red-wash); border-color: var(--chip-red-border); }
-.tk-chip[data-tone="amber"] { color: var(--amber); background: var(--amber-wash); border-color: var(--pending-border); }
 .tk-row-detail { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
 .tk-row-headline { font: 500 var(--type-button-size)/1.45 var(--font-sans); color: var(--ink); }
 .tk-row-headline[data-tone="forecast"] { color: var(--muted); }
@@ -135,9 +130,6 @@
 .tk-sep { margin: 0 var(--status-dot); }
 /* A headline or meta part wraps as a whole: a wrapped part never lies under the next one. */
 :is(.tk-row-headline, .tk-row-meta) > * { display: inline-block; max-width: 100%; }
-.tk-tone[data-tone="red"] { color: var(--red); }
-.tk-tone[data-tone="amber"] { color: var(--amber); }
-.tk-tone[data-tone="green"] { color: var(--green); }
 .tk-row > svg { flex: none; width: var(--glyph-key); height: var(--glyph-key); color: var(--muted); }
 /* The tick trail: the row is a <label> around ChoiceList's checkbox; the whole row is the target. */
 label.tk-row { cursor: pointer; }
@@ -243,7 +235,6 @@ label.tk-row { cursor: pointer; }
 
 /* TaskRow: the id column holds its width; a chip wider than it ellipses under the id, so every headline lines up. */
 .tk-row-identity { width: var(--animal-id-col); min-width: var(--animal-id-col); }
-.tk-row-identity > .tk-chip { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 
 /* ---- Skeleton 3 ---- */
 

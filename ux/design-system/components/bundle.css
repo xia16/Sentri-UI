@@ -484,6 +484,38 @@ button.st-measure-box:is(:active,[data-preview~="pressed"]){background:var(--pre
 .st-status[data-tone="progress"]{color:var(--progress)}
 .st-status[data-tone="green"]{color:var(--green)}
 .st-status[data-tone="red"]{color:var(--red)}
+/* chip: a filled badge in a row. Text wraps, never an ellipsis; the icon is a second cue, never the only one. */
+.st-status[data-variant="chip"]{display:inline-flex;align-items:center;gap:var(--space-4);width:fit-content;max-width:var(--row-chip-max);padding:var(--space-3) var(--space-6);border:1px solid var(--line);border-radius:var(--radius-chip);background:var(--well);font:600 var(--type-meta-size)/1.2 var(--font-sans);overflow-wrap:anywhere}
+.st-status[data-variant="chip"]::before{display:none}
+.st-status[data-variant="chip"] svg{flex:none;width:var(--glyph-tag);height:var(--glyph-tag)}
+.st-status[data-variant="chip"][data-tone="progress"]{background:var(--progress-wash);border-color:var(--chip-progress-border)}
+.st-status[data-variant="chip"][data-tone="green"]{background:var(--green-wash);border-color:var(--chip-green-border)}
+.st-status[data-variant="chip"][data-tone="amber"]{background:var(--amber-wash);border-color:var(--pending-border)}
+.st-status[data-variant="chip"][data-tone="red"]{background:var(--red-wash);border-color:var(--chip-red-border)}
+/* ConditionTag: a recorded condition with its care level (attention amber/red · ongoing neutral · resolved green · notice outline) */
+.st-condition{box-sizing:border-box;font-family:var(--font-sans)}
+.st-condition svg{flex:none;width:var(--glyph-tag);height:var(--glyph-tag)}
+.st-condition[data-variant="tag"]{display:inline-flex;align-items:center;gap:var(--space-4);min-height:var(--tag-height);max-width:100%;padding:var(--space-3) var(--space-6);border:1px solid var(--line);border-radius:var(--radius-chip);background:var(--well);color:var(--ink-2);font:600 var(--type-meta-size)/1.2 var(--font-sans);white-space:nowrap}
+.st-condition-level-word{flex:none;font:600 var(--type-meta-size)/1.2 var(--font-sans);padding-left:var(--space-4);border-left:1px solid currentColor}
+.st-condition[data-pending]{background:var(--well);border-color:var(--line);color:var(--muted)}
+.st-condition[data-pending] .st-condition-name{text-decoration:line-through}
+.st-condition[data-variant="mark"]{display:inline-flex}
+.st-condition-name{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.st-condition-day{flex:none;font:400 var(--type-meta-size)/1.2 var(--font-sans);color:inherit}
+.st-condition[data-variant="tag"][data-care="attention"]{color:var(--amber);background:var(--amber-wash);border-color:var(--pending-border)}
+.st-condition[data-variant="tag"][data-level="hospital"]{color:var(--red);background:var(--red-wash);border-color:var(--chip-red-border)}
+.st-condition[data-variant="tag"][data-care="resolved"]{color:var(--green);background:var(--green-wash);border-color:var(--chip-green-border)}
+.st-condition[data-variant="tag"][data-care="notice"]{background:transparent;color:var(--muted);font-weight:500}
+.st-condition[data-variant="detail"]{display:flex;align-items:flex-start;gap:var(--space-12)}
+.st-condition-mark{flex:none;display:grid;place-items:center;width:var(--row-icon);height:var(--row-icon);border-radius:var(--radius-segment);background:var(--row-icon-bg);color:var(--row-icon-ink)}
+.st-condition-mark svg{width:var(--size-18);height:var(--size-18)}
+.st-condition[data-care="attention"] .st-condition-mark{background:var(--amber-wash);color:var(--amber)}
+.st-condition[data-level="hospital"] .st-condition-mark{background:var(--red-wash);color:var(--red)}
+.st-condition[data-care="resolved"] .st-condition-mark{background:var(--green-wash);color:var(--green)}
+.st-condition-copy{display:flex;flex-direction:column;gap:var(--space-2);min-width:0}
+.st-condition-level{font:500 var(--type-button-size)/1.4 var(--font-sans);color:var(--ink)}
+.st-condition-meta{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
+.st-condition-note{font:400 var(--type-row-title-size)/1.5 var(--font-sans);color:var(--ink);overflow-wrap:anywhere}
 .st-status-line.st-status-line{display:block;margin:0;font:400 var(--type-row-title-size)/1.5 var(--font-sans);color:var(--ink)}
 .st-status-line.st-status-line[data-mono]{font-family:var(--font-mono)}
 

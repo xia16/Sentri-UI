@@ -1,0 +1,10 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Status line</title>
+<div data-state="Default"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.statusLine([[{ text: "Overdue" }, { text: "3 days", tone: "red" }]]))</script></div>
+<div data-state="Receipt (dot separator)"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.statusLine(["Saved", { text: "+4 this visit", tone: "green" }], { sep: "dot" }))</script></div>
+<div data-state="Mono line 2"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.statusLine(["parity 3", [{ text: "owed" }, { text: "4", tone: "amber" }]], { sep: "dot", mono: true }))</script></div>
+<div data-state="Live (announced)"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.statusLine(["Saved", { text: "+4 this visit", tone: "green" }], { sep: "dot", live: true }))</script></div>
+<div data-state="Long (wraps)" style="width:220px"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.statusLine([[{ text: "Overdue" }, { text: "3 days", tone: "red" }], "last record yesterday by the night shift"], { sep: "dot" }))</script></div>
+<div data-state="Chinese"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.statusLine([[{ text: "逾期" }, { text: "3天", tone: "red" }]], { tight: true }))</script></div>
+<script>SentriUI.liveFill(document, { delay: 0 })</script>

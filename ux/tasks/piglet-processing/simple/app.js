@@ -32,6 +32,8 @@
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   /* The same words with their registry id (ux/laws/strings.json, `sp.<key>`): S for a skeleton text slot, H for raw HTML,
      btn for a design-system Button. The strict design lint checks every visible string on the list through these. */
+  /* a Status chip for a row: kind picks the colour (Status's one map) */
+  function chipOf(kind, k) { var o = S(k); o.kind = kind; return o; }
   function S(k, a, tone) { var o = { text: T(k, a), str: 'sp.' + L.key(k, a), args: a || undefined }; if (tone) o.tone = tone; return o; }
   function H(k, a) { return '<span data-str="sp.' + esc(L.key(k, a)) + '">' + esc(T(k, a)) + '</span>'; }
   function btn(k, a, o) { return UI.button(Object.assign({ label: T(k, a), strs: { label: 'sp.' + L.key(k, a) } }, o || {})); }
@@ -59,8 +61,8 @@
   }
   function penChip(p) {   // the End page's rows
     var sts = P.todo(p).map(function (k) { return P.status(p, k); });
-    if (!P.s.ended && sts.indexOf('late') >= 0) return S('chip.late', null, 'amber');
-    if (p.sowDied) return S('chip.sow', null, 'red');
+    if (!P.s.ended && sts.indexOf('late') >= 0) return chipOf('late', 'chip.late');
+    if (p.sowDied) return chipOf('died', 'chip.sow');
     return null;
   }
   function names(keys) { return keys.reduce(function (acc, k, i) { return (i ? acc.concat([SEP]) : acc).concat([S(chipKey(k))]); }, []); }
@@ -69,10 +71,10 @@
   function sowChip(p) {
     var sts = P.todo(p).map(function (k) { return P.status(p, k); });
     if (P.s.ended) return null;
-    if (sts.indexOf('late') >= 0) return S('chip.late', null, 'amber');
-    if (p.sowDied) return S('chip.sow', null, 'red');
-    if (sts.length) return S('st.todo', null, 'green');
-    return P.coming(p).length ? null : S('chips.done');
+    if (sts.indexOf('late') >= 0) return chipOf('late', 'chip.late');
+    if (p.sowDied) return chipOf('died', 'chip.sow');
+    if (sts.length) return chipOf('awaiting', 'st.todo');
+    return P.coming(p).length ? null : chipOf('done', 'chips.done');
   }
   /* The pen's card, exactly farrowing's room list: the pen header (`A03 · 1 sow ›`, TaskGroup) and the sow's row under it
      (TaskRow): mono sow ID with its one chip; the headline is what is due (or, with nothing due, farrowing's figure:
@@ -154,7 +156,7 @@
   function metaHtml(parts) {
     return parts.map(function (x) {
       if (x.sep) return '<span class="tk-sep">·</span>';
-      if (typeof x === 'object') return '<span class="tk-tone" data-tone="' + esc(x.tone) + '">' + esc(x.text) + '</span>';
+      if (typeof x === 'object') return '<span class="st-part" data-tone="' + esc(x.tone) + '">' + esc(x.text) + '</span>';
       return esc(x);
     }).join('');
   }
@@ -281,7 +283,7 @@
       var id = [x.tag, x.notch].filter(Boolean).join(' · ');
       var mark = UI.iconButton({ action: ended ? 'noop' : 'breeder', value: x.no, icon: I('bookmark'), label: T(x.keep ? 'mark.off' : 'mark.on', { no: x.no }), className: 'sp-mark' })
         .replace('class="icon-button', 'aria-pressed="' + !!x.keep + '" class="icon-button');
-      var row = K.row({ id: id, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
+      var row = K.row({ id: id, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
         meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), action: ended ? '' : 'give-fix', value: x.no, trail: '', still: ended, label: T('fix.aria', { no: x.no }) });
       return '<div class="sp-pigrow" data-ds="TaskRow">' + row + mark + '</div>';
     });

@@ -28,7 +28,6 @@
 .inspection-phone .roster-meta{color:var(--muted)}
 .inspection-phone .roster-pig.selected{background:#eaf2e5}
 .inspection-phone .check-target input{accent-color:var(--green);width:20px;height:20px}
-.inspection-phone .recorded-tag{font-weight:500}
 .inspection-phone .inspect-dock{border-color:var(--line);background:#fff}
 .inspection-phone button:focus-visible,.inspection-phone input:focus-visible{outline:3px solid #577fa6;outline-offset:2px}
 @media(max-width:370px){

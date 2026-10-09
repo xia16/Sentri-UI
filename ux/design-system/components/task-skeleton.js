@@ -27,7 +27,7 @@
   const glyph = k => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${own[k] || (root.SentriIcons && root.SentriIcons.paths && root.SentriIcons.paths[k]) || ''}"/></svg>`;
   /* A line of parts, each a text slot with an optional tone: [{ text, str, args, tone }]; { sep: true } is the
      shared separator, a real text node (ds.sep, the same · as Status lines). */
-  const parts = v => (Array.isArray(v) ? v.map(p => { const o = obj(p); if (o.sep) return '<span class="tk-sep" data-str="ds.sep">·</span>'; return o.tone ? `<span class="tk-tone" data-tone="${esc(o.tone)}">${T(o)}</span>` : T(o); }).join('') : T(v));
+  const parts = v => (Array.isArray(v) ? v.map(p => { const o = obj(p); if (o.sep) return '<span class="tk-sep" data-str="ds.sep">·</span>'; return o.tone ? `<span class="st-part" data-tone="${esc(o.tone)}">${T(o)}</span>` : T(o); }).join('') : T(v));
   /* ---- TaskPhone ---- */
   function statusbar({ time = { text: '9:41', str: 'tk.statusbar.time' } } = {}) {
     return `<div class="tk-statusbar" aria-hidden="true"><span>${T(time)}</span><span class="tk-statusbar-icons">${glyph('signal')}${glyph('battery')}</span></div>`;
@@ -98,12 +98,19 @@
       : `<span class="tk-group-door">${inner}</span>`;
     return `<section class="tk-group" data-ds="TaskGroup"><header class="tk-group-head">${head}</header>${Array.isArray(rows) ? rows.join('') : rows}</section>`;
   }
+  /* The row's one chip is SentriUI's Status chip: { text, str, args, kind } (kind: awaiting · active · done · late · overdue · died). */
+  function statusChip(chip) {
+    const o = obj(chip), UI = root.SentriUI;
+    const p = { text: o.text ?? '', kind: o.kind || '', tone: o.tone || undefined, variant: 'chip' };
+    if (o.str) { p.strs = { text: o.str }; if (o.args) p.args = { text: o.args }; }
+    return UI.status(p);
+  }
   /* ---- TaskRow: id + chip | headline + meta | chevron, edit or tick ----
      trail 'tick' (with tick: { action = 'toggle', value, checked, label }): the row is a <label> around ChoiceList's multi
      trail, a checkbox (the selection of a bulk act); the whole row is the target. still: a row with no action (a <div>,
      e.g. one that holds its place after a record). data: { name: value } becomes data-name="value" on the row. */
   function row({ id, chip, headline, tone, meta, trail = 'chevron', action = 'open', value = '', label, tick, still = false, data } = {}) {
-    const c = chip ? `<span class="tk-chip"${chip.tone ? ` data-tone="${esc(chip.tone)}"` : ''}>${T(chip)}</span>` : '';
+    const c = chip ? statusChip(chip) : '';
     const g = trail === 'edit' ? glyph('edit') : trail === 'chevron' ? glyph('chevron') : '';
     const d = data ? Object.keys(data).map(k => ` data-${esc(k)}="${esc(data[k])}"`).join('') : '';
     const inner = `

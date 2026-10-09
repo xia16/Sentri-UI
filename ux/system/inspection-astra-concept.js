@@ -34,7 +34,7 @@ const stPickerOptions=o=>{
 };
 // Entry markers (read by the atlas): a control that is a way into another feature says which one; a pig row with a health tag is also a way into Health record.
 const entryOf={feed:'feed-plan','feed-edit-pen':'feed-plan','feed-edit-selected':'feed-plan','pig-feed':'feed-plan',pig:'pig-profile',health:'health-record',finding:'health-record',scan:'inspection',search:'inspection'};
-const entryFor=(a,label='')=>entryOf[a]?(a==='pig'&&/recorded-tag care-/.test(label)?'pig-profile health-record':entryOf[a]):'';
+const entryFor=(a,label='')=>entryOf[a]?(a==='pig'&&/data-ds="ConditionTag"[^>]*data-care="(attention|ongoing)"/.test(label)?'pig-profile health-record':entryOf[a]):'';
 const button=(a,label,cls='button',v='',disabled=false)=>`<button type="button" class="${cls}"${entryFor(a,label)?` data-entry="${entryFor(a,label)}"`:''} data-action="${a}" data-value="${esc(v)}"${disabled?' disabled':''}>${label}</button>`;
 const ib=(a,k,label,v='')=>button(a,icon(k),'icon-button',v).replace('<button',`<button aria-label="${label}"`);
 const footer=(left,right)=>SentriUI.sheetFooter({content:left+(right||'')});
@@ -169,8 +169,8 @@ function needsHealthAttention(k){return ['Monitor','Treat in place','Hospital pe
 function healthStateFields(c){return fieldSelect(c,'Care','triage',careOptions,c.form.triage||'None');}
 function attentionOverview(p){
  const active=cases(p).filter(needsHealthAttention);
- const row=(type,title,detail,link,value,tone='')=>button(link,'<span class="attention-type">'+esc(type)+'</span><span class="attention-copy"><strong>'+esc(title)+'</strong>'+(detail?'<small>'+esc(detail)+'</small>':'')+'</span>'+icon('chevron'),'attention-row '+tone,value);
- const records=active.map(k=>row('Health',k.name,[k.triage&&k.triage!=='None'?k.triage:'', 'Day '+k.day].filter(Boolean).join(' · '),'finding',p.id+'|'+k.name,careAppearance(k).cls));
+ const row=(type,title,detail,link,value,tone='',mark='')=>button(link,(mark||'<span class="attention-type">'+esc(type)+'</span>')+'<span class="attention-copy"><strong>'+esc(title)+'</strong>'+(detail?'<small>'+esc(detail)+'</small>':'')+'</span>'+icon('chevron'),'attention-row '+tone,value);
+ const records=active.map(k=>row('Health',k.name,[k.triage&&k.triage!=='None'?k.triage:'', 'Day '+k.day].filter(Boolean).join(' · '),'finding',p.id+'|'+k.name,careAppearance(k).cls,SentriUI.conditionTag((a=>({variant:'mark',care:a.care,level:a.level,icon:a.symbol}))(careAppearance(k)))));
  if(p.note)records.push(row('Note',p.note,'','pig-log',p.id));
  return records.length?'<div class="attention-overview"><div class="attention-list" aria-label="Current notifications">'+records.join('')+'</div></div>':'';
 }
@@ -226,20 +226,20 @@ function environmentBody(c){
 }
 
 function careAppearance(k){
- if(k.triage==='Hospital pen')return {cls:'care-hospital',symbol:'hospital',status:'Move to hospital pen'};
- if(k.triage==='Treat in place')return {cls:'care-treatment',symbol:'treat',status:'Treat in place'};
- if(k.triage==='Monitor')return {cls:'care-monitor',symbol:'monitor',status:'Monitor'};
- return {cls:'care-ongoing',symbol:'note',status:'No action needed'};
+ if(k.triage==='Hospital pen')return {cls:'care-hospital',symbol:'hospital',status:'Move to hospital pen',care:'attention',level:'hospital'};
+ if(k.triage==='Treat in place')return {cls:'care-treatment',symbol:'treat',status:'Treat in place',care:'attention',level:'treat'};
+ if(k.triage==='Monitor')return {cls:'care-monitor',symbol:'monitor',status:'Monitor',care:'attention',level:'monitor'};
+ return {cls:'care-ongoing',symbol:'note',status:'No action needed',care:'ongoing'};
 }
 function pigFeedTags(p){
  const tags=[];
- if(p.noFeed)tags.push({kind:'stop',label:'No feed',cls:'feed-tag feed-stopped',symbol:'feed',status:'0.0 kg/day'});
- else if(Number.isFinite(p.feedHold))tags.push({kind:'hold',label:'Feed held',cls:'feed-tag feed-notice',symbol:'feed',status:quantity(p.feedHold)+' kg/day · fixed amount'});
- else if(Number.isFinite(p.factor)&&Math.abs(p.factor-1)>.000001){const delta=(p.factor>=1?'+':'')+Number(((p.factor-1)*100).toFixed(1))+'%';tags.push({kind:'ration',label:'Feed '+delta,delta,cls:'feed-tag feed-notice',symbol:'feed',status:'Included in daily feed'});}
+ if(p.noFeed)tags.push({kind:'stop',label:'No feed',cls:'feed-tag feed-stopped',symbol:'feed',status:'0.0 kg/day',care:'notice'});
+ else if(Number.isFinite(p.feedHold))tags.push({kind:'hold',label:'Feed held',cls:'feed-tag feed-notice',symbol:'feed',status:quantity(p.feedHold)+' kg/day · fixed amount',care:'notice'});
+ else if(Number.isFinite(p.factor)&&Math.abs(p.factor-1)>.000001){const delta=(p.factor>=1?'+':'')+Number(((p.factor-1)*100).toFixed(1))+'%';tags.push({kind:'ration',label:'Feed '+delta,delta,cls:'feed-tag feed-notice',symbol:'feed',status:'Included in daily feed',care:'notice'});}
  return tags;
 }
 const tagDescription=t=>[t.label,t.day,t.status].filter(Boolean).join(' · ');
-function recordedTag(t){return '<span class="recorded-tag '+t.cls+'" title="'+esc(tagDescription(t))+'">'+(t.symbol?icon(t.symbol):'')+'<span class="tag-label">'+esc(t.label)+'</span>'+(t.day?'<small>'+esc(t.day)+'</small>':'')+'</span>';}
+function recordedTag(t){return SentriUI.conditionTag({name:t.label,day:t.day,care:t.care,level:t.level,icon:t.symbol,careText:t.status,pending:!!t.pending});}
 function animalType(p){return p.registry?.type||p.type||(p.parity?'Sow':p.stage)||'Pig';}
 function stageSummary(p){
  const type=animalType(p);
@@ -281,7 +281,7 @@ function dockBulkDetails(root){
 }
 function fitRecordedTags(root){
  root.querySelectorAll('.recorded-tags').forEach(line=>{
-  const tags=[...line.querySelectorAll('.recorded-tag')],more=line.querySelector('.tag-more'),width=line.clientWidth;
+  const tags=[...line.querySelectorAll('.st-condition')],more=line.querySelector('.tag-more'),width=line.clientWidth;
   if(!width)return;
   tags.forEach(tag=>{tag.hidden=false;tag.style.maxWidth=Math.min(tags.length>1?160:width,width)+'px';});more.hidden=true;
   const gap=4;let shown=tags.length;
@@ -1133,8 +1133,8 @@ function recordFlowOverlay(c){
  if(['pig-feed','pig-feed-curve','pig-feed-changes'].includes(c.view))return pigFeedPage(c);
  if(!['finding','finding-edit','finding-close'].includes(c.view))return null;
  const k=currentFinding(c);if(!k)return sheet(c,'Finding closed',c.pigId,'<p class="quiet-note">The record is retained in this pig’s log.</p>',footer(back(),''));
- if(c.view==='finding')return sheet(c,k.name,p.id+' · '+k.kind+' · Day '+k.day,
-  '<div class="finding-summary"><span class="record-type">Care</span><strong>'+esc(careLabel(k.triage))+'</strong>'+(k.note?'<p>'+esc(k.note)+'</p>':'')+'</div>'+'<p class="quiet-note">Recorded '+esc(k.recordedDate||'—')+' · '+esc(k.recordedBy||'—')+'</p>'+(k.feedLinked?'<p class="quiet-note">Linked feed adjustment: '+(p.factor>=1?'+':'')+Math.round((p.factor-1)*100)+'%. Resolving this finding restores the base plan.</p>':'')+
+ if(c.view==='finding')return sheet(c,k.name,p.id+' · '+k.kind,
+  '<div class="finding-summary">'+SentriUI.conditionTag({variant:'detail',day:'Day '+k.day,careText:careLabel(k.triage),note:k.note||'',...(a=>({care:a.care,level:a.level,icon:a.symbol}))(careAppearance(k))})+'</div>'+'<p class="quiet-note">Recorded '+esc(k.recordedDate||'—')+' · '+esc(k.recordedBy||'—')+'</p>'+(k.feedLinked?'<p class="quiet-note">Linked feed adjustment: '+(p.factor>=1?'+':'')+Math.round((p.factor-1)*100)+'%. Resolving this finding restores the base plan.</p>':'')+
   (p.treatment?.target===k.name?'<p class="quiet-note">Latest treatment: '+esc(p.treatment.medicine)+' · '+esc(p.treatment.dose)+' '+esc(p.treatment.unit)+' · '+esc(p.treatment.method)+'</p>':'')+'<div class="compact-actions st-panel st-row-group st-action-list">'+action('finding-edit','note','Edit finding','Care and notes')+action('finding-treat','condition','Record treatment','For '+k.name+' on this pig')+(k.feedLinked?action('pig-adjustment','feed','Review feed adjustment','Condition band and end date',p.id):'')+action('finding-close','check','Resolve or remove','Recovered, or entered in error')+'</div>',footer(back(),''));
  if(c.view==='finding-edit')return sheet(c,'Edit finding',p.id+' · '+k.name,
   (k.feedLinked?'<p class="quiet-note">'+esc(k.name)+' · Body condition. Use Review feed adjustment to change the condition band.</p>':fieldSelect(c,'Finding','findingLabel',[[k.name,k.name],...catalog.filter(x=>x.name!==k.name&&!cases(p).some(y=>y.name===x.name)).map(x=>[x.name,x.name])],f.findingLabel))+
@@ -1283,7 +1283,7 @@ function feedPigPreview(c){
   const tags=pigFeedTags(p).map(tag=>{
    const f=c.form,adjusting=f.mode==='resume'||f.mode==='adjust'&&Number.isFinite(+f.percent)&&+f.percent>=-50&&+f.percent<=50;
    const replaced=!t.blocked&&(f.mode==='stop'?tag.kind!=='stop':f.mode==='hold'?tag.kind!=='hold':adjusting?tag.kind!=='ration'||Math.abs((p.factor??1)-(f.mode==='resume'?1:1+Number(f.percent)/100))>.000001:false);
-   return replaced?'<del class="pending-feed-tag" aria-label="'+esc(tag.label+' will be removed or replaced on Save')+'">'+recordedTag({...tag,status:'Removed or replaced on Save'})+'</del>':recordedTag(tag);
+   return replaced?'<del class="pending-feed-tag" aria-label="'+esc(tag.label+' will be removed or replaced on Save')+'">'+recordedTag({...tag,status:'Removed or replaced on Save',pending:true})+'</del>':recordedTag(tag);
   }).join(''),plan=p.feedPlan||t.pe.formula,changed=!t.blocked&&Number.isFinite(after)&&Math.abs(after-before)>.0001,delta=after-before;
   const change=t.blocked?'<span class="feed-change-state">'+esc(t.blocked)+'</span>':'<span class="feed-pig-values"><span class="feed-reading"><small>Current</small><span>'+kg(before)+'</span></span><span class="feed-change-arrow" aria-hidden="true">→</span><span class="feed-reading is-new"><small>New</small><strong>'+kg(after)+'</strong></span></span><small class="feed-change-state">'+(changed?(delta>0?'+':'')+kg(delta)+' kg/day':'Unchanged')+'</small>';
   return '<div class="pig-review-row feed-pig-preview '+(t.blocked?'is-blocked':changed?'is-changed':'is-unchanged')+'"><span class="pig-review-identity feed-pig-identity"><strong>'+esc(p.id)+'</strong><small>'+esc(plan)+'</small>'+(tags?'<span class="feed-pig-badge">'+tags+'</span>':'')+'</span><span class="pig-review-change feed-pig-change">'+change+'</span></div>';

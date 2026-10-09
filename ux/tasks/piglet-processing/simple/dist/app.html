@@ -169,6 +169,8 @@
   --red: #a13a2d;
   --red-wash: #fff1ee;
   --progress: #466888;
+  --progress-wash: #e9f0f6;
+  --chip-progress-border: #cddbe7;
   --focus: #577fa6;
   --current-marker: #526847;
   --tab-ink: #68745d;
@@ -277,6 +279,9 @@
   --glyph-pad: 20px;
   --caret-width: 2px;
   --status-dot: 4px;
+  --glyph-tag: 12px;
+  --tag-height: 24px;
+  --dot-size: 10px;
   --radio-size: 20px;
   --radio-dot: 10px;
   --ring-width: 2px;
@@ -870,6 +875,38 @@ button.st-measure-box:is(:active,[data-preview~="pressed"]){background:var(--pre
 .st-status[data-tone="progress"]{color:var(--progress)}
 .st-status[data-tone="green"]{color:var(--green)}
 .st-status[data-tone="red"]{color:var(--red)}
+/* chip: a filled badge in a row. Text wraps, never an ellipsis; the icon is a second cue, never the only one. */
+.st-status[data-variant="chip"]{display:inline-flex;align-items:center;gap:var(--space-4);width:fit-content;max-width:var(--row-chip-max);padding:var(--space-3) var(--space-6);border:1px solid var(--line);border-radius:var(--radius-chip);background:var(--well);font:600 var(--type-meta-size)/1.2 var(--font-sans);overflow-wrap:anywhere}
+.st-status[data-variant="chip"]::before{display:none}
+.st-status[data-variant="chip"] svg{flex:none;width:var(--glyph-tag);height:var(--glyph-tag)}
+.st-status[data-variant="chip"][data-tone="progress"]{background:var(--progress-wash);border-color:var(--chip-progress-border)}
+.st-status[data-variant="chip"][data-tone="green"]{background:var(--green-wash);border-color:var(--chip-green-border)}
+.st-status[data-variant="chip"][data-tone="amber"]{background:var(--amber-wash);border-color:var(--pending-border)}
+.st-status[data-variant="chip"][data-tone="red"]{background:var(--red-wash);border-color:var(--chip-red-border)}
+/* ConditionTag: a recorded condition with its care level (attention amber/red · ongoing neutral · resolved green · notice outline) */
+.st-condition{box-sizing:border-box;font-family:var(--font-sans)}
+.st-condition svg{flex:none;width:var(--glyph-tag);height:var(--glyph-tag)}
+.st-condition[data-variant="tag"]{display:inline-flex;align-items:center;gap:var(--space-4);min-height:var(--tag-height);max-width:100%;padding:var(--space-3) var(--space-6);border:1px solid var(--line);border-radius:var(--radius-chip);background:var(--well);color:var(--ink-2);font:600 var(--type-meta-size)/1.2 var(--font-sans);white-space:nowrap}
+.st-condition-level-word{flex:none;font:600 var(--type-meta-size)/1.2 var(--font-sans);padding-left:var(--space-4);border-left:1px solid currentColor}
+.st-condition[data-pending]{background:var(--well);border-color:var(--line);color:var(--muted)}
+.st-condition[data-pending] .st-condition-name{text-decoration:line-through}
+.st-condition[data-variant="mark"]{display:inline-flex}
+.st-condition-name{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.st-condition-day{flex:none;font:400 var(--type-meta-size)/1.2 var(--font-sans);color:inherit}
+.st-condition[data-variant="tag"][data-care="attention"]{color:var(--amber);background:var(--amber-wash);border-color:var(--pending-border)}
+.st-condition[data-variant="tag"][data-level="hospital"]{color:var(--red);background:var(--red-wash);border-color:var(--chip-red-border)}
+.st-condition[data-variant="tag"][data-care="resolved"]{color:var(--green);background:var(--green-wash);border-color:var(--chip-green-border)}
+.st-condition[data-variant="tag"][data-care="notice"]{background:transparent;color:var(--muted);font-weight:500}
+.st-condition[data-variant="detail"]{display:flex;align-items:flex-start;gap:var(--space-12)}
+.st-condition-mark{flex:none;display:grid;place-items:center;width:var(--row-icon);height:var(--row-icon);border-radius:var(--radius-segment);background:var(--row-icon-bg);color:var(--row-icon-ink)}
+.st-condition-mark svg{width:var(--size-18);height:var(--size-18)}
+.st-condition[data-care="attention"] .st-condition-mark{background:var(--amber-wash);color:var(--amber)}
+.st-condition[data-level="hospital"] .st-condition-mark{background:var(--red-wash);color:var(--red)}
+.st-condition[data-care="resolved"] .st-condition-mark{background:var(--green-wash);color:var(--green)}
+.st-condition-copy{display:flex;flex-direction:column;gap:var(--space-2);min-width:0}
+.st-condition-level{font:500 var(--type-button-size)/1.4 var(--font-sans);color:var(--ink)}
+.st-condition-meta{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
+.st-condition-note{font:400 var(--type-row-title-size)/1.5 var(--font-sans);color:var(--ink);overflow-wrap:anywhere}
 .st-status-line.st-status-line{display:block;margin:0;font:400 var(--type-row-title-size)/1.5 var(--font-sans);color:var(--ink)}
 .st-status-line.st-status-line[data-mono]{font-family:var(--font-mono)}
 
@@ -1122,11 +1159,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .tk-row:active { background: var(--press); }
 .tk-row-identity { flex: none; min-width: var(--animal-id-col); display: flex; flex-direction: column; align-items: flex-start; gap: 7px; }
 .tk-row-id { font: 600 var(--type-row-title-size) var(--font-mono); letter-spacing: -0.6px; color: var(--ink); }
-.tk-chip { display: inline-flex; align-items: center; max-width: var(--row-chip-max); padding: 3px 6px; border: 1px solid var(--line); border-radius: var(--radius-chip);
-  background: var(--well); color: var(--muted); font: 600 var(--type-meta-size)/1.2 var(--font-sans); white-space: nowrap; }
-.tk-chip[data-tone="green"] { color: var(--green); background: var(--green-wash); border-color: var(--chip-green-border); }
-.tk-chip[data-tone="red"] { color: var(--red); background: var(--red-wash); border-color: var(--chip-red-border); }
-.tk-chip[data-tone="amber"] { color: var(--amber); background: var(--amber-wash); border-color: var(--pending-border); }
 .tk-row-detail { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
 .tk-row-headline { font: 500 var(--type-button-size)/1.45 var(--font-sans); color: var(--ink); }
 .tk-row-headline[data-tone="forecast"] { color: var(--muted); }
@@ -1134,9 +1166,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .tk-sep { margin: 0 var(--status-dot); }
 /* A headline or meta part wraps as a whole: a wrapped part never lies under the next one. */
 :is(.tk-row-headline, .tk-row-meta) > * { display: inline-block; max-width: 100%; }
-.tk-tone[data-tone="red"] { color: var(--red); }
-.tk-tone[data-tone="amber"] { color: var(--amber); }
-.tk-tone[data-tone="green"] { color: var(--green); }
 .tk-row > svg { flex: none; width: var(--glyph-key); height: var(--glyph-key); color: var(--muted); }
 /* The tick trail: the row is a <label> around ChoiceList's checkbox; the whole row is the target. */
 label.tk-row { cursor: pointer; }
@@ -1242,7 +1271,6 @@ label.tk-row { cursor: pointer; }
 
 /* TaskRow: the id column holds its width; a chip wider than it ellipses under the id, so every headline lines up. */
 .tk-row-identity { width: var(--animal-id-col); min-width: var(--animal-id-col); }
-.tk-row-identity > .tk-chip { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 
 /* ---- Skeleton 3 ---- */
 
@@ -1536,7 +1564,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 <main class="tk-phone inspection-phone" data-ds="TaskPhone" data-st-context="page" id="phone"></main>
 <aside class="sp-demo" id="demo"></aside>
 <script>/* ../../../design-system/components/bundle.js */
-/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"Banner"},{"name":"Photos"}]} */
+/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
 /* SentriIcons (sentri-icons.js) and SentriUI (sentri-components.js), verbatim. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
@@ -1969,9 +1997,45 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       if(tpl)announce(el,tpl.innerHTML,{delay,then});
     });
   }
-  /* Status · word: a coloured state word with a 4px dot (`due now`, `sow died`) — never a filled badge. */
-  function status({text='',tone='muted',id='',className='',strs,args}={}){
-    return `<span class="st-status ${esc(className)}" data-ds="Status"${id?` id="${esc(id)}"`:''} data-tone="${toneOf(tone)||'muted'}">${tx(text,{strs,args},'text')}</span>`;
+  /* Status: how a state is said. One colour map for every status, here and in the README:
+       awaiting muted · active progress · done green · late amber · overdue red · died red
+     `kind` picks a row of the map (tone, and the icon a chip carries); `tone` alone is the old word call and still works.
+     variant: 'word' (a 4px dot and the word, inline) · 'chip' (a filled badge in a row). Text is always given: colour never carries a state alone. */
+  const KINDS={awaiting:{tone:'muted',icon:''},active:{tone:'progress',icon:''},done:{tone:'green',icon:'check'},late:{tone:'amber',icon:'clock'},overdue:{tone:'red',icon:'alert'},died:{tone:'red',icon:''}};
+  const STATUS_VARIANTS=['word','chip'];
+  function status({text='',tone,kind='',variant='word',icon,id='',className='',strs,args}={}){
+    const k=kind?oneOf('Status','kind',kind,Object.keys(KINDS),''):'';
+    const t=toneOf(tone)||(k&&KINDS[k].tone)||'muted';
+    const v=oneOf('Status','variant',variant,STATUS_VARIANTS,'word');
+    const o={strs,args};
+    const attrs=`class="st-status ${esc(className)}" data-ds="Status" data-variant="${v}"${id?` id="${esc(id)}"`:''} data-tone="${t}"${k?` data-kind="${k}"`:''}`;
+    const g=v==='chip'?(icon!=null?icon:(k?KINDS[k].icon:'')):'';
+    return `<span ${attrs}>${g?glyph(g):''}${tx(text,o,'text')}</span>`;
+  }
+  /* ConditionTag: a recorded health condition with its care level, never colour-only.
+       care  attention (needs action: level monitor · treat · hospital) · ongoing (recorded, no action) · resolved ·
+             notice (a standing instruction on the animal, e.g. Feed held — not a condition)
+     variant 'tag' (in a row: icon, name, day count) · 'detail' (in a record header: the care-level word, the day, a note).
+     careText is the care-level word (the caller localizes it); the tag keeps it for assistive tech, the detail prints it. */
+  const CARES=['attention','ongoing','resolved','notice'];
+  const LEVELS={monitor:{icon:'monitor',text:'Monitor',short:''},treat:{icon:'treat',text:'Treat in place',short:'Treat'},hospital:{icon:'hospital',text:'Hospital pen',short:'Hospital'}};
+  const CARE_ICON={ongoing:'note',resolved:'check',notice:'note'};
+  const CARE_TEXT={attention:'Needs attention',ongoing:'Ongoing',resolved:'Resolved',notice:''};
+  function conditionTag({name='',day='',care='ongoing',level='',careText,levelText,note='',pending=false,icon,variant='tag',id='',className='',strs,args}={}){
+    const c=oneOf('ConditionTag','care',care,CARES,'ongoing');
+    const lv=c==='attention'?oneOf('ConditionTag','level',level||'monitor',Object.keys(LEVELS),'monitor'):'';
+    const v=oneOf('ConditionTag','variant',variant,['tag','detail','mark'],'tag');
+    const o={strs,args};
+    const word=careText!=null?careText:(c==='attention'?LEVELS[lv].text:CARE_TEXT[c]);
+    const g=icon!=null?icon:(c==='attention'?LEVELS[lv].icon:CARE_ICON[c]);
+    const attrs=`class="st-condition ${esc(className)}" data-ds="ConditionTag" data-variant="${v}" data-care="${c}"${lv?` data-level="${lv}"`:''}${pending?' data-pending=""':''}${id?` id="${esc(id)}"`:''}`;
+    const dayHtml=day?`<small class="st-condition-day">${tx(day,o,'day')}</small>`:'';
+    if(v==='mark')return `<span ${attrs} role="img" aria-label="${esc(word)}"><span class="st-condition-mark">${g?glyph(g):''}</span></span>`;
+    if(v==='detail'){
+      return `<div ${attrs}><span class="st-condition-mark">${g?glyph(g):''}</span><span class="st-condition-copy"><strong class="st-condition-level">${tx(word,o,'careText')}</strong>${name||day?`<span class="st-condition-meta">${name?tx(name,o,'name'):''}${name&&day?' · ':''}${day?tx(day,o,'day'):''}</span>`:''}${note?`<span class="st-condition-note">${tx(note,o,'note')}</span>`:''}</span></div>`;
+    }
+    const title=[name,day,word].filter(Boolean).join(' · ');
+    return `<span ${attrs} title="${esc(title)}">${g?glyph(g):''}<span class="st-condition-name">${tx(name,o,'name')}</span>${dayHtml}${lv&&(levelText!=null?levelText:LEVELS[lv].short)?`<small class="st-condition-level-word">${tx(levelText!=null?levelText:LEVELS[lv].short,o,'levelText')}</small>`:''}${word?`<span class="st-visually-hidden"> · ${tx(word,o,'careText')}</span>`:''}</span>`;
   }
   /* The tokens as HTML, for announce() into a region the host already holds. */
   function statusText(tokens,{sep='',tight=false}={}){return toks(tokens,{tight,dot:sep==='dot'});}
@@ -2305,7 +2369,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     const scrimHtml=sc===false?'':scrim(Object.assign({layer},sc));
     return `${scrimHtml}<section class="sheet${cls}" ${common} role="dialog" aria-modal="true" data-st-context="drawer" data-size="${sz}"${sizing==='full'?' data-sizing="full"':' data-sizing="content"'}><div class="grab" aria-hidden="true"></div>${main}</section>`;
   }
-  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
@@ -2341,7 +2405,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   const glyph = k => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${own[k] || (root.SentriIcons && root.SentriIcons.paths && root.SentriIcons.paths[k]) || ''}"/></svg>`;
   /* A line of parts, each a text slot with an optional tone: [{ text, str, args, tone }]; { sep: true } is the
      shared separator, a real text node (ds.sep, the same · as Status lines). */
-  const parts = v => (Array.isArray(v) ? v.map(p => { const o = obj(p); if (o.sep) return '<span class="tk-sep" data-str="ds.sep">·</span>'; return o.tone ? `<span class="tk-tone" data-tone="${esc(o.tone)}">${T(o)}</span>` : T(o); }).join('') : T(v));
+  const parts = v => (Array.isArray(v) ? v.map(p => { const o = obj(p); if (o.sep) return '<span class="tk-sep" data-str="ds.sep">·</span>'; return o.tone ? `<span class="st-part" data-tone="${esc(o.tone)}">${T(o)}</span>` : T(o); }).join('') : T(v));
   /* ---- TaskPhone ---- */
   function statusbar({ time = { text: '9:41', str: 'tk.statusbar.time' } } = {}) {
     return `<div class="tk-statusbar" aria-hidden="true"><span>${T(time)}</span><span class="tk-statusbar-icons">${glyph('signal')}${glyph('battery')}</span></div>`;
@@ -2412,12 +2476,19 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       : `<span class="tk-group-door">${inner}</span>`;
     return `<section class="tk-group" data-ds="TaskGroup"><header class="tk-group-head">${head}</header>${Array.isArray(rows) ? rows.join('') : rows}</section>`;
   }
+  /* The row's one chip is SentriUI's Status chip: { text, str, args, kind } (kind: awaiting · active · done · late · overdue · died). */
+  function statusChip(chip) {
+    const o = obj(chip), UI = root.SentriUI;
+    const p = { text: o.text ?? '', kind: o.kind || '', tone: o.tone || undefined, variant: 'chip' };
+    if (o.str) { p.strs = { text: o.str }; if (o.args) p.args = { text: o.args }; }
+    return UI.status(p);
+  }
   /* ---- TaskRow: id + chip | headline + meta | chevron, edit or tick ----
      trail 'tick' (with tick: { action = 'toggle', value, checked, label }): the row is a <label> around ChoiceList's multi
      trail, a checkbox (the selection of a bulk act); the whole row is the target. still: a row with no action (a <div>,
      e.g. one that holds its place after a record). data: { name: value } becomes data-name="value" on the row. */
   function row({ id, chip, headline, tone, meta, trail = 'chevron', action = 'open', value = '', label, tick, still = false, data } = {}) {
-    const c = chip ? `<span class="tk-chip"${chip.tone ? ` data-tone="${esc(chip.tone)}"` : ''}>${T(chip)}</span>` : '';
+    const c = chip ? statusChip(chip) : '';
     const g = trail === 'edit' ? glyph('edit') : trail === 'chevron' ? glyph('chevron') : '';
     const d = data ? Object.keys(data).map(k => ` data-${esc(k)}="${esc(data[k])}"`).join('') : '';
     const inner = `
@@ -3305,6 +3376,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   /* The same words with their registry id (ux/laws/strings.json, `sp.<key>`): S for a skeleton text slot, H for raw HTML,
      btn for a design-system Button. The strict design lint checks every visible string on the list through these. */
+  /* a Status chip for a row: kind picks the colour (Status's one map) */
+  function chipOf(kind, k) { var o = S(k); o.kind = kind; return o; }
   function S(k, a, tone) { var o = { text: T(k, a), str: 'sp.' + L.key(k, a), args: a || undefined }; if (tone) o.tone = tone; return o; }
   function H(k, a) { return '<span data-str="sp.' + esc(L.key(k, a)) + '">' + esc(T(k, a)) + '</span>'; }
   function btn(k, a, o) { return UI.button(Object.assign({ label: T(k, a), strs: { label: 'sp.' + L.key(k, a) } }, o || {})); }
@@ -3332,8 +3405,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   }
   function penChip(p) {   // the End page's rows
     var sts = P.todo(p).map(function (k) { return P.status(p, k); });
-    if (!P.s.ended && sts.indexOf('late') >= 0) return S('chip.late', null, 'amber');
-    if (p.sowDied) return S('chip.sow', null, 'red');
+    if (!P.s.ended && sts.indexOf('late') >= 0) return chipOf('late', 'chip.late');
+    if (p.sowDied) return chipOf('died', 'chip.sow');
     return null;
   }
   function names(keys) { return keys.reduce(function (acc, k, i) { return (i ? acc.concat([SEP]) : acc).concat([S(chipKey(k))]); }, []); }
@@ -3342,10 +3415,10 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function sowChip(p) {
     var sts = P.todo(p).map(function (k) { return P.status(p, k); });
     if (P.s.ended) return null;
-    if (sts.indexOf('late') >= 0) return S('chip.late', null, 'amber');
-    if (p.sowDied) return S('chip.sow', null, 'red');
-    if (sts.length) return S('st.todo', null, 'green');
-    return P.coming(p).length ? null : S('chips.done');
+    if (sts.indexOf('late') >= 0) return chipOf('late', 'chip.late');
+    if (p.sowDied) return chipOf('died', 'chip.sow');
+    if (sts.length) return chipOf('awaiting', 'st.todo');
+    return P.coming(p).length ? null : chipOf('done', 'chips.done');
   }
   /* The pen's card, exactly farrowing's room list: the pen header (`A03 · 1 sow ›`, TaskGroup) and the sow's row under it
      (TaskRow): mono sow ID with its one chip; the headline is what is due (or, with nothing due, farrowing's figure:
@@ -3427,7 +3500,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function metaHtml(parts) {
     return parts.map(function (x) {
       if (x.sep) return '<span class="tk-sep">·</span>';
-      if (typeof x === 'object') return '<span class="tk-tone" data-tone="' + esc(x.tone) + '">' + esc(x.text) + '</span>';
+      if (typeof x === 'object') return '<span class="st-part" data-tone="' + esc(x.tone) + '">' + esc(x.text) + '</span>';
       return esc(x);
     }).join('');
   }
@@ -3554,7 +3627,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       var id = [x.tag, x.notch].filter(Boolean).join(' · ');
       var mark = UI.iconButton({ action: ended ? 'noop' : 'breeder', value: x.no, icon: I('bookmark'), label: T(x.keep ? 'mark.off' : 'mark.on', { no: x.no }), className: 'sp-mark' })
         .replace('class="icon-button', 'aria-pressed="' + !!x.keep + '" class="icon-button');
-      var row = K.row({ id: id, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
+      var row = K.row({ id: id, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
         meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), action: ended ? '' : 'give-fix', value: x.no, trail: '', still: ended, label: T('fix.aria', { no: x.no }) });
       return '<div class="sp-pigrow" data-ds="TaskRow">' + row + mark + '</div>';
     });

@@ -1,0 +1,48 @@
+[
+  {
+    "id": "chip",
+    "name": "Chip",
+    "use": "use for a workflow state on a list row: Awaiting, Active, Done, Late, Overdue, Sow died (one per row, under the ID).",
+    "notUse": "not for a recorded health condition — use ConditionTag; not for a forecast like \"Due tomorrow\" — that is row text.",
+    "states": [
+      "Awaiting",
+      "Active",
+      "Done",
+      "Late",
+      "Overdue",
+      "Sow died",
+      "Long label (wraps)",
+      "Chinese"
+    ]
+  },
+  {
+    "id": "word",
+    "name": "Word",
+    "use": "use for a state said inline in a heading, a meta line or a map cell: a 4px dot and the word (the pen map uses it).",
+    "notUse": "not for a state on a list row — use the chip; not for a coloured value inside a sentence — use the line.",
+    "states": [
+      "Awaiting",
+      "Active",
+      "Done",
+      "Late",
+      "Overdue",
+      "Sow died",
+      "Long label (wraps)",
+      "Chinese"
+    ]
+  },
+  {
+    "id": "line",
+    "name": "Line",
+    "use": "use for a body line whose values carry the colour: a receipt, an overdue figure, a row's mono line 2.",
+    "notUse": "not for a state word on its own — use the word or the chip.",
+    "states": [
+      "Default",
+      "Receipt (dot separator)",
+      "Mono line 2",
+      "Live (announced)",
+      "Long (wraps)",
+      "Chinese"
+    ]
+  }
+]
