@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T14:34:47.393Z",
- "commit": "918e0a3",
+ "generated": "2026-10-09T14:52:32.607Z",
+ "commit": "3e3f835",
  "platforms": [
   {
    "id": "mobile",
@@ -11378,121 +11378,4014 @@
    "name": "Button",
    "group": "Base",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 6,
+     "budget": 5,
+     "hierarchy": 7,
+     "spacing": 6,
+     "broken": 5
+    },
+    "lowest": 5,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": false,
+      "why": "\"The footer and bar actions\" names no sibling to use instead (IconButton, a Row tap, ChoiceList)."
+     },
+     {
+      "line": 2,
+      "pass": false,
+      "why": "Registers have rules but there is no when-not section naming an alternative."
+     },
+     {
+      "line": 3,
+      "pass": false,
+      "why": "Hold parts are named; the base button (label, optional leading icon, caption) has no anatomy."
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "task-end-early has no screen left (farrowing.task-ready ends early with a red hold); the tool register is forked as .sp-tool in piglet processing."
+     },
+     {
+      "line": 5,
+      "pass": false,
+      "why": "Pressed, focus, busy, armed and unknown are described but not rendered in the preview."
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "Preview footer buttons measure 44px tall; text action Clear 44x44; only real farrowing/task footers reach 48."
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "At most two actions per bar, primary right; the preview respects it."
+     },
+     {
+      "line": 8,
+      "pass": false,
+      "why": "Disabled and waiting differ from enabled by fill colour only; in real screens the reason line is hidden, so nothing else changes."
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "Verb+count rule stated; no max length, no truncation example; README lists \"Save\" as a commit example while banning \"Save\"."
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "Focus ring, aria-disabled waiting, guard(), keyboard two-step hold all specified."
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Raw values in bundle.css: #aab2a1, #e9ece3, #92998d, #bdc7b6, #fff1ee, #20291f, #b6c0ad, 13px radius, 52px min-height."
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No related-components table and no classification statement."
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "375px preview has no overflow but does not show every state."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "primary (commit)",
+      "usedBy": [
+       "farrowing.finish",
+       "inspection.review-selected",
+       "piglet-processing.give-ids"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 9,
+       "spacing": 7,
+       "broken": 6
+      },
+      "findings": [
+       "44px in the preview footer, 48 in hosts; height depends on the host class, not the component."
+      ]
+     },
+     {
+      "name": "secondary / Back (surface-back; a lone Back fills ink)",
+      "usedBy": [
+       "farrowing.history",
+       "inspection.pen",
+       "piglet-processing.pen-log",
+       "piglet-processing.sheet-todo"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 7
+      },
+      "findings": [
+       "Back border/press colours are raw (#b6c0ad, #f5f6f1, #526847); the Sheet preview still labels the exit \"Close\"."
+      ]
+     },
+     {
+      "name": "danger",
+      "usedBy": [
+       "piglet-processing.end-task"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 7,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 7
+      },
+      "findings": [
+       "Appears only as a hold in real screens; plain danger is seen only in the preview."
+      ]
+     },
+     {
+      "name": "task-end-early (red-wash)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+       "clarity": 5,
+       "budget": 4,
+       "hierarchy": 6,
+       "spacing": 8,
+       "broken": 7
+      },
+      "findings": [
+       "No screen uses it: farrowing.task-ready draws End task early as a filled red hold. The preview pairs it with End task, two red acts in one bar."
+      ]
+     },
+     {
+      "name": "tool",
+      "usedBy": [
+       "farrowing.finish"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 7,
+       "hierarchy": 7,
+       "spacing": 7,
+       "broken": 7
+      },
+      "findings": [
+       "Piglet processing forks it as .sp-tool (paper, bordered, icon, three in a row) on piglet-processing.sheet-todo instead of the well-filled pair."
+      ]
+     },
+     {
+      "name": "text",
+      "usedBy": [
+       "farrowing.death",
+       "piglet-processing.sheet-todo"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 7,
+       "broken": 6
+      },
+      "findings": [
+       "Hit area exactly 44x44, under the 48 glove floor."
+      ]
+     },
+     {
+      "name": "hold (primary / danger)",
+      "usedBy": [
+       "farrowing.finish",
+       "farrowing.task-ready",
+       "piglet-processing.end-task"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 6,
+       "budget": 5,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Two caption faces: the Button card is 11px sentence case (\"Hold to end\"), TaskHold is 9px capitals (\"HOLD TO END\"); every real screen uses the capitals."
+      ]
+     },
+     {
+      "name": "waiting",
+      "usedBy": [
+       "piglet-processing.sheet-todo",
+       "piglet-processing.record-death",
+       "piglet-processing.give-ids"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 5,
+       "budget": 7,
+       "hierarchy": 7,
+       "spacing": 8,
+       "broken": 4
+      },
+      "findings": [
+       "The reason line is visually hidden by the TaskSheet default, so a waiting \"Save\"/\"Submit\" looks exactly like disabled with no reason on screen (ADR 0002 requires one persistent line beside the bar)."
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "Waiting buttons in real task screens show no reason: TaskSheet hides the status line by default, so piglet-processing.record-death \"Save\" and sheet-todo \"Submit\" read as greyed-out disabled.",
+      "fix": "Make the footer status visible whenever the primary is waiting (status.visible defaults to true when primary.waiting)."
+     },
+     {
+      "severity": "high",
+      "text": "Height is decided by host classes: 52px bare, 44px in .inspection-phone/.farrowing-phone, 48/56 in footers. Preview footers render at 44px, under the 48 glove floor.",
+      "fix": "One rule: .button min-height: var(--control-height) (48) everywhere; drop the 44px host override."
+     },
+     {
+      "severity": "high",
+      "text": "Copy rule broken in use: the piglet-processing footer says \"Submit\" (strings submit.n, idf.submit), and the README gives \"Save\" as a commit example while banning Save/Submit.",
+      "fix": "Rename to verb+count (\"Record 3 items\", \"Record 12 piglets\"); remove \"Save\" from the Commit register examples."
+     },
+     {
+      "severity": "medium",
+      "text": "Two hold faces (11px sentence-case caption in Button vs 9px capitals in TaskHold) for the same act.",
+      "fix": "Keep the farrowing face (TaskHold) as the only hold caption and update the Button card and preview to it."
+     },
+     {
+      "severity": "medium",
+      "text": "Raw colours and radii in .button CSS (#aab2a1, #e9ece3, #92998d, #bdc7b6, #fff1ee, #20291f, 13px).",
+      "fix": "Replace with control-border, disabled-fill, disabled-ink, red-wash, ink and radius-control tokens."
+     },
+     {
+      "severity": "low",
+      "text": "task-end-early has no screen; the tool register is forked as .sp-tool.",
+      "fix": "Drop task-end-early (End early is a danger hold); move .sp-tool onto register:\"tool\"."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "merge",
+      "name": "TaskHold -> Button hold",
+      "why": "Same act, two caption faces; TaskHold is only the footer placement.",
+      "seenIn": [
+       "farrowing.finish",
+       "piglet-processing.end-task"
+      ]
+     },
+     {
+      "kind": "merge",
+      "name": ".sp-tool -> Button tool register",
+      "why": "Same job (a mid-sheet act), forked look.",
+      "seenIn": [
+       "piglet-processing.sheet-todo"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "IconButton",
    "group": "Base",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 7,
+     "budget": 7,
+     "hierarchy": 7,
+     "spacing": 5,
+     "broken": 4
+    },
+    "lowest": 4,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "A square icon-only tool; \"every verb gets a labelled button or tile\" names the alternative."
+     },
+     {
+      "line": 2,
+      "pass": true,
+      "why": "Do/do-not: universal glyphs only; verbs get Button."
+     },
+     {
+      "line": 3,
+      "pass": false,
+      "why": "No anatomy section; the badge is not marked optional; container variants are hidden in a className."
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "Real variants (bordered toolbar, header return, plain close/mark) are undocumented; the 44px header return is not described at all."
+     },
+     {
+      "line": 5,
+      "pass": false,
+      "why": "Pressed is \"not drawn\"; no disabled or focus example is rendered."
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "Default 44x44: task-return, sheet close (dismiss), sp-mark, more; inspection forks go to 32/36px wide."
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Not a choice set."
+     },
+     {
+      "line": 8,
+      "pass": false,
+      "why": "Disabled differs by grey only."
+     },
+     {
+      "line": 9,
+      "pass": true,
+      "why": "aria-label examples given (\"Filter, 2 applied\")."
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "aria-label required; global focus ring."
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Raw 10px radius in the bundle; screen forks use #cbd3c1, 11/13px radii, 46/52px heights."
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No related links (Button, Icon, the TaskSheet close) and no classification."
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "The 375px preview shows default + badge only; no other states."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "bordered (toolbar / dock: room-filter-button)",
+      "usedBy": [
+       "farrowing.room",
+       "inspection.walk",
+       "piglet-processing.give-ids"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 6,
+       "broken": 7
+      },
+      "findings": [
+       "inspection.walk renders it 48x52 (not square); the give-ids scan button uses control-border instead of line."
+      ]
+     },
+     {
+      "name": "header return (task-return)",
+      "usedBy": [
+       "farrowing.room",
+       "inspection.walk"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 7,
+       "broken": 4
+      },
+      "findings": [
+       "Bordered like the toolbar variant but 44x44, under the floor; undocumented."
+      ]
+     },
+     {
+      "name": "plain (close, more, breeder mark)",
+      "usedBy": [
+       "farrowing.finish",
+       "piglet-processing.tagged-list"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 7,
+       "hierarchy": 7,
+       "spacing": 7,
+       "broken": 4
+      },
+      "findings": [
+       "44x44; the TaskSheet close is a separate .tk-sheet-close implementation of the same thing."
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "The default target is 44x44 (bundle .icon-button height:44px); header return, sheet close and breeder marks all measure 44.",
+      "fix": "Set .icon-button to var(--control-height) (48) square; keep the glyph size."
+     },
+     {
+      "severity": "high",
+      "text": "No pressed state for a gloved tap.",
+      "fix": "Add the shared press: background var(--press) and translateY(1px) on :active, as Button has."
+     },
+     {
+      "severity": "medium",
+      "text": "Variants live as screen forks: inspection 46px / 48x52 / #cbd3c1, dock clear 36px wide, feed-optional 32px wide, home 48px with radius 13.",
+      "fix": "Add variant: \"bordered\" | \"plain\" to iconButton() and delete the per-screen overrides."
+     },
+     {
+      "severity": "medium",
+      "text": "The TaskSheet close (.tk-sheet-close) and the farrowing dismiss are two implementations of the plain variant.",
+      "fix": "Render the sheet close with SentriUI.iconButton({ variant: \"plain\" })."
+     },
+     {
+      "severity": "low",
+      "text": "The header return variant is undocumented.",
+      "fix": "Document it as the bordered variant at 48 in the header."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "new-variant",
+      "name": "IconButton bordered / plain",
+      "why": "Two looks already in every task; today a className plus forks.",
+      "seenIn": [
+       "farrowing.room",
+       "inspection.walk",
+       "farrowing.finish"
+      ]
+     },
+     {
+      "kind": "merge",
+      "name": "TaskSheet close -> IconButton plain",
+      "why": "Same job, separate code.",
+      "seenIn": [
+       "piglet-processing.sheet-todo",
+       "farrowing.finish"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Icon",
    "group": "Base",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 8,
+     "budget": 6,
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 6
+    },
+    "lowest": 6,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": false,
+      "why": "Purpose stated; no \"use X instead\" line (for example a Status dot, or the word alone)."
+     },
+     {
+      "line": 2,
+      "pass": false,
+      "why": "No when-not section."
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "A single open-stroke path on a 24 grid; nothing optional."
+     },
+     {
+      "line": 4,
+      "pass": true,
+      "why": "Stroke weights (1.6 / 1.8-2 / key 2.2) listed with their sizes."
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "Static; the host owns states (stated)."
+     },
+     {
+      "line": 6,
+      "pass": true,
+      "why": "Not tappable."
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "n/a"
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Icons never carry meaning alone (stated)."
+     },
+     {
+      "line": 9,
+      "pass": true,
+      "why": "Every icon keeps its word."
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "icon() emits aria-hidden=\"true\" (not documented in the card)."
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "The global svg rule uses raw 20px and stroke 1.8 (contradicting the 1.6 rule); screens set sizes in px."
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "n/a"
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "n/a"
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No related links or classification."
+     },
+     {
+      "line": 15,
+      "pass": true,
+      "why": "All glyphs render at 375 without overflow."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "standard stroke (1.6)",
+      "usedBy": [
+       "farrowing.room",
+       "inspection.walk"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 6,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 6
+      },
+      "findings": [
+       "The bundle default svg stroke is 1.8, not 1.6."
+      ]
+     },
+     {
+      "name": "key stroke (2.2; backspace 1.8)",
+      "usedBy": [
+       "farrowing.death",
+       "piglet-processing.record-death"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Clean in use; held back only by the component-level token fail (line 11)."
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "medium",
+      "text": "Duplicate glyphs: origin = place (identical path), chevron = arrow (same path), plus ~ condition.",
+      "fix": "Keep one name per glyph (place, chevron, plus) and alias the others."
+     },
+     {
+      "severity": "medium",
+      "text": "Unknown names silently draw a chevron, which reads as \"more\" - a typo becomes a false affordance.",
+      "fix": "Return an empty svg and console.warn in development."
+     },
+     {
+      "severity": "medium",
+      "text": "A known bug is shipped: the grid path closes to x=3 (M14 3h7v7H3z).",
+      "fix": "Fix the squares to M14 3h7v7h-7z and M14 14h7v7h-7z."
+     },
+     {
+      "severity": "low",
+      "text": "\"more\" is three 0.01px dots, near invisible at stroke 1.6 in glare.",
+      "fix": "Draw three r=1.5 filled dots, or stroke 2.4."
+     },
+     {
+      "severity": "low",
+      "text": "The README says 52 glyphs; the preview renders 54 (backspace, offline).",
+      "fix": "Update the count or derive it from the registry."
+     },
+     {
+      "severity": "low",
+      "text": "The global svg default (stroke 1.8, 20px) contradicts the 1.6 rule.",
+      "fix": "Set stroke-width from an icon-stroke token (1.6)."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "merge",
+      "name": "origin + place, chevron + arrow",
+      "why": "Identical paths under two names.",
+      "seenIn": [
+       "farrowing.room"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Heading",
    "group": "Base",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 6,
+     "budget": 8,
+     "hierarchy": 6,
+     "spacing": 8,
+     "broken": 6
+    },
+    "lowest": 6,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": false,
+      "why": "Purpose line exists; no \"use X instead\" naming a sibling (TaskSection, rowGroup title, Log group label)."
+     },
+     {
+      "line": 2,
+      "pass": false,
+      "why": "No when / when-not per kind; the owner's gap: nothing says which heading to use where."
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Title, icon, description, meta, action named and all shown in the preview."
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "panel kind is used on one screen (farrowing.overview) and is 1px from section; its when-to-use is only \"a title inside a panel\"."
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "Static text; default and empty (absent) stated; the action follows Button."
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "Text action hit area is 44x44 (preview \"Edit\"), 69x44 on piglet-processing.sheet-todo \"View log\"; floor is 48."
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Not a choice control."
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "No state carried by colour; status colour banned in headings."
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "Sentence case and noun stated; no long-title example, no rule for how the 46%-wide aside wraps against a long title."
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "`level` sets the h-element; the action takes the global focus ring."
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "bundle.css hard-codes 22/13/12/11/10px, 12px gaps, 44px and font fallbacks; the type tokens (page-title, section-title, group-label) are not referenced."
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No classification line and no related links."
+     },
+     {
+      "line": 15,
+      "pass": true,
+      "why": "All four kinds render at 375 with no overflow."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "page",
+      "usedBy": [
+       "farrowing.overview",
+       "farrowing.history",
+       "pig-profile.log",
+       "workbench.choose-unit"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 9,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Fine in use; held back only by the component-wide token and doc gaps (lines 11, 14)."
+      ]
+     },
+     {
+      "name": "section",
+      "usedBy": [
+       "farrowing.overview",
+       "piglet-processing.sheet-todo",
+       "farrowing.death"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 8,
+       "hierarchy": 7,
+       "spacing": 8,
+       "broken": 6
+      },
+      "findings": [
+       "Carries the only action slot in use (\"View log >\" 69x44)."
+      ]
+     },
+     {
+      "name": "panel",
+      "usedBy": [
+       "farrowing.overview"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 4,
+       "budget": 7,
+       "hierarchy": 4,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "12px vs section 13px is not a perceptible level; one screen."
+      ]
+     },
+     {
+      "name": "group",
+      "usedBy": [
+       "farrowing.history",
+       "piglet-processing.pen-log",
+       "pig-profile.log",
+       "inspection.review-selected"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Always reached through rowGroup or Log, never called directly; the README should say so."
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "No guidance on which kind to use when. Section, panel and group headings appear on one sheet with no rule.",
+      "fix": "Add a \"Which heading\" table. page = the screen or sheet title, once, in its header. section = names a block and sits outside, above its panel; it alone takes the icon, the meta (a count or time for the whole block) and the one link-out action. group = labels a run of rows or log entries inside one panel; muted, no icon, no action; reach it through rowGroup({title}) or Log. Never stack two headings over one block."
+     },
+     {
+      "severity": "medium",
+      "text": "panel (12px) is not a perceptible step from section (13px) and is used on one screen (farrowing.overview \"Whole-task progress\").",
+      "fix": "Merge panel into section: a title inside a panel uses section; alias kind \"panel\" to section and fix farrowing.overview."
+     },
+     {
+      "severity": "medium",
+      "text": "The text action is 44px tall (preview \"Edit\" 44x44; \"View log\" 69x44 on piglet-processing.sheet-todo), under the 48px glove floor.",
+      "fix": "Set the action min-height and min-width to control-height (48px); keep the negative margin so the heading does not grow."
+     },
+     {
+      "severity": "medium",
+      "text": "Raw values in bundle.css (22/13/12/11/10px, 12px gaps, 44px) instead of the type and space tokens the DS README names.",
+      "fix": "Map each kind to its type token (page-title, section-title, group-label), the gap to space-heading, the action to control-height."
+     },
+     {
+      "severity": "low",
+      "text": "Two implementations: home, farrowing and inspection load ux/system/sentri-components.js (no data-ds, no strs); the task skeleton loads components/bundle.js.",
+      "fix": "Point the three prototypes at bundle.js and delete the heading/row/facts/log/segment copies in sentri-components.js."
+     },
+     {
+      "severity": "low",
+      "text": "No long-title example; a long title beside a meta is unspecified.",
+      "fix": "Add a preview case with a 40-character title and a meta; state that the title wraps and the aside stays top-aligned."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "merge",
+      "name": "Heading kind \"panel\" into \"section\"",
+      "why": "One screen uses it and the 1px size step carries no hierarchy; the standard asks for the smallest variant set that covers real screens.",
+      "seenIn": [
+       "farrowing.overview"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Row",
    "group": "Base",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 4,
+     "budget": 6,
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 5
+    },
+    "lowest": 4,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": false,
+      "why": "Purpose present; does not send animal rows to TaskRow or history to Log."
+     },
+     {
+      "line": 2,
+      "pass": false,
+      "why": "No when / when-not across the three roots and the look-alikes."
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Parts named (icon/code, title, line 2, chip/trailing, trail) and all shown in the preview."
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "rowSelect, rowAction and the code/token litter row are used on no screen; TaskRow's tick and door+act do those jobs instead."
+     },
+     {
+      "line": 5,
+      "pass": false,
+      "why": "Pressed, focus, disabled and busy are stated but not rendered in the preview."
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "rowAction's act button is 101x44; inspection.review-selected's Remove is 53x44."
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Not a choice control."
+     },
+     {
+      "line": 8,
+      "pass": false,
+      "why": "Disabled is opacity .5 only, which the DS state law forbids (\"nothing else is ever greyed\")."
+     },
+     {
+      "line": 9,
+      "pass": true,
+      "why": "Truncation (ellipsis) and wrap:true both stated and shown."
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "button / label roots, aria-current, aria-labelledby for the act and the focus ring are stated."
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Base row CSS uses raw #eef2e7, #53674a, #f1f5eb, #eaf2e5, #526847, 68px and 12x14px; only the candidate additions use tokens."
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "Links ADR 0002 only; no classification against TaskRow, TaskDay items or the Home task card."
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "Only the default faces are rendered at 375."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "navigation row (icon tile, title, line 2, chevron; in rowGroup)",
+      "usedBy": [
+       "piglet-processing.more-actions",
+       "inspection.actions",
+       "inspection.pen",
+       "pig-profile.full",
+       "feed-plan.bulk"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Closest to ready, but the README's own Don't says \"no icons on list rows\" while this variant is defined by its icon tile."
+      ]
+     },
+     {
+      "name": "scope row (trailing count word, aria-current)",
+      "usedBy": [
+       "workbench.choose-unit"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Unit picker: \"Unit 6 · 8 pigs · 4 pens · 2 tasks >\"."
+      ]
+     },
+     {
+      "name": "summary/count row (trailing number; div at 0, button above 0)",
+      "usedBy": [
+       "farrowing.overview"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 6,
+       "budget": 8,
+       "hierarchy": 7,
+       "spacing": 8,
+       "broken": 7
+      },
+      "findings": [
+       "A zero row becomes a non-button div with no cue; the empty law says it should be absent, or the README should allow it."
+      ]
+     },
+     {
+      "name": "animal / litter row (code column, chip, token lines): row({code})",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {},
+      "findings": [
+       "No screen. The real animal row is TaskRow (piglet-processing.pen-list) and farrowing's .sow-row (farrowing.room)."
+      ]
+     },
+     {
+      "name": "selectable row (rowSelect, checkbox)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {},
+      "findings": [
+       "No screen. Look-alikes: TaskRow trail \"tick\"; inspection's label.check-target.pen-select-target on feed-plan.* screens."
+      ]
+     },
+     {
+      "name": "action row (rowAction, door + one-tap button)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {},
+      "findings": [
+       "No screen. Look-alikes: TaskDay items with act (piglet-processing.sheet-todo, sheet-done); inspection.review-selected li.st-row + Remove (53x44). The TaskRow README says door+act \"replaces SentriUI.rowAction\"."
+      ]
+     },
+     {
+      "name": "done/record row (trail edit, wrap)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {},
+      "findings": [
+       "Preview only; done rows in use are TaskRow (Done chip + edit trail) on piglet-processing.pen-list."
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "Two row families do the same jobs: Row's candidates (code row, rowSelect, rowAction, done row) have no screen, while TaskRow (animal row, tick, door, door+act) and TaskDay items serve every real task screen. The owner's rule is one implementation per job.",
+      "fix": "Pick the owner: make TaskRow's animal/tick/door/act faces variants of Row (one implementation, Row the base) and delete row({code}), rowSelect and rowAction, or the reverse. Until then mark the three candidates \"no screen\"."
+     },
+     {
+      "severity": "high",
+      "text": "Look-alikes outside both families: Home's task card (workbench.today, 88-235px buttons), farrowing's .sow-row (farrowing.room), inspection's checkbox pen rows (feed-plan.*) and the review-list row with Remove (inspection.review-selected).",
+      "fix": "Classify each in Row's README: Home task card = separate component (a card, not a row); .sow-row = the animal variant; checkbox pen rows = the selectable variant; the review row = the action variant."
+     },
+     {
+      "severity": "medium",
+      "text": "Disabled is opacity .5, against the DS state law; the README itself says to prefer omission.",
+      "fix": "Remove the disabled face; keep the attribute for semantics only and require a reason line."
+     },
+     {
+      "severity": "medium",
+      "text": "Second targets under 48px: rowAction act 101x44, review-row Remove 53x44.",
+      "fix": "Act and inline buttons take min-height control-height (48px)."
+     },
+     {
+      "severity": "medium",
+      "text": "The README contradicts itself: the anatomy has an icon tile and the Don'ts say \"no icons on list rows\"; five screens use icon rows.",
+      "fix": "Restate: icon tiles only on navigation rows (lists of places or actions); never on animal or record rows."
+     },
+     {
+      "severity": "low",
+      "text": "Base row CSS uses raw colours and sizes; the preview injects inline-styled trailing HTML.",
+      "fix": "Use row-icon-bg, row-icon-ink, press, green-wash, current-marker, row-min and space-row-y/x; pass a typed trailing {text, tone} in the preview."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "merge",
+      "name": "TaskRow (animal, tick, door, door+act) with Row (code row, rowSelect, rowAction, done row)",
+      "why": "Same jobs, two implementations; only TaskRow has screens.",
+      "seenIn": [
+       "piglet-processing.pen-list",
+       "piglet-processing.sheet-todo",
+       "piglet-processing.end-task"
+      ]
+     },
+     {
+      "kind": "new-component",
+      "name": "Home task card",
+      "why": "A different job (summarise one task type with progress and timing) in a card, not a row; already named as a Home pattern in the atlas.",
+      "seenIn": [
+       "workbench.today",
+       "workbench.choose-unit",
+       "workbench.gestation"
+      ]
+     },
+     {
+      "kind": "new-variant",
+      "name": "Row: selectable (adopt inspection's checkbox pen rows)",
+      "why": "Bulk selection on the feed-plan and inspection screens is hand-built.",
+      "seenIn": [
+       "feed-plan.pen",
+       "feed-plan.bulk"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Panel",
    "group": "Base",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 5,
+     "budget": 7,
+     "hierarchy": 7,
+     "spacing": 8,
+     "broken": 7
+    },
+    "lowest": 5,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": false,
+      "why": "\"The one container surface\" - no use-X-instead (TaskGroup card, Row group, Facts)."
+     },
+     {
+      "line": 2,
+      "pass": false,
+      "why": "Only \"do not nest\"; no when-not naming an alternative."
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Border, radius, padding and context background named."
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "The real variants (padded content, row list with 0 padding, facts dl, log) are not listed; they live in other cards."
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "Static; empty is absent (stated)."
+     },
+     {
+      "line": 6,
+      "pass": true,
+      "why": "Not tappable."
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "n/a"
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "n/a"
+     },
+     {
+      "line": 9,
+      "pass": true,
+      "why": "No copy."
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "The tag option allows section/dl; no role needed."
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Uses a parallel --st-* namespace with raw hex roots (--st-line:#dfe4d8, --st-inset:#f6f8f1) and raw 16/12px padding instead of the tokens.css names."
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "n/a"
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "n/a"
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "Does not link Facts, Row group, Log, TaskTotals or TaskProgress, which are all built on it."
+     },
+     {
+      "line": 15,
+      "pass": true,
+      "why": "The 375 preview renders both contexts without overflow (cramped at about 187px each)."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "content (padded)",
+      "usedBy": [
+       "farrowing.finish",
+       "farrowing.task-ready"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Raw --st-* tokens."
+      ]
+     },
+     {
+      "name": "list (st-row-group, padding 0)",
+      "usedBy": [
+       "inspection.pen"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Documented only in Row."
+      ]
+     },
+     {
+      "name": "facts (st-facts)",
+      "usedBy": [
+       "farrowing.finish",
+       "piglet-processing.sheet-todo"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Documented in Facts."
+      ]
+     },
+     {
+      "name": "log (st-log)",
+      "usedBy": [
+       "farrowing.history",
+       "piglet-processing.pen-log"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Documented in Log."
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "Its job is unclear: screens almost never call panel() directly - it is the surface under Facts, Row group, Log, TaskTotals, TaskProgress and TaskSection. The card reads like a component you pick, so the owner cannot tell what it is for.",
+      "fix": "Rewrite the purpose: \"The surface every grouped block sits on; you rarely call it - use Facts, Row group or Log\", and list those as its variants."
+     },
+     {
+      "severity": "high",
+      "text": "Three look-alikes skip it: the TaskGroup card (paper, line, radius-panel plus a 0 2px 8px shadow, against \"panels are not shadowed\"), ChoiceList .st-choice-panel, and the chooser .catalog-* lists.",
+      "fix": "Build TaskGroup and .st-choice-panel on .st-panel; drop the TaskGroup shadow or name it the one sanctioned exception."
+     },
+     {
+      "severity": "medium",
+      "text": "A parallel token namespace (--st-line, --st-inset, --st-radius) with raw hex roots duplicates tokens.css.",
+      "fix": "Point --st-* at tokens (--st-line: var(--line), and so on) or use the tokens directly."
+     },
+     {
+      "severity": "low",
+      "text": "The preview shows a paragraph in a panel - a use no screen has.",
+      "fix": "Preview the real variants: a Facts block and a Row group, page vs drawer."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "merge",
+      "name": "TaskGroup card + ChoiceList panel -> Panel",
+      "why": "Same surface job; one implementation.",
+      "seenIn": [
+       "farrowing.room",
+       "piglet-processing.pen-list",
+       "inspection.filters"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Facts",
    "group": "Base",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 8,
+     "budget": 7,
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 5
+    },
+    "lowest": 5,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": false,
+      "why": "Purpose line present; does not say \"for a figure you tap, use Row\"."
+     },
+     {
+      "line": 2,
+      "pass": false,
+      "why": "No when-not; the \"never acts\" rule is broken in use and no alternative is named."
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Label, value, meta named; the preview shows meta and the em-dash empty."
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "columns 1 and 3 are documented but no atlas screen shows them; only 2 columns appears (piglet-processing pen sheet)."
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "Static; default and empty (em dash / absent group) stated and rendered."
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "In use the piglet pen sheet puts > buttons inside facts: 26-65px wide x 44px tall (piglet-processing.sheet-todo, pen-log)."
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Not a choice control."
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "No colour-borne state."
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "Value formatting stated; no long-value example, and dd uses overflow-wrap:anywhere (an ear tag can break mid-ID)."
+     },
+     {
+      "line": 10,
+      "pass": false,
+      "why": "dl/dt/dd semantics are used but not stated."
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Raw 18px/20px gaps, 16px padding and 11/14/10px type in bundle.css."
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No classification line, no related links (Panel, TaskMetrics)."
+     },
+     {
+      "line": 15,
+      "pass": true,
+      "why": "Preview renders at 375 with no overflow."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "two-column (default)",
+      "usedBy": [
+       "piglet-processing.sheet-todo",
+       "piglet-processing.sheet-done",
+       "piglet-processing.pen-log",
+       "piglet-processing.counts"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 7,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 5
+      },
+      "findings": [
+       "In use it carries > buttons the component forbids, narrower than 48px."
+      ]
+     },
+     {
+      "name": "three-column",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {},
+      "findings": [
+       "No atlas screen shows it (farrowing litter code calls columns:3, but no screen renders it)."
+      ]
+     },
+     {
+      "name": "one-column",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {},
+      "findings": [
+       "No screen uses it."
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "Judged in use, the piglet pen sheet (Boars · gilts >, Litter weight >, Tagged 0 of 12 >, Breeders kept >) makes facts tappable through valueHtml; each target is a 26-65 x 44px button, not the cell, and the README says facts never act.",
+      "fix": "Decide one way: add a \"tappable fact\" option where the whole cell is one 48px-plus button with the > trail, or move those four figures to Rows. Then forbid buttons in valueHtml."
+     },
+     {
+      "severity": "medium",
+      "text": "Unused variants: columns 1 and 3 have no screen.",
+      "fix": "Keep only 2 columns until a screen needs 3; delete the 1-column mode or mark both \"no screen yet\"."
+     },
+     {
+      "severity": "medium",
+      "text": "Raw spacing and type values in bundle.css.",
+      "fix": "Use space-panel for padding, a gap token pair, and type tokens for label, value and meta."
+     },
+     {
+      "severity": "low",
+      "text": "overflow-wrap:anywhere can split an ear tag or batch code across lines.",
+      "fix": "Set the mono ID span to white-space:nowrap and add a long-value example to the preview."
+     },
+     {
+      "severity": "low",
+      "text": "Stale copy in ux/system/sentri-components.js (no data-ds, no strs).",
+      "fix": "Point the prototypes at components/bundle.js."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "new-variant",
+      "name": "Facts: tappable",
+      "why": "The piglet pen sheet needs figures that open their edit sheet; today they are hand-built buttons inside a read-only grid.",
+      "seenIn": [
+       "piglet-processing.sheet-todo",
+       "piglet-processing.pen-log"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Log",
    "group": "Base",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 8,
+     "budget": 5,
+     "hierarchy": 7,
+     "spacing": 8,
+     "broken": 7
+    },
+    "lowest": 5,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": false,
+      "why": "Purpose present; no sibling named (Row for an editable record, TaskReceipt for a day receipt)."
+     },
+     {
+      "line": 2,
+      "pass": false,
+      "why": "No when / when-not."
+     },
+     {
+      "line": 3,
+      "pass": false,
+      "why": "Parts named, but the preview does not show extraHtml or the candidate group description."
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "The categorised log (a kind word over each entry, kind filters above) is a real variant on two screens and is not documented as one."
+     },
+     {
+      "line": 5,
+      "pass": false,
+      "why": "Empty state is stated but not rendered in the preview."
+     },
+     {
+      "line": 6,
+      "pass": true,
+      "why": "No targets of its own."
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Not a choice control."
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "No colour-borne state."
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "Label and meta formats stated, but hosts break them (see findings) and there is no long-entry example."
+     },
+     {
+      "line": 10,
+      "pass": false,
+      "why": "No role stated (sections and articles; is it a list?)."
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Raw #cbd6c2 thread, #849b72 dot, 7px, 18px and 13/11/10/9px type in bundle.css; the README names log-dot and log-line tokens the CSS does not use."
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No classification line or related links."
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "Only the default state is rendered at 375; no proof of the empty state."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "day log (plain)",
+      "usedBy": [
+       "farrowing.history",
+       "piglet-processing.pen-log"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 5,
+       "hierarchy": 7,
+       "spacing": 8,
+       "broken": 7
+      },
+      "findings": [
+       "farrowing.history repeats \"Farrowing finished\" as title and detail; piglet-processing.pen-log writes one entry per piglet ID (8 lines of \"ID 0012xx\")."
+      ]
+     },
+     {
+      "name": "categorised log",
+      "usedBy": [
+       "pig-profile.log",
+       "inspection.pen-log"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 6,
+       "hierarchy": 7,
+       "spacing": 8,
+       "broken": 7
+      },
+      "findings": [
+       "Prints \"Author not supplied\"; group labels mix \"1 Aug 2026\" and \"Before this walk\"."
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "Budget in use: piglet-processing.pen-log lists every ID as its own entry (ID 001201 ... ID 001208), and farrowing.history says \"Farrowing finished\" twice in one entry.",
+      "fix": "Add a rule and an example: one recorded act is one entry (\"8 IDs · 001201-001208\"); detail never repeats the title. Fix the two hosts."
+     },
+     {
+      "severity": "medium",
+      "text": "Hosts write group labels and meta four ways: \"5 days ago\", \"day 4\", \"1 Aug 2026\", \"Before this walk\"; meta \"G.H · 10/07 10:07\" vs \"14:02 · L. Madsen\" vs \"G. Hansen\".",
+      "fix": "Pin the format in the component: meta = time · initials (the group label carries the date); group labels = Today / Yesterday / weekday / \"Jul 8\". Take a date and initials as data, not free strings."
+     },
+     {
+      "severity": "medium",
+      "text": "The categorised log is a real variant (pig-profile.log, inspection.pen-log) without its own when-to-use.",
+      "fix": "Document it: use category only when one log mixes kinds of event and offers a kind filter; otherwise use the plain log."
+     },
+     {
+      "severity": "medium",
+      "text": "Missing data is printed as text (\"Author not supplied\"), though the content law says missing is absent.",
+      "fix": "Add a Don't: drop an empty meta part; never print a placeholder."
+     },
+     {
+      "severity": "low",
+      "text": "Raw colours and sizes; the log-dot and log-line tokens are named in the README but not used in CSS.",
+      "fix": "Use var(--log-dot), var(--log-line) and the type tokens."
+     },
+     {
+      "severity": "low",
+      "text": "Empty state is not rendered in the preview.",
+      "fix": "Add a second preview case, log([]), showing \"No activity recorded yet\"."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "new-variant",
+      "name": "Log: categorised",
+      "why": "Same job (history tail), different structure (kind word, kind filter); used on two screens.",
+      "seenIn": [
+       "pig-profile.log",
+       "inspection.pen-log"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Sheet",
    "group": "Base",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 4,
+     "budget": 4,
+     "hierarchy": 7,
+     "spacing": 5,
+     "broken": 4
+    },
+    "lowest": 4,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "\"The two ways a surface is presented\" - drawer vs page."
+     },
+     {
+      "line": 2,
+      "pass": true,
+      "why": "Choosing between them: a drawer holds about five fields; a page form has Back."
+     },
+     {
+      "line": 3,
+      "pass": false,
+      "why": "Grab, close, subtitle, aside and the status line are not named here (only in TaskSheet)."
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "Four sizes plus page, but dialog is a separate card and TaskSheet/TaskPage duplicate the drawer and page."
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "Static container; states belong to the contents (stated)."
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "Preview footer buttons are 44px; the drawer close is 44x44 in farrowing and piglet processing."
+     },
+     {
+      "line": 7,
+      "pass": false,
+      "why": "Max two footer actions stated, but inspection.filters renders three (Back, Reset, Show pigs)."
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "n/a (no selected/error state)."
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "No title copy rules; the preview uses \"Close\", which TaskSheet bans."
+     },
+     {
+      "line": 10,
+      "pass": false,
+      "why": "No role=dialog/aria-modal or focus rule in this card; inspection drawers have only a grab bar (a gesture) plus Back, no close."
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Raw #dce0d4 handle, #fff/white page, #b6c0ad Back border, 28px radius, raw padding."
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "n/a"
+     },
+     {
+      "line": 13,
+      "pass": false,
+      "why": "Piglet processing stacks a drawer on a drawer (record-death over the pen sheet); no unsaved-change exit rule."
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "Does not link TaskSheet/TaskPage/TaskDialog or say which is canonical."
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "The 375 preview shows one short drawer only; no page, no sizes, no dialog."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "drawer (compact/short/medium/long, content-sized)",
+      "usedBy": [
+       "farrowing.death",
+       "farrowing.finish",
+       "inspection.filters",
+       "inspection.review-selected",
+       "piglet-processing.sheet-todo",
+       "piglet-processing.record-death"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 5,
+       "budget": 4,
+       "hierarchy": 7,
+       "spacing": 4,
+       "broken": 4
+      },
+      "findings": [
+       "Two implementations (.sheet in farrowing/inspection, .tk-sheet in piglet processing).",
+       "Inspection drawers are a fixed medium height with half of it empty; the footer pads 12/18 so the buttons end at 832px, on the handle bar (832-836).",
+       "Left edges disagree: inspection body 21 / footer 18; farrowing sow drawer body 18 / footer 21.",
+       "Close present in farrowing and piglet processing, absent in inspection."
+      ]
+     },
+     {
+      "name": "page (full canvas, Back footer)",
+      "usedBy": [
+       "farrowing.history",
+       "farrowing.task-ready",
+       "inspection.pen",
+       "inspection.walk-log",
+       "piglet-processing.pen-log",
+       "piglet-processing.end-task"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 5,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 7
+      },
+      "findings": [
+       "Renders the same across all three features, but through two implementations (.sheet[data-presentation=page] and TaskPage .tk-page)."
+      ]
+     },
+     {
+      "name": "dialog (one question over a drawer)",
+      "usedBy": [
+       "farrowing.death",
+       "farrowing.history"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 7,
+       "hierarchy": 7,
+       "spacing": 7,
+       "broken": 7
+      },
+      "findings": [
+       "Lives only in TaskDialog and farrowing CSS; not documented on Sheet."
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "One job, two implementations: Sheet (.sheet, farrowing + inspection) and TaskSheet/TaskPage (.tk-*, piglet processing) draw the same drawer and page with different gutters, heights and close rules.",
+      "fix": "Make Sheet the one card with variants drawer | page | dialog, implemented by the TaskSheet/TaskPage/TaskDialog code (the fixed one); port farrowing and inspection to it."
+     },
+     {
+      "severity": "high",
+      "text": "Inspection drawer footers pad 12px 18px: the buttons end at y=832, on the 92x4 handle bar (832-836).",
+      "fix": "Use the footer padding 14/21/28 on every sheet footer (TaskSheet already does)."
+     },
+     {
+      "severity": "high",
+      "text": "The inspection.filters footer holds three actions (Back, Reset, Show pigs), breaking the two-action law.",
+      "fix": "Move Reset to a text action in the drawer head (aside), leaving Back + Show pigs."
+     },
+     {
+      "severity": "medium",
+      "text": "Fixed-height drawers with dead space and a distant footer (inspection.review-selected, inspection.filters).",
+      "fix": "Content-sized by default (data-sizing=content / TaskSheet height:\"content\")."
+     },
+     {
+      "severity": "medium",
+      "text": "The exit is inconsistent: the Sheet preview says \"Close\"; inspection drawers have no close; the farrowing Dead drawer swaps the close for Clear; TaskSheet bans Close.",
+      "fix": "One rule on Sheet: the footer exit is Back; drawers also carry the close IconButton; aside text actions sit left of it and never replace it."
+     },
+     {
+      "severity": "medium",
+      "text": "A drawer stacked on a drawer (piglet-processing.record-death over the pen sheet), against one overlay at a time.",
+      "fix": "Replace the pen drawer content in place (push), or use the dialog variant for a single question."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "merge",
+      "name": "TaskSheet + TaskPage + TaskDialog -> Sheet (drawer | page | dialog)",
+      "why": "Same job, two code paths; one card with three presentations.",
+      "seenIn": [
+       "farrowing.death",
+       "inspection.filters",
+       "piglet-processing.sheet-todo",
+       "piglet-processing.pen-log"
+      ]
+     },
+     {
+      "kind": "merge",
+      "name": "TaskHold -> Sheet footer + Button hold",
+      "why": "It is only the footer placement of the Button hold.",
+      "seenIn": [
+       "farrowing.finish",
+       "piglet-processing.end-task"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Segment",
    "group": "Base",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 6,
+     "budget": 8,
+     "hierarchy": 7,
+     "spacing": 8,
+     "broken": 3
+    },
+    "lowest": 3,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": false,
+      "why": "Purpose present; no \"to narrow by tag, use filter chips (TaskChips)\" line."
+     },
+     {
+      "line": 2,
+      "pass": false,
+      "why": "No when-not; the README says it switches a list, yet farrowing.death uses it to switch a form between subjects."
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Track, buttons and a label with an inline count named and shown."
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "Three variants exist in practice (lens; two-line lens = TaskLens/.room-tabs; view switch) and none is documented."
+     },
+     {
+      "line": 5,
+      "pass": false,
+      "why": "Pressed is \"not drawn\": a gloved tap gets no feedback until re-render; focus is not rendered in the preview."
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "Buttons are 44px tall inside the two prototype scopes and 38px outside them; floor is 48."
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Four segments at most, stated; demos respect it."
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Active differs by fill and weight 500 (inside the scopes); weight is a non-colour cue."
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "Character budget stated; no long-label example."
+     },
+     {
+      "line": 10,
+      "pass": false,
+      "why": "role=group, aria-pressed and ariaLabel stated; no keyboard row (arrows/Home/End), unlike TaskChips, which wires radioBind."
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Base .segment is 38px, radius 10px, 12px type, #fff; the track and active face exist only under :is(.farrowing-phone,.inspection-phone)."
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No classification, no link to TaskLens or TaskChips."
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "The preview passes only because it is wrapped in .inspection-phone; rendered bare at 375 it has no track, no active face and 38px buttons (cgate/Segment/bare-unscoped-375.png)."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "lens (states of one list, count inline)",
+      "usedBy": [
+       "inspection.walk",
+       "feed-plan.pen",
+       "inspection.stage-times"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 8,
+       "hierarchy": 7,
+       "spacing": 8,
+       "broken": 3
+      },
+      "findings": [
+       "The inspection list \"All 7 · Health 4 · Feed 3\" is hand-built from .room-tabs, not SentriUI.segment; the preview is the only real call."
+      ]
+     },
+     {
+      "name": "two-line lens (count under label, sticky, filter button): today TaskLens / .room-tabs",
+      "usedBy": [
+       "farrowing.room",
+       "farrowing.count",
+       "farrowing.death"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 6
+      },
+      "findings": [
+       "Same job as Segment, different look: a variant, not a separate component."
+      ]
+     },
+     {
+      "name": "view switch (subject or mode of one sheet)",
+      "usedBy": [
+       "farrowing.death",
+       "farrowing.born",
+       "feed-plan.bulk",
+       "health-record.condition-picker"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 5,
+       "budget": 8,
+       "hierarchy": 7,
+       "spacing": 8,
+       "broken": 4
+      },
+      "findings": [
+       "Only farrowing calls SentriUI.segment; inspection hand-builds .scope-tabs (Pigs/Pens, role=tablist) and .health-tabs (Diseases/Symptoms)."
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "Not self-contained: the track, the active face and the 44px height live under :is(.farrowing-phone,.inspection-phone). Outside them (any task-skeleton screen) the segment renders with no track, no visible active state and 38px buttons.",
+      "fix": "Move the scoped rules onto .st-segment itself (well track, line border, paper + 500 active, min-height control-height) and drop the preview's .inspection-phone wrapper."
+     },
+     {
+      "severity": "high",
+      "text": "Targets are 44px at best (preview 112x44, farrowing.death 173x44); the floor is 48.",
+      "fix": "min-height: var(--control-height) (48px)."
+     },
+     {
+      "severity": "medium",
+      "text": "The README limits Segment to list lenses, but it is used, and hand-copied, as a view switch (Piglets / The sow; Care / Piglet records; Pigs / Pens; Diseases / Symptoms).",
+      "fix": "Document two variants: lens (states of one list; working pile first, All last) and view switch (2-3 subjects of one sheet; no All, no counts). Replace .scope-tabs and .health-tabs with SentriUI.segment."
+     },
+     {
+      "severity": "medium",
+      "text": "TaskLens / .room-tabs is the same job with a different look (count under label, sticky, filter button).",
+      "fix": "Make it the Segment variant \"two-line lens\" in the one implementation; TaskLens becomes the skeleton's call into it."
+     },
+     {
+      "severity": "medium",
+      "text": "No pressed feedback; a gloved worker cannot tell the tap landed until the list re-renders.",
+      "fix": "Add the shared press fill (press token) on :active."
+     },
+     {
+      "severity": "low",
+      "text": "No keyboard row; TaskChips already uses radioBind.",
+      "fix": "State arrows/Home/End and wire radioBind, or state that one tab stop per button is intended."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "new-component",
+      "name": "FilterChips (promote TaskChips to a base component)",
+      "why": "Piglet processing's \"All 12 · Iron 6 · Dock tail 4 · Castrate 6 · Coccidiosis 6 · Tag 7 · Done 3\" is not a Segment variant. Research rule: segmented = a fixed set of 2-5 views of the same data; filter chips = narrowing a list by tags from a dynamic set. Here the set is dynamic (only the jobs due today, 2-7 chips), goes past Segment's cap of 4, scrolls, and each chip is a tag (a job), not a state. It already exists as TaskChips; make it generic (any list narrowed by tag), raise the chip to 48px, and keep the rule \"never chips and a lens on one list\". Open question for the owner: \"Done\" is a state, not a tag; it sits in the chip row only because the list cannot also carry a lens.",
+      "seenIn": [
+       "piglet-processing.pen-list",
+       "piglet-processing.job-chip",
+       "piglet-processing.chip-done"
+      ]
+     },
+     {
+      "kind": "merge",
+      "name": "TaskLens into Segment as variant \"two-line lens\"",
+      "why": "Same job (switch a list between its states), different look; the owner's rule makes it a variant with one implementation.",
+      "seenIn": [
+       "farrowing.room"
+      ]
+     },
+     {
+      "kind": "new-variant",
+      "name": "Segment: view switch",
+      "why": "Four screens switch the subject or mode of one sheet; two of them hand-build it.",
+      "seenIn": [
+       "farrowing.death",
+       "farrowing.born",
+       "feed-plan.bulk",
+       "health-record.condition-picker"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "ChoiceList",
    "group": "Base",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 7,
+     "budget": 7,
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 5
+    },
+    "lowest": 5,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "One-line job (the chooser); PickerField named for the trigger"
+     },
+     {
+      "line": 2,
+      "pass": false,
+      "why": "No explicit when-not; Segment, TaskChoice and the filter chips are not named as alternatives"
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Row parts named (label, meta, 24px trailing slot); search, empty and lead named"
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "multi mode has no preview and no screen; radio rows and inline Choice ship on screens only in the TaskRadios face"
+     },
+     {
+      "line": 5,
+      "pass": false,
+      "why": "States listed, but multi, pressed and empty are not rendered; disabled has a reason pattern (omit)"
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "Rows 58-60px pass; the Clear text action is 44x44"
+     },
+     {
+      "line": 7,
+      "pass": false,
+      "why": "No cap on rows per group or on when search must appear"
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Check, checkbox and ring plus 600/700 weight, not colour only"
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "No label length or truncation rule; no long-label example"
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "role=radio/radiogroup, roving tab stop, arrows via radioBind, focus ring stated"
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Raw px throughout and #eaf0e2 press fill; no CSS variable list"
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Not a text field; search has an aria-label"
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay itself"
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No related links; classification not stated on the page"
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "375px render has no multi, empty or pressed state"
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "navigate",
+      "usedBy": [
+       "health-record.medicine-picker",
+       "health-record.condition-picker"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 6
+      },
+      "findings": [
+       "The condition picker draws its own .catalog-category door rows instead of choiceRow navigate; its meta sits under the label while the medicine picker puts it right of the label"
+      ]
+     },
+     {
+      "name": "single",
+      "usedBy": [
+       "health-record.edit-finding (link condition)"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 6
+      },
+      "findings": [
+       "PickerField.pickerOptions draws the same single-select row again (st-picker-option, green check) beside choiceRow single (ink check): two implementations of one row"
+      ]
+     },
+     {
+      "name": "multi",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+       "clarity": 6,
+       "budget": 7,
+       "hierarchy": 7,
+       "spacing": 7,
+       "broken": 3
+      },
+      "findings": [
+       "No screen uses choiceRow multi; the only multi chooser (condition picker) hand-rolls .catalog-item with the checkbox on the LEFT, breaking the trailing-slot rule",
+       "No preview"
+      ]
+     },
+     {
+      "name": "radio rows (candidate; TaskRadios face)",
+      "usedBy": [
+       "piglet-processing.adjust-count"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 7
+      },
+      "findings": [
+       "Two faces of one radio row (DS panel rows vs TaskRadios flat rows) with different chosen weight (700 vs 400)"
+      ]
+     },
+     {
+      "name": "inline Choice (candidate)",
+      "usedBy": [
+       "piglet-processing.move-piglets"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 7,
+       "hierarchy": 7,
+       "spacing": 7,
+       "broken": 6
+      },
+      "findings": [
+       "Clear is 44x44, below the 48px glove floor"
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "The multi-select chooser on real screens (condition picker) does not use ChoiceList: it hand-rolls checkbox rows with the box on the left, and door rows with their own meta layout.",
+      "fix": "Render the condition picker with choiceRow({mode:\"multi\"}) and choiceRow({mode:\"navigate\", meta:\"10 symptoms · 1 selected\"}); delete the .catalog-item and .catalog-category styles."
+     },
+     {
+      "severity": "high",
+      "text": "Single-select rows exist twice: choiceRow single (ink check) and pickerOptions (st-picker-option, green check).",
+      "fix": "Make pickerOptions a thin wrapper that returns choiceGroup(choiceRow single ...) and delete the st-picker-option CSS."
+     },
+     {
+      "severity": "medium",
+      "text": "multi mode, the empty state and the pressed state are missing from the preview, so the 375px proof does not cover the component.",
+      "fix": "Add to preview.html a multi group with one checked row, a choiceEmpty line and a row forced into its pressed fill."
+     },
+     {
+      "severity": "medium",
+      "text": "The Clear text action measures 44x44, below the 48px glove floor.",
+      "fix": "Set .st-text-action min-height and min-width to control-height (48px)."
+     },
+     {
+      "severity": "low",
+      "text": "No when-not, no row cap, no label-length rule; raw px and #eaf0e2 instead of tokens.",
+      "fix": "Add \"Use Segment for 2-5 fixed short options in a filter; use TaskChoice for a choice that changes the page\"; cap a group at about 8 rows before search; map the press fill to choice-press."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "merge",
+      "name": "pickerOptions into ChoiceList single",
+      "why": "Same job, same row, two implementations with different check colours",
+      "seenIn": [
+       "farrowing.death",
+       "health-record.edit-finding"
+      ]
+     },
+     {
+      "kind": "new-variant",
+      "name": "Segment: facet (filter choice Any · 0 · 1 · 2–5 · 6+)",
+      "why": "Parity is a fixed set of 5 or fewer short tokens that narrows a list; it is not an outcome being recorded. M3 and Apple call that a segmented control, not a list. It is not a ChoiceList variant: ChoiceList draws vertical rows, and the record-sheet Choice caps at 4 outcomes. On one screen it does not earn a new Choice chips component. Today the options are 66x44, below the floor; inspection.filters uses PickerFields for the same kind of facet.",
+      "seenIn": [
+       "farrowing.room (Filter sows)"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "CategoryFooter",
    "group": "Base",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 7,
+     "budget": 8,
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 7
+    },
+    "lowest": 7,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "States the job: actions-page footer, Back left, category tabs right"
+     },
+     {
+      "line": 2,
+      "pass": false,
+      "why": "No when-not (for example a sheet footer with Back + primary)"
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Back, tabs, active underline and handle named"
+     },
+     {
+      "line": 4,
+      "pass": true,
+      "why": "One variant, used by both action pages"
+     },
+     {
+      "line": 5,
+      "pass": false,
+      "why": "Tab pressed is \"not drawn\" and disabled dims; no rendered state set"
+     },
+     {
+      "line": 6,
+      "pass": true,
+      "why": "Back 86x48; tabs 48 tall, 66-126 wide"
+     },
+     {
+      "line": 7,
+      "pass": false,
+      "why": "No cap on the number of categories (the law says three strips)"
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Active tab: 700 weight + 3px underline, not colour only"
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "One-word rule stated, but no overflow or under-310px example"
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "aria-current=location, nav aria-label, focus rings stated"
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Raw px (86, 92, 14/18/28, 310) in CSS; no variable list"
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Not a form field"
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay"
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No related links or classification"
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "The 375 preview shows one state only; no overflow or narrow render"
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "default",
+      "usedBy": [
+       "pig-profile.actions",
+       "inspection.actions"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 7
+      },
+      "findings": [
+       "Screens show Production · Health · General; the README and the verb-sheet law say Health · Routine · Production"
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "medium",
+      "text": "Category names and order on screens (Production, Health, General) contradict the README and the verb-sheet law (Health, Routine, Production).",
+      "fix": "Pick one: rename General to Routine and order Health · Routine · Production in actionCatalogue, or change the law. The footer renders whatever order it is given."
+     },
+     {
+      "severity": "medium",
+      "text": "`disabled` dims a tab to half opacity, which the DS law forbids (nothing else is ever greyed).",
+      "fix": "Remove the disabled option from categoryFooter; callers leave out an empty category."
+     },
+     {
+      "severity": "low",
+      "text": "The preview shows a single state: no scrolled or overflowing tabs, no under-310px shrink, no focus.",
+      "fix": "Add a 5-category instance at 300px width and a focused tab to preview.html."
+     },
+     {
+      "severity": "low",
+      "text": "Raw px widths and paddings instead of back-width, control-height and footer tokens.",
+      "fix": "Swap 86px for back-width, 48px for control-height, and the padding for the footer tokens."
+     }
+    ],
+    "proposals": []
+   }
   },
   {
    "name": "Field",
    "group": "Fields",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 7,
+     "budget": 6,
+     "hierarchy": 7,
+     "spacing": 7,
+     "broken": 3
+    },
+    "lowest": 3,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "Label-over-control wrapper; PickerField named for choices"
+     },
+     {
+      "line": 2,
+      "pass": false,
+      "why": "No when-not (optional inputs are optional rows, counts are Stepper, typed numbers are Numpad)"
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Root, label, control and skin named"
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "The textarea (Note) is shown as a variant with no rule; the optional-row rule (design/optional-fields) is not reflected"
+     },
+     {
+      "line": 5,
+      "pass": false,
+      "why": "Error is listed but does not render red; focus and disabled not shown"
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "Inputs are 46px (field-height), below the 48 floor"
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Not a chooser (n/a)"
+     },
+     {
+      "line": 8,
+      "pass": false,
+      "why": "Error is a red border only, and in phone hosts not even that"
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "Unit-in-label rule stated, but no label length or long-label example"
+     },
+     {
+      "line": 10,
+      "pass": false,
+      "why": "No error announcement (aria-invalid, aria-describedby) stated"
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "#aeb8a1 / 11px raw in CSS; the README drift note is stale (computed #bdc7b6 / 12px)"
+     },
+     {
+      "line": 12,
+      "pass": false,
+      "why": "No error-message slot, so error text cannot say what is wrong and how to fix it"
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay"
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No related links or classification"
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "The 375 render shows the error state without its red border, and the textarea in monospace"
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "text input",
+      "usedBy": [
+       "health-record.treatment (Dose)",
+       "farrowing piglet identity"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 7,
+       "hierarchy": 7,
+       "spacing": 6,
+       "broken": 4
+      },
+      "findings": [
+       "Dose and Unit sit side by side in two columns; the record-sheet law says fields never go in columns",
+       "46px tall"
+      ]
+     },
+     {
+      "name": "note (textarea)",
+      "usedBy": [
+       "inspection.pen-note",
+       "pig-profile.note",
+       "health-record.edit-finding"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 6,
+       "budget": 5,
+       "hierarchy": 7,
+       "spacing": 7,
+       "broken": 3
+      },
+      "findings": [
+       "The textarea renders in the browser monospace (no font-family on .field textarea)",
+       "The resize:vertical drag handle is a trap for gloved hands",
+       "edit-finding shows an always-open \"Note · optional\" textarea, while record-health and treatment use an \"Add note\" optional row: two rules for the same optional note",
+       "pig-profile.note says it three times: sheet title \"Add a note\", label \"Note\", placeholder \"Add a note\""
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "The error state is invisible in every phone host: `:is(.farrowing-phone,.inspection-phone) :is(input...,textarea){border-color:#bdc7b6}` outranks `.field.error input{border-color:var(--red)}`. The error field computes to rgb(189,199,182).",
+      "fix": "Raise the error rule to `:is(.farrowing-phone,.inspection-phone) .field.error :is(input,textarea)`, or wrap the phone border rule in `:where()`. Add aria-invalid and a message line so the error is not colour only."
+     },
+     {
+      "severity": "high",
+      "text": "The textarea renders in monospace (pen note, preview Note) because .field textarea sets no font.",
+      "fix": "Add `font:400 14px/1.6 var(--sans)` to `.field textarea`."
+     },
+     {
+      "severity": "high",
+      "text": "The optional note is drawn two ways: an always-open \"Note · optional\" textarea (edit-finding, farrowing fault resolution) and an \"Add note\" optional row (record-health, treatment).",
+      "fix": "State the rule in the README: a Field is never shown open for an optional input. An optional Note is an optional row (design/optional-fields) that opens this Field. Convert edit-finding and the fault resolution note to that row."
+     },
+     {
+      "severity": "medium",
+      "text": "Inputs are 46px tall, below the 48px glove floor.",
+      "fix": "Set field-height to 48px."
+     },
+     {
+      "severity": "medium",
+      "text": "There is no slot for an error or help message, so error text cannot persist or explain the fix.",
+      "fix": "Add an optional hint/error line under the control, linked with aria-describedby."
+     },
+     {
+      "severity": "low",
+      "text": "resize:vertical gives a drag-only handle; Dose and Unit sit in two columns on treatment.",
+      "fix": "Use auto-grow (field-sizing:content) with resize:none. Stack Dose then Unit, or put the unit in the label as the README says."
+     }
+    ],
+    "proposals": []
+   }
   },
   {
    "name": "PickerField",
    "group": "Fields",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 5,
+     "budget": 6,
+     "hierarchy": 6,
+     "spacing": 5,
+     "broken": 2
+    },
+    "lowest": 2,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "Replaces native select; ChoiceList multi named"
+     },
+     {
+      "line": 2,
+      "pass": true,
+      "why": "Two to four outcomes: the Choice field named as the alternative"
+     },
+     {
+      "line": 3,
+      "pass": false,
+      "why": "Trigger parts named; the sheet (title, search, tabs, selected tray, footer) is not"
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "Only single exists in the DS; the multi and nested pickers that screens need are unspecified"
+     },
+     {
+      "line": 5,
+      "pass": false,
+      "why": "Error, loading and empty \"not drawn\"; disabled dims (forbidden by the DS law)"
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "Trigger 47px in the preview; 40px (Care, Method) and 44px (Conditions) on screens"
+     },
+     {
+      "line": 7,
+      "pass": false,
+      "why": "No cap on options before search or nesting"
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Selected option: check + 600"
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "No long-value truncation; the multi trigger joins names with commas"
+     },
+     {
+      "line": 10,
+      "pass": false,
+      "why": "listbox/option roles, but no keyboard model for nested levels"
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "#bdc7b6 and raw px; inspection CSS overrides the trigger six times (12px font, 40-44px)"
+     },
+     {
+      "line": 12,
+      "pass": false,
+      "why": "The Conditions trigger on record-health has no visible label; placeholder \"Choose ...\" instead of \"Select\""
+     },
+     {
+      "line": 13,
+      "pass": false,
+      "why": "The condition sheet shows a header back arrow, a close X and footer Back together, plus Done"
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No related links or classification"
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "The real multi picker breaks: after the first tick the list disappears"
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "single (flat/sectioned)",
+      "usedBy": [
+       "health-record.edit-finding",
+       "health-record.record-health (Care)",
+       "inspection.filters",
+       "farrowing.death"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 7,
+       "hierarchy": 7,
+       "spacing": 5,
+       "broken": 5
+      },
+      "findings": [
+       "Trigger height is 40, 44, 47 or 48px across screens because of host overrides",
+       "Placeholder copy varies: Select / Choose method / Choose unit / Select medicine"
+      ]
+     },
+     {
+      "name": "multi (condition picker)",
+      "usedBy": [
+       "health-record.condition-picker",
+       "health-record.record-health"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 4,
+       "budget": 5,
+       "hierarchy": 5,
+       "spacing": 5,
+       "broken": 1
+      },
+      "findings": [
+       "An unclosed <details> in bulkHealthPicker (ux/system/inspection-astra-concept.js:699) swallows the catalogue: after one tick the list vanishes behind \"1 selected\"; opening it shows the ticked row twice and the list clipped",
+       "Four exits: header back arrow, header close X, footer Back and Done",
+       "Search covers only the open group: \"fev\" in General appearance finds nothing and offers Add \"fev\"",
+       "The trigger is a fork (.bulk-condition-button) with no label, and writes the names joined by commas instead of \"n selected\"",
+       "Checkbox on the left; a native disclosure triangle"
+      ]
+     },
+     {
+      "name": "nested single (medicine picker)",
+      "usedBy": [
+       "health-record.medicine-picker"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 7,
+       "hierarchy": 7,
+       "spacing": 7,
+       "broken": 6
+      },
+      "findings": [
+       "The category level is navigate rows; no path is written back (\"Antibiotics / Amoxicillin\")"
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "The multi condition picker loses its list on the first selection: `<details class=\"chooser-selected\">...</div>` is never closed, so .health-catalog renders inside the collapsed <details>.",
+      "fix": "Close the tag (`</div></details>`). Better: replace the disclosure with a \"1 selected\" ChoiceList navigate row that opens a review level."
+     },
+     {
+      "severity": "high",
+      "text": "Screens need multi and nested pickers, but the component defines only single and sends callers to ChoiceList multi, so every host builds its own sheet.",
+      "fix": "Give PickerField the sheet, with the variants single, multi, cascade and cascade-multi (see proposals), and draw the rows with ChoiceList."
+     },
+     {
+      "severity": "high",
+      "text": "The condition sheet stacks four exits (back arrow, close X, Back, Done).",
+      "fix": "Show the header back arrow only while a level is open; keep footer Back (leaves and keeps the draft) + \"Done · n\"; drop the X."
+     },
+     {
+      "severity": "medium",
+      "text": "Host CSS forks the trigger (12px text, 40-44px), and Conditions uses a separate .bulk-condition-button with no label.",
+      "fix": "Delete the six .st-picker-trigger overrides in inspection-astra-concept.css. Render Conditions as pickerField({label:\"Conditions\", display:\"2 selected\"}), with the trigger at min-height 48."
+     },
+     {
+      "severity": "medium",
+      "text": "Search covers only the open group, so a symptom in another group reads as missing and invites a custom duplicate.",
+      "fix": "Search the whole catalogue (both kinds) and show each hit with its path as meta (\"Symptoms · General appearance\")."
+     },
+     {
+      "severity": "low",
+      "text": "`disabled` dims the trigger, which the DS law forbids; placeholder copy drifts from \"Select\".",
+      "fix": "Remove disabled. Default the placeholder to \"Select\", and to \"None\" for multi."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "new-variant",
+      "name": "PickerField multi",
+      "why": "Flat or sectioned multi-select: trailing checkboxes (ChoiceList multi), footer Back + \"Done · n selected\", trigger shows \"n selected\" or \"None\", and the selected items as a \"n selected\" row at the top, not a <details>",
+      "seenIn": [
+       "health-record.condition-picker",
+       "inspection.filters"
+      ]
+     },
+     {
+      "kind": "new-variant",
+      "name": "PickerField cascade",
+      "why": "The ADM/Vant/TDesign Cascader model: one level at a time, a step row of the chosen levels that can be tapped to go back, auto-advance on pick, and the path written back to the trigger (\"Antibiotics / Amoxicillin\")",
+      "seenIn": [
+       "health-record.medicine-picker"
+      ]
+     },
+     {
+      "kind": "new-variant",
+      "name": "PickerField cascade-multi",
+      "why": "The condition picker: kind (Diseases/Symptoms) to group to ticked leaves. A step row replaces the tabs and the back-arrow header; group rows carry \"n selected\" meta; search spans the whole tree with path meta; ticks across branches persist; \"Done · n\"",
+      "seenIn": [
+       "health-record.condition-picker"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Stepper",
    "group": "Fields",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 8,
+     "budget": 7,
+     "hierarchy": 8,
+     "spacing": 6,
+     "broken": 6
+    },
+    "lowest": 6,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "Counting animals; Measure named for measured values"
+     },
+     {
+      "line": 2,
+      "pass": true,
+      "why": "The don'ts name Measure and forbid typing a count"
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Label, description, keys, value and status line named"
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "The DS row and hero faces are used by no screen; screens use the TaskStepper faces (row, well, count)"
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "Default, empty, pressed, floor-gray, focus, corrected and draft rendered"
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "Keys 46 wide (DS), 44 wide (TaskStepper row), 44x44 in the farrowing forks; pointer text actions 44 tall"
+     },
+     {
+      "line": 7,
+      "pass": false,
+      "why": "No cap on stacked steppers per sheet"
+     },
+     {
+      "line": 8,
+      "pass": false,
+      "why": "Draft (green) and corrected (amber) differ by colour only"
+     },
+     {
+      "line": 9,
+      "pass": true,
+      "why": "Label of 14 characters or fewer stated"
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "spinbutton, aria-valuenow/min/max, status region, arrow keys"
+     },
+     {
+      "line": 11,
+      "pass": true,
+      "why": "Tokens throughout; only 1-3px borders and offsets are raw"
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Not a text field; no typed counts"
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay"
+     },
+     {
+      "line": 14,
+      "pass": true,
+      "why": "Candidate status and ADR link; TaskStepper links back"
+     },
+     {
+      "line": 15,
+      "pass": true,
+      "why": "375 render of every state, no overflow"
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "row (DS face, filled ink +)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 6,
+       "hierarchy": 8,
+       "spacing": 5,
+       "broken": 5
+      },
+      "findings": [
+       "No screen uses it",
+       "The reserved 44px hint line leaves uneven gaps under the first rows of a stack"
+      ]
+     },
+     {
+      "name": "hero (DS face)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 7
+      },
+      "findings": [
+       "No screen uses it; farrowing.count hand-rolls .hero-stepper"
+      ]
+     },
+     {
+      "name": "TaskStepper row face",
+      "usedBy": [
+       "piglet-processing.counts",
+       "piglet-processing.record-death",
+       "piglet-processing.adjust-count"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 6
+      },
+      "findings": [
+       "Keys are 44px wide, below the 48 floor"
+      ]
+     },
+     {
+      "name": "TaskStepper well/count faces",
+      "usedBy": [
+       "piglet-processing.move-piglets",
+       "piglet-processing.set-count"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 7
+      },
+      "findings": [
+       "The count face colours + green, which the Stepper README forbids until the owner decides"
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "Key widths are below the glove floor: 46px (DS face), 44px (TaskStepper row face), 44x44 (farrowing .row-stepper forks). Pointer text actions are 44px tall.",
+      "fix": "Set the key face to 48px (control-height) in every face, and text actions to min-height 48."
+     },
+     {
+      "severity": "medium",
+      "text": "Farrowing still hand-rolls three look-alikes (.row-stepper on death and edit, .hero-stepper on count, .feature-stepper on foster and reconcile) instead of SentriTask.stepper.",
+      "fix": "Swap them for the SentriTask.stepper faces row, count and well, and delete the forks."
+     },
+     {
+      "severity": "medium",
+      "text": "No screen uses the DS faces (filled ink +); task pages use other faces. Two looks for one job, with no stated rule.",
+      "fix": "List the faces (row, well, count) as this card's variants, and retire the filled-ink face or name a screen that needs it."
+     },
+     {
+      "severity": "medium",
+      "text": "Draft (green value) and corrected (amber value) are colour-only.",
+      "fix": "Add a word in the status line (\"+1 unsaved\", \"corrected\") alongside the colour."
+     },
+     {
+      "severity": "low",
+      "text": "The reserved 44px hint line opens uneven gaps in a stack where only some rows can show pointers.",
+      "fix": "Reserve per sheet, not per row: in a stack, rows without pointers take reserveHint:false."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "merge",
+      "name": "TaskStepper faces into Stepper variants",
+      "why": "Same job, different look = variant; one implementation, with the face as the variant",
+      "seenIn": [
+       "piglet-processing.counts",
+       "farrowing.count"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Measure",
    "group": "Fields",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 8,
+     "budget": 6,
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 7
+    },
+    "lowest": 6,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "Purpose stated; names Stepper (counts) and the Numpad run (sequences) instead"
+     },
+     {
+      "line": 2,
+      "pass": true,
+      "why": "Don'ts give the alternatives, Stepper and the Numpad run"
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Label, box, value, unit, status region and note named; demo shows all"
+     },
+     {
+      "line": 4,
+      "pass": true,
+      "why": "No variant claimed; the base field is used by piglet-processing.weight and give-ids"
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "Default, empty, pressed, active, focus, warn, refused and corrected rendered; disabled ruled out with a reason"
+     },
+     {
+      "line": 6,
+      "pass": true,
+      "why": "Box is 50px+ tall at 375px; no target below 48"
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Single value; no choice set"
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Warn has a dot and words, refused is struck through, corrected carries a \"was\" note"
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "No label length cap or long-label truncation example"
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "aria-describedby, live value, focus ring, no gesture-only action"
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Raw px in CSS (1/2/3/6/8px), and the README lists no CSS variables"
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Visible label, persistent hint, refusal says why, no system keyboard"
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay"
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "Does not say whether it is a component, variant or pattern; related parts named only in prose"
+     },
+     {
+      "line": 15,
+      "pass": true,
+      "why": "Every state rendered at 375px, no overflow or clipping"
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "Value field (unit always)",
+      "usedBy": [
+       "piglet-processing.weight",
+       "piglet-processing.give-ids"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 6,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "On the weight sheet the label \"Weight (kg)\" and the box unit \"kg\" say the unit twice"
+      ]
+     },
+     {
+      "name": "Identifier readout (no unit), misuse",
+      "usedBy": [
+       "piglet-processing.give-ids"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 5,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 5
+      },
+      "findings": [
+       "The Tag field is a Measure with no unit, which its own README forbids (an ear tag is typed in the Numpad's readout)",
+       "A duplicate tag is drawn with tone \"refused\" (blocks), but Numpad rules a duplicate tag is a warning that still records"
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "Give IDs builds the ear-tag field as a Measure with no unit and marks a duplicate tag \"refused\", breaking both the Measure rule (no unit = not a Measure) and the Numpad rule (a duplicate tag warns and records).",
+      "fix": "Either add an \"identifier\" variant to Measure (mono, no unit, warn-only tone) and document it, or render the tag as the Numpad readout; switch the duplicate to tone \"warn\"."
+     },
+     {
+      "severity": "medium",
+      "text": "The weight sheet says the unit twice: label \"Weight (kg)\" over a box that writes \"kg\".",
+      "fix": "Label the field \"Litter weight\" (or \"Weight\") and keep the unit only in the box; add a README line: the label never carries the unit."
+     },
+     {
+      "severity": "medium",
+      "text": "An optional Measure renders as a full 62px field (\"Weight · Optional\" on Give IDs), while the optional-input rule and farrowing use a collapsed \"+ Litter weight\" row.",
+      "fix": "Add a collapsed optional state: one row of label + \"Optional\" + an Add door, expanding to the box on tap (match the Photos header row)."
+     },
+     {
+      "severity": "low",
+      "text": "CSS uses raw px for borders, gaps and the unit gap, and the README lists no CSS variables.",
+      "fix": "Map 1/2/3/6/8px to existing tokens (caret-width, status-dot, space-key-gap) and add a CSS-variables list to the README."
+     },
+     {
+      "severity": "low",
+      "text": "No label-length rule or long-label example; zh labels are untested in the preview.",
+      "fix": "State a label cap and add one long en and one zh label to the preview."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "new-variant",
+      "name": "Measure · identifier (tag)",
+      "why": "Give IDs needs a pad-set mono value with no unit and a warn-only duplicate tone; today it is a Measure that breaks its own rules",
+      "seenIn": [
+       "piglet-processing.give-ids"
+      ]
+     },
+     {
+      "kind": "new-variant",
+      "name": "Measure · optional row (collapsed)",
+      "why": "Optional values (litter weight, piglet weight) should be one row until opened, like Photos and farrowing's + Litter weight",
+      "seenIn": [
+       "piglet-processing.give-ids",
+       "farrowing.blocked"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Numpad",
    "group": "Fields",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 8,
+     "budget": 8,
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 6
+    },
+    "lowest": 6,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "One type-to-set pad; names Stepper for counts"
+     },
+     {
+      "line": 2,
+      "pass": true,
+      "why": "Don'ts name Stepper; under-Measure vs run use stated"
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Keys, decimal slot, readout, status line, running list named; run demo shows them"
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "The run variant (running list) is used by no atlas screen; the compact variant the screens use is not in the preview"
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "Default, empty, suggested, cleared, full, pressed, floor-gray, warn and scan failure rendered"
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "Status-line text action \"Use 000258\" is 44px tall (< 48)"
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Fixed 12-key grid; running list capped at 3"
+     },
+     {
+      "line": 8,
+      "pass": false,
+      "why": "Floor-gray keys differ only by colour until tapped (owner-ruled exception, but no non-colour cue)"
+     },
+     {
+      "line": 9,
+      "pass": true,
+      "why": "Status line sized for two lines of the longest en/zh warning"
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "Spoken labels, live value, hardware keys mapped, Enter never commits"
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Raw px (1/2/3/4/6/8px) in CSS; no CSS-variable list"
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "No system keyboard; dead taps answered in words"
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "A docked pad, not an overlay; Back closes it"
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No classification line; related parts only in prose"
+     },
+     {
+      "line": 15,
+      "pass": true,
+      "why": "All run states rendered at 375px; keys measured not to move"
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "Under a Measure (compact)",
+      "usedBy": [
+       "piglet-processing.weight",
+       "piglet-processing.give-ids"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 7,
+       "broken": 7
+      },
+      "findings": [
+       "Not rendered in the Numpad preview, though it is the only variant in atlas screens",
+       "On the weight sheet the empty reserved status line leaves a ~70px dead band between the Measure and the keys"
+      ]
+     },
+     {
+      "name": "Run (readout + running list)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 6
+      },
+      "findings": [
+       "No atlas screen uses it (only the archived id.html slice)",
+       "\"Use 000258\" text action is 44px"
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "The run variant with the three-line list has no atlas screen, while the compact variant every screen uses (weight sheet, Give IDs) is missing from the preview.",
+      "fix": "Add compact examples (empty, typing, warn) to preview.html; mark the run variant unused or drop it until a screen needs it."
+     },
+     {
+      "severity": "medium",
+      "text": "Status-line text actions (\"Use 000258\") measure 86x44, under the 48px glove floor.",
+      "fix": "Give .st-text-action min-height: var(--control-height) inside the pad's status line, and reserve 48px for the line."
+     },
+     {
+      "severity": "medium",
+      "text": "Floor-gray keys can be told apart only by colour until tapped.",
+      "fix": "Keep the colour but also drop the key border (a shape change), as Photos does for its inactive camera."
+     },
+     {
+      "severity": "low",
+      "text": "Raw px in CSS and no CSS-variable list.",
+      "fix": "Map to space-key-gap / caret-width tokens and list the variables in the README."
+     }
+    ],
+    "proposals": []
+   }
   },
   {
    "name": "Status",
    "group": "Status and feedback",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 7,
+     "budget": 8,
+     "hierarchy": 7,
+     "spacing": 8,
+     "broken": 4
+    },
+    "lowest": 4,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "\"How a state is said\"; points to Row/Button for a status that acts"
+     },
+     {
+      "line": 2,
+      "pass": true,
+      "why": "Don'ts and placement rules present"
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Dot, word, line, tokens, separator named and shown"
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "The Word variant is used by no atlas screen; real state chips are filled badges from TaskRow, farrowing and health tags"
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "States declared none (text only) with reasons; default and live shown"
+     },
+     {
+      "line": 6,
+      "pass": true,
+      "why": "No tap targets"
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "One chip per row stated"
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Every tone carries a word; colour never alone"
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "No length cap for a status word; no long or zh example"
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "Live region mounted empty and filled; port notes given"
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Raw 4px separator margin; no CSS-variable list"
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field"
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay"
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No classification line; no table of related look-alikes (Row chip, health tag)"
+     },
+     {
+      "line": 15,
+      "pass": true,
+      "why": "All tones and lines render at 375px without overflow"
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "Word (dot + word)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 7,
+       "spacing": 8,
+       "broken": 3
+      },
+      "findings": [
+       "No screen renders it; every live status chip is a filled badge instead"
+      ]
+     },
+     {
+      "name": "Line (coloured values)",
+      "usedBy": [
+       "piglet-processing.sheet-late",
+       "farrowing.room"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 6
+      },
+      "findings": [
+       "The look-alikes are hand-built (TaskDay .tk-tone \"late\", farrowing \"Overdue · 3 days\" row text), not statusLine()"
+      ]
+     },
+     {
+      "name": "Chip (filled, as built in screens), undocumented",
+      "usedBy": [
+       "piglet-processing.pen-list",
+       "piglet-processing.sheet-late",
+       "farrowing.room",
+       "farrowing.count"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 6,
+       "budget": 8,
+       "hierarchy": 7,
+       "spacing": 8,
+       "broken": 3
+      },
+      "findings": [
+       "Three implementations: TaskRow .tk-chip (To do / Done / Late) and farrowing .state-word / .done-word (Active / Done)",
+       "\"To do\" is green on green-wash, but green means done/recorded; the README forbids filled badges"
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "Status is not what the product uses. Every state chip in the atlas is a filled badge built outside it: TaskRow .tk-chip (To do / Done / Late on piglet-processing.pen-list) and farrowing .state-word / .done-word (Active / Done on farrowing.room). The README says \"never a filled badge\".",
+      "fix": "Decide one face. Either add a \"chip\" variant to Status (filled wash, 10px/600, 20px tall) and have TaskRow and farrowing call SentriUI.status({ variant: \"chip\" }), or move those screens to the dot-word. Do not keep both."
+     },
+     {
+      "severity": "high",
+      "text": "\"To do\" is drawn green (rgb 39,102,64 on green-wash) on the pen list, so pens not yet done wear the \"done\" colour, while \"Done\" is grey.",
+      "fix": "Map To do to muted (or amber when due now), Done to green, Late to amber, through Status tones rather than per-feature CSS."
+     },
+     {
+      "severity": "medium",
+      "text": "Health tags (Thin, Fever, Arthritis) do a different job: they name a recorded condition with a care level, not a workflow state. They are .recorded-tag pills with their own amber/orange tones.",
+      "fix": "Keep them out of Status; give them their own component (ConditionTag) with care-level tones, and link it from Status's Related list."
+     },
+     {
+      "severity": "medium",
+      "text": "Status-line look-alikes are hand-built: TaskDay's mono \"late\" (.tk-tone) and farrowing's \"Overdue · 3 days\" row text.",
+      "fix": "Render them with SentriUI.statusLine([...], { mono: true }) so the tone rule (colour on the value, word in ink) holds."
+     },
+     {
+      "severity": "low",
+      "text": "\"Due tomorrow\" on farrowing rows is a forecast in muted 14/500 with no dot. It is fine as text, but the README does not say a forecast is not a Status.",
+      "fix": "Add one line: forecasts (\"Due tomorrow\", \"Expected in 5 days\") are row text, not a Status word."
+     },
+     {
+      "severity": "low",
+      "text": "No word-length cap or zh example; raw 4px separator margin.",
+      "fix": "Cap the word length, add a zh example, and tokenise the separator margin."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "new-variant",
+      "name": "Status · chip (filled)",
+      "why": "The filled state chip is the de-facto Status on four screens, with three implementations",
+      "seenIn": [
+       "piglet-processing.pen-list",
+       "farrowing.room",
+       "farrowing.count"
+      ]
+     },
+     {
+      "kind": "new-component",
+      "name": "ConditionTag (health tag)",
+      "why": "Thin / Fever / Arthritis label a recorded condition with a care level, a different job from a workflow state",
+      "seenIn": [
+       "health-record.mixed",
+       "pig-profile.full",
+       "inspection.walk"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Banner",
    "group": "Status and feedback",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 7,
+     "budget": 7,
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 5
+    },
+    "lowest": 5,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": false,
+      "why": "Purpose stated but names no sibling to use instead (TaskWarning, a field status line)"
+     },
+     {
+      "line": 2,
+      "pass": true,
+      "why": "Don'ts say when not (a warning that still records goes to the field status line)"
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Box, headline, consequence, summary and Clear named and shown"
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "Neither tone is used by any atlas screen; farrowing and piglet-processing use TaskWarning or their own CSS"
+     },
+     {
+      "line": 5,
+      "pass": false,
+      "why": "The Cleared + Undo state is not rendered in the preview"
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "Clear text action measures 46x44 (< 48)"
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "One banner at a time stated"
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Tones differ by headline words and weight, not colour alone"
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "No headline length cap or long/zh example"
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "One live region; focus return via handFocus specified"
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Raw px (1px border, 4px gaps); no CSS-variable list"
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field"
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay"
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "Does not link TaskWarning or state the relation (variant or duplicate)"
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "Danger and correction render cleanly at 375px, but the Cleared/Undo state has no proof"
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "danger",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 6
+      },
+      "findings": [
+       "Same job and nearly the same face as TaskWarning red (farrowing's danger band); no screen uses Banner for it"
+      ]
+     },
+     {
+      "name": "correction",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 7,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 5
+      },
+      "findings": [
+       "farrowing.edit shows no banner in its captured state; the archived edit.html slice is the only user",
+       "Clear is 44px tall; Cleared/Undo not rendered"
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "Banner and TaskWarning do the same job (a consequence above a commit, on a wash, with optional text actions) with two implementations: Banner danger is red-wash/red border with a 14/700 headline; TaskWarning red is red-wash/danger-border with a 12/700 title. Only TaskWarning is used (piglet-processing.phone-clash, farrowing.blocked).",
+      "fix": "Merge them: one Banner with tones danger / correction / notice, built once; TaskWarning becomes Banner at the skeleton's 12px size (a size property), not a second component."
+     },
+     {
+      "severity": "high",
+      "text": "The Home offline banner (\"3 records saved on this device · No connection · waiting to upload\", workbench.today) is a third look-alike: amber wash, a leading icon, the whole box a door with ›. Banner forbids icons; TaskWarning's amber door banner matches it.",
+      "fix": "Make it the merged Banner's notice tone with the door property (icon optional, the whole box one button at least 48px), and render Home with it."
+     },
+     {
+      "severity": "medium",
+      "text": "Clear (46x44) is under the 48px glove floor.",
+      "fix": "Give banner text actions min-height: var(--control-height) and make the summary row 48px."
+     },
+     {
+      "severity": "medium",
+      "text": "Cleared + Undo (5s) is specified but not rendered in the preview.",
+      "fix": "Add a Cleared/Undo example to preview.html."
+     },
+     {
+      "severity": "low",
+      "text": "Raw px, no CSS-variable list, no headline length cap.",
+      "fix": "Tokenise the 1px/4px values, list the variables, cap the headline at one line with a zh example."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "merge",
+      "name": "Banner + TaskWarning",
+      "why": "Same job (a consequence before a commit, or a pending notice), two implementations; only TaskWarning ships in screens",
+      "seenIn": [
+       "farrowing.blocked",
+       "piglet-processing.phone-clash",
+       "piglet-processing.list-ended"
+      ]
+     },
+     {
+      "kind": "new-variant",
+      "name": "Banner · notice (door)",
+      "why": "The Home offline/upload banner and farrowing's \"Save your correction first · Review ›\" are an amber notice that opens something",
+      "seenIn": [
+       "workbench.today",
+       "workbench.saved-work",
+       "farrowing.blocked"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Photos",
    "group": "Status and feedback",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "judged": "2026-10-09",
+    "commit": "3e3f835",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 8,
+     "budget": 8,
+     "hierarchy": 7,
+     "spacing": 6,
+     "broken": 5
+    },
+    "lowest": 5,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": false,
+      "why": "Purpose stated, but no \"use X instead\" sibling (TaskPhotos, Note)"
+     },
+     {
+      "line": 2,
+      "pass": false,
+      "why": "No when-not section naming an alternative"
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Card, header row, camera, answer line and thumbnails named; demo shows them"
+     },
+     {
+      "line": 4,
+      "pass": false,
+      "why": "No atlas screen uses the Photos card; farrowing.death uses its own photo line (the TaskPhotos face)"
+     },
+     {
+      "line": 5,
+      "pass": false,
+      "why": "Errors (denied, too-large), pressed and focus are specified but not rendered"
+     },
+     {
+      "line": 6,
+      "pass": false,
+      "why": "Camera button measures 44x44 (< 48)"
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Max 12 stated and shown in the full state"
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Inactive/full camera loses its ring (shape) as well as colour, and the answer line says why"
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "No label or answer-line length cap; no long/zh example"
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "Spoken labels, capture-first, viewer focus return specified"
+     },
+     {
+      "line": 11,
+      "pass": false,
+      "why": "Raw px (20px offset, 8/4/3/2/1px) and no CSS-variable list"
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Label visible; errors say what is wrong and how to fix it"
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Viewer has a visible Back; Delete only while drafting"
+     },
+     {
+      "line": 14,
+      "pass": false,
+      "why": "No classification and no link to TaskPhotos, which redraws it"
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "At 375px the camera circle sits flush on the card's top, right and bottom edges; error states have no proof"
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "Card (well + ringed circle)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 7,
+       "spacing": 6,
+       "broken": 5
+      },
+      "findings": [
+       "Camera is 44px and tangent to the card edge",
+       "No atlas screen uses it"
+      ]
+     },
+     {
+      "name": "Line (TaskPhotos: no well, outlined squircle key)",
+      "usedBy": [
+       "farrowing.death"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 8,
+       "hierarchy": 7,
+       "spacing": 8,
+       "broken": 5
+      },
+      "findings": [
+       "Uses the key squircle that Photos says the camera must never be",
+       "Camera key is 44px"
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "As the reference for the optional row, Photos and its only shipped face disagree: Photos rules a ringed circle \"deliberately not the keys' squircle\"; TaskPhotos (farrowing.death) draws an outlined squircle key with a leading camera glyph and no well. Two looks, one job.",
+      "fix": "Pick one face for the optional row (the farrowing line is the one in use), make the other a documented variant or retire it, and update the Photos rule to match."
+     },
+     {
+      "severity": "high",
+      "text": "The camera is 44x44 in both faces, under the 48px glove floor, and it is the row's only target.",
+      "fix": "Set the camera to var(--control-height) (48px) and the empty row min-height to 48px."
+     },
+     {
+      "severity": "medium",
+      "text": "The camera circle fills the 44px row exactly, so its ring touches the card's top, right and bottom edges (no inner padding on the right).",
+      "fix": "Pad the card space-row-y vertically and space-row-x on the right so the camera sits inside the well."
+     },
+     {
+      "severity": "medium",
+      "text": "The optional row is not generalised: Measure renders an optional weight as a full field on Give IDs, and farrowing uses \"+ Litter weight\" pills. The label scale also differs (Photos 13/500, Measure 14/600).",
+      "fix": "Write the optional row once (label at choice-label 14/600, \"Optional\" muted, the action at the right, 48px) and have Photos, Measure and Note use it."
+     },
+     {
+      "severity": "medium",
+      "text": "The denied / too-large errors, pressed and focus are specified but not rendered.",
+      "fix": "Add them to preview.html."
+     },
+     {
+      "severity": "low",
+      "text": "Raw px, no CSS-variable list, no when-not section.",
+      "fix": "Tokenise, list the variables, add \"When not: a fact that needs words, use Note\"."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "merge",
+      "name": "Photos + TaskPhotos",
+      "why": "Same field, two faces with contradicting rules; one should be a variant of the other",
+      "seenIn": [
+       "farrowing.death"
+      ]
+     },
+     {
+      "kind": "new-component",
+      "name": "OptionalRow (section pattern)",
+      "why": "The collapsed optional input (label · Optional · action) recurs in Photos, the Give IDs weight and farrowing's + Litter weight",
+      "seenIn": [
+       "farrowing.death",
+       "farrowing.blocked",
+       "piglet-processing.give-ids"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "TaskPhone",

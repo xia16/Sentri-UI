@@ -1,0 +1,173 @@
+{
+  "status": "in-design",
+  "judged": "2026-10-09",
+  "commit": "3e3f835",
+  "model": "claude-opus-5-5",
+  "scores": {
+    "clarity": 8,
+    "budget": 5,
+    "hierarchy": 7,
+    "spacing": 8,
+    "broken": 7
+  },
+  "lowest": 5,
+  "checklist": [
+    {
+      "line": 1,
+      "pass": false,
+      "why": "Purpose present; no sibling named (Row for an editable record, TaskReceipt for a day receipt)."
+    },
+    {
+      "line": 2,
+      "pass": false,
+      "why": "No when / when-not."
+    },
+    {
+      "line": 3,
+      "pass": false,
+      "why": "Parts named, but the preview does not show extraHtml or the candidate group description."
+    },
+    {
+      "line": 4,
+      "pass": false,
+      "why": "The categorised log (a kind word over each entry, kind filters above) is a real variant on two screens and is not documented as one."
+    },
+    {
+      "line": 5,
+      "pass": false,
+      "why": "Empty state is stated but not rendered in the preview."
+    },
+    {
+      "line": 6,
+      "pass": true,
+      "why": "No targets of its own."
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "Not a choice control."
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "No colour-borne state."
+    },
+    {
+      "line": 9,
+      "pass": false,
+      "why": "Label and meta formats stated, but hosts break them (see findings) and there is no long-entry example."
+    },
+    {
+      "line": 10,
+      "pass": false,
+      "why": "No role stated (sections and articles; is it a list?)."
+    },
+    {
+      "line": 11,
+      "pass": false,
+      "why": "Raw #cbd6c2 thread, #849b72 dot, 7px, 18px and 13/11/10/9px type in bundle.css; the README names log-dot and log-line tokens the CSS does not use."
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+    },
+    {
+      "line": 14,
+      "pass": false,
+      "why": "No classification line or related links."
+    },
+    {
+      "line": 15,
+      "pass": false,
+      "why": "Only the default state is rendered at 375; no proof of the empty state."
+    }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "day log (plain)",
+      "usedBy": [
+        "farrowing.history",
+        "piglet-processing.pen-log"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 5,
+        "hierarchy": 7,
+        "spacing": 8,
+        "broken": 7
+      },
+      "findings": [
+        "farrowing.history repeats \"Farrowing finished\" as title and detail; piglet-processing.pen-log writes one entry per piglet ID (8 lines of \"ID 0012xx\")."
+      ]
+    },
+    {
+      "name": "categorised log",
+      "usedBy": [
+        "pig-profile.log",
+        "inspection.pen-log"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 6,
+        "hierarchy": 7,
+        "spacing": 8,
+        "broken": 7
+      },
+      "findings": [
+        "Prints \"Author not supplied\"; group labels mix \"1 Aug 2026\" and \"Before this walk\"."
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "text": "Budget in use: piglet-processing.pen-log lists every ID as its own entry (ID 001201 ... ID 001208), and farrowing.history says \"Farrowing finished\" twice in one entry.",
+      "fix": "Add a rule and an example: one recorded act is one entry (\"8 IDs · 001201-001208\"); detail never repeats the title. Fix the two hosts."
+    },
+    {
+      "severity": "medium",
+      "text": "Hosts write group labels and meta four ways: \"5 days ago\", \"day 4\", \"1 Aug 2026\", \"Before this walk\"; meta \"G.H · 10/07 10:07\" vs \"14:02 · L. Madsen\" vs \"G. Hansen\".",
+      "fix": "Pin the format in the component: meta = time · initials (the group label carries the date); group labels = Today / Yesterday / weekday / \"Jul 8\". Take a date and initials as data, not free strings."
+    },
+    {
+      "severity": "medium",
+      "text": "The categorised log is a real variant (pig-profile.log, inspection.pen-log) without its own when-to-use.",
+      "fix": "Document it: use category only when one log mixes kinds of event and offers a kind filter; otherwise use the plain log."
+    },
+    {
+      "severity": "medium",
+      "text": "Missing data is printed as text (\"Author not supplied\"), though the content law says missing is absent.",
+      "fix": "Add a Don't: drop an empty meta part; never print a placeholder."
+    },
+    {
+      "severity": "low",
+      "text": "Raw colours and sizes; the log-dot and log-line tokens are named in the README but not used in CSS.",
+      "fix": "Use var(--log-dot), var(--log-line) and the type tokens."
+    },
+    {
+      "severity": "low",
+      "text": "Empty state is not rendered in the preview.",
+      "fix": "Add a second preview case, log([]), showing \"No activity recorded yet\"."
+    }
+  ],
+  "proposals": [
+    {
+      "kind": "new-variant",
+      "name": "Log: categorised",
+      "why": "Same job (history tail), different structure (kind word, kind filter); used on two screens.",
+      "seenIn": [
+        "pig-profile.log",
+        "inspection.pen-log"
+      ]
+    }
+  ]
+}

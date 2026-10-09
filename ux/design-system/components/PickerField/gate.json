@@ -1,0 +1,213 @@
+{
+  "status": "in-design",
+  "judged": "2026-10-09",
+  "commit": "3e3f835",
+  "model": "claude-opus-5-5",
+  "scores": {
+    "clarity": 5,
+    "budget": 6,
+    "hierarchy": 6,
+    "spacing": 5,
+    "broken": 2
+  },
+  "lowest": 2,
+  "checklist": [
+    {
+      "line": 1,
+      "pass": true,
+      "why": "Replaces native select; ChoiceList multi named"
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "Two to four outcomes: the Choice field named as the alternative"
+    },
+    {
+      "line": 3,
+      "pass": false,
+      "why": "Trigger parts named; the sheet (title, search, tabs, selected tray, footer) is not"
+    },
+    {
+      "line": 4,
+      "pass": false,
+      "why": "Only single exists in the DS; the multi and nested pickers that screens need are unspecified"
+    },
+    {
+      "line": 5,
+      "pass": false,
+      "why": "Error, loading and empty \"not drawn\"; disabled dims (forbidden by the DS law)"
+    },
+    {
+      "line": 6,
+      "pass": false,
+      "why": "Trigger 47px in the preview; 40px (Care, Method) and 44px (Conditions) on screens"
+    },
+    {
+      "line": 7,
+      "pass": false,
+      "why": "No cap on options before search or nesting"
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "Selected option: check + 600"
+    },
+    {
+      "line": 9,
+      "pass": false,
+      "why": "No long-value truncation; the multi trigger joins names with commas"
+    },
+    {
+      "line": 10,
+      "pass": false,
+      "why": "listbox/option roles, but no keyboard model for nested levels"
+    },
+    {
+      "line": 11,
+      "pass": false,
+      "why": "#bdc7b6 and raw px; inspection CSS overrides the trigger six times (12px font, 40-44px)"
+    },
+    {
+      "line": 12,
+      "pass": false,
+      "why": "The Conditions trigger on record-health has no visible label; placeholder \"Choose ...\" instead of \"Select\""
+    },
+    {
+      "line": 13,
+      "pass": false,
+      "why": "The condition sheet shows a header back arrow, a close X and footer Back together, plus Done"
+    },
+    {
+      "line": 14,
+      "pass": false,
+      "why": "No related links or classification"
+    },
+    {
+      "line": 15,
+      "pass": false,
+      "why": "The real multi picker breaks: after the first tick the list disappears"
+    }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "single (flat/sectioned)",
+      "usedBy": [
+        "health-record.edit-finding",
+        "health-record.record-health (Care)",
+        "inspection.filters",
+        "farrowing.death"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 7,
+        "hierarchy": 7,
+        "spacing": 5,
+        "broken": 5
+      },
+      "findings": [
+        "Trigger height is 40, 44, 47 or 48px across screens because of host overrides",
+        "Placeholder copy varies: Select / Choose method / Choose unit / Select medicine"
+      ]
+    },
+    {
+      "name": "multi (condition picker)",
+      "usedBy": [
+        "health-record.condition-picker",
+        "health-record.record-health"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 4,
+        "budget": 5,
+        "hierarchy": 5,
+        "spacing": 5,
+        "broken": 1
+      },
+      "findings": [
+        "An unclosed <details> in bulkHealthPicker (ux/system/inspection-astra-concept.js:699) swallows the catalogue: after one tick the list vanishes behind \"1 selected\"; opening it shows the ticked row twice and the list clipped",
+        "Four exits: header back arrow, header close X, footer Back and Done",
+        "Search covers only the open group: \"fev\" in General appearance finds nothing and offers Add \"fev\"",
+        "The trigger is a fork (.bulk-condition-button) with no label, and writes the names joined by commas instead of \"n selected\"",
+        "Checkbox on the left; a native disclosure triangle"
+      ]
+    },
+    {
+      "name": "nested single (medicine picker)",
+      "usedBy": [
+        "health-record.medicine-picker"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 7,
+        "hierarchy": 7,
+        "spacing": 7,
+        "broken": 6
+      },
+      "findings": [
+        "The category level is navigate rows; no path is written back (\"Antibiotics / Amoxicillin\")"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "text": "The multi condition picker loses its list on the first selection: `<details class=\"chooser-selected\">...</div>` is never closed, so .health-catalog renders inside the collapsed <details>.",
+      "fix": "Close the tag (`</div></details>`). Better: replace the disclosure with a \"1 selected\" ChoiceList navigate row that opens a review level."
+    },
+    {
+      "severity": "high",
+      "text": "Screens need multi and nested pickers, but the component defines only single and sends callers to ChoiceList multi, so every host builds its own sheet.",
+      "fix": "Give PickerField the sheet, with the variants single, multi, cascade and cascade-multi (see proposals), and draw the rows with ChoiceList."
+    },
+    {
+      "severity": "high",
+      "text": "The condition sheet stacks four exits (back arrow, close X, Back, Done).",
+      "fix": "Show the header back arrow only while a level is open; keep footer Back (leaves and keeps the draft) + \"Done · n\"; drop the X."
+    },
+    {
+      "severity": "medium",
+      "text": "Host CSS forks the trigger (12px text, 40-44px), and Conditions uses a separate .bulk-condition-button with no label.",
+      "fix": "Delete the six .st-picker-trigger overrides in inspection-astra-concept.css. Render Conditions as pickerField({label:\"Conditions\", display:\"2 selected\"}), with the trigger at min-height 48."
+    },
+    {
+      "severity": "medium",
+      "text": "Search covers only the open group, so a symptom in another group reads as missing and invites a custom duplicate.",
+      "fix": "Search the whole catalogue (both kinds) and show each hit with its path as meta (\"Symptoms · General appearance\")."
+    },
+    {
+      "severity": "low",
+      "text": "`disabled` dims the trigger, which the DS law forbids; placeholder copy drifts from \"Select\".",
+      "fix": "Remove disabled. Default the placeholder to \"Select\", and to \"None\" for multi."
+    }
+  ],
+  "proposals": [
+    {
+      "kind": "new-variant",
+      "name": "PickerField multi",
+      "why": "Flat or sectioned multi-select: trailing checkboxes (ChoiceList multi), footer Back + \"Done · n selected\", trigger shows \"n selected\" or \"None\", and the selected items as a \"n selected\" row at the top, not a <details>",
+      "seenIn": [
+        "health-record.condition-picker",
+        "inspection.filters"
+      ]
+    },
+    {
+      "kind": "new-variant",
+      "name": "PickerField cascade",
+      "why": "The ADM/Vant/TDesign Cascader model: one level at a time, a step row of the chosen levels that can be tapped to go back, auto-advance on pick, and the path written back to the trigger (\"Antibiotics / Amoxicillin\")",
+      "seenIn": [
+        "health-record.medicine-picker"
+      ]
+    },
+    {
+      "kind": "new-variant",
+      "name": "PickerField cascade-multi",
+      "why": "The condition picker: kind (Diseases/Symptoms) to group to ticked leaves. A step row replaces the tabs and the back-arrow header; group rows carry \"n selected\" meta; search spans the whole tree with path meta; ticks across branches persist; \"Done · n\"",
+      "seenIn": [
+        "health-record.condition-picker"
+      ]
+    }
+  ]
+}

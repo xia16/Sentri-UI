@@ -1,0 +1,289 @@
+{
+  "status": "in-design",
+  "judged": "2026-10-09",
+  "commit": "3e3f835",
+  "model": "claude-opus-5-5",
+  "scores": {
+    "clarity": 6,
+    "budget": 5,
+    "hierarchy": 7,
+    "spacing": 6,
+    "broken": 5
+  },
+  "lowest": 5,
+  "checklist": [
+    {
+      "line": 1,
+      "pass": false,
+      "why": "\"The footer and bar actions\" names no sibling to use instead (IconButton, a Row tap, ChoiceList)."
+    },
+    {
+      "line": 2,
+      "pass": false,
+      "why": "Registers have rules but there is no when-not section naming an alternative."
+    },
+    {
+      "line": 3,
+      "pass": false,
+      "why": "Hold parts are named; the base button (label, optional leading icon, caption) has no anatomy."
+    },
+    {
+      "line": 4,
+      "pass": false,
+      "why": "task-end-early has no screen left (farrowing.task-ready ends early with a red hold); the tool register is forked as .sp-tool in piglet processing."
+    },
+    {
+      "line": 5,
+      "pass": false,
+      "why": "Pressed, focus, busy, armed and unknown are described but not rendered in the preview."
+    },
+    {
+      "line": 6,
+      "pass": false,
+      "why": "Preview footer buttons measure 44px tall; text action Clear 44x44; only real farrowing/task footers reach 48."
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "At most two actions per bar, primary right; the preview respects it."
+    },
+    {
+      "line": 8,
+      "pass": false,
+      "why": "Disabled and waiting differ from enabled by fill colour only; in real screens the reason line is hidden, so nothing else changes."
+    },
+    {
+      "line": 9,
+      "pass": false,
+      "why": "Verb+count rule stated; no max length, no truncation example; README lists \"Save\" as a commit example while banning \"Save\"."
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "Focus ring, aria-disabled waiting, guard(), keyboard two-step hold all specified."
+    },
+    {
+      "line": 11,
+      "pass": false,
+      "why": "Raw values in bundle.css: #aab2a1, #e9ece3, #92998d, #bdc7b6, #fff1ee, #20291f, #b6c0ad, 13px radius, 52px min-height."
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+    },
+    {
+      "line": 14,
+      "pass": false,
+      "why": "No related-components table and no classification statement."
+    },
+    {
+      "line": 15,
+      "pass": false,
+      "why": "375px preview has no overflow but does not show every state."
+    }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "primary (commit)",
+      "usedBy": [
+        "farrowing.finish",
+        "inspection.review-selected",
+        "piglet-processing.give-ids"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 9,
+        "spacing": 7,
+        "broken": 6
+      },
+      "findings": [
+        "44px in the preview footer, 48 in hosts; height depends on the host class, not the component."
+      ]
+    },
+    {
+      "name": "secondary / Back (surface-back; a lone Back fills ink)",
+      "usedBy": [
+        "farrowing.history",
+        "inspection.pen",
+        "piglet-processing.pen-log",
+        "piglet-processing.sheet-todo"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 7
+      },
+      "findings": [
+        "Back border/press colours are raw (#b6c0ad, #f5f6f1, #526847); the Sheet preview still labels the exit \"Close\"."
+      ]
+    },
+    {
+      "name": "danger",
+      "usedBy": [
+        "piglet-processing.end-task"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 7,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 7
+      },
+      "findings": [
+        "Appears only as a hold in real screens; plain danger is seen only in the preview."
+      ]
+    },
+    {
+      "name": "task-end-early (red-wash)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+        "clarity": 5,
+        "budget": 4,
+        "hierarchy": 6,
+        "spacing": 8,
+        "broken": 7
+      },
+      "findings": [
+        "No screen uses it: farrowing.task-ready draws End task early as a filled red hold. The preview pairs it with End task, two red acts in one bar."
+      ]
+    },
+    {
+      "name": "tool",
+      "usedBy": [
+        "farrowing.finish"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 7,
+        "hierarchy": 7,
+        "spacing": 7,
+        "broken": 7
+      },
+      "findings": [
+        "Piglet processing forks it as .sp-tool (paper, bordered, icon, three in a row) on piglet-processing.sheet-todo instead of the well-filled pair."
+      ]
+    },
+    {
+      "name": "text",
+      "usedBy": [
+        "farrowing.death",
+        "piglet-processing.sheet-todo"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 7,
+        "broken": 6
+      },
+      "findings": [
+        "Hit area exactly 44x44, under the 48 glove floor."
+      ]
+    },
+    {
+      "name": "hold (primary / danger)",
+      "usedBy": [
+        "farrowing.finish",
+        "farrowing.task-ready",
+        "piglet-processing.end-task"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 6,
+        "budget": 5,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Two caption faces: the Button card is 11px sentence case (\"Hold to end\"), TaskHold is 9px capitals (\"HOLD TO END\"); every real screen uses the capitals."
+      ]
+    },
+    {
+      "name": "waiting",
+      "usedBy": [
+        "piglet-processing.sheet-todo",
+        "piglet-processing.record-death",
+        "piglet-processing.give-ids"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 5,
+        "budget": 7,
+        "hierarchy": 7,
+        "spacing": 8,
+        "broken": 4
+      },
+      "findings": [
+        "The reason line is visually hidden by the TaskSheet default, so a waiting \"Save\"/\"Submit\" looks exactly like disabled with no reason on screen (ADR 0002 requires one persistent line beside the bar)."
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "text": "Waiting buttons in real task screens show no reason: TaskSheet hides the status line by default, so piglet-processing.record-death \"Save\" and sheet-todo \"Submit\" read as greyed-out disabled.",
+      "fix": "Make the footer status visible whenever the primary is waiting (status.visible defaults to true when primary.waiting)."
+    },
+    {
+      "severity": "high",
+      "text": "Height is decided by host classes: 52px bare, 44px in .inspection-phone/.farrowing-phone, 48/56 in footers. Preview footers render at 44px, under the 48 glove floor.",
+      "fix": "One rule: .button min-height: var(--control-height) (48) everywhere; drop the 44px host override."
+    },
+    {
+      "severity": "high",
+      "text": "Copy rule broken in use: the piglet-processing footer says \"Submit\" (strings submit.n, idf.submit), and the README gives \"Save\" as a commit example while banning Save/Submit.",
+      "fix": "Rename to verb+count (\"Record 3 items\", \"Record 12 piglets\"); remove \"Save\" from the Commit register examples."
+    },
+    {
+      "severity": "medium",
+      "text": "Two hold faces (11px sentence-case caption in Button vs 9px capitals in TaskHold) for the same act.",
+      "fix": "Keep the farrowing face (TaskHold) as the only hold caption and update the Button card and preview to it."
+    },
+    {
+      "severity": "medium",
+      "text": "Raw colours and radii in .button CSS (#aab2a1, #e9ece3, #92998d, #bdc7b6, #fff1ee, #20291f, 13px).",
+      "fix": "Replace with control-border, disabled-fill, disabled-ink, red-wash, ink and radius-control tokens."
+    },
+    {
+      "severity": "low",
+      "text": "task-end-early has no screen; the tool register is forked as .sp-tool.",
+      "fix": "Drop task-end-early (End early is a danger hold); move .sp-tool onto register:\"tool\"."
+    }
+  ],
+  "proposals": [
+    {
+      "kind": "merge",
+      "name": "TaskHold -> Button hold",
+      "why": "Same act, two caption faces; TaskHold is only the footer placement.",
+      "seenIn": [
+        "farrowing.finish",
+        "piglet-processing.end-task"
+      ]
+    },
+    {
+      "kind": "merge",
+      "name": ".sp-tool -> Button tool register",
+      "why": "Same job (a mid-sheet act), forked look.",
+      "seenIn": [
+        "piglet-processing.sheet-todo"
+      ]
+    }
+  ]
+}

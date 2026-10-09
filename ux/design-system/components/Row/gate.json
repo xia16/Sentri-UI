@@ -1,0 +1,248 @@
+{
+  "status": "in-design",
+  "judged": "2026-10-09",
+  "commit": "3e3f835",
+  "model": "claude-opus-5-5",
+  "scores": {
+    "clarity": 4,
+    "budget": 6,
+    "hierarchy": 8,
+    "spacing": 8,
+    "broken": 5
+  },
+  "lowest": 4,
+  "checklist": [
+    {
+      "line": 1,
+      "pass": false,
+      "why": "Purpose present; does not send animal rows to TaskRow or history to Log."
+    },
+    {
+      "line": 2,
+      "pass": false,
+      "why": "No when / when-not across the three roots and the look-alikes."
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "Parts named (icon/code, title, line 2, chip/trailing, trail) and all shown in the preview."
+    },
+    {
+      "line": 4,
+      "pass": false,
+      "why": "rowSelect, rowAction and the code/token litter row are used on no screen; TaskRow's tick and door+act do those jobs instead."
+    },
+    {
+      "line": 5,
+      "pass": false,
+      "why": "Pressed, focus, disabled and busy are stated but not rendered in the preview."
+    },
+    {
+      "line": 6,
+      "pass": false,
+      "why": "rowAction's act button is 101x44; inspection.review-selected's Remove is 53x44."
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "Not a choice control."
+    },
+    {
+      "line": 8,
+      "pass": false,
+      "why": "Disabled is opacity .5 only, which the DS state law forbids (\"nothing else is ever greyed\")."
+    },
+    {
+      "line": 9,
+      "pass": true,
+      "why": "Truncation (ellipsis) and wrap:true both stated and shown."
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "button / label roots, aria-current, aria-labelledby for the act and the focus ring are stated."
+    },
+    {
+      "line": 11,
+      "pass": false,
+      "why": "Base row CSS uses raw #eef2e7, #53674a, #f1f5eb, #eaf2e5, #526847, 68px and 12x14px; only the candidate additions use tokens."
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+    },
+    {
+      "line": 14,
+      "pass": false,
+      "why": "Links ADR 0002 only; no classification against TaskRow, TaskDay items or the Home task card."
+    },
+    {
+      "line": 15,
+      "pass": false,
+      "why": "Only the default faces are rendered at 375."
+    }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "navigation row (icon tile, title, line 2, chevron; in rowGroup)",
+      "usedBy": [
+        "piglet-processing.more-actions",
+        "inspection.actions",
+        "inspection.pen",
+        "pig-profile.full",
+        "feed-plan.bulk"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Closest to ready, but the README's own Don't says \"no icons on list rows\" while this variant is defined by its icon tile."
+      ]
+    },
+    {
+      "name": "scope row (trailing count word, aria-current)",
+      "usedBy": [
+        "workbench.choose-unit"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Unit picker: \"Unit 6 · 8 pigs · 4 pens · 2 tasks >\"."
+      ]
+    },
+    {
+      "name": "summary/count row (trailing number; div at 0, button above 0)",
+      "usedBy": [
+        "farrowing.overview"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 6,
+        "budget": 8,
+        "hierarchy": 7,
+        "spacing": 8,
+        "broken": 7
+      },
+      "findings": [
+        "A zero row becomes a non-button div with no cue; the empty law says it should be absent, or the README should allow it."
+      ]
+    },
+    {
+      "name": "animal / litter row (code column, chip, token lines): row({code})",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {},
+      "findings": [
+        "No screen. The real animal row is TaskRow (piglet-processing.pen-list) and farrowing's .sow-row (farrowing.room)."
+      ]
+    },
+    {
+      "name": "selectable row (rowSelect, checkbox)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {},
+      "findings": [
+        "No screen. Look-alikes: TaskRow trail \"tick\"; inspection's label.check-target.pen-select-target on feed-plan.* screens."
+      ]
+    },
+    {
+      "name": "action row (rowAction, door + one-tap button)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {},
+      "findings": [
+        "No screen. Look-alikes: TaskDay items with act (piglet-processing.sheet-todo, sheet-done); inspection.review-selected li.st-row + Remove (53x44). The TaskRow README says door+act \"replaces SentriUI.rowAction\"."
+      ]
+    },
+    {
+      "name": "done/record row (trail edit, wrap)",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {},
+      "findings": [
+        "Preview only; done rows in use are TaskRow (Done chip + edit trail) on piglet-processing.pen-list."
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "text": "Two row families do the same jobs: Row's candidates (code row, rowSelect, rowAction, done row) have no screen, while TaskRow (animal row, tick, door, door+act) and TaskDay items serve every real task screen. The owner's rule is one implementation per job.",
+      "fix": "Pick the owner: make TaskRow's animal/tick/door/act faces variants of Row (one implementation, Row the base) and delete row({code}), rowSelect and rowAction, or the reverse. Until then mark the three candidates \"no screen\"."
+    },
+    {
+      "severity": "high",
+      "text": "Look-alikes outside both families: Home's task card (workbench.today, 88-235px buttons), farrowing's .sow-row (farrowing.room), inspection's checkbox pen rows (feed-plan.*) and the review-list row with Remove (inspection.review-selected).",
+      "fix": "Classify each in Row's README: Home task card = separate component (a card, not a row); .sow-row = the animal variant; checkbox pen rows = the selectable variant; the review row = the action variant."
+    },
+    {
+      "severity": "medium",
+      "text": "Disabled is opacity .5, against the DS state law; the README itself says to prefer omission.",
+      "fix": "Remove the disabled face; keep the attribute for semantics only and require a reason line."
+    },
+    {
+      "severity": "medium",
+      "text": "Second targets under 48px: rowAction act 101x44, review-row Remove 53x44.",
+      "fix": "Act and inline buttons take min-height control-height (48px)."
+    },
+    {
+      "severity": "medium",
+      "text": "The README contradicts itself: the anatomy has an icon tile and the Don'ts say \"no icons on list rows\"; five screens use icon rows.",
+      "fix": "Restate: icon tiles only on navigation rows (lists of places or actions); never on animal or record rows."
+    },
+    {
+      "severity": "low",
+      "text": "Base row CSS uses raw colours and sizes; the preview injects inline-styled trailing HTML.",
+      "fix": "Use row-icon-bg, row-icon-ink, press, green-wash, current-marker, row-min and space-row-y/x; pass a typed trailing {text, tone} in the preview."
+    }
+  ],
+  "proposals": [
+    {
+      "kind": "merge",
+      "name": "TaskRow (animal, tick, door, door+act) with Row (code row, rowSelect, rowAction, done row)",
+      "why": "Same jobs, two implementations; only TaskRow has screens.",
+      "seenIn": [
+        "piglet-processing.pen-list",
+        "piglet-processing.sheet-todo",
+        "piglet-processing.end-task"
+      ]
+    },
+    {
+      "kind": "new-component",
+      "name": "Home task card",
+      "why": "A different job (summarise one task type with progress and timing) in a card, not a row; already named as a Home pattern in the atlas.",
+      "seenIn": [
+        "workbench.today",
+        "workbench.choose-unit",
+        "workbench.gestation"
+      ]
+    },
+    {
+      "kind": "new-variant",
+      "name": "Row: selectable (adopt inspection's checkbox pen rows)",
+      "why": "Bulk selection on the feed-plan and inspection screens is hand-built.",
+      "seenIn": [
+        "feed-plan.pen",
+        "feed-plan.bulk"
+      ]
+    }
+  ]
+}

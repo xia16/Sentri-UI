@@ -1,0 +1,197 @@
+{
+  "status": "in-design",
+  "judged": "2026-10-09",
+  "commit": "3e3f835",
+  "model": "claude-opus-5-5",
+  "scores": {
+    "clarity": 7,
+    "budget": 7,
+    "hierarchy": 7,
+    "spacing": 5,
+    "broken": 4
+  },
+  "lowest": 4,
+  "checklist": [
+    {
+      "line": 1,
+      "pass": true,
+      "why": "A square icon-only tool; \"every verb gets a labelled button or tile\" names the alternative."
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "Do/do-not: universal glyphs only; verbs get Button."
+    },
+    {
+      "line": 3,
+      "pass": false,
+      "why": "No anatomy section; the badge is not marked optional; container variants are hidden in a className."
+    },
+    {
+      "line": 4,
+      "pass": false,
+      "why": "Real variants (bordered toolbar, header return, plain close/mark) are undocumented; the 44px header return is not described at all."
+    },
+    {
+      "line": 5,
+      "pass": false,
+      "why": "Pressed is \"not drawn\"; no disabled or focus example is rendered."
+    },
+    {
+      "line": 6,
+      "pass": false,
+      "why": "Default 44x44: task-return, sheet close (dismiss), sp-mark, more; inspection forks go to 32/36px wide."
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "Not a choice set."
+    },
+    {
+      "line": 8,
+      "pass": false,
+      "why": "Disabled differs by grey only."
+    },
+    {
+      "line": 9,
+      "pass": true,
+      "why": "aria-label examples given (\"Filter, 2 applied\")."
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "aria-label required; global focus ring."
+    },
+    {
+      "line": 11,
+      "pass": false,
+      "why": "Raw 10px radius in the bundle; screen forks use #cbd3c1, 11/13px radii, 46/52px heights."
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+    },
+    {
+      "line": 14,
+      "pass": false,
+      "why": "No related links (Button, Icon, the TaskSheet close) and no classification."
+    },
+    {
+      "line": 15,
+      "pass": false,
+      "why": "The 375px preview shows default + badge only; no other states."
+    }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "bordered (toolbar / dock: room-filter-button)",
+      "usedBy": [
+        "farrowing.room",
+        "inspection.walk",
+        "piglet-processing.give-ids"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 6,
+        "broken": 7
+      },
+      "findings": [
+        "inspection.walk renders it 48x52 (not square); the give-ids scan button uses control-border instead of line."
+      ]
+    },
+    {
+      "name": "header return (task-return)",
+      "usedBy": [
+        "farrowing.room",
+        "inspection.walk"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 7,
+        "broken": 4
+      },
+      "findings": [
+        "Bordered like the toolbar variant but 44x44, under the floor; undocumented."
+      ]
+    },
+    {
+      "name": "plain (close, more, breeder mark)",
+      "usedBy": [
+        "farrowing.finish",
+        "piglet-processing.tagged-list"
+      ],
+      "status": "in-design",
+      "scores": {
+        "clarity": 7,
+        "budget": 7,
+        "hierarchy": 7,
+        "spacing": 7,
+        "broken": 4
+      },
+      "findings": [
+        "44x44; the TaskSheet close is a separate .tk-sheet-close implementation of the same thing."
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "text": "The default target is 44x44 (bundle .icon-button height:44px); header return, sheet close and breeder marks all measure 44.",
+      "fix": "Set .icon-button to var(--control-height) (48) square; keep the glyph size."
+    },
+    {
+      "severity": "high",
+      "text": "No pressed state for a gloved tap.",
+      "fix": "Add the shared press: background var(--press) and translateY(1px) on :active, as Button has."
+    },
+    {
+      "severity": "medium",
+      "text": "Variants live as screen forks: inspection 46px / 48x52 / #cbd3c1, dock clear 36px wide, feed-optional 32px wide, home 48px with radius 13.",
+      "fix": "Add variant: \"bordered\" | \"plain\" to iconButton() and delete the per-screen overrides."
+    },
+    {
+      "severity": "medium",
+      "text": "The TaskSheet close (.tk-sheet-close) and the farrowing dismiss are two implementations of the plain variant.",
+      "fix": "Render the sheet close with SentriUI.iconButton({ variant: \"plain\" })."
+    },
+    {
+      "severity": "low",
+      "text": "The header return variant is undocumented.",
+      "fix": "Document it as the bordered variant at 48 in the header."
+    }
+  ],
+  "proposals": [
+    {
+      "kind": "new-variant",
+      "name": "IconButton bordered / plain",
+      "why": "Two looks already in every task; today a className plus forks.",
+      "seenIn": [
+        "farrowing.room",
+        "inspection.walk",
+        "farrowing.finish"
+      ]
+    },
+    {
+      "kind": "merge",
+      "name": "TaskSheet close -> IconButton plain",
+      "why": "Same job, separate code.",
+      "seenIn": [
+        "piglet-processing.sheet-todo",
+        "farrowing.finish"
+      ]
+    }
+  ]
+}
