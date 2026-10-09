@@ -225,7 +225,7 @@ function openFeature(id, sel) {
   function drawEdges(active) {
     svg.innerHTML = defs;
     Object.entries(nodes).forEach(([k, n]) => { n.classList.remove('nb-out', 'nb-in', 'dim'); n.querySelector('.bdg')?.remove(); if (n.dataset.t != null) n.title = n.dataset.t; else n.dataset.t = n.title; });
-    if (!active) return;
+    return; // a plain sitemap: only the selected node is marked (aria-current); the flow data is not drawn
     const rel = edges.filter(([a, b]) => (a === active || b === active) && a !== b && pos[a] && pos[b]);
     const mk = {}; // neighbour -> { dir, label }
     rel.forEach(([a, b, label]) => { const o = a === active ? b : a, dir = a === active ? 'out' : 'in'; if (!mk[o] || (dir === 'out' && mk[o].dir === 'in')) mk[o] = { dir, label }; });
