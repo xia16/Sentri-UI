@@ -82,10 +82,10 @@
 
   var S;
   function load() {
-    try { S = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) { S = null; }
+    try { S = (window.AtlasBare && window.AtlasBare.bare) ? null : JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) { S = null; }   // a bare atlas screen starts from the sample and keeps nothing
     if (!S || !S.pens) S = seed('tag');
   }
-  function save() { try { sessionStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* private window: the demo still runs */ } }
+  function save() { if (window.AtlasBare && window.AtlasBare.bare) return; try { sessionStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* private window: the demo still runs */ } }
   function reset() { S = seed(S ? S.scheme : 'tag'); save(); }
   /* A different farm: switching the scheme starts the demo again on that farm */
   function setScheme(s) { S = seed(s); save(); }

@@ -69,8 +69,8 @@
   "entryPoints": [
     {
       "section": "Home",
-      "label": "via Overview, unit chosen",
-      "from": "workbench.today",
+      "label": "from a unit on Home",
+      "from": "workbench.unit",
       "control": "Inspect unit",
       "lands": "inspection.walk"
     },

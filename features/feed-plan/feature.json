@@ -40,24 +40,10 @@
   "entryPoints": [
     {
       "section": "Inspection",
-      "label": "Actions, several pens ticked (Pens tab)",
-      "from": "inspection.actions",
-      "control": "Feed",
-      "lands": "feed-plan.bulk"
-    },
-    {
-      "section": "Inspection",
       "label": "Pen feed value in the pen header",
       "from": "inspection.walk",
       "control": "Pen feed (7.6 kg / Ad-lib)",
       "lands": "feed-plan.editor"
-    },
-    {
-      "section": "Inspection",
-      "label": "Pen sheet, Feed guidance",
-      "from": "inspection.pen",
-      "control": "Feed guidance",
-      "lands": "feed-plan.pen"
     },
     {
       "section": "Pigs",
@@ -360,7 +346,8 @@
         ],
         "issues": [
           "The row is named \"Feed\" with the sub-line \"for these pigs\" under a tab called Pens: pens and pigs are used for the same row.",
-          "In the Pens tab no row reaches equipment faults though the pen chooser for them is in the code."
+          "In the Pens tab no row reaches equipment faults though the pen chooser for them is in the code.",
+          "Ways in not drawn: the Actions sheet's Pens tab (several pens → Feed) and the pen sheet's Feed guidance have no screen of their own that renders them — add scenarios to the Inspection prototype, then record the entries."
         ]
       }
     },

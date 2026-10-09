@@ -4,19 +4,91 @@
    A feature without an anchor uses its named groups as stacked strips. Arrows: only the selected node's. */
 'use strict';
 
-let CURRENT = null; // the open feature page: { mark(id) } so a bare screen can announce itself
+let CURRENT = null; // the open feature page: { follow(id) } so a bare screen can announce where a tap took it
 
 /* ---------- a live screen ----------
-   SHIM: until screens open bare by URL, a screen is the existing prototype in an iframe at 1400px,
-   switched to the screen's `preset` through its select.scenario, cropped to its own phone by the
-   phone's viewport rect. The iframe grows instead of scrolling. Replace with the bare URL when it lands. */
+   A screen opens bare: the prototype page with ?screen=<id> (ux/system/atlas-bare.js) renders only the phone's content at
+   390 x 844 and posts { atlasReady: id }; the atlas draws the device frame and scales the iframe into it.
+   Only when no ready message comes in 4 s (a page without the script) is the old crop of the whole study page used. */
+const READY_MS = 4000;
+const AMBER = '#e0a100';
 function shot(screen, opts = {}) {
-  const H = opts.height || 760, k = H / 844, W = Math.round(390 * k);
-  const box = el(`<div class="shot" style="width:${W}px;height:${H}px"></div>`);
+  const H = (opts.height || 760) - 20, k = H / 844, W = Math.round(390 * k); // opts.height is the frame's; the 10px bezel sits outside the screen
+  const frame = el('<div class="devframe"></div>');
+  const box = el(`<div class="shot" style="width:${W}px;height:${H}px"></div>`); frame.append(box);
   if (!screen || !screen.url) {
     box.append(el(`<div class="blank">${screen?.name ? `<b>${esc(screen.name)}</b>` : ''}<span>${esc(screen?.blank || 'Not designed yet.')}</span></div>`));
-    return box;
+    return frame;
   }
+  const wait = el('<div class="wait" aria-hidden="true"></div>'); box.append(wait);
+  const f = el('<iframe class="bare" title="Live screen"></iframe>');
+  f.style.transform = `scale(${k})`;
+  f.src = screen.url + (screen.url.includes('?') ? '&' : '?') + 'screen=' + encodeURIComponent(screen.id);
+  box.append(f);
+  let ok = false, timer = 0;
+  const onMsg = (m) => {
+    if (!f.isConnected) return removeEventListener('message', onMsg);
+    if (m.source !== f.contentWindow || !m.data || m.data.atlasReady !== screen.id) return;
+    ok = true; removeEventListener('message', onMsg); clearTimeout(timer);
+    try { decorate(f, screen, opts); } catch (e) { console.warn('atlas: could not mark the screen', e); }
+    f.style.visibility = 'visible'; wait.remove();
+  };
+  addEventListener('message', onMsg);
+  timer = setTimeout(() => {
+    if (ok || !f.isConnected) return;
+    console.warn(`atlas: no ready message from ${screen.url} for ${screen.id} within ${READY_MS / 1000}s: falling back to the crop shim`);
+    removeEventListener('message', onMsg); f.remove(); wait.remove(); cropShot(box, W, screen, opts);
+  }, READY_MS);
+  return frame;
+}
+
+/* What the atlas adds on a bare screen: open a sheet, outline the way in (or what a feature adds), make the way in a link. */
+function decorate(f, screen, opts) {
+  const d = f.contentDocument, p = d.querySelector('.atlas-phone');
+  if (!p) return;
+  const visible = (e) => e.getBoundingClientRect().height > 0;
+  const smallest = (list) => list.sort((a, b) => a.getBoundingClientRect().width * a.getBoundingClientRect().height - b.getBoundingClientRect().width * b.getBoundingClientRect().height)[0];
+  const amber = (e, fill) => { e.style.outline = `3px solid ${AMBER}`; e.style.outlineOffset = '-2px'; if (fill) e.style.background = fill; };
+  const link = (c) => { if (opts.onControl) c.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); opts.onControl(); }, true); };
+  if (opts.open) { const o = [...p.querySelectorAll('button, a, [role=button]')].find((e) => e.textContent.trim().startsWith(opts.open)); if (o) o.click(); }
+  if (opts.addPlaceholder) { // a dashed amber card under the heading: this feature adds here, not designed yet
+    const heads = [...p.querySelectorAll('*')].filter((e) => e.childElementCount <= 2 && e.textContent.trim() === opts.addPlaceholder.after && visible(e) && !e.closest('[role=tab], nav, footer'));
+    let head = heads[0] && (heads.length > 1 ? smallest(heads.slice()) : heads[0]);
+    if (head) {
+      const pw = p.getBoundingClientRect().width; // climb to the heading's full-width row, then insert under it
+      while (head.parentElement && head.parentElement !== p && head.getBoundingClientRect().width < pw * 0.8) head = head.parentElement;
+      const ph = d.createElement('div'); ph.textContent = opts.addPlaceholder.text;
+      ph.style.cssText = 'margin:10px 18px;padding:16px;border:2px dashed #e0a100;border-radius:16px;color:#896017;font:600 13px Plus Jakarta Sans,Arial,sans-serif;background:#fff8e6;text-align:center';
+      head.insertAdjacentElement('afterend', ph);
+    }
+  }
+  if (opts.markAdded) { const hit = smallest([...p.querySelectorAll('*')].filter((e) => e.childElementCount <= 3 && visible(e) && e.textContent.trim().startsWith(opts.markAdded))); if (hit) amber(hit.closest('button, a, li, [role=button]') || hit); }
+  if (opts.entry) { // the page marks its ways in: data-entry="<feature id>" (space-separated for several); data-entry-via tells apart two ways on one screen into the same feature
+    const marked = [...p.querySelectorAll(`[data-entry~="${opts.entry}"]`)].filter(visible);
+    const onTop = (e) => { const r = e.getBoundingClientRect(), t = d.elementFromPoint(r.left + r.width / 2, Math.min(r.top + r.height / 2, 840)); return t && e.contains(t); }; // not hidden behind a sheet
+    const all = marked.filter(onTop).length ? marked.filter(onTop) : marked;
+    const via = opts.via ? all.filter((e) => e.getAttribute('data-entry-via') === opts.via) : all.filter((e) => !e.hasAttribute('data-entry-via'));
+    const word = String(opts.control || '').split(/[ (]/)[0].toLowerCase(); // several markers for one feature on a screen: the one whose text opens with the control's name, else the first
+    const pool = via.length ? via : all, c = (word && pool.find((e) => e.textContent.trim().toLowerCase().startsWith(word))) || pool[0];
+    if (c) { amber(c); link(c); return; }
+    console.warn(`atlas: no data-entry="${opts.entry}" on ${screen.id}: matching the control's text instead`);
+  }
+  if (opts.control) textControl(f, p, opts, visible, smallest, amber, link);
+}
+
+/* Fallback for a screen with no entry marker: find the control by its text, then climb to the whole tap target. */
+function textControl(f, p, opts, visible, smallest, amber, link) {
+  const hit = smallest([...p.querySelectorAll('*')].filter((e) => e.childElementCount <= 3 && visible(e) && e.textContent.trim().startsWith(opts.control)));
+  const act = hit && hit.closest('button, a, [role=button], [role=tab], [data-action]');
+  let c = act && act.getBoundingClientRect().height < 140 ? act : hit;
+  const cur = (e) => f.contentWindow.getComputedStyle(e).cursor;
+  while (c && c.parentElement && p.contains(c.parentElement) && c.parentElement !== p && cur(c.parentElement) === 'pointer') c = c.parentElement;
+  if (c) { amber(c); link(c); }
+}
+
+/* SHIM, only when a page sends no ready message: the whole study page in an iframe at 1400px, switched to the screen's
+   `preset` through its select.scenario, cropped to its own phone by the phone's viewport rect. */
+function cropShot(box, W, screen, opts) {
   const f = el('<iframe title="Live screen"></iframe>'); f.src = screen.url; box.append(f);
   const find = (d) => [...d.querySelectorAll('.phone, section.device, .tk-phone')].find((p) => p.getBoundingClientRect().width > 300);
   const smallest = (list) => list.sort((a, b) => a.getBoundingClientRect().width * a.getBoundingClientRect().height - b.getBoundingClientRect().width * b.getBoundingClientRect().height)[0];
@@ -60,11 +132,10 @@ function shot(screen, opts = {}) {
       box.style.height = Math.round(r.height * kk) + 'px'; f.style.visibility = 'visible';
     } catch (e) { box.append(el('<div class="blank"><b>Could not show this screen</b></div>')); }
   };
-  return box;
 }
 
 /* a bare screen (#49) will announce its id; the flow follows the demo */
-addEventListener('message', (m) => { if (m.data && m.data.atlasScreen && CURRENT) CURRENT.mark(m.data.atlasScreen); });
+addEventListener('message', (m) => { if (m.data && m.data.atlasScreen && CURRENT) CURRENT.follow(m.data.atlasScreen); });
 
 /* ---------- layout ---------- */
 function layoutFlow(f, entries) {
@@ -171,7 +242,8 @@ function openFeature(id, sel) {
     });
   }
   const mark = (nid) => { Object.entries(nodes).forEach(([k, b]) => b.setAttribute('aria-current', k === nid)); drawEdges(nid); setParam('screen', nid); };
-  CURRENT = { mark: (sid) => nodes[sid] && mark(sid) };
+  // the phone shows another screen of this feature after a tap: the flow follows (node, arrows, ?screen=, notes) without reloading the phone
+  CURRENT = { follow: (sid) => { if (!nodes[sid] || sid === shown) return; selected = shown = sid; mark(sid); if (notes.classList.contains('open')) fillNotes(); pz && pz.reveal(nodes[sid]); } };
   wrap.addEventListener('click', (e) => { if (!e.target.closest('.node, .zoom')) drawEdges(null); });
 
   /* the notes panel follows what the phone shows */
@@ -216,7 +288,7 @@ function openFeature(id, sel) {
     if (nid.startsWith('entry:')) {
       const e = entries.find((x) => x.id === nid), src = e.from ? idx[e.from] : { name: 'App start', blank: 'The app opens here.' };
       shown = e.from;
-      dock.append(el(`<div class="cap">${e.control ? 'Tap the <span class="hl">outlined</span> part' : esc(src.name)}</div>`), shot(src, { height: H, control: e.control, onControl: () => e.lands && select(e.lands) }));
+      dock.append(el(`<div class="cap">${e.control ? 'Tap the <span class="hl">outlined</span> part' : esc(src.name)}</div>`), shot(src, { height: H, control: e.control, entry: f.id, via: /choose unit/i.test(e.label || '') ? 'choose-unit' : /toolbox/i.test(e.control || '') ? 'toolbox' : '', onControl: () => e.lands && select(e.lands) }));
     } else if (nid.startsWith('adds:')) {
       const a = f.addsTo[+nid.split(':')[1]], target = idx[a.screen]; other = allFeatures().find((x) => x.id === a.feature) || { id: a.feature, name: a.feature };
       shown = a.screen;

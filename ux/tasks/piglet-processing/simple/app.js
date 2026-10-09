@@ -42,7 +42,7 @@
   function idKey(p) { return scheme() === 'breeders' ? ['id.picked', { n: P.breeders(p) }] : ['id.of.' + scheme(), { n: P.idCount(p), m: p.alive }]; }
   function idWhat(p) { var x = idKey(p); return T(x[0], x[1]); }
   function idS(p) { var x = idKey(p); return S(x[0], x[1]); }
-  var reduced = function () { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; };
+  var reduced = function () { return (window.AtlasBare && window.AtlasBare.bare) || window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; };
   function lastWeight(p) { return p.weights.length ? p.weights[p.weights.length - 1] : null; }
 
   /* ================= the pen list: one row per pen ================= */
@@ -457,6 +457,7 @@
     if (leaving) return;
     document.documentElement.lang = L.lang === 'zh' ? 'zh-CN' : 'en';
     document.title = T('task');
+    if (window.AtlasBare) AtlasBare.watch(atlasScreen);
     var html = K.statusbar() + listScreen(!!(V.pen || V.end));
     if (V.pen) html += penSheet(!!(V.over || V.end));
     var o = V.pen && V.over;
@@ -718,5 +719,30 @@
     var c = q.get('chip'); if (c) V.chip = c;
     var pn = q.get('pen'); if (pn && P.s.pens[pn]) { V.pen = pn; V.tab = q.get('tab') === 'pig' ? 'pig' : 'proc'; }
   })();
+  /* the atlas (?screen=): a bare screen is reached by the taps a worker would make, and the screen the state is in is announced back */
+  var ATLAS_STEPS = {
+    'adjust-count': [['pen', 'A03'], ['item', 'iron'], ['adjust', 'iron']], 'tagged-list': [['pen', 'A02'], ['tagged-open']], 'give-ids': [['pen', 'A02'], ['tagged-open'], ['give-new']],
+    'counts': [['pen', 'A03'], ['counts-open']], 'weight': [['pen', 'A03'], ['weight-open']], 'more-actions': [['pen', 'A03'], ['more']], 'record-death': [['pen', 'A03'], ['tool-death']],
+    'move-piglets': [['pen', 'A03'], ['more'], ['tool', 'move']], 'set-count': [['pen', 'A03'], ['more'], ['tool', 'count']], 'pen-log': [['pen', 'A01'], ['log-open']], 'end-task': [['end']]
+  };
+  function atlasScreen(screens) {
+    var b = 'piglet-processing.';
+    if (V.end) return b + 'end-task';
+    if (!V.pen) return P.s.ended ? b + 'list-ended' : V.chip === 'done' ? b + 'chip-done' : V.chip ? b + 'job-chip' : scheme() === 'none' ? b + 'list-no-id' : b + 'pen-list';
+    if (V.sub === 'give') return b + 'give-ids';
+    var by = { tagged: 'tagged-list', log: 'pen-log', adjust: 'adjust-count', counts: 'counts', weight: 'weight', more: 'more-actions', death: 'record-death', move: 'move-piglets', count: 'set-count' };
+    if (V.over) return by[V.over] ? b + by[V.over] : null;
+    var hit = (screens || []).filter(function (c) {
+      var u = new URL(c.url, location.href).searchParams;
+      return c.id.indexOf(b + 'sheet-') === 0 && u.get('pen') === V.pen && (u.get('scheme') || 'tag') === scheme();
+    })[0];
+    return hit ? hit.id : null;
+  }
+  if (window.AtlasBare && AtlasBare.bare) {
+    var sid = AtlasBare.id.replace('piglet-processing.', '');
+    if (sid === 'list-ended') P.end();
+    if (sid === 'phone-clash') { P.submit('A05', [{ k: 'iron', n: P.need(P.s.pens.A05, 'iron'), why: '' }]); P.otherPhone(); }
+    (ATLAS_STEPS[sid] || []).forEach(function (s) { act(s[0], s[1]); });
+  }
   render();
 })();
