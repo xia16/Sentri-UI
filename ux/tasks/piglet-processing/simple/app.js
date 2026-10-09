@@ -404,10 +404,9 @@
     var p = pen(), d = V.move;
     var others = P.pens().filter(function (o) { return P.sameBatch(p, o); });
     var body = '<section class="sp-pick">' + UI.heading({ title: T('move.to'), meta: T('move.batch', { b: P.BATCH.name }), kind: 'section', level: 3 }) +
-      '<div class="tk-choice sp-pens" role="group" aria-label="' + esc(T('move.to')) + '">' + others.map(function (o) {
-        return '<button type="button" class="tk-choice-tile" aria-pressed="' + (d.to === o.code) + '" data-action="move-to" data-value="' + o.code + '">' +
-          '<strong>' + o.code + '</strong><small>' + esc(T('day.n', { d: o.age })) + '</small></button>';
-      }).join('') + '</div></section>';
+      UI.choiceGroup(others.map(function (o) {
+        return UI.choiceRow({ label: o.code, mono: true, meta: T('day.n', { d: o.age }), mode: 'single', selected: d.to === o.code, action: 'move-to', value: o.code });
+      })) + '</section>';
     body += stepper('move', T('move.how'), d.n, { min: 1, max: p.alive, variant: 'hero', hint: '' });
     var asks = moveAsks(p);
     asks.forEach(function (k) {

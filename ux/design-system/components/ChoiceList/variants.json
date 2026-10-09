@@ -1,0 +1,81 @@
+[
+  {
+    "id": "navigate",
+    "name": "Navigate",
+    "use": "Use for opening another choice level.",
+    "notUse": "Not for single for selecting a leaf.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Disabled",
+      "Focus",
+      "Loading",
+      "Empty",
+      "Long-label"
+    ]
+  },
+  {
+    "id": "single",
+    "name": "Single",
+    "use": "Use for one value in a picker catalogue.",
+    "notUse": "Not for radio for visible unselected outcomes.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Focus",
+      "Loading",
+      "Empty",
+      "Long-label"
+    ]
+  },
+  {
+    "id": "multi",
+    "name": "Multi",
+    "use": "Use for independent values with trailing checkboxes.",
+    "notUse": "Not for single for one value.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Focus",
+      "Loading",
+      "Empty",
+      "Long-label"
+    ]
+  },
+  {
+    "id": "radio",
+    "name": "Radio rows",
+    "use": "Use for two to four recorded outcomes with visible rings.",
+    "notUse": "Not for PickerField for five or more outcomes.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Focus",
+      "Loading",
+      "Empty",
+      "Long-label"
+    ]
+  },
+  {
+    "id": "inline",
+    "name": "Inline Choice",
+    "use": "Use for two or three short recorded outcomes.",
+    "notUse": "Not for radio rows for long labels.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Focus",
+      "Loading",
+      "Empty",
+      "Long-label"
+    ]
+  }
+]

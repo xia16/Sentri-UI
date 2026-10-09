@@ -99,17 +99,6 @@
 .farrowing-phone .finish-form-details .weight-control input::-webkit-inner-spin-button,.farrowing-phone .finish-form-details .weight-control input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .farrowing-phone .finish-form-details .weight-control:focus-within{outline:2px solid #398257;outline-offset:2px}
 .farrowing-phone .finish-form-details .weight-control input:focus-visible{outline:none}
-.farrowing-phone .assistance-question{margin:24px 0 0;padding:0;border:0;min-width:0}
-.farrowing-phone .answer-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.farrowing-phone .answer-option{display:flex;align-items:center;gap:9px;min-height:46px;padding:10px 13px;border:1px solid #c5cebf;border-radius:10px;background:white;font-size:13px;font-weight:500;cursor:pointer}
-.farrowing-phone .answer-option input{margin:0;width:17px;height:17px;accent-color:#28734b;flex-shrink:0}
-.farrowing-phone .answer-option:has(input:checked){background:#eff8f1;border-color:#398257;color:#245c3b}
-.farrowing-phone .answer-option:has(input:focus-visible){outline:2px solid #398257;outline-offset:2px}
-.farrowing-phone .answer-option input:focus-visible{outline:none}
-.farrowing-phone .answer-controls{display:flex;align-items:center;gap:10px;margin-top:8px}
-.farrowing-phone .answer-controls .answer-options{flex:1;margin:0}
-.farrowing-phone .clear-answer{background:transparent;color:#426b4e;font-size:11px;text-decoration:underline;text-underline-offset:3px;min-height:44px;min-width:44px;padding:0 4px}
-.farrowing-phone .clear-answer:disabled{background:transparent;color:#a0a89b;text-decoration:none}
 .farrowing-phone .finish-question{margin:0 0 12px}
 .farrowing-phone .finish-question legend{font-size:16px}
 .farrowing-phone .question-hint{margin:4px 0 6px}
@@ -132,19 +121,12 @@
 .farrowing-phone .finish-extras-heading{margin-bottom:4px}
 
 .farrowing-phone .finish-field{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px}
-.farrowing-phone .finish-weight-control,.farrowing-phone .finish-choice-pair{width:137px;flex-shrink:0}
-.farrowing-phone .finish-weight-control{display:flex;align-items:center;gap:8px;border:1px solid #c5cebf;border-radius:11px;padding:0 12px;min-height:44px;background:white}
+.farrowing-phone .finish-weight-control{width:calc(var(--size-120) + var(--size-17));flex-shrink:0;display:flex;align-items:center;gap:8px;border:1px solid #c5cebf;border-radius:11px;padding:0 12px;min-height:44px;background:white}
 .farrowing-phone .finish-weight-control input{min-width:0;width:100%;border:0;padding:8px 0;background:transparent;font:500 16px var(--sans);color:var(--ink);appearance:textfield;-moz-appearance:textfield}
 .farrowing-phone .finish-weight-control input::-webkit-inner-spin-button,.farrowing-phone .finish-weight-control input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .farrowing-phone .finish-weight-control>span{font-size:11px;color:var(--muted)}
 .farrowing-phone .finish-weight-control:focus-within{outline:2px solid #3e6890;outline-offset:2px}
 .farrowing-phone .finish-weight-control input:focus-visible{outline:none}
-.farrowing-phone .finish-choice-pair{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.farrowing-phone .finish-choice-pair label{display:flex;align-items:center;justify-content:center;gap:5px;min-height:44px;border:1px solid #c5cebf;border-radius:11px;font-size:13px;cursor:pointer}
-.farrowing-phone .finish-choice-pair input{width:14px;height:14px;margin:0;accent-color:var(--ink)}
-.farrowing-phone .finish-choice-pair label:has(input:checked){border-color:var(--ink);background:#f1f3ed}
-.farrowing-phone .finish-choice-pair label:has(input:focus-visible){outline:2px solid #3e6890;outline-offset:2px}
-.farrowing-phone .finish-choice-pair input:focus-visible{outline:none}
 .farrowing-phone .finish-field-label{position:relative;min-width:0;display:flex;flex-direction:column}
 .farrowing-phone .finish-clear-answer{background:transparent;color:var(--muted);padding:0;text-align:left;font-size:10px;min-height:26px;text-decoration:underline;text-underline-offset:3px}
 .farrowing-phone .finish-pending{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border-radius:10px;background:#fff5df;color:var(--amber)}
@@ -190,7 +172,6 @@
 @media(max-width:370px){
  .farrowing-phone .sheet[data-view="finish"] .summary{padding-top:8px;padding-bottom:4px}
  .farrowing-phone .sheet[data-view="finish"] .finish-question{margin-bottom:8px}
- .farrowing-phone .sheet[data-view="finish"] .assistance-question{margin-top:8px}
  .farrowing-phone .sheet[data-view="count"] .count-area{padding-top:10px;padding-bottom:4px}
  .farrowing-phone .sheet[data-view="count"] .count-label{margin-bottom:4px}
  .farrowing-phone .sheet[data-view="count"] .hero-stepper{min-height:70px}

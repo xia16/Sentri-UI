@@ -78,10 +78,6 @@
 /* Move: the other pens as tiles, four to a line */
 .sp-pick > .st-heading { margin-bottom: 8px; }
 .sheet-body > .sp-pick + * { margin-top: var(--space-section); }
-.tk-choice.sp-pens { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.sp-pens .tk-choice-tile { min-height: 60px; gap: 2px; padding: 8px 4px; }
-.sp-pens .tk-choice-tile strong { font: 600 var(--type-identifier-strong-size)/1.2 var(--font-mono); }
-.sp-pens .tk-choice-tile small { font-size: var(--type-meta-size); color: var(--muted); }
 
 /* ---- outside the phone: the demo controls ----
    Wide window: a card beside (or under) the framed phone. Phone width: a small "Demo" pill on the status bar's empty

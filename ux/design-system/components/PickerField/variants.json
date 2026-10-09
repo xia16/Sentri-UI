@@ -1,0 +1,70 @@
+[
+  {
+    "id": "single",
+    "name": "Single",
+    "use": "Use for one value from five or more options.",
+    "notUse": "Not for ChoiceList radio for two to four outcomes.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Active",
+      "Disabled",
+      "Focus",
+      "Error",
+      "Loading",
+      "Empty",
+      "Long-label"
+    ]
+  },
+  {
+    "id": "multi",
+    "name": "Multi",
+    "use": "Use for several values from a flat or sectioned catalogue.",
+    "notUse": "Not for cascade-multi for a tree.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Active",
+      "Disabled",
+      "Focus",
+      "Error",
+      "Loading",
+      "Empty",
+      "Long-label"
+    ]
+  },
+  {
+    "id": "cascade",
+    "name": "Cascade",
+    "use": "Use for one leaf from a tree, such as medicine category \u2192 medicine.",
+    "notUse": "Not for single for a flat list.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Active",
+      "Disabled",
+      "Focus",
+      "Error",
+      "Loading",
+      "Empty",
+      "Long-label"
+    ]
+  },
+  {
+    "id": "cascade-multi",
+    "name": "Cascade multi",
+    "use": "Use for several leaves across kinds and groups, such as conditions.",
+    "notUse": "Not for multi for a flat list.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Active",
+      "Disabled",
+      "Focus",
+      "Error",
+      "Loading",
+      "Empty",
+      "Long-label"
+    ]
+  }
+]

@@ -222,7 +222,7 @@
       renderSync();if(overlay.querySelector('.sync-drawer'))showSync();
     },900);
   }
-  function sectionChooser(){return head('Your sections','Green Valley Farm')+`<div class="app-scroll screen-enter"><p class="work-note">Choose where you're working.</p><div class="section-list">${sections.map(s=>{const count=pendingTypes(s.id);return btn('section',`<div class="section-card-top"><span class="section-symbol">${icon(s.icon)}</span><strong>${s.name}</strong>${icon(s.id===state.section?'check':'arrow')}</div><p class="population">${s.units.length} units · ${s.population} pigs</p><div class="section-work"><strong>${count?count+' task types ready':'No scheduled work today'}</strong></div>`,'section-card'+(s.id===state.section?' selected':''),s.id);}).join('')}</div><p class="work-note">Work is shared with your team. Your section selection changes the view for you.</p></div>`+nav();}
+  function sectionChooser(){return head('Your sections','Green Valley Farm')+`<div class="app-scroll screen-enter"><p class="work-note">Select where you're working.</p>${SentriUI.choiceGroup(sections.map(s=>{const count=pendingTypes(s.id);return SentriUI.choiceRow({label:s.name,meta:s.units.length+' units · '+s.population+' pigs · '+(count?count+' task types ready':'No scheduled work today'),mode:'single',selected:s.id===state.section,action:'section',value:s.id});}))}<p class="work-note">Work is shared with your team. Your section selection changes the view for you.</p></div>`+nav();}
   function openDesigned(file,unit,entry,lens=null){
     const url=new URL(file,location.href);
     url.searchParams.set('layout','focus');url.searchParams.set('from','home');
@@ -278,11 +278,11 @@
     const list=overlay.querySelector('#unit-options');
     list.innerHTML=all.map(u=>{
       const info=unitInfo(u),count=remaining(u).length;
-      return SentriUI.row({title:'Unit '+u,description:info.pigs+' pigs · '+info.pens+' pens',trailing:count?count+' '+(count===1?'task':'tasks'):'No tasks',action:'pick-unit',value:u,attrs:{'aria-current':state.unit===u?'location':'false'}});
+      return SentriUI.choiceRow({label:'Unit '+u,meta:info.pigs+' pigs · '+info.pens+' pens'+(count?' · '+count+' '+(count===1?'task':'tasks'):' · No tasks'),mode:'single',selected:state.unit===u,action:'pick-unit',value:u});
     }).join('');
   }
   function showUnits(){
-    drawer(section().name+' units',`<p class="unit-picker-count">All ${section().units.length} units</p><div id="unit-options" class="unit-options st-panel st-row-group" role="group" aria-label="Units"></div>`);
+    drawer(section().name+' units',`<p class="unit-picker-count">All ${section().units.length} units</p><div id="unit-options" class="unit-options st-choice-panel" role="group" aria-label="Units"></div>`);
     overlay.querySelector('.sheet,.dialog').classList.add('unit-picker');unitChoices();
   }
   function selectScope(unit){
