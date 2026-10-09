@@ -264,14 +264,13 @@ function openFeature(id, sel) {
   const table = (cls, heads, rows) => `<table class="spec ${cls}"><thead><tr>${heads.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
   const splitState = (t, i) => { const m = String(t).match(/^([^:]{1,60}):\s+([\s\S]+)$/); const title = m ? m[1] : `State ${i + 1}`; const trig = title.match(/\(([^)]+)\)\s*$/); return { title: trig ? title.replace(/\s*\([^)]+\)\s*$/, '') : title, what: m ? m[2] : t, how: trig ? trig[1] : '' }; };
   let pinTok = 0;
+  const lit = (card, on) => { if (card._pin) card._pin.classList.toggle('on', on); if (card._ring) card._ring.hidden = !on; if (card._lead) card._lead.classList.toggle('on', on); };
   function expandCard(card, scroll) {
-    card.closest('.body').querySelectorAll('.ecard.open').forEach((c) => { if (c !== card) { c.classList.remove('open'); c._pin && c._pin.classList.remove('on'); c._ring && (c._ring.hidden = true); } });
-    card.classList.add('open'); if (card._pin) card._pin.classList.add('on'); if (card._ring) card._ring.hidden = false;
-    const lg = card.querySelector('.lg'), more = card.querySelector('.more');
-    if (lg && more) { lg.classList.remove('full'); more.hidden = lg.scrollHeight <= lg.clientHeight + 1; more.textContent = 'more'; }
+    card.closest('.body').querySelectorAll('.ecard.open').forEach((c) => { if (c !== card) { c.classList.remove('open'); lit(c, false); } });
+    card.classList.add('open'); lit(card, true);
     if (scroll) card.scrollIntoView({ block: 'center' });
   }
-  function collapseCard(card) { const sl = card.querySelector('.srcl'); if (sl) { sl.hidden = true; card.querySelector('.srct').textContent = 'Source'; } card.classList.remove('open'); if (card._pin) card._pin.classList.remove('on'); if (card._ring) card._ring.hidden = true; }
+  function collapseCard(card) { const sl = card.querySelector('.srcl'); if (sl) { sl.hidden = true; card.querySelector('.srct').textContent = 'Source ▸'; } card.classList.remove('open'); lit(card, false); }
   function clearPins() { pinTok++; dock.querySelectorAll('.pins').forEach((p) => p.remove()); }
 
   /* find each element on the live phone (by its quoted text, its sample value, then its name) and draw its number over it */
@@ -285,7 +284,7 @@ function openFeature(id, sel) {
       if (!fr || !fr.isConnected) return;
       let doc, phone; try { doc = fr.contentDocument; phone = doc.querySelector('.atlas-phone'); } catch (_) { return; }
       if (!phone) return;
-      const k = parseFloat(box.dataset.k) || 1, W = 390 * k, H = 844 * k, S = 18; // S: the largest pin, tested for room
+      const k = parseFloat(box.dataset.k) || 1, W = 390 * k, H = 844 * k, S = 16; // S: the largest pin, tested for room
       const norm = (t) => String(t || '').replace(/\s+/g, ' ').trim().toLowerCase();
       const pool = [...phone.querySelectorAll('*')].filter((e) => e.childElementCount <= 3 && !/^(script|style|svg|path)$/i.test(e.tagName)).map((e) => { const r = e.getBoundingClientRect(); return { e, r, t: norm(e.textContent), a: r.width * r.height }; }).filter((c) => c.r.width > 2 && c.r.height > 2 && c.r.top < 844 && c.r.bottom > 0 && c.t);
       const find = (needle) => {
@@ -309,12 +308,14 @@ function openFeature(id, sel) {
         cand.push(String(e.name || '').split('·').pop());
         let hit = null; for (const c of cand) { hit = find(c); if (hit) break; }
         if (!hit) { card.classList.add('off'); missing.push(e.name); return; }
-        const r = hit.r, L = r.left * k, T = r.top * k, R = r.right * k, B = r.bottom * k, cy = (T + B) / 2 - S / 2;
+        const r = hit.r, L = r.left * k, T = r.top * k, R = r.right * k, B = r.bottom * k, cy = Math.max(1, Math.min(H - S - 1, (T + B) / 2 - S / 2)), G = 4;
         const free = (x, y) => inside(x, y) && !hits(x, y, texts) && !hits(x, y, taken);
-        let spot = [[L - S - 3, cy], [L - S - 2, T - S - 2], [R + 3, cy]].find(([x, y]) => free(x, y)), leader = null;
-        if (!spot) { // no free spot beside it: a pin in a free margin with a hairline to the element
-          const my = Math.min(H - S - 2, Math.max(2, cy)); const mx = [2, W - S - 2].find((x) => free(x, my));
-          if (mx != null) { spot = [mx, my]; leader = [mx + S / 2, my + S / 2, Math.min(R, Math.max(L, mx + S / 2)), Math.min(B, Math.max(T, my + S / 2))]; }
+        let spot = [[L - S - G, cy], [L - S - G, T - S - G], [R + G, cy], [L, T - S - G], [L, B + G], [R + G, T - S - G]].find(([x, y]) => free(x, y)), leader = false;
+        if (!spot) { // a pin in the phone's left or right margin, with a hairline to the element
+          const sides = [2, W - S - 2].sort((p, q) => Math.abs(p - (L + R) / 2) - Math.abs(q - (L + R) / 2));
+          for (const dy of [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6]) { const y = cy + dy * (S + 2); const x = sides.find((sx) => inside(sx, y) && !hits(sx, y, taken) && !hits(sx, y, texts)); if (x != null) { spot = [x, y]; break; } }
+          if (!spot) { const x = sides.find((sx) => !hits(sx, cy, taken)); if (x != null) spot = [x, cy]; }
+          leader = !!spot;
         }
         if (!spot) { card.classList.add('off'); missing.push(e.name); return; }
         taken.push([spot[0], spot[1], spot[0] + S, spot[1] + S]);
@@ -322,13 +323,15 @@ function openFeature(id, sel) {
         Object.assign(ring.style, { left: L - 2 + 'px', top: T - 2 + 'px', width: R - L + 4 + 'px', height: B - T + 4 + 'px' });
         const pin = el(`<button class="pin" aria-label="Element ${n}: ${esc(e.name)}">${n}</button>`);
         pin.style.left = spot[0] + S / 2 + 'px'; pin.style.top = spot[1] + S / 2 + 'px';
-        if (leader) layer.append(el(`<svg class="lead" width="${W}" height="${H}"><line x1="${leader[0]}" y1="${leader[1]}" x2="${leader[2]}" y2="${leader[3]}"/></svg>`));
-        const hot = (on) => { pin.classList.toggle('hot', on); ring.hidden = !(on || card.classList.contains('open')); };
-        card._pin = pin; card._ring = ring; card._hot = hot;
+        let lead = null;
+        if (leader) { const px = spot[0] + S / 2, py = spot[1] + S / 2; lead = el(`<svg class="lead" width="${W}" height="${H}"><line x1="${px}" y1="${py}" x2="${Math.min(R, Math.max(L, px))}" y2="${Math.min(B, Math.max(T, py))}"/></svg>`); layer.append(lead); }
+        const hot = (on) => { pin.classList.toggle('hot', on); ring.hidden = !(on || card.classList.contains('open')); if (lead) lead.classList.toggle('on', on || card.classList.contains('open')); };
+        card._pin = pin; card._ring = ring; card._lead = lead; card._hot = hot;
         card.addEventListener('mouseenter', () => hot(true)); card.addEventListener('mouseleave', () => hot(false));
         pin.addEventListener('mouseenter', () => expandCard(card, true)); pin.addEventListener('mouseleave', () => hot(false));
         pin.onclick = () => expandCard(card, true);
         layer.append(ring, pin);
+        if (card.classList.contains('open')) lit(card, true);
       });
       const nn = document.querySelector('#sec-elements .n');
       if (nn && missing.length) { nn.textContent = `${items.length} · ${missing.length} not on screen`; nn.title = 'Not found on the screen: ' + missing.join('; '); }
@@ -346,9 +349,10 @@ function openFeature(id, sel) {
     const head = `<div class="spechead"><div class="t"><h2>${esc(s.name)}</h2>${s.zh ? `<span class="zh">${esc(s.zh)}</span>` : ''}<span class="pill">${dot(s.status)}${esc(STATUS[s.status] || s.status)}</span>${gate}</div>
       ${confirm.length ? `<div class="badges"><span class="badge">To confirm <b>${confirm.length}</b></span></div>` : ''}</div>
       ${nt.purpose ? `<p class="lead">${esc(nt.purpose)}</p>` : ''}`;
-    const cards = els.map((e, i) => `<article class="ecard" data-i="${i}"><div class="eh" role="button" tabindex="0"><span class="num">${i + 1}</span><b>${esc(e.name)}</b></div><div class="ex">${e.shows ? `<code class="cv">${esc(e.shows)}</code>` : ''}${e.logic ? `<p class="lg">${esc(e.logic)}</p><button class="more" hidden>more</button>` : ''}${e.source ? `<button class="srct">Source</button><div class="srcl" hidden>${esc(e.source)}</div>` : ''}</div></article>`);
+    const split = (t) => { const ss = String(t).match(/[^.!?]+(?:[.!?]+(?=\s|$)|$)\s*/g) || [t]; let a = '', i = 0; while (i < ss.length && (!a || a.length + ss[i].length <= 190)) a += ss[i++]; return [a.trim(), ss.slice(i).join('').trim()]; };
+    const cards = els.map((e, i) => { const [la, lb] = split(e.logic || ''); return `<article class="ecard" data-i="${i}"><div class="eh" role="button" tabindex="0"><span class="num">${i + 1}</span><b>${esc(e.name)}</b></div><div class="ex">${e.shows ? `<code class="cv">${esc(e.shows)}</code>` : ''}${la ? `<p class="lg">${esc(la)}${lb ? `<span class="rest" hidden> ${esc(lb)}</span>` : ''}</p>` : ''}${lb || e.source ? `<div class="lnk">${lb ? '<button class="more">more</button>' : ''}${e.source ? '<button class="srct">Source ▸</button>' : ''}</div>` : ''}${e.source ? `<div class="srcl" hidden>${esc(e.source)}</div>` : ''}</div></article>`; });
     const body = [
-      (issues.length ? `<section class="sec issues" id="sec-issues" data-open="false"><h3 class="sh" tabindex="0" role="button" aria-expanded="false"><span class="lbl">${issues.length} issue${issues.length === 1 ? '' : 's'}</span><span class="caret">${ICON.caret}</span></h3><div class="sb">${issues.map((t) => `<div class="callout">${ICON.warn}<p>${esc(t)}</p></div>`).join('')}</div></section>` : ''),
+      (issues.length ? `<section class="sec issues" id="sec-issues" data-open="false"><h3 class="sh" tabindex="0" role="button" aria-expanded="false"><span class="lbl">${issues.length} issue${issues.length === 1 ? '' : 's'}</span><span class="caret">${ICON.caret}</span></h3><div class="sb">${issues.map((t) => `<div class="callout iss" role="button" tabindex="0">${ICON.warn}<p>${esc(t)}</p><span class="chev">${ICON.caret}</span></div>`).join('')}</div></section>` : ''),
       sec('elements', 'Elements', els.length, els.length > 0, els.length ? `<div class="ecards">${cards.join('')}</div>` : none),
       sec('states', 'States', states.length, states.length > 0 && states.length <= 6, states.length ? table('states', ['State', 'What changes', 'How you get there'], states.map((x) => `<tr><td class="k">${esc(x.title)}</td><td>${esc(x.what)}</td><td class="how">${x.how ? esc(x.how) : '<span class="muted">—</span>'}</td></tr>`)) : none),
       sec('controls', 'Controls', ctrls.length, ctrls.length > 0 && ctrls.length <= 6, ctrls.length ? table('controls', ['Control', 'Does', 'Goes to'], ctrls.map((c) => `<tr><td class="k">${esc(c.control)}</td><td>${esc(c.does)}</td><td class="to">${goesTo(c.goesTo)}</td></tr>`)) : none),
@@ -371,11 +375,12 @@ function openFeature(id, sel) {
       const toggle = () => { const sec = h.parentElement, on = sec.dataset.open !== 'true'; sec.dataset.open = on; h.setAttribute('aria-expanded', on); };
       h.onclick = toggle; h.onkeydown = (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(); } };
     });
+    body.querySelectorAll('.callout.iss').forEach((c) => { const t = () => c.classList.toggle('open'); c.onclick = t; c.onkeydown = (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); t(); } }; });
     body.querySelectorAll('.ecard').forEach((c) => {
       const row = c.querySelector('.eh'), toggle = () => (c.classList.contains('open') ? collapseCard(c) : expandCard(c, false));
       row.onclick = toggle; row.onkeydown = (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(); } };
-      const st = c.querySelector('.srct'); if (st) st.onclick = () => { const sl = c.querySelector('.srcl'); sl.hidden = !sl.hidden; st.textContent = sl.hidden ? 'Source' : 'Hide source'; };
-      const more = c.querySelector('.more'); if (more) more.onclick = () => { const full = c.querySelector('.lg').classList.toggle('full'); more.textContent = full ? 'less' : 'more'; };
+      const st = c.querySelector('.srct'); if (st) st.onclick = () => { const sl = c.querySelector('.srcl'); sl.hidden = !sl.hidden; st.textContent = sl.hidden ? 'Source ▸' : 'Source ▾'; };
+      const more = c.querySelector('.more'); if (more) more.onclick = () => { const r = c.querySelector('.rest'); r.hidden = !r.hidden; more.textContent = r.hidden ? 'more' : 'less'; };
     });
     body.querySelectorAll('[data-go]').forEach((b) => { b.onclick = () => goto(b.dataset.go); });
     body.querySelectorAll('[data-prd]').forEach((a) => { a.onclick = (ev) => { ev.preventDefault(); notesTab = 'prd'; fillNotes(); }; });
@@ -394,7 +399,8 @@ function openFeature(id, sel) {
       const sb = el('<div class="sb"></div>'); let n = h.nextSibling; while (n && !(n.nodeType === 1 && n.tagName === 'H2')) { const nx = n.nextSibling; sb.append(n); n = nx; }
       const sec = el(`<section class="sec" data-open="${/^(problem|rules)$/i.test(h.textContent.trim())}"></section>`);
       const hd = el(`<h3 class="sh" tabindex="0" role="button"><span class="lbl">${esc(h.textContent)}</span><span class="caret">${ICON.caret}</span></h3>`);
-      h.replaceWith(sec); sec.append(hd, sb); hd.setAttribute('aria-expanded', sec.dataset.open);
+      const pv = (sb.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 140);
+      h.replaceWith(sec); sec.append(hd, el(`<p class="prev">${esc(pv)}</p>`), sb); hd.setAttribute('aria-expanded', sec.dataset.open);
       const toggle = () => { const on = sec.dataset.open !== 'true'; sec.dataset.open = on; hd.setAttribute('aria-expanded', on); };
       hd.onclick = toggle; hd.onkeydown = (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(); } };
     });
@@ -430,12 +436,15 @@ function openFeature(id, sel) {
     } else { shown = nid; dock.append(el('<div class="cap">&nbsp;</div>'), shot(idx[nid], { height: H })); }
     const ns = idx[shown] && idx[shown].notes, noteCount = ns ? (ns.elements || []).filter((e) => !CHROME.test(`${e.name} ${e.shows}`)).length : 0;
     const tools = el(`<div class="tools"><button class="notesbtn" data-notes aria-pressed="${notes.classList.contains('open')}"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 2.5h10v11H3z M5.5 5.5h5 M5.5 8h5 M5.5 10.5h3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nc">Notes${noteCount ? ` · ${noteCount}` : ''}</span></button>${other ? `<a href="#" data-other>Open ${esc(other.name)}</a>` : ''}</div>`);
-    tools.firstChild.onclick = () => { if (notes.classList.contains('open')) setNotes(false); else openNotes(); };
+
     const ol = tools.querySelector('[data-other]'); if (ol) ol.onclick = (ev) => { ev.preventDefault(); openFeature(other.id); };
     dock.append(tools); if (notes.classList.contains('open')) fillNotes();
   }
 
   col.append(wrap, notes); page.append(col, dock);
+  let pdown = false; const toggleNotes = () => { if (notes.classList.contains('open')) setNotes(false); else openNotes(); };
+  dock.addEventListener('pointerdown', (ev) => { if (ev.button === 0 && ev.target.closest('[data-notes]')) { pdown = true; toggleNotes(); } });
+  dock.addEventListener('click', (ev) => { if (!ev.target.closest('[data-notes]')) return; if (pdown) { pdown = false; return; } toggleNotes(); });
   pz = panzoom(wrap, plane, () => fitTo(wrap, width, height, 1, 14, 0.7));
   wrap.querySelectorAll('[data-z]').forEach((b) => { b.onclick = () => { const z = +b.dataset.z; z ? pz.step(z > 0 ? 1.2 : 1 / 1.2) : pz.fit(); }; });
   requestAnimationFrame(() => pz.fit());

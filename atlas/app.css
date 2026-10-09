@@ -280,3 +280,26 @@ table.copy td.id { font:11.5px var(--mono); overflow-wrap:anywhere }
 .edgechip[hidden] { display:none }
 .notes .doc code, .notes code { font-size:12px }
 .pins .lead line { stroke-width:.75; stroke-dasharray:2 2; opacity:.4 }
+
+/* review round 7 */
+.pin { width:14px; height:14px; font-size:11px; letter-spacing:-.6px; border-width:0; box-shadow:0 0 0 1.5px #fff, 0 1px 3px #0004 }
+.pin.hot, .pin.on { transform:translate(-50%,-50%) scale(1.3) } .pin:hover { transform:translate(-50%,-50%) scale(1.3) }
+.pins .lead { opacity:.45 } .pins .lead.on { opacity:1 } .pins .lead line { stroke-width:1; stroke-dasharray:none; opacity:1 }
+.lg { display:block; -webkit-line-clamp:unset; overflow:visible }
+.lnk { display:flex; justify-content:flex-end; gap:12px; margin-top:4px }
+.lnk button, .more, .srct { display:inline; margin:0; font-size:12px; font-weight:600; color:var(--muted); text-decoration:underline }
+.lnk button:hover { color:var(--ink) }
+.callout.iss { cursor:pointer; align-items:center }
+.callout.iss p { flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.callout.iss.open { align-items:flex-start } .callout.iss.open p { white-space:normal; overflow:visible }
+.callout .chev { color:var(--amber); display:inline-flex; flex:none; transition:transform .12s } .callout.iss.open .chev { transform:rotate(180deg); margin-top:3px }
+.sec.issues .sb { max-height:calc((100vh - 56px) * .4); overflow:auto; padding-bottom:8px }
+.flowwrap.cut::after { width:72px; background:linear-gradient(to right, rgba(243,244,238,0), var(--ground) 55%, var(--ground)) }
+.dock .tools .notesbtn[aria-pressed=true] { background:var(--green-wash); border-color:var(--green); color:var(--green) }
+.notes header { align-items:center; height:52px; padding-top:0; padding-bottom:0 }
+.notes .tab, .notes .x { display:inline-flex; align-items:center; justify-content:center; height:28px; line-height:1 }
+.notes .x { margin-left:auto; width:28px; padding:0 }
+.notes .doc .prev { margin:6px 0 2px; font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.notes .doc .sec[data-open=true] > .prev { display:none }
+.node > span { -webkit-line-clamp:3; line-height:1.2; font-size:12px }
+.flowwrap.cut::after { width:90px; background:linear-gradient(to right, rgba(243,244,238,0), var(--ground) 35%, var(--ground)) }
