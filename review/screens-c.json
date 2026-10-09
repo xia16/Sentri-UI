@@ -155,18 +155,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-c-16",
-  "target": {
-   "kind": "screen",
-   "id": "inspection.find-pig"
-  },
-  "kind": "broken",
-  "severity": "low",
-  "title": "Sample-tag button touches the field label; result tags not mono",
-  "detail": "'Try sample tag 000306' ends at y=392 where the 'Ear tag or pen' label starts: no gap. Results set ear tags in Plus Jakarta while the walk uses mono. Fix: section gap above the label; identifier type for tags.",
-  "source": "screen-review"
- },
- {
   "id": "screens-c-17",
   "target": {
    "kind": "screen",
