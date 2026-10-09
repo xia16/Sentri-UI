@@ -804,3 +804,6 @@
 .inspection-phone .log-date-field{flex:1;min-width:0;margin:0}
 
 .inspection-phone [data-action="sample-scan"]+.inspect-search{margin-top:var(--space-section)}
+
+.inspection-phone .feed-editor-sheet>.sheet-body{display:block;overflow-y:auto}
+.inspection-phone .feed-editor-sheet .feed-fixed-form{height:auto;min-height:0}

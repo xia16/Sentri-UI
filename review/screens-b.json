@@ -1,17 +1,5 @@
 [
  {
-  "id": "screens-b-1",
-  "target": {
-   "kind": "screen",
-   "id": "feed-plan.editor"
-  },
-  "kind": "broken",
-  "severity": "high",
-  "title": "Adjust feed hides its controls; Save can never be enabled",
-  "detail": "From Pen feeding, Adjust feed shows only the pig table. The Adjustment panel (mode, %, end date, note) sits below a 297px sheet body with overflow hidden; \"Complete the required fields first\" floats unpadded at the left edge. Fix: let the sheet body grow or scroll to the panel.",
-  "source": "screen-review"
- },
- {
   "id": "screens-b-4",
   "target": {
    "kind": "feature",
