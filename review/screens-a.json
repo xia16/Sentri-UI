@@ -238,18 +238,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-a-24",
-  "target": {
-   "kind": "screen",
-   "id": "environment.issue-resolved"
-  },
-  "kind": "broken",
-  "severity": "low",
-  "title": "Resolve toast covers the issue's reporter line",
-  "detail": "After Mark resolved, the toast 'Issue resolved in this preview' sits over the evidence card, hiding 'G. Hansen · 06:40'. Fix: show the toast above the footer without covering content, or drop it since the status already reads Resolved.",
-  "source": "screen-review"
- },
- {
   "id": "screens-a-25",
   "target": {
    "kind": "screen",

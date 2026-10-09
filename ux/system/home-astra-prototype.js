@@ -327,7 +327,7 @@
     if(a==='apply-device'){if(sync.connection==='offline')return;const d=unitDevices()[0];d.mode=d.draftMode;d.speed=d.draftSpeed;d.updated='Preview setting applied · just now';render();toast('Sample setting saved · no equipment command sent');return;}
     if(a==='report-fault'){reportFault();return;}
     if(a==='fault-detail'){faultDetail(v);return;}
-    if(a==='resolve-fault'){const f=maintenanceRecords().find(f=>f.id===state.faultId);if(f)f.resolved=true;closeDrawer();render();toast('Issue resolved in this preview');return;}
+    if(a==='resolve-fault'){const f=maintenanceRecords().find(f=>f.id===state.faultId);if(f)f.resolved=true;closeDrawer();render();faultDetail(state.faultId);return;}
     if(a==='assistant'||a==='context-assistant'){if(a==='assistant')state.workUnit=state.unit;state.assistantTab=a==='context-assistant'?'chat':'findings';push('assistant');return;}
     if(a==='assistant-tab'){state.assistantTab=v;render();return;}
     if(a==='suggestion'){chat(v);return;}
