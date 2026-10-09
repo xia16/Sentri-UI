@@ -1,25 +1,43 @@
 <!doctype html><meta charset="utf-8">
 <section data-state="Default"><h3>Default</h3><div id="state-Default"></div>
-<script>var UI=window.SentriUI;document.getElementById("state-Default").innerHTML=UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "multi", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false});</script>
+
 </section>
 <section data-state="Pressed"><h3>Pressed</h3><div id="state-Pressed"></div>
-<script>var UI=window.SentriUI;document.getElementById("state-Pressed").innerHTML=UI.choiceGroup(UI.choiceRow({"pressed": true, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "multi", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false});</script>
+
 </section>
 <section data-state="Selected"><h3>Selected</h3><div id="state-Selected"></div>
-<script>var UI=window.SentriUI;document.getElementById("state-Selected").innerHTML=UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "multi", "selected": true, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false});</script>
+
 </section>
 <section data-state="Disabled"><h3>Disabled</h3><div id="state-Disabled"></div>
-<script>var UI=window.SentriUI;document.getElementById("state-Disabled").innerHTML=UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": true, "reason": "Unavailable offline. Reconnect to select.", "label": "Amoxicillin", "mode": "multi", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false});</script>
+
 </section>
 <section data-state="Focus" data-preview="focus"><h3>Focus</h3><div id="state-Focus"></div>
-<script>var UI=window.SentriUI;document.getElementById("state-Focus").innerHTML=UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "multi", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false});</script>
+
 </section>
 <section data-state="Loading"><h3>Loading</h3><div id="state-Loading"></div>
-<script>var UI=window.SentriUI;document.getElementById("state-Loading").innerHTML=UI.choiceEmpty("Loading options\u2026");</script>
+
 </section>
 <section data-state="Empty"><h3>Empty</h3><div id="state-Empty"></div>
-<script>var UI=window.SentriUI;document.getElementById("state-Empty").innerHTML=UI.choiceEmpty("No options available.");</script>
+
 </section>
 <section data-state="Long-label"><h3>Long-label</h3><div id="state-Long-label"></div>
-<script>var UI=window.SentriUI;document.getElementById("state-Long-label").innerHTML=UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称", "mode": "multi", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false});</script>
+
 </section>
+<script>
+// Each state renders in its own iframe in the atlas: draw only the states present.
+var UI = window.SentriUI;
+var RENDER = {
+  "state-Default": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "multi", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false}),
+  "state-Pressed": () => UI.choiceGroup(UI.choiceRow({"pressed": true, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "multi", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false}),
+  "state-Selected": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "multi", "selected": true, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false}),
+  "state-Disabled": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": true, "reason": "Unavailable offline. Reconnect to select.", "label": "Amoxicillin", "mode": "multi", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false}),
+  "state-Focus": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "multi", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false}),
+  "state-Loading": () => UI.choiceEmpty("Loading options\u2026"),
+  "state-Empty": () => UI.choiceEmpty("No options available."),
+  "state-Long-label": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称", "mode": "multi", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false})
+};
+document.querySelectorAll('[data-state]').forEach(function (s) {
+  var t = RENDER[s.id] ? s : s.querySelector('[id]');
+  if (t && RENDER[t.id]) t.innerHTML = RENDER[t.id]();
+});
+</script>

@@ -27,5 +27,5 @@ const R={
 "dialog-waiting":()=>UI.sheet({variant:'dialog',title:'End task early?',icon:'alert',subtitle:'Unfinished work stays incomplete. Records are kept.',body:UI.rowSelect({title:'I want to end the task',action:'ack',value:'ack'}),footer:foot({primary:{label:'End task early',action:'end',register:'danger',waiting:true},status:{text:'Tick the box to confirm'}})}),
 "dialog-zh":()=>UI.sheet({variant:'dialog',title:'\u8981\u63d0\u524d\u7ed3\u675f\u8fd9\u9879\u4efb\u52a1\u5417\uff1f\u672a\u5b8c\u6210\u7684\u5de5\u4f5c\u4f1a\u4fdd\u7559',icon:'alert',subtitle:'\u5df2\u7ecf\u8bb0\u5f55\u7684\u5185\u5bb9\u4e0d\u4f1a\u4e22\u5931\uff0c\u672a\u5b8c\u6210\u7684\u5de5\u4f5c\u4ecd\u7136\u4fdd\u6301\u672a\u5b8c\u6210\u72b6\u6001\u3002',body:'',footer:UI.sheetFooter({back:{action:'back',label:'\u8fd4\u56de'},primary:{label:'\u63d0\u524d\u7ed3\u675f\u4efb\u52a1',action:'end',register:'danger'}})})
 };
-document.querySelectorAll('[data-demo]').forEach(el=>{const k=el.getAttribute('data-demo'),r=R[k];el.querySelector('.bg').innerHTML=bg();if(r)el.querySelector('.over').innerHTML=r();});
+document.querySelectorAll('[data-state]').forEach(el=>{const k=el.getAttribute('data-demo'),r=R[k];el.querySelector('.bg').innerHTML=bg();if(r)el.querySelector('.over').innerHTML=r();});
 </script></body></html>

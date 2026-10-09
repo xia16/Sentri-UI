@@ -31,5 +31,5 @@ const R={
 "page-zh":()=>UI.sheet({variant:'page',bar:bar,title:'\u732a\u6ce8\u8bb0\u5f55\u548c\u4e8b\u4ef6\u6e05\u5355\uff0c\u5305\u62ec\u51fa\u751f\u3001\u6b7b\u4ea1\u3001\u8f6c\u680f\u548c\u8ba1\u6570',subtitle:'B4 \u00b7 \u6bcd\u732a 000254 \u00b7 \u7b2c 2 \u5929',body:rows(3,'\u8bb0\u5f55'),footer:UI.sheetFooter({back:{action:'back',label:'\u8fd4\u56de'}})}),
 "page-over":()=>UI.sheet({variant:'page',bar:bar,title:'Treatment',subtitle:'B4 \u00b7 11 alive',body:rows(2),footer:foot({primary:{label:'Record treatment',action:'save'}})})+UI.sheet({title:'Medicine',subtitle:'Pick one',size:'short',body:rows(2,'Medicine'),footer:UI.sheetFooter({back:{action:'back'}})})
 };
-document.querySelectorAll('[data-demo]').forEach(el=>{const k=el.getAttribute('data-demo'),r=R[k];el.querySelector('.bg').innerHTML=bg();if(r)el.querySelector('.over').innerHTML=r();});
+document.querySelectorAll('[data-state]').forEach(el=>{const k=el.getAttribute('data-demo'),r=R[k];el.querySelector('.bg').innerHTML=bg();if(r)el.querySelector('.over').innerHTML=r();});
 </script></body></html>

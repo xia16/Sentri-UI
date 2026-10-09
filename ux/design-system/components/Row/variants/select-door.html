@@ -1,6 +1,22 @@
-<div data-state="Default" id="sd-state-0"><script>document.getElementById('sd-state-0').innerHTML=SentriUI.rowSelectDoor({"title": "000418", "description": "Sow · parity 3 · Pen A02", "value": "000418", "openAction": "pig", "openValue": "000418", "mono": true, "wrap": true});</script></div>
-<div data-state="Pressed (door)" id="sd-state-1"><script>document.getElementById('sd-state-1').innerHTML=SentriUI.rowSelectDoor({"title": "000418", "description": "Sow · parity 3 · Pen A02", "value": "000418", "openAction": "pig", "openValue": "000418", "mono": true, "wrap": true, "attrs": {"data-preview": "pressed"}});</script></div>
-<div data-state="Selected" id="sd-state-2"><script>document.getElementById('sd-state-2').innerHTML=SentriUI.rowSelectDoor({"title": "000418", "description": "Sow · parity 3 · Pen A02", "value": "000418", "openAction": "pig", "openValue": "000418", "mono": true, "wrap": true, "checked": true});</script></div>
-<div data-state="Selected + Pressed" id="sd-state-3"><script>document.getElementById('sd-state-3').innerHTML=SentriUI.rowSelectDoor({"title": "000418", "description": "Sow · parity 3 · Pen A02", "value": "000418", "openAction": "pig", "openValue": "000418", "mono": true, "wrap": true, "checked": true, "attrs": {"data-preview": "pressed"}});</script></div>
-<div data-state="No door" id="sd-state-5"><script>document.getElementById('sd-state-5').innerHTML=SentriUI.rowSelect({"title": "Pen C1", "description": "3 displayed pigs", "value": "C1", "wrap": true, "checked": true});</script></div>
-<div data-state="Long label / Chinese" id="sd-state-4"><script>document.getElementById('sd-state-4').innerHTML=SentriUI.rowSelectDoor({"title": "检查待处理的母猪与仔猪记录", "description": "母猪 · 胎次 3 · 长文字完整换行到下一行", "value": "000418", "openAction": "pig", "openValue": "000418", "mono": true, "wrap": true});</script></div>
+<div data-state="Default" id="sd-state-0"></div>
+<div data-state="Pressed (door)" id="sd-state-1"></div>
+<div data-state="Selected" id="sd-state-2"></div>
+<div data-state="Selected + Pressed" id="sd-state-3"></div>
+<div data-state="No door" id="sd-state-5"></div>
+<div data-state="Long label / Chinese" id="sd-state-4"></div>
+<script>
+// Each state renders in its own iframe in the atlas: draw only the states present.
+var UI = window.SentriUI;
+var RENDER = {
+  "sd-state-0": () => SentriUI.rowSelectDoor({"title": "000418", "description": "Sow · parity 3 · Pen A02", "value": "000418", "openAction": "pig", "openValue": "000418", "mono": true, "wrap": true}),
+  "sd-state-1": () => SentriUI.rowSelectDoor({"title": "000418", "description": "Sow · parity 3 · Pen A02", "value": "000418", "openAction": "pig", "openValue": "000418", "mono": true, "wrap": true, "attrs": {"data-preview": "pressed"}}),
+  "sd-state-2": () => SentriUI.rowSelectDoor({"title": "000418", "description": "Sow · parity 3 · Pen A02", "value": "000418", "openAction": "pig", "openValue": "000418", "mono": true, "wrap": true, "checked": true}),
+  "sd-state-3": () => SentriUI.rowSelectDoor({"title": "000418", "description": "Sow · parity 3 · Pen A02", "value": "000418", "openAction": "pig", "openValue": "000418", "mono": true, "wrap": true, "checked": true, "attrs": {"data-preview": "pressed"}}),
+  "sd-state-5": () => SentriUI.rowSelect({"title": "Pen C1", "description": "3 displayed pigs", "value": "C1", "wrap": true, "checked": true}),
+  "sd-state-4": () => SentriUI.rowSelectDoor({"title": "检查待处理的母猪与仔猪记录", "description": "母猪 · 胎次 3 · 长文字完整换行到下一行", "value": "000418", "openAction": "pig", "openValue": "000418", "mono": true, "wrap": true})
+};
+document.querySelectorAll('[data-state]').forEach(function (s) {
+  var t = RENDER[s.id] ? s : s.querySelector('[id]');
+  if (t && RENDER[t.id]) t.innerHTML = RENDER[t.id]();
+});
+</script>
