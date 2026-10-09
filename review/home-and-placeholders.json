@@ -1,17 +1,5 @@
 [
  {
-  "id": "home-and-placeholders-1",
-  "target": {
-   "kind": "feature",
-   "id": "environment"
-  },
-  "kind": "broken",
-  "severity": "high",
-  "title": "All 7 environment screens open the unit hub, not their own screen",
-  "detail": "None of the environment screens has steps or a preset, so each opens the Home unit page instead of the sensors, fan, maintenance or issue views. The atlas shows the wrong picture for the whole feature.",
-  "source": "sweep"
- },
- {
   "id": "home-and-placeholders-2",
   "target": {
    "kind": "feature",

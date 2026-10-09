@@ -84,7 +84,7 @@
   let state = {page:'home',section:initialSection,unit:null,task:null,workUnit:null,assistantTab:'findings',chat:[],answered:false,notes:[],log:[],overlay:null};
   // UI-only queue: no device database or upload service is connected to this study.
   const pendingExamples=[{title:'Pregnancy check · 000308',context:'Gestation · Unit 7 · Batch 31',time:'09:32'},{title:'Pen note · C2',context:'Gestation · Unit 8',time:'09:35'},{title:'Feed adjustment · 000267',context:'Gestation · Unit 7 · Pen C1',time:'09:38'}];
-  const sync={connection:'offline',pending:[...pendingExamples],status:'waiting',message:'',attempt:0};
+  const sync={connection:params.get('connection')==='online'?'online':'offline',pending:[...pendingExamples],status:'waiting',message:'',attempt:0};
   if(params.get('view')==='sections')state.page='sections';
   if(params.get('view')==='unit'){const available=sections.find(s=>s.id===initialSection).units;state.unit=available.includes(+params.get('unit'))?+params.get('unit'):available[0];}
   const app = $('#app'), overlay = $('#overlay');

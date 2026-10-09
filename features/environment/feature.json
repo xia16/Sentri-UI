@@ -183,14 +183,17 @@
           "Only a ventilation fan exists; the concept names \"devices\" in general.",
           "unclear: alert thresholds, who is told when a reading is out of range, and where real data comes from; none are in the code."
         ]
-      }
+      },
+      "steps": [
+        "[data-action=\"environment\"]"
+      ]
     },
     {
       "id": "environment.fan-manual",
       "name": "Fan in Manual mode",
       "zh": "风机手动模式",
       "status": "in-design",
-      "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7&connection=online",
       "preset": "",
       "figma": "",
       "notes": {
@@ -231,7 +234,11 @@
         "issues": [
           "No confirmation or safety limit for speed 0; unclear whether 0% is allowed on a real fan."
         ]
-      }
+      },
+      "steps": [
+        "[data-action=\"environment\"]",
+        "[data-action=\"fan-mode\"][data-value=\"manual\"]"
+      ]
     },
     {
       "id": "environment.maintenance",
@@ -290,7 +297,10 @@
           "The path here is Toolbox, two taps from the unit; the unit screen's Maintenance chip does not link here.",
           "No photo, priority, assignee, or history of who resolved it."
         ]
-      }
+      },
+      "steps": [
+        "[data-action=\"unit-fault\"]"
+      ]
     },
     {
       "id": "environment.maintenance-empty",
@@ -330,7 +340,11 @@
         "edge": [],
         "rules": [],
         "issues": []
-      }
+      },
+      "steps": [
+        "Toolbox",
+        "Maintenance"
+      ]
     },
     {
       "id": "environment.report-issue",
@@ -362,7 +376,11 @@
         "issues": [
           "Equipment and location are free text; no list of the unit's devices or pens is offered."
         ]
-      }
+      },
+      "steps": [
+        "[data-action=\"unit-fault\"]",
+        "Report issue"
+      ]
     },
     {
       "id": "environment.issue-detail",
@@ -394,7 +412,11 @@
         "issues": [
           "Resolving needs no note and records no resolver or time."
         ]
-      }
+      },
+      "steps": [
+        "[data-action=\"unit-fault\"]",
+        "[data-action=\"fault-detail\"]"
+      ]
     },
     {
       "id": "environment.issue-resolved",
@@ -432,7 +454,12 @@
         "issues": [
           "Cannot reopen an issue."
         ]
-      }
+      },
+      "steps": [
+        "[data-action=\"unit-fault\"]",
+        "[data-action=\"fault-detail\"]",
+        "Mark resolved"
+      ]
     }
   ]
 }
