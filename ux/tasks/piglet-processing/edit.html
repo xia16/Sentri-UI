@@ -1134,7 +1134,7 @@
   /* ---- render: keeps scroll and focus; live regions mount empty and are filled after (ADR 0002) ---- */
   function render() {
     var scr = document.getElementById('screen');
-    var body = scr.querySelector('[data-view="' + view + '"] .tk-sheet-body, .tk-page-body'), top = body ? body.scrollTop : 0;
+    var body = scr.querySelector('[data-view="' + view + '"] .sheet-body, .sheet-body'), top = body ? body.scrollTop : 0;
     var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-action]');
     var fk = f ? [f.dataset.action, f.dataset.value || '', f.dataset.step || '', f.dataset.key || ''] : null;
     var html;
@@ -1151,7 +1151,7 @@
     }
     PP.apply(scr);
     UI.liveFill(scr, { then: function (el) { PP.apply(el); } });
-    var nb = scr.querySelector('[data-view="' + view + '"] .tk-sheet-body, .tk-page-body'); if (nb) nb.scrollTop = top;
+    var nb = scr.querySelector('[data-view="' + view + '"] .sheet-body, .sheet-body'); if (nb) nb.scrollTop = top;
     // the pinned correction card covers the top of the list: anything scrolled into view stops below it (R3-15)
     var pin = nb && nb.querySelector('.ed-sticky'); if (nb) nb.style.scrollPaddingTop = pin ? (pin.offsetHeight - 18 + 8) + 'px' : '';
     // The pad rule: the host scrolls the active field into view above the docked pad.
@@ -1202,7 +1202,7 @@
     try { localStorage.removeItem(key()); } catch (err) {}
     setUrl('edit-saved', { saved: saved.id });
     render();
-    var sb = document.querySelector('[data-view="edit"] .tk-sheet-body'); if (sb) sb.scrollTop = 0;
+    var sb = document.querySelector('[data-view="edit"] .sheet-body'); if (sb) sb.scrollTop = 0;
   }
   function saveDouble() {
     var p = dblPair(); if (!p) return;
@@ -1356,7 +1356,7 @@
       }, 5000);
     } else if (a === 'undo-clear') {
       clearTimeout(clearTimer); if (cleared) draft = cleared.draft; cleared = null; render();
-      var cl = document.querySelector('[data-view="edit"] .tk-sheet-head [data-action="clear"]'); if (cl) cl.focus();
+      var cl = document.querySelector('[data-view="edit"] .utility-header [data-action="clear"]'); if (cl) cl.focus();
     } else if (a === 'save') {
       if (now - lastSave < 600) { render(); return; }
       lastSave = now;

@@ -469,14 +469,14 @@
     else if (S.view === 'suggest') { var dr = suggestSheet(); html = dr ? explainPage(true) + dr : explainPage(); }
     if (over) html = '<div inert>' + html + '</div>' + over;
     var root = document.getElementById('screen');
-    var body = root.querySelector('.tk-sheet .tk-sheet-body, .tk-page .tk-page-body'), top = body ? body.scrollTop : 0, view = S.view + ':' + S.sub;
+    var body = root.querySelector('.sheet .sheet-body, .sheet[data-presentation="page"] .sheet-body'), top = body ? body.scrollTop : 0, view = S.view + ':' + S.sub;
     // the phone and the room behind are drawn once and stay (an iframe reloads when re-inserted); the sheets re-render
     if (!root.querySelector('#ct-over')) root.innerHTML = K.phone('<div id="ct-over" class="ct-over"></div>', { bar: false, label: s('pp.count.title') });
     if (S.view !== 'explain' && !root.querySelector('.ct-behind')) root.querySelector('#ct-over').insertAdjacentHTML('beforebegin', behind());
     root.querySelector('#ct-over').innerHTML = html;
     PP.apply(root);
     UI.liveFill(root, { then: function (el) { PP.apply(el); } });      // live regions mount empty, then fill (Status)
-    var nb = root.querySelector('.tk-sheet .tk-sheet-body, .tk-page .tk-page-body'); if (nb && view === S.lastView) nb.scrollTop = top;
+    var nb = root.querySelector('.sheet .sheet-body, .sheet[data-presentation="page"] .sheet-body'); if (nb && view === S.lastView) nb.scrollTop = top;
     S.lastView = view;
   }
 
@@ -620,7 +620,7 @@
   });
   // Swipe down on a sheet's grab or head = Back.
   var grab = null;
-  document.getElementById('screen').addEventListener('pointerdown', function (ev) { if (ev.target.closest('.tk-grab, .tk-sheet-head')) grab = ev.clientY; }, true);
+  document.getElementById('screen').addEventListener('pointerdown', function (ev) { if (ev.target.closest('.grab, .utility-header')) grab = ev.clientY; }, true);
   document.getElementById('screen').addEventListener('pointerup', function (ev) {
     if (grab != null && ev.clientY - grab > 100) { if (back() !== 'nav') render(); }
     grab = null;

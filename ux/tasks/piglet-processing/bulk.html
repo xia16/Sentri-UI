@@ -234,12 +234,12 @@
   /* ---- render: keeps scroll and focus ---- */
   var scr = document.getElementById('screen');
   function render() {
-    var pb = scr.querySelector('.tk-page-body'), top = pb ? pb.scrollTop : 0;
+    var pb = scr.querySelector('.sheet-body'), top = pb ? pb.scrollTop : 0;
     var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-action]');
     var fk = f ? [f.dataset.action, f.value || f.dataset.value || ''] : null;
     scr.innerHTML = K.phone(page() + (S.review ? review() : ''), { bar: false });
     PP.apply(scr);
-    var nb = scr.querySelector('.tk-page-body'); if (nb) nb.scrollTop = top;
+    var nb = scr.querySelector('.sheet-body'); if (nb) nb.scrollTop = top;
     if (fk) {
       var t = Array.prototype.filter.call(scr.querySelectorAll('[data-action]'), function (e) { return e.dataset.action === fk[0] && (e.value || e.dataset.value || '') === fk[1] && !e.closest('[inert]'); })[0];
       if (t) t.focus({ preventScroll: true });
@@ -290,9 +290,9 @@
   ['pointerdown', 'touchstart'].forEach(function (e) { window.addEventListener(e, armHold, { passive: true, capture: true }); });
   window.addEventListener('scroll', function () {
     if (!S.held.length) return;
-    var pb = scr.querySelector('.tk-page-body'); if (!pb) return;
+    var pb = scr.querySelector('.sheet-body'); if (!pb) return;
     var topY = pb.getBoundingClientRect().top;
-    var els = Array.prototype.filter.call(scr.querySelectorAll('.tk-page .tk-row[data-flash]'), function (e) { return true; });
+    var els = Array.prototype.filter.call(scr.querySelectorAll('.sheet[data-presentation="page"] .tk-row[data-flash]'), function (e) { return true; });
     if (els.length && els.every(function (e) { return e.getBoundingClientRect().bottom <= topY; })) settle(); else armHold();
   }, { passive: true, capture: true });
 
@@ -317,7 +317,7 @@
     else if (a === 'leave') nav('room.html', { state: 'room', filter: doseCfg(DOSE).tx, unit: ROOM !== 7 ? ROOM : '' });
     else if (a === 'open-litter') nav('litter.html', { state: 'litter', crate: v, unit: ROOM !== 7 ? ROOM : '' });
   });
-  function focusSheet() { var sh = scr.querySelector('.tk-sheet'); if (sh) sh.focus({ preventScroll: true }); }
+  function focusSheet() { var sh = scr.querySelector('.sheet'); if (sh) sh.focus({ preventScroll: true }); }
   /* The contract: what the review shows for each ticked litter, frozen when Review opens (piglets, alive, dead, moves, counts). */
   function freeze() {
     S.contract = {};

@@ -34,7 +34,7 @@
 /* Find's result is the room's row, flat and divided (farrowing's finder), on the sheet's column */
 .pp-results .tk-row { padding-left: 0; padding-right: 0; border-bottom: 1px solid var(--line); }
 /* Filter's footer: Back · Reset · Show (farrowing's Filter sows); Reset is Back's width */
-.tk-footer > .button.pp-reset { flex: none; width: var(--back-width); min-width: 0; padding-left: 8px; padding-right: 8px; }
+.sheet-footer > .button.pp-reset { flex: none; width: var(--back-width); min-width: 0; padding-left: 8px; padding-right: 8px; }
 /* the litter drawer (litter.js) */
 .lt-face { display: flex; flex-direction: column; gap: var(--space-heading); }
 .lt-face > .pp-group { margin-top: var(--space-heading); }
@@ -720,7 +720,7 @@
   /* ---- render: keeps the room's scroll, the drawer's scroll and focus ---- */
   function render() {
     var sc = phone.querySelector('.tk-scroll'), top = sc ? sc.scrollTop : 0;
-    var sh = phone.querySelector('.tk-sheet'), sb = sh && sh.querySelector('.tk-sheet-body'), sv = sh ? sh.dataset.view || '' : '', stop = sb ? sb.scrollTop : 0;
+    var sh = phone.querySelector('.sheet'), sb = sh && sh.querySelector('.sheet-body'), sv = sh ? sh.dataset.view || '' : '', stop = sb ? sb.scrollTop : 0;
     var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-action]');
     var fk = f ? [f.dataset.action, f.dataset.value || '', f.dataset.step || ''] : null;
     var header = K.header({ title: P('pp.common.task'), back: { action: 'back' }, backLabel: P('pp.room.aria.back') });
@@ -728,7 +728,7 @@
     var overlay = S.error ? '' : LD.view ? LD.html() : roomSheet();
     phone.innerHTML = K.statusbar() + K.screen({ header: header, body: body, dock: S.error ? '' : dock(), inert: !!overlay, label: P('pp.room.aria.list', { n: ROOM }) }) + overlay;
     var sc2 = phone.querySelector('.tk-scroll'); if (sc2) sc2.scrollTop = top;
-    var sh2 = phone.querySelector('.tk-sheet'), sb2 = sh2 && sh2.querySelector('.tk-sheet-body');
+    var sh2 = phone.querySelector('.sheet'), sb2 = sh2 && sh2.querySelector('.sheet-body');
     if (sb2 && sh2.dataset.view === sv) sb2.scrollTop = stop;
     PP.apply(phone);
     UI.liveFill(phone, { then: function (el) { PP.apply(el); } });

@@ -649,7 +649,7 @@
   /* ---- render: the active page over the room (one page at a time) ---- */
   var screen = document.getElementById('screen');
   function render() {
-    var scroll = screen.querySelector('.tk-page-body'), top = scroll ? scroll.scrollTop : 0, was = S.shown;
+    var scroll = screen.querySelector('.sheet-body'), top = scroll ? scroll.scrollTop : 0, was = S.shown;
     var inner;
     if (!TASK) {
       // A unit with no processing task: nothing to end here; its litters record deaths, counts and moves (Q18)
@@ -663,7 +663,7 @@
     PP.apply(screen);
     UI.liveFill(screen, { then: function (el) { PP.apply(el); } });
     S.shown = S.sheet + (S.ended ? ':e' : '');
-    var nb = screen.querySelector('.tk-page-body');
+    var nb = screen.querySelector('.sheet-body');
     if (nb) nb.scrollTop = S.shown === was ? top : S.sheet === 'overview' ? S.ovScroll : 0;
   }
 
@@ -684,7 +684,7 @@
     try { history[push ? 'pushState' : 'replaceState'](st || {}, '', location.pathname + '?' + p.toString()); } catch (e) {}
   }
   function openSheet(n) {
-    if (S.sheet === 'overview') { var b = screen.querySelector('.tk-page-body'); if (b) S.ovScroll = b.scrollTop; }
+    if (S.sheet === 'overview') { var b = screen.querySelector('.sheet-body'); if (b) S.ovScroll = b.scrollTop; }
     var from = S.sheet; S.sheet = n; S.opened = Date.now(); setUrl(true, { sheet: n, from: from }); render();
   }
   function closeSheet() {

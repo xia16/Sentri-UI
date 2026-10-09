@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T16:19:03.017Z",
- "commit": "5108fab",
+ "generated": "2026-10-09T17:14:19.236Z",
+ "commit": "65212a6",
  "platforms": [
   {
    "id": "mobile",
@@ -13077,213 +13077,225 @@
   {
    "name": "Sheet",
    "group": "Base",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "status": "agent-checked",
+    "round": 3,
+    "judged": "2026-10-10",
+    "commit": "c2a8d06",
     "model": "claude-opus-5-5",
     "scores": {
-     "clarity": 4,
-     "budget": 4,
-     "hierarchy": 7,
-     "spacing": 5,
-     "broken": 4
+     "clarity": 8,
+     "budget": 8,
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 8
     },
-    "lowest": 4,
+    "lowest": 8,
+    "previous": [
+     {
+      "finding": "Drawers still open on drawers (piglet record-death/weight/more-actions over the pen drawer; farrowing Dead/Edit over the sow drawer)",
+      "fixed": true,
+      "note": "Tapped through at 390x844. Piglet A03: the pen drawer 000245 is opened, then Record death, Litter weight, More actions and More actions > Set count each show as the only visible role=dialog. Back brings 000245 back, and saving Record 1 death also returns to it. Farrowing: Dead 6 > Back gives the sow drawer 000418 alone. Edit record > Back does the same. Sow details opens as an embedded page, and Back returns to 000418. farrowing.born is a dialog over the Edit drawer, which the README allows ('a dialog for the one question')."
+     },
+     {
+      "finding": "Old host CSS still styles the sheet (farrowing .sheet/.dialog, astra-surfaces.css in dist, study page on AstraSurfaces.present)",
+      "fixed": true,
+      "note": "No .sheet/.dialog/.scrim/.grab geometry rules are left in the farrowing CSS. The born dialog footer now starts at x=21, the same as the preview, not 42. dist/app.html no longer links astra-surfaces. sentri-components-study.js builds through UI.sheet/UI.sheetFooter. Leftover: ux/system/astra-surfaces.css still exists, unlinked."
+     },
+     {
+      "finding": "Primary labels 'Submit'/'Save' break the label rule",
+      "fixed": true,
+      "note": "In use: Record items, Record deaths / Record 1 death, Record weight, Record 12 piglets, Save correction."
+     },
+     {
+      "finding": "workbench.end-task-early is a yes/no drawn as a drawer",
+      "fixed": true,
+      "note": "It is a dialog with an alert glyph, one line, no close, and Back 86x48 + End task early 248x48 (danger)."
+     },
+     {
+      "finding": "Aside actions look different (farrowing Clear filled)",
+      "fixed": true,
+      "note": "Farrowing's Clear (Dead, Edit) is now plain st-text-action, 48x48, matching inspection's Reset."
+     },
+     {
+      "finding": "Preview gaps (no lead/Above/glyph; scrim missed the heading; Waiting bodies did not match)",
+      "fixed": true,
+      "note": "There is a new 'Lead + Above (drill-down)' drawer cell (back-arrow lead, search Above) and a dialog 'Without glyph' cell. The cells have a status bar, so the drawer scrim dims Pen B4. The drawer Waiting cell has a Died stepper for 'Say how many died', and the dialog Waiting cell draws the checkbox."
+     }
+    ],
     "checklist": [
      {
       "line": 1,
       "pass": true,
-      "why": "\"The two ways a surface is presented\" - drawer vs page."
+      "why": "\"The one surface presented over a task\"; Banner, Status and a task screen named as alternatives."
      },
      {
       "line": 2,
       "pass": true,
-      "why": "Choosing between them: a drawer holds about five fields; a page form has Back."
+      "why": "Both lists present; alternatives (Banner, Status, page, dialog) exist."
      },
      {
       "line": 3,
-      "pass": false,
-      "why": "Grab, close, subtitle, aside and the status line are not named here (only in TaskSheet)."
+      "pass": true,
+      "why": "Every named part is now drawn, including the lead, Above and the glyph, with and without."
      },
      {
       "line": 4,
-      "pass": false,
-      "why": "Four sizes plus page, but dialog is a separate card and TaskSheet/TaskPage duplicate the drawer and page."
+      "pass": true,
+      "why": "Three variants, each with use/not-use and real screens."
      },
      {
       "line": 5,
       "pass": true,
-      "why": "Static container; states belong to the contents (stated)."
+      "why": "Default, pressed, waiting-with-reason, error, empty, long/Chinese and held size are drawn; loading is stated n/a."
      },
      {
       "line": 6,
-      "pass": false,
-      "why": "Preview footer buttons are 44px; the drawer close is 44x44 in farrowing and piglet processing."
+      "pass": true,
+      "why": "21 preview cells and 9 real screens have no visible control under 48px. The born dialog radios (20px) sit in full-width tappable rows."
      },
      {
       "line": 7,
-      "pass": false,
-      "why": "Max two footer actions stated, but inspection.filters renders three (Back, Reset, Show pigs)."
+      "pass": true,
+      "why": "Max two footer controls; every real footer complies (More actions has Back only)."
      },
      {
       "line": 8,
       "pass": true,
-      "why": "n/a (no selected/error state)."
+      "why": "Waiting primaries show a reason in words in use (Tick at least one item, Say how many died, Type the weight)."
      },
      {
       "line": 9,
-      "pass": false,
-      "why": "No title copy rules; the preview uses \"Close\", which TaskSheet bans."
+      "pass": true,
+      "why": "The label rule holds in real screens: a verb plus its count (Record 1 death, Record 12 piglets)."
      },
      {
       "line": 10,
-      "pass": false,
-      "why": "No role=dialog/aria-modal or focus rule in this card; inspection drawers have only a grab bar (a gesture) plus Back, no close."
+      "pass": true,
+      "why": "role=dialog on every surface, and one modal at a time in the piglet and farrowing flows."
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "Raw #dce0d4 handle, #fff/white page, #b6c0ad Back border, 28px radius, raw padding."
+      "pass": true,
+      "why": "Sheet geometry comes from the bundle's tokens only. The remaining farrowing px rules style body content, not the sheet."
      },
      {
       "line": 12,
       "pass": true,
-      "why": "n/a"
+      "why": "n/a (not a form field)."
      },
      {
       "line": 13,
-      "pass": false,
-      "why": "Piglet processing stacks a drawer on a drawer (record-death over the pen sheet); no unsaved-change exit rule."
+      "pass": true,
+      "why": "Close or Back is always visible. Back returns up one level, and a second drawer never stacks."
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "Does not link TaskSheet/TaskPage/TaskDialog or say which is canonical."
+      "pass": true,
+      "why": "Related list and classification stated; retired Task* named."
      },
      {
       "line": 15,
-      "pass": false,
-      "why": "The 375 preview shows one short drawer only; no page, no sizes, no dialog."
+      "pass": true,
+      "why": "Every listed state is drawn per variant at phone width, with no horizontal overflow measured."
      }
     ],
     "classification": "component",
     "variants": [
      {
-      "name": "drawer (compact/short/medium/long, content-sized)",
+      "name": "drawer",
       "usedBy": [
        "farrowing.death",
        "farrowing.finish",
+       "farrowing.edit",
        "inspection.filters",
        "inspection.review-selected",
+       "inspection.go-to-pen",
+       "inspection.finish",
        "piglet-processing.sheet-todo",
-       "piglet-processing.record-death"
+       "piglet-processing.record-death",
+       "piglet-processing.weight",
+       "piglet-processing.more-actions"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 5,
-       "budget": 4,
-       "hierarchy": 7,
-       "spacing": 4,
-       "broken": 4
-      },
-      "findings": [
-       "Two implementations (.sheet in farrowing/inspection, .tk-sheet in piglet processing).",
-       "Inspection drawers are a fixed medium height with half of it empty; the footer pads 12/18 so the buttons end at 832px, on the handle bar (832-836).",
-       "Left edges disagree: inspection body 21 / footer 18; farrowing sow drawer body 18 / footer 21.",
-       "Close present in farrowing and piglet processing, absent in inspection."
-      ]
-     },
-     {
-      "name": "page (full canvas, Back footer)",
-      "usedBy": [
-       "farrowing.history",
-       "farrowing.task-ready",
-       "inspection.pen",
-       "inspection.walk-log",
-       "piglet-processing.pen-log",
-       "piglet-processing.end-task"
-      ],
-      "status": "in-design",
-      "scores": {
-       "clarity": 7,
-       "budget": 5,
+       "clarity": 8,
+       "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
-       "broken": 7
+       "broken": 8
       },
       "findings": [
-       "Renders the same across all three features, but through two implementations (.sheet[data-presentation=page] and TaskPage .tk-page)."
+       "One drawer at a time, verified by tapping through. Footer 14/21/28, close 48x48, Back 86x48, primary 248x48.",
+       "farrowing.death says the count three times: the title 'Dead 6', the subtitle '1 unsaved' and the label 'Record 1 death'."
       ]
      },
      {
-      "name": "dialog (one question over a drawer)",
+      "name": "page",
       "usedBy": [
-       "farrowing.death",
-       "farrowing.history"
+       "farrowing.history",
+       "farrowing.profile",
+       "inspection.pen",
+       "inspection.walk-log",
+       "inspection.actions",
+       "piglet-processing.pen-log",
+       "piglet-processing.move-piglets",
+       "piglet-processing.end-task"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 7,
-       "budget": 7,
-       "hierarchy": 7,
-       "spacing": 7,
-       "broken": 7
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
       },
       "findings": [
-       "Lives only in TaskDialog and farrowing CSS; not documented on Sheet."
+       "Unchanged from round 2: clean."
+      ]
+     },
+     {
+      "name": "dialog",
+      "usedBy": [
+       "farrowing.born",
+       "workbench.end-task-early"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "The inset is fixed: the footer starts at 21 in farrowing.born. The dialog backdrop does not blur, unlike the drawer scrim. The README does not say whether this is on purpose."
       ]
      }
     ],
     "findings": [
      {
-      "severity": "high",
-      "text": "One job, two implementations: Sheet (.sheet, farrowing + inspection) and TaskSheet/TaskPage (.tk-*, piglet processing) draw the same drawer and page with different gutters, heights and close rules.",
-      "fix": "Make Sheet the one card with variants drawer | page | dialog, implemented by the TaskSheet/TaskPage/TaskDialog code (the fixed one); port farrowing and inspection to it."
+      "severity": "low",
+      "text": "farrowing.death states the same count three times: 'Dead 6' in the title, '1 unsaved' in the subtitle and 'Record 1 death' on the primary.",
+      "fix": "Drop the '· 1 unsaved' subtitle part; the primary already carries the unsaved count."
      },
      {
-      "severity": "high",
-      "text": "Inspection drawer footers pad 12px 18px: the buttons end at y=832, on the 92x4 handle bar (832-836).",
-      "fix": "Use the footer padding 14/21/28 on every sheet footer (TaskSheet already does)."
+      "severity": "low",
+      "text": "ux/system/astra-surfaces.css is no longer linked anywhere but still exists, so it reads as a second implementation.",
+      "fix": "Delete the file (astra-surfaces.js isPage stays if its test still needs it)."
      },
      {
-      "severity": "high",
-      "text": "The inspection.filters footer holds three actions (Back, Reset, Show pigs), breaking the two-action law.",
-      "fix": "Move Reset to a text action in the drawer head (aside), leaving Back + Show pigs."
-     },
-     {
-      "severity": "medium",
-      "text": "Fixed-height drawers with dead space and a distant footer (inspection.review-selected, inspection.filters).",
-      "fix": "Content-sized by default (data-sizing=content / TaskSheet height:\"content\")."
-     },
-     {
-      "severity": "medium",
-      "text": "The exit is inconsistent: the Sheet preview says \"Close\"; inspection drawers have no close; the farrowing Dead drawer swaps the close for Clear; TaskSheet bans Close.",
-      "fix": "One rule on Sheet: the footer exit is Back; drawers also carry the close IconButton; aside text actions sit left of it and never replace it."
-     },
-     {
-      "severity": "medium",
-      "text": "A drawer stacked on a drawer (piglet-processing.record-death over the pen sheet), against one overlay at a time.",
-      "fix": "Replace the pen drawer content in place (push), or use the dialog variant for a single question."
+      "severity": "low",
+      "text": "The dialog backdrop has no blur, but the drawer scrim does. The README does not say whether this is intended.",
+      "fix": "State it in the README (e.g. 'a dialog keeps what it sits over readable'), or give .dialog-backdrop the same --blur-scrim."
      }
     ],
     "proposals": [
      {
       "kind": "merge",
-      "name": "TaskSheet + TaskPage + TaskDialog -> Sheet (drawer | page | dialog)",
-      "why": "Same job, two code paths; one card with three presentations.",
-      "seenIn": [
-       "farrowing.death",
-       "inspection.filters",
-       "piglet-processing.sheet-todo",
-       "piglet-processing.pen-log"
-      ]
-     },
-     {
-      "kind": "merge",
       "name": "TaskHold -> Sheet footer + Button hold",
-      "why": "It is only the footer placement of the Button hold.",
+      "why": "TaskHold is still only where the Button hold sits in the footer (carried from rounds 1-2).",
       "seenIn": [
        "farrowing.finish",
        "piglet-processing.end-task"
@@ -15430,12 +15442,6 @@
    "gate": null
   },
   {
-   "name": "TaskSheet",
-   "group": "Task skeleton",
-   "status": "in-design",
-   "gate": null
-  },
-  {
    "name": "TaskHold",
    "group": "Task skeleton",
    "status": "in-design",
@@ -15509,18 +15515,6 @@
   },
   {
    "name": "TaskDay",
-   "group": "Task skeleton",
-   "status": "in-design",
-   "gate": null
-  },
-  {
-   "name": "TaskPage",
-   "group": "Task skeleton",
-   "status": "in-design",
-   "gate": null
-  },
-  {
-   "name": "TaskDialog",
    "group": "Task skeleton",
    "status": "in-design",
    "gate": null
@@ -20045,9 +20039,9 @@
     "id": "Sheet"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "One job, two implementations: Sheet (.sheet, farrowing + inspection) and TaskSheet/TaskPage…",
-   "detail": "One job, two implementations: Sheet (.sheet, farrowing + inspection) and TaskSheet/TaskPage (.tk-*, piglet processing) draw the same drawer and page with different gutters, heights and close rules.\nFix: Make Sheet the one card with variants drawer | page | dialog, implemented by the TaskSheet/TaskPage/TaskDialog code (the fixed one); port farrowing and inspection to it.",
+   "severity": "low",
+   "title": "farrowing.death states the same count three times: 'Dead 6' in the title, '1 unsaved' in the…",
+   "detail": "farrowing.death states the same count three times: 'Dead 6' in the title, '1 unsaved' in the subtitle and 'Record 1 death' on the primary.\nFix: Drop the '· 1 unsaved' subtitle part; the primary already carries the unsaved count.",
    "source": "gate"
   },
   {
@@ -20057,9 +20051,9 @@
     "id": "Sheet"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "Inspection drawer footers pad 12px 18px: the buttons end at y=832, on the 92x4 handle bar (832-836).",
-   "detail": "Inspection drawer footers pad 12px 18px: the buttons end at y=832, on the 92x4 handle bar (832-836).\nFix: Use the footer padding 14/21/28 on every sheet footer (TaskSheet already does).",
+   "severity": "low",
+   "title": "ux/system/astra-surfaces.css is no longer linked anywhere but still exists, so it reads as a…",
+   "detail": "ux/system/astra-surfaces.css is no longer linked anywhere but still exists, so it reads as a second implementation.\nFix: Delete the file (astra-surfaces.js isPage stays if its test still needs it).",
    "source": "gate"
   },
   {
@@ -20069,45 +20063,9 @@
     "id": "Sheet"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "The inspection.filters footer holds three actions (Back, Reset, Show pigs), breaking the…",
-   "detail": "The inspection.filters footer holds three actions (Back, Reset, Show pigs), breaking the two-action law.\nFix: Move Reset to a text action in the drawer head (aside), leaving Back + Show pigs.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Sheet:3",
-   "target": {
-    "kind": "component",
-    "id": "Sheet"
-   },
-   "kind": "design",
-   "severity": "medium",
-   "title": "Fixed-height drawers with dead space and a distant footer (inspection.review-selected,…",
-   "detail": "Fixed-height drawers with dead space and a distant footer (inspection.review-selected, inspection.filters).\nFix: Content-sized by default (data-sizing=content / TaskSheet height:\"content\").",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Sheet:4",
-   "target": {
-    "kind": "component",
-    "id": "Sheet"
-   },
-   "kind": "design",
-   "severity": "medium",
-   "title": "The exit is inconsistent: the Sheet preview says \"Close\"; inspection drawers have no close; the…",
-   "detail": "The exit is inconsistent: the Sheet preview says \"Close\"; inspection drawers have no close; the farrowing Dead drawer swaps the close for Clear; TaskSheet bans Close.\nFix: One rule on Sheet: the footer exit is Back; drawers also carry the close IconButton; aside text actions sit left of it and never replace it.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Sheet:5",
-   "target": {
-    "kind": "component",
-    "id": "Sheet"
-   },
-   "kind": "design",
-   "severity": "medium",
-   "title": "A drawer stacked on a drawer (piglet-processing.record-death over the pen sheet), against one…",
-   "detail": "A drawer stacked on a drawer (piglet-processing.record-death over the pen sheet), against one overlay at a time.\nFix: Replace the pen drawer content in place (push), or use the dialog variant for a single question.",
+   "severity": "low",
+   "title": "The dialog backdrop has no blur, but the drawer scrim does. The README does not say whether this…",
+   "detail": "The dialog backdrop has no blur, but the drawer scrim does. The README does not say whether this is intended.\nFix: State it in the README (e.g. 'a dialog keeps what it sits over readable'), or give .dialog-backdrop the same --blur-scrim.",
    "source": "gate"
   },
   {
@@ -20118,20 +20076,8 @@
    },
    "kind": "decision",
    "severity": "medium",
-   "title": "Merge TaskSheet + TaskPage + TaskDialog -> Sheet (drawer | page | dialog)?",
-   "detail": "Same job, two code paths; one card with three presentations.\nSeen in: farrowing.death, inspection.filters, piglet-processing.sheet-todo, piglet-processing.pen-log",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Sheet:p1",
-   "target": {
-    "kind": "component",
-    "id": "Sheet"
-   },
-   "kind": "decision",
-   "severity": "medium",
    "title": "Merge TaskHold -> Sheet footer + Button hold?",
-   "detail": "It is only the footer placement of the Button hold.\nSeen in: farrowing.finish, piglet-processing.end-task",
+   "detail": "TaskHold is still only where the Button hold sits in the footer (carried from rounds 1-2).\nSeen in: farrowing.finish, piglet-processing.end-task",
    "source": "gate"
   },
   {

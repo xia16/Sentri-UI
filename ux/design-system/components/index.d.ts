@@ -562,6 +562,69 @@ export interface SentriUI {
   iconButton(props: IconButtonProps): string;
 }
 
+/** Sheet: drawer | page | dialog. A text slot is a string, { text, str, args } (the string registry's twin) or { html } (trusted markup). */
+export type SheetText = string | { text?: string; str?: string; args?: Record<string, unknown>; html?: string };
+/** A Button spec for a footer; `waiting` draws the waiting face (aria-disabled), `describedby` is wired by sheetFooter's status. */
+export interface SheetAction { label: SheetText; action?: string; value?: string; register?: 'primary' | 'secondary' | 'tool' | 'text' | 'danger'; waiting?: boolean; busy?: boolean; describedby?: string; className?: string; attrs?: SafeAttrs }
+export interface SheetProps {
+  /** drawer (default): over the page, sized to its content, a handle and a ✕ · page: the whole canvas, Back in the footer, no ✕ · dialog: one small decision rising from the bottom. */
+  variant?: 'drawer' | 'page' | 'dialog';
+  title: SheetText;
+  /** One line under the title; an array of text slots joined by { sep: true } (parts may carry tone). For a dialog it is the description. */
+  subtitle?: SheetText | Array<SheetText | { sep: true } | { text: string; tone: 'amber' | 'red' | 'green' }>;
+  subtitleTone?: 'amber' | 'red' | 'green';
+  /** A glyph name before a dialog's title. */
+  icon?: IconName;
+  /** Drawer only: the ✕. It is always drawn; this renames its action / label. */
+  close?: { action?: string; value?: string; label?: SheetText };
+  /** Raw HTML: an up-one-level control before the title (a drawer that drills into categories). Not a second Back. */
+  lead?: string;
+  /** Raw HTML: text actions (Clear, Reset) left of the ✕, never in its place. */
+  aside?: string;
+  /** Raw HTML between the head and the body that does not scroll (a filter bar). */
+  above?: string;
+  body?: string;
+  bodyClass?: string;
+  /** A sheetFooter() string; false for none (a picker that drills by its lead control). Default: Back alone. */
+  footer?: string | false;
+  /** Drawer max height: compact 42% · short 58% · medium 76% (default) · long 85%. */
+  size?: 'compact' | 'short' | 'medium' | 'long';
+  /** content (default): as tall as the content, up to size · full: held at size for content that grows as the worker taps. */
+  sizing?: 'content' | 'full';
+  label?: SheetText;
+  /** Written as data-view for the host. */
+  view?: string;
+  className?: string;
+  id?: string;
+  /** Overlay layer: z = base + 10 × layer (scrim 2, drawer 3, page 5, dialog 8). Overlays after a sheet in the phone rise a layer on their own. */
+  layer?: number;
+  inert?: boolean;
+  /** Page: trusted markup for the status bar. */
+  bar?: string;
+  /** Drawer: the scrim's action / label, or false to omit it. */
+  scrim?: { action?: string; value?: string; label?: SheetText } | false;
+  attrs?: SafeAttrs;
+}
+export interface SheetFooterProps {
+  /** Back, the footer's exit; `false` for none. Default { action: 'back' }. */
+  back?: { action?: string; value?: string; label?: SheetText } | false;
+  /** The primary on the right: a Button spec, or trusted HTML. */
+  primary?: SheetAction | string;
+  /** A hold-to-commit in place of the primary. */
+  hold?: { label: SheetText; caption?: SheetText; action?: string; value?: string; tone?: 'danger' | 'primary'; phase?: string; waiting?: boolean; statusId?: string; describedby?: string };
+  /** The one line above the bar: why the primary waits. Drawn whenever the primary / hold is waiting or the line has an action; visible: false keeps it read-only. */
+  status?: string | { text?: string; str?: string; args?: Record<string, unknown>; id?: string; tone?: 'amber' | 'red'; visible?: boolean; action?: SheetAction };
+  /** Trusted footer markup in place of back / primary / hold (a host's own two controls). */
+  content?: string;
+  className?: string;
+}
+export interface SentriUI {
+  sheet(props: SheetProps): string;
+  sheetFooter(props?: SheetFooterProps): string;
+  backButton(props?: { action?: string; value?: string; label?: SheetText; className?: string }): string;
+  scrim(props?: { action?: string; value?: string; label?: SheetText; layer?: number }): string;
+}
+
 export interface SentriIcons {
   /** name → SVG path data on a 24×24 grid. */
   readonly paths: Readonly<Record<IconName, string>>;

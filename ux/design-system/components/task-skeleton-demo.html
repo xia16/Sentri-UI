@@ -19,16 +19,16 @@
 .tk-pair-col > h3 { margin: 0 0 8px; padding: 0 var(--space-gutter); font: 500 var(--type-group-label-size)/1.5 var(--font-sans); color: var(--muted); }
 .tk-pair-col > img { display: block; width: 100%; height: auto; }
 /* Host layout of the demo's own screens: the stack gaps between the parts (farrowing's page body gap 18). */
-.tk-page[data-view="foster"] .tk-page-body > * + * { margin-top: 18px; }
+.sheet[data-presentation="page"][data-view="foster"] .sheet-body > * + * { margin-top: 18px; }
 .tk-demo-section { display: flex; flex-direction: column; gap: 10px; }
-.tk-page[data-view="overview"] .tk-page-body > * + * { margin-top: var(--space-section); }
-.tk-page:is([data-view="end"], [data-view="receipt"]) .tk-page-body { display: flex; flex-direction: column; gap: 16px; }
-.tk-page[data-view="care"] .tk-page-body { display: flex; flex-direction: column; gap: var(--space-heading); }
+.sheet[data-presentation="page"][data-view="overview"] .sheet-body > * + * { margin-top: var(--space-section); }
+.sheet[data-presentation="page"]:is([data-view="end"], [data-view="receipt"]) .sheet-body { display: flex; flex-direction: column; gap: 16px; }
+.sheet[data-presentation="page"][data-view="care"] .sheet-body { display: flex; flex-direction: column; gap: var(--space-heading); }
 .tk-demo-stack { display: flex; flex-direction: column; }
 .tk-demo-stack > .st-segment { margin: 0 0 4px; }
 .tk-demo-stack > .tk-warning { margin: 17px 0; }
 .tk-demo-section > * { margin: 0; }
-.tk-sheet[data-view="count"] .tk-sheet-body > * + * { margin-top: var(--space-heading); }
+.sheet[data-view="count"] .sheet-body > * + * { margin-top: var(--space-heading); }
 @media (min-width: 431px) {
   .tk-pair-grid { grid-template-columns: repeat(2, var(--phone-width)); justify-content: center; gap: var(--space-action-section); }
   .tk-pair-col > h3 { padding: 0; }

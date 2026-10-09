@@ -50,7 +50,7 @@ try {
   await lens(page, 'done');
   assert.match(await rowText(page, 'A02'), /Iron done just now/);
   await page.click('[data-action="filter"]');
-  await page.click('.tk-sheet [data-action="clear-filter"]');
+  await page.click('.sheet [data-action="clear-filter"]');
   await page.click('[data-action="close-sheet"]');
   await page.waitForTimeout(100);
   assert.doesNotMatch(page.url(), /filter=/);

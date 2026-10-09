@@ -15,7 +15,7 @@ const base = `http://localhost:${port}/ux/tasks/piglet-processing/`;
 const ready = (p) => p.waitForSelector('html[data-ready]');
 const text = async (p, sel) => (await p.locator(sel).first().innerText()).replace(/\s+/g, ' ');
 // the surface on top: the Move sheet (R2-22: a sheet like Record death; Save and Back return to the litter drawer)
-const drawer = (p) => text(p, '.tk-sheet');
+const drawer = (p) => text(p, '.sheet');
 const back = async (p) => { await p.waitForURL(/room\.html\?.*state=litter/); await ready(p); };
 
 // room → the litter (its drawer over the room, or its own page) → its Move door
@@ -27,7 +27,7 @@ async function openMove(page, crate, fresh) {
   await page.waitForURL(/state=litter/); await ready(page);
   await page.click(`[data-action="open-move"]`);
   await page.waitForURL(/move\.html/); await ready(page);
-  await page.waitForSelector('.tk-sheet[data-view="move"]');
+  await page.waitForSelector('.sheet[data-view="move"]');
 }
 async function find(page, q) {
   const box = page.locator('[data-role="crate-q"]');
@@ -83,7 +83,7 @@ try {
   await page.click('[data-action="save-move"]');
   await back(page);
   assert.match(await drawer(page), /Saved · 2 piglets moved to B02/);
-  const face = await text(page, '.tk-sheet');
+  const face = await text(page, '.sheet');
   assert.match(face, /Iron 0–2 of 8 owed · check/);
   console.log('ok 3 ask waits → Move 2 to B02 · Iron unknown → B09 owes 0–2 of 8');
 
@@ -112,15 +112,15 @@ try {
   console.log('ok 5 crowded warning:', d.match(/B08 will have[^.]*\./)[0]);
 
   // 6. Back from the Move sheet lands on the litter's drawer over the room, its Move door there again.
-  await page.click('.tk-sheet[data-view="move"] .tk-footer [data-action="back"]');
+  await page.click('.sheet[data-view="move"] .sheet-footer [data-action="back"]');
   await page.waitForURL(/room\.html\?.*state=litter.*crate=C05/); await ready(page);
   await page.locator('[data-action="open-move"]').first().waitFor();
   console.log('ok 6 Back → the litter drawer');
 
   // 7. R2-22: the Move is a sheet (title, subtitle, Clear, Back, pinned footer); the likely crates lead, the lookup forgives.
   await openMove(page, 'A02', true);
-  assert.equal(await page.locator('.tk-sheet[data-view="move"] .tk-sheet-title').innerText(), 'Move piglets');
-  assert.equal(await page.locator('.tk-sheet[data-view="move"] .tk-footer [data-action="back"]').count(), 1);
+  assert.equal(await page.locator('.sheet[data-view="move"] .sheet-title').innerText(), 'Move piglets');
+  assert.equal(await page.locator('.sheet[data-view="move"] .sheet-footer [data-action="back"]').count(), 1);
   const likely = await page.locator('#mv-results [data-action="pick-crate"]').evaluateAll((els) => els.map((e) => e.dataset.value));
   assert.match(await text(page, '#mv-results'), /^Likely · same age, smaller litters/);
   assert.deepEqual(likely.slice(0, 4), ['E01', 'B02', 'C05', 'C04']);           // same age band, smallest first, any row
@@ -192,7 +192,7 @@ try {
   assert.ok(d.indexOf("E01's own 7 piglets join too") >= 0 && d.indexOf("E01's own 7 piglets join too") < d.indexOf('Piglets'), 'warning above the count');
   await page.goBack(); await ready(page);
   await page.goForward(); await ready(page);
-  await page.waitForSelector('.tk-sheet[data-view="move"]');
+  await page.waitForSelector('.sheet[data-view="move"]');
   assert.match(await drawer(page), /To crate\s*E01/);
   await page.goto(base + 'move.html?state=move-tagged'); await ready(page);
   assert.ok(await page.getByRole('checkbox', { name: '000301' }).count() >= 1, 'chip has its name');

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sheet · dialog</title><style>
+.ph{position:relative;height:640px;max-width:390px;margin:0 auto;overflow:hidden;background:var(--app-background);font-family:var(--sans);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius-device)}
+.ph .bg{padding:0 var(--space-gutter)}
+.ph .bar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
+.ph[data-pressed] .surface-back{background:var(--back-press)}
+.ph[data-pressed] .sheet-close{background:var(--press)}
+.ph[data-pressed] .sheet-footer .button.primary{filter:brightness(.96);transform:translateY(1px)}
+.ph[data-pressed] .sheet-footer .surface-back:only-child{background:var(--ink)}
+</style></head><body>
+<div class="ph" data-state="Default (glyph)" data-demo="dialog-default"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Without glyph" data-demo="dialog-plain"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Pressed" data-demo="dialog-pressed" data-pressed=""><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Waiting (reason shown)" data-demo="dialog-waiting"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Long / Chinese" data-demo="dialog-zh"><div class="bg"></div><div class="over"></div></div>
+<script>
+const UI=window.SentriUI,esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const bg=()=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+UI.heading({title:'Pen B4',kind:'page',description:'Sow 000254 \u00b7 11 piglets'})+UI.panel(UI.row({title:'Litter',description:'11 alive \u00b7 day 2'}),{className:'st-row-group'});
+const bar='<div class="bar" aria-hidden="true"><span>9:41</span></div>';
+const note=(l,v)=>UI.field({label:l,control:'<textarea rows="3" placeholder="'+esc(v||'')+'"></textarea>'});
+const rows=(n,t)=>UI.panel(Array.from({length:n},(_,i)=>UI.row({title:(t||'Piglet')+' '+(i+1),description:'Day 2 \u00b7 B4',action:'x'})).join(''),{className:'st-row-group'});
+const foot=(p,extra)=>UI.sheetFooter(Object.assign({back:{action:'back'},primary:{label:'Record death',action:'save'}},p||{}));
+const R={
+"dialog-default":()=>UI.sheet({variant:'dialog',title:'Born 14 \u00b7 correct it',icon:'edit',subtitle:'Choose what changed.',body:'<div style="height:var(--space-12)"></div>',footer:foot({primary:{label:'Apply',action:'apply'}})}),
+"dialog-plain":()=>UI.sheet({variant:'dialog',title:'Discard the count?',subtitle:'The numbers you set are not recorded.',body:'',footer:foot({primary:{label:'Discard',action:'discard'}})}),
+"dialog-pressed":()=>UI.sheet({variant:'dialog',title:'Born 14 \u00b7 correct it',icon:'edit',subtitle:'Choose what changed.',body:'<div style="height:var(--space-12)"></div>',footer:foot({primary:{label:'Apply',action:'apply'}})}),
+"dialog-waiting":()=>UI.sheet({variant:'dialog',title:'End task early?',icon:'alert',subtitle:'Unfinished work stays incomplete. Records are kept.',body:UI.rowSelect({title:'I want to end the task',action:'ack',value:'ack'}),footer:foot({primary:{label:'End task early',action:'end',register:'danger',waiting:true},status:{text:'Tick the box to confirm'}})}),
+"dialog-zh":()=>UI.sheet({variant:'dialog',title:'\u8981\u63d0\u524d\u7ed3\u675f\u8fd9\u9879\u4efb\u52a1\u5417\uff1f\u672a\u5b8c\u6210\u7684\u5de5\u4f5c\u4f1a\u4fdd\u7559',icon:'alert',subtitle:'\u5df2\u7ecf\u8bb0\u5f55\u7684\u5185\u5bb9\u4e0d\u4f1a\u4e22\u5931\uff0c\u672a\u5b8c\u6210\u7684\u5de5\u4f5c\u4ecd\u7136\u4fdd\u6301\u672a\u5b8c\u6210\u72b6\u6001\u3002',body:'',footer:UI.sheetFooter({back:{action:'back',label:'\u8fd4\u56de'},primary:{label:'\u63d0\u524d\u7ed3\u675f\u4efb\u52a1',action:'end',register:'danger'}})})
+};
+document.querySelectorAll('[data-demo]').forEach(el=>{const k=el.getAttribute('data-demo'),r=R[k];el.querySelector('.bg').innerHTML=bg();if(r)el.querySelector('.over').innerHTML=r();});
+</script></body></html>

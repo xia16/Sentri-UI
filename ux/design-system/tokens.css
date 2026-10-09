@@ -142,6 +142,7 @@
   --statusbar-height: 42px;
   --animal-row-min: 76px;
   --animal-id-col: 59px;
+  --grab-width: 42px;
   --grab-height: 24px;
   --entry-row-min: 66px;
   --glyph-key-task: 17px;
@@ -189,6 +190,10 @@
   --hold-caption-opacity: 0.85;
   --hold-commit: 850ms;
   --hold-arm: 5000ms;
+  --sheet-in: 240ms;
+  --sheet-out: 180ms;
+  --fade: 200ms;
+  --ease-arrive: cubic-bezier(.22,1,.36,1);
   --drawer-compact-max: 42%;
   --drawer-short-max: 58%;
   --drawer-medium-max: 76%;

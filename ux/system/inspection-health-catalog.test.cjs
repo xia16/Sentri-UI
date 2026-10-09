@@ -1,5 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+require('../design-system/components/bundle.js');
 require('./astra-surfaces.js');
 require('./inspection-astra-concept.js');
 const model = globalThis.InspectionStudy;
@@ -98,9 +99,9 @@ test('condition picker uses the same full-height drawer for single and bulk reco
     model.openBulkAction(context, 'health', subjects);
     model.handleRecordAction(context, 'bulk-pick-health', '');
     const html = model.overlay(context);
-    sizes.push(html.match(/health-picker-step" data-size="([^"]+)"/)?.[1]);
+    sizes.push(html.match(/health-picker-step"[^>]*data-size="([^"]+)"/)?.[1]);
     assert.match(html, /aria-label="Choose conditions"/);
-    assert.match(html, /health-picker-step" data-size="long"/);
+    assert.match(html, /health-picker-step"[^>]*data-size="long"/);
   }
   assert.deepEqual(sizes, ['long', 'long']);
 });

@@ -71,3 +71,7 @@ Only in the bundle: base for the DS pages, the field cards (Stepper, Measure, Nu
 - Names for the scale tokens that deserve a role name (for example `size-20` as the glyph size).
 - Deleting the retired files (the owner's call).
 - The gate findings that are not about duplication, tokens or size (copy rules, variants, previews) are untouched: this step does not redesign.
+
+## Sheet (component pass)
+
+One implementation of the drawer, the page and the dialog: `SentriUI.sheet`, `sheetFooter`, `backButton` and `scrim` in `components/bundle.js`, styled in `bundle.css` section 3. It replaces three copies: the hand-built `.sheet` markup of Farrowing (`roomSheet`, `detailSheet`, `featurePage`, the record surface and the dialogs), Inspection (`sheet()`), Home (`drawer()` and its page footers), and the task skeleton's TaskSheet / TaskPage / TaskDialog (`SentriTask.sheet`, `drawer`, `page`, `dialog`, `footer` and `back` now call the component; their `tk-*` classes are gone). `AstraSurfaces.present`, `normalizeBack` and `markContext` (the regex rewrite of hand-built markup) are deleted; `AstraSurfaces.isPage` stays as the prototypes' page-or-drawer list.

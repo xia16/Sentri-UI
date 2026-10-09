@@ -28,28 +28,6 @@
   /* A line of parts, each a text slot with an optional tone: [{ text, str, args, tone }]; { sep: true } is the
      shared separator, a real text node (ds.sep, the same · as Status lines). */
   const parts = v => (Array.isArray(v) ? v.map(p => { const o = obj(p); if (o.sep) return '<span class="tk-sep" data-str="ds.sep">·</span>'; return o.tone ? `<span class="tk-tone" data-tone="${esc(o.tone)}">${T(o)}</span>` : T(o); }).join('') : T(v));
-  /* A Button from SentriUI (Button card), from a { label, action, value, register, waiting } spec. */
-  function button(b) {
-    if (!b) return '';
-    if (typeof b === 'string') return b;
-    const l = obj(b.label);
-    const UI = root.SentriUI;
-    const props = { label: l.text ?? '', register: b.register || 'primary', action: b.action || '', value: b.value || '', waiting: !!b.waiting, describedby: b.describedby || '' };
-    if (l.str) { props.strs = { label: l.str }; if (l.args) props.args = { label: l.args }; }
-    if (UI && UI.button) return UI.button(props);
-    return `<button type="button" class="button ${esc(props.register)}" data-ds="Button"${A(props.action, props.value)}>${T(l)}</button>`;
-  }
-  /* A hold from SentriUI (Button holdButton): { label, caption, action, value, tone, phase, statusId }. */
-  function hold(h) {
-    const UI = root.SentriUI, l = obj(h.label), c = obj(h.caption);
-    const props = { label: l.text ?? '', caption: c.text ?? '', action: h.action || 'hold', value: h.value || '', tone: h.tone || 'primary', phase: h.phase || 'idle', statusId: h.statusId || '', waiting: !!h.waiting, describedby: h.describedby || '' };
-    const strs = {}, args = {};
-    if (l.str) { strs.label = l.str; if (l.args) args.label = l.args; }
-    if (c.str) { strs.caption = c.str; if (c.args) args.caption = c.args; }
-    props.strs = strs; props.args = args;
-    return UI.holdButton(props);
-  }
-
   /* ---- TaskPhone ---- */
   function statusbar({ time = { text: '9:41', str: 'tk.statusbar.time' } } = {}) {
     return `<div class="tk-statusbar" aria-hidden="true"><span>${T(time)}</span><span class="tk-statusbar-icons">${glyph('signal')}${glyph('battery')}</span></div>`;
@@ -334,71 +312,21 @@
     return `<nav class="tk-dock" data-ds="TaskDock"${L(tools.label)}>${p}${t}</nav>`;
   }
 
-  /* ---- Footer: Back + one primary (a Button spec, a hold spec, or raw HTML) ---- */
-  function back({ action = 'back', value = '', label = { text: 'Back', str: 'act.back' } } = {}) {
-    return `<button type="button" class="tk-back"${A(action, value)}>${glyph('back-chevron')}<span>${T(label)}</span></button>`;
+  /* ---- Footer, Back, drawer, page, dialog: the Sheet card (SentriUI.sheet / sheetFooter / backButton) — one implementation.
+     These keep the skeleton's call signatures; see Sheet/README.md. ---- */
+  const back = o => root.SentriUI.backButton(o || {});
+  const footer = o => root.SentriUI.sheetFooter(o || {});
+  function scrim(o = {}) { return root.SentriUI.scrim(o); }
+  /* sheet: the drawer without its scrim (the host places scrim() before it); drawer: scrim + sheet. height 'full' = Sheet's
+     sizing 'full'. The ✕ is always drawn (close only renames its action); aside sits left of it. */
+  function sheet(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { variant: 'drawer', sizing: o.height === 'full' ? 'full' : 'content', scrim: false })); }
+  function drawer(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { variant: 'drawer', sizing: o.height === 'full' ? 'full' : 'content', scrim: Object.assign({ layer: o.layer || 0 }, o.scrim) })); }
+  /* page: description -> subtitle; bar draws the skeleton's status bar. */
+  function page(o = {}) {
+    const { description, descriptionTone, bar = true, ...rest } = o;
+    return root.SentriUI.sheet(Object.assign({}, rest, { variant: 'page', subtitle: description, subtitleTone: descriptionTone, bar: bar ? statusbar() : '' }));
   }
-  /* status: { text, str, args, id, tone, action } — one status line directly above the footer (the reason a waiting primary
-     waits, or the hold's progress line); it is wired as the primary's aria-describedby / the hold's statusId. action:
-     { label, action, value } adds one text action at the line's end (`42 is right`). */
-  function footer({ back: b = {}, primary, hold: h, status } = {}) {
-    let s = '';
-    if (status) {
-      const id = status.id || 'tk-footer-status';
-      // Farrowing draws no line above a footer: the status is read (role=status, the primary's / hold's description) but
-      // visually hidden, unless the page opts in (`visible: true`, e.g. after a tap on the waiting primary).
-      // A line that carries a text action (`17 is right`) is shown unless the page says `visible: false`: its act must be
-      // reachable.
-      const vis = status.visible != null ? !!status.visible : !!status.action, hid = vis ? '' : ' st-visually-hidden';
-      const act = vis && status.action ? button(Object.assign({ register: 'text' }, status.action)) : '';
-      if (!vis) s = `<p class="tk-footer-status${hid}" id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>`;
-      else s = act
-        ? `<div class="tk-footer-status" data-action-slot><p id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>${act}</div>`
-        : `<p class="tk-footer-status" id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>`;
-      if (h && !h.statusId) h = Object.assign({}, h, { statusId: id });
-      if (primary && typeof primary === 'object' && !primary.describedby) primary = Object.assign({}, primary, { describedby: id });
-    }
-    return `${s}<div class="tk-footer" data-ds="TaskFooter">${b ? back(b) : ''}${h ? hold(h) : button(primary)}</div>`;
-  }
-
-  /* ---- The overlay layer model ----
-     Every overlay (scrim, sheet, page, dialog) sits on a layer: z = base + 10 × layer (scrim 2, sheet 3, page 5, dialog 8).
-     Layer 0 is over the task screen. An overlay placed after a page or a sheet in the phone rises one layer on its own
-     (CSS); `layer: n` sets it explicitly for deeper stacks (a sheet over a sheet over a page: layer 2). */
-  const LY = n => (n ? ` data-layer="${esc(n)}"` : '');
-
-  /* ---- TaskSheet: the drawer ---- */
-  function scrim({ action = 'dismiss', label = { text: 'Dismiss sheet', str: 'tk.sheet.dismiss' }, layer = 0 } = {}) {
-    return `<button type="button" class="tk-scrim" data-ds="TaskSheet"${LY(layer)}${A(action)}${L(label)}></button>`;
-  }
-  /* size: compact | short | medium | long (the max height). height: 'content' (default) | 'full'.
-     close: { action, label } draws the ✕; aside: raw HTML in its place (a text action such as Clear). */
-  function sheet({ title, subtitle, subtitleTone = '', close = { action: 'dismiss' }, aside = '', body = '', footer: f = '', size = 'medium', height = 'content', label, view = '', layer = 0, inert = false } = {}) {
-    const x = aside || (close ? `<button type="button" class="tk-sheet-close"${A(close.action || 'dismiss', close.value)}${L(close.label, { text: 'Close', str: 'act.close' })}>${glyph('close')}</button>` : '');
-    const sub = subtitle ? `<p class="tk-sheet-subtitle"${subtitleTone ? ` data-tone="${esc(subtitleTone)}"` : ''}>${parts(subtitle)}</p>` : '';
-    return `<section class="tk-sheet" data-ds="TaskSheet" role="dialog" aria-modal="true" tabindex="-1" data-st-context="drawer"${LY(layer)}${inert ? ' inert' : ''} data-size="${esc(size)}"${height === 'full' ? ' data-height="full"' : ''}${view ? ` data-view="${esc(view)}"` : ''}${L(label ?? title)}>
-      <div class="tk-grab" aria-hidden="true"></div>
-      <header class="tk-sheet-head"><div class="tk-sheet-titles"><h2 class="tk-sheet-title">${T(title)}</h2>${sub}</div>${x}</header>
-      <div class="tk-sheet-body">${body}</div>${f}</section>`;
-  }
-  function drawer(o = {}) { return scrim(Object.assign({ layer: o.layer || 0 }, o.scrim)) + sheet(o); }
-
-  /* ---- TaskPage: the record page ----
-     aside: raw HTML at the right end of the title line (text actions such as Clear), as a sheet's aside.
-     inert: while a drawer or dialog is over the page. view: data-view (the host's state name). descriptionTone: 'amber' |
-     'red' | 'green' colours the whole description line (a part can still carry its own tone). */
-  function page({ title, description, descriptionTone = '', body = '', footer: f = '', label, bar = true, aside = '', inert = false, layer = 0, view = '' } = {}) {
-    const t = `<h2 class="tk-page-title">${T(title)}</h2>`;
-    return `<section class="tk-page" data-ds="TaskPage" role="region" tabindex="-1" data-st-context="page"${LY(layer)}${view ? ` data-view="${esc(view)}"` : ''}${inert ? ' inert' : ''}${L(label ?? title)}>${bar ? statusbar() : ''}
-      <header class="tk-page-head"${aside ? ' data-aside' : ''}>${aside ? `<div class="tk-page-titleline">${t}<div class="tk-page-aside">${aside}</div></div>` : t}${description ? `<p class="tk-page-desc"${descriptionTone ? ` data-tone="${esc(descriptionTone)}"` : ''}>${parts(description)}</p>` : ''}</header>
-      <div class="tk-page-body">${body}</div>${f || footer({})}</section>`;
-  }
-
-  /* ---- TaskDialog ---- */
-  function dialog({ title, icon = '', description, body = '', footer: f = '', label, layer = 0 } = {}) {
-    return `<div class="tk-dialog-backdrop" data-ds="TaskDialog"${LY(layer)}><div class="tk-dialog" role="dialog" aria-modal="true"${L(label ?? title)}>
-      <div class="tk-dialog-body"><h2 class="tk-dialog-title">${icon ? glyph(icon) : ''}${T(title)}</h2>${description ? `<p class="tk-dialog-desc">${parts(description)}</p>` : ''}${body}</div>${f}</div></div>`;
-  }
+  function dialog(o = {}) { const { description, ...rest } = o; return root.SentriUI.sheet(Object.assign({}, rest, { variant: 'dialog', subtitle: description })); }
 
   /* ---- TaskChips (candidate): one row of filter chips over a task list — `All · Iron 4 · Castrate 6 · Done 3`. One is
      chosen at a time (a radio group: role=radiogroup, each chip role=radio with aria-checked and a roving tab stop; wire the

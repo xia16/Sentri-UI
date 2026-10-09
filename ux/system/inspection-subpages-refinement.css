@@ -4,13 +4,6 @@
 .inspection-phone .dialog{color:var(--ink);}
 
 /* All secondary pages use the same readable inset and anchored action footer. */
-.inspection-phone .sheet>.utility-header{min-height:64px;padding-top:8px;padding-bottom:10px;}
-.inspection-phone .sheet>.utility-header h3,
-.inspection-phone .sheet>.utility-header .st-heading-title{overflow-wrap:anywhere;}
-.inspection-phone .sheet>.sheet-body{min-height:0;}
-.inspection-phone .sheet-footer{min-height:68px;padding:12px 18px max(12px,env(safe-area-inset-bottom));gap:10px;}
-.inspection-phone .sheet-footer .button{min-height:var(--tap-min);}
-.inspection-phone .sheet-footer .text-button{min-height:44px;padding:10px 8px;}
 .inspection-phone .sheet-footer .button.primary[data-action^="save-"]:disabled,
 .inspection-phone .sheet-footer .button.primary[data-action^="record-"]:disabled{opacity:.55;}
 
@@ -79,16 +72,12 @@
 .inspection-phone .bulk-condition-button{border-radius:12px;background:#fff;}
 
 /* Pickers and narrow dialogs are stable next steps in the same task flow. */
-.inspection-phone .picker-step>.utility-header{min-height:58px;}
 .inspection-phone .picker-step>.sheet-body{padding-top:12px;}
 .inspection-phone .picker-step .health-catalog,
 .inspection-phone .picker-step .medicine-results{border-top:1px solid #e8eddf;}
 .inspection-phone .medicine-option{min-height:64px;border-bottom:1px solid #e8eddf;}
 .inspection-phone .medicine-option:last-child{border-bottom:0;}
 .inspection-phone .catalog-path{background:var(--paper);}
-.inspection-phone .dialog{border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 28px #26351e18;}
-.inspection-phone .dialog .dialog-body{padding:18px;}
-.inspection-phone .dialog .dialog-footer{padding:12px 18px;gap:10px;border-top:1px solid var(--line);}
 
 /* Unit/environment, equipment and check-in confirmation surfaces. */
 .inspection-phone .unit-detail-section{padding-bottom:20px;}
@@ -101,10 +90,6 @@
 .inspection-phone .feed-feature{border:1px solid #dfe8d8;background:var(--surface);}
 
 @media(max-width:370px){
- .inspection-phone .sheet-footer{padding-left:12px;padding-right:12px;}
- .inspection-phone .sheet>.utility-header{padding-left:12px;padding-right:12px;}
- .inspection-phone .sheet>.sheet-body{padding-left:12px;padding-right:12px;}
- .inspection-phone .bulk-action-sheet>.sheet-body{padding-left:12px;padding-right:12px;}
  .inspection-phone .bulk-control-grid{grid-template-columns:1fr;}
  .inspection-phone .feed-change-state{max-width:110px;}
 }

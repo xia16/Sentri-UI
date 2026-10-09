@@ -137,14 +137,11 @@
 .device .maintenance-card.resolved .maintenance-card-top small { color: #657060; }
 
 /* Saved-work drawer and other drawers. */
-.device .drawer { background: #fff; }
-.device .drawer-head { min-height: 64px; border-bottom: 1px solid var(--line); }
-.device .drawer-body { padding-top: 14px; }
 .device .sync-summary.pending { background: #fff8ec; }
 .device .sync-summary:not(.pending) { background: #eaf2e5; }
 .device .sync-drawer .primary { background: var(--ink); }
-.device .drawer-body .primary:disabled { background: #7c8979; }
-.device .drawer-body .primary[data-action="close"] {
+.device .sheet-body .primary:disabled { background: #7c8979; }
+.device .sheet-body .primary[data-action="close"] {
   background: #fff;
   color: var(--ink);
   border: 1px solid #cbd6c0;
@@ -171,7 +168,7 @@
 .device .message.user { background: #eaf2e5; }
 .device .composer button,
 .device #answer-form .primary,
-.device .drawer-body #fault-form .primary { background: #20291f; }
+.device .sheet-body #fault-form .primary { background: #20291f; }
 
 /* Placeholder/task lifecycle surfaces.  The complete action is the only
    green primary; ending early remains a red doorway/confirmation. */
@@ -233,7 +230,7 @@ body:has(#detail) #detail .lifecycle-actions button[data-confirm-end] {
 
 /* Home's early-end confirmation uses data-action; the gallery uses the
    data-confirm-end attribute. Both keep the final destructive step red. */
-.device .drawer-body [data-action="confirm-end-task"],
+.device .sheet-body [data-action="confirm-end-task"],
 body:has(#detail) #detail .lifecycle-actions [data-confirm-end] {
   background: #a13a2d;
   color: #fff;

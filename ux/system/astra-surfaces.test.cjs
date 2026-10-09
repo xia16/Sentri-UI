@@ -49,7 +49,7 @@ test('medicine picker preserves the treatment page and entered dose behind it', 
 });
 test('pig page has Actions without assumed quick actions', () => {
   const html = model.overlay(context('pig'));
-  const footer = html.slice(html.indexOf('<footer'));
+  const footer = html.slice(html.indexOf('class="sheet-footer'));
   assert.match(footer, /data-action="pig-actions"/);
   assert.doesNotMatch(footer, /data-action="(?:health|note|treatment)"/);
 });
@@ -225,20 +225,4 @@ test('Production hides actions from conflicting stages and shares only batch mem
 test('farrowing surface policy includes substantial pages but preserves review drawers', () => {
   for (const view of ['history', 'roomOverview', 'roomEndTask', 'roomTaskReceipt', 'roomTaskSows', 'roomPenDetail', 'roomPenFeed', 'roomPenLog', 'marker', 'pigletCare', 'pigletEdit', 'foster', 'pigletDeath', 'countReconcile']) assert.equal(surfaces.isPage('farrowing', view), true, view);
   for (const view of ['count', 'finish', 'locked', 'death', 'edit', 'editFinish', 'deathBreakdown']) assert.equal(surfaces.isPage('farrowing', view), false, view);
-});
-test('page conversion preserves actions and fields while removing duplicated exits', () => {
-  const html = '<button class="scrim" data-action="dismiss"></button><section class="sheet" role="dialog" aria-modal="true"><div class="grab"></div><header class="utility-header"><h3>Finish</h3><button data-action="dismiss">Close</button><button data-action="clear">Clear</button></header><div class="sheet-body"><input value="12.6"></div><div class="sheet-footer"><button data-action="returnCount">Back</button><button data-action="lock">Hold to finish</button></div></section>';
-  const page = surfaces.present(html, { page: true, backAction: 'returnCount' });
-  checkPage(page); assert.match(page, /data-action="clear"/); assert.match(page, /value="12.6"/); assert.match(page, /data-action="lock"/);
-  const drawer = surfaces.present(html);
-  assert.doesNotMatch(drawer, /data-presentation="page"/);
-  assert.match(drawer, /class="surface-back record-back"/);
-});
-test('surface contexts are exact and drawers receive a footer Back', () => {
-  const drawer = surfaces.present('<section class="sheet" role="dialog"><div class="sheet-body"></div></section>');
-  assert.match(drawer, /class="sheet"[^>]*data-st-context="drawer"/);
-  assert.match(drawer, /<footer class="sheet-footer"><button[^>]*data-action="back"/);
-  assert.doesNotMatch(drawer, /sheet-body[^>]*data-st-context/);
-  const page = surfaces.present('<section class="sheet" role="dialog"><div class="sheet-body"></div></section>', {page:true});
-  assert.match(page, /class="sheet"[^>]*data-st-context="page"/);
 });
