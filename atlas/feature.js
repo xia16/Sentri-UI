@@ -138,44 +138,48 @@ function cropShot(box, W, screen, opts) {
 addEventListener('message', (m) => { if (m.data && m.data.atlasScreen && CURRENT) CURRENT.follow(m.data.atlasScreen); });
 
 /* ---------- layout ----------
-   Everything stacks top to bottom and fills the width: Ways in, In any status, then the task bands (each anchor status a full-width lane,
-   lifecycle order, a down arrow between; exits as dashed lanes at the end of the band), then Other and Adds to.
-   `avail` is the width the flow can use; the lanes take as many columns as fit it at about 85% scale. */
+   One flat canvas: only screens are boxes. A band is an uppercase label with a hairline rule and its nodes below it; statuses inside a band
+   are small labels on one vertical timeline line, their nodes indented from it; an exit is a dashed branch off the line.
+   `avail` is the width the flow can use; nodes take as many columns as fit it at about 85% scale. */
 function layoutFlow(f, entries, avail) {
-  const NW = 190, NH = 48, HEAD = 32, PAD = 16, GAP = 18, VG = 12, x0 = 20;
-  const per = Math.max(2, Math.min(6, Math.floor(((avail || 1000) / 0.85 - 2 * x0 - 4 * PAD + GAP) / (NW + GAP))));
-  const cw = per * (NW + GAP) - GAP + 4 * PAD;
-  const pos = {}, boxes = [], placed = new Set(); let y = 20;
-  const lane = (name, kind, ids, x, yy, w) => {
-    const cols = Math.max(1, Math.floor((w - 2 * PAD + GAP) / (NW + GAP))), rows = Math.max(1, Math.ceil(ids.length / cols)), head = name ? HEAD : PAD;
-    const h = head + rows * NH + (rows - 1) * VG + PAD;
-    boxes.push({ name, kind, x, y: yy, w, h });
-    ids.forEach((id, i) => { pos[id] = { x: x + PAD + (i % cols) * (NW + GAP), y: yy + head + Math.floor(i / cols) * (NH + VG) }; placed.add(id); });
-    return h;
+  const NW = 190, NH = 48, GAP = 18, VG = 12, x0 = 20, IND = 20, LAB = 28, LH = 16;
+  const per = Math.max(2, Math.min(6, Math.floor(((avail || 1000) / 0.85 - 2 * x0 - IND + GAP) / (NW + GAP))));
+  const cw = per * (NW + GAP) - GAP + IND;
+  const pos = {}, boxes = [], placed = new Set(); let y = 12;
+  const nodes = (ids, x, yy, w) => {
+    const cols = Math.max(1, Math.floor((w + GAP) / (NW + GAP))), rows = Math.max(1, Math.ceil(ids.length / cols));
+    ids.forEach((id, i) => { pos[id] = { x: x + (i % cols) * (NW + GAP), y: yy + Math.floor(i / cols) * (NH + VG) }; placed.add(id); });
+    return rows * NH + (rows - 1) * VG;
   };
-  const strip = (name, kind, ids) => { ids = ids.filter((i) => !placed.has(i) || i.includes(':')); if (!ids.length) return; y += lane(name, kind, ids, x0, y, cw) + 22; };
-  strip('Ways in', 'entry', entries.map((e) => e.id));
+  const band = (name) => { y += LAB; boxes.push({ name, kind: 'band', x: x0, y, w: cw, h: LH }); y += LH + 12; };
+  const strip = (name, ids) => { ids = ids.filter((i) => !placed.has(i) || i.includes(':')); if (!ids.length) return; band(name); y += nodes(ids, x0, y, cw); };
+  strip('Ways in', entries.map((e) => e.id));
   const a = f.anchor, ownIds = f.screens.map((s) => s.id);
   if (a) {
-    strip('In any status', 'any', a.any || []);
+    strip('In any status', a.any || []);
     const [t1, t2] = a.task || [];
-    const band = (name, build) => { const box = { name, kind: 'band', x: x0, y, w: cw, h: 0 }; boxes.push(box); const end = build(y + HEAD); box.h = end - y + PAD; y = end + PAD + 22; };
-    band(t1 ? t1.name : a.name, (iy) => {
-      const top = ((t1 && t1.screens) || []).filter((i) => !placed.has(i));
-      if (top.length) iy += lane('', 'plain', top, x0 + PAD, iy, cw - 2 * PAD) + 12;
-      const sts = (a.statuses || []).filter((s) => (s.screens || []).length), exits = a.exits || [];
-      sts.forEach((s, i) => { iy += lane(s.name, 'status', s.screens, x0 + PAD, iy, cw - 2 * PAD); if (i < sts.length - 1) { boxes.push({ name: '↓', kind: 'down', x: x0 + PAD, y: iy, w: cw - 2 * PAD, h: 20 }); iy += 20; } else iy += 0; });
-      exits.forEach((s) => { iy += 10; iy += lane(s.name + ' · exit', 'exit', s.screens || [], x0 + PAD, iy, cw - 2 * PAD); });
-      return iy;
-    });
-    if (t2) band(t2.name, (iy) => iy + lane('', 'plain', (t2.screens || []).filter((i) => !placed.has(i)), x0 + PAD, iy, cw - 2 * PAD));
+    band(t1 ? t1.name : a.name);
+    const top = ((t1 && t1.screens) || []).filter((i) => !placed.has(i));
+    if (top.length) y += nodes(top, x0, y, cw);
+    const sts = (a.statuses || []).filter((s) => (s.screens || []).length), exits = (a.exits || []).filter((s) => (s.screens || []).length);
+    const lineY = y + 4; let lastY = lineY;
+    const lane = (name, ids, exit) => {
+      y += 16;
+      boxes.push({ name, kind: exit ? 'lane exit' : 'lane', x: x0 + IND, y, w: 200, h: LH });
+      boxes.push(exit ? { name: '', kind: 'branch', x: x0 + 1, y: y + LH / 2, w: IND - 4, h: 0 } : { name: '', kind: 'dot', x: x0 - 3, y: y + 4, w: 8, h: 8 });
+      lastY = y + LH / 2; y += LH + 8; y += nodes(ids, x0 + IND, y, cw - IND);
+    };
+    sts.forEach((s) => lane(s.name, s.screens, false));
+    exits.forEach((s) => lane(s.name + ' · exit', s.screens, true));
+    if (sts.length || exits.length) boxes.push({ name: '', kind: 'tline', x: x0, y: lineY, w: 2, h: Math.max(0, lastY - lineY) });
+    if (t2 && (t2.screens || []).length) { band(t2.name); y += nodes(t2.screens.filter((i) => !placed.has(i)), x0, y, cw); }
   } else {
     const owned = new Set(ownIds);
-    (f.groups || []).forEach(([name, ids]) => strip(name === 'Old UI' ? 'Screens in the old UI' : name, 'status', ids.filter((i) => owned.has(i))));
+    (f.groups || []).forEach(([name, ids]) => strip(name === 'Old UI' ? 'Screens in the old UI' : name, ids.filter((i) => owned.has(i))));
   }
-  strip(a || (f.groups || []).length ? 'Other' : 'Screens', a || (f.groups || []).length ? '' : 'status', ownIds);
-  strip('Adds to', 'adds', (f.addsTo || []).map((_, i) => 'adds:' + i));
-  return { pos, boxes, width: x0 + cw + 20, height: y + 40, NW, NH };
+  strip(a || (f.groups || []).length ? 'Other' : 'Screens', ownIds);
+  strip('Adds to', (f.addsTo || []).map((_, i) => 'adds:' + i));
+  return { pos, boxes, width: x0 + cw + 20, height: y + 60, NW, NH };
 }
 
 /* ---------- the page ---------- */
@@ -269,11 +273,19 @@ function openFeature(id, sel) {
     if (scroll) card.scrollIntoView({ block: 'center' });
   }
   function collapseCard(card) { const sl = card.querySelector('.srcl'); if (sl) { sl.hidden = true; card.querySelector('.srct').textContent = 'Source ▸'; } card.classList.remove('open'); lit(card, false); }
-  function clearPins() { pinTok++; dock.querySelectorAll('.pins').forEach((p) => p.remove()); }
+  let phoneObs = null;
+  function clearPins() { pinTok++; if (phoneObs) phoneObs.disconnect(); dock.querySelectorAll('.pins').forEach((p) => p.remove()); setForeign(false); }
+  /* the phone shows a state that has no notes of its own: say so, quietly, in the Notes header */
+  function setForeign(on) {
+    const body = notes.querySelector('.body'), had = body.querySelector('.foreign');
+    if (!on) { if (had) had.remove(); return; }
+    if (had || notesTab !== 'screen') return;
+    const head = body.querySelector('.spechead'); if (head) head.insertAdjacentHTML('afterend', '<p class="foreign">The phone is showing a state without its own notes — tap Back, or pick a screen in the flow.</p>');
+  }
 
   /* find each element on the live phone (by its quoted text, its sample value, then its name) and draw its number over it */
   function locate(items) {
-    const tok = ++pinTok, frame = dock.querySelector('.devframe');
+    const tok = ++pinTok, frame = dock.querySelector('.devframe'); if (phoneObs) phoneObs.disconnect();
     dock.querySelectorAll('.pins').forEach((p) => p.remove());
     if (!frame || !items.length) return;
     const run = () => {
@@ -298,7 +310,8 @@ function openFeature(id, sel) {
       const hits = (x, y, list) => list.some(([a, b, c, d]) => x < c + 1 && x + S > a - 1 && y < d + 1 && y + S > b - 1);
       const inside = (x, y) => x >= 1 && y >= 1 && x + S <= W - 1 && y + S <= H - 1;
       const layer = el('<div class="pins"></div>'); box.append(layer);
-      const taken = []; let missing = [];
+      const taken = []; let missing = [], located = 0, covered = 0;
+      items.forEach(({ card }) => card.classList.remove('off'));
       items.forEach(({ n, e, card }) => {
         const sh = e.shows || '', cand = [];
         let m; const re = /["“]([^"”]{2,})["”]/g; while ((m = re.exec(sh))) cand.push(m[1]);
@@ -314,6 +327,9 @@ function openFeature(id, sel) {
         if (!hit) for (const c of cand) { hit = find(c); if (hit) break; }
         if (hit && viaAt === true) { const box2 = hit.e.closest('button, a, li, [role=button], [role=tab], [data-action], [class*="card"], [class*="row"]'); if (box2 && phone.contains(box2) && box2 !== phone) { const r2 = box2.getBoundingClientRect(); if (r2.width > 2 && r2.height > 2 && r2.height < 400) hit = { e: box2, r: r2 }; } }
         if (!hit) { card.classList.add('off'); missing.push(e.name); return; }
+        located++;
+        { const hr = hit.e.getBoundingClientRect(), top = doc.elementFromPoint(Math.min(389, Math.max(0, hr.left + hr.width / 2)), Math.min(843, Math.max(0, hr.top + hr.height / 2))); // hidden or covered by another layer: no pin
+          if (!top || !hit.e.contains(top)) { covered++; card.classList.add('off'); missing.push(e.name); return; } }
         const r = hit.r, L = r.left * k, T = r.top * k, R = r.right * k, B = r.bottom * k, cy = Math.max(1, Math.min(H - S - 1, (T + B) / 2 - S / 2)), G = 4;
         const free = (x, y) => inside(x, y) && !hits(x, y, texts) && !hits(x, y, taken);
         let spot = [[L - S - G, T - S - G], [R + G, T - S - G], [L - S - G, cy], [R + G, cy]].find(([x, y]) => free(x, y)), leader = false;
@@ -339,10 +355,16 @@ function openFeature(id, sel) {
         layer.append(ring, pin);
         if (card.classList.contains('open')) lit(card, true);
       });
-      const nn = document.querySelector('#sec-elements .n');
+      const foreign = located > 0 && covered >= Math.ceil(located / 2); // most annotated elements are gone or covered: the phone is elsewhere
+      if (foreign) { layer.remove(); items.forEach(({ card }) => card.classList.remove('off')); }
+      setForeign(foreign);
+      if (!foreign) { const nn0 = document.querySelector('#sec-elements .n'); if (nn0 && !missing.length) nn0.textContent = String(items.length); }
+      let tmr = 0; phoneObs = new MutationObserver(() => { clearTimeout(tmr); tmr = setTimeout(() => { if (tok === pinTok && frame.isConnected) locate(items); }, 150); });
+      phoneObs.observe(phone, { subtree: true, childList: true, attributes: true, characterData: true });
+      const nn = foreign ? null : document.querySelector('#sec-elements .n');
       if (nn && missing.length) { nn.textContent = `${items.length} · ${missing.length} not on screen`; nn.title = 'Not found on the screen: ' + missing.join('; '); }
     };
-    if (frame.dataset.ready) run(); else frame.addEventListener('atlas-ready', run, { once: true });
+    if (frame.dataset.ready) setTimeout(run, 180); else frame.addEventListener('atlas-ready', run, { once: true });
   }
 
   function specHtml(s, nt) {
