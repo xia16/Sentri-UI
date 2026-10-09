@@ -30,18 +30,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-c-4",
-  "target": {
-   "kind": "feature",
-   "id": "health-record"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Required-fields hint sits at the screen edge, outside the gutter",
-  "detail": "'Complete the required fields first' starts at x=0 on Record health, Care instructions, Resolve conditions, Treatment, weight, body condition, note, miscarriage, batch membership. On Record weight it stays after Save enables. Fix: the Button waiting status line inside the footer gutter, naming the missing field, gone once valid.",
-  "source": "screen-review"
- },
- {
   "id": "screens-c-5",
   "target": {
    "kind": "screen",

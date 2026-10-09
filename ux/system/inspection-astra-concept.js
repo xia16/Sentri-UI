@@ -22,9 +22,16 @@ const stPickerOptions=o=>SentriUI.pickerOptions(o);
 // Entry markers (read by the atlas): a control that is a way into another feature says which one; a pig row with a health tag is also a way into Health record.
 const entryOf={feed:'feed-plan','feed-edit-pen':'feed-plan','feed-edit-selected':'feed-plan','pig-feed':'feed-plan',pig:'pig-profile',health:'health-record',finding:'health-record',scan:'inspection',search:'inspection'};
 const entryFor=(a,label='')=>entryOf[a]?(a==='pig'&&/data-ds="ConditionTag"[^>]*data-care="(attention|ongoing)"/.test(label)?'pig-profile health-record':entryOf[a]):'';
-const button=(a,label,cls='button',v='',disabled=false)=>{
+const waitingReasons={
+ 'save-health':'Choose a disease or symptom', 'save-record':'Enter a reading', 'save-weight':'Enter a weight',
+ 'save-production-task':'Choose an outcome', 'save-miscarriage':'Choose a reason', 'save-batch-membership':'Choose a batch',
+ 'save-disposition':'Choose a reason', 'feed-edit-save':'Change the feeding mode or adjustment',
+ 'feed-optional-save':'Change the date or note', 'record-optional-save':'Enter a value',
+ 'log-date-apply':'Choose a start and end date'
+};
+const button=(a,label,cls='button',v='',disabled=false,reason='')=>{
  if(cls==='dock-search')return SentriUI.iconButton({action:a,value:v,icon:icon('search'),label:'Search ear tag',className:cls});
- if(cls.split(' ').includes('button')||cls.split(' ').includes('text-button')||cls==='task-history')return SentriUI.button({label:'',register:cls.includes('primary')?'primary':cls.includes('text-button')||cls==='task-history'?'text':'secondary',action:a,value:v,disabled,className:cls==='task-history'?'':cls.split(' ').filter(c=>c!=='button'&&c!=='primary').join(' '),reason:disabled?'Complete the required fields first':'',attrs:entryFor(a,label)?{'data-entry':entryFor(a,label)}:{}}).replace('<span class="st-button-label"></span>',label);
+ if(cls.split(' ').includes('button')||cls.split(' ').includes('text-button')||cls==='task-history')return SentriUI.button({label:'',register:cls.includes('primary')?'primary':cls.includes('text-button')||cls==='task-history'?'text':'secondary',action:a,value:v,waiting:disabled,className:cls==='task-history'?'':cls.split(' ').filter(c=>c!=='button'&&c!=='primary').join(' '),reason:disabled?(reason||waitingReasons[a]||'Choose an option to continue') :'',attrs:entryFor(a,label)?{'data-entry':entryFor(a,label)}:{}}).replace('<span class="st-button-label"></span>',label);
  return `<button type="button" class="${cls}"${entryFor(a,label)?` data-entry="${entryFor(a,label)}"`:''} data-action="${a}" data-value="${esc(v)}"${disabled?' disabled':''}>${label}</button>`;
 };
 const ib=(a,k,label,v='')=>SentriUI.iconButton({action:a,icon:icon(k),label,value:v});
@@ -614,6 +621,25 @@ function bulkListOverlay(c,{kind,rowsHtml,heading,sub,column,toggleLabel,control
  collapsed=collapsed??!!c.form.controlsCollapsed;
  return '<div class="bulk-action-layout'+(layoutClass?' '+esc(layoutClass):'')+(short?' is-short':'')+'" data-bulk-kind="'+esc(kind)+'"><section class="pig-review-card bulk-pigs'+(short?' is-short':'')+'"><div class="pig-review-heading feed-pigs-heading"><span><h4>'+esc(heading)+'</h4><small>'+esc(sub)+'</small></span><strong>'+column+'</strong></div><div class="pig-review-list bulk-pig-list'+(listClass?' '+esc(listClass):'')+'" role="region" aria-label="'+esc(heading)+'" tabindex="0" data-bulk-rows>'+rowsHtml+'</div></section><section class="bulk-controls facts-surface'+(overlayClass?' '+esc(overlayClass):'')+' bulk-details-overlay'+(collapsed?' is-collapsed':'')+'" aria-label="'+esc(toggleLabel)+'">'+button('bulk-toggle-controls','<span>'+esc(toggleLabel)+'</span>'+icon('chevron'),'bulk-controls-toggle').replace('<button','<button aria-expanded="'+!collapsed+'"')+(!collapsed?'<div class="bulk-control-fields">'+controlsHtml+'</div>':'')+'</section></div>';
 }
+function bulkWaitingReason(c){
+ const f=c.form,view=c.view;
+ if(bulkMeasurements[view])return 'Enter a '+bulkMeasurements[view].label.toLowerCase()+' above zero';
+ if(view==='health')return f.conditions.length?'Choose a new condition':'Choose a disease or symptom';
+ if(['resolve','triage','edit-conditions'].includes(view))return !f.target?'Choose a condition':view==='resolve'&&!f.outcome?'Choose an outcome':'Change the care or add a note';
+ if(view==='treatment')return !f.medicine.trim()?'Choose a medicine':!f.method?'Choose a method':!f.doseUnit?'Choose a dose unit':'Enter a dose above zero';
+ if(view==='body')return 'Choose a body condition';
+ return 'Write a note';
+}
+function bulkCommit(c){
+ const f=c.form,count=bulkChanges(c).filter(r=>r.change&&r.eligible).length;
+ return button('bulk-save',f.bulk?'Save · '+countLabel(count):f.taskId?'Save and complete task':'Save','button primary','',!bulkActionValid(c),bulkWaitingReason(c));
+}
+function refreshBulkCommit(root,c){
+ const footer=root.querySelector('.phone > .sheet > .sheet-footer');
+ if(!footer)return;
+ const reason=footer.previousElementSibling;if(reason?.classList.contains('st-button-reason'))reason.remove();
+ footer.outerHTML=SentriUI.sheetFooter({content:back()+bulkCommit(c)});
+}
 function bulkActionPage(c){
  const f=c.form,view=c.view,single=!f.bulk,conditions=[...new Set(f.subjects.flatMap(id=>cases(pig(c,id)).map(k=>k.name)))],target=bulkSelect(c,'Condition','target',[['','Choose condition'],...conditions.map(n=>[n,n])]);let controls='';
  if(view==='health')controls=SentriUI.pickerField({label:'Conditions',strs:{label:'ds.picker.conditions'},variant:'cascade-multi',selected:f.conditions,names:f.conditions,action:'bulk-pick-health'})+bulkSelect(c,'Care','triage',careOptions);
@@ -631,10 +657,10 @@ function bulkActionPage(c){
   const p=pig(c,f.subjects[0]),m=bulkMeasurements[view];
   if(m)controls=(SentriUI.field({label:(m.label)+" · "+(m.unit),control:"<input type=\"number\" min=\"0\" step=\"any\" inputmode=\"decimal\" data-bulk-value=\""+(esc(p.id))+"\" value=\""+(esc(f.values[p.id]??''))+"\" aria-label=\""+(m.label)+" for "+(esc(p.id))+"\" placeholder=\"—\">"}))+"<p class=\"quiet-note\">Last recorded: "+esc(p[view]??'—')+(p[view]!=null?' '+m.unit+' · '+measurementAge(p,view):'')+'</p>';
   const title=f.taskId==='vaccination'?'Record vaccination':m?'Record '+m.label.toLowerCase():bulkTitles[view];
-  return sheet(c,title,p.id+' · '+penOf(c,p.id).id,'<section class="bulk-controls facts-surface" aria-label="Record details">'+controls+note+'</section>',footer(back(),button('bulk-save',f.taskId?'Save and complete task':'Save','button primary','',!bulkActionValid(c)))).replace('class="sheet"','class="sheet single-action-sheet"');
+  return sheet(c,title,p.id+' · '+penOf(c,p.id).id,'<section class="bulk-controls facts-surface" aria-label="Record details">'+controls+note+'</section>',footer(back(),bulkCommit(c))).replace('class="sheet"','class="sheet single-action-sheet"');
  }
  const body=bulkListOverlay(c,{kind:view,rowsHtml:bulkRows(c),heading:'Pigs',sub:f.subjects.length+' selected',column:(bulkMeasurements[view]?'Current → New · '+bulkMeasurements[view].unit:view==='treatment'?'Dose'+(f.doseUnit?' · '+esc(f.doseUnit):''):'Preview changes'),toggleLabel:view==='treatment'?'Treatment details':'Details',controlsHtml:controls+note,short:f.subjects.length<=3});
- return sheet(c,bulkTitles[view],countLabel(f.subjects.length),body,footer(back(),button('bulk-save',single?'Save':'Save · '+countLabel(count),'button primary','',!bulkActionValid(c)))).replace('class="sheet"','class="sheet bulk-action-sheet"');
+ return sheet(c,bulkTitles[view],countLabel(f.subjects.length),body,footer(back(),bulkCommit(c))).replace('class="sheet"','class="sheet bulk-action-sheet"');
 }
 // Sample catalogue illustrates browsing and selection; it is not a treatment recommendation.
 const medicineCatalogue=[
@@ -710,7 +736,7 @@ function installBulkInputs(){
    for(const row of bulkChanges(c)){const text=[...root.querySelectorAll('[data-bulk-summary]')].find(x=>x.dataset.bulkSummary===row.id);if(text){const state=bulkRowState(row,c.view);text.textContent=state;text.hidden=!state;}}
    el.setAttribute('aria-invalid',bulkChanges(c).find(r=>r.id===el.dataset.bulkValue)?.error?'true':'false');
   }else if(rail){const scroll=rail.scrollTop;rail.innerHTML=bulkRows(c);rail.scrollTop=scroll;}
-  const save=root.querySelector('[data-action="bulk-save"]');save.disabled=!bulkActionValid(c);save.textContent=f.bulk?'Save · '+countLabel(bulkChanges(c).filter(r=>r.change&&r.eligible).length):f.taskId?'Save and complete task':'Save';
+  refreshBulkCommit(root,c);
  };
  gallery.addEventListener('input',update,true);gallery.addEventListener('change',update,true);
 }
@@ -879,7 +905,7 @@ function installV2(){
   root.querySelectorAll('[data-feed-edit="percent"]').forEach(input=>{if(input!==el)input.value=Number.isFinite(+c.form.percent)?Number((+c.form.percent).toFixed(2)):'';});
   const state=root.querySelector('[data-feed-edit="feedingState"]');if(state)state.value='adjust';
  }
- root.querySelector('[data-bulk-rows]').innerHTML=feedPigPreview(c);root.querySelector('[data-action="feed-edit-save"]').disabled=!feedEditorValid(c);
+ root.querySelector('[data-bulk-rows]').innerHTML=feedPigPreview(c);const save=root.querySelector('[data-action="feed-edit-save"]'),ready=feedEditorValid(c);save.toggleAttribute('aria-disabled',!ready);if(!ready)save.setAttribute('aria-disabled','true');const reason=save.closest('.sheet-footer').previousElementSibling;if(ready&&reason?.classList.contains('st-button-reason'))reason.remove();
  const hint=root.querySelector('[data-feed-input-hint]');hint.textContent=c.form.mode==='adjust'&&(!Number.isFinite(+c.form.percent)||+c.form.percent < -50.000001||+c.form.percent > 50.000001)?'Choose −50% to +50%.':c.form.mode==='stop'?'No feed · 0.0 kg/day':feedEditorHeld(c)?'Daily amounts stay fixed':'Replaces existing adjustments';
  },true);
 paths.humidity='M12 3C9 8 5 12 5 16a7 7 0 0 0 14 0c0-4-4-8-7-13z';paths.air='M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h6';paths.wrench='M14 3a6 6 0 0 0-7 7L2 17a3 3 0 0 0 5 5l7-7a6 6 0 0 0 7-7l-4 4-5-5z';paths.temperature='M9 14V5a3 3 0 0 1 6 0v9a5 5 0 1 1-6 0M12 9v9';paths.measure='M3 5h18v14H3zM7 5v5M11 5v3M15 5v5';
