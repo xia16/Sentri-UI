@@ -12,18 +12,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-a-2",
-  "target": {
-   "kind": "screen",
-   "id": "environment.report-issue"
-  },
-  "kind": "broken",
-  "severity": "high",
-  "title": "Report issue primary button label is invisible",
-  "detail": "'Save sample issue' computes ink text on ink fill, so the drawer's only commit reads as a blank black block. The form is hand-built (raw form, inputs, button.primary) instead of SentriUI Field and Button. Fix: build it from the DS parts.",
-  "source": "screen-review"
- },
- {
   "id": "screens-a-4",
   "target": {
    "kind": "screen",
