@@ -1,0 +1,1593 @@
+[
+ {
+  "id": "tasks-built-1",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.room"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Figures at two scopes look like one measure",
+  "detail": "Unit card and tabs count Unit 7; the task card counts all units, and only it names its scope. Active and Awaiting print three times (bar, support line, tabs). \"Done 2\" and \"Farrowed 7\" look alike but count differently.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-2",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.room"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Do pen headers keep feed, fault, note and log tools?",
+  "detail": "Pen headers open pen tools, though rulings call pen headers census-only. Unclear whose feature these tools are; the farrowing PRD lists them as out of scope.",
+  "source": "notes",
+  "options": [
+   "Keep them in farrowing",
+   "Move them to a shared pen feature",
+   "Remove from the room list; pen header opens nothing"
+  ],
+  "recommendation": "Remove from the room list now and give them a shared pen feature later; fewer doors on a gloved screen."
+ },
+ {
+  "id": "tasks-built-3",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.room"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Should the due-range filter touch Active and Done sows?",
+  "detail": "The due range matches each sow's stored due text, so it also hides Active and Done sows by a date that no longer matters to them. Tab counts shrink with it.",
+  "source": "notes",
+  "options": [
+   "Filter applies to Awaiting sows only",
+   "Filter applies to all sows (as built)",
+   "Replace due range with one Overdue chip"
+  ],
+  "recommendation": "Apply the due and parity filter to Awaiting only; Active and Done sows always show."
+ },
+ {
+  "id": "tasks-built-4",
+  "target": {
+   "kind": "component",
+   "id": "Filter sheet"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Filter sheet, Range slider, Choice chips are undrawn placeholders",
+  "detail": "Only farrowing.room uses these three placeholder parts. No spec, states or gate; a two-handle date slider is hard for gloved thumbs. Piglet processing filters with TaskChips instead.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-5",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.room"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Home farrowing card opens Task overview over the room",
+  "detail": "Owner call: Home's whole-farm card lands on the room list. The prototype shows the Task overview sheet first, then Back returns to Home, so the room is never the first thing seen.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-6",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.room"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Row recency, hand and \"Last record\" have no computing rule",
+  "detail": "\"1h ago\", \"G.H\" and \"Last record 08:41\" are fixed sample text. No rule for wording thresholds (just now, minutes, hours, yesterday, date), whose hand shows after several edits, or what Overdue rows show as line 2.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-7",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.room"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Last record line repeats each row's recency",
+  "detail": "The header line duplicates the newest row's \"1h ago · G.H\"; the ruled one-sentence task copy under it is missing. Information budget: pick one place for recency.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-8",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.room"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Two search doors: magnifier and Scan ear tag text box",
+  "detail": "Search opens \"Find a sow\" and Scan ear tag also holds a text search. Two doors to one result list; the scan sheet has no camera in the prototype.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-9",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.room"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Unit card never shows its neutral Target state",
+  "detail": "The prototype hard-codes the amber below-target flag, so the neutral state (figure meets target) is never drawn or testable.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-10",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.room"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Row meta lines render at 9px, below the 10px floor",
+  "detail": "Core row facts (\"born 14 · 1h ago · G.H\", \"parity 5 · 11 born last\") and the Target line measure 9-9.5px. Owner exemptions cover only hold caption, table heading and dock caption, not row text. Hard to read in a barn.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-11",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.room"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Farrowing page is a fixed 390px frame; scrolls sideways at 360px",
+  "detail": "At a 360px viewport the page width stays 390 (horizontal scroll). TaskPhone says the page fills the screen at phone width; farrowing's own .phone does not, unlike the piglet prototype.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-12",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.room"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Unsaved Edit draft: invisible on row, home unspecified",
+  "detail": "An Edit draft kept with Back blocks Finish and End task, but the sow's row shows nothing. No rule says where the draft lives, whether another phone sees it, or when it expires.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-13",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.count"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Four exits for one sheet: X, Back, handle, backdrop",
+  "detail": "Rulings keep handle, backdrop and one bar exit but no close button. The sheet draws X and Back that do the same thing; the exit word rule is Back.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-14",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.count"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Born and Dead repeat on Counting, Finish, locked record and log",
+  "detail": "The same Born / Dead (and Alive) figures are redrawn on four surfaces one tap apart. Rank which one the worker must see on each; the hero should own the total.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-15",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.count"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Header lacks ruled recency stamp and day count",
+  "detail": "Header status word \"Farrowing\" repeats the room chip, and the ruled recency stamp and gestation day are missing. Also true of Before first count, which prints the Due text the row just showed.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-16",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.count"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Pointer text replaces the receipt and shifts the layout",
+  "detail": "The greyed-minus pointer differs from the ruled two-pointer copy and takes the receipt's place for 4 s, so the hero area changes height under a tapping thumb.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-17",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.count"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "\"Record dead\" or \"Record death\" for the button name?",
+  "detail": "RULINGS says Record dead; farrowing count, locked and drawer title read Record death, and piglet processing also says Record death. One verb for the one shared drawer.",
+  "source": "notes",
+  "options": [
+   "Record dead (ruling)",
+   "Record death (prototype, both tasks)"
+  ],
+  "recommendation": "Record dead, as ruled; change the prototypes."
+ },
+ {
+  "id": "tasks-built-18",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.count"
+  },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "Disabled minus is aria-only; behaviour at the floor not specified",
+  "detail": "At the floor the minus is only aria-disabled; whether it looks disabled depends on CSS, it stays focusable and a tap shows the pointer. State the intended disabled contract.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-19",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.count"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Edit and Finish drawn dimmed with no reason shown",
+  "detail": "Edit and Finish farrowing are greyed on Before first count, and Finish stays greyed with no reason. Rulings allow dimming only for the Alive minus floor; waiting buttons need a visible reason (see gate on Button).",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-20",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.before"
+  },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "Receipt copy contradicts ruling that removed the instruction",
+  "detail": "\"Tap + as piglets are born\" is the instruction the ruling removed; it belongs under the room title, where it is also missing. Decide where the first-use hint lives.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-21",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.death"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Does leaving the dead drawer keep or discard the draft?",
+  "detail": "Rulings: Back keeps the draft, Clear discards. Prototype: Back, X, swipe and backdrop all discard it, so \"N unsaved\", Finish's \"Save piglet deaths first\" and the death-draft blocked state never appear.",
+  "source": "notes",
+  "options": [
+   "Keep the draft (ruling), show \"N unsaved\" on the sheet and row",
+   "Discard on leave; Save is the only commit (prototype)",
+   "Discard on leave with a confirm when the draft is non-empty"
+  ],
+  "recommendation": "Discard with a confirm when non-empty: removes the unreachable blocked variants and fits the simplicity rule. Reverses a ruling, so the owner must nod."
+ },
+ {
+  "id": "tasks-built-22",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.death"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Dead drawer shows no sow id or pen",
+  "detail": "Header reads \"Dead 6 · Born dead or died\"; the worker cannot see which sow is being recorded, and the drawer opens from five places.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-23",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.death"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Draft told three ways: header, \"1 unsaved\", green row",
+  "detail": "\"Dead 6\", \"1 unsaved\" and the green value all say the same draft. Photo field is a header row with an icon button, not the ruled single card, and sits under the fold.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-24",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.death"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "After the lock, where are piglet deaths recorded?",
+  "detail": "Locked and ended farrowing records offer Record death, and the processing pen sheet has its own Record death. Two doors for one fact; Q9 wants one shared dead picker. No rule says which task owns post-lock deaths.",
+  "source": "sweep",
+  "options": [
+   "Farrowing locked record only",
+   "Processing pen sheet only; farrowing locked bar drops it",
+   "Both, writing one ledger via the same drawer"
+  ],
+  "recommendation": "Both doors open the one shared dead drawer and write the same record; no duplicate entry forms."
+ },
+ {
+  "id": "tasks-built-25",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.death"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "May piglet deaths be recorded after the sow has died?",
+  "detail": "Ended records allow piglet deaths; the ruling is silent. The sow's alive piglets move to piglet care, where processing records deaths too.",
+  "source": "notes",
+  "options": [
+   "Allow, as built",
+   "Block; route to processing"
+  ],
+  "recommendation": "Allow: same door as a locked record, so rules stay uniform."
+ },
+ {
+  "id": "tasks-built-26",
+  "target": {
+   "kind": "component",
+   "id": "TaskStepper"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Steppers still 44px, below the 48px glove floor",
+  "detail": "TaskStepper row face and farrowing .row-stepper keys are 44x44, and farrowing hand-rolls three look-alike steppers instead of SentriTask.stepper. Sow count keys are the most-tapped control.",
+  "source": "gate"
+ },
+ {
+  "id": "tasks-built-27",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.finish"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Primary button repeats the sheet title",
+  "detail": "The ruled button is \"Lock born N\"; the prototype reads \"Finish farrowing\", the same words as the sheet title. The Born / Alive / Dead panel repeats Counting one tap earlier.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-28",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.finish"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Litter weight and Assistance are two buttons, not one group",
+  "detail": "Rulings ask for one cohesive optional group. Two collapsed buttons are drawn, and the ruled soft warning for litter weight outside 0.8-2.5 kg per alive piglet does not exist.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-29",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.blocked"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Death-draft variant of Lock blocked cannot be reached",
+  "detail": "Only the Edit-draft route reaches it, because leaving the death drawer clears the draft. Banner copy and layout also differ from the ruled \"1 death unsaved · Record dead\" pointer above the bar.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-30",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.locked"
+  },
+  "kind": "design",
+  "severity": "high",
+  "title": "Locked record is a facts list, not the ruled record face",
+  "detail": "Ruling: one summary card (14 born | 8 alive | 6 dead), rows At finish / Finished / Farrowing record, bar Edit · Record dead. Built: seven-row list, Edit and Record death in an action row, View log as a title link. Dead is told three ways.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-31",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.locked"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "A missing piglet after the lock has no door",
+  "detail": "Edge case says it \"routes through the litter census elsewhere\". No spec says where, and Set count (processing) is the only count tool; developers cannot tell which screen owns it.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-32",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.edit"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Edit Save dimmed and Clear in header, against ruling",
+  "detail": "Ruling: Save absent before a change, never greyed; Clear on the change-summary row. Built: Save dimmed from entry, Clear in the header.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-33",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.edit"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Edit lets Alive drop below the floor; Born effect unexplained",
+  "detail": "Alive can go below the counting floor, which changes derived Born, and nothing on screen explains it. Needs a rule on how a pre-lock Alive correction restates Born in the log.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-34",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.born"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Died option shows the full cause list inline in the popup",
+  "detail": "More born > Died opens six causes inside a popup, long on a small phone. The Edit screen behind the popup is not shown on its own anywhere.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-35",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.born"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Selected radio shows a blue browser focus ring",
+  "detail": "The first radio in the Correct born popup draws a default blue box, off-palette against the 2px ink ring ruled for radios.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-36",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.edit-finished"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Finish details opens a page; ruling expands the row in place",
+  "detail": "Prototype pushes a separate \"Edit finish details\" page, the ruling expands the row. PRD also calls it \"At finish\", the screen \"Finish details\".",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-37",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.history"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Log not newest-first; finish entry repeats \"Farrowing finished\"",
+  "detail": "Groups run \"5 days ago\", \"Aug 27\", \"Aug 26\" (mixed relative and absolute). The finish entry prints its title and detail identically, and every row repeats the hand's full name.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-38",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.history"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Log lacks ruled rail, amber corrections and red sow-death mark",
+  "detail": "Title is \"Farrowing log\"; the copy pass names it \"Farrowing record\". No amber correction values or red sow-death milestone as ruled. Gate agrees: one act, one entry, detail never repeats the title.",
+  "source": "gate"
+ },
+ {
+  "id": "tasks-built-39",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.ended"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Sow-died record misses ruled \"Farrowing record\" row",
+  "detail": "The stamp inside the band and the Farrowing record row are missing; the death is told in the stamp, the band and the room chip, and the face is the generic summary.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-40",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.task-blocked"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Can the task end while sows are still farrowing?",
+  "detail": "Prototype blocks ending on active sows and unsaved drafts (ruling Q5). State contract C9 says closing is never blocked; Round 4 says End is allowed with review items open. Three sources disagree.",
+  "source": "notes",
+  "options": [
+   "Block on active sows and drafts (as built)",
+   "Block on active sows only; drafts dropped with a warning",
+   "Never block; list as unresolved at End"
+  ],
+  "recommendation": "Block on active sows only. Unsaved drafts are listed and dropped with a clear warning, so one stuck draft cannot hold the batch."
+ },
+ {
+  "id": "tasks-built-41",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.task-blocked"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Same counts shown by warnings, outcomes, overview and receipt",
+  "detail": "Warning cards, Task outcomes rows, the overview card, Performance metrics and the receipt state the same counts three to four times across the end flow.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-42",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.task-blocked"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Outcome rows total 19 sows; progress bar says 18",
+  "detail": "End review header and outcomes list 19 sows (e.g. Finished 18 + Sow deaths 1), but the overview denominator is 18. A sow that died after finishing is counted in Farrowed and again in Sow deaths.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-43",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.task-blocked"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Primary button dimmed while disabled, no reason",
+  "detail": "The blocked End button is dim-as-disabled, with the reason only in cards above. Show the reason beside the button.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-44",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.task-ready"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Where do awaiting sows go when the task ends early?",
+  "detail": "Ending early marks awaiting sows \"removed from this batch\", a marker only; no transfer is built and the card does not say where they go. Pig-profile says removal returns a sow to rebreed watch.",
+  "source": "notes",
+  "options": [
+   "Marker only, nothing else changes",
+   "Return to rebreed watch (as batch removal does)",
+   "Carry into the next batch's awaiting list"
+  ],
+  "recommendation": "Return to rebreed watch and say so on the warning card."
+ },
+ {
+  "id": "tasks-built-45",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.task-ready"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Removal card and \"Awaiting 9\" row state the same fact",
+  "detail": "The amber removal warning and the Awaiting farrowing outcome row both say 9; one should go.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-46",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.task-complete"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "With no warnings, End is two summaries already on the overview",
+  "detail": "The all-finished review adds no information beyond the Task overview; consider ending from the overview directly.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-47",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.task-outcomes"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Miscarriage and \"Not in pig\" entry forms are not designed",
+  "detail": "Outcomes appear in counts, but the Record miscarriage, Mark not in pig and Edit litter record rows on the pig Actions sheet (in PRD scope) have no screen; atlas shows pig-profile addsTo as not added.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-48",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.overview"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Red \"End task early\" outline only opens review, looks committing",
+  "detail": "On the overview the bar button is a red-washed outline that only opens the review; on the review the same words are a solid red hold. Two looks for one verb; a tap should not wear the danger colour.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-49",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.overview"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Unit chooser duplicates Home's Choose unit",
+  "detail": "Both list units with their progress; the overview also repeats progress, performance and outcomes that End and the receipt show.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-50",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.task-receipt"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Frozen receipt vs live sow records after End",
+  "detail": "Receipt figures come from the closure event, but \"sow records stay live\". No rule says whether a later correction changes, annotates or is excluded from the receipt, or who is told.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-51",
+  "target": {
+   "kind": "screen",
+   "id": "farrowing.task-receipt"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Third appearance of performance and outcome blocks",
+  "detail": "Overview, End review and receipt show the same two cards. The receipt should carry only who, when and what changed since.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-52",
+  "target": {
+   "kind": "feature",
+   "id": "farrowing"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Prototype-only values: draft, recency, hand not computed",
+  "detail": "Several notes mark values as fixed sample text. Developers need the data source for recency, hand, Last record, due text, and the draft store before the freeze.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-53",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-list"
+  },
+  "kind": "broken",
+  "severity": "high",
+  "title": "\"3 / 12 pens done\" counts pens not started as done",
+  "detail": "Pens with every step ahead (B05, B06) count done, so 1 finished pen shows as 3. PRD says Done means nothing left and nothing ahead. The same rule feeds the Done chip and End page.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-54",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-list"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "What should \"pens done\" and the Done chip count?",
+  "detail": "Owner open item: a pen with nothing due yet counts as done. It overstates progress, lists unstarted pens under Done, and End shows them again under \"Not due yet\".",
+  "source": "notes",
+  "options": [
+   "Done = nothing left and nothing ahead (PRD); bar never reaches 100% before End",
+   "Count only pens that owe something today; Coming pens leave both sides",
+   "Keep as built"
+  ],
+  "recommendation": "Coming pens leave numerator and denominator: \"3 of 9 pens done today\"."
+ },
+ {
+  "id": "tasks-built-55",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-list"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Is bulk recording by job chip built, as Rounds 8-9 ruled?",
+  "detail": "Round 9: tap a job chip, tick through pens, one \"Finish iron treatment\" hold; Round 8 adds a window override. Prototype chips only filter, so every pen opens separately. Owner twice kept bulk.",
+  "source": "notes",
+  "options": [
+   "Build as ruled",
+   "Filter only for v1; bulk after the freeze",
+   "Drop bulk"
+  ],
+  "recommendation": "Build the smallest form: chip, tick pens inside the window, one hold. Outside-window pens stay a manual override."
+ },
+ {
+  "id": "tasks-built-56",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-list"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "No way back to Home from the pen list",
+  "detail": "Header has no back control, unlike farrowing's room; the only exit is the browser. Latest commit says Back on every bar.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-57",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-list"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Pen list has no dock, search, scan or Go to pen",
+  "detail": "The skeleton ends in a dock; farrowing has Go to pen, Scan ear tag and Search. Processing shows 12 pens with none of them, though a batch can hold dozens and tags are the identifier.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-58",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-list"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Summary card names one job; chips show bigger ones",
+  "detail": "The card says \"Iron 6\" while Tag is 7; only the first job in plan order is named, so the headline is not the biggest or most urgent workload.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-59",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-list"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Pen code and sow id repeat; header says \"1 sow\" everywhere",
+  "detail": "Group header and row both name the pen and sow, and \"1 sow\" is printed on every pen because multi-sow pens are out of scope. Pure noise on a 12-row list.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-60",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-list"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Home and the task disagree on batch, pens and timing",
+  "detail": "Home says Batch 27, 8 pens, care due tomorrow; the list shows Batch 40, 12 pens, 6 due today.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-61",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-list"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "\"Last record 08:20\" has no date",
+  "detail": "Time only, never the date, so it can be yesterday's; the newest row shows 10/09. The Tag chip's tip string (sp.chip.id.tip) is also never shown.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-62",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-list"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Tag and Done chips sit off-screen in the scroll row",
+  "detail": "At 390px the row ends at \"Castrate 6\" with a fade; Tag 7 and Done 3, the two most-used filters, need a sideways swipe to discover.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-63",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.job-chip"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Job chip shows pens but nothing to tick",
+  "detail": "The list is only a filter; every pen still opens to record. See the bulk decision on the pen list.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-64",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.chip-done"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Done chip lists pens that have not started",
+  "detail": "B05 and B06 (\"Iron tomorrow\") appear next to finished A01 under Done.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-65",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.list-no-id"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "How is a farm's ID scheme set in the product?",
+  "detail": "The scheme (tag, notch, breeders only, none) is a Demo switch outside the phone. Round 2 Q17 also wants who, which day and the done rule configured.",
+  "source": "notes",
+  "options": [
+   "Farm-level console setting, read-only in the app",
+   "Per batch, chosen when the task starts",
+   "Per task, editable by the supervisor"
+  ],
+  "recommendation": "Farm-level console setting; the app only reads it."
+ },
+ {
+  "id": "tasks-built-66",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.list-no-id"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "ID step window (day 3-7) is a builder guess",
+  "detail": "PRD lists \"ID window day 3-7\" as interpreted by the builder; Q17 says the age-day is farm config. The step turns late after day 7, with no cut-off ruling.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-67",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.phone-clash"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "First-in wins, second kept as a note: confirm or revert?",
+  "detail": "PRD: \"simplification, not yet confirmed\". Rulings Q8 and Round 4/6 keep both records and flag \"Given twice\" or \"Different piglets\"; those answers are dropped here.",
+  "source": "notes",
+  "options": [
+   "First wins; second kept as a note, never counted",
+   "Keep both, flag a possible double dose (rulings)",
+   "First wins and ask the second worker \"same piglets?\""
+  ],
+  "recommendation": "First wins, second kept as a note: nothing for farmers to answer."
+ },
+ {
+  "id": "tasks-built-68",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.phone-clash"
+  },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "Clash note has no dismiss rule or placement spec",
+  "detail": "An amber note sits above the summary until OK; whether it queues when several arrive, and how it behaves offline, is not stated.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-69",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-coming"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Not-yet-due sheet gives no opening day",
+  "detail": "Everything is greyed \"Not due yet · can be done early\" yet nothing says which day opens first except the list headline.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-70",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-todo"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Which event starts pen day 1, and where do dates come from?",
+  "detail": "Day cards print \"Planned 10/07\" derived from pen age, not a farrowing date. Farrowing has no \"when\"; a litter can take hours or days. Needs a rule: day 1 is the finish date, the first count, or the sow's date.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-71",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-todo"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Castration is owed for boars only; prototype owes all piglets",
+  "detail": "Castrate ticks all live piglets, and fewer piglets forces \"Why fewer? Weak / Sick\", so gilts would have to be recorded as weak. Q16 recorded castrated vs not, split by reason.",
+  "source": "sweep",
+  "options": [
+   "Owe boars only, using Boars · gilts or the IDs' sex",
+   "Owe all piglets; add a reason \"gilts\" and others",
+   "Show Castrate only after sex is known"
+  ],
+  "recommendation": "Owe boars only; use the saved Boars · gilts split, and show Castrate for all when unknown."
+ },
+ {
+  "id": "tasks-built-72",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-todo"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Rename \"Submit\"? Verb rule bans it",
+  "detail": "Q11 bans Submit, Confirm and Complete; the sheet, PRD and strings use Submit. Gate flags it on Button. The button also reads greyed with no reason at 0 ticks.",
+  "source": "gate",
+  "options": [
+   "Record N items",
+   "Submit (as built; amend Q11)"
+  ],
+  "recommendation": "Record 2 items - matches Record in Q11 and counts what is saved."
+ },
+ {
+  "id": "tasks-built-73",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-todo"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Piglets card: four facts, four doors, plus a weigh nag",
+  "detail": "Boars/gilts, Litter weight, Tagged and Breeders kept each open a different sheet, with a weigh hint above the tool row. Q18 says processing records weight \"only when missing, no nag\".",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-74",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-todo"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Ticked count \"12 piglets\" reads as a value, not a button",
+  "detail": "After a tick the count to adjust is plain mono text. Make the control state obvious or move it to an explicit row action.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-75",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-todo"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Losses \"come off untreated piglets first\" is a builder rule",
+  "detail": "A death or Set count lowers alive and caps treatments given at alive, assuming the lost piglets were untreated first. Not ruled; a treated piglet dying leaves \"given\" wrong for the pen.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-76",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-todo"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Treatment windows: constants or console config, one dose only?",
+  "detail": "Windows (Iron 2-4, Tail 2-4, Castrate 3-7, Cocci 3-5, ID 3-7) are fixed. Q2 sends product and dose from console; Q12 makes each dose its own obligation (iron d3, d14). Source and multi-dose support not stated.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-77",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-breeders"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "May the breeders pick close with no breeders?",
+  "detail": "Builder rule: \"Done picking · no breeders\" closes the step. Q17 lets the worker close the set; no ruling says zero keepers is valid.",
+  "source": "notes",
+  "options": [
+   "Allowed (as built)",
+   "Require at least one breeder",
+   "Ask \"no breeders?\" once"
+  ],
+  "recommendation": "Allowed with one confirm."
+ },
+ {
+  "id": "tasks-built-78",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-late"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Keep one \"late\" state or add Round 2's \"missed\"?",
+  "detail": "Q15 had a lapsed state: missed past the last age-day, counting as owed at End (Round 7). Prototype: everything past its window is late forever, per Q6 \"no clinical cut-off\".",
+  "source": "notes",
+  "options": [
+   "Late only (as built); End lists as not given",
+   "Add missed after the last window day"
+  ],
+  "recommendation": "Late only: farmers get one word; End already lists what was not given."
+ },
+ {
+  "id": "tasks-built-79",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-done"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "How is a wrong record corrected, before and after End?",
+  "detail": "Q7 and Round 1: Edit by anyone, stamped, original kept, writable after End. Prototype: only Undo within the visit; Edit and all after-End writes were cut (HANDOFF open 1). A wrong done row stays wrong.",
+  "source": "notes",
+  "options": [
+   "Edit as ruled (stamped, original kept)",
+   "Withdraw a done row (stamped, kept), then re-record; read-only after End",
+   "Undo within the visit only (as built)"
+  ],
+  "recommendation": "Withdraw and re-record, like crossing out on paper; no value edit; read-only after End."
+ },
+ {
+  "id": "tasks-built-80",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-done"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Done pen still offers Submit and Tag piglets",
+  "detail": "A fully done pen shows a disabled Submit and a Tag piglets tool when 12 of 12 are tagged. The Done card's \"Show\" label also reads as a title.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-81",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.adjust-count"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Only Weak and Sick as reasons: add Other or exempt reasons?",
+  "detail": "Round 2 reasons (hernia, cryptorchid, kept boar) were cut. Fewer piglets with no fitting reason forces a false one, especially for castrate.",
+  "source": "notes",
+  "options": [
+   "Weak, Sick only",
+   "Add Other (no text)",
+   "Per-treatment reasons"
+  ],
+  "recommendation": "Add Other with no text; revisit per-treatment after the castration decision."
+ },
+ {
+  "id": "tasks-built-82",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.tagged-list"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "\"Tagged x of y\" appears three times",
+  "detail": "Group header, Piglets card and the ID item meta all say it. Also unclear: dead piglets keep their tags on this list because deaths are counted, not picked.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-83",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.give-ids"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Give IDs never stops after the last piglet",
+  "detail": "After the last piglet the form offers another; the count left (\"8 without ID\") lives only in the description. Add a done state.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-84",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.give-ids"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Sex required per piglet, but Q3 says never block",
+  "detail": "Record stays disabled until a sex is tapped. Q3: sex and weight are optional and never block. Sex feeds boars/gilts and castration but adds a tap to every piglet.",
+  "source": "notes",
+  "options": [
+   "Required (as built); amend Q3",
+   "Optional; fill from Boars · gilts later"
+  ],
+  "recommendation": "Required: castration and breeders both need it."
+ },
+ {
+  "id": "tasks-built-85",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.give-ids"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Optional weight is a full field, not a collapsed row",
+  "detail": "Weight renders as a full 62px field; farrowing's optional facts are \"+ Litter weight\" rows.",
+  "source": "gate"
+ },
+ {
+  "id": "tasks-built-86",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.tagged-list"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "Where does per-piglet work live: tasks or a universal feature?",
+  "detail": "Round 10 direction: ID, weigh, sex and breeder pick may become universal. Proposal pending; ranking is placeholder. Impacts this whole sheet set.",
+  "source": "notes",
+  "options": [
+   "Universal feature opened from any task",
+   "Keep inside piglet processing for v1"
+  ],
+  "recommendation": "Keep inside processing for v1; build as shared parts so it can move."
+ },
+ {
+  "id": "tasks-built-87",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.counts"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Boars plus gilts not checked against alive",
+  "detail": "The two steppers can total more or fewer than the pen's alive count with no warning; castration depends on this number.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-88",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.weight"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Litter weight here vs birth litter weight in farrowing",
+  "detail": "Both are labelled \"Litter weight\" (12.6 kg at birth; 24.6 kg on day 6). No rule on how they differ, which wins, or whether processing may overwrite the farrowing figure.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-89",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.weight"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Second weighing appended; no plausibility check",
+  "detail": "Glossary says replace on the same day and refuse over 6 kg per piglet; built appends and accepts anything. Weight log lines also show no who or when.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-90",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.more-actions"
+  },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "More actions has no notes; Edit tool is missing",
+  "detail": "The sheet lists Move piglets and Set count with no elements or states. Round 5 lists Edit among the pen tools; it was cut.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-91",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.record-death"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Is count-by-cause enough, or build the shared dead picker?",
+  "detail": "Q9 (owner, in principle): processing uses the one shared dead picker, listing tagged piglets. Built: a count-by-cause sheet with four causes (farrowing has six). Tags stay listed after a death.",
+  "source": "notes",
+  "options": [
+   "Shared dead drawer (same component), untagged by cause",
+   "Shared drawer that also picks tagged piglets",
+   "Count-by-cause sheet (as built)"
+  ],
+  "recommendation": "Use the farrowing dead drawer component by cause; picking tagged piglets is later."
+ },
+ {
+  "id": "tasks-built-92",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.record-death"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Dead sheet opens over the pen sheet: stacked drawers",
+  "detail": "Gate: a drawer stacked on a drawer, against one overlay at a time. Save also reads greyed with no reason.",
+  "source": "gate"
+ },
+ {
+  "id": "tasks-built-93",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.move-piglets"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Moved piglets' IDs do not move to the new pen",
+  "detail": "Piglets tagged before the move keep tags, but the IDs stay on the old pen, so Tagged x of y and the Piglets list disagree on both pens.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-94",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.move-piglets"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Do moved piglets follow the source or destination schedule?",
+  "detail": "A day-4 piglet moved to a day-1 pen is marked \"moved in\" and owed under the receiving pen's age. Q14 says they carry what the source owed; the receiving-pen suggestion was cut.",
+  "source": "sweep",
+  "options": [
+   "Destination pen age (as built)",
+   "Source pen age, shown on the piglet",
+   "Block moves across more than 2 days"
+  ],
+  "recommendation": "Destination pen age; warn when the gap is more than 2 days."
+ },
+ {
+  "id": "tasks-built-95",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.move-piglets"
+  },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "Pen tiles do not scale; Move vs lock rule unchecked",
+  "detail": "Tiles list every pen with only a day; a real batch holds dozens. Q13 allows Move only after farrowing lock, and no check is shown.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-96",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.set-count"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "What does \"N piglets unaccounted\" do for the worker?",
+  "detail": "Set count writes a batch total that shows on the list and End but never says which pen, who or how it clears. Round 9 keeps it as a checker only.",
+  "source": "notes",
+  "options": [
+   "Informational only (as built)",
+   "Tap shows pens with lower counts",
+   "Supervisor must acknowledge at End"
+  ],
+  "recommendation": "Tap opens the pens whose counts came in lower; still non-blocking."
+ },
+ {
+  "id": "tasks-built-97",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-log"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Pen log writes one entry per piglet ID",
+  "detail": "Twelve \"ID 0012xx\" lines bury everything else. Group one act into one entry (\"12 IDs · 001201-001212\"). Gate raises the same issue; weight lines show no actor.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-98",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-log"
+  },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "Born is farrowing's number, not seen here",
+  "detail": "Day 0 shows \"Born 13\"; the log cannot correct it and no link goes to the farrowing record.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-99",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.end-task"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Block End while the batch's farrowing is open?",
+  "detail": "Q5 (agreed): cannot end while farrowing is open, with the reason shown. Not built: End is always available. Farrowing also has its own blocking question.",
+  "source": "notes",
+  "options": [
+   "Block with a reason line (ruling)",
+   "Allow, list as unresolved",
+   "Block only for pens whose farrowing is open"
+  ],
+  "recommendation": "Block with the reason (\"Farrowing still open · 2 sows\")."
+ },
+ {
+  "id": "tasks-built-100",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.end-task"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Who may end the task?",
+  "detail": "Code comment says the supervisor; no role check. Farrowing says provenance replaces permissions, and the PRD says \"a supervisor ends the task\".",
+  "source": "notes",
+  "options": [
+   "Anyone, stamped (like farrowing)",
+   "Supervisors only"
+  ],
+  "recommendation": "Anyone, stamped; the hold is the guard."
+ },
+ {
+  "id": "tasks-built-101",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.end-task"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "End review is 12 pen rows, not \"numbers\"",
+  "detail": "Q5 wants the review in numbers; the page lists each pen with steps and meta. \"Not due yet\" duplicates unstarted pens already counted done.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-102",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.list-ended"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "After End every row reads \"Task ended\"; done equals not done",
+  "detail": "Chips go, the headline becomes \"Task ended\" for finished and unfinished pens alike, and the summary repeats \"Not done 9\" and \"3 / 12 done\". Done pens lose their chip.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-103",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.list-ended"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "After-End records: blocked, flagged-uncounted, or writable?",
+  "detail": "Round 3: an after-End record is kept, stamped \"after End\", never counted. Round 1 Q7: corrections stay writable. Prototype blocks all writes, including other-phone sync.",
+  "source": "notes",
+  "options": [
+   "Block all (as built)",
+   "Keep stamped \"after End\", not counted (Round 3)"
+  ],
+  "recommendation": "Block in the app; accept late sync as a flagged, uncounted record."
+ },
+ {
+  "id": "tasks-built-104",
+  "target": {
+   "kind": "feature",
+   "id": "piglet-processing"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Atlas copy lists show string keys, not copy",
+  "detail": "Every piglet screen's copy field holds raw keys (\"sp.task\", \"sp.sum.due\") instead of text, so a developer or translator cannot read the screens' copy.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-105",
+  "target": {
+   "kind": "feature",
+   "id": "piglet-processing"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Which build is the one to freeze: simple/ or the full task?",
+  "detail": "HANDOFF open 4: carry simplified flows into the full task or promote simple/ as the task. The full-task rulings (Edit, Explain, bulk hold, shared dead picker) are not built in simple/.",
+  "source": "notes",
+  "options": [
+   "Promote simple/ as the task",
+   "Carry simple/ flows into the full task"
+  ],
+  "recommendation": "Promote simple/; add only bulk and the shared dead picker."
+ },
+ {
+  "id": "tasks-built-106",
+  "target": {
+   "kind": "feature",
+   "id": "piglet-processing"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Confirm builder rules: Move asks \"Have tags?\"; Tag chip filters",
+  "detail": "Unconfirmed builder interpretations: Move asks \"Have tags?\", the Tag chip only filters (no bulk tagging), a higher count just corrects, past-window sheet records auto-late.",
+  "source": "notes",
+  "options": [
+   "Confirm all",
+   "Reject the Tag-chip filter-only rule"
+  ],
+  "recommendation": "Confirm all; revisit with the bulk decision."
+ },
+ {
+  "id": "tasks-built-107",
+  "target": {
+   "kind": "pattern",
+   "id": "Task skeleton"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Approve the 24 candidate Task parts, tokens and colour snaps?",
+  "detail": "All Task* parts are \"candidate, not approved\", with no gate.json. ADR 0003 lists candidate tokens, colour snaps and a full-bleed status bar as still open for the owner at close.",
+  "source": "notes",
+  "options": [
+   "Approve as a set",
+   "Approve only parts both tasks use",
+   "Hold until gated"
+  ],
+  "recommendation": "Gate every part first (none has run), then approve as a set."
+ },
+ {
+  "id": "tasks-built-108",
+  "target": {
+   "kind": "pattern",
+   "id": "Task skeleton"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Chips or lens tabs as every task's list filter?",
+  "detail": "Processing filters by job with chips; farrowing by status with lens tabs. ADR: \"decided per task for now\". Other tasks have no design yet.",
+  "source": "notes",
+  "options": [
+   "Two named variants: tabs for status, chips for jobs",
+   "Chips everywhere",
+   "Tabs everywhere"
+  ],
+  "recommendation": "Two named variants; document each in the pattern."
+ },
+ {
+  "id": "tasks-built-109",
+  "target": {
+   "kind": "pattern",
+   "id": "Task skeleton"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Keep 9px captions and headings in the skeleton?",
+  "detail": "Hold caption, dock caption and table heading are 9px \"below the floor by the owner's round-5 ruling\"; gate also flags two hold faces. Round 5 says revisit README rules for both tasks.",
+  "source": "gate",
+  "options": [
+   "Keep 9px (match farrowing)",
+   "Raise to 10-11px in both tasks"
+  ],
+  "recommendation": "Raise to 11px for both: gloved, night-time use."
+ },
+ {
+  "id": "tasks-built-110",
+  "target": {
+   "kind": "pattern",
+   "id": "Task skeleton"
+  },
+  "kind": "design",
+  "severity": "high",
+  "title": "Farrowing does not run on the skeleton it defines",
+  "detail": "Farrowing uses hand-rolled classes (sentri-components.js); only piglet processing uses Task parts. Parity is checked by pixel comparison only, and gate shows two implementations for sheet and page.",
+  "source": "gate"
+ },
+ {
+  "id": "tasks-built-111",
+  "target": {
+   "kind": "pattern",
+   "id": "Task skeleton"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Pattern says dock, lens tabs, unit card; processing lacks all three",
+  "detail": "The two listed screens differ: no dock, chips instead of tabs, a job card instead of a unit figure. The pattern note describes one screen, not its permitted variations.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-112",
+  "target": {
+   "kind": "component",
+   "id": "TaskSheet"
+  },
+  "kind": "design",
+  "severity": "high",
+  "title": "TaskSheet and Sheet draw the same drawer twice",
+  "detail": "Sheet (.sheet, farrowing and inspection) and TaskSheet/TaskPage (.tk-*) differ in gutters, heights and close rules. Owner rule: one implementation per job.",
+  "source": "gate"
+ },
+ {
+  "id": "tasks-built-113",
+  "target": {
+   "kind": "component",
+   "id": "TaskWarning"
+  },
+  "kind": "design",
+  "severity": "high",
+  "title": "TaskWarning and Banner do one job with two looks",
+  "detail": "Banner danger (14/700 headline) and TaskWarning red (12/700 title), plus Home's offline banner, are three look-alikes of one consequence-above-commit pattern.",
+  "source": "gate"
+ },
+ {
+  "id": "tasks-built-114",
+  "target": {
+   "kind": "component",
+   "id": "TaskRow"
+  },
+  "kind": "design",
+  "severity": "high",
+  "title": "TaskRow and Row are two row families",
+  "detail": "Row's candidates have no screen; TaskRow and TaskDay serve every real task screen. Farrowing's .sow-row is a further look-alike.",
+  "source": "gate"
+ },
+ {
+  "id": "tasks-built-115",
+  "target": {
+   "kind": "component",
+   "id": "TaskRow"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Status chips are built outside the Status component",
+  "detail": "To do, Done, Late, Active and Sow died chips are hand-built (.tk-chip, .state-word) rather than Status; \"Due tomorrow\" is not defined as a forecast.",
+  "source": "gate"
+ },
+ {
+  "id": "tasks-built-116",
+  "target": {
+   "kind": "component",
+   "id": "TaskPhone"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Full-bleed status bar kept at phone width: unconfirmed",
+  "detail": "ADR open question 6: the demo status bar stays on a phone-width window; a real phone has its own. Pending owner nod.",
+  "source": "notes"
+ },
+ {
+  "id": "tasks-built-117",
+  "target": {
+   "kind": "section",
+   "id": "tasks"
+  },
+  "kind": "design",
+  "severity": "high",
+  "title": "Eight of ten task types are Figma placeholders",
+  "detail": "Breeding, heat check, post-farrowing, weaning, pregnancy, return heat, end nursery and end finishing have no design; the section promise \"all tasks look the same\" is tested on two.",
+  "source": "sweep"
+ },
+ {
+  "id": "tasks-built-118",
+  "target": {
+   "kind": "section",
+   "id": "tasks"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Task skeleton assumes pen grouping; other tasks may group otherwise",
+  "detail": "Section copy says rows are grouped by pen. Weaning, heat check and finishing may group by batch, sow or room. Say what the skeleton permits and what a new task must decide.",
+  "source": "sweep"
+ }
+]

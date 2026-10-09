@@ -1,0 +1,927 @@
+[
+ {
+  "id": "home-and-placeholders-1",
+  "target": {
+   "kind": "feature",
+   "id": "environment"
+  },
+  "kind": "broken",
+  "severity": "high",
+  "title": "All 7 environment screens open the unit hub, not their own screen",
+  "detail": "None of the environment screens has steps or a preset, so each opens the Home unit page instead of the sensors, fan, maintenance or issue views. The atlas shows the wrong picture for the whole feature.",
+  "source": "sweep"
+ },
+ {
+  "id": "home-and-placeholders-2",
+  "target": {
+   "kind": "feature",
+   "id": "environment"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Does Inspection keep its built equipment-fault and unit-environment screens?",
+  "detail": "Environment's PRD says Inspection no longer carries sensors or maintenance, but Inspection still holds built unit-detail, pen-faults, fault-report, fault-resolve and sensor screens, and its section text says equipment and environment sit there. Two homes for the same faults.",
+  "source": "sweep",
+  "options": [
+   "Remove the Inspection fault and sensor screens; Environment owns them",
+   "Keep a per-pen fault entry in Inspection that writes the same record",
+   "Keep both and merge later"
+  ],
+  "recommendation": "Remove from Inspection; keep one fault record owned by Environment, and let the pen sheet link to it."
+ },
+ {
+  "id": "home-and-placeholders-3",
+  "target": {
+   "kind": "screen",
+   "id": "environment.page"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Who is told when a reading is out of range?",
+  "detail": "Alert thresholds, recipients and the source of real readings are not defined anywhere; the page shows only sample history.",
+  "source": "notes",
+  "options": [
+   "Out of scope for the prototype; mark as backend follow-up",
+   "Fixed farm-wide thresholds, flag on the unit hub",
+   "Per-unit thresholds set by a supervisor"
+  ],
+  "recommendation": "Mark out of scope now; decide thresholds before real data is wired."
+ },
+ {
+  "id": "home-and-placeholders-4",
+  "target": {
+   "kind": "screen",
+   "id": "environment.page"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Can the fan be set offline, and is 0% allowed?",
+  "detail": "Auto/Manual and Apply are disabled offline, so a worker in a room without signal cannot change the fan. Speed 0 needs no confirmation or limit. Neither rule is decided.",
+  "source": "notes",
+  "options": [
+   "Disabled offline, 0% blocked below a minimum",
+   "Queue the command and show it as pending",
+   "Allow 0% with a confirmation"
+  ],
+  "recommendation": "Keep disabled offline (a queued command to equipment is unsafe); set a minimum speed or confirm 0%."
+ },
+ {
+  "id": "home-and-placeholders-5",
+  "target": {
+   "kind": "screen",
+   "id": "environment.page"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Offline note repeats three times; last reading fixed at 09:40",
+  "detail": "The offline message shows under the chart, on the Devices tag and under the fan; every sensor shows one 09:40 time while the status bar says 9:41. Say it once, with a time per sensor.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-6",
+  "target": {
+   "kind": "feature",
+   "id": "environment"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Do Farrowing and Breeding units get an environment entrance?",
+  "detail": "The sample gives them no sensors, so the card is absent, but old-design farrowing rooms carry sensors. A farrowing worker then has no environment or maintenance door at all.",
+  "source": "notes",
+  "options": [
+   "Same entrance in every unit; empty state when no devices",
+   "Only where the unit has sensors or devices (today)",
+   "Always show Maintenance, show Environment only with data"
+  ],
+  "recommendation": "Always show Maintenance (equipment fails anywhere); show Environment only with data."
+ },
+ {
+  "id": "home-and-placeholders-7",
+  "target": {
+   "kind": "screen",
+   "id": "environment.maintenance"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Should the Maintenance chip open the issue list?",
+  "detail": "The Maintenance chip on the unit hub opens Inspection; the list is only reachable through Toolbox, which exists only inside a unit. Two taps and an unexpected destination.",
+  "source": "notes",
+  "options": [
+   "Chip opens Maintenance",
+   "Chip stays a signal, Toolbox is the door",
+   "Remove the chip, put the count on the Environment card"
+  ],
+  "recommendation": "Chip opens the Maintenance list; keep Toolbox as a second door."
+ },
+ {
+  "id": "home-and-placeholders-8",
+  "target": {
+   "kind": "screen",
+   "id": "environment.report-issue"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Equipment and location are free text with no picklist",
+  "detail": "The reporter types equipment and location, though the unit's pens and devices are known. Typing with gloves is slow and produces unmatchable names. Use pen and equipment pickers with Other.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-9",
+  "target": {
+   "kind": "screen",
+   "id": "environment.issue-detail"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "What does an issue record beyond open and resolved?",
+  "detail": "No photo, priority, assignee, resolver, resolve time or note; a resolved issue cannot be reopened and stays listed forever.",
+  "source": "notes",
+  "options": [
+   "Keep minimal: add resolver and time only",
+   "Add photo and a resolve note",
+   "Add priority and assignee for supervisors"
+  ],
+  "recommendation": "Add resolver, time and optional note and allow Reopen; defer photo, priority and assignee."
+ },
+ {
+  "id": "home-and-placeholders-10",
+  "target": {
+   "kind": "screen",
+   "id": "environment.maintenance-empty"
+  },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "'Only resolved' issues state has no designed empty view",
+  "detail": "When every issue is resolved the list shows dimmed cards with '0 open issues' instead of the empty state; the rule for when old resolved issues leave the list is missing.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-11",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.settings"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Where do Language and Log out live?",
+  "detail": "The old Figma has Select language, Log out and a result screen; the prototype has no control and no entry, and the screen has no URL so it cannot be shown.",
+  "source": "notes",
+  "options": [
+   "Header profile button",
+   "Toolbox settings row",
+   "Bottom of the section chooser"
+  ],
+  "recommendation": "Toolbox settings row: the header is already full with the Assistant."
+ },
+ {
+  "id": "home-and-placeholders-12",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.saved-work"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "How does the saved-work drawer relate to the Data sync feature?",
+  "detail": "The old Figma has a data-sync list, per-pig and per-treatment detail with conflict states, and upload screens; the drawer only shows a flat queue and upload. Which one owns conflicts and detail?",
+  "source": "notes",
+  "options": [
+   "Drawer is the entry; Data sync screens become its row detail",
+   "Separate Data sync page behind the drawer",
+   "Drop conflict handling for now"
+  ],
+  "recommendation": "Drawer is the entry, rows open Data sync detail; design data-sync once."
+ },
+ {
+  "id": "home-and-placeholders-13",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.saved-work"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Nothing records into the saved-work queue",
+  "detail": "The three records are fictional; records made in Farrowing, Piglet processing or Inspection never appear. A developer cannot tell what is queued, in what order, or how a conflict is reported.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-14",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.today"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Saved-work card tops the page and pushes today's work down",
+  "detail": "While offline, a full-width card sits above the first task card on every Home view. A farmer's first question is 'what is due', not 'what is unsent'. The count could live in the header.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-15",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.unit"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Unit hub stacks too many items before the task cards",
+  "detail": "The unit view shows saved work, Inspect unit with three attention chips and an environment strip, then tasks. Information repeats (the same Health 3 and Feed 3 in every unit) and the Maintenance chip signals a different feature. Rank what the worker must see first.",
+  "source": "sweep"
+ },
+ {
+  "id": "home-and-placeholders-16",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.unit"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Unit hub 'Checked Yesterday' drops who and when",
+  "detail": "The strip keeps only the first segment of the check stamp; the direction doc asks for last-check time.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-17",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.today"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "'Across N units' and the timing pill repeat on every card",
+  "detail": "The footer count means units that carry the task, not units with work, and repeats on every card. On a long list the footer adds a line and little information.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-18",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.today"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Seven card states are never reached by any sample",
+  "detail": "Alert, Past expected, Overdue, Rechecks or first/repeat, Waiting for another task, Unit work complete and Waiting-next-unknown are coded but no data reaches them, so their design is untested.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-19",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.today"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Piglet card disagrees with the prototype it opens",
+  "detail": "Home says Batch 27, 8 pens, next care tomorrow; opening it lands on Batch 40, 12 pens, 6 due. The card also mixes litters ('4 litters with care due') and pens ('1 / 8 pens').",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-20",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.gestation"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Gestation card shows 'Today' and 'Tomorrow' for the same batch",
+  "detail": "Batch 32 pill says Today while the body says Next checks, Tomorrow. The date is also fixed sample text, 'Thu, 8 Jul'.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-21",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.gestation"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Heat check shows the same 20 twice",
+  "detail": "The card reads '20 sows to check' and '0 / 20 sows in heat': a count and an outcome that looks like progress.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-22",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.sections"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "'Task types ready' counts waiting tasks as ready",
+  "detail": "The chooser says '2 task types ready' when tasks may only be waiting; the unit sheet's '2 tasks' counts unrecorded rows, not due work. Farrowing also reads 19 pigs here but 18 sows on its Overview.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-23",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.choose-unit"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Current unit row has no tint or check",
+  "detail": "The direction doc asks for a tint and check; the code only sets aria-current, so a worker cannot see which unit is chosen.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-24",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.work-due"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "'Due now' only exists as an accessible label",
+  "detail": "When work is due the pill still reads 'Day 3 of 7'; the due state is invisible beyond the count.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-25",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.task-preview"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Tasks without a page open an empty stand-in",
+  "detail": "Every task other than Farrowing and Piglet processing lands on 'This task page is still to come', with no work shown. The wording differs from the research name 'Not designed yet'. Eight Tasks features are placeholders behind it.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-26",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.task-ready"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Does completing a task show a review first?",
+  "detail": "Complete task closes at once. The rules ask for a review before closing.",
+  "source": "notes",
+  "options": [
+   "No review, plain confirm",
+   "Review sheet with what is recorded and what is open, then hold to complete",
+   "Review only when something is unrecorded"
+  ],
+  "recommendation": "Review sheet then hold to complete, like Farrowing's end task."
+ },
+ {
+  "id": "home-and-placeholders-27",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.end-task-early"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "End task early states no consequence",
+  "detail": "The drawer says only that unfinished work remains incomplete; the rules say each task must show its batch and backfill effects. Farrowing's end-task sheets already do this.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-28",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.closed-task"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Closed receipt is a stub",
+  "detail": "The page says 'Results page not designed yet'. Farrowing has a finished task receipt; the generic one should reuse it.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-29",
+  "target": {
+   "kind": "feature",
+   "id": "workbench"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "What does 'Day N of N' mean for tasks with no batch window?",
+  "detail": "Pregnancy, Heat and Return-heat windows differ; Nursery and Finishing exits have no definition. Show Day N, a countdown or nothing.",
+  "source": "notes",
+  "options": [
+   "Hide the pill when no window",
+   "Show 'Day N' only",
+   "Invent a default window"
+  ],
+  "recommendation": "Hide the pill when there is no configured window."
+ },
+ {
+  "id": "home-and-placeholders-30",
+  "target": {
+   "kind": "feature",
+   "id": "workbench"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Do treatments, vaccinations and transfers get Home cards?",
+  "detail": "The Home card study proposes them as the owner's three major operational tasks; the workbench PRD and samples list only production tasks. Nursery and finishing exits are acknowledged but undefined.",
+  "source": "sweep",
+  "options": [
+   "Add cards for all three",
+   "Keep Home to production tasks",
+   "Add treatments and vaccinations only"
+  ],
+  "recommendation": "Decide before designing Prescriptions; recommend treatments and vaccinations only, as they have Figma."
+ },
+ {
+  "id": "home-and-placeholders-31",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.unit-farrowing"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Opening Piglet processing from a unit passes a unit the prototype ignores",
+  "detail": "unit=6 and returnUnit=6 are forwarded but the prototype shows every pen; Back does not return to the unit.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-32",
+  "target": {
+   "kind": "screen",
+   "id": "workbench.quiet-section"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "'Tomorrow' card in a quiet section is hard-coded",
+  "detail": "Growth check, Batch 26 is fixed text, not derived from a task; Growth check has no definition elsewhere.",
+  "source": "notes"
+ },
+ {
+  "id": "home-and-placeholders-33",
+  "target": {
+   "kind": "pattern",
+   "id": "Home task card"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Home task card lives only in prototype code, not the design system",
+  "detail": "The pattern points at one screen and has no component, README or gate; the card is a bespoke JS and CSS renderer beside the Task skeleton's TaskSummary, two different summary cards. Strings are literal, not from the strings file.",
+  "source": "sweep"
+ },
+ {
+  "id": "home-and-placeholders-34",
+  "target": {
+   "kind": "feature",
+   "id": "breeding"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Which Breeding states and six search cases are in?",
+  "detail": "Old Figma has 8 running, 7 ended screens and six search cases A-F (pig not in batch or unit). Search is a Find-pig concern across tasks, and ended-task reading repeats every task's pattern. Scope it before drawing.",
+  "source": "sweep",
+  "options": [
+   "Build on the Task skeleton; search handled by shared Find pig",
+   "Keep the six search cases inside Breeding"
+  ],
+  "recommendation": "Task skeleton plus shared search; fold the six cases into one Find pig flow."
+ },
+ {
+  "id": "home-and-placeholders-35",
+  "target": {
+   "kind": "feature",
+   "id": "heat-check"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Is heat check one form shared with the Heat event?",
+  "detail": "The task has 13 running and 17 ended screens and a boar-transfer sub-flow; the Heat placeholder records the same event from a pig. The Breeding section says one form, one record from any door.",
+  "source": "sweep",
+  "options": [
+   "Task rows open the Heat form",
+   "Task has its own mark form that writes the same record"
+  ],
+  "recommendation": "Task rows open the Heat form; boar transfer is Move."
+ },
+ {
+  "id": "home-and-placeholders-36",
+  "target": {
+   "kind": "feature",
+   "id": "post-farrowing"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Sow check form has no field list",
+  "detail": "Figma gives only the initial state of one form; the fields, the outcome and what 'checked' does to the growing denominator are not stated. Needs references before designing.",
+  "source": "sweep"
+ },
+ {
+  "id": "home-and-placeholders-37",
+  "target": {
+   "kind": "feature",
+   "id": "weaning"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Weaning check, Wean and Mark as breeder overlap three ways",
+  "detail": "The Weaning check task (10+17 screens), the Wean event and Mark as breeder all record weaning, piglet info and breeder choice. Piglet processing already marks breeders. Which is the door and which the form?",
+  "source": "sweep",
+  "options": [
+   "Task rows open the Wean form; breeders chosen in the Mark as breeder form",
+   "Weaning task owns the whole flow including identity",
+   "Wean form is pig-only; the task only checks"
+  ],
+  "recommendation": "Task rows open the Wean form; identity stays in Mark as breeder."
+ },
+ {
+  "id": "home-and-placeholders-38",
+  "target": {
+   "kind": "feature",
+   "id": "pregnancy"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "No reference beyond the list tab",
+  "detail": "Figma holds only the pig list; result options, first and second check, unclear recheck and ended state are not drawn although Home cards already show them.",
+  "source": "sweep"
+ },
+ {
+  "id": "home-and-placeholders-39",
+  "target": {
+   "kind": "feature",
+   "id": "return-heat"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "No reference beyond the list tab",
+  "detail": "Figma holds only the list; Home rules say observation has no completion bar and 'no return' is not evidence, but no check form or end flow exists.",
+  "source": "sweep"
+ },
+ {
+  "id": "home-and-placeholders-40",
+  "target": {
+   "kind": "feature",
+   "id": "end-nursery"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "What does an end-nursery check record?",
+  "detail": "Only a list tab exists; unclear whether it moves pigs, checks weight or just confirms. Overlaps Move and Weight, and has no Home card definition.",
+  "source": "sweep",
+  "options": [
+   "Confirm and move",
+   "Check only",
+   "Merge into one end-stage task"
+  ],
+  "recommendation": "Merge with end-finishing into one end-stage task once the owner defines the move."
+ },
+ {
+  "id": "home-and-placeholders-41",
+  "target": {
+   "kind": "feature",
+   "id": "end-finishing"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "Is end-finishing the same task as end-nursery?",
+  "detail": "Only a list tab exists with no Home card definition; sale or transfer rules are unknown.",
+  "source": "sweep",
+  "options": [
+   "Same task with a stage setting",
+   "Separate task"
+  ],
+  "recommendation": "Same task with a stage setting."
+ },
+ {
+  "id": "home-and-placeholders-42",
+  "target": {
+   "kind": "feature",
+   "id": "pig-list"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "What does Pig list own that Pig profile does not?",
+  "detail": "The Figma file holds list, filter, detail, health and events; detail and health are already built as Pig profile and Health record. Only the list, filters, more actions and Edit pig info remain.",
+  "source": "sweep",
+  "options": [
+   "Pig list is search and filter only, opening Pig profile",
+   "Drop the page; use Inspection's list"
+  ],
+  "recommendation": "Search and filter only, opening Pig profile; Edit pig info joins its actions."
+ },
+ {
+  "id": "home-and-placeholders-43",
+  "target": {
+   "kind": "feature",
+   "id": "disease"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Duplicates Health record; keep only the missing parts",
+  "detail": "Add, remove or recover and triage are built as Health record (record health, resolve conditions, care instructions). Left over: second confirmations. Mark as duplicate or reduce to the catalogue.",
+  "source": "sweep"
+ },
+ {
+  "id": "home-and-placeholders-44",
+  "target": {
+   "kind": "feature",
+   "id": "triage"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Is triage the same thing as care level?",
+  "detail": "Health record has four care levels while the old file has triage levels with confirmations on leaving, recovering or removing. Two names for one idea?",
+  "source": "sweep",
+  "options": [
+   "One concept, called care",
+   "Keep triage as the supervisor term"
+  ],
+  "recommendation": "One concept, called care; retire the triage placeholder."
+ },
+ {
+  "id": "home-and-placeholders-45",
+  "target": {
+   "kind": "feature",
+   "id": "treat"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Per-pig Treat or Prescriptions as the treatment flow?",
+  "detail": "Health record already builds Record treatment (medicine, many pigs). Prescriptions is a different, newer plan flow. Treat's 'no disease' state needs a rule.",
+  "source": "sweep",
+  "options": [
+   "Keep both; the free treatment stays in Health record",
+   "Prescription flow only"
+  ],
+  "recommendation": "Keep both; the free treatment stays in Health record and Treat is retired."
+ },
+ {
+  "id": "home-and-placeholders-46",
+  "target": {
+   "kind": "feature",
+   "id": "prescriptions"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "How does a prescription relate to per-pig treatment?",
+  "detail": "28 screens in nine groups (2025.9) with scan, skip dose and abnormality states; the largest unbuilt flow. Overlaps Data sync (waiting treatments) and the open Home card question.",
+  "source": "sweep",
+  "options": [
+   "Prescriptions are plans that create treatment records",
+   "Separate record types"
+  ],
+  "recommendation": "Plans that create the same treatment record; decide the Home card first."
+ },
+ {
+  "id": "home-and-placeholders-47",
+  "target": {
+   "kind": "feature",
+   "id": "report-death"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Death is drawn in three places",
+  "detail": "Farrowing's death sheet, Piglet processing's Record death and this Inspection flow (10 screens) each record death. Which is the shared form and how does it count against batches?",
+  "source": "sweep",
+  "options": [
+   "One death form with piglet and sow variants",
+   "Keep each local"
+  ],
+  "recommendation": "One death form; entry points differ only by preset."
+ },
+ {
+  "id": "home-and-placeholders-48",
+  "target": {
+   "kind": "feature",
+   "id": "abortion"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Miscarriage built in Pig profile vs Abortion placeholder",
+  "detail": "Pig profile already builds Record miscarriage and Farrowing's outcomes use it; this feature repeats it as three placeholder screens (6 in Figma). Same event, two names.",
+  "source": "sweep",
+  "options": [
+   "Retire Abortion; miscarriage is the form",
+   "Rename the built form to Abortion"
+  ],
+  "recommendation": "Retire Abortion; keep the built Record miscarriage."
+ },
+ {
+  "id": "home-and-placeholders-49",
+  "target": {
+   "kind": "feature",
+   "id": "farrowing-record"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Retire Record farrowing in favour of the Farrowing task?",
+  "detail": "Farrowing is built with counting, finish and edit. Record farrowing (8 old screens) is the pig-door duplicate, including preconditions and 'join batch'.",
+  "source": "sweep",
+  "options": [
+   "Pig action opens the Farrowing sheet",
+   "Keep as a separate quick form"
+  ],
+  "recommendation": "Pig action opens the Farrowing sheet; keep only join-batch."
+ },
+ {
+  "id": "home-and-placeholders-50",
+  "target": {
+   "kind": "feature",
+   "id": "fostering"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Fostering vs Piglet processing 'Move piglets'",
+  "detail": "Piglet processing builds Move piglets within a batch; fostering moves between sows and across stages. Is fostering a move, or its own event with parentage?",
+  "source": "sweep",
+  "options": [
+   "Fostering is Move piglets with a receiving sow",
+   "Own event"
+  ],
+  "recommendation": "Fostering is Move piglets with a receiving sow."
+ },
+ {
+  "id": "home-and-placeholders-51",
+  "target": {
+   "kind": "feature",
+   "id": "heat"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Blocked states of the Heat form are not ruled",
+  "detail": "The old file draws bred and pregnant pigs as separate states; the section says the sow's state decides what is available, and the form is shared with Heat check.",
+  "source": "sweep",
+  "options": [
+   "Blocked with the reason",
+   "Allow with a warning"
+  ],
+  "recommendation": "Blocked with the reason, as the section text says."
+ },
+ {
+  "id": "home-and-placeholders-52",
+  "target": {
+   "kind": "feature",
+   "id": "keep-breeding"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Where is Mark as breeder done?",
+  "detail": "Piglet processing marks breeders inline; the Weaning task has 'Keep breeders and fill IDs'; this file has 13 screens plus a No-ID variant. Three doors, three forms.",
+  "source": "sweep",
+  "options": [
+   "One form, three doors",
+   "Only at weaning"
+  ],
+  "recommendation": "One form, three doors."
+ },
+ {
+  "id": "home-and-placeholders-53",
+  "target": {
+   "kind": "feature",
+   "id": "unexpected-pregnancy"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Line and batch choice repeats Abortion and Heat",
+  "detail": "Production line and batch search appear in three events; design the shared line and batch picker once and reuse it.",
+  "source": "sweep"
+ },
+ {
+  "id": "home-and-placeholders-54",
+  "target": {
+   "kind": "feature",
+   "id": "wean"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Wean duplicates the Weaning check task",
+  "detail": "The same check and piglet information as the task. The blocked state (farrowing not finished) is a rule shared with Farrowing.",
+  "source": "sweep",
+  "options": [
+   "Block with the reason",
+   "Offer to finish farrowing first"
+  ],
+  "recommendation": "Block with the reason."
+ },
+ {
+  "id": "home-and-placeholders-55",
+  "target": {
+   "kind": "feature",
+   "id": "backfat"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "One-pig measure already built in Pig profile",
+  "detail": "Pig profile's Record weight, temperature or backfat takes one reading per pig; this placeholder duplicates that form.",
+  "source": "sweep"
+ },
+ {
+  "id": "home-and-placeholders-56",
+  "target": {
+   "kind": "feature",
+   "id": "weight"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "Weight appears as pig reading, litter weight and task check",
+  "detail": "Individual weight, Piglet litter weight and the weaning check each weigh. The old file hides weight in the backfat group.",
+  "source": "sweep",
+  "options": [
+   "One weight form with a pig or litter target",
+   "Keep separate"
+  ],
+  "recommendation": "One weight form with a pig or litter target."
+ },
+ {
+  "id": "home-and-placeholders-57",
+  "target": {
+   "kind": "feature",
+   "id": "temperature"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "One-pig measure already built in Pig profile",
+  "detail": "Same as Backfat: a duplicate of the built reading form; retire or link.",
+  "source": "sweep"
+ },
+ {
+  "id": "home-and-placeholders-58",
+  "target": {
+   "kind": "feature",
+   "id": "move"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Move vs batch membership and Piglet 'Move piglets'",
+  "detail": "Old Move picks a location for many pigs; Pig profile builds batch membership (batch, not place) and Piglet processing moves piglets between pens. Which events are place moves?",
+  "source": "sweep",
+  "options": [
+   "One Move form for place; batch changes stay separate",
+   "Merge with batch membership"
+  ],
+  "recommendation": "One Move form for place; batch changes stay separate."
+ },
+ {
+  "id": "home-and-placeholders-59",
+  "target": {
+   "kind": "feature",
+   "id": "missing"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Single confirm screen; needs reason and effect",
+  "detail": "One screen in Figma. No reason, date or batch effect is specified, and blocked pigs are not described.",
+  "source": "sweep"
+ },
+ {
+  "id": "home-and-placeholders-60",
+  "target": {
+   "kind": "section",
+   "id": "sampling"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Sampling section text is 'Not written yet'",
+  "detail": "No shared rules for how rooms, sample types (mixed, pig, person, supply, environment) and result states (waiting, negative, positive) relate. The English and Chinese Figma sections differ.",
+  "source": "sweep"
+ },
+ {
+  "id": "home-and-placeholders-61",
+  "target": {
+   "kind": "section",
+   "id": "sync"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Sync section text is 'Not written yet'",
+  "detail": "No shared rules for what syncs, conflict handling or how it relates to Home's Saved work drawer.",
+  "source": "sweep"
+ },
+ {
+  "id": "home-and-placeholders-62",
+  "target": {
+   "kind": "feature",
+   "id": "sampling"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Which Figma section is the reference: Chinese or English V2.0?",
+  "detail": "The English one is shorter and uses different screens. Sampling also needs an owner and a Home entrance.",
+  "source": "sweep",
+  "options": [
+   "Chinese",
+   "English",
+   "Merge"
+  ],
+  "recommendation": "Chinese, the fuller one."
+ },
+ {
+  "id": "home-and-placeholders-63",
+  "target": {
+   "kind": "feature",
+   "id": "data-sync"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Is Data sync a page or part of the Saved-work drawer?",
+  "detail": "17 old screens (2025.4): entry banner, list, per-pig and per-treatment detail with conflict and empty states, and upload. Home already has a drawer. Treatment sync is tied to Prescriptions.",
+  "source": "sweep",
+  "options": [
+   "Drawer is the list; detail is a sheet",
+   "Separate page"
+  ],
+  "recommendation": "Drawer is the list, detail a sheet."
+ }
+]
