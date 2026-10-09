@@ -1011,7 +1011,7 @@ function logFilterBar(c,events,scope){
  const current=c[scope+'LogFilter']||'All',types=['All',...logTypes.filter(t=>scope==='pen'||t!=='Equipment')];
  const date=c[scope+'LogDate'],count=visibleLogEntries(c,events,scope).length,filtered=current!=='All'||(date&&date.preset!=='all');
  const entry=pickerEntry(c,'log-category',{items:types.map(t=>[t,t==='All'?'All activity':t]),label:'Filter '+scope+' log',target:'log',scope,value:current});
- return '<div class="sheet-filterbar log-filterbar"><div class="log-filter-controls"><div class="log-category-select">'+pickerTriggerButton(entry,'log-category','log-category-trigger','Filter '+scope+' log')+'</div>'+button('log-date-open','<span>'+esc(logDateLabel(date))+'</span>'+icon('chevron'),'log-date-trigger',scope).replace('<button','<button aria-haspopup="dialog"')+'</div><div class="log-results"><span role="status">'+count+' '+(count===1?'entry':'entries')+' · Newest first</span>'+(filtered?button('log-clear','Clear','text-button',scope):'')+'</div></div>';
+ return '<div class="sheet-filterbar log-filterbar"><div class="log-filter-controls"><div class="log-category-select">'+pickerTriggerButton(entry,'log-category','log-category-trigger','Filter '+scope+' log')+'</div>'+SentriUI.pickerField({label:'Dates',display:logDateLabel(date),action:'log-date-open',className:'log-date-field'}).replace('data-action="log-date-open"','data-action="log-date-open" data-value="'+scope+'"')+'</div><div class="log-results"><span role="status">'+count+' '+(count===1?'entry':'entries')+' · Newest first</span>'+(filtered?button('log-clear','Clear','text-button',scope):'')+'</div></div>';
 }
 function categorizedLog(c,events,scope){
  const visible=visibleLogEntries(c,events,scope);

@@ -800,3 +800,5 @@
 .inspection-phone .recorded-tags .st-condition{flex:0 0 auto}
 
 .inspection-phone .attention-row>.st-condition[data-variant="mark"]{flex:none}
+
+.inspection-phone .log-date-field{flex:1;min-width:0;margin:0}

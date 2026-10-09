@@ -66,18 +66,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-c-8",
-  "target": {
-   "kind": "screen",
-   "id": "inspection.pen-log"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Date filter box is 90px tall and unlabelled beside Activity",
-  "detail": "The 'All dates' trigger measures 186x90 with no label, next to the labelled 160x48 Activity picker; the row is misaligned. Same on pig-profile.log. Fix: use the PickerField trigger with a 'Dates' label at field height.",
-  "source": "screen-review"
- },
- {
   "id": "screens-c-9",
   "target": {
    "kind": "screen",
