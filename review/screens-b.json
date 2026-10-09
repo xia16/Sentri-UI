@@ -1,0 +1,200 @@
+[
+ {
+  "id": "screens-b-1",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.editor"
+  },
+  "kind": "broken",
+  "severity": "high",
+  "title": "Adjust feed hides its controls; Save can never be enabled",
+  "detail": "From Pen feeding, Adjust feed shows only the pig table. The Adjustment panel (mode, %, end date, note) sits below a 297px sheet body with overflow hidden; \"Complete the required fields first\" floats unpadded at the left edge. Fix: let the sheet body grow or scroll to the panel.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-2",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.chip-done"
+  },
+  "kind": "broken",
+  "severity": "high",
+  "title": "\"Edit\" on a done pen opens a sheet with nothing editable",
+  "detail": "A01's row trails \"Edit\" (verb: correct a posted record). Tapping it opens the pen sheet: \"Nothing left to do\", a disabled Record items, no correction. Fix: show the plain chevron until the correction decision (tasks-built-79) is made.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-3",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-todo"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Chinese \"公猪·母猪\" calls piglets boars and sows",
+  "detail": "Boars · gilts reads 公猪·母猪 on the Piglets card and counts sheet; 母猪 is also the pen header's word for the sow (1头母猪). A farmer reads breeding boars and sows. Fix: 小公猪·小母猪 in strings.js.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-4",
+  "target": {
+   "kind": "feature",
+   "id": "feed-plan"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Feed plan screens have no Chinese",
+  "detail": "inspection-astra-concept has no zh strings or language switch, so Pen feeding, Adjust feed and Feed plan are English-only and Chinese fit cannot be checked. Fix: move feed copy into the strings registry with zh.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-5",
+  "target": {
+   "kind": "feature",
+   "id": "piglet-processing"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Every drawer has both a header X and a footer Back",
+  "detail": "Pen sheet, fewer piglets, death, boars and gilts, weight, set count and More actions each show X and Back that do the same thing. Two controls, one act; the verbs give Back and Close different meanings. Fix: keep the footer Back only.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-6",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.move-piglets"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Move asks about treatments the pen record already answers",
+  "detail": "Moving from A03, where Dock tail is done for all 12, still asks \"Had tail docking? No / Yes\". Fix: ask only about treatments partly given in the source pen; fill the rest from the record.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-7",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-breeders"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "\"Tagged 1 of 12\" on a breeders-only farm implies 11 owed",
+  "detail": "On a farm that tags breeders only, the Piglets card still reads Tagged 1 of 12 next to Breeders kept 1. The fraction suggests 11 untagged piglets. Fix: under the breeders scheme drop the Tagged fact; Breeders kept says it.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-8",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.sheet-todo"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Tag piglets is both a tool button and a day item",
+  "detail": "A03's sheet offers Tag piglets in the tool row and as the Day 3 item (\"Not filled · 0 of 12 tagged\"); both open the same list. Fix: show the tool only once the ID item is done or absent.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-9",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.end-task"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "End task states \"9 not done\" three times",
+  "detail": "Summary says \"3 of 12 pens done\" and \"9 pens not done\"; the group header repeats \"Not done · 9 pens\". Fix: keep \"3 of 12 pens done\" and the group title; drop the other two counts.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-10",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.pig"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Three phrasings for one pen-allocated feed state",
+  "detail": "Pen feeding row: \"Follow curve\"; pig Feed plan: \"Included in pen allocation\"; walk tag: \"Included in daily feed\". One state, three words. Fix: one string used on all three screens.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-11",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.editor"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "\"Unchanged\" filled badge on every row before any change",
+  "detail": "Each pig row shows Current → New with identical values and a filled \"Unchanged\" badge; the law says status words are coloured text with a dot, never filled badges. Fix: show New and its status only once a change exists.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-12",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.adlib"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "\"Ad-lib\" said twice in one card",
+  "detail": "The Grower 1 card shows Ad-lib as the meta on the right and again as the Daily feed value. Fix: drop the meta; the value says it.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-13",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-log"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Dates appear in three formats across one pen",
+  "detail": "Pen log groups by weekday (Thu, Wed, Sun), day cards say \"Planned 10/08\", the list says \"10/09\" or a bare time. The worker cannot match a log line to a day card. Fix: one format, weekday plus date.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-14",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.pen-list"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Pen header and pen row are two doors to one sheet",
+  "detail": "Each pen is a group whose header (\"A02 · 1 sow ›\") and only row both open the same sheet: two targets, two chevrons per pen. Fix: one row per pen, carrying the pen code.",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-15",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.give-ids"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Hint asks for a number that is already filled",
+  "detail": "The tag is prefilled (001217) yet the disabled reason reads \"Add the number and the sex\". Only sex is missing. Fix: the hint names only what is missing (\"Pick boar or gilt\").",
+  "source": "screen-review"
+ },
+ {
+  "id": "screens-b-16",
+  "target": {
+   "kind": "screen",
+   "id": "piglet-processing.adjust-count"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "\"Use 12\" is not a registered verb",
+  "detail": "The fewer-piglets sheet's primary reads \"Use N\"; strings.json has no Use, and nothing is recorded until the pen's Record. Which word?",
+  "options": [
+   "Register \"Use\" as stage-a-count",
+   "\"Tick 12\" (Tick: choose subjects, nothing recorded until Record)",
+   "\"Back\" carrying the count, no primary"
+  ],
+  "recommendation": "\"Tick 12\": an existing verb with exactly this meaning.",
+  "source": "screen-review"
+ }
+]
