@@ -630,25 +630,11 @@
 .inspection-phone .attention-overview{margin:0 0 24px}
 .inspection-phone .attention-list>.attention-row:last-child{margin-bottom:0}
 
-.inspection-phone .overview-details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 18px}
-.inspection-phone .overview-fact{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:5px}
-.inspection-phone .overview-fact-label{font-size:11px;color:#69765e}
-.inspection-phone .overview-fact>strong{font-size:13px;font-weight:500;line-height:1.4}
-.inspection-phone .overview-fact>small{font-size:10px;color:#77816e;line-height:1.4}
-.inspection-phone .overview-fact.is-empty .overview-fact-label,.inspection-phone .overview-fact.is-empty>strong{color:#959b8e}
 
 /* A shared surface for grouped facts; notification and navigation styles retain their roles. */
 .inspection-phone .facts-surface{padding:14px;background:#f6f7f2;border-radius:10px}
 
 
-.inspection-phone .overview-health-row{grid-column:1/-1;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;column-gap:14px;margin-top:-8px;margin-bottom:-6px;min-width:0}
-.inspection-phone .overview-health-row>.overview-fact-label{display:flex;align-items:center;min-height:44px}
-/* The label stays fixed; only the bounded tag rail scrolls. */
-.inspection-phone .overview-health-list{display:flex;flex-flow:row nowrap;align-items:center;gap:8px;width:100%;min-width:0;max-width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#b7c1ad transparent}
-.inspection-phone .overview-health-value{display:flex;flex:0 0 auto;align-items:center;min-height:var(--tap-min);margin:0;padding:0;border:0;background:none;text-align:left}
-.inspection-phone .overview-health-value:focus-visible{outline:2px solid #526c45;outline-offset:-2px;border-radius:6px}
-.inspection-phone .overview-health-empty{display:flex;align-items:center;min-height:44px;font-size:13px;color:#959b8e}
-.inspection-phone .overview-health-row.is-empty>.overview-fact-label{color:#959b8e}
 
 /* Care state belongs to its finding, rather than a second duplicate badge: the care mark (ConditionTag) carries it. */
 

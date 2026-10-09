@@ -2366,7 +2366,7 @@
     "sp.pg.weight": {"en": "Litter weight", "zh": "整窝体重", "kind": "label"},
     "sp.pg.weightv": {"en": "{w} kg · day {d}", "zh": "{w}公斤 · 第{d}天", "kind": "label"},
     "sp.pg.noweight": {"en": "Not weighed", "zh": "无", "kind": "label"},
-    "sp.pg.weight.hint": {"en": "Weigh the litter: growth figures need it.", "zh": "请填写仔猪总体重，否则将会影响后期生长效益的计算。", "kind": "label"},
+    "sp.pg.weight.hint": {"en": "Weigh the litter", "zh": "称窝重", "kind": "label"},
     "sp.pg.ids": {"en": "Identified piglets", "zh": "有身份仔猪", "kind": "label"},
     "sp.pg.scan": {"en": "Scan tag", "zh": "扫描耳标", "kind": "label"},
     "sp.pg.notch": {"en": "Choose notch", "zh": "选择耳缺", "kind": "label"},

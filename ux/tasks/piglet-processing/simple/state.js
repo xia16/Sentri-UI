@@ -29,7 +29,7 @@
     function pen(code, age, born, dead, extra) {
       var i = Object.keys(pens).length;
       var p = { code: code, row: code[0], age: age, born: born, alive: born - dead, dead: dead, sowDied: false, movedIn: 0, movedOut: 0,
-        sow: '000' + (231 + i * 7), parity: 1 + (i * 5) % 6, litter: litter++, ids: [], idIn: 0, idOut: 0, picked: null, sex: null, weights: [], tr: {} };
+        sow: '000' + (231 + i * 7), parity: 1 + (i * 5) % 6, litter: litter++, ids: [], idIn: 0, idOut: 0, picked: null, sex: null, weights: [], tr: {}, bornAt: daysAgoAt(age, 7, 10), bornWho: OTHER };
       PLAN.forEach(function (t) { p.tr[t.key] = { got: 0, why: '' }; });
       Object.assign(p, extra || {});
       pens[code] = p;
@@ -69,8 +69,8 @@
     // B03: iron this morning
     give('B03', 'iron', 13, 0, 7, 52);
     // litter weights: birth weights on a few litters, A01 weighed again on its ID day
-    ['A01', 'A02', 'B03'].forEach(function (c, i) { pens[c].weights.push({ kg: [15.2, 14.1, 16.8][i], day: 0 }); });
-    pens.A01.weights.push({ kg: 24.6, day: 4 }); pens.A01.sex = { boar: 6, gilt: 6 };
+    ['A01', 'A02', 'B03'].forEach(function (c, i) { pens[c].weights.push({ kg: [15.2, 14.1, 16.8][i], day: 0, at: daysAgoAt(pens[c].age, 8, 0), who: OTHER }); });
+    pens.A01.weights.push({ kg: 24.6, day: 4, at: daysAgoAt(pens.A01.age - 4, 9, 15), who: ME }); pens.A01.sex = { boar: 6, gilt: 6 };
     // identity: A01 all done; A02 four of twelve so far, one kept for breeding
     if (scheme === 'tag' || scheme === 'notch') { ident('A01', 12, 2, 10, 0, []); ident('A02', 4, 0, 7, 30, [1]); }
     if (scheme === 'breeders') {
@@ -211,7 +211,7 @@
   }
   /* The litter's weight from the Piglets tab (a birth weight backfill or a weigh day) */
   function setWeight(code, kg) {
-    return change('weight', function () { var p = S.pens[code]; p.weights.push({ kg: +kg, day: p.age, at: Date.now() }); return kg; });
+    return change('weight', function () { var p = S.pens[code]; p.weights.push({ kg: +kg, day: p.age, at: Date.now(), who: ME }); return kg; });
   }
   function bulk(k, picks) {   // picks: [{ pen, mark }]
     return change('bulk', function () {
