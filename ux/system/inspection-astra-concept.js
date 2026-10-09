@@ -1409,7 +1409,7 @@ function choices(items,current,key,group){return SentriUI.choiceRadios({label:'R
 function selectionReviewGroup(label,items){
  if(!items.length)return '';
  const heading=stHeading({title:label,kind:'group',level:4});
- const rows=items.map(item=>SentriUI.rowAction({title:item.title,description:item.detail,wrap:true,action:item.action==='unselect-pen'?'pen-detail':'pig',value:item.value,act:{label:'Remove',action:item.action,value:item.value}})).join('');
+ const rows=items.map(item=>SentriUI.rowAction({title:item.title,description:item.detail,wrap:true,action:item.action==='unselect-pen'?'pen-detail':'pig',value:item.value,act:{label:'Untick',action:item.action,value:item.value}})).join('');
  return heading+'<div class="review-list st-panel st-row-group" aria-label="'+esc(label)+'">'+rows+'</div>';
 }
 function legacyOverlay(c){
