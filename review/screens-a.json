@@ -84,18 +84,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-a-11",
-  "target": {
-   "kind": "screen",
-   "id": "environment.fan-manual"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Apply is drawn as plain text, not a button",
-  "detail": "'Apply preview setting' is a secondary with no border or fill, so it reads as a caption; live and waiting differ only by text tone. Fix: control-border secondary, or the ink primary, as it is the device's only commit.",
-  "source": "screen-review"
- },
- {
   "id": "screens-a-12",
   "target": {
    "kind": "screen",
