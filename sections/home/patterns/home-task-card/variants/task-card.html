@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/ux/system/home-astra-prototype.css">
+<link rel="stylesheet" href="/ux/system/astra-home-task-card.css">
+</head>
+<body>
+<!-- One element per state the Home task card notes list. The script after them fills the one that is present (each atlas cell holds a single state). -->
+<div data-state="Alert" class="slot"></div>
+<div data-state="Live" class="slot"></div>
+<div data-state="Past expected" class="slot"></div>
+<div data-state="Due" class="slot"></div>
+<div data-state="Overdue" class="slot"></div>
+<div data-state="Pregnancy rechecks / breeding split" class="slot"></div>
+<div data-state="Ready to complete" class="slot"></div>
+<div data-state="Waiting for another task" class="slot"></div>
+<div data-state="Unit work complete" class="slot"></div>
+<div data-state="Waiting" class="slot"></div>
+<div data-state="Waiting, next unknown" class="slot"></div>
+<div data-state="Round complete" class="slot"></div>
+<div data-state="Closed" class="slot"></div>
+<script src="/ux/system/astra-home-task-card.js"></script>
+<script>
+(() => {
+  const C = window.SentriHomeTaskCard, scope = { kind: 'unit', label: 'Unit 7', action: 'Open unit task' };
+  const prog = (value, total, label = 'Checks recorded') => ({ kind: 'completion', label, value, total, unit: 'sows' });
+  // one card from a kind and the facts the Home prototype would supply for it
+  const card = (kind, title, context, facts, progress, extra = {}) => {
+    const r = C.attention(kind, facts);
+    return C.render({ id: kind, ...r, identity: { title, context, icon: 'production' }, progress, status: { label: r.state === 'active' ? 'Due now' : 'Waiting', tone: r.state === 'active' ? 'blue' : '' }, timing: { elapsed: 'Day 2 of 7', remaining: 'Overdue 1 day' }, scope, ...extra });
+  };
+  const closed = (state, stamp) => C.render({ id: 'x' + state, state, identity: { title: 'Pregnancy check', context: 'Batch 31' }, scope, completedAt: stamp });
+  const preg = (facts, p = prog(7, 18)) => card('pregnancy', 'Pregnancy check', 'Batch 31 · First check', { label: 'sows ready to check', ...facts }, p);
+  const farr = (facts) => card('farrowing', 'Farrowing', 'Batch 28 · Farrowing window', { label: 'sows due today', ...facts }, prog(7, 18, 'Farrowings recorded'));
+  const states = {
+    'Alert': () => preg({ due: 3, alert: { count: 2, label: 'sows with a confirmed exception', detail: 'Open the task' } }),
+    'Live': () => farr({ live: 3, due: 2 }),
+    'Past expected': () => farr({ late: 2 }),
+    'Due': () => preg({ due: 4, later: 3 }),
+    'Overdue': () => preg({ due: 4, overdue: 2 }),
+    'Pregnancy rechecks / breeding split': () => preg({ due: 5, rechecks: 2 }) + card('breeding', 'Breeding', 'Batch 34 · Service sequence', { label: 'sows ready for service', due: 5, first: 3, repeat: 2 }, prog(6, 12, 'Service sequences complete')),
+    'Ready to complete': () => preg({ readyToComplete: true }, prog(18, 18)),
+    'Waiting for another task': () => card('breeding', 'Breeding', 'Batch 34 · Service sequence', { readyToComplete: true, closureBlockedBy: 'heat check' }, prog(12, 12, 'Service sequences complete')),
+    'Unit work complete': () => farr({ unitComplete: true }),
+    'Waiting': () => preg({ nextLabel: 'Tomorrow', nextAt: 1440 }),
+    'Waiting, next unknown': () => card('breeding', 'Breeding', 'Batch 34 · Service sequence', {}, prog(6, 12, 'Service sequences complete')),
+    'Round complete': () => card('heat', 'Heat check', 'Batch 35 · Replacement gilts', { roundComplete: true, nextLabel: '14:30', nextAt: 870 }, null),
+    'Closed': () => closed('complete', 'Completed · Today, 09:10') + closed('terminated', 'Ended early · Today, 09:10'),
+  };
+  document.querySelectorAll('[data-state]').forEach((el) => { const f = states[el.getAttribute('data-state')]; if (f) el.innerHTML = f(); });
+})();
+</script>
+</body>
+</html>

@@ -108,6 +108,32 @@ if (existsSync(proposedPath)) for (const c of read('ux/design-system/components/
 }
 for (const p of sections.platforms) for (const s of p.sections) for (const pt of s.patterns || []) for (const id of pt.screens || []) if (!owner[id]) problems.push(`sections.json: pattern "${pt.name}" names ${id}, which no feature has`);
 
+// backlog: review/*.json (written by review sweeps) plus every component gate finding and proposal
+const backlog = [];
+const KINDS = ['decision', 'design', 'broken', 'unclear'];
+const reviewDir = join(root, 'review');
+if (existsSync(reviewDir)) for (const fn of readdirSync(reviewDir).filter((n) => n.endsWith('.json'))) {
+  let data; try { data = JSON.parse(readFileSync(join(reviewDir, fn), 'utf8')); } catch (e) { problems.push(`review/${fn}: ${e.message}`); continue; }
+  for (const it of Array.isArray(data) ? data : data.items || [data]) {
+    if (!it || !it.id || !it.title || !it.target) { problems.push(`review/${fn}: an item needs id, target and title`); continue; }
+    if (!KINDS.includes(it.kind)) problems.push(`review/${fn}: ${it.id} has kind "${it.kind}"`);
+    backlog.push({ severity: 'medium', source: fn.replace(/\.json$/, ''), ...it });
+  }
+}
+const BROKEN = /overflow|clipp|target|\b4[0-7]px\b|not working|doesn.t work|console|error|swallow|vanish|loses|cannot|broken/i;
+for (const c of components) {
+  if (!c.gate) continue;
+  (c.gate.findings || []).forEach((f, i) => {
+    const text = typeof f === 'string' ? f : f.text || '';
+    const title = text.length > 100 ? text.slice(0, 97).replace(/\s+\S*$/, '') + '…' : text;
+    backlog.push({ id: `gate:${c.name}:${i}`, target: { kind: 'component', id: c.name }, kind: BROKEN.test(text) ? 'broken' : 'design', severity: f.severity || 'medium', title, detail: text + (f.fix ? `\nFix: ${f.fix}` : ''), source: 'gate' });
+  });
+  (c.gate.proposals || []).forEach((p, i) => {
+    const title = p.kind === 'merge' ? `Merge ${p.name}?` : p.kind === 'new-variant' ? `New variant: ${p.name}?` : `New component: ${p.name}?`;
+    backlog.push({ id: `gate:${c.name}:p${i}`, target: { kind: 'component', id: c.name }, kind: 'decision', severity: 'medium', title, detail: (p.why || '') + ((p.seenIn || []).length ? `\nSeen in: ${p.seenIn.join(', ')}` : ''), source: 'gate' });
+  });
+}
+
 if (problems.length) {
   console.error(`atlas: ${problems.length} problem(s), atlas.json not written:\n  - ` + problems.join('\n  - '));
   process.exit(1);
@@ -123,6 +149,7 @@ const atlas = {
     sections: p.sections.map((s) => ({ ...s, features: features.filter((f) => f.platform === p.id && f.section === s.id).map((f) => ({ ...f, status: statusOf(f) })) })),
   })),
   components,
+  backlog,
   oldUi,
 };
 const counts = features.reduce((c, f) => ((c[statusOf(f)] = (c[statusOf(f)] || 0) + 1), c), {});

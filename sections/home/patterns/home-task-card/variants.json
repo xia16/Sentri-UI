@@ -1,0 +1,9 @@
+[
+  {
+    "id": "task-card",
+    "name": "Task card",
+    "use": "summarise one task type on Overview: what to do now, how far along it is, when the next work comes",
+    "notUse": "a list of animals, or the task page itself",
+    "states": ["Alert", "Live", "Past expected", "Due", "Overdue", "Pregnancy rechecks / breeding split", "Ready to complete", "Waiting for another task", "Unit work complete", "Waiting", "Waiting, next unknown", "Round complete", "Closed"]
+  }
+]

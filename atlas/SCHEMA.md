@@ -84,6 +84,8 @@ Element shape: `{ "name", "at"?, "shows", "states"?: [{ "state", "when", "shows"
 
 A section in `sections/sections.json` may list `patterns: [{ "name", "screens": [screen ids], "note" }]`: a way of building screens that several features share (Tasks: the task skeleton). Every screen id must exist. The board shows them under the section title; a pattern page shows the listed screens as live phones.
 
+A pattern's states are drawn like a component variant's: `sections/<section-id>/patterns/<pattern-id>/variants.json` (`[{ id, name, use, notUse, states }]`, pattern-id = the slugified pattern name) and `variants/<id>.html` (top-level elements carrying `data-state`, see Component variants below). Without them the pattern page says the states haven't been drawn and offers the live screens behind a closed "Current view" disclosure.
+
 ## Component gate results
 
 `ux/design-system/components/<Name>/gate.json`, written by a component's gate run:
@@ -95,8 +97,12 @@ A component page has an Overview tab (the README) and one tab per variant. Varia
 
 A variant's states are drawn in `ux/design-system/components/<Name>/variants/<variant-id>.html`: a small document whose top-level elements carry `data-state="<State name>"`. The atlas renders each `[data-state]` element in its own labelled cell at phone width (it injects `tokens.css`, `bundle.css` and `bundle.js` as the single preview does, keeps the document's own `<style>` and `<link>`s, and any `<script>` outside the state elements; each cell holds only its own state element, so scripts must tolerate the others being absent). A variant without that file shows "This variant's states haven't been drawn yet" and the old whole preview behind a closed "Current preview" disclosure.
 
+## Backlog
+
+`review/*.json` (an array of items per file) holds what review sweeps found: `{ id, target: { kind: "screen"|"feature"|"component"|"section", id }, kind: "decision"|"design"|"broken"|"unclear", severity: "high"|"medium"|"low", title, detail, options?, recommendation?, source }`. The generator also turns every component `gate.json` finding into an item (`source: "gate"`; `broken` when its text is about overflow, targets, a state not working or errors, else `design`) and every `proposals[]` entry into a `decision`. All of it is `atlas.json`'s `backlog`. Decisions add to a feature's and screen's "To confirm" count; the other kinds add to its "To-dos".
+
 ## Generated `atlas/atlas.json`
 
-`{ "generated", "commit", "components": [{ name, group, status (gate.json's, else "in-design"; "placeholder" for proposed ones), gate (the gate.json or null), seenIn?, note? }], "platforms": [{ id, name, sections: [{ id, name, zh, shared, features: [<feature.json> + "status" derived from its screens + "prd" (the PRD.md text)] }] }], "oldUi": <references/figma/index.json> }`
+`{ "generated", "commit", "backlog": [the items above], "components": [{ name, group, status (gate.json's, else "in-design"; "placeholder" for proposed ones), gate (the gate.json or null), seenIn?, note? }], "platforms": [{ id, name, sections: [{ id, name, zh, shared, features: [<feature.json> + "status" derived from its screens + "prd" (the PRD.md text)] }] }], "oldUi": <references/figma/index.json> }`
 
 Feature status: `placeholder` when every screen is a placeholder; `in-design` when any screen is below agent-checked; `agent-checked` when all are agent-checked or approved; `frozen` when all are approved (and there is at least one).
