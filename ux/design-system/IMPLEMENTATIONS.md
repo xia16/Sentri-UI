@@ -95,3 +95,9 @@ Panel owns the surface of TaskGroup, ChoiceList option groups, catalogue lists a
 Icon rendering in Home, Inspection, Farrowing and the task skeleton delegates to SentriIcons; local path registries and mutations are deleted. Measurements' ruler glyph moved from Inspection to the registry. Standard/key stroke tokens and canonical aliases keep callers compatible; unknown names warn and render nothing. CategoryFooter's hand-built Inspection fallback is deleted. The host action catalogues and study use Health · Routine · Production, without disabled categories. Piglet processing inherits these implementations and its dist/app.html is rebuilt.
 
 See [verification and rendered proof](components/pass-proof/README.md).
+
+## Banner / Photos pass (2026-10-10)
+
+`SentriUI.banner` owns danger, correction and notice; door and small size are properties. `SentriTask.warning` is only an adapter for legacy string slots and tone names. TaskWarning CSS, Farrowing danger/door markup, Inspection removal warnings and Home sync-card styling are retired. Piglet processing's ended notice uses notice and its dist is rebuilt.
+
+`SentriUI.photos` owns the line face built on the existing `optionalRow`; `SentriTask.photos` delegates without rewriting markup or styling. Farrowing death and piglet mortality use it. The unused well/circle face and TaskPhotos CSS are retired. Optional-row labels share choice-label type; Farrowing litter weight already uses that row. Give IDs Measure is unchanged pending the owner's Numpad split. State documents and 375px screenshots live with the two component pages.

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"></head><body>
+<section data-state="Default" id="notice-0"></section>
+<section data-state="Pressed" id="notice-1"></section>
+<section data-state="Focus" id="notice-2"></section>
+<section data-state="Disabled" id="notice-3"></section>
+<section data-state="Loading" id="notice-4"></section>
+<section data-state="Long label / Chinese" id="notice-5"></section>
+<section data-state="Error" id="notice-error"></section>
+<script>
+const put=(id,html)=>document.querySelectorAll('[data-state]').forEach(el=>{if(el.id===id)el.innerHTML=html});
+put("notice-0",SentriUI.banner({"tone": "notice", "headline": "3 records saved on this device", "consequence": "No connection · waiting to upload", "state": "Default", "id": "notice-0-banner", "door": {"action": "review", "label": "Review notice"}}));
+put("notice-1",SentriUI.banner({"tone": "notice", "headline": "3 records saved on this device", "consequence": "No connection · waiting to upload", "state": "Pressed", "id": "notice-1-banner", "door": {"action": "review", "label": "Review notice"}}));
+put("notice-2",SentriUI.banner({"tone": "notice", "headline": "3 records saved on this device", "consequence": "No connection · waiting to upload", "state": "Focus", "id": "notice-2-banner", "door": {"action": "review", "label": "Review notice"}}));
+put("notice-3",SentriUI.banner({"tone": "notice", "headline": "3 records saved on this device", "consequence": "No connection · waiting to upload", "state": "Disabled", "id": "notice-3-banner", "door": {"action": "review", "label": "Review notice"}, "reason": "Waiting for the current review to finish"}));
+put("notice-4",SentriUI.banner({"tone": "notice", "headline": "3 records saved on this device", "consequence": "Uploading saved records…", "state": "Loading", "id": "notice-4-banner", "door": {"action": "review", "label": "Review notice"}}));
+put("notice-5",SentriUI.banner({"tone": "notice", "headline": "有多条分娩记录已保存在此设备上正在等待网络连接后再上传", "consequence": "无网络连接", "state": "Long label / Chinese", "id": "notice-5-banner", "door": {"action": "review", "label": "Review notice"}}));
+put('notice-error',SentriUI.banner({tone:'notice',headline:'3 records saved on this device',consequence:'Upload interrupted · tap to retry',door:{action:'sync'},state:'Error'}));
+SentriUI.liveFill(document.body,{delay:0});
+</script>
+</body></html>

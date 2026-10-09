@@ -1,0 +1,9 @@
+{
+  "status": "retired",
+  "round": 1,
+  "judged": "2026-10-10",
+  "commit": "726879e",
+  "model": "claude-opus-5-5",
+  "classification": "variant-of:Banner",
+  "why": "Thin compatibility alias of SentriUI.banner with no CSS of its own. Judged as Banner."
+}

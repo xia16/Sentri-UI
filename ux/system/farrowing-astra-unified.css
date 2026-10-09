@@ -8,8 +8,6 @@
 .farrowing-phone .sow-title-link>svg{width:16px;height:16px;color:var(--muted);stroke-width:1.8}
 
 .farrowing-phone .sheet-body>.segment:first-child{margin-top:0}
-.farrowing-phone .edit-body .change-summary{margin:0 0 4px;padding:6px 12px;font-size:11px;line-height:1.5}
-.farrowing-phone .edit-body .change-list{font:10px/1.5 var(--font-sans);gap:2px 12px}
 .farrowing-phone .sheet[data-view="edit"] .edit-body{display:flex;flex-direction:column;padding:12px 21px 16px}
 .farrowing-phone .edit-review,.farrowing-phone .edit-finish-door{flex-shrink:0}
 .farrowing-phone .edit-counts{display:flex;flex-direction:column;flex:1;min-height:420px}
