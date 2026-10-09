@@ -72,30 +72,6 @@
   "source": "sweep"
  },
  {
-  "id": "inspection-group-9",
-  "target": {
-   "kind": "screen",
-   "id": "health-record.ongoing"
-  },
-  "kind": "broken",
-  "severity": "low",
-  "title": "Sow 000281 has different age and breed on two health screens",
-  "detail": "health-record.ongoing shows 1080 days and breed '—'; health-record.many shows 1280 days and Yorkshire. Same ear tag, conflicting data.",
-  "source": "sweep"
- },
- {
-  "id": "inspection-group-10",
-  "target": {
-   "kind": "screen",
-   "id": "pig-profile.production-task"
-  },
-  "kind": "broken",
-  "severity": "low",
-  "title": "Last outcome card is clipped at the sheet edge",
-  "detail": "Recheck later is cut off at the bottom of the outcome list, with its border and radius cropped before the Note field.",
-  "source": "sweep"
- },
- {
   "id": "inspection-group-11",
   "target": {
    "kind": "screen",
@@ -798,18 +774,6 @@
   "source": "notes"
  },
  {
-  "id": "inspection-group-56",
-  "target": {
-   "kind": "screen",
-   "id": "health-record.many"
-  },
-  "kind": "design",
-  "severity": "medium",
-  "title": "Sideways scrolling hides the oldest ongoing conditions",
-  "detail": "Lameness and Coughing are cut off in a scrolling row; the longest-running conditions are the least visible.",
-  "source": "notes"
- },
- {
   "id": "inspection-group-57",
   "target": {
    "kind": "screen",
@@ -843,18 +807,6 @@
   "severity": "low",
   "title": "Log wording differs: 'Record corrected' vs 'Finding entered in error'",
   "detail": "Bulk and single forms log the same outcome with two phrases. One wording per outcome.",
-  "source": "notes"
- },
- {
-  "id": "inspection-group-60",
-  "target": {
-   "kind": "screen",
-   "id": "health-record.record-health"
-  },
-  "kind": "design",
-  "severity": "low",
-  "title": "Save reads 'Save · 0 pigs' while disabled",
-  "detail": "A disabled button should say Save, not a count of zero.",
   "source": "notes"
  },
  {

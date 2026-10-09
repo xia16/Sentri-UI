@@ -116,11 +116,12 @@
   function listScreen(inert) {
     var all = P.pens(), done = all.filter(isDone), todo = all.filter(function (p) { return !isDone(p); }), ended = P.s.ended;
     var last = P.last();
-    var body = K.latest(last ? { lead: S('last'), value: S('fig', { v: hm(last.at) }), rest: S('last.who', { who: last.who }) } : { lead: S('last.none') });
+    var clash = P.s.notes.some(function (n) { return !n.seen; });
+    var body = clash ? '' : K.latest(last ? { lead: S('last'), value: S('fig', { v: hm(last.at) }), rest: S('last.who', { who: last.who }) } : { lead: S('last.none') });
     if (V.flash && !V.pen) body += flashLine();
     P.s.notes.forEach(function (n, i) {
       if (n.seen) return;
-      body += '<div class="sp-note">' + K.warning({ tone: 'amber', text: S('note.clash', { Tr: tr(n.tr), pen: n.pen, who: n.who, t: hm(n.at) }),
+      body += '<div class="sp-note">' + K.warning({ tone: 'amber', title: S('note.title'), text: S('note.clash', { Tr: tr(n.tr), pen: n.pen, who: n.who, t: hm(n.at) }),
         actions: btn('ok', null, { register: 'text', action: 'note-ok', value: String(i) }) }) + '</div>';
     });
     // the summary card: the first job on the plan that pens need today (the same count as its chip) | the task, the door to End
@@ -253,7 +254,7 @@
   function penSheet(inert) {
     var p = pen(), ended = !!P.s.ended, body = '';
     if (V.flash && V.flash.pen === p.code) body += flashLine();
-    if (ended) body += K.warning({ tone: 'amber', text: T('ended.note') });
+    if (ended) body += K.warning({ tone: 'notice', text: T('ended.note') });
     body += pigletsCard(p);
     if (!ended) body += toolRow();
     body += processing(p);
@@ -298,7 +299,7 @@
   }
   /* ---- fewer piglets for one ticked item: a stepper; a shortfall asks one reason ---- */
   function stepper(key, label, value, o) {
-    return K.stepper(Object.assign({ label: label, value: value, key: key, action: 'step', min: 0 }, o || {}));
+    return UI.stepper(Object.assign({ label: label, value: value, key: key, action: 'step', min: 0, reserveHint: false }, o || {}));
   }
   function adjustSheet() {
     var p = pen(), d = V.adj, n = P.need(p, d.k), less = d.n < n;
@@ -416,7 +417,7 @@
       UI.choiceGroup(others.map(function (o) {
         return UI.choiceRow({ label: o.code, mono: true, meta: T('day.n', { d: o.age }), mode: 'single', selected: d.to === o.code, action: 'move-to', value: o.code });
       })) + '</section>';
-    body += stepper('move', T('move.how'), d.n, { min: 1, max: p.alive, variant: 'hero', hint: '' });
+    body += stepper('move', T('move.how'), d.n, { min: 1, max: p.alive, variant: 'well', hint: '' });
     var asks = moveAsks(p);
     asks.forEach(function (k) {
       body += K.radios({ layout: 'row', label: k === 'id' ? T('move.hadid.' + scheme()) : T('move.had', { tr: trl(k) }), action: 'had', key: k,
@@ -430,7 +431,7 @@
   function countSheet() {
     var p = pen(), d = V.count;
     return K.drawer({ title: T('count.title'), subtitle: T('count.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'count',
-      body: stepper('count', T('count.label'), d.n, { variant: 'hero', face: 'count', min: 0, hint: '' }),
+      body: stepper('count', T('count.label'), d.n, { variant: 'count', min: 0, hint: '' }),
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.count', { n: d.n }), action: 'count-save', register: 'primary', waiting: d.n === p.alive }, status: d.n === p.alive ? T('sr.count') : null }) });
   }
 

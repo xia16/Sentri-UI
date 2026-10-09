@@ -5,7 +5,7 @@
 The one card under the last-record line: **left, this unit's figure; right, the whole task's progress**, which opens the task overview.
 
 **Anatomy** (`.tk-summary`, `data-ds="TaskSummary"`)
-- A two-column grid (`1fr` | `1.12fr`), margin `0 space-panel 10px`, `paper`, 1px `line`, `radius-panel`, `shadow-card`, clipped.
+- A two-column grid (`1fr` | `1.12fr`), margin `0 space-panel 10px`, `paper`, 1px `line`, `radius-panel`, clipped.
 - **Each half** padded `space-heading space-card-x` (12 × 15), a column:
   - **Heading:** `description` 11px/500 `muted`, 19px tall, a 14px glyph 6px before it.
   - **Value:** 5px below, 35px tall; the figure in `figure-card` (31px/600 mono, −1.4px, tabular).

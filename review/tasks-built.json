@@ -120,30 +120,6 @@
   "source": "notes"
  },
  {
-  "id": "tasks-built-10",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.room"
-  },
-  "kind": "design",
-  "severity": "medium",
-  "title": "Row meta lines render at 9px, below the 10px floor",
-  "detail": "Core row facts (\"born 14 · 1h ago · G.H\", \"parity 5 · 11 born last\") and the Target line measure 9-9.5px. Owner exemptions cover only hold caption, table heading and dock caption, not row text. Hard to read in a barn.",
-  "source": "sweep"
- },
- {
-  "id": "tasks-built-11",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.room"
-  },
-  "kind": "broken",
-  "severity": "low",
-  "title": "Farrowing page is a fixed 390px frame; scrolls sideways at 360px",
-  "detail": "At a 360px viewport the page width stays 390 (horizontal scroll). TaskPhone says the page fills the screen at phone width; farrowing's own .phone does not, unlike the piglet prototype.",
-  "source": "sweep"
- },
- {
   "id": "tasks-built-12",
   "target": {
    "kind": "screen",
@@ -466,18 +442,6 @@
   "source": "notes"
  },
  {
-  "id": "tasks-built-37",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.history"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Log not newest-first; finish entry repeats \"Farrowing finished\"",
-  "detail": "Groups run \"5 days ago\", \"Aug 27\", \"Aug 26\" (mixed relative and absolute). The finish entry prints its title and detail identically, and every row repeats the hand's full name.",
-  "source": "notes"
- },
- {
   "id": "tasks-built-38",
   "target": {
    "kind": "screen",
@@ -544,18 +508,6 @@
   "source": "sweep"
  },
  {
-  "id": "tasks-built-43",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.task-blocked"
-  },
-  "kind": "design",
-  "severity": "low",
-  "title": "Primary button dimmed while disabled, no reason",
-  "detail": "The blocked End button is dim-as-disabled, with the reason only in cards above. Show the reason beside the button.",
-  "source": "notes"
- },
- {
   "id": "tasks-built-44",
   "target": {
    "kind": "screen",
@@ -608,18 +560,6 @@
   "title": "Miscarriage and \"Not in pig\" entry forms are not designed",
   "detail": "Outcomes appear in counts, but the Record miscarriage, Mark not in pig and Edit litter record rows on the pig Actions sheet (in PRD scope) have no screen; atlas shows pig-profile addsTo as not added.",
   "source": "notes"
- },
- {
-  "id": "tasks-built-48",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.overview"
-  },
-  "kind": "design",
-  "severity": "medium",
-  "title": "Red \"End task early\" outline only opens review, looks committing",
-  "detail": "On the overview the bar button is a red-washed outline that only opens the review; on the review the same words are a solid red hold. Two looks for one verb; a tap should not wear the danger colour.",
-  "source": "sweep"
  },
  {
   "id": "tasks-built-49",
@@ -928,23 +868,6 @@
   "recommendation": "Owe boars only; use the saved Boars · gilts split, and show Castrate for all when unknown."
  },
  {
-  "id": "tasks-built-72",
-  "target": {
-   "kind": "screen",
-   "id": "piglet-processing.sheet-todo"
-  },
-  "kind": "decision",
-  "severity": "medium",
-  "title": "Rename \"Submit\"? Verb rule bans it",
-  "detail": "Q11 bans Submit, Confirm and Complete; the sheet, PRD and strings use Submit. Gate flags it on Button. The button also reads greyed with no reason at 0 ticks.",
-  "source": "gate",
-  "options": [
-   "Record N items",
-   "Submit (as built; amend Q11)"
-  ],
-  "recommendation": "Record 2 items - matches Record in Q11 and counts what is saved."
- },
- {
   "id": "tasks-built-73",
   "target": {
    "kind": "screen",
@@ -954,18 +877,6 @@
   "severity": "medium",
   "title": "Piglets card: four facts, four doors, plus a weigh nag",
   "detail": "Boars/gilts, Litter weight, Tagged and Breeders kept each open a different sheet, with a weigh hint above the tool row. Q18 says processing records weight \"only when missing, no nag\".",
-  "source": "notes"
- },
- {
-  "id": "tasks-built-74",
-  "target": {
-   "kind": "screen",
-   "id": "piglet-processing.sheet-todo"
-  },
-  "kind": "design",
-  "severity": "low",
-  "title": "Ticked count \"12 piglets\" reads as a value, not a button",
-  "detail": "After a tick the count to adjust is plain mono text. Make the control state obvious or move it to an explicit row action.",
   "source": "notes"
  },
  {
@@ -1117,18 +1028,6 @@
   "recommendation": "Required: castration and breeders both need it."
  },
  {
-  "id": "tasks-built-85",
-  "target": {
-   "kind": "screen",
-   "id": "piglet-processing.give-ids"
-  },
-  "kind": "design",
-  "severity": "low",
-  "title": "Optional weight is a full field, not a collapsed row",
-  "detail": "Weight renders as a full 62px field; farrowing's optional facts are \"+ Litter weight\" rows.",
-  "source": "gate"
- },
- {
   "id": "tasks-built-86",
   "target": {
    "kind": "screen",
@@ -1212,18 +1111,6 @@
   "recommendation": "Use the farrowing dead drawer component by cause; picking tagged piglets is later."
  },
  {
-  "id": "tasks-built-92",
-  "target": {
-   "kind": "screen",
-   "id": "piglet-processing.record-death"
-  },
-  "kind": "design",
-  "severity": "low",
-  "title": "Dead sheet opens over the pen sheet: stacked drawers",
-  "detail": "Gate: a drawer stacked on a drawer, against one overlay at a time. Save also reads greyed with no reason.",
-  "source": "gate"
- },
- {
   "id": "tasks-built-93",
   "target": {
    "kind": "screen",
@@ -1282,18 +1169,6 @@
    "Supervisor must acknowledge at End"
   ],
   "recommendation": "Tap opens the pens whose counts came in lower; still non-blocking."
- },
- {
-  "id": "tasks-built-97",
-  "target": {
-   "kind": "screen",
-   "id": "piglet-processing.pen-log"
-  },
-  "kind": "design",
-  "severity": "medium",
-  "title": "Pen log writes one entry per piglet ID",
-  "detail": "Twelve \"ID 0012xx\" lines bury everything else. Group one act into one entry (\"12 IDs · 001201-001212\"). Gate raises the same issue; weight lines show no actor.",
-  "source": "notes"
  },
  {
   "id": "tasks-built-98",
