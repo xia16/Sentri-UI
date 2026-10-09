@@ -809,3 +809,4 @@
 .inspection-phone .feed-editor-sheet .feed-fixed-form{height:auto;min-height:0}
 
 .inspection-phone .ongoing-findings{margin-bottom:var(--space-section)}
+.inspection-phone .feed-editor-sheet .bulk-controls-toggle{min-height:var(--tap-min)}

@@ -429,7 +429,12 @@
         "issues": [
           "The end date is held on the pig as a plain date; when it passes, nothing returns the pig to the curve."
         ]
-      }
+      },
+      "preset": "feed",
+      "steps": [
+        "[data-action=\"feed-edit-pen\"].primary",
+        "[data-action=\"feed-optional-open\"][data-value=\"until\"]"
+      ]
     },
     {
       "id": "feed-plan.pig",
@@ -485,7 +490,11 @@
           "Supplier, brand, energy, protein and lysine proposed in ASTRA-FEED-PLAN-FIELDS are not shown.",
           "The Feeding block repeats the one on the pig record."
         ]
-      }
+      },
+      "preset": "feed",
+      "steps": [
+        "[data-action=\"pig-feed\"][data-value=\"000267\"]"
+      ]
     },
     {
       "id": "feed-plan.pen-up",

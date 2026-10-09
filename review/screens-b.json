@@ -1,17 +1,5 @@
 [
  {
-  "id": "screens-b-4",
-  "target": {
-   "kind": "feature",
-   "id": "feed-plan"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Feed plan screens have no Chinese",
-  "detail": "inspection-astra-concept has no zh strings or language switch, so Pen feeding, Adjust feed and Feed plan are English-only and Chinese fit cannot be checked. Fix: move feed copy into the strings registry with zh.",
-  "source": "screen-review"
- },
- {
   "id": "screens-b-5",
   "target": {
    "kind": "feature",
