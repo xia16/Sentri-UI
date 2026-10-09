@@ -54,18 +54,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-c-6",
-  "target": {
-   "kind": "screen",
-   "id": "health-record.many"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Ongoing conditions on the record cannot be opened",
-  "detail": "Arthritis, Lameness, Coughing are plain text in the General details Health fact; nothing opens their finding to edit, treat or resolve, though the flow says 'tap the Arthritis tag'. Fix: list ongoing conditions as rows under the attention rows, each opening its finding.",
-  "source": "screen-review"
- },
- {
   "id": "screens-c-7",
   "target": {
    "kind": "screen",

@@ -405,7 +405,9 @@ function recordCard({kind,title,meta='',badge='',copy='',qualification='',tone='
  return link?button(link,body,'record-card '+tone,value):'<article class="record-card '+tone+'">'+body+'</article>';
 }
 function pigRecordCards(p){
- return attentionOverview(p)+(p.treatment?'<div class="recent-treatment"><span>Last treatment</span><strong>'+esc(p.treatment.medicine)+'</strong><small>'+esc(p.treatment.dose+' '+p.treatment.unit+' · '+p.treatment.method)+'</small></div>':'');
+ const ongoing=cases(p).filter(k=>!needsHealthAttention(k));
+ const rows=ongoing.length?SentriUI.rowGroup({rows:ongoing.map(k=>SentriUI.row({title:k.name,description:[Number.isFinite(k.day)?k.day+' days':'', 'No action needed'].filter(Boolean).join(' · '),action:'finding',value:p.id+'|'+k.name,trailing:'chevron'}))}):'';
+ return attentionOverview(p)+rows+(p.treatment?'<div class="recent-treatment"><span>Last treatment</span><strong>'+esc(p.treatment.medicine)+'</strong><small>'+esc(p.treatment.dose+' '+p.treatment.unit+' · '+p.treatment.method)+'</small></div>':'');
 }
 function currentTasksForPig(c,p){
  if(!p)return [];
@@ -482,8 +484,7 @@ function overviewDetails(p,c){
  const r=p.registry||{},facts=[factItem('Age',p.age??daysFromWalk(r.birthDate),'days'),factItem('Type',animalType(p)),factItem('Breed',r.breed),factItem('Batch',p.batchId)];
  for(const [key,label,unit] of [['weight','Weight','kg'],['temperature','Temperature','°C']])facts.push(factItem(label,p[key],unit,measurementAge(p,key)));
  facts.push(factItem('On farm',r.onFarm===undefined?null:r.onFarm?'Yes':'No'));
- const other=cases(p).filter(k=>!needsHealthAttention(k));   // the banner above shows the attention cases; this row adds only what it does not
- if(other.length)facts.push(factItem('Health',other.map(k=>k.name).join(' · ')));
+ 
  return stFacts(facts);
 }
 function typeDetails(p,c){
