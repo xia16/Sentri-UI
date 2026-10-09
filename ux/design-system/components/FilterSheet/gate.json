@@ -1,48 +1,53 @@
 {
-  "status": "in-design",
-  "round": 1,
+  "status": "agent-checked",
+  "round": 2,
   "judged": "2026-10-10",
-  "commit": "78d747e",
+  "commit": "af1de4c",
   "model": "claude-opus-5-5",
-  "scores": { "clarity": 8, "budget": 7, "hierarchy": 7, "spacing": 6, "broken": 5 },
-  "lowest": 5,
+  "previous": { "round": 1, "commit": "78d747e", "status": "in-design", "lowest": 5, "scores": { "clarity": 8, "budget": 7, "hierarchy": 7, "spacing": 6, "broken": 5 } },
+  "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+  "lowest": 8,
   "checklist": [
     { "line": 1, "pass": true, "why": "Purpose line names Sheet as the alternative for record forms." },
     { "line": 2, "pass": true, "why": "When / when not present; PickerField and ChoiceList exist." },
-    { "line": 3, "pass": true, "why": "Anatomy names drawer, scope, Clear, groups, help, Back, counted commit, reason; demo shows them." },
+    { "line": 3, "pass": true, "why": "Anatomy named and shown: drawer, scope, Clear, groups, help, Back, counted commit, reason." },
     { "line": 4, "pass": true, "why": "One variant (List filters) used by farrowing.room and inspection.filters." },
-    { "line": 5, "pass": true, "why": "Default, pressed, active, empty, disabled, error, loading rendered; reason shown above the footer. Disabled renders identically to Empty." },
-    { "line": 6, "pass": true, "why": "Measured at 390: Clear/Close 48x48, chips 54-72x48, handles 48x48, Back 86x48, Show 248x48; no overlap." },
-    { "line": 7, "pass": true, "why": "States five short choice rows, PickerField beyond; demo stays within it." },
-    { "line": 8, "pass": true, "why": "Selected chip has a check, disabled commit has a written reason, error is text." },
-    { "line": 9, "pass": false, "why": "Long / Chinese keeps English Clear, Back, Any and 'Show 12 头母猪'; the commit label template 'Show {n} {noun}' cannot be localised through the API." },
-    { "line": 10, "pass": true, "why": "Sheet dialog semantics, visible Back/Close, keyboard on chips and sliders, count in an aria-live button." },
-    { "line": 11, "pass": true, "why": "New CSS resolves to existing tokens; README lists them." },
-    { "line": 12, "pass": true, "why": "Group labels visible (Parity, Production stage, Disease or symptom, Care); reason persists." },
-    { "line": 13, "pass": true, "why": "Visible Close and Back; nested pickers replace content; draft preserved, no farm record so no discard confirm." },
-    { "line": 14, "pass": true, "why": "Links Sheet, FilterChips, ChoiceList, PickerField, RangeSlider; states component classification." },
-    { "line": 15, "pass": false, "why": "Atlas List filters tab logs 32 console 404s (tokens.css, bundle.css, bundle.js, sentri-icons.js) from relative links in each srcdoc cell; the 5th parity chip is clipped at 375 and 390 with no visible scroll affordance." }
+    { "line": 5, "pass": true, "why": "Default, active, empty, disabled, error, loading, long/zh rendered; Disabled now distinct (fieldset and Clear disabled, 'Syncing · filters return when it finishes'); Pressed dropped." },
+    { "line": 6, "pass": true, "why": "Measured at 390: Clear/Close 48x48, chips 54-72x48 wrapped to two rows, handles 48x48, pickers 348x48, Back 86x48, Show 248x48." },
+    { "line": 7, "pass": true, "why": "Five parity chips wrap and stay visible; PickerField beyond." },
+    { "line": 8, "pass": true, "why": "Selected chip has a check; blocked commit and disabled sheet each carry a written reason." },
+    { "line": 9, "pass": true, "why": "zh cell renders 清除 / 返回 / 显示 12 头母猪 / 7天以上前 – 7天以后; labels come from strings.json (act.clear, act.back, ds.filter.show, fa/in.filter.show.*)." },
+    { "line": 10, "pass": true, "why": "Dialog semantics, visible Back/Close, keyboard on chips and sliders, count in an aria-live button." },
+    { "line": 11, "pass": true, "why": "New CSS resolves to existing tokens." },
+    { "line": 12, "pass": true, "why": "Group labels visible; sheet and list summary now agree ('Due: 5 days ago – In 7+ days · Parity 2–5')." },
+    { "line": 13, "pass": true, "why": "Back keeps the draft; list Clear resets applied and draft; reopening after list Clear shows defaults on both screens." },
+    { "line": 14, "pass": true, "why": "Links Sheet, FilterChips, ChoiceList, PickerField, RangeSlider." },
+    { "line": 15, "pass": true, "why": "Atlas Overview + List filters: 8 cells, zero 4xx, zero console errors; farrowing.room and inspection.filters console clean; no horizontal overflow at 390." }
   ],
   "classification": "component",
   "variants": [
     {
       "name": "List filters",
       "usedBy": ["farrowing.room", "inspection.filters"],
-      "status": "in-design",
-      "scores": { "clarity": 8, "budget": 7, "hierarchy": 7, "spacing": 6, "broken": 5 },
+      "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
       "findings": [
-        "Tested by use at 390x844: live count updates on every drag, key and chip/picker change; 0 results disables Show with 'No sows match' / 'No pigs match'; Clear restores defaults; Back then reopen keeps the draft; Show applies, list summary and badge appear (farrowing badge 2, inspection badge 1). Console clean on both screens.",
-        "Draft goes stale after the list-level Clear (farrowing room-clear-filter, inspection reset-filters): list shows no filter, reopening shows the old draft (parity 2–5 still checked, Show 6 sows)."
+        "Used end to end at 390x844: drag, arrows/Home/End, chips, pickers; 0 results blocks Show with 'No sows match' / 'No pigs match'; sheet Clear; Back then reopen keeps the draft; Show applies with summary and badge (farrowing 2, inspection 1); list Clear then reopen shows defaults (Show 7 sows / Show 7 pigs)."
       ]
     }
   ],
+  "round1": [
+    { "finding": "Stale draft after list Clear", "fixed": true },
+    { "finding": "Atlas cells 404 on relative assets", "fixed": true },
+    { "finding": "Parity chips clipped", "fixed": true },
+    { "finding": "Commit/Clear/Back not localisable", "fixed": true },
+    { "finding": "Disabled duplicated Empty; Pressed not a state", "fixed": true },
+    { "finding": "inspection.filters note hand-edited in atlas.json", "fixed": true, "note": "now in features/inspection/feature.json; a rebuild carries it" }
+  ],
   "findings": [
-    { "severity": "high", "text": "Stale draft: the list summary's Clear (room-clear-filter) and Inspection's reset-filters reset the applied filter but not filterDraft, so reopening the sheet shows filters the list says are off.", "fix": "In room-clear-filter and reset-filters also reset the draft to defaults; Back keeps the draft only for unapplied edits." },
-    { "severity": "high", "text": "Atlas console not clean: every srcdoc cell of variants/list.html loads ../../tokens.css, ../bundle.css, ../../../system/sentri-icons.js, ../bundle.js and 404s (32 errors on the tab).", "fix": "Drop the asset link/script tags from variants/list.html (atlas injects them, as other components' variant files do) or make them root-relative." },
-    { "severity": "medium", "text": "Parity chips overflow: '6+' is clipped at the sheet edge at 390 (the 4th chip in atlas cells), with no visible scrollbar; Farrowing previously showed all five on a facet Segment.", "fix": "Let FilterChips wrap inside FilterSheet groups, or use Segment facet for a fixed 5-value set." },
-    { "severity": "medium", "text": "Commit label is hard-coded 'Show {count} {noun}' and Clear/Back stay English in the zh example.", "fix": "Add a commitLabel (string or fn(count)) prop and pass localised Clear/Back strings; render the zh state with them." },
-    { "severity": "low", "text": "Disabled state duplicates Empty ('Show 0 sows' + 'No sows match'); Pressed only greys the Clear text action — neither is a FilterSheet state.", "fix": "Give Disabled a distinct cause (e.g. 'Filters unavailable offline') or drop it; drop Pressed (Button owns it)." },
-    { "severity": "low", "text": "The inspection.filters note was hand-edited into atlas.json and is lost on regeneration (build reverts it to 'Reset clears the draft; Show pigs applies it').", "fix": "Put the note in the generator's source for inspection.filters." }
+    { "severity": "medium", "text": "Disabled and Error still print a count the sheet does not know: 'Show 0 sows' while syncing, 'Show 12 sows' beside 'Results unavailable'.", "fix": "When disabled or error, label the commit without a number ('Show sows')." },
+    { "severity": "low", "text": "Farrowing's filter IconButton shows badge '2' but its aria-label stays 'Filter sows'; Inspection says 'Filter pigs, 1 applied'.", "fix": "Pass the applied count into the farrowing IconButton label as Inspection does." },
+    { "severity": "low", "text": "Chip rows sit 18px inside the group heading's left edge (Parity at x=21, chips at x=39).", "fix": "Drop the chips-track inline padding inside .st-filter-group." }
   ],
   "proposals": []
 }
