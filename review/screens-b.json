@@ -1,56 +1,5 @@
 [
  {
-<<<<<<< HEAD
-  "id": "screens-b-1",
-  "target": {
-   "kind": "screen",
-   "id": "feed-plan.editor"
-  },
-  "kind": "broken",
-  "severity": "high",
-  "title": "Adjust feed hides its controls; Save can never be enabled",
-  "detail": "From Pen feeding, Adjust feed shows only the pig table. The Adjustment panel (mode, %, end date, note) sits below a 297px sheet body with overflow hidden; \"Complete the required fields first\" floats unpadded at the left edge. Fix: let the sheet body grow or scroll to the panel.",
-  "source": "screen-review"
- },
- {
-  "id": "screens-b-2",
-  "target": {
-   "kind": "screen",
-   "id": "piglet-processing.pen-list"
-  },
-  "kind": "broken",
-  "severity": "high",
-  "title": "\"Edit\" on a done pen opens a sheet with nothing editable",
-  "detail": "A01's row trails \"Edit\" (verb: correct a posted record). Tapping it opens the pen sheet: \"Nothing left to do\", a disabled Record items, no correction. Fix: show the plain chevron until the correction decision (tasks-built-79) is made.",
-  "source": "screen-review"
- },
- {
-  "id": "screens-b-3",
-  "target": {
-   "kind": "screen",
-   "id": "piglet-processing.sheet-todo"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Chinese \"公猪·母猪\" calls piglets boars and sows",
-  "detail": "Boars · gilts reads 公猪·母猪 on the Piglets card and counts sheet; 母猪 is also the pen header's word for the sow (1头母猪). A farmer reads breeding boars and sows. Fix: 小公猪·小母猪 in strings.js.",
-  "source": "screen-review"
- },
- {
-  "id": "screens-b-4",
-  "target": {
-   "kind": "feature",
-   "id": "feed-plan"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Feed plan screens have no Chinese",
-  "detail": "inspection-astra-concept has no zh strings or language switch, so Pen feeding, Adjust feed and Feed plan are English-only and Chinese fit cannot be checked. Fix: move feed copy into the strings registry with zh.",
-  "source": "screen-review"
- },
- {
-=======
->>>>>>> origin/main
   "id": "screens-b-5",
   "target": {
    "kind": "feature",
