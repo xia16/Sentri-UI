@@ -12,18 +12,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-b-3",
-  "target": {
-   "kind": "screen",
-   "id": "piglet-processing.sheet-todo"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Chinese \"公猪·母猪\" calls piglets boars and sows",
-  "detail": "Boars · gilts reads 公猪·母猪 on the Piglets card and counts sheet; 母猪 is also the pen header's word for the sow (1头母猪). A farmer reads breeding boars and sows. Fix: 小公猪·小母猪 in strings.js.",
-  "source": "screen-review"
- },
- {
   "id": "screens-b-4",
   "target": {
    "kind": "feature",
