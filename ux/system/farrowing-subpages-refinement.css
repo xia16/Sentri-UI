@@ -119,3 +119,5 @@
 /* Farrowing's Finish form: the optional rows (moved here from the retired sentri-components.css; they name Farrowing classes) */
 .farrowing-phone .finish-extras>.st-optional-row:first-child{margin-top:0}
 .farrowing-phone .finish-field-answer{justify-content:flex-end;min-height:54px}
+
+.farrowing-phone .finish-extras>.st-optional-row[aria-expanded="true"] .st-optional-answer{display:none}

@@ -114,13 +114,25 @@ export interface CategoryFooterProps {
   args?: StrArgs<'back'>;
 }
 
+export interface PickerItem { group?: string; disabled?: boolean; reason?: string; strs?: Strs<'label' | 'meta'>; args?: StrArgs<'label' | 'meta'>; value: string; label: string; meta?: string; aliases?: string[]; secondaryAction?: {label: string; action: string}; children?: PickerItem[]; attrs?: SafeAttrs }
+export interface PickerBodyProps { variant?: 'single' | 'multi' | 'cascade' | 'cascade-multi'; items?: PickerItem[]; selected?: string[]; path?: string[]; query?: string; action?: string; stepAction?: string; searchAttrs?: SafeAttrs; loading?: boolean; error?: string; strs?: Strs<'search' | 'all' | 'loading' | 'error' | 'empty' | 'noMatch'>; args?: StrArgs<'search' | 'all' | 'loading' | 'error' | 'empty' | 'noMatch'> }
 export interface PickerFieldProps {
+  /** Optional contextual name for repeated fields; current display is appended to it. Visible label remains. */
+  ariaLabel?: string;
+  variant?: 'single' | 'multi' | 'cascade' | 'cascade-multi';
+  selected?: string[];
+  path?: string[];
+  reason?: string;
+  error?: string;
+  loading?: boolean;
+  pressed?: boolean;
+  active?: boolean;
   /** Raw HTML label text (usually a plain string). */
   label?: string;
   value?: string;
   /** Text shown in place of value. */
   display?: string;
-  /** Default "Choose". */
+  /** Default "Select"; multi displays None or n selected. */
   placeholder?: string;
   /** Default "open-picker". */
   action?: string;
@@ -134,9 +146,12 @@ export interface PickerFieldProps {
 }
 
 /** [value, label, subtitle?, groupName?, ids?]; a group's ids come from its first option. */
-export type PickerOption = [string, string, string?, string?, { strs?: Strs<'label' | 'sub' | 'group'>; args?: StrArgs<'label' | 'sub' | 'group'> }?];
+export type PickerOption = [string, string, string?, string?, { disabled?: boolean; reason?: string; strs?: Strs<'label' | 'sub' | 'group'>; args?: StrArgs<'label' | 'sub' | 'group'> }?];
 
 export interface ChoiceRowProps {
+  disabled?: boolean;
+  reason?: string;
+  pressed?: boolean;
   label: string;
   meta?: string;
   /** navigate: chevron · single: check when selected · multi: checkbox · radio (candidate): a visible ring, role=radio. */
@@ -445,6 +460,11 @@ export interface HoldBindOptions {
 }
 export interface RadioOption { value: string; label: string; meta?: string; /** Latin and digit codes only (warns in dev otherwise). */ mono?: boolean; strs?: Strs<'label' | 'meta'>; args?: StrArgs<'label' | 'meta'> }
 export interface ChoiceRadiosProps {
+  /** Hide only the field label when an enclosing optional row already names it; accessible label and Clear remain. */
+  labelHidden?: boolean;
+  disabled?: boolean;
+  reason?: string;
+  pressed?: boolean;
   label: string;
   /** Makes the field optional: while a value is chosen, a `Clear` text action (data-action "<action>-clear") shows. */
   optional?: string;
@@ -551,12 +571,14 @@ export interface SentriUI {
   categoryFooter(props: CategoryFooterProps): string;
   field(props: { label?: string; control?: string; className?: string; ds?: string }): string;
   pickerField(props: PickerFieldProps): string;
-  pickerOptions(props: { options: PickerOption[]; selected?: string; action?: string; className?: string }): string;
+  pickerOptions(props: { options: PickerOption[]; selected?: string | string[]; action?: string; className?: string; variant?: 'single' | 'multi'; loading?: boolean; error?: string }): string;
+  pickerBody(props: PickerBodyProps): string;
+  pickerFooter(props?: { selected?: string[]; multi?: boolean; backAction?: string; doneAction?: string; strs?: Strs<'back' | 'done'>; args?: StrArgs<'back' | 'done'> }): string;
   chooserList(content: string, options?: { tone?: 'flat' | 'inset'; className?: string; ds?: string }): string;
   choiceRow(props: ChoiceRowProps): string;
   /** radio (candidate): the panel is a radiogroup labelled by the heading. */
   choiceGroup(rows: string | string[], options?: { title?: string; lead?: string; className?: string; radio?: boolean; /** Raw HTML at the heading's right end (a radio field's Clear). */ aside?: string; id?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
-  choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs }): string;
+  choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs; strs?: Strs<'label' | 'placeholder'> }): string;
   choiceEmpty(text: string, options?: { strs?: Strs<'text'>; args?: StrArgs<'text'> }): string;
   segment(props: SegmentProps): string;
   iconButton(props: IconButtonProps): string;

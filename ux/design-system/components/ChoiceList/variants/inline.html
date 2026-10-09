@@ -1,0 +1,25 @@
+<!doctype html><meta charset="utf-8">
+<section data-state="Default"><h3>Default</h3><div id="state-Default"></div>
+<script>var UI=window.SentriUI;document.getElementById("state-Default").innerHTML=UI.choiceRadios({"label": "Sex", "layout": "inline", "optional": "Optional", "options": [{"value": "a", "label": "Female"}, {"value": "b", "label": "Male"}], "selected": "", "className": "is-default"});</script>
+</section>
+<section data-state="Pressed"><h3>Pressed</h3><div id="state-Pressed"></div>
+<script>var UI=window.SentriUI;document.getElementById("state-Pressed").innerHTML=UI.choiceRadios({"label": "Sex", "layout": "inline", "optional": "Optional", "options": [{"value": "a", "label": "Female"}, {"value": "b", "label": "Male"}], "selected": "", "pressed":true});</script>
+</section>
+<section data-state="Selected"><h3>Selected</h3><div id="state-Selected"></div>
+<script>var UI=window.SentriUI;document.getElementById("state-Selected").innerHTML=UI.choiceRadios({"label": "Sex", "layout": "inline", "optional": "Optional", "options": [{"value": "a", "label": "Female"}, {"value": "b", "label": "Male"}], "selected": "a", "className": "is-selected"});</script>
+</section>
+<section data-state="Disabled"><h3>Disabled</h3><div id="state-Disabled"></div>
+<script>var UI=window.SentriUI;document.getElementById("state-Disabled").innerHTML=UI.choiceRadios({"label": "Sex", "layout": "inline", "optional": "Optional", "options": [{"value": "a", "label": "Female"}, {"value": "b", "label": "Male"}], "selected": "", "disabled":true,"reason":"Unavailable offline. Reconnect to select."});</script>
+</section>
+<section data-state="Focus" data-preview="focus"><h3>Focus</h3><div id="state-Focus"></div>
+<script>var UI=window.SentriUI;document.getElementById("state-Focus").innerHTML=UI.choiceRadios({"label": "Sex", "layout": "inline", "optional": "Optional", "options": [{"value": "a", "label": "Female"}, {"value": "b", "label": "Male"}], "selected": "", "className": "is-focus"});</script>
+</section>
+<section data-state="Loading"><h3>Loading</h3><div id="state-Loading"></div>
+<script>var UI=window.SentriUI;document.getElementById("state-Loading").innerHTML=UI.choiceEmpty("Loading options\u2026");</script>
+</section>
+<section data-state="Empty"><h3>Empty</h3><div id="state-Empty"></div>
+<script>var UI=window.SentriUI;document.getElementById("state-Empty").innerHTML=UI.choiceEmpty("No options available.");</script>
+</section>
+<section data-state="Long-label"><h3>Long-label</h3><div id="state-Long-label"></div>
+<script>var UI=window.SentriUI;document.getElementById("state-Long-label").innerHTML=UI.choiceRadios({"label":"仔猪是否已经完成当天所需的处理", "layout":"inline", "options":[{"value":"a","label":"尚未处理"},{"value":"b","label":"已经处理"}]});</script>
+</section>

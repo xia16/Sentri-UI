@@ -1,5 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+require('../design-system/components/bundle.js');
 require('./astra-surfaces.js');
 require('./inspection-astra-concept.js');
 const model = globalThis.InspectionStudy;
@@ -99,7 +100,7 @@ test('condition picker uses the same full-height drawer for single and bulk reco
     model.handleRecordAction(context, 'bulk-pick-health', '');
     const html = model.overlay(context);
     sizes.push(html.match(/health-picker-step" data-size="([^"]+)"/)?.[1]);
-    assert.match(html, /aria-label="Choose conditions"/);
+    assert.match(html, /aria-label="Select conditions"/);
     assert.match(html, /health-picker-step" data-size="long"/);
   }
   assert.deepEqual(sizes, ['long', 'long']);
@@ -172,7 +173,7 @@ test('health selections persist across categories and Done does not save the rec
  const name=model.catalog.find(x=>x.kind==='Symptom'&&x.section==='Body system').name;
  model.handleRecordAction(c,'bulk-pick-health','');c.form.conditions=[name];
  model.handleRecordAction(c,'health-catalog-section','Body system');model.handleRecordAction(c,'health-catalog-back','');
- assert.deepEqual(c.form.conditions,[name]);assert.match(model.overlay(c),/Done · 1 selected/);
+ assert.deepEqual(c.form.conditions,[name]);assert.match(model.overlay(c),/Done · 1/);
  model.handleRecordAction(c,'bulk-health-done','');assert.equal(c.view,'health');assert.deepEqual(c.form.conditions,[name]);
  assert.ok(!model.pig(c,'000267').cases.some(x=>x.name===name));
 });
@@ -200,20 +201,20 @@ test('dosage units show Liquid and Weight subtitles without navigating deeper', 
 });
 test('medicine and health render the shared flat chooser surface', () => {
  const c=model.seed();model.openBulkAction(c,'treatment',['000267']);c.view='medicine-picker';c.form.medicineCategory='Antibiotics';
- assert.match(model.overlay(c),/st-chooser-list[^>]*data-chooser-tone="flat"/);
+ assert.match(model.overlay(c),/class="st-choice-panel"/);
  model.openBulkAction(c,'health',['000267']);model.handleRecordAction(c,'bulk-pick-health','');
- assert.match(model.overlay(c),/st-chooser-list[^>]*data-chooser-tone="flat"/);
+ assert.match(model.overlay(c),/class="st-choice-panel"/);
 });
 
-test('catalogue category navigation lives in the chooser header, not a second body row', () => {
+test('catalogue navigation uses tappable path steps and only one exit pair', () => {
  const c=model.seed();model.openBulkAction(c,'treatment',['000267']);c.view='medicine-picker';c.form.medicineCategory='Antibiotics';
  let html=model.overlay(c).split('<section class="sheet picker-step')[1];
- assert.match(html,/aria-label="Antibiotics"/);
- assert.match(html,/<header[^>]*>[\s\S]*chooser-header-back[\s\S]*data-action="medicine-root"/);
- assert.doesNotMatch(html,/class="catalog-path"/);
- model.openBulkAction(c,'health',['000267']);c.view='bulk-health-picker';c.form.catalogSection='Body system';
+ assert.match(html,/Chosen levels/);assert.match(html,/data-action="medicine-step"/);
+ assert.doesNotMatch(html,/chooser-header-back|Close chooser/);
+ model.openBulkAction(c,'health',['000267']);c.view='bulk-health-picker';c.form.conditionPath=['Symptom','General appearance'];
  html=model.overlay(c).split('<section class="sheet picker-step')[1];
- assert.match(html,/aria-label="Body system"/);
- assert.match(html,/data-action="health-catalog-back"/);
- assert.doesNotMatch(html,/class="catalog-path"/);
+ assert.match(html,/data-action="condition-step"/);
+ assert.equal((html.match(/data-action="back"/g)||[]).length,1);
+ assert.equal((html.match(/data-action="bulk-health-done"/g)||[]).length,1);
+ assert.doesNotMatch(html,/<details|chooser-header-back|Close chooser/);
 });

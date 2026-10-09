@@ -793,12 +793,12 @@
              {
               "state": "Current",
               "when": "A unit is already chosen",
-              "shows": "aria-current on its row; the direction doc asks for a tint and check, the code sets only the attribute"
+              "shows": "ChoiceList single: green trailing check, stronger selected label and aria-pressed."
              }
             ],
             "logic": "The count is open tasks in the section with unrecorded rows in this unit, so a waiting task counts and can disagree with the cards the unit screen shows. Pigs and pens come from units{}; in the Farrowing section they are overridden (Unit 6: 8 pigs, 4 pens; Unit 7: 7, 4; Unit 8: 4, 2) to match the Farrowing prototype.",
             "rule": "All units of the section are listed with no search (about 15 at most). Choosing a unit narrows counts, not batch time.",
-            "source": "remaining(unit), unitChoices(), units{}, farrowingUnits{}",
+            "source": "remaining(unit), unitChoices(), units{}, farrowingUnits{}; SentriUI.choiceRow single",
             "at": "2 tasks"
            }
           ],
@@ -828,13 +828,13 @@
           "states": [],
           "elements": [
            {
-            "name": "Section card",
+            "name": "ChoiceList single section row",
             "shows": "Gestation · 3 units · 246 pigs · 2 task types ready",
             "states": [
              {
               "state": "Current",
               "when": "It is the section the worker is in",
-              "shows": "Check mark; others show an arrow"
+              "shows": "Trailing green check and stronger label; other options have an empty trailing slot."
              },
              {
               "state": "Has work",
@@ -849,7 +849,7 @@
             ],
             "logic": "Units = units in the section; pigs = a fixed population per section; task types = distinct task types with unrecorded rows (pendingTypes), not work due now.",
             "rule": "Selecting a section clears the unit, remembers the section on the device and opens its Overview.",
-            "source": "sections[].units, sections[].population, pendingTypes()",
+            "source": "sections[].units, sections[].population, pendingTypes(); SentriUI.choiceRow single",
             "at": "2 task types ready"
            }
           ],
@@ -9940,54 +9940,54 @@
           "elements": [
            {
             "name": "Catalogue",
-            "shows": "Diseases and Symptoms tabs, category doors, items",
+            "shows": "PickerField cascade-multi: kind → group → trailing checkbox rows; tappable chosen-level steps",
             "states": [
              {
-              "state": "Diseases tab",
-              "when": "Tab selected",
-              "shows": "9 categories: Respiratory, Gastrointestinal, Reproductive and neonatal, Skin and external, Nervous system, Systemic, Musculoskeletal, Nutritional and metabolic, Other; each with disease count and \"N selected\""
-             },
-             {
-              "state": "Symptoms tab (default)",
-              "when": "Tab selected",
-              "shows": "General appearance, Limbs, Tail, Head and neck, Eyes, Ears, Nose, Mouth, Skin, Body system (one page with Urinary, Respiratory, Digestive, Reproductive)"
+              "state": "Browse",
+              "when": "No search text",
+              "shows": "Diseases / Symptoms, then one group level, then leaves. Branches show n selected."
              },
              {
               "state": "Search",
               "when": "Text typed",
-              "shows": "Results grouped by category; matches name, category, section and aliases (PRRS, pig flu); \"Add “name”\" when nothing matches exactly"
+              "shows": "Matches labels, all groups and aliases across both kinds; result meta shows its full path."
+             },
+             {
+              "state": "Selected",
+              "when": "A leaf is ticked",
+              "shows": "The catalogue stays visible. Ticks persist across branches; there is no selected disclosure."
              },
              {
               "state": "Custom item",
-              "when": "Added by typing",
-              "shows": "Asks for a category; removable with an x; kept for the session"
+              "when": "A new exact name is entered",
+              "shows": "Add asks for a category; a separately named removal action retains session reuse."
              }
             ],
-            "logic": "Item row shows how many selected pigs already carry it (\"Already on 1 selected\").",
+            "logic": "Shared ChoiceList rows; existing cases are identified in meta.",
             "at": "General appearance"
            },
            {
             "name": "Done",
-            "shows": "Done · N selected",
-            "rule": "Done keeps the choice; Back discards changes made in the picker.",
+            "shows": "Done · N",
+            "rule": "Done accepts the picker draft; Back and Escape leave and keep it on the record form. Neither records health. Only Back and Done are exits.",
             "at": "Done"
            }
           ],
           "controls": [],
           "copy": [
-           "Diseases (raw)",
-           "Symptoms (raw)",
-           "Search symptoms (raw)",
-           "Done (raw)"
+           "Conditions: None / n selected",
+           "Search all options",
+           "Diseases / Symptoms",
+           "Done · n"
           ],
           "edge": [
            "The disease and symptom hierarchy was translated from the Figma file."
           ],
           "rules": [
-           "Diseases and symptoms are one catalogue and one picker."
+           "Diseases and symptoms are one catalogue and one picker.",
+           "One level at a time, auto-advance on branches; whole-tree search."
           ],
           "issues": [
-           "\"Link condition\" (for a treatment) reuses this catalogue with another layout: two near-identical pickers.",
            "No recently used list: a frequent condition sits two doors deep each time."
           ]
          }
@@ -10258,7 +10258,7 @@
              {
               "state": "Search",
               "when": "Text typed",
-              "shows": "Matches name, category and detail; the category is added in front of the row"
+              "shows": "Whole-tree name, category and detail matches with category path meta."
              },
              {
               "state": "Vaccination task",
@@ -10271,7 +10271,7 @@
               "shows": "\"No medicines found. Try another name or category.\""
              }
             ],
-            "logic": "A changed medicine clears the brand. The catalogue is a sample, not a treatment recommendation.",
+            "logic": "PickerField cascade with ChoiceList rows and tappable chosen-level steps. Selecting a leaf writes category / medicine to the trigger and clears the brand if changed. Sample catalogue only.",
             "at": "Antibiotics"
            }
           ],

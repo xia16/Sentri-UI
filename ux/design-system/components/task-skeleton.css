@@ -352,7 +352,7 @@ label.tk-row { cursor: pointer; }
 .tk-radios .st-choice-panel { background: transparent; border: 0; border-radius: 0; }
 .tk-radios .st-choice-row.st-choice-row { min-height: var(--radio-row-min); padding: 0; gap: 10px; border-bottom: 1px solid var(--line); }
 .tk-radios .st-choice-row.st-choice-row + .st-choice-row { border-top: 0; }
-.tk-radios .st-choice-label, .tk-radios .st-choice-row[data-mode="radio"][aria-checked="true"] .st-choice-label { font: 400 var(--type-button-size)/1.4 var(--font-sans); }
+.tk-radios .st-choice-label { font: 400 var(--type-button-size)/1.4 var(--font-sans); }
 .tk-radios .st-choice-row .st-radio { order: 2; margin-left: auto; border-width: var(--ring-width-fine); border-color: var(--muted); }
 .tk-radios .st-choice-row[aria-checked="true"] .st-radio { border-color: var(--ink); }
 
@@ -525,3 +525,5 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 @media (prefers-reduced-motion: reduce) {
   :is(.tk-sheet, .tk-page, .tk-scrim, .tk-dialog-backdrop):is([data-enter], [data-leave]) { animation: none; }
 }
+
+.tk-radios .st-choice-row[data-mode="radio"][aria-checked="true"] .st-choice-label,.tk-radios[data-face="row"] .st-choice-inline-opt[aria-checked="true"]{font-weight:var(--type-weight-strong)}

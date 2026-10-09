@@ -31,7 +31,7 @@ test('icon registry: filter is a funnel, not the chevron fallback', () => {
 
 test('pickerField renders a button trigger with placeholder state, never a select', () => {
   const empty = ui.pickerField({label:'Method', value:'', placeholder:'Choose method', key:'method'});
-  assert.match(empty, /<button type="button" class="st-picker-trigger is-placeholder" data-action="open-picker" data-picker-key="method">/);
+  assert.match(empty, /<button type="button" class="st-picker-trigger is-placeholder"[^>]*data-action="open-picker" data-picker-key="method">/);
   assert.match(empty, /Choose method/);
   assert.doesNotMatch(empty, /<select/);
   const chosen = ui.pickerField({label:'Method', value:'Injection', key:'method'});
@@ -42,8 +42,8 @@ test('pickerField renders a button trigger with placeholder state, never a selec
 
 test('pickerOptions marks exactly one selected row', () => {
   const result = ui.pickerOptions({options:[['Injection','Injection'],['Oral','Oral'],['Topical','Topical','On the skin']], selected:'Oral'});
-  assert.equal((result.match(/aria-selected="true"/g) || []).length, 1);
+  assert.equal((result.match(/aria-pressed="true"/g) || []).length, 1);
   assert.match(result, /data-action="picker-select" data-value="Oral"/);
   assert.match(result, /On the skin/);
-  assert.equal((result.match(/aria-selected="false"/g) || []).length, 2);
+  assert.equal((result.match(/aria-pressed="false"/g) || []).length, 2);
 });
