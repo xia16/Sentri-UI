@@ -1,102 +1,234 @@
 {
-  "round": 3,
   "status": "in-design",
+  "round": 4,
+  "regate": "cleanup pass, PR #72",
   "judged": "2026-10-10",
-  "commit": "8e198e7",
+  "commit": "ce52431",
   "model": "claude-opus-5-5",
-  "scores": { "clarity": 8, "budget": 8, "hierarchy": 7, "spacing": 8, "broken": 7 },
+  "scores": {
+    "clarity": 8,
+    "budget": 8,
+    "hierarchy": 8,
+    "spacing": 7,
+    "broken": 8
+  },
   "lowest": 7,
   "checklist": [
-    { "line": 1, "pass": true, "why": "One-line job; ChoiceList radio named as the alternative" },
-    { "line": 2, "pass": true, "why": "When / when-not name Segment, Field, optional rows and TaskChoice" },
-    { "line": 3, "pass": true, "why": "Anatomy names chosen names vs count, › steps, and the single/multi footer difference" },
-    { "line": 4, "pass": true, "why": "single, multi, cascade, cascade-multi, each with use / not-use and an atlas tab" },
-    { "line": 5, "pass": true, "why": "Nine states per variant; single Active now shows the value (Low appetite), not the label" },
-    { "line": 6, "pass": true, "why": "Triggers 48-65, rows 56-58, steps 48, footer 48 (Back 86 wide on screens); nothing under 48 on the three bare screens" },
-    { "line": 7, "pass": true, "why": "Eight rows before scroll; search spans the tree (\"cough\" finds Coughing under Respiratory system)" },
-    { "line": 8, "pass": true, "why": "Checkbox tick, check, count, bold label; not colour" },
-    { "line": 9, "pass": true, "why": "No \"0 selected\" or \"1 options\"; group meta only above zero (\"2 selected\")" },
-    { "line": 10, "pass": true, "why": "aria-current on last step, › separators aria-hidden, Escape closes and focus returns to the trigger" },
-    { "line": 11, "pass": true, "why": "Last host override (.st-picker-trigger height:48px) removed; tokens only" },
-    { "line": 12, "pass": true, "why": "Visible labels; Select / None defaults" },
-    { "line": 13, "pass": true, "why": "Back leaves and keeps the draft (verb law), Done · n confirms, single has Back only" },
-    { "line": 14, "pass": true, "why": "Related, classification, references, changelog present" },
-    { "line": 15, "pass": true, "why": "Tapped condition picker: 4 ticks across Symptoms and Diseases, steps, Done, reopen, 5th tick, Back, search, Escape; medicine pick writes the path. Works; two display defects below" }
+    {
+      "line": 1,
+      "pass": true,
+      "why": "One-line job; ChoiceList radio named as the alternative"
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "When / when-not name Segment, Field, optional rows and TaskChoice"
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "Anatomy names chosen names vs count, › steps, and the single/multi footer difference"
+    },
+    {
+      "line": 4,
+      "pass": true,
+      "why": "single, multi, cascade, cascade-multi, each with use / not-use and an atlas tab"
+    },
+    {
+      "line": 5,
+      "pass": true,
+      "why": "Nine states per variant; single Active now shows the value (Low appetite), not the label"
+    },
+    {
+      "line": 6,
+      "pass": true,
+      "why": "Triggers 48-65, rows 56-58, steps 48, footer 48 (Back 86 wide on screens); nothing under 48 on the three bare screens"
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "Eight rows before scroll; search spans the tree (\"cough\" finds Coughing under Respiratory system)"
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "Checkbox tick, check, count, bold label; not colour"
+    },
+    {
+      "line": 9,
+      "pass": true,
+      "why": "No \"0 selected\" or \"1 options\"; group meta only above zero (\"2 selected\")"
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "aria-current on last step, › separators aria-hidden, Escape closes and focus returns to the trigger"
+    },
+    {
+      "line": 11,
+      "pass": true,
+      "why": "Last host override (.st-picker-trigger height:48px) removed; tokens only"
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Visible labels; Select / None defaults"
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Back leaves and keeps the draft (verb law), Done · n confirms, single has Back only"
+    },
+    {
+      "line": 14,
+      "pass": true,
+      "why": "Related, classification, references, changelog present"
+    },
+    {
+      "line": 15,
+      "pass": true,
+      "why": "Ticked 4 conditions, Done, Record health shows names +1; medicine pick, reopen keeps path and tick; one footer spacing defect"
+    }
   ],
   "classification": "component",
   "variants": [
     {
       "name": "single",
-      "usedBy": ["health-record.treatment (Method, Unit)", "health-record.edit-finding (Care)", "farrowing.death"],
+      "usedBy": [
+        "health-record.treatment (Method, Unit)",
+        "health-record.edit-finding (Care)",
+        "farrowing.death"
+      ],
       "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
-      "findings": ["Fixed: Back only, Active shows the picked value, demo relabelled Cause"]
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Fixed: Back only, Active shows the picked value, demo relabelled Cause"
+      ]
     },
     {
       "name": "multi",
-      "usedBy": ["inspection.filters"],
+      "usedBy": [
+        "inspection.filters"
+      ],
       "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
-      "findings": ["Filter keeps \"n selected\"; Back / Done · n per the verb law"]
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Filter keeps \"n selected\"; Back / Done · n per the verb law"
+      ]
     },
     {
       "name": "cascade",
-      "usedBy": ["health-record.medicine-picker"],
+      "usedBy": [
+        "health-record.medicine-picker"
+      ],
       "status": "in-design",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 7, "spacing": 8, "broken": 8 },
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 7,
+        "broken": 8
+      },
       "findings": [
-        "Fixed: no \"1 options\" meta; step row reads All › Antibiotics; pick commits and writes the path",
-        "Not fixed: the medicine sheet's only footer action, Back, is still the full-width filled primary (host footer, not pickerFooter)",
-        "Trigger path uses \" / \" (Antibiotics / Antibiotic B) while the sheet uses ›; reopening starts at All with no check on the current medicine",
-        "Atlas cascade demo labels the field Medicine but browses Symptoms"
+        "Fixed: Back is the secondary pickerFooter Back; trigger path \"Antibiotics › Antibiotic B\"; reopening opens All › Antibiotics with Antibiotic B ticked",
+        "New: the picker footer has no side gutter (Back 390 wide, edge to edge, corners cut)",
+        "Not fixed: atlas cascade demo labels Medicine but browses Symptoms"
       ]
     },
     {
       "name": "cascade-multi",
-      "usedBy": ["health-record.condition-picker", "health-record.record-health"],
+      "usedBy": [
+        "health-record.condition-picker",
+        "health-record.record-health"
+      ],
       "status": "in-design",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 7 },
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 7,
+        "broken": 8
+      },
       "findings": [
-        "Fixed: › separated steps with the last step current; \"2 selected\" only on chosen groups; Record health shows names",
-        "Record health trigger with 4 conditions clamps at 2 lines and cuts \"· +1\" off (\"…Porcine reproductive and…\"; scrollHeight 59 > clientHeight 39): the worker cannot see that more are chosen"
+        "Fixed: Record health with 4 conditions shows two clamped lines of names plus an unclamped \"+1\" inside the 65px trigger",
+        "New: Select conditions footer Back / Done · 4 run to the screen edges (no gutter)"
       ]
     }
   ],
   "findings": [
     {
       "severity": "medium",
-      "text": "Record-form names are line-clamped after \"+n\" is appended, so with long names the \"+n\" is the part that gets cut (Record health, 4 conditions: \"Weakness or unsteady stance · Reduced appetite · Porcine reproductive and…\").",
-      "fix": "Render \"+n\" in its own unclamped span after the clamped names span in pickerField, so the count is always visible."
-    },
-    {
-      "severity": "medium",
-      "text": "Medicine picker's sole Back is still drawn as the full-width filled primary button; everywhere else Back is secondary (round-2 finding, not fixed).",
-      "fix": "Render the medicine sheet footer with SentriUI.pickerFooter({multi:false}) instead of the host footer, which gives a secondary Back."
+      "text": ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on Select conditions (Back / Done · 4) and Select medicine (Back, 390px wide) the buttons touch the screen edges and their rounded corners are cut. Moving the medicine sheet onto pickerFooter spread it.",
+      "fix": "bundle.css: .st-picker-footer{padding-block:var(--space-12)} (no inline 0) so the sheet footer keeps its gutter."
     },
     {
       "severity": "low",
-      "text": "Path written two ways: trigger \"Antibiotics / Antibiotic B\", sheet \"All › Antibiotics\".",
-      "fix": "pickerField: join path with \" › \" to match the step row."
+      "text": "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path [Antibiotics, Conditions] (round 3, not fixed).",
+      "fix": "variants/cascade.html: use medicine categories and a medicine leaf."
     },
     {
       "severity": "low",
-      "text": "Reopening the medicine picker starts at All with nothing marked, so the current pick is not shown.",
-      "fix": "Host opens at the stored path's parent level with the chosen leaf selected."
-    },
-    {
-      "severity": "low",
-      "text": "Atlas Overview demos Conditions (a record form) as \"1 selected\", and the cascade demo browses Symptoms under a Medicine label.",
-      "fix": "Overview: pass names:[\"Low appetite\"]; cascade.html: use medicine categories for items."
+      "text": "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed).",
+      "fix": "preview.html: pass names:[\"Low appetite\"]."
     }
   ],
   "proposals": [],
-  "previous": [
-    { "finding": "Back and Done in the multi footer do the same thing", "fixed": true, "note": "Reversed: no longer a defect. Back = leave and keep the draft is the repo's verb law; Done · n confirms; README says so. Verified Back after a 5th tick keeps it on the trigger" },
-    { "finding": "Record health shows \"4 selected\" instead of the chosen names", "fixed": true, "note": "Names joined by · on the trigger, filters keep the count; but the +n is clipped by the 2-line clamp (new finding)" },
-    { "finding": "pickerBody prints \"0 selected\" / \"1 options\" branch meta", "fixed": true, "note": "Symptoms list has no zero meta; \"2 selected\" on chosen groups only; medicine categories have no meta" },
-    { "finding": "Single shows Back + Done and Active renders the label as value", "fixed": true, "note": "Single footer is Back only; Active shows Low appetite; demo label is Cause" },
-    { "finding": "Step row has no separator", "fixed": true, "note": "All › Symptoms › General appearance, last step bold with aria-current" },
-    { "finding": "inspection-subpages-refinement.css pins the trigger height", "fixed": true, "note": "Selector removed" },
-    { "finding": "cascade variant: Back drawn as filled primary on the medicine sheet", "fixed": false, "note": "Still the host's filled primary Back" }
-  ]
+  "verdicts": [
+    {
+      "finding": "+n clipped by the 2-line clamp",
+      "result": "fixed",
+      "note": ".st-picker-more outside .st-picker-names; \"+1\" visible"
+    },
+    {
+      "finding": "Medicine Back drawn as filled primary",
+      "result": "fixed",
+      "note": "pickerFooter({multi:false}) gives a secondary Back; but no gutter (new finding)"
+    },
+    {
+      "finding": "Path joined with \" / \" on the trigger",
+      "result": "fixed",
+      "note": "\" › \" on trigger, search meta and group titles"
+    },
+    {
+      "finding": "Reopen starts at All with nothing marked",
+      "result": "fixed",
+      "note": "Opens at the category with the current medicine ticked"
+    },
+    {
+      "finding": "Overview \"1 selected\"; cascade demo browses Symptoms under Medicine",
+      "result": "not fixed"
+    }
+  ],
+  "previous": {
+    "round": 3,
+    "commit": "8e198e7",
+    "status": "in-design",
+    "lowest": 7,
+    "scores": {
+      "clarity": 8,
+      "budget": 8,
+      "hierarchy": 7,
+      "spacing": 8,
+      "broken": 7
+    },
+    "findings": [
+      "Record-form names are line-clamped after \"+n\" is appended, so with long names the \"+n\" is the part that gets cut (Record health, 4 conditions: \"Weakness or unsteady stance · Reduced appetite · Porcine reproductive and…\").",
+      "Medicine picker's sole Back is still drawn as the full-width filled primary button; everywhere else Back is secondary (round-2 finding, not fixed).",
+      "Path written two ways: trigger \"Antibiotics / Antibiotic B\", sheet \"All › Antibiotics\".",
+      "Reopening the medicine picker starts at All with nothing marked, so the current pick is not shown.",
+      "Atlas Overview demos Conditions (a record form) as \"1 selected\", and the cascade demo browses Symptoms under a Medicine label."
+    ]
+  }
 }
