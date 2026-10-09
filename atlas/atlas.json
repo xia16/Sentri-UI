@@ -13525,6 +13525,12 @@
    }
   },
   {
+   "name": "FilterChips",
+   "group": "Base",
+   "status": "in-design",
+   "gate": null
+  },
+  {
    "name": "ChoiceList",
    "group": "Base",
    "status": "in-design",
@@ -15763,15 +15769,6 @@
     "farrowing.room"
    ],
    "note": "A two-handle slider for a due-date range, with its end labels."
-  },
-  {
-   "name": "Choice chips",
-   "group": "Inputs and filters",
-   "status": "placeholder",
-   "seenIn": [
-    "farrowing.room"
-   ],
-   "note": "A row of single-choice chips (Any, 0, 1, 2-5, 6+)."
   }
  ],
  "backlog": [

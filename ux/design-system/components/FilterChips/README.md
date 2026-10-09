@@ -1,30 +1,24 @@
-# Segment
+# FilterChips
 
-Switch a fixed set of 2–5 views or choices of the same list or sheet. Use [FilterChips](../FilterChips/README.md) instead for dynamic tag filters.
+Narrow a list by a changing set of category tags. Use [Segment](../Segment/README.md) instead for fixed views and list states.
 
 ## When to use
 
-- **Lens:** use for states of one list with inline counts.
-- **Two-line lens:** use for states of one list with counts beneath labels.
-- **View switch:** use for 2–3 subjects of one sheet.
-- **Facet:** use for one fixed single-choice filter in a filter sheet.
+- **Tags:** use for narrowing a list by changing job or category tags.
 
 ## When not to use
 
-Use FilterChips for changing tags, especially more than five. Use ChoiceList for recorded form outcomes and Button for actions. These controls do not record a farm fact.
+Use Segment for To do / Done and other fixed views. Use ChoiceList for recorded form outcomes and Button for actions. These controls do not record a farm fact.
 
 ## Anatomy
 
-Track, equal-width option buttons, label, optional mono count, selected underline, optional reason line. Filtering and sticky placement belong to the host layout; an adjacent IconButton opens advanced filters.
+Scrollable track, tag button, label, optional mono count, selected check, optional reason line. Filtering and sticky placement belong to the host layout; an adjacent IconButton opens advanced filters.
 
 ## Variants
 
 See [variants.json](variants.json) for use boundaries and each variant’s rendered states.
 
-- [Lens](variants/lens.html): states of one list with inline counts.
-- [Two-line lens](variants/two-line-lens.html): states of one list with counts beneath labels.
-- [View switch](variants/view-switch.html): 2–3 subjects of one sheet.
-- [Facet](variants/facet.html): one fixed single-choice filter in a filter sheet.
+- [Tags](variants/tags.html): narrowing a list by changing job or category tags.
 
 ## States
 
@@ -32,7 +26,7 @@ See [variants.json](variants.json) for use boundaries and each variant’s rende
 |---|---|
 | Default | Enabled options; host supplies current selection. |
 | Pressed | Press fill immediately on touch; static demo uses state=Pressed. |
-| Selected | Weight plus underline; never colour alone. |
+| Selected | Weight plus check mark; never colour alone. |
 | Disabled | Native disabled button, dashed outline; host supplies one visible reason beside the row. Prefer omission unless temporarily unavailable. |
 | Focus | Token focus ring. |
 | Long-label | English and Chinese labels wrap without clipping or ellipsis. |
@@ -41,7 +35,7 @@ Error and loading belong to the list/sheet, not this synchronous control. Empty 
 
 ## Behaviour
 
-Selection changes the content below immediately through the host’s data-action handler. No record is committed. Counts include zero; missing counts are omitted. Lens order is working pile, finished pile, All last. View switches have no All or counts. Segment has 2–5 choices; view switch has 2–3. Do not scroll Segment.
+Selection changes the content below immediately through the host’s data-action handler. No record is committed. Counts include zero; missing counts are omitted. Single selection; All clears the tag constraint. There is no total tag cap; show only what fits and scroll the remainder. The track has a visible scrollbar and keyboard navigation, so swipe is not required. A Segment lens may sit above tags when it controls a separate state dimension, as in Piglet processing.
 
 ## Content rules
 
@@ -49,7 +43,7 @@ Sentence case; nouns or states, never commit verbs. Aim for 1–2 words, ≤12 E
 
 ## Accessibility
 
-Named role=group; buttons expose aria-pressed. Every target is at least tap-min in both dimensions. Tab reaches the control; arrows select adjacent enabled options, Home/End select the first/last. Enter/Space activate. Disabled options are skipped. The shared bundle dispatches selection through ordinary clicks and restores focus after host rendering. Hosts provide an ariaLabel/label and keep list announcements outside the control.
+Named role=radiogroup; buttons expose role=radio and aria-checked, with a roving tab stop. Every target is at least tap-min in both dimensions. Tab reaches the control; arrows select adjacent enabled options, Home/End select the first/last. Enter/Space activate. Disabled options are skipped. The shared bundle dispatches selection through ordinary clicks and restores focus after host rendering. Hosts provide an ariaLabel/label and keep list announcements outside the control.
 
 ## Do / don’t
 
@@ -59,7 +53,7 @@ Named role=group; buttons expose aria-pressed. Every target is at least tap-min 
 
 ## API and tokens
 
-`SentriUI.segment({ options: [[value, trustedLabelHTML, {count, disabled, strs, args}]], active, action, ariaLabel, variant, state, disabled, reason, className })`. Existing calls remain valid; default variant is lens.
+`SentriUI.filterChips({ items: [{value, label, count, checked, disabled}], action, key, label, state, reason })`. TaskChips is a compatibility adapter into this implementation.
 
 CSS uses tap-min, well, line, paper, ink, muted, press, focus, control-border, radius-segment, radius-control, radius-8, space-2/3/4/6, space-key-gap, space-row-x, space-gutter, size-16, type-row-title-size, type-description-size, type-meta-size, font-sans and font-mono. No prototype scope is required.
 
@@ -74,5 +68,3 @@ Component: generic, used across sections. Named appearances are variants. Sticky
 ## Changelog
 
 2026-10-10: consolidated implementations, self-contained tokens, keyboard and press feedback, documented states and Chinese overflow.
-
-[Gate remediation and checklist verification](VERIFICATION.md).

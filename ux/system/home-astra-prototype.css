@@ -152,19 +152,12 @@
 .unit-hub-maintenance small{margin-left:auto;font-size:10px}
 .unit-hub-maintenance.has-issues small{color:var(--amber)}
 .environment-page,.maintenance-page{padding-top:14px}
-.sensor-tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;padding:3px 0;scrollbar-width:thin}
-.sensor-tabs button{display:flex;align-items:center;justify-content:center;gap:5px;flex:1;white-space:nowrap;min-height:44px;padding:8px;font-size:10px;border:1px solid var(--line);border-radius:11px;background:#fafbf7}
-.sensor-tabs svg{width:13px;height:13px}
-.sensor-tabs button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:white}
 .sensor-detail,.device-control{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
 .sensor-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .sensor-detail-heading p{font-size:12px;color:var(--muted)}
 .sensor-detail-heading strong{font:400 34px var(--mono);display:block;margin-top:7px;letter-spacing:-1.5px}
 .sensor-detail-heading strong small{font:11px var(--sans);letter-spacing:0;margin-left:5px;color:var(--muted)}
 .sensor-detail-heading>span{font-size:10px;line-height:1.7;color:var(--muted);text-align:right}
-.sensor-period{display:flex;gap:5px;margin:18px 0 2px}
-.sensor-period button{min-height:36px;padding:0 14px;font-size:11px;border-radius:9px;color:var(--muted)}
-.sensor-period button[aria-pressed=true]{background:#edf1e6;color:var(--ink)}
 .sensor-chart svg{width:100%;height:auto;display:block;stroke:none;fill:none}
 .sensor-chart svg text{fill:#78826f;font:9px var(--sans);stroke:none}
 .sensor-range-stats{display:flex;gap:20px;padding:8px 0 15px;font-size:10px;color:var(--muted)}

@@ -172,8 +172,12 @@ export interface ChoiceRowProps {
 }
 
 export interface SegmentProps {
+  variant?: 'lens' | 'two-line-lens' | 'view-switch' | 'facet';
+  state?: string;
+  disabled?: boolean;
+  reason?: string;
   /** [value, label, ids?] — the label is raw HTML so a count can be marked up. */
-  options: [string, string, { strs?: Strs<'label'>; args?: StrArgs<'label'> }?][];
+  options: [string, string, { strs?: Strs<'label'>; args?: StrArgs<'label'>; count?: string | number; disabled?: boolean; ariaLabel?: string }?][];
   active?: string;
   action?: string;
   ariaLabel?: string;
@@ -605,6 +609,7 @@ export interface SentriUI {
   choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs; strs?: Strs<'label' | 'placeholder'> }): string;
   choiceEmpty(text: string, options?: { strs?: Strs<'text'>; args?: StrArgs<'text'> }): string;
   segment(props: SegmentProps): string;
+  filterChips(props: { items: { value: string; label: string; count?: string | number; checked?: boolean; disabled?: boolean; aria?: string }[]; action?: string; key?: string; label?: string; state?: string; reason?: string }): string;
   iconButton(props: IconButtonProps): string;
 }
 

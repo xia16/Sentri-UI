@@ -28,8 +28,6 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .button:active:not(:disabled){transform:translateY(1px)}
 .button.danger:not([aria-disabled="true"]){background:var(--red);border-color:var(--red)}
 .icon-button{background:transparent;min-width:var(--tap-min);height:var(--tap-min);display:grid;place-items:center;border-radius:var(--radius-10);position:relative}
-.segment{display:flex;border-radius:var(--radius-10);padding:var(--space-3);margin-top:var(--space-16);border:1px solid transparent}
-.segment button{flex:1;min-height:var(--tap-min);background:transparent;font-size:var(--font-size-12);border-radius:var(--radius-8)}
 .field{display:flex;flex-direction:column;gap:var(--space-9);font-size:var(--font-size-12);font-weight:600;margin:var(--space-18) 0 0}
 .field textarea,.field input,.field select{width:100%;border:1px solid var(--field-border);border-radius:var(--radius-11);padding:var(--space-12);background:var(--paper);color:var(--ink);font-size:var(--font-size-14);min-height:var(--field-height)}
 .field textarea{min-height:var(--size-90);resize:vertical;line-height:1.6}
@@ -168,9 +166,6 @@ body{background:var(--ground);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) .button.secondary{background:var(--paper);border-color:var(--control-border);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) .button.primary:not(:disabled):not([aria-disabled="true"]){background:var(--ink);border-color:var(--ink);color:var(--paper)}
 :is(.farrowing-phone,.inspection-phone) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea){border-color:var(--control-border);border-radius:var(--radius-12)}
-:is(.farrowing-phone,.inspection-phone) :is(.room-tabs,.segment,.scope-tabs,.health-tabs){background:var(--well);border-color:var(--line)}
-:is(.farrowing-phone,.inspection-phone) :is(.room-tabs,.segment,.scope-tabs,.health-tabs) button{font-weight:400;min-height:var(--tap-min)}
-:is(.farrowing-phone,.inspection-phone) :is(.room-tabs,.segment,.scope-tabs,.health-tabs) :is(button[aria-pressed=true],button[aria-selected=true],button.on){font-weight:500;background:var(--paper);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) :is(button,a,input,select,textarea,summary):focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 /* Action semantics remain explicit; destructive controls never inherit the green treatment. */
 :is(.farrowing-phone,.inspection-phone) .button:is(.danger,.task-end-confirm):not(:disabled):not([aria-disabled="true"]){background:var(--red);border-color:var(--red);color:var(--paper)}
@@ -641,3 +636,25 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-choice-row.st-choice-row:focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
 .st-picker-trigger:focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 .st-choice-inline-clear{min-width:var(--tap-min)}
+/* Segment and FilterChips: independent of phone/prototype scopes. */
+.st-selection{min-width:0;flex:1}
+.st-segment{display:flex;gap:var(--space-3);padding:var(--space-3);border:1px solid var(--line);border-radius:var(--radius-segment);background:var(--well)}
+.st-segment button,.st-filter-chips button{box-sizing:border-box;min-width:var(--tap-min);min-height:var(--tap-min);border:0;border-radius:var(--radius-8);padding:var(--space-4) var(--space-6);background:transparent;color:var(--ink);font:400 var(--type-row-title-size)/1.4 var(--font-sans);display:flex;align-items:center;justify-content:center;gap:var(--space-3);cursor:pointer}
+.st-segment button{flex:1;min-width:var(--tap-min);flex-wrap:wrap}
+.st-selection-label{overflow-wrap:anywhere;min-width:0}
+.st-selection-count{font:500 var(--type-meta-size)/1.4 var(--font-mono);color:var(--muted)}
+.st-segment button[aria-pressed=true]{background:var(--paper);font-weight:500;box-shadow:inset 0 calc(-1 * var(--space-3)) var(--ink)}
+.st-segment[data-variant=two-line-lens] button{flex-direction:column}
+.st-segment button:active,.st-filter-chips button:active,[data-state=Pressed].st-segment button:first-child,[data-state=Pressed].st-filter-chips button:first-child{background:var(--press)}
+.st-segment button:focus-visible,.st-filter-chips button:focus-visible,[data-state=Focus] button:first-child{outline:var(--space-3) solid var(--focus);outline-offset:var(--space-2)}
+.st-segment button:disabled,.st-filter-chips button:disabled{cursor:default;border:1px dashed var(--control-border)}
+.st-selection-reason{margin:var(--space-6) 0;color:var(--muted);font:400 var(--type-description-size)/1.4 var(--font-sans)}
+.st-filter-chips{min-width:0;padding:var(--space-6) 0}
+.st-filter-chips-track{display:flex;gap:var(--space-key-gap);overflow-x:auto;padding:var(--space-4) var(--space-gutter);scrollbar-width:thin}
+.st-filter-chips button{flex:none;max-width:100%;padding:var(--space-6) var(--space-row-x);border:1px solid var(--line);border-radius:var(--radius-control);background:var(--well)}
+.st-filter-chips button[aria-checked=true]{background:var(--paper);font-weight:500}
+.st-chip-check{visibility:hidden;display:flex;width:var(--size-16);flex:none}
+.st-chip-check svg{width:var(--size-16);height:var(--size-16)}
+[aria-checked=true]>.st-chip-check{visibility:visible}
+
+.st-chip-check:empty{box-sizing:border-box;width:var(--space-8);height:var(--space-12);border-right:var(--space-2) solid currentColor;border-bottom:var(--space-2) solid currentColor;transform:rotate(45deg);margin-right:var(--space-6)}

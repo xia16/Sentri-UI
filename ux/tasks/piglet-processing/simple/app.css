@@ -121,3 +121,5 @@
 .sp-proc > .st-heading { margin-bottom: 8px; }
 .sp-proc > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
 .tk-day[data-when="done"] .tk-day-head > strong { color: var(--muted); }
+
+.sp-list-lens{margin:0 var(--space-panel)}

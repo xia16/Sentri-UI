@@ -97,20 +97,6 @@
 .device .section-card-top strong { font-weight: 500; }
 .device .section-work { margin-top: 14px; }
 
-/* Environment, connected devices and maintenance share one quiet paper
-   surface; amber remains reserved for open attention. */
-.device .sensor-tabs button,
-.device .sensor-period button,
-.device .device-mode button {
-  min-height: 44px;
-}
-
-.device .sensor-tabs button[aria-pressed="true"] {
-  background: #eaf2e5;
-  border-color: #b8cbb0;
-  color: var(--ink);
-}
-
 .device .sensor-detail,
 .device .device-control,
 .device .maintenance-card {
