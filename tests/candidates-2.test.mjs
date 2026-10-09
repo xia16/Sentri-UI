@@ -104,7 +104,7 @@ test('choice radios: one tab stop; Clear only on an optional field with a value'
 });
 test('row: existing navigation signature retains content and routing', () => {
   assert.equal(UI.row({ title: 'Pen 14', description: '3 sows due today', action: 'open', value: 'p14' }),
-    '<button class="st-row " data-ds="Row" data-variant="plain" type="button" data-action="open" data-value="p14"><span class="st-row-copy"><strong>Pen 14</strong><small>3 sows due today</small></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></button>');
+    '<button class="st-row " data-ds="Row" data-variant="plain" type="button" data-action="open" data-value="p14"><span class="st-row-copy"><strong>Pen 14</strong><small>3 sows due today</small></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg></span></button>');
 });
 test('row: colour lives on the value; the separator is a real text node', () => {
   const html = UI.row({ title: [[{ text: 'Overdue' }, { text: '3 days', tone: 'red' }]], description: ['7 alive', 'parity 5'] });

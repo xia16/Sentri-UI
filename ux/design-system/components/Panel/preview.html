@@ -1,14 +1,15 @@
-<!-- @dsCard group="Structure" height=330 subtitle="Page context vs drawer context" -->
-<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
-<body>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:720px"><div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:18px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="a"></div></div><div class="inspection-phone" data-st-context="drawer" style="max-width:390px;padding:18px;background:var(--paper);font-family:var(--sans);color:var(--ink)"><div id="b"></div></div></div>
-<script>
-const UI = window.SentriUI, I = window.SentriIcons.icon;
-const body = UI.heading({ title: 'Litter', kind: 'panel' }) + '<p style="margin:0;font-size:13px;line-height:1.5">11 born alive · 1 stillborn. Fostering closes at 48 hours.</p>';
-a.innerHTML = UI.heading({ title: 'On a page' }) + UI.panel(body);
-b.innerHTML = UI.heading({ title: 'In a drawer' }) + UI.panel(body);
-</script>
-</body>
-</html>
+<!doctype html><html lang="en"><meta charset="utf-8"><style>body{margin:0;font-family:var(--font-sans);color:var(--ink);background:var(--app-background)}[data-state]{box-sizing:border-box;max-width:100%;padding:var(--space-panel);margin-bottom:var(--space-section)}.glyphs{display:grid;grid-template-columns:repeat(auto-fit,minmax(var(--back-width),1fr));gap:var(--space-8)}.glyphs span{display:flex;align-items:center;gap:var(--space-4);font-size:var(--font-size-12)}[data-st-context="page"]{background:var(--app-background)}[data-st-context="drawer"]{background:var(--paper)}</style><body>
+<div data-state="Default"></div>
+<div data-state="Empty"></div>
+<div data-state="Long label / Chinese"></div>
+<script>document.querySelectorAll('[data-state]').forEach(el=>{const chinese=el.dataset.state.includes('Chinese');
+if(el.dataset.state==='Empty'){el.innerHTML=SentriUI.panel('');return;}
+el.dataset.stContext='page';
+el.innerHTML=SentriUI.heading({title:chinese?'产仔记录':'Litter'})+SentriUI.facts([{label:chinese?'活产仔猪':'Born alive',value:'11'},{label:chinese?'死产仔猪':'Stillborn',value:'1'}])+'<div style="margin-top:var(--space-section)">'+SentriUI.heading({title:chinese?'栏位信息':'Pen'})+SentriUI.rowGroup(SentriUI.row({title:chinese?'查看这个栏位的所有历史记录和工作安排':'Pen log',description:chinese?'最近记录 · 今天':'last record · today',action:'open-log',wrap:true}))+'</div>';});</script>
+<div data-extra-state="Default"></div>
+<div data-extra-state="Empty"></div>
+<div data-extra-state="Long label / Chinese"></div>
+<script>document.querySelectorAll('[data-extra-state]').forEach(el=>{const chinese=el.dataset.extraState.includes('Chinese');
+if(el.dataset.extraState==='Empty'){el.innerHTML=SentriUI.panel('');return;}
+el.dataset.stContext='drawer';
+el.innerHTML=SentriUI.heading({title:chinese?'产仔记录':'Litter'})+SentriUI.facts([{label:chinese?'活产仔猪':'Born alive',value:'11'},{label:chinese?'死产仔猪':'Stillborn',value:'1'}])+'<div style="margin-top:var(--space-section)">'+SentriUI.heading({title:chinese?'栏位信息':'Pen'})+SentriUI.rowGroup(SentriUI.row({title:chinese?'查看这个栏位的所有历史记录和工作安排':'Pen log',description:chinese?'最近记录 · 今天':'last record · today',action:'open-log',wrap:true}))+'</div>';});</script></body></html>

@@ -23,8 +23,7 @@
     return ` aria-label="${esc(o.text ?? '')}"` + (o.str ? ` data-str-attr="aria-label:${esc(o.str)}"${argsAttr(o.args)}` : '');
   }
   const A = (action, value) => (action ? ` data-action="${esc(action)}" data-value="${esc(value ?? '')}"` : '');
-  const own = { 'back-chevron': 'M15 5l-7 7 7 7' };
-  const glyph = k => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${own[k] || (root.SentriIcons && root.SentriIcons.paths && root.SentriIcons.paths[k]) || ''}"/></svg>`;
+  const glyph = k => root.SentriIcons.icon(k === 'back-chevron' ? 'back' : k);
   /* A line of parts, each a text slot with an optional tone: [{ text, str, args, tone }]; { sep: true } is the
      shared separator, a real text node (ds.sep, the same · as Status lines). */
   const parts = v => (Array.isArray(v) ? v.map(p => { const o = obj(p); if (o.sep) return '<span class="tk-sep" data-str="ds.sep">·</span>'; return o.tone ? `<span class="st-part" data-tone="${esc(o.tone)}">${T(o)}</span>` : T(o); }).join('') : T(v));
@@ -96,7 +95,7 @@
     const head = door
       ? `<button type="button" class="tk-group-door"${A(door.action, door.value)}${L(door.label)}>${inner}${glyph('chevron')}</button>`
       : `<span class="tk-group-door">${inner}</span>`;
-    return `<section class="tk-group" data-ds="TaskGroup"><header class="tk-group-head">${head}</header>${Array.isArray(rows) ? rows.join('') : rows}</section>`;
+    return `<section class="st-panel tk-group" data-ds="TaskGroup"><header class="tk-group-head">${head}</header>${Array.isArray(rows) ? rows.join('') : rows}</section>`;
   }
   /* ---- row (alias of SentriUI.row / rowSelect — use Row): id + chip | headline + meta | chevron, edit or tick ----
      trail 'tick' (with tick: { action = 'toggle', value, checked, label }): the row is a <label> around ChoiceList's multi
@@ -114,13 +113,8 @@
     return root.SentriUI.stepper({...props,variant:props.face||(props.variant==='hero'?'well':props.variant||'row')});
   }
 
-  /* ---- TaskPhotos: the design system's Photos card in farrowing's face (a line, not a well: a camera glyph, the label,
-     `Optional`, and an outlined camera key at the right; 50px thumbnails under it). Every prop is SentriUI.photos'. ---- */
-  function photos(props = {}) {
-    const UI = root.SentriUI;
-    const html = UI.photos(Object.assign({}, props, { className: `tk-photos${props.className ? ' ' + props.className : ''}` }));
-    return html.replace(/(<span class="st-photos-label"[^>]*>)/, `$1<span class="tk-photos-glyph">${glyph('camera')}</span>`);
-  }
+  /* TaskPhotos: compatibility alias; Photos owns the optional line face. */
+  function photos(props = {}) { return root.SentriUI.photos(props); }
 
   /* ---- door (alias of SentriUI.row / rowAction — use Row): a row with no id column (farrowing's .disclosure): a title, one muted description line, a chevron.
      For a non-animal door inside a sheet or a page (`Record here › Move piglets`). ---- */
@@ -148,19 +142,9 @@
     return html.replace('data-ds="ChoiceList"', `data-ds="ChoiceList" data-face="${row ? 'row' : 'flat'}"`);
   }
 
-  /* ---- TaskWarning: farrowing's danger band (.danger-band): a pale red box, the warning in 12px red, then (optional)
-     text actions, then one 10px muted consequence line. tone: 'red' (default) | 'amber'. ---- */
-  /* title: a bold first line (farrowing's banners and bands lead with it; the text under it drops to 11px).
-     icon + door: farrowing's End banner (⚠ `9 sows will be removed from this batch` ›): the icon left, the copy, a chevron;
-     with door ({ action, value, label }) the whole band is one button. tone 'amber' is the banner's colours. */
-  function warning({ title, text, actions = '', detail, tone = 'red', icon = '', door: d, label } = {}) {
-    const copy = `${title ? `<strong class="tk-warning-title">${parts(title)}</strong>` : ''}${text ? `<p class="tk-warning-text">${parts(text)}</p>` : ''}${actions ? `<div class="tk-warning-actions">${actions}</div>` : ''}${detail ? `<small class="tk-warning-detail">${parts(detail)}</small>` : ''}`;
-    const t = esc(tone === 'amber' ? 'amber' : 'red');
-    if (!icon && !d) return `<div class="tk-warning" data-ds="TaskWarning" data-tone="${t}" role="note"${L(label)}>${copy}</div>`;
-    const inner = `${icon ? `<span class="tk-warning-icon">${glyph(icon)}</span>` : ''}<span class="tk-warning-copy">${copy}</span>${d ? `<span class="tk-warning-go">${glyph('chevron')}</span>` : ''}`;
-    return d
-      ? `<button type="button" class="tk-warning" data-ds="TaskWarning" data-tone="${t}" data-banner=""${A(d.action || 'open', d.value)}${L(d.label ?? label)}>${inner}</button>`
-      : `<div class="tk-warning" data-ds="TaskWarning" data-tone="${t}" data-banner="" role="note"${L(label)}>${inner}</div>`;
+  /* TaskWarning: legacy slot/tone adapter; Banner owns rendering and styles. */
+  function warning({title,text,actions='',detail,tone='red',icon='',door,label}={}) {
+    return root.SentriUI.banner({tone:tone==='notice'?'notice':tone==='amber'?'notice':'danger',headline:{html:parts(title||{text:tone==='notice'?'Pending record':tone==='amber'?'Review required':'Before recording',str:tone==='notice'?'ds.banner.pending':tone==='amber'?'ds.banner.review':'ds.banner.before'})},consequence:text?{html:parts(text)}:'',actions,detail:detail?{html:parts(detail)}:'',icon,door:door?{...door,label:obj(door.label||label).text}:null,size:'small'});
   }
 
   /* ---- TaskSection: farrowing's icon-headed card section (Task outcomes, Other outcomes): a section heading with its

@@ -10,7 +10,7 @@
 | [motion.html](system/motion.html) | Mark-to-move motion spec, with the front-end implementation contract |
 | [farrowing-contract.html](system/farrowing-contract.html) | The farrowing state contract (developer handoff) |
 
-Shared layer — every screen renders from these: `sentri-components.js/.css` (heading · panel · facts · row · log · field · picker field + sheet · segment · icon button), `sentri-icons.js` (one icon registry), `sentri-visual-foundation.css` (tokens), `astra-surfaces.js/.css` (sheet/page presentation). Guardrails: `no-native-selects.test.cjs`, `icon-registry.test.cjs` — run all suites with `node <file>` in `system/`.
+Shared layer — every screen renders from these: `sentri-components.js/.css` (heading · panel · facts · row · log · field · picker field + sheet · segment · icon button), `SentriIcons` in `ux/design-system/components/bundle.js` (one icon registry), `sentri-visual-foundation.css` (tokens), `astra-surfaces.js/.css` (sheet/page presentation). Guardrails: `no-native-selects.test.cjs`, `icon-registry.test.cjs` — run all suites with `node <file>` in `system/`.
 
 Superseded renders live in [archive/](archive/): the old farrowing suite (`farrowing.html`), the unified task list (`screens.html`), the check-in study (`check-in.html`), and the workflow review deck (`workflows.html`).
 

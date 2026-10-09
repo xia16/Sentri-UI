@@ -8,8 +8,6 @@
 .farrowing-phone .sow-title-link>svg{width:16px;height:16px;color:var(--muted);stroke-width:1.8}
 
 .farrowing-phone .sheet-body>.segment:first-child{margin-top:0}
-.farrowing-phone .edit-body .change-summary{margin:0 0 4px;padding:6px 12px;font-size:11px;line-height:1.5}
-.farrowing-phone .edit-body .change-list{font:10px/1.5 var(--font-sans);gap:2px 12px}
 .farrowing-phone .sheet[data-view="edit"] .edit-body{display:flex;flex-direction:column;padding:12px 21px 16px}
 .farrowing-phone .edit-review,.farrowing-phone .edit-finish-door{flex-shrink:0}
 .farrowing-phone .edit-counts{display:flex;flex-direction:column;flex:1;min-height:420px}
@@ -42,7 +40,6 @@
 .farrowing-phone .photo-field{background:transparent;padding:0;margin:24px 0 20px}
 .farrowing-phone .photo-title{font-size:13px}
 .farrowing-phone .disclosure{background:#f3f4ee;padding:12px;border-radius:10px;margin:16px 0}
-.farrowing-phone .filter-section{border:0;padding:0;margin-bottom:28px}
 .farrowing-phone .task-progress{border:0}
 .farrowing-phone .tc-heading{justify-content:flex-start;gap:6px}
 .farrowing-phone .tc-heading>svg:not(.tc-leading-icon){margin-left:auto}
@@ -241,4 +238,3 @@
 /* Separate location from record context with space rather than repeated punctuation. */
 .farrowing-phone .sheet-subtitle .sow-context{display:flex;flex-wrap:wrap;column-gap:12px;row-gap:2px}
 .farrowing-phone .sow-context .sow-location{white-space:nowrap}
-.farrowing-phone .task-end-sheet[data-presentation="page"]{height:100%;max-height:100%;bottom:0}

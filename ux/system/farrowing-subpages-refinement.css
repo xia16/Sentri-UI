@@ -24,7 +24,6 @@
 .farrowing-phone .home-task-title{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:500}
 .farrowing-phone .home-task-states{font-size:11px;color:var(--muted)}
 .farrowing-phone .home-resume{font-size:11px;color:var(--green)}
-.farrowing-phone .filter-section{border-color:var(--line)}
 .farrowing-phone .room-search-label input{border-color:#bdc7b6}
 .farrowing-phone .search-result{border-color:var(--line)}
 .farrowing-phone .scanner-demo{background:var(--well);border:1px solid var(--line)}
@@ -44,9 +43,7 @@
 .farrowing-phone .sheet[data-view=finish] .finish-totals,.farrowing-phone .sheet[data-view=locked] .facts-surface{padding:14px}
 .farrowing-phone .sheet[data-view=finish] :is(.finish-condition,.finish-extras){border-color:var(--line);border-radius:var(--subpage-radius)}
 .farrowing-phone .sheet[data-view=death] .sheet-body,.farrowing-phone .sheet[data-view=edit] .edit-body{padding-top:16px}
-.farrowing-phone .sheet[data-view=death] .segment,.farrowing-phone .sheet[data-view=edit] .change-summary{border:1px solid var(--line)}
-.farrowing-phone .sheet[data-view=death] .danger-band{background:#fff1ee;border-color:#edc8c0;color:var(--red)}
-.farrowing-phone .sheet[data-view=edit] .change-summary{background:#fff5df;border-color:#efdbb0;color:var(--amber)}
+.farrowing-phone .sheet[data-view=death] .segment{border:1px solid var(--line)}
 .farrowing-phone .sheet[data-view=editFinish] .edit-body{padding-top:16px}
 .farrowing-phone .sheet[data-view=locked] .record-inline-actions{padding-top:4px}
 
@@ -67,7 +64,6 @@
 
 /* Task closure review and receipt; overview selectors stay with the parent. */
 .farrowing-phone .task-end-sheet .sheet-body{gap:16px}
-.farrowing-phone .task-end-sheet .task-warning-card{border-color:#efdbb0;background:#fff5df}
 .farrowing-phone .task-end-sheet .task-review-sows{border-top:1px solid var(--line)}
 .farrowing-phone .task-end-sheet .task-review-sow{min-height:68px;border-color:var(--line)}
 .farrowing-phone .task-end-sheet .task-review-sow strong{font-weight:500}
@@ -85,9 +81,8 @@
 }
 
 @media(prefers-reduced-motion:reduce){.farrowing-phone .button:active{transform:none}}
-.farrowing-phone :is(.processing-task,.piglet-row-main,.foster-sows button,.task-warning-card,.task-review-sow) :is(strong,small){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.farrowing-phone .processing-task>span:last-child,.farrowing-phone .task-warning-copy{min-width:0;overflow:hidden}
-.farrowing-phone .piglet-row-main>span,.farrowing-phone .task-warning-copy>span,.farrowing-phone .feature-door :is(strong,small){display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.farrowing-phone :is(.processing-task,.piglet-row-main,.foster-sows button,.task-review-sow) :is(strong,small){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.farrowing-phone .piglet-row-main>span,.farrowing-phone .feature-door :is(strong,small){display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* Optional finish details follow the same add-detail button convention as treatment. */
 .finish-extras>.finish-field{margin-top:12px}
@@ -96,3 +91,5 @@
 .farrowing-phone .finish-field-answer{justify-content:flex-end;min-height:54px}
 
 .farrowing-phone .finish-extras>.st-optional-row[aria-expanded="true"] .st-optional-answer{display:none}
+
+.farrowing-phone .processing-task>span:last-child{min-width:0;overflow:hidden}

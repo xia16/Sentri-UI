@@ -37,7 +37,7 @@ def px_token(prop, val):
 PXRE = re.compile(r"(?<![\w.#-])(-?\d*\.?\d+)px\b")
 def conv_value(prop, value):
     value = re.sub(r"var\((--[\w-]+),\s*[^()]*(?:\([^()]*\)[^()]*)*\)", lambda m: "var(" + m.group(1) + ")", value)
-    value = value.replace("0 -10px 40px #27351d0b", "var(--shadow-sheet)").replace("0 3px 12px #26351e04", "var(--shadow-card)")
+    value = value.replace("0 -10px 40px #27351d0b", "var(--shadow-sheet)")
     # colours
     def hexsub(m):
         h = m.group(0).lower()

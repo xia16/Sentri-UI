@@ -34,7 +34,7 @@ All 18 functions of the old file exist in the bundle. A differential run of 34 c
 | `segment` | diverged (superset) | per-option `strs` |
 | `iconButton` | diverged (superset) | `strs` for the badge |
 | `optionalRow` | same | `data-ds="OptionalRow"` only; the document click handler for inline rows is the same in both |
-| icon registry (`sentri-icons.js`) | same | 52 glyphs identical; the bundle adds `backspace` |
+| icon registry | `SentriIcons` in the bundle (one registry, count derived; legacy `sentri-icons.js` retired) | `SentriIcons` in the bundle | one source of truth |
 
 Only in the bundle (37): `stepper`, `measure`, `numpad` and its helpers (`numpadInput`, `numpadScan`, `numpadCommit`, `numpadKey`, `numpadScanner`), `rowSelect`, `rowAction`, `rowSelectChange`, `status`, `statusLine`, `statusText`, `announce`, `liveFill`, `banner`, `photos`, `button`, `buttonReason`, `guard`, `handFocus`, `holdButton`, `holdStep`, `holdBind`, `HOLD`, `choiceRadios`, `radioNext`, `radioBind`. Only in the old file: nothing.
 
@@ -80,6 +80,10 @@ One implementation of the drawer, the page and the dialog: `SentriUI.sheet`, `sh
 
 Button now owns primary, secondary, text action, tool, destructive and hold variants. Farrowing’s hold timer and Piglet’s `.sp-tool` are retired; `SentriTask.holdBind` delegates to the bundle. IconButton owns bordered and plain at `tap-min` square; Sheet Close and prototype toolbar/header tools use it. Host classes position controls; their forked geometry and colours have been removed. Waiting reasons stay visible and are linked to their control.
 
+## FilterSheet / RangeSlider pass (2026-10-10)
+
+`SentriUI.filterSheet` composes Sheet with caller-supplied groups and owns Clear, Back, live counted commit and zero/loading/error reasons. Farrowing and Inspection now call it; their filter drawer markup is retired. `SentriUI.rangeSlider` owns Farrowing’s numeric bounds, keyboard, nearest-handle track taps and captured drag; the prototype’s native range overlay, gesture handlers and slider CSS are deleted. The two 48px handles occupy opposite sides of one track to avoid overlapping targets at equal bounds. Home and Piglet processing contain no hand-built filter sheet; Piglet’s distributable was rebuilt with the bundle. Both proposals are removed and registered in the atlas Inputs and filters group.
+
 ## Stepper + Field pass (2026-10-10)
 
 Stepper owns row, count and well in bundle.js / bundle.css. TaskStepper's markup and CSS face layer is retired; SentriTask.stepper is only a compatibility adapter. Piglet processing calls SentriUI.stepper directly. Farrowing translates its existing delta-in-value event contract through a small adapter and has no row-stepper, hero-stepper or feature-stepper markup or styles. The unused filled-ink face is retired; count keys remain neutral pending an owner colour decision.
@@ -87,3 +91,17 @@ Stepper owns row, count and well in bundle.js / bundle.css. TaskStepper's markup
 Field owns the input/textarea skin, error border, sans font, auto-grow, visible corrective/help/reason line and ARIA association. Removed phone and page border overrides and local Field skins. Home's report and clarification fields, Inspection's capture helpers / optional-note controls / treatment dose, and Farrowing's optional fault resolution use the bundle. Dose then Unit stack in capture order. No Numpad or Measure split was implemented.
 
 See [Stepper verification](components/Stepper/verification.md) and [Field verification](components/Field/verification.md) for checklist evidence and the known atlas reachability gaps.
+
+## Panel / Icon / CategoryFooter pass (2026-10-10)
+
+Panel owns the surface of TaskGroup, ChoiceList option groups, catalogue lists and Farrowing pen cards. TaskGroup and pen-card surface declarations are retired; short chooser wrappers no longer create a second inset around a Panel. Existing Facts, Row group, Log and task consumers continue on `.st-panel`.
+
+Icon rendering in Home, Inspection, Farrowing and the task skeleton delegates to SentriIcons; local path registries and mutations are deleted. Measurements' ruler glyph moved from Inspection to the registry. Standard/key stroke tokens and canonical aliases keep callers compatible; unknown names warn and render nothing. CategoryFooter's hand-built Inspection fallback is deleted. The host action catalogues and study use Health · Routine · Production, without disabled categories. Piglet processing inherits these implementations and its dist/app.html is rebuilt.
+
+See [verification and rendered proof](components/pass-proof/README.md).
+
+## Banner / Photos pass (2026-10-10)
+
+`SentriUI.banner` owns danger, correction and notice; door and small size are properties. `SentriTask.warning` is only an adapter for legacy string slots and tone names. TaskWarning CSS, Farrowing danger/door markup, Inspection removal warnings and Home sync-card styling are retired. Piglet processing's ended notice uses notice and its dist is rebuilt.
+
+`SentriUI.photos` owns the line face built on the existing `optionalRow`; `SentriTask.photos` delegates without rewriting markup or styling. Farrowing death and piglet mortality use it. The unused well/circle face and TaskPhotos CSS are retired. Optional-row labels share choice-label type; Farrowing litter weight already uses that row. Give IDs Measure is unchanged pending the owner's Numpad split. State documents and 375px screenshots live with the two component pages.

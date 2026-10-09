@@ -1,0 +1,20 @@
+[
+  {
+    "id": "range",
+    "name": "Range",
+    "use": "use for narrowing a list by two numeric bounds",
+    "notUse": "not for recording a single value — use Measure",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "At limits",
+      "Disabled",
+      "Error",
+      "Long / Chinese"
+    ],
+    "usedBy": [
+      "farrowing.room"
+    ]
+  }
+]

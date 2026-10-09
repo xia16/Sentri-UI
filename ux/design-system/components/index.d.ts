@@ -114,7 +114,7 @@ export interface LogEntry {
 export interface LogDayOptions { now?: Date | number | string; lang?: string; today?: string; yesterday?: string }
 export interface LogGroup { label?: string; description?: string; entries: LogEntry[]; strs?: Strs<'label' | 'description'>; args?: StrArgs<'label' | 'description'> }
 
-export interface Category { id: string; label: string; disabled?: boolean; strs?: Strs<'label'>; args?: StrArgs<'label'> }
+export interface Category { id: string; label: string; strs?: Strs<'label'>; args?: StrArgs<'label'> }
 export interface CategoryFooterProps {
   categories: Category[];
   active?: string;
@@ -397,15 +397,21 @@ export interface StatusLineOptions {
 }
 export interface BannerProps {
   /** danger: red wash and border, red 700 headline (an irreversible act, a terminal fact).
-   *  correction: `amber-wash-strong` with an `amber` border (Edit). */
-  tone?: 'danger' | 'correction';
-  headline: string;
-  /** The mono line under the headline: what it costs, or the stamp. */
-  consequence?: string;
+   *  correction: amber review; notice: pending state such as offline upload. */
+  tone?: 'danger' | 'correction' | 'notice';
+  door?: { action?: string; value?: string; label?: string };
+  icon?: string;
+  size?: 'small' | '';
+  state?: string;
+  reason?: string;
+  detail?: string | { html: string };
+  headline: string | { html: string };
+  /** Supporting line under the headline: what it costs, or the stamp. */
+  consequence?: string | { html: string };
   /** correction: the live change summary (`stillborn 1 → 0`), tokens with the corrected values amber. After Clear: `Cleared` with Undo. */
   summary?: string | Token[] | null;
   /** Text actions on the summary row (Clear; after it, Undo). */
-  actions?: FieldAction[];
+  actions?: FieldAction[] | string;
   /** No summary: the banner itself is the one live region (it appears in answer to a choice). */
   live?: boolean;
   /** Stable id; the summary region is `<id>-summary`. */
@@ -417,6 +423,9 @@ export interface BannerProps {
 /** pending: this photo waits to upload (an amber dot on the tile, and its spoken label says so). */
 export interface PhotoItem { id?: string; src?: string; alt?: string; pending?: boolean }
 export interface PhotosProps {
+  adding?: boolean;
+  disabledReason?: string;
+  preview?: 'pressed' | 'focus' | '';
   label?: string;
   optional?: string;
   /** The count and upload state beside the label: `3 attached · 1 waiting to upload`. */
@@ -718,13 +727,14 @@ export interface SentriUI {
 export interface SentriIcons {
   /** name → SVG path data on a 24×24 grid. */
   readonly paths: Readonly<Record<IconName, string>>;
-  /** `<svg viewBox="0 0 24 24" aria-hidden="true"><path d=…/></svg>`; an unknown name falls back to chevron. */
+  readonly aliases: Readonly<Record<string, IconName>>;
+  /** `<svg viewBox="0 0 24 24" aria-hidden="true"><path d=…/></svg>`; an unknown name warns and returns an empty svg. */
   icon(name: IconName): string;
 }
 
 export type IconName =
   | 'more' | 'monitor' | 'treat' | 'hospital' | 'profile' | 'chart' | 'origin' | 'back' | 'chevron' | 'close'
-  | 'check' | 'note' | 'feed' | 'link' | 'condition' | 'weight' | 'search' | 'grid' | 'scan' | 'clock'
+  | 'measure' | 'check' | 'note' | 'feed' | 'link' | 'condition' | 'weight' | 'search' | 'grid' | 'scan' | 'clock'
   | 'alert' | 'signal' | 'battery' | 'filter' | 'minus' | 'plus' | 'record' | 'camera' | 'edit' | 'wrench'
   | 'details' | 'calendar' | 'bookmark' | 'transfer' | 'down' | 'arrow' | 'place' | 'home' | 'toolbox' | 'spark'
   | 'heat' | 'pregnancy' | 'farrow' | 'barn' | 'return' | 'send' | 'health' | 'temperature' | 'humidity' | 'air'
@@ -733,3 +743,7 @@ export type IconName =
 declare global {
   interface Window { SentriUI: SentriUI; SentriIcons: SentriIcons }
 }
+
+export interface RangeSliderProps { min?:number; max?:number; step?:number; value?:[number,number]; label?:string; unit?:string; key?:string; state?:string; disabled?:boolean; reason?:string; error?:string; format?:(value:number)=>string }
+export interface FilterSheetProps { title?:string; subtitle?:string; groups?:{label?:string;content:string;help?:string}[]; count?:number; noun?:string; emptyReason?:string; backAction?:string; clearAction?:string; applyAction?:string; state?:string; loading?:boolean; error?:string; disabled?:boolean; reason?:string; labels?:{clear?:string;back?:string;counting?:string;show?:(count:number,noun:string)=>string}; showStr?:{one:string;many:string}; className?:string; scrim?:boolean }
+export interface SentriUI { rangeSlider(props?:RangeSliderProps):string; filterSheet(props?:FilterSheetProps):string }
