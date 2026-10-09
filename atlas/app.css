@@ -160,3 +160,123 @@ main { position:fixed; inset:56px 0 0 0 }
 .node.node[aria-current=true] { border:2px solid var(--green); background:var(--green-wash); box-shadow:none; font-weight:800; opacity:1 }
 .dock .tools button { font-weight:700; color:var(--green); padding:4px 10px; border-radius:999px } .dock .tools button:hover { text-decoration:underline }
 .dock .tools button[aria-pressed=true] { background:var(--green-wash); text-decoration:none }
+
+/* review round 4: the Notes panel is a screen spec */
+.notes { width:440px } .flowcol.notes-open .flowwrap { left:440px }
+.notes .body { padding:0 0 40px; font-size:13px; line-height:1.5; scroll-behavior:auto }
+.notes .body > .doc, .notes .body > .none { margin:16px 20px }
+.spechead { padding:18px 20px 0 }
+.spechead .t { display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px }
+.spechead h2 { margin:0; font-size:22px; line-height:1.2; letter-spacing:-.02em; font-weight:800 }
+.spechead .zh { color:var(--muted); font-size:15px }
+.pill { display:inline-flex; align-items:center; gap:6px; padding:2px 10px 2px 8px; border-radius:999px; border:1px solid var(--line); background:var(--wash); font-size:11.5px; font-weight:700; color:var(--ink) }
+.badges { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px }
+.badge { display:inline-flex; gap:5px; align-items:baseline; padding:2px 9px; border-radius:6px; border:1px solid var(--line); font-size:11.5px; font-weight:600; color:var(--ink) }
+.badge b { font:600 11.5px var(--mono) } .badge.muted { color:var(--muted); background:transparent; border-style:dashed }
+.badge.amber { background:var(--amber-wash); border-color:#e3d2a2; color:var(--amber) }
+.notes .lead { margin:14px 20px 0; font-size:16px; line-height:1.45; font-weight:500; letter-spacing:-.005em }
+.glance { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:16px 20px 6px }
+.tile { display:flex; flex-direction:column; gap:1px; text-align:left; padding:9px 11px; border:1px solid var(--line); border-radius:10px; background:var(--paper) }
+.tile:hover { border-color:#b9c2b2; background:var(--wash) }
+.tile b { font:600 18px/1.2 var(--mono) } .tile span { font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:700 }
+.tile.amber { background:var(--amber-wash); border-color:#e3d2a2 } .tile.amber b, .tile.amber span { color:var(--amber) }
+.sec { margin-top:6px }
+.sh { position:sticky; top:0; z-index:3; display:flex; align-items:center; gap:8px; margin:0; padding:12px 20px 9px; background:var(--paper); border-bottom:1px solid var(--line); cursor:pointer; user-select:none }
+.sh .lbl { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted) }
+.sh .n { font:600 11px var(--mono); color:var(--ink); background:var(--wash); border-radius:999px; padding:1px 7px }
+.sh .caret { margin-left:auto; color:var(--muted); display:inline-flex; transition:transform .12s }
+.sec[data-open=false] .caret { transform:rotate(-90deg) } .sec[data-open=false] .sb { display:none }
+.sh:hover .lbl { color:var(--ink) }
+.sb { padding:12px 20px 4px }
+.ecards { display:flex; flex-direction:column; gap:10px }
+.ecard { border:1px solid var(--line); border-radius:10px; padding:10px 12px 11px; background:var(--paper); transition:border-color .1s, box-shadow .1s }
+.ecard.hot { border-color:var(--green); box-shadow:0 0 0 3px var(--green-wash) }
+.eh { display:flex; align-items:center; gap:9px; margin-bottom:8px }
+.eh b { font-size:13px; font-weight:700 }
+.num, .pin { display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:var(--green); color:#fff; font:700 11px/1 var(--sans); flex:none }
+.loc { margin-left:auto; font-size:10.5px; font-weight:600; color:var(--muted); border:1px dashed #b9c2b2; border-radius:5px; padding:0 6px }
+.ecard dl { display:grid; grid-template-columns:54px 1fr; gap:5px 10px; margin:0 }
+.ecard dt { font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:700; padding-top:2px }
+.ecard dd { margin:0; min-width:0; overflow-wrap:anywhere }
+.ecard dd code { font:12px/1.5 var(--mono); background:var(--wash); padding:1px 6px; border-radius:5px }
+.ecard dd.src { color:var(--muted); font:11.5px/1.5 var(--mono) }
+table.spec { width:100%; border-collapse:collapse; font-size:12.5px; margin:0 0 8px; table-layout:fixed }
+table.spec th { text-align:left; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:700; padding:2px 10px 7px 0; border-bottom:1px solid var(--line) }
+table.spec td { padding:9px 10px 9px 0; border-bottom:1px solid var(--line); vertical-align:top; overflow-wrap:anywhere; line-height:1.45 }
+table.spec tr:last-child td { border-bottom:0 }
+table.spec td.k { font-weight:700 }
+table.states th:nth-child(1), table.states td:nth-child(1) { width:26% } table.states th:nth-child(3), table.states td:nth-child(3) { width:86px }
+table.controls th:nth-child(1), table.controls td:nth-child(1) { width:28% } table.controls th:nth-child(3), table.controls td:nth-child(3) { width:30% }
+table.copy th:nth-child(1), table.copy td:nth-child(1) { width:30% } table.copy th:nth-child(3), table.copy td:nth-child(3) { width:22% }
+table.edge th:nth-child(2), table.edge td:nth-child(2) { width:80px }
+table.copy td.id { font:11.5px var(--mono); overflow-wrap:anywhere }
+.tag { display:inline-block; margin-left:4px; padding:0 6px; border-radius:5px; background:var(--amber-wash); color:var(--amber); border:1px solid #e3d2a2; font-size:10.5px; font-weight:700; white-space:nowrap }
+.chip { display:inline-flex; align-items:center; gap:6px; padding:2px 9px 2px 8px; margin:1px 0; border:1px solid var(--line); border-radius:999px; background:var(--paper); font-size:12px; font-weight:600; color:var(--green); text-align:left }
+.chip:hover { background:var(--green-wash); border-color:var(--green) }
+.callout { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; margin-bottom:8px; background:var(--amber-wash); border:1px solid #e3d2a2; border-radius:10px; color:#5f4410 }
+.callout svg { flex:none; margin-top:2px; color:var(--amber) } .callout p { margin:0; font-size:12.5px; line-height:1.5 }
+.quote { display:block; padding:2px 0 2px 12px; margin-bottom:10px; border-left:3px solid var(--line); color:var(--ink); font-size:12.5px; line-height:1.5 }
+.quote:hover { border-left-color:var(--green); background:var(--wash); text-decoration:none }
+.notes .doc { font-size:13px; line-height:1.55 }
+.notes .doc h1 { font-size:24px } .notes .doc h2 { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:700; margin:26px 0 8px; padding-bottom:7px; border-bottom:1px solid var(--line) }
+.notes .doc h3 { font-size:14px }
+.notes .doc table { table-layout:auto; font-size:12.5px } .notes .doc th { font-size:10.5px; letter-spacing:.07em; font-weight:700; padding:2px 10px 7px 0; border-top:0; border-bottom:1px solid var(--line) }
+.notes .doc td { padding:9px 10px 9px 0; border-top:0; border-bottom:1px solid var(--line) } .notes .doc td:first-child { font-weight:400 }
+.notes .doc li::marker { color:var(--muted) }
+
+/* pins over the live phone */
+.pins { position:absolute; inset:0; pointer-events:none; z-index:5 }
+.pin { position:absolute; transform:translate(-50%,-50%); pointer-events:auto; cursor:pointer; border:2px solid #fff; box-shadow:0 1px 4px #0004; width:20px; height:20px; font-size:10.5px }
+.pin.hot { background:var(--hl); color:#20291f; z-index:2; transform:translate(-50%,-50%) scale(1.15) }
+.ring { position:absolute; border:2px solid var(--hl); border-radius:6px; background:#e0a10022; pointer-events:none }
+
+.notes .doc table td:first-child { width:62% }
+
+/* review round 5 */
+.pin { width:16px; height:16px; font-size:10px; border-width:1.5px; opacity:.55; transition:opacity .1s }
+.pin:hover, .pin.hot, .pin.on { opacity:1; background:var(--green); transform:translate(-50%,-50%) scale(1.25); z-index:2 }
+.ring { border:1.5px dashed var(--green); background:none; border-radius:4px }
+.ecard { padding:0; overflow:hidden }
+.ecard.hot, .ecard:hover { border-color:#b9c2b2; box-shadow:none }
+.ecard.open { border-color:var(--green); box-shadow:0 0 0 3px var(--green-wash) }
+.eh { display:flex; align-items:center; gap:8px; margin:0; padding:8px 10px; cursor:pointer; min-width:0 }
+.eh b { flex:0 1 auto; max-width:48%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:12.5px }
+.eh .cv { flex:0 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font:11.5px var(--mono); background:var(--wash); padding:1px 6px; border-radius:5px }
+.ecard.open .eh { flex-wrap:wrap } .ecard.open .eh b { max-width:none; white-space:normal }
+.ecard.open .eh .cv { flex:1 0 100%; white-space:normal; overflow-wrap:anywhere; margin-left:28px; box-sizing:border-box; max-width:calc(100% - 28px) }
+.loc { margin-left:auto; cursor:help }
+.ex { display:none; padding:0 12px 10px 38px }
+.ecard.open .ex { display:block }
+.lg { margin:0; font-size:12.5px; line-height:1.5; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden }
+.lg.full { display:block; -webkit-line-clamp:unset }
+.more { color:var(--green); font-size:12px; font-weight:600; margin-top:2px } .more:hover { text-decoration:underline }
+.srcl { margin-top:7px; padding-top:6px; border-top:1px solid var(--line); color:var(--muted); font:11px/1.45 var(--mono); overflow-wrap:anywhere }
+.dock .tools .notesbtn { display:inline-flex; align-items:center; gap:7px; padding:6px 14px; border:1px solid var(--line); border-radius:999px; background:var(--paper); color:var(--ink); font-weight:700; text-decoration:none }
+.dock .tools .notesbtn:hover { background:var(--wash); text-decoration:none }
+.dock .tools .notesbtn[aria-pressed=true] { background:var(--green); border-color:var(--green); color:#fff }
+.sec[data-open=false] > .sb { display:none }
+.notes .doc .sec { margin-top:0 } .notes .doc .sb { padding:12px 0 6px }
+.notes .doc .sh { padding-left:0; padding-right:0 }
+.notes .doc > .sec:first-child .sh { top:0 }
+.loc { white-space:nowrap; flex:none }
+
+
+/* review round 6 */
+.pin { width:14px; height:14px; font-size:9px; border-width:1px }
+.pin:hover, .pin.hot, .pin.on { transform:translate(-50%,-50%) scale(1.3) }
+.pins .lead { position:absolute; left:0; top:0; pointer-events:none; overflow:visible } .pins .lead line { stroke:var(--green); stroke-width:1; opacity:.55 }
+.eh b { flex:1 1 auto; max-width:none; white-space:normal; overflow:visible; text-overflow:clip }
+.ecard.off .eh b { color:var(--muted); font-weight:600 }
+.ex { padding:0 12px 10px 38px }
+.ex .cv { display:block; font:12px/1.5 var(--mono); background:var(--wash); padding:2px 7px; border-radius:5px; margin:0 0 7px; white-space:normal; overflow-wrap:anywhere }
+.srct { display:block; margin-top:7px; color:var(--muted); font-size:12px; font-weight:600 } .srct:hover { color:var(--ink); text-decoration:underline }
+.srcl { margin-top:5px; padding-top:0; border-top:0; font:12px/1.45 var(--mono); color:var(--muted) }
+.srcl[hidden] { display:none }
+.sec.issues .sh { position:static; border-bottom:0; padding-top:10px }
+.sec.issues .sh .lbl { color:var(--amber); text-transform:none; letter-spacing:0; font-size:13px; font-weight:700 }
+.sec.issues { border-bottom:1px solid var(--line); padding-bottom:6px }
+.flowwrap.cut::after { content:''; position:absolute; top:0; bottom:0; right:0; width:48px; background:linear-gradient(to right, rgba(243,244,238,0), var(--ground)); pointer-events:none; z-index:2 }
+.edgechip { position:absolute; right:10px; top:50%; transform:translateY(-50%); z-index:3; width:28px; height:28px; border-radius:50%; background:var(--paper); border:1px solid var(--line); box-shadow:0 2px 8px #20291f22; font-weight:700; color:var(--green) }
+.edgechip[hidden] { display:none }
+.notes .doc code, .notes code { font-size:12px }
+.pins .lead line { stroke-width:.75; stroke-dasharray:2 2; opacity:.4 }

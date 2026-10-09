@@ -15,7 +15,7 @@ const AMBER = '#e0a100';
 function shot(screen, opts = {}) {
   const H = (opts.height || 760) - 20, k = H / 844, W = Math.round(390 * k); // opts.height is the frame's; the 10px bezel sits outside the screen
   const frame = el('<div class="devframe"></div>');
-  const box = el(`<div class="shot" style="width:${W}px;height:${H}px"></div>`); frame.append(box);
+  const box = el(`<div class="shot" style="width:${W}px;height:${H}px" data-k="${k}"></div>`); frame.append(box);
   if (!screen || !screen.url) {
     box.append(el(`<div class="blank">${screen?.name ? `<b>${esc(screen.name)}</b>` : ''}<span>${esc(screen?.blank || 'Not designed yet.')}</span></div>`));
     return frame;
@@ -31,7 +31,7 @@ function shot(screen, opts = {}) {
     if (m.source !== f.contentWindow || !m.data || m.data.atlasReady !== screen.id) return;
     ok = true; removeEventListener('message', onMsg); clearTimeout(timer);
     try { decorate(f, screen, opts); } catch (e) { console.warn('atlas: could not mark the screen', e); }
-    f.style.visibility = 'visible'; wait.remove();
+    f.style.visibility = 'visible'; wait.remove(); frame.dataset.ready = '1'; frame.dispatchEvent(new Event('atlas-ready'));
   };
   addEventListener('message', onMsg);
   timer = setTimeout(() => {
@@ -243,37 +243,171 @@ function openFeature(id, sel) {
   }
   const mark = (nid) => { Object.entries(nodes).forEach(([k, b]) => b.setAttribute('aria-current', k === nid)); drawEdges(nid); setParam('screen', nid); };
   // the phone shows another screen of this feature after a tap: the flow follows (node, arrows, ?screen=, notes) without reloading the phone
-  CURRENT = { follow: (sid) => { if (!nodes[sid] || sid === shown) return; selected = shown = sid; mark(sid); if (notes.classList.contains('open')) fillNotes(); pz && pz.reveal(nodes[sid]); } };
+  const countOf = (sid) => { const n = idx[sid] && idx[sid].notes; return n ? (n.elements || []).filter((e) => !CHROME.test(`${e.name} ${e.shows}`)).length : 0; };
+  CURRENT = { follow: (sid) => { if (!nodes[sid] || sid === shown) return; selected = shown = sid; mark(sid); const nc = dock.querySelector('.notesbtn .nc'); if (nc) nc.textContent = 'Notes' + (countOf(sid) ? ' · ' + countOf(sid) : ''); if (notes.classList.contains('open')) fillNotes(); pz && pz.reveal(nodes[sid]); } };
   wrap.addEventListener('click', (e) => { if (!e.target.closest('.node, .zoom')) drawEdges(null); });
 
   /* the notes panel follows what the phone shows */
   const notes = el('<div class="notes"><header><button class="tab" data-t="screen">Screen notes</button><button class="tab" data-t="prd">Feature PRD</button><button class="x" title="Close notes" aria-label="Close notes">✕</button></header><div class="body"></div></div>');
   let notesTab = 'screen', shown = null, pz = null, selected = null;
-  const setNotes = (on) => { notes.classList.toggle('open', on); col.classList.toggle('notes-open', on); dock.querySelector('[data-notes]')?.setAttribute('aria-pressed', String(on)); if (pz) { pz.fit(); const sel = nodes[selected]; if (sel) pz.reveal(sel); } };
+  const setNotes = (on) => { if (!on) clearPins(); notes.classList.toggle('open', on); col.classList.toggle('notes-open', on); dock.querySelector('[data-notes]')?.setAttribute('aria-pressed', String(on)); if (pz) { pz.fit(); const sel = nodes[selected]; if (sel) pz.reveal(sel); } };
   const goto = (sid) => { const t = idx[sid]; if (!t) return; if (t.feature.id === f.id) select(sid); else openFeature(t.feature.id, sid); };
-  const li = (xs) => (xs && xs.length ? `<ul>${xs.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p class="none">None written yet.</p>');
+  /* ---------- the Notes panel: a screen spec ---------- */
+  const ICON = { warn: '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 1.8 14.8 13.5H1.2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 6.2v3.6M8 11.6v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>', caret: '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' };
+  const CHROME = /status bar|home indicator|9:41|battery|signal/i; // prototype phone chrome, not product UI
   const goesTo = (t) => {
     if (!t) return '<span class="muted">—</span>';
     let out = '', last = 0; const re = /[a-z0-9-]+\.[a-z0-9-]+/g; let m;
-    while ((m = re.exec(t))) { if (!idx[m[0]]) continue; out += esc(t.slice(last, m.index)) + `<button class="goto" data-go="${esc(m[0])}">${esc(idx[m[0]].name)}</button>`; last = m.index + m[0].length; }
+    while ((m = re.exec(t))) { if (!idx[m[0]]) continue; out += esc(t.slice(last, m.index)) + `<button class="chip" data-go="${esc(m[0])}">${dot(idx[m[0]].status)}${esc(idx[m[0]].name)}</button>`; last = m.index + m[0].length; }
     return out + esc(t.slice(last));
   };
+  const table = (cls, heads, rows) => `<table class="spec ${cls}"><thead><tr>${heads.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
+  const splitState = (t, i) => { const m = String(t).match(/^([^:]{1,60}):\s+([\s\S]+)$/); const title = m ? m[1] : `State ${i + 1}`; const trig = title.match(/\(([^)]+)\)\s*$/); return { title: trig ? title.replace(/\s*\([^)]+\)\s*$/, '') : title, what: m ? m[2] : t, how: trig ? trig[1] : '' }; };
+  let pinTok = 0;
+  function expandCard(card, scroll) {
+    card.closest('.body').querySelectorAll('.ecard.open').forEach((c) => { if (c !== card) { c.classList.remove('open'); c._pin && c._pin.classList.remove('on'); c._ring && (c._ring.hidden = true); } });
+    card.classList.add('open'); if (card._pin) card._pin.classList.add('on'); if (card._ring) card._ring.hidden = false;
+    const lg = card.querySelector('.lg'), more = card.querySelector('.more');
+    if (lg && more) { lg.classList.remove('full'); more.hidden = lg.scrollHeight <= lg.clientHeight + 1; more.textContent = 'more'; }
+    if (scroll) card.scrollIntoView({ block: 'center' });
+  }
+  function collapseCard(card) { const sl = card.querySelector('.srcl'); if (sl) { sl.hidden = true; card.querySelector('.srct').textContent = 'Source'; } card.classList.remove('open'); if (card._pin) card._pin.classList.remove('on'); if (card._ring) card._ring.hidden = true; }
+  function clearPins() { pinTok++; dock.querySelectorAll('.pins').forEach((p) => p.remove()); }
+
+  /* find each element on the live phone (by its quoted text, its sample value, then its name) and draw its number over it */
+  function locate(items) {
+    const tok = ++pinTok, frame = dock.querySelector('.devframe');
+    dock.querySelectorAll('.pins').forEach((p) => p.remove());
+    if (!frame || !items.length) return;
+    const run = () => {
+      if (tok !== pinTok) return;
+      const fr = frame.querySelector('iframe.bare'), box = frame.querySelector('.shot');
+      if (!fr || !fr.isConnected) return;
+      let doc, phone; try { doc = fr.contentDocument; phone = doc.querySelector('.atlas-phone'); } catch (_) { return; }
+      if (!phone) return;
+      const k = parseFloat(box.dataset.k) || 1, W = 390 * k, H = 844 * k, S = 18; // S: the largest pin, tested for room
+      const norm = (t) => String(t || '').replace(/\s+/g, ' ').trim().toLowerCase();
+      const pool = [...phone.querySelectorAll('*')].filter((e) => e.childElementCount <= 3 && !/^(script|style|svg|path)$/i.test(e.tagName)).map((e) => { const r = e.getBoundingClientRect(); return { e, r, t: norm(e.textContent), a: r.width * r.height }; }).filter((c) => c.r.width > 2 && c.r.height > 2 && c.r.top < 844 && c.r.bottom > 0 && c.t);
+      const find = (needle) => {
+        const n = norm(needle).replace(/…+$/, ''); if (n.length < 2) return null;
+        for (const test of [(c) => c.t === n, (c) => c.t.startsWith(n) && c.t.length <= n.length * 2 + 8, (c) => c.t.includes(n) && c.t.length <= n.length * 3 + 12]) {
+          const hit = pool.filter(test).sort((a, b) => a.a - b.a)[0]; if (hit) return hit;
+        }
+        return null;
+      };
+      /* every text rect of the screen, in the pins' coordinates */
+      const texts = []; const tw = doc.createTreeWalker(phone, NodeFilter.SHOW_TEXT); const rg = doc.createRange();
+      for (let n; (n = tw.nextNode());) { if (!n.nodeValue.trim()) continue; rg.selectNodeContents(n); for (const r of rg.getClientRects()) if (r.width > 1 && r.height > 1) texts.push([r.left * k, r.top * k, r.right * k, r.bottom * k]); }
+      const hits = (x, y, list) => list.some(([a, b, c, d]) => x < c + 1 && x + S > a - 1 && y < d + 1 && y + S > b - 1);
+      const inside = (x, y) => x >= 1 && y >= 1 && x + S <= W - 1 && y + S <= H - 1;
+      const layer = el('<div class="pins"></div>'); box.append(layer);
+      const taken = []; let missing = [];
+      items.forEach(({ n, e, card }) => {
+        const sh = e.shows || '', cand = [];
+        let m; const re = /["“]([^"”]{2,})["”]/g; while ((m = re.exec(sh))) cand.push(m[1]);
+        sh.replace(/\([^)]*\)/g, '').split(/\s[+·]\s|,|;/).forEach((p) => cand.push(p));
+        cand.push(String(e.name || '').split('·').pop());
+        let hit = null; for (const c of cand) { hit = find(c); if (hit) break; }
+        if (!hit) { card.classList.add('off'); missing.push(e.name); return; }
+        const r = hit.r, L = r.left * k, T = r.top * k, R = r.right * k, B = r.bottom * k, cy = (T + B) / 2 - S / 2;
+        const free = (x, y) => inside(x, y) && !hits(x, y, texts) && !hits(x, y, taken);
+        let spot = [[L - S - 3, cy], [L - S - 2, T - S - 2], [R + 3, cy]].find(([x, y]) => free(x, y)), leader = null;
+        if (!spot) { // no free spot beside it: a pin in a free margin with a hairline to the element
+          const my = Math.min(H - S - 2, Math.max(2, cy)); const mx = [2, W - S - 2].find((x) => free(x, my));
+          if (mx != null) { spot = [mx, my]; leader = [mx + S / 2, my + S / 2, Math.min(R, Math.max(L, mx + S / 2)), Math.min(B, Math.max(T, my + S / 2))]; }
+        }
+        if (!spot) { card.classList.add('off'); missing.push(e.name); return; }
+        taken.push([spot[0], spot[1], spot[0] + S, spot[1] + S]);
+        const ring = el('<i class="ring" hidden></i>');
+        Object.assign(ring.style, { left: L - 2 + 'px', top: T - 2 + 'px', width: R - L + 4 + 'px', height: B - T + 4 + 'px' });
+        const pin = el(`<button class="pin" aria-label="Element ${n}: ${esc(e.name)}">${n}</button>`);
+        pin.style.left = spot[0] + S / 2 + 'px'; pin.style.top = spot[1] + S / 2 + 'px';
+        if (leader) layer.append(el(`<svg class="lead" width="${W}" height="${H}"><line x1="${leader[0]}" y1="${leader[1]}" x2="${leader[2]}" y2="${leader[3]}"/></svg>`));
+        const hot = (on) => { pin.classList.toggle('hot', on); ring.hidden = !(on || card.classList.contains('open')); };
+        card._pin = pin; card._ring = ring; card._hot = hot;
+        card.addEventListener('mouseenter', () => hot(true)); card.addEventListener('mouseleave', () => hot(false));
+        pin.addEventListener('mouseenter', () => expandCard(card, true)); pin.addEventListener('mouseleave', () => hot(false));
+        pin.onclick = () => expandCard(card, true);
+        layer.append(ring, pin);
+      });
+      const nn = document.querySelector('#sec-elements .n');
+      if (nn && missing.length) { nn.textContent = `${items.length} · ${missing.length} not on screen`; nn.title = 'Not found on the screen: ' + missing.join('; '); }
+    };
+    if (frame.dataset.ready) run(); else frame.addEventListener('atlas-ready', run, { once: true });
+  }
+
+  function specHtml(s, nt) {
+    const issues = nt.issues || [], confirm = JSON.stringify(nt).match(/to confirm/gi) || [];
+    const els = (nt.elements || []).filter((e) => !CHROME.test(`${e.name} ${e.shows}`));
+    const states = (nt.states || []).map(splitState), ctrls = nt.controls || [], copy = nt.copy || [], edge = nt.edge || [], rules = nt.rules || [];
+    const sec = (id, label, n, open, inner) => `<section class="sec" id="sec-${id}" data-open="${open}"><h3 class="sh" tabindex="0" role="button" aria-expanded="${open}"><span class="lbl">${label}</span><span class="n">${n}</span><span class="caret">${ICON.caret}</span></h3><div class="sb">${inner}</div></section>`;
+    const none = '<p class="none">None written yet.</p>';
+    const gate = s.gate ? `<span class="badge">Gate <b>${esc(Array.isArray(s.gate) ? s.gate.join(' ') : s.gate)}</b></span>` : '';
+    const head = `<div class="spechead"><div class="t"><h2>${esc(s.name)}</h2>${s.zh ? `<span class="zh">${esc(s.zh)}</span>` : ''}<span class="pill">${dot(s.status)}${esc(STATUS[s.status] || s.status)}</span>${gate}</div>
+      ${confirm.length ? `<div class="badges"><span class="badge">To confirm <b>${confirm.length}</b></span></div>` : ''}</div>
+      ${nt.purpose ? `<p class="lead">${esc(nt.purpose)}</p>` : ''}`;
+    const cards = els.map((e, i) => `<article class="ecard" data-i="${i}"><div class="eh" role="button" tabindex="0"><span class="num">${i + 1}</span><b>${esc(e.name)}</b></div><div class="ex">${e.shows ? `<code class="cv">${esc(e.shows)}</code>` : ''}${e.logic ? `<p class="lg">${esc(e.logic)}</p><button class="more" hidden>more</button>` : ''}${e.source ? `<button class="srct">Source</button><div class="srcl" hidden>${esc(e.source)}</div>` : ''}</div></article>`);
+    const body = [
+      (issues.length ? `<section class="sec issues" id="sec-issues" data-open="false"><h3 class="sh" tabindex="0" role="button" aria-expanded="false"><span class="lbl">${issues.length} issue${issues.length === 1 ? '' : 's'}</span><span class="caret">${ICON.caret}</span></h3><div class="sb">${issues.map((t) => `<div class="callout">${ICON.warn}<p>${esc(t)}</p></div>`).join('')}</div></section>` : ''),
+      sec('elements', 'Elements', els.length, els.length > 0, els.length ? `<div class="ecards">${cards.join('')}</div>` : none),
+      sec('states', 'States', states.length, states.length > 0 && states.length <= 6, states.length ? table('states', ['State', 'What changes', 'How you get there'], states.map((x) => `<tr><td class="k">${esc(x.title)}</td><td>${esc(x.what)}</td><td class="how">${x.how ? esc(x.how) : '<span class="muted">—</span>'}</td></tr>`)) : none),
+      sec('controls', 'Controls', ctrls.length, ctrls.length > 0 && ctrls.length <= 6, ctrls.length ? table('controls', ['Control', 'Does', 'Goes to'], ctrls.map((c) => `<tr><td class="k">${esc(c.control)}</td><td>${esc(c.does)}</td><td class="to">${goesTo(c.goesTo)}</td></tr>`)) : none),
+      sec('copy', 'Copy', copy.length, false, copy.length ? table('copy', ['Id', 'English', '中文'], copy.map((c, i) => `<tr data-copy="${i}"></tr>`)) : none),
+      sec('edge', 'Edge cases', edge.length, false, edge.length ? table('edge', ['Case', 'Handled?'], edge.map((t) => `<tr><td>${esc(t)}</td><td class="how"><span class="muted">unknown</span></td></tr>`)) : none),
+      sec('rules', 'PRD rules applied', rules.length, false, rules.length ? rules.map((t) => `<a class="quote" href="#" data-prd>${esc(t)}</a>`).join('') : none),
+    ];
+    return { html: head + body.join(''), els, copy };
+  }
+
   function fillNotes() {
     notes.querySelectorAll('.tab').forEach((b) => b.setAttribute('aria-pressed', b.dataset.t === notesTab));
-    const body = notes.querySelector('.body');
-    if (notesTab === 'prd') { body.innerHTML = f.prd ? `<div class="doc">${md(f.prd)}</div>` : '<p class="none">No PRD written yet.</p>'; return; }
+    const body = notes.querySelector('.body'); body.scrollTop = 0; clearPins();
+    if (notesTab === 'prd') { body.innerHTML = f.prd ? `<div class="doc">${md(prdSource(f.prd))}</div>` : '<p class="none">No PRD written yet.</p>'; collapsePrd(body); return; }
     const s = idx[shown], nt = s && s.notes;
     if (!s) { body.innerHTML = '<p class="none">Select a screen in the flow.</p>'; return; }
-    if (!nt || !Object.keys(nt).length) { body.innerHTML = `<h4>${esc(s.name)}</h4><p class="none">No notes written for this screen yet.</p>`; return; }
-    const blocks = (rows) => (rows && rows.length ? rows.join('') : '<p class="none">None written yet.</p>');
-    body.innerHTML = `<h4>${esc(s.name)}${s.zh ? ' · ' + esc(s.zh) : ''}</h4>${nt.purpose ? `<p>${esc(nt.purpose)}</p>` : '<p class="none">None written yet.</p>'}
-      <h4>States</h4>${li(nt.states)}
-      <h4>Elements</h4>${blocks((nt.elements || []).map((e) => `<div class="nb"><b>${esc(e.name)}</b><div>${esc(e.shows)}</div>${e.logic ? `<div class="m">Logic: ${esc(e.logic)}</div>` : ''}${e.source ? `<div class="m">Source: ${esc(e.source)}</div>` : ''}</div>`))}
-      <h4>Controls</h4>${blocks((nt.controls || []).map((c) => `<div class="nb"><b>${esc(c.control)}</b><div>${esc(c.does)}</div>${c.goesTo ? `<div class="m">Goes to: ${goesTo(c.goesTo)}</div>` : ''}</div>`))}
-      <h4>Copy ids</h4>${nt.copy && nt.copy.length ? `<p>${nt.copy.map((c) => `<code data-copy="${esc(c)}">${esc(c)}</code>`).join(' ')}</p>` : '<p class="none">None written yet.</p>'}
-      <h4>Edge cases</h4>${li(nt.edge)}<h4>PRD rules applied</h4>${li(nt.rules)}<h4>Issues</h4>${li(nt.issues)}`;
+    if (!nt || !Object.keys(nt).length) { body.innerHTML = `<div class="spechead"><div class="t"><h2>${esc(s.name)}</h2>${s.zh ? `<span class="zh">${esc(s.zh)}</span>` : ''}<span class="pill">${dot(s.status)}${esc(STATUS[s.status] || s.status)}</span></div></div><p class="none">No notes written yet.</p>`; return; }
+    const spec = specHtml(s, nt); body.innerHTML = spec.html;
+    body.querySelectorAll('.sh').forEach((h) => {
+      const toggle = () => { const sec = h.parentElement, on = sec.dataset.open !== 'true'; sec.dataset.open = on; h.setAttribute('aria-expanded', on); };
+      h.onclick = toggle; h.onkeydown = (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(); } };
+    });
+    body.querySelectorAll('.ecard').forEach((c) => {
+      const row = c.querySelector('.eh'), toggle = () => (c.classList.contains('open') ? collapseCard(c) : expandCard(c, false));
+      row.onclick = toggle; row.onkeydown = (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(); } };
+      const st = c.querySelector('.srct'); if (st) st.onclick = () => { const sl = c.querySelector('.srcl'); sl.hidden = !sl.hidden; st.textContent = sl.hidden ? 'Source' : 'Hide source'; };
+      const more = c.querySelector('.more'); if (more) more.onclick = () => { const full = c.querySelector('.lg').classList.toggle('full'); more.textContent = full ? 'less' : 'more'; };
+    });
     body.querySelectorAll('[data-go]').forEach((b) => { b.onclick = () => goto(b.dataset.go); });
-    loadStrings().then((reg) => body.querySelectorAll('[data-copy]').forEach((c) => { const x = reg.strings && reg.strings[c.dataset.copy]; if (x) c.title = x.en; }));
+    body.querySelectorAll('[data-prd]').forEach((a) => { a.onclick = (ev) => { ev.preventDefault(); notesTab = 'prd'; fillNotes(); }; });
+    const cards = [...body.querySelectorAll('.ecard')]; locate(spec.els.map((e, i) => ({ n: i + 1, e, card: cards[i] })));
+    loadStrings().then((reg) => {
+      if (!body.isConnected || idx[shown] !== s) return;
+      body.querySelectorAll('tr[data-copy]').forEach((tr) => {
+        const c = spec.copy[+tr.dataset.copy], x = reg.strings && reg.strings[c];
+        tr.innerHTML = x ? `<td class="id">${esc(c)}</td><td>${esc(x.en)}</td><td>${esc(x.zh || '—')}</td>` : `<td class="id muted">—</td><td>${esc(String(c).replace(/\s*\(raw\)\s*/g, ' ').trim())} <span class="tag">not in registry</span></td><td class="muted">—</td>`;
+      });
+    });
+  }
+  function collapsePrd(body) {
+    const doc = body.querySelector('.doc'); if (!doc) return;
+    [...doc.querySelectorAll('h2')].forEach((h) => {
+      const sb = el('<div class="sb"></div>'); let n = h.nextSibling; while (n && !(n.nodeType === 1 && n.tagName === 'H2')) { const nx = n.nextSibling; sb.append(n); n = nx; }
+      const sec = el(`<section class="sec" data-open="${/^(problem|rules)$/i.test(h.textContent.trim())}"></section>`);
+      const hd = el(`<h3 class="sh" tabindex="0" role="button"><span class="lbl">${esc(h.textContent)}</span><span class="caret">${ICON.caret}</span></h3>`);
+      h.replaceWith(sec); sec.append(hd, sb); hd.setAttribute('aria-expanded', sec.dataset.open);
+      const toggle = () => { const on = sec.dataset.open !== 'true'; sec.dataset.open = on; hd.setAttribute('aria-expanded', on); };
+      hd.onclick = toggle; hd.onkeydown = (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(); } };
+    });
+  }
+  /* the PRD tab: a Decisions list of "heading — gist" lines becomes a table */
+  function prdSource(src) {
+    const lines = String(src).split('\n'), i = lines.findIndex((l) => /^##\s+Decisions\s*$/.test(l));
+    if (i < 0) return src;
+    let j = i + 1; while (j < lines.length && !/^##\s/.test(lines[j])) j++;
+    const sec = lines.slice(i + 1, j), items = sec.filter((l) => /^[-*]\s/.test(l));
+    if (!items.length || !items.every((l) => l.includes(' — '))) return src;
+    const rows = items.map((l) => { const t = l.replace(/^[-*]\s+/, ''), k = t.indexOf(' — '); return `| ${t.slice(0, k).replace(/\|/g, '/')} | ${t.slice(k + 3).replace(/\|/g, '/')} |`; });
+    return [...lines.slice(0, i + 1), '', '| Decision | Basis |', '| --- | --- |', ...rows, '', ...lines.slice(j)].join('\n');
   }
   const openNotes = (tab, anchor) => { if (tab) notesTab = tab; setNotes(true); fillNotes(); if (anchor) notes.querySelector('#' + anchor)?.scrollIntoView(); };
   notes.querySelectorAll('.tab').forEach((b) => { b.onclick = () => { notesTab = b.dataset.t; fillNotes(); }; });
@@ -294,16 +428,21 @@ function openFeature(id, sel) {
       shown = a.screen;
       dock.append(el('<div class="cap">&nbsp;</div>'), shot(target, { height: H, open: a.open, markAdded: a.added ? a.what : null, addPlaceholder: a.added ? null : { after: a.under, text: `Added by ${f.name} — not designed yet` } }));
     } else { shown = nid; dock.append(el('<div class="cap">&nbsp;</div>'), shot(idx[nid], { height: H })); }
-    const tools = el(`<div class="tools"><button data-notes aria-pressed="${notes.classList.contains('open')}">Notes</button>${other ? `<a href="#" data-other>Open ${esc(other.name)}</a>` : ''}</div>`);
+    const ns = idx[shown] && idx[shown].notes, noteCount = ns ? (ns.elements || []).filter((e) => !CHROME.test(`${e.name} ${e.shows}`)).length : 0;
+    const tools = el(`<div class="tools"><button class="notesbtn" data-notes aria-pressed="${notes.classList.contains('open')}"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 2.5h10v11H3z M5.5 5.5h5 M5.5 8h5 M5.5 10.5h3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nc">Notes${noteCount ? ` · ${noteCount}` : ''}</span></button>${other ? `<a href="#" data-other>Open ${esc(other.name)}</a>` : ''}</div>`);
     tools.firstChild.onclick = () => { if (notes.classList.contains('open')) setNotes(false); else openNotes(); };
     const ol = tools.querySelector('[data-other]'); if (ol) ol.onclick = (ev) => { ev.preventDefault(); openFeature(other.id); };
     dock.append(tools); if (notes.classList.contains('open')) fillNotes();
   }
 
   col.append(wrap, notes); page.append(col, dock);
-  pz = panzoom(wrap, plane, () => fitTo(wrap, width, height, 1, 14, 0.75));
+  pz = panzoom(wrap, plane, () => fitTo(wrap, width, height, 1, 14, 0.7));
   wrap.querySelectorAll('[data-z]').forEach((b) => { b.onclick = () => { const z = +b.dataset.z; z ? pz.step(z > 0 ? 1.2 : 1 / 1.2) : pz.fit(); }; });
   requestAnimationFrame(() => pz.fit());
+  const chip = el('<button class="edgechip" title="More to the right" aria-label="Pan right" hidden>→</button>'); wrap.append(chip);
+  const cutBy = () => pz.state.x + (width - 90) * pz.state.k - wrap.clientWidth;
+  chip.onclick = (ev) => { ev.stopPropagation(); pz.pan(-Math.min(300, cutBy() + 24), 0); };
+  const iv = setInterval(() => { if (!wrap.isConnected) return clearInterval(iv); const cut = cutBy() > 6; chip.hidden = !cut; wrap.classList.toggle('cut', cut); }, 200);
   const firstOf = () => { const a = f.anchor; const own = new Set(f.screens.map((s) => s.id)); const pick = (ids) => (ids || []).find((i) => own.has(i)); return (a && pick((a.statuses || []).flatMap((s) => s.screens || []))) || pick((f.groups || []).flatMap((g) => g[1])) || f.screens[0]?.id; };
   select(sel && nodes[sel] ? sel : (nodes[firstOf()] ? firstOf() : Object.keys(nodes)[0]));
 }

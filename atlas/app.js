@@ -39,7 +39,7 @@ function panzoom(wrap, plane, fitFn) {
   const apply = () => { plane.style.transform = `translate(${t.x}px,${t.y}px) scale(${t.k})`; };
   let start = null;
   wrap.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0 || e.target.closest('.zoom')) return;
+    if (e.button !== 0 || e.target.closest('.zoom, .edgechip')) return;
     e.preventDefault(); start = { x: e.clientX, y: e.clientY, tx: t.x, ty: t.y, id: e.pointerId }; wrap.dataset.moved = '';
   });
   wrap.addEventListener('pointermove', (e) => {
@@ -65,7 +65,7 @@ function panzoom(wrap, plane, fitFn) {
     if (b.left < r.left + m) dx = r.left + m - b.left; else if (b.right > r.right - m) dx = r.right - m - b.right;
     if (b.top < r.top + m) dy = r.top + m - b.top; else if (b.bottom > r.bottom - m) dy = r.bottom - m - b.bottom;
     t.x += dx; t.y += dy; apply(); };
-  return { fit, step, reveal, state: t };
+  return { fit, step, reveal, pan: (dx, dy) => { t.x += dx; t.y += dy; apply(); }, state: t };
 }
 /* scale that fits a (w x h) drawing into a wrapper, centred */
 function fitTo(wrap, w, h, maxK = 1, pad = 24, minK = 0.25) {
