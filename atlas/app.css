@@ -382,3 +382,14 @@ table.copy td.id { font:11.5px var(--mono); overflow-wrap:anywhere }
 .vdetail { max-width:720px; margin:12px 0 0 } .vdetail .vname { font-weight:700; font-size:14px; margin-bottom:6px }
 .stage { margin:0 0 14px }
 .fl.open .sev::after { content:"" } .fl.open { padding-bottom:2px }
+
+/* component page: variant tabs and the state grid */
+.vtabs { display:flex; flex-wrap:wrap; gap:2px; width:max-content; max-width:100%; background:var(--wash); padding:3px; border-radius:999px; margin:6px 0 18px }
+.vtabs button { display:inline-flex; gap:7px; align-items:center; white-space:nowrap; padding:5px 14px; border-radius:999px; font-weight:600; font-size:12.5px; color:var(--muted) }
+.vtabs button[aria-pressed=true] { background:var(--paper); color:var(--ink); box-shadow:0 1px 2px #0001 }
+.vuse1 { margin:0 0 10px; font-size:13.5px; max-width:720px } .vuse1 b { font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-right:4px }
+.sgrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:26px 28px; margin:14px 0 8px; align-items:start }
+.scell { margin:0 } .scell figcaption { margin:0 0 8px; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted) }
+.scell iframe { width:100%; max-width:400px; border:1px solid var(--line); border-radius:10px; background:#fff; display:block }
+details.cur { margin:4px 0 16px } details.cur summary { cursor:pointer; color:var(--green); font-size:12.5px; font-weight:600; list-style:none } details.cur summary::-webkit-details-marker { display:none } details.cur[open] summary { margin-bottom:10px }
+.vbody h3 { margin-top:24px }

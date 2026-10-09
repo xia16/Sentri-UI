@@ -89,6 +89,12 @@ A section in `sections/sections.json` may list `patterns: [{ "name", "screens": 
 `ux/design-system/components/<Name>/gate.json`, written by a component's gate run:
 `{ "status": "in-design" | "agent-checked" | "approved", "judged": "<date>", "commit", "model", "scores": { clarity, budget, hierarchy, spacing, broken } (0-10), "lowest", "findings": [{ severity, text, fix }], "variants"?: [{ name, status, scores?, findings? }] }`. Pass mark 8.
 
+## Component variants and their states
+
+A component page has an Overview tab (the README) and one tab per variant. Variant ids come from `ux/design-system/components/<Name>/variants.json` when the component pass writes one — `[{ "id", "name", "use", "notUse", "states": ["Default", "Pressed", ...] }]` — else from the slugified `variants[].name` of its `gate.json`. The selected tab is the URL's `&variant=<id>`.
+
+A variant's states are drawn in `ux/design-system/components/<Name>/variants/<variant-id>.html`: a small document whose top-level elements carry `data-state="<State name>"`. The atlas renders each `[data-state]` element in its own labelled cell at phone width (it injects `tokens.css`, `bundle.css` and `bundle.js` as the single preview does, keeps the document's own `<style>` and `<link>`s, and any `<script>` outside the state elements; each cell holds only its own state element, so scripts must tolerate the others being absent). A variant without that file shows "This variant's states haven't been drawn yet" and the old whole preview behind a closed "Current preview" disclosure.
+
 ## Generated `atlas/atlas.json`
 
 `{ "generated", "commit", "components": [{ name, group, status (gate.json's, else "in-design"; "placeholder" for proposed ones), gate (the gate.json or null), seenIn?, note? }], "platforms": [{ id, name, sections: [{ id, name, zh, shared, features: [<feature.json> + "status" derived from its screens + "prd" (the PRD.md text)] }] }], "oldUi": <references/figma/index.json> }`

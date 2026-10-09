@@ -22,6 +22,7 @@ const navItem = (nav, key, html, count, onclick) => {
 };
 
 /* ---------- Components ---------- */
+let initialVariant = new URLSearchParams(location.search).get('variant');
 let COMPONENT_GROUPS = [
   ['Base', ['Button', 'IconButton', 'Icon', 'Heading', 'Row', 'Panel', 'Facts', 'Log', 'Sheet', 'Segment', 'ChoiceList', 'CategoryFooter']],
   ['Fields', ['Field', 'PickerField', 'Stepper', 'Measure', 'Numpad']],
@@ -97,6 +98,7 @@ async function renderComponents() {
   const pages = { _brand: 'Brand book', _foundations: 'Foundations', _icons: 'Icons' };
   const go = (key) => {
     setParam('component', key === 'Cover' ? null : key);
+    setParam('variant', null);
     nav.querySelectorAll('button').forEach((b) => b.setAttribute('aria-current', b.dataset.k === key));
     pane.scrollTop = 0; pane.innerHTML = '';
     ({ Cover: pageCover, _brand: pageBrand, _foundations: pageFoundations, _icons: pageIcons, _task: pageTask }[key] || pageComponent)(key);
@@ -169,46 +171,70 @@ async function renderComponents() {
       pane.querySelectorAll('a[data-sid]').forEach((a) => { a.onclick = (e) => { e.preventDefault(); const s = idx2[a.dataset.sid]; openFeature(s.feature.id, s.id); }; });
       return;
     }
-    const gate = CI[name] && CI[name].gate, variants = (gate && gate.variants) || [];
+    const gate = CI[name] && CI[name].gate;
+    const slug = (t) => String(t).split(' (')[0].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     pane.append(gateBlock(gate, st));
-    if (!variants.length) pane.append(el('<p class="muted" style="margin:0 0 14px;font-size:12px">Variants and their states are written in the component pass.</p>'));
     let readme = ''; try { readme = await getText(`${DS}/components/${name}/README.md`); } catch (_) {}
     const cand = /candidate/i.test(readme.slice(0, 300)), adr = (readme.slice(0, 400).match(/ADR (\d{4})/) || [])[1];
     if (cand) meta.querySelector('.t').textContent += ` · candidate${adr ? ' (ADR ' + adr + ')' : ''}`;
-    let prev = await styledPreview(name);
-    if (!prev) {
-      prev = el('<div class="nopreview">No preview of its own yet — built in the component pass</div>');
-    }
-    const stage = el('<div class="stage"></div>'); stage.append(prev); pane.append(stage);
-    if (variants.length) {
-      pane.append(el('<h3>Variants</h3>'));
-      const list = el('<div class="vlist"></div>'), detail = el('<div class="vdetail"></div>'); pane.append(list, detail);
-      const select = async (i) => {
-        list.querySelectorAll('.vrow').forEach((r, j) => r.setAttribute('aria-pressed', String(j === i)));
-        detail.innerHTML = ''; stage.innerHTML = '';
-        if (i < 0) { stage.append(prev); return; }
-        const v = variants[i]; let pv = null;
-        if (v.preview) pv = await styledPreview(name, v.preview);
-        stage.append(pv || el('<div class="nopreview">No preview of this variant yet</div>'));
-        detail.append(el(`<div class="vname">${esc(String(v.name).split(' (')[0])}</div>`), gateBlock({ scores: v.scores, findings: v.findings }, v.status || 'in-design'));
-      };
-      variants.forEach((v, i) => {
-        const [vn, ...rest] = String(v.name).split(' ('), use = rest.join(' (').replace(/\)$/, ''), n = (v.usedBy || []).length;
-        const row = el(`<button class="vrow" aria-pressed="false">${dot(v.status || 'in-design')}<b>${esc(vn)}</b><span class="vuse">${esc(use)}</span><span class="vn">${n ? `used by ${n} screen${n === 1 ? '' : 's'}` : 'no screen'}</span></button>`);
-        row.onclick = () => select(row.getAttribute('aria-pressed') === 'true' ? -1 : i); list.append(row);
+    /* variants: variants.json (the component pass) wins; else the gate's own list */
+    let vj = null; try { vj = await getJson(`${DS}/components/${name}/variants.json`); } catch (_) {}
+    const fromGate = ((gate && gate.variants) || []).map((v) => { const [n, ...r] = String(v.name).split(' ('); return { id: slug(v.name), name: n, use: r.join(' (').replace(/\)\s*:?\s*/, ' · ').replace(/ · $/, ''), derived: true, status: v.status, scores: v.scores, findings: v.findings, usedBy: v.usedBy || [] }; });
+    const variants = vj && vj.length ? vj.map((v) => Object.assign({ usedBy: [] }, fromGate.find((g) => g.id === v.id || g.id === slug(v.name)) || {}, v)) : fromGate;
+    const tabs = [...(readme ? [{ id: 'overview', name: 'Overview' }] : []), ...variants];
+    if (!tabs.length) { pane.append(el('<p class="none">Nothing written for this component yet.</p>')); return; }
+    const want = initialVariant; initialVariant = null;
+    const bar = el('<div class="vtabs" role="tablist"></div>'), body = el('<div class="vbody"></div>'); pane.append(bar, body);
+    const chipsFor = (ids) => {
+      const ix = screenIndex(), ok = (ids || []).map((x) => String(x).split(' ')[0]).filter((x) => ix[x]);
+      if (!ok.length) return '<p class="none">No screen uses this yet.</p>';
+      return `<div class="usedby">${ok.slice(0, 16).map((x) => `<a href="?feature=${esc(ix[x].feature.id)}&screen=${esc(x)}" data-sid="${esc(x)}">${esc(ix[x].feature.name)} · ${esc(ix[x].name)}</a>`).join('')}${ok.length > 16 ? `<span class="muted">+${ok.length - 16} more</span>` : ''}</div>`;
+    };
+    const wireChips = (root) => root.querySelectorAll('a[data-sid]').forEach((a2) => { a2.onclick = (e) => { e.preventDefault(); const s = screenIndex()[a2.dataset.sid]; openFeature(s.feature.id, s.id); }; });
+    /* the state grid: every [data-state] element of variants/<id>.html in its own labelled cell, at phone width */
+    async function stateGrid(v) {
+      let html = null; try { html = await getText(`${DS}/components/${name}/variants/${v.id}.html`); } catch (_) {}
+      if (!html) return null;
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const states = [...doc.querySelectorAll('[data-state]')].filter((x) => !x.parentElement.closest('[data-state]'));
+      if (!states.length) return null;
+      const head = [...doc.head.querySelectorAll('style, link[rel=stylesheet]')].map((x) => x.outerHTML).join('');
+      const tail = [...doc.querySelectorAll('script')].filter((x) => !x.closest('[data-state]')).map((x) => x.outerHTML).join('');
+      const dir = `${DS}/components/${name}/`;
+      const inject = `<base href="${dir}"><link rel="stylesheet" href="${DS}/tokens.css"><link rel="stylesheet" href="${DS}/components/bundle.css"><script src="${DS}/components/bundle.js"><\/script>`;
+      const grid = el('<div class="sgrid"></div>');
+      states.forEach((s) => {
+        const cell = el(`<figure class="scell"><figcaption>${esc(s.getAttribute('data-state'))}</figcaption></figure>`), f = el('<iframe title="State"></iframe>');
+        f.style.height = '20px'; f.srcdoc = `<!doctype html><html><head>${inject}${head}<style>html,body{margin:0;background:#fff}body{padding:14px}</style></head><body>${s.outerHTML}${tail}</body></html>`;
+        f.onload = () => { try { const d = f.contentDocument; f.style.height = Math.max(60, Math.max(d.documentElement.scrollHeight, d.body.scrollHeight)) + 'px'; } catch (_) {} };
+        cell.append(f); grid.append(cell);
       });
+      return grid;
     }
-    const used = usedBy(name);
-    pane.append(el('<h3>Used by</h3>'));
-    if (!used.length) pane.append(el('<p class="none">Not mapped yet.</p>'));
-    else {
-      const u = el('<div class="usedby"></div>');
-      used.slice(0, 16).forEach((s) => { const a = el(`<a href="?feature=${esc(s.feature.id)}&screen=${esc(s.id)}">${esc(s.feature.name)} · ${esc(s.name)}</a>`); a.onclick = (e) => { e.preventDefault(); openFeature(s.feature.id, s.id); }; u.append(a); });
-      if (used.length > 16) u.append(el(`<span class="muted">+${used.length - 16} more</span>`));
-      pane.append(u);
+    async function show(id) {
+      bar.querySelectorAll('button').forEach((b2) => b2.setAttribute('aria-pressed', String(b2.dataset.id === id)));
+      setParam('variant', id); body.innerHTML = '';
+      if (id === 'overview') {
+        body.append(el(`<div class="guide doc">${md(readme, { link: compLink })}</div>`));
+        const used = usedBy(name); body.append(el('<h3>Used by</h3>'));
+        const u = el(used.length ? `<div class="usedby">${used.slice(0, 16).map((s) => `<a href="?feature=${esc(s.feature.id)}&screen=${esc(s.id)}" data-sid="${esc(s.id)}">${esc(s.feature.name)} · ${esc(s.name)}</a>`).join('')}${used.length > 16 ? `<span class="muted">+${used.length - 16} more</span>` : ''}</div>` : '<p class="none">Not mapped yet.</p>');
+        body.append(u); wireChips(body); return;
+      }
+      const v = variants.find((x) => x.id === id); if (!v) return;
+      if (v.use || v.notUse) body.append(el(`<p class="vuse1">${v.use ? `${v.derived ? '' : '<b>Use for</b> '}${esc(v.use)}` : ''}${v.notUse ? `${v.use ? ' · ' : ''}<b>Not for</b> ${esc(v.notUse)}` : ''}</p>`));
+      body.append(gateBlock({ scores: v.scores, findings: v.findings }, v.status || 'in-design'));
+      const grid = await stateGrid(v);
+      if (grid) body.append(grid);
+      else {
+        body.append(el('<p class="muted" style="margin:6px 0 12px">This variant’s states haven’t been drawn yet — the component pass draws them.</p>'));
+        const d = el('<details class="cur"><summary>Current preview ›</summary></details>');
+        d.addEventListener('toggle', async () => { if (d.open && !d.querySelector('.pv, .nopreview')) { const pv = await styledPreview(name); d.append(pv || el('<div class="nopreview">No preview of its own yet — built in the component pass</div>')); } });
+        body.append(d);
+      }
+      body.append(el('<h3>Used by</h3>')); body.append(el(chipsFor(v.usedBy))); wireChips(body);
     }
-    pane.append(el('<h3>Guidelines</h3>'));
-    pane.append(el(readme ? `<div class="guide doc">${md(readme, { link: compLink })}</div>` : '<p class="none">No README written yet.</p>'));
+    tabs.forEach((t) => { const b2 = el(`<button role="tab" data-id="${esc(t.id)}" aria-pressed="false">${t.id !== 'overview' ? dot(t.status || 'in-design') : ''}${esc(t.name)}</button>`); b2.onclick = () => show(t.id); bar.append(b2); });
+    show(tabs.some((t) => t.id === want) ? want : (variants[0] || tabs[0]).id);
   }
   const want = q.get('component');
   const inTask = want && (COMPONENT_GROUPS.find((g) => g[0] === 'Task skeleton') || [0, []])[1].includes(want);
