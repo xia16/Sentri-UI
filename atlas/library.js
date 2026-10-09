@@ -73,7 +73,7 @@ function verdictOf(g) {
 /* a gate, collapsed to one line: status pill, verdict, "Gate details"; the bars and the findings open on demand */
 function gateBlock(g, status) {
   const v = verdictOf(g), pill = `<span class="pill">${dot(status)}${esc(STATUS[status] || status)}</span>`;
-  const box = el(`<div class="gate2"><div class="gline">${pill}<span class="gv ${v ? (v.pass ? 'ok' : 'bad') : ''}">${esc(v ? v.text : g ? 'No scores yet' : 'Not gated yet')}</span>${g ? '<button class="gdet" aria-expanded="false">Gate details ›</button>' : ''}</div><div class="gbody" hidden></div></div>`);
+  const box = el(`<div class="gate2"><div class="gline">${pill}<span class="gv ${v ? (v.pass ? (status === 'approved' ? 'ok' : '') : 'bad') : ''}">${esc(v ? v.text : g ? 'No scores yet' : 'Not gated yet')}</span>${g ? '<button class="gdet" aria-expanded="false">Gate details ›</button>' : ''}</div><div class="gbody" hidden></div></div>`);
   if (!g) return box;
   const sc = g.scores || {}, low = v && v.low;
   const bars = SCORE_KEYS.filter((k) => sc[k] != null).map((k) => `<div class="gbar${k === low ? ' low' : ''}${sc[k] < PASS ? ' fail' : ''}"><span class="k">${k}</span><span class="tr"><i style="width:${sc[k] * 10}%"></i><u style="left:${PASS * 10}%"></u></span><b>${sc[k]}</b></div>`).join('');
@@ -87,20 +87,25 @@ function gateBlock(g, status) {
 }
 
 /* the state grid: every [data-state] element of <dir>variants/<id>.html in its own labelled cell, at phone width (null when the file is missing or has no states) */
-async function stateGridAt(dir, id) {
+async function stateGridAt(dir, id, opts = {}) {
   let html = null; try { html = await getText(`${dir}variants/${id}.html`); } catch (_) {}
   if (!html) return null;
   const doc = new DOMParser().parseFromString(html, 'text/html');
-  const states = [...doc.querySelectorAll('[data-state]')].filter((x) => !x.parentElement.closest('[data-state]'));
+  let states = [...doc.querySelectorAll('[data-state]')].filter((x) => !x.parentElement.closest('[data-state]'));
   if (!states.length) return null;
+  if (opts.one) states = [states.find((x) => /^default$/i.test(x.getAttribute('data-state'))) || states[0]]; // the Overview shows one example per variant
   const head = [...doc.head.querySelectorAll('style, link[rel=stylesheet]')].map((x) => x.outerHTML).join('');
   const tail = [...doc.querySelectorAll('script')].filter((x) => !x.closest('[data-state]')).map((x) => x.outerHTML).join('');
   const inject = `<base href="${dir}"><link rel="stylesheet" href="${DS}/tokens.css"><link rel="stylesheet" href="${DS}/components/bundle.css"><script src="${DS}/components/bundle.js"><\/script>`;
-  const grid = el('<div class="sgrid"></div>');
+  const grid = el(`<div class="sgrid${opts.bare ? ' bare' : ''}"></div>`);
   states.forEach((s) => {
-    const cell = el(`<figure class="scell"><figcaption>${esc(s.getAttribute('data-state'))}</figcaption></figure>`), f = el('<iframe title="State"></iframe>');
-    f.style.height = '20px'; f.srcdoc = `<!doctype html><html><head>${inject}${head}<style>html,body{margin:0;background:#fff}body{padding:14px}</style></head><body>${s.outerHTML}${tail}</body></html>`;
-    f.onload = () => { try { const d = f.contentDocument; f.style.height = Math.max(60, Math.max(d.documentElement.scrollHeight, d.body.scrollHeight)) + 'px'; } catch (_) {} };
+    { const h = s.querySelector(':scope > h2, :scope > h3'); if (h && h.textContent.trim().toLowerCase() === s.getAttribute('data-state').trim().toLowerCase()) h.remove(); } // the cell caption already names the state
+    const cell = el(`<figure class="scell"><figcaption>${esc(opts.caption || s.getAttribute('data-state'))}</figcaption></figure>`), f = el('<iframe title="State"></iframe>');
+    f.style.height = '20px'; f.srcdoc = `<!doctype html><html><head>${inject}${head}<style>html,body{margin:0;background:${opts.bare ? 'transparent' : '#fff'}}body{padding:${opts.bare ? '0' : '14px'}}</style></head><body>${s.outerHTML}${tail}</body></html>`;
+    f.onload = () => { try { const d = f.contentDocument;
+      const own = [...d.querySelectorAll('[data-state] *')].slice(0, 12).find((x) => { const c = d.defaultView.getComputedStyle(x), r = x.getBoundingClientRect(); return parseFloat(c.borderTopWidth) > 0 && c.borderTopStyle !== 'none' && r.width > d.documentElement.clientWidth * 0.8; });
+      if (own) { f.style.border = '0'; f.style.background = 'transparent'; d.documentElement.style.background = d.body.style.background = 'transparent'; d.body.style.padding = '0'; } /* the item draws its own surface: no cell frame */
+      f.style.height = Math.max(60, Math.max(d.documentElement.scrollHeight, d.body.scrollHeight)) + 'px'; } catch (_) {} };
     cell.append(f); grid.append(cell);
   });
   return grid;
@@ -140,7 +145,11 @@ async function renderComponents() {
   pane.addEventListener('click', (e) => { const a = e.target.closest('a[href^="?view=components&component="]'); if (a) { e.preventDefault(); go(new URLSearchParams(a.getAttribute('href')).get('component')); } });
 
   async function pageCover() {
-    pane.append(el('<h2>Cover</h2>')); const f = await styledPreview('Cover'); pane.append(f || el(FAILED('the cover')));
+    const f = await styledPreview('Cover'); pane.append(f || el(FAILED('the cover')));
+    const by = (st) => (S.data.components || []).filter((c) => c.status === st);
+    const bits = [['agent-checked', 'agent-checked'], ['in-design', 'in design'], ['placeholder', 'placeholder']].filter(([st]) => by(st).length)
+      .map(([st, w]) => `<a href="#" data-st="${st}">${by(st).length} ${w}</a>`);
+    if (bits.length) { const line = el(`<p class="cstat">${bits.join(' · ')}</p>`); pane.append(line); line.querySelectorAll('a').forEach((a) => { a.onclick = (e) => { e.preventDefault(); go(by(a.dataset.st)[0].name); }; }); }
   }
   async function pageBrand() {
     pane.append(el('<h2>Brand book</h2>'));
@@ -155,7 +164,8 @@ async function renderComponents() {
     pane.append(el(`<div class="icons">${names.map((n) => `<div>${iconSvg(icons, n, 28, 'display:block;margin:0 auto 8px;color:#20291f')}${esc(n)}</div>`).join('')}</div>`));
     const al = Object.entries(icons.aliases);
     pane.append(el('<h3>Aliases</h3>'));
-    pane.append(el(`<p class="none">${al.map(([a, n]) => `<code>${esc(a)}</code> draws <code>${esc(n)}</code>`).join(' · ')}. Names only; use the glyph name in new work.</p>`));
+    pane.append(el('<p class="muted" style="margin:0 0 10px">Names that draw another glyph. Use the glyph name in new work.</p>'));
+    pane.append(el(`<ul class="aliases">${al.map(([a, n]) => `<li><span>${esc(a)}</span><span class="muted">draws</span><span>${esc(n)}</span></li>`).join('')}</ul>`));
   }
   async function pageFoundations() {
     pane.append(el('<h2>Foundations</h2>'));
@@ -198,7 +208,6 @@ async function renderComponents() {
     }
     const gate = CI[name] && CI[name].gate;
     const slug = (t) => String(t).split(' (')[0].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    pane.append(gateBlock(gate, st));
     let readme = ''; try { readme = await getText(`${DS}/components/${name}/README.md`); } catch (_) {}
     const cand = /candidate/i.test(readme.slice(0, 300)), adr = (readme.slice(0, 400).match(/ADR (\d{4})/) || [])[1];
     if (cand) meta.querySelector('.t').textContent += ` · candidate${adr ? ' (ADR ' + adr + ')' : ''}`;
@@ -227,18 +236,30 @@ async function renderComponents() {
       bar.querySelectorAll('button').forEach((b2) => b2.setAttribute('aria-pressed', String(b2.dataset.id === id)));
       setParam('variant', id === 'overview' ? null : id); body.innerHTML = '';
       if (id === 'overview') {
-        const prev = await styledPreview(name);
-        body.append(prev || el('<div class="nopreview">No preview of its own yet — built in the component pass</div>'));
+        body.append(gateBlock(gate, st));
+        if (withStates.length > 1) { // one captioned example per variant; the states live in the variant tabs
+          const g = el('<div class="sgrid ovgrid"></div>');
+          for (const v of withStates) { const one = await stateGridAt(dirOf, v.id, { one: true, bare: true, caption: v.name }); if (one) g.append(...one.children); }
+          body.append(g);
+        } else {
+          const prev = await styledPreview(name);
+          body.append(prev || el('<div class="nopreview">No preview of its own yet — built in the component pass</div>'));
+        }
         if (without.length) body.append(el(`<p class="muted" style="margin:0 0 14px;font-size:12.5px">Variants (to be drawn in the component pass): ${without.map((v) => esc(v.name)).join(' · ')}</p>`));
         else if (!variants.length) body.append(el('<p class="muted" style="margin:0 0 14px;font-size:12px">Variants and their states are written in the component pass.</p>'));
-        if (readme) { body.append(el('<h3>Guidelines</h3>')); body.append(el(`<div class="guide doc">${md(readme, { link: compLink })}</div>`)); }
+        if (readme) { body.append(el('<h3>Guidelines</h3>')); body.append(el(`<div class="guide doc">${md(readme.replace(/^\s*#\s+.*\r?\n/, ''), { link: compLink })}</div>`)); }
         /* real screen ids: the variants' own usedBy plus any screen whose notes name the component */
         const ids = [...new Set([...variants.flatMap((v) => v.usedBy || []), ...usedBy(name).map((x) => x.id)])];
         body.append(el('<h3>Used by</h3>')); body.append(el(chipsFor(ids)));
         wireChips(body); return;
       }
       const v = variants.find((x) => x.id === id); if (!v) return;
-      if (v.use || v.notUse) body.append(el(`<p class="vuse1">${v.use ? `<b>Use for</b> ${esc(v.use)}` : ''}${v.notUse ? `${v.use ? ' · ' : ''}<b>Not for</b> ${esc(v.notUse)}` : ''}</p>`));
+      if (v.use || v.notUse) {
+        const bare = (t) => esc(String(t).replace(/^\s*(use for|not for|use|not)\s+/i, '')).replace(/(—\s*use\s+)([a-z][a-z-]*)/gi, (m, a, w) => (variants.some((x) => x.id === w.toLowerCase()) ? `${a}<a href="#" data-vt="${w.toLowerCase()}">${w}</a>` : m));
+        const u = el(`<p class="vuse1">${v.use ? `<b>Use for</b> ${bare(v.use)}` : ''}${v.notUse ? `${v.use ? ' · ' : ''}<b>Not for</b> ${bare(v.notUse)}` : ''}</p>`);
+        u.querySelectorAll('[data-vt]').forEach((a2) => { a2.onclick = (e) => { e.preventDefault(); if (tabs.some((t) => t.id === a2.dataset.vt)) show(a2.dataset.vt); }; });
+        body.append(u);
+      }
       if (!same(v) && (v.scores || v.findings)) body.append(gateBlock({ scores: v.scores, findings: v.findings }, v.status || 'in-design'));
       body.append(drawn[v.id]);
       body.append(el('<h3>Used by</h3>')); body.append(el(chipsFor(v.usedBy))); wireChips(body);
@@ -254,6 +275,7 @@ async function renderComponents() {
 /* ---------- Copy: one registry; screens refer to strings by id ---------- */
 const NS_NAMES = { act: 'Shared actions', label: 'Shared labels', pp: 'Piglet processing', sp: 'Piglet processing · simple', tk: 'Task skeleton', ds: 'Design-system demos', fr: 'Farrowing', time: 'Time', dead: 'Deaths', pointer: 'Pointer', preview: 'Previews', receipt: 'Receipts', row: 'Rows', status: 'Status' };
 const CAP = 300;
+const DEMOS = ['pp', 'sp', 'ds']; // prototype and demo strings, one item at the foot of the nav
 
 async function renderCopy() {
   const { pane, nav } = libShell('Copy', 'One registry, English and Chinese. Screens refer to strings by id, never raw text: change it here and it changes everywhere.');
@@ -276,35 +298,42 @@ async function renderCopy() {
     setParam('key', key === '@verbs' ? null : key);
     if (key === '@verbs') body.innerHTML = '<h2>Shared vocabulary</h2><p class="muted" style="margin:-6px 0 14px">Each verb has one meaning, everywhere.</p>' + table(['Verb', '中文', 'Means'], Object.entries(reg.verbs || {}).map(([v, x]) => `<tr><td><b>${esc(v)}</b></td><td>${esc(x.zh)}</td><td>${esc(x.meaning)}</td></tr>`));
     else if (key === '@banned') body.innerHTML = '<h2>Banned words</h2>' + table(['Word', 'Why'], Object.entries(reg.banned || {}).map(([w, why]) => `<tr><td><b>${esc(w)}</b></td><td>${esc(why)}</td></tr>`));
+    else if (key === '@demos') body.innerHTML = '<h2>Demos</h2><p class="muted" style="margin:-6px 0 14px">Strings used only by prototypes and design-system demos. Search for a specific one.</p>' + DEMOS.map((k) => { const rows = strings.filter(([id]) => id.split('.')[0] === k); return `<h3>${esc(nameOf(k))} <span class="muted">${rows.length}${rows.length > CAP ? ` · showing ${CAP}` : ''}</span></h3>` + table(['Id', 'English', '中文'], strRows(rows)); }).join('');
     else { const rows = strings.filter(([id]) => id.split('.')[0] === key); body.innerHTML = `<h2>${esc(nameOf(key))} <span class="muted" style="font-size:14px;font-weight:500">${rows.length}${rows.length > CAP ? ` · showing ${CAP}, search for the rest` : ''}</span></h2>` + table(['Id', 'English', '中文'], strRows(rows)); }
   }
   [['@verbs', 'Shared vocabulary', Object.keys(reg.verbs || {}).length], ['@banned', 'Banned words', Object.keys(reg.banned || {}).length]].forEach(([k, n, c]) => navItem(nav, k, esc(n), c, () => { key = k; search.value = ''; draw(); }));
   nav.append(el('<h5>Strings</h5>'));
-  Object.entries(ns).sort((a, b) => b[1] - a[1]).forEach(([k, c]) => navItem(nav, k, esc(nameOf(k)), c, () => { key = k; search.value = ''; draw(); }));
+  Object.entries(ns).filter(([k]) => !DEMOS.includes(k)).sort((a, b) => b[1] - a[1]).forEach(([k, c]) => navItem(nav, k, esc(nameOf(k)), c, () => { key = k; search.value = ''; draw(); }));
+  const demoN = DEMOS.reduce((n, k) => n + (ns[k] || 0), 0);
+  if (demoN) navItem(nav, '@demos', 'Demos', demoN, () => { key = '@demos'; search.value = ''; draw(); });
   search.oninput = draw; pane.append(search, body); draw();
 }
 
 
 /* ---------- Backlog: what the reviews found, one line each until opened ---------- */
 const BK = [['decision', 'Decision'], ['design', 'Design'], ['broken', 'Broken'], ['unclear', 'Unclear']];
-const bkState = { kind: '', sec: '' };
+const bkState = { kind: '', sec: '', feature: '' }; // kind '@todo' is every kind but decision
 function renderBacklog() {
   const main = document.getElementById('main'); main.innerHTML = '';
   const items = S.data.backlog || [], idx = screenIndex(), feats = Object.fromEntries(allFeatures().map((f) => [f.id, f]));
   const where = (t) => {
-    if (t.kind === 'screen' && idx[t.id]) { const s = idx[t.id]; return { key: 'screen:' + t.id, name: `${s.feature.name} · ${s.name}`, sec: s.feature.sectionRef.name, open: () => openFeature(s.feature.id, s.id) }; }
-    if (t.kind === 'feature' && feats[t.id]) { const f = feats[t.id]; return { key: 'feature:' + t.id, name: f.name, sec: f.sectionRef.name, open: () => openFeature(f.id) }; }
+    if (t.kind === 'screen' && idx[t.id]) { const s = idx[t.id]; return { fid: s.feature.id, key: 'screen:' + t.id, name: `${s.feature.name} · ${s.name}`, sec: s.feature.sectionRef.name, open: () => openFeature(s.feature.id, s.id) }; }
+    if (t.kind === 'feature' && feats[t.id]) { const f = feats[t.id]; return { fid: f.id, key: 'feature:' + t.id, name: f.name, sec: f.sectionRef.name, open: () => openFeature(f.id) }; }
     if (t.kind === 'component') return { key: 'component:' + t.id, name: t.id, sec: 'Components', open: () => { S.view = 'components'; setParam('view', 'components'); setParam('component', t.id); setParam('variant', null); closeFeature(); render(); } };
     return { key: t.kind + ':' + t.id, name: String(t.id), sec: t.kind === 'section' ? String(t.id) : 'Other', open: null };
   };
   const secs = [...new Set(items.map((b) => where(b.target).sec))];
   const page = el('<div class="backlog"></div>'); main.append(page);
-  const counts = (k) => items.filter((b) => b.kind === k && (!bkState.sec || where(b.target).sec === bkState.sec)).length;
-  const bar = el(`<div class="bkbar">${BK.map(([k, n]) => `<button class="bkc k-${k}" aria-pressed="${bkState.kind === k}" data-k="${k}"><b>${counts(k)}</b> ${n}</button>`).join('')}<select class="bksec" aria-label="Section"><option value="">All sections</option>${secs.map((s) => `<option${bkState.sec === s ? ' selected' : ''}>${esc(s)}</option>`).join('')}</select></div>`);
+  const inScope = (b) => (!bkState.sec || where(b.target).sec === bkState.sec) && (!bkState.feature || where(b.target).fid === bkState.feature);
+  const kindOk = (b) => !bkState.kind || (bkState.kind === '@todo' ? b.kind !== 'decision' : b.kind === bkState.kind);
+  const counts = (k) => items.filter((b) => b.kind === k && inScope(b)).length;
+  const fname = bkState.feature && feats[bkState.feature] ? feats[bkState.feature].name : '';
+  const bar = el(`<div class="bkbar">${BK.map(([k, n]) => `<button class="bkc k-${k}" aria-pressed="${bkState.kind === k}" data-k="${k}"><b>${counts(k)}</b> ${n}</button>`).join('')}${fname ? `<button class="bkc bkfeat" data-clear title="Show every feature"><span>${esc(fname)}${bkState.kind === '@todo' ? ' · To-dos' : ''}</span><span aria-hidden="true">✕</span></button>` : ''}<select class="bksec" aria-label="Section"><option value="">All sections</option>${secs.map((s) => `<option${bkState.sec === s ? ' selected' : ''}>${esc(s)}</option>`).join('')}</select></div>`);
   const list = el('<div class="bklist"></div>'); page.append(bar, list);
   bar.querySelectorAll('.bkc').forEach((b) => { b.onclick = () => { bkState.kind = bkState.kind === b.dataset.k ? '' : b.dataset.k; renderBacklog(); }; });
+  const clr = bar.querySelector('[data-clear]'); if (clr) clr.onclick = () => { bkState.feature = ''; if (bkState.kind === '@todo') bkState.kind = ''; renderBacklog(); };
   bar.querySelector('.bksec').onchange = (e) => { bkState.sec = e.target.value; renderBacklog(); };
-  const shown = items.filter((b) => (!bkState.kind || b.kind === bkState.kind) && (!bkState.sec || where(b.target).sec === bkState.sec));
+  const shown = items.filter((b) => kindOk(b) && inScope(b));
   if (!shown.length) { list.append(el(`<p class="none">${items.length ? 'Nothing matches.' : 'No review items yet.'}</p>`)); return; }
   const groups = new Map();
   shown.forEach((b) => { const w = where(b.target); if (!groups.has(w.key)) groups.set(w.key, { w, items: [] }); groups.get(w.key).items.push(b); });
@@ -314,7 +343,7 @@ function renderBacklog() {
     const nm = sec.querySelector('.gname').firstElementChild; nm.textContent = g.w.name; if (g.w.open) nm.onclick = (e) => { e.preventDefault(); g.w.open(); };
     g.items.sort((a, b) => kRank[a.kind] - kRank[b.kind] || (sevRank[a.severity] ?? 1) - (sevRank[b.severity] ?? 1)).forEach((b) => {
       const opts = (b.options || []).map((o) => `<li>${esc(typeof o === 'string' ? o : o.label || o.name || JSON.stringify(o))}</li>`).join('');
-      const row = el(`<div class="bkitem"><button class="bi" aria-expanded="false"><span class="ktag k-${esc(b.kind)}">${esc(cap(b.kind))}</span><span class="sevdot sev-${esc(b.severity || 'medium')}" title="${esc(cap(b.severity || 'medium'))}"></span><span class="bt"></span></button><div class="bd" hidden>${b.detail ? `<p>${esc(b.detail).replace(/\n/g, '<br>')}</p>` : ''}${opts ? `<div class="bopt"><b>Options</b><ul>${opts}</ul></div>` : ''}${b.recommendation ? `<p class="brec"><b>Recommendation</b> ${esc(b.recommendation)}</p>` : ''}<small>${esc(b.source || '')}</small></div></div>`);
+      const row = el(`<div class="bkitem"><button class="bi" aria-expanded="false"><span class="ktag k-${esc(b.kind)}">${esc(cap(b.kind))}</span><span class="bt"></span></button><div class="bd" hidden>${b.detail ? `<p>${esc(b.detail).replace(/\n/g, '<br>')}</p>` : ''}${opts ? `<div class="bopt"><b>Options</b><ul>${opts}</ul></div>` : ''}${b.recommendation ? `<p class="brec"><b>Recommendation</b> ${esc(b.recommendation)}</p>` : ''}<small>${esc(b.source || '')}</small></div></div>`);
       row.querySelector('.bt').textContent = b.title;
       const btn = row.querySelector('.bi'), d = row.querySelector('.bd');
       btn.onclick = () => { d.hidden = !d.hidden; btn.setAttribute('aria-expanded', String(!d.hidden)); row.classList.toggle('open', !d.hidden); };

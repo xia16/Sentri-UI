@@ -39,14 +39,14 @@
     'Past expected': () => farr({ late: 2 }),
     'Due': () => preg({ due: 4, later: 3 }),
     'Overdue': () => preg({ due: 4, overdue: 2 }),
-    'Pregnancy rechecks / breeding split': () => preg({ due: 5, rechecks: 2 }) + card('breeding', 'Breeding', 'Batch 34 · Service sequence', { label: 'sows ready for service', due: 5, first: 3, repeat: 2 }, prog(6, 12, 'Service sequences complete')),
+    'Pregnancy rechecks / breeding split': () => preg({ due: 5, rechecks: 2 }) + '<div style="height:12px"></div>' + card('breeding', 'Breeding', 'Batch 34 · Service sequence', { label: 'sows ready for service', due: 5, first: 3, repeat: 2 }, prog(6, 12, 'Service sequences complete')),
     'Ready to complete': () => preg({ readyToComplete: true }, prog(18, 18)),
     'Waiting for another task': () => card('breeding', 'Breeding', 'Batch 34 · Service sequence', { readyToComplete: true, closureBlockedBy: 'heat check' }, prog(12, 12, 'Service sequences complete')),
     'Unit work complete': () => farr({ unitComplete: true }),
     'Waiting': () => preg({ nextLabel: 'Tomorrow', nextAt: 1440 }),
     'Waiting, next unknown': () => card('breeding', 'Breeding', 'Batch 34 · Service sequence', {}, prog(6, 12, 'Service sequences complete')),
     'Round complete': () => card('heat', 'Heat check', 'Batch 35 · Replacement gilts', { roundComplete: true, nextLabel: '14:30', nextAt: 870 }, null),
-    'Closed': () => closed('complete', 'Completed · Today, 09:10') + closed('terminated', 'Ended early · Today, 09:10'),
+    'Closed': () => closed('complete', 'Today, 09:10') + closed('terminated', 'Today, 09:10'),
   };
   document.querySelectorAll('[data-state]').forEach((el) => { const f = states[el.getAttribute('data-state')]; if (f) el.innerHTML = f(); });
 })();

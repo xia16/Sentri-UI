@@ -410,3 +410,47 @@ details.cur { margin:4px 0 16px } details.cur summary { cursor:pointer; color:va
 .sevdot { flex:none; width:8px; height:8px; border-radius:50% } .sev-high { background:#c0502a } .sev-medium { background:#d0a23a } .sev-low { background:#c9cfc2 }
 .bd { padding:2px 0 12px 78px; font-size:12.5px; line-height:1.55; max-width:760px } .bd p { margin:0 0 8px } .bd small { color:var(--muted) }
 .bd .bopt b, .brec b { font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-right:6px } .bd ul { margin:4px 0 8px; padding-left:18px }
+
+/* review fixes, round 1: green means approved only; one surface; nothing said twice */
+.node.node[aria-current=true] { border:2px solid var(--ink); background:var(--paper); font-weight:700 }
+.node[hidden] { display:none }
+.fold { position:absolute; z-index:1; padding:3px 0; font-size:12px; font-weight:600; color:var(--ink); text-decoration:underline; white-space:nowrap }
+.fold.open { color:var(--muted); font-weight:500 }
+.crumb .meta a { color:var(--ink); text-decoration:underline }
+.gv.ok { color:var(--green) } .gdet { margin-left:0; color:var(--ink); text-decoration:underline }
+.gline { gap:10px }
+.num, .pin { background:var(--ink) } .pin:hover, .pin.hot, .pin.on { background:var(--ink) }
+.pin.hot { color:#fff } .ring { border-color:var(--ink) } .pins .lead line { stroke:var(--ink) }
+.ecard.open { border-color:var(--ink); box-shadow:none }
+.dock .tools .notesbtn[aria-pressed=true] { background:var(--paper); border-color:var(--line); color:var(--ink); box-shadow:0 1px 2px #0001 }
+.dock .tools button[aria-pressed=true] { background:var(--paper) }
+/* component pages: one preview surface, plain guidelines */
+.pv { background:none; border:0; padding:0 }
+.guide { background:none; border:0; padding:0 }
+.sgrid.ovgrid { margin-top:0 }
+.cstat { margin:14px 0 0; font-size:13px; color:var(--muted) } .cstat a { color:var(--ink); text-decoration:underline }
+.aliases { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:6px 24px; font-size:13px }
+.aliases li { display:flex; gap:8px }
+/* pattern pages: the card is the only frame; its caption is plain text */
+.patternpage .scell iframe { border:0; border-radius:0; background:transparent; max-width:none }
+.patternpage .sgrid { grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)) }
+/* library pages share one side column */
+.index { grid-template-columns:260px 1fr }
+.index aside { padding:24px 16px } .index aside h1 { font-size:26px; margin:0 0 6px 10px } .index aside p { margin:0 0 16px 10px; font-size:13px }
+/* old UI */
+.fileopen { border:0; border-radius:0; padding:0; font-weight:600; color:var(--ink); text-decoration:underline } .fileopen:hover { background:none }
+.index h2 { display:grid; grid-template-columns:1fr 90px 100px; gap:16px; padding:0 14px 0 14px; align-items:baseline } .index h2 .n { text-align:right; text-transform:none; letter-spacing:0; font-weight:500 } .index h2 a { margin-left:0; text-align:right }
+.row { grid-template-columns:1fr 90px 100px } .row .n { text-align:right } .row span:last-child { text-align:right }
+/* backlog */
+.bkgroup h3 a { color:var(--ink) }
+.bkc[aria-pressed=true] { background:var(--ink); border-color:var(--ink); color:var(--paper) } .bkc[aria-pressed=true] b { color:var(--paper) }
+.bkfeat { color:var(--ink) }
+
+.ovgrid .scell iframe { border:0; border-radius:0; background:transparent; max-width:none }
+
+/* review fixes, round 2 */
+a { color:var(--ink); text-decoration:underline; text-underline-offset:2px }
+.row, .row:hover { text-decoration:none } .fileopen:hover { text-decoration:underline }
+.chip, .more, .edgechip, details.cur summary, .notes .goto, .dock .cap a, .region .patterns button { color:var(--ink) }
+.board, .flowwrap { bottom:56px }
+.zoom { bottom:10px }

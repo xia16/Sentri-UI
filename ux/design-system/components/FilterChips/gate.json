@@ -96,7 +96,7 @@
       "name": "tags (single-select job filter with counts)",
       "usedBy": [
         "piglet-processing.pen-list",
-        "piglet-processing.job-chip"
+        "piglet-processing.pen-list"
       ],
       "status": "agent-checked",
       "scores": {

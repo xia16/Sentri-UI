@@ -313,13 +313,13 @@
   "id": "tasks-built-26",
   "target": {
    "kind": "component",
-   "id": "TaskStepper"
+   "id": "Stepper"
   },
   "kind": "design",
   "severity": "medium",
   "title": "Steppers still 44px, below the 48px glove floor",
   "detail": "TaskStepper row face and farrowing .row-stepper keys are 44x44, and farrowing hand-rolls three look-alike steppers instead of SentriTask.stepper. Sow count keys are the most-tapped control.",
-  "source": "gate"
+  "source": "Gate · Stepper · 2026-10-10"
  },
  {
   "id": "tasks-built-27",
@@ -745,7 +745,7 @@
   "id": "tasks-built-63",
   "target": {
    "kind": "screen",
-   "id": "piglet-processing.job-chip"
+   "id": "piglet-processing.pen-list"
   },
   "kind": "design",
   "severity": "medium",
@@ -757,7 +757,7 @@
   "id": "tasks-built-64",
   "target": {
    "kind": "screen",
-   "id": "piglet-processing.chip-done"
+   "id": "piglet-processing.pen-list"
   },
   "kind": "broken",
   "severity": "medium",
@@ -769,7 +769,7 @@
   "id": "tasks-built-65",
   "target": {
    "kind": "screen",
-   "id": "piglet-processing.list-no-id"
+   "id": "piglet-processing.pen-list"
   },
   "kind": "decision",
   "severity": "medium",
@@ -787,7 +787,7 @@
   "id": "tasks-built-66",
   "target": {
    "kind": "screen",
-   "id": "piglet-processing.list-no-id"
+   "id": "piglet-processing.pen-list"
   },
   "kind": "unclear",
   "severity": "medium",
@@ -799,7 +799,7 @@
   "id": "tasks-built-67",
   "target": {
    "kind": "screen",
-   "id": "piglet-processing.phone-clash"
+   "id": "piglet-processing.pen-list"
   },
   "kind": "decision",
   "severity": "medium",
@@ -817,7 +817,7 @@
   "id": "tasks-built-68",
   "target": {
    "kind": "screen",
-   "id": "piglet-processing.phone-clash"
+   "id": "piglet-processing.pen-list"
   },
   "kind": "unclear",
   "severity": "low",
@@ -1233,7 +1233,7 @@
   "id": "tasks-built-102",
   "target": {
    "kind": "screen",
-   "id": "piglet-processing.list-ended"
+   "id": "piglet-processing.pen-list"
   },
   "kind": "design",
   "severity": "medium",
@@ -1245,7 +1245,7 @@
   "id": "tasks-built-103",
   "target": {
    "kind": "screen",
-   "id": "piglet-processing.list-ended"
+   "id": "piglet-processing.pen-list"
   },
   "kind": "decision",
   "severity": "medium",
