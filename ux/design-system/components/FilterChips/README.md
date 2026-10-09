@@ -25,8 +25,8 @@ See [variants.json](variants.json) for use boundaries and each variant’s rende
 | State | Appearance and behaviour |
 |---|---|
 | Default | Enabled options; host supplies current selection. |
-| Pressed | Press fill immediately on touch; static demo uses state=Pressed. |
-| Selected | Weight plus check mark; never colour alone. |
+| Pressed | An unselected chip darkens to the handle tone at once on touch; the selected chip keeps its paper face. The static demo presses the second chip. |
+| Selected | Weight plus check mark, shown only on the selected chip; the chip keeps the same width selected or not (padding reserves the check); never colour alone. |
 | Disabled | Native disabled button, dashed outline; host supplies one visible reason beside the row. Prefer omission unless temporarily unavailable. |
 | Focus | Token focus ring. |
 | Long-label | English and Chinese labels wrap without clipping or ellipsis. |
@@ -39,7 +39,7 @@ Selection changes the content below immediately through the host’s data-action
 
 ## Content rules
 
-Sentence case; nouns or states, never commit verbs. Aim for 1–2 words, ≤12 English characters / 6 Chinese characters at 2–3 choices; ≤8 / 4 at 4–5. Translate rather than abbreviate states. Long translations wrap and increase height; never ellipsize a status. Counts are optional properties, defined once, never repeated in the label. Legacy labels may contain trusted HTML; never pass unsanitized user content.
+Sentence case; the job or category as a noun, never a commit verb. One or two words, at most 12 English characters or 6 Chinese characters per chip; no abbreviations. A chip that is too long wraps rather than truncating, but prefer a shorter name. One optional count per chip, never in the label; zero is shown. All comes first and has no count when a lens above already carries the total. The set is dynamic and scrolls sideways; there is no cap on chips. Legacy labels may contain trusted HTML; never pass unsanitized user content.
 
 ## Accessibility
 
@@ -47,9 +47,9 @@ Named role=radiogroup; buttons expose role=radio and aria-checked, with a roving
 
 ## Do / don’t
 
-- Do use one count per choice; don’t repeat it in surrounding headings.
+- Do show only tags that have work today; don’t list empty tags.
+- Do keep All first and uncounted when a lens above shows the total; don’t repeat totals.
 - Do preserve the selection for an empty result; don’t hide the way back.
-- Do name subjects consistently; don’t mix unrelated navigation destinations.
 
 ## API and tokens
 

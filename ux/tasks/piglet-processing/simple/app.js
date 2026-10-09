@@ -71,10 +71,17 @@
   function sowChip(p) {
     var sts = P.todo(p).map(function (k) { return P.status(p, k); });
     if (P.s.ended) return null;
+<<<<<<< HEAD
     if (sts.indexOf('late') >= 0) return chipOf('late', 'chip.late');
     if (p.sowDied) return chipOf('died', 'chip.sow');
     if (sts.length) return chipOf('awaiting', 'st.todo');
     return P.coming(p).length ? null : chipOf('done', 'chips.done');
+=======
+    if (sts.indexOf('late') >= 0) return S('chip.late', null, 'amber');
+    if (p.sowDied) return S('chip.sow', null, 'red');
+    /* the lens above already says To do / Done; the row keeps only what differs (Late, Sow died) */
+    return null;
+>>>>>>> 0cde753 (Segment/FilterChips round-2 fixes: visible pressed state, wrapper no longer stretches, one lens rule (Piglet uses two-line), no repeated Done count or To do pill, fan mode on Segment, check only when selected)
   }
   /* The pen's card, exactly farrowing's room list: the pen header (`A03 · 1 sow ›`, TaskGroup) and the sow's row under it
      (TaskRow): mono sow ID with its one chip; the headline is what is due (or, with nothing due, farrowing's figure:
@@ -109,7 +116,7 @@
     var items = [{ value: '', label: S('chips.all'), checked: V.chip === '', aria: T('chips.all') }]
       .concat(chipCounts().map(function (c) { return { value: c.k, label: S(chipKey(c.k)), count: S('fig', { v: c.n }), checked: V.chip === c.k, aria: T('chip.aria', { name: chipName(c.k), n: c.n }) }; }))
       ;
-    return '<div class="sp-list-lens">'+UI.segment({options:[['todo',K.T(S('lens.todo')),{count:all.length-done}],['done',K.T(S('lens.done')),{count:done}]],active:V.lens,action:'list-lens',ariaLabel:T('chips.label')})+'</div>' + (V.lens==='todo'?K.chips({ items: items, action: 'chip', key: 'chips', label: T('chips.label') }):'');
+    return '<div class="sp-list-lens">'+UI.segment({variant:'two-line-lens',options:[['todo',K.T(S('lens.todo')),{count:all.length-done}],['done',K.T(S('lens.done'))]],active:V.lens,action:'list-lens',ariaLabel:T('chips.label')})+'</div>' + (V.lens==='todo'?K.chips({ items: items, action: 'chip', key: 'chips', label: T('chips.label') }):'');
   }
   /* the task's overall checker: piglets the records cannot account for (set counts lower than the record), batch level only */
   function batchLine() { var u = P.s.unaccounted || 0; return u > 0 ? S('batch.unacc', { b: P.BATCH.name, n: u }) : S('batch', { b: P.BATCH.name }); }

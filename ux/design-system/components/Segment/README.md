@@ -4,8 +4,8 @@ Switch a fixed set of 2–5 views or choices of the same list or sheet. Use [Fil
 
 ## When to use
 
-- **Lens:** use for states of one list with inline counts.
-- **Two-line lens:** use for states of one list with counts beneath labels.
+- **Two-line lens (the default lens):** use for the To do / Done (or Active / Done / All) states of a task list, count beneath each label. Farrowing, Inspection and Piglet processing all use it, so the same job looks the same everywhere. Sits beside the filter IconButton when the list has one.
+- **Lens (inline count):** use only for a 2-state split inside a card or sheet header where a second text line would not fit, and no filter button sits beside it. Not for the main list of a task: use the two-line lens.
 - **View switch:** use for 2–3 subjects of one sheet.
 - **Facet:** use for one fixed single-choice filter in a filter sheet.
 
@@ -31,7 +31,7 @@ See [variants.json](variants.json) for use boundaries and each variant’s rende
 | State | Appearance and behaviour |
 |---|---|
 | Default | Enabled options; host supplies current selection. |
-| Pressed | Press fill immediately on touch; static demo uses state=Pressed. |
+| Pressed | An unselected option darkens to the handle tone at once on touch (visibly different from both unselected and selected); a selected option keeps its paper face. The static demo presses the second option. |
 | Selected | Weight plus underline; never colour alone. |
 | Disabled | Native disabled button, dashed outline; host supplies one visible reason beside the row. Prefer omission unless temporarily unavailable. |
 | Focus | Token focus ring. |

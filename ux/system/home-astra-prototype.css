@@ -152,6 +152,7 @@
 .unit-hub-maintenance small{margin-left:auto;font-size:10px}
 .unit-hub-maintenance.has-issues small{color:var(--amber)}
 .environment-page,.maintenance-page{padding-top:14px}
+.device-control>.st-selection{margin:var(--space-12) 0}
 .sensor-detail,.device-control{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
 .sensor-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .sensor-detail-heading p{font-size:12px;color:var(--muted)}
@@ -171,9 +172,6 @@
 .device-section-heading h3{font-size:13px;font-weight:500}.device-section-heading>span{font-size:10px;color:var(--muted)}
 .device-control-heading{display:flex;align-items:center;gap:10px}.device-control-heading h3{font-size:13px;font-weight:500}
 .device-control-heading p{font-size:10px;color:var(--muted);margin-top:5px}
-.device-mode{display:flex;padding:3px;background:#edf0e7;border-radius:10px;margin:17px 0 14px}
-.device-mode button{flex:1;min-height:40px;font-size:12px;border-radius:8px}
-.device-mode button[aria-pressed=true]{background:white;box-shadow:0 1px 3px #20271f10}
 .fan-speed-label{display:flex;justify-content:space-between;font-size:11px;margin:13px 0 4px}
 #fan-speed{padding:0;min-height:44px;border:0;accent-color:#597e46}
 .device-control .secondary{width:100%;margin-top:12px}.device-updated{font-size:10px;color:var(--green);margin-top:10px}

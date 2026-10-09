@@ -1028,7 +1028,8 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-picker-trigger:focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 .st-choice-inline-clear{min-width:var(--tap-min)}
 /* Segment and FilterChips: independent of phone/prototype scopes. */
-.st-selection{min-width:0;flex:1}
+.st-selection{min-width:0;flex:none}
+.tk-lens-bar>.st-selection,.room-lensbar>.st-selection,.inspect-controls>.st-selection{flex:1}
 .st-segment{display:flex;gap:var(--space-3);padding:var(--space-3);border:1px solid var(--line);border-radius:var(--radius-segment);background:var(--well)}
 .st-segment button,.st-filter-chips button{box-sizing:border-box;min-width:var(--tap-min);min-height:var(--tap-min);border:0;border-radius:var(--radius-8);padding:var(--space-4) var(--space-6);background:transparent;color:var(--ink);font:400 var(--type-row-title-size)/1.4 var(--font-sans);display:flex;align-items:center;justify-content:center;gap:var(--space-3);cursor:pointer}
 .st-segment button{flex:1;min-width:var(--tap-min);flex-wrap:wrap}
@@ -1036,17 +1037,16 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-selection-count{font:500 var(--type-meta-size)/1.4 var(--font-mono);color:var(--muted)}
 .st-segment button[aria-pressed=true]{background:var(--paper);font-weight:500;box-shadow:inset 0 calc(-1 * var(--space-3)) var(--ink)}
 .st-segment[data-variant=two-line-lens] button{flex-direction:column}
-.st-segment button:active,.st-filter-chips button:active,[data-state=Pressed].st-segment button:first-child,[data-state=Pressed].st-filter-chips button:first-child{background:var(--press)}
+.st-segment button:not([aria-pressed=true]):not(:disabled):active,.st-filter-chips button:not([aria-checked=true]):not(:disabled):active,[data-state=Pressed].st-segment button:nth-child(2),[data-state=Pressed].st-filter-chips button:nth-child(2){background:var(--handle)}
 .st-segment button:focus-visible,.st-filter-chips button:focus-visible,[data-state=Focus] button:first-child{outline:var(--space-3) solid var(--focus);outline-offset:var(--space-2)}
 .st-segment button:disabled,.st-filter-chips button:disabled{cursor:default;border:1px dashed var(--control-border)}
 .st-selection-reason{margin:var(--space-6) 0;color:var(--muted);font:400 var(--type-description-size)/1.4 var(--font-sans)}
 .st-filter-chips{min-width:0;padding:var(--space-6) 0}
 .st-filter-chips-track{display:flex;gap:var(--space-key-gap);overflow-x:auto;padding:var(--space-4) var(--space-gutter);scrollbar-width:thin}
-.st-filter-chips button{flex:none;max-width:100%;padding:var(--space-6) var(--space-row-x);border:1px solid var(--line);border-radius:var(--radius-control);background:var(--well)}
+.st-filter-chips button{flex:none;max-width:100%;padding:var(--space-6) calc(var(--space-row-x) + (var(--size-16) + var(--space-3)) / 2);border:1px solid var(--line);border-radius:var(--radius-control);background:var(--well)}
 .st-filter-chips button[aria-checked=true]{background:var(--paper);font-weight:500}
-.st-chip-check{visibility:hidden;display:flex;width:var(--size-16);flex:none}
+.st-chip-check{display:flex;width:var(--size-16);flex:none}
 .st-chip-check svg{width:var(--size-16);height:var(--size-16)}
-[aria-checked=true]>.st-chip-check{visibility:visible}
 
 .st-chip-check:empty{box-sizing:border-box;width:var(--space-8);height:var(--space-12);border-right:var(--space-2) solid currentColor;border-bottom:var(--space-2) solid currentColor;transform:rotate(45deg);margin-right:var(--space-6)}
 
@@ -1819,7 +1819,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function filterChips({items=[],action='chip',key='chips',label='',state='Default',reason=''}={}){
     if(!items.length)return '';
     const on=(items.find(i=>i.checked)||items[0]).value;
-    return `<div class="st-filter-chips" data-ds="FilterChips" data-field="${esc(key)}" data-state="${esc(state)}"><div class="st-filter-chips-track" role="radiogroup" aria-label="${esc(label)}">${items.map(i=>`<button type="button" role="radio" aria-checked="${i.value===on}" tabindex="${i.value===on?0:-1}" data-action="${esc(action)}" data-value="${esc(i.value)}"${i.aria?` aria-label="${esc(i.aria)}"`:""}${i.disabled?' disabled':''}><span class="st-chip-check" aria-hidden="true">${globalThis.SentriIcons?globalThis.SentriIcons.icon('check'):''}</span><span class="st-selection-label">${i.label}</span>${i.count!=null?`<span class="st-selection-count">${i.count}</span>`:''}</button>`).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
+    return `<div class="st-filter-chips" data-ds="FilterChips" data-field="${esc(key)}" data-state="${esc(state)}"><div class="st-filter-chips-track" role="radiogroup" aria-label="${esc(label)}">${items.map(i=>`<button type="button" role="radio" aria-checked="${i.value===on}" tabindex="${i.value===on?0:-1}" data-action="${esc(action)}" data-value="${esc(i.value)}"${i.aria?` aria-label="${esc(i.aria)}"`:""}${i.disabled?' disabled':''}>${i.value===on?`<span class="st-chip-check" aria-hidden="true">${globalThis.SentriIcons?globalThis.SentriIcons.icon('check'):''}</span>`:''}<span class="st-selection-label">${i.label}</span>${i.count!=null?`<span class="st-selection-count">${i.count}</span>`:''}</button>`).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
   }
   function iconButton({action='',icon='',label='',className='',value='',badge='',disabled=false,strs,args}={}){
     const o={strs,args},hasBadge=(badge!==''&&badge!=null)||has(o,'badge');
@@ -3462,10 +3462,17 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function sowChip(p) {
     var sts = P.todo(p).map(function (k) { return P.status(p, k); });
     if (P.s.ended) return null;
+<<<<<<< HEAD
     if (sts.indexOf('late') >= 0) return chipOf('late', 'chip.late');
     if (p.sowDied) return chipOf('died', 'chip.sow');
     if (sts.length) return chipOf('awaiting', 'st.todo');
     return P.coming(p).length ? null : chipOf('done', 'chips.done');
+=======
+    if (sts.indexOf('late') >= 0) return S('chip.late', null, 'amber');
+    if (p.sowDied) return S('chip.sow', null, 'red');
+    /* the lens above already says To do / Done; the row keeps only what differs (Late, Sow died) */
+    return null;
+>>>>>>> 0cde753 (Segment/FilterChips round-2 fixes: visible pressed state, wrapper no longer stretches, one lens rule (Piglet uses two-line), no repeated Done count or To do pill, fan mode on Segment, check only when selected)
   }
   /* The pen's card, exactly farrowing's room list: the pen header (`A03 · 1 sow ›`, TaskGroup) and the sow's row under it
      (TaskRow): mono sow ID with its one chip; the headline is what is due (or, with nothing due, farrowing's figure:
@@ -3500,7 +3507,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     var items = [{ value: '', label: S('chips.all'), checked: V.chip === '', aria: T('chips.all') }]
       .concat(chipCounts().map(function (c) { return { value: c.k, label: S(chipKey(c.k)), count: S('fig', { v: c.n }), checked: V.chip === c.k, aria: T('chip.aria', { name: chipName(c.k), n: c.n }) }; }))
       ;
-    return '<div class="sp-list-lens">'+UI.segment({options:[['todo',K.T(S('lens.todo')),{count:all.length-done}],['done',K.T(S('lens.done')),{count:done}]],active:V.lens,action:'list-lens',ariaLabel:T('chips.label')})+'</div>' + (V.lens==='todo'?K.chips({ items: items, action: 'chip', key: 'chips', label: T('chips.label') }):'');
+    return '<div class="sp-list-lens">'+UI.segment({variant:'two-line-lens',options:[['todo',K.T(S('lens.todo')),{count:all.length-done}],['done',K.T(S('lens.done'))]],active:V.lens,action:'list-lens',ariaLabel:T('chips.label')})+'</div>' + (V.lens==='todo'?K.chips({ items: items, action: 'chip', key: 'chips', label: T('chips.label') }):'');
   }
   /* the task's overall checker: piglets the records cannot account for (set counts lower than the record), batch level only */
   function batchLine() { var u = P.s.unaccounted || 0; return u > 0 ? S('batch.unacc', { b: P.BATCH.name, n: u }) : S('batch', { b: P.BATCH.name }); }
