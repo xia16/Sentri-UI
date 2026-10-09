@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"></head><body>
+<section data-state="Default" data-args="{&quot;variant&quot;: &quot;text&quot;, &quot;label&quot;: &quot;Identity&quot;, &quot;unit&quot;: &quot;&quot;, &quot;hint&quot;: &quot;&quot;, &quot;value&quot;: &quot;&quot;}"></section>
+<section data-state="Focus" data-args="{&quot;variant&quot;: &quot;text&quot;, &quot;label&quot;: &quot;Identity&quot;, &quot;unit&quot;: &quot;&quot;, &quot;hint&quot;: &quot;&quot;, &quot;value&quot;: &quot;&quot;, &quot;focus&quot;: true}"></section>
+<section data-state="Filled" data-args="{&quot;variant&quot;: &quot;text&quot;, &quot;label&quot;: &quot;Identity&quot;, &quot;unit&quot;: &quot;&quot;, &quot;hint&quot;: &quot;&quot;, &quot;value&quot;: &quot;Sow 00024&quot;}"></section>
+<section data-state="Error" data-args="{&quot;variant&quot;: &quot;text&quot;, &quot;label&quot;: &quot;Identity&quot;, &quot;unit&quot;: &quot;&quot;, &quot;hint&quot;: &quot;&quot;, &quot;value&quot;: &quot;&quot;, &quot;error&quot;: &quot;Required detail is missing. Enter a description.&quot;}"></section>
+<section data-state="Disabled" data-args="{&quot;variant&quot;: &quot;text&quot;, &quot;label&quot;: &quot;Identity&quot;, &quot;unit&quot;: &quot;&quot;, &quot;hint&quot;: &quot;&quot;, &quot;value&quot;: &quot;&quot;, &quot;disabled&quot;: true, &quot;reason&quot;: &quot;Record is locked. Open Edit to correct it.&quot;}"></section>
+<section data-state="Long Chinese label" data-args="{&quot;variant&quot;: &quot;text&quot;, &quot;label&quot;: &quot;请说明本次记录与实际情况不同的原因，并填写实际给药剂量以及使用单位&quot;, &quot;unit&quot;: &quot;&quot;, &quot;hint&quot;: &quot;&quot;, &quot;value&quot;: &quot;&quot;}"></section>
+<script>
+document.querySelectorAll("[data-state]").forEach(function(s){s.innerHTML=SentriUI.field(JSON.parse(s.getAttribute("data-args")));});
+</script>
+</body></html>

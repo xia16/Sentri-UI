@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T19:12:35.601Z",
- "commit": "dfc548b",
+ "generated": "2026-10-09T19:25:43.802Z",
+ "commit": "105662c",
  "platforms": [
   {
    "id": "mobile",
@@ -1695,7 +1695,9 @@
            "farrowing.death",
            "farrowing.finish",
            "farrowing.blocked",
-           "farrowing.edit"
+           "farrowing.edit",
+           "farrowing.foster",
+           "farrowing.reconcile"
           ]
          },
          {
@@ -2068,6 +2070,26 @@
          "farrowing.task-outcomes",
          "farrowing.task-receipt",
          "hold End task early"
+        ],
+        [
+         "farrowing.count",
+         "farrowing.foster",
+         "More actions, Foster piglets"
+        ],
+        [
+         "farrowing.foster",
+         "farrowing.count",
+         "Save, or Back"
+        ],
+        [
+         "farrowing.count",
+         "farrowing.reconcile",
+         "More actions, Reconcile piglet count"
+        ],
+        [
+         "farrowing.reconcile",
+         "farrowing.count",
+         "Save, or Back"
         ]
        ],
        "screens": [
@@ -3864,6 +3886,78 @@
           "issues": [
            "Third appearance of the same performance and outcome blocks."
           ]
+         }
+        },
+        {
+         "id": "farrowing.foster",
+         "name": "Foster piglets",
+         "zh": "寄养",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "foster",
+         "figma": "",
+         "notes": {
+          "purpose": "Send or receive piglets between this litter and another, counted on one Well stepper.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Piglet count",
+            "shows": "Large - and + keys around the number of piglets moved.",
+            "states": [
+             {
+              "state": "Default",
+              "when": "Value equals what the system holds",
+              "shows": "Number in ink"
+             },
+             {
+              "state": "Changed",
+              "when": "Value differs from the system count",
+              "shows": "Number in amber with the difference written out"
+             }
+            ],
+            "source": "farrowing-astra-concept.js",
+            "at": "Piglet count"
+           }
+          ],
+          "controls": [],
+          "copy": [],
+          "edge": []
+         }
+        },
+        {
+         "id": "farrowing.reconcile",
+         "name": "Reconcile piglet count",
+         "zh": "核对仔猪数",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "reconcile",
+         "figma": "",
+         "notes": {
+          "purpose": "Explain a mismatch: count the piglets in the litter and say why it differs from the system count.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Count the piglets in this litter",
+            "shows": "Large - and + keys around the counted number; a warning says how many piglets will be added or removed.",
+            "states": [
+             {
+              "state": "Default",
+              "when": "Value equals what the system holds",
+              "shows": "Number in ink"
+             },
+             {
+              "state": "Changed",
+              "when": "Value differs from the system count",
+              "shows": "Number in amber with the difference written out"
+             }
+            ],
+            "source": "farrowing-astra-concept.js",
+            "at": "Count the piglets in this litter"
+           }
+          ],
+          "controls": [],
+          "copy": [],
+          "edge": []
          }
         }
        ],
@@ -13587,6 +13681,11 @@
       "severity": "low",
       "text": "Lens (inline count) has no screen; it survives only as a documented option.",
       "fix": "Remove it at the next pass if no screen adopts it."
+     },
+     {
+      "severity": "low",
+      "text": "Lens tab now demos Today / 7 days with no counts: a time-range view switch, not states of one list (the README's lens is working pile / finished pile with inline counts). Its Long-label state passes active:'today' with options todo/done, so nothing is selected.",
+      "fix": "variants/lens.html: demo a 2-state pile split with inline counts in a card header (e.g. Open 2 / Closed 5), and set Long-label active:'todo'."
      }
     ],
     "proposals": [],
@@ -14193,80 +14292,81 @@
   {
    "name": "Field",
    "group": "Fields",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "status": "agent-checked",
+    "round": 2,
+    "judged": "2026-10-10",
+    "commit": "871f471",
     "model": "claude-opus-5-5",
     "scores": {
-     "clarity": 7,
-     "budget": 6,
-     "hierarchy": 7,
-     "spacing": 7,
-     "broken": 3
+     "clarity": 8,
+     "budget": 8,
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 8
     },
-    "lowest": 3,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
       "pass": true,
-      "why": "Label-over-control wrapper; PickerField named for choices"
+      "why": "Labels a text control; PickerField and Stepper named"
      },
      {
       "line": 2,
-      "pass": false,
-      "why": "No when-not (optional inputs are optional rows, counts are Stepper, typed numbers are Numpad)"
+      "pass": true,
+      "why": "When not: an optional input is an optional row; PickerField, Stepper, Measure"
      },
      {
       "line": 3,
       "pass": true,
-      "why": "Root, label, control and skin named"
+      "why": "Label, control, unit, message line named and shown"
      },
      {
       "line": 4,
-      "pass": false,
-      "why": "The textarea (Note) is shown as a variant with no rule; the optional-row rule (design/optional-fields) is not reflected"
+      "pass": true,
+      "why": "Number with unit now used: treatment Dose reads 'Dose (mL)' once Unit is picked"
      },
      {
       "line": 5,
-      "pass": false,
-      "why": "Error is listed but does not render red; focus and disabled not shown"
+      "pass": true,
+      "why": "Default, focus, filled, error, disabled with reason, long label render in every variant tab and are captioned in the Overview"
      },
      {
       "line": 6,
-      "pass": false,
-      "why": "Inputs are 46px (field-height), below the 48 floor"
+      "pass": true,
+      "why": "Inputs 48 tall, textareas 348x90 on reconcile, fault resolution, treatment at 390x844"
      },
      {
       "line": 7,
       "pass": true,
-      "why": "Not a chooser (n/a)"
+      "why": "Not a chooser"
      },
      {
       "line": 8,
-      "pass": false,
-      "why": "Error is a red border only, and in phone hosts not even that"
+      "pass": true,
+      "why": "Error adds a message, aria-invalid and role=alert; disabled shows its reason"
      },
      {
       "line": 9,
-      "pass": false,
-      "why": "Unit-in-label rule stated, but no label length or long-label example"
+      "pass": true,
+      "why": "Long Chinese label (with unit) wraps in full"
      },
      {
       "line": 10,
-      "pass": false,
-      "why": "No error announcement (aria-invalid, aria-describedby) stated"
+      "pass": true,
+      "why": "aria-describedby, aria-invalid, focus ring, native keyboard"
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "#aeb8a1 / 11px raw in CSS; the README drift note is stale (computed #bdc7b6 / 12px)"
+      "pass": true,
+      "why": "Field CSS resolves to tokens"
      },
      {
       "line": 12,
-      "pass": false,
-      "why": "No error-message slot, so error text cannot say what is wrong and how to fix it"
+      "pass": true,
+      "why": "Visible label, persistent hint, corrective error, inputmode=decimal"
      },
      {
       "line": 13,
@@ -14275,117 +14375,151 @@
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "No related links or classification"
+      "pass": true,
+      "why": "Related links and classification present"
      },
      {
       "line": 15,
-      "pass": false,
-      "why": "The 375 render shows the error state without its red border, and the textarea in monospace"
+      "pass": true,
+      "why": "Atlas Text / Number with unit / Textarea: 6 of 6 cells render; console clean"
      }
     ],
     "classification": "component",
     "variants": [
      {
-      "name": "text input",
+      "name": "text",
       "usedBy": [
-       "health-record.treatment (Dose)",
+       "inspection.fault-report",
+       "farrowing fault report (Device name, Other)",
        "farrowing piglet identity"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 7,
-       "budget": 7,
-       "hierarchy": 7,
-       "spacing": 6,
-       "broken": 4
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
       },
       "findings": [
-       "Dose and Unit sit side by side in two columns; the record-sheet law says fields never go in columns",
-       "46px tall"
+       "Filled example puts 'Gate repaired beside the aisle.' in an Identity field"
       ]
      },
      {
-      "name": "note (textarea)",
+      "name": "number with unit",
       "usedBy": [
-       "inspection.pen-note",
-       "pig-profile.note",
-       "health-record.edit-finding"
+       "health-record.treatment"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 6,
-       "budget": 5,
-       "hierarchy": 7,
-       "spacing": 7,
-       "broken": 3
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
       },
       "findings": [
-       "The textarea renders in the browser monospace (no font-family on .field textarea)",
-       "The resize:vertical drag handle is a trap for gloved hands",
-       "edit-finding shows an always-open \"Note · optional\" textarea, while record-health and treatment use an \"Add note\" optional row: two rules for the same optional note",
-       "pig-profile.note says it three times: sheet title \"Add a note\", label \"Note\", placeholder \"Add a note\""
+       "Native number spinner arrows appear inside Dose on focus"
       ]
+     },
+     {
+      "name": "textarea",
+      "usedBy": [
+       "inspection.pen-note",
+       "inspection.fault-report",
+       "farrowing fault resolution (after Add)",
+       "farrowing reconcile (Reason for mismatch)"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": []
      }
     ],
     "findings": [
      {
-      "severity": "high",
-      "text": "The error state is invisible in every phone host: `:is(.farrowing-phone,.inspection-phone) :is(input...,textarea){border-color:#bdc7b6}` outranks `.field.error input{border-color:var(--red)}`. The error field computes to rgb(189,199,182).",
-      "fix": "Raise the error rule to `:is(.farrowing-phone,.inspection-phone) .field.error :is(input,textarea)`, or wrap the phone border rule in `:where()`. Add aria-invalid and a message line so the error is not colour only."
-     },
-     {
-      "severity": "high",
-      "text": "The textarea renders in monospace (pen note, preview Note) because .field textarea sets no font.",
-      "fix": "Add `font:400 14px/1.6 var(--sans)` to `.field textarea`."
-     },
-     {
-      "severity": "high",
-      "text": "The optional note is drawn two ways: an always-open \"Note · optional\" textarea (edit-finding, farrowing fault resolution) and an \"Add note\" optional row (record-health, treatment).",
-      "fix": "State the rule in the README: a Field is never shown open for an optional input. An optional Note is an optional row (design/optional-fields) that opens this Field. Convert edit-finding and the fault resolution note to that row."
-     },
-     {
-      "severity": "medium",
-      "text": "Inputs are 46px tall, below the 48px glove floor.",
-      "fix": "Set field-height to 48px."
-     },
-     {
-      "severity": "medium",
-      "text": "There is no slot for an error or help message, so error text cannot persist or explain the fix.",
-      "fix": "Add an optional hint/error line under the control, linked with aria-describedby."
+      "severity": "low",
+      "text": "Number fields show the browser's tiny spinner arrows on focus (treatment Dose, Number tab): an ungloveable second control inside the field.",
+      "fix": "Hide spin buttons in Field CSS (appearance: textfield; ::-webkit-inner-spin-button { appearance: none })."
      },
      {
       "severity": "low",
-      "text": "resize:vertical gives a drag-only handle; Dose and Unit sit in two columns on treatment.",
-      "fix": "Use auto-grow (field-sizing:content) with resize:none. Stack Dose then Unit, or put the unit in the label as the README says."
+      "text": "Overview clips the focus ring at the column's left and right edges.",
+      "fix": "Give the Overview column 4px inline padding (or overflow: visible)."
+     },
+     {
+      "severity": "low",
+      "text": "Text variant's Filled example reads 'Gate repaired beside the aisle.' under the label Identity.",
+      "fix": "Use an identity value (e.g. a tag number) or relabel the example."
      }
     ],
+    "previous": {
+     "round": 1,
+     "commit": "67fbfe2",
+     "lowest": 5,
+     "findings": [
+      {
+       "text": "Atlas variant tabs blank except Default",
+       "fixed": true,
+       "evidence": "Text, Number with unit, Textarea each render 6 of 6 cells from data-args; console clean"
+      },
+      {
+       "text": "Dose and Unit side by side on health-record.treatment",
+       "fixed": true,
+       "evidence": "Medicine, Method, Unit, Dose stacked on the bulk and single-pig paths (both bulkActionPage) and in the v2 treatment sheet"
+      },
+      {
+       "text": "Number with unit used by no screen",
+       "fixed": true,
+       "evidence": "Picking mL relabels Dose to 'Dose (mL)'; usedBy health-record.treatment"
+      },
+      {
+       "text": "Overview prints 18 fields with no state names",
+       "fixed": true,
+       "evidence": "Variant heading and state caption above each example"
+      },
+      {
+       "text": "Variant tabs said No screen uses this yet",
+       "fixed": true,
+       "evidence": "Each tab lists Used by screens"
+      }
+     ]
+    },
     "proposals": []
    },
    "files": {
-    "variantsJson": false,
-    "variants": []
+    "variantsJson": true,
+    "variants": [
+     "number",
+     "text",
+     "textarea"
+    ]
    }
   },
   {
    "name": "PickerField",
    "group": "Fields",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "round": 4,
-    "regate": "cleanup pass, PR #72",
+    "status": "agent-checked",
+    "round": 5,
+    "regate": "sweep fixes c0d9835 (footer padding-block, cascade/overview demos)",
     "judged": "2026-10-10",
-    "commit": "ce52431",
+    "commit": "c0d9835",
     "model": "claude-opus-5-5",
     "scores": {
      "clarity": 8,
      "budget": 8,
      "hierarchy": 8,
-     "spacing": 7,
+     "spacing": 8,
      "broken": 8
     },
-    "lowest": 7,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
@@ -14415,7 +14549,7 @@
      {
       "line": 6,
       "pass": true,
-      "why": "Triggers 48-65, rows 56-58, steps 48, footer 48 (Back 86 wide on screens); nothing under 48 on the three bare screens"
+      "why": "Triggers 48-65, rows 56-58, steps 48; footer Back / Done 168x48 at x=21-189 and 201-369, medicine Back x=21-369; corners 12px intact"
      },
      {
       "line": 7,
@@ -14440,7 +14574,7 @@
      {
       "line": 11,
       "pass": true,
-      "why": "Last host override (.st-picker-trigger height:48px) removed; tokens only"
+      "why": "Footer now padding-block only, sheet keeps its gutter; tokens only, no host override"
      },
      {
       "line": 12,
@@ -14460,7 +14594,7 @@
      {
       "line": 15,
       "pass": true,
-      "why": "Ticked 4 conditions, Done, Record health shows names +1; medicine pick, reopen keeps path and tick; one footer spacing defect"
+      "why": "Ticked 4 conditions, Done · 4, Record health shows 3 names +1 (65px); medicine pick shows Antibiotics › Antibiotic B, reopen opens All › Antibiotics with B ticked; console clean"
      }
     ],
     "classification": "component",
@@ -14506,18 +14640,18 @@
       "usedBy": [
        "health-record.medicine-picker"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
-       "spacing": 7,
+       "spacing": 8,
        "broken": 8
       },
       "findings": [
-       "Fixed: Back is the secondary pickerFooter Back; trigger path \"Antibiotics › Antibiotic B\"; reopening opens All › Antibiotics with Antibiotic B ticked",
-       "New: the picker footer has no side gutter (Back 390 wide, edge to edge, corners cut)",
-       "Not fixed: atlas cascade demo labels Medicine but browses Symptoms"
+       "Fixed: Select medicine Back inset x=21-369, corners intact",
+       "Fixed: atlas demo browses Antibiotics › Penicillins › Amoxicillin",
+       "Low: atlas Active trigger reads \"Antibiotics › Penicillins\" (group path) while the screen trigger reads \"Antibiotics › Antibiotic B\" (category › medicine)"
       ]
      },
      {
@@ -14526,82 +14660,60 @@
        "health-record.condition-picker",
        "health-record.record-health"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
-       "spacing": 7,
+       "spacing": 8,
        "broken": 8
       },
       "findings": [
-       "Fixed: Record health with 4 conditions shows two clamped lines of names plus an unclamped \"+1\" inside the 65px trigger",
-       "New: Select conditions footer Back / Done · 4 run to the screen edges (no gutter)"
+       "Fixed: Select conditions footer Back / Done · 4 inset 21px each side, 12px gap"
       ]
      }
     ],
     "findings": [
      {
-      "severity": "medium",
-      "text": ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on Select conditions (Back / Done · 4) and Select medicine (Back, 390px wide) the buttons touch the screen edges and their rounded corners are cut. Moving the medicine sheet onto pickerFooter spread it.",
-      "fix": "bundle.css: .st-picker-footer{padding-block:var(--space-12)} (no inline 0) so the sheet footer keeps its gutter."
-     },
-     {
       "severity": "low",
-      "text": "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path [Antibiotics, Conditions] (round 3, not fixed).",
-      "fix": "variants/cascade.html: use medicine categories and a medicine leaf."
-     },
-     {
-      "severity": "low",
-      "text": "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed).",
-      "fix": "preview.html: pass names:[\"Low appetite\"]."
+      "text": "Atlas cascade Active demo passes path [Antibiotics, Penicillins], so the trigger reads \"Antibiotics › Penicillins\" and never names the chosen Amoxicillin; the real medicine trigger reads category › medicine.",
+      "fix": "variants/cascade.html state-Active: path [\"Penicillins\",\"Amoxicillin\"] (or whatever pickerField needs to end on the leaf)."
      }
     ],
     "proposals": [],
     "verdicts": [
      {
-      "finding": "+n clipped by the 2-line clamp",
+      "finding": ".st-picker-footer padding overrode sheet gutter",
       "result": "fixed",
-      "note": ".st-picker-more outside .st-picker-names; \"+1\" visible"
+      "note": "Conditions Back x21-189, Done · 4 x201-369; Medicine Back x21-369; radius 12px, bottom 832"
      },
      {
-      "finding": "Medicine Back drawn as filled primary",
+      "finding": "Cascade demo browses Symptoms under Medicine",
       "result": "fixed",
-      "note": "pickerFooter({multi:false}) gives a secondary Back; but no gutter (new finding)"
+      "note": "Antibiotics › Penicillins › Amoxicillin / Ampicillin"
      },
      {
-      "finding": "Path joined with \" / \" on the trigger",
+      "finding": "Overview shows \"1 selected\"",
       "result": "fixed",
-      "note": "\" › \" on trigger, search meta and group titles"
-     },
-     {
-      "finding": "Reopen starts at All with nothing marked",
-      "result": "fixed",
-      "note": "Opens at the category with the current medicine ticked"
-     },
-     {
-      "finding": "Overview \"1 selected\"; cascade demo browses Symptoms under Medicine",
-      "result": "not fixed"
+      "note": "Overview trigger reads Low appetite"
      }
     ],
     "previous": {
-     "round": 3,
-     "commit": "8e198e7",
+     "round": 4,
+     "commit": "ce52431",
      "status": "in-design",
      "lowest": 7,
      "scores": {
       "clarity": 8,
       "budget": 8,
-      "hierarchy": 7,
-      "spacing": 8,
-      "broken": 7
+      "hierarchy": 8,
+      "spacing": 7,
+      "broken": 8
      },
      "findings": [
-      "Record-form names are line-clamped after \"+n\" is appended, so with long names the \"+n\" is the part that gets cut (Record health, 4 conditions: \"Weakness or unsteady stance · Reduced appetite · Porcine reproductive and…\").",
-      "Medicine picker's sole Back is still drawn as the full-width filled primary button; everywhere else Back is secondary (round-2 finding, not fixed).",
-      "Path written two ways: trigger \"Antibiotics / Antibiotic B\", sheet \"All › Antibiotics\".",
-      "Reopening the medicine picker starts at All with nothing marked, so the current pick is not shown.",
-      "Atlas Overview demos Conditions (a record form) as \"1 selected\", and the cascade demo browses Symptoms under a Medicine label."
+      ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on Select conditions (Back / Done · 4) and Select medicine (Back, 390px wide) the buttons touch the screen edges and their rounded corners are cut. Moving the medicine sheet onto pickerFooter spread it.",
+      "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path [Antibiotics, Conditions] (round 3, not fixed).",
+      "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed)."
      ]
     }
    },
@@ -14618,80 +14730,81 @@
   {
    "name": "Stepper",
    "group": "Fields",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "status": "agent-checked",
+    "round": 2,
+    "judged": "2026-10-10",
+    "commit": "871f471",
     "model": "claude-opus-5-5",
     "scores": {
      "clarity": 8,
-     "budget": 7,
+     "budget": 8,
      "hierarchy": 8,
-     "spacing": 6,
-     "broken": 6
+     "spacing": 8,
+     "broken": 8
     },
-    "lowest": 6,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
       "pass": true,
-      "why": "Counting animals; Measure named for measured values"
+      "why": "Counts animals; Measure and Numpad named as siblings"
      },
      {
       "line": 2,
       "pass": true,
-      "why": "The don'ts name Measure and forbid typing a count"
+      "why": "When / when not present; Measure, PickerField, Numpad exist"
      },
      {
       "line": 3,
       "pass": true,
-      "why": "Label, description, keys, value and status line named"
+      "why": "Label, description, keys, spinbutton, status line, pointers named and shown"
      },
      {
       "line": 4,
-      "pass": false,
-      "why": "The DS row and hero faces are used by no screen; screens use the TaskStepper faces (row, well, count)"
+      "pass": true,
+      "why": "Row, count, well each have a use line and usedBy screens in the atlas tab"
      },
      {
       "line": 5,
       "pass": true,
-      "why": "Default, empty, pressed, floor-gray, focus, corrected and draft rendered"
+      "why": "All 12 states render in each variant tab and are captioned in the Overview"
      },
      {
       "line": 6,
-      "pass": false,
-      "why": "Keys 46 wide (DS), 44 wide (TaskStepper row), 44x44 in the farrowing forks; pointer text actions 44 tall"
+      "pass": true,
+      "why": "Keys 48x54 (row), 54x78 (count), 48x48 (well) on death, edit, count, foster, reconcile at 390x844"
      },
      {
       "line": 7,
-      "pass": false,
-      "why": "No cap on stacked steppers per sheet"
+      "pass": true,
+      "why": "Seven row steppers per drawer, one count or well per sheet"
      },
      {
       "line": 8,
-      "pass": false,
-      "why": "Draft (green) and corrected (amber) differ by colour only"
+      "pass": true,
+      "why": "Draft says +1 unsaved, corrected says Corrected; error, floor, ceiling, disabled carry text"
      },
      {
       "line": 9,
       "pass": true,
-      "why": "Label of 14 characters or fewer stated"
+      "why": "Long Chinese label wraps in full in every variant tab"
      },
      {
       "line": 10,
       "pass": true,
-      "why": "spinbutton, aria-valuenow/min/max, status region, arrow keys"
+      "why": "Group, spinbutton with valuenow/min/max, arrow keys, focus ring"
      },
      {
       "line": 11,
       "pass": true,
-      "why": "Tokens throughout; only 1-3px borders and offsets are raw"
+      "why": "Tokens throughout; only 1px borders raw"
      },
      {
       "line": 12,
       "pass": true,
-      "why": "Not a text field; no typed counts"
+      "why": "Not a text field"
      },
      {
       "line": 13,
@@ -14701,127 +14814,143 @@
      {
       "line": 14,
       "pass": true,
-      "why": "Candidate status and ADR link; TaskStepper links back"
+      "why": "Related links and classification; TaskStepper retired and points here"
      },
      {
       "line": 15,
       "pass": true,
-      "why": "375 render of every state, no overflow"
+      "why": "Atlas Row/Count/Well: 12 of 12 cells render; atlas console clean"
      }
     ],
     "classification": "component",
     "variants": [
      {
-      "name": "row (DS face, filled ink +)",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {
-       "clarity": 8,
-       "budget": 6,
-       "hierarchy": 8,
-       "spacing": 5,
-       "broken": 5
-      },
-      "findings": [
-       "No screen uses it",
-       "The reserved 44px hint line leaves uneven gaps under the first rows of a stack"
-      ]
-     },
-     {
-      "name": "hero (DS face)",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {
-       "clarity": 8,
-       "budget": 8,
-       "hierarchy": 8,
-       "spacing": 8,
-       "broken": 7
-      },
-      "findings": [
-       "No screen uses it; farrowing.count hand-rolls .hero-stepper"
-      ]
-     },
-     {
-      "name": "TaskStepper row face",
+      "name": "row",
       "usedBy": [
+       "farrowing.death",
+       "farrowing.edit",
        "piglet-processing.counts",
        "piglet-processing.record-death",
        "piglet-processing.adjust-count"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
-       "broken": 6
+       "broken": 8
       },
       "findings": [
-       "Keys are 44px wide, below the 48 floor"
+       "Focus cell still rings both keys"
       ]
      },
      {
-      "name": "TaskStepper well/count faces",
+      "name": "count",
       "usedBy": [
-       "piglet-processing.move-piglets",
+       "farrowing.count",
        "piglet-processing.set-count"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
-       "broken": 7
+       "broken": 8
+      },
+      "findings": []
+     },
+     {
+      "name": "well",
+      "usedBy": [
+       "fostering.piglets",
+       "piglet-processing.move-piglets",
+       "farrowing foster (Foster piglets)",
+       "farrowing reconcile (Reconcile piglet count)"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
       },
       "findings": [
-       "The count face colours + green, which the Stepper README forbids until the owner decides"
+       "usedBy omits the farrowing foster and reconcile sheets that render it; fostering.piglets has no prototype URL",
+       "Reconcile warning says 'reported count' but nothing on screen is labelled reported"
       ]
      }
     ],
     "findings": [
      {
-      "severity": "high",
-      "text": "Key widths are below the glove floor: 46px (DS face), 44px (TaskStepper row face), 44x44 (farrowing .row-stepper forks). Pointer text actions are 44px tall.",
-      "fix": "Set the key face to 48px (control-height) in every face, and text actions to min-height 48."
-     },
-     {
-      "severity": "medium",
-      "text": "Farrowing still hand-rolls three look-alikes (.row-stepper on death and edit, .hero-stepper on count, .feature-stepper on foster and reconcile) instead of SentriTask.stepper.",
-      "fix": "Swap them for the SentriTask.stepper faces row, count and well, and delete the forks."
-     },
-     {
-      "severity": "medium",
-      "text": "No screen uses the DS faces (filled ink +); task pages use other faces. Two looks for one job, with no stated rule.",
-      "fix": "List the faces (row, well, count) as this card's variants, and retire the filled-ink face or name a screen that needs it."
-     },
-     {
-      "severity": "medium",
-      "text": "Draft (green value) and corrected (amber value) are colour-only.",
-      "fix": "Add a word in the status line (\"+1 unsaved\", \"corrected\") alongside the colour."
+      "severity": "low",
+      "text": "Reconcile warning title says 'The reported count will replace 9', but the well is labelled 'Count the piglets in this litter'; the word 'reported' no longer names anything on screen.",
+      "fix": "Title the warning 'Your count will replace 9'."
      },
      {
       "severity": "low",
-      "text": "The reserved 44px hint line opens uneven gaps in a stack where only some rows can show pointers.",
-      "fix": "Reserve per sheet, not per row: in a stack, rows without pointers take reserveHint:false."
+      "text": "Focus state still rings both keys (Decrease by forced outline, Increase by real focus), and Pressed + reads like the grey floor/ceiling key in the Overview.",
+      "fix": "Ring one key in Focus; give Pressed a fill distinct from aria-disabled."
+     },
+     {
+      "severity": "low",
+      "text": "Overview clips the focus ring of the Increase key at the column's right edge.",
+      "fix": "Give the Overview column 4px inline padding (or overflow: visible)."
+     },
+     {
+      "severity": "low",
+      "text": "Well usedBy lists fostering.piglets (no prototype URL) and omits the two farrowing sheets that actually render the well.",
+      "fix": "Add the farrowing foster and reconcile screens to atlas screens and to usedBy."
      }
     ],
-    "proposals": [
-     {
-      "kind": "merge",
-      "name": "TaskStepper faces into Stepper variants",
-      "why": "Same job, different look = variant; one implementation, with the face as the variant",
-      "seenIn": [
-       "piglet-processing.counts",
-       "farrowing.count"
-      ]
-     }
-    ]
+    "previous": {
+     "round": 1,
+     "commit": "67fbfe2",
+     "lowest": 5,
+     "findings": [
+      {
+       "text": "Atlas variant tabs blank except Default (TypeError)",
+       "fixed": true,
+       "evidence": "Row, Count, Well each render 12 of 12 cells from data-args; atlas console clean"
+      },
+      {
+       "text": "Overview: 36 unlabelled steppers",
+       "fixed": true,
+       "evidence": "Variant heading and state caption above each example"
+      },
+      {
+       "text": "Variant tabs said No screen uses this yet",
+       "fixed": true,
+       "evidence": "Row 5, Count 2, Well 2 screens under Used by"
+      },
+      {
+       "text": "Reconcile says the new count three times",
+       "fixed": true,
+       "evidence": "Reported tile gone; System count 9 tile, well 11, warning '2 piglets will be added' - reported vs system and the difference are all still visible, so nothing the farmer needs to reconcile is lost"
+      },
+      {
+       "text": "Focus rings both keys; Pressed looks like disabled",
+       "fixed": false,
+       "evidence": "Unchanged in Overview and variant tabs"
+      },
+      {
+       "text": "Well value sans on foster, mono on reconcile",
+       "fixed": true,
+       "evidence": "Both IBM Plex Mono 28px"
+      }
+     ]
+    },
+    "proposals": []
    },
    "files": {
-    "variantsJson": false,
-    "variants": []
+    "variantsJson": true,
+    "variants": [
+     "count",
+     "row",
+     "well"
+    ]
    }
   },
   {
@@ -16053,8 +16182,24 @@
   {
    "name": "TaskStepper",
    "group": "Task skeleton",
-   "status": "in-design",
-   "gate": null,
+   "status": "retired",
+   "gate": {
+    "status": "retired",
+    "round": 1,
+    "judged": "2026-10-10",
+    "commit": "67fbfe2",
+    "model": "claude-opus-5-5",
+    "classification": "variant-of:Stepper",
+    "note": "Merged into Stepper (variants row, count, well). The folder holds only a README pointing to Stepper; SentriTask.stepper is a compatibility adapter with no markup or CSS. Judged under Stepper/gate.json.",
+    "previous": {
+     "findings": [
+      {
+       "text": "TaskStepper faces should be Stepper variants",
+       "fixed": true
+      }
+     ]
+    }
+   },
    "files": {
     "variantsJson": false,
     "variants": []
@@ -20503,6 +20648,18 @@
    "source": "gate"
   },
   {
+   "id": "gate:Segment:2",
+   "target": {
+    "kind": "component",
+    "id": "Segment"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Lens tab now demos Today / 7 days with no counts: a time-range view switch, not states of one…",
+   "detail": "Lens tab now demos Today / 7 days with no counts: a time-range view switch, not states of one list (the README's lens is working pile / finished pile with inline counts). Its Long-label state passes active:'today' with options todo/done, so nothing is selected.\nFix: variants/lens.html: demo a 2-state pile split with inline counts in a card header (e.g. Open 2 / Closed 5), and set Long-label active:'todo'.",
+   "source": "gate"
+  },
+  {
    "id": "gate:FilterChips:0",
    "target": {
     "kind": "component",
@@ -20592,10 +20749,10 @@
     "kind": "component",
     "id": "Field"
    },
-   "kind": "broken",
-   "severity": "high",
-   "title": "The error state is invisible in every phone host: `:is(.farrowing-phone,.inspection-phone)…",
-   "detail": "The error state is invisible in every phone host: `:is(.farrowing-phone,.inspection-phone) :is(input...,textarea){border-color:#bdc7b6}` outranks `.field.error input{border-color:var(--red)}`. The error field computes to rgb(189,199,182).\nFix: Raise the error rule to `:is(.farrowing-phone,.inspection-phone) .field.error :is(input,textarea)`, or wrap the phone border rule in `:where()`. Add aria-invalid and a message line so the error is not colour only.",
+   "kind": "design",
+   "severity": "low",
+   "title": "Number fields show the browser's tiny spinner arrows on focus (treatment Dose, Number tab): an…",
+   "detail": "Number fields show the browser's tiny spinner arrows on focus (treatment Dose, Number tab): an ungloveable second control inside the field.\nFix: Hide spin buttons in Field CSS (appearance: textfield; ::-webkit-inner-spin-button { appearance: none }).",
    "source": "gate"
   },
   {
@@ -20605,9 +20762,9 @@
     "id": "Field"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "The textarea renders in monospace (pen note, preview Note) because .field textarea sets no font.",
-   "detail": "The textarea renders in monospace (pen note, preview Note) because .field textarea sets no font.\nFix: Add `font:400 14px/1.6 var(--sans)` to `.field textarea`.",
+   "severity": "low",
+   "title": "Overview clips the focus ring at the column's left and right edges.",
+   "detail": "Overview clips the focus ring at the column's left and right edges.\nFix: Give the Overview column 4px inline padding (or overflow: visible).",
    "source": "gate"
   },
   {
@@ -20617,45 +20774,9 @@
     "id": "Field"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "The optional note is drawn two ways: an always-open \"Note · optional\" textarea (edit-finding,…",
-   "detail": "The optional note is drawn two ways: an always-open \"Note · optional\" textarea (edit-finding, farrowing fault resolution) and an \"Add note\" optional row (record-health, treatment).\nFix: State the rule in the README: a Field is never shown open for an optional input. An optional Note is an optional row (design/optional-fields) that opens this Field. Convert edit-finding and the fault resolution note to that row.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Field:3",
-   "target": {
-    "kind": "component",
-    "id": "Field"
-   },
-   "kind": "broken",
-   "severity": "medium",
-   "title": "Inputs are 46px tall, below the 48px glove floor.",
-   "detail": "Inputs are 46px tall, below the 48px glove floor.\nFix: Set field-height to 48px.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Field:4",
-   "target": {
-    "kind": "component",
-    "id": "Field"
-   },
-   "kind": "broken",
-   "severity": "medium",
-   "title": "There is no slot for an error or help message, so error text cannot persist or explain the fix.",
-   "detail": "There is no slot for an error or help message, so error text cannot persist or explain the fix.\nFix: Add an optional hint/error line under the control, linked with aria-describedby.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Field:5",
-   "target": {
-    "kind": "component",
-    "id": "Field"
-   },
-   "kind": "design",
    "severity": "low",
-   "title": "resize:vertical gives a drag-only handle; Dose and Unit sit in two columns on treatment.",
-   "detail": "resize:vertical gives a drag-only handle; Dose and Unit sit in two columns on treatment.\nFix: Use auto-grow (field-sizing:content) with resize:none. Stack Dose then Unit, or put the unit in the label as the README says.",
+   "title": "Text variant's Filled example reads 'Gate repaired beside the aisle.' under the label Identity.",
+   "detail": "Text variant's Filled example reads 'Gate repaired beside the aisle.' under the label Identity.\nFix: Use an identity value (e.g. a tag number) or relabel the example.",
    "source": "gate"
   },
   {
@@ -20665,33 +20786,9 @@
     "id": "PickerField"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on…",
-   "detail": ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on Select conditions (Back / Done · 4) and Select medicine (Back, 390px wide) the buttons touch the screen edges and their rounded corners are cut. Moving the medicine sheet onto pickerFooter spread it.\nFix: bundle.css: .st-picker-footer{padding-block:var(--space-12)} (no inline 0) so the sheet footer keeps its gutter.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:PickerField:1",
-   "target": {
-    "kind": "component",
-    "id": "PickerField"
-   },
-   "kind": "design",
    "severity": "low",
-   "title": "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path…",
-   "detail": "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path [Antibiotics, Conditions] (round 3, not fixed).\nFix: variants/cascade.html: use medicine categories and a medicine leaf.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:PickerField:2",
-   "target": {
-    "kind": "component",
-    "id": "PickerField"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed).",
-   "detail": "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed).\nFix: preview.html: pass names:[\"Low appetite\"].",
+   "title": "Atlas cascade Active demo passes path [Antibiotics, Penicillins], so the trigger reads…",
+   "detail": "Atlas cascade Active demo passes path [Antibiotics, Penicillins], so the trigger reads \"Antibiotics › Penicillins\" and never names the chosen Amoxicillin; the real medicine trigger reads category › medicine.\nFix: variants/cascade.html state-Active: path [\"Penicillins\",\"Amoxicillin\"] (or whatever pickerField needs to end on the leaf).",
    "source": "gate"
   },
   {
@@ -20700,10 +20797,10 @@
     "kind": "component",
     "id": "Stepper"
    },
-   "kind": "broken",
-   "severity": "high",
-   "title": "Key widths are below the glove floor: 46px (DS face), 44px (TaskStepper row face), 44x44…",
-   "detail": "Key widths are below the glove floor: 46px (DS face), 44px (TaskStepper row face), 44x44 (farrowing .row-stepper forks). Pointer text actions are 44px tall.\nFix: Set the key face to 48px (control-height) in every face, and text actions to min-height 48.",
+   "kind": "design",
+   "severity": "low",
+   "title": "Reconcile warning title says 'The reported count will replace 9', but the well is labelled…",
+   "detail": "Reconcile warning title says 'The reported count will replace 9', but the well is labelled 'Count the piglets in this litter'; the word 'reported' no longer names anything on screen.\nFix: Title the warning 'Your count will replace 9'.",
    "source": "gate"
   },
   {
@@ -20713,9 +20810,9 @@
     "id": "Stepper"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "Farrowing still hand-rolls three look-alikes (.row-stepper on death and edit, .hero-stepper on…",
-   "detail": "Farrowing still hand-rolls three look-alikes (.row-stepper on death and edit, .hero-stepper on count, .feature-stepper on foster and reconcile) instead of SentriTask.stepper.\nFix: Swap them for the SentriTask.stepper faces row, count and well, and delete the forks.",
+   "severity": "low",
+   "title": "Focus state still rings both keys (Decrease by forced outline, Increase by real focus), and…",
+   "detail": "Focus state still rings both keys (Decrease by forced outline, Increase by real focus), and Pressed + reads like the grey floor/ceiling key in the Overview.\nFix: Ring one key in Focus; give Pressed a fill distinct from aria-disabled.",
    "source": "gate"
   },
   {
@@ -20725,9 +20822,9 @@
     "id": "Stepper"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "No screen uses the DS faces (filled ink +); task pages use other faces. Two looks for one job,…",
-   "detail": "No screen uses the DS faces (filled ink +); task pages use other faces. Two looks for one job, with no stated rule.\nFix: List the faces (row, well, count) as this card's variants, and retire the filled-ink face or name a screen that needs it.",
+   "severity": "low",
+   "title": "Overview clips the focus ring of the Increase key at the column's right edge.",
+   "detail": "Overview clips the focus ring of the Increase key at the column's right edge.\nFix: Give the Overview column 4px inline padding (or overflow: visible).",
    "source": "gate"
   },
   {
@@ -20737,33 +20834,9 @@
     "id": "Stepper"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "Draft (green value) and corrected (amber value) are colour-only.",
-   "detail": "Draft (green value) and corrected (amber value) are colour-only.\nFix: Add a word in the status line (\"+1 unsaved\", \"corrected\") alongside the colour.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Stepper:4",
-   "target": {
-    "kind": "component",
-    "id": "Stepper"
-   },
-   "kind": "broken",
    "severity": "low",
-   "title": "The reserved 44px hint line opens uneven gaps in a stack where only some rows can show pointers.",
-   "detail": "The reserved 44px hint line opens uneven gaps in a stack where only some rows can show pointers.\nFix: Reserve per sheet, not per row: in a stack, rows without pointers take reserveHint:false.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Stepper:p0",
-   "target": {
-    "kind": "component",
-    "id": "Stepper"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "Merge TaskStepper faces into Stepper variants?",
-   "detail": "Same job, different look = variant; one implementation, with the face as the variant\nSeen in: piglet-processing.counts, farrowing.count",
+   "title": "Well usedBy lists fostering.piglets (no prototype URL) and omits the two farrowing sheets that…",
+   "detail": "Well usedBy lists fostering.piglets (no prototype URL) and omits the two farrowing sheets that actually render the well.\nFix: Add the farrowing foster and reconcile screens to atlas screens and to usedBy.",
    "source": "gate"
   },
   {

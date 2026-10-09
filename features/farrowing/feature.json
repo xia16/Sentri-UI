@@ -24,7 +24,9 @@
           "farrowing.death",
           "farrowing.finish",
           "farrowing.blocked",
-          "farrowing.edit"
+          "farrowing.edit",
+          "farrowing.foster",
+          "farrowing.reconcile"
         ]
       },
       {
@@ -397,6 +399,26 @@
       "farrowing.task-outcomes",
       "farrowing.task-receipt",
       "hold End task early"
+    ],
+    [
+      "farrowing.count",
+      "farrowing.foster",
+      "More actions, Foster piglets"
+    ],
+    [
+      "farrowing.foster",
+      "farrowing.count",
+      "Save, or Back"
+    ],
+    [
+      "farrowing.count",
+      "farrowing.reconcile",
+      "More actions, Reconcile piglet count"
+    ],
+    [
+      "farrowing.reconcile",
+      "farrowing.count",
+      "Save, or Back"
     ]
   ],
   "screens": [
@@ -2184,6 +2206,78 @@
         "issues": [
           "Third appearance of the same performance and outcome blocks."
         ]
+      }
+    },
+    {
+      "id": "farrowing.foster",
+      "name": "Foster piglets",
+      "zh": "寄养",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "foster",
+      "figma": "",
+      "notes": {
+        "purpose": "Send or receive piglets between this litter and another, counted on one Well stepper.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Piglet count",
+            "shows": "Large - and + keys around the number of piglets moved.",
+            "states": [
+              {
+                "state": "Default",
+                "when": "Value equals what the system holds",
+                "shows": "Number in ink"
+              },
+              {
+                "state": "Changed",
+                "when": "Value differs from the system count",
+                "shows": "Number in amber with the difference written out"
+              }
+            ],
+            "source": "farrowing-astra-concept.js",
+            "at": "Piglet count"
+          }
+        ],
+        "controls": [],
+        "copy": [],
+        "edge": []
+      }
+    },
+    {
+      "id": "farrowing.reconcile",
+      "name": "Reconcile piglet count",
+      "zh": "核对仔猪数",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "reconcile",
+      "figma": "",
+      "notes": {
+        "purpose": "Explain a mismatch: count the piglets in the litter and say why it differs from the system count.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Count the piglets in this litter",
+            "shows": "Large - and + keys around the counted number; a warning says how many piglets will be added or removed.",
+            "states": [
+              {
+                "state": "Default",
+                "when": "Value equals what the system holds",
+                "shows": "Number in ink"
+              },
+              {
+                "state": "Changed",
+                "when": "Value differs from the system count",
+                "shows": "Number in amber with the difference written out"
+              }
+            ],
+            "source": "farrowing-astra-concept.js",
+            "at": "Count the piglets in this litter"
+          }
+        ],
+        "controls": [],
+        "copy": [],
+        "edge": []
       }
     }
   ]

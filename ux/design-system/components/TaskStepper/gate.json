@@ -1,0 +1,10 @@
+{
+  "status": "retired",
+  "round": 1,
+  "judged": "2026-10-10",
+  "commit": "67fbfe2",
+  "model": "claude-opus-5-5",
+  "classification": "variant-of:Stepper",
+  "note": "Merged into Stepper (variants row, count, well). The folder holds only a README pointing to Stepper; SentriTask.stepper is a compatibility adapter with no markup or CSS. Judged under Stepper/gate.json.",
+  "previous": { "findings": [ { "text": "TaskStepper faces should be Stepper variants", "fixed": true } ] }
+}
