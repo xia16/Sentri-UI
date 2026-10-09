@@ -1010,14 +1010,16 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-choice-row[data-mode="single"] .st-choice-trail{color:var(--green)}
 .st-choice-trail input[type="checkbox"]{accent-color:var(--green)}
 .st-choice-row[data-mode="multi"]:has(:checked) .st-choice-label{font-weight:var(--type-weight-strong)}
-.st-picker-steps{display:flex;flex-wrap:wrap;gap:var(--space-4)}
+.st-picker-steps{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-4)}
+.st-picker-sep{color:var(--muted);font:var(--font-size-14)/1 var(--font-sans)}
+.st-picker-value.is-names{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;white-space:normal;overflow-wrap:anywhere}
 .st-picker-steps button,.st-picker-footer button{min-height:var(--tap-min);min-width:var(--tap-min);padding:var(--space-8);font:inherit}
 .st-picker-footer{display:flex;justify-content:space-between;gap:var(--space-12);padding:var(--space-12) 0}
 .st-choice-search input{min-height:var(--tap-min)}
 
-[data-state="Focus"] :is(.st-picker-trigger,.st-choice-row,.st-choice-inline-opt){outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
+[data-state="Focus"] :is(.st-picker-trigger,.st-choice-row,.st-choice-inline-opt:first-child){outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
 .st-choice-inline-opt:is([data-preview="pressed"],:active){background:var(--choice-press)}
-.st-choice-inline-opt[aria-disabled="true"]{background:var(--disabled-surface);color:var(--disabled-ink)}
+.st-choice-inline-opt[aria-disabled="true"]{background:var(--disabled-surface);color:var(--ink)}
 
 .st-picker-steps button{background:transparent;border:0;border-radius:var(--radius-control);color:var(--ink)}
 .st-picker-steps button:is(:active,:focus-visible){background:var(--choice-press)}
@@ -1720,11 +1722,11 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   /* Mobile-standard choice control: a trigger button that opens a picker sheet.
      Replaces native <select>; the host app owns the picker view and state.
      strs: label (raw label wrapped in a span), display or value (the shown value), placeholder. */
-  function pickerField({label='',value='',display='',placeholder='Select',action='open-picker',key='',disabled=false,reason='',error='',loading=false,variant='single',selected=[],path=[],pressed=false,active=false,ariaLabel='',className='',strs,args}={}){
-    const multi=variant.includes('multi');
-    const text=multi?(selected.length?selected.length+' selected':'None'):path.length?path.join(' / '):display||value;
+  function pickerField({label='',value='',display='',placeholder='Select',action='open-picker',key='',disabled=false,reason='',error='',loading=false,variant='single',selected=[],names=[],path=[],pressed=false,active=false,ariaLabel='',className='',strs,args}={}){
+    const multi=variant.includes('multi'), named=multi&&names.length>0;
+    const text=named?names.slice(0,3).join(' · ')+(names.length>3?' · +'+(names.length-3):''):multi?(selected.length?selected.length+' selected':'None'):path.length?path.join(' / '):display||value;
     const shown=text!==''&&text!=null, id=fieldId('st-picker'), hint=error||reason||(loading?'Loading options…':'');
-    return `<div class="field st-picker-field ${esc(className)}" data-ds="PickerField" data-variant="${esc(variant)}"><span id="${id}-label">${tx(label,{strs,args},'label')}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value"${sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
+    return `<div class="field st-picker-field ${esc(className)}" data-ds="PickerField" data-variant="${esc(variant)}"><span id="${id}-label">${tx(label,{strs,args},'label')}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value${named?' is-names':''}"${named?'':sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
   }
   // Shared chooser surface: flat catalogue lists or a muted inset for short choices.
   function chooserList(content,{className='',tone='flat',ds='ChoiceList'}={}){
@@ -1747,12 +1749,13 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     const visible=q?leaves(items).filter(n=>[n.label,n.group||'',...n.trail,...(n.aliases||[])].join(' ').toLocaleLowerCase().includes(q)):cascade?nodes:leaves(items);
     const count=n=>leaves([n]).filter(x=>selected.includes(x.value)).length;
     const rows=visible.map(n=>{
-      const row=choiceRow({label:n.label,meta:n.children?(multi?count(n)+' selected':n.children.length+' options'):q?n.trail.join(' / '):n.meta||'',mode:n.children?'navigate':multi?'multi':'single',action:n.children||!multi?action:'',value:n.value,selected:selected.includes(n.value),disabled:!!n.disabled,reason:n.reason||'',attrs:n.attrs||{},strs:{...n.strs,...(n.children?{meta:multi?'ds.picker.selected':'ds.picker.options'}:{})},args:{...n.args,...(n.children?{meta:{n:multi?count(n):n.children.length}}:{})}});
+      const row=choiceRow({label:n.label,meta:n.children?(multi&&count(n)?count(n)+' selected':''):q?n.trail.join(' / '):n.meta||'',mode:n.children?'navigate':multi?'multi':'single',action:n.children||!multi?action:'',value:n.value,selected:selected.includes(n.value),disabled:!!n.disabled,reason:n.reason||'',attrs:n.attrs||{},strs:{...n.strs,...(n.children&&multi&&count(n)?{meta:'ds.picker.selected'}:{})},args:{...n.args,...(n.children&&multi&&count(n)?{meta:{n:count(n)}}:{})}});
       const extra=n.secondaryAction?`<div class="st-choice-extra">${button({label:n.secondaryAction.label,action:n.secondaryAction.action,value:n.value,register:'text',attrs:{'aria-label':n.secondaryAction.label+' '+n.label}})}</div>`:'';
       return row+extra;
     });
     const search=choiceSearch({label:'Search all options',value:query,attrs:searchAttrs,strs:{label:strs.search||'ds.picker.search',placeholder:strs.search||'ds.picker.search'}});
-    const trail=cascade?`<nav class="st-picker-steps" aria-label="Chosen levels"><button type="button" data-action="${esc(stepAction)}" data-value="0">${tx('All',{strs:{all:strs.all||'ds.picker.all'}},'all')}</button>${steps.map((n,i)=>`<button type="button" data-action="${esc(stepAction)}" data-value="${i+1}">${tx(n.label,n,'label')}</button>`).join('')}</nav>`:'';
+    const sep='<span class="st-picker-sep" aria-hidden="true">›</span>';
+    const trail=cascade?`<nav class="st-picker-steps" aria-label="Chosen levels"><button type="button" data-action="${esc(stepAction)}" data-value="0">${tx('All',{strs:{all:strs.all||'ds.picker.all'}},'all')}</button>${steps.map((n,i)=>sep+`<button type="button" data-action="${esc(stepAction)}" data-value="${i+1}"${i===steps.length-1?' aria-current="step"':''}>${tx(n.label,n,'label')}</button>`).join('')}</nav>`:'';
     const groups=[];
     visible.forEach((n,i)=>{const title=n.group||n.trail?.join(' / ')||'';let group=groups.find(g=>g.title===title);if(!group){group={title,rows:[]};groups.push(group);}group.rows.push(rows[i]);});
     const list=!cascade&&!q?groups.map(g=>choiceGroup(g.rows,{title:g.title})).join(''):choiceGroup(rows);
@@ -1760,8 +1763,11 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     return `<div class="st-picker-body" data-ds="PickerField" data-variant="${esc(variant)}">${search}${trail}${content}</div>`;
   }
 
+  /* Back leaves and keeps the draft (pure navigation); Done confirms it. A single pick commits, so single has Back only. */
   function pickerFooter({selected=[],multi=false,backAction='back',doneAction='picker-done',strs={},args={}}={}){
-    return `<footer class="sheet-footer st-picker-footer"><button type="button" class="button secondary" data-action="${esc(backAction)}">${tx('Back',{strs:{back:strs.back||'act.back'}},'back')}</button><button type="button" class="button primary" data-action="${esc(doneAction)}">${tx('Done'+(multi?' · '+selected.length:''),{strs:{done:strs.done||(multi?'ds.picker.done_count':'ds.picker.done')},args:{done:{n:selected.length,...args.done}}},'done')}</button></footer>`;
+    const backBtn=`<button type="button" class="button secondary" data-action="${esc(backAction)}">${tx('Back',{strs:{back:strs.back||'act.back'}},'back')}</button>`;
+    if(!multi)return `<footer class="sheet-footer st-picker-footer">${backBtn}</footer>`;
+    return `<footer class="sheet-footer st-picker-footer">${backBtn}<button type="button" class="button primary" data-action="${esc(doneAction)}">${tx('Done · '+selected.length,{strs:{done:strs.done||'ds.picker.done_count'},args:{done:{n:selected.length,...args.done}}},'done')}</button></footer>`;
   }
   /* Choice chooser primitives. Every chooser shape is composed from these three:
      flat list = one untitled group; sectioned list = several titled groups;
