@@ -482,6 +482,8 @@ function overviewDetails(p,c){
  const r=p.registry||{},facts=[factItem('Age',p.age??daysFromWalk(r.birthDate),'days'),factItem('Type',animalType(p)),factItem('Breed',r.breed),factItem('Batch',p.batchId)];
  for(const [key,label,unit] of [['weight','Weight','kg'],['temperature','Temperature','°C']])facts.push(factItem(label,p[key],unit,measurementAge(p,key)));
  facts.push(factItem('On farm',r.onFarm===undefined?null:r.onFarm?'Yes':'No'));
+ const other=cases(p).filter(k=>!needsHealthAttention(k));   // the banner above shows the attention cases; this row adds only what it does not
+ if(other.length)facts.push(factItem('Health',other.map(k=>k.name).join(' · ')));
  return stFacts(facts);
 }
 function typeDetails(p,c){
