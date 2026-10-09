@@ -72,18 +72,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-a-12",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.room"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "'Awaiting' lens label breaks mid-word below 390px",
-  "detail": "In the demo page at 390 and 360 viewports the phone is 344-360 wide and the lens reads 'Awaitin / g'. Fix: apply the Segments copy budget (drop counts first) or let the filter button shrink; never break a word.",
-  "source": "screen-review"
- },
- {
   "id": "screens-a-13",
   "target": {
    "kind": "feature",
