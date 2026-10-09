@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T20:12:06.014Z",
- "commit": "40e3728",
+ "generated": "2026-10-09T20:11:38.048Z",
+ "commit": "de7cc22",
  "platforms": [
   {
    "id": "mobile",
@@ -206,14 +206,17 @@
            "Only a ventilation fan exists; the concept names \"devices\" in general.",
            "unclear: alert thresholds, who is told when a reading is out of range, and where real data comes from; none are in the code."
           ]
-         }
+         },
+         "steps": [
+          "[data-action=\"environment\"]"
+         ]
         },
         {
          "id": "environment.fan-manual",
          "name": "Fan in Manual mode",
          "zh": "风机手动模式",
          "status": "in-design",
-         "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7&connection=online",
          "preset": "",
          "figma": "",
          "notes": {
@@ -254,7 +257,11 @@
           "issues": [
            "No confirmation or safety limit for speed 0; unclear whether 0% is allowed on a real fan."
           ]
-         }
+         },
+         "steps": [
+          "[data-action=\"environment\"]",
+          "[data-action=\"fan-mode\"][data-value=\"manual\"]"
+         ]
         },
         {
          "id": "environment.maintenance",
@@ -313,7 +320,11 @@
            "The path here is Toolbox, two taps from the unit; the unit screen's Maintenance chip does not link here.",
            "No photo, priority, assignee, or history of who resolved it."
           ]
-         }
+         },
+         "steps": [
+          "Toolbox",
+          "Maintenance"
+         ]
         },
         {
          "id": "environment.maintenance-empty",
@@ -353,7 +364,11 @@
           "edge": [],
           "rules": [],
           "issues": []
-         }
+         },
+         "steps": [
+          "Toolbox",
+          "Maintenance"
+         ]
         },
         {
          "id": "environment.report-issue",
@@ -385,7 +400,12 @@
           "issues": [
            "Equipment and location are free text; no list of the unit's devices or pens is offered."
           ]
-         }
+         },
+         "steps": [
+          "Toolbox",
+          "Maintenance",
+          "Report issue"
+         ]
         },
         {
          "id": "environment.issue-detail",
@@ -417,7 +437,12 @@
           "issues": [
            "Resolving needs no note and records no resolver or time."
           ]
-         }
+         },
+         "steps": [
+          "Toolbox",
+          "Maintenance",
+          "[data-action=\"fault-detail\"]"
+         ]
         },
         {
          "id": "environment.issue-resolved",
@@ -455,7 +480,13 @@
           "issues": [
            "Cannot reopen an issue."
           ]
-         }
+         },
+         "steps": [
+          "Toolbox",
+          "Maintenance",
+          "[data-action=\"fault-detail\"]",
+          "Mark resolved"
+         ]
         }
        ],
        "prd": "# Environment & devices 环境与设备\r\n\r\n## Problem\r\n\r\nA worker in a unit needs to see whether the room is right (temperature, humidity, ammonia), to set the ventilation fan, and to report and close equipment faults, without leaving the unit. The old UI has no such place; faults and sensors were scattered across Inspection.\r\n\r\n## Who\r\n\r\nFloor workers and supervisors responsible for a unit.\r\n\r\n## Anchor\r\n\r\nNone. Two groups: Sensors and devices; Maintenance. The only lifecycle is an issue: open, then resolved.\r\n\r\n## Rules\r\n\r\n- Environment lives at the unit, one tap from Home. Inspection no longer carries sensors, batch tracker or maintenance.\r\n- A sensor with no numeric reading is omitted, never shown as 0. A unit with neither readings nor devices has no entrance. A controllable device is independent of readings.\r\n- Readings: Temperature °C, Humidity %, Ammonia ppm NH₃, each with last-reading time, a Today or 7-day trend, low and high, and a reading-history table.\r\n- Fan: Auto (follows the unit schedule) or Manual with a speed 0-100 in steps of 5; an explicit Apply; everything disabled offline with \"Reconnect to change device settings.\"\r\n- Maintenance is unit-scoped: open-issue count; Report issue (equipment, location in the unit, note, all required); issue detail with Mark resolved. The open count feeds the Maintenance chip on the unit hub.\r\n- All data is sample; no command is sent to equipment (PREVIEW badges).\r\n\r\n## Scope\r\n\r\nIn: sensors, fan, maintenance list, report and resolve.\r\n\r\nOut: real sensor feeds, alerts and thresholds, photos or assignees on issues, devices other than the fan, cross-unit views.\r\n\r\n## Decisions\r\n\r\n- Decided (ASTRA-HOME-DIRECTION): environment and maintenance belong to unit Home; Inspection does not repeat them.\r\n- Open: alert thresholds and who is told; whether the Maintenance chip should link to the list (today it is reached only through Toolbox); whether issues get priority, photo, assignee and a resolver stamp; which other devices are controllable; whether Farrowing and Breeding units get an entrance (the sample has none).\r\n",
@@ -2476,6 +2507,11 @@
            {
             "control": "− / + keys",
             "does": "each tap is saved at once; − at the floor is refused with the pointer text"
+           },
+           {
+            "control": "Back, X, grab handle, backdrop",
+            "does": "all four leave to the room list and fold the visit into one log line",
+            "goesTo": "farrowing.room"
            }
           ],
           "copy": [
@@ -3666,7 +3702,7 @@
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "locked",
          "steps": [
-          "Edit"
+          "[data-action=\"edit\"].tool"
          ],
          "figma": "",
          "notes": {
@@ -4096,6 +4132,10 @@
         ],
         "any": [
          "piglet-processing.pen-list",
+         "piglet-processing.job-chip",
+         "piglet-processing.chip-done",
+         "piglet-processing.list-no-id",
+         "piglet-processing.phone-clash",
          "piglet-processing.tagged-list",
          "piglet-processing.counts",
          "piglet-processing.weight",
@@ -4114,7 +4154,8 @@
           "id": "ending",
           "name": "Ending the task",
           "screens": [
-           "piglet-processing.end-task"
+           "piglet-processing.end-task",
+           "piglet-processing.list-ended"
           ]
          }
         ]
@@ -4144,8 +4185,23 @@
         ],
         [
          "piglet-processing.pen-list",
+         "piglet-processing.job-chip",
+         "tap a job chip (Iron, Dock tail, Castrate, Coccidiosis, Tag)"
+        ],
+        [
+         "piglet-processing.pen-list",
+         "piglet-processing.chip-done",
+         "tap the Done chip"
+        ],
+        [
+         "piglet-processing.pen-list",
          "piglet-processing.end-task",
          "tap the Task side of the summary card"
+        ],
+        [
+         "piglet-processing.end-task",
+         "piglet-processing.list-ended",
+         "hold End task"
         ],
         [
          "piglet-processing.sheet-todo",
@@ -4209,13 +4265,7 @@
          "figma": "",
          "notes": {
           "purpose": "One row per pen (a pen is one sow with her litter) so the worker sees what each pen still needs and walks the pens.",
-          "states": [
-           "One job: Shows only the pens that need one job today, so the worker can walk them with the treatment in hand. (tap a job chip (Iron, Dock tail, Castrate, Coccidiosis, Tag))",
-           "Done pens: Lists pens with nothing left to do. (tap the Done chip)",
-           "Farm without ID: Shows the list for fatteners raised as a batch, where no piglet gets an ID.",
-           "Two phones recorded the same job: Shows what the worker sees when another phone recorded the same treatment first.",
-           "Task ended: The same list after End: read-only. (after End task)"
-          ],
+          "states": [],
           "elements": [
            {
             "name": "Pen row",
@@ -4384,6 +4434,205 @@
            "Pen code and sow ID are shown twice (header and row); the header says \"1 sow\" on every pen.",
            "Home says Batch 27 / 8 pens / care due tomorrow; this list is Batch 40 / 12 pens / 6 pens due today.",
            "No way back to Home."
+          ]
+         }
+        },
+        {
+         "id": "piglet-processing.job-chip",
+         "name": "Pen list · one job",
+         "zh": "栏位列表 · 单项处理",
+         "status": "in-design",
+         "url": "/ux/tasks/piglet-processing/simple/index.html?chip=iron",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "Shows only the pens that need one job today, so the worker can walk them with the treatment in hand.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Filtered list",
+            "shows": "A03 · A04 · A05 · A06 · B01 · B04",
+            "states": [
+             {
+              "state": "Pens listed",
+              "when": "The selected job is due, late or has some left on a pen",
+              "shows": "Those pens, rows unchanged"
+             },
+             {
+              "state": "Empty",
+              "when": "The selected chip has count 0",
+              "shows": "The chip stays visible and the list says \"No pen needs this now.\""
+             }
+            ],
+            "logic": "Same rule as the chip count. The Tag chip has a tip string (sp.chip.id.tip) that is not shown.",
+            "source": "listScreen(); needsToday(pen, chip)",
+            "at": "A03"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "sp.chips.all",
+           "sp.tr.iron",
+           "sp.chip.none",
+           "sp.chip.aria"
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": [
+           "The list is only a filter; each pen still has to be opened to record (no tick-through)."
+          ]
+         }
+        },
+        {
+         "id": "piglet-processing.chip-done",
+         "name": "Pen list · done pens",
+         "zh": "栏位列表 · 已完成",
+         "status": "in-design",
+         "url": "/ux/tasks/piglet-processing/simple/index.html?chip=done",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "Lists pens with nothing left to do.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Done rows",
+            "shows": "A01 · Done · 12 piglets; B05 · Iron tomorrow",
+            "states": [
+             {
+              "state": "Finished",
+              "when": "Every step is recorded",
+              "shows": "Green \"Done\", \"12 piglets\", pencil"
+             },
+             {
+              "state": "Not started",
+              "when": "Nothing due yet (B05, B06)",
+              "shows": "No chip, forecast headline \"Iron tomorrow\""
+             },
+             {
+              "state": "Empty",
+              "when": "No pen qualifies",
+              "shows": "\"No pen is done yet.\""
+             }
+            ],
+            "logic": "A pen is done when its to-do list is empty, so pens that have not started appear here.",
+            "source": "isDone(); penCard()",
+            "at": "Iron tomorrow"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "sp.chips.done",
+           "sp.empty.done"
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": [
+           "Pens that have not started appear under Done."
+          ]
+         }
+        },
+        {
+         "id": "piglet-processing.list-no-id",
+         "name": "Pen list · farm without ID",
+         "zh": "栏位列表 · 不编号的猪场",
+         "status": "in-design",
+         "url": "/ux/tasks/piglet-processing/simple/index.html?scheme=none",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "Shows the list for fatteners raised as a batch, where no piglet gets an ID.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Farm ID scheme",
+            "shows": "Tag every piglet · Notch every piglet · Tag breeders only · No ID",
+            "states": [
+             {
+              "state": "Tag every piglet",
+              "when": "Scheme tag",
+              "shows": "ID step \"Tag piglets\"; chip Tag; \"n of m tagged\"; 6-digit tag from the farm strip"
+             },
+             {
+              "state": "Notch every piglet",
+              "when": "Scheme notch",
+              "shows": "Step \"Notch piglets\"; chip Notch; \"n of m notched\"; ID is litter-number-piglet"
+             },
+             {
+              "state": "Tag breeders only",
+              "when": "Scheme breeders",
+              "shows": "Step \"Pick breeders\"; chip Breeders; done when the worker closes the pick; facts show breeders"
+             },
+             {
+              "state": "No ID",
+              "when": "Scheme none",
+              "shows": "Four treatments only: no ID step, no Tag chip, no tool, no tagged facts; the Piglets card shows only Boars · gilts and Litter weight"
+             }
+            ],
+            "rule": "A farm whose scheme is no identity owes no tagging and shows none. Switching the setting in the Demo panel restarts the demo.",
+            "source": "PPS.hasId(); SCHEMES in state.js",
+            "at": "Coccidiosis"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "sp.scheme.none"
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": [
+           "The scheme is a demo switch outside the phone; how a farm's scheme is set in the real product is open (Round 1 Q3)."
+          ]
+         }
+        },
+        {
+         "id": "piglet-processing.phone-clash",
+         "name": "Pen list · two phones recorded the same job",
+         "zh": "栏位列表 · 两部手机冲突",
+         "status": "in-design",
+         "url": "/ux/tasks/piglet-processing/simple/index.html",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "Shows what the worker sees when another phone recorded the same treatment first.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Clash note",
+            "shows": "Iron for A05 was already recorded by L. Madsen at 08:40. Yours is kept as a note.",
+            "states": [
+             {
+              "state": "Other phone second",
+              "when": "Your phone recorded first, then the other phone's record arrives",
+              "shows": "Amber note on the list; the pen sheet shows the other worker's record in Done"
+             },
+             {
+              "state": "Other phone first",
+              "when": "The other phone's record arrived before yours",
+              "shows": "Pen sheet says \"L. Madsen's phone recorded Iron on A05 at 08:40.\""
+             },
+             {
+              "state": "Yours kept",
+              "when": "Both recorded",
+              "shows": "Done row shows \"yours kept as a note (hh:mm)\""
+             }
+            ],
+            "rule": "First record in wins; the second is kept as a note, both stamped, never merged. Offline collisions are kept (Round 1 Q8), simplified here to first-in-wins. After End the demo says the task has ended.",
+            "source": "state.js otherPhone(); sp.note.clash",
+            "at": "Iron for A05 was already recorded by L. Madsen at 08:40."
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "sp.note.clash",
+           "sp.ok",
+           "sp.kept.note",
+           "sp.note.arrived"
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": [
+           "Two same-record collision answers from Round 4/6 (\"Given twice\", \"Different piglets\") are dropped in this prototype."
           ]
          }
         },
@@ -5446,6 +5695,66 @@
            "unclear: who may end (the code comment says the supervisor; no role check)."
           ]
          }
+        },
+        {
+         "id": "piglet-processing.list-ended",
+         "name": "Pen list · task ended",
+         "zh": "栏位列表 · 任务已结束",
+         "status": "in-design",
+         "url": "/ux/tasks/piglet-processing/simple/index.html",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "The same list after End: read-only.",
+          "states": [],
+          "elements": [
+           {
+            "name": "After End",
+            "shows": "Task ended · hh:mm · name · Not done · N · pens",
+            "states": [
+             {
+              "state": "Summary",
+              "when": "Task ended",
+              "shows": "Left half \"Not done · N · pens\", right half \"Task ended · hh:mm · name\""
+             },
+             {
+              "state": "Pen row",
+              "when": "Task ended",
+              "shows": "Headline \"Task ended\"; chips gone"
+             },
+             {
+              "state": "Pen sheet",
+              "when": "Task ended",
+              "shows": "Amber \"Task ended. Nothing more can be recorded.\"; tool row, ticks and Submit removed; pens open read-only"
+             },
+             {
+              "state": "End page",
+              "when": "Task ended",
+              "shows": "Receipt \"Piglet processing ended · 08:20 · G. Hansen\" and a \"Not given\" group"
+             }
+            ],
+            "rule": "After End no new treatment marks (Round 3). Round 1 Q7 allowed corrections and ID rows to stay writable; the prototype blocks all writes. The other-phone demo says the task has ended.",
+            "source": "sp.ended.*; sp.end.done.*",
+            "at": "Task ended"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "sp.sum.notdone",
+           "sp.sum.ended",
+           "sp.ended.at",
+           "sp.ended.row",
+           "sp.end.done.title",
+           "sp.end.done.line",
+           "sp.sec.notgiven",
+           "sp.ended.note"
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": [
+           "Nothing can be corrected after End, against Round 1 Q7 (corrections stay writable, stamped)."
+          ]
+         }
         }
        ],
        "prd": "# Piglet processing 仔猪处理\r\n\r\n## Problem\r\n\r\nAfter farrowing, each litter owes a schedule by age-day (iron, dock tail, castrate, coccidiosis, and the identification step the farm requires). The worker records it pen by pen, with paper habits and dirty gloves. The task must show what each pen still needs today, record a pen with one tick per item and one Submit, and keep the litter's count honest through deaths, moves and counts, all looking exactly like Farrowing.\r\n\r\n## Who\r\n\r\nPiglet-care workers walking the pens (farmers, not tech-savvy; Round 8). A supervisor ends the task.\r\n\r\n## Anchor\r\n\r\nPen (a sow with her litter). Its status is derived, not stored: Coming (every step still ahead), To do (anything due or partly given), Late (a step past its window; shown over To do), Done (nothing left, nothing ahead). A dead sow adds a red chip but the litter stays on its schedule. The task has its own band: in progress, then ended (End task by hold).\r\n\r\n## Rules\r\n\r\n- Windows in pen age days: Iron 2-4, Dock tail 2-4, Castrate 3-7, Coccidiosis 3-5, ID 3-7. Outside the window a record is stamped early or late automatically; early counts on time (Round 1 Q6).\r\n- One tick per item, one Submit. Fewer piglets than alive asks one reason (weak or sick); the rest stay on the list.\r\n- Identity follows the farm: tag every piglet, notch every piglet, breeders only, or no ID (then no ID step at all). ID is always available on a pen and is also a step on the ID day. One piglet at a time, tag or notch; sex required here; weight optional (Rounds 1, 7, 10).\r\n- Alive = born, minus dead, minus moved out, plus moved in. Set count only adjusts the record; the difference goes to the batch-level \"N piglets unaccounted\", not to the pen (Round 9). Move offers only the pens of the batch and asks what the piglets already had.\r\n- Same look as Farrowing: list row = id + one chip + one headline + one meta line; the pen opens as a sheet; Back, not Close (Round 5). End task is a hold and reviews in numbers (Round 1 Q5).\r\n- Two phones recording the same item: first record wins, the second is kept as a note (simplification, not yet confirmed).\r\n- In the rulings but not in this prototype: End blocked while the batch's farrowing is open; corrections after End; the shared dead picker; Edit; bulk recording with a Finish hold.\r\n\r\n## Scope\r\n\r\nIn: pen list with job chips, pen sheet, Piglets list, Give IDs, boars and gilts, litter weight, death, move, set count, pen log, End task.\r\n\r\nOut: recording several pens at once (Round 9 keeps bulk as chips, but the prototype has only the filter), farrowing's Born figure, the weaning handoff, breeder ranking (placeholder only), multi-sow pens, fostering outside the batch.\r\n\r\n## Decisions\r\n\r\nDecided:\r\n- Same look as Farrowing, pruned to its density; farmers first; restrict rather than add mechanisms (Rounds 5, 8).\r\n- Set count just adjusts; no nurse sows outside the task; Move only within the batch (Round 9).\r\n- Tagging per farm scheme; per-piglet work and breeder selection may become universal; ranking is a placeholder (Rounds 7, 10).\r\n- Verbs Record, Edit, Set count, End task (Q11, provisional).\r\n\r\nOpen (HANDOFF, needs the owner):\r\n1. The seven simplifications: moves within the batch with Yes/No; count = reason or \"count was wrong\"; first-in-wins sync; cut nurse sow outside the task; cut after-End evidence; cut fine-grained corrections; keep bulk. The prototype implements 1, 2, 3 and 5 and keeps bulk only as a filter.\r\n2. Rules the builder interpreted: ID window day 3-7; the Tag chip filters only (no bulk tagging); Move asks \"Have tags?\"; \"Done picking\" may close with no breeders; a pen with nothing due yet counts as done; losses come off untreated piglets first; a higher count just corrects; sheet records past the window are marked late automatically; bulk pre-ticks only pens fully inside the window.\r\n3. Candidate approvals at close: task skeleton parts (ADR 0003, with Chips) and candidates 2 (ADR 0002) with four nods (keyboard two-step hold, one 35% sweep, Row code 600, 64 px optional radio row).\r\n4. Build path: carry the simplified flows into the full task, or promote simple/ to be the task.\r\n5. Where per-piglet work (ID, weigh, sex, breeder) lives as a universal feature (Round 10 direction only; proposal first).\r\n6. How a farm's ID scheme is configured (Round 1 Q3); in the prototype it is a Demo switch outside the phone.\r\n",
@@ -6099,7 +6408,11 @@
            "A pen-total preview (feedPreview) and a Feed breakdown sheet exist in code but are not drawn or opened.",
            "The screen carries too much: mode, percent, slider, chips and a per-pig table all state one decision."
           ]
-         }
+         },
+         "preset": "feed",
+         "steps": [
+          "[data-action=\"feed-edit-pen\"].primary"
+         ]
         },
         {
          "id": "feed-plan.end-date",
@@ -6126,7 +6439,12 @@
           "issues": [
            "The end date is held on the pig as a plain date; when it passes, nothing returns the pig to the curve."
           ]
-         }
+         },
+         "preset": "feed",
+         "steps": [
+          "[data-action=\"feed-edit-pen\"].primary",
+          "[data-action=\"feed-optional-open\"][data-value=\"until\"]"
+         ]
         },
         {
          "id": "feed-plan.pig",
@@ -6182,7 +6500,11 @@
            "Supplier, brand, energy, protein and lysine proposed in ASTRA-FEED-PLAN-FIELDS are not shown.",
            "The Feeding block repeats the one on the pig record."
           ]
-         }
+         },
+         "preset": "feed",
+         "steps": [
+          "[data-action=\"pig-feed\"][data-value=\"000267\"]"
+         ]
         },
         {
          "id": "feed-plan.pen-up",
@@ -6911,15 +7233,17 @@
            {
             "name": "Filter fields",
             "shows": "Production stage, Disease or symptom, Care",
-            "logic": "Options come from the unit's pigs: stages and condition names found there. Care: No action needed · Monitor · Treat in place · Move to hospital pen. Reset clears the draft; Show pigs applies it.",
+            "logic": "Options come from the unit’s pigs. Clear restores draft defaults; Back retains the draft; Clear on the list resets the draft too. Show n pigs applies it; zero matches blocks commit with No pigs match. SentriUI.filterSheet owns the drawer and counted footer.",
             "source": "filter state in main()",
             "at": "Production stage"
            }
           ],
           "controls": [],
           "copy": [
-           "Filter pigs (raw)",
-           "Show pigs (raw)"
+           "Filter pigs",
+           "Clear (act.clear)",
+           "Show n pigs",
+           "No pigs match"
           ],
           "edge": [
            "Batch can be filtered but has no control here (set by the unreachable batch sheet)."
@@ -8669,7 +8993,7 @@
           "elements": [
            {
             "name": "Outcome choices and Save",
-            "shows": "Pregnant · Not in pig · Recheck later; Save and complete",
+            "shows": "Pregnant · Not in pig · Recheck later; Save",
             "states": [
              {
               "state": "Pregnancy check",
@@ -8694,7 +9018,7 @@
           "controls": [],
           "copy": [
            "Record outcome (raw)",
-           "Save and complete (raw)",
+           "Save (raw)",
            "Save follow-up (raw)"
           ],
           "issues": [
@@ -9985,7 +10309,7 @@
              {
               "state": "From a vaccination task",
               "when": "Health task",
-              "shows": "Titled \"Record vaccination\", vaccine list only, no condition chip, Save reads \"Save and complete task\""
+              "shows": "Titled \"Record vaccination\", vaccine list only, no condition chip, Save reads \"Save\""
              }
             ],
             "at": "Record treatment"
@@ -10020,7 +10344,7 @@
            },
            {
             "name": "Save",
-            "shows": "Save · N pigs / Save and complete task",
+            "shows": "Save · N pigs / Save",
             "rule": "Disabled until medicine, method, unit and a dose above 0 are set. One treatment record per included pig; logs \"Treatment recorded\" or \"Vaccination recorded\"; a task completes on Save. Dead sows are excluded. Returns to the list, the finding, or the pig record.",
             "at": "Save"
            }
@@ -13569,7 +13893,7 @@
       "name": "tags (single-select job filter with counts)",
       "usedBy": [
        "piglet-processing.pen-list",
-       "piglet-processing.pen-list"
+       "piglet-processing.job-chip"
       ],
       "status": "agent-checked",
       "scores": {
@@ -14071,6 +14395,379 @@
     "variantsJson": true,
     "variants": [
      "default"
+    ]
+   }
+  },
+  {
+   "name": "FilterSheet",
+   "group": "Inputs and filters",
+   "status": "agent-checked",
+   "gate": {
+    "status": "agent-checked",
+    "round": 2,
+    "judged": "2026-10-10",
+    "commit": "af1de4c",
+    "model": "claude-opus-5-5",
+    "previous": {
+     "round": 1,
+     "commit": "78d747e",
+     "status": "in-design",
+     "lowest": 5,
+     "scores": {
+      "clarity": 8,
+      "budget": 7,
+      "hierarchy": 7,
+      "spacing": 6,
+      "broken": 5
+     }
+    },
+    "scores": {
+     "clarity": 8,
+     "budget": 8,
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 8
+    },
+    "lowest": 8,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "Purpose line names Sheet as the alternative for record forms."
+     },
+     {
+      "line": 2,
+      "pass": true,
+      "why": "When / when not present; PickerField and ChoiceList exist."
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Anatomy named and shown: drawer, scope, Clear, groups, help, Back, counted commit, reason."
+     },
+     {
+      "line": 4,
+      "pass": true,
+      "why": "One variant (List filters) used by farrowing.room and inspection.filters."
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "Default, active, empty, disabled, error, loading, long/zh rendered; Disabled now distinct (fieldset and Clear disabled, 'Syncing · filters return when it finishes'); Pressed dropped."
+     },
+     {
+      "line": 6,
+      "pass": true,
+      "why": "Measured at 390: Clear/Close 48x48, chips 54-72x48 wrapped to two rows, handles 48x48, pickers 348x48, Back 86x48, Show 248x48."
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Five parity chips wrap and stay visible; PickerField beyond."
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Selected chip has a check; blocked commit and disabled sheet each carry a written reason."
+     },
+     {
+      "line": 9,
+      "pass": true,
+      "why": "zh cell renders 清除 / 返回 / 显示 12 头母猪 / 7天以上前 – 7天以后; labels come from strings.json (act.clear, act.back, ds.filter.show, fa/in.filter.show.*)."
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "Dialog semantics, visible Back/Close, keyboard on chips and sliders, count in an aria-live button."
+     },
+     {
+      "line": 11,
+      "pass": true,
+      "why": "New CSS resolves to existing tokens."
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Group labels visible; sheet and list summary now agree ('Due: 5 days ago – In 7+ days · Parity 2–5')."
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Back keeps the draft; list Clear resets applied and draft; reopening after list Clear shows defaults on both screens."
+     },
+     {
+      "line": 14,
+      "pass": true,
+      "why": "Links Sheet, FilterChips, ChoiceList, PickerField, RangeSlider."
+     },
+     {
+      "line": 15,
+      "pass": true,
+      "why": "Atlas Overview + List filters: 8 cells, zero 4xx, zero console errors; farrowing.room and inspection.filters console clean; no horizontal overflow at 390."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "List filters",
+      "usedBy": [
+       "farrowing.room",
+       "inspection.filters"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Used end to end at 390x844: drag, arrows/Home/End, chips, pickers; 0 results blocks Show with 'No sows match' / 'No pigs match'; sheet Clear; Back then reopen keeps the draft; Show applies with summary and badge (farrowing 2, inspection 1); list Clear then reopen shows defaults (Show 7 sows / Show 7 pigs)."
+      ]
+     }
+    ],
+    "round1": [
+     {
+      "finding": "Stale draft after list Clear",
+      "fixed": true
+     },
+     {
+      "finding": "Atlas cells 404 on relative assets",
+      "fixed": true
+     },
+     {
+      "finding": "Parity chips clipped",
+      "fixed": true
+     },
+     {
+      "finding": "Commit/Clear/Back not localisable",
+      "fixed": true
+     },
+     {
+      "finding": "Disabled duplicated Empty; Pressed not a state",
+      "fixed": true
+     },
+     {
+      "finding": "inspection.filters note hand-edited in atlas.json",
+      "fixed": true,
+      "note": "now in features/inspection/feature.json; a rebuild carries it"
+     }
+    ],
+    "findings": [
+     {
+      "severity": "medium",
+      "text": "Disabled and Error still print a count the sheet does not know: 'Show 0 sows' while syncing, 'Show 12 sows' beside 'Results unavailable'.",
+      "fix": "When disabled or error, label the commit without a number ('Show sows')."
+     },
+     {
+      "severity": "low",
+      "text": "Farrowing's filter IconButton shows badge '2' but its aria-label stays 'Filter sows'; Inspection says 'Filter pigs, 1 applied'.",
+      "fix": "Pass the applied count into the farrowing IconButton label as Inspection does."
+     },
+     {
+      "severity": "low",
+      "text": "Chip rows sit 18px inside the group heading's left edge (Parity at x=21, chips at x=39).",
+      "fix": "Drop the chips-track inline padding inside .st-filter-group."
+     }
+    ],
+    "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "list"
+    ]
+   }
+  },
+  {
+   "name": "RangeSlider",
+   "group": "Inputs and filters",
+   "status": "agent-checked",
+   "gate": {
+    "status": "agent-checked",
+    "round": 2,
+    "judged": "2026-10-10",
+    "commit": "af1de4c",
+    "model": "claude-opus-5-5",
+    "previous": {
+     "round": 1,
+     "commit": "78d747e",
+     "status": "in-design",
+     "lowest": 5,
+     "scores": {
+      "clarity": 7,
+      "budget": 7,
+      "hierarchy": 6,
+      "spacing": 7,
+      "broken": 5
+     }
+    },
+    "scores": {
+     "clarity": 8,
+     "budget": 8,
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 8
+    },
+    "lowest": 8,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "Purpose line names Measure for one exact value."
+     },
+     {
+      "line": 2,
+      "pass": true,
+      "why": "When / when not present; a Not for section names the feed slider."
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Label, bounds, track with filled span, two handles, end labels, reason named and shown."
+     },
+     {
+      "line": 4,
+      "pass": true,
+      "why": "One Range variant used by farrowing.room."
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "Default, pressed (dragging), focus, at limits, disabled (grey fill, dashed handles, reason), error, long/zh rendered; data-dragging set on a live drag."
+     },
+     {
+      "line": 6,
+      "pass": true,
+      "why": "Handles 48x48, staggered so equal bounds stay grabbable."
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Not a choice control; the copied five-row rule is gone."
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Selection carried by handles and written value as well as the fill; disabled has a reason."
+     },
+     {
+      "line": 9,
+      "pass": true,
+      "why": "zh value '昨天 – 3天后' stays on one line; the long label wraps above it."
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "role=slider; aria-valuetext uses format ('4 days ago', 'In 7+ days'); arrows/Home/End and track tap verified."
+     },
+     {
+      "line": 11,
+      "pass": true,
+      "why": "Tokens only (--green, --disabled-border; README token list misses them, see findings)."
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "format gives '7+ days ago – In 7+ days'; equal bounds collapse to one value; matches the list summary."
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+     },
+     {
+      "line": 14,
+      "pass": true,
+      "why": "Links FilterSheet, FilterChips, ChoiceList, PickerField, Sheet."
+     },
+     {
+      "line": 15,
+      "pass": true,
+      "why": "Atlas Overview + Range: 8 cells, zero 4xx, zero console errors; guard test covers the asset tags."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "Range",
+      "usedBy": [
+       "farrowing.room"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Mouse drag, keys and track tap update value text, fill and aria-valuetext together; handles never cross; 0-result range blocks the sheet commit."
+      ]
+     }
+    ],
+    "round1": [
+     {
+      "finding": "Raw negative value text, no formatter",
+      "fixed": true
+     },
+     {
+      "finding": "Atlas cells 404 on relative assets",
+      "fixed": true
+     },
+     {
+      "finding": "No fill between handles",
+      "fixed": true,
+      "note": "fill is --green; the design-system README colour law lists green for 'done, recorded, synced, selected', so a selected span in green is within the law. Not reversed."
+     },
+     {
+      "finding": "zh value wraps mid-range",
+      "fixed": true
+     },
+     {
+      "finding": "README FilterSheet boilerplate",
+      "fixed": true
+     }
+    ],
+    "findings": [
+     {
+      "severity": "low",
+      "text": "Label and formatted value run together with a capital mid-line: 'Due In 7+ days', 'Due 4 days ago – In 7+ days'.",
+      "fix": "Set the value on its own line under the label so the formatter's sentence case reads as a value."
+     },
+     {
+      "severity": "low",
+      "text": "If the owner's 'green = approved/done only' rule is meant to override the README, the green span conflicts; the README names selection green, so it passes today.",
+      "fix": "Owner decides: keep the README, or switch the fill to --ink and drop 'selected' from the green law."
+     },
+     {
+      "severity": "low",
+      "text": "README token list omits --green and --disabled-border, which the fill now uses.",
+      "fix": "Add both to the API and tokens line."
+     },
+     {
+      "severity": "low",
+      "text": "zh end label '7天以后' drops the open-ended '+' that 'In 7+ days' and '7天以上前' carry.",
+      "fix": "Use '7天以上后' in the zh formatter."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "merge",
+      "name": "Feed adjustment slider",
+      "why": "Still open (README now says so): Inspection's feed edit records a value; it belongs with Stepper/Measure.",
+      "seenIn": [
+       "inspection.actions"
+      ]
+     }
+    ]
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "range"
     ]
    }
   },
@@ -15653,7 +16350,7 @@
       "usedBy": [
        "workbench.today",
        "workbench.saved-work",
-       "piglet-processing.pen-list"
+       "piglet-processing.phone-clash"
       ],
       "status": "agent-checked",
       "scores": {
@@ -15676,7 +16373,7 @@
      },
      {
       "severity": "low",
-      "text": "piglet-processing.pen-list: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's 'by L. Madsen at 08:40' say the same who/when right above each other (screen budget, not the component).",
+      "text": "piglet-processing.phone-clash: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's 'by L. Madsen at 08:40' say the same who/when right above each other (screen budget, not the component).",
       "fix": "In the prototype, hide the Last record line while the clash banner shows, or drop the time/name from the banner text."
      }
     ],
@@ -16073,39 +16770,9 @@
     "variantsJson": false,
     "variants": []
    }
-  },
-  {
-   "name": "Filter sheet",
-   "group": "Inputs and filters",
-   "status": "placeholder",
-   "seenIn": [
-    "farrowing.room"
-   ],
-   "note": "A sheet that narrows a list by due range and parity, with Back, Reset and a Show-n-sows button."
-  },
-  {
-   "name": "Range slider",
-   "group": "Inputs and filters",
-   "status": "placeholder",
-   "seenIn": [
-    "farrowing.room"
-   ],
-   "note": "A two-handle slider for a due-date range, with its end labels."
   }
  ],
  "backlog": [
-  {
-   "severity": "high",
-   "source": "sweep",
-   "id": "home-and-placeholders-1",
-   "target": {
-    "kind": "feature",
-    "id": "environment"
-   },
-   "kind": "broken",
-   "title": "All 7 environment screens open the unit hub, not their own screen",
-   "detail": "None of the environment screens has steps or a preset, so each opens the Home unit page instead of the sensors, fan, maintenance or issue views. The atlas shows the wrong picture for the whole feature."
-  },
   {
    "severity": "high",
    "source": "sweep",
@@ -18238,78 +18905,6 @@
    "detail": "Thirteen placeholder screens render the plain walk, with no note saying who removes or draws them. A developer may build them from the notes."
   },
   {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-a-1",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.before"
-   },
-   "kind": "broken",
-   "title": "Sheets collapse whenever a waiting reason line shows",
-   "detail": "Before first count, Edit record (both), Lock blocked and End task (active sows): the body clips mid-row, the hint overlaps Litter summary, tiles are cut, and the reason line sits flush at x=0. Fix: put the reason in the footer's status slot, not the scrolling body."
-  },
-  {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-a-2",
-   "target": {
-    "kind": "screen",
-    "id": "environment.report-issue"
-   },
-   "kind": "broken",
-   "title": "Report issue primary button label is invisible",
-   "detail": "'Save sample issue' computes ink text on ink fill, so the drawer's only commit reads as a blank black block. The form is hand-built (raw form, inputs, button.primary) instead of SentriUI Field and Button. Fix: build it from the DS parts."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-3",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.task-blocked"
-   },
-   "kind": "broken",
-   "title": "Room dock shows through below the End task footer",
-   "detail": "On all four End task pages the room's dark Scan pill, search button and a second handle bar show beneath the footer, in the live demo too. Fix: the page must cover the dock, with its footer on the phone's bottom edge."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-4",
-   "target": {
-    "kind": "screen",
-    "id": "workbench.unit"
-   },
-   "kind": "broken",
-   "title": "Unit hub figures disagree with the Inspection page they open",
-   "detail": "Gestation Unit 7 hub says 'Checked Yesterday, 16:10' and Health 3; tapping it opens Inspection with 'Last check-in 06:40 · G. Hansen' and Health 4. Fix: read both from one source."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-5",
-   "target": {
-    "kind": "screen",
-    "id": "workbench.today"
-   },
-   "kind": "broken",
-   "title": "Progress label says 'complete' over a 1 of 8 bar",
-   "detail": "Piglet processing reads 'All scheduled items complete · 1 / 8 pens' (work-due adds '4 litters with care due' above it); Breeding reads 'Service sequences complete · 1 / 8 sows'. Fix: name what the bar counts ('Pens done')."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-6",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.edit-finished"
-   },
-   "kind": "broken",
-   "title": "Atlas 'Edit record (finished litter)' shows the locked record",
-   "detail": "The step 'Edit' hits the room row's Edit behind the sheet, which reopens the same locked record, so the screenshot equals farrowing.locked. Fix: step '[data-action=\"edit\"].tool'."
-  },
-  {
    "severity": "medium",
    "source": "screen-review",
    "id": "screens-a-7",
@@ -18356,30 +18951,6 @@
    "kind": "design",
    "title": "Fan speed is a thin slider, hard with gloves",
    "detail": "A 0-100 range slider in steps of 5 needs a precise drag; it is not one of the DS fields. Fix: a Stepper (−/+ 5%, 48px keys) with the value in mono."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-11",
-   "target": {
-    "kind": "screen",
-    "id": "environment.fan-manual"
-   },
-   "kind": "broken",
-   "title": "Apply is drawn as plain text, not a button",
-   "detail": "'Apply preview setting' is a secondary with no border or fill, so it reads as a caption; live and waiting differ only by text tone. Fix: control-border secondary, or the ink primary, as it is the device's only commit."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-12",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.room"
-   },
-   "kind": "broken",
-   "title": "'Awaiting' lens label breaks mid-word below 390px",
-   "detail": "In the demo page at 390 and 360 viewports the phone is 344-360 wide and the lens reads 'Awaitin / g'. Fix: apply the Segments copy budget (drop counts first) or let the filter button shrink; never break a word."
   },
   {
    "severity": "medium",
@@ -18526,18 +19097,6 @@
   {
    "severity": "low",
    "source": "screen-review",
-   "id": "screens-a-24",
-   "target": {
-    "kind": "screen",
-    "id": "environment.issue-resolved"
-   },
-   "kind": "broken",
-   "title": "Resolve toast covers the issue's reporter line",
-   "detail": "After Mark resolved, the toast 'Issue resolved in this preview' sits over the evidence card, hiding 'G. Hansen · 06:40'. Fix: show the toast above the footer without covering content, or drop it since the status already reads Resolved."
-  },
-  {
-   "severity": "low",
-   "source": "screen-review",
    "id": "screens-a-25",
    "target": {
     "kind": "screen",
@@ -18546,54 +19105,6 @@
    "kind": "design",
    "title": "Hold caption differs from Farrowing's for the same act",
    "detail": "Home's End task early button is captioned 'HOLD TO END'; Farrowing's is 'HOLD TO END EARLY'. Fix: one caption per verb from strings.json."
-  },
-  {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-b-1",
-   "target": {
-    "kind": "screen",
-    "id": "feed-plan.editor"
-   },
-   "kind": "broken",
-   "title": "Adjust feed hides its controls; Save can never be enabled",
-   "detail": "From Pen feeding, Adjust feed shows only the pig table. The Adjustment panel (mode, %, end date, note) sits below a 297px sheet body with overflow hidden; \"Complete the required fields first\" floats unpadded at the left edge. Fix: let the sheet body grow or scroll to the panel."
-  },
-  {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-b-2",
-   "target": {
-    "kind": "screen",
-    "id": "piglet-processing.pen-list"
-   },
-   "kind": "broken",
-   "title": "\"Edit\" on a done pen opens a sheet with nothing editable",
-   "detail": "A01's row trails \"Edit\" (verb: correct a posted record). Tapping it opens the pen sheet: \"Nothing left to do\", a disabled Record items, no correction. Fix: show the plain chevron until the correction decision (tasks-built-79) is made."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-b-3",
-   "target": {
-    "kind": "screen",
-    "id": "piglet-processing.sheet-todo"
-   },
-   "kind": "broken",
-   "title": "Chinese \"公猪·母猪\" calls piglets boars and sows",
-   "detail": "Boars · gilts reads 公猪·母猪 on the Piglets card and counts sheet; 母猪 is also the pen header's word for the sow (1头母猪). A farmer reads breeding boars and sows. Fix: 小公猪·小母猪 in strings.js."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-b-4",
-   "target": {
-    "kind": "feature",
-    "id": "feed-plan"
-   },
-   "kind": "broken",
-   "title": "Feed plan screens have no Chinese",
-   "detail": "inspection-astra-concept has no zh strings or language switch, so Pen feeding, Adjust feed and Feed plan are English-only and Chinese fit cannot be checked. Fix: move feed copy into the strings registry with zh."
   },
   {
    "severity": "medium",
@@ -18748,30 +19259,6 @@
   {
    "severity": "high",
    "source": "screen-review",
-   "id": "screens-c-1",
-   "target": {
-    "kind": "screen",
-    "id": "pig-profile.production-task"
-   },
-   "kind": "broken",
-   "title": "Pregnancy outcomes unstyled; the chosen outcome is invisible",
-   "detail": "Each outcome runs title into description, a tick sits under every option, and tapping Not in pig changes nothing visible before Save and complete enables. A mis-tap removes the sow from her batch unseen. Fix: render the outcomes with ChoiceList (radio) so one selected state shows."
-  },
-  {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-c-2",
-   "target": {
-    "kind": "screen",
-    "id": "health-record.treatment"
-   },
-   "kind": "broken",
-   "title": "Treatment form trapped in a 260px scroll box",
-   "detail": "The page's body scroller is 260px tall inside a full-height page: Dose and Unit are cut off at y=380, the lower half is empty, and the hint line floats mid-page. Fix: let the sheet body fill the space down to the footer."
-  },
-  {
-   "severity": "high",
-   "source": "screen-review",
    "id": "screens-c-3",
    "target": {
     "kind": "screen",
@@ -18790,18 +19277,6 @@
   {
    "severity": "medium",
    "source": "screen-review",
-   "id": "screens-c-4",
-   "target": {
-    "kind": "feature",
-    "id": "health-record"
-   },
-   "kind": "broken",
-   "title": "Required-fields hint sits at the screen edge, outside the gutter",
-   "detail": "'Complete the required fields first' starts at x=0 on Record health, Care instructions, Resolve conditions, Treatment, weight, body condition, note, miscarriage, batch membership. On Record weight it stays after Save enables. Fix: the Button waiting status line inside the footer gutter, naming the missing field, gone once valid."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
    "id": "screens-c-5",
    "target": {
     "kind": "screen",
@@ -18814,18 +19289,6 @@
   {
    "severity": "medium",
    "source": "screen-review",
-   "id": "screens-c-6",
-   "target": {
-    "kind": "screen",
-    "id": "health-record.many"
-   },
-   "kind": "broken",
-   "title": "Ongoing conditions on the record cannot be opened",
-   "detail": "Arthritis, Lameness, Coughing are plain text in the General details Health fact; nothing opens their finding to edit, treat or resolve, though the flow says 'tap the Arthritis tag'. Fix: list ongoing conditions as rows under the attention rows, each opening its finding."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
    "id": "screens-c-7",
    "target": {
     "kind": "screen",
@@ -18834,18 +19297,6 @@
    "kind": "unclear",
    "title": "Next task says Pregnancy check while Vaccination is due today",
    "detail": "On 000306 Sow cycle's Next task reads 'Pregnancy check · in 1 day' while Current tasks leads with Vaccination due today. 'Next' counts only production tasks, so it contradicts the card above. Fix: drop Next task (Current tasks already shows it) or say what it counts."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-c-8",
-   "target": {
-    "kind": "screen",
-    "id": "inspection.pen-log"
-   },
-   "kind": "broken",
-   "title": "Date filter box is 90px tall and unlabelled beside Activity",
-   "detail": "The 'All dates' trigger measures 186x90 with no label, next to the labelled 160x48 Activity picker; the row is misaligned. Same on pig-profile.log. Fix: use the PickerField trigger with a 'Dates' label at field height."
   },
   {
    "severity": "medium",
@@ -18935,18 +19386,6 @@
    "kind": "design",
    "title": "20 of 24 pen tiles say 'Not in unit'",
    "detail": "The pen map repeats 'Not in unit' on every greyed tile, burying the four live pens; the caption 'Pen layout · only pens…' is hidden under the footer. Fix: leave non-unit tiles blank and pad the caption above the footer."
-  },
-  {
-   "severity": "low",
-   "source": "screen-review",
-   "id": "screens-c-16",
-   "target": {
-    "kind": "screen",
-    "id": "inspection.find-pig"
-   },
-   "kind": "broken",
-   "title": "Sample-tag button touches the field label; result tags not mono",
-   "detail": "'Try sample tag 000306' ends at y=392 where the 'Ear tag or pen' label starts: no gap. Results set ear tags in Plus Jakarta while the walk uses mono. Fix: section gap above the label; identifier type for tags."
   },
   {
    "severity": "low",
@@ -19320,11 +19759,11 @@
   },
   {
    "severity": "medium",
-   "source": "Gate · Stepper · 2026-10-10",
+   "source": "gate",
    "id": "tasks-built-26",
    "target": {
     "kind": "component",
-    "id": "Stepper"
+    "id": "TaskStepper"
    },
    "kind": "design",
    "title": "Steppers still 44px, below the 48px glove floor",
@@ -19756,7 +20195,7 @@
    "id": "tasks-built-63",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.pen-list"
+    "id": "piglet-processing.job-chip"
    },
    "kind": "design",
    "title": "Job chip shows pens but nothing to tick",
@@ -19768,7 +20207,7 @@
    "id": "tasks-built-64",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.pen-list"
+    "id": "piglet-processing.chip-done"
    },
    "kind": "broken",
    "title": "Done chip lists pens that have not started",
@@ -19780,7 +20219,7 @@
    "id": "tasks-built-65",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.pen-list"
+    "id": "piglet-processing.list-no-id"
    },
    "kind": "decision",
    "title": "How is a farm's ID scheme set in the product?",
@@ -19798,7 +20237,7 @@
    "id": "tasks-built-66",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.pen-list"
+    "id": "piglet-processing.list-no-id"
    },
    "kind": "unclear",
    "title": "ID step window (day 3-7) is a builder guess",
@@ -19810,7 +20249,7 @@
    "id": "tasks-built-67",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.pen-list"
+    "id": "piglet-processing.phone-clash"
    },
    "kind": "decision",
    "title": "First-in wins, second kept as a note: confirm or revert?",
@@ -19828,7 +20267,7 @@
    "id": "tasks-built-68",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.pen-list"
+    "id": "piglet-processing.phone-clash"
    },
    "kind": "unclear",
    "title": "Clash note has no dismiss rule or placement spec",
@@ -20244,7 +20683,7 @@
    "id": "tasks-built-102",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.pen-list"
+    "id": "piglet-processing.list-ended"
    },
    "kind": "design",
    "title": "After End every row reads \"Task ended\"; done equals not done",
@@ -20256,7 +20695,7 @@
    "id": "tasks-built-103",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.pen-list"
+    "id": "piglet-processing.list-ended"
    },
    "kind": "decision",
    "title": "After-End records: blocked, flagged-uncounted, or writable?",
@@ -21003,6 +21442,102 @@
    "source": "gate"
   },
   {
+   "id": "gate:FilterSheet:0",
+   "target": {
+    "kind": "component",
+    "id": "FilterSheet"
+   },
+   "kind": "broken",
+   "severity": "medium",
+   "title": "Disabled and Error still print a count the sheet does not know: 'Show 0 sows' while syncing,…",
+   "detail": "Disabled and Error still print a count the sheet does not know: 'Show 0 sows' while syncing, 'Show 12 sows' beside 'Results unavailable'.\nFix: When disabled or error, label the commit without a number ('Show sows').",
+   "source": "gate"
+  },
+  {
+   "id": "gate:FilterSheet:1",
+   "target": {
+    "kind": "component",
+    "id": "FilterSheet"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Farrowing's filter IconButton shows badge '2' but its aria-label stays 'Filter sows'; Inspection…",
+   "detail": "Farrowing's filter IconButton shows badge '2' but its aria-label stays 'Filter sows'; Inspection says 'Filter pigs, 1 applied'.\nFix: Pass the applied count into the farrowing IconButton label as Inspection does.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:FilterSheet:2",
+   "target": {
+    "kind": "component",
+    "id": "FilterSheet"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Chip rows sit 18px inside the group heading's left edge (Parity at x=21, chips at x=39).",
+   "detail": "Chip rows sit 18px inside the group heading's left edge (Parity at x=21, chips at x=39).\nFix: Drop the chips-track inline padding inside .st-filter-group.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:RangeSlider:0",
+   "target": {
+    "kind": "component",
+    "id": "RangeSlider"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Label and formatted value run together with a capital mid-line: 'Due In 7+ days', 'Due 4 days…",
+   "detail": "Label and formatted value run together with a capital mid-line: 'Due In 7+ days', 'Due 4 days ago – In 7+ days'.\nFix: Set the value on its own line under the label so the formatter's sentence case reads as a value.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:RangeSlider:1",
+   "target": {
+    "kind": "component",
+    "id": "RangeSlider"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "If the owner's 'green = approved/done only' rule is meant to override the README, the green span…",
+   "detail": "If the owner's 'green = approved/done only' rule is meant to override the README, the green span conflicts; the README names selection green, so it passes today.\nFix: Owner decides: keep the README, or switch the fill to --ink and drop 'selected' from the green law.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:RangeSlider:2",
+   "target": {
+    "kind": "component",
+    "id": "RangeSlider"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "README token list omits --green and --disabled-border, which the fill now uses.",
+   "detail": "README token list omits --green and --disabled-border, which the fill now uses.\nFix: Add both to the API and tokens line.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:RangeSlider:3",
+   "target": {
+    "kind": "component",
+    "id": "RangeSlider"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "zh end label '7天以后' drops the open-ended '+' that 'In 7+ days' and '7天以上前' carry.",
+   "detail": "zh end label '7天以后' drops the open-ended '+' that 'In 7+ days' and '7天以上前' carry.\nFix: Use '7天以上后' in the zh formatter.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:RangeSlider:p0",
+   "target": {
+    "kind": "component",
+    "id": "RangeSlider"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge Feed adjustment slider?",
+   "detail": "Still open (README now says so): Inspection's feed edit records a value; it belongs with Stepper/Measure.\nSeen in: inspection.actions",
+   "source": "gate"
+  },
+  {
    "id": "gate:Field:0",
    "target": {
     "kind": "component",
@@ -21286,8 +21821,8 @@
    },
    "kind": "design",
    "severity": "low",
-   "title": "piglet-processing.pen-list: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's…",
-   "detail": "piglet-processing.pen-list: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's 'by L. Madsen at 08:40' say the same who/when right above each other (screen budget, not the component).\nFix: In the prototype, hide the Last record line while the clash banner shows, or drop the time/name from the banner text.",
+   "title": "piglet-processing.phone-clash: the screen subtitle 'Last record 08:40 · L. Madsen' and the…",
+   "detail": "piglet-processing.phone-clash: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's 'by L. Madsen at 08:40' say the same who/when right above each other (screen budget, not the component).\nFix: In the prototype, hide the Last record line while the clash banner shows, or drop the time/name from the banner text.",
    "source": "gate"
   },
   {

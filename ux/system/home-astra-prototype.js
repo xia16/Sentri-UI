@@ -8,7 +8,7 @@
   const icon = key => window.SentriIcons.icon(key);
   const btn = (action, text, cls='', value='', extra='') => {
     if(action==='complete-task')return SentriUI.holdButton({action,label:'End task',caption:'HOLD TO END',tone:'primary'});
-    if(['primary','secondary'].includes(cls))return SentriUI.button({action,value,register:cls,label:''}).replace('<span class="st-button-label"></span>',text).replace('<button',`<button ${extra}`);
+    if(['primary','secondary'].includes(cls))return SentriUI.button({action,value,register:cls,label:text}).replace('<button',`<button ${extra}`);
     return `<button type="button" class="${cls}" data-action="${action}" data-value="${esc(value)}" ${extra}>${text}</button>`;
   };
   const ib = (action, key, label, value='') => SentriUI.iconButton({action,icon:icon(key),label,value,variant:key==='more'?'plain':'bordered'});
@@ -21,7 +21,7 @@
   const units = {
     1:{pigs:48,pens:6,checked:'Today, 08:20 · M. Chen'},2:{pigs:46,pens:6,checked:'Yesterday, 16:10 · G. Hansen'},3:{pigs:44,pens:6,checked:'Today, 08:45 · M. Chen'},4:{pigs:46,pens:6,checked:'Yesterday, 15:40 · G. Hansen'},
     6:{pigs:8,pens:4,checked:'Today, 08:15 · G. Hansen'},
-    7:{pigs:86,pens:8,checked:'Yesterday, 16:10 · G. Hansen'},8:{pigs:74,pens:7,checked:'Today, 08:35 · M. Chen'},9:{pigs:86,pens:8,checked:'Yesterday, 16:40 · G. Hansen'},
+    7:{pigs:86,pens:8,checked:SentriUnitSnapshot.checkIn.time+' · '+SentriUnitSnapshot.checkIn.who},8:{pigs:74,pens:7,checked:'Today, 08:35 · M. Chen'},9:{pigs:86,pens:8,checked:'Yesterday, 16:40 · G. Hansen'},
     10:{pigs:24,pens:24,checked:'Today, 08:15 · G. Hansen'},11:{pigs:24,pens:24,checked:'Yesterday, 17:00 · M. Chen'},12:{pigs:180,pens:6,checked:'Today, 08:30 · M. Chen'},13:{pigs:180,pens:6,checked:'Today, 08:50 · M. Chen'}
   };
   // Unit context belongs at the entrance; values remain sample data for this study.
@@ -64,7 +64,7 @@
   let state = {page:'home',section:initialSection,unit:null,task:null,workUnit:null,assistantTab:'findings',chat:[],answered:false,notes:[],log:[],overlay:null};
   // UI-only queue: no device database or upload service is connected to this study.
   const pendingExamples=[{title:'Pregnancy check · 000308',context:'Gestation · Unit 7 · Batch 31',time:'09:32'},{title:'Pen note · C2',context:'Gestation · Unit 8',time:'09:35'},{title:'Feed adjustment · 000267',context:'Gestation · Unit 7 · Pen C1',time:'09:38'}];
-  const sync={connection:'offline',pending:[...pendingExamples],status:'waiting',message:'',attempt:0};
+  const sync={connection:params.get('connection')==='online'?'online':'offline',pending:[...pendingExamples],status:'waiting',message:'',attempt:0};
   if(params.get('view')==='sections')state.page='sections';
   if(params.get('view')==='unit'){const available=sections.find(s=>s.id===initialSection).units;state.unit=available.includes(+params.get('unit'))?+params.get('unit'):available[0];}
   const app = $('#app'), overlay = $('#overlay');
@@ -95,9 +95,9 @@
     return30:{context:'First monitoring pass',day:3,days:7,kind:'observation',verb:'sows ready to check',due:{7:4,8:6},state:'round-complete',nextAt:870},
     heat34:{context:'Weaned sows',day:2,days:3,kind:'observation',verb:'sows ready to check',due:{1:8,2:6,3:6},nextAt:870},
     heat35:{context:'Replacement gilts',day:1,days:3,kind:'observation',verb:'sows ready to check',due:{2:4,4:6},state:'round-complete',nextAt:870},
-    service34:{context:'Service sequence',day:3,days:7,label:'Service sequences complete',verb:'sows ready for service',due:{1:2,3:3},state:'waiting',nextAt:840},
+    service34:{context:'Service sequence',day:3,days:7,label:'Sows done',verb:'sows ready for service',due:{1:2,3:3},state:'waiting',nextAt:840},
     farrow28:{context:'Farrowing window',day:2,days:7,label:'Farrowings recorded',verb:'sows due today',kind:'distribution',due:{6:2,7:2,8:0},nextAt:1440},
-    piglet27:{context:'Age-day schedule',day:3,days:7,label:'All scheduled items complete',verb:'litters due',due:{6:2,7:2},state:'waiting',nextAt:1440}
+    piglet27:{context:'Age-day schedule',day:3,days:7,label:'Pens done',verb:'litters due',due:{6:2,7:2},state:'waiting',nextAt:1440}
   };
   function taskModel(t){
     const count=Object.keys(t.counts).length,scope={kind:state.unit?'unit':'overview',label:state.unit?'Unit '+state.unit:'Across '+count+' '+(count===1?'unit':'units'),action:state.unit?'Open unit task':'View task'};
@@ -124,7 +124,7 @@
     const u=unitInfo(state.unit),sensors=availableSensors(),devices=unitDevices(),faults=maintenanceRecords().filter(f=>!f.resolved);
     // Attention is distinct from all recorded findings: exclude no-action-needed conditions.
     // Counts are fictional snapshot values; null means unavailable, never zero.
-    const care=attentionPreview==='unknown'?{health:null,feed:null}:attentionPreview==='busy'?{health:24,feed:13}:attentionPreview==='clear'||attentionPreview==='maintenance'?{health:0,feed:0}:attentionPreview==='health'?{health:3,feed:0}:attentionPreview==='feed'?{health:0,feed:3}:{health:3,feed:3};
+    const care=attentionPreview==='unknown'?{health:null,feed:null}:attentionPreview==='busy'?{health:24,feed:13}:attentionPreview==='clear'||attentionPreview==='maintenance'?{health:0,feed:0}:attentionPreview==='health'?{health:SentriUnitSnapshot.health,feed:0}:attentionPreview==='feed'?{health:0,feed:3}:{health:SentriUnitSnapshot.health,feed:SentriUnitSnapshot.feed};
     const signals=[{label:'Health',count:care.health,unit:'pig',icon:'health'},{label:'Feed',count:care.feed,unit:'pig',icon:'feed'},{label:'Maintenance',count:faults.length,unit:'issue',icon:'wrench'}];
     const active=signals.filter(s=>Number.isFinite(s.count)&&s.count>0),unavailable=signals.some(s=>s.count===null);
     const inspectLabel = `Inspect unit, ${u.pigs} pigs, ${u.pens} pens`;
@@ -164,14 +164,14 @@
   }
   function environment(){
     const sensors=availableSensors(),selected=sensors.find(s=>s.id===state.sensor)||sensors[0],offline=sync.connection==='offline';
-    return head('Environment & devices','Unit '+state.unit,'<span class="preview-badge">PREVIEW</span>')+`<div class="app-scroll environment-page">${selected?`${SentriUI.segment({variant:'view-switch',options:sensors.map(s=>[s.id,s.name]),active:selected.id,action:'sensor',ariaLabel:'Sensor'})}<section class="sensor-detail"><div class="sensor-detail-heading"><div><p>${selected.name}</p><strong>${selected.value}<small>${selected.unit}</small></strong></div><span>Last reading<br>${currentUnitContext().updated}</span></div>${SentriUI.segment({variant:'view-switch',options:[['today','Today'],['week','7 days']],active:state.sensorRange==='week'?'week':'today',action:'sensor-range',ariaLabel:'Chart period'})}${sensorChart(selected)}<p class="helper">Sample readings · ${offline?'offline, showing last available values':'connected'}</p></section>`:''}${unitDevices().length?`<div class="device-section-heading"><h3>Devices</h3><span>${offline?'Offline':'Connected'}</span></div>${unitDevices().map(d=>`<section class="device-control"><div class="device-control-heading">${icon('air')}<div><h3>${d.name}</h3><p>${d.mode==='auto'?'Auto · following unit schedule':'Manual · '+d.speed+'% speed'}</p></div></div>${SentriUI.segment({variant:'view-switch',options:[['auto','Auto'],['manual','Manual']],active:d.draftMode,action:'fan-mode',ariaLabel:'Fan mode',disabled:offline})}${d.draftMode==='manual'?`<label class="fan-speed-label" for="fan-speed">Fan speed <output id="fan-speed-value">${d.draftSpeed}%</output></label><input id="fan-speed" type="range" min="0" max="100" step="5" value="${d.draftSpeed}" ${offline?'disabled':''}>`:''}${btn('apply-device','Apply preview setting','secondary','',offline||d.draftMode===d.mode&&(d.draftMode==='auto'||d.draftSpeed===d.speed)?'disabled':'')}<p class="helper">${offline?'Reconnect to change device settings.':'Preview controls only · no command is sent to equipment.'}</p>${d.updated?`<p class="device-updated">${d.updated}</p>`:''}</section>`).join('')}`:''}</div>`;
+    return head('Environment & devices','Unit '+state.unit,'<span class="preview-badge">PREVIEW</span>')+`<div class="app-scroll environment-page">${selected?`${SentriUI.segment({variant:'view-switch',options:sensors.map(s=>[s.id,s.name]),active:selected.id,action:'sensor',ariaLabel:'Sensor'})}<section class="sensor-detail"><div class="sensor-detail-heading"><div><p>${selected.name}</p><strong>${selected.value}<small>${selected.unit}</small></strong></div><span>Last reading<br>${currentUnitContext().updated}</span></div>${SentriUI.segment({variant:'view-switch',options:[['today','Today'],['week','7 days']],active:state.sensorRange==='week'?'week':'today',action:'sensor-range',ariaLabel:'Chart period'})}${sensorChart(selected)}<p class="helper">Sample readings · ${offline?'offline, showing last available values':'connected'}</p></section>`:''}${unitDevices().length?`<div class="device-section-heading"><h3>Devices</h3><span>${offline?'Offline':'Connected'}</span></div>${unitDevices().map(d=>`<section class="device-control"><div class="device-control-heading">${icon('air')}<div><h3>${d.name}</h3><p>${d.mode==='auto'?'Auto · following unit schedule':'Manual · '+d.speed+'% speed'}</p></div></div>${SentriUI.segment({variant:'view-switch',options:[['auto','Auto'],['manual','Manual']],active:d.draftMode,action:'fan-mode',ariaLabel:'Fan mode',disabled:offline})}${d.draftMode==='manual'?`<label class="fan-speed-label" for="fan-speed">Fan speed <output id="fan-speed-value">${d.draftSpeed}%</output></label><input id="fan-speed" type="range" min="0" max="100" step="5" value="${d.draftSpeed}" ${offline?'disabled':''}>`:''}${btn('apply-device','Save setting','primary','',offline||d.draftMode===d.mode&&(d.draftMode==='auto'||d.draftSpeed===d.speed)?'disabled':'')}<p class="helper">${offline?'Reconnect to change device settings.':'Preview controls only · no command is sent to equipment.'}</p>${d.updated?`<p class="device-updated">${d.updated}</p>`:''}</section>`).join('')}`:''}</div>`;
   }
   function maintenance(){
     const rows=maintenanceRecords(),open=rows.filter(f=>!f.resolved);
-    return head('Maintenance','Unit '+state.unit,'<span class="preview-badge">PREVIEW</span>')+`<div class="app-scroll maintenance-page"><div class="maintenance-heading"><span>${open.length} open ${open.length===1?'issue':'issues'}</span>${btn('report-fault','Report issue','text-button')}</div>${rows.length?rows.map(f=>btn('fault-detail',`<span class="maintenance-card-top"><span>${esc(f.device)}</span><small>${f.resolved?'Resolved':'Open'}</small></span><span class="maintenance-location">${esc(f.pen)}</span><p>${esc(f.note)}</p><small>${esc(f.by)}</small>${icon('arrow')}`,'maintenance-card'+(f.resolved?' resolved':''),f.id)).join(''):'<div class="empty-state"><h3>No open issues</h3><p>Report equipment that needs attention in this unit.</p></div>'}<p class="helper">Sample maintenance records · changes stay in this preview.</p></div>`;
+    return head('Maintenance','Unit '+state.unit,'<span class="preview-badge">PREVIEW</span>')+`<div class="app-scroll maintenance-page"><div class="maintenance-heading"><span>${open.length} open ${open.length===1?'issue':'issues'}</span>${SentriUI.button({action:'report-fault',label:'Report issue',register:'text'})}</div>${rows.length?rows.map(f=>btn('fault-detail',`<span class="maintenance-card-top"><span>${esc(f.device)}</span><small>${f.resolved?'Resolved':'Open'}</small></span><span class="maintenance-location">${esc(f.pen)}</span><p>${esc(f.note)}</p><small>${esc(f.by)}</small>${icon('arrow')}`,'maintenance-card'+(f.resolved?' resolved':''),f.id)).join(''):'<div class="empty-state"><h3>No open issues</h3><p>Report equipment that needs attention in this unit.</p></div>'}<p class="helper">Sample maintenance records · changes stay in this preview.</p></div>`;
   }
-  function reportFault(){drawer('Report equipment issue',`<form id="fault-form">${SentriUI.field({label:`Equipment`,control:`<input id="fault-device" name="device" placeholder="e.g. Drinking station" maxlength="80" required>`})}${SentriUI.field({label:`Location in Unit ${state.unit}`,control:`<input id="fault-location" name="location" placeholder="e.g. Pen C2" maxlength="80" required>`})}${SentriUI.field({label:`What needs attention?`,control:`<textarea id="fault-note" name="note" maxlength="500" required></textarea>`})}<button class="primary" type="submit">Save sample issue</button></form>`);}
-  function faultDetail(id){const f=maintenanceRecords().find(f=>f.id===id);if(!f)return;state.faultId=id;drawer(f.device,`<p>${esc(f.pen)} · ${f.resolved?'Resolved':'Open'}</p><div class="evidence"><p>${esc(f.note)}</p><small>${esc(f.by)}</small></div>${f.resolved?'<p>Resolved in this preview.</p>':btn('resolve-fault','Mark resolved','primary')}`);}
+  function reportFault(){drawer('Report equipment issue',`<form id="fault-form">${SentriUI.field({label:`Equipment`,control:`<input id="fault-device" name="device" placeholder="e.g. Drinking station" maxlength="80" required>`})}${SentriUI.field({label:`Location in Unit ${state.unit}`,control:`<input id="fault-location" name="location" placeholder="e.g. Pen C2" maxlength="80" required>`})}${SentriUI.field({label:`What needs attention?`,control:`<textarea id="fault-note" name="note" maxlength="500" required></textarea>`})}${SentriUI.button({label:"Record issue",strs:{label:"record.issue"},register:"primary"}).replace('type="button"','type="submit"')}</form>`);}
+  function faultDetail(id){const f=maintenanceRecords().find(f=>f.id===id);if(!f)return;state.faultId=id;drawer(f.device,`<p>${esc(f.pen)} · ${f.resolved?'Resolved':'Open'}</p><div class="evidence"><p>${esc(f.note)}</p><small>${esc(f.by)}</small></div>${f.resolved?'':btn('resolve-fault','Mark resolved','primary')}`);}
   function comingUp(){const next=state.section==='farrowing'?null:unitContext[state.unit]?.next;if(!next?.length)return '';return `<details class="upcoming-work"><summary><span>Coming up</span><small>${next.length} ${next.length===1?'batch':'batches'}</small>${icon('down')}</summary>${next.map(n=>`<div class="upcoming-row"><span>${n.batch}</span><div>${n.title}<small>${n.when}</small></div></div>`).join('')}</details>`;}
   function home(){
     const models=window.SentriHomeTaskCard.order(scopedTasks().map(taskModel));
@@ -241,6 +241,8 @@
   // The atlas follows the demo (?screen=): the screen whose url holds this scope (view, section, unit, work, attention), else null.
   function atlasScreen(screens){
     const dr=overlay.querySelector('.sheet,.dialog');
+    if(state.page==='environment')return unitDevices()[0]?.draftMode==='manual'?'environment.fan-manual':'environment.page';
+    if(state.page==='maintenance'){if(dr)return dr.querySelector('#fault-form')?'environment.report-issue':maintenanceRecords().find(f=>f.id===state.faultId)?.resolved?'environment.issue-resolved':'environment.issue-detail';return maintenanceRecords().length?'environment.maintenance':'environment.maintenance-empty';}
     if(dr){
       if(dr.classList.contains('unit-picker'))return 'workbench.choose-unit';
       if(dr.classList.contains('sync-drawer'))return 'workbench.saved-work';
@@ -249,7 +251,7 @@
     if(state.page==='placeholder'){const t=task();return t.completedAt||t.terminatedAt?'workbench.closed-task':taskModel(t).state==='ready'?'workbench.task-ready':'workbench.task-preview';}
     if(!['home','sections'].includes(state.page))return null;
     const view=state.page==='sections'?'sections':state.unit?'unit':'';
-    const hit=(screens||[]).find(c=>{const u=new URL(c.url,location.href).searchParams;
+    const hit=(screens||[]).filter(c=>c.id.startsWith('workbench.')).find(c=>{const u=new URL(c.url,location.href).searchParams;
       return (u.get('view')||'')===view&&(view==='sections'||(u.get('section')||'gestation')===state.section)&&(view!=='unit'||u.get('unit')===String(state.unit))&&(u.get('work')||'mixed')===workPreview&&(u.get('attention')||'current')===attentionPreview;});
     return hit?hit.id:null;
   }
@@ -308,7 +310,7 @@
     if(a==='apply-device'){if(sync.connection==='offline')return;const d=unitDevices()[0];d.mode=d.draftMode;d.speed=d.draftSpeed;d.updated='Preview setting applied · just now';render();toast('Sample setting saved · no equipment command sent');return;}
     if(a==='report-fault'){reportFault();return;}
     if(a==='fault-detail'){faultDetail(v);return;}
-    if(a==='resolve-fault'){const f=maintenanceRecords().find(f=>f.id===state.faultId);if(f)f.resolved=true;closeDrawer();render();toast('Issue resolved in this preview');return;}
+    if(a==='resolve-fault'){const f=maintenanceRecords().find(f=>f.id===state.faultId);if(f)f.resolved=true;closeDrawer();render();faultDetail(state.faultId);return;}
     if(a==='assistant'||a==='context-assistant'){if(a==='assistant')state.workUnit=state.unit;state.assistantTab=a==='context-assistant'?'chat':'findings';push('assistant');return;}
     if(a==='assistant-tab'){state.assistantTab=v;render();return;}
     if(a==='suggestion'){chat(v);return;}

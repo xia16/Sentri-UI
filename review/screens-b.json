@@ -1,5 +1,6 @@
 [
  {
+<<<<<<< HEAD
   "id": "screens-b-1",
   "target": {
    "kind": "screen",
@@ -48,6 +49,8 @@
   "source": "screen-review"
  },
  {
+=======
+>>>>>>> origin/main
   "id": "screens-b-5",
   "target": {
    "kind": "feature",

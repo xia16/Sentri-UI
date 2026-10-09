@@ -1,77 +1,5 @@
 [
  {
-  "id": "screens-a-1",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.before"
-  },
-  "kind": "broken",
-  "severity": "high",
-  "title": "Sheets collapse whenever a waiting reason line shows",
-  "detail": "Before first count, Edit record (both), Lock blocked and End task (active sows): the body clips mid-row, the hint overlaps Litter summary, tiles are cut, and the reason line sits flush at x=0. Fix: put the reason in the footer's status slot, not the scrolling body.",
-  "source": "screen-review"
- },
- {
-  "id": "screens-a-2",
-  "target": {
-   "kind": "screen",
-   "id": "environment.report-issue"
-  },
-  "kind": "broken",
-  "severity": "high",
-  "title": "Report issue primary button label is invisible",
-  "detail": "'Save sample issue' computes ink text on ink fill, so the drawer's only commit reads as a blank black block. The form is hand-built (raw form, inputs, button.primary) instead of SentriUI Field and Button. Fix: build it from the DS parts.",
-  "source": "screen-review"
- },
- {
-  "id": "screens-a-3",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.task-blocked"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Room dock shows through below the End task footer",
-  "detail": "On all four End task pages the room's dark Scan pill, search button and a second handle bar show beneath the footer, in the live demo too. Fix: the page must cover the dock, with its footer on the phone's bottom edge.",
-  "source": "screen-review"
- },
- {
-  "id": "screens-a-4",
-  "target": {
-   "kind": "screen",
-   "id": "workbench.unit"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Unit hub figures disagree with the Inspection page they open",
-  "detail": "Gestation Unit 7 hub says 'Checked Yesterday, 16:10' and Health 3; tapping it opens Inspection with 'Last check-in 06:40 · G. Hansen' and Health 4. Fix: read both from one source.",
-  "source": "screen-review"
- },
- {
-  "id": "screens-a-5",
-  "target": {
-   "kind": "screen",
-   "id": "workbench.today"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Progress label says 'complete' over a 1 of 8 bar",
-  "detail": "Piglet processing reads 'All scheduled items complete · 1 / 8 pens' (work-due adds '4 litters with care due' above it); Breeding reads 'Service sequences complete · 1 / 8 sows'. Fix: name what the bar counts ('Pens done').",
-  "source": "screen-review"
- },
- {
-  "id": "screens-a-6",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.edit-finished"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Atlas 'Edit record (finished litter)' shows the locked record",
-  "detail": "The step 'Edit' hits the room row's Edit behind the sheet, which reopens the same locked record, so the screenshot equals farrowing.locked. Fix: step '[data-action=\"edit\"].tool'.",
-  "source": "screen-review"
- },
- {
   "id": "screens-a-7",
   "target": {
    "kind": "feature",
@@ -117,30 +45,6 @@
   "severity": "medium",
   "title": "Fan speed is a thin slider, hard with gloves",
   "detail": "A 0-100 range slider in steps of 5 needs a precise drag; it is not one of the DS fields. Fix: a Stepper (−/+ 5%, 48px keys) with the value in mono.",
-  "source": "screen-review"
- },
- {
-  "id": "screens-a-11",
-  "target": {
-   "kind": "screen",
-   "id": "environment.fan-manual"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Apply is drawn as plain text, not a button",
-  "detail": "'Apply preview setting' is a secondary with no border or fill, so it reads as a caption; live and waiting differ only by text tone. Fix: control-border secondary, or the ink primary, as it is the device's only commit.",
-  "source": "screen-review"
- },
- {
-  "id": "screens-a-12",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.room"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "'Awaiting' lens label breaks mid-word below 390px",
-  "detail": "In the demo page at 390 and 360 viewports the phone is 344-360 wide and the lens reads 'Awaitin / g'. Fix: apply the Segments copy budget (drop counts first) or let the filter button shrink; never break a word.",
   "source": "screen-review"
  },
  {
@@ -283,18 +187,6 @@
   "severity": "low",
   "title": "Temperature named twice above one value",
   "detail": "The selected tab says Temperature and the card repeats 'Temperature' over 22.4 °C. Fix: drop the card label; the tab names it.",
-  "source": "screen-review"
- },
- {
-  "id": "screens-a-24",
-  "target": {
-   "kind": "screen",
-   "id": "environment.issue-resolved"
-  },
-  "kind": "broken",
-  "severity": "low",
-  "title": "Resolve toast covers the issue's reporter line",
-  "detail": "After Mark resolved, the toast 'Issue resolved in this preview' sits over the evidence card, hiding 'G. Hansen · 06:40'. Fix: show the toast above the footer without covering content, or drop it since the status already reads Resolved.",
   "source": "screen-review"
  },
  {

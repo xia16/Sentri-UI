@@ -28,4 +28,9 @@ for (const page of pages) {
     assert.doesNotMatch(html, /new\s+URL\s*\(/, 'new URL( throws inside the atlas srcdoc iframe: use a plain relative path or none');
     assert.doesNotMatch(html, /srcdoc/i, 'the atlas already runs this page in a srcdoc iframe: render with SentriUI.* instead of loading another document');
   });
+  test(`${name}: no <link>/<script src> to tokens, bundle or icons`, () => {
+    const html = fs.readFileSync(page, 'utf8');
+    const assets = [...html.matchAll(/<(?:link|script)[^>]*(?:href|src)=["']([^"']+)["']/gi)].map((m) => m[1]).filter((u) => /tokens\.css|bundle\.(?:css|js)|sentri-icons/.test(u));
+    assert.deepEqual(assets, [], 'the atlas injects tokens.css, bundle.css and bundle.js into every cell; a relative link 404s inside the srcdoc iframe');
+  });
 }

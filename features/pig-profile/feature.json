@@ -812,7 +812,7 @@
         "elements": [
           {
             "name": "Outcome choices and Save",
-            "shows": "Pregnant · Not in pig · Recheck later; Save and complete",
+            "shows": "Pregnant · Not in pig · Recheck later; Save",
             "states": [
               {
                 "state": "Pregnancy check",
@@ -837,7 +837,7 @@
         "controls": [],
         "copy": [
           "Record outcome (raw)",
-          "Save and complete (raw)",
+          "Save (raw)",
           "Save follow-up (raw)"
         ],
         "issues": [

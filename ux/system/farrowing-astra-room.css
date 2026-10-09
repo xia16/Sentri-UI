@@ -40,24 +40,7 @@
 .home-task-states b{color:#24613a;font-weight:600}
 .home-resume{font-size:11px;color:var(--muted);padding-top:13px;border-top:1px solid var(--line);width:100%}@media(max-width:370px){.room-list .row-main{font-size:13px}.sow-identity{min-width:60px}}@media(prefers-reduced-motion:reduce){.room-list .pen-card,.room-list .pen-top{transition:none}.room-list .pen-card.pen-arrival,.room-list .pen-arrival .pen-top{animation:none}.room-list .pen-card.pen-arrival{border-color:#91a77f}.room-list .pen-arrival .pen-top{background:#e8efdf}}
 /* Range filters: native draggable thumbs with keyboard-friendly bounds. */
-.filter-section{padding:0 0 22px;margin-bottom:22px;border-bottom:1px solid var(--line)}
-.filter-section-head{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
-.filter-section-head .filter-title{margin:0}
-.due-range-value{font-size:12px;line-height:1.6;color:var(--muted);min-height:20px;font-variant-numeric:tabular-nums}
-.due-range{position:relative;height:48px;margin:16px 16px 0;touch-action:none;cursor:ew-resize}
-.due-range-track{position:absolute;left:0;right:0;top:22px;height:4px;border-radius:3px;background:linear-gradient(to right,#dfe4d7 0 var(--from),#53694a var(--from) var(--to),#dfe4d7 var(--to) 100%)}
-.due-range input[type=range]{position:absolute;inset:0;width:calc(100% + 32px);left:-16px;height:48px;padding:0;margin:0;appearance:none;-webkit-appearance:none;pointer-events:none;background:transparent;accent-color:#53694a}
-.due-range input[type=range]::-webkit-slider-runnable-track{height:4px;background:transparent}
-.due-range input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:32px;height:32px;margin-top:-14px;background:white;border:1.5px solid #74846a;border-radius:50%;box-shadow:0 2px 5px #20301920;pointer-events:auto;cursor:ew-resize}
-.due-range input[type=range]::-moz-range-track{height:4px;background:transparent}
-.due-range input[type=range]::-moz-range-thumb{width:30px;height:30px;background:white;border:1.5px solid #74846a;border-radius:50%;pointer-events:auto;cursor:ew-resize}
-.due-range input[type=range]:focus-visible{outline:none;z-index:2}
-.due-range input[type=range]:focus-visible::-webkit-slider-thumb{outline:3px solid #3e6890;outline-offset:3px}
-.due-range input[type=range]:focus-visible::-moz-range-thumb{outline:3px solid #3e6890;outline-offset:3px}
-.range-ticks{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin:0 0 17px}
-.filter-section .filter-explanation{margin-top:10px}
 
-.room-filter-sheet .filter-section:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
 /* Keep the comparison table;
 
 /* Match Inspection's pen identity row; the farrowing list has no feed summary. */
