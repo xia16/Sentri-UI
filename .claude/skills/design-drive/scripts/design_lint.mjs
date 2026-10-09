@@ -71,7 +71,7 @@ export function tokenSets(repo, cfg) {
   const radius = new Set([0, ...(t.radius?.tokens || []).map(x => px(x.value)), ...(extra.radius || [])].filter(v => v != null));
   const hex = v => String(v).toLowerCase();
   const colors = new Set([...(t.color?.tokens || []).map(x => hex(x.value)), ...(extra.colors || []).map(hex)]);
-  const touch = px((t.size?.tokens || []).find(x => x.name === 'touch-min')?.value) || 44;
+  const touch = px((t.size?.tokens || []).find(x => x.name === 'tap-min')?.value) || 48;
   return { spacing: [...spacing], fontSize: [...fontSize], radius: [...radius], colors: [...colors], touch };
 }
 

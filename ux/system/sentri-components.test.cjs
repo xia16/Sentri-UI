@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const vm = require('node:vm');
 const fs = require('node:fs');
 const context = {};
-vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'sentri-components.js'),'utf8'), context);
+vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'../design-system/components/bundle.js'),'utf8'), context);
 const ui = context.SentriUI;
 
 test('titles escape supplied text while preserving a caller-owned action', () => {

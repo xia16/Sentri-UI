@@ -61,7 +61,7 @@ Compose it from four calls:
 - **Optional fields clear through a visible `Clear`:**
   - While an optional field (`optional` set) holds a value, a `Clear` text action shows: at the right end of the rows' heading, or under the inline label.
   - `data-action` is `"<action>-clear"` and `data-value` is the field key. Tapping the chosen radio again does nothing.
-  - An inline optional field **reserves the Clear slot** (44px) even when nothing is chosen, so the row never changes shape.
+  - An inline optional field **reserves the Clear slot** (48px) even when nothing is chosen, so the row never changes shape.
 - A fifth outcome makes it a picker; four long ones use rows.
 
 **Mono labels:** `mono: true` on a row or an option sets the label in IBM Plex Mono. **It is for Latin letter and digit codes only** (crate codes, ear tags: `A02`, `000254`). Other text warns in development.

@@ -31,7 +31,7 @@ for _s in (sys.stdout, sys.stderr):
         pass
 
 CONFIG = Path("docs/agents/design.md")
-CORE = ("color", "type", "spacing", "radius", "touch-min")
+CORE = ("color", "type", "spacing", "radius", "tap-min")
 SEMVER = re.compile(r"^\d+\.\d+\.\d+$")
 COVER = "Cover"  # the Design System type's title card, not a component
 STATES = re.compile(r"^(?:#+\s*|\*\*)States\b", re.M)
@@ -81,7 +81,7 @@ def check_tokens(ds: Path, r: Report) -> dict:
         "type": any(s.get("fontSize") for g in t.get("type", {}).get("groups", []) for s in g.get("styles", [])),
         "spacing": bool(t.get("spacing", {}).get("tokens")),
         "radius": bool(t.get("radius", {}).get("tokens")),
-        "touch-min": any(x.get("name") == "touch-min" for x in t.get("size", {}).get("tokens", [])),
+        "tap-min": any(x.get("name") == "tap-min" for x in t.get("size", {}).get("tokens", [])),
     }
     for k in CORE:
         if not present[k]:

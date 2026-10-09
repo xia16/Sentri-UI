@@ -1,3 +1,4 @@
+/* Retired — use ux/design-system/components/bundle.* (kept for the owner to delete; no page loads this file). */
 /* Canonical shared components, loaded after legacy prototype styles.
    Context belongs to the containing page/drawer, not its individual panels. */
 :root{--st-canvas:#f6f7f1;--st-paper:#fff;--st-inset:#f6f8f1;--st-ink:#20291f;--st-muted:#657060;--st-line:#dfe4d8;--st-rule:#e8eddf;--st-panel-bg:var(--st-paper);--st-space-section:24px;--st-radius:18px;--drawer-compact-max:42%;--drawer-short-max:58%;--drawer-medium-height:76%;--drawer-medium-max:76%;--drawer-long-height:85%;--drawer-long-max:85%}

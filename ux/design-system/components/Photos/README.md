@@ -11,13 +11,13 @@ Photos is the optional row ([Field](../Field/README.md)) with the camera as its 
 **Anatomy**
 - **Card:** a `well` fill with **no outline**. This is the owner's craft-pass ruling: the emptiest element must not have the strongest border.
   - `radius-control`, `space-row-x` padding on the left.
-  - Empty, it is one `touch-min` (44px) row.
+  - Empty, it is one `tap-min` (48px) row.
   - It sits **20px** below the field before it, so a thumb overshooting `Other +` cannot hit the camera.
 - **Header row:**
   - The label at `row-title` (13px/500), then the optional word at `description` in `muted`.
   - Then the count (`3 attached · 1 waiting to upload`: tokens, the upload value amber).
   - The camera sits at the right end.
-- **Camera:** a `touch-min` circle with a `paper` fill, a **`ring-width-fine` (1.5px) ring in `muted`** (the rulings' ink3 maps to `muted`), and the registry's `camera` glyph at `glyph-pad` in `ink`.
+- **Camera:** a `tap-min` circle with a `paper` fill, a **`ring-width-fine` (1.5px) ring in `muted`** (the rulings' ink3 maps to `muted`), and the registry's `camera` glyph at `glyph-pad` in `ink`.
   - It is deliberately not the keys' squircle, so it never reads as another +.
   - The word lives in the label; the button is the glyph, with a spoken label.
 - **Answer line:** one persistent `role="status"` line **directly under the header row**, 12px, referenced by the camera. It takes no space while empty.
@@ -43,7 +43,7 @@ Photos is the optional row ([Field](../Field/README.md)) with the camera as its 
 - **Pressed:** the camera fills `press`.
 - **Focus:** a 3px `focus` ring at 2px offset on the camera and on a thumbnail.
 - **Loading:** not drawn. A pending upload is the amber count and dot, not a spinner.
-- **Empty:** the one 44px row. The card is present whenever the sheet takes photos.
+- **Empty:** the one 48px row. The card is present whenever the sheet takes photos.
 
 **Component contract**
 - **Props:** `label`, `optional`, `count`, `active`, `items: [{ id, src, alt, pending }]`, `max = 12`, `action = 'photo-add'`, `viewAction = 'photo-view'`, `key`, `hint`, `error: '' | 'denied' | 'too-large' | 'cancelled'`, `id`, `className`, `strs`, `args`.

@@ -33,7 +33,7 @@ TOKENS = {
     "type": {"groups": [{"name": "Text", "styles": [{"name": "body", "fontSize": "14px"}]}]},
     "spacing": {"tokens": [{"name": "s", "value": "8px"}, {"name": "m", "value": "16px"}]},
     "radius": {"tokens": [{"name": "control", "value": "8px"}]},
-    "size": {"tokens": [{"name": "touch-min", "value": "44px"}]},
+    "size": {"tokens": [{"name": "tap-min", "value": "44px"}]},
 }
 STRINGS = {
     "verbs": {"Record": {"meaning": "commit one observation", "zh": "记录"}},

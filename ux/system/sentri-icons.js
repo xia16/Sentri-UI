@@ -1,3 +1,4 @@
+/* Retired — use ux/design-system/components/bundle.* (kept for the owner to delete; no page loads this file). */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
 (function(root){

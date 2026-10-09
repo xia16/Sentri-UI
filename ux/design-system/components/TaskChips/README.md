@@ -7,7 +7,7 @@ One row of filter chips over a task list: `All · Iron 4 · Castrate 6 · Tag 5 
 **Anatomy** (`.tk-chips`, `data-ds="TaskChips"`)
 - **Row:** `app-background`, padded `6px 0 9px`. The track (`.tk-chips-track`) scrolls sideways with no scrollbar, starts at `space-gutter`, `space-key-gap` (8px) between chips.
 - **End of the row:** a trailing spacer `space-gutter` wide and a `space-gutter` fade on the right edge. Scrolled to the end, the last chip sits clear of the fade: never cut, never under the edge. While more chips are to the right, the fade says so.
-- **Chip** (`.tk-chips-chip`): `touch-min` (44px) tall, `space-row-x` side padding, `well`, 1px `line`, `radius-segment` (10px). The label in `row-title` 13px `tab-ink`; the count after it, `space-key-gap` apart, in `meta` 10px/500 mono `muted`.
+- **Chip** (`.tk-chips-chip`): `tap-min` (48px) tall, `space-row-x` side padding, `well`, 1px `line`, `radius-segment` (10px). The label in `row-title` 13px `tab-ink`; the count after it, `space-key-gap` apart, in `meta` 10px/500 mono `muted`.
 - **Chosen chip** (`aria-checked="true"`): farrowing's pressed segment — `paper`, label 500 `ink`, shadow `0 1px 3px`.
 
 **States**

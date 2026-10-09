@@ -10,7 +10,7 @@ The footer and bar actions. It is a CSS component (`<button class="button primar
 - Back is `surface-back`: 86 × 48, `back-border`, on the left. A lone Back fills the footer and turns `ink`.
 
 **Geometry**
-- 48px high in footers and 44px minimum anywhere else.
+- 48px (`tap-min`) high everywhere.
 - `radius-control` (12px), 14px/500 label.
 - Pressing darkens the button to `brightness(.96)` and moves it down 1px.
 
@@ -44,7 +44,7 @@ The footer and bar actions. It is a CSS component (`<button class="button primar
   - Pressed, it darkens with the standard `brightness(.96)` and moves down 1px. `choice-press` on `well` is 1.05:1 and would not show.
 - **Text** is `register: 'text'` (`.st-text-action`): the quietest register.
   - A bare word at `row-title` (13px) in **`type-weight-strong` (700)** and **`ink-2`** (the rulings' ink2, 8.3:1 on `paper`).
-  - No container, and a hit area of at least `touch-min` in both directions.
+  - No container, and a hit area of at least `tap-min` in both directions.
   - Pressed, it turns `ink` over a transient `press` fill.
   - It sits right-aligned on the row it acts on, and is present only while it applies (`Clear` on a draft, a floor pointer such as `Wrong count? Edit`).
 

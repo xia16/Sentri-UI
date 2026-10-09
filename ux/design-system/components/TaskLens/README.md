@@ -7,7 +7,7 @@ The lens tabs over the grouped list, **each with its count under the label**, an
 **Anatomy** (`.tk-lens`, `data-ds="TaskLens"`)
 - Sticky at `top: 0`, `app-background`, padded `6px 0 9px` with a 1px transparent bottom edge (68px in all).
 - **Bar:** margin `0 space-panel`, 7px gap.
-- **Tabs** (`.tk-lens-tabs`): `well` track, 1px `line`, `radius-segment`, 3px padding, 1px gaps. Each tab is `touch-min` tall, `radius-tab` (7px), a column: the label in `description` 11px `muted`, 3px above the count in `meta` 10px/500 mono `muted`.
+- **Tabs** (`.tk-lens-tabs`): `well` track, 1px `line`, `radius-segment`, 3px padding, 1px gaps. Each tab is `tap-min` tall, `radius-tab` (7px), a column: the label in `description` 11px `muted`, 3px above the count in `meta` 10px/500 mono `muted`.
 - **Pressed tab** (`aria-pressed="true"`): `paper`, label 500 `ink`, shadow `0 1px 3px`.
 - **Filter** (`.tk-lens-filter`): `control-height` square (48px), `paper`, 1px `line`, `radius-control`, the filter glyph at 17px.
 

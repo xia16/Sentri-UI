@@ -9,7 +9,7 @@
 .inspection-phone .sheet>.utility-header .st-heading-title{overflow-wrap:anywhere;}
 .inspection-phone .sheet>.sheet-body{min-height:0;}
 .inspection-phone .sheet-footer{min-height:68px;padding:12px 18px max(12px,env(safe-area-inset-bottom));gap:10px;}
-.inspection-phone .sheet-footer .button{min-height:44px;}
+.inspection-phone .sheet-footer .button{min-height:var(--tap-min);}
 .inspection-phone .sheet-footer .text-button{min-height:44px;padding:10px 8px;}
 .inspection-phone .sheet-footer .button.primary[data-action^="save-"]:disabled,
 .inspection-phone .sheet-footer .button.primary[data-action^="record-"]:disabled{opacity:.55;}
@@ -110,8 +110,8 @@
 }
 
 /* Keep compact controls reachable on touch screens without changing desktop study chrome. */
-.inspection-phone :is(.catalog-search input,.stage-legend button,.record-tabs button,.inspection-filter-summary .text-button,.unit-summary-heading .text-button,.profile-details-link,.dock-selection-summary .selection-review,.feed-percent-control input[type="number"],.feed-range-labels .text-button,.feed-amount-fields input[type="range"],.log-results .text-button,.instruction-detail .text-button,.bulk-reading input){min-height:44px;}
-.inspection-phone .bulk-controls :is(input,select,textarea){min-height:44px;}
+.inspection-phone :is(.catalog-search input,.stage-legend button,.record-tabs button,.inspection-filter-summary .text-button,.unit-summary-heading .text-button,.profile-details-link,.dock-selection-summary .selection-review,.feed-percent-control input[type="number"],.feed-range-labels .text-button,.feed-amount-fields input[type="range"],.log-results .text-button,.instruction-detail .text-button,.bulk-reading input){min-height:var(--tap-min);}
+.inspection-phone .bulk-controls :is(input,select,textarea){min-height:var(--tap-min);}
 
 /* Bulk records: the pigs are the page; details float over the list as a card.
    The list keeps the full page height and scrolls behind the panel; its bottom

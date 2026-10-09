@@ -19,7 +19,7 @@ Call `SentriUI.numpad({ label, value, unit, placeholder, suggested, decimals, ma
   - Under it sits the same box as an active Measure: an `ink` border at `caret-width`, a mono `figure` value, a caret, and the unit when there is one.
   - The **value** is a polite live region, so typing announces only the value, never the label.
 - **Feedback region.** It is **bounded**. Its heights are fixed and it scrolls inside itself, so no feedback ever moves the keys.
-  - **Status line** (`role="status"`, always mounted, which the key group points to with `aria-describedby`). It is `touch-min` (44px) tall: room for two lines of `input` 14px (the longest duplicate warning in en or zh) or one line with a text action.
+  - **Status line** (`role="status"`, always mounted, which the key group points to with `aria-describedby`). It is `tap-min` (48px) tall: room for two lines of `input` 14px (the longest duplicate warning in en or zh) or one line with a text action.
   - **Running list** (run use only). Three lines of mono 14px `ink`, newest first, indented to the value's left edge (`000257 · 1.51 kg`). The space is reserved even when the list is empty.
 - **The keys never move.** The readout and the feedback region hold fixed heights, so the keys sit at the same place for every piglet and in every state. The demo measures this: 218px from the top of the pad in all 15 run states, en and zh, at 360 and 390.
 - **No commit key.** The surface's bar holds the one primary (`Record · next piglet`, or the drawer's `Save`).
@@ -108,7 +108,7 @@ Call `SentriUI.numpad({ label, value, unit, placeholder, suggested, decimals, ma
 **Status: candidate.** `compact: true` is the run without its three-line running list.
 - Use it for a run that must fit one 360 × 740 phone with a field above the pad (the tag and weigh run with the sex field).
 - The host speaks the last record in the status line instead (`Last 000257 · 1.51 kg`, with a text action such as `Edit piglet 4`).
-- The status line keeps its reserved `touch-min` height, so the keys still never move.
+- The status line keeps its reserved `tap-min` height, so the keys still never move.
 - The readout, the keys and the event contract are unchanged.
 
 **Component contract**

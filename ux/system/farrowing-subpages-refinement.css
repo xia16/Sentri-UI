@@ -68,7 +68,7 @@
 .farrowing-phone .sheet[data-view=locked] .record-inline-actions{padding-top:4px}
 
 /* History and death breakdown pages. */
-.farrowing-phone .detail-sheet[data-size] .sheet-body{padding:20px var(--subpage-pad) 24px}
+.farrowing-phone .sheet.detail-sheet[data-size] .sheet-body{padding:20px var(--subpage-pad) 24px}
 .farrowing-phone .death-breakdown-facts{margin:0;border:1px solid var(--line);border-radius:var(--subpage-radius);background:var(--surface,#f8faf5);padding:4px 14px}
 .farrowing-phone .death-breakdown-facts>div{display:flex;justify-content:space-between;align-items:center;min-height:48px;border-bottom:1px solid var(--line)}
 .farrowing-phone .death-breakdown-facts>div:last-child{border-bottom:0}
@@ -116,3 +116,6 @@
 
 /* Optional finish details follow the same add-detail button convention as treatment. */
 .finish-extras>.finish-field{margin-top:12px}
+/* Farrowing's Finish form: the optional rows (moved here from the retired sentri-components.css; they name Farrowing classes) */
+.farrowing-phone .finish-extras>.st-optional-row:first-child{margin-top:0}
+.farrowing-phone .finish-field-answer{justify-content:flex-end;min-height:54px}

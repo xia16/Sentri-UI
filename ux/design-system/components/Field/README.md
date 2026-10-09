@@ -8,7 +8,7 @@ Call `SentriUI.field({ label, control, className, ds })`. `label` and `control` 
 - Root: `<label class="field">`, a column with a 9px gap and an 18px top margin, so stacked fields keep their rhythm without a wrapper.
 - Label: 12px/600 in `ink`, above the control.
 - Control: an `input`, `textarea` or `select` gets the field skin, and a `button` (as in `PickerField`) supplies its own.
-- The skin: at least `field-height` (46px), 12px padding, a 1px border, `paper`, a 14px value. A textarea is 90px high with a 1.6 line height and resizes vertically.
+- The skin: at least `field-height` (48px), 12px padding, a 1px border, `paper`, a 14px value. A textarea is 90px high with a 1.6 line height and resizes vertically.
 
 **What the caller provides**
 - `label`: a noun in sentence case ("Cause of death", "Weight (kg)"). Put the unit in the label, never in the value.
@@ -34,7 +34,7 @@ Call `SentriUI.field({ label, control, className, ds })`. `label` and `control` 
 ## Variant: the optional row
 
 Every optional input in a record sheet is an **optional row**, `SentriUI.optionalRow({ label, value, icon, editIcon, action | inline, key, open, optionalWord })`. It is the Photos header pattern for any field.
-- **Anatomy:** a full-width `touch-min` row on `well`, `space-row-x` padding on the left. The label is `row-title` (13px/500), then the word "Optional" at `description` in `muted`. The trailing action is a ringed icon circle (`ring-width-fine` in `muted`, `paper` fill), the same as Photos' camera.
+- **Anatomy:** a full-width `tap-min` row on `well`, `space-row-x` padding on the left. The label is `row-title` (13px/500), then the word "Optional" at `description` in `muted`. The trailing action is a ringed icon circle (`ring-width-fine` in `muted`, `paper` fill), the same as Photos' camera.
 - **Empty:** the label, "Optional" and the `icon` (plus, or the camera for Photos).
 - **Tap:** the row and the action are one tap target. `action` asks the host to open the field (picker, note editor, camera). `inline` reveals the field's own markup under the row instead (a note, a brand).
 - **Filled:** the value is the row's answer line (12px, `ink`, one line, ellipsis) and the action becomes `editIcon` (edit). The word stays.

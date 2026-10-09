@@ -21,7 +21,7 @@ Call `SentriUI.banner({ tone, headline, consequence, summary, actions, live, id 
   - `danger`: **`type-weight-strong` (700)** in `red`, the ruled 14/700 red headline.
   - `correction`: 600 in `ink`.
 - **Consequence:** `choice-meta` (12px) in IBM Plex Mono, `muted` (the ruled "12 mono ink2"). It says what the act costs, or gives the stamp.
-- **Summary (correction):** a row at least `touch-min` tall under an `amber` rule.
+- **Summary (correction):** a row at least `tap-min` tall under an `amber` rule.
   - The text is 12px/500 mono in `ink`, one token per corrected figure, joined by the `·` text node. The corrected value is `amber` at 600 (the correction mark is the amber value).
   - `Clear` is a text action at the right end, `space-row-y` from the text.
 

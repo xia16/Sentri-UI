@@ -13,7 +13,7 @@ Every drawer in a task: **grab, title, subtitle, ✕, divider, scrolling body, f
 - **Head** (`.tk-sheet-head`): padded `5px space-gutter-sheet 17px`, a 1px `line` divider under it, items at the top, 10px gap.
   - **Title:** `sheet-title` 20px/500/1.3, −0.4px, `ink`.
   - **Subtitle:** 6px under it, `description` 11px/1.6 `muted` (`000418 · B1 · Parity 3`). Parts may carry colour (`1 unsaved` green).
-  - **✕** (`.tk-sheet-close`): `touch-min` square, `radius-segment`, transparent, the close glyph at 20px. `aside` replaces it with a text action (`Clear`) while a draft exists.
+  - **✕** (`.tk-sheet-close`): `tap-min` square, `radius-segment`, transparent, the close glyph at 20px. `aside` replaces it with a text action (`Clear`) while a draft exists.
 - **Body** (`.tk-sheet-body`): padded `18px space-gutter-sheet space-panel`, scrolls (`overscroll-behavior: contain`).
 - **Footer** (`.tk-footer`, `data-ds="TaskFooter"`): always the drawer's last child. `paper`, 1px `line` on top, padded `space-row-x space-gutter-sheet space-footer-bottom` (14 / 21 / 28), 14px gap, the 92×4 `handle` bar 8px from the bottom.
   - **Back** (`.tk-back`): `back-width` × `control-height` (86 × 48), `paper`, 1px `back-border`, `radius-control`, a 16px chevron-left 4px before `Back` (14px/500). Alone in the footer it fills it in the primary's face (`ink`, 600).

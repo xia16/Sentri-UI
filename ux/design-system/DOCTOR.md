@@ -8,8 +8,8 @@ output.
 ## Core — present
 
 Colour (40 tokens, with usage and contrast), type (19 styles over two
-families), spacing (11), radius (6), shadow (3), size including `touch-min`
-44px, drawer heights. All required core categories exist.
+families), spacing (11), radius (6), shadow (3), size including `tap-min`
+48px, drawer heights. All required core categories exist.
 
 ## Gaps
 
