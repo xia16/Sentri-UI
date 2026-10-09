@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T20:17:54.534Z",
- "commit": "66b6170",
+ "generated": "2026-10-09T20:27:05.567Z",
+ "commit": "b800abc",
  "platforms": [
   {
    "id": "mobile",
@@ -11239,44 +11239,40 @@
   {
    "name": "Button",
    "group": "Base",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "round": 3,
+    "status": "agent-checked",
+    "round": 4,
+    "regate": "after cap, on main b800abc",
     "judged": "2026-10-10",
-    "commit": "bfd0fa8",
+    "commit": "b800abc",
     "model": "claude-opus-5-5",
     "previous": {
-     "round": 2,
+     "round": 3,
      "judged": "2026-10-10",
-     "commit": "40bb120",
-     "lowest": 6,
+     "commit": "bfd0fa8",
+     "lowest": 5,
      "status": "in-design",
      "findings": [
       {
        "severity": "high",
-       "text": "Tool preview at 375px: nowrap Long / Chinese label clipped and scrolled the page; preview showed icon + label.",
-       "result": "fixed: tool preview is label-only, 343x48, the Chinese label ellipsizes with the full label in title; standalone preview scrollWidth 375."
-      },
-      {
-       "severity": "medium",
-       "text": "Disabled text action and disabled tool kept enabled ink.",
-       "result": "fixed: disabled text action and disabled tool compute disabled ink rgb(146,153,141); tool takes the disabled surface."
+       "text": "Atlas component page Overview for Button renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render; only the landing Overview breaks). Broken since round 1 (033fa58).",
+       "result": "fixed: preview.html no longer fetches/constructs URLs; Overview shows Primary, Secondary, Text action, Hold (danger + primary), Tool, Destructive; console clean."
       },
       {
        "severity": "low",
-       "text": "End walk class rendered twice.",
-       "result": "fixed on Inspection (\"button primary finish-walk\"). The same doubling remains on Farrowing's Scan ear tag (new low finding)."
+       "text": "Farrowing Scan ear tag still renders class \"button primary button primary dock-scan\" (the End walk doubling, fixed only on Inspection).",
+       "result": "fixed: farrowing btn() strips button/primary; Scan ear tag renders \"button primary dock-scan\"; no duplicate class tokens on any screen checked."
       },
       {
        "severity": "low",
-       "text": "Host raw colours: task-end-early #fff1ee; .button.primary #20291f.",
-       "result": "fixed: task-end-early rule deleted; #20291f override replaced by var(--ink)."
+       "text": "README tokens list space-1, which tokens.css does not define (the CSS uses border-width).",
+       "result": "fixed: README tokens list border-width."
       },
       {
        "severity": "low",
-       "text": "Destructive preview's disabled reason was a piglet reason.",
-       "result": "not fixed: variants/destructive.html still says \"Choose the piglets first.\""
+       "text": "Destructive preview's disabled reason is a piglet reason (\"Choose the piglets first.\").",
+       "result": "fixed: destructive reason is \"Saved records keep their photos.\""
       }
      ]
     },
@@ -11285,9 +11281,9 @@
      "budget": 8,
      "hierarchy": 8,
      "spacing": 8,
-     "broken": 5
+     "broken": 8
     },
-    "lowest": 5,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
@@ -11317,7 +11313,7 @@
      {
       "line": 6,
       "pass": true,
-      "why": "Every Button on Farrowing, Inspection walk/filters, the Piglet pen sheet and the 375 preview is >= 48 tall (tools 111x48, End walk 95x48)."
+      "why": "390x844 bare: Scan ear tag 217x48, End walk 95x48, tools 111x48, Back 86x48 (86x56 beside a hold), Untick 79x48, hold 248-254x56; nothing under 48 on farrowing.finish/room, inspection.walk/filters/pen/review-selected/actions, piglet sheet-todo/give-ids/end-task, workbench.choose-unit."
      },
      {
       "line": 7,
@@ -11342,7 +11338,7 @@
      {
       "line": 11,
       "pass": true,
-      "why": "Component and host CSS on tokens; README still lists an undefined space-1 token (low)."
+      "why": "Component and host CSS on tokens; README now lists border-width. Every variant specimen page still writes border-bottom:var(--space-1) (undefined token) - harness only, low."
      },
      {
       "line": 12,
@@ -11361,8 +11357,8 @@
      },
      {
       "line": 15,
-      "pass": false,
-      "why": "Standalone preview is clean at 375, but the atlas component page Overview renders no buttons: \"Failed to construct 'URL': Invalid URL\"."
+      "pass": true,
+      "why": "Atlas Overview now renders all six variant cells; every variant tab renders all cells; console clean, no 404s; 390x844 screens have no horizontal scroll."
      }
     ],
     "classification": "component",
@@ -11385,7 +11381,7 @@
        "broken": 8
       },
       "findings": [
-       "End walk class now single on Inspection; Farrowing Scan ear tag still renders \"button primary button primary dock-scan\"."
+       "Scan ear tag doubling fixed; End walk 95x48."
       ]
      },
      {
@@ -11421,7 +11417,7 @@
        "broken": 8
       },
       "findings": [
-       "Disabled now uses disabled ink."
+       "Inspection review-selected Untick is now secondary (79x48), not a text action."
       ]
      },
      {
@@ -11472,30 +11468,20 @@
        "broken": 8
       },
       "findings": [
-       "Disabled reason in the preview is still a piglet reason."
+       "Reason now a photo reason."
       ]
      }
     ],
     "findings": [
      {
-      "severity": "high",
-      "text": "Atlas component page Overview for Button renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render; only the landing Overview breaks). Broken since round 1 (033fa58).",
-      "fix": "In preview.html resolve against a real base (parent.location.href when location is about:srcdoc, else document.baseURI) for both bundle.js and fetch('variants/'+id+'.html') - or drop the fetch/srcdoc loop and use plain iframes src=variants/<id>.html."
+      "severity": "low",
+      "text": "Every Button and IconButton variant specimen page styles its example separator with var(--space-1), a token tokens.css does not define (the separator silently drops).",
+      "fix": "Replace var(--space-1) with var(--border-width) in variants/*.html."
      },
      {
       "severity": "low",
-      "text": "Farrowing Scan ear tag still renders class \"button primary button primary dock-scan\" (the End walk doubling, fixed only on Inspection).",
-      "fix": "Strip button/primary from className in farrowing-astra-concept.js btn() as inspection-astra-concept.js now does."
-     },
-     {
-      "severity": "low",
-      "text": "README tokens list space-1, which tokens.css does not define (the CSS uses border-width).",
-      "fix": "Replace space-1 with border-width in README line 75."
-     },
-     {
-      "severity": "low",
-      "text": "Destructive preview's disabled reason is a piglet reason (\"Choose the piglets first.\").",
-      "fix": "Use a photo reason in variants/destructive.html, e.g. \"Saved records keep their photos.\""
+      "text": "Sheets show both a header close (X) and a footer Back that do the same thing (Farrowing finish, Piglet pen sheet) - the same act offered twice.",
+      "fix": "Keep one return per sheet: footer Back where a footer exists, else the X; or record the pair as the rule in Sheet."
      }
     ],
     "proposals": []
@@ -11515,34 +11501,35 @@
   {
    "name": "IconButton",
    "group": "Base",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "round": 3,
+    "status": "agent-checked",
+    "round": 4,
+    "regate": "after cap, on main b800abc",
     "judged": "2026-10-10",
-    "commit": "bfd0fa8",
+    "commit": "b800abc",
     "model": "claude-opus-5-5",
     "previous": {
-     "round": 2,
+     "round": 3,
      "judged": "2026-10-10",
-     "commit": "40bb120",
-     "lowest": 7,
+     "commit": "bfd0fa8",
+     "lowest": 5,
      "status": "in-design",
      "findings": [
       {
-       "severity": "medium",
-       "text": "README copied Button rows (hold, Escape, labels wrap, one primary per bar).",
-       "result": "fixed: README rewritten for IconButton; no hold/Escape/wrap/primary rows remain."
+       "severity": "high",
+       "text": "Atlas component page Overview for IconButton renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render). Broken since round 1 (033fa58).",
+       "result": "fixed: Overview renders both variants; console clean."
       },
       {
        "severity": "low",
-       "text": "Raw radius fork .photo-title .icon-button{border-radius:10px}.",
-       "result": "fixed: rule deleted; every IconButton measured computes 12px (radius-control)."
+       "text": "README tokens list space-1, which tokens.css does not define.",
+       "result": "fixed: README tokens list border-width."
       },
       {
        "severity": "low",
-       "text": "Piglet sheet close labelled just \"Close\".",
-       "result": "fixed: \"Close pen sheet\" / zh \"关闭猪栏页\", 48x48."
+       "text": "Related table's first row links Button / IconButton from IconButton's own README.",
+       "result": "fixed: Related table's row is just Button."
       }
      ]
     },
@@ -11551,9 +11538,9 @@
      "budget": 8,
      "hierarchy": 8,
      "spacing": 8,
-     "broken": 5
+     "broken": 8
     },
-    "lowest": 5,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
@@ -11583,7 +11570,7 @@
      {
       "line": 6,
       "pass": true,
-      "why": "Every IconButton on Farrowing, Inspection walk/filters, the Piglet pen sheet and the preview is 48x48."
+      "why": "Every IconButton on farrowing.finish/room, inspection walk/filters/review-selected, piglet sheet-todo/give-ids and workbench.choose-unit is 48x48."
      },
      {
       "line": 7,
@@ -11597,8 +11584,8 @@
      },
      {
       "line": 9,
-      "pass": true,
-      "why": "Accessible names name the subject (Close pen sheet, Close Filter pigs)."
+      "pass": false,
+      "why": "Inspection Filter pigs sheet close is now just \"Close\": FilterSheet (#75) passes no label, regressing round 3's \"Close Filter pigs\". Others name the subject (Close pen sheet, Close Selected, Close dialog)."
      },
      {
       "line": 10,
@@ -11608,7 +11595,7 @@
      {
       "line": 11,
       "pass": true,
-      "why": "Radius fork gone; CSS on tokens. README lists undefined space-1 (low)."
+      "why": "Radius 12px everywhere measured; README lists border-width. Specimen pages use undefined var(--space-1) for separators (low)."
      },
      {
       "line": 12,
@@ -11623,12 +11610,12 @@
      {
       "line": 14,
       "pass": true,
-      "why": "Related table and classification present (first row links IconButton to itself)."
+      "why": "Related table now just Button; classification present."
      },
      {
       "line": 15,
-      "pass": false,
-      "why": "Standalone preview clean at 375, but the atlas component Overview renders nothing: \"Failed to construct 'URL': Invalid URL\"."
+      "pass": true,
+      "why": "Atlas Overview renders the bordered and plain cells; Bordered and Plain tabs render all 7 cells; console clean, no 404s."
      }
     ],
     "classification": "component",
@@ -11657,6 +11644,8 @@
        "farrowing.finish",
        "piglet-processing.sheet-todo",
        "inspection.filters",
+       "inspection.review-selected",
+       "workbench.choose-unit",
        "piglet-processing.give-ids"
       ],
       "status": "agent-checked",
@@ -11668,25 +11657,25 @@
        "broken": 8
       },
       "findings": [
-       "Every sheet close measured now names its sheet."
+       "Inspection Filter pigs close is a bare \"Close\" (via FilterSheet)."
       ]
      }
     ],
     "findings": [
      {
-      "severity": "high",
-      "text": "Atlas component page Overview for IconButton renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render). Broken since round 1 (033fa58).",
-      "fix": "Same fix as Button: resolve bundle.js and variants/<id>.html against a real base (parent.location.href when location is about:srcdoc), or use plain iframes src=variants/<id>.html."
+      "severity": "medium",
+      "text": "New in use: the Inspection Filter pigs sheet close reads just \"Close\" - FilterSheet's drawer defaults closeLabel to 'Close' and inspection passes none (was \"Close Filter pigs\" in round 3).",
+      "fix": "In FilterSheet default the close label to 'Close '+title (and the zh string), or pass close:{label:{text:'Close Filter pigs'}} from inspection-astra-concept.js."
      },
      {
       "severity": "low",
-      "text": "README tokens list space-1, which tokens.css does not define.",
-      "fix": "Replace space-1 with border-width in README line 65."
+      "text": "Farrowing finish close is named \"Close finish drawer\" - 'drawer' is build jargon, not the sheet's title.",
+      "fix": "Name it \"Close Finish farrowing\"."
      },
      {
       "severity": "low",
-      "text": "Related table's first row links Button / IconButton from IconButton's own README.",
-      "fix": "Make the row just Button: labelled acts, used when the act needs a visible verb."
+      "text": "Variant specimen pages use undefined var(--space-1) for separators.",
+      "fix": "Use var(--border-width)."
      }
     ],
     "proposals": []
@@ -12088,21 +12077,56 @@
   {
    "name": "Row",
    "group": "Base",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "round": 3,
+    "status": "agent-checked",
+    "round": 4,
+    "regate": "after cap, on main b800abc",
     "judged": "2026-10-10",
-    "commit": "8f50a3c",
+    "commit": "b800abc",
     "model": "claude-opus-5-5",
+    "previous": {
+     "round": 3,
+     "judged": "2026-10-10",
+     "commit": "8f50a3c",
+     "lowest": 7,
+     "status": "in-design",
+     "findings": [
+      {
+       "severity": "medium",
+       "text": "Line 15: proof/ has no state PNGs for tick or select-door (selectable PNGs deleted, nothing added); verification.md says every state is in proof/.",
+       "result": "fixed: tick-* and select-door-* PNGs in proof/."
+      },
+      {
+       "severity": "medium",
+       "text": "README still ends with 'Addendum (round 1 fixes)' that contradicts the main text: a 'Selectable checkbox' section and 'it is still a proposed select + door variant'; tick and select + door are described twice.",
+       "result": "fixed: addendum deleted; Plain line moved into Variants."
+      },
+      {
+       "severity": "low",
+       "text": "README says select + door covers 'Inspection pens (header box)', but the pen header is still a hand-built label.check-target + pen-name button, so rowSelect (no door) has no caller.",
+       "result": "fixed: Inspection pen header renders rowSelect (48x48 box, mixed state) beside the pen door."
+      },
+      {
+       "severity": "low",
+       "text": "A ticked piglet item turns into door-act with a count act and inline chevron; no specimen shows this state.",
+       "result": "fixed: Tick tab has a Ticked + count act state matching the piglet sheet in use."
+      },
+      {
+       "severity": "low",
+       "text": "Plain (Show toggle) reports data-variant=plain but is not in variants.json.",
+       "result": "not fixed: variants.json still has no plain; piglet sheet's Show/Dock tail row reports data-variant=plain."
+      }
+     ]
+    },
     "scores": {
-     "clarity": 7,
-     "budget": 7,
+     "clarity": 8,
+     "budget": 8,
      "hierarchy": 8,
      "spacing": 8,
      "broken": 8
     },
-    "lowest": 7,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
@@ -12122,7 +12146,7 @@
      {
       "line": 4,
       "pass": true,
-      "why": "Selectable folded away; tick and select + door carry usedBy and the atlas shows Used by."
+      "why": "Eight variants with usedBy; a Show/Hide toggle still reports data-variant=plain but variants.json omits plain (low)."
      },
      {
       "line": 5,
@@ -12132,7 +12156,7 @@
      {
       "line": 6,
       "pass": true,
-      "why": "390px: pig/pen box 24px in a 48x48 label (all edges hit), door 290x70-77, tick rows 346x68, scope 346x68, animal 356x76."
+      "why": "390x844: animal 356x76-84, ticked piglet item door 213x68 + act 93x48, tick 346x68, select-door 352x70-77 with 48x48 box, pen header box 48x48, navigation 352x68, scope 348x68; nothing under 48."
      },
      {
       "line": 7,
@@ -12142,7 +12166,7 @@
      {
       "line": 8,
       "pass": true,
-      "why": "Ring vs check disc, native checkbox (incl. mixed pen header), Done chip only after save."
+      "why": "Native checkbox incl. pen header mixed (indeterminate=true when 1 of 3 pigs selected); ring vs check disc; Done chip after save."
      },
      {
       "line": 9,
@@ -12172,12 +12196,12 @@
      {
       "line": 14,
       "pass": true,
-      "why": "TaskRow aliases, TaskDay arrangement, Home card pattern."
+      "why": "TaskRow aliases, TaskDay arrangement, Home card pattern; README addendum gone."
      },
      {
       "line": 15,
-      "pass": false,
-      "why": "proof/ still has no tick-* or select-door-* PNGs (only three in-use shots in a scratchpad); verification.md claims every state is in proof/."
+      "pass": true,
+      "why": "proof/ now holds tick-{default,ticked,ticked-count-act,pressed,long-label-chinese} and select-door-{default,pressed-door,selected,selected-pressed,no-door,long-label-chinese}; every atlas tab renders all cells; console clean, no 404s."
      }
     ],
     "classification": "component",
@@ -12206,7 +12230,7 @@
       ],
       "status": "agent-checked",
       "scores": {
-       "clarity": 9,
+       "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
@@ -12228,9 +12252,7 @@
        "spacing": 8,
        "broken": 8
       },
-      "findings": [
-       "A ticked piglet item becomes door-act (inline chevron + '2 piglets' act); no tick or door-act specimen shows it."
-      ]
+      "findings": []
      },
      {
       "name": "scope",
@@ -12283,7 +12305,7 @@
       "usedBy": [
        "piglet-processing.sheet-todo"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
@@ -12292,8 +12314,7 @@
        "broken": 8
       },
       "findings": [
-       "No proof/tick-*.png (line 15).",
-       "Ticked state in use adds a count act and inline chevron the Ticked specimen lacks."
+       "Proof present; Ticked + count act specimen matches in-use door-act (213x68 door, 93x48 act)."
       ]
      },
      {
@@ -12303,96 +12324,32 @@
        "inspection.actions",
        "feed-plan.pen"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 7,
+       "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
        "broken": 8
       },
       "findings": [
-       "No proof/select-door-*.png (line 15).",
-       "The no-door case (rowSelect) has no caller: the pen header the README cites is still a hand-built label.check-target with a separate pen door."
+       "Proof present; pen header now uses the no-door case with mixed state."
       ]
      }
     ],
     "findings": [
      {
-      "severity": "medium",
-      "text": "Line 15: proof/ has no state PNGs for tick or select-door (selectable PNGs deleted, nothing added); verification.md says every state is in proof/.",
-      "fix": "Generate proof/tick-{default,ticked,pressed,long-label-chinese}.png and proof/select-door-{default,pressed,selected,selected-pressed,no-door,long-label-chinese}.png at 375px."
-     },
-     {
-      "severity": "medium",
-      "text": "README still ends with 'Addendum (round 1 fixes)' that contradicts the main text: a 'Selectable checkbox' section and 'it is still a proposed select + door variant'; tick and select + door are described twice.",
-      "fix": "Delete the addendum; move its one unique line (Plain: a Show/Hide toggle reports plain) into Variants."
+      "severity": "low",
+      "text": "The Show/Hide toggle row (piglet sheet 'Show · Dock tail') reports data-variant=plain, which variants.json and the atlas tabs do not list.",
+      "fix": "Add a plain entry to variants.json with its usedBy, or render the toggle as navigation without an icon."
      },
      {
       "severity": "low",
-      "text": "README says select + door covers 'Inspection pens (header box)', but the pen header is still a hand-built label.check-target + pen-name button, so rowSelect (no door) has no caller.",
-      "fix": "Render the pen header with rowSelectDoor (box + pen door), or drop the no-door case and the pen claim."
-     },
-     {
-      "severity": "low",
-      "text": "A ticked piglet item turns into door-act with a count act and inline chevron; no specimen shows this state.",
-      "fix": "Add a 'Ticked + count act' state to variants/tick.html."
-     },
-     {
-      "severity": "low",
-      "text": "Plain (Show toggle) reports data-variant=plain but is not in variants.json.",
-      "fix": "List plain in variants.json or render the toggle as navigation without an icon."
+      "text": "verification.md still names branch 45-row and predates the tick/select-door proofs.",
+      "fix": "Update its header to the merged commit and list the new proof files."
      }
     ],
-    "previous": {
-     "round": 2,
-     "lowest": 5,
-     "commit": "956c0b6",
-     "findings": [
-      {
-       "text": "Inspection pig rows clip (.pig-open>span matched the chevron; door split 141/141).",
-       "fixed": true,
-       "note": "Rule scoped to :not(.st-row-chevron); door 290px, chevron 15px; meta and tags render in full on walk, pen, actions, review-selected, feed-plan pen/pig."
-      },
-      {
-       "text": "Selectable has no caller; README names Inspection/Feed plan.",
-       "fixed": "partial",
-       "note": "Variant, preview and proofs removed and folded into select + door; the no-door case still has no caller and the pen header remains hand-built."
-      },
-      {
-       "text": "Tick and select-door only in an addendum; Overview omits them; tabs say no screen uses them.",
-       "fixed": "partial",
-       "note": "Main Anatomy/Variants cover both, Overview and Used by populated; the stale addendum was not deleted."
-      },
-      {
-       "text": "No proof PNGs for tick or select-door.",
-       "fixed": false,
-       "note": "proof/ unchanged for these; scratchpad shots are not component proof."
-      },
-      {
-       "text": "Tick specimen chevron; ticked + count act unshown; pen box trailing.",
-       "fixed": "partial",
-       "note": "Chevron gone; pen and pig boxes both leading (x=19, 48x48); ticked + count act state still unshown."
-      },
-      {
-       "text": "Done chip rows report plain; disabled navigation keeps chevron.",
-       "fixed": true,
-       "note": "Saved Iron reports record after Record 1 item; disabled navigation/animal/scope/record specimens have no chevron."
-      }
-     ],
-     "reversed": "None. Broken rises 5 to 8: no clipping or undersized targets on any screen checked, no console errors."
-    },
-    "proposals": [
-     {
-      "kind": "new-variant",
-      "name": "Row header checkbox (pen select-all with mixed state)",
-      "why": "The pen header is a hand-built label; it is select + door (box + pen door) with a mixed state and should use rowSelectDoor.",
-      "seenIn": [
-       "inspection.walk",
-       "feed-plan.pen"
-      ]
-     }
-    ]
+    "proposals": []
    },
    "files": {
     "variantsJson": true,
@@ -20641,10 +20598,10 @@
     "kind": "component",
     "id": "Button"
    },
-   "kind": "broken",
-   "severity": "high",
-   "title": "Atlas component page Overview for Button renders no buttons: the atlas runs preview.html as an…",
-   "detail": "Atlas component page Overview for Button renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render; only the landing Overview breaks). Broken since round 1 (033fa58).\nFix: In preview.html resolve against a real base (parent.location.href when location is about:srcdoc, else document.baseURI) for both bundle.js and fetch('variants/'+id+'.html') - or drop the fetch/srcdoc loop and use plain iframes src=variants/<id>.html.",
+   "kind": "design",
+   "severity": "low",
+   "title": "Every Button and IconButton variant specimen page styles its example separator with…",
+   "detail": "Every Button and IconButton variant specimen page styles its example separator with var(--space-1), a token tokens.css does not define (the separator silently drops).\nFix: Replace var(--space-1) with var(--border-width) in variants/*.html.",
    "source": "gate"
   },
   {
@@ -20655,32 +20612,8 @@
    },
    "kind": "design",
    "severity": "low",
-   "title": "Farrowing Scan ear tag still renders class \"button primary button primary dock-scan\" (the End…",
-   "detail": "Farrowing Scan ear tag still renders class \"button primary button primary dock-scan\" (the End walk doubling, fixed only on Inspection).\nFix: Strip button/primary from className in farrowing-astra-concept.js btn() as inspection-astra-concept.js now does.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Button:2",
-   "target": {
-    "kind": "component",
-    "id": "Button"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "README tokens list space-1, which tokens.css does not define (the CSS uses border-width).",
-   "detail": "README tokens list space-1, which tokens.css does not define (the CSS uses border-width).\nFix: Replace space-1 with border-width in README line 75.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Button:3",
-   "target": {
-    "kind": "component",
-    "id": "Button"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "Destructive preview's disabled reason is a piglet reason (\"Choose the piglets first.\").",
-   "detail": "Destructive preview's disabled reason is a piglet reason (\"Choose the piglets first.\").\nFix: Use a photo reason in variants/destructive.html, e.g. \"Saved records keep their photos.\"",
+   "title": "Sheets show both a header close (X) and a footer Back that do the same thing (Farrowing finish,…",
+   "detail": "Sheets show both a header close (X) and a footer Back that do the same thing (Farrowing finish, Piglet pen sheet) - the same act offered twice.\nFix: Keep one return per sheet: footer Back where a footer exists, else the X; or record the pair as the rule in Sheet.",
    "source": "gate"
   },
   {
@@ -20689,10 +20622,10 @@
     "kind": "component",
     "id": "IconButton"
    },
-   "kind": "broken",
-   "severity": "high",
-   "title": "Atlas component page Overview for IconButton renders no buttons: the atlas runs preview.html as…",
-   "detail": "Atlas component page Overview for IconButton renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render). Broken since round 1 (033fa58).\nFix: Same fix as Button: resolve bundle.js and variants/<id>.html against a real base (parent.location.href when location is about:srcdoc), or use plain iframes src=variants/<id>.html.",
+   "kind": "design",
+   "severity": "medium",
+   "title": "New in use: the Inspection Filter pigs sheet close reads just \"Close\" - FilterSheet's drawer…",
+   "detail": "New in use: the Inspection Filter pigs sheet close reads just \"Close\" - FilterSheet's drawer defaults closeLabel to 'Close' and inspection passes none (was \"Close Filter pigs\" in round 3).\nFix: In FilterSheet default the close label to 'Close '+title (and the zh string), or pass close:{label:{text:'Close Filter pigs'}} from inspection-astra-concept.js.",
    "source": "gate"
   },
   {
@@ -20703,8 +20636,8 @@
    },
    "kind": "design",
    "severity": "low",
-   "title": "README tokens list space-1, which tokens.css does not define.",
-   "detail": "README tokens list space-1, which tokens.css does not define.\nFix: Replace space-1 with border-width in README line 65.",
+   "title": "Farrowing finish close is named \"Close finish drawer\" - 'drawer' is build jargon, not the…",
+   "detail": "Farrowing finish close is named \"Close finish drawer\" - 'drawer' is build jargon, not the sheet's title.\nFix: Name it \"Close Finish farrowing\".",
    "source": "gate"
   },
   {
@@ -20715,8 +20648,8 @@
    },
    "kind": "design",
    "severity": "low",
-   "title": "Related table's first row links Button / IconButton from IconButton's own README.",
-   "detail": "Related table's first row links Button / IconButton from IconButton's own README.\nFix: Make the row just Button: labelled acts, used when the act needs a visible verb.",
+   "title": "Variant specimen pages use undefined var(--space-1) for separators.",
+   "detail": "Variant specimen pages use undefined var(--space-1) for separators.\nFix: Use var(--border-width).",
    "source": "gate"
   },
   {
@@ -20786,9 +20719,9 @@
     "id": "Row"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "Line 15: proof/ has no state PNGs for tick or select-door (selectable PNGs deleted, nothing…",
-   "detail": "Line 15: proof/ has no state PNGs for tick or select-door (selectable PNGs deleted, nothing added); verification.md says every state is in proof/.\nFix: Generate proof/tick-{default,ticked,pressed,long-label-chinese}.png and proof/select-door-{default,pressed,selected,selected-pressed,no-door,long-label-chinese}.png at 375px.",
+   "severity": "low",
+   "title": "The Show/Hide toggle row (piglet sheet 'Show · Dock tail') reports data-variant=plain, which…",
+   "detail": "The Show/Hide toggle row (piglet sheet 'Show · Dock tail') reports data-variant=plain, which variants.json and the atlas tabs do not list.\nFix: Add a plain entry to variants.json with its usedBy, or render the toggle as navigation without an icon.",
    "source": "gate"
   },
   {
@@ -20798,57 +20731,9 @@
     "id": "Row"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "README still ends with 'Addendum (round 1 fixes)' that contradicts the main text: a 'Selectable…",
-   "detail": "README still ends with 'Addendum (round 1 fixes)' that contradicts the main text: a 'Selectable checkbox' section and 'it is still a proposed select + door variant'; tick and select + door are described twice.\nFix: Delete the addendum; move its one unique line (Plain: a Show/Hide toggle reports plain) into Variants.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Row:2",
-   "target": {
-    "kind": "component",
-    "id": "Row"
-   },
-   "kind": "broken",
    "severity": "low",
-   "title": "README says select + door covers 'Inspection pens (header box)', but the pen header is still a…",
-   "detail": "README says select + door covers 'Inspection pens (header box)', but the pen header is still a hand-built label.check-target + pen-name button, so rowSelect (no door) has no caller.\nFix: Render the pen header with rowSelectDoor (box + pen door), or drop the no-door case and the pen claim.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Row:3",
-   "target": {
-    "kind": "component",
-    "id": "Row"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "A ticked piglet item turns into door-act with a count act and inline chevron; no specimen shows…",
-   "detail": "A ticked piglet item turns into door-act with a count act and inline chevron; no specimen shows this state.\nFix: Add a 'Ticked + count act' state to variants/tick.html.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Row:4",
-   "target": {
-    "kind": "component",
-    "id": "Row"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "Plain (Show toggle) reports data-variant=plain but is not in variants.json.",
-   "detail": "Plain (Show toggle) reports data-variant=plain but is not in variants.json.\nFix: List plain in variants.json or render the toggle as navigation without an icon.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Row:p0",
-   "target": {
-    "kind": "component",
-    "id": "Row"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "New variant: Row header checkbox (pen select-all with mixed state)?",
-   "detail": "The pen header is a hand-built label; it is select + door (box + pen door) with a mixed state and should use rowSelectDoor.\nSeen in: inspection.walk, feed-plan.pen",
+   "title": "verification.md still names branch 45-row and predates the tick/select-door proofs.",
+   "detail": "verification.md still names branch 45-row and predates the tick/select-door proofs.\nFix: Update its header to the merged commit and list the new proof files.",
    "source": "gate"
   },
   {

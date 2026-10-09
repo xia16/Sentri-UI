@@ -1,68 +1,246 @@
 {
-  "status": "in-design",
-  "round": 3,
+  "status": "agent-checked",
+  "round": 4,
+  "regate": "after cap, on main b800abc",
   "judged": "2026-10-10",
-  "commit": "bfd0fa8",
+  "commit": "b800abc",
   "model": "claude-opus-5-5",
   "previous": {
-    "round": 2,
+    "round": 3,
     "judged": "2026-10-10",
-    "commit": "40bb120",
-    "lowest": 6,
+    "commit": "bfd0fa8",
+    "lowest": 5,
     "status": "in-design",
     "findings": [
-      { "severity": "high", "text": "Tool preview at 375px: nowrap Long / Chinese label clipped and scrolled the page; preview showed icon + label.", "result": "fixed: tool preview is label-only, 343x48, the Chinese label ellipsizes with the full label in title; standalone preview scrollWidth 375." },
-      { "severity": "medium", "text": "Disabled text action and disabled tool kept enabled ink.", "result": "fixed: disabled text action and disabled tool compute disabled ink rgb(146,153,141); tool takes the disabled surface." },
-      { "severity": "low", "text": "End walk class rendered twice.", "result": "fixed on Inspection (\"button primary finish-walk\"). The same doubling remains on Farrowing's Scan ear tag (new low finding)." },
-      { "severity": "low", "text": "Host raw colours: task-end-early #fff1ee; .button.primary #20291f.", "result": "fixed: task-end-early rule deleted; #20291f override replaced by var(--ink)." },
-      { "severity": "low", "text": "Destructive preview's disabled reason was a piglet reason.", "result": "not fixed: variants/destructive.html still says \"Choose the piglets first.\"" }
+      {
+        "severity": "high",
+        "text": "Atlas component page Overview for Button renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render; only the landing Overview breaks). Broken since round 1 (033fa58).",
+        "result": "fixed: preview.html no longer fetches/constructs URLs; Overview shows Primary, Secondary, Text action, Hold (danger + primary), Tool, Destructive; console clean."
+      },
+      {
+        "severity": "low",
+        "text": "Farrowing Scan ear tag still renders class \"button primary button primary dock-scan\" (the End walk doubling, fixed only on Inspection).",
+        "result": "fixed: farrowing btn() strips button/primary; Scan ear tag renders \"button primary dock-scan\"; no duplicate class tokens on any screen checked."
+      },
+      {
+        "severity": "low",
+        "text": "README tokens list space-1, which tokens.css does not define (the CSS uses border-width).",
+        "result": "fixed: README tokens list border-width."
+      },
+      {
+        "severity": "low",
+        "text": "Destructive preview's disabled reason is a piglet reason (\"Choose the piglets first.\").",
+        "result": "fixed: destructive reason is \"Saved records keep their photos.\""
+      }
     ]
   },
-  "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 5 },
-  "lowest": 5,
+  "scores": {
+    "clarity": 8,
+    "budget": 8,
+    "hierarchy": 8,
+    "spacing": 8,
+    "broken": 8
+  },
+  "lowest": 8,
   "checklist": [
-    { "line": 1, "pass": true, "why": "One-sentence job; IconButton and ChoiceList named instead." },
-    { "line": 2, "pass": true, "why": "When / when not present with named alternatives." },
-    { "line": 3, "pass": true, "why": "Container, label, optional icon, loading marker, reason line, hold sweep and caption." },
-    { "line": 4, "pass": true, "why": "Six variants each with a use line and real screens." },
-    { "line": 5, "pass": true, "why": "Press moves 2px; disabled text action and tool now use disabled ink; waiting grey." },
-    { "line": 6, "pass": true, "why": "Every Button on Farrowing, Inspection walk/filters, the Piglet pen sheet and the 375 preview is >= 48 tall (tools 111x48, End walk 95x48)." },
-    { "line": 7, "pass": true, "why": "Two footer actions, three tools; screens respect it." },
-    { "line": 8, "pass": true, "why": "Disabled and waiting carry a visible reason line; not colour-only." },
-    { "line": 9, "pass": true, "why": "Registered verbs; an ellipsized tool label keeps its full name in title." },
-    { "line": 10, "pass": true, "why": "Native button, aria-disabled waiting, aria-busy, two-press hold, Escape cancels." },
-    { "line": 11, "pass": true, "why": "Component and host CSS on tokens; README still lists an undefined space-1 token (low)." },
-    { "line": 12, "pass": true, "why": "Not a field." },
-    { "line": 13, "pass": true, "why": "Not an overlay." },
-    { "line": 14, "pass": true, "why": "Related table and classification present." },
-    { "line": 15, "pass": false, "why": "Standalone preview is clean at 375, but the atlas component page Overview renders no buttons: \"Failed to construct 'URL': Invalid URL\"." }
+    {
+      "line": 1,
+      "pass": true,
+      "why": "One-sentence job; IconButton and ChoiceList named instead."
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "When / when not present with named alternatives."
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "Container, label, optional icon, loading marker, reason line, hold sweep and caption."
+    },
+    {
+      "line": 4,
+      "pass": true,
+      "why": "Six variants each with a use line and real screens."
+    },
+    {
+      "line": 5,
+      "pass": true,
+      "why": "Press moves 2px; disabled text action and tool now use disabled ink; waiting grey."
+    },
+    {
+      "line": 6,
+      "pass": true,
+      "why": "390x844 bare: Scan ear tag 217x48, End walk 95x48, tools 111x48, Back 86x48 (86x56 beside a hold), Untick 79x48, hold 248-254x56; nothing under 48 on farrowing.finish/room, inspection.walk/filters/pen/review-selected/actions, piglet sheet-todo/give-ids/end-task, workbench.choose-unit."
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "Two footer actions, three tools; screens respect it."
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "Disabled and waiting carry a visible reason line; not colour-only."
+    },
+    {
+      "line": 9,
+      "pass": true,
+      "why": "Registered verbs; an ellipsized tool label keeps its full name in title."
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "Native button, aria-disabled waiting, aria-busy, two-press hold, Escape cancels."
+    },
+    {
+      "line": 11,
+      "pass": true,
+      "why": "Component and host CSS on tokens; README now lists border-width. Every variant specimen page still writes border-bottom:var(--space-1) (undefined token) - harness only, low."
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+    },
+    {
+      "line": 14,
+      "pass": true,
+      "why": "Related table and classification present."
+    },
+    {
+      "line": 15,
+      "pass": true,
+      "why": "Atlas Overview now renders all six variant cells; every variant tab renders all cells; console clean, no 404s; 390x844 screens have no horizontal scroll."
+    }
   ],
   "classification": "component",
   "variants": [
-    { "name": "primary", "usedBy": ["farrowing.finish", "farrowing.room", "piglet-processing.sheet-todo", "inspection.walk", "inspection.filters"], "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
-      "findings": ["End walk class now single on Inspection; Farrowing Scan ear tag still renders \"button primary button primary dock-scan\"."] },
-    { "name": "secondary (Back)", "usedBy": ["farrowing.finish", "piglet-processing.sheet-todo", "inspection.filters"], "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
-      "findings": [] },
-    { "name": "text action (Clear, Untick)", "usedBy": ["farrowing.death", "inspection.filters", "inspection.review-selected"], "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
-      "findings": ["Disabled now uses disabled ink."] },
-    { "name": "hold (primary / danger)", "usedBy": ["farrowing.finish", "farrowing.task-ready", "piglet-processing.end-task"], "status": "agent-checked",
-      "scores": { "clarity": 9, "budget": 8, "hierarchy": 9, "spacing": 8, "broken": 8 },
-      "findings": [] },
-    { "name": "tool", "usedBy": ["piglet-processing.sheet-todo"], "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
-      "findings": ["Label-only in preview and use; 111x48 in use (en and zh); long Chinese label ellipsizes with title; disabled grey."] },
-    { "name": "destructive", "usedBy": ["farrowing photo dialog (Delete; no atlas screen)"], "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
-      "findings": ["Disabled reason in the preview is still a piglet reason."] }
+    {
+      "name": "primary",
+      "usedBy": [
+        "farrowing.finish",
+        "farrowing.room",
+        "piglet-processing.sheet-todo",
+        "inspection.walk",
+        "inspection.filters"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Scan ear tag doubling fixed; End walk 95x48."
+      ]
+    },
+    {
+      "name": "secondary (Back)",
+      "usedBy": [
+        "farrowing.finish",
+        "piglet-processing.sheet-todo",
+        "inspection.filters"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": []
+    },
+    {
+      "name": "text action (Clear, Untick)",
+      "usedBy": [
+        "farrowing.death",
+        "inspection.filters",
+        "inspection.review-selected"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Inspection review-selected Untick is now secondary (79x48), not a text action."
+      ]
+    },
+    {
+      "name": "hold (primary / danger)",
+      "usedBy": [
+        "farrowing.finish",
+        "farrowing.task-ready",
+        "piglet-processing.end-task"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 9,
+        "budget": 8,
+        "hierarchy": 9,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": []
+    },
+    {
+      "name": "tool",
+      "usedBy": [
+        "piglet-processing.sheet-todo"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Label-only in preview and use; 111x48 in use (en and zh); long Chinese label ellipsizes with title; disabled grey."
+      ]
+    },
+    {
+      "name": "destructive",
+      "usedBy": [
+        "farrowing photo dialog (Delete; no atlas screen)"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Reason now a photo reason."
+      ]
+    }
   ],
   "findings": [
-    { "severity": "high", "text": "Atlas component page Overview for Button renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render; only the landing Overview breaks). Broken since round 1 (033fa58).", "fix": "In preview.html resolve against a real base (parent.location.href when location is about:srcdoc, else document.baseURI) for both bundle.js and fetch('variants/'+id+'.html') - or drop the fetch/srcdoc loop and use plain iframes src=variants/<id>.html." },
-    { "severity": "low", "text": "Farrowing Scan ear tag still renders class \"button primary button primary dock-scan\" (the End walk doubling, fixed only on Inspection).", "fix": "Strip button/primary from className in farrowing-astra-concept.js btn() as inspection-astra-concept.js now does." },
-    { "severity": "low", "text": "README tokens list space-1, which tokens.css does not define (the CSS uses border-width).", "fix": "Replace space-1 with border-width in README line 75." },
-    { "severity": "low", "text": "Destructive preview's disabled reason is a piglet reason (\"Choose the piglets first.\").", "fix": "Use a photo reason in variants/destructive.html, e.g. \"Saved records keep their photos.\"" }
+    {
+      "severity": "low",
+      "text": "Every Button and IconButton variant specimen page styles its example separator with var(--space-1), a token tokens.css does not define (the separator silently drops).",
+      "fix": "Replace var(--space-1) with var(--border-width) in variants/*.html."
+    },
+    {
+      "severity": "low",
+      "text": "Sheets show both a header close (X) and a footer Back that do the same thing (Farrowing finish, Piglet pen sheet) - the same act offered twice.",
+      "fix": "Keep one return per sheet: footer Back where a footer exists, else the X; or record the pair as the rule in Sheet."
+    }
   ],
   "proposals": []
 }

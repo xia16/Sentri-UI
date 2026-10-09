@@ -1,53 +1,178 @@
 {
-  "status": "in-design",
-  "round": 3,
+  "status": "agent-checked",
+  "round": 4,
+  "regate": "after cap, on main b800abc",
   "judged": "2026-10-10",
-  "commit": "bfd0fa8",
+  "commit": "b800abc",
   "model": "claude-opus-5-5",
   "previous": {
-    "round": 2,
+    "round": 3,
     "judged": "2026-10-10",
-    "commit": "40bb120",
-    "lowest": 7,
+    "commit": "bfd0fa8",
+    "lowest": 5,
     "status": "in-design",
     "findings": [
-      { "severity": "medium", "text": "README copied Button rows (hold, Escape, labels wrap, one primary per bar).", "result": "fixed: README rewritten for IconButton; no hold/Escape/wrap/primary rows remain." },
-      { "severity": "low", "text": "Raw radius fork .photo-title .icon-button{border-radius:10px}.", "result": "fixed: rule deleted; every IconButton measured computes 12px (radius-control)." },
-      { "severity": "low", "text": "Piglet sheet close labelled just \"Close\".", "result": "fixed: \"Close pen sheet\" / zh \"关闭猪栏页\", 48x48." }
+      {
+        "severity": "high",
+        "text": "Atlas component page Overview for IconButton renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render). Broken since round 1 (033fa58).",
+        "result": "fixed: Overview renders both variants; console clean."
+      },
+      {
+        "severity": "low",
+        "text": "README tokens list space-1, which tokens.css does not define.",
+        "result": "fixed: README tokens list border-width."
+      },
+      {
+        "severity": "low",
+        "text": "Related table's first row links Button / IconButton from IconButton's own README.",
+        "result": "fixed: Related table's row is just Button."
+      }
     ]
   },
-  "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 5 },
-  "lowest": 5,
+  "scores": {
+    "clarity": 8,
+    "budget": 8,
+    "hierarchy": 8,
+    "spacing": 8,
+    "broken": 8
+  },
+  "lowest": 8,
   "checklist": [
-    { "line": 1, "pass": true, "why": "One sentence; Button named for verbs." },
-    { "line": 2, "pass": true, "why": "When / when not; Button and ChoiceList named." },
-    { "line": 3, "pass": true, "why": "48 container, glyph, label, badge, selected check, reason line." },
-    { "line": 4, "pass": true, "why": "Bordered and plain, each with a use line and real screens." },
-    { "line": 5, "pass": true, "why": "Pressed fills var(--press) and moves 2px." },
-    { "line": 6, "pass": true, "why": "Every IconButton on Farrowing, Inspection walk/filters, the Piglet pen sheet and the preview is 48x48." },
-    { "line": 7, "pass": true, "why": "At most three toolbar tools stated." },
-    { "line": 8, "pass": true, "why": "Selected adds a check and aria-pressed; disabled has a reason line." },
-    { "line": 9, "pass": true, "why": "Accessible names name the subject (Close pen sheet, Close Filter pigs)." },
-    { "line": 10, "pass": true, "why": "aria-label required, focus ring, aria-disabled focusable; no stray Button rows." },
-    { "line": 11, "pass": true, "why": "Radius fork gone; CSS on tokens. README lists undefined space-1 (low)." },
-    { "line": 12, "pass": true, "why": "Not a field." },
-    { "line": 13, "pass": true, "why": "Not an overlay." },
-    { "line": 14, "pass": true, "why": "Related table and classification present (first row links IconButton to itself)." },
-    { "line": 15, "pass": false, "why": "Standalone preview clean at 375, but the atlas component Overview renders nothing: \"Failed to construct 'URL': Invalid URL\"." }
+    {
+      "line": 1,
+      "pass": true,
+      "why": "One sentence; Button named for verbs."
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "When / when not; Button and ChoiceList named."
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "48 container, glyph, label, badge, selected check, reason line."
+    },
+    {
+      "line": 4,
+      "pass": true,
+      "why": "Bordered and plain, each with a use line and real screens."
+    },
+    {
+      "line": 5,
+      "pass": true,
+      "why": "Pressed fills var(--press) and moves 2px."
+    },
+    {
+      "line": 6,
+      "pass": true,
+      "why": "Every IconButton on farrowing.finish/room, inspection walk/filters/review-selected, piglet sheet-todo/give-ids and workbench.choose-unit is 48x48."
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "At most three toolbar tools stated."
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "Selected adds a check and aria-pressed; disabled has a reason line."
+    },
+    {
+      "line": 9,
+      "pass": false,
+      "why": "Inspection Filter pigs sheet close is now just \"Close\": FilterSheet (#75) passes no label, regressing round 3's \"Close Filter pigs\". Others name the subject (Close pen sheet, Close Selected, Close dialog)."
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "aria-label required, focus ring, aria-disabled focusable; no stray Button rows."
+    },
+    {
+      "line": 11,
+      "pass": true,
+      "why": "Radius 12px everywhere measured; README lists border-width. Specimen pages use undefined var(--space-1) for separators (low)."
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+    },
+    {
+      "line": 14,
+      "pass": true,
+      "why": "Related table now just Button; classification present."
+    },
+    {
+      "line": 15,
+      "pass": true,
+      "why": "Atlas Overview renders the bordered and plain cells; Bordered and Plain tabs render all 7 cells; console clean, no 404s."
+    }
   ],
   "classification": "component",
   "variants": [
-    { "name": "bordered (header return, filter, search, scan)", "usedBy": ["farrowing.room", "farrowing.finish", "inspection.walk", "piglet-processing.give-ids"], "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
-      "findings": [] },
-    { "name": "plain (sheet close, clear selection, breeder mark)", "usedBy": ["farrowing.finish", "piglet-processing.sheet-todo", "inspection.filters", "piglet-processing.give-ids"], "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
-      "findings": ["Every sheet close measured now names its sheet."] }
+    {
+      "name": "bordered (header return, filter, search, scan)",
+      "usedBy": [
+        "farrowing.room",
+        "farrowing.finish",
+        "inspection.walk",
+        "piglet-processing.give-ids"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": []
+    },
+    {
+      "name": "plain (sheet close, clear selection, breeder mark)",
+      "usedBy": [
+        "farrowing.finish",
+        "piglet-processing.sheet-todo",
+        "inspection.filters",
+        "inspection.review-selected",
+        "workbench.choose-unit",
+        "piglet-processing.give-ids"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Inspection Filter pigs close is a bare \"Close\" (via FilterSheet)."
+      ]
+    }
   ],
   "findings": [
-    { "severity": "high", "text": "Atlas component page Overview for IconButton renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render). Broken since round 1 (033fa58).", "fix": "Same fix as Button: resolve bundle.js and variants/<id>.html against a real base (parent.location.href when location is about:srcdoc), or use plain iframes src=variants/<id>.html." },
-    { "severity": "low", "text": "README tokens list space-1, which tokens.css does not define.", "fix": "Replace space-1 with border-width in README line 65." },
-    { "severity": "low", "text": "Related table's first row links Button / IconButton from IconButton's own README.", "fix": "Make the row just Button: labelled acts, used when the act needs a visible verb." }
+    {
+      "severity": "medium",
+      "text": "New in use: the Inspection Filter pigs sheet close reads just \"Close\" - FilterSheet's drawer defaults closeLabel to 'Close' and inspection passes none (was \"Close Filter pigs\" in round 3).",
+      "fix": "In FilterSheet default the close label to 'Close '+title (and the zh string), or pass close:{label:{text:'Close Filter pigs'}} from inspection-astra-concept.js."
+    },
+    {
+      "severity": "low",
+      "text": "Farrowing finish close is named \"Close finish drawer\" - 'drawer' is build jargon, not the sheet's title.",
+      "fix": "Name it \"Close Finish farrowing\"."
+    },
+    {
+      "severity": "low",
+      "text": "Variant specimen pages use undefined var(--space-1) for separators.",
+      "fix": "Use var(--border-width)."
+    }
   ],
   "proposals": []
 }

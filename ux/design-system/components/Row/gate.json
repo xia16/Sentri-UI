@@ -1,67 +1,273 @@
 {
-  "status": "in-design",
-  "round": 3,
+  "status": "agent-checked",
+  "round": 4,
+  "regate": "after cap, on main b800abc",
   "judged": "2026-10-10",
-  "commit": "8f50a3c",
+  "commit": "b800abc",
   "model": "claude-opus-5-5",
-  "scores": { "clarity": 7, "budget": 7, "hierarchy": 8, "spacing": 8, "broken": 8 },
-  "lowest": 7,
+  "previous": {
+    "round": 3,
+    "judged": "2026-10-10",
+    "commit": "8f50a3c",
+    "lowest": 7,
+    "status": "in-design",
+    "findings": [
+      {
+        "severity": "medium",
+        "text": "Line 15: proof/ has no state PNGs for tick or select-door (selectable PNGs deleted, nothing added); verification.md says every state is in proof/.",
+        "result": "fixed: tick-* and select-door-* PNGs in proof/."
+      },
+      {
+        "severity": "medium",
+        "text": "README still ends with 'Addendum (round 1 fixes)' that contradicts the main text: a 'Selectable checkbox' section and 'it is still a proposed select + door variant'; tick and select + door are described twice.",
+        "result": "fixed: addendum deleted; Plain line moved into Variants."
+      },
+      {
+        "severity": "low",
+        "text": "README says select + door covers 'Inspection pens (header box)', but the pen header is still a hand-built label.check-target + pen-name button, so rowSelect (no door) has no caller.",
+        "result": "fixed: Inspection pen header renders rowSelect (48x48 box, mixed state) beside the pen door."
+      },
+      {
+        "severity": "low",
+        "text": "A ticked piglet item turns into door-act with a count act and inline chevron; no specimen shows this state.",
+        "result": "fixed: Tick tab has a Ticked + count act state matching the piglet sheet in use."
+      },
+      {
+        "severity": "low",
+        "text": "Plain (Show toggle) reports data-variant=plain but is not in variants.json.",
+        "result": "not fixed: variants.json still has no plain; piglet sheet's Show/Dock tail row reports data-variant=plain."
+      }
+    ]
+  },
+  "scores": {
+    "clarity": 8,
+    "budget": 8,
+    "hierarchy": 8,
+    "spacing": 8,
+    "broken": 8
+  },
+  "lowest": 8,
   "checklist": [
-    { "line": 1, "pass": true, "why": "Purpose plus Log/Facts siblings named." },
-    { "line": 2, "pass": true, "why": "When / when-not with existing alternatives." },
-    { "line": 3, "pass": true, "why": "Anatomy now names the leading box and the tick mark; trail dropped when disabled." },
-    { "line": 4, "pass": true, "why": "Selectable folded away; tick and select + door carry usedBy and the atlas shows Used by." },
-    { "line": 5, "pass": true, "why": "Default, pressed, selected/ticked, disabled-with-reason, loading, error rendered; disabled rows lose the chevron." },
-    { "line": 6, "pass": true, "why": "390px: pig/pen box 24px in a 48x48 label (all edges hit), door 290x70-77, tick rows 346x68, scope 346x68, animal 356x76." },
-    { "line": 7, "pass": true, "why": "No cap for scrollable lists, stated; search for large ones." },
-    { "line": 8, "pass": true, "why": "Ring vs check disc, native checkbox (incl. mixed pen header), Done chip only after save." },
-    { "line": 9, "pass": true, "why": "Inspection pig rows no longer clip: 'Gestation · 40 days' and both condition tags render in full at 390." },
-    { "line": 10, "pass": true, "why": "Sibling checkbox and door, aria-pressed on tick rows, visible focus ring." },
-    { "line": 11, "pass": true, "why": "Row CSS tokens only; the selected pig wash (#edf2e7) is host CSS, not Row." },
-    { "line": 12, "pass": true, "why": "Not a field." },
-    { "line": 13, "pass": true, "why": "Not an overlay." },
-    { "line": 14, "pass": true, "why": "TaskRow aliases, TaskDay arrangement, Home card pattern." },
-    { "line": 15, "pass": false, "why": "proof/ still has no tick-* or select-door-* PNGs (only three in-use shots in a scratchpad); verification.md claims every state is in proof/." }
+    {
+      "line": 1,
+      "pass": true,
+      "why": "Purpose plus Log/Facts siblings named."
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "When / when-not with existing alternatives."
+    },
+    {
+      "line": 3,
+      "pass": true,
+      "why": "Anatomy now names the leading box and the tick mark; trail dropped when disabled."
+    },
+    {
+      "line": 4,
+      "pass": true,
+      "why": "Eight variants with usedBy; a Show/Hide toggle still reports data-variant=plain but variants.json omits plain (low)."
+    },
+    {
+      "line": 5,
+      "pass": true,
+      "why": "Default, pressed, selected/ticked, disabled-with-reason, loading, error rendered; disabled rows lose the chevron."
+    },
+    {
+      "line": 6,
+      "pass": true,
+      "why": "390x844: animal 356x76-84, ticked piglet item door 213x68 + act 93x48, tick 346x68, select-door 352x70-77 with 48x48 box, pen header box 48x48, navigation 352x68, scope 348x68; nothing under 48."
+    },
+    {
+      "line": 7,
+      "pass": true,
+      "why": "No cap for scrollable lists, stated; search for large ones."
+    },
+    {
+      "line": 8,
+      "pass": true,
+      "why": "Native checkbox incl. pen header mixed (indeterminate=true when 1 of 3 pigs selected); ring vs check disc; Done chip after save."
+    },
+    {
+      "line": 9,
+      "pass": true,
+      "why": "Inspection pig rows no longer clip: 'Gestation · 40 days' and both condition tags render in full at 390."
+    },
+    {
+      "line": 10,
+      "pass": true,
+      "why": "Sibling checkbox and door, aria-pressed on tick rows, visible focus ring."
+    },
+    {
+      "line": 11,
+      "pass": true,
+      "why": "Row CSS tokens only; the selected pig wash (#edf2e7) is host CSS, not Row."
+    },
+    {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field."
+    },
+    {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+    },
+    {
+      "line": 14,
+      "pass": true,
+      "why": "TaskRow aliases, TaskDay arrangement, Home card pattern; README addendum gone."
+    },
+    {
+      "line": 15,
+      "pass": true,
+      "why": "proof/ now holds tick-{default,ticked,ticked-count-act,pressed,long-label-chinese} and select-door-{default,pressed-door,selected,selected-pressed,no-door,long-label-chinese}; every atlas tab renders all cells; console clean, no 404s."
+    }
   ],
   "classification": "component",
   "variants": [
-    { "name": "navigation", "usedBy": ["piglet-processing.more-actions", "inspection.actions"], "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 }, "findings": [] },
-    { "name": "animal", "usedBy": ["farrowing.room", "piglet-processing.pen-list"], "status": "agent-checked",
-      "scores": { "clarity": 9, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 }, "findings": [] },
-    { "name": "door + act", "usedBy": ["inspection.review-selected", "piglet-processing.sheet-todo"], "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 }, "findings": ["A ticked piglet item becomes door-act (inline chevron + '2 piglets' act); no tick or door-act specimen shows it."] },
-    { "name": "scope", "usedBy": ["workbench.choose-unit"], "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 }, "findings": [] },
-    { "name": "summary count", "usedBy": ["farrowing.overview"], "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 }, "findings": [] },
-    { "name": "done / record", "usedBy": ["farrowing.room", "piglet-processing.sheet-todo"], "status": "agent-checked",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 }, "findings": [] },
-    { "name": "tick (due ring / ticked disc)", "usedBy": ["piglet-processing.sheet-todo"], "status": "in-design",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 }, "findings": ["No proof/tick-*.png (line 15).", "Ticked state in use adds a count act and inline chevron the Ticked specimen lacks."] },
-    { "name": "select + door", "usedBy": ["inspection.walk", "inspection.actions", "feed-plan.pen"], "status": "in-design",
-      "scores": { "clarity": 7, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 }, "findings": ["No proof/select-door-*.png (line 15).", "The no-door case (rowSelect) has no caller: the pen header the README cites is still a hand-built label.check-target with a separate pen door."] }
+    {
+      "name": "navigation",
+      "usedBy": [
+        "piglet-processing.more-actions",
+        "inspection.actions"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": []
+    },
+    {
+      "name": "animal",
+      "usedBy": [
+        "farrowing.room",
+        "piglet-processing.pen-list"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": []
+    },
+    {
+      "name": "door + act",
+      "usedBy": [
+        "inspection.review-selected",
+        "piglet-processing.sheet-todo"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": []
+    },
+    {
+      "name": "scope",
+      "usedBy": [
+        "workbench.choose-unit"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": []
+    },
+    {
+      "name": "summary count",
+      "usedBy": [
+        "farrowing.overview"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": []
+    },
+    {
+      "name": "done / record",
+      "usedBy": [
+        "farrowing.room",
+        "piglet-processing.sheet-todo"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": []
+    },
+    {
+      "name": "tick (due ring / ticked disc)",
+      "usedBy": [
+        "piglet-processing.sheet-todo"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Proof present; Ticked + count act specimen matches in-use door-act (213x68 door, 93x48 act)."
+      ]
+    },
+    {
+      "name": "select + door",
+      "usedBy": [
+        "inspection.walk",
+        "inspection.actions",
+        "feed-plan.pen"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": [
+        "Proof present; pen header now uses the no-door case with mixed state."
+      ]
+    }
   ],
   "findings": [
-    { "severity": "medium", "text": "Line 15: proof/ has no state PNGs for tick or select-door (selectable PNGs deleted, nothing added); verification.md says every state is in proof/.", "fix": "Generate proof/tick-{default,ticked,pressed,long-label-chinese}.png and proof/select-door-{default,pressed,selected,selected-pressed,no-door,long-label-chinese}.png at 375px." },
-    { "severity": "medium", "text": "README still ends with 'Addendum (round 1 fixes)' that contradicts the main text: a 'Selectable checkbox' section and 'it is still a proposed select + door variant'; tick and select + door are described twice.", "fix": "Delete the addendum; move its one unique line (Plain: a Show/Hide toggle reports plain) into Variants." },
-    { "severity": "low", "text": "README says select + door covers 'Inspection pens (header box)', but the pen header is still a hand-built label.check-target + pen-name button, so rowSelect (no door) has no caller.", "fix": "Render the pen header with rowSelectDoor (box + pen door), or drop the no-door case and the pen claim." },
-    { "severity": "low", "text": "A ticked piglet item turns into door-act with a count act and inline chevron; no specimen shows this state.", "fix": "Add a 'Ticked + count act' state to variants/tick.html." },
-    { "severity": "low", "text": "Plain (Show toggle) reports data-variant=plain but is not in variants.json.", "fix": "List plain in variants.json or render the toggle as navigation without an icon." }
+    {
+      "severity": "low",
+      "text": "The Show/Hide toggle row (piglet sheet 'Show · Dock tail') reports data-variant=plain, which variants.json and the atlas tabs do not list.",
+      "fix": "Add a plain entry to variants.json with its usedBy, or render the toggle as navigation without an icon."
+    },
+    {
+      "severity": "low",
+      "text": "verification.md still names branch 45-row and predates the tick/select-door proofs.",
+      "fix": "Update its header to the merged commit and list the new proof files."
+    }
   ],
-  "previous": {
-    "round": 2, "lowest": 5, "commit": "956c0b6",
-    "findings": [
-      { "text": "Inspection pig rows clip (.pig-open>span matched the chevron; door split 141/141).", "fixed": true, "note": "Rule scoped to :not(.st-row-chevron); door 290px, chevron 15px; meta and tags render in full on walk, pen, actions, review-selected, feed-plan pen/pig." },
-      { "text": "Selectable has no caller; README names Inspection/Feed plan.", "fixed": "partial", "note": "Variant, preview and proofs removed and folded into select + door; the no-door case still has no caller and the pen header remains hand-built." },
-      { "text": "Tick and select-door only in an addendum; Overview omits them; tabs say no screen uses them.", "fixed": "partial", "note": "Main Anatomy/Variants cover both, Overview and Used by populated; the stale addendum was not deleted." },
-      { "text": "No proof PNGs for tick or select-door.", "fixed": false, "note": "proof/ unchanged for these; scratchpad shots are not component proof." },
-      { "text": "Tick specimen chevron; ticked + count act unshown; pen box trailing.", "fixed": "partial", "note": "Chevron gone; pen and pig boxes both leading (x=19, 48x48); ticked + count act state still unshown." },
-      { "text": "Done chip rows report plain; disabled navigation keeps chevron.", "fixed": true, "note": "Saved Iron reports record after Record 1 item; disabled navigation/animal/scope/record specimens have no chevron." }
-    ],
-    "reversed": "None. Broken rises 5 to 8: no clipping or undersized targets on any screen checked, no console errors."
-  },
-  "proposals": [
-    { "kind": "new-variant", "name": "Row header checkbox (pen select-all with mixed state)", "why": "The pen header is a hand-built label; it is select + door (box + pen door) with a mixed state and should use rowSelectDoor.", "seenIn": ["inspection.walk", "feed-plan.pen"] }
-  ]
+  "proposals": []
 }
