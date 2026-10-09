@@ -807,3 +807,5 @@
 
 .inspection-phone .feed-editor-sheet>.sheet-body{display:block;overflow-y:auto}
 .inspection-phone .feed-editor-sheet .feed-fixed-form{height:auto;min-height:0}
+
+.inspection-phone .ongoing-findings{margin-bottom:var(--space-section)}

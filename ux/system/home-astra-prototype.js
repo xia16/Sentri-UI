@@ -260,6 +260,8 @@
   // The atlas follows the demo (?screen=): the screen whose url holds this scope (view, section, unit, work, attention), else null.
   function atlasScreen(screens){
     const dr=overlay.querySelector('.sheet,.dialog');
+    if(state.page==='environment')return unitDevices()[0]?.draftMode==='manual'?'environment.fan-manual':'environment.page';
+    if(state.page==='maintenance'){if(dr)return dr.querySelector('#fault-form')?'environment.report-issue':maintenanceRecords().find(f=>f.id===state.faultId)?.resolved?'environment.issue-resolved':'environment.issue-detail';return maintenanceRecords().length?'environment.maintenance':'environment.maintenance-empty';}
     if(dr){
       if(dr.classList.contains('unit-picker'))return 'workbench.choose-unit';
       if(dr.classList.contains('sync-drawer'))return 'workbench.saved-work';
@@ -268,7 +270,7 @@
     if(state.page==='placeholder'){const t=task();return t.completedAt||t.terminatedAt?'workbench.closed-task':taskModel(t).state==='ready'?'workbench.task-ready':'workbench.task-preview';}
     if(!['home','sections'].includes(state.page))return null;
     const view=state.page==='sections'?'sections':state.unit?'unit':'';
-    const hit=(screens||[]).find(c=>{const u=new URL(c.url,location.href).searchParams;
+    const hit=(screens||[]).filter(c=>c.id.startsWith('workbench.')).find(c=>{const u=new URL(c.url,location.href).searchParams;
       return (u.get('view')||'')===view&&(view==='sections'||(u.get('section')||'gestation')===state.section)&&(view!=='unit'||u.get('unit')===String(state.unit))&&(u.get('work')||'mixed')===workPreview&&(u.get('attention')||'current')===attentionPreview;});
     return hit?hit.id:null;
   }
