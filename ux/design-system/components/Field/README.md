@@ -34,10 +34,10 @@ Call `SentriUI.field({ label, control, className, ds })`. `label` and `control` 
 ## Variant: the optional row
 
 Every optional input in a record sheet is an **optional row**, `SentriUI.optionalRow({ label, value, icon, editIcon, action | inline, key, open, optionalWord })`. It is the Photos header pattern for any field.
-- **Anatomy:** a full-width `tap-min` row on `well`, `space-row-x` padding on the left. The label is `row-title` (13px/500), then the word "Optional" at `description` in `muted`. The trailing action is a ringed icon circle (`ring-width-fine` in `muted`, `paper` fill), the same as Photos' camera.
+- **Anatomy:** a full-width `tap-min` row on `well`, `space-row-x` padding on the left. The label is `choice-label` (14px/600), then the word "Optional" at `description` in `muted`. The trailing action is a ringed icon circle (`ring-width-fine` in `muted`, `paper` fill); Photos uses the same row with its outlined camera action and padded line face.
 - **Empty:** the label, "Optional" and the `icon` (plus, or the camera for Photos).
 - **Tap:** the row and the action are one tap target. `action` asks the host to open the field (picker, note editor, camera). `inline` reveals the field's own markup under the row instead (a note, a brand).
 - **Filled:** the value is the row's answer line (12px, `ink`, one line, ellipsis) and the action becomes `editIcon` (edit). The word stays.
 - **Placement:** below the required fields, in capture order, full width, one per line. Never chips, never side by side, never a label with a small "Optional" over a bare control.
-- **Where:** `components/bundle.js` (DS screens, Piglet processing) and `ux/system/sentri-components.js` (the Astra prototypes) carry the same markup and `st-optional-*` classes. A required note (a choice demands it) stays a plain `field`.
+- **Where:** `components/bundle.js` is the only implementation, shared by all prototypes; `ux/system/sentri-components.js` is retired. A required note (a choice demands it) stays a plain `field`.
 

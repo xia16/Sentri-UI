@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"></head><body>
+<section data-state="Default" id="danger-0"></section>
+<section data-state="Pressed" id="danger-1"></section>
+<section data-state="Focus" id="danger-2"></section>
+<section data-state="Long label / Chinese" id="danger-3"></section>
+<section data-state="Disabled" id="danger-disabled"></section>
+<script>
+if(document.getElementById("danger-0"))document.getElementById("danger-0").innerHTML=SentriUI.banner({"tone": "danger", "headline": "Recording ends farrowing", "consequence": "9 alive stay under piglet care", "state": "Default", "id": "danger-0-banner", "detail": "Batch F26 · B1", "actions": [{"label": "Review", "action": "review"}]});
+if(document.getElementById("danger-1"))document.getElementById("danger-1").innerHTML=SentriUI.banner({"tone": "danger", "headline": "Recording ends farrowing", "consequence": "9 alive stay under piglet care", "state": "Pressed", "id": "danger-1-banner", "actions": [{"label": "Review", "action": "review"}]});
+if(document.querySelector("#danger-1 button"))document.querySelector("#danger-1 button").dataset.preview="pressed";
+if(document.getElementById("danger-2"))document.getElementById("danger-2").innerHTML=SentriUI.banner({"tone": "danger", "headline": "Recording ends farrowing", "consequence": "9 alive stay under piglet care", "state": "Focus", "id": "danger-2-banner", "actions": [{"label": "Review", "action": "review"}]});
+if(document.querySelector("#danger-2 button"))document.querySelector("#danger-2 button").dataset.preview="focus";
+if(document.getElementById("danger-3"))document.getElementById("danger-3").innerHTML=SentriUI.banner({"tone": "danger", "headline": "请先保存您对之前分娩记录所作的更正然后检查所有修改内容", "consequence": "先检查更正记录 · 在此设备上保存 · 等待上传", "state": "Long label / Chinese", "id": "danger-3-banner", "actions": [{"label": "Review", "action": "review"}], "icon": "alert"});
+if(document.getElementById('danger-disabled'))document.getElementById('danger-disabled').innerHTML=SentriUI.banner({tone:'danger',headline:'Review the consequence',state:'Disabled',reason:'Waiting for the current review to finish',door:{action:'review'}});
+SentriUI.liveFill(document.body,{delay:0});
+</script>
+</body></html>

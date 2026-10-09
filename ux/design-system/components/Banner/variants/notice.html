@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"></head><body>
+<section data-state="Default" id="notice-0"></section>
+<section data-state="Pressed" id="notice-1"></section>
+<section data-state="Focus" id="notice-2"></section>
+<section data-state="Disabled" id="notice-3"></section>
+<section data-state="Loading" id="notice-4"></section>
+<section data-state="Long label / Chinese" id="notice-5"></section>
+<section data-state="Error" id="notice-error"></section>
+<script>
+if(document.getElementById("notice-0"))document.getElementById("notice-0").innerHTML=SentriUI.banner({"tone": "notice", "headline": "3 records saved on this device", "consequence": "No connection · waiting to upload", "state": "Default", "id": "notice-0-banner", "door": {"action": "review", "label": "Review notice"}});
+if(document.getElementById("notice-1"))document.getElementById("notice-1").innerHTML=SentriUI.banner({"tone": "notice", "headline": "3 records saved on this device", "consequence": "No connection · waiting to upload", "state": "Pressed", "id": "notice-1-banner", "door": {"action": "review", "label": "Review notice"}});
+if(document.getElementById("notice-2"))document.getElementById("notice-2").innerHTML=SentriUI.banner({"tone": "notice", "headline": "3 records saved on this device", "consequence": "No connection · waiting to upload", "state": "Focus", "id": "notice-2-banner", "door": {"action": "review", "label": "Review notice"}});
+if(document.getElementById("notice-3"))document.getElementById("notice-3").innerHTML=SentriUI.banner({"tone": "notice", "headline": "3 records saved on this device", "consequence": "No connection · waiting to upload", "state": "Disabled", "id": "notice-3-banner", "door": {"action": "review", "label": "Review notice"}, "reason": "Waiting for the current review to finish"});
+if(document.getElementById("notice-4"))document.getElementById("notice-4").innerHTML=SentriUI.banner({"tone": "notice", "headline": "3 records saved on this device", "consequence": "Uploading saved records…", "state": "Loading", "id": "notice-4-banner", "door": {"action": "review", "label": "Review notice"}});
+if(document.getElementById("notice-5"))document.getElementById("notice-5").innerHTML=SentriUI.banner({"tone": "notice", "headline": "请先保存您对之前分娩记录所作的更正然后检查所有修改内容", "consequence": "先检查更正记录 · 在此设备上保存 · 等待上传", "state": "Long label / Chinese", "id": "notice-5-banner", "door": {"action": "review", "label": "Review notice"}, "icon": "alert"});
+if(document.getElementById('notice-error'))document.getElementById('notice-error').innerHTML=SentriUI.banner({tone:'notice',headline:'3 records saved on this device',consequence:'Upload interrupted · tap to retry',door:{action:'sync'},state:'Error'});
+SentriUI.liveFill(document.body,{delay:0});
+</script>
+</body></html>

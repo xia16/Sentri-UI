@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"></head><body>
+<section data-state="Default" id="line-0"></section>
+<section data-state="Empty" id="line-1"></section>
+<section data-state="One photo" id="line-2"></section>
+<section data-state="Several photos" id="line-3"></section>
+<section data-state="Adding" id="line-4"></section>
+<section data-state="Uploading" id="line-5"></section>
+<section data-state="Denied" id="line-6"></section>
+<section data-state="Too large" id="line-7"></section>
+<section data-state="Pressed" id="line-8"></section>
+<section data-state="Focus" id="line-9"></section>
+<section data-state="Disabled" id="line-10"></section>
+<section data-state="Full" id="line-11"></section>
+<section data-state="Cancelled" id="line-12"></section>
+<section data-state="Long label / Chinese" id="line-13"></section>
+<script>
+if(document.getElementById("line-0"))document.getElementById("line-0").innerHTML=SentriUI.photos({"id": "line-0-photos", "key": "line-0"});
+if(document.getElementById("line-1"))document.getElementById("line-1").innerHTML=SentriUI.photos({"id": "line-1-photos", "key": "line-1"});
+if(document.getElementById("line-2"))document.getElementById("line-2").innerHTML=SentriUI.photos({"id": "line-2-photos", "key": "line-2", "items": [{"id": "0", "pending": false}]});
+if(document.getElementById("line-3"))document.getElementById("line-3").innerHTML=SentriUI.photos({"id": "line-3-photos", "key": "line-3", "items": [{"id": "0", "pending": false}, {"id": "1", "pending": false}, {"id": "2", "pending": false}]});
+if(document.getElementById("line-4"))document.getElementById("line-4").innerHTML=SentriUI.photos({"id": "line-4-photos", "key": "line-4", "adding": true});
+if(document.getElementById("line-5"))document.getElementById("line-5").innerHTML=SentriUI.photos({"id": "line-5-photos", "key": "line-5", "items": [{"id": "0", "pending": true}, {"id": "1", "pending": false}, {"id": "2", "pending": false}]});
+if(document.getElementById("line-6"))document.getElementById("line-6").innerHTML=SentriUI.photos({"id": "line-6-photos", "key": "line-6", "error": "denied"});
+if(document.getElementById("line-7"))document.getElementById("line-7").innerHTML=SentriUI.photos({"id": "line-7-photos", "key": "line-7", "error": "too-large"});
+if(document.getElementById("line-8"))document.getElementById("line-8").innerHTML=SentriUI.photos({"id": "line-8-photos", "key": "line-8", "preview": "pressed"});
+if(document.getElementById("line-9"))document.getElementById("line-9").innerHTML=SentriUI.photos({"id": "line-9-photos", "key": "line-9", "preview": "focus"});
+if(document.getElementById("line-10"))document.getElementById("line-10").innerHTML=SentriUI.photos({"id": "line-10-photos", "key": "line-10", "active": false, "disabledReason": "Choose a cause first · photos ride that record"});
+if(document.getElementById("line-11"))document.getElementById("line-11").innerHTML=SentriUI.photos({"id": "line-11-photos", "key": "line-11", "items": [{"id": "0", "pending": false}, {"id": "1", "pending": false}, {"id": "2", "pending": false}, {"id": "3", "pending": false}, {"id": "4", "pending": false}, {"id": "5", "pending": false}, {"id": "6", "pending": false}, {"id": "7", "pending": false}, {"id": "8", "pending": false}, {"id": "9", "pending": false}, {"id": "10", "pending": false}, {"id": "11", "pending": false}]});
+if(document.getElementById("line-12"))document.getElementById("line-12").innerHTML=SentriUI.photos({"id": "line-12-photos", "key": "line-12", "error": "cancelled"});
+if(document.getElementById("line-13"))document.getElementById("line-13").innerHTML=SentriUI.photos({"id": "line-13-photos", "key": "line-13", "label": "为本次分娩事件附加现场照片以便之后检查记录", "optional": "选填", "hint": "照片保存在此设备上 · 无网络连接 · 等待上传"});
+SentriUI.liveFill(document.body,{delay:0});
+</script>
+</body></html>

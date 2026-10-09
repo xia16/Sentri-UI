@@ -207,7 +207,8 @@
     const n=sync.pending.length,busy=sync.status==='uploading';
     const title=n?(busy?'Uploading '+n+' records':n+' records saved on this device'):'All records uploaded';
     const subtitle=n?(busy?'Sending saved work…':sync.connection==='offline'?'No connection · waiting to upload':sync.status==='failed'?'Upload interrupted · tap to retry':'Connection available · tap to upload'):'No records waiting on this device';
-    return btn('sync',icon(n?(sync.connection==='offline'?'offline':'upload'):'check')+'<span><strong>'+title+'</strong><small>'+subtitle+'</small></span>'+icon('arrow'),'sync-card'+(n?' pending':''),'','aria-label="'+title+'. '+subtitle+'"');
+    if(!n)return SentriUI.row({title,description:subtitle,action:'sync',icon:icon('check')});
+    return SentriUI.banner({tone:'notice',headline:title,consequence:subtitle,icon:n?'offline':'check',door:{action:'sync',label:title+'. '+subtitle},state:busy?'Loading':'Default'});
   }
   function showSync(){
     const n=sync.pending.length,busy=sync.status==='uploading',offline=sync.connection==='offline';

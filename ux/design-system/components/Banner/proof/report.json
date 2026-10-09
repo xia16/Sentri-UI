@@ -1,0 +1,703 @@
+{
+  "variants": [
+    {
+      "name": "Banner",
+      "variant": "danger",
+      "state": "Default",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "danger",
+      "state": "Pressed",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "danger",
+      "state": "Focus",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "danger",
+      "state": "Long label / Chinese",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "danger",
+      "state": "Disabled",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "correction",
+      "state": "Default",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "correction",
+      "state": "Pressed",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "correction",
+      "state": "Focus",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "correction",
+      "state": "Disabled",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "correction",
+      "state": "Cleared",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "correction",
+      "state": "Long label / Chinese",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "correction",
+      "state": "Changed",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "notice",
+      "state": "Default",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "notice",
+      "state": "Pressed",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "notice",
+      "state": "Focus",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "notice",
+      "state": "Disabled",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "notice",
+      "state": "Loading",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "notice",
+      "state": "Long label / Chinese",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Banner",
+      "variant": "notice",
+      "state": "Error",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "Default",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "Empty",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "One photo",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "Several photos",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "Adding",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "Uploading",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "Denied",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "Too large",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "Pressed",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "Focus",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "Disabled",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "Full",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "Cancelled",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "name": "Photos",
+      "variant": "line",
+      "state": "Long label / Chinese",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    }
+  ],
+  "screens": [
+    {
+      "id": "workbench.today",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "workbench.choose-unit",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "workbench.sections",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "workbench.gestation",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "workbench.work-due",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "workbench.all-recorded",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "workbench.quiet-section",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "workbench.unit",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "workbench.unit-farrowing",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "workbench.saved-work",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "workbench.task-preview",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "workbench.task-ready",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "workbench.end-task-early",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "workbench.closed-task",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.room",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.count",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.before",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.death",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.finish",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.blocked",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.locked",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.edit",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.born",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.history",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.ended",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.task-blocked",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.task-ready",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.task-complete",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.task-outcomes",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.edit-finished",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.overview",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "farrowing.task-receipt",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.pen-list",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.job-chip",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.chip-done",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.list-no-id",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.phone-clash",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.sheet-coming",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.sheet-todo",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.sheet-breeders",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.sheet-late",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.sheet-done",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.adjust-count",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.tagged-list",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.give-ids",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.counts",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.weight",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.more-actions",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.record-death",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.move-piglets",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.set-count",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.pen-log",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.end-task",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "piglet-processing.list-ended",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.walk",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.stage-times",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.animal-types",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.pen-signals",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.pen",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.pen-note",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.pen-log",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.filters",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.go-to-pen",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.find-pig",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.actions",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.review-selected",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.walk-log",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.finish",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    },
+    {
+      "id": "inspection.walk-recorded",
+      "errors": [],
+      "overflow": false,
+      "small": []
+    }
+  ],
+  "previews": [
+    {
+      "name": "Banner",
+      "errors": [],
+      "components": 19
+    },
+    {
+      "name": "Photos",
+      "errors": [],
+      "components": 14
+    }
+  ],
+  "interactions": {
+    "homeDoor": true,
+    "clearUndo": true,
+    "expiryFocus": true,
+    "photoCaptureViewer": true,
+    "photoFocusReturn": true
+  }
+}

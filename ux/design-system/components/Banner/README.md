@@ -1,64 +1,56 @@
-**Status: candidate.** Consolidated from the slices' DangerBand and EditBanner compositions and farrowing's two bands, then revised after the design panel ([ADR 0002](../../adr/0002-candidates-2.md)). It is not approved.
-
 # Banner
 
-A headline over its consequence, on a wash, at the top of what it governs. There are two tones and no others.
+Banner states a consequence or pending condition before the action it governs. Use [Field](../Field/README.md) instead for validation of one input.
 
-Call `SentriUI.banner({ tone, headline, consequence, summary, actions, live, id })`.
+## When
+Use above a destructive commit, when a correction needs review, or for offline work waiting to upload. Farrowing uses danger and correction; Home and Piglet processing use notice.
 
-**Tones**
-- **`danger`:** an irreversible act about to happen, or a terminal fact.
-  - Farrowing's sow warning above `Save · HOLD` (`Saving ends farrowing` over `7 alive stay under piglet care`).
-  - The record face's band (`Sow died · prolapse` over `aug 25 · 06:20 · L.M`).
-- **`correction`:** Edit's banner (`Correcting a past record` over `logged as G.H`), with the live change summary (`stillborn 1 → 0 · alive 10 → 11`) and the `Clear` text action.
-  - It appears at the first change, not on entry (RULINGS, Edit).
+## When not
+Use [Status](../Status/README.md) for a quiet recorded fact; use Field for a refused value. Do not stack banners or repeat the same consequence in a card below.
 
-**Anatomy**
-- **Box:** `space-row-y` × `space-panel` padding, `radius-inset`, a 1px border, no shadow, no left-border accent.
-  - `danger`: a `red-wash` fill and a `red` border.
-  - `correction`: an `amber-wash-strong` fill and an **`amber` border** (5.6:1, so the box reads as amber in sunlight). `amber` text holds 4.6:1 on the wash.
-- **Headline:** `choice-label` (14px).
-  - `danger`: **`type-weight-strong` (700)** in `red`, the ruled 14/700 red headline.
-  - `correction`: 600 in `ink`.
-- **Consequence:** `choice-meta` (12px) in IBM Plex Mono, `muted` (the ruled "12 mono ink2"). It says what the act costs, or gives the stamp.
-- **Summary (correction):** a row at least `tap-min` tall under an `amber` rule.
-  - The text is 12px/500 mono in `ink`, one token per corrected figure, joined by the `·` text node. The corrected value is `amber` at 600 (the correction mark is the amber value).
-  - `Clear` is a text action at the right end, `space-row-y` from the text.
+## Anatomy
+Box; leading tone word or optional icon; one-line headline; optional consequence; optional detail; optional live summary; optional text actions. With `door`, the whole box is one button with a trailing ›; it contains no nested actions.
 
-**States**
-- **Default:** the headline and the consequence.
-- **Live — one region per banner:**
-  - With a summary, the summary text is the banner's only live region (`role="status"`, `aria-live="polite"`, `aria-atomic`).
-  - Without one, `live: true` makes the whole banner the region (the sow warning appears when the sow is chosen).
-  - Regions mount empty, and `liveFill`/`announce` fill them (see Status). Never nest two.
-- **Cleared:** after `Clear`, the summary reads `Cleared` with an `Undo` text action for 5 seconds.
-  - Undo restores the draft.
-  - When the time runs out, the host removes the banner.
-- **Pressed and focus:** only the text actions have them (the Button card's text register).
-- **Disabled, loading:** not drawn.
-- **Error:** none. The banner is not an error message; a refused value speaks in its field's status line.
-- **Empty:** absent. A correction with no change has no banner.
+## Variants
+- **Danger** (`danger`): consequence before a destructive commit or a terminal fact, as in Farrowing death and Inspection removal.
+- **Correction** (`correction`): amber review before recording a changed fact. `door` opens Review; a summary supports Clear and Undo.
+- **Notice** (`notice`): pending offline uploads or work waiting, as on Home and the ended Piglet task.
 
-**Component contract**
-- **Props:** `tone: 'danger' | 'correction'` (an unknown tone warns in development and falls back to `danger`), `headline`, `consequence`, `summary: string | Token[]`, `actions: FieldAction[]`, `live`, `id`, `className`, `strs`, `args`.
-- **Ids:** the root is `id`; the summary region is `<id>-summary`.
-- **Events:**
-  - `Clear` is `<button class="st-text-action" data-action="clear">`. The host discards the draft, re-renders the summary as `Cleared` with `Undo` (`data-action="undo-clear"`), and starts a 5s timer.
-  - `Undo` restores the draft.
-- **Focus return:**
-  - After `Clear`, focus moves to `Undo`.
-  - After `Undo`, focus moves to `Clear`.
-  - When the banner goes away (the Undo timeout, or the last change undone by hand), call `SentriUI.handFocus(banner, firstField)` before removing it. It moves focus to the sheet's first field (which the host names) **only if focus is still inside the banner**; focus the worker has put elsewhere is left alone.
-- **Slots:** headline, consequence, summary tokens, and actions.
+`door`, `icon` and `size: 'small'` are properties, not extra variants. TaskWarning is a compatibility alias to Banner, not another face.
 
-**Don'ts**
-- Don't use `danger` for a warning that still records (a duplicate tag, a weight out of range). That is amber, in the field's status line.
-- Don't stack two banners, and don't add an icon.
-- Don't put the primary act inside the banner. It stays in the bar, under the banner.
-- Don't make `Clear` final with no way back. It always offers `Undo`.
+## States
+| State | Rendered behavior |
+| --- | --- |
+| Default | Headline, consequence; optional actions or whole-box door |
+| Pressed / Focus | Press fill or visible focus ring on the action/door |
+| Disabled | Door disabled with a visible reason and dashed border |
+| Error | Upload interrupted; notice door offers retry and keeps local work |
+| Loading | Notice states what is uploading; host retains the review door |
+| Changed | Live change summary with Clear; appears at the first correction |
+| Cleared | Correction summary says Cleared; Undo remains for 5 seconds |
+| Long label / Chinese | Headline ellipsizes on one line; consequence wraps |
 
-**Strings**
-- `strs: { headline, consequence, summary }` and `args`. A token summary takes per-part `strs`.
-- Each action takes `{ label, action, strs: { label }, args }`.
-- `ds.c2.demo.cleared` (`Cleared`) and `ds.c2.undo` (`Undo`) are in the registry.
-- Without `strs` the output is unchanged.
+No selected state: a banner is not a choice. Input validation belongs in Field; a failed upload uses notice with a retry door. An empty correction is omitted. [State documents](variants.json) render every applicable state.
+
+## Behavior
+`SentriUI.banner({tone, headline, consequence, summary, actions, live, id, door, icon, size, state, reason, detail, strs, args})` returns HTML. String slots also accept trusted `{html}` from the task skeleton. Unknown tone falls back to danger with a development warning. `actions` accepts text-action descriptors (or legacy trusted task markup). Maximum two text actions; the primary commit stays in the footer.
+
+The host handles review, Clear and Undo events. Clear snapshots the draft, empties it, renders `summary: 'Cleared'` and an `undo-clear` action, focuses Undo and starts a 5-second timer. Undo restores the snapshot and returns focus to Clear. On expiry call `SentriUI.handFocus(banner, firstField)` before removing it; do not steal focus from elsewhere. Summary is the only live region when present. Call `SentriUI.liveFill` after mounting. The state demo keeps Cleared visible for inspection; the host owns its timer.
+
+## Content rules
+Sentence case. Aim for at most 42 English characters or 18 Chinese characters in a headline; cap at one visual line, with ellipsis for excess. Keep the full text in the DOM and put necessary consequences in the wrapping line (up to 100 English / 45 Chinese characters). Example: “先保存更正记录” / “Save your correction first”. Action labels are verbs, at most 16 English / 6 Chinese characters. Never rely on colour: every tone has a leading word or icon.
+
+## Accessibility
+Static box: `role="note"`; dynamic summary: `role="status"`, polite and atomic. Door is a native button; Tab focuses it, Enter/Space activates. Text actions use Button keyboard/focus behavior. Disabled doors have a visible reason and native disabled semantics. No gesture-only action. All targets and summary rows use the 48px glove floor.
+
+## Do / don't
+Do name the consequence once and place the commit below it. Don't nest buttons in a door, put banners inside cards, or use red for connectivity. Do offer Undo after Clear; don't remove the focused Undo without returning focus.
+
+## Tokens
+`space-row-y`, `space-row-x`, `space-4`, `space-8`, `tap-min`, `control-height`, `size-1`, `size-2`, `size-3`, `radius-control`, `danger-border`, `red-wash`, `red`, `pending-border`, `amber-wash`, `ink`, `muted`, `press`, `focus`, `glyph-pad`, `type-weight-strong`, `type-choice-label-size`, `type-choice-meta-size`, `font-sans`, `font-mono`. No local colour or size values.
+
+## Related and classification
+Generic **component**, shared across sections. [Button](../Button/README.md) owns text-action targets. [Status](../Status/README.md) owns quiet feedback. [TaskWarning](../TaskWarning/README.md) is its retired compatibility alias. Optional icon and door are properties, not copies.
+
+## Changelog
+2026-10-10: merged TaskWarning and Home offline banner; added notice/door, padded targets, rendered Cleared and Chinese states. See [verification](verification.md).

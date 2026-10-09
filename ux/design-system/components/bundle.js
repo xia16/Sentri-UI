@@ -379,11 +379,11 @@
     const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}" aria-describedby="${esc(hid)}"${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
     const copy=`<span class="st-stepper-copy"><span class="st-stepper-label" id="${esc(lid)}">${tx(label,o,'label')}</span>${description||has(o,'description')?`<small class="st-stepper-description">${tx(description,o,'description')}</small>`:''}</span>`;
     const vargs=a.value||(s.value?{n:String(n)}:null);
-    const val=`<span class="st-stepper-value" role="spinbutton" tabindex="0" aria-labelledby="${esc(lid)}" aria-describedby="${esc(hid)}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${esc(n)}</span>`;
+    const val=`<span class="st-stepper-value" role="spinbutton" tabindex="0" aria-label="${esc(label)}" aria-describedby="${esc(hid)}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${esc(n)}</span>`;
     const canPoint=hero||min>0||pointers.length>0;
     const reserve=reserveHint!=null?(reserveHint?(canPoint?'action':'text'):''):(canPoint?'action':max!=null?'text':'');
     const hl=hintLine('st-stepper-hint',{id:hid,text:hint,o,reserve,actions:pointers,fieldKey:key});
-    return `<div class="st-stepper ${esc(className)}" data-ds="Stepper" data-variant="${hero?'hero':'row'}" data-field="${esc(key)}" role="group" aria-labelledby="${esc(lid)}"${n===0?' data-zero=""':''}${isChanged?' data-changed=""':''}${isDraft?' data-draft=""':''}${max!=null&&max>=1000?' data-wide=""':''}>${copy}<span class="st-stepper-keys">${key1(-1,floorGray)}${val}${key1(1,ceilGray)}</span>${hl}</div>`;
+    return `<div class="st-stepper ${esc(className)}" data-ds="Stepper" data-variant="${hero?'hero':'row'}" data-field="${esc(key)}" role="group" aria-label="${esc(label)}"${n===0?' data-zero=""':''}${isChanged?' data-changed=""':''}${isDraft?' data-draft=""':''}${max!=null&&max>=1000?' data-wide=""':''}>${copy}<span class="st-stepper-keys">${key1(-1,floorGray)}${val}${key1(1,ceilGray)}</span>${hl}</div>`;
   }
   /* The box a measured or typed value sits in; shared by Measure (a button) and the Numpad readout (static).
      live: the value announces as it is typed (concise: the value only, never the label). */
@@ -604,37 +604,42 @@
     const html=toks(tokens,{tight,dot:s==='dot'});
     return isLive?live('p',attrs,html):`<p${attrs}>${html}</p>`;
   }
-  /* Banner: a headline over its consequence, on a wash. tone 'danger' (red: an irreversible act or a terminal
-     fact) or 'correction' (a strong amber wash with an amber border: Edit's banner, with a live change summary and
-     Clear, then `Cleared · Undo`). One live region per banner: the summary when there is one, else the banner itself. */
-  function banner({tone='danger',headline='',consequence='',summary=null,actions=[],live:isLive=false,id='',className='',strs,args}={}){
-    const o={strs,args},t=oneOf('Banner','tone',tone,['danger','correction'],'danger');
-    const bid=id||fieldId('st-banner');
-    const cons=consequence||has(o,'consequence')?`<span class="st-banner-consequence">${tx(consequence,o,'consequence')}</span>`:'';
+  /* Banner: consequence, correction review or pending notice. Door is one button, never nested actions.
+     One live region per banner: its summary when present, otherwise the live box. */
+  function banner({tone='danger',headline='',consequence='',summary=null,actions=[],live:isLive=false,id='',className='',strs,args,door=null,icon='',size='',state='',reason='',detail=''}={}){
+    const o={strs,args},t=oneOf('Banner','tone',tone,['danger','correction','notice'],'danger'),bid=id||fieldId('st-banner');
+    const slot=(v,key)=>v&&typeof v==='object'&&'html' in v?v.html:tx(v,o,key);
     const hasSum=summary!=null||has(o,'summary');
     const sumHtml=summary==null?tx('',o,'summary'):Array.isArray(summary)?toks(summary,{dot:true}):tx(summary,o,'summary');
-    const sum=hasSum?`<div class="st-banner-summary">${live('p',` class="st-banner-summary-text" id="${esc(bid)}-summary"`,sumHtml)}${textActions(actions,'')}</div>`:'';
-    const body=`<strong class="st-banner-headline">${tx(headline,o,'headline')}</strong>${cons}`;
-    if(isLive&&hasSum)warn('Banner','live and summary together: the summary is the one live region');
-    const attrs=` class="st-banner ${esc(className)}" data-ds="Banner" data-tone="${t}" id="${esc(bid)}"`;
-    return isLive&&!hasSum?live('div',attrs,body):`<div${attrs}>${body}${sum}</div>`;
+    const actionHtml=typeof actions==='string'?actions:textActions(actions,'');
+    const sum=hasSum?`<span class="st-banner-summary">${live('span',` class="st-banner-summary-text" id="${esc(bid)}-summary"`,sumHtml)}${door?'':actionHtml}</span>`:(!door&&actionHtml?`<div class="st-banner-actions">${actionHtml}</div>`:'');
+    const body=`<span class="st-banner-body">${icon?`<span class="st-banner-icon" aria-hidden="true">${glyph(icon)}</span>`:`<span class="st-banner-tone" data-str="ds.banner.tone.${t}">${t==='danger'?'Warning':t==='correction'?'Correction':'Notice'}</span>`}<span class="st-banner-copy"><strong class="st-banner-headline">${slot(headline,'headline')}</strong>${consequence?`<span class="st-banner-consequence">${slot(consequence,'consequence')}</span>`:''}${detail?`<span class="st-banner-consequence">${slot(detail,'detail')}</span>`:''}${reason?`<span class="st-banner-consequence">${esc(reason)}</span>`:''}</span>${door?'<span aria-hidden="true">›</span>':''}</span>`;
+    const attrs=` class="st-banner ${esc(className)}" data-ds="Banner" data-tone="${t}" data-size="${esc(size)}" data-state="${esc(state)}"${state==='Loading'?' aria-busy="true"':''} id="${esc(bid)}"`;
+    if(door)return `<button type="button"${attrs} data-door data-action="${esc(door.action||'open')}" data-value="${esc(door.value||'')}"${door.label?` aria-label="${esc(door.label)}"`:''}${state==='Disabled'?' disabled':''}>${body}${sum}</button>`;
+    return isLive&&!hasSum?live('div',attrs,body+sum):`<div${attrs} role="note">${body}${sum}</div>`;
   }
-  /* Photos: the record's photo field — a well card, the label and the camera circle on one 44px row, the answer line
+  /* Photos: the record's optional photo row, label and padded camera action on one >=48px row, the answer line
      under it, thumbnails beneath. Inactive until there is something to attach to; at max the camera grays the same way
      (floor-gray: aria-disabled, still tappable, data-reason says why, answered in the line). Thumbnails open the viewer.
      error: 'denied' (camera permission) · 'too-large' — answered amber; a cancelled capture says nothing. */
   const PHOTO_ERRORS={denied:{id:'ds.c2.photos.denied',en:'Camera not allowed · allow it in Settings, then try again'},'too-large':{id:'ds.c2.photos.too_large',en:'Photo too large to attach · take it again'}};
-  function photos({label='Photos',optional='',count=null,active=true,items=[],max=12,action='photo-add',viewAction='photo-view',key='photos',hint='',error='',id='',className='',strs,args}={}){
-    const o={strs,args},s=strs||{},a=args||{},pid=id||fieldId('st-photos'),hid=pid+'-hint',lid=pid+'-label';
+  function photos({label='Photos',optional='Optional',count=null,active=true,items=[],max=12,action='photo-add',viewAction='photo-view',key='photos',hint='',error='',id='',className='',strs,args,adding=false,disabledReason='',preview=''}={}){
+    const o={strs,args},s=strs||{},a=args||{},pid=id||fieldId('st-photos'),hid=pid+'-hint';
     const err=oneOf('Photos','error',error,['denied','too-large','cancelled'],'');
     const ERR=PHOTO_ERRORS[err];
     const list=items||[],full=list.length>=max,reason=!active?'inactive':full?'full':'';
-    const countHtml=count==null?'':`<small class="st-photos-count">${Array.isArray(count)?toks(count,{dot:true}):part(count)}</small>`;
-    const head=`<div class="st-photos-head"><span class="st-photos-label" id="${esc(lid)}"><span${sa(s.label,a.label)}>${esc(label)}</span>${optional||has(o,'optional')?`<small>${tx(optional,o,'optional')}</small>`:''}${countHtml}</span><button type="button" class="st-photos-camera" id="${esc(pid)}-camera" data-action="${esc(action)}" data-value="${esc(key)}" aria-describedby="${esc(hid)}"${reason?` aria-disabled="true" data-reason="${reason}"`:''}${ariaText('Take a photo',s.camera,a.camera)}>${glyph('camera')}</button></div>`;
+    const pending=list.filter(it=>it.pending).length;
+    const value=count==null?(list.length?`${list.length} attached${pending?` · ${pending} waiting to upload`:''}`:''):Array.isArray(count)?count.map(x=>typeof x==='string'?x:x.text||'').join(' · '):typeof count==='object'?count.text:count;
+    const blocked=disabledReason||(!active?'Record a death first · photos ride that record':full?`${max} photos at most`:'');
+    let head=optionalRow({label,value,optionalWord:optional,icon:glyph('camera'),action,key,className:'st-photos-head',attrs:{'aria-describedby':hid,...(reason||disabledReason||adding?{'aria-disabled':'true','data-reason':reason||'busy'}:{}),...(adding?{'aria-busy':'true'}:{}),...(preview?{'data-preview':preview}:{})}}).replace('<button type="button"','<button type="button" id="'+esc(pid)+'-camera"').replace('class="st-optional-row ', 'class="st-optional-row st-photos-camera ');
+    head=head.replace(`<span class="st-optional-label">${esc(label)}</span>`,`<span class="st-optional-label"${sa(s.label,a.label)}>${esc(label)}</span>`).replace(`<small class="st-optional-word">${esc(optional)}</small>`,`<small class="st-optional-word"${sa(s.optional,a.optional)}>${esc(optional)}</small>`);
+    const countParts=count==null?(list.length?tx(`${list.length} attached`,{strs:{attached:'ds.c2.photos.attached'},args:{attached:{n:list.length}}},'attached')+(pending?' · '+tx(`${pending} waiting to upload`,{strs:{waiting:'ds.c2.photos.waiting'},args:{waiting:{n:pending}}},'waiting'):''):''):Array.isArray(count)?toks(count,{dot:true}):part(count);
+    head=head.replace(`<span class="st-optional-answer" role="status">${esc(value||'')}</span>`,`<span class="st-optional-answer" role="status">${countParts}</span>`);
+    if(s.camera)head=head.replace(/ aria-label="[^"]*"/,ariaText('Take a photo',s.camera,a.camera));
     const thumb=(it,i)=>`<li><button type="button" class="st-photos-thumb" id="${esc(pid)}-thumb-${i+1}" data-action="${esc(viewAction)}" data-value="${esc(it.id!=null?it.id:i)}"${it.pending?' data-pending=""':''}${ariaText(it.alt||`Photo ${i+1}${it.pending?' · waiting to upload':''}`,it.pending?s.thumbPending:s.thumb,{n:i+1})}>${it.src?`<img src="${esc(it.src)}" alt="">`:`<span class="st-photos-index"${sa(s.index,{n:i+1})}>${i+1}</span>`}</button></li>`;
-    const thumbs=list.length?`<ul class="st-photos-items" aria-labelledby="${esc(lid)}">${list.map(thumb).join('')}</ul>`:'';
+    const thumbs=list.length?`<ul class="st-photos-items" aria-label="${esc(label)}">${list.map(thumb).join('')}</ul>`:'';
     // An error is answered with its own registered message (it wins over hint); a cancelled capture says nothing.
-    const hl=ERR?hintLine('st-photos-hint',{id:hid,text:ERR.en,tone:'warn',o:{strs:{hint:ERR.id}}}):hintLine('st-photos-hint',{id:hid,text:err==='cancelled'?'':hint,o});
+    const hl=ERR?hintLine('st-photos-hint',{id:hid,text:ERR.en,tone:'warn',o:{strs:{hint:ERR.id}}}):hintLine('st-photos-hint',{id:hid,text:err==='cancelled'?'':adding?'Adding photo…':hint||blocked,o});
     return `<div class="st-photos ${esc(className)}" data-ds="Photos" id="${esc(pid)}" data-field="${esc(key)}"${!active?' data-inactive=""':''}${full?' data-full=""':''}${err?` data-error="${err}"`:''}>${head}${hl}${thumbs}</div>`;
   }
   /* Button, as a factory. Registers (RULINGS, three button registers + the text action): primary (the one commit,
@@ -805,7 +810,7 @@
     }
     const lid=rid+'-label';
     const opt=x=>`<button type="button" class="st-choice-inline-opt"${disabled?' aria-disabled="true"':''}${pressed?' data-preview="pressed"':''} role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}"><span class="st-radio" aria-hidden="true"></span><span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span></button>`;
-    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio" id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
+    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio" id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-label="${esc(label)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
   }
   /* The radio keyboard model, pure: ArrowDown/ArrowRight → next, ArrowUp/ArrowLeft → previous (both wrap), Home → first,
      End → last. Returns the value to select and focus, or null for any other key. */

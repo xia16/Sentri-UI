@@ -79,3 +79,9 @@ One implementation of the drawer, the page and the dialog: `SentriUI.sheet`, `sh
 ## Button / IconButton pass (2026-10-10)
 
 Button now owns primary, secondary, text action, tool, destructive and hold variants. Farrowing’s hold timer and Piglet’s `.sp-tool` are retired; `SentriTask.holdBind` delegates to the bundle. IconButton owns bordered and plain at `tap-min` square; Sheet Close and prototype toolbar/header tools use it. Host classes position controls; their forked geometry and colours have been removed. Waiting reasons stay visible and are linked to their control.
+
+## Banner / Photos pass (2026-10-10)
+
+`SentriUI.banner` owns danger, correction and notice; door and small size are properties. `SentriTask.warning` is only an adapter for legacy string slots and tone names. TaskWarning CSS, Farrowing danger/door markup, Inspection removal warnings and Home sync-card styling are retired. Piglet processing's ended notice uses notice and its dist is rebuilt.
+
+`SentriUI.photos` owns the line face built on the existing `optionalRow`; `SentriTask.photos` delegates without rewriting markup or styling. Farrowing death and piglet mortality use it. The unused well/circle face and TaskPhotos CSS are retired. Optional-row labels share choice-label type; Farrowing litter weight already uses that row. Give IDs Measure is unchanged pending the owner's Numpad split. State documents and 375px screenshots live with the two component pages.

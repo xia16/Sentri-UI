@@ -1,0 +1,24 @@
+[
+  {
+    "id": "line",
+    "name": "Optional photo row",
+    "use": "Use for optional evidence attached to one event",
+    "notUse": "Not for a fact that needs words — use Note",
+    "states": [
+      "Default",
+      "Empty",
+      "One photo",
+      "Several photos",
+      "Adding",
+      "Uploading",
+      "Denied",
+      "Too large",
+      "Pressed",
+      "Focus",
+      "Disabled",
+      "Full",
+      "Cancelled",
+      "Long label / Chinese"
+    ]
+  }
+]

@@ -1,0 +1,45 @@
+[
+  {
+    "id": "danger",
+    "name": "Danger",
+    "use": "Use for a consequence before a destructive commit or a terminal fact",
+    "notUse": "Not for field validation — use Field",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Disabled",
+      "Long label / Chinese"
+    ]
+  },
+  {
+    "id": "correction",
+    "name": "Correction",
+    "use": "Use for reviewing a correction before recording it",
+    "notUse": "Not for connectivity — use Banner notice",
+    "states": [
+      "Default",
+      "Changed",
+      "Pressed",
+      "Focus",
+      "Disabled",
+      "Cleared",
+      "Long label / Chinese"
+    ]
+  },
+  {
+    "id": "notice",
+    "name": "Notice",
+    "use": "Use for pending offline uploads or work waiting to be reviewed",
+    "notUse": "Not for destructive consequences — use Banner danger",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Disabled",
+      "Loading",
+      "Error",
+      "Long label / Chinese"
+    ]
+  }
+]

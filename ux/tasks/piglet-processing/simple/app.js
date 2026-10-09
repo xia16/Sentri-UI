@@ -253,7 +253,7 @@
   function penSheet(inert) {
     var p = pen(), ended = !!P.s.ended, body = '';
     if (V.flash && V.flash.pen === p.code) body += flashLine();
-    if (ended) body += K.warning({ tone: 'amber', text: T('ended.note') });
+    if (ended) body += K.warning({ tone: 'notice', text: T('ended.note') });
     body += pigletsCard(p);
     if (!ended) body += toolRow();
     body += processing(p);

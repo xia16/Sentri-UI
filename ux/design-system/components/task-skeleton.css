@@ -163,19 +163,6 @@
 .tk-stepper[data-face="count"] .st-stepper-key[aria-disabled="true"] .st-stepper-face { background: var(--paper); border-color: var(--chip-green-border); color: var(--disabled-ink); box-shadow: none; }
 .tk-stepper[data-face="count"] .st-stepper-value { color: var(--count-ink); }
 
-/* TaskPhotos: farrowing's photo line — no well; a camera glyph, the label 13px, `Optional` 10px; an outlined camera key. */
-.st-photos.tk-photos { padding: 0; border-radius: 0; background: transparent; }
-* + .st-photos.tk-photos { margin-top: var(--space-section); }
-.tk-photos .st-photos-head { gap: 6px; }
-.tk-photos .st-photos-label { align-items: center; column-gap: 7px; font: 500 var(--type-row-title-size)/1.4 var(--font-sans); }
-.tk-photos .st-photos-label small { font: var(--type-meta-size)/1.4 var(--font-sans); color: var(--muted); }
-.tk-photos-glyph { display: inline-flex; }
-.tk-photos-glyph svg { width: var(--glyph-key); height: var(--glyph-key); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.tk-photos .st-photos-camera.st-photos-camera { border: 1px solid var(--task-key-border); border-radius: var(--radius-segment); background: var(--paper); }
-.tk-photos .st-photos-items { gap: var(--space-key-gap); padding: var(--space-key-gap) 0; }
-.tk-photos .st-photos-thumb.st-photos-thumb { width: var(--photo-thumb-task); height: var(--photo-thumb-task); border: 0; border-radius: 8px; }
-.tk-photos .st-photos-hint.st-photos-hint { padding-right: 0; }
-
 /* TaskChoice: farrowing's choice tiles (Foster: Send / Receive). */
 .tk-choice { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .tk-choice[data-count="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -198,15 +185,6 @@
 .tk-radios .st-choice-label { font: 400 var(--type-button-size)/1.4 var(--font-sans); }
 .tk-radios .st-choice-row .st-radio { order: 2; margin-left: auto; border-width: var(--ring-width-fine); border-color: var(--muted); }
 .tk-radios .st-choice-row[aria-checked="true"] .st-radio { border-color: var(--ink); }
-
-/* TaskWarning: farrowing's danger band — pale red, 12px red text, text actions, a 10px muted consequence line. */
-.tk-warning { margin: 0; padding: var(--space-row-y); border: 1px solid var(--danger-border); border-radius: var(--radius-control); background: var(--red-wash); color: var(--red);
-  font: var(--type-choice-meta-size)/1.6 var(--font-sans); }
-.tk-warning[data-tone="amber"] { border-color: var(--pending-border); background: var(--amber-wash); color: var(--amber); }
-.tk-warning-text { margin: 0; }
-.tk-warning-actions { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--space-row-y); margin-top: 4px; }
-.tk-warning-actions > .st-text-action { color: inherit; }
-.tk-warning-detail { display: block; margin-top: 4px; font: var(--type-meta-size)/1.6 var(--font-sans); color: var(--muted); }
 
 /* TaskTable: farrowing's comparison table (Choose a unit). Column headings and sublines are 9px, as farrowing
    (`table-heading`, below the 10px floor by the owner's round-5 ruling, like the hold caption). */
@@ -245,26 +223,6 @@
   .tk-table-columns, .tk-table-row { column-gap: 5px; grid-template-columns: minmax(65px, 1.35fr) repeat(var(--tk-cols, 3), minmax(0, 1fr)) 16px; padding-left: var(--space-row-y); padding-right: var(--space-row-y); }
   .tk-table-name > strong { font-size: var(--type-row-title-size); }
 }
-
-/* ---- Skeleton 4 ---- */
-
-/* TaskWarning title (bold, as farrowing), and the End banner (⚠ icon, copy, chevron; the whole band a door). */
-.tk-warning-title { display: block; font: 600 var(--type-choice-meta-size)/1.5 var(--font-sans); }
-.tk-warning-title + .tk-warning-text { margin-top: 4px; font-size: var(--type-description-size); }
-.tk-warning[data-tone="amber"] { border-color: var(--banner-border); background: var(--banner-wash); color: var(--amber); }
-.tk-warning[data-banner] { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 80px; text-align: left; }
-button.tk-warning[data-banner] { margin: 0; cursor: pointer; }
-button.tk-warning[data-banner]:active { filter: brightness(.97); }
-.tk-warning-icon { flex: none; align-self: flex-start; display: grid; place-items: center; width: 16px; margin-top: 2px; }
-.tk-warning-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.tk-warning-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.tk-warning-copy > .tk-warning-title + .tk-warning-text { margin-top: 0; line-height: 1.6; }
-.tk-warning-go { flex: none; display: grid; place-items: center; }
-.tk-warning-go svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-/* The red band's hierarchy is farrowing's .danger-band: the headline is <strong> (bold, red), the consequence line a <small> (muted, 10px,
-   4px under). The amber band and the End banner (data-banner) keep their own look: amber text throughout, as their reference. */
-.tk-warning:not([data-tone="amber"]) .tk-warning-title { font-weight: 700; line-height: 1.6; }
-.tk-warning:not([data-tone="amber"]):not([data-banner]) .tk-warning-title + .tk-warning-text { margin-top: 4px; font-size: var(--type-meta-size); color: var(--muted); }
 
 /* TaskRadios layout 'row': farrowing's inline field — label (Optional tag, Clear) left, outlined option pills right. */
 .st-choice-inline.tk-radios[data-face="row"] { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); min-height: 64px; }
