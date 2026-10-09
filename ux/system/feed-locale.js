@@ -1,7 +1,7 @@
 import registry from '../laws/strings.json' with {type:'json'};
 const language = typeof location !== 'undefined' && new URLSearchParams(location.search).get('lang') === 'zh' ? 'zh' : 'en';
 const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const entries = Object.entries(registry.strings).filter(([id]) => id.startsWith('feed.copy.')).map(([id,copy]) => {
+const entries = Object.entries(registry.strings).filter(([id]) => /^feed\.(copy|aria)\./.test(id)).map(([id,copy]) => {
   const keys = [];
   const parts = copy.en.split(/(\{\w+\})/).map(part => {
     if (/^\{\w+\}$/.test(part)) { const key=part.slice(1,-1);keys.push(key);return key==='n'?'([+−-]?\\d+(?:\\.\\d+)?)':key==='code'?'([A-Za-z0-9-]+)':key==='delta'?'([+−-]?\\d+(?:\\.\\d+)?%)':'([^·]+?)'; }
@@ -16,6 +16,7 @@ function translated(text){
     const args=Object.fromEntries(entry.keys.map((key,i)=>[key,match[i+1]]));
     return {id:entry.id,text:text.replace(value,entry.copy[language].replace(/\{(\w+)\}/g,(_,key)=>args[key]))};
   }
+  if(/[a-z0-9—]\.\s/.test(value))return {text:text.split(/((?<=[a-z0-9—])\.\s+)/).map(part=>/^\.\s+$/.test(part)?(language==='zh'?'。':part):translated(part)?.text||part).join('')};
   if(value.includes('·'))return {text:text.split(/(\s*·\s*)/).map(part=>part.includes('·')?part:translated(part)?.text||part).join('')};
   return null;
 }

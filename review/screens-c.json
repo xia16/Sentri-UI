@@ -1,17 +1,5 @@
 [
  {
-  "id": "screens-c-2",
-  "target": {
-   "kind": "screen",
-   "id": "health-record.treatment"
-  },
-  "kind": "broken",
-  "severity": "high",
-  "title": "Treatment form trapped in a 260px scroll box",
-  "detail": "The page's body scroller is 260px tall inside a full-height page: Dose and Unit are cut off at y=380, the lower half is empty, and the hint line floats mid-page. Fix: let the sheet body fill the space down to the footer.",
-  "source": "screen-review"
- },
- {
   "id": "screens-c-3",
   "target": {
    "kind": "screen",

@@ -1,17 +1,5 @@
 [
  {
-  "id": "screens-a-1",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.before"
-  },
-  "kind": "broken",
-  "severity": "high",
-  "title": "Sheets collapse whenever a waiting reason line shows",
-  "detail": "Before first count, Edit record (both), Lock blocked and End task (active sows): the body clips mid-row, the hint overlaps Litter summary, tiles are cut, and the reason line sits flush at x=0. Fix: put the reason in the footer's status slot, not the scrolling body.",
-  "source": "screen-review"
- },
- {
   "id": "screens-a-7",
   "target": {
    "kind": "feature",

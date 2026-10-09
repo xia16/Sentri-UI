@@ -802,6 +802,8 @@
 .inspection-phone .attention-row>.st-condition[data-variant="mark"]{flex:none}
 
 .inspection-phone .log-date-field{flex:1;min-width:0;margin:0}
+.inspection-phone .log-filter-controls{align-items:flex-start}
+.inspection-phone .log-category-select .log-category-trigger{margin:0}
 
 .inspection-phone [data-action="sample-scan"]+.inspect-search{margin-top:var(--space-section)}
 
@@ -810,3 +812,4 @@
 
 .inspection-phone .ongoing-findings{margin-bottom:var(--space-section)}
 .inspection-phone .feed-editor-sheet .bulk-controls-toggle{min-height:var(--tap-min)}
+.inspection-phone .feed-editor-sheet .bulk-controls.facts-surface{max-height:none;overflow:visible}
