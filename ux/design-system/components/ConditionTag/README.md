@@ -13,7 +13,7 @@ ConditionTag names a **recorded health condition** on an animal, with its day co
 - **Detail:** a mark tile (`row-icon`, 34px, tinted by care) + the care-level word (14px/500, `ink`) + a meta line (`name · day`, 11px `muted`) + an optional note (13px).
 
 ## Care levels (the states)
-The care level is a recorded fact, not a colour: it is always said by the icon and, in the detail, by a word.
+The care level is a recorded fact, not a colour. Monitor and Treat share amber on purpose (one colour map); they differ by **icon and word**: Monitor shows the eye icon, Treat shows the syringe icon and the visible word `Treat`, Hospital the hospital icon and the word `Hospital` (red). In the detail the full care word is printed.
 
 | Care | Level | Means | Colours | Icon |
 |---|---|---|---|---|
@@ -22,13 +22,14 @@ The care level is a recorded fact, not a colour: it is always said by the icon a
 | `attention` | `hospital` | move to the hospital pen | `red` on `red-wash`, `chip-red-border` | hospital |
 | `ongoing` | | recorded, no action needed | `ink-2` on `well`, `line` | note |
 | `resolved` | | recovered | `green` on `green-wash`, `chip-green-border` | check |
-| `notice` | | a standing instruction on the animal (`Feed held`), not a condition | `muted`, outline | the caller's (`feed`) |
+| `notice` | | a standing instruction on the animal (`Feed held`, `No feed`), not a condition | `muted`, outline | the caller's (`feed`) |
 
 The colours follow the Status map: green is done (resolved), amber needs attention, red is the hospital pen.
 
 ## Variants
 - **Tag** (`variant: 'tag'`, default): in a row, several per line. Used by Inspection's pig list and the profile's health list.
 - **Detail** (`variant: 'detail'`): at the head of a condition's record page. Used by Inspection's finding page.
+- **Mark** (`variant: 'mark'`): just the care icon tile, for the icon slot of a Row (Inspection's attention list). It replaces the hand-built care-tinted row.
 
 ## States
 | State | Tag | Detail |
@@ -42,6 +43,7 @@ The colours follow the Status map: green is done (resolved), amber needs attenti
 | Empty | absent: no condition, no tag (the list shows `—`) | absent |
 | Long name | the name ends in an ellipsis; the icon and day stay | wraps |
 | Chinese | `食欲差 · 第3天` fits | fits |
+| Pending removal (`pending`) | muted, struck name, drawn inside the component | n/a |
 | Overflow in a line | the host folds the extra tags into `+N` (Inspection's `fitRecordedTags`) | n/a |
 
 ## Behaviour

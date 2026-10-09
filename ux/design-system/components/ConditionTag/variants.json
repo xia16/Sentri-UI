@@ -29,5 +29,18 @@
       "Long note (wraps)",
       "Chinese"
     ]
+  },
+  {
+    "id": "mark",
+    "name": "Mark",
+    "use": "use as the icon slot of a Row that lists conditions needing attention: the care icon tile alone.",
+    "notUse": "not on its own where the care word is not printed beside it — use the tag.",
+    "states": [
+      "Monitor",
+      "Treat in place",
+      "Hospital pen",
+      "Ongoing",
+      "Resolved"
+    ]
   }
 ]

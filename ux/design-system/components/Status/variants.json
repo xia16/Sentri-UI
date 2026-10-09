@@ -18,7 +18,7 @@
   {
     "id": "word",
     "name": "Word",
-    "use": "use for a state said inline in a heading or a line of meta: a 4px dot and the word.",
+    "use": "use for a state said inline in a heading, a meta line or a map cell: a 4px dot and the word (the pen map uses it).",
     "notUse": "not for a state on a list row — use the chip; not for a coloured value inside a sentence — use the line.",
     "states": [
       "Awaiting",
@@ -28,22 +28,6 @@
       "Overdue",
       "Sow died",
       "Long label (wraps)",
-      "Chinese"
-    ]
-  },
-  {
-    "id": "dot",
-    "name": "Dot",
-    "use": "use for the state of an item in a compact list when the list or its header already names that state in words.",
-    "notUse": "not as the only place a state is said — use the word or the chip.",
-    "states": [
-      "Awaiting",
-      "Active",
-      "Done",
-      "Late",
-      "Overdue",
-      "Sow died",
-      "In a row (beside its own text)",
       "Chinese"
     ]
   },

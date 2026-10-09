@@ -283,7 +283,7 @@
       var id = [x.tag, x.notch].filter(Boolean).join(' · ');
       var mark = UI.iconButton({ action: ended ? 'noop' : 'breeder', value: x.no, icon: I('bookmark'), label: T(x.keep ? 'mark.off' : 'mark.on', { no: x.no }), className: 'sp-mark' })
         .replace('class="icon-button', 'aria-pressed="' + !!x.keep + '" class="icon-button');
-      var row = K.row({ id: id, chip: x.keep ? { text: T('breeder'), tone: 'muted' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
+      var row = K.row({ id: id, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
         meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), action: ended ? '' : 'give-fix', value: x.no, trail: '', still: ended, label: T('fix.aria', { no: x.no }) });
       return '<div class="sp-pigrow" data-ds="TaskRow">' + row + mark + '</div>';
     });

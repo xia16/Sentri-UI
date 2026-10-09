@@ -4,11 +4,11 @@
 <head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}.r{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:14px}</style></head>
 <body>
 <div data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--font-sans);color:var(--ink)">
-<div class="r" id="chips"></div><div class="r" id="words"></div><div class="r" id="dots"></div><div id="lines" style="display:flex;flex-direction:column;gap:8px"></div></div>
+<div class="r" id="chips"></div><div class="r" id="words"></div><div id="lines" style="display:flex;flex-direction:column;gap:8px"></div></div>
 <script>
 const UI = window.SentriUI;
 const kinds = [['awaiting', 'To do'], ['active', 'Active'], ['done', 'Done'], ['late', 'Late'], ['overdue', 'Overdue'], ['died', 'Sow died']];
-for (const [id, v] of [['chips', 'chip'], ['words', 'word'], ['dots', 'dot']]) document.getElementById(id).innerHTML = kinds.map(([kind, text]) => UI.status({ variant: v, kind, text })).join('');
+for (const [id, v] of [['chips', 'chip'], ['words', 'word']]) document.getElementById(id).innerHTML = kinds.map(([kind, text]) => UI.status({ variant: v, kind, text })).join('');
 document.getElementById('lines').innerHTML =
   UI.statusLine(['Saved', { text: '+4 this visit', tone: 'green' }], { sep: 'dot', live: true }) +
   UI.statusLine([[{ text: 'Overdue' }, { text: '3 days', tone: 'red' }]]) +

@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T17:24:45.138Z",
- "commit": "5838678",
+ "generated": "2026-10-09T17:25:07.359Z",
+ "commit": "4f1b184",
  "platforms": [
   {
    "id": "mobile",
@@ -14834,72 +14834,73 @@
    "status": "in-design",
    "gate": {
     "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "round": 2,
+    "judged": "2026-10-10",
+    "commit": "c1508ba",
     "model": "claude-opus-5-5",
     "scores": {
      "clarity": 7,
      "budget": 8,
-     "hierarchy": 7,
+     "hierarchy": 8,
      "spacing": 8,
-     "broken": 4
+     "broken": 8
     },
-    "lowest": 4,
+    "lowest": 7,
     "checklist": [
      {
       "line": 1,
       "pass": true,
-      "why": "\"How a state is said\"; points to Row/Button for a status that acts"
+      "why": "Workflow-state job; names ConditionTag, Banner and row text for a forecast"
      },
      {
       "line": 2,
       "pass": true,
-      "why": "Don'ts and placement rules present"
+      "why": "Both lists present; alternatives exist in the library"
      },
      {
       "line": 3,
       "pass": true,
-      "why": "Dot, word, line, tokens, separator named and shown"
+      "why": "Chip, word, dot, line anatomy named and drawn"
      },
      {
       "line": 4,
       "pass": false,
-      "why": "The Word variant is used by no atlas screen; real state chips are filled badges from TaskRow, farrowing and health tags"
+      "why": "Word and Dot are used by no screen (Dot's README says so)"
      },
      {
       "line": 5,
       "pass": true,
-      "why": "States declared none (text only) with reasons; default and live shown"
+      "why": "States table per variant; none-states give reasons"
      },
      {
       "line": 6,
       "pass": true,
-      "why": "No tap targets"
+      "why": "Not a target; host rows measure 76-88px"
      },
      {
       "line": 7,
       "pass": true,
-      "why": "One chip per row stated"
+      "why": "One chip per row; urgency order stated"
      },
      {
       "line": 8,
       "pass": true,
-      "why": "Every tone carries a word; colour never alone"
+      "why": "Chip, word and line always carry the word; the colour-only Dot is gated (see variant)"
      },
      {
       "line": 9,
-      "pass": false,
-      "why": "No length cap for a status word; no long or zh example"
+      "pass": true,
+      "why": "12 / 6 character cap, wrap not ellipsis, long and zh examples"
      },
      {
       "line": 10,
       "pass": true,
-      "why": "Live region mounted empty and filled; port notes given"
+      "why": "Live region rule, aria-hidden icon, port notes"
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "Raw 4px separator margin; no CSS-variable list"
+      "pass": true,
+      "why": "Separator now var(--space-4); CSS-variable list given; only a 1px hairline is raw"
      },
      {
       "line": 12,
@@ -14913,35 +14914,76 @@
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "No classification line; no table of related look-alikes (Row chip, health tag)"
+      "pass": true,
+      "why": "Related table and Classification section present"
      },
      {
       "line": 15,
       "pass": true,
-      "why": "All tones and lines render at 375px without overflow"
+      "why": "All kinds and variants render at 375px with no overflow (scrollWidth 375)"
      }
     ],
     "classification": "component",
     "variants": [
      {
-      "name": "Word (dot + word)",
+      "name": "Chip",
+      "usedBy": [
+       "farrowing.room",
+       "farrowing.count",
+       "piglet-processing.pen-list",
+       "piglet-processing.sheet-late",
+       "workbench.today",
+       "workbench.work-due"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Map holds on Farrowing (Active blue, Done green+check, Sow died red) and the pen list (To do muted, Late amber+clock, Done green+check); every chip carries its word",
+       "Home passes a timing count ('Day 2 of 7') with icon 'clock', which the map reserves for Late; the README says a count is not a Status",
+       "The tagged-piglets page uses the chip for 'Breeder', an attribute, not a state"
+      ]
+     },
+     {
+      "name": "Word",
       "usedBy": [],
       "status": "in-design",
       "scores": {
        "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 4
+      },
+      "findings": [
+       "No screen uses it; Farrowing's Go-to-pen map still hand-colours its state words (.pen-cell.active green)"
+      ]
+     },
+     {
+      "name": "Dot",
+      "usedBy": [],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
        "budget": 8,
        "hierarchy": 7,
        "spacing": 8,
        "broken": 3
       },
       "findings": [
-       "No screen renders it; every live status chip is a filled badge instead"
+       "No screen uses it",
+       "Done, Late, Overdue and Sow died are all solid dots: same shape, only colour differs"
       ]
      },
      {
-      "name": "Line (coloured values)",
+      "name": "Line",
       "usedBy": [
+       "piglet-processing.pen-list",
        "piglet-processing.sheet-late",
        "farrowing.room"
       ],
@@ -14951,85 +14993,83 @@
        "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
-       "broken": 6
+       "broken": 7
       },
       "findings": [
-       "The look-alikes are hand-built (TaskDay .tk-tone \"late\", farrowing \"Overdue · 3 days\" row text), not statusLine()"
-      ]
-     },
-     {
-      "name": "Chip (filled, as built in screens), undocumented",
-      "usedBy": [
-       "piglet-processing.pen-list",
-       "piglet-processing.sheet-late",
-       "farrowing.room",
-       "farrowing.count"
-      ],
-      "status": "in-design",
-      "scores": {
-       "clarity": 6,
-       "budget": 8,
-       "hierarchy": 7,
-       "spacing": 8,
-       "broken": 3
-      },
-      "findings": [
-       "Three implementations: TaskRow .tk-chip (To do / Done / Late) and farrowing .state-word / .done-word (Active / Done)",
-       "\"To do\" is green on green-wash, but green means done/recorded; the README forbids filled badges"
+       "Farrowing builds 'Overdue · 3 days' by regex-injecting <span class=\"st-part\" data-tone=\"red\"> (farrowing-astra-concept.js:236) instead of calling statusLine()"
       ]
      }
     ],
     "findings": [
      {
-      "severity": "high",
-      "text": "Status is not what the product uses. Every state chip in the atlas is a filled badge built outside it: TaskRow .tk-chip (To do / Done / Late on piglet-processing.pen-list) and farrowing .state-word / .done-word (Active / Done on farrowing.room). The README says \"never a filled badge\".",
-      "fix": "Decide one face. Either add a \"chip\" variant to Status (filled wash, 10px/600, 20px tall) and have TaskRow and farrowing call SentriUI.status({ variant: \"chip\" }), or move those screens to the dot-word. Do not keep both."
-     },
-     {
-      "severity": "high",
-      "text": "\"To do\" is drawn green (rgb 39,102,64 on green-wash) on the pen list, so pens not yet done wear the \"done\" colour, while \"Done\" is grey.",
-      "fix": "Map To do to muted (or amber when due now), Done to green, Late to amber, through Status tones rather than per-feature CSS."
+      "severity": "medium",
+      "text": "Farrowing's Go-to-pen map paints pen states by hand and off the map: .pen-cell.active small is green (map: active = progress blue), .late red, .due amber; penFact() codes 'Overdue' as kind 'late' (farrowing-astra-room.css:10, farrowing-astra-concept.js:248).",
+      "fix": "Render the pen-cell state with SentriUI.status({ variant: 'word', kind }) and map Overdue to kind 'overdue'; delete the .pen-cell.<kind> small colours."
      },
      {
       "severity": "medium",
-      "text": "Health tags (Thin, Fever, Arthritis) do a different job: they name a recorded condition with a care level, not a workflow state. They are .recorded-tag pills with their own amber/orange tones.",
-      "fix": "Keep them out of Status; give them their own component (ConditionTag) with care-level tones, and link it from Status's Related list."
+      "text": "Home's task card puts a timing count in a Status chip with the Late clock icon ('Day 2 of 7' blue, 'Day 3 of 7' muted), so the clock means two things.",
+      "fix": "Drop icon:'clock' at astra-home-task-card.js:24, or make the timing plain meta text; a count is not a Status."
      },
      {
       "severity": "medium",
-      "text": "Status-line look-alikes are hand-built: TaskDay's mono \"late\" (.tk-tone) and farrowing's \"Overdue · 3 days\" row text.",
-      "fix": "Render them with SentriUI.statusLine([...], { mono: true }) so the tone rule (colour on the value, word in ink) holds."
+      "text": "Word and Dot still have no screen (line 4); Dot tells Done/Late/Overdue/Died apart by colour alone.",
+      "fix": "Put Word on the pen map (first finding) and remove Dot from the library until a screen needs it."
      },
      {
       "severity": "low",
-      "text": "\"Due tomorrow\" on farrowing rows is a forecast in muted 14/500 with no dot. It is fine as text, but the README does not say a forecast is not a Status.",
-      "fix": "Add one line: forecasts (\"Due tomorrow\", \"Expected in 5 days\") are row text, not a Status word."
+      "text": "Farrowing's overdue line hand-writes the statusLine markup via regex.",
+      "fix": "Build it with SentriUI.statusLine([[{ text: 'Overdue' }, { text: '3 days', tone: 'red' }]])."
      },
      {
       "severity": "low",
-      "text": "No word-length cap or zh example; raw 4px separator margin.",
-      "fix": "Cap the word length, add a zh example, and tokenise the separator margin."
+      "text": "'Breeder' on the tagged-piglets row is an attribute shown as a state chip.",
+      "fix": "Show it as row meta or by the bookmark state it already has; keep the chip for workflow states."
      }
     ],
+    "previous": {
+     "round": 1,
+     "commit": "3e3f835",
+     "lowest": 4,
+     "verdicts": [
+      {
+       "finding": "Status used by no screen; three hand-built chip implementations",
+       "result": "fixed",
+       "note": "TaskRow, Farrowing and Home call status({ variant: 'chip' }); .tk-chip, .state-word/.done-word/.ended-word, .hc-status deleted. Residual: Farrowing pen-map colours."
+      },
+      {
+       "finding": "'To do' drawn green",
+       "result": "fixed",
+       "note": "To do is awaiting/muted rgb(101,112,96) on the pen list and sheet"
+      },
+      {
+       "finding": "Health tags are a different job",
+       "result": "fixed",
+       "note": "Moved to ConditionTag, linked from Related"
+      },
+      {
+       "finding": "Status-line look-alikes hand-built",
+       "result": "partly fixed",
+       "note": "TaskDay .tk-tone gone; Farrowing overdue still regex-injected"
+      },
+      {
+       "finding": "Forecast not covered by README",
+       "result": "fixed"
+      },
+      {
+       "finding": "No length cap, zh example, raw 4px separator",
+       "result": "fixed"
+      }
+     ],
+     "reversed": "none"
+    },
     "proposals": [
      {
-      "kind": "new-variant",
-      "name": "Status · chip (filled)",
-      "why": "The filled state chip is the de-facto Status on four screens, with three implementations",
+      "kind": "merge",
+      "name": "Farrowing pen-map state words into Status word",
+      "why": "A fourth hand-built state colouring, off the map (Active green)",
       "seenIn": [
-       "piglet-processing.pen-list",
-       "farrowing.room",
-       "farrowing.count"
-      ]
-     },
-     {
-      "kind": "new-component",
-      "name": "ConditionTag (health tag)",
-      "why": "Thin / Fever / Arthritis label a recorded condition with a care level, a different job from a workflow state",
-      "seenIn": [
-       "health-record.mixed",
-       "pig-profile.full",
-       "inspection.walk"
+       "farrowing.room"
       ]
      }
     ]
@@ -15039,7 +15079,180 @@
    "name": "ConditionTag",
    "group": "Status and feedback",
    "status": "in-design",
-   "gate": null
+   "gate": {
+    "status": "in-design",
+    "round": 1,
+    "judged": "2026-10-10",
+    "commit": "c1508ba",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 8,
+     "budget": 8,
+     "hierarchy": 7,
+     "spacing": 8,
+     "broken": 3
+    },
+    "lowest": 3,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "Recorded-condition job; names Status, Banner, TaskChips instead"
+     },
+     {
+      "line": 2,
+      "pass": true,
+      "why": "Both lists present with library alternatives"
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Tag and detail parts named; day and note optional"
+     },
+     {
+      "line": 4,
+      "pass": true,
+      "why": "Tag on walk/profile/health-record, Detail on the finding page"
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "Care levels drawn; interaction states none, with reasons"
+     },
+     {
+      "line": 6,
+      "pass": true,
+      "why": "Never a target; host rows 76px"
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Overflow folds into +N via fitRecordedTags"
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Each care level has its own icon and an announced care word"
+     },
+     {
+      "line": 9,
+      "pass": true,
+      "why": "Name and care caps, ellipsis demo, zh example"
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "Text semantics, aria-hidden icon, row aria-label"
+     },
+     {
+      "line": 11,
+      "pass": true,
+      "why": "Component CSS is all tokens and lists its variables"
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Not a field"
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay"
+     },
+     {
+      "line": 14,
+      "pass": true,
+      "why": "Related table and Classification present"
+     },
+     {
+      "line": 15,
+      "pass": true,
+      "why": "Preview and variants render at 375px, no overflow, no clipped names"
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "Tag",
+      "usedBy": [
+       "inspection.walk",
+       "inspection.walk-log",
+       "pig-profile.full",
+       "health-record.mixed",
+       "health-record.care-states"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 7,
+       "spacing": 8,
+       "broken": 6
+      },
+      "findings": [
+       "Monitor and Treat in place are the same amber; on screen they differ only by a 12px icon (the care word is visually hidden)",
+       "Inspection recolours the tag per screen for a pending feed (.pending-feed-tag .st-condition)",
+       "'No feed' is coded care attention/monitor, though it is a standing instruction (notice)"
+      ]
+     },
+     {
+      "name": "Detail",
+      "usedBy": [
+       "health-record.finding"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "Header says Fever, detail says Treat in place · Day 2: nothing repeated"
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "The migration left an unclosed comment at ux/system/inspection-astra-concept.css:684 ('/* Care state belongs to its finding{width:...'), which swallows every rule up to line 728. Dead: attention-row care tints (monitor and treatment now identical rgb 252,244,229), the pen-feed stopped state, and the log filter controls (pig-profile.log: category trigger 20px, date trigger 40px tall, below the 48px floor).",
+      "fix": "Restore '/* Care state belongs to its finding, rather than a second duplicate badge. */' on its own line and put the attention-row rules back on the lines after it."
+     },
+     {
+      "severity": "medium",
+      "text": "Monitor and Treat in place share amber; on the pig list the care level shows only as a 12px eye vs syringe icon.",
+      "fix": "Keep amber for both but show the care word visibly for Treat and Hospital, or give Treat its own token if the farm needs it at a glance."
+     },
+     {
+      "severity": "medium",
+      "text": "The profile and health-record 'attention-row' is a hand-built look-alike with its own care colours (care-treatment orange #924514): a second care map.",
+      "fix": "Build it as a Row whose icon slot is the ConditionTag mark (st-condition-mark with data-care/level); delete the .attention-row.care-* tints."
+     },
+     {
+      "severity": "low",
+      "text": "Per-screen recolouring of a pending feed tag breaks 'never choose a colour per screen'.",
+      "fix": "Draw the pending look inside the component (notice with a struck name), or drop the override."
+     },
+     {
+      "severity": "low",
+      "text": "'No feed' is passed as attention/monitor with careText '0.0 kg/day'.",
+      "fix": "Pass care:'notice'; use amber only if it needs action, and say so in the care word."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "merge",
+      "name": "attention-row into Row + ConditionTag mark",
+      "why": "Same job (a condition with its care level) with its own colour map",
+      "seenIn": [
+       "pig-profile.full",
+       "health-record.mixed",
+       "health-record.finding"
+      ]
+     }
+    ]
+   }
   },
   {
    "name": "Banner",
@@ -20717,9 +20930,9 @@
     "id": "Status"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "Status is not what the product uses. Every state chip in the atlas is a filled badge built…",
-   "detail": "Status is not what the product uses. Every state chip in the atlas is a filled badge built outside it: TaskRow .tk-chip (To do / Done / Late on piglet-processing.pen-list) and farrowing .state-word / .done-word (Active / Done on farrowing.room). The README says \"never a filled badge\".\nFix: Decide one face. Either add a \"chip\" variant to Status (filled wash, 10px/600, 20px tall) and have TaskRow and farrowing call SentriUI.status({ variant: \"chip\" }), or move those screens to the dot-word. Do not keep both.",
+   "severity": "medium",
+   "title": "Farrowing's Go-to-pen map paints pen states by hand and off the map: .pen-cell.active small is…",
+   "detail": "Farrowing's Go-to-pen map paints pen states by hand and off the map: .pen-cell.active small is green (map: active = progress blue), .late red, .due amber; penFact() codes 'Overdue' as kind 'late' (farrowing-astra-room.css:10, farrowing-astra-concept.js:248).\nFix: Render the pen-cell state with SentriUI.status({ variant: 'word', kind }) and map Overdue to kind 'overdue'; delete the .pen-cell.<kind> small colours.",
    "source": "gate"
   },
   {
@@ -20729,9 +20942,9 @@
     "id": "Status"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "\"To do\" is drawn green (rgb 39,102,64 on green-wash) on the pen list, so pens not yet done wear…",
-   "detail": "\"To do\" is drawn green (rgb 39,102,64 on green-wash) on the pen list, so pens not yet done wear the \"done\" colour, while \"Done\" is grey.\nFix: Map To do to muted (or amber when due now), Done to green, Late to amber, through Status tones rather than per-feature CSS.",
+   "severity": "medium",
+   "title": "Home's task card puts a timing count in a Status chip with the Late clock icon ('Day 2 of 7'…",
+   "detail": "Home's task card puts a timing count in a Status chip with the Late clock icon ('Day 2 of 7' blue, 'Day 3 of 7' muted), so the clock means two things.\nFix: Drop icon:'clock' at astra-home-task-card.js:24, or make the timing plain meta text; a count is not a Status.",
    "source": "gate"
   },
   {
@@ -20742,8 +20955,8 @@
    },
    "kind": "design",
    "severity": "medium",
-   "title": "Health tags (Thin, Fever, Arthritis) do a different job: they name a recorded condition with a…",
-   "detail": "Health tags (Thin, Fever, Arthritis) do a different job: they name a recorded condition with a care level, not a workflow state. They are .recorded-tag pills with their own amber/orange tones.\nFix: Keep them out of Status; give them their own component (ConditionTag) with care-level tones, and link it from Status's Related list.",
+   "title": "Word and Dot still have no screen (line 4); Dot tells Done/Late/Overdue/Died apart by colour alone.",
+   "detail": "Word and Dot still have no screen (line 4); Dot tells Done/Late/Overdue/Died apart by colour alone.\nFix: Put Word on the pen map (first finding) and remove Dot from the library until a screen needs it.",
    "source": "gate"
   },
   {
@@ -20753,9 +20966,9 @@
     "id": "Status"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "Status-line look-alikes are hand-built: TaskDay's mono \"late\" (.tk-tone) and farrowing's…",
-   "detail": "Status-line look-alikes are hand-built: TaskDay's mono \"late\" (.tk-tone) and farrowing's \"Overdue · 3 days\" row text.\nFix: Render them with SentriUI.statusLine([...], { mono: true }) so the tone rule (colour on the value, word in ink) holds.",
+   "severity": "low",
+   "title": "Farrowing's overdue line hand-writes the statusLine markup via regex.",
+   "detail": "Farrowing's overdue line hand-writes the statusLine markup via regex.\nFix: Build it with SentriUI.statusLine([[{ text: 'Overdue' }, { text: '3 days', tone: 'red' }]]).",
    "source": "gate"
   },
   {
@@ -20766,20 +20979,8 @@
    },
    "kind": "design",
    "severity": "low",
-   "title": "\"Due tomorrow\" on farrowing rows is a forecast in muted 14/500 with no dot. It is fine as text,…",
-   "detail": "\"Due tomorrow\" on farrowing rows is a forecast in muted 14/500 with no dot. It is fine as text, but the README does not say a forecast is not a Status.\nFix: Add one line: forecasts (\"Due tomorrow\", \"Expected in 5 days\") are row text, not a Status word.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Status:5",
-   "target": {
-    "kind": "component",
-    "id": "Status"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "No word-length cap or zh example; raw 4px separator margin.",
-   "detail": "No word-length cap or zh example; raw 4px separator margin.\nFix: Cap the word length, add a zh example, and tokenise the separator margin.",
+   "title": "'Breeder' on the tagged-piglets row is an attribute shown as a state chip.",
+   "detail": "'Breeder' on the tagged-piglets row is an attribute shown as a state chip.\nFix: Show it as row meta or by the bookmark state it already has; keep the chip for workflow states.",
    "source": "gate"
   },
   {
@@ -20790,20 +20991,80 @@
    },
    "kind": "decision",
    "severity": "medium",
-   "title": "New variant: Status · chip (filled)?",
-   "detail": "The filled state chip is the de-facto Status on four screens, with three implementations\nSeen in: piglet-processing.pen-list, farrowing.room, farrowing.count",
+   "title": "Merge Farrowing pen-map state words into Status word?",
+   "detail": "A fourth hand-built state colouring, off the map (Active green)\nSeen in: farrowing.room",
    "source": "gate"
   },
   {
-   "id": "gate:Status:p1",
+   "id": "gate:ConditionTag:0",
    "target": {
     "kind": "component",
-    "id": "Status"
+    "id": "ConditionTag"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "The migration left an unclosed comment at ux/system/inspection-astra-concept.css:684 ('/* Care…",
+   "detail": "The migration left an unclosed comment at ux/system/inspection-astra-concept.css:684 ('/* Care state belongs to its finding{width:...'), which swallows every rule up to line 728. Dead: attention-row care tints (monitor and treatment now identical rgb 252,244,229), the pen-feed stopped state, and the log filter controls (pig-profile.log: category trigger 20px, date trigger 40px tall, below the 48px floor).\nFix: Restore '/* Care state belongs to its finding, rather than a second duplicate badge. */' on its own line and put the attention-row rules back on the lines after it.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:ConditionTag:1",
+   "target": {
+    "kind": "component",
+    "id": "ConditionTag"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Monitor and Treat in place share amber; on the pig list the care level shows only as a 12px eye…",
+   "detail": "Monitor and Treat in place share amber; on the pig list the care level shows only as a 12px eye vs syringe icon.\nFix: Keep amber for both but show the care word visibly for Treat and Hospital, or give Treat its own token if the farm needs it at a glance.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:ConditionTag:2",
+   "target": {
+    "kind": "component",
+    "id": "ConditionTag"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "The profile and health-record 'attention-row' is a hand-built look-alike with its own care…",
+   "detail": "The profile and health-record 'attention-row' is a hand-built look-alike with its own care colours (care-treatment orange #924514): a second care map.\nFix: Build it as a Row whose icon slot is the ConditionTag mark (st-condition-mark with data-care/level); delete the .attention-row.care-* tints.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:ConditionTag:3",
+   "target": {
+    "kind": "component",
+    "id": "ConditionTag"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Per-screen recolouring of a pending feed tag breaks 'never choose a colour per screen'.",
+   "detail": "Per-screen recolouring of a pending feed tag breaks 'never choose a colour per screen'.\nFix: Draw the pending look inside the component (notice with a struck name), or drop the override.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:ConditionTag:4",
+   "target": {
+    "kind": "component",
+    "id": "ConditionTag"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "'No feed' is passed as attention/monitor with careText '0.0 kg/day'.",
+   "detail": "'No feed' is passed as attention/monitor with careText '0.0 kg/day'.\nFix: Pass care:'notice'; use amber only if it needs action, and say so in the care word.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:ConditionTag:p0",
+   "target": {
+    "kind": "component",
+    "id": "ConditionTag"
    },
    "kind": "decision",
    "severity": "medium",
-   "title": "New component: ConditionTag (health tag)?",
-   "detail": "Thin / Fever / Arthritis label a recorded condition with a care level, a different job from a workflow state\nSeen in: health-record.mixed, pig-profile.full, inspection.walk",
+   "title": "Merge attention-row into Row + ConditionTag mark?",
+   "detail": "Same job (a condition with its care level) with its own colour map\nSeen in: pig-profile.full, health-record.mixed, health-record.finding",
    "source": "gate"
   },
   {

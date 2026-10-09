@@ -320,8 +320,8 @@ export type Part = string | { text: string; tone?: Tone; mono?: boolean; strs?: 
 export type Token = Part | Part[];
 /** The status kinds: one colour map (awaiting muted, active progress, done green, late amber, overdue red, died red). */
 export type StatusKind = 'awaiting' | 'active' | 'done' | 'late' | 'overdue' | 'died';
-/** Status: `word` (dot and word, inline), `chip` (filled badge in a row) or `dot` (shape alone; text is its name). `kind` picks tone and icon; `tone` alone still works. */
-export interface StatusProps { text: string; kind?: StatusKind; tone?: Tone; variant?: 'word' | 'chip' | 'dot'; /** chip only: a registry icon name, default from kind */ icon?: string; id?: string; className?: string; strs?: Strs<'text'>; args?: StrArgs<'text'> }
+/** Status: `word` (dot and word, inline), or `chip` (filled badge in a row). `kind` picks tone and icon; `tone` alone still works. */
+export interface StatusProps { text: string; kind?: StatusKind; tone?: Tone; variant?: 'word' | 'chip'; /** chip only: a registry icon name, default from kind */ icon?: string; id?: string; className?: string; strs?: Strs<'text'>; args?: StrArgs<'text'> }
 /** ConditionTag: a recorded health condition with its care level. */
 export interface ConditionTagProps {
   name?: string;
@@ -332,9 +332,13 @@ export interface ConditionTagProps {
   level?: 'monitor' | 'treat' | 'hospital';
   /** the care-level word, localized by the caller */
   careText?: string;
+  /** the short visible word for treat and hospital (default Treat, Hospital) */
+  levelText?: string;
+  /** a tag that will be removed on save: struck name, muted */
+  pending?: boolean;
   /** detail only */
   note?: string;
-  icon?: string; variant?: 'tag' | 'detail'; id?: string; className?: string;
+  icon?: string; variant?: 'tag' | 'detail' | 'mark'; id?: string; className?: string;
   strs?: Strs<'name' | 'day' | 'careText' | 'note'>; args?: StrArgs<'name' | 'day' | 'careText' | 'note'>;
 }
 export interface StatusLineOptions {

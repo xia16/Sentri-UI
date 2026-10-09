@@ -169,8 +169,8 @@ function needsHealthAttention(k){return ['Monitor','Treat in place','Hospital pe
 function healthStateFields(c){return fieldSelect(c,'Care','triage',careOptions,c.form.triage||'None');}
 function attentionOverview(p){
  const active=cases(p).filter(needsHealthAttention);
- const row=(type,title,detail,link,value,tone='')=>button(link,'<span class="attention-type">'+esc(type)+'</span><span class="attention-copy"><strong>'+esc(title)+'</strong>'+(detail?'<small>'+esc(detail)+'</small>':'')+'</span>'+icon('chevron'),'attention-row '+tone,value);
- const records=active.map(k=>row('Health',k.name,[k.triage&&k.triage!=='None'?k.triage:'', 'Day '+k.day].filter(Boolean).join(' · '),'finding',p.id+'|'+k.name,careAppearance(k).cls));
+ const row=(type,title,detail,link,value,tone='',mark='')=>button(link,(mark||'<span class="attention-type">'+esc(type)+'</span>')+'<span class="attention-copy"><strong>'+esc(title)+'</strong>'+(detail?'<small>'+esc(detail)+'</small>':'')+'</span>'+icon('chevron'),'attention-row '+tone,value);
+ const records=active.map(k=>row('Health',k.name,[k.triage&&k.triage!=='None'?k.triage:'', 'Day '+k.day].filter(Boolean).join(' · '),'finding',p.id+'|'+k.name,careAppearance(k).cls,SentriUI.conditionTag((a=>({variant:'mark',care:a.care,level:a.level,icon:a.symbol}))(careAppearance(k)))));
  if(p.note)records.push(row('Note',p.note,'','pig-log',p.id));
  return records.length?'<div class="attention-overview"><div class="attention-list" aria-label="Current notifications">'+records.join('')+'</div></div>':'';
 }
@@ -233,13 +233,13 @@ function careAppearance(k){
 }
 function pigFeedTags(p){
  const tags=[];
- if(p.noFeed)tags.push({kind:'stop',label:'No feed',cls:'feed-tag feed-stopped',symbol:'feed',status:'0.0 kg/day',care:'attention',level:'monitor'});
+ if(p.noFeed)tags.push({kind:'stop',label:'No feed',cls:'feed-tag feed-stopped',symbol:'feed',status:'0.0 kg/day',care:'notice'});
  else if(Number.isFinite(p.feedHold))tags.push({kind:'hold',label:'Feed held',cls:'feed-tag feed-notice',symbol:'feed',status:quantity(p.feedHold)+' kg/day · fixed amount',care:'notice'});
  else if(Number.isFinite(p.factor)&&Math.abs(p.factor-1)>.000001){const delta=(p.factor>=1?'+':'')+Number(((p.factor-1)*100).toFixed(1))+'%';tags.push({kind:'ration',label:'Feed '+delta,delta,cls:'feed-tag feed-notice',symbol:'feed',status:'Included in daily feed',care:'notice'});}
  return tags;
 }
 const tagDescription=t=>[t.label,t.day,t.status].filter(Boolean).join(' · ');
-function recordedTag(t){return SentriUI.conditionTag({name:t.label,day:t.day,care:t.care,level:t.level,icon:t.symbol,careText:t.status});}
+function recordedTag(t){return SentriUI.conditionTag({name:t.label,day:t.day,care:t.care,level:t.level,icon:t.symbol,careText:t.status,pending:!!t.pending});}
 function animalType(p){return p.registry?.type||p.type||(p.parity?'Sow':p.stage)||'Pig';}
 function stageSummary(p){
  const type=animalType(p);
@@ -1283,7 +1283,7 @@ function feedPigPreview(c){
   const tags=pigFeedTags(p).map(tag=>{
    const f=c.form,adjusting=f.mode==='resume'||f.mode==='adjust'&&Number.isFinite(+f.percent)&&+f.percent>=-50&&+f.percent<=50;
    const replaced=!t.blocked&&(f.mode==='stop'?tag.kind!=='stop':f.mode==='hold'?tag.kind!=='hold':adjusting?tag.kind!=='ration'||Math.abs((p.factor??1)-(f.mode==='resume'?1:1+Number(f.percent)/100))>.000001:false);
-   return replaced?'<del class="pending-feed-tag" aria-label="'+esc(tag.label+' will be removed or replaced on Save')+'">'+recordedTag({...tag,status:'Removed or replaced on Save'})+'</del>':recordedTag(tag);
+   return replaced?'<del class="pending-feed-tag" aria-label="'+esc(tag.label+' will be removed or replaced on Save')+'">'+recordedTag({...tag,status:'Removed or replaced on Save',pending:true})+'</del>':recordedTag(tag);
   }).join(''),plan=p.feedPlan||t.pe.formula,changed=!t.blocked&&Number.isFinite(after)&&Math.abs(after-before)>.0001,delta=after-before;
   const change=t.blocked?'<span class="feed-change-state">'+esc(t.blocked)+'</span>':'<span class="feed-pig-values"><span class="feed-reading"><small>Current</small><span>'+kg(before)+'</span></span><span class="feed-change-arrow" aria-hidden="true">→</span><span class="feed-reading is-new"><small>New</small><strong>'+kg(after)+'</strong></span></span><small class="feed-change-state">'+(changed?(delta>0?'+':'')+kg(delta)+' kg/day':'Unchanged')+'</small>';
   return '<div class="pig-review-row feed-pig-preview '+(t.blocked?'is-blocked':changed?'is-changed':'is-unchanged')+'"><span class="pig-review-identity feed-pig-identity"><strong>'+esc(p.id)+'</strong><small>'+esc(plan)+'</small>'+(tags?'<span class="feed-pig-badge">'+tags+'</span>':'')+'</span><span class="pig-review-change feed-pig-change">'+change+'</span></div>';

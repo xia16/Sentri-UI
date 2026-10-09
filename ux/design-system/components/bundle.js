@@ -434,20 +434,15 @@
   /* Status: how a state is said. One colour map for every status, here and in the README:
        awaiting muted · active progress · done green · late amber · overdue red · died red
      `kind` picks a row of the map (tone, and the icon a chip carries); `tone` alone is the old word call and still works.
-     variant: 'word' (a 4px dot and the word, inline) · 'chip' (a filled badge in a row) · 'dot' (the shape alone; its text is
-     the accessible name and the title). Text is always given: colour and shape never carry a state alone. */
+     variant: 'word' (a 4px dot and the word, inline) · 'chip' (a filled badge in a row). Text is always given: colour never carries a state alone. */
   const KINDS={awaiting:{tone:'muted',icon:''},active:{tone:'progress',icon:''},done:{tone:'green',icon:'check'},late:{tone:'amber',icon:'clock'},overdue:{tone:'red',icon:'alert'},died:{tone:'red',icon:''}};
-  const STATUS_VARIANTS=['word','chip','dot'];
+  const STATUS_VARIANTS=['word','chip'];
   function status({text='',tone,kind='',variant='word',icon,id='',className='',strs,args}={}){
     const k=kind?oneOf('Status','kind',kind,Object.keys(KINDS),''):'';
     const t=toneOf(tone)||(k&&KINDS[k].tone)||'muted';
     const v=oneOf('Status','variant',variant,STATUS_VARIANTS,'word');
     const o={strs,args};
     const attrs=`class="st-status ${esc(className)}" data-ds="Status" data-variant="${v}"${id?` id="${esc(id)}"`:''} data-tone="${t}"${k?` data-kind="${k}"`:''}`;
-    if(v==='dot'){
-      const tid=has(o,'text')?` data-str-attr="title:${esc(strs.text)}"`:'';
-      return `<span ${attrs} title="${esc(text)}"${tid}><span class="st-visually-hidden">${tx(text,o,'text')}</span></span>`;
-    }
     const g=v==='chip'?(icon!=null?icon:(k?KINDS[k].icon:'')):'';
     return `<span ${attrs}>${g?glyph(g):''}${tx(text,o,'text')}</span>`;
   }
@@ -457,23 +452,24 @@
      variant 'tag' (in a row: icon, name, day count) · 'detail' (in a record header: the care-level word, the day, a note).
      careText is the care-level word (the caller localizes it); the tag keeps it for assistive tech, the detail prints it. */
   const CARES=['attention','ongoing','resolved','notice'];
-  const LEVELS={monitor:{icon:'monitor',text:'Monitor'},treat:{icon:'treat',text:'Treat in place'},hospital:{icon:'hospital',text:'Hospital pen'}};
+  const LEVELS={monitor:{icon:'monitor',text:'Monitor',short:''},treat:{icon:'treat',text:'Treat in place',short:'Treat'},hospital:{icon:'hospital',text:'Hospital pen',short:'Hospital'}};
   const CARE_ICON={ongoing:'note',resolved:'check',notice:'note'};
   const CARE_TEXT={attention:'Needs attention',ongoing:'Ongoing',resolved:'Resolved',notice:''};
-  function conditionTag({name='',day='',care='ongoing',level='',careText,note='',icon,variant='tag',id='',className='',strs,args}={}){
+  function conditionTag({name='',day='',care='ongoing',level='',careText,levelText,note='',pending=false,icon,variant='tag',id='',className='',strs,args}={}){
     const c=oneOf('ConditionTag','care',care,CARES,'ongoing');
     const lv=c==='attention'?oneOf('ConditionTag','level',level||'monitor',Object.keys(LEVELS),'monitor'):'';
-    const v=oneOf('ConditionTag','variant',variant,['tag','detail'],'tag');
+    const v=oneOf('ConditionTag','variant',variant,['tag','detail','mark'],'tag');
     const o={strs,args};
     const word=careText!=null?careText:(c==='attention'?LEVELS[lv].text:CARE_TEXT[c]);
     const g=icon!=null?icon:(c==='attention'?LEVELS[lv].icon:CARE_ICON[c]);
-    const attrs=`class="st-condition ${esc(className)}" data-ds="ConditionTag" data-variant="${v}" data-care="${c}"${lv?` data-level="${lv}"`:''}${id?` id="${esc(id)}"`:''}`;
+    const attrs=`class="st-condition ${esc(className)}" data-ds="ConditionTag" data-variant="${v}" data-care="${c}"${lv?` data-level="${lv}"`:''}${pending?' data-pending=""':''}${id?` id="${esc(id)}"`:''}`;
     const dayHtml=day?`<small class="st-condition-day">${tx(day,o,'day')}</small>`:'';
+    if(v==='mark')return `<span ${attrs} role="img" aria-label="${esc(word)}"><span class="st-condition-mark">${g?glyph(g):''}</span></span>`;
     if(v==='detail'){
       return `<div ${attrs}><span class="st-condition-mark">${g?glyph(g):''}</span><span class="st-condition-copy"><strong class="st-condition-level">${tx(word,o,'careText')}</strong>${name||day?`<span class="st-condition-meta">${name?tx(name,o,'name'):''}${name&&day?' · ':''}${day?tx(day,o,'day'):''}</span>`:''}${note?`<span class="st-condition-note">${tx(note,o,'note')}</span>`:''}</span></div>`;
     }
     const title=[name,day,word].filter(Boolean).join(' · ');
-    return `<span ${attrs} title="${esc(title)}">${g?glyph(g):''}<span class="st-condition-name">${tx(name,o,'name')}</span>${dayHtml}${word?`<span class="st-visually-hidden"> · ${tx(word,o,'careText')}</span>`:''}</span>`;
+    return `<span ${attrs} title="${esc(title)}">${g?glyph(g):''}<span class="st-condition-name">${tx(name,o,'name')}</span>${dayHtml}${lv&&(levelText!=null?levelText:LEVELS[lv].short)?`<small class="st-condition-level-word">${tx(levelText!=null?levelText:LEVELS[lv].short,o,'levelText')}</small>`:''}${word?`<span class="st-visually-hidden"> · ${tx(word,o,'careText')}</span>`:''}</span>`;
   }
   /* The tokens as HTML, for announce() into a region the host already holds. */
   function statusText(tokens,{sep='',tight=false}={}){return toks(tokens,{tight,dot:sep==='dot'});}
