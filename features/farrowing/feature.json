@@ -805,11 +805,6 @@
           {
             "control": "− / + keys",
             "does": "each tap is saved at once; − at the floor is refused with the pointer text"
-          },
-          {
-            "control": "Back, X, grab handle, backdrop",
-            "does": "all four leave to the room list and fold the visit into one log line",
-            "goesTo": "farrowing.room"
           }
         ],
         "copy": [

@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T19:41:08.395Z",
- "commit": "f41f800",
+ "generated": "2026-10-09T19:59:41.938Z",
+ "commit": "16fe276",
  "platforms": [
   {
    "id": "mobile",
@@ -2476,11 +2476,6 @@
            {
             "control": "− / + keys",
             "does": "each tap is saved at once; − at the floor is refused with the pointer text"
-           },
-           {
-            "control": "Back, X, grab handle, backdrop",
-            "does": "all four leave to the room list and fold the visit into one log line",
-            "goesTo": "farrowing.room"
            }
           ],
           "copy": [
@@ -19598,11 +19593,11 @@
   },
   {
    "severity": "medium",
-   "source": "gate",
+   "source": "Gate · Stepper · 2026-10-10",
    "id": "tasks-built-26",
    "target": {
     "kind": "component",
-    "id": "TaskStepper"
+    "id": "Stepper"
    },
    "kind": "design",
    "title": "Steppers still 44px, below the 48px glove floor",

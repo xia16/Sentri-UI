@@ -127,14 +127,15 @@ async function renderPattern(sec, pt) {
   header(`<a href="#" id="pat-back">${esc(sec.name)}</a> / <b>${esc(pt.name)}</b> <span class="zh">Pattern</span>`);
   document.getElementById('pat-back').onclick = (e) => { e.preventDefault(); render(); };
   const idx = screenIndex(), pid = String(pt.name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), dir = `/sections/${sec.id}/patterns/${pid}/`;
-  const page = el(`<div class="patternpage"><h2>${esc(pt.name)}</h2>${pt.note ? `<p class="muted">${esc(pt.note)}</p>` : ''}<div class="pbody"></div></div>`), body = page.querySelector('.pbody');
+  const page = el(`<div class="patternpage"><h2>${esc(pt.name)}</h2><div class="pbody"></div></div>`), body = page.querySelector('.pbody');
   main.append(page);
   let vj = null; try { vj = await getJson(dir + 'variants.json'); } catch (_) {}
   const chips = () => `<div class="seen"><h3>Seen on</h3><div class="usedby">${(pt.screens || []).filter((id) => idx[id]).map((id) => `<a href="#" data-sid="${esc(id)}">${esc(idx[id].feature.name)} · ${esc(idx[id].name)}</a>`).join("")}</div></div>`;
   const wire = (root) => root.querySelectorAll('a[data-sid]').forEach((a2) => { a2.onclick = (e) => { e.preventDefault(); const s = idx[a2.dataset.sid]; openFeature(s.feature.id, s.id); }; });
   const phones = () => { const row = el('<div class="phones"></div>'); (pt.screens || []).forEach((id) => { const s = idx[id]; if (!s) return; const cell = el(`<figure><figcaption>${dot(s.status)}<a href="#">${esc(s.feature.name)} · ${esc(s.name)}</a></figcaption></figure>`); cell.querySelector('a').onclick = (e) => { e.preventDefault(); openFeature(s.feature.id, s.id); }; cell.append(shot(s, { height: 640 })); row.append(cell); }); return row; };
   const drawn = {};
-  if (vj) await Promise.all(vj.map(async (v) => { drawn[v.id] = await stateGridAt(dir, v.id); }));
+  if (pt.note && !(vj || []).some((v) => v.use || v.notUse)) page.querySelector('h2').insertAdjacentHTML('afterend', `<p class="muted">${esc(pt.note)}</p>`); // Use for / Not for say the same, so the note only stands when they are missing
+  if (vj) await Promise.all(vj.map(async (v) => { drawn[v.id] = await stateGridAt(dir, v.id, { bare: true }); }));
   const tabs = (vj || []).filter((v) => drawn[v.id]);
   if (!tabs.length) { // no states drawn yet: the live screens, behind a closed disclosure
     body.append(el('<p class="muted" style="margin:0 0 12px">This pattern’s states haven’t been drawn yet — the component pass draws them.</p>'));
@@ -164,8 +165,8 @@ function renderBoard() {
     r.querySelectorAll('[data-p]').forEach((b) => { b.onclick = (e) => { e.stopPropagation(); renderPattern(s, s.patterns[+b.dataset.p]); }; });
     r.querySelector('.cards').style.gridTemplateColumns = `repeat(${Math.min(3, s.features.length)}, 200px)`;
     s.features.forEach((f) => {
-      const n = f.screens.length, ph = f.screens.filter((z) => z.status === 'placeholder').length;
-      const c = el(`<button class="card ${f.status === 'placeholder' ? 'placeholder' : ''}"><div class="name">${dot(f.status)}<span class="ico" data-i="${esc(FEATURE_ICON[f.id] || '')}"></span>${esc(f.name)}</div><div class="zh">${esc(f.zh || '')}</div><div class="size">${plural(n, 'screen')}${ph && ph < n ? ` · ${ph} placeholder` : ''}${hasPrd(f) ? '<span class="prdtag">PRD</span>' : ''}</div></button>`);
+      const n = f.screens.length;
+      const c = el(`<button class="card ${f.status === 'placeholder' ? 'placeholder' : ''}"><div class="name">${dot(f.status)}<span class="ico" data-i="${esc(FEATURE_ICON[f.id] || '')}"></span>${esc(f.name)}</div><div class="zh">${esc(f.zh || '')}</div><div class="size">${plural(n, 'screen')}${hasPrd(f) ? '<span class="prdtag">PRD</span>' : ''}</div></button>`);
       c.onclick = () => openFeature(f.id); r.querySelector('.cards').append(c);
     });
     plane.append(r);
@@ -174,7 +175,7 @@ function renderBoard() {
     r.style.left = x + 'px'; r.style.top = y + 'px'; x += rw + 32; rowH = Math.max(rowH, rh); maxX = Math.max(maxX, x);
   });
   loadIcons().then((icons) => plane.querySelectorAll('.ico').forEach((n) => { n.innerHTML = icons && (n.dataset.i in icons.paths || n.dataset.i in icons.aliases) ? iconSvg(icons, n.dataset.i, 16, '') : '<i class="neutral"></i>'; }));
-  const W = maxX + 8, H = y + rowH + 40;
+  const W = maxX + 8, H = y + rowH + 90; // room under the last row for the zoom controls
   const pz = panzoom(board, plane, () => { const t = fitTo(board, W, H, 1, 0, 0.9); return { k: t.k, x: 0, y: 0 }; });
   board.querySelectorAll('[data-z]').forEach((b) => { b.onclick = () => { const z = +b.dataset.z; z ? pz.step(z > 0 ? 1.2 : 1 / 1.2) : pz.fit(); }; });
   pz.fit();
@@ -187,8 +188,8 @@ function renderOld() {
   const wrap = el(`<div class="index"><aside><h1>Old UI</h1><p>The product as it is today, in Figma: ${plural(files.length, 'file')}, about ${total} screens. Reference for research; not part of the atlas.</p></aside><div class="list"></div></div>`);
   const list = wrap.querySelector('.list');
   files.forEach((f) => {
-    list.append(el(`<h2>${esc(f.file)} <span>${plural(f.screens, 'screen')}</span><a class="fileopen" href="https://www.figma.com/design/${esc(f.key)}/" target="_blank" rel="noopener">Open file ↗</a></h2>`));
-    f.flows.forEach(([name, n, node]) => list.append(el(`<a class="row" target="_blank" rel="noopener" href="https://www.figma.com/design/${esc(f.key)}/?node-id=${esc(String(node).replace(':', '-'))}"><b>${esc(name)}</b><span class="muted">${plural(n, 'screen')} ↗</span></a>`)));
+    list.append(el(`<h2><span>${esc(f.file)}</span> <span class="n">${plural(f.screens, 'screen')}</span><a class="fileopen" href="https://www.figma.com/design/${esc(f.key)}/" target="_blank" rel="noopener">Open file ↗</a></h2>`));
+    f.flows.forEach(([name, n, node]) => list.append(el(`<a class="row" target="_blank" rel="noopener" href="https://www.figma.com/design/${esc(f.key)}/?node-id=${esc(String(node).replace(':', '-'))}"><b>${esc(name)}</b><span class="muted n">${plural(n, 'screen')}</span><span class="muted">↗</span></a>`)));
   });
   main.append(wrap);
 }

@@ -313,13 +313,13 @@
   "id": "tasks-built-26",
   "target": {
    "kind": "component",
-   "id": "TaskStepper"
+   "id": "Stepper"
   },
   "kind": "design",
   "severity": "medium",
   "title": "Steppers still 44px, below the 48px glove floor",
   "detail": "TaskStepper row face and farrowing .row-stepper keys are 44x44, and farrowing hand-rolls three look-alike steppers instead of SentriTask.stepper. Sow count keys are the most-tapped control.",
-  "source": "gate"
+  "source": "Gate · Stepper · 2026-10-10"
  },
  {
   "id": "tasks-built-27",

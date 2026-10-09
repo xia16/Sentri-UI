@@ -141,11 +141,11 @@ addEventListener('message', (m) => { if (m.data && m.data.atlasScreen && CURRENT
    One flat canvas: only screens are boxes. A band is an uppercase label with a hairline rule and its nodes below it; statuses inside a band
    are small labels on one vertical timeline line, their nodes indented from it; an exit is a dashed branch off the line.
    `avail` is the width the flow can use; nodes take as many columns as fit it at about 85% scale. */
-function layoutFlow(f, entries, avail) {
+function layoutFlow(f, entries, avail, open = new Set()) {
   const NW = 190, NH = 48, GAP = 18, VG = 12, x0 = 20, IND = 20, LAB = 28, LH = 16;
   const per = Math.max(2, Math.min(6, Math.floor(((avail || 1000) / 0.85 - 2 * x0 - IND + GAP) / (NW + GAP))));
   const cw = per * (NW + GAP) - GAP + IND;
-  const pos = {}, boxes = [], placed = new Set(); let y = 12;
+  const pos = {}, boxes = [], placed = new Set(), folds = []; let y = 12;
   const nodes = (ids, x, yy, w) => {
     const cols = Math.max(1, Math.floor((w + GAP) / (NW + GAP))), rows = Math.max(1, Math.ceil(ids.length / cols));
     ids.forEach((id, i) => { pos[id] = { x: x + (i % cols) * (NW + GAP), y: yy + Math.floor(i / cols) * (NH + VG) }; placed.add(id); });
@@ -153,10 +153,17 @@ function layoutFlow(f, entries, avail) {
   };
   const band = (name) => { y += LAB; boxes.push({ name, kind: 'band', x: x0, y, w: cw, h: LH }); y += LH + 12; };
   const strip = (name, ids) => { ids = ids.filter((i) => !placed.has(i) || i.includes(':')); if (!ids.length) return; band(name); y += nodes(ids, x0, y, cw); };
+  /* a long band that is not the main road starts folded to one line ("In any status · 13 ›"); its nodes still exist, hidden */
+  const foldable = (name, ids, label) => {
+    ids = ids.filter((i) => !placed.has(i)); if (!ids.length) return;
+    const isOpen = open.has(name); folds.push({ name, label, ids, open: isOpen, x: x0, y: y + LAB, w: cw });
+    if (isOpen) return strip(name, ids);
+    y += LAB + 22; ids.forEach((i) => { placed.add(i); pos[i] = { x: x0, y: 0 }; });
+  };
   strip('Ways in', entries.map((e) => e.id));
   const a = f.anchor, ownIds = f.screens.map((s) => s.id);
   if (a) {
-    strip('In any status', a.any || []);
+    (a.any || []).length > 6 ? foldable('In any status', a.any, 'In any status') : strip('In any status', a.any || []);
     const [t1, t2] = a.task || [];
     band(t1 ? t1.name : a.name);
     const top = ((t1 && t1.screens) || []).filter((i) => !placed.has(i));
@@ -175,11 +182,14 @@ function layoutFlow(f, entries, avail) {
     if (t2 && (t2.screens || []).length) { band(t2.name); y += nodes(t2.screens.filter((i) => !placed.has(i)), x0, y, cw); }
   } else {
     const owned = new Set(ownIds);
-    (f.groups || []).forEach(([name, ids]) => strip(name === 'Old UI' ? 'Screens in the old UI' : name, ids.filter((i) => owned.has(i))));
+    (f.groups || []).forEach(([name, ids]) => {
+      const own = ids.filter((i) => owned.has(i));
+      if (/not reachable/i.test(name)) foldable(name, own, 'Built, not reachable'); else strip(name === 'Old UI' ? 'Screens in the old UI' : name, own);
+    });
   }
   strip(a || (f.groups || []).length ? 'Other' : 'Screens', ownIds);
   strip('Adds to', (f.addsTo || []).map((_, i) => 'adds:' + i));
-  return { pos, boxes, width: x0 + cw + 20, height: y + 60, NW, NH };
+  return { pos, boxes, folds, width: x0 + cw + 20, height: y + 100, NW, NH };
 }
 
 /* ---------- the page ---------- */
@@ -191,28 +201,35 @@ function openFeature(id, sel) {
   const idx = screenIndex(); setParam('feature', id);
   const n = f.screens.length;
   const ownIds = new Set(f.screens.map((s) => s.id)), mine = (S.data.backlog || []).filter((b) => (b.target.kind === 'feature' && b.target.id === f.id) || (b.target.kind === 'screen' && ownIds.has(b.target.id)));
-  const todos = f.screens.filter((s) => s.status === 'placeholder').length + f.screens.reduce((t, s) => t + ((s.notes && s.notes.issues) || []).length, 0) + mine.filter((b) => b.kind !== 'decision').length;
-  const confirm = ((f.prd || '').match(/to confirm/gi) || []).length + mine.filter((b) => b.kind === 'decision').length;
-  header(`<a href="#" id="crumb-back">${esc(f.sectionRef.name)}</a> / <b>${esc(f.name)}</b> <span class="zh">${esc(f.zh || '')}</span>
-    <span class="meta">${dot(f.status)}${f.status === 'frozen' ? '<span>Frozen</span> · ' : ''}<span>${plural(n, 'screen')}</span> · <a href="#" id="l-prd">PRD</a> · <a href="#" id="l-dec">Decisions</a>${todos ? ` · <span title="Placeholder screens plus issues written in screen notes">To-dos ${todos}</span>` : ''}${confirm ? ` · <span title="Open questions marked “to confirm” in the PRD">To confirm ${confirm}</span>` : ''}</span>`);
-  document.getElementById('crumb-back').onclick = (e) => { e.preventDefault(); closeFeature(); };
+  const todos = mine.filter((b) => b.kind !== 'decision').length, confirm = mine.length - todos; // the same sets the Backlog opens on
+  const planned = f.status === 'placeholder', prd = hasPrd(f), sameName = String(f.name).toLowerCase() === String(f.sectionRef.name).toLowerCase();
+  header(`${sameName ? '' : `<a href="#" id="crumb-back">${esc(f.sectionRef.name)}</a> / `}<b>${esc(f.name)}</b> <span class="zh">${esc(f.zh || '')}</span>
+    <span class="meta">${dot(f.status)}${f.status === 'frozen' ? '<span>Frozen</span> · ' : ''}<span>${plural(n, 'screen')}</span>${planned ? ' · <span>Not designed yet</span>' : ''}${prd ? ' · <a href="#" id="l-prd">PRD</a> · <a href="#" id="l-dec">Decisions</a>' : ''}${todos ? ` · <a href="#" id="l-todo" title="Open to-dos for this feature in the Backlog">To-dos ${todos}</a>` : ''}${confirm ? ` · <a href="#" id="l-conf" title="Questions waiting for the owner, in the Backlog">To confirm ${confirm}</a>` : ''}</span>`);
+  const toBacklog = (kind) => (e) => { e.preventDefault(); Object.assign(bkState, { kind, sec: '', feature: f.id }); S.view = 'backlog'; closeFeature(); render(); };
+  document.getElementById('l-todo')?.addEventListener('click', toBacklog('@todo')); document.getElementById('l-conf')?.addEventListener('click', toBacklog('decision'));
+  const back = document.getElementById('crumb-back'); if (back) back.onclick = (e) => { e.preventDefault(); closeFeature(); };
   const page = document.getElementById('feature'); page.hidden = false; page.innerHTML = '';
 
   const entries = (f.entryPoints || []).map((e, i) => Object.assign({}, e, { id: 'entry:' + i }));
   const availW = () => innerWidth - 440 - (document.querySelector('.feature .notes.open') ? 440 : 0) - 28;
-  let L = layoutFlow(f, entries, availW()), pos = L.pos; const NW = L.NW, NH = L.NH;
+  const unfolded = new Set(); let L = layoutFlow(f, entries, availW(), unfolded), pos = L.pos; const NW = L.NW, NH = L.NH;
   const edges = [...entries.filter((e) => e.lands).map((e) => [e.id, e.lands, e.control || e.label]), ...(f.flow || [])];
 
   const col = el('<div class="flowcol"></div>');
   const wrap = el('<div class="flowwrap"><div class="flowplane"><svg width="10" height="10"></svg></div><div class="zoom"><button data-z="-1" title="Zoom out">−</button><button data-z="0" title="Fit">⤢</button><button data-z="1" title="Zoom in">+</button></div></div>');
   const plane = wrap.querySelector('.flowplane'), svg = plane.querySelector('svg');
   const groups = el('<div class="groups"></div>'); plane.prepend(groups);
-  const drawGroups = () => { groups.innerHTML = L.boxes.map((b) => `<div class="group ${b.kind || ''}" style="left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px"><span>${esc(b.name)}</span></div>`).join(''); };
+  const drawGroups = () => {
+    groups.innerHTML = L.boxes.map((b) => `<div class="group ${b.kind || ''}" style="left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px"><span>${esc(b.name)}</span></div>`).join('')
+      + L.folds.map((x) => x.open ? `<button class="fold open" data-fold="${esc(x.name)}" style="left:${x.x + x.w - 60}px;top:${x.y - 3}px">Fold ‹</button>` : `<button class="fold" data-fold="${esc(x.name)}" title="${esc(x.name)}" style="left:${x.x}px;top:${x.y - 4}px">${esc(x.label)} · ${x.ids.length} ›</button>`).join('');
+    groups.querySelectorAll('[data-fold]').forEach((b) => { b.onclick = () => { const k = b.dataset.fold; unfolded.has(k) ? unfolded.delete(k) : unfolded.add(k); relayout(); }; });
+  };
+  const applyFolds = () => { const hid = new Set(L.folds.filter((x) => !x.open).flatMap((x) => x.ids)); Object.entries(nodes).forEach(([id, n]) => { n.hidden = hid.has(id); }); };
   drawGroups();
   function relayout() {
-    L = layoutFlow(f, entries, availW()); pos = L.pos; drawGroups();
+    L = layoutFlow(f, entries, availW(), unfolded); pos = L.pos; drawGroups();
     Object.entries(nodes).forEach(([id, n]) => { if (pos[id]) { n.style.left = pos[id].x + 'px'; n.style.top = pos[id].y + 'px'; } });
-    drawEdges(selected && nodes[selected] ? selected : null);
+    applyFolds(); drawEdges(selected && nodes[selected] ? selected : null);
   }
   addEventListener('resize', () => { if (wrap.isConnected) { relayout(); pz.fit(); } });
   const dock = el('<div class="dock"></div>'), nodes = {};
@@ -221,6 +238,8 @@ function openFeature(id, sel) {
   f.screens.forEach((s) => place(s.id, `${dot(s.status)}<span>${esc(s.name)}</span>`, s.status === 'placeholder' ? 'placeholder' : '', s.status === 'placeholder' ? 'Placeholder — not designed yet' : (s.zh ? `${s.name} · ${s.zh}` : s.name), () => select(s.id)));
   (f.addsTo || []).forEach((a, i) => place('adds:' + i, `<span>${esc(a.what)}</span>`, 'adds', `Adds to ${a.feature}`, () => select('adds:' + i)));
 
+  const showNode = (id) => { const x = L.folds.find((g) => !g.open && g.ids.includes(id)); if (x) { unfolded.add(x.name); relayout(); } };
+  showNode(sel); applyFolds();
   const defs = '<defs><marker id="aron" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#276640"/></marker></defs>';
   const trim = (t) => { t = String(t || ''); return t.length > 40 ? t.slice(0, 39) + '…' : t; };
   function drawEdges(active) {
@@ -247,7 +266,7 @@ function openFeature(id, sel) {
   const mark = (nid) => { Object.entries(nodes).forEach(([k, b]) => b.setAttribute('aria-current', k === nid)); drawEdges(nid); setParam('screen', nid); };
   // the phone shows another screen of this feature after a tap: the flow follows (node, arrows, ?screen=, notes) without reloading the phone
   const countOf = (sid) => { const n = idx[sid] && idx[sid].notes; return n ? (n.elements || []).filter((e) => !CHROME.test(`${e.name} ${e.shows}`)).length : 0; };
-  CURRENT = { follow: (sid) => { if (!nodes[sid] || sid === shown) return; selected = shown = sid; mark(sid); const nc = dock.querySelector('.notesbtn .nc'); if (nc) nc.textContent = 'Notes' + (countOf(sid) ? ' · ' + countOf(sid) : ''); if (notes.classList.contains('open')) fillNotes(); pz && pz.reveal(nodes[sid]); } };
+  CURRENT = { follow: (sid) => { if (!nodes[sid] || sid === shown) return; showNode(sid); selected = shown = sid; mark(sid); const nc = dock.querySelector('.notesbtn .nc'); if (nc) nc.textContent = 'Notes' + (countOf(sid) ? ' · ' + countOf(sid) : ''); if (notes.classList.contains('open')) fillNotes(); pz && pz.reveal(nodes[sid]); } };
   wrap.addEventListener('click', (e) => { if (!e.target.closest('.node, .zoom')) drawEdges(null); });
 
   /* the notes panel follows what the phone shows */
@@ -448,8 +467,9 @@ function openFeature(id, sel) {
   const openNotes = (tab, anchor) => { if (tab) notesTab = tab; setNotes(true); fillNotes(); if (anchor) notes.querySelector('#' + anchor)?.scrollIntoView(); };
   notes.querySelectorAll('.tab').forEach((b) => { b.onclick = () => { notesTab = b.dataset.t; fillNotes(); }; });
   notes.querySelector('.x').onclick = () => setNotes(false);
-  document.getElementById('l-prd').onclick = (e) => { e.preventDefault(); openNotes('prd'); };
-  document.getElementById('l-dec').onclick = (e) => { e.preventDefault(); openNotes('prd', 'h-decisions'); };
+  const lp = document.getElementById('l-prd'), ld = document.getElementById('l-dec');
+  if (lp) lp.onclick = (e) => { e.preventDefault(); openNotes('prd'); };
+  if (ld) ld.onclick = (e) => { e.preventDefault(); openNotes('prd', 'h-decisions'); };
 
   function select(nid) {
     selected = nid; mark(nid); dock.innerHTML = '';
@@ -465,7 +485,8 @@ function openFeature(id, sel) {
       dock.append(el('<div class="cap">&nbsp;</div>'), shot(target, { height: H, open: a.open, markAdded: a.added ? a.what : null, addPlaceholder: a.added ? null : { after: a.under, text: `Added by ${f.name} — not designed yet` } }));
     } else { shown = nid; dock.append(el('<div class="cap">&nbsp;</div>'), shot(idx[nid], { height: H })); }
     const ns = idx[shown] && idx[shown].notes, noteCount = ns ? (ns.elements || []).filter((e) => !CHROME.test(`${e.name} ${e.shows}`)).length : 0;
-    const tools = el(`<div class="tools"><button class="notesbtn" data-notes aria-pressed="${notes.classList.contains('open')}"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 2.5h10v11H3z M5.5 5.5h5 M5.5 8h5 M5.5 10.5h3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nc">Notes${noteCount ? ` · ${noteCount}` : ''}</span></button>${other ? `<a href="#" data-other>Open ${esc(other.name)}</a>` : ''}</div>`);
+    const hasNotes = !!(ns && Object.keys(ns).length) && !(idx[shown] && idx[shown].status === 'placeholder');
+    const tools = el(`<div class="tools">${hasNotes ? `<button class="notesbtn" data-notes aria-pressed="${notes.classList.contains('open')}"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 2.5h10v11H3z M5.5 5.5h5 M5.5 8h5 M5.5 10.5h3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nc">Notes${noteCount ? ` · ${noteCount}` : ''}</span></button>` : ''}${other ? `<a href="#" data-other>Open ${esc(other.name)}</a>` : ''}</div>`);
 
     const ol = tools.querySelector('[data-other]'); if (ol) ol.onclick = (ev) => { ev.preventDefault(); openFeature(other.id); };
     dock.append(tools); if (notes.classList.contains('open')) fillNotes();
