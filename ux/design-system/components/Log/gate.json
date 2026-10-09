@@ -1,41 +1,74 @@
 {
-  "status": "in-design",
-  "judged": "2026-10-09",
-  "commit": "3e3f835",
+  "status": "agent-checked",
+  "judged": "2026-10-10",
+  "commit": "c84edf3",
   "model": "claude-opus-5-5",
+  "round": 1,
+  "previous": [
+    {
+      "finding": "One entry per ID; 'Farrowing finished' twice (high)",
+      "fixed": true,
+      "note": "piglet-processing.pen-log 'IDs given · 12 / 001201–001212'; farrowing.history 'Farrowing finished · born 14' once; the component drops a detail equal to its title."
+    },
+    {
+      "finding": "Group labels and meta written four ways (medium)",
+      "fixed": true,
+      "note": "Labels Today / weekday / 'Aug 28' / Earlier on every host; stamp '08:12 · G.H' via logDay/logStamp; farrowing's dayLabel delegates to logDay."
+    },
+    {
+      "finding": "Categorised log undocumented (medium)",
+      "fixed": true,
+      "note": "Own variant page and when sentence; used by pig-profile.log and inspection.pen-log."
+    },
+    {
+      "finding": "'Author not supplied' printed (medium)",
+      "fixed": true,
+      "note": "Missing time or author is left out; 'Missing author is left out' state rendered."
+    },
+    {
+      "finding": "Raw colours, log tokens unused (low)",
+      "fixed": true,
+      "note": "--log-line, --log-dot and type tokens in bundle.css."
+    },
+    {
+      "finding": "Empty state not rendered (low)",
+      "fixed": true,
+      "note": "Rendered in both variants and live on Home Records."
+    }
+  ],
   "scores": {
-    "clarity": 8,
-    "budget": 5,
-    "hierarchy": 7,
+    "clarity": 9,
+    "budget": 8,
+    "hierarchy": 8,
     "spacing": 8,
-    "broken": 7
+    "broken": 8
   },
-  "lowest": 5,
+  "lowest": 8,
   "checklist": [
     {
       "line": 1,
-      "pass": false,
-      "why": "Purpose present; no sibling named (Row for an editable record, TaskReceipt for a day receipt)."
+      "pass": true,
+      "why": "Job sentence plus 'use Row / TaskReceipt instead'."
     },
     {
       "line": 2,
-      "pass": false,
-      "why": "No when / when-not."
+      "pass": true,
+      "why": "When-not names TaskDay and rows; no actions in entries."
     },
     {
       "line": 3,
-      "pass": false,
-      "why": "Parts named, but the preview does not show extraHtml or the candidate group description."
+      "pass": true,
+      "why": "Group heading, thread, dot, category, Corrected word, was line, stamp, extraHtml all shown."
     },
     {
       "line": 4,
-      "pass": false,
-      "why": "The categorised log (a kind word over each entry, kind filters above) is a real variant on two screens and is not documented as one."
+      "pass": true,
+      "why": "Day log and categorised, each with a when sentence and screens."
     },
     {
       "line": 5,
-      "pass": false,
-      "why": "Empty state is stated but not rendered in the preview."
+      "pass": true,
+      "why": "Default, corrected, attachment, empty and filter-empty rendered; no interactive states."
     },
     {
       "line": 6,
@@ -50,22 +83,22 @@
     {
       "line": 8,
       "pass": true,
-      "why": "No colour-borne state."
+      "why": "Correction said in words ('Corrected', 'Was 9 alive'), not colour."
     },
     {
       "line": 9,
-      "pass": false,
-      "why": "Label and meta formats stated, but hosts break them (see findings) and there is no long-entry example."
+      "pass": true,
+      "why": "Title 60 characters, sentence case; long entry state rendered."
     },
     {
       "line": 10,
-      "pass": false,
-      "why": "No role stated (sections and articles; is it a list?)."
+      "pass": true,
+      "why": "section per day, ol/li entries; thread is decoration."
     },
     {
       "line": 11,
-      "pass": false,
-      "why": "Raw #cbd6c2 thread, #849b72 dot, 7px, 18px and 13/11/10/9px type in bundle.css; the README names log-dot and log-line tokens the CSS does not use."
+      "pass": true,
+      "why": "Tokens only; variables listed."
     },
     {
       "line": 12,
@@ -79,95 +112,71 @@
     },
     {
       "line": 14,
-      "pass": false,
-      "why": "No classification line or related links."
+      "pass": true,
+      "why": "Related links and classification."
     },
     {
       "line": 15,
-      "pass": false,
-      "why": "Only the default state is rendered at 375; no proof of the empty state."
+      "pass": true,
+      "why": "All states of both variants at 375, no overflow."
     }
   ],
   "classification": "component",
   "variants": [
     {
-      "name": "day log (plain)",
+      "name": "day log",
       "usedBy": [
         "farrowing.history",
-        "piglet-processing.pen-log"
+        "piglet-processing.pen-log",
+        "home Toolbox > Records (empty)"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-        "clarity": 8,
-        "budget": 5,
-        "hierarchy": 7,
+        "clarity": 9,
+        "budget": 8,
+        "hierarchy": 8,
         "spacing": 8,
-        "broken": 7
+        "broken": 8
       },
       "findings": [
-        "farrowing.history repeats \"Farrowing finished\" as title and detail; piglet-processing.pen-log writes one entry per piglet ID (8 lines of \"ID 0012xx\")."
+        "piglet-processing.pen-log: 'Litter weighed · 24.6 kg' and 'Born 13' have no stamp while every other act has time · initials."
       ]
     },
     {
-      "name": "categorised log",
+      "name": "categorised",
       "usedBy": [
         "pig-profile.log",
         "inspection.pen-log"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-        "clarity": 7,
-        "budget": 6,
-        "hierarchy": 7,
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
         "spacing": 8,
-        "broken": 7
+        "broken": 8
       },
       "findings": [
-        "Prints \"Author not supplied\"; group labels mix \"1 Aug 2026\" and \"Before this walk\"."
+        "pig-profile.log 'Earlier' lists standing states ('Thin · Day 12 · Monitor', 'Individual adjustment active') rather than recorded acts."
       ]
     }
   ],
   "findings": [
     {
-      "severity": "high",
-      "text": "Budget in use: piglet-processing.pen-log lists every ID as its own entry (ID 001201 ... ID 001208), and farrowing.history says \"Farrowing finished\" twice in one entry.",
-      "fix": "Add a rule and an example: one recorded act is one entry (\"8 IDs · 001201-001208\"); detail never repeats the title. Fix the two hosts."
-    },
-    {
-      "severity": "medium",
-      "text": "Hosts write group labels and meta four ways: \"5 days ago\", \"day 4\", \"1 Aug 2026\", \"Before this walk\"; meta \"G.H · 10/07 10:07\" vs \"14:02 · L. Madsen\" vs \"G. Hansen\".",
-      "fix": "Pin the format in the component: meta = time · initials (the group label carries the date); group labels = Today / Yesterday / weekday / \"Jul 8\". Take a date and initials as data, not free strings."
-    },
-    {
-      "severity": "medium",
-      "text": "The categorised log is a real variant (pig-profile.log, inspection.pen-log) without its own when-to-use.",
-      "fix": "Document it: use category only when one log mixes kinds of event and offers a kind filter; otherwise use the plain log."
-    },
-    {
-      "severity": "medium",
-      "text": "Missing data is printed as text (\"Author not supplied\"), though the content law says missing is absent.",
-      "fix": "Add a Don't: drop an empty meta part; never print a placeholder."
+      "severity": "low",
+      "text": "piglet-processing.pen-log: both 'Litter weighed' entries and 'Born 13' carry no time or initials, though the weighing is recorded in the same task as stamped acts; it reads as a fixture gap, not a missing-author case.",
+      "fix": "Give those fixture events at and by in the simple prototype's data."
     },
     {
       "severity": "low",
-      "text": "Raw colours and sizes; the log-dot and log-line tokens are named in the README but not used in CSS.",
-      "fix": "Use var(--log-dot), var(--log-line) and the type tokens."
+      "text": "pig-profile.log 'Earlier' holds states, not acts ('Thin / Body condition · Day 12 · Monitor', 'Individual adjustment active'), and health is also on the profile banner. The day variant's 'Missing author is left out' example uses the same state wording.",
+      "fix": "Write the act that was recorded ('Body condition: thin', 'Feed adjusted +10%') and use an act in the variant example."
     },
     {
       "severity": "low",
-      "text": "Empty state is not rendered in the preview.",
-      "fix": "Add a second preview case, log([]), showing \"No activity recorded yet\"."
+      "text": "Home Records heading description reads 'Updates in this prototype' (the Toolbox entry says 'Updates made in this preview'): demo copy over a real log.",
+      "fix": "Drop the description or say what the log holds ('Answers you sent')."
     }
   ],
-  "proposals": [
-    {
-      "kind": "new-variant",
-      "name": "Log: categorised",
-      "why": "Same job (history tail), different structure (kind word, kind filter); used on two screens.",
-      "seenIn": [
-        "pig-profile.log",
-        "inspection.pen-log"
-      ]
-    }
-  ]
+  "proposals": []
 }
