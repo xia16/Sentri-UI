@@ -303,3 +303,16 @@ table.copy td.id { font:11.5px var(--mono); overflow-wrap:anywhere }
 .notes .doc .sec[data-open=true] > .prev { display:none }
 .node > span { -webkit-line-clamp:3; line-height:1.2; font-size:12px }
 .flowwrap.cut::after { width:90px; background:linear-gradient(to right, rgba(243,244,238,0), var(--ground) 35%, var(--ground)) }
+
+/* annotations: states, rule */
+.nst { flex:none; font:600 11px var(--sans); color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:0 7px; margin-left:auto; white-space:nowrap }
+.ex table.est { margin:2px 0 8px; table-layout:auto; font-size:12.5px } .ex table.est td { padding:6px 8px 6px 0 } .ex table.est th { padding-bottom:4px }
+.stag { display:inline-block; padding:0 7px; border-radius:5px; background:var(--wash); border:1px solid var(--line); font-size:11.5px; font-weight:700; white-space:nowrap }
+.ex table.est tr:hover td { background:var(--wash) }
+.rl { margin:6px 0 0; font-size:12.5px; line-height:1.5 } .rk { display:inline-block; margin-right:8px; font-size:10.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--amber) }
+
+/* flow lanes */
+.group.down { border:0; background:none } .group.down span { left:0; right:0; top:1px; text-align:center; font-size:15px; letter-spacing:0; color:var(--muted) }
+.group.plain { border:0; background:none }
+.groups { position:absolute; left:0; top:0 }
+.flowwrap.cutb::before { content:''; position:absolute; left:0; right:0; bottom:0; height:56px; background:linear-gradient(to bottom, rgba(243,244,238,0), var(--ground)); pointer-events:none; z-index:2 }

@@ -113,222 +113,166 @@
       "figma": "",
       "notes": {
         "purpose": "The first screen of the app: what needs doing now in the worker's section, task by task across all its units.",
-        "states": [
-          "Overview scope (no unit chosen) in the Farrowing section, mixed work: Farrowing live and due (active), Piglet processing waiting under \"Next\", one closed Piglet processing receipt.",
-          "Offline at start: saved-work card at the top with 3 records waiting.",
-          "URL params read by the page: section (breeding|gestation|farrowing|nursery), view (sections|overview|unit), unit, work (mixed|active|waiting|round-complete|ready), attention (current|clear|health|feed|maintenance|busy|unknown). `layout=focus` is not read by Home itself; it is only forwarded to the detail pages Home opens."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Header · farm label",
-            "shows": "GREEN VALLEY FARM",
-            "logic": "Static uppercase label above the section name; there is no farm switch.",
-            "source": "literal in header() of home-astra-prototype.js"
+            "name": "Task card · state",
+            "shows": "Farrowing: \"2 sows farrowing · 4 due today\"; Piglet processing: \"Next care · Tomorrow\"",
+            "states": [
+              {
+                "state": "Alert",
+                "when": "A confirmed exception exists for the task (count > 0)",
+                "shows": "Exception count and its label, rank 0. No Home sample reaches it"
+              },
+              {
+                "state": "Live",
+                "when": "Farrowing only: at least one sow is flagged active in the scope",
+                "shows": "\"N sows farrowing\"; supporting line \"N past expected date\" if any, else \"N due today\""
+              },
+              {
+                "state": "Past expected",
+                "when": "Farrowing only: nothing live, some sows past their expected date without a final record",
+                "shows": "\"N sows past expected date\" · \"No final record\". Home never supplies a late count, so it is not reached"
+              },
+              {
+                "state": "Due",
+                "when": "Any other task: eligible items in the scope > 0",
+                "shows": "\"N <task label>\" (sows ready to check, litters with care due…) plus one supporting line; \"N past due\" replaces it if anything is overdue, and the card moves up a rank"
+              },
+              {
+                "state": "Ready to complete",
+                "when": "All required work recorded and nothing blocks closure",
+                "shows": "Quiet \"All required work recorded\", full bar, \"Review & complete task\" row; no timing pill, no footer"
+              },
+              {
+                "state": "Waiting for another task",
+                "when": "Ready, but a task it depends on is still open (closureBlockedBy)",
+                "shows": "\"Waiting for <task> to close\" in the quiet style. Coded, no sample reaches it"
+              },
+              {
+                "state": "Unit work complete",
+                "when": "This unit is finished but the task is still open elsewhere (unitComplete)",
+                "shows": "\"Unit work complete · task still open\". Coded, no sample reaches it"
+              },
+              {
+                "state": "Waiting",
+                "when": "Nothing due; the next event is known",
+                "shows": "\"<Next label> · <time>\" such as \"Next care · Tomorrow\" or \"Next expected · Tomorrow\"; no count; sorted under \"Next\". With no known next event: \"Waiting for heat confirmations\" / \"Waiting for next scheduled care\" / \"Waiting for farrowing records\" / \"No work due now\""
+              },
+              {
+                "state": "Round complete",
+                "when": "Heat check or return-heat check only, and the round was explicitly closed",
+                "shows": "\"Round complete · Next check · 14:30\", no progress bar"
+              },
+              {
+                "state": "Closed",
+                "when": "Completed or ended early",
+                "shows": "Compact receipt at the bottom (see Closed task card)"
+              }
+            ],
+            "logic": "Evaluated in this order: closed, alert, task-specific work due, ready, unit complete, next scheduled action. A full bar, a finished unit or one full session never proves the whole task is ready. Home's sample data forces Piglet processing to \"Waiting\" (cardFields.piglet27.state) so its due counts of 2 + 2 are ignored unless ?work=active.",
+            "rule": "Counts are unique animals or litters in the selected scope, never procedures. The headline is what is actionable now; it is not total minus completed when eligibility depends on time.",
+            "source": "resolveAttention() in astra-home-task-card.js; HOME-TASK-DISPLAY-RULES.md"
           },
           {
-            "name": "Header · section name",
-            "shows": "Farrowing ⌄",
-            "logic": "The current section's name with a chevron. On first load the section is the URL `section` when valid, else the last section the worker picked (localStorage key sentri-home-prototype-section), else Gestation. Tapping opens the section chooser.",
-            "source": "sections[] in home-astra-prototype.js; params.get('section')"
+            "name": "Task card · headline and supporting line",
+            "shows": "2 sows farrowing · 4 due today",
+            "logic": "Value = sum of the sample \"due\" counts over the scope (Farrowing due {6:2, 7:2, 8:0}); \"live\" = the next unrecorded sow in each unit except Unit 8, so Overview 2, Unit 6 1, Unit 7 1, Unit 8 none. Only one supporting line is shown, by task: pregnancy and postpartum \"N rechecks due\" else \"N scheduled later\" (unrecorded minus due); breeding \"N first · N repeat\"; heat and return-heat \"Current round\". Label takes the singular for 1 (\"1 sow farrowing\"). With no live sow, due today becomes the headline with no supporting line; with nothing due the card is Waiting.",
+            "source": "taskModel() facts; cardFields in home-astra-prototype.js"
           },
           {
-            "name": "Header · Assistant",
-            "shows": "Assistant",
-            "logic": "Door to the Assistant page (a separate space; findings and chat live there, not on Home).",
-            "source": "header()"
+            "name": "Task card · progress bar",
+            "shows": "Farrowings recorded · 7 / 18 sows",
+            "logic": "Named aggregate progress: items with a recorded result over all items in the scope (Farrowing Overview 7/18, Unit 6 4/8, Unit 7 1/6, Unit 8 2/4; Piglet processing counts pens, 1/8). Bar width = value/total. Home forces a plain completion bar even where the task itself shows a distribution. Heat and return-heat have no completion bar, and \"recorded in heat\" is an outcome, not progress. The bar is hidden on upcoming cards.",
+            "source": "metric(t, unit); tasks[].counts and measure"
           },
           {
-            "name": "Scope rail · Overview",
-            "shows": "Overview",
-            "logic": "Pressed when no unit is chosen. Tapping it clears the unit and shows the section's tasks across all units.",
-            "source": "scopeRail(); state.unit"
+            "name": "Task card · timing pill and footer",
+            "shows": "Day 2 of 7 · Across 3 units · View task",
+            "logic": "The pill is the position in the batch window (cardFields day, days), \"Today\" when the window is one day; it is context, not a completion measure, and not the litters' own age. It is hidden on a Ready card. \"Across N units\" = units that carry the task (not units with work due); in a unit scope the footer is replaced by an arrow in the header and the card opens that unit's task.",
+            "source": "cardFields.*.day/days; taskModel().scope"
           },
           {
-            "name": "Scope rail · Choose unit",
-            "shows": "Choose unit · 3 units",
-            "logic": "Second button. Label is \"Choose unit\" with no unit chosen, \"Unit N\" with one. The small figure is the number of units in the section (Farrowing: 6, 7, 8; Gestation 7, 8, 9; Breeding 1-4; Nursery 12, 13). Tapping opens the unit picker.",
-            "source": "sections[].units"
+            "name": "\"Next\" sub-heading and card order",
+            "shows": "Next",
+            "logic": "Cards sort by attention rank: live farrowing or alert 0, overdue 1, due 2, ready to complete 2.5, waiting 3 (earliest next event first), closed 4. Equal ranks keep their order so the list does not jump. \"Next\" is printed once above the first quiet card (waiting, round complete or upcoming).",
+            "source": "SentriHomeTaskCard.order()"
           },
           {
             "name": "Saved-work card",
             "shows": "3 records saved on this device · No connection · waiting to upload",
-            "logic": "The offline banner. While records are waiting (sync.pending.length > 0) it sits at the top under the scope rail; title is \"N records saved on this device\" (or \"Uploading N records\"), the subtitle follows the connection: \"No connection · waiting to upload\", \"Connection available · tap to upload\", \"Upload interrupted · tap to retry\", \"Sending saved work…\". With nothing waiting it moves to the bottom of the list as \"All records uploaded · No records waiting on this device\". The page starts offline with 3 sample records.",
-            "source": "sync{} and pendingExamples in home-astra-prototype.js (fictional; no real queue)"
+            "states": [
+              {
+                "state": "Waiting, offline",
+                "when": "Records are queued and there is no connection (the page starts here with 3 sample records)",
+                "shows": "Top card: \"N records saved on this device\" · \"No connection · waiting to upload\""
+              },
+              {
+                "state": "Waiting, online",
+                "when": "Queued and a connection is available",
+                "shows": "\"Connection available · tap to upload\""
+              },
+              {
+                "state": "Interrupted",
+                "when": "An upload started and failed",
+                "shows": "\"Upload interrupted · tap to retry\""
+              },
+              {
+                "state": "Uploading",
+                "when": "An upload is running",
+                "shows": "\"Uploading N records\" · \"Sending saved work…\""
+              },
+              {
+                "state": "Clear",
+                "when": "Nothing is waiting",
+                "shows": "Moves to the bottom of the list: \"All records uploaded · No records waiting on this device\""
+              }
+            ],
+            "logic": "The queue is fictional (three samples). Nothing the other prototypes record feeds it.",
+            "source": "sync{} and pendingExamples in home-astra-prototype.js"
           },
           {
-            "name": "Today's work heading",
-            "shows": "Today’s work · Thu, 8 Jul",
-            "logic": "One heading anchors the list; the date is fixed sample text, not today's date.",
-            "source": "literal in home()"
-          },
-          {
-            "name": "Task card · Farrowing · title",
-            "shows": "Farrowing",
-            "logic": "The task type of the instance (tasks[].type).",
-            "source": "tasks[] farrow28"
-          },
-          {
-            "name": "Task card · Farrowing · batch line",
-            "shows": "Batch 28 · Farrowing window",
-            "logic": "Batch name, then a fixed context phrase for the task (cardFields.farrow28.context). Does not change with the unit chosen.",
-            "source": "tasks[].batch + cardFields[].context"
-          },
-          {
-            "name": "Task card · Farrowing · timing pill",
-            "shows": "Day 2 of 7",
-            "logic": "Clock icon and \"Day N of N\" for the batch window (cardFields day, days); \"Today\" when the window is one day. Contextual timing only, never a completion measure (HOME-TASK-DISPLAY-RULES). Shown on every open card except the ready-to-complete state; in a unit scope an arrow follows it.",
-            "source": "cardFields.farrow28.day/days"
-          },
-          {
-            "name": "Task card · Farrowing · headline count",
-            "shows": "2 sows farrowing",
-            "logic": "Farrowing rule 1: recorded farrowing underway. Value = sows whose record is flagged active within the scope (sample rule: the next unrecorded sow in each unit except Unit 8). Overview 2 (Units 6 and 7), Unit 6: 1, Unit 7: 1, Unit 8: none. Label takes the singular for 1 (\"1 sow farrowing\").",
-            "source": "SentriHomeTaskCard.attention(\"farrowing\"); taskModel(): facts.live"
-          },
-          {
-            "name": "Task card · Farrowing · supporting line",
-            "shows": "4 due today",
-            "logic": "Rule: while farrowing is underway, one supporting line: \"N past expected date\" if late, else \"N due today\". Home never supplies a late count, so only the due-today line appears. Value = sum of cardFields.farrow28.due over the scope ({6:2, 7:2, 8:0}). With no live sow, due today becomes the headline (\"4 sows due today\") with no supporting line; with nothing due, a quiet line \"Next expected · Tomorrow\" replaces the block.",
-            "source": "resolveAttention() in astra-home-task-card.js; cardFields.farrow28.due"
-          },
-          {
-            "name": "Task card · Farrowing · progress",
-            "shows": "Farrowings recorded · 7 / 18 sows",
-            "logic": "Named aggregate progress: sows with a recorded result over all sows in the scope. Overview 7/18 (Unit 6 4/8, Unit 7 1/6, Unit 8 2/4). Bar width = value/total. Home forces the bar to a plain completion bar (the distribution bar with farrowed/active/awaiting lives in the task).",
-            "source": "metric(t, unit); records Map built from tasks[].counts"
-          },
-          {
-            "name": "Task card · Farrowing · footer",
-            "shows": "Across 3 units · View task",
-            "logic": "Overview only. \"Across N units\" = the number of units that carry this task (Object.keys(counts).length), not units with work due. In a unit scope the footer is replaced by the arrow in the header and the action is \"Open unit task\".",
-            "source": "taskModel().scope"
-          },
-          {
-            "name": "\"Next\" sub-heading",
-            "shows": "Next",
-            "logic": "Printed once above the first quiet card (waiting, round-complete or upcoming). Open cards sort by attention rank: live farrowing/alert 0, overdue 1, due 2, ready to complete 2.5, waiting 3 (earliest next event first), closed 4; equal ranks keep their order.",
-            "source": "SentriHomeTaskCard.order()"
-          },
-          {
-            "name": "Task card · Piglet processing · title and batch",
-            "shows": "Piglet processing · Batch 27 · Age-day schedule",
-            "logic": "Same slots as every card. Batch 27 (not the 40 the opened prototype shows).",
-            "source": "tasks[] piglet27; cardFields.piglet27.context"
-          },
-          {
-            "name": "Task card · Piglet processing · timing pill",
-            "shows": "Day 3 of 7",
-            "logic": "Batch window position (cardFields day 3, days 7); not the litters' own age. The rules warn litter age and task age must not be conflated.",
-            "source": "cardFields.piglet27"
-          },
-          {
-            "name": "Task card · Piglet processing · quiet line",
-            "shows": "Next care · Tomorrow",
-            "logic": "Rule 2 (next scheduled care) in the quiet style under a \"Next\" sub-heading. The card is forced to the waiting state (cardFields.piglet27.state = \"waiting\") so the sample due counts {6:2, 7:2} are ignored; nextAt 1440 prints \"Tomorrow\". Earlier times print as hh:mm.",
-            "source": "resolveAttention(): names.piglet / displayRules.piglet.next"
-          },
-          {
-            "name": "Task card · Piglet processing · when care is due",
-            "shows": "4 litters with care due",
-            "logic": "Seen with ?work=active. Rule 1: litters with at least one scheduled care item due and unfinished; count unique litters. Value = sum of cardFields.piglet27.due. No supporting line is supplied (the rule would show litters with overdue required care).",
-            "source": "displayRules.piglet.label"
-          },
-          {
-            "name": "Task card · Piglet processing · progress",
-            "shows": "All scheduled items complete · 1 / 8 pens",
-            "logic": "Whole-schedule progress, not today's work: pens with a result over pens in the scope (measure \"pens\"). Unit 6 1/4, Unit 7 0/4.",
-            "source": "tasks[].measure = \"pens\""
-          },
-          {
-            "name": "Task card · Piglet processing · footer",
-            "shows": "Across 2 units · View task",
-            "logic": "Units 6 and 7 carry the task. Tapping the card leaves Home for the piglet-processing prototype (simple/index.html) with layout, from, section, entry (and unit, returnUnit in a unit scope) in the URL; that page reads none of them.",
-            "source": "openTask() / openDesigned()"
-          },
-          {
-            "name": "Closed tasks heading",
-            "shows": "Closed tasks · 1",
-            "logic": "Heading with the count of closed instances in the scope (completedAt or terminatedAt set).",
-            "source": "home()"
+            "name": "Section and unit scope",
+            "shows": "Farrowing ⌄ · Overview · Choose unit · 3 units",
+            "logic": "Section on first load = URL `section` when valid, else the last one picked (localStorage sentri-home-prototype-section; ignored if storage is blocked), else Gestation. The second scope button reads \"Choose unit\" with no unit chosen and \"Unit N\" with one; the small figure is the number of units in the section (Farrowing 6, 7, 8; Gestation 7, 8, 9; Breeding 1-4; Nursery 12, 13). Choosing a unit re-runs every card rule on that unit's figures; whole-task closure stays global.",
+            "source": "sections[], scopeRail(), params.get('section')"
           },
           {
             "name": "Closed task card",
             "shows": "Piglet processing · Batch 26 · Across 3 units · Completed · Today, 09:10",
-            "logic": "Closed tasks collect at the bottom under \"Closed tasks N\" as a compact receipt: check icon (stop icon and \"Ended early\" when terminated), title, batch (and scope in the overview), completion stamp. Never revived with due counts. Tapping opens the read-only receipt page.",
+            "states": [
+              {
+                "state": "Completed",
+                "when": "completedAt is set on the instance",
+                "shows": "Check icon, title, batch (and scope in the Overview), \"Completed · <stamp>\""
+              },
+              {
+                "state": "Ended early",
+                "when": "terminatedAt is set (End task early)",
+                "shows": "Stop icon and \"Ended early · <stamp>\""
+              }
+            ],
+            "logic": "Closed cards collect at the bottom under \"Closed tasks N\" (N = closed instances in the scope), always sort last, and never show due counts again, even if old records would say otherwise.",
             "source": "tasks[] completedAt/terminatedAt; SentriHomeTaskCard.render"
-          },
-          {
-            "name": "Bottom navigation",
-            "shows": "Home · Scan · Toolbox",
-            "logic": "Home is active; Scan opens a scan drawer; Toolbox opens the tool list. Both are outside this feature.",
-            "source": "nav()"
           }
         ],
-        "controls": [
-          {
-            "control": "Section name (header)",
-            "does": "opens the section chooser",
-            "goesTo": "workbench.sections"
-          },
-          {
-            "control": "Choose unit",
-            "does": "opens the unit picker",
-            "goesTo": "workbench.choose-unit"
-          },
-          {
-            "control": "Saved-work card",
-            "does": "opens the Saved work drawer",
-            "goesTo": "workbench.saved-work"
-          },
-          {
-            "control": "Farrowing card",
-            "does": "leaves Home for the Farrowing prototype's whole-task overview (entry=overview)",
-            "goesTo": "farrowing.room"
-          },
-          {
-            "control": "Piglet processing card",
-            "does": "leaves Home for the piglet-processing prototype",
-            "goesTo": "piglet-processing.pen-list"
-          },
-          {
-            "control": "Closed task card",
-            "does": "opens the read-only receipt page",
-            "goesTo": "workbench.closed-task"
-          },
-          {
-            "control": "Assistant",
-            "does": "opens the Assistant page (outside this feature)",
-            "goesTo": ""
-          },
-          {
-            "control": "Scan / Toolbox",
-            "does": "opens Scan drawer / Toolbox page (outside this feature)",
-            "goesTo": ""
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) every string on Home is literal in home-astra-prototype.js and astra-home-task-card.js; none uses ux/laws/strings.json yet"
         ],
         "edge": [
-          "A section with no tasks shows the quiet empty state (Nursery).",
-          "Singular/plural: \"1 sow farrowing\", \"1 pen\".",
-          "Unit scope hides the footer and shows the arrow; a unit without the task hides its card.",
-          "Closed tasks never show due counts; they sort last.",
-          "If localStorage is blocked the remembered section is simply not used."
+          "A section with no tasks shows the quiet empty state (Nursery, see workbench.quiet-section).",
+          "A unit that does not carry a task hides that task's card."
         ],
-        "rules": [
-          "Shared evaluation order: closed receipt, confirmed exception, task-specific work due, all required recorded, unit work complete, next scheduled action.",
-          "Main count = actionable now; bar = named aggregate progress. \"Day N of N is contextual timing, not a completion measure.\"",
-          "Counts are unique animals or litters in the selected scope."
-        ],
+        "rules": [],
         "issues": [
-          "unclear: `layout=focus` has no effect on Home; it only matters when Home opens a detail page.",
-          "The date \"Thu, 8 Jul\" is fixed sample text while the piglet-processing prototype uses the real clock.",
-          "\"Across 3 units\" counts units that carry the task, not units with work due, and repeats on every card in the overview.",
-          "Piglet processing card mixes litters and pens: \"4 litters with care due\" (with ?work=active) next to a bar of \"1 / 8 pens\". A pen is a litter in the opened prototype.",
-          "The Piglet processing card says care is due tomorrow (Batch 27, 8 pens, 2 units) but the prototype it opens starts on Batch 40 with 12 pens and 6 pens due today. Home passes unit and section; the prototype ignores them.",
-          "The saved-work card sits at the top of the list as a permanent first card while offline, pushing the day's work down; the queue it shows is fictional.",
-          "The screen has no way to reach language or log out (the old Figma has them)."
+          "The date \"Thu, 8 Jul\" is fixed sample text, while the piglet-processing prototype uses the real clock.",
+          "\"Across 3 units\" counts units that carry the task, not units with work due, and repeats on every card.",
+          "The Piglet card mixes litters (\"4 litters with care due\") and pens (\"1 / 8 pens\"). A pen is a litter in the prototype.",
+          "The Piglet card says Batch 27, 8 pens, care due tomorrow; the prototype it opens starts on Batch 40, 12 pens, 6 due today.",
+          "The saved-work card sits first while offline and pushes the day's work down; its queue is fictional.",
+          "`layout=focus` has no effect on Home; it is only forwarded to detail pages.",
+          "No way to reach language or log out (the old Figma has both)."
         ]
       }
     },
@@ -342,74 +286,43 @@
       "figma": "",
       "notes": {
         "purpose": "Pick one unit of the section to narrow every count to that unit.",
-        "states": [
-          "How to reach: open the Overview and tap \"Choose unit\"; no URL param opens it.",
-          "A medium-height drawer over the dimmed Overview; the current unit (when there is one) is marked with aria-current on its row."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Drawer title",
-            "shows": "Farrowing units",
-            "logic": "Section name + \" units\".",
-            "source": "showUnits()"
-          },
-          {
-            "name": "Count line",
-            "shows": "All 3 units",
-            "logic": "All units of the section are listed, including units with no tasks; around 15 units is the stated maximum so there is no search.",
-            "source": "ASTRA-HOME-DIRECTION.md, Unit navigation refinement"
-          },
-          {
-            "name": "Unit row · title",
-            "shows": "Unit 6",
-            "logic": "\"Unit \" + id.",
-            "source": "unitChoices()"
-          },
-          {
-            "name": "Unit row · description",
-            "shows": "8 pigs · 4 pens",
-            "logic": "Pigs and pens of the unit. In the Farrowing section the pig and pen figures are overridden (Unit 6: 8 pigs, 4 pens; Unit 7: 7 pigs, 4 pens; Unit 8: 4 pigs, 2 pens) so they match the Farrowing prototype.",
-            "source": "units{}, farrowingUnits{}"
-          },
-          {
-            "name": "Unit row · trailing",
-            "shows": "2 tasks",
-            "logic": "Number of open tasks in the section that have unrecorded rows in this unit (remaining(unit): not closed, rows without a result > 0), or \"No tasks\". Waiting tasks count if they have unrecorded rows, so it can disagree with the cards the unit screen shows.",
-            "source": "remaining()"
-          },
-          {
-            "name": "Footer",
-            "shows": "Back",
-            "logic": "Closes the drawer and returns focus to the Choose unit button.",
-            "source": "drawer()"
+            "name": "Unit row",
+            "shows": "Unit 6 · 8 pigs · 4 pens · 2 tasks",
+            "states": [
+              {
+                "state": "Has work",
+                "when": "The unit has unrecorded rows in at least one open task",
+                "shows": "\"N tasks\" (singular \"1 task\")"
+              },
+              {
+                "state": "No work",
+                "when": "No open task has unrecorded rows in the unit",
+                "shows": "\"No tasks\"; the unit is still listed"
+              },
+              {
+                "state": "Current",
+                "when": "A unit is already chosen",
+                "shows": "aria-current on its row; the direction doc asks for a tint and check, the code sets only the attribute"
+              }
+            ],
+            "logic": "The count is open tasks in the section with unrecorded rows in this unit, so a waiting task counts and can disagree with the cards the unit screen shows. Pigs and pens come from units{}; in the Farrowing section they are overridden (Unit 6: 8 pigs, 4 pens; Unit 7: 7, 4; Unit 8: 4, 2) to match the Farrowing prototype.",
+            "rule": "All units of the section are listed with no search (about 15 at most). Choosing a unit narrows counts, not batch time.",
+            "source": "remaining(unit), unitChoices(), units{}, farrowingUnits{}"
           }
         ],
-        "controls": [
-          {
-            "control": "A unit row",
-            "does": "sets the unit, updates the URL (view=unit&unit=N) and returns to Home in that unit's scope",
-            "goesTo": "workbench.unit-farrowing"
-          },
-          {
-            "control": "Back / scrim / Escape",
-            "does": "closes the drawer",
-            "goesTo": "workbench.today"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) Farrowing units · All 3 units · Unit 6 · 8 pigs · 4 pens · 2 tasks · Back"
         ],
         "edge": [
-          "Units with no tasks still appear, with \"No tasks\".",
-          "Focus is trapped in the drawer; Tab cycles."
+          "Units with no tasks still appear."
         ],
-        "rules": [
-          "\"The picker has no search\" (about 15 units at most).",
-          "Unit selection narrows counts, not batch time."
-        ],
+        "rules": [],
         "issues": [
-          "\"2 tasks\" counts tasks with unrecorded rows, which includes waiting tasks, while the unit screen shows only cards for tasks that carry the unit and a \"Next\" group; the label does not say what it counts.",
-          "unclear: the direction doc says the selected unit has a muted tint and a checkmark; the picker code only sets aria-current, and whether the row component draws it was not checked."
+          "\"2 tasks\" counts tasks with unrecorded rows, waiting ones included; the label does not say what it counts."
         ]
       }
     },
@@ -423,74 +336,41 @@
       "figma": "",
       "notes": {
         "purpose": "A quiet view across the farm to choose where to work.",
-        "states": [
-          "`?view=sections` or tap the section name in the header. Four sections: Breeding, Gestation, Farrowing, Nursery. The current one is marked with a check, others an arrow."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Page title",
-            "shows": "Your sections · Green Valley Farm",
-            "logic": "Page heading with the farm name as subtitle.",
-            "source": "sectionChooser()"
-          },
-          {
-            "name": "Intro",
-            "shows": "Choose where you're working.",
-            "logic": "Static helper text.",
-            "source": "literal"
-          },
-          {
-            "name": "Section card · title",
-            "shows": "Gestation",
-            "logic": "Section name with its symbol; check on the current section.",
-            "source": "sections[]"
-          },
-          {
-            "name": "Section card · population",
-            "shows": "3 units · 246 pigs",
-            "logic": "Units in the section and a fixed pig population per section.",
-            "source": "sections[].units.length, sections[].population"
-          },
-          {
-            "name": "Section card · work",
-            "shows": "2 task types ready",
-            "logic": "Number of distinct task types in the section with unrecorded rows (pendingTypes); \"No scheduled work today\" when 0 (Nursery). Waiting tasks with unrecorded rows count as \"ready\".",
-            "source": "pendingTypes()"
-          },
-          {
-            "name": "Footer note",
-            "shows": "Work is shared with your team. Your section selection changes the view for you.",
-            "logic": "Static.",
-            "source": "literal"
-          },
-          {
-            "name": "Bottom navigation",
-            "shows": "Home · Scan · Toolbox",
-            "logic": "Home is active; Scan opens a scan drawer; Toolbox opens the tool list. Both are outside this feature.",
-            "source": "nav()"
+            "name": "Section card",
+            "shows": "Gestation · 3 units · 246 pigs · 2 task types ready",
+            "states": [
+              {
+                "state": "Current",
+                "when": "It is the section the worker is in",
+                "shows": "Check mark; others show an arrow"
+              },
+              {
+                "state": "Has work",
+                "when": "At least one task type in the section has unrecorded rows",
+                "shows": "\"N task types ready\" (waiting tasks with unrecorded rows count as ready)"
+              },
+              {
+                "state": "Quiet",
+                "when": "No task type has unrecorded rows (Nursery)",
+                "shows": "\"No scheduled work today\""
+              }
+            ],
+            "logic": "Units = units in the section; pigs = a fixed population per section; task types = distinct task types with unrecorded rows (pendingTypes), not work due now.",
+            "rule": "Selecting a section clears the unit, remembers the section on the device and opens its Overview.",
+            "source": "sections[].units, sections[].population, pendingTypes()"
           }
         ],
-        "controls": [
-          {
-            "control": "A section card",
-            "does": "switches section, clears the unit, remembers the section locally, goes to its Overview",
-            "goesTo": "workbench.today"
-          },
-          {
-            "control": "Home (bottom bar)",
-            "does": "back to the Overview",
-            "goesTo": "workbench.today"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
         "edge": [
           "A section with no scheduled work still opens, to a quiet empty state."
         ],
-        "rules": [
-          "\"Selecting a section opens its Overview. Remember the last section.\""
-        ],
+        "rules": [],
         "issues": [
           "\"task types ready\" counts waiting tasks as ready; it says nothing about work due now.",
           "The footer note and intro repeat the choice the cards already make."
@@ -506,76 +386,87 @@
       "preset": "",
       "figma": "",
       "notes": {
-        "purpose": "The same Overview in a section that shows every kind of card state at once.",
-        "states": [
-          "Active: Pregnancy check Batch 31 \"5 sows ready to check · 7 scheduled later\", progress 8 / 20 sows.",
-          "Quiet group under \"Next\": Return-heat check \"Round complete · Next check · 14:30\" (no bar); Pregnancy check Batch 32 \"Next checks · Tomorrow\", 0 / 8 sows.",
-          "Closed: Pregnancy check Batch 29 receipt.",
-          "Tapping a card opens the \"not designed yet\" task preview (no detail page exists for these tasks)."
-        ],
+        "purpose": "The same Overview in a section that shows several card states at once.",
+        "states": [],
         "elements": [
           {
-            "name": "Task card · Pregnancy check · headline",
-            "shows": "5 sows ready to check",
-            "logic": "Pregnancy rule 1: checks whose window is open (sum of cardFields.preg31.due {7:2, 8:2, 9:1}).",
-            "source": "attention(\"pregnancy\")"
+            "name": "Pregnancy check card",
+            "shows": "5 sows ready to check · 7 scheduled later · 8 / 20 sows",
+            "states": [
+              {
+                "state": "Due",
+                "when": "Check windows are open",
+                "shows": "\"N sows ready to check\" = sum of due {7:2, 8:2, 9:1}; supporting line \"N scheduled later\" (unrecorded 12 minus due 5)"
+              },
+              {
+                "state": "Waiting",
+                "when": "Nothing due, next check known (Batch 32)",
+                "shows": "\"Next checks · Tomorrow\", 0 / 8 sows"
+              }
+            ],
+            "logic": "Supporting line priority: overdue checks, then due rechecks, then scheduled later; only the first applies and rechecks are inside the main count. A full first-check bar does not complete later checks.",
+            "source": "attention(\"pregnancy\"); facts.later in taskModel()"
           },
           {
-            "name": "Task card · Pregnancy check · supporting line",
-            "shows": "7 scheduled later",
-            "logic": "Rule: overdue → due rechecks → scheduled later; only the first applies. Here: unrecorded sows (12) minus due (5).",
-            "source": "facts.later in taskModel()"
-          },
-          {
-            "name": "Task card · Return-heat check · quiet line",
+            "name": "Return-heat card",
             "shows": "Round complete · Next check · 14:30",
-            "logic": "Observation task with an explicit \"round complete\" preview state (cardFields.return30.state). No progress bar, per the rule \"no Home progress bar for return-heat\". Only explicit activity may mark a round complete.",
+            "states": [
+              {
+                "state": "Round complete",
+                "when": "The round was explicitly closed (cardFields.return30.state)",
+                "shows": "Quiet line with a check, no progress bar"
+              },
+              {
+                "state": "Due",
+                "when": "Sows within their window still need the observation",
+                "shows": "\"N sows to check\" · \"Current round\""
+              }
+            ],
+            "rule": "Only explicit activity marks a round complete. No return and a blank mark are not evidence of a completed or negative observation. No Home progress bar, return rate or elapsed-time bar.",
             "source": "resolveAttention(); roundComplete"
           },
           {
-            "name": "Task card · Pregnancy check Batch 32 · timing pill",
-            "shows": "Today",
-            "logic": "Window of one day prints \"Today\" in the pill even though the card says the next checks are tomorrow.",
-            "source": "cardFields.preg32.days = 1"
+            "name": "Heat check card",
+            "shows": "20 sows to check · Recorded in heat 0 / 20 sows",
+            "logic": "Recorded in heat is an outcome bar, not completion: reaching the target does not close observation work. No overdue count without explicit observation records and a configured deadline.",
+            "source": "displayRules.heat"
+          },
+          {
+            "name": "\"Next\" sub-heading and card order",
+            "shows": "Next",
+            "logic": "Cards sort by attention rank: live farrowing or alert 0, overdue 1, due 2, ready to complete 2.5, waiting 3 (earliest next event first), closed 4. Equal ranks keep their order so the list does not jump. \"Next\" is printed once above the first quiet card (waiting, round complete or upcoming).",
+            "source": "SentriHomeTaskCard.order()"
           },
           {
             "name": "Closed task card",
             "shows": "Piglet processing · Batch 26 · Across 3 units · Completed · Today, 09:10",
-            "logic": "Closed tasks collect at the bottom under \"Closed tasks N\" as a compact receipt: check icon (stop icon and \"Ended early\" when terminated), title, batch (and scope in the overview), completion stamp. Never revived with due counts. Tapping opens the read-only receipt page.",
+            "states": [
+              {
+                "state": "Completed",
+                "when": "completedAt is set on the instance",
+                "shows": "Check icon, title, batch (and scope in the Overview), \"Completed · <stamp>\""
+              },
+              {
+                "state": "Ended early",
+                "when": "terminatedAt is set (End task early)",
+                "shows": "Stop icon and \"Ended early · <stamp>\""
+              }
+            ],
+            "logic": "Closed cards collect at the bottom under \"Closed tasks N\" (N = closed instances in the scope), always sort last, and never show due counts again, even if old records would say otherwise.",
             "source": "tasks[] completedAt/terminatedAt; SentriHomeTaskCard.render"
-          },
-          {
-            "name": "\"Next\" sub-heading",
-            "shows": "Next",
-            "logic": "Printed once above the first quiet card (waiting, round-complete or upcoming). Open cards sort by attention rank: live farrowing/alert 0, overdue 1, due 2, ready to complete 2.5, waiting 3 (earliest next event first), closed 4; equal ranks keep their order.",
-            "source": "SentriHomeTaskCard.order()"
           }
         ],
-        "controls": [
-          {
-            "control": "A task card without a detail page",
-            "does": "opens the task preview",
-            "goesTo": "workbench.task-preview"
-          },
-          {
-            "control": "A closed task card",
-            "does": "opens the receipt page",
-            "goesTo": "workbench.closed-task"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
         "edge": [
-          "Observation tasks (heat, return-heat) have no progress bar on Home; Heat check shows \"Recorded in heat\" as an outcome bar instead."
+          "Tasks without a detail page open the \"not designed yet\" preview instead of a task."
         ],
-        "rules": [
-          "Return-heat: \"No Home progress bar, return-rate result or elapsed-time bar.\"",
-          "Heat: recorded-in-heat is an outcome, not completion."
-        ],
+        "rules": [],
         "issues": [
           "Batch 32 shows \"Today\" in the pill and \"Next checks · Tomorrow\" in the body.",
-          "Heat check in Breeding shows \"20 sows to check\" and \"0 / 20 sows\" recorded in heat: the same 20 twice."
+          "Heat check in Breeding shows \"20 sows to check\" and \"0 / 20 sows\" in heat: the same 20 twice."
         ]
       }
     },
@@ -589,33 +480,35 @@
       "figma": "",
       "notes": {
         "purpose": "Shows the Overview when every task has work due now.",
-        "states": [
-          "`work=active` forces due counts on cards that are waiting by default: Piglet processing becomes \"4 litters with care due\". Other `work` values: waiting, round-complete, ready (see workbench.all-recorded). The same choice is a select outside the phone (\"Work preview\")."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Task card · Piglet processing · headline",
+            "name": "Piglet processing card · due",
             "shows": "4 litters with care due",
-            "logic": "Sum of cardFields.piglet27.due ({6:2, 7:2}); label from displayRules.piglet.label; singular \"litter with care due\" for 1.",
-            "source": "attention(\"piglet\")"
+            "states": [
+              {
+                "state": "Due",
+                "when": "?work=active (or the Work preview select outside the phone)",
+                "shows": "\"N litters with care due\" = sum of cardFields.piglet27.due {6:2, 7:2}; singular \"1 litter with care due\""
+              },
+              {
+                "state": "Waiting",
+                "when": "Default",
+                "shows": "\"Next care · Tomorrow\", due counts ignored"
+              }
+            ],
+            "rule": "Count unique litters, not procedures. A supporting line would be litters with overdue required care; Home supplies none.",
+            "source": "attention(\"piglet\"); displayRules.piglet"
           }
         ],
-        "controls": [
-          {
-            "control": "Piglet processing card",
-            "does": "opens the piglet-processing prototype",
-            "goesTo": "piglet-processing.pen-list"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
         "edge": [],
-        "rules": [
-          "\"Count unique litters, not the number of procedures.\""
-        ],
+        "rules": [],
         "issues": [
-          "The \"Due now\" status label exists only in the card's accessible name; visually the pill still says \"Day 3 of 7\"."
+          "\"Due now\" exists only in the card's accessible name; visually the pill still says \"Day 3 of 7\"."
         ]
       }
     },
@@ -629,39 +522,38 @@
       "figma": "",
       "notes": {
         "purpose": "Shows the cards that are ready to be completed by the worker.",
-        "states": [
-          "`work=ready`: cards with a completion bar fill to total and show \"All required work recorded\" and a \"Review & complete task\" row; the timing pill and footer are hidden. Tasks without a bar (heat, return-heat) are unchanged (\"10 sows to check · Current round\")."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Task card · quiet line",
-            "shows": "All required work recorded",
-            "logic": "Ready state: facts.readyToComplete, only when no closure dependency (closureBlockedBy is not set in Home; \"Waiting for X to close\" exists in the card code but is not exercised).",
-            "source": "resolveAttention()"
-          },
-          {
-            "name": "Task card · call to action",
-            "shows": "Review & complete task",
-            "logic": "Shown instead of the footer on a ready card. Whole-task closure stays global, not scope-dependent.",
-            "source": "render(); ready"
+            "name": "Ready card",
+            "shows": "All required work recorded · Review & complete task",
+            "states": [
+              {
+                "state": "Ready",
+                "when": "?work=ready: a card with a completion bar fills to its total",
+                "shows": "Quiet \"All required work recorded\", full bar, \"Review & complete task\" row; timing pill and footer hidden"
+              },
+              {
+                "state": "Observation task",
+                "when": "Heat and return-heat have no completion bar",
+                "shows": "Unchanged (\"10 sows to check · Current round\")"
+              },
+              {
+                "state": "Blocked",
+                "when": "closureBlockedBy is set",
+                "shows": "\"Waiting for <task> to close\" instead. Coded, no sample reaches it"
+              }
+            ],
+            "rule": "A full bar never proves readiness by itself; dependencies and future required work must be checked. Closure is whole-task and stays global, not scope-dependent.",
+            "source": "resolveAttention(); facts.readyToComplete, closureBlockedBy"
           }
         ],
-        "controls": [
-          {
-            "control": "A ready card",
-            "does": "opens the ready-to-complete preview",
-            "goesTo": "workbench.task-ready"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
-        "edge": [
-          "A full bar never proves readiness on its own; the rules require dependencies to be checked (not simulated here)."
-        ],
-        "rules": [
-          "\"A full outcome bar, one full treatment session or a finished unit does not prove whole-task readiness.\""
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "The dependency wait (\"Waiting for farrowing to close\") is coded but no sample reaches it."
         ]
@@ -677,30 +569,28 @@
       "figma": "",
       "notes": {
         "purpose": "What the Overview shows when a section has no task today.",
-        "states": [
-          "Empty state with a check mark: \"No scheduled tasks today\", then \"Select a unit to inspect pens or record anything you find.\" and a Tomorrow card."
-        ],
+        "states": [],
         "elements": [
           {
             "name": "Empty state",
             "shows": "No scheduled tasks today",
-            "logic": "Shown when the scoped task list is empty. In a unit scope the text becomes \"You can still inspect this unit and record anything you find.\" and the Tomorrow card is hidden.",
+            "states": [
+              {
+                "state": "Overview, no tasks",
+                "when": "The scoped task list is empty (Nursery)",
+                "shows": "\"No scheduled tasks today\", \"Select a unit to inspect pens or record anything you find.\" and a Tomorrow card"
+              },
+              {
+                "state": "Unit, no tasks",
+                "when": "A unit is chosen and carries no task",
+                "shows": "\"You can still inspect this unit and record anything you find.\"; the Tomorrow card is hidden"
+              }
+            ],
+            "logic": "The Tomorrow card (Growth check · Batch 26 · Units 12-13) is fixed sample text, not derived from any task.",
             "source": "home()"
-          },
-          {
-            "name": "Tomorrow card",
-            "shows": "Tomorrow · Growth check · Batch 26 · Units 12–13 · sample weights",
-            "logic": "Static sample text, Overview only.",
-            "source": "literal in home()"
           }
         ],
-        "controls": [
-          {
-            "control": "Choose unit",
-            "does": "opens the unit picker",
-            "goesTo": "workbench.choose-unit"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
@@ -723,95 +613,83 @@
       "figma": "",
       "notes": {
         "purpose": "The same Home narrowed to one unit: its facts, its entrances (inspect, environment) and only its tasks.",
-        "states": [
-          "`view=unit&unit=N`. `attention` changes the attention chips (current, clear, health, feed, maintenance, busy, unknown); a select outside the phone does the same."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Scope rail · Overview",
-            "shows": "Overview",
-            "logic": "Pressed when no unit is chosen. Tapping it clears the unit and shows the section's tasks across all units.",
-            "source": "scopeRail(); state.unit"
-          },
-          {
-            "name": "Scope rail · Unit",
-            "shows": "Unit 7 · 3 units",
-            "logic": "Replaces \"Choose unit\"; the unit picker reopens from it.",
-            "source": "scopeRail()"
-          },
-          {
-            "name": "Unit hub · Inspect unit",
-            "shows": "Inspect unit · 86 pigs · 8 pens",
-            "logic": "Entrance to the Inspection prototype for this unit. Pigs and pens come from units{}.",
-            "source": "unitStrip()"
+            "name": "Unit hub · attention chips",
+            "shows": "Health 3 · Feed 3 · Maintenance 1",
+            "states": [
+              {
+                "state": "Flagged",
+                "when": "A signal is above zero",
+                "shows": "A chip per signal with its count"
+              },
+              {
+                "state": "Clear",
+                "when": "All signals are zero",
+                "shows": "\"No flagged items\""
+              },
+              {
+                "state": "Unknown",
+                "when": "The summary could not be read",
+                "shows": "\"Health and feed summary unavailable\"; never shown as zero"
+              }
+            ],
+            "logic": "Health and Feed are fictional snapshot counts chosen by the `attention` preview (current, clear, health, feed, maintenance, busy, unknown) and are the same in every unit. Maintenance = open maintenance records of the unit.",
+            "source": "unitStrip(); maintenanceRecords()"
           },
           {
             "name": "Unit hub · Checked",
             "shows": "Checked Yesterday",
-            "logic": "First segment of units[N].checked (the part before the name); date and checker are sample data.",
+            "logic": "First segment of units[N].checked (the part before the name). Date and checker are sample data; who checked is dropped.",
             "source": "units{}"
-          },
-          {
-            "name": "Unit hub · attention chips",
-            "shows": "Health 3 · Feed 3 · Maintenance 1",
-            "logic": "Chips only for signals above zero. Health and Feed are fictional snapshot counts chosen by the attention preview; Maintenance = open maintenance records of the unit. When all are zero: \"No flagged items\"; when unknown: \"Health and feed summary unavailable\".",
-            "source": "unitStrip(); maintenanceRecords()"
           },
           {
             "name": "Unit hub · Environment & devices",
             "shows": "Environment & devices · 22.4 °C · 64 % · 8 ppm NH₃",
-            "logic": "Present only if the unit has at least one numeric reading or one device; shows readings, or \"N devices\" when there are none. Absent in all Farrowing and Breeding units of the sample.",
+            "states": [
+              {
+                "state": "Readings",
+                "when": "The unit has at least one numeric reading",
+                "shows": "The readings that exist (temperature, humidity, ammonia)"
+              },
+              {
+                "state": "Devices only",
+                "when": "No readings but a controllable device",
+                "shows": "\"N devices\" (singular \"1 device\")"
+              },
+              {
+                "state": "Absent",
+                "when": "No reading and no device (all Farrowing and Breeding units of the sample)",
+                "shows": "The card is not drawn"
+              }
+            ],
             "source": "availableSensors(), unitDevices()"
           },
           {
-            "name": "Task cards",
+            "name": "Task cards in a unit",
             "shows": "Pregnancy check · 2 sows ready to check · 2 scheduled later · 2 / 6 sows",
-            "logic": "Same cards as the Overview with the unit's figures; the footer is replaced by the arrow; tasks without the unit are hidden.",
+            "logic": "The Overview rules re-run on the unit's figures; the footer is replaced by an arrow; tasks without the unit are hidden.",
             "source": "scopedTasks()"
           },
           {
             "name": "Coming up",
             "shows": "Coming up · 2 batches",
-            "logic": "Collapsed card listing next batches/rounds for the unit (Batch 31 Pregnancy check Next round · tomorrow; Batch 30 Return-heat Next round · 14:30). Not shown in the Farrowing section.",
+            "logic": "Collapsed list of the unit's next batches or rounds (Batch 31 Pregnancy check · tomorrow; Batch 30 Return-heat · 14:30). Not shown in the Farrowing section, which has no unit context.",
             "source": "unitContext[7].next; comingUp()"
           }
         ],
-        "controls": [
-          {
-            "control": "Inspect unit",
-            "does": "opens the Inspection prototype with this unit",
-            "goesTo": "inspection.walk"
-          },
-          {
-            "control": "Environment & devices",
-            "does": "opens the Environment page",
-            "goesTo": "environment.page"
-          },
-          {
-            "control": "Toolbox → Maintenance",
-            "does": "opens the unit's maintenance list (the row only exists when a unit is chosen)",
-            "goesTo": "environment.maintenance"
-          },
-          {
-            "control": "Overview",
-            "does": "clears the unit",
-            "goesTo": "workbench.gestation"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
         "edge": [
-          "A unit with no readings and no device has no environment card.",
-          "Singular/plural: \"1 device\", \"1 issue\".",
-          "Attention counts of \"unknown\" are shown as unavailable, never zero."
+          "A unit with no readings and no device has no environment card."
         ],
-        "rules": [
-          "\"Unit context belongs at the entrance.\" \"Inspection owns the pen walk; Unit Home owns population, last check, environment/device access and maintenance.\""
-        ],
+        "rules": [],
         "issues": [
           "The same Health 3 / Feed 3 snapshot appears in every unit.",
-          "The Maintenance count is a chip inside the Inspect card, but tapping it opens Inspection, not Maintenance; the list is only reachable via Toolbox. A handler `unit-fault` exists with no control.",
+          "The Maintenance chip sits inside the Inspect card but opens Inspection, not Maintenance; the list is only reachable via Toolbox.",
           "\"Checked Yesterday\" drops who checked and when; the direction doc says the strip shows last-check time."
         ]
       }
@@ -826,55 +704,41 @@
       "figma": "",
       "notes": {
         "purpose": "A unit of the Farrowing section: the card the worker opens to continue in this unit.",
-        "states": [
-          "Farrowing \"1 sow farrowing · 2 due today · 4 / 8 sows\"; Piglet processing quiet \"Next care · Tomorrow\", 1 / 4 pens. Unit 8: Farrowing quiet \"Next expected · Tomorrow\", 2 / 4 sows, no Piglet card."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Unit hub",
-            "shows": "Inspect unit · 8 pigs · 4 pens · Checked Today",
-            "logic": "No environment card and no Coming up here: currentUnitContext() returns nothing for the Farrowing section.",
-            "source": "unitStrip()"
-          },
-          {
-            "name": "Task card · Farrowing",
-            "shows": "1 sow farrowing · 2 due today",
-            "logic": "Same rules as the Overview, narrowed to Unit 6.",
-            "source": "taskModel()"
-          },
-          {
-            "name": "Task card · Piglet processing",
-            "shows": "Next care · Tomorrow · 1 / 4 pens",
-            "logic": "Opening it passes unit=6 and returnUnit=6 to the prototype, which ignores them.",
-            "source": "openTask()"
+            "name": "Unit cards by unit",
+            "shows": "Unit 6: 1 sow farrowing · 2 due today · 4 / 8 sows; Piglet processing Next care · Tomorrow, 1 / 4 pens",
+            "states": [
+              {
+                "state": "Unit 6",
+                "when": "Live sow, 2 due",
+                "shows": "Farrowing active \"1 sow farrowing · 2 due today\", 4 / 8 sows; Piglet processing waiting, 1 / 4 pens"
+              },
+              {
+                "state": "Unit 7",
+                "when": "Live sow, 2 due",
+                "shows": "Farrowing \"1 sow farrowing · 2 due today\", 1 / 6 sows"
+              },
+              {
+                "state": "Unit 8",
+                "when": "No live sow, nothing due, no Piglet task",
+                "shows": "Farrowing waiting \"Next expected · Tomorrow\", 2 / 4 sows; no Piglet card"
+              }
+            ],
+            "logic": "No environment card and no Coming up: currentUnitContext() returns nothing for the Farrowing section.",
+            "source": "taskModel(), unitStrip()"
           }
         ],
-        "controls": [
-          {
-            "control": "Farrowing card",
-            "does": "opens the Farrowing prototype in Unit 6",
-            "goesTo": "farrowing.room"
-          },
-          {
-            "control": "Piglet processing card",
-            "does": "opens the piglet-processing prototype",
-            "goesTo": "piglet-processing.pen-list"
-          },
-          {
-            "control": "Inspect unit",
-            "does": "opens Inspection",
-            "goesTo": "inspection.walk"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
-        "edge": [
-          "Unit 8 has no Piglet card."
-        ],
+        "edge": [],
         "rules": [],
         "issues": [
-          "The Farrowing units show no environment or maintenance entrance although farrowing rooms carry sensors in the old design (unclear: the sample just has no context for this section)."
+          "The Farrowing units show no environment or maintenance entrance although farrowing rooms carry sensors in the old design.",
+          "Opening Piglet processing passes unit=6 and returnUnit=6, which the prototype ignores."
         ]
       }
     },
@@ -888,58 +752,57 @@
       "figma": "",
       "notes": {
         "purpose": "Shows what is saved on the phone and not yet sent, and lets the worker upload it.",
-        "states": [
-          "How to reach: tap the saved-work card. The state is picked with the \"Connection preview\" select outside the phone (not in the URL): No signal · 3 pending (default), Connected · ready to upload, Upload fails · retry needed, All records uploaded.",
-          "Offline: \"3 records waiting to upload\" + \"No connection · check Wi-Fi or mobile signal\"; button \"Upload 3 records\"; pressing it offline reports \"Still no connection. All 3 records remain on this device.\"",
-          "Uploading (0.9 s): button \"Uploading…\" disabled, message \"Uploading saved records…\".",
-          "Failed: \"Upload did not complete. Your records are still on this device. Try again.\" with \"Retry upload\".",
-          "Done: \"Everything is uploaded\", \"There are no records waiting on this device.\", button \"Done\"."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Summary",
-            "shows": "3 records waiting to upload",
-            "logic": "Count of sync.pending; icon is the offline icon when there is no connection, otherwise upload; a check when empty.",
-            "source": "showSync()"
-          },
-          {
-            "name": "Connection line",
-            "shows": "No connection · check Wi-Fi or mobile signal",
-            "logic": "From sync.connection.",
-            "source": "showSync()"
+            "name": "Upload button and message",
+            "shows": "Upload 3 records · No connection · check Wi-Fi or mobile signal",
+            "states": [
+              {
+                "state": "Offline",
+                "when": "No connection (default; \"Connection preview\" select outside the phone)",
+                "shows": "\"3 records waiting to upload\", button \"Upload 3 records\"; pressing it reports \"Still no connection. All 3 records remain on this device.\""
+              },
+              {
+                "state": "Ready",
+                "when": "Connected, records waiting",
+                "shows": "Upload icon; button uploads"
+              },
+              {
+                "state": "Uploading",
+                "when": "About 0.9 s after pressing",
+                "shows": "Button \"Uploading…\" disabled, \"Uploading saved records…\""
+              },
+              {
+                "state": "Failed",
+                "when": "The simulated upload fails",
+                "shows": "\"Upload did not complete. Your records are still on this device. Try again.\" with \"Retry upload\""
+              },
+              {
+                "state": "Done",
+                "when": "Queue empty",
+                "shows": "\"Everything is uploaded\", \"There are no records waiting on this device.\", button \"Done\""
+              }
+            ],
+            "rule": "Only a successful upload clears the queue; a failure keeps every record. The drawer separates records saved on this device from records uploaded for the team.",
+            "source": "showSync(); sync.connection"
           },
           {
             "name": "Record row",
             "shows": "Pregnancy check · 000308 · Gestation · Unit 7 · Batch 31 · 09:32",
-            "logic": "Title, context and save time of a queued record. Three fictional samples; nothing the other screens do feeds this queue.",
+            "logic": "Task, animal, place and save time of a queued record. Three fictional samples; nothing the other screens do feeds this queue.",
             "source": "pendingExamples"
           }
         ],
-        "controls": [
-          {
-            "control": "Upload / Retry upload",
-            "does": "simulated upload; clears the queue only on success",
-            "goesTo": "workbench.today"
-          },
-          {
-            "control": "Back / Done",
-            "does": "closes the drawer",
-            "goesTo": "workbench.today"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
-        "edge": [
-          "A failed upload keeps every record.",
-          "Only a successful upload clears the queue and moves the card to the bottom."
-        ],
-        "rules": [
-          "\"Distinguishes records saved on this device from records uploaded for the team.\""
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "The offline queue is entirely simulated: records made in the other prototypes never appear here.",
-          "unclear: where the old Figma data-sync list/detail (数据同步) fits relative to this drawer."
+          "unclear: where the old Figma data-sync list and detail (数据同步) fit relative to this drawer."
         ]
       }
     },
@@ -953,50 +816,33 @@
       "figma": "",
       "notes": {
         "purpose": "Placeholder page for every task that has no detail design yet; the task stays open between scheduled work.",
-        "states": [
-          "How to reach: tap a task card that has no detail page, such as Pregnancy check Batch 31 in Gestation. Only Farrowing and Piglet processing hand off to real prototypes."
-        ],
+        "states": [],
         "elements": [
           {
             "name": "Title and subtitle",
             "shows": "Pregnancy check · Batch 31 · All units",
-            "logic": "Task type; batch; scope: \" · All units\" in the overview or \" · Unit N\" from a unit.",
-            "source": "placeholder()"
-          },
-          {
-            "name": "Body",
-            "shows": "Task preview — This task page is still to come. The task stays open between scheduled work.",
-            "logic": "Static message. The research docs call this the \"Not designed yet\" page; the code says \"Task preview\".",
-            "source": "placeholder()"
-          },
-          {
-            "name": "Footer",
-            "shows": "Back · End task early",
-            "logic": "Back returns to Home; End task early opens a confirmation.",
+            "states": [
+              {
+                "state": "From the Overview",
+                "when": "Opened from the Overview",
+                "shows": "Subtitle ends \" · All units\""
+              },
+              {
+                "state": "From a unit",
+                "when": "Opened inside a unit",
+                "shows": "Subtitle ends \" · Unit N\""
+              }
+            ],
+            "logic": "Only Farrowing and Piglet processing hand off to real prototypes; every other task lands here.",
             "source": "placeholder()"
           }
         ],
-        "controls": [
-          {
-            "control": "Back",
-            "does": "returns to Home with scope restored",
-            "goesTo": "workbench.gestation"
-          },
-          {
-            "control": "End task early",
-            "does": "opens the confirmation drawer",
-            "goesTo": "workbench.end-task-early"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
-        "edge": [
-          "Header Back is omitted on these nested pages; Back lives in the footer."
-        ],
-        "rules": [
-          "\"Pregnancy check, return-heat, heat check, breeding and piglet processing have a minimal Not designed yet page.\" (Piglet processing now hands off to its prototype.)"
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "The page does not say what the task is or show any of its work; it is a stand-in.",
           "The wording differs from the research name (\"Not designed yet\")."
@@ -1013,38 +859,22 @@
       "figma": "",
       "notes": {
         "purpose": "The page behind a ready card: lets the worker complete the whole task.",
-        "states": [
-          "How to reach: with work=ready tap a ready card. Heading \"Ready to complete\", body \"All required work across all units is recorded. Complete the task to move it into closed tasks.\", footer Back · Complete task (primary)."
-        ],
+        "states": [],
         "elements": [
           {
             "name": "Complete task",
             "shows": "Complete task",
-            "logic": "Enabled only when the card's model state is ready; sets completedAt \"Today · just now\" and returns to Home, where it joins Closed tasks.",
+            "logic": "Enabled only when the card's model state is ready. Sets completedAt \"Today · just now\" and returns to Home, where the card joins Closed tasks.",
+            "rule": "Completion is explicit; nothing closes automatically, and it stays inside the task overview.",
             "source": "complete-task handler"
           }
         ],
-        "controls": [
-          {
-            "control": "Complete task",
-            "does": "closes the task into the receipt list",
-            "goesTo": "workbench.gestation"
-          },
-          {
-            "control": "Back",
-            "does": "returns",
-            "goesTo": "workbench.all-recorded"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
-        "edge": [
-          "Completion is explicit; nothing closes automatically."
-        ],
-        "rules": [
-          "\"Completion stays inside the task overview.\""
-        ],
+        "edge": [],
+        "rules": [],
         "issues": [
           "No review of what is being completed; the rules ask for a review before closing."
         ]
@@ -1060,36 +890,22 @@
       "figma": "",
       "notes": {
         "purpose": "Confirms ending a task before its work is complete.",
-        "states": [
-          "How to reach: Task preview › End task early. Compact drawer: \"End task early?\", \"Unfinished work will remain incomplete. Existing records are kept.\", red \"End task early\" button, Back."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Confirm button",
+            "name": "End task early",
             "shows": "End task early",
-            "logic": "Sets terminatedAt \"Today · just now\"; the card then shows in Closed tasks as \"Ended early\".",
+            "logic": "Sets terminatedAt \"Today · just now\". Existing records are kept and unfinished work stays incomplete; the card then shows under Closed tasks as \"Ended early\".",
+            "rule": "Consequences must be shown inside each task (batch membership, backfill); this drawer states none.",
             "source": "confirm-end-task handler"
           }
         ],
-        "controls": [
-          {
-            "control": "End task early",
-            "does": "ends the task and returns to Home",
-            "goesTo": "workbench.gestation"
-          },
-          {
-            "control": "Back",
-            "does": "closes the drawer",
-            "goesTo": "workbench.task-preview"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
         "edge": [],
-        "rules": [
-          "\"Early-end consequences must be shown inside each task\" (batch membership, backfill)."
-        ],
+        "rules": [],
         "issues": [
           "The drawer states no consequence for the task (the rules say each task must)."
         ]
@@ -1105,31 +921,33 @@
       "figma": "",
       "notes": {
         "purpose": "Read-only page for a completed or ended task.",
-        "states": [
-          "How to reach: tap a card under \"Closed tasks\". Title task type, subtitle \"Batch 29 · Completed\" (or \"· Ended early\"), check icon, \"Task complete\" / \"Task ended early\", the stamp \"Today, 08:45\", \"Results page not designed yet.\"; one full-width Back."
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Stamp",
-            "shows": "Today, 08:45",
-            "logic": "completedAt or terminatedAt string of the instance.",
+            "name": "Receipt",
+            "shows": "Batch 29 · Completed · Task complete · Today, 08:45",
+            "states": [
+              {
+                "state": "Completed",
+                "when": "completedAt is set",
+                "shows": "Check icon, \"Task complete\", subtitle \"· Completed\", the stamp"
+              },
+              {
+                "state": "Ended early",
+                "when": "terminatedAt is set",
+                "shows": "\"Task ended early\", subtitle \"· Ended early\", the stamp"
+              }
+            ],
+            "logic": "The stamp is the instance's completedAt or terminatedAt string. \"Results page not designed yet.\" is a stub.",
             "source": "tasks[]"
           }
         ],
-        "controls": [
-          {
-            "control": "Back",
-            "does": "returns to Home",
-            "goesTo": "workbench.gestation"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw)"
         ],
         "edge": [],
-        "rules": [
-          "\"Explicitly completed or ended early: compact receipt, bottom of the list.\""
-        ],
+        "rules": [],
         "issues": [
           "The results page is a stub (\"Results page not designed yet\")."
         ]
@@ -1143,7 +961,7 @@
       "notes": {
         "purpose": "Lets the worker choose a language and log out. Not built.",
         "states": [
-          "The old design (Figma 首页 › 工作台) has Select language, Log out and an operation-result screen. The Home prototype has neither control nor an entry; the header holds only the farm label, section name and Assistant."
+          "Not built: the old design (Figma 首页 › 工作台) has Select language, Log out and an operation-result screen; the Home prototype has neither control nor an entry."
         ],
         "elements": [],
         "controls": [],

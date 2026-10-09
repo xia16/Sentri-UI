@@ -34,7 +34,7 @@ function render() {
 }
 
 /* ---------- pan and zoom, shared by the board and the flow. A drag never clicks or selects. ---------- */
-function panzoom(wrap, plane, fitFn) {
+function panzoom(wrap, plane, fitFn, opts = {}) {
   const t = { x: 0, y: 0, k: 1 }, MIN = 0.25, MAX = 1.8;
   const apply = () => { plane.style.transform = `translate(${t.x}px,${t.y}px) scale(${t.k})`; };
   let start = null;
@@ -52,6 +52,12 @@ function panzoom(wrap, plane, fitFn) {
   wrap.addEventListener('pointerup', end); wrap.addEventListener('pointercancel', end);
   wrap.addEventListener('wheel', (e) => {
     e.preventDefault();
+    if (opts.scroll && !(e.ctrlKey || e.metaKey)) { // a plain wheel scrolls; ctrl/cmd + wheel zooms
+      const sz = opts.size(), r = wrap.getBoundingClientRect(), pad = 14;
+      t.y = Math.max(Math.min(pad, r.height - sz.height * t.k), Math.min(pad, t.y - e.deltaY));
+      if (sz.width * t.k > r.width - 2 * pad) t.x = Math.max(r.width - sz.width * t.k - pad, Math.min(pad, t.x - e.deltaX));
+      apply(); return;
+    }
     const k = Math.min(MAX, Math.max(MIN, t.k * Math.exp(-e.deltaY * 0.0015)));
     const r = wrap.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
     t.x = mx - (mx - t.x) * (k / t.k); t.y = my - (my - t.y) * (k / t.k); t.k = k; apply();

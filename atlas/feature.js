@@ -137,56 +137,45 @@ function cropShot(box, W, screen, opts) {
 /* a bare screen (#49) will announce its id; the flow follows the demo */
 addEventListener('message', (m) => { if (m.data && m.data.atlasScreen && CURRENT) CURRENT.follow(m.data.atlasScreen); });
 
-/* ---------- layout ---------- */
-function layoutFlow(f, entries) {
-  const NW = 190, NH = 48, CP = 14, HEAD = 32, PAD = 16, GAP = 18, VG = 12, PER = 5;
-  const pos = {}, boxes = [], x0 = 20;
-  let y = 20, maxX = 0, y0top = 0; const placed = new Set();
-  const strip = (name, kind, ids) => {
-    ids = ids.filter((i) => !placed.has(i) || i.includes(':')); if (!ids.length) return;
-    const rows = Math.ceil(ids.length / PER), cols = Math.min(PER, ids.length), h = HEAD + rows * NH + (rows - 1) * VG + PAD;
-    boxes.push({ name, kind, x: x0, y, w: 0, h });
-    ids.forEach((id, i) => { pos[id] = { x: x0 + PAD + (i % PER) * (NW + GAP), y: y + HEAD + Math.floor(i / PER) * (NH + VG) }; placed.add(id); });
-    maxX = Math.max(maxX, x0 + PAD + cols * NW + (cols - 1) * GAP + PAD); y += h + 22;
+/* ---------- layout ----------
+   Everything stacks top to bottom and fills the width: Ways in, In any status, then the task bands (each anchor status a full-width lane,
+   lifecycle order, a down arrow between; exits as dashed lanes at the end of the band), then Other and Adds to.
+   `avail` is the width the flow can use; the lanes take as many columns as fit it at about 85% scale. */
+function layoutFlow(f, entries, avail) {
+  const NW = 190, NH = 48, HEAD = 32, PAD = 16, GAP = 18, VG = 12, x0 = 20;
+  const per = Math.max(2, Math.min(6, Math.floor(((avail || 1000) / 0.85 - 2 * x0 - 4 * PAD + GAP) / (NW + GAP))));
+  const cw = per * (NW + GAP) - GAP + 4 * PAD;
+  const pos = {}, boxes = [], placed = new Set(); let y = 20;
+  const lane = (name, kind, ids, x, yy, w) => {
+    const cols = Math.max(1, Math.floor((w - 2 * PAD + GAP) / (NW + GAP))), rows = Math.max(1, Math.ceil(ids.length / cols)), head = name ? HEAD : PAD;
+    const h = head + rows * NH + (rows - 1) * VG + PAD;
+    boxes.push({ name, kind, x, y: yy, w, h });
+    ids.forEach((id, i) => { pos[id] = { x: x + PAD + (i % cols) * (NW + GAP), y: yy + head + Math.floor(i / cols) * (NH + VG) }; placed.add(id); });
+    return h;
   };
+  const strip = (name, kind, ids) => { ids = ids.filter((i) => !placed.has(i) || i.includes(':')); if (!ids.length) return; y += lane(name, kind, ids, x0, y, cw) + 22; };
   strip('Ways in', 'entry', entries.map((e) => e.id));
   const a = f.anchor, ownIds = f.screens.map((s) => s.id);
   if (a) {
     strip('In any status', 'any', a.any || []);
-    const col = (name, ids, x, yy, kind) => {
-      ids = ids || []; const h = HEAD + Math.max(1, ids.length) * NH + Math.max(0, ids.length - 1) * VG + PAD;
-      boxes.push({ name, kind, x, y: yy, w: NW + CP * 2, h });
-      ids.forEach((id, i) => { pos[id] = { x: x + CP, y: yy + HEAD + i * (NH + VG) }; placed.add(id); }); return h;
-    };
-    const bandY = y; let inner = bandY + HEAD, x = x0 + PAD, hMax = 0, topW = 0;
     const [t1, t2] = a.task || [];
-    const top = ((t1 && t1.screens) || []).filter((i) => !placed.has(i));
-    if (top.length) { // screens of the first task band sit in a strip at the top of the band
-      const rows = Math.ceil(top.length / PER);
-      top.forEach((id, i) => { pos[id] = { x: x0 + PAD + (i % PER) * (NW + GAP), y: inner + Math.floor(i / PER) * (NH + VG) }; placed.add(id); });
-      topW = PAD * 2 + Math.min(PER, top.length) * NW + (Math.min(PER, top.length) - 1) * GAP;
-      const th = rows * NH + (rows - 1) * VG + 14; inner += th; y0top = th;
-    }
-    const sts = a.statuses || [], exits = a.exits || [];
-    sts.forEach((s, i) => { hMax = Math.max(hMax, col(s.name, s.screens, x, inner, 'status')); if (i < sts.length - 1) boxes[boxes.length - 1].arrow = true; x += NW + CP * 2 + GAP; });
-    exits.forEach((s) => { hMax = Math.max(hMax, col(s.name + ' · exit', s.screens, x, inner, 'exit')); x += NW + CP * 2 + GAP; });
-    hMax += y0top;
-    boxes.push({ name: t1 ? t1.name : a.name, kind: 'band', x: x0, y: bandY, w: Math.max(topW, x - x0 - GAP + PAD), h: HEAD + hMax + PAD });
-    let endX = x0 + Math.max(topW, x - x0 - GAP + PAD);
-    if (t2) {
-      const bx = endX + 24, h2 = col('End task', t2.screens, bx + PAD, inner, 'status');
-      boxes.push({ name: t2.name, kind: 'band', x: bx, y: bandY, w: NW + CP * 2 + PAD * 2, h: HEAD + Math.max(hMax, h2) + PAD });
-      endX = bx + NW + CP * 2 + PAD * 2;
-    }
-    maxX = Math.max(maxX, endX); y = bandY + HEAD + hMax + PAD + 22;
+    const band = (name, build) => { const box = { name, kind: 'band', x: x0, y, w: cw, h: 0 }; boxes.push(box); const end = build(y + HEAD); box.h = end - y + PAD; y = end + PAD + 22; };
+    band(t1 ? t1.name : a.name, (iy) => {
+      const top = ((t1 && t1.screens) || []).filter((i) => !placed.has(i));
+      if (top.length) iy += lane('', 'plain', top, x0 + PAD, iy, cw - 2 * PAD) + 12;
+      const sts = (a.statuses || []).filter((s) => (s.screens || []).length), exits = a.exits || [];
+      sts.forEach((s, i) => { iy += lane(s.name, 'status', s.screens, x0 + PAD, iy, cw - 2 * PAD); if (i < sts.length - 1) { boxes.push({ name: '↓', kind: 'down', x: x0 + PAD, y: iy, w: cw - 2 * PAD, h: 20 }); iy += 20; } else iy += 0; });
+      exits.forEach((s) => { iy += 10; iy += lane(s.name + ' · exit', 'exit', s.screens || [], x0 + PAD, iy, cw - 2 * PAD); });
+      return iy;
+    });
+    if (t2) band(t2.name, (iy) => iy + lane('', 'plain', (t2.screens || []).filter((i) => !placed.has(i)), x0 + PAD, iy, cw - 2 * PAD));
   } else {
     const owned = new Set(ownIds);
-    (f.groups || []).forEach(([name, ids]) => strip(name === 'Old UI' ? 'Screens in the old UI' : name, '', ids.filter((i) => owned.has(i))));
+    (f.groups || []).forEach(([name, ids]) => strip(name === 'Old UI' ? 'Screens in the old UI' : name, 'status', ids.filter((i) => owned.has(i))));
   }
-  strip(a || (f.groups || []).length ? 'Other' : 'Screens', '', ownIds); // anything not placed above
+  strip(a || (f.groups || []).length ? 'Other' : 'Screens', a || (f.groups || []).length ? '' : 'status', ownIds);
   strip('Adds to', 'adds', (f.addsTo || []).map((_, i) => 'adds:' + i));
-  boxes.forEach((b) => { if (!b.w) b.w = maxX - x0; });
-  return { pos, boxes, width: maxX + 20 + 96, height: y + 96, NW, NH };
+  return { pos, boxes, width: x0 + cw + 20, height: y + 40, NW, NH };
 }
 
 /* ---------- the page ---------- */
@@ -205,13 +194,22 @@ function openFeature(id, sel) {
   const page = document.getElementById('feature'); page.hidden = false; page.innerHTML = '';
 
   const entries = (f.entryPoints || []).map((e, i) => Object.assign({}, e, { id: 'entry:' + i }));
-  const { pos, boxes, width, height, NW, NH } = layoutFlow(f, entries);
+  const availW = () => innerWidth - 440 - (document.querySelector('.feature .notes.open') ? 440 : 0) - 28;
+  let L = layoutFlow(f, entries, availW()), pos = L.pos; const NW = L.NW, NH = L.NH;
   const edges = [...entries.filter((e) => e.lands).map((e) => [e.id, e.lands, e.control || e.label]), ...(f.flow || [])];
 
   const col = el('<div class="flowcol"></div>');
   const wrap = el('<div class="flowwrap"><div class="flowplane"><svg width="10" height="10"></svg></div><div class="zoom"><button data-z="-1" title="Zoom out">−</button><button data-z="0" title="Fit">⤢</button><button data-z="1" title="Zoom in">+</button></div></div>');
   const plane = wrap.querySelector('.flowplane'), svg = plane.querySelector('svg');
-  boxes.forEach((b) => plane.append(el(`<div class="group ${b.kind || ''}" style="left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px"><span>${esc(b.name)}</span>${b.arrow ? '<i class="next">→</i>' : ''}</div>`)));
+  const groups = el('<div class="groups"></div>'); plane.prepend(groups);
+  const drawGroups = () => { groups.innerHTML = L.boxes.map((b) => `<div class="group ${b.kind || ''}" style="left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px"><span>${esc(b.name)}</span></div>`).join(''); };
+  drawGroups();
+  function relayout() {
+    L = layoutFlow(f, entries, availW()); pos = L.pos; drawGroups();
+    Object.entries(nodes).forEach(([id, n]) => { if (pos[id]) { n.style.left = pos[id].x + 'px'; n.style.top = pos[id].y + 'px'; } });
+    drawEdges(selected && nodes[selected] ? selected : null);
+  }
+  addEventListener('resize', () => { if (wrap.isConnected) { relayout(); pz.fit(); } });
   const dock = el('<div class="dock"></div>'), nodes = {};
   const place = (nid, html, cls, title, onclick) => { if (!pos[nid]) return; const b = el(`<button class="node ${cls}" title="${esc(title)}">${html}</button>`); b.style.left = pos[nid].x + 'px'; b.style.top = pos[nid].y + 'px'; b.onclick = onclick; plane.append(b); nodes[nid] = b; };
   entries.forEach((e) => place(e.id, `<span><b>${esc(e.section)}</b> · ${esc(e.label)}</span>`, 'entry', `${e.section} · ${e.label}`, () => select(e.id)));
@@ -250,7 +248,7 @@ function openFeature(id, sel) {
   /* the notes panel follows what the phone shows */
   const notes = el('<div class="notes"><header><button class="tab" data-t="screen">Screen notes</button><button class="tab" data-t="prd">Feature PRD</button><button class="x" title="Close notes" aria-label="Close notes">✕</button></header><div class="body"></div></div>');
   let notesTab = 'screen', shown = null, pz = null, selected = null;
-  const setNotes = (on) => { if (!on) clearPins(); notes.classList.toggle('open', on); col.classList.toggle('notes-open', on); dock.querySelector('[data-notes]')?.setAttribute('aria-pressed', String(on)); if (pz) { pz.fit(); const sel = nodes[selected]; if (sel) pz.reveal(sel); } };
+  const setNotes = (on) => { if (!on) clearPins(); notes.classList.toggle('open', on); col.classList.toggle('notes-open', on); dock.querySelector('[data-notes]')?.setAttribute('aria-pressed', String(on)); if (pz) { relayout(); pz.fit(); const sel = nodes[selected]; if (sel) pz.reveal(sel); } };
   const goto = (sid) => { const t = idx[sid]; if (!t) return; if (t.feature.id === f.id) select(sid); else openFeature(t.feature.id, sid); };
   /* ---------- the Notes panel: a screen spec ---------- */
   const ICON = { warn: '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 1.8 14.8 13.5H1.2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 6.2v3.6M8 11.6v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>', caret: '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' };
@@ -306,7 +304,10 @@ function openFeature(id, sel) {
         let m; const re = /["“]([^"”]{2,})["”]/g; while ((m = re.exec(sh))) cand.push(m[1]);
         sh.replace(/\([^)]*\)/g, '').split(/\s[+·]\s|,|;/).forEach((p) => cand.push(p));
         cand.push(String(e.name || '').split('·').pop());
-        let hit = null; for (const c of cand) { hit = find(c); if (hit) break; }
+        let hit = null, viaAt = false;
+        for (const t of [].concat(e.at || [])) { hit = find(t); if (hit) { viaAt = true; break; } } // `at`: text visible inside the element
+        if (!hit) for (const c of cand) { hit = find(c); if (hit) break; }
+        if (hit && viaAt) { const box2 = hit.e.closest('button, a, li, [role=button], [role=tab], [data-action], [class*="card"], [class*="row"]'); if (box2 && phone.contains(box2) && box2 !== phone) { const r2 = box2.getBoundingClientRect(); if (r2.width > 2 && r2.height > 2 && r2.height < 400) hit = { e: box2, r: r2 }; } }
         if (!hit) { card.classList.add('off'); missing.push(e.name); return; }
         const r = hit.r, L = r.left * k, T = r.top * k, R = r.right * k, B = r.bottom * k, cy = Math.max(1, Math.min(H - S - 1, (T + B) / 2 - S / 2)), G = 4;
         const free = (x, y) => inside(x, y) && !hits(x, y, texts) && !hits(x, y, taken);
@@ -350,12 +351,12 @@ function openFeature(id, sel) {
       ${confirm.length ? `<div class="badges"><span class="badge">To confirm <b>${confirm.length}</b></span></div>` : ''}</div>
       ${nt.purpose ? `<p class="lead">${esc(nt.purpose)}</p>` : ''}`;
     const split = (t) => { const ss = String(t).match(/[^.!?]+(?:[.!?]+(?=\s|$)|$)\s*/g) || [t]; let a = '', i = 0; while (i < ss.length && (!a || a.length + ss[i].length <= 190)) a += ss[i++]; return [a.trim(), ss.slice(i).join('').trim()]; };
-    const cards = els.map((e, i) => { const [la, lb] = split(e.logic || ''); return `<article class="ecard" data-i="${i}"><div class="eh" role="button" tabindex="0"><span class="num">${i + 1}</span><b>${esc(e.name)}</b></div><div class="ex">${e.shows ? `<code class="cv">${esc(e.shows)}</code>` : ''}${la ? `<p class="lg">${esc(la)}${lb ? `<span class="rest" hidden> ${esc(lb)}</span>` : ''}</p>` : ''}${lb || e.source ? `<div class="lnk">${lb ? '<button class="more">more</button>' : ''}${e.source ? '<button class="srct">Source ▸</button>' : ''}</div>` : ''}${e.source ? `<div class="srcl" hidden>${esc(e.source)}</div>` : ''}</div></article>`; });
+    const cards = els.map((e, i) => { const [la, lb] = split(e.logic || ''), st = e.states || []; return `<article class="ecard" data-i="${i}"><div class="eh" role="button" tabindex="0"><span class="num">${i + 1}</span><b>${esc(e.name)}</b>${st.length ? `<span class="nst">${st.length} state${st.length === 1 ? '' : 's'}</span>` : ''}</div><div class="ex">${e.shows ? `<code class="cv">${esc(e.shows)}</code>` : ''}${st.length ? table('est', ['State', 'When', 'Shows'], st.map((x) => `<tr><td><span class="stag">${esc(x.state)}</span></td><td>${esc(x.when)}</td><td>${esc(x.shows)}</td></tr>`)) : ''}${la ? `<p class="lg">${esc(la)}${lb ? `<span class="rest" hidden> ${esc(lb)}</span>` : ''}</p>` : ''}${e.rule ? `<p class="rl"><span class="rk">Rule</span>${esc(e.rule)}</p>` : ''}${lb || e.source ? `<div class="lnk">${lb ? '<button class="more">more</button>' : ''}${e.source ? '<button class="srct">Source ▸</button>' : ''}</div>` : ''}${e.source ? `<div class="srcl" hidden>${esc(e.source)}</div>` : ''}</div></article>`; });
     const body = [
       (issues.length ? `<section class="sec issues" id="sec-issues" data-open="false"><h3 class="sh" tabindex="0" role="button" aria-expanded="false"><span class="lbl">${issues.length} issue${issues.length === 1 ? '' : 's'}</span><span class="caret">${ICON.caret}</span></h3><div class="sb">${issues.map((t) => `<div class="callout iss" role="button" tabindex="0">${ICON.warn}<p>${esc(t)}</p><span class="chev">${ICON.caret}</span></div>`).join('')}</div></section>` : ''),
-      sec('elements', 'Elements', els.length, els.length > 0, els.length ? `<div class="ecards">${cards.join('')}</div>` : none),
+      sec('elements', 'Annotations', els.length, els.length > 0, els.length ? `<div class="ecards">${cards.join('')}</div>` : none),
       sec('states', 'States', states.length, states.length > 0 && states.length <= 6, states.length ? table('states', ['State', 'What changes', 'How you get there'], states.map((x) => `<tr><td class="k">${esc(x.title)}</td><td>${esc(x.what)}</td><td class="how">${x.how ? esc(x.how) : '<span class="muted">—</span>'}</td></tr>`)) : none),
-      sec('controls', 'Controls', ctrls.length, ctrls.length > 0 && ctrls.length <= 6, ctrls.length ? table('controls', ['Control', 'Does', 'Goes to'], ctrls.map((c) => `<tr><td class="k">${esc(c.control)}</td><td>${esc(c.does)}</td><td class="to">${goesTo(c.goesTo)}</td></tr>`)) : none),
+      !ctrls.length ? '' : sec('controls', 'Controls', ctrls.length, ctrls.length > 0 && ctrls.length <= 6, ctrls.length ? table('controls', ['Control', 'Does', 'Goes to'], ctrls.map((c) => `<tr><td class="k">${esc(c.control)}</td><td>${esc(c.does)}</td><td class="to">${goesTo(c.goesTo)}</td></tr>`)) : none),
       sec('copy', 'Copy', copy.length, false, copy.length ? table('copy', ['Id', 'English', '中文'], copy.map((c, i) => `<tr data-copy="${i}"></tr>`)) : none),
       sec('edge', 'Edge cases', edge.length, false, edge.length ? table('edge', ['Case', 'Handled?'], edge.map((t) => `<tr><td>${esc(t)}</td><td class="how"><span class="muted">unknown</span></td></tr>`)) : none),
       sec('rules', 'PRD rules applied', rules.length, false, rules.length ? rules.map((t) => `<a class="quote" href="#" data-prd>${esc(t)}</a>`).join('') : none),
@@ -376,6 +377,7 @@ function openFeature(id, sel) {
       h.onclick = toggle; h.onkeydown = (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(); } };
     });
     body.querySelectorAll('.callout.iss').forEach((c) => { const t = () => c.classList.toggle('open'); c.onclick = t; c.onkeydown = (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); t(); } }; });
+    body.querySelectorAll('.ecard tbody tr').forEach((tr) => { const c = tr.closest('.ecard'); tr.addEventListener('mouseenter', () => c._hot && c._hot(true)); tr.addEventListener('mouseleave', () => c._hot && c._hot(false)); });
     body.querySelectorAll('.ecard').forEach((c) => {
       const row = c.querySelector('.eh'), toggle = () => (c.classList.contains('open') ? collapseCard(c) : expandCard(c, false));
       row.onclick = toggle; row.onkeydown = (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(); } };
@@ -445,13 +447,15 @@ function openFeature(id, sel) {
   let pdown = false; const toggleNotes = () => { if (notes.classList.contains('open')) setNotes(false); else openNotes(); };
   dock.addEventListener('pointerdown', (ev) => { if (ev.button === 0 && ev.target.closest('[data-notes]')) { pdown = true; toggleNotes(); } });
   dock.addEventListener('click', (ev) => { if (!ev.target.closest('[data-notes]')) return; if (pdown) { pdown = false; return; } toggleNotes(); });
-  pz = panzoom(wrap, plane, () => fitTo(wrap, width, height, 1, 14, 0.7));
+  pz = panzoom(wrap, plane, () => { const r = wrap.getBoundingClientRect(), k = Math.max(0.7, Math.min(1, (r.width - 28) / L.width)); return { k, x: Math.max(14, (r.width - L.width * k) / 2), y: 14 }; },
+    { scroll: true, size: () => L });
   wrap.querySelectorAll('[data-z]').forEach((b) => { b.onclick = () => { const z = +b.dataset.z; z ? pz.step(z > 0 ? 1.2 : 1 / 1.2) : pz.fit(); }; });
   requestAnimationFrame(() => pz.fit());
   const chip = el('<button class="edgechip" title="More to the right" aria-label="Pan right" hidden>→</button>'); wrap.append(chip);
-  const cutBy = () => pz.state.x + (width - 90) * pz.state.k - wrap.clientWidth;
+  const cutBy = () => pz.state.x + (L.width - 20) * pz.state.k - wrap.clientWidth;
+  const belowBy = () => pz.state.y + L.height * pz.state.k - wrap.clientHeight;
   chip.onclick = (ev) => { ev.stopPropagation(); pz.pan(-Math.min(300, cutBy() + 24), 0); };
-  const iv = setInterval(() => { if (!wrap.isConnected) return clearInterval(iv); const cut = cutBy() > 6; chip.hidden = !cut; wrap.classList.toggle('cut', cut); }, 200);
+  const iv = setInterval(() => { if (!wrap.isConnected) return clearInterval(iv); const cut = cutBy() > 6; chip.hidden = !cut; wrap.classList.toggle('cut', cut); wrap.classList.toggle('cutb', belowBy() > 8); }, 200);
   const firstOf = () => { const a = f.anchor; const own = new Set(f.screens.map((s) => s.id)); const pick = (ids) => (ids || []).find((i) => own.has(i)); return (a && pick((a.statuses || []).flatMap((s) => s.screens || []))) || pick((f.groups || []).flatMap((g) => g[1])) || f.screens[0]?.id; };
   select(sel && nodes[sel] ? sel : (nodes[firstOf()] ? firstOf() : Object.keys(nodes)[0]));
 }

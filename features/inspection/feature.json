@@ -174,199 +174,146 @@
       "preset": "walk",
       "figma": "",
       "notes": {
-        "purpose": "The worker walks one unit pen by pen, sees every pig with its stage, health tags and feed change, picks pigs or pens, and records on the spot.",
+        "purpose": "The worker walks one unit pen by pen, sees every pig with its stage, health tags and feed change, selects pigs or pens, and records on the spot.",
         "states": [
-          "Nothing selected: the dock offers Go to pen, Scan ear tag and Search.",
-          "One or more pigs or pens selected: the dock shows Clear, \"Selected · N\", View selected and Actions.",
-          "Lens All, Health or Feed (counts under each label).",
-          "Filters on: a strip names them with Clear; no pig matches: \"No pigs match\" with Show all pigs.",
-          "Before check-in: \"Finish walk\" and last check-in 06:40. After check-in: \"Check in again\" and last check-in 09:41.",
-          "Opened from Home: the back arrow returns to Home with the unit kept; opened alone: it opens a one-row Today sheet."
+          "Opened from Home: the back arrow returns to Home with the unit kept. Opened alone: it opens a one-row Today sheet.",
+          "Filters on and no pig matches: \"No pigs match\" with Show all pigs."
         ],
         "elements": [
           {
-            "name": "Header · title",
-            "shows": "Inspection",
-            "logic": "Fixed page title.",
-            "source": "literal"
+            "name": "Pig row",
+            "shows": "Ear tag, stage and days, health tags, feed tag, checkbox",
+            "states": [
+              {
+                "state": "Sow in a stage",
+                "when": "Stage start known (stageStartedAt, else service date for gestating, else farrowing date for lactating)",
+                "shows": "Gestation · 42 days"
+              },
+              {
+                "state": "Sow, no start date",
+                "when": "No date can be found",
+                "shows": "Gestation · —"
+              },
+              {
+                "state": "Sow off production, open",
+                "when": "breedingStatus is Open",
+                "shows": "Open · 8 days"
+              },
+              {
+                "state": "Boar, piglet, grower",
+                "when": "Not a sow",
+                "shows": "Type + age: Grower · 63 days old"
+              },
+              {
+                "state": "Condition needs attention",
+                "when": "Care is Monitor / Treat in place / Move to hospital pen",
+                "shows": "Tag with \"Day N\", care icon and colour; listed first"
+              },
+              {
+                "state": "Condition ongoing",
+                "when": "Care is No action needed",
+                "shows": "Tag with \"N days\" (Arthritis · 120 days)"
+              },
+              {
+                "state": "Feed changed",
+                "when": "Factor other than 100%, a held amount, or stopped",
+                "shows": "Feed +10% / Feed −10% / Feed held / No feed, after the health tags"
+              },
+              {
+                "state": "Tags overflow",
+                "when": "They do not fit one line",
+                "shows": "Last ones collapse into +N; the full list is in the pig record"
+              }
+            ],
+            "logic": "Duration never falls back to the animal's lifetime age. The checkbox selects the pig only, never its pen.",
+            "source": "stageSummary(p) · cases(p) · careAppearance(k) · pigFeedTags(p) · fitRecordedTags()"
           },
           {
-            "name": "Header · unit",
-            "shows": "Unit 7",
-            "logic": "Shows \"Unit N\" when the page was opened from Home with a unit (?unit=N), otherwise the sample \"Unit 7\".",
-            "source": "SentriHomeLink.unit (astra-home-link.js) or unitLabel"
+            "name": "Pen header",
+            "shows": "Pen id, pig count, note icon, feed value, checkbox",
+            "states": [
+              {
+                "state": "Has a note",
+                "when": "pen.note is set",
+                "shows": "Note icon only; the text is in the pen sheet"
+              },
+              {
+                "state": "Trough pen",
+                "when": "Pigs have allowances",
+                "shows": "Sum of daily allowances in kg (base x factor, held amount, 0 when stopped)"
+              },
+              {
+                "state": "Ad-lib pen",
+                "when": "Pen mode is ad-lib",
+                "shows": "\"Ad-lib\", no weight"
+              },
+              {
+                "state": "Feed state under the value",
+                "when": "No feed: every pig stopped. Formula due: the pen's formula change is due. Auto: station-fed.",
+                "shows": "\"No feed\" / \"Formula due\" / \"Auto\" / nothing"
+              },
+              {
+                "state": "Pen has no matching pig",
+                "when": "Filters exclude all its pigs",
+                "shows": "Pen is hidden, with its feed button"
+              }
+            ],
+            "logic": "Pig count is ALL pigs in the pen, not only those the filter shows. Ticking the pen selects it AND every pig it shows under the current filters; the checkbox is indeterminate when only some are ticked.",
+            "source": "penFeedEntry() · allocation(pe) · pe.switchDue · c.selectedPens"
           },
           {
-            "name": "Header · Back to Today",
-            "shows": "chevron button",
-            "logic": "Returns to Home when opened from Home (from=home); otherwise opens the sheet \"Today · Your work\" holding one row \"Inspection · Unit 7\" with the last check-in time.",
-            "source": "action home"
-          },
-          {
-            "name": "Header · Finish walk",
-            "shows": "Finish walk / Check in again",
-            "logic": "Text button. Label turns to \"Check in again\" once checkedIn is true. Opens the Finish walk sheet.",
-            "source": "c.checkedIn"
-          },
-          {
-            "name": "Intro · Last check-in",
-            "shows": "Last check-in 06:40 · G. Hansen",
-            "logic": "Time is 06:40 until the walk is checked in, then 09:41. The name \"G. Hansen\" is fixed text for every walk, not the signed-in worker.",
-            "source": "literal times and name in main()"
-          },
-          {
-            "name": "Intro · Log",
-            "shows": "Log (clock icon)",
-            "logic": "Opens \"This walk\": every update recorded since the page loaded, newest first. Empty: \"No updates yet\".",
-            "source": "c.events"
-          },
-          {
-            "name": "Lens tabs · All / Health / Feed",
-            "shows": "All 7 · Health 4 · Feed 3 (walk preset)",
-            "logic": "Count = pigs that pass the active filters and the lens. Health counts a pig with any recorded condition, including ongoing ones that need no action (000281 Arthritis). Feed counts a pig with a feed change (held, stopped, or an adjustment other than 100%) and every pig in a pen whose formula change is due (both D4 pigs).",
+            "name": "Lens tabs",
+            "shows": "All 7 · Health 4 · Feed 3",
+            "logic": "Count = pigs that pass the active filters and the lens. Health counts a pig with any recorded condition, ongoing ones included (000281 Arthritis). Feed counts a pig with a feed change (held, stopped, or a factor other than 100%) and every pig in a pen whose formula change is due.",
             "source": "matchesLens() · cases(p) · feedNews(p, pen)"
           },
           {
-            "name": "Filter button",
-            "shows": "funnel with a number badge",
-            "logic": "Badge = number of active filters among batch, stage, condition, care, manual-feed, health-status. Opens the Filter pigs sheet.",
-            "source": "filterN in main()"
+            "name": "Filter button and strip",
+            "shows": "Funnel with number badge; strip \"Batch 20 · Gestating · Fever\" with Clear",
+            "logic": "Badge = active filters among batch, stage, condition, care, manual-feed, health-status. The strip appears only when a filter is on; Care shows its label, not its value. Clear resets every filter and the lens.",
+            "source": "filterN · c.batchFilter, c.stage, c.healthFilter, c.triageFilter"
           },
           {
-            "name": "Filter strip",
-            "shows": "e.g. \"Batch 20 · Gestating · Fever · Treat in place\" and Clear",
-            "logic": "Only when a filter is on. Care shows its label (\"Move to hospital pen\"), not its value. Clear resets every filter and the lens.",
-            "source": "c.batchFilter, c.stage, c.healthFilter, c.triageFilter"
+            "name": "Dock",
+            "shows": "Go to pen, Scan ear tag, Search; or the selection",
+            "states": [
+              {
+                "state": "Nothing selected",
+                "when": "No pig or pen ticked",
+                "shows": "Go to pen (shows \"Pens\" until the list is scrolled, then the pen at the top), Scan ear tag, Search"
+              },
+              {
+                "state": "Selection",
+                "when": "One or more ticked",
+                "shows": "Clear, \"Selected · 2 pens · 3 pigs\", View selected, Actions"
+              }
+            ],
+            "logic": "Scan has no camera in the prototype; Search finds by ear tag or pen."
           },
           {
-            "name": "Pen header · name",
-            "shows": "C1 · 3 pigs",
-            "logic": "Pen id and the number of ALL pigs in the pen (not only those the filter shows). Tapping opens the pen sheet. A pen with no matching pig is hidden.",
-            "source": "c.pens[].pigs"
-          },
-          {
-            "name": "Pen header · note icon",
-            "shows": "note icon next to the name",
-            "logic": "Shown when the pen has a note (C1 \"Close the aisle gate after passing.\"); only a presence mark, the note text is not on the list.",
-            "source": "pen.note"
-          },
-          {
-            "name": "Pen header · feed button",
-            "shows": "7.6 kg · 4.9 kg + \"Auto\" · Ad-lib + \"Formula due\"",
-            "logic": "Value = sum of every pig's daily allowance in the pen (base x factor, a held amount, or 0 when stopped) for trough pens, \"Ad-lib\" for ad-lib pens. Small state under it: \"No feed\" when every pig is stopped, else \"Formula due\" when the pen's formula change is due, else \"Auto\" for station-fed pens, else nothing. Tapping opens the feed editor for the pen.",
-            "source": "penFeedEntry() · allocation(pe) · pe.switchDue · pe.mode"
-          },
-          {
-            "name": "Pen header · pen checkbox",
-            "shows": "checkbox, indeterminate when some pigs are ticked",
-            "logic": "Ticking selects the pen AND every pig it shows under the current filters; unticking removes them. Its accessible name states how many pigs are displayed.",
-            "source": "c.selectedPens, c.selected"
-          },
-          {
-            "name": "Pig row · checkbox",
-            "shows": "checkbox",
-            "logic": "Selects the pig only, never its pen.",
-            "source": "c.selected"
-          },
-          {
-            "name": "Pig row · ear tag",
-            "shows": "000267",
-            "logic": "Bold id; whole row (except the checkbox) opens the pig record.",
-            "source": "pig.id"
-          },
-          {
-            "name": "Pig row · meta",
-            "shows": "Gestation · 42 days · Grower · 63 days old",
-            "logic": "Sows: stage name + days in the stage since the stage start (stageStartedAt, else the service date for gestating sows, else farrowing date for lactating); \"—\" when no start date is known; never falls back to lifetime age. Off-production sows with breedingStatus Open read \"Open\". Other types (boar, piglet, grower): type + \"N days old\".",
-            "source": "stageSummary(p) · walkDate 12 Sep 2026"
-          },
-          {
-            "name": "Pig row · health tags",
-            "shows": "Thin · Day 12, Arthritis · 120 days",
-            "logic": "One tag per condition, needs-attention ones first. Day text: \"Day N\" while care is Monitor / Treat in place / Move to hospital pen, \"N days\" once the care is \"No action needed\". The care level shows only as an icon and colour (monitor, treatment, hospital) and in the tag tooltip.",
-            "source": "cases(p) · careAppearance(k) · issueStatus(k)"
-          },
-          {
-            "name": "Pig row · feed tag",
-            "shows": "Feed +10% · Feed held · No feed",
-            "logic": "After the health tags. +/-% = the pig's factor against 100%; Feed held = fixed amount; No feed = stopped.",
-            "source": "pigFeedTags(p)"
-          },
-          {
-            "name": "Pig row · +N",
-            "shows": "+2",
-            "logic": "When the tags do not fit one line, the last ones collapse into +N (recomputed after fonts load and on resize); the full list is in the pig record and the row's accessible name.",
-            "source": "fitRecordedTags()"
-          },
-          {
-            "name": "Dock · Go to pen",
-            "shows": "pen id + \"Go to pen\"",
-            "logic": "Shows \"Pens\" until the list is scrolled, then the pen currently at the top. Opens the pen map.",
-            "source": "c.currentPen"
-          },
-          {
-            "name": "Dock · Scan ear tag / Search",
-            "shows": "primary button / search icon",
-            "logic": "Scan has no camera in the prototype; Search finds by ear tag or pen.",
-            "source": "literal"
-          },
-          {
-            "name": "Dock · selection",
-            "shows": "Selected · 2 pigs, View selected, Actions",
-            "logic": "Label joins \"N pens\" and \"N pigs\". Actions opens the Actions sheet for the selection.",
-            "source": "selectionLabel(c)"
+            "name": "Finish walk and last check-in",
+            "shows": "Header button; \"Last check-in 06:40 · G. Hansen\"",
+            "states": [
+              {
+                "state": "Before check-in",
+                "when": "checkedIn is false",
+                "shows": "\"Finish walk\", last check-in 06:40"
+              },
+              {
+                "state": "After check-in",
+                "when": "checkedIn is true",
+                "shows": "\"Check in again\", last check-in 09:41"
+              }
+            ],
+            "logic": "The name G. Hansen is fixed text, not the signed-in worker.",
+            "source": "c.checkedIn"
           }
         ],
         "controls": [
           {
-            "control": "A pig row",
-            "does": "opens the pig record",
-            "goesTo": "pig-profile.full"
-          },
-          {
-            "control": "A health tag or the row of a pig with attention",
-            "does": "same pig record; its needs-attention rows open the finding",
-            "goesTo": "health-record.mixed"
-          },
-          {
-            "control": "Pen name",
-            "does": "opens the pen sheet",
-            "goesTo": "inspection.pen"
-          },
-          {
-            "control": "Pen feed value",
-            "does": "opens the feed editor for the pen",
-            "goesTo": "feed-plan.editor"
-          },
-          {
-            "control": "Pen or pig checkboxes then Actions",
-            "does": "opens the Actions sheet",
+            "control": "Pen or pig checkboxes",
+            "does": "Select only; ticking records nothing (\"Selection is not an inspection result\")",
             "goesTo": "inspection.actions"
-          },
-          {
-            "control": "Filter button",
-            "does": "opens Filter pigs",
-            "goesTo": "inspection.filters"
-          },
-          {
-            "control": "Go to pen",
-            "does": "opens the pen map",
-            "goesTo": "inspection.go-to-pen"
-          },
-          {
-            "control": "Scan ear tag · Search",
-            "does": "opens the find-a-pig sheet",
-            "goesTo": "inspection.find-pig"
-          },
-          {
-            "control": "Log",
-            "does": "opens this walk's updates",
-            "goesTo": "inspection.walk-log"
-          },
-          {
-            "control": "Finish walk",
-            "does": "opens the check-in sheet",
-            "goesTo": "inspection.finish"
           }
         ],
         "copy": [
@@ -380,15 +327,7 @@
         ],
         "edge": [
           "A pen whose pigs all fail the filter disappears from the list.",
-          "A pen with no pigs matching shows no feed button; a pig with a missing stage start shows \"Gestation · —\".",
-          "Ad-lib pens show \"Ad-lib\" instead of a weight and have no individual allowance.",
           "Selecting a pen after the filter changed selects only the pigs displayed."
-        ],
-        "rules": [
-          "\"Selection is not an inspection result\" (page footer): ticking pigs records nothing.",
-          "\"A pig checkbox does not implicitly select its pen\" (ASTRA-INSPECTION-ROUND-3).",
-          "Feed is guidance, not a completion checklist: no \"record as done\" on feed.",
-          "Care is the only editable condition state; attention is derived from it (ASTRA-BULK-ACTIONS)."
         ],
         "issues": [
           "The label \"Health 4\" counts pigs with ANY condition, including ongoing ones that need no action (Arthritis); a worker reads it as \"pigs to check\". It does not say what it counts.",
@@ -412,47 +351,36 @@
       "preset": "stage-times",
       "figma": "",
       "notes": {
-        "purpose": "Shows how the stage and elapsed days read on the row, including a sow that is open (not in pig) and ongoing arthritis.",
-        "states": [
-          "Same as the walk. 000312 is Off production and open; 000281 has Arthritis; a batch 21 \"Off production\" exists for 000312."
-        ],
+        "purpose": "Shows how the stage and elapsed days read on the row, including an open sow.",
         "elements": [
           {
-            "name": "Pig row · meta for 000312",
-            "shows": "Open · 8 days",
-            "logic": "Off-production sows whose breedingStatus is Open read \"Open\" instead of the stage; days = walk date minus the stage start (4 Sep 2026).",
+            "name": "Pig row · stage and days",
+            "shows": "Open · 8 days / Gestation · 40 days",
+            "states": [
+              {
+                "state": "Open sow (000312)",
+                "when": "Off production with breedingStatus Open",
+                "shows": "Open · 8 days (walk date minus stage start 4 Sep)"
+              },
+              {
+                "state": "Gestating sow",
+                "when": "stageStartedAt set",
+                "shows": "Gestation · 40 days"
+              },
+              {
+                "state": "No stage start (000306)",
+                "when": "No stage start and no service date",
+                "shows": "Gestation · —"
+              }
+            ],
+            "logic": "\"Open\" shows only when the status is explicit, never inferred from a missing service date. Days never fall back to lifetime age.",
             "source": "stageSummary(p)"
-          },
-          {
-            "name": "Pig row · meta for the other sows",
-            "shows": "Gestation · 40 days",
-            "logic": "Days since stageStartedAt; \"—\" when no date; never the animal's lifetime age.",
-            "source": "stageSummary(p)"
-          },
-          {
-            "name": "Lens counts",
-            "shows": "All 7 · Health 4 · Feed 3",
-            "logic": "Same rule as the walk.",
-            "source": "matchesLens()"
           }
         ],
-        "controls": [
-          {
-            "control": "A pig row",
-            "does": "opens the pig record",
-            "goesTo": "pig-profile.full"
-          }
-        ],
-        "edge": [
-          "A sow with no stage start and no service date shows \"Gestation · —\" (000306).",
-          "\"Open\" is shown only when the status is explicit, never inferred from a missing service date."
-        ],
-        "rules": [
-          "Duration never falls back to lifetime age (comment in the code)."
-        ],
+        "controls": [],
         "issues": [
-          "The same walk as inspection.walk with one extra batch; the preset has no visible difference except the Open row.",
-          "The row says \"Gestation · 40 days\" (days in stage) while the pig record says \"Last service · 40 days ago\" (days since service): two clocks that look alike and can differ."
+          "Same walk as inspection.walk with one extra batch; only the Open row differs.",
+          "Row says \"Gestation · 40 days\" (days in stage), pig record says \"Last service · 40 days ago\": two clocks that can differ."
         ]
       }
     },
@@ -465,45 +393,28 @@
       "preset": "animal-types",
       "figma": "",
       "notes": {
-        "purpose": "Shows that the list is not only sows: boars and piglets sit in their own pens and read by type and age.",
-        "states": [
-          "Two pens are added: B1 (boar B-024, ad-lib \"Boar feed\") and P1 (piglet 001104, ad-lib \"Piglet starter\"). All = 9."
-        ],
+        "purpose": "Shows that boars and piglets sit in their own pens and read by type and age.",
         "elements": [
           {
-            "name": "Pig row · meta for a boar",
-            "shows": "Boar · 420 days old",
-            "logic": "Non-sows show type + age in days; age comes from p.age, else from the birth date.",
-            "source": "stageSummary(p) · animalType(p)"
-          },
-          {
-            "name": "Pig row · meta for a piglet",
-            "shows": "Piglet · 18 days old",
-            "logic": "Same rule.",
-            "source": "stageSummary(p)"
-          },
-          {
-            "name": "Pen header · feed button",
-            "shows": "Ad-lib",
-            "logic": "Both pens are ad-lib, so no weight and no feed editing.",
-            "source": "pe.mode"
+            "name": "Pig row · stage and days",
+            "shows": "Boar · 420 days old / Piglet · 18 days old",
+            "states": [
+              {
+                "state": "Boar or piglet",
+                "when": "Not a sow",
+                "shows": "Type + age in days (p.age, else from birth date)"
+              }
+            ],
+            "logic": "B1 and P1 are ad-lib pens, so the pen feed shows \"Ad-lib\" with no weight and no feed editing. Detail blocks on the record follow the animal type.",
+            "source": "typeDetails"
           }
         ],
-        "controls": [
-          {
-            "control": "A boar or piglet row",
-            "does": "opens its record, whose detail block changes with the type (Boar breeding, Piglet growth)",
-            "goesTo": "pig-profile.full"
-          }
-        ],
+        "controls": [],
         "edge": [
           "Backfat can be recorded only for sows and gilts; the bulk form lists boars and piglets as \"Sows and gilts only\"."
         ],
-        "rules": [
-          "Detail blocks follow the animal type (typeDetails)."
-        ],
         "issues": [
-          "The sample piglet is a single pig in a pen of one; the real unit would hold litters as groups, which the walk cannot show yet."
+          "The sample piglet is a single pig in a pen of one; the real unit would hold litters as groups."
         ]
       }
     },
@@ -517,35 +428,18 @@
       "figma": "",
       "notes": {
         "purpose": "Intended to show a pen carrying both a note and an open equipment fault.",
-        "states": [
-          "C1 has a note and an open fault (Drinking station: \"Leaking valve at the east end.\")."
-        ],
         "elements": [
           {
-            "name": "Pen header · note icon",
-            "shows": "note icon on C1",
-            "logic": "Visible, as on the walk.",
-            "source": "pen.note"
-          },
-          {
-            "name": "Pen header · fault",
-            "shows": "nothing",
+            "name": "Pen header · fault mark",
+            "shows": "Nothing",
             "logic": "No fault mark is drawn on the list: penEntry() only knows the note. The fault appears only in the pen log after it is reported.",
-            "source": "pe.faults"
+            "source": "penEntry()"
           }
         ],
-        "controls": [
-          {
-            "control": "Pen name",
-            "does": "opens the pen sheet; the sheet has no fault row",
-            "goesTo": "inspection.pen"
-          }
-        ],
-        "edge": [],
-        "rules": [],
+        "controls": [],
         "issues": [
-          "The preset looks identical to the walk: an open equipment fault has no sign on the list and no row in the pen sheet.",
-          "Built in the code but no control in the prototype opens it (checked in the browser and by searching the code for a control with this action). This covers Equipment faults (pen-faults), Report fault, Resolve fault and the \"Report equipment fault\" pen chooser."
+          "Looks identical to the walk: an open fault has no sign on the list and no row in the pen sheet.",
+          "No control opens this (fault sheets, Report fault, Resolve fault)."
         ]
       }
     },
@@ -557,78 +451,41 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Everything about one pen outside its pigs: the note, the feed guidance and the pen log. How to reach it: open the walk and tap a pen name.",
-        "states": [
-          "With a note: a note card above the list (C1). Without a note: the row reads \"Add pen note\" (C2)."
-        ],
+        "purpose": "Everything about one pen outside its pigs: the note, the feed guidance and the pen log.",
         "elements": [
           {
-            "name": "Title · scope",
-            "shows": "Pen C1 · 3 pigs · Unit 7",
-            "logic": "Pen id; pig count of the whole pen; unit name.",
-            "source": "pen.pigs.length"
+            "name": "Note card and note row",
+            "shows": "Note card above the list; row Add / Edit pen note",
+            "states": [
+              {
+                "state": "Pen has a note (C1)",
+                "when": "pen.note is set",
+                "shows": "Note card with text, author, time; row reads \"Edit pen note\"; the card is the only place the text shows"
+              },
+              {
+                "state": "No note (C2)",
+                "when": "No note",
+                "shows": "No card; row reads \"Add pen note\""
+              }
+            ],
+            "logic": "Author and time as saved (\"today · 09:41\" for notes saved in this session). Notes are attached to the pen, never recorded on its pigs."
           },
           {
-            "name": "Note card",
-            "shows": "Close the aisle gate after passing. · G. Hansen · today · 06:40",
-            "logic": "Shown only when the pen has a note; author and time as saved (\"today · 09:41\" for notes saved in this session). Opens the full note.",
-            "source": "pe.note, pe.noteBy"
-          },
-          {
-            "name": "Row · Feed guidance",
+            "name": "Feed guidance row",
             "shows": "Gestation 1 · 7.6 kg",
-            "logic": "Formula name + feedLabel: allocation in kg, \"Station-fed\" or \"Ad-lib\".",
-            "source": "pe.formula · feedLabel(pe)"
-          },
-          {
-            "name": "Row · pen note",
-            "shows": "Edit pen note / Add pen note",
-            "logic": "Title and subtitle change with whether a note exists (\"Update the note for this pen\" / \"Leave information for the next person\").",
-            "source": "pe.note"
-          },
-          {
-            "name": "Row · Pen log",
-            "shows": "Pen log · Transfers, health and notes",
-            "logic": "Always shown.",
-            "source": "literal"
+            "logic": "Formula name + allocation in kg, \"Station-fed\" or \"Ad-lib\". Opens the reading page first; its Adjust feed button opens the editor.",
+            "source": "feedLabel"
           }
         ],
-        "controls": [
-          {
-            "control": "Note card",
-            "does": "reads the whole note",
-            "goesTo": "inspection.pen-note"
-          },
-          {
-            "control": "Feed guidance",
-            "does": "opens the Pen feeding page (reading); its Adjust feed button opens the editor",
-            "goesTo": "feed-plan.pen"
-          },
-          {
-            "control": "Add / Edit pen note",
-            "does": "opens the note form",
-            "goesTo": "inspection.pen-note"
-          },
-          {
-            "control": "Pen log",
-            "does": "opens the pen's activity",
-            "goesTo": "inspection.pen-log"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Pen information (raw)",
           "Feed guidance (raw)",
           "Pen log (raw)"
         ],
-        "edge": [
-          "The note card is the only place a note's text is visible; the walk shows only an icon."
-        ],
-        "rules": [
-          "Notes are attached to the pen, never recorded on its pigs (ROUND-3)."
-        ],
         "issues": [
-          "Two doors to the pen's feed with different results: the feed value in the pen header opens the editor directly, the \"Feed guidance\" row here opens the reading page first.",
-          "The note is shown twice on this sheet (the note card and the \"Edit pen note\" row), and is copied into the pen log as \"Pen note added\"."
+          "Two doors to the pen's feed with different results: header value opens the editor, this row opens the reading page first.",
+          "The note appears twice on this sheet (card and Edit row) and again in the pen log as \"Pen note added\"."
         ]
       }
     },
@@ -640,67 +497,42 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Read, add, edit or close the pen's note. How to reach it: pen sheet, then the note card or Add / Edit pen note.",
-        "states": [
-          "Reading: note text, author line, Edit note (text button), Close note (primary).",
-          "Closed: \"Closed · Kept in pen log\", closer and time, and Undo close (disabled when a new note was written meanwhile).",
-          "Editing: one text area, Save note disabled while empty."
-        ],
+        "purpose": "Read, add, edit or close the pen's note.",
         "elements": [
           {
-            "name": "Note text",
-            "shows": "Close the aisle gate after passing.",
-            "logic": "The current note, or the one just closed.",
-            "source": "pe.note / pe.closedNotes"
-          },
-          {
-            "name": "Author line",
-            "shows": "G. Hansen · today · 06:40",
-            "logic": "Who and when the note was first added; an edit overwrites the author with the editor and \"today · 09:41\".",
-            "source": "pe.noteBy"
-          },
-          {
-            "name": "Closed status",
-            "shows": "Closed · Kept in pen log",
-            "logic": "Only just after closing; the note leaves the pen and a log entry \"Pen note closed\" is added with the text and original author.",
-            "source": "closePenNote()"
-          },
-          {
-            "name": "Save note",
-            "shows": "primary button",
-            "logic": "Disabled while the text area is empty or blank.",
-            "source": "valid(c)"
+            "name": "Note screen",
+            "shows": "Reading, editing or closed view",
+            "states": [
+              {
+                "state": "Reading",
+                "when": "A note exists",
+                "shows": "Text, author line, Edit note, Close note"
+              },
+              {
+                "state": "Editing",
+                "when": "Edit note or Add pen note",
+                "shows": "One text area; Save note disabled while empty or blank"
+              },
+              {
+                "state": "Closed",
+                "when": "Just after Close note",
+                "shows": "\"Closed · Kept in pen log\", closer and time, Undo close (disabled when a new note was written meanwhile)"
+              }
+            ],
+            "rule": "One note per pen. Saving replaces the text and overwrites the author with the editor and \"today · 09:41\"; the old text survives only in the log. Close note moves the note to the pen log (\"Pen note closed\", original author) and clears the pen; Undo close restores it and logs \"Pen note reopened\"."
           }
         ],
-        "controls": [
-          {
-            "control": "Close note",
-            "does": "moves the note into the pen log and clears the pen",
-            "goesTo": "inspection.pen-note"
-          },
-          {
-            "control": "Undo close",
-            "does": "restores the note and logs \"Pen note reopened\"",
-            "goesTo": "inspection.pen-note"
-          },
-          {
-            "control": "Back",
-            "does": "returns to the pen sheet",
-            "goesTo": "inspection.pen"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Pen note (raw)",
           "Close note (raw)",
           "Undo close (raw)"
         ],
         "edge": [
-          "One note per pen: writing a new note replaces the text; the old text is kept only in the log.",
-          "Pen note can also be written for several pens at once from the Actions sheet (Pens tab)."
+          "A pen note can also be written for several pens at once from the Actions sheet (Pens tab)."
         ],
-        "rules": [],
         "issues": [
-          "A pen holds one note; Close note and Edit note overlap (an edit replaces, a close archives), and there is no way to keep two notes.",
+          "Close note and Edit note overlap (edit replaces, close archives); two notes cannot coexist.",
           "Author is overwritten on edit, so the original author is lost from the card."
         ]
       }
@@ -713,59 +545,29 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "The pen's activity: transfers, notes, equipment, health, feed. How to reach it: pen sheet, Pen log.",
+        "purpose": "The pen's activity: transfers, notes, equipment, health, feed.",
         "states": [
-          "All activity / one category; all dates / Today / Last 7 days / Last 30 days / custom range; empty: \"No activity recorded yet\" or \"No matching entries\"."
+          "Empty: \"No activity recorded yet\" or, with filters, \"No matching entries\"."
         ],
         "elements": [
           {
-            "name": "Filter bar · category",
-            "shows": "All activity (select)",
-            "logic": "Choices: All, Production, Health, Movement, Feed, Measurements, Notes, Equipment. Equipment is offered for the pen log only (not for a pig log).",
-            "source": "logTypes"
-          },
-          {
-            "name": "Filter bar · date",
-            "shows": "All dates (button)",
-            "logic": "Opens the Date range drawer; shows \"12 Sep\" or \"5 Sep–12 Sep\" for a custom range.",
-            "source": "c.penLogDate"
-          },
-          {
-            "name": "Result line",
-            "shows": "2 entries · Newest first",
-            "logic": "Count after both filters; Clear appears when a filter is on.",
-            "source": "visibleLogEntries()"
+            "name": "Filter bar",
+            "shows": "Category select and date button, result line",
+            "logic": "Categories: All, Production, Health, Movement, Feed, Measurements, Notes, Equipment (Equipment for the pen log only). Date: all / Today / Last 7 / Last 30 / custom. Custom needs both dates, end on or after start (\"Choose a start and end date.\" / \"End date must be on or after start date.\"). Results newest first; Clear appears when a filter is on.",
+            "source": "eventCategory"
           },
           {
             "name": "Entry",
-            "shows": "type tag, title, note, \"12 Sept 2026 · 06:40 · G. Hansen\"",
-            "logic": "Grouped by date. The date comes from the entry; entries with no known date stay under their own label (\"Before this walk\"); dates are never invented.",
-            "source": "logEntryDate() · eventCategory()"
-          },
-          {
-            "name": "Entry · note text",
-            "shows": "Unit 6 · B2 → Unit 7 · C1 · 000254, 000267, 000281",
-            "logic": "For pen entries the pig ids that took part are appended to the note.",
-            "source": "penLogEntries()"
+            "shows": "Type tag, title, note, date · time · author",
+            "logic": "Grouped by date taken from the entry; entries with no known date stay under their own label (\"Before this walk\"); dates are never invented. Pen entries append the ids of the pigs that took part.",
+            "source": "eventCategory"
           }
         ],
-        "controls": [
-          {
-            "control": "Date range",
-            "does": "opens the date drawer (presets or custom start/end; Apply disabled when start > end)",
-            "goesTo": "inspection.pen-log"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Pen log (raw)",
           "All activity (raw)",
           "Date range (raw)"
-        ],
-        "edge": [
-          "Custom range needs both dates and end on or after start, otherwise \"Choose a start and end date.\" or \"End date must be on or after start date.\""
-        ],
-        "rules": [
-          "ASTRA-LOG-FILTER-PATTERNS: one category filter and one date range; newest first."
         ],
         "issues": [
           "Category is inferred from the title for legacy entries (eventCategory), so a renamed title silently falls into Notes.",
@@ -781,42 +583,16 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Narrow the walk to a production stage, a condition or a care level. How to reach it: the funnel button on the walk.",
-        "states": [
-          "Default: all three read \"All / Any\". Reset clears the draft; Show pigs applies it."
-        ],
+        "purpose": "Narrow the walk by production stage, condition or care level.",
         "elements": [
           {
-            "name": "Production stage",
-            "shows": "All production stages",
-            "logic": "Options are the stages found among the unit's pigs.",
-            "source": "stageList(c)"
-          },
-          {
-            "name": "Disease or symptom",
-            "shows": "Any condition",
-            "logic": "Options are the condition names found on the unit's pigs.",
-            "source": "cases(p).map(k=>k.name)"
-          },
-          {
-            "name": "Care",
-            "shows": "Any care",
-            "logic": "No action needed · Monitor · Treat in place · Move to hospital pen.",
-            "source": "careOptions"
+            "name": "Filter fields",
+            "shows": "Production stage, Disease or symptom, Care",
+            "logic": "Options come from the unit's pigs: stages and condition names found there. Care: No action needed · Monitor · Treat in place · Move to hospital pen. Reset clears the draft; Show pigs applies it.",
+            "source": "filter state in main()"
           }
         ],
-        "controls": [
-          {
-            "control": "Reset",
-            "does": "clears the draft",
-            "goesTo": "inspection.filters"
-          },
-          {
-            "control": "Show pigs",
-            "does": "applies and returns to the walk",
-            "goesTo": "inspection.walk"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Filter pigs (raw)",
           "Show pigs (raw)"
@@ -824,7 +600,6 @@
         "edge": [
           "Batch can be filtered but has no control here (set by the unreachable batch sheet)."
         ],
-        "rules": [],
         "issues": [
           "Batch, health status and manual-feed are part of the filter state but have no field in this sheet.",
           "The Health lens and the condition/care filters overlap."
@@ -839,37 +614,38 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Jump to a pen on the list by its place in the unit. How to reach it: Go to pen in the dock.",
-        "states": [
-          "Four columns (A to D) by six rows; a pen with no matching pig is disabled and reads \"Not in unit\" or \"No matches\"."
-        ],
+        "purpose": "Jump to a pen on the list by its place in the unit.",
         "elements": [
           {
             "name": "Pen cell",
             "shows": "C1 · 2 health",
-            "logic": "Id and a one-line fact: \"N health\" when the pen has pigs with any condition (ongoing included), otherwise \"N pigs\".",
-            "source": "inspectionPenFact()"
-          },
-          {
-            "name": "Current pen",
-            "shows": "outlined cell",
-            "logic": "The pen at the top of the list.",
-            "source": "c.currentPen"
-          },
-          {
-            "name": "Hold to peek",
-            "shows": "pop-up with pig count, feed, conditions, manual-feed pigs, note",
-            "logic": "Holding a cell 350 ms shows the preview without navigating. Same gesture as farrowing.",
-            "source": "inspectionPenPreview()"
+            "states": [
+              {
+                "state": "Pen with conditions",
+                "when": "Pigs with any condition, ongoing included",
+                "shows": "\"N health\""
+              },
+              {
+                "state": "Pen without conditions",
+                "when": "None",
+                "shows": "\"N pigs\""
+              },
+              {
+                "state": "Disabled",
+                "when": "Pen not in unit or no pig matches the filter",
+                "shows": "\"Not in unit\" / \"No matches\""
+              },
+              {
+                "state": "Current pen",
+                "when": "It is at the top of the list",
+                "shows": "Outlined cell"
+              }
+            ],
+            "rule": "Holding a cell 350 ms shows a preview (pig count, feed, conditions, manual-feed pigs, note) without navigating, same as farrowing. Tapping scrolls the list so the pen sits under the sticky controls.",
+            "logic": "Same four-column, six-row map as farrowing; positions are sample positions, not the real layout."
           }
         ],
-        "controls": [
-          {
-            "control": "Tap a cell",
-            "does": "closes the map and scrolls the list so the pen sits under the sticky controls",
-            "goesTo": "inspection.walk"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Go to pen (raw)",
           "Tap a pen to go to its pigs. Hold to peek. (raw)"
@@ -877,13 +653,10 @@
         "edge": [
           "The filter stays on; a pen with no matching pig cannot be opened."
         ],
-        "rules": [
-          "Same four-column, six-row map as farrowing; positions are sample positions, not the real unit layout."
-        ],
         "issues": [
-          "\"N health\" counts ongoing conditions as well; nothing says it counts pigs.",
-          "The peek preview contains a fault line that is never filled (faults list is always empty in the code).",
-          "The audit marks the long-press as possibly unsuitable on mobile."
+          "\"N health\" counts ongoing conditions and reads like a pig count.",
+          "The peek preview has a fault line that is never filled.",
+          "Long-press may be unsuitable on mobile (audit)."
         ]
       }
     },
@@ -895,47 +668,41 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Find a pig by ear tag or pen. How to reach it: Search or Scan ear tag in the dock.",
-        "states": [
-          "Search: input \"Ear tag or pen\" and the result list.",
-          "Scan: the same plus \"Camera scanning is not connected in this prototype.\" and a button \"Try sample tag 000306\"."
-        ],
+        "purpose": "Find a pig by ear tag or pen.",
         "elements": [
           {
-            "name": "Result count",
-            "shows": "7 pigs found",
-            "logic": "All pigs of the unit when the box is empty; filtered by tag or pen text as typed.",
-            "source": "searchResults(c)"
-          },
-          {
-            "name": "Result row",
-            "shows": "000254 · C1 · Gestating",
-            "logic": "Pen id and the raw stage name.",
-            "source": "penOf(c,p.id).id, p.stage"
+            "name": "Result list",
+            "shows": "7 pigs found; 000254 · C1 · Gestating",
+            "states": [
+              {
+                "state": "Empty box",
+                "when": "Nothing typed",
+                "shows": "All pigs of the unit"
+              },
+              {
+                "state": "Typed",
+                "when": "Text matches tag or pen",
+                "shows": "Filtered rows"
+              },
+              {
+                "state": "No match",
+                "when": "Nothing matches",
+                "shows": "\"No matching pigs in this unit.\""
+              },
+              {
+                "state": "Scan",
+                "when": "Opened from Scan ear tag",
+                "shows": "Same sheet plus \"Camera scanning is not connected in this prototype.\" and \"Try sample tag 000306\""
+              }
+            ],
+            "logic": "Row shows the pen id and the raw stage name. Search and scan only navigate; saving a record is the only write."
           }
         ],
-        "controls": [
-          {
-            "control": "A result",
-            "does": "opens the pig record",
-            "goesTo": "pig-profile.full"
-          },
-          {
-            "control": "Try sample tag 000306",
-            "does": "opens that pig",
-            "goesTo": "pig-profile.empty"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Find a pig (raw)",
           "Scan ear tag (raw)",
           "Try sample tag 000306 (raw)"
-        ],
-        "edge": [
-          "No match: \"No matching pigs in this unit.\""
-        ],
-        "rules": [
-          "SEARCH-IDENTITY: search and scan are navigation aids, saving a record is the only write."
         ],
         "issues": [
           "Ear-notch search (named in the identity notes) is not here.",
@@ -952,105 +719,64 @@
       "preset": "selected",
       "figma": "",
       "notes": {
-        "purpose": "One action sheet for the ticked pigs or pens. Here two pigs (000254, 000267) are selected; the same sheet opens for one pig (see pig-profile.actions) or for pens.",
-        "states": [
-          "Pigs selected, more than one: tabs Health and General at the foot; the Production group is hidden.",
-          "Pens ticked: a Pigs / Pens switch at the top; the Pens tab offers Pen note and Feed (see feed-plan.bulk).",
-          "Rows that do not apply move to \"Unavailable actions (N)\" with the reason."
-        ],
+        "purpose": "One action sheet for the ticked pigs or pens. Here two pigs are selected.",
         "elements": [
           {
-            "name": "Title · scope",
-            "shows": "Actions · 2 pigs",
-            "logic": "selectionLabel: \"N pens · N pigs\".",
-            "source": "c.selected, c.selectedPens"
+            "name": "Action row availability",
+            "shows": "Rows in Health and General groups",
+            "states": [
+              {
+                "state": "Record a health finding / treatment",
+                "when": "At least one selected pig is alive",
+                "shows": "Shown"
+              },
+              {
+                "state": "Edit conditions",
+                "when": "Two or more selected AND one has a condition",
+                "shows": "Shown; bulk only"
+              },
+              {
+                "state": "Resolve conditions · Care instructions",
+                "when": "A selected pig has a condition",
+                "shows": "Shown; otherwise unavailable (\"No open conditions to resolve.\" / \"Record a health finding first.\")"
+              },
+              {
+                "state": "Adjust feed",
+                "when": "At least one pig can be fed (not ad-lib, not dead, has a plan)",
+                "shows": "Shown; otherwise unavailable with the reason"
+              },
+              {
+                "state": "Add a note",
+                "when": "Live pigs",
+                "shows": "Always shown"
+              },
+              {
+                "state": "Production group",
+                "when": "Exactly one pig",
+                "shows": "Hidden for several pigs or pens so a group never gets a single-sow workflow"
+              }
+            ],
+            "logic": "Rows that do not apply move to \"Unavailable actions (N)\" with the reason. Dead sows get only a note.",
+            "source": "ASTRA-BULK-ACTIONS"
           },
           {
-            "name": "Health · Disease or symptom",
-            "shows": "Record a health finding",
-            "logic": "Shown when at least one selected pig is alive.",
-            "source": "actionCatalogue()"
+            "name": "Measurements & condition menu",
+            "shows": "Body condition, weight, backfat, temperature",
+            "logic": "Weight takes a separate value per pig. Backfat for sows and gilts only. Temperature is offered for one pig only.",
+            "rule": "Batch save applies only to included, changed rows; an invalid entered value blocks the whole save."
           },
           {
-            "name": "Health · Record treatment",
-            "shows": "Medicine, dose and method",
-            "logic": "Same condition.",
-            "source": "actionCatalogue()"
-          },
-          {
-            "name": "Health · Edit conditions",
-            "shows": "Review changes for each pig",
-            "logic": "Only for a selection of two or more AND at least one pig has a condition.",
-            "source": "hasCases && !single"
-          },
-          {
-            "name": "Health · Resolve conditions · Care instructions",
-            "shows": "Recover or correct a finding · Monitor, treat or move",
-            "logic": "Only when a selected pig has a condition; otherwise listed as unavailable (\"No open conditions to resolve.\" / \"Record a health finding first.\").",
-            "source": "hasCases"
-          },
-          {
-            "name": "General · Add a note",
-            "shows": "The same note for these pigs",
-            "logic": "Always for live pigs.",
-            "source": "actionCatalogue()"
-          },
-          {
-            "name": "General · Measurements & condition",
-            "shows": "Body condition and measurements",
-            "logic": "Opens a small menu: Record body condition, Record weight (a separate value for each pig), Record backfat (sows and gilts only). Record temperature is offered for one pig only.",
-            "source": "measurementsMenu()"
-          },
-          {
-            "name": "General · Adjust feed",
-            "shows": "Review the current daily allowance",
-            "logic": "Shown when at least one selected pig can be fed (not ad-lib, not dead, has a plan); otherwise listed as unavailable with the reason.",
-            "source": "feedUnavailableReason()"
+            "name": "Pigs / Pens switch",
+            "shows": "Tabs at the top when pens are ticked",
+            "logic": "The Pens tab offers Pen note and Feed. Selecting a pen selects its pigs; there is no pen-level health or feed record."
           },
           {
             "name": "Footer tabs",
             "shows": "Health · General",
-            "logic": "Jump to a group; the active tab follows the scroll. Production is added for one pig only.",
-            "source": "actionCategoryNav()"
+            "logic": "Jump to a group; the active tab follows the scroll."
           }
         ],
-        "controls": [
-          {
-            "control": "Disease or symptom · Record treatment · Edit conditions · Resolve conditions · Care instructions",
-            "does": "open the health forms for the selected pigs",
-            "goesTo": "health-record.record-health"
-          },
-          {
-            "control": "Measurements & condition",
-            "does": "opens the measurement menu",
-            "goesTo": "pig-profile.measurements"
-          },
-          {
-            "control": "Add a note",
-            "does": "opens the note form",
-            "goesTo": "pig-profile.note"
-          },
-          {
-            "control": "Adjust feed",
-            "does": "opens the feed editor for the selected pigs",
-            "goesTo": "feed-plan.editor"
-          },
-          {
-            "control": "Unavailable actions (N)",
-            "does": "lists the blocked rows with the reasons",
-            "goesTo": "pig-profile.unavailable-actions"
-          },
-          {
-            "control": "Pens tab",
-            "does": "switches to the pen actions",
-            "goesTo": "feed-plan.bulk"
-          },
-          {
-            "control": "View selected (dock)",
-            "does": "lists the selection with Remove on each row",
-            "goesTo": "inspection.review-selected"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Actions (raw)",
           "Disease or symptom (raw)",
@@ -1058,21 +784,11 @@
           "Adjust feed (raw)",
           "Unavailable actions (raw)"
         ],
-        "edge": [
-          "Dead sows are not eligible for any action except a note.",
-          "Production actions are hidden for a multi-pig or pen selection so a group never receives a single-sow workflow.",
-          "Batch results: Save applies only to included, changed rows; an invalid entered value blocks the whole save."
-        ],
-        "rules": [
-          "\"Current task, including Farrowing: hidden in bulk\" (ASTRA-BULK-ACTIONS).",
-          "One drawer shape for 1 or many pigs: list of pigs above, anchored controls and Save below.",
-          "Selecting a pen selects its pigs; there is no pen-level health or feed record."
-        ],
         "issues": [
-          "Health and General groups sit in one long scroll with tabs at the foot; two groups of three or four rows each do not need tabs.",
-          "\"Edit conditions\" (bulk only), \"Resolve conditions\" and \"Care instructions\" all edit a finding; three doors for one record.",
-          "\"Measurements & condition\" is a menu that holds body condition, which is a health record, next to weight and backfat.",
-          "The sheet header says only \"2 pigs\"; it does not name the pigs or pens."
+          "Health and General groups sit in one long scroll with tabs at the foot; two small groups do not need tabs.",
+          "Edit conditions, Resolve conditions and Care instructions all edit a finding: three doors for one record.",
+          "Measurements & condition puts body condition (a health record) next to weight and backfat.",
+          "The sheet header says only \"2 pigs\"; it does not name them."
         ]
       }
     },
@@ -1084,44 +800,31 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Check who is in the selection and remove anyone. How to reach it: View selected in the dock.",
-        "states": [
-          "Pens group (when pens are ticked) and Pigs group; each row has a Remove button."
-        ],
+        "purpose": "Check who is in the selection and remove anyone.",
         "elements": [
           {
-            "name": "Pig row",
-            "shows": "000254 · C1 · Gestating",
-            "logic": "Raw stage name, not the stage-and-days text of the list.",
-            "source": "p.stage"
-          },
-          {
-            "name": "Pen row",
-            "shows": "C1 · 3 pigs",
-            "logic": "Pen id and pig count.",
-            "source": "pen.pigs.length"
+            "name": "Selection list",
+            "shows": "Pens group and Pigs group, each row with Remove",
+            "states": [
+              {
+                "state": "Pens ticked",
+                "when": "At least one pen selected",
+                "shows": "A Pens group above Pigs"
+              },
+              {
+                "state": "Last pig removed",
+                "when": "Selection becomes empty",
+                "shows": "The sheet closes and the selection clears"
+              }
+            ],
+            "logic": "Pig row shows the raw stage name (\"Gestating\"), not the list's stage-and-days text."
           }
         ],
-        "controls": [
-          {
-            "control": "Remove",
-            "does": "unticks that pig or pen",
-            "goesTo": "inspection.review-selected"
-          },
-          {
-            "control": "Actions",
-            "does": "opens the Actions sheet",
-            "goesTo": "inspection.actions"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Selected (raw)",
           "Remove (raw)"
         ],
-        "edge": [
-          "Removing the last pig closes the selection."
-        ],
-        "rules": [],
         "issues": [
           "Stage shown as \"Gestating\" while the list shows \"Gestation\"."
         ]
@@ -1135,33 +838,30 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Everything recorded since the page opened. How to reach it: Log on the walk.",
-        "states": [
-          "Empty: \"No updates yet — Health findings, measurements and pen updates will appear here.\"",
-          "Each update: title, subjects, note, time and author."
-        ],
+        "purpose": "Everything recorded since the page opened.",
         "elements": [
           {
             "name": "Update",
             "shows": "Health recorded · 000267 · Thin · Monitor · 09:41 · G. Hansen",
-            "logic": "Every saved record adds one event (health, measurement, note, feed change, pen note, fault); the time is always 09:41 and the author G. Hansen in the prototype.",
-            "source": "c.events"
+            "states": [
+              {
+                "state": "Empty",
+                "when": "Nothing saved yet",
+                "shows": "\"No updates yet\" with a hint"
+              },
+              {
+                "state": "Has updates",
+                "when": "Any saved record",
+                "shows": "One event each (health, measurement, note, feed change, pen note, fault), newest first"
+              }
+            ],
+            "logic": "Time is always 09:41 and author G. Hansen in the prototype."
           }
         ],
-        "controls": [
-          {
-            "control": "Back",
-            "does": "returns to the walk",
-            "goesTo": "inspection.walk"
-          }
-        ],
+        "controls": [],
         "copy": [
           "This walk (raw)",
           "No updates yet (raw)"
-        ],
-        "edge": [],
-        "rules": [
-          "The first review renamed \"History\" to \"Updates this walk\" (BLIND-REVIEW)."
         ],
         "issues": [
           "The button is called Log, the aria-label \"Updates this walk\" and the sheet \"This walk\": three names.",
@@ -1177,41 +877,22 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Check in to the unit to record that it was walked. How to reach it: Finish walk on the walk.",
-        "states": [
-          "Before check-in: count of updates and one primary \"Check in to Unit 7\"."
-        ],
+        "purpose": "Check in to the unit to record that it was walked.",
         "elements": [
           {
-            "name": "Count",
-            "shows": "Recorded during this walk · 0",
-            "logic": "Number of updates saved in this walk.",
-            "source": "c.events.length"
-          },
-          {
-            "name": "Statement",
-            "shows": "Check in as G. Hansen to record that you walked this unit. This does not mark every pig as healthy or every instruction as completed.",
-            "logic": "Fixed text.",
-            "source": "literal"
+            "name": "Check-in",
+            "shows": "Recorded during this walk · 0; Check in to Unit 7",
+            "logic": "The count is updates saved in this walk. Check-in records only that the unit was walked; it does not mark pigs healthy or instructions completed.",
+            "rule": "Allowed with nothing recorded and pens unseen."
           }
         ],
-        "controls": [
-          {
-            "control": "Check in to Unit 7",
-            "does": "records the check-in",
-            "goesTo": "inspection.walk-recorded"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Finish walk (raw)",
           "Check in to Unit 7 (raw)"
         ],
-        "edge": [],
-        "rules": [
-          "Check-in records only that the unit was walked."
-        ],
         "issues": [
-          "Walking all pens is not checked: check-in is allowed with nothing recorded and pens unseen."
+          "Walking all pens is not checked: check-in is allowed with nothing recorded."
         ]
       }
     },
@@ -1223,33 +904,28 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Confirmation after check-in. How to reach it: Finish walk, then Check in.",
-        "states": [
-          "Single state."
-        ],
+        "purpose": "Confirmation after check-in.",
         "elements": [
           {
-            "name": "Mark and text",
+            "name": "Confirmation",
             "shows": "Checked in at 09:41 · G. Hansen · Unit 7 · 0 updates recorded",
-            "logic": "Time fixed at 09:41; the update count is the walk's event count (\"1 update\" singular).",
-            "source": "c.events.length"
+            "states": [
+              {
+                "state": "One update",
+                "when": "Walk event count is 1",
+                "shows": "\"1 update\" (singular)"
+              }
+            ],
+            "logic": "Time is fixed at 09:41; the count is the walk's event count."
           }
         ],
-        "controls": [
-          {
-            "control": "Back to unit",
-            "does": "returns to the walk, which now reads \"Check in again\" and last check-in 09:41",
-            "goesTo": "inspection.walk"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Walk recorded (raw)",
           "Back to unit (raw)"
         ],
-        "edge": [],
-        "rules": [],
         "issues": [
-          "Two back controls (the header Back and the primary \"Back to unit\") do the same thing."
+          "Two back controls (header Back and \"Back to unit\") do the same thing."
         ]
       }
     },
@@ -1262,62 +938,52 @@
       "preset": "sensors",
       "figma": "",
       "notes": {
-        "purpose": "Designed to give the unit a summary above the list: pig and pen counts, open equipment faults, latest sensor readings and the batch tracker. In the prototype the card exists in code only and is not drawn.",
-        "states": [
-          "Sensors present: three readings (Temperature 22.4 °C, Humidity 64 %, Ammonia 8 ppm NH3), updated 09:40."
-        ],
+        "purpose": "Designed as a unit summary above the list; the card exists in code only and is not drawn.",
         "elements": [
           {
-            "name": "Unit button",
-            "shows": "Unit 7 with grid icon and chevron",
-            "logic": "Would open the unit sheet (Environment and Equipment).",
-            "source": "unitName(c)"
-          },
-          {
-            "name": "Faults chip",
-            "shows": "1 fault / N faults",
-            "logic": "Only when a pen has an open fault; counts open faults in all pens.",
-            "source": "openFaults(pe)"
-          },
-          {
-            "name": "Population",
-            "shows": "7 pigs · 3 pens",
-            "logic": "Total pigs and pens in the unit.",
-            "source": "pigs(c).length · c.pens.length"
-          },
-          {
             "name": "Environment strip",
-            "shows": "icon, value, unit per sensor",
-            "logic": "Value is \"—\" when the reading is null; unit label \"ppm NH3\" for ammonia. Sensors with installed:false are left out.",
-            "source": "unitSensors(c)"
+            "shows": "Temperature 22.4 °C, Humidity 64 %, Ammonia 8 ppm NH3, updated 09:40",
+            "states": [
+              {
+                "state": "Reading present",
+                "when": "Sensor installed with a value",
+                "shows": "Icon, value, unit"
+              },
+              {
+                "state": "Reading null",
+                "when": "Installed but no value",
+                "shows": "\"—\" with label kept"
+              },
+              {
+                "state": "Not installed",
+                "when": "installed:false",
+                "shows": "Left out"
+              },
+              {
+                "state": "No sensors",
+                "when": "None installed",
+                "shows": "\"No connected sensors\""
+              }
+            ],
+            "logic": "Values are absent, not zero."
           },
           {
-            "name": "Sensor empty line",
-            "shows": "No connected sensors",
-            "logic": "When no sensor is installed.",
-            "source": "c.sensors"
+            "name": "Faults chip and population",
+            "shows": "1 fault · 7 pigs · 3 pens",
+            "logic": "Faults chip only when a pen has an open fault, counting all pens. Population = total pigs and pens in the unit."
           }
         ],
-        "controls": [
-          {
-            "control": "Unit button",
-            "does": "would open the unit sheet",
-            "goesTo": "inspection.unit-detail"
-          }
-        ],
+        "controls": [],
         "copy": [
           "No connected sensors (raw)",
           "Latest environmental readings (raw)"
         ],
-        "edge": [
-          "Environmental values are absent, not zero (ROUND-3)."
-        ],
         "rules": [
-          "Sensor card should show source, freshness and trend once real readings exist (ROUND-3)."
+          "Sensor card should show source, freshness and trend once real readings exist."
         ],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk. What the card would show is described on inspection.sensors.",
-          "The whole unit summary has no way onto the screen; either draw it or remove the code."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
+          "Either draw the unit summary or remove the code."
         ]
       }
     },
@@ -1331,22 +997,22 @@
       "figma": "",
       "notes": {
         "purpose": "The unit has no sensors installed.",
-        "states": [
-          "sensors = [] so the summary would read \"No connected sensors\"; the unit sheet would read \"No sensors installed\"."
-        ],
         "elements": [
           {
             "name": "Sensor empty line",
             "shows": "No connected sensors",
-            "logic": "Shown instead of the environment strip.",
-            "source": "c.sensors"
+            "states": [
+              {
+                "state": "No sensors",
+                "when": "sensors = []",
+                "shows": "Line replaces the strip; the unit sheet reads \"No sensors installed\""
+              }
+            ]
           }
         ],
         "controls": [],
-        "edge": [],
-        "rules": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk. What the card would show is described on inspection.sensors."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
         ]
       }
     },
@@ -1360,24 +1026,22 @@
       "figma": "",
       "notes": {
         "purpose": "One sensor (Humidity) is installed but returns no value.",
-        "states": [
-          "value = null: the metric shows \"—\" and the unit sheet reads \"Reading unavailable\" under its name."
-        ],
         "elements": [
           {
             "name": "Metric",
             "shows": "— and the unit",
-            "logic": "A null value renders as a dash with the label kept, marked is-unavailable.",
-            "source": "unitEnvironment(c)"
+            "states": [
+              {
+                "state": "No reading",
+                "when": "value is null",
+                "shows": "Dash with label kept (is-unavailable); unit sheet says \"Reading unavailable\"; never shown as 0 or removed"
+              }
+            ]
           }
         ],
         "controls": [],
-        "edge": [
-          "An unavailable sensor is not removed and not shown as 0."
-        ],
-        "rules": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk. What the card would show is described on inspection.sensors."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
         ]
       }
     },
@@ -1390,33 +1054,24 @@
       "preset": "no-batches",
       "figma": "",
       "notes": {
-        "purpose": "The unit has no batches; the batch tracker section is left out.",
-        "states": [
-          "Every pig batchId is empty. Visible effect: the pig record shows no Batch fact, no Next task and no batch task."
-        ],
+        "purpose": "The unit has no batches; the batch tracker is left out.",
         "elements": [
           {
             "name": "Batch tracker",
-            "shows": "absent",
-            "logic": "The tracker block is drawn only when the unit has at least one batch.",
-            "source": "c.batches.length"
-          },
-          {
-            "name": "Pig record · Batch / Next task",
-            "shows": "— / —",
-            "logic": "Empty facts show a dash.",
-            "source": "p.batchId"
+            "shows": "Absent",
+            "states": [
+              {
+                "state": "No batches",
+                "when": "Every pig batchId is empty",
+                "shows": "Tracker not drawn; pig record shows no Batch fact, Next task or batch task; Batch membership is unavailable (\"No production batches are available.\")"
+              }
+            ],
+            "logic": "An empty section is absent, never rendered as \"none\"."
           }
         ],
         "controls": [],
-        "edge": [
-          "Batch membership then offers \"No production batches are available.\" as an unavailable action."
-        ],
-        "rules": [
-          "An empty section is absent, never rendered as \"none\" (design law in productionOverview)."
-        ],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk. What the card would show is described on inspection.sensors."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
         ]
       }
     },
@@ -1430,24 +1085,28 @@
       "figma": "",
       "notes": {
         "purpose": "The unit has one batch (20) in pens C1 and C2; pen D4 is removed.",
-        "states": [
-          "Roster shows 5 pigs; lens counts All 5 · Health 2 · Feed 1."
-        ],
         "elements": [
           {
             "name": "Batch tracker row",
             "shows": "Batch 20 · 5 pigs · Next · Tomorrow · 13 Sep Pregnancy check",
-            "logic": "Would list each batch with pig count and either the running task (\"N days in progress\") or the next task.",
-            "source": "batchTrackerRows()"
+            "states": [
+              {
+                "state": "Task running",
+                "when": "A current production task",
+                "shows": "\"N days in progress\""
+              },
+              {
+                "state": "No current task",
+                "when": "Nothing running",
+                "shows": "Next task with its date"
+              }
+            ],
+            "logic": "A batch advances only once every current production task has finished. Roster shows 5 pigs; lens All 5 · Health 2 · Feed 1."
           }
         ],
         "controls": [],
-        "edge": [],
-        "rules": [
-          "A batch advances only once every current production task has finished (comment in the code)."
-        ],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk. What the card would show is described on inspection.sensors."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
         ]
       }
     },
@@ -1461,22 +1120,16 @@
       "figma": "",
       "notes": {
         "purpose": "Three batches: 20 (C1), 21 (C2, Gestating from 8 Aug) and 18 (grower, D4).",
-        "states": [
-          "Roster has no Arthritis, so Health = 3."
-        ],
         "elements": [
           {
             "name": "Batch tracker rows",
-            "shows": "Batch 20 3 pigs / Batch 21 2 pigs / Batch 18 2 pigs",
-            "logic": "One row per batch with its next task.",
-            "source": "c.batches"
+            "shows": "One row per batch with its pig count and next task",
+            "logic": "Roster has no Arthritis, so Health = 3."
           }
         ],
         "controls": [],
-        "edge": [],
-        "rules": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk. What the card would show is described on inspection.sensors."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
         ]
       }
     },
@@ -1489,39 +1142,29 @@
       "preset": "batch-farrowing",
       "figma": "",
       "notes": {
-        "purpose": "Batch 20 is in farrowing: two sows have farrowed and are Lactating, three are still Farrowing.",
-        "states": [
-          "The row meta reads \"Lactation · 2 days\" for 000254 and 000267 and \"Farrowing · 2 days\" for the other three."
-        ],
+        "purpose": "Batch 20 is in farrowing: two sows have farrowed, three have not.",
         "elements": [
           {
-            "name": "Pig row · meta",
+            "name": "Pig row · stage",
             "shows": "Lactation · 2 days / Farrowing · 2 days",
-            "logic": "Stage is set from the batch task: completedPigIds become Lactating, the rest Farrowing; days since the stage start 10 Sep.",
-            "source": "stageSummary(p)"
-          },
-          {
-            "name": "Pig record · Current tasks",
-            "shows": "Farrowing · In progress · Batch 20",
-            "logic": "A farrowing task card for sows still Farrowing; tapping it opens the Farrowing prototype.",
-            "source": "currentTasksForPig()"
+            "states": [
+              {
+                "state": "Farrowed",
+                "when": "Sow id in the task's completedPigIds",
+                "shows": "Lactation · 2 days; the farrowing task card is gone from her record"
+              },
+              {
+                "state": "Not yet",
+                "when": "Other sows of the batch",
+                "shows": "Farrowing · 2 days; record shows Farrowing · In progress · Batch 20, opening the Farrowing prototype"
+              }
+            ],
+            "logic": "Stage is set from the batch task; days since the stage start 10 Sep. Farrowing is hidden in bulk actions. Next task after farrowing: Weaning on Thu 1 Oct."
           }
         ],
-        "controls": [
-          {
-            "control": "Farrowing task card (on the pig record)",
-            "does": "opens Farrowing",
-            "goesTo": "farrowing.room"
-          }
-        ],
-        "edge": [
-          "Next task after farrowing is Weaning on Thu 1 Oct."
-        ],
-        "rules": [
-          "Farrowing is hidden in bulk actions and opened from the sow."
-        ],
+        "controls": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset differs only in the stage text. What the card would show is described on inspection.sensors."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
         ]
       }
     },
@@ -1534,33 +1177,18 @@
       "preset": "batch-concurrent",
       "figma": "",
       "notes": {
-        "purpose": "One batch with two production tasks running at once: In-heat check for the first two sows, Breeding for the other three.",
-        "states": [
-          "All five sows read \"In heat · 2 days\" (stage In heat from 10 Sep). Health 3."
-        ],
+        "purpose": "One batch with two production tasks running at once: In-heat check and Breeding.",
         "elements": [
-          {
-            "name": "Pig row · meta",
-            "shows": "In heat · 2 days",
-            "logic": "Stage text of the batch stage.",
-            "source": "stageSummary(p)"
-          },
           {
             "name": "Pig record · Current tasks",
             "shows": "In-heat check · N days in progress / Breeding",
-            "logic": "Each sow sees only the task she belongs to (task.pigIds), the batch's next task appears once none is current.",
-            "source": "batchTaskForPig()"
+            "logic": "Each sow sees only the task she belongs to (task.pigIds); the batch's next task (Pregnancy check, Mon 5 Oct) appears once none is current. All five rows read \"In heat · 2 days\".",
+            "rule": "Several current production tasks can run for one batch."
           }
         ],
         "controls": [],
-        "edge": [
-          "Next task: Pregnancy check on Mon 5 Oct."
-        ],
-        "rules": [
-          "Several current production tasks can run for one batch; each pig sees the one that applies to her."
-        ],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset differs only in the stage text. What the card would show is described on inspection.sensors."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
         ]
       }
     },
@@ -1572,41 +1200,54 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Readings and open equipment faults for the whole unit. Built in the code but no control in the prototype opens it (checked in the browser and by searching the code for a control with this action).",
-        "states": [
-          "Environment: grid of readings (Temperature, Humidity, Ammonia), each with its time or \"Reading unavailable\"; \"No sensors installed\" when empty.",
-          "Equipment faults: \"N open\" and one card per fault; empty: \"No open equipment faults\"."
-        ],
+        "purpose": "Readings and open equipment faults for the whole unit. Built in the code but no control in the prototype opens it.",
         "elements": [
           {
-            "name": "Reading",
-            "shows": "Temperature 22.4 °C · 09:40 · Unit 7",
-            "logic": "Value or \"—\"; the line under it is the update time or \"Reading unavailable\".",
-            "source": "c.sensors"
+            "name": "Environment readings",
+            "shows": "Temperature 22.4 °C · 09:40",
+            "states": [
+              {
+                "state": "Reading",
+                "when": "Value present",
+                "shows": "Value with update time"
+              },
+              {
+                "state": "Unavailable",
+                "when": "Value null",
+                "shows": "\"—\" and \"Reading unavailable\""
+              },
+              {
+                "state": "No sensors",
+                "when": "None installed",
+                "shows": "\"No sensors installed\""
+              }
+            ]
           },
           {
-            "name": "Fault card",
-            "shows": "Pen C2 · Open · Drinking station · Drinker valve leaking on the east side. · Reported 06:40 · G. Hansen",
-            "logic": "One per open fault across all pens.",
-            "source": "pe.faults"
+            "name": "Equipment faults",
+            "shows": "\"N open\" and a card per fault",
+            "states": [
+              {
+                "state": "Open faults",
+                "when": "Any pen has one",
+                "shows": "One card per open fault across all pens (read-only here)"
+              },
+              {
+                "state": "None",
+                "when": "No open fault",
+                "shows": "\"No open equipment faults\""
+              }
+            ]
           }
         ],
-        "controls": [
-          {
-            "control": "Back",
-            "does": "returns to the walk",
-            "goesTo": "inspection.walk"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Environment & equipment (raw)",
           "No open equipment faults (raw)"
         ],
-        "edge": [],
-        "rules": [],
         "issues": [
-          "Also exists as separate sheets \"Environment\" and \"Equipment faults\" with the same content.",
-          "Fault cards are read-only here; reporting and resolving live in the pen fault sheets, which are also unreachable."
+          "Also exists as separate Environment and Equipment faults sheets with the same content.",
+          "Reporting and resolving live in the pen fault sheets, also unreachable."
         ]
       }
     },
@@ -1618,43 +1259,18 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "One batch: stage, pigs, pens, task tracker, and a way to filter the walk by it. Built in the code but no control in the prototype opens it (checked in the browser and by searching the code for a control with this action).",
-        "states": [
-          "Single state."
-        ],
+        "purpose": "One batch: stage, pigs, pens, task tracker, and a way to filter the walk. Built in the code but no control in the prototype opens it.",
         "elements": [
-          {
-            "name": "Scope",
-            "shows": "Gestating · 5 pigs · Unit 7",
-            "logic": "Stage, pig count, unit.",
-            "source": "batch"
-          },
           {
             "name": "Batch tracker",
             "shows": "Pregnancy check · 5 pigs · Next · Tomorrow · 13 Sep",
-            "logic": "Running tasks with \"N pigs · N days in progress\" or the next task with its date.",
-            "source": "batchTrackerContent()"
-          },
-          {
-            "name": "Pens",
-            "shows": "C1 · C2",
-            "logic": "Pens that hold the batch.",
-            "source": "batch.pens"
+            "logic": "Running tasks show \"N pigs · N days in progress\"; otherwise the next task with its date.",
+            "rule": "Opening a batch offers a deliberate filter (Show pigs in this batch); swiping does not silently change the list."
           }
         ],
-        "controls": [
-          {
-            "control": "Show pigs in this batch",
-            "does": "filters the walk to the batch",
-            "goesTo": "inspection.walk"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Show pigs in this batch (raw)"
-        ],
-        "edge": [],
-        "rules": [
-          "Opening a batch offers a deliberate filter; swiping does not silently change the list (ROUND-3)."
         ],
         "issues": [
           "The batch carousel and square batch cards described in ROUND-3 no longer exist in the code."
@@ -1669,37 +1285,30 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Open faults in one pen with Report fault. Built in the code but no control in the prototype opens it (checked in the browser and by searching the code for a control with this action).",
-        "states": [
-          "Faults listed: one row per open fault (device, description); none: \"No open faults\"."
-        ],
+        "purpose": "Open faults in one pen with Report fault. Built in the code but no control in the prototype opens it.",
         "elements": [
           {
-            "name": "Fault row",
+            "name": "Fault list",
             "shows": "Drinking station · Drinker valve leaking on the east side.",
-            "logic": "Open faults of the pen only.",
-            "source": "openFaults(pe)"
+            "states": [
+              {
+                "state": "Faults",
+                "when": "The pen has open faults",
+                "shows": "One row per fault"
+              },
+              {
+                "state": "None",
+                "when": "No open faults",
+                "shows": "\"No open faults\""
+              }
+            ],
+            "logic": "A fault belongs to one device in one pen."
           }
         ],
-        "controls": [
-          {
-            "control": "A fault row",
-            "does": "opens it",
-            "goesTo": "inspection.fault-resolve"
-          },
-          {
-            "control": "Report fault",
-            "does": "opens the report form",
-            "goesTo": "inspection.fault-report"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Equipment faults (raw)",
           "Report fault (raw)"
-        ],
-        "edge": [],
-        "rules": [
-          "A fault belongs to one device in one pen."
         ],
         "issues": [
           "No pen-level control opens this sheet."
@@ -1714,39 +1323,18 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Report a device fault in one pen. Built in the code but no control in the prototype opens it (checked in the browser and by searching the code for a control with this action).",
-        "states": [
-          "Device chosen from Feeding station / Drinking station / Other equipment; \"Other\" adds a device name field.",
-          "Save disabled until device and description are filled (and the name when Other)."
-        ],
+        "purpose": "Report a device fault in one pen. Built in the code but no control in the prototype opens it.",
         "elements": [
           {
-            "name": "Device",
-            "shows": "Choose device",
-            "logic": "Choosing a device that already has an open fault opens that fault instead of a duplicate.",
-            "source": "pe.faults"
-          },
-          {
-            "name": "Description",
-            "shows": "What is broken or not working?",
-            "logic": "Required.",
-            "source": "f.description"
+            "name": "Report form",
+            "shows": "Device and description",
+            "rule": "Device is Feeding station / Drinking station / Other equipment; Other adds a device name field. Report fault stays disabled until device and description (and name for Other) are filled. Choosing a device that already has an open fault opens that fault instead of a duplicate."
           }
         ],
-        "controls": [
-          {
-            "control": "Report fault",
-            "does": "saves and returns to the sheet that opened it",
-            "goesTo": "inspection.pen-faults"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Report fault (raw)"
         ],
-        "edge": [
-          "Saving an already-open device opens the existing fault."
-        ],
-        "rules": [],
         "issues": []
       }
     },
@@ -1758,31 +1346,29 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Read one fault and resolve it with an optional note. Built in the code but no control in the prototype opens it (checked in the browser and by searching the code for a control with this action).",
-        "states": [
-          "Open: description, who and when, optional \"Resolution note\", Resolve fault.",
-          "Resolved: \"Resolved 09:41 · G. Hansen\" and the note."
-        ],
+        "purpose": "Read one fault and resolve it with an optional note. Built in the code but no control in the prototype opens it.",
         "elements": [
           {
             "name": "Fault",
             "shows": "Drinking station · Pen C2 · Open fault · Reported 06:40 · G. Hansen",
-            "logic": "Name, state, description and reporter.",
-            "source": "pe.faults"
+            "states": [
+              {
+                "state": "Open",
+                "when": "Not resolved",
+                "shows": "Description, reporter, optional Resolution note, Resolve fault (logs \"Fault resolved\")"
+              },
+              {
+                "state": "Resolved",
+                "when": "After resolving",
+                "shows": "\"Resolved 09:41 · G. Hansen\" and the note"
+              }
+            ]
           }
         ],
-        "controls": [
-          {
-            "control": "Resolve fault",
-            "does": "closes the fault and logs \"Fault resolved\"",
-            "goesTo": "inspection.pen-faults"
-          }
-        ],
+        "controls": [],
         "copy": [
           "Resolve fault (raw)"
         ],
-        "edge": [],
-        "rules": [],
         "issues": []
       }
     }

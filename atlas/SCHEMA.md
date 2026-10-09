@@ -46,7 +46,7 @@ Words are the design workflow's ([glossary](../docs/design-workflow/GLOSSARY.md)
     "notes": {
       "purpose": "one sentence: what the screen is for",
       "states": ["each state the screen can be in"],
-      "elements": [{ "name": "Unit card · Target", "shows": "Target 12", "logic": "when and how it is shown, how it is computed", "source": "where the value comes from" }],
+      "elements": [{ "name": "Sow row", "shows": "the sow's line in the room", "states": [{ "state": "Active", "when": "farrowing, not locked", "shows": "n alive · n dead, time since last record, who, Active badge" }], "logic": "", "rule": "", "source": "" }],   // see the rule below
       "controls": [{ "control": "A sow row", "does": "opens her record", "goesTo": "farrowing.before | farrowing.count | farrowing.locked by her status" }],
       "copy": ["string ids from ux/laws/strings.json, or literal text marked (raw) when the screen does not use the registry yet"],
       "edge": ["edge cases the screen must handle"],
@@ -58,6 +58,20 @@ Words are the design workflow's ([glossary](../docs/design-workflow/GLOSSARY.md)
 ```
 
 Rules the generator checks: ids unique across all features; every id in `anchor`, `groups`, `flow`, `entryPoints.lands` is one of the feature's screens; every `entryPoints.from` and `addsTo.screen` is a screen of some feature (or `null` for the app's start); a screen sits in exactly one anchor status, exit, `any` or task band; `url` and `placeholder` exclude each other.
+
+## Screen notes: what earns a note (owner, 2026-10-09)
+
+**The live demo is the spec.** Notes cover only what clicking through the demo cannot show. The PRD (`PRD.md`) is the feature's why, rules and scope; notes never repeat it.
+
+An element gets a note only when it has at least one of:
+1. **States the demo can't present all of**: every variant of a data-driven element (a sow row awaiting / active / done / died; empty, offline, error, overflow). Give `states`: `[{ "state", "when", "shows" }]`.
+2. **Hidden logic**: how a value, colour or label is computed and over what scope (`logic`, `source`).
+3. **An interaction rule the UI can't show**: a hold duration, what is saved and when, what blocks an action and why (`rule`).
+4. An **edge case** the demo has no data for (screen-level `edge`).
+
+Never annotated: static labels and headings, the app bar and back, the phone's status bar, standard buttons whose only job is to navigate, anything the screenshot already makes obvious. `controls` lists only taps whose result the demo can't show (a block, a save, a hold); ordinary navigation is the flow's arrows and the demo itself.
+
+Element shape: `{ "name", "at"?, "shows", "states"?: [{ "state", "when", "shows" }], "logic"?, "rule"?, "source"? }` — at least one of `states`, `logic`, `rule`. `at` is text visible inside the element on that screen (a string or list); the atlas finds the element by it first (smallest visible element with that text, then its nearest card/row/button) and falls back to `shows` / `name`. Aim for under ~8 elements per screen; a screen that needs more is a sign the screen itself is overloaded (record that in `issues`).
 
 ## Generated `atlas/atlas.json`
 

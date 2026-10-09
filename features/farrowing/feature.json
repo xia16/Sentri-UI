@@ -409,244 +409,202 @@
       "preset": "room",
       "figma": "",
       "notes": {
-        "purpose": "The task's home: pick the next sow in one unit, see the unit's litter size and the whole task's progress, and jump by pen, ear tag or search.",
+        "purpose": "The task's home: pick the next sow in one unit, read the unit's litter size and the whole task's progress, and jump by pen, ear tag or search.",
         "states": [
-          "Default: lens All, no filter, every sow of Unit 7 grouped by pen (sample: B1 1 sow, B2 1, B3 2, B4 3 = 7 sows)",
-          "Lens Awaiting / Active / Done: only rows in that state are listed; the other pens' sows stay in the pen header count",
-          "Filter applied: funnel shows a count badge, a summary line \"Due: … · Parity …\" with a Clear action appears under the tabs, tab counts shrink to the filtered set",
-          "Pen partly filtered: pen header shows \"N shown\" beside its sow count",
-          "Empty list: \"No awaiting sows\" / \"No matching sows\" with a hint (\"Adjust the filters…\" or \"Choose another status…\")",
-          "Scrolled: the tab bar and filter line stay stuck at the top; the dock pen code follows the pen under the sticky bar",
-          "Unit switched (from the Task overview): list, scroll and current pen are kept per unit and reset when the filter or lens changed",
-          "Task already ended: the room is replaced by the prototype's Today card \"Task ended · N finished / View receipt\"",
-          "Launched from Home's whole-farm card: the prototype opens the Task overview sheet over the room first (see issues)"
+          "Empty list: \"No awaiting sows\" / \"No matching sows\" with a hint (\"Adjust the filters…\" when a filter is on, else \"Choose another status…\")",
+          "Task already ended: the room is replaced by the Today card \"Task ended · N finished / View receipt\"",
+          "Unit switched from the Task overview: scroll position and current pen are kept per unit, and reset when the lens or filter changed meanwhile"
         ],
         "elements": [
           {
-            "name": "App bar",
-            "shows": "Back chevron + \"Farrowing\"",
-            "logic": "Chevron labelled \"Back to Today\": leaves the task. When launched from Home it returns to Home (same section, same unit scope); stand-alone it shows the prototype's own Today card.",
-            "source": "astra-home-link.js; prototype farrowing-astra-concept.js room()"
+            "name": "Sow row",
+            "shows": "One line per task sow, grouped under her pen: ear tag, state chip, two text lines, rail icon.",
+            "states": [
+              {
+                "state": "Awaiting · not yet due",
+                "when": "No live total (alive + dead = 0), not finished, no outcome. Due text begins \"Due tomorrow\" or \"Due in N days\"",
+                "shows": "No chip. Line 1 \"Due tomorrow\" / \"Due in 2 days\" (muted). Line 2 \"parity 5 · 11 born last\" (12 when unknown). Chevron."
+              },
+              {
+                "state": "Awaiting · due",
+                "when": "Same, due text \"Due today\" or \"Due yesterday\"",
+                "shows": "Line 1 \"Due today\" in ink (not muted). Line 2 as above. Chevron."
+              },
+              {
+                "state": "Awaiting · overdue",
+                "when": "Due text begins \"Overdue\" (expected date = service + 114 days; overdue from day 116)",
+                "shows": "Line 1 \"Overdue · 3 days\": only \"3 days\" is red, the word stays ink. Line 2 as above."
+              },
+              {
+                "state": "Active",
+                "when": "Live total above zero and not finished",
+                "shows": "Green \"Active\" chip. Line 1 \"9 alive · 5 dead\". Line 2 \"born 14 · 1h ago · G.H\" (\"just now\" after a tap in this session). Chevron. No overdue colour once she has a record."
+              },
+              {
+                "state": "Done",
+                "when": "Litter finished (locked)",
+                "shows": "Grey \"Done\" chip. Line 1 alive · dead as now (alive falls when later deaths are recorded). Line 2 \"born 14 · final 05:58 · G.H\". Pencil icon: locked but editable."
+              },
+              {
+                "state": "Sow died",
+                "when": "Farrowing ended through the sow's death",
+                "shows": "Red \"Sow died\" chip instead of Done. Same two lines; line 2 \"born 10 · yesterday · L.M\". Pencil. Counts under the Done tab."
+              },
+              {
+                "state": "Production outcome",
+                "when": "Miscarriage, Not in pig or Removed from batch recorded",
+                "shows": "No chip. Line 1 the outcome name; line 2 \"Recorded · 08:10 · G.H\". Chevron; opens the Production log. Counts under Done."
+              }
+            ],
+            "logic": "Days are counted from due, never the gestation day. Awaiting vs Active flips on the live total: a sow counted back to zero reads Awaiting again and regains her Due line. Recency (\"1h ago\") and hand (\"G.H\") are fixed sample text, not computed from records.",
+            "source": "farrowing-astra-concept.js roomRow(), roomState(); RULINGS \"Model\"",
+            "at": "000418"
           },
           {
-            "name": "Phone status bar",
-            "shows": "9:41, signal, battery",
-            "logic": "Prototype phone chrome, not product UI.",
-            "source": "prototype"
+            "name": "Unit card",
+            "shows": "The left half of the context strip: unit name, one large figure, its label and a target line.",
+            "states": [
+              {
+                "state": "Target amber",
+                "when": "The figure is below the target (the card's belowTarget flag)",
+                "shows": "\"Target 12\" in amber text"
+              },
+              {
+                "state": "Target not amber",
+                "when": "The figure meets or beats the target",
+                "shows": "\"Target 12\" in the normal support colour"
+              }
+            ],
+            "logic": "Figure = the unit's average live piglets per litter (\"Live / litter\"); target = its per-litter target. The prototype hard-codes 10 and 12 and sets belowTarget to true, so Target is always amber and the 10 is not derived from the litters shown. Period and cohort of the average are not stated. Not editable; the unit changes only through the Task overview or Home's Choose unit.",
+            "source": "farrowing-astra-concept.js room() unit:{value,target,belowTarget}; astra-task-overview.js (tc-target-attention); ASTRA-ROOM-PAGE-AUDIT.md",
+            "at": "Live / litter"
+          },
+          {
+            "name": "Task overview card",
+            "shows": "The right half of the strip, one button that opens the Task overview: heading, number, label, three-colour bar, support line.",
+            "states": [
+              {
+                "state": "Counts",
+                "when": "Always",
+                "shows": "\"7 / 18 · Farrowed · all units\" with support \"2 active · 9 awaiting\""
+              },
+              {
+                "state": "Zero segment",
+                "when": "Farrowed, Active or Awaiting is 0",
+                "shows": "That segment is left out of the bar; the number and support text still print the zero"
+              },
+              {
+                "state": "Other outcomes",
+                "when": "Sows with miscarriage, not in pig or removed, or that died before or during farrowing",
+                "shows": "Counted in neither the number nor the denominator, so they leave the bar entirely"
+              }
+            ],
+            "logic": "Numerator Farrowed = finished litters in all units, excluding outcomes and sows that died before or during farrowing (a sow that died after finishing stays counted). Denominator = Farrowed + Active + Awaiting. Segment widths are proportional to those counts. Scope is all units and never follows the lens or filter.",
+            "source": "farrowing-astra-concept.js taskOverview(); astra-task-overview.js statusProgress()",
+            "at": "Farrowed"
           },
           {
             "name": "Last record line",
-            "shows": "Last record 08:41 · G. Hansen",
-            "logic": "Time and hand of the newest record in the unit. In the prototype it is fixed text: 08:41, or 09:41 once any sow in the unit carries the 09:41 stamp a live tap writes; the hand is always \"G. Hansen\".",
-            "source": "prototype farrowing-astra-concept.js room() \"latest\"; not computed from events (unclear: should be the newest event time and hand)"
-          },
-          {
-            "name": "Unit card · name",
-            "shows": "Unit 7 (grid icon)",
-            "logic": "The unit whose sows are listed below. Changes only through the unit list on the Task overview sheet or the Home Choose unit door.",
-            "source": "roomContext().unitId"
-          },
-          {
-            "name": "Unit card · value",
-            "shows": "10 (large) with \"Live / litter\" under it",
-            "logic": "The unit's average live piglets per litter, one KPI for the unit. In the prototype it is a fixed sample (unit.livePerLitter = 10); not derived from the litters shown. Period and cohort of the average are not stated.",
-            "source": "prototype farrowing-astra-concept.js sampleUnit()/roomContext() livePerLitter; ux/research/farrowing/ASTRA-ROOM-PAGE-AUDIT.md says \"illustrative 10 / target 12\""
-          },
-          {
-            "name": "Unit card · Target 12",
-            "shows": "Target 12 (amber text)",
-            "logic": "The unit's per-litter target. The text is hard-coded and always amber because belowTarget is hard-coded true; it is not compared with the 10. The context also holds bornAliveTarget = 12, which only the End task performance metrics read. Target is not editable here.",
-            "source": "prototype farrowing-astra-concept.js room() AstraTaskOverview.render unit.target, belowTarget; console config not designed (unclear: where the target is configured)"
-          },
-          {
-            "name": "Task overview card · heading",
-            "shows": "Task overview ›",
-            "logic": "The right half of the context strip is one button; whole card (heading, number, bar, support line) opens the Task overview sheet. The chevron marks it as the only interactive half.",
-            "source": "astra-task-overview.js render()"
-          },
-          {
-            "name": "Task overview card · value",
-            "shows": "7 / 18",
-            "logic": "Numerator = Farrowed: sows in ALL units whose litter is finished (locked), excluding miscarriage / not-in-pig / removed outcomes and excluding sows that died before or during farrowing (a sow that died after finishing stays counted). Denominator = Farrowed + Active + Awaiting, so other outcomes leave both the number and the bar. Never changes with the room's lens or filter.",
-            "source": "prototype farrowing-astra-concept.js taskOverview(c).totals Farrowed, ProgressTotal"
-          },
-          {
-            "name": "Task overview card · label",
-            "shows": "Farrowed · all units",
-            "logic": "\"Farrowed\" is the counted thing; \"· all units\" states the scope (unlike the unit card and the tab counts, which are Unit 7 only).",
-            "source": "astra-task-overview.js"
-          },
-          {
-            "name": "Task overview card · progress bar",
-            "shows": "Three-segment bar",
-            "logic": "Segments Farrowed / Active / Awaiting with widths proportional to their counts (sample 7 : 2 : 9 of 18); zero segments are omitted. aria-valuenow = Farrowed. Not tappable on its own.",
-            "source": "astra-task-overview.js statusProgress()"
-          },
-          {
-            "name": "Task overview card · support line",
-            "shows": "2 active · 9 awaiting",
-            "logic": "Active and Awaiting counts across all units: the same two numbers the bar segments show, as text.",
-            "source": "taskOverview(c).totals.Active / Awaiting"
+            "shows": "\"Last record 08:41 · G. Hansen\" under the app bar.",
+            "logic": "Meant to be the newest record time and hand in the unit. In the prototype it is fixed text: 08:41, or 09:41 once any sow carries the 09:41 stamp a live tap writes; the hand is always G. Hansen.",
+            "source": "farrowing-astra-concept.js room() \"latest\"",
+            "at": "Last record"
           },
           {
             "name": "State tabs",
-            "shows": "Awaiting 4 · Active 1 · Done 2 · All 7",
-            "logic": "One tab strip. Counts are for the CURRENT unit only and respect the active filter (so they shrink when a filter is applied). Awaiting = no live total yet; Active = live total above zero and not finished; Done = finished litters, sows that died (they stay as a Done-register row) and sows with a recorded outcome. Default tab is All. Each tab has a spoken label \"Awaiting, 4 sows\".",
-            "source": "prototype farrowing-astra-concept.js roomState(), roomCounts()"
+            "shows": "Awaiting · Active · Done · All, each with a count; All is the default.",
+            "states": [
+              {
+                "state": "No filter",
+                "when": "Default",
+                "shows": "Counts for the whole current unit, e.g. Awaiting 4 · Active 1 · Done 2 · All 7"
+              },
+              {
+                "state": "Filter applied",
+                "when": "Due or parity filter is on",
+                "shows": "Every count shrinks to the filtered sows"
+              },
+              {
+                "state": "Zero count",
+                "when": "A lens has no sows",
+                "shows": "Tab stays, shows 0; the list shows the empty state"
+              }
+            ],
+            "logic": "Counts are for the current unit only (not all units) and follow the filter, not the other tab. Done = finished litters, sows that died and sows with a recorded outcome. Selecting a tab resets the scroll to the top.",
+            "source": "farrowing-astra-concept.js roomState(), roomCounts()",
+            "at": "Awaiting"
           },
           {
-            "name": "Filter button",
-            "shows": "Funnel icon, count badge when filtering",
-            "logic": "Opens the Filter sows sheet. Badge = number of active filters (due range, parity: 0-2). Below the tabs a line \"Due: Today – In 2 days · Parity 2–5\" with Clear shows while any filter is active.",
-            "source": "prototype farrowing-astra-concept.js roomFilterCount(), roomFilterLabel()"
+            "name": "Filter",
+            "shows": "Funnel button beside the tabs; opens the Filter sows sheet (due range, parity).",
+            "states": [
+              {
+                "state": "No filter",
+                "when": "Due range 7+ days ago … in 7+ days and parity Any",
+                "shows": "Plain funnel, no summary line"
+              },
+              {
+                "state": "Filter on",
+                "when": "Due range or parity changed",
+                "shows": "Count badge on the funnel (0–2 filters) and a line under the tabs \"Due: Today – In 2 days · Parity 2–5\" with Clear"
+              }
+            ],
+            "rule": "Apply keeps the filter until Clear; Clear removes both filters at once. The due range matches each sow's stored due text, so it also hides Active and Done sows by a date that no longer matters to them.",
+            "source": "farrowing-astra-concept.js roomFilterCount(), roomFilterLabel(), dueMatches()",
+            "at": "All"
           },
           {
-            "name": "Pen card · header",
-            "shows": "B4 · 3 sows ›  (and \"2 shown\" when filtered)",
-            "logic": "Pen code, number of task sows in that pen (always the full count, ignoring lens and filter), chevron. Tapping the header opens that pen's detail sheet. \"N shown\" appears only when the lens or filter hides some of the pen's sows. Pens are ordered alphanumerically; pens with no visible sow are not listed.",
-            "source": "prototype farrowing-astra-concept.js room() pens"
+            "name": "Pen header",
+            "shows": "Pen code, sow count, chevron (opens the pen sheet), and \"N shown\" when rows are hidden.",
+            "states": [
+              {
+                "state": "All shown",
+                "when": "Lens All and no filter, or every sow in the pen passes",
+                "shows": "\"B4 · 3 sows\" (\"1 sow\" for one)"
+              },
+              {
+                "state": "Partly hidden",
+                "when": "The lens or filter hides some of the pen's sows",
+                "shows": "Count unchanged plus \"2 shown\" beside it"
+              },
+              {
+                "state": "Hidden pen",
+                "when": "No sow of the pen passes",
+                "shows": "Pen is not listed at all"
+              }
+            ],
+            "logic": "The sow count is the pen's full task total, ignoring lens and filter. Pens are ordered alphanumerically.",
+            "source": "farrowing-astra-concept.js room() pens",
+            "at": "sows"
           },
           {
-            "name": "Row · ear tag",
-            "shows": "000418",
-            "logic": "The sow's id, mono 13px. Identifies the row; no strike-through or special style has meaning. Sits above the state chip.",
-            "source": "sow record tag"
-          },
-          {
-            "name": "Row · Active chip",
-            "shows": "Active (green tint)",
-            "logic": "Shown when the live total (alive + dead) is above zero and the litter is not finished. Disappears when she is recounted back to zero (she reads Awaiting again).",
-            "source": "prototype farrowing-astra-concept.js roomRow()"
-          },
-          {
-            "name": "Row · Done chip",
-            "shows": "Done (grey tint)",
-            "logic": "Shown when the litter is finished (locked). Done rows end with a pencil icon instead of a chevron.",
-            "source": "prototype farrowing-astra-concept.js roomRow()"
-          },
-          {
-            "name": "Row · Sow died chip",
-            "shows": "Sow died (red tint)",
-            "logic": "Shown instead of Done when farrowing ended through the sow's death. She stays in the room as a Done-register row.",
-            "source": "prototype farrowing-astra-concept.js roomRow() ended-word"
-          },
-          {
-            "name": "Row · Awaiting line 1",
-            "shows": "Due today / Due tomorrow / Due in 2 days / Due yesterday / Overdue · 3 days",
-            "logic": "Days from due (expected date = service + 114 days; the gestation day is never printed on rows). \"Overdue\" from day 116; only the number \"3 days\" is red, the word stays ink. Tomorrow and later (\"forecast\") are drawn lighter/muted. Awaiting rows carry no chip.",
-            "source": "prototype farrowing-astra-concept.js roomRow(); sow.due text (sample); RULINGS \"Model\""
-          },
-          {
-            "name": "Row · Awaiting line 2",
-            "shows": "parity 5 · 11 born last",
-            "logic": "Her parity and the number born in her last litter (default 12 when unknown).",
-            "source": "sow.parity, sow.lastBorn"
-          },
-          {
-            "name": "Row · Active/Done/Died line 1",
-            "shows": "9 alive · 5 dead",
-            "logic": "Alive = the live Alive count (Active: posted + this visit; Done: alive now, falls when later deaths are recorded). Dead = sum of all dead types recorded. Same format on Active, Done and Sow died rows.",
-            "source": "prototype farrowing-astra-concept.js roomRow(): r.alive, sum(r.dead)"
-          },
-          {
-            "name": "Row · Active/Done/Died line 2",
-            "shows": "born 14 · 1h ago · G.H",
-            "logic": "born N = alive + dead (derived, frozen at finish). Then recency in words: Active \"1h ago\" (prototype fixed text; \"just now\" after a tap in this session), Done \"final 05:58\" (the time she was finished), Sow died \"yesterday\". Then the hand's initials of the newest record: the prototype always prints G.H (L.M for the died sow). Never coloured by age.",
-            "source": "prototype farrowing-astra-concept.js roomRow(); ux/research/farrowing/RULINGS.md \"Model\" (interval chip retired)"
-          },
-          {
-            "name": "Row · rail icon",
-            "shows": "Chevron (Awaiting, Active) / pencil (Done, Sow died)",
-            "logic": "Chevron = opens the live record. Pencil = a finished (locked) record that can still be edited.",
-            "source": "prototype farrowing-astra-concept.js roomRow() icon(r.locked?\"edit\":\"chevron\")"
-          },
-          {
-            "name": "Row · outcome sow",
-            "shows": "Miscarriage / Not in pig / Removed from batch",
-            "logic": "A sow with a recorded production outcome shows the outcome as line 1 and \"Recorded · hh:mm · G.H\" as line 2, counts as Done, and opens the Production log instead of a sheet.",
-            "source": "prototype farrowing-astra-concept.js roomRow() productionOutcome"
-          },
-          {
-            "name": "Dock · Go to pen",
-            "shows": "B1 / Go to pen (grid icon)",
-            "logic": "Left dock button. The pen code is the pen currently at the top of the list under the sticky bar (updates while scrolling, after a jump and after opening a sow). Opens the pen map.",
-            "source": "prototype farrowing-astra-concept.js room() dock-pen; scroll handler"
-          },
-          {
-            "name": "Dock · Scan ear tag",
-            "shows": "Scan ear tag (scan icon, dark primary button)",
-            "logic": "The one icon-with-label pairing the rulings sanction. Opens the scan sheet.",
-            "source": "RULINGS \"Names and glyphs\""
-          },
-          {
-            "name": "Dock · Search",
-            "shows": "Magnifier icon only",
-            "logic": "Icon-only button labelled \"Search ear tag\". Opens the Find a sow sheet.",
-            "source": "prototype farrowing-astra-concept.js room() dock-search"
+            "name": "Dock",
+            "shows": "Go to pen (left), Scan ear tag (primary), Search (icon only).",
+            "states": [
+              {
+                "state": "Pen code",
+                "when": "Always",
+                "shows": "Shows the pen at the top of the list under the sticky bar; follows scroll live and updates after a jump or after opening a sow. \"Pens\" when none."
+              },
+              {
+                "state": "Pen map tile",
+                "when": "Each A–D × 1–6 pen in the Go to pen sheet",
+                "shows": "One-word fact: \"Active\" / \"2 active\"; else \"Overdue\" / \"2 overdue\"; else \"N born ✓\" when all finished; else \"Due today\" or the first due text; \"No matches\" (pen has sows, none pass the view, disabled); \"Not in task\" (disabled)"
+              }
+            ],
+            "rule": "Pen map: tap jumps to the pen and highlights it for 0.9 s; hold 0.35 s peeks at its sows. The tab bar and filter line stay stuck at the top while the list scrolls. Scan ear tag has no camera in the prototype (\"Try sample tag\" opens the first sow) and also holds the ear-tag text search.",
+            "source": "farrowing-astra-concept.js room() dock, penFact(), roomAfterRender(), scroll handler",
+            "at": "Go to pen"
           }
         ],
         "controls": [
           {
-            "control": "Back chevron in the app bar",
-            "does": "leaves the task (Home when launched from Home)"
-          },
-          {
-            "control": "Task overview card (right half of the strip)",
-            "does": "opens the whole-task overview sheet",
-            "goesTo": "farrowing.overview"
-          },
-          {
-            "control": "State tabs",
-            "does": "switch the lens in place; scroll resets to the top of the list"
-          },
-          {
-            "control": "Funnel button",
-            "does": "opens the Filter sows sheet (not a separate screen): expected-farrowing range slider (7+ days ago … in 7+ days), Parity chips (Any, 0, 1, 2–5, 6+), Reset, \"Show N sows\"; Apply keeps the filter until Clear"
-          },
-          {
-            "control": "Clear in the filter line",
-            "does": "removes both filters at once"
-          },
-          {
             "control": "Pen header",
-            "does": "opens a Pen sheet (not a separate screen): notices, Feed guidance, Report equipment fault, Add/Edit pen note, Pen log, each with its own sub-page"
+            "does": "opens a Pen sheet (not a separate screen): notices, Feed guidance, Report equipment fault, Add/Edit pen note, Pen log"
           },
           {
-            "control": "Awaiting row",
-            "does": "opens her sheet with nothing recorded yet",
-            "goesTo": "farrowing.before"
-          },
-          {
-            "control": "Active row",
-            "does": "opens the counting sheet",
-            "goesTo": "farrowing.count"
-          },
-          {
-            "control": "Done row (finished)",
-            "does": "opens the locked record",
-            "goesTo": "farrowing.locked"
-          },
-          {
-            "control": "Sow died row",
-            "does": "opens the ended record",
-            "goesTo": "farrowing.ended"
-          },
-          {
-            "control": "Outcome row (miscarriage, not in pig, removed)",
-            "does": "opens the Production log",
-            "goesTo": "farrowing.history"
-          },
-          {
-            "control": "Dock · Go to pen",
-            "does": "opens the pen map sheet: A–D columns by rows 1–6, each tile with a one-word fact (Active, 2 active, Overdue, N born with a tick, Due today, Not in task, No matches); tap jumps to the pen and highlights it for 0.9 s; long-press 0.35 s peeks at its sows; tiles with no visible sow are disabled"
-          },
-          {
-            "control": "Dock · Scan ear tag",
-            "does": "opens the scan sheet: camera is not connected in the prototype; \"Try sample tag 000418\" opens that sow; also holds the ear-tag text search"
-          },
-          {
-            "control": "Dock · Search",
-            "does": "opens \"Find a sow\": text field (ear tag or pen) with live results \"N sows found\"; a result opens like a row"
+            "control": "Search",
+            "does": "opens \"Find a sow\": ear tag or pen text with live \"N sows found\"; a result opens like a row"
           }
         ],
         "copy": [
@@ -663,14 +621,9 @@
           "(raw) No awaiting sows · No matching sows"
         ],
         "edge": [
-          "A sow whose live total returns to zero (undo, Edit) moves back from Active to Awaiting and gets her Due line again",
-          "A sow farrowing early or late is never red once she has a record: the overdue number only shows on Awaiting rows",
-          "Pen with sows of mixed status: the header count is the pen's total, rows follow the lens",
-          "Filter that hides every sow: empty state with the filter hint; Clear / Reset recovers",
-          "Unit switch keeps each unit's own scroll position and current pen when lens and filter are unchanged",
-          "Returning from a sow restores the scroll and the pen he left from",
-          "Sow with a draft (unsaved Edit) is blocked from task end (see End task), but the row shows nothing about the draft",
-          "Done lens includes sow-died and outcome rows, so Done (8 across units) can exceed \"Farrowed\" (7)"
+          "A sow with an unsaved Edit draft blocks ending the task, but her row shows nothing about the draft",
+          "Done tab can exceed Farrowed on the card (Done 8 across units vs Farrowed 7) because Done includes sow deaths and outcome rows",
+          "Filter that hides every sow: empty state with the filter hint; Clear or Reset recovers"
         ],
         "rules": [
           "\"Rows speak in days from due, never gestation day\" (Model)",
@@ -684,19 +637,15 @@
           "\"words carry actions, icons carry objects\" — the dock's Scan ear tag is the one sanctioned icon + text pairing (Names and glyphs)"
         ],
         "issues": [
-          "Same facts at two scopes on one screen: the unit card and the state tabs are Unit 7 only (and the tabs follow the filter); the Task overview card is all units and ignores the filter. Only the card says its scope (\"all units\"); the tabs do not say \"Unit 7\".",
-          "Active and Awaiting are stated three times at two scopes: the card's bar segments, its text \"2 active · 9 awaiting\", and the tabs \"Active 1 · Awaiting 4\".",
-          "\"Done 2\" (tabs) and \"Farrowed 7\" (card) look like the same measure but count differently (Done includes sows that died and outcome rows; Farrowed excludes sows that died before/during farrowing and all outcomes). Neither label explains the difference.",
-          "\"Live / litter 10\" and \"Target 12\" are fixed sample text; the 10 is not computed from litters and contradicts the End task performance metric (Born alive / litter 12.0 against the same target 12 in the sample). The label does not say over which period or which litters. unclear: source, period and who sets the target.",
-          "\"Target 12\" is always amber because belowTarget is hard-coded; it would read as a warning even when the unit meets the target.",
-          "\"Last record 08:41 · G. Hansen\" is fixed text and repeats what each Active row's \"1h ago · G.H\" already says; the one-sentence task copy the contract requires under it (\"Count as she farrows. Every tap saves, come back anytime. Finish when she's done.\") is missing.",
-          "Row recency (\"1h ago\") and hand (\"G.H\") are hard-coded, not derived from record stamps; the Active text does not tick (contract: minutes under 1 h, hours under 24 h, yesterday).",
-          "Overdue sows: the ruled second line \"induced yesterday · L.M\" (latest disposition from the sow page) is not implemented; an overdue row only shows the parity line.",
-          "Pen headers are tappable (chevron, pen sheet with feed guidance, equipment fault, pen note, pen log). The rulings call pen headers census-only dead zones and name no pen tools; unclear whose feature these belong to and whether they should live in a farrowing task.",
-          "Two search doors: the magnifier opens Find a sow and the Scan ear tag sheet also contains the same text search.",
-          "The due-range filter matches the sow's stored due text, so it also hides or shows Active and Done sows by a due date that no longer matters to them.",
-          "Entry mismatch: the owner confirmed Home's Farrowing card lands on this room list, but the code opens the Task overview sheet over it for the whole-farm entry (entry=overview) and its Back returns to Home; only a unit entry (Choose unit) lands here.",
-          "Header icon-only X on sheets plus Back plus grab handle plus backdrop are four exits for one sheet (see Counting)."
+          "Unit card and tabs are Unit 7 only; the Task overview card is all units. Only the card names its scope.",
+          "Active and Awaiting appear three times at two scopes: bar segments, support text and tabs.",
+          "\"Done 2\" and \"Farrowed 7\" look like one measure but count differently; neither label explains it.",
+          "Live / litter 10 and Target 12 are fixed sample text, always amber, and clash with the End task metric (12.0 against the same target).",
+          "Row recency and hand are hard-coded; \"1h ago\" never ticks. Overdue rows lack the ruled \"induced yesterday · L.M\" second line.",
+          "Last record line repeats each row's recency; the ruled one-sentence task copy under it is missing.",
+          "Pen headers open pen tools (feed, fault, note, log) although the rulings call them census-only dead zones; unclear whose feature that is.",
+          "Two search doors: the magnifier and the text search inside Scan ear tag.",
+          "Entry mismatch: Home's whole-farm card is meant to land here but opens the Task overview sheet over it first."
         ]
       }
     },
@@ -709,164 +658,134 @@
       "preset": "count",
       "figma": "",
       "notes": {
-        "purpose": "Keep the live count while she farrows: one big Alive number whose + and - save at once, the litter so far, and the doors to deaths, corrections, the log and Finish.",
+        "purpose": "Keep the live count while she farrows: one big Alive number whose + and − save at once, with the litter so far.",
         "states": [
-          "Default (sample 000418): Alive 9, Dead 5, Born 14, receipt \"Saved · +4 this visit\"",
-          "Visit with nothing changed: receipt reads \"Saved\"",
-          "After - taps: pending falls; if it goes below zero the receipt reads \"Saved · N died this visit\"",
-          "At the Born floor (Alive cannot go down): - is greyed (aria-disabled); tapping it shows \"Use Record dead for deaths. Use Edit for corrections.\" for 4 s in place of the receipt",
-          "Edit draft waiting (changes saved nowhere): Finish farrowing stays enabled here but the Finish sheet will be blocked",
-          "No events and Alive 0: this is the Before first count screen"
+          "Edit draft waiting (kept with Back): Finish farrowing stays enabled but opens the blocked Finish sheet",
+          "Visit with nothing changed: receipt reads just \"Saved\""
         ],
         "elements": [
           {
-            "name": "Header · sow id",
-            "shows": "000418 ›",
-            "logic": "The sow's ear-tag id followed by a chevron; the whole title is a button (44px hit area) and is the one door to her sow page. Id is plain text in the mono face, no strike-through or other styling carries meaning.",
-            "source": "prototype farrowing-astra-concept.js identity(); tag from the sow record"
-          },
-          {
-            "name": "Header · pen / parity",
-            "shows": "B1 / Parity 3",
-            "logic": "Pen code, then \"Parity n\" (her current parity from the sow record).",
-            "source": "sow record: pen, parity"
-          },
-          {
-            "name": "Header · state line",
-            "shows": "Farrowing",
-            "logic": "Status word for the sow: \"Farrowing\" once her live total is above zero; \"Due today\" (the room's Due line without the day number) while nothing is recorded; \"Finished …\" / \"Died …\" for locked records. The gestation day and the started / saved stamp the rulings put in this header are not shown.",
-            "source": "prototype farrowing-astra-concept.js identity() / recordStamp()"
-          },
-          {
-            "name": "Header · close (X)",
-            "shows": "X icon button, label \"Close sow drawer\"",
-            "logic": "Same exit as Back: leaves the sheet and returns to the room list (also folds the open visit when on Counting). The grab handle and the backdrop are a third and fourth way out.",
-            "source": "prototype farrowing-astra-concept.js act close"
-          },
-          {
-            "name": "Alive label",
-            "shows": "Alive",
-            "logic": "Names the hero number.",
-            "source": "static"
-          },
-          {
-            "name": "Hero stepper · -",
-            "shows": "Large minus key (58px)",
-            "logic": "Takes one off Alive and off the open visit. Floor: Alive cannot go below B* minus the dead recorded (min alive = anchor - total dead; in the sample 10 - 5 = 5). At the floor the key is greyed, nothing is written and the pointer text appears. aria-disabled only.",
-            "source": "prototype farrowing-astra-concept.js act(\"alive\") floor()"
-          },
-          {
-            "name": "Hero value",
-            "shows": "9",
-            "logic": "Alive now = posted + this visit. Plain numeral in the mono face, no box, grey when 0. Not typeable (type-to-set is retired).",
-            "source": "s.alive"
-          },
-          {
-            "name": "Hero stepper · +",
-            "shows": "Large plus key",
-            "logic": "Adds one; always allowed. The first + on an Awaiting sow makes her Active.",
-            "source": "prototype farrowing-astra-concept.js act(\"alive\")"
+            "name": "Alive stepper",
+            "shows": "Large − and + keys around the Alive number (not typeable).",
+            "states": [
+              {
+                "state": "Above the floor",
+                "when": "Alive is more than anchor − dead recorded",
+                "shows": "− and + both live; each tap changes Alive and the open visit and is saved at once"
+              },
+              {
+                "state": "At the floor",
+                "when": "Alive equals the floor (sample 10 − 5 = 5)",
+                "shows": "− is greyed (aria-disabled); a tap writes nothing and shows the pointer text for 4 s in place of the receipt"
+              },
+              {
+                "state": "Zero",
+                "when": "Alive is 0 and no events",
+                "shows": "Number is grey; she reads as Before first count"
+              }
+            ],
+            "logic": "Alive = posted + this visit. + is always allowed; the first + makes an Awaiting sow Active. Recording a death lowers the floor, so − becomes possible again. Counting down to zero makes her Awaiting again.",
+            "source": "farrowing-astra-concept.js act(\"alive\"), floor()",
+            "at": "Alive"
           },
           {
             "name": "Receipt",
-            "shows": "Saved · +4 this visit",
-            "logic": "Live status under the number. \"+4\" = piglets added this visit (pending); down form \"Saved · 2 died this visit\". The visit folds into one log line when the sheet is left.",
-            "source": "prototype farrowing-astra-concept.js receipt()"
+            "shows": "Status line under the number.",
+            "states": [
+              {
+                "state": "Saved",
+                "when": "Visit changed nothing",
+                "shows": "\"Saved\""
+              },
+              {
+                "state": "Added",
+                "when": "Net + this visit",
+                "shows": "\"Saved · +4 this visit\""
+              },
+              {
+                "state": "Removed",
+                "when": "Net − this visit",
+                "shows": "\"Saved · 2 died this visit\""
+              },
+              {
+                "state": "Pointer",
+                "when": "A greyed − was tapped, for 4 s",
+                "shows": "\"Use Record dead for deaths. Use Edit for corrections.\""
+              }
+            ],
+            "logic": "The visit folds into one log line (\"+4 alive\") when the sheet is left by any exit.",
+            "source": "farrowing-astra-concept.js receipt(), fold()",
+            "at": "Saved"
           },
           {
-            "name": "Pointer text",
-            "shows": "Use Record dead for deaths. Use Edit for corrections.",
-            "logic": "Replaces the receipt for 4 s after tapping a greyed minus.",
-            "source": "prototype farrowing-astra-concept.js receipt() s.pointers"
+            "name": "Litter summary",
+            "shows": "Born and Dead figures, the causes line and View log.",
+            "states": [
+              {
+                "state": "Deaths recorded",
+                "when": "Dead above zero",
+                "shows": "One chip per type with a non-zero count: Stillborn 1 · Mummified 1 · Crushed 2 · Other 1"
+              },
+              {
+                "state": "No deaths",
+                "when": "Dead is 0",
+                "shows": "Causes line is hidden"
+              },
+              {
+                "state": "No events",
+                "when": "Nothing recorded and no pending count",
+                "shows": "View log is disabled"
+              }
+            ],
+            "logic": "Born = Alive + all dead (derived, never typed). Dead = sum of the six types.",
+            "source": "farrowing-astra-concept.js born(), causes(), litterHeading()",
+            "at": "Litter summary"
           },
           {
-            "name": "Litter summary heading",
-            "shows": "Litter summary  View log ›",
-            "logic": "Section title with a link to the Farrowing log; disabled when no event and no pending count exist.",
-            "source": "prototype farrowing-astra-concept.js litterHeading()"
+            "name": "Edit · Record death",
+            "shows": "Two of the three quick actions (the third is More actions).",
+            "states": [
+              {
+                "state": "Edit disabled",
+                "when": "Nothing posted: no events and Born is 0",
+                "shows": "Greyed"
+              },
+              {
+                "state": "Record death with draft",
+                "when": "A piglet death draft exists",
+                "shows": "Small \"Unsaved\" under the label (cannot occur today because leaving the drawer clears the draft)"
+              }
+            ],
+            "source": "farrowing-astra-concept.js recordActions()",
+            "at": "Record death"
           },
           {
-            "name": "Litter summary · Born",
-            "shows": "14",
-            "logic": "Born = Alive + all dead (derived, never typed). While counting it moves with both numbers.",
-            "source": "prototype farrowing-astra-concept.js born(s)"
-          },
-          {
-            "name": "Litter summary · Dead",
-            "shows": "5",
-            "logic": "Sum of the six dead types recorded.",
-            "source": "sum(s.dead)"
-          },
-          {
-            "name": "Litter summary · causes line",
-            "shows": "Stillborn 1 · Mummified 1 · Crushed 2 · Other 1",
-            "logic": "One chip per type with a non-zero count; hidden when Dead is 0.",
-            "source": "prototype farrowing-astra-concept.js causes()"
-          },
-          {
-            "name": "Action row · Edit",
-            "shows": "Edit (pencil)",
-            "logic": "Opens Edit record; disabled when nothing has been recorded.",
-            "source": "act(\"edit\")"
-          },
-          {
-            "name": "Action row · Record death",
-            "shows": "Record death (alert icon), small \"Unsaved\" under it when a death draft exists",
-            "logic": "Opens the death drawer. A pending draft would be flagged \"Unsaved\" (cannot currently survive leaving the drawer, see issues).",
-            "source": "act(\"death\")"
-          },
-          {
-            "name": "Action row · More actions",
-            "shows": "More actions (dots)",
-            "logic": "Opens the sow page with its Actions sheet open (farrowing actions listed there).",
-            "source": "act(\"sowActions\") -> pig-profile.full"
-          },
-          {
-            "name": "Bar · Back",
-            "shows": "Back",
-            "logic": "Folds the open visit (one \"+N alive\" log line, anchor = Born) and returns to the room list.",
-            "source": "act(\"close\") fold()"
-          },
-          {
-            "name": "Bar · Finish farrowing",
-            "shows": "Finish farrowing (primary)",
-            "logic": "Opens the Finish sheet. Disabled until Born is above zero.",
-            "source": "act(\"finish\")"
+            "name": "Finish farrowing",
+            "shows": "Primary button in the bar.",
+            "states": [
+              {
+                "state": "Disabled",
+                "when": "Born is 0",
+                "shows": "Greyed"
+              },
+              {
+                "state": "Enabled",
+                "when": "Born above zero",
+                "shows": "Opens the Finish sheet; opens the blocked version if an Edit draft is waiting"
+              }
+            ],
+            "source": "farrowing-astra-concept.js count()",
+            "at": "Finish farrowing"
           }
         ],
         "controls": [
           {
-            "control": "- / + keys",
-            "does": "change Alive; each tap is saved at once"
-          },
-          {
-            "control": "View log ›",
-            "does": "opens the Farrowing log",
-            "goesTo": "farrowing.history"
-          },
-          {
-            "control": "Edit",
-            "does": "opens Edit record",
-            "goesTo": "farrowing.edit"
-          },
-          {
-            "control": "Record death",
-            "does": "opens the death drawer",
-            "goesTo": "farrowing.death"
-          },
-          {
-            "control": "More actions / sow id ›",
-            "does": "opens the sow page (Pig profile) with the Actions sheet / the profile",
-            "goesTo": "pig-profile.full"
-          },
-          {
-            "control": "Finish farrowing",
-            "does": "opens the Finish sheet (Lock blocked version if an Edit draft waits)",
-            "goesTo": "farrowing.finish | farrowing.blocked"
+            "control": "− / + keys",
+            "does": "each tap is saved at once; − at the floor is refused with the pointer text"
           },
           {
             "control": "Back, X, grab handle, backdrop",
-            "does": "leave to the room list (visit folds)",
+            "does": "all four leave to the room list and fold the visit into one log line",
             "goesTo": "farrowing.room"
           }
         ],
@@ -881,9 +800,7 @@
           "(raw) Back · Finish farrowing"
         ],
         "edge": [
-          "Counting - to zero un-crosses her: she reads Awaiting again (Before first count)",
           "Leaving by any exit folds the visit; reopening shows the folded total",
-          "Floor depends on posted dead: recording a death lowers the floor so - becomes possible",
           "An Edit draft kept with Back is not lost; Finish then opens blocked"
         ],
         "rules": [
@@ -896,12 +813,11 @@
           "\"The exit word is always Back\" (Piglet processing, Round 5)"
         ],
         "issues": [
-          "Four exits for one sheet: the X in the header, the Back button, the grab handle and the backdrop; the rulings keep the handle/backdrop and a bar exit but no close button.",
-          "Born and Dead are shown here and again on Finish, the locked record and the log; the summary card duplicates the Edit, log and Finish doors' own context.",
-          "Sheet header lacks the ruled recency stamp (saved hh:mm · who, started hh:mm) and the day count; the status word \"Farrowing\" repeats what the room chip says.",
-          "The pointer text differs from the ruled two-pointer copy (\"Found dead? Record dead\" · \"Wrong count? Edit\") and replaces the receipt instead of using the reserved line under it, so the layout moves.",
-          "Button reads \"Record death\"; the rulings and contract name it \"Record dead\".",
-          "Minus at the floor is only aria-disabled; whether it looks disabled depends on CSS (grey, not dimmed per the ruling's scoped exception)."
+          "Four exits for one sheet (X, Back, handle, backdrop); the rulings keep the handle, backdrop and a bar exit but no close button.",
+          "Born and Dead repeat on Finish, the locked record and the log.",
+          "Header lacks the ruled recency stamp and day count; its status word \"Farrowing\" repeats the room chip.",
+          "Pointer text differs from the ruled two-pointer copy and replaces the receipt, so the layout moves; \"Record death\" should read \"Record dead\".",
+          "Minus at the floor is only aria-disabled; whether it looks disabled depends on CSS."
         ]
       }
     },
@@ -914,89 +830,81 @@
       "preset": "before",
       "figma": "",
       "notes": {
-        "purpose": "The same counting sheet for a sow with nothing recorded yet: Alive 0, with Record death live (a stillborn can be the first record) and Edit / Finish unavailable.",
+        "purpose": "The counting sheet for a sow with nothing recorded yet: Alive 0, Record death live (a stillborn can be the first record).",
         "states": [
-          "Default (sample 000455, B4): Alive 0, no events",
-          "Overdue sow: state line reads \"Overdue · 3 days\"",
-          "After the first + (or first death) she becomes Farrowing on the same sheet; the room row crosses to Active when she is left",
-          "Counted back to zero later: reads this state again, but View log and Edit remain available if events exist"
+          "Counted back to zero later: reads this state again, but View log and Edit stay available if events exist"
         ],
         "elements": [
           {
-            "name": "Header · sow id",
-            "shows": "000455 ›",
-            "logic": "The sow's ear-tag id followed by a chevron; the whole title is a button (44px hit area) and is the one door to her sow page. Id is plain text in the mono face, no strike-through or other styling carries meaning.",
-            "source": "prototype farrowing-astra-concept.js identity(); tag from the sow record"
+            "name": "Header state line",
+            "shows": "The status word after the pen and parity.",
+            "states": [
+              {
+                "state": "Due",
+                "when": "No live total, expected date ahead or today",
+                "shows": "\"Due today\" / \"Due tomorrow\" / \"Due in 2 days\" (the room's Due line without the day number)"
+              },
+              {
+                "state": "Overdue",
+                "when": "Past the expected date",
+                "shows": "\"Overdue · 3 days\""
+              },
+              {
+                "state": "Farrowing",
+                "when": "After the first + or first death",
+                "shows": "\"Farrowing\", on the same sheet"
+              }
+            ],
+            "source": "farrowing-astra-concept.js identity()",
+            "at": "Parity 2"
           },
           {
-            "name": "Header · pen / parity",
-            "shows": "B4 / Parity 2",
-            "logic": "Pen code, then \"Parity n\" (her current parity from the sow record).",
-            "source": "sow record: pen, parity"
+            "name": "Alive and receipt",
+            "shows": "Grey 0, then the line \"Tap + as piglets are born\".",
+            "logic": "− is greyed, + is live. The receipt line shows only while there are no events and Alive is 0; the first tap turns it into \"Saved · +1 this visit\". Opening and leaving without a tap writes nothing.",
+            "rule": "The first + (or first death) is the start of farrowing; there is no separate start action.",
+            "source": "farrowing-astra-concept.js receipt()",
+            "at": "Tap + as piglets are born"
           },
           {
-            "name": "Header · state line",
-            "shows": "Due today",
-            "logic": "The room's Due line without the gestation day (\"Due today\", \"Due tomorrow\", \"Due in 2 days\", \"Overdue · 3 days\"). Replaces the \"Farrowing\" word while the live total is zero.",
-            "source": "prototype farrowing-astra-concept.js identity() / recordStamp()"
-          },
-          {
-            "name": "Header · close (X)",
-            "shows": "X icon button, label \"Close sow drawer\"",
-            "logic": "Same exit as Back: leaves the sheet and returns to the room list (also folds the open visit when on Counting). The grab handle and the backdrop are a third and fourth way out.",
-            "source": "prototype farrowing-astra-concept.js act close"
-          },
-          {
-            "name": "Hero value",
-            "shows": "0 (grey)",
-            "logic": "Zero state of the Alive number; - is greyed (nothing to undo), + is live.",
-            "source": "s.alive"
-          },
-          {
-            "name": "Receipt",
-            "shows": "Tap + as piglets are born",
-            "logic": "Shown only while there are no events and Alive is 0; becomes \"Saved · +1 this visit\" at the first tap.",
-            "source": "prototype farrowing-astra-concept.js receipt()"
-          },
-          {
-            "name": "Litter summary",
-            "shows": "Born 0 · Dead 0",
-            "logic": "No causes line while Dead is 0. View log is disabled until an event exists.",
-            "source": "prototype farrowing-astra-concept.js count()"
-          },
-          {
-            "name": "Action row",
-            "shows": "Edit (disabled) · Record death · More actions",
-            "logic": "Edit is disabled because nothing is posted. Record death is live for a stillborn first record.",
-            "source": "prototype farrowing-astra-concept.js recordActions()"
-          },
-          {
-            "name": "Bar",
-            "shows": "Back · Finish farrowing (disabled)",
-            "logic": "Finish needs Born above zero. Back returns to the room list.",
-            "source": "prototype farrowing-astra-concept.js count()"
+            "name": "Unavailable controls",
+            "shows": "What is greyed while nothing is recorded.",
+            "states": [
+              {
+                "state": "Edit",
+                "when": "Nothing posted",
+                "shows": "Disabled"
+              },
+              {
+                "state": "View log",
+                "when": "No event exists",
+                "shows": "Disabled"
+              },
+              {
+                "state": "Finish farrowing",
+                "when": "Born is 0",
+                "shows": "Disabled"
+              },
+              {
+                "state": "Record death",
+                "when": "Always",
+                "shows": "Live: a stillborn can be the first record"
+              }
+            ],
+            "source": "farrowing-astra-concept.js count(), recordActions()",
+            "at": "Record death"
           }
         ],
         "controls": [
           {
             "control": "+ key",
-            "does": "first record: she becomes Farrowing (same sheet)",
+            "does": "first record: she becomes Farrowing on this same sheet and the room row crosses to Active when she is left",
             "goesTo": "farrowing.count"
           },
           {
             "control": "Record death",
-            "does": "opens the death drawer (a stillborn can be the first record)",
+            "does": "opens the death drawer; a stillborn can be the first record",
             "goesTo": "farrowing.death"
-          },
-          {
-            "control": "More actions / sow id ›",
-            "does": "opens the sow page and its Actions sheet (induction, not-in-pig, remove from batch and other dispositions live there)",
-            "goesTo": "pig-profile.full"
-          },
-          {
-            "control": "Back, X",
-            "does": "return to the room list",
-            "goesTo": "farrowing.room"
           }
         ],
         "copy": [
@@ -1006,8 +914,7 @@
         ],
         "edge": [
           "A stray + that nobody undoes hides an overdue sow behind \"1 alive · 0 dead\" (accepted cost in the rulings)",
-          "Opening and leaving without a tap writes nothing",
-          "Sow with records recounted to zero is not this state's virgin version: History and Edit stay reachable"
+          "A sow recounted to zero is not a virgin sheet: History and Edit stay reachable"
         ],
         "rules": [
           "\"Farrowing starts at the first recorded event — full stop. The started mark is KILLED\" (Starting and ending a session)",
@@ -1016,10 +923,9 @@
           "\"The pre-start face stays bare — no records yet\" (Surfaces & entrances)"
         ],
         "issues": [
-          "Receipt copy \"Tap + as piglets are born\" is the instruction the ruling removed (\"the sheet is not the place for copy\"; bare \"no records yet\"); the how-to sentence belongs under the room title and is also missing there.",
-          "Edit and Finish are drawn dimmed here; the rulings allow dim-as-disabled only for the Alive minus at its floor and the floor-gray family.",
-          "The ruled gestation day (\"day 117\") is missing from the header; the overdue state only says \"Overdue · 3 days\".",
-          "Sow header repeats the Due line the room row just showed."
+          "Receipt copy \"Tap + as piglets are born\" is the instruction the ruling removed; it belongs under the room title, where it is missing too.",
+          "Edit and Finish are drawn dimmed; the rulings allow dim-as-disabled only for the Alive minus floor.",
+          "The ruled gestation day is missing from the header; it repeats the Due line the room row just showed."
         ]
       }
     },
@@ -1032,95 +938,107 @@
       "preset": "draft",
       "figma": "",
       "notes": {
-        "purpose": "The one dead drawer: tally piglets that were born dead or died by type, or record the sow's own death. Opened during farrowing in this preview; the same drawer also opens from Before first count, Finish, the locked record and the ended record.",
+        "purpose": "The one dead drawer: tally piglets born dead or died by type, or record the sow's own death.",
         "states": [
-          "Piglets mode, nothing drafted: header \"Dead 5\", rows at rest, Save disabled, Clear disabled",
-          "Piglets mode with a draft (preset: one Crushed drafted): header \"Dead 6\" with \"Born dead or died · 1 unsaved\" in green, Crushed row shows 3 in green with its - enabled, Save enabled",
-          "The sow mode: radio list of causes, red warning band, Save is hold-to-commit",
-          "The sow mode with a piglet draft or an Edit draft: warning \"Save or clear the pending piglet deaths / correction before ending\" with a Review button, Save disabled",
-          "After finish (opened from the locked record): + is capped so the drafted deaths cannot exceed Alive now; saving lowers Alive now",
-          "Ended sow: only the Piglets segment is offered",
-          "Photo dialog over the drawer (tap a thumbnail): Back, Delete"
+          "Photo dialog over the drawer (tap a thumbnail): Back, Delete",
+          "Opened from Before first count, Finish, the locked record or the ended record: same drawer, returns to where it was opened"
         ],
         "elements": [
           {
-            "name": "Title row",
-            "shows": "Dead 6",
-            "logic": "Total of the dead already saved (5 in the sample) plus the draft.",
-            "source": "sum(s.dead) + sum(s.deathDraft)"
-          },
-          {
-            "name": "Subtitle",
-            "shows": "Born dead or died · 1 unsaved",
-            "logic": "The green \"N unsaved\" is the draft count; it disappears when the draft is empty.",
-            "source": "sum(s.deathDraft)"
-          },
-          {
-            "name": "Clear",
-            "shows": "Clear (text action, title row)",
-            "logic": "Discards the draft (and, in sow mode, the chosen cause and note); disabled when nothing is drafted.",
-            "source": "act(\"clearDeath\")"
-          },
-          {
-            "name": "Segment",
-            "shows": "Piglets | The sow",
-            "logic": "Two-way control; hidden down to Piglets only once the sow has died.",
-            "source": "SentriUI.segment; s.mode"
+            "name": "Dead header",
+            "shows": "\"Dead 6\" with \"Born dead or died · 1 unsaved\" and Clear.",
+            "states": [
+              {
+                "state": "No draft",
+                "when": "Nothing drafted",
+                "shows": "\"Dead 5\" (saved total); no unsaved count; Clear and Save disabled"
+              },
+              {
+                "state": "Draft",
+                "when": "One or more deaths drafted",
+                "shows": "\"Dead 6\" (saved + draft); \"1 unsaved\" in green; Clear live"
+              }
+            ],
+            "source": "farrowing-astra-concept.js identity()",
+            "at": "Born dead or died"
           },
           {
             "name": "Type rows",
-            "shows": "Stillborn · Mummified · Crushed · Scours · Starve-out · Other, each - n +",
-            "logic": "Value = saved total + this draft; draft value green. - only undoes the draft (disabled at 0 draft). + has no limit before finish; after finish it stops when the draft reaches Alive now. Other is a plain row.",
-            "source": "prototype farrowing-astra-concept.js death(); types[]"
+            "shows": "Stillborn · Mummified · Crushed · Scours · Starve-out · Other, each with − n +.",
+            "states": [
+              {
+                "state": "Before finish",
+                "when": "Litter not locked",
+                "shows": "+ has no limit; deaths raise Born, never Alive"
+              },
+              {
+                "state": "After finish",
+                "when": "Litter locked",
+                "shows": "+ stops when drafted deaths equal Alive now; saving lowers Alive now"
+              }
+            ],
+            "logic": "Value = saved total + this draft (draft in green). − only undoes the draft and is disabled at 0 draft.",
+            "source": "farrowing-astra-concept.js death(), act(\"deadStep\")",
+            "at": "Crushed"
           },
           {
-            "name": "Photos field",
-            "shows": "Photos · Optional + camera button, thumbnails",
-            "logic": "Camera button is disabled until a death is drafted (or a sow cause is chosen). Each tap opens the file/camera input; thumbnails open the photo dialog. Photos ride the save.",
-            "source": "s.photos"
+            "name": "Piglets | The sow",
+            "shows": "Two-way segment at the top.",
+            "states": [
+              {
+                "state": "Both",
+                "when": "Sow still alive",
+                "shows": "Piglets and The sow"
+              },
+              {
+                "state": "Piglets only",
+                "when": "Sow already died",
+                "shows": "The sow segment is not offered"
+              }
+            ],
+            "source": "SentriUI.segment; death()",
+            "at": "The sow"
           },
           {
-            "name": "Sow mode · causes",
-            "shows": "Farrowing · Prolapse · Found dead · Other (radios)",
-            "logic": "Single choice; choosing Other adds an optional \"Details · optional\" line.",
-            "source": "s.sowCause / s.sowNote"
+            "name": "The sow",
+            "shows": "Radio causes Farrowing · Prolapse · Found dead · Other, a red band and a hold-to-save bar.",
+            "states": [
+              {
+                "state": "No cause",
+                "when": "Nothing chosen",
+                "shows": "Save disabled"
+              },
+              {
+                "state": "Draft waiting",
+                "when": "A piglet draft or an Edit draft exists",
+                "shows": "Band adds \"Save or clear the pending piglet deaths / correction before ending\" with Review; Save disabled"
+              },
+              {
+                "state": "Ready",
+                "when": "Cause chosen, no draft",
+                "shows": "Save enabled; \"Other\" adds an optional details line"
+              }
+            ],
+            "rule": "Saving is a 0.85 s hold: ends farrowing, freezes Born, writes \"Sow died · cause\". Band always reads \"Saving ends farrowing · 7 alive stay under piglet care\" (current Alive).",
+            "source": "farrowing-astra-concept.js death(), act(\"saveDeath\")",
+            "at": "The sow"
           },
           {
-            "name": "Sow mode · warning band",
-            "shows": "Saving ends farrowing · 7 alive stay under piglet care",
-            "logic": "Always shown in sow mode; the number is the current Alive. When a piglet or Edit draft exists, a \"Review piglet deaths\" / \"Review correction\" button and the sentence \"Save or clear the pending … before ending.\" are added.",
-            "source": "prototype farrowing-astra-concept.js death()"
+            "name": "Photos",
+            "shows": "Optional photos with a camera button and thumbnails.",
+            "logic": "Camera is disabled until a death is drafted (or a sow cause is chosen). Photos ride the save.",
+            "source": "farrowing-astra-concept.js death() photo-field",
+            "at": "Photos"
           },
           {
-            "name": "Bar · Back",
-            "shows": "Back",
-            "logic": "In this prototype Back discards the draft (and any sow cause) before returning to the sheet it was opened from.",
-            "source": "prototype farrowing-astra-concept.js act(\"back\")"
-          },
-          {
-            "name": "Bar · Save",
-            "shows": "Save (piglets) / Save with caption HOLD TO SAVE (the sow)",
-            "logic": "Piglets: adds the draft to the dead types, writes one log line \"+3 crushed · +1 other\" and returns. The sow: 0.85 s hold; ends farrowing, freezes Born, writes \"Sow died · cause\"; disabled without a cause or with any draft/correction waiting.",
-            "source": "act(\"saveDeath\")"
+            "name": "Save and Back",
+            "shows": "Bar.",
+            "rule": "Save (piglets) adds the draft to the dead types and writes one log line such as \"+3 crushed · +1 other\". Back, X, handle and backdrop discard the draft (and any sow cause); the ruling says they should keep it.",
+            "source": "farrowing-astra-concept.js act(\"saveDeath\"), act(\"back\")",
+            "at": "Save"
           }
         ],
         "controls": [
-          {
-            "control": "Type row - / +",
-            "does": "change the draft for that type"
-          },
-          {
-            "control": "Piglets | The sow",
-            "does": "switch mode"
-          },
-          {
-            "control": "Clear",
-            "does": "discards the draft"
-          },
-          {
-            "control": "Camera / thumbnail",
-            "does": "attach a photo / open it (Back, Delete)"
-          },
           {
             "control": "Save (piglets)",
             "does": "commits the deaths and returns to the screen it was opened from",
@@ -1132,12 +1050,7 @@
             "goesTo": "farrowing.ended"
           },
           {
-            "control": "Back, X, handle, backdrop",
-            "does": "discard the draft and return to the previous sheet (Counting, Finish, Locked record or Before first count)",
-            "goesTo": "farrowing.count"
-          },
-          {
-            "control": "Review (inside the sow warning)",
+            "control": "Review (inside the sow band)",
             "does": "goes back to Piglets mode or to Edit to resolve the draft",
             "goesTo": "farrowing.edit"
           }
@@ -1152,8 +1065,6 @@
           "(raw) Back · Save · HOLD TO SAVE"
         ],
         "edge": [
-          "Reachable from every status: Awaiting (Before first count), Farrowing, Finish, Finished and Sow died; it returns to the screen that opened it (the preset shows the Farrowing case)",
-          "Before finish deaths never touch Alive (Born grows); after finish they lower Alive now",
           "Sow cannot be saved dead twice: sow mode disappears once ended",
           "A piglet draft or an Edit draft blocks saving the sow's death"
         ],
@@ -1166,12 +1077,10 @@
           "\"No WHEN anywhere, absolutely\" (Model)"
         ],
         "issues": [
-          "Back, X, swipe and backdrop all clear the draft; the ruling says Back and dismiss KEEP the draft on the device and only Clear discards it. Because of this the green \"N unsaved\" state and the Record death \"Unsaved\" tag can never be seen after leaving the drawer, and the Finish sheet's \"Save piglet deaths first\" block cannot happen.",
-          "Two ways to discard (Back and Clear) do the same thing in the prototype.",
-          "Header \"Dead 6\" and the subtitle \"1 unsaved\" and the green Crushed 3 all say the same draft three times.",
-          "The title row and the drawer contain no sow id or pen; the worker cannot see which sow is being recorded.",
-          "Button and title copy \"Record death\" / \"Dead\" mix with the ruled \"Record dead\".",
-          "Photo field is a header row with an icon button, not the ruled single enclosed card; label is \"Photos / Optional\" rather than \"Photos — optional\"."
+          "Back, X, swipe and backdrop all clear the draft; the ruling keeps it, so \"N unsaved\" and Finish's \"Save piglet deaths first\" never show.",
+          "\"Dead 6\", \"1 unsaved\" and the green row all say the same draft three times.",
+          "No sow id or pen is shown; the worker cannot see which sow is being recorded.",
+          "Photo field is a header row with an icon button, not the ruled single card; \"Record death\" mixes with the ruled \"Record dead\"."
         ]
       }
     },
@@ -1184,80 +1093,64 @@
       "preset": "finish",
       "figma": "",
       "notes": {
-        "purpose": "Review the litter, report weak and deformed piglets, add optional facts, then hold to finish and lock Born.",
-        "states": [
-          "Default: totals Born 14 · Alive 9 · Dead 5, condition rows at weak 1 / deformed 1, optional rows collapsed",
-          "Litter weight opened: kg field under the optional row",
-          "Assistance opened: Assisted farrowing Yes / No radios with Clear answer",
-          "Finish enabled only when Born is above zero and no draft waits (otherwise this becomes Lock blocked)"
-        ],
+        "purpose": "Report weak and deformed piglets, add optional facts, then hold to finish and lock Born.",
+        "states": [],
         "elements": [
           {
-            "name": "Header",
-            "shows": "Finish farrowing · 000418 · B1 · Parity 3, X",
-            "logic": "Title names the action; subtitle identifies the sow. X returns to Counting.",
-            "source": "prototype farrowing-astra-concept.js identity()"
-          },
-          {
-            "name": "Totals panel",
-            "shows": "Born 14 · Alive 9 · Dead 5",
-            "logic": "Read-only recap of the litter (same numbers as Counting). Alive here is Alive at the moment of finishing.",
-            "source": "prototype farrowing-astra-concept.js finish()"
-          },
-          {
             "name": "Piglet condition",
-            "shows": "Piglet condition · Among the 9 alive piglets · 0 if none",
-            "logic": "Two - n + rows: Weak and Deformed. Each tap saves. weak + deformed cannot exceed Alive. Healthy has no row (it derives as Alive - weak - deformed and prints on the record).",
-            "source": "act(\"classify\")"
+            "shows": "Weak and Deformed steppers: \"Among the 9 alive piglets · 0 if none\".",
+            "rule": "Each tap saves at once. Weak + deformed cannot exceed Alive (the + greys out). Healthy has no row; it is Alive − weak − deformed and prints on the record.",
+            "source": "farrowing-astra-concept.js act(\"classify\")",
+            "at": "Piglet condition"
           },
           {
-            "name": "Optional buttons",
-            "shows": "+ Litter weight   + Assistance",
-            "logic": "Two outlined buttons; each shows its answer once given (\"Litter weight · 12.6 kg\", \"Assistance · Yes\"). Tapping toggles the field below.",
-            "source": "finishOptional"
+            "name": "Optional facts",
+            "shows": "Two buttons, + Litter weight and + Assistance, each expanding a field.",
+            "states": [
+              {
+                "state": "Not given",
+                "when": "Nothing entered",
+                "shows": "Button label only"
+              },
+              {
+                "state": "Given",
+                "when": "Value entered",
+                "shows": "Label carries the answer: \"Litter weight · 12.6 kg\", \"Assistance · Yes\""
+              },
+              {
+                "state": "Cleared",
+                "when": "Clear answer pressed",
+                "shows": "Assistance returns to \"Not recorded\""
+              }
+            ],
+            "logic": "Litter weight is a decimal number; a negative value is cleared. No range warning in the prototype (the ruled soft warning outside 0.8–2.5 kg × alive is absent).",
+            "source": "farrowing-astra-concept.js finish(), updateTextField()",
+            "at": "Litter weight"
           },
           {
-            "name": "Litter weight field",
-            "shows": "kg input, placeholder -",
-            "logic": "Decimal number, optional; negative values are cleared. No range warning in the prototype.",
-            "source": "s.weight"
-          },
-          {
-            "name": "Assistance field",
-            "shows": "Assisted farrowing  No / Yes  Clear answer",
-            "logic": "Optional yes/no; Clear returns it to \"not recorded\".",
-            "source": "s.assisted"
-          },
-          {
-            "name": "Bar · Back",
-            "shows": "Back",
-            "logic": "Returns to Counting; weak, deformed and the optional facts are already saved.",
-            "source": "returnCount"
-          },
-          {
-            "name": "Bar · Finish farrowing",
-            "shows": "Finish farrowing, caption HOLD TO FINISH",
-            "logic": "Press and hold 0.85 s. Locks Born (frozen = Born), writes \"Farrowing finished · born 14\", opens the locked record. Disabled while a draft waits or Born is 0.",
-            "source": "act(\"lock\")"
+            "name": "Finish farrowing (hold)",
+            "shows": "Primary button, caption HOLD TO FINISH.",
+            "states": [
+              {
+                "state": "Enabled",
+                "when": "Born above zero and no draft waiting",
+                "shows": "Hold 0.85 s"
+              },
+              {
+                "state": "Disabled",
+                "when": "Born is 0, or any draft waits",
+                "shows": "Greyed; the sheet becomes Lock blocked when a draft waits"
+              }
+            ],
+            "rule": "Hold 0.85 s locks Born (frozen = Born) and writes \"Farrowing finished · born 14\". Releasing early cancels without writing.",
+            "source": "farrowing-astra-concept.js act(\"lock\"), hold()",
+            "at": "HOLD TO FINISH"
           }
         ],
         "controls": [
           {
-            "control": "Weak / Deformed - and +",
-            "does": "save the count at once"
-          },
-          {
-            "control": "+ Litter weight / + Assistance",
-            "does": "expand or collapse the field"
-          },
-          {
-            "control": "Back, X, handle, backdrop",
-            "does": "return to Counting",
-            "goesTo": "farrowing.count"
-          },
-          {
             "control": "Finish farrowing (hold)",
-            "does": "locks the litter",
+            "does": "locks the litter and opens the locked record",
             "goesTo": "farrowing.locked"
           }
         ],
@@ -1271,8 +1164,6 @@
           "(raw) Back · HOLD TO FINISH"
         ],
         "edge": [
-          "Weak or deformed cannot be raised beyond Alive; the plus greys out",
-          "An early release of the hold cancels without writing",
           "Born cannot be 0 when finishing"
         ],
         "rules": [
@@ -1282,10 +1173,9 @@
           "\"Lock born N is hold-to-commit\" (Surfaces & entrances)"
         ],
         "issues": [
-          "The ruled button \"Lock born N\" is \"Finish farrowing\" here; the sheet title and the button repeat the same words.",
-          "Born / Alive / Dead panel repeats the Counting summary one tap earlier.",
-          "Litter weight and Assistance are two collapsed buttons rather than one cohesive group, and the ruled soft weight warning (outside 0.8–2.5 kg × alive) is absent.",
-          "Both an X and Back return to Counting."
+          "The ruled button \"Lock born N\" reads \"Finish farrowing\", the same words as the sheet title.",
+          "The Born / Alive / Dead panel repeats the Counting summary one tap earlier.",
+          "Litter weight and Assistance are two collapsed buttons, not one cohesive group; X and Back both return to Counting."
         ]
       }
     },
@@ -1298,44 +1188,42 @@
       "preset": "blocked",
       "figma": "",
       "notes": {
-        "purpose": "The Finish sheet when an unsaved record waits: a banner says what to resolve first and Finish farrowing stays disabled.",
-        "states": [
-          "Preset: an Edit draft exists (Crushed raised by one) -> banner \"Save your correction first / Resolve this before finishing.\" with Review",
-          "Unsaved piglet deaths -> \"Save piglet deaths first\" (not reachable today because the drawer clears its draft when left)",
-          "Unsaved sow cause / other sow draft -> \"Save or clear the sow record\""
-        ],
+        "purpose": "The Finish sheet when an unsaved record waits: a banner says what to resolve first and Finish stays disabled.",
+        "states": [],
         "elements": [
           {
             "name": "Pending banner",
-            "shows": "Save your correction first · Resolve this before finishing.  Review ›",
-            "logic": "Appears above the totals whenever hasDraft(s) is true: an Edit with changes, a death draft, or a sow cause. The text names the first applicable draft. Review leads to the drawer (death draft or sow cause) or to Edit.",
-            "source": "prototype farrowing-astra-concept.js finish() review"
+            "shows": "Warning above the totals with Review ›.",
+            "states": [
+              {
+                "state": "Correction",
+                "when": "An Edit with changes exists",
+                "shows": "\"Save your correction first · Resolve this before finishing.\" Review opens Edit"
+              },
+              {
+                "state": "Piglet deaths",
+                "when": "A death draft exists",
+                "shows": "\"Save piglet deaths first\" (unreachable today because leaving the drawer clears the draft). Review opens the drawer"
+              },
+              {
+                "state": "Sow record",
+                "when": "A sow cause is chosen but unsaved",
+                "shows": "\"Save or clear the sow record\". Review opens the drawer"
+              }
+            ],
+            "logic": "Shown whenever any draft exists; the text names the first applicable one in the order death draft, correction, sow cause.",
+            "source": "farrowing-astra-concept.js hasDraft(), finish()",
+            "at": "Resolve this before finishing."
           },
           {
-            "name": "Totals, condition rows, optional buttons",
-            "shows": "Same as Finish",
-            "logic": "The weak / deformed steppers and the optional facts stay usable.",
-            "source": "prototype farrowing-astra-concept.js finish()"
-          },
-          {
-            "name": "Bar · Finish farrowing",
-            "shows": "Greyed, caption HOLD TO FINISH",
-            "logic": "Disabled until the draft is saved or cleared; a held press does nothing.",
-            "source": "hold(..., blocked)"
+            "name": "Finish farrowing",
+            "shows": "Greyed, caption HOLD TO FINISH.",
+            "rule": "A held press does nothing until the draft is saved or cleared; a draft never crosses the lock. Clearing in Edit returns to the plain Finish sheet.",
+            "source": "farrowing-astra-concept.js hold(…, blocked)",
+            "at": "HOLD TO FINISH"
           }
         ],
-        "controls": [
-          {
-            "control": "Review ›",
-            "does": "opens the unsaved item",
-            "goesTo": "farrowing.edit"
-          },
-          {
-            "control": "Back",
-            "does": "returns to Counting",
-            "goesTo": "farrowing.count"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) Save your correction first",
           "(raw) Save piglet deaths first",
@@ -1343,18 +1231,14 @@
           "(raw) Resolve this before finishing.",
           "(raw) Review"
         ],
-        "edge": [
-          "A draft never crosses the lock: saving or clearing it re-arms Finish in place",
-          "Clearing in Edit returns here as the plain Finish sheet"
-        ],
+        "edge": [],
         "rules": [
           "\"A draft never crosses the lock\" and the pointer \"1 death unsaved · Record dead\" above the bar (Starting and ending a session)",
           "\"this is a guard on the lock, not a gate on recording\" (Starting and ending a session)"
         ],
         "issues": [
-          "Banner copy and layout differ from the ruled pointer \"1 death unsaved · Record dead\" above the bar.",
-          "The disabled Finish button is dimmed; the Lock's floor-gray family is the ruled form.",
-          "Only the Edit-draft route can reach this state; the death-draft variant is unreachable because Back clears the draft."
+          "Banner copy and layout differ from the ruled pointer \"1 death unsaved · Record dead\" above the bar; the disabled button is dimmed.",
+          "Only the Edit-draft route reaches this state; the death-draft variant is unreachable."
         ]
       }
     },
@@ -1367,99 +1251,47 @@
       "preset": "locked",
       "figma": "",
       "notes": {
-        "purpose": "Read the finished litter: the frozen Born and every fact captured at finish, with doors to the log, further deaths and Edit.",
-        "states": [
-          "Default (sample 000418, finished Aug 27 08:12): Born 14 · Alive now 8 · Dead 6 · Weak 1 · Deformed 1 · Assisted Yes · Litter weight 12.6 kg",
-          "Facts not given read \"Not recorded\" (Assisted) or a dash (Litter weight)",
-          "Later deaths recorded here lower Alive now; Born never moves except through Correct born"
-        ],
+        "purpose": "Read the finished litter: the frozen Born and every fact captured at finish.",
+        "states": [],
         "elements": [
           {
-            "name": "Header · sow id",
-            "shows": "000418 ›",
-            "logic": "The sow's ear-tag id followed by a chevron; the whole title is a button (44px hit area) and is the one door to her sow page. Id is plain text in the mono face, no strike-through or other styling carries meaning.",
-            "source": "prototype farrowing-astra-concept.js identity(); tag from the sow record"
-          },
-          {
-            "name": "Header · pen / parity",
-            "shows": "B1 / Parity 3",
-            "logic": "Pen code, then \"Parity n\" (her current parity from the sow record).",
-            "source": "sow record: pen, parity"
-          },
-          {
-            "name": "Header · state line",
-            "shows": "Finished Aug 27 at 08:12 by G. Hansen",
-            "logic": "Replaces the status word with the finish stamp: \"Finished <date> at <time> by <hand>\" from the Farrowing finished event. Sample uses Aug 27.",
-            "source": "prototype farrowing-astra-concept.js identity() / recordStamp()"
-          },
-          {
-            "name": "Header · close (X)",
-            "shows": "X icon button, label \"Close sow drawer\"",
-            "logic": "Same exit as Back: leaves the sheet and returns to the room list (also folds the open visit when on Counting). The grab handle and the backdrop are a third and fourth way out.",
-            "source": "prototype farrowing-astra-concept.js act close"
-          },
-          {
-            "name": "Litter summary heading",
-            "shows": "Litter summary  View log ›",
-            "logic": "Link to the Farrowing log.",
-            "source": "prototype farrowing-astra-concept.js litterHeading()"
+            "name": "Header stamp",
+            "shows": "\"Finished Aug 27 at 08:12 by G. Hansen\" in place of the status word.",
+            "logic": "Date, time and hand come from the \"Farrowing finished\" event. This is the only place the finish date appears.",
+            "source": "farrowing-astra-concept.js recordStamp()",
+            "at": "Finished"
           },
           {
             "name": "Facts list",
-            "shows": "Born 14 · Alive now 8 · Dead 6 · Weak 1 · Deformed 1 · Assisted Yes · Litter weight 12.6 kg",
-            "logic": "Seven label/value rows in one panel. Born = frozen at finish. Alive now = Born - dead recorded (falls with later deaths). Dead = all dead types. Weak/Deformed from the Finish sheet. Assisted Yes / No / Not recorded. Litter weight in kg or a dash.",
-            "source": "prototype farrowing-astra-concept.js finishFacts()"
-          },
-          {
-            "name": "Dead › link",
-            "shows": "Dead ›",
-            "logic": "Only when Dead is above zero: opens the Death breakdown sheet (not a separate screen) listing each type with a count and a Total dead line.",
-            "source": "act(\"deathBreakdown\")"
-          },
-          {
-            "name": "Action row",
-            "shows": "Edit · Record death · More actions",
-            "logic": "Edit opens Edit on the locked record (Born row, finish details). Record death opens the drawer (deaths lower Alive now). More actions opens the Actions sheet.",
-            "source": "prototype farrowing-astra-concept.js recordActions()"
-          },
-          {
-            "name": "Bar",
-            "shows": "Back",
-            "logic": "Returns to the room list (no primary action: nothing is left to finish).",
-            "source": "prototype farrowing-astra-concept.js recordNavigation()"
+            "shows": "Born · Alive now · Dead · Weak · Deformed · Assisted · Litter weight.",
+            "states": [
+              {
+                "state": "Complete",
+                "when": "All finish facts given",
+                "shows": "Born 14 · Alive now 8 · Dead 6 · Weak 1 · Deformed 1 · Assisted Yes · Litter weight 12.6 kg"
+              },
+              {
+                "state": "Facts missing",
+                "when": "Assistance or weight not given",
+                "shows": "Assisted \"Not recorded\"; Litter weight a dash"
+              },
+              {
+                "state": "No deaths",
+                "when": "Dead is 0",
+                "shows": "\"Dead\" shows 0 and is not a link"
+              },
+              {
+                "state": "After later deaths",
+                "when": "Piglet deaths recorded after the lock",
+                "shows": "Alive now falls; Born never moves except through Correct born"
+              }
+            ],
+            "logic": "Born is frozen at finish. Alive now = Born − dead recorded. Dead = all dead types; with Dead above zero it is a link to a Death breakdown sheet (each type with a count and Total dead).",
+            "source": "farrowing-astra-concept.js finishFacts(), deathBreakdown()",
+            "at": "Alive now"
           }
         ],
-        "controls": [
-          {
-            "control": "View log ›",
-            "does": "opens the Farrowing log",
-            "goesTo": "farrowing.history"
-          },
-          {
-            "control": "Dead ›",
-            "does": "opens the Death breakdown sheet"
-          },
-          {
-            "control": "Edit",
-            "does": "opens Edit on the finished litter",
-            "goesTo": "farrowing.edit-finished"
-          },
-          {
-            "control": "Record death",
-            "does": "opens the death drawer",
-            "goesTo": "farrowing.death"
-          },
-          {
-            "control": "More actions / sow id ›",
-            "does": "sow page and its Actions sheet",
-            "goesTo": "pig-profile.full"
-          },
-          {
-            "control": "Back, X, handle, backdrop",
-            "does": "room list",
-            "goesTo": "farrowing.room"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) Finished <date> at <time> by <hand>",
           "(raw) Litter summary · View log",
@@ -1479,10 +1311,8 @@
         ],
         "issues": [
           "The face is a seven-row facts list, not the ruled record face (summary card + At finish + Finished + Farrowing record rows).",
-          "Dead is told three ways: the Dead fact, the Dead › breakdown sheet and the log; Born, Alive and Dead also appear on Finish and Counting.",
-          "Finish date appears only in the header stamp; there is no Finished row.",
-          "Edit and Record death sit in an action row; the ruled bar is Edit · Record dead.",
-          "View log is a link on the section title, not the chevron on the fact line."
+          "Dead is told three ways (fact, breakdown sheet, log); Born, Alive and Dead repeat on Finish and Counting.",
+          "Edit and Record death sit in an action row (ruled bar: Edit · Record dead); View log is a title link, not the fact-line chevron."
         ]
       }
     },
@@ -1496,66 +1326,45 @@
       "figma": "",
       "notes": {
         "purpose": "Correct posted figures while she is still farrowing: Alive and each dead type in place, logged as one stamped correction.",
-        "states": [
-          "Untouched: quiet list, Save disabled, Clear disabled, no banner",
-          "First change: amber banner \"Correcting a past record · logged as G. Hansen\" and a mono line per change (\"Crushed 2 → 1\"); changed values turn amber; Save enabled",
-          "Back keeps the draft (Counting shows it as pending; Finish is then blocked)"
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Header",
-            "shows": "Edit record · 000418 · B1, Clear",
-            "logic": "Title and subtitle name the record. Clear (text action) discards the draft; disabled until a change exists.",
-            "source": "prototype farrowing-astra-concept.js identity()"
+            "name": "Correction banner",
+            "shows": "Amber \"Correcting a past record · logged as G. Hansen\" with one line per change.",
+            "states": [
+              {
+                "state": "Untouched",
+                "when": "No change yet",
+                "shows": "No banner; Save and Clear disabled"
+              },
+              {
+                "state": "Changed",
+                "when": "From the first change",
+                "shows": "Banner plus a mono line per figure, e.g. \"Crushed 2 → 1\"; changed values turn amber; Save enabled"
+              }
+            ],
+            "source": "farrowing-astra-concept.js editSummary(), changes()",
+            "at": "Edit record"
           },
           {
-            "name": "Banner + change summary",
-            "shows": "Correcting a past record · logged as G. Hansen; Crushed 2 → 1",
-            "logic": "Appears at the first change. One line per changed figure, \"name from → to\".",
-            "source": "prototype farrowing-astra-concept.js editSummary(), changes()"
+            "name": "Figure rows",
+            "shows": "Alive and the six dead types, each − n +.",
+            "logic": "Editable in place, floor 0, amber when different from posted. No Born row (Born derives). Alive can go below the counting floor here; nothing on the screen explains it.",
+            "source": "farrowing-astra-concept.js edit(), act(\"editStep\")",
+            "at": "Stillborn"
           },
           {
-            "name": "Alive row",
-            "shows": "Alive  - 9 +",
-            "logic": "Editable in place; - stops at 0. Amber when different from posted. No Born row (Born derives).",
-            "source": "s.edit.alive"
-          },
-          {
-            "name": "Dead type rows",
-            "shows": "Stillborn · Mummified · Crushed · Scours · Starve-out · Other, each - n +",
-            "logic": "Edit posted dead counts; floors at 0; amber when changed.",
-            "source": "s.edit.dead"
-          },
-          {
-            "name": "Bar · Back",
-            "shows": "Back",
-            "logic": "Keeps the draft and returns to the screen it was opened from.",
-            "source": "act(\"back\")"
-          },
-          {
-            "name": "Bar · Save",
-            "shows": "Save (primary)",
-            "logic": "Disabled until there is a change. Commits everything as one stamped correction event, folds the open visit and re-anchors the floor.",
-            "source": "act(\"saveEdit\")"
+            "name": "Save and Back",
+            "shows": "Bar.",
+            "rule": "Save commits everything as one stamped correction event, folds the open visit and re-anchors the floor. Back keeps the draft: Counting shows it as pending and Finish is then blocked.",
+            "source": "farrowing-astra-concept.js act(\"saveEdit\")",
+            "at": "Save"
           }
         ],
         "controls": [
           {
-            "control": "Row - / +",
-            "does": "edit the draft figure"
-          },
-          {
-            "control": "Clear",
-            "does": "discards the draft"
-          },
-          {
             "control": "Save",
-            "does": "commits the correction and returns",
-            "goesTo": "farrowing.count"
-          },
-          {
-            "control": "Back, X, handle, backdrop",
-            "does": "keep the draft and return",
+            "does": "commits the correction and returns (to Finish when opened from it)",
             "goesTo": "farrowing.count"
           }
         ],
@@ -1565,8 +1374,6 @@
           "(raw) Clear · Back · Save"
         ],
         "edge": [
-          "Opened from Finish (via Review) it returns to Finish after Save",
-          "Zero-change Save is disabled",
           "A missed fact is a recording, never an Edit"
         ],
         "rules": [
@@ -1576,9 +1383,8 @@
           "\"The correction mark is the amber value, not a pencil\" (After the lock)"
         ],
         "issues": [
-          "Save is shown dimmed until a change exists; the ruling says Save is absent before a change, never grayed.",
-          "Clear sits in the header; the ruling places it on the change-summary row.",
-          "Alive can be lowered here below the Born floor that governs counting (allowed by design, but nothing on the screen explains it)."
+          "Save is dimmed until a change exists; the ruling says absent before a change, never grayed.",
+          "Clear sits in the header; the ruling places it on the change-summary row."
         ]
       }
     },
@@ -1591,66 +1397,55 @@
       "preset": "born",
       "figma": "",
       "notes": {
-        "purpose": "After farrowing has finished, someone finds that Born was wrong: a popup lets them add born piglets or set the total again.",
-        "states": [
-          "Popup open over the dimmed post-lock Edit (preset: \"More born\", +1, Alive)",
-          "More born -> Died: cause list appears (Other selected by default)",
-          "Count was wrong: plain total, floor = dead recorded"
-        ],
+        "purpose": "After farrowing has finished, someone finds Born was wrong: a popup adds born piglets or sets the total again.",
+        "states": [],
         "elements": [
           {
-            "name": "Dialog title",
-            "shows": "Born 14 · correct it",
-            "logic": "The frozen Born with an edit icon.",
-            "source": "s.edit.born"
-          },
-          {
-            "name": "Hint",
-            "shows": "Choose what changed.",
-            "logic": "Static.",
-            "source": "static"
-          },
-          {
-            "name": "Radios",
-            "shows": "More born / Count was wrong",
-            "logic": "More born adds a signed delta; Count was wrong replaces the total. Switching resets the number (1, or the current Born).",
-            "source": "act(\"bornMode\")"
-          },
-          {
-            "name": "Stepper",
-            "shows": "+1 (More born) / 14 (Count was wrong)",
-            "logic": "More born minimum 1. Count was wrong minimum = dead recorded (cannot go below the bodies).",
-            "source": "act(\"bornStep\")"
+            "name": "Correction mode",
+            "shows": "Radios More born / Count was wrong with a stepper.",
+            "states": [
+              {
+                "state": "More born",
+                "when": "Extra piglets found",
+                "shows": "Stepper \"+1\", minimum 1; adds a signed delta"
+              },
+              {
+                "state": "Count was wrong",
+                "when": "Total was mistaken",
+                "shows": "Stepper shows the new Born (starts at the current 14); minimum = dead recorded, so it cannot go below the bodies"
+              }
+            ],
+            "logic": "Switching mode resets the number (1, or the current Born).",
+            "source": "farrowing-astra-concept.js act(\"bornMode\"), act(\"bornStep\")",
+            "at": "More born"
           },
           {
             "name": "Alive | Died",
-            "shows": "Alive / Died chips",
-            "logic": "Only for More born: where the extra piglets go. Died reveals the cause list (six types).",
-            "source": "act(\"bornSplit\")"
+            "shows": "Chips for where the extra piglets go.",
+            "states": [
+              {
+                "state": "Alive",
+                "when": "More born only (default)",
+                "shows": "Extra piglets are added alive"
+              },
+              {
+                "state": "Died",
+                "when": "More born only",
+                "shows": "Cause list of the six types appears (Other preselected) and the piglets add to that dead type"
+              }
+            ],
+            "source": "farrowing-astra-concept.js act(\"bornSplit\"), popup()",
+            "at": "Alive"
           },
           {
-            "name": "Back · Apply",
-            "shows": "Back / Apply",
-            "logic": "Back closes. Apply updates Born in the draft (and the chosen dead type), returns to Edit with Born amber; Save on Edit commits.",
-            "source": "act(\"applyBorn\")"
+            "name": "Apply",
+            "shows": "Back · Apply.",
+            "rule": "Apply updates Born (and the chosen dead type) in the Edit draft and returns to Edit with Born amber; nothing is saved until Save on Edit.",
+            "source": "farrowing-astra-concept.js act(\"applyBorn\")",
+            "at": "Apply"
           }
         ],
-        "controls": [
-          {
-            "control": "Radios, stepper, chips",
-            "does": "compose the correction"
-          },
-          {
-            "control": "Apply",
-            "does": "returns to Edit with Born amber",
-            "goesTo": "farrowing.edit-finished"
-          },
-          {
-            "control": "Back",
-            "does": "closes the popup",
-            "goesTo": "farrowing.edit-finished"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) Born N · correct it",
           "(raw) Choose what changed.",
@@ -1659,8 +1454,7 @@
           "(raw) Back · Apply"
         ],
         "edge": [
-          "Born can only be changed after the lock",
-          "Apply does not save; Save on Edit does"
+          "Born can only be changed after the lock"
         ],
         "rules": [
           "\"Post-lock Edit … Born renders as a locked row whose one key is an amber ✎ … opens the ceremony popup\" (After the lock)",
@@ -1669,7 +1463,7 @@
           "\"Extra live piglet found later routes through … More born\" (After the lock)"
         ],
         "issues": [
-          "More born -> Died uses the full type list inline inside the popup; a long popup on a small phone.",
+          "More born → Died shows the full type list inline, a long popup on a small phone.",
           "The Edit screen behind the popup is not shown on its own anywhere (see Edit record (finished litter))."
         ]
       }
@@ -1683,65 +1477,77 @@
       "preset": "history",
       "figma": "",
       "notes": {
-        "purpose": "Read-only list of everything recorded for this litter, grouped by day, with corrections, the finish and photos.",
+        "purpose": "Read-only list of everything recorded for this litter, grouped by day.",
         "states": [
-          "Locked sample: +1 crushed (5 days ago), +4 alive, Farrowing finished · born 14, then earlier lines",
-          "While counting: open visit as its own top line \"+4 alive · this visit\"",
-          "Production outcome sows: same sheet titled \"Production log\"",
-          "Empty: \"Counts and saved updates will appear here.\""
+          "Photo dialog (tap a thumbnail): Back only, no Delete",
+          "Opened from Counting, Locked record, Sow died or an outcome row; Back returns to that origin"
         ],
         "elements": [
           {
-            "name": "Title",
-            "shows": "Farrowing log",
-            "logic": "Title of the page; subtitle \"B1 · 000418 · born 14 · 8 alive now\" (or \"farrowing · N alive\").",
-            "source": "prototype farrowing-astra-concept.js detailSheet()"
+            "name": "Log title",
+            "shows": "Title and subtitle naming the sow.",
+            "states": [
+              {
+                "state": "Farrowing log",
+                "when": "Normal litter",
+                "shows": "Subtitle \"B1 · 000418 · born 14 · 8 alive now\" (or \"farrowing · N alive\" while counting)"
+              },
+              {
+                "state": "Production log",
+                "when": "Sow has a recorded outcome",
+                "shows": "Title \"Production log\"; subtitle names the outcome"
+              }
+            ],
+            "source": "farrowing-astra-concept.js detailSheet(), history()",
+            "at": "Farrowing log"
           },
           {
-            "name": "Day group",
-            "shows": "Aug 26 / 5 days ago / Today",
-            "logic": "Group label = the event's day text.",
-            "source": "events[].day"
-          },
-          {
-            "name": "Entry",
-            "shows": "+3 crushed · +1 other",
-            "logic": "Event text. Detail line: \"Correction\" for corrections, \"Farrowing finished\" for the lock; meta \"08:12 · G. Hansen\" (time and full name on every row).",
-            "source": "prototype farrowing-astra-concept.js history()"
-          },
-          {
-            "name": "Photo tiles",
-            "shows": "Thumbnails under an entry",
-            "logic": "Tap opens the photo dialog (Back only).",
-            "source": "savedPhoto"
-          },
-          {
-            "name": "Bar · Back",
-            "shows": "Back",
-            "logic": "Returns to the sheet that opened it.",
-            "source": "act(\"back\")"
+            "name": "Log entry",
+            "shows": "Event text, a detail line and \"08:12 · G. Hansen\".",
+            "states": [
+              {
+                "state": "Count or death",
+                "when": "Normal save",
+                "shows": "\"+3 crushed · +1 other\" or \"+5 alive\"; no detail line"
+              },
+              {
+                "state": "Correction",
+                "when": "Saved from Edit",
+                "shows": "Detail line \"Correction\""
+              },
+              {
+                "state": "Finish",
+                "when": "Lock event",
+                "shows": "\"Farrowing finished · born 14\" with detail \"Farrowing finished\""
+              },
+              {
+                "state": "This visit",
+                "when": "Counting is open with a pending count",
+                "shows": "Top line \"+4 alive · this visit\""
+              },
+              {
+                "state": "With photos",
+                "when": "Photos were attached",
+                "shows": "Thumbnail tiles under the entry"
+              },
+              {
+                "state": "Empty",
+                "when": "No events",
+                "shows": "\"Counts and saved updates will appear here.\""
+              }
+            ],
+            "logic": "Group label is the event's day text; the sample mixes relative (\"5 days ago\") and absolute (\"Aug 26\") labels and is not newest-first.",
+            "source": "farrowing-astra-concept.js history()",
+            "at": "G. Hansen"
           }
         ],
-        "controls": [
-          {
-            "control": "Photo thumbnail",
-            "does": "opens the photo dialog"
-          },
-          {
-            "control": "Back, X, handle",
-            "does": "return to the previous screen",
-            "goesTo": "farrowing.locked"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) Farrowing log",
           "(raw) Counts and saved updates will appear here.",
           "(raw) Correction · Farrowing finished"
         ],
-        "edge": [
-          "Opened from Counting, Locked record, Sow died or an outcome row; Back returns to that origin",
-          "Nothing is tappable except photos"
-        ],
+        "edge": [],
         "rules": [
           "\"One ledger surface, the Farrowing record page … Read-only, the list is the reveal\" (After the lock)",
           "\"Dates speak relative within the week\" (Names and glyphs)",
@@ -1749,10 +1555,8 @@
         ],
         "issues": [
           "Title is \"Farrowing log\"; the copy pass names it \"Farrowing record\".",
-          "Milestone rows print \"Farrowing finished\" twice (event text \"Farrowing finished · born 14\" plus the detail line); correction rows add the word \"Correction\".",
-          "Every row repeats the hand's full name; the ruling puts the hand in the day header when one hand wrote the day.",
-          "No rail, dots, amber corrections or red sow-death milestone as ruled; plain log list.",
-          "The sample order is not newest-first by date (5 days ago, Aug 26, Aug 27, …), mixing relative and absolute day labels."
+          "Finish rows print \"Farrowing finished\" twice; every row repeats the hand's full name instead of grouping it in the day header.",
+          "No rail, amber corrections or red sow-death milestone as ruled; day order is not newest-first."
         ]
       }
     },
@@ -1765,96 +1569,51 @@
       "preset": "ended",
       "figma": "",
       "notes": {
-        "purpose": "The record of a litter whose sow died: a red band with the cause, the litter facts as they stood, and the doors still available.",
-        "states": [
-          "Default (sample 000399, B3): cause Prolapse, Born 10 · Alive 7 · Dead 3",
-          "Death before or during farrowing: litter excluded from finished-litter KPIs; after farrowing: included"
-        ],
+        "purpose": "The record of a litter whose sow died: a red band with the cause and the litter facts as they stood.",
+        "states": [],
         "elements": [
           {
-            "name": "Header · sow id",
-            "shows": "000399 ›",
-            "logic": "The sow's ear-tag id followed by a chevron; the whole title is a button (44px hit area) and is the one door to her sow page. Id is plain text in the mono face, no strike-through or other styling carries meaning.",
-            "source": "prototype farrowing-astra-concept.js identity(); tag from the sow record"
-          },
-          {
-            "name": "Header · pen / parity",
-            "shows": "B3 / Parity 4",
-            "logic": "Pen code, then \"Parity n\" (her current parity from the sow record).",
-            "source": "sow record: pen, parity"
-          },
-          {
-            "name": "Header · state line",
-            "shows": "Died Aug 25 at 06:20 by L. Madsen",
-            "logic": "Death stamp from the Sow died event.",
-            "source": "prototype farrowing-astra-concept.js identity() / recordStamp()"
-          },
-          {
-            "name": "Header · close (X)",
-            "shows": "X icon button, label \"Close sow drawer\"",
-            "logic": "Same exit as Back: leaves the sheet and returns to the room list (also folds the open visit when on Counting). The grab handle and the backdrop are a third and fourth way out.",
-            "source": "prototype farrowing-astra-concept.js act close"
-          },
-          {
-            "name": "Danger band",
-            "shows": "Sow died · prolapse",
-            "logic": "Red band with the chosen cause (Other prints its details).",
-            "source": "prototype farrowing-astra-concept.js locked() ended"
+            "name": "Header stamp and band",
+            "shows": "\"Died Aug 25 at 06:20 by L. Madsen\" and a red band \"Sow died · prolapse\".",
+            "logic": "Stamp from the Sow died event; the band carries the chosen cause (Other prints its details). The death is thus told in the stamp, the band and the room chip.",
+            "source": "farrowing-astra-concept.js recordStamp(), locked()",
+            "at": "Sow died"
           },
           {
             "name": "Litter summary",
-            "shows": "Born 10 · Alive 7 · Dead 3 + causes",
-            "logic": "Summary panel with the three numbers and the causes line (no finish facts, nothing was finished). Heading has View log ›.",
-            "source": "prototype farrowing-astra-concept.js summary()"
+            "shows": "Born 10 · Alive 7 · Dead 3 with a causes line.",
+            "logic": "No finish facts (nothing was finished). Record death here is for piglets only. The 7 alive piglets stay under piglet care.",
+            "source": "farrowing-astra-concept.js summary()",
+            "at": "Litter summary"
           },
           {
-            "name": "Action row",
-            "shows": "Edit · Record death · More actions",
-            "logic": "Record death is for piglets only (the sow segment is hidden). Edit opens the post-lock Edit (no finish details).",
-            "source": "prototype farrowing-astra-concept.js recordActions()"
-          },
-          {
-            "name": "Bar",
-            "shows": "Back",
-            "logic": "Returns to the room list.",
-            "source": "recordNavigation"
+            "name": "Death timing",
+            "shows": "Whether this litter counts in the task figures.",
+            "states": [
+              {
+                "state": "Before or during farrowing",
+                "when": "Sow died before the first count or mid-farrowing",
+                "shows": "Litter excluded from finished-litter KPIs and from Farrowed"
+              },
+              {
+                "state": "After farrowing",
+                "when": "Sow died once the litter was finished",
+                "shows": "Litter included in KPIs and in Farrowed"
+              }
+            ],
+            "logic": "Timing is stored when the death is saved (before = Born was 0).",
+            "source": "farrowing-astra-concept.js act(\"saveDeath\") deathStage, taskClosureReview()",
+            "at": "Sow died"
           }
         ],
-        "controls": [
-          {
-            "control": "View log ›",
-            "does": "opens the log",
-            "goesTo": "farrowing.history"
-          },
-          {
-            "control": "Edit",
-            "does": "opens Edit (Born row, dead rows)",
-            "goesTo": "farrowing.edit-finished"
-          },
-          {
-            "control": "Record death",
-            "does": "piglet deaths only",
-            "goesTo": "farrowing.death"
-          },
-          {
-            "control": "More actions",
-            "does": "sow page",
-            "goesTo": "pig-profile.full"
-          },
-          {
-            "control": "Back",
-            "does": "room list",
-            "goesTo": "farrowing.room"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) Sow died · <cause>",
           "(raw) Died <date> at <time> by <hand>",
           "(raw) Born · Alive · Dead"
         ],
         "edge": [
-          "She stays in the room until batch close",
-          "7 alive piglets stay under piglet care (processing can move them)"
+          "She stays in the room until the task ends"
         ],
         "rules": [
           "\"She stays in the room … a Done-register row — red chip sow died\" (Starting and ending a session)",
@@ -1862,9 +1621,8 @@
           "\"Sow dies mid-farrowing … Born derives from what stands, classification skipped\" (Starting and ending a session)"
         ],
         "issues": [
-          "The death is stated in the header stamp, the red band and the room chip.",
-          "The ruled \"Farrowing record\" row and the stamp inside the band are missing; the record face is the generic summary.",
-          "Piglet deaths after the sow died are recordable; the ruling says nothing about them here."
+          "The ruled \"Farrowing record\" row and the stamp inside the band are missing; the face is the generic summary.",
+          "Piglet deaths after the sow died are recordable; the ruling says nothing about them."
         ]
       }
     },
@@ -1878,71 +1636,119 @@
       "figma": "",
       "notes": {
         "purpose": "Review the whole task across all units and end it: warnings first, then performance and outcomes, then hold to end.",
-        "states": [
-          "Sample: 2 sows still farrowing (Unit 7 000418, Unit 6) and 9 awaiting",
-          "Title \"End task early\", hold button disabled until the active sows are finished and drafts are saved or cleared"
-        ],
+        "states": [],
         "elements": [
           {
-            "name": "Header",
-            "shows": "End task early · Farrowing · All 3 units",
-            "logic": "Title is \"End task early\" whenever any sow is awaiting or the task is blocked; scope line names all units.",
-            "source": "prototype farrowing-astra-concept.js taskEndSheet()"
+            "name": "Title",
+            "shows": "\"End task early · Farrowing · All 3 units\".",
+            "logic": "Title is \"End task early\" whenever any sow is awaiting or the task is blocked, otherwise \"End task\".",
+            "source": "farrowing-astra-concept.js taskEndSheet()",
+            "at": "End task early"
           },
           {
-            "name": "Warning · will be removed",
-            "shows": "9 sows will be removed from this batch / These sows have not farrowed.",
-            "logic": "Amber card; count = Awaiting sows in all units. Opens the awaiting list.",
-            "source": "prototype farrowing-astra-concept.js taskWarning(\"awaiting\")"
+            "name": "Warning cards",
+            "shows": "Cards above the metrics; each opens a grouped sow list.",
+            "states": [
+              {
+                "state": "Will be removed",
+                "when": "Sows awaiting in any unit",
+                "shows": "Amber \"9 sows will be removed from this batch / These sows have not farrowed.\""
+              },
+              {
+                "state": "Still farrowing",
+                "when": "Active sows in any unit",
+                "shows": "\"2 sows are still farrowing / Finish these records before ending.\" Blocks ending"
+              },
+              {
+                "state": "Unsaved records",
+                "when": "Any sow has an Edit, death or sow draft",
+                "shows": "\"N unsaved records / Save or clear the changes first.\" Blocks ending"
+              }
+            ],
+            "source": "farrowing-astra-concept.js taskWarning()",
+            "at": "still farrowing"
           },
           {
-            "name": "Warning · still farrowing",
-            "shows": "2 sows are still farrowing / Finish these records before ending.",
-            "logic": "Count = Active sows in all units. Blocks ending. Opens the active list.",
-            "source": "prototype farrowing-astra-concept.js taskWarning(\"active\")"
-          },
-          {
-            "name": "Warning · unsaved records",
-            "shows": "N unsaved records / Save or clear the changes first.",
-            "logic": "Appears only when sows have an Edit, death or sow draft. Blocks ending.",
-            "source": "prototype farrowing-astra-concept.js taskWarning(\"drafts\")"
+            "name": "Warning list",
+            "shows": "The sheet a card opens (not a separate screen): sows grouped for one reason.",
+            "states": [
+              {
+                "state": "Active farrowing",
+                "when": "From Still farrowing",
+                "shows": "Each sow with \"N alive\"; hint \"Open a sow to review and finish the record.\""
+              },
+              {
+                "state": "Awaiting farrowing",
+                "when": "From Will be removed",
+                "shows": "Each sow with her due text; notice that ending removes them from the batch"
+              },
+              {
+                "state": "Unsaved records",
+                "when": "From Unsaved records",
+                "shows": "Each sow with \"Unsaved\"; hint to save or clear"
+              },
+              {
+                "state": "Sow deaths",
+                "when": "From Task outcomes",
+                "shows": "Each sow with timing (Before / During / After farrowing) and, if she had a litter, its figures and whether KPIs include it"
+              }
+            ],
+            "rule": "Opening a sow switches the room to her unit; Back returns to the same review.",
+            "source": "farrowing-astra-concept.js taskEndSheet() roomTaskSows",
+            "at": "still farrowing"
           },
           {
             "name": "Performance metrics",
-            "shows": "Born alive / litter 12.0 (Target 12) · Stillborn rate 7.2% (7 stillborn / 97 born) · Born 97 · Alive now · Piglet deaths",
-            "logic": "Finished litters only (finished and not ended before/during farrowing; sample: 7 litters). Born alive / litter = (born - stillborn - mummified) / finished litters. Stillborn rate = stillborn / born. Dash when there is no denominator. Target comes from bornAliveTarget (12).",
-            "source": "prototype farrowing-astra-concept.js taskClosureReview().performance, taskPerformance()"
+            "shows": "Born alive / litter, Stillborn rate, Born, Alive now, Piglet deaths.",
+            "states": [
+              {
+                "state": "No finished litter",
+                "when": "Zero finished litters",
+                "shows": "Dashes where there is no denominator"
+              },
+              {
+                "state": "Below target",
+                "when": "Born alive / litter under the target",
+                "shows": "Target line in amber (\"Target 12\")"
+              }
+            ],
+            "logic": "Finished litters only (finished and not ended before or during farrowing; sample 7). Born alive / litter = (born − stillborn − mummified) / finished litters. Stillborn rate = stillborn / born. Target comes from bornAliveTarget (12).",
+            "source": "farrowing-astra-concept.js taskClosureReview().performance, taskPerformance()",
+            "at": "Performance metrics"
           },
           {
             "name": "Task outcomes",
-            "shows": "Finished farrowing 7 · Still farrowing 2 · Awaiting farrowing 9 · Sow deaths 1",
-            "logic": "Rows of the sow count per outcome for every unit; zero rows are omitted (except Finished farrowing and Awaiting); miscarriages, not in pig and removed appear only when above zero. Title meta \"19 sows\" = all sows in the task.",
-            "source": "prototype farrowing-astra-concept.js taskOutcomeSummary()"
+            "shows": "Sow count per outcome across all units; title meta is all sows in the task.",
+            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Miscarriages, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
+            "source": "farrowing-astra-concept.js taskOutcomeSummary()",
+            "at": "Task outcomes"
           },
           {
-            "name": "Bar",
-            "shows": "Back · End task early (disabled, red)",
-            "logic": "Disabled while blocked.",
-            "source": "hold(..., blocked)"
+            "name": "End task button",
+            "shows": "Hold button in the bar.",
+            "states": [
+              {
+                "state": "Blocked",
+                "when": "Active sows or unsaved records remain",
+                "shows": "Red \"End task early\", disabled"
+              },
+              {
+                "state": "Early",
+                "when": "Sows awaiting, nothing blocking",
+                "shows": "Red \"End task early\", HOLD TO END EARLY"
+              },
+              {
+                "state": "Normal",
+                "when": "No awaiting sows, nothing blocking",
+                "shows": "Ink \"End task\", HOLD TO END"
+              }
+            ],
+            "rule": "Hold 0.85 s ends the task and opens the receipt. Ending early marks awaiting sows removed from the batch (a marker only; no transfer is built). Disabled while blocked.",
+            "source": "farrowing-astra-concept.js taskEndSheet(), closeTask()",
+            "at": "HOLD TO END EARLY"
           }
         ],
-        "controls": [
-          {
-            "control": "Warning cards (still farrowing, unsaved records, will be removed)",
-            "does": "open a grouped sow list (not a separate screen); each sow there opens her record and Back returns to the same review",
-            "goesTo": "farrowing.count"
-          },
-          {
-            "control": "Back",
-            "does": "returns to the Task overview",
-            "goesTo": "farrowing.overview"
-          },
-          {
-            "control": "End task / End task early (hold 0.85 s)",
-            "does": "ends the task and opens the receipt",
-            "goesTo": "farrowing.task-receipt"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) End task · End task early",
           "(raw) Farrowing · All 3 units",
@@ -1950,18 +1756,16 @@
           "(raw) Task outcomes · N sows",
           "(raw) HOLD TO END · HOLD TO END EARLY"
         ],
+        "edge": [
+          "Blocking items are listed first; ending is impossible until they are cleared"
+        ],
         "rules": [
           "Same grammar as the ruled End task: \"manual only … hold-to-commit with receipt; … cannot end while the batch's farrowing task is open\" (Piglet processing, Q5)",
           "Task closure doc: active farrowing and unsaved drafts block; awaiting sows are removed from the batch (ux/research/farrowing/ASTRA-TASK-CLOSURE.md)"
         ],
-        "edge": [
-          "Blocking items are listed first; ending is impossible until they are cleared",
-          "Opening a listed sow and pressing Back returns to this review"
-        ],
         "issues": [
-          "Warning cards, Task outcomes (\"Still farrowing 2\", \"Awaiting farrowing 9\") and the Task overview card all state the same counts.",
-          "Performance metrics and Task outcomes are repeated on the Task overview, End task and receipt.",
-          "The prototype blocks ending on active sows; the contract C9 says closing is never blocked (older); unclear which holds. The processing ruling blocks only while the farrowing task is open.",
+          "Warning cards, Task outcomes rows and the Task overview card state the same counts; metrics and outcomes also repeat on the overview and receipt.",
+          "The prototype blocks ending on active sows; contract C9 says closing is never blocked. Unclear which holds.",
           "Primary button is dimmed while disabled (dim-as-disabled)."
         ]
       }
@@ -1975,60 +1779,68 @@
       "preset": "task-ready",
       "figma": "",
       "notes": {
-        "purpose": "Review the whole task across all units and end it: warnings first, then performance and outcomes, then hold to end.",
-        "states": [
-          "All active sows finished; 9 sows are still awaiting",
-          "Title \"End task early\", red hold button enabled"
-        ],
+        "purpose": "Review the whole task across all units and end it early: awaiting sows will be removed from the batch.",
+        "states": [],
         "elements": [
           {
-            "name": "Header",
-            "shows": "End task early · Farrowing · All 3 units",
-            "logic": "Early because sows remain awaiting.",
-            "source": "prototype farrowing-astra-concept.js taskEndSheet()"
-          },
-          {
-            "name": "Warning · will be removed",
-            "shows": "9 sows will be removed from this batch / These sows have not farrowed.",
-            "logic": "Amber card; the removal is the cost of ending early. Opens the awaiting list.",
-            "source": "prototype farrowing-astra-concept.js taskWarning(\"awaiting\")"
+            "name": "Removal warning",
+            "shows": "Amber card \"9 sows will be removed from this batch / These sows have not farrowed.\"",
+            "logic": "Count = awaiting sows in all units; it opens the awaiting list. The removal is the cost of ending early; where the sows go is not said.",
+            "source": "farrowing-astra-concept.js taskWarning(\"awaiting\")",
+            "at": "will be removed from this batch"
           },
           {
             "name": "Performance metrics",
-            "shows": "Born alive / litter 12.0 (Target 12) · Stillborn rate 7.2% (7 stillborn / 97 born) · Born 97 · Alive now · Piglet deaths",
-            "logic": "Finished litters only (finished and not ended before/during farrowing; sample: 7 litters). Born alive / litter = (born - stillborn - mummified) / finished litters. Stillborn rate = stillborn / born. Dash when there is no denominator. Target comes from bornAliveTarget (12).",
-            "source": "prototype farrowing-astra-concept.js taskClosureReview().performance, taskPerformance()"
+            "shows": "Born alive / litter, Stillborn rate, Born, Alive now, Piglet deaths.",
+            "states": [
+              {
+                "state": "No finished litter",
+                "when": "Zero finished litters",
+                "shows": "Dashes where there is no denominator"
+              },
+              {
+                "state": "Below target",
+                "when": "Born alive / litter under the target",
+                "shows": "Target line in amber (\"Target 12\")"
+              }
+            ],
+            "logic": "Finished litters only (finished and not ended before or during farrowing; sample 7). Born alive / litter = (born − stillborn − mummified) / finished litters. Stillborn rate = stillborn / born. Target comes from bornAliveTarget (12).",
+            "source": "farrowing-astra-concept.js taskClosureReview().performance, taskPerformance()",
+            "at": "Performance metrics"
           },
           {
             "name": "Task outcomes",
-            "shows": "Finished farrowing 7 · Still farrowing 2 · Awaiting farrowing 9 · Sow deaths 1",
-            "logic": "Rows of the sow count per outcome for every unit; zero rows are omitted (except Finished farrowing and Awaiting); miscarriages, not in pig and removed appear only when above zero. Title meta \"19 sows\" = all sows in the task.",
-            "source": "prototype farrowing-astra-concept.js taskOutcomeSummary()"
+            "shows": "Sow count per outcome across all units; title meta is all sows in the task.",
+            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Miscarriages, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
+            "source": "farrowing-astra-concept.js taskOutcomeSummary()",
+            "at": "Task outcomes"
           },
           {
-            "name": "Bar",
-            "shows": "Back · End task early (red, HOLD TO END EARLY)",
-            "logic": "Enabled; ends the task and removes awaiting sows from the batch (a marker in the prototype, no transfer).",
-            "source": "prototype farrowing-astra-concept.js closeTask()"
+            "name": "End task button",
+            "shows": "Hold button in the bar.",
+            "states": [
+              {
+                "state": "Blocked",
+                "when": "Active sows or unsaved records remain",
+                "shows": "Red \"End task early\", disabled"
+              },
+              {
+                "state": "Early",
+                "when": "Sows awaiting, nothing blocking",
+                "shows": "Red \"End task early\", HOLD TO END EARLY"
+              },
+              {
+                "state": "Normal",
+                "when": "No awaiting sows, nothing blocking",
+                "shows": "Ink \"End task\", HOLD TO END"
+              }
+            ],
+            "rule": "Hold 0.85 s ends the task and opens the receipt. Ending early marks awaiting sows removed from the batch (a marker only; no transfer is built). Enabled here: no active sows or drafts remain.",
+            "source": "farrowing-astra-concept.js taskEndSheet(), closeTask()",
+            "at": "HOLD TO END EARLY"
           }
         ],
-        "controls": [
-          {
-            "control": "Warning cards (still farrowing, unsaved records, will be removed)",
-            "does": "open a grouped sow list (not a separate screen); each sow there opens her record and Back returns to the same review",
-            "goesTo": "farrowing.count"
-          },
-          {
-            "control": "Back",
-            "does": "returns to the Task overview",
-            "goesTo": "farrowing.overview"
-          },
-          {
-            "control": "End task / End task early (hold 0.85 s)",
-            "does": "ends the task and opens the receipt",
-            "goesTo": "farrowing.task-receipt"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) End task · End task early",
           "(raw) Farrowing · All 3 units",
@@ -2036,17 +1848,15 @@
           "(raw) Task outcomes · N sows",
           "(raw) HOLD TO END · HOLD TO END EARLY"
         ],
+        "edge": [
+          "Finished sows stay in the batch; awaiting sows are marked removed-at-close; the receipt says \"Task ended early\""
+        ],
         "rules": [
           "Same grammar as the ruled End task: \"manual only … hold-to-commit with receipt; … cannot end while the batch's farrowing task is open\" (Piglet processing, Q5)",
           "Task closure doc: active farrowing and unsaved drafts block; awaiting sows are removed from the batch (ux/research/farrowing/ASTRA-TASK-CLOSURE.md)"
         ],
-        "edge": [
-          "Finished sows stay in the batch; awaiting sows are marked removed-at-close",
-          "Receipt says \"Task ended early\""
-        ],
         "issues": [
-          "Two-step to the same facts: the removal card and the \"Awaiting farrowing 9\" row.",
-          "Removal reads as a consequence of ending but the destination of the 9 sows is not said (a transfer workflow is out of scope)."
+          "The removal card and the \"Awaiting farrowing 9\" row state the same fact; the destination of the 9 sows is not said."
         ]
       }
     },
@@ -2059,54 +1869,44 @@
       "preset": "task-complete",
       "figma": "",
       "notes": {
-        "purpose": "Review the whole task across all units and end it: warnings first, then performance and outcomes, then hold to end.",
-        "states": [
-          "Every sow finished (or died): 18 finished litters, 1 sow death, nothing awaiting",
-          "Title \"End task\", ink hold button enabled"
-        ],
+        "purpose": "Review the whole task and end it when every sow has finished or died.",
+        "states": [],
         "elements": [
           {
-            "name": "Header",
-            "shows": "End task · Farrowing · All 3 units",
-            "logic": "Plain title when no sow is awaiting and nothing blocks.",
-            "source": "prototype farrowing-astra-concept.js taskEndSheet()"
+            "name": "Plain end",
+            "shows": "Title \"End task\", no warnings, ink hold button.",
+            "logic": "No sow is awaiting and nothing blocks, so no warning cards appear and ending removes nobody. Receipt title is \"Task ended\".",
+            "source": "farrowing-astra-concept.js taskEndSheet()",
+            "at": "HOLD TO END"
           },
           {
             "name": "Performance metrics",
-            "shows": "Born alive / litter 12.0 (Target 12) · Stillborn rate 7.2% (7 stillborn / 97 born) · Born 97 · Alive now · Piglet deaths",
-            "logic": "Finished litters only (finished and not ended before/during farrowing; sample: 7 litters). Born alive / litter = (born - stillborn - mummified) / finished litters. Stillborn rate = stillborn / born. Dash when there is no denominator. Target comes from bornAliveTarget (12).",
-            "source": "prototype farrowing-astra-concept.js taskClosureReview().performance, taskPerformance()"
+            "shows": "Born alive / litter, Stillborn rate, Born, Alive now, Piglet deaths.",
+            "states": [
+              {
+                "state": "No finished litter",
+                "when": "Zero finished litters",
+                "shows": "Dashes where there is no denominator"
+              },
+              {
+                "state": "Below target",
+                "when": "Born alive / litter under the target",
+                "shows": "Target line in amber (\"Target 12\")"
+              }
+            ],
+            "logic": "Finished litters only (finished and not ended before or during farrowing; sample 7). Born alive / litter = (born − stillborn − mummified) / finished litters. Stillborn rate = stillborn / born. Target comes from bornAliveTarget (12).",
+            "source": "farrowing-astra-concept.js taskClosureReview().performance, taskPerformance()",
+            "at": "Performance metrics"
           },
           {
             "name": "Task outcomes",
-            "shows": "Finished farrowing 7 · Still farrowing 2 · Awaiting farrowing 9 · Sow deaths 1",
-            "logic": "Rows of the sow count per outcome for every unit; zero rows are omitted (except Finished farrowing and Awaiting); miscarriages, not in pig and removed appear only when above zero. Title meta \"19 sows\" = all sows in the task.",
-            "source": "prototype farrowing-astra-concept.js taskOutcomeSummary()"
-          },
-          {
-            "name": "Bar",
-            "shows": "Back · End task (HOLD TO END)",
-            "logic": "Enabled; ends the task with no removals.",
-            "source": "prototype farrowing-astra-concept.js closeTask()"
+            "shows": "Sow count per outcome across all units; title meta is all sows in the task.",
+            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Miscarriages, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
+            "source": "farrowing-astra-concept.js taskOutcomeSummary()",
+            "at": "Task outcomes"
           }
         ],
-        "controls": [
-          {
-            "control": "Warning cards (still farrowing, unsaved records, will be removed)",
-            "does": "open a grouped sow list (not a separate screen); each sow there opens her record and Back returns to the same review",
-            "goesTo": "farrowing.count"
-          },
-          {
-            "control": "Back",
-            "does": "returns to the Task overview",
-            "goesTo": "farrowing.overview"
-          },
-          {
-            "control": "End task / End task early (hold 0.85 s)",
-            "does": "ends the task and opens the receipt",
-            "goesTo": "farrowing.task-receipt"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) End task · End task early",
           "(raw) Farrowing · All 3 units",
@@ -2114,13 +1914,10 @@
           "(raw) Task outcomes · N sows",
           "(raw) HOLD TO END · HOLD TO END EARLY"
         ],
+        "edge": [],
         "rules": [
           "Same grammar as the ruled End task: \"manual only … hold-to-commit with receipt; … cannot end while the batch's farrowing task is open\" (Piglet processing, Q5)",
           "Task closure doc: active farrowing and unsaved drafts block; awaiting sows are removed from the batch (ux/research/farrowing/ASTRA-TASK-CLOSURE.md)"
-        ],
-        "edge": [
-          "No warnings shown",
-          "Receipt title \"Task ended\""
         ],
         "issues": [
           "With no warnings the sheet is only the two summaries the Task overview already shows."
@@ -2136,60 +1933,25 @@
       "preset": "task-outcomes",
       "figma": "",
       "notes": {
-        "purpose": "Review the whole task across all units and end it: warnings first, then performance and outcomes, then hold to end.",
-        "states": [
-          "Like \"awaiting sows\", plus a recorded miscarriage in Unit 6",
-          "Task outcomes gains a \"Miscarriages 1\" row; not in pig and removed rows appear only when recorded"
-        ],
+        "purpose": "Review the task when sows have recorded production outcomes such as a miscarriage.",
+        "states": [],
         "elements": [
           {
-            "name": "Header",
-            "shows": "End task early · Farrowing · All 3 units",
-            "logic": "Early if any sow is still awaiting.",
-            "source": "prototype farrowing-astra-concept.js taskEndSheet()"
-          },
-          {
-            "name": "Performance metrics",
-            "shows": "Born alive / litter 12.0 (Target 12) · Stillborn rate 7.2% (7 stillborn / 97 born) · Born 97 · Alive now · Piglet deaths",
-            "logic": "Finished litters only (finished and not ended before/during farrowing; sample: 7 litters). Born alive / litter = (born - stillborn - mummified) / finished litters. Stillborn rate = stillborn / born. Dash when there is no denominator. Target comes from bornAliveTarget (12).",
-            "source": "prototype farrowing-astra-concept.js taskClosureReview().performance, taskPerformance()"
-          },
-          {
-            "name": "Task outcomes",
-            "shows": "Finished farrowing 7 · Still farrowing 2 · Awaiting farrowing 9 · Sow deaths 1",
-            "logic": "Rows of the sow count per outcome for every unit; zero rows are omitted (except Finished farrowing and Awaiting); miscarriages, not in pig and removed appear only when above zero. Title meta \"19 sows\" = all sows in the task.",
-            "source": "prototype farrowing-astra-concept.js taskOutcomeSummary()"
-          },
-          {
             "name": "Outcome rows",
-            "shows": "Miscarriages · Not in pig · Removed earlier · Sow deaths",
-            "logic": "Each row shows a count; they sit outside Farrowed and the progress denominator. Nonzero rows open a list on the Task overview (\"Other outcomes\"); here they are plain rows.",
-            "source": "prototype farrowing-astra-concept.js taskOutcomeSummary()"
+            "shows": "Miscarriages · Not in pig · Removed earlier · Sow deaths in Task outcomes.",
+            "logic": "Each row appears only when above zero. These sows sit outside Farrowed, Active, Awaiting and the progress denominator, and outside the KPIs. Here the rows are plain; on the Task overview nonzero rows open a sow list.",
+            "source": "farrowing-astra-concept.js taskOutcomeSummary()",
+            "at": "Miscarriages"
           },
           {
-            "name": "Bar",
-            "shows": "Back · hold button",
-            "logic": "As in the matching earlier cases.",
-            "source": "prototype farrowing-astra-concept.js taskEndSheet()"
+            "name": "Title",
+            "shows": "\"End task early · Farrowing · All 3 units\".",
+            "logic": "Early if any sow is still awaiting; otherwise \"End task\".",
+            "source": "farrowing-astra-concept.js taskEndSheet()",
+            "at": "End task early"
           }
         ],
-        "controls": [
-          {
-            "control": "Warning cards (still farrowing, unsaved records, will be removed)",
-            "does": "open a grouped sow list (not a separate screen); each sow there opens her record and Back returns to the same review",
-            "goesTo": "farrowing.count"
-          },
-          {
-            "control": "Back",
-            "does": "returns to the Task overview",
-            "goesTo": "farrowing.overview"
-          },
-          {
-            "control": "End task / End task early (hold 0.85 s)",
-            "does": "ends the task and opens the receipt",
-            "goesTo": "farrowing.task-receipt"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) End task · End task early",
           "(raw) Farrowing · All 3 units",
@@ -2197,15 +1959,13 @@
           "(raw) Task outcomes · N sows",
           "(raw) HOLD TO END · HOLD TO END EARLY"
         ],
+        "edge": [],
         "rules": [
           "Same grammar as the ruled End task: \"manual only … hold-to-commit with receipt; … cannot end while the batch's farrowing task is open\" (Piglet processing, Q5)",
           "Task closure doc: active farrowing and unsaved drafts block; awaiting sows are removed from the batch (ux/research/farrowing/ASTRA-TASK-CLOSURE.md)"
         ],
-        "edge": [
-          "Outcome sows are excluded from Awaiting, Active and Finished and from the KPIs"
-        ],
         "issues": [
-          "Outcome counts appear on the Task overview (\"Other outcomes\"), here, and on the receipt; the miscarriage entry form is not part of this prototype."
+          "Outcome counts appear on the Task overview, here and on the receipt; the miscarriage entry form is not in this prototype."
         ]
       }
     },
@@ -2216,63 +1976,49 @@
       "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "The Edit face after farrowing has finished or the sow has died: Born is a locked row with an amber pencil, the dead rows stay flat, and weak, deformed, litter weight and assisted sit behind one At finish row. Added because the rulings (\"Post-lock Edit, drawn\") and contract C5.4 require it and no preset shows it alone (Correct born only shows it dimmed behind the popup).",
-        "states": [
-          "Untouched list under the sow header, Save absent/disabled",
-          "Born corrected through the popup: Born amber, summary line \"Born 14 -> 16\", Save enabled",
-          "Ruled At finish disclosure open in place (the prototype instead pushes a separate \"Edit finish details\" page with weak, deformed, litter weight and assisted)",
-          "Ended sow: no finish details row"
-        ],
+        "purpose": "The Edit face after farrowing has finished or the sow has died: Born is a locked row with an amber pencil; finish details sit behind one row.",
+        "states": [],
         "elements": [
           {
             "name": "Born row",
-            "shows": "Born 14 with an amber pencil key",
-            "logic": "Locked row: the value is not steppable; the pencil opens the Correct born popup. Amber when changed.",
-            "source": "prototype farrowing-astra-concept.js edit() bornRow"
+            "shows": "Born 14 with an amber pencil key.",
+            "logic": "Value is not steppable; the pencil opens the Correct born popup. Turns amber when changed. Before the lock Edit has no Born row.",
+            "source": "farrowing-astra-concept.js edit() bornRow",
+            "at": "Born"
           },
           {
             "name": "Dead rows",
-            "shows": "Six - n + rows",
-            "logic": "Editable; the total of dead types cannot exceed Born.",
-            "source": "prototype farrowing-astra-concept.js edit()"
+            "shows": "Six − n + rows.",
+            "logic": "The total of the dead types cannot exceed Born.",
+            "source": "farrowing-astra-concept.js edit()",
+            "at": "Stillborn"
           },
           {
             "name": "At finish row",
-            "shows": "At finish  weak 1 · deformed 1 · 12.6 kg · assisted ›",
-            "logic": "Ruled: expands in place; prototype: \"Finish details ›\" door to a separate page \"Edit finish details\".",
-            "source": "RULINGS \"Model\"; prototype farrowing-astra-concept.js edit-finish-door"
-          },
-          {
-            "name": "Bar",
-            "shows": "Back · Save",
-            "logic": "Save folds the visit and writes one stamped correction.",
-            "source": "act(\"saveEdit\")"
+            "shows": "Weak 1 · deformed 1 · 12.6 kg · assisted ›.",
+            "states": [
+              {
+                "state": "Finished litter",
+                "when": "Sow finished normally",
+                "shows": "Row present; the prototype opens a separate \"Edit finish details\" page, the ruling expands it in place"
+              },
+              {
+                "state": "Ended sow",
+                "when": "Sow died",
+                "shows": "No finish details row"
+              }
+            ],
+            "source": "RULINGS \"Model\"; farrowing-astra-concept.js edit()",
+            "at": "At finish"
           }
         ],
-        "controls": [
-          {
-            "control": "Born pencil",
-            "does": "opens the popup",
-            "goesTo": "farrowing.born"
-          },
-          {
-            "control": "Finish details ›",
-            "does": "weak, deformed, weight, assisted page (not a screen of its own)"
-          },
-          {
-            "control": "Save / Back",
-            "does": "return to the record",
-            "goesTo": "farrowing.locked"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) Edit record",
           "(raw) Born N",
           "(raw) At finish"
         ],
-        "edge": [
-          "Owner ruling: this is where Correct born lives; Edit record while she is still farrowing has no Born row"
-        ],
+        "edge": [],
         "rules": [
           "\"Post-lock Edit, drawn: Born renders as a locked row whose one key is an amber ✎\" (After the lock)",
           "\"Edit folds what a hand rarely fixes\" (Model)"
@@ -2289,75 +2035,88 @@
       "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "The whole-task sheet behind the Task overview card: progress across all units, a unit chooser, performance metrics, other outcomes and the doors to End task. Added because ASTRA-TASK-CLOSURE.md and the code require it as the only way to End task and no preset opens it.",
+        "purpose": "The whole-task sheet behind the Task overview card: progress across all units, unit chooser, performance, other outcomes and the way to End task.",
         "states": [
-          "Default: 7 / 18 progress, three unit rows, Performance metrics, Other outcomes",
           "Opened from Home's whole-farm card: the first thing the prototype shows; Back returns to Home"
         ],
         "elements": [
           {
             "name": "Whole-task progress",
-            "shows": "Whole-task progress · 18 sows, stacked bar, Farrowed 7 · Active 2 · Awaiting 9",
-            "logic": "Same numbers as the room card across all units.",
-            "source": "prototype farrowing-astra-concept.js roomOverview"
+            "shows": "Sow total, stacked bar and Farrowed · Active · Awaiting counts.",
+            "logic": "Same numbers and rules as the room's Task overview card; zero segments are left out of the bar.",
+            "source": "farrowing-astra-concept.js roomOverview, taskOverview()",
+            "at": "Whole-task progress"
           },
           {
             "name": "Choose a unit",
-            "shows": "Unit · Farrowed · Active · Awaiting table with a Current unit tag",
-            "logic": "One row per unit; tap switches the room to that unit.",
-            "source": "taskOverview(c).units"
-          },
-          {
-            "name": "Performance metrics",
-            "shows": "Born alive / litter, Stillborn rate, totals",
-            "logic": "See End task.",
-            "source": "prototype farrowing-astra-concept.js taskPerformance()"
+            "shows": "Unit · Farrowed · Active · Awaiting table.",
+            "states": [
+              {
+                "state": "Current unit",
+                "when": "Row is the unit the room shows",
+                "shows": "\"Current unit\" tag; other rows share one background"
+              },
+              {
+                "state": "Other unit",
+                "when": "Any other unit",
+                "shows": "Tapping switches the room to that unit and keeps its own scroll"
+              }
+            ],
+            "source": "farrowing-astra-concept.js taskOverview().units",
+            "at": "Choose a unit"
           },
           {
             "name": "Other outcomes",
-            "shows": "Miscarriages · Sow deaths · Not in pig · Removed from batch",
-            "logic": "Rows with counts (zero shown for the first two); nonzero rows open a sow list.",
-            "source": "prototype farrowing-astra-concept.js taskOtherOutcomes()"
+            "shows": "Miscarriages · Sow deaths · Not in pig · Removed from batch.",
+            "states": [
+              {
+                "state": "Always listed",
+                "when": "Miscarriages and Sow deaths",
+                "shows": "Shown even at 0"
+              },
+              {
+                "state": "When recorded",
+                "when": "Not in pig, Removed from batch",
+                "shows": "Row appears only above zero"
+              },
+              {
+                "state": "Tappable",
+                "when": "Count above zero",
+                "shows": "Opens a grouped sow list; zero rows do nothing"
+              }
+            ],
+            "source": "farrowing-astra-concept.js taskOtherOutcomes()",
+            "at": "Other outcomes"
           },
           {
-            "name": "Bar",
-            "shows": "Back · End task / End task early",
-            "logic": "End task early when sows are awaiting or blocked.",
-            "source": "prototype farrowing-astra-concept.js roomOverview"
+            "name": "End button",
+            "shows": "Bar primary.",
+            "states": [
+              {
+                "state": "End task early",
+                "when": "Sows awaiting or the task is blocked",
+                "shows": "Red"
+              },
+              {
+                "state": "End task",
+                "when": "Otherwise",
+                "shows": "Ink with a check icon"
+              }
+            ],
+            "source": "farrowing-astra-concept.js roomOverview",
+            "at": "End task"
           }
         ],
-        "controls": [
-          {
-            "control": "Unit row",
-            "does": "switches unit and opens its room list",
-            "goesTo": "farrowing.room"
-          },
-          {
-            "control": "Outcome row",
-            "does": "opens a grouped sow list"
-          },
-          {
-            "control": "End task / End task early",
-            "does": "opens the review",
-            "goesTo": "farrowing.task-ready"
-          },
-          {
-            "control": "Back",
-            "does": "room list",
-            "goesTo": "farrowing.room"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) Task overview · Whole-task progress · Choose a unit · Other outcomes"
         ],
-        "edge": [
-          "Choose a unit duplicates the Home Choose unit door"
-        ],
+        "edge": [],
         "rules": [
           "Task closure: unit rows share one background; only a Current tag marks the current unit (ASTRA-TASK-CLOSURE.md)"
         ],
         "issues": [
-          "Progress, performance metrics and outcomes repeat on the End task and receipt; the unit chooser here duplicates Home's Choose unit."
+          "Progress, performance and outcomes repeat on End task and the receipt; the unit chooser duplicates Home's Choose unit."
         ]
       }
     },
@@ -2368,42 +2127,47 @@
       "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "The frozen record after the task ended: who, when, performance and outcomes. Added because the contract (C9 \"closed\") and the task-closure doc require it; no preset reaches it (it appears only after a held End task).",
-        "states": [
-          "Task ended / Task ended early (title and heading differ when sows were awaiting)"
-        ],
+        "purpose": "The frozen record after the task ended: who, when, performance and outcomes.",
+        "states": [],
         "elements": [
           {
             "name": "Status",
-            "shows": "Check mark · Farrowing task ended / Ended with 9 sows awaiting · date · hand",
-            "logic": "From the closure event.",
-            "source": "prototype farrowing-astra-concept.js taskEndSheet()"
+            "shows": "Check mark, heading, date and hand.",
+            "states": [
+              {
+                "state": "Ended",
+                "when": "No sow was awaiting",
+                "shows": "\"Task ended\" / \"Farrowing task ended\""
+              },
+              {
+                "state": "Ended early",
+                "when": "Sows were awaiting",
+                "shows": "\"Task ended early\" / \"Ended with 9 sows awaiting\""
+              }
+            ],
+            "source": "farrowing-astra-concept.js taskEndSheet()",
+            "at": "Task ended"
           },
           {
-            "name": "Performance metrics, Task outcomes",
-            "shows": "As at the moment of ending",
-            "logic": "Frozen figures; awaiting row reads \"Removed · not farrowed\".",
-            "source": "prototype farrowing-astra-concept.js closeTask()"
+            "name": "Frozen figures",
+            "shows": "Performance metrics and Task outcomes as at the moment of ending.",
+            "logic": "Taken from the closure event, not recomputed; the awaiting row reads \"Removed · not farrowed\". Sow records stay live.",
+            "source": "farrowing-astra-concept.js closeTask()",
+            "at": "Performance metrics"
           },
           {
-            "name": "Bar",
-            "shows": "Back to Today",
-            "logic": "Leaves to Home's Today card, which then shows \"Task ended · N finished / View receipt\".",
-            "source": "prototype farrowing-astra-concept.js roomHome()"
+            "name": "Back to Today",
+            "shows": "Primary button.",
+            "logic": "Leaves to Home's Today card, which then reads \"Task ended · N finished / View receipt\".",
+            "source": "farrowing-astra-concept.js roomHome()",
+            "at": "Back to Today"
           }
         ],
-        "controls": [
-          {
-            "control": "Back to Today",
-            "does": "leaves the task"
-          }
-        ],
+        "controls": [],
         "copy": [
           "(raw) Task ended · Task ended early · Back to Today"
         ],
-        "edge": [
-          "Receipt describes the closure event; sow records stay live"
-        ],
+        "edge": [],
         "rules": [
           "Receipt, not an editable closed task (ASTRA-TASK-CLOSURE.md)"
         ],
