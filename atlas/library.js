@@ -32,9 +32,9 @@ const SKELETON_DEMO = `${DS}/components/task-skeleton-demo.html`;
 const nameWords = (n) => n.replace(/([a-z])([A-Z])/g, '$1 $2');
 
 /* a preview rendered styled: the previews expect a host that preloads tokens, the bundle and the fonts */
-async function styledPreview(name) {
+async function styledPreview(name, file = 'preview.html') {
   const dir = `${DS}/components/${name}/`;
-  let html; try { html = await getText(dir + 'preview.html'); } catch (e) { return null; }
+  let html; try { html = await getText(dir + file); } catch (e) { return null; }
   const hint = (html.match(/dsCard[^>]*?height=(\d+)/) || [])[1];
   const inject = `<base href="${dir}"><link rel="stylesheet" href="${DS}/tokens.css"><link rel="stylesheet" href="${DS}/components/bundle.css"><script src="${DS}/components/bundle.js"><\/script>`;
   const doc = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, (m) => m + inject) : inject + html;
@@ -59,13 +59,27 @@ function usedBy(name) {
 }
 
 const SCORE_KEYS = ['clarity', 'budget', 'hierarchy', 'spacing', 'broken'], PASS = 8;
-function gateBlock(g) {
-  if (!g) return '<div class="gate"><div class="gh">Gate <span>Not gated yet</span></div></div>';
-  const sc = g.scores || {}, low = SCORE_KEYS.reduce((m, k) => (sc[k] != null && (m == null || sc[k] < sc[m]) ? k : m), null);
+const cap = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
+function verdictOf(g) {
+  const sc = (g && g.scores) || {}, ks = SCORE_KEYS.filter((k) => sc[k] != null);
+  if (!ks.length) return null;
+  const low = ks.reduce((m, k) => (sc[k] < sc[m] ? k : m), ks[0]), n = (g.findings || []).length, pass = sc[low] >= PASS;
+  return { pass, low, text: pass ? `Passing · lowest ${sc[low]}/10` : `Not passing · lowest: ${cap(low)} ${sc[low]}/10${n ? ` · ${n} finding${n === 1 ? '' : 's'}` : ''}` };
+}
+/* a gate, collapsed to one line: status pill, verdict, "Gate details"; the bars and the findings open on demand */
+function gateBlock(g, status) {
+  const v = verdictOf(g), pill = `<span class="pill">${dot(status)}${esc(STATUS[status] || status)}</span>`;
+  const box = el(`<div class="gate2"><div class="gline">${pill}<span class="gv ${v ? (v.pass ? 'ok' : 'bad') : ''}">${esc(v ? v.text : g ? 'No scores yet' : 'Not gated yet')}</span>${g ? '<button class="gdet" aria-expanded="false">Gate details ›</button>' : ''}</div><div class="gbody" hidden></div></div>`);
+  if (!g) return box;
+  const sc = g.scores || {}, low = v && v.low;
   const bars = SCORE_KEYS.filter((k) => sc[k] != null).map((k) => `<div class="gbar${k === low ? ' low' : ''}${sc[k] < PASS ? ' fail' : ''}"><span class="k">${k}</span><span class="tr"><i style="width:${sc[k] * 10}%"></i><u style="left:${PASS * 10}%"></u></span><b>${sc[k]}</b></div>`).join('');
-  const fs = (g.findings || []).map((f) => `<li><span class="sev">${esc(f.severity)}</span>${esc(f.text)}${f.fix ? ` <em>Fix: ${esc(f.fix)}</em>` : ''}</li>`).join('');
-  const vs = (g.variants || []).map((v) => `<span class="vchip">${dot(v.status)}${esc(v.name)}</span>`).join('');
-  return `<div class="gate"><div class="gh">Gate <span>${esc([g.judged, g.model].filter(Boolean).join(' · '))} · pass mark ${PASS}</span></div><div class="gbars">${bars}</div>${fs ? `<ul class="gfind">${fs}</ul>` : ''}${vs ? `<div class="gvar">${vs}</div>` : ''}</div>`;
+  const fs = (g.findings || []).map((f) => { const o = typeof f === 'string' ? { text: f } : f; return `<li><button class="fl"><span class="sev">${esc(o.severity || 'note')}</span><span class="ft">${esc(o.text)}</span></button><div class="ff" hidden><p>${esc(o.text)}</p>${o.fix ? `<p class="fx"><b>Fix</b> ${esc(o.fix)}</p>` : ''}</div></li>`; }).join('');
+  const foot = [g.judged, g.model].filter(Boolean).join(' · ');
+  box.querySelector('.gbody').innerHTML = `<div class="gbars">${bars}</div>${fs ? `<ul class="gfind">${fs}</ul>` : ''}${foot ? `<div class="gfoot">${esc(foot)} · pass mark ${PASS}</div>` : ''}`;
+  const btn = box.querySelector('.gdet'), body = box.querySelector('.gbody');
+  btn.onclick = () => { body.hidden = !body.hidden; btn.setAttribute('aria-expanded', String(!body.hidden)); btn.textContent = body.hidden ? 'Gate details ›' : 'Gate details ⌄'; };
+  box.querySelectorAll('.fl').forEach((b2) => { b2.onclick = () => { const d = b2.nextElementSibling; d.hidden = !d.hidden; b2.classList.toggle('open', !d.hidden); }; });
+  return box;
 }
 
 async function renderComponents() {
@@ -146,7 +160,7 @@ async function renderComponents() {
   async function pageComponent(name) {
     const group = (COMPONENT_GROUPS.find((g) => g[1].includes(name)) || [''])[0];
     const head = el(`<h2>${esc(name)}</h2>`); pane.append(head);
-    const st = stOf(name), meta = el(`<div class="cmeta">${dot(st)}<span class="t">${esc(STATUS[st] || st)} · ${esc(group)}</span></div>`); pane.append(meta);
+    const st = stOf(name), meta = el(`<div class="cmeta">${st === 'placeholder' ? dot(st) : ''}<span class="t">${st === 'placeholder' ? esc(STATUS[st]) + ' · ' : ''}${esc(group)}</span></div>`); pane.append(meta);
     if (st === 'placeholder') {
       const c = CI[name], idx2 = screenIndex();
       const links = (c.seenIn || []).map((id) => idx2[id] ? `<a href="?feature=${esc(idx2[id].feature.id)}&screen=${esc(id)}" data-sid="${esc(id)}">${esc(idx2[id].feature.name)} · ${esc(idx2[id].name)}</a>` : '').filter(Boolean).join(', ');
@@ -155,8 +169,9 @@ async function renderComponents() {
       pane.querySelectorAll('a[data-sid]').forEach((a) => { a.onclick = (e) => { e.preventDefault(); const s = idx2[a.dataset.sid]; openFeature(s.feature.id, s.id); }; });
       return;
     }
-    pane.append(el(gateBlock(CI[name] && CI[name].gate)));
-    pane.append(el('<p class="muted" style="margin:-6px 0 14px;font-size:12px">Variants and their states are written in the component pass.</p>'));
+    const gate = CI[name] && CI[name].gate, variants = (gate && gate.variants) || [];
+    pane.append(gateBlock(gate, st));
+    if (!variants.length) pane.append(el('<p class="muted" style="margin:0 0 14px;font-size:12px">Variants and their states are written in the component pass.</p>'));
     let readme = ''; try { readme = await getText(`${DS}/components/${name}/README.md`); } catch (_) {}
     const cand = /candidate/i.test(readme.slice(0, 300)), adr = (readme.slice(0, 400).match(/ADR (\d{4})/) || [])[1];
     if (cand) meta.querySelector('.t').textContent += ` · candidate${adr ? ' (ADR ' + adr + ')' : ''}`;
@@ -164,7 +179,25 @@ async function renderComponents() {
     if (!prev) {
       prev = el('<div class="nopreview">No preview of its own yet — built in the component pass</div>');
     }
-    pane.append(prev);
+    const stage = el('<div class="stage"></div>'); stage.append(prev); pane.append(stage);
+    if (variants.length) {
+      pane.append(el('<h3>Variants</h3>'));
+      const list = el('<div class="vlist"></div>'), detail = el('<div class="vdetail"></div>'); pane.append(list, detail);
+      const select = async (i) => {
+        list.querySelectorAll('.vrow').forEach((r, j) => r.setAttribute('aria-pressed', String(j === i)));
+        detail.innerHTML = ''; stage.innerHTML = '';
+        if (i < 0) { stage.append(prev); return; }
+        const v = variants[i]; let pv = null;
+        if (v.preview) pv = await styledPreview(name, v.preview);
+        stage.append(pv || el('<div class="nopreview">No preview of this variant yet</div>'));
+        detail.append(el(`<div class="vname">${esc(String(v.name).split(' (')[0])}</div>`), gateBlock({ scores: v.scores, findings: v.findings }, v.status || 'in-design'));
+      };
+      variants.forEach((v, i) => {
+        const [vn, ...rest] = String(v.name).split(' ('), use = rest.join(' (').replace(/\)$/, ''), n = (v.usedBy || []).length;
+        const row = el(`<button class="vrow" aria-pressed="false">${dot(v.status || 'in-design')}<b>${esc(vn)}</b><span class="vuse">${esc(use)}</span><span class="vn">${n ? `used by ${n} screen${n === 1 ? '' : 's'}` : 'no screen'}</span></button>`);
+        row.onclick = () => select(row.getAttribute('aria-pressed') === 'true' ? -1 : i); list.append(row);
+      });
+    }
     const used = usedBy(name);
     pane.append(el('<h3>Used by</h3>'));
     if (!used.length) pane.append(el('<p class="none">Not mapped yet.</p>'));

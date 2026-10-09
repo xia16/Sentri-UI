@@ -359,3 +359,26 @@ table.copy td.id { font:11.5px var(--mono); overflow-wrap:anywhere }
 .region .patterns button { text-transform:none; letter-spacing:0; font-size:12px; font-weight:600; color:var(--green); border:1px solid var(--line); border-radius:999px; padding:1px 10px; background:var(--paper) } .region .patterns button:hover { background:var(--green-wash) }
 .patternpage { position:absolute; inset:0; overflow:auto; padding:28px 36px 60px } .patternpage h2 { margin:0 0 6px; font-size:24px; letter-spacing:-.02em } .patternpage > p { max-width:640px; margin:0 0 20px }
 .patternpage .phones { display:flex; flex-wrap:wrap; gap:28px; align-items:flex-start } .patternpage figure { margin:0 } .patternpage figcaption { display:flex; gap:8px; align-items:center; margin:0 0 10px; font-size:13px; font-weight:600 }
+
+/* gate, collapsed */
+.gate2 { max-width:720px; margin:0 0 16px }
+.gline { display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:13px }
+.gv { font-weight:600 } .gv.bad { color:var(--amber) } .gv.ok { color:var(--green) }
+.gdet { margin-left:auto; color:var(--green); font-size:12.5px; font-weight:600 } .gdet:hover { text-decoration:underline }
+.gbody { margin-top:10px; padding:12px 14px; border:1px solid var(--line); border-radius:10px; background:var(--paper) }
+.gbody .gbars { margin:0 0 6px }
+.gfind { margin:6px 0 0; padding:0; list-style:none }
+.gfind li { border-top:1px solid var(--line) }
+.fl { display:flex; gap:8px; align-items:baseline; width:100%; padding:7px 0; text-align:left; font-size:12.5px }
+.fl .ft { flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis } .fl.open .ft { display:none }
+.fl .sev { flex:none; text-transform:capitalize; font-size:11.5px; font-weight:700; background:none; color:var(--amber); padding:0; margin:0 }
+.fl .sev::after { content:' ·'; color:var(--muted) }
+.ff { padding:0 0 8px; font-size:12.5px; line-height:1.5 } .ff p { margin:0 0 4px } .ff .fx { color:var(--muted) } .ff .fx b { font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; margin-right:6px }
+.gfoot { margin-top:8px; font-size:11.5px; color:var(--muted) }
+.vlist { display:flex; flex-direction:column; max-width:720px; border-top:1px solid var(--line) }
+.vrow { display:grid; grid-template-columns:auto auto 1fr auto; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--line); text-align:left; font-size:12.5px }
+.vrow b { font-weight:700 } .vrow .vuse { color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0 } .vrow .vn { color:var(--muted); font-size:11.5px; white-space:nowrap }
+.vrow:hover { background:var(--wash) } .vrow[aria-pressed=true] { background:var(--green-wash) }
+.vdetail { max-width:720px; margin:12px 0 0 } .vdetail .vname { font-weight:700; font-size:14px; margin-bottom:6px }
+.stage { margin:0 0 14px }
+.fl.open .sev::after { content:"" } .fl.open { padding-bottom:2px }
