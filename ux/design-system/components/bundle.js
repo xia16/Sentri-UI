@@ -116,10 +116,8 @@
   function rowGroup(content,{title='',level=5,className='',strs,args}={}){
     return panel((title||has({strs},'title')?heading({title,kind:'group',level,className:'st-row-group-label',strs,args}):'')+content,{className:'st-row-group '+className,ds:'Row'});
   }
-  /* Row (candidate additions, ADR 0002). Three roots over one copy: row (a button or a div), rowSelect (a <label> with a
-     checkbox), rowAction (two sibling targets). Candidate options: code, token-list title/description (colour on the
-     value), mono, chip, wrap, trail ('auto' · 'chevron' · 'edit' · 'none'), typed trailing ({ text, tone }), id.
-     Without them the output is unchanged. */
+  /* Row family: button or inert row, select label and sibling door + act targets.
+     All variants share the copy renderer, Status chips and token-based layout. */
   function rowCopy({title,description,code,mono,tight,o,titleId=''}){
     const tList=Array.isArray(title),dList=Array.isArray(description);
     const titleHtml=tList?toks(title,{tight}):tx(title,o,'title');
@@ -129,26 +127,38 @@
     return {codeHtml,titleHtml,small,strong:inner=>`<strong${titleId?` id="${esc(titleId)}"`:''}>${titleHtml}${inner||''}</strong>`};
   }
   const safeAttr=attrs=>Object.entries(attrs||{}).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
+  /* mark: a leading tick for a row that is ticked in place — 'due' (empty ring) or 'ticked' (check disc). Saved is a Done chip, not a mark. */
+  const rowMark=m=>m==='due'||m==='ticked'?`<span class="st-row-mark" data-mark="${m}" aria-hidden="true">${m==='ticked'?check:''}</span>`:'';
   function rowChip(chip,trailing,card){
     if(chip&&trailing)warn(card,'chip and trailing together: a row says one thing on the right; the chip wins');
     return chip?status(Object.assign({},chip,{className:'st-row-chip'})):'';
   }
-  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',trail='auto',attrs={},strs,args,code='',mono=false,chip=null,wrap=false,tight=false,id=''}={}){
+  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',trail='auto',attrs={},strs,args,code='',mono=false,chip=null,wrap=false,tight=false,id='',variant='',reason='',mark=''}={}){
     const o={strs,args};
+    variant=variant||(mark?'tick':code?'animal':trail==='edit'||(chip&&chip.kind==='done')?'record':icon?'navigation':attrs['aria-current']?'scope':'plain');
+    if(disabled) description=reason||description||'Unavailable — try again later';
     if(code&&icon)warn('Row','code and icon together: a row leads with one; the code wins');
     const tr=oneOf('Row','trail',trail,['auto','chevron','edit','none'],'auto');
     const typed=trailing&&typeof trailing==='object';
-    // With strs.trailing the value is plain fallback text (escaped); a string without it stays legacy trusted HTML.
-    const trailHtml=chip?'':typed?`<span class="st-row-trailing">${part(trailing)}</span>`:has(o,'trailing')?`<span class="st-row-trailing">${tx(trailing,o,'trailing')}</span>`:trailing?`<span class="st-row-trailing">${trailing}</span>`:'';
-    const c=rowCopy({title,description,code,mono,tight,o});
+    // Typed trailing words support tone and localization; legacy strings are escaped.
+    const trailHtml=chip?'':typed?`<span class="st-row-trailing">${part(trailing)}</span>`:has(o,'trailing')?`<span class="st-row-trailing">${tx(trailing,o,'trailing')}</span>`:trailing?`<span class="st-row-trailing">${esc(trailing)}</span>`:'';
+    const c=rowCopy({title,description,code,mono,tight,o,titleId:id?id+'-title':''});
     const tag=action?'button':'div';
-    const railHtml=tr==='edit'?`<span class="st-row-chevron" data-rail="edit">${glyph('edit')}</span>`:(tr==='chevron'||(tr==='auto'&&action))?`<span class="st-row-chevron">${arrow}</span>`:'';
-    return `<${tag} class="st-row ${esc(className)}" data-ds="Row"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${icon&&!code?`<span class="st-row-icon">${icon}</span>`:''}${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${rowChip(chip,trailing,'Row')}${trailHtml}${railHtml}</${tag}>`;
+    const railHtml=disabled?'':variant==='tick'&&tr==='auto'?'':tr==='edit'?`<span class="st-row-chevron" data-rail="edit">${glyph('edit')}<span data-str="act.edit">Edit</span></span>`:(tr==='chevron'||(tr==='auto'&&action))?`<span class="st-row-chevron">${arrow}</span>`:'';
+    return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="${esc(variant)}"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${rowMark(mark)}${icon&&!code&&variant==='navigation'?`<span class="st-row-icon">${icon}</span>`:''}${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,trailing,'Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,trailing,'Row')}${trailHtml}${railHtml}</${tag}>`;
   }
-  /* rowSelect: a bulk pick. The whole row is a <label>; the payload is change-only: rowSelectChange(event) → { value, checked }. */
-  function rowSelect({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,checked=false,action='select',value='',id='',className='',attrs={},strs,args}={}){
+  /* rowSelect: the select + door variant without the door (a select-only list): the whole row is a <label>, leading box. Payload is change-only: rowSelectChange(event) → { value, checked }. */
+  function rowSelect({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,checked=false,action='select',value='',id='',className='',attrs={},strs,args,inputAttrs={},disabled=false,reason=''}={}){
+    if(disabled) description=reason||description||'Unavailable — try again later';
     const o={strs,args},c=rowCopy({title,description,code,mono,tight,o});
-    return `<label class="st-row ${esc(className)}" data-ds="Row" data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${rowChip(chip,'','Row')}<span class="st-choice-trail"><input type="checkbox" data-action="${esc(action)}" value="${esc(value)}"${checked?' checked':''}></span></label>`;
+    return `<label class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door" data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><span class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${disabled?' disabled':''}${safeAttr(inputAttrs)}></span>${title||description||code?`${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,'','Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,'','Row')}`:''}</label>`;
+  }
+  /* rowSelectDoor: a list that both selects (a bulk act) and opens. Two sibling targets, none nested: the checkbox (48px hit area,
+     the same box as rowSelect) toggles; the door (copy + ›) opens. contentHtml: trusted markup in place of the title/description copy. */
+  function rowSelectDoor({title='',description='',code='',mono=false,wrap=false,tight=false,checked=false,action='select',value='',openAction='open',openValue='',label='',id='',className='',doorClass='',attrs={},strs,args,inputAttrs={},contentHtml=''}={}){
+    const o={strs,args},c=rowCopy({title,description,code,mono,tight,o});
+    const copy=contentHtml||`${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>`;
+    return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door" data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><label class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${safeAttr(inputAttrs)}></label><button type="button" class="st-row-door ${esc(doorClass)}" data-action="${esc(openAction)}" data-value="${esc(openValue)}"${label?` aria-label="${esc(label)}"`:''}>${copy}<span class="st-row-chevron">${arrow}</span></button></div>`;
   }
   function rowSelectChange(ev){
     const t=ev&&ev.target;
@@ -157,12 +167,12 @@
   }
   /* rowAction: two sibling targets. The copy is the door (action, an inline ›); the act button records in one tap. The act
      button is named by its label plus the row title. act.pending: the pending face after the first tap, until the host settles. */
-  function rowAction({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,action='',value='',act={},id='',className='',attrs={},strs,args}={}){
+  function rowAction({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,action='',value='',act={},id='',className='',attrs={},strs,args,mark=''}={}){
     const o={strs,args},rid=id||fieldId('st-row'),tid=rid+'-title',aid=rid+'-act';
     const c=rowCopy({title,description,code,mono,tight,o,titleId:tid});
-    const door=`<button type="button" class="st-row-door" data-action="${esc(action)}" data-value="${esc(value)}">${c.codeHtml}<span class="st-row-copy">${c.strong(`<span class="st-row-door-chevron">${arrow}</span>`)}${c.small}</span></button>`;
+    const door=`<button type="button" class="st-row-door" data-action="${esc(action)}" data-value="${esc(value)}">${rowMark(mark)}${c.codeHtml}<span class="st-row-copy">${c.strong(`<span class="st-row-door-chevron">${arrow}</span>`)}${c.small}</span></button>`;
     const btn=button(Object.assign({register:'secondary'},act,{id:aid,labelledby:`${aid} ${tid}`}));
-    return `<div class="st-row ${esc(className)}" data-ds="Row" data-act="" id="${esc(rid)}"${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${door}${rowChip(chip,'','Row')}${btn}</div>`;
+    return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="door-act" data-act="" id="${esc(rid)}"${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${door}${rowChip(chip,'','Row')}${btn}</div>`;
   }
   /* Log: the history tail. One entry per recorded act; the group label carries the day; an entry's stamp is "time · who"
      with an absent part left out. Two variants: day (default) and categorised (a kind word above each title, with a kind
@@ -928,7 +938,7 @@
     e.preventDefault();e.stopImmediatePropagation();const target=buttons.find(x=>x.dataset.value===next);target.click();
     const fresh=Array.from(host.querySelectorAll('[data-ds="Segment"] button,[data-ds="FilterChips"] button')).find(x=>x.dataset.action===b.dataset.action&&x.dataset.value===next);fresh?.focus();fresh?.scrollIntoView({block:'nearest',inline:'nearest'});
   },true);
-  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

@@ -182,7 +182,8 @@
   }
   function dayItem(p, k, ended, future) {
     var t = P.plan(k), st = P.status(p, k), n = P.need(p, k);
-    if (st === 'done') return { title: tr(k), meta: doneMeta(p, k), mark: 'done', action: k === 'id' ? 'id-open' : 'noop', value: k, id: 'sp-done-' + k };
+    if (st === 'done') return { title: tr(k), meta: doneMeta(p, k), mark: 'done', action: k === 'id' ? 'id-open' : 'noop', value: k, id: 'sp-done-' + k,
+      fresh: V.justRec.some(function (id) { var r = P.s.records.filter(function (x) { return x.id === id; })[0]; return r && r.tr === k; }) };
     if (k === 'id') {
       var filled = scheme() === 'breeders' ? !!p.picked : P.recs(p.code, 'id').length > 0;   // opens Give IDs
       var m = [{ text: T(filled ? 'item.filled' : 'item.notfilled'), tone: filled ? 'green' : 'amber' }, SEP, idWhat(p)];
@@ -194,7 +195,7 @@
     if (st === 'late') meta.push(SEP, { text: T('late'), tone: 'amber' });
     if (future && dft) meta.push(SEP, { text: T('item.early'), tone: 'amber' });
     if (dft && dft.n < n) meta.push(SEP, { text: T('left', { n: n - dft.n }) + ' · ' + T('why.' + (dft.why || 'weak')), tone: 'amber' });
-    return { title: tr(k), meta: meta, mark: dft ? 'done' : 'due', action: ended ? 'noop' : 'item', value: k, id: 'sp-tk-' + k, label: tr(k),
+    return { title: tr(k), meta: meta, mark: dft ? 'ticked' : 'due', action: ended ? 'noop' : 'item', value: k, id: 'sp-tk-' + k, label: tr(k),
       act: dft ? { label: pigs(dft.n), action: 'adjust', value: k } : null };
   }
   function processing(p) {
@@ -210,8 +211,6 @@
       var future = d > p.age;
       var items = days[d].map(function (k) { return dayItem(p, k, ended, future); });
       var day = K.day({ title: T('day.open', { d: d }), status: future ? T('day.early') : T('day.plan', { date: dayDate(p, d) }), items: items });
-      days[d].forEach(function (k) { if (V.draft[k]) day = day.replace('id="sp-tk-' + k + '-title"', 'id="sp-tk-' + k + '-title" data-ticked=""'); });
-      V.justRec.forEach(function (id) { var r = P.s.records.filter(function (x) { return x.id === id; })[0]; if (r) day = day.replace('id="sp-done-' + r.tr + '-title"', 'id="sp-done-' + r.tr + '-title" data-fresh=""'); });
       return day.replace('class="tk-day"', 'class="tk-day" data-when="' + (future ? 'future' : 'today') + '"');
     }).join('');
     if (!Object.keys(days).length) html += '<p class="sp-quiet">' + esc(T('proc.nothing')) + '</p>';
@@ -280,7 +279,7 @@
       var mark = UI.iconButton({ action: ended ? 'noop' : 'breeder', value: x.no, icon: I('bookmark'), label: T(x.keep ? 'mark.off' : 'mark.on', { no: x.no }), variant: 'plain', selected: !!x.keep, className: 'sp-mark' });
       var row = K.row({ id: id, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
         meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), action: ended ? '' : 'give-fix', value: x.no, trail: '', still: ended, label: T('fix.aria', { no: x.no }) });
-      return '<div class="sp-pigrow" data-ds="TaskRow">' + row + mark + '</div>';
+      return '<div class="sp-pigrow" data-ds="Row">' + row + mark + '</div>';
     });
     var body = (!ended && p.ids.length ? '<p class="sp-quiet">' + esc(T('tagged.hint')) + '</p>' : '') +
       K.list([K.group({ title: T(scheme() === 'notch' ? 'pc.notched' : 'pc.tagged'), face: 'word', meta: '· ' + idWhat(p) + ' · ' + T('breeders.n', { n: P.breeders(p) }),

@@ -1,0 +1,139 @@
+[
+  {
+    "id": "navigation",
+    "name": "Navigation",
+    "use": "Use for lists of places or actions",
+    "notUse": "Not for animal records — use animal",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Long label / Chinese",
+      "Disabled"
+    ],
+    "usedBy": [
+      "piglet-processing.more-actions",
+      "inspection.actions"
+    ]
+  },
+  {
+    "id": "animal",
+    "name": "Animal",
+    "use": "Use for one animal or litter",
+    "notUse": "Not for navigation — use navigation",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Long label / Chinese",
+      "Disabled"
+    ],
+    "usedBy": [
+      "farrowing.room",
+      "piglet-processing.pen-list"
+    ]
+  },
+  {
+    "id": "door-act",
+    "name": "Door + act",
+    "use": "Use for opening details beside one immediate act",
+    "notUse": "Not for a record without an act — use record",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Long label / Chinese",
+      "Loading",
+      "Error"
+    ],
+    "usedBy": [
+      "inspection.review-selected",
+      "piglet-processing.sheet-todo"
+    ]
+  },
+  {
+    "id": "scope",
+    "name": "Scope",
+    "use": "Use for choosing a work unit",
+    "notUse": "Not for bulk selection — use select + door",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Long label / Chinese",
+      "Current",
+      "Disabled"
+    ],
+    "usedBy": [
+      "workbench.choose-unit"
+    ]
+  },
+  {
+    "id": "summary-count",
+    "name": "Summary count",
+    "use": "Use for overview counts that open a list above zero",
+    "notUse": "Not for task progress cards — use the Home task card pattern",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Long label / Chinese",
+      "Empty"
+    ],
+    "usedBy": [
+      "farrowing.overview"
+    ]
+  },
+  {
+    "id": "record",
+    "name": "Done / record",
+    "use": "Use for wrapped evidence and Edit",
+    "notUse": "Not for event timelines — use Log",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Long label / Chinese",
+      "Disabled"
+    ],
+    "usedBy": [
+      "farrowing.room",
+      "piglet-processing.sheet-todo"
+    ]
+  },
+  {
+    "id": "tick",
+    "name": "Tick in place",
+    "use": "Use for an item ticked in place before saving (piglet day list)",
+    "notUse": "Not for bulk selection — use select + door; saved items — use record",
+    "states": [
+      "Default",
+      "Ticked",
+      "Ticked + count act",
+      "Pressed",
+      "Long label / Chinese"
+    ],
+    "usedBy": [
+      "piglet-processing.sheet-todo"
+    ]
+  },
+  {
+    "id": "select-door",
+    "name": "Select + door",
+    "use": "Use when a list selects for a bulk act (Inspection pens and pigs); with a door it also opens the item, without one the whole row selects",
+    "notUse": "Not for open + one-tap act — use door-act",
+    "states": [
+      "Default",
+      "Pressed (door)",
+      "Selected",
+      "Selected + Pressed",
+      "No door",
+      "Long label / Chinese"
+    ],
+    "usedBy": [
+      "inspection.walk",
+      "inspection.actions",
+      "feed-plan.pen"
+    ]
+  }
+]

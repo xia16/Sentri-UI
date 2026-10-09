@@ -141,7 +141,7 @@ try {
   await page.click('[data-action="back"]');
   await page.waitForURL(/state=litter/); await ready(page);
   // the evidence row is Row (ADR 0002): its tap opens Edit (✎); a corrected figure is amber and says what it was (R1-28)
-  const rec = page.locator('.tk-day-door[data-action="open-edit"]', { hasText: 'Iron' }).first();
+  const rec = page.locator('.st-row-door[data-action="open-edit"], .st-row[data-action="open-edit"]', { hasText: 'Iron' }).first();
   assert.match((await rec.innerText()).replace(/\s+/g, ' '), /10 piglets\s*·?\s*2 deferred: weak.*was 12 · corrected/);
   assert.equal(await rec.locator('.tk-tone[data-tone="amber"]').count(), 3);
   assert.match(await text(page, '[data-action="open-dose"][data-value="iron3"]'), /2 owed|weak/);
@@ -172,21 +172,21 @@ try {
   await page.waitForURL(/litter\.html/);
   assert.match(page.url(), /crate=B01/);
   await page.goto(base + 'bulk.html?state=bulk&tx=iron&fresh=1'); await ready(page);
-  await page.locator('label.tk-row:has(input[value="B01"]) .tk-row-headline').scrollIntoViewIfNeeded();
-  const hl = await page.locator('label.tk-row:has(input[value="B01"]) .tk-row-headline').boundingBox();
+  await page.locator('label.st-row:has(input[value="B01"]) .st-row-copy strong').scrollIntoViewIfNeeded();
+  const hl = await page.locator('label.st-row:has(input[value="B01"]) .st-row-copy strong').boundingBox();
   await page.mouse.click(hl.x + hl.width / 2, hl.y + hl.height / 2);
   assert.ok(await page.isChecked('input[data-action="toggle"][value="B01"]'));
   await page.click('[data-action="review"]');
   const rb = await page.locator('[data-action="record"]').boundingBox();
   await page.mouse.move(rb.x + rb.width / 2, rb.y + rb.height / 2); await page.mouse.down(); await page.waitForTimeout(1000); await page.mouse.up();
   await page.waitForSelector('#bk-receipt');
-  const b01 = (await page.locator('.tk-row:has-text("B01")').first().innerText()).replace(/\s+/g, ' ');
+  const b01 = (await page.locator('.st-row:has-text("B01")').first().innerText()).replace(/\s+/g, ' ');
   assert.match(b01, /Sow died/);
   assert.match(b01, /Done/);
   assert.match(b01, /2 days late/);
   // a reload keeps the lateness: it is the ledger's (`lateBy`), not the page's memory
   await page.goto(base + 'bulk.html?state=bulk&tx=iron'); await ready(page);
-  const b01r = (await page.locator('.tk-row:has-text("B01")').first().innerText()).replace(/\s+/g, ' ');
+  const b01r = (await page.locator('.st-row:has-text("B01")').first().innerText()).replace(/\s+/g, ' ');
   assert.match(b01r, /Done/); assert.match(b01r, /2 days late/);
   console.log('ok 7 bulk: id opens the litter, row ticks; Sow died row keeps Done + late, also after a reload:', b01r);
 

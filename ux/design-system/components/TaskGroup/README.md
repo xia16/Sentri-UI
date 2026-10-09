@@ -2,7 +2,7 @@
 
 # TaskGroup (the grouped list)
 
-The task's list is **grouped by where the animals are**: one card per pen or crate row, a header naming it, then its [rows](../TaskRow/README.md). Never a flat list.
+The task's list is **grouped by where the animals are**: one card per pen or crate row, a header naming it, then its [rows](../Row/README.md). Never a flat list.
 
 **Anatomy**
 - **List** (`.tk-list`): padded `1px space-panel space-gutter`, a column with `space-heading` (12px) between cards.
