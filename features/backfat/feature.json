@@ -1,0 +1,30 @@
+{
+  "id": "backfat",
+  "name": "Backfat",
+  "zh": "背膘",
+  "platform": "mobile",
+  "section": "measures",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "backfat.backfat"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "backfat.backfat",
+      "name": "Backfat",
+      "zh": "背膘",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Record backfat for one pig only (a single pig, per the screen name).",
+        "issues": []
+      }
+    }
+  ]
+}

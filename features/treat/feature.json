@@ -1,0 +1,54 @@
+{
+  "id": "treat",
+  "name": "Treat",
+  "zh": "治疗",
+  "platform": "mobile",
+  "section": "health",
+  "newFeature": false,
+  "duplicates": "built inside Inspection — see inspection / health-record",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "treat.treat",
+        "treat.target",
+        "treat.none"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "treat.treat",
+      "name": "Treatment form",
+      "zh": "治疗",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Record a treatment for the selected pigs.",
+        "issues": []
+      }
+    },
+    {
+      "id": "treat.target",
+      "name": "Choose target",
+      "zh": "选择目标疾病 / 选择目标症状",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Choose the disease or symptom the treatment is for.",
+        "issues": []
+      }
+    },
+    {
+      "id": "treat.none",
+      "name": "No disease or symptom",
+      "zh": "无疾病/症状",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "What shows when the pig has nothing to treat.",
+        "issues": []
+      }
+    }
+  ]
+}

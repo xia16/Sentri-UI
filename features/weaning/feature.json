@@ -1,0 +1,90 @@
+{
+  "id": "weaning",
+  "name": "Weaning check",
+  "zh": "断奶检查",
+  "platform": "mobile",
+  "section": "tasks",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "weaning.list",
+        "weaning.overview",
+        "weaning.check",
+        "weaning.identity",
+        "weaning.end",
+        "weaning.ended"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "weaning.list",
+      "name": "Pig list tab",
+      "zh": "断奶检查猪只列表",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8023-17019",
+      "notes": {
+        "purpose": "Litters and sows to check by pen, with filter.",
+        "issues": []
+      }
+    },
+    {
+      "id": "weaning.overview",
+      "name": "Task overview",
+      "zh": "任务概览 / Grid",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8023-17019",
+      "notes": {
+        "purpose": "Whole-task progress and the pen grid.",
+        "issues": []
+      }
+    },
+    {
+      "id": "weaning.check",
+      "name": "Weaning check",
+      "zh": "断奶检查",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8023-17019",
+      "notes": {
+        "purpose": "The check: default state, already-submitted state, sow status and piglet information (断奶检查 - 母猪状态, 仔猪信息).",
+        "issues": []
+      }
+    },
+    {
+      "id": "weaning.identity",
+      "name": "Keep breeders and fill IDs",
+      "zh": "选择留种猪只 / 填身份",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8023-17019",
+      "notes": {
+        "purpose": "Choose breeders, match piglets and fill or add identity (选择留种猪只, 选择匹配猪只, 填身份, 补充身份).",
+        "issues": []
+      }
+    },
+    {
+      "id": "weaning.end",
+      "name": "End task",
+      "zh": "结束任务",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8023-17019",
+      "notes": {
+        "purpose": "End the task.",
+        "issues": []
+      }
+    },
+    {
+      "id": "weaning.ended",
+      "name": "Ended task",
+      "zh": "任务已结束",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8023-17019",
+      "notes": {
+        "purpose": "Read-only list, weaning detail, piglet information (edit state) and task detail after the task ends.",
+        "issues": []
+      }
+    }
+  ]
+}

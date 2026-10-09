@@ -1,0 +1,1094 @@
+{
+  "id": "health-record",
+  "name": "Health record",
+  "zh": "健康管理",
+  "platform": "mobile",
+  "section": "health",
+  "newFeature": false,
+  "duplicates": "Health is drawn three times in the old Figma: in Inspection (健康 - add and remove disease or symptom), in the pig list (health management) and in the 健康与治疗 treatment file. This feature holds the one version built in the Inspection prototype.",
+  "anchor": {
+    "name": "Finding",
+    "statuses": [
+      {
+        "id": "attention",
+        "name": "Needs attention",
+        "screens": [
+          "health-record.mixed",
+          "health-record.care-states"
+        ]
+      },
+      {
+        "id": "ongoing",
+        "name": "Ongoing, no action needed",
+        "screens": [
+          "health-record.ongoing",
+          "health-record.many"
+        ]
+      }
+    ],
+    "exits": [
+      {
+        "id": "closed",
+        "name": "Closed (recovered or entered in error)",
+        "screens": [
+          "health-record.resolve-finding",
+          "health-record.resolve-conditions"
+        ]
+      }
+    ],
+    "any": [
+      "health-record.finding",
+      "health-record.edit-finding",
+      "health-record.record-health",
+      "health-record.condition-picker",
+      "health-record.care-instructions",
+      "health-record.treatment",
+      "health-record.medicine-picker"
+    ]
+  },
+  "entryPoints": [
+    {
+      "section": "Inspection",
+      "label": "A pig with a condition in the walk",
+      "from": "inspection.walk",
+      "control": "A pig row with health tags",
+      "lands": "health-record.mixed"
+    },
+    {
+      "section": "Inspection",
+      "label": "Actions on ticked pigs",
+      "from": "inspection.actions",
+      "control": "Disease or symptom",
+      "lands": "health-record.record-health"
+    },
+    {
+      "section": "Pigs",
+      "label": "Attention row or health tag on the pig record",
+      "from": "pig-profile.full",
+      "control": "A needs-attention row",
+      "lands": "health-record.finding"
+    },
+    {
+      "section": "Pigs",
+      "label": "Actions, Health group",
+      "from": "pig-profile.full",
+      "control": "Actions → Health → Disease or symptom",
+      "lands": "health-record.record-health"
+    },
+    {
+      "section": "Tasks",
+      "label": "A Health task (vaccination, treatment) on a pig",
+      "from": "pig-profile.tasks",
+      "control": "A Health task card",
+      "lands": "health-record.treatment"
+    }
+  ],
+  "addsTo": [
+    {
+      "feature": "pig-profile",
+      "what": "Health actions (Disease or symptom, Record treatment, Resolve conditions, Care instructions)",
+      "screen": "pig-profile.actions",
+      "open": "Actions",
+      "under": "Health",
+      "added": true
+    },
+    {
+      "feature": "inspection",
+      "what": "Health tags with care icon on every pig row",
+      "screen": "inspection.walk",
+      "open": "Pig row",
+      "under": "Health tags",
+      "added": true
+    }
+  ],
+  "flow": [
+    [
+      "health-record.mixed",
+      "health-record.finding",
+      "tap an attention row"
+    ],
+    [
+      "health-record.ongoing",
+      "health-record.finding",
+      "tap the Arthritis tag"
+    ],
+    [
+      "health-record.finding",
+      "health-record.edit-finding",
+      "tap Edit finding"
+    ],
+    [
+      "health-record.finding",
+      "health-record.treatment",
+      "tap Record treatment"
+    ],
+    [
+      "health-record.finding",
+      "health-record.resolve-finding",
+      "tap Resolve or remove"
+    ],
+    [
+      "health-record.record-health",
+      "health-record.condition-picker",
+      "tap Choose conditions"
+    ],
+    [
+      "health-record.condition-picker",
+      "health-record.record-health",
+      "tap Done"
+    ],
+    [
+      "health-record.treatment",
+      "health-record.medicine-picker",
+      "tap Select medicine"
+    ],
+    [
+      "health-record.medicine-picker",
+      "health-record.treatment",
+      "tap a medicine"
+    ],
+    [
+      "health-record.record-health",
+      "health-record.mixed",
+      "Save: the finding appears as a row or tag"
+    ]
+  ],
+  "screens": [
+    {
+      "id": "health-record.mixed",
+      "name": "Pig with open conditions and an ongoing one",
+      "zh": "健康 · 需处理与持续",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "health-mixed",
+      "figma": "",
+      "notes": {
+        "purpose": "Read a pig's health on the spot: what needs attention now (Fever, Poor appetite) and what is only recorded (Arthritis). Sow 000306 is the example; the sheet is her pig record viewed for health.",
+        "states": [
+          "Needs-attention rows plus an ongoing tag in General details (this screen).",
+          "Only ongoing conditions: health-record.ongoing.",
+          "No condition: no rows and Health reads \"—\"."
+        ],
+        "elements": [
+          {
+            "name": "Attention row · type",
+            "shows": "Health",
+            "logic": "Fixed type word on each condition row (a pig note row reads \"Note\").",
+            "source": "attentionOverview(p)"
+          },
+          {
+            "name": "Attention row · title",
+            "shows": "Fever",
+            "logic": "The condition name.",
+            "source": "k.name"
+          },
+          {
+            "name": "Attention row · detail",
+            "shows": "Treat in place · Day 2",
+            "logic": "Care label (left out when None) then \"Day N\" - day of the condition, counted from the recorded start.",
+            "source": "k.triage, k.day"
+          },
+          {
+            "name": "Attention row · colour and chevron",
+            "shows": "amber/red band by care level",
+            "logic": "Class from the care level: hospital, treatment, monitor; chevron opens the finding.",
+            "source": "careAppearance(k).cls"
+          },
+          {
+            "name": "Health row in General details",
+            "shows": "Health · Arthritis · 120 days",
+            "logic": "Ongoing conditions (care \"No action needed\") as tags with \"N days\"; opens the condition. The row scrolls sideways when it does not fit.",
+            "source": "overviewDetails(p)"
+          },
+          {
+            "name": "Temperature",
+            "shows": "39.5 °C · Today",
+            "logic": "A plain reading; no link to Fever and no flag.",
+            "source": "p.temperature"
+          },
+          {
+            "name": "Last treatment",
+            "shows": "medicine · dose · method",
+            "logic": "Shown under the attention rows once a treatment is recorded.",
+            "source": "p.treatment"
+          }
+        ],
+        "controls": [
+          {
+            "control": "An attention row or a health tag",
+            "does": "opens the finding",
+            "goesTo": "health-record.finding"
+          },
+          {
+            "control": "Actions → Health → Disease or symptom",
+            "does": "records another condition",
+            "goesTo": "health-record.record-health"
+          },
+          {
+            "control": "Actions → Health → Record treatment",
+            "does": "records a treatment",
+            "goesTo": "health-record.treatment"
+          },
+          {
+            "control": "Actions → Health → Care instructions",
+            "does": "changes care",
+            "goesTo": "health-record.care-instructions"
+          },
+          {
+            "control": "Actions → Health → Resolve conditions",
+            "does": "recovers or corrects",
+            "goesTo": "health-record.resolve-conditions"
+          }
+        ],
+        "copy": [
+          "Health (raw)",
+          "Treat in place (raw)",
+          "Monitor (raw)",
+          "Day 2 (raw)"
+        ],
+        "edge": [
+          "A pig note appears as a \"Note\" row among the health rows and opens the log, not a finding.",
+          "A dead sow keeps her conditions but cannot be changed."
+        ],
+        "rules": [
+          "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed (ASTRA-BULK-ACTIONS, \"Unified care\").",
+          "Human-entered records lead; derived plans and stable facts stay in reading sections."
+        ],
+        "issues": [
+          "The word \"Health\" is the type on every attention row, the label of the Health row below and the name of an Actions group: three meanings on one screen.",
+          "Duration is written two ways: \"Day 2\" for a condition needing attention and \"120 days\" for an ongoing one; same fact, two formats.",
+          "The same conditions appear in the walk row tags, in these rows and (ongoing) in General details: the care level is stated in words only here.",
+          "No sign here that treatment was or was not given for Fever; \"Last treatment\" is absent until one is recorded.",
+          "A temperature of 39.5 sits in General details far below the Fever row."
+        ]
+      }
+    },
+    {
+      "id": "health-record.ongoing",
+      "name": "Pig with an ongoing condition",
+      "zh": "健康 · 持续状况",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "health-ongoing",
+      "figma": "",
+      "notes": {
+        "purpose": "A condition that is recorded but needs no action: sow 000281 has Arthritis (120 days, \"Condition recorded. No action needed.\").",
+        "states": [
+          "No needs-attention rows; the condition appears only as a tag in General details."
+        ],
+        "elements": [
+          {
+            "name": "Health row",
+            "shows": "Arthritis · 120 days",
+            "logic": "Ongoing tag in the grid, not an alert; opens the condition.",
+            "source": "overviewDetails(p)"
+          },
+          {
+            "name": "Walk row tag",
+            "shows": "Arthritis · 120 days",
+            "logic": "Same tag on the walk list; counts in the Health lens.",
+            "source": "pigRow(c,p)"
+          }
+        ],
+        "controls": [
+          {
+            "control": "The tag",
+            "does": "opens the finding",
+            "goesTo": "health-record.finding"
+          }
+        ],
+        "copy": [
+          "Health (raw)"
+        ],
+        "edge": [
+          "A condition stays visible until it is explicitly resolved."
+        ],
+        "rules": [
+          "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed (ASTRA-BULK-ACTIONS, \"Unified care\").",
+          "\"A condition with No action needed remains recorded and visible in the health tags until explicitly resolved.\""
+        ],
+        "issues": [
+          "A pig with nothing to do still counts in the walk's Health lens and the pen map \"N health\", so the count does not mean work."
+        ]
+      }
+    },
+    {
+      "id": "health-record.many",
+      "name": "Pig with several ongoing conditions",
+      "zh": "健康 · 多个持续状况",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "health-many",
+      "figma": "",
+      "notes": {
+        "purpose": "How a long list of ongoing conditions fits: Arthritis (120 days), Lameness (45 days), Coughing (30 days).",
+        "states": [
+          "Tags sit in one row that scrolls sideways."
+        ],
+        "elements": [
+          {
+            "name": "Health row",
+            "shows": "Arthritis · 120 days, Lameness · 45 days, Coughing · 30 days",
+            "logic": "Region with keyboard focus, each tag its own button; accessible name \"name · N days · View condition\".",
+            "source": "overviewDetails(p)"
+          },
+          {
+            "name": "Walk row tags",
+            "shows": "tags with +N",
+            "logic": "On the list the extra tags collapse into +N.",
+            "source": "fitRecordedTags()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "A tag",
+            "does": "opens that finding",
+            "goesTo": "health-record.finding"
+          }
+        ],
+        "copy": [],
+        "edge": [],
+        "rules": [],
+        "issues": [
+          "A sideways-scrolling row hides conditions two and three from a glance, yet these are the ones with the longest history."
+        ]
+      }
+    },
+    {
+      "id": "health-record.care-states",
+      "name": "Care levels on the list",
+      "zh": "健康 · 照护状态",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "care-states",
+      "figma": "",
+      "notes": {
+        "purpose": "Shows the four care levels as they read on the walk list: the same Diarrhoea tag on 000801 now carries Move to hospital pen.",
+        "states": [
+          "No action needed (neutral note icon) · Monitor (eye icon) · Treat in place (syringe icon) · Move to hospital pen (hospital icon)."
+        ],
+        "elements": [
+          {
+            "name": "Tag icon and colour",
+            "shows": "icon + condition + Day N",
+            "logic": "Class and icon from the care level: care-ongoing, care-monitor, care-treatment, care-hospital. The care words are only in the tooltip and in the row's accessible name.",
+            "source": "careAppearance(k)"
+          },
+          {
+            "name": "Tag sort",
+            "shows": "needs-attention tags first",
+            "logic": "On a row, conditions needing attention are listed before ongoing ones.",
+            "source": "pigRow(c,p)"
+          }
+        ],
+        "controls": [
+          {
+            "control": "A pig row",
+            "does": "opens the record",
+            "goesTo": "pig-profile.full"
+          }
+        ],
+        "copy": [
+          "No action needed (raw)",
+          "Monitor (raw)",
+          "Treat in place (raw)",
+          "Move to hospital pen (raw)"
+        ],
+        "edge": [],
+        "rules": [
+          "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed (ASTRA-BULK-ACTIONS, \"Unified care\")."
+        ],
+        "issues": [
+          "The preset opens the same text as the walk; the care level differs only by icon and colour, which a screenshot of text does not show.",
+          "Hospital pen is a care choice only: nothing moves the pig to a hospital pen."
+        ]
+      }
+    },
+    {
+      "id": "health-record.finding",
+      "name": "Finding",
+      "zh": "健康记录详情",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "One condition on one pig: its care, note, treatment and the ways to change or close it. How to reach it: a needs-attention row or a health tag on the pig record.",
+        "states": [
+          "Linked to feed (body condition: Thin): extra line and a Review feed adjustment row.",
+          "Not linked: the three rows only.",
+          "Closed or removed meanwhile: \"Finding closed - The record is retained in this pig's log.\""
+        ],
+        "elements": [
+          {
+            "name": "Title · scope",
+            "shows": "Thin · 000267 · Body condition · Day 12",
+            "logic": "Condition name; ear tag, kind (Disease, Symptom, Body condition) and day count.",
+            "source": "k.name, k.kind, k.day"
+          },
+          {
+            "name": "Care",
+            "shows": "Care · Monitor",
+            "logic": "Care label of the condition and the note beneath when there is one.",
+            "source": "careLabel(k.triage)"
+          },
+          {
+            "name": "Recorded line",
+            "shows": "Recorded 12 Sep 2026 · G. Hansen",
+            "logic": "Date and author; \"—\" for either when missing (the seeded Thin reads \"Recorded — · —\").",
+            "source": "k.recordedDate, k.recordedBy"
+          },
+          {
+            "name": "Feed link note",
+            "shows": "Linked feed adjustment: +10%. Resolving this finding restores the base plan.",
+            "logic": "Only for body-condition findings tied to a feed adjustment.",
+            "source": "k.feedLinked"
+          },
+          {
+            "name": "Latest treatment",
+            "shows": "Latest treatment: medicine · dose unit · method",
+            "logic": "Only when the pig's last treatment targeted this condition.",
+            "source": "p.treatment.target"
+          },
+          {
+            "name": "Row · Edit finding",
+            "shows": "Care and notes",
+            "logic": "Always.",
+            "source": "literal"
+          },
+          {
+            "name": "Row · Record treatment",
+            "shows": "For Thin on this pig",
+            "logic": "Opens the treatment form with the condition fixed.",
+            "source": "literal"
+          },
+          {
+            "name": "Row · Review feed adjustment",
+            "shows": "Condition band and end date",
+            "logic": "Only when linked to feed; opens the feed editor.",
+            "source": "k.feedLinked"
+          },
+          {
+            "name": "Row · Resolve or remove",
+            "shows": "Recovered, or entered in error",
+            "logic": "Always.",
+            "source": "literal"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Edit finding",
+            "does": "opens the edit form",
+            "goesTo": "health-record.edit-finding"
+          },
+          {
+            "control": "Record treatment",
+            "does": "opens treatment for this condition",
+            "goesTo": "health-record.treatment"
+          },
+          {
+            "control": "Review feed adjustment",
+            "does": "opens the feed editor for the pig",
+            "goesTo": "feed-plan.editor"
+          },
+          {
+            "control": "Resolve or remove",
+            "does": "opens the outcome form",
+            "goesTo": "health-record.resolve-finding"
+          }
+        ],
+        "copy": [
+          "Care (raw)",
+          "Edit finding (raw)",
+          "Record treatment (raw)",
+          "Review feed adjustment (raw)",
+          "Resolve or remove (raw)"
+        ],
+        "edge": [
+          "Back returns to the entry page; saved changes keep the sheet on the finding."
+        ],
+        "rules": [
+          "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed (ASTRA-BULK-ACTIONS, \"Unified care\").",
+          "Recovery keeps the case in history; entered in error marks it as a correction."
+        ],
+        "issues": [
+          "\"Recorded — · —\" shows empty dashes where the date and author are unknown.",
+          "The day count is stored at 1 when a finding is recorded and never advances in the prototype; \"Day 2\" and \"120 days\" are sample numbers.",
+          "Four rows for one record; Edit finding (care, note) and Resolve or remove both change the finding."
+        ]
+      }
+    },
+    {
+      "id": "health-record.edit-finding",
+      "name": "Edit finding",
+      "zh": "编辑健康记录",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Rename the condition, change its care and add a note. How to reach it: Finding, Edit finding.",
+        "states": [
+          "Body-condition finding linked to feed: the name is fixed and the text says \"Use Review feed adjustment to change the condition band.\"",
+          "Other findings: a picker of every catalogue name the pig does not already carry."
+        ],
+        "elements": [
+          {
+            "name": "Finding",
+            "shows": "Thin",
+            "logic": "Picker of catalogue names; a name already on the pig is not offered.",
+            "source": "catalog"
+          },
+          {
+            "name": "Care",
+            "shows": "No action needed · Monitor · Treat in place · Move to hospital pen",
+            "logic": "Select picker.",
+            "source": "careOptions"
+          },
+          {
+            "name": "Note · optional",
+            "shows": "text",
+            "logic": "Free text.",
+            "source": "f.caseNote"
+          },
+          {
+            "name": "Save changes",
+            "shows": "primary",
+            "logic": "Writes the new name, kind, care and note; log entry \"Finding edited\" with \"old → new · old care → new care\".",
+            "source": "saveFinding()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Save changes",
+            "does": "saves and returns to the finding",
+            "goesTo": "health-record.finding"
+          }
+        ],
+        "copy": [
+          "Edit finding (raw)",
+          "Save changes (raw)"
+        ],
+        "edge": [
+          "A linked treatment target is renamed with the finding."
+        ],
+        "rules": [
+          "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed (ASTRA-BULK-ACTIONS, \"Unified care\")."
+        ],
+        "issues": [
+          "The finding's start date and author cannot be corrected here."
+        ]
+      }
+    },
+    {
+      "id": "health-record.resolve-finding",
+      "name": "Resolve or remove",
+      "zh": "解决或移除",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Close one finding as Recovered or Entered in error. How to reach it: Finding, Resolve or remove.",
+        "states": [
+          "Linked to feed: \"This also ends the linked feed adjustment and returns this pig to the base plan.\""
+        ],
+        "elements": [
+          {
+            "name": "Outcome",
+            "shows": "Recovered | Entered in error",
+            "logic": "Select picker, default Recovered.",
+            "source": "f.outcome"
+          },
+          {
+            "name": "Note · optional",
+            "shows": "text",
+            "logic": "Kept with the closed case.",
+            "source": "f.closeNote"
+          },
+          {
+            "name": "Explanation",
+            "shows": "The finding leaves the active list. Its record and this change remain in the pig's log.",
+            "logic": "Fixed.",
+            "source": "literal"
+          },
+          {
+            "name": "Save outcome",
+            "shows": "primary",
+            "logic": "Moves the case to the pig's closed cases, ends a linked feed adjustment (factor back to 1), logs \"Recovered\" or \"Finding entered in error\", returns to the pig record.",
+            "source": "closeFinding()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Save outcome",
+            "does": "saves and returns to the pig record",
+            "goesTo": "pig-profile.full"
+          }
+        ],
+        "copy": [
+          "Resolve or remove (raw)",
+          "Recovered (raw)",
+          "Entered in error (raw)",
+          "Save outcome (raw)"
+        ],
+        "edge": [
+          "No second confirmation for Entered in error."
+        ],
+        "rules": [
+          "Recovery keeps the case in history; entered in error marks a correction."
+        ],
+        "issues": [
+          "Two names for the same thing: \"Resolve or remove\" here, \"Resolve conditions\" in Actions."
+        ]
+      }
+    },
+    {
+      "id": "health-record.record-health",
+      "name": "Record health",
+      "zh": "记录疾病 / 症状",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Add one or more diseases or symptoms to one pig or many in one move. How to reach it: Actions, Health, Disease or symptom (one pig or several).",
+        "states": [
+          "One pig: a Details panel only (no pig list).",
+          "Several pigs: a list of the pigs above the Details panel, each row with a checkbox, a preview and a state.",
+          "Details collapsed or open (toggle).",
+          "Save disabled until a condition is chosen and at least one row would change."
+        ],
+        "elements": [
+          {
+            "name": "Title · scope",
+            "shows": "Record health · 2 pigs",
+            "logic": "Count of selected pigs; one pig shows \"ear tag · pen\".",
+            "source": "countLabel()"
+          },
+          {
+            "name": "Row preview",
+            "shows": "Add Fever · No action needed / Already recorded · unchanged / Choose conditions",
+            "logic": "Per pig: conditions that would be added with the care label, or \"Already recorded - unchanged\" if she already has all of them, or the prompt.",
+            "source": "bulkChanges()"
+          },
+          {
+            "name": "Row checkbox",
+            "shows": "Include pig",
+            "logic": "Unticking excludes the pig (row reads \"Excluded\").",
+            "source": "f.excluded"
+          },
+          {
+            "name": "Choose conditions",
+            "shows": "summary of the chosen names or \"Choose conditions\"",
+            "logic": "Button that opens the catalogue picker.",
+            "source": "f.conditions"
+          },
+          {
+            "name": "Care",
+            "shows": "No action needed (default)",
+            "logic": "Select picker; the same care is given to every added condition.",
+            "source": "careOptions"
+          },
+          {
+            "name": "Add note chip",
+            "shows": "Add note",
+            "logic": "Opens a note editor; the note is stored with each added condition.",
+            "source": "f.note"
+          },
+          {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "logic": "N = pigs that would change. Writes one finding per pig and name, day 1, recorded date 12 Sep 2026, by G. Hansen, and one log entry \"Health recorded\".",
+            "source": "saveBulkAction()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Choose conditions",
+            "does": "opens the catalogue",
+            "goesTo": "health-record.condition-picker"
+          },
+          {
+            "control": "Save",
+            "does": "saves, clears the selection and returns to the walk list",
+            "goesTo": "inspection.walk"
+          }
+        ],
+        "copy": [
+          "Record health (raw)",
+          "Choose conditions (raw)",
+          "Care (raw)",
+          "Add note (raw)",
+          "No action needed (raw)"
+        ],
+        "edge": [
+          "A condition the pig already has is skipped and keeps its original start date.",
+          "Dead sows are not eligible.",
+          "Care default is No action needed, so a newly recorded Fever does not need attention unless the worker changes Care."
+        ],
+        "rules": [
+          "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed (ASTRA-BULK-ACTIONS, \"Unified care\").",
+          "One searchable disease/symptom catalogue for one or many pigs (HEALTH-MANAGEMENT).",
+          "Existing cases keep their original start date."
+        ],
+        "issues": [
+          "The default Care \"No action needed\" makes the quickest path (choose Fever, Save) record a fever as a non-alert; the first screen does not ask the worker to think about care.",
+          "The Save label reads \"Save · 0 pigs\" while disabled.",
+          "The catalogue starts on Symptoms and needs two taps to reach a symptom; a gloved worker faces three levels (tab, door, item)."
+        ]
+      }
+    },
+    {
+      "id": "health-record.condition-picker",
+      "name": "Choose conditions",
+      "zh": "选择疾病 / 症状",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Search or browse the disease and symptom catalogue and tick one or more. How to reach it: Record health, Choose conditions.",
+        "states": [
+          "Tabs Diseases | Symptoms (default Symptoms).",
+          "Category doors with counts; inside a category the items with checkboxes.",
+          "Search: results grouped by category, plus \"Add “name”\" when nothing matches exactly.",
+          "Custom item: asks for its category, then can be removed with an x.",
+          "\"N selected\" folded list when something is ticked."
+        ],
+        "elements": [
+          {
+            "name": "Disease doors",
+            "shows": "9 categories (Respiratory, Gastrointestinal, Reproductive and neonatal, Skin and external, Nervous system, Systemic, Musculoskeletal, Nutritional and metabolic, Other)",
+            "logic": "Each shows its disease count and \"N selected\".",
+            "source": "catalog"
+          },
+          {
+            "name": "Symptom doors",
+            "shows": "General appearance · Limbs · Tail · Head and neck · Eyes · Ears · Nose · Mouth · Skin · Body system",
+            "logic": "Body areas are separate doors; Body system opens one page with Urinary, Respiratory, Digestive and Reproductive groups.",
+            "source": "catalog"
+          },
+          {
+            "name": "Item row",
+            "shows": "Coughing  ·  Already on 1 selected",
+            "logic": "Checkbox; detail line shows \"Custom · category\" and how many selected pigs already carry it.",
+            "source": "catalogItem()"
+          },
+          {
+            "name": "Search",
+            "shows": "Search diseases / Search symptoms",
+            "logic": "Matches name, category, section and aliases (e.g. PRRS, pig flu), case-insensitive.",
+            "source": "conditionSearchText()"
+          },
+          {
+            "name": "Done",
+            "shows": "Done · N selected",
+            "logic": "Keeps the choice. Back discards the changes made in the picker.",
+            "source": "bulk-health-done"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Done",
+            "does": "returns to Record health with the choice",
+            "goesTo": "health-record.record-health"
+          }
+        ],
+        "copy": [
+          "Diseases (raw)",
+          "Symptoms (raw)",
+          "Search symptoms (raw)",
+          "Done (raw)"
+        ],
+        "edge": [
+          "A typed name that is not in the catalogue can be added as a custom disease or symptom and placed under a chosen category; custom items are kept for the session.",
+          "The disease and symptom hierarchy was translated from the Figma file."
+        ],
+        "rules": [
+          "Diseases and symptoms are one catalogue and one picker (HEALTH-MANAGEMENT)."
+        ],
+        "issues": [
+          "\"Link condition\" (for a treatment) reuses this catalogue with another layout, so there are two near-identical pickers.",
+          "No recently used or common list: a frequent condition sits two doors deep each time."
+        ]
+      }
+    },
+    {
+      "id": "health-record.care-instructions",
+      "name": "Care instructions and edit conditions",
+      "zh": "照护指示",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Change the care level (and add a note) for a chosen condition across the selected pigs. How to reach it: Actions, Health, Care instructions (one or many pigs), or Edit conditions (several pigs).",
+        "states": [
+          "Titled \"Care instructions\" or \"Edit conditions\": the same form and rows, only the title and the log entry differ (\"Triage updated\" / \"Finding edited\").",
+          "Condition not chosen: each row lists that pig's conditions or \"No open conditions\".",
+          "Condition chosen: rows read \"Thin · Monitor → Treat in place\" or \"No Thin · unchanged\"."
+        ],
+        "elements": [
+          {
+            "name": "Condition",
+            "shows": "Choose condition",
+            "logic": "Picker of the condition names found on the selected pigs.",
+            "source": "bulkSelect"
+          },
+          {
+            "name": "Care",
+            "shows": "Keep current care (default) · No action needed · Monitor · Treat in place · Move to hospital pen",
+            "logic": "Keep current care leaves each pig's own level.",
+            "source": "careOptions"
+          },
+          {
+            "name": "Row preview",
+            "shows": "Thin · Monitor → Treat in place · Note updated",
+            "logic": "Per pig: care change and note change; \"Unchanged\" when equal.",
+            "source": "bulkChanges()"
+          },
+          {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "logic": "N = changed pigs.",
+            "source": "bulkActionValid()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Save",
+            "does": "saves and returns to the list",
+            "goesTo": "inspection.walk"
+          }
+        ],
+        "copy": [
+          "Care instructions (raw)",
+          "Edit conditions (raw)",
+          "Keep current care (raw)"
+        ],
+        "edge": [
+          "Pigs without that condition are shown and left unchanged.",
+          "Dead sows are excluded."
+        ],
+        "rules": [
+          "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed (ASTRA-BULK-ACTIONS, \"Unified care\").",
+          "Bulk: Keep current care preserves each pig's existing choice."
+        ],
+        "issues": [
+          "Two Actions rows (Edit conditions, Care instructions) open the same form under two titles; a third (Edit finding) edits the same record for one pig."
+        ]
+      }
+    },
+    {
+      "id": "health-record.resolve-conditions",
+      "name": "Resolve conditions",
+      "zh": "解决疾病 / 症状",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Recover or correct one chosen condition across the selected pigs. How to reach it: Actions, Health, Resolve conditions.",
+        "states": [
+          "Condition and Outcome (Recovered | Entered in error) chosen: rows read \"Thin → Recovered\"; before the outcome: \"Thin · choose outcome\"."
+        ],
+        "elements": [
+          {
+            "name": "Condition",
+            "shows": "Choose condition",
+            "logic": "Names found on the selected pigs.",
+            "source": "bulkSelect"
+          },
+          {
+            "name": "Outcome",
+            "shows": "Choose outcome",
+            "logic": "Recovered or Entered in error.",
+            "source": "f.outcome"
+          },
+          {
+            "name": "Row preview",
+            "shows": "Thin → Recovered",
+            "logic": "Pigs without the condition are \"No X · unchanged\".",
+            "source": "bulkChanges()"
+          },
+          {
+            "name": "Row note",
+            "shows": "Resets linked feed adjustment",
+            "logic": "For feed-linked body-condition findings.",
+            "source": "row.finding.feedLinked"
+          },
+          {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "logic": "Closes each case, logs \"Recovered\" or \"Record corrected\".",
+            "source": "saveBulkAction()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Save",
+            "does": "saves and returns to the list",
+            "goesTo": "inspection.walk"
+          }
+        ],
+        "copy": [
+          "Resolve conditions (raw)",
+          "Recovered (raw)",
+          "Entered in error (raw)"
+        ],
+        "edge": [
+          "Recovery of a feed-linked finding also resets the feed factor to 1."
+        ],
+        "rules": [
+          "Recovery keeps the case in history; entered in error marks it as a correction."
+        ],
+        "issues": [
+          "The log wording differs: \"Recovered\" here and \"Finding entered in error\" in the single-pig form against \"Record corrected\" here."
+        ]
+      }
+    },
+    {
+      "id": "health-record.treatment",
+      "name": "Record treatment",
+      "zh": "记录治疗",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Record medicine actually given, to one pig or many, without implying every pig got the same dose. How to reach it: Actions, Health, Record treatment; Finding, Record treatment; or a Health task such as Vaccination.",
+        "states": [
+          "One pig: Details panel only; many: list with a Dose column and a per-pig dose that overrides the shared dose.",
+          "From a finding: the condition is fixed and shown.",
+          "From a vaccination task: titled \"Record vaccination\", vaccine list only, no condition chip, Save reads \"Save and complete task\".",
+          "Save disabled until medicine, method, unit and a dose above 0 are set."
+        ],
+        "elements": [
+          {
+            "name": "Medicine / Vaccine",
+            "shows": "Select medicine",
+            "logic": "Button; opens the medicine picker.",
+            "source": "f.medicine"
+          },
+          {
+            "name": "Method",
+            "shows": "Injection · Oral · Topical · In feed · In water",
+            "logic": "Select picker.",
+            "source": "f.method"
+          },
+          {
+            "name": "Dose · Unit",
+            "shows": "Set dose for all / Dose · mL · mg · g",
+            "logic": "Shared dose, applied to every row; a row can hold its own value.",
+            "source": "f.dose, f.values"
+          },
+          {
+            "name": "Brand chip",
+            "shows": "Brand",
+            "logic": "Optional; opens the brand picker with sample brands and \"Add a brand\".",
+            "source": "f.brand"
+          },
+          {
+            "name": "Condition chip",
+            "shows": "Condition",
+            "logic": "Optional link to a condition from the selected pigs or the whole catalogue; links only to pigs carrying it.",
+            "source": "f.target"
+          },
+          {
+            "name": "Add note chip",
+            "shows": "Add note",
+            "logic": "Optional.",
+            "source": "f.note"
+          },
+          {
+            "name": "Row state",
+            "shows": "Enter a dose above 0",
+            "logic": "Only on an invalid row; valid rows show no text.",
+            "source": "bulkRowState()"
+          },
+          {
+            "name": "Save",
+            "shows": "Save · N pigs / Save and complete task",
+            "logic": "One treatment record per included pig; log \"Treatment recorded\" or \"Vaccination recorded\"; a task completes on Save.",
+            "source": "saveBulkAction()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Medicine",
+            "does": "opens the picker",
+            "goesTo": "health-record.medicine-picker"
+          },
+          {
+            "control": "Save",
+            "does": "saves and returns to the list, the finding, or the pig record",
+            "goesTo": "inspection.walk"
+          }
+        ],
+        "copy": [
+          "Record treatment (raw)",
+          "Select medicine (raw)",
+          "Method (raw)",
+          "Set dose for all (raw)",
+          "Record vaccination (raw)"
+        ],
+        "edge": [
+          "Dead sows are excluded.",
+          "A shared dose change clears any per-row overrides.",
+          "A task-triggered treatment may prefill the medicine, but the user still confirms (TREATMENT.md; the prototype prefills nothing)."
+        ],
+        "rules": [
+          "TREATMENT.md: medicine actually administered; shared dose plus per-pig dose overrides; one record per included pig; medicines, methods and units should come from farm configuration."
+        ],
+        "issues": [
+          "Medicines, brands and units are a sample list and not farm configuration.",
+          "Dose is \"per pig\" in one place and \"for all\" in another.",
+          "The finding's \"Record treatment\" and the Health group's \"Record treatment\" differ only by the fixed condition."
+        ]
+      }
+    },
+    {
+      "id": "health-record.medicine-picker",
+      "name": "Select medicine",
+      "zh": "选择药品",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Choose the medicine (or vaccine). How to reach it: Record treatment, Select medicine.",
+        "states": [
+          "Categories: Antibiotics (2), Pain relief (1), Parasite control (1), Vaccines (2); inside a category the medicines; search across name, category and detail.",
+          "Vaccination task: only Vaccines.",
+          "No match: \"No medicines found. Try another name or category.\""
+        ],
+        "elements": [
+          {
+            "name": "Category door",
+            "shows": "Antibiotics · 2 medicines",
+            "logic": "Name and count.",
+            "source": "medicineCatalogue"
+          },
+          {
+            "name": "Medicine row",
+            "shows": "Antibiotic A · Injectable solution",
+            "logic": "Name and form; with a search term the category is added in front. A check marks the chosen one.",
+            "source": "medicineResults()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "A medicine",
+            "does": "selects it and returns to the form (a changed medicine clears the brand)",
+            "goesTo": "health-record.treatment"
+          }
+        ],
+        "copy": [
+          "Select medicine (raw)",
+          "Search medicines (raw)"
+        ],
+        "edge": [
+          "The catalogue is a sample, \"not a treatment recommendation\" (code comment)."
+        ],
+        "rules": [
+          "Searchable, categorized medicine selection (TREATMENT.md)."
+        ],
+        "issues": [
+          "Sample names (\"Antibiotic A\") and \"Sample brand A\" are placeholders."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "id": "fostering",
+  "name": "Fostering",
+  "zh": "寄养",
+  "platform": "mobile",
+  "section": "breeding",
+  "newFeature": false,
+  "duplicates": "built inside Inspection — see inspection / health-record",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "fostering.type",
+        "fostering.receive",
+        "fostering.piglets",
+        "fostering.result"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "fostering.type",
+      "name": "Choose fostering type",
+      "zh": "选择寄养类型",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Choose the kind of fostering.",
+        "issues": []
+      }
+    },
+    {
+      "id": "fostering.receive",
+      "name": "Choose receiving sow",
+      "zh": "选择接收的母猪",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Choose the sow that takes piglets, in the piglet-processing stage or the farrowing stage.",
+        "issues": []
+      }
+    },
+    {
+      "id": "fostering.piglets",
+      "name": "Choose piglets to move",
+      "zh": "选择要转出的仔猪",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Choose the piglets that move out, and optionally fill their identity.",
+        "issues": []
+      }
+    },
+    {
+      "id": "fostering.result",
+      "name": "Confirm result",
+      "zh": "寄养结果确认",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Check the outcome of the fostering.",
+        "issues": []
+      }
+    }
+  ]
+}

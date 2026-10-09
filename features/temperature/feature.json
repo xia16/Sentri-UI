@@ -1,0 +1,30 @@
+{
+  "id": "temperature",
+  "name": "Temperature",
+  "zh": "体温",
+  "platform": "mobile",
+  "section": "measures",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "temperature.temperature"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "temperature.temperature",
+      "name": "Temperature",
+      "zh": "体温",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Record temperature for one pig only (a single pig, per the screen name).",
+        "issues": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "id": "unexpected-pregnancy",
+  "name": "Unexpected pregnancy",
+  "zh": "意外妊娠",
+  "platform": "mobile",
+  "section": "breeding",
+  "newFeature": false,
+  "duplicates": "built inside Inspection — see inspection / health-record",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "unexpected-pregnancy.pregnancy",
+        "unexpected-pregnancy.line",
+        "unexpected-pregnancy.batch",
+        "unexpected-pregnancy.result"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "unexpected-pregnancy.pregnancy",
+      "name": "Record pregnancy",
+      "zh": "妊娠",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Record a pregnancy that was not planned.",
+        "issues": []
+      }
+    },
+    {
+      "id": "unexpected-pregnancy.line",
+      "name": "Choose production line",
+      "zh": "选择生产线",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Choose the production line.",
+        "issues": []
+      }
+    },
+    {
+      "id": "unexpected-pregnancy.batch",
+      "name": "Choose batch",
+      "zh": "选择批次",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Choose a batch: default, search, search results, and the chosen state.",
+        "issues": []
+      }
+    },
+    {
+      "id": "unexpected-pregnancy.result",
+      "name": "Result",
+      "zh": "操作结果",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Result of the action.",
+        "issues": []
+      }
+    }
+  ]
+}

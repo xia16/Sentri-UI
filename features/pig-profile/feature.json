@@ -1,0 +1,1471 @@
+{
+  "id": "pig-profile",
+  "name": "Pig profile",
+  "zh": "猪只详情",
+  "platform": "mobile",
+  "section": "pigs",
+  "newFeature": false,
+  "duplicates": "The old Figma draws pig detail in the 猪只列表 file as well as inside Inspection.",
+  "groups": [
+    [
+      "The record",
+      [
+        "pig-profile.full",
+        "pig-profile.partial",
+        "pig-profile.empty",
+        "pig-profile.tasks"
+      ]
+    ],
+    [
+      "Read more",
+      [
+        "pig-profile.production-batches",
+        "pig-profile.batch-record",
+        "pig-profile.origin",
+        "pig-profile.log"
+      ]
+    ],
+    [
+      "Actions · Production",
+      [
+        "pig-profile.actions",
+        "pig-profile.production-task",
+        "pig-profile.miscarriage",
+        "pig-profile.batch-membership"
+      ]
+    ],
+    [
+      "Actions · General",
+      [
+        "pig-profile.measurements",
+        "pig-profile.measure",
+        "pig-profile.body-condition",
+        "pig-profile.note"
+      ]
+    ],
+    [
+      "Actions · Unavailable",
+      [
+        "pig-profile.unavailable-actions"
+      ]
+    ]
+  ],
+  "entryPoints": [
+    {
+      "section": "Inspection",
+      "label": "Tap a pig in the walk",
+      "from": "inspection.walk",
+      "control": "A pig row",
+      "lands": "pig-profile.full"
+    },
+    {
+      "section": "Inspection",
+      "label": "Search or scan a tag",
+      "from": "inspection.find-pig",
+      "control": "A result",
+      "lands": "pig-profile.full"
+    },
+    {
+      "section": "Tasks",
+      "label": "From a task: a sow in the Farrowing room list opens her record (inside Farrowing's sow drawer)",
+      "from": "farrowing.room",
+      "control": "The first sow row, then Profile",
+      "lands": "pig-profile.full"
+    },
+    {
+      "section": "Tasks",
+      "label": "From a task: Actions on a sow opens the Actions sheet with Farrowing's rows added",
+      "from": "farrowing.room",
+      "control": "The first sow row, then Actions",
+      "lands": "pig-profile.actions"
+    },
+    {
+      "section": "Pigs",
+      "label": "From the pig list (the pig list itself is a placeholder feature written elsewhere, so no source screen exists yet)",
+      "from": null,
+      "control": "A pig row in the list",
+      "lands": "pig-profile.full"
+    }
+  ],
+  "flow": [
+    [
+      "pig-profile.full",
+      "pig-profile.production-batches",
+      "tap Production stats"
+    ],
+    [
+      "pig-profile.production-batches",
+      "pig-profile.batch-record",
+      "tap a batch row"
+    ],
+    [
+      "pig-profile.full",
+      "pig-profile.origin",
+      "tap Origin"
+    ],
+    [
+      "pig-profile.full",
+      "pig-profile.log",
+      "tap Log"
+    ],
+    [
+      "pig-profile.full",
+      "pig-profile.tasks",
+      "tap a task card"
+    ],
+    [
+      "pig-profile.tasks",
+      "pig-profile.production-task",
+      "tap a Production task"
+    ],
+    [
+      "pig-profile.full",
+      "pig-profile.actions",
+      "tap Actions"
+    ],
+    [
+      "pig-profile.actions",
+      "pig-profile.production-task",
+      "tap a task row"
+    ],
+    [
+      "pig-profile.actions",
+      "pig-profile.miscarriage",
+      "tap Record miscarriage"
+    ],
+    [
+      "pig-profile.actions",
+      "pig-profile.batch-membership",
+      "tap Batch membership"
+    ],
+    [
+      "pig-profile.actions",
+      "pig-profile.measurements",
+      "tap Measurements & condition"
+    ],
+    [
+      "pig-profile.measurements",
+      "pig-profile.measure",
+      "tap Weight, Temperature or Backfat"
+    ],
+    [
+      "pig-profile.measurements",
+      "pig-profile.body-condition",
+      "tap Record body condition"
+    ],
+    [
+      "pig-profile.actions",
+      "pig-profile.note",
+      "tap Add a note"
+    ],
+    [
+      "pig-profile.actions",
+      "pig-profile.unavailable-actions",
+      "tap Unavailable actions"
+    ]
+  ],
+  "screens": [
+    {
+      "id": "pig-profile.full",
+      "name": "Pig record · populated",
+      "zh": "猪只详情 · 完整",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "figma": "",
+      "notes": {
+        "purpose": "Read one pig on the spot: what needs attention, what to do next, who she is, how she is fed, and where to read more. The populated example is sow 000267 (Duroc, parity 2, Thin · Monitor).",
+        "states": [
+          "Needs-attention rows present or absent.",
+          "Pig dead (stage \"Sow died\"): Actions offers a note only.",
+          "Embedded in Farrowing: the same sheet opens inside the sow drawer with Farrowing's production actions added."
+        ],
+        "elements": [
+          {
+            "name": "Header · title",
+            "shows": "000267",
+            "logic": "The pig's ear tag.",
+            "source": "pig.id"
+          },
+          {
+            "name": "Header · scope",
+            "shows": "Unit 7 · C1 · Gestation · 42 days",
+            "logic": "Unit name, pen id and the stage summary (same text as the walk row).",
+            "source": "unitName · penOf · stageSummary(p)"
+          },
+          {
+            "name": "Needs-attention rows",
+            "shows": "Health · Thin · Monitor · Day 12",
+            "logic": "One row per condition whose care is Monitor, Treat in place or Move to hospital pen: type word \"Health\", the condition, then care (omitted when None) and \"Day N\". Row colour follows the care level. Absent when there is none.",
+            "source": "attentionOverview(p)"
+          },
+          {
+            "name": "Pig note row",
+            "shows": "Note · text",
+            "logic": "Only when the pig has a note (p.note); opens the pig log.",
+            "source": "p.note"
+          },
+          {
+            "name": "Last treatment",
+            "shows": "Last treatment · medicine name · dose unit · method",
+            "logic": "Only when a treatment was recorded for the pig (not in the sample pigs until one is recorded).",
+            "source": "p.treatment"
+          },
+          {
+            "name": "Current tasks",
+            "shows": "Current tasks · 1 task · Pregnancy check · Tomorrow · 13 Sep · Batch 20 · Production",
+            "logic": "Horizontal rail of task cards (see pig-profile.tasks). Absent when the pig has no task.",
+            "source": "currentTasksForPig()"
+          },
+          {
+            "name": "General details · Age",
+            "shows": "966 days",
+            "logic": "The pig's age field, else days since the birth date; \"—\" if neither.",
+            "source": "p.age or registry.birthDate"
+          },
+          {
+            "name": "General details · Type · Breed",
+            "shows": "Sow · Duroc",
+            "logic": "Animal type: registry type, else the type field, else \"Sow\" if the pig has a parity, else its stage. Breed from the registry.",
+            "source": "animalType(p) · registry.breed"
+          },
+          {
+            "name": "General details · Batch",
+            "shows": "20",
+            "logic": "The pig's production batch id.",
+            "source": "p.batchId"
+          },
+          {
+            "name": "General details · Weight · Temperature",
+            "shows": "180 kg · 2 days ago / 38.8 °C · Today",
+            "logic": "Last recorded value with the age of the reading (\"Today\", \"1 day ago\", \"N days ago\", \"Date unknown\").",
+            "source": "p.weight, measurementDates"
+          },
+          {
+            "name": "General details · On farm",
+            "shows": "Yes",
+            "logic": "From the registry; \"—\" when unknown.",
+            "source": "registry.onFarm"
+          },
+          {
+            "name": "General details · Health",
+            "shows": "tags or —",
+            "logic": "Ongoing conditions only (care \"No action needed\"), each a tag with \"N days\" that opens the condition; \"—\" when none. Needs-attention conditions are in the rows above instead.",
+            "source": "cases(p).filter(!needsHealthAttention)"
+          },
+          {
+            "name": "Type block",
+            "shows": "Sow cycle / Gilt breeding / Boar breeding / Piglet growth / Growth",
+            "logic": "Heading and facts follow the animal type: sow Last service, Expected farrowing, Backfat, Teat count, Next task, Parity; gilt not gestating First heat, Next heat; boar Last service, Breeding number; piglet Birth weight, Weaning date, Dam, Weaning weight; grower/finisher/weaner Entry weight, Entry date.",
+            "source": "typeDetails(p)"
+          },
+          {
+            "name": "Type block · Last service",
+            "shows": "1 Aug 2026 · 42 days ago",
+            "logic": "Date as recorded plus days before the walk date (12 Sep 2026).",
+            "source": "registry.serviceDate"
+          },
+          {
+            "name": "Type block · Expected farrowing",
+            "shows": "23 Nov 2026 · In 72 days",
+            "logic": "Text is \"Today\", \"In N days\" ahead, or \"N days past expected\".",
+            "source": "dueDateLabel()"
+          },
+          {
+            "name": "Type block · Next task",
+            "shows": "Pregnancy check · In 1 day",
+            "logic": "Next task of the pig's batch with timing: \"Today\", \"In N days\" ahead, \"N days overdue\" behind.",
+            "source": "batch.next, batch.nextDate"
+          },
+          {
+            "name": "Feeding block",
+            "shows": "Feeding · View plan · Gestation 1 · Included in pen allocation · 2.6 kg/day · Feed +10% Thin · mild",
+            "logic": "Formula, delivery context, the pig's allowance and its feed tags with their reason. \"No feeding plan recorded\" for a pen with unknown mode.",
+            "source": "pigFeedFacts()"
+          },
+          {
+            "name": "Pig record links",
+            "shows": "Production stats · Origin · Log",
+            "logic": "Three rows with a one-line description each.",
+            "source": "literal"
+          },
+          {
+            "name": "Footer",
+            "shows": "Back · Actions",
+            "logic": "Back returns to where the pig was opened; Actions opens the pig's Actions sheet.",
+            "source": "pigRecordToolbar()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "A needs-attention row or an ongoing health tag",
+            "does": "opens the finding",
+            "goesTo": "health-record.finding"
+          },
+          {
+            "control": "A task card",
+            "does": "opens the task (see pig-profile.tasks)",
+            "goesTo": "pig-profile.tasks"
+          },
+          {
+            "control": "View plan",
+            "does": "opens the pig's feed plan",
+            "goesTo": "feed-plan.pig"
+          },
+          {
+            "control": "Production stats",
+            "does": "opens the batch history",
+            "goesTo": "pig-profile.production-batches"
+          },
+          {
+            "control": "Origin",
+            "does": "opens provenance",
+            "goesTo": "pig-profile.origin"
+          },
+          {
+            "control": "Log",
+            "does": "opens the pig log",
+            "goesTo": "pig-profile.log"
+          },
+          {
+            "control": "Actions",
+            "does": "opens the Actions sheet for this pig",
+            "goesTo": "pig-profile.actions"
+          }
+        ],
+        "copy": [
+          "General details (raw)",
+          "Pig record (raw)",
+          "Production stats (raw)",
+          "Origin (raw)",
+          "Log (raw)",
+          "Actions (raw)",
+          "Current tasks (raw)",
+          "Feeding (raw)",
+          "View plan (raw)"
+        ],
+        "edge": [
+          "A pig in no batch shows no Next task value and a dash for Batch.",
+          "The type block is absent for types it does not know."
+        ],
+        "rules": [
+          "Human-entered records lead; derived plans and stable facts stay in reading sections (comment in the code).",
+          "Reading links keep a 44 px tap height and return to the correct pig record (BLIND-REVIEW)."
+        ],
+        "issues": [
+          "The same facts are repeated on one sheet: Pregnancy check appears as a task card (\"Tomorrow · 13 Sep · Batch 20\") and as Next task (\"In 1 day\"); Batch 20 appears in the task card and in General details; the stage and days appear in the header and the sow cycle (\"Gestation · 42 days\" and \"Last service 42 days ago\").",
+          "Six blocks (attention, tasks, general details, type block, feeding, record links) on one sheet; a worker standing at a pen needs the care and the next action first, not breed, on-farm and teat count.",
+          "Age is in days for a sow (\"966 days\"), which a farmer cannot read at a glance.",
+          "Weight and Temperature show the value in plain text; a temperature of 39.5 C gets no mark beside a Fever finding.",
+          "Type word appears three times: General details \"Type\", the block title \"Sow cycle\", and the stage.",
+          "Dashes: every empty field is drawn as a row with \"—\" (sample pigs with partial data show many), instead of leaving the row out."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.partial",
+      "name": "Pig record · partial",
+      "zh": "猪只详情 · 部分信息",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-partial",
+      "figma": "",
+      "notes": {
+        "purpose": "How the record reads when the registry is thin: sow 000254 has breed, weight, age, teats but no service date, no expected farrowing and no backfat.",
+        "states": [
+          "Some fields filled, some \"—\"."
+        ],
+        "elements": [
+          {
+            "name": "Sow cycle · Last service · Expected farrowing · Backfat",
+            "shows": "— — —",
+            "logic": "Empty values draw the dash and the row stays; the age note beside a value is dropped.",
+            "source": "recordValue()"
+          },
+          {
+            "name": "General details · Health",
+            "shows": "—",
+            "logic": "No conditions recorded.",
+            "source": "cases(p)"
+          },
+          {
+            "name": "Weight",
+            "shows": "205 kg · 7 days ago",
+            "logic": "Reading age shown beside the value.",
+            "source": "measurementAge()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "A needs-attention row or an ongoing health tag",
+            "does": "opens the finding",
+            "goesTo": "health-record.finding"
+          },
+          {
+            "control": "A task card",
+            "does": "opens the task (see pig-profile.tasks)",
+            "goesTo": "pig-profile.tasks"
+          },
+          {
+            "control": "View plan",
+            "does": "opens the pig's feed plan",
+            "goesTo": "feed-plan.pig"
+          },
+          {
+            "control": "Production stats",
+            "does": "opens the batch history",
+            "goesTo": "pig-profile.production-batches"
+          },
+          {
+            "control": "Origin",
+            "does": "opens provenance",
+            "goesTo": "pig-profile.origin"
+          },
+          {
+            "control": "Log",
+            "does": "opens the pig log",
+            "goesTo": "pig-profile.log"
+          },
+          {
+            "control": "Actions",
+            "does": "opens the Actions sheet for this pig",
+            "goesTo": "pig-profile.actions"
+          }
+        ],
+        "edge": [
+          "The Feeding and Next task blocks are unaffected by missing registry data."
+        ],
+        "rules": [
+          "An empty section is absent, never rendered as \"none\" - applied to production averages but not to these rows."
+        ],
+        "issues": [
+          "Missing facts are shown as dashes in a fixed grid; four dashes in a row (service, farrowing, backfat, and Health) read as a broken page."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.empty",
+      "name": "Pig record · mostly empty",
+      "zh": "猪只详情 · 空字段",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-empty",
+      "figma": "",
+      "notes": {
+        "purpose": "The worst case: sow 000306 has only type and on-farm in the registry, but real work: two open conditions, a vaccination due today, a station-fed plan.",
+        "states": [
+          "Header \"Gestation · —\" (no stage start).",
+          "Needs-attention rows for Fever (Treat in place · Day 2) and Poor appetite (Monitor · Day 2).",
+          "Two tasks."
+        ],
+        "elements": [
+          {
+            "name": "General details",
+            "shows": "Age — · Breed — · Weight — · Temperature — · Health —",
+            "logic": "All registry facts empty.",
+            "source": "recordValue()"
+          },
+          {
+            "name": "Sow cycle",
+            "shows": "Last service — · Expected farrowing — · Backfat — · Teat count — · Parity 5",
+            "logic": "Parity is held on the pig, so it shows.",
+            "source": "p.parity"
+          },
+          {
+            "name": "Feeding",
+            "shows": "Gestation 1 · Station-fed · 2.5 kg/day",
+            "logic": "Station-fed pen.",
+            "source": "pe.mode"
+          }
+        ],
+        "controls": [
+          {
+            "control": "A needs-attention row or an ongoing health tag",
+            "does": "opens the finding",
+            "goesTo": "health-record.finding"
+          },
+          {
+            "control": "A task card",
+            "does": "opens the task (see pig-profile.tasks)",
+            "goesTo": "pig-profile.tasks"
+          },
+          {
+            "control": "View plan",
+            "does": "opens the pig's feed plan",
+            "goesTo": "feed-plan.pig"
+          },
+          {
+            "control": "Production stats",
+            "does": "opens the batch history",
+            "goesTo": "pig-profile.production-batches"
+          },
+          {
+            "control": "Origin",
+            "does": "opens provenance",
+            "goesTo": "pig-profile.origin"
+          },
+          {
+            "control": "Log",
+            "does": "opens the pig log",
+            "goesTo": "pig-profile.log"
+          },
+          {
+            "control": "Actions",
+            "does": "opens the Actions sheet for this pig",
+            "goesTo": "pig-profile.actions"
+          }
+        ],
+        "edge": [
+          "The preset is named for empty fields, yet the pig carries open work; that work is shown in full while the facts are blank."
+        ],
+        "rules": [],
+        "issues": [
+          "The same facts are repeated on one sheet: Pregnancy check appears as a task card (\"Tomorrow · 13 Sep · Batch 20\") and as Next task (\"In 1 day\"); Batch 20 appears in the task card and in General details; the stage and days appear in the header and the sow cycle (\"Gestation · 42 days\" and \"Last service 42 days ago\").",
+          "The worker's view is dominated by the grid of dashes; the two attention rows and two tasks are the only useful content and they sit above it.",
+          "Header \"Gestation · —\" has a dash where the stage days should be."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.tasks",
+      "name": "Pig record · current tasks",
+      "zh": "猪只详情 · 当前任务",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "pig-tasks",
+      "figma": "",
+      "notes": {
+        "purpose": "Show that one pig can have several tasks at once and how each opens. Sow 000254 has a Vaccination (Health, due today) and her batch's Pregnancy check (Production, tomorrow).",
+        "states": [
+          "One or more cards; a card may be marked active (in progress) or due (today).",
+          "No task: the whole section is absent."
+        ],
+        "elements": [
+          {
+            "name": "Heading",
+            "shows": "Current tasks · 2 tasks",
+            "logic": "Count with singular/plural.",
+            "source": "tasks.length"
+          },
+          {
+            "name": "Task card · icon",
+            "shows": "syringe / chart / plus",
+            "logic": "Syringe for vaccination or a Vaccination title, chart for Production type, plus for others.",
+            "source": "taskIcon()"
+          },
+          {
+            "name": "Task card · title and line",
+            "shows": "Vaccination · Due today · Scheduled vaccination",
+            "logic": "Status then summary, joined with \" · \". Batch tasks use summary \"Batch 20\" and the status \"In progress\" or the next date.",
+            "source": "t.status, t.summary"
+          },
+          {
+            "name": "Task card · type",
+            "shows": "Health | Production",
+            "logic": "Type chip from the task.",
+            "source": "t.type"
+          },
+          {
+            "name": "Order",
+            "shows": "Vaccination before Pregnancy check",
+            "logic": "Sorted: In progress, then Due today, then Tomorrow, then the rest.",
+            "source": "priority() in currentTasksForPig"
+          },
+          {
+            "name": "Sources",
+            "shows": "host tasks, pig tasks, batch task",
+            "logic": "Tasks from Farrowing's drawer, the pig's own list and the batch (current or next task); de-duplicated by id or title; tasks completed in this session are removed.",
+            "source": "currentTasksForPig()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Vaccination or other Health task",
+            "does": "opens Record vaccination (vaccine list only) which completes the task on Save",
+            "goesTo": "health-record.treatment"
+          },
+          {
+            "control": "Production task (Pregnancy check ...)",
+            "does": "opens the outcome form",
+            "goesTo": "pig-profile.production-task"
+          },
+          {
+            "control": "Farrowing or Piglet processing task",
+            "does": "opens the Farrowing prototype (or the drawer's task when embedded)",
+            "goesTo": "farrowing.room"
+          }
+        ],
+        "copy": [
+          "Current tasks (raw)",
+          "Due today (raw)"
+        ],
+        "edge": [
+          "Only tasks of the pig's own batch pigs: a task with a pigIds list shows only to those pigs."
+        ],
+        "rules": [
+          "\"Current task, including Farrowing: hidden in bulk actions\" (ASTRA-BULK-ACTIONS) - tasks are single-pig."
+        ],
+        "issues": [
+          "The same tasks are listed again in the Actions sheet (Production cluster, and Health) - two doors to one task.",
+          "A task's own type word (Health / Production) sits beside the Actions groups called Health and Production; same names, different meaning (task type vs action group)."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.production-batches",
+      "name": "Production stats",
+      "zh": "生产统计",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "production-batches",
+      "figma": "",
+      "notes": {
+        "purpose": "A sow's batch history: averages over finished batches and one row per batch, current first. The example is sow 000281.",
+        "states": [
+          "Averages shown only when at least one batch is completed; otherwise the section is absent.",
+          "Metric set follows the animal type.",
+          "No batch records: \"No batch records.\""
+        ],
+        "elements": [
+          {
+            "name": "Title · scope",
+            "shows": "Production stats · 000281 · Unit 7 · C1",
+            "logic": "Page title; ear tag, unit, pen.",
+            "source": "pigRecordPage()"
+          },
+          {
+            "name": "Averages · heading",
+            "shows": "Averages · 2 completed batches",
+            "logic": "Count of completed batches.",
+            "source": "productionAverages()"
+          },
+          {
+            "name": "Averages · Born alive",
+            "shows": "13",
+            "logic": "Mean of bornAlive over completed batches, one decimal (14 and 12).",
+            "source": "records.bornAlive"
+          },
+          {
+            "name": "Averages · Weaned",
+            "shows": "12",
+            "logic": "Mean of weaned (13 and 11).",
+            "source": "records.weaned"
+          },
+          {
+            "name": "Averages · Weaning wt.",
+            "shows": "6.6 kg",
+            "logic": "Total weaning litter weight divided by total weaned piglets over batches that have both; kg per piglet.",
+            "source": "weaningLitterWeight / weaned"
+          },
+          {
+            "name": "Averages for other types",
+            "shows": "Boar: Services / batch; others: Entry weight, Exit weight",
+            "logic": "Sow and gilt use the litter metrics.",
+            "source": "productionOverview()"
+          },
+          {
+            "name": "Batch row · current",
+            "shows": "Batch 20 · Gestation · 46 days · Current",
+            "logic": "The current batch, built from the pig's batch id with the stage summary; tag \"Current\".",
+            "source": "productionRecords()"
+          },
+          {
+            "name": "Batch row · finished",
+            "shows": "Batch 16 · 13 weaned · 6.6 kg · 8 Jul 2026",
+            "logic": "Weaned count, weaning weight per piglet, finish date (\"Date unknown\" if none), rating if any. Boar: \"N services\"; others \"N kg at finish\".",
+            "source": "record fields"
+          }
+        ],
+        "controls": [
+          {
+            "control": "A batch row",
+            "does": "opens that batch record",
+            "goesTo": "pig-profile.batch-record"
+          },
+          {
+            "control": "Back",
+            "does": "returns to the pig record",
+            "goesTo": "pig-profile.full"
+          }
+        ],
+        "copy": [
+          "Production stats (raw)",
+          "Averages (raw)",
+          "Batches (raw)"
+        ],
+        "edge": [
+          "A weaning weight of a batch with zero weaned piglets is ignored."
+        ],
+        "rules": [
+          "Design law: an empty section is absent, never rendered as \"none\" (comment in productionOverview)."
+        ],
+        "issues": [
+          "The pig's lifetime figures (litters, born total, farrowing rate, weaning rate, farrowing interval, non-productive days) are seeded on the pig but not drawn here.",
+          "The second line of each finished batch repeats \"6.6 kg\" which the Averages block gives as an average."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.batch-record",
+      "name": "Batch record",
+      "zh": "批次记录",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "One finished or current batch of the pig. How to reach it: a batch row on Production stats.",
+        "states": [
+          "Current: \"Current batch\" and This cycle (Last service, Expected farrowing; others show Type, Age).",
+          "Finished: Results, Finish weaning, author and finish date, optional note.",
+          "Record not found: \"Record unavailable.\""
+        ],
+        "elements": [
+          {
+            "name": "Title · scope",
+            "shows": "Batch 16 · 000281 · Finished",
+            "logic": "In progress for the current batch.",
+            "source": "record.status"
+          },
+          {
+            "name": "Results",
+            "shows": "Born alive 14 · Stillborn 1 · Weaned 13 · Weaning weight 6.6 kg/pig",
+            "logic": "Weaning weight = litter weight / weaned.",
+            "source": "record"
+          },
+          {
+            "name": "Finish weaning",
+            "shows": "Farrowed 10 Jun 2026 · Weaned 8 Jul 2026 · Parity · Rating · Sow weight · Backfat",
+            "logic": "Dashes for missing values. For boars and others the block is \"Finish record\" with Finished and Rating.",
+            "source": "profileFacts()"
+          },
+          {
+            "name": "Author line",
+            "shows": "8 Jul 2026 · G. Hansen",
+            "logic": "Finish date and who recorded.",
+            "source": "record.recordedBy"
+          },
+          {
+            "name": "Note",
+            "shows": "text",
+            "logic": "Only when the batch record holds a note.",
+            "source": "record.note"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Back",
+            "does": "returns to Production stats",
+            "goesTo": "pig-profile.production-batches"
+          }
+        ],
+        "copy": [
+          "Results (raw)",
+          "Finish weaning (raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": [
+          "\"Finish weaning\" is the title for sows only; the name for a boar block is \"Finish record\"."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.origin",
+      "name": "Origin",
+      "zh": "来源",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Where the pig came from and the identities it carries. How to reach it: Origin on the pig record.",
+        "states": [
+          "Facts present or \"—\"; the disclosure \"Other identities N\" lists more identities, or reads \"Other identities —\" when none."
+        ],
+        "elements": [
+          {
+            "name": "Origin & dates",
+            "shows": "Entry type, Birth date, Arrival date, First heat, Birth farm, Genetic line, Dam, Sire",
+            "logic": "Fixed set of eight rows; dash when missing.",
+            "source": "registry"
+          },
+          {
+            "name": "Identity records",
+            "shows": "Current ear tag, Breeding number, Other ear tag",
+            "logic": "The ear tag is the pig's id.",
+            "source": "p.id, registry"
+          },
+          {
+            "name": "Other identities",
+            "shows": "RFID 982 000 000 267 · Birth record BR-2024-0267",
+            "logic": "Collapsible list of type and value.",
+            "source": "registry.identities"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Back",
+            "does": "returns to the pig record",
+            "goesTo": "pig-profile.full"
+          }
+        ],
+        "copy": [
+          "Origin & dates (raw)",
+          "Identity records (raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": [
+          "Entire page is read-only; a worker who finds a wrong ear tag or breed cannot fix it here."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.log",
+      "name": "Pig log",
+      "zh": "猪只记录",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Everything recorded on this pig, filterable. How to reach it: Log on the pig record, or the Note row.",
+        "states": [
+          "All activity or one category (Production, Health, Movement, Feed, Measurements, Notes); all dates or a preset or custom range; empty or no match."
+        ],
+        "elements": [
+          {
+            "name": "Filter bar",
+            "shows": "All activity · All dates · 5 entries · Newest first",
+            "logic": "Same bar as the pen log; no Equipment category for pigs.",
+            "source": "logFilterBar()"
+          },
+          {
+            "name": "Entry",
+            "shows": "Health · Thin · Body condition · Day 12 · Monitor · Before this walk · Author not supplied",
+            "logic": "Category tag, title, note, date and time, author. Seeded entries without a date read \"Before this walk\"; they stay at the end and pass no date filter.",
+            "source": "pigLogEntries()"
+          },
+          {
+            "name": "Entry · today",
+            "shows": "Today · 09:41",
+            "logic": "Entries saved in the session are stamped Today 09:41.",
+            "source": "c.events"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Date range",
+            "does": "opens the date drawer",
+            "goesTo": "pig-profile.log"
+          },
+          {
+            "control": "Back",
+            "does": "returns to the pig record",
+            "goesTo": "pig-profile.full"
+          }
+        ],
+        "copy": [
+          "Pig log (raw)",
+          "No activity recorded yet (raw)"
+        ],
+        "edge": [
+          "Corrections and entered-in-error findings stay in the log."
+        ],
+        "rules": [
+          "ASTRA-LOG-FILTER-PATTERNS."
+        ],
+        "issues": [
+          "\"Author not supplied\" and \"Start date and author not supplied\" appear on seeded entries; real records would always have both.",
+          "The name changes: Log (link), Pig log (title)."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.actions",
+      "name": "Actions · one pig",
+      "zh": "操作（单头猪）",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Everything a worker can do to one pig, in three groups: Production, Health, General. How to reach it: Actions on the pig record; in Farrowing, Actions on a sow. The same sheet opens for several pigs (inspection.actions).",
+        "states": [
+          "Production group: only for one pig, and only the rows that fit her stage and tasks.",
+          "Unavailable rows move to \"Unavailable actions (N)\" with the reason.",
+          "Dead sow: Production and Health empty, only a note.",
+          "Opened from Farrowing (embedded): rows added by Farrowing are mixed in (piglet processing, piglet deaths, reconcile count, foster, edit litter, sow death, remove from batch, mark not in pig, transfer)."
+        ],
+        "elements": [
+          {
+            "name": "Title · scope",
+            "shows": "Actions · 000306 · C2",
+            "logic": "Ear tag and pen.",
+            "source": "penOf(c,p.id).id"
+          },
+          {
+            "name": "Production · task cluster",
+            "shows": "Pregnancy check → row \"Pregnancy check · Tomorrow · 13 Sep · Batch 20\"",
+            "logic": "One cluster per production scope found among her tasks and her stage (Farrowing, Piglet processing, Pregnancy check, Gestation, Breeding, Lactation, Growth, Shared); the cluster heading and the single row carry the same word.",
+            "source": "productionActionsForPig()"
+          },
+          {
+            "name": "Production · Record miscarriage",
+            "shows": "Record a pregnancy loss",
+            "logic": "Offered when the stage reads gestating, in heat or breeding.",
+            "source": "stage regex /gestat|in heat|breeding/"
+          },
+          {
+            "name": "Production · Batch membership",
+            "shows": "Batch 20 · move or remove / Add this pig to a batch",
+            "logic": "Always listed; unavailable (\"No production batches are available.\") when she is in no batch and no other batch exists.",
+            "source": "productionActionsForPig()"
+          },
+          {
+            "name": "Health group",
+            "shows": "Disease or symptom · Record treatment · Resolve conditions · Care instructions",
+            "logic": "Resolve and Care appear only if she has a condition; otherwise they are listed as unavailable with the reason. Edit conditions is bulk only.",
+            "source": "actionCatalogue()"
+          },
+          {
+            "name": "General group",
+            "shows": "Add a note · Measurements & condition · Adjust feed",
+            "logic": "Adjust feed is absent (unavailable with reason) for ad-lib, dead or no-plan pigs.",
+            "source": "actionCatalogue()"
+          },
+          {
+            "name": "Footer tabs",
+            "shows": "Production | Health | General",
+            "logic": "Jump to a group; the active tab follows scroll position.",
+            "source": "actionCategoryNav()"
+          },
+          {
+            "name": "Unavailable actions (N)",
+            "shows": "link at the end",
+            "logic": "Count of blocked rows; opens the list.",
+            "source": "unavailable.length"
+          }
+        ],
+        "controls": [
+          {
+            "control": "A task row",
+            "does": "opens the outcome form (or Farrowing for farrowing and piglet processing)",
+            "goesTo": "pig-profile.production-task"
+          },
+          {
+            "control": "Record miscarriage",
+            "does": "opens the form",
+            "goesTo": "pig-profile.miscarriage"
+          },
+          {
+            "control": "Batch membership",
+            "does": "opens the form",
+            "goesTo": "pig-profile.batch-membership"
+          },
+          {
+            "control": "Disease or symptom · Record treatment · Resolve conditions · Care instructions",
+            "does": "open the health forms",
+            "goesTo": "health-record.record-health"
+          },
+          {
+            "control": "Measurements & condition",
+            "does": "opens the menu",
+            "goesTo": "pig-profile.measurements"
+          },
+          {
+            "control": "Add a note",
+            "does": "opens the note form",
+            "goesTo": "pig-profile.note"
+          },
+          {
+            "control": "Adjust feed",
+            "does": "opens the feed editor",
+            "goesTo": "feed-plan.editor"
+          },
+          {
+            "control": "Unavailable actions",
+            "does": "opens the blocked list",
+            "goesTo": "pig-profile.unavailable-actions"
+          }
+        ],
+        "copy": [
+          "Actions (raw)",
+          "Production (raw)",
+          "Health (raw)",
+          "General (raw)",
+          "Unavailable actions (raw)"
+        ],
+        "edge": [
+          "For a dead sow every row is unavailable except Add a note.",
+          "Remove from batch, Move to another farrowing batch and Batch membership overlap: the Farrowing versions are hidden when this sheet's own Batch membership row exists.",
+          "Mark not in pig, Remove from batch and Transfer sow render only inside Farrowing's sow drawer (they need the host's data and are not reachable standalone)."
+        ],
+        "rules": [
+          "Production actions exist only for one pig (ASTRA-BULK-ACTIONS).",
+          "A blocked pig is listed with the reason, never dropped silently (section rule).",
+          "Farrowing opens the shared health flows rather than duplicating them (HEALTH-MANAGEMENT)."
+        ],
+        "issues": [
+          "The cluster heading repeats the row title (\"Pregnancy check\" over \"Pregnancy check\") when a cluster holds one row.",
+          "The task appears here, in Current tasks on the record, and as Next task: three places for one task.",
+          "Production holds clusters named after tasks or stages (Gestation, Shared) with one row each; the grouping adds a heading per row.",
+          "Body condition is under General (Measurements & condition) but creates a health finding.",
+          "Farrowing's own row \"Add note / Edit note\" (a marker, named Add marker in MARKERS.md) and this sheet's \"Add a note\" are the same idea; when the Farrowing row exists this sheet hides its own."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.production-task",
+      "name": "Record task outcome",
+      "zh": "记录任务结果",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Finish or defer a production task from the pig. How to reach it: a Production task card on the record, or the task row in Actions.",
+        "states": [
+          "Pregnancy check: Pregnant · Not in pig · Recheck later.",
+          "Any other task: Complete task · Follow up.",
+          "Save disabled until an outcome is chosen."
+        ],
+        "elements": [
+          {
+            "name": "Title · scope",
+            "shows": "Pregnancy check · 000306 · Batch 20",
+            "logic": "Task title, ear tag, batch.",
+            "source": "f.taskTitle"
+          },
+          {
+            "name": "Outcome choices",
+            "shows": "Pregnant - Keep in the current gestation batch; Not in pig - Close this task and return the sow to rebreed watch; Recheck later - Keep the task open for another check",
+            "logic": "Selected one shows a check mark.",
+            "source": "productionTaskPage()"
+          },
+          {
+            "name": "Note · optional",
+            "shows": "Add useful context for the next person",
+            "logic": "Free text.",
+            "source": "f.taskNote"
+          },
+          {
+            "name": "Save",
+            "shows": "Save and complete / Save follow-up",
+            "logic": "Label turns to \"Save follow-up\" for Recheck later and Follow up.",
+            "source": "f.taskOutcome"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Save and complete",
+            "does": "completes the task (not for recheck/follow-up); Not in pig removes her from the batch and sets her Off production / Open; returns to the pig record",
+            "goesTo": "pig-profile.full"
+          }
+        ],
+        "copy": [
+          "Record outcome (raw)",
+          "Save and complete (raw)",
+          "Save follow-up (raw)"
+        ],
+        "edge": [
+          "\"Not in pig\" changes the sow's stage and batch with no confirmation."
+        ],
+        "rules": [
+          "Not in pig: \"records a production outcome, removes the sow from this batch, and returns her to rebreed watch\" (code text)."
+        ],
+        "issues": [
+          "Not in pig is one tap in a list of three equal choices; a mis-tap changes batch and stage with no confirmation or undo.",
+          "The record page of a non-pregnancy task uses a generic \"Complete task / Follow up\" pair that tells the worker nothing about what was done."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.miscarriage",
+      "name": "Record miscarriage",
+      "zh": "记录流产",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Record a pregnancy loss as a production outcome. How to reach it: Actions, Production, Record miscarriage.",
+        "states": [
+          "Reason empty: Save disabled."
+        ],
+        "elements": [
+          {
+            "name": "Warning",
+            "shows": "This sow will be removed from the batch. Saved records are kept.",
+            "logic": "Fixed.",
+            "source": "literal"
+          },
+          {
+            "name": "Reason",
+            "shows": "Enter the reason",
+            "logic": "Free text, required.",
+            "source": "c.lossReason"
+          },
+          {
+            "name": "Save",
+            "shows": "Save",
+            "logic": "Removes her from the batch, sets Off production / Open, adds \"Miscarriage recorded\" (Production) and returns to the pig record.",
+            "source": "saveMiscarriage()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Save",
+            "does": "saves",
+            "goesTo": "pig-profile.full"
+          }
+        ],
+        "copy": [
+          "Record miscarriage (raw)",
+          "Enter the reason (raw)"
+        ],
+        "edge": [
+          "Single-animal action, hidden from bulk.",
+          "Not offered once another outcome is recorded in Farrowing; this sheet does not check for an existing outcome (unclear: whether it should)."
+        ],
+        "rules": [
+          "MISCARRIAGE.md: reason, batch removal consequence, history, unavailable states for dead sows."
+        ],
+        "issues": [
+          "Reason is a free text box; the production-task outcome \"Not in pig\" lists evidence choices instead - two forms for a similar loss."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.batch-membership",
+      "name": "Batch membership",
+      "zh": "批次归属",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Put the pig into a batch, move her to another, or remove her. How to reach it: Actions, Production, Batch membership.",
+        "states": [
+          "In a batch: card \"Current batch · Batch 20 · Gestating · 5 pigs\", choices of other batches and \"Remove from batch\".",
+          "In no batch: \"No batch - This pig is not assigned to a production batch.\" and \"Add to batch\".",
+          "No batch to choose: \"No production batches are available.\""
+        ],
+        "elements": [
+          {
+            "name": "Current batch card",
+            "shows": "Batch 20 · Gestating · 5 pigs",
+            "logic": "Stage and member count.",
+            "source": "c.batches"
+          },
+          {
+            "name": "Picker",
+            "shows": "Change membership / Add to batch",
+            "logic": "Options \"Batch N · stage\" for the other batches and \"Remove from batch\".",
+            "source": "batchMembershipPage()"
+          },
+          {
+            "name": "Note",
+            "shows": "Why is this changing?",
+            "logic": "Optional.",
+            "source": "f.batchNote"
+          },
+          {
+            "name": "Save",
+            "shows": "Move pig / Add to batch / Remove from batch",
+            "logic": "Label follows the choice; disabled until one is chosen. Moving also sets the pig's stage to the new batch's stage.",
+            "source": "saveBatchMembership()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Save",
+            "does": "saves and returns to the pig record",
+            "goesTo": "pig-profile.full"
+          }
+        ],
+        "copy": [
+          "Batch membership (raw)",
+          "Move pig (raw)"
+        ],
+        "edge": [
+          "Moving a pig overwrites her stage with the batch stage."
+        ],
+        "rules": [],
+        "issues": [
+          "A stage change as a side effect of \"Move pig\" is not stated on the form."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.measurements",
+      "name": "Measurements & condition",
+      "zh": "测量与体况",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Pick which reading to record. How to reach it: Actions, General, Measurements & condition.",
+        "states": [
+          "One pig: Record body condition (hidden for an ad-lib pig), Record weight, Record temperature, Record backfat (sows and gilts only).",
+          "Several pigs: body condition, weight (a separate value for each), backfat; no temperature."
+        ],
+        "elements": [
+          {
+            "name": "Body condition row",
+            "shows": "Condition and linked care",
+            "logic": "Opens the body-condition form.",
+            "source": "measurementsMenu()"
+          },
+          {
+            "name": "Weight row",
+            "shows": "Weight in kg / A separate value for each pig",
+            "logic": "Text follows single or bulk.",
+            "source": "measurementsMenu()"
+          },
+          {
+            "name": "Temperature row",
+            "shows": "Body temperature in °C",
+            "logic": "One pig only.",
+            "source": "measurementsMenu()"
+          },
+          {
+            "name": "Backfat row",
+            "shows": "Backfat depth in mm",
+            "logic": "Only if the pig is a sow or gilt.",
+            "source": "animalType(p)"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Weight · Temperature · Backfat",
+            "does": "open the reading form",
+            "goesTo": "pig-profile.measure"
+          },
+          {
+            "control": "Record body condition",
+            "does": "opens the condition form",
+            "goesTo": "pig-profile.body-condition"
+          }
+        ],
+        "copy": [
+          "Measurements & condition (raw)"
+        ],
+        "edge": [],
+        "rules": [
+          "Weight, backfat and temperature take one value per pig (section rule)."
+        ],
+        "issues": [
+          "A menu with three or four rows between the Actions sheet and the form: one extra tap for each reading."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.measure",
+      "name": "Record weight, temperature or backfat",
+      "zh": "记录体重 / 体温 / 背膘",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Enter one reading for one pig, or one per pig for several. How to reach it: Measurements & condition, then the reading.",
+        "states": [
+          "One pig: a number field with the unit, \"Last recorded: 192 kg · 3 days ago\", optional note.",
+          "Several pigs: scrolling list \"Current → New · kg\", a row per pig; blank rows stay unchanged.",
+          "A value that is not above 0 marks the row \"Enter a value above 0\" and blocks the save.",
+          "Backfat: boars and piglets rows read \"Sows and gilts only\"."
+        ],
+        "elements": [
+          {
+            "name": "Field",
+            "shows": "Weight · kg",
+            "logic": "Number, decimal; unit follows the reading (kg, °C, mm).",
+            "source": "bulkMeasurements"
+          },
+          {
+            "name": "Last recorded",
+            "shows": "Last recorded: 192 kg · 3 days ago",
+            "logic": "Previous value and age of the reading; shown for one pig only.",
+            "source": "p[view], measurementAge()"
+          },
+          {
+            "name": "Row preview",
+            "shows": "180 → 190 kg",
+            "logic": "Current to new value.",
+            "source": "bulkChanges()"
+          },
+          {
+            "name": "Save",
+            "shows": "Save / Save · N pigs",
+            "logic": "N = rows that changed; disabled until at least one row changed and none has an error.",
+            "source": "bulkActionValid()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Save",
+            "does": "writes the readings and a log entry per pig, clears the selection and returns to the walk list",
+            "goesTo": "inspection.walk"
+          }
+        ],
+        "copy": [
+          "Record weight (raw)",
+          "Save (raw)"
+        ],
+        "edge": [
+          "Dead sows are excluded.",
+          "Excluded (unticked) rows stay unchanged."
+        ],
+        "rules": [
+          "Blank rows stay unchanged; invalid entered readings block the whole save (ASTRA-BULK-ACTIONS)."
+        ],
+        "issues": [
+          "After saving a reading the sheet drops back to the walk list, not to the pig record the worker came from (the production task, miscarriage and batch forms do return to the record).",
+          "Any value above 0 saves: there is no upper bound or plausibility check on weight, temperature or backfat.",
+          "A saved temperature has no normal range or flag."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.body-condition",
+      "name": "Body condition",
+      "zh": "体况",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Record a pig as Thin or Over-conditioned. How to reach it: Measurements & condition, Record body condition.",
+        "states": [
+          "Choose condition: Thin or Over-conditioned; note says \"Records condition. Feed stays unchanged.\"",
+          "Several pigs: preview \"— → Thin\"; rows already at that condition stay unchanged."
+        ],
+        "elements": [
+          {
+            "name": "Condition",
+            "shows": "Choose condition",
+            "logic": "Two options only.",
+            "source": "bulkSelect"
+          },
+          {
+            "name": "Row preview",
+            "shows": "Thin → Over-conditioned",
+            "logic": "Current body-condition finding name, or \"—\".",
+            "source": "p.bodyCondition"
+          },
+          {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "logic": "On Save a Body condition finding is added with care Monitor (or its name replaced); the log reads \"... · feed unchanged\".",
+            "source": "saveBulkAction()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Save",
+            "does": "saves, clears the selection and returns to the walk list",
+            "goesTo": "inspection.walk"
+          }
+        ],
+        "copy": [
+          "Body condition (raw)",
+          "Records condition. Feed stays unchanged. (raw)"
+        ],
+        "edge": [
+          "Earlier versions linked the condition band to an automatic feed adjustment; this form does not (the band form is in the code but not opened)."
+        ],
+        "rules": [
+          "Body condition records the finding only; feed changes are made in Adjust feed."
+        ],
+        "issues": [
+          "A body condition becomes a health finding with Monitor care at once, so it appears as \"needs attention\" on the walk; the form does not say so."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.note",
+      "name": "Add a note",
+      "zh": "添加备注",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Leave a note on a pig (or the same note on several). How to reach it: Actions, General, Add a note.",
+        "states": [
+          "One pig: a text area. Several pigs: the same note is recorded separately for each included pig."
+        ],
+        "elements": [
+          {
+            "name": "Note",
+            "shows": "Add a note",
+            "logic": "Free text.",
+            "source": "f.note"
+          },
+          {
+            "name": "Save",
+            "shows": "Save / Save · N pigs",
+            "logic": "Disabled while empty. The note becomes the pig's note, shown as a \"Note\" row on the record, replacing any earlier note.",
+            "source": "saveBulkAction()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Save",
+            "does": "saves, clears the selection and returns to the walk list",
+            "goesTo": "inspection.walk"
+          }
+        ],
+        "copy": [
+          "Add a note (raw)"
+        ],
+        "edge": [
+          "Allowed on a dead sow."
+        ],
+        "rules": [
+          "The same note is recorded separately for each pig (ASTRA-BULK-ACTIONS)."
+        ],
+        "issues": [
+          "A new note overwrites the old one on the pig (the log keeps both); the screen does not say so."
+        ]
+      }
+    },
+    {
+      "id": "pig-profile.unavailable-actions",
+      "name": "Unavailable actions",
+      "zh": "不可用操作",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "Show every blocked action with its reason. How to reach it: \"Unavailable actions (N)\" at the end of the Actions sheet.",
+        "states": [
+          "Grouped Production, Health, General; every row disabled with the reason as its sub-line."
+        ],
+        "elements": [
+          {
+            "name": "Row",
+            "shows": "Resolve conditions · No open conditions to resolve.",
+            "logic": "Title and the reason.",
+            "source": "actionCatalogue().unavailable"
+          },
+          {
+            "name": "Reasons in the code",
+            "shows": "No open conditions to resolve. · Record a health finding first. · Pig has died · Ad-lib feeding has no fixed daily allowance · No feeding plan recorded · No production batches are available. · Ad-lib pigs do not have an individual ration.",
+            "logic": "Fixed strings by cause.",
+            "source": "feedUnavailableReason() etc."
+          }
+        ],
+        "controls": [
+          {
+            "control": "Back",
+            "does": "returns to Actions",
+            "goesTo": "pig-profile.actions"
+          }
+        ],
+        "copy": [
+          "Unavailable actions (raw)"
+        ],
+        "edge": [],
+        "rules": [
+          "A blocked action is listed with the reason, never dropped silently."
+        ],
+        "issues": [
+          "The list sits one tap behind the Actions sheet, and for most pigs holds one or two rows; showing the reason on the row inside Actions (disabled) would avoid the extra page."
+        ]
+      }
+    }
+  ]
+}

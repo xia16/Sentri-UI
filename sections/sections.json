@@ -1,0 +1,69 @@
+{
+  "platforms": [
+    {
+      "id": "mobile",
+      "name": "Mobile",
+      "sections": [
+        {
+          "id": "home",
+          "name": "Home",
+          "zh": "首页",
+          "shared": "Home is the workbench, not a statistics page: it shows what needs doing now. A section chooser summarises each section's workload; a section's Overview groups work by task type with timing and progress; picking a unit narrows the counts. Scan and Toolbox stay in reach, and the Assistant opens from the header."
+        },
+        {
+          "id": "tasks",
+          "name": "Tasks",
+          "zh": "生产任务",
+          "shared": "All tasks look the same and only the information differs. Each task page is built from the same task skeleton: a header naming the task, a summary card, a lens bar with the count under each label, rows grouped by pen, a dock as the last row, and sheets and pages made of the same parts."
+        },
+        {
+          "id": "inspection",
+          "name": "Inspection",
+          "zh": "巡检",
+          "shared": "A walk through one unit. The worker sees every pig in it, including untagged groups, picks one or many, and records on the spot. The unit's equipment, environment and pen-count checks sit here too. There is no cohort and no lens: the unit is the scope."
+        },
+        {
+          "id": "pigs",
+          "name": "Pigs",
+          "zh": "猪只",
+          "shared": "Finding a pig and reading its record. Search takes an ear tag or ear notch, scan reads the tag, and untagged pigs appear as groups where one row means several head. Picking pigs raises one action sheet, the same for one pig or twenty."
+        },
+        {
+          "id": "health",
+          "name": "Health & treatments",
+          "zh": "健康与治疗",
+          "shared": "Conditions, triage levels, deaths and treatments share one catalogue of diseases and symptoms and one action sheet. Whether an action is available depends on the pig's state, and a blocked pig is listed with the reason, never dropped silently."
+        },
+        {
+          "id": "breeding",
+          "name": "Breeding & litters",
+          "zh": "繁殖与产仔",
+          "shared": "The sow's cycle events (heat, abortion, pregnancy, farrowing, weaning) and the litter events around them, such as fostering. Each event has one form and one record, whether it is reached from a task or from a pig's actions. The sow's state decides what is available."
+        },
+        {
+          "id": "measures",
+          "name": "Measures & movement",
+          "zh": "测量与转移",
+          "shared": "Weight, backfat and temperature take one value per pig, so they are recorded one pig at a time. Transfer and missing reports apply one payload to the whole selection. All of them are reached from the same action sheet and write the same record from any door."
+        },
+        {
+          "id": "sampling",
+          "name": "Sampling & testing",
+          "zh": "采样与检测",
+          "shared": "Not written yet."
+        },
+        {
+          "id": "sync",
+          "name": "Data sync",
+          "zh": "数据同步",
+          "shared": "Not written yet."
+        }
+      ]
+    },
+    {
+      "id": "web",
+      "name": "Web",
+      "sections": []
+    }
+  ]
+}

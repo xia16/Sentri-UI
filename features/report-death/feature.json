@@ -1,0 +1,66 @@
+{
+  "id": "report-death",
+  "name": "Report death",
+  "zh": "上报死亡",
+  "platform": "mobile",
+  "section": "health",
+  "newFeature": false,
+  "duplicates": "built inside Inspection — see inspection / health-record",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "report-death.list",
+        "report-death.cause",
+        "report-death.bulk",
+        "report-death.confirm"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "report-death.list",
+      "name": "Death list",
+      "zh": "死亡列表",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The selected pigs with their death causes.",
+        "issues": []
+      }
+    },
+    {
+      "id": "report-death.cause",
+      "name": "Choose cause",
+      "zh": "选择疾病 / 选择症状",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Choose the disease or symptom that is the cause; the chosen cause.",
+        "issues": []
+      }
+    },
+    {
+      "id": "report-death.bulk",
+      "name": "Bulk actions",
+      "zh": "批量操作",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Add a cause or upload photos for several pigs at once.",
+        "issues": []
+      }
+    },
+    {
+      "id": "report-death.confirm",
+      "name": "Confirm and result",
+      "zh": "二次确认 / 操作结果",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Second confirmation and result.",
+        "issues": []
+      }
+    }
+  ]
+}

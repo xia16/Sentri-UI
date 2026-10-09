@@ -1,0 +1,1828 @@
+{
+ "generated": "fixture (converted from the round-6 prototype sample)",
+ "commit": "",
+ "platforms": [
+  {
+   "id": "mobile",
+   "name": "Mobile",
+   "sections": [
+    {
+     "id": "home",
+     "name": "Home",
+     "zh": "首页",
+     "shared": "",
+     "features": [
+      {
+       "id": "workbench",
+       "name": "Workbench",
+       "zh": "工作台",
+       "platform": "mobile",
+       "section": "home",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "workbench.farrowing",
+         "name": "Today · Farrowing",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?layout=focus&section=farrowing"
+        },
+        {
+         "id": "workbench.inspection",
+         "name": "Today · Inspection",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?layout=focus&section=inspection"
+        },
+        {
+         "id": "workbench.settings",
+         "name": "Language and log out",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "in-design",
+       "prd": ""
+      },
+      {
+       "id": "environment",
+       "name": "Environment & devices",
+       "zh": "环境与设备",
+       "platform": "mobile",
+       "section": "home",
+       "newFeature": true,
+       "duplicates": "",
+       "entryPoints": [
+        {
+         "section": "Home",
+         "label": "from Workbench",
+         "from": "workbench.farrowing",
+         "control": "",
+         "lands": null
+        }
+       ],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "environment.unit",
+         "name": "Unit sensors",
+         "zh": "",
+         "status": "placeholder"
+        },
+        {
+         "id": "environment.fault",
+         "name": "Report a fault",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      }
+     ]
+    },
+    {
+     "id": "tasks",
+     "name": "Tasks",
+     "zh": "生产任务",
+     "shared": "",
+     "features": [
+      {
+       "id": "farrowing",
+       "name": "Farrowing",
+       "zh": "分娩",
+       "platform": "mobile",
+       "section": "tasks",
+       "newFeature": false,
+       "duplicates": "",
+       "anchor": {
+        "name": "Sow",
+        "statuses": [
+         {
+          "id": "awaiting",
+          "name": "Awaiting",
+          "screens": [
+           "farrowing.before"
+          ]
+         },
+         {
+          "id": "farrowing",
+          "name": "Farrowing",
+          "screens": [
+           "farrowing.count",
+           "farrowing.draft",
+           "farrowing.edit",
+           "farrowing.finish",
+           "farrowing.blocked"
+          ]
+         },
+         {
+          "id": "finished",
+          "name": "Finished",
+          "screens": [
+           "farrowing.locked",
+           "farrowing.born"
+          ]
+         }
+        ],
+        "exits": [
+         {
+          "id": "died",
+          "name": "Died",
+          "screens": [
+           "farrowing.ended"
+          ]
+         }
+        ],
+        "any": [
+         "farrowing.room",
+         "farrowing.history"
+        ],
+        "task": [
+         {
+          "id": "in-progress",
+          "name": "Task in progress"
+         },
+         {
+          "id": "ending",
+          "name": "Ending the task",
+          "screens": [
+           "farrowing.task-ready",
+           "farrowing.task-blocked",
+           "farrowing.task-complete",
+           "farrowing.task-outcomes"
+          ]
+         }
+        ]
+       },
+       "entryPoints": [
+        {
+         "section": "Home",
+         "label": "via Overview",
+         "from": "workbench.farrowing",
+         "control": "View task",
+         "lands": "farrowing.room"
+        },
+        {
+         "section": "Home",
+         "label": "via Unit",
+         "from": "workbench.farrowing",
+         "control": "Choose unit",
+         "lands": "farrowing.room"
+        }
+       ],
+       "addsTo": [
+        {
+         "feature": "pig-profile",
+         "what": "Farrowing actions in Actions",
+         "screen": "pig-profile.full",
+         "open": "Actions",
+         "under": "Production",
+         "added": false
+        }
+       ],
+       "flow": [
+        [
+         "farrowing.room",
+         "farrowing.before",
+         "tap a sow"
+        ],
+        [
+         "farrowing.before",
+         "farrowing.count",
+         "start count"
+        ],
+        [
+         "farrowing.count",
+         "farrowing.draft",
+         "record a death"
+        ],
+        [
+         "farrowing.draft",
+         "farrowing.count",
+         "save"
+        ],
+        [
+         "farrowing.count",
+         "farrowing.finish",
+         "Finish farrowing"
+        ],
+        [
+         "farrowing.finish",
+         "farrowing.blocked",
+         "hold to lock · open items"
+        ],
+        [
+         "farrowing.finish",
+         "farrowing.locked",
+         "hold to lock"
+        ],
+        [
+         "farrowing.count",
+         "farrowing.edit",
+         "Edit"
+        ],
+        [
+         "farrowing.edit",
+         "farrowing.count",
+         "save"
+        ],
+        [
+         "farrowing.locked",
+         "farrowing.born",
+         "correct born"
+        ],
+        [
+         "farrowing.born",
+         "farrowing.locked",
+         "save"
+        ],
+        [
+         "farrowing.count",
+         "farrowing.ended",
+         "sow died"
+        ],
+        [
+         "farrowing.room",
+         "farrowing.history",
+         "log"
+        ],
+        [
+         "farrowing.room",
+         "farrowing.task-blocked",
+         "End task · sows active"
+        ],
+        [
+         "farrowing.room",
+         "farrowing.task-ready",
+         "End task"
+        ],
+        [
+         "farrowing.task-ready",
+         "farrowing.task-complete",
+         "hold to end"
+        ],
+        [
+         "farrowing.task-complete",
+         "farrowing.task-outcomes",
+         "outcomes"
+        ]
+       ],
+       "screens": [
+        {
+         "id": "farrowing.room",
+         "name": "Room list",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "room",
+         "notes": {
+          "purpose": "Find the next sow to attend in the unit, and see the unit's progress.",
+          "states": [
+           "awaiting / active / done filters",
+           "no sows awaiting",
+           "offline"
+          ],
+          "controls": [
+           {
+            "control": "A sow row",
+            "does": "opens her record",
+            "goesTo": "Before first count, Counting or Locked record, by her status"
+           },
+           {
+            "control": "Filter tabs",
+            "does": "narrow the list by status",
+            "goesTo": ""
+           },
+           {
+            "control": "Scan ear tag",
+            "does": "jumps to the scanned sow",
+            "goesTo": "her record"
+           },
+           {
+            "control": "Task overview",
+            "does": "opens the unit's task overview",
+            "goesTo": "End task"
+           }
+          ],
+          "copy": [
+           "fr.room.title",
+           "act.scan"
+          ],
+          "edge": [
+           "A sow farrowing in another unit",
+           "Two workers on one sow"
+          ],
+          "rules": [
+           "Every count change is a stamped record."
+          ],
+          "elements": [
+           {
+            "name": "Unit card · Target",
+            "shows": "Target 12",
+            "logic": "The unit's planned sows for the task",
+            "source": "Task plan"
+           },
+           {
+            "name": "Sow row · state word",
+            "shows": "Active",
+            "logic": "From her status; one word",
+            "source": "Sow status"
+           }
+          ],
+          "issues": [
+           "The unit progress and the filter tabs both count sows"
+          ]
+         }
+        },
+        {
+         "id": "farrowing.count",
+         "name": "Counting",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "count",
+         "notes": {
+          "purpose": "Record piglets as they arrive, one tap per piglet.",
+          "states": [
+           "counting",
+           "with a death draft",
+           "offline"
+          ],
+          "controls": [
+           {
+            "control": "+ / −",
+            "does": "adds or removes a live piglet",
+            "goesTo": ""
+           },
+           {
+            "control": "Record death",
+            "does": "opens the death entry",
+            "goesTo": "Death entry"
+           },
+           {
+            "control": "Edit",
+            "does": "opens the record to correct counts while farrowing",
+            "goesTo": "Edit record"
+           },
+           {
+            "control": "Finish farrowing",
+            "does": "opens the finish sheet",
+            "goesTo": "Finish"
+           }
+          ],
+          "copy": [
+           "act.edit",
+           "act.finish"
+          ],
+          "edge": [
+           "Mis-tap then immediate undo",
+           "Sow dies mid-farrowing → Sow died"
+          ],
+          "rules": [
+           "Every count change is a stamped record."
+          ]
+         }
+        },
+        {
+         "id": "farrowing.before",
+         "name": "Before first count",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "before"
+        },
+        {
+         "id": "farrowing.draft",
+         "name": "Death entry",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "draft"
+        },
+        {
+         "id": "farrowing.finish",
+         "name": "Finish",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "finish"
+        },
+        {
+         "id": "farrowing.blocked",
+         "name": "Lock blocked",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "blocked"
+        },
+        {
+         "id": "farrowing.locked",
+         "name": "Locked record",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "locked",
+         "notes": {
+          "purpose": "Read a finished sow's fixed record.",
+          "states": [
+           "locked",
+           "with a later correction"
+          ],
+          "controls": [
+           {
+            "control": "View log",
+            "does": "opens the farrowing log",
+            "goesTo": "Farrowing log"
+           },
+           {
+            "control": "Edit",
+            "does": "corrects finish details",
+            "goesTo": ""
+           },
+           {
+            "control": "Correct born",
+            "does": "opens the born correction",
+            "goesTo": "Correct born"
+           }
+          ],
+          "copy": [
+           "act.edit"
+          ],
+          "edge": [
+           "Opening a record locked on another device"
+          ],
+          "rules": [
+           "Born is fixed at the lock."
+          ]
+         }
+        },
+        {
+         "id": "farrowing.edit",
+         "name": "Edit record",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "edit",
+         "notes": {
+          "purpose": "Correct the counts while the sow is still farrowing.",
+          "states": [
+           "unchanged (Save disabled)",
+           "changed",
+           "invalid total"
+          ],
+          "controls": [
+           {
+            "control": "Each − / +",
+            "does": "changes that count",
+            "goesTo": ""
+           },
+           {
+            "control": "Clear",
+            "does": "discards the draft",
+            "goesTo": ""
+           },
+           {
+            "control": "Back",
+            "does": "leaves, keeping the draft on the device",
+            "goesTo": "Counting"
+           },
+           {
+            "control": "Save",
+            "does": "writes a stamped correction",
+            "goesTo": "Counting"
+           }
+          ],
+          "copy": [
+           "act.back",
+           "act.clear",
+           "act.save"
+          ],
+          "edge": [
+           "Lowering below recorded deaths"
+          ],
+          "rules": [
+           "Every count change is a stamped record; nothing is overwritten."
+          ]
+         }
+        },
+        {
+         "id": "farrowing.born",
+         "name": "Correct born",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "born",
+         "notes": {
+          "purpose": "Correct Born after the lock, when a mistake is found.",
+          "states": [
+           "dialog open",
+           "saved"
+          ],
+          "controls": [
+           {
+            "control": "Born field",
+            "does": "sets the corrected number",
+            "goesTo": ""
+           },
+           {
+            "control": "Save",
+            "does": "writes a stamped correction; the original is kept and the new value shows amber",
+            "goesTo": "Locked record"
+           }
+          ],
+          "copy": [
+           "act.save"
+          ],
+          "edge": [
+           "Correction after piglet processing has started"
+          ],
+          "rules": [
+           "Born changes only through Correct born, stamped, original kept."
+          ]
+         }
+        },
+        {
+         "id": "farrowing.history",
+         "name": "Farrowing log",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "history"
+        },
+        {
+         "id": "farrowing.ended",
+         "name": "Sow died",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "ended"
+        },
+        {
+         "id": "farrowing.task-blocked",
+         "name": "End task · active sows",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "task-blocked"
+        },
+        {
+         "id": "farrowing.task-ready",
+         "name": "End task · awaiting",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "task-ready"
+        },
+        {
+         "id": "farrowing.task-complete",
+         "name": "End task · all finished",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "task-complete"
+        },
+        {
+         "id": "farrowing.task-outcomes",
+         "name": "End task · outcomes",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "task-outcomes"
+        }
+       ],
+       "status": "in-design",
+       "prd": "# Farrowing\n\n## Problem\n\nWorkers record each sow's farrowing as it happens — born, alive, dead — and lock it when she is done, so counts downstream (piglet processing, weaning) start from a fixed Born.\n\n## Who\n\nFarrowing-room workers, gloved, one hand, interrupted; a supervisor ending the task for the batch.\n\n## Anchor\n\nThe sow: awaiting → farrowing → finished (locked); died is an exit. The task: in progress → ending → ended.\n\n## Rules\n\n- Born is fixed at the lock; it changes only through Correct born, stamped, original kept.\n- Every count change is a stamped record; nothing is overwritten.\n- End task is manual, hold-to-commit, and needs every sow finished or explained.\n\n## Scope\n\nIn: counting, deaths, finish and lock, corrections, end task. Out: fostering (its own feature), piglet processing.\n\n## Decisions\n\n- End task stays manual (to confirm with the owner).\n"
+      },
+      {
+       "id": "piglet-processing",
+       "name": "Piglet processing",
+       "zh": "仔猪处理",
+       "platform": "mobile",
+       "section": "tasks",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [
+        {
+         "section": "Home",
+         "label": "from Today",
+         "from": "workbench.farrowing",
+         "control": "",
+         "lands": "pp.app"
+        }
+       ],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "pp.app",
+         "name": "Piglets list (simple)",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/tasks/piglet-processing/simple/dist/app.html"
+        }
+       ],
+       "status": "in-design",
+       "prd": ""
+      },
+      {
+       "id": "heat-check",
+       "name": "Heat check",
+       "zh": "查情",
+       "platform": "mobile",
+       "section": "tasks",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "heat-check.list",
+         "name": "Pig list tab",
+         "zh": "",
+         "status": "placeholder"
+        },
+        {
+         "id": "heat-check.do",
+         "name": "Record",
+         "zh": "",
+         "status": "placeholder"
+        },
+        {
+         "id": "heat-check.end",
+         "name": "End task",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "breeding",
+       "name": "Breeding",
+       "zh": "配种",
+       "platform": "mobile",
+       "section": "tasks",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "breeding.list",
+         "name": "Pig list tab",
+         "zh": "",
+         "status": "placeholder"
+        },
+        {
+         "id": "breeding.do",
+         "name": "Record",
+         "zh": "",
+         "status": "placeholder"
+        },
+        {
+         "id": "breeding.end",
+         "name": "End task",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "post-farrowing",
+       "name": "Sow post-farrowing check",
+       "zh": "母猪产后检查",
+       "platform": "mobile",
+       "section": "tasks",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "post-farrowing.list",
+         "name": "Pig list tab",
+         "zh": "",
+         "status": "placeholder"
+        },
+        {
+         "id": "post-farrowing.do",
+         "name": "Record",
+         "zh": "",
+         "status": "placeholder"
+        },
+        {
+         "id": "post-farrowing.end",
+         "name": "End task",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "weaning",
+       "name": "Weaning check",
+       "zh": "断奶检查",
+       "platform": "mobile",
+       "section": "tasks",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "weaning.list",
+         "name": "Pig list tab",
+         "zh": "",
+         "status": "placeholder"
+        },
+        {
+         "id": "weaning.do",
+         "name": "Record",
+         "zh": "",
+         "status": "placeholder"
+        },
+        {
+         "id": "weaning.end",
+         "name": "End task",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "return-heat",
+       "name": "Return-to-heat check",
+       "zh": "查返情",
+       "platform": "mobile",
+       "section": "tasks",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "return-heat.list",
+         "name": "Pig list tab (only screen in Figma)",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "pregnancy",
+       "name": "Pregnancy check",
+       "zh": "孕检",
+       "platform": "mobile",
+       "section": "tasks",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "pregnancy.list",
+         "name": "Pig list tab (only screen in Figma)",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "end-nursery",
+       "name": "End nursery check",
+       "zh": "结束保育检查",
+       "platform": "mobile",
+       "section": "tasks",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "end-nursery.list",
+         "name": "Pig list tab (only screen in Figma)",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "end-finishing",
+       "name": "End finishing check",
+       "zh": "结束育肥检查",
+       "platform": "mobile",
+       "section": "tasks",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "end-finishing.list",
+         "name": "Pig list tab (only screen in Figma)",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      }
+     ]
+    },
+    {
+     "id": "inspection",
+     "name": "Inspection",
+     "zh": "巡检",
+     "shared": "",
+     "features": [
+      {
+       "id": "inspection",
+       "name": "Inspection walk",
+       "zh": "巡检",
+       "platform": "mobile",
+       "section": "inspection",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [
+        {
+         "section": "Home",
+         "label": "from Today",
+         "from": "workbench.inspection",
+         "control": "",
+         "lands": "inspection.walk"
+        }
+       ],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "inspection.walk",
+         "name": "Unit walk",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "walk"
+        },
+        {
+         "id": "inspection.stage",
+         "name": "Stage · elapsed days",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "stage-times"
+        },
+        {
+         "id": "inspection.types",
+         "name": "Types · boars and piglets",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "animal-types"
+        },
+        {
+         "id": "inspection.sensors",
+         "name": "Unit · sensors",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "sensors"
+        },
+        {
+         "id": "inspection.no-sensors",
+         "name": "Unit · no sensors",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "no-sensors"
+        },
+        {
+         "id": "inspection.batches",
+         "name": "Unit · three batches",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "many-batches"
+        },
+        {
+         "id": "inspection.pen-signals",
+         "name": "Pen · note and fault",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "pen-signals"
+        },
+        {
+         "id": "inspection.selected",
+         "name": "Multiple pigs",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "selected"
+        }
+       ],
+       "status": "in-design",
+       "prd": ""
+      },
+      {
+       "id": "feed-plan",
+       "name": "Feed plan",
+       "zh": "饲喂计划",
+       "platform": "mobile",
+       "section": "inspection",
+       "newFeature": true,
+       "duplicates": "",
+       "groups": [
+        [
+         "Several pens",
+         [
+          "feed.bulk"
+         ]
+        ],
+        [
+         "One pen",
+         [
+          "feed.pen",
+          "feed.up",
+          "feed.held",
+          "feed.adlib"
+         ]
+        ]
+       ],
+       "entryPoints": [
+        {
+         "section": "Inspection",
+         "label": "Actions → Feed",
+         "from": "inspection.selected",
+         "control": "Feed",
+         "lands": "feed.bulk"
+        }
+       ],
+       "addsTo": [],
+       "flow": [
+        [
+         "feed.bulk",
+         "feed.pen",
+         "one pen"
+        ],
+        [
+         "feed.pen",
+         "feed.up",
+         "increase"
+        ],
+        [
+         "feed.pen",
+         "feed.held",
+         "hold"
+        ],
+        [
+         "feed.pen",
+         "feed.adlib",
+         "ad-lib"
+        ]
+       ],
+       "screens": [
+        {
+         "id": "feed.pen",
+         "name": "Pen feed",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "feed"
+        },
+        {
+         "id": "feed.bulk",
+         "name": "Feed · multiple pens",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "feed-bulk"
+        },
+        {
+         "id": "feed.up",
+         "name": "Pen feed · increased",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "pen-feed-up"
+        },
+        {
+         "id": "feed.held",
+         "name": "Pen feed · held",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "pen-feed-held"
+        },
+        {
+         "id": "feed.adlib",
+         "name": "Ad-lib feeding",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "adlib"
+        }
+       ],
+       "status": "in-design",
+       "prd": ""
+      }
+     ]
+    },
+    {
+     "id": "pigs",
+     "name": "Pigs",
+     "zh": "猪只",
+     "shared": "",
+     "features": [
+      {
+       "id": "pig-list",
+       "name": "Pig list",
+       "zh": "猪只列表",
+       "platform": "mobile",
+       "section": "pigs",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "pig-list.list",
+         "name": "List and filter",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "pig-profile",
+       "name": "Pig profile",
+       "zh": "猪只详情",
+       "platform": "mobile",
+       "section": "pigs",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [
+        {
+         "section": "Inspection",
+         "label": "tap a pig",
+         "from": "inspection.walk",
+         "control": "",
+         "lands": "pig-profile.full"
+        },
+        {
+         "section": "Tasks",
+         "label": "any task → pig",
+         "from": "farrowing.room",
+         "control": "",
+         "lands": "pig-profile.full"
+        },
+        {
+         "section": "Pigs",
+         "label": "from Pig list",
+         "from": "pig-list.list",
+         "control": "",
+         "lands": "pig-profile.full"
+        }
+       ],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "pig-profile.full",
+         "name": "Pig record · populated",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "profile-full"
+        },
+        {
+         "id": "pig-profile.partial",
+         "name": "Pig record · partial",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "profile-partial"
+        },
+        {
+         "id": "pig-profile.empty",
+         "name": "Pig record · empty",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "profile-empty"
+        },
+        {
+         "id": "pig-profile.tasks",
+         "name": "Pig · current tasks",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "pig-tasks"
+        },
+        {
+         "id": "pig-profile.batches",
+         "name": "Production · batch history",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "production-batches"
+        }
+       ],
+       "status": "in-design",
+       "prd": ""
+      }
+     ]
+    },
+    {
+     "id": "health",
+     "name": "Health & treatments",
+     "zh": "健康与治疗",
+     "shared": "",
+     "features": [
+      {
+       "id": "health-record",
+       "name": "Health record",
+       "zh": "健康管理",
+       "platform": "mobile",
+       "section": "health",
+       "newFeature": false,
+       "duplicates": "Also drawn in Pig list and Health & treatment Figma files",
+       "entryPoints": [
+        {
+         "section": "Inspection",
+         "label": "attention on a pig",
+         "from": "inspection.walk",
+         "control": "",
+         "lands": "health.mixed"
+        },
+        {
+         "section": "Pigs",
+         "label": "from Pig profile",
+         "from": "pig-profile.full",
+         "control": "",
+         "lands": "health.mixed"
+        }
+       ],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "health.mixed",
+         "name": "Attention · mixed",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "health-mixed"
+        },
+        {
+         "id": "health.ongoing",
+         "name": "Disease · ongoing",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "health-ongoing"
+        },
+        {
+         "id": "health.many",
+         "name": "Multiple conditions",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "health-many"
+        },
+        {
+         "id": "health.care",
+         "name": "Care states",
+         "zh": "",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "care-states"
+        }
+       ],
+       "status": "in-design",
+       "prd": ""
+      },
+      {
+       "id": "prescriptions",
+       "name": "Treatment prescriptions",
+       "zh": "处方治疗",
+       "platform": "mobile",
+       "section": "health",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "rx.overview",
+         "name": "Overview · choose task",
+         "zh": "",
+         "status": "placeholder"
+        },
+        {
+         "id": "rx.unit",
+         "name": "Unit · doses",
+         "zh": "",
+         "status": "placeholder"
+        },
+        {
+         "id": "rx.treat",
+         "name": "Treat by scanning",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "triage",
+       "name": "Triage level",
+       "zh": "分诊等级",
+       "platform": "mobile",
+       "section": "health",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "triage.main",
+         "name": "Triage level",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "report-death",
+       "name": "Report death",
+       "zh": "上报死亡",
+       "platform": "mobile",
+       "section": "health",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "report-death.main",
+         "name": "Report death",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "treat",
+       "name": "Treat a pig",
+       "zh": "治疗",
+       "platform": "mobile",
+       "section": "health",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "treat.main",
+         "name": "Treat a pig",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      }
+     ]
+    },
+    {
+     "id": "breeding",
+     "name": "Breeding & litters",
+     "zh": "繁殖与产仔",
+     "shared": "",
+     "features": [
+      {
+       "id": "foster",
+       "name": "Fostering",
+       "zh": "寄养",
+       "platform": "mobile",
+       "section": "breeding",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "foster.main",
+         "name": "Fostering",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "keep-breeding",
+       "name": "Keep for breeding",
+       "zh": "标记留种",
+       "platform": "mobile",
+       "section": "breeding",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "keep-breeding.main",
+         "name": "Keep for breeding",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "abortion",
+       "name": "Abortion",
+       "zh": "流产",
+       "platform": "mobile",
+       "section": "breeding",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "abortion.main",
+         "name": "Abortion",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "heat",
+       "name": "Heat",
+       "zh": "发情",
+       "platform": "mobile",
+       "section": "breeding",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "heat.main",
+         "name": "Heat",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "wean",
+       "name": "Wean",
+       "zh": "断奶",
+       "platform": "mobile",
+       "section": "breeding",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "wean.main",
+         "name": "Wean",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      }
+     ]
+    },
+    {
+     "id": "measures",
+     "name": "Measures & movement",
+     "zh": "测量与转移",
+     "shared": "",
+     "features": [
+      {
+       "id": "weight",
+       "name": "Weight",
+       "zh": "体重",
+       "platform": "mobile",
+       "section": "measures",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "weight.main",
+         "name": "Weight",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "backfat",
+       "name": "Backfat",
+       "zh": "背膘",
+       "platform": "mobile",
+       "section": "measures",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "backfat.main",
+         "name": "Backfat",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "temperature",
+       "name": "Temperature",
+       "zh": "体温",
+       "platform": "mobile",
+       "section": "measures",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "temperature.main",
+         "name": "Temperature",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "move",
+       "name": "Move",
+       "zh": "转移",
+       "platform": "mobile",
+       "section": "measures",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "move.main",
+         "name": "Move",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      },
+      {
+       "id": "missing",
+       "name": "Report missing",
+       "zh": "上报失踪",
+       "platform": "mobile",
+       "section": "measures",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "missing.main",
+         "name": "Report missing",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      }
+     ]
+    },
+    {
+     "id": "sampling",
+     "name": "Sampling & testing",
+     "zh": "采样与检测",
+     "shared": "",
+     "features": [
+      {
+       "id": "sampling",
+       "name": "Sampling",
+       "zh": "采样",
+       "platform": "mobile",
+       "section": "sampling",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "sampling.list",
+         "name": "To sample / sampled",
+         "zh": "",
+         "status": "placeholder"
+        },
+        {
+         "id": "sampling.detail",
+         "name": "Sample detail",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      }
+     ]
+    },
+    {
+     "id": "sync",
+     "name": "Data sync",
+     "zh": "数据同步",
+     "shared": "",
+     "features": [
+      {
+       "id": "data-sync",
+       "name": "Data sync",
+       "zh": "数据同步",
+       "platform": "mobile",
+       "section": "sync",
+       "newFeature": false,
+       "duplicates": "",
+       "entryPoints": [],
+       "addsTo": [],
+       "flow": [],
+       "screens": [
+        {
+         "id": "sync.list",
+         "name": "Sync list",
+         "zh": "",
+         "status": "placeholder"
+        },
+        {
+         "id": "sync.conflict",
+         "name": "Conflict",
+         "zh": "",
+         "status": "placeholder"
+        }
+       ],
+       "status": "placeholder",
+       "prd": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "web",
+   "name": "Web",
+   "sections": []
+  }
+ ],
+ "oldUi": [
+  {
+   "file": "首页 Home",
+   "key": "UuyZbUklgF674X57hm3PHF",
+   "screens": 17,
+   "flows": [
+    [
+     "工作台 Workbench",
+     5,
+     "6003:11580"
+    ],
+    [
+     "首页（总览）Overview ×7",
+     7,
+     "11372:8137"
+    ],
+    [
+     "AI出图 cards",
+     5,
+     "11105:4710"
+    ]
+   ]
+  },
+  {
+   "file": "生产任务 Production tasks",
+   "key": "psrxDa9LRWLdTL9XMZmWdc",
+   "screens": 172,
+   "flows": [
+    [
+     "查情 Heat check",
+     35,
+     "7561:10830"
+    ],
+    [
+     "配种 Breeding",
+     26,
+     "7845:6780"
+    ],
+    [
+     "分娩 Farrowing",
+     18,
+     "7952:7750"
+    ],
+    [
+     "仔猪处理 Piglet processing",
+     28,
+     "8003:11059"
+    ],
+    [
+     "母猪产后检查 Post-farrowing check",
+     12,
+     "8006:14820"
+    ],
+    [
+     "断奶检查 Weaning check",
+     27,
+     "8023:17019"
+    ],
+    [
+     "Task list tabs (incl. 查返情, 孕检, 结束保育, 结束育肥)",
+     18,
+     "7606:8140"
+    ]
+   ]
+  },
+  {
+   "file": "巡检 Inspection",
+   "key": "4GZGPBauEOWQQjnRrzoUgF",
+   "screens": 149,
+   "flows": [
+    [
+     "Inspection home, detail, equipment, notes",
+     46,
+     "60:408"
+    ],
+    [
+     "Per-pig production actions",
+     47,
+     "60:408"
+    ],
+    [
+     "Per-pig health actions",
+     29,
+     "60:408"
+    ],
+    [
+     "Per-pig records",
+     13,
+     "60:408"
+    ],
+    [
+     "No-ID pigs",
+     4,
+     "60:408"
+    ]
+   ]
+  },
+  {
+   "file": "猪只列表 Pig list",
+   "key": "ZnHLToEqmWREEgMXsu8ZvZ",
+   "screens": 44,
+   "flows": [
+    [
+     "Pig list and filter",
+     4,
+     "6003:11580"
+    ],
+    [
+     "Pig detail tabs",
+     4,
+     "6003:11580"
+    ],
+    [
+     "Health management",
+     6,
+     "6003:11580"
+    ],
+    [
+     "Events",
+     3,
+     "6003:11580"
+    ],
+    [
+     "Edit pig",
+     3,
+     "6003:11580"
+    ],
+    [
+     "English copy",
+     20,
+     "11590:489"
+    ]
+   ]
+  },
+  {
+   "file": "健康与治疗 Health & treatment",
+   "key": "pvx1wum54VYOsIjep7haoZ",
+   "screens": 28,
+   "flows": [
+    [
+     "Prescriptions and treatment (2025.9.4)",
+     26,
+     "6003:11580"
+    ]
+   ]
+  },
+  {
+   "file": "数据同步 Data sync",
+   "key": "LhQhJho192tNKCFvf5Drnf",
+   "screens": 17,
+   "flows": [
+    [
+     "Data sync (2025.4)",
+     17,
+     "10541:8073"
+    ]
+   ]
+  },
+  {
+   "file": "采样与检测 Sampling & testing",
+   "key": "PqMXbJLyoJ9lFGjmqBv5Cs",
+   "screens": 17,
+   "flows": [
+    [
+     "Sampling V2.0 CN",
+     11,
+     "6032:6415"
+    ],
+    [
+     "Sampling V2.0 EN",
+     6,
+     "6032:8550"
+    ]
+   ]
+  }
+ ]
+}

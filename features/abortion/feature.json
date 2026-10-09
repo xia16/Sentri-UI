@@ -1,0 +1,54 @@
+{
+  "id": "abortion",
+  "name": "Abortion",
+  "zh": "流产",
+  "platform": "mobile",
+  "section": "breeding",
+  "newFeature": false,
+  "duplicates": "built inside Inspection — see inspection (miscarriage)",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "abortion.abortion",
+        "abortion.line",
+        "abortion.result"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "abortion.abortion",
+      "name": "Record abortion",
+      "zh": "流产",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Record that a sow aborted.",
+        "issues": []
+      }
+    },
+    {
+      "id": "abortion.line",
+      "name": "Choose production line",
+      "zh": "选择生产线",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Choose the production line.",
+        "issues": []
+      }
+    },
+    {
+      "id": "abortion.result",
+      "name": "Result",
+      "zh": "操作结果",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Result of the action.",
+        "issues": []
+      }
+    }
+  ]
+}

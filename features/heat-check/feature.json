@@ -1,0 +1,90 @@
+{
+  "id": "heat-check",
+  "name": "Heat check",
+  "zh": "查情",
+  "platform": "mobile",
+  "section": "tasks",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "heat-check.list",
+        "heat-check.overview",
+        "heat-check.mark",
+        "heat-check.submit",
+        "heat-check.end",
+        "heat-check.ended"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "heat-check.list",
+      "name": "Pig list tab",
+      "zh": "查情猪只列表",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7561-10830",
+      "notes": {
+        "purpose": "Pigs of the task by pen, with filter and data selection (Tab：查情，选择数据+筛选).",
+        "issues": []
+      }
+    },
+    {
+      "id": "heat-check.overview",
+      "name": "Task overview and grid",
+      "zh": "任务概览 / Grid",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7561-10830",
+      "notes": {
+        "purpose": "Whole-task progress and the pen grid with pen selection (任务概览, Grid, Grid（选择栏位）).",
+        "issues": []
+      }
+    },
+    {
+      "id": "heat-check.mark",
+      "name": "Mark heat",
+      "zh": "查情（选择单头/多头猪）",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7561-10830",
+      "notes": {
+        "purpose": "Mark one or several pigs, including the last pig and changing a mark (查情（选择单头猪）, 选择多头猪, 修改状态).",
+        "issues": []
+      }
+    },
+    {
+      "id": "heat-check.submit",
+      "name": "Submit result",
+      "zh": "提交结果",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7561-10830",
+      "notes": {
+        "purpose": "Submit the result with a heat time and date (提交结果, 选择发情时间, 选择日期, 已发情猪只列表).",
+        "issues": []
+      }
+    },
+    {
+      "id": "heat-check.end",
+      "name": "End task",
+      "zh": "结束任务",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7561-10830",
+      "notes": {
+        "purpose": "End the task with a second confirmation, then return home to the pen's tab (结束任务, 二次确认).",
+        "issues": []
+      }
+    },
+    {
+      "id": "heat-check.ended",
+      "name": "Ended task",
+      "zh": "任务已结束",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7561-10830",
+      "notes": {
+        "purpose": "Read-only list and task detail after the task ends (Tab：猪只列表, Tab：任务详情, 筛选).",
+        "issues": []
+      }
+    }
+  ]
+}

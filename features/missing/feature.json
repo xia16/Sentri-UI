@@ -1,0 +1,30 @@
+{
+  "id": "missing",
+  "name": "Report missing",
+  "zh": "上报失踪",
+  "platform": "mobile",
+  "section": "measures",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "missing.confirm"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "missing.confirm",
+      "name": "Confirm",
+      "zh": "上报失踪-二次确认",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Second confirmation of a missing report.",
+        "issues": []
+      }
+    }
+  ]
+}

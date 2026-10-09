@@ -1,0 +1,156 @@
+:root { --ground:#f3f4ee; --paper:#fff; --ink:#20291f; --muted:#657060; --line:#dfe4d8; --wash:#eef1e7; --green:#276640; --green-wash:#eaf2e5; --amber:#896017; --amber-wash:#f6efdc; --hl:#e0a100; --sans:'Plus Jakarta Sans',Arial,sans-serif; --mono:'IBM Plex Mono',monospace; }
+* { box-sizing:border-box }
+html,body { margin:0; height:100%; background:var(--ground); color:var(--ink); font:14px/1.45 var(--sans) }
+a { color:var(--green); text-decoration:none } a:hover { text-decoration:underline }
+button { font:inherit; color:inherit; background:none; border:0; cursor:pointer; padding:0 }
+button:focus-visible, a:focus-visible, input:focus-visible { outline:2px solid #3e6890; outline-offset:2px }
+.muted { color:var(--muted) }
+
+/* top bar */
+.top { position:fixed; inset:0 0 auto 0; height:56px; display:flex; align-items:center; gap:18px; padding:0 24px; background:var(--ground); border-bottom:1px solid var(--line); z-index:20 }
+.brand { white-space:nowrap; font-weight:800; letter-spacing:-.02em; font-size:17px } .brand i { color:var(--green); font-style:normal }
+.seg { display:flex; gap:2px; background:var(--wash); padding:3px; border-radius:999px }
+.seg button { white-space:nowrap; padding:5px 14px; border-radius:999px; font-weight:600; color:var(--muted) }
+.seg button[aria-pressed=true] { background:var(--paper); color:var(--ink); box-shadow:0 1px 2px #0001 }
+.crumb { color:var(--muted); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; display:flex; align-items:center; gap:6px }
+.crumb b { color:var(--ink) } .crumb .zh { margin-left:2px } .crumb .meta { margin-left:12px; font-size:12px; display:inline-flex; gap:6px; align-items:center }
+main { position:fixed; inset:56px 0 0 0 }
+
+.dot { display:inline-block; width:9px; height:9px; border-radius:50%; flex:none }
+.st-in-design { background:var(--green) } .st-agent-checked { background:#2f7fc1 } .st-approved { background:var(--ink) }
+.st-frozen { background:var(--ink); box-shadow:0 0 0 2px var(--paper), 0 0 0 3px var(--ink) }
+.st-placeholder { border:1.5px dashed #9aa394 }
+
+.empty { position:absolute; inset:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:30px; text-align:center; color:var(--muted); border:1.5px dashed #c9cfc2; border-radius:22px }
+.empty b { color:var(--ink); font-size:16px }
+.none { color:var(--muted); font-style:italic; margin:0 }
+
+/* board */
+.board, .flowwrap { position:absolute; inset:0; overflow:hidden; cursor:grab; user-select:none; -webkit-user-select:none; touch-action:none }
+.board.drag, .flowwrap.drag { cursor:grabbing }
+.plane, .flowplane { position:absolute; left:0; top:0; transform-origin:0 0 }
+.region { position:absolute; border-radius:22px; background:color-mix(in srgb,var(--paper) 55%,transparent); border:1px solid var(--line); padding:18px }
+.region h2 { margin:0 0 14px; font-size:15px; display:flex; gap:8px; align-items:baseline } .region h2 small { color:var(--muted); font-weight:500 }
+.cards { display:grid; gap:12px }
+.card { background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:12px 14px; text-align:left; display:flex; flex-direction:column; gap:3px; min-height:84px }
+.card:hover { box-shadow:0 6px 18px #20291f14 } .card.placeholder { background:transparent; border-style:dashed }
+.card .name { font-weight:700; line-height:1.2; display:flex; gap:7px; align-items:center } .card .zh, .card .size { color:var(--muted); font-size:12px }
+.card .size { margin-top:auto; padding-top:6px }
+.zoom { position:absolute; right:20px; bottom:20px; display:flex; gap:6px; z-index:5 }
+.zoom button { width:34px; height:34px; border-radius:10px; background:var(--paper); border:1px solid var(--line); font-weight:700 }
+
+/* feature page */
+.feature { position:fixed; inset:56px 0 0 0; background:var(--ground); display:grid; grid-template-columns:1fr 440px; z-index:10 }
+.feature[hidden] { display:none }
+.flowcol { position:relative; overflow:hidden; min-width:0 }
+.group { position:absolute; border:1px solid var(--line); border-radius:18px; background:color-mix(in srgb,var(--paper) 45%,transparent) }
+.group span { position:absolute; left:16px; top:10px; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted) }
+.group.entry { background:var(--wash); border-style:dashed } .group.adds { border-style:dashed; background:transparent }
+.group.band { background:transparent; border:1.5px solid var(--line) } .group.band > span { color:var(--ink) }
+.group.status { background:var(--paper) } .group.exit { background:transparent; border-style:dashed }
+.group .next { position:absolute; right:-17px; top:6px; font-style:normal; color:var(--muted); font-weight:700 }
+.flowplane svg { position:absolute; left:0; top:0; overflow:visible; pointer-events:none }
+.edge { fill:none; stroke:var(--green); stroke-width:2 }
+.elabel { font:600 11px var(--sans); fill:var(--green); paint-order:stroke; stroke:var(--ground); stroke-width:4px }
+.node { position:absolute; width:176px; height:44px; padding:0 12px; display:flex; align-items:center; gap:9px; background:var(--paper); border:1px solid var(--line); border-radius:12px; font-weight:600; font-size:13px; text-align:left; white-space:nowrap }
+.node > span { overflow:hidden; text-overflow:ellipsis }
+.node:hover { border-color:#b9c2b2 } .node[aria-current=true] { border-color:var(--green); box-shadow:0 0 0 3px var(--green-wash) }
+.node.placeholder { background:transparent; border-style:dashed; color:var(--muted) }
+.node.entry { color:var(--muted) } .node.entry b { color:var(--ink) }
+.node.adds { background:transparent; border-style:dashed; color:var(--muted) }
+.dock { border-left:1px solid var(--line); display:flex; flex-direction:column; align-items:center; padding:18px 16px; gap:10px; overflow:auto }
+.dock .cap { font-size:12px; font-weight:600; color:var(--muted); text-align:center; min-height:18px; display:flex; gap:7px; align-items:center; justify-content:center }
+.dock .cap a { font-weight:700 } .dock .hl { color:var(--hl) }
+.dock .tools { font-size:13px; font-weight:700 } .dock .tools button { color:var(--green) } .dock .tools button[aria-pressed=true] { text-decoration:underline }
+.shot { position:relative; overflow:hidden; border-radius:42px; flex:none; background:var(--paper); box-shadow:0 0 0 1px var(--line) }
+.shot iframe { position:absolute; border:0; width:1400px; height:1500px; transform-origin:0 0; left:0; top:0; visibility:hidden }
+.shot .blank { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:30px; text-align:center; color:var(--muted); background:repeating-linear-gradient(135deg,var(--paper) 0 10px,var(--wash) 10px 20px); border:1.5px dashed #c9cfc2; border-radius:42px }
+.shot .blank b { color:var(--ink); font-size:16px }
+
+/* notes panel */
+.notes { position:absolute; left:0; top:0; bottom:0; width:430px; max-width:92%; background:var(--paper); border-right:1px solid var(--line); box-shadow:8px 0 24px #20291f14; z-index:4; display:flex; flex-direction:column; transform:translateX(-104%); transition:transform .18s ease; visibility:hidden }
+.notes.open { transform:none; visibility:visible }
+.notes header { display:flex; gap:4px; align-items:center; padding:14px 14px 10px; border-bottom:1px solid var(--line) }
+.notes .tab { padding:5px 12px; border-radius:999px; font-weight:600; color:var(--muted) } .notes .tab[aria-pressed=true] { background:var(--wash); color:var(--ink) }
+.notes .x { margin-left:auto; width:28px; height:28px; border-radius:8px; color:var(--muted) } .notes .x:hover { background:var(--wash) }
+.notes .body { overflow:auto; padding:16px 18px 30px; font-size:13px; flex:1 }
+
+/* rendered text (notes, PRD, READMEs) */
+.doc h1 { font-size:24px; letter-spacing:-.02em; margin:0 0 12px } .doc h2 { font-size:17px; margin:22px 0 6px } .doc h3 { font-size:14px; margin:18px 0 4px }
+.doc h4, .notes h4 { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:18px 0 6px } .notes h4:first-child { margin-top:0 }
+.doc p { margin:0 0 10px } .doc ul, .doc ol, .notes ul { margin:0 0 10px; padding-left:18px } .doc li, .notes li { margin:3px 0 }
+.doc code, .notes code { font:12px var(--mono); background:var(--wash); padding:1px 5px; border-radius:5px }
+.doc pre { background:var(--wash); padding:12px; border-radius:10px; overflow:auto; margin:0 0 12px } .doc pre code { background:none; padding:0 }
+.doc table, .notes table { width:100%; border-collapse:collapse; margin:0 0 12px; font-size:12.5px } .doc th { text-align:left; font-size:11px; color:var(--muted); letter-spacing:.04em; text-transform:uppercase }
+.doc td, .doc th, .notes td, .notes th { border-top:1px solid var(--line); padding:6px 8px 6px 0; vertical-align:top; text-align:left }
+.notes th { font-size:10.5px; color:var(--muted); letter-spacing:.05em; text-transform:uppercase; border-top:0 }
+.notes td:first-child { font-weight:600 }
+.notes .goto { color:var(--green); font-weight:600; text-align:left } .notes .goto:hover { text-decoration:underline }
+.notes p { margin:0 }
+
+/* library views: components, copy */
+.lib { position:absolute; inset:0; display:grid; grid-template-columns:260px 1fr; overflow:hidden }
+.lib aside { padding:24px 16px; border-right:1px solid var(--line); overflow:auto }
+.lib aside h1 { font-size:26px; letter-spacing:-.03em; margin:0 0 6px 10px } .lib aside > p { color:var(--muted); margin:0 0 16px 10px; font-size:13px }
+.lib nav h5 { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:18px 10px 4px }
+.lib nav button { display:flex; width:100%; justify-content:space-between; gap:8px; align-items:center; padding:6px 10px; border-radius:9px; font-weight:600; font-size:13px; text-align:left } .lib nav button:hover, .lib nav button[aria-current=true] { background:var(--paper) }
+.lib nav span { color:var(--muted); font-weight:500; display:inline-flex; align-items:center } .lib nav .l { display:inline-flex; gap:8px; align-items:center; color:inherit; font-weight:600 }
+.lib .pane { overflow:auto; padding:24px 32px 60px }
+.lib .pane > h2 { margin:0 0 14px; font-size:22px; letter-spacing:-.02em; display:flex; gap:10px; align-items:center }
+.lib .pane h3 { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:28px 0 10px }
+.cmeta { display:flex; gap:7px; align-items:center; color:var(--muted); font-size:12px; margin:-6px 0 14px }
+.preview { width:100%; border:1px solid var(--line); border-radius:16px; background:var(--paper) }
+.guide { background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:20px 24px; max-width:860px }
+.swatches { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:10px }
+.sw { background:var(--paper); border:1px solid var(--line); border-radius:14px; overflow:hidden; display:flex; flex-direction:column }
+.sw i { height:46px; border-bottom:1px solid var(--line) } .sw div { padding:8px 10px 10px; font-size:12px; color:var(--muted) }
+.sw b { color:var(--ink); font-size:13px; display:flex; justify-content:space-between; gap:8px } .sw b code { font:11.5px var(--mono); font-weight:500; color:var(--muted) } .sw p { margin:4px 0 0; line-height:1.4 }
+.tstyle { display:grid; grid-template-columns:200px 1fr; gap:16px; align-items:baseline; padding:12px 0; border-bottom:1px solid var(--line) }
+.tstyle small { display:block; color:var(--muted); font:11.5px var(--mono) } .tstyle p { grid-column:2; margin:0; color:var(--muted); font-size:12px }
+.scale { display:grid; grid-template-columns:200px 1fr; gap:6px 16px; align-items:center }
+.scale .bar { height:14px; background:var(--green); border-radius:3px; opacity:.75 } .scale .box { width:64px; height:44px; background:var(--green-wash); border:1.5px solid var(--green) }
+.scale small { color:var(--muted); font-size:12px; grid-column:2; margin:-2px 0 8px } .scale > div:nth-child(odd) { font-weight:600 } .scale code { font:12px var(--mono); color:var(--muted); font-weight:400; margin-left:6px }
+.icons { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:10px }
+.icons div { background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:14px 6px 10px; text-align:center; font-size:11.5px; color:var(--muted) } .icons img { width:28px; height:28px; display:block; margin:0 auto 8px }
+.usedby { display:flex; flex-wrap:wrap; gap:6px 14px }
+.copy-table { width:100%; border-collapse:collapse; font-size:13px } .copy-table th { text-align:left; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); padding:8px 8px 8px 0; border-bottom:1px solid var(--line) }
+.copy-table td { padding:8px 8px 8px 0; border-bottom:1px solid var(--line); vertical-align:top } .copy-table td.id { font:12px var(--mono); color:var(--muted); white-space:nowrap }
+.search { width:100%; max-width:480px; padding:8px 12px; border:1px solid var(--line); border-radius:10px; font:inherit; background:var(--paper); margin-bottom:14px }
+
+/* old UI */
+.index { position:absolute; inset:0; display:grid; grid-template-columns:300px 1fr; overflow:hidden }
+.index aside { padding:40px 28px; border-right:1px solid var(--line) } .index aside h1 { font-size:34px; letter-spacing:-.03em; margin:0 0 10px } .index aside p { color:var(--muted) }
+.index .list { overflow:auto; padding:32px 40px 80px }
+.index h2 { font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:28px 0 8px; display:flex; gap:10px } .index h2:first-child { margin-top:0 } .index h2 a { text-transform:none; letter-spacing:0; font-weight:600; margin-left:auto }
+.row { display:grid; grid-template-columns:1fr 120px; gap:16px; padding:11px 14px; border-bottom:1px solid var(--line); color:inherit } .row:hover { background:var(--paper); text-decoration:none }
+.sw p, .tstyle p { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden }
+
+/* review round 1 */
+.flowwrap { z-index:1 } .notes { z-index:10; background:#fff }
+.node { width:190px; height:48px; white-space:normal; line-height:1.25; font-size:12.5px }
+.node > span { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:clip }
+.dock .cap { display:block; max-width:100%; overflow-wrap:anywhere }
+.dock .tools { display:flex; gap:14px; align-items:center; font-size:13px; font-weight:700 } .dock .tools a { font-weight:600 }
+.notes .nb { padding:7px 0; border-top:1px solid var(--line) } .notes .nb:first-of-type { border-top:0 } .notes .nb b { display:block } .notes .nb .m { color:var(--muted); font-size:12px }
+.card .zh, .card .size { font-size:13px } .region h2 small { font-size:13px } .card .name { font-size:15px }
+.pv { display:flex; justify-content:center; background:var(--wash); border:1px solid var(--line); border-radius:16px; padding:16px; overflow:hidden }
+.pv .preview { border:0; border-radius:12px; max-width:100% }
+.fileopen { border:1px solid var(--green); border-radius:999px; padding:2px 12px; font-weight:700 } .fileopen:hover { background:var(--green-wash); text-decoration:none }
+.row b { font-weight:500; color:var(--ink) } .row .muted { font-size:12px }
+
+/* review round 2 */
+.flowcol.notes-open .flowwrap { left:430px }
+.node { overflow:visible }
+.node.dim { opacity:.5 } .node.nb-out { border-color:var(--green); box-shadow:0 0 0 3px var(--green-wash) } .node.nb-in { border-color:#9aa394; box-shadow:0 0 0 3px #e4e6df }
+.node .bdg { position:absolute; right:-7px; top:-9px; font-style:normal; font-size:11px; font-weight:700; line-height:1; padding:3px 6px; border-radius:999px; background:var(--paper); border:1px solid var(--line) }
+.node.nb-out .bdg { color:var(--green); border-color:var(--green) }
+.sw p, .tstyle p { display:block; -webkit-line-clamp:unset; overflow:visible }
+.node .bdg { font:700 13px Arial,sans-serif; padding:2px 6px 3px }
+
+/* review round 3 */
+.node { color:var(--ink); font-size:12.5px } .node.entry { color:var(--ink) } .node.entry b { font-weight:700 } .node.placeholder { color:var(--muted) }
+.node.dim { opacity:.6 }
+.node.nb-out, .node.nb-in { box-shadow:none; background:var(--paper) }
+.node.node[aria-current=true] { border:2px solid var(--green); background:var(--green-wash); box-shadow:none; font-weight:800; opacity:1 }
+.dock .tools button { font-weight:700; color:var(--green); padding:4px 10px; border-radius:999px } .dock .tools button:hover { text-decoration:underline }
+.dock .tools button[aria-pressed=true] { background:var(--green-wash); text-decoration:none }

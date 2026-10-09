@@ -1,0 +1,66 @@
+{
+  "id": "data-sync",
+  "name": "Data sync",
+  "zh": "数据同步",
+  "platform": "mobile",
+  "section": "sync",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "data-sync.banner",
+        "data-sync.list",
+        "data-sync.detail",
+        "data-sync.upload"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "data-sync.banner",
+      "name": "Entry",
+      "zh": "公告栏位置示意",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/LhQhJho192tNKCFvf5Drnf?node-id=10541-8073",
+      "notes": {
+        "purpose": "Where the sync notice sits: home entry and the all-treatments list.",
+        "issues": []
+      }
+    },
+    {
+      "id": "data-sync.list",
+      "name": "Sync list",
+      "zh": "数据同步列表",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/LhQhJho192tNKCFvf5Drnf?node-id=10541-8073",
+      "notes": {
+        "purpose": "The list of items to sync, and its empty state.",
+        "issues": []
+      }
+    },
+    {
+      "id": "data-sync.detail",
+      "name": "Sync detail",
+      "zh": "数据同步-详情",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/LhQhJho192tNKCFvf5Drnf?node-id=10541-8073",
+      "notes": {
+        "purpose": "Detail by pig or by treatment: waiting, syncing, conflict, and empty.",
+        "issues": []
+      }
+    },
+    {
+      "id": "data-sync.upload",
+      "name": "Data upload",
+      "zh": "数据上传",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/LhQhJho192tNKCFvf5Drnf?node-id=10541-8073",
+      "notes": {
+        "purpose": "The upload screens.",
+        "issues": []
+      }
+    }
+  ]
+}

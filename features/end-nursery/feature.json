@@ -1,0 +1,32 @@
+{
+  "id": "end-nursery",
+  "name": "End-nursery check",
+  "zh": "结束保育检查",
+  "platform": "mobile",
+  "section": "tasks",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "end-nursery.list"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "end-nursery.list",
+      "name": "Pig list tab",
+      "zh": "Tab：结束保育检查（猪只List）",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7606-9270",
+      "notes": {
+        "purpose": "The task's pig list by pen (Tab：结束保育检查（猪只List）).",
+        "issues": [
+          "Figma has only the list tab: no in-progress or ended screens, no check, no end task."
+        ]
+      }
+    }
+  ]
+}
