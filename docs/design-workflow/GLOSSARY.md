@@ -60,7 +60,7 @@ A screen that passed the gates.
 _Avoid_: Done, ready, reviewed
 
 **Approved**:
-A screen a human approved in a session, recorded with who, when and which commit.
+An agent-checked screen with no open to-do and no provisional flag that a human approved in a session, recorded with who, when and which commit.
 _Avoid_: Signed off, accepted
 
 **Provisional**:
@@ -71,14 +71,14 @@ A flag on a screen that was approved and then touched; it is back in design.
 _Avoid_: Stale
 
 **Frozen**:
-A feature whose every screen is approved; it hands off to developers.
+A feature with at least one screen, every one of them approved; it hands off to developers.
 _Avoid_: Final, locked, signed off
 
 **Reopened**:
 What happens to the touched screens of a frozen feature when anything changes them.
 
 **Touched**:
-A screen whose rendering changed, judged by its screenshot baseline, not by which files were edited.
+A screen whose rendering, behaviour, navigation or product rules changed; a screenshot baseline shows only the first, so the others are judged by the gates' walk-throughs and by what the change edited.
 
 **Set**:
 A component approved with the first feature that froze using it.
