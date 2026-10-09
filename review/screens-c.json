@@ -1,17 +1,5 @@
 [
  {
-  "id": "screens-c-1",
-  "target": {
-   "kind": "screen",
-   "id": "pig-profile.production-task"
-  },
-  "kind": "broken",
-  "severity": "high",
-  "title": "Pregnancy outcomes unstyled; the chosen outcome is invisible",
-  "detail": "Each outcome runs title into description, a tick sits under every option, and tapping Not in pig changes nothing visible before Save and complete enables. A mis-tap removes the sow from her batch unseen. Fix: render the outcomes with ChoiceList (radio) so one selected state shows.",
-  "source": "screen-review"
- },
- {
   "id": "screens-c-2",
   "target": {
    "kind": "screen",
