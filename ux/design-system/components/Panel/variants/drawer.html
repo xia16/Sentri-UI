@@ -5,4 +5,4 @@
 <script>document.querySelectorAll('[data-state]').forEach(el=>{const chinese=el.dataset.state.includes('Chinese');
 if(el.dataset.state==='Empty'){el.innerHTML=SentriUI.panel('');return;}
 el.dataset.stContext='drawer';
-el.innerHTML=SentriUI.heading({title:chinese?'产仔记录':'Litter'})+SentriUI.facts([{label:chinese?'活产仔猪':'Born alive',value:'11'},{label:chinese?'死产仔猪':'Stillborn',value:'1'}])+SentriUI.heading({title:chinese?'栏位信息':'Pen'})+SentriUI.rowGroup(SentriUI.row({title:chinese?'查看这个栏位的所有历史记录和工作安排':'Pen log',description:chinese?'最近记录 · 今天':'last record · today',action:'open-log',wrap:true}));});</script></body></html>
+el.innerHTML=SentriUI.heading({title:chinese?'产仔记录':'Litter'})+SentriUI.facts([{label:chinese?'活产仔猪':'Born alive',value:'11'},{label:chinese?'死产仔猪':'Stillborn',value:'1'}])+'<div style="margin-top:var(--space-section)">'+SentriUI.heading({title:chinese?'栏位信息':'Pen'})+SentriUI.rowGroup(SentriUI.row({title:chinese?'查看这个栏位的所有历史记录和工作安排':'Pen log',description:chinese?'最近记录 · 今天':'last record · today',action:'open-log',wrap:true}))+'</div>';});</script></body></html>

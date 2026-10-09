@@ -31,7 +31,7 @@ body{background:var(--ground);color:var(--ink)}
 }
 
 /* Shared room context and explicit record commits. */
-:is(.farrowing-phone,.inspection-phone) .task-context-card{background:#fff;border-color:var(--line);border-radius:18px;box-shadow:0 3px 12px #26351e04}
+:is(.farrowing-phone,.inspection-phone) .task-context-card{background:#fff;border-color:var(--line);border-radius:18px}
 :is(.farrowing-phone,.inspection-phone) .tc-task:before{background:var(--line)}
 :is(.farrowing-phone,.inspection-phone) .tc-task:active{background:var(--green-wash)}
 :is(.farrowing-phone,.inspection-phone) .tc-heading{color:var(--muted);font-weight:500}

@@ -47,7 +47,7 @@
 
 /* ---- TaskSummary: the unit figure | the task-overview progress ---- */
 .tk-summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); margin: 0 var(--space-panel) 10px;
-  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); box-shadow: var(--shadow-card); }
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); }
 /* No clip on the card (a clip reads as hiding the task half's last pixel on a room too short to scroll): the task half
    keeps the card's right corners with its own radius, so its pressed wash never spills. */
 .tk-summary-task { border-radius: 0 var(--radius-panel) var(--radius-panel) 0; }

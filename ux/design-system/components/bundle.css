@@ -171,7 +171,7 @@ body{background:var(--ground);color:var(--ink)}
 }
 
 /* Shared room context and explicit record commits. */
-:is(.farrowing-phone,.inspection-phone) .task-context-card{background:var(--paper);border-color:var(--line);border-radius:var(--radius-18);box-shadow:var(--shadow-card)}
+:is(.farrowing-phone,.inspection-phone) .task-context-card{background:var(--paper);border-color:var(--line);border-radius:var(--radius-18)}
 :is(.farrowing-phone,.inspection-phone) .tc-task:before{background:var(--line)}
 :is(.farrowing-phone,.inspection-phone) .tc-task:active{background:var(--green-wash)}
 :is(.farrowing-phone,.inspection-phone) .tc-heading{color:var(--muted);font-weight:500}
@@ -270,6 +270,12 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 .st-category-footer.st-category-footer{display:grid;grid-template-columns:var(--back-width) minmax(0,1fr);align-items:center;gap:var(--space-16);position:relative;flex:none;min-width:0;padding:var(--space-footer-top) var(--space-gutter) var(--space-footer-bottom);border-top:var(--border-width) solid var(--st-line);background:var(--st-paper);container-type:inline-size}
 .st-category-footer .st-category-tabs{display:flex;min-width:0;gap:var(--space-2);overflow-x:auto;overscroll-behavior-x:contain;padding:0;margin:0;border:0;background:transparent;scrollbar-width:none}
 .st-category-tabs::-webkit-scrollbar{display:none}
+/* Overflow cue: tabs snap to their start, and the strip fades at whichever edge has more to scroll. No overflow, no fade. */
+@property --st-fade-l{syntax:"<length>";inherits:false;initial-value:0px}
+@property --st-fade-r{syntax:"<length>";inherits:false;initial-value:0px}
+.st-category-footer .st-category-tabs{scroll-snap-type:x proximity;--st-fade-l:0px;--st-fade-r:0px;-webkit-mask-image:linear-gradient(to right,transparent,#000 var(--st-fade-l),#000 calc(100% - var(--st-fade-r)),transparent);mask-image:linear-gradient(to right,transparent,#000 var(--st-fade-l),#000 calc(100% - var(--st-fade-r)),transparent);animation:st-tabs-fade linear both;animation-timeline:scroll(self inline)}
+.st-category-footer .st-category-tabs button{scroll-snap-align:start}
+@keyframes st-tabs-fade{0%{--st-fade-l:0px;--st-fade-r:var(--space-24)}8%{--st-fade-l:var(--space-24);--st-fade-r:var(--space-24)}92%{--st-fade-l:var(--space-24);--st-fade-r:var(--space-24)}100%{--st-fade-l:var(--space-24);--st-fade-r:0px}}
 .st-category-footer .st-category-tabs button{position:relative;flex:1 0 auto;min-width:var(--tap-min);min-height:var(--control-height);margin:0;padding:0 var(--space-8);border:0;border-radius:0;background:transparent;color:var(--tab-ink);font:500 var(--font-size-12) var(--font-sans);white-space:nowrap;touch-action:manipulation}
 .st-category-footer .st-category-tabs button[aria-current="location"]{background:transparent;color:var(--tab-ink-active);font-weight:700}
 .st-category-tabs button[aria-current="location"]:after{content:"";position:absolute;bottom:var(--border-width);left:var(--space-8);right:var(--space-8);height:var(--size-3);border-radius:var(--radius-2);background:var(--current-marker)}

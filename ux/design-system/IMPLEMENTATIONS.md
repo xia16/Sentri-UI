@@ -34,7 +34,7 @@ All 18 functions of the old file exist in the bundle. A differential run of 34 c
 | `segment` | diverged (superset) | per-option `strs` |
 | `iconButton` | diverged (superset) | `strs` for the badge |
 | `optionalRow` | same | `data-ds="OptionalRow"` only; the document click handler for inline rows is the same in both |
-| icon registry (`sentri-icons.js`) | same | 52 glyphs identical; the bundle adds `backspace` |
+| icon registry | `SentriIcons` in the bundle (one registry, count derived; legacy `sentri-icons.js` retired) | `SentriIcons` in the bundle | one source of truth |
 
 Only in the bundle (37): `stepper`, `measure`, `numpad` and its helpers (`numpadInput`, `numpadScan`, `numpadCommit`, `numpadKey`, `numpadScanner`), `rowSelect`, `rowAction`, `rowSelectChange`, `status`, `statusLine`, `statusText`, `announce`, `liveFill`, `banner`, `photos`, `button`, `buttonReason`, `guard`, `handFocus`, `holdButton`, `holdStep`, `holdBind`, `HOLD`, `choiceRadios`, `radioNext`, `radioBind`. Only in the old file: nothing.
 

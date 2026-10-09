@@ -173,7 +173,7 @@ function renderBoard() {
     if (x > 40 && x + rw > ROW) { x = 40; y += rowH + 32; rowH = 0; }
     r.style.left = x + 'px'; r.style.top = y + 'px'; x += rw + 32; rowH = Math.max(rowH, rh); maxX = Math.max(maxX, x);
   });
-  loadIconPaths().then((paths) => plane.querySelectorAll('.ico').forEach((n) => { const p = paths[n.dataset.i]; n.innerHTML = p ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="${esc(p)}"/></svg>` : '<i class="neutral"></i>'; }));
+  loadIcons().then((icons) => plane.querySelectorAll('.ico').forEach((n) => { n.innerHTML = icons && (n.dataset.i in icons.paths || n.dataset.i in icons.aliases) ? iconSvg(icons, n.dataset.i, 16, '') : '<i class="neutral"></i>'; }));
   const W = maxX + 8, H = y + rowH + 40;
   const pz = panzoom(board, plane, () => { const t = fitTo(board, W, H, 1, 0, 0.9); return { k: t.k, x: 0, y: 0 }; });
   board.querySelectorAll('[data-z]').forEach((b) => { b.onclick = () => { const z = +b.dataset.z; z ? pz.step(z > 0 ? 1.2 : 1 / 1.2) : pz.fit(); }; });
