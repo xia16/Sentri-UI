@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T19:25:43.802Z",
- "commit": "105662c",
+ "generated": "2026-10-09T19:40:05.643Z",
+ "commit": "2991a72",
  "platforms": [
   {
    "id": "mobile",
@@ -15720,75 +15720,76 @@
   {
    "name": "Banner",
    "group": "Status and feedback",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "status": "agent-checked",
+    "round": 3,
+    "judged": "2026-10-10",
+    "commit": "ec40759",
     "model": "claude-opus-5-5",
     "scores": {
-     "clarity": 7,
-     "budget": 7,
+     "clarity": 9,
+     "budget": 8,
      "hierarchy": 8,
      "spacing": 8,
-     "broken": 5
+     "broken": 9
     },
-    "lowest": 5,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
-      "pass": false,
-      "why": "Purpose stated but names no sibling to use instead (TaskWarning, a field status line)"
+      "pass": true,
+      "why": "Job stated; Status and Field named as alternatives"
      },
      {
       "line": 2,
       "pass": true,
-      "why": "Don'ts say when not (a warning that still records goes to the field status line)"
+      "why": "When / when not present"
      },
      {
       "line": 3,
       "pass": true,
-      "why": "Box, headline, consequence, summary and Clear named and shown"
+      "why": "Box, tone icon, headline, consequence, summary, actions, door named and rendered"
      },
      {
       "line": 4,
-      "pass": false,
-      "why": "Neither tone is used by any atlas screen; farrowing and piglet-processing use TaskWarning or their own CSS"
+      "pass": true,
+      "why": "Three tones, each with a use line and real screens"
      },
      {
       "line": 5,
-      "pass": false,
-      "why": "The Cleared + Undo state is not rendered in the preview"
+      "pass": true,
+      "why": "19 states render in the atlas tabs (Danger 5, Correction 7, Notice 7), none empty"
      },
      {
       "line": 6,
-      "pass": false,
-      "why": "Clear text action measures 46x44 (< 48)"
+      "pass": true,
+      "why": "Doors 354x72-131 on real screens; OK/Review text actions >=48; no target under 48 in 19 cells or 69 screens"
      },
      {
       "line": 7,
       "pass": true,
-      "why": "One banner at a time stated"
+      "why": "One banner per screen checked; at most two text actions"
      },
      {
       "line": 8,
       "pass": true,
-      "why": "Tones differ by headline words and weight, not colour alone"
+      "why": "Icon per tone plus words; disabled is dashed in the tone colour with a reason line"
      },
      {
       "line": 9,
-      "pass": false,
-      "why": "No headline length cap or long/zh example"
+      "pass": true,
+      "why": "Each tone's zh cell has its own headline and its tone icon; over-cap headline ellipsised"
      },
      {
       "line": 10,
       "pass": true,
-      "why": "One live region; focus return via handFocus specified"
+      "why": "role=note, native button door; clear/undo focus asserted by the check script"
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "Raw px (1px border, 4px gaps); no CSS-variable list"
+      "pass": true,
+      "why": "border-width and type-weight tokens; no line-height token exists"
      },
      {
       "line": 12,
@@ -15802,291 +15803,258 @@
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "Does not link TaskWarning or state the relation (variant or duplicate)"
+      "pass": true,
+      "why": "Links Button, Status, Field, TaskWarning"
      },
      {
       "line": 15,
-      "pass": false,
-      "why": "Danger and correction render cleanly at 375px, but the Cleared/Undo state has no proof"
+      "pass": true,
+      "why": "Re-rendered all 19 states myself: every proof PNG is byte-identical to current output; no tone column, tone-coloured dashed disabled border"
      }
     ],
     "classification": "component",
+    "previous": [
+     {
+      "finding": "phone-clash headline 'Review required' contradicts 'Yours is kept as a note'",
+      "fixed": true,
+      "note": "Headline 'Recorded on another phone first' (zh 已由另一部手机先记录), notice tone, OK only; 'Review required' no longer in any source"
+     },
+     {
+      "finding": "proof/*.png stale",
+      "fixed": true,
+      "note": "All 19 Banner proofs byte-identical to a fresh render at ec40759"
+     },
+     {
+      "finding": "zh cell reuses correction copy and alert icon in every tone",
+      "fixed": true,
+      "note": "Danger, correction, notice each have own zh headline/consequence and tone icon (alert, pencil, document)"
+     }
+    ],
     "variants": [
      {
       "name": "danger",
-      "usedBy": [],
-      "status": "in-design",
+      "usedBy": [
+       "farrowing.ended",
+       "farrowing.task-blocked"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 9,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 9
+      },
+      "findings": []
+     },
+     {
+      "name": "correction",
+      "usedBy": [
+       "farrowing.blocked",
+       "farrowing.edit"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 9,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 9
+      },
+      "findings": []
+     },
+     {
+      "name": "notice",
+      "usedBy": [
+       "workbench.today",
+       "workbench.saved-work",
+       "piglet-processing.phone-clash"
+      ],
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
-       "broken": 6
+       "broken": 9
       },
       "findings": [
-       "Same job and nearly the same face as TaskWarning red (farrowing's danger band); no screen uses Banner for it"
-      ]
-     },
-     {
-      "name": "correction",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {
-       "clarity": 7,
-       "budget": 7,
-       "hierarchy": 8,
-       "spacing": 8,
-       "broken": 5
-      },
-      "findings": [
-       "farrowing.edit shows no banner in its captured state; the archived edit.html slice is the only user",
-       "Clear is 44px tall; Cleared/Undo not rendered"
+       "zh cell consequence 等待上传 repeats the headline's 等待…上传"
       ]
      }
     ],
     "findings": [
      {
-      "severity": "high",
-      "text": "Banner and TaskWarning do the same job (a consequence above a commit, on a wash, with optional text actions) with two implementations: Banner danger is red-wash/red border with a 14/700 headline; TaskWarning red is red-wash/danger-border with a 12/700 title. Only TaskWarning is used (piglet-processing.phone-clash, farrowing.blocked).",
-      "fix": "Merge them: one Banner with tones danger / correction / notice, built once; TaskWarning becomes Banner at the skeleton's 12px size (a size property), not a second component."
-     },
-     {
-      "severity": "high",
-      "text": "The Home offline banner (\"3 records saved on this device · No connection · waiting to upload\", workbench.today) is a third look-alike: amber wash, a leading icon, the whole box a door with ›. Banner forbids icons; TaskWarning's amber door banner matches it.",
-      "fix": "Make it the merged Banner's notice tone with the door property (icon optional, the whole box one button at least 48px), and render Home with it."
-     },
-     {
-      "severity": "medium",
-      "text": "Clear (46x44) is under the 48px glove floor.",
-      "fix": "Give banner text actions min-height: var(--control-height) and make the summary row 48px."
-     },
-     {
-      "severity": "medium",
-      "text": "Cleared + Undo (5s) is specified but not rendered in the preview.",
-      "fix": "Add a Cleared/Undo example to preview.html."
+      "severity": "low",
+      "text": "Notice zh cell says waiting-to-upload twice: headline ends 等待网络连接后再上传 and the consequence repeats 等待上传.",
+      "fix": "Shorten the consequence to 无网络连接 (keep the headline over the cap)."
      },
      {
       "severity": "low",
-      "text": "Raw px, no CSS-variable list, no headline length cap.",
-      "fix": "Tokenise the 1px/4px values, list the variables, cap the headline at one line with a zh example."
+      "text": "piglet-processing.phone-clash: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's 'by L. Madsen at 08:40' say the same who/when right above each other (screen budget, not the component).",
+      "fix": "In the prototype, hide the Last record line while the clash banner shows, or drop the time/name from the banner text."
      }
     ],
-    "proposals": [
-     {
-      "kind": "merge",
-      "name": "Banner + TaskWarning",
-      "why": "Same job (a consequence before a commit, or a pending notice), two implementations; only TaskWarning ships in screens",
-      "seenIn": [
-       "farrowing.blocked",
-       "piglet-processing.phone-clash",
-       "piglet-processing.list-ended"
-      ]
-     },
-     {
-      "kind": "new-variant",
-      "name": "Banner · notice (door)",
-      "why": "The Home offline/upload banner and farrowing's \"Save your correction first · Review ›\" are an amber notice that opens something",
-      "seenIn": [
-       "workbench.today",
-       "workbench.saved-work",
-       "farrowing.blocked"
-      ]
-     }
-    ]
+    "proposals": []
    },
    "files": {
-    "variantsJson": false,
-    "variants": []
+    "variantsJson": true,
+    "variants": [
+     "correction",
+     "danger",
+     "notice"
+    ]
    }
   },
   {
    "name": "Photos",
    "group": "Status and feedback",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "status": "agent-checked",
+    "round": 3,
+    "judged": "2026-10-10",
+    "commit": "ec40759",
     "model": "claude-opus-5-5",
     "scores": {
-     "clarity": 8,
+     "clarity": 9,
      "budget": 8,
-     "hierarchy": 7,
-     "spacing": 6,
-     "broken": 5
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 9
     },
-    "lowest": 5,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
-      "pass": false,
-      "why": "Purpose stated, but no \"use X instead\" sibling (TaskPhotos, Note)"
+      "pass": true,
+      "why": "Job stated; Note named as the alternative"
      },
      {
       "line": 2,
-      "pass": false,
-      "why": "No when-not section naming an alternative"
+      "pass": true,
+      "why": "When / when not; Note and Measure named"
      },
      {
       "line": 3,
       "pass": true,
-      "why": "Card, header row, camera, answer line and thumbnails named; demo shows them"
+      "why": "Optional row, label, Optional word, count, camera, answer line, thumbnails named and rendered"
      },
      {
       "line": 4,
-      "pass": false,
-      "why": "No atlas screen uses the Photos card; farrowing.death uses its own photo line (the TaskPhotos face)"
+      "pass": true,
+      "why": "One face (line), used by farrowing.death"
      },
      {
       "line": 5,
-      "pass": false,
-      "why": "Errors (denied, too-large), pressed and focus are specified but not rendered"
+      "pass": true,
+      "why": "13 states render in the atlas tab, none empty; Empty folded into Default (README says so); Cancelled shows two kept photos"
      },
      {
       "line": 6,
-      "pass": false,
-      "why": "Camera button measures 44x44 (< 48)"
+      "pass": true,
+      "why": "Row 348x48, camera 48x48, thumbs 56x56; nothing under 48 in any cell or on farrowing.death"
      },
      {
       "line": 7,
       "pass": true,
-      "why": "Max 12 stated and shown in the full state"
+      "why": "12 maximum stated and shown"
      },
      {
       "line": 8,
       "pass": true,
-      "why": "Inactive/full camera loses its ring (shape) as well as colour, and the answer line says why"
+      "why": "Disabled has a reason line; adding/disabled/full dash only the camera ring; errors are words"
      },
      {
       "line": 9,
-      "pass": false,
-      "why": "No label or answer-line length cap; no long/zh example"
+      "pass": true,
+      "why": "zh example wraps without clipping"
      },
      {
       "line": 10,
       "pass": true,
-      "why": "Spoken labels, capture-first, viewer focus return specified"
+      "why": "Native buttons; capture->camera focus and viewer->thumb focus return asserted by the check script"
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "Raw px (20px offset, 8/4/3/2/1px) and no CSS-variable list"
+      "pass": true,
+      "why": "Photos CSS uses border-width and type-weight-semibold; README token list now matches"
      },
      {
       "line": 12,
       "pass": true,
-      "why": "Label visible; errors say what is wrong and how to fix it"
+      "why": "Visible label; errors say what and how to fix"
      },
      {
       "line": 13,
       "pass": true,
-      "why": "Viewer has a visible Back; Delete only while drafting"
+      "why": "Viewer is a Sheet with Back"
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "No classification and no link to TaskPhotos, which redraws it"
+      "pass": true,
+      "why": "Links Field, Sheet, Button, TaskPhotos; optionalRow deferral noted"
      },
      {
       "line": 15,
-      "pass": false,
-      "why": "At 375px the camera circle sits flush on the card's top, right and bottom edges; error states have no proof"
+      "pass": true,
+      "why": "Re-rendered all 13 states myself: every proof PNG byte-identical to current output; line-empty.png removed"
      }
     ],
     "classification": "component",
-    "variants": [
+    "previous": [
      {
-      "name": "Card (well + ringed circle)",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {
-       "clarity": 8,
-       "budget": 8,
-       "hierarchy": 7,
-       "spacing": 6,
-       "broken": 5
-      },
-      "findings": [
-       "Camera is 44px and tangent to the card edge",
-       "No atlas screen uses it"
-      ]
+      "finding": "proof/*.png stale",
+      "fixed": true,
+      "note": "13 proofs byte-identical to a fresh render; bordered thumbs, ring-only dashing"
      },
      {
-      "name": "Line (TaskPhotos: no well, outlined squircle key)",
+      "finding": "README token list names size-1, omits border-width/type-weight-semibold",
+      "fixed": true,
+      "note": "List corrected"
+     },
+     {
+      "finding": "optionalRow raw 600/400 weights and stroke-width 1.7",
+      "fixed": false,
+      "note": "Not changed; it lives in the shared optionalRow (sentri-components) used by other optional rows, so it is the optional row's debt, not a Photos fail. Kept as a low note"
+     },
+     {
+      "finding": "Default/Empty/Cancelled identical; tile digits repeat the count",
+      "fixed": true,
+      "note": "Empty cell removed, Cancelled shows two kept photos, tiles carry no digits"
+     }
+    ],
+    "variants": [
+     {
+      "name": "line",
       "usedBy": [
        "farrowing.death"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 7,
+       "clarity": 9,
        "budget": 8,
-       "hierarchy": 7,
+       "hierarchy": 8,
        "spacing": 8,
-       "broken": 5
+       "broken": 9
       },
-      "findings": [
-       "Uses the key squircle that Photos says the camera must never be",
-       "Camera key is 44px"
-      ]
+      "findings": []
      }
     ],
     "findings": [
      {
-      "severity": "high",
-      "text": "As the reference for the optional row, Photos and its only shipped face disagree: Photos rules a ringed circle \"deliberately not the keys' squircle\"; TaskPhotos (farrowing.death) draws an outlined squircle key with a leading camera glyph and no well. Two looks, one job.",
-      "fix": "Pick one face for the optional row (the farrowing line is the one in use), make the other a documented variant or retire it, and update the Photos rule to match."
-     },
-     {
-      "severity": "high",
-      "text": "The camera is 44x44 in both faces, under the 48px glove floor, and it is the row's only target.",
-      "fix": "Set the camera to var(--control-height) (48px) and the empty row min-height to 48px."
-     },
-     {
-      "severity": "medium",
-      "text": "The camera circle fills the 44px row exactly, so its ring touches the card's top, right and bottom edges (no inner padding on the right).",
-      "fix": "Pad the card space-row-y vertically and space-row-x on the right so the camera sits inside the well."
-     },
-     {
-      "severity": "medium",
-      "text": "The optional row is not generalised: Measure renders an optional weight as a full field on Give IDs, and farrowing uses \"+ Litter weight\" pills. The label scale also differs (Photos 13/500, Measure 14/600).",
-      "fix": "Write the optional row once (label at choice-label 14/600, \"Optional\" muted, the action at the right, 48px) and have Photos, Measure and Note use it."
-     },
-     {
-      "severity": "medium",
-      "text": "The denied / too-large errors, pressed and focus are specified but not rendered.",
-      "fix": "Add them to preview.html."
-     },
-     {
       "severity": "low",
-      "text": "Raw px, no CSS-variable list, no when-not section.",
-      "fix": "Tokenise, list the variables, add \"When not: a fact that needs words, use Note\"."
+      "text": "The shared optionalRow (ux/system/sentri-components.css) still uses raw font weights and stroke-width:1.7; Photos inherits them. Belongs to the optional row, not Photos.",
+      "fix": "When OptionalRow gets its own page, move its weights to type-weight tokens and its stroke to an icon-stroke token."
      }
     ],
-    "proposals": [
-     {
-      "kind": "merge",
-      "name": "Photos + TaskPhotos",
-      "why": "Same field, two faces with contradicting rules; one should be a variant of the other",
-      "seenIn": [
-       "farrowing.death"
-      ]
-     },
-     {
-      "kind": "new-component",
-      "name": "OptionalRow (section pattern)",
-      "why": "The collapsed optional input (label · Optional · action) recurs in Photos, the Give IDs weight and farrowing's + Litter weight",
-      "seenIn": [
-       "farrowing.death",
-       "farrowing.blocked",
-       "piglet-processing.give-ids"
-      ]
-     }
-    ]
+    "proposals": []
    },
    "files": {
-    "variantsJson": false,
-    "variants": []
+    "variantsJson": true,
+    "variants": [
+     "line"
+    ]
    }
   },
   {
@@ -16208,8 +16176,16 @@
   {
    "name": "TaskPhotos",
    "group": "Task skeleton",
-   "status": "in-design",
-   "gate": null,
+   "status": "retired",
+   "gate": {
+    "status": "retired",
+    "round": 1,
+    "judged": "2026-10-10",
+    "commit": "726879e",
+    "model": "claude-opus-5-5",
+    "classification": "variant-of:Photos",
+    "why": "Thin compatibility alias of SentriUI.photos with no CSS of its own. Judged as Photos."
+   },
    "files": {
     "variantsJson": false,
     "variants": []
@@ -16238,8 +16214,16 @@
   {
    "name": "TaskWarning",
    "group": "Task skeleton",
-   "status": "in-design",
-   "gate": null,
+   "status": "retired",
+   "gate": {
+    "status": "retired",
+    "round": 1,
+    "judged": "2026-10-10",
+    "commit": "726879e",
+    "model": "claude-opus-5-5",
+    "classification": "variant-of:Banner",
+    "why": "Thin compatibility alias of SentriUI.banner with no CSS of its own. Judged as Banner."
+   },
    "files": {
     "variantsJson": false,
     "variants": []
@@ -21014,9 +20998,9 @@
     "id": "Banner"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "Banner and TaskWarning do the same job (a consequence above a commit, on a wash, with optional…",
-   "detail": "Banner and TaskWarning do the same job (a consequence above a commit, on a wash, with optional text actions) with two implementations: Banner danger is red-wash/red border with a 14/700 headline; TaskWarning red is red-wash/danger-border with a 12/700 title. Only TaskWarning is used (piglet-processing.phone-clash, farrowing.blocked).\nFix: Merge them: one Banner with tones danger / correction / notice, built once; TaskWarning becomes Banner at the skeleton's 12px size (a size property), not a second component.",
+   "severity": "low",
+   "title": "Notice zh cell says waiting-to-upload twice: headline ends 等待网络连接后再上传 and the consequence…",
+   "detail": "Notice zh cell says waiting-to-upload twice: headline ends 等待网络连接后再上传 and the consequence repeats 等待上传.\nFix: Shorten the consequence to 无网络连接 (keep the headline over the cap).",
    "source": "gate"
   },
   {
@@ -21026,69 +21010,9 @@
     "id": "Banner"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "The Home offline banner (\"3 records saved on this device · No connection · waiting to upload\",…",
-   "detail": "The Home offline banner (\"3 records saved on this device · No connection · waiting to upload\", workbench.today) is a third look-alike: amber wash, a leading icon, the whole box a door with ›. Banner forbids icons; TaskWarning's amber door banner matches it.\nFix: Make it the merged Banner's notice tone with the door property (icon optional, the whole box one button at least 48px), and render Home with it.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Banner:2",
-   "target": {
-    "kind": "component",
-    "id": "Banner"
-   },
-   "kind": "design",
-   "severity": "medium",
-   "title": "Clear (46x44) is under the 48px glove floor.",
-   "detail": "Clear (46x44) is under the 48px glove floor.\nFix: Give banner text actions min-height: var(--control-height) and make the summary row 48px.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Banner:3",
-   "target": {
-    "kind": "component",
-    "id": "Banner"
-   },
-   "kind": "design",
-   "severity": "medium",
-   "title": "Cleared + Undo (5s) is specified but not rendered in the preview.",
-   "detail": "Cleared + Undo (5s) is specified but not rendered in the preview.\nFix: Add a Cleared/Undo example to preview.html.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Banner:4",
-   "target": {
-    "kind": "component",
-    "id": "Banner"
-   },
-   "kind": "design",
    "severity": "low",
-   "title": "Raw px, no CSS-variable list, no headline length cap.",
-   "detail": "Raw px, no CSS-variable list, no headline length cap.\nFix: Tokenise the 1px/4px values, list the variables, cap the headline at one line with a zh example.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Banner:p0",
-   "target": {
-    "kind": "component",
-    "id": "Banner"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "Merge Banner + TaskWarning?",
-   "detail": "Same job (a consequence before a commit, or a pending notice), two implementations; only TaskWarning ships in screens\nSeen in: farrowing.blocked, piglet-processing.phone-clash, piglet-processing.list-ended",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Banner:p1",
-   "target": {
-    "kind": "component",
-    "id": "Banner"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "New variant: Banner · notice (door)?",
-   "detail": "The Home offline/upload banner and farrowing's \"Save your correction first · Review ›\" are an amber notice that opens something\nSeen in: workbench.today, workbench.saved-work, farrowing.blocked",
+   "title": "piglet-processing.phone-clash: the screen subtitle 'Last record 08:40 · L. Madsen' and the…",
+   "detail": "piglet-processing.phone-clash: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's 'by L. Madsen at 08:40' say the same who/when right above each other (screen budget, not the component).\nFix: In the prototype, hide the Last record line while the clash banner shows, or drop the time/name from the banner text.",
    "source": "gate"
   },
   {
@@ -21098,93 +21022,9 @@
     "id": "Photos"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "As the reference for the optional row, Photos and its only shipped face disagree: Photos rules a…",
-   "detail": "As the reference for the optional row, Photos and its only shipped face disagree: Photos rules a ringed circle \"deliberately not the keys' squircle\"; TaskPhotos (farrowing.death) draws an outlined squircle key with a leading camera glyph and no well. Two looks, one job.\nFix: Pick one face for the optional row (the farrowing line is the one in use), make the other a documented variant or retire it, and update the Photos rule to match.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Photos:1",
-   "target": {
-    "kind": "component",
-    "id": "Photos"
-   },
-   "kind": "broken",
-   "severity": "high",
-   "title": "The camera is 44x44 in both faces, under the 48px glove floor, and it is the row's only target.",
-   "detail": "The camera is 44x44 in both faces, under the 48px glove floor, and it is the row's only target.\nFix: Set the camera to var(--control-height) (48px) and the empty row min-height to 48px.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Photos:2",
-   "target": {
-    "kind": "component",
-    "id": "Photos"
-   },
-   "kind": "broken",
-   "severity": "medium",
-   "title": "The camera circle fills the 44px row exactly, so its ring touches the card's top, right and…",
-   "detail": "The camera circle fills the 44px row exactly, so its ring touches the card's top, right and bottom edges (no inner padding on the right).\nFix: Pad the card space-row-y vertically and space-row-x on the right so the camera sits inside the well.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Photos:3",
-   "target": {
-    "kind": "component",
-    "id": "Photos"
-   },
-   "kind": "design",
-   "severity": "medium",
-   "title": "The optional row is not generalised: Measure renders an optional weight as a full field on Give…",
-   "detail": "The optional row is not generalised: Measure renders an optional weight as a full field on Give IDs, and farrowing uses \"+ Litter weight\" pills. The label scale also differs (Photos 13/500, Measure 14/600).\nFix: Write the optional row once (label at choice-label 14/600, \"Optional\" muted, the action at the right, 48px) and have Photos, Measure and Note use it.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Photos:4",
-   "target": {
-    "kind": "component",
-    "id": "Photos"
-   },
-   "kind": "broken",
-   "severity": "medium",
-   "title": "The denied / too-large errors, pressed and focus are specified but not rendered.",
-   "detail": "The denied / too-large errors, pressed and focus are specified but not rendered.\nFix: Add them to preview.html.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Photos:5",
-   "target": {
-    "kind": "component",
-    "id": "Photos"
-   },
-   "kind": "design",
    "severity": "low",
-   "title": "Raw px, no CSS-variable list, no when-not section.",
-   "detail": "Raw px, no CSS-variable list, no when-not section.\nFix: Tokenise, list the variables, add \"When not: a fact that needs words, use Note\".",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Photos:p0",
-   "target": {
-    "kind": "component",
-    "id": "Photos"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "Merge Photos + TaskPhotos?",
-   "detail": "Same field, two faces with contradicting rules; one should be a variant of the other\nSeen in: farrowing.death",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Photos:p1",
-   "target": {
-    "kind": "component",
-    "id": "Photos"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "New component: OptionalRow (section pattern)?",
-   "detail": "The collapsed optional input (label · Optional · action) recurs in Photos, the Give IDs weight and farrowing's + Litter weight\nSeen in: farrowing.death, farrowing.blocked, piglet-processing.give-ids",
+   "title": "The shared optionalRow (ux/system/sentri-components.css) still uses raw font weights and…",
+   "detail": "The shared optionalRow (ux/system/sentri-components.css) still uses raw font weights and stroke-width:1.7; Photos inherits them. Belongs to the optional row, not Photos.\nFix: When OptionalRow gets its own page, move its weights to type-weight tokens and its stroke to an icon-stroke token.",
    "source": "gate"
   }
  ],

@@ -1,174 +1,46 @@
 {
-  "status": "in-design",
-  "judged": "2026-10-09",
-  "commit": "3e3f835",
+  "status": "agent-checked",
+  "round": 3,
+  "judged": "2026-10-10",
+  "commit": "ec40759",
   "model": "claude-opus-5-5",
-  "scores": {
-    "clarity": 7,
-    "budget": 7,
-    "hierarchy": 8,
-    "spacing": 8,
-    "broken": 5
-  },
-  "lowest": 5,
+  "scores": { "clarity": 9, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 9 },
+  "lowest": 8,
   "checklist": [
-    {
-      "line": 1,
-      "pass": false,
-      "why": "Purpose stated but names no sibling to use instead (TaskWarning, a field status line)"
-    },
-    {
-      "line": 2,
-      "pass": true,
-      "why": "Don'ts say when not (a warning that still records goes to the field status line)"
-    },
-    {
-      "line": 3,
-      "pass": true,
-      "why": "Box, headline, consequence, summary and Clear named and shown"
-    },
-    {
-      "line": 4,
-      "pass": false,
-      "why": "Neither tone is used by any atlas screen; farrowing and piglet-processing use TaskWarning or their own CSS"
-    },
-    {
-      "line": 5,
-      "pass": false,
-      "why": "The Cleared + Undo state is not rendered in the preview"
-    },
-    {
-      "line": 6,
-      "pass": false,
-      "why": "Clear text action measures 46x44 (< 48)"
-    },
-    {
-      "line": 7,
-      "pass": true,
-      "why": "One banner at a time stated"
-    },
-    {
-      "line": 8,
-      "pass": true,
-      "why": "Tones differ by headline words and weight, not colour alone"
-    },
-    {
-      "line": 9,
-      "pass": false,
-      "why": "No headline length cap or long/zh example"
-    },
-    {
-      "line": 10,
-      "pass": true,
-      "why": "One live region; focus return via handFocus specified"
-    },
-    {
-      "line": 11,
-      "pass": false,
-      "why": "Raw px (1px border, 4px gaps); no CSS-variable list"
-    },
-    {
-      "line": 12,
-      "pass": true,
-      "why": "Not a field"
-    },
-    {
-      "line": 13,
-      "pass": true,
-      "why": "Not an overlay"
-    },
-    {
-      "line": 14,
-      "pass": false,
-      "why": "Does not link TaskWarning or state the relation (variant or duplicate)"
-    },
-    {
-      "line": 15,
-      "pass": false,
-      "why": "Danger and correction render cleanly at 375px, but the Cleared/Undo state has no proof"
-    }
+    { "line": 1, "pass": true, "why": "Job stated; Status and Field named as alternatives" },
+    { "line": 2, "pass": true, "why": "When / when not present" },
+    { "line": 3, "pass": true, "why": "Box, tone icon, headline, consequence, summary, actions, door named and rendered" },
+    { "line": 4, "pass": true, "why": "Three tones, each with a use line and real screens" },
+    { "line": 5, "pass": true, "why": "19 states render in the atlas tabs (Danger 5, Correction 7, Notice 7), none empty" },
+    { "line": 6, "pass": true, "why": "Doors 354x72-131 on real screens; OK/Review text actions >=48; no target under 48 in 19 cells or 69 screens" },
+    { "line": 7, "pass": true, "why": "One banner per screen checked; at most two text actions" },
+    { "line": 8, "pass": true, "why": "Icon per tone plus words; disabled is dashed in the tone colour with a reason line" },
+    { "line": 9, "pass": true, "why": "Each tone's zh cell has its own headline and its tone icon; over-cap headline ellipsised" },
+    { "line": 10, "pass": true, "why": "role=note, native button door; clear/undo focus asserted by the check script" },
+    { "line": 11, "pass": true, "why": "border-width and type-weight tokens; no line-height token exists" },
+    { "line": 12, "pass": true, "why": "Not a field" },
+    { "line": 13, "pass": true, "why": "Not an overlay" },
+    { "line": 14, "pass": true, "why": "Links Button, Status, Field, TaskWarning" },
+    { "line": 15, "pass": true, "why": "Re-rendered all 19 states myself: every proof PNG is byte-identical to current output; no tone column, tone-coloured dashed disabled border" }
   ],
   "classification": "component",
+  "previous": [
+    { "finding": "phone-clash headline 'Review required' contradicts 'Yours is kept as a note'", "fixed": true, "note": "Headline 'Recorded on another phone first' (zh 已由另一部手机先记录), notice tone, OK only; 'Review required' no longer in any source" },
+    { "finding": "proof/*.png stale", "fixed": true, "note": "All 19 Banner proofs byte-identical to a fresh render at ec40759" },
+    { "finding": "zh cell reuses correction copy and alert icon in every tone", "fixed": true, "note": "Danger, correction, notice each have own zh headline/consequence and tone icon (alert, pencil, document)" }
+  ],
   "variants": [
-    {
-      "name": "danger",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {
-        "clarity": 8,
-        "budget": 8,
-        "hierarchy": 8,
-        "spacing": 8,
-        "broken": 6
-      },
-      "findings": [
-        "Same job and nearly the same face as TaskWarning red (farrowing's danger band); no screen uses Banner for it"
-      ]
-    },
-    {
-      "name": "correction",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {
-        "clarity": 7,
-        "budget": 7,
-        "hierarchy": 8,
-        "spacing": 8,
-        "broken": 5
-      },
-      "findings": [
-        "farrowing.edit shows no banner in its captured state; the archived edit.html slice is the only user",
-        "Clear is 44px tall; Cleared/Undo not rendered"
-      ]
-    }
+    { "name": "danger", "usedBy": ["farrowing.ended", "farrowing.task-blocked"], "status": "agent-checked",
+      "scores": { "clarity": 9, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 9 }, "findings": [] },
+    { "name": "correction", "usedBy": ["farrowing.blocked", "farrowing.edit"], "status": "agent-checked",
+      "scores": { "clarity": 9, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 9 }, "findings": [] },
+    { "name": "notice", "usedBy": ["workbench.today", "workbench.saved-work", "piglet-processing.phone-clash"], "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 9 },
+      "findings": ["zh cell consequence 等待上传 repeats the headline's 等待…上传"] }
   ],
   "findings": [
-    {
-      "severity": "high",
-      "text": "Banner and TaskWarning do the same job (a consequence above a commit, on a wash, with optional text actions) with two implementations: Banner danger is red-wash/red border with a 14/700 headline; TaskWarning red is red-wash/danger-border with a 12/700 title. Only TaskWarning is used (piglet-processing.phone-clash, farrowing.blocked).",
-      "fix": "Merge them: one Banner with tones danger / correction / notice, built once; TaskWarning becomes Banner at the skeleton's 12px size (a size property), not a second component."
-    },
-    {
-      "severity": "high",
-      "text": "The Home offline banner (\"3 records saved on this device · No connection · waiting to upload\", workbench.today) is a third look-alike: amber wash, a leading icon, the whole box a door with ›. Banner forbids icons; TaskWarning's amber door banner matches it.",
-      "fix": "Make it the merged Banner's notice tone with the door property (icon optional, the whole box one button at least 48px), and render Home with it."
-    },
-    {
-      "severity": "medium",
-      "text": "Clear (46x44) is under the 48px glove floor.",
-      "fix": "Give banner text actions min-height: var(--control-height) and make the summary row 48px."
-    },
-    {
-      "severity": "medium",
-      "text": "Cleared + Undo (5s) is specified but not rendered in the preview.",
-      "fix": "Add a Cleared/Undo example to preview.html."
-    },
-    {
-      "severity": "low",
-      "text": "Raw px, no CSS-variable list, no headline length cap.",
-      "fix": "Tokenise the 1px/4px values, list the variables, cap the headline at one line with a zh example."
-    }
+    { "severity": "low", "text": "Notice zh cell says waiting-to-upload twice: headline ends 等待网络连接后再上传 and the consequence repeats 等待上传.", "fix": "Shorten the consequence to 无网络连接 (keep the headline over the cap)." },
+    { "severity": "low", "text": "piglet-processing.phone-clash: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's 'by L. Madsen at 08:40' say the same who/when right above each other (screen budget, not the component).", "fix": "In the prototype, hide the Last record line while the clash banner shows, or drop the time/name from the banner text." }
   ],
-  "proposals": [
-    {
-      "kind": "merge",
-      "name": "Banner + TaskWarning",
-      "why": "Same job (a consequence before a commit, or a pending notice), two implementations; only TaskWarning ships in screens",
-      "seenIn": [
-        "farrowing.blocked",
-        "piglet-processing.phone-clash",
-        "piglet-processing.list-ended"
-      ]
-    },
-    {
-      "kind": "new-variant",
-      "name": "Banner · notice (door)",
-      "why": "The Home offline/upload banner and farrowing's \"Save your correction first · Review ›\" are an amber notice that opens something",
-      "seenIn": [
-        "workbench.today",
-        "workbench.saved-work",
-        "farrowing.blocked"
-      ]
-    }
-  ]
+  "proposals": []
 }

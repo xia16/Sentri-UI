@@ -1,17 +1,4 @@
-<!-- @dsCard group="Fields" height=520 subtitle="Candidate · inactive, live, attached, full" -->
-<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
-<body>
-<div class="inspection-phone" data-st-context="drawer" style="max-width:390px;padding:16px;background:var(--paper);font-family:var(--sans);color:var(--ink);display:flex;flex-direction:column;gap:20px"><div id="inactive"></div><div id="live"></div><div id="some"></div><div id="full"></div></div>
-<script>
-const UI = window.SentriUI;
-const items = n => Array.from({ length: n }, (_, i) => ({ id: 'p' + (i + 1) }));
-inactive.innerHTML = UI.photos({ optional: 'Optional', active: false, key: 'a', hint: 'Record a death first · photos ride that record' });
-live.innerHTML = UI.photos({ optional: 'Optional', key: 'b' });
-some.innerHTML = UI.photos({ optional: 'Optional', key: 'c', items: items(3), count: ['3 attached', { text: '1 waiting to upload', tone: 'amber' }] });
-full.innerHTML = UI.photos({ optional: 'Optional', key: 'd', items: items(12), count: '12 attached', hint: '12 photos at most' });
-document.querySelector('[data-field="b"] .st-photos-camera').setAttribute('data-preview', 'pressed');
-</script>
-</body>
-</html>
+<!-- @dsCard group="Fields" height=640 subtitle="All variants and states" -->
+<!doctype html><html lang="en"><head><meta charset="utf-8"></head><body><main id="examples"></main><script>
+(async()=>{for(const id of ["line"]){const response=await fetch("variants/"+id+".html"); const doc=new DOMParser().parseFromString(await response.text(),"text/html");const box=document.createElement("div");box.innerHTML=doc.body.innerHTML;document.getElementById("examples").append(box);for(const script of box.querySelectorAll("script")){new Function(script.textContent)();script.remove();}}})();
+</script></body></html>

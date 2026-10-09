@@ -190,6 +190,9 @@
   --tracking-page: -0.5px;
   --tracking-page-tight: -0.6px;
   --tracking-sheet: -0.4px;
+  --type-weight-regular: 400;
+  --type-weight-medium: 500;
+  --type-weight-semibold: 600;
   --type-weight-strong: 700;
   --hold-sweep-opacity: 0.35;
   --task-hold-caption-opacity: 0.8;

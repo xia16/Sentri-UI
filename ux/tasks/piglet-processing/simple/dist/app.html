@@ -338,6 +338,9 @@
   --tracking-page: -0.5px;
   --tracking-page-tight: -0.6px;
   --tracking-sheet: -0.4px;
+  --type-weight-regular: 400;
+  --type-weight-medium: 500;
+  --type-weight-semibold: 600;
   --type-weight-strong: 700;
   --hold-sweep-opacity: 0.35;
   --task-hold-caption-opacity: 0.8;
@@ -500,6 +503,9 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .sheet-status[data-action-slot]>p{flex:1;min-width:0;margin:0}
 .sheet-status[data-action-slot]>.st-text-action{flex:none}
 .sheet[data-presentation="page"]>.sheet-status{padding-left:var(--space-gutter);padding-right:var(--space-gutter)}
+/* a waiting reason that sheetFooter lifts above the bar: one status line, not a column-sized flex child */
+.sheet>.st-button-reason.st-button-reason{flex:none;margin:0;padding:var(--space-row-y) var(--space-gutter) 0;background:var(--paper);border-top:1px solid var(--line)}
+.sheet>.st-button-reason+.sheet-footer{border-top:0}
 /* Dialog: one small decision, rising from the bottom edge (reachable by the thumb), over a dimmed phone. */
 .dialog-backdrop{position:absolute;inset:0;z-index:calc(8 + 10 * var(--sheet-layer,0));display:flex;flex-direction:column;justify-content:flex-end;background:var(--dialog-backdrop)}
 .dialog{display:flex;flex-direction:column;overflow:hidden;max-height:calc(100% - var(--space-24));background:var(--paper);color:var(--ink);border-radius:var(--radius-dialog) var(--radius-dialog) 0 0;box-shadow:var(--shadow-dialog)}
@@ -932,32 +938,38 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-choice-inline-opt:is(:focus-visible,[data-preview~="focus"]){outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 
 /* Banner: headline over consequence on a wash; danger red, correction amber with its live summary and Clear */
-.st-banner{display:flex;flex-direction:column;gap:var(--space-4);margin:0;padding:var(--space-row-y) var(--space-panel);border:1px solid var(--red);border-radius:var(--radius-inset);background:var(--red-wash);color:var(--ink)}
-.st-banner-headline{font:var(--type-weight-strong) var(--type-choice-label-size)/1.4 var(--font-sans);color:var(--red)}
-.st-banner-consequence{font:400 var(--type-choice-meta-size)/1.5 var(--font-mono);color:var(--muted)}
-.st-banner[data-tone="correction"]{border-color:var(--amber);background:var(--amber-wash-strong)}
-.st-banner[data-tone="correction"] .st-banner-headline{font-weight:600;color:var(--ink)}
-.st-banner-summary{display:flex;align-items:center;justify-content:space-between;gap:var(--space-row-y);min-height:var(--tap-min);margin-top:var(--space-4);border-top:1px solid var(--amber)}
-.st-banner-summary-text.st-banner-summary-text{flex:1;min-width:0;margin:0;font:500 var(--type-choice-meta-size)/1.5 var(--font-mono);color:var(--ink)}
-.st-banner-summary .st-text-action{padding:0 0 0 var(--space-row-y);justify-content:flex-end}
-
-/* Photos: a well card, no outline; the camera is a paper circle with a ring (inactive: well, no ring) */
-.st-photos{display:flex;flex-direction:column;margin:0;padding:0 0 0 var(--space-row-x);border-radius:var(--radius-control);background:var(--well);color:var(--ink)}
-.st-photos-head{display:flex;align-items:center;gap:var(--space-row-y);min-height:var(--tap-min)}
-.st-photos-label{display:flex;align-items:baseline;flex-wrap:wrap;column-gap:var(--space-8);flex:1;min-width:0;font:500 var(--type-row-title-size)/1.4 var(--font-sans)}
-.st-photos-label small{font:400 var(--type-description-size)/1.4 var(--font-sans);color:var(--muted)}
-.st-photos-camera.st-photos-camera{display:grid;place-items:center;flex:none;width:var(--tap-min);height:var(--tap-min);margin:0;padding:0;border:var(--ring-width-fine) solid var(--muted);border-radius:50%;background:var(--paper);color:var(--ink);cursor:pointer;touch-action:manipulation}
-.st-photos-camera svg{width:var(--glyph-pad);height:var(--glyph-pad);stroke-width:1.8}
-.st-photos-camera.st-photos-camera[aria-disabled="true"]{border-color:var(--well);background:var(--well);color:var(--disabled-ink);cursor:default}
-.st-photos-camera:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){background:var(--press)}
-.st-photos-camera:is(:focus-visible,[data-preview~="focus"]),.st-photos-thumb:is(:focus-visible,[data-preview~="focus"]){outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
-.st-photos-items{display:flex;flex-wrap:wrap;gap:var(--space-key-gap);margin:0;padding:0 var(--space-row-x) var(--space-row-x) 0;list-style:none}
-.st-photos-thumb.st-photos-thumb{display:grid;place-items:center;width:var(--photo-tile);height:var(--photo-tile);margin:0;padding:0;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius-segment);background:var(--paper);color:var(--muted);font:500 var(--type-identifier-size)/1 var(--font-mono);cursor:pointer}
+.st-banner{flex:none;margin:0;padding:var(--space-row-y) var(--space-row-x);border:var(--border-width) solid var(--danger-border);border-radius:var(--radius-control);background:var(--red-wash);color:var(--ink);text-align:left}
+.st-banner-body{display:flex;align-items:center;gap:var(--space-8);min-height:var(--tap-min)}
+.st-banner-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:var(--space-4)}
+.st-banner-headline{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:var(--type-weight-strong) var(--type-choice-label-size)/1.4 var(--font-sans);color:var(--red)}
+.st-banner[data-size="small"] .st-banner-headline{font-size:var(--type-choice-meta-size)}
+.st-banner-consequence{font:var(--type-weight-regular) var(--type-choice-meta-size)/1.5 var(--font-sans);overflow-wrap:anywhere}
+.st-banner-consequence{color:var(--muted)}
+.st-banner[data-tone="correction"],.st-banner[data-tone="notice"]{border-color:var(--pending-border);background:var(--amber-wash)}
+.st-banner[data-tone="correction"] .st-banner-headline,.st-banner[data-tone="notice"] .st-banner-headline{color:var(--ink)}
+.st-banner-summary,.st-banner-actions{display:flex;align-items:center;flex-wrap:wrap;gap:var(--space-8);min-height:var(--tap-min)}
+.st-banner-summary-text{flex:1;margin:0;font:var(--type-weight-medium) var(--type-choice-meta-size)/1.5 var(--font-mono)}
+.st-banner .st-text-action{min-height:var(--control-height);min-width:var(--tap-min)}
+.st-banner[data-door]{width:100%;min-height:var(--tap-min);cursor:pointer}
+.st-banner[data-door]:is(:active,[data-state="Pressed"]){background:var(--press)}
+.st-banner[data-door]:is(:focus-visible,[data-state="Focus"]){outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
+.st-banner:disabled{border-style:dashed;cursor:default}
+.st-banner-icon svg{width:var(--glyph-pad);height:var(--glyph-pad)}
+.st-photos{display:flex;flex-direction:column;padding:var(--space-row-y) 0;color:var(--ink)}
+.st-photos .st-optional-row{min-height:var(--tap-min);margin:0;padding:0;background:transparent}
+.st-photos .st-optional-label{font:var(--type-weight-semibold) var(--type-choice-label-size)/1.4 var(--font-sans);overflow-wrap:anywhere}
+.st-photos .st-optional-answer{white-space:normal;overflow-wrap:anywhere}
+.st-photos .st-optional-act{display:grid;place-items:center;flex:none;width:var(--control-height);height:var(--control-height);border:0;background:transparent}
+.st-photos .st-optional-act svg{width:var(--glyph-pad);height:var(--glyph-pad)}
+.st-photos-camera[aria-disabled="true"] .st-optional-act{color:var(--disabled-ink)}
+.st-photos-camera[aria-disabled="true"] .st-optional-act svg{border-style:dashed}
+.st-photos-camera:is(:active,[data-preview="pressed"]){background:var(--press)}
+.st-photos-camera:is(:focus-visible,[data-preview="focus"]),.st-photos-thumb:focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
+.st-photos-items{display:flex;flex-wrap:wrap;gap:var(--space-key-gap);margin:0;padding:var(--space-8) 0;list-style:none}
+.st-photos-thumb.st-photos-thumb{position:relative;display:grid;place-items:center;min-width:var(--tap-min);width:var(--photo-tile);height:var(--photo-tile);padding:0;overflow:hidden;border:var(--border-width) solid var(--line);border-radius:var(--radius-segment);background:var(--paper);color:var(--muted)}
 .st-photos-thumb img{width:100%;height:100%;object-fit:cover}
-.st-photos-hint.st-photos-hint{padding-right:var(--space-row-x);font-size:var(--type-choice-meta-size)}
-.st-photos-hint:not(:empty){padding-bottom:var(--space-8)}
-* + .st-photos{margin-top:var(--space-20)}
-.st-photos-thumb.st-photos-thumb{position:relative}
+.st-photos-hint.st-photos-hint{flex-wrap:nowrap;align-items:flex-start;font-size:var(--type-choice-meta-size)}
+.st-photos-hint::before{margin-top:var(--space-6)}
 .st-photos-thumb[data-pending]::after{content:"";position:absolute;right:var(--space-4);bottom:var(--space-4);width:var(--status-dot);height:var(--status-dot);border-radius:50%;background:var(--amber)}
 
 /* Numpad compact: the run without its running list (the host speaks the last record in the status line) */
@@ -974,8 +986,8 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-optional-row:disabled{opacity:.5}
 .st-optional-copy{display:flex;flex-direction:column;flex:1;min-width:0;padding:var(--space-7) 0}
 .st-optional-head{display:flex;align-items:baseline;gap:var(--space-8);min-width:0}
-.st-optional-label{font:500 var(--type-row-title-size)/1.4 var(--font-sans);color:var(--ink)}
-.st-optional-word{font:400 var(--type-description-size)/1.4 var(--font-sans);color:var(--muted)}
+.st-optional-label{font:600 var(--type-choice-label-size)/1.4 var(--font-sans);color:var(--ink)}
+.st-optional-word{flex:none;white-space:nowrap;font:400 var(--type-description-size)/1.4 var(--font-sans);color:var(--muted)}
 .st-optional-answer{font:400 var(--font-size-12)/1.5 var(--font-sans);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .st-optional-answer:empty{display:none}
 .st-optional-act{display:grid;place-items:center;flex:none;width:var(--tap-min);height:var(--tap-min);color:var(--ink)}
@@ -1246,19 +1258,6 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 
 /* ---- Skeleton 2 (owner round 5: match farrowing) ---- */
 
-/* TaskPhotos: farrowing's photo line — no well; a camera glyph, the label 13px, `Optional` 10px; an outlined camera key. */
-.st-photos.tk-photos { padding: 0; border-radius: 0; background: transparent; }
-* + .st-photos.tk-photos { margin-top: var(--space-section); }
-.tk-photos .st-photos-head { gap: 6px; }
-.tk-photos .st-photos-label { align-items: center; column-gap: 7px; font: 500 var(--type-row-title-size)/1.4 var(--font-sans); }
-.tk-photos .st-photos-label small { font: var(--type-meta-size)/1.4 var(--font-sans); color: var(--muted); }
-.tk-photos-glyph { display: inline-flex; }
-.tk-photos-glyph svg { width: var(--glyph-key); height: var(--glyph-key); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.tk-photos .st-photos-camera.st-photos-camera { border: 1px solid var(--task-key-border); border-radius: var(--radius-segment); background: var(--paper); }
-.tk-photos .st-photos-items { gap: var(--space-key-gap); padding: var(--space-key-gap) 0; }
-.tk-photos .st-photos-thumb.st-photos-thumb { width: var(--photo-thumb-task); height: var(--photo-thumb-task); border: 0; border-radius: 8px; }
-.tk-photos .st-photos-hint.st-photos-hint { padding-right: 0; }
-
 /* TaskChoice: farrowing's choice tiles (Foster: Send / Receive). */
 .tk-choice { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .tk-choice[data-count="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -1281,15 +1280,6 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .tk-radios .st-choice-label { font: 400 var(--type-button-size)/1.4 var(--font-sans); }
 .tk-radios .st-choice-row .st-radio { order: 2; margin-left: auto; border-width: var(--ring-width-fine); border-color: var(--muted); }
 .tk-radios .st-choice-row[aria-checked="true"] .st-radio { border-color: var(--ink); }
-
-/* TaskWarning: farrowing's danger band — pale red, 12px red text, text actions, a 10px muted consequence line. */
-.tk-warning { margin: 0; padding: var(--space-row-y); border: 1px solid var(--danger-border); border-radius: var(--radius-control); background: var(--red-wash); color: var(--red);
-  font: var(--type-choice-meta-size)/1.6 var(--font-sans); }
-.tk-warning[data-tone="amber"] { border-color: var(--pending-border); background: var(--amber-wash); color: var(--amber); }
-.tk-warning-text { margin: 0; }
-.tk-warning-actions { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--space-row-y); margin-top: 4px; }
-.tk-warning-actions > .st-text-action { color: inherit; }
-.tk-warning-detail { display: block; margin-top: 4px; font: var(--type-meta-size)/1.6 var(--font-sans); color: var(--muted); }
 
 /* TaskTable: farrowing's comparison table (Choose a unit). Column headings and sublines are 9px, as farrowing
    (`table-heading`, below the 10px floor by the owner's round-5 ruling, like the hold caption). */
@@ -1328,26 +1318,6 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
   .tk-table-columns, .tk-table-row { column-gap: 5px; grid-template-columns: minmax(65px, 1.35fr) repeat(var(--tk-cols, 3), minmax(0, 1fr)) 16px; padding-left: var(--space-row-y); padding-right: var(--space-row-y); }
   .tk-table-name > strong { font-size: var(--type-row-title-size); }
 }
-
-/* ---- Skeleton 4 ---- */
-
-/* TaskWarning title (bold, as farrowing), and the End banner (⚠ icon, copy, chevron; the whole band a door). */
-.tk-warning-title { display: block; font: 600 var(--type-choice-meta-size)/1.5 var(--font-sans); }
-.tk-warning-title + .tk-warning-text { margin-top: 4px; font-size: var(--type-description-size); }
-.tk-warning[data-tone="amber"] { border-color: var(--banner-border); background: var(--banner-wash); color: var(--amber); }
-.tk-warning[data-banner] { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 80px; text-align: left; }
-button.tk-warning[data-banner] { margin: 0; cursor: pointer; }
-button.tk-warning[data-banner]:active { filter: brightness(.97); }
-.tk-warning-icon { flex: none; align-self: flex-start; display: grid; place-items: center; width: 16px; margin-top: 2px; }
-.tk-warning-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.tk-warning-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.tk-warning-copy > .tk-warning-title + .tk-warning-text { margin-top: 0; line-height: 1.6; }
-.tk-warning-go { flex: none; display: grid; place-items: center; }
-.tk-warning-go svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-/* The red band's hierarchy is farrowing's .danger-band: the headline is <strong> (bold, red), the consequence line a <small> (muted, 10px,
-   4px under). The amber band and the End banner (data-banner) keep their own look: amber text throughout, as their reference. */
-.tk-warning:not([data-tone="amber"]) .tk-warning-title { font-weight: 700; line-height: 1.6; }
-.tk-warning:not([data-tone="amber"]):not([data-banner]) .tk-warning-title + .tk-warning-text { margin-top: 4px; font-size: var(--type-meta-size); color: var(--muted); }
 
 /* TaskRadios layout 'row': farrowing's inline field — label (Optional tag, Clear) left, outlined option pills right. */
 .st-choice-inline.tk-radios[data-face="row"] { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); min-height: 64px; }
@@ -2166,37 +2136,43 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     const html=toks(tokens,{tight,dot:s==='dot'});
     return isLive?live('p',attrs,html):`<p${attrs}>${html}</p>`;
   }
-  /* Banner: a headline over its consequence, on a wash. tone 'danger' (red: an irreversible act or a terminal
-     fact) or 'correction' (a strong amber wash with an amber border: Edit's banner, with a live change summary and
-     Clear, then `Cleared · Undo`). One live region per banner: the summary when there is one, else the banner itself. */
-  function banner({tone='danger',headline='',consequence='',summary=null,actions=[],live:isLive=false,id='',className='',strs,args}={}){
-    const o={strs,args},t=oneOf('Banner','tone',tone,['danger','correction'],'danger');
-    const bid=id||fieldId('st-banner');
-    const cons=consequence||has(o,'consequence')?`<span class="st-banner-consequence">${tx(consequence,o,'consequence')}</span>`:'';
+  /* Banner: consequence, correction review or pending notice. Door is one button, never nested actions.
+     One live region per banner: its summary when present, otherwise the live box. */
+  const BANNER_ICON={danger:'alert',correction:'edit',notice:'note'};
+  function banner({tone='danger',headline='',consequence='',summary=null,actions=[],live:isLive=false,id='',className='',strs,args,door=null,icon='',size='',state='',reason='',detail=''}={}){
+    const o={strs,args},t=oneOf('Banner','tone',tone,['danger','correction','notice'],'danger'),bid=id||fieldId('st-banner');
+    const slot=(v,key)=>v&&typeof v==='object'&&'html' in v?v.html:tx(v,o,key);
     const hasSum=summary!=null||has(o,'summary');
     const sumHtml=summary==null?tx('',o,'summary'):Array.isArray(summary)?toks(summary,{dot:true}):tx(summary,o,'summary');
-    const sum=hasSum?`<div class="st-banner-summary">${live('p',` class="st-banner-summary-text" id="${esc(bid)}-summary"`,sumHtml)}${textActions(actions,'')}</div>`:'';
-    const body=`<strong class="st-banner-headline">${tx(headline,o,'headline')}</strong>${cons}`;
-    if(isLive&&hasSum)warn('Banner','live and summary together: the summary is the one live region');
-    const attrs=` class="st-banner ${esc(className)}" data-ds="Banner" data-tone="${t}" id="${esc(bid)}"`;
-    return isLive&&!hasSum?live('div',attrs,body):`<div${attrs}>${body}${sum}</div>`;
+    const actionHtml=typeof actions==='string'?actions:textActions(actions,'');
+    const sum=hasSum?`<span class="st-banner-summary">${live('span',` class="st-banner-summary-text" id="${esc(bid)}-summary"`,sumHtml)}${door?'':actionHtml}</span>`:(!door&&actionHtml?`<div class="st-banner-actions">${actionHtml}</div>`:'');
+    const body=`<span class="st-banner-body"><span class="st-banner-icon" aria-hidden="true">${glyph(icon||BANNER_ICON[t])}</span><span class="st-banner-copy"><strong class="st-banner-headline">${slot(headline,'headline')}</strong>${consequence?`<span class="st-banner-consequence">${slot(consequence,'consequence')}</span>`:''}${detail?`<span class="st-banner-consequence">${slot(detail,'detail')}</span>`:''}${reason?`<span class="st-banner-consequence">${esc(reason)}</span>`:''}</span>${door?'<span aria-hidden="true">›</span>':''}</span>`;
+    const attrs=` class="st-banner ${esc(className)}" data-ds="Banner" data-tone="${t}" data-size="${esc(size)}" data-state="${esc(state)}"${state==='Loading'?' aria-busy="true"':''} id="${esc(bid)}"`;
+    if(door)return `<button type="button"${attrs} data-door data-action="${esc(door.action||'open')}" data-value="${esc(door.value||'')}"${door.label?` aria-label="${esc(door.label)}"`:''}${state==='Disabled'?' disabled':''}>${body}${sum}</button>`;
+    return isLive&&!hasSum?live('div',attrs,body+sum):`<div${attrs} role="note">${body}${sum}</div>`;
   }
-  /* Photos: the record's photo field — a well card, the label and the camera circle on one 44px row, the answer line
+  /* Photos: the record's optional photo row, label and padded camera action on one >=48px row, the answer line
      under it, thumbnails beneath. Inactive until there is something to attach to; at max the camera grays the same way
      (floor-gray: aria-disabled, still tappable, data-reason says why, answered in the line). Thumbnails open the viewer.
      error: 'denied' (camera permission) · 'too-large' — answered amber; a cancelled capture says nothing. */
   const PHOTO_ERRORS={denied:{id:'ds.c2.photos.denied',en:'Camera not allowed · allow it in Settings, then try again'},'too-large':{id:'ds.c2.photos.too_large',en:'Photo too large to attach · take it again'}};
-  function photos({label='Photos',optional='',count=null,active=true,items=[],max=12,action='photo-add',viewAction='photo-view',key='photos',hint='',error='',id='',className='',strs,args}={}){
-    const o={strs,args},s=strs||{},a=args||{},pid=id||fieldId('st-photos'),hid=pid+'-hint',lid=pid+'-label';
+  function photos({label='Photos',optional='Optional',count=null,active=true,items=[],max=12,action='photo-add',viewAction='photo-view',key='photos',hint='',error='',id='',className='',strs,args,adding=false,disabledReason='',preview=''}={}){
+    const o={strs,args},s=strs||{},a=args||{},pid=id||fieldId('st-photos'),hid=pid+'-hint';
     const err=oneOf('Photos','error',error,['denied','too-large','cancelled'],'');
     const ERR=PHOTO_ERRORS[err];
     const list=items||[],full=list.length>=max,reason=!active?'inactive':full?'full':'';
-    const countHtml=count==null?'':`<small class="st-photos-count">${Array.isArray(count)?toks(count,{dot:true}):part(count)}</small>`;
-    const head=`<div class="st-photos-head"><span class="st-photos-label" id="${esc(lid)}"><span${sa(s.label,a.label)}>${esc(label)}</span>${optional||has(o,'optional')?`<small>${tx(optional,o,'optional')}</small>`:''}${countHtml}</span><button type="button" class="st-photos-camera" id="${esc(pid)}-camera" data-action="${esc(action)}" data-value="${esc(key)}" aria-describedby="${esc(hid)}"${reason?` aria-disabled="true" data-reason="${reason}"`:''}${ariaText('Take a photo',s.camera,a.camera)}>${glyph('camera')}</button></div>`;
-    const thumb=(it,i)=>`<li><button type="button" class="st-photos-thumb" id="${esc(pid)}-thumb-${i+1}" data-action="${esc(viewAction)}" data-value="${esc(it.id!=null?it.id:i)}"${it.pending?' data-pending=""':''}${ariaText(it.alt||`Photo ${i+1}${it.pending?' · waiting to upload':''}`,it.pending?s.thumbPending:s.thumb,{n:i+1})}>${it.src?`<img src="${esc(it.src)}" alt="">`:`<span class="st-photos-index"${sa(s.index,{n:i+1})}>${i+1}</span>`}</button></li>`;
-    const thumbs=list.length?`<ul class="st-photos-items" aria-labelledby="${esc(lid)}">${list.map(thumb).join('')}</ul>`:'';
+    const pending=list.filter(it=>it.pending).length;
+    const value=count==null?(list.length?`${list.length} attached${pending?` · ${pending} waiting to upload`:''}`:''):Array.isArray(count)?count.map(x=>typeof x==='string'?x:x.text||'').join(' · '):typeof count==='object'?count.text:count;
+    const blocked=disabledReason||(!active?'Record a death first · photos ride that record':full?`${max} photos at most`:'');
+    let head=optionalRow({label,value,optionalWord:optional,icon:glyph('camera'),action,key,className:'st-photos-head',attrs:{'aria-describedby':hid,...(reason||disabledReason||adding?{'aria-disabled':'true','data-reason':reason||'busy'}:{}),...(adding?{'aria-busy':'true'}:{}),...(preview?{'data-preview':preview}:{})}}).replace('<button type="button"','<button type="button" id="'+esc(pid)+'-camera"').replace('class="st-optional-row ', 'class="st-optional-row st-photos-camera ');
+    head=head.replace(`<span class="st-optional-label">${esc(label)}</span>`,`<span class="st-optional-label"${sa(s.label,a.label)}>${esc(label)}</span>`).replace(`<small class="st-optional-word">${esc(optional)}</small>`,`<small class="st-optional-word"${sa(s.optional,a.optional)}>${esc(optional)}</small>`);
+    const countParts=count==null?(list.length?tx(`${list.length} attached`,{strs:{attached:'ds.c2.photos.attached'},args:{attached:{n:list.length}}},'attached')+(pending?' · '+tx(`${pending} waiting to upload`,{strs:{waiting:'ds.c2.photos.waiting'},args:{waiting:{n:pending}}},'waiting'):''):''):Array.isArray(count)?toks(count,{dot:true}):part(count);
+    head=head.replace(`<span class="st-optional-answer" role="status">${esc(value||'')}</span>`,`<span class="st-optional-answer" role="status">${countParts}</span>`);
+    if(s.camera)head=head.replace(/ aria-label="[^"]*"/,ariaText('Take a photo',s.camera,a.camera));
+    const thumb=(it,i)=>`<li><button type="button" class="st-photos-thumb" id="${esc(pid)}-thumb-${i+1}" data-action="${esc(viewAction)}" data-value="${esc(it.id!=null?it.id:i)}"${it.pending?' data-pending=""':''}${ariaText(it.alt||`Photo ${i+1}${it.pending?' · waiting to upload':''}`,it.pending?s.thumbPending:s.thumb,{n:i+1})}>${it.src?`<img src="${esc(it.src)}" alt="">`:''}</button></li>`;
+    const thumbs=list.length?`<ul class="st-photos-items" aria-label="${esc(label)}">${list.map(thumb).join('')}</ul>`:'';
     // An error is answered with its own registered message (it wins over hint); a cancelled capture says nothing.
-    const hl=ERR?hintLine('st-photos-hint',{id:hid,text:ERR.en,tone:'warn',o:{strs:{hint:ERR.id}}}):hintLine('st-photos-hint',{id:hid,text:err==='cancelled'?'':hint,o});
+    const hl=ERR?hintLine('st-photos-hint',{id:hid,text:ERR.en,tone:'warn',o:{strs:{hint:ERR.id}}}):hintLine('st-photos-hint',{id:hid,text:err==='cancelled'?'':adding?'Adding photo…':hint||blocked,o});
     return `<div class="st-photos ${esc(className)}" data-ds="Photos" id="${esc(pid)}" data-field="${esc(key)}"${!active?' data-inactive=""':''}${full?' data-full=""':''}${err?` data-error="${err}"`:''}>${head}${hl}${thumbs}</div>`;
   }
   /* Button, as a factory. Registers (RULINGS, three button registers + the text action): primary (the one commit,
@@ -2623,13 +2599,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     return root.SentriUI.stepper({...props,variant:props.face||(props.variant==='hero'?'well':props.variant||'row')});
   }
 
-  /* ---- TaskPhotos: the design system's Photos card in farrowing's face (a line, not a well: a camera glyph, the label,
-     `Optional`, and an outlined camera key at the right; 50px thumbnails under it). Every prop is SentriUI.photos'. ---- */
-  function photos(props = {}) {
-    const UI = root.SentriUI;
-    const html = UI.photos(Object.assign({}, props, { className: `tk-photos${props.className ? ' ' + props.className : ''}` }));
-    return html.replace(/(<span class="st-photos-label"[^>]*>)/, `$1<span class="tk-photos-glyph">${glyph('camera')}</span>`);
-  }
+  /* TaskPhotos: compatibility alias; Photos owns the optional line face. */
+  function photos(props = {}) { return root.SentriUI.photos(props); }
 
   /* ---- door (alias of SentriUI.row / rowAction — use Row): a row with no id column (farrowing's .disclosure): a title, one muted description line, a chevron.
      For a non-animal door inside a sheet or a page (`Record here › Move piglets`). ---- */
@@ -2657,19 +2628,9 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     return html.replace('data-ds="ChoiceList"', `data-ds="ChoiceList" data-face="${row ? 'row' : 'flat'}"`);
   }
 
-  /* ---- TaskWarning: farrowing's danger band (.danger-band): a pale red box, the warning in 12px red, then (optional)
-     text actions, then one 10px muted consequence line. tone: 'red' (default) | 'amber'. ---- */
-  /* title: a bold first line (farrowing's banners and bands lead with it; the text under it drops to 11px).
-     icon + door: farrowing's End banner (⚠ `9 sows will be removed from this batch` ›): the icon left, the copy, a chevron;
-     with door ({ action, value, label }) the whole band is one button. tone 'amber' is the banner's colours. */
-  function warning({ title, text, actions = '', detail, tone = 'red', icon = '', door: d, label } = {}) {
-    const copy = `${title ? `<strong class="tk-warning-title">${parts(title)}</strong>` : ''}${text ? `<p class="tk-warning-text">${parts(text)}</p>` : ''}${actions ? `<div class="tk-warning-actions">${actions}</div>` : ''}${detail ? `<small class="tk-warning-detail">${parts(detail)}</small>` : ''}`;
-    const t = esc(tone === 'amber' ? 'amber' : 'red');
-    if (!icon && !d) return `<div class="tk-warning" data-ds="TaskWarning" data-tone="${t}" role="note"${L(label)}>${copy}</div>`;
-    const inner = `${icon ? `<span class="tk-warning-icon">${glyph(icon)}</span>` : ''}<span class="tk-warning-copy">${copy}</span>${d ? `<span class="tk-warning-go">${glyph('chevron')}</span>` : ''}`;
-    return d
-      ? `<button type="button" class="tk-warning" data-ds="TaskWarning" data-tone="${t}" data-banner=""${A(d.action || 'open', d.value)}${L(d.label ?? label)}>${inner}</button>`
-      : `<div class="tk-warning" data-ds="TaskWarning" data-tone="${t}" data-banner="" role="note"${L(label)}>${inner}</div>`;
+  /* TaskWarning: legacy slot/tone adapter; Banner owns rendering and styles. */
+  function warning({title,text,actions='',detail,tone='red',icon='',door,label}={}) {
+    return root.SentriUI.banner({tone:tone==='notice'?'notice':tone==='amber'?'notice':'danger',headline:{html:parts(title||{text:tone==='notice'?'Pending record':tone==='amber'?'Review required':'Before recording',str:tone==='notice'?'ds.banner.pending':tone==='amber'?'ds.banner.review':'ds.banner.before'})},consequence:text?{html:parts(text)}:'',actions,detail:detail?{html:parts(detail)}:'',icon,door:door?{...door,label:obj(door.label||label).text}:null,size:'small'});
   }
 
   /* ---- TaskSection: farrowing's icon-headed card section (Task outcomes, Other outcomes): a section heading with its
@@ -2909,6 +2870,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'end.notdone': 'Not done', 'end.coming': 'Not due yet in {n} pens: {list}. Ending the task stops these too.', 'end.coming.1': 'Not due yet in 1 pen: {list}. Ending the task stops this too.',
     'end.hold': 'End task', 'end.caption': 'HOLD TO END', 'end.done.title': 'Task ended', 'end.done.line': 'Piglet processing ended',
     'not.given': '{tr} not given', 'not.given.list': 'Not given: {list}',
+    'note.title': 'Recorded on another phone first',
     'note.clash': '{Tr} for {pen} was already recorded by {who} at {t}. Yours is kept as a note.',
     'note.arrived': '{who}\'s phone recorded {tr} on {pen} at {t}.',
     'demo.lang': 'Language', 'demo.reset': 'Reset demo', 'demo.open': 'Demo', 'demo.other': 'Demo: another phone recorded iron on A05',
@@ -3018,6 +2980,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'end.notdone': '没做完', 'end.coming': '还有{n}栏没到时间：{list}。结束任务后这些也不做了。', 'end.coming.1': '还有1栏没到时间：{list}。结束任务后这些也不做了。',
     'end.hold': '结束任务', 'end.caption': '按住结束', 'end.done.title': '任务已结束', 'end.done.line': '仔猪处理已结束',
     'not.given': '没有{tr}', 'not.given.list': '没做：{list}',
+    'note.title': '已由另一部手机先记录',
     'note.clash': '{pen}的{tr}已经由{who}在{t}记录了。你的记录留作备注。',
     'note.arrived': '{who}的手机在{t}记录了{pen}的{tr}。',
     'demo.lang': '语言', 'demo.reset': '重置演示', 'demo.open': '演示', 'demo.other': '演示：另一部手机记录了A05补铁',
@@ -3533,11 +3496,12 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function listScreen(inert) {
     var all = P.pens(), done = all.filter(isDone), todo = all.filter(function (p) { return !isDone(p); }), ended = P.s.ended;
     var last = P.last();
-    var body = K.latest(last ? { lead: S('last'), value: S('fig', { v: hm(last.at) }), rest: S('last.who', { who: last.who }) } : { lead: S('last.none') });
+    var clash = P.s.notes.some(function (n) { return !n.seen; });
+    var body = clash ? '' : K.latest(last ? { lead: S('last'), value: S('fig', { v: hm(last.at) }), rest: S('last.who', { who: last.who }) } : { lead: S('last.none') });
     if (V.flash && !V.pen) body += flashLine();
     P.s.notes.forEach(function (n, i) {
       if (n.seen) return;
-      body += '<div class="sp-note">' + K.warning({ tone: 'amber', text: S('note.clash', { Tr: tr(n.tr), pen: n.pen, who: n.who, t: hm(n.at) }),
+      body += '<div class="sp-note">' + K.warning({ tone: 'amber', title: S('note.title'), text: S('note.clash', { Tr: tr(n.tr), pen: n.pen, who: n.who, t: hm(n.at) }),
         actions: btn('ok', null, { register: 'text', action: 'note-ok', value: String(i) }) }) + '</div>';
     });
     // the summary card: the first job on the plan that pens need today (the same count as its chip) | the task, the door to End
@@ -3670,7 +3634,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function penSheet(inert) {
     var p = pen(), ended = !!P.s.ended, body = '';
     if (V.flash && V.flash.pen === p.code) body += flashLine();
-    if (ended) body += K.warning({ tone: 'amber', text: T('ended.note') });
+    if (ended) body += K.warning({ tone: 'notice', text: T('ended.note') });
     body += pigletsCard(p);
     if (!ended) body += toolRow();
     body += processing(p);
