@@ -98,30 +98,15 @@
       : `<span class="tk-group-door">${inner}</span>`;
     return `<section class="tk-group" data-ds="TaskGroup"><header class="tk-group-head">${head}</header>${Array.isArray(rows) ? rows.join('') : rows}</section>`;
   }
-  /* The row's one chip is SentriUI's Status chip: { text, str, args, kind } (kind: awaiting · active · done · late · overdue · died). */
-  function statusChip(chip) {
-    const o = obj(chip), UI = root.SentriUI;
-    const p = { text: o.text ?? '', kind: o.kind || '', tone: o.tone || undefined, variant: 'chip' };
-    if (o.str) { p.strs = { text: o.str }; if (o.args) p.args = { text: o.args }; }
-    return UI.status(p);
-  }
   /* ---- TaskRow: id + chip | headline + meta | chevron, edit or tick ----
      trail 'tick' (with tick: { action = 'toggle', value, checked, label }): the row is a <label> around ChoiceList's multi
      trail, a checkbox (the selection of a bulk act); the whole row is the target. still: a row with no action (a <div>,
      e.g. one that holds its place after a record). data: { name: value } becomes data-name="value" on the row. */
   function row({ id, chip, headline, tone, meta, trail = 'chevron', action = 'open', value = '', label, tick, still = false, data } = {}) {
-    const c = chip ? statusChip(chip) : '';
-    const g = trail === 'edit' ? glyph('edit') : trail === 'chevron' ? glyph('chevron') : '';
-    const d = data ? Object.keys(data).map(k => ` data-${esc(k)}="${esc(data[k])}"`).join('') : '';
-    const inner = `
-      <span class="tk-row-identity"><span class="tk-row-id">${T(id)}</span>${c}</span>
-      <span class="tk-row-detail"><span class="tk-row-headline"${tone ? ` data-tone="${esc(tone)}"` : ''}>${parts(headline)}</span>${meta ? `<span class="tk-row-meta">${parts(meta)}</span>` : ''}</span>`;
-    if (trail === 'tick') {
-      const t = tick || {};
-      return `<label class="tk-row" data-ds="TaskRow" data-trail="tick"${d}>${inner}<span class="tk-row-tick st-choice-trail"><input type="checkbox" data-action="${esc(t.action || 'toggle')}" value="${esc(t.value ?? value)}"${t.checked ? ' checked' : ''}${L(t.label)}></span></label>`;
-    }
-    if (still) return `<div class="tk-row" data-ds="TaskRow"${d}>${inner}${g}</div>`;
-    return `<button type="button" class="tk-row" data-ds="TaskRow"${A(action, value)}${L(label)}${d}>${inner}${g}</button>`;
+    const convert = v => Array.isArray(v) ? v.filter(x=>!x.sep).map(convert) : typeof v==='object' && v ? {text:v.text||'',strs:v.str?{text:v.str}:undefined,args:v.args?{text:v.args}:undefined,tone:v.tone} : v;
+    const props={code:obj(id).text||'',strs:obj(id).str?{code:obj(id).str}:undefined,args:obj(id).args?{code:obj(id).args}:undefined,chip:chip?{variant:'chip',kind:chip.kind,text:obj(chip).text||'',strs:obj(chip).str?{text:obj(chip).str}:undefined,args:obj(chip).args?{text:obj(chip).args}:undefined}:null,title:Array.isArray(headline)?headline.map(x=>x.sep?{text:'·',strs:{text:'ds.sep'}}:convert(x)):typeof headline==='object'?[convert(headline)]:headline,description:typeof meta==='object'&&!Array.isArray(meta)?[convert(meta)]:convert(meta),mono:true,wrap:true,trail:trail||'none',action:still?'':action,value,variant:trail==='edit'?'record':'animal',attrs:Object.assign(tone?{'data-tone':tone}:{},label?{'aria-label':obj(label).text||''}:{},Object.fromEntries(Object.entries(data||{}).map(([k,v])=>['data-'+k,v])))};
+    if(trail==='tick') return root.SentriUI.rowSelect({...props,action:tick?.action||'toggle',value:tick?.value??value,checked:!!tick?.checked,inputAttrs:tick?.label?{'aria-label':obj(tick.label).text||''}:{}});
+    return root.SentriUI.row(props);
   }
 
   /* ---- TaskStepper: the design system's Stepper card (its behaviour, strings and a11y) in farrowing's face ----
@@ -147,20 +132,10 @@
 
   /* ---- TaskRow door: a row with no id column (farrowing's .disclosure): a title, one muted description line, a chevron.
      For a non-animal door inside a sheet or a page (`Record here › Move piglets`). ---- */
-  let doorSeq = 0;
-  function door({ title, description, action = 'open', value = '', label, trail = 'chevron', act, id = '' } = {}) {
-    /* act: a Button spec ({ label, action, value, register = 'secondary', waiting, busy }) — the row's one-tap at its end
-       (`Record 12`), beside the door; its accessible name is its label plus the row's title. */
-    if (act) {
-      const rid = id || `tk-door-${++doorSeq}`, tid = rid + '-title', aid = rid + '-act';
-      const g = trail === 'chevron' ? glyph('chevron') : trail === 'edit' ? glyph('edit') : '';
-      const main = `<button type="button" class="tk-door-main"${A(action, value)}${L(label)}><span class="tk-door-copy"><strong id="${esc(tid)}">${parts(title)}</strong>${description ? `<small>${parts(description)}</small>` : ''}</span>${g}</button>`;
-      const UI = root.SentriUI, l = obj(act.label);
-      const props = { label: l.text ?? '', register: act.register || 'secondary', action: act.action || 'act', value: act.value ?? value, waiting: !!act.waiting, busy: !!act.busy, id: aid, labelledby: `${aid} ${tid}` };
-      if (l.str) { props.strs = { label: l.str }; if (l.args) props.args = { label: l.args }; }
-      return `<div class="tk-door" data-ds="TaskRow" data-variant="door" data-act="" id="${esc(rid)}">${main}${UI.button(props)}</div>`;
-    }
-    return `<button type="button" class="tk-door" data-ds="TaskRow" data-variant="door"${A(action, value)}${L(label)}><span class="tk-door-copy"><strong>${parts(title)}</strong>${description ? `<small>${parts(description)}</small>` : ''}</span>${trail === 'chevron' ? glyph('chevron') : trail === 'edit' ? glyph('edit') : ''}</button>`;
+  function door({ title, description, action = 'open', value = '', label, trail = 'chevron', act, id = '', chip, attrs = {}, mono = false } = {}) {
+    const convert=v=>Array.isArray(v)?v.filter(x=>!x.sep).map(convert):typeof v==='object'&&v?[{text:v.text||'',strs:v.str?{text:v.str}:undefined,args:v.args?{text:v.args}:undefined,tone:v.tone}]:v;
+    const props={title:convert(title),description:convert(description),action,value,trail:trail||'none',wrap:true,id,chip,mono,attrs:{...attrs,...(label?{'aria-label':obj(label).text||''}:{})}};
+    return act ? root.SentriUI.rowAction({...props,act:{...act,action:act.action||'act',value:act.value??value,label:obj(act.label).text||'',strs:obj(act.label).str?{label:obj(act.label).str}:undefined,args:obj(act.label).args?{label:obj(act.label).args}:undefined}}) : root.SentriUI.row(props);
   }
 
   /* ---- TaskChoice: farrowing's choice tiles (Foster piglets: Send / Receive): two (or three) big outlined tiles, an icon
@@ -228,16 +203,7 @@
   let daySeq = 0;
   function day({ title, status, items = [], label } = {}) {
     const UI = root.SentriUI;
-    const rows = items.map(i => {
-      const mark = i.mark === 'done' ? `<span class="tk-day-mark" data-mark="done">${glyph('check')}</span>` : i.mark === 'due' ? '<span class="tk-day-mark" data-mark="due"></span>' : '';
-      const rid = i.id || `tk-day-${++daySeq}`, tid = rid + '-title';
-      const main = `<button type="button" class="tk-day-door"${A(i.action || 'open', i.value)}${L(i.label)}>${mark}<span class="tk-day-copy"><strong id="${esc(tid)}">${parts(i.title)}</strong>${i.meta ? `<small>${parts(i.meta)}</small>` : ''}</span></button>`;
-      if (!i.act) return `<div class="tk-day-row"${i.mark === 'done' ? ' data-done=""' : ''}>${main}</div>`;
-      const a = i.act, l = obj(a.label), aid = rid + '-act';
-      const props = { label: l.text ?? '', register: a.register || 'secondary', action: a.action || 'act', value: a.value ?? i.value ?? '', waiting: !!a.waiting, busy: !!a.busy, id: aid, labelledby: `${aid} ${tid}` };
-      if (l.str) { props.strs = { label: l.str }; if (l.args) props.args = { label: l.args }; }
-      return `<div class="tk-day-row" data-act=""${i.mark === 'done' ? ' data-done=""' : ''}>${main}${UI.button(props)}</div>`;
-    }).join('');
+    const rows = items.map(i => door({title:i.title,description:i.meta,action:i.action==='noop'?'':i.action||'open',value:i.value,label:i.label,id:i.id||`tk-day-${++daySeq}`,trail:i.mark==='done'&&i.action!=='noop'?'edit':'',mono:true,chip:i.mark==='done'?{variant:'chip',kind:'done',text:'Done',strs:{text:'ds.row.done'}}:null,attrs:i.mark==='done'?{'data-done':''}:{},act:i.act})).join('');
     return `<section class="tk-day" data-ds="TaskDay"${L(label ?? title)}><header class="tk-day-head"><strong>${parts(title)}</strong>${status ? `<span>${parts(status)}</span>` : ''}</header>${rows}</section>`;
   }
 

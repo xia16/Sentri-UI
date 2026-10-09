@@ -285,7 +285,7 @@
         .replace('class="icon-button', 'aria-pressed="' + !!x.keep + '" class="icon-button');
       var row = K.row({ id: id, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
         meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), action: ended ? '' : 'give-fix', value: x.no, trail: '', still: ended, label: T('fix.aria', { no: x.no }) });
-      return '<div class="sp-pigrow" data-ds="TaskRow">' + row + mark + '</div>';
+      return '<div class="sp-pigrow" data-ds="Row">' + row + mark + '</div>';
     });
     var body = (!ended && p.ids.length ? '<p class="sp-quiet">' + esc(T('tagged.hint')) + '</p>' : '') +
       K.list([K.group({ title: T(scheme() === 'notch' ? 'pc.notched' : 'pc.tagged'), face: 'word', meta: '· ' + idWhat(p) + ' · ' + T('breeders.n', { n: P.breeders(p) }),

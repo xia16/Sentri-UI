@@ -1,0 +1,96 @@
+[
+  {
+    "id": "navigation",
+    "name": "Navigation",
+    "use": "Use for lists of places or actions",
+    "notUse": "Not for animal records — use animal",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Long label / Chinese",
+      "Disabled"
+    ]
+  },
+  {
+    "id": "animal",
+    "name": "Animal",
+    "use": "Use for one animal or litter",
+    "notUse": "Not for navigation — use navigation",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Long label / Chinese",
+      "Disabled"
+    ]
+  },
+  {
+    "id": "selectable",
+    "name": "Selectable",
+    "use": "Use for bulk selection of pens or animals",
+    "notUse": "Not for single navigation — use scope",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Long label / Chinese",
+      "Selected",
+      "Disabled"
+    ]
+  },
+  {
+    "id": "door-act",
+    "name": "Door + act",
+    "use": "Use for opening details beside one immediate act",
+    "notUse": "Not for a record without an act — use record",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Long label / Chinese",
+      "Loading",
+      "Error"
+    ]
+  },
+  {
+    "id": "scope",
+    "name": "Scope",
+    "use": "Use for choosing a work unit",
+    "notUse": "Not for bulk selection — use selectable",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Long label / Chinese",
+      "Current",
+      "Disabled"
+    ]
+  },
+  {
+    "id": "summary-count",
+    "name": "Summary count",
+    "use": "Use for overview counts that open a list above zero",
+    "notUse": "Not for task progress cards — use the Home task card pattern",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Long label / Chinese",
+      "Empty"
+    ]
+  },
+  {
+    "id": "record",
+    "name": "Done / record",
+    "use": "Use for wrapped evidence and Edit",
+    "notUse": "Not for event timelines — use Log",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Long label / Chinese",
+      "Disabled"
+    ]
+  }
+]

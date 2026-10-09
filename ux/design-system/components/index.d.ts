@@ -53,6 +53,8 @@ export interface Fact {
 }
 
 export interface RowProps {
+  variant?: RowCopyProps["variant"];
+  reason?: string;
   /** A string, or (candidate, ADR 0002) a token list with colour on the value: `[[{text:'Overdue'},{text:'3 days',tone:'red'}]]`. */
   title: string | Token[];
   /** A string, or (candidate) a token list the row draws with `·` between tokens — the row law's line 2. */
@@ -63,7 +65,7 @@ export interface RowProps {
   action?: string;
   value?: string;
   disabled?: boolean;
-  /** Before the rail: a typed word ({ text, tone }). A plain string is legacy trusted HTML (with strs.trailing, escaped text). Not with chip. */
+  /** Before the rail: a typed word ({ text, tone }). Legacy plain strings are escaped text. Not with chip. */
   trailing?: string | Exclude<Part, string>;
   /** Candidate: the right end. auto (default): a chevron when action is set · chevron · edit (✎, a done row whose tap opens Edit) · none. */
   trail?: 'auto' | 'chevron' | 'edit' | 'none';
@@ -514,6 +516,9 @@ export interface ChoiceRadiosProps {
 }
 /** The shared row fields (row, rowSelect, rowAction). */
 export interface RowCopyProps {
+  variant?: "navigation" | "animal" | "selectable" | "door-act" | "scope" | "summary-count" | "record";
+  reason?: string;
+  disabled?: boolean;
   title: string | Token[];
   description?: string | Token[];
   /** A leading mono identifier (crate `A02`) at `identifier-strong`, in a `row-code-min` column. Not with an icon. */
@@ -531,7 +536,7 @@ export interface RowCopyProps {
   strs?: Strs<'title' | 'description' | 'code'>;
   args?: StrArgs<'title' | 'description' | 'code'>;
 }
-export interface RowSelectProps extends RowCopyProps { checked?: boolean; /** Default 'select'. */ action?: string; value: string }
+export interface RowSelectProps extends RowCopyProps { inputAttrs?: SafeAttrs; checked?: boolean; /** Default 'select'. */ action?: string; value: string }
 export interface RowActionProps extends RowCopyProps {
   /** The door (the copy, with an inline ›). */
   action: string;

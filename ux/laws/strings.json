@@ -23,6 +23,7 @@
     "Complete": "rooms and tasks are ended, not completed; say End task or Finish farrowing; the DS README's 'Complete' ban stands"
   },
   "strings": {
+    "ds.row.done": {"en": "Done", "zh": "已处理", "kind": "status"},
     "ds.picker.select": {"en": "Select", "zh": "请选择", "kind": "label"},
     "ds.picker.none": {"en": "None", "zh": "未选择", "kind": "label"},
     "ds.picker.selected": {"en": "{n} selected", "zh": "已选 {n} 项", "kind": "label"},

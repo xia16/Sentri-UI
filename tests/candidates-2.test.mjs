@@ -102,9 +102,9 @@ test('choice radios: one tab stop; Clear only on an optional field with a value'
   assert.match(chosen, /role="radiogroup"/);
   assert.doesNotMatch(UI.choiceRadios({ label: 'X', options: opts, selected: 'b' }), /choose-clear/, 'a required field has no Clear');
 });
-test('row: without the candidate options the output is unchanged', () => {
+test('row: existing navigation signature retains content and routing', () => {
   assert.equal(UI.row({ title: 'Pen 14', description: '3 sows due today', action: 'open', value: 'p14' }),
-    '<button class="st-row " data-ds="Row" type="button" data-action="open" data-value="p14"><span class="st-row-copy"><strong>Pen 14</strong><small>3 sows due today</small></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></button>');
+    '<button class="st-row " data-ds="Row" data-variant="navigation" type="button" data-action="open" data-value="p14"><span class="st-row-copy"><strong>Pen 14</strong><small>3 sows due today</small></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></span></button>');
 });
 test('row: colour lives on the value; the separator is a real text node', () => {
   const html = UI.row({ title: [[{ text: 'Overdue' }, { text: '3 days', tone: 'red' }]], description: ['7 alive', 'parity 5'] });
@@ -113,7 +113,7 @@ test('row: colour lives on the value; the separator is a real text node', () => 
 });
 test('rowSelect: a label with a checkbox; the payload is change-only { value, checked }', () => {
   const html = UI.rowSelect({ title: 'Iron', value: 'A02', checked: true, action: 'toggle' });
-  assert.match(html, /^<label class="st-row [^"]*" data-ds="Row" data-select="">/);
+  assert.match(html, /^<label class="st-row [^"]*" data-ds="Row" data-variant="selectable" data-select="">/);
   assert.match(html, /<input type="checkbox" data-action="toggle" value="A02" checked>/);
   const input = { type: 'checkbox', value: 'A02', checked: false, getAttribute: () => 'toggle', closest: sel => (sel === '.st-row[data-select]' ? {} : null) };
   assert.deepEqual(UI.rowSelectChange({ target: input }), { value: 'A02', checked: false, action: 'toggle' });
@@ -122,7 +122,7 @@ test('rowSelect: a label with a checkbox; the payload is change-only { value, ch
 });
 test('rowAction: two sibling targets; the act is named with the row title; pending is busy', () => {
   const html = UI.rowAction({ id: 'r1', title: 'Iron', action: 'open-dose', value: 'iron', act: { label: 'Record 12', action: 'record', value: 'iron' } });
-  assert.match(html, /^<div class="st-row [^"]*" data-ds="Row" data-act="" id="r1">/);
+  assert.match(html, /^<div class="st-row [^"]*" data-ds="Row" data-variant="door-act" data-act="" id="r1">/);
   assert.equal((html.match(/<button/g) || []).length, 2);
   assert.match(html, /<strong id="r1-title">/);
   assert.match(html, /id="r1-act"[^>]*aria-labelledby="r1-act r1-title"/);

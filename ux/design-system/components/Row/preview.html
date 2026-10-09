@@ -1,28 +1,5 @@
-<!-- @dsCard group="Lists" height=900 -->
-<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
-<body>
-<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="a"></div><div id="b" style="margin-top:24px"></div></div>
+<!-- @dsCard group="Lists" height=1100 -->
+<div id="row-preview"></div>
 <script>
-const UI = window.SentriUI, I = window.SentriIcons.icon;
-a.innerHTML = UI.rowGroup(
-  UI.row({ title: 'Farrowing', description: '3 sows due today · room 3', icon: I('farrow'), action: 'open', value: 'farrowing', trailing: '<span style="color:var(--amber);font-size:10px;font-weight:500">Due now</span>' }) +
-  UI.row({ title: 'Feed check', description: '12 pens · last yesterday', icon: I('feed'), action: 'open', value: 'feed', attrs: { 'aria-current': 'location' } }) +
-  UI.row({ title: 'Pregnancy check', description: 'Done · 31 checked', icon: I('pregnancy'), action: 'open', value: 'preg', trailing: '<span style="color:var(--green);font-size:10px;font-weight:500">Done</span>' }) +
-  UI.row({ title: 'Environment', description: '21.4° · 64% humidity', icon: I('temperature') }),
-  { title: 'Room 3' }
-);
-// Candidate (ADR 0002): litter rows (code, token lines with colour on the value, one chip), rowSelect, rowAction, a done row.
-const owed = n => [{ text: 'owed' }, { text: String(n), tone: 'amber' }];
-b.innerHTML = UI.rowGroup(
-  UI.row({ code: 'A02', title: ['Iron and tail'], description: ['2h ago', owed(4), 'parity 3'], mono: true, wrap: true, action: 'open-litter', value: 'A02' }) +
-  UI.row({ code: 'B04', title: [[{ text: 'Overdue' }, { text: '3 days', tone: 'red' }]], description: ['7 alive', 'parity 5'], mono: true, wrap: true, chip: { text: 'sow died', tone: 'red' }, action: 'open-litter', value: 'B04' }) +
-  UI.rowSelect({ code: 'C01', title: ['Iron and tail'], description: [owed(9)], mono: true, checked: true, action: 'toggle', value: 'C01' }) +
-  UI.rowAction({ title: 'Iron and tail', description: 'owed 12', action: 'open-dose', value: 'iron', act: { label: 'Record 12', action: 'record', value: 'iron' } }) +
-  UI.row({ title: 'Iron · 12', description: 'all 12 · 09:14 · G.H · 2 weak kept back, dosed after the count · 10:02 · L.M', wrap: true, trail: 'edit', action: 'open-edit', value: 'iron-done' }),
-  { title: 'Candidate variants' }
-);
+(async()=>{const root=document.getElementById('row-preview');for(const id of ['navigation','animal','selectable','door-act','scope','summary-count','record']){const html=await fetch('variants/'+id+'.html').then(r=>r.text());const section=document.createElement('section');section.innerHTML=html;root.append(section);for(const old of section.querySelectorAll('script')){const script=document.createElement('script');script.textContent=old.textContent;old.replaceWith(script);}}})();
 </script>
-</body>
-</html>

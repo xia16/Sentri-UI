@@ -611,7 +611,7 @@ body{background:var(--ground);color:var(--ink)}
 .st-fact dt{font:400 var(--font-size-11)/1.5 var(--font-sans);color:var(--st-muted);margin:0 0 var(--space-5)}
 .st-fact dd{font:500 var(--font-size-14)/1.5 var(--font-sans);color:var(--st-ink);margin:0;overflow-wrap:anywhere}
 .st-fact small{display:block;font-size:var(--font-size-10);line-height:1.5;color:var(--st-muted);margin-top:var(--space-4)}
-.st-row.st-row{display:flex;align-items:center;gap:var(--space-12);width:100%;min-height:var(--row-min);margin:0;padding:var(--space-12) var(--space-14);border:0;border-radius:0;background:transparent;text-align:left;text-decoration:none;font-family:var(--font-sans);color:var(--st-ink)}
+.st-row.st-row{display:flex;align-items:center;gap:var(--space-12);width:100%;min-height:var(--row-min);margin:0;padding:var(--space-row-y) var(--space-row-x);border:0;border-radius:0;background:transparent;text-align:left;text-decoration:none;font-family:var(--font-sans);color:var(--st-ink)}
 .st-row+.st-row{border-top:1px solid var(--st-rule)}
 .st-row.st-row .st-row-icon{display:grid;place-items:center;width:var(--size-34);height:var(--size-34);border-radius:var(--radius-10);background:var(--row-icon-bg);color:var(--row-icon-ink);flex:none}
 .st-row-icon svg{width:var(--size-18);height:var(--size-18);fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
@@ -624,7 +624,7 @@ body{background:var(--ground);color:var(--ink)}
 .st-row-chevron svg{width:var(--size-15);height:var(--size-15);fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 button.st-row{cursor:pointer}
 button.st-row:active:not(:disabled){background:var(--press)}
-button.st-row:disabled{opacity:.5;cursor:default}
+button.st-row:disabled{cursor:default}
 button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:inset var(--size-3) 0 var(--current-marker)}
 .st-panel.st-row-group{padding:0;overflow:hidden}
 .st-row-group>.st-row-group-label.st-heading{margin:0;padding:var(--space-14) var(--space-14) 0}
@@ -1050,6 +1050,23 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 
 .st-chip-check:empty{box-sizing:border-box;width:var(--space-8);height:var(--space-12);border-right:var(--space-2) solid currentColor;border-bottom:var(--space-2) solid currentColor;transform:rotate(45deg);margin-right:var(--space-6)}
 
+/* Row family: shared targets and state proof. */
+.st-row-identity{display:flex;flex:none;flex-direction:column;align-items:flex-start;gap:var(--space-4);width:var(--animal-id-col)}
+.st-row[data-variant="animal"],.st-row[data-variant="record"]{min-height:var(--animal-row-min)}
+.st-row[data-act] .button{min-height:var(--control-height);min-width:var(--tap-min)}
+.st-row[data-preview~="pressed"],.st-row-door[data-preview~="pressed"],.st-row[data-preview~="pressed"] .st-row-door{background:var(--press)}
+.st-row[data-preview~="focus"],.st-row:focus-within{outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
+.st-row[data-select] .st-choice-trail{min-width:var(--tap-min);min-height:var(--tap-min);display:grid;place-items:center}
+.st-row[data-select] input{min-width:var(--tap-min);min-height:var(--tap-min)}
+.st-row[data-wrap] .st-row-copy{overflow-wrap:anywhere}
+
+.st-row[data-tone="forecast"] .st-row-copy strong{color:var(--muted)}
+.st-row[data-wrap] .st-tok{display:inline-block;max-width:100%}
+
+.st-row-identity .st-row-chip{max-width:100%}
+.st-row-identity .st-row-code{max-width:100%;overflow-wrap:anywhere}
+.st-row-chevron[data-rail="edit"]{align-items:center;gap:var(--space-4);font-size:var(--type-description-size)}
+
 </style>
 <style>/* ../../../design-system/components/task-skeleton.css */
 /* Task skeleton (candidate, ADR 0003): farrowing's task anatomy as shared parts.
@@ -1160,25 +1177,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .tk-lens ~ .tk-list .tk-group-head { position: sticky; top: var(--tk-sticky, 68px); z-index: 1; }
 /* A list on a page or in a sheet: the surface's body already carries the gutter. */
 .sheet-body .tk-list { padding: 0; }
-
-/* ---- TaskRow: mono id + chip under it | one headline, one meta line | trailing chevron or edit ---- */
-.tk-row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: var(--animal-row-min); margin: 0;
-  padding: var(--space-animal-row-y) var(--space-row-x); border: 0; background: transparent; color: var(--ink); font: inherit; text-align: left; }
-.tk-row + .tk-row { border-top: 1px solid var(--line); }
-.tk-row:active { background: var(--press); }
-.tk-row-identity { flex: none; min-width: var(--animal-id-col); display: flex; flex-direction: column; align-items: flex-start; gap: 7px; }
-.tk-row-id { font: 600 var(--type-row-title-size) var(--font-mono); letter-spacing: -0.6px; color: var(--ink); }
-.tk-row-detail { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
-.tk-row-headline { font: 500 var(--type-button-size)/1.45 var(--font-sans); color: var(--ink); }
-.tk-row-headline[data-tone="forecast"] { color: var(--muted); }
-.tk-row-meta { font: var(--type-meta-size)/1.6 var(--font-mono); color: var(--muted); }
 .tk-sep { margin: 0 var(--status-dot); }
-/* A headline or meta part wraps as a whole: a wrapped part never lies under the next one. */
-:is(.tk-row-headline, .tk-row-meta) > * { display: inline-block; max-width: 100%; }
-.tk-row > svg { flex: none; width: var(--glyph-key); height: var(--glyph-key); color: var(--muted); }
-/* The tick trail: the row is a <label> around ChoiceList's checkbox; the whole row is the target. */
-label.tk-row { cursor: pointer; }
-.tk-row-tick { flex: none; }
 
 /* ---- TaskTotals: the figures a sheet commits, at farrowing's Finish size (a panel of label over figure) ---- */
 .tk-totals.st-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-heading); margin: 0; padding: var(--space-row-x); }
@@ -1248,23 +1247,6 @@ label.tk-row { cursor: pointer; }
 .tk-photos .st-photos-thumb.st-photos-thumb { width: var(--photo-thumb-task); height: var(--photo-thumb-task); border: 0; border-radius: 8px; }
 .tk-photos .st-photos-hint.st-photos-hint { padding-right: 0; }
 
-/* TaskRow door: farrowing's .disclosure — a title 13px/600, one muted line, a chevron; a line under each. */
-.tk-door { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 62px; margin: 0; padding: 15px 0;
-  border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; text-align: left; }
-.tk-door:active { background: var(--press); }
-.tk-door-copy { flex: 1; min-width: 0; }
-.tk-door-copy > strong { display: block; font: 600 var(--type-row-title-size)/1.4 var(--font-sans); }
-.tk-door-copy > small { display: block; margin-top: 5px; font: var(--type-meta-size)/1.7 var(--font-sans); color: var(--muted); }
-.tk-door > svg, .tk-door-main > svg { flex: none; width: 16px; height: 16px; color: var(--ink); }
-/* A door with a one-tap at its end (`Record 12`): the door is the copy (and its chevron), the button sits beside it. */
-.tk-door[data-act] { padding: 0; gap: var(--space-row-y); }
-.tk-door[data-act]:active { background: transparent; }
-.tk-door-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 62px; margin: 0; padding: 15px 0;
-  border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
-.tk-door-main:active { background: var(--press); }
-.tk-door[data-act] > .button { flex: none; min-height: var(--tap-min); margin: 0; padding: 0 var(--space-row-x); border-radius: var(--radius-control);
-  font: 500 var(--type-button-size)/1.3 var(--font-sans); }
-
 /* TaskChoice: farrowing's choice tiles (Foster: Send / Receive). */
 .tk-choice { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .tk-choice[data-count="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -1277,9 +1259,6 @@ label.tk-row { cursor: pointer; }
 /* One left edge per surface: a ChoiceList's group title inside a page or sheet sits on the body's edge, not 17px in. */
 .sheet-body .st-choice-heading.st-choice-heading { padding-left: 0; padding-right: 0; }
 .sheet-body .st-choice-heading-row { padding-right: 0; }
-
-/* TaskRow: the id column holds its width; a chip wider than it ellipses under the id, so every headline lines up. */
-.tk-row-identity { width: var(--animal-id-col); min-width: var(--animal-id-col); }
 
 /* ---- Skeleton 3 ---- */
 
@@ -1392,21 +1371,6 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .tk-day-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); padding: var(--space-row-y) var(--space-row-x); background: var(--surface); }
 .tk-day-head > strong { font: 700 var(--type-row-title-size)/1.25 var(--font-sans); color: var(--ink); }
 .tk-day-head > span { font: var(--type-meta-size)/1.3 var(--font-mono); color: var(--muted); }
-.tk-day-row { display: flex; align-items: center; gap: var(--space-row-y); padding-right: var(--space-row-x); border-top: 1px solid var(--line); background: var(--paper); }
-.tk-day-door { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--space-row-y); min-height: 62px; margin: 0; padding: 10px 0 10px var(--space-row-x);
-  border: 0; background: transparent; color: var(--ink); font: inherit; text-align: left; }
-.tk-day-row:not([data-act]) > .tk-day-door { margin-right: calc(-1 * var(--space-row-x)); padding-right: var(--space-row-x); }
-.tk-day-door:active { background: var(--press); }
-.tk-day-mark { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; }
-.tk-day-mark[data-mark="due"] { border: 1px solid var(--task-key-border); background: var(--paper); }
-.tk-day-mark[data-mark="done"] { background: var(--green-wash); color: var(--current-marker); }
-.tk-day-mark svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.tk-day-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.tk-day-copy > strong { font: 700 var(--type-choice-meta-size)/1.25 var(--font-sans); }
-.tk-day-copy > small { font: var(--type-meta-size)/1.3 var(--font-mono); color: var(--muted); }
-.tk-day-copy > small > * { display: inline-block; max-width: 100%; }
-.tk-day-row[data-done] .tk-day-copy > strong { color: var(--muted); }
-.tk-day-row > .button { flex: none; min-height: var(--tap-min); margin: 0; padding: 0 var(--space-row-x); border-radius: var(--radius-control); font: 500 var(--type-button-size)/1.3 var(--font-sans); }
 
 /* TaskDock unit: the labelled place control (B1 / Go to pen). */
 .tk-dock-unit { flex: none; display: flex; align-items: center; gap: 9px; min-height: 50px; margin: 0; padding: 0 3px; border: 0; background: var(--paper); color: var(--ink); text-align: left; }
@@ -1419,7 +1383,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .tk-doors[data-card] { display: flex; flex-direction: column; gap: var(--space-heading); }
 .tk-doors[data-card] > * { margin: 0; }
 
-@media (prefers-reduced-motion: reduce) { .tk-summary-task, .tk-row { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .tk-summary-task { transition: none; } }
 
 /* ---- TaskChips (candidate): one row of filter chips over a task list (README: TaskChips/README.md) ----
    Farrowing's segment faces on separate chips: a `well` chip with a 1px `line`, `radius-segment`; the chosen chip is the
@@ -1488,11 +1452,10 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 /* Processing: one TaskDay card per age-day (the skeleton's day card). A ticked, not yet submitted item is not a done
    row: it stays in ink on the green wash; a row saved on this visit fills its check in place; later days are muted. */
 .sheet-body > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
-.tk-day-row:has([data-ticked]) { background: var(--green-wash); }
-.tk-day-row:has([data-ticked]) .tk-day-copy > strong { color: var(--ink); }
-.tk-day-row:has([data-ticked]) .tk-day-mark, .tk-day-row:has([data-fresh]) .tk-day-mark { animation: sp-tick-in 200ms ease-out; }
-.tk-day[data-when="future"] .tk-day-head > strong, .tk-day[data-when="future"] .tk-day-copy > strong { color: var(--muted); }
-@media (prefers-reduced-motion: reduce) { .tk-day-row .tk-day-mark { animation: none !important; } }
+.st-row:has([data-ticked]) { background: var(--green-wash); }
+.st-row:has([data-ticked]) .st-row-copy > strong { color: var(--ink); }
+.tk-day[data-when="future"] .tk-day-head > strong, .tk-day[data-when="future"] .st-row-copy > strong { color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { }
 
 /* Piglets: Scan tag · Choose notch · Add manually — three tool Buttons in a line */
 .sp-adds { display: flex; gap: var(--space-key-gap); }
@@ -1502,7 +1465,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 /* Give IDs: one piglet at a time — big readouts (Measure) on the skeleton's Numpad, Boar · Gilt as TaskChoice tiles */
 .sp-give-id { display: flex; align-items: flex-start; gap: var(--space-key-gap); }
 .sp-give-id > .sp-give-scan { margin-top: 30px; }
-.sp-keep-row > .tk-row-identity { display: none; }
+.sp-keep-row > .st-row-identity { display: none; }
 .sp-give-id > .st-measure { flex: 1; min-width: 0; }
 .sp-give-scan.icon-button { flex: none; width: var(--control-height); height: var(--control-height); border: 1px solid var(--control-border); border-radius: var(--radius-control); background: var(--paper); }
 .sp-give-scan svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -1514,7 +1477,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 /* the pad docks above the footer, out of the scroller */
 :is(.sheet[data-presentation="page"], .sheet) > .st-numpad { flex: none; padding: var(--space-row-y) var(--space-gutter); background: var(--paper); border-top: 1px solid var(--line); }
 :is(.sheet[data-presentation="page"], .sheet) > .st-numpad + .sheet-footer { border-top: 0; }
-.sheet-body > .tk-row[data-trail="tick"] { border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
+.sheet-body > .st-row[data-select] { border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
 .button.sp-wide { width: 100%; }
 
 /* Move: the other pens as tiles, four to a line */
@@ -1558,7 +1521,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 /* a piglet on the Piglets page: the row (tap to fix) and its breeder flag beside it */
 .sp-pigrow { display: flex; align-items: center; padding-right: 6px; }
 .sp-pigrow + .sp-pigrow { border-top: 1px solid var(--line); }
-.sp-pigrow > .tk-row { flex: 1; min-width: 0; }
+.sp-pigrow > .st-row { flex: 1; min-width: 0; }
 /* Processing: a section title like the Piglets card's; the Done section sits last */
 .sp-proc > .st-heading { margin-bottom: 8px; }
 .sp-proc > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
@@ -1666,10 +1629,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function rowGroup(content,{title='',level=5,className='',strs,args}={}){
     return panel((title||has({strs},'title')?heading({title,kind:'group',level,className:'st-row-group-label',strs,args}):'')+content,{className:'st-row-group '+className,ds:'Row'});
   }
-  /* Row (candidate additions, ADR 0002). Three roots over one copy: row (a button or a div), rowSelect (a <label> with a
-     checkbox), rowAction (two sibling targets). Candidate options: code, token-list title/description (colour on the
-     value), mono, chip, wrap, trail ('auto' · 'chevron' · 'edit' · 'none'), typed trailing ({ text, tone }), id.
-     Without them the output is unchanged. */
+  /* Row family: button or inert row, selectable label and sibling door + act targets.
+     All variants share the copy renderer, Status chips and token-based layout. */
   function rowCopy({title,description,code,mono,tight,o,titleId=''}){
     const tList=Array.isArray(title),dList=Array.isArray(description);
     const titleHtml=tList?toks(title,{tight}):tx(title,o,'title');
@@ -1683,22 +1644,25 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     if(chip&&trailing)warn(card,'chip and trailing together: a row says one thing on the right; the chip wins');
     return chip?status(Object.assign({},chip,{className:'st-row-chip'})):'';
   }
-  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',trail='auto',attrs={},strs,args,code='',mono=false,chip=null,wrap=false,tight=false,id=''}={}){
+  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',trail='auto',attrs={},strs,args,code='',mono=false,chip=null,wrap=false,tight=false,id='',variant='',reason=''}={}){
     const o={strs,args};
+    variant=variant||(code?'animal':trail==='edit'?'record':icon?'navigation':attrs['aria-current']?'scope':'navigation');
+    if(disabled) description=reason||description||'Unavailable — try again later';
     if(code&&icon)warn('Row','code and icon together: a row leads with one; the code wins');
     const tr=oneOf('Row','trail',trail,['auto','chevron','edit','none'],'auto');
     const typed=trailing&&typeof trailing==='object';
-    // With strs.trailing the value is plain fallback text (escaped); a string without it stays legacy trusted HTML.
-    const trailHtml=chip?'':typed?`<span class="st-row-trailing">${part(trailing)}</span>`:has(o,'trailing')?`<span class="st-row-trailing">${tx(trailing,o,'trailing')}</span>`:trailing?`<span class="st-row-trailing">${trailing}</span>`:'';
-    const c=rowCopy({title,description,code,mono,tight,o});
+    // Typed trailing words support tone and localization; legacy strings are escaped.
+    const trailHtml=chip?'':typed?`<span class="st-row-trailing">${part(trailing)}</span>`:has(o,'trailing')?`<span class="st-row-trailing">${tx(trailing,o,'trailing')}</span>`:trailing?`<span class="st-row-trailing">${esc(trailing)}</span>`:'';
+    const c=rowCopy({title,description,code,mono,tight,o,titleId:id?id+'-title':''});
     const tag=action?'button':'div';
-    const railHtml=tr==='edit'?`<span class="st-row-chevron" data-rail="edit">${glyph('edit')}</span>`:(tr==='chevron'||(tr==='auto'&&action))?`<span class="st-row-chevron">${arrow}</span>`:'';
-    return `<${tag} class="st-row ${esc(className)}" data-ds="Row"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${icon&&!code?`<span class="st-row-icon">${icon}</span>`:''}${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${rowChip(chip,trailing,'Row')}${trailHtml}${railHtml}</${tag}>`;
+    const railHtml=tr==='edit'?`<span class="st-row-chevron" data-rail="edit">${glyph('edit')}<span data-str="act.edit">Edit</span></span>`:(tr==='chevron'||(tr==='auto'&&action))?`<span class="st-row-chevron">${arrow}</span>`:'';
+    return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="${esc(variant)}"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${icon&&!code&&variant==='navigation'?`<span class="st-row-icon">${icon}</span>`:''}${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,trailing,'Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,trailing,'Row')}${trailHtml}${railHtml}</${tag}>`;
   }
   /* rowSelect: a bulk pick. The whole row is a <label>; the payload is change-only: rowSelectChange(event) → { value, checked }. */
-  function rowSelect({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,checked=false,action='select',value='',id='',className='',attrs={},strs,args}={}){
+  function rowSelect({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,checked=false,action='select',value='',id='',className='',attrs={},strs,args,inputAttrs={},disabled=false,reason=''}={}){
+    if(disabled) description=reason||description||'Unavailable — try again later';
     const o={strs,args},c=rowCopy({title,description,code,mono,tight,o});
-    return `<label class="st-row ${esc(className)}" data-ds="Row" data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${rowChip(chip,'','Row')}<span class="st-choice-trail"><input type="checkbox" data-action="${esc(action)}" value="${esc(value)}"${checked?' checked':''}></span></label>`;
+    return `<label class="st-row ${esc(className)}" data-ds="Row" data-variant="selectable" data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,'','Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,'','Row')}<span class="st-choice-trail"><input type="checkbox" data-action="${esc(action)}" value="${esc(value)}"${checked?' checked':''}${disabled?' disabled':''}${safeAttr(inputAttrs)}></span></label>`;
   }
   function rowSelectChange(ev){
     const t=ev&&ev.target;
@@ -1712,7 +1676,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     const c=rowCopy({title,description,code,mono,tight,o,titleId:tid});
     const door=`<button type="button" class="st-row-door" data-action="${esc(action)}" data-value="${esc(value)}">${c.codeHtml}<span class="st-row-copy">${c.strong(`<span class="st-row-door-chevron">${arrow}</span>`)}${c.small}</span></button>`;
     const btn=button(Object.assign({register:'secondary'},act,{id:aid,labelledby:`${aid} ${tid}`}));
-    return `<div class="st-row ${esc(className)}" data-ds="Row" data-act="" id="${esc(rid)}"${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${door}${rowChip(chip,'','Row')}${btn}</div>`;
+    return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="door-act" data-act="" id="${esc(rid)}"${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${door}${rowChip(chip,'','Row')}${btn}</div>`;
   }
   /* groups: [{label, strs:{label}, args:{label}, entries:[{category,title,detail,meta,strs:{…},args:{…}}]}]; options.strs.empty for the empty line. */
   function log(groups,{className='',empty='No activity recorded yet',strs,args}={}){
@@ -2525,30 +2489,15 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       : `<span class="tk-group-door">${inner}</span>`;
     return `<section class="tk-group" data-ds="TaskGroup"><header class="tk-group-head">${head}</header>${Array.isArray(rows) ? rows.join('') : rows}</section>`;
   }
-  /* The row's one chip is SentriUI's Status chip: { text, str, args, kind } (kind: awaiting · active · done · late · overdue · died). */
-  function statusChip(chip) {
-    const o = obj(chip), UI = root.SentriUI;
-    const p = { text: o.text ?? '', kind: o.kind || '', tone: o.tone || undefined, variant: 'chip' };
-    if (o.str) { p.strs = { text: o.str }; if (o.args) p.args = { text: o.args }; }
-    return UI.status(p);
-  }
   /* ---- TaskRow: id + chip | headline + meta | chevron, edit or tick ----
      trail 'tick' (with tick: { action = 'toggle', value, checked, label }): the row is a <label> around ChoiceList's multi
      trail, a checkbox (the selection of a bulk act); the whole row is the target. still: a row with no action (a <div>,
      e.g. one that holds its place after a record). data: { name: value } becomes data-name="value" on the row. */
   function row({ id, chip, headline, tone, meta, trail = 'chevron', action = 'open', value = '', label, tick, still = false, data } = {}) {
-    const c = chip ? statusChip(chip) : '';
-    const g = trail === 'edit' ? glyph('edit') : trail === 'chevron' ? glyph('chevron') : '';
-    const d = data ? Object.keys(data).map(k => ` data-${esc(k)}="${esc(data[k])}"`).join('') : '';
-    const inner = `
-      <span class="tk-row-identity"><span class="tk-row-id">${T(id)}</span>${c}</span>
-      <span class="tk-row-detail"><span class="tk-row-headline"${tone ? ` data-tone="${esc(tone)}"` : ''}>${parts(headline)}</span>${meta ? `<span class="tk-row-meta">${parts(meta)}</span>` : ''}</span>`;
-    if (trail === 'tick') {
-      const t = tick || {};
-      return `<label class="tk-row" data-ds="TaskRow" data-trail="tick"${d}>${inner}<span class="tk-row-tick st-choice-trail"><input type="checkbox" data-action="${esc(t.action || 'toggle')}" value="${esc(t.value ?? value)}"${t.checked ? ' checked' : ''}${L(t.label)}></span></label>`;
-    }
-    if (still) return `<div class="tk-row" data-ds="TaskRow"${d}>${inner}${g}</div>`;
-    return `<button type="button" class="tk-row" data-ds="TaskRow"${A(action, value)}${L(label)}${d}>${inner}${g}</button>`;
+    const convert = v => Array.isArray(v) ? v.filter(x=>!x.sep).map(convert) : typeof v==='object' && v ? {text:v.text||'',strs:v.str?{text:v.str}:undefined,args:v.args?{text:v.args}:undefined,tone:v.tone} : v;
+    const props={code:obj(id).text||'',strs:obj(id).str?{code:obj(id).str}:undefined,args:obj(id).args?{code:obj(id).args}:undefined,chip:chip?{variant:'chip',kind:chip.kind,text:obj(chip).text||'',strs:obj(chip).str?{text:obj(chip).str}:undefined,args:obj(chip).args?{text:obj(chip).args}:undefined}:null,title:Array.isArray(headline)?headline.map(x=>x.sep?{text:'·',strs:{text:'ds.sep'}}:convert(x)):typeof headline==='object'?[convert(headline)]:headline,description:typeof meta==='object'&&!Array.isArray(meta)?[convert(meta)]:convert(meta),mono:true,wrap:true,trail:trail||'none',action:still?'':action,value,variant:trail==='edit'?'record':'animal',attrs:Object.assign(tone?{'data-tone':tone}:{},label?{'aria-label':obj(label).text||''}:{},Object.fromEntries(Object.entries(data||{}).map(([k,v])=>['data-'+k,v])))};
+    if(trail==='tick') return root.SentriUI.rowSelect({...props,action:tick?.action||'toggle',value:tick?.value??value,checked:!!tick?.checked,inputAttrs:tick?.label?{'aria-label':obj(tick.label).text||''}:{}});
+    return root.SentriUI.row(props);
   }
 
   /* ---- TaskStepper: the design system's Stepper card (its behaviour, strings and a11y) in farrowing's face ----
@@ -2574,20 +2523,10 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 
   /* ---- TaskRow door: a row with no id column (farrowing's .disclosure): a title, one muted description line, a chevron.
      For a non-animal door inside a sheet or a page (`Record here › Move piglets`). ---- */
-  let doorSeq = 0;
-  function door({ title, description, action = 'open', value = '', label, trail = 'chevron', act, id = '' } = {}) {
-    /* act: a Button spec ({ label, action, value, register = 'secondary', waiting, busy }) — the row's one-tap at its end
-       (`Record 12`), beside the door; its accessible name is its label plus the row's title. */
-    if (act) {
-      const rid = id || `tk-door-${++doorSeq}`, tid = rid + '-title', aid = rid + '-act';
-      const g = trail === 'chevron' ? glyph('chevron') : trail === 'edit' ? glyph('edit') : '';
-      const main = `<button type="button" class="tk-door-main"${A(action, value)}${L(label)}><span class="tk-door-copy"><strong id="${esc(tid)}">${parts(title)}</strong>${description ? `<small>${parts(description)}</small>` : ''}</span>${g}</button>`;
-      const UI = root.SentriUI, l = obj(act.label);
-      const props = { label: l.text ?? '', register: act.register || 'secondary', action: act.action || 'act', value: act.value ?? value, waiting: !!act.waiting, busy: !!act.busy, id: aid, labelledby: `${aid} ${tid}` };
-      if (l.str) { props.strs = { label: l.str }; if (l.args) props.args = { label: l.args }; }
-      return `<div class="tk-door" data-ds="TaskRow" data-variant="door" data-act="" id="${esc(rid)}">${main}${UI.button(props)}</div>`;
-    }
-    return `<button type="button" class="tk-door" data-ds="TaskRow" data-variant="door"${A(action, value)}${L(label)}><span class="tk-door-copy"><strong>${parts(title)}</strong>${description ? `<small>${parts(description)}</small>` : ''}</span>${trail === 'chevron' ? glyph('chevron') : trail === 'edit' ? glyph('edit') : ''}</button>`;
+  function door({ title, description, action = 'open', value = '', label, trail = 'chevron', act, id = '', chip, attrs = {}, mono = false } = {}) {
+    const convert=v=>Array.isArray(v)?v.filter(x=>!x.sep).map(convert):typeof v==='object'&&v?[{text:v.text||'',strs:v.str?{text:v.str}:undefined,args:v.args?{text:v.args}:undefined,tone:v.tone}]:v;
+    const props={title:convert(title),description:convert(description),action,value,trail:trail||'none',wrap:true,id,chip,mono,attrs:{...attrs,...(label?{'aria-label':obj(label).text||''}:{})}};
+    return act ? root.SentriUI.rowAction({...props,act:{...act,action:act.action||'act',value:act.value??value,label:obj(act.label).text||'',strs:obj(act.label).str?{label:obj(act.label).str}:undefined,args:obj(act.label).args?{label:obj(act.label).args}:undefined}}) : root.SentriUI.row(props);
   }
 
   /* ---- TaskChoice: farrowing's choice tiles (Foster piglets: Send / Receive): two (or three) big outlined tiles, an icon
@@ -2655,16 +2594,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   let daySeq = 0;
   function day({ title, status, items = [], label } = {}) {
     const UI = root.SentriUI;
-    const rows = items.map(i => {
-      const mark = i.mark === 'done' ? `<span class="tk-day-mark" data-mark="done">${glyph('check')}</span>` : i.mark === 'due' ? '<span class="tk-day-mark" data-mark="due"></span>' : '';
-      const rid = i.id || `tk-day-${++daySeq}`, tid = rid + '-title';
-      const main = `<button type="button" class="tk-day-door"${A(i.action || 'open', i.value)}${L(i.label)}>${mark}<span class="tk-day-copy"><strong id="${esc(tid)}">${parts(i.title)}</strong>${i.meta ? `<small>${parts(i.meta)}</small>` : ''}</span></button>`;
-      if (!i.act) return `<div class="tk-day-row"${i.mark === 'done' ? ' data-done=""' : ''}>${main}</div>`;
-      const a = i.act, l = obj(a.label), aid = rid + '-act';
-      const props = { label: l.text ?? '', register: a.register || 'secondary', action: a.action || 'act', value: a.value ?? i.value ?? '', waiting: !!a.waiting, busy: !!a.busy, id: aid, labelledby: `${aid} ${tid}` };
-      if (l.str) { props.strs = { label: l.str }; if (l.args) props.args = { label: l.args }; }
-      return `<div class="tk-day-row" data-act=""${i.mark === 'done' ? ' data-done=""' : ''}>${main}${UI.button(props)}</div>`;
-    }).join('');
+    const rows = items.map(i => door({title:i.title,description:i.meta,action:i.action==='noop'?'':i.action||'open',value:i.value,label:i.label,id:i.id||`tk-day-${++daySeq}`,trail:i.mark==='done'&&i.action!=='noop'?'edit':'',mono:true,chip:i.mark==='done'?{variant:'chip',kind:'done',text:'Done',strs:{text:'ds.row.done'}}:null,attrs:i.mark==='done'?{'data-done':''}:{},act:i.act})).join('');
     return `<section class="tk-day" data-ds="TaskDay"${L(label ?? title)}><header class="tk-day-head"><strong>${parts(title)}</strong>${status ? `<span>${parts(status)}</span>` : ''}</header>${rows}</section>`;
   }
 
@@ -3676,7 +3606,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
         .replace('class="icon-button', 'aria-pressed="' + !!x.keep + '" class="icon-button');
       var row = K.row({ id: id, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
         meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), action: ended ? '' : 'give-fix', value: x.no, trail: '', still: ended, label: T('fix.aria', { no: x.no }) });
-      return '<div class="sp-pigrow" data-ds="TaskRow">' + row + mark + '</div>';
+      return '<div class="sp-pigrow" data-ds="Row">' + row + mark + '</div>';
     });
     var body = (!ended && p.ids.length ? '<p class="sp-quiet">' + esc(T('tagged.hint')) + '</p>' : '') +
       K.list([K.group({ title: T(scheme() === 'notch' ? 'pc.notched' : 'pc.tagged'), face: 'word', meta: '· ' + idWhat(p) + ' · ' + T('breeders.n', { n: P.breeders(p) }),

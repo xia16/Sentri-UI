@@ -46,11 +46,10 @@
 /* Processing: one TaskDay card per age-day (the skeleton's day card). A ticked, not yet submitted item is not a done
    row: it stays in ink on the green wash; a row saved on this visit fills its check in place; later days are muted. */
 .sheet-body > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
-.tk-day-row:has([data-ticked]) { background: var(--green-wash); }
-.tk-day-row:has([data-ticked]) .tk-day-copy > strong { color: var(--ink); }
-.tk-day-row:has([data-ticked]) .tk-day-mark, .tk-day-row:has([data-fresh]) .tk-day-mark { animation: sp-tick-in 200ms ease-out; }
-.tk-day[data-when="future"] .tk-day-head > strong, .tk-day[data-when="future"] .tk-day-copy > strong { color: var(--muted); }
-@media (prefers-reduced-motion: reduce) { .tk-day-row .tk-day-mark { animation: none !important; } }
+.st-row:has([data-ticked]) { background: var(--green-wash); }
+.st-row:has([data-ticked]) .st-row-copy > strong { color: var(--ink); }
+.tk-day[data-when="future"] .tk-day-head > strong, .tk-day[data-when="future"] .st-row-copy > strong { color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { }
 
 /* Piglets: Scan tag · Choose notch · Add manually — three tool Buttons in a line */
 .sp-adds { display: flex; gap: var(--space-key-gap); }
@@ -60,7 +59,7 @@
 /* Give IDs: one piglet at a time — big readouts (Measure) on the skeleton's Numpad, Boar · Gilt as TaskChoice tiles */
 .sp-give-id { display: flex; align-items: flex-start; gap: var(--space-key-gap); }
 .sp-give-id > .sp-give-scan { margin-top: 30px; }
-.sp-keep-row > .tk-row-identity { display: none; }
+.sp-keep-row > .st-row-identity { display: none; }
 .sp-give-id > .st-measure { flex: 1; min-width: 0; }
 .sp-give-scan.icon-button { flex: none; width: var(--control-height); height: var(--control-height); border: 1px solid var(--control-border); border-radius: var(--radius-control); background: var(--paper); }
 .sp-give-scan svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -72,7 +71,7 @@
 /* the pad docks above the footer, out of the scroller */
 :is(.sheet[data-presentation="page"], .sheet) > .st-numpad { flex: none; padding: var(--space-row-y) var(--space-gutter); background: var(--paper); border-top: 1px solid var(--line); }
 :is(.sheet[data-presentation="page"], .sheet) > .st-numpad + .sheet-footer { border-top: 0; }
-.sheet-body > .tk-row[data-trail="tick"] { border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
+.sheet-body > .st-row[data-select] { border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
 .button.sp-wide { width: 100%; }
 
 /* Move: the other pens as tiles, four to a line */
@@ -116,7 +115,7 @@
 /* a piglet on the Piglets page: the row (tap to fix) and its breeder flag beside it */
 .sp-pigrow { display: flex; align-items: center; padding-right: 6px; }
 .sp-pigrow + .sp-pigrow { border-top: 1px solid var(--line); }
-.sp-pigrow > .tk-row { flex: 1; min-width: 0; }
+.sp-pigrow > .st-row { flex: 1; min-width: 0; }
 /* Processing: a section title like the Piglets card's; the Done section sits last */
 .sp-proc > .st-heading { margin-bottom: 8px; }
 .sp-proc > .tk-day + .tk-day { margin-top: var(--space-key-gap); }

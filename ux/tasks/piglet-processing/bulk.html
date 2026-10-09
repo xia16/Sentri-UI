@@ -21,11 +21,11 @@
 .bk-review { display: flex; flex-direction: column; gap: var(--space-heading); }
 .bk-review > * { margin: 0; }
 /* A row this record finished holds its place (flash), then settles into its door. */
-.bk-row-open { appearance: none; background: none; border: 0; margin: -21px -10px -7px; padding: 21px 10px 7px; min-height: 44px; min-width: 44px; box-sizing: border-box; cursor: pointer; text-align: left; }
-.bk-row-open:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; border-radius: 6px; }
-.tk-row[data-flash] { background: var(--green-wash); }
-.tk-row { transition: background 1100ms ease-out; }
-@media (prefers-reduced-motion: reduce) { .tk-row { transition: none; } }
+.bk-row-open { appearance: none; background: none; border: 0; margin: 0; padding: 0; min-height: var(--tap-min); min-width: var(--tap-min); box-sizing: border-box; cursor: pointer; text-align: left; }
+.bk-row-open:focus-visible { outline: var(--size-3) solid var(--focus); outline-offset: calc(-1 * var(--size-3)); border-radius: var(--radius-control); }
+.st-row[data-flash] { background: var(--green-wash); }
+.st-row { transition: background 1100ms ease-out; }
+@media (prefers-reduced-motion: reduce) { .st-row { transition: none; } }
 </style>
 </head>
 <body class="tk-stage">
@@ -139,8 +139,8 @@
       data: S.flash && S.held.indexOf(r.litter) >= 0 ? { flash: '' } : null });
     // A tickable row is one tap to tick (the whole row); its id is its own target and opens the litter.
     // (A button inside a label would be the label's control: `for` keeps the tick the row's.)
-    if (how === 'select') html = html.replace('<label class="tk-row"', '<label for="bk-tick-' + r.litter + '" class="tk-row"').replace('<input type="checkbox"', '<input id="bk-tick-' + r.litter + '" type="checkbox"').replace(/<span class="tk-row-id">(<span [^>]*>[^<]*<\/span>)<\/span>/, function (m, inner) {
-      return '<button type="button" class="tk-row-id bk-row-open" data-action="open-litter" data-value="' + r.litter + '">' + inner + '</button>';
+    if (how === 'select') html = html.replace('<label class="st-row "', '<label for="bk-tick-' + r.litter + '" class="st-row "').replace('<input type="checkbox"', '<input id="bk-tick-' + r.litter + '" type="checkbox"').replace(/<span class="st-row-code">(<span [^>]*>[^<]*<\/span>)<\/span>/, function (m, inner) {
+      return '<button type="button" class="st-row-code bk-row-open" data-action="open-litter" data-value="' + r.litter + '">' + inner + '</button>';
     });
     return html;
   }
@@ -292,7 +292,7 @@
     if (!S.held.length) return;
     var pb = scr.querySelector('.sheet-body'); if (!pb) return;
     var topY = pb.getBoundingClientRect().top;
-    var els = Array.prototype.filter.call(scr.querySelectorAll('.sheet[data-presentation="page"] .tk-row[data-flash]'), function (e) { return true; });
+    var els = Array.prototype.filter.call(scr.querySelectorAll('.sheet[data-presentation="page"] .st-row[data-flash]'), function (e) { return true; });
     if (els.length && els.every(function (e) { return e.getBoundingClientRect().bottom <= topY; })) settle(); else armHold();
   }, { passive: true, capture: true });
 

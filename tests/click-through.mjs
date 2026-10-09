@@ -172,21 +172,21 @@ try {
   await page.waitForURL(/litter\.html/);
   assert.match(page.url(), /crate=B01/);
   await page.goto(base + 'bulk.html?state=bulk&tx=iron&fresh=1'); await ready(page);
-  await page.locator('label.tk-row:has(input[value="B01"]) .tk-row-headline').scrollIntoViewIfNeeded();
-  const hl = await page.locator('label.tk-row:has(input[value="B01"]) .tk-row-headline').boundingBox();
+  await page.locator('label.st-row:has(input[value="B01"]) .st-row-copy strong').scrollIntoViewIfNeeded();
+  const hl = await page.locator('label.st-row:has(input[value="B01"]) .st-row-copy strong').boundingBox();
   await page.mouse.click(hl.x + hl.width / 2, hl.y + hl.height / 2);
   assert.ok(await page.isChecked('input[data-action="toggle"][value="B01"]'));
   await page.click('[data-action="review"]');
   const rb = await page.locator('[data-action="record"]').boundingBox();
   await page.mouse.move(rb.x + rb.width / 2, rb.y + rb.height / 2); await page.mouse.down(); await page.waitForTimeout(1000); await page.mouse.up();
   await page.waitForSelector('#bk-receipt');
-  const b01 = (await page.locator('.tk-row:has-text("B01")').first().innerText()).replace(/\s+/g, ' ');
+  const b01 = (await page.locator('.st-row:has-text("B01")').first().innerText()).replace(/\s+/g, ' ');
   assert.match(b01, /Sow died/);
   assert.match(b01, /Done/);
   assert.match(b01, /2 days late/);
   // a reload keeps the lateness: it is the ledger's (`lateBy`), not the page's memory
   await page.goto(base + 'bulk.html?state=bulk&tx=iron'); await ready(page);
-  const b01r = (await page.locator('.tk-row:has-text("B01")').first().innerText()).replace(/\s+/g, ' ');
+  const b01r = (await page.locator('.st-row:has-text("B01")').first().innerText()).replace(/\s+/g, ' ');
   assert.match(b01r, /Done/); assert.match(b01r, /2 days late/);
   console.log('ok 7 bulk: id opens the litter, row ticks; Sow died row keeps Done + late, also after a reload:', b01r);
 
