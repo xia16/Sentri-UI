@@ -1,0 +1,23 @@
+[
+  {
+    "id": "default",
+    "name": "Category navigation",
+    "use": "Use for navigation between action categories.",
+    "notUse": "Not for record submission — use Sheet footer.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Active",
+      "Focused",
+      "Empty",
+      "Five categories at 300px",
+      "Long label / Chinese",
+      "Back pressed",
+      "Scrolled"
+    ],
+    "usedBy": [
+      "pig-profile.actions",
+      "inspection.actions"
+    ]
+  }
+]

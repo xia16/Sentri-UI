@@ -1,46 +1,97 @@
 {
   "status": "in-design",
-  "judged": "2026-10-09",
-  "commit": "3e3f835",
+  "round": 1,
+  "judged": "2026-10-10",
+  "commit": "7f47b7b",
   "model": "claude-opus-5-5",
   "scores": {
     "clarity": 8,
-    "budget": 6,
+    "budget": 8,
     "hierarchy": 8,
     "spacing": 8,
-    "broken": 6
+    "broken": 7
   },
-  "lowest": 6,
-  "checklist": [
+  "lowest": 7,
+  "previous": [
+    {
+      "finding": "Duplicate glyphs: origin = place, arrow = chevron, condition ~ plus.",
+      "fixed": "partly",
+      "note": "bundle.js: non-enumerable aliases, 51 canonical glyphs. But ux/system/sentri-icons.js still holds all three duplicates and the atlas Icons page renders from it."
+    },
+    {
+      "finding": "Unknown names silently draw a chevron.",
+      "fixed": true,
+      "note": "Empty svg + console.warn (seen for unknown-demo); no empty svg on any of 115 screens."
+    },
+    {
+      "finding": "Grid path closes to x=3.",
+      "fixed": "partly",
+      "note": "Fixed in bundle; every screen scanned draws the corrected grid. The stale registry still has M14 3h7v7H3z and the atlas Icons page shows it."
+    },
+    {
+      "finding": "'more' is three 0.01px dots.",
+      "fixed": "partly",
+      "note": "Bundle draws three r=1.5 filled circles (farrowing.count, .before, .locked, .ended, .edit-finished). The atlas Icons page still shows the old h.01 path."
+    },
+    {
+      "finding": "README glyph count 52 vs 54 rendered.",
+      "fixed": true,
+      "note": "Preview derives the count from Object.keys(paths): 51."
+    },
+    {
+      "finding": "Global svg stroke 1.8 contradicts 1.6.",
+      "fixed": true,
+      "note": "svg and host rules use --icon-stroke 1.6; key/pad strokes tokenised."
+    }
+  ],
+  "previousChecklistFails": [
     {
       "line": 1,
-      "pass": false,
-      "why": "Purpose stated; no \"use X instead\" line (for example a Status dot, or the word alone)."
+      "fixed": true
     },
     {
       "line": 2,
-      "pass": false,
-      "why": "No when-not section."
+      "fixed": true
+    },
+    {
+      "line": 11,
+      "fixed": true
+    },
+    {
+      "line": 14,
+      "fixed": true
+    }
+  ],
+  "checklist": [
+    {
+      "line": 1,
+      "pass": true,
+      "why": "Job plus use Status / IconButton instead."
+    },
+    {
+      "line": 2,
+      "pass": true,
+      "why": "When-not: word alone, Status."
     },
     {
       "line": 3,
       "pass": true,
-      "why": "A single open-stroke path on a 24 grid; nothing optional."
+      "why": "One open-stroke path on 24 grid; More's filled-dot exception named."
     },
     {
       "line": 4,
       "pass": true,
-      "why": "Stroke weights (1.6 / 1.8-2 / key 2.2) listed with their sizes."
+      "why": "Standard and Key, each with screens."
     },
     {
       "line": 5,
       "pass": true,
-      "why": "Static; the host owns states (stated)."
+      "why": "Default and Unknown rendered; host owns interactive states."
     },
     {
       "line": 6,
       "pass": true,
-      "why": "Not tappable."
+      "why": "Not tappable; hosts measured 48px+ (More actions tile 111x74)."
     },
     {
       "line": 7,
@@ -50,22 +101,22 @@
     {
       "line": 8,
       "pass": true,
-      "why": "Icons never carry meaning alone (stated)."
+      "why": "Icons always paired with a word (stated)."
     },
     {
       "line": 9,
       "pass": true,
-      "why": "Every icon keeps its word."
+      "why": "One lowercase name per glyph; labels from host."
     },
     {
       "line": 10,
       "pass": true,
-      "why": "icon() emits aria-hidden=\"true\" (not documented in the card)."
+      "why": "aria-hidden + focusable=false documented and emitted."
     },
     {
       "line": 11,
-      "pass": false,
-      "why": "The global svg rule uses raw 20px and stroke 1.8 (contradicting the 1.6 rule); screens set sizes in px."
+      "pass": true,
+      "why": "icon-stroke, icon-key-stroke, icon-pad-stroke, glyph-* tokens."
     },
     {
       "line": 12,
@@ -79,40 +130,24 @@
     },
     {
       "line": 14,
-      "pass": false,
-      "why": "No related links or classification."
+      "pass": true,
+      "why": "Related links and classification present."
     },
     {
       "line": 15,
       "pass": true,
-      "why": "All glyphs render at 375 without overflow."
+      "why": "51 glyphs render at 375 with no overflow."
     }
   ],
   "classification": "component",
   "variants": [
     {
-      "name": "standard stroke (1.6)",
+      "name": "Standard (icon-stroke 1.6)",
       "usedBy": [
         "farrowing.room",
-        "inspection.walk"
-      ],
-      "status": "in-design",
-      "scores": {
-        "clarity": 8,
-        "budget": 6,
-        "hierarchy": 8,
-        "spacing": 8,
-        "broken": 6
-      },
-      "findings": [
-        "The bundle default svg stroke is 1.8, not 1.6."
-      ]
-    },
-    {
-      "name": "key stroke (2.2; backspace 1.8)",
-      "usedBy": [
-        "farrowing.death",
-        "piglet-processing.record-death"
+        "farrowing.overview",
+        "inspection.walk",
+        "pig-profile.actions"
       ],
       "status": "in-design",
       "scores": {
@@ -120,53 +155,40 @@
         "budget": 8,
         "hierarchy": 8,
         "spacing": 8,
-        "broken": 8
+        "broken": 7
       },
       "findings": [
-        "Clean in use; held back only by the component-level token fail (line 11)."
+        "The atlas Icons catalogue still draws the stale registry (broken grid, h.01 more, origin/arrow/condition duplicates, 52 entries)."
       ]
+    },
+    {
+      "name": "Key (icon-key-stroke 2.2; backspace icon-pad-stroke 1.8)",
+      "usedBy": [
+        "farrowing.death",
+        "piglet-processing.record-death"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 8
+      },
+      "findings": []
     }
   ],
   "findings": [
     {
       "severity": "medium",
-      "text": "Duplicate glyphs: origin = place (identical path), chevron = arrow (same path), plus ~ condition.",
-      "fix": "Keep one name per glyph (place, chevron, plus) and alias the others."
-    },
-    {
-      "severity": "medium",
-      "text": "Unknown names silently draw a chevron, which reads as \"more\" - a typo becomes a false affordance.",
-      "fix": "Return an empty svg and console.warn in development."
-    },
-    {
-      "severity": "medium",
-      "text": "A known bug is shipped: the grid path closes to x=3 (M14 3h7v7H3z).",
-      "fix": "Fix the squares to M14 3h7v7h-7z and M14 14h7v7h-7z."
+      "text": "The old registry ux/system/sentri-icons.js was not removed: it still has the broken grid, the 0.01px More dots, the chevron fallback and the origin/arrow/condition duplicates, and atlas/library.js loadIconPaths() reads it, so the atlas Icons page (and the atlas .ico glyphs) show the bugs this pass fixed.",
+      "fix": "Point loadIconPaths at /ux/design-system/components/bundle.js (SentriIcons.paths), then delete ux/system/sentri-icons.js (and the stale ux/system/sentri-components.js copy)."
     },
     {
       "severity": "low",
-      "text": "\"more\" is three 0.01px dots, near invisible at stroke 1.6 in glare.",
-      "fix": "Draw three r=1.5 filled dots, or stroke 2.4."
-    },
-    {
-      "severity": "low",
-      "text": "The README says 52 glyphs; the preview renders 54 (backspace, offline).",
-      "fix": "Update the count or derive it from the registry."
-    },
-    {
-      "severity": "low",
-      "text": "The global svg default (stroke 1.8, 20px) contradicts the 1.6 rule.",
-      "fix": "Set stroke-width from an icon-stroke token (1.6)."
+      "text": "IMPLEMENTATIONS.md still says the icon registries are '52 glyphs identical'.",
+      "fix": "Update the row to: one registry (bundle.js), count derived, legacy file retired."
     }
   ],
-  "proposals": [
-    {
-      "kind": "merge",
-      "name": "origin + place, chevron + arrow",
-      "why": "Identical paths under two names.",
-      "seenIn": [
-        "farrowing.room"
-      ]
-    }
-  ]
+  "proposals": []
 }

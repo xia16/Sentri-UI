@@ -87,3 +87,11 @@ Stepper owns row, count and well in bundle.js / bundle.css. TaskStepper's markup
 Field owns the input/textarea skin, error border, sans font, auto-grow, visible corrective/help/reason line and ARIA association. Removed phone and page border overrides and local Field skins. Home's report and clarification fields, Inspection's capture helpers / optional-note controls / treatment dose, and Farrowing's optional fault resolution use the bundle. Dose then Unit stack in capture order. No Numpad or Measure split was implemented.
 
 See [Stepper verification](components/Stepper/verification.md) and [Field verification](components/Field/verification.md) for checklist evidence and the known atlas reachability gaps.
+
+## Panel / Icon / CategoryFooter pass (2026-10-10)
+
+Panel owns the surface of TaskGroup, ChoiceList option groups, catalogue lists and Farrowing pen cards. TaskGroup and pen-card surface declarations are retired; short chooser wrappers no longer create a second inset around a Panel. Existing Facts, Row group, Log and task consumers continue on `.st-panel`.
+
+Icon rendering in Home, Inspection, Farrowing and the task skeleton delegates to SentriIcons; local path registries and mutations are deleted. Measurements' ruler glyph moved from Inspection to the registry. Standard/key stroke tokens and canonical aliases keep callers compatible; unknown names warn and render nothing. CategoryFooter's hand-built Inspection fallback is deleted. The host action catalogues and study use Health · Routine · Production, without disabled categories. Piglet processing inherits these implementations and its dist/app.html is rebuilt.
+
+See [verification and rendered proof](components/pass-proof/README.md).

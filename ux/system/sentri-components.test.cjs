@@ -74,7 +74,7 @@ test('category footer preserves navigation actions and one current category', ()
 
 test('chooser groups remain flat and expose meaningful accessible subtitles', () => {
  const html=ui.pickerOptions({options:[['mL','mL','Millilitres','Liquid'],['mg','mg','Milligrams','Weight'],['g','g','Grams','Weight']],selected:'mg'});
- assert.equal((html.match(/class="st-choice-panel"/g)||[]).length,2);
+ assert.equal((html.match(/class="st-panel st-choice-panel"/g)||[]).length,2);
  assert.equal((html.match(/data-ds="ChoiceList"/g)||[]).length,5);
  assert.match(html,/aria-label="Liquid"/);assert.match(html,/aria-label="Weight"/);
  assert.equal((html.match(/data-mode="single"/g)||[]).length,3);
@@ -82,6 +82,6 @@ test('chooser groups remain flat and expose meaningful accessible subtitles', ()
  assert.doesNotMatch(html,/open-picker|chevron/);
 });
 test('short choices use the shared muted surface and catalogues use flat surfaces', () => {
- assert.match(ui.pickerOptions({options:[['a','First'],['b','Second','Supporting detail']]}),/class="st-choice-panel"/);
+ assert.match(ui.pickerOptions({options:[['a','First'],['b','Second','Supporting detail']]}),/class="st-panel st-choice-panel"/);
  assert.match(ui.chooserList('<button>Medicine</button>'),/data-chooser-tone="flat"/);
 });

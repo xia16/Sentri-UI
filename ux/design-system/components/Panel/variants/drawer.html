@@ -1,0 +1,8 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><style>body{margin:0;font-family:var(--font-sans);color:var(--ink);background:var(--app-background)}[data-state]{box-sizing:border-box;max-width:100%;padding:var(--space-panel);margin-bottom:var(--space-section)}.glyphs{display:grid;grid-template-columns:repeat(auto-fit,minmax(var(--back-width),1fr));gap:var(--space-8)}.glyphs span{display:flex;align-items:center;gap:var(--space-4);font-size:var(--font-size-12)}[data-st-context="drawer"]{background:var(--paper)}</style><body>
+<div data-state="Default"></div>
+<div data-state="Empty"></div>
+<div data-state="Long label / Chinese"></div>
+<script>document.querySelectorAll('[data-state]').forEach(el=>{const chinese=el.dataset.state.includes('Chinese');
+if(el.dataset.state==='Empty'){el.innerHTML=SentriUI.panel('');return;}
+el.dataset.stContext='drawer';
+el.innerHTML=SentriUI.heading({title:chinese?'产仔记录':'Litter'})+SentriUI.facts([{label:chinese?'活产仔猪':'Born alive',value:'11'},{label:chinese?'死产仔猪':'Stillborn',value:'1'}])+SentriUI.heading({title:chinese?'栏位信息':'Pen'})+SentriUI.rowGroup(SentriUI.row({title:chinese?'查看这个栏位的所有历史记录和工作安排':'Pen log',description:chinese?'最近记录 · 今天':'last record · today',action:'open-log',wrap:true}));});</script></body></html>

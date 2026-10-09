@@ -178,10 +178,10 @@ test('Farrowing actions use one note, one measurements entrance and no Feed cate
   const s = farrowing.seed('count');
   const c = context('actions'); c.selected.add(c.pigId); c.batches = []; model.pig(c, c.pigId).stage = 'Farrowing'; c.hostActions = farrowing.sowActionCatalogue(s);
   const catalogue = model.actionCatalogue(c);
-  assert.deepEqual(catalogue.groups.map(group => group.id), ['production', 'health', 'general']);
+  assert.deepEqual(catalogue.groups.map(group => group.id), ['health', 'routine', 'production']);
   const production = catalogue.groups.find(group => group.id === 'production').items;
   assert.equal(production.find(item => item.value === 'edit').section, 'farrowing');
-  const general = catalogue.groups.find(group => group.id === 'general').items;
+  const general = catalogue.groups.find(group => group.id === 'routine').items;
   assert.equal(general.filter(item => item.title === 'Edit note').length, 1);
   assert.equal(general.some(item => item.title === 'Add a note'), false);
   assert.equal(general.some(item => item.a === 'measurements-menu'), true);
@@ -193,18 +193,18 @@ test('Farrowing actions use one note, one measurements entrance and no Feed cate
   const menuHtml = model.overlay(c);
   for (const action of ['body', 'weight', 'temperature', 'backfat']) assert.match(menuHtml, new RegExp(`data-action="${action}"`), action);
 });
-test('stage-aware Production is available without a Farrowing host and comes first', () => {
+test('stage-aware Production is available without a Farrowing host and follows Health and Routine', () => {
   const standalone = context('actions'); standalone.selected.add(standalone.pigId);
   const standaloneHtml = model.overlay(standalone);
   assert.match(standaloneHtml, /data-action-group="production"/);
   assert.match(standaloneHtml, /aria-label="Pregnancy check actions"/);
   assert.match(standaloneHtml, /aria-label="Gestation actions"/);
   assert.match(standaloneHtml, /Batch membership/);
-  assert.ok(standaloneHtml.indexOf('data-action-group="production"') < standaloneHtml.indexOf('data-action-group="health"'));
+  assert.ok(standaloneHtml.indexOf('data-action-group="production"') > standaloneHtml.indexOf('data-action-group="health"'));
   const populated = context('actions'); populated.selected.add(populated.pigId);
   populated.hostActions = farrowing.sowActionCatalogue(farrowing.seed('count'));
   const html = model.overlay(populated);
-  assert.ok(html.indexOf('data-action-group="production"') < html.indexOf('data-action-group="health"'));
+  assert.ok(html.indexOf('data-action-group="production"') > html.indexOf('data-action-group="health"'));
 });
 test('Production hides actions from conflicting stages and shares only batch membership', () => {
   const gestating = context('actions'); gestating.selected.add(gestating.pigId);

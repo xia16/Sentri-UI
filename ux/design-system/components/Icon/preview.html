@@ -1,12 +1,8 @@
-<!-- @dsCard group="Foundations" height=560 subtitle="All 52 glyphs from SentriIcons" -->
-<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
-<body>
-<div id="a" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:4px;padding:16px;background:var(--paper);font-family:var(--sans)"></div>
-<script>
-const UI = window.SentriUI, I = window.SentriIcons.icon;
-a.innerHTML = Object.keys(window.SentriIcons.paths).map(n => '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;color:var(--ink)"><span style="display:block;width:22px;height:22px">' + I(n).replace('<svg', '<svg style="width:22px;height:22px;stroke-width:1.6"') + '</span><span style="font:400 10px/1.3 var(--mono);color:var(--muted)">' + n + '</span></div>').join('');
-</script>
-</body>
-</html>
+<!doctype html><html lang="en"><meta charset="utf-8"><style>body{margin:0;font-family:var(--font-sans);color:var(--ink);background:var(--app-background)}[data-state]{box-sizing:border-box;max-width:100%;padding:var(--space-panel);margin-bottom:var(--space-section)}.glyphs{display:grid;grid-template-columns:repeat(auto-fit,minmax(var(--back-width),1fr));gap:var(--space-8)}.glyphs span{display:flex;align-items:center;gap:var(--space-4);font-size:var(--font-size-12)}[data-st-context="drawer"]{background:var(--paper)}</style><body>
+<div data-state="Default"></div>
+<div data-state="Unknown"></div>
+<script>document.querySelectorAll('[data-state]').forEach(el=>{const names=el.dataset.state==='Unknown'?['unknown-demo']:Object.keys(SentriIcons.paths);
+el.innerHTML=(el.dataset.state==='Default'?'<p>'+Object.keys(SentriIcons.paths).length+' glyphs</p>':'')+'<div class="glyphs">'+names.map(name=>'<span>'+SentriIcons.icon(name)+'<span>'+name+'</span></span>').join('')+'</div>';});</script>
+<div data-extra-state="Default"></div>
+<script>document.querySelectorAll('[data-extra-state]').forEach(el=>{const names=el.dataset.extraState==='Unknown'?['unknown-demo']:['minus','plus','backspace'];
+el.innerHTML='<div class="glyphs">'+names.map(name=>'<span>'+SentriIcons.icon(name)+'<span>'+name+'</span></span>').join('')+'</div>';el.querySelectorAll('svg').forEach(svg=>svg.style.strokeWidth=svg.querySelector('path').getAttribute('d')===SentriIcons.paths.backspace?'var(--icon-pad-stroke)':'var(--icon-key-stroke)');});</script></body></html>

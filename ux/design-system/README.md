@@ -100,12 +100,12 @@ It reads; it never acts. The fact line puts words left and the trail (when · wh
 
 ## Iconography
 
-- One registry, `SentriIcons` (`sentri-icons.js`): 52 single-path glyphs on a 24×24 grid, drawn as open strokes. `SentriIcons.icon(name)` returns the `<svg>`; the stylesheet supplies `fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round`.
+- One registry, `SentriIcons` (in `components/bundle.js`): canonical glyph count from `Object.keys(SentriIcons.paths).length`, with paths on a 24×24 grid, drawn as open strokes. `SentriIcons.icon(name)` returns the `<svg>`; the stylesheet supplies `fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round`.
 - Stroke 1.6 at 14–18px (headings 16px, rows 18px, chevrons 15px); 1.8–2 for checks and choice trails at 16–20px. Icons take the colour of their text — `muted` beside secondary text, `row-icon-ink` in row tiles, `green` for a selected check.
 - Every icon keeps its word. Glyphs are for recognition, never meaning on their own: verb tiles, rows and buttons always carry a label; icon-only buttons carry an `aria-label`.
 - Never hand-draw an inline SVG in a screen: add the path to the registry so every app renders the same glyph. No emoji; the only glyph characters in copy are `·` (separator), `→` (movement and deltas), `›` (more) and `×` (multiples).
 - The `Icons` asset group holds each glyph as a standalone SVG drawn in `ink` at stroke 1.6.
-- Field keys are the one heavier exception: the Stepper's `minus` / `plus` draw at stroke 2.2 (`glyph-key` 14px, `glyph-key-hero` 18px) and the Numpad's `backspace` at 1.8 (`glyph-pad` 20px), so a key reads at arm's length in glare. `backspace` (a left-pointing key cap with an ×) is the registry's 53rd glyph, candidate with the field cards (ADR 0001); it means "delete the last typed character" and nothing else.
+- Field keys are the one heavier exception: the Stepper's `minus` / `plus` draw at stroke 2.2 (`glyph-key` 14px, `glyph-key-hero` 18px) and the Numpad's `backspace` at 1.8 (`glyph-pad` 20px), so a key reads at arm's length in glare. `backspace` (a left-pointing key cap with an ×) is a registry glyph, candidate with the field cards (ADR 0001); it means "delete the last typed character" and nothing else.
 
 ## The wordmark
 

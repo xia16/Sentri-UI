@@ -1,28 +1,63 @@
 # Panel
 
-The one container surface. A panel is a bordered, unshadowed box that holds rows, facts, a log or free content.
+The one surface every grouped block sits on; you rarely call it directly. Use Facts instead for read-only pairs, Row group for destinations, and Log for history.
 
-Call `SentriUI.panel(content, { tag, className })`.
+## When to use
 
-**How it looks**
-- A 1px `line` border and `radius-panel` (18px), with `space-panel` (16px) of padding.
-- No shadow.
+Use beneath Facts, Row group, Log, TaskGroup, TaskTotals, TaskProgress and TaskSection. ChoiceList also uses this surface for grouped options.
 
-**What the caller provides**
-- The content HTML.
-- The container's context. Mark the page or drawer that holds the panel with `data-st-context`:
-  - On a `page`, panels are `paper` on `app-background`.
-  - In a `drawer`, panels are `inset` on `paper`.
-  - Never set a panel's colour yourself.
+## When not to use
 
-**Do and don't**
-- Don't nest panels. A panel inside a panel turns transparent, so use a heading or rules instead.
-- Don't add a left-border accent. Don't add a shadow.
-- Separate panels with `space-section` (24px), each under its own heading.
+Use Heading and divider rules to organise content inside an existing panel. Use Sheet for a page or drawer shell. Never put a card in a card or use a panel for a paragraph alone.
 
-**States**
-- Default only: a panel is a static container. Press, focus and disabled belong to the rows and controls inside it.
-- Empty: absent — an empty panel is not rendered (see *Missing is not zero, and empty is absent*).
+## Anatomy
 
-**Strings**
-`panel` has no text slots. `rowGroup` and `log` take `strs`/`args` (see Row and Log); the root carries `data-ds="Panel"`.
+Context fill, hairline border, rounded corners and content slot. Padding belongs to the consumer: Facts and Log are padded; Row group, TaskGroup and ChoiceList run edge to edge. These content components are related consumers, not additional Panel variants.
+
+## Variants
+
+- **Page:** use on the app canvas; paper on app-background.
+- **Drawer:** use inside a drawer; inset on paper.
+
+The enclosing `data-st-context="page|drawer"` chooses the variant. The default outside a context is page.
+
+## States
+
+| State | Rendering |
+| --- | --- |
+| Default | Bordered surface, no shadow |
+| Empty | Absent; `panel('')` returns an empty string |
+| Long label / Chinese | Content wraps using the consumer's copy rules |
+| Pressed, active, focused, disabled, error, loading | Owned by the contained control; Panel is static |
+
+## Behaviour
+
+`SentriUI.panel(content, {tag, className, ds})` returns a semantic container. It has no events, navigation or async work. Separate grouped blocks with space-section. Nested panels are not a supported composition; replace the inner surface with a heading and rules.
+
+## Content rules
+
+Panel has no text slots, label length, casing or truncation. Facts, Row and Log govern their own copy. Do not repeat a section title within its surface. Optional inputs stay optional rows beneath required fields.
+
+## Accessibility
+
+No implicit role, focus stop or keyboard handler. `tag` permits div, section, article, aside or dl; use the consumer to supply correct semantics. Only controls inside the panel are tappable, at tap-min or above. They own focus and keyboard interaction.
+
+## Tokens / API
+
+`line`, `inset`, `paper`, `app-background`, `radius-panel`, `space-panel`, `space-section`. The compatibility aliases `--st-line`, `--st-inset`, `--st-radius` resolve to these tokens. No elevation or accent stripe.
+
+## Do / don't
+
+Do show one Facts block or one Row group per surface. Don't wrap Facts or Log in another Panel. Don't apply a custom fill or shadow to a consumer.
+
+## Related components
+
+[Facts](../Facts/README.md), [Row](../Row/README.md), [Log](../Log/README.md), [ChoiceList](../ChoiceList/README.md), [TaskGroup](../TaskGroup/README.md), [TaskTotals](../TaskTotals/README.md), [TaskProgress](../TaskProgress/README.md), [TaskSection](../TaskSection/README.md), [Sheet](../Sheet/README.md).
+
+## Classification
+
+Component; page and drawer are context variants. Consumer compositions retain their own component APIs. See variants.json for screen usage and variants/ for isolated states.
+
+## Changelog
+
+2026-10-10: unified TaskGroup, ChoiceList and Farrowing pen surfaces; replaced the paragraph demo with Facts and Row groups.

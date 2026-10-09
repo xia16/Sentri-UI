@@ -26,7 +26,7 @@ test('icon registry: filter is a funnel, not the chevron fallback', () => {
   const filter = icons.icon('filter');
   assert.match(filter, /M4 5h16l-6 7v6l-4 2v-8z/);
   assert.doesNotMatch(filter, /m9 5 7 7-7 7|M9 5l7 7-7 7/);
-  assert.equal(icons.icon('definitely-missing'), icons.icon('chevron'));
+  assert.match(icons.icon('definitely-missing'), /<svg[^>]*><\/svg>/);
 });
 
 test('pickerField renders a button trigger with placeholder state, never a select', () => {

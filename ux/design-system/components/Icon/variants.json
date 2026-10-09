@@ -1,0 +1,29 @@
+[
+  {
+    "id": "standard",
+    "name": "Standard",
+    "use": "Use for standard glyphs in labelled controls.",
+    "notUse": "Not for an unlabelled action — use IconButton.",
+    "states": [
+      "Default",
+      "Unknown"
+    ],
+    "usedBy": [
+      "farrowing.room",
+      "inspection.walk"
+    ]
+  },
+  {
+    "id": "key",
+    "name": "Key",
+    "use": "Use for key glyphs in labelled controls.",
+    "notUse": "Not for an unlabelled action — use IconButton.",
+    "states": [
+      "Default"
+    ],
+    "usedBy": [
+      "farrowing.death",
+      "piglet-processing.record-death"
+    ]
+  }
+]
