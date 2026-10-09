@@ -93,7 +93,7 @@
     meta.push(S('day.n', { d: p.age }));
     if (lastR) meta.push(SEP, S('fig', { v: sameDay(lastR.at) ? hm(lastR.at) : md(lastR.at) }), SEP, S('fig', { v: short(lastR.who) }));
     var done = !P.s.ended && !td.length && !c.length;
-    var row = K.row({ id: S('code', { c: p.sow }), chip: sowChip(p), headline: headline, tone: tone, meta: meta, action: 'pen', value: p.code, trail: done ? 'edit' : 'chevron' });
+    var row = K.row({ id: S('code', { c: p.sow }), chip: sowChip(p), headline: headline, tone: tone, meta: meta, action: 'pen', value: p.code, trail: 'chevron' });
     return K.group({ title: S('code', { c: p.code }), meta: S('sows.one'), door: { action: 'pen', value: p.code, label: T('pen.aria', { pen: p.code }) }, rows: row });
   }
   function isDone(p) { return P.todo(p).length === 0; }

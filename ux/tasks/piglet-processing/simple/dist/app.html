@@ -500,6 +500,9 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .sheet-status[data-action-slot]>p{flex:1;min-width:0;margin:0}
 .sheet-status[data-action-slot]>.st-text-action{flex:none}
 .sheet[data-presentation="page"]>.sheet-status{padding-left:var(--space-gutter);padding-right:var(--space-gutter)}
+/* a waiting reason that sheetFooter lifts above the bar: one status line, not a column-sized flex child */
+.sheet>.st-button-reason.st-button-reason{flex:none;margin:0;padding:var(--space-row-y) var(--space-gutter) 0;background:var(--paper);border-top:1px solid var(--line)}
+.sheet>.st-button-reason+.sheet-footer{border-top:0}
 /* Dialog: one small decision, rising from the bottom edge (reachable by the thumb), over a dimmed phone. */
 .dialog-backdrop{position:absolute;inset:0;z-index:calc(8 + 10 * var(--sheet-layer,0));display:flex;flex-direction:column;justify-content:flex-end;background:var(--dialog-backdrop)}
 .dialog{display:flex;flex-direction:column;overflow:hidden;max-height:calc(100% - var(--space-24));background:var(--paper);color:var(--ink);border-radius:var(--radius-dialog) var(--radius-dialog) 0 0;box-shadow:var(--shadow-dialog)}
@@ -3510,7 +3513,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     meta.push(S('day.n', { d: p.age }));
     if (lastR) meta.push(SEP, S('fig', { v: sameDay(lastR.at) ? hm(lastR.at) : md(lastR.at) }), SEP, S('fig', { v: short(lastR.who) }));
     var done = !P.s.ended && !td.length && !c.length;
-    var row = K.row({ id: S('code', { c: p.sow }), chip: sowChip(p), headline: headline, tone: tone, meta: meta, action: 'pen', value: p.code, trail: done ? 'edit' : 'chevron' });
+    var row = K.row({ id: S('code', { c: p.sow }), chip: sowChip(p), headline: headline, tone: tone, meta: meta, action: 'pen', value: p.code, trail: 'chevron' });
     return K.group({ title: S('code', { c: p.code }), meta: S('sows.one'), door: { action: 'pen', value: p.code, label: T('pen.aria', { pen: p.code }) }, rows: row });
   }
   function isDone(p) { return P.todo(p).length === 0; }

@@ -12,18 +12,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-b-2",
-  "target": {
-   "kind": "screen",
-   "id": "piglet-processing.chip-done"
-  },
-  "kind": "broken",
-  "severity": "high",
-  "title": "\"Edit\" on a done pen opens a sheet with nothing editable",
-  "detail": "A01's row trails \"Edit\" (verb: correct a posted record). Tapping it opens the pen sheet: \"Nothing left to do\", a disabled Record items, no correction. Fix: show the plain chevron until the correction decision (tasks-built-79) is made.",
-  "source": "screen-review"
- },
- {
   "id": "screens-b-3",
   "target": {
    "kind": "screen",
