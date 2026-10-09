@@ -153,6 +153,7 @@
 .unit-hub-maintenance.has-issues small{color:var(--amber)}
 .environment-page,.maintenance-page{padding-top:14px}
 .device-control>.st-selection{margin:var(--space-12) 0}
+.environment-page>.st-selection{margin-bottom:var(--space-12)}
 .sensor-detail,.device-control{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
 .sensor-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .sensor-detail-heading p{font-size:12px;color:var(--muted)}

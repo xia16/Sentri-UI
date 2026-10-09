@@ -6,7 +6,7 @@
    4. sentri-visual-foundation.css (its :root palette now comes from tokens.css)
    Section 2 sits in a cascade layer (sentri-base): any page stylesheet wins over it in any load order, so Home, Farrowing
    and Inspection keep their own base. Sections 3-5 are unlayered and load after the page CSS.
-   5. sentri-components.css (the SentriUI parts), verbatim.
+   5. the SentriUI parts.
    Screens scope the foundation to a phone root: wrap content in .inspection-phone or .farrowing-phone
    and mark the container data-st-context="page" or "drawer". */
 :root{--sans:var(--font-sans);--mono:var(--font-mono);--wash:var(--well)}
@@ -75,9 +75,9 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .sheet-subtitle[data-tone="amber"]{color:var(--amber)}
 .sheet-subtitle[data-tone="red"]{color:var(--red)}
 .sheet-subtitle[data-tone="green"]{color:var(--green)}
-.sheet-subtitle .st-tone[data-tone="red"]{color:var(--red)}
-.sheet-subtitle .st-tone[data-tone="amber"]{color:var(--amber)}
-.sheet-subtitle .st-tone[data-tone="green"]{color:var(--green)}
+.sheet-subtitle .st-part[data-tone="red"]{color:var(--red)}
+.sheet-subtitle .st-part[data-tone="amber"]{color:var(--amber)}
+.sheet-subtitle .st-part[data-tone="green"]{color:var(--green)}
 .sheet-subtitle .st-sep{margin:0 var(--status-dot)}
 .sheet-aside .text-button,.sheet-aside .st-text-action{min-width:var(--tap-min)}
 .sheet-aside{flex:none;display:flex;align-items:center;align-self:flex-start;gap:var(--space-6)}
@@ -613,7 +613,9 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-choice-row[data-mode="multi"]:has(:checked) .st-choice-label{font-weight:var(--type-weight-strong)}
 .st-picker-steps{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-4)}
 .st-picker-sep{color:var(--muted);font:var(--font-size-14)/1 var(--font-sans)}
-.st-picker-value.is-names{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;white-space:normal;overflow-wrap:anywhere}
+.st-picker-value.is-names{display:flex;align-items:baseline;gap:var(--space-6);white-space:normal;overflow:visible}
+.st-picker-names{min-width:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+.st-picker-more{flex:none;color:var(--muted);font-weight:600}
 .st-picker-steps button,.st-picker-footer button{min-height:var(--tap-min);min-width:var(--tap-min);padding:var(--space-8);font:inherit}
 .st-picker-footer{display:flex;justify-content:space-between;gap:var(--space-12);padding:var(--space-12) 0}
 .st-choice-search input{min-height:var(--tap-min)}
@@ -643,6 +645,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-selection-count{font:500 var(--type-meta-size)/1.4 var(--font-mono);color:var(--muted)}
 .st-segment button[aria-pressed=true]{background:var(--paper);font-weight:500;box-shadow:inset 0 calc(-1 * var(--space-3)) var(--ink)}
 .st-segment[data-variant=two-line-lens] button{flex-direction:column}
+.st-segment[data-variant=two-line-lens] .st-selection-count:empty{min-height:1.4em}
 .st-segment button:not([aria-pressed=true]):not(:disabled):active,.st-filter-chips button:not([aria-checked=true]):not(:disabled):active,[data-state=Pressed].st-segment button:nth-child(2),[data-state=Pressed].st-filter-chips button:nth-child(2){background:var(--handle)}
 .st-segment button:focus-visible,.st-filter-chips button:focus-visible,[data-state=Focus] button:first-child{outline:var(--space-3) solid var(--focus);outline-offset:var(--space-2)}
 .st-segment button:disabled,.st-filter-chips button:disabled{cursor:default;border:1px dashed var(--control-border)}
@@ -650,7 +653,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-filter-chips{min-width:0;padding:var(--space-6) 0}
 .st-filter-chips-track{display:flex;gap:var(--space-key-gap);overflow-x:auto;padding:var(--space-4) var(--space-gutter);scrollbar-width:thin}
 .st-filter-chips button{flex:none;max-width:100%;padding:var(--space-6) calc(var(--space-row-x) + (var(--size-16) + var(--space-3)) / 2);border:1px solid var(--line);border-radius:var(--radius-control);background:var(--well)}
-.st-filter-chips button[aria-checked=true]{background:var(--paper);font-weight:500}
+.st-filter-chips button[aria-checked=true]{background:var(--paper);font-weight:500;padding-inline:var(--space-row-x)}
 .st-chip-check{display:flex;width:var(--size-16);flex:none}
 .st-chip-check svg{width:var(--size-16);height:var(--size-16)}
 

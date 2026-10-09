@@ -53,7 +53,7 @@ test("search spans kinds, groups and aliases while another branch is open", () =
     selected: ["fever"],
   });
   assert.match(html, /Influenza/);
-  assert.match(html, /Diseases \/ Respiratory/);
+  assert.match(html, /Diseases › Respiratory/);
   assert.doesNotMatch(html, /No options match/);
 });
 test("descendant counts persist across branches, with one exit pair", () => {
@@ -83,7 +83,7 @@ test("trigger uses count or complete path, preserves labels and describes errors
     path: ["Antibiotics", "Amoxicillin"],
     error: "Select an available medicine.",
   });
-  assert.match(single, /Antibiotics \/ Amoxicillin/);
+  assert.match(single, /Antibiotics › Amoxicillin/);
   assert.match(single, /aria-invalid="true"/);
   assert.match(single, /aria-describedby/);
 });
@@ -177,7 +177,7 @@ test("medicine path is display metadata; the recorded medicine value keeps its o
   assert.equal(c.form.medicine, "Antibiotic A");
   assert.deepEqual(c.form.medicinePath, ["Antibiotics", "Antibiotic A"]);
   const html = M.overlay(c);
-  assert.match(html, /Antibiotics \/ Antibiotic A/);
+  assert.match(html, /Antibiotics › Antibiotic A/);
   c.form.conditionPath = ["Symptom", "General appearance"];
   c.form.search = "fever";
   c.form.conditions = ["Fever"];

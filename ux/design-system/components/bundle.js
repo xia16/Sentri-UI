@@ -1,5 +1,5 @@
 /* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
-/* SentriIcons (sentri-icons.js) and SentriUI (sentri-components.js), verbatim. */
+/* SentriIcons (sentri-icons.js) and the SentriUI parts, in one file. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
 (function(root){
@@ -250,9 +250,10 @@
      strs: label (raw label wrapped in a span), display or value (the shown value), placeholder. */
   function pickerField({label='',value='',display='',placeholder='Select',action='open-picker',key='',disabled=false,reason='',error='',loading=false,variant='single',selected=[],names=[],path=[],pressed=false,active=false,ariaLabel='',className='',strs,args}={}){
     const multi=variant.includes('multi'), named=multi&&names.length>0;
-    const text=named?names.slice(0,3).join(' · ')+(names.length>3?' · +'+(names.length-3):''):multi?(selected.length?selected.length+' selected':'None'):path.length?path.join(' / '):display||value;
+    const text=named?names.slice(0,3).join(' · ')+(names.length>3?' · +'+(names.length-3):''):multi?(selected.length?selected.length+' selected':'None'):path.length?path.join(' › '):display||value;
+    const more=named&&names.length>3?'+'+(names.length-3):'';
     const shown=text!==''&&text!=null, id=fieldId('st-picker'), hint=error||reason||(loading?'Loading options…':'');
-    return `<div class="field st-picker-field ${esc(className)}" data-ds="PickerField" data-variant="${esc(variant)}"><span id="${id}-label">${tx(label,{strs,args},'label')}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value${named?' is-names':''}"${named?'':sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
+    return `<div class="field st-picker-field ${esc(className)}" data-ds="PickerField" data-variant="${esc(variant)}"><span id="${id}-label">${tx(label,{strs,args},'label')}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value${named?' is-names':''}"${named?'':sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${named?`<span class="st-picker-names">${esc(names.slice(0,3).join(' · '))}</span>${more?`<span class="st-picker-more">${esc(more)}</span>`:''}`:esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
   }
   // Shared chooser surface: flat catalogue lists or a muted inset for short choices.
   function chooserList(content,{className='',tone='flat',ds='ChoiceList'}={}){
@@ -275,7 +276,7 @@
     const visible=q?leaves(items).filter(n=>[n.label,n.group||'',...n.trail,...(n.aliases||[])].join(' ').toLocaleLowerCase().includes(q)):cascade?nodes:leaves(items);
     const count=n=>leaves([n]).filter(x=>selected.includes(x.value)).length;
     const rows=visible.map(n=>{
-      const row=choiceRow({label:n.label,meta:n.children?(multi&&count(n)?count(n)+' selected':''):q?n.trail.join(' / '):n.meta||'',mode:n.children?'navigate':multi?'multi':'single',action:n.children||!multi?action:'',value:n.value,selected:selected.includes(n.value),disabled:!!n.disabled,reason:n.reason||'',attrs:n.attrs||{},strs:{...n.strs,...(n.children&&multi&&count(n)?{meta:'ds.picker.selected'}:{})},args:{...n.args,...(n.children&&multi&&count(n)?{meta:{n:count(n)}}:{})}});
+      const row=choiceRow({label:n.label,meta:n.children?(multi&&count(n)?count(n)+' selected':''):q?n.trail.join(' › '):n.meta||'',mode:n.children?'navigate':multi?'multi':'single',action:n.children||!multi?action:'',value:n.value,selected:selected.includes(n.value),disabled:!!n.disabled,reason:n.reason||'',attrs:n.attrs||{},strs:{...n.strs,...(n.children&&multi&&count(n)?{meta:'ds.picker.selected'}:{})},args:{...n.args,...(n.children&&multi&&count(n)?{meta:{n:count(n)}}:{})}});
       const extra=n.secondaryAction?`<div class="st-choice-extra">${button({label:n.secondaryAction.label,action:n.secondaryAction.action,value:n.value,register:'text',attrs:{'aria-label':n.secondaryAction.label+' '+n.label}})}</div>`:'';
       return row+extra;
     });
@@ -283,7 +284,7 @@
     const sep='<span class="st-picker-sep" aria-hidden="true">›</span>';
     const trail=cascade?`<nav class="st-picker-steps" aria-label="Chosen levels"><button type="button" data-action="${esc(stepAction)}" data-value="0">${tx('All',{strs:{all:strs.all||'ds.picker.all'}},'all')}</button>${steps.map((n,i)=>sep+`<button type="button" data-action="${esc(stepAction)}" data-value="${i+1}"${i===steps.length-1?' aria-current="step"':''}>${tx(n.label,n,'label')}</button>`).join('')}</nav>`:'';
     const groups=[];
-    visible.forEach((n,i)=>{const title=n.group||n.trail?.join(' / ')||'';let group=groups.find(g=>g.title===title);if(!group){group={title,rows:[]};groups.push(group);}group.rows.push(rows[i]);});
+    visible.forEach((n,i)=>{const title=n.group||n.trail?.join(' › ')||'';let group=groups.find(g=>g.title===title);if(!group){group={title,rows:[]};groups.push(group);}group.rows.push(rows[i]);});
     const list=!cascade&&!q?groups.map(g=>choiceGroup(g.rows,{title:g.title})).join(''):choiceGroup(rows);
     const content=loading||error?choiceEmpty(loading?'Loading options…':error,{strs:{text:loading?strs.loading||'ds.picker.loading':strs.error}}):visible.length?list:choiceEmpty(q?'No options match “'+query+'”.':'No options available.',{strs:{text:q?strs.noMatch||'ds.picker.no_match':strs.empty||'ds.picker.empty'},args:{text:{query}}});
     return `<div class="st-picker-body" data-ds="PickerField" data-variant="${esc(variant)}">${search}${trail}${content}</div>`;
@@ -327,9 +328,9 @@
   }
   function choiceEmpty(text,{strs,args}={}){return `<p class="st-choice-empty" data-ds="ChoiceList" role="status">${tx(text,{strs,args},'text')}</p>`;}
   /* options: [value,label,{strs:{label},args:{label}}?]; label is raw HTML, kept as the span's fallback. */
-  function segment({options=[],active='',action='',className='',ariaLabel='',variant='lens',state='Default',disabled=false,reason=''}={}){
+  function segment({options=[],active='',action='',className='',ariaLabel='',variant='two-line-lens',state='Default',disabled=false,reason=''}={}){
     if(!options.length)return '';
-    return `<div class="st-selection"><div class="st-segment ${esc(className)}" data-ds="Segment" data-variant="${esc(variant)}" data-state="${esc(state)}" role="group" aria-label="${esc(ariaLabel)}">${options.map(([v,label,x={}])=>{const blocked=disabled||x.disabled;return `<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}"${x.ariaLabel?` aria-label="${esc(x.ariaLabel)}"`:""}${blocked?' disabled':''}><span class="st-selection-label"${has(x,'label')?sa(x.strs.label,x.args&&x.args.label):''}>${label}</span>${x.count!=null?`<span class="st-selection-count">${x.count}</span>`:''}</button>`;}).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
+    return `<div class="st-selection"><div class="st-segment ${esc(className)}" data-ds="Segment" data-variant="${esc(variant)}" data-state="${esc(state)}" role="group" aria-label="${esc(ariaLabel)}">${options.map(([v,label,x={}])=>{const blocked=disabled||x.disabled;return `<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}"${x.ariaLabel?` aria-label="${esc(x.ariaLabel)}"`:""}${blocked?' disabled':''}><span class="st-selection-label"${has(x,'label')?sa(x.strs.label,x.args&&x.args.label):''}>${label}</span>${x.count!=null?`<span class="st-selection-count">${x.count}</span>`:variant==='two-line-lens'?'<span class="st-selection-count" aria-hidden="true"></span>':''}</button>`;}).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
   }
   function filterChips({items=[],action='chip',key='chips',label='',state='Default',reason=''}={}){
     if(!items.length)return '';
@@ -804,8 +805,8 @@
       return choiceGroup(rows,{title:label,lead,radio:true,aside:clearBtn,id:rid,className,strs:s.label?{title:s.label}:undefined,args:a.label?{title:a.label}:undefined});
     }
     const lid=rid+'-label';
-    const opt=x=>`<button type="button" class="st-choice-inline-opt"${disabled?' aria-disabled="true"':''}${pressed?' data-preview="pressed"':''} role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}"><span class="st-radio" aria-hidden="true"></span><span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span></button>`;
-    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio" id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
+    const opt=x=>`<button type="button" class="st-choice-inline-opt"${disabled?' aria-disabled="true"':''}${pressed&&x===options[0]?' data-preview="pressed"':''} role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}"><span class="st-radio" aria-hidden="true"></span><span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span></button>`;
+    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio" id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="st-visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
   }
   /* The radio keyboard model, pure: ArrowDown/ArrowRight → next, ArrowUp/ArrowLeft → previous (both wrap), Home → first,
      End → last. Returns the value to select and focus, or null for any other key. */
@@ -869,7 +870,7 @@
   const sPaths={'back-chevron':'M15 5l-7 7 7 7'};
   const sGlyph=k=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${sPaths[k]||(root.SentriIcons&&root.SentriIcons.paths&&root.SentriIcons.paths[k])||''}"/></svg>`;
   /* A line of parts, each a text slot with an optional tone: [{ text, str, args, tone }]; { sep: true } is the shared separator. */
-  const sParts=v=>Array.isArray(v)?v.map(p=>{const o=sObj(p);if(o.sep)return SEP;return o.tone?`<span class="st-tone" data-tone="${esc(o.tone)}">${sT(o)}</span>`:sT(o);}).join(''):sT(v);
+  const sParts=v=>Array.isArray(v)?v.map(p=>{const o=sObj(p);if(o.sep)return SEP;return o.tone?`<span class="st-part" data-tone="${esc(o.tone)}">${sT(o)}</span>`:sT(o);}).join(''):sT(v);
   /* Back: the footer's exit, the same on every sheet (a 16px chevron + the word). Alone in a footer it fills the bar. */
   function backButton({action='back',value='',label={text:'Back',str:'act.back'},className=''}={}){
     return button({register:'secondary',action,value,label:'',className:'surface-back'+(className?' '+className:'')}).replace('<span class="st-button-label"></span>',sGlyph('back-chevron')+'<span>'+sT(label)+'</span>');
