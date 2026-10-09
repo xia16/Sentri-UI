@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T19:39:31.455Z",
- "commit": "3f944de",
+ "generated": "2026-10-09T19:40:36.100Z",
+ "commit": "ec7940d",
  "platforms": [
   {
    "id": "mobile",
@@ -322,7 +322,8 @@
           ]
          },
          "steps": [
-          "[data-action=\"unit-fault\"]"
+          "Toolbox",
+          "Maintenance"
          ]
         },
         {
@@ -401,7 +402,8 @@
           ]
          },
          "steps": [
-          "[data-action=\"unit-fault\"]",
+          "Toolbox",
+          "Maintenance",
           "Report issue"
          ]
         },
@@ -437,7 +439,8 @@
           ]
          },
          "steps": [
-          "[data-action=\"unit-fault\"]",
+          "Toolbox",
+          "Maintenance",
           "[data-action=\"fault-detail\"]"
          ]
         },
@@ -479,7 +482,8 @@
           ]
          },
          "steps": [
-          "[data-action=\"unit-fault\"]",
+          "Toolbox",
+          "Maintenance",
           "[data-action=\"fault-detail\"]",
           "Mark resolved"
          ]
@@ -3698,7 +3702,7 @@
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "locked",
          "steps": [
-          "Edit"
+          "[data-action=\"edit\"].tool"
          ],
          "figma": "",
          "notes": {
@@ -18510,18 +18514,6 @@
   {
    "severity": "medium",
    "source": "screen-review",
-   "id": "screens-a-3",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.task-blocked"
-   },
-   "kind": "broken",
-   "title": "Room dock shows through below the End task footer",
-   "detail": "On all four End task pages the room's dark Scan pill, search button and a second handle bar show beneath the footer, in the live demo too. Fix: the page must cover the dock, with its footer on the phone's bottom edge."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
    "id": "screens-a-4",
    "target": {
     "kind": "screen",
@@ -18542,18 +18534,6 @@
    "kind": "broken",
    "title": "Progress label says 'complete' over a 1 of 8 bar",
    "detail": "Piglet processing reads 'All scheduled items complete · 1 / 8 pens' (work-due adds '4 litters with care due' above it); Breeding reads 'Service sequences complete · 1 / 8 sows'. Fix: name what the bar counts ('Pens done')."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-6",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.edit-finished"
-   },
-   "kind": "broken",
-   "title": "Atlas 'Edit record (finished litter)' shows the locked record",
-   "detail": "The step 'Edit' hits the room row's Edit behind the sheet, which reopens the same locked record, so the screenshot equals farrowing.locked. Fix: step '[data-action=\"edit\"].tool'."
   },
   {
    "severity": "medium",
@@ -18806,30 +18786,6 @@
    "detail": "From Pen feeding, Adjust feed shows only the pig table. The Adjustment panel (mode, %, end date, note) sits below a 297px sheet body with overflow hidden; \"Complete the required fields first\" floats unpadded at the left edge. Fix: let the sheet body grow or scroll to the panel."
   },
   {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-b-2",
-   "target": {
-    "kind": "screen",
-    "id": "piglet-processing.chip-done"
-   },
-   "kind": "broken",
-   "title": "\"Edit\" on a done pen opens a sheet with nothing editable",
-   "detail": "A01's row trails \"Edit\" (verb: correct a posted record). Tapping it opens the pen sheet: \"Nothing left to do\", a disabled Record items, no correction. Fix: show the plain chevron until the correction decision (tasks-built-79) is made."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-b-3",
-   "target": {
-    "kind": "screen",
-    "id": "piglet-processing.sheet-todo"
-   },
-   "kind": "broken",
-   "title": "Chinese \"公猪·母猪\" calls piglets boars and sows",
-   "detail": "Boars · gilts reads 公猪·母猪 on the Piglets card and counts sheet; 母猪 is also the pen header's word for the sow (1头母猪). A farmer reads breeding boars and sows. Fix: 小公猪·小母猪 in strings.js."
-  },
-  {
    "severity": "medium",
    "source": "screen-review",
    "id": "screens-b-4",
@@ -18990,18 +18946,6 @@
     "\"Back\" carrying the count, no primary"
    ],
    "recommendation": "\"Tick 12\": an existing verb with exactly this meaning."
-  },
-  {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-c-1",
-   "target": {
-    "kind": "screen",
-    "id": "pig-profile.production-task"
-   },
-   "kind": "broken",
-   "title": "Pregnancy outcomes unstyled; the chosen outcome is invisible",
-   "detail": "Each outcome runs title into description, a tick sits under every option, and tapping Not in pig changes nothing visible before Save and complete enables. A mis-tap removes the sow from her batch unseen. Fix: render the outcomes with ChoiceList (radio) so one selected state shows."
   },
   {
    "severity": "high",
