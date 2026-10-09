@@ -349,7 +349,9 @@
         tone: used ? 'refused' : '', hint: used ? T('id.taken', { no: used }) : g.id.suggested ? T(notch() ? 'give.use.n' : 'give.use', { no: no }) : '', className: 'sp-give-measure' }) +
         (notch() ? '' : UI.iconButton({ action: 'give-scan', icon: I('scan'), label: T('pg.scan'), className: 'sp-give-scan' })) + '</div>';
       body += K.choice({ action: 'give-sex', label: T('id.sex'), options: [{ value: 'boar', label: T('boar'), pressed: g.sex === 'boar' }, { value: 'gilt', label: T('gilt'), pressed: g.sex === 'gilt' }] });
-      body += UI.measure({ label: T('give.kg'), optional: T('optional'), value: g.kg, unit: 'kg', placeholder: '—', action: 'give-field', key: 'kg', active: g.field === 'kg', className: 'sp-give-measure' });
+      /* weight is optional: the optional row until it is being typed, then the Measure on the Numpad */
+      body += g.field === 'kg' ? UI.measure({ label: T('give.kg'), optional: T('optional'), value: g.kg, unit: 'kg', placeholder: '—', action: 'give-field', key: 'kg', active: true, className: 'sp-give-measure' })
+        : UI.optionalRow({ label: T('give.kg'), optionalWord: T('optional'), value: g.kg ? T('kg', { w: g.kg }) : '', icon: I('plus'), editIcon: I('edit'), action: 'give-field', key: 'kg' });
     }
     var ready = !giveUsed(p) && giveNo(p) && g.sex;
     var primary = { label: T(g.edit ? 'give.fix' : 'give.save'), action: 'give-save', register: 'primary', waiting: !ready };

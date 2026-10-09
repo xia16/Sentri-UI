@@ -535,3 +535,20 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 
 /* Utility: visually hidden, still read (a live status line, a label for assistive tech only). */
 .st-visually-hidden { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+/* OptionalRow: the one look of every optional input: label (row-title) · muted "Optional" · trailing icon action. See Field/README. */
+.st-optional-row{display:flex;align-items:center;gap:12px;width:100%;min-height:var(--touch-min);margin:12px 0 0;padding:0 0 0 var(--space-row-x);border:0;border-radius:var(--radius-control);background:var(--well);text-align:left;font-family:var(--font-sans);color:var(--ink);touch-action:manipulation}
+.st-optional-row:active{background:var(--press)}
+.st-optional-row:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.st-optional-row:disabled{opacity:.5}
+.st-optional-copy{display:flex;flex-direction:column;flex:1;min-width:0;padding:7px 0}
+.st-optional-head{display:flex;align-items:baseline;gap:8px;min-width:0}
+.st-optional-label{font:500 var(--type-row-title-size)/1.4 var(--font-sans);color:var(--ink)}
+.st-optional-word{font:400 var(--type-description-size,11px)/1.4 var(--font-sans);color:var(--muted)}
+.st-optional-answer{font:400 12px/1.5 var(--font-sans);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-optional-answer:empty{display:none}
+.st-optional-act{display:grid;place-items:center;flex:none;width:var(--touch-min);height:var(--touch-min);color:var(--ink)}
+.st-optional-act svg{box-sizing:content-box;width:16px;height:16px;padding:6px;border:var(--ring-width-fine) solid var(--muted);border-radius:50%;background:var(--paper);fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.st-optional-body{margin:8px 0 0}
+.st-optional-body[hidden]{display:none}
+.st-optional-body .field{margin-top:0}

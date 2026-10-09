@@ -54,8 +54,6 @@
 .inspection-phone .feed-pig-row:last-child{border-bottom:0;}
 .inspection-phone .feed-reading{font:500 12px var(--mono);}
 .inspection-phone .feed-change-state{max-width:145px;line-height:1.35;}
-.inspection-phone .feed-optional-controls{gap:10px;}
-.inspection-phone .feed-optional-item{min-height:44px;border:1px solid #e8eddf;border-radius:10px;background:var(--surface);}
 .inspection-phone .plan-preview{padding:8px 12px;border:1px solid #dfe8d8;border-radius:10px;background:var(--green-wash);}
 .inspection-phone .individual-ration{border:1px solid #dfe8d8;}
 
