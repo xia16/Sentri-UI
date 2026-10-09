@@ -37,3 +37,8 @@ export function localizeFeed(root){
     }
   }
 }
+
+export function recordReason(text){
+  const copy=Object.entries(registry.strings).find(([id,copy])=>id.startsWith('record.reason.')&&copy.en===text)?.[1];
+  return copy?copy[language]:text;
+}

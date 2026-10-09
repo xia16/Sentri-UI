@@ -1,4 +1,4 @@
-import {localizeFeed} from './feed-locale.js';
+import {localizeFeed,recordReason} from './feed-locale.js';
 import './unit-snapshot.js';
 /* Inspection study: in-memory sample farm plans; no production writes. */
 (()=>{
@@ -33,7 +33,7 @@ const waitingReasons={
 };
 const button=(a,label,cls='button',v='',disabled=false,reason='')=>{
  if(cls==='dock-search')return SentriUI.iconButton({action:a,value:v,icon:icon('search'),label:'Search ear tag',className:cls});
- if(cls.split(' ').includes('button')||cls.split(' ').includes('text-button')||cls==='task-history')return SentriUI.button({label:'',register:cls.includes('primary')?'primary':cls.includes('text-button')||cls==='task-history'?'text':'secondary',action:a,value:v,waiting:disabled,className:cls==='task-history'?'':cls.split(' ').filter(c=>c!=='button'&&c!=='primary').join(' '),reason:disabled?(reason||waitingReasons[a]||'Choose an option to continue') :'',attrs:entryFor(a,label)?{'data-entry':entryFor(a,label)}:{}}).replace('<span class="st-button-label"></span>',label);
+ if(cls.split(' ').includes('button')||cls.split(' ').includes('text-button')||cls==='task-history')return SentriUI.button({label:'',register:cls.includes('primary')?'primary':cls.includes('text-button')||cls==='task-history'?'text':'secondary',action:a,value:v,waiting:disabled,className:cls==='task-history'?'':cls.split(' ').filter(c=>c!=='button'&&c!=='primary').join(' '),reason:disabled?recordReason(reason||waitingReasons[a]||'Choose an option to continue'):'',attrs:entryFor(a,label)?{'data-entry':entryFor(a,label)}:{}}).replace('<span class="st-button-label"></span>',label);
  return `<button type="button" class="${cls}"${entryFor(a,label)?` data-entry="${entryFor(a,label)}"`:''} data-action="${a}" data-value="${esc(v)}"${disabled?' disabled':''}>${label}</button>`;
 };
 const ib=(a,k,label,v='')=>SentriUI.iconButton({action:a,icon:icon(k),label,value:v});
