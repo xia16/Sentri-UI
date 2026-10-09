@@ -1,3 +1,4 @@
+/* Retired — use ux/design-system/components/bundle.* (kept for the owner to delete; no page loads this file). */
 /* Shared visual vocabulary for the current Sentri prototypes. */
 :root{--ground:#f3f4ee;--paper:#fff;--app-background:#f6f7f1;--surface:#f8faf5;--ink:#20291f;--muted:#657060;--line:#dfe4d8;--well:#eef1e7;--wash:#eef1e7;--green:#276640;--green-wash:#eaf2e5;--amber:#896017;--red:#a13a2d;--focus:#577fa6}
 body{background:var(--ground);color:var(--ink)}

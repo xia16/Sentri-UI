@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-require('./sentri-components.js');
+require('../design-system/components/bundle.js');
 require('./astra-surfaces.js');
 const surfaces = globalThis.AstraSurfaces;
 require('./inspection-astra-concept.js');

@@ -34,13 +34,13 @@
 
 /* ---- TaskHeader: back + the task's name ---- */
 .tk-header { flex: none; min-height: 60px; display: flex; align-items: center; gap: var(--space-heading); padding: 4px var(--space-gutter) 10px; background: var(--app-background); }
-.tk-header-back { flex: none; display: grid; place-items: center; width: var(--touch-min); height: var(--touch-min); padding: 0;
+.tk-header-back { flex: none; display: grid; place-items: center; width: var(--tap-min); height: var(--tap-min); padding: 0;
   background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink); }
 .tk-header-back svg { width: 18px; height: 18px; }
 .tk-header-title { flex: 1; min-width: 0; margin: 0; font: 500 var(--type-page-title-size)/1.25 var(--font-sans); letter-spacing: -0.6px; color: var(--ink); }
 
 /* ---- TaskLatest: the last-record line ---- */
-.tk-latest { display: flex; align-items: center; min-height: var(--touch-min); margin: 0; padding: 0 var(--space-gutter) 8px;
+.tk-latest { display: flex; align-items: center; min-height: var(--tap-min); margin: 0; padding: 0 var(--space-gutter) 8px;
   font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
 .tk-latest > p { margin: 0; }
 .tk-latest strong { font-weight: 500; color: var(--ink); }
@@ -92,7 +92,7 @@
 .tk-lens { position: sticky; top: 0; z-index: 2; padding: 6px 0 9px; border-bottom: 1px solid transparent; background: var(--app-background); }
 .tk-lens-bar { display: flex; gap: 7px; margin: 0 var(--space-panel); }
 .tk-lens-tabs { flex: 1; min-width: 0; display: flex; gap: 1px; padding: 3px; background: var(--well); border: 1px solid var(--line); border-radius: var(--radius-segment); }
-.tk-lens-tab { flex: 1; min-width: 0; min-height: var(--touch-min); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+.tk-lens-tab { flex: 1; min-width: 0; min-height: var(--tap-min); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
   padding: 4px 6px; border: 0; border-radius: var(--radius-tab); background: transparent; color: var(--muted); font: 400 var(--type-description-size) var(--font-sans); }
 .tk-lens-tab[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px #20271f0d; }
 .tk-lens-count { font: 500 var(--type-meta-size) var(--font-mono); color: var(--muted); }
@@ -105,7 +105,7 @@
 .tk-group { flex-shrink: 0; overflow: clip; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); box-shadow: 0 2px 8px #20291f0a; }
 .tk-group-head { display: flex; align-items: center; gap: 10px; padding: 2px var(--space-row-x);
   background: var(--surface); border-bottom: 1px solid var(--line); font: var(--type-description-size) var(--font-sans); color: var(--muted); }
-.tk-group-door { flex: 1; min-width: 0; display: flex; align-items: center; gap: 5px; min-height: var(--touch-min); padding: 0; margin: 0;
+.tk-group-door { flex: 1; min-width: 0; display: flex; align-items: center; gap: 5px; min-height: var(--tap-min); padding: 0; margin: 0;
   border: 0; border-radius: 6px; background: transparent; color: var(--muted); font: inherit; text-align: left; }
 .tk-group-title { font: 600 var(--type-row-title-size) var(--font-mono); color: var(--ink); }
 .tk-group-title[data-face="word"] { font-family: var(--font-sans); }
@@ -153,7 +153,7 @@ label.tk-row { cursor: pointer; }
 /* ---- TaskDock: the room's bottom tools ---- */
 .tk-dock { flex: none; position: relative; display: flex; align-items: center; gap: 9px; padding: var(--space-heading) var(--space-panel) var(--space-section);
   background: var(--paper); border-top: 1px solid var(--line); }
-.tk-dock-primary { flex: 1; display: flex; align-items: center; justify-content: center; gap: var(--space-key-gap); min-height: var(--touch-min); padding: 10px var(--space-heading);
+.tk-dock-primary { flex: 1; display: flex; align-items: center; justify-content: center; gap: var(--space-key-gap); min-height: var(--tap-min); padding: 10px var(--space-heading);
   background: var(--ink); border: 1px solid var(--ink); border-radius: var(--radius-control); color: var(--paper); font: 500 var(--type-panel-title-size)/1.3 var(--font-sans); }
 .tk-dock-tool { flex: none; display: grid; place-items: center; width: var(--control-height); min-height: 50px; padding: 0;
   background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink); }
@@ -195,7 +195,7 @@ label.tk-row { cursor: pointer; }
 .tk-sheet-titles { flex: 1; min-width: 0; }
 .tk-sheet-title { margin: 0; font: 500 var(--type-sheet-title-size)/1.3 var(--font-sans); letter-spacing: -0.4px; color: var(--ink); }
 .tk-sheet-subtitle { margin: 6px 0 0; font: var(--type-description-size)/1.6 var(--font-sans); color: var(--muted); }
-.tk-sheet-close { flex: none; display: grid; place-items: center; width: var(--touch-min); height: var(--touch-min); padding: 0; margin: 0;
+.tk-sheet-close { flex: none; display: grid; place-items: center; width: var(--tap-min); height: var(--tap-min); padding: 0; margin: 0;
   border: 0; border-radius: var(--radius-segment); background: transparent; color: var(--ink); }
 .tk-sheet-close svg { width: var(--glyph-pad); height: var(--glyph-pad); }
 .tk-sheet-body { flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 18px var(--space-gutter-sheet) var(--space-panel); }
@@ -256,8 +256,8 @@ label.tk-row { cursor: pointer; }
 .st-stepper.tk-stepper[data-face="row"] { min-height: var(--entry-row-min); column-gap: var(--space-key-gap); }
 .st-stepper.tk-stepper[data-face="row"] + .st-stepper.tk-stepper[data-face="row"] { border-top: 1px solid var(--line); }
 .tk-stepper[data-face="row"] .st-stepper-label { font: 500 var(--type-entry-label-size)/1.4 var(--font-sans); }
-.tk-stepper[data-face="row"] .st-stepper-key { width: var(--touch-min); min-height: var(--entry-row-min); }
-.tk-stepper:is([data-face="row"], [data-face="well"]) .st-stepper-face { width: var(--touch-min); height: var(--touch-min); border: 1px solid var(--task-key-border);
+.tk-stepper[data-face="row"] .st-stepper-key { width: var(--tap-min); min-height: var(--entry-row-min); }
+.tk-stepper:is([data-face="row"], [data-face="well"]) .st-stepper-face { width: var(--tap-min); height: var(--tap-min); border: 1px solid var(--task-key-border);
   border-radius: var(--radius-control); background: var(--paper); color: var(--ink); }
 .tk-stepper[data-face="well"] .st-stepper-face { width: var(--field-height); height: var(--field-height); }
 .tk-stepper:is([data-face="row"], [data-face="well"]) .st-stepper-key:not([data-step^="-"]):not([aria-disabled="true"]) .st-stepper-face { background: var(--paper); border-color: var(--task-key-border); color: var(--ink); }
@@ -314,7 +314,7 @@ label.tk-row { cursor: pointer; }
 .tk-door-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 62px; margin: 0; padding: 15px 0;
   border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
 .tk-door-main:active { background: var(--press); }
-.tk-door[data-act] > .button { flex: none; min-height: var(--touch-min); margin: 0; padding: 0 var(--space-row-x); border-radius: var(--radius-control);
+.tk-door[data-act] > .button { flex: none; min-height: var(--tap-min); margin: 0; padding: 0 var(--space-row-x); border-radius: var(--radius-control);
   font: 500 var(--type-button-size)/1.3 var(--font-sans); }
 
 /* TaskChoice: farrowing's choice tiles (Foster: Send / Receive). */
@@ -428,9 +428,9 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .tk-radios[data-face="row"] .st-choice-inline-label { flex: 1; min-width: 0; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start; column-gap: var(--space-key-gap);
   font: 500 var(--type-entry-label-size)/1.4 var(--font-sans); }
 .tk-radios[data-face="row"] .st-choice-inline-label small { font: 400 var(--type-meta-size)/1.4 var(--font-sans); }
-.tk-radios[data-face="row"] .st-choice-inline-clear { min-height: var(--touch-min); }
+.tk-radios[data-face="row"] .st-choice-inline-clear { min-height: var(--tap-min); }
 .tk-radios[data-face="row"] .st-choice-inline-opts { flex: none; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(66px, 1fr); gap: 6px; align-self: center; }
-.tk-radios[data-face="row"] .st-choice-inline-opt.st-choice-inline-opt { justify-content: center; gap: 5px; min-width: 0; min-height: var(--touch-min); padding: 0 var(--space-row-y);
+.tk-radios[data-face="row"] .st-choice-inline-opt.st-choice-inline-opt { justify-content: center; gap: 5px; min-width: 0; min-height: var(--tap-min); padding: 0 var(--space-row-y);
   border: 1px solid var(--control-border); border-radius: 11px; font: 500 var(--type-row-title-size)/1.3 var(--font-sans); }
 .tk-radios[data-face="row"] .st-choice-inline-opt[aria-checked="true"] { border-color: var(--ink); background: var(--press); font-weight: 500; }
 .tk-radios[data-face="row"] .st-radio { width: 14px; height: 14px; border-width: var(--ring-width-fine); border-color: var(--muted); }
@@ -471,7 +471,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .tk-day-copy > small { font: var(--type-meta-size)/1.3 var(--font-mono); color: var(--muted); }
 .tk-day-copy > small > * { display: inline-block; max-width: 100%; }
 .tk-day-row[data-done] .tk-day-copy > strong { color: var(--muted); }
-.tk-day-row > .button { flex: none; min-height: var(--touch-min); margin: 0; padding: 0 var(--space-row-x); border-radius: var(--radius-control); font: 500 var(--type-button-size)/1.3 var(--font-sans); }
+.tk-day-row > .button { flex: none; min-height: var(--tap-min); margin: 0; padding: 0 var(--space-row-x); border-radius: var(--radius-control); font: 500 var(--type-button-size)/1.3 var(--font-sans); }
 
 /* TaskDock unit: the labelled place control (B1 / Go to pen). */
 .tk-dock-unit { flex: none; display: flex; align-items: center; gap: 9px; min-height: 50px; margin: 0; padding: 0 3px; border: 0; background: var(--paper); color: var(--ink); text-align: left; }
@@ -493,14 +493,14 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 
 /* ---- TaskChips (candidate): one row of filter chips over a task list (README: TaskChips/README.md) ----
    Farrowing's segment faces on separate chips: a `well` chip with a 1px `line`, `radius-segment`; the chosen chip is the
-   pressed segment (`paper`, `ink` 500, the segment shadow). 44px targets; the count in mono inside the chip. The track
+   pressed segment (`paper`, `ink` 500, the segment shadow). 48px targets; the count in mono inside the chip. The track
    scrolls sideways; a trailing spacer the gutter's width keeps the last chip clear of the edge fade. */
 .tk-chips { padding: 6px 0 9px; background: var(--app-background); }
 .tk-chips-track { display: flex; gap: var(--space-key-gap); overflow-x: auto; padding: 0 0 0 var(--space-gutter); scrollbar-width: none;
   -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--space-gutter)), transparent); mask-image: linear-gradient(to right, #000 calc(100% - var(--space-gutter)), transparent); }
 .tk-chips-track::-webkit-scrollbar { display: none; }
 .tk-chips-track::after { content: ""; flex: none; width: var(--space-gutter); }
-.tk-chips-chip { flex: none; display: inline-flex; align-items: center; gap: var(--space-key-gap); min-height: var(--touch-min); margin: 0; padding: 0 var(--space-row-x);
+.tk-chips-chip { flex: none; display: inline-flex; align-items: center; gap: var(--space-key-gap); min-height: var(--tap-min); margin: 0; padding: 0 var(--space-row-x);
   border: 1px solid var(--line); border-radius: var(--radius-segment); background: var(--well); color: var(--tab-ink);
   font: 400 var(--type-row-title-size)/1.2 var(--font-sans); white-space: nowrap; cursor: pointer; }
 .tk-chips-chip[aria-checked="true"] { background: var(--paper); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px #20271f0d; }

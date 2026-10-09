@@ -6,7 +6,7 @@ Call `SentriUI.segment({ options: [[value, label], …], active, action, ariaLab
 
 **How it looks**
 - A `well` track with a `line` border and `radius-segment`.
-- The active button turns `paper` and 500 weight. Every button is at least 44px high.
+- The active button turns `paper` and 500 weight. Every button is at least 48px (`tap-min`) high.
 
 **What the caller provides**
 - Labels that name the animal's state, never a verb: "Open / Mated", "Not in heat / In heat". "To check / Checked" is the one licensed action phrase.

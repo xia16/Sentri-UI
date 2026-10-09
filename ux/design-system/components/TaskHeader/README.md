@@ -6,11 +6,11 @@ The top of a task: **back + the task's name**, then **the last-record line** as 
 
 **Anatomy — header** (`.tk-header`, `data-ds="TaskHeader"`)
 - A row, `min-height` 60px, padded `4px space-gutter 10px`, `space-heading` (12px) gap, `app-background`, outside the scroller (it never scrolls).
-- **Back** (`.tk-header-back`): `touch-min` square (44px), `paper`, 1px `line`, `radius-control`; the chevron-left glyph at 18px. It leaves the task (to Today).
+- **Back** (`.tk-header-back`): `tap-min` square (48px), `paper`, 1px `line`, `radius-control`; the chevron-left glyph at 18px. It leaves the task (to Today).
 - **Title** (`.tk-header-title`, `h1`): `page-title` 22px/500, line-height 1.25, −0.6px tracking, `ink`.
 
 **Anatomy — last record** (`.tk-latest`, `data-ds="TaskLatest"`)
-- `touch-min` tall, text centred, padded `0 space-gutter 8px`, `description` 11px/1.5 `muted`: `Last record` **`08:41`** `· G. Hansen`. The time is 500 `ink`.
+- `tap-min` tall, text centred, padded `0 space-gutter 8px`, `description` 11px/1.5 `muted`: `Last record` **`08:41`** `· G. Hansen`. The time is 500 `ink`.
 
 **States**
 - Default only. Back takes the global 3px `focus` ring; pressed and disabled are not drawn.

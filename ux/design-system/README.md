@@ -41,7 +41,7 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
 
 - Single column, 390px phone canvas. Gutters: `space-gutter` (18px) for headers and drawer footers, `space-gutter-sheet` (21px) for full-page bodies; at 370px and below every gutter and panel padding drops to `space-gutter-narrow` (12px).
 - Panels pad `space-panel` (16px). Rows pad `space-row-y` × `space-row-x` (12 × 14) with a `row-min` of 68px. Sections sit `space-section` (24px) apart; action categories `space-action-section` (32px).
-- **Touch:** nothing tappable is smaller than `touch-min` (44px). Footer buttons, Back and icon buttons are `control-height` (48px); fields are `field-height` (46px); chooser rows `choice-row-min` (56px).
+- **Touch:** nothing tappable is smaller than `tap-min` (48px). Footer buttons, Back and icon buttons are `control-height` (48px); fields are `field-height` (48px); chooser rows `choice-row-min` (56px).
 - Footers pad `14px 18px 28px`; the bottom 28px leaves room for the 92×4px `handle` bar.
 
 ### Surfaces, borders, radii and elevation

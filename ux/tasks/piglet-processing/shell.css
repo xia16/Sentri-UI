@@ -12,7 +12,7 @@
 .pp-hdr-title { flex: 1; min-width: 0; }
 .pp-hdr-context { display: flex; justify-content: space-between; align-items: center; gap: var(--space-key-gap); }
 /* The litter header's door (to the sow page): a bare button around text + ›. */
-.pp-door { display: inline-flex; align-items: center; gap: var(--space-key-gap); min-height: var(--touch-min); padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; }
+.pp-door { display: inline-flex; align-items: center; gap: var(--space-key-gap); min-height: var(--tap-min); padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; }
 .pp-door svg { width: var(--glyph-key); height: var(--glyph-key); flex: none; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 /* The two tools sit in a two-column grid (the buttons are Button's tool register, ADR 0002). */
 .pp-tools { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-footer-gap); }
@@ -46,7 +46,7 @@
    16px glyph 5px before it; the draft word 10px muted on its own line. Farrowing shows three tools (gap 8); processing's
    four (Edit · Record death · Set count · Move, RULINGS round 5) sit 6px apart so they fit one line at 390px. */
 .pp-toolrow { display: flex; gap: 6px; margin: 0; }
-.pp-toolrow .pp-tool { flex: 1 1 auto; min-width: var(--touch-min); min-height: var(--touch-min); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; column-gap: 5px;
+.pp-toolrow .pp-tool { flex: 1 1 auto; min-width: var(--tap-min); min-height: var(--tap-min); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; column-gap: 5px;
   margin: 0; padding: 8px 6px; border: 1px solid var(--line); border-radius: var(--radius-segment); background: var(--paper); color: var(--ink);
   font: 500 var(--type-identifier-size)/1.3 var(--font-sans); white-space: nowrap; }
 .pp-toolrow .pp-tool:active { background: var(--press); }

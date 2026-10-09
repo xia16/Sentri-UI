@@ -14,7 +14,7 @@ Call `SentriUI.heading({ title, kind, icon, description, meta, action, level })`
 - `title`: sentence case, and a noun ("Litter", "Sow details").
 - `description`: one `muted` line, only when it tells the worker something the title does not.
 - `meta`: short, and never a sentence ("Mon 09:42", "3 of 12").
-- `action`: raw HTML for one text button or link. The component extends its hit area to 44px.
+- `action`: raw HTML for one text button or link. The component extends its hit area to `tap-min` (48px).
 
 **Do and don't**
 - Do use `icon` only where the icon names the subject: a feed heading takes `SentriIcons.icon('feed')`. The icon is 16px and `muted`.

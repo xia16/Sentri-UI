@@ -6,11 +6,10 @@ const path = require('node:path');
 
 const read = f => fs.readFileSync(path.join(__dirname, f), 'utf8');
 const iconsContext = {};
-vm.runInNewContext(read('sentri-icons.js'), iconsContext);
-const uiContext = {};
-vm.runInNewContext(read('sentri-components.js'), uiContext);
+// the one implementation: ux/design-system/components/bundle.js (SentriIcons + SentriUI)
+vm.runInNewContext(read('../design-system/components/bundle.js'), iconsContext);
 const icons = iconsContext.SentriIcons;
-const ui = uiContext.SentriUI;
+const ui = iconsContext.SentriUI;
 
 // The gallery scenario switcher is prototype chrome, not app UI; every other
 // native <select> must have been replaced by the shared picker components.

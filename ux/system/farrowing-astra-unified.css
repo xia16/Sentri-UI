@@ -15,14 +15,14 @@
 .farrowing-phone .utility-header h3{font-size:21px;letter-spacing:-.7px;margin:0}
 .farrowing-phone .utility-header p{font-size:11px;line-height:1.6;color:var(--muted);margin:6px 0 0}
 .farrowing-phone .sow-header{border-bottom:1px solid var(--line);margin-bottom:12px}
-.farrowing-phone .sow-title-link{display:inline-flex;align-items:center;gap:8px;background:transparent;min-height:44px;padding:8px 4px;margin:-8px -4px;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left}
+.farrowing-phone .sow-title-link{display:inline-flex;align-items:center;gap:8px;background:transparent;min-height:var(--tap-min);padding:8px 4px;margin:-8px -4px;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left}
 .farrowing-phone .sow-title-link>svg{width:16px;height:16px;color:var(--muted);stroke-width:1.8}
 .farrowing-phone .utility-header>.sow-header-actions{display:flex;flex-direction:row;align-items:center;align-self:flex-start;gap:6px;flex:none}
 .farrowing-phone .sow-header-actions .text-button{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:12px;font-size:13px;color:var(--ink);font-weight:600;white-space:nowrap}
-.farrowing-phone .sow-header-actions .icon-button{width:44px;height:44px;flex:none}
+.farrowing-phone .sow-header-actions .icon-button{width:var(--tap-min);height:var(--tap-min);flex:none}
 .farrowing-phone .edit-header{border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:0}
 .farrowing-phone .sheet-body>.segment:first-child{margin-top:0}
-.farrowing-phone .edit-header .text-button{padding:0 4px;min-width:44px;color:var(--ink)}
+.farrowing-phone .edit-header .text-button{padding:0 4px;min-width:var(--tap-min);color:var(--ink)}
 .farrowing-phone .edit-header .text-button:disabled{background:transparent;color:var(--muted);opacity:.5}
 .farrowing-phone .edit-body .change-summary{margin:0 0 4px;padding:6px 12px;font-size:11px;line-height:1.5}
 .farrowing-phone .edit-body .change-list{font:10px/1.5 var(--sans);gap:2px 12px}
@@ -31,7 +31,7 @@
 .farrowing-phone .edit-counts{display:flex;flex-direction:column;flex:1;min-height:420px}
 .farrowing-phone .edit-counts .entry-row{flex:1;min-height:60px}
 .farrowing-phone .edit-counts .entry-label{font-size:15px}
-.farrowing-phone .edit-finish-door{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;margin:4px 0 0;padding:0;background:transparent;font-size:12px;text-align:left}
+.farrowing-phone .edit-finish-door{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:var(--tap-min);margin:4px 0 0;padding:0;background:transparent;font-size:12px;text-align:left}
 .farrowing-phone .edit-finish-door>svg{width:14px;height:14px;color:var(--muted)}
 .farrowing-phone .sheet[data-view="editFinish"] .finish-question{margin-top:12px}
 .farrowing-phone .sheet[data-view="editFinish"] .finish-form-details{margin-bottom:12px}
@@ -66,7 +66,7 @@
 .farrowing-phone .completed-facts dt{display:flex;align-items:center;min-height:16px;font-size:11px;line-height:1.4;color:#77816e;margin-bottom:5px}
 .farrowing-phone .completed-facts dd{margin:0;font-size:14px;font-weight:500;line-height:1.4;color:var(--ink);font-variant-numeric:tabular-nums}
 .farrowing-phone .completed-facts small{display:block;margin-top:5px;font-size:10px;font-weight:400;line-height:1.5;color:#77816e;overflow-wrap:anywhere}
-.farrowing-phone .death-breakdown-link{display:flex;align-items:center;gap:4px;min-height:44px;min-width:44px;margin:-10px 0;padding:0;background:transparent;font:inherit;color:inherit;white-space:nowrap}
+.farrowing-phone .death-breakdown-link{display:flex;align-items:center;gap:4px;min-height:var(--tap-min);min-width:var(--tap-min);margin:-10px 0;padding:0;background:transparent;font:inherit;color:inherit;white-space:nowrap}
 .farrowing-phone .death-breakdown-link svg{width:12px;height:12px;color:var(--muted)}
 .farrowing-phone .death-breakdown-facts{margin:0;padding:2px 14px;background:#f6f7f2;border-radius:10px}
 .farrowing-phone .death-breakdown-facts>div{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:9px 0;font-size:13px;line-height:1.5}
@@ -177,7 +177,7 @@
 .farrowing-phone .finish-pending{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border-radius:10px;background:#fff5df;color:var(--amber)}
 .farrowing-phone .finish-pending strong{display:block;font-size:11px;line-height:1.5;font-weight:600}
 .farrowing-phone .finish-pending span{display:block;font-size:10px;line-height:1.5}
-.farrowing-phone .finish-review-link{display:flex;align-items:center;gap:4px;min-height:44px;padding:0;background:transparent;font-size:11px;font-weight:600}
+.farrowing-phone .finish-review-link{display:flex;align-items:center;gap:4px;min-height:var(--tap-min);padding:0;background:transparent;font-size:11px;font-weight:600}
 .farrowing-phone .finish-review-link svg{width:13px;height:13px}
 .farrowing-phone .sheet[data-view="finish"] .sheet-footer{padding-top:14px}@media(max-width:370px){
  .farrowing-phone .finish-header{padding-bottom:12px;margin-bottom:10px}
@@ -332,7 +332,7 @@
 /* Record tools belong to the litter summary; only exit/completion stays fixed. */
 .farrowing-phone .record-inline-actions{margin-top:12px}
 .farrowing-phone .record-inline-actions .record-action-group{display:grid;grid-template-columns:.65fr 1.15fr 1.15fr;gap:8px;min-width:0;border:0;padding:0}
-.farrowing-phone .record-inline-actions .record-toolbar-action{flex-direction:row;flex-wrap:wrap;gap:5px;min-height:44px;padding:8px 6px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-size:12px;font-weight:500}
+.farrowing-phone .record-inline-actions .record-toolbar-action{flex-direction:row;flex-wrap:wrap;gap:5px;min-height:var(--tap-min);padding:8px 6px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-size:12px;font-weight:500}
 .farrowing-phone .record-inline-actions .record-toolbar-action svg{width:16px;height:16px;flex:none}
 .farrowing-phone .record-inline-actions .record-toolbar-action small{flex-basis:100%;font-size:10px;color:var(--muted)}
 .farrowing-phone .record-inline-actions .record-toolbar-action:hover{background:var(--surface,#f5f6f1)}

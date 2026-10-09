@@ -1,3 +1,4 @@
+/* Retired — use ux/design-system/components/bundle.* (kept for the owner to delete; no page loads this file). */
 /* Shared reading components. Business rules and navigation stay with callers. */
 (function(root){
   'use strict';

@@ -5,7 +5,7 @@ The mobile choice control that replaces every native `<select>`. It is a trigger
 Call `SentriUI.pickerField({ label, value, display, placeholder, action, key, disabled })` for the trigger. For the sheet's option list, call `SentriUI.pickerOptions({ options, selected, action })`. Each option is `[value, label, subtitle?, group?]`.
 
 **How it looks**
-- The trigger matches a text field: at least 46px high (`field-height`), a `control-border` border, `radius-control`, 14px text and a `muted` chevron.
+- The trigger matches a text field: at least 48px high (`field-height`), a `control-border` border, `radius-control`, 14px text and a `muted` chevron.
 - Options are 56px rows split by `rule`. The selected option is 600 weight with a `green` check.
 - Ungrouped options sit in one `inset`. Grouped options get a titled panel per group.
 

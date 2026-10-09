@@ -13,7 +13,7 @@ Call `SentriUI.stepper({ label, description, value, min, max, step, key, action,
   - The label is `choice-label` (14px at 600) in `ink`. The description is `description` (11px) in `muted`.
   - When steppers stack, `rule` divides them, never above the first.
 - **Keys.**
-  - Each key's face is `field-height` (46px) square with `radius-control`. The faces are `space-key-gap` (8px) from the value.
+  - Each key's face is `field-height` (48px) square with `radius-control`. The faces are `space-key-gap` (8px) from the value.
   - Each key's hit area spans the whole row height, so a gloved tap anywhere in the row's column counts.
   - − is `paper` with a `control-border` edge and an `ink` glyph.
   - **+ is filled `ink` with a `paper` glyph.**
@@ -22,7 +22,7 @@ Call `SentriUI.stepper({ label, description, value, min, max, step, key, action,
   - The cell is 3ch wide, or 4ch when `max ≥ 1000`, so the keys never move as the count gains a digit.
   - The value is a `role="spinbutton"` with `aria-valuenow`, `aria-valuemin` and `aria-valuemax`, and is labelled by the label.
 - **Status region (the hint line).** One persistent `role="status"` line under the row, always mounted. Both keys and the value point to it with `aria-describedby`. It is reserved, so no row slides under the thumb when a pointer appears.
-  - It is `touch-min` (44px) tall where pointers can appear: the hero, `min > 0`, or `pointers` given.
+  - It is `tap-min` (48px) tall where pointers can appear: the hero, `min > 0`, or `pointers` given.
   - It is one text line where only a ceiling note can appear (`max` given).
   - In a row that can do neither, it takes no space.
   - `reserveHint: false` or `true` overrides this.
@@ -43,7 +43,7 @@ Call `SentriUI.stepper({ label, description, value, min, max, step, key, action,
 - **Disabled: the floor-gray** (see *States* in the design-system README).
   - − at the floor (`value <= min`) and + at the ceiling (`value >= max`) take `disabled-fill` with a `disabled-ink` glyph.
   - They stay `aria-disabled` and tappable. The host answers the tap in the hint line:
-    - At the floor, with **pointers**. These are text actions (the fourth register: 13px/600, no container, at least 44px): `Found dead? Record dead` · `Wrong count? Edit`.
+    - At the floor, with **pointers**. These are text actions (the fourth register: 13px/600, no container, at least 48px): `Found dead? Record dead` · `Wrong count? Edit`.
     - At the ceiling, with **host-supplied copy**, which is required (`Weak and deformed can't pass 11 alive`).
   - − is present even when there is nothing to undo.
 - **Focus:** a 3px `focus` ring, offset 2px, on the key face. The spinbutton value takes the same ring.
