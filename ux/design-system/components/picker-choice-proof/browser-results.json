@@ -1,0 +1,146 @@
+{
+  "errors": [],
+  "results": [
+    {
+      "variant": "PickerField/single",
+      "small": [],
+      "overflow": false
+    },
+    {
+      "variant": "PickerField/multi",
+      "small": [],
+      "overflow": false
+    },
+    {
+      "variant": "PickerField/cascade",
+      "small": [],
+      "overflow": false
+    },
+    {
+      "variant": "PickerField/cascade-multi",
+      "small": [],
+      "overflow": false
+    },
+    {
+      "variant": "ChoiceList/navigate",
+      "small": [],
+      "overflow": false
+    },
+    {
+      "variant": "ChoiceList/single",
+      "small": [],
+      "overflow": false
+    },
+    {
+      "variant": "ChoiceList/multi",
+      "small": [],
+      "overflow": false
+    },
+    {
+      "variant": "ChoiceList/radio",
+      "small": [],
+      "overflow": false
+    },
+    {
+      "variant": "ChoiceList/inline",
+      "small": [],
+      "overflow": false
+    },
+    {
+      "screen": "workbench.choose-unit",
+      "url": "/ux/system/home-astra-prototype.html?layout=focus&section=farrowing",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "workbench.sections",
+      "url": "/ux/system/home-astra-prototype.html?view=sections",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "farrowing.death",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "farrowing.finish",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "farrowing.edit",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "farrowing.born",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "farrowing.edit-finished",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "piglet-processing.adjust-count",
+      "url": "/ux/tasks/piglet-processing/simple/index.html?pen=A03",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "piglet-processing.move-piglets",
+      "url": "/ux/tasks/piglet-processing/simple/index.html?pen=A03",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "pig-profile.log",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "health-record.edit-finding",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "health-record.record-health",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "health-record.condition-picker",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "health-record.resolve-conditions",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "health-record.treatment",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "ready": true,
+      "small": []
+    },
+    {
+      "screen": "health-record.medicine-picker",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "ready": true,
+      "small": []
+    }
+  ]
+}

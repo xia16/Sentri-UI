@@ -1,3 +1,4 @@
+require('../design-system/components/bundle.js');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 require('../design-system/components/bundle.js');

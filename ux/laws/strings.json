@@ -23,6 +23,18 @@
     "Complete": "rooms and tasks are ended, not completed; say End task or Finish farrowing; the DS README's 'Complete' ban stands"
   },
   "strings": {
+    "ds.picker.select": {"en": "Select", "zh": "请选择", "kind": "label"},
+    "ds.picker.none": {"en": "None", "zh": "未选择", "kind": "label"},
+    "ds.picker.selected": {"en": "{n} selected", "zh": "已选 {n} 项", "kind": "label"},
+    "ds.picker.search": {"en": "Search all options", "zh": "搜索所有选项", "kind": "label"},
+    "ds.picker.all": {"en": "All", "zh": "全部", "kind": "label"},
+    "ds.picker.loading": {"en": "Loading options…", "zh": "正在加载选项…", "kind": "label"},
+    "ds.picker.empty": {"en": "No options available.", "zh": "暂无可选项。", "kind": "label"},
+    "ds.picker.no_match": {"en": "No options match “{query}”.", "zh": "没有与“{query}”匹配的选项。", "kind": "label"},
+    "ds.picker.options": {"en": "{n} options", "zh": "{n} 个选项", "kind": "label"},
+    "ds.picker.done": {"en": "Done", "zh": "完成", "kind": "action"},
+    "ds.picker.done_count": {"en": "Done · {n}", "zh": "完成 · {n}", "kind": "action"},
+    "ds.picker.conditions": {"en": "Conditions", "zh": "疾病与症状", "kind": "label"},
     "act.back": {"en": "Back", "zh": "返回", "kind": "action"},
     "act.clear": {"en": "Clear", "zh": "清除", "kind": "action"},
     "act.close": {"en": "Close", "zh": "关闭", "kind": "action"},
