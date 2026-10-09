@@ -1,0 +1,1292 @@
+[
+ {
+  "id": "inspection-group-3",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.editor"
+  },
+  "kind": "broken",
+  "severity": "high",
+  "title": "Adjust feed screen opens the walk list, not the editor",
+  "detail": "Bare and in the atlas phone, feed-plan.editor has no preset or steps, so it renders the plain walk. The most important feed screen cannot be reviewed.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-4",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.end-date"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "End date and note screen opens the walk list",
+  "detail": "No preset or steps on this screen, so it renders the unit walk. The date and note form that the notes describe is not shown.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-5",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.pig"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Pig feed plan screen opens the walk list",
+  "detail": "No preset or steps; the page that should show the Feeding block and Base curve renders the walk instead.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-6",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.animal-types"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Boar and piglet rows are off-screen when opened",
+  "detail": "The screen should show boars and piglets but opens at the top (C1 sow rows); the B1 and P1 pens sit far below the fold, so its point is not visible.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-7",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.care-states"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Hospital-care tag is not in view on the care-levels screen",
+  "detail": "The notes point at Diarrhoea on 000801 with Move to hospital pen, but the screen opens at the top; that row is below the fold, so the four care levels are not seen together.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-8",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.mixed"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Sow 000306 reads 'Gestation · 40 days' here, '—' on the walk",
+  "detail": "The record header shows 40 days, but the walk and pig-profile.empty show 'Gestation · —' (no stage start). Same pig, two stage readings.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-9",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.ongoing"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Sow 000281 has different age and breed on two health screens",
+  "detail": "health-record.ongoing shows 1080 days and breed '—'; health-record.many shows 1280 days and Yorkshire. Same ear tag, conflicting data.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-10",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.production-task"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Last outcome card is clipped at the sheet edge",
+  "detail": "Recheck later is cut off at the bottom of the outcome list, with its border and radius cropped before the Note field.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-11",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.walk"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Pen header counts and feed total ignore the active filter",
+  "detail": "The count '3 pigs' and the kg total cover all pigs while rows show only filtered pigs. The total does not match the rows a worker sees.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-12",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.walk"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Plural not handled: '1 days', '1 days old', '1 days ago'",
+  "detail": "An ongoing condition on day 1 reads '1 days'; pig-profile Age and Last service repeat the fault. Needs a plural rule in the copy.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-13",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.walk"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Check-in author and times are fixed text (G. Hansen, 06:40, 09:41)",
+  "detail": "'Last check-in', the walk log and the confirmation use constants, not the signed-in worker and real times. A developer cannot tell what is real.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-14",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.pen-signals"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "An open equipment fault has no sign on the list",
+  "detail": "The screen should show a pen with a note and a fault, but it renders like the walk: no fault mark exists, and the fault shows only in the pen log after it is reported.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-15",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.go-to-pen"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Pen peek has a fault line that is never filled",
+  "detail": "The preview carries a fault line in code but nothing feeds it. A pen of unknown feeding mode also reads 'Ad-lib' in the peek feed line.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-16",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.finding"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Finding day count is stored as 1 and never advances",
+  "detail": "'Day N' is the urgency cue on rows and tags, but the prototype never increments it. Seeded findings also show 'Recorded — · —'.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-17",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.end-date"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Feed end date passes and nothing returns the pig to the curve",
+  "detail": "The end date is a plain date; no rule restores the pig to the base curve when it passes, so the 'until' promise is empty.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-18",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.editor"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Feed amounts show one decimal on rows, two in the editor",
+  "detail": "A pig row reads 2.6 kg/day while the editor shows 2.64; the same number reads differently on two screens.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-19",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.find-pig"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "Search, review and scan show 'Gestating'; the row says 'Gestation'",
+  "detail": "Find, Selected and Scan sheets use the raw stage word, the walk row uses stage and days. Same pig, two stage strings.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-20",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.measure"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Weight, temperature and backfat accept any value above 0",
+  "detail": "No upper bound or normal range; a typo of 1800 kg saves. In bulk, one invalid row blocks the whole save.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-21",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.measure"
+  },
+  "kind": "broken",
+  "severity": "low",
+  "title": "After a reading, the sheet drops to the walk, not the pig",
+  "detail": "Reading, body condition and note forms return to the walk list; task, miscarriage and batch forms return to the record. One sheet family, two return rules.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-22",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.production-task"
+  },
+  "kind": "broken",
+  "severity": "medium",
+  "title": "Not in pig changes batch and stage with no confirmation or undo",
+  "detail": "One tap among three equal choices removes the sow from her batch and sets her Off production / Open. A mis-tap cannot be recovered here.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-23",
+  "target": {
+   "kind": "feature",
+   "id": "inspection"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Draw or delete the unit summary, sensors, batches and fault flows?",
+  "detail": "13 placeholder screens (sensors, batches, unit sheet, pen faults, report, resolve) exist only in code; no control reaches them. The Environment feature already owns sensors, maintenance and report-issue.",
+  "options": [
+   "Delete all 13; Environment owns sensors and faults",
+   "Keep a one-line unit summary (pigs, pens, open faults) linking to Environment",
+   "Draw the full summary card, batch tracker and fault flow here"
+  ],
+  "recommendation": "Delete the sensor and fault screens (Environment covers them); keep at most a one-line unit summary with a link.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-24",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.batch-detail"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Is the batch tracker part of the walk?",
+  "detail": "Batch tracker, batch sheet and batch filter are built but unreachable, and the filter has no field. The ROUND-3 carousel is gone. Tasks already organise work by batch.",
+  "options": [
+   "Remove batch tracker and batch filter from Inspection",
+   "Place a batch row on the walk and enable the filter",
+   "Show batch only on the pig record"
+  ],
+  "recommendation": "Remove from Inspection; tasks and the pig record already carry batch.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-25",
+  "target": {
+   "kind": "section",
+   "id": "inspection"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Where does the pen head-count check live?",
+  "detail": "The section text promises pen-count checks, but no Inspection screen exists. Research (pen-count.md) designs count correction as a pen-scoped event, with no screen in the atlas.",
+  "options": [
+   "Add a pen count row to the pen sheet",
+   "Leave count correction to Fostering and Missing features",
+   "Drop the claim from the section text"
+  ],
+  "recommendation": "Add one row to the pen sheet that opens the pen count, so the text matches the product.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-26",
+  "target": {
+   "kind": "feature",
+   "id": "health-record"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Default Care when recording a finding: No action needed or Monitor?",
+  "detail": "The shortest path (choose Fever, Save) records a fever as an ongoing non-alert, so it never appears under needs attention.",
+  "options": [
+   "Keep No action needed as default",
+   "Default to Monitor for all findings",
+   "Make Care a required choice with no default"
+  ],
+  "recommendation": "Make Care a required choice with no default, so a fever cannot silently become a non-alert.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-27",
+  "target": {
+   "kind": "feature",
+   "id": "health-record"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Does 'Move to hospital pen' actually move the pig?",
+  "detail": "Hospital pen is a care choice only: no pen change, no task, nothing. The label promises an action the app does not take.",
+  "options": [
+   "Rename to 'Needs hospital pen' (a flag)",
+   "Open the Move flow from the care choice",
+   "Remove the level"
+  ],
+  "recommendation": "Rename it as a flag and link to Move from the finding, so the app does not imply a move that did not happen.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-28",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.resolve-finding"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Should 'Entered in error' need a confirmation?",
+  "detail": "Save outcome closes a finding as Entered in error with no second step, and also ends a linked feed adjustment. The log keeps the record but the active one is gone.",
+  "options": [
+   "Keep one tap",
+   "Confirm line for Entered in error only",
+   "Undo for 10 seconds"
+  ],
+  "recommendation": "Undo for 10 seconds; cheaper than a confirm dialog with gloves.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-29",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.treatment"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Where do medicines, brands, methods and units come from?",
+  "detail": "The list is a sample ('Antibiotic A', 'Sample brand A'). Farm configuration does not exist. Prescriptions is a separate feature that may supply the medicine.",
+  "options": [
+   "Farm-configured list owned by management web",
+   "Fixed global list for the pilot",
+   "Prefill from Prescriptions when a task opened the form"
+  ],
+  "recommendation": "Farm-configured list, prefilled from Prescriptions when a task opened the form.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-30",
+  "target": {
+   "kind": "feature",
+   "id": "feed-plan"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Which feed fields show, and on which page?",
+  "detail": "ASTRA-FEED-PLAN-FIELDS proposes brand, supplier, energy, protein and lysine; none is drawn, and protein and lysine units are unconfirmed. Pen page, pig page or neither?",
+  "options": [
+   "Pen page only: formula, brand, nutrition",
+   "Pig page only",
+   "Neither; keep formula, mode and kg"
+  ],
+  "recommendation": "Pen page: formula and brand only; nutrition values stay in the management web.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-31",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.editor"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Does saving a feed change drop a body-condition link silently?",
+  "detail": "Save ends the link between a Thin finding and its feed adjustment; Resolve warns but the editor does not. Body condition says 'Feed stays unchanged', so the link may be dead product.",
+  "options": [
+   "Keep the link and warn on the editor",
+   "Drop linking entirely (body condition records only)",
+   "Link and end the finding too"
+  ],
+  "recommendation": "Drop linking entirely; delete the link copy on the finding and resolve screens.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-32",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.editor"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "One way back to the curve: mode, 0% or Reset?",
+  "detail": "Follow curve, percent 0 and Reset all return to the curve. Three controls for one outcome add taps and confusion.",
+  "options": [
+   "Keep Follow curve only",
+   "Keep Reset only",
+   "Keep all three"
+  ],
+  "recommendation": "Keep the Follow curve mode; remove Reset and treat 0% as the same state.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-33",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.pen-held"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Should 'Hold amount' show kg and an end?",
+  "detail": "The tag reads 'Feed held' with kg only in a tooltip; a gloved worker cannot see how much or until when. Hold also freezes the curve until reset.",
+  "options": [
+   "Show 'Held 2.6 kg' on the tag",
+   "Keep tooltip; show on the pig page only",
+   "Remove Hold; use percent only"
+  ],
+  "recommendation": "Show 'Held 2.6 kg' on the tag, with no tooltip dependence.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-34",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.pen-up"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Show a pen-wide feed change at the pen, not on every pig?",
+  "detail": "A pen-wide +10% repeats as a tag on every row; the pen header shows only the new kg.",
+  "options": [
+   "Tag once on the pen header; pig rows show only individual changes",
+   "Keep a tag per pig",
+   "Both"
+  ],
+  "recommendation": "Tag once on the pen header; show pig tags only for individual changes.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-35",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.adlib"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "Hide or disable Adjust feed on ad-lib pens?",
+  "detail": "Adjust feed is offered and always answers 'unavailable': a dead end on the main bottom button.",
+  "options": [
+   "Hide the button",
+   "Show it disabled with the reason",
+   "Keep"
+  ],
+  "recommendation": "Hide the button; the page already says Ad-lib.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-36",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.walk"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "What do the 'Health' and 'Feed' counts count?",
+  "detail": "Health counts any condition, ongoing included; Feed mixes pigs with a change and every pig in a pen whose formula is due. A worker reads both as 'pigs to check'.",
+  "options": [
+   "Health = needs attention only; Feed = pigs with an individual change",
+   "Rename the lenses",
+   "Keep, add a one-line legend"
+  ],
+  "recommendation": "Count needs-attention pigs only; show formula-due at the pen header, not as pigs.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-37",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.walk"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Should check-in require anything?",
+  "detail": "Check-in is allowed with nothing recorded and pens unseen. Is a unit walk a fact the farm can rely on?",
+  "options": [
+   "Allow always",
+   "Warn when pens are unvisited",
+   "Require every pen opened"
+  ],
+  "recommendation": "Warn with the unseen-pen count; do not block.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-38",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.walk"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Show the care level as words on the row?",
+  "detail": "Monitor, Treat in place and Move to hospital pen differ only by icon and colour; the words are in a tooltip. A gloved worker cannot tell them apart.",
+  "options": [
+   "Words on every tag",
+   "Words on needs-attention tags only",
+   "Distinct icon shape"
+  ],
+  "recommendation": "Put the care word on needs-attention tags; ongoing keeps the neutral tag.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-39",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.pen-note"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "Edit and Close note overlap: keep one note per pen?",
+  "detail": "Edit overwrites the author; Close archives to the log. Two actions on one note, and the first writer disappears from the card.",
+  "options": [
+   "One note; edit keeps the original author line",
+   "Allow several notes",
+   "Keep"
+  ],
+  "recommendation": "Keep one note; show 'edited by' while keeping the first author.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-40",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.note"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "One pig note that replaces the old one, or a list?",
+  "detail": "A new note overwrites the previous one and the sheet does not say so; the log keeps both.",
+  "options": [
+   "Keep one note; say it replaces",
+   "Short list of notes",
+   "Notes only in the log"
+  ],
+  "recommendation": "Notes only in the log; remove the overwrite.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-41",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.full"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "What order and content for the pig record?",
+  "detail": "Six blocks, with Batch, stage, Next task and Type repeated; a sow's age is in days; empty rows draw '—'. A worker at the pen needs care and next action first.",
+  "options": [
+   "Attention, tasks, feeding, then a collapsed Details",
+   "Keep six blocks and hide empty rows",
+   "Tabs: Now, Facts, History"
+  ],
+  "recommendation": "Attention, tasks and feeding first; facts collapsed; hide empty rows; age in months for sows.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-42",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.production-batches"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "Draw lifetime figures or keep batch history only?",
+  "detail": "Litters, born total, farrowing and weaning rates, interval and non-productive days are seeded but not drawn. Do supervisors need them on the phone?",
+  "options": [
+   "Draw the main four on Production stats",
+   "Leave to the management web",
+   "Remove the seeded data"
+  ],
+  "recommendation": "Leave to the management web.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-43",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.origin"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "Can ear tag or breed be corrected from Origin?",
+  "detail": "The page is read-only; a wrong ear tag or breed cannot be fixed. A mistaken tag is a common farm error.",
+  "options": [
+   "Read-only on the phone",
+   "Edit for breed and tag with a log entry",
+   "Fix from the Pig list"
+  ],
+  "recommendation": "Read-only on the phone; corrections in the management web.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-44",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.actions"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "One door per finding: merge Edit, Resolve and Care instructions?",
+  "detail": "Three bulk rows plus Edit finding and Resolve or remove change the same finding. Names clash: 'Resolve conditions' and 'Resolve or remove'.",
+  "options": [
+   "One 'Update conditions' row with care and outcome together",
+   "Keep rows, rename them in line",
+   "Bulk only through selected pigs"
+  ],
+  "recommendation": "One row 'Update conditions' for one or many pigs, with care and outcome in one form.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-45",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.actions"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Where do tasks live: card, Next task row, or Actions?",
+  "detail": "The same task shows as a card on the record, as Next task and as a row in Actions with a cluster heading that repeats its name.",
+  "options": [
+   "Cards on the record only; Actions opens the task",
+   "Actions only",
+   "Keep"
+  ],
+  "recommendation": "Cards on the record only; remove task rows from Actions.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-46",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.batch-membership"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Should Move pig overwrite her stage, and say so?",
+  "detail": "Moving a pig sets her stage to the new batch's stage, which the form does not state.",
+  "options": [
+   "Keep, and state it on the form",
+   "Do not change stage",
+   "Ask which"
+  ],
+  "recommendation": "Keep the rule and state it above the Save button.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-47",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.miscarriage"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "Miscarriage reason: free text or evidence choices?",
+  "detail": "Miscarriage takes free text while 'Not in pig' offers evidence choices; two forms for a similar loss, and no check for an outcome already recorded.",
+  "options": [
+   "Same choices on both",
+   "Merge into one outcome form",
+   "Keep"
+  ],
+  "recommendation": "Merge into one 'Pregnancy ended' form with choices and optional text.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-48",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.actions"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "Drop the Health / General tabs in the action sheet?",
+  "detail": "Two small groups sit in one scroll with footer tabs. Tabs add taps for a few rows.",
+  "options": [
+   "Remove the tabs",
+   "Keep",
+   "Section headings only"
+  ],
+  "recommendation": "Remove the tabs.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-49",
+  "target": {
+   "kind": "section",
+   "id": "health"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Does Health own death and triage, or only conditions?",
+  "detail": "Section text lists conditions, triage, deaths and treatments. Care replaced triage; deaths and prescriptions are separate features. Which belong in this section's contract?",
+  "options": [
+   "Findings, care and treatment only",
+   "Include death and prescriptions",
+   "Rename the section"
+  ],
+  "recommendation": "Findings, care and treatment only; deaths and prescriptions get their own sections.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-50",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.record-health"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Catalogue is three levels deep with no recent list",
+  "detail": "Tab, door, then item before a fever is chosen. A frequent condition sits two doors deep each time.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-51",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.condition-picker"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Two near-identical pickers: Choose conditions and Link condition",
+  "detail": "Same catalogue with another layout for treatment. Gloved workers need one picker with a recent and common list on top.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-52",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.finding"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Four rows for one finding; Edit and Resolve both change it",
+  "detail": "Edit finding, Record treatment, Resolve or remove and Review feed adjustment compete. Needs one primary action and a clear secondary.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-53",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.care-instructions"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Care instructions and Edit conditions are one form under two titles",
+  "detail": "Same screen, different log entry ('Triage updated' vs 'Finding edited'); the second title adds no function.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-54",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.mixed"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "'Health' means three things on one screen",
+  "detail": "It labels every attention row, the Health field in details and the Actions group. Duration is 'Day 2' for attention and '120 days' for ongoing.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-55",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.mixed"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Temperature 39.5 is unflagged beside a Fever finding",
+  "detail": "The reading sits in General details, far from the Fever row, and nothing marks it high. No sign whether treatment was given for Fever.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-56",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.many"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Sideways scrolling hides the oldest ongoing conditions",
+  "detail": "Lameness and Coughing are cut off in a scrolling row; the longest-running conditions are the least visible.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-57",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.care-states"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Care level differs only by icon and colour",
+  "detail": "Four levels use small icons and colour; colour-blind workers and text-only readers cannot tell them apart.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-58",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.treatment"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Dose is 'per pig' in one place and 'for all' in another",
+  "detail": "Dose labels differ between single and bulk; treatment from a finding and from the Health group differ only by a fixed condition.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-59",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.resolve-conditions"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Log wording differs: 'Record corrected' vs 'Finding entered in error'",
+  "detail": "Bulk and single forms log the same outcome with two phrases. One wording per outcome.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-60",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.record-health"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Save reads 'Save · 0 pigs' while disabled",
+  "detail": "A disabled button should say Save, not a count of zero.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-61",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.edit-finding"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Start date and author cannot be corrected on a finding",
+  "detail": "Seeded findings show 'Recorded — · —'. The edit form changes name, care and note, never the start.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-62",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.pen"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Two doors to a pen's feed; the note shows twice",
+  "detail": "The pen header opens the editor, the Feed guidance row opens the reading page first. The note sits in a card, an Edit row and the pen log.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-63",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.filters"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Filter state has batch, health status and manual feed, but no controls",
+  "detail": "Three filters exist in state and the strip label but cannot be set. The Health lens and condition/care filters overlap.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-64",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.find-pig"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Scan and Search open almost the same sheet; no ear-notch search",
+  "detail": "The identity notes list ear-notch search, absent here. Camera scanning is a stub with a sample-tag button. Untagged groups cannot be found.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-65",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.walk-log"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Three names for one thing: Log, Updates this walk, This walk",
+  "detail": "Button, aria label and sheet title differ, and the same events repeat in each pig log and the pen log.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-66",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.walk-recorded"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Two Back controls do the same thing",
+  "detail": "The header Back and 'Back to unit' on the confirmation both return to the unit.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-67",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.pen-log"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Log category is inferred from titles for old entries",
+  "detail": "A renamed title silently falls into Notes. The same log and filter bar is shared with the pig log.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-68",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.go-to-pen"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Long-press peek is hard with gloves; 'N health' misreads as pigs",
+  "detail": "Hold 350 ms is hard with gloves and not discoverable. '2 health' counts ongoing conditions, not pigs needing care.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-69",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.review-selected"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Selected sheet shows raw stage 'Gestating'",
+  "detail": "The row repeats 'Gestating' where the list says 'Gestation · 40 days', and has no pen context for the pig.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-70",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.actions"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Sheet header says only '2 pigs' and names nobody",
+  "detail": "The worker cannot confirm who the action applies to. Body condition also sits under Measurements though it creates a health finding.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-71",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.stage-times"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Row clock and record clock disagree",
+  "detail": "Row: 'Gestation · 40 days' (days in stage); record: 'Last service · 40 days ago'. Two clocks that can differ; the screen duplicates the walk with one row changed.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-72",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.finish"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Check-in sheet shows a large zero when nothing was recorded",
+  "detail": "'Recorded during this walk 0' dominates; the empty state could say so in words.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-73",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.pen"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "'Formula due' on the walk has no explanation here",
+  "detail": "Nothing tells the worker what formula change is due or when; the page shows only formula, mode and kg.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-74",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.editor"
+  },
+  "kind": "design",
+  "severity": "high",
+  "title": "Editor carries mode, percent, slider, chips and a table for one decision",
+  "detail": "Too much for gloved hands on one sheet; a pen-total preview exists in code and is not drawn. The scope reads '3 pigs' without naming the pen.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-75",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.bulk"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "'Feed for these pigs' sits under a tab called Pens",
+  "detail": "Pens and pigs mean the same row. No row reaches equipment faults though a pen chooser exists in the code.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-76",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.pig"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Pig feed page cannot adjust and repeats the record's block",
+  "detail": "The only change path is the Actions sheet; the Feeding block is identical on the record. The curve source name is not drawn.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-77",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.pen-down"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "A decrease uses the same neutral tag as an increase",
+  "detail": "Direction is only the sign; nothing distinguishes a drop in feed visually.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-78",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.partial"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Four dashes in a row read as a broken page",
+  "detail": "Service, farrowing, backfat and Health show '—' rows where the 'absent, not none' rule says to leave the row out.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-79",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.empty"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Dash grid dominates; attention rows are the only content",
+  "detail": "The worst case still draws Age, Breed, Weight, Temperature, Health as '—'. Hide empty rows.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-80",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.tasks"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Task type word shares names with Actions groups",
+  "detail": "'Health' and 'Production' mean task type here and action group there; tasks also appear in Actions.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-81",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.measurements"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "An extra menu sits between Actions and each reading",
+  "detail": "Three or four rows before the form: one more tap per reading, with body condition mixed in.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-82",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.body-condition"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Body condition silently becomes a 'needs attention' Monitor finding",
+  "detail": "The form does not say that the pig will show as needing attention on the walk.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-83",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.unavailable-actions"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Blocked actions sit one tap behind Actions",
+  "detail": "The list usually holds one or two rows; the reason could sit on the disabled row itself.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-84",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.batch-record"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "Current batch shows two bare headings and little content",
+  "detail": "'Current batch' and 'This cycle' label a thin card; boars get 'Finish record' while sows get 'Finish weaning'.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-85",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.log"
+  },
+  "kind": "design",
+  "severity": "low",
+  "title": "'Author not supplied' on seeded entries; name changes Log / Pig log",
+  "detail": "The seed lacks authors, and the link and title use different names.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-86",
+  "target": {
+   "kind": "section",
+   "id": "pigs"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Section promises untagged groups and ear-notch search; no screen shows them",
+  "detail": "Pigs says one row can mean several head and search takes an ear notch. The profile covers per-tag sows only; the Pig list entry has no source screen.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-87",
+  "target": {
+   "kind": "section",
+   "id": "inspection"
+  },
+  "kind": "design",
+  "severity": "medium",
+  "title": "Walk shows no untagged groups, though the section says it does",
+  "detail": "The sample unit has only tagged pigs and a single piglet (inspection.animal-types); a litter as a group is not drawn.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-88",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.pen-log"
+  },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "Who writes pen log entries and how long are they kept?",
+  "detail": "Entries with no date stay under 'Before this walk'; custom range needs both dates. Authorship and retention are not stated.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-89",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.editor"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "What happens to a held pig as the curve grows?",
+  "detail": "Hold fixes today's kg until reset; no rule says if growth or a move resets it. No expiry unless an end date is set.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-90",
+  "target": {
+   "kind": "screen",
+   "id": "feed-plan.bulk"
+  },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "Unticked pigs inside a ticked pen still change",
+  "detail": "Opening from pens captures the pens' current pigs, unlike ticked-pig selection; the sheet only says '3 pens · 7 pigs'.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-91",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.actions"
+  },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "Adjust feed unavailable reason uses only the first pig",
+  "detail": "If the first selected pig is dead and a later one is ad-lib, the reason covers one pig; no rule for mixed selections.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-92",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.finding"
+  },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "Latest treatment line shows only if it targeted this finding",
+  "detail": "A treatment given for another condition is not shown here, though the pig record shows it.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-93",
+  "target": {
+   "kind": "screen",
+   "id": "pig-profile.production-task"
+  },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "'Complete task / Follow up' says nothing about what was done",
+  "detail": "Non-pregnancy production tasks have no outcomes; the notes do not say which tasks use this pair.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-94",
+  "target": {
+   "kind": "feature",
+   "id": "pig-profile"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Pig list entry has no source screen",
+  "detail": "The PRD lists the Pig list as an entry point, but that feature is a placeholder written elsewhere. How a pig is picked there is not shown.",
+  "source": "notes"
+ },
+ {
+  "id": "inspection-group-95",
+  "target": {
+   "kind": "feature",
+   "id": "health-record"
+  },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "Dead sow: which findings can still change?",
+  "detail": "The mixed screen says conditions stay visible but cannot be changed; the notes do not say if a note or care change is allowed.",
+  "source": "sweep"
+ },
+ {
+  "id": "inspection-group-96",
+  "target": {
+   "kind": "screen",
+   "id": "inspection.sensors"
+  },
+  "kind": "unclear",
+  "severity": "medium",
+  "title": "Placeholder screens name no owner or removal plan",
+  "detail": "Thirteen placeholder screens render the plain walk, with no note saying who removes or draws them. A developer may build them from the notes.",
+  "source": "sweep"
+ }
+]
