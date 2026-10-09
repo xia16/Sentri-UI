@@ -9,12 +9,12 @@
 // Each state renders in its own iframe in the atlas: draw only the states present.
 var UI = window.SentriUI;
 var RENDER = {
-  "state-Default": () => SentriUI.segment({variant:'lens',options:[['todo','To do',{count:18}],['done','Done',{count:3}]],active:'todo',ariaLabel:'Lens',state:'Default',disabled:false,reason:''}),
-  "state-Pressed": () => SentriUI.segment({variant:'lens',options:[['todo','To do',{count:18}],['done','Done',{count:3}]],active:'todo',ariaLabel:'Lens',state:'Pressed',disabled:false,reason:''}),
-  "state-Selected": () => SentriUI.segment({variant:'lens',options:[['todo','To do',{count:18}],['done','Done',{count:3}]],active:'done',ariaLabel:'Lens',state:'Selected',disabled:false,reason:''}),
-  "state-Disabled": () => SentriUI.segment({variant:'lens',options:[['todo','To do',{count:18}],['done','Done',{count:3}]],active:'todo',ariaLabel:'Lens',state:'Disabled',disabled:true,reason:'Records are unavailable offline.'}),
-  "state-Focus": () => SentriUI.segment({variant:'lens',options:[['todo','To do',{count:18}],['done','Done',{count:3}]],active:'todo',ariaLabel:'Lens',state:'Focus',disabled:false,reason:''}),
-  "state-Long-label": () => SentriUI.segment({variant:'lens',options:[['todo','待处理的仔猪记录'],['done','已完成的母猪记录']],active:'todo',ariaLabel:'Lens',state:'Long-label',disabled:false,reason:''})
+  "state-Default": () => SentriUI.segment({variant:'lens',options:[['today','Today'],['week','7 days']],active:'today',ariaLabel:'Lens',state:'Default',disabled:false,reason:''}),
+  "state-Pressed": () => SentriUI.segment({variant:'lens',options:[['today','Today'],['week','7 days']],active:'today',ariaLabel:'Lens',state:'Pressed',disabled:false,reason:''}),
+  "state-Selected": () => SentriUI.segment({variant:'lens',options:[['today','Today'],['week','7 days']],active:'week',ariaLabel:'Lens',state:'Selected',disabled:false,reason:''}),
+  "state-Disabled": () => SentriUI.segment({variant:'lens',options:[['today','Today'],['week','7 days']],active:'today',ariaLabel:'Lens',state:'Disabled',disabled:true,reason:'Records are unavailable offline.'}),
+  "state-Focus": () => SentriUI.segment({variant:'lens',options:[['today','Today'],['week','7 days']],active:'today',ariaLabel:'Lens',state:'Focus',disabled:false,reason:''}),
+  "state-Long-label": () => SentriUI.segment({variant:'lens',options:[['todo','待处理的仔猪记录'],['done','已完成的母猪记录']],active:'today',ariaLabel:'Lens',state:'Long-label',disabled:false,reason:''})
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {
   var t = RENDER[s.id] ? s : s.querySelector('[id]');
