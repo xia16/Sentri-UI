@@ -176,6 +176,11 @@
       "severity": "low",
       "text": "Lens (inline count) has no screen; it survives only as a documented option.",
       "fix": "Remove it at the next pass if no screen adopts it."
+    },
+    {
+      "severity": "low",
+      "text": "Lens tab now demos Today / 7 days with no counts: a time-range view switch, not states of one list (the README's lens is working pile / finished pile with inline counts). Its Long-label state passes active:'today' with options todo/done, so nothing is selected.",
+      "fix": "variants/lens.html: demo a 2-state pile split with inline counts in a card header (e.g. Open 2 / Closed 5), and set Long-label active:'todo'."
     }
   ],
   "proposals": [],

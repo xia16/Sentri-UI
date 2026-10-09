@@ -1,18 +1,18 @@
 {
-  "status": "in-design",
-  "round": 4,
-  "regate": "cleanup pass, PR #72",
+  "status": "agent-checked",
+  "round": 5,
+  "regate": "sweep fixes c0d9835 (footer padding-block, cascade/overview demos)",
   "judged": "2026-10-10",
-  "commit": "ce52431",
+  "commit": "c0d9835",
   "model": "claude-opus-5-5",
   "scores": {
     "clarity": 8,
     "budget": 8,
     "hierarchy": 8,
-    "spacing": 7,
+    "spacing": 8,
     "broken": 8
   },
-  "lowest": 7,
+  "lowest": 8,
   "checklist": [
     {
       "line": 1,
@@ -42,7 +42,7 @@
     {
       "line": 6,
       "pass": true,
-      "why": "Triggers 48-65, rows 56-58, steps 48, footer 48 (Back 86 wide on screens); nothing under 48 on the three bare screens"
+      "why": "Triggers 48-65, rows 56-58, steps 48; footer Back / Done 168x48 at x=21-189 and 201-369, medicine Back x=21-369; corners 12px intact"
     },
     {
       "line": 7,
@@ -67,7 +67,7 @@
     {
       "line": 11,
       "pass": true,
-      "why": "Last host override (.st-picker-trigger height:48px) removed; tokens only"
+      "why": "Footer now padding-block only, sheet keeps its gutter; tokens only, no host override"
     },
     {
       "line": 12,
@@ -87,7 +87,7 @@
     {
       "line": 15,
       "pass": true,
-      "why": "Ticked 4 conditions, Done, Record health shows names +1; medicine pick, reopen keeps path and tick; one footer spacing defect"
+      "why": "Ticked 4 conditions, Done · 4, Record health shows 3 names +1 (65px); medicine pick shows Antibiotics › Antibiotic B, reopen opens All › Antibiotics with B ticked; console clean"
     }
   ],
   "classification": "component",
@@ -133,18 +133,18 @@
       "usedBy": [
         "health-record.medicine-picker"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
         "clarity": 8,
         "budget": 8,
         "hierarchy": 8,
-        "spacing": 7,
+        "spacing": 8,
         "broken": 8
       },
       "findings": [
-        "Fixed: Back is the secondary pickerFooter Back; trigger path \"Antibiotics › Antibiotic B\"; reopening opens All › Antibiotics with Antibiotic B ticked",
-        "New: the picker footer has no side gutter (Back 390 wide, edge to edge, corners cut)",
-        "Not fixed: atlas cascade demo labels Medicine but browses Symptoms"
+        "Fixed: Select medicine Back inset x=21-369, corners intact",
+        "Fixed: atlas demo browses Antibiotics › Penicillins › Amoxicillin",
+        "Low: atlas Active trigger reads \"Antibiotics › Penicillins\" (group path) while the screen trigger reads \"Antibiotics › Antibiotic B\" (category › medicine)"
       ]
     },
     {
@@ -153,82 +153,60 @@
         "health-record.condition-picker",
         "health-record.record-health"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
         "clarity": 8,
         "budget": 8,
         "hierarchy": 8,
-        "spacing": 7,
+        "spacing": 8,
         "broken": 8
       },
       "findings": [
-        "Fixed: Record health with 4 conditions shows two clamped lines of names plus an unclamped \"+1\" inside the 65px trigger",
-        "New: Select conditions footer Back / Done · 4 run to the screen edges (no gutter)"
+        "Fixed: Select conditions footer Back / Done · 4 inset 21px each side, 12px gap"
       ]
     }
   ],
   "findings": [
     {
-      "severity": "medium",
-      "text": ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on Select conditions (Back / Done · 4) and Select medicine (Back, 390px wide) the buttons touch the screen edges and their rounded corners are cut. Moving the medicine sheet onto pickerFooter spread it.",
-      "fix": "bundle.css: .st-picker-footer{padding-block:var(--space-12)} (no inline 0) so the sheet footer keeps its gutter."
-    },
-    {
       "severity": "low",
-      "text": "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path [Antibiotics, Conditions] (round 3, not fixed).",
-      "fix": "variants/cascade.html: use medicine categories and a medicine leaf."
-    },
-    {
-      "severity": "low",
-      "text": "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed).",
-      "fix": "preview.html: pass names:[\"Low appetite\"]."
+      "text": "Atlas cascade Active demo passes path [Antibiotics, Penicillins], so the trigger reads \"Antibiotics › Penicillins\" and never names the chosen Amoxicillin; the real medicine trigger reads category › medicine.",
+      "fix": "variants/cascade.html state-Active: path [\"Penicillins\",\"Amoxicillin\"] (or whatever pickerField needs to end on the leaf)."
     }
   ],
   "proposals": [],
   "verdicts": [
     {
-      "finding": "+n clipped by the 2-line clamp",
+      "finding": ".st-picker-footer padding overrode sheet gutter",
       "result": "fixed",
-      "note": ".st-picker-more outside .st-picker-names; \"+1\" visible"
+      "note": "Conditions Back x21-189, Done · 4 x201-369; Medicine Back x21-369; radius 12px, bottom 832"
     },
     {
-      "finding": "Medicine Back drawn as filled primary",
+      "finding": "Cascade demo browses Symptoms under Medicine",
       "result": "fixed",
-      "note": "pickerFooter({multi:false}) gives a secondary Back; but no gutter (new finding)"
+      "note": "Antibiotics › Penicillins › Amoxicillin / Ampicillin"
     },
     {
-      "finding": "Path joined with \" / \" on the trigger",
+      "finding": "Overview shows \"1 selected\"",
       "result": "fixed",
-      "note": "\" › \" on trigger, search meta and group titles"
-    },
-    {
-      "finding": "Reopen starts at All with nothing marked",
-      "result": "fixed",
-      "note": "Opens at the category with the current medicine ticked"
-    },
-    {
-      "finding": "Overview \"1 selected\"; cascade demo browses Symptoms under Medicine",
-      "result": "not fixed"
+      "note": "Overview trigger reads Low appetite"
     }
   ],
   "previous": {
-    "round": 3,
-    "commit": "8e198e7",
+    "round": 4,
+    "commit": "ce52431",
     "status": "in-design",
     "lowest": 7,
     "scores": {
       "clarity": 8,
       "budget": 8,
-      "hierarchy": 7,
-      "spacing": 8,
-      "broken": 7
+      "hierarchy": 8,
+      "spacing": 7,
+      "broken": 8
     },
     "findings": [
-      "Record-form names are line-clamped after \"+n\" is appended, so with long names the \"+n\" is the part that gets cut (Record health, 4 conditions: \"Weakness or unsteady stance · Reduced appetite · Porcine reproductive and…\").",
-      "Medicine picker's sole Back is still drawn as the full-width filled primary button; everywhere else Back is secondary (round-2 finding, not fixed).",
-      "Path written two ways: trigger \"Antibiotics / Antibiotic B\", sheet \"All › Antibiotics\".",
-      "Reopening the medicine picker starts at All with nothing marked, so the current pick is not shown.",
-      "Atlas Overview demos Conditions (a record form) as \"1 selected\", and the cascade demo browses Symptoms under a Medicine label."
+      ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on Select conditions (Back / Done · 4) and Select medicine (Back, 390px wide) the buttons touch the screen edges and their rounded corners are cut. Moving the medicine sheet onto pickerFooter spread it.",
+      "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path [Antibiotics, Conditions] (round 3, not fixed).",
+      "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed)."
     ]
   }
 }
