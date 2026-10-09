@@ -1,15 +1,47 @@
-<!-- @dsCard group="Choosers" height=420 subtitle="Label over a text control" -->
-<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
-<body>
-<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="a"></div><div id="b"></div><div id="c"></div><div id="d"></div></div>
+<!-- @dsCard group="Fields" height=1200 subtitle="Field variants and states" -->
+<!doctype html><html lang="en"><head><meta charset="utf-8"></head><body>
+<section data-state="Default" id="text-state-0"></section>
+<section data-state="Focus" id="text-state-1"></section>
+<section data-state="Filled" id="text-state-2"></section>
+<section data-state="Error" id="text-state-3"></section>
+<section data-state="Disabled" id="text-state-4"></section>
+<section data-state="Long Chinese label" id="text-state-5"></section>
 <script>
-const UI = window.SentriUI;
-a.innerHTML = UI.field({ ds: 'Field', label: 'Weight (kg)', control: '<input type="text" inputmode="decimal" placeholder="0.0">' });
-b.innerHTML = UI.field({ ds: 'Field', label: 'Weight (kg)', control: '<input type="text" inputmode="decimal" value="1.4">' });
-c.innerHTML = UI.field({ ds: 'Field', className: 'error', label: 'Weight (kg), enter a number', control: '<input type="text" inputmode="decimal" value="x">' });
-d.innerHTML = UI.field({ ds: 'Field', label: 'Note', control: '<textarea placeholder="Optional"></textarea>' });
+document.getElementById("text-state-0").innerHTML=SentriUI.field({"variant": "text", "label": "Identity", "unit": "", "hint": "", "value": ""});
+document.getElementById("text-state-1").innerHTML=SentriUI.field({"variant": "text", "label": "Identity", "unit": "", "hint": "", "value": "", "focus": true});
+document.getElementById("text-state-2").innerHTML=SentriUI.field({"variant": "text", "label": "Identity", "unit": "", "hint": "", "value": "Gate repaired beside the aisle."});
+document.getElementById("text-state-3").innerHTML=SentriUI.field({"variant": "text", "label": "Identity", "unit": "", "hint": "", "value": "", "error": "Required detail is missing. Enter a description."});
+document.getElementById("text-state-4").innerHTML=SentriUI.field({"variant": "text", "label": "Identity", "unit": "", "hint": "", "value": "", "disabled": true, "reason": "Record is locked. Open Edit to correct it."});
+document.getElementById("text-state-5").innerHTML=SentriUI.field({"variant": "text", "label": "请说明本次记录与实际情况不同的原因，并填写实际给药剂量以及使用单位", "unit": "", "hint": "", "value": ""});
 </script>
-</body>
-</html>
+
+<section data-state="Default" id="number-state-0"></section>
+<section data-state="Focus" id="number-state-1"></section>
+<section data-state="Filled" id="number-state-2"></section>
+<section data-state="Error" id="number-state-3"></section>
+<section data-state="Disabled" id="number-state-4"></section>
+<section data-state="Long Chinese label" id="number-state-5"></section>
+<script>
+document.getElementById("number-state-0").innerHTML=SentriUI.field({"variant": "number", "label": "Dose", "unit": "mL", "hint": "Record the amount administered.", "value": ""});
+document.getElementById("number-state-1").innerHTML=SentriUI.field({"variant": "number", "label": "Dose", "unit": "mL", "hint": "Record the amount administered.", "value": "", "focus": true});
+document.getElementById("number-state-2").innerHTML=SentriUI.field({"variant": "number", "label": "Dose", "unit": "mL", "hint": "Record the amount administered.", "value": "2.5"});
+document.getElementById("number-state-3").innerHTML=SentriUI.field({"variant": "number", "label": "Dose", "unit": "mL", "hint": "Record the amount administered.", "value": "", "error": "Value is missing. Enter the recorded amount."});
+document.getElementById("number-state-4").innerHTML=SentriUI.field({"variant": "number", "label": "Dose", "unit": "mL", "hint": "Record the amount administered.", "value": "", "disabled": true, "reason": "Record is locked. Open Edit to correct it."});
+document.getElementById("number-state-5").innerHTML=SentriUI.field({"variant": "number", "label": "请说明本次记录与实际情况不同的原因，并填写实际给药剂量以及使用单位", "unit": "mL", "hint": "Record the amount administered.", "value": ""});
+</script>
+
+<section data-state="Default" id="textarea-state-0"></section>
+<section data-state="Focus" id="textarea-state-1"></section>
+<section data-state="Filled" id="textarea-state-2"></section>
+<section data-state="Error" id="textarea-state-3"></section>
+<section data-state="Disabled" id="textarea-state-4"></section>
+<section data-state="Long Chinese label" id="textarea-state-5"></section>
+<script>
+document.getElementById("textarea-state-0").innerHTML=SentriUI.field({"variant": "textarea", "label": "Explanation", "unit": "", "hint": "", "value": ""});
+document.getElementById("textarea-state-1").innerHTML=SentriUI.field({"variant": "textarea", "label": "Explanation", "unit": "", "hint": "", "value": "", "focus": true});
+document.getElementById("textarea-state-2").innerHTML=SentriUI.field({"variant": "textarea", "label": "Explanation", "unit": "", "hint": "", "value": "Gate repaired beside the aisle."});
+document.getElementById("textarea-state-3").innerHTML=SentriUI.field({"variant": "textarea", "label": "Explanation", "unit": "", "hint": "", "value": "", "error": "Required detail is missing. Enter a description."});
+document.getElementById("textarea-state-4").innerHTML=SentriUI.field({"variant": "textarea", "label": "Explanation", "unit": "", "hint": "", "value": "", "disabled": true, "reason": "Record is locked. Open Edit to correct it."});
+document.getElementById("textarea-state-5").innerHTML=SentriUI.field({"variant": "textarea", "label": "请说明本次记录与实际情况不同的原因，并填写实际给药剂量以及使用单位", "unit": "", "hint": "", "value": ""});
+</script>
+</body></html>

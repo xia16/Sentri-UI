@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"></head><body>
+<section data-state="Default" id="state-0"></section>
+<section data-state="Focus" id="state-1"></section>
+<section data-state="Filled" id="state-2"></section>
+<section data-state="Error" id="state-3"></section>
+<section data-state="Disabled" id="state-4"></section>
+<section data-state="Long Chinese label" id="state-5"></section>
+<script>
+document.getElementById("state-0").innerHTML=SentriUI.field({"variant": "number", "label": "Dose", "unit": "mL", "hint": "Record the amount administered.", "value": ""});
+document.getElementById("state-1").innerHTML=SentriUI.field({"variant": "number", "label": "Dose", "unit": "mL", "hint": "Record the amount administered.", "value": "", "focus": true});
+document.getElementById("state-2").innerHTML=SentriUI.field({"variant": "number", "label": "Dose", "unit": "mL", "hint": "Record the amount administered.", "value": "2.5"});
+document.getElementById("state-3").innerHTML=SentriUI.field({"variant": "number", "label": "Dose", "unit": "mL", "hint": "Record the amount administered.", "value": "", "error": "Value is missing. Enter the recorded amount."});
+document.getElementById("state-4").innerHTML=SentriUI.field({"variant": "number", "label": "Dose", "unit": "mL", "hint": "Record the amount administered.", "value": "", "disabled": true, "reason": "Record is locked. Open Edit to correct it."});
+document.getElementById("state-5").innerHTML=SentriUI.field({"variant": "number", "label": "请说明本次记录与实际情况不同的原因，并填写实际给药剂量以及使用单位", "unit": "mL", "hint": "Record the amount administered.", "value": ""});
+</script></body></html>

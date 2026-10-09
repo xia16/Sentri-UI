@@ -1,43 +1,58 @@
 # Field
 
-The label-over-control wrapper that every form field sits in. It is a `<label>` holding the label text and one control, so tapping the text focuses the control. `PickerField` is built on it, and a text input or note is dropped into it directly.
+Labels a text control and its persistent help or corrective message. Use PickerField instead for choices and Stepper for animal counts.
 
-Call `SentriUI.field({ label, control, className, ds })`. `label` and `control` are raw HTML strings. `ds` writes `data-ds` on the root; pass `'Field'` from a screen and the card name from a component built on top (`PickerField` passes its own).
+Status: candidate; implementation checked on this branch, owner approval remains separate.
 
-**Anatomy**
-- Root: `<label class="field">`, a column with a 9px gap and an 18px top margin, so stacked fields keep their rhythm without a wrapper.
-- Label: 12px/600 in `ink`, above the control.
-- Control: an `input`, `textarea` or `select` gets the field skin, and a `button` (as in `PickerField`) supplies its own.
-- The skin: at least `field-height` (48px), 12px padding, a 1px border, `paper`, a 14px value. A textarea is 90px high with a 1.6 line height and resizes vertically.
+## When
+Use for required text, treatment doses with units, and explanations; show a note editor only after the worker chooses Add.
 
-**What the caller provides**
-- `label`: a noun in sentence case ("Cause of death", "Weight (kg)"). Put the unit in the label, never in the value.
-- `control`: one control. Two controls in one label make the tap target ambiguous.
-- Fields stack in capture order, never in columns.
+### When not
+A Field is never shown open for an optional input. An optional Note is an optional row: label · muted Optional · trailing Add action, opening this Field. Reuse SentriUI.optionalRow({label, inline:SentriUI.field(...)}). Use PickerField for options, Stepper for counts, and Measure with Numpad for weights and typed tags.
 
-**Rules**
-- A choice field is `PickerField`, not a `<select>`. No native selects anywhere.
-- Drift to know about: the input border (`#aeb8a1`) and radius (11px) are hard-coded in the stylesheet, close to but not equal to `control-border` and `radius-control` (12px). A picker trigger uses the tokens, so the two differ by a pixel.
+## Anatomy
+Root label; visible label text; one input or textarea; optional unit in the label; optional help/error/reason line beneath the control.
 
-**States**
-- Default: the label over a `paper` control with its border.
-- Pressed: not drawn. A text control has no pressed style.
-- Disabled: not drawn. The stylesheet has no rule for a disabled `input`, `textarea` or `select`. Leave out a field the worker can't fill. A disabled `button` control takes the button rule (the `PickerField` trigger dims to half opacity).
-- Focus: the global 3px `focus` ring at 2px offset on the control. The label does not change.
-- Error: add `className: 'error'`. A text input or textarea takes a `red` border. There is no error message slot: put the reason in the label or a line the screen owns. A `button` control shows no error.
-- Loading: not drawn.
-- Empty: an empty control shows its browser placeholder. Fields are never rendered over an empty section.
+## Variants
+- **Text** (`text`): use for identity and required short text. not for choices — use PickerField.
+- **Number with unit** (`number`): use for treatment dose with the unit in the label. not for animal counts — use Stepper.
+- **Textarea** (`textarea`): use for a required explanation or a note after Add. not for an unopened optional note — use OptionalRow.
 
-**Strings**
-`field` has no `strs`. `label` is raw HTML: to fill it from the registry, wrap the text in `<span data-str="id">` yourself, as `pickerField` does. Without a wrapper the output is unchanged.
+## States
+| State | Behaviour |
+| --- | --- |
+| Default | See rendered variant examples. |
+| Focus | See rendered variant examples. |
+| Filled | See rendered variant examples. |
+| Error | Persistent corrective message, not colour alone. |
+| Disabled | Visible reason; controls cannot change the value. |
+| Long Chinese label | Wraps in full without ellipsis. |
 
-## Variant: the optional row
+## Behaviour
+Fields stack in capture order, never in columns. Textarea grows with field-sizing:content and has no drag handle. Error takes precedence over help; disabled reason takes precedence over help. Messages persist after typing and are linked through aria-describedby. Hosts validate on commit or blur and supply what went wrong and how to fix it. Native disabled controls cannot be edited and always have a nearby reason. No loading or selection state: submitting belongs to Button. A dedicated Note editor has already been opened by its entry row; do not put another optional row inside it.
 
-Every optional input in a record sheet is an **optional row**, `SentriUI.optionalRow({ label, value, icon, editIcon, action | inline, key, open, optionalWord })`. It is the Photos header pattern for any field.
-- **Anatomy:** a full-width `tap-min` row on `well`, `space-row-x` padding on the left. The label is `row-title` (13px/500), then the word "Optional" at `description` in `muted`. The trailing action is a ringed icon circle (`ring-width-fine` in `muted`, `paper` fill), the same as Photos' camera.
-- **Empty:** the label, "Optional" and the `icon` (plus, or the camera for Photos).
-- **Tap:** the row and the action are one tap target. `action` asks the host to open the field (picker, note editor, camera). `inline` reveals the field's own markup under the row instead (a note, a brand).
-- **Filled:** the value is the row's answer line (12px, `ink`, one line, ellipsis) and the action becomes `editIcon` (edit). The word stays.
-- **Placement:** below the required fields, in capture order, full width, one per line. Never chips, never side by side, never a label with a small "Optional" over a bare control.
-- **Where:** `components/bundle.js` (DS screens, Piglet processing) and `ux/system/sentri-components.js` (the Astra prototypes) carry the same markup and `st-optional-*` classes. A required note (a choice demands it) stays a plain `field`.
+## Content rules
+Sentence case labels, normally ≤30 English characters or 15 Chinese characters. Longer labels wrap in full. Short text normally ≤80 characters; notes ≤500, enforced by the host when relevant. No truncation inside controls. Put units in the label, not the entered value. Placeholder offers an example, never repeats the title or substitutes for a label. Chinese copy uses the same sans font.
 
+## Accessibility
+Native label associates with one nested control. Hint/error uses aria-describedby; errors add aria-invalid and role=alert. Native Tab, text editing, Enter in textarea and platform number keyboard apply. Visible focus ring; fields are at least field-height / tap-min. Use inputmode=decimal for number and an appropriate input type. Raw control HTML is trusted host markup; aria labels and existing descriptions remain the host’s responsibility.
+
+## Do / don't
+Do name the missing value and a fix in errors. Do stack Dose then Unit. Don’t show an optional textarea before Add. Don’t repeat “Add a note” as title, label and placeholder.
+
+## API and tokens
+SentriUI.field({label, variant, value, unit, hint, error, disabled, reason, id, placeholder, control, className, ds, labelHidden, focus}). control remains a compatible trusted HTML slot; otherwise the component generates the native control. label accepts trusted registry markup. labelHidden hides only the visual label when the opening OptionalRow already names it; retain its accessible association. Optional inputs use SentriUI.optionalRow; required conditional explanations use Field directly.
+
+CSS variables: tap-min, field-height, font-sans, font-size-12, font-size-14, type-description-size, space-9, space-18, space-12, control-border, radius-control, ink, muted, paper, well, red, focus, size-2, size-3, ring-width-fine, size-90. All sizing and colour resolve to tokens.
+
+## Related components
+[PickerField](../PickerField/README.md), [Stepper](../Stepper/README.md), [Measure](../Measure/README.md), [Sheet](../Sheet/README.md). OptionalRow is the shared reveal pattern in bundle.js.
+
+## Classification
+Component: generic input used across sections. The named faces are variants, not copies. Optional input reveal is a pattern composed from OptionalRow and Field.
+
+## Examples and references
+[Preview](preview.html); [verification and screenshots](verification.md); each variant's states live in variants/*.html and variants.json. Primary guidance: the [component standard](../../../../docs/design-workflow/research/component-standard.md), Ant Design Mobile and TDesign; Material 3 and Apple HIG guide focus, labels and target sizes.
+
+## Changelog
+2026-10-10: consolidated variants, corrected gate findings, documented states and migrated prototype forks. Numpad / Measure decisions remain outside this pass.

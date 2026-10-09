@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"></head><body>
+<section data-state="Default" id="state-0"></section>
+<section data-state="Empty" id="state-1"></section>
+<section data-state="Pressed" id="state-2"></section>
+<section data-state="Focus" id="state-3"></section>
+<section data-state="Floor" id="state-4"></section>
+<section data-state="Ceiling" id="state-5"></section>
+<section data-state="Disabled" id="state-6"></section>
+<section data-state="Error" id="state-7"></section>
+<section data-state="Loading" id="state-8"></section>
+<section data-state="Draft" id="state-9"></section>
+<section data-state="Corrected" id="state-10"></section>
+<section data-state="Long Chinese label" id="state-11"></section>
+<script>
+document.getElementById("state-0").innerHTML=SentriUI.stepper({"variant": "count", "description": "Current litter", "label": "Alive", "value": 3, "key": "count-Default", "min": 0, "max": 12, "reserveHint": false});
+document.getElementById("state-1").innerHTML=SentriUI.stepper({"variant": "count", "label": "Alive", "value": 0, "key": "count-Empty", "min": 0, "max": 12, "reserveHint": false, "hint": ""});
+document.getElementById("state-2").innerHTML=SentriUI.stepper({"variant": "count", "label": "Alive", "value": 3, "key": "count-Pressed", "min": 0, "max": 12, "reserveHint": false, "pressed": true});
+document.getElementById("state-3").innerHTML=SentriUI.stepper({"variant": "count", "label": "Alive", "value": 3, "key": "count-Focus", "min": 0, "max": 12, "reserveHint": false, "focus": true});
+document.getElementById("state-4").innerHTML=SentriUI.stepper({"variant": "count", "label": "Alive", "value": 0, "key": "count-Floor", "min": 0, "max": 12, "reserveHint": false, "hint": "No piglets to subtract", "pointers": [{"label":"Record dead","action":"record-dead"},{"label":"Edit count","action":"edit"}]});
+document.getElementById("state-5").innerHTML=SentriUI.stepper({"variant": "count", "label": "Alive", "value": 12, "key": "count-Ceiling", "min": 0, "max": 12, "reserveHint": false, "hint": "Cannot exceed 12 alive"});
+document.getElementById("state-6").innerHTML=SentriUI.stepper({"variant": "count", "label": "Alive", "value": 3, "key": "count-Disabled", "min": 0, "max": 12, "reserveHint": false, "disabled": true, "reason": "Record is locked. Open Edit to correct it."});
+document.getElementById("state-7").innerHTML=SentriUI.stepper({"variant": "count", "label": "Alive", "value": 3, "key": "count-Error", "min": 0, "max": 12, "reserveHint": false, "error": "Count exceeds the litter. Recount and correct it."});
+document.getElementById("state-8").innerHTML=SentriUI.stepper({"variant": "count", "label": "Alive", "value": 3, "key": "count-Loading", "min": 0, "max": 12, "reserveHint": false, "loading": true});
+document.getElementById("state-9").innerHTML=SentriUI.stepper({"variant": "count", "label": "Alive", "value": 3, "key": "count-Draft", "min": 0, "max": 12, "reserveHint": false, "draft": true, "status": "+1 unsaved"});
+document.getElementById("state-10").innerHTML=SentriUI.stepper({"variant": "count", "label": "Alive", "value": 3, "key": "count-Corrected", "min": 0, "max": 12, "reserveHint": false, "changed": true});
+document.getElementById("state-11").innerHTML=SentriUI.stepper({"variant": "count", "label": "本窝需要记录并核对的仔猪数量，包括转入和转出的所有仔猪", "value": 3, "key": "count-Long Chinese label", "min": 0, "max": 12, "reserveHint": false});
+</script></body></html>

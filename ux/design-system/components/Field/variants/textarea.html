@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"></head><body>
+<section data-state="Default" id="state-0"></section>
+<section data-state="Focus" id="state-1"></section>
+<section data-state="Filled" id="state-2"></section>
+<section data-state="Error" id="state-3"></section>
+<section data-state="Disabled" id="state-4"></section>
+<section data-state="Long Chinese label" id="state-5"></section>
+<script>
+document.getElementById("state-0").innerHTML=SentriUI.field({"variant": "textarea", "label": "Explanation", "unit": "", "hint": "", "value": ""});
+document.getElementById("state-1").innerHTML=SentriUI.field({"variant": "textarea", "label": "Explanation", "unit": "", "hint": "", "value": "", "focus": true});
+document.getElementById("state-2").innerHTML=SentriUI.field({"variant": "textarea", "label": "Explanation", "unit": "", "hint": "", "value": "Gate repaired beside the aisle."});
+document.getElementById("state-3").innerHTML=SentriUI.field({"variant": "textarea", "label": "Explanation", "unit": "", "hint": "", "value": "", "error": "Required detail is missing. Enter a description."});
+document.getElementById("state-4").innerHTML=SentriUI.field({"variant": "textarea", "label": "Explanation", "unit": "", "hint": "", "value": "", "disabled": true, "reason": "Record is locked. Open Edit to correct it."});
+document.getElementById("state-5").innerHTML=SentriUI.field({"variant": "textarea", "label": "请说明本次记录与实际情况不同的原因，并填写实际给药剂量以及使用单位", "unit": "", "hint": "", "value": ""});
+</script></body></html>

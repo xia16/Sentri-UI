@@ -1,0 +1,62 @@
+[
+  {
+    "id": "row",
+    "name": "Row",
+    "use": "use for inline animal counts in death, condition and adjustment records",
+    "notUse": "not for the primary screen count — use count",
+    "states": [
+      "Default",
+      "Empty",
+      "Pressed",
+      "Focus",
+      "Floor",
+      "Ceiling",
+      "Disabled",
+      "Error",
+      "Loading",
+      "Draft",
+      "Corrected",
+      "Long Chinese label"
+    ]
+  },
+  {
+    "id": "count",
+    "name": "Count",
+    "use": "use for the primary count in Farrowing and Set count",
+    "notUse": "not for repeated record rows — use row",
+    "states": [
+      "Default",
+      "Empty",
+      "Pressed",
+      "Focus",
+      "Floor",
+      "Ceiling",
+      "Disabled",
+      "Error",
+      "Loading",
+      "Draft",
+      "Corrected",
+      "Long Chinese label"
+    ]
+  },
+  {
+    "id": "well",
+    "name": "Well",
+    "use": "use for foster, move and reconcile counts",
+    "notUse": "not for a measured value — use Measure",
+    "states": [
+      "Default",
+      "Empty",
+      "Pressed",
+      "Focus",
+      "Floor",
+      "Ceiling",
+      "Disabled",
+      "Error",
+      "Loading",
+      "Draft",
+      "Corrected",
+      "Long Chinese label"
+    ]
+  }
+]
