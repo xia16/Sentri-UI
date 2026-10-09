@@ -1,0 +1,49 @@
+{
+  "status": "in-design",
+  "round": 1,
+  "judged": "2026-10-10",
+  "commit": "78d747e",
+  "model": "claude-opus-5-5",
+  "scores": { "clarity": 7, "budget": 7, "hierarchy": 6, "spacing": 7, "broken": 5 },
+  "lowest": 5,
+  "checklist": [
+    { "line": 1, "pass": true, "why": "Purpose line names Measure for one exact value." },
+    { "line": 2, "pass": true, "why": "When / when not present; PickerField and ChoiceList exist." },
+    { "line": 3, "pass": true, "why": "Label, bounds, track, two handles, end labels, optional reason named and shown." },
+    { "line": 4, "pass": true, "why": "One Range variant used by farrowing.room; generic numeric control." },
+    { "line": 5, "pass": true, "why": "Default, pressed (dragging), focus, at limits, disabled with reason, error rendered; a live drag sets data-dragging." },
+    { "line": 6, "pass": true, "why": "Handles 48x48, staggered above/below the track so equal bounds do not overlap (measured at 171,448 and 171,496)." },
+    { "line": 7, "pass": true, "why": "Not a choice control; no cap needed (the README's five-row text is copied boilerplate)." },
+    { "line": 8, "pass": true, "why": "Disabled handles dashed plus a written reason; error is text." },
+    { "line": 9, "pass": false, "why": "zh value wraps mid-range ('0–' / '5 天') via overflow-wrap:anywhere; the lower limit renders as '-7–-7 days'." },
+    { "line": 10, "pass": true, "why": "role=slider with valuemin/max/now/text per handle, focus ring, arrows/Home/End, track tap moves the nearer handle — all verified by use." },
+    { "line": 11, "pass": true, "why": "Tokens only." },
+    { "line": 12, "pass": false, "why": "Value text misstates Farrowing's scale: 'Due in -7–7 days', ends '-7 days'/'7 days', though the bounds mean '7+ days ago' and 'In 7+ days' (the list summary still says so); no formatter prop." },
+    { "line": 13, "pass": true, "why": "Not an overlay." },
+    { "line": 14, "pass": true, "why": "Links FilterSheet, FilterChips, PickerField; component classification stated." },
+    { "line": 15, "pass": false, "why": "Atlas Range tab logs console 404s from relative asset links in variants/range.html srcdoc cells." }
+  ],
+  "classification": "component",
+  "variants": [
+    {
+      "name": "Range",
+      "usedBy": ["farrowing.room"],
+      "status": "in-design",
+      "scores": { "clarity": 7, "budget": 7, "hierarchy": 6, "spacing": 7, "broken": 5 },
+      "findings": [
+        "Mouse drag (down/move/up) of both handles works, handles never cross, data-dragging set while moving; ArrowLeft/Right, Home, End work; track tap moves the nearer handle; equal bounds stay grabbable.",
+        "Raw negative value text and no selected-span fill (see component findings)."
+      ]
+    }
+  ],
+  "findings": [
+    { "severity": "high", "text": "Value text is raw numbers: Farrowing shows 'Due in -7–7 days', ends '-7 days'/'7 days', and '-7–-7 days' at the limit, while -7/7 are open-ended ('7+ days ago' / 'In 7+ days') and the list summary formats them that way — sheet and list disagree and the sheet is wrong at the ends.", "fix": "Add a format(value) prop used for output, end labels and aria-valuetext; Farrowing passes dueDay (7+ days ago · Today · In 7+ days)." },
+    { "severity": "high", "text": "Atlas console not clean: variants/range.html cells request ../../tokens.css, ../bundle.css, ../bundle.js, sentri-icons.js and 404 inside srcdoc.", "fix": "Remove the asset tags from variants/range.html (atlas injects them) or make them root-relative." },
+    { "severity": "medium", "text": "The track has no fill between the handles; the chosen span is only implied by two staggered circles with stems, and Farrowing's old 'Today' midpoint label is gone.", "fix": "Paint the rail segment between the handles with an ink token and add an optional mid-label property." },
+    { "severity": "medium", "text": "Long zh value breaks inside the number range ('0–' then '5 天').", "fix": "Use overflow-wrap:break-word on the label and white-space:nowrap on <output>." },
+    { "severity": "low", "text": "README carries FilterSheet boilerplate ('Do show current bounds and count', 'Limit short visible choice rows to five', 'Do preserve drafts on Back') that is not RangeSlider's job.", "fix": "Cut those lines; keep slider rules only (step, bounds never cross, Measure for exact values)." }
+  ],
+  "proposals": [
+    { "kind": "merge", "name": "Feed adjustment slider", "why": "Inspection's feed edit still uses a hand-built native single range (−50%..+50%); it records a value, so it belongs with Stepper/Measure, not as a RangeSlider variant.", "seenIn": ["inspection.actions"] }
+  ]
+}
