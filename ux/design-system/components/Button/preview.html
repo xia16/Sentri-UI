@@ -1,27 +1,18 @@
 <!-- @dsCard group="Controls" height=760 -->
-<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
-<body>
-<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div class="sheet-footer" style="position:relative;margin:0 -16px;padding:14px 18px 28px;display:flex;gap:12px"><button type="button" class="button secondary surface-back" style="width:86px"><span>Back</span></button><button type="button" class="button primary">Record for 12 pigs</button></div>
-<div class="sheet-footer" style="position:relative;margin:12px -16px 0;padding:14px 18px 28px;display:flex;gap:12px"><button type="button" class="button task-end-early">End early</button><button type="button" class="button danger">End task</button></div>
-<div class="sheet-footer" style="position:relative;margin:12px -16px 0;padding:14px 18px 28px;display:flex;gap:12px"><button type="button" class="button primary" disabled>Confirm &amp; next</button></div>
-<!-- Candidate (ADR 0002): the tool and text registers, the waiting face with its reason, hold-to-commit. -->
-<div id="candidates" style="margin-top:24px;display:flex;flex-direction:column;gap:16px"></div></div>
-<script>
-const UI = window.SentriUI, I = window.SentriIcons.icon;
-document.querySelector('.surface-back').insertAdjacentHTML('afterbegin', I('back'));
-const row = html => `<div style="display:flex;flex-wrap:wrap;gap:12px">${html}</div>`;
-candidates.innerHTML =
-  `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${UI.button({ label: 'Record dead', register: 'tool', action: 'open-dead' })}${UI.button({ label: 'Set count', register: 'tool', action: 'open-count' })}</div>` +
-  `<div style="display:flex;justify-content:flex-end">${UI.button({ label: 'Clear', register: 'text', action: 'clear' })}</div>` +
-  row(UI.buttonReason({ id: 'why', text: 'Choose a cause for 2 crushed to save' }) + UI.button({ label: 'Back', action: 'back' }) + UI.button({ label: 'Save', register: 'primary', waiting: true, describedby: 'why' })) +
-  row(UI.button({ label: 'Back', action: 'back' }) + UI.holdButton({ label: 'End task', caption: 'Hold to end' })) +
-  row(UI.button({ label: 'Back', action: 'back' }) + UI.holdButton({ label: 'End task', caption: 'Keep holding', phase: 'holding', id: 'held' })) +
-  row(UI.button({ label: 'Back', action: 'back' }) + UI.holdButton({ label: 'Lock born 14', caption: 'Hold to lock', tone: 'primary' }));
-document.getElementById('held').setAttribute('data-preview', 'still');
-candidates.querySelectorAll('.primary,.danger').forEach(b => { b.style.flex = '1'; });
-UI.holdBind(candidates, { onCommit: el => setTimeout(() => el.setAttribute('data-phase', 'idle'), 1200) });
-</script>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Button</title></head><body><main id="examples"></main><script>
+(async()=>{
+ if(!window.SentriUI){
+  for(const href of ['../../tokens.css','../bundle.css']){const l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.append(l);}
+  await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='../bundle.js';s.onload=resolve;s.onerror=reject;document.head.append(s);});
+ }
+ const variants=["primary", "secondary", "text", "hold", "tool", "destructive"];
+ for(const id of variants){
+  const html=await fetch('variants/'+id+'.html').then(r=>r.text());
+  const iframe=document.createElement('iframe');iframe.title='Button '+id;iframe.style.width='100%';iframe.style.border='0';
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  const css=Array.from(document.querySelectorAll('link[rel="stylesheet"],style')).map(n=>n.tagName==='LINK'?'<link rel="stylesheet" href="'+n.href+'">':n.outerHTML).join('');
+  doc.head.insertAdjacentHTML('beforeend',css+'<script src="'+new URL('../bundle.js',location.href).href+'"><'+'/script>');
+  iframe.srcdoc=doc.documentElement.outerHTML;iframe.onload=()=>iframe.style.height=iframe.contentDocument.body.scrollHeight+'px';examples.append(iframe);
+ }
+})().catch(e=>{examples.textContent=e.message;console.error(e);});
+</script></body></html>

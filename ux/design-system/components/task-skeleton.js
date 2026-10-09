@@ -234,23 +234,8 @@
     return `<section class="tk-day" data-ds="TaskDay"${L(label ?? title)}><header class="tk-day-head"><strong>${parts(title)}</strong>${status ? `<span>${parts(status)}</span>` : ''}</header>${rows}</section>`;
   }
 
-  /* ---- TaskHold binding: SentriUI.holdBind, with farrowing's caption — the caption (`HOLD TO END`) stays as it is through
-     the hold (farrowing shows only the sweep); the cues still reach the hold's status line (statusId) when there is one.
-     The unknown phase keeps the Button card's message. Same options and return as SentriUI.holdBind. ---- */
-  function holdBind(scope, opts = {}) {
-    const UI = root.SentriUI, sel = opts.selector || '.st-hold', idle = new WeakMap();
-    const keep = b => { const c = b && b.querySelector('.st-hold-caption'); if (c && b.getAttribute('data-phase') === 'idle') idle.set(b, c.outerHTML); };
-    scope.querySelectorAll(sel).forEach(keep);
-    const early = e => { const b = e.target.closest && e.target.closest(sel); if (b) keep(b); };
-    scope.addEventListener('pointerdown', early, true);
-    scope.addEventListener('keydown', early, true);
-    const onPhase = opts.onPhase;
-    return UI.holdBind(scope, Object.assign({}, opts, { onPhase(b, phase, cue) {
-      const c = b.querySelector('.st-hold-caption');
-      if (phase !== 'unknown' && c && idle.has(b) && c.outerHTML !== idle.get(b)) c.outerHTML = idle.get(b);
-      if (onPhase) onPhase(b, phase, cue);
-    } }));
-  }
+  // Compatibility alias: Button owns the hold face and interaction.
+  const holdBind = (scope, opts = {}) => root.SentriUI.holdBind(scope, opts);
 
   /* ---- TaskDoors: a list of doors. card: false (default) — flat door rows (SentriTask.door, no id column).
      card: true — farrowing's Pen page / sow-actions list: an optional section title with its icon, then the doors in one

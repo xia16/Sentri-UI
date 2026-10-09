@@ -8,12 +8,12 @@ test('sheet drawer: scrim, grab, head with a ✕, body, a Back footer by default
   assert.match(html, /^<button type="button" class="scrim"/);
   assert.match(html, /role="dialog" aria-modal="true" data-st-context="drawer" data-size="medium" data-sizing="content"/);
   assert.match(html, /<div class="grab" aria-hidden="true">/);
-  assert.equal((html.match(/class="sheet-close"/g) || []).length, 1);
-  assert.equal((html.match(/class="surface-back"/g) || []).length, 1);
+  assert.equal((html.match(/class="icon-button sheet-close"/g) || []).length, 1);
+  assert.equal((html.match(/class="button secondary surface-back"/g) || []).length, 1);
 });
 test('sheet drawer always carries the ✕, the aside sits beside it, never in its place', () => {
   const html = UI.sheet({ title: 'T', aside: '<button class="st-text-action">Clear</button>', close: null });
-  assert.match(html, /class="sheet-aside">.*Clear.*<\/div><button type="button" class="sheet-close"/);
+  assert.match(html, /class="sheet-aside">.*Clear.*<\/div><button type="button" class="icon-button sheet-close"/);
 });
 test('sheet page: no scrim, no grab, no ✕, one Back; dialog: backdrop, no ✕', () => {
   const page = UI.sheet({ variant: 'page', title: 'Log', bar: '<div class="statusbar"></div>' });

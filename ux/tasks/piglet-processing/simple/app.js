@@ -250,7 +250,7 @@
     if (P.hasId()) tools.push(['id-open', 'scan', T('tr.id.' + scheme())]);
     tools.push(['tool-death', 'alert', T('tool.death')], ['more', 'more', T('more.title')]);
     return '<div class="sp-toolrow" data-count="' + tools.length + '">' + tools.map(function (x) {
-      return '<button type="button" class="sp-tool" data-action="' + x[0] + '" data-value="">' + I(x[1]) + '<span>' + esc(x[2]) + '</span></button>';
+      return UI.button({register: 'tool', action: x[0], icon: I(x[1]), label: x[2]});
     }).join('') + '</div>';
   }
   function penSheet(inert) {
@@ -279,8 +279,7 @@
     var p = pen(), ended = !!P.s.ended;
     var rows = p.ids.slice().reverse().map(function (x) {
       var id = [x.tag, x.notch].filter(Boolean).join(' · ');
-      var mark = UI.iconButton({ action: ended ? 'noop' : 'breeder', value: x.no, icon: I('bookmark'), label: T(x.keep ? 'mark.off' : 'mark.on', { no: x.no }), className: 'sp-mark' })
-        .replace('class="icon-button', 'aria-pressed="' + !!x.keep + '" class="icon-button');
+      var mark = UI.iconButton({ action: ended ? 'noop' : 'breeder', value: x.no, icon: I('bookmark'), label: T(x.keep ? 'mark.off' : 'mark.on', { no: x.no }), variant: 'plain', selected: !!x.keep, className: 'sp-mark' });
       var row = K.row({ id: id, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
         meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), action: ended ? '' : 'give-fix', value: x.no, trail: '', still: ended, label: T('fix.aria', { no: x.no }) });
       return '<div class="sp-pigrow" data-ds="TaskRow">' + row + mark + '</div>';
@@ -705,7 +704,7 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && (V.pen || V.end)) { closeTop(); render(); }
   });
-  var holds = K.holdBind(phone, { onCommit: function (b) {
+  var holds = UI.holdBind(phone, { onCommit: function (b) {
     var a = b.getAttribute('data-action');
     setTimeout(function () {
       holds.settle(b, 'done');

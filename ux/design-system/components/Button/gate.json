@@ -285,5 +285,11 @@
         "piglet-processing.sheet-todo"
       ]
     }
-  ]
+  ],
+  "remediation": {
+    "date": "2026-10-10",
+    "branch": "45-button",
+    "verification": "../Button/verification.md",
+    "summary": "All listed implementation and documentation findings addressed; original frontier-model judgment preserved for audit. Human approval is not implied."
+  }
 }

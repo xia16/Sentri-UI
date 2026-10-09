@@ -406,14 +406,14 @@ button{cursor:pointer;color:inherit;border:0}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:var(--size-3) solid var(--focus-strong);outline-offset:var(--size-3)}
 button:disabled,button[aria-disabled=true]{cursor:default;color:var(--disabled-ink);background:var(--disabled-surface);border-color:var(--disabled-border)}
 svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
-.button{min-height:var(--size-52);padding:var(--space-10) var(--space-17);display:flex;align-items:center;justify-content:center;gap:var(--space-7);border:1px solid var(--button-border);background:var(--paper);border-radius:var(--radius-13);font-weight:700;font-size:var(--font-size-14);text-align:center;line-height:1.3}
+.button{min-height:var(--tap-min);min-width:var(--tap-min);padding:var(--space-10) var(--space-17);display:flex;align-items:center;justify-content:center;gap:var(--space-7);border:var(--space-1) solid var(--control-border);background:var(--paper);border-radius:var(--radius-control);font-weight:var(--type-weight-strong);font-size:var(--type-button-size);text-align:center;line-height:1.3}
 .button.primary{flex:1;background:var(--ink);border-color:var(--ink);color:var(--paper)}
 .button.primary:disabled{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink)}
 .button.secondary{min-width:var(--back-width);font-weight:600}
 .button:hover:not(:disabled){filter:brightness(.96)}
-.button:active:not(:disabled){transform:translateY(1px)}
+.button:active:not(:disabled){transform:translateY(var(--space-1))}
 .button.danger:not([aria-disabled="true"]){background:var(--red);border-color:var(--red)}
-.icon-button{background:transparent;min-width:var(--tap-min);height:var(--tap-min);display:grid;place-items:center;border-radius:var(--radius-10);position:relative}
+.icon-button{background:transparent;min-width:var(--tap-min);height:var(--tap-min);display:grid;place-items:center;border-radius:var(--radius-control);position:relative}
 .segment{display:flex;border-radius:var(--radius-10);padding:var(--space-3);margin-top:var(--space-16);border:1px solid transparent}
 .segment button{flex:1;min-height:var(--tap-min);background:transparent;font-size:var(--font-size-12);border-radius:var(--radius-8)}
 .field{display:flex;flex-direction:column;gap:var(--space-9);font-size:var(--font-size-12);font-weight:600;margin:var(--space-18) 0 0}
@@ -469,9 +469,9 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .sheet-subtitle .st-sep{margin:0 var(--status-dot)}
 .sheet-aside .text-button,.sheet-aside .st-text-action{min-width:var(--tap-min)}
 .sheet-aside{flex:none;display:flex;align-items:center;align-self:flex-start;gap:var(--space-6)}
-.sheet-close{flex:none;display:grid;place-items:center;width:var(--tap-min);height:var(--tap-min);padding:0;margin:0;border:0;border-radius:var(--radius-segment);background:transparent;color:var(--ink)}
+.sheet-close{margin:0}
 .sheet-close svg{width:var(--glyph-pad);height:var(--glyph-pad)}
-.sheet-close:active{background:var(--press)}
+
 /* Body: the one scroller. */
 .sheet-body{flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:var(--space-18) var(--space-gutter-sheet) var(--space-panel);scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .sheet-body::-webkit-scrollbar{display:none;width:0;height:0}
@@ -481,11 +481,9 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .sheet-footer{flex:none;position:relative;display:flex;align-items:stretch;gap:var(--space-row-x);margin:0;padding:var(--space-row-x) var(--space-gutter-sheet) var(--space-footer-bottom);background:var(--paper);border-top:1px solid var(--line)}
 .sheet-footer::after{content:"";position:absolute;bottom:var(--space-8);left:calc(50% - var(--handle-width) / 2);width:var(--handle-width);height:var(--size-4);border-radius:var(--radius-4);background:var(--handle);pointer-events:none}
 .sheet[data-presentation="page"]>.sheet-footer{padding-left:var(--space-gutter);padding-right:var(--space-gutter)}
-.sheet-footer>.button{flex:1;min-width:0;min-height:var(--control-height);margin:0;padding:var(--space-10) var(--space-17);border-radius:var(--radius-control);font:500 var(--type-button-size)/1.3 var(--font-sans)}
-.sheet-footer>.st-hold .st-hold-caption{font:500 var(--type-hold-caption-size)/1.3 var(--font-sans);letter-spacing:0.07em;text-transform:uppercase;opacity:var(--task-hold-caption-opacity)}
-.sheet-footer>.st-hold[data-phase="unknown"] .st-hold-caption{opacity:1}
+.sheet-footer>.button:not(.surface-back){flex:1;min-width:0;min-height:var(--control-height);margin:0;padding:var(--space-10) var(--space-17);border-radius:var(--radius-control);font:500 var(--type-button-size)/1.3 var(--font-sans)}
 /* Back: the one exit of every footer. Alone it fills the bar in the primary's face. */
-.surface-back{flex:none;display:flex;align-items:center;justify-content:center;gap:var(--space-4);width:var(--back-width);min-width:var(--back-width);min-height:var(--control-height);margin:0;padding:var(--space-8);background:var(--paper);border:1px solid var(--back-border);border-radius:var(--radius-control);box-shadow:none;color:var(--ink);font:500 var(--type-button-size) var(--font-sans);white-space:nowrap;touch-action:manipulation}
+.button.surface-back{flex:none;display:flex;align-items:center;justify-content:center;gap:var(--space-4);width:var(--back-width);min-width:var(--back-width);min-height:var(--control-height);margin:0;padding:var(--space-8);background:var(--paper);border:1px solid var(--back-border);border-radius:var(--radius-control);box-shadow:none;color:var(--ink);font:500 var(--type-button-size) var(--font-sans);white-space:nowrap;touch-action:manipulation}
 .surface-back>svg{width:var(--size-16);height:var(--size-16);flex:none;transform:none}
 .surface-back:active{background:var(--back-press)}
 .surface-back:only-child{flex:1 1 auto;width:auto;min-width:0;background:var(--ink);border-color:var(--ink);color:var(--paper);font-weight:600}
@@ -544,7 +542,6 @@ body{background:var(--ground);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) :is(.statusbar,.task-header){background:var(--app-background)}
 :is(.farrowing-phone,.inspection-phone) .task-header{padding:var(--space-4) var(--space-18) var(--space-10);gap:var(--space-12)}
 :is(.farrowing-phone,.inspection-phone) .task-header h2{font-size:var(--font-size-22);line-height:1.25;font-weight:500;letter-spacing:var(--tracking-page-tight)}
-:is(.farrowing-phone,.inspection-phone) .task-header>.task-return{width:var(--tap-min);min-width:var(--tap-min);height:var(--tap-min);border:1px solid var(--line);border-radius:var(--radius-12);background:var(--paper)}
 :is(.farrowing-phone,.inspection-phone) .task-activity{padding-left:var(--space-18);padding-right:var(--space-18);color:var(--muted)}
 :is(.farrowing-phone,.inspection-phone) .task-activity strong{font-weight:500}
 :is(.farrowing-phone,.inspection-phone) .page-header h3{font-size:var(--font-size-20);line-height:1.3;font-weight:500;letter-spacing:var(--tracking-sheet)}
@@ -560,7 +557,6 @@ body{background:var(--ground);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) :is(button,a,input,select,textarea,summary):focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 /* Action semantics remain explicit; destructive controls never inherit the green treatment. */
 :is(.farrowing-phone,.inspection-phone) .button:is(.danger,.task-end-confirm):not(:disabled):not([aria-disabled="true"]){background:var(--red);border-color:var(--red);color:var(--paper)}
-:is(.farrowing-phone,.inspection-phone) .button.task-end-early:not(:disabled):not([aria-disabled="true"]){background:var(--red-wash);border-color:var(--red);color:var(--red)}
 @media(max-width:370px){
  :is(.farrowing-phone,.inspection-phone) .task-header{gap:var(--space-8);padding-left:var(--space-12);padding-right:var(--space-12)}
  :is(.farrowing-phone,.inspection-phone) .task-header h2{font-size:var(--font-size-20)}
@@ -646,7 +642,7 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 .st-empty{margin:0;font-size:var(--font-size-12);line-height:1.6;color:var(--st-muted)}
 .st-section+.st-section{margin-top:var(--st-space-section)}
 /* Screen-level controls follow the existing footer/back contract. */
-:is(.inspection-phone,.farrowing-phone,.device) :is(.button.primary,.primary-button,.lifecycle-primary):not(:disabled):not([aria-disabled="true"]):not(.danger):not(.task-end-early):not(.task-end-confirm){background:var(--ink);border-color:var(--ink);color:var(--paper)}
+:is(.inspection-phone,.farrowing-phone,.device) :is(.button.primary,.primary-button,.lifecycle-primary):not(:disabled):not([aria-disabled="true"]):not(.danger):not(.task-end-confirm){background:var(--ink);border-color:var(--ink);color:var(--paper)}
 :is(.inspection-phone,.farrowing-phone) .button.task-complete:not(:disabled){background:var(--ink);border-color:var(--ink);color:var(--paper)}
 :is(.inspection-phone,.farrowing-phone) .finish-walk:not(:disabled){background:var(--ink);border-color:var(--ink);color:var(--paper)}
 :is(.st-row,.st-heading-action button,.st-heading-action a):focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
@@ -892,7 +888,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 
 /* Button registers: tool (a soft well, no border) and text (the bare word); the waiting face; the reason line */
 .button.tool{min-height:var(--control-height);background:var(--well);border-color:var(--well);color:var(--ink)}
-.button:not([aria-disabled="true"])[data-preview~="pressed"]{filter:brightness(.96);transform:translateY(1px)}
+.button:not([aria-disabled="true"])[data-preview~="pressed"]{filter:brightness(.96);transform:translateY(var(--space-1))}
 .st-text-action.st-text-action{justify-content:flex-start;min-width:var(--tap-min)}
 .st-text-action:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){color:var(--ink);background:var(--press);border-radius:var(--radius-control)}
 .st-text-action.st-text-action[aria-disabled="true"]{color:var(--disabled-ink);background:transparent;cursor:default}
@@ -905,7 +901,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 /* hold: the sweep fills the button over hold-commit; the caption rides under the verb */
 .button.st-hold{position:relative;overflow:hidden;flex-direction:column;gap:var(--space-4);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .st-hold>.st-hold-label,.st-hold>.st-hold-caption{position:relative;pointer-events:none}
-.st-hold-caption{font:var(--type-weight-strong) var(--type-description-size)/1.3 var(--font-sans);opacity:var(--hold-caption-opacity)}
+.st-hold-caption{font:500 var(--type-hold-caption-size)/1.3 var(--font-sans);letter-spacing:0.07em;text-transform:uppercase;opacity:var(--task-hold-caption-opacity)}
 .st-hold::before{content:"";position:absolute;inset:0;background:var(--ink);opacity:var(--hold-sweep-opacity);transform:scaleX(0);transform-origin:left}
 .button.primary.st-hold::before{background:var(--paper)}
 .st-hold[data-phase="holding"]::before{transform:scaleX(1);transition:transform var(--hold-commit) linear}
@@ -994,6 +990,19 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-optional-body .field{margin-top:0}
 .st-optional-body textarea{height:var(--size-90);min-height:var(--size-90)}
 .st-optional-list{display:block}
+
+/* Button and IconButton own their geometry; host hooks only position them. */
+.button .st-button-label{min-width:0;overflow-wrap:anywhere}
+.button.danger{color:var(--paper)}
+.button.tool svg{width:var(--space-16);height:var(--space-16)}
+.icon-button.icon-button{box-sizing:border-box;flex:none;width:var(--tap-min);min-width:var(--tap-min);height:var(--tap-min);min-height:var(--tap-min);padding:0;border:var(--space-1) solid var(--line);border-radius:var(--radius-control);background:var(--paper);color:var(--ink)}
+.icon-button.icon-button[data-variant="plain"]{border-color:transparent;background:transparent}
+.icon-button:is(:active,[data-preview~="pressed"]):not([aria-disabled="true"]){background:var(--press);transform:translateY(var(--space-1))}
+.icon-button:is(:focus-visible,[data-preview~="focus"]){outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
+.icon-button[aria-disabled="true"]{color:var(--disabled-ink);cursor:default}
+.st-icon-selected svg{width:var(--space-12);height:var(--space-12)}
+.st-icon-selected{position:absolute;right:0;bottom:0;font-size:var(--type-description-size);background:var(--paper)}
+@media(prefers-reduced-motion:reduce){.icon-button:is(:active,[data-preview~="pressed"]){transform:none}}
 
 </style>
 <style>/* ../../../design-system/components/task-skeleton.css */
@@ -1432,14 +1441,10 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .sp-fact-act svg { flex: none; width: 12px; height: 12px; fill: none; stroke: var(--muted); stroke-width: 2; }
 /* farrowing's in-sheet tool row (Edit · Record death · More actions): outlined tools sharing the width */
 .sp-toolrow { display: flex; gap: var(--space-key-gap); }
-.sp-tool { flex: 1 1 0; min-width: 0; min-height: var(--tap-min); display: flex; align-items: center; justify-content: center; gap: 5px;
-  margin: 0; padding: 8px 6px; border: 1px solid var(--line); border-radius: var(--radius-segment); background: var(--paper); color: var(--ink);
-  font: 500 var(--type-identifier-size)/1.3 var(--font-sans); white-space: nowrap; cursor: pointer; }
-.sp-tool:active { background: var(--press); }
-.sp-tool svg { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sp-toolrow > .button.tool { flex: 1 1 0; min-width: var(--tap-min); padding: var(--space-8) var(--space-6); }
 /* the breeder mark on an identified piglet: a 44px flag; filled when kept */
-.icon-button.sp-mark { flex: none; width: var(--tap-min); height: var(--tap-min); border: 0; background: none; color: var(--muted); }
-.sp-mark svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+
+.sp-mark svg { width: var(--glyph-pad); height: var(--glyph-pad); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
 .sp-mark[aria-pressed="true"] { color: var(--green); }
 .sp-mark[aria-pressed="true"] svg { fill: currentColor; }
 .sp-tabs.st-segment { margin: 0; }
@@ -1753,9 +1758,11 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function segment({options=[],active='',action='',className='',ariaLabel=''}={}){
     return `<div class="st-segment segment ${esc(className)}" data-ds="Segment" role="group"${ariaLabel?` aria-label="${esc(ariaLabel)}"`:''}>${options.map(([v,label,x])=>`<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}">${has(x,'label')?`<span${sa(x.strs.label,x.args&&x.args.label)}>${label}</span>`:label}</button>`).join('')}</div>`;
   }
-  function iconButton({action='',icon='',label='',className='',value='',badge='',disabled=false,strs,args}={}){
+  function iconButton({action='',icon='',label='',variant='bordered',className='',value='',badge='',disabled=false,pressed=false,selected=null,reason='',describedby='',attrs={},strs,args}={}){
     const o={strs,args},hasBadge=(badge!==''&&badge!=null)||has(o,'badge');
-    return `<button type="button" class="icon-button ${esc(className)}" data-ds="IconButton" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${disabled?' disabled':''}>${icon}${hasBadge?`<span class="filter-badge">${tx(badge,o,'badge')}</span>`:''}</button>`;
+    const v=oneOf('IconButton','variant',variant,['bordered','plain'],'bordered');
+    const rid=reason?(describedby||fieldId('st-icon-reason')):describedby;
+    return `<button type="button" class="icon-button ${esc(className)}" data-ds="IconButton" data-variant="${v}" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${disabled?' aria-disabled="true"':''}${pressed?' data-preview="pressed"':''}${selected!=null?` aria-pressed="${!!selected}"`:''}${rid?` aria-describedby="${esc(rid)}"`:''}${safeAttr(attrs)}><span aria-hidden="true">${icon}</span>${selected?`<span class="st-icon-selected" aria-hidden="true">${sGlyph('check')}</span>`:''}${hasBadge?`<span class="filter-badge">${tx(badge,o,'badge')}</span>`:''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
   }
   /* ---- Field cards (candidate, ADR 0001): Stepper, Measure, Numpad ----
      Event contract: every control is a <button data-action> whose data-value is the caller's field key;
@@ -1773,7 +1780,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   const ariaText=(text,id,args)=>` aria-label="${esc(text)}"${id?` data-str-attr="aria-label:${esc(id)}"${args?` data-args="${esc(JSON.stringify(args))}"`:''}`:''}`;
   const hintTone=t=>t==='warn'||t==='refused'?'amber':'muted';
   // Text actions (the fourth register, ≥44px): [{label, action, value, strs:{label}, args}].
-  const textActions=(list,key)=>(list||[]).map(p=>`<button type="button" class="st-text-action" data-action="${esc(p.action||'')}" data-value="${esc(p.value!=null?p.value:key)}">${tx(p.label,p,'label')}</button>`).join('');
+  const textActions=(list,key)=>(list||[]).map(p=>button({label:p.label||'',register:'text',action:p.action||'',value:p.value!=null?p.value:key,strs:p.strs,args:p.args})).join('');
   /* The card's one persistent status region. Always mounted (an empty live region still announces later);
      reserve: '' (no height when empty) · 'text' (one line) · 'action' (44px: room for a text action or two lines). */
   function hintLine(cls,{id='',text='',tone='',o={},key='hint',reserve='',actions=[],fieldKey=''}={}){
@@ -2018,13 +2025,14 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   }
   /* Button, as a factory. Registers (RULINGS, three button registers + the text action): primary (the one commit,
      ink) · secondary (an exit, outlined) · tool (a mid-sheet act, a soft well, no border) · text (the quietest: a bare
-     word, 13/700 ink-2, no container, ≥44px) · danger · end-early. waiting: the waiting face — present, quiet,
+     word, 13/700 ink-2, no container, ≥48px) · danger. waiting: the waiting face — present, quiet,
      focusable (aria-disabled, never disabled); guard() answers its tap. busy: sent, until the host settles. */
-  const REGISTER={primary:'button primary',secondary:'button secondary',tool:'button tool',danger:'button danger','end-early':'button task-end-early'};
-  function button({label='',register='secondary',action='',value='',waiting=false,busy=false,describedby='',labelledby='',id='',attrs={},className='',strs,args}={}){
-    const o={strs,args},r=oneOf('Button','register',register,['primary','secondary','tool','text','danger','end-early'],'secondary');
+  const REGISTER={primary:'button primary',secondary:'button secondary',tool:'button tool',danger:'button danger'};
+  function button({label='',register='secondary',action='',value='',waiting=false,disabled=false,busy=false,icon='',reason='',describedby='',labelledby='',id='',attrs={},className='',strs,args}={}){
+    const o={strs,args},r=oneOf('Button','register',register,['primary','secondary','tool','text','danger'],'secondary');
     const cls=r==='text'?'st-text-action':REGISTER[r];
-    return `<button type="button" class="${cls}${className?' '+esc(className):''}" data-ds="Button" data-register="${r}"${id?` id="${esc(id)}"`:''} data-action="${esc(action)}" data-value="${esc(value)}"${waiting||busy?' aria-disabled="true"':''}${busy?' aria-busy="true" data-busy=""':''}${describedby?` aria-describedby="${esc(describedby)}"`:''}${labelledby?` aria-labelledby="${esc(labelledby)}"`:''}${safeAttr(attrs)}>${tx(label,o,'label')}</button>`;
+    const rid=reason?(describedby||fieldId('st-button-reason')):describedby;
+    return `<button type="button" class="${cls}${className?' '+esc(className):''}" data-ds="Button" data-register="${r}"${id?` id="${esc(id)}"`:''} data-action="${esc(action)}" data-value="${esc(value)}"${waiting||busy?' aria-disabled="true"':''}${disabled?' disabled':''}${busy?' aria-busy="true" data-busy=""':''}${rid?` aria-describedby="${esc(rid)}"`:''}${labelledby?` aria-labelledby="${esc(labelledby)}"`:''}${safeAttr(attrs)}>${icon?`<span aria-hidden="true">${icon}</span>`:''}<span class="st-button-label">${tx(label,o,'label')}</span>${busy?'<span class="st-button-busy" aria-hidden="true">…</span>':''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
   }
   /* The reason a waiting button waits, one persistent status line beside the bar (row-title size). */
   function buttonReason({text='',id='',actions=[],className='',strs,args}={}){
@@ -2119,7 +2127,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       const cap=b.querySelector('.st-hold-caption'),id=r.cue&&cues[r.cue];
       // Every idle transition restores the idle caption; the cue for it goes to the status line only.
       if(r.phase==='idle'){if(idleCap.has(b)&&cap)cap.outerHTML=idleCap.get(b);}
-      else if(id&&cap){cap.setAttribute('data-str',id);cap.textContent=t(id);}
+      else if(id&&cap&&['armed','pending','done','unknown'].includes(r.phase)){cap.setAttribute('data-str',id);cap.textContent=t(id);}
       const line=b.getAttribute('data-hold-status')&&root.document&&root.document.getElementById(b.getAttribute('data-hold-status'));
       if(line&&id)announce(line,`<span data-str="${esc(id)}">${esc(t(id))}</span>`);
       if(r.commit)buzz(HOLD.vibrateCommit);else if(r.cue==='released')buzz(HOLD.vibrateRelease);
@@ -2249,7 +2257,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   const sParts=v=>Array.isArray(v)?v.map(p=>{const o=sObj(p);if(o.sep)return SEP;return o.tone?`<span class="st-tone" data-tone="${esc(o.tone)}">${sT(o)}</span>`:sT(o);}).join(''):sT(v);
   /* Back: the footer's exit, the same on every sheet (a 16px chevron + the word). Alone in a footer it fills the bar. */
   function backButton({action='back',value='',label={text:'Back',str:'act.back'},className=''}={}){
-    return `<button type="button" class="surface-back${className?' '+esc(className):''}" data-ds="Sheet"${sA(action,value)}>${sGlyph('back-chevron')}<span>${sT(label)}</span></button>`;
+    return button({register:'secondary',action,value,label:'',className:'surface-back'+(className?' '+className:'')}).replace('<span class="st-button-label"></span>',sGlyph('back-chevron')+'<span>'+sT(label)+'</span>');
   }
   /* A Button from a { label, action, value, register, waiting, describedby } spec (a string is already HTML). */
   function sButton(b){
@@ -2270,15 +2278,17 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
      footer markup in place of back/primary/hold (a host's own two controls); className adds a page hook. */
   function sheetFooter({back:b={},primary,hold:h,status:st,content='',className=''}={}){
     let line='';
+    if(!st&&primary&&typeof primary==='object'&&primary.reason){st=sObj(primary.reason);primary=Object.assign({},primary,{reason:''});}
     if(st){
       const id=st.id||fieldId('st-sheet-status'),waiting=!!((primary&&typeof primary==='object'&&primary.waiting)||(h&&h.waiting));
-      const vis=st.visible!=null?!!st.visible:(waiting||!!st.action),tone=st.tone?` data-tone="${esc(st.tone)}"`:'';
+      const vis=waiting||!!st.action||!!st.visible,tone=st.tone?` data-tone="${esc(st.tone)}"`:'';
       const act=vis&&st.action?sButton(Object.assign({register:'text'},st.action)):'';
       if(!vis)line=`<p class="sheet-status st-visually-hidden" id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>`;
       else line=act?`<div class="sheet-status" data-action-slot><p id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>${act}</div>`:`<p class="sheet-status" id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>`;
       if(h&&!h.statusId)h=Object.assign({},h,{statusId:id});
       if(primary&&typeof primary==='object'&&!primary.describedby)primary=Object.assign({},primary,{describedby:id});
     }
+    if(content){content=content.replace(/<p class="st-field-hint st-button-reason[^]*?<\/p>/g,reason=>{line+=reason;return '';});}
     const inner=content||`${b?backButton(b):''}${h?sHold(h):sButton(primary)}`;
     return `${line}<div class="sheet-footer${className?' '+esc(className):''}" data-ds="Sheet">${inner}</div>`;
   }
@@ -2297,7 +2307,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       return `<div class="dialog-backdrop" data-ds="Sheet" data-variant="dialog"${sLayer(layer)}><div class="dialog${cls}" role="dialog" aria-modal="true" tabindex="-1"${id?` id="${esc(id)}"`:''}${vw}${inert?' inert':''}${sL(label??title)}${ex}><div class="dialog-body${bodyClass?' '+esc(bodyClass):''}"><h2 class="dialog-title">${icon?sGlyph(icon):''}${sT(title)}</h2>${subtitle?`<p class="dialog-desc">${sParts(subtitle)}</p>`:''}${body}</div>${foot}</div></div>`;
     }
     const sub=subtitle?`<p class="sheet-subtitle"${subtitleTone?` data-tone="${esc(subtitleTone)}"`:''}>${sParts(subtitle)}</p>`:'';
-    const cl=Object.assign({action:'dismiss'},close||{}),x=v==='drawer'?`<button type="button" class="sheet-close"${sA(cl.action,cl.value)}${sL(cl.label,{text:'Close',str:'act.close'})}>${sGlyph('close')}</button>`:'';
+    const cl=Object.assign({action:'dismiss'},close||{}),closeLabel=sObj(cl.label||{text:'Close',str:'act.close'}),x=v==='drawer'?iconButton({variant:'plain',action:cl.action,value:cl.value,icon:sGlyph('close'),label:closeLabel.text||'Close',className:'sheet-close',attrs:closeLabel.str?{'data-str-attr':'aria-label:'+closeLabel.str}: {}}):'';
     const head=`<header class="utility-header">${lead}<div class="sheet-titles"><h2 class="sheet-title">${sT(title)}</h2>${sub}</div>${aside?`<div class="sheet-aside">${aside}</div>`:''}${x}</header>`;
     const common=`data-ds="Sheet" tabindex="-1"${sLayer(layer)}${inert?' inert':''}${id?` id="${esc(id)}"`:''}${vw}${sL(label??title)}${ex}`;
     const main=`${head}${above}<div class="sheet-body${bodyClass?' '+esc(bodyClass):''}">${body}</div>${foot}`;
@@ -2548,23 +2558,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     return `<section class="tk-day" data-ds="TaskDay"${L(label ?? title)}><header class="tk-day-head"><strong>${parts(title)}</strong>${status ? `<span>${parts(status)}</span>` : ''}</header>${rows}</section>`;
   }
 
-  /* ---- TaskHold binding: SentriUI.holdBind, with farrowing's caption — the caption (`HOLD TO END`) stays as it is through
-     the hold (farrowing shows only the sweep); the cues still reach the hold's status line (statusId) when there is one.
-     The unknown phase keeps the Button card's message. Same options and return as SentriUI.holdBind. ---- */
-  function holdBind(scope, opts = {}) {
-    const UI = root.SentriUI, sel = opts.selector || '.st-hold', idle = new WeakMap();
-    const keep = b => { const c = b && b.querySelector('.st-hold-caption'); if (c && b.getAttribute('data-phase') === 'idle') idle.set(b, c.outerHTML); };
-    scope.querySelectorAll(sel).forEach(keep);
-    const early = e => { const b = e.target.closest && e.target.closest(sel); if (b) keep(b); };
-    scope.addEventListener('pointerdown', early, true);
-    scope.addEventListener('keydown', early, true);
-    const onPhase = opts.onPhase;
-    return UI.holdBind(scope, Object.assign({}, opts, { onPhase(b, phase, cue) {
-      const c = b.querySelector('.st-hold-caption');
-      if (phase !== 'unknown' && c && idle.has(b) && c.outerHTML !== idle.get(b)) c.outerHTML = idle.get(b);
-      if (onPhase) onPhase(b, phase, cue);
-    } }));
-  }
+  // Compatibility alias: Button owns the hold face and interaction.
+  const holdBind = (scope, opts = {}) => root.SentriUI.holdBind(scope, opts);
 
   /* ---- TaskDoors: a list of doors. card: false (default) — flat door rows (SentriTask.door, no id column).
      card: true — farrowing's Pen page / sow-actions list: an optional section title with its icon, then the doors in one
@@ -3523,7 +3518,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     if (P.hasId()) tools.push(['id-open', 'scan', T('tr.id.' + scheme())]);
     tools.push(['tool-death', 'alert', T('tool.death')], ['more', 'more', T('more.title')]);
     return '<div class="sp-toolrow" data-count="' + tools.length + '">' + tools.map(function (x) {
-      return '<button type="button" class="sp-tool" data-action="' + x[0] + '" data-value="">' + I(x[1]) + '<span>' + esc(x[2]) + '</span></button>';
+      return UI.button({register: 'tool', action: x[0], icon: I(x[1]), label: x[2]});
     }).join('') + '</div>';
   }
   function penSheet(inert) {
@@ -3552,8 +3547,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     var p = pen(), ended = !!P.s.ended;
     var rows = p.ids.slice().reverse().map(function (x) {
       var id = [x.tag, x.notch].filter(Boolean).join(' · ');
-      var mark = UI.iconButton({ action: ended ? 'noop' : 'breeder', value: x.no, icon: I('bookmark'), label: T(x.keep ? 'mark.off' : 'mark.on', { no: x.no }), className: 'sp-mark' })
-        .replace('class="icon-button', 'aria-pressed="' + !!x.keep + '" class="icon-button');
+      var mark = UI.iconButton({ action: ended ? 'noop' : 'breeder', value: x.no, icon: I('bookmark'), label: T(x.keep ? 'mark.off' : 'mark.on', { no: x.no }), variant: 'plain', selected: !!x.keep, className: 'sp-mark' });
       var row = K.row({ id: id, chip: x.keep ? { text: T('breeder'), tone: 'green' } : null, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
         meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), action: ended ? '' : 'give-fix', value: x.no, trail: '', still: ended, label: T('fix.aria', { no: x.no }) });
       return '<div class="sp-pigrow" data-ds="TaskRow">' + row + mark + '</div>';
@@ -3978,7 +3972,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && (V.pen || V.end)) { closeTop(); render(); }
   });
-  var holds = K.holdBind(phone, { onCommit: function (b) {
+  var holds = UI.holdBind(phone, { onCommit: function (b) {
     var a = b.getAttribute('data-action');
     setTimeout(function () {
       holds.settle(b, 'done');

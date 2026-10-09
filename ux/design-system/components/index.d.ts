@@ -164,6 +164,12 @@ export interface SegmentProps {
 }
 
 export interface IconButtonProps {
+  variant?: 'bordered' | 'plain';
+  pressed?: boolean;
+  selected?: boolean;
+  reason?: string;
+  describedby?: string;
+  attrs?: SafeAttrs;
   action?: string;
   icon: IconHtml;
   /** Required: becomes aria-label. */
@@ -182,7 +188,7 @@ export interface IconButtonProps {
  *  `<button data-action data-value="<field key>">`; delegate with `closest('[data-action]')`.
  *  The root carries `data-field`. A floor-gray key is `aria-disabled` and still fires. */
 
-/** A text action shown in a Stepper's hint line (the fourth register, ≥44px). */
+/** A text action shown in a Stepper's hint line (the fourth register, ≥48px). */
 export interface StepperPointer { label: string; action: string; value?: string; strs?: Strs<'label'>; args?: StrArgs<'label'> }
 
 /** Candidate. `− n +`: keys are `<button data-action data-value=key data-step="-step|step">`.
@@ -377,11 +383,14 @@ export interface PhotosProps {
   strs?: Strs<'label' | 'optional' | 'hint' | 'camera' | 'thumb' | 'thumbPending' | 'index'>;
   args?: StrArgs<'label' | 'optional' | 'hint' | 'camera'>;
 }
-export type ButtonRegister = 'primary' | 'secondary' | 'tool' | 'text' | 'danger' | 'end-early';
+export type ButtonRegister = 'primary' | 'secondary' | 'tool' | 'text' | 'danger';
 export interface ButtonProps {
+  icon?: IconHtml;
+  reason?: string;
+  disabled?: boolean;
   label: string;
   /** primary: the one commit (ink) · secondary: an exit (outlined) · tool: a mid-sheet act (soft well, no border) ·
-   *  text: the bare word (13/700 `ink-2`, ≥44px, no container) · danger · end-early. Default secondary; unknown values warn in dev. */
+   *  text: the bare word (13/700 `ink-2`, ≥48px, no container) · danger. Default secondary; unknown values warn in dev. */
   register?: ButtonRegister;
   action?: string;
   value?: string;
@@ -402,7 +411,7 @@ export interface ButtonProps {
 export type HoldPhase = 'idle' | 'holding' | 'armed' | 'pending' | 'done' | 'unknown';
 export interface HoldButtonProps {
   label: string;
-  /** The idle line under the verb (`Hold to end`); holdBind swaps it per cue and restores it on every idle transition. */
+  /** The Farrowing caption (`HOLD TO END`); holding retains it; armed and result phases show instructions. */
   caption?: string;
   action?: string;
   value?: string;
@@ -565,7 +574,7 @@ export interface SentriUI {
 /** Sheet: drawer | page | dialog. A text slot is a string, { text, str, args } (the string registry's twin) or { html } (trusted markup). */
 export type SheetText = string | { text?: string; str?: string; args?: Record<string, unknown>; html?: string };
 /** A Button spec for a footer; `waiting` draws the waiting face (aria-disabled), `describedby` is wired by sheetFooter's status. */
-export interface SheetAction { label: SheetText; action?: string; value?: string; register?: 'primary' | 'secondary' | 'tool' | 'text' | 'danger'; waiting?: boolean; busy?: boolean; describedby?: string; className?: string; attrs?: SafeAttrs }
+export interface SheetAction { reason?: SheetText; label: SheetText; action?: string; value?: string; register?: 'primary' | 'secondary' | 'tool' | 'text' | 'danger'; waiting?: boolean; busy?: boolean; describedby?: string; className?: string; attrs?: SafeAttrs }
 export interface SheetProps {
   /** drawer (default): over the page, sized to its content, a handle and a ✕ · page: the whole canvas, Back in the footer, no ✕ · dialog: one small decision rising from the bottom. */
   variant?: 'drawer' | 'page' | 'dialog';

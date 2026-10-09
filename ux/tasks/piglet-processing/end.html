@@ -433,7 +433,7 @@
     var body = (en ? alreadyBlock(en) : '') + progressCard(t) + '<div class="en-block">' + cratesCard(ls) + '</div>' +
       '<div class="en-block">' + metrics(t, false) + '</div>' +
       (day.n ? K.section({ title: P('pp.end.day.title'), icon: 'details', rows: true, items: [{ label: P(one('pp.end.day.d', day.n), { n: day.n, who: day.order.join(' · ') }), action: 'day' }] }) : '');
-    var foot = en ? backOnly('back') : K.footer({ back: { action: 'back' }, primary: UI.button({ label: PP.t('pp.end.act.end'), register: 'end-early', action: 'review', strs: { label: 'pp.end.act.end' } }) });
+    var foot = en ? backOnly('back') : K.footer({ back: { action: 'back' }, primary: UI.button({ label: PP.t('pp.end.act.end'), register: 'secondary', action: 'review', strs: { label: 'pp.end.act.end' } }) });
     return page('pp.end.ov.title', null, 'pp.end.scope.short', { n: UNIT }, body, foot);
   }
   // farrowing's End task early: one warning (what ending drops), the door to the unfinished litters, what is open for

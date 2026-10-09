@@ -178,7 +178,7 @@
         { label: s('tk.demo.metrics.sb', 'Stillborn rate'), value: s('tk.demo.metrics.sb.v', '7.2'), unit: s('tk.demo.metrics.pct', '%'), sub: s('tk.demo.metrics.sb.sub', '7 stillborn / 97 born') }],
       totals: [{ label: s('tk.demo.born', 'Born'), value: n(97) }, { label: s('tk.demo.metrics.alive', 'Alive now'), value: n(59) }, { label: s('tk.demo.metrics.deaths', 'Piglet deaths'), value: n(38) }] });
     return K.page({ title: s('tk.demo.overview', 'Task overview'), description: s('tk.demo.overview.sub', 'Farrowing · All 3 units'), view: 'overview', body: prog + tbl + met,
-      footer: K.footer({ back: { action: 'back' }, primary: { label: s('tk.demo.end_early', 'End task early'), action: 'end', register: 'end-early', waiting: true },
+      footer: K.footer({ back: { action: 'back' }, primary: { label: s('tk.demo.end_early', 'End task early'), action: 'end', register: 'secondary', waiting: true },
         status: { text: 'Save or clear the 2 drafts on this phone to end', str: 'ds.c2.demo.hold_reason', id: 'tk-demo-end-reason', tone: 'amber' } }) });
   }
 

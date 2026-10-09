@@ -9,7 +9,6 @@
 .farrowing-phone .room-tabs{border:1px solid var(--line);padding:3px}
 .farrowing-phone .room-tabs button{color:var(--muted);font-weight:400}
 .farrowing-phone .room-tabs button[aria-pressed=true]{color:var(--ink);font-weight:500;background:var(--paper,#fff)}
-.farrowing-phone .room-filter-button,.farrowing-phone .dock-search{border-color:var(--line);background:var(--paper,#fff)}
 .farrowing-phone .room-list{gap:12px;padding-bottom:22px}
 .farrowing-phone .pen-card{border-color:var(--line);border-radius:var(--subpage-radius);box-shadow:0 2px 8px rgba(32,41,31,.04)}
 .farrowing-phone .room-list .pen-top{background:var(--surface,#f8faf5);border-color:var(--line);padding-left:14px;padding-right:14px}
@@ -53,7 +52,6 @@
 .farrowing-phone .sheet[data-view=count] .count-label{color:#356547;font-weight:500}
 .farrowing-phone .sheet[data-view=count] .hero-value{color:#203d2b}
 .farrowing-phone .sheet[data-view=count] .hero-stepper .key[data-value="1"]{background:var(--green);border-color:var(--green)}
-.farrowing-phone .sheet[data-view=count] .record-inline-actions .record-toolbar-action{border-color:var(--line);font-weight:500}
 .farrowing-phone .sheet[data-view=finish] .finish-body{padding-top:18px}
 .farrowing-phone .sheet[data-view=locked] .completed-record-body{padding-top:6px}
 .farrowing-phone .sheet[data-view=finish] .finish-totals,.farrowing-phone .sheet[data-view=locked] .facts-surface{padding:14px}

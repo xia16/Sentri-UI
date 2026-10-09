@@ -3811,7 +3811,7 @@
          "preset": "task-complete",
          "steps": [
           {
-           "tap": ".hold",
+           "tap": ".st-hold",
            "hold": 1000
           }
          ],

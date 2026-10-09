@@ -26,8 +26,12 @@
     offline:'m3 3 18 18M4 9a13 13 0 0 1 2-1M10 6a14 14 0 0 1 10 3M7 13a8 8 0 0 1 3-1M14 12a8 8 0 0 1 3 1M10 17a3 3 0 0 1 4 0M12 21h.01'
   };
   const icon = key => window.SentriIcons ? window.SentriIcons.icon(key) : `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[key] || paths.arrow}"/></svg>`;
-  const btn = (action, text, cls='', value='', extra='') => `<button type="button" class="${cls}" data-action="${action}" data-value="${esc(value)}" ${extra}>${text}</button>`;
-  const ib = (action, key, label, value='') => btn(action, icon(key), 'icon-button', value, `aria-label="${esc(label)}"`);
+  const btn = (action, text, cls='', value='', extra='') => {
+    if(action==='complete-task')return SentriUI.holdButton({action,label:'End task',caption:'HOLD TO END',tone:'primary'});
+    if(['primary','secondary'].includes(cls))return SentriUI.button({action,value,register:cls,label:''}).replace('<span class="st-button-label"></span>',text).replace('<button',`<button ${extra}`);
+    return `<button type="button" class="${cls}" data-action="${action}" data-value="${esc(value)}" ${extra}>${text}</button>`;
+  };
+  const ib = (action, key, label, value='') => SentriUI.iconButton({action,icon:icon(key),label,value,variant:key==='more'?'plain':'bordered'});
   const sections = [
     {id:'breeding',name:'Breeding',units:[1,2,3,4],population:184,icon:'heat',detail:'Heat checks & service'},
     {id:'gestation',name:'Gestation',units:[7,8,9],population:246,icon:'pregnancy',detail:'Pregnancy & return checks'},
@@ -271,7 +275,7 @@
   function render(){app.innerHTML=(pages[state.page]||home)();window.AtlasBare&&AtlasBare.watch(atlasScreen);document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));}
   if(window.AtlasBare&&AtlasBare.bare)new MutationObserver(()=>AtlasBare.watch(atlasScreen)).observe(overlay,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
   function closeDrawer(){overlay.innerHTML='';state.overlay=null;app.inert=false;if(returnFocus?.isConnected)returnFocus.focus();}
-  function dialog(title,description,primary){returnFocus=document.activeElement;app.inert=true;overlay.innerHTML=SentriUI.sheet({variant:'dialog',title,icon:'alert',subtitle:description,label:title,footer:SentriUI.sheetFooter({back:{action:'close'},primary:{label:primary.label,action:primary.action,register:'danger'}})});overlay.querySelector('.dialog')?.focus({preventScroll:true});}
+  function dialog(title,description,primary){returnFocus=document.activeElement;app.inert=true;overlay.innerHTML=SentriUI.sheet({variant:'dialog',title,icon:'alert',subtitle:description,label:title,footer:SentriUI.sheetFooter({back:{action:'close'},hold:{label:primary.label,caption:'HOLD TO END',action:primary.action,tone:'danger'}})});overlay.querySelector('.dialog')?.focus({preventScroll:true});}
   function drawer(title,body,{size='medium',sizing='content'}={}){returnFocus=document.activeElement;app.inert=true;overlay.innerHTML=SentriUI.sheet({title,body,size,sizing,label:title,close:{action:'close',label:'Close dialog'},scrim:{action:'close',label:'Close dialog'},footer:SentriUI.sheetFooter({back:{action:'close'}})});const primary=overlay.querySelector('.sheet-body .primary, .sheet-body [data-drawer-primary]');if(primary){const form=primary.closest('form');if(form)primary.setAttribute('form',form.id);overlay.querySelector('.sheet-footer').append(primary);}overlay.querySelector('.sheet,.dialog')?.focus({preventScroll:true});}
   function unitChoices(){
     const all=section().units;
@@ -294,10 +298,11 @@
   function scan(){drawer('Scan an ear tag',`<div class="scan-frame">${icon('scan')}</div><p>Scanner preview. Use a sample ear tag to try the lookup.</p><form id="lookup-form"><label class="form-label" for="tag">Ear tag</label><input id="tag" name="tag" inputmode="numeric" placeholder="${taskRecords(taskBy('preg31'),7)[2].id}" required maxlength="12"><button type="submit" class="primary">Find sample pig</button></form>${btn('sample-scan','Use a sample tag','secondary')}<p class="helper">Camera and tag-reader hardware are not connected.</p>`);}
   function lookup(query){const term=query.trim().toLowerCase();const matches=[];tasks.forEach(t=>Object.keys(t.counts).forEach(u=>taskRecords(t,+u).filter(r=>r.id===term||r.pen.toLowerCase()===term).forEach(r=>matches.push({t,u,r}))));drawer('Search results',matches.length?SentriUI.panel(matches.slice(0,12).map(({t,u,r})=>SentriUI.row({title:r.id+' · Pen '+r.pen,description:'Unit '+u+' · '+t.type+' · '+t.batch,action:'lookup-result',value:t.id+':'+u+':'+r.id})).join(''),{className:'st-row-group'}):'<p>No matching sample pig or pen. Try the suggested sample tag or pen A1.</p>'+btn('search','Search again','secondary'));}
   function chat(question){state.assistantTab='chat';state.chat.push({who:'user',text:question},{who:'assistant',text:'This is a preview of the conversation entrance. In the connected app, I would use your current '+(state.workUnit?'Unit '+state.workUnit:section().name)+' context to investigate this request and ask for any missing details. No analysis or farm action has been performed.'});render();const scroller=app.querySelector('.app-scroll');scroller.scrollTop=scroller.scrollHeight;}
+  SentriUI.holdBind(document.body,{onCommit(el){if(el.dataset.action==='confirm-end-task'){task().terminatedAt='Today · just now';closeDrawer();goHome();}else if(el.dataset.action==='complete-task'&&taskModel(task()).state==='ready'){task().completedAt='Today · just now';goHome();}}});
   document.addEventListener('click',e=>{
     const demo=e.target.closest('[data-demo]');if(demo){closeDrawer();navStack=[];state.section='gestation';state.unit=demo.dataset.demo==='unit'?7:null;state.page=demo.dataset.demo==='sections'?'sections':'home';const url=new URL(location.href);url.searchParams.set('view',demo.dataset.demo);url.searchParams.set('section','gestation');history.replaceState(null,'',url);render();return;}
     const card=e.target.closest('.home-task-card[data-card]');if(card){openTask(card.dataset.card,state.unit);return;}
-    const el=e.target.closest('[data-action]');if(!el)return;const a=el.dataset.action,v=el.dataset.value;
+    const el=e.target.closest('[data-action]');if(!el||el.disabled||el.matches('.st-hold')||SentriUI.guard(el))return;const a=el.dataset.action,v=el.dataset.value;
     if(a==='close'){closeDrawer();return;}
     if(a==='sync'){showSync();return;}
     if(a==='upload'){uploadPending();return;}

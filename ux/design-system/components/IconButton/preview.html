@@ -1,15 +1,18 @@
-<!-- @dsCard group="Controls" height=110 -->
-<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
-<body>
-<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="a" style="display:flex;gap:12px;align-items:center"></div></div>
-<script>
-const UI = window.SentriUI, I = window.SentriIcons.icon;
-a.innerHTML = UI.iconButton({ icon: I('filter'), label: 'Filter', action: 'filter', className: 'room-filter-button' }) +
-  UI.iconButton({ icon: I('filter'), label: 'Filter, 2 applied', action: 'filter', badge: 2, className: 'room-filter-button' }) +
-  UI.iconButton({ icon: I('search'), label: 'Search', action: 'search', className: 'room-filter-button' }) +
-  UI.iconButton({ icon: I('more'), label: 'More actions', action: 'more' });
-</script>
-</body>
-</html>
+<!-- @dsCard group="Controls" height=760 -->
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>IconButton</title></head><body><main id="examples"></main><script>
+(async()=>{
+ if(!window.SentriUI){
+  for(const href of ['../../tokens.css','../bundle.css']){const l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.append(l);}
+  await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='../bundle.js';s.onload=resolve;s.onerror=reject;document.head.append(s);});
+ }
+ const variants=["bordered", "plain"];
+ for(const id of variants){
+  const html=await fetch('variants/'+id+'.html').then(r=>r.text());
+  const iframe=document.createElement('iframe');iframe.title='IconButton '+id;iframe.style.width='100%';iframe.style.border='0';
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  const css=Array.from(document.querySelectorAll('link[rel="stylesheet"],style')).map(n=>n.tagName==='LINK'?'<link rel="stylesheet" href="'+n.href+'">':n.outerHTML).join('');
+  doc.head.insertAdjacentHTML('beforeend',css+'<script src="'+new URL('../bundle.js',location.href).href+'"><'+'/script>');
+  iframe.srcdoc=doc.documentElement.outerHTML;iframe.onload=()=>iframe.style.height=iframe.contentDocument.body.scrollHeight+'px';examples.append(iframe);
+ }
+})().catch(e=>{examples.textContent=e.message;console.error(e);});
+</script></body></html>

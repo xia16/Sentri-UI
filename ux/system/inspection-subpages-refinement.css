@@ -171,7 +171,7 @@
 .inspection-phone .picker-step :is(.catalog-category small,.catalog-item small,.medicine-option small){font-size:11px;line-height:1.4;color:var(--st-muted,#68745d)}
 .inspection-phone .picker-step .catalog-path{position:static;min-height:44px;padding:0 0 12px;border:0;background:transparent}
 .inspection-phone .picker-step .catalog-path strong{font-size:14px;font-weight:600}
-.inspection-phone .picker-step .catalog-path-back{width:44px;height:44px;flex:none}
+.inspection-phone .picker-step .catalog-path-back{flex:none}
 .inspection-phone .picker-step .catalog-group h5{padding:16px 4px 8px;font:600 12px/1.4 var(--sans);letter-spacing:0;text-transform:none;color:var(--st-muted,#68745d)}
 .inspection-phone .picker-step .catalog-items{padding-bottom:0}
 .inspection-phone .picker-step .chooser-selection{display:grid;place-items:center;width:22px;height:22px;flex:none;border:1px solid #b7c1ad;border-radius:50%;color:#486141}

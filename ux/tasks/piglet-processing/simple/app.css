@@ -28,14 +28,10 @@
 .sp-fact-act svg { flex: none; width: 12px; height: 12px; fill: none; stroke: var(--muted); stroke-width: 2; }
 /* farrowing's in-sheet tool row (Edit · Record death · More actions): outlined tools sharing the width */
 .sp-toolrow { display: flex; gap: var(--space-key-gap); }
-.sp-tool { flex: 1 1 0; min-width: 0; min-height: var(--tap-min); display: flex; align-items: center; justify-content: center; gap: 5px;
-  margin: 0; padding: 8px 6px; border: 1px solid var(--line); border-radius: var(--radius-segment); background: var(--paper); color: var(--ink);
-  font: 500 var(--type-identifier-size)/1.3 var(--font-sans); white-space: nowrap; cursor: pointer; }
-.sp-tool:active { background: var(--press); }
-.sp-tool svg { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sp-toolrow > .button.tool { flex: 1 1 0; min-width: var(--tap-min); padding: var(--space-8) var(--space-6); }
 /* the breeder mark on an identified piglet: a 44px flag; filled when kept */
-.icon-button.sp-mark { flex: none; width: var(--tap-min); height: var(--tap-min); border: 0; background: none; color: var(--muted); }
-.sp-mark svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+
+.sp-mark svg { width: var(--glyph-pad); height: var(--glyph-pad); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
 .sp-mark[aria-pressed="true"] { color: var(--green); }
 .sp-mark[aria-pressed="true"] svg { fill: currentColor; }
 .sp-tabs.st-segment { margin: 0; }
