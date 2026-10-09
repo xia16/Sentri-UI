@@ -124,17 +124,9 @@
     return `<button type="button" class="tk-row" data-ds="TaskRow"${A(action, value)}${L(label)}${d}>${inner}${g}</button>`;
   }
 
-  /* ---- TaskStepper: the design system's Stepper card (its behaviour, strings and a11y) in farrowing's face ----
-     Every prop is SentriUI.stepper's. face: 'row' (default for variant 'row': farrowing's entry row, outlined keys) |
-     'well' (default for variant 'hero': the Foster / Reconcile stepper on a well, its label as the section title above) |
-     'count' (the count sheet's hero on the green area: a filled green +). */
+  // Compatibility adapter; Stepper owns every face and its implementation.
   function stepper(props = {}) {
-    const UI = root.SentriUI;
-    const face = props.face || (props.variant === 'hero' ? 'well' : 'row');
-    // Farrowing reserves no hint line: a stepper with no hint and no pointers takes no space under its keys.
-    const quiet = props.reserveHint == null && !props.hint && !(props.strs && props.strs.hint) && !(props.pointers && props.pointers.length);
-    const html = UI.stepper(Object.assign({}, props, quiet ? { reserveHint: false } : {}, { className: `tk-stepper${props.className ? ' ' + props.className : ''}` }));
-    return html.replace('data-ds="Stepper"', `data-ds="Stepper" data-face="${esc(face)}"`);
+    return root.SentriUI.stepper({...props,variant:props.face||(props.variant==='hero'?'well':props.variant||'row')});
   }
 
   /* ---- TaskPhotos: the design system's Photos card in farrowing's face (a line, not a well: a camera glyph, the label,

@@ -40,14 +40,6 @@
 .farrowing-phone .pen-notice-fault{background:#fff8ea;border-color:#ead9b8}
 .farrowing-phone .pen-detail-copy{font-size:13px;line-height:1.7}
 .farrowing-phone .pen-detail-meta{font-family:var(--mono);font-size:10px}
-.farrowing-phone .pen-field{gap:8px}
-.farrowing-phone .pen-field :is(input,select,textarea){border-color:#bdc7b6}
-
-/* Count, death, correction, finish, and completed record sheets. */
-.farrowing-phone .sheet[data-view=count] .count-area{background:var(--green-wash,#eaf2e5);border-radius:16px;padding:16px 12px 10px}
-.farrowing-phone .sheet[data-view=count] .count-label{color:#356547;font-weight:500}
-.farrowing-phone .sheet[data-view=count] .hero-value{color:#203d2b}
-.farrowing-phone .sheet[data-view=count] .hero-stepper .key[data-value="1"]{background:var(--green);border-color:var(--green)}
 .farrowing-phone .sheet[data-view=count] .record-inline-actions .record-toolbar-action{border-color:var(--line);font-weight:500}
 .farrowing-phone .sheet[data-view=finish] .finish-body{padding-top:18px}
 .farrowing-phone .sheet[data-view=locked] .completed-record-body{padding-top:6px}

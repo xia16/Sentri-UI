@@ -75,3 +75,11 @@ Only in the bundle: base for the DS pages, the field cards (Stepper, Measure, Nu
 ## Sheet (component pass)
 
 One implementation of the drawer, the page and the dialog: `SentriUI.sheet`, `sheetFooter`, `backButton` and `scrim` in `components/bundle.js`, styled in `bundle.css` section 3. It replaces three copies: the hand-built `.sheet` markup of Farrowing (`roomSheet`, `detailSheet`, `featurePage`, the record surface and the dialogs), Inspection (`sheet()`), Home (`drawer()` and its page footers), and the task skeleton's TaskSheet / TaskPage / TaskDialog (`SentriTask.sheet`, `drawer`, `page`, `dialog`, `footer` and `back` now call the component; their `tk-*` classes are gone). `AstraSurfaces.present`, `normalizeBack` and `markContext` (the regex rewrite of hand-built markup) are deleted; `AstraSurfaces.isPage` stays as the prototypes' page-or-drawer list.
+
+## Stepper + Field pass (2026-10-10)
+
+Stepper owns row, count and well in bundle.js / bundle.css. TaskStepper's markup and CSS face layer is retired; SentriTask.stepper is only a compatibility adapter. Piglet processing calls SentriUI.stepper directly. Farrowing translates its existing delta-in-value event contract through a small adapter and has no row-stepper, hero-stepper or feature-stepper markup or styles. The unused filled-ink face is retired; count keys remain neutral pending an owner colour decision.
+
+Field owns the input/textarea skin, error border, sans font, auto-grow, visible corrective/help/reason line and ARIA association. Removed phone and page border overrides and local Field skins. Home's report and clarification fields, Inspection's capture helpers / optional-note controls / treatment dose, and Farrowing's optional fault resolution use the bundle. Dose then Unit stack in capture order. No Numpad or Measure split was implemented.
+
+See [Stepper verification](components/Stepper/verification.md) and [Field verification](components/Field/verification.md) for checklist evidence and the known atlas reachability gaps.

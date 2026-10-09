@@ -300,7 +300,7 @@
   }
   /* ---- fewer piglets for one ticked item: a stepper; a shortfall asks one reason ---- */
   function stepper(key, label, value, o) {
-    return K.stepper(Object.assign({ label: label, value: value, key: key, action: 'step', min: 0 }, o || {}));
+    return UI.stepper(Object.assign({ label: label, value: value, key: key, action: 'step', min: 0, reserveHint: false }, o || {}));
   }
   function adjustSheet() {
     var p = pen(), d = V.adj, n = P.need(p, d.k), less = d.n < n;
@@ -418,7 +418,7 @@
       UI.choiceGroup(others.map(function (o) {
         return UI.choiceRow({ label: o.code, mono: true, meta: T('day.n', { d: o.age }), mode: 'single', selected: d.to === o.code, action: 'move-to', value: o.code });
       })) + '</section>';
-    body += stepper('move', T('move.how'), d.n, { min: 1, max: p.alive, variant: 'hero', hint: '' });
+    body += stepper('move', T('move.how'), d.n, { min: 1, max: p.alive, variant: 'well', hint: '' });
     var asks = moveAsks(p);
     asks.forEach(function (k) {
       body += K.radios({ layout: 'row', label: k === 'id' ? T('move.hadid.' + scheme()) : T('move.had', { tr: trl(k) }), action: 'had', key: k,
@@ -432,7 +432,7 @@
   function countSheet() {
     var p = pen(), d = V.count;
     return K.drawer({ title: T('count.title'), subtitle: T('count.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'count',
-      body: stepper('count', T('count.label'), d.n, { variant: 'hero', face: 'count', min: 0, hint: '' }),
+      body: stepper('count', T('count.label'), d.n, { variant: 'count', min: 0, hint: '' }),
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.count', { n: d.n }), action: 'count-save', register: 'primary', waiting: d.n === p.alive }, status: d.n === p.alive ? T('sr.count') : null }) });
   }
 

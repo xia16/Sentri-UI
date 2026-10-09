@@ -146,41 +146,6 @@ label.tk-row { cursor: pointer; }
 
 /* ---- Skeleton 2 (owner round 5: match farrowing) ---- */
 
-/* TaskStepper · row face: farrowing's entry row — the label 15px/500, outlined keys (both), a mono 18px value; pressed ink. */
-.st-stepper.tk-stepper[data-face="row"] { min-height: var(--entry-row-min); column-gap: var(--space-key-gap); }
-.st-stepper.tk-stepper[data-face="row"] + .st-stepper.tk-stepper[data-face="row"] { border-top: 1px solid var(--line); }
-.tk-stepper[data-face="row"] .st-stepper-label { font: 500 var(--type-entry-label-size)/1.4 var(--font-sans); }
-.tk-stepper[data-face="row"] .st-stepper-key { width: var(--tap-min); min-height: var(--entry-row-min); }
-.tk-stepper:is([data-face="row"], [data-face="well"]) .st-stepper-face { width: var(--tap-min); height: var(--tap-min); border: 1px solid var(--task-key-border);
-  border-radius: var(--radius-control); background: var(--paper); color: var(--ink); }
-.tk-stepper[data-face="well"] .st-stepper-face { width: var(--field-height); height: var(--field-height); }
-.tk-stepper:is([data-face="row"], [data-face="well"]) .st-stepper-key:not([data-step^="-"]):not([aria-disabled="true"]) .st-stepper-face { background: var(--paper); border-color: var(--task-key-border); color: var(--ink); }
-.tk-stepper:is([data-face="row"], [data-face="well"]) .st-stepper-face svg { width: var(--glyph-key-task); height: var(--glyph-key-task); stroke-width: 2.2; }
-.tk-stepper .st-stepper-key[aria-disabled="true"] .st-stepper-face { background: var(--well); border-color: var(--line); color: var(--disabled-ink); }
-.tk-stepper.tk-stepper .st-stepper-key.st-stepper-key:not([aria-disabled="true"]):is(:active, [data-preview~="pressed"]) .st-stepper-face { background: var(--ink); border-color: var(--ink); color: var(--paper); filter: none; }
-.tk-stepper[data-face="row"] .st-stepper-value { min-width: 3ch; font: 600 var(--type-step-value-size)/1.3 var(--font-mono); }
-.tk-stepper[data-face="row"][data-zero] .st-stepper-value { color: var(--ink); }
-/* TaskStepper · well face: the label as a section title, then the keys and value on a well (Foster, Reconcile). */
-.st-stepper.tk-stepper[data-face="well"] { row-gap: 10px; }
-.tk-stepper[data-face="well"] .st-stepper-copy { align-items: flex-start; text-align: left; }
-.tk-stepper[data-face="well"] .st-stepper-label { font: 500 var(--type-section-title-size)/1.5 var(--font-sans); color: var(--ink); }
-.tk-stepper[data-face="well"] .st-stepper-keys { padding: var(--space-row-y); border-radius: var(--radius-inset); background: var(--well); }
-.tk-stepper[data-face="well"] .st-stepper-key { width: var(--field-height); min-height: var(--field-height); }
-.tk-stepper[data-face="well"] .st-stepper-value { font: 600 var(--type-figure-well-size)/1.3 var(--font-mono); letter-spacing: 0; color: var(--ink); }
-.tk-stepper[data-face="well"][data-zero] .st-stepper-value { color: var(--ink); }
-.tk-stepper[data-face="well"] .st-stepper-hint.st-stepper-hint { justify-content: flex-start; text-align: left; font-size: var(--type-description-size); line-height: 1.6; }
-/* TaskStepper · count face: the count sheet's hero on the green area; − outlined green, + filled green. */
-.st-stepper.tk-stepper[data-face="count"] { padding: var(--space-panel) var(--space-row-y) 10px; border-radius: var(--radius-count); background: var(--green-wash); }
-.tk-stepper[data-face="count"] .st-stepper-label { font: 500 var(--type-row-title-size)/1.3 var(--font-sans); color: var(--green); }
-.tk-stepper[data-face="count"] .st-stepper-keys { gap: var(--space-heading); min-height: 86px; }
-.tk-stepper[data-face="count"] .st-stepper-face { width: var(--hero-key); height: var(--hero-key); border: 1px solid var(--chip-green-border); border-radius: var(--radius-hero-key);
-  background: var(--paper); color: var(--green); }
-.tk-stepper[data-face="count"] .st-stepper-face svg { width: var(--glyph-key-count); height: var(--glyph-key-count); }
-.tk-stepper[data-face="count"] .st-stepper-key:not([data-step^="-"]):not([aria-disabled="true"]) .st-stepper-face { background: var(--green); border-color: var(--green); color: var(--paper);
-  box-shadow: 0 3px 8px #225d3520; }
-.tk-stepper[data-face="count"] .st-stepper-key[aria-disabled="true"] .st-stepper-face { background: var(--paper); border-color: var(--chip-green-border); color: var(--disabled-ink); box-shadow: none; }
-.tk-stepper[data-face="count"] .st-stepper-value { color: var(--count-ink); }
-
 /* TaskPhotos: farrowing's photo line — no well; a camera glyph, the label 13px, `Optional` 10px; an outlined camera key. */
 .st-photos.tk-photos { padding: 0; border-radius: 0; background: transparent; }
 * + .st-photos.tk-photos { margin-top: var(--space-section); }
