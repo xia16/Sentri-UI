@@ -99,7 +99,10 @@ for (const [group, names] of GROUPS) for (const name of names) {
   let gate = null;
   if (existsSync(gp)) { try { gate = JSON.parse(readFileSync(gp, 'utf8')); } catch (e) { problems.push(`components/${name}/gate.json: ${e.message}`); } }
   if (gate && !['in-design', 'agent-checked', 'approved'].includes(gate.status)) problems.push(`components/${name}/gate.json: status "${gate.status}"`);
-  components.push({ name, group, status: gate?.status || 'in-design', gate });
+  // which files exist, so the atlas page asks only for those (a missing variants.json or variant page is a 404 in the console)
+  const cdir = join(root, 'ux/design-system/components', name), vdir = join(cdir, 'variants');
+  const files = { variantsJson: existsSync(join(cdir, 'variants.json')), variants: existsSync(vdir) ? readdirSync(vdir).filter((n) => n.endsWith('.html')).map((n) => n.slice(0, -5)).sort() : [] };
+  components.push({ name, group, status: gate?.status || 'in-design', gate, files });
 }
 const proposedPath = join(root, 'ux/design-system/components/_proposed.json');
 if (existsSync(proposedPath)) for (const c of read('ux/design-system/components/_proposed.json')) {
