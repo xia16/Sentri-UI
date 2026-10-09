@@ -715,7 +715,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-range:has(:disabled) .st-range-fill{background:var(--disabled-border)}
 .st-filter-fields{min-width:0;margin:0;padding:0;border:0}
 .st-filter-fields:disabled{opacity:.6}
-.st-filter-group .st-filter-chips-track{flex-wrap:wrap;overflow-x:visible}
+.st-filter-group .st-filter-chips-track{flex-wrap:wrap;overflow-x:visible;padding-inline:0}
 .st-range-rail{position:relative;height:calc(2 * var(--tap-min));touch-action:none}
 .st-range-rail::before{content:'';position:absolute;inset-inline:0;top:50%;height:var(--space-4);background:var(--line)}
 .st-range-handle{position:absolute;top:0;transform:translateX(-50%);width:var(--tap-min);height:var(--tap-min);min-width:var(--tap-min);border:var(--border-width) solid var(--ink);border-radius:50%;background:var(--paper);color:var(--ink);font-size:var(--type-sheet-title-size);touch-action:none}

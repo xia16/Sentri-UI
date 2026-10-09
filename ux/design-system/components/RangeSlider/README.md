@@ -56,7 +56,7 @@ Do snap to the step and keep the bounds from crossing. Do use Measure for one ex
 
 ## API and tokens
 
-`SentriUI.rangeSlider` returns HTML; see [types](../index.d.ts). Tokens: `--tap-min`, `--border-width`, `--space-2`, `--space-3`, `--space-4`, `--space-8`, `--space-16`, `--space-24`, `--ink`, `--paper`, `--well`, `--line`, `--muted`, `--focus`, `--type-input-size`, `--type-description-size`, `--type-sheet-title-size`. No custom theme tokens.
+`SentriUI.rangeSlider` returns HTML; see [types](../index.d.ts). Tokens: `--tap-min`, `--border-width`, `--space-2`, `--space-3`, `--space-4`, `--space-8`, `--space-16`, `--space-24`, `--ink`, `--green`, `--disabled-border`, `--paper`, `--well`, `--line`, `--muted`, `--focus`, `--type-input-size`, `--type-description-size`, `--type-sheet-title-size`. No custom theme tokens.
 
 ## Not for
 

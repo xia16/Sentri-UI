@@ -942,7 +942,8 @@
   /* format(n) → the label for a value (open ends like "7+ days ago", "Today"). The value text, the end labels and aria-valuetext all use it;
      the drag handler looks it up by key, so two sliders on a page that share a key share a formatter. Without it: "a–b unit". */
   const rangeFormats=new Map();
-  const rangeText=(v,fmt,unit)=>fmt?(v[0]===v[1]?fmt(v[0]):fmt(v[0])+' – '+fmt(v[1])):v.join('–')+(unit?' '+unit:'');
+  const rangeMid=t=>String(t).replace(/^([A-Z])(?=[a-z])/,c=>c.toLowerCase()),
+  rangeText=(v,fmt,unit)=>fmt?(v[0]===v[1]?rangeMid(fmt(v[0])):rangeMid(fmt(v[0]))+' – '+rangeMid(fmt(v[1]))):v.join('–')+(unit?' '+unit:'');
   const rangeFill=(v,min,max)=>`left:${(v[0]-min)/(max-min)*100}%;width:${(v[1]-v[0])/(max-min)*100}%`;
   function rangeSlider({min=0,max=10,step=1,value=[min,max],label='Range',unit='',key='range',state='Default',disabled=false,reason='',error='',format=null}={}){
     if(!(max>min&&step>0))throw new RangeError('RangeSlider requires max > min and step > 0');
@@ -955,8 +956,8 @@
      feature's own "Show {n} sow(s)" strings. disabled = the whole sheet is unavailable (e.g. while syncing); reason says why. */
   function filterSheet({title='Filter',subtitle='',groups=[],count=0,noun='items',emptyReason='No items match',backAction='filter-back',clearAction='filter-clear',applyAction='filter-apply',state='Default',loading=false,error='',disabled=false,reason:why='',labels={},showStr=null,className='',scrim=true}={}){
     const blocked=count===0||loading||!!error||disabled,reason=disabled?(why||error):(error||(loading?(labels.counting||'Counting results…'):count===0?emptyReason:'')),
-      show=labels.show?labels.show(count,noun):`Show ${count} ${noun}`,
-      showSpec=loading?{text:labels.counting||'Counting results…',str:'ds.filter.counting'}:{text:show,str:showStr?(count===1?showStr.one:showStr.many):'ds.filter.show',args:showStr?{n:count}:{n:count,noun}};
+      show=labels.show?labels.show(count,noun):`Show ${count} ${noun}`,quiet=disabled||!!error,
+      showSpec=loading?{text:labels.counting||'Counting results…',str:'ds.filter.counting'}:quiet?{text:labels.showNone||`Show ${noun}`,str:'ds.filter.show.none',args:{noun}}:{text:show,str:showStr?(count===1?showStr.one:showStr.many):'ds.filter.show',args:showStr?{n:count}:{n:count,noun}};
     return sheet({title,subtitle,className:'st-filter-sheet '+className,close:{action:backAction},scrim:scrim?{action:backAction}:false,aside:button({label:labels.clear||'Clear',register:'text',action:clearAction,disabled,strs:{label:'act.clear'}}),body:`<div data-ds="FilterSheet" data-state="${esc(state)}"><fieldset class="st-filter-fields"${disabled?' disabled':''}>${groups.map(g=>`<section class="st-filter-group">${g.label?`<h3>${esc(g.label)}</h3>`:''}${g.content}${g.help?`<p>${esc(g.help)}</p>`:''}</section>`).join('')}</fieldset></div>`,footer:sheetFooter({back:{action:backAction,label:{text:labels.back||'Back',str:'act.back'}},primary:{label:showSpec,action:applyAction,disabled:blocked,attrs:{'aria-live':'polite','aria-atomic':'true'}},status:{text:reason,id:fieldId('st-filter-status'),visible:!!reason}})});
   }
   if(typeof document!=='undefined'){
