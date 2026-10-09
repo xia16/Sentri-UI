@@ -23,8 +23,7 @@
     return ` aria-label="${esc(o.text ?? '')}"` + (o.str ? ` data-str-attr="aria-label:${esc(o.str)}"${argsAttr(o.args)}` : '');
   }
   const A = (action, value) => (action ? ` data-action="${esc(action)}" data-value="${esc(value ?? '')}"` : '');
-  const own = { 'back-chevron': 'M15 5l-7 7 7 7' };
-  const glyph = k => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${own[k] || (root.SentriIcons && root.SentriIcons.paths && root.SentriIcons.paths[k]) || ''}"/></svg>`;
+  const glyph = k => root.SentriIcons.icon(k === 'back-chevron' ? 'back' : k);
   /* A line of parts, each a text slot with an optional tone: [{ text, str, args, tone }]; { sep: true } is the
      shared separator, a real text node (ds.sep, the same · as Status lines). */
   const parts = v => (Array.isArray(v) ? v.map(p => { const o = obj(p); if (o.sep) return '<span class="tk-sep" data-str="ds.sep">·</span>'; return o.tone ? `<span class="st-part" data-tone="${esc(o.tone)}">${T(o)}</span>` : T(o); }).join('') : T(v));
@@ -96,7 +95,7 @@
     const head = door
       ? `<button type="button" class="tk-group-door"${A(door.action, door.value)}${L(door.label)}>${inner}${glyph('chevron')}</button>`
       : `<span class="tk-group-door">${inner}</span>`;
-    return `<section class="tk-group" data-ds="TaskGroup"><header class="tk-group-head">${head}</header>${Array.isArray(rows) ? rows.join('') : rows}</section>`;
+    return `<section class="st-panel tk-group" data-ds="TaskGroup"><header class="tk-group-head">${head}</header>${Array.isArray(rows) ? rows.join('') : rows}</section>`;
   }
   /* ---- row (alias of SentriUI.row / rowSelect — use Row): id + chip | headline + meta | chevron, edit or tick ----
      trail 'tick' (with tick: { action = 'toggle', value, checked, label }): the row is a <label> around ChoiceList's multi

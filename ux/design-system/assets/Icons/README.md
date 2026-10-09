@@ -1,6 +1,6 @@
 # Icons
 
-The 52 glyphs of the `SentriIcons` registry (`ux/system/sentri-icons.js`). Each file is one of them, saved as a standalone SVG.
+The 52 glyphs of the `SentriIcons` registry (`ux/design-system/components/bundle.js`). Each file is one of them, saved as a standalone SVG.
 
 **How the files are drawn**
 - Stroke `ink` (#20291f), 1.6 wide, with round caps and joins, on a 24×24 viewBox.

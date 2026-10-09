@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T19:36:38.278Z",
- "commit": "2991a72",
+ "generated": "2026-10-09T19:39:55.659Z",
+ "commit": "fb17fe8",
  "platforms": [
   {
    "id": "mobile",
@@ -11934,50 +11934,64 @@
   {
    "name": "Icon",
    "group": "Base",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "status": "agent-checked",
+    "round": 2,
+    "judged": "2026-10-10",
+    "commit": "9a1315c",
     "model": "claude-opus-5-5",
     "scores": {
      "clarity": 8,
-     "budget": 6,
+     "budget": 8,
      "hierarchy": 8,
      "spacing": 8,
-     "broken": 6
+     "broken": 8
     },
-    "lowest": 6,
+    "lowest": 8,
+    "previous": [
+     {
+      "finding": "The old registry ux/system/sentri-icons.js was not removed: it still has the broken grid, the 0.01px More dots, the chev...",
+      "fixed": true,
+      "note": "atlas/library.js loadIcons() reads bundle.js SentriIcons; ux/system/sentri-icons.js deleted; no request to it from the atlas or 5 screens. Atlas Icons page: 51 glyphs, no duplicates, grid M3 3h7v7H3z..., more = three r=1.5 circles, aliases (origin/arrow/condition) listed separately."
+     },
+     {
+      "finding": "IMPLEMENTATIONS.md still says the icon registries are '52 glyphs identical'.",
+      "fixed": "partly",
+      "note": "Row 37 updated; row 9 still lists sentri-icons.js as a live old-UI JS file."
+     }
+    ],
+    "previousChecklistFails": [],
     "checklist": [
      {
       "line": 1,
-      "pass": false,
-      "why": "Purpose stated; no \"use X instead\" line (for example a Status dot, or the word alone)."
+      "pass": true,
+      "why": "Job plus use Status / IconButton instead."
      },
      {
       "line": 2,
-      "pass": false,
-      "why": "No when-not section."
+      "pass": true,
+      "why": "When-not: word alone, Status."
      },
      {
       "line": 3,
       "pass": true,
-      "why": "A single open-stroke path on a 24 grid; nothing optional."
+      "why": "One open-stroke path on 24 grid; More filled-dot exception named and rendered."
      },
      {
       "line": 4,
       "pass": true,
-      "why": "Stroke weights (1.6 / 1.8-2 / key 2.2) listed with their sizes."
+      "why": "Standard and Key, each with screens."
      },
      {
       "line": 5,
       "pass": true,
-      "why": "Static; the host owns states (stated)."
+      "why": "Default and Unknown (empty svg + console.warn) rendered; host owns interactive states."
      },
      {
       "line": 6,
       "pass": true,
-      "why": "Not tappable."
+      "why": "Not tappable; icon hosts on 5 screens all >= 48px."
      },
      {
       "line": 7,
@@ -11987,22 +12001,22 @@
      {
       "line": 8,
       "pass": true,
-      "why": "Icons never carry meaning alone (stated)."
+      "why": "Icons always paired with a word."
      },
      {
       "line": 9,
       "pass": true,
-      "why": "Every icon keeps its word."
+      "why": "One lowercase name per glyph; aliases are names only."
      },
      {
       "line": 10,
       "pass": true,
-      "why": "icon() emits aria-hidden=\"true\" (not documented in the card)."
+      "why": "aria-hidden + focusable=false emitted."
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "The global svg rule uses raw 20px and stroke 1.8 (contradicting the 1.6 rule); screens set sizes in px."
+      "pass": true,
+      "why": "Component CSS uses icon-stroke / icon-key-stroke / icon-pad-stroke / glyph-* tokens (host drift noted as a finding)."
      },
      {
       "line": 12,
@@ -12016,42 +12030,27 @@
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "No related links or classification."
+      "pass": true,
+      "why": "Related links and classification present."
      },
      {
       "line": 15,
       "pass": true,
-      "why": "All glyphs render at 375 without overflow."
+      "why": "51 glyphs + Key render at 375 with no overflow (scrollWidth 375)."
      }
     ],
     "classification": "component",
     "variants": [
      {
-      "name": "standard stroke (1.6)",
+      "name": "Standard (icon-stroke 1.6)",
       "usedBy": [
        "farrowing.room",
-       "inspection.walk"
+       "inspection.walk",
+       "pig-profile.actions",
+       "piglet-processing.more-actions",
+       "health-record.treatment"
       ],
-      "status": "in-design",
-      "scores": {
-       "clarity": 8,
-       "budget": 6,
-       "hierarchy": 8,
-       "spacing": 8,
-       "broken": 6
-      },
-      "findings": [
-       "The bundle default svg stroke is 1.8, not 1.6."
-      ]
-     },
-     {
-      "name": "key stroke (2.2; backspace 1.8)",
-      "usedBy": [
-       "farrowing.death",
-       "piglet-processing.record-death"
-      ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
@@ -12060,56 +12059,46 @@
        "broken": 8
       },
       "findings": [
-       "Clean in use; held back only by the component-level token fail (line 11)."
+       "Hosts restroke the glyph: 1.7 (tc-heading, tk-summary-heading, section-title), 1.8 (pen-name, st-condition, dock), 2 (status bar); 4 strokes on one screen."
       ]
+     },
+     {
+      "name": "Key (icon-key-stroke 2.2; backspace icon-pad-stroke 1.8)",
+      "usedBy": [
+       "farrowing.death",
+       "piglet-processing.record-death"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": []
      }
     ],
     "findings": [
      {
       "severity": "medium",
-      "text": "Duplicate glyphs: origin = place (identical path), chevron = arrow (same path), plus ~ condition.",
-      "fix": "Keep one name per glyph (place, chevron, plus) and alias the others."
-     },
-     {
-      "severity": "medium",
-      "text": "Unknown names silently draw a chevron, which reads as \"more\" - a typo becomes a false affordance.",
-      "fix": "Return an empty svg and console.warn in development."
-     },
-     {
-      "severity": "medium",
-      "text": "A known bug is shipped: the grid path closes to x=3 (M14 3h7v7H3z).",
-      "fix": "Fix the squares to M14 3h7v7h-7z and M14 14h7v7h-7z."
+      "text": "In use the Standard glyph is drawn at 1.6, 1.7, 1.8 and 2 on the same screen (farrowing.room, inspection.walk): raw stroke-width in task-skeleton.css (.tk-summary-heading 1.7, .tk-warning-* 1.8, .tk-dock-unit 1.8, .tk-receipt-mark 2), astra-task-overview.css .tc-heading 1.7, inspection/farrowing .section-title 1.7, piglet-processing simple/app.css .sp-more 2.4 / .sp-give-scan 1.8. Pre-existing, not from this PR.",
+      "fix": "Replace those raw stroke-width values with var(--icon-stroke) (or --icon-key-stroke where a heavier key is meant); add a css-vars test that bans raw stroke-width on svg rules."
      },
      {
       "severity": "low",
-      "text": "\"more\" is three 0.01px dots, near invisible at stroke 1.6 in glare.",
-      "fix": "Draw three r=1.5 filled dots, or stroke 2.4."
-     },
-     {
-      "severity": "low",
-      "text": "The README says 52 glyphs; the preview renders 54 (backspace, offline).",
-      "fix": "Update the count or derive it from the registry."
-     },
-     {
-      "severity": "low",
-      "text": "The global svg default (stroke 1.8, 20px) contradicts the 1.6 rule.",
-      "fix": "Set stroke-width from an icon-stroke token (1.6)."
+      "text": "Stale references to the retired file: IMPLEMENTATIONS.md row 9, assets/Icons/README.md line 21 (\"not yet in ux/system/sentri-icons.js\"), bundle.js line 2 header comment.",
+      "fix": "Drop sentri-icons.js from those three lines (leave ADR 0001 as history)."
      }
     ],
-    "proposals": [
-     {
-      "kind": "merge",
-      "name": "origin + place, chevron + arrow",
-      "why": "Identical paths under two names.",
-      "seenIn": [
-       "farrowing.room"
-      ]
-     }
-    ]
+    "proposals": []
    },
    "files": {
-    "variantsJson": false,
-    "variants": []
+    "variantsJson": true,
+    "variants": [
+     "key",
+     "standard"
+    ]
    }
   },
   {
@@ -12654,50 +12643,78 @@
   {
    "name": "Panel",
    "group": "Base",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "status": "agent-checked",
+    "round": 1,
+    "judged": "2026-10-10",
+    "commit": "7f47b7b",
     "model": "claude-opus-5-5",
     "scores": {
-     "clarity": 5,
-     "budget": 7,
-     "hierarchy": 7,
+     "clarity": 8,
+     "budget": 8,
+     "hierarchy": 8,
      "spacing": 8,
-     "broken": 7
+     "broken": 8
     },
-    "lowest": 5,
+    "lowest": 8,
+    "previous": [
+     {
+      "finding": "Job unclear: Panel is the surface under Facts/Row group/Log/TaskTotals/TaskProgress/TaskSection, not a component you pick.",
+      "fixed": true,
+      "note": "Purpose line says you rarely call it; When to use lists every consumer."
+     },
+     {
+      "finding": "TaskGroup card (shadowed), ChoiceList .st-choice-panel and chooser lists skip .st-panel.",
+      "fixed": true,
+      "note": "tk-group, st-choice-panel and pen-card are .st-panel; computed box-shadow none on farrowing.overview, farrowing.room, piglet-processing.pen-list, health-record.condition-picker; inset chooser fill removed."
+     },
+     {
+      "finding": "Parallel --st-* namespace with raw hex roots.",
+      "fixed": true,
+      "note": "--st-line/--st-inset/--st-radius/--st-paper resolve to tokens.css names; border uses border-width, padding space-panel."
+     },
+     {
+      "finding": "Preview shows a paragraph in a panel.",
+      "fixed": true,
+      "note": "Overview and Page/Drawer tabs render a Facts block and a Row group, with Empty and Chinese states."
+     },
+     {
+      "finding": "Proposal: merge TaskGroup card + ChoiceList panel into Panel.",
+      "fixed": true,
+      "note": "Both built on .st-panel; one surface rule."
+     }
+    ],
     "checklist": [
      {
       "line": 1,
-      "pass": false,
-      "why": "\"The one container surface\" - no use-X-instead (TaskGroup card, Row group, Facts)."
+      "pass": true,
+      "why": "One-sentence job plus use Facts / Row group / Log instead."
      },
      {
       "line": 2,
-      "pass": false,
-      "why": "Only \"do not nest\"; no when-not naming an alternative."
+      "pass": true,
+      "why": "When-not names Heading, Sheet."
      },
      {
       "line": 3,
       "pass": true,
-      "why": "Border, radius, padding and context background named."
+      "why": "Fill, hairline, radius, content slot; padding owned by consumer (stated)."
      },
      {
       "line": 4,
-      "pass": false,
-      "why": "The real variants (padded content, row list with 0 padding, facts dl, log) are not listed; they live in other cards."
+      "pass": true,
+      "why": "Page and Drawer, each with a when-to-use and two real screens."
      },
      {
       "line": 5,
       "pass": true,
-      "why": "Static; empty is absent (stated)."
+      "why": "Static; Default, Empty, Long/Chinese rendered; interactive states owned by contents."
      },
      {
       "line": 6,
       "pass": true,
-      "why": "Not tappable."
+      "why": "Not tappable; no target under 48px on any judged screen."
      },
      {
       "line": 7,
@@ -12707,22 +12724,22 @@
      {
       "line": 8,
       "pass": true,
-      "why": "n/a"
+      "why": "n/a; no colour-only state."
      },
      {
       "line": 9,
       "pass": true,
-      "why": "No copy."
+      "why": "No text slots; consumers' copy rules; Chinese specimen."
      },
      {
       "line": 10,
       "pass": true,
-      "why": "The tag option allows section/dl; no role needed."
+      "why": "No role; tag option for semantics; contents own focus."
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "Uses a parallel --st-* namespace with raw hex roots (--st-line:#dfe4d8, --st-inset:#f6f8f1) and raw 16/12px padding instead of the tokens.css names."
+      "pass": true,
+      "why": "Rules resolve to tokens; aliases listed."
      },
      {
       "line": 12,
@@ -12736,59 +12753,26 @@
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "Does not link Facts, Row group, Log, TaskTotals or TaskProgress, which are all built on it."
+      "pass": true,
+      "why": "Links nine consumers/siblings; classification stated."
      },
      {
       "line": 15,
       "pass": true,
-      "why": "The 375 preview renders both contexts without overflow (cramped at about 187px each)."
+      "why": "Preview at 375 has no overflow; all state cells render."
      }
     ],
     "classification": "component",
     "variants": [
      {
-      "name": "content (padded)",
+      "name": "Page (paper on app-background)",
       "usedBy": [
-       "farrowing.finish",
-       "farrowing.task-ready"
+       "farrowing.overview",
+       "farrowing.room",
+       "piglet-processing.pen-list",
+       "pig-profile.actions"
       ],
-      "status": "in-design",
-      "scores": {
-       "clarity": 7,
-       "budget": 8,
-       "hierarchy": 8,
-       "spacing": 8,
-       "broken": 8
-      },
-      "findings": [
-       "Raw --st-* tokens."
-      ]
-     },
-     {
-      "name": "list (st-row-group, padding 0)",
-      "usedBy": [
-       "inspection.pen"
-      ],
-      "status": "in-design",
-      "scores": {
-       "clarity": 7,
-       "budget": 8,
-       "hierarchy": 8,
-       "spacing": 8,
-       "broken": 8
-      },
-      "findings": [
-       "Documented only in Row."
-      ]
-     },
-     {
-      "name": "facts (st-facts)",
-      "usedBy": [
-       "farrowing.finish",
-       "piglet-processing.sheet-todo"
-      ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
@@ -12797,16 +12781,18 @@
        "broken": 8
       },
       "findings": [
-       "Documented in Facts."
+       "In the atlas cell the host body is white, so the Page specimen shows white panels on white: only the hairline separates them. Real screens are correct (#fff on #f6f7f1)."
       ]
      },
      {
-      "name": "log (st-log)",
+      "name": "Drawer (inset on paper)",
       "usedBy": [
-       "farrowing.history",
-       "piglet-processing.pen-log"
+       "piglet-processing.sheet-todo",
+       "piglet-processing.more-actions",
+       "farrowing.finish",
+       "health-record.condition-picker"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
@@ -12814,49 +12800,68 @@
        "spacing": 8,
        "broken": 8
       },
-      "findings": [
-       "Documented in Log."
-      ]
+      "findings": []
      }
     ],
     "findings": [
      {
-      "severity": "high",
-      "text": "Its job is unclear: screens almost never call panel() directly - it is the surface under Facts, Row group, Log, TaskTotals, TaskProgress and TaskSection. The card reads like a component you pick, so the owner cannot tell what it is for.",
-      "fix": "Rewrite the purpose: \"The surface every grouped block sits on; you rarely call it - use Facts, Row group or Log\", and list those as its variants."
-     },
-     {
-      "severity": "high",
-      "text": "Three look-alikes skip it: the TaskGroup card (paper, line, radius-panel plus a 0 2px 8px shadow, against \"panels are not shadowed\"), ChoiceList .st-choice-panel, and the chooser .catalog-* lists.",
-      "fix": "Build TaskGroup and .st-choice-panel on .st-panel; drop the TaskGroup shadow or name it the one sanctioned exception."
-     },
-     {
-      "severity": "medium",
-      "text": "A parallel token namespace (--st-line, --st-inset, --st-radius) with raw hex roots duplicates tokens.css.",
-      "fix": "Point --st-* at tokens (--st-line: var(--line), and so on) or use the tokens directly."
+      "severity": "low",
+      "text": "The Page specimen does not show its defining trait in the atlas: the cell canvas renders white, so the paper panel blends into it.",
+      "fix": "In variants/page.html give the [data-st-context=page] cell background:var(--app-background), as drawer.html sets paper."
      },
      {
       "severity": "low",
-      "text": "The preview shows a paragraph in a panel - a use no screen has.",
-      "fix": "Preview the real variants: a Facts block and a Row group, page vs drawer."
+      "text": "In the specimens the second heading (Pen) sits about 8px under the Facts panel and about 20px above its own Row group, so it reads as belonging to the block above.",
+      "fix": "Separate the two blocks in the specimen with space-section (the README's own rule), e.g. wrap each heading+block in a section with margin-top var(--space-section)."
+     },
+     {
+      "severity": "low",
+      "text": "Summary/hero cards beside Panels still carry a faint shadow (tk-summary, task-context-card, home-task-card, inspect-pen: 0 3px 12px rgba(38,53,30,.016)), so elevation is inconsistent with 'panels are not shadowed'.",
+      "fix": "Drop the shadow on those cards or name the summary card as the one sanctioned exception in the DS README."
      }
     ],
     "proposals": [
      {
-      "kind": "merge",
-      "name": "TaskGroup card + ChoiceList panel -> Panel",
-      "why": "Same surface job; one implementation.",
+      "kind": "new-variant",
+      "name": "Panel summary (split hero card)",
+      "why": "The Task summary card (two halves with a hairline divider) is the same surface job, re-implemented with its own shadow on three screens.",
       "seenIn": [
-       "farrowing.room",
        "piglet-processing.pen-list",
-       "inspection.filters"
+       "farrowing.room",
+       "workbench.today"
       ]
+     }
+    ],
+    "previousChecklistFails": [
+     {
+      "line": 1,
+      "fixed": true
+     },
+     {
+      "line": 2,
+      "fixed": true
+     },
+     {
+      "line": 4,
+      "fixed": true,
+      "note": "page/drawer variants with screens"
+     },
+     {
+      "line": 11,
+      "fixed": true
+     },
+     {
+      "line": 14,
+      "fixed": true
      }
     ]
    },
    "files": {
-    "variantsJson": false,
-    "variants": []
+    "variantsJson": true,
+    "variants": [
+     "drawer",
+     "page"
+    ]
    }
   },
   {
@@ -14148,145 +14153,203 @@
   {
    "name": "CategoryFooter",
    "group": "Base",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "status": "agent-checked",
+    "round": 1,
+    "judged": "2026-10-10",
+    "commit": "7f47b7b",
     "model": "claude-opus-5-5",
     "scores": {
-     "clarity": 7,
+     "clarity": 8,
      "budget": 8,
      "hierarchy": 8,
      "spacing": 8,
-     "broken": 7
+     "broken": 8
     },
-    "lowest": 7,
+    "lowest": 8,
+    "previous": [
+     {
+      "finding": "Screens show Production · Health · General; law says Health · Routine · Production.",
+      "fixed": true,
+      "note": "pig-profile.*, health-record.* action pages show Health · Routine · Production; inspection.actions (batch) Health · Routine. No 'General' category left on any screen."
+     },
+     {
+      "finding": "disabled dims a tab to half opacity.",
+      "fixed": true,
+      "note": "Removed from bundle.js, bundle.css and index.d.ts; README states omit + reason pattern. (Stale copy remains in unused ux/system/sentri-components.js.)"
+     },
+     {
+      "finding": "Preview shows one state only.",
+      "fixed": true,
+      "note": "Nine cells render: Default, Pressed, Active, Focused, Empty, Five at 300px, Long/Chinese, Back pressed, Scrolled."
+     },
+     {
+      "finding": "Raw px widths and paddings.",
+      "fixed": true,
+      "note": "back-width, control-height, space-footer-top/bottom, space-gutter, border-width."
+     },
+     {
+      "finding": "Variant: screens contradict README order.",
+      "fixed": true,
+      "note": "Same as the first."
+     }
+    ],
+    "previousChecklistFails": [
+     {
+      "line": 2,
+      "fixed": true
+     },
+     {
+      "line": 5,
+      "fixed": true
+     },
+     {
+      "line": 7,
+      "fixed": true,
+      "note": "max three on real verb sheets"
+     },
+     {
+      "line": 9,
+      "fixed": true
+     },
+     {
+      "line": 11,
+      "fixed": true
+     },
+     {
+      "line": 14,
+      "fixed": true
+     },
+     {
+      "line": 15,
+      "fixed": true
+     }
+    ],
     "checklist": [
      {
       "line": 1,
       "pass": true,
-      "why": "States the job: actions-page footer, Back left, category tabs right"
+      "why": "Job plus use Sheet footer instead."
      },
      {
       "line": 2,
-      "pass": false,
-      "why": "No when-not (for example a sheet footer with Back + primary)"
+      "pass": true,
+      "why": "When-not names Segment, FilterChips, Sheet footer."
      },
      {
       "line": 3,
       "pass": true,
-      "why": "Back, tabs, active underline and handle named"
+      "why": "Back, nav, buttons, underline, handle; categories optional."
      },
      {
       "line": 4,
       "pass": true,
-      "why": "One variant, used by both action pages"
+      "why": "One variant, two+ screens."
      },
      {
       "line": 5,
-      "pass": false,
-      "why": "Tab pressed is \"not drawn\" and disabled dims; no rendered state set"
+      "pass": true,
+      "why": "All states rendered; disabled unsupported with omit-and-explain pattern."
      },
      {
       "line": 6,
       "pass": true,
-      "why": "Back 86x48; tabs 48 tall, 66-126 wide"
+      "why": "Back 86x48, tabs 48 tall and 48+ wide on pig-profile.actions and in every preview cell."
      },
      {
       "line": 7,
-      "pass": false,
-      "why": "No cap on the number of categories (the law says three strips)"
+      "pass": true,
+      "why": "At most three on real sheets; five is a labelled stress fixture."
      },
      {
       "line": 8,
       "pass": true,
-      "why": "Active tab: 700 weight + 3px underline, not colour only"
+      "why": "Active = bold + underline + aria-current."
      },
      {
       "line": 9,
-      "pass": false,
-      "why": "One-word rule stated, but no overflow or under-310px example"
+      "pass": true,
+      "why": "12 EN / 6 ZH chars, sentence case, never ellipsised; long example shown."
      },
      {
       "line": 10,
       "pass": true,
-      "why": "aria-current=location, nav aria-label, focus rings stated"
+      "why": "nav + aria-label, aria-current=location, focus ring rendered, keyboard row, no swipe-only."
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "Raw px (86, 92, 14/18/28, 310) in CSS; no variable list"
+      "pass": true,
+      "why": "No raw values in .st-category* rules; tokens listed."
      },
      {
       "line": 12,
       "pass": true,
-      "why": "Not a form field"
+      "why": "n/a"
      },
      {
       "line": 13,
       "pass": true,
-      "why": "Not an overlay"
+      "why": "n/a"
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "No related links or classification"
+      "pass": true,
+      "why": "Related links and classification present."
      },
      {
       "line": 15,
-      "pass": false,
-      "why": "The 375 preview shows one state only; no overflow or narrow render"
+      "pass": true,
+      "why": "375 preview: no page overflow; overflow only inside the tab scroller for the 300px/Chinese fixtures."
      }
     ],
     "classification": "component",
     "variants": [
      {
-      "name": "default",
+      "name": "Category navigation",
       "usedBy": [
        "pig-profile.actions",
-       "inspection.actions"
+       "inspection.actions",
+       "pig-profile.unavailable-actions",
+       "health-record.record-health"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 7,
+       "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
-       "broken": 7
+       "broken": 8
       },
       "findings": [
-       "Screens show Production · Health · General; the README and the verb-sheet law say Health · Routine · Production"
+       "Overflowing labels are cut mid-word with no edge cue (300px fixture 'Productio', Scrolled 'roduction')."
       ]
      }
     ],
     "findings": [
      {
-      "severity": "medium",
-      "text": "Category names and order on screens (Production, Health, General) contradict the README and the verb-sheet law (Health, Routine, Production).",
-      "fix": "Pick one: rename General to Routine and order Health · Routine · Production in actionCatalogue, or change the law. The footer renders whatever order it is given."
-     },
-     {
-      "severity": "medium",
-      "text": "`disabled` dims a tab to half opacity, which the DS law forbids (nothing else is ever greyed).",
-      "fix": "Remove the disabled option from categoryFooter; callers leave out an empty category."
+      "severity": "low",
+      "text": "When tabs overflow, a label is hard-cut mid-word with no cue that the strip scrolls (300px and Scrolled cells; in the 323px atlas cells even the 3-category Default cuts 'Productic'). Real phones at 360px+ fit three English labels, so this only bites on stress cases.",
+      "fix": "Add scroll-snap-type:x proximity with scroll-snap-align:start on tabs and a token-based edge fade (mask-image) on .st-category-tabs when scrollWidth > clientWidth."
      },
      {
       "severity": "low",
-      "text": "The preview shows a single state: no scrolled or overflowing tabs, no under-310px shrink, no focus.",
-      "fix": "Add a 5-category instance at 300px width and a focused tab to preview.html."
+      "text": "The Overview tab's Used by says 'Not mapped yet' while the variant lists two screens; the footer also appears on pig-profile.* sub-pages and health-record.record-health / care-instructions / resolve-conditions.",
+      "fix": "Add those screen ids to variants.json usedBy and map the component in the atlas screen notes."
      },
      {
       "severity": "low",
-      "text": "Raw px widths and paddings instead of back-width, control-height and footer tokens.",
-      "fix": "Swap 86px for back-width, 48px for control-height, and the padding for the footer tokens."
+      "text": "A stale categoryFooter with the c.disabled option survives in ux/system/sentri-components.js (no page loads it).",
+      "fix": "Delete ux/system/sentri-components.js with the legacy icon registry."
      }
     ],
     "proposals": []
    },
    "files": {
-    "variantsJson": false,
-    "variants": []
+    "variantsJson": true,
+    "variants": [
+     "default"
+    ]
    }
   },
   {
@@ -20797,8 +20860,8 @@
    },
    "kind": "design",
    "severity": "medium",
-   "title": "Duplicate glyphs: origin = place (identical path), chevron = arrow (same path), plus ~ condition.",
-   "detail": "Duplicate glyphs: origin = place (identical path), chevron = arrow (same path), plus ~ condition.\nFix: Keep one name per glyph (place, chevron, plus) and alias the others.",
+   "title": "In use the Standard glyph is drawn at 1.6, 1.7, 1.8 and 2 on the same screen (farrowing.room,…",
+   "detail": "In use the Standard glyph is drawn at 1.6, 1.7, 1.8 and 2 on the same screen (farrowing.room, inspection.walk): raw stroke-width in task-skeleton.css (.tk-summary-heading 1.7, .tk-warning-* 1.8, .tk-dock-unit 1.8, .tk-receipt-mark 2), astra-task-overview.css .tc-heading 1.7, inspection/farrowing .section-title 1.7, piglet-processing simple/app.css .sp-more 2.4 / .sp-give-scan 1.8. Pre-existing, not from this PR.\nFix: Replace those raw stroke-width values with var(--icon-stroke) (or --icon-key-stroke where a heavier key is meant); add a css-vars test that bans raw stroke-width on svg rules.",
    "source": "gate"
   },
   {
@@ -20808,69 +20871,9 @@
     "id": "Icon"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "Unknown names silently draw a chevron, which reads as \"more\" - a typo becomes a false affordance.",
-   "detail": "Unknown names silently draw a chevron, which reads as \"more\" - a typo becomes a false affordance.\nFix: Return an empty svg and console.warn in development.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Icon:2",
-   "target": {
-    "kind": "component",
-    "id": "Icon"
-   },
-   "kind": "broken",
-   "severity": "medium",
-   "title": "A known bug is shipped: the grid path closes to x=3 (M14 3h7v7H3z).",
-   "detail": "A known bug is shipped: the grid path closes to x=3 (M14 3h7v7H3z).\nFix: Fix the squares to M14 3h7v7h-7z and M14 14h7v7h-7z.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Icon:3",
-   "target": {
-    "kind": "component",
-    "id": "Icon"
-   },
-   "kind": "design",
    "severity": "low",
-   "title": "\"more\" is three 0.01px dots, near invisible at stroke 1.6 in glare.",
-   "detail": "\"more\" is three 0.01px dots, near invisible at stroke 1.6 in glare.\nFix: Draw three r=1.5 filled dots, or stroke 2.4.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Icon:4",
-   "target": {
-    "kind": "component",
-    "id": "Icon"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "The README says 52 glyphs; the preview renders 54 (backspace, offline).",
-   "detail": "The README says 52 glyphs; the preview renders 54 (backspace, offline).\nFix: Update the count or derive it from the registry.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Icon:5",
-   "target": {
-    "kind": "component",
-    "id": "Icon"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "The global svg default (stroke 1.8, 20px) contradicts the 1.6 rule.",
-   "detail": "The global svg default (stroke 1.8, 20px) contradicts the 1.6 rule.\nFix: Set stroke-width from an icon-stroke token (1.6).",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Icon:p0",
-   "target": {
-    "kind": "component",
-    "id": "Icon"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "Merge origin + place, chevron + arrow?",
-   "detail": "Identical paths under two names.\nSeen in: farrowing.room",
+   "title": "Stale references to the retired file: IMPLEMENTATIONS.md row 9, assets/Icons/README.md line 21…",
+   "detail": "Stale references to the retired file: IMPLEMENTATIONS.md row 9, assets/Icons/README.md line 21 (\"not yet in ux/system/sentri-icons.js\"), bundle.js line 2 header comment.\nFix: Drop sentri-icons.js from those three lines (leave ADR 0001 as history).",
    "source": "gate"
   },
   {
@@ -20987,10 +20990,10 @@
     "kind": "component",
     "id": "Panel"
    },
-   "kind": "broken",
-   "severity": "high",
-   "title": "Its job is unclear: screens almost never call panel() directly - it is the surface under Facts,…",
-   "detail": "Its job is unclear: screens almost never call panel() directly - it is the surface under Facts, Row group, Log, TaskTotals, TaskProgress and TaskSection. The card reads like a component you pick, so the owner cannot tell what it is for.\nFix: Rewrite the purpose: \"The surface every grouped block sits on; you rarely call it - use Facts, Row group or Log\", and list those as its variants.",
+   "kind": "design",
+   "severity": "low",
+   "title": "The Page specimen does not show its defining trait in the atlas: the cell canvas renders white,…",
+   "detail": "The Page specimen does not show its defining trait in the atlas: the cell canvas renders white, so the paper panel blends into it.\nFix: In variants/page.html give the [data-st-context=page] cell background:var(--app-background), as drawer.html sets paper.",
    "source": "gate"
   },
   {
@@ -21000,9 +21003,9 @@
     "id": "Panel"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "Three look-alikes skip it: the TaskGroup card (paper, line, radius-panel plus a 0 2px 8px…",
-   "detail": "Three look-alikes skip it: the TaskGroup card (paper, line, radius-panel plus a 0 2px 8px shadow, against \"panels are not shadowed\"), ChoiceList .st-choice-panel, and the chooser .catalog-* lists.\nFix: Build TaskGroup and .st-choice-panel on .st-panel; drop the TaskGroup shadow or name it the one sanctioned exception.",
+   "severity": "low",
+   "title": "In the specimens the second heading (Pen) sits about 8px under the Facts panel and about 20px…",
+   "detail": "In the specimens the second heading (Pen) sits about 8px under the Facts panel and about 20px above its own Row group, so it reads as belonging to the block above.\nFix: Separate the two blocks in the specimen with space-section (the README's own rule), e.g. wrap each heading+block in a section with margin-top var(--space-section).",
    "source": "gate"
   },
   {
@@ -21012,21 +21015,9 @@
     "id": "Panel"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "A parallel token namespace (--st-line, --st-inset, --st-radius) with raw hex roots duplicates…",
-   "detail": "A parallel token namespace (--st-line, --st-inset, --st-radius) with raw hex roots duplicates tokens.css.\nFix: Point --st-* at tokens (--st-line: var(--line), and so on) or use the tokens directly.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Panel:3",
-   "target": {
-    "kind": "component",
-    "id": "Panel"
-   },
-   "kind": "design",
    "severity": "low",
-   "title": "The preview shows a paragraph in a panel - a use no screen has.",
-   "detail": "The preview shows a paragraph in a panel - a use no screen has.\nFix: Preview the real variants: a Facts block and a Row group, page vs drawer.",
+   "title": "Summary/hero cards beside Panels still carry a faint shadow (tk-summary, task-context-card,…",
+   "detail": "Summary/hero cards beside Panels still carry a faint shadow (tk-summary, task-context-card, home-task-card, inspect-pen: 0 3px 12px rgba(38,53,30,.016)), so elevation is inconsistent with 'panels are not shadowed'.\nFix: Drop the shadow on those cards or name the summary card as the one sanctioned exception in the DS README.",
    "source": "gate"
   },
   {
@@ -21037,8 +21028,8 @@
    },
    "kind": "decision",
    "severity": "medium",
-   "title": "Merge TaskGroup card + ChoiceList panel -> Panel?",
-   "detail": "Same surface job; one implementation.\nSeen in: farrowing.room, piglet-processing.pen-list, inspection.filters",
+   "title": "New variant: Panel summary (split hero card)?",
+   "detail": "The Task summary card (two halves with a hairline divider) is the same surface job, re-implemented with its own shadow on three screens.\nSeen in: piglet-processing.pen-list, farrowing.room, workbench.today",
    "source": "gate"
   },
   {
@@ -21275,10 +21266,10 @@
     "kind": "component",
     "id": "CategoryFooter"
    },
-   "kind": "design",
-   "severity": "medium",
-   "title": "Category names and order on screens (Production, Health, General) contradict the README and the…",
-   "detail": "Category names and order on screens (Production, Health, General) contradict the README and the verb-sheet law (Health, Routine, Production).\nFix: Pick one: rename General to Routine and order Health · Routine · Production in actionCatalogue, or change the law. The footer renders whatever order it is given.",
+   "kind": "broken",
+   "severity": "low",
+   "title": "When tabs overflow, a label is hard-cut mid-word with no cue that the strip scrolls (300px and…",
+   "detail": "When tabs overflow, a label is hard-cut mid-word with no cue that the strip scrolls (300px and Scrolled cells; in the 323px atlas cells even the 3-category Default cuts 'Productic'). Real phones at 360px+ fit three English labels, so this only bites on stress cases.\nFix: Add scroll-snap-type:x proximity with scroll-snap-align:start on tabs and a token-based edge fade (mask-image) on .st-category-tabs when scrollWidth > clientWidth.",
    "source": "gate"
   },
   {
@@ -21288,9 +21279,9 @@
     "id": "CategoryFooter"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "`disabled` dims a tab to half opacity, which the DS law forbids (nothing else is ever greyed).",
-   "detail": "`disabled` dims a tab to half opacity, which the DS law forbids (nothing else is ever greyed).\nFix: Remove the disabled option from categoryFooter; callers leave out an empty category.",
+   "severity": "low",
+   "title": "The Overview tab's Used by says 'Not mapped yet' while the variant lists two screens; the footer…",
+   "detail": "The Overview tab's Used by says 'Not mapped yet' while the variant lists two screens; the footer also appears on pig-profile.* sub-pages and health-record.record-health / care-instructions / resolve-conditions.\nFix: Add those screen ids to variants.json usedBy and map the component in the atlas screen notes.",
    "source": "gate"
   },
   {
@@ -21299,22 +21290,10 @@
     "kind": "component",
     "id": "CategoryFooter"
    },
-   "kind": "broken",
-   "severity": "low",
-   "title": "The preview shows a single state: no scrolled or overflowing tabs, no under-310px shrink, no focus.",
-   "detail": "The preview shows a single state: no scrolled or overflowing tabs, no under-310px shrink, no focus.\nFix: Add a 5-category instance at 300px width and a focused tab to preview.html.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:CategoryFooter:3",
-   "target": {
-    "kind": "component",
-    "id": "CategoryFooter"
-   },
    "kind": "design",
    "severity": "low",
-   "title": "Raw px widths and paddings instead of back-width, control-height and footer tokens.",
-   "detail": "Raw px widths and paddings instead of back-width, control-height and footer tokens.\nFix: Swap 86px for back-width, 48px for control-height, and the padding for the footer tokens.",
+   "title": "A stale categoryFooter with the c.disabled option survives in ux/system/sentri-components.js (no…",
+   "detail": "A stale categoryFooter with the c.disabled option survives in ux/system/sentri-components.js (no page loads it).\nFix: Delete ux/system/sentri-components.js with the legacy icon registry.",
    "source": "gate"
   },
   {

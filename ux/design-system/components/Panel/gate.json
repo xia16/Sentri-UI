@@ -1,46 +1,74 @@
 {
-  "status": "in-design",
-  "judged": "2026-10-09",
-  "commit": "3e3f835",
+  "status": "agent-checked",
+  "round": 1,
+  "judged": "2026-10-10",
+  "commit": "7f47b7b",
   "model": "claude-opus-5-5",
   "scores": {
-    "clarity": 5,
-    "budget": 7,
-    "hierarchy": 7,
+    "clarity": 8,
+    "budget": 8,
+    "hierarchy": 8,
     "spacing": 8,
-    "broken": 7
+    "broken": 8
   },
-  "lowest": 5,
+  "lowest": 8,
+  "previous": [
+    {
+      "finding": "Job unclear: Panel is the surface under Facts/Row group/Log/TaskTotals/TaskProgress/TaskSection, not a component you pick.",
+      "fixed": true,
+      "note": "Purpose line says you rarely call it; When to use lists every consumer."
+    },
+    {
+      "finding": "TaskGroup card (shadowed), ChoiceList .st-choice-panel and chooser lists skip .st-panel.",
+      "fixed": true,
+      "note": "tk-group, st-choice-panel and pen-card are .st-panel; computed box-shadow none on farrowing.overview, farrowing.room, piglet-processing.pen-list, health-record.condition-picker; inset chooser fill removed."
+    },
+    {
+      "finding": "Parallel --st-* namespace with raw hex roots.",
+      "fixed": true,
+      "note": "--st-line/--st-inset/--st-radius/--st-paper resolve to tokens.css names; border uses border-width, padding space-panel."
+    },
+    {
+      "finding": "Preview shows a paragraph in a panel.",
+      "fixed": true,
+      "note": "Overview and Page/Drawer tabs render a Facts block and a Row group, with Empty and Chinese states."
+    },
+    {
+      "finding": "Proposal: merge TaskGroup card + ChoiceList panel into Panel.",
+      "fixed": true,
+      "note": "Both built on .st-panel; one surface rule."
+    }
+  ],
   "checklist": [
     {
       "line": 1,
-      "pass": false,
-      "why": "\"The one container surface\" - no use-X-instead (TaskGroup card, Row group, Facts)."
+      "pass": true,
+      "why": "One-sentence job plus use Facts / Row group / Log instead."
     },
     {
       "line": 2,
-      "pass": false,
-      "why": "Only \"do not nest\"; no when-not naming an alternative."
+      "pass": true,
+      "why": "When-not names Heading, Sheet."
     },
     {
       "line": 3,
       "pass": true,
-      "why": "Border, radius, padding and context background named."
+      "why": "Fill, hairline, radius, content slot; padding owned by consumer (stated)."
     },
     {
       "line": 4,
-      "pass": false,
-      "why": "The real variants (padded content, row list with 0 padding, facts dl, log) are not listed; they live in other cards."
+      "pass": true,
+      "why": "Page and Drawer, each with a when-to-use and two real screens."
     },
     {
       "line": 5,
       "pass": true,
-      "why": "Static; empty is absent (stated)."
+      "why": "Static; Default, Empty, Long/Chinese rendered; interactive states owned by contents."
     },
     {
       "line": 6,
       "pass": true,
-      "why": "Not tappable."
+      "why": "Not tappable; no target under 48px on any judged screen."
     },
     {
       "line": 7,
@@ -50,22 +78,22 @@
     {
       "line": 8,
       "pass": true,
-      "why": "n/a"
+      "why": "n/a; no colour-only state."
     },
     {
       "line": 9,
       "pass": true,
-      "why": "No copy."
+      "why": "No text slots; consumers' copy rules; Chinese specimen."
     },
     {
       "line": 10,
       "pass": true,
-      "why": "The tag option allows section/dl; no role needed."
+      "why": "No role; tag option for semantics; contents own focus."
     },
     {
       "line": 11,
-      "pass": false,
-      "why": "Uses a parallel --st-* namespace with raw hex roots (--st-line:#dfe4d8, --st-inset:#f6f8f1) and raw 16/12px padding instead of the tokens.css names."
+      "pass": true,
+      "why": "Rules resolve to tokens; aliases listed."
     },
     {
       "line": 12,
@@ -79,59 +107,26 @@
     },
     {
       "line": 14,
-      "pass": false,
-      "why": "Does not link Facts, Row group, Log, TaskTotals or TaskProgress, which are all built on it."
+      "pass": true,
+      "why": "Links nine consumers/siblings; classification stated."
     },
     {
       "line": 15,
       "pass": true,
-      "why": "The 375 preview renders both contexts without overflow (cramped at about 187px each)."
+      "why": "Preview at 375 has no overflow; all state cells render."
     }
   ],
   "classification": "component",
   "variants": [
     {
-      "name": "content (padded)",
+      "name": "Page (paper on app-background)",
       "usedBy": [
-        "farrowing.finish",
-        "farrowing.task-ready"
+        "farrowing.overview",
+        "farrowing.room",
+        "piglet-processing.pen-list",
+        "pig-profile.actions"
       ],
-      "status": "in-design",
-      "scores": {
-        "clarity": 7,
-        "budget": 8,
-        "hierarchy": 8,
-        "spacing": 8,
-        "broken": 8
-      },
-      "findings": [
-        "Raw --st-* tokens."
-      ]
-    },
-    {
-      "name": "list (st-row-group, padding 0)",
-      "usedBy": [
-        "inspection.pen"
-      ],
-      "status": "in-design",
-      "scores": {
-        "clarity": 7,
-        "budget": 8,
-        "hierarchy": 8,
-        "spacing": 8,
-        "broken": 8
-      },
-      "findings": [
-        "Documented only in Row."
-      ]
-    },
-    {
-      "name": "facts (st-facts)",
-      "usedBy": [
-        "farrowing.finish",
-        "piglet-processing.sheet-todo"
-      ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
         "clarity": 8,
         "budget": 8,
@@ -140,16 +135,18 @@
         "broken": 8
       },
       "findings": [
-        "Documented in Facts."
+        "In the atlas cell the host body is white, so the Page specimen shows white panels on white: only the hairline separates them. Real screens are correct (#fff on #f6f7f1)."
       ]
     },
     {
-      "name": "log (st-log)",
+      "name": "Drawer (inset on paper)",
       "usedBy": [
-        "farrowing.history",
-        "piglet-processing.pen-log"
+        "piglet-processing.sheet-todo",
+        "piglet-processing.more-actions",
+        "farrowing.finish",
+        "health-record.condition-picker"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
         "clarity": 8,
         "budget": 8,
@@ -157,43 +154,59 @@
         "spacing": 8,
         "broken": 8
       },
-      "findings": [
-        "Documented in Log."
-      ]
+      "findings": []
     }
   ],
   "findings": [
     {
-      "severity": "high",
-      "text": "Its job is unclear: screens almost never call panel() directly - it is the surface under Facts, Row group, Log, TaskTotals, TaskProgress and TaskSection. The card reads like a component you pick, so the owner cannot tell what it is for.",
-      "fix": "Rewrite the purpose: \"The surface every grouped block sits on; you rarely call it - use Facts, Row group or Log\", and list those as its variants."
-    },
-    {
-      "severity": "high",
-      "text": "Three look-alikes skip it: the TaskGroup card (paper, line, radius-panel plus a 0 2px 8px shadow, against \"panels are not shadowed\"), ChoiceList .st-choice-panel, and the chooser .catalog-* lists.",
-      "fix": "Build TaskGroup and .st-choice-panel on .st-panel; drop the TaskGroup shadow or name it the one sanctioned exception."
-    },
-    {
-      "severity": "medium",
-      "text": "A parallel token namespace (--st-line, --st-inset, --st-radius) with raw hex roots duplicates tokens.css.",
-      "fix": "Point --st-* at tokens (--st-line: var(--line), and so on) or use the tokens directly."
+      "severity": "low",
+      "text": "The Page specimen does not show its defining trait in the atlas: the cell canvas renders white, so the paper panel blends into it.",
+      "fix": "In variants/page.html give the [data-st-context=page] cell background:var(--app-background), as drawer.html sets paper."
     },
     {
       "severity": "low",
-      "text": "The preview shows a paragraph in a panel - a use no screen has.",
-      "fix": "Preview the real variants: a Facts block and a Row group, page vs drawer."
+      "text": "In the specimens the second heading (Pen) sits about 8px under the Facts panel and about 20px above its own Row group, so it reads as belonging to the block above.",
+      "fix": "Separate the two blocks in the specimen with space-section (the README's own rule), e.g. wrap each heading+block in a section with margin-top var(--space-section)."
+    },
+    {
+      "severity": "low",
+      "text": "Summary/hero cards beside Panels still carry a faint shadow (tk-summary, task-context-card, home-task-card, inspect-pen: 0 3px 12px rgba(38,53,30,.016)), so elevation is inconsistent with 'panels are not shadowed'.",
+      "fix": "Drop the shadow on those cards or name the summary card as the one sanctioned exception in the DS README."
     }
   ],
   "proposals": [
     {
-      "kind": "merge",
-      "name": "TaskGroup card + ChoiceList panel -> Panel",
-      "why": "Same surface job; one implementation.",
+      "kind": "new-variant",
+      "name": "Panel summary (split hero card)",
+      "why": "The Task summary card (two halves with a hairline divider) is the same surface job, re-implemented with its own shadow on three screens.",
       "seenIn": [
-        "farrowing.room",
         "piglet-processing.pen-list",
-        "inspection.filters"
+        "farrowing.room",
+        "workbench.today"
       ]
+    }
+  ],
+  "previousChecklistFails": [
+    {
+      "line": 1,
+      "fixed": true
+    },
+    {
+      "line": 2,
+      "fixed": true
+    },
+    {
+      "line": 4,
+      "fixed": true,
+      "note": "page/drawer variants with screens"
+    },
+    {
+      "line": 11,
+      "fixed": true
+    },
+    {
+      "line": 14,
+      "fixed": true
     }
   ]
 }

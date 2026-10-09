@@ -1,135 +1,49 @@
 {
-  "status": "in-design",
-  "judged": "2026-10-09",
-  "commit": "3e3f835",
+  "status": "agent-checked",
+  "round": 1,
+  "judged": "2026-10-10",
+  "commit": "7f47b7b",
   "model": "claude-opus-5-5",
-  "scores": {
-    "clarity": 7,
-    "budget": 8,
-    "hierarchy": 8,
-    "spacing": 8,
-    "broken": 7
-  },
-  "lowest": 7,
+  "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+  "lowest": 8,
+  "previous": [
+    { "finding": "Screens show Production · Health · General; law says Health · Routine · Production.", "fixed": true, "note": "pig-profile.*, health-record.* action pages show Health · Routine · Production; inspection.actions (batch) Health · Routine. No 'General' category left on any screen." },
+    { "finding": "disabled dims a tab to half opacity.", "fixed": true, "note": "Removed from bundle.js, bundle.css and index.d.ts; README states omit + reason pattern. (Stale copy remains in unused ux/system/sentri-components.js.)" },
+    { "finding": "Preview shows one state only.", "fixed": true, "note": "Nine cells render: Default, Pressed, Active, Focused, Empty, Five at 300px, Long/Chinese, Back pressed, Scrolled." },
+    { "finding": "Raw px widths and paddings.", "fixed": true, "note": "back-width, control-height, space-footer-top/bottom, space-gutter, border-width." },
+    { "finding": "Variant: screens contradict README order.", "fixed": true, "note": "Same as the first." }
+  ],
+  "previousChecklistFails": [
+    { "line": 2, "fixed": true }, { "line": 5, "fixed": true }, { "line": 7, "fixed": true, "note": "max three on real verb sheets" },
+    { "line": 9, "fixed": true }, { "line": 11, "fixed": true }, { "line": 14, "fixed": true }, { "line": 15, "fixed": true }
+  ],
   "checklist": [
-    {
-      "line": 1,
-      "pass": true,
-      "why": "States the job: actions-page footer, Back left, category tabs right"
-    },
-    {
-      "line": 2,
-      "pass": false,
-      "why": "No when-not (for example a sheet footer with Back + primary)"
-    },
-    {
-      "line": 3,
-      "pass": true,
-      "why": "Back, tabs, active underline and handle named"
-    },
-    {
-      "line": 4,
-      "pass": true,
-      "why": "One variant, used by both action pages"
-    },
-    {
-      "line": 5,
-      "pass": false,
-      "why": "Tab pressed is \"not drawn\" and disabled dims; no rendered state set"
-    },
-    {
-      "line": 6,
-      "pass": true,
-      "why": "Back 86x48; tabs 48 tall, 66-126 wide"
-    },
-    {
-      "line": 7,
-      "pass": false,
-      "why": "No cap on the number of categories (the law says three strips)"
-    },
-    {
-      "line": 8,
-      "pass": true,
-      "why": "Active tab: 700 weight + 3px underline, not colour only"
-    },
-    {
-      "line": 9,
-      "pass": false,
-      "why": "One-word rule stated, but no overflow or under-310px example"
-    },
-    {
-      "line": 10,
-      "pass": true,
-      "why": "aria-current=location, nav aria-label, focus rings stated"
-    },
-    {
-      "line": 11,
-      "pass": false,
-      "why": "Raw px (86, 92, 14/18/28, 310) in CSS; no variable list"
-    },
-    {
-      "line": 12,
-      "pass": true,
-      "why": "Not a form field"
-    },
-    {
-      "line": 13,
-      "pass": true,
-      "why": "Not an overlay"
-    },
-    {
-      "line": 14,
-      "pass": false,
-      "why": "No related links or classification"
-    },
-    {
-      "line": 15,
-      "pass": false,
-      "why": "The 375 preview shows one state only; no overflow or narrow render"
-    }
+    { "line": 1, "pass": true, "why": "Job plus use Sheet footer instead." },
+    { "line": 2, "pass": true, "why": "When-not names Segment, FilterChips, Sheet footer." },
+    { "line": 3, "pass": true, "why": "Back, nav, buttons, underline, handle; categories optional." },
+    { "line": 4, "pass": true, "why": "One variant, two+ screens." },
+    { "line": 5, "pass": true, "why": "All states rendered; disabled unsupported with omit-and-explain pattern." },
+    { "line": 6, "pass": true, "why": "Back 86x48, tabs 48 tall and 48+ wide on pig-profile.actions and in every preview cell." },
+    { "line": 7, "pass": true, "why": "At most three on real sheets; five is a labelled stress fixture." },
+    { "line": 8, "pass": true, "why": "Active = bold + underline + aria-current." },
+    { "line": 9, "pass": true, "why": "12 EN / 6 ZH chars, sentence case, never ellipsised; long example shown." },
+    { "line": 10, "pass": true, "why": "nav + aria-label, aria-current=location, focus ring rendered, keyboard row, no swipe-only." },
+    { "line": 11, "pass": true, "why": "No raw values in .st-category* rules; tokens listed." },
+    { "line": 12, "pass": true, "why": "n/a" },
+    { "line": 13, "pass": true, "why": "n/a" },
+    { "line": 14, "pass": true, "why": "Related links and classification present." },
+    { "line": 15, "pass": true, "why": "375 preview: no page overflow; overflow only inside the tab scroller for the 300px/Chinese fixtures." }
   ],
   "classification": "component",
   "variants": [
-    {
-      "name": "default",
-      "usedBy": [
-        "pig-profile.actions",
-        "inspection.actions"
-      ],
-      "status": "in-design",
-      "scores": {
-        "clarity": 7,
-        "budget": 8,
-        "hierarchy": 8,
-        "spacing": 8,
-        "broken": 7
-      },
-      "findings": [
-        "Screens show Production · Health · General; the README and the verb-sheet law say Health · Routine · Production"
-      ]
-    }
+    { "name": "Category navigation", "usedBy": ["pig-profile.actions", "inspection.actions", "pig-profile.unavailable-actions", "health-record.record-health"], "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": ["Overflowing labels are cut mid-word with no edge cue (300px fixture 'Productio', Scrolled 'roduction')."] }
   ],
   "findings": [
-    {
-      "severity": "medium",
-      "text": "Category names and order on screens (Production, Health, General) contradict the README and the verb-sheet law (Health, Routine, Production).",
-      "fix": "Pick one: rename General to Routine and order Health · Routine · Production in actionCatalogue, or change the law. The footer renders whatever order it is given."
-    },
-    {
-      "severity": "medium",
-      "text": "`disabled` dims a tab to half opacity, which the DS law forbids (nothing else is ever greyed).",
-      "fix": "Remove the disabled option from categoryFooter; callers leave out an empty category."
-    },
-    {
-      "severity": "low",
-      "text": "The preview shows a single state: no scrolled or overflowing tabs, no under-310px shrink, no focus.",
-      "fix": "Add a 5-category instance at 300px width and a focused tab to preview.html."
-    },
-    {
-      "severity": "low",
-      "text": "Raw px widths and paddings instead of back-width, control-height and footer tokens.",
-      "fix": "Swap 86px for back-width, 48px for control-height, and the padding for the footer tokens."
-    }
+    { "severity": "low", "text": "When tabs overflow, a label is hard-cut mid-word with no cue that the strip scrolls (300px and Scrolled cells; in the 323px atlas cells even the 3-category Default cuts 'Productic'). Real phones at 360px+ fit three English labels, so this only bites on stress cases.", "fix": "Add scroll-snap-type:x proximity with scroll-snap-align:start on tabs and a token-based edge fade (mask-image) on .st-category-tabs when scrollWidth > clientWidth." },
+    { "severity": "low", "text": "The Overview tab's Used by says 'Not mapped yet' while the variant lists two screens; the footer also appears on pig-profile.* sub-pages and health-record.record-health / care-instructions / resolve-conditions.", "fix": "Add those screen ids to variants.json usedBy and map the component in the atlas screen notes." },
+    { "severity": "low", "text": "A stale categoryFooter with the c.disabled option survives in ux/system/sentri-components.js (no page loads it).", "fix": "Delete ux/system/sentri-components.js with the legacy icon registry." }
   ],
   "proposals": []
 }

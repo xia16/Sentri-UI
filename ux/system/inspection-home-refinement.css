@@ -10,7 +10,7 @@
 .inspection-phone .inspect-controls{background:#f6f7f1;padding:4px 18px 12px;height:66px;gap:8px}
 .inspection-phone .inspect-controls .lens-count{font-size:10px;font-weight:400;color:var(--muted);margin:0}
 .inspection-phone .inspect-list{padding:0 18px 20px;gap:12px}
-.inspection-phone .inspect-pen{border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 3px 12px #26351e04}
+.inspection-phone .inspect-pen{border:1px solid var(--line);border-radius:18px;background:#fff}
 .inspection-phone .inspect-pen-head{background:#f8faf5;min-height:50px;padding-left:0;border-bottom-color:#e8eddf}
 .inspection-phone .pen-name strong{font-weight:500}
 .inspection-phone .pen-feed strong{font-family:var(--font-sans);font-weight:500;font-size:11px}

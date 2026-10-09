@@ -114,7 +114,7 @@ export interface LogEntry {
 export interface LogDayOptions { now?: Date | number | string; lang?: string; today?: string; yesterday?: string }
 export interface LogGroup { label?: string; description?: string; entries: LogEntry[]; strs?: Strs<'label' | 'description'>; args?: StrArgs<'label' | 'description'> }
 
-export interface Category { id: string; label: string; disabled?: boolean; strs?: Strs<'label'>; args?: StrArgs<'label'> }
+export interface Category { id: string; label: string; strs?: Strs<'label'>; args?: StrArgs<'label'> }
 export interface CategoryFooterProps {
   categories: Category[];
   active?: string;
@@ -718,13 +718,14 @@ export interface SentriUI {
 export interface SentriIcons {
   /** name → SVG path data on a 24×24 grid. */
   readonly paths: Readonly<Record<IconName, string>>;
-  /** `<svg viewBox="0 0 24 24" aria-hidden="true"><path d=…/></svg>`; an unknown name falls back to chevron. */
+  readonly aliases: Readonly<Record<string, IconName>>;
+  /** `<svg viewBox="0 0 24 24" aria-hidden="true"><path d=…/></svg>`; an unknown name warns and returns an empty svg. */
   icon(name: IconName): string;
 }
 
 export type IconName =
   | 'more' | 'monitor' | 'treat' | 'hospital' | 'profile' | 'chart' | 'origin' | 'back' | 'chevron' | 'close'
-  | 'check' | 'note' | 'feed' | 'link' | 'condition' | 'weight' | 'search' | 'grid' | 'scan' | 'clock'
+  | 'measure' | 'check' | 'note' | 'feed' | 'link' | 'condition' | 'weight' | 'search' | 'grid' | 'scan' | 'clock'
   | 'alert' | 'signal' | 'battery' | 'filter' | 'minus' | 'plus' | 'record' | 'camera' | 'edit' | 'wrench'
   | 'details' | 'calendar' | 'bookmark' | 'transfer' | 'down' | 'arrow' | 'place' | 'home' | 'toolbox' | 'spark'
   | 'heat' | 'pregnancy' | 'farrow' | 'barn' | 'return' | 'send' | 'health' | 'temperature' | 'humidity' | 'air'

@@ -202,9 +202,9 @@ test('dosage units show Liquid and Weight subtitles without navigating deeper', 
 });
 test('medicine and health render the shared flat chooser surface', () => {
  const c=model.seed();model.openBulkAction(c,'treatment',['000267']);c.view='medicine-picker';c.form.medicineCategory='Antibiotics';
- assert.match(model.overlay(c),/class="st-choice-panel"/);
+ assert.match(model.overlay(c),/class="st-panel st-choice-panel"/);
  model.openBulkAction(c,'health',['000267']);model.handleRecordAction(c,'bulk-pick-health','');
- assert.match(model.overlay(c),/class="st-choice-panel"/);
+ assert.match(model.overlay(c),/class="st-panel st-choice-panel"/);
 });
 
 test('catalogue navigation uses tappable path steps and only one exit pair', () => {

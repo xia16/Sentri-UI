@@ -1,0 +1,175 @@
+{
+  "errors": [],
+  "result": [
+    {
+      "name": "Panel",
+      "variant": "page",
+      "state": "Default",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "Panel",
+      "variant": "page",
+      "state": "Empty",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "Panel",
+      "variant": "page",
+      "state": "Long label / Chinese",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "Panel",
+      "variant": "drawer",
+      "state": "Default",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "Panel",
+      "variant": "drawer",
+      "state": "Empty",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "Panel",
+      "variant": "drawer",
+      "state": "Long label / Chinese",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "Icon",
+      "variant": "standard",
+      "state": "Default",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "Icon",
+      "variant": "standard",
+      "state": "Unknown",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "Icon",
+      "variant": "key",
+      "state": "Default",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "CategoryFooter",
+      "variant": "default",
+      "state": "Default",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "CategoryFooter",
+      "variant": "default",
+      "state": "Pressed",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "CategoryFooter",
+      "variant": "default",
+      "state": "Active",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "CategoryFooter",
+      "variant": "default",
+      "state": "Focused",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "CategoryFooter",
+      "variant": "default",
+      "state": "Empty",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "CategoryFooter",
+      "variant": "default",
+      "state": "Five categories at 300px",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "CategoryFooter",
+      "variant": "default",
+      "state": "Long label / Chinese",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "CategoryFooter",
+      "variant": "default",
+      "state": "Back pressed",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "name": "CategoryFooter",
+      "variant": "default",
+      "state": "Scrolled",
+      "bad": [],
+      "overflow": false
+    },
+    {
+      "screen": "workbench.today",
+      "bad": []
+    },
+    {
+      "screen": "farrowing.room",
+      "bad": []
+    },
+    {
+      "screen": "farrowing.finish",
+      "bad": []
+    },
+    {
+      "screen": "farrowing.history",
+      "bad": []
+    },
+    {
+      "screen": "inspection.walk",
+      "bad": []
+    },
+    {
+      "screen": "inspection.filters",
+      "bad": []
+    },
+    {
+      "screen": "inspection.actions",
+      "bad": []
+    },
+    {
+      "screen": "pig-profile.actions",
+      "bad": []
+    },
+    {
+      "screen": "piglet-processing.pen-list",
+      "bad": []
+    },
+    {
+      "screen": "piglet-processing.sheet-todo",
+      "bad": []
+    },
+    {
+      "screen": "piglet-processing.record-death",
+      "bad": []
+    }
+  ]
+}

@@ -6,7 +6,9 @@ const cache = {};
 const getJson = (u) => (cache[u] = cache[u] || fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); }));
 const getText = (u) => (cache[u] = cache[u] || fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.text(); }));
 const loadStrings = () => getJson('/ux/laws/strings.json').catch(() => ({ verbs: {}, banned: {}, strings: {} }));
-const loadIconPaths = () => cache.icons || (cache.icons = new Promise((res) => { const t = document.createElement('script'); t.src = '/ux/system/sentri-icons.js'; t.onload = () => res((globalThis.SentriIcons && SentriIcons.paths) || {}); t.onerror = () => res({}); document.head.append(t); }));
+/* One icon source: the bundle's SentriIcons registry (paths, aliases, icon()). */
+const loadIcons = () => cache.icons || (cache.icons = new Promise((res) => { const t = document.createElement('script'); t.src = '/ux/design-system/components/bundle.js'; t.onload = () => res(globalThis.SentriIcons || null); t.onerror = () => res(null); document.head.append(t); }));
+const iconSvg = (icons, name, size, style) => icons ? icons.icon(name).replace('<svg ', `<svg width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"${style ? ` style="${style}"` : ''} `) : '';
 const FAILED = (what) => `<p class="none">Could not read ${esc(what)}.</p>`;
 
 /* one nav + one pane, shared by Components and Copy */
@@ -145,12 +147,14 @@ async function renderComponents() {
   }
   async function pageIcons() {
     pane.append(el('<h2>Icons</h2>'));
-    const order = ds?.assetGroups?.Icons?.order || [];
-    if (!order.length) { pane.append(el(FAILED('the icon list'))); return; }
-    // The listed assets/Icons/*.svg are not all in the repo; the registry holds every glyph, drawn here as the files are (ink, stroke 1.6).
-    const paths = await loadIconPaths();
-    const glyph = (n) => (paths[n] ? `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#20291f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 8px"><path d="${esc(paths[n])}"/></svg>` : `<img src="${DS}/assets/Icons/${esc(n)}.svg" alt="">`);
-    pane.append(el(`<div class="icons">${order.map((f) => { const n = f.replace(/\.svg$/, ''); return `<div>${glyph(n)}${esc(n)}</div>`; }).join('')}</div>`));
+    const icons = await loadIcons();
+    if (!icons) { pane.append(el(FAILED('the icon registry'))); return; }
+    // Every glyph comes from the bundle registry, drawn as the app draws it. Aliases are names that resolve to a glyph, not glyphs.
+    const names = Object.keys(icons.paths);
+    pane.append(el(`<div class="icons">${names.map((n) => `<div>${iconSvg(icons, n, 28, 'display:block;margin:0 auto 8px;color:#20291f')}${esc(n)}</div>`).join('')}</div>`));
+    const al = Object.entries(icons.aliases);
+    pane.append(el('<h3>Aliases</h3>'));
+    pane.append(el(`<p class="none">${al.map(([a, n]) => `<code>${esc(a)}</code> draws <code>${esc(n)}</code>`).join(' · ')}. Names only; use the glyph name in new work.</p>`));
   }
   async function pageFoundations() {
     pane.append(el('<h2>Foundations</h2>'));
@@ -227,8 +231,9 @@ async function renderComponents() {
         if (without.length) body.append(el(`<p class="muted" style="margin:0 0 14px;font-size:12.5px">Variants (to be drawn in the component pass): ${without.map((v) => esc(v.name)).join(' · ')}</p>`));
         else if (!variants.length) body.append(el('<p class="muted" style="margin:0 0 14px;font-size:12px">Variants and their states are written in the component pass.</p>'));
         if (readme) { body.append(el('<h3>Guidelines</h3>')); body.append(el(`<div class="guide doc">${md(readme, { link: compLink })}</div>`)); }
-        const used = usedBy(name); body.append(el('<h3>Used by</h3>'));
-        body.append(el(used.length ? `<div class="usedby">${used.slice(0, 16).map((s) => `<a href="?feature=${esc(s.feature.id)}&screen=${esc(s.id)}" data-sid="${esc(s.id)}">${esc(s.feature.name)} · ${esc(s.name)}</a>`).join('')}${used.length > 16 ? `<span class="muted">+${used.length - 16} more</span>` : ''}</div>` : '<p class="none">Not mapped yet.</p>'));
+        /* real screen ids: the variants' own usedBy plus any screen whose notes name the component */
+        const ids = [...new Set([...variants.flatMap((v) => v.usedBy || []), ...usedBy(name).map((x) => x.id)])];
+        body.append(el('<h3>Used by</h3>')); body.append(el(chipsFor(ids)));
         wireChips(body); return;
       }
       const v = variants.find((x) => x.id === id); if (!v) return;

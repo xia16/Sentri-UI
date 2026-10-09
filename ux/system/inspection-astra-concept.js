@@ -5,8 +5,7 @@
 const walkDate='2026-09-12';
 const unitName=c=>c.unitLabel||(globalThis.SentriHomeLink?.unit?'Unit '+globalThis.SentriHomeLink.unit:'Unit 7');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const paths={more:'M5 12h.01M12 12h.01M19 12h.01',monitor:'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6',treat:'M15 3l6 6M16 4l-4 4M20 8l-4 4M10 6l8 8M11 7l-7 7v6h6l7-7M4 20l-2 2M8 12l3 3M11 9l3 3',hospital:'M13 3h8v18h-8M17 3v18M13 7h8M13 17h8M2 12h12M9 8l5 4-5 4',profile:'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M4 21v-2a8 8 0 0 1 16 0v2',chart:'M4 20V10M12 20V4M20 20v-7',origin:'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0',back:'M15 5l-7 7 7 7M8 12h13',chevron:'M9 5l7 7-7 7',close:'M6 6l12 12M18 6L6 18',check:'M5 12l4 4L19 6',note:'M5 3h14v18H5zM8 8h8M8 12h8M8 16h5',feed:'M3 12h18l-3 7H6zM7 8l1-2 2 1-1 2zM12 5l1-2 2 1-1 2zM15 9l1-2 2 1-1 2z',link:'M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-2 2M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l2-2',condition:'M12 4v16M4 12h16',weight:'M5 6h14l2 15H3zM8 6a4 4 0 0 1 8 0M12 11v4',search:'M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14M15 15l6 6',grid:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',scan:'M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5M7 12h10',clock:'M12 8v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0',alert:'M12 3L2 21h20zM12 9v5M12 17v1',signal:'M4 18v-3M9 18v-7M14 18V7M19 18V3',battery:'M3 6h16v12H3zM22 10v4M6 9h10v6H6z',filter:'M4 5h16l-6 7v6l-4 2v-8z'};
-const icon=k=>globalThis.SentriIcons?SentriIcons.icon(k):`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[k]||paths.chevron}"/></svg>`;
+const icon=k=>SentriIcons.icon(k);
 // SentriUI is the shared reading vocabulary; fallbacks keep the study importable
 // in source-only checks before the runtime bundle is mounted.
 const stOptionalRow=o=>SentriUI.optionalRow(o);
@@ -354,8 +353,8 @@ function healthList(c){
  const f=c.form;if(c.view==='record-optional'&&f.optionalKey==='target')return linkConditionResults(c);if(f.customDraft)return customCategoryPicker(c);const raw=(f.search||'').trim(),q=normalizedCondition(raw),available=healthCatalogue(f).filter(item=>q||item.kind===f.kind);if(q)return healthSearchResults(c,available,raw,q);
  if(f.kind==='Disease'){
   const groups=[...new Set(available.map(item=>item.group))];
-  if(!f.catalogGroup)return '<nav class="catalog-categories" aria-label="Disease categories">'+groups.map(group=>catalogDoor(c,'health-catalog-group',group,group,available.filter(item=>item.group===group))).join('')+'</nav>';
-  const items=available.filter(item=>item.group===f.catalogGroup);return catalogPath(f.catalogGroup,'Disease category')+'<div class="catalog-items">'+customFirst(items).map(item=>catalogItem(c,item)).join('')+'</div>';
+  if(!f.catalogGroup)return '<nav class="st-panel st-row-group catalog-categories" aria-label="Disease categories">'+groups.map(group=>catalogDoor(c,'health-catalog-group',group,group,available.filter(item=>item.group===group))).join('')+'</nav>';
+  const items=available.filter(item=>item.group===f.catalogGroup);return catalogPath(f.catalogGroup,'Disease category')+'<div class="st-panel st-row-group catalog-items">'+customFirst(items).map(item=>catalogItem(c,item)).join('')+'</div>';
  }
  const sections=[...new Set(available.map(item=>item.section))];
  if(!f.catalogSection){
@@ -365,12 +364,12 @@ function healthList(c){
    if(section==='Body area')for(const group of groups)doors.push(catalogDoor(c,'health-catalog-group',group,group,sectionItems.filter(item=>item.group===group)));
    else doors.push(catalogDoor(c,'health-catalog-section',section,section,sectionItems,'symptoms'));
   }
-  return '<nav class="catalog-categories" aria-label="Symptom categories">'+doors.join('')+'</nav>';
+  return '<nav class="st-panel st-row-group catalog-categories" aria-label="Symptom categories">'+doors.join('')+'</nav>';
  }
  const sectionItems=available.filter(item=>item.section===f.catalogSection),groups=[...new Set(sectionItems.map(item=>item.group))];
- if(f.catalogSection==='Body system')return catalogPath('Body system')+groups.map(group=>'<section class="catalog-group"><h5>'+esc(group)+'</h5><div class="catalog-items">'+customFirst(sectionItems.filter(item=>item.group===group)).map(item=>catalogItem(c,item)).join('')+'</div></section>').join('');
+ if(f.catalogSection==='Body system')return catalogPath('Body system')+groups.map(group=>'<section class="catalog-group"><h5>'+esc(group)+'</h5><div class="st-panel st-row-group catalog-items">'+customFirst(sectionItems.filter(item=>item.group===group)).map(item=>catalogItem(c,item)).join('')+'</div></section>').join('');
  const activeGroup=f.catalogGroup||groups[0],items=sectionItems.filter(item=>item.group===activeGroup);
- return catalogPath(activeGroup)+'<div class="catalog-items">'+customFirst(items).map(item=>catalogItem(c,item)).join('')+'</div>';
+ return catalogPath(activeGroup)+'<div class="st-panel st-row-group catalog-items">'+customFirst(items).map(item=>catalogItem(c,item)).join('')+'</div>';
 }
 
 function healthForm(c){const f=c.form;return sheet(c,'Record health',scope(c),(SentriUI.segment({variant:'view-switch',options:[['Disease','Diseases'],['Symptom','Symptoms']],active:f.kind,action:'health-kind',ariaLabel:'Condition type'}))+(SentriUI.field({label:"Search "+(f.kind.toLowerCase())+"s",control:"<input type=\"search\" data-v2=\"search\" value=\""+(esc(f.search||''))+"\" placeholder=\"Name, category or abbreviation\">",className:"catalog-search"}))+"<div class=\"health-catalog\">"+(healthList(c))+"</div><p class=\"selected-conditions\">"+(f.conditions.length?f.conditions.map(esc).join(' · '):'Choose diseases or symptoms')+"</p>"+(healthStateFields(c))+"<p class=\"quiet-note\">Existing cases keep their original start date.</p>",footer(back(),button('save-health',`Record · ${countLabel(f.subjects.length)}`,'button primary','',!f.conditions.length)));}
@@ -763,7 +762,7 @@ function actionCatalogue(c){
  const rows=picked(c),single=rows.length===1,live=rows.some(p=>p.stage!=='Sow died'),fed=rows.every(p=>penOf(c,p.id).mode!=='adlib'),hasCases=rows.some(p=>cases(p).length),host=single&&!c.selectedPens.size?(c.hostActions||[]):[];
  const groups=[];const replacedHostBatch=new Set(['remove-batch','move-batch']);
  const currentPig=single?rows[0]:null,hostVisible=x=>x.group!=='production'||productionHostActionEligible(c,currentPig,x);
- const unavailable=host.filter(x=>x.reason&&!replacedHostBatch.has(x.id)&&hostVisible(x)).map(x=>({title:x.title,reason:x.reason,group:x.group==='records'?'general':x.group,section:x.group==='production'?hostProductionScope(x):x.scope||'',k:x.icon||(x.group==='health'?'alert':x.group==='production'?'chart':'note')}));
+ const unavailable=host.filter(x=>x.reason&&!replacedHostBatch.has(x.id)&&hostVisible(x)).map(x=>({title:x.title,reason:x.reason,group:x.group==='records'?'routine':x.group,section:x.group==='production'?hostProductionScope(x):x.scope||'',k:x.icon||(x.group==='health'?'alert':x.group==='production'?'chart':'note')}));
  const add=(id,label,items)=>{if(items.length)groups.push({id,label,items,empty:''});};
  const item=(a,k,title,sub,value='',section='')=>({a,k,title,sub,value,section});
  const nativeProduction=single&&!c.selectedPens.size?productionActionsForPig(c,rows[0]):[],nativeIds=new Set(nativeProduction.map(x=>x.value));
@@ -773,13 +772,13 @@ function actionCatalogue(c){
  add('health','Health',live?[item('health','condition','Disease or symptom','Record a health finding'),item('treatment','treat','Record treatment','Medicine, dose and method'),...(hasCases?[...(single?[]:[item('edit-conditions','note','Edit conditions','Review changes for each pig')]),item('resolve','check','Resolve conditions','Recover or correct a finding'),item('triage','alert','Care instructions','Monitor, treat or move')]:[]),...host.filter(x=>x.group==='health'&&!x.reason).map(x=>item('sow-host-action','alert',x.title,x.sub,x.id))]:[]);
  if(!hasCases&&live)unavailable.push({title:'Resolve conditions',group:'health',k:'check',reason:'No open conditions to resolve.'},{title:'Care instructions',group:'health',k:'alert',reason:'Record a health finding first.'});
  
- const hostGeneral=host.filter(x=>x.group==='general'&&!x.reason),hostRecords=host.filter(x=>x.group==='records'&&!x.reason),hasUnifiedNote=hostGeneral.some(x=>x.id==='marker');
+ const hostGeneral=host.filter(x=>x.group==='routine'&&!x.reason),hostRecords=host.filter(x=>x.group==='records'&&!x.reason),hasUnifiedNote=hostGeneral.some(x=>x.id==='marker');
  const measurements=live?[item('measurements-menu','measure','Measurements & condition',single?'Body condition, weight, temperature and backfat':'Body condition and measurements')]:[];
  const adjustFeed=live&&rows.some(p=>!feedUnavailableReason(p,penOf(c,p.id)))?[item('feed-edit-selected','feed','Adjust feed','Review the current daily allowance')]:[];
- if(live&&!adjustFeed.length)unavailable.push({title:'Adjust feed',group:'general',k:'feed',reason:feedUnavailableReason(rows[0],penOf(c,rows[0].id))+'.'});
- add('general','General',[...hostGeneral.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...(!hasUnifiedNote?[item('note','note','Add a note',single?'Leave a note for this sow':'The same note for these pigs')]:[]),...hostRecords.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...measurements,...adjustFeed]);
- if(!fed&&live&&single)unavailable.push({title:'Body condition adjustment',group:'general',k:'measure',reason:'Ad-lib pigs do not have an individual ration.'});
- const order=['production','health','general'];groups.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
+ if(live&&!adjustFeed.length)unavailable.push({title:'Adjust feed',group:'routine',k:'feed',reason:feedUnavailableReason(rows[0],penOf(c,rows[0].id))+'.'});
+ add('routine','Routine',[...hostGeneral.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...(!hasUnifiedNote?[item('note','note','Add a note',single?'Leave a note for this sow':'The same note for these pigs')]:[]),...hostRecords.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...measurements,...adjustFeed]);
+ if(!fed&&live&&single)unavailable.push({title:'Body condition adjustment',group:'routine',k:'measure',reason:'Ad-lib pigs do not have an individual ration.'});
+ const order=['health','routine','production'];groups.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
  return {groups,unavailable};
 }
 function sowTaskCard(c){if(picked(c).length!==1||c.selectedPens.size)return '';const tasks=currentTasksForPig(c,picked(c)[0]);if(!tasks.length)return '';const heading=stHeading({title:'Current tasks',meta:String(tasks.length),kind:'section',level:4});return `<section class="sow-task-section" aria-label="Linked tasks">${heading}<div class="sow-task-rail" aria-label="Current tasks">${tasks.map(t=>button(t.action||'sow-current-task',`<span class="sow-task-card-main"><strong>${esc(t.title)}</strong>${icon('chevron')}</span><span class="sow-task-card-meta"><span class="sow-task-status">${esc(t.status)}</span><span class="sow-task-type" data-type="${esc((t.type||'General').toLowerCase())}">${esc(t.type||'General')}</span></span>`,'sow-task-card',t.value||t.id)).join('')}</div></section>`;}
@@ -793,13 +792,13 @@ function productionActionGroups(c,items,disabled=false){
  return '<div class="production-action-groups">'+cluster('Farrowing',farrowing)+cluster('Piglet processing',processing)+cluster('Pregnancy check',pregnancy)+cluster('Gestation',gestation)+cluster('Breeding',breeding)+cluster('Lactation',lactation)+cluster('Growth',growth)+cluster('Shared',other)+'</div>';
 }
 function actionSections(c,groups,disabled=false){return groups.map(g=>{const categoryIcon=icon(g.id==='production'?'chart':g.id==='health'?'condition':g.id==='feed'?'feed':'note');const heading=stHeading({title:g.label,icon:categoryIcon,kind:'section',level:4,className:'section-title st-category-heading'});return `<section class="sow-action-group st-action-section${disabled?' unavailable-action-group':''}" data-action-group="${g.id}" aria-label="${g.label}">${heading}${g.id==='production'&&g.items.length?productionActionGroups(c,g.items,disabled):'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(g.items,disabled)+'</div>'}${g.empty?'<p class="action-category-empty">'+esc(g.empty)+'</p>':''}</section>`;}).join('');}
-function unavailableActionGroups(c){const rows=actionCatalogue(c).unavailable;return [['production','Production'],['health','Health'],['general','General']].map(([id,label])=>({id,label,items:rows.filter(x=>(x.group||'general')===id).map(x=>({a:'unavailable-action',k:x.k||'note',title:x.title,sub:x.reason,value:'',section:x.section||''}))})).filter(g=>g.items.length);}
+function unavailableActionGroups(c){const rows=actionCatalogue(c).unavailable;return [['health','Health'],['routine','Routine'],['production','Production']].map(([id,label])=>({id,label,items:rows.filter(x=>(x.group||'routine')===id).map(x=>({a:'unavailable-action',k:x.k||'note',title:x.title,sub:x.reason,value:'',section:x.section||''}))})).filter(g=>g.items.length);}
 function actionsPage(c){
  const {groups,unavailable}=actionCatalogue(c),single=picked(c).length===1,p=single?picked(c)[0]:null;
  const body=actionSections(c,groups)+(unavailable.length?button('unavailable-actions',`Unavailable actions (${unavailable.length}) ${icon('chevron')}`,'unavailable-actions-link'):'');
  return sheet(c,'More actions',single?p.id+' · '+penOf(c,p.id).id:selectionLabel(c),body,'');
 }
-function actionCategoryNav(c){const batch=picked(c).length!==1||c.selectedPens.size>0,groups=actionCatalogue(c).groups.filter(g=>!batch||g.id!=='production'),current=groups.some(g=>g.id===c.actionCategory)?c.actionCategory:groups[0]?.id;return globalThis.SentriUI?.categoryFooter?globalThis.SentriUI.categoryFooter({categories:groups.map(g=>({id:g.id,label:g.label})),active:current,backAction:'back',categoryAction:'action-category',label:'Action categories',className:'record-toolbar actions-bottom-bar'}):`<footer class="sheet-footer record-toolbar actions-bottom-bar"><button type="button" class="surface-back record-back" data-action="back" aria-label="Back">${icon('back')}<span>Back</span></button><nav class="action-category-nav" aria-label="Action categories">${groups.map(g=>button('action-category',g.label,'',g.id).replace('<button',`<button aria-current="${g.id===current?'location':'false'}"`)).join('')}</nav></footer>`;}
+function actionCategoryNav(c){const batch=picked(c).length!==1||c.selectedPens.size>0,groups=actionCatalogue(c).groups.filter(g=>!batch||g.id!=='production'),current=groups.some(g=>g.id===c.actionCategory)?c.actionCategory:groups[0]?.id;return globalThis.SentriUI.categoryFooter({categories:groups.map(g=>({id:g.id,label:g.label})),active:current,backAction:'back',categoryAction:'action-category',label:'Action categories',className:'record-toolbar actions-bottom-bar'});}
 
 function measurementsMenu(c){
  const rows=picked(c),single=rows.length===1,items=[];
@@ -881,7 +880,6 @@ function installV2(){
  root.querySelector('[data-bulk-rows]').innerHTML=feedPigPreview(c);root.querySelector('[data-action="feed-edit-save"]').disabled=!feedEditorValid(c);
  const hint=root.querySelector('[data-feed-input-hint]');hint.textContent=c.form.mode==='adjust'&&(!Number.isFinite(+c.form.percent)||+c.form.percent < -50.000001||+c.form.percent > 50.000001)?'Choose −50% to +50%.':c.form.mode==='stop'?'No feed · 0.0 kg/day':feedEditorHeld(c)?'Daily amounts stay fixed':'Replaces existing adjustments';
  },true);
-paths.humidity='M12 3C9 8 5 12 5 16a7 7 0 0 0 14 0c0-4-4-8-7-13z';paths.air='M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h6';paths.wrench='M14 3a6 6 0 0 0-7 7L2 17a3 3 0 0 0 5 5l7-7a6 6 0 0 0 7-7l-4 4-5-5z';paths.temperature='M9 14V5a3 3 0 0 1 6 0v9a5 5 0 1 1-6 0M12 9v9';paths.measure='M3 5h18v14H3zM7 5v5M11 5v3M15 5v5';
  gallery.addEventListener('click',e=>{const el=e.target.closest('[data-action]');if(!el||el.disabled)return;const i=+el.closest('[data-card]').dataset.card,c=states[i],a=el.dataset.action,v=el.dataset.value,fromMeasurements=c.view==='measurements-menu';let handled=true;
  if(handleRecordAction(c,a,v)){if(fromMeasurements)c.measurementsReturn=true;}
  else if(a==='open-picker'){c.form.pickerKey=el.dataset.pickerKey;c.form.pickerReturn=c.view;c.view='picker';}

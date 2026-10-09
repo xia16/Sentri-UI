@@ -1,0 +1,32 @@
+[
+  {
+    "id": "page",
+    "name": "Page",
+    "use": "Use for page grouped blocks.",
+    "notUse": "Not for standalone facts — use Facts.",
+    "states": [
+      "Default",
+      "Empty",
+      "Long label / Chinese"
+    ],
+    "usedBy": [
+      "farrowing.finish",
+      "inspection.pen"
+    ]
+  },
+  {
+    "id": "drawer",
+    "name": "Drawer",
+    "use": "Use for drawer grouped blocks.",
+    "notUse": "Not for standalone facts — use Facts.",
+    "states": [
+      "Default",
+      "Empty",
+      "Long label / Chinese"
+    ],
+    "usedBy": [
+      "piglet-processing.sheet-todo",
+      "farrowing.history"
+    ]
+  }
+]

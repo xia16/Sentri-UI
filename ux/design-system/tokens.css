@@ -68,10 +68,12 @@
   --space-footer-gap: 12px;
   --space-section: 24px;
   --space-action-section: 32px;
+  --space-footer-top: 14px;
   --space-footer-bottom: 28px;
   --space-key-gap: 8px;
   --space-card-x: 15px;
   --space-animal-row-y: 13px;
+  --border-width: 1px;
   --space-2: 2px;
   --space-3: 3px;
   --space-4: 4px;
@@ -114,7 +116,6 @@
   --radius-14: 14px;
   --radius-18: 18px;
   --radius-28: 28px;
-  --shadow-card: 0 3px 12px #26351e04;
   --shadow-sheet: 0 -10px 40px #27351d0b;
   --shadow-dialog: 0 -15px 55px #17290d30;
   --tap-min: 48px;
@@ -122,6 +123,10 @@
   --field-height: 48px;
   --row-min: 68px;
   --choice-row-min: 56px;
+  --icon-pad-stroke: 1.8;
+  --icon-key-stroke: 2.2;
+  --size-300: 300px;
+  --icon-stroke: 1.6;
   --back-width: 86px;
   --row-icon: 34px;
   --stepper-row-min: 60px;
@@ -164,7 +169,6 @@
   --font-size-20: 20px;
   --font-size-22: 22px;
   --handle-width: 92px;
-  --border-width: 1px;
   --size-2: 2px;
   --size-3: 3px;
   --size-4: 4px;
