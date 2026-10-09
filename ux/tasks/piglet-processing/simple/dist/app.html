@@ -3462,17 +3462,10 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function sowChip(p) {
     var sts = P.todo(p).map(function (k) { return P.status(p, k); });
     if (P.s.ended) return null;
-<<<<<<< HEAD
     if (sts.indexOf('late') >= 0) return chipOf('late', 'chip.late');
     if (p.sowDied) return chipOf('died', 'chip.sow');
-    if (sts.length) return chipOf('awaiting', 'st.todo');
-    return P.coming(p).length ? null : chipOf('done', 'chips.done');
-=======
-    if (sts.indexOf('late') >= 0) return S('chip.late', null, 'amber');
-    if (p.sowDied) return S('chip.sow', null, 'red');
     /* the lens above already says To do / Done; the row keeps only what differs (Late, Sow died) */
     return null;
->>>>>>> 0cde753 (Segment/FilterChips round-2 fixes: visible pressed state, wrapper no longer stretches, one lens rule (Piglet uses two-line), no repeated Done count or To do pill, fan mode on Segment, check only when selected)
   }
   /* The pen's card, exactly farrowing's room list: the pen header (`A03 · 1 sow ›`, TaskGroup) and the sow's row under it
      (TaskRow): mono sow ID with its one chip; the headline is what is due (or, with nothing due, farrowing's figure:
