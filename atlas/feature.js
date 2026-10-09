@@ -190,8 +190,9 @@ function openFeature(id, sel) {
   S.view = 'atlas';
   const idx = screenIndex(); setParam('feature', id);
   const n = f.screens.length;
-  const todos = f.screens.filter((s) => s.status === 'placeholder').length + f.screens.reduce((t, s) => t + ((s.notes && s.notes.issues) || []).length, 0);
-  const confirm = ((f.prd || '').match(/to confirm/gi) || []).length;
+  const ownIds = new Set(f.screens.map((s) => s.id)), mine = (S.data.backlog || []).filter((b) => (b.target.kind === 'feature' && b.target.id === f.id) || (b.target.kind === 'screen' && ownIds.has(b.target.id)));
+  const todos = f.screens.filter((s) => s.status === 'placeholder').length + f.screens.reduce((t, s) => t + ((s.notes && s.notes.issues) || []).length, 0) + mine.filter((b) => b.kind !== 'decision').length;
+  const confirm = ((f.prd || '').match(/to confirm/gi) || []).length + mine.filter((b) => b.kind === 'decision').length;
   header(`<a href="#" id="crumb-back">${esc(f.sectionRef.name)}</a> / <b>${esc(f.name)}</b> <span class="zh">${esc(f.zh || '')}</span>
     <span class="meta">${dot(f.status)}${f.status === 'frozen' ? '<span>Frozen</span> · ' : ''}<span>${plural(n, 'screen')}</span> · <a href="#" id="l-prd">PRD</a> · <a href="#" id="l-dec">Decisions</a>${todos ? ` · <span title="Placeholder screens plus issues written in screen notes">To-dos ${todos}</span>` : ''}${confirm ? ` · <span title="Open questions marked “to confirm” in the PRD">To confirm ${confirm}</span>` : ''}</span>`);
   document.getElementById('crumb-back').onclick = (e) => { e.preventDefault(); closeFeature(); };
@@ -368,7 +369,7 @@ function openFeature(id, sel) {
   }
 
   function specHtml(s, nt) {
-    const issues = nt.issues || [], confirm = JSON.stringify(nt).match(/to confirm/gi) || [];
+    const issues = nt.issues || [], confirm = (JSON.stringify(nt).match(/to confirm/gi) || []).concat((S.data.backlog || []).filter((b) => b.kind === 'decision' && b.target.kind === 'screen' && b.target.id === s.id));
     const els = (nt.elements || []).filter((e) => !CHROME.test(`${e.name} ${e.shows}`));
     const states = (nt.states || []).map(splitState), ctrls = nt.controls || [], copy = nt.copy || [], edge = nt.edge || [], rules = nt.rules || [];
     const sec = (id, label, n, open, inner) => `<section class="sec" id="sec-${id}" data-open="${open}"><h3 class="sh" tabindex="0" role="button" aria-expanded="${open}"><span class="lbl">${label}</span><span class="n">${n}</span><span class="caret">${ICON.caret}</span></h3><div class="sb">${inner}</div></section>`;

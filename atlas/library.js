@@ -83,6 +83,26 @@ function gateBlock(g, status) {
   return box;
 }
 
+/* the state grid: every [data-state] element of <dir>variants/<id>.html in its own labelled cell, at phone width (null when the file is missing or has no states) */
+async function stateGridAt(dir, id) {
+  let html = null; try { html = await getText(`${dir}variants/${id}.html`); } catch (_) {}
+  if (!html) return null;
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const states = [...doc.querySelectorAll('[data-state]')].filter((x) => !x.parentElement.closest('[data-state]'));
+  if (!states.length) return null;
+  const head = [...doc.head.querySelectorAll('style, link[rel=stylesheet]')].map((x) => x.outerHTML).join('');
+  const tail = [...doc.querySelectorAll('script')].filter((x) => !x.closest('[data-state]')).map((x) => x.outerHTML).join('');
+  const inject = `<base href="${dir}"><link rel="stylesheet" href="${DS}/tokens.css"><link rel="stylesheet" href="${DS}/components/bundle.css"><script src="${DS}/components/bundle.js"><\/script>`;
+  const grid = el('<div class="sgrid"></div>');
+  states.forEach((s) => {
+    const cell = el(`<figure class="scell"><figcaption>${esc(s.getAttribute('data-state'))}</figcaption></figure>`), f = el('<iframe title="State"></iframe>');
+    f.style.height = '20px'; f.srcdoc = `<!doctype html><html><head>${inject}${head}<style>html,body{margin:0;background:#fff}body{padding:14px}</style></head><body>${s.outerHTML}${tail}</body></html>`;
+    f.onload = () => { try { const d = f.contentDocument; f.style.height = Math.max(60, Math.max(d.documentElement.scrollHeight, d.body.scrollHeight)) + 'px'; } catch (_) {} };
+    cell.append(f); grid.append(cell);
+  });
+  return grid;
+}
+
 async function renderComponents() {
   const CI = {};
   if (S.data.components) {
@@ -177,64 +197,47 @@ async function renderComponents() {
     let readme = ''; try { readme = await getText(`${DS}/components/${name}/README.md`); } catch (_) {}
     const cand = /candidate/i.test(readme.slice(0, 300)), adr = (readme.slice(0, 400).match(/ADR (\d{4})/) || [])[1];
     if (cand) meta.querySelector('.t').textContent += ` · candidate${adr ? ' (ADR ' + adr + ')' : ''}`;
-    /* variants: variants.json (the component pass) wins; else the gate's own list */
+    /* variants: variants.json (the component pass) wins; else the gate's own list. A variant gets a tab only when its states are drawn. */
     let vj = null; try { vj = await getJson(`${DS}/components/${name}/variants.json`); } catch (_) {}
-    const fromGate = ((gate && gate.variants) || []).map((v) => { const [n, ...r] = String(v.name).split(' ('); return { id: slug(v.name), name: n, use: r.join(' (').replace(/\)\s*:?\s*/, ' · ').replace(/ · $/, ''), derived: true, status: v.status, scores: v.scores, findings: v.findings, usedBy: v.usedBy || [] }; });
+    const fromGate = ((gate && gate.variants) || []).map((v) => ({ id: slug(v.name), name: String(v.name).split(' (')[0], status: v.status, scores: v.scores, findings: v.findings, usedBy: v.usedBy || [] }));
     const variants = vj && vj.length ? vj.map((v) => Object.assign({ usedBy: [] }, fromGate.find((g) => g.id === v.id || g.id === slug(v.name)) || {}, v)) : fromGate;
-    const tabs = [...(readme ? [{ id: 'overview', name: 'Overview' }] : []), ...variants];
-    if (!tabs.length) { pane.append(el('<p class="none">Nothing written for this component yet.</p>')); return; }
+    const dirOf = `${DS}/components/${name}/`;
+    const drawn = {};
+    await Promise.all(variants.map(async (v) => { drawn[v.id] = await stateGridAt(dirOf, v.id); }));
+    const withStates = variants.filter((v) => drawn[v.id]), without = variants.filter((v) => !drawn[v.id]);
+    const tabs = [{ id: 'overview', name: 'Overview' }, ...withStates];
     const want = initialVariant; initialVariant = null;
-    const bar = el('<div class="vtabs" role="tablist"></div>'), body = el('<div class="vbody"></div>'); pane.append(bar, body);
+    const bar = el('<div class="vtabs" role="tablist"></div>'), body = el('<div class="vbody"></div>');
+    if (withStates.length) pane.append(bar);
+    pane.append(body);
     const chipsFor = (ids) => {
       const ix = screenIndex(), ok = (ids || []).map((x) => String(x).split(' ')[0]).filter((x) => ix[x]);
       if (!ok.length) return '<p class="none">No screen uses this yet.</p>';
       return `<div class="usedby">${ok.slice(0, 16).map((x) => `<a href="?feature=${esc(ix[x].feature.id)}&screen=${esc(x)}" data-sid="${esc(x)}">${esc(ix[x].feature.name)} · ${esc(ix[x].name)}</a>`).join('')}${ok.length > 16 ? `<span class="muted">+${ok.length - 16} more</span>` : ''}</div>`;
     };
     const wireChips = (root) => root.querySelectorAll('a[data-sid]').forEach((a2) => { a2.onclick = (e) => { e.preventDefault(); const s = screenIndex()[a2.dataset.sid]; openFeature(s.feature.id, s.id); }; });
-    /* the state grid: every [data-state] element of variants/<id>.html in its own labelled cell, at phone width */
-    async function stateGrid(v) {
-      let html = null; try { html = await getText(`${DS}/components/${name}/variants/${v.id}.html`); } catch (_) {}
-      if (!html) return null;
-      const doc = new DOMParser().parseFromString(html, 'text/html');
-      const states = [...doc.querySelectorAll('[data-state]')].filter((x) => !x.parentElement.closest('[data-state]'));
-      if (!states.length) return null;
-      const head = [...doc.head.querySelectorAll('style, link[rel=stylesheet]')].map((x) => x.outerHTML).join('');
-      const tail = [...doc.querySelectorAll('script')].filter((x) => !x.closest('[data-state]')).map((x) => x.outerHTML).join('');
-      const dir = `${DS}/components/${name}/`;
-      const inject = `<base href="${dir}"><link rel="stylesheet" href="${DS}/tokens.css"><link rel="stylesheet" href="${DS}/components/bundle.css"><script src="${DS}/components/bundle.js"><\/script>`;
-      const grid = el('<div class="sgrid"></div>');
-      states.forEach((s) => {
-        const cell = el(`<figure class="scell"><figcaption>${esc(s.getAttribute('data-state'))}</figcaption></figure>`), f = el('<iframe title="State"></iframe>');
-        f.style.height = '20px'; f.srcdoc = `<!doctype html><html><head>${inject}${head}<style>html,body{margin:0;background:#fff}body{padding:14px}</style></head><body>${s.outerHTML}${tail}</body></html>`;
-        f.onload = () => { try { const d = f.contentDocument; f.style.height = Math.max(60, Math.max(d.documentElement.scrollHeight, d.body.scrollHeight)) + 'px'; } catch (_) {} };
-        cell.append(f); grid.append(cell);
-      });
-      return grid;
-    }
+    const same = (v) => JSON.stringify([v.scores || null, v.findings || null]) === JSON.stringify([gate && gate.scores || null, gate && gate.findings || null]);
     async function show(id) {
       bar.querySelectorAll('button').forEach((b2) => b2.setAttribute('aria-pressed', String(b2.dataset.id === id)));
-      setParam('variant', id); body.innerHTML = '';
+      setParam('variant', id === 'overview' ? null : id); body.innerHTML = '';
       if (id === 'overview') {
-        body.append(el(`<div class="guide doc">${md(readme, { link: compLink })}</div>`));
+        const prev = await styledPreview(name);
+        body.append(prev || el('<div class="nopreview">No preview of its own yet — built in the component pass</div>'));
+        if (without.length) body.append(el(`<p class="muted" style="margin:0 0 14px;font-size:12.5px">Variants (to be drawn in the component pass): ${without.map((v) => esc(v.name)).join(' · ')}</p>`));
+        else if (!variants.length) body.append(el('<p class="muted" style="margin:0 0 14px;font-size:12px">Variants and their states are written in the component pass.</p>'));
+        if (readme) { body.append(el('<h3>Guidelines</h3>')); body.append(el(`<div class="guide doc">${md(readme, { link: compLink })}</div>`)); }
         const used = usedBy(name); body.append(el('<h3>Used by</h3>'));
-        const u = el(used.length ? `<div class="usedby">${used.slice(0, 16).map((s) => `<a href="?feature=${esc(s.feature.id)}&screen=${esc(s.id)}" data-sid="${esc(s.id)}">${esc(s.feature.name)} · ${esc(s.name)}</a>`).join('')}${used.length > 16 ? `<span class="muted">+${used.length - 16} more</span>` : ''}</div>` : '<p class="none">Not mapped yet.</p>');
-        body.append(u); wireChips(body); return;
+        body.append(el(used.length ? `<div class="usedby">${used.slice(0, 16).map((s) => `<a href="?feature=${esc(s.feature.id)}&screen=${esc(s.id)}" data-sid="${esc(s.id)}">${esc(s.feature.name)} · ${esc(s.name)}</a>`).join('')}${used.length > 16 ? `<span class="muted">+${used.length - 16} more</span>` : ''}</div>` : '<p class="none">Not mapped yet.</p>'));
+        wireChips(body); return;
       }
       const v = variants.find((x) => x.id === id); if (!v) return;
-      if (v.use || v.notUse) body.append(el(`<p class="vuse1">${v.use ? `${v.derived ? '' : '<b>Use for</b> '}${esc(v.use)}` : ''}${v.notUse ? `${v.use ? ' · ' : ''}<b>Not for</b> ${esc(v.notUse)}` : ''}</p>`));
-      body.append(gateBlock({ scores: v.scores, findings: v.findings }, v.status || 'in-design'));
-      const grid = await stateGrid(v);
-      if (grid) body.append(grid);
-      else {
-        body.append(el('<p class="muted" style="margin:6px 0 12px">This variant’s states haven’t been drawn yet — the component pass draws them.</p>'));
-        const d = el('<details class="cur"><summary>Current preview ›</summary></details>');
-        d.addEventListener('toggle', async () => { if (d.open && !d.querySelector('.pv, .nopreview')) { const pv = await styledPreview(name); d.append(pv || el('<div class="nopreview">No preview of its own yet — built in the component pass</div>')); } });
-        body.append(d);
-      }
+      if (v.use || v.notUse) body.append(el(`<p class="vuse1">${v.use ? `<b>Use for</b> ${esc(v.use)}` : ''}${v.notUse ? `${v.use ? ' · ' : ''}<b>Not for</b> ${esc(v.notUse)}` : ''}</p>`));
+      if (!same(v) && (v.scores || v.findings)) body.append(gateBlock({ scores: v.scores, findings: v.findings }, v.status || 'in-design'));
+      body.append(drawn[v.id]);
       body.append(el('<h3>Used by</h3>')); body.append(el(chipsFor(v.usedBy))); wireChips(body);
     }
     tabs.forEach((t) => { const b2 = el(`<button role="tab" data-id="${esc(t.id)}" aria-pressed="false">${t.id !== 'overview' ? dot(t.status || 'in-design') : ''}${esc(t.name)}</button>`); b2.onclick = () => show(t.id); bar.append(b2); });
-    show(tabs.some((t) => t.id === want) ? want : (variants[0] || tabs[0]).id);
+    show(tabs.some((t) => t.id === want) ? want : 'overview');
   }
   const want = q.get('component');
   const inTask = want && (COMPONENT_GROUPS.find((g) => g[0] === 'Task skeleton') || [0, []])[1].includes(want);
@@ -272,4 +275,44 @@ async function renderCopy() {
   nav.append(el('<h5>Strings</h5>'));
   Object.entries(ns).sort((a, b) => b[1] - a[1]).forEach(([k, c]) => navItem(nav, k, esc(nameOf(k)), c, () => { key = k; search.value = ''; draw(); }));
   search.oninput = draw; pane.append(search, body); draw();
+}
+
+
+/* ---------- Backlog: what the reviews found, one line each until opened ---------- */
+const BK = [['decision', 'Decision'], ['design', 'Design'], ['broken', 'Broken'], ['unclear', 'Unclear']];
+const bkState = { kind: '', sec: '' };
+function renderBacklog() {
+  const main = document.getElementById('main'); main.innerHTML = '';
+  const items = S.data.backlog || [], idx = screenIndex(), feats = Object.fromEntries(allFeatures().map((f) => [f.id, f]));
+  const where = (t) => {
+    if (t.kind === 'screen' && idx[t.id]) { const s = idx[t.id]; return { key: 'screen:' + t.id, name: `${s.feature.name} · ${s.name}`, sec: s.feature.sectionRef.name, open: () => openFeature(s.feature.id, s.id) }; }
+    if (t.kind === 'feature' && feats[t.id]) { const f = feats[t.id]; return { key: 'feature:' + t.id, name: f.name, sec: f.sectionRef.name, open: () => openFeature(f.id) }; }
+    if (t.kind === 'component') return { key: 'component:' + t.id, name: t.id, sec: 'Components', open: () => { S.view = 'components'; setParam('view', 'components'); setParam('component', t.id); setParam('variant', null); closeFeature(); render(); } };
+    return { key: t.kind + ':' + t.id, name: String(t.id), sec: t.kind === 'section' ? String(t.id) : 'Other', open: null };
+  };
+  const secs = [...new Set(items.map((b) => where(b.target).sec))];
+  const page = el('<div class="backlog"></div>'); main.append(page);
+  const counts = (k) => items.filter((b) => b.kind === k && (!bkState.sec || where(b.target).sec === bkState.sec)).length;
+  const bar = el(`<div class="bkbar">${BK.map(([k, n]) => `<button class="bkc k-${k}" aria-pressed="${bkState.kind === k}" data-k="${k}"><b>${counts(k)}</b> ${n}</button>`).join('')}<select class="bksec" aria-label="Section"><option value="">All sections</option>${secs.map((s) => `<option${bkState.sec === s ? ' selected' : ''}>${esc(s)}</option>`).join('')}</select></div>`);
+  const list = el('<div class="bklist"></div>'); page.append(bar, list);
+  bar.querySelectorAll('.bkc').forEach((b) => { b.onclick = () => { bkState.kind = bkState.kind === b.dataset.k ? '' : b.dataset.k; renderBacklog(); }; });
+  bar.querySelector('.bksec').onchange = (e) => { bkState.sec = e.target.value; renderBacklog(); };
+  const shown = items.filter((b) => (!bkState.kind || b.kind === bkState.kind) && (!bkState.sec || where(b.target).sec === bkState.sec));
+  if (!shown.length) { list.append(el(`<p class="none">${items.length ? 'Nothing matches.' : 'No review items yet.'}</p>`)); return; }
+  const groups = new Map();
+  shown.forEach((b) => { const w = where(b.target); if (!groups.has(w.key)) groups.set(w.key, { w, items: [] }); groups.get(w.key).items.push(b); });
+  const sevRank = { high: 0, medium: 1, low: 2 }, kRank = { decision: 0, broken: 1, design: 2, unclear: 3 };
+  [...groups.values()].sort((a, b) => b.items.filter((x) => x.kind === 'decision').length - a.items.filter((x) => x.kind === 'decision').length || b.items.length - a.items.length).forEach((g) => {
+    const sec = el(`<section class="bkgroup"><h3><span class="gname">${g.w.open ? '<a href="#"></a>' : '<span></span>'}</span><small>${esc(g.w.sec)} · ${g.items.length}</small></h3></section>`);
+    const nm = sec.querySelector('.gname').firstElementChild; nm.textContent = g.w.name; if (g.w.open) nm.onclick = (e) => { e.preventDefault(); g.w.open(); };
+    g.items.sort((a, b) => kRank[a.kind] - kRank[b.kind] || (sevRank[a.severity] ?? 1) - (sevRank[b.severity] ?? 1)).forEach((b) => {
+      const opts = (b.options || []).map((o) => `<li>${esc(typeof o === 'string' ? o : o.label || o.name || JSON.stringify(o))}</li>`).join('');
+      const row = el(`<div class="bkitem"><button class="bi" aria-expanded="false"><span class="ktag k-${esc(b.kind)}">${esc(cap(b.kind))}</span><span class="sevdot sev-${esc(b.severity || 'medium')}" title="${esc(cap(b.severity || 'medium'))}"></span><span class="bt"></span></button><div class="bd" hidden>${b.detail ? `<p>${esc(b.detail).replace(/\n/g, '<br>')}</p>` : ''}${opts ? `<div class="bopt"><b>Options</b><ul>${opts}</ul></div>` : ''}${b.recommendation ? `<p class="brec"><b>Recommendation</b> ${esc(b.recommendation)}</p>` : ''}<small>${esc(b.source || '')}</small></div></div>`);
+      row.querySelector('.bt').textContent = b.title;
+      const btn = row.querySelector('.bi'), d = row.querySelector('.bd');
+      btn.onclick = () => { d.hidden = !d.hidden; btn.setAttribute('aria-expanded', String(!d.hidden)); row.classList.toggle('open', !d.hidden); };
+      sec.append(row);
+    });
+    list.append(sec);
+  });
 }

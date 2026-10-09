@@ -393,3 +393,20 @@ table.copy td.id { font:11.5px var(--mono); overflow-wrap:anywhere }
 .scell iframe { width:100%; max-width:400px; border:1px solid var(--line); border-radius:10px; background:#fff; display:block }
 details.cur { margin:4px 0 16px } details.cur summary { cursor:pointer; color:var(--green); font-size:12.5px; font-weight:600; list-style:none } details.cur summary::-webkit-details-marker { display:none } details.cur[open] summary { margin-bottom:10px }
 .vbody h3 { margin-top:24px }
+
+/* backlog */
+.backlog { position:absolute; inset:0; overflow:auto; padding:22px 32px 60px; max-width:none }
+.bkbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 14px }
+.bkc { display:inline-flex; gap:6px; align-items:baseline; padding:4px 12px; border:1px solid var(--line); border-radius:999px; background:var(--paper); font-size:12.5px; font-weight:600; color:var(--muted) } .bkc b { font:600 12.5px var(--mono); color:var(--ink) }
+.bkc[aria-pressed=true] { border-color:var(--ink); color:var(--ink) }
+.bksec { margin-left:auto; padding:5px 10px; border:1px solid var(--line); border-radius:8px; background:var(--paper); font:inherit; font-size:12.5px }
+.bklist { max-width:900px }
+.bkgroup { margin:0 0 18px } .bkgroup h3 { display:flex; align-items:baseline; gap:10px; margin:0 0 4px; padding:0 0 6px; border-bottom:1px solid var(--line); font-size:13.5px } .bkgroup h3 small { color:var(--muted); font-weight:500; font-size:11.5px }
+.bkitem { border-bottom:1px solid var(--line) }
+.bi { display:flex; gap:10px; align-items:center; width:100%; padding:8px 2px; text-align:left; font-size:13px }
+.bi .bt { flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis } .bkitem.open .bt { white-space:normal }
+.ktag { flex:none; width:68px; text-align:center; padding:0 6px; border-radius:5px; border:1px solid var(--line); font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--muted) }
+.ktag.k-decision { background:var(--amber-wash); color:var(--amber); border-color:#e3d2a2 } .ktag.k-broken { color:#a8431f; border-color:#e2b9a6 }
+.sevdot { flex:none; width:8px; height:8px; border-radius:50% } .sev-high { background:#c0502a } .sev-medium { background:#d0a23a } .sev-low { background:#c9cfc2 }
+.bd { padding:2px 0 12px 78px; font-size:12.5px; line-height:1.55; max-width:760px } .bd p { margin:0 0 8px } .bd small { color:var(--muted) }
+.bd .bopt b, .brec b { font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-right:6px } .bd ul { margin:4px 0 8px; padding-left:18px }

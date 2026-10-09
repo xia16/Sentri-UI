@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T15:16:58.345Z",
- "commit": "6194756",
+ "generated": "2026-10-09T16:09:28.208Z",
+ "commit": "4a23ff8",
  "platforms": [
   {
    "id": "mobile",
@@ -15557,6 +15557,1676 @@
     "farrowing.room"
    ],
    "note": "A row of single-choice chips (Any, 0, 1, 2-5, 6+)."
+  }
+ ],
+ "backlog": [
+  {
+   "id": "gate:Button:0",
+   "target": {
+    "kind": "component",
+    "id": "Button"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "Waiting buttons in real task screens show no reason: TaskSheet hides the status line by default,…",
+   "detail": "Waiting buttons in real task screens show no reason: TaskSheet hides the status line by default, so piglet-processing.record-death \"Save\" and sheet-todo \"Submit\" read as greyed-out disabled.\nFix: Make the footer status visible whenever the primary is waiting (status.visible defaults to true when primary.waiting).",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Button:1",
+   "target": {
+    "kind": "component",
+    "id": "Button"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "Height is decided by host classes: 52px bare, 44px in .inspection-phone/.farrowing-phone, 48/56…",
+   "detail": "Height is decided by host classes: 52px bare, 44px in .inspection-phone/.farrowing-phone, 48/56 in footers. Preview footers render at 44px, under the 48 glove floor.\nFix: One rule: .button min-height: var(--control-height) (48) everywhere; drop the 44px host override.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Button:2",
+   "target": {
+    "kind": "component",
+    "id": "Button"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "Copy rule broken in use: the piglet-processing footer says \"Submit\" (strings submit.n,…",
+   "detail": "Copy rule broken in use: the piglet-processing footer says \"Submit\" (strings submit.n, idf.submit), and the README gives \"Save\" as a commit example while banning Save/Submit.\nFix: Rename to verb+count (\"Record 3 items\", \"Record 12 piglets\"); remove \"Save\" from the Commit register examples.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Button:3",
+   "target": {
+    "kind": "component",
+    "id": "Button"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Two hold faces (11px sentence-case caption in Button vs 9px capitals in TaskHold) for the same act.",
+   "detail": "Two hold faces (11px sentence-case caption in Button vs 9px capitals in TaskHold) for the same act.\nFix: Keep the farrowing face (TaskHold) as the only hold caption and update the Button card and preview to it.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Button:4",
+   "target": {
+    "kind": "component",
+    "id": "Button"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Raw colours and radii in .button CSS (#aab2a1, #e9ece3, #92998d, #bdc7b6, #fff1ee, #20291f, 13px).",
+   "detail": "Raw colours and radii in .button CSS (#aab2a1, #e9ece3, #92998d, #bdc7b6, #fff1ee, #20291f, 13px).\nFix: Replace with control-border, disabled-fill, disabled-ink, red-wash, ink and radius-control tokens.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Button:5",
+   "target": {
+    "kind": "component",
+    "id": "Button"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "task-end-early has no screen; the tool register is forked as .sp-tool.",
+   "detail": "task-end-early has no screen; the tool register is forked as .sp-tool.\nFix: Drop task-end-early (End early is a danger hold); move .sp-tool onto register:\"tool\".",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Button:p0",
+   "target": {
+    "kind": "component",
+    "id": "Button"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge TaskHold -> Button hold?",
+   "detail": "Same act, two caption faces; TaskHold is only the footer placement.\nSeen in: farrowing.finish, piglet-processing.end-task",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Button:p1",
+   "target": {
+    "kind": "component",
+    "id": "Button"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge .sp-tool -> Button tool register?",
+   "detail": "Same job (a mid-sheet act), forked look.\nSeen in: piglet-processing.sheet-todo",
+   "source": "gate"
+  },
+  {
+   "id": "gate:IconButton:0",
+   "target": {
+    "kind": "component",
+    "id": "IconButton"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "The default target is 44x44 (bundle .icon-button height:44px); header return, sheet close and…",
+   "detail": "The default target is 44x44 (bundle .icon-button height:44px); header return, sheet close and breeder marks all measure 44.\nFix: Set .icon-button to var(--control-height) (48) square; keep the glyph size.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:IconButton:1",
+   "target": {
+    "kind": "component",
+    "id": "IconButton"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "No pressed state for a gloved tap.",
+   "detail": "No pressed state for a gloved tap.\nFix: Add the shared press: background var(--press) and translateY(1px) on :active, as Button has.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:IconButton:2",
+   "target": {
+    "kind": "component",
+    "id": "IconButton"
+   },
+   "kind": "broken",
+   "severity": "medium",
+   "title": "Variants live as screen forks: inspection 46px / 48x52 / #cbd3c1, dock clear 36px wide,…",
+   "detail": "Variants live as screen forks: inspection 46px / 48x52 / #cbd3c1, dock clear 36px wide, feed-optional 32px wide, home 48px with radius 13.\nFix: Add variant: \"bordered\" | \"plain\" to iconButton() and delete the per-screen overrides.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:IconButton:3",
+   "target": {
+    "kind": "component",
+    "id": "IconButton"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "The TaskSheet close (.tk-sheet-close) and the farrowing dismiss are two implementations of the…",
+   "detail": "The TaskSheet close (.tk-sheet-close) and the farrowing dismiss are two implementations of the plain variant.\nFix: Render the sheet close with SentriUI.iconButton({ variant: \"plain\" }).",
+   "source": "gate"
+  },
+  {
+   "id": "gate:IconButton:4",
+   "target": {
+    "kind": "component",
+    "id": "IconButton"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "The header return variant is undocumented.",
+   "detail": "The header return variant is undocumented.\nFix: Document it as the bordered variant at 48 in the header.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:IconButton:p0",
+   "target": {
+    "kind": "component",
+    "id": "IconButton"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New variant: IconButton bordered / plain?",
+   "detail": "Two looks already in every task; today a className plus forks.\nSeen in: farrowing.room, inspection.walk, farrowing.finish",
+   "source": "gate"
+  },
+  {
+   "id": "gate:IconButton:p1",
+   "target": {
+    "kind": "component",
+    "id": "IconButton"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge TaskSheet close -> IconButton plain?",
+   "detail": "Same job, separate code.\nSeen in: piglet-processing.sheet-todo, farrowing.finish",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Icon:0",
+   "target": {
+    "kind": "component",
+    "id": "Icon"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Duplicate glyphs: origin = place (identical path), chevron = arrow (same path), plus ~ condition.",
+   "detail": "Duplicate glyphs: origin = place (identical path), chevron = arrow (same path), plus ~ condition.\nFix: Keep one name per glyph (place, chevron, plus) and alias the others.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Icon:1",
+   "target": {
+    "kind": "component",
+    "id": "Icon"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Unknown names silently draw a chevron, which reads as \"more\" - a typo becomes a false affordance.",
+   "detail": "Unknown names silently draw a chevron, which reads as \"more\" - a typo becomes a false affordance.\nFix: Return an empty svg and console.warn in development.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Icon:2",
+   "target": {
+    "kind": "component",
+    "id": "Icon"
+   },
+   "kind": "broken",
+   "severity": "medium",
+   "title": "A known bug is shipped: the grid path closes to x=3 (M14 3h7v7H3z).",
+   "detail": "A known bug is shipped: the grid path closes to x=3 (M14 3h7v7H3z).\nFix: Fix the squares to M14 3h7v7h-7z and M14 14h7v7h-7z.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Icon:3",
+   "target": {
+    "kind": "component",
+    "id": "Icon"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "\"more\" is three 0.01px dots, near invisible at stroke 1.6 in glare.",
+   "detail": "\"more\" is three 0.01px dots, near invisible at stroke 1.6 in glare.\nFix: Draw three r=1.5 filled dots, or stroke 2.4.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Icon:4",
+   "target": {
+    "kind": "component",
+    "id": "Icon"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "The README says 52 glyphs; the preview renders 54 (backspace, offline).",
+   "detail": "The README says 52 glyphs; the preview renders 54 (backspace, offline).\nFix: Update the count or derive it from the registry.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Icon:5",
+   "target": {
+    "kind": "component",
+    "id": "Icon"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "The global svg default (stroke 1.8, 20px) contradicts the 1.6 rule.",
+   "detail": "The global svg default (stroke 1.8, 20px) contradicts the 1.6 rule.\nFix: Set stroke-width from an icon-stroke token (1.6).",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Icon:p0",
+   "target": {
+    "kind": "component",
+    "id": "Icon"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge origin + place, chevron + arrow?",
+   "detail": "Identical paths under two names.\nSeen in: farrowing.room",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Heading:0",
+   "target": {
+    "kind": "component",
+    "id": "Heading"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "No guidance on which kind to use when. Section, panel and group headings appear on one sheet…",
+   "detail": "No guidance on which kind to use when. Section, panel and group headings appear on one sheet with no rule.\nFix: Add a \"Which heading\" table. page = the screen or sheet title, once, in its header. section = names a block and sits outside, above its panel; it alone takes the icon, the meta (a count or time for the whole block) and the one link-out action. group = labels a run of rows or log entries inside one panel; muted, no icon, no action; reach it through rowGroup({title}) or Log. Never stack two headings over one block.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Heading:1",
+   "target": {
+    "kind": "component",
+    "id": "Heading"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "panel (12px) is not a perceptible step from section (13px) and is used on one screen…",
+   "detail": "panel (12px) is not a perceptible step from section (13px) and is used on one screen (farrowing.overview \"Whole-task progress\").\nFix: Merge panel into section: a title inside a panel uses section; alias kind \"panel\" to section and fix farrowing.overview.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Heading:2",
+   "target": {
+    "kind": "component",
+    "id": "Heading"
+   },
+   "kind": "broken",
+   "severity": "medium",
+   "title": "The text action is 44px tall (preview \"Edit\" 44x44; \"View log\" 69x44 on…",
+   "detail": "The text action is 44px tall (preview \"Edit\" 44x44; \"View log\" 69x44 on piglet-processing.sheet-todo), under the 48px glove floor.\nFix: Set the action min-height and min-width to control-height (48px); keep the negative margin so the heading does not grow.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Heading:3",
+   "target": {
+    "kind": "component",
+    "id": "Heading"
+   },
+   "kind": "broken",
+   "severity": "medium",
+   "title": "Raw values in bundle.css (22/13/12/11/10px, 12px gaps, 44px) instead of the type and space…",
+   "detail": "Raw values in bundle.css (22/13/12/11/10px, 12px gaps, 44px) instead of the type and space tokens the DS README names.\nFix: Map each kind to its type token (page-title, section-title, group-label), the gap to space-heading, the action to control-height.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Heading:4",
+   "target": {
+    "kind": "component",
+    "id": "Heading"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Two implementations: home, farrowing and inspection load ux/system/sentri-components.js (no…",
+   "detail": "Two implementations: home, farrowing and inspection load ux/system/sentri-components.js (no data-ds, no strs); the task skeleton loads components/bundle.js.\nFix: Point the three prototypes at bundle.js and delete the heading/row/facts/log/segment copies in sentri-components.js.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Heading:5",
+   "target": {
+    "kind": "component",
+    "id": "Heading"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "No long-title example; a long title beside a meta is unspecified.",
+   "detail": "No long-title example; a long title beside a meta is unspecified.\nFix: Add a preview case with a 40-character title and a meta; state that the title wraps and the aside stays top-aligned.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Heading:p0",
+   "target": {
+    "kind": "component",
+    "id": "Heading"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge Heading kind \"panel\" into \"section\"?",
+   "detail": "One screen uses it and the 1px size step carries no hierarchy; the standard asks for the smallest variant set that covers real screens.\nSeen in: farrowing.overview",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Row:0",
+   "target": {
+    "kind": "component",
+    "id": "Row"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "Two row families do the same jobs: Row's candidates (code row, rowSelect, rowAction, done row)…",
+   "detail": "Two row families do the same jobs: Row's candidates (code row, rowSelect, rowAction, done row) have no screen, while TaskRow (animal row, tick, door, door+act) and TaskDay items serve every real task screen. The owner's rule is one implementation per job.\nFix: Pick the owner: make TaskRow's animal/tick/door/act faces variants of Row (one implementation, Row the base) and delete row({code}), rowSelect and rowAction, or the reverse. Until then mark the three candidates \"no screen\".",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Row:1",
+   "target": {
+    "kind": "component",
+    "id": "Row"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "Look-alikes outside both families: Home's task card (workbench.today, 88-235px buttons),…",
+   "detail": "Look-alikes outside both families: Home's task card (workbench.today, 88-235px buttons), farrowing's .sow-row (farrowing.room), inspection's checkbox pen rows (feed-plan.*) and the review-list row with Remove (inspection.review-selected).\nFix: Classify each in Row's README: Home task card = separate component (a card, not a row); .sow-row = the animal variant; checkbox pen rows = the selectable variant; the review row = the action variant.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Row:2",
+   "target": {
+    "kind": "component",
+    "id": "Row"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Disabled is opacity .5, against the DS state law; the README itself says to prefer omission.",
+   "detail": "Disabled is opacity .5, against the DS state law; the README itself says to prefer omission.\nFix: Remove the disabled face; keep the attribute for semantics only and require a reason line.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Row:3",
+   "target": {
+    "kind": "component",
+    "id": "Row"
+   },
+   "kind": "broken",
+   "severity": "medium",
+   "title": "Second targets under 48px: rowAction act 101x44, review-row Remove 53x44.",
+   "detail": "Second targets under 48px: rowAction act 101x44, review-row Remove 53x44.\nFix: Act and inline buttons take min-height control-height (48px).",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Row:4",
+   "target": {
+    "kind": "component",
+    "id": "Row"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "The README contradicts itself: the anatomy has an icon tile and the Don'ts say \"no icons on list…",
+   "detail": "The README contradicts itself: the anatomy has an icon tile and the Don'ts say \"no icons on list rows\"; five screens use icon rows.\nFix: Restate: icon tiles only on navigation rows (lists of places or actions); never on animal or record rows.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Row:5",
+   "target": {
+    "kind": "component",
+    "id": "Row"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Base row CSS uses raw colours and sizes; the preview injects inline-styled trailing HTML.",
+   "detail": "Base row CSS uses raw colours and sizes; the preview injects inline-styled trailing HTML.\nFix: Use row-icon-bg, row-icon-ink, press, green-wash, current-marker, row-min and space-row-y/x; pass a typed trailing {text, tone} in the preview.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Row:p0",
+   "target": {
+    "kind": "component",
+    "id": "Row"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge TaskRow (animal, tick, door, door+act) with Row (code row, rowSelect, rowAction, done row)?",
+   "detail": "Same jobs, two implementations; only TaskRow has screens.\nSeen in: piglet-processing.pen-list, piglet-processing.sheet-todo, piglet-processing.end-task",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Row:p1",
+   "target": {
+    "kind": "component",
+    "id": "Row"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New component: Home task card?",
+   "detail": "A different job (summarise one task type with progress and timing) in a card, not a row; already named as a Home pattern in the atlas.\nSeen in: workbench.today, workbench.choose-unit, workbench.gestation",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Row:p2",
+   "target": {
+    "kind": "component",
+    "id": "Row"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New variant: Row: selectable (adopt inspection's checkbox pen rows)?",
+   "detail": "Bulk selection on the feed-plan and inspection screens is hand-built.\nSeen in: feed-plan.pen, feed-plan.bulk",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Panel:0",
+   "target": {
+    "kind": "component",
+    "id": "Panel"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "Its job is unclear: screens almost never call panel() directly - it is the surface under Facts,…",
+   "detail": "Its job is unclear: screens almost never call panel() directly - it is the surface under Facts, Row group, Log, TaskTotals, TaskProgress and TaskSection. The card reads like a component you pick, so the owner cannot tell what it is for.\nFix: Rewrite the purpose: \"The surface every grouped block sits on; you rarely call it - use Facts, Row group or Log\", and list those as its variants.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Panel:1",
+   "target": {
+    "kind": "component",
+    "id": "Panel"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "Three look-alikes skip it: the TaskGroup card (paper, line, radius-panel plus a 0 2px 8px…",
+   "detail": "Three look-alikes skip it: the TaskGroup card (paper, line, radius-panel plus a 0 2px 8px shadow, against \"panels are not shadowed\"), ChoiceList .st-choice-panel, and the chooser .catalog-* lists.\nFix: Build TaskGroup and .st-choice-panel on .st-panel; drop the TaskGroup shadow or name it the one sanctioned exception.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Panel:2",
+   "target": {
+    "kind": "component",
+    "id": "Panel"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "A parallel token namespace (--st-line, --st-inset, --st-radius) with raw hex roots duplicates…",
+   "detail": "A parallel token namespace (--st-line, --st-inset, --st-radius) with raw hex roots duplicates tokens.css.\nFix: Point --st-* at tokens (--st-line: var(--line), and so on) or use the tokens directly.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Panel:3",
+   "target": {
+    "kind": "component",
+    "id": "Panel"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "The preview shows a paragraph in a panel - a use no screen has.",
+   "detail": "The preview shows a paragraph in a panel - a use no screen has.\nFix: Preview the real variants: a Facts block and a Row group, page vs drawer.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Panel:p0",
+   "target": {
+    "kind": "component",
+    "id": "Panel"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge TaskGroup card + ChoiceList panel -> Panel?",
+   "detail": "Same surface job; one implementation.\nSeen in: farrowing.room, piglet-processing.pen-list, inspection.filters",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Facts:0",
+   "target": {
+    "kind": "component",
+    "id": "Facts"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "Judged in use, the piglet pen sheet (Boars · gilts >, Litter weight >, Tagged 0 of 12 >,…",
+   "detail": "Judged in use, the piglet pen sheet (Boars · gilts >, Litter weight >, Tagged 0 of 12 >, Breeders kept >) makes facts tappable through valueHtml; each target is a 26-65 x 44px button, not the cell, and the README says facts never act.\nFix: Decide one way: add a \"tappable fact\" option where the whole cell is one 48px-plus button with the > trail, or move those four figures to Rows. Then forbid buttons in valueHtml.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Facts:1",
+   "target": {
+    "kind": "component",
+    "id": "Facts"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Unused variants: columns 1 and 3 have no screen.",
+   "detail": "Unused variants: columns 1 and 3 have no screen.\nFix: Keep only 2 columns until a screen needs 3; delete the 1-column mode or mark both \"no screen yet\".",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Facts:2",
+   "target": {
+    "kind": "component",
+    "id": "Facts"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Raw spacing and type values in bundle.css.",
+   "detail": "Raw spacing and type values in bundle.css.\nFix: Use space-panel for padding, a gap token pair, and type tokens for label, value and meta.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Facts:3",
+   "target": {
+    "kind": "component",
+    "id": "Facts"
+   },
+   "kind": "broken",
+   "severity": "low",
+   "title": "overflow-wrap:anywhere can split an ear tag or batch code across lines.",
+   "detail": "overflow-wrap:anywhere can split an ear tag or batch code across lines.\nFix: Set the mono ID span to white-space:nowrap and add a long-value example to the preview.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Facts:4",
+   "target": {
+    "kind": "component",
+    "id": "Facts"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Stale copy in ux/system/sentri-components.js (no data-ds, no strs).",
+   "detail": "Stale copy in ux/system/sentri-components.js (no data-ds, no strs).\nFix: Point the prototypes at components/bundle.js.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Facts:p0",
+   "target": {
+    "kind": "component",
+    "id": "Facts"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New variant: Facts: tappable?",
+   "detail": "The piglet pen sheet needs figures that open their edit sheet; today they are hand-built buttons inside a read-only grid.\nSeen in: piglet-processing.sheet-todo, piglet-processing.pen-log",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Log:0",
+   "target": {
+    "kind": "component",
+    "id": "Log"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "Budget in use: piglet-processing.pen-log lists every ID as its own entry (ID 001201 ... ID…",
+   "detail": "Budget in use: piglet-processing.pen-log lists every ID as its own entry (ID 001201 ... ID 001208), and farrowing.history says \"Farrowing finished\" twice in one entry.\nFix: Add a rule and an example: one recorded act is one entry (\"8 IDs · 001201-001208\"); detail never repeats the title. Fix the two hosts.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Log:1",
+   "target": {
+    "kind": "component",
+    "id": "Log"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Hosts write group labels and meta four ways: \"5 days ago\", \"day 4\", \"1 Aug 2026\", \"Before this…",
+   "detail": "Hosts write group labels and meta four ways: \"5 days ago\", \"day 4\", \"1 Aug 2026\", \"Before this walk\"; meta \"G.H · 10/07 10:07\" vs \"14:02 · L. Madsen\" vs \"G. Hansen\".\nFix: Pin the format in the component: meta = time · initials (the group label carries the date); group labels = Today / Yesterday / weekday / \"Jul 8\". Take a date and initials as data, not free strings.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Log:2",
+   "target": {
+    "kind": "component",
+    "id": "Log"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "The categorised log is a real variant (pig-profile.log, inspection.pen-log) without its own…",
+   "detail": "The categorised log is a real variant (pig-profile.log, inspection.pen-log) without its own when-to-use.\nFix: Document it: use category only when one log mixes kinds of event and offers a kind filter; otherwise use the plain log.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Log:3",
+   "target": {
+    "kind": "component",
+    "id": "Log"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Missing data is printed as text (\"Author not supplied\"), though the content law says missing is…",
+   "detail": "Missing data is printed as text (\"Author not supplied\"), though the content law says missing is absent.\nFix: Add a Don't: drop an empty meta part; never print a placeholder.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Log:4",
+   "target": {
+    "kind": "component",
+    "id": "Log"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Raw colours and sizes; the log-dot and log-line tokens are named in the README but not used in CSS.",
+   "detail": "Raw colours and sizes; the log-dot and log-line tokens are named in the README but not used in CSS.\nFix: Use var(--log-dot), var(--log-line) and the type tokens.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Log:5",
+   "target": {
+    "kind": "component",
+    "id": "Log"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Empty state is not rendered in the preview.",
+   "detail": "Empty state is not rendered in the preview.\nFix: Add a second preview case, log([]), showing \"No activity recorded yet\".",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Log:p0",
+   "target": {
+    "kind": "component",
+    "id": "Log"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New variant: Log: categorised?",
+   "detail": "Same job (history tail), different structure (kind word, kind filter); used on two screens.\nSeen in: pig-profile.log, inspection.pen-log",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Sheet:0",
+   "target": {
+    "kind": "component",
+    "id": "Sheet"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "One job, two implementations: Sheet (.sheet, farrowing + inspection) and TaskSheet/TaskPage…",
+   "detail": "One job, two implementations: Sheet (.sheet, farrowing + inspection) and TaskSheet/TaskPage (.tk-*, piglet processing) draw the same drawer and page with different gutters, heights and close rules.\nFix: Make Sheet the one card with variants drawer | page | dialog, implemented by the TaskSheet/TaskPage/TaskDialog code (the fixed one); port farrowing and inspection to it.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Sheet:1",
+   "target": {
+    "kind": "component",
+    "id": "Sheet"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "Inspection drawer footers pad 12px 18px: the buttons end at y=832, on the 92x4 handle bar (832-836).",
+   "detail": "Inspection drawer footers pad 12px 18px: the buttons end at y=832, on the 92x4 handle bar (832-836).\nFix: Use the footer padding 14/21/28 on every sheet footer (TaskSheet already does).",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Sheet:2",
+   "target": {
+    "kind": "component",
+    "id": "Sheet"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "The inspection.filters footer holds three actions (Back, Reset, Show pigs), breaking the…",
+   "detail": "The inspection.filters footer holds three actions (Back, Reset, Show pigs), breaking the two-action law.\nFix: Move Reset to a text action in the drawer head (aside), leaving Back + Show pigs.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Sheet:3",
+   "target": {
+    "kind": "component",
+    "id": "Sheet"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Fixed-height drawers with dead space and a distant footer (inspection.review-selected,…",
+   "detail": "Fixed-height drawers with dead space and a distant footer (inspection.review-selected, inspection.filters).\nFix: Content-sized by default (data-sizing=content / TaskSheet height:\"content\").",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Sheet:4",
+   "target": {
+    "kind": "component",
+    "id": "Sheet"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "The exit is inconsistent: the Sheet preview says \"Close\"; inspection drawers have no close; the…",
+   "detail": "The exit is inconsistent: the Sheet preview says \"Close\"; inspection drawers have no close; the farrowing Dead drawer swaps the close for Clear; TaskSheet bans Close.\nFix: One rule on Sheet: the footer exit is Back; drawers also carry the close IconButton; aside text actions sit left of it and never replace it.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Sheet:5",
+   "target": {
+    "kind": "component",
+    "id": "Sheet"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "A drawer stacked on a drawer (piglet-processing.record-death over the pen sheet), against one…",
+   "detail": "A drawer stacked on a drawer (piglet-processing.record-death over the pen sheet), against one overlay at a time.\nFix: Replace the pen drawer content in place (push), or use the dialog variant for a single question.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Sheet:p0",
+   "target": {
+    "kind": "component",
+    "id": "Sheet"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge TaskSheet + TaskPage + TaskDialog -> Sheet (drawer | page | dialog)?",
+   "detail": "Same job, two code paths; one card with three presentations.\nSeen in: farrowing.death, inspection.filters, piglet-processing.sheet-todo, piglet-processing.pen-log",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Sheet:p1",
+   "target": {
+    "kind": "component",
+    "id": "Sheet"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge TaskHold -> Sheet footer + Button hold?",
+   "detail": "It is only the footer placement of the Button hold.\nSeen in: farrowing.finish, piglet-processing.end-task",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Segment:0",
+   "target": {
+    "kind": "component",
+    "id": "Segment"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "Not self-contained: the track, the active face and the 44px height live under…",
+   "detail": "Not self-contained: the track, the active face and the 44px height live under :is(.farrowing-phone,.inspection-phone). Outside them (any task-skeleton screen) the segment renders with no track, no visible active state and 38px buttons.\nFix: Move the scoped rules onto .st-segment itself (well track, line border, paper + 500 active, min-height control-height) and drop the preview's .inspection-phone wrapper.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Segment:1",
+   "target": {
+    "kind": "component",
+    "id": "Segment"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "Targets are 44px at best (preview 112x44, farrowing.death 173x44); the floor is 48.",
+   "detail": "Targets are 44px at best (preview 112x44, farrowing.death 173x44); the floor is 48.\nFix: min-height: var(--control-height) (48px).",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Segment:2",
+   "target": {
+    "kind": "component",
+    "id": "Segment"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "The README limits Segment to list lenses, but it is used, and hand-copied, as a view switch…",
+   "detail": "The README limits Segment to list lenses, but it is used, and hand-copied, as a view switch (Piglets / The sow; Care / Piglet records; Pigs / Pens; Diseases / Symptoms).\nFix: Document two variants: lens (states of one list; working pile first, All last) and view switch (2-3 subjects of one sheet; no All, no counts). Replace .scope-tabs and .health-tabs with SentriUI.segment.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Segment:3",
+   "target": {
+    "kind": "component",
+    "id": "Segment"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "TaskLens / .room-tabs is the same job with a different look (count under label, sticky, filter…",
+   "detail": "TaskLens / .room-tabs is the same job with a different look (count under label, sticky, filter button).\nFix: Make it the Segment variant \"two-line lens\" in the one implementation; TaskLens becomes the skeleton's call into it.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Segment:4",
+   "target": {
+    "kind": "component",
+    "id": "Segment"
+   },
+   "kind": "broken",
+   "severity": "medium",
+   "title": "No pressed feedback; a gloved worker cannot tell the tap landed until the list re-renders.",
+   "detail": "No pressed feedback; a gloved worker cannot tell the tap landed until the list re-renders.\nFix: Add the shared press fill (press token) on :active.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Segment:5",
+   "target": {
+    "kind": "component",
+    "id": "Segment"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "No keyboard row; TaskChips already uses radioBind.",
+   "detail": "No keyboard row; TaskChips already uses radioBind.\nFix: State arrows/Home/End and wire radioBind, or state that one tab stop per button is intended.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Segment:p0",
+   "target": {
+    "kind": "component",
+    "id": "Segment"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New component: FilterChips (promote TaskChips to a base component)?",
+   "detail": "Piglet processing's \"All 12 · Iron 6 · Dock tail 4 · Castrate 6 · Coccidiosis 6 · Tag 7 · Done 3\" is not a Segment variant. Research rule: segmented = a fixed set of 2-5 views of the same data; filter chips = narrowing a list by tags from a dynamic set. Here the set is dynamic (only the jobs due today, 2-7 chips), goes past Segment's cap of 4, scrolls, and each chip is a tag (a job), not a state. It already exists as TaskChips; make it generic (any list narrowed by tag), raise the chip to 48px, and keep the rule \"never chips and a lens on one list\". Open question for the owner: \"Done\" is a state, not a tag; it sits in the chip row only because the list cannot also carry a lens.\nSeen in: piglet-processing.pen-list, piglet-processing.job-chip, piglet-processing.chip-done",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Segment:p1",
+   "target": {
+    "kind": "component",
+    "id": "Segment"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge TaskLens into Segment as variant \"two-line lens\"?",
+   "detail": "Same job (switch a list between its states), different look; the owner's rule makes it a variant with one implementation.\nSeen in: farrowing.room",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Segment:p2",
+   "target": {
+    "kind": "component",
+    "id": "Segment"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New variant: Segment: view switch?",
+   "detail": "Four screens switch the subject or mode of one sheet; two of them hand-build it.\nSeen in: farrowing.death, farrowing.born, feed-plan.bulk, health-record.condition-picker",
+   "source": "gate"
+  },
+  {
+   "id": "gate:ChoiceList:0",
+   "target": {
+    "kind": "component",
+    "id": "ChoiceList"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "The multi-select chooser on real screens (condition picker) does not use ChoiceList: it…",
+   "detail": "The multi-select chooser on real screens (condition picker) does not use ChoiceList: it hand-rolls checkbox rows with the box on the left, and door rows with their own meta layout.\nFix: Render the condition picker with choiceRow({mode:\"multi\"}) and choiceRow({mode:\"navigate\", meta:\"10 symptoms · 1 selected\"}); delete the .catalog-item and .catalog-category styles.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:ChoiceList:1",
+   "target": {
+    "kind": "component",
+    "id": "ChoiceList"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "Single-select rows exist twice: choiceRow single (ink check) and pickerOptions…",
+   "detail": "Single-select rows exist twice: choiceRow single (ink check) and pickerOptions (st-picker-option, green check).\nFix: Make pickerOptions a thin wrapper that returns choiceGroup(choiceRow single ...) and delete the st-picker-option CSS.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:ChoiceList:2",
+   "target": {
+    "kind": "component",
+    "id": "ChoiceList"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "multi mode, the empty state and the pressed state are missing from the preview, so the 375px…",
+   "detail": "multi mode, the empty state and the pressed state are missing from the preview, so the 375px proof does not cover the component.\nFix: Add to preview.html a multi group with one checked row, a choiceEmpty line and a row forced into its pressed fill.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:ChoiceList:3",
+   "target": {
+    "kind": "component",
+    "id": "ChoiceList"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "The Clear text action measures 44x44, below the 48px glove floor.",
+   "detail": "The Clear text action measures 44x44, below the 48px glove floor.\nFix: Set .st-text-action min-height and min-width to control-height (48px).",
+   "source": "gate"
+  },
+  {
+   "id": "gate:ChoiceList:4",
+   "target": {
+    "kind": "component",
+    "id": "ChoiceList"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "No when-not, no row cap, no label-length rule; raw px and #eaf0e2 instead of tokens.",
+   "detail": "No when-not, no row cap, no label-length rule; raw px and #eaf0e2 instead of tokens.\nFix: Add \"Use Segment for 2-5 fixed short options in a filter; use TaskChoice for a choice that changes the page\"; cap a group at about 8 rows before search; map the press fill to choice-press.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:ChoiceList:p0",
+   "target": {
+    "kind": "component",
+    "id": "ChoiceList"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge pickerOptions into ChoiceList single?",
+   "detail": "Same job, same row, two implementations with different check colours\nSeen in: farrowing.death, health-record.edit-finding",
+   "source": "gate"
+  },
+  {
+   "id": "gate:ChoiceList:p1",
+   "target": {
+    "kind": "component",
+    "id": "ChoiceList"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New variant: Segment: facet (filter choice Any · 0 · 1 · 2–5 · 6+)?",
+   "detail": "Parity is a fixed set of 5 or fewer short tokens that narrows a list; it is not an outcome being recorded. M3 and Apple call that a segmented control, not a list. It is not a ChoiceList variant: ChoiceList draws vertical rows, and the record-sheet Choice caps at 4 outcomes. On one screen it does not earn a new Choice chips component. Today the options are 66x44, below the floor; inspection.filters uses PickerFields for the same kind of facet.\nSeen in: farrowing.room (Filter sows)",
+   "source": "gate"
+  },
+  {
+   "id": "gate:CategoryFooter:0",
+   "target": {
+    "kind": "component",
+    "id": "CategoryFooter"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Category names and order on screens (Production, Health, General) contradict the README and the…",
+   "detail": "Category names and order on screens (Production, Health, General) contradict the README and the verb-sheet law (Health, Routine, Production).\nFix: Pick one: rename General to Routine and order Health · Routine · Production in actionCatalogue, or change the law. The footer renders whatever order it is given.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:CategoryFooter:1",
+   "target": {
+    "kind": "component",
+    "id": "CategoryFooter"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "`disabled` dims a tab to half opacity, which the DS law forbids (nothing else is ever greyed).",
+   "detail": "`disabled` dims a tab to half opacity, which the DS law forbids (nothing else is ever greyed).\nFix: Remove the disabled option from categoryFooter; callers leave out an empty category.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:CategoryFooter:2",
+   "target": {
+    "kind": "component",
+    "id": "CategoryFooter"
+   },
+   "kind": "broken",
+   "severity": "low",
+   "title": "The preview shows a single state: no scrolled or overflowing tabs, no under-310px shrink, no focus.",
+   "detail": "The preview shows a single state: no scrolled or overflowing tabs, no under-310px shrink, no focus.\nFix: Add a 5-category instance at 300px width and a focused tab to preview.html.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:CategoryFooter:3",
+   "target": {
+    "kind": "component",
+    "id": "CategoryFooter"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Raw px widths and paddings instead of back-width, control-height and footer tokens.",
+   "detail": "Raw px widths and paddings instead of back-width, control-height and footer tokens.\nFix: Swap 86px for back-width, 48px for control-height, and the padding for the footer tokens.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Field:0",
+   "target": {
+    "kind": "component",
+    "id": "Field"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "The error state is invisible in every phone host: `:is(.farrowing-phone,.inspection-phone)…",
+   "detail": "The error state is invisible in every phone host: `:is(.farrowing-phone,.inspection-phone) :is(input...,textarea){border-color:#bdc7b6}` outranks `.field.error input{border-color:var(--red)}`. The error field computes to rgb(189,199,182).\nFix: Raise the error rule to `:is(.farrowing-phone,.inspection-phone) .field.error :is(input,textarea)`, or wrap the phone border rule in `:where()`. Add aria-invalid and a message line so the error is not colour only.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Field:1",
+   "target": {
+    "kind": "component",
+    "id": "Field"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "The textarea renders in monospace (pen note, preview Note) because .field textarea sets no font.",
+   "detail": "The textarea renders in monospace (pen note, preview Note) because .field textarea sets no font.\nFix: Add `font:400 14px/1.6 var(--sans)` to `.field textarea`.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Field:2",
+   "target": {
+    "kind": "component",
+    "id": "Field"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "The optional note is drawn two ways: an always-open \"Note · optional\" textarea (edit-finding,…",
+   "detail": "The optional note is drawn two ways: an always-open \"Note · optional\" textarea (edit-finding, farrowing fault resolution) and an \"Add note\" optional row (record-health, treatment).\nFix: State the rule in the README: a Field is never shown open for an optional input. An optional Note is an optional row (design/optional-fields) that opens this Field. Convert edit-finding and the fault resolution note to that row.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Field:3",
+   "target": {
+    "kind": "component",
+    "id": "Field"
+   },
+   "kind": "broken",
+   "severity": "medium",
+   "title": "Inputs are 46px tall, below the 48px glove floor.",
+   "detail": "Inputs are 46px tall, below the 48px glove floor.\nFix: Set field-height to 48px.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Field:4",
+   "target": {
+    "kind": "component",
+    "id": "Field"
+   },
+   "kind": "broken",
+   "severity": "medium",
+   "title": "There is no slot for an error or help message, so error text cannot persist or explain the fix.",
+   "detail": "There is no slot for an error or help message, so error text cannot persist or explain the fix.\nFix: Add an optional hint/error line under the control, linked with aria-describedby.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Field:5",
+   "target": {
+    "kind": "component",
+    "id": "Field"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "resize:vertical gives a drag-only handle; Dose and Unit sit in two columns on treatment.",
+   "detail": "resize:vertical gives a drag-only handle; Dose and Unit sit in two columns on treatment.\nFix: Use auto-grow (field-sizing:content) with resize:none. Stack Dose then Unit, or put the unit in the label as the README says.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:PickerField:0",
+   "target": {
+    "kind": "component",
+    "id": "PickerField"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "The multi condition picker loses its list on the first selection: `<details…",
+   "detail": "The multi condition picker loses its list on the first selection: `<details class=\"chooser-selected\">...</div>` is never closed, so .health-catalog renders inside the collapsed <details>.\nFix: Close the tag (`</div></details>`). Better: replace the disclosure with a \"1 selected\" ChoiceList navigate row that opens a review level.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:PickerField:1",
+   "target": {
+    "kind": "component",
+    "id": "PickerField"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "Screens need multi and nested pickers, but the component defines only single and sends callers…",
+   "detail": "Screens need multi and nested pickers, but the component defines only single and sends callers to ChoiceList multi, so every host builds its own sheet.\nFix: Give PickerField the sheet, with the variants single, multi, cascade and cascade-multi (see proposals), and draw the rows with ChoiceList.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:PickerField:2",
+   "target": {
+    "kind": "component",
+    "id": "PickerField"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "The condition sheet stacks four exits (back arrow, close X, Back, Done).",
+   "detail": "The condition sheet stacks four exits (back arrow, close X, Back, Done).\nFix: Show the header back arrow only while a level is open; keep footer Back (leaves and keeps the draft) + \"Done · n\"; drop the X.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:PickerField:3",
+   "target": {
+    "kind": "component",
+    "id": "PickerField"
+   },
+   "kind": "broken",
+   "severity": "medium",
+   "title": "Host CSS forks the trigger (12px text, 40-44px), and Conditions uses a separate…",
+   "detail": "Host CSS forks the trigger (12px text, 40-44px), and Conditions uses a separate .bulk-condition-button with no label.\nFix: Delete the six .st-picker-trigger overrides in inspection-astra-concept.css. Render Conditions as pickerField({label:\"Conditions\", display:\"2 selected\"}), with the trigger at min-height 48.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:PickerField:4",
+   "target": {
+    "kind": "component",
+    "id": "PickerField"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Search covers only the open group, so a symptom in another group reads as missing and invites a…",
+   "detail": "Search covers only the open group, so a symptom in another group reads as missing and invites a custom duplicate.\nFix: Search the whole catalogue (both kinds) and show each hit with its path as meta (\"Symptoms · General appearance\").",
+   "source": "gate"
+  },
+  {
+   "id": "gate:PickerField:5",
+   "target": {
+    "kind": "component",
+    "id": "PickerField"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "`disabled` dims the trigger, which the DS law forbids; placeholder copy drifts from \"Select\".",
+   "detail": "`disabled` dims the trigger, which the DS law forbids; placeholder copy drifts from \"Select\".\nFix: Remove disabled. Default the placeholder to \"Select\", and to \"None\" for multi.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:PickerField:p0",
+   "target": {
+    "kind": "component",
+    "id": "PickerField"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New variant: PickerField multi?",
+   "detail": "Flat or sectioned multi-select: trailing checkboxes (ChoiceList multi), footer Back + \"Done · n selected\", trigger shows \"n selected\" or \"None\", and the selected items as a \"n selected\" row at the top, not a <details>\nSeen in: health-record.condition-picker, inspection.filters",
+   "source": "gate"
+  },
+  {
+   "id": "gate:PickerField:p1",
+   "target": {
+    "kind": "component",
+    "id": "PickerField"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New variant: PickerField cascade?",
+   "detail": "The ADM/Vant/TDesign Cascader model: one level at a time, a step row of the chosen levels that can be tapped to go back, auto-advance on pick, and the path written back to the trigger (\"Antibiotics / Amoxicillin\")\nSeen in: health-record.medicine-picker",
+   "source": "gate"
+  },
+  {
+   "id": "gate:PickerField:p2",
+   "target": {
+    "kind": "component",
+    "id": "PickerField"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New variant: PickerField cascade-multi?",
+   "detail": "The condition picker: kind (Diseases/Symptoms) to group to ticked leaves. A step row replaces the tabs and the back-arrow header; group rows carry \"n selected\" meta; search spans the whole tree with path meta; ticks across branches persist; \"Done · n\"\nSeen in: health-record.condition-picker",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Stepper:0",
+   "target": {
+    "kind": "component",
+    "id": "Stepper"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "Key widths are below the glove floor: 46px (DS face), 44px (TaskStepper row face), 44x44…",
+   "detail": "Key widths are below the glove floor: 46px (DS face), 44px (TaskStepper row face), 44x44 (farrowing .row-stepper forks). Pointer text actions are 44px tall.\nFix: Set the key face to 48px (control-height) in every face, and text actions to min-height 48.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Stepper:1",
+   "target": {
+    "kind": "component",
+    "id": "Stepper"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Farrowing still hand-rolls three look-alikes (.row-stepper on death and edit, .hero-stepper on…",
+   "detail": "Farrowing still hand-rolls three look-alikes (.row-stepper on death and edit, .hero-stepper on count, .feature-stepper on foster and reconcile) instead of SentriTask.stepper.\nFix: Swap them for the SentriTask.stepper faces row, count and well, and delete the forks.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Stepper:2",
+   "target": {
+    "kind": "component",
+    "id": "Stepper"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "No screen uses the DS faces (filled ink +); task pages use other faces. Two looks for one job,…",
+   "detail": "No screen uses the DS faces (filled ink +); task pages use other faces. Two looks for one job, with no stated rule.\nFix: List the faces (row, well, count) as this card's variants, and retire the filled-ink face or name a screen that needs it.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Stepper:3",
+   "target": {
+    "kind": "component",
+    "id": "Stepper"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Draft (green value) and corrected (amber value) are colour-only.",
+   "detail": "Draft (green value) and corrected (amber value) are colour-only.\nFix: Add a word in the status line (\"+1 unsaved\", \"corrected\") alongside the colour.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Stepper:4",
+   "target": {
+    "kind": "component",
+    "id": "Stepper"
+   },
+   "kind": "broken",
+   "severity": "low",
+   "title": "The reserved 44px hint line opens uneven gaps in a stack where only some rows can show pointers.",
+   "detail": "The reserved 44px hint line opens uneven gaps in a stack where only some rows can show pointers.\nFix: Reserve per sheet, not per row: in a stack, rows without pointers take reserveHint:false.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Stepper:p0",
+   "target": {
+    "kind": "component",
+    "id": "Stepper"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge TaskStepper faces into Stepper variants?",
+   "detail": "Same job, different look = variant; one implementation, with the face as the variant\nSeen in: piglet-processing.counts, farrowing.count",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Measure:0",
+   "target": {
+    "kind": "component",
+    "id": "Measure"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "Give IDs builds the ear-tag field as a Measure with no unit and marks a duplicate tag \"refused\",…",
+   "detail": "Give IDs builds the ear-tag field as a Measure with no unit and marks a duplicate tag \"refused\", breaking both the Measure rule (no unit = not a Measure) and the Numpad rule (a duplicate tag warns and records).\nFix: Either add an \"identifier\" variant to Measure (mono, no unit, warn-only tone) and document it, or render the tag as the Numpad readout; switch the duplicate to tone \"warn\".",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Measure:1",
+   "target": {
+    "kind": "component",
+    "id": "Measure"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "The weight sheet says the unit twice: label \"Weight (kg)\" over a box that writes \"kg\".",
+   "detail": "The weight sheet says the unit twice: label \"Weight (kg)\" over a box that writes \"kg\".\nFix: Label the field \"Litter weight\" (or \"Weight\") and keep the unit only in the box; add a README line: the label never carries the unit.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Measure:2",
+   "target": {
+    "kind": "component",
+    "id": "Measure"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "An optional Measure renders as a full 62px field (\"Weight · Optional\" on Give IDs), while the…",
+   "detail": "An optional Measure renders as a full 62px field (\"Weight · Optional\" on Give IDs), while the optional-input rule and farrowing use a collapsed \"+ Litter weight\" row.\nFix: Add a collapsed optional state: one row of label + \"Optional\" + an Add door, expanding to the box on tap (match the Photos header row).",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Measure:3",
+   "target": {
+    "kind": "component",
+    "id": "Measure"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "CSS uses raw px for borders, gaps and the unit gap, and the README lists no CSS variables.",
+   "detail": "CSS uses raw px for borders, gaps and the unit gap, and the README lists no CSS variables.\nFix: Map 1/2/3/6/8px to existing tokens (caret-width, status-dot, space-key-gap) and add a CSS-variables list to the README.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Measure:4",
+   "target": {
+    "kind": "component",
+    "id": "Measure"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "No label-length rule or long-label example; zh labels are untested in the preview.",
+   "detail": "No label-length rule or long-label example; zh labels are untested in the preview.\nFix: State a label cap and add one long en and one zh label to the preview.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Measure:p0",
+   "target": {
+    "kind": "component",
+    "id": "Measure"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New variant: Measure · identifier (tag)?",
+   "detail": "Give IDs needs a pad-set mono value with no unit and a warn-only duplicate tone; today it is a Measure that breaks its own rules\nSeen in: piglet-processing.give-ids",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Measure:p1",
+   "target": {
+    "kind": "component",
+    "id": "Measure"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New variant: Measure · optional row (collapsed)?",
+   "detail": "Optional values (litter weight, piglet weight) should be one row until opened, like Photos and farrowing's + Litter weight\nSeen in: piglet-processing.give-ids, farrowing.blocked",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Numpad:0",
+   "target": {
+    "kind": "component",
+    "id": "Numpad"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "The run variant with the three-line list has no atlas screen, while the compact variant every…",
+   "detail": "The run variant with the three-line list has no atlas screen, while the compact variant every screen uses (weight sheet, Give IDs) is missing from the preview.\nFix: Add compact examples (empty, typing, warn) to preview.html; mark the run variant unused or drop it until a screen needs it.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Numpad:1",
+   "target": {
+    "kind": "component",
+    "id": "Numpad"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Status-line text actions (\"Use 000258\") measure 86x44, under the 48px glove floor.",
+   "detail": "Status-line text actions (\"Use 000258\") measure 86x44, under the 48px glove floor.\nFix: Give .st-text-action min-height: var(--control-height) inside the pad's status line, and reserve 48px for the line.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Numpad:2",
+   "target": {
+    "kind": "component",
+    "id": "Numpad"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Floor-gray keys can be told apart only by colour until tapped.",
+   "detail": "Floor-gray keys can be told apart only by colour until tapped.\nFix: Keep the colour but also drop the key border (a shape change), as Photos does for its inactive camera.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Numpad:3",
+   "target": {
+    "kind": "component",
+    "id": "Numpad"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Raw px in CSS and no CSS-variable list.",
+   "detail": "Raw px in CSS and no CSS-variable list.\nFix: Map to space-key-gap / caret-width tokens and list the variables in the README.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Status:0",
+   "target": {
+    "kind": "component",
+    "id": "Status"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "Status is not what the product uses. Every state chip in the atlas is a filled badge built…",
+   "detail": "Status is not what the product uses. Every state chip in the atlas is a filled badge built outside it: TaskRow .tk-chip (To do / Done / Late on piglet-processing.pen-list) and farrowing .state-word / .done-word (Active / Done on farrowing.room). The README says \"never a filled badge\".\nFix: Decide one face. Either add a \"chip\" variant to Status (filled wash, 10px/600, 20px tall) and have TaskRow and farrowing call SentriUI.status({ variant: \"chip\" }), or move those screens to the dot-word. Do not keep both.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Status:1",
+   "target": {
+    "kind": "component",
+    "id": "Status"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "\"To do\" is drawn green (rgb 39,102,64 on green-wash) on the pen list, so pens not yet done wear…",
+   "detail": "\"To do\" is drawn green (rgb 39,102,64 on green-wash) on the pen list, so pens not yet done wear the \"done\" colour, while \"Done\" is grey.\nFix: Map To do to muted (or amber when due now), Done to green, Late to amber, through Status tones rather than per-feature CSS.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Status:2",
+   "target": {
+    "kind": "component",
+    "id": "Status"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Health tags (Thin, Fever, Arthritis) do a different job: they name a recorded condition with a…",
+   "detail": "Health tags (Thin, Fever, Arthritis) do a different job: they name a recorded condition with a care level, not a workflow state. They are .recorded-tag pills with their own amber/orange tones.\nFix: Keep them out of Status; give them their own component (ConditionTag) with care-level tones, and link it from Status's Related list.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Status:3",
+   "target": {
+    "kind": "component",
+    "id": "Status"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Status-line look-alikes are hand-built: TaskDay's mono \"late\" (.tk-tone) and farrowing's…",
+   "detail": "Status-line look-alikes are hand-built: TaskDay's mono \"late\" (.tk-tone) and farrowing's \"Overdue · 3 days\" row text.\nFix: Render them with SentriUI.statusLine([...], { mono: true }) so the tone rule (colour on the value, word in ink) holds.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Status:4",
+   "target": {
+    "kind": "component",
+    "id": "Status"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "\"Due tomorrow\" on farrowing rows is a forecast in muted 14/500 with no dot. It is fine as text,…",
+   "detail": "\"Due tomorrow\" on farrowing rows is a forecast in muted 14/500 with no dot. It is fine as text, but the README does not say a forecast is not a Status.\nFix: Add one line: forecasts (\"Due tomorrow\", \"Expected in 5 days\") are row text, not a Status word.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Status:5",
+   "target": {
+    "kind": "component",
+    "id": "Status"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "No word-length cap or zh example; raw 4px separator margin.",
+   "detail": "No word-length cap or zh example; raw 4px separator margin.\nFix: Cap the word length, add a zh example, and tokenise the separator margin.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Status:p0",
+   "target": {
+    "kind": "component",
+    "id": "Status"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New variant: Status · chip (filled)?",
+   "detail": "The filled state chip is the de-facto Status on four screens, with three implementations\nSeen in: piglet-processing.pen-list, farrowing.room, farrowing.count",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Status:p1",
+   "target": {
+    "kind": "component",
+    "id": "Status"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New component: ConditionTag (health tag)?",
+   "detail": "Thin / Fever / Arthritis label a recorded condition with a care level, a different job from a workflow state\nSeen in: health-record.mixed, pig-profile.full, inspection.walk",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Banner:0",
+   "target": {
+    "kind": "component",
+    "id": "Banner"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "Banner and TaskWarning do the same job (a consequence above a commit, on a wash, with optional…",
+   "detail": "Banner and TaskWarning do the same job (a consequence above a commit, on a wash, with optional text actions) with two implementations: Banner danger is red-wash/red border with a 14/700 headline; TaskWarning red is red-wash/danger-border with a 12/700 title. Only TaskWarning is used (piglet-processing.phone-clash, farrowing.blocked).\nFix: Merge them: one Banner with tones danger / correction / notice, built once; TaskWarning becomes Banner at the skeleton's 12px size (a size property), not a second component.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Banner:1",
+   "target": {
+    "kind": "component",
+    "id": "Banner"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "The Home offline banner (\"3 records saved on this device · No connection · waiting to upload\",…",
+   "detail": "The Home offline banner (\"3 records saved on this device · No connection · waiting to upload\", workbench.today) is a third look-alike: amber wash, a leading icon, the whole box a door with ›. Banner forbids icons; TaskWarning's amber door banner matches it.\nFix: Make it the merged Banner's notice tone with the door property (icon optional, the whole box one button at least 48px), and render Home with it.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Banner:2",
+   "target": {
+    "kind": "component",
+    "id": "Banner"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Clear (46x44) is under the 48px glove floor.",
+   "detail": "Clear (46x44) is under the 48px glove floor.\nFix: Give banner text actions min-height: var(--control-height) and make the summary row 48px.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Banner:3",
+   "target": {
+    "kind": "component",
+    "id": "Banner"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Cleared + Undo (5s) is specified but not rendered in the preview.",
+   "detail": "Cleared + Undo (5s) is specified but not rendered in the preview.\nFix: Add a Cleared/Undo example to preview.html.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Banner:4",
+   "target": {
+    "kind": "component",
+    "id": "Banner"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Raw px, no CSS-variable list, no headline length cap.",
+   "detail": "Raw px, no CSS-variable list, no headline length cap.\nFix: Tokenise the 1px/4px values, list the variables, cap the headline at one line with a zh example.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Banner:p0",
+   "target": {
+    "kind": "component",
+    "id": "Banner"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge Banner + TaskWarning?",
+   "detail": "Same job (a consequence before a commit, or a pending notice), two implementations; only TaskWarning ships in screens\nSeen in: farrowing.blocked, piglet-processing.phone-clash, piglet-processing.list-ended",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Banner:p1",
+   "target": {
+    "kind": "component",
+    "id": "Banner"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New variant: Banner · notice (door)?",
+   "detail": "The Home offline/upload banner and farrowing's \"Save your correction first · Review ›\" are an amber notice that opens something\nSeen in: workbench.today, workbench.saved-work, farrowing.blocked",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Photos:0",
+   "target": {
+    "kind": "component",
+    "id": "Photos"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "As the reference for the optional row, Photos and its only shipped face disagree: Photos rules a…",
+   "detail": "As the reference for the optional row, Photos and its only shipped face disagree: Photos rules a ringed circle \"deliberately not the keys' squircle\"; TaskPhotos (farrowing.death) draws an outlined squircle key with a leading camera glyph and no well. Two looks, one job.\nFix: Pick one face for the optional row (the farrowing line is the one in use), make the other a documented variant or retire it, and update the Photos rule to match.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Photos:1",
+   "target": {
+    "kind": "component",
+    "id": "Photos"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "The camera is 44x44 in both faces, under the 48px glove floor, and it is the row's only target.",
+   "detail": "The camera is 44x44 in both faces, under the 48px glove floor, and it is the row's only target.\nFix: Set the camera to var(--control-height) (48px) and the empty row min-height to 48px.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Photos:2",
+   "target": {
+    "kind": "component",
+    "id": "Photos"
+   },
+   "kind": "broken",
+   "severity": "medium",
+   "title": "The camera circle fills the 44px row exactly, so its ring touches the card's top, right and…",
+   "detail": "The camera circle fills the 44px row exactly, so its ring touches the card's top, right and bottom edges (no inner padding on the right).\nFix: Pad the card space-row-y vertically and space-row-x on the right so the camera sits inside the well.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Photos:3",
+   "target": {
+    "kind": "component",
+    "id": "Photos"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "The optional row is not generalised: Measure renders an optional weight as a full field on Give…",
+   "detail": "The optional row is not generalised: Measure renders an optional weight as a full field on Give IDs, and farrowing uses \"+ Litter weight\" pills. The label scale also differs (Photos 13/500, Measure 14/600).\nFix: Write the optional row once (label at choice-label 14/600, \"Optional\" muted, the action at the right, 48px) and have Photos, Measure and Note use it.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Photos:4",
+   "target": {
+    "kind": "component",
+    "id": "Photos"
+   },
+   "kind": "broken",
+   "severity": "medium",
+   "title": "The denied / too-large errors, pressed and focus are specified but not rendered.",
+   "detail": "The denied / too-large errors, pressed and focus are specified but not rendered.\nFix: Add them to preview.html.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Photos:5",
+   "target": {
+    "kind": "component",
+    "id": "Photos"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Raw px, no CSS-variable list, no when-not section.",
+   "detail": "Raw px, no CSS-variable list, no when-not section.\nFix: Tokenise, list the variables, add \"When not: a fact that needs words, use Note\".",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Photos:p0",
+   "target": {
+    "kind": "component",
+    "id": "Photos"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge Photos + TaskPhotos?",
+   "detail": "Same field, two faces with contradicting rules; one should be a variant of the other\nSeen in: farrowing.death",
+   "source": "gate"
+  },
+  {
+   "id": "gate:Photos:p1",
+   "target": {
+    "kind": "component",
+    "id": "Photos"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "New component: OptionalRow (section pattern)?",
+   "detail": "The collapsed optional input (label · Optional · action) recurs in Photos, the Give IDs weight and farrowing's + Litter weight\nSeen in: farrowing.death, farrowing.blocked, piglet-processing.give-ids",
+   "source": "gate"
   }
  ],
  "oldUi": [

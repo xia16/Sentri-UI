@@ -4,7 +4,7 @@
 
 const q = new URLSearchParams(location.search);
 const S = { data: null, view: 'atlas', platformId: 'mobile' };
-const VIEWS = [['atlas', 'Atlas'], ['components', 'Components'], ['copy', 'Copy'], ['old', 'Old UI']];
+const VIEWS = [['atlas', 'Atlas'], ['components', 'Components'], ['copy', 'Copy'], ['old', 'Old UI'], ['backlog', 'Backlog']];
 const STATUS = { 'in-design': 'In design', 'agent-checked': 'Agent-checked', approved: 'Approved', frozen: 'Frozen', placeholder: 'Placeholder' };
 
 const el = (h) => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content.firstElementChild; };
@@ -30,7 +30,7 @@ function setView(id) { S.view = id; ['feature', 'screen', 'component', 'key'].fo
 function render() {
   setParam('view', S.view === 'atlas' ? null : S.view); setParam('platform', S.platformId === 'mobile' ? null : S.platformId);
   header('');
-  ({ old: renderOld, components: renderComponents, copy: renderCopy }[S.view] || renderBoard)();
+  ({ old: renderOld, components: renderComponents, copy: renderCopy, backlog: renderBacklog }[S.view] || renderBoard)();
 }
 
 /* ---------- pan and zoom, shared by the board and the flow. A drag never clicks or selects. ---------- */
@@ -122,19 +122,35 @@ function md(src, opts = {}) {
 /* ---------- board ---------- */
 const FEATURE_ICON = { farrowing: 'farrow', 'farrowing-record': 'record', 'piglet-processing': 'spark', inspection: 'monitor', 'pig-list': 'grid', 'pig-profile': 'profile', disease: 'alert', 'health-record': 'health', prescriptions: 'treat', triage: 'hospital', treat: 'treat', 'report-death': 'alert', abortion: 'alert', 'feed-plan': 'feed', 'data-sync': 'upload', sampling: 'details', environment: 'temperature', workbench: 'home', breeding: 'heat', 'heat-check': 'heat', heat: 'heat', pregnancy: 'pregnancy', 'return-heat': 'return', 'post-farrowing': 'farrow', weaning: 'calendar', wean: 'calendar', weight: 'weight', backfat: 'chart', temperature: 'temperature', move: 'transfer', missing: 'place', 'keep-breeding': 'bookmark', 'unexpected-pregnancy': 'pregnancy', fostering: 'link', 'end-finishing': 'check', 'end-nursery': 'check' };
 const hasPrd = (f) => !!(f.prd && f.prd.trim() && !/not designed yet/i.test(f.prd));
-function renderPattern(sec, pt) {
+async function renderPattern(sec, pt) {
   const main = document.getElementById('main'); main.innerHTML = '';
   header(`<a href="#" id="pat-back">${esc(sec.name)}</a> / <b>${esc(pt.name)}</b> <span class="zh">Pattern</span>`);
   document.getElementById('pat-back').onclick = (e) => { e.preventDefault(); render(); };
-  const idx = screenIndex(), page = el(`<div class="patternpage"><h2>${esc(pt.name)}</h2>${pt.note ? `<p class="muted">${esc(pt.note)}</p>` : ''}<div class="phones"></div></div>`);
-  const row = page.querySelector('.phones');
-  (pt.screens || []).forEach((id) => {
-    const s = idx[id]; if (!s) return;
-    const cell = el(`<figure><figcaption>${dot(s.status)}<a href="#">${esc(s.feature.name)} · ${esc(s.name)}</a></figcaption></figure>`);
-    cell.querySelector('a').onclick = (e) => { e.preventDefault(); openFeature(s.feature.id, s.id); };
-    cell.append(shot(s, { height: 640 })); row.append(cell);
-  });
+  const idx = screenIndex(), pid = String(pt.name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), dir = `/sections/${sec.id}/patterns/${pid}/`;
+  const page = el(`<div class="patternpage"><h2>${esc(pt.name)}</h2>${pt.note ? `<p class="muted">${esc(pt.note)}</p>` : ''}<div class="pbody"></div></div>`), body = page.querySelector('.pbody');
   main.append(page);
+  let vj = null; try { vj = await getJson(dir + 'variants.json'); } catch (_) {}
+  const chips = () => `<div class="seen"><h3>Seen on</h3><div class="usedby">${(pt.screens || []).filter((id) => idx[id]).map((id) => `<a href="#" data-sid="${esc(id)}">${esc(idx[id].feature.name)} · ${esc(idx[id].name)}</a>`).join("")}</div></div>`;
+  const wire = (root) => root.querySelectorAll('a[data-sid]').forEach((a2) => { a2.onclick = (e) => { e.preventDefault(); const s = idx[a2.dataset.sid]; openFeature(s.feature.id, s.id); }; });
+  const phones = () => { const row = el('<div class="phones"></div>'); (pt.screens || []).forEach((id) => { const s = idx[id]; if (!s) return; const cell = el(`<figure><figcaption>${dot(s.status)}<a href="#">${esc(s.feature.name)} · ${esc(s.name)}</a></figcaption></figure>`); cell.querySelector('a').onclick = (e) => { e.preventDefault(); openFeature(s.feature.id, s.id); }; cell.append(shot(s, { height: 640 })); row.append(cell); }); return row; };
+  const drawn = {};
+  if (vj) await Promise.all(vj.map(async (v) => { drawn[v.id] = await stateGridAt(dir, v.id); }));
+  const tabs = (vj || []).filter((v) => drawn[v.id]);
+  if (!tabs.length) { // no states drawn yet: the live screens, behind a closed disclosure
+    body.append(el('<p class="muted" style="margin:0 0 12px">This pattern’s states haven’t been drawn yet — the component pass draws them.</p>'));
+    const d = el('<details class="cur"><summary>Current view ›</summary></details>'); let done = false;
+    d.addEventListener('toggle', () => { if (d.open && !done) { done = true; d.append(phones()); } });
+    body.append(d, el(chips())); wire(body); return;
+  }
+  const bar = el('<div class="vtabs" role="tablist"></div>'), inner = el('<div class="vbody"></div>'); if (tabs.length > 1) body.append(bar); body.append(inner);
+  const show = (id) => {
+    bar.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === id))); inner.innerHTML = '';
+    const v = tabs.find((x) => x.id === id);
+    if (v.use || v.notUse) inner.append(el(`<p class="vuse1">${v.use ? `<b>Use for</b> ${esc(v.use)}` : ''}${v.notUse ? `${v.use ? ' · ' : ''}<b>Not for</b> ${esc(v.notUse)}` : ''}</p>`));
+    inner.append(drawn[id], el(chips())); wire(inner);
+  };
+  tabs.forEach((v) => { const b = el(`<button role="tab" data-id="${esc(v.id)}" aria-pressed="false">${esc(v.name)}</button>`); b.onclick = () => show(v.id); bar.append(b); });
+  show(tabs[0].id);
 }
 function renderBoard() {
   const main = document.getElementById('main'); main.innerHTML = '';
