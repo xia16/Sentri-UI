@@ -24,7 +24,6 @@
 .farrowing-phone .home-task-title{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:500}
 .farrowing-phone .home-task-states{font-size:11px;color:var(--muted)}
 .farrowing-phone .home-resume{font-size:11px;color:var(--green)}
-.farrowing-phone .filter-section{border-color:var(--line)}
 .farrowing-phone .room-search-label input{border-color:#bdc7b6}
 .farrowing-phone .search-result{border-color:var(--line)}
 .farrowing-phone .scanner-demo{background:var(--well);border:1px solid var(--line)}

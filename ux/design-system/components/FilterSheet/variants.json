@@ -1,0 +1,21 @@
+[
+  {
+    "id": "list",
+    "name": "List filters",
+    "use": "use for narrowing a list by draft filter groups",
+    "notUse": "not for recording a single value — use Measure",
+    "states": [
+      "Default",
+      "Active",
+      "Empty",
+      "Disabled",
+      "Error",
+      "Loading",
+      "Long / Chinese"
+    ],
+    "usedBy": [
+      "farrowing.room",
+      "inspection.filters"
+    ]
+  }
+]
