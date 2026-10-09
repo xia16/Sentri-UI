@@ -1999,7 +1999,9 @@
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "locked",
-      "steps": ["Edit"],
+      "steps": [
+        "[data-action=\"edit\"].tool"
+      ],
       "figma": "",
       "notes": {
         "purpose": "The Edit face after farrowing has finished or the sow has died: Born is a locked row with an amber pencil; finish details sit behind one row.",
@@ -2061,7 +2063,9 @@
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
-      "steps": ["Task overview"],
+      "steps": [
+        "Task overview"
+      ],
       "figma": "",
       "notes": {
         "purpose": "The whole-task sheet behind the Task overview card: progress across all units, unit chooser, performance, other outcomes and the way to End task.",
@@ -2156,7 +2160,12 @@
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "task-complete",
-      "steps": [{"tap":".st-hold","hold":1000}],
+      "steps": [
+        {
+          "tap": ".st-hold",
+          "hold": 1000
+        }
+      ],
       "figma": "",
       "notes": {
         "purpose": "The frozen record after the task ended: who, when, performance and outcomes.",

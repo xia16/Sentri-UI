@@ -48,18 +48,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-a-6",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.edit-finished"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Atlas 'Edit record (finished litter)' shows the locked record",
-  "detail": "The step 'Edit' hits the room row's Edit behind the sheet, which reopens the same locked record, so the screenshot equals farrowing.locked. Fix: step '[data-action=\"edit\"].tool'.",
-  "source": "screen-review"
- },
- {
   "id": "screens-a-7",
   "target": {
    "kind": "feature",
