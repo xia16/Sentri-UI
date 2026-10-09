@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
+/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
 /* SentriIcons (sentri-icons.js) and the SentriUI parts, in one file. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
@@ -242,8 +242,19 @@
   }
   const chevron='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
   const check='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4L19 6"/></svg>';
-  function field({label='',control='',className='',ds=''}={}){
-    return `<label class="field ${esc(className)}"${ds?` data-ds="${esc(ds)}"`:''}>${label}${control}</label>`;
+  function field({label='',control='',className='',ds='Field',variant='text',value='',unit='',hint='',error='',disabled=false,reason='',id='',placeholder='',labelHidden=false,focus=false}={}){
+    const fid=id||fieldId('st-field'),hid=fid+'-hint';
+    const bad=!!error||className.split(' ').includes('error');
+    const message=error|| (bad?'Invalid value. Enter a valid value.':disabled?(reason||'This record cannot be edited.'):hint);
+    if(control)variant=/<textarea\b/i.test(control)?'textarea':/type=["']number["']/i.test(control)?'number':variant;
+    if(!control)control=variant==='textarea'?`<textarea id="${esc(fid)}" placeholder="${esc(placeholder)}">${esc(value)}</textarea>`:`<input id="${esc(fid)}" type="${variant==='number'?'number':'text'}"${variant==='number'?' inputmode="decimal"':''} value="${esc(value)}" placeholder="${esc(placeholder)}">`;
+    control=control.replace(/<(input|textarea)\b([^>]*)>/i,(_,tag,attrs)=>{
+      const previous=attrs.match(/aria-describedby=["']([^"']*)["']/i)?.[1]||'';
+      if(message)attrs=attrs.replace(/\saria-describedby=["'][^"']*["']/i,'');
+      if(bad)attrs=attrs.replace(/\saria-invalid=["'][^"']*["']/i,'');
+      return `<${tag}${attrs}${label&&!/aria-label(?:ledby)?=/.test(attrs)?` aria-labelledby="${esc(fid)}-label"`:""}${message?` aria-describedby="${esc([previous,hid].filter(Boolean).join(' '))}"`:''}${bad?' aria-invalid="true"':''}${disabled&&!/\bdisabled\b/.test(attrs)?' disabled':''}>`;
+    });
+    return `<label class="field ${bad?'error ':''}${esc(className)}" data-ds="${esc(ds||'Field')}" data-variant="${esc(variant)}"${focus?' data-preview="focus"':''}>${label||unit?`<span${labelHidden?' class="visually-hidden"':''} id="${esc(fid)}-label">${label}${unit?` (${esc(unit)})`:''}</span>`: ''}${control}${message?`<span class="st-field-message" id="${esc(hid)}" role="${bad?'alert':'status'}">${esc(message)}</span>`:''}</label>`;
   }
   /* Mobile-standard choice control: a trigger button that opens a picker sheet.
      Replaces native <select>; the host app owns the picker view and state.
@@ -371,21 +382,35 @@
   /* Stepper: `− n +`, the one counting shape. variant 'row' (a 60px sheet row) or 'hero' (the count sheet's one number).
      A key emits a requested delta; the host posts it (immediate host) or adds it to a draft (staged host).
      pointers: text actions shown in the status region at the floor. */
-  function stepper({label='',description='',value=0,min=0,max=null,step=1,action='step',key='',variant='row',changed=false,draft=false,tone='',hint='',pointers=[],reserveHint,id='',className='',strs,args}={}){
+  function stepper({label='',description='',value=0,min=0,max=null,step=1,action='step',key='',variant='row',changed=false,draft=false,tone='',hint='',pointers=[],reserveHint,id='',className='',disabled=false,reason='',error='',loading=false,pressed=false,focus=false,status='',hintHtml='',strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{};
-    const n=Number(value)||0,hero=variant==='hero',lid=id||fieldId('st-stepper'),hid=lid+'-hint',d=Math.abs(Number(step)||1);
-    const floorGray=n<=min,ceilGray=max!=null&&n>=max;
+    const n=Number(value)||0,hero=variant!=='row',lid=id||fieldId('st-stepper'),hid=lid+'-hint',d=Math.abs(Number(step)||1);
+    variant=variant==='hero'?'count':variant;
+    const floorGray=disabled||loading||n<=min,ceilGray=disabled||loading||(max!=null&&n>=max);
     // draft: the value carries an unsaved staged addition (green, the number is the receipt); it wins over changed.
     const isDraft=draft||tone==='draft',isChanged=!isDraft&&(changed||tone==='changed');
-    const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}" aria-describedby="${esc(hid)}"${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
+    const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}" aria-describedby="${esc(hid)}"${pressed&&dir>0?' data-preview="pressed"':focus&&dir>0?' data-preview="focus"':''}${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
     const copy=`<span class="st-stepper-copy"><span class="st-stepper-label" id="${esc(lid)}">${tx(label,o,'label')}</span>${description||has(o,'description')?`<small class="st-stepper-description">${tx(description,o,'description')}</small>`:''}</span>`;
     const vargs=a.value||(s.value?{n:String(n)}:null);
-    const val=`<span class="st-stepper-value" role="spinbutton" tabindex="0" aria-labelledby="${esc(lid)}" aria-describedby="${esc(hid)}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${esc(n)}</span>`;
-    const canPoint=hero||min>0||pointers.length>0;
-    const reserve=reserveHint!=null?(reserveHint?(canPoint?'action':'text'):''):(canPoint?'action':max!=null?'text':'');
-    const hl=hintLine('st-stepper-hint',{id:hid,text:hint,o,reserve,actions:pointers,fieldKey:key});
-    return `<div class="st-stepper ${esc(className)}" data-ds="Stepper" data-variant="${hero?'hero':'row'}" data-field="${esc(key)}" role="group" aria-labelledby="${esc(lid)}"${n===0?' data-zero=""':''}${isChanged?' data-changed=""':''}${isDraft?' data-draft=""':''}${max!=null&&max>=1000?' data-wide=""':''}>${copy}<span class="st-stepper-keys">${key1(-1,floorGray)}${val}${key1(1,ceilGray)}</span>${hl}</div>`;
+    const val=`<span class="st-stepper-value" role="spinbutton" tabindex="0" data-st-spin${disabled||loading?' aria-disabled="true"':''}${error?' aria-invalid="true"':''} aria-labelledby="${esc(lid)}" aria-describedby="${esc(hid)}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${esc(n)}</span>`;
+    const canPoint=pointers.length>0;
+    const reserve=reserveHint!=null?(reserveHint?(canPoint?'action':'text'):''):'';
+    const messages=[hint||has(o,'hint')?tx(hint,o,'hint'):'',error?esc(error):'',disabled?esc(reason||'This record cannot be edited.'):'',loading?tx('Saving…',{strs:{status:'ds.stepper.saving'}},'status'):'',isDraft?tx(status||'Unsaved',{strs:{status:s.status||(!status?'ds.stepper.unsaved':undefined)},args:{status:a.status}},'status'):isChanged?tx(status||'Corrected',{strs:{status:s.status||(!status?'ds.stepper.corrected':undefined)},args:{status:a.status}},'status'):''].filter(Boolean);
+    let hl=hintLine('st-stepper-hint',{id:hid,reserve,fieldKey:key});
+    hl=hl.replace(/>.*<\/p>$/,`>${hintHtml||messages.join('<span aria-hidden="true"> · </span>')}${textActions(pointers,key)}</p>`);
+    return `<div class="st-stepper ${esc(className)}" data-ds="Stepper" data-variant="${esc(variant)}" data-field="${esc(key)}"${loading?' aria-busy="true"':''}${error?' data-error="true"':''} role="group" aria-labelledby="${esc(lid)}"${n===0?' data-zero=""':''}${isChanged?' data-changed=""':''}${isDraft?' data-draft=""':''}${max!=null&&max>=1000?' data-wide=""':''}>${copy}<span class="st-stepper-keys">${key1(-1,floorGray)}${val}${key1(1,ceilGray)}</span>${hl}</div>`;
   }
+  if(typeof document!=='undefined')document.addEventListener('keydown',e=>{
+    const spin=e.target.closest('[data-st-spin]');if(!spin||!['ArrowUp','ArrowDown'].includes(e.key))return;
+    e.preventDefault();
+    const group=spin.closest('.st-stepper'),key=group.dataset.field,variant=group.dataset.variant,label=group.querySelector('.st-stepper-label').textContent;
+    const ancestors=[];for(let node=group.parentElement;node;node=node.parentElement)ancestors.push(node);
+    group.querySelectorAll('.st-stepper-key')[e.key==='ArrowDown'?0:1].click();
+    // Legacy hosts replace their sheet on each delta. Keep repeated arrow presses on the value.
+    const scope=ancestors.find(node=>node.isConnected);
+    const replacement=spin.isConnected?spin:[...(scope?.querySelectorAll('.st-stepper')||[])].find(node=>!node.closest('[inert]')&&node.dataset.field===key&&node.dataset.variant===variant&&node.querySelector('.st-stepper-label').textContent===label)?.querySelector('[data-st-spin]');
+    replacement?.focus({preventScroll:true});
+  });
   /* The box a measured or typed value sits in; shared by Measure (a button) and the Numpad readout (static).
      live: the value announces as it is typed (concise: the value only, never the label). */
   function valueBox(tag,{value='',unit='',unitGap=true,placeholder='—',active=false,live=false,attrs='',vid='',uid=''},o){

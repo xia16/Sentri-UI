@@ -1,200 +1,56 @@
 {
-  "status": "in-design",
-  "judged": "2026-10-09",
-  "commit": "3e3f835",
+  "status": "agent-checked",
+  "round": 2,
+  "judged": "2026-10-10",
+  "commit": "871f471",
   "model": "claude-opus-5-5",
-  "scores": {
-    "clarity": 8,
-    "budget": 7,
-    "hierarchy": 8,
-    "spacing": 6,
-    "broken": 6
-  },
-  "lowest": 6,
+  "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+  "lowest": 8,
   "checklist": [
-    {
-      "line": 1,
-      "pass": true,
-      "why": "Counting animals; Measure named for measured values"
-    },
-    {
-      "line": 2,
-      "pass": true,
-      "why": "The don'ts name Measure and forbid typing a count"
-    },
-    {
-      "line": 3,
-      "pass": true,
-      "why": "Label, description, keys, value and status line named"
-    },
-    {
-      "line": 4,
-      "pass": false,
-      "why": "The DS row and hero faces are used by no screen; screens use the TaskStepper faces (row, well, count)"
-    },
-    {
-      "line": 5,
-      "pass": true,
-      "why": "Default, empty, pressed, floor-gray, focus, corrected and draft rendered"
-    },
-    {
-      "line": 6,
-      "pass": false,
-      "why": "Keys 46 wide (DS), 44 wide (TaskStepper row), 44x44 in the farrowing forks; pointer text actions 44 tall"
-    },
-    {
-      "line": 7,
-      "pass": false,
-      "why": "No cap on stacked steppers per sheet"
-    },
-    {
-      "line": 8,
-      "pass": false,
-      "why": "Draft (green) and corrected (amber) differ by colour only"
-    },
-    {
-      "line": 9,
-      "pass": true,
-      "why": "Label of 14 characters or fewer stated"
-    },
-    {
-      "line": 10,
-      "pass": true,
-      "why": "spinbutton, aria-valuenow/min/max, status region, arrow keys"
-    },
-    {
-      "line": 11,
-      "pass": true,
-      "why": "Tokens throughout; only 1-3px borders and offsets are raw"
-    },
-    {
-      "line": 12,
-      "pass": true,
-      "why": "Not a text field; no typed counts"
-    },
-    {
-      "line": 13,
-      "pass": true,
-      "why": "Not an overlay"
-    },
-    {
-      "line": 14,
-      "pass": true,
-      "why": "Candidate status and ADR link; TaskStepper links back"
-    },
-    {
-      "line": 15,
-      "pass": true,
-      "why": "375 render of every state, no overflow"
-    }
+    { "line": 1, "pass": true, "why": "Counts animals; Measure and Numpad named as siblings" },
+    { "line": 2, "pass": true, "why": "When / when not present; Measure, PickerField, Numpad exist" },
+    { "line": 3, "pass": true, "why": "Label, description, keys, spinbutton, status line, pointers named and shown" },
+    { "line": 4, "pass": true, "why": "Row, count, well each have a use line and usedBy screens in the atlas tab" },
+    { "line": 5, "pass": true, "why": "All 12 states render in each variant tab and are captioned in the Overview" },
+    { "line": 6, "pass": true, "why": "Keys 48x54 (row), 54x78 (count), 48x48 (well) on death, edit, count, foster, reconcile at 390x844" },
+    { "line": 7, "pass": true, "why": "Seven row steppers per drawer, one count or well per sheet" },
+    { "line": 8, "pass": true, "why": "Draft says +1 unsaved, corrected says Corrected; error, floor, ceiling, disabled carry text" },
+    { "line": 9, "pass": true, "why": "Long Chinese label wraps in full in every variant tab" },
+    { "line": 10, "pass": true, "why": "Group, spinbutton with valuenow/min/max, arrow keys, focus ring" },
+    { "line": 11, "pass": true, "why": "Tokens throughout; only 1px borders raw" },
+    { "line": 12, "pass": true, "why": "Not a text field" },
+    { "line": 13, "pass": true, "why": "Not an overlay" },
+    { "line": 14, "pass": true, "why": "Related links and classification; TaskStepper retired and points here" },
+    { "line": 15, "pass": true, "why": "Atlas Row/Count/Well: 12 of 12 cells render; atlas console clean" }
   ],
   "classification": "component",
   "variants": [
-    {
-      "name": "row (DS face, filled ink +)",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {
-        "clarity": 8,
-        "budget": 6,
-        "hierarchy": 8,
-        "spacing": 5,
-        "broken": 5
-      },
-      "findings": [
-        "No screen uses it",
-        "The reserved 44px hint line leaves uneven gaps under the first rows of a stack"
-      ]
-    },
-    {
-      "name": "hero (DS face)",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {
-        "clarity": 8,
-        "budget": 8,
-        "hierarchy": 8,
-        "spacing": 8,
-        "broken": 7
-      },
-      "findings": [
-        "No screen uses it; farrowing.count hand-rolls .hero-stepper"
-      ]
-    },
-    {
-      "name": "TaskStepper row face",
-      "usedBy": [
-        "piglet-processing.counts",
-        "piglet-processing.record-death",
-        "piglet-processing.adjust-count"
-      ],
-      "status": "in-design",
-      "scores": {
-        "clarity": 8,
-        "budget": 8,
-        "hierarchy": 8,
-        "spacing": 8,
-        "broken": 6
-      },
-      "findings": [
-        "Keys are 44px wide, below the 48 floor"
-      ]
-    },
-    {
-      "name": "TaskStepper well/count faces",
-      "usedBy": [
-        "piglet-processing.move-piglets",
-        "piglet-processing.set-count"
-      ],
-      "status": "in-design",
-      "scores": {
-        "clarity": 8,
-        "budget": 8,
-        "hierarchy": 8,
-        "spacing": 8,
-        "broken": 7
-      },
-      "findings": [
-        "The count face colours + green, which the Stepper README forbids until the owner decides"
-      ]
-    }
+    { "name": "row", "usedBy": ["farrowing.death", "farrowing.edit", "piglet-processing.counts", "piglet-processing.record-death", "piglet-processing.adjust-count"], "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": ["Focus cell still rings both keys"] },
+    { "name": "count", "usedBy": ["farrowing.count", "piglet-processing.set-count"], "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": [] },
+    { "name": "well", "usedBy": ["fostering.piglets", "piglet-processing.move-piglets", "farrowing foster (Foster piglets)", "farrowing reconcile (Reconcile piglet count)"], "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": ["usedBy omits the farrowing foster and reconcile sheets that render it; fostering.piglets has no prototype URL", "Reconcile warning says 'reported count' but nothing on screen is labelled reported"] }
   ],
   "findings": [
-    {
-      "severity": "high",
-      "text": "Key widths are below the glove floor: 46px (DS face), 44px (TaskStepper row face), 44x44 (farrowing .row-stepper forks). Pointer text actions are 44px tall.",
-      "fix": "Set the key face to 48px (control-height) in every face, and text actions to min-height 48."
-    },
-    {
-      "severity": "medium",
-      "text": "Farrowing still hand-rolls three look-alikes (.row-stepper on death and edit, .hero-stepper on count, .feature-stepper on foster and reconcile) instead of SentriTask.stepper.",
-      "fix": "Swap them for the SentriTask.stepper faces row, count and well, and delete the forks."
-    },
-    {
-      "severity": "medium",
-      "text": "No screen uses the DS faces (filled ink +); task pages use other faces. Two looks for one job, with no stated rule.",
-      "fix": "List the faces (row, well, count) as this card's variants, and retire the filled-ink face or name a screen that needs it."
-    },
-    {
-      "severity": "medium",
-      "text": "Draft (green value) and corrected (amber value) are colour-only.",
-      "fix": "Add a word in the status line (\"+1 unsaved\", \"corrected\") alongside the colour."
-    },
-    {
-      "severity": "low",
-      "text": "The reserved 44px hint line opens uneven gaps in a stack where only some rows can show pointers.",
-      "fix": "Reserve per sheet, not per row: in a stack, rows without pointers take reserveHint:false."
-    }
+    { "severity": "low", "text": "Reconcile warning title says 'The reported count will replace 9', but the well is labelled 'Count the piglets in this litter'; the word 'reported' no longer names anything on screen.", "fix": "Title the warning 'Your count will replace 9'." },
+    { "severity": "low", "text": "Focus state still rings both keys (Decrease by forced outline, Increase by real focus), and Pressed + reads like the grey floor/ceiling key in the Overview.", "fix": "Ring one key in Focus; give Pressed a fill distinct from aria-disabled." },
+    { "severity": "low", "text": "Overview clips the focus ring of the Increase key at the column's right edge.", "fix": "Give the Overview column 4px inline padding (or overflow: visible)." },
+    { "severity": "low", "text": "Well usedBy lists fostering.piglets (no prototype URL) and omits the two farrowing sheets that actually render the well.", "fix": "Add the farrowing foster and reconcile screens to atlas screens and to usedBy." }
   ],
-  "proposals": [
-    {
-      "kind": "merge",
-      "name": "TaskStepper faces into Stepper variants",
-      "why": "Same job, different look = variant; one implementation, with the face as the variant",
-      "seenIn": [
-        "piglet-processing.counts",
-        "farrowing.count"
-      ]
-    }
-  ]
+  "previous": {
+    "round": 1, "commit": "67fbfe2", "lowest": 5,
+    "findings": [
+      { "text": "Atlas variant tabs blank except Default (TypeError)", "fixed": true, "evidence": "Row, Count, Well each render 12 of 12 cells from data-args; atlas console clean" },
+      { "text": "Overview: 36 unlabelled steppers", "fixed": true, "evidence": "Variant heading and state caption above each example" },
+      { "text": "Variant tabs said No screen uses this yet", "fixed": true, "evidence": "Row 5, Count 2, Well 2 screens under Used by" },
+      { "text": "Reconcile says the new count three times", "fixed": true, "evidence": "Reported tile gone; System count 9 tile, well 11, warning '2 piglets will be added' - reported vs system and the difference are all still visible, so nothing the farmer needs to reconcile is lost" },
+      { "text": "Focus rings both keys; Pressed looks like disabled", "fixed": false, "evidence": "Unchanged in Overview and variant tabs" },
+      { "text": "Well value sans on foster, mono on reconcile", "fixed": true, "evidence": "Both IBM Plex Mono 28px" }
+    ]
+  },
+  "proposals": []
 }

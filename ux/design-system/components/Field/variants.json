@@ -1,0 +1,55 @@
+[
+  {
+    "id": "text",
+    "name": "Text",
+    "use": "use for identity and required short text",
+    "notUse": "not for choices — use PickerField",
+    "states": [
+      "Default",
+      "Focus",
+      "Filled",
+      "Error",
+      "Disabled",
+      "Long Chinese label"
+    ],
+    "usedBy": [
+      "inspection.fault-report"
+    ]
+  },
+  {
+    "id": "number",
+    "name": "Number with unit",
+    "use": "use for treatment dose, with the unit in the label",
+    "notUse": "not for animal counts — use Stepper",
+    "states": [
+      "Default",
+      "Focus",
+      "Filled",
+      "Error",
+      "Disabled",
+      "Long Chinese label"
+    ],
+    "usedBy": [
+      "health-record.treatment"
+    ]
+  },
+  {
+    "id": "textarea",
+    "name": "Textarea",
+    "use": "use for a required explanation or a note after Add",
+    "notUse": "not for an unopened optional note — use OptionalRow",
+    "states": [
+      "Default",
+      "Focus",
+      "Filled",
+      "Error",
+      "Disabled",
+      "Long Chinese label"
+    ],
+    "usedBy": [
+      "inspection.pen-note",
+      "inspection.fault-report",
+      "inspection.fault-resolve"
+    ]
+  }
+]

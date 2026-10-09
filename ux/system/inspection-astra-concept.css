@@ -36,8 +36,7 @@
 .scope-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;margin-bottom:17px;color:var(--muted)}.scope-summary strong{color:var(--ink)}
 .action-list{display:flex;flex-direction:column}.action-item{display:flex;align-items:center;gap:12px;min-height:76px;width:100%;padding:13px 0;background:transparent;text-align:left;border-bottom:1px solid var(--line)}.action-item:last-child{border-bottom:0}.action-symbol{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:var(--well)}.action-symbol svg{width:19px;height:19px}.action-item>span:nth-child(2){flex:1;display:flex;flex-direction:column;gap:6px}.action-item strong{font-size:14px;font-weight:600}.action-item small{font-size:11px;color:var(--muted);line-height:1.6}.action-item>svg{width:15px;height:15px;color:var(--muted)}
 .quiet-note{font-size:11px;line-height:1.7;color:var(--muted);margin:14px 0 0}
-.task-action-panel{display:flex;flex-direction:column;gap:12px}.task-action-panel>h4{margin:0;font-size:13px}.task-outcome-list{gap:8px}.batch-membership-card{display:flex;flex-direction:column;gap:3px;margin-bottom:16px;padding:15px 16px}.batch-membership-card>span,.batch-membership-card>small{color:var(--muted);font-size:10px}.batch-membership-card>strong{font-size:16px}
-.field{display:flex;flex-direction:column;gap:9px;font-size:12px;font-weight:600;margin:18px 0 0}.field textarea,.field input,.field select{width:100%;border:1px solid #aeb8a1;border-radius:11px;padding:12px;background:white;color:var(--ink);font-size:14px;min-height:var(--tap-min)}.field textarea{min-height:90px;resize:vertical;line-height:1.6}.field small{color:var(--muted);font-weight:400;line-height:1.6}.field.error input,.field.error textarea{border-color:var(--red)}
+.task-action-panel{display:flex;flex-direction:column;gap:12px}.task-action-panel>h4{margin:0;font-size:13px}.task-outcome-list{gap:8px}.batch-membership-card{display:flex;flex-direction:column;gap:3px;margin-bottom:16px;padding:15px 16px}.batch-membership-card>span,.batch-membership-card>small{color:var(--muted);font-size:10px}.batch-membership-card>strong{font-size:16px}.field small{color:var(--muted);font-weight:400;line-height:1.6}
 .feed-feature{background:#eef1e6;border-radius:15px;padding:18px;margin-bottom:18px}.feed-feature .kicker{font-size:11px;color:var(--muted);margin:0 0 8px}.feed-feature strong{font:600 32px var(--font-mono);letter-spacing:-1px}.feed-feature strong.word{font:600 26px var(--font-sans);letter-spacing:-.8px}.feed-feature p{font-size:11px;color:var(--muted);line-height:1.7;margin:10px 0 0}
 .detail-section{padding:17px 0;border-top:1px solid var(--line)}.detail-section h4{font-size:13px;margin:0 0 13px}.detail-line{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:12px;line-height:1.7;margin:9px 0}.detail-line small{color:var(--muted);display:block;font-size:10px}.detail-line strong{font:500 13px var(--font-mono);white-space:nowrap}.instruction-detail{padding:13px 14px;border-left:3px solid #b29158;background:#fcf7ec;border-radius:0 10px 10px 0;font-size:12px;line-height:1.7;margin:10px 0}.instruction-detail small{display:block;color:var(--muted);font-size:10px;margin-top:6px}.instruction-detail .text-button{display:block;font-size:11px;font-weight:600;margin-top:5px;min-height:44px;padding:0}
 .plan-preview{margin:17px 0 0;background:#f4f6ef;border-radius:12px;padding:13px}.plan-preview>strong{font-size:12px}.plan-preview .detail-line{font-size:11px}.plan-preview .detail-line strong{font-size:12px}.plan-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px}.plan-meta .field{margin-top:16px}.plan-meta select{font-size:12px}
@@ -499,7 +498,6 @@
 .feed-fixed-form{flex:1;min-height:0;gap:10px}
 .feed-adjustment-line{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .feed-adjustment-line .field{flex-direction:row;align-items:center;gap:12px;flex:1}
-.feed-adjustment-line .field input{width:88px;min-width:0}
 .feed-adjustment-line .feed-reset{font-size:11px;min-height:44px;white-space:nowrap}
 .pig-review-card{display:flex;flex-direction:column;flex:1;min-height:66px;overflow:hidden;border:1px solid #dce1d6;border-radius:12px;background:#fff}
 .pig-review-heading,.feed-pigs-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid #e2e6dd;background:#f7f8f4}
@@ -532,7 +530,6 @@
 .feed-control-caption .feed-reset{font:600 11px var(--font-sans);min-height:36px;white-space:nowrap}
 .feed-action-panel [data-feed-edit="percent"]:not([type="range"]){font-weight:600;font-variant-numeric:tabular-nums}
 .feed-action-panel .field{min-width:0}
-.feed-action-panel .field input,.feed-action-panel .field select{min-width:0;width:100%;box-sizing:border-box}
 .feed-main-fields .field>span,.feed-adjustment-heading{display:flex;align-items:center;min-height:28px}
 .feed-adjustment-heading{justify-content:space-between;gap:4px}
 .feed-adjustment-heading .feed-reset{min-height:28px;padding:0 2px;font:600 10px var(--font-sans);color:#526847}
@@ -540,7 +537,6 @@
 .feed-optional-remove{margin-top:16px;min-height:44px}
 .inspection-phone .feed-optional-sheet>.sheet-body{padding:16px 21px 12px}
 .feed-optional-sheet .field{margin-top:0;gap:8px}
-.feed-optional-sheet .field textarea{height:90px;min-height:90px;resize:none;font-family:var(--font-sans)}
 .feed-optional-sheet .feed-optional-remove{margin-top:4px}
 .feed-editor-sheet .feed-pig-rows{container-type:inline-size}
 @container (max-width:285px){
@@ -550,11 +546,9 @@
 .feed-editor-sheet .feed-pig-rows{scrollbar-gutter:stable}
 .feed-fixed-form .field{margin:0;gap:5px;font:11px var(--font-sans)}
 .feed-fixed-form .plan-meta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin:0}
-.feed-fixed-form .field input,.feed-fixed-form .field select{min-height:44px;padding:8px 10px;font:12px var(--font-sans);border-radius:8px}
 .feed-fixed-form .field small,.feed-amount-fields>small{font:10px/1.35 var(--font-sans);color:#68745d}
 .feed-amount-fields{padding:12px}
 .feed-amount-fields input[type="range"]{display:block;width:100%;min-height:36px;margin:4px 0 0;accent-color:#526847}
-.feed-amount-fields .field input{font:600 15px var(--font-sans);font-variant-numeric:tabular-nums}
 .feed-amount-fields input:disabled{opacity:.55}
 .feed-breakdown-link{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;padding:4px 0;background:transparent;font:12px var(--font-sans);color:var(--ink);text-align:left}
 .feed-breakdown-link svg{width:13px;height:13px;color:#68745d}
@@ -694,8 +688,6 @@
 .inspection-phone .bulk-controls.facts-surface{display:flex;flex-direction:column;flex:none;gap:10px;padding:12px;max-height:58%;overflow:auto}
 .bulk-control-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .bulk-controls .field{margin:0;min-width:0;gap:5px;font-size:11px}
-.bulk-controls .field input,.bulk-controls .field select,.bulk-controls .field textarea{box-sizing:border-box;min-width:0;width:100%;min-height:var(--tap-min);padding:8px;font:12px var(--font-sans)}
-.bulk-controls .field textarea{height:64px;resize:none}
 .bulk-controls .quiet-note{margin:0;font-size:10px}
 
 /* Reserve the controls' space, so scrolling rows never pass underneath them. */

@@ -246,27 +246,28 @@ export interface StepperProps {
   key?: string;
   /** Default "step". */
   action?: string;
-  /** row: 60px sheet row (default) · hero: the count sheet's one number. */
-  variant?: 'row' | 'hero';
-  /** A corrected value in Edit, amber. `tone: 'changed'` is accepted as an alias. */
+  /** row: inline record (default) · count: primary screen count · well: foster/reconcile. hero is a compatibility alias for count. */
+  variant?: 'row' | 'count' | 'well' | 'hero';
+  disabled?: boolean; reason?: string; error?: string; loading?: boolean; pressed?: boolean; focus?: boolean; status?: string; hintHtml?: string;
+  /** A corrected value in Edit, amber plus the word Corrected. `tone: 'changed'` is accepted as an alias. */
   changed?: boolean;
-  /** The value carries an unsaved staged addition (dead drawer): green, the number is the receipt. Wins over changed.
+  /** The value carries an unsaved staged addition (dead drawer): green plus a status receipt (pass the actual delta in status). Wins over changed.
    *  `tone: 'draft'` is accepted as an alias. */
   draft?: boolean;
   tone?: 'changed' | 'draft';
-  /** The hint line: ceiling copy, or the hero's receipt. */
+  /** The hint line: ceiling copy, or the count receipt. */
   hint?: string;
   /** Text actions at the floor: `Found dead? Record dead` · `Wrong count? Edit`. */
   pointers?: StepperPointer[];
-  /** Override the reserved hint line (default: 44px where pointers can appear, one line with a max, none otherwise). */
+  /** Reserve once per sheet: true reserves 48px for pointer actions or one text line; default false. */
   reserveHint?: boolean;
   /** Id of the label element; generated when omitted. */
   id?: string;
   className?: string;
   /** value gets args {n} automatically; decrease/increase are the keys' aria-labels (data-str-attr),
    *  each key named by the row label + its own label. */
-  strs?: Strs<'label' | 'description' | 'value' | 'hint' | 'decrease' | 'increase'>;
-  args?: StrArgs<'label' | 'description' | 'value' | 'hint' | 'decrease' | 'increase'>;
+  strs?: Strs<'label' | 'description' | 'value' | 'hint' | 'status' | 'decrease' | 'increase'>;
+  args?: StrArgs<'label' | 'description' | 'value' | 'hint' | 'status' | 'decrease' | 'increase'>;
 }
 
 /** Candidate. A measured value with its unit; the box is
@@ -635,7 +636,7 @@ export interface SentriUI {
   logGroups(entries: LogEntry[], options?: LogDayOptions & { earlier?: string }): LogGroup[];
   log(groups: LogGroup[], options?: { empty?: string; kind?: 'day' | 'categorised'; correctedLabel?: string; className?: string; strs?: Strs<'empty'>; args?: StrArgs<'empty'> }): string;
   categoryFooter(props: CategoryFooterProps): string;
-  field(props: { label?: string; control?: string; className?: string; ds?: string }): string;
+  field(props: { label?: string; control?: string; className?: string; ds?: string; variant?: 'text' | 'number' | 'textarea'; value?: string; unit?: string; hint?: string; error?: string; disabled?: boolean; reason?: string; id?: string; placeholder?: string; labelHidden?: boolean; focus?: boolean }): string;
   pickerField(props: PickerFieldProps): string;
   pickerOptions(props: { options: PickerOption[]; selected?: string | string[]; action?: string; className?: string; variant?: 'single' | 'multi'; loading?: boolean; error?: string }): string;
   pickerBody(props: PickerBodyProps): string;
