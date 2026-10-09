@@ -1,0 +1,45 @@
+{
+  "status": "in-design",
+  "round": 3,
+  "previous": { "round": 2, "commit": "d5aa6fa", "judged": "2026-10-10", "lowest": 7, "scores": { "clarity": 7, "budget": 8, "hierarchy": 8, "spacing": 7, "broken": 7 } },
+  "judged": "2026-10-10",
+  "commit": "0cde753",
+  "model": "claude-opus-5-5",
+  "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 7, "broken": 7 },
+  "lowest": 7,
+  "roundTwoFindings": [
+    { "finding": "Press feedback invisible", "fixed": true, "note": "An unselected chip presses to --handle #dce0d4 (measured on Dock tail); the selected chip keeps paper; the demo presses chip 2." },
+    { "finding": "Hidden check slot offsets labels", "fixed": "partly", "note": "The check is rendered only on the selected chip and unselected labels are centred, but the width is not stable: selecting Iron grows it 82->101px and All shrinks 83->63px, shifting every chip after it. The README claims the width stays the same." },
+    { "finding": "Content rules copied from Segment", "fixed": true, "note": "Chip-specific rules: 1-2 word job names, 12/6 character cap, one count, All first without a count, the dynamic set scrolls." },
+    { "finding": "Demo data incoherent (All 2)", "fixed": "partly", "note": "variants/tags.html drops All's count; the Overview preview on the atlas page still shows All 2 beside Iron 3 / Dock tail 4." }
+  ],
+  "reversals": "None.",
+  "checklist": [
+    { "line": 1, "pass": true, "why": "Purpose plus 'use Segment instead for fixed views and list states'." },
+    { "line": 2, "pass": true, "why": "When/when-not; names Segment, ChoiceList, Button." },
+    { "line": 3, "pass": true, "why": "Scroll track, chip, label, count, check, reason named and shown." },
+    { "line": 4, "pass": true, "why": "One variant (tags), used by Piglet processing's pen list." },
+    { "line": 5, "pass": true, "why": "Pressed visible on unselected chips; the selected chip keeps its face." },
+    { "line": 6, "pass": true, "why": "Chips 48px tall, narrowest 63px at 390; token gap." },
+    { "line": 7, "pass": true, "why": "No cap by design; the dynamic set scrolls." },
+    { "line": 8, "pass": true, "why": "Selected = check + weight + paper face; disabled = dashed outline + reason." },
+    { "line": 9, "pass": true, "why": "Own chip content rules now; the Chinese long label renders without clipping." },
+    { "line": 10, "pass": true, "why": "radiogroup/radio/aria-checked, roving tabindex, arrows/Home/End." },
+    { "line": 11, "pass": true, "why": "Rules use tokens (--handle, --paper, --well, --size-16)." },
+    { "line": 12, "pass": true, "why": "Not a form field." },
+    { "line": 13, "pass": true, "why": "Not an overlay." },
+    { "line": 14, "pass": true, "why": "Links Segment, ChoiceList, IconButton; TaskChips adapter; classified component." },
+    { "line": 15, "pass": true, "why": "Six states at 375; only intentional horizontal scroll." }
+  ],
+  "classification": "component",
+  "variants": [
+    { "name": "tags (single-select job filter with counts)", "usedBy": ["piglet-processing.pen-list", "piglet-processing.job-chip"], "status": "in-design",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 7, "broken": 7 },
+      "findings": ["Selecting a chip changes its width by about 19px (check + gap), so the scroll track reflows under the finger."] }
+  ],
+  "findings": [
+    { "severity": "medium", "text": "Width is not stable on select: the padding that reserves the check stays on the selected chip too, so it grows by the check width (Iron 82->101, All 83->63 at 390), contradicting the README.", "fix": "Give the selected chip the plain padding: .st-filter-chips button[aria-checked=true]{padding-inline:var(--space-row-x)}." },
+    { "severity": "low", "text": "The atlas Overview preview still shows All with a count (All 2 beside Iron 3), against the new 'All has no count' rule; only variants/tags.html was updated.", "fix": "Drop All's count in FilterChips/preview.html as in variants/tags.html." }
+  ],
+  "proposals": []
+}

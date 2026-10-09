@@ -419,8 +419,6 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .button:active:not(:disabled){transform:translateY(1px)}
 .button.danger:not([aria-disabled="true"]){background:var(--red);border-color:var(--red)}
 .icon-button{background:transparent;min-width:var(--tap-min);height:var(--tap-min);display:grid;place-items:center;border-radius:var(--radius-10);position:relative}
-.segment{display:flex;border-radius:var(--radius-10);padding:var(--space-3);margin-top:var(--space-16);border:1px solid transparent}
-.segment button{flex:1;min-height:var(--tap-min);background:transparent;font-size:var(--font-size-12);border-radius:var(--radius-8)}
 .field{display:flex;flex-direction:column;gap:var(--space-9);font-size:var(--font-size-12);font-weight:600;margin:var(--space-18) 0 0}
 .field textarea,.field input,.field select{width:100%;border:1px solid var(--field-border);border-radius:var(--radius-11);padding:var(--space-12);background:var(--paper);color:var(--ink);font-size:var(--font-size-14);min-height:var(--field-height)}
 .field textarea{min-height:var(--size-90);resize:vertical;line-height:1.6}
@@ -559,9 +557,6 @@ body{background:var(--ground);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) .button.secondary{background:var(--paper);border-color:var(--control-border);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) .button.primary:not(:disabled):not([aria-disabled="true"]){background:var(--ink);border-color:var(--ink);color:var(--paper)}
 :is(.farrowing-phone,.inspection-phone) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea){border-color:var(--control-border);border-radius:var(--radius-12)}
-:is(.farrowing-phone,.inspection-phone) :is(.room-tabs,.segment,.scope-tabs,.health-tabs){background:var(--well);border-color:var(--line)}
-:is(.farrowing-phone,.inspection-phone) :is(.room-tabs,.segment,.scope-tabs,.health-tabs) button{font-weight:400;min-height:var(--tap-min)}
-:is(.farrowing-phone,.inspection-phone) :is(.room-tabs,.segment,.scope-tabs,.health-tabs) :is(button[aria-pressed=true],button[aria-selected=true],button.on){font-weight:500;background:var(--paper);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) :is(button,a,input,select,textarea,summary):focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 /* Action semantics remain explicit; destructive controls never inherit the green treatment. */
 :is(.farrowing-phone,.inspection-phone) .button:is(.danger,.task-end-confirm):not(:disabled):not([aria-disabled="true"]){background:var(--red);border-color:var(--red);color:var(--paper)}
@@ -1032,6 +1027,28 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-choice-row.st-choice-row:focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
 .st-picker-trigger:focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 .st-choice-inline-clear{min-width:var(--tap-min)}
+/* Segment and FilterChips: independent of phone/prototype scopes. */
+.st-selection{min-width:0;flex:none}
+.tk-lens-bar>.st-selection,.room-lensbar>.st-selection,.inspect-controls>.st-selection{flex:1}
+.st-segment{display:flex;gap:var(--space-3);padding:var(--space-3);border:1px solid var(--line);border-radius:var(--radius-segment);background:var(--well)}
+.st-segment button,.st-filter-chips button{box-sizing:border-box;min-width:var(--tap-min);min-height:var(--tap-min);border:0;border-radius:var(--radius-8);padding:var(--space-4) var(--space-6);background:transparent;color:var(--ink);font:400 var(--type-row-title-size)/1.4 var(--font-sans);display:flex;align-items:center;justify-content:center;gap:var(--space-3);cursor:pointer}
+.st-segment button{flex:1;min-width:var(--tap-min);flex-wrap:wrap}
+.st-selection-label{overflow-wrap:anywhere;min-width:0}
+.st-selection-count{font:500 var(--type-meta-size)/1.4 var(--font-mono);color:var(--muted)}
+.st-segment button[aria-pressed=true]{background:var(--paper);font-weight:500;box-shadow:inset 0 calc(-1 * var(--space-3)) var(--ink)}
+.st-segment[data-variant=two-line-lens] button{flex-direction:column}
+.st-segment button:not([aria-pressed=true]):not(:disabled):active,.st-filter-chips button:not([aria-checked=true]):not(:disabled):active,[data-state=Pressed].st-segment button:nth-child(2),[data-state=Pressed].st-filter-chips button:nth-child(2){background:var(--handle)}
+.st-segment button:focus-visible,.st-filter-chips button:focus-visible,[data-state=Focus] button:first-child{outline:var(--space-3) solid var(--focus);outline-offset:var(--space-2)}
+.st-segment button:disabled,.st-filter-chips button:disabled{cursor:default;border:1px dashed var(--control-border)}
+.st-selection-reason{margin:var(--space-6) 0;color:var(--muted);font:400 var(--type-description-size)/1.4 var(--font-sans)}
+.st-filter-chips{min-width:0;padding:var(--space-6) 0}
+.st-filter-chips-track{display:flex;gap:var(--space-key-gap);overflow-x:auto;padding:var(--space-4) var(--space-gutter);scrollbar-width:thin}
+.st-filter-chips button{flex:none;max-width:100%;padding:var(--space-6) calc(var(--space-row-x) + (var(--size-16) + var(--space-3)) / 2);border:1px solid var(--line);border-radius:var(--radius-control);background:var(--well)}
+.st-filter-chips button[aria-checked=true]{background:var(--paper);font-weight:500}
+.st-chip-check{display:flex;width:var(--size-16);flex:none}
+.st-chip-check svg{width:var(--size-16);height:var(--size-16)}
+
+.st-chip-check:empty{box-sizing:border-box;width:var(--space-8);height:var(--space-12);border-right:var(--space-2) solid currentColor;border-bottom:var(--space-2) solid currentColor;transform:rotate(45deg);margin-right:var(--space-6)}
 
 </style>
 <style>/* ../../../design-system/components/task-skeleton.css */
@@ -1128,15 +1145,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 /* ---- TaskLens: tabs with the count under the label, and the filter ---- */
 .tk-lens { position: sticky; top: 0; z-index: 2; padding: 6px 0 9px; border-bottom: 1px solid transparent; background: var(--app-background); }
 .tk-lens-bar { display: flex; gap: 7px; margin: 0 var(--space-panel); }
-.tk-lens-tabs { flex: 1; min-width: 0; display: flex; gap: 1px; padding: 3px; background: var(--well); border: 1px solid var(--line); border-radius: var(--radius-segment); }
-.tk-lens-tab { flex: 1; min-width: 0; min-height: var(--tap-min); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-  padding: 4px 6px; border: 0; border-radius: var(--radius-tab); background: transparent; color: var(--muted); font: 400 var(--type-description-size) var(--font-sans); }
-.tk-lens-tab[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px #20271f0d; }
-.tk-lens-count { font: 500 var(--type-meta-size) var(--font-mono); color: var(--muted); }
-.tk-lens-filter { flex: none; display: grid; place-items: center; width: var(--control-height); height: var(--control-height); padding: 0;
-  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink); }
-.tk-lens-filter svg { width: 17px; height: 17px; }
-
 /* ---- TaskGroup: a pen / crate-row card, its header and its rows ---- */
 .tk-list { display: flex; flex-direction: column; gap: var(--space-heading); padding: 1px var(--space-panel) var(--space-gutter); }
 .tk-group { flex-shrink: 0; overflow: clip; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-panel); box-shadow: 0 2px 8px #20291f0a; }
@@ -1555,6 +1563,9 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .sp-proc > .st-heading { margin-bottom: 8px; }
 .sp-proc > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
 .tk-day[data-when="done"] .tk-day-head > strong { color: var(--muted); }
+
+.sp-list-lens{margin:0 var(--space-panel)}
+
 </style>
 </head>
 <body class="tk-stage">
@@ -1801,8 +1812,14 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   }
   function choiceEmpty(text,{strs,args}={}){return `<p class="st-choice-empty" data-ds="ChoiceList" role="status">${tx(text,{strs,args},'text')}</p>`;}
   /* options: [value,label,{strs:{label},args:{label}}?]; label is raw HTML, kept as the span's fallback. */
-  function segment({options=[],active='',action='',className='',ariaLabel=''}={}){
-    return `<div class="st-segment segment ${esc(className)}" data-ds="Segment" role="group"${ariaLabel?` aria-label="${esc(ariaLabel)}"`:''}>${options.map(([v,label,x])=>`<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}">${has(x,'label')?`<span${sa(x.strs.label,x.args&&x.args.label)}>${label}</span>`:label}</button>`).join('')}</div>`;
+  function segment({options=[],active='',action='',className='',ariaLabel='',variant='lens',state='Default',disabled=false,reason=''}={}){
+    if(!options.length)return '';
+    return `<div class="st-selection"><div class="st-segment ${esc(className)}" data-ds="Segment" data-variant="${esc(variant)}" data-state="${esc(state)}" role="group" aria-label="${esc(ariaLabel)}">${options.map(([v,label,x={}])=>{const blocked=disabled||x.disabled;return `<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}"${x.ariaLabel?` aria-label="${esc(x.ariaLabel)}"`:""}${blocked?' disabled':''}><span class="st-selection-label"${has(x,'label')?sa(x.strs.label,x.args&&x.args.label):''}>${label}</span>${x.count!=null?`<span class="st-selection-count">${x.count}</span>`:''}</button>`;}).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
+  }
+  function filterChips({items=[],action='chip',key='chips',label='',state='Default',reason=''}={}){
+    if(!items.length)return '';
+    const on=(items.find(i=>i.checked)||items[0]).value;
+    return `<div class="st-filter-chips" data-ds="FilterChips" data-field="${esc(key)}" data-state="${esc(state)}"><div class="st-filter-chips-track" role="radiogroup" aria-label="${esc(label)}">${items.map(i=>`<button type="button" role="radio" aria-checked="${i.value===on}" tabindex="${i.value===on?0:-1}" data-action="${esc(action)}" data-value="${esc(i.value)}"${i.aria?` aria-label="${esc(i.aria)}"`:""}${i.disabled?' disabled':''}>${i.value===on?`<span class="st-chip-check" aria-hidden="true">${globalThis.SentriIcons?globalThis.SentriIcons.icon('check'):''}</span>`:''}<span class="st-selection-label">${i.label}</span>${i.count!=null?`<span class="st-selection-count">${i.count}</span>`:''}</button>`).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
   }
   function iconButton({action='',icon='',label='',className='',value='',badge='',disabled=false,strs,args}={}){
     const o={strs,args},hasBadge=(badge!==''&&badge!=null)||has(o,'badge');
@@ -2289,7 +2306,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     const key=e=>{
       const r=e.target.closest&&e.target.closest('[role="radio"]');if(!r)return;
       const group=r.closest('[role="radiogroup"]');if(!group)return;
-      const radios=Array.from(group.querySelectorAll('[role="radio"]')).filter(x=>x.getAttribute('aria-disabled')!=='true');
+      const radios=Array.from(group.querySelectorAll('[role="radio"]')).filter(x=>x.getAttribute('aria-disabled')!=='true'&&!x.disabled);
       const cur=radios.find(x=>x.getAttribute('aria-checked')==='true')||r;
       const next=radioNext(radios.map(x=>x.getAttribute('data-value')),r.getAttribute('data-value')||cur.getAttribute('data-value'),e.key);
       if(next==null)return;
@@ -2393,7 +2410,15 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     const scrimHtml=sc===false?'':scrim(Object.assign({layer},sc));
     return `${scrimHtml}<section class="sheet${cls}" ${common} role="dialog" aria-modal="true" data-st-context="drawer" data-size="${sz}"${sizing==='full'?' data-sizing="full"':' data-sizing="content"'}><div class="grab" aria-hidden="true"></div>${main}</section>`;
   }
-  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  if(typeof document!=='undefined')document.addEventListener('keydown',e=>{
+    const b=e.target.closest?.('.st-segment button,.st-filter-chips button');if(!b||b.disabled)return;
+    const host=b.closest('.spec,.tk-phone,.phone')||document;
+    const row=b.parentElement, buttons=Array.from(row.querySelectorAll('button')).filter(x=>!x.disabled);
+    const next=radioNext(buttons.map(x=>x.dataset.value),b.dataset.value,e.key);if(next==null)return;
+    e.preventDefault();e.stopImmediatePropagation();const target=buttons.find(x=>x.dataset.value===next);target.click();
+    const fresh=Array.from(host.querySelectorAll('[data-ds="Segment"] button,[data-ds="FilterChips"] button')).find(x=>x.dataset.action===b.dataset.action&&x.dataset.value===next);fresh?.focus();fresh?.scrollIntoView({block:'nearest',inline:'nearest'});
+  },true);
+  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
@@ -2485,9 +2510,9 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 
   /* ---- TaskLens: tabs, the count under each label; the filter at the end ---- */
   function lens({ tabs = [], action = 'lens', filter } = {}) {
-    const b = tabs.map(t => `<button type="button" class="tk-lens-tab" aria-pressed="${t.pressed ? 'true' : 'false'}"${A(action, t.value)}${L(t.label)}><span>${T(t.text)}</span><span class="tk-lens-count">${T(t.count)}</span></button>`).join('');
-    const f = filter ? `<button type="button" class="tk-lens-filter"${A(filter.action || 'filter', filter.value)}${L(filter.label)}>${glyph('filter')}</button>` : '';
-    return `<div class="tk-lens" data-ds="TaskLens"><div class="tk-lens-bar"><div class="tk-lens-tabs" role="group"${L(tabs.label)}>${b}</div>${f}</div></div>`;
+    const control=window.SentriUI.segment({variant:'two-line-lens',options:tabs.map(t=>[t.value,T(t.text),{count:T(t.count),ariaLabel:t.label}]),active:tabs.find(t=>t.pressed)?.value,action,ariaLabel:tabs.label||'List state'});
+    const f=filter?window.SentriUI.iconButton({action:filter.action||'filter',value:filter.value,icon:glyph('filter'),label:filter.label||'Filter list'}):'';
+    return `<div class="tk-lens"><div class="tk-lens-bar">${control}${f}</div></div>`;
   }
 
   /* ---- TaskGroup: a pen / crate-row card ---- */
@@ -2743,9 +2768,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
      items: [{ value, label, count, checked, aria }] (label and count are text slots; count is drawn in mono inside the
      chip). action: the one data-action for every chip. key: the group's data-field (radioBind's field). ---- */
   function chips({ items = [], action = 'chip', key = 'chips', label } = {}) {
-    const on = items.some(i => i.checked) ? items.find(i => i.checked).value : (items[0] && items[0].value);
-    const b = items.map(i => `<button type="button" class="tk-chips-chip" role="radio" aria-checked="${i.value === on ? 'true' : 'false'}" tabindex="${i.value === on ? 0 : -1}"${A(action, i.value)}${L(i.aria)}><span class="tk-chips-label">${T(i.label)}</span>${i.count != null && i.count !== '' ? `<span class="tk-chips-count">${T(i.count)}</span>` : ''}</button>`).join('');
-    return `<div class="tk-chips" data-ds="TaskChips" data-field="${esc(key)}"><div class="tk-chips-track" role="radiogroup"${L(label)}>${b}</div></div>`;
+    return window.SentriUI.filterChips({items:items.map(i=>({...i,label:T(i.label),count:i.count==null?null:T(i.count)})),action,key,label});
   }
 
   const api = { T, statusbar, phone, screen, header, latest, summary, progress, lens, chips, list, group, row, door, doors, radios, warning, section, receipt, day, holdBind, table, metrics, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
@@ -3380,7 +3403,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 
   /* What is open on the phone (not kept: a reload starts on the pen list) */
   function fresh(keep) {
-    return { chip: '', pen: null, tab: 'proc', draft: {}, over: null, adj: null, death: null, move: null, count: null, weight: null, give: null,
+    return { lens: 'todo', chip: '', pen: null, tab: 'proc', draft: {}, over: null, adj: null, death: null, move: null, count: null, weight: null, give: null,
       end: null, flash: null, open: {}, keepOpen: {}, justRec: [], demoOpen: keep ? keep.demoOpen : false };
   }
   var V = fresh();
@@ -3441,8 +3464,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     if (P.s.ended) return null;
     if (sts.indexOf('late') >= 0) return chipOf('late', 'chip.late');
     if (p.sowDied) return chipOf('died', 'chip.sow');
-    if (sts.length) return chipOf('awaiting', 'st.todo');
-    return P.coming(p).length ? null : chipOf('done', 'chips.done');
+    /* the lens above already says To do / Done; the row keeps only what differs (Late, Sow died) */
+    return null;
   }
   /* The pen's card, exactly farrowing's room list: the pen header (`A03 · 1 sow ›`, TaskGroup) and the sow's row under it
      (TaskRow): mono sow ID with its one chip; the headline is what is due (or, with nothing due, farrowing's figure:
@@ -3465,19 +3488,19 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     return K.group({ title: S('code', { c: p.code }), meta: S('sows.one'), door: { action: 'pen', value: p.code, label: T('pen.aria', { pen: p.code }) }, rows: row });
   }
   function isDone(p) { return P.todo(p).length === 0; }
-  /* the chips: All · one per job that pens need today (with how many) · Done. A chip only filters the pens. */
+  /* The lens selects To do / Done; tags narrow jobs within To do. */
   function chipCounts() {
-    var all = P.pens();
+    var all = P.pens().filter(function(p){return !isDone(p);});
     if (P.s.ended) return [];
     return P.steps().map(function (k) { return { k: k, n: all.filter(function (p) { return needsToday(p, k); }).length }; })
       .filter(function (c) { return c.n > 0 || c.k === V.chip; });
   }
   function chipsRow() {
     var all = P.pens(), done = all.filter(isDone).length;
-    var items = [{ value: '', label: S('chips.all'), count: S('fig', { v: all.length }), checked: V.chip === '', aria: T('chips.all') }]
+    var items = [{ value: '', label: S('chips.all'), checked: V.chip === '', aria: T('chips.all') }]
       .concat(chipCounts().map(function (c) { return { value: c.k, label: S(chipKey(c.k)), count: S('fig', { v: c.n }), checked: V.chip === c.k, aria: T('chip.aria', { name: chipName(c.k), n: c.n }) }; }))
-      .concat([{ value: 'done', label: S('chips.done'), count: S('fig', { v: done }), checked: V.chip === 'done', aria: T('chips.done') }]);
-    return K.chips({ items: items, action: 'chip', key: 'chips', label: T('chips.label') });
+      ;
+    return '<div class="sp-list-lens">'+UI.segment({variant:'two-line-lens',options:[['todo',K.T(S('lens.todo')),{count:all.length-done}],['done',K.T(S('lens.done'))]],active:V.lens,action:'list-lens',ariaLabel:T('chips.label')})+'</div>' + (V.lens==='todo'?K.chips({ items: items, action: 'chip', key: 'chips', label: T('chips.label') }):'');
   }
   /* the task's overall checker: piglets the records cannot account for (set counts lower than the record), batch level only */
   function batchLine() { var u = P.s.unaccounted || 0; return u > 0 ? S('batch.unacc', { b: P.BATCH.name, n: u }) : S('batch', { b: P.BATCH.name }); }
@@ -3507,9 +3530,9 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
         support: ended ? S('ended.at', { t: hm(ended.at), who: ended.who }) : S('sum.end'), action: 'end', label: T('end.title') }
     });
     body += chipsRow();
-    var shown = !V.chip ? all : V.chip === 'done' ? done : all.filter(function (p) { return needsToday(p, V.chip); });
+    var shown = V.lens === 'done' ? done : todo.filter(function (p) { return !V.chip || needsToday(p, V.chip); });
     body += shown.length ? K.list(shown.map(penCard))
-      : '<p class="sp-empty">' + H(V.chip === 'done' ? 'empty.done' : 'chip.none') + '</p>';
+      : '<p class="sp-empty">' + H(V.lens === 'done' ? 'empty.done' : 'chip.none') + '</p>';
     return K.screen({ inert: inert, label: T('task'), header: K.header({ title: S('task'), back: null }), body: body });
   }
 
@@ -3864,7 +3887,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     phone.querySelectorAll('.tk-scroll, .sheet-body, .sheet-body').forEach(function (el) {
       var host = el.closest('[data-view]'); keep[(host ? host.getAttribute('data-view') : 'list') + el.className] = el.scrollTop;
     });
-    var chipsX = phone.querySelector('.tk-chips-track'), cx = chipsX ? chipsX.scrollLeft : 0;
+    var chipsX = phone.querySelector('.st-filter-chips-track'), cx = chipsX ? chipsX.scrollLeft : 0;
     var focusSel = null, a = document.activeElement, caret = null;
     if (a && phone.contains(a)) {
       if (a.id) focusSel = '#' + CSS.escape(a.id);
@@ -3882,7 +3905,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       var host = el.closest('[data-view]'), k = (host ? host.getAttribute('data-view') : 'list') + el.className;
       if (keep[k] != null) el.scrollTop = keep[k];
     });
-    var ct = phone.querySelector('.tk-chips-track'); if (ct) ct.scrollLeft = cx;
+    var ct = phone.querySelector('.st-filter-chips-track'); if (ct) ct.scrollLeft = cx;
     if (V.pageTop) { phone.querySelectorAll('.sheet-body, .sheet-body').forEach(function (x) { x.scrollTop = 0; }); V.pageTop = false; }
     if (V.toTop) { var sc = phone.querySelector('.tk-scroll'); if (sc) sc.scrollTop = 0; V.toTop = false; }
     if (focusSel) {
@@ -3948,6 +3971,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function act(a, v, el) {
     var p = V.pen ? pen() : null;
     switch (a) {
+      case 'list-lens': V.lens = v; break;
       case 'chip': if (v === V.chip) return; V.chip = v; break;
       case 'pen': V.pen = v; V.flash = null; V.open = {}; V.draft = {}; V.tab = 'proc'; break;
       case 'dismiss': case 'back': closeTop(); break;
@@ -4087,7 +4111,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   (function () {
     var q = new URLSearchParams(location.search);
     var s = q.get('scheme'); if (s && P.SCHEMES.indexOf(s) >= 0 && s !== scheme()) P.setScheme(s);
-    var c = q.get('chip'); if (c) V.chip = c;
+    var c = q.get('chip'); if (c === 'done') V.lens = 'done'; else if(c) V.chip = c;
     var pn = q.get('pen'); if (pn && P.s.pens[pn]) { V.pen = pn; V.tab = q.get('tab') === 'pig' ? 'pig' : 'proc'; }
   })();
   /* the atlas (?screen=): a bare screen is reached by the taps a worker would make, and the screen the state is in is announced back */
@@ -4099,7 +4123,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function atlasScreen(screens) {
     var b = 'piglet-processing.';
     if (V.end) return b + 'end-task';
-    if (!V.pen) return P.s.ended ? b + 'list-ended' : V.chip === 'done' ? b + 'chip-done' : V.chip ? b + 'job-chip' : scheme() === 'none' ? b + 'list-no-id' : b + 'pen-list';
+    if (!V.pen) return P.s.ended ? b + 'list-ended' : V.lens === 'done' ? b + 'chip-done' : V.chip ? b + 'job-chip' : scheme() === 'none' ? b + 'list-no-id' : b + 'pen-list';
     if (V.sub === 'give') return b + 'give-ids';
     var by = { tagged: 'tagged-list', log: 'pen-log', adjust: 'adjust-count', counts: 'counts', weight: 'weight', more: 'more-actions', death: 'record-death', move: 'move-piglets', count: 'set-count' };
     if (V.over) return by[V.over] ? b + by[V.over] : null;

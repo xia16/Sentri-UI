@@ -3,6 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 require('../design-system/components/bundle.js');
 require('./astra-surfaces.js');
+require('../design-system/components/bundle.js');
 require('./inspection-astra-concept.js');
 const model = globalThis.InspectionStudy;
 

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "lens",
+    "name": "Lens",
+    "use": "Use for a 2-state split in a card or sheet header with no room for a second line.",
+    "notUse": "Not for a task list's main To do / Done states — use Two-line lens; not for dynamic tags — use FilterChips",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Focus",
+      "Long-label"
+    ]
+  },
+  {
+    "id": "two-line-lens",
+    "name": "Two-line lens",
+    "use": "Use for a task list's states (To do / Done, Active / Done / All) with counts beneath labels, beside the filter button if any.",
+    "notUse": "Not for dynamic tags — use FilterChips",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Focus",
+      "Long-label"
+    ]
+  },
+  {
+    "id": "view-switch",
+    "name": "View switch",
+    "use": "Use for 2–3 subjects of one sheet.",
+    "notUse": "Not for dynamic tags — use FilterChips",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Focus",
+      "Long-label"
+    ]
+  },
+  {
+    "id": "facet",
+    "name": "Facet",
+    "use": "Use for one fixed single-choice filter in a filter sheet.",
+    "notUse": "Not for dynamic tags — use FilterChips",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Focus",
+      "Long-label"
+    ]
+  }
+]

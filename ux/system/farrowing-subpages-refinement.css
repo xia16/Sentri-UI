@@ -6,9 +6,6 @@
 /* Room list, pen groups, search, scan, and filter entry points. */
 .farrowing-phone .room-scroll{background:var(--app-background,#f6f7f1)}
 .farrowing-phone .room-controls{background:var(--app-background,#f6f7f1);border-bottom:1px solid transparent}
-.farrowing-phone .room-tabs{border:1px solid var(--line);padding:3px}
-.farrowing-phone .room-tabs button{color:var(--muted);font-weight:400}
-.farrowing-phone .room-tabs button[aria-pressed=true]{color:var(--ink);font-weight:500;background:var(--paper,#fff)}
 .farrowing-phone .room-filter-button,.farrowing-phone .dock-search{border-color:var(--line);background:var(--paper,#fff)}
 .farrowing-phone .room-list{gap:12px;padding-bottom:22px}
 .farrowing-phone .pen-card{border-color:var(--line);border-radius:var(--subpage-radius);box-shadow:0 2px 8px rgba(32,41,31,.04)}
@@ -29,8 +26,6 @@
 .farrowing-phone .home-task-states{font-size:11px;color:var(--muted)}
 .farrowing-phone .home-resume{font-size:11px;color:var(--green)}
 .farrowing-phone .filter-section{border-color:var(--line)}
-.farrowing-phone .due-options button,.farrowing-phone .parity-options button,.farrowing-phone .pen-cell{border-color:var(--line)}
-.farrowing-phone .due-options button[aria-pressed=true],.farrowing-phone .parity-options button[aria-pressed=true],.farrowing-phone .pen-cell.current{background:var(--green-wash,#eaf2e5);border-color:#8ea88a;color:var(--ink)}
 .farrowing-phone .room-search-label input{border-color:#bdc7b6}
 .farrowing-phone .search-result{border-color:var(--line)}
 .farrowing-phone .scanner-demo{background:var(--well);border:1px solid var(--line)}

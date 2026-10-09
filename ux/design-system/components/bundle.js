@@ -238,8 +238,14 @@
   }
   function choiceEmpty(text,{strs,args}={}){return `<p class="st-choice-empty" data-ds="ChoiceList" role="status">${tx(text,{strs,args},'text')}</p>`;}
   /* options: [value,label,{strs:{label},args:{label}}?]; label is raw HTML, kept as the span's fallback. */
-  function segment({options=[],active='',action='',className='',ariaLabel=''}={}){
-    return `<div class="st-segment segment ${esc(className)}" data-ds="Segment" role="group"${ariaLabel?` aria-label="${esc(ariaLabel)}"`:''}>${options.map(([v,label,x])=>`<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}">${has(x,'label')?`<span${sa(x.strs.label,x.args&&x.args.label)}>${label}</span>`:label}</button>`).join('')}</div>`;
+  function segment({options=[],active='',action='',className='',ariaLabel='',variant='lens',state='Default',disabled=false,reason=''}={}){
+    if(!options.length)return '';
+    return `<div class="st-selection"><div class="st-segment ${esc(className)}" data-ds="Segment" data-variant="${esc(variant)}" data-state="${esc(state)}" role="group" aria-label="${esc(ariaLabel)}">${options.map(([v,label,x={}])=>{const blocked=disabled||x.disabled;return `<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}"${x.ariaLabel?` aria-label="${esc(x.ariaLabel)}"`:""}${blocked?' disabled':''}><span class="st-selection-label"${has(x,'label')?sa(x.strs.label,x.args&&x.args.label):''}>${label}</span>${x.count!=null?`<span class="st-selection-count">${x.count}</span>`:''}</button>`;}).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
+  }
+  function filterChips({items=[],action='chip',key='chips',label='',state='Default',reason=''}={}){
+    if(!items.length)return '';
+    const on=(items.find(i=>i.checked)||items[0]).value;
+    return `<div class="st-filter-chips" data-ds="FilterChips" data-field="${esc(key)}" data-state="${esc(state)}"><div class="st-filter-chips-track" role="radiogroup" aria-label="${esc(label)}">${items.map(i=>`<button type="button" role="radio" aria-checked="${i.value===on}" tabindex="${i.value===on?0:-1}" data-action="${esc(action)}" data-value="${esc(i.value)}"${i.aria?` aria-label="${esc(i.aria)}"`:""}${i.disabled?' disabled':''}>${i.value===on?`<span class="st-chip-check" aria-hidden="true">${globalThis.SentriIcons?globalThis.SentriIcons.icon('check'):''}</span>`:''}<span class="st-selection-label">${i.label}</span>${i.count!=null?`<span class="st-selection-count">${i.count}</span>`:''}</button>`).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
   }
   function iconButton({action='',icon='',label='',className='',value='',badge='',disabled=false,strs,args}={}){
     const o={strs,args},hasBadge=(badge!==''&&badge!=null)||has(o,'badge');
@@ -726,7 +732,7 @@
     const key=e=>{
       const r=e.target.closest&&e.target.closest('[role="radio"]');if(!r)return;
       const group=r.closest('[role="radiogroup"]');if(!group)return;
-      const radios=Array.from(group.querySelectorAll('[role="radio"]')).filter(x=>x.getAttribute('aria-disabled')!=='true');
+      const radios=Array.from(group.querySelectorAll('[role="radio"]')).filter(x=>x.getAttribute('aria-disabled')!=='true'&&!x.disabled);
       const cur=radios.find(x=>x.getAttribute('aria-checked')==='true')||r;
       const next=radioNext(radios.map(x=>x.getAttribute('data-value')),r.getAttribute('data-value')||cur.getAttribute('data-value'),e.key);
       if(next==null)return;
@@ -830,7 +836,15 @@
     const scrimHtml=sc===false?'':scrim(Object.assign({layer},sc));
     return `${scrimHtml}<section class="sheet${cls}" ${common} role="dialog" aria-modal="true" data-st-context="drawer" data-size="${sz}"${sizing==='full'?' data-sizing="full"':' data-sizing="content"'}><div class="grab" aria-hidden="true"></div>${main}</section>`;
   }
-  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  if(typeof document!=='undefined')document.addEventListener('keydown',e=>{
+    const b=e.target.closest?.('.st-segment button,.st-filter-chips button');if(!b||b.disabled)return;
+    const host=b.closest('.spec,.tk-phone,.phone')||document;
+    const row=b.parentElement, buttons=Array.from(row.querySelectorAll('button')).filter(x=>!x.disabled);
+    const next=radioNext(buttons.map(x=>x.dataset.value),b.dataset.value,e.key);if(next==null)return;
+    e.preventDefault();e.stopImmediatePropagation();const target=buttons.find(x=>x.dataset.value===next);target.click();
+    const fresh=Array.from(host.querySelectorAll('[data-ds="Segment"] button,[data-ds="FilterChips"] button')).find(x=>x.dataset.action===b.dataset.action&&x.dataset.value===next);fresh?.focus();fresh?.scrollIntoView({block:'nearest',inline:'nearest'});
+  },true);
+  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
