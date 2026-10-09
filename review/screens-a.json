@@ -24,18 +24,6 @@
   "source": "screen-review"
  },
  {
-  "id": "screens-a-5",
-  "target": {
-   "kind": "screen",
-   "id": "workbench.today"
-  },
-  "kind": "broken",
-  "severity": "medium",
-  "title": "Progress label says 'complete' over a 1 of 8 bar",
-  "detail": "Piglet processing reads 'All scheduled items complete · 1 / 8 pens' (work-due adds '4 litters with care due' above it); Breeding reads 'Service sequences complete · 1 / 8 sows'. Fix: name what the bar counts ('Pens done').",
-  "source": "screen-review"
- },
- {
   "id": "screens-a-7",
   "target": {
    "kind": "feature",

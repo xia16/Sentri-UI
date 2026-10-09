@@ -115,9 +115,9 @@
     return30:{context:'First monitoring pass',day:3,days:7,kind:'observation',verb:'sows ready to check',due:{7:4,8:6},state:'round-complete',nextAt:870},
     heat34:{context:'Weaned sows',day:2,days:3,kind:'observation',verb:'sows ready to check',due:{1:8,2:6,3:6},nextAt:870},
     heat35:{context:'Replacement gilts',day:1,days:3,kind:'observation',verb:'sows ready to check',due:{2:4,4:6},state:'round-complete',nextAt:870},
-    service34:{context:'Service sequence',day:3,days:7,label:'Service sequences complete',verb:'sows ready for service',due:{1:2,3:3},state:'waiting',nextAt:840},
+    service34:{context:'Service sequence',day:3,days:7,label:'Sows done',verb:'sows ready for service',due:{1:2,3:3},state:'waiting',nextAt:840},
     farrow28:{context:'Farrowing window',day:2,days:7,label:'Farrowings recorded',verb:'sows due today',kind:'distribution',due:{6:2,7:2,8:0},nextAt:1440},
-    piglet27:{context:'Age-day schedule',day:3,days:7,label:'All scheduled items complete',verb:'litters due',due:{6:2,7:2},state:'waiting',nextAt:1440}
+    piglet27:{context:'Age-day schedule',day:3,days:7,label:'Pens done',verb:'litters due',due:{6:2,7:2},state:'waiting',nextAt:1440}
   };
   function taskModel(t){
     const count=Object.keys(t.counts).length,scope={kind:state.unit?'unit':'overview',label:state.unit?'Unit '+state.unit:'Across '+count+' '+(count===1?'unit':'units'),action:state.unit?'Open unit task':'View task'};
