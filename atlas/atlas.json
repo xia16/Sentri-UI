@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T19:40:36.100Z",
- "commit": "ec7940d",
+ "generated": "2026-10-09T19:50:52.591Z",
+ "commit": "8080842",
  "platforms": [
   {
    "id": "mobile",
@@ -6408,7 +6408,11 @@
            "A pen-total preview (feedPreview) and a Feed breakdown sheet exist in code but are not drawn or opened.",
            "The screen carries too much: mode, percent, slider, chips and a per-pig table all state one decision."
           ]
-         }
+         },
+         "preset": "feed",
+         "steps": [
+          "[data-action=\"feed-edit-pen\"].primary"
+         ]
         },
         {
          "id": "feed-plan.end-date",
@@ -6435,7 +6439,12 @@
           "issues": [
            "The end date is held on the pig as a plain date; when it passes, nothing returns the pig to the curve."
           ]
-         }
+         },
+         "preset": "feed",
+         "steps": [
+          "[data-action=\"feed-edit-pen\"].primary",
+          "[data-action=\"feed-optional-open\"][data-value=\"until\"]"
+         ]
         },
         {
          "id": "feed-plan.pig",
@@ -6491,7 +6500,11 @@
            "Supplier, brand, energy, protein and lysine proposed in ASTRA-FEED-PLAN-FIELDS are not shown.",
            "The Feeding block repeats the one on the pig record."
           ]
-         }
+         },
+         "preset": "feed",
+         "steps": [
+          "[data-action=\"pig-feed\"][data-value=\"000267\"]"
+         ]
         },
         {
          "id": "feed-plan.pen-up",
@@ -18500,42 +18513,6 @@
    "detail": "Before first count, Edit record (both), Lock blocked and End task (active sows): the body clips mid-row, the hint overlaps Litter summary, tiles are cut, and the reason line sits flush at x=0. Fix: put the reason in the footer's status slot, not the scrolling body."
   },
   {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-a-2",
-   "target": {
-    "kind": "screen",
-    "id": "environment.report-issue"
-   },
-   "kind": "broken",
-   "title": "Report issue primary button label is invisible",
-   "detail": "'Save sample issue' computes ink text on ink fill, so the drawer's only commit reads as a blank black block. The form is hand-built (raw form, inputs, button.primary) instead of SentriUI Field and Button. Fix: build it from the DS parts."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-4",
-   "target": {
-    "kind": "screen",
-    "id": "workbench.unit"
-   },
-   "kind": "broken",
-   "title": "Unit hub figures disagree with the Inspection page they open",
-   "detail": "Gestation Unit 7 hub says 'Checked Yesterday, 16:10' and Health 3; tapping it opens Inspection with 'Last check-in 06:40 · G. Hansen' and Health 4. Fix: read both from one source."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-5",
-   "target": {
-    "kind": "screen",
-    "id": "workbench.today"
-   },
-   "kind": "broken",
-   "title": "Progress label says 'complete' over a 1 of 8 bar",
-   "detail": "Piglet processing reads 'All scheduled items complete · 1 / 8 pens' (work-due adds '4 litters with care due' above it); Breeding reads 'Service sequences complete · 1 / 8 sows'. Fix: name what the bar counts ('Pens done')."
-  },
-  {
    "severity": "medium",
    "source": "screen-review",
    "id": "screens-a-7",
@@ -18582,30 +18559,6 @@
    "kind": "design",
    "title": "Fan speed is a thin slider, hard with gloves",
    "detail": "A 0-100 range slider in steps of 5 needs a precise drag; it is not one of the DS fields. Fix: a Stepper (−/+ 5%, 48px keys) with the value in mono."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-11",
-   "target": {
-    "kind": "screen",
-    "id": "environment.fan-manual"
-   },
-   "kind": "broken",
-   "title": "Apply is drawn as plain text, not a button",
-   "detail": "'Apply preview setting' is a secondary with no border or fill, so it reads as a caption; live and waiting differ only by text tone. Fix: control-border secondary, or the ink primary, as it is the device's only commit."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-a-12",
-   "target": {
-    "kind": "screen",
-    "id": "farrowing.room"
-   },
-   "kind": "broken",
-   "title": "'Awaiting' lens label breaks mid-word below 390px",
-   "detail": "In the demo page at 390 and 360 viewports the phone is 344-360 wide and the lens reads 'Awaitin / g'. Fix: apply the Segments copy budget (drop counts first) or let the filter button shrink; never break a word."
   },
   {
    "severity": "medium",
@@ -18752,18 +18705,6 @@
   {
    "severity": "low",
    "source": "screen-review",
-   "id": "screens-a-24",
-   "target": {
-    "kind": "screen",
-    "id": "environment.issue-resolved"
-   },
-   "kind": "broken",
-   "title": "Resolve toast covers the issue's reporter line",
-   "detail": "After Mark resolved, the toast 'Issue resolved in this preview' sits over the evidence card, hiding 'G. Hansen · 06:40'. Fix: show the toast above the footer without covering content, or drop it since the status already reads Resolved."
-  },
-  {
-   "severity": "low",
-   "source": "screen-review",
    "id": "screens-a-25",
    "target": {
     "kind": "screen",
@@ -18772,30 +18713,6 @@
    "kind": "design",
    "title": "Hold caption differs from Farrowing's for the same act",
    "detail": "Home's End task early button is captioned 'HOLD TO END'; Farrowing's is 'HOLD TO END EARLY'. Fix: one caption per verb from strings.json."
-  },
-  {
-   "severity": "high",
-   "source": "screen-review",
-   "id": "screens-b-1",
-   "target": {
-    "kind": "screen",
-    "id": "feed-plan.editor"
-   },
-   "kind": "broken",
-   "title": "Adjust feed hides its controls; Save can never be enabled",
-   "detail": "From Pen feeding, Adjust feed shows only the pig table. The Adjustment panel (mode, %, end date, note) sits below a 297px sheet body with overflow hidden; \"Complete the required fields first\" floats unpadded at the left edge. Fix: let the sheet body grow or scroll to the panel."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-b-4",
-   "target": {
-    "kind": "feature",
-    "id": "feed-plan"
-   },
-   "kind": "broken",
-   "title": "Feed plan screens have no Chinese",
-   "detail": "inspection-astra-concept has no zh strings or language switch, so Pen feeding, Adjust feed and Feed plan are English-only and Chinese fit cannot be checked. Fix: move feed copy into the strings registry with zh."
   },
   {
    "severity": "medium",
@@ -18980,18 +18897,6 @@
   {
    "severity": "medium",
    "source": "screen-review",
-   "id": "screens-c-4",
-   "target": {
-    "kind": "feature",
-    "id": "health-record"
-   },
-   "kind": "broken",
-   "title": "Required-fields hint sits at the screen edge, outside the gutter",
-   "detail": "'Complete the required fields first' starts at x=0 on Record health, Care instructions, Resolve conditions, Treatment, weight, body condition, note, miscarriage, batch membership. On Record weight it stays after Save enables. Fix: the Button waiting status line inside the footer gutter, naming the missing field, gone once valid."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
    "id": "screens-c-5",
    "target": {
     "kind": "screen",
@@ -19004,18 +18909,6 @@
   {
    "severity": "medium",
    "source": "screen-review",
-   "id": "screens-c-6",
-   "target": {
-    "kind": "screen",
-    "id": "health-record.many"
-   },
-   "kind": "broken",
-   "title": "Ongoing conditions on the record cannot be opened",
-   "detail": "Arthritis, Lameness, Coughing are plain text in the General details Health fact; nothing opens their finding to edit, treat or resolve, though the flow says 'tap the Arthritis tag'. Fix: list ongoing conditions as rows under the attention rows, each opening its finding."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
    "id": "screens-c-7",
    "target": {
     "kind": "screen",
@@ -19024,18 +18917,6 @@
    "kind": "unclear",
    "title": "Next task says Pregnancy check while Vaccination is due today",
    "detail": "On 000306 Sow cycle's Next task reads 'Pregnancy check · in 1 day' while Current tasks leads with Vaccination due today. 'Next' counts only production tasks, so it contradicts the card above. Fix: drop Next task (Current tasks already shows it) or say what it counts."
-  },
-  {
-   "severity": "medium",
-   "source": "screen-review",
-   "id": "screens-c-8",
-   "target": {
-    "kind": "screen",
-    "id": "inspection.pen-log"
-   },
-   "kind": "broken",
-   "title": "Date filter box is 90px tall and unlabelled beside Activity",
-   "detail": "The 'All dates' trigger measures 186x90 with no label, next to the labelled 160x48 Activity picker; the row is misaligned. Same on pig-profile.log. Fix: use the PickerField trigger with a 'Dates' label at field height."
   },
   {
    "severity": "medium",
@@ -19125,18 +19006,6 @@
    "kind": "design",
    "title": "20 of 24 pen tiles say 'Not in unit'",
    "detail": "The pen map repeats 'Not in unit' on every greyed tile, burying the four live pens; the caption 'Pen layout · only pens…' is hidden under the footer. Fix: leave non-unit tiles blank and pad the caption above the footer."
-  },
-  {
-   "severity": "low",
-   "source": "screen-review",
-   "id": "screens-c-16",
-   "target": {
-    "kind": "screen",
-    "id": "inspection.find-pig"
-   },
-   "kind": "broken",
-   "title": "Sample-tag button touches the field label; result tags not mono",
-   "detail": "'Try sample tag 000306' ends at y=392 where the 'Ear tag or pen' label starts: no gap. Results set ear tags in Plus Jakarta while the walk uses mono. Fix: section gap above the label; identifier type for tags."
   },
   {
    "severity": "low",
