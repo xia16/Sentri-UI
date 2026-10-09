@@ -1,63 +1,58 @@
 {
   "status": "in-design",
-  "round": 2,
-  "previous": { "commit": "3e3f835", "judged": "2026-10-09", "lowest": 3, "scores": { "clarity": 6, "budget": 8, "hierarchy": 7, "spacing": 8, "broken": 3 } },
+  "round": 3,
+  "previous": { "round": 2, "commit": "d5aa6fa", "judged": "2026-10-10", "lowest": 6, "scores": { "clarity": 7, "budget": 7, "hierarchy": 8, "spacing": 7, "broken": 6 } },
   "judged": "2026-10-10",
-  "commit": "d5aa6fa",
+  "commit": "0cde753",
   "model": "claude-opus-5-5",
-  "scores": { "clarity": 7, "budget": 7, "hierarchy": 8, "spacing": 7, "broken": 6 },
-  "lowest": 6,
-  "roundOneFindings": [
-    { "finding": "Not self-contained (track/active face only under prototype scopes)", "fixed": true, "note": ".st-segment carries the well track, line border, paper face, weight 500 and ink underline; the scoped rules are deleted from bundle.css and prototype CSS." },
-    { "finding": "Targets 38-44px", "fixed": true, "note": "Every Segment button measured 48px tall at 390 (preview, farrowing.room, piglet list, inspection walk, condition picker, Pigs/Pens, parity facet, environment)." },
-    { "finding": "View switch undocumented; .scope-tabs/.health-tabs hand-built", "fixed": true, "note": "Variant documented; Diseases/Symptoms and Pigs/Pens now call SentriUI.segment; Pigs/Pens counts dropped (the header already says 3 pens · 7 pigs)." },
-    { "finding": "TaskLens a duplicate implementation", "fixed": true, "note": "TaskLens renders SentriUI.segment variant two-line-lens plus an IconButton." },
-    { "finding": "No pressed feedback", "fixed": "partly", "note": "An :active rule exists, but --press (#f1f5eb) on the --well track (#eef1e7) is a 3-4 RGB step: invisible on an unselected option; on the selected option it removes the paper face so it reads as deselected." },
-    { "finding": "No keyboard row", "fixed": true, "note": "Arrows/Home/End/Enter/Space documented and wired; disabled options skipped." }
+  "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 7, "broken": 8 },
+  "lowest": 7,
+  "roundTwoFindings": [
+    { "finding": ".st-selection{flex:1} stretched in column flex (Choose conditions ~160px gap)", "fixed": true, "note": "Wrapper is flex:none; the Diseases/Symptoms wrapper measures 354x56 and Search follows 12px below." },
+    { "finding": "Press feedback imperceptible", "fixed": true, "note": "An unselected option presses to --handle #dce0d4 (measured on Piglet's Done); the selected option keeps its paper face; the demo presses the second option." },
+    { "finding": "Lens vs two-line lens differ only in look", "fixed": true, "note": "README and variants.json state the rule; Piglet, Farrowing and Inspection all render the two-line lens. No screen uses the inline lens now." },
+    { "finding": "Piglet: Done count repeats the card; To do pills on rows", "fixed": true, "note": "Done has no count; rows carry no To do / Done pill (only Late / Sow died)." },
+    { "finding": "Environment: sensor switch flush on card; period tagged lens; fan .device-mode hand-built", "fixed": "partly", "note": "Period and Fan mode are Segment view switch, .device-mode CSS deleted, the fan switch has a 12px gap. The Sensor switch still ends exactly where the sensor card begins (bottom 173 = top 173)." },
+    { "finding": "Dead copies (sentri-components.js segment(), foundation .scope-tabs/.health-tabs/.room-tabs)", "fixed": false, "note": "Both still present; not loaded." }
   ],
-  "reversals": "None. Round 1 asked the owner whether Done belongs in the chip row; the owner chose a To do / Done lens above the chips, which this round accepts.",
+  "reversals": "None. Owner rulings stand: a lens above chips is allowed; Done as a lens state is accepted.",
   "checklist": [
     { "line": 1, "pass": true, "why": "Purpose plus 'use FilterChips instead for dynamic tag filters'." },
     { "line": 2, "pass": true, "why": "When per variant; when-not names FilterChips, ChoiceList, Button." },
     { "line": 3, "pass": true, "why": "Track, buttons, label, optional count, underline, reason line named and shown." },
-    { "line": 4, "pass": false, "why": "Lens and two-line lens have the same when-to-use (states of one list with counts); only the look differs, so nothing tells a builder which to pick (Piglet uses one-line, Farrowing two-line for the same job)." },
-    { "line": 5, "pass": false, "why": "Pressed is drawn with --press, indistinguishable from --well on an unselected option; the static demo presses the selected option, which then looks unselected." },
-    { "line": 6, "pass": true, "why": "All Segment buttons 48px tall, narrowest 67px (5-option parity facet) at 390." },
-    { "line": 7, "pass": true, "why": "2-5 stated, view switch 2-3; the ended death sheet omits the single-option switch." },
+    { "line": 4, "pass": true, "why": "Two-line lens is the default lens; inline lens only for a 2-state split in a card/sheet header; view switch and facet are distinct jobs." },
+    { "line": 5, "pass": true, "why": "Pressed = --handle on unselected options, selected keeps its face; demo presses option 2." },
+    { "line": 6, "pass": true, "why": "Every button 48px tall at 390 (Piglet 174 wide, Farrowing 72, conditions 172, environment 113/157)." },
+    { "line": 7, "pass": true, "why": "2-5 stated, view switch 2-3." },
     { "line": 8, "pass": true, "why": "Selected = weight + ink underline; disabled = dashed outline + reason line." },
-    { "line": 9, "pass": true, "why": "Length/casing/wrap rules stated; the Chinese example renders without clipping (though it does not actually wrap at demo width)." },
+    { "line": 9, "pass": true, "why": "Length/casing/wrap rules stated; long-label demo renders without clipping." },
     { "line": 10, "pass": true, "why": "role=group + aria-pressed, token focus ring, arrow/Home/End row." },
-    { "line": 11, "pass": true, "why": "New .st-segment rules resolve to tokens; tokens listed in the README." },
+    { "line": 11, "pass": true, "why": "Pressed now uses --handle, a listed token; no raw colours in .st-segment rules." },
     { "line": 12, "pass": true, "why": "Not a form field." },
     { "line": 13, "pass": true, "why": "Not an overlay." },
-    { "line": 14, "pass": true, "why": "Related (FilterChips, ChoiceList, IconButton, TaskLens adapter) and classification stated." },
-    { "line": 15, "pass": true, "why": "Four variant documents, six states each, no overflow at 375 (cgate/Segment/variant-*.png)." }
+    { "line": 14, "pass": true, "why": "Related components and classification stated." },
+    { "line": 15, "pass": true, "why": "Variant documents render six states at 375 with no page overflow." }
   ],
   "classification": "component",
   "variants": [
-    { "name": "lens (inline count)", "usedBy": ["piglet-processing.pen-list", "piglet-processing.chip-done", "piglet-processing.job-chip"], "status": "in-design",
-      "scores": { "clarity": 6, "budget": 7, "hierarchy": 8, "spacing": 8, "broken": 7 },
-      "findings": ["Same job as two-line lens with a different look; Piglet's To do / Done lens does not look like Farrowing's room lens.", "Piglet's lens takes its accessible name from chips.label ('Show pens that need'), the chips' name.", "environment.page tags Today / 7 days as lens; it is a period switch (view switch), not list states."] },
-    { "name": "two-line lens (count under label, beside the filter IconButton)", "usedBy": ["farrowing.room", "inspection.walk", "feed-plan.bulk"], "status": "in-design",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 7 },
-      "findings": ["Pressed fill invisible on unselected tabs (shared token issue)."] },
-    { "name": "view switch", "usedBy": ["farrowing.death", "farrowing.born", "health-record.condition-picker", "health-record.record-health", "feed-plan.bulk", "environment.page"], "status": "in-design",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 6, "broken": 6 },
-      "findings": ["Condition picker: .st-selection{flex:1} grows the wrapper to 220px in the sheet's column flex, leaving a ~160px empty gap above the search field.", "Environment page: the sensor switch sits flush on the card below (no gap) since the old margin went with .sensor-tabs.", "Fan Auto/Manual on the same page is still a hand-built 40px .device-mode copy with raw colours."] },
-    { "name": "facet", "usedBy": ["farrowing.room (Filter sows sheet: Parity)"], "status": "in-design",
-      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 7 },
-      "findings": ["The atlas says 'No screen uses this yet'; the parity facet in the Filter sows sheet is its user.", "Pressed fill invisible (shared token issue)."] }
+    { "name": "two-line lens (default lens)", "usedBy": ["piglet-processing.pen-list", "farrowing.room", "inspection.walk", "feed-plan.bulk"], "status": "in-design",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 7, "broken": 8 },
+      "findings": ["Piglet: To do has a count line and Done has none, so the two labels sit at different heights (To do about 8px higher than Done)."] },
+    { "name": "lens (inline count)", "usedBy": [], "status": "in-design",
+      "scores": { "clarity": 7, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": ["No screen uses it now. The Overview preview and the bundle.js default (variant='lens') still show it as To do 18 / Done 3, the task-list case the README now forbids for it."] },
+    { "name": "view switch", "usedBy": ["farrowing.death", "farrowing.born", "health-record.condition-picker", "health-record.record-health", "feed-plan.bulk", "environment.page", "environment.fan-manual"], "status": "in-design",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 7, "broken": 8 },
+      "findings": ["Environment: the Sensor switch touches the sensor card below (0px gap); the period and fan switches are fine."] },
+    { "name": "facet", "usedBy": ["farrowing.room (Filter sows sheet: Parity)"], "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": [] }
   ],
   "findings": [
-    { "severity": "high", "text": ".st-selection{flex:1} stretches vertically in a column flex parent: the Choose conditions sheet shows the Diseases/Symptoms switch, then ~160px of empty space before Search (st-selection 354x220, track 56).", "fix": "Make the wrapper flex:none by default and flex:1 only inside a row bar (.tk-lens-bar>.st-selection, .room-lensbar>.st-selection, .inspect-controls>.st-selection)." },
-    { "severity": "medium", "text": "Press feedback is imperceptible: --press #f1f5eb vs --well #eef1e7 on unselected options; on the selected option it replaces the paper face so the tap looks like a deselect.", "fix": "Press unselected buttons with a darker token on the well (--choice-press or a new --press-on-well) and skip the press fill on aria-pressed=true; demo Pressed on an unselected option." },
-    { "severity": "medium", "text": "Lens vs two-line lens differ only in look; Piglet's To do / Done lens is one-line while Farrowing's room lens is two-line for the same job, against the farrowing-parity rule.", "fix": "Merge into one lens (two-line), or state the rule (two-line when beside the filter IconButton or with 3+ options) and render Piglet's lens two-line." },
-    { "severity": "medium", "text": "Piglet list budget: Done 3 repeats the task card's '3 / 12 pens done', and every row under the To do lens still wears a 'To do' pill.", "fix": "Drop the row status pill while a single-state lens is active; keep one done figure (lens count or card, not both)." },
-    { "severity": "low", "text": "Environment page: the sensor view switch touches the card below; Today/7 days is labelled lens; Fan Auto/Manual is still hand-built (.device-mode, 40px, raw #edf0e7/white).", "fix": "Give the host a space-token gap; set variant:'view-switch' for the period; replace .device-mode with SentriUI.segment view-switch (or ChoiceList if it records a setting)." },
-    { "severity": "low", "text": "Dead copies remain: ux/system/sentri-components.js still defines segment(); sentri-visual-foundation.css still styles .room-tabs/.segment/.scope-tabs/.health-tabs with #fff and 44px. Neither is loaded, but they read as a second implementation.", "fix": "Delete the segment() copy and the three scoped selector rules." }
+    { "severity": "medium", "text": "A two-line lens with a count on some options only (Piglet: To do 9 / Done) misaligns the labels: the countless option centres a single line.", "fix": "In two-line-lens always render the count line (empty, aria-hidden, same line height) so every label shares one baseline." },
+    { "severity": "low", "text": "The Overview preview and the bundle.js default variant ('lens') present the inline lens as To do / Done with counts, contradicting the new rule.", "fix": "Default the variant to 'two-line-lens' and show the Overview with it; demo the inline lens as a 2-state card-header split." },
+    { "severity": "low", "text": "Environment: the Sensor view switch sits flush on the sensor card (0px gap).", "fix": "Add .environment-page>.st-selection{margin-bottom:var(--space-12)}, as was done for .device-control." },
+    { "severity": "low", "text": "Dead copies remain: ux/system/sentri-components.js segment(); sentri-visual-foundation.css .room-tabs/.scope-tabs/.health-tabs.", "fix": "Delete them." }
   ],
-  "proposals": [
-    { "kind": "merge", "name": "Segment lens + two-line lens -> one lens", "why": "Same job, same data; two looks in two sections invite drift. If both are kept, the README must state when each applies.", "seenIn": ["piglet-processing.pen-list", "farrowing.room"] },
-    { "kind": "merge", "name": "Environment fan Auto/Manual (.device-mode) into Segment view switch", "why": "Same look and job as Segment, hand-built at 40px with raw colours, on a screen already migrated.", "seenIn": ["environment.page", "environment.fan-manual"] }
-  ]
+  "proposals": []
 }
