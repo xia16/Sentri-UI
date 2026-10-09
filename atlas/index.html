@@ -1,0 +1,43 @@
+<!doctype html>
+<!-- The atlas: every product feature of the app and where its design stands. Read-only.
+     Data: atlas.json (generated; see SCHEMA.md), falling back to fixture.json.
+
+     Why each region sits where it does (the information-budget rule: nothing twice, extra behind a
+     link, count or hover, every element placed for a reason):
+     - Top bar: where you are and nothing else - brand, the four views, the platform switch (only the
+       Atlas view has platforms), then the breadcrumb.
+     - Breadcrumb on a feature page: the feature's own facts (status dot, screen count, PRD, Decisions,
+       to-dos) ride on the line you already read to know where you are, so no left bar is needed and
+       the flow gets the width.
+     - No legend: a status is a dot; hovering it names it. A legend would repeat what every dot can say.
+     - Board: sections as labelled regions, features as small cards (name, status, size). The one overview.
+     - Feature page, centre: the flow - what you came to see. Arrows only for the selected node, so the
+       flow is plain shapes until you ask.
+     - Feature page, right: the live phone for the selected node, docked so the flow stays visible.
+     - Notes: behind a button under the phone and closed by default; they are reference, not the first read.
+     - Components / Copy: a left list and a pane, one nav each; a component's usage and status sit on
+       its own page, not in the list.
+     - Old UI: the only place Figma appears. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sentri atlas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand" id="brand">sentri <i>atlas</i></div>
+  <div class="seg" id="views"></div>
+  <div class="seg" id="platforms"></div>
+  <div class="crumb" id="crumb"></div>
+</header>
+<main id="main"></main>
+<section class="feature" id="feature" hidden></section>
+<script src="app.js"></script>
+<script src="feature.js"></script>
+<script src="library.js"></script>
+<script src="boot.js"></script>
+</body>
+</html>

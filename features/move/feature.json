@@ -1,0 +1,42 @@
+{
+  "id": "move",
+  "name": "Move",
+  "zh": "转移",
+  "platform": "mobile",
+  "section": "measures",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "move.place",
+        "move.record"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "move.place",
+      "name": "Choose location",
+      "zh": "选择位置",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Choose where the pigs move to.",
+        "issues": []
+      }
+    },
+    {
+      "id": "move.record",
+      "name": "Record move",
+      "zh": "子功能-记录",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The record entry for a move.",
+        "issues": []
+      }
+    }
+  ]
+}

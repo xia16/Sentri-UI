@@ -1,0 +1,54 @@
+{
+  "id": "keep-breeding",
+  "name": "Mark as breeder",
+  "zh": "标记留种",
+  "platform": "mobile",
+  "section": "breeding",
+  "newFeature": false,
+  "duplicates": "built inside Inspection — see inspection / health-record",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "keep-breeding.mark",
+        "keep-breeding.remove",
+        "keep-breeding.confirm"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "keep-breeding.mark",
+      "name": "Mark as breeder",
+      "zh": "标记留种",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Mark a pig to keep: fill the ear notch, fill the parents, check the sow's status.",
+        "issues": []
+      }
+    },
+    {
+      "id": "keep-breeding.remove",
+      "name": "Remove breeder mark",
+      "zh": "移除留种",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Remove the mark: confirm parents, fill ear tag and sex, blocked and all-allowed selections.",
+        "issues": []
+      }
+    },
+    {
+      "id": "keep-breeding.confirm",
+      "name": "Confirm and result",
+      "zh": "二次确认 / 操作结果",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Second confirmation, pop-up and result.",
+        "issues": []
+      }
+    }
+  ]
+}

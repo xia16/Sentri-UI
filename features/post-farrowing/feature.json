@@ -1,0 +1,78 @@
+{
+  "id": "post-farrowing",
+  "name": "Post-farrowing check",
+  "zh": "母猪产后检查",
+  "platform": "mobile",
+  "section": "tasks",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "post-farrowing.list",
+        "post-farrowing.overview",
+        "post-farrowing.check",
+        "post-farrowing.end",
+        "post-farrowing.ended"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "post-farrowing.list",
+      "name": "Pig list tab",
+      "zh": "母猪产后检查猪只列表",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8006-14820",
+      "notes": {
+        "purpose": "Sows to check by pen, with filter.",
+        "issues": []
+      }
+    },
+    {
+      "id": "post-farrowing.overview",
+      "name": "Task overview",
+      "zh": "任务概览 / Grid",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8006-14820",
+      "notes": {
+        "purpose": "Whole-task progress and the pen grid.",
+        "issues": []
+      }
+    },
+    {
+      "id": "post-farrowing.check",
+      "name": "Sow check form",
+      "zh": "母猪产后检查-初始态",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8006-14820",
+      "notes": {
+        "purpose": "Record the sow's post-farrowing check (the initial state of the form).",
+        "issues": []
+      }
+    },
+    {
+      "id": "post-farrowing.end",
+      "name": "End task",
+      "zh": "结束任务",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8006-14820",
+      "notes": {
+        "purpose": "End the task.",
+        "issues": []
+      }
+    },
+    {
+      "id": "post-farrowing.ended",
+      "name": "Ended task",
+      "zh": "任务已结束",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8006-14820",
+      "notes": {
+        "purpose": "Read-only list, check detail and task detail after the task ends.",
+        "issues": []
+      }
+    }
+  ]
+}

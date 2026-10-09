@@ -1,0 +1,66 @@
+{
+  "id": "disease",
+  "name": "Disease and symptom",
+  "zh": "疾病与症状",
+  "platform": "mobile",
+  "section": "health",
+  "newFeature": false,
+  "duplicates": "built inside Inspection — see inspection / health-record",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "disease.add",
+        "disease.remove",
+        "disease.triage",
+        "disease.result"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "disease.add",
+      "name": "Add disease or symptom",
+      "zh": "添加疾病 / 添加症状",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Add a disease to several pigs or a symptom to one pig, with the selected-pigs list.",
+        "issues": []
+      }
+    },
+    {
+      "id": "disease.remove",
+      "name": "Remove or recover",
+      "zh": "移除疾病/症状",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Remove a disease or symptom, or mark it recovered; default state and the state after.",
+        "issues": []
+      }
+    },
+    {
+      "id": "disease.triage",
+      "name": "Choose triage level",
+      "zh": "选择健康分诊等级",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Choose the triage level after a change.",
+        "issues": []
+      }
+    },
+    {
+      "id": "disease.result",
+      "name": "Confirm and result",
+      "zh": "二次确认 / 操作结果",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Second confirmation and result.",
+        "issues": []
+      }
+    }
+  ]
+}

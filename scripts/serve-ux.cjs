@@ -24,19 +24,32 @@ const TYPES = {
 http
   .createServer((req, res) => {
     const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
-    const file = path.resolve(root, '.' + pathname);
-    if (!file.startsWith(root + path.sep)) {
+    if (pathname === '/') {
+      res.writeHead(302, { Location: '/atlas/' });
+      return res.end();
+    }
+    let file = path.resolve(root, '.' + pathname);
+    if (file !== root && !file.startsWith(root + path.sep)) {
       res.writeHead(403);
       return res.end();
     }
-    fs.readFile(file, (err, data) => {
-      if (err) {
-        res.writeHead(404);
-        return res.end('Not found');
+    fs.stat(file, (statErr, stat) => {
+      if (!statErr && stat.isDirectory()) {
+        if (!pathname.endsWith('/')) {
+          res.writeHead(302, { Location: pathname + '/' });
+          return res.end();
+        }
+        file = path.join(file, 'index.html');
       }
-      const type = TYPES[path.extname(file)] || 'application/octet-stream';
-      res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-store' });
-      res.end(data);
+      fs.readFile(file, (err, data) => {
+        if (err) {
+          res.writeHead(404);
+          return res.end('Not found');
+        }
+        const type = TYPES[path.extname(file)] || 'application/octet-stream';
+        res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-store' });
+        res.end(data);
+      });
     });
   })
   .listen(port, '127.0.0.1', () => {

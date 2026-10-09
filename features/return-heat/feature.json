@@ -1,0 +1,32 @@
+{
+  "id": "return-heat",
+  "name": "Return-heat check",
+  "zh": "查返情",
+  "platform": "mobile",
+  "section": "tasks",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "return-heat.list"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "return-heat.list",
+      "name": "Pig list tab",
+      "zh": "Tab：查返情（猪只List）",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7606-10300",
+      "notes": {
+        "purpose": "The task's pig list by pen (Tab：查返情（猪只List）).",
+        "issues": [
+          "Figma has only the list tab: no in-progress or ended screens, no check, no end task."
+        ]
+      }
+    }
+  ]
+}

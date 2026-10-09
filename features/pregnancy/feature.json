@@ -1,0 +1,32 @@
+{
+  "id": "pregnancy",
+  "name": "Pregnancy check",
+  "zh": "孕检",
+  "platform": "mobile",
+  "section": "tasks",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "pregnancy.list"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "pregnancy.list",
+      "name": "Pig list tab",
+      "zh": "Tab：孕检（猪只List）",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7607-10820",
+      "notes": {
+        "purpose": "The task's pig list by pen (Tab：孕检（猪只List）).",
+        "issues": [
+          "Figma has only the list tab: no in-progress or ended screens, no check, no end task."
+        ]
+      }
+    }
+  ]
+}

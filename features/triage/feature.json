@@ -1,0 +1,42 @@
+{
+  "id": "triage",
+  "name": "Triage level",
+  "zh": "分诊等级",
+  "platform": "mobile",
+  "section": "health",
+  "newFeature": false,
+  "duplicates": "built inside Inspection — see inspection / health-record",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "triage.adjust",
+        "triage.confirm"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "triage.adjust",
+      "name": "Adjust triage level",
+      "zh": "调整健康分诊等级",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Choose a pig's health triage level.",
+        "issues": []
+      }
+    },
+    {
+      "id": "triage.confirm",
+      "name": "Confirmations and result",
+      "zh": "二次确认 / 操作结果",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Second confirmations (leave page, recover or remove) and the result.",
+        "issues": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "id": "prescriptions",
+  "name": "Prescription treatment",
+  "zh": "处方治疗",
+  "platform": "mobile",
+  "section": "health",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "prescriptions.entry",
+        "prescriptions.detail",
+        "prescriptions.pigs",
+        "prescriptions.dose",
+        "prescriptions.treat",
+        "prescriptions.stop"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "prescriptions.entry",
+      "name": "Home entry",
+      "zh": "首页入口",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/pvx1wum54VYOsIjep7haoZ?node-id=6003-11580",
+      "notes": {
+        "purpose": "Overview, choose the task to run, and a unit with a single dose.",
+        "issues": [
+          "The file is dated 2025.9.4 (CN section); the older Inspection treatment is a different, per-pig flow."
+        ]
+      }
+    },
+    {
+      "id": "prescriptions.detail",
+      "name": "Prescription and treatment detail",
+      "zh": "处方详情 / 治疗详情页",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/pvx1wum54VYOsIjep7haoZ?node-id=6003-11580",
+      "notes": {
+        "purpose": "Prescription detail, treatment detail and a unit with several doses.",
+        "issues": [
+          "The file is dated 2025.9.4 (CN section); the older Inspection treatment is a different, per-pig flow."
+        ]
+      }
+    },
+    {
+      "id": "prescriptions.pigs",
+      "name": "Add and remove pigs",
+      "zh": "添加猪只 / 移除猪只 / 移出处方",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/pvx1wum54VYOsIjep7haoZ?node-id=6003-11580",
+      "notes": {
+        "purpose": "Add pigs to a prescription (empty list, choose pigs), remove or move them out, other ways to search.",
+        "issues": [
+          "The file is dated 2025.9.4 (CN section); the older Inspection treatment is a different, per-pig flow."
+        ]
+      }
+    },
+    {
+      "id": "prescriptions.dose",
+      "name": "Skip a dose",
+      "zh": "跳过剂次",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/pvx1wum54VYOsIjep7haoZ?node-id=6003-11580",
+      "notes": {
+        "purpose": "Skip a dose and scan the ear tag.",
+        "issues": [
+          "The file is dated 2025.9.4 (CN section); the older Inspection treatment is a different, per-pig flow."
+        ]
+      }
+    },
+    {
+      "id": "prescriptions.treat",
+      "name": "Give the treatment",
+      "zh": "治疗",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/pvx1wum54VYOsIjep7haoZ?node-id=6003-11580",
+      "notes": {
+        "purpose": "Scan tag, choose ear notch, confirm completion with or without abnormality, error states.",
+        "issues": [
+          "The file is dated 2025.9.4 (CN section); the older Inspection treatment is a different, per-pig flow."
+        ]
+      }
+    },
+    {
+      "id": "prescriptions.stop",
+      "name": "Stop prescription or treatment",
+      "zh": "终止处方 / 终止治疗",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/pvx1wum54VYOsIjep7haoZ?node-id=6003-11580",
+      "notes": {
+        "purpose": "Stop a prescription or a treatment with a second confirmation and a toast.",
+        "issues": [
+          "The file is dated 2025.9.4 (CN section); the older Inspection treatment is a different, per-pig flow."
+        ]
+      }
+    }
+  ]
+}

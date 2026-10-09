@@ -1,0 +1,66 @@
+{
+  "id": "farrowing-record",
+  "name": "Record farrowing",
+  "zh": "记录分娩",
+  "platform": "mobile",
+  "section": "breeding",
+  "newFeature": false,
+  "duplicates": "built inside Inspection and as the farrowing task — see inspection / farrowing",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "farrowing-record.before",
+        "farrowing-record.record",
+        "farrowing-record.batch",
+        "farrowing-record.result"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "farrowing-record.before",
+      "name": "Preconditions",
+      "zh": "前置条件",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "What must be true before farrowing can be recorded.",
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing-record.record",
+      "name": "Record farrowing",
+      "zh": "分娩",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Record the farrowing; the edited state.",
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing-record.batch",
+      "name": "Join batch",
+      "zh": "加入批次",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Add the sow to a batch.",
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing-record.result",
+      "name": "Result",
+      "zh": "操作结果",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Result of the action.",
+        "issues": []
+      }
+    }
+  ]
+}

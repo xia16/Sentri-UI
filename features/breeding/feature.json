@@ -1,0 +1,90 @@
+{
+  "id": "breeding",
+  "name": "Breeding",
+  "zh": "配种",
+  "platform": "mobile",
+  "section": "tasks",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "breeding.list",
+        "breeding.overview",
+        "breeding.record",
+        "breeding.search",
+        "breeding.end",
+        "breeding.ended"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "breeding.list",
+      "name": "Pig list tab",
+      "zh": "配种猪只列表",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7845-6780",
+      "notes": {
+        "purpose": "Pigs due for mating by pen, with filter (Tab：配种（猪只List）, 筛选, Grid).",
+        "issues": []
+      }
+    },
+    {
+      "id": "breeding.overview",
+      "name": "Task overview",
+      "zh": "任务概览",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7845-6780",
+      "notes": {
+        "purpose": "Whole-task progress and the pen grid.",
+        "issues": []
+      }
+    },
+    {
+      "id": "breeding.record",
+      "name": "Record mating",
+      "zh": "配种",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7845-6780",
+      "notes": {
+        "purpose": "Record a mating, an extra mating, and change the semen (配种-默认态, 配种, 额外配种, 更换精液).",
+        "issues": []
+      }
+    },
+    {
+      "id": "breeding.search",
+      "name": "Search results",
+      "zh": "6 种搜索结果",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7845-6780",
+      "notes": {
+        "purpose": "Six cases of a searched pig by heat, batch and unit membership (A–F), with the end-task failure (某栏位猪只列表, 结束任务失败).",
+        "issues": []
+      }
+    },
+    {
+      "id": "breeding.end",
+      "name": "End task",
+      "zh": "结束任务",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7845-6780",
+      "notes": {
+        "purpose": "End the task with a second confirmation (结束任务, 二次确认).",
+        "issues": []
+      }
+    },
+    {
+      "id": "breeding.ended",
+      "name": "Ended task",
+      "zh": "任务已结束",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7845-6780",
+      "notes": {
+        "purpose": "Read-only list, task detail and mating detail after the task ends (配种详情, Tab：任务详情).",
+        "issues": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "id": "pig-list",
+  "name": "Pig list",
+  "zh": "猪只列表",
+  "platform": "mobile",
+  "section": "pigs",
+  "newFeature": false,
+  "duplicates": "the old file also holds pig detail and health management, built as pig-profile and health-record",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "pig-list.list",
+        "pig-list.detail",
+        "pig-list.health",
+        "pig-list.events",
+        "pig-list.edit"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "pig-list.list",
+      "name": "Pig list",
+      "zh": "猪只列表",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/ZnHLToEqmWREEgMXsu8ZvZ?node-id=6003-11580",
+      "notes": {
+        "purpose": "The farm's pigs as a list, with filter and a more-actions button.",
+        "issues": [
+          "The file's detail and health pages are built elsewhere (pig-profile, health-record)."
+        ]
+      }
+    },
+    {
+      "id": "pig-list.detail",
+      "name": "Pig detail",
+      "zh": "猪只详情",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/ZnHLToEqmWREEgMXsu8ZvZ?node-id=6003-11580",
+      "notes": {
+        "purpose": "A pig's Overview, Basic info, Production (marked not to be done yet) and event list tabs.",
+        "issues": [
+          "The file's detail and health pages are built elsewhere (pig-profile, health-record)."
+        ]
+      }
+    },
+    {
+      "id": "pig-list.health",
+      "name": "Health management",
+      "zh": "健康管理",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/ZnHLToEqmWREEgMXsu8ZvZ?node-id=6003-11580",
+      "notes": {
+        "purpose": "Triage level, add or remove disease or symptom, temperature and notes on one pig.",
+        "issues": [
+          "The file's detail and health pages are built elsewhere (pig-profile, health-record)."
+        ]
+      }
+    },
+    {
+      "id": "pig-list.events",
+      "name": "All events",
+      "zh": "全部事件",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/ZnHLToEqmWREEgMXsu8ZvZ?node-id=6003-11580",
+      "notes": {
+        "purpose": "The pig's events, adding an event and choosing an event type.",
+        "issues": [
+          "The file's detail and health pages are built elsewhere (pig-profile, health-record)."
+        ]
+      }
+    },
+    {
+      "id": "pig-list.edit",
+      "name": "Edit pig info",
+      "zh": "编辑猪只信息",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/ZnHLToEqmWREEgMXsu8ZvZ?node-id=6003-11580",
+      "notes": {
+        "purpose": "Edit identity fields, treatment and more actions.",
+        "issues": [
+          "The file's detail and health pages are built elsewhere (pig-profile, health-record)."
+        ]
+      }
+    }
+  ]
+}

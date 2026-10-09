@@ -1,0 +1,32 @@
+{
+  "id": "end-finishing",
+  "name": "End-finishing check",
+  "zh": "结束育肥检查",
+  "platform": "mobile",
+  "section": "tasks",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "end-finishing.list"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "end-finishing.list",
+      "name": "Pig list tab",
+      "zh": "Tab：结束育肥检查（猪只List）",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7606-9375",
+      "notes": {
+        "purpose": "The task's pig list by pen (Tab：结束育肥检查（猪只List）).",
+        "issues": [
+          "Figma has only the list tab: no in-progress or ended screens, no check, no end task."
+        ]
+      }
+    }
+  ]
+}

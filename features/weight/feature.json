@@ -1,0 +1,32 @@
+{
+  "id": "weight",
+  "name": "Weight",
+  "zh": "体重",
+  "platform": "mobile",
+  "section": "measures",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "weight.weight"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "weight.weight",
+      "name": "Individual weight",
+      "zh": "体重-个体体重",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Record one pig's weight.",
+        "issues": [
+          "Only one screen; it sits in the backfat group."
+        ]
+      }
+    }
+  ]
+}

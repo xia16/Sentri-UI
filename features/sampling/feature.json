@@ -1,0 +1,74 @@
+{
+  "id": "sampling",
+  "name": "Sampling and testing",
+  "zh": "采样与检测",
+  "platform": "mobile",
+  "section": "sampling",
+  "newFeature": false,
+  "duplicates": "",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "sampling.rooms",
+        "sampling.list",
+        "sampling.pending",
+        "sampling.done"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "sampling.rooms",
+      "name": "Choose room",
+      "zh": "选择房间",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/PqMXbJLyoJ9lFGjmqBv5Cs?node-id=6032-6415",
+      "notes": {
+        "purpose": "Choose the room to sample.",
+        "issues": [
+          "The English section is shorter and uses different screens from the Chinese one."
+        ]
+      }
+    },
+    {
+      "id": "sampling.list",
+      "name": "Sample list",
+      "zh": "采样列表",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/PqMXbJLyoJ9lFGjmqBv5Cs?node-id=6032-6415",
+      "notes": {
+        "purpose": "The samples to take and the samples taken.",
+        "issues": [
+          "The English section is shorter and uses different screens from the Chinese one."
+        ]
+      }
+    },
+    {
+      "id": "sampling.pending",
+      "name": "Sample to take",
+      "zh": "待采样详情",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/PqMXbJLyoJ9lFGjmqBv5Cs?node-id=6032-6415",
+      "notes": {
+        "purpose": "Detail by sample type: mixed, pig, person, supply, environment.",
+        "issues": [
+          "The English section is shorter and uses different screens from the Chinese one."
+        ]
+      }
+    },
+    {
+      "id": "sampling.done",
+      "name": "Sample taken",
+      "zh": "已采样详情",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/PqMXbJLyoJ9lFGjmqBv5Cs?node-id=6032-6415",
+      "notes": {
+        "purpose": "Detail of a taken sample: waiting for test, negative, positive.",
+        "issues": [
+          "The English section is shorter and uses different screens from the Chinese one."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "id": "heat",
+  "name": "Heat",
+  "zh": "发情",
+  "platform": "mobile",
+  "section": "breeding",
+  "newFeature": false,
+  "duplicates": "built inside Inspection — see inspection / health-record",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "heat.heat",
+        "heat.batch",
+        "heat.result"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "heat.heat",
+      "name": "Record heat",
+      "zh": "发情",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Mark a non-pregnant or gilt pig in heat; the states bred and pregnant.",
+        "issues": []
+      }
+    },
+    {
+      "id": "heat.batch",
+      "name": "Choose batch",
+      "zh": "选择批次",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Choose the batch the pig joins.",
+        "issues": []
+      }
+    },
+    {
+      "id": "heat.result",
+      "name": "Result",
+      "zh": "操作结果",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Result of the action.",
+        "issues": []
+      }
+    }
+  ]
+}

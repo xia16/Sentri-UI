@@ -1,0 +1,78 @@
+{
+  "id": "wean",
+  "name": "Wean",
+  "zh": "断奶",
+  "platform": "mobile",
+  "section": "breeding",
+  "newFeature": false,
+  "duplicates": "built inside Inspection — see inspection / health-record",
+  "groups": [
+    [
+      "Old UI",
+      [
+        "wean.check",
+        "wean.piglets",
+        "wean.mating",
+        "wean.blocked",
+        "wean.result"
+      ]
+    ]
+  ],
+  "screens": [
+    {
+      "id": "wean.check",
+      "name": "Weaning check",
+      "zh": "断奶检查",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The check, and the edited state.",
+        "issues": []
+      }
+    },
+    {
+      "id": "wean.piglets",
+      "name": "Piglet information",
+      "zh": "仔猪信息",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Piglet counts and details, default and filled.",
+        "issues": []
+      }
+    },
+    {
+      "id": "wean.mating",
+      "name": "Mating information",
+      "zh": "选择配种公猪 / 补充配种信息",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Choose the mating boar and fill in mating information.",
+        "issues": []
+      }
+    },
+    {
+      "id": "wean.blocked",
+      "name": "Blocked",
+      "zh": "分娩未结束",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Cannot mark weaned while farrowing is not finished; ask first.",
+        "issues": []
+      }
+    },
+    {
+      "id": "wean.result",
+      "name": "Result",
+      "zh": "操作结果",
+      "status": "placeholder",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Result of the action.",
+        "issues": []
+      }
+    }
+  ]
+}
