@@ -38,10 +38,19 @@ async function styledPreview(name) {
   const hint = (html.match(/dsCard[^>]*?height=(\d+)/) || [])[1];
   const inject = `<base href="${dir}"><link rel="stylesheet" href="${DS}/tokens.css"><link rel="stylesheet" href="${DS}/components/bundle.css"><script src="${DS}/components/bundle.js"><\/script>`;
   const doc = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, (m) => m + inject) : inject + html;
-  const f = el('<iframe class="preview" title="Preview"></iframe>');
-  f.style.height = (hint ? +hint + 8 : 420) + 'px'; f.srcdoc = doc;
-  f.onload = () => { try { const h = f.contentDocument.documentElement.scrollHeight; if (h > (hint ? +hint : 0)) f.style.height = h + 8 + 'px'; } catch (_) {} };
-  return f;
+  const wide = name === 'Cover', f = el('<iframe class="preview" title="Preview"></iframe>');
+  const box = el('<div class="pv"></div>'); box.append(f);
+  f.style.width = wide ? '960px' : '440px'; f.style.height = (hint ? +hint + 8 : 420) + 'px'; f.srcdoc = doc;
+  f.onload = async () => {
+    try {
+      const d = f.contentDocument;
+      if (wide) { f.style.width = Math.max(960, d.documentElement.scrollWidth) + 'px'; await new Promise((r) => setTimeout(r, 60)); }
+      const h = Math.max(d.documentElement.scrollHeight, d.body.scrollHeight), w = f.offsetWidth;
+      f.style.height = h + 'px';
+      if (wide) { box.style.display = 'block'; box.style.padding = '0'; box.style.border = '0'; box.style.background = 'none'; const k = Math.min(1, box.clientWidth / w); if (k < 1) { f.style.transformOrigin = '0 0'; f.style.transform = `scale(${k})`; box.style.height = h * k + 'px'; } }
+    } catch (_) {}
+  };
+  return box;
 }
 
 function usedBy(name) {
@@ -114,7 +123,7 @@ async function renderComponents() {
     if (cand) meta.querySelector('.t').textContent += ` · candidate${adr ? ' (ADR ' + adr + ')' : ''}`;
     let prev = await styledPreview(name);
     if (!prev) {
-      prev = el(`<iframe class="preview" title="Task skeleton demo" src="${SKELETON_DEMO}" style="height:900px"></iframe>`);
+      prev = el(`<iframe class="preview" title="Task skeleton demo" src="${SKELETON_DEMO}" style="width:100%;height:900px;border:1px solid var(--line)"></iframe>`);
       pane.append(el('<p class="muted" style="margin:0 0 10px">No preview of its own: the task skeleton demo shows every part.</p>'));
     }
     pane.append(prev);

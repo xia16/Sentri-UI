@@ -61,12 +61,16 @@ function panzoom(wrap, plane, fitFn) {
   wrap.addEventListener('dragstart', (e) => e.preventDefault());
   const fit = () => { Object.assign(t, fitFn()); apply(); };
   const step = (f) => { const r = wrap.getBoundingClientRect(), cx = r.width / 2, cy = r.height / 2, k = Math.min(MAX, Math.max(MIN, t.k * f)); t.x = cx - (cx - t.x) * (k / t.k); t.y = cy - (cy - t.y) * (k / t.k); t.k = k; apply(); };
-  return { fit, step, state: t };
+  const reveal = (n) => { const r = wrap.getBoundingClientRect(), b = n.getBoundingClientRect(), m = 24; let dx = 0, dy = 0;
+    if (b.left < r.left + m) dx = r.left + m - b.left; else if (b.right > r.right - m) dx = r.right - m - b.right;
+    if (b.top < r.top + m) dy = r.top + m - b.top; else if (b.bottom > r.bottom - m) dy = r.bottom - m - b.bottom;
+    t.x += dx; t.y += dy; apply(); };
+  return { fit, step, reveal, state: t };
 }
 /* scale that fits a (w x h) drawing into a wrapper, centred */
-function fitTo(wrap, w, h, maxK = 1, pad = 24) {
-  const r = wrap.getBoundingClientRect(), k = Math.max(0.25, Math.min(maxK, (r.width - pad * 2) / w, (r.height - pad * 2) / h));
-  return { k, x: Math.max(pad, (r.width - w * k) / 2), y: Math.max(pad, (r.height - h * k) / 2) };
+function fitTo(wrap, w, h, maxK = 1, pad = 24, minK = 0.25) {
+  const r = wrap.getBoundingClientRect(), k = Math.max(minK, Math.min(maxK, (r.width - pad * 2) / w, (r.height - pad * 2) / h));
+  return { k, x: Math.max(pad, (r.width - w * k) / 2), y: pad }; // top-aligned; pan for the rest
 }
 
 /* ---------- a tiny, safe markdown renderer: headings, paragraphs, lists, tables, bold, code, links ---------- */
@@ -131,7 +135,7 @@ function renderBoard() {
     r.style.left = x + 'px'; r.style.top = y + 'px'; x += rw + 32; rowH = Math.max(rowH, rh); maxX = Math.max(maxX, x);
   });
   const W = maxX + 8, H = y + rowH + 40;
-  const pz = panzoom(board, plane, () => fitTo(board, W, H, 1, 20));
+  const pz = panzoom(board, plane, () => { const t = fitTo(board, W, H, 1, 0, 0.9); return { k: t.k, x: 0, y: 0 }; });
   board.querySelectorAll('[data-z]').forEach((b) => { b.onclick = () => { const z = +b.dataset.z; z ? pz.step(z > 0 ? 1.2 : 1 / 1.2) : pz.fit(); }; });
   pz.fit();
 }
@@ -143,7 +147,7 @@ function renderOld() {
   const wrap = el(`<div class="index"><aside><h1>Old UI</h1><p>The product as it is today, in Figma: ${plural(files.length, 'file')}, about ${total} screens. Reference for research; not part of the atlas.</p></aside><div class="list"></div></div>`);
   const list = wrap.querySelector('.list');
   files.forEach((f) => {
-    list.append(el(`<h2>${esc(f.file)} <span>${plural(f.screens, 'screen')}</span><a href="https://www.figma.com/design/${esc(f.key)}/" target="_blank" rel="noopener">Open file ↗</a></h2>`));
+    list.append(el(`<h2>${esc(f.file)} <span>${plural(f.screens, 'screen')}</span><a class="fileopen" href="https://www.figma.com/design/${esc(f.key)}/" target="_blank" rel="noopener">Open file ↗</a></h2>`));
     f.flows.forEach(([name, n, node]) => list.append(el(`<a class="row" target="_blank" rel="noopener" href="https://www.figma.com/design/${esc(f.key)}/?node-id=${esc(String(node).replace(':', '-'))}"><b>${esc(name)}</b><span class="muted">${plural(n, 'screen')} ↗</span></a>`)));
   });
   main.append(wrap);
