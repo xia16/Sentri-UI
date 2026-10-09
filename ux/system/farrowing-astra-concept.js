@@ -347,7 +347,7 @@ function taskEndSheet(s,c){
  const closureLabel=r.awaiting.length||r.blocked?'End task early':'End task';
  return sheet(closureLabel,`${removal}${warning}${drafts}${taskPerformance(r.performance)}${taskOutcomeSummary({total:r.rows.length,finished:r.finished.length,active:r.active.length,awaiting:r.awaiting.length,removed:r.removed.length,ended:r.ended.length,miscarriages:r.miscarriages.length,notInPig:r.notInPig.length})}`,footer(SentriUI.backButton({action:'room-back'}),hold('room-end-confirm',closureLabel,r.blocked,closureLabel==='End task early').replace('button primary hold','button primary hold '+(closureLabel==='End task'?'task-complete':'task-end-confirm'))),'task-end-expanded');
 }
-function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls='',scope=c.unit.name,aside='')=>roomSheet(title,body,actions,cls,scope,aside);if(s.view==='roomFilter'){const f=c.filterDraft,n=visibleRoomRecords(c,f).length;return SentriUI.filterSheet({title:'Filter sows',subtitle:c.unit.name,count:n,noun:n===1?'sow':'sows',emptyReason:'No sows match',backAction:'room-back',clearAction:'room-reset-filter',applyAction:'room-apply-filter',groups:[{content:SentriUI.rangeSlider({min:-7,max:7,value:[f.from,f.to],label:'Due in',unit:'days',key:'due'})},{label:'Parity',content:SentriUI.filterChips({label:'Parity',action:'room-parity',items:parityChoices.map(v=>({value:v,label:v,checked:v===f.parity}))}),help:'Use the parity recorded on the sow’s profile.'}]});}
+function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls='',scope=c.unit.name,aside='')=>roomSheet(title,body,actions,cls,scope,aside);if(s.view==='roomFilter'){const f=c.filterDraft,n=visibleRoomRecords(c,f).length;return SentriUI.filterSheet({title:'Filter sows',subtitle:c.unit.name,count:n,noun:n===1?'sow':'sows',emptyReason:'No sows match',showStr:{one:'fa.filter.show.one',many:'fa.filter.show.many'},backAction:'room-back',clearAction:'room-reset-filter',applyAction:'room-apply-filter',groups:[{content:SentriUI.rangeSlider({min:-7,max:7,value:[f.from,f.to],label:'Due',key:'due',format:dueDay})},{label:'Parity',content:SentriUI.filterChips({label:'Parity',action:'room-parity',items:parityChoices.map(v=>({value:v,label:v,checked:v===f.parity}))}),help:'Use the parity recorded on the sow’s profile.'}]});}
  if(s.view==='roomPicker'&&c.picker)return roomSheet(c.picker.label,SentriUI.pickerOptions({options:c.picker.options,selected:c.picker.selected}),footer(SentriUI.backButton({action:'room-back'})),'picker-sheet',c.unit.name);
  if(['roomEndTask','roomTaskSows','roomTaskReceipt'].includes(s.view))return taskEndSheet(s,c);
  const penPage=penSubpage(s,c);if(penPage!==null)return penPage;
@@ -377,7 +377,7 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
  if(a==='room-parity')c.filterDraft.parity=v;
  if(a==='room-reset-filter')c.filterDraft=defaultRoomFilter();
  if(a==='room-apply-filter'){c.filter=clone(c.filterDraft);c.scroll=nextScroll;c.tailSpace=0;s.view='room';}
- if(a==='room-clear-filter'){c.filter=defaultRoomFilter();c.scroll=nextScroll;c.tailSpace=0;}
+ if(a==='room-clear-filter'){c.filter=defaultRoomFilter();c.filterDraft=defaultRoomFilter();c.scroll=nextScroll;c.tailSpace=0;}
  if(a==='room-grid')s.view='roomGrid';
  if(a==='room-pen'){if(c.peek){c.peek=null;return true;}c.currentPen=v;c.jump=v;c.highlightUntil=Date.now()+900;c.highlightPen=v;s.view='room';}
 

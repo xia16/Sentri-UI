@@ -6,7 +6,6 @@
     "notUse": "not for recording a single value — use Measure",
     "states": [
       "Default",
-      "Pressed",
       "Active",
       "Empty",
       "Disabled",

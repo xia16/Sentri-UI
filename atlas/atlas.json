@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T19:12:35.601Z",
- "commit": "dfc548b",
+ "generated": "2026-10-09T19:44:59.970Z",
+ "commit": "ac8fdcd",
  "platforms": [
   {
    "id": "mobile",
@@ -7095,7 +7095,7 @@
            {
             "name": "Filter fields",
             "shows": "Production stage, Disease or symptom, Care",
-            "logic": "Options come from the unit’s pigs. Clear restores draft defaults; Back retains the draft. Show n pigs applies it; zero matches blocks commit with No pigs match. SentriUI.filterSheet owns the drawer and counted footer.",
+            "logic": "Options come from the unit’s pigs. Clear restores draft defaults; Back retains the draft; Clear on the list resets the draft too. Show n pigs applies it; zero matches blocks commit with No pigs match. SentriUI.filterSheet owns the drawer and counted footer.",
             "source": "filter state in main()",
             "at": "Production stage"
            }
@@ -13589,6 +13589,11 @@
       "severity": "low",
       "text": "Lens (inline count) has no screen; it survives only as a documented option.",
       "fix": "Remove it at the next pass if no screen adopts it."
+     },
+     {
+      "severity": "low",
+      "text": "Lens tab now demos Today / 7 days with no counts: a time-range view switch, not states of one list (the README's lens is working pile / finished pile with inline counts). Its Long-label state passes active:'today' with options todo/done, so nothing is selected.",
+      "fix": "variants/lens.html: demo a 2-state pile split with inline counts in a card header (e.g. Open 2 / Closed 5), and set Long-label active:'todo'."
      }
     ],
     "proposals": [],
@@ -14193,6 +14198,325 @@
    }
   },
   {
+   "name": "FilterSheet",
+   "group": "Inputs and filters",
+   "status": "in-design",
+   "gate": {
+    "status": "in-design",
+    "round": 1,
+    "judged": "2026-10-10",
+    "commit": "78d747e",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 8,
+     "budget": 7,
+     "hierarchy": 7,
+     "spacing": 6,
+     "broken": 5
+    },
+    "lowest": 5,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "Purpose line names Sheet as the alternative for record forms."
+     },
+     {
+      "line": 2,
+      "pass": true,
+      "why": "When / when not present; PickerField and ChoiceList exist."
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Anatomy names drawer, scope, Clear, groups, help, Back, counted commit, reason; demo shows them."
+     },
+     {
+      "line": 4,
+      "pass": true,
+      "why": "One variant (List filters) used by farrowing.room and inspection.filters."
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "Default, pressed, active, empty, disabled, error, loading rendered; reason shown above the footer. Disabled renders identically to Empty."
+     },
+     {
+      "line": 6,
+      "pass": true,
+      "why": "Measured at 390: Clear/Close 48x48, chips 54-72x48, handles 48x48, Back 86x48, Show 248x48; no overlap."
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "States five short choice rows, PickerField beyond; demo stays within it."
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Selected chip has a check, disabled commit has a written reason, error is text."
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "Long / Chinese keeps English Clear, Back, Any and 'Show 12 头母猪'; the commit label template 'Show {n} {noun}' cannot be localised through the API."
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "Sheet dialog semantics, visible Back/Close, keyboard on chips and sliders, count in an aria-live button."
+     },
+     {
+      "line": 11,
+      "pass": true,
+      "why": "New CSS resolves to existing tokens; README lists them."
+     },
+     {
+      "line": 12,
+      "pass": true,
+      "why": "Group labels visible (Parity, Production stage, Disease or symptom, Care); reason persists."
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Visible Close and Back; nested pickers replace content; draft preserved, no farm record so no discard confirm."
+     },
+     {
+      "line": 14,
+      "pass": true,
+      "why": "Links Sheet, FilterChips, ChoiceList, PickerField, RangeSlider; states component classification."
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "Atlas List filters tab logs 32 console 404s (tokens.css, bundle.css, bundle.js, sentri-icons.js) from relative links in each srcdoc cell; the 5th parity chip is clipped at 375 and 390 with no visible scroll affordance."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "List filters",
+      "usedBy": [
+       "farrowing.room",
+       "inspection.filters"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 7,
+       "hierarchy": 7,
+       "spacing": 6,
+       "broken": 5
+      },
+      "findings": [
+       "Tested by use at 390x844: live count updates on every drag, key and chip/picker change; 0 results disables Show with 'No sows match' / 'No pigs match'; Clear restores defaults; Back then reopen keeps the draft; Show applies, list summary and badge appear (farrowing badge 2, inspection badge 1). Console clean on both screens.",
+       "Draft goes stale after the list-level Clear (farrowing room-clear-filter, inspection reset-filters): list shows no filter, reopening shows the old draft (parity 2–5 still checked, Show 6 sows)."
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "Stale draft: the list summary's Clear (room-clear-filter) and Inspection's reset-filters reset the applied filter but not filterDraft, so reopening the sheet shows filters the list says are off.",
+      "fix": "In room-clear-filter and reset-filters also reset the draft to defaults; Back keeps the draft only for unapplied edits."
+     },
+     {
+      "severity": "high",
+      "text": "Atlas console not clean: every srcdoc cell of variants/list.html loads ../../tokens.css, ../bundle.css, ../../../system/sentri-icons.js, ../bundle.js and 404s (32 errors on the tab).",
+      "fix": "Drop the asset link/script tags from variants/list.html (atlas injects them, as other components' variant files do) or make them root-relative."
+     },
+     {
+      "severity": "medium",
+      "text": "Parity chips overflow: '6+' is clipped at the sheet edge at 390 (the 4th chip in atlas cells), with no visible scrollbar; Farrowing previously showed all five on a facet Segment.",
+      "fix": "Let FilterChips wrap inside FilterSheet groups, or use Segment facet for a fixed 5-value set."
+     },
+     {
+      "severity": "medium",
+      "text": "Commit label is hard-coded 'Show {count} {noun}' and Clear/Back stay English in the zh example.",
+      "fix": "Add a commitLabel (string or fn(count)) prop and pass localised Clear/Back strings; render the zh state with them."
+     },
+     {
+      "severity": "low",
+      "text": "Disabled state duplicates Empty ('Show 0 sows' + 'No sows match'); Pressed only greys the Clear text action — neither is a FilterSheet state.",
+      "fix": "Give Disabled a distinct cause (e.g. 'Filters unavailable offline') or drop it; drop Pressed (Button owns it)."
+     },
+     {
+      "severity": "low",
+      "text": "The inspection.filters note was hand-edited into atlas.json and is lost on regeneration (build reverts it to 'Reset clears the draft; Show pigs applies it').",
+      "fix": "Put the note in the generator's source for inspection.filters."
+     }
+    ],
+    "proposals": []
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "list"
+    ]
+   }
+  },
+  {
+   "name": "RangeSlider",
+   "group": "Inputs and filters",
+   "status": "in-design",
+   "gate": {
+    "status": "in-design",
+    "round": 1,
+    "judged": "2026-10-10",
+    "commit": "78d747e",
+    "model": "claude-opus-5-5",
+    "scores": {
+     "clarity": 7,
+     "budget": 7,
+     "hierarchy": 6,
+     "spacing": 7,
+     "broken": 5
+    },
+    "lowest": 5,
+    "checklist": [
+     {
+      "line": 1,
+      "pass": true,
+      "why": "Purpose line names Measure for one exact value."
+     },
+     {
+      "line": 2,
+      "pass": true,
+      "why": "When / when not present; PickerField and ChoiceList exist."
+     },
+     {
+      "line": 3,
+      "pass": true,
+      "why": "Label, bounds, track, two handles, end labels, optional reason named and shown."
+     },
+     {
+      "line": 4,
+      "pass": true,
+      "why": "One Range variant used by farrowing.room; generic numeric control."
+     },
+     {
+      "line": 5,
+      "pass": true,
+      "why": "Default, pressed (dragging), focus, at limits, disabled with reason, error rendered; a live drag sets data-dragging."
+     },
+     {
+      "line": 6,
+      "pass": true,
+      "why": "Handles 48x48, staggered above/below the track so equal bounds do not overlap (measured at 171,448 and 171,496)."
+     },
+     {
+      "line": 7,
+      "pass": true,
+      "why": "Not a choice control; no cap needed (the README's five-row text is copied boilerplate)."
+     },
+     {
+      "line": 8,
+      "pass": true,
+      "why": "Disabled handles dashed plus a written reason; error is text."
+     },
+     {
+      "line": 9,
+      "pass": false,
+      "why": "zh value wraps mid-range ('0–' / '5 天') via overflow-wrap:anywhere; the lower limit renders as '-7–-7 days'."
+     },
+     {
+      "line": 10,
+      "pass": true,
+      "why": "role=slider with valuemin/max/now/text per handle, focus ring, arrows/Home/End, track tap moves the nearer handle — all verified by use."
+     },
+     {
+      "line": 11,
+      "pass": true,
+      "why": "Tokens only."
+     },
+     {
+      "line": 12,
+      "pass": false,
+      "why": "Value text misstates Farrowing's scale: 'Due in -7–7 days', ends '-7 days'/'7 days', though the bounds mean '7+ days ago' and 'In 7+ days' (the list summary still says so); no formatter prop."
+     },
+     {
+      "line": 13,
+      "pass": true,
+      "why": "Not an overlay."
+     },
+     {
+      "line": 14,
+      "pass": true,
+      "why": "Links FilterSheet, FilterChips, PickerField; component classification stated."
+     },
+     {
+      "line": 15,
+      "pass": false,
+      "why": "Atlas Range tab logs console 404s from relative asset links in variants/range.html srcdoc cells."
+     }
+    ],
+    "classification": "component",
+    "variants": [
+     {
+      "name": "Range",
+      "usedBy": [
+       "farrowing.room"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 7,
+       "budget": 7,
+       "hierarchy": 6,
+       "spacing": 7,
+       "broken": 5
+      },
+      "findings": [
+       "Mouse drag (down/move/up) of both handles works, handles never cross, data-dragging set while moving; ArrowLeft/Right, Home, End work; track tap moves the nearer handle; equal bounds stay grabbable.",
+       "Raw negative value text and no selected-span fill (see component findings)."
+      ]
+     }
+    ],
+    "findings": [
+     {
+      "severity": "high",
+      "text": "Value text is raw numbers: Farrowing shows 'Due in -7–7 days', ends '-7 days'/'7 days', and '-7–-7 days' at the limit, while -7/7 are open-ended ('7+ days ago' / 'In 7+ days') and the list summary formats them that way — sheet and list disagree and the sheet is wrong at the ends.",
+      "fix": "Add a format(value) prop used for output, end labels and aria-valuetext; Farrowing passes dueDay (7+ days ago · Today · In 7+ days)."
+     },
+     {
+      "severity": "high",
+      "text": "Atlas console not clean: variants/range.html cells request ../../tokens.css, ../bundle.css, ../bundle.js, sentri-icons.js and 404 inside srcdoc.",
+      "fix": "Remove the asset tags from variants/range.html (atlas injects them) or make them root-relative."
+     },
+     {
+      "severity": "medium",
+      "text": "The track has no fill between the handles; the chosen span is only implied by two staggered circles with stems, and Farrowing's old 'Today' midpoint label is gone.",
+      "fix": "Paint the rail segment between the handles with an ink token and add an optional mid-label property."
+     },
+     {
+      "severity": "medium",
+      "text": "Long zh value breaks inside the number range ('0–' then '5 天').",
+      "fix": "Use overflow-wrap:break-word on the label and white-space:nowrap on <output>."
+     },
+     {
+      "severity": "low",
+      "text": "README carries FilterSheet boilerplate ('Do show current bounds and count', 'Limit short visible choice rows to five', 'Do preserve drafts on Back') that is not RangeSlider's job.",
+      "fix": "Cut those lines; keep slider rules only (step, bounds never cross, Measure for exact values)."
+     }
+    ],
+    "proposals": [
+     {
+      "kind": "merge",
+      "name": "Feed adjustment slider",
+      "why": "Inspection's feed edit still uses a hand-built native single range (−50%..+50%); it records a value, so it belongs with Stepper/Measure, not as a RangeSlider variant.",
+      "seenIn": [
+       "inspection.actions"
+      ]
+     }
+    ]
+   },
+   "files": {
+    "variantsJson": true,
+    "variants": [
+     "range"
+    ]
+   }
+  },
+  {
    "name": "Field",
    "group": "Fields",
    "status": "in-design",
@@ -14372,22 +14696,22 @@
   {
    "name": "PickerField",
    "group": "Fields",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "round": 4,
-    "regate": "cleanup pass, PR #72",
+    "status": "agent-checked",
+    "round": 5,
+    "regate": "sweep fixes c0d9835 (footer padding-block, cascade/overview demos)",
     "judged": "2026-10-10",
-    "commit": "ce52431",
+    "commit": "c0d9835",
     "model": "claude-opus-5-5",
     "scores": {
      "clarity": 8,
      "budget": 8,
      "hierarchy": 8,
-     "spacing": 7,
+     "spacing": 8,
      "broken": 8
     },
-    "lowest": 7,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
@@ -14417,7 +14741,7 @@
      {
       "line": 6,
       "pass": true,
-      "why": "Triggers 48-65, rows 56-58, steps 48, footer 48 (Back 86 wide on screens); nothing under 48 on the three bare screens"
+      "why": "Triggers 48-65, rows 56-58, steps 48; footer Back / Done 168x48 at x=21-189 and 201-369, medicine Back x=21-369; corners 12px intact"
      },
      {
       "line": 7,
@@ -14442,7 +14766,7 @@
      {
       "line": 11,
       "pass": true,
-      "why": "Last host override (.st-picker-trigger height:48px) removed; tokens only"
+      "why": "Footer now padding-block only, sheet keeps its gutter; tokens only, no host override"
      },
      {
       "line": 12,
@@ -14462,7 +14786,7 @@
      {
       "line": 15,
       "pass": true,
-      "why": "Ticked 4 conditions, Done, Record health shows names +1; medicine pick, reopen keeps path and tick; one footer spacing defect"
+      "why": "Ticked 4 conditions, Done · 4, Record health shows 3 names +1 (65px); medicine pick shows Antibiotics › Antibiotic B, reopen opens All › Antibiotics with B ticked; console clean"
      }
     ],
     "classification": "component",
@@ -14508,18 +14832,18 @@
       "usedBy": [
        "health-record.medicine-picker"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
-       "spacing": 7,
+       "spacing": 8,
        "broken": 8
       },
       "findings": [
-       "Fixed: Back is the secondary pickerFooter Back; trigger path \"Antibiotics › Antibiotic B\"; reopening opens All › Antibiotics with Antibiotic B ticked",
-       "New: the picker footer has no side gutter (Back 390 wide, edge to edge, corners cut)",
-       "Not fixed: atlas cascade demo labels Medicine but browses Symptoms"
+       "Fixed: Select medicine Back inset x=21-369, corners intact",
+       "Fixed: atlas demo browses Antibiotics › Penicillins › Amoxicillin",
+       "Low: atlas Active trigger reads \"Antibiotics › Penicillins\" (group path) while the screen trigger reads \"Antibiotics › Antibiotic B\" (category › medicine)"
       ]
      },
      {
@@ -14528,82 +14852,60 @@
        "health-record.condition-picker",
        "health-record.record-health"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
-       "spacing": 7,
+       "spacing": 8,
        "broken": 8
       },
       "findings": [
-       "Fixed: Record health with 4 conditions shows two clamped lines of names plus an unclamped \"+1\" inside the 65px trigger",
-       "New: Select conditions footer Back / Done · 4 run to the screen edges (no gutter)"
+       "Fixed: Select conditions footer Back / Done · 4 inset 21px each side, 12px gap"
       ]
      }
     ],
     "findings": [
      {
-      "severity": "medium",
-      "text": ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on Select conditions (Back / Done · 4) and Select medicine (Back, 390px wide) the buttons touch the screen edges and their rounded corners are cut. Moving the medicine sheet onto pickerFooter spread it.",
-      "fix": "bundle.css: .st-picker-footer{padding-block:var(--space-12)} (no inline 0) so the sheet footer keeps its gutter."
-     },
-     {
       "severity": "low",
-      "text": "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path [Antibiotics, Conditions] (round 3, not fixed).",
-      "fix": "variants/cascade.html: use medicine categories and a medicine leaf."
-     },
-     {
-      "severity": "low",
-      "text": "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed).",
-      "fix": "preview.html: pass names:[\"Low appetite\"]."
+      "text": "Atlas cascade Active demo passes path [Antibiotics, Penicillins], so the trigger reads \"Antibiotics › Penicillins\" and never names the chosen Amoxicillin; the real medicine trigger reads category › medicine.",
+      "fix": "variants/cascade.html state-Active: path [\"Penicillins\",\"Amoxicillin\"] (or whatever pickerField needs to end on the leaf)."
      }
     ],
     "proposals": [],
     "verdicts": [
      {
-      "finding": "+n clipped by the 2-line clamp",
+      "finding": ".st-picker-footer padding overrode sheet gutter",
       "result": "fixed",
-      "note": ".st-picker-more outside .st-picker-names; \"+1\" visible"
+      "note": "Conditions Back x21-189, Done · 4 x201-369; Medicine Back x21-369; radius 12px, bottom 832"
      },
      {
-      "finding": "Medicine Back drawn as filled primary",
+      "finding": "Cascade demo browses Symptoms under Medicine",
       "result": "fixed",
-      "note": "pickerFooter({multi:false}) gives a secondary Back; but no gutter (new finding)"
+      "note": "Antibiotics › Penicillins › Amoxicillin / Ampicillin"
      },
      {
-      "finding": "Path joined with \" / \" on the trigger",
+      "finding": "Overview shows \"1 selected\"",
       "result": "fixed",
-      "note": "\" › \" on trigger, search meta and group titles"
-     },
-     {
-      "finding": "Reopen starts at All with nothing marked",
-      "result": "fixed",
-      "note": "Opens at the category with the current medicine ticked"
-     },
-     {
-      "finding": "Overview \"1 selected\"; cascade demo browses Symptoms under Medicine",
-      "result": "not fixed"
+      "note": "Overview trigger reads Low appetite"
      }
     ],
     "previous": {
-     "round": 3,
-     "commit": "8e198e7",
+     "round": 4,
+     "commit": "ce52431",
      "status": "in-design",
      "lowest": 7,
      "scores": {
       "clarity": 8,
       "budget": 8,
-      "hierarchy": 7,
-      "spacing": 8,
-      "broken": 7
+      "hierarchy": 8,
+      "spacing": 7,
+      "broken": 8
      },
      "findings": [
-      "Record-form names are line-clamped after \"+n\" is appended, so with long names the \"+n\" is the part that gets cut (Record health, 4 conditions: \"Weakness or unsteady stance · Reduced appetite · Porcine reproductive and…\").",
-      "Medicine picker's sole Back is still drawn as the full-width filled primary button; everywhere else Back is secondary (round-2 finding, not fixed).",
-      "Path written two ways: trigger \"Antibiotics / Antibiotic B\", sheet \"All › Antibiotics\".",
-      "Reopening the medicine picker starts at All with nothing marked, so the current pick is not shown.",
-      "Atlas Overview demos Conditions (a record form) as \"1 selected\", and the cascade demo browses Symptoms under a Medicine label."
+      ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on Select conditions (Back / Done · 4) and Select medicine (Back, 390px wide) the buttons touch the screen edges and their rounded corners are cut. Moving the medicine sheet onto pickerFooter spread it.",
+      "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path [Antibiotics, Conditions] (round 3, not fixed).",
+      "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed)."
      ]
     }
    },
@@ -16161,24 +16463,6 @@
     "variantsJson": false,
     "variants": []
    }
-  },
-  {
-   "name": "Filter sheet",
-   "group": "Inputs and filters",
-   "status": "placeholder",
-   "seenIn": [
-    "farrowing.room"
-   ],
-   "note": "A sheet that narrows a list by due range and parity, with Back, Reset and a Show-n-sows button."
-  },
-  {
-   "name": "Range slider",
-   "group": "Inputs and filters",
-   "status": "placeholder",
-   "seenIn": [
-    "farrowing.room"
-   ],
-   "note": "A two-handle slider for a due-date range, with its end labels."
   }
  ],
  "backlog": [
@@ -20505,6 +20789,18 @@
    "source": "gate"
   },
   {
+   "id": "gate:Segment:2",
+   "target": {
+    "kind": "component",
+    "id": "Segment"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Lens tab now demos Today / 7 days with no counts: a time-range view switch, not states of one…",
+   "detail": "Lens tab now demos Today / 7 days with no counts: a time-range view switch, not states of one list (the README's lens is working pile / finished pile with inline counts). Its Long-label state passes active:'today' with options todo/done, so nothing is selected.\nFix: variants/lens.html: demo a 2-state pile split with inline counts in a card header (e.g. Open 2 / Closed 5), and set Long-label active:'todo'.",
+   "source": "gate"
+  },
+  {
    "id": "gate:FilterChips:0",
    "target": {
     "kind": "component",
@@ -20589,6 +20885,150 @@
    "source": "gate"
   },
   {
+   "id": "gate:FilterSheet:0",
+   "target": {
+    "kind": "component",
+    "id": "FilterSheet"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "Stale draft: the list summary's Clear (room-clear-filter) and Inspection's reset-filters reset…",
+   "detail": "Stale draft: the list summary's Clear (room-clear-filter) and Inspection's reset-filters reset the applied filter but not filterDraft, so reopening the sheet shows filters the list says are off.\nFix: In room-clear-filter and reset-filters also reset the draft to defaults; Back keeps the draft only for unapplied edits.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:FilterSheet:1",
+   "target": {
+    "kind": "component",
+    "id": "FilterSheet"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "Atlas console not clean: every srcdoc cell of variants/list.html loads ../../tokens.css,…",
+   "detail": "Atlas console not clean: every srcdoc cell of variants/list.html loads ../../tokens.css, ../bundle.css, ../../../system/sentri-icons.js, ../bundle.js and 404s (32 errors on the tab).\nFix: Drop the asset link/script tags from variants/list.html (atlas injects them, as other components' variant files do) or make them root-relative.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:FilterSheet:2",
+   "target": {
+    "kind": "component",
+    "id": "FilterSheet"
+   },
+   "kind": "broken",
+   "severity": "medium",
+   "title": "Parity chips overflow: '6+' is clipped at the sheet edge at 390 (the 4th chip in atlas cells),…",
+   "detail": "Parity chips overflow: '6+' is clipped at the sheet edge at 390 (the 4th chip in atlas cells), with no visible scrollbar; Farrowing previously showed all five on a facet Segment.\nFix: Let FilterChips wrap inside FilterSheet groups, or use Segment facet for a fixed 5-value set.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:FilterSheet:3",
+   "target": {
+    "kind": "component",
+    "id": "FilterSheet"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Commit label is hard-coded 'Show {count} {noun}' and Clear/Back stay English in the zh example.",
+   "detail": "Commit label is hard-coded 'Show {count} {noun}' and Clear/Back stay English in the zh example.\nFix: Add a commitLabel (string or fn(count)) prop and pass localised Clear/Back strings; render the zh state with them.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:FilterSheet:4",
+   "target": {
+    "kind": "component",
+    "id": "FilterSheet"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "Disabled state duplicates Empty ('Show 0 sows' + 'No sows match'); Pressed only greys the Clear…",
+   "detail": "Disabled state duplicates Empty ('Show 0 sows' + 'No sows match'); Pressed only greys the Clear text action — neither is a FilterSheet state.\nFix: Give Disabled a distinct cause (e.g. 'Filters unavailable offline') or drop it; drop Pressed (Button owns it).",
+   "source": "gate"
+  },
+  {
+   "id": "gate:FilterSheet:5",
+   "target": {
+    "kind": "component",
+    "id": "FilterSheet"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "The inspection.filters note was hand-edited into atlas.json and is lost on regeneration (build…",
+   "detail": "The inspection.filters note was hand-edited into atlas.json and is lost on regeneration (build reverts it to 'Reset clears the draft; Show pigs applies it').\nFix: Put the note in the generator's source for inspection.filters.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:RangeSlider:0",
+   "target": {
+    "kind": "component",
+    "id": "RangeSlider"
+   },
+   "kind": "design",
+   "severity": "high",
+   "title": "Value text is raw numbers: Farrowing shows 'Due in -7–7 days', ends '-7 days'/'7 days', and…",
+   "detail": "Value text is raw numbers: Farrowing shows 'Due in -7–7 days', ends '-7 days'/'7 days', and '-7–-7 days' at the limit, while -7/7 are open-ended ('7+ days ago' / 'In 7+ days') and the list summary formats them that way — sheet and list disagree and the sheet is wrong at the ends.\nFix: Add a format(value) prop used for output, end labels and aria-valuetext; Farrowing passes dueDay (7+ days ago · Today · In 7+ days).",
+   "source": "gate"
+  },
+  {
+   "id": "gate:RangeSlider:1",
+   "target": {
+    "kind": "component",
+    "id": "RangeSlider"
+   },
+   "kind": "broken",
+   "severity": "high",
+   "title": "Atlas console not clean: variants/range.html cells request ../../tokens.css, ../bundle.css,…",
+   "detail": "Atlas console not clean: variants/range.html cells request ../../tokens.css, ../bundle.css, ../bundle.js, sentri-icons.js and 404 inside srcdoc.\nFix: Remove the asset tags from variants/range.html (atlas injects them) or make them root-relative.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:RangeSlider:2",
+   "target": {
+    "kind": "component",
+    "id": "RangeSlider"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "The track has no fill between the handles; the chosen span is only implied by two staggered…",
+   "detail": "The track has no fill between the handles; the chosen span is only implied by two staggered circles with stems, and Farrowing's old 'Today' midpoint label is gone.\nFix: Paint the rail segment between the handles with an ink token and add an optional mid-label property.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:RangeSlider:3",
+   "target": {
+    "kind": "component",
+    "id": "RangeSlider"
+   },
+   "kind": "design",
+   "severity": "medium",
+   "title": "Long zh value breaks inside the number range ('0–' then '5 天').",
+   "detail": "Long zh value breaks inside the number range ('0–' then '5 天').\nFix: Use overflow-wrap:break-word on the label and white-space:nowrap on <output>.",
+   "source": "gate"
+  },
+  {
+   "id": "gate:RangeSlider:4",
+   "target": {
+    "kind": "component",
+    "id": "RangeSlider"
+   },
+   "kind": "design",
+   "severity": "low",
+   "title": "README carries FilterSheet boilerplate ('Do show current bounds and count', 'Limit short visible…",
+   "detail": "README carries FilterSheet boilerplate ('Do show current bounds and count', 'Limit short visible choice rows to five', 'Do preserve drafts on Back') that is not RangeSlider's job.\nFix: Cut those lines; keep slider rules only (step, bounds never cross, Measure for exact values).",
+   "source": "gate"
+  },
+  {
+   "id": "gate:RangeSlider:p0",
+   "target": {
+    "kind": "component",
+    "id": "RangeSlider"
+   },
+   "kind": "decision",
+   "severity": "medium",
+   "title": "Merge Feed adjustment slider?",
+   "detail": "Inspection's feed edit still uses a hand-built native single range (−50%..+50%); it records a value, so it belongs with Stepper/Measure, not as a RangeSlider variant.\nSeen in: inspection.actions",
+   "source": "gate"
+  },
+  {
    "id": "gate:Field:0",
    "target": {
     "kind": "component",
@@ -20667,33 +21107,9 @@
     "id": "PickerField"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on…",
-   "detail": ".st-picker-footer{padding:var(--space-12) 0} overrides .sheet-footer's side padding, so on Select conditions (Back / Done · 4) and Select medicine (Back, 390px wide) the buttons touch the screen edges and their rounded corners are cut. Moving the medicine sheet onto pickerFooter spread it.\nFix: bundle.css: .st-picker-footer{padding-block:var(--space-12)} (no inline 0) so the sheet footer keeps its gutter.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:PickerField:1",
-   "target": {
-    "kind": "component",
-    "id": "PickerField"
-   },
-   "kind": "design",
    "severity": "low",
-   "title": "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path…",
-   "detail": "Atlas cascade variant demo labels the field Medicine but browses Symptoms, with path [Antibiotics, Conditions] (round 3, not fixed).\nFix: variants/cascade.html: use medicine categories and a medicine leaf.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:PickerField:2",
-   "target": {
-    "kind": "component",
-    "id": "PickerField"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed).",
-   "detail": "Overview demos Conditions as \"1 selected\" while record forms show names (round 3, not fixed).\nFix: preview.html: pass names:[\"Low appetite\"].",
+   "title": "Atlas cascade Active demo passes path [Antibiotics, Penicillins], so the trigger reads…",
+   "detail": "Atlas cascade Active demo passes path [Antibiotics, Penicillins], so the trigger reads \"Antibiotics › Penicillins\" and never names the chosen Amoxicillin; the real medicine trigger reads category › medicine.\nFix: variants/cascade.html state-Active: path [\"Penicillins\",\"Amoxicillin\"] (or whatever pickerField needs to end on the leaf).",
    "source": "gate"
   },
   {

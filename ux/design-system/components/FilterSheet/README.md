@@ -23,10 +23,9 @@ Sheet drawer, title, optional scope, Clear text action, named filter groups, opt
 | State | Treatment |
 | --- | --- |
 | Default | Enabled, current values shown. |
-| Pressed | Heavier border and inset surface. |
 | Active | Selected choice includes a check and accessible selection state. |
-| Empty | Zero count; commit blocked with No sows match. |
-| Disabled | Blocked with a persistent reason. |
+| Empty | Zero count; commit blocked with the reason (No sows match). The controls stay live so the draft can be widened. |
+| Disabled | The whole sheet is unavailable (e.g. while syncing): every control, Clear and Show are disabled and one persistent reason says why. Not the same as Empty. |
 | Error | Persistent explanation and recovery instruction. |
 | Loading | Counting results; commit blocked. |
 | Long / Chinese | Labels wrap without truncation. |
@@ -35,13 +34,13 @@ Every state is rendered in [the variant](variants/list.html).
 
 ## Behaviour
 
-The caller owns draft and applied values. Back, Close and scrim preserve the draft; reopening resumes it. Clear changes the draft to defaults. Show commits and closes. Count updates after every draft change; zero results blocks commit with a visible reason. Applied values appear once in the list summary and active group count badges the filter IconButton. No farm data is recorded, so leaving requires no unsaved-record confirmation.
+The caller owns draft and applied values. Back, Close and scrim preserve the draft; reopening resumes it. Clear changes the draft to defaults. Clear on the list (the summary line) resets the applied filter and the draft together, so reopening never shows filters the list says are off; the caller keeps applied and draft in agreement after any list-level clear. Show commits and closes. Count updates after every draft change; zero results blocks commit with a visible reason. Applied values appear once in the list summary and active group count badges the filter IconButton. No farm data is recorded, so leaving requires no unsaved-record confirmation.
 
 No presets existed in Farrowing; do not invent a preset variant. A caller can put up to four FilterChips presets above a range. Limit short visible choice rows to five; use PickerField beyond five. One drawer at a time; replace its content for nested pickers.
 
 ## Content rules
 
-Sentence case. Label budget: 32 English characters / 16 Chinese characters; longer labels wrap, never truncate values or reasons. Always name units. Reasons say what is missing and how to recover. Clear uses registered `act.clear`; Back preserves draft. The caller supplies noun singular/plural and localized strings.
+Sentence case. Short choice groups wrap (nothing is cut off or hidden behind a scroll). Label budget: 32 English characters / 16 Chinese characters; longer labels wrap, never truncate values or reasons. Always name units. Reasons say what is missing and how to recover. Clear uses registered `act.clear`; Back preserves draft. Every label is a registered string (`act.clear`, `act.back`, `ds.filter.show`, `ds.filter.counting`; a feature passes `showStr:{one,many}` for its own “Show {n} sow(s)”). Where no shell fills them, pass `labels:{clear,back,counting,show(n,noun)}` in the user’s language.
 
 ## Accessibility
 
@@ -51,7 +50,7 @@ All targets use `--tap-min` (48 CSS pixels). Disabled commit stays understandabl
 
 ## Do / don’t
 
-Do show current bounds and count. Do preserve drafts on Back. Don’t repeat count in a second heading. Don’t use colour alone for selection or errors. Don’t stack cards or drawers.
+Do show the count only on the Show button. Do preserve drafts on Back, but reset them when the list is cleared. Don’t repeat the count in a second heading. Don’t use colour alone for selection or errors. Don’t stack cards or drawers.
 
 ## API and tokens
 
