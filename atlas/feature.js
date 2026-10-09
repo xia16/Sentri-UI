@@ -193,7 +193,7 @@ function openFeature(id, sel) {
   const todos = f.screens.filter((s) => s.status === 'placeholder').length + f.screens.reduce((t, s) => t + ((s.notes && s.notes.issues) || []).length, 0);
   const confirm = ((f.prd || '').match(/to confirm/gi) || []).length;
   header(`<a href="#" id="crumb-back">${esc(f.sectionRef.name)}</a> / <b>${esc(f.name)}</b> <span class="zh">${esc(f.zh || '')}</span>
-    <span class="meta">${dot(f.status)}<span>${plural(n, 'screen')}</span> · <a href="#" id="l-prd">PRD</a> · <a href="#" id="l-dec">Decisions</a>${todos ? ` · <span title="Placeholder screens plus issues written in screen notes">To-dos ${todos}</span>` : ''}${confirm ? ` · <span title="Open questions marked “to confirm” in the PRD">To confirm ${confirm}</span>` : ''}</span>`);
+    <span class="meta">${dot(f.status)}${f.status === 'frozen' ? '<span>Frozen</span> · ' : ''}<span>${plural(n, 'screen')}</span> · <a href="#" id="l-prd">PRD</a> · <a href="#" id="l-dec">Decisions</a>${todos ? ` · <span title="Placeholder screens plus issues written in screen notes">To-dos ${todos}</span>` : ''}${confirm ? ` · <span title="Open questions marked “to confirm” in the PRD">To confirm ${confirm}</span>` : ''}</span>`);
   document.getElementById('crumb-back').onclick = (e) => { e.preventDefault(); closeFeature(); };
   const page = document.getElementById('feature'); page.hidden = false; page.innerHTML = '';
 

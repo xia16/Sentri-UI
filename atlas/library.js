@@ -67,14 +67,16 @@ async function renderComponents() {
     setParam('component', key === 'Cover' ? null : key);
     nav.querySelectorAll('button').forEach((b) => b.setAttribute('aria-current', b.dataset.k === key));
     pane.scrollTop = 0; pane.innerHTML = '';
-    ({ Cover: pageCover, _brand: pageBrand, _foundations: pageFoundations, _icons: pageIcons }[key] || pageComponent)(key);
+    ({ Cover: pageCover, _brand: pageBrand, _foundations: pageFoundations, _icons: pageIcons, _task: pageTask }[key] || pageComponent)(key);
   };
   navItem(nav, 'Cover', 'Cover', null, () => go('Cover'));
   Object.entries(pages).forEach(([k, n]) => navItem(nav, k, n, null, () => go(k)));
-  COMPONENT_GROUPS.forEach(([g, names]) => {
+  COMPONENT_GROUPS.filter((g) => g[0] !== 'Task skeleton').forEach(([g, names]) => {
     nav.append(el(`<h5>${esc(g)}</h5>`));
     names.forEach((n) => navItem(nav, n, `${dot('in-design')}${esc(n)}`, null, () => go(n)));
   });
+  nav.append(el('<h5>Task skeleton</h5>'));
+  navItem(nav, '_task', `${dot('in-design')}Task skeleton (to be organised)`, null, () => go('_task'));
   document.querySelector('.lib aside > p').textContent = `Mobile design system · ${count} parts. ` + 'A part is set when the first feature using it freezes.';
 
   const compLink = (u) => { const m = u.match(/(?:^|\/)([A-Za-z]+)\/README\.md$/); return m && COMPONENT_GROUPS.some((g) => g[1].includes(m[1])) ? '?view=components&component=' + m[1] : null; };
@@ -114,17 +116,26 @@ async function renderComponents() {
     pane.append(el('<h3>Radius</h3>'));
     pane.append(el(`<div class="scale">${t.radius.tokens.map((s) => `<div>${esc(s.name)}<code>${esc(s.value)}</code></div><div><div class="box" style="border-radius:${esc(s.value)}"></div></div><small>${esc(s.usage)}</small>`).join('')}</div>`));
   }
+  async function pageTask() {
+    pane.append(el('<h2>Task skeleton (to be organised)</h2>'));
+    pane.append(el(`<div class="cmeta">${dot('in-design')}<span class="t">${esc(STATUS['in-design'])}</span></div>`));
+    pane.append(el('<p class="muted" style="max-width:720px;margin:0 0 14px">Extracted from Farrowing in one go (ADR 0003). Most of these are the task page’s structure (they belong on the Tasks section’s Task skeleton page), some duplicate base components, two belong to Piglet processing. Organised in the component pass (#45).</p>'));
+    pane.append(el(`<iframe class="preview" title="Task skeleton demo" src="${SKELETON_DEMO}" style="width:100%;height:900px;border:1px solid var(--line)"></iframe>`));
+    pane.append(el('<h3>Parts</h3>'));
+    const names = (COMPONENT_GROUPS.find((g) => g[0] === 'Task skeleton') || [0, []])[1];
+    pane.append(el(`<div class="usedby">${names.map((n) => `<a href="${DS}/components/${esc(n)}/README.md" target="_blank" rel="noopener">${esc(n)}</a>`).join('')}</div>`));
+  }
   async function pageComponent(name) {
     const group = (COMPONENT_GROUPS.find((g) => g[1].includes(name)) || [''])[0];
     const head = el(`<h2>${esc(name)}</h2>`); pane.append(head);
     const meta = el(`<div class="cmeta">${dot('in-design')}<span class="t">${esc(STATUS['in-design'])} · ${esc(group)}</span></div>`); pane.append(meta);
+    pane.append(el('<p class="muted" style="margin:-6px 0 14px;font-size:12px">Variants and their states are written in the component pass.</p>'));
     let readme = ''; try { readme = await getText(`${DS}/components/${name}/README.md`); } catch (_) {}
     const cand = /candidate/i.test(readme.slice(0, 300)), adr = (readme.slice(0, 400).match(/ADR (\d{4})/) || [])[1];
     if (cand) meta.querySelector('.t').textContent += ` · candidate${adr ? ' (ADR ' + adr + ')' : ''}`;
     let prev = await styledPreview(name);
     if (!prev) {
-      prev = el(`<iframe class="preview" title="Task skeleton demo" src="${SKELETON_DEMO}" style="width:100%;height:900px;border:1px solid var(--line)"></iframe>`);
-      pane.append(el('<p class="muted" style="margin:0 0 10px">No preview of its own: the task skeleton demo shows every part.</p>'));
+      prev = el('<div class="nopreview">No preview of its own yet — built in the component pass</div>');
     }
     pane.append(prev);
     const used = usedBy(name);
@@ -140,7 +151,8 @@ async function renderComponents() {
     pane.append(el(readme ? `<div class="guide doc">${md(readme, { link: compLink })}</div>` : '<p class="none">No README written yet.</p>'));
   }
   const want = q.get('component');
-  go(want && (pages[want] || want === 'Cover' || COMPONENT_GROUPS.some((g) => g[1].includes(want))) ? want : 'Cover');
+  const inTask = want && (COMPONENT_GROUPS.find((g) => g[0] === 'Task skeleton') || [0, []])[1].includes(want);
+  go(inTask || want === '_task' ? '_task' : want && (pages[want] || want === 'Cover' || COMPONENT_GROUPS.some((g) => g[1].includes(want))) ? want : 'Cover');
 }
 
 /* ---------- Copy: one registry; screens refer to strings by id ---------- */

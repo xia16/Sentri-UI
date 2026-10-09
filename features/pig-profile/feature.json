@@ -552,6 +552,8 @@
       "zh": "批次记录",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "production-batches",
+      "steps": ["[data-action=\"pig-production-batch\"]"],
       "figma": "",
       "notes": {
         "purpose": "One finished or current batch of the pig.",
@@ -599,6 +601,8 @@
       "zh": "来源",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-origin\"]"],
       "figma": "",
       "notes": {
         "purpose": "Where the pig came from and the identities it carries.",
@@ -638,6 +642,8 @@
       "zh": "猪只记录",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-log\"]"],
       "figma": "",
       "notes": {
         "purpose": "Everything recorded on this pig, filterable.",
@@ -684,6 +690,8 @@
       "zh": "操作（单头猪）",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]"],
       "figma": "",
       "notes": {
         "purpose": "Everything a worker can do to one pig, in three groups: Production, Health, General. The same sheet opens for several pigs (inspection.actions).",
@@ -796,6 +804,8 @@
       "zh": "记录任务结果",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"production-task\"]"],
       "figma": "",
       "notes": {
         "purpose": "Finish or defer a production task from the pig.",
@@ -842,6 +852,8 @@
       "zh": "记录流产",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"miscarriage\"]"],
       "figma": "",
       "notes": {
         "purpose": "Record a pregnancy loss as a production outcome.",
@@ -872,6 +884,8 @@
       "zh": "批次归属",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"batch-membership\"]"],
       "figma": "",
       "notes": {
         "purpose": "Put the pig into a batch, move her to another, or remove her.",
@@ -916,6 +930,8 @@
       "zh": "测量与体况",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"measurements-menu\"]"],
       "figma": "",
       "notes": {
         "purpose": "Pick which reading to record.",
@@ -954,6 +970,8 @@
       "zh": "记录体重 / 体温 / 背膘",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"measurements-menu\"]","[data-action=\"weight\"]"],
       "figma": "",
       "notes": {
         "purpose": "Enter one reading for one pig, or one per pig for several.",
@@ -1025,6 +1043,8 @@
       "zh": "体况",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"measurements-menu\"]","[data-action=\"body\"]"],
       "figma": "",
       "notes": {
         "purpose": "Record a pig as Thin or Over-conditioned.",
@@ -1068,6 +1088,8 @@
       "zh": "添加备注",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"note\"]"],
       "figma": "",
       "notes": {
         "purpose": "Leave a note on a pig (or the same note on several).",
@@ -1094,6 +1116,8 @@
       "zh": "不可用操作",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": ["[aria-label=\"Select pig 000254\"]","[data-action=\"actions\"]","[data-action=\"unavailable-actions\"]"],
       "figma": "",
       "notes": {
         "purpose": "Show every blocked action with its reason.",

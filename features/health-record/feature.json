@@ -363,6 +363,8 @@
       "zh": "健康记录详情",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "health-mixed",
+      "steps": ["[data-action=\"finding\"]"],
       "figma": "",
       "notes": {
         "purpose": "One condition on one pig: its care, note, treatment and the ways to change or close it.",
@@ -433,6 +435,8 @@
       "zh": "编辑健康记录",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "health-mixed",
+      "steps": ["[data-action=\"finding\"]","[data-action=\"finding-edit\"]"],
       "figma": "",
       "notes": {
         "purpose": "Rename the condition, change its care and add a note.",
@@ -478,6 +482,8 @@
       "zh": "解决或移除",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "health-mixed",
+      "steps": ["[data-action=\"finding\"]","[data-action=\"finding-close\"]"],
       "figma": "",
       "notes": {
         "purpose": "Close one finding as Recovered or Entered in error.",
@@ -514,6 +520,8 @@
       "zh": "记录疾病 / 症状",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"health\"]"],
       "figma": "",
       "notes": {
         "purpose": "Add one or more diseases or symptoms to one pig or many in one move.",
@@ -592,6 +600,8 @@
       "zh": "选择疾病 / 症状",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"health\"]","[data-action=\"bulk-pick-health\"]"],
       "figma": "",
       "notes": {
         "purpose": "Search or browse the disease and symptom catalogue and tick one or more.",
@@ -656,6 +666,8 @@
       "zh": "照护指示",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"triage\"]"],
       "figma": "",
       "notes": {
         "purpose": "Change the care level (and add a note) for a chosen condition across the selected pigs.",
@@ -730,6 +742,8 @@
       "zh": "解决疾病 / 症状",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"resolve\"]"],
       "figma": "",
       "notes": {
         "purpose": "Recover or correct one chosen condition across the selected pigs.",
@@ -786,6 +800,8 @@
       "zh": "记录治疗",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"treatment\"]"],
       "figma": "",
       "notes": {
         "purpose": "Record medicine actually given, to one pig or many, without implying every pig got the same dose.",
@@ -879,6 +895,8 @@
       "zh": "选择药品",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"treatment\"]","[data-action=\"medicine-open\"]"],
       "figma": "",
       "notes": {
         "purpose": "Choose the medicine (or vaccine).",

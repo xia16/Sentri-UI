@@ -475,7 +475,8 @@
                 "shows": "\"Target 12\" in the normal support colour"
               }
             ],
-            "logic": "Figure = the unit's average live piglets per litter (\"Live / litter\"); target = its per-litter target. The prototype hard-codes 10 and 12 and sets belowTarget to true, so Target is always amber and the 10 is not derived from the litters shown. Period and cohort of the average are not stated. Not editable; the unit changes only through the Task overview or Home's Choose unit.",
+            "rule": "Confirmed by the owner: Target is an amber below-target warning. It is amber when the unit's live-per-litter is below the target and neutral otherwise.",
+            "logic": "Figure = the unit's average live piglets per litter (\"Live / litter\"); target = its per-litter target. Not editable; the unit changes only through the Task overview or Home's Choose unit.",
             "source": "farrowing-astra-concept.js room() unit:{value,target,belowTarget}; astra-task-overview.js (tc-target-attention); ASTRA-ROOM-PAGE-AUDIT.md",
             "at": "Live / litter"
           },
@@ -640,7 +641,7 @@
           "Unit card and tabs are Unit 7 only; the Task overview card is all units. Only the card names its scope.",
           "Active and Awaiting appear three times at two scopes: bar segments, support text and tabs.",
           "\"Done 2\" and \"Farrowed 7\" look like one measure but count differently; neither label explains it.",
-          "Live / litter 10 and Target 12 are fixed sample text, always amber, and clash with the End task metric (12.0 against the same target).",
+          "Prototype hard-codes amber (belowTarget = true); never shows the neutral state.",
           "Row recency and hand are hard-coded; \"1h ago\" never ticks. Overdue rows lack the ruled \"induced yesterday · L.M\" second line.",
           "Last record line repeats each row's recency; the ruled one-sentence task copy under it is missing.",
           "Pen headers open pen tools (feed, fault, note, log) although the rulings call them census-only dead zones; unclear whose feature that is.",
@@ -1973,7 +1974,10 @@
       "id": "farrowing.edit-finished",
       "name": "Edit record (finished litter)",
       "zh": "编辑记录(已完成)",
-      "status": "placeholder",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "locked",
+      "steps": ["Edit"],
       "figma": "",
       "notes": {
         "purpose": "The Edit face after farrowing has finished or the sow has died: Born is a locked row with an amber pencil; finish details sit behind one row.",
@@ -1994,8 +1998,8 @@
             "at": "Stillborn"
           },
           {
-            "name": "At finish row",
-            "shows": "Weak 1 · deformed 1 · 12.6 kg · assisted ›.",
+            "name": "Finish details row",
+            "shows": "One row; weak, deformed, litter weight and assistance sit behind it.",
             "states": [
               {
                 "state": "Finished litter",
@@ -2009,14 +2013,14 @@
               }
             ],
             "source": "RULINGS \"Model\"; farrowing-astra-concept.js edit()",
-            "at": "At finish"
+            "at": "Finish details"
           }
         ],
         "controls": [],
         "copy": [
           "(raw) Edit record",
           "(raw) Born N",
-          "(raw) At finish"
+          "(raw) Finish details"
         ],
         "edge": [],
         "rules": [
@@ -2024,7 +2028,7 @@
           "\"Edit folds what a hand rarely fixes\" (Model)"
         ],
         "issues": [
-          "Prototype pushes a separate Edit finish details page; the ruling expands the At finish row in place."
+          "Prototype pushes a separate Edit finish details page; the ruling expands the Finish details row in place."
         ]
       }
     },
@@ -2032,7 +2036,10 @@
       "id": "farrowing.overview",
       "name": "Task overview",
       "zh": "任务总览",
-      "status": "placeholder",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": ["Task overview"],
       "figma": "",
       "notes": {
         "purpose": "The whole-task sheet behind the Task overview card: progress across all units, unit chooser, performance, other outcomes and the way to End task.",
@@ -2124,7 +2131,10 @@
       "id": "farrowing.task-receipt",
       "name": "Task receipt",
       "zh": "任务回执",
-      "status": "placeholder",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "task-complete",
+      "steps": [{"tap":".hold","hold":1000}],
       "figma": "",
       "notes": {
         "purpose": "The frozen record after the task ended: who, when, performance and outcomes.",

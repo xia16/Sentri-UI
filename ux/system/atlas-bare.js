@@ -4,6 +4,8 @@
    - Putting the page in the state: the screen's `preset` goes through the page's select.scenario; pages driven by their own
      URL params (Home, Piglet processing) already carry them in the screen's url.
    - Ready: parent.postMessage({ atlasReady: id }).
+   - Screens only a tap reaches: the screen's `steps` (ordered; each a string or { tap, hold }) are replayed after the preset.
+     A step is visible text, an aria-label / title, or a CSS selector (starts with [ . #), matched inside the phone.
    - The flow follows the demo: a page calls AtlasBare.watch(fn) after every render, fn() returns the screen id of the
      state it is in (or null); when that changes, parent.postMessage({ atlasScreen: id }).
    One convention for every prototype: new pages include this script in <head> and call AtlasBare.watch where they can.
@@ -57,6 +59,46 @@
     phone.classList.add('atlas-phone');
   }
 
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function frames() { return new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); }); }
+  function shown(el) { return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length); }
+  function norm(t) { return (t || '').replace(/\s+/g, ' ').trim().toLowerCase(); }
+  var TAPPABLE = 'button,a,[data-action],[role=button],label,summary,[tabindex]';
+  function findStep(phone, key) {
+    var k = String(key), want = norm(k), el, list, i;
+    if (/^[\[.#]/.test(k)) { list = phone.querySelectorAll(k); for (i = 0; i < list.length; i++) if (shown(list[i])) return list[i]; return null; }
+    var all = Array.prototype.filter.call(phone.querySelectorAll('*'), shown), best = null;
+    for (i = 0; i < all.length; i++) {   // smallest visible element whose text is the step, then its nearest control
+      el = all[i];
+      if (norm(el.textContent) === want && (!best || best.contains(el))) best = el;
+    }
+    if (best) return best.closest(TAPPABLE) && phone.contains(best.closest(TAPPABLE)) ? best.closest(TAPPABLE) : best;
+    for (i = 0; i < all.length; i++) {   // a control whose text begins with the step (its other words are a hint line)
+      el = all[i];
+      if (el.matches(TAPPABLE) && norm(el.textContent).indexOf(want) === 0 && (!best || best.contains(el))) best = el;
+    }
+    if (best) return best;
+    for (i = 0; i < all.length; i++) if (norm(all[i].getAttribute('aria-label')) === want || norm(all[i].getAttribute('title')) === want) return all[i];
+    return null;
+  }
+  function replay(phone, steps) {
+    var chain = Promise.resolve();
+    steps.forEach(function (st) {
+      chain = chain.then(function () {
+        var key = typeof st === 'string' ? st : st.tap, hold = typeof st === 'object' && st.hold;
+        var el = findStep(phone, key);
+        if (!el) { console.error('atlas-bare: step not found: ' + key); return; }
+        if (hold) {
+          var o = { bubbles: true, cancelable: true, button: 0, pointerId: 1, pointerType: 'mouse', isPrimary: true };
+          el.dispatchEvent(new PointerEvent('pointerdown', o));
+          return wait(hold).then(function () { el.dispatchEvent(new PointerEvent('pointerup', o)); });
+        }
+        el.click();
+      }).then(frames).then(function () { return wait(60); });
+    });
+    return chain;
+  }
+
   function check() {
     if (!ready || !fn) return;
     var sid = null; try { sid = fn(AB.screens); } catch (e) { return; }
@@ -65,6 +107,7 @@
     if (sid) parent.postMessage({ atlasScreen: sid }, '*');
   }
   AB.watch = function (f) { fn = f; check(); };
+  AB.current = function () { try { return fn ? fn(AB.screens) : null; } catch (e) { return null; } };   // the screen the page is on now (for checks)
 
   function start() {
     data.then(function (d) {
@@ -78,6 +121,8 @@
         else if (sel.value !== preset) { sel.value = preset; sel.dispatchEvent(new Event('change', { bubbles: true })); }
       }
       if (!AB.screen) console.warn('atlas-bare: unknown screen ' + id);
+      var steps = (AB.screen && AB.screen.steps) || [];
+      (steps.length ? frames().then(function () { return replay(phone, steps); }) : Promise.resolve()).then(function () {
       hideAround(phone);
       var fonts = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 250); })]) : Promise.resolve();
       fonts.then(function () { requestAnimationFrame(function () { requestAnimationFrame(function () {
@@ -85,6 +130,7 @@
         if (fn) { try { prev = fn(AB.screens); } catch (e) { prev = null; } }   // the state the screen opens in is not a change
         parent.postMessage({ atlasReady: id }, '*');
       }); }); });
+      });
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();

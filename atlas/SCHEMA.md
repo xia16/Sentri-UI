@@ -42,6 +42,7 @@ Words are the design workflow's ([glossary](../docs/design-workflow/GLOSSARY.md)
     "status": "in-design",
     "url": "/ux/system/farrowing-astra-concept.html?layout=focus",   // where it renders today; omit for a placeholder
     "preset": "room",                   // the prototype's scenario value that shows it, if any
+    "steps": ["Task overview", { "tap": "Finish", "hold": 900 }],   // taps to replay after the preset, for a screen no scenario opens (below)
     "figma": "",                        // never shown in the atlas; for research only
     "notes": {
       "purpose": "one sentence: what the screen is for",
@@ -58,6 +59,10 @@ Words are the design workflow's ([glossary](../docs/design-workflow/GLOSSARY.md)
 ```
 
 Rules the generator checks: ids unique across all features; every id in `anchor`, `groups`, `flow`, `entryPoints.lands` is one of the feature's screens; every `entryPoints.from` and `addsTo.screen` is a screen of some feature (or `null` for the app's start); a screen sits in exactly one anchor status, exit, `any` or task band; `url` and `placeholder` exclude each other.
+
+## `steps`: screens only a tap reaches
+
+When no scenario of the prototype opens a screen, give it the `url`/`preset` of the nearest state it can start from, and `steps`: an ordered list of taps `atlas-bare.js` replays inside the phone (after the preset, waiting for the phone to settle between taps) before it renders and posts `{atlasReady}`. A step is the control's visible text, its `aria-label` / `title`, or a CSS selector (starts with `[`, `.` or `#`); `{ "tap": "...", "hold": ms }` presses and holds for hold-to-commit buttons. A screen with `url` may have `steps`; a step that finds nothing logs an error and is skipped. Keep paths short, and use text over selectors so they survive restyling.
 
 ## Screen notes: what earns a note (owner, 2026-10-09)
 

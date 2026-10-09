@@ -17,9 +17,9 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline:2px solid #
 main { position:fixed; inset:56px 0 0 0 }
 
 .dot { display:inline-block; width:9px; height:9px; border-radius:50%; flex:none }
-.st-in-design { background:var(--green) } .st-agent-checked { background:#2f7fc1 } .st-approved { background:var(--ink) }
-.st-frozen { background:var(--ink); box-shadow:0 0 0 2px var(--paper), 0 0 0 3px var(--ink) }
-.st-placeholder { border:1.5px dashed #9aa394 }
+.st-in-design { background:transparent; border:1.5px solid var(--muted) } .st-agent-checked { background:#2f6fb0 } .st-approved { background:var(--green) }
+.st-frozen { background:var(--green) }
+.st-placeholder { background:transparent; border:1.5px dashed #9aa394 }
 
 .empty { position:absolute; inset:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:30px; text-align:center; color:var(--muted); border:1.5px dashed #c9cfc2; border-radius:22px }
 .empty b { color:var(--ink); font-size:16px }
@@ -336,3 +336,5 @@ table.copy td.id { font:11.5px var(--mono); overflow-wrap:anywhere }
 .node.dim { opacity:.5 }
 
 .notes .foreign { margin:10px 20px 0; padding:7px 10px; font-size:12px; color:var(--muted); border-left:2px solid var(--line) }
+
+.nopreview { border:1.5px dashed #c9cfc2; border-radius:14px; padding:26px 20px; margin:0 0 14px; text-align:center; color:var(--muted); font-size:13px }

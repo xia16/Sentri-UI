@@ -255,6 +255,13 @@
   const pages={home,sections:sectionChooser,placeholder,environment,maintenance,assistant,finding,toolbox,records:recordLog};
   // The atlas follows the demo (?screen=): the screen whose url holds this scope (view, section, unit, work, attention), else null.
   function atlasScreen(screens){
+    const dr=overlay.querySelector('.drawer');
+    if(dr){
+      if(dr.classList.contains('unit-picker'))return 'workbench.choose-unit';
+      if(dr.classList.contains('sync-drawer'))return 'workbench.saved-work';
+      return state.page==='placeholder'&&dr.querySelector('[data-action="confirm-end-task"]')?'workbench.end-task-early':null;
+    }
+    if(state.page==='placeholder'){const t=task();return t.completedAt||t.terminatedAt?'workbench.closed-task':taskModel(t).state==='ready'?'workbench.task-ready':'workbench.task-preview';}
     if(!['home','sections'].includes(state.page))return null;
     const view=state.page==='sections'?'sections':state.unit?'unit':'';
     const hit=(screens||[]).find(c=>{const u=new URL(c.url,location.href).searchParams;
@@ -262,6 +269,7 @@
     return hit?hit.id:null;
   }
   function render(){app.innerHTML=(pages[state.page]||home)();window.AtlasBare&&AtlasBare.watch(atlasScreen);document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));}
+  if(window.AtlasBare&&AtlasBare.bare)new MutationObserver(()=>AtlasBare.watch(atlasScreen)).observe(overlay,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
   function closeDrawer(){overlay.innerHTML='';state.overlay=null;app.inert=false;if(returnFocus?.isConnected)returnFocus.focus();}
   function drawer(title,body,{size='medium',sizing='content'}={}){returnFocus=document.activeElement;app.inert=true;overlay.innerHTML=`<button class="scrim" data-action="close" aria-label="Close dialog"></button><section class="drawer" data-st-context="drawer" data-size="${size}" data-sizing="${sizing}" role="dialog" aria-modal="true" aria-labelledby="drawer-title" tabindex="-1"><div class="drawer-handle"></div><header class="drawer-head">${SentriUI.heading({title,kind:'page',level:2}).replace('<h2','<h2 id="drawer-title"')}${ib('close','close','Close dialog')}</header><div class="drawer-body">${body}</div><footer class="st-home-drawer-footer">${btn('close',icon('back')+'<span>Back</span>','st-home-back')}</footer></section>`;const primary=overlay.querySelector('.drawer-body .primary, .drawer-body [data-drawer-primary]');if(primary){const form=primary.closest('form');if(form)primary.setAttribute('form',form.id);overlay.querySelector('.st-home-drawer-footer').append(primary);}overlay.querySelector('.drawer')?.focus({preventScroll:true});}
   function unitChoices(){

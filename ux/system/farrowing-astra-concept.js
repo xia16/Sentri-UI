@@ -131,8 +131,11 @@ function atlasScreen(s,c){
  if(v==='death')return 'farrowing.death';
  if(v==='finish')return hasDraft(s)?'farrowing.blocked':'farrowing.finish';
  if(v==='locked')return s.ended?'farrowing.ended':'farrowing.locked';
- if(v==='edit')return s.popup?.kind==='born'?'farrowing.born':'farrowing.edit';
+ if(v==='edit')return s.popup?.kind==='born'?'farrowing.born':s.locked||s.ended?'farrowing.edit-finished':'farrowing.edit';
  if(v==='history')return 'farrowing.history';
+ if(v==='roomOverview')return 'farrowing.overview';
+ if(v==='roomTaskReceipt')return 'farrowing.task-receipt';
+ if(v==='editFinish')return 'farrowing.edit-finished';
  if(v==='roomEndTask'){const r=taskClosureReview(c);return r.blocked?'farrowing.task-blocked':r.awaiting.length?'farrowing.task-ready':r.miscarriages.length?'farrowing.task-outcomes':'farrowing.task-complete';}
  return null;
 }

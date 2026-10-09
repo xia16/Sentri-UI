@@ -467,6 +467,10 @@
       "zh": "栏位详情",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"C1\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Everything about one pen outside its pigs: the note, the feed guidance and the pen log.",
@@ -515,6 +519,11 @@
       "zh": "栏位备注",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"C1\"]",
+        "[data-action=\"pen-note\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Read, add, edit or close the pen's note.",
@@ -564,6 +573,11 @@
       "zh": "栏位记录",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"C1\"]",
+        "[data-action=\"pen-log\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "The pen's activity: transfers, notes, equipment, health, feed.",
@@ -604,6 +618,10 @@
       "zh": "筛选",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[aria-label=\"Filter pigs\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Narrow the walk by production stage, condition or care level.",
@@ -636,6 +654,10 @@
       "zh": "前往栏位",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"grid\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Jump to a pen on the list by its place in the unit.",
@@ -702,6 +724,10 @@
       "zh": "搜索 / 扫码",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"scan\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Find a pig by ear tag or pen.",
@@ -843,6 +869,11 @@
       "zh": "已选",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[aria-label=\"Select pig 000254\"]",
+        "[data-action=\"review-sheet\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Check who is in the selection and remove anyone.",
@@ -882,6 +913,10 @@
       "zh": "本次巡检记录",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"history\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Everything recorded since the page opened.",
@@ -922,6 +957,10 @@
       "zh": "结束巡检",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"finish\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Check in to the unit to record that it was walked.",
@@ -950,6 +989,11 @@
       "zh": "巡检已记录",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"finish\"]",
+        "[data-action=\"check-in\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Confirmation after check-in.",
@@ -982,12 +1026,10 @@
       "id": "inspection.sensors",
       "name": "Unit summary · sensors",
       "zh": "单元概览 · 传感器",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "sensors",
+      "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "Designed as a unit summary above the list; the card exists in code only and is not drawn.",
+        "purpose": "Designed as a unit summary above the list; the card exists in code only and is not drawn. Built in the prototype's code, but nothing opens it yet.",
         "elements": [
           {
             "name": "Environment strip",
@@ -1032,7 +1074,8 @@
         ],
         "issues": [
           "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
-          "Either draw the unit summary or remove the code."
+          "Either draw the unit summary or remove the code.",
+          "unitOverview is never rendered, so this preset shows the plain walk list."
         ]
       }
     },
@@ -1040,12 +1083,10 @@
       "id": "inspection.no-sensors",
       "name": "Unit summary · no sensors",
       "zh": "单元概览 · 无传感器",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "no-sensors",
+      "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "The unit has no sensors installed.",
+        "purpose": "The unit has no sensors installed. Built in the prototype's code, but nothing opens it yet.",
         "elements": [
           {
             "name": "Sensor empty line",
@@ -1061,7 +1102,8 @@
         ],
         "controls": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
+          "unitOverview is never rendered, so this preset shows the plain walk list."
         ]
       }
     },
@@ -1069,12 +1111,10 @@
       "id": "inspection.sensor-unavailable",
       "name": "Unit summary · a sensor with no reading",
       "zh": "单元概览 · 传感器无读数",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "sensor-unavailable",
+      "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "One sensor (Humidity) is installed but returns no value.",
+        "purpose": "One sensor (Humidity) is installed but returns no value. Built in the prototype's code, but nothing opens it yet.",
         "elements": [
           {
             "name": "Metric",
@@ -1090,7 +1130,8 @@
         ],
         "controls": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
+          "unitOverview is never rendered, so this preset shows the plain walk list."
         ]
       }
     },
@@ -1098,12 +1139,10 @@
       "id": "inspection.no-batches",
       "name": "Unit batches · none",
       "zh": "单元批次 · 无",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "no-batches",
+      "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "The unit has no batches; the batch tracker is left out.",
+        "purpose": "The unit has no batches; the batch tracker is left out. Built in the prototype's code, but nothing opens it yet.",
         "elements": [
           {
             "name": "Batch tracker",
@@ -1120,7 +1159,8 @@
         ],
         "controls": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
+          "unitOverview is never rendered, so this preset shows the plain walk list."
         ]
       }
     },
@@ -1128,12 +1168,10 @@
       "id": "inspection.one-batch",
       "name": "Unit batches · one",
       "zh": "单元批次 · 一个",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "one-batch",
+      "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "The unit has one batch (20) in pens C1 and C2; pen D4 is removed.",
+        "purpose": "The unit has one batch (20) in pens C1 and C2; pen D4 is removed. Built in the prototype's code, but nothing opens it yet.",
         "elements": [
           {
             "name": "Batch tracker row",
@@ -1155,7 +1193,8 @@
         ],
         "controls": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
+          "unitOverview is never rendered, so this preset shows the plain walk list."
         ]
       }
     },
@@ -1163,12 +1202,10 @@
       "id": "inspection.many-batches",
       "name": "Unit batches · several",
       "zh": "单元批次 · 多个",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "many-batches",
+      "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "Three batches: 20 (C1), 21 (C2, Gestating from 8 Aug) and 18 (grower, D4).",
+        "purpose": "Three batches: 20 (C1), 21 (C2, Gestating from 8 Aug) and 18 (grower, D4). Built in the prototype's code, but nothing opens it yet.",
         "elements": [
           {
             "name": "Batch tracker rows",
@@ -1178,7 +1215,8 @@
         ],
         "controls": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
+          "unitOverview is never rendered, so this preset shows the plain walk list."
         ]
       }
     },
@@ -1186,12 +1224,10 @@
       "id": "inspection.batch-farrowing",
       "name": "Unit batches · one in farrowing",
       "zh": "单元批次 · 分娩中",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "batch-farrowing",
+      "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "Batch 20 is in farrowing: two sows have farrowed, three have not.",
+        "purpose": "Batch 20 is in farrowing: two sows have farrowed, three have not. Built in the prototype's code, but nothing opens it yet.",
         "elements": [
           {
             "name": "Pig row · stage",
@@ -1214,7 +1250,8 @@
         ],
         "controls": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
+          "unitOverview is never rendered, so this preset shows the plain walk list."
         ]
       }
     },
@@ -1222,12 +1259,10 @@
       "id": "inspection.batch-concurrent",
       "name": "Unit batches · heat check and breeding together",
       "zh": "单元批次 · 并行任务",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "batch-concurrent",
+      "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "One batch with two production tasks running at once: In-heat check and Breeding.",
+        "purpose": "One batch with two production tasks running at once: In-heat check and Breeding. Built in the prototype's code, but nothing opens it yet.",
         "elements": [
           {
             "name": "Pig row · stage and tasks",
@@ -1239,7 +1274,8 @@
         ],
         "controls": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
+          "unitOverview is never rendered, so this preset shows the plain walk list."
         ]
       }
     },
@@ -1247,11 +1283,10 @@
       "id": "inspection.unit-detail",
       "name": "Unit sheet · environment and equipment",
       "zh": "单元详情",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "Readings and open equipment faults for the whole unit. Built in the code but no control in the prototype opens it.",
+        "purpose": "Readings and open equipment faults for the whole unit. Built in the code but no control in the prototype opens it. Built in the prototype's code, but nothing opens it yet.",
         "elements": [
           {
             "name": "Environment readings",
@@ -1308,11 +1343,10 @@
       "id": "inspection.batch-detail",
       "name": "Batch sheet",
       "zh": "批次详情",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "One batch: stage, pigs, pens, task tracker, and a way to filter the walk. Built in the code but no control in the prototype opens it.",
+        "purpose": "One batch: stage, pigs, pens, task tracker, and a way to filter the walk. Built in the code but no control in the prototype opens it. Built in the prototype's code, but nothing opens it yet.",
         "elements": [
           {
             "name": "Batch tracker",
@@ -1335,11 +1369,10 @@
       "id": "inspection.pen-faults",
       "name": "Pen equipment faults",
       "zh": "设备故障",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "Open faults in one pen with Report fault. Built in the code but no control in the prototype opens it.",
+        "purpose": "Open faults in one pen with Report fault. Built in the code but no control in the prototype opens it. Built in the prototype's code, but nothing opens it yet.",
         "elements": [
           {
             "name": "Fault list",
@@ -1374,11 +1407,10 @@
       "id": "inspection.fault-report",
       "name": "Report fault",
       "zh": "报告故障",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "Report a device fault in one pen. Built in the code but no control in the prototype opens it.",
+        "purpose": "Report a device fault in one pen. Built in the code but no control in the prototype opens it. Built in the prototype's code, but nothing opens it yet.",
         "elements": [
           {
             "name": "Report form",
@@ -1398,11 +1430,10 @@
       "id": "inspection.fault-resolve",
       "name": "Fault",
       "zh": "故障记录",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "Read one fault and resolve it with an optional note. Built in the code but no control in the prototype opens it.",
+        "purpose": "Read one fault and resolve it with an optional note. Built in the code but no control in the prototype opens it. Built in the prototype's code, but nothing opens it yet.",
         "elements": [
           {
             "name": "Fault",

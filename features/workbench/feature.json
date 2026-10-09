@@ -305,7 +305,7 @@
       "zh": "选择单元",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?layout=focus&section=farrowing",
-      "preset": "",
+      "steps": ["Choose unit"],
       "figma": "",
       "notes": {
         "purpose": "Pick one unit of the section to narrow every count to that unit.",
@@ -780,7 +780,7 @@
       "zh": "待上传的记录",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?layout=focus&section=farrowing",
-      "preset": "",
+      "steps": ["3 records saved on this device"],
       "figma": "",
       "notes": {
         "purpose": "Shows what is saved on the phone and not yet sent, and lets the worker upload it.",
@@ -846,7 +846,7 @@
       "zh": "任务预览（未设计）",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation",
-      "preset": "",
+      "steps": ["[data-card=\"preg31\"]"],
       "figma": "",
       "notes": {
         "purpose": "Placeholder page for every task that has no detail design yet; the task stays open between scheduled work.",
@@ -890,7 +890,7 @@
       "zh": "任务预览 · 可完成",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&work=ready",
-      "preset": "",
+      "steps": ["[data-card=\"preg31\"]"],
       "figma": "",
       "notes": {
         "purpose": "The page behind a ready card: lets the worker complete the whole task.",
@@ -922,7 +922,7 @@
       "zh": "提前结束任务",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation",
-      "preset": "",
+      "steps": ["[data-card=\"preg31\"]","End task early"],
       "figma": "",
       "notes": {
         "purpose": "Confirms ending a task before its work is complete.",
@@ -954,7 +954,7 @@
       "zh": "已结束任务",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation",
-      "preset": "",
+      "steps": ["[data-card=\"preg29done\"]"],
       "figma": "",
       "notes": {
         "purpose": "Read-only page for a completed or ended task.",

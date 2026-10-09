@@ -42,6 +42,8 @@ for (const f of features) {
     if (!STATUSES.includes(s.status)) problems.push(`${where}: ${s.id} has status "${s.status}"`);
     if (s.status === 'placeholder' && s.url) problems.push(`${where}: ${s.id} is a placeholder with a url`);
     if (s.status !== 'placeholder' && !s.url) problems.push(`${where}: ${s.id} is ${s.status} but has no url`);
+    if (s.steps && (!Array.isArray(s.steps) || !s.steps.every((t) => typeof t === 'string' || (t && typeof t.tap === 'string')))) problems.push(`${where}: ${s.id} steps must be a list of strings or { tap, hold }`);
+    if (s.steps && !s.url) problems.push(`${where}: ${s.id} has steps but no url`);
     if (!s.id.startsWith(f.id + '.')) problems.push(`${where}: ${s.id} does not start with "${f.id}."`);
     for (const e of s.notes?.elements || []) {
       if (!(e.states?.length || e.logic || e.rule)) problems.push(`${where}: ${s.id} element "${e.name}" has no states, logic or rule — the demo shows it; drop it (SCHEMA.md, screen notes)`);
