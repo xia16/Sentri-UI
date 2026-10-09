@@ -1,0 +1,39 @@
+{
+  "status": "in-design",
+  "round": 1,
+  "judged": "2026-10-10",
+  "commit": "d5aa6fa",
+  "model": "claude-opus-5-5",
+  "scores": { "clarity": 7, "budget": 8, "hierarchy": 8, "spacing": 7, "broken": 7 },
+  "lowest": 7,
+  "checklist": [
+    { "line": 1, "pass": true, "why": "Purpose plus 'use Segment instead for fixed views and list states'." },
+    { "line": 2, "pass": true, "why": "When/when-not present; names Segment, ChoiceList, Button." },
+    { "line": 3, "pass": true, "why": "Scroll track, chip, label, count, check, reason named and shown." },
+    { "line": 4, "pass": true, "why": "One variant (tags), used by Piglet processing's pen list." },
+    { "line": 5, "pass": false, "why": "Pressed uses --press (#f1f5eb) on --well chips (#eef1e7): invisible on an unselected chip; the demo presses the selected chip, which then looks unselected." },
+    { "line": 6, "pass": true, "why": "Chips 48px tall, narrowest 63px (All) at 390; token gap between chips." },
+    { "line": 7, "pass": true, "why": "States no cap by design: the dynamic set scrolls; the demo shows 7 with overflow." },
+    { "line": 8, "pass": true, "why": "Selected = check mark + weight + paper face; disabled = dashed outline + reason." },
+    { "line": 9, "pass": true, "why": "Wrap rules and a Chinese long-label example render without clipping; the content rules themselves are copied from Segment ('2-3 choices', '4-5') and do not fit chips." },
+    { "line": 10, "pass": true, "why": "radiogroup/radio/aria-checked, roving tabindex, arrows/Home/End give a non-swipe path through the scroll." },
+    { "line": 11, "pass": true, "why": "New .st-filter-chips rules use tokens; listed in the README." },
+    { "line": 12, "pass": true, "why": "Not a form field." },
+    { "line": 13, "pass": true, "why": "Not an overlay." },
+    { "line": 14, "pass": true, "why": "Links Segment, ChoiceList, IconButton; TaskChips stated as an adapter; classified component." },
+    { "line": 15, "pass": true, "why": "Six states rendered at 375; only intentional horizontal scroll (cgate/FilterChips/)." }
+  ],
+  "classification": "component",
+  "variants": [
+    { "name": "tags (single-select job filter with counts)", "usedBy": ["piglet-processing.pen-list", "piglet-processing.job-chip"], "status": "in-design",
+      "scores": { "clarity": 7, "budget": 8, "hierarchy": 8, "spacing": 7, "broken": 7 },
+      "findings": ["Done is out of the chip row and is now a Segment lens state; the All chip dropped its count (the To do count carries it); chips hide under the Done lens. All as briefed."] }
+  ],
+  "findings": [
+    { "severity": "medium", "text": "Press feedback is invisible on an unselected chip (--press vs --well differ by 3-4 RGB); pressing the selected chip strips its paper face so it reads as deselected.", "fix": "Press unselected chips with a darker token (--choice-press or a new --press-on-well); leave the selected chip's face alone; demo Pressed on an unselected chip." },
+    { "severity": "medium", "text": "The hidden check keeps its 16px slot on unselected chips (visibility:hidden), so labels sit right of centre ('   Iron 6') and every chip is 16px wider than its content.", "fix": "Collapse the check on unselected chips (display:none) and accept the small width change on select, or draw the check inside the chip's left padding." },
+    { "severity": "low", "text": "README content rules and do/don't are copied from Segment ('≤12 characters at 2-3 choices; ≤8 at 4-5', 'name subjects consistently') and do not describe a scrolling tag set.", "fix": "State chip rules: 1-2 word job names, a character cap per chip, one count per tag, All first and without a count when a lens above carries the total." },
+    { "severity": "low", "text": "Demo data is incoherent: All shows 2 while Iron shows 3 and Weight 8; the real screen omits All's count.", "fix": "Demo All without a count (as Piglet does) or with a total at least every tag's count." }
+  ],
+  "proposals": []
+}
