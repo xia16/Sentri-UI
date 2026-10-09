@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T16:19:03.017Z",
- "commit": "5108fab",
+ "generated": "2026-10-09T17:14:18.665Z",
+ "commit": "94aa996",
  "platforms": [
   {
    "id": "mobile",
@@ -15430,12 +15430,6 @@
    "gate": null
   },
   {
-   "name": "TaskSheet",
-   "group": "Task skeleton",
-   "status": "in-design",
-   "gate": null
-  },
-  {
    "name": "TaskHold",
    "group": "Task skeleton",
    "status": "in-design",
@@ -15509,18 +15503,6 @@
   },
   {
    "name": "TaskDay",
-   "group": "Task skeleton",
-   "status": "in-design",
-   "gate": null
-  },
-  {
-   "name": "TaskPage",
-   "group": "Task skeleton",
-   "status": "in-design",
-   "gate": null
-  },
-  {
-   "name": "TaskDialog",
    "group": "Task skeleton",
    "status": "in-design",
    "gate": null
