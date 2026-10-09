@@ -613,7 +613,7 @@ function bulkListOverlay(c,{kind,rowsHtml,heading,sub,column,toggleLabel,control
 }
 function bulkActionPage(c){
  const f=c.form,view=c.view,single=!f.bulk,conditions=[...new Set(f.subjects.flatMap(id=>cases(pig(c,id)).map(k=>k.name)))],target=bulkSelect(c,'Condition','target',[['','Choose condition'],...conditions.map(n=>[n,n])]);let controls='';
- if(view==='health')controls=SentriUI.pickerField({label:'Conditions',strs:{label:'ds.picker.conditions'},variant:'cascade-multi',selected:f.conditions,action:'bulk-pick-health'})+bulkSelect(c,'Care','triage',careOptions);
+ if(view==='health')controls=SentriUI.pickerField({label:'Conditions',strs:{label:'ds.picker.conditions'},variant:'cascade-multi',selected:f.conditions,names:f.conditions,action:'bulk-pick-health'})+bulkSelect(c,'Care','triage',careOptions);
  if(view==='edit-conditions'||view==='triage')controls=target+bulkSelect(c,'Care','triage',[['keep','Keep current care'],...careOptions]);
  if(view==='resolve')controls='<div class="bulk-control-grid">'+target+bulkSelect(c,'Outcome','outcome',[['','Choose outcome'],['recover','Recovered'],['strike','Entered in error']])+'</div>';
  if(view==='treatment'){

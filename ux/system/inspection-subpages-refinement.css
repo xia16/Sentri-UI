@@ -125,7 +125,7 @@
 .inspection-phone .bulk-reading input{width:56px;min-height:44px;text-align:center;appearance:textfield}
 .inspection-phone .bulk-reading input::-webkit-inner-spin-button{appearance:none}
 .inspection-phone .bulk-control-grid{align-items:start}
-.inspection-phone .bulk-controls .bulk-control-grid .field>input,.inspection-phone .bulk-controls .bulk-control-grid .st-picker-trigger{height:48px;min-height:48px}
+.inspection-phone .bulk-controls .bulk-control-grid .field>input{height:48px;min-height:48px}
 .inspection-phone .bulk-control-fields{min-height:0}
 @media(max-width:360px){.inspection-phone .bulk-pig-row{padding-left:12px;padding-right:12px;gap:6px}.inspection-phone .bulk-details-overlay.facts-surface{padding-left:12px;padding-right:12px}}
 

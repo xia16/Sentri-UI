@@ -121,6 +121,8 @@ export interface PickerFieldProps {
   ariaLabel?: string;
   variant?: 'single' | 'multi' | 'cascade' | 'cascade-multi';
   selected?: string[];
+  /** Record forms: the chosen names, shown on the trigger instead of a count. */
+  names?: string[];
   path?: string[];
   reason?: string;
   error?: string;

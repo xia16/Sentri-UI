@@ -13,7 +13,7 @@ Use [Segment](../Segment/README.md) for changing a lens. Use [Field](../Field/RE
 
 ## Anatomy
 
-Visible label; trigger value or count; trailing chevron; optional persistent reason/error; sheet title; search; tappable chosen-level step row (cascade); ChoiceList option group; Back and Done footer (multi).
+Visible label; trigger value, chosen names (record forms) or count (filters); trailing chevron; optional persistent reason/error; sheet title; search; chosen-level step path with › separators (cascade); ChoiceList option group; footer: Back, plus Done · n (multi only; a single pick commits, so single has Back alone).
 
 ## Variants
 
@@ -28,7 +28,7 @@ Visible label; trigger value or count; trailing chevron; optional persistent rea
 | --- | --- |
 | Default | Missing value stays missing; Select (single) or None (multi). |
 | Pressed | `choice-press`; static `pressed` prop for rows and triggers. |
-| Selected / active | Trailing check, checkbox or ring plus stronger label; trigger shows path or count. |
+| Selected / active | Trailing check, checkbox or ring plus stronger label; trigger shows the picked value or path (never the field label), the chosen names (record forms) or a count (filters). |
 | Disabled | Prefer omission. If needed, retain readable text and a persistent reason; `aria-disabled`, no dimming. Host rejects activation and announces the reason. |
 | Focus | `focus` ring; keyboard focus never depends on colour alone. |
 | Error | Picker trigger has `aria-invalid`, border and persistent corrective text. ChoiceList is not a validated field: host supplies the field error. |
@@ -40,13 +40,13 @@ Every declared state is in `variants/<id>.html`; these documents rely on atlas-i
 
 ## Behaviour
 
-Show at most eight rows before using a scrollable catalogue and search. Search is required above eight leaves and spans the entire tree, including aliases and path labels. Do not duplicate selected leaves in a second list or disclosure. Multi triggers show only “n selected”; ticks stay visible in their original rows. Group counts describe selected descendants.
+Show at most eight rows before using a scrollable catalogue and search. Search is required above eight leaves and spans the entire tree, including aliases and path labels. Do not duplicate selected leaves in a second list or disclosure. Multi triggers on a record form (the chosen items are the record, as on Record health) show the chosen names, wrapping to two lines, then “+n”; only filters show “n selected”. Ticks stay visible in their original rows. Group counts describe selected descendants and appear only above zero; categories in a single cascade carry no count.
 
-Cascade opens one level at a time; choosing a branch auto-advances. Tappable steps reopen earlier levels; changing a branch replaces the downstream path without clearing ticks in other branches. A single leaf writes its complete path back to the trigger. Multi keeps one exit pair: Back and Done · n. Back keeps the draft; Done accepts it. A host that discards a changed draft must ask first. Modal hosts use one active dialog, inert background, focus trapping, Escape → Back, and return focus to the trigger.
+Cascade opens one level at a time; choosing a branch auto-advances. Tappable steps reopen earlier levels; changing a branch replaces the downstream path without clearing ticks in other branches. A single leaf writes its complete path back to the trigger. Multi keeps one exit pair that says different things: **Back** leaves the sheet and keeps the draft selection on the device (pure navigation, per the Back verb law); **Done · n** confirms it; a **Clear** text action, where offered, discards it. A single pick commits at once, so single sheets have Back only and no Done. Modal hosts use one active dialog, inert background, focus trapping, Escape → Back, and return focus to the trigger.
 
 ## Content rules
 
-Sentence case, farm vocabulary, nouns for options. Aim for labels ≤32 English characters or 16 Chinese characters, meta ≤64 / 32; never truncate the catalogue label to meet the budget. Trigger label ≤24 / 12; its value may ellipsize. Inline options ≤8 English or 4 Chinese characters; use radio rows for longer outcomes. Search placeholders describe search, not the field label. No comma-joined multi values, duplicate count summaries, nested cards or decorative status colour.
+Sentence case, farm vocabulary, nouns for options. Aim for labels ≤32 English characters or 16 Chinese characters, meta ≤64 / 32; never truncate the catalogue label to meet the budget. Trigger label ≤24 / 12; its value may ellipsize. Inline options ≤8 English or 4 Chinese characters; use radio rows for longer outcomes. Search placeholders describe search, not the field label. Names on a record trigger are joined with “ · ”, not commas; no duplicate count summaries, nested cards or decorative status colour.
 
 ## Accessibility
 
@@ -63,7 +63,7 @@ Shared copy (Select, None, counts, All, Done, loading and empty) has English/Chi
 ## Do / don't
 
 - Do keep checks on the right and search across branches. Don't build custom left-checkbox catalogue rows.
-- Do show a count once on the multi trigger and once on Done. Don't repeat names in a selected disclosure.
+- Do show the chosen names on a record form, and the count once on a filter trigger and once on Done. Don't repeat names in a selected disclosure.
 - Do wrap Chinese in option rows. Don't shrink type or targets to fit it.
 - Do retain a disabled reason. Don't dim controls or use colour alone.
 
@@ -80,5 +80,7 @@ Component: generic and shared across sections. Selection modes are variants of t
 The one-level, auto-advance and tappable-step model follows Ant Design Mobile Cascader and TDesign Mobile step Cascader, with Apple/Material guidance for containment, keyboard and dismissal, as recorded in [the component standard, section 4.5](../../../../docs/design-workflow/research/component-standard.md). Sentri uses its own `tap-min` floor rather than smaller library defaults.
 
 ## Changelog
+
+2026-10-10 (round 2 fixes): Back keeps the draft, Done confirms; record forms show chosen names; no zero or “1 options” meta; single has no Done; steps read as a path.
 
 2026-10-10: consolidated picker option rows; added controlled multi/cascade bodies and documented state proofs. Gate findings are addressed by this pass; owner approval remains separate from implementation verification.
