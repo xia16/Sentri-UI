@@ -101,7 +101,10 @@ async function stateGridAt(dir, id, opts = {}) {
     { const h = s.querySelector(':scope > h2, :scope > h3'); if (h && h.textContent.trim().toLowerCase() === s.getAttribute('data-state').trim().toLowerCase()) h.remove(); } // the cell caption already names the state
     const cell = el(`<figure class="scell"><figcaption>${esc(opts.caption || s.getAttribute('data-state'))}</figcaption></figure>`), f = el('<iframe title="State"></iframe>');
     f.style.height = '20px'; f.srcdoc = `<!doctype html><html><head>${inject}${head}<style>html,body{margin:0;background:${opts.bare ? 'transparent' : '#fff'}}body{padding:${opts.bare ? '0' : '14px'}}</style></head><body>${s.outerHTML}${tail}</body></html>`;
-    f.onload = () => { try { const d = f.contentDocument; f.style.height = Math.max(60, Math.max(d.documentElement.scrollHeight, d.body.scrollHeight)) + 'px'; } catch (_) {} };
+    f.onload = () => { try { const d = f.contentDocument;
+      const own = [...d.querySelectorAll('[data-state] *')].slice(0, 12).find((x) => { const c = d.defaultView.getComputedStyle(x), r = x.getBoundingClientRect(); return parseFloat(c.borderTopWidth) > 0 && c.borderTopStyle !== 'none' && r.width > d.documentElement.clientWidth * 0.8; });
+      if (own) { f.style.border = '0'; f.style.background = 'transparent'; d.documentElement.style.background = d.body.style.background = 'transparent'; d.body.style.padding = '0'; } /* the item draws its own surface: no cell frame */
+      f.style.height = Math.max(60, Math.max(d.documentElement.scrollHeight, d.body.scrollHeight)) + 'px'; } catch (_) {} };
     cell.append(f); grid.append(cell);
   });
   return grid;

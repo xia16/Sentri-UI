@@ -15,7 +15,7 @@
   "id": "screens-b-2",
   "target": {
    "kind": "screen",
-   "id": "piglet-processing.chip-done"
+   "id": "piglet-processing.pen-list"
   },
   "kind": "broken",
   "severity": "high",

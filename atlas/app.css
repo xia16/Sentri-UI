@@ -447,3 +447,10 @@ details.cur { margin:4px 0 16px } details.cur summary { cursor:pointer; color:va
 .bkfeat { color:var(--ink) }
 
 .ovgrid .scell iframe { border:0; border-radius:0; background:transparent; max-width:none }
+
+/* review fixes, round 2 */
+a { color:var(--ink); text-decoration:underline; text-underline-offset:2px }
+.row, .row:hover { text-decoration:none } .fileopen:hover { text-decoration:underline }
+.chip, .more, .edgechip, details.cur summary, .notes .goto, .dock .cap a, .region .patterns button { color:var(--ink) }
+.board, .flowwrap { bottom:56px }
+.zoom { bottom:10px }

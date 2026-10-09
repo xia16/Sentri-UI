@@ -157,8 +157,9 @@ function renderBoard() {
   const main = document.getElementById('main'); main.innerHTML = '';
   const pl = platform();
   if (!pl.sections.length) { main.append(el(`<div class="empty"><b>No ${esc(pl.name.toLowerCase())} features yet</b><span>They appear here once the first ${esc(pl.name.toLowerCase())} feature is mapped.</span></div>`)); return; }
-  const board = el(`<div class="board"><div class="plane"></div><div class="zoom"><button data-z="-1" title="Zoom out">−</button><button data-z="0" title="Fit everything">⤢</button><button data-z="1" title="Zoom in">+</button></div></div>`);
-  const plane = board.querySelector('.plane'); main.append(board);
+  const board = el(`<div class="board"><div class="plane"></div></div>`);
+  const zoomEl = el('<div class="zoom"><button data-z="-1" title="Zoom out">−</button><button data-z="0" title="Fit everything">⤢</button><button data-z="1" title="Zoom in">+</button></div>');
+  const plane = board.querySelector('.plane'); main.append(board, zoomEl);
   let x = 40, y = 40, rowH = 0, maxX = 0; const ROW = 1500;
   pl.sections.forEach((s) => {
     const r = el(`<section class="region"><h2 ${s.shared ? `title="${esc(s.shared)}"` : ''}>${esc(s.name)} <small>${esc(s.zh)}</small></h2>${(s.patterns || []).length ? `<div class="patterns">Patterns ${(s.patterns || []).map((p, i) => `<button data-p="${i}">${esc(p.name)}</button>`).join('')}</div>` : ''}<div class="cards"></div></section>`);
@@ -177,7 +178,7 @@ function renderBoard() {
   loadIcons().then((icons) => plane.querySelectorAll('.ico').forEach((n) => { n.innerHTML = icons && (n.dataset.i in icons.paths || n.dataset.i in icons.aliases) ? iconSvg(icons, n.dataset.i, 16, '') : '<i class="neutral"></i>'; }));
   const W = maxX + 8, H = y + rowH + 90; // room under the last row for the zoom controls
   const pz = panzoom(board, plane, () => { const t = fitTo(board, W, H, 1, 0, 0.9); return { k: t.k, x: 0, y: 0 }; });
-  board.querySelectorAll('[data-z]').forEach((b) => { b.onclick = () => { const z = +b.dataset.z; z ? pz.step(z > 0 ? 1.2 : 1 / 1.2) : pz.fit(); }; });
+  zoomEl.querySelectorAll('[data-z]').forEach((b) => { b.onclick = () => { const z = +b.dataset.z; z ? pz.step(z > 0 ? 1.2 : 1 / 1.2) : pz.fit(); }; });
   pz.fit();
 }
 

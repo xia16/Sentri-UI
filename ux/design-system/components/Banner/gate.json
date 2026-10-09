@@ -34,13 +34,13 @@
       "scores": { "clarity": 9, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 9 }, "findings": [] },
     { "name": "correction", "usedBy": ["farrowing.blocked", "farrowing.edit"], "status": "agent-checked",
       "scores": { "clarity": 9, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 9 }, "findings": [] },
-    { "name": "notice", "usedBy": ["workbench.today", "workbench.saved-work", "piglet-processing.phone-clash"], "status": "agent-checked",
+    { "name": "notice", "usedBy": ["workbench.today", "workbench.saved-work", "piglet-processing.pen-list"], "status": "agent-checked",
       "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 9 },
       "findings": ["zh cell consequence 等待上传 repeats the headline's 等待…上传"] }
   ],
   "findings": [
     { "severity": "low", "text": "Notice zh cell says waiting-to-upload twice: headline ends 等待网络连接后再上传 and the consequence repeats 等待上传.", "fix": "Shorten the consequence to 无网络连接 (keep the headline over the cap)." },
-    { "severity": "low", "text": "piglet-processing.phone-clash: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's 'by L. Madsen at 08:40' say the same who/when right above each other (screen budget, not the component).", "fix": "In the prototype, hide the Last record line while the clash banner shows, or drop the time/name from the banner text." }
+    { "severity": "low", "text": "piglet-processing.pen-list: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's 'by L. Madsen at 08:40' say the same who/when right above each other (screen budget, not the component).", "fix": "In the prototype, hide the Last record line while the clash banner shows, or drop the time/name from the banner text." }
   ],
   "proposals": []
 }

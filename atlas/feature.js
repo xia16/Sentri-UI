@@ -163,7 +163,7 @@ function layoutFlow(f, entries, avail, open = new Set()) {
   strip('Ways in', entries.map((e) => e.id));
   const a = f.anchor, ownIds = f.screens.map((s) => s.id);
   if (a) {
-    (a.any || []).length > 6 ? foldable('In any status', a.any, 'In any status') : strip('In any status', a.any || []);
+    strip('In any status', a.any || []);
     const [t1, t2] = a.task || [];
     band(t1 ? t1.name : a.name);
     const top = ((t1 && t1.screens) || []).filter((i) => !placed.has(i));
@@ -216,7 +216,8 @@ function openFeature(id, sel) {
   const edges = [...entries.filter((e) => e.lands).map((e) => [e.id, e.lands, e.control || e.label]), ...(f.flow || [])];
 
   const col = el('<div class="flowcol"></div>');
-  const wrap = el('<div class="flowwrap"><div class="flowplane"><svg width="10" height="10"></svg></div><div class="zoom"><button data-z="-1" title="Zoom out">−</button><button data-z="0" title="Fit">⤢</button><button data-z="1" title="Zoom in">+</button></div></div>');
+  const wrap = el('<div class="flowwrap"><div class="flowplane"><svg width="10" height="10"></svg></div></div>');
+  const zoomEl = el('<div class="zoom"><button data-z="-1" title="Zoom out">−</button><button data-z="0" title="Fit">⤢</button><button data-z="1" title="Zoom in">+</button></div>');
   const plane = wrap.querySelector('.flowplane'), svg = plane.querySelector('svg');
   const groups = el('<div class="groups"></div>'); plane.prepend(groups);
   const drawGroups = () => {
@@ -352,7 +353,9 @@ function openFeature(id, sel) {
           if (!top || !hit.e.contains(top)) { covered++; card.classList.add('off'); missing.push(e.name); return; } }
         const r = hit.r, L = r.left * k, T = r.top * k, R = r.right * k, B = r.bottom * k, cy = Math.max(1, Math.min(H - S - 1, (T + B) / 2 - S / 2)), G = 4;
         const free = (x, y) => inside(x, y) && !hits(x, y, texts) && !hits(x, y, taken);
-        let spot = [[L - S - G, T - S - G], [R + G, T - S - G], [L - S - G, cy], [R + G, cy]].find(([x, y]) => free(x, y)), leader = false;
+        const cx = (L + R) / 2, cands = [[L - S - G, T - S - G], [R + G, T - S - G], [L - S - G, cy], [R + G, cy], [cx - S / 2, T - S - G], [cx - S / 2, B + G], [L - S - G, B + G], [R + G, B + G]]
+          .sort((p, q) => Math.hypot(p[0] + S / 2 - cx, p[1] + S / 2 - (T + B) / 2) - Math.hypot(q[0] + S / 2 - cx, q[1] + S / 2 - (T + B) / 2)); // nearest edge first; a pin never sits on its element
+        let spot = cands.find(([x, y]) => free(x, y)) || cands.find(([x, y]) => inside(x, y) && !hits(x, y, taken)), leader = false;
         if (!spot) { // a pin in the phone's left or right margin, with a hairline to the element
           const sides = [2, W - S - 2].sort((p, q) => Math.abs(p - (L + R) / 2) - Math.abs(q - (L + R) / 2));
           for (const dy of [0, 1, -1]) { const y = cy + dy * (S + 2); const x = sides.find((sx) => inside(sx, y) && !hits(sx, y, taken) && !hits(sx, y, texts)); if (x != null) { spot = [x, y]; break; } }
@@ -492,13 +495,13 @@ function openFeature(id, sel) {
     dock.append(tools); if (notes.classList.contains('open')) fillNotes();
   }
 
-  col.append(wrap, notes); page.append(col, dock);
+  col.append(wrap, zoomEl, notes); page.append(col, dock);
   let pdown = false; const toggleNotes = () => { if (notes.classList.contains('open')) setNotes(false); else openNotes(); };
   dock.addEventListener('pointerdown', (ev) => { if (ev.button === 0 && ev.target.closest('[data-notes]')) { pdown = true; toggleNotes(); } });
   dock.addEventListener('click', (ev) => { if (!ev.target.closest('[data-notes]')) return; if (pdown) { pdown = false; return; } toggleNotes(); });
   pz = panzoom(wrap, plane, () => { const r = wrap.getBoundingClientRect(), k = Math.max(0.7, Math.min(1, (r.width - 28) / L.width)); return { k, x: Math.max(14, (r.width - L.width * k) / 2), y: 14 }; },
     { scroll: true, size: () => L });
-  wrap.querySelectorAll('[data-z]').forEach((b) => { b.onclick = () => { const z = +b.dataset.z; z ? pz.step(z > 0 ? 1.2 : 1 / 1.2) : pz.fit(); }; });
+  zoomEl.querySelectorAll('[data-z]').forEach((b) => { b.onclick = () => { const z = +b.dataset.z; z ? pz.step(z > 0 ? 1.2 : 1 / 1.2) : pz.fit(); }; });
   requestAnimationFrame(() => pz.fit());
   const chip = el('<button class="edgechip" title="More to the right" aria-label="Pan right" hidden>→</button>'); wrap.append(chip);
   const cutBy = () => pz.state.x + (L.width - 20) * pz.state.k - wrap.clientWidth;

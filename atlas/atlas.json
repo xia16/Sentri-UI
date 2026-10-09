@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T19:59:41.938Z",
- "commit": "16fe276",
+ "generated": "2026-10-09T20:12:06.014Z",
+ "commit": "40e3728",
  "platforms": [
   {
    "id": "mobile",
@@ -4096,10 +4096,6 @@
         ],
         "any": [
          "piglet-processing.pen-list",
-         "piglet-processing.job-chip",
-         "piglet-processing.chip-done",
-         "piglet-processing.list-no-id",
-         "piglet-processing.phone-clash",
          "piglet-processing.tagged-list",
          "piglet-processing.counts",
          "piglet-processing.weight",
@@ -4118,8 +4114,7 @@
           "id": "ending",
           "name": "Ending the task",
           "screens": [
-           "piglet-processing.end-task",
-           "piglet-processing.list-ended"
+           "piglet-processing.end-task"
           ]
          }
         ]
@@ -4149,23 +4144,8 @@
         ],
         [
          "piglet-processing.pen-list",
-         "piglet-processing.job-chip",
-         "tap a job chip (Iron, Dock tail, Castrate, Coccidiosis, Tag)"
-        ],
-        [
-         "piglet-processing.pen-list",
-         "piglet-processing.chip-done",
-         "tap the Done chip"
-        ],
-        [
-         "piglet-processing.pen-list",
          "piglet-processing.end-task",
          "tap the Task side of the summary card"
-        ],
-        [
-         "piglet-processing.end-task",
-         "piglet-processing.list-ended",
-         "hold End task"
         ],
         [
          "piglet-processing.sheet-todo",
@@ -4229,7 +4209,13 @@
          "figma": "",
          "notes": {
           "purpose": "One row per pen (a pen is one sow with her litter) so the worker sees what each pen still needs and walks the pens.",
-          "states": [],
+          "states": [
+           "One job: Shows only the pens that need one job today, so the worker can walk them with the treatment in hand. (tap a job chip (Iron, Dock tail, Castrate, Coccidiosis, Tag))",
+           "Done pens: Lists pens with nothing left to do. (tap the Done chip)",
+           "Farm without ID: Shows the list for fatteners raised as a batch, where no piglet gets an ID.",
+           "Two phones recorded the same job: Shows what the worker sees when another phone recorded the same treatment first.",
+           "Task ended: The same list after End: read-only. (after End task)"
+          ],
           "elements": [
            {
             "name": "Pen row",
@@ -4398,205 +4384,6 @@
            "Pen code and sow ID are shown twice (header and row); the header says \"1 sow\" on every pen.",
            "Home says Batch 27 / 8 pens / care due tomorrow; this list is Batch 40 / 12 pens / 6 pens due today.",
            "No way back to Home."
-          ]
-         }
-        },
-        {
-         "id": "piglet-processing.job-chip",
-         "name": "Pen list · one job",
-         "zh": "栏位列表 · 单项处理",
-         "status": "in-design",
-         "url": "/ux/tasks/piglet-processing/simple/index.html?chip=iron",
-         "preset": "",
-         "figma": "",
-         "notes": {
-          "purpose": "Shows only the pens that need one job today, so the worker can walk them with the treatment in hand.",
-          "states": [],
-          "elements": [
-           {
-            "name": "Filtered list",
-            "shows": "A03 · A04 · A05 · A06 · B01 · B04",
-            "states": [
-             {
-              "state": "Pens listed",
-              "when": "The selected job is due, late or has some left on a pen",
-              "shows": "Those pens, rows unchanged"
-             },
-             {
-              "state": "Empty",
-              "when": "The selected chip has count 0",
-              "shows": "The chip stays visible and the list says \"No pen needs this now.\""
-             }
-            ],
-            "logic": "Same rule as the chip count. The Tag chip has a tip string (sp.chip.id.tip) that is not shown.",
-            "source": "listScreen(); needsToday(pen, chip)",
-            "at": "A03"
-           }
-          ],
-          "controls": [],
-          "copy": [
-           "sp.chips.all",
-           "sp.tr.iron",
-           "sp.chip.none",
-           "sp.chip.aria"
-          ],
-          "edge": [],
-          "rules": [],
-          "issues": [
-           "The list is only a filter; each pen still has to be opened to record (no tick-through)."
-          ]
-         }
-        },
-        {
-         "id": "piglet-processing.chip-done",
-         "name": "Pen list · done pens",
-         "zh": "栏位列表 · 已完成",
-         "status": "in-design",
-         "url": "/ux/tasks/piglet-processing/simple/index.html?chip=done",
-         "preset": "",
-         "figma": "",
-         "notes": {
-          "purpose": "Lists pens with nothing left to do.",
-          "states": [],
-          "elements": [
-           {
-            "name": "Done rows",
-            "shows": "A01 · Done · 12 piglets; B05 · Iron tomorrow",
-            "states": [
-             {
-              "state": "Finished",
-              "when": "Every step is recorded",
-              "shows": "Green \"Done\", \"12 piglets\", pencil"
-             },
-             {
-              "state": "Not started",
-              "when": "Nothing due yet (B05, B06)",
-              "shows": "No chip, forecast headline \"Iron tomorrow\""
-             },
-             {
-              "state": "Empty",
-              "when": "No pen qualifies",
-              "shows": "\"No pen is done yet.\""
-             }
-            ],
-            "logic": "A pen is done when its to-do list is empty, so pens that have not started appear here.",
-            "source": "isDone(); penCard()",
-            "at": "Iron tomorrow"
-           }
-          ],
-          "controls": [],
-          "copy": [
-           "sp.chips.done",
-           "sp.empty.done"
-          ],
-          "edge": [],
-          "rules": [],
-          "issues": [
-           "Pens that have not started appear under Done."
-          ]
-         }
-        },
-        {
-         "id": "piglet-processing.list-no-id",
-         "name": "Pen list · farm without ID",
-         "zh": "栏位列表 · 不编号的猪场",
-         "status": "in-design",
-         "url": "/ux/tasks/piglet-processing/simple/index.html?scheme=none",
-         "preset": "",
-         "figma": "",
-         "notes": {
-          "purpose": "Shows the list for fatteners raised as a batch, where no piglet gets an ID.",
-          "states": [],
-          "elements": [
-           {
-            "name": "Farm ID scheme",
-            "shows": "Tag every piglet · Notch every piglet · Tag breeders only · No ID",
-            "states": [
-             {
-              "state": "Tag every piglet",
-              "when": "Scheme tag",
-              "shows": "ID step \"Tag piglets\"; chip Tag; \"n of m tagged\"; 6-digit tag from the farm strip"
-             },
-             {
-              "state": "Notch every piglet",
-              "when": "Scheme notch",
-              "shows": "Step \"Notch piglets\"; chip Notch; \"n of m notched\"; ID is litter-number-piglet"
-             },
-             {
-              "state": "Tag breeders only",
-              "when": "Scheme breeders",
-              "shows": "Step \"Pick breeders\"; chip Breeders; done when the worker closes the pick; facts show breeders"
-             },
-             {
-              "state": "No ID",
-              "when": "Scheme none",
-              "shows": "Four treatments only: no ID step, no Tag chip, no tool, no tagged facts; the Piglets card shows only Boars · gilts and Litter weight"
-             }
-            ],
-            "rule": "A farm whose scheme is no identity owes no tagging and shows none. Switching the setting in the Demo panel restarts the demo.",
-            "source": "PPS.hasId(); SCHEMES in state.js",
-            "at": "Coccidiosis"
-           }
-          ],
-          "controls": [],
-          "copy": [
-           "sp.scheme.none"
-          ],
-          "edge": [],
-          "rules": [],
-          "issues": [
-           "The scheme is a demo switch outside the phone; how a farm's scheme is set in the real product is open (Round 1 Q3)."
-          ]
-         }
-        },
-        {
-         "id": "piglet-processing.phone-clash",
-         "name": "Pen list · two phones recorded the same job",
-         "zh": "栏位列表 · 两部手机冲突",
-         "status": "in-design",
-         "url": "/ux/tasks/piglet-processing/simple/index.html",
-         "preset": "",
-         "figma": "",
-         "notes": {
-          "purpose": "Shows what the worker sees when another phone recorded the same treatment first.",
-          "states": [],
-          "elements": [
-           {
-            "name": "Clash note",
-            "shows": "Iron for A05 was already recorded by L. Madsen at 08:40. Yours is kept as a note.",
-            "states": [
-             {
-              "state": "Other phone second",
-              "when": "Your phone recorded first, then the other phone's record arrives",
-              "shows": "Amber note on the list; the pen sheet shows the other worker's record in Done"
-             },
-             {
-              "state": "Other phone first",
-              "when": "The other phone's record arrived before yours",
-              "shows": "Pen sheet says \"L. Madsen's phone recorded Iron on A05 at 08:40.\""
-             },
-             {
-              "state": "Yours kept",
-              "when": "Both recorded",
-              "shows": "Done row shows \"yours kept as a note (hh:mm)\""
-             }
-            ],
-            "rule": "First record in wins; the second is kept as a note, both stamped, never merged. Offline collisions are kept (Round 1 Q8), simplified here to first-in-wins. After End the demo says the task has ended.",
-            "source": "state.js otherPhone(); sp.note.clash",
-            "at": "Iron for A05 was already recorded by L. Madsen at 08:40."
-           }
-          ],
-          "controls": [],
-          "copy": [
-           "sp.note.clash",
-           "sp.ok",
-           "sp.kept.note",
-           "sp.note.arrived"
-          ],
-          "edge": [],
-          "rules": [],
-          "issues": [
-           "Two same-record collision answers from Round 4/6 (\"Given twice\", \"Different piglets\") are dropped in this prototype."
           ]
          }
         },
@@ -5657,66 +5444,6 @@
            "The ruling that End is blocked while farrowing is open is not built.",
            "Not-yet-started pens are counted done and also listed under \"Not due yet\".",
            "unclear: who may end (the code comment says the supervisor; no role check)."
-          ]
-         }
-        },
-        {
-         "id": "piglet-processing.list-ended",
-         "name": "Pen list · task ended",
-         "zh": "栏位列表 · 任务已结束",
-         "status": "in-design",
-         "url": "/ux/tasks/piglet-processing/simple/index.html",
-         "preset": "",
-         "figma": "",
-         "notes": {
-          "purpose": "The same list after End: read-only.",
-          "states": [],
-          "elements": [
-           {
-            "name": "After End",
-            "shows": "Task ended · hh:mm · name · Not done · N · pens",
-            "states": [
-             {
-              "state": "Summary",
-              "when": "Task ended",
-              "shows": "Left half \"Not done · N · pens\", right half \"Task ended · hh:mm · name\""
-             },
-             {
-              "state": "Pen row",
-              "when": "Task ended",
-              "shows": "Headline \"Task ended\"; chips gone"
-             },
-             {
-              "state": "Pen sheet",
-              "when": "Task ended",
-              "shows": "Amber \"Task ended. Nothing more can be recorded.\"; tool row, ticks and Submit removed; pens open read-only"
-             },
-             {
-              "state": "End page",
-              "when": "Task ended",
-              "shows": "Receipt \"Piglet processing ended · 08:20 · G. Hansen\" and a \"Not given\" group"
-             }
-            ],
-            "rule": "After End no new treatment marks (Round 3). Round 1 Q7 allowed corrections and ID rows to stay writable; the prototype blocks all writes. The other-phone demo says the task has ended.",
-            "source": "sp.ended.*; sp.end.done.*",
-            "at": "Task ended"
-           }
-          ],
-          "controls": [],
-          "copy": [
-           "sp.sum.notdone",
-           "sp.sum.ended",
-           "sp.ended.at",
-           "sp.ended.row",
-           "sp.end.done.title",
-           "sp.end.done.line",
-           "sp.sec.notgiven",
-           "sp.ended.note"
-          ],
-          "edge": [],
-          "rules": [],
-          "issues": [
-           "Nothing can be corrected after End, against Round 1 Q7 (corrections stay writable, stamped)."
           ]
          }
         }
@@ -13842,7 +13569,7 @@
       "name": "tags (single-select job filter with counts)",
       "usedBy": [
        "piglet-processing.pen-list",
-       "piglet-processing.job-chip"
+       "piglet-processing.pen-list"
       ],
       "status": "agent-checked",
       "scores": {
@@ -15926,7 +15653,7 @@
       "usedBy": [
        "workbench.today",
        "workbench.saved-work",
-       "piglet-processing.phone-clash"
+       "piglet-processing.pen-list"
       ],
       "status": "agent-checked",
       "scores": {
@@ -15949,7 +15676,7 @@
      },
      {
       "severity": "low",
-      "text": "piglet-processing.phone-clash: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's 'by L. Madsen at 08:40' say the same who/when right above each other (screen budget, not the component).",
+      "text": "piglet-processing.pen-list: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's 'by L. Madsen at 08:40' say the same who/when right above each other (screen budget, not the component).",
       "fix": "In the prototype, hide the Last record line while the clash banner shows, or drop the time/name from the banner text."
      }
     ],
@@ -18838,7 +18565,7 @@
    "id": "screens-b-2",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.chip-done"
+    "id": "piglet-processing.pen-list"
    },
    "kind": "broken",
    "title": "\"Edit\" on a done pen opens a sheet with nothing editable",
@@ -20029,7 +19756,7 @@
    "id": "tasks-built-63",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.job-chip"
+    "id": "piglet-processing.pen-list"
    },
    "kind": "design",
    "title": "Job chip shows pens but nothing to tick",
@@ -20041,7 +19768,7 @@
    "id": "tasks-built-64",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.chip-done"
+    "id": "piglet-processing.pen-list"
    },
    "kind": "broken",
    "title": "Done chip lists pens that have not started",
@@ -20053,7 +19780,7 @@
    "id": "tasks-built-65",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.list-no-id"
+    "id": "piglet-processing.pen-list"
    },
    "kind": "decision",
    "title": "How is a farm's ID scheme set in the product?",
@@ -20071,7 +19798,7 @@
    "id": "tasks-built-66",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.list-no-id"
+    "id": "piglet-processing.pen-list"
    },
    "kind": "unclear",
    "title": "ID step window (day 3-7) is a builder guess",
@@ -20083,7 +19810,7 @@
    "id": "tasks-built-67",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.phone-clash"
+    "id": "piglet-processing.pen-list"
    },
    "kind": "decision",
    "title": "First-in wins, second kept as a note: confirm or revert?",
@@ -20101,7 +19828,7 @@
    "id": "tasks-built-68",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.phone-clash"
+    "id": "piglet-processing.pen-list"
    },
    "kind": "unclear",
    "title": "Clash note has no dismiss rule or placement spec",
@@ -20517,7 +20244,7 @@
    "id": "tasks-built-102",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.list-ended"
+    "id": "piglet-processing.pen-list"
    },
    "kind": "design",
    "title": "After End every row reads \"Task ended\"; done equals not done",
@@ -20529,7 +20256,7 @@
    "id": "tasks-built-103",
    "target": {
     "kind": "screen",
-    "id": "piglet-processing.list-ended"
+    "id": "piglet-processing.pen-list"
    },
    "kind": "decision",
    "title": "After-End records: blocked, flagged-uncounted, or writable?",
@@ -21559,8 +21286,8 @@
    },
    "kind": "design",
    "severity": "low",
-   "title": "piglet-processing.phone-clash: the screen subtitle 'Last record 08:40 · L. Madsen' and the…",
-   "detail": "piglet-processing.phone-clash: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's 'by L. Madsen at 08:40' say the same who/when right above each other (screen budget, not the component).\nFix: In the prototype, hide the Last record line while the clash banner shows, or drop the time/name from the banner text.",
+   "title": "piglet-processing.pen-list: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's…",
+   "detail": "piglet-processing.pen-list: the screen subtitle 'Last record 08:40 · L. Madsen' and the banner's 'by L. Madsen at 08:40' say the same who/when right above each other (screen budget, not the component).\nFix: In the prototype, hide the Last record line while the clash banner shows, or drop the time/name from the banner text.",
    "source": "gate"
   },
   {
