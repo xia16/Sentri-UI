@@ -4,20 +4,17 @@
 .inspection-phone .statusbar{background:#f6f7f1}
 .inspection-phone .task-header{padding:4px 18px 10px;gap:12px}
 .inspection-phone .inspection-page-title small{font-size:11px;margin-top:5px}
-.inspection-phone .task-header>.task-return{background:#fff;border-color:var(--line);border-radius:12px;width:44px;min-width:44px}
-.inspection-phone .task-header>.finish-walk{font-weight:500;background:var(--green);border-color:var(--green);padding:0 12px}
 .inspection-phone .task-activity{padding:0 18px 6px;min-height:42px}
 .inspection-phone .task-activity strong{font-weight:500}
 .inspection-phone .task-history{color:var(--muted);min-height:var(--tap-min);padding-right:2px}
 .inspection-phone .inspect-controls{background:#f6f7f1;padding:4px 18px 12px;height:66px;gap:8px}
 .inspection-phone .inspect-controls .lens-count{font-size:10px;font-weight:400;color:var(--muted);margin:0}
-.inspection-phone .inspect-controls .room-filter-button{height:52px;min-width:48px;border:1px solid var(--line);border-radius:12px;background:#fff;color:#53634b}
 .inspection-phone .inspect-list{padding:0 18px 20px;gap:12px}
 .inspection-phone .inspect-pen{border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 3px 12px #26351e04}
 .inspection-phone .inspect-pen-head{background:#f8faf5;min-height:50px;padding-left:12px;border-bottom-color:#e8eddf}
 .inspection-phone .pen-select-target{top:3px}
 .inspection-phone .pen-name strong{font-weight:500}
-.inspection-phone .pen-feed strong{font-family:var(--sans);font-weight:500;font-size:11px}
+.inspection-phone .pen-feed strong{font-family:var(--font-sans);font-weight:500;font-size:11px}
 .inspection-phone .roster-pig{border-bottom-color:#e8eddf;padding-right:12px}
 .inspection-phone .roster-pig,.inspection-phone .roster-pig .pig-open{min-height:70px}
 .inspection-phone .roster-pig .check-target{width:var(--tap-min);min-width:var(--tap-min)}
@@ -30,7 +27,6 @@
 @media(max-width:370px){
  .inspection-phone .task-header{padding-left:12px;padding-right:12px;gap:8px}
  .inspection-phone .task-header h2{font-size:20px}
- .inspection-phone .task-header>.finish-walk{padding:0 10px}
  .inspection-phone .inspect-controls,.inspection-phone .inspect-list{padding-left:12px;padding-right:12px}
  .inspection-phone .task-activity{padding-left:12px;padding-right:12px}
 }

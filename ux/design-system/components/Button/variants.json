@@ -1,0 +1,98 @@
+[
+  {
+    "id": "primary",
+    "name": "Primary",
+    "use": "Use for the one record or commit in a footer.",
+    "notUse": "Not for navigation — use secondary.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Disabled",
+      "Long / Chinese",
+      "Waiting",
+      "Loading"
+    ]
+  },
+  {
+    "id": "secondary",
+    "name": "Secondary",
+    "use": "Use for Back or another supporting exit.",
+    "notUse": "Not for committing data — use primary.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Disabled",
+      "Long / Chinese",
+      "Waiting",
+      "Loading"
+    ]
+  },
+  {
+    "id": "text",
+    "name": "Text action",
+    "use": "Use for Clear, Reset or Edit beside content.",
+    "notUse": "Not for the footer commit — use primary.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Disabled",
+      "Long / Chinese",
+      "Waiting",
+      "Loading"
+    ]
+  },
+  {
+    "id": "hold",
+    "name": "Hold",
+    "use": "Use for Finish farrowing, Lock or End task with deliberate confirmation.",
+    "notUse": "Not for a reversible edit — use primary.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Disabled",
+      "Long / Chinese",
+      "Waiting",
+      "Loading",
+      "Holding",
+      "Armed",
+      "Pending",
+      "Done",
+      "Unknown",
+      "Failed"
+    ]
+  },
+  {
+    "id": "tool",
+    "name": "Tool",
+    "use": "Use for labelled mid-sheet acts such as Record death or Set count.",
+    "notUse": "Not for the final commit — use primary.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Disabled",
+      "Long / Chinese",
+      "Waiting",
+      "Loading"
+    ]
+  },
+  {
+    "id": "destructive",
+    "name": "Destructive",
+    "use": "Use for Delete an attachment in the real Farrowing photo dialog.",
+    "notUse": "Not for ending a task — use hold with danger tone.",
+    "states": [
+      "Default",
+      "Pressed",
+      "Focus",
+      "Disabled",
+      "Long / Chinese",
+      "Waiting",
+      "Loading"
+    ]
+  }
+]

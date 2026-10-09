@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T17:53:46.421Z",
- "commit": "1e6390d",
+ "generated": "2026-10-09T18:16:14.602Z",
+ "commit": "7cdd987",
  "platforms": [
   {
    "id": "mobile",
@@ -3811,7 +3811,7 @@
          "preset": "task-complete",
          "steps": [
           {
-           "tap": ".hold",
+           "tap": ".st-hold",
            "hold": 1000
           }
          ],
@@ -11380,72 +11380,107 @@
    "status": "in-design",
    "gate": {
     "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "round": 3,
+    "judged": "2026-10-10",
+    "commit": "bfd0fa8",
     "model": "claude-opus-5-5",
+    "previous": {
+     "round": 2,
+     "judged": "2026-10-10",
+     "commit": "40bb120",
+     "lowest": 6,
+     "status": "in-design",
+     "findings": [
+      {
+       "severity": "high",
+       "text": "Tool preview at 375px: nowrap Long / Chinese label clipped and scrolled the page; preview showed icon + label.",
+       "result": "fixed: tool preview is label-only, 343x48, the Chinese label ellipsizes with the full label in title; standalone preview scrollWidth 375."
+      },
+      {
+       "severity": "medium",
+       "text": "Disabled text action and disabled tool kept enabled ink.",
+       "result": "fixed: disabled text action and disabled tool compute disabled ink rgb(146,153,141); tool takes the disabled surface."
+      },
+      {
+       "severity": "low",
+       "text": "End walk class rendered twice.",
+       "result": "fixed on Inspection (\"button primary finish-walk\"). The same doubling remains on Farrowing's Scan ear tag (new low finding)."
+      },
+      {
+       "severity": "low",
+       "text": "Host raw colours: task-end-early #fff1ee; .button.primary #20291f.",
+       "result": "fixed: task-end-early rule deleted; #20291f override replaced by var(--ink)."
+      },
+      {
+       "severity": "low",
+       "text": "Destructive preview's disabled reason was a piglet reason.",
+       "result": "not fixed: variants/destructive.html still says \"Choose the piglets first.\""
+      }
+     ]
+    },
     "scores": {
-     "clarity": 6,
-     "budget": 5,
-     "hierarchy": 7,
-     "spacing": 6,
+     "clarity": 8,
+     "budget": 8,
+     "hierarchy": 8,
+     "spacing": 8,
      "broken": 5
     },
     "lowest": 5,
     "checklist": [
      {
       "line": 1,
-      "pass": false,
-      "why": "\"The footer and bar actions\" names no sibling to use instead (IconButton, a Row tap, ChoiceList)."
+      "pass": true,
+      "why": "One-sentence job; IconButton and ChoiceList named instead."
      },
      {
       "line": 2,
-      "pass": false,
-      "why": "Registers have rules but there is no when-not section naming an alternative."
+      "pass": true,
+      "why": "When / when not present with named alternatives."
      },
      {
       "line": 3,
-      "pass": false,
-      "why": "Hold parts are named; the base button (label, optional leading icon, caption) has no anatomy."
+      "pass": true,
+      "why": "Container, label, optional icon, loading marker, reason line, hold sweep and caption."
      },
      {
       "line": 4,
-      "pass": false,
-      "why": "task-end-early has no screen left (farrowing.task-ready ends early with a red hold); the tool register is forked as .sp-tool in piglet processing."
+      "pass": true,
+      "why": "Six variants each with a use line and real screens."
      },
      {
       "line": 5,
-      "pass": false,
-      "why": "Pressed, focus, busy, armed and unknown are described but not rendered in the preview."
+      "pass": true,
+      "why": "Press moves 2px; disabled text action and tool now use disabled ink; waiting grey."
      },
      {
       "line": 6,
-      "pass": false,
-      "why": "Preview footer buttons measure 44px tall; text action Clear 44x44; only real farrowing/task footers reach 48."
+      "pass": true,
+      "why": "Every Button on Farrowing, Inspection walk/filters, the Piglet pen sheet and the 375 preview is >= 48 tall (tools 111x48, End walk 95x48)."
      },
      {
       "line": 7,
       "pass": true,
-      "why": "At most two actions per bar, primary right; the preview respects it."
+      "why": "Two footer actions, three tools; screens respect it."
      },
      {
       "line": 8,
-      "pass": false,
-      "why": "Disabled and waiting differ from enabled by fill colour only; in real screens the reason line is hidden, so nothing else changes."
+      "pass": true,
+      "why": "Disabled and waiting carry a visible reason line; not colour-only."
      },
      {
       "line": 9,
-      "pass": false,
-      "why": "Verb+count rule stated; no max length, no truncation example; README lists \"Save\" as a commit example while banning \"Save\"."
+      "pass": true,
+      "why": "Registered verbs; an ellipsized tool label keeps its full name in title."
      },
      {
       "line": 10,
       "pass": true,
-      "why": "Focus ring, aria-disabled waiting, guard(), keyboard two-step hold all specified."
+      "why": "Native button, aria-disabled waiting, aria-busy, two-press hold, Escape cancels."
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "Raw values in bundle.css: #aab2a1, #e9ece3, #92998d, #bdc7b6, #fff1ee, #20291f, #b6c0ad, 13px radius, 52px min-height."
+      "pass": true,
+      "why": "Component and host CSS on tokens; README still lists an undefined space-1 token (low)."
      },
      {
       "line": 12,
@@ -11459,121 +11494,72 @@
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "No related-components table and no classification statement."
+      "pass": true,
+      "why": "Related table and classification present."
      },
      {
       "line": 15,
       "pass": false,
-      "why": "375px preview has no overflow but does not show every state."
+      "why": "Standalone preview is clean at 375, but the atlas component page Overview renders no buttons: \"Failed to construct 'URL': Invalid URL\"."
      }
     ],
     "classification": "component",
     "variants": [
      {
-      "name": "primary (commit)",
+      "name": "primary",
       "usedBy": [
        "farrowing.finish",
-       "inspection.review-selected",
-       "piglet-processing.give-ids"
+       "farrowing.room",
+       "piglet-processing.sheet-todo",
+       "inspection.walk",
+       "inspection.filters"
       ],
-      "status": "in-design",
-      "scores": {
-       "clarity": 8,
-       "budget": 8,
-       "hierarchy": 9,
-       "spacing": 7,
-       "broken": 6
-      },
-      "findings": [
-       "44px in the preview footer, 48 in hosts; height depends on the host class, not the component."
-      ]
-     },
-     {
-      "name": "secondary / Back (surface-back; a lone Back fills ink)",
-      "usedBy": [
-       "farrowing.history",
-       "inspection.pen",
-       "piglet-processing.pen-log",
-       "piglet-processing.sheet-todo"
-      ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
-       "broken": 7
+       "broken": 8
       },
       "findings": [
-       "Back border/press colours are raw (#b6c0ad, #f5f6f1, #526847); the Sheet preview still labels the exit \"Close\"."
+       "End walk class now single on Inspection; Farrowing Scan ear tag still renders \"button primary button primary dock-scan\"."
       ]
      },
      {
-      "name": "danger",
+      "name": "secondary (Back)",
       "usedBy": [
-       "piglet-processing.end-task"
+       "farrowing.finish",
+       "piglet-processing.sheet-todo",
+       "inspection.filters"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
-       "budget": 7,
+       "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
-       "broken": 7
+       "broken": 8
       },
-      "findings": [
-       "Appears only as a hold in real screens; plain danger is seen only in the preview."
-      ]
+      "findings": []
      },
      {
-      "name": "task-end-early (red-wash)",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {
-       "clarity": 5,
-       "budget": 4,
-       "hierarchy": 6,
-       "spacing": 8,
-       "broken": 7
-      },
-      "findings": [
-       "No screen uses it: farrowing.task-ready draws End task early as a filled red hold. The preview pairs it with End task, two red acts in one bar."
-      ]
-     },
-     {
-      "name": "tool",
-      "usedBy": [
-       "farrowing.finish"
-      ],
-      "status": "in-design",
-      "scores": {
-       "clarity": 7,
-       "budget": 7,
-       "hierarchy": 7,
-       "spacing": 7,
-       "broken": 7
-      },
-      "findings": [
-       "Piglet processing forks it as .sp-tool (paper, bordered, icon, three in a row) on piglet-processing.sheet-todo instead of the well-filled pair."
-      ]
-     },
-     {
-      "name": "text",
+      "name": "text action (Clear, Untick)",
       "usedBy": [
        "farrowing.death",
-       "piglet-processing.sheet-todo"
+       "inspection.filters",
+       "inspection.review-selected"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
-       "spacing": 7,
-       "broken": 6
+       "spacing": 8,
+       "broken": 8
       },
       "findings": [
-       "Hit area exactly 44x44, under the 48 glove floor."
+       "Disabled now uses disabled ink."
       ]
      },
      {
@@ -11583,89 +11569,74 @@
        "farrowing.task-ready",
        "piglet-processing.end-task"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 6,
-       "budget": 5,
+       "clarity": 9,
+       "budget": 8,
+       "hierarchy": 9,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": []
+     },
+     {
+      "name": "tool",
+      "usedBy": [
+       "piglet-processing.sheet-todo"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
        "broken": 8
       },
       "findings": [
-       "Two caption faces: the Button card is 11px sentence case (\"Hold to end\"), TaskHold is 9px capitals (\"HOLD TO END\"); every real screen uses the capitals."
+       "Label-only in preview and use; 111x48 in use (en and zh); long Chinese label ellipsizes with title; disabled grey."
       ]
      },
      {
-      "name": "waiting",
+      "name": "destructive",
       "usedBy": [
-       "piglet-processing.sheet-todo",
-       "piglet-processing.record-death",
-       "piglet-processing.give-ids"
+       "farrowing photo dialog (Delete; no atlas screen)"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 5,
-       "budget": 7,
-       "hierarchy": 7,
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
        "spacing": 8,
-       "broken": 4
+       "broken": 8
       },
       "findings": [
-       "The reason line is visually hidden by the TaskSheet default, so a waiting \"Save\"/\"Submit\" looks exactly like disabled with no reason on screen (ADR 0002 requires one persistent line beside the bar)."
+       "Disabled reason in the preview is still a piglet reason."
       ]
      }
     ],
     "findings": [
      {
       "severity": "high",
-      "text": "Waiting buttons in real task screens show no reason: TaskSheet hides the status line by default, so piglet-processing.record-death \"Save\" and sheet-todo \"Submit\" read as greyed-out disabled.",
-      "fix": "Make the footer status visible whenever the primary is waiting (status.visible defaults to true when primary.waiting)."
-     },
-     {
-      "severity": "high",
-      "text": "Height is decided by host classes: 52px bare, 44px in .inspection-phone/.farrowing-phone, 48/56 in footers. Preview footers render at 44px, under the 48 glove floor.",
-      "fix": "One rule: .button min-height: var(--control-height) (48) everywhere; drop the 44px host override."
-     },
-     {
-      "severity": "high",
-      "text": "Copy rule broken in use: the piglet-processing footer says \"Submit\" (strings submit.n, idf.submit), and the README gives \"Save\" as a commit example while banning Save/Submit.",
-      "fix": "Rename to verb+count (\"Record 3 items\", \"Record 12 piglets\"); remove \"Save\" from the Commit register examples."
-     },
-     {
-      "severity": "medium",
-      "text": "Two hold faces (11px sentence-case caption in Button vs 9px capitals in TaskHold) for the same act.",
-      "fix": "Keep the farrowing face (TaskHold) as the only hold caption and update the Button card and preview to it."
-     },
-     {
-      "severity": "medium",
-      "text": "Raw colours and radii in .button CSS (#aab2a1, #e9ece3, #92998d, #bdc7b6, #fff1ee, #20291f, 13px).",
-      "fix": "Replace with control-border, disabled-fill, disabled-ink, red-wash, ink and radius-control tokens."
+      "text": "Atlas component page Overview for Button renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render; only the landing Overview breaks). Broken since round 1 (033fa58).",
+      "fix": "In preview.html resolve against a real base (parent.location.href when location is about:srcdoc, else document.baseURI) for both bundle.js and fetch('variants/'+id+'.html') - or drop the fetch/srcdoc loop and use plain iframes src=variants/<id>.html."
      },
      {
       "severity": "low",
-      "text": "task-end-early has no screen; the tool register is forked as .sp-tool.",
-      "fix": "Drop task-end-early (End early is a danger hold); move .sp-tool onto register:\"tool\"."
-     }
-    ],
-    "proposals": [
-     {
-      "kind": "merge",
-      "name": "TaskHold -> Button hold",
-      "why": "Same act, two caption faces; TaskHold is only the footer placement.",
-      "seenIn": [
-       "farrowing.finish",
-       "piglet-processing.end-task"
-      ]
+      "text": "Farrowing Scan ear tag still renders class \"button primary button primary dock-scan\" (the End walk doubling, fixed only on Inspection).",
+      "fix": "Strip button/primary from className in farrowing-astra-concept.js btn() as inspection-astra-concept.js now does."
      },
      {
-      "kind": "merge",
-      "name": ".sp-tool -> Button tool register",
-      "why": "Same job (a mid-sheet act), forked look.",
-      "seenIn": [
-       "piglet-processing.sheet-todo"
-      ]
+      "severity": "low",
+      "text": "README tokens list space-1, which tokens.css does not define (the CSS uses border-width).",
+      "fix": "Replace space-1 with border-width in README line 75."
+     },
+     {
+      "severity": "low",
+      "text": "Destructive preview's disabled reason is a piglet reason (\"Choose the piglets first.\").",
+      "fix": "Use a photo reason in variants/destructive.html, e.g. \"Saved records keep their photos.\""
      }
-    ]
+    ],
+    "proposals": []
    }
   },
   {
@@ -11674,72 +11645,97 @@
    "status": "in-design",
    "gate": {
     "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "round": 3,
+    "judged": "2026-10-10",
+    "commit": "bfd0fa8",
     "model": "claude-opus-5-5",
-    "scores": {
-     "clarity": 7,
-     "budget": 7,
-     "hierarchy": 7,
-     "spacing": 5,
-     "broken": 4
+    "previous": {
+     "round": 2,
+     "judged": "2026-10-10",
+     "commit": "40bb120",
+     "lowest": 7,
+     "status": "in-design",
+     "findings": [
+      {
+       "severity": "medium",
+       "text": "README copied Button rows (hold, Escape, labels wrap, one primary per bar).",
+       "result": "fixed: README rewritten for IconButton; no hold/Escape/wrap/primary rows remain."
+      },
+      {
+       "severity": "low",
+       "text": "Raw radius fork .photo-title .icon-button{border-radius:10px}.",
+       "result": "fixed: rule deleted; every IconButton measured computes 12px (radius-control)."
+      },
+      {
+       "severity": "low",
+       "text": "Piglet sheet close labelled just \"Close\".",
+       "result": "fixed: \"Close pen sheet\" / zh \"关闭猪栏页\", 48x48."
+      }
+     ]
     },
-    "lowest": 4,
+    "scores": {
+     "clarity": 8,
+     "budget": 8,
+     "hierarchy": 8,
+     "spacing": 8,
+     "broken": 5
+    },
+    "lowest": 5,
     "checklist": [
      {
       "line": 1,
       "pass": true,
-      "why": "A square icon-only tool; \"every verb gets a labelled button or tile\" names the alternative."
+      "why": "One sentence; Button named for verbs."
      },
      {
       "line": 2,
       "pass": true,
-      "why": "Do/do-not: universal glyphs only; verbs get Button."
+      "why": "When / when not; Button and ChoiceList named."
      },
      {
       "line": 3,
-      "pass": false,
-      "why": "No anatomy section; the badge is not marked optional; container variants are hidden in a className."
+      "pass": true,
+      "why": "48 container, glyph, label, badge, selected check, reason line."
      },
      {
       "line": 4,
-      "pass": false,
-      "why": "Real variants (bordered toolbar, header return, plain close/mark) are undocumented; the 44px header return is not described at all."
+      "pass": true,
+      "why": "Bordered and plain, each with a use line and real screens."
      },
      {
       "line": 5,
-      "pass": false,
-      "why": "Pressed is \"not drawn\"; no disabled or focus example is rendered."
+      "pass": true,
+      "why": "Pressed fills var(--press) and moves 2px."
      },
      {
       "line": 6,
-      "pass": false,
-      "why": "Default 44x44: task-return, sheet close (dismiss), sp-mark, more; inspection forks go to 32/36px wide."
+      "pass": true,
+      "why": "Every IconButton on Farrowing, Inspection walk/filters, the Piglet pen sheet and the preview is 48x48."
      },
      {
       "line": 7,
       "pass": true,
-      "why": "Not a choice set."
+      "why": "At most three toolbar tools stated."
      },
      {
       "line": 8,
-      "pass": false,
-      "why": "Disabled differs by grey only."
+      "pass": true,
+      "why": "Selected adds a check and aria-pressed; disabled has a reason line."
      },
      {
       "line": 9,
       "pass": true,
-      "why": "aria-label examples given (\"Filter, 2 applied\")."
+      "why": "Accessible names name the subject (Close pen sheet, Close Filter pigs)."
      },
      {
       "line": 10,
       "pass": true,
-      "why": "aria-label required; global focus ring."
+      "why": "aria-label required, focus ring, aria-disabled focusable; no stray Button rows."
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "Raw 10px radius in the bundle; screen forks use #cbd3c1, 11/13px radii, 46/52px heights."
+      "pass": true,
+      "why": "Radius fork gone; CSS on tokens. README lists undefined space-1 (low)."
      },
      {
       "line": 12,
@@ -11753,121 +11749,74 @@
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "No related links (Button, Icon, the TaskSheet close) and no classification."
+      "pass": true,
+      "why": "Related table and classification present (first row links IconButton to itself)."
      },
      {
       "line": 15,
       "pass": false,
-      "why": "The 375px preview shows default + badge only; no other states."
+      "why": "Standalone preview clean at 375, but the atlas component Overview renders nothing: \"Failed to construct 'URL': Invalid URL\"."
      }
     ],
     "classification": "component",
     "variants": [
      {
-      "name": "bordered (toolbar / dock: room-filter-button)",
+      "name": "bordered (header return, filter, search, scan)",
       "usedBy": [
        "farrowing.room",
+       "farrowing.finish",
        "inspection.walk",
        "piglet-processing.give-ids"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
-       "spacing": 6,
-       "broken": 7
+       "spacing": 8,
+       "broken": 8
       },
-      "findings": [
-       "inspection.walk renders it 48x52 (not square); the give-ids scan button uses control-border instead of line."
-      ]
+      "findings": []
      },
      {
-      "name": "header return (task-return)",
-      "usedBy": [
-       "farrowing.room",
-       "inspection.walk"
-      ],
-      "status": "in-design",
-      "scores": {
-       "clarity": 7,
-       "budget": 8,
-       "hierarchy": 8,
-       "spacing": 7,
-       "broken": 4
-      },
-      "findings": [
-       "Bordered like the toolbar variant but 44x44, under the floor; undocumented."
-      ]
-     },
-     {
-      "name": "plain (close, more, breeder mark)",
+      "name": "plain (sheet close, clear selection, breeder mark)",
       "usedBy": [
        "farrowing.finish",
-       "piglet-processing.tagged-list"
+       "piglet-processing.sheet-todo",
+       "inspection.filters",
+       "piglet-processing.give-ids"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 7,
-       "budget": 7,
-       "hierarchy": 7,
-       "spacing": 7,
-       "broken": 4
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
       },
       "findings": [
-       "44x44; the TaskSheet close is a separate .tk-sheet-close implementation of the same thing."
+       "Every sheet close measured now names its sheet."
       ]
      }
     ],
     "findings": [
      {
       "severity": "high",
-      "text": "The default target is 44x44 (bundle .icon-button height:44px); header return, sheet close and breeder marks all measure 44.",
-      "fix": "Set .icon-button to var(--control-height) (48) square; keep the glyph size."
-     },
-     {
-      "severity": "high",
-      "text": "No pressed state for a gloved tap.",
-      "fix": "Add the shared press: background var(--press) and translateY(1px) on :active, as Button has."
-     },
-     {
-      "severity": "medium",
-      "text": "Variants live as screen forks: inspection 46px / 48x52 / #cbd3c1, dock clear 36px wide, feed-optional 32px wide, home 48px with radius 13.",
-      "fix": "Add variant: \"bordered\" | \"plain\" to iconButton() and delete the per-screen overrides."
-     },
-     {
-      "severity": "medium",
-      "text": "The TaskSheet close (.tk-sheet-close) and the farrowing dismiss are two implementations of the plain variant.",
-      "fix": "Render the sheet close with SentriUI.iconButton({ variant: \"plain\" })."
+      "text": "Atlas component page Overview for IconButton renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render). Broken since round 1 (033fa58).",
+      "fix": "Same fix as Button: resolve bundle.js and variants/<id>.html against a real base (parent.location.href when location is about:srcdoc), or use plain iframes src=variants/<id>.html."
      },
      {
       "severity": "low",
-      "text": "The header return variant is undocumented.",
-      "fix": "Document it as the bordered variant at 48 in the header."
-     }
-    ],
-    "proposals": [
-     {
-      "kind": "new-variant",
-      "name": "IconButton bordered / plain",
-      "why": "Two looks already in every task; today a className plus forks.",
-      "seenIn": [
-       "farrowing.room",
-       "inspection.walk",
-       "farrowing.finish"
-      ]
+      "text": "README tokens list space-1, which tokens.css does not define.",
+      "fix": "Replace space-1 with border-width in README line 65."
      },
      {
-      "kind": "merge",
-      "name": "TaskSheet close -> IconButton plain",
-      "why": "Same job, separate code.",
-      "seenIn": [
-       "piglet-processing.sheet-todo",
-       "farrowing.finish"
-      ]
+      "severity": "low",
+      "text": "Related table's first row links Button / IconButton from IconButton's own README.",
+      "fix": "Make the row just Button: labelled acts, used when the act needs a visible verb."
      }
-    ]
+    ],
+    "proposals": []
    }
   },
   {
@@ -19793,10 +19742,10 @@
     "kind": "component",
     "id": "Button"
    },
-   "kind": "design",
+   "kind": "broken",
    "severity": "high",
-   "title": "Waiting buttons in real task screens show no reason: TaskSheet hides the status line by default,…",
-   "detail": "Waiting buttons in real task screens show no reason: TaskSheet hides the status line by default, so piglet-processing.record-death \"Save\" and sheet-todo \"Submit\" read as greyed-out disabled.\nFix: Make the footer status visible whenever the primary is waiting (status.visible defaults to true when primary.waiting).",
+   "title": "Atlas component page Overview for Button renders no buttons: the atlas runs preview.html as an…",
+   "detail": "Atlas component page Overview for Button renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render; only the landing Overview breaks). Broken since round 1 (033fa58).\nFix: In preview.html resolve against a real base (parent.location.href when location is about:srcdoc, else document.baseURI) for both bundle.js and fetch('variants/'+id+'.html') - or drop the fetch/srcdoc loop and use plain iframes src=variants/<id>.html.",
    "source": "gate"
   },
   {
@@ -19805,10 +19754,10 @@
     "kind": "component",
     "id": "Button"
    },
-   "kind": "broken",
-   "severity": "high",
-   "title": "Height is decided by host classes: 52px bare, 44px in .inspection-phone/.farrowing-phone, 48/56…",
-   "detail": "Height is decided by host classes: 52px bare, 44px in .inspection-phone/.farrowing-phone, 48/56 in footers. Preview footers render at 44px, under the 48 glove floor.\nFix: One rule: .button min-height: var(--control-height) (48) everywhere; drop the 44px host override.",
+   "kind": "design",
+   "severity": "low",
+   "title": "Farrowing Scan ear tag still renders class \"button primary button primary dock-scan\" (the End…",
+   "detail": "Farrowing Scan ear tag still renders class \"button primary button primary dock-scan\" (the End walk doubling, fixed only on Inspection).\nFix: Strip button/primary from className in farrowing-astra-concept.js btn() as inspection-astra-concept.js now does.",
    "source": "gate"
   },
   {
@@ -19817,10 +19766,10 @@
     "kind": "component",
     "id": "Button"
    },
-   "kind": "broken",
-   "severity": "high",
-   "title": "Copy rule broken in use: the piglet-processing footer says \"Submit\" (strings submit.n,…",
-   "detail": "Copy rule broken in use: the piglet-processing footer says \"Submit\" (strings submit.n, idf.submit), and the README gives \"Save\" as a commit example while banning Save/Submit.\nFix: Rename to verb+count (\"Record 3 items\", \"Record 12 piglets\"); remove \"Save\" from the Commit register examples.",
+   "kind": "design",
+   "severity": "low",
+   "title": "README tokens list space-1, which tokens.css does not define (the CSS uses border-width).",
+   "detail": "README tokens list space-1, which tokens.css does not define (the CSS uses border-width).\nFix: Replace space-1 with border-width in README line 75.",
    "source": "gate"
   },
   {
@@ -19830,57 +19779,9 @@
     "id": "Button"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "Two hold faces (11px sentence-case caption in Button vs 9px capitals in TaskHold) for the same act.",
-   "detail": "Two hold faces (11px sentence-case caption in Button vs 9px capitals in TaskHold) for the same act.\nFix: Keep the farrowing face (TaskHold) as the only hold caption and update the Button card and preview to it.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Button:4",
-   "target": {
-    "kind": "component",
-    "id": "Button"
-   },
-   "kind": "design",
-   "severity": "medium",
-   "title": "Raw colours and radii in .button CSS (#aab2a1, #e9ece3, #92998d, #bdc7b6, #fff1ee, #20291f, 13px).",
-   "detail": "Raw colours and radii in .button CSS (#aab2a1, #e9ece3, #92998d, #bdc7b6, #fff1ee, #20291f, 13px).\nFix: Replace with control-border, disabled-fill, disabled-ink, red-wash, ink and radius-control tokens.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Button:5",
-   "target": {
-    "kind": "component",
-    "id": "Button"
-   },
-   "kind": "design",
    "severity": "low",
-   "title": "task-end-early has no screen; the tool register is forked as .sp-tool.",
-   "detail": "task-end-early has no screen; the tool register is forked as .sp-tool.\nFix: Drop task-end-early (End early is a danger hold); move .sp-tool onto register:\"tool\".",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Button:p0",
-   "target": {
-    "kind": "component",
-    "id": "Button"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "Merge TaskHold -> Button hold?",
-   "detail": "Same act, two caption faces; TaskHold is only the footer placement.\nSeen in: farrowing.finish, piglet-processing.end-task",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Button:p1",
-   "target": {
-    "kind": "component",
-    "id": "Button"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "Merge .sp-tool -> Button tool register?",
-   "detail": "Same job (a mid-sheet act), forked look.\nSeen in: piglet-processing.sheet-todo",
+   "title": "Destructive preview's disabled reason is a piglet reason (\"Choose the piglets first.\").",
+   "detail": "Destructive preview's disabled reason is a piglet reason (\"Choose the piglets first.\").\nFix: Use a photo reason in variants/destructive.html, e.g. \"Saved records keep their photos.\"",
    "source": "gate"
   },
   {
@@ -19891,8 +19792,8 @@
    },
    "kind": "broken",
    "severity": "high",
-   "title": "The default target is 44x44 (bundle .icon-button height:44px); header return, sheet close and…",
-   "detail": "The default target is 44x44 (bundle .icon-button height:44px); header return, sheet close and breeder marks all measure 44.\nFix: Set .icon-button to var(--control-height) (48) square; keep the glyph size.",
+   "title": "Atlas component page Overview for IconButton renders no buttons: the atlas runs preview.html as…",
+   "detail": "Atlas component page Overview for IconButton renders no buttons: the atlas runs preview.html as an about:srcdoc iframe, so new URL('../bundle.js',location.href) throws \"Invalid URL\" (variant tabs render). Broken since round 1 (033fa58).\nFix: Same fix as Button: resolve bundle.js and variants/<id>.html against a real base (parent.location.href when location is about:srcdoc), or use plain iframes src=variants/<id>.html.",
    "source": "gate"
   },
   {
@@ -19902,9 +19803,9 @@
     "id": "IconButton"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "No pressed state for a gloved tap.",
-   "detail": "No pressed state for a gloved tap.\nFix: Add the shared press: background var(--press) and translateY(1px) on :active, as Button has.",
+   "severity": "low",
+   "title": "README tokens list space-1, which tokens.css does not define.",
+   "detail": "README tokens list space-1, which tokens.css does not define.\nFix: Replace space-1 with border-width in README line 65.",
    "source": "gate"
   },
   {
@@ -19913,58 +19814,10 @@
     "kind": "component",
     "id": "IconButton"
    },
-   "kind": "broken",
-   "severity": "medium",
-   "title": "Variants live as screen forks: inspection 46px / 48x52 / #cbd3c1, dock clear 36px wide,…",
-   "detail": "Variants live as screen forks: inspection 46px / 48x52 / #cbd3c1, dock clear 36px wide, feed-optional 32px wide, home 48px with radius 13.\nFix: Add variant: \"bordered\" | \"plain\" to iconButton() and delete the per-screen overrides.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:IconButton:3",
-   "target": {
-    "kind": "component",
-    "id": "IconButton"
-   },
-   "kind": "design",
-   "severity": "medium",
-   "title": "The TaskSheet close (.tk-sheet-close) and the farrowing dismiss are two implementations of the…",
-   "detail": "The TaskSheet close (.tk-sheet-close) and the farrowing dismiss are two implementations of the plain variant.\nFix: Render the sheet close with SentriUI.iconButton({ variant: \"plain\" }).",
-   "source": "gate"
-  },
-  {
-   "id": "gate:IconButton:4",
-   "target": {
-    "kind": "component",
-    "id": "IconButton"
-   },
    "kind": "design",
    "severity": "low",
-   "title": "The header return variant is undocumented.",
-   "detail": "The header return variant is undocumented.\nFix: Document it as the bordered variant at 48 in the header.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:IconButton:p0",
-   "target": {
-    "kind": "component",
-    "id": "IconButton"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "New variant: IconButton bordered / plain?",
-   "detail": "Two looks already in every task; today a className plus forks.\nSeen in: farrowing.room, inspection.walk, farrowing.finish",
-   "source": "gate"
-  },
-  {
-   "id": "gate:IconButton:p1",
-   "target": {
-    "kind": "component",
-    "id": "IconButton"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "Merge TaskSheet close -> IconButton plain?",
-   "detail": "Same job, separate code.\nSeen in: piglet-processing.sheet-todo, farrowing.finish",
+   "title": "Related table's first row links Button / IconButton from IconButton's own README.",
+   "detail": "Related table's first row links Button / IconButton from IconButton's own README.\nFix: Make the row just Button: labelled acts, used when the act needs a visible verb.",
    "source": "gate"
   },
   {

@@ -2134,7 +2134,7 @@
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "task-complete",
-      "steps": [{"tap":".hold","hold":1000}],
+      "steps": [{"tap":".st-hold","hold":1000}],
       "figma": "",
       "notes": {
         "purpose": "The frozen record after the task ended: who, when, performance and outcomes.",

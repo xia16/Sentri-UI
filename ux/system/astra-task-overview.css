@@ -1,5 +1,5 @@
 /* A shared hierarchy, with optional progress only for bounded measures. */
-.task-context-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);border:1px solid #cdd2c1;border-radius:15px;overflow:hidden;background:#f6f4eb;box-shadow:0 2px 6px #2037190c,inset 0 1px 0 #ffffffa6;color:var(--ink,#20291f);font-family:var(--sans,'Plus Jakarta Sans',sans-serif)}
+.task-context-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);border:1px solid #cdd2c1;border-radius:15px;overflow:hidden;background:#f6f4eb;box-shadow:0 2px 6px #2037190c,inset 0 1px 0 #ffffffa6;color:var(--ink,#20291f);font-family:var(--font-sans,'Plus Jakarta Sans',sans-serif)}
 .tc-unit,.tc-task{display:flex;flex-direction:column;align-items:flex-start;padding:12px 15px;min-width:0;gap:0}
 .tc-task{position:relative;border:0;background:transparent;text-decoration:none;text-align:left;cursor:pointer;color:inherit;border-radius:0;font:inherit;transition:background .15s ease}
 .tc-task:before{content:'';position:absolute;left:0;top:14px;bottom:14px;width:1px;background:#d3d6c8;pointer-events:none}
@@ -8,8 +8,8 @@
 .tc-task .tc-heading{font-weight:600;color:#38462f}
 .tc-heading svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.7;flex-shrink:0}
 .tc-value{display:flex;align-items:baseline;gap:5px;margin-top:5px;min-height:35px;white-space:nowrap}
-.tc-value strong{font:600 31px/1.15 var(--mono,'IBM Plex Mono',monospace);letter-spacing:-1.4px;font-variant-numeric:tabular-nums}
-.tc-suffix{font-size:17px;font-weight:500}.tc-denominator{font:400 15px var(--mono,'IBM Plex Mono',monospace);color:#738069;letter-spacing:-.5px}
+.tc-value strong{font:600 31px/1.15 var(--font-mono,'IBM Plex Mono',monospace);letter-spacing:-1.4px;font-variant-numeric:tabular-nums}
+.tc-suffix{font-size:17px;font-weight:500}.tc-denominator{font:400 15px var(--font-mono,'IBM Plex Mono',monospace);color:#738069;letter-spacing:-.5px}
 .tc-description{font-size:11px;font-weight:500;line-height:1.5;margin-top:2px;color:#394432}
 .tc-scope{color:#748068;font-size:10px;font-weight:400;white-space:nowrap}
 .tc-support{font-size:10px;line-height:1.6;color:#6e7965;margin-top:6px}

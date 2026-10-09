@@ -326,9 +326,11 @@
     const on=(items.find(i=>i.checked)||items[0]).value;
     return `<div class="st-filter-chips" data-ds="FilterChips" data-field="${esc(key)}" data-state="${esc(state)}"><div class="st-filter-chips-track" role="radiogroup" aria-label="${esc(label)}">${items.map(i=>`<button type="button" role="radio" aria-checked="${i.value===on}" tabindex="${i.value===on?0:-1}" data-action="${esc(action)}" data-value="${esc(i.value)}"${i.aria?` aria-label="${esc(i.aria)}"`:""}${i.disabled?' disabled':''}>${i.value===on?`<span class="st-chip-check" aria-hidden="true">${globalThis.SentriIcons?globalThis.SentriIcons.icon('check'):''}</span>`:''}<span class="st-selection-label">${i.label}</span>${i.count!=null?`<span class="st-selection-count">${i.count}</span>`:''}</button>`).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
   }
-  function iconButton({action='',icon='',label='',className='',value='',badge='',disabled=false,strs,args}={}){
+  function iconButton({action='',icon='',label='',variant='bordered',className='',value='',badge='',disabled=false,pressed=false,selected=null,reason='',describedby='',attrs={},strs,args}={}){
     const o={strs,args},hasBadge=(badge!==''&&badge!=null)||has(o,'badge');
-    return `<button type="button" class="icon-button ${esc(className)}" data-ds="IconButton" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${disabled?' disabled':''}>${icon}${hasBadge?`<span class="filter-badge">${tx(badge,o,'badge')}</span>`:''}</button>`;
+    const v=oneOf('IconButton','variant',variant,['bordered','plain'],'bordered');
+    const rid=reason?(describedby||fieldId('st-icon-reason')):describedby;
+    return `<button type="button" class="icon-button ${esc(className)}" data-ds="IconButton" data-variant="${v}" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${disabled?' aria-disabled="true"':''}${pressed?' data-preview="pressed"':''}${selected!=null?` aria-pressed="${!!selected}"`:''}${rid?` aria-describedby="${esc(rid)}"`:''}${safeAttr(attrs)}><span aria-hidden="true">${icon}</span>${selected?`<span class="st-icon-selected" aria-hidden="true">${sGlyph('check')}</span>`:''}${hasBadge?`<span class="filter-badge">${tx(badge,o,'badge')}</span>`:''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
   }
   /* ---- Field cards (candidate, ADR 0001): Stepper, Measure, Numpad ----
      Event contract: every control is a <button data-action> whose data-value is the caller's field key;
@@ -346,7 +348,7 @@
   const ariaText=(text,id,args)=>` aria-label="${esc(text)}"${id?` data-str-attr="aria-label:${esc(id)}"${args?` data-args="${esc(JSON.stringify(args))}"`:''}`:''}`;
   const hintTone=t=>t==='warn'||t==='refused'?'amber':'muted';
   // Text actions (the fourth register, ≥44px): [{label, action, value, strs:{label}, args}].
-  const textActions=(list,key)=>(list||[]).map(p=>`<button type="button" class="st-text-action" data-action="${esc(p.action||'')}" data-value="${esc(p.value!=null?p.value:key)}">${tx(p.label,p,'label')}</button>`).join('');
+  const textActions=(list,key)=>(list||[]).map(p=>button({label:p.label||'',register:'text',action:p.action||'',value:p.value!=null?p.value:key,strs:p.strs,args:p.args})).join('');
   /* The card's one persistent status region. Always mounted (an empty live region still announces later);
      reserve: '' (no height when empty) · 'text' (one line) · 'action' (44px: room for a text action or two lines). */
   function hintLine(cls,{id='',text='',tone='',o={},key='hint',reserve='',actions=[],fieldKey=''}={}){
@@ -627,13 +629,14 @@
   }
   /* Button, as a factory. Registers (RULINGS, three button registers + the text action): primary (the one commit,
      ink) · secondary (an exit, outlined) · tool (a mid-sheet act, a soft well, no border) · text (the quietest: a bare
-     word, 13/700 ink-2, no container, ≥44px) · danger · end-early. waiting: the waiting face — present, quiet,
+     word, 13/700 ink-2, no container, ≥48px) · danger. waiting: the waiting face — present, quiet,
      focusable (aria-disabled, never disabled); guard() answers its tap. busy: sent, until the host settles. */
-  const REGISTER={primary:'button primary',secondary:'button secondary',tool:'button tool',danger:'button danger','end-early':'button task-end-early'};
-  function button({label='',register='secondary',action='',value='',waiting=false,busy=false,describedby='',labelledby='',id='',attrs={},className='',strs,args}={}){
-    const o={strs,args},r=oneOf('Button','register',register,['primary','secondary','tool','text','danger','end-early'],'secondary');
+  const REGISTER={primary:'button primary',secondary:'button secondary',tool:'button tool',danger:'button danger'};
+  function button({label='',register='secondary',action='',value='',waiting=false,disabled=false,busy=false,icon='',reason='',describedby='',labelledby='',id='',attrs={},className='',strs,args}={}){
+    const o={strs,args},r=oneOf('Button','register',register,['primary','secondary','tool','text','danger'],'secondary');
     const cls=r==='text'?'st-text-action':REGISTER[r];
-    return `<button type="button" class="${cls}${className?' '+esc(className):''}" data-ds="Button" data-register="${r}"${id?` id="${esc(id)}"`:''} data-action="${esc(action)}" data-value="${esc(value)}"${waiting||busy?' aria-disabled="true"':''}${busy?' aria-busy="true" data-busy=""':''}${describedby?` aria-describedby="${esc(describedby)}"`:''}${labelledby?` aria-labelledby="${esc(labelledby)}"`:''}${safeAttr(attrs)}>${tx(label,o,'label')}</button>`;
+    const rid=reason?(describedby||fieldId('st-button-reason')):describedby;
+    return `<button type="button" class="${cls}${className?' '+esc(className):''}" data-ds="Button" data-register="${r}"${id?` id="${esc(id)}"`:''} data-action="${esc(action)}" data-value="${esc(value)}"${waiting||busy?' aria-disabled="true"':''}${disabled?' disabled':''}${busy?' aria-busy="true" data-busy=""':''}${rid?` aria-describedby="${esc(rid)}"`:''}${labelledby?` aria-labelledby="${esc(labelledby)}"`:''}${r==='tool'&&typeof label==='string'&&label&&!strs?` title="${esc(label)}"`:''}${safeAttr(attrs)}>${icon?`<span aria-hidden="true">${icon}</span>`:''}<span class="st-button-label">${tx(label,o,'label')}</span>${busy?'<span class="st-button-busy" aria-hidden="true">…</span>':''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
   }
   /* The reason a waiting button waits, one persistent status line beside the bar (row-title size). */
   function buttonReason({text='',id='',actions=[],className='',strs,args}={}){
@@ -728,7 +731,7 @@
       const cap=b.querySelector('.st-hold-caption'),id=r.cue&&cues[r.cue];
       // Every idle transition restores the idle caption; the cue for it goes to the status line only.
       if(r.phase==='idle'){if(idleCap.has(b)&&cap)cap.outerHTML=idleCap.get(b);}
-      else if(id&&cap){cap.setAttribute('data-str',id);cap.textContent=t(id);}
+      else if(id&&cap&&['armed','pending','done','unknown'].includes(r.phase)){cap.setAttribute('data-str',id);cap.textContent=t(id);}
       const line=b.getAttribute('data-hold-status')&&root.document&&root.document.getElementById(b.getAttribute('data-hold-status'));
       if(line&&id)announce(line,`<span data-str="${esc(id)}">${esc(t(id))}</span>`);
       if(r.commit)buzz(HOLD.vibrateCommit);else if(r.cue==='released')buzz(HOLD.vibrateRelease);
@@ -859,7 +862,7 @@
   const sParts=v=>Array.isArray(v)?v.map(p=>{const o=sObj(p);if(o.sep)return SEP;return o.tone?`<span class="st-tone" data-tone="${esc(o.tone)}">${sT(o)}</span>`:sT(o);}).join(''):sT(v);
   /* Back: the footer's exit, the same on every sheet (a 16px chevron + the word). Alone in a footer it fills the bar. */
   function backButton({action='back',value='',label={text:'Back',str:'act.back'},className=''}={}){
-    return `<button type="button" class="surface-back${className?' '+esc(className):''}" data-ds="Sheet"${sA(action,value)}>${sGlyph('back-chevron')}<span>${sT(label)}</span></button>`;
+    return button({register:'secondary',action,value,label:'',className:'surface-back'+(className?' '+className:'')}).replace('<span class="st-button-label"></span>',sGlyph('back-chevron')+'<span>'+sT(label)+'</span>');
   }
   /* A Button from a { label, action, value, register, waiting, describedby } spec (a string is already HTML). */
   function sButton(b){
@@ -880,15 +883,17 @@
      footer markup in place of back/primary/hold (a host's own two controls); className adds a page hook. */
   function sheetFooter({back:b={},primary,hold:h,status:st,content='',className=''}={}){
     let line='';
+    if(!st&&primary&&typeof primary==='object'&&primary.reason){st=sObj(primary.reason);primary=Object.assign({},primary,{reason:''});}
     if(st){
       const id=st.id||fieldId('st-sheet-status'),waiting=!!((primary&&typeof primary==='object'&&primary.waiting)||(h&&h.waiting));
-      const vis=st.visible!=null?!!st.visible:(waiting||!!st.action),tone=st.tone?` data-tone="${esc(st.tone)}"`:'';
+      const vis=waiting||!!st.action||!!st.visible,tone=st.tone?` data-tone="${esc(st.tone)}"`:'';
       const act=vis&&st.action?sButton(Object.assign({register:'text'},st.action)):'';
       if(!vis)line=`<p class="sheet-status st-visually-hidden" id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>`;
       else line=act?`<div class="sheet-status" data-action-slot><p id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>${act}</div>`:`<p class="sheet-status" id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>`;
       if(h&&!h.statusId)h=Object.assign({},h,{statusId:id});
       if(primary&&typeof primary==='object'&&!primary.describedby)primary=Object.assign({},primary,{describedby:id});
     }
+    if(content){content=content.replace(/<p class="st-field-hint st-button-reason[^]*?<\/p>/g,reason=>{line+=reason;return '';});}
     const inner=content||`${b?backButton(b):''}${h?sHold(h):sButton(primary)}`;
     return `${line}<div class="sheet-footer${className?' '+esc(className):''}" data-ds="Sheet">${inner}</div>`;
   }
@@ -907,7 +912,7 @@
       return `<div class="dialog-backdrop" data-ds="Sheet" data-variant="dialog"${sLayer(layer)}><div class="dialog${cls}" role="dialog" aria-modal="true" tabindex="-1"${id?` id="${esc(id)}"`:''}${vw}${inert?' inert':''}${sL(label??title)}${ex}><div class="dialog-body${bodyClass?' '+esc(bodyClass):''}"><h2 class="dialog-title">${icon?sGlyph(icon):''}${sT(title)}</h2>${subtitle?`<p class="dialog-desc">${sParts(subtitle)}</p>`:''}${body}</div>${foot}</div></div>`;
     }
     const sub=subtitle?`<p class="sheet-subtitle"${subtitleTone?` data-tone="${esc(subtitleTone)}"`:''}>${sParts(subtitle)}</p>`:'';
-    const cl=Object.assign({action:'dismiss'},close||{}),x=v==='drawer'?`<button type="button" class="sheet-close"${sA(cl.action,cl.value)}${sL(cl.label,{text:'Close',str:'act.close'})}>${sGlyph('close')}</button>`:'';
+    const cl=Object.assign({action:'dismiss'},close||{}),closeLabel=sObj(cl.label||{text:'Close',str:'act.close'}),x=v==='drawer'?iconButton({variant:'plain',action:cl.action,value:cl.value,icon:sGlyph('close'),label:closeLabel.text||'Close',className:'sheet-close',attrs:closeLabel.str?{'data-str-attr':'aria-label:'+closeLabel.str}: {}}):'';
     const head=`<header class="utility-header">${lead}<div class="sheet-titles"><h2 class="sheet-title">${sT(title)}</h2>${sub}</div>${aside?`<div class="sheet-aside">${aside}</div>`:''}${x}</header>`;
     const common=`data-ds="Sheet" tabindex="-1"${sLayer(layer)}${inert?' inert':''}${id?` id="${esc(id)}"`:''}${vw}${sL(label??title)}${ex}`;
     const main=`${head}${above}<div class="sheet-body${bodyClass?' '+esc(bodyClass):''}">${body}</div>${foot}`;

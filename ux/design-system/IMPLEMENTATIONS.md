@@ -75,3 +75,7 @@ Only in the bundle: base for the DS pages, the field cards (Stepper, Measure, Nu
 ## Sheet (component pass)
 
 One implementation of the drawer, the page and the dialog: `SentriUI.sheet`, `sheetFooter`, `backButton` and `scrim` in `components/bundle.js`, styled in `bundle.css` section 3. It replaces three copies: the hand-built `.sheet` markup of Farrowing (`roomSheet`, `detailSheet`, `featurePage`, the record surface and the dialogs), Inspection (`sheet()`), Home (`drawer()` and its page footers), and the task skeleton's TaskSheet / TaskPage / TaskDialog (`SentriTask.sheet`, `drawer`, `page`, `dialog`, `footer` and `back` now call the component; their `tk-*` classes are gone). `AstraSurfaces.present`, `normalizeBack` and `markContext` (the regex rewrite of hand-built markup) are deleted; `AstraSurfaces.isPage` stays as the prototypes' page-or-drawer list.
+
+## Button / IconButton pass (2026-10-10)
+
+Button now owns primary, secondary, text action, tool, destructive and hold variants. Farrowing’s hold timer and Piglet’s `.sp-tool` are retired; `SentriTask.holdBind` delegates to the bundle. IconButton owns bordered and plain at `tap-min` square; Sheet Close and prototype toolbar/header tools use it. Host classes position controls; their forked geometry and colours have been removed. Waiting reasons stay visible and are linked to their control.
