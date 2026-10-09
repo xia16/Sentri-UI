@@ -5,27 +5,7 @@
   'use strict';
   const $ = selector => document.querySelector(selector);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const paths = {
-    down:'m6 9 6 6 6-6', arrow:'m9 5 7 7-7 7', back:'m14 5-7 7 7 7M7 12h14', close:'m6 6 12 12M18 6 6 18',
-    home:'m3 10 9-7 9 7v11h-6v-7H9v7H3z', scan:'M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5M7 12h10',
-    toolbox:'M3 8h18v12H3zM8 8V4h8v4M3 13h18M10 12v3h4v-3', spark:'m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4z',
-    grid:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z', check:'m5 12 4 4L19 6',
-    clock:'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 7v6l4 2', note:'M5 3h14v18H5zM8 8h8M8 12h8M8 16h5',
-    heat:'M12 3c1 5-4 5-4 9 0 2 2 3 3 3-1-3 3-4 3-7 4 4 6 7 4 10-2 4-9 4-12 0-3-5 3-10 6-15z',
-    pregnancy:'M3 15h4l3-8 4 12 3-7h4M3 4h18', place:'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
-    barn:'m3 9 9-6 9 6v12H3zM9 21V11h6v10M3 9h18', return:'M4 8h11a6 6 0 0 1 0 12h-3M8 3 3 8l5 5',
-    farrow:'M3 12h4l3-7 4 14 3-7h4', send:'M12 20V4m-6 6 6-6 6 6', search:'M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0m-2 5 6 6',
-    health:'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8M8 12h8M12 8v8',
-    alert:'M12 3 2 21h20zM12 9v5M12 17v1', feed:'M3 12h18l-3 7H6zM8 5v3M12 3v4M16 5v3',
-    temperature:'M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0M12 8v9',
-    humidity:'M12 3S5 11 5 15a7 7 0 0 0 14 0c0-4-7-12-7-12z',
-    air:'M3 8h12a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h5',
-    wrench:'m14 6 4 4 4-4a7 7 0 0 1-9 9l-7 7-4-4 7-7a7 7 0 0 1 9-9z',
-    chart:'M5 20V10M12 20V4M19 20v-8',
-    upload:'M12 16V4m-4 4 4-4 4 4M4 15v6h16v-6',
-    offline:'m3 3 18 18M4 9a13 13 0 0 1 2-1M10 6a14 14 0 0 1 10 3M7 13a8 8 0 0 1 3-1M14 12a8 8 0 0 1 3 1M10 17a3 3 0 0 1 4 0M12 21h.01'
-  };
-  const icon = key => window.SentriIcons ? window.SentriIcons.icon(key) : `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[key] || paths.arrow}"/></svg>`;
+  const icon = key => window.SentriIcons.icon(key);
   const btn = (action, text, cls='', value='', extra='') => {
     if(action==='complete-task')return SentriUI.holdButton({action,label:'End task',caption:'HOLD TO END',tone:'primary'});
     if(['primary','secondary'].includes(cls))return SentriUI.button({action,value,register:cls,label:''}).replace('<span class="st-button-label"></span>',text).replace('<button',`<button ${extra}`);

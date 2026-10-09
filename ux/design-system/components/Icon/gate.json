@@ -168,5 +168,15 @@
         "farrowing.room"
       ]
     }
-  ]
+  ],
+  "resolution": {
+    "date": "2026-10-10",
+    "note": "Findings addressed in the component pass; original judge scores preserved.",
+    "evidence": "../pass-proof/README.md",
+    "changes": [
+      "Canonical non-enumerable aliases; condition shares plus.",
+      "Unknown names warn and return empty SVG; grid corrected; More uses three filled r=1.5 dots.",
+      "Registry count derived; default stroke token added; prototype registries removed."
+    ]
+  }
 }

@@ -79,3 +79,11 @@ One implementation of the drawer, the page and the dialog: `SentriUI.sheet`, `sh
 ## Button / IconButton pass (2026-10-10)
 
 Button now owns primary, secondary, text action, tool, destructive and hold variants. Farrowing’s hold timer and Piglet’s `.sp-tool` are retired; `SentriTask.holdBind` delegates to the bundle. IconButton owns bordered and plain at `tap-min` square; Sheet Close and prototype toolbar/header tools use it. Host classes position controls; their forked geometry and colours have been removed. Waiting reasons stay visible and are linked to their control.
+
+## Panel / Icon / CategoryFooter pass (2026-10-10)
+
+Panel owns the surface of TaskGroup, ChoiceList option groups, catalogue lists and Farrowing pen cards. TaskGroup and pen-card surface declarations are retired; short chooser wrappers no longer create a second inset around a Panel. Existing Facts, Row group, Log and task consumers continue on `.st-panel`.
+
+Icon rendering in Home, Inspection, Farrowing and the task skeleton delegates to SentriIcons; local path registries and mutations are deleted. Measurements' ruler glyph moved from Inspection to the registry. Standard/key stroke tokens and canonical aliases keep callers compatible; unknown names warn and render nothing. CategoryFooter's hand-built Inspection fallback is deleted. The host action catalogues and study use Health · Routine · Production, without disabled categories. Piglet processing inherits these implementations and its dist/app.html is rebuilt.
+
+See [verification and rendered proof](components/pass-proof/README.md).

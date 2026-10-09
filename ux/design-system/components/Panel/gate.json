@@ -195,5 +195,15 @@
         "inspection.filters"
       ]
     }
-  ]
+  ],
+  "resolution": {
+    "date": "2026-10-10",
+    "note": "Findings addressed in the component pass; original judge scores preserved.",
+    "evidence": "../pass-proof/README.md",
+    "changes": [
+      "Purpose and consumer ownership documented; page/drawer specimens render Facts and Row group.",
+      "TaskGroup, ChoiceList, Farrowing pen cards and catalogue lists use st-panel; shadows and nested chooser surfaces retired.",
+      "Existing token aliases verified; default surface works without an explicit context."
+    ]
+  }
 }

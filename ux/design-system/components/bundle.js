@@ -5,23 +5,23 @@
 (function(root){
   'use strict';
   const paths={
-    more:'M5 12h.01M12 12h.01M19 12h.01',
+    more:'M6.5 12a1.5 1.5 0 1 0-3 0 1.5 1.5 0 1 0 3 0M13.5 12a1.5 1.5 0 1 0-3 0 1.5 1.5 0 1 0 3 0M20.5 12a1.5 1.5 0 1 0-3 0 1.5 1.5 0 1 0 3 0',
     monitor:'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6',
     treat:'M15 3l6 6M16 4l-4 4M20 8l-4 4M10 6l8 8M11 7l-7 7v6h6l7-7M4 20l-2 2M8 12l3 3M11 9l3 3',
     hospital:'M13 3h8v18h-8M17 3v18M13 7h8M13 17h8M2 12h12M9 8l5 4-5 4',
     profile:'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M4 21v-2a8 8 0 0 1 16 0v2',
     chart:'M4 20V10M12 20V4M20 20v-7',
-    origin:'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
     back:'M15 5l-7 7 7 7M8 12h13',
     chevron:'M9 5l7 7-7 7',
     close:'M6 6l12 12M18 6L6 18',
     check:'M5 12l4 4L19 6',
     note:'M5 3h14v18H5zM8 8h8M8 12h8M8 16h5',
     feed:'M3 12h18l-3 7H6zM7 8l1-2 2 1-1 2zM12 5l1-2 2 1-1 2zM15 9l1-2 2 1-1 2z',
-    link:'M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-2 2M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l2-2',condition:'M12 4v16M4 12h16',
+    link:'M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-2 2M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l2-2',
+    measure:'M3 5h18v14H3zM7 5v5M11 5v3M15 5v5',
     weight:'M5 6h14l2 15H3zM8 6a4 4 0 0 1 8 0M12 11v4',
     search:'M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14M15 15l6 6',
-    grid:'M3 3h7v7H3zM14 3h7v7H3zM3 14h7v7H3zM14 14h7v7H3z',
+    grid:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
     scan:'M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5M7 12h10',
     clock:'M12 8v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0',
     alert:'M12 3L2 21h20zM12 9v5M12 17v1',
@@ -39,7 +39,6 @@
     bookmark:'M6 3h12v18l-6-4-6 4z',
     transfer:'M7 7h11l-3-3M18 7l-3 3M17 17H6l3-3M6 17l3 3',
     down:'m6 9 6 6 6-6',
-    arrow:'m9 5 7 7-7 7',
     place:'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
     home:'m3 10 9-7 9 7v11h-6v-7H9v7H3z',
     toolbox:'M3 8h18v12H3zM8 8V4h8v4M3 13h18M10 12v3h4v-3',
@@ -58,8 +57,16 @@
     backspace:'M9 5h12v14H9l-6-7zM12 9l6 6M18 9l-6 6',
     offline:'m3 3 18 18M4 9a13 13 0 0 1 2-1M10 6a14 14 0 0 1 10 3M7 13a8 8 0 0 1 3-1M14 12a8 8 0 0 1 3 1M10 17a3 3 0 0 1 4 0M12 21h.01'
   };
-  const icon=k=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[k]||paths.chevron}"/></svg>`;
-  const api=Object.freeze({paths:Object.freeze({...paths}),icon});
+  const aliases=Object.freeze({origin:'place',arrow:'chevron',condition:'plus'});
+  // Compatibility aliases do not add duplicate glyphs to the enumerable registry.
+  for(const [alias,name] of Object.entries(aliases))Object.defineProperty(paths,alias,{value:paths[name],enumerable:false});
+  const icon=k=>{
+    const name=Object.hasOwn(aliases,k)?aliases[k]:k, path=Object.hasOwn(paths,name)?paths[name]:'';
+    if(!path)console.warn(`SentriIcons: unknown icon "${k}"`);
+    const body=!path?'':name==='more'?[5,12,19].map(cx=>`<circle cx="${cx}" cy="12" r="1.5" fill="currentColor" stroke="none"/>`).join(''):`<path d="${path}"/>`;
+    return `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">${body}</svg>`;
+  };
+  const api=Object.freeze({paths:Object.freeze(paths),aliases,icon});
   root.SentriIcons=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
@@ -75,7 +82,7 @@
   const sa=(id,args)=>id?` data-str="${esc(id)}"${args&&Object.keys(args).length?` data-args="${esc(JSON.stringify(args))}"`:''}`:'';
   const tx=(text,o,key)=>{const id=o&&o.strs&&o.strs[key];return id?`<span${sa(id,o.args&&o.args[key])}>${esc(text)}</span>`:esc(text);};
   const has=(o,key)=>!!(o&&o.strs&&o.strs[key]);
-  const arrow='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
+  const arrow=root.SentriIcons.icon('chevron');
   /* Heading: three kinds. page = the title of a screen or sheet (title + description only). section = the title of a block,
      above its panel (the only kind with icon, meta and action). group = labels a run of rows or log entries inside one
      panel (muted; title + description only). "panel" is retired: it reads as section. A slot the kind does not carry is
@@ -95,6 +102,7 @@
     return `<div class="st-heading ${esc(className)}" data-ds="Heading" data-kind="${k}"${icon?' data-has-icon="true"':''}><div class="st-heading-main"><h${h} class="st-heading-title">${icon?`<span class="st-heading-icon">${icon}</span>`:''}<span${sa(strs&&strs.title,args&&args.title)}>${esc(title)}</span></h${h}>${showDesc?`<p class="st-heading-description">${tx(description,o,'description')}</p>`:''}</div>${showMeta||act?`<div class="st-heading-aside">${showMeta?`<span class="st-heading-meta">${tx(meta,o,'meta')}</span>`:''}${act?`<span class="st-heading-action">${act}</span>`:''}</div>`:''}</div>`;
   }
   function panel(content,{className='',tag='div',ds='Panel'}={}){
+    if(!content||!String(content).trim())return '';
     const t=['div','section','article','aside','dl'].includes(tag)?tag:'div';
     return `<${t} class="st-panel ${esc(className)}" data-ds="${esc(ds)}">${content}</${t}>`;
   }
@@ -238,10 +246,10 @@
   /* strs.back = the Back text; categories[i].strs.label = each tab. The nav aria-label stays plain text. */
   function categoryFooter({categories=[],active='',backAction='back',categoryAction='action-category',label='Action categories',className='',strs,args}={}){
     const current=categories.some(c=>c.id===active)?active:categories[0]?.id;
-    return `<footer class="sheet-footer st-category-footer ${esc(className)}" data-ds="CategoryFooter">${backButton({action:backAction,label:strs&&strs.back?{text:'Back',str:strs.back,args:args&&args.back}:'Back'})}<nav class="st-category-tabs action-category-nav" aria-label="${esc(label)}">${categories.map(c=>`<button type="button" data-action="${esc(categoryAction)}" data-value="${esc(c.id)}" aria-current="${c.id===current?'location':'false'}"${c.disabled?' disabled':''}>${tx(c.label,c,'label')}</button>`).join('')}</nav></footer>`;
+    return `<footer class="sheet-footer st-category-footer ${esc(className)}" data-ds="CategoryFooter">${backButton({action:backAction,label:strs&&strs.back?{text:'Back',str:strs.back,args:args&&args.back}:'Back'})}<nav class="st-category-tabs action-category-nav" aria-label="${esc(label)}">${categories.map(c=>`<button type="button" data-action="${esc(categoryAction)}" data-value="${esc(c.id)}" aria-current="${c.id===current?'location':'false'}">${tx(c.label,c,'label')}</button>`).join('')}</nav></footer>`;
   }
-  const chevron='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
-  const check='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4L19 6"/></svg>';
+  const chevron=root.SentriIcons.icon('chevron');
+  const check=root.SentriIcons.icon('check');
   function field({label='',control='',className='',ds=''}={}){
     return `<label class="field ${esc(className)}"${ds?` data-ds="${esc(ds)}"`:''}>${label}${control}</label>`;
   }
@@ -319,7 +327,7 @@
     const body=Array.isArray(rows)?rows.join(''):rows;
     const showTitle=title||has({strs},'title');
     const hid=radio&&showTitle?(id||fieldId('st-choice'))+'-title':'';
-    return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
+    return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-panel st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
   }
   function choiceSearch({label='Search',placeholder='',value='',attrs={},strs={}}={}){
     const extra=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
@@ -353,7 +361,7 @@
      host answers the tap in that status region. */
   let fieldUid=0;
   const fieldId=p=>`${p}-${++fieldUid}`;
-  const glyph=k=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${(root.SentriIcons&&root.SentriIcons.paths[k])||''}"/></svg>`;
+  const glyph=k=>root.SentriIcons.icon(k);
   // aria-label with an optional registry twin (the shell fills it through data-str-attr).
   const ariaText=(text,id,args)=>` aria-label="${esc(text)}"${id?` data-str-attr="aria-label:${esc(id)}"${args?` data-args="${esc(JSON.stringify(args))}"`:''}`:''}`;
   const hintTone=t=>t==='warn'||t==='refused'?'amber':'muted';
@@ -866,8 +874,7 @@
   function sT(v){if(v==null||v==='')return '';const o=sObj(v);if(o.html!=null)return String(o.html);return o.str?`<span data-str="${esc(o.str)}"${sArgs(o.args)}>${esc(o.text??'')}</span>`:esc(o.text);}
   function sL(v,fallback){const o=sObj(v==null||v===''?fallback:v);if(o.text==null&&!o.str)return '';return ` aria-label="${esc(o.text??'')}"`+(o.str?` data-str-attr="aria-label:${esc(o.str)}"${sArgs(o.args)}`:'');}
   const sA=(action,value)=>action?` data-action="${esc(action)}" data-value="${esc(value??'')}"`:'';
-  const sPaths={'back-chevron':'M15 5l-7 7 7 7'};
-  const sGlyph=k=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${sPaths[k]||(root.SentriIcons&&root.SentriIcons.paths&&root.SentriIcons.paths[k])||''}"/></svg>`;
+  const sGlyph=k=>root.SentriIcons.icon(k==='back-chevron'?'back':k);
   /* A line of parts, each a text slot with an optional tone: [{ text, str, args, tone }]; { sep: true } is the shared separator. */
   const sParts=v=>Array.isArray(v)?v.map(p=>{const o=sObj(p);if(o.sep)return SEP;return o.tone?`<span class="st-tone" data-tone="${esc(o.tone)}">${sT(o)}</span>`:sT(o);}).join(''):sT(v);
   /* Back: the footer's exit, the same on every sheet (a 16px chevron + the word). Alone in a footer it fills the bar. */

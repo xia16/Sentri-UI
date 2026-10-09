@@ -131,5 +131,15 @@
       "fix": "Swap 86px for back-width, 48px for control-height, and the padding for the footer tokens."
     }
   ],
-  "proposals": []
+  "proposals": [],
+  "resolution": {
+    "date": "2026-10-10",
+    "note": "Findings addressed in the component pass; original judge scores preserved.",
+    "evidence": "../pass-proof/README.md",
+    "changes": [
+      "Catalogue order Health, Routine, Production; General renamed Routine.",
+      "Disabled option removed from implementation and types.",
+      "Pressed, focus, empty, Chinese and five-category 300px states rendered; semantic footer tokens."
+    ]
+  }
 }
