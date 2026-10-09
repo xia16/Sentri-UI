@@ -161,15 +161,22 @@
                 "state": "Pig without one",
                 "when": "Factor is 100%",
                 "shows": "\"Follow curve\""
+              },
+              {
+                "state": "Unknown mode",
+                "when": "Pen mode unknown",
+                "shows": "No formula label; pigs read \"No feeding plan recorded\" on their own page"
               }
             ],
             "logic": "Pen total = sum of every pig's allowance today: base x factor, the held amount, or 0 if stopped. Pig amount e.g. base 2.4 x 1.1 = 2.64, shown rounded to one decimal. Pig count in the title is all pigs of the pen.",
-            "source": "allocation(pe) · pigFeedTags(p)"
+            "source": "allocation(pe) · pigFeedTags(p)",
+            "at": "Daily feed"
           },
           {
             "name": "Card · formula and delivery",
             "shows": "Gestation 1 · Shared trough / Station-fed / Ad-lib",
-            "logic": "Formula name and a label from the pen's feeding mode. Feed is guidance, not a completion checklist: no Record as done, no refill or delivery log."
+            "logic": "Formula name and a label from the pen's feeding mode. Feed is guidance, not a completion checklist: no Record as done, no refill or delivery log.",
+            "at": "Gestation 1"
           }
         ],
         "controls": [],
@@ -210,7 +217,8 @@
                 "shows": "\"Ad-lib\" replaces the kg total, no pig rows; Adjust feed opens the editor, which answers \"Feed adjustment unavailable · Ad-lib feeding has no fixed daily allowance.\""
               }
             ],
-            "rule": "Ad-lib formula and timing are read-only; no feeding-completion event is created."
+            "rule": "Ad-lib formula and timing are read-only; no feeding-completion event is created.",
+            "at": "Ad-lib"
           }
         ],
         "controls": [],
@@ -253,7 +261,8 @@
               }
             ],
             "logic": "Pen note writes the same note to every selected pen. Feed opens the editor over the pigs of the ticked pens; ad-lib pigs appear as blocked rows. Pigs not ticked inside a ticked pen still count: opening from pens captures the pens' current pigs.",
-            "rule": "A fault needs one pen, so equipment fault reporting asks for a single pen."
+            "rule": "A fault needs one pen, so equipment fault reporting asks for a single pen.",
+            "at": "3 pens · 7 pigs"
           }
         ],
         "controls": [],
@@ -286,24 +295,34 @@
             "shows": "Follow curve | Hold amount | Stop feed",
             "states": [
               {
-                "state": "Follow curve (default)",
-                "when": "Mode selected",
+                "state": "Follow curve",
+                "when": "Default; no hold or stop on the pigs",
                 "shows": "Percentage from -50 to +50 of the base curve"
               },
               {
                 "state": "Hold amount",
-                "when": "Mode selected",
+                "when": "Chosen, or every pig already has a held amount",
                 "shows": "Every pig keeps today's kg as a fixed amount; % box disabled (\"Daily amounts stay fixed\")"
               },
               {
                 "state": "Stop feed",
-                "when": "Mode selected",
+                "when": "Chosen, or every pig already stopped",
                 "shows": "0.0 kg/day; box disabled (\"No feed · 0.0 kg/day\")"
               },
               {
                 "state": "Mixed",
-                "when": "Pigs have different factors",
-                "shows": "Box shows placeholder \"Mixed\" and \"Choose one % for all pigs\""
+                "when": "Opened over pigs with different factors",
+                "shows": "Box shows placeholder \"Mixed\", hint \"Choose one % for all pigs\""
+              },
+              {
+                "state": "Unchanged plan",
+                "when": "Opened and only an end date or note edited",
+                "shows": "Plan left as is; Save logs \"Plan unchanged\""
+              },
+              {
+                "state": "Reset",
+                "when": "Reset pressed",
+                "shows": "Back to the curve at 0%; Save logs \"Reset to curve\""
               },
               {
                 "state": "Nothing adjustable",
@@ -312,13 +331,15 @@
               }
             ],
             "logic": "Changing mode resets the percentage to 0 when mixed or out of range. The percentage REPLACES each pig's existing adjustment. Hold amount fixes today's kg; later curve growth no longer applies until reset. Reset = follow curve, 0%, no end date.",
-            "source": "feed editor state"
+            "source": "feed editor state",
+            "at": "Feeding mode"
           },
           {
             "name": "Percentage input",
             "shows": "Number box and slider, -50 to +50",
             "logic": "Slider moves in 5% steps, the box accepts any decimal; they stay in step. Starts at the current factor of the target (only if all pigs share it).",
-            "rule": "Blank or outside -50 to +50 disables Save."
+            "rule": "Blank or outside -50 to +50 disables Save.",
+            "at": "Adjustment · %"
           },
           {
             "name": "Pig row",
@@ -340,18 +361,21 @@
                 "shows": "\"Ad-lib feeding has no fixed daily allowance\" / \"Pig has died\" / \"No feeding plan recorded\"; never changed"
               }
             ],
-            "logic": "Scope in the title is the pig count; a pen entry shows its pig count, not the pen name."
+            "logic": "Scope in the title is the pig count; a pen entry shows its pig count, not the pen name.",
+            "at": "000267"
           },
           {
             "name": "Optional chips",
             "shows": "End date · Add note",
             "logic": "Chip shows \"Until 15 Sep\" or the note text; an x clears it. With one pig targeted, the existing end date and reason are prefilled.",
-            "rule": "End date must be today or later. When it passes, the prototype does nothing."
+            "rule": "End date must be today or later. When it passes, the prototype does nothing.",
+            "at": "End date"
           },
           {
             "name": "Save",
             "shows": "Primary button",
-            "rule": "Enabled when at least one pig can be adjusted AND (a mode other than keep, or a changed end date / note) AND percent within -50 to +50 AND any end date is today or later. Writes to each eligible pig, logs one \"Feed plan changed\" per pig (\"old → new kg/day · +10% of curve · Until date · reason\"), returns to the walk. Ad-lib pigs in a selection stay unchanged."
+            "rule": "Enabled when at least one pig can be adjusted AND (a mode other than keep, or a changed end date / note) AND percent within -50 to +50 AND any end date is today or later. Writes to each eligible pig, logs one \"Feed plan changed\" per pig (\"old → new kg/day · +10% of curve · Until date · reason\"), returns to the walk. Ad-lib pigs in a selection stay unchanged.",
+            "at": "Save"
           }
         ],
         "controls": [],
@@ -389,7 +413,8 @@
           {
             "name": "End date and note forms",
             "shows": "Date field with Remove date; text area with Remove note",
-            "rule": "Date accepts today (12 Sep 2026) or later; earlier is refused. Save stays disabled until the value differs from the saved one. Saving only a note or date turns on Save in the editor even when mode and percent are unchanged."
+            "rule": "Date accepts today (12 Sep 2026) or later; earlier is refused. Save stays disabled until the value differs from the saved one. Saving only a note or date turns on Save in the editor even when mode and percent are unchanged.",
+            "at": "Until"
           }
         ],
         "controls": [],
@@ -433,12 +458,14 @@
               }
             ],
             "logic": "Context: \"Station-fed\" for station pens, \"Included in pen allocation\" for trough pens. The tag carries its reason: the saved reason or the body-condition band (\"Thin · mild\"); Feed held and No feed carry their own kg line.",
-            "source": "pigFeedTags(p)"
+            "source": "pigFeedTags(p)",
+            "at": "Included in pen allocation"
           },
           {
             "name": "Base curve",
             "shows": "Line chart, days 35/42/49/56, Today marked",
-            "logic": "Points are made-up base kg per day around the pig's base amount; vertical range = min/max rounded outward by 0.2. Caption \"kg/day · before individual adjustments\". The curve source (\"Sample farm curve\") is in the data but not drawn."
+            "logic": "Points are made-up base kg per day around the pig's base amount; vertical range = min/max rounded outward by 0.2. Caption \"kg/day · before individual adjustments\". The curve source (\"Sample farm curve\") is in the data but not drawn.",
+            "at": "Base curve"
           }
         ],
         "controls": [],
@@ -477,7 +504,8 @@
                 "shows": "Pen value (7.6 x 1.1 = 8.14) shown to one decimal; Feed lens count rises to 5"
               }
             ],
-            "logic": "Tag delta = (factor - 1) x 100, one decimal, sign shown."
+            "logic": "Tag delta = (factor - 1) x 100, one decimal, sign shown.",
+            "at": "Feed +10%"
           }
         ],
         "controls": [],
@@ -507,7 +535,8 @@
                 "shows": "Pen value (2.6 + 2.4 + 2.4) x 0.95 = 7.03"
               }
             ],
-            "logic": "Tag delta = (factor - 1) x 100, one decimal, sign shown."
+            "logic": "Tag delta = (factor - 1) x 100, one decimal, sign shown.",
+            "at": "Feed -5%"
           }
         ],
         "controls": [],
@@ -536,7 +565,8 @@
                 "when": "Every C1 pig has a fixed daily amount equal to what it received before",
                 "shows": "Pen value unchanged; tag \"Feed held\", the kg only in its tooltip (\"2.6 kg/day · fixed amount\")"
               }
-            ]
+            ],
+            "at": "Feed held"
           }
         ],
         "controls": [],

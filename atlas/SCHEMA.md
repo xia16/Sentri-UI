@@ -71,7 +71,7 @@ An element gets a note only when it has at least one of:
 
 Never annotated: static labels and headings, the app bar and back, the phone's status bar, standard buttons whose only job is to navigate, anything the screenshot already makes obvious. `controls` lists only taps whose result the demo can't show (a block, a save, a hold); ordinary navigation is the flow's arrows and the demo itself.
 
-Element shape: `{ "name", "at"?, "shows", "states"?: [{ "state", "when", "shows" }], "logic"?, "rule"?, "source"? }` — at least one of `states`, `logic`, `rule`. `at` is text visible inside the element on that screen (a string or list); the atlas finds the element by it first (smallest visible element with that text, then its nearest card/row/button) and falls back to `shows` / `name`. Aim for under ~8 elements per screen; a screen that needs more is a sign the screen itself is overloaded (record that in `issues`).
+Element shape: `{ "name", "at"?, "shows", "states"?: [{ "state", "when", "shows" }], "logic"?, "rule"?, "source"? }` — at least one of `states`, `logic`, `rule`. `at` is text visible inside the element on that screen (a string or list); the atlas finds the element by it first (smallest visible element with that text, then its nearest card/row/button) and falls back to `shows` / `name`. An `at` that starts with `[`, `.` or `#` is a CSS selector inside the screen (for icon-only controls, e.g. `[aria-label="Filter"]`); otherwise it is visible text, then an `aria-label` / `title` equal to it. Aim for under ~8 elements per screen; a screen that needs more is a sign the screen itself is overloaded (record that in `issues`).
 
 ## Generated `atlas/atlas.json`
 

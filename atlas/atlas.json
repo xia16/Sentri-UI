@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T10:09:06.795Z",
- "commit": "78b5d12",
+ "generated": "2026-10-09T10:22:51.120Z",
+ "commit": "057a6e0",
  "platforms": [
   {
    "id": "mobile",
@@ -117,7 +117,8 @@
              }
             ],
             "logic": "Sample figures per unit (Unit 7: 22.4 °C, 64 %, 8 ppm). \"Last reading\" is unitContext[N].updated, one fixed sample time for every sensor.",
-            "source": "availableSensors(); unitContext[N].readings, .updated"
+            "source": "availableSensors(); unitContext[N].readings, .updated",
+            "at": "Last reading"
            },
            {
             "name": "Chart, Low / High and history",
@@ -135,7 +136,8 @@
              }
             ],
             "logic": "Not real history: series = current value plus fixed offsets scaled by sensor (temperature ×1, humidity ×6, ammonia ×2); y range = min/max ± padding. Low and High are the min and max of the plotted points; \"Reading history\" lists the same points as Time and value.",
-            "source": "sensorHistory(), sensorChart()"
+            "source": "sensorHistory(), sensorChart()",
+            "at": "Low 21.9 °C"
            },
            {
             "name": "Connection",
@@ -152,7 +154,8 @@
               "shows": "Note reads \"connected\"; tag \"Connected\"; controls enabled; helper \"Preview controls only · no command is sent to equipment.\""
              }
             ],
-            "source": "environment(); sync.connection"
+            "source": "environment(); sync.connection",
+            "at": "Sample readings · offline, showing last available values"
            },
            {
             "name": "Ventilation fan card",
@@ -176,7 +179,8 @@
             ],
             "logic": "Controllable devices are independent of readings: a unit can have devices with no readings (the unit card then says \"N devices\") or readings with no device.",
             "rule": "Apply is disabled offline and whenever the draft mode and speed equal the applied ones. Nothing is sent to equipment; the setting lives in memory only.",
-            "source": "unitDevices(); fan-mode and apply-device handlers"
+            "source": "unitDevices(); fan-mode and apply-device handlers",
+            "at": "Auto · following unit schedule"
            }
           ],
           "controls": [],
@@ -228,7 +232,8 @@
              }
             ],
             "rule": "The draft is not applied until Apply; everything is disabled offline. Preview only: no command is sent to equipment.",
-            "source": "fan-speed input, apply-device handler, d.updated"
+            "source": "fan-speed input, apply-device handler, d.updated",
+            "at": "Fan speed"
            }
           ],
           "controls": [],
@@ -275,14 +280,16 @@
              }
             ],
             "logic": "Location and note are free text typed by the reporter.",
-            "source": "maintenanceCache; fault.pen/.note/.by"
+            "source": "maintenanceCache; fault.pen/.note/.by",
+            "at": "Leaking valve at the east end."
            },
            {
             "name": "Open count",
             "shows": "1 open issue",
             "logic": "Records not resolved, singular or plural. The same count feeds the Maintenance chip on the unit screen. Unit 7 starts with one open issue; the `attention` param hides it (clear, health, feed) or adds a default one in other units (maintenance, busy).",
             "rule": "Only reachable once a unit is chosen: the Toolbox row exists only in a unit scope. Issues are unit-scoped.",
-            "source": "maintenanceRecords()"
+            "source": "maintenanceRecords()",
+            "at": "1 open issue"
            }
           ],
           "controls": [],
@@ -326,7 +333,8 @@
               "shows": "Not this state: the resolved cards stay listed with \"0 open issues\""
              }
             ],
-            "source": "maintenance()"
+            "source": "maintenance()",
+            "at": "No open issues"
            }
           ],
           "controls": [],
@@ -355,7 +363,8 @@
             "shows": "Equipment · Location in Unit 7 · What needs attention? · Save sample issue",
             "logic": "Equipment (max 80) and Location (max 80, label names the unit) are free text; Note is a textarea (max 500). Save adds an open record at the top with reporter \"G. Hansen · just now\", closes the drawer and toasts \"Issue saved in this preview\".",
             "rule": "All three fields are required; whitespace-only values are ignored.",
-            "source": "fault-device, fault-location, fault-note; fault-form submit"
+            "source": "fault-device, fault-location, fault-note; fault-form submit",
+            "at": "Save sample issue"
            }
           ],
           "controls": [],
@@ -386,7 +395,8 @@
             "shows": "Mark resolved",
             "logic": "Sets resolved on the record, closes the drawer and toasts \"Issue resolved in this preview\"; the open count drops.",
             "rule": "No note is asked and no resolver or time is recorded.",
-            "source": "resolve-fault handler"
+            "source": "resolve-fault handler",
+            "at": "Mark resolved"
            }
           ],
           "controls": [],
@@ -423,7 +433,8 @@
              }
             ],
             "rule": "A resolved issue cannot be reopened.",
-            "source": "faultDetail()"
+            "source": "faultDetail()",
+            "at": "Resolved in this preview."
            }
           ],
           "controls": [],
@@ -564,82 +575,102 @@
             "states": [
              {
               "state": "Alert",
-              "when": "A confirmed exception exists for the task (count > 0)",
-              "shows": "Exception count and its label, rank 0. No Home sample reaches it"
+              "when": "f.alert.count > 0 (a confirmed exception). No sample reaches it: Home never supplies alert",
+              "shows": "Exception count and its label, rank 0"
              },
              {
               "state": "Live",
-              "when": "Farrowing only: at least one sow is flagged active in the scope",
-              "shows": "\"N sows farrowing\"; supporting line \"N past expected date\" if any, else \"N due today\""
+              "when": "Farrowing only: at least one sow row in the scope is flagged active",
+              "shows": "\"N sows farrowing\"; supporting line \"N due today\" when due > 0 (the \"N past expected date\" line needs a late count, which no sample supplies)"
              },
              {
               "state": "Past expected",
-              "when": "Farrowing only: nothing live, some sows past their expected date without a final record",
-              "shows": "\"N sows past expected date\" · \"No final record\". Home never supplies a late count, so it is not reached"
+              "when": "Farrowing, no live sow, late > 0. No sample reaches it: Home never supplies late",
+              "shows": "\"N sows past expected date\" · \"No final record\""
              },
              {
               "state": "Due",
-              "when": "Any other task: eligible items in the scope > 0",
-              "shows": "\"N <task label>\" (sows ready to check, litters with care due…) plus one supporting line; \"N past due\" replaces it if anything is overdue, and the card moves up a rank"
+              "when": "Not farrowing and the due count in the scope is > 0",
+              "shows": "\"N <task label>\" (sows ready to check, sows ready for service, litters with care due); one supporting line: pregnancy \"N scheduled later\" (unrecorded minus due), heat and return-heat \"Current round\", else none. Farrowing with no live sow: \"N sows due today\", no supporting line"
+             },
+             {
+              "state": "Overdue",
+              "when": "Due > 0 and f.overdue > 0. No sample reaches it: Home never supplies overdue",
+              "shows": "Supporting line \"N past due\" replaces the other line; rank 1"
+             },
+             {
+              "state": "Pregnancy rechecks / breeding split",
+              "when": "f.rechecks > 0, or f.first and f.repeat supplied. No sample reaches it",
+              "shows": "\"N rechecks due\" (before \"scheduled later\"); breeding \"N first · N repeat\""
              },
              {
               "state": "Ready to complete",
-              "when": "All required work recorded and nothing blocks closure",
-              "shows": "Quiet \"All required work recorded\", full bar, \"Review & complete task\" row; no timing pill, no footer"
+              "when": "?work=ready and the card has a completion bar (heat and return-heat are excluded)",
+              "shows": "Quiet \"All required work recorded\", bar full, \"Review & complete task\" row; timing pill and footer hidden"
              },
              {
               "state": "Waiting for another task",
-              "when": "Ready, but a task it depends on is still open (closureBlockedBy)",
-              "shows": "\"Waiting for <task> to close\" in the quiet style. Coded, no sample reaches it"
+              "when": "Ready and closureBlockedBy is set. No sample reaches it",
+              "shows": "\"Waiting for <task> to close\", quiet style"
              },
              {
               "state": "Unit work complete",
-              "when": "This unit is finished but the task is still open elsewhere (unitComplete)",
-              "shows": "\"Unit work complete · task still open\". Coded, no sample reaches it"
+              "when": "f.unitComplete is set. No sample reaches it",
+              "shows": "\"Unit work complete · task still open\""
              },
              {
               "state": "Waiting",
-              "when": "Nothing due; the next event is known",
-              "shows": "\"<Next label> · <time>\" such as \"Next care · Tomorrow\" or \"Next expected · Tomorrow\"; no count; sorted under \"Next\". With no known next event: \"Waiting for heat confirmations\" / \"Waiting for next scheduled care\" / \"Waiting for farrowing records\" / \"No work due now\""
+              "when": "The card's preview state is waiting (Pregnancy Batch 32, Breeding, Piglet processing), ?work=waiting, or nothing is due or live in the scope (Farrowing in Unit 8)",
+              "shows": "\"<Next> · <time>\": \"Next care\", \"Next checks\", \"Next service\", \"Next expected\", \"Next check\" + \"Tomorrow\" (nextAt of a day or more) or hh:mm; no count, sorted under \"Next\""
+             },
+             {
+              "state": "Waiting, next unknown",
+              "when": "Nothing due and no nextLabel. No sample reaches it: every sample card has a nextAt",
+              "shows": "\"Waiting for heat confirmations\" (breeding), \"Waiting for next scheduled care\" (piglet), \"Waiting for farrowing records\" (postpartum), else \"No work due now\""
              },
              {
               "state": "Round complete",
-              "when": "Heat check or return-heat check only, and the round was explicitly closed",
-              "shows": "\"Round complete · Next check · 14:30\", no progress bar"
+              "when": "Heat or return-heat card whose preview state is round-complete (Return-heat Batch 30, Heat Batch 35) or ?work=round-complete",
+              "shows": "\"Round complete · Next check · 14:30\", no progress bar. Other tasks fall back to Waiting"
              },
              {
               "state": "Closed",
-              "when": "Completed or ended early",
+              "when": "completedAt or terminatedAt is set",
               "shows": "Compact receipt at the bottom (see Closed task card)"
              }
             ],
             "logic": "Evaluated in this order: closed, alert, task-specific work due, ready, unit complete, next scheduled action. A full bar, a finished unit or one full session never proves the whole task is ready. Home's sample data forces Piglet processing to \"Waiting\" (cardFields.piglet27.state) so its due counts of 2 + 2 are ignored unless ?work=active.",
             "rule": "Counts are unique animals or litters in the selected scope, never procedures. The headline is what is actionable now; it is not total minus completed when eligibility depends on time.",
-            "source": "resolveAttention() in astra-home-task-card.js; HOME-TASK-DISPLAY-RULES.md"
+            "source": "resolveAttention() in astra-home-task-card.js; HOME-TASK-DISPLAY-RULES.md",
+            "at": "sows farrowing"
            },
            {
             "name": "Task card · headline and supporting line",
             "shows": "2 sows farrowing · 4 due today",
             "logic": "Value = sum of the sample \"due\" counts over the scope (Farrowing due {6:2, 7:2, 8:0}); \"live\" = the next unrecorded sow in each unit except Unit 8, so Overview 2, Unit 6 1, Unit 7 1, Unit 8 none. Only one supporting line is shown, by task: pregnancy and postpartum \"N rechecks due\" else \"N scheduled later\" (unrecorded minus due); breeding \"N first · N repeat\"; heat and return-heat \"Current round\". Label takes the singular for 1 (\"1 sow farrowing\"). With no live sow, due today becomes the headline with no supporting line; with nothing due the card is Waiting.",
-            "source": "taskModel() facts; cardFields in home-astra-prototype.js"
+            "source": "taskModel() facts; cardFields in home-astra-prototype.js",
+            "at": "4 due today"
            },
            {
             "name": "Task card · progress bar",
             "shows": "Farrowings recorded · 7 / 18 sows",
             "logic": "Named aggregate progress: items with a recorded result over all items in the scope (Farrowing Overview 7/18, Unit 6 4/8, Unit 7 1/6, Unit 8 2/4; Piglet processing counts pens, 1/8). Bar width = value/total. Home forces a plain completion bar even where the task itself shows a distribution. Heat and return-heat have no completion bar, and \"recorded in heat\" is an outcome, not progress. The bar is hidden on upcoming cards.",
-            "source": "metric(t, unit); tasks[].counts and measure"
+            "source": "metric(t, unit); tasks[].counts and measure",
+            "at": "7 / 18 sows"
            },
            {
             "name": "Task card · timing pill and footer",
             "shows": "Day 2 of 7 · Across 3 units · View task",
             "logic": "The pill is the position in the batch window (cardFields day, days), \"Today\" when the window is one day; it is context, not a completion measure, and not the litters' own age. It is hidden on a Ready card. \"Across N units\" = units that carry the task (not units with work due); in a unit scope the footer is replaced by an arrow in the header and the card opens that unit's task.",
-            "source": "cardFields.*.day/days; taskModel().scope"
+            "source": "cardFields.*.day/days; taskModel().scope",
+            "at": "Across 3 units"
            },
            {
             "name": "\"Next\" sub-heading and card order",
             "shows": "Next",
             "logic": "Cards sort by attention rank: live farrowing or alert 0, overdue 1, due 2, ready to complete 2.5, waiting 3 (earliest next event first), closed 4. Equal ranks keep their order so the list does not jump. \"Next\" is printed once above the first quiet card (waiting, round complete or upcoming).",
-            "source": "SentriHomeTaskCard.order()"
+            "source": "SentriHomeTaskCard.order()",
+            "at": "Next"
            },
            {
             "name": "Saved-work card",
@@ -672,13 +703,15 @@
              }
             ],
             "logic": "The queue is fictional (three samples). Nothing the other prototypes record feeds it.",
-            "source": "sync{} and pendingExamples in home-astra-prototype.js"
+            "source": "sync{} and pendingExamples in home-astra-prototype.js",
+            "at": "3 records saved on this device"
            },
            {
             "name": "Section and unit scope",
             "shows": "Farrowing ⌄ · Overview · Choose unit · 3 units",
             "logic": "Section on first load = URL `section` when valid, else the last one picked (localStorage sentri-home-prototype-section; ignored if storage is blocked), else Gestation. The second scope button reads \"Choose unit\" with no unit chosen and \"Unit N\" with one; the small figure is the number of units in the section (Farrowing 6, 7, 8; Gestation 7, 8, 9; Breeding 1-4; Nursery 12, 13). Choosing a unit re-runs every card rule on that unit's figures; whole-task closure stays global.",
-            "source": "sections[], scopeRail(), params.get('section')"
+            "source": "sections[], scopeRail(), params.get('section')",
+            "at": "Choose unit"
            },
            {
             "name": "Closed task card",
@@ -696,7 +729,8 @@
              }
             ],
             "logic": "Closed cards collect at the bottom under \"Closed tasks N\" (N = closed instances in the scope), always sort last, and never show due counts again, even if old records would say otherwise.",
-            "source": "tasks[] completedAt/terminatedAt; SentriHomeTaskCard.render"
+            "source": "tasks[] completedAt/terminatedAt; SentriHomeTaskCard.render",
+            "at": "Completed · Today, 09:10"
            }
           ],
           "controls": [],
@@ -753,7 +787,8 @@
             ],
             "logic": "The count is open tasks in the section with unrecorded rows in this unit, so a waiting task counts and can disagree with the cards the unit screen shows. Pigs and pens come from units{}; in the Farrowing section they are overridden (Unit 6: 8 pigs, 4 pens; Unit 7: 7, 4; Unit 8: 4, 2) to match the Farrowing prototype.",
             "rule": "All units of the section are listed with no search (about 15 at most). Choosing a unit narrows counts, not batch time.",
-            "source": "remaining(unit), unitChoices(), units{}, farrowingUnits{}"
+            "source": "remaining(unit), unitChoices(), units{}, farrowingUnits{}",
+            "at": "2 tasks"
            }
           ],
           "controls": [],
@@ -803,7 +838,8 @@
             ],
             "logic": "Units = units in the section; pigs = a fixed population per section; task types = distinct task types with unrecorded rows (pendingTypes), not work due now.",
             "rule": "Selecting a section clears the unit, remembers the section on the device and opens its Overview.",
-            "source": "sections[].units, sections[].population, pendingTypes()"
+            "source": "sections[].units, sections[].population, pendingTypes()",
+            "at": "2 task types ready"
            }
           ],
           "controls": [],
@@ -848,7 +884,8 @@
              }
             ],
             "logic": "Supporting line priority: overdue checks, then due rechecks, then scheduled later; only the first applies and rechecks are inside the main count. A full first-check bar does not complete later checks.",
-            "source": "attention(\"pregnancy\"); facts.later in taskModel()"
+            "source": "attention(\"pregnancy\"); facts.later in taskModel()",
+            "at": "7 scheduled later"
            },
            {
             "name": "Return-heat card",
@@ -866,19 +903,15 @@
              }
             ],
             "rule": "Only explicit activity marks a round complete. No return and a blank mark are not evidence of a completed or negative observation. No Home progress bar, return rate or elapsed-time bar.",
-            "source": "resolveAttention(); roundComplete"
-           },
-           {
-            "name": "Heat check card",
-            "shows": "20 sows to check · Recorded in heat 0 / 20 sows",
-            "logic": "Recorded in heat is an outcome bar, not completion: reaching the target does not close observation work. No overdue count without explicit observation records and a configured deadline.",
-            "source": "displayRules.heat"
+            "source": "resolveAttention(); roundComplete",
+            "at": "Round complete · Next check · 14:30"
            },
            {
             "name": "\"Next\" sub-heading and card order",
             "shows": "Next",
             "logic": "Cards sort by attention rank: live farrowing or alert 0, overdue 1, due 2, ready to complete 2.5, waiting 3 (earliest next event first), closed 4. Equal ranks keep their order so the list does not jump. \"Next\" is printed once above the first quiet card (waiting, round complete or upcoming).",
-            "source": "SentriHomeTaskCard.order()"
+            "source": "SentriHomeTaskCard.order()",
+            "at": "Next"
            },
            {
             "name": "Closed task card",
@@ -896,7 +929,8 @@
              }
             ],
             "logic": "Closed cards collect at the bottom under \"Closed tasks N\" (N = closed instances in the scope), always sort last, and never show due counts again, even if old records would say otherwise.",
-            "source": "tasks[] completedAt/terminatedAt; SentriHomeTaskCard.render"
+            "source": "tasks[] completedAt/terminatedAt; SentriHomeTaskCard.render",
+            "at": "Completed · Today, 08:45"
            }
           ],
           "controls": [],
@@ -909,7 +943,7 @@
           "rules": [],
           "issues": [
            "Batch 32 shows \"Today\" in the pill and \"Next checks · Tomorrow\" in the body.",
-           "Heat check in Breeding shows \"20 sows to check\" and \"0 / 20 sows\" in heat: the same 20 twice."
+           "Heat check (Breeding section) shows \"20 sows to check\" and \"0 / 20 sows\" in heat: the same 20 twice."
           ]
          }
         },
@@ -941,7 +975,8 @@
              }
             ],
             "rule": "Count unique litters, not procedures. A supporting line would be litters with overdue required care; Home supplies none.",
-            "source": "attention(\"piglet\"); displayRules.piglet"
+            "source": "attention(\"piglet\"); displayRules.piglet",
+            "at": "litters with care due"
            }
           ],
           "controls": [],
@@ -973,7 +1008,7 @@
             "states": [
              {
               "state": "Ready",
-              "when": "?work=ready: a card with a completion bar fills to its total",
+              "when": "?work=ready: the card has a completion bar",
               "shows": "Quiet \"All required work recorded\", full bar, \"Review & complete task\" row; timing pill and footer hidden"
              },
              {
@@ -983,12 +1018,13 @@
              },
              {
               "state": "Blocked",
-              "when": "closureBlockedBy is set",
-              "shows": "\"Waiting for <task> to close\" instead. Coded, no sample reaches it"
+              "when": "closureBlockedBy is set. No sample reaches it: Home never sets it",
+              "shows": "\"Waiting for <task> to close\" instead"
              }
             ],
             "rule": "A full bar never proves readiness by itself; dependencies and future required work must be checked. Closure is whole-task and stays global, not scope-dependent.",
-            "source": "resolveAttention(); facts.readyToComplete, closureBlockedBy"
+            "source": "resolveAttention(); facts.readyToComplete, closureBlockedBy",
+            "at": "Review & complete task"
            }
           ],
           "controls": [],
@@ -1030,7 +1066,8 @@
              }
             ],
             "logic": "The Tomorrow card (Growth check · Batch 26 · Units 12-13) is fixed sample text, not derived from any task.",
-            "source": "home()"
+            "source": "home()",
+            "at": "No scheduled tasks today"
            }
           ],
           "controls": [],
@@ -1079,13 +1116,15 @@
              }
             ],
             "logic": "Health and Feed are fictional snapshot counts chosen by the `attention` preview (current, clear, health, feed, maintenance, busy, unknown) and are the same in every unit. Maintenance = open maintenance records of the unit.",
-            "source": "unitStrip(); maintenanceRecords()"
+            "source": "unitStrip(); maintenanceRecords()",
+            "at": "Health"
            },
            {
             "name": "Unit hub · Checked",
             "shows": "Checked Yesterday",
             "logic": "First segment of units[N].checked (the part before the name). Date and checker are sample data; who checked is dropped.",
-            "source": "units{}"
+            "source": "units{}",
+            "at": "Checked Yesterday"
            },
            {
             "name": "Unit hub · Environment & devices",
@@ -1107,19 +1146,22 @@
               "shows": "The card is not drawn"
              }
             ],
-            "source": "availableSensors(), unitDevices()"
+            "source": "availableSensors(), unitDevices()",
+            "at": "ppm NH₃"
            },
            {
             "name": "Task cards in a unit",
             "shows": "Pregnancy check · 2 sows ready to check · 2 scheduled later · 2 / 6 sows",
             "logic": "The Overview rules re-run on the unit's figures; the footer is replaced by an arrow; tasks without the unit are hidden.",
-            "source": "scopedTasks()"
+            "source": "scopedTasks()",
+            "at": "2 scheduled later"
            },
            {
             "name": "Coming up",
             "shows": "Coming up · 2 batches",
             "logic": "Collapsed list of the unit's next batches or rounds (Batch 31 Pregnancy check · tomorrow; Batch 30 Return-heat · 14:30). Not shown in the Farrowing section, which has no unit context.",
-            "source": "unitContext[7].next; comingUp()"
+            "source": "unitContext[7].next; comingUp()",
+            "at": "Coming up"
            }
           ],
           "controls": [],
@@ -1170,7 +1212,8 @@
              }
             ],
             "logic": "No environment card and no Coming up: currentUnitContext() returns nothing for the Farrowing section.",
-            "source": "taskModel(), unitStrip()"
+            "source": "taskModel(), unitStrip()",
+            "at": "2 due today"
            }
           ],
           "controls": [],
@@ -1228,13 +1271,15 @@
              }
             ],
             "rule": "Only a successful upload clears the queue; a failure keeps every record. The drawer separates records saved on this device from records uploaded for the team.",
-            "source": "showSync(); sync.connection"
+            "source": "showSync(); sync.connection",
+            "at": "Upload 3 records"
            },
            {
             "name": "Record row",
             "shows": "Pregnancy check · 000308 · Gestation · Unit 7 · Batch 31 · 09:32",
             "logic": "Task, animal, place and save time of a queued record. Three fictional samples; nothing the other screens do feeds this queue.",
-            "source": "pendingExamples"
+            "source": "pendingExamples",
+            "at": "Pregnancy check · 000308"
            }
           ],
           "controls": [],
@@ -1277,7 +1322,8 @@
              }
             ],
             "logic": "Only Farrowing and Piglet processing hand off to real prototypes; every other task lands here.",
-            "source": "placeholder()"
+            "source": "placeholder()",
+            "at": "Batch 31 · All units"
            }
           ],
           "controls": [],
@@ -1309,7 +1355,8 @@
             "shows": "Complete task",
             "logic": "Enabled only when the card's model state is ready. Sets completedAt \"Today · just now\" and returns to Home, where the card joins Closed tasks.",
             "rule": "Completion is explicit; nothing closes automatically, and it stays inside the task overview.",
-            "source": "complete-task handler"
+            "source": "complete-task handler",
+            "at": "Complete task"
            }
           ],
           "controls": [],
@@ -1340,7 +1387,8 @@
             "shows": "End task early",
             "logic": "Sets terminatedAt \"Today · just now\". Existing records are kept and unfinished work stays incomplete; the card then shows under Closed tasks as \"Ended early\".",
             "rule": "Consequences must be shown inside each task (batch membership, backfill); this drawer states none.",
-            "source": "confirm-end-task handler"
+            "source": "confirm-end-task handler",
+            "at": "Unfinished work will remain incomplete."
            }
           ],
           "controls": [],
@@ -1382,7 +1430,8 @@
              }
             ],
             "logic": "The stamp is the instance's completedAt or terminatedAt string. \"Results page not designed yet.\" is a stub.",
-            "source": "tasks[]"
+            "source": "tasks[]",
+            "at": "Task complete"
            }
           ],
           "controls": [],
@@ -2141,7 +2190,7 @@
             ],
             "rule": "Apply keeps the filter until Clear; Clear removes both filters at once. The due range matches each sow's stored due text, so it also hides Active and Done sows by a date that no longer matters to them.",
             "source": "farrowing-astra-concept.js roomFilterCount(), roomFilterLabel(), dueMatches()",
-            "at": "All"
+            "at": "[aria-label=\"Filter sows\"]"
            },
            {
             "name": "Pen header",
@@ -4079,7 +4128,8 @@
             ],
             "logic": "Meta = piglets alive now · pen age in days · time (mm/dd if not today) of the pen's newest record · that worker as initial.surname-initial; the count is dropped when it is already the headline; pens with no record show just count and day. Plan order: Iron, Dock tail, Castrate, Coccidiosis, then the ID step.",
             "rule": "One chip at most, one headline, one meta line (looks like farrowing's room list). Identity is owed only where the farm scheme requires it.",
-            "source": "penCard(); sowChip(); state.js status(), todo(), coming()"
+            "source": "penCard(); sowChip(); state.js status(), todo(), coming()",
+            "at": "To do"
            },
            {
             "name": "Summary card · left half",
@@ -4097,18 +4147,25 @@
              },
              {
               "state": "Unaccounted",
-              "when": "Set count lowered some counts",
+              "when": "Set count lowered some counts (task total above 0)",
               "shows": "Support line \"Batch 40 · 3 piglets unaccounted\""
+             },
+             {
+              "state": "Ended",
+              "when": "After End task",
+              "shows": "Heading \"Not done\", the number of not-done pens, \"pens\""
              }
             ],
             "logic": "\"Needs today\" = the step is due, late, or has piglets left from an earlier save. Only the first job is named even when other jobs have more pens.",
-            "source": "listScreen(); needsToday()"
+            "source": "listScreen(); needsToday()",
+            "at": "Iron to do today"
            },
            {
             "name": "Summary card · right half",
             "shows": "Task · 3 / 12 · pens done · Tap to end the task",
             "logic": "Pens done over all pens, with a bar. A pen is done when it has nothing left to do today, which includes pens whose steps are all still ahead (B05, B06), so the figure overstates progress.",
-            "source": "isDone(); sp.sum.*"
+            "source": "isDone(); sp.sum.*",
+            "at": "Tap to end the task"
            },
            {
             "name": "Chips row",
@@ -4128,16 +4185,23 @@
               "state": "ID chip",
               "when": "Farm has an ID step",
               "shows": "Named by the scheme (Tag, Notch, Breeders); absent on a No ID farm"
+             },
+             {
+              "state": "Ended",
+              "when": "After End task",
+              "shows": "Job chips are gone; All and Done remain"
              }
             ],
             "rule": "One radio group that only filters the list; bulk recording is not built.",
-            "source": "chipsRow()"
+            "source": "chipsRow()",
+            "at": "Dock tail"
            },
            {
             "name": "Latest line",
             "shows": "Last record 08:20 · G. Hansen",
             "logic": "The newest record of any kind on any pen (treatment, ID, death, move, count), its clock time and who; \"Nothing recorded yet\" when none. The time only, never the date.",
-            "source": "PPS.last()"
+            "source": "PPS.last()",
+            "at": "Last record"
            }
           ],
           "controls": [],
@@ -4225,7 +4289,8 @@
              }
             ],
             "logic": "Same rule as the chip count. The Tag chip has a tip string (sp.chip.id.tip) that is not shown.",
-            "source": "listScreen(); needsToday(pen, chip)"
+            "source": "listScreen(); needsToday(pen, chip)",
+            "at": "A03"
            }
           ],
           "controls": [],
@@ -4275,7 +4340,8 @@
              }
             ],
             "logic": "A pen is done when its to-do list is empty, so pens that have not started appear here.",
-            "source": "isDone(); penCard()"
+            "source": "isDone(); penCard()",
+            "at": "Iron tomorrow"
            }
           ],
           "controls": [],
@@ -4328,7 +4394,8 @@
              }
             ],
             "rule": "A farm whose scheme is no identity owes no tagging and shows none. Switching the setting in the Demo panel restarts the demo.",
-            "source": "PPS.hasId(); SCHEMES in state.js"
+            "source": "PPS.hasId(); SCHEMES in state.js",
+            "at": "Coccidiosis"
            }
           ],
           "controls": [],
@@ -4375,7 +4442,8 @@
              }
             ],
             "rule": "First record in wins; the second is kept as a note, both stamped, never merged. Offline collisions are kept (Round 1 Q8), simplified here to first-in-wins. After End the demo says the task has ended.",
-            "source": "state.js otherPhone(); sp.note.clash"
+            "source": "state.js otherPhone(); sp.note.clash",
+            "at": "Iron for A05 was already recorded by L. Madsen at 08:40."
            }
           ],
           "controls": [],
@@ -4426,7 +4494,8 @@
             ],
             "logic": "One card per plan day: Iron and Dock tail day 2; Castrate, Coccidiosis and the ID step day 3.",
             "rule": "Early is allowed for any scheduled item actually done and counts on time; the record is marked early.",
-            "source": "processing(); sp.day.*"
+            "source": "processing(); sp.day.*",
+            "at": "Not due yet · can be done early"
            }
           ],
           "controls": [],
@@ -4480,7 +4549,7 @@
              {
               "state": "Ticked",
               "when": "Tapped, not yet submitted",
-              "shows": "Check disc and the piglet count (\"12 piglets\" = alive minus already given) as a button into the count sheet; nothing is saved until Submit"
+              "shows": "Check disc and the piglet count (\"12 piglets\" = alive minus already given) as a button into the count sheet; amber \"early\" if the day is later than pen age; amber \"N left · reason\" if the count was lowered; nothing is saved until Submit"
              },
              {
               "state": "Some left",
@@ -4494,13 +4563,14 @@
              },
              {
               "state": "Done",
-              "when": "Nothing left for the step",
+              "when": "Nothing owed for the step",
               "shows": "Stays in its day card about four seconds after Submit, then folds into the Done card"
              }
             ],
-            "logic": "Windows are in pen-age days (day 1 = born). A death or Set count lowers alive; treatments given are capped at alive.",
+            "logic": "Windows are in pen-age days (day 1 = born). Status per step: done when nothing is owed and it was given; left when some were given and some are owed; otherwise coming, due or late by pen age against the window. A death or Set count lowers alive; treatments given are capped at alive.",
             "rule": "Late stays due, carries its real date and counts late. After End the ticks and Submit are gone and the sheet warns \"Task ended. Nothing more can be recorded.\"",
-            "source": "dayItem(); state.js PLAN, status(), need(); sp.given.days, sp.late, sp.item.*"
+            "source": "dayItem(); state.js PLAN, status(), need(); sp.given.days, sp.late, sp.item.*",
+            "at": "day 3–7"
            },
            {
             "name": "Age-day card",
@@ -4522,16 +4592,22 @@
               "shows": "The card disappears"
              }
             ],
-            "source": "processing(); sp.day.*"
+            "source": "processing(); sp.day.*",
+            "at": "Planned 10/07"
            },
            {
             "name": "Piglets card",
             "shows": "Boars · gilts 6 · 6 · Litter weight 24.6 kg · Tagged 4 of 12 · Breeders kept 1",
             "states": [
              {
-              "state": "Boars · gilts known",
-              "when": "A split was saved, or every alive piglet has an ID",
-              "shows": "The two numbers (counted from the IDs when all alive piglets have one)"
+              "state": "Boars · gilts from IDs",
+              "when": "Tag or notch farm and every alive piglet has an ID",
+              "shows": "Counted from the IDs"
+             },
+             {
+              "state": "Boars · gilts saved",
+              "when": "Otherwise, a split was saved on the pen (Boars · gilts sheet)",
+              "shows": "The saved split"
              },
              {
               "state": "Boars · gilts unknown",
@@ -4549,19 +4625,26 @@
               "shows": "\"—\" and the hint \"Weigh the litter: growth figures need it.\""
              },
              {
+              "state": "Notch farm",
+              "when": "Scheme notch",
+              "shows": "The fact is labelled \"Notched n of m\""
+             },
+             {
               "state": "No ID step",
               "when": "Farm scheme is No ID",
-              "shows": "Tagged and Breeders kept are not drawn"
+              "shows": "Tagged and Breeders kept are not drawn; two facts remain"
              }
             ],
             "logic": "Each fact is a button into its own sheet. \"n of m\" = piglets with an ID over piglets alive; Breeders kept = IDs flagged as breeders. There is no separate piglets-alive figure: it is in the subtitle (born − dead, adjusted by deaths, moves and Set count).",
-            "source": "pigletsCard(); sp.pg.*, sp.pc.*"
+            "source": "pigletsCard(); sp.pg.*, sp.pc.*",
+            "at": "Litter weight"
            },
            {
             "name": "Tool row",
             "shows": "Tag piglets · Record death · More",
             "logic": "Three tools as farrowing's row. The first is named by the farm scheme (Tag piglets, Notch piglets, Pick breeders) and is absent on a No ID farm; the whole row is hidden after End task.",
-            "source": "toolRow(); sp.tr.id.*"
+            "source": "toolRow(); sp.tr.id.*",
+            "at": "Record death"
            },
            {
             "name": "Done card",
@@ -4583,14 +4666,16 @@
               "shows": "Stays in its day card about four seconds before moving here"
              }
             ],
-            "source": "processing(); sp.proc.done, sp.tl.*, sp.kept.note"
+            "source": "processing(); sp.proc.done, sp.tl.*, sp.kept.note",
+            "at": "1 item"
            },
            {
             "name": "Submit and Back",
             "shows": "Back · Submit · 2 items",
             "logic": "Submit saves every ticked item as one stamped record (who, when, count; marked early or late if outside its window), stays on the sheet, and shows \"2 items saved · Undo\" which takes those records back. Back drops unsaved ticks.",
             "rule": "Submit is disabled at 0 ticks and absent after End task. Every treatment is one tap for all live piglets; lowering the number asks a reason for the rest.",
-            "source": "penSheet(); sp.submit.n, sp.flash.items, sp.undo"
+            "source": "penSheet(); sp.submit.n, sp.flash.items, sp.undo",
+            "at": "Submit"
            }
           ],
           "controls": [],
@@ -4668,9 +4753,10 @@
               "shows": "Done; progress words \"1 breeder picked\""
              }
             ],
-            "logic": "Replaces the Tag piglets step and tool. \"n of m\" is not counted on this scheme; the Piglets card shows breeders instead.",
+            "logic": "Replaces the Tag piglets step and tool. The step's progress words are \"N breeder(s) picked\" instead of \"n of m tagged\"; the Piglets card is unchanged.",
             "rule": "Identity follows each farm's standard.",
-            "source": "dayItem(); pigletsCard(); sp.id.picked"
+            "source": "dayItem(); pigletsCard(); sp.id.picked",
+            "at": "Pick breeders"
            }
           ],
           "controls": [],
@@ -4720,7 +4806,8 @@
              }
             ],
             "rule": "Late stays due until done or task end and counts late; no clinical cut-off in v1.",
-            "source": "state.js status(), record()"
+            "source": "state.js status(), record()",
+            "at": "late"
            }
           ],
           "controls": [],
@@ -4768,24 +4855,26 @@
               "shows": "Stays in its day card about four seconds before moving here"
              }
             ],
-            "source": "processing(); sp.proc.done, sp.tl.*, sp.kept.note"
+            "source": "processing(); sp.proc.done, sp.tl.*, sp.kept.note",
+            "at": "5 items"
            },
            {
             "name": "Empty line",
             "shows": "Nothing left to do in this pen.",
             "states": [
              {
-              "state": "Empty",
-              "when": "There are no day cards and no done items",
-              "shows": "The line is shown"
+              "state": "Shown",
+              "when": "The pen has no day card left, whether or not it has done items (A01)",
+              "shows": "The line, then the folded Done card"
              },
              {
-              "state": "Complete",
-              "when": "Done items exist (A01)",
-              "shows": "Only the folded Done card and the Piglets card"
+              "state": "Hidden",
+              "when": "At least one step is still open or saved this visit",
+              "shows": "Not drawn"
              }
             ],
-            "source": "sp.proc.nothing"
+            "source": "sp.proc.nothing",
+            "at": "Nothing left to do in this pen."
            }
           ],
           "controls": [],
@@ -4837,7 +4926,8 @@
             ],
             "logic": "The stepper starts at the number still owed (alive minus given), minimum 1. The reason becomes the one shown on the item (\"2 left · weak\").",
             "rule": "A skip carries a reason; deferred piglets stay due.",
-            "source": "adjustSheet(); sp.treat.*"
+            "source": "adjustSheet(); sp.treat.*",
+            "at": "Piglets given"
            }
           ],
           "controls": [],
@@ -4887,13 +4977,15 @@
              }
             ],
             "logic": "Headline is sex and optional weight; meta is time (only for today) and who tagged it. The group header reads \"Tagged · 4 of 12 tagged · 1 breeder\" (\"Notched\" on a notch farm).",
-            "source": "taggedPage(); p.ids[]"
+            "source": "taggedPage(); p.ids[]",
+            "at": "001214"
            },
            {
             "name": "Flag button",
             "shows": "bookmark",
             "rule": "Toggles breeder and stamps a record. Breeder selection may become a universal per-pig feature (Round 10); ranking is a placeholder.",
-            "source": "sp.mark.on, sp.mark.off"
+            "source": "sp.mark.on, sp.mark.off",
+            "at": "Tap the flag to keep it for breeding."
            },
            {
             "name": "Empty and primary",
@@ -4916,7 +5008,8 @@
              }
             ],
             "logic": "Primary is named by scheme: Tag a piglet, Notch a piglet, Tag a breeder. The hint \"Tap a piglet to fix it. Tap the flag to keep it for breeding.\" appears when at least one piglet has an ID and the task is open.",
-            "source": "sp.add.*, sp.id.none.yet, sp.id.done.pick"
+            "source": "sp.add.*, sp.id.none.yet, sp.id.done.pick",
+            "at": "Tag a piglet"
            }
           ],
           "controls": [],
@@ -4963,19 +5056,16 @@
             "name": "Tag readout",
             "shows": "Tag · 001205 · Use 001205 · or scan",
             "logic": "Prefilled with the next number on the strip (farm-wide highest tag + 1; strip starts at 001201). Typing replaces it, up to 6 digits. On a notch farm it is the pen's next piglet number (max 2 digits) and the saved ID is litter-number-piglet. Scan reads the next tag (demo). A cleared readout shows \"—\".",
-            "source": "givePage(); state.js nextNo()"
-           },
-           {
-            "name": "Duplicate guard",
-            "shows": "001204 is already used.",
-            "rule": "Blocks Record while the number is on any pen of the farm.",
-            "source": "state.js taken(); sp.id.taken"
+            "rule": "Record is blocked while the number is already on any pen of the farm (\"001204 is already used.\", refused tone).",
+            "source": "givePage(); state.js nextNo(), taken()",
+            "at": "Use 001217 · or scan"
            },
            {
             "name": "Sex and weight",
             "shows": "Boar · Gilt · Weight (optional)",
             "rule": "Sex is required: Record stays disabled until one is chosen. Weight is optional, kg with one decimal, up to two integer digits.",
-            "source": "sp.id.sex, sp.give.kg"
+            "source": "sp.id.sex, sp.give.kg",
+            "at": "Optional"
            },
            {
             "name": "Record · next piglet",
@@ -5002,7 +5092,8 @@
               "shows": "No primary"
              }
             ],
-            "source": "sp.give.save, sp.give.fix, sp.undo"
+            "source": "sp.give.save, sp.give.fix, sp.undo",
+            "at": "Record · next piglet"
            }
           ],
           "controls": [],
@@ -5052,7 +5143,8 @@
             "shows": "Boars · Gilts",
             "logic": "Starting values are the saved split, or counted from IDs when every piglet has one. Whole numbers from 0.",
             "rule": "The sum is not checked against piglets alive.",
-            "source": "countsSheet()"
+            "source": "countsSheet()",
+            "at": "Boars and gilts"
            }
           ],
           "controls": [],
@@ -5088,7 +5180,8 @@
             "shows": "Weight (kg)",
             "logic": "Numpad, one decimal, up to 3 integer digits. Each save is appended as a new weigh kept with its pen age; the Piglets card shows the latest.",
             "rule": "Save is disabled until the value is above zero.",
-            "source": "weightSheet(); state.js setWeight()"
+            "source": "weightSheet(); state.js setWeight()",
+            "at": "Weight (kg)"
            }
           ],
           "controls": [],
@@ -5148,7 +5241,8 @@
             "shows": "Crushed · Scours · Starve-out · Other · 3 piglets died",
             "logic": "Each stepper is capped at the piglets alive; Save is disabled at a total of 0. Saving drops Alive by the total, raises Dead, caps treatments given at alive, and writes the log line \"Died · 3\".",
             "rule": "Processing marks deaths through one shared dead picker that also lists tagged piglets (Round 1 Q9); this sheet is a count by cause and does not, so tagged piglets stay on the Piglets list.",
-            "source": "state.js death(); sp.flash.death, sp.log.death"
+            "source": "state.js death(); sp.flash.death, sp.log.death",
+            "at": "Starve-out"
            }
           ],
           "controls": [],
@@ -5188,7 +5282,8 @@
             "shows": "A01 · day 6",
             "logic": "One tile per other pen of the batch (pen age 1-6; here every other pen) with its day.",
             "rule": "Move only offers pens in the task (and batch); no other room.",
-            "source": "movePage(); state.js sameBatch()"
+            "source": "movePage(); state.js sameBatch()",
+            "at": "Pens in batch 40"
            },
            {
             "name": "Had treatment?",
@@ -5206,13 +5301,15 @@
              }
             ],
             "logic": "\"Don't know\" of Round 2 Q14 is cut.",
-            "source": "moveAsks(); sp.move.had, sp.move.hadid.*"
+            "source": "moveAsks(); sp.move.had, sp.move.hadid.*",
+            "at": "Had iron?"
            },
            {
             "name": "Move N piglets",
             "shows": "How many · Move 3 piglets",
-            "logic": "How many is a stepper from 1 to alive. A \"had\" answer shifts the given count to the receiving pen; otherwise the receiving pen marks the owed piglets \"moved in\". Tags are not carried: only the count moves.",
-            "source": "state.js move(); sp.move.save"
+            "logic": "How many is a stepper from 1 to alive. A \"had\" answer shifts the given count to the receiving pen; otherwise the receiving pen marks the owed piglets \"moved in\".",
+            "source": "state.js move(); sp.move.save",
+            "at": "Move 1 piglet"
            }
           ],
           "controls": [],
@@ -5255,7 +5352,8 @@
             "shows": "Piglets alive · was 12 · Batch 40 · 3 piglets unaccounted",
             "logic": "The drop (old minus new) is added to a task-level total shown as \"N piglets unaccounted\" on the list summary and in End task; a higher count lowers it. It is a batch checker, not a pen status. A treatment fully given stays fully given at the new count.",
             "rule": "Set count just adjusts the pen's record to what is there now. No reason is asked and Save is disabled while unchanged.",
-            "source": "state.js setCount(); sp.batch.unacc, sp.end.unacc"
+            "source": "state.js setCount(); sp.batch.unacc, sp.end.unacc",
+            "at": "Piglets alive"
            }
           ],
           "controls": [],
@@ -5293,7 +5391,8 @@
             "shows": "Iron · 12 piglets · G.H 10/05 08:05",
             "logic": "Treatments, deaths, moves, counts, IDs, breeder picks and weights grouped by pen day (day 0 holds \"Born 13\" and \"1 dead at birth\"), with who and when (time if today, else mm/dd + time). Weight lines show no actor.",
             "rule": "Stamped history; no deletion.",
-            "source": "logPage(); sp.log.*"
+            "source": "logPage(); sp.log.*",
+            "at": "Litter weighed · 24.6 kg"
            }
           ],
           "controls": [],
@@ -5337,32 +5436,33 @@
             "states": [
              {
               "state": "Due today",
-              "when": "Something is due and nothing is late",
-              "shows": "Second line: the largest piglet count among the due treatments, \"due today\""
+              "when": "The pen has steps to do and none is late",
+              "shows": "Headline the steps; meta \"due today\" and the largest owed piglet count among the treatments (the ID progress words if only the ID step is left)"
              },
              {
               "state": "Late",
-              "when": "A step is past its window",
-              "shows": "Amber \"Late\" chip; \"late · day 6\""
+              "when": "Any step in the pen is late",
+              "shows": "Meta amber \"late · day 6\" with the same count"
              },
              {
               "state": "Some left",
-              "when": "Only partial treatments remain",
-              "shows": "\"2 left · weak\""
+              "when": "Every step left is a partial treatment (status left) and no ID step",
+              "shows": "Meta \"2 left · weak\" (or the reason given)"
              },
              {
-              "state": "Sow died",
-              "when": "The sow died",
-              "shows": "Red \"Sow died\" chip"
+              "state": "Not given (after End)",
+              "when": "Task ended",
+              "shows": "Group titled \"Not given\"; rows show the steps only, no meta"
              },
              {
               "state": "All done",
               "when": "No pen has anything to do",
-              "shows": "\"All pens done\" instead of the list"
+              "shows": "Progress meta \"All pens done\" and no list"
              }
             ],
-            "logic": "\"3 of 12 pens done · 9 pens not done\" uses the same done rule as the list, so pens not yet started count as done.",
-            "source": "endPage(); todoMeta(), penChip(); sp.end.*"
+            "logic": "No chips here (Late and Sow died appear on the pen list only). \"3 of 12 pens done · 9 pens not done\" uses the same done rule as the list, so pens not yet started count as done.",
+            "source": "endPage(); todoMeta(), penChip(); sp.end.*",
+            "at": "Not done"
            },
            {
             "name": "Not due yet and Unaccounted",
@@ -5370,8 +5470,8 @@
             "states": [
              {
               "state": "Not due yet",
-              "when": "Some pens have steps still ahead",
-              "shows": "Count of pens and the step names"
+              "when": "Some pens have steps still ahead and the task is open",
+              "shows": "Count of pens and the step names; hidden after End"
              },
              {
               "state": "Unaccounted",
@@ -5379,14 +5479,16 @@
               "shows": "\"N piglets unaccounted in this batch: counts came in lower than the records.\""
              }
             ],
-            "source": "sp.end.coming, sp.end.unacc"
+            "source": "sp.end.coming, sp.end.unacc",
+            "at": "Ending the task stops these too."
            },
            {
             "name": "Hold to end",
             "shows": "End task · HOLD TO END",
-            "logic": "Danger hold that commits after about 0.85 s (design-system token --hold-commit); releasing early cancels. On commit the task is ended and the list becomes read-only.",
+            "logic": "Danger hold: the commit fires when the hold timer elapses, about 0.85 s (token --hold-commit, default 850 ms). Releasing, leaving the button, blur or Escape before that returns to idle without committing (holdStep in the design-system bundle). On commit the task is ended and the list becomes read-only.",
             "rule": "Manual only, review in numbers, hold-to-commit (Round 1 Q5). End is allowed with review items open (Round 4). Ending should be blocked while the batch's farrowing task is open; that is not built.",
-            "source": "sp.end.hold; K.holdBind"
+            "source": "sp.end.hold; K.holdBind",
+            "at": "HOLD TO END"
            }
           ],
           "controls": [],
@@ -5456,7 +5558,8 @@
              }
             ],
             "rule": "After End no new treatment marks (Round 3). Round 1 Q7 allowed corrections and ID rows to stay writable; the prototype blocks all writes. The other-phone demo says the task has ended.",
-            "source": "sp.ended.*; sp.end.done.*"
+            "source": "sp.ended.*; sp.end.done.*",
+            "at": "Task ended"
            }
           ],
           "controls": [],
@@ -5892,15 +5995,22 @@
               "state": "Pig without one",
               "when": "Factor is 100%",
               "shows": "\"Follow curve\""
+             },
+             {
+              "state": "Unknown mode",
+              "when": "Pen mode unknown",
+              "shows": "No formula label; pigs read \"No feeding plan recorded\" on their own page"
              }
             ],
             "logic": "Pen total = sum of every pig's allowance today: base x factor, the held amount, or 0 if stopped. Pig amount e.g. base 2.4 x 1.1 = 2.64, shown rounded to one decimal. Pig count in the title is all pigs of the pen.",
-            "source": "allocation(pe) · pigFeedTags(p)"
+            "source": "allocation(pe) · pigFeedTags(p)",
+            "at": "Daily feed"
            },
            {
             "name": "Card · formula and delivery",
             "shows": "Gestation 1 · Shared trough / Station-fed / Ad-lib",
-            "logic": "Formula name and a label from the pen's feeding mode. Feed is guidance, not a completion checklist: no Record as done, no refill or delivery log."
+            "logic": "Formula name and a label from the pen's feeding mode. Feed is guidance, not a completion checklist: no Record as done, no refill or delivery log.",
+            "at": "Gestation 1"
            }
           ],
           "controls": [],
@@ -5941,7 +6051,8 @@
               "shows": "\"Ad-lib\" replaces the kg total, no pig rows; Adjust feed opens the editor, which answers \"Feed adjustment unavailable · Ad-lib feeding has no fixed daily allowance.\""
              }
             ],
-            "rule": "Ad-lib formula and timing are read-only; no feeding-completion event is created."
+            "rule": "Ad-lib formula and timing are read-only; no feeding-completion event is created.",
+            "at": "Ad-lib"
            }
           ],
           "controls": [],
@@ -5984,7 +6095,8 @@
              }
             ],
             "logic": "Pen note writes the same note to every selected pen. Feed opens the editor over the pigs of the ticked pens; ad-lib pigs appear as blocked rows. Pigs not ticked inside a ticked pen still count: opening from pens captures the pens' current pigs.",
-            "rule": "A fault needs one pen, so equipment fault reporting asks for a single pen."
+            "rule": "A fault needs one pen, so equipment fault reporting asks for a single pen.",
+            "at": "3 pens · 7 pigs"
            }
           ],
           "controls": [],
@@ -6017,24 +6129,34 @@
             "shows": "Follow curve | Hold amount | Stop feed",
             "states": [
              {
-              "state": "Follow curve (default)",
-              "when": "Mode selected",
+              "state": "Follow curve",
+              "when": "Default; no hold or stop on the pigs",
               "shows": "Percentage from -50 to +50 of the base curve"
              },
              {
               "state": "Hold amount",
-              "when": "Mode selected",
+              "when": "Chosen, or every pig already has a held amount",
               "shows": "Every pig keeps today's kg as a fixed amount; % box disabled (\"Daily amounts stay fixed\")"
              },
              {
               "state": "Stop feed",
-              "when": "Mode selected",
+              "when": "Chosen, or every pig already stopped",
               "shows": "0.0 kg/day; box disabled (\"No feed · 0.0 kg/day\")"
              },
              {
               "state": "Mixed",
-              "when": "Pigs have different factors",
-              "shows": "Box shows placeholder \"Mixed\" and \"Choose one % for all pigs\""
+              "when": "Opened over pigs with different factors",
+              "shows": "Box shows placeholder \"Mixed\", hint \"Choose one % for all pigs\""
+             },
+             {
+              "state": "Unchanged plan",
+              "when": "Opened and only an end date or note edited",
+              "shows": "Plan left as is; Save logs \"Plan unchanged\""
+             },
+             {
+              "state": "Reset",
+              "when": "Reset pressed",
+              "shows": "Back to the curve at 0%; Save logs \"Reset to curve\""
              },
              {
               "state": "Nothing adjustable",
@@ -6043,13 +6165,15 @@
              }
             ],
             "logic": "Changing mode resets the percentage to 0 when mixed or out of range. The percentage REPLACES each pig's existing adjustment. Hold amount fixes today's kg; later curve growth no longer applies until reset. Reset = follow curve, 0%, no end date.",
-            "source": "feed editor state"
+            "source": "feed editor state",
+            "at": "Feeding mode"
            },
            {
             "name": "Percentage input",
             "shows": "Number box and slider, -50 to +50",
             "logic": "Slider moves in 5% steps, the box accepts any decimal; they stay in step. Starts at the current factor of the target (only if all pigs share it).",
-            "rule": "Blank or outside -50 to +50 disables Save."
+            "rule": "Blank or outside -50 to +50 disables Save.",
+            "at": "Adjustment · %"
            },
            {
             "name": "Pig row",
@@ -6071,18 +6195,21 @@
               "shows": "\"Ad-lib feeding has no fixed daily allowance\" / \"Pig has died\" / \"No feeding plan recorded\"; never changed"
              }
             ],
-            "logic": "Scope in the title is the pig count; a pen entry shows its pig count, not the pen name."
+            "logic": "Scope in the title is the pig count; a pen entry shows its pig count, not the pen name.",
+            "at": "000267"
            },
            {
             "name": "Optional chips",
             "shows": "End date · Add note",
             "logic": "Chip shows \"Until 15 Sep\" or the note text; an x clears it. With one pig targeted, the existing end date and reason are prefilled.",
-            "rule": "End date must be today or later. When it passes, the prototype does nothing."
+            "rule": "End date must be today or later. When it passes, the prototype does nothing.",
+            "at": "End date"
            },
            {
             "name": "Save",
             "shows": "Primary button",
-            "rule": "Enabled when at least one pig can be adjusted AND (a mode other than keep, or a changed end date / note) AND percent within -50 to +50 AND any end date is today or later. Writes to each eligible pig, logs one \"Feed plan changed\" per pig (\"old → new kg/day · +10% of curve · Until date · reason\"), returns to the walk. Ad-lib pigs in a selection stay unchanged."
+            "rule": "Enabled when at least one pig can be adjusted AND (a mode other than keep, or a changed end date / note) AND percent within -50 to +50 AND any end date is today or later. Writes to each eligible pig, logs one \"Feed plan changed\" per pig (\"old → new kg/day · +10% of curve · Until date · reason\"), returns to the walk. Ad-lib pigs in a selection stay unchanged.",
+            "at": "Save"
            }
           ],
           "controls": [],
@@ -6120,7 +6247,8 @@
            {
             "name": "End date and note forms",
             "shows": "Date field with Remove date; text area with Remove note",
-            "rule": "Date accepts today (12 Sep 2026) or later; earlier is refused. Save stays disabled until the value differs from the saved one. Saving only a note or date turns on Save in the editor even when mode and percent are unchanged."
+            "rule": "Date accepts today (12 Sep 2026) or later; earlier is refused. Save stays disabled until the value differs from the saved one. Saving only a note or date turns on Save in the editor even when mode and percent are unchanged.",
+            "at": "Until"
            }
           ],
           "controls": [],
@@ -6164,12 +6292,14 @@
              }
             ],
             "logic": "Context: \"Station-fed\" for station pens, \"Included in pen allocation\" for trough pens. The tag carries its reason: the saved reason or the body-condition band (\"Thin · mild\"); Feed held and No feed carry their own kg line.",
-            "source": "pigFeedTags(p)"
+            "source": "pigFeedTags(p)",
+            "at": "Included in pen allocation"
            },
            {
             "name": "Base curve",
             "shows": "Line chart, days 35/42/49/56, Today marked",
-            "logic": "Points are made-up base kg per day around the pig's base amount; vertical range = min/max rounded outward by 0.2. Caption \"kg/day · before individual adjustments\". The curve source (\"Sample farm curve\") is in the data but not drawn."
+            "logic": "Points are made-up base kg per day around the pig's base amount; vertical range = min/max rounded outward by 0.2. Caption \"kg/day · before individual adjustments\". The curve source (\"Sample farm curve\") is in the data but not drawn.",
+            "at": "Base curve"
            }
           ],
           "controls": [],
@@ -6208,7 +6338,8 @@
               "shows": "Pen value (7.6 x 1.1 = 8.14) shown to one decimal; Feed lens count rises to 5"
              }
             ],
-            "logic": "Tag delta = (factor - 1) x 100, one decimal, sign shown."
+            "logic": "Tag delta = (factor - 1) x 100, one decimal, sign shown.",
+            "at": "Feed +10%"
            }
           ],
           "controls": [],
@@ -6238,7 +6369,8 @@
               "shows": "Pen value (2.6 + 2.4 + 2.4) x 0.95 = 7.03"
              }
             ],
-            "logic": "Tag delta = (factor - 1) x 100, one decimal, sign shown."
+            "logic": "Tag delta = (factor - 1) x 100, one decimal, sign shown.",
+            "at": "Feed -5%"
            }
           ],
           "controls": [],
@@ -6267,7 +6399,8 @@
               "when": "Every C1 pig has a fixed daily amount equal to what it received before",
               "shows": "Pen value unchanged; tag \"Feed held\", the kg only in its tooltip (\"2.6 kg/day · fixed amount\")"
              }
-            ]
+            ],
+            "at": "Feed held"
            }
           ],
           "controls": [],
@@ -6468,28 +6601,28 @@
             "states": [
              {
               "state": "Sow in a stage",
-              "when": "Stage start known (stageStartedAt, else service date for gestating, else farrowing date for lactating)",
-              "shows": "Gestation · 42 days"
+              "when": "Stage set; days = walk date minus start (stageStartedAt, else service date for Gestating, farrowing date for Lactating, offProductionSince for Off production)",
+              "shows": "Gestation · 42 days (Gestating reads Gestation, Lactating reads Lactation, other stages by name)"
              },
              {
-              "state": "Sow, no start date",
-              "when": "No date can be found",
+              "state": "Sow, start unusable",
+              "when": "Start missing or after the walk date",
               "shows": "Gestation · —"
              },
              {
               "state": "Sow off production, open",
-              "when": "breedingStatus is Open",
+              "when": "Stage Off production and breedingStatus Open",
               "shows": "Open · 8 days"
              },
              {
               "state": "Boar, piglet, grower",
               "when": "Not a sow",
-              "shows": "Type + age: Grower · 63 days old"
+              "shows": "Type + \"N days old\" from age, else birth date; \"Age —\" when neither"
              },
              {
               "state": "Condition needs attention",
-              "when": "Care is Monitor / Treat in place / Move to hospital pen",
-              "shows": "Tag with \"Day N\", care icon and colour; listed first"
+              "when": "Care is Monitor, Treat in place or Move to hospital pen",
+              "shows": "Tag with \"Day N\" (only when day is a number), care icon and colour; sorted first"
              },
              {
               "state": "Condition ongoing",
@@ -6498,8 +6631,8 @@
              },
              {
               "state": "Feed changed",
-              "when": "Factor other than 100%, a held amount, or stopped",
-              "shows": "Feed +10% / Feed −10% / Feed held / No feed, after the health tags"
+              "when": "One tag only, first match: stopped, then held amount, then factor not 100%",
+              "shows": "No feed / Feed held / Feed +10% (one decimal), after the health tags"
              },
              {
               "state": "Tags overflow",
@@ -6508,7 +6641,8 @@
              }
             ],
             "logic": "Duration never falls back to the animal's lifetime age. The checkbox selects the pig only, never its pen.",
-            "source": "stageSummary(p) · cases(p) · careAppearance(k) · pigFeedTags(p) · fitRecordedTags()"
+            "source": "stageSummary(p) · cases(p) · careAppearance(k) · pigFeedTags(p) · fitRecordedTags()",
+            "at": "Gestation · 42 days"
            },
            {
             "name": "Pen header",
@@ -6538,22 +6672,28 @@
               "state": "Pen has no matching pig",
               "when": "Filters exclude all its pigs",
               "shows": "Pen is hidden, with its feed button"
+             },
+             {
+              "state": "Ad-lib pen with formula due",
+              "when": "Pen mode ad-lib and switchDue (D4)",
+              "shows": "\"Ad-lib\" with \"Formula due\" under it"
+             },
+             {
+              "state": "Pen issue strip",
+              "when": "pen.issue set by the old report path (not seeded)",
+              "shows": "Strip \"Feeder low · 06:40\" under the header"
              }
             ],
             "logic": "Pig count is ALL pigs in the pen, not only those the filter shows. Ticking the pen selects it AND every pig it shows under the current filters; the checkbox is indeterminate when only some are ticked.",
-            "source": "penFeedEntry() · allocation(pe) · pe.switchDue · c.selectedPens"
+            "source": "penFeedEntry() · allocation(pe) · pe.switchDue · c.selectedPens",
+            "at": "7.6 kg"
            },
            {
-            "name": "Lens tabs",
+            "name": "Lens tabs and filter",
             "shows": "All 7 · Health 4 · Feed 3",
-            "logic": "Count = pigs that pass the active filters and the lens. Health counts a pig with any recorded condition, ongoing ones included (000281 Arthritis). Feed counts a pig with a feed change (held, stopped, or a factor other than 100%) and every pig in a pen whose formula change is due.",
-            "source": "matchesLens() · cases(p) · feedNews(p, pen)"
-           },
-           {
-            "name": "Filter button and strip",
-            "shows": "Funnel with number badge; strip \"Batch 20 · Gestating · Fever\" with Clear",
-            "logic": "Badge = active filters among batch, stage, condition, care, manual-feed, health-status. The strip appears only when a filter is on; Care shows its label, not its value. Clear resets every filter and the lens.",
-            "source": "filterN · c.batchFilter, c.stage, c.healthFilter, c.triageFilter"
+            "logic": "Count = pigs that pass the active filters and the lens. Health counts a pig with any recorded condition, ongoing included (000281 Arthritis). Feed counts a pig with a feed change (held, stopped, factor not 100%) and every pig in a pen whose formula change is due. The funnel badge counts active filters (batch, stage, condition, care, manual feed, health status); the strip names them with Clear — health status reads \"Needs attention\" / \"No action needed\", manual feed \"Manual feed\", care shows its label.",
+            "source": "matchesLens() · cases(p) · feedNews(p, pen)",
+            "at": "Health"
            },
            {
             "name": "Dock",
@@ -6570,7 +6710,8 @@
               "shows": "Clear, \"Selected · 2 pens · 3 pigs\", View selected, Actions"
              }
             ],
-            "logic": "Scan has no camera in the prototype; Search finds by ear tag or pen."
+            "logic": "Scan has no camera in the prototype; Search finds by ear tag or pen.",
+            "at": "Scan ear tag"
            },
            {
             "name": "Finish walk and last check-in",
@@ -6588,7 +6729,8 @@
              }
             ],
             "logic": "The name G. Hansen is fixed text, not the signed-in worker.",
-            "source": "c.checkedIn"
+            "source": "c.checkedIn",
+            "at": "Finish walk"
            }
           ],
           "controls": [
@@ -6620,7 +6762,8 @@
            "The author \"G. Hansen\" and the times 06:40 / 09:41 are fixed text; \"Last check-in\" is not tied to a real check-in.",
            "The pen-level \"issue\" banner (Feeder low · 06:40) is in the code but the sample data clears it, so it never shows; the 2nd-round study removed the feeder alert.",
            "Filters for health status (needs attention / no action needed) and manual-feed have state and a strip label but no control sets them.",
-           "Search, review and the Scan list show the raw stage \"Gestating\" while the row shows \"Gestation · 40 days\"."
+           "Search, review and the Scan list show the raw stage \"Gestating\" while the row shows \"Gestation · 40 days\".",
+           "An ongoing condition on day 1 reads \"1 days\"; plural is not handled."
           ]
          }
         },
@@ -6656,7 +6799,8 @@
              }
             ],
             "logic": "\"Open\" shows only when the status is explicit, never inferred from a missing service date. Days never fall back to lifetime age.",
-            "source": "stageSummary(p)"
+            "source": "stageSummary(p)",
+            "at": "Open · 8 days"
            }
           ],
           "controls": [],
@@ -6685,10 +6829,16 @@
               "state": "Boar or piglet",
               "when": "Not a sow",
               "shows": "Type + age in days (p.age, else from birth date)"
+             },
+             {
+              "state": "Age unknown",
+              "when": "No age and no birth date",
+              "shows": "\"Boar · Age —\""
              }
             ],
             "logic": "B1 and P1 are ad-lib pens, so the pen feed shows \"Ad-lib\" with no weight and no feed editing. Detail blocks on the record follow the animal type.",
-            "source": "typeDetails"
+            "source": "typeDetails",
+            "at": "Boar · 420 days old"
            }
           ],
           "controls": [],
@@ -6715,7 +6865,8 @@
             "name": "Pen header · fault mark",
             "shows": "Nothing",
             "logic": "No fault mark is drawn on the list: penEntry() only knows the note. The fault appears only in the pen log after it is reported.",
-            "source": "penEntry()"
+            "source": "penEntry()",
+            "at": "· 3 pigs"
            }
           ],
           "controls": [],
@@ -6750,13 +6901,15 @@
               "shows": "No card; row reads \"Add pen note\""
              }
             ],
-            "logic": "Author and time as saved (\"today · 09:41\" for notes saved in this session). Notes are attached to the pen, never recorded on its pigs."
+            "logic": "Author and time as saved (\"today · 09:41\" for notes saved in this session). Notes are attached to the pen, never recorded on its pigs.",
+            "at": "Close the aisle gate after passing."
            },
            {
             "name": "Feed guidance row",
             "shows": "Gestation 1 · 7.6 kg",
             "logic": "Formula name + allocation in kg, \"Station-fed\" or \"Ad-lib\". Opens the reading page first; its Adjust feed button opens the editor.",
-            "source": "feedLabel"
+            "source": "feedLabel",
+            "at": "Gestation 1 · 7.6 kg"
            }
           ],
           "controls": [],
@@ -6801,7 +6954,8 @@
               "shows": "\"Closed · Kept in pen log\", closer and time, Undo close (disabled when a new note was written meanwhile)"
              }
             ],
-            "rule": "One note per pen. Saving replaces the text and overwrites the author with the editor and \"today · 09:41\"; the old text survives only in the log. Close note moves the note to the pen log (\"Pen note closed\", original author) and clears the pen; Undo close restores it and logs \"Pen note reopened\"."
+            "rule": "One note per pen. Saving replaces the text and overwrites the author with the editor and \"today · 09:41\"; the old text survives only in the log. Close note moves the note to the pen log (\"Pen note closed\", original author) and clears the pen; Undo close restores it and logs \"Pen note reopened\".",
+            "at": "Edit note"
            }
           ],
           "controls": [],
@@ -6836,13 +6990,15 @@
             "name": "Filter bar",
             "shows": "Category select and date button, result line",
             "logic": "Categories: All, Production, Health, Movement, Feed, Measurements, Notes, Equipment (Equipment for the pen log only). Date: all / Today / Last 7 / Last 30 / custom. Custom needs both dates, end on or after start (\"Choose a start and end date.\" / \"End date must be on or after start date.\"). Results newest first; Clear appears when a filter is on.",
-            "source": "eventCategory"
+            "source": "eventCategory",
+            "at": "All activity"
            },
            {
             "name": "Entry",
             "shows": "Type tag, title, note, date · time · author",
             "logic": "Grouped by date taken from the entry; entries with no known date stay under their own label (\"Before this walk\"); dates are never invented. Pen entries append the ids of the pigs that took part.",
-            "source": "eventCategory"
+            "source": "eventCategory",
+            "at": "Pen note added"
            }
           ],
           "controls": [],
@@ -6871,7 +7027,8 @@
             "name": "Filter fields",
             "shows": "Production stage, Disease or symptom, Care",
             "logic": "Options come from the unit's pigs: stages and condition names found there. Care: No action needed · Monitor · Treat in place · Move to hospital pen. Reset clears the draft; Show pigs applies it.",
-            "source": "filter state in main()"
+            "source": "filter state in main()",
+            "at": "Production stage"
            }
           ],
           "controls": [],
@@ -6921,10 +7078,21 @@
               "state": "Current pen",
               "when": "It is at the top of the list",
               "shows": "Outlined cell"
+             },
+             {
+              "state": "Filtered view",
+              "when": "A filter is on",
+              "shows": "Counts and \"No matches\" use only the pigs the filter shows"
+             },
+             {
+              "state": "Peek preview",
+              "when": "Hold 350 ms",
+              "shows": "Pen id and pigs, \"N pigs in this view\" when filtered, feed line, \"Formula change due\", up to 3 pigs with conditions then \"+N more pigs with health findings\", manual-feed count, \"Pen note available\""
              }
             ],
             "rule": "Holding a cell 350 ms shows a preview (pig count, feed, conditions, manual-feed pigs, note) without navigating, same as farrowing. Tapping scrolls the list so the pen sits under the sticky controls.",
-            "logic": "Same four-column, six-row map as farrowing; positions are sample positions, not the real layout."
+            "logic": "Same four-column, six-row map as farrowing; positions are sample positions, not the real layout.",
+            "at": "2 health"
            }
           ],
           "controls": [],
@@ -6938,7 +7106,8 @@
           "issues": [
            "\"N health\" counts ongoing conditions and reads like a pig count.",
            "The peek preview has a fault line that is never filled.",
-           "Long-press may be unsuitable on mobile (audit)."
+           "Long-press may be unsuitable on mobile (audit).",
+           "The peek feed line labels a pen of unknown feeding mode as \"Ad-lib\"."
           ]
          }
         },
@@ -6977,7 +7146,8 @@
               "shows": "Same sheet plus \"Camera scanning is not connected in this prototype.\" and \"Try sample tag 000306\""
              }
             ],
-            "logic": "Row shows the pen id and the raw stage name. Search and scan only navigate; saving a record is the only write."
+            "logic": "Row shows the pen id and the raw stage name. Search and scan only navigate; saving a record is the only write.",
+            "at": "7 pigs found"
            }
           ],
           "controls": [],
@@ -7036,26 +7206,34 @@
               "state": "Production group",
               "when": "Exactly one pig",
               "shows": "Hidden for several pigs or pens so a group never gets a single-sow workflow"
+             },
+             {
+              "state": "Adjust feed unavailable",
+              "when": "No selected pig can be fed",
+              "shows": "Reason is that of the first selected pig only (Pig has died / Ad-lib feeding has no fixed daily allowance / No feeding plan recorded)"
+             },
+             {
+              "state": "Health group empty",
+              "when": "No selected pig is alive",
+              "shows": "Group and its rows are absent"
              }
             ],
             "logic": "Rows that do not apply move to \"Unavailable actions (N)\" with the reason. Dead sows get only a note.",
-            "source": "ASTRA-BULK-ACTIONS"
+            "source": "ASTRA-BULK-ACTIONS",
+            "at": "Edit conditions"
            },
            {
             "name": "Measurements & condition menu",
             "shows": "Body condition, weight, backfat, temperature",
             "logic": "Weight takes a separate value per pig. Backfat for sows and gilts only. Temperature is offered for one pig only.",
-            "rule": "Batch save applies only to included, changed rows; an invalid entered value blocks the whole save."
-           },
-           {
-            "name": "Pigs / Pens switch",
-            "shows": "Tabs at the top when pens are ticked",
-            "logic": "The Pens tab offers Pen note and Feed. Selecting a pen selects its pigs; there is no pen-level health or feed record."
+            "rule": "Batch save applies only to included, changed rows; an invalid entered value blocks the whole save.",
+            "at": "Measurements & condition"
            },
            {
             "name": "Footer tabs",
             "shows": "Health · General",
-            "logic": "Jump to a group; the active tab follows the scroll."
+            "logic": "Jump to a group; the active tab follows the scroll.",
+            "at": "General"
            }
           ],
           "controls": [],
@@ -7099,7 +7277,8 @@
               "shows": "The sheet closes and the selection clears"
              }
             ],
-            "logic": "Pig row shows the raw stage name (\"Gestating\"), not the list's stage-and-days text."
+            "logic": "Pig row shows the raw stage name (\"Gestating\"), not the list's stage-and-days text.",
+            "at": "Selected"
            }
           ],
           "controls": [],
@@ -7137,7 +7316,8 @@
               "shows": "One event each (health, measurement, note, feed change, pen note, fault), newest first"
              }
             ],
-            "logic": "Time is always 09:41 and author G. Hansen in the prototype."
+            "logic": "Time is always 09:41 and author G. Hansen in the prototype.",
+            "at": "No updates yet"
            }
           ],
           "controls": [],
@@ -7165,7 +7345,8 @@
             "name": "Check-in",
             "shows": "Recorded during this walk · 0; Check in to Unit 7",
             "logic": "The count is updates saved in this walk. Check-in records only that the unit was walked; it does not mark pigs healthy or instructions completed.",
-            "rule": "Allowed with nothing recorded and pens unseen."
+            "rule": "Allowed with nothing recorded and pens unseen.",
+            "at": "Recorded during this walk"
            }
           ],
           "controls": [],
@@ -7198,7 +7379,8 @@
               "shows": "\"1 update\" (singular)"
              }
             ],
-            "logic": "Time is fixed at 09:41; the count is the walk's event count."
+            "logic": "Time is fixed at 09:41; the count is the walk's event count.",
+            "at": "Checked in at 09:41"
            }
           ],
           "controls": [],
@@ -7441,7 +7623,8 @@
               "shows": "Farrowing · 2 days; record shows Farrowing · In progress · Batch 20, opening the Farrowing prototype"
              }
             ],
-            "logic": "Stage is set from the batch task; days since the stage start 10 Sep. Farrowing is hidden in bulk actions. Next task after farrowing: Weaning on Thu 1 Oct."
+            "logic": "Stage is set from the batch task; days since the stage start 10 Sep. Farrowing is hidden in bulk actions. Next task after farrowing: Weaning on Thu 1 Oct.",
+            "at": "Lactation · 2 days"
            }
           ],
           "controls": [],
@@ -7462,10 +7645,11 @@
           "purpose": "One batch with two production tasks running at once: In-heat check and Breeding.",
           "elements": [
            {
-            "name": "Pig record · Current tasks",
+            "name": "Pig row · stage and tasks",
             "shows": "In-heat check · N days in progress / Breeding",
             "logic": "Each sow sees only the task she belongs to (task.pigIds); the batch's next task (Pregnancy check, Mon 5 Oct) appears once none is current. All five rows read \"In heat · 2 days\".",
-            "rule": "Several current production tasks can run for one batch."
+            "rule": "Several current production tasks can run for one batch.",
+            "at": "In heat · 2 days"
            }
           ],
           "controls": [],
@@ -7503,7 +7687,8 @@
               "when": "None installed",
               "shows": "\"No sensors installed\""
              }
-            ]
+            ],
+            "at": "Environment"
            },
            {
             "name": "Equipment faults",
@@ -7519,7 +7704,8 @@
               "when": "No open fault",
               "shows": "\"No open equipment faults\""
              }
-            ]
+            ],
+            "at": "Equipment faults"
            }
           ],
           "controls": [],
@@ -7547,7 +7733,8 @@
             "name": "Batch tracker",
             "shows": "Pregnancy check · 5 pigs · Next · Tomorrow · 13 Sep",
             "logic": "Running tasks show \"N pigs · N days in progress\"; otherwise the next task with its date.",
-            "rule": "Opening a batch offers a deliberate filter (Show pigs in this batch); swiping does not silently change the list."
+            "rule": "Opening a batch offers a deliberate filter (Show pigs in this batch); swiping does not silently change the list.",
+            "at": "Batch tracker"
            }
           ],
           "controls": [],
@@ -7584,7 +7771,8 @@
               "shows": "\"No open faults\""
              }
             ],
-            "logic": "A fault belongs to one device in one pen."
+            "logic": "A fault belongs to one device in one pen.",
+            "at": "Drinking station"
            }
           ],
           "controls": [],
@@ -7610,7 +7798,8 @@
            {
             "name": "Report form",
             "shows": "Device and description",
-            "rule": "Device is Feeding station / Drinking station / Other equipment; Other adds a device name field. Report fault stays disabled until device and description (and name for Other) are filled. Choosing a device that already has an open fault opens that fault instead of a duplicate."
+            "rule": "Device is Feeding station / Drinking station / Other equipment; Other adds a device name field. Report fault stays disabled until device and description (and name for Other) are filled. Choosing a device that already has an open fault opens that fault instead of a duplicate.",
+            "at": "Device"
            }
           ],
           "controls": [],
@@ -7644,7 +7833,8 @@
               "when": "After resolving",
               "shows": "\"Resolved 09:41 · G. Hansen\" and the note"
              }
-            ]
+            ],
+            "at": "Reported 06:40"
            }
           ],
           "controls": [],
@@ -7958,7 +8148,8 @@
               "shows": "No rows; Health field reads —"
              }
             ],
-            "logic": "Rows absent when there are none."
+            "logic": "Rows absent when there are none.",
+            "at": "Monitor · Day 12"
            },
            {
             "name": "Pig note and Last treatment rows",
@@ -7979,7 +8170,8 @@
            {
             "name": "Current tasks rail",
             "shows": "Task cards, e.g. Pregnancy check · Tomorrow · 13 Sep · Batch 20",
-            "logic": "Absent when the pig has no task. States and ordering are on pig-profile.tasks."
+            "logic": "Absent when the pig has no task. States and ordering are on pig-profile.tasks.",
+            "at": "Current tasks"
            },
            {
             "name": "General details",
@@ -7994,10 +8186,16 @@
               "state": "Unknown",
               "when": "Field missing",
               "shows": "\"—\""
+             },
+             {
+              "state": "Reading date missing or in the future",
+              "when": "Weight or Temperature has no date, or a date after the walk",
+              "shows": "Age note reads \"Date unknown\"; \"1 day ago\" for one day"
              }
             ],
             "logic": "Age: age field, else days since birth date. Type: registry type, else type field, else \"Sow\" if the pig has a parity, else its stage.",
-            "source": "registry; p.age; p.weightReadings"
+            "source": "registry; p.age; p.weightReadings",
+            "at": "General details"
            },
            {
             "name": "Type block",
@@ -8034,13 +8232,15 @@
               "shows": "Block absent"
              }
             ],
-            "logic": "Last service = date plus days before the walk date (12 Sep 2026). Expected farrowing: \"Today\", \"In N days\" or \"N days past expected\". Next task (batch): \"Today\", \"In N days\" or \"N days overdue\"; dash when no batch.",
-            "source": "typeDetails"
+            "logic": "Last service = date plus days before the walk date (12 Sep 2026); blank age when the date is in the future. Expected farrowing: \"Today\", \"In N days\" or \"N days past expected\". Next task (batch): \"Today\", \"In N days\" or \"N days overdue\" once the date has passed; dash when no batch.",
+            "source": "typeDetails",
+            "at": "Sow cycle"
            },
            {
             "name": "Feeding block",
             "shows": "Gestation 1 · Included in pen allocation · 2.6 kg/day · Feed +10% Thin · mild",
-            "logic": "Formula, delivery context, the pig's allowance and its tags with their reason. \"No feeding plan recorded\" for a pen with unknown mode."
+            "logic": "Formula, delivery context, the pig's allowance and its tags with their reason. \"No feeding plan recorded\" for a pen with unknown mode.",
+            "at": "Feeding"
            }
           ],
           "controls": [],
@@ -8067,7 +8267,8 @@
            "Age is in days for a sow (\"966 days\"), unreadable at a glance.",
            "A temperature of 39.5 C gets no mark beside a Fever finding.",
            "Type appears three times: General details Type, the block title, the stage.",
-           "Empty fields draw a row with \"—\" instead of leaving the row out."
+           "Empty fields draw a row with \"—\" instead of leaving the row out.",
+           "Last service reads \"1 days ago\" and Age \"1 days\": plural is not handled."
           ]
          }
         },
@@ -8092,7 +8293,8 @@
               "shows": "Row stays with \"—\"; the age note beside a value is dropped"
              }
             ],
-            "logic": "Feeding and Next task blocks are unaffected by missing registry data."
+            "logic": "Feeding and Next task blocks are unaffected by missing registry data.",
+            "at": "Expected farrowing"
            }
           ],
           "controls": [],
@@ -8124,12 +8326,14 @@
               "when": "No stage start and no service date",
               "shows": "Dash where the days would be"
              }
-            ]
+            ],
+            "at": "Gestation · —"
            },
            {
             "name": "Registry facts",
             "shows": "Age — · Breed — · Weight — · Temperature — · Health —; Last service — · Backfat — · Teat count —",
-            "logic": "Parity 5 still shows because it is held on the pig. Feeding reads \"Station-fed · 2.5 kg/day\" in a station pen."
+            "logic": "Parity 5 still shows because it is held on the pig. Feeding reads \"Station-fed · 2.5 kg/day\" in a station pen.",
+            "at": "Teat count"
            }
           ],
           "controls": [],
@@ -8162,32 +8366,35 @@
             "states": [
              {
               "state": "In progress",
-              "when": "Batch task running",
-              "shows": "Status \"In progress\", summary \"Batch 20\", active card"
+              "when": "Status contains \"in progress\" (batch task running, or Farrowing for a Farrowing-stage sow)",
+              "shows": "Active card; summary \"Batch 20\""
              },
              {
-              "state": "Due today",
-              "when": "Due date is today",
-              "shows": "Status \"Due today\", due card"
+              "state": "Due",
+              "when": "Status contains \"today\"",
+              "shows": "Due card (\"Due today\")"
              },
              {
               "state": "Upcoming",
-              "when": "Later date",
-              "shows": "Date, e.g. Tomorrow · 13 Sep"
+              "when": "Anything else",
+              "shows": "Date (Tomorrow · 13 Sep) or \"Scheduled\" when the batch task has no date"
              }
             ],
-            "logic": "Icon: syringe for vaccination, chart for Production, plus otherwise. Order: In progress, Due today, Tomorrow, the rest. A task with a pigIds list shows only to those pigs.",
-            "source": "host tasks, pig tasks, batch task"
+            "logic": "Icon: syringe for vaccination, chart for Production, note otherwise. Order: In progress, Due today, Tomorrow, the rest.",
+            "source": "host tasks, pig tasks, batch task",
+            "at": "Due today · Scheduled vaccination"
            },
            {
             "name": "Task sources",
             "shows": "Which tasks appear",
-            "logic": "Merged from Farrowing's drawer, the pig's own list and the batch (current or next task); de-duplicated by id or title; tasks completed this session are removed."
+            "logic": "Merged from Farrowing's drawer, the pig's own list and the batch (current or next task); de-duplicated by id or title; tasks completed this session are removed.",
+            "at": "Current tasks"
            },
            {
             "name": "Opening a task",
             "shows": "Health, Production or Farrowing task",
-            "rule": "Health task opens Record vaccination (vaccine list only) and completes the task on Save. Production task opens the outcome form. Farrowing or Piglet processing opens the Farrowing prototype (or the drawer's task when embedded). Tasks are single-pig: hidden in bulk actions."
+            "rule": "Health task opens Record vaccination (vaccine list only) and completes the task on Save. Production task opens the outcome form. Farrowing or Piglet processing opens the Farrowing prototype (or the drawer's task when embedded). Tasks are single-pig: hidden in bulk actions.",
+            "at": "Pregnancy check"
            }
           ],
           "controls": [],
@@ -8246,7 +8453,8 @@
              }
             ],
             "logic": "Born alive and Weaned = mean over completed batches (14 and 12; 13 and 11), one decimal. Weaning wt. = total weaning litter weight / total weaned piglets over batches that have both; a batch with zero weaned is ignored.",
-            "source": "productionOverview"
+            "source": "productionOverview",
+            "at": "Averages"
            },
            {
             "name": "Batch row",
@@ -8267,7 +8475,8 @@
               "when": "Completed batch",
               "shows": "\"N services\" / \"N kg at finish\""
              }
-            ]
+            ],
+            "at": "Batch 16"
            }
           ],
           "controls": [],
@@ -8318,7 +8527,8 @@
               "shows": "\"Finish record\" with Finished and Rating"
              }
             ],
-            "logic": "Weaning weight = litter weight / weaned. Dashes for missing values. The note shows only when the record holds one; the author line is finish date and who recorded."
+            "logic": "Weaning weight = litter weight / weaned. Dashes for missing values. The note shows only when the record holds one; the author line is finish date and who recorded.",
+            "at": "Finish weaning"
            }
           ],
           "controls": [],
@@ -8356,7 +8566,8 @@
               "shows": "\"Other identities —\""
              }
             ],
-            "logic": "Fixed set of eight rows (Entry type, Birth date, Arrival date, First heat, Birth farm, Genetic line, Dam, Sire); dash when missing."
+            "logic": "Fixed set of eight rows (Entry type, Birth date, Arrival date, First heat, Birth farm, Genetic line, Dam, Sire); dash when missing.",
+            "at": "Origin & dates"
            }
           ],
           "controls": [],
@@ -8382,7 +8593,8 @@
            {
             "name": "Filter bar",
             "shows": "All activity · All dates · 5 entries · Newest first",
-            "logic": "Same bar as the pen log, without the Equipment category. Categories: Production, Health, Movement, Feed, Measurements, Notes; date presets or custom range; empty or no match shows an empty line."
+            "logic": "Same bar as the pen log, without the Equipment category. Categories: Production, Health, Movement, Feed, Measurements, Notes; date presets or custom range; empty or no match shows an empty line.",
+            "at": "All activity"
            },
            {
             "name": "Entry",
@@ -8399,7 +8611,8 @@
               "shows": "Stamped Today · 09:41"
              }
             ],
-            "logic": "Corrections and entered-in-error findings stay in the log."
+            "logic": "Corrections and entered-in-error findings stay in the log.",
+            "at": "Movement"
            }
           ],
           "controls": [],
@@ -8444,9 +8657,20 @@
               "state": "Batch membership",
               "when": "Always listed",
               "shows": "\"Batch 20 · move or remove\" / \"Add this pig to a batch\"; unavailable (\"No production batches are available.\") when she is in no batch and none exists"
+             },
+             {
+              "state": "Farrowing or piglet processing task",
+              "when": "A current task with that title",
+              "shows": "\"Open Farrowing\" row, or the task row (Piglet processing opens the Farrowing prototype)"
+             },
+             {
+              "state": "Dead sow",
+              "when": "Stage Sow died",
+              "shows": "No Production rows"
              }
             ],
-            "logic": "Production exists only for one pig. Mark not in pig, Remove from batch and Transfer sow render only inside Farrowing's sow drawer. Farrowing's versions of batch moves are hidden when this sheet's own Batch membership row exists."
+            "logic": "Production exists only for one pig. Mark not in pig, Remove from batch and Transfer sow render only inside Farrowing's sow drawer. Farrowing's versions of batch moves are hidden when this sheet's own Batch membership row exists.",
+            "at": "Record miscarriage"
            },
            {
             "name": "Health group",
@@ -8463,12 +8687,21 @@
               "shows": "Resolve and Care listed as unavailable with the reason"
              }
             ],
-            "logic": "Edit conditions is bulk only. Farrowing opens these shared flows rather than duplicating them."
+            "logic": "Edit conditions is bulk only. Farrowing opens these shared flows rather than duplicating them.",
+            "at": "Record treatment"
            },
            {
             "name": "General group",
             "shows": "Add a note · Measurements & condition · Adjust feed",
-            "logic": "Adjust feed is unavailable with the reason for ad-lib, dead or no-plan pigs. When Farrowing's Add marker row exists, this sheet hides its own Add a note."
+            "logic": "Adjust feed is unavailable with the reason for ad-lib, dead or no-plan pigs. When Farrowing's Add marker row exists, this sheet hides its own Add a note.",
+            "at": "Add a note",
+            "states": [
+             {
+              "state": "Adjust feed unavailable",
+              "when": "Dead sow, ad-lib pen, or no feeding plan",
+              "shows": "Listed under Unavailable actions with the reason; a single ad-lib pig also gets \"Body condition adjustment · Ad-lib pigs do not have an individual ration.\""
+             }
+            ]
            },
            {
             "name": "Dead sow",
@@ -8484,7 +8717,8 @@
            {
             "name": "Unavailable actions (N)",
             "shows": "Link at the end",
-            "rule": "A blocked row is listed with its reason, never dropped silently. N = count of blocked rows; footer tabs jump between groups and follow the scroll."
+            "rule": "A blocked row is listed with its reason, never dropped silently. N = count of blocked rows; footer tabs jump between groups and follow the scroll.",
+            "at": "Unavailable actions"
            }
           ],
           "controls": [],
@@ -8534,7 +8768,8 @@
               "shows": "Save reads \"Save follow-up\"; the task is not completed"
              }
             ],
-            "rule": "Save is disabled until an outcome is chosen. Not in pig removes the sow from the batch and sets her Off production / Open with no confirmation or undo; returns to the pig record."
+            "rule": "Save is disabled until an outcome is chosen. Not in pig removes the sow from the batch and sets her Off production / Open with no confirmation or undo; returns to the pig record.",
+            "at": "Not in pig"
            }
           ],
           "controls": [],
@@ -8562,7 +8797,8 @@
            {
             "name": "Reason and Save",
             "shows": "Warning \"This sow will be removed from the batch. Saved records are kept.\"; Reason",
-            "rule": "Reason is required; Save is disabled while empty. Save removes her from the batch, sets Off production / Open, adds \"Miscarriage recorded\" (Production) and returns to the pig record. Single-animal action, hidden from bulk."
+            "rule": "Reason is required; Save is disabled while empty. Save removes her from the batch, sets Off production / Open, adds \"Miscarriage recorded\" (Production) and returns to the pig record. Single-animal action, hidden from bulk.",
+            "at": "Reason"
            }
           ],
           "controls": [],
@@ -8608,7 +8844,8 @@
               "shows": "\"No production batches are available.\""
              }
             ],
-            "rule": "Save is disabled until a choice is made. Moving a pig overwrites her stage with the new batch's stage."
+            "rule": "Save is disabled until a choice is made. Moving a pig overwrites her stage with the new batch's stage.",
+            "at": "Current batch"
            }
           ],
           "controls": [],
@@ -8646,7 +8883,8 @@
               "shows": "Body condition, Weight (\"A separate value for each pig\"), Backfat; no Temperature"
              }
             ],
-            "logic": "Weight, backfat and temperature take one value per pig."
+            "logic": "Weight, backfat and temperature take one value per pig.",
+            "at": "Record backfat"
            }
           ],
           "controls": [],
@@ -8691,14 +8929,31 @@
               "state": "Backfat for boar or piglet",
               "when": "Not sow or gilt",
               "shows": "Row reads \"Sows and gilts only\""
+             },
+             {
+              "state": "Row ineligible",
+              "when": "Dead sow, unticked, or backfat on a boar",
+              "shows": "\"Not eligible\" / \"Excluded\" / \"Sows and gilts only\""
+             },
+             {
+              "state": "Blank row",
+              "when": "No value typed",
+              "shows": "\"No reading · unchanged\""
+             },
+             {
+              "state": "Valid change",
+              "when": "Value above 0",
+              "shows": "\"180 → 190 kg\", then \"Ready to save\""
              }
             ],
-            "logic": "Dead sows are excluded; unticked rows stay unchanged."
+            "logic": "Dead sows are excluded; unticked rows stay unchanged.",
+            "at": "Last recorded: 180 kg · 2 days ago"
            },
            {
             "name": "Save",
             "shows": "Save / Save · N pigs",
-            "rule": "N = rows that changed. Disabled until at least one row changed and none has an error; an invalid value blocks the whole save. Writes the readings and a log entry per pig, clears the selection and returns to the walk list. Any value above 0 saves: no plausibility check."
+            "rule": "N = rows that changed. Disabled until at least one row changed and none has an error; an invalid value blocks the whole save. Writes the readings and a log entry per pig, clears the selection and returns to the walk list. Any value above 0 saves: no plausibility check.",
+            "at": "Save"
            }
           ],
           "controls": [],
@@ -8738,7 +8993,8 @@
              }
             ],
             "logic": "Preview shows the current body-condition finding name or \"—\".",
-            "rule": "Save adds a Body condition finding with care Monitor (or replaces its name); the log reads \"... · feed unchanged\". Records the finding only; feed changes are made in Adjust feed. Returns to the walk list."
+            "rule": "Save adds a Body condition finding with care Monitor (or replaces its name); the log reads \"... · feed unchanged\". Records the finding only; feed changes are made in Adjust feed. Returns to the walk list.",
+            "at": "Records condition. Feed stays unchanged."
            }
           ],
           "controls": [],
@@ -8767,7 +9023,8 @@
            {
             "name": "Note form",
             "shows": "Add a note; Save / Save · N pigs",
-            "rule": "Save is disabled while empty. The note becomes the pig's note, shown as a Note row on the record, replacing any earlier note (the log keeps both). Several pigs: the same note is recorded separately for each included pig. Allowed on a dead sow. Returns to the walk list."
+            "rule": "Save is disabled while empty. The note becomes the pig's note, shown as a Note row on the record, replacing any earlier note (the log keeps both). Several pigs: the same note is recorded separately for each included pig. Allowed on a dead sow. Returns to the walk list.",
+            "at": "Note"
            }
           ],
           "controls": [],
@@ -8824,7 +9081,8 @@
               "shows": "\"No production batches are available.\""
              }
             ],
-            "logic": "Grouped Production, Health, General; every row disabled with the reason as sub-line. A blocked action is listed with its reason, never dropped silently."
+            "logic": "Grouped Production, Health, General; every row disabled with the reason as sub-line. A blocked action is listed with its reason, never dropped silently.",
+            "at": "No open conditions to resolve."
            }
           ],
           "controls": [],
@@ -9109,11 +9367,17 @@
               "state": "Pig note",
               "when": "p.note set",
               "shows": "A \"Note\" row among the health rows; opens the log, not a finding"
+             },
+             {
+              "state": "Duration unknown",
+              "when": "Condition has no numeric day",
+              "shows": "No \"Day N\" text; ongoing tag reads \"Duration unknown\" in its accessible name"
              }
             ],
             "logic": "\"Day N\" counts from the recorded start. A condition stays visible until explicitly resolved.",
             "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
-            "source": "cases(p) · careAppearance(k) · issueStatus(k)"
+            "source": "cases(p) · careAppearance(k) · issueStatus(k)",
+            "at": "Treat in place · Day 2"
            },
            {
             "name": "Last treatment",
@@ -9168,7 +9432,8 @@
               "shows": "No attention rows; tag in General details and on the walk row; counts in the walk's Health lens"
              }
             ],
-            "logic": "Not an alert. \"A condition with No action needed remains recorded and visible until explicitly resolved.\""
+            "logic": "Not an alert. \"A condition with No action needed remains recorded and visible until explicitly resolved.\"",
+            "at": "Arthritis"
            }
           ],
           "controls": [],
@@ -9203,7 +9468,8 @@
               "when": "More tags than fit",
               "shows": "On the record the row scrolls sideways (each tag its own button, name \"name · N days · View condition\"); on the walk the extra tags collapse into +N"
              }
-            ]
+            ],
+            "at": "Lameness"
            }
           ],
           "controls": [],
@@ -9250,7 +9516,8 @@
              }
             ],
             "logic": "Class care-ongoing / monitor / treatment / hospital. The care words appear only in the tooltip and the row's accessible name. Tags needing attention sort before ongoing ones.",
-            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed."
+            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "Diarrhoea"
            }
           ],
           "controls": [],
@@ -9295,7 +9562,8 @@
              }
             ],
             "logic": "Kind is Disease, Symptom or Body condition. Day count is stored as 1 and never advances in the prototype. Latest treatment line appears only when the pig's last treatment targeted this condition.",
-            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed."
+            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "Recorded — · —"
            },
            {
             "name": "Feed link",
@@ -9312,12 +9580,14 @@
               "shows": "Edit finding, Record treatment, Resolve or remove only"
              }
             ],
-            "logic": "Record treatment opens the form with this condition fixed."
+            "logic": "Record treatment opens the form with this condition fixed.",
+            "at": "Linked feed adjustment"
            },
            {
             "name": "Resolve or remove",
             "shows": "Recovered, or entered in error",
-            "rule": "Recovery keeps the case in history; entered in error marks it as a correction. Saved changes keep the sheet on the finding."
+            "rule": "Recovery keeps the case in history; entered in error marks it as a correction. Saved changes keep the sheet on the finding.",
+            "at": "Resolve or remove"
            }
           ],
           "controls": [],
@@ -9357,13 +9627,15 @@
               "when": "Not linked",
               "shows": "Picker of every catalogue name the pig does not already carry"
              }
-            ]
+            ],
+            "at": "Finding"
            },
            {
             "name": "Save changes",
             "shows": "Primary button",
             "logic": "Writes the new name, kind, care and note; logs \"Finding edited\" with \"old → new · old care → new care\". A linked treatment target is renamed with the finding.",
-            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed."
+            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "Save changes"
            }
           ],
           "controls": [],
@@ -9396,7 +9668,8 @@
               "shows": "\"This also ends the linked feed adjustment and returns this pig to the base plan.\""
              }
             ],
-            "rule": "Default Recovered. Save moves the case to the pig's closed cases, ends a linked feed adjustment (factor back to 1), logs \"Recovered\" or \"Finding entered in error\" and returns to the pig record. No second confirmation for Entered in error."
+            "rule": "Default Recovered. Save moves the case to the pig's closed cases, ends a linked feed adjustment (factor back to 1), logs \"Recovered\" or \"Finding entered in error\" and returns to the pig record. No second confirmation for Entered in error.",
+            "at": "Save outcome"
            }
           ],
           "controls": [],
@@ -9447,20 +9720,28 @@
               "state": "Excluded",
               "when": "Checkbox unticked",
               "shows": "\"Excluded\""
+             },
+             {
+              "state": "Not eligible",
+              "when": "Dead sow",
+              "shows": "\"Not eligible\""
              }
             ],
-            "logic": "One pig shows only the Details panel, several show the list. Dead sows are not eligible."
+            "logic": "One pig shows only the Details panel, several show the list. Dead sows are not eligible.",
+            "at": "C1 · Gestation · 42 days"
            },
            {
             "name": "Care default",
             "shows": "Care · No action needed",
             "logic": "The same care is given to every added condition. The default is No action needed, so a newly recorded Fever does not need attention unless Care is changed.",
-            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed."
+            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "No action needed"
            },
            {
             "name": "Save",
             "shows": "Save · N pigs",
-            "rule": "Disabled until a condition is chosen and at least one row would change; N = pigs that would change. Writes one finding per pig and name, day 1, recorded 12 Sep 2026 by G. Hansen, plus one \"Health recorded\" log entry. A condition the pig already has is skipped and keeps its original start date. Returns to the walk list."
+            "rule": "Disabled until a condition is chosen and at least one row would change; N = pigs that would change. Writes one finding per pig and name, day 1, recorded 12 Sep 2026 by G. Hansen, plus one \"Health recorded\" log entry. A condition the pig already has is skipped and keeps its original start date. Returns to the walk list.",
+            "at": "Save"
            }
           ],
           "controls": [],
@@ -9516,12 +9797,14 @@
               "shows": "Asks for a category; removable with an x; kept for the session"
              }
             ],
-            "logic": "Item row shows how many selected pigs already carry it (\"Already on 1 selected\")."
+            "logic": "Item row shows how many selected pigs already carry it (\"Already on 1 selected\").",
+            "at": "General appearance"
            },
            {
             "name": "Done",
             "shows": "Done · N selected",
-            "rule": "Done keeps the choice; Back discards changes made in the picker."
+            "rule": "Done keeps the choice; Back discards changes made in the picker.",
+            "at": "Done"
            }
           ],
           "controls": [],
@@ -9567,7 +9850,8 @@
               "when": "Opened from Edit conditions (several pigs)",
               "shows": "Same form and rows; log entry \"Finding edited\""
              }
-            ]
+            ],
+            "at": "Care instructions"
            },
            {
             "name": "Pig row",
@@ -9587,15 +9871,22 @@
               "state": "Chosen, pig lacks it",
               "when": "Pig without that condition",
               "shows": "\"No Thin · unchanged\""
+             },
+             {
+              "state": "Not eligible",
+              "when": "Dead sow or unticked",
+              "shows": "\"Not eligible\" / \"Excluded\""
              }
             ],
             "logic": "Condition options are the names found on the selected pigs. Dead sows are excluded.",
-            "rule": "Keep current care (default) preserves each pig's own level. Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed."
+            "rule": "Keep current care (default) preserves each pig's own level. Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "Thin"
            },
            {
             "name": "Save",
             "shows": "Save · N pigs",
-            "logic": "N = changed pigs. Returns to the walk list."
+            "logic": "N = changed pigs. Returns to the walk list.",
+            "at": "Save"
            }
           ],
           "controls": [],
@@ -9644,12 +9935,14 @@
               "shows": "Note \"Resets linked feed adjustment\"; factor returns to 1"
              }
             ],
-            "logic": "Condition options are the names found on the selected pigs."
+            "logic": "Condition options are the names found on the selected pigs.",
+            "at": "Condition"
            },
            {
             "name": "Save",
             "shows": "Save · N pigs",
-            "rule": "Closes each case and logs \"Recovered\" or \"Record corrected\". Recovery keeps the case in history; entered in error marks a correction."
+            "rule": "Closes each case and logs \"Recovered\" or \"Record corrected\". Recovery keeps the case in history; entered in error marks a correction.",
+            "at": "Save"
            }
           ],
           "controls": [],
@@ -9697,7 +9990,8 @@
               "when": "Health task",
               "shows": "Titled \"Record vaccination\", vaccine list only, no condition chip, Save reads \"Save and complete task\""
              }
-            ]
+            ],
+            "at": "Record treatment"
            },
            {
             "name": "Dose and row state",
@@ -9712,14 +10006,26 @@
               "state": "Valid row",
               "when": "Dose above 0",
               "shows": "No text"
+             },
+             {
+              "state": "Incomplete",
+              "when": "Medicine, method, unit or dose missing",
+              "shows": "\"Complete treatment details\""
+             },
+             {
+              "state": "Ready",
+              "when": "All set and dose above 0",
+              "shows": "\"Antibiotic A · 2 mL\""
              }
             ],
-            "logic": "Method: Injection, Oral, Topical, In feed, In water. Condition chip links only to pigs carrying that condition."
+            "logic": "Method: Injection, Oral, Topical, In feed, In water. Condition chip links only to pigs carrying that condition.",
+            "at": "Dose"
            },
            {
             "name": "Save",
             "shows": "Save · N pigs / Save and complete task",
-            "rule": "Disabled until medicine, method, unit and a dose above 0 are set. One treatment record per included pig; logs \"Treatment recorded\" or \"Vaccination recorded\"; a task completes on Save. Dead sows are excluded. Returns to the list, the finding, or the pig record."
+            "rule": "Disabled until medicine, method, unit and a dose above 0 are set. One treatment record per included pig; logs \"Treatment recorded\" or \"Vaccination recorded\"; a task completes on Save. Dead sows are excluded. Returns to the list, the finding, or the pig record.",
+            "at": "Save"
            }
           ],
           "controls": [],
@@ -9778,7 +10084,8 @@
               "shows": "\"No medicines found. Try another name or category.\""
              }
             ],
-            "logic": "A changed medicine clears the brand. The catalogue is a sample, not a treatment recommendation."
+            "logic": "A changed medicine clears the brand. The catalogue is a sample, not a treatment recommendation.",
+            "at": "Antibiotics"
            }
           ],
           "controls": [],

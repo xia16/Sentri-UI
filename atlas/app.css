@@ -316,3 +316,4 @@ table.copy td.id { font:11.5px var(--mono); overflow-wrap:anywhere }
 .group.plain { border:0; background:none }
 .groups { position:absolute; left:0; top:0 }
 .flowwrap.cutb::before { content:''; position:absolute; left:0; right:0; bottom:0; height:56px; background:linear-gradient(to bottom, rgba(243,244,238,0), var(--ground)); pointer-events:none; z-index:2 }
+.pins .lead { opacity:.7 }

@@ -191,11 +191,17 @@
                 "state": "Pig note",
                 "when": "p.note set",
                 "shows": "A \"Note\" row among the health rows; opens the log, not a finding"
+              },
+              {
+                "state": "Duration unknown",
+                "when": "Condition has no numeric day",
+                "shows": "No \"Day N\" text; ongoing tag reads \"Duration unknown\" in its accessible name"
               }
             ],
             "logic": "\"Day N\" counts from the recorded start. A condition stays visible until explicitly resolved.",
             "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
-            "source": "cases(p) · careAppearance(k) · issueStatus(k)"
+            "source": "cases(p) · careAppearance(k) · issueStatus(k)",
+            "at": "Treat in place · Day 2"
           },
           {
             "name": "Last treatment",
@@ -250,7 +256,8 @@
                 "shows": "No attention rows; tag in General details and on the walk row; counts in the walk's Health lens"
               }
             ],
-            "logic": "Not an alert. \"A condition with No action needed remains recorded and visible until explicitly resolved.\""
+            "logic": "Not an alert. \"A condition with No action needed remains recorded and visible until explicitly resolved.\"",
+            "at": "Arthritis"
           }
         ],
         "controls": [],
@@ -285,7 +292,8 @@
                 "when": "More tags than fit",
                 "shows": "On the record the row scrolls sideways (each tag its own button, name \"name · N days · View condition\"); on the walk the extra tags collapse into +N"
               }
-            ]
+            ],
+            "at": "Lameness"
           }
         ],
         "controls": [],
@@ -332,7 +340,8 @@
               }
             ],
             "logic": "Class care-ongoing / monitor / treatment / hospital. The care words appear only in the tooltip and the row's accessible name. Tags needing attention sort before ongoing ones.",
-            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed."
+            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "Diarrhoea"
           }
         ],
         "controls": [],
@@ -377,7 +386,8 @@
               }
             ],
             "logic": "Kind is Disease, Symptom or Body condition. Day count is stored as 1 and never advances in the prototype. Latest treatment line appears only when the pig's last treatment targeted this condition.",
-            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed."
+            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "Recorded — · —"
           },
           {
             "name": "Feed link",
@@ -394,12 +404,14 @@
                 "shows": "Edit finding, Record treatment, Resolve or remove only"
               }
             ],
-            "logic": "Record treatment opens the form with this condition fixed."
+            "logic": "Record treatment opens the form with this condition fixed.",
+            "at": "Linked feed adjustment"
           },
           {
             "name": "Resolve or remove",
             "shows": "Recovered, or entered in error",
-            "rule": "Recovery keeps the case in history; entered in error marks it as a correction. Saved changes keep the sheet on the finding."
+            "rule": "Recovery keeps the case in history; entered in error marks it as a correction. Saved changes keep the sheet on the finding.",
+            "at": "Resolve or remove"
           }
         ],
         "controls": [],
@@ -439,13 +451,15 @@
                 "when": "Not linked",
                 "shows": "Picker of every catalogue name the pig does not already carry"
               }
-            ]
+            ],
+            "at": "Finding"
           },
           {
             "name": "Save changes",
             "shows": "Primary button",
             "logic": "Writes the new name, kind, care and note; logs \"Finding edited\" with \"old → new · old care → new care\". A linked treatment target is renamed with the finding.",
-            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed."
+            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "Save changes"
           }
         ],
         "controls": [],
@@ -478,7 +492,8 @@
                 "shows": "\"This also ends the linked feed adjustment and returns this pig to the base plan.\""
               }
             ],
-            "rule": "Default Recovered. Save moves the case to the pig's closed cases, ends a linked feed adjustment (factor back to 1), logs \"Recovered\" or \"Finding entered in error\" and returns to the pig record. No second confirmation for Entered in error."
+            "rule": "Default Recovered. Save moves the case to the pig's closed cases, ends a linked feed adjustment (factor back to 1), logs \"Recovered\" or \"Finding entered in error\" and returns to the pig record. No second confirmation for Entered in error.",
+            "at": "Save outcome"
           }
         ],
         "controls": [],
@@ -529,20 +544,28 @@
                 "state": "Excluded",
                 "when": "Checkbox unticked",
                 "shows": "\"Excluded\""
+              },
+              {
+                "state": "Not eligible",
+                "when": "Dead sow",
+                "shows": "\"Not eligible\""
               }
             ],
-            "logic": "One pig shows only the Details panel, several show the list. Dead sows are not eligible."
+            "logic": "One pig shows only the Details panel, several show the list. Dead sows are not eligible.",
+            "at": "C1 · Gestation · 42 days"
           },
           {
             "name": "Care default",
             "shows": "Care · No action needed",
             "logic": "The same care is given to every added condition. The default is No action needed, so a newly recorded Fever does not need attention unless Care is changed.",
-            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed."
+            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "No action needed"
           },
           {
             "name": "Save",
             "shows": "Save · N pigs",
-            "rule": "Disabled until a condition is chosen and at least one row would change; N = pigs that would change. Writes one finding per pig and name, day 1, recorded 12 Sep 2026 by G. Hansen, plus one \"Health recorded\" log entry. A condition the pig already has is skipped and keeps its original start date. Returns to the walk list."
+            "rule": "Disabled until a condition is chosen and at least one row would change; N = pigs that would change. Writes one finding per pig and name, day 1, recorded 12 Sep 2026 by G. Hansen, plus one \"Health recorded\" log entry. A condition the pig already has is skipped and keeps its original start date. Returns to the walk list.",
+            "at": "Save"
           }
         ],
         "controls": [],
@@ -598,12 +621,14 @@
                 "shows": "Asks for a category; removable with an x; kept for the session"
               }
             ],
-            "logic": "Item row shows how many selected pigs already carry it (\"Already on 1 selected\")."
+            "logic": "Item row shows how many selected pigs already carry it (\"Already on 1 selected\").",
+            "at": "General appearance"
           },
           {
             "name": "Done",
             "shows": "Done · N selected",
-            "rule": "Done keeps the choice; Back discards changes made in the picker."
+            "rule": "Done keeps the choice; Back discards changes made in the picker.",
+            "at": "Done"
           }
         ],
         "controls": [],
@@ -649,7 +674,8 @@
                 "when": "Opened from Edit conditions (several pigs)",
                 "shows": "Same form and rows; log entry \"Finding edited\""
               }
-            ]
+            ],
+            "at": "Care instructions"
           },
           {
             "name": "Pig row",
@@ -669,15 +695,22 @@
                 "state": "Chosen, pig lacks it",
                 "when": "Pig without that condition",
                 "shows": "\"No Thin · unchanged\""
+              },
+              {
+                "state": "Not eligible",
+                "when": "Dead sow or unticked",
+                "shows": "\"Not eligible\" / \"Excluded\""
               }
             ],
             "logic": "Condition options are the names found on the selected pigs. Dead sows are excluded.",
-            "rule": "Keep current care (default) preserves each pig's own level. Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed."
+            "rule": "Keep current care (default) preserves each pig's own level. Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "Thin"
           },
           {
             "name": "Save",
             "shows": "Save · N pigs",
-            "logic": "N = changed pigs. Returns to the walk list."
+            "logic": "N = changed pigs. Returns to the walk list.",
+            "at": "Save"
           }
         ],
         "controls": [],
@@ -726,12 +759,14 @@
                 "shows": "Note \"Resets linked feed adjustment\"; factor returns to 1"
               }
             ],
-            "logic": "Condition options are the names found on the selected pigs."
+            "logic": "Condition options are the names found on the selected pigs.",
+            "at": "Condition"
           },
           {
             "name": "Save",
             "shows": "Save · N pigs",
-            "rule": "Closes each case and logs \"Recovered\" or \"Record corrected\". Recovery keeps the case in history; entered in error marks a correction."
+            "rule": "Closes each case and logs \"Recovered\" or \"Record corrected\". Recovery keeps the case in history; entered in error marks a correction.",
+            "at": "Save"
           }
         ],
         "controls": [],
@@ -779,7 +814,8 @@
                 "when": "Health task",
                 "shows": "Titled \"Record vaccination\", vaccine list only, no condition chip, Save reads \"Save and complete task\""
               }
-            ]
+            ],
+            "at": "Record treatment"
           },
           {
             "name": "Dose and row state",
@@ -794,14 +830,26 @@
                 "state": "Valid row",
                 "when": "Dose above 0",
                 "shows": "No text"
+              },
+              {
+                "state": "Incomplete",
+                "when": "Medicine, method, unit or dose missing",
+                "shows": "\"Complete treatment details\""
+              },
+              {
+                "state": "Ready",
+                "when": "All set and dose above 0",
+                "shows": "\"Antibiotic A · 2 mL\""
               }
             ],
-            "logic": "Method: Injection, Oral, Topical, In feed, In water. Condition chip links only to pigs carrying that condition."
+            "logic": "Method: Injection, Oral, Topical, In feed, In water. Condition chip links only to pigs carrying that condition.",
+            "at": "Dose"
           },
           {
             "name": "Save",
             "shows": "Save · N pigs / Save and complete task",
-            "rule": "Disabled until medicine, method, unit and a dose above 0 are set. One treatment record per included pig; logs \"Treatment recorded\" or \"Vaccination recorded\"; a task completes on Save. Dead sows are excluded. Returns to the list, the finding, or the pig record."
+            "rule": "Disabled until medicine, method, unit and a dose above 0 are set. One treatment record per included pig; logs \"Treatment recorded\" or \"Vaccination recorded\"; a task completes on Save. Dead sows are excluded. Returns to the list, the finding, or the pig record.",
+            "at": "Save"
           }
         ],
         "controls": [],
@@ -860,7 +908,8 @@
                 "shows": "\"No medicines found. Try another name or category.\""
               }
             ],
-            "logic": "A changed medicine clears the brand. The catalogue is a sample, not a treatment recommendation."
+            "logic": "A changed medicine clears the brand. The catalogue is a sample, not a treatment recommendation.",
+            "at": "Antibiotics"
           }
         ],
         "controls": [],

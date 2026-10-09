@@ -103,7 +103,8 @@
               }
             ],
             "logic": "Sample figures per unit (Unit 7: 22.4 °C, 64 %, 8 ppm). \"Last reading\" is unitContext[N].updated, one fixed sample time for every sensor.",
-            "source": "availableSensors(); unitContext[N].readings, .updated"
+            "source": "availableSensors(); unitContext[N].readings, .updated",
+            "at": "Last reading"
           },
           {
             "name": "Chart, Low / High and history",
@@ -121,7 +122,8 @@
               }
             ],
             "logic": "Not real history: series = current value plus fixed offsets scaled by sensor (temperature ×1, humidity ×6, ammonia ×2); y range = min/max ± padding. Low and High are the min and max of the plotted points; \"Reading history\" lists the same points as Time and value.",
-            "source": "sensorHistory(), sensorChart()"
+            "source": "sensorHistory(), sensorChart()",
+            "at": "Low 21.9 °C"
           },
           {
             "name": "Connection",
@@ -138,7 +140,8 @@
                 "shows": "Note reads \"connected\"; tag \"Connected\"; controls enabled; helper \"Preview controls only · no command is sent to equipment.\""
               }
             ],
-            "source": "environment(); sync.connection"
+            "source": "environment(); sync.connection",
+            "at": "Sample readings · offline, showing last available values"
           },
           {
             "name": "Ventilation fan card",
@@ -162,7 +165,8 @@
             ],
             "logic": "Controllable devices are independent of readings: a unit can have devices with no readings (the unit card then says \"N devices\") or readings with no device.",
             "rule": "Apply is disabled offline and whenever the draft mode and speed equal the applied ones. Nothing is sent to equipment; the setting lives in memory only.",
-            "source": "unitDevices(); fan-mode and apply-device handlers"
+            "source": "unitDevices(); fan-mode and apply-device handlers",
+            "at": "Auto · following unit schedule"
           }
         ],
         "controls": [],
@@ -214,7 +218,8 @@
               }
             ],
             "rule": "The draft is not applied until Apply; everything is disabled offline. Preview only: no command is sent to equipment.",
-            "source": "fan-speed input, apply-device handler, d.updated"
+            "source": "fan-speed input, apply-device handler, d.updated",
+            "at": "Fan speed"
           }
         ],
         "controls": [],
@@ -261,14 +266,16 @@
               }
             ],
             "logic": "Location and note are free text typed by the reporter.",
-            "source": "maintenanceCache; fault.pen/.note/.by"
+            "source": "maintenanceCache; fault.pen/.note/.by",
+            "at": "Leaking valve at the east end."
           },
           {
             "name": "Open count",
             "shows": "1 open issue",
             "logic": "Records not resolved, singular or plural. The same count feeds the Maintenance chip on the unit screen. Unit 7 starts with one open issue; the `attention` param hides it (clear, health, feed) or adds a default one in other units (maintenance, busy).",
             "rule": "Only reachable once a unit is chosen: the Toolbox row exists only in a unit scope. Issues are unit-scoped.",
-            "source": "maintenanceRecords()"
+            "source": "maintenanceRecords()",
+            "at": "1 open issue"
           }
         ],
         "controls": [],
@@ -312,7 +319,8 @@
                 "shows": "Not this state: the resolved cards stay listed with \"0 open issues\""
               }
             ],
-            "source": "maintenance()"
+            "source": "maintenance()",
+            "at": "No open issues"
           }
         ],
         "controls": [],
@@ -341,7 +349,8 @@
             "shows": "Equipment · Location in Unit 7 · What needs attention? · Save sample issue",
             "logic": "Equipment (max 80) and Location (max 80, label names the unit) are free text; Note is a textarea (max 500). Save adds an open record at the top with reporter \"G. Hansen · just now\", closes the drawer and toasts \"Issue saved in this preview\".",
             "rule": "All three fields are required; whitespace-only values are ignored.",
-            "source": "fault-device, fault-location, fault-note; fault-form submit"
+            "source": "fault-device, fault-location, fault-note; fault-form submit",
+            "at": "Save sample issue"
           }
         ],
         "controls": [],
@@ -372,7 +381,8 @@
             "shows": "Mark resolved",
             "logic": "Sets resolved on the record, closes the drawer and toasts \"Issue resolved in this preview\"; the open count drops.",
             "rule": "No note is asked and no resolver or time is recorded.",
-            "source": "resolve-fault handler"
+            "source": "resolve-fault handler",
+            "at": "Mark resolved"
           }
         ],
         "controls": [],
@@ -409,7 +419,8 @@
               }
             ],
             "rule": "A resolved issue cannot be reopened.",
-            "source": "faultDetail()"
+            "source": "faultDetail()",
+            "at": "Resolved in this preview."
           }
         ],
         "controls": [],

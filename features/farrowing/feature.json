@@ -551,7 +551,7 @@
             ],
             "rule": "Apply keeps the filter until Clear; Clear removes both filters at once. The due range matches each sow's stored due text, so it also hides Active and Done sows by a date that no longer matters to them.",
             "source": "farrowing-astra-concept.js roomFilterCount(), roomFilterLabel(), dueMatches()",
-            "at": "All"
+            "at": "[aria-label=\"Filter sows\"]"
           },
           {
             "name": "Pen header",

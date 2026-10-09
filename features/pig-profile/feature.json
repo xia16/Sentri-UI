@@ -200,7 +200,8 @@
                 "shows": "No rows; Health field reads —"
               }
             ],
-            "logic": "Rows absent when there are none."
+            "logic": "Rows absent when there are none.",
+            "at": "Monitor · Day 12"
           },
           {
             "name": "Pig note and Last treatment rows",
@@ -221,7 +222,8 @@
           {
             "name": "Current tasks rail",
             "shows": "Task cards, e.g. Pregnancy check · Tomorrow · 13 Sep · Batch 20",
-            "logic": "Absent when the pig has no task. States and ordering are on pig-profile.tasks."
+            "logic": "Absent when the pig has no task. States and ordering are on pig-profile.tasks.",
+            "at": "Current tasks"
           },
           {
             "name": "General details",
@@ -236,10 +238,16 @@
                 "state": "Unknown",
                 "when": "Field missing",
                 "shows": "\"—\""
+              },
+              {
+                "state": "Reading date missing or in the future",
+                "when": "Weight or Temperature has no date, or a date after the walk",
+                "shows": "Age note reads \"Date unknown\"; \"1 day ago\" for one day"
               }
             ],
             "logic": "Age: age field, else days since birth date. Type: registry type, else type field, else \"Sow\" if the pig has a parity, else its stage.",
-            "source": "registry; p.age; p.weightReadings"
+            "source": "registry; p.age; p.weightReadings",
+            "at": "General details"
           },
           {
             "name": "Type block",
@@ -276,13 +284,15 @@
                 "shows": "Block absent"
               }
             ],
-            "logic": "Last service = date plus days before the walk date (12 Sep 2026). Expected farrowing: \"Today\", \"In N days\" or \"N days past expected\". Next task (batch): \"Today\", \"In N days\" or \"N days overdue\"; dash when no batch.",
-            "source": "typeDetails"
+            "logic": "Last service = date plus days before the walk date (12 Sep 2026); blank age when the date is in the future. Expected farrowing: \"Today\", \"In N days\" or \"N days past expected\". Next task (batch): \"Today\", \"In N days\" or \"N days overdue\" once the date has passed; dash when no batch.",
+            "source": "typeDetails",
+            "at": "Sow cycle"
           },
           {
             "name": "Feeding block",
             "shows": "Gestation 1 · Included in pen allocation · 2.6 kg/day · Feed +10% Thin · mild",
-            "logic": "Formula, delivery context, the pig's allowance and its tags with their reason. \"No feeding plan recorded\" for a pen with unknown mode."
+            "logic": "Formula, delivery context, the pig's allowance and its tags with their reason. \"No feeding plan recorded\" for a pen with unknown mode.",
+            "at": "Feeding"
           }
         ],
         "controls": [],
@@ -309,7 +319,8 @@
           "Age is in days for a sow (\"966 days\"), unreadable at a glance.",
           "A temperature of 39.5 C gets no mark beside a Fever finding.",
           "Type appears three times: General details Type, the block title, the stage.",
-          "Empty fields draw a row with \"—\" instead of leaving the row out."
+          "Empty fields draw a row with \"—\" instead of leaving the row out.",
+          "Last service reads \"1 days ago\" and Age \"1 days\": plural is not handled."
         ]
       }
     },
@@ -334,7 +345,8 @@
                 "shows": "Row stays with \"—\"; the age note beside a value is dropped"
               }
             ],
-            "logic": "Feeding and Next task blocks are unaffected by missing registry data."
+            "logic": "Feeding and Next task blocks are unaffected by missing registry data.",
+            "at": "Expected farrowing"
           }
         ],
         "controls": [],
@@ -366,12 +378,14 @@
                 "when": "No stage start and no service date",
                 "shows": "Dash where the days would be"
               }
-            ]
+            ],
+            "at": "Gestation · —"
           },
           {
             "name": "Registry facts",
             "shows": "Age — · Breed — · Weight — · Temperature — · Health —; Last service — · Backfat — · Teat count —",
-            "logic": "Parity 5 still shows because it is held on the pig. Feeding reads \"Station-fed · 2.5 kg/day\" in a station pen."
+            "logic": "Parity 5 still shows because it is held on the pig. Feeding reads \"Station-fed · 2.5 kg/day\" in a station pen.",
+            "at": "Teat count"
           }
         ],
         "controls": [],
@@ -404,32 +418,35 @@
             "states": [
               {
                 "state": "In progress",
-                "when": "Batch task running",
-                "shows": "Status \"In progress\", summary \"Batch 20\", active card"
+                "when": "Status contains \"in progress\" (batch task running, or Farrowing for a Farrowing-stage sow)",
+                "shows": "Active card; summary \"Batch 20\""
               },
               {
-                "state": "Due today",
-                "when": "Due date is today",
-                "shows": "Status \"Due today\", due card"
+                "state": "Due",
+                "when": "Status contains \"today\"",
+                "shows": "Due card (\"Due today\")"
               },
               {
                 "state": "Upcoming",
-                "when": "Later date",
-                "shows": "Date, e.g. Tomorrow · 13 Sep"
+                "when": "Anything else",
+                "shows": "Date (Tomorrow · 13 Sep) or \"Scheduled\" when the batch task has no date"
               }
             ],
-            "logic": "Icon: syringe for vaccination, chart for Production, plus otherwise. Order: In progress, Due today, Tomorrow, the rest. A task with a pigIds list shows only to those pigs.",
-            "source": "host tasks, pig tasks, batch task"
+            "logic": "Icon: syringe for vaccination, chart for Production, note otherwise. Order: In progress, Due today, Tomorrow, the rest.",
+            "source": "host tasks, pig tasks, batch task",
+            "at": "Due today · Scheduled vaccination"
           },
           {
             "name": "Task sources",
             "shows": "Which tasks appear",
-            "logic": "Merged from Farrowing's drawer, the pig's own list and the batch (current or next task); de-duplicated by id or title; tasks completed this session are removed."
+            "logic": "Merged from Farrowing's drawer, the pig's own list and the batch (current or next task); de-duplicated by id or title; tasks completed this session are removed.",
+            "at": "Current tasks"
           },
           {
             "name": "Opening a task",
             "shows": "Health, Production or Farrowing task",
-            "rule": "Health task opens Record vaccination (vaccine list only) and completes the task on Save. Production task opens the outcome form. Farrowing or Piglet processing opens the Farrowing prototype (or the drawer's task when embedded). Tasks are single-pig: hidden in bulk actions."
+            "rule": "Health task opens Record vaccination (vaccine list only) and completes the task on Save. Production task opens the outcome form. Farrowing or Piglet processing opens the Farrowing prototype (or the drawer's task when embedded). Tasks are single-pig: hidden in bulk actions.",
+            "at": "Pregnancy check"
           }
         ],
         "controls": [],
@@ -488,7 +505,8 @@
               }
             ],
             "logic": "Born alive and Weaned = mean over completed batches (14 and 12; 13 and 11), one decimal. Weaning wt. = total weaning litter weight / total weaned piglets over batches that have both; a batch with zero weaned is ignored.",
-            "source": "productionOverview"
+            "source": "productionOverview",
+            "at": "Averages"
           },
           {
             "name": "Batch row",
@@ -509,7 +527,8 @@
                 "when": "Completed batch",
                 "shows": "\"N services\" / \"N kg at finish\""
               }
-            ]
+            ],
+            "at": "Batch 16"
           }
         ],
         "controls": [],
@@ -560,7 +579,8 @@
                 "shows": "\"Finish record\" with Finished and Rating"
               }
             ],
-            "logic": "Weaning weight = litter weight / weaned. Dashes for missing values. The note shows only when the record holds one; the author line is finish date and who recorded."
+            "logic": "Weaning weight = litter weight / weaned. Dashes for missing values. The note shows only when the record holds one; the author line is finish date and who recorded.",
+            "at": "Finish weaning"
           }
         ],
         "controls": [],
@@ -598,7 +618,8 @@
                 "shows": "\"Other identities —\""
               }
             ],
-            "logic": "Fixed set of eight rows (Entry type, Birth date, Arrival date, First heat, Birth farm, Genetic line, Dam, Sire); dash when missing."
+            "logic": "Fixed set of eight rows (Entry type, Birth date, Arrival date, First heat, Birth farm, Genetic line, Dam, Sire); dash when missing.",
+            "at": "Origin & dates"
           }
         ],
         "controls": [],
@@ -624,7 +645,8 @@
           {
             "name": "Filter bar",
             "shows": "All activity · All dates · 5 entries · Newest first",
-            "logic": "Same bar as the pen log, without the Equipment category. Categories: Production, Health, Movement, Feed, Measurements, Notes; date presets or custom range; empty or no match shows an empty line."
+            "logic": "Same bar as the pen log, without the Equipment category. Categories: Production, Health, Movement, Feed, Measurements, Notes; date presets or custom range; empty or no match shows an empty line.",
+            "at": "All activity"
           },
           {
             "name": "Entry",
@@ -641,7 +663,8 @@
                 "shows": "Stamped Today · 09:41"
               }
             ],
-            "logic": "Corrections and entered-in-error findings stay in the log."
+            "logic": "Corrections and entered-in-error findings stay in the log.",
+            "at": "Movement"
           }
         ],
         "controls": [],
@@ -686,9 +709,20 @@
                 "state": "Batch membership",
                 "when": "Always listed",
                 "shows": "\"Batch 20 · move or remove\" / \"Add this pig to a batch\"; unavailable (\"No production batches are available.\") when she is in no batch and none exists"
+              },
+              {
+                "state": "Farrowing or piglet processing task",
+                "when": "A current task with that title",
+                "shows": "\"Open Farrowing\" row, or the task row (Piglet processing opens the Farrowing prototype)"
+              },
+              {
+                "state": "Dead sow",
+                "when": "Stage Sow died",
+                "shows": "No Production rows"
               }
             ],
-            "logic": "Production exists only for one pig. Mark not in pig, Remove from batch and Transfer sow render only inside Farrowing's sow drawer. Farrowing's versions of batch moves are hidden when this sheet's own Batch membership row exists."
+            "logic": "Production exists only for one pig. Mark not in pig, Remove from batch and Transfer sow render only inside Farrowing's sow drawer. Farrowing's versions of batch moves are hidden when this sheet's own Batch membership row exists.",
+            "at": "Record miscarriage"
           },
           {
             "name": "Health group",
@@ -705,12 +739,21 @@
                 "shows": "Resolve and Care listed as unavailable with the reason"
               }
             ],
-            "logic": "Edit conditions is bulk only. Farrowing opens these shared flows rather than duplicating them."
+            "logic": "Edit conditions is bulk only. Farrowing opens these shared flows rather than duplicating them.",
+            "at": "Record treatment"
           },
           {
             "name": "General group",
             "shows": "Add a note · Measurements & condition · Adjust feed",
-            "logic": "Adjust feed is unavailable with the reason for ad-lib, dead or no-plan pigs. When Farrowing's Add marker row exists, this sheet hides its own Add a note."
+            "logic": "Adjust feed is unavailable with the reason for ad-lib, dead or no-plan pigs. When Farrowing's Add marker row exists, this sheet hides its own Add a note.",
+            "at": "Add a note",
+            "states": [
+              {
+                "state": "Adjust feed unavailable",
+                "when": "Dead sow, ad-lib pen, or no feeding plan",
+                "shows": "Listed under Unavailable actions with the reason; a single ad-lib pig also gets \"Body condition adjustment · Ad-lib pigs do not have an individual ration.\""
+              }
+            ]
           },
           {
             "name": "Dead sow",
@@ -726,7 +769,8 @@
           {
             "name": "Unavailable actions (N)",
             "shows": "Link at the end",
-            "rule": "A blocked row is listed with its reason, never dropped silently. N = count of blocked rows; footer tabs jump between groups and follow the scroll."
+            "rule": "A blocked row is listed with its reason, never dropped silently. N = count of blocked rows; footer tabs jump between groups and follow the scroll.",
+            "at": "Unavailable actions"
           }
         ],
         "controls": [],
@@ -776,7 +820,8 @@
                 "shows": "Save reads \"Save follow-up\"; the task is not completed"
               }
             ],
-            "rule": "Save is disabled until an outcome is chosen. Not in pig removes the sow from the batch and sets her Off production / Open with no confirmation or undo; returns to the pig record."
+            "rule": "Save is disabled until an outcome is chosen. Not in pig removes the sow from the batch and sets her Off production / Open with no confirmation or undo; returns to the pig record.",
+            "at": "Not in pig"
           }
         ],
         "controls": [],
@@ -804,7 +849,8 @@
           {
             "name": "Reason and Save",
             "shows": "Warning \"This sow will be removed from the batch. Saved records are kept.\"; Reason",
-            "rule": "Reason is required; Save is disabled while empty. Save removes her from the batch, sets Off production / Open, adds \"Miscarriage recorded\" (Production) and returns to the pig record. Single-animal action, hidden from bulk."
+            "rule": "Reason is required; Save is disabled while empty. Save removes her from the batch, sets Off production / Open, adds \"Miscarriage recorded\" (Production) and returns to the pig record. Single-animal action, hidden from bulk.",
+            "at": "Reason"
           }
         ],
         "controls": [],
@@ -850,7 +896,8 @@
                 "shows": "\"No production batches are available.\""
               }
             ],
-            "rule": "Save is disabled until a choice is made. Moving a pig overwrites her stage with the new batch's stage."
+            "rule": "Save is disabled until a choice is made. Moving a pig overwrites her stage with the new batch's stage.",
+            "at": "Current batch"
           }
         ],
         "controls": [],
@@ -888,7 +935,8 @@
                 "shows": "Body condition, Weight (\"A separate value for each pig\"), Backfat; no Temperature"
               }
             ],
-            "logic": "Weight, backfat and temperature take one value per pig."
+            "logic": "Weight, backfat and temperature take one value per pig.",
+            "at": "Record backfat"
           }
         ],
         "controls": [],
@@ -933,14 +981,31 @@
                 "state": "Backfat for boar or piglet",
                 "when": "Not sow or gilt",
                 "shows": "Row reads \"Sows and gilts only\""
+              },
+              {
+                "state": "Row ineligible",
+                "when": "Dead sow, unticked, or backfat on a boar",
+                "shows": "\"Not eligible\" / \"Excluded\" / \"Sows and gilts only\""
+              },
+              {
+                "state": "Blank row",
+                "when": "No value typed",
+                "shows": "\"No reading · unchanged\""
+              },
+              {
+                "state": "Valid change",
+                "when": "Value above 0",
+                "shows": "\"180 → 190 kg\", then \"Ready to save\""
               }
             ],
-            "logic": "Dead sows are excluded; unticked rows stay unchanged."
+            "logic": "Dead sows are excluded; unticked rows stay unchanged.",
+            "at": "Last recorded: 180 kg · 2 days ago"
           },
           {
             "name": "Save",
             "shows": "Save / Save · N pigs",
-            "rule": "N = rows that changed. Disabled until at least one row changed and none has an error; an invalid value blocks the whole save. Writes the readings and a log entry per pig, clears the selection and returns to the walk list. Any value above 0 saves: no plausibility check."
+            "rule": "N = rows that changed. Disabled until at least one row changed and none has an error; an invalid value blocks the whole save. Writes the readings and a log entry per pig, clears the selection and returns to the walk list. Any value above 0 saves: no plausibility check.",
+            "at": "Save"
           }
         ],
         "controls": [],
@@ -980,7 +1045,8 @@
               }
             ],
             "logic": "Preview shows the current body-condition finding name or \"—\".",
-            "rule": "Save adds a Body condition finding with care Monitor (or replaces its name); the log reads \"... · feed unchanged\". Records the finding only; feed changes are made in Adjust feed. Returns to the walk list."
+            "rule": "Save adds a Body condition finding with care Monitor (or replaces its name); the log reads \"... · feed unchanged\". Records the finding only; feed changes are made in Adjust feed. Returns to the walk list.",
+            "at": "Records condition. Feed stays unchanged."
           }
         ],
         "controls": [],
@@ -1009,7 +1075,8 @@
           {
             "name": "Note form",
             "shows": "Add a note; Save / Save · N pigs",
-            "rule": "Save is disabled while empty. The note becomes the pig's note, shown as a Note row on the record, replacing any earlier note (the log keeps both). Several pigs: the same note is recorded separately for each included pig. Allowed on a dead sow. Returns to the walk list."
+            "rule": "Save is disabled while empty. The note becomes the pig's note, shown as a Note row on the record, replacing any earlier note (the log keeps both). Several pigs: the same note is recorded separately for each included pig. Allowed on a dead sow. Returns to the walk list.",
+            "at": "Note"
           }
         ],
         "controls": [],
@@ -1066,7 +1133,8 @@
                 "shows": "\"No production batches are available.\""
               }
             ],
-            "logic": "Grouped Production, Health, General; every row disabled with the reason as sub-line. A blocked action is listed with its reason, never dropped silently."
+            "logic": "Grouped Production, Health, General; every row disabled with the reason as sub-line. A blocked action is listed with its reason, never dropped silently.",
+            "at": "No open conditions to resolve."
           }
         ],
         "controls": [],

@@ -305,16 +305,21 @@ function openFeature(id, sel) {
         sh.replace(/\([^)]*\)/g, '').split(/\s[+·]\s|,|;/).forEach((p) => cand.push(p));
         cand.push(String(e.name || '').split('·').pop());
         let hit = null, viaAt = false;
-        for (const t of [].concat(e.at || [])) { hit = find(t); if (hit) { viaAt = true; break; } } // `at`: text visible inside the element
+        for (const t of [].concat(e.at || [])) { // `at`: a CSS selector (starts with [ . #), else visible text, else an aria-label / title
+          if (/^[\[.#]/.test(t)) { let n = null; try { n = [...phone.querySelectorAll(t)].find((x) => { const r = x.getBoundingClientRect(); return r.width > 2 && r.height > 2 && r.top < 844; }); } catch (_) {} if (n) { hit = { e: n, r: n.getBoundingClientRect() }; viaAt = 'sel'; break; } continue; }
+          hit = find(t);
+          if (!hit) { const nt = norm(t), n = [...phone.querySelectorAll('[aria-label],[title]')].find((x) => { const r = x.getBoundingClientRect(); return r.width > 2 && r.height > 2 && [x.getAttribute('aria-label'), x.getAttribute('title')].some((v) => norm(v) === nt); }); if (n) { hit = { e: n, r: n.getBoundingClientRect() }; viaAt = 'sel'; break; } }
+          if (hit) { viaAt = true; break; }
+        }
         if (!hit) for (const c of cand) { hit = find(c); if (hit) break; }
-        if (hit && viaAt) { const box2 = hit.e.closest('button, a, li, [role=button], [role=tab], [data-action], [class*="card"], [class*="row"]'); if (box2 && phone.contains(box2) && box2 !== phone) { const r2 = box2.getBoundingClientRect(); if (r2.width > 2 && r2.height > 2 && r2.height < 400) hit = { e: box2, r: r2 }; } }
+        if (hit && viaAt === true) { const box2 = hit.e.closest('button, a, li, [role=button], [role=tab], [data-action], [class*="card"], [class*="row"]'); if (box2 && phone.contains(box2) && box2 !== phone) { const r2 = box2.getBoundingClientRect(); if (r2.width > 2 && r2.height > 2 && r2.height < 400) hit = { e: box2, r: r2 }; } }
         if (!hit) { card.classList.add('off'); missing.push(e.name); return; }
         const r = hit.r, L = r.left * k, T = r.top * k, R = r.right * k, B = r.bottom * k, cy = Math.max(1, Math.min(H - S - 1, (T + B) / 2 - S / 2)), G = 4;
         const free = (x, y) => inside(x, y) && !hits(x, y, texts) && !hits(x, y, taken);
-        let spot = [[L - S - G, cy], [L - S - G, T - S - G], [R + G, cy], [L, T - S - G], [L, B + G], [R + G, T - S - G]].find(([x, y]) => free(x, y)), leader = false;
+        let spot = [[L - S - G, T - S - G], [R + G, T - S - G], [L - S - G, cy], [R + G, cy]].find(([x, y]) => free(x, y)), leader = false;
         if (!spot) { // a pin in the phone's left or right margin, with a hairline to the element
           const sides = [2, W - S - 2].sort((p, q) => Math.abs(p - (L + R) / 2) - Math.abs(q - (L + R) / 2));
-          for (const dy of [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6]) { const y = cy + dy * (S + 2); const x = sides.find((sx) => inside(sx, y) && !hits(sx, y, taken) && !hits(sx, y, texts)); if (x != null) { spot = [x, y]; break; } }
+          for (const dy of [0, 1, -1]) { const y = cy + dy * (S + 2); const x = sides.find((sx) => inside(sx, y) && !hits(sx, y, taken) && !hits(sx, y, texts)); if (x != null) { spot = [x, y]; break; } }
           if (!spot) { const x = sides.find((sx) => !hits(sx, cy, taken)); if (x != null) spot = [x, cy]; }
           leader = !!spot;
         }

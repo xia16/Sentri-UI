@@ -121,82 +121,102 @@
             "states": [
               {
                 "state": "Alert",
-                "when": "A confirmed exception exists for the task (count > 0)",
-                "shows": "Exception count and its label, rank 0. No Home sample reaches it"
+                "when": "f.alert.count > 0 (a confirmed exception). No sample reaches it: Home never supplies alert",
+                "shows": "Exception count and its label, rank 0"
               },
               {
                 "state": "Live",
-                "when": "Farrowing only: at least one sow is flagged active in the scope",
-                "shows": "\"N sows farrowing\"; supporting line \"N past expected date\" if any, else \"N due today\""
+                "when": "Farrowing only: at least one sow row in the scope is flagged active",
+                "shows": "\"N sows farrowing\"; supporting line \"N due today\" when due > 0 (the \"N past expected date\" line needs a late count, which no sample supplies)"
               },
               {
                 "state": "Past expected",
-                "when": "Farrowing only: nothing live, some sows past their expected date without a final record",
-                "shows": "\"N sows past expected date\" · \"No final record\". Home never supplies a late count, so it is not reached"
+                "when": "Farrowing, no live sow, late > 0. No sample reaches it: Home never supplies late",
+                "shows": "\"N sows past expected date\" · \"No final record\""
               },
               {
                 "state": "Due",
-                "when": "Any other task: eligible items in the scope > 0",
-                "shows": "\"N <task label>\" (sows ready to check, litters with care due…) plus one supporting line; \"N past due\" replaces it if anything is overdue, and the card moves up a rank"
+                "when": "Not farrowing and the due count in the scope is > 0",
+                "shows": "\"N <task label>\" (sows ready to check, sows ready for service, litters with care due); one supporting line: pregnancy \"N scheduled later\" (unrecorded minus due), heat and return-heat \"Current round\", else none. Farrowing with no live sow: \"N sows due today\", no supporting line"
+              },
+              {
+                "state": "Overdue",
+                "when": "Due > 0 and f.overdue > 0. No sample reaches it: Home never supplies overdue",
+                "shows": "Supporting line \"N past due\" replaces the other line; rank 1"
+              },
+              {
+                "state": "Pregnancy rechecks / breeding split",
+                "when": "f.rechecks > 0, or f.first and f.repeat supplied. No sample reaches it",
+                "shows": "\"N rechecks due\" (before \"scheduled later\"); breeding \"N first · N repeat\""
               },
               {
                 "state": "Ready to complete",
-                "when": "All required work recorded and nothing blocks closure",
-                "shows": "Quiet \"All required work recorded\", full bar, \"Review & complete task\" row; no timing pill, no footer"
+                "when": "?work=ready and the card has a completion bar (heat and return-heat are excluded)",
+                "shows": "Quiet \"All required work recorded\", bar full, \"Review & complete task\" row; timing pill and footer hidden"
               },
               {
                 "state": "Waiting for another task",
-                "when": "Ready, but a task it depends on is still open (closureBlockedBy)",
-                "shows": "\"Waiting for <task> to close\" in the quiet style. Coded, no sample reaches it"
+                "when": "Ready and closureBlockedBy is set. No sample reaches it",
+                "shows": "\"Waiting for <task> to close\", quiet style"
               },
               {
                 "state": "Unit work complete",
-                "when": "This unit is finished but the task is still open elsewhere (unitComplete)",
-                "shows": "\"Unit work complete · task still open\". Coded, no sample reaches it"
+                "when": "f.unitComplete is set. No sample reaches it",
+                "shows": "\"Unit work complete · task still open\""
               },
               {
                 "state": "Waiting",
-                "when": "Nothing due; the next event is known",
-                "shows": "\"<Next label> · <time>\" such as \"Next care · Tomorrow\" or \"Next expected · Tomorrow\"; no count; sorted under \"Next\". With no known next event: \"Waiting for heat confirmations\" / \"Waiting for next scheduled care\" / \"Waiting for farrowing records\" / \"No work due now\""
+                "when": "The card's preview state is waiting (Pregnancy Batch 32, Breeding, Piglet processing), ?work=waiting, or nothing is due or live in the scope (Farrowing in Unit 8)",
+                "shows": "\"<Next> · <time>\": \"Next care\", \"Next checks\", \"Next service\", \"Next expected\", \"Next check\" + \"Tomorrow\" (nextAt of a day or more) or hh:mm; no count, sorted under \"Next\""
+              },
+              {
+                "state": "Waiting, next unknown",
+                "when": "Nothing due and no nextLabel. No sample reaches it: every sample card has a nextAt",
+                "shows": "\"Waiting for heat confirmations\" (breeding), \"Waiting for next scheduled care\" (piglet), \"Waiting for farrowing records\" (postpartum), else \"No work due now\""
               },
               {
                 "state": "Round complete",
-                "when": "Heat check or return-heat check only, and the round was explicitly closed",
-                "shows": "\"Round complete · Next check · 14:30\", no progress bar"
+                "when": "Heat or return-heat card whose preview state is round-complete (Return-heat Batch 30, Heat Batch 35) or ?work=round-complete",
+                "shows": "\"Round complete · Next check · 14:30\", no progress bar. Other tasks fall back to Waiting"
               },
               {
                 "state": "Closed",
-                "when": "Completed or ended early",
+                "when": "completedAt or terminatedAt is set",
                 "shows": "Compact receipt at the bottom (see Closed task card)"
               }
             ],
             "logic": "Evaluated in this order: closed, alert, task-specific work due, ready, unit complete, next scheduled action. A full bar, a finished unit or one full session never proves the whole task is ready. Home's sample data forces Piglet processing to \"Waiting\" (cardFields.piglet27.state) so its due counts of 2 + 2 are ignored unless ?work=active.",
             "rule": "Counts are unique animals or litters in the selected scope, never procedures. The headline is what is actionable now; it is not total minus completed when eligibility depends on time.",
-            "source": "resolveAttention() in astra-home-task-card.js; HOME-TASK-DISPLAY-RULES.md"
+            "source": "resolveAttention() in astra-home-task-card.js; HOME-TASK-DISPLAY-RULES.md",
+            "at": "sows farrowing"
           },
           {
             "name": "Task card · headline and supporting line",
             "shows": "2 sows farrowing · 4 due today",
             "logic": "Value = sum of the sample \"due\" counts over the scope (Farrowing due {6:2, 7:2, 8:0}); \"live\" = the next unrecorded sow in each unit except Unit 8, so Overview 2, Unit 6 1, Unit 7 1, Unit 8 none. Only one supporting line is shown, by task: pregnancy and postpartum \"N rechecks due\" else \"N scheduled later\" (unrecorded minus due); breeding \"N first · N repeat\"; heat and return-heat \"Current round\". Label takes the singular for 1 (\"1 sow farrowing\"). With no live sow, due today becomes the headline with no supporting line; with nothing due the card is Waiting.",
-            "source": "taskModel() facts; cardFields in home-astra-prototype.js"
+            "source": "taskModel() facts; cardFields in home-astra-prototype.js",
+            "at": "4 due today"
           },
           {
             "name": "Task card · progress bar",
             "shows": "Farrowings recorded · 7 / 18 sows",
             "logic": "Named aggregate progress: items with a recorded result over all items in the scope (Farrowing Overview 7/18, Unit 6 4/8, Unit 7 1/6, Unit 8 2/4; Piglet processing counts pens, 1/8). Bar width = value/total. Home forces a plain completion bar even where the task itself shows a distribution. Heat and return-heat have no completion bar, and \"recorded in heat\" is an outcome, not progress. The bar is hidden on upcoming cards.",
-            "source": "metric(t, unit); tasks[].counts and measure"
+            "source": "metric(t, unit); tasks[].counts and measure",
+            "at": "7 / 18 sows"
           },
           {
             "name": "Task card · timing pill and footer",
             "shows": "Day 2 of 7 · Across 3 units · View task",
             "logic": "The pill is the position in the batch window (cardFields day, days), \"Today\" when the window is one day; it is context, not a completion measure, and not the litters' own age. It is hidden on a Ready card. \"Across N units\" = units that carry the task (not units with work due); in a unit scope the footer is replaced by an arrow in the header and the card opens that unit's task.",
-            "source": "cardFields.*.day/days; taskModel().scope"
+            "source": "cardFields.*.day/days; taskModel().scope",
+            "at": "Across 3 units"
           },
           {
             "name": "\"Next\" sub-heading and card order",
             "shows": "Next",
             "logic": "Cards sort by attention rank: live farrowing or alert 0, overdue 1, due 2, ready to complete 2.5, waiting 3 (earliest next event first), closed 4. Equal ranks keep their order so the list does not jump. \"Next\" is printed once above the first quiet card (waiting, round complete or upcoming).",
-            "source": "SentriHomeTaskCard.order()"
+            "source": "SentriHomeTaskCard.order()",
+            "at": "Next"
           },
           {
             "name": "Saved-work card",
@@ -229,13 +249,15 @@
               }
             ],
             "logic": "The queue is fictional (three samples). Nothing the other prototypes record feeds it.",
-            "source": "sync{} and pendingExamples in home-astra-prototype.js"
+            "source": "sync{} and pendingExamples in home-astra-prototype.js",
+            "at": "3 records saved on this device"
           },
           {
             "name": "Section and unit scope",
             "shows": "Farrowing ⌄ · Overview · Choose unit · 3 units",
             "logic": "Section on first load = URL `section` when valid, else the last one picked (localStorage sentri-home-prototype-section; ignored if storage is blocked), else Gestation. The second scope button reads \"Choose unit\" with no unit chosen and \"Unit N\" with one; the small figure is the number of units in the section (Farrowing 6, 7, 8; Gestation 7, 8, 9; Breeding 1-4; Nursery 12, 13). Choosing a unit re-runs every card rule on that unit's figures; whole-task closure stays global.",
-            "source": "sections[], scopeRail(), params.get('section')"
+            "source": "sections[], scopeRail(), params.get('section')",
+            "at": "Choose unit"
           },
           {
             "name": "Closed task card",
@@ -253,7 +275,8 @@
               }
             ],
             "logic": "Closed cards collect at the bottom under \"Closed tasks N\" (N = closed instances in the scope), always sort last, and never show due counts again, even if old records would say otherwise.",
-            "source": "tasks[] completedAt/terminatedAt; SentriHomeTaskCard.render"
+            "source": "tasks[] completedAt/terminatedAt; SentriHomeTaskCard.render",
+            "at": "Completed · Today, 09:10"
           }
         ],
         "controls": [],
@@ -310,7 +333,8 @@
             ],
             "logic": "The count is open tasks in the section with unrecorded rows in this unit, so a waiting task counts and can disagree with the cards the unit screen shows. Pigs and pens come from units{}; in the Farrowing section they are overridden (Unit 6: 8 pigs, 4 pens; Unit 7: 7, 4; Unit 8: 4, 2) to match the Farrowing prototype.",
             "rule": "All units of the section are listed with no search (about 15 at most). Choosing a unit narrows counts, not batch time.",
-            "source": "remaining(unit), unitChoices(), units{}, farrowingUnits{}"
+            "source": "remaining(unit), unitChoices(), units{}, farrowingUnits{}",
+            "at": "2 tasks"
           }
         ],
         "controls": [],
@@ -360,7 +384,8 @@
             ],
             "logic": "Units = units in the section; pigs = a fixed population per section; task types = distinct task types with unrecorded rows (pendingTypes), not work due now.",
             "rule": "Selecting a section clears the unit, remembers the section on the device and opens its Overview.",
-            "source": "sections[].units, sections[].population, pendingTypes()"
+            "source": "sections[].units, sections[].population, pendingTypes()",
+            "at": "2 task types ready"
           }
         ],
         "controls": [],
@@ -405,7 +430,8 @@
               }
             ],
             "logic": "Supporting line priority: overdue checks, then due rechecks, then scheduled later; only the first applies and rechecks are inside the main count. A full first-check bar does not complete later checks.",
-            "source": "attention(\"pregnancy\"); facts.later in taskModel()"
+            "source": "attention(\"pregnancy\"); facts.later in taskModel()",
+            "at": "7 scheduled later"
           },
           {
             "name": "Return-heat card",
@@ -423,19 +449,15 @@
               }
             ],
             "rule": "Only explicit activity marks a round complete. No return and a blank mark are not evidence of a completed or negative observation. No Home progress bar, return rate or elapsed-time bar.",
-            "source": "resolveAttention(); roundComplete"
-          },
-          {
-            "name": "Heat check card",
-            "shows": "20 sows to check · Recorded in heat 0 / 20 sows",
-            "logic": "Recorded in heat is an outcome bar, not completion: reaching the target does not close observation work. No overdue count without explicit observation records and a configured deadline.",
-            "source": "displayRules.heat"
+            "source": "resolveAttention(); roundComplete",
+            "at": "Round complete · Next check · 14:30"
           },
           {
             "name": "\"Next\" sub-heading and card order",
             "shows": "Next",
             "logic": "Cards sort by attention rank: live farrowing or alert 0, overdue 1, due 2, ready to complete 2.5, waiting 3 (earliest next event first), closed 4. Equal ranks keep their order so the list does not jump. \"Next\" is printed once above the first quiet card (waiting, round complete or upcoming).",
-            "source": "SentriHomeTaskCard.order()"
+            "source": "SentriHomeTaskCard.order()",
+            "at": "Next"
           },
           {
             "name": "Closed task card",
@@ -453,7 +475,8 @@
               }
             ],
             "logic": "Closed cards collect at the bottom under \"Closed tasks N\" (N = closed instances in the scope), always sort last, and never show due counts again, even if old records would say otherwise.",
-            "source": "tasks[] completedAt/terminatedAt; SentriHomeTaskCard.render"
+            "source": "tasks[] completedAt/terminatedAt; SentriHomeTaskCard.render",
+            "at": "Completed · Today, 08:45"
           }
         ],
         "controls": [],
@@ -466,7 +489,7 @@
         "rules": [],
         "issues": [
           "Batch 32 shows \"Today\" in the pill and \"Next checks · Tomorrow\" in the body.",
-          "Heat check in Breeding shows \"20 sows to check\" and \"0 / 20 sows\" in heat: the same 20 twice."
+          "Heat check (Breeding section) shows \"20 sows to check\" and \"0 / 20 sows\" in heat: the same 20 twice."
         ]
       }
     },
@@ -498,7 +521,8 @@
               }
             ],
             "rule": "Count unique litters, not procedures. A supporting line would be litters with overdue required care; Home supplies none.",
-            "source": "attention(\"piglet\"); displayRules.piglet"
+            "source": "attention(\"piglet\"); displayRules.piglet",
+            "at": "litters with care due"
           }
         ],
         "controls": [],
@@ -530,7 +554,7 @@
             "states": [
               {
                 "state": "Ready",
-                "when": "?work=ready: a card with a completion bar fills to its total",
+                "when": "?work=ready: the card has a completion bar",
                 "shows": "Quiet \"All required work recorded\", full bar, \"Review & complete task\" row; timing pill and footer hidden"
               },
               {
@@ -540,12 +564,13 @@
               },
               {
                 "state": "Blocked",
-                "when": "closureBlockedBy is set",
-                "shows": "\"Waiting for <task> to close\" instead. Coded, no sample reaches it"
+                "when": "closureBlockedBy is set. No sample reaches it: Home never sets it",
+                "shows": "\"Waiting for <task> to close\" instead"
               }
             ],
             "rule": "A full bar never proves readiness by itself; dependencies and future required work must be checked. Closure is whole-task and stays global, not scope-dependent.",
-            "source": "resolveAttention(); facts.readyToComplete, closureBlockedBy"
+            "source": "resolveAttention(); facts.readyToComplete, closureBlockedBy",
+            "at": "Review & complete task"
           }
         ],
         "controls": [],
@@ -587,7 +612,8 @@
               }
             ],
             "logic": "The Tomorrow card (Growth check · Batch 26 · Units 12-13) is fixed sample text, not derived from any task.",
-            "source": "home()"
+            "source": "home()",
+            "at": "No scheduled tasks today"
           }
         ],
         "controls": [],
@@ -636,13 +662,15 @@
               }
             ],
             "logic": "Health and Feed are fictional snapshot counts chosen by the `attention` preview (current, clear, health, feed, maintenance, busy, unknown) and are the same in every unit. Maintenance = open maintenance records of the unit.",
-            "source": "unitStrip(); maintenanceRecords()"
+            "source": "unitStrip(); maintenanceRecords()",
+            "at": "Health"
           },
           {
             "name": "Unit hub · Checked",
             "shows": "Checked Yesterday",
             "logic": "First segment of units[N].checked (the part before the name). Date and checker are sample data; who checked is dropped.",
-            "source": "units{}"
+            "source": "units{}",
+            "at": "Checked Yesterday"
           },
           {
             "name": "Unit hub · Environment & devices",
@@ -664,19 +692,22 @@
                 "shows": "The card is not drawn"
               }
             ],
-            "source": "availableSensors(), unitDevices()"
+            "source": "availableSensors(), unitDevices()",
+            "at": "ppm NH₃"
           },
           {
             "name": "Task cards in a unit",
             "shows": "Pregnancy check · 2 sows ready to check · 2 scheduled later · 2 / 6 sows",
             "logic": "The Overview rules re-run on the unit's figures; the footer is replaced by an arrow; tasks without the unit are hidden.",
-            "source": "scopedTasks()"
+            "source": "scopedTasks()",
+            "at": "2 scheduled later"
           },
           {
             "name": "Coming up",
             "shows": "Coming up · 2 batches",
             "logic": "Collapsed list of the unit's next batches or rounds (Batch 31 Pregnancy check · tomorrow; Batch 30 Return-heat · 14:30). Not shown in the Farrowing section, which has no unit context.",
-            "source": "unitContext[7].next; comingUp()"
+            "source": "unitContext[7].next; comingUp()",
+            "at": "Coming up"
           }
         ],
         "controls": [],
@@ -727,7 +758,8 @@
               }
             ],
             "logic": "No environment card and no Coming up: currentUnitContext() returns nothing for the Farrowing section.",
-            "source": "taskModel(), unitStrip()"
+            "source": "taskModel(), unitStrip()",
+            "at": "2 due today"
           }
         ],
         "controls": [],
@@ -785,13 +817,15 @@
               }
             ],
             "rule": "Only a successful upload clears the queue; a failure keeps every record. The drawer separates records saved on this device from records uploaded for the team.",
-            "source": "showSync(); sync.connection"
+            "source": "showSync(); sync.connection",
+            "at": "Upload 3 records"
           },
           {
             "name": "Record row",
             "shows": "Pregnancy check · 000308 · Gestation · Unit 7 · Batch 31 · 09:32",
             "logic": "Task, animal, place and save time of a queued record. Three fictional samples; nothing the other screens do feeds this queue.",
-            "source": "pendingExamples"
+            "source": "pendingExamples",
+            "at": "Pregnancy check · 000308"
           }
         ],
         "controls": [],
@@ -834,7 +868,8 @@
               }
             ],
             "logic": "Only Farrowing and Piglet processing hand off to real prototypes; every other task lands here.",
-            "source": "placeholder()"
+            "source": "placeholder()",
+            "at": "Batch 31 · All units"
           }
         ],
         "controls": [],
@@ -866,7 +901,8 @@
             "shows": "Complete task",
             "logic": "Enabled only when the card's model state is ready. Sets completedAt \"Today · just now\" and returns to Home, where the card joins Closed tasks.",
             "rule": "Completion is explicit; nothing closes automatically, and it stays inside the task overview.",
-            "source": "complete-task handler"
+            "source": "complete-task handler",
+            "at": "Complete task"
           }
         ],
         "controls": [],
@@ -897,7 +933,8 @@
             "shows": "End task early",
             "logic": "Sets terminatedAt \"Today · just now\". Existing records are kept and unfinished work stays incomplete; the card then shows under Closed tasks as \"Ended early\".",
             "rule": "Consequences must be shown inside each task (batch membership, backfill); this drawer states none.",
-            "source": "confirm-end-task handler"
+            "source": "confirm-end-task handler",
+            "at": "Unfinished work will remain incomplete."
           }
         ],
         "controls": [],
@@ -939,7 +976,8 @@
               }
             ],
             "logic": "The stamp is the instance's completedAt or terminatedAt string. \"Results page not designed yet.\" is a stub.",
-            "source": "tasks[]"
+            "source": "tasks[]",
+            "at": "Task complete"
           }
         ],
         "controls": [],

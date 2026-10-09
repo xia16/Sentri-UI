@@ -186,28 +186,28 @@
             "states": [
               {
                 "state": "Sow in a stage",
-                "when": "Stage start known (stageStartedAt, else service date for gestating, else farrowing date for lactating)",
-                "shows": "Gestation · 42 days"
+                "when": "Stage set; days = walk date minus start (stageStartedAt, else service date for Gestating, farrowing date for Lactating, offProductionSince for Off production)",
+                "shows": "Gestation · 42 days (Gestating reads Gestation, Lactating reads Lactation, other stages by name)"
               },
               {
-                "state": "Sow, no start date",
-                "when": "No date can be found",
+                "state": "Sow, start unusable",
+                "when": "Start missing or after the walk date",
                 "shows": "Gestation · —"
               },
               {
                 "state": "Sow off production, open",
-                "when": "breedingStatus is Open",
+                "when": "Stage Off production and breedingStatus Open",
                 "shows": "Open · 8 days"
               },
               {
                 "state": "Boar, piglet, grower",
                 "when": "Not a sow",
-                "shows": "Type + age: Grower · 63 days old"
+                "shows": "Type + \"N days old\" from age, else birth date; \"Age —\" when neither"
               },
               {
                 "state": "Condition needs attention",
-                "when": "Care is Monitor / Treat in place / Move to hospital pen",
-                "shows": "Tag with \"Day N\", care icon and colour; listed first"
+                "when": "Care is Monitor, Treat in place or Move to hospital pen",
+                "shows": "Tag with \"Day N\" (only when day is a number), care icon and colour; sorted first"
               },
               {
                 "state": "Condition ongoing",
@@ -216,8 +216,8 @@
               },
               {
                 "state": "Feed changed",
-                "when": "Factor other than 100%, a held amount, or stopped",
-                "shows": "Feed +10% / Feed −10% / Feed held / No feed, after the health tags"
+                "when": "One tag only, first match: stopped, then held amount, then factor not 100%",
+                "shows": "No feed / Feed held / Feed +10% (one decimal), after the health tags"
               },
               {
                 "state": "Tags overflow",
@@ -226,7 +226,8 @@
               }
             ],
             "logic": "Duration never falls back to the animal's lifetime age. The checkbox selects the pig only, never its pen.",
-            "source": "stageSummary(p) · cases(p) · careAppearance(k) · pigFeedTags(p) · fitRecordedTags()"
+            "source": "stageSummary(p) · cases(p) · careAppearance(k) · pigFeedTags(p) · fitRecordedTags()",
+            "at": "Gestation · 42 days"
           },
           {
             "name": "Pen header",
@@ -256,22 +257,28 @@
                 "state": "Pen has no matching pig",
                 "when": "Filters exclude all its pigs",
                 "shows": "Pen is hidden, with its feed button"
+              },
+              {
+                "state": "Ad-lib pen with formula due",
+                "when": "Pen mode ad-lib and switchDue (D4)",
+                "shows": "\"Ad-lib\" with \"Formula due\" under it"
+              },
+              {
+                "state": "Pen issue strip",
+                "when": "pen.issue set by the old report path (not seeded)",
+                "shows": "Strip \"Feeder low · 06:40\" under the header"
               }
             ],
             "logic": "Pig count is ALL pigs in the pen, not only those the filter shows. Ticking the pen selects it AND every pig it shows under the current filters; the checkbox is indeterminate when only some are ticked.",
-            "source": "penFeedEntry() · allocation(pe) · pe.switchDue · c.selectedPens"
+            "source": "penFeedEntry() · allocation(pe) · pe.switchDue · c.selectedPens",
+            "at": "7.6 kg"
           },
           {
-            "name": "Lens tabs",
+            "name": "Lens tabs and filter",
             "shows": "All 7 · Health 4 · Feed 3",
-            "logic": "Count = pigs that pass the active filters and the lens. Health counts a pig with any recorded condition, ongoing ones included (000281 Arthritis). Feed counts a pig with a feed change (held, stopped, or a factor other than 100%) and every pig in a pen whose formula change is due.",
-            "source": "matchesLens() · cases(p) · feedNews(p, pen)"
-          },
-          {
-            "name": "Filter button and strip",
-            "shows": "Funnel with number badge; strip \"Batch 20 · Gestating · Fever\" with Clear",
-            "logic": "Badge = active filters among batch, stage, condition, care, manual-feed, health-status. The strip appears only when a filter is on; Care shows its label, not its value. Clear resets every filter and the lens.",
-            "source": "filterN · c.batchFilter, c.stage, c.healthFilter, c.triageFilter"
+            "logic": "Count = pigs that pass the active filters and the lens. Health counts a pig with any recorded condition, ongoing included (000281 Arthritis). Feed counts a pig with a feed change (held, stopped, factor not 100%) and every pig in a pen whose formula change is due. The funnel badge counts active filters (batch, stage, condition, care, manual feed, health status); the strip names them with Clear — health status reads \"Needs attention\" / \"No action needed\", manual feed \"Manual feed\", care shows its label.",
+            "source": "matchesLens() · cases(p) · feedNews(p, pen)",
+            "at": "Health"
           },
           {
             "name": "Dock",
@@ -288,7 +295,8 @@
                 "shows": "Clear, \"Selected · 2 pens · 3 pigs\", View selected, Actions"
               }
             ],
-            "logic": "Scan has no camera in the prototype; Search finds by ear tag or pen."
+            "logic": "Scan has no camera in the prototype; Search finds by ear tag or pen.",
+            "at": "Scan ear tag"
           },
           {
             "name": "Finish walk and last check-in",
@@ -306,7 +314,8 @@
               }
             ],
             "logic": "The name G. Hansen is fixed text, not the signed-in worker.",
-            "source": "c.checkedIn"
+            "source": "c.checkedIn",
+            "at": "Finish walk"
           }
         ],
         "controls": [
@@ -338,7 +347,8 @@
           "The author \"G. Hansen\" and the times 06:40 / 09:41 are fixed text; \"Last check-in\" is not tied to a real check-in.",
           "The pen-level \"issue\" banner (Feeder low · 06:40) is in the code but the sample data clears it, so it never shows; the 2nd-round study removed the feeder alert.",
           "Filters for health status (needs attention / no action needed) and manual-feed have state and a strip label but no control sets them.",
-          "Search, review and the Scan list show the raw stage \"Gestating\" while the row shows \"Gestation · 40 days\"."
+          "Search, review and the Scan list show the raw stage \"Gestating\" while the row shows \"Gestation · 40 days\".",
+          "An ongoing condition on day 1 reads \"1 days\"; plural is not handled."
         ]
       }
     },
@@ -374,7 +384,8 @@
               }
             ],
             "logic": "\"Open\" shows only when the status is explicit, never inferred from a missing service date. Days never fall back to lifetime age.",
-            "source": "stageSummary(p)"
+            "source": "stageSummary(p)",
+            "at": "Open · 8 days"
           }
         ],
         "controls": [],
@@ -403,10 +414,16 @@
                 "state": "Boar or piglet",
                 "when": "Not a sow",
                 "shows": "Type + age in days (p.age, else from birth date)"
+              },
+              {
+                "state": "Age unknown",
+                "when": "No age and no birth date",
+                "shows": "\"Boar · Age —\""
               }
             ],
             "logic": "B1 and P1 are ad-lib pens, so the pen feed shows \"Ad-lib\" with no weight and no feed editing. Detail blocks on the record follow the animal type.",
-            "source": "typeDetails"
+            "source": "typeDetails",
+            "at": "Boar · 420 days old"
           }
         ],
         "controls": [],
@@ -433,7 +450,8 @@
             "name": "Pen header · fault mark",
             "shows": "Nothing",
             "logic": "No fault mark is drawn on the list: penEntry() only knows the note. The fault appears only in the pen log after it is reported.",
-            "source": "penEntry()"
+            "source": "penEntry()",
+            "at": "· 3 pigs"
           }
         ],
         "controls": [],
@@ -468,13 +486,15 @@
                 "shows": "No card; row reads \"Add pen note\""
               }
             ],
-            "logic": "Author and time as saved (\"today · 09:41\" for notes saved in this session). Notes are attached to the pen, never recorded on its pigs."
+            "logic": "Author and time as saved (\"today · 09:41\" for notes saved in this session). Notes are attached to the pen, never recorded on its pigs.",
+            "at": "Close the aisle gate after passing."
           },
           {
             "name": "Feed guidance row",
             "shows": "Gestation 1 · 7.6 kg",
             "logic": "Formula name + allocation in kg, \"Station-fed\" or \"Ad-lib\". Opens the reading page first; its Adjust feed button opens the editor.",
-            "source": "feedLabel"
+            "source": "feedLabel",
+            "at": "Gestation 1 · 7.6 kg"
           }
         ],
         "controls": [],
@@ -519,7 +539,8 @@
                 "shows": "\"Closed · Kept in pen log\", closer and time, Undo close (disabled when a new note was written meanwhile)"
               }
             ],
-            "rule": "One note per pen. Saving replaces the text and overwrites the author with the editor and \"today · 09:41\"; the old text survives only in the log. Close note moves the note to the pen log (\"Pen note closed\", original author) and clears the pen; Undo close restores it and logs \"Pen note reopened\"."
+            "rule": "One note per pen. Saving replaces the text and overwrites the author with the editor and \"today · 09:41\"; the old text survives only in the log. Close note moves the note to the pen log (\"Pen note closed\", original author) and clears the pen; Undo close restores it and logs \"Pen note reopened\".",
+            "at": "Edit note"
           }
         ],
         "controls": [],
@@ -554,13 +575,15 @@
             "name": "Filter bar",
             "shows": "Category select and date button, result line",
             "logic": "Categories: All, Production, Health, Movement, Feed, Measurements, Notes, Equipment (Equipment for the pen log only). Date: all / Today / Last 7 / Last 30 / custom. Custom needs both dates, end on or after start (\"Choose a start and end date.\" / \"End date must be on or after start date.\"). Results newest first; Clear appears when a filter is on.",
-            "source": "eventCategory"
+            "source": "eventCategory",
+            "at": "All activity"
           },
           {
             "name": "Entry",
             "shows": "Type tag, title, note, date · time · author",
             "logic": "Grouped by date taken from the entry; entries with no known date stay under their own label (\"Before this walk\"); dates are never invented. Pen entries append the ids of the pigs that took part.",
-            "source": "eventCategory"
+            "source": "eventCategory",
+            "at": "Pen note added"
           }
         ],
         "controls": [],
@@ -589,7 +612,8 @@
             "name": "Filter fields",
             "shows": "Production stage, Disease or symptom, Care",
             "logic": "Options come from the unit's pigs: stages and condition names found there. Care: No action needed · Monitor · Treat in place · Move to hospital pen. Reset clears the draft; Show pigs applies it.",
-            "source": "filter state in main()"
+            "source": "filter state in main()",
+            "at": "Production stage"
           }
         ],
         "controls": [],
@@ -639,10 +663,21 @@
                 "state": "Current pen",
                 "when": "It is at the top of the list",
                 "shows": "Outlined cell"
+              },
+              {
+                "state": "Filtered view",
+                "when": "A filter is on",
+                "shows": "Counts and \"No matches\" use only the pigs the filter shows"
+              },
+              {
+                "state": "Peek preview",
+                "when": "Hold 350 ms",
+                "shows": "Pen id and pigs, \"N pigs in this view\" when filtered, feed line, \"Formula change due\", up to 3 pigs with conditions then \"+N more pigs with health findings\", manual-feed count, \"Pen note available\""
               }
             ],
             "rule": "Holding a cell 350 ms shows a preview (pig count, feed, conditions, manual-feed pigs, note) without navigating, same as farrowing. Tapping scrolls the list so the pen sits under the sticky controls.",
-            "logic": "Same four-column, six-row map as farrowing; positions are sample positions, not the real layout."
+            "logic": "Same four-column, six-row map as farrowing; positions are sample positions, not the real layout.",
+            "at": "2 health"
           }
         ],
         "controls": [],
@@ -656,7 +691,8 @@
         "issues": [
           "\"N health\" counts ongoing conditions and reads like a pig count.",
           "The peek preview has a fault line that is never filled.",
-          "Long-press may be unsuitable on mobile (audit)."
+          "Long-press may be unsuitable on mobile (audit).",
+          "The peek feed line labels a pen of unknown feeding mode as \"Ad-lib\"."
         ]
       }
     },
@@ -695,7 +731,8 @@
                 "shows": "Same sheet plus \"Camera scanning is not connected in this prototype.\" and \"Try sample tag 000306\""
               }
             ],
-            "logic": "Row shows the pen id and the raw stage name. Search and scan only navigate; saving a record is the only write."
+            "logic": "Row shows the pen id and the raw stage name. Search and scan only navigate; saving a record is the only write.",
+            "at": "7 pigs found"
           }
         ],
         "controls": [],
@@ -754,26 +791,34 @@
                 "state": "Production group",
                 "when": "Exactly one pig",
                 "shows": "Hidden for several pigs or pens so a group never gets a single-sow workflow"
+              },
+              {
+                "state": "Adjust feed unavailable",
+                "when": "No selected pig can be fed",
+                "shows": "Reason is that of the first selected pig only (Pig has died / Ad-lib feeding has no fixed daily allowance / No feeding plan recorded)"
+              },
+              {
+                "state": "Health group empty",
+                "when": "No selected pig is alive",
+                "shows": "Group and its rows are absent"
               }
             ],
             "logic": "Rows that do not apply move to \"Unavailable actions (N)\" with the reason. Dead sows get only a note.",
-            "source": "ASTRA-BULK-ACTIONS"
+            "source": "ASTRA-BULK-ACTIONS",
+            "at": "Edit conditions"
           },
           {
             "name": "Measurements & condition menu",
             "shows": "Body condition, weight, backfat, temperature",
             "logic": "Weight takes a separate value per pig. Backfat for sows and gilts only. Temperature is offered for one pig only.",
-            "rule": "Batch save applies only to included, changed rows; an invalid entered value blocks the whole save."
-          },
-          {
-            "name": "Pigs / Pens switch",
-            "shows": "Tabs at the top when pens are ticked",
-            "logic": "The Pens tab offers Pen note and Feed. Selecting a pen selects its pigs; there is no pen-level health or feed record."
+            "rule": "Batch save applies only to included, changed rows; an invalid entered value blocks the whole save.",
+            "at": "Measurements & condition"
           },
           {
             "name": "Footer tabs",
             "shows": "Health · General",
-            "logic": "Jump to a group; the active tab follows the scroll."
+            "logic": "Jump to a group; the active tab follows the scroll.",
+            "at": "General"
           }
         ],
         "controls": [],
@@ -817,7 +862,8 @@
                 "shows": "The sheet closes and the selection clears"
               }
             ],
-            "logic": "Pig row shows the raw stage name (\"Gestating\"), not the list's stage-and-days text."
+            "logic": "Pig row shows the raw stage name (\"Gestating\"), not the list's stage-and-days text.",
+            "at": "Selected"
           }
         ],
         "controls": [],
@@ -855,7 +901,8 @@
                 "shows": "One event each (health, measurement, note, feed change, pen note, fault), newest first"
               }
             ],
-            "logic": "Time is always 09:41 and author G. Hansen in the prototype."
+            "logic": "Time is always 09:41 and author G. Hansen in the prototype.",
+            "at": "No updates yet"
           }
         ],
         "controls": [],
@@ -883,7 +930,8 @@
             "name": "Check-in",
             "shows": "Recorded during this walk · 0; Check in to Unit 7",
             "logic": "The count is updates saved in this walk. Check-in records only that the unit was walked; it does not mark pigs healthy or instructions completed.",
-            "rule": "Allowed with nothing recorded and pens unseen."
+            "rule": "Allowed with nothing recorded and pens unseen.",
+            "at": "Recorded during this walk"
           }
         ],
         "controls": [],
@@ -916,7 +964,8 @@
                 "shows": "\"1 update\" (singular)"
               }
             ],
-            "logic": "Time is fixed at 09:41; the count is the walk's event count."
+            "logic": "Time is fixed at 09:41; the count is the walk's event count.",
+            "at": "Checked in at 09:41"
           }
         ],
         "controls": [],
@@ -1159,7 +1208,8 @@
                 "shows": "Farrowing · 2 days; record shows Farrowing · In progress · Batch 20, opening the Farrowing prototype"
               }
             ],
-            "logic": "Stage is set from the batch task; days since the stage start 10 Sep. Farrowing is hidden in bulk actions. Next task after farrowing: Weaning on Thu 1 Oct."
+            "logic": "Stage is set from the batch task; days since the stage start 10 Sep. Farrowing is hidden in bulk actions. Next task after farrowing: Weaning on Thu 1 Oct.",
+            "at": "Lactation · 2 days"
           }
         ],
         "controls": [],
@@ -1180,10 +1230,11 @@
         "purpose": "One batch with two production tasks running at once: In-heat check and Breeding.",
         "elements": [
           {
-            "name": "Pig record · Current tasks",
+            "name": "Pig row · stage and tasks",
             "shows": "In-heat check · N days in progress / Breeding",
             "logic": "Each sow sees only the task she belongs to (task.pigIds); the batch's next task (Pregnancy check, Mon 5 Oct) appears once none is current. All five rows read \"In heat · 2 days\".",
-            "rule": "Several current production tasks can run for one batch."
+            "rule": "Several current production tasks can run for one batch.",
+            "at": "In heat · 2 days"
           }
         ],
         "controls": [],
@@ -1221,7 +1272,8 @@
                 "when": "None installed",
                 "shows": "\"No sensors installed\""
               }
-            ]
+            ],
+            "at": "Environment"
           },
           {
             "name": "Equipment faults",
@@ -1237,7 +1289,8 @@
                 "when": "No open fault",
                 "shows": "\"No open equipment faults\""
               }
-            ]
+            ],
+            "at": "Equipment faults"
           }
         ],
         "controls": [],
@@ -1265,7 +1318,8 @@
             "name": "Batch tracker",
             "shows": "Pregnancy check · 5 pigs · Next · Tomorrow · 13 Sep",
             "logic": "Running tasks show \"N pigs · N days in progress\"; otherwise the next task with its date.",
-            "rule": "Opening a batch offers a deliberate filter (Show pigs in this batch); swiping does not silently change the list."
+            "rule": "Opening a batch offers a deliberate filter (Show pigs in this batch); swiping does not silently change the list.",
+            "at": "Batch tracker"
           }
         ],
         "controls": [],
@@ -1302,7 +1356,8 @@
                 "shows": "\"No open faults\""
               }
             ],
-            "logic": "A fault belongs to one device in one pen."
+            "logic": "A fault belongs to one device in one pen.",
+            "at": "Drinking station"
           }
         ],
         "controls": [],
@@ -1328,7 +1383,8 @@
           {
             "name": "Report form",
             "shows": "Device and description",
-            "rule": "Device is Feeding station / Drinking station / Other equipment; Other adds a device name field. Report fault stays disabled until device and description (and name for Other) are filled. Choosing a device that already has an open fault opens that fault instead of a duplicate."
+            "rule": "Device is Feeding station / Drinking station / Other equipment; Other adds a device name field. Report fault stays disabled until device and description (and name for Other) are filled. Choosing a device that already has an open fault opens that fault instead of a duplicate.",
+            "at": "Device"
           }
         ],
         "controls": [],
@@ -1362,7 +1418,8 @@
                 "when": "After resolving",
                 "shows": "\"Resolved 09:41 · G. Hansen\" and the note"
               }
-            ]
+            ],
+            "at": "Reported 06:40"
           }
         ],
         "controls": [],
