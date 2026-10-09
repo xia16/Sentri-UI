@@ -1,213 +1,102 @@
 {
+  "round": 3,
   "status": "in-design",
-  "judged": "2026-10-09",
-  "commit": "3e3f835",
+  "judged": "2026-10-10",
+  "commit": "8e198e7",
   "model": "claude-opus-5-5",
-  "scores": {
-    "clarity": 5,
-    "budget": 6,
-    "hierarchy": 6,
-    "spacing": 5,
-    "broken": 2
-  },
-  "lowest": 2,
+  "scores": { "clarity": 8, "budget": 8, "hierarchy": 7, "spacing": 8, "broken": 7 },
+  "lowest": 7,
   "checklist": [
-    {
-      "line": 1,
-      "pass": true,
-      "why": "Replaces native select; ChoiceList multi named"
-    },
-    {
-      "line": 2,
-      "pass": true,
-      "why": "Two to four outcomes: the Choice field named as the alternative"
-    },
-    {
-      "line": 3,
-      "pass": false,
-      "why": "Trigger parts named; the sheet (title, search, tabs, selected tray, footer) is not"
-    },
-    {
-      "line": 4,
-      "pass": false,
-      "why": "Only single exists in the DS; the multi and nested pickers that screens need are unspecified"
-    },
-    {
-      "line": 5,
-      "pass": false,
-      "why": "Error, loading and empty \"not drawn\"; disabled dims (forbidden by the DS law)"
-    },
-    {
-      "line": 6,
-      "pass": false,
-      "why": "Trigger 47px in the preview; 40px (Care, Method) and 44px (Conditions) on screens"
-    },
-    {
-      "line": 7,
-      "pass": false,
-      "why": "No cap on options before search or nesting"
-    },
-    {
-      "line": 8,
-      "pass": true,
-      "why": "Selected option: check + 600"
-    },
-    {
-      "line": 9,
-      "pass": false,
-      "why": "No long-value truncation; the multi trigger joins names with commas"
-    },
-    {
-      "line": 10,
-      "pass": false,
-      "why": "listbox/option roles, but no keyboard model for nested levels"
-    },
-    {
-      "line": 11,
-      "pass": false,
-      "why": "#bdc7b6 and raw px; inspection CSS overrides the trigger six times (12px font, 40-44px)"
-    },
-    {
-      "line": 12,
-      "pass": false,
-      "why": "The Conditions trigger on record-health has no visible label; placeholder \"Choose ...\" instead of \"Select\""
-    },
-    {
-      "line": 13,
-      "pass": false,
-      "why": "The condition sheet shows a header back arrow, a close X and footer Back together, plus Done"
-    },
-    {
-      "line": 14,
-      "pass": false,
-      "why": "No related links or classification"
-    },
-    {
-      "line": 15,
-      "pass": false,
-      "why": "The real multi picker breaks: after the first tick the list disappears"
-    }
+    { "line": 1, "pass": true, "why": "One-line job; ChoiceList radio named as the alternative" },
+    { "line": 2, "pass": true, "why": "When / when-not name Segment, Field, optional rows and TaskChoice" },
+    { "line": 3, "pass": true, "why": "Anatomy names chosen names vs count, › steps, and the single/multi footer difference" },
+    { "line": 4, "pass": true, "why": "single, multi, cascade, cascade-multi, each with use / not-use and an atlas tab" },
+    { "line": 5, "pass": true, "why": "Nine states per variant; single Active now shows the value (Low appetite), not the label" },
+    { "line": 6, "pass": true, "why": "Triggers 48-65, rows 56-58, steps 48, footer 48 (Back 86 wide on screens); nothing under 48 on the three bare screens" },
+    { "line": 7, "pass": true, "why": "Eight rows before scroll; search spans the tree (\"cough\" finds Coughing under Respiratory system)" },
+    { "line": 8, "pass": true, "why": "Checkbox tick, check, count, bold label; not colour" },
+    { "line": 9, "pass": true, "why": "No \"0 selected\" or \"1 options\"; group meta only above zero (\"2 selected\")" },
+    { "line": 10, "pass": true, "why": "aria-current on last step, › separators aria-hidden, Escape closes and focus returns to the trigger" },
+    { "line": 11, "pass": true, "why": "Last host override (.st-picker-trigger height:48px) removed; tokens only" },
+    { "line": 12, "pass": true, "why": "Visible labels; Select / None defaults" },
+    { "line": 13, "pass": true, "why": "Back leaves and keeps the draft (verb law), Done · n confirms, single has Back only" },
+    { "line": 14, "pass": true, "why": "Related, classification, references, changelog present" },
+    { "line": 15, "pass": true, "why": "Tapped condition picker: 4 ticks across Symptoms and Diseases, steps, Done, reopen, 5th tick, Back, search, Escape; medicine pick writes the path. Works; two display defects below" }
   ],
   "classification": "component",
   "variants": [
     {
-      "name": "single (flat/sectioned)",
-      "usedBy": [
-        "health-record.edit-finding",
-        "health-record.record-health (Care)",
-        "inspection.filters",
-        "farrowing.death"
-      ],
+      "name": "single",
+      "usedBy": ["health-record.treatment (Method, Unit)", "health-record.edit-finding (Care)", "farrowing.death"],
+      "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": ["Fixed: Back only, Active shows the picked value, demo relabelled Cause"]
+    },
+    {
+      "name": "multi",
+      "usedBy": ["inspection.filters"],
+      "status": "agent-checked",
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
+      "findings": ["Filter keeps \"n selected\"; Back / Done · n per the verb law"]
+    },
+    {
+      "name": "cascade",
+      "usedBy": ["health-record.medicine-picker"],
       "status": "in-design",
-      "scores": {
-        "clarity": 7,
-        "budget": 7,
-        "hierarchy": 7,
-        "spacing": 5,
-        "broken": 5
-      },
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 7, "spacing": 8, "broken": 8 },
       "findings": [
-        "Trigger height is 40, 44, 47 or 48px across screens because of host overrides",
-        "Placeholder copy varies: Select / Choose method / Choose unit / Select medicine"
+        "Fixed: no \"1 options\" meta; step row reads All › Antibiotics; pick commits and writes the path",
+        "Not fixed: the medicine sheet's only footer action, Back, is still the full-width filled primary (host footer, not pickerFooter)",
+        "Trigger path uses \" / \" (Antibiotics / Antibiotic B) while the sheet uses ›; reopening starts at All with no check on the current medicine",
+        "Atlas cascade demo labels the field Medicine but browses Symptoms"
       ]
     },
     {
-      "name": "multi (condition picker)",
-      "usedBy": [
-        "health-record.condition-picker",
-        "health-record.record-health"
-      ],
+      "name": "cascade-multi",
+      "usedBy": ["health-record.condition-picker", "health-record.record-health"],
       "status": "in-design",
-      "scores": {
-        "clarity": 4,
-        "budget": 5,
-        "hierarchy": 5,
-        "spacing": 5,
-        "broken": 1
-      },
+      "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 7 },
       "findings": [
-        "An unclosed <details> in bulkHealthPicker (ux/system/inspection-astra-concept.js:699) swallows the catalogue: after one tick the list vanishes behind \"1 selected\"; opening it shows the ticked row twice and the list clipped",
-        "Four exits: header back arrow, header close X, footer Back and Done",
-        "Search covers only the open group: \"fev\" in General appearance finds nothing and offers Add \"fev\"",
-        "The trigger is a fork (.bulk-condition-button) with no label, and writes the names joined by commas instead of \"n selected\"",
-        "Checkbox on the left; a native disclosure triangle"
-      ]
-    },
-    {
-      "name": "nested single (medicine picker)",
-      "usedBy": [
-        "health-record.medicine-picker"
-      ],
-      "status": "in-design",
-      "scores": {
-        "clarity": 7,
-        "budget": 7,
-        "hierarchy": 7,
-        "spacing": 7,
-        "broken": 6
-      },
-      "findings": [
-        "The category level is navigate rows; no path is written back (\"Antibiotics / Amoxicillin\")"
+        "Fixed: › separated steps with the last step current; \"2 selected\" only on chosen groups; Record health shows names",
+        "Record health trigger with 4 conditions clamps at 2 lines and cuts \"· +1\" off (\"…Porcine reproductive and…\"; scrollHeight 59 > clientHeight 39): the worker cannot see that more are chosen"
       ]
     }
   ],
   "findings": [
     {
-      "severity": "high",
-      "text": "The multi condition picker loses its list on the first selection: `<details class=\"chooser-selected\">...</div>` is never closed, so .health-catalog renders inside the collapsed <details>.",
-      "fix": "Close the tag (`</div></details>`). Better: replace the disclosure with a \"1 selected\" ChoiceList navigate row that opens a review level."
-    },
-    {
-      "severity": "high",
-      "text": "Screens need multi and nested pickers, but the component defines only single and sends callers to ChoiceList multi, so every host builds its own sheet.",
-      "fix": "Give PickerField the sheet, with the variants single, multi, cascade and cascade-multi (see proposals), and draw the rows with ChoiceList."
-    },
-    {
-      "severity": "high",
-      "text": "The condition sheet stacks four exits (back arrow, close X, Back, Done).",
-      "fix": "Show the header back arrow only while a level is open; keep footer Back (leaves and keeps the draft) + \"Done · n\"; drop the X."
+      "severity": "medium",
+      "text": "Record-form names are line-clamped after \"+n\" is appended, so with long names the \"+n\" is the part that gets cut (Record health, 4 conditions: \"Weakness or unsteady stance · Reduced appetite · Porcine reproductive and…\").",
+      "fix": "Render \"+n\" in its own unclamped span after the clamped names span in pickerField, so the count is always visible."
     },
     {
       "severity": "medium",
-      "text": "Host CSS forks the trigger (12px text, 40-44px), and Conditions uses a separate .bulk-condition-button with no label.",
-      "fix": "Delete the six .st-picker-trigger overrides in inspection-astra-concept.css. Render Conditions as pickerField({label:\"Conditions\", display:\"2 selected\"}), with the trigger at min-height 48."
-    },
-    {
-      "severity": "medium",
-      "text": "Search covers only the open group, so a symptom in another group reads as missing and invites a custom duplicate.",
-      "fix": "Search the whole catalogue (both kinds) and show each hit with its path as meta (\"Symptoms · General appearance\")."
+      "text": "Medicine picker's sole Back is still drawn as the full-width filled primary button; everywhere else Back is secondary (round-2 finding, not fixed).",
+      "fix": "Render the medicine sheet footer with SentriUI.pickerFooter({multi:false}) instead of the host footer, which gives a secondary Back."
     },
     {
       "severity": "low",
-      "text": "`disabled` dims the trigger, which the DS law forbids; placeholder copy drifts from \"Select\".",
-      "fix": "Remove disabled. Default the placeholder to \"Select\", and to \"None\" for multi."
+      "text": "Path written two ways: trigger \"Antibiotics / Antibiotic B\", sheet \"All › Antibiotics\".",
+      "fix": "pickerField: join path with \" › \" to match the step row."
+    },
+    {
+      "severity": "low",
+      "text": "Reopening the medicine picker starts at All with nothing marked, so the current pick is not shown.",
+      "fix": "Host opens at the stored path's parent level with the chosen leaf selected."
+    },
+    {
+      "severity": "low",
+      "text": "Atlas Overview demos Conditions (a record form) as \"1 selected\", and the cascade demo browses Symptoms under a Medicine label.",
+      "fix": "Overview: pass names:[\"Low appetite\"]; cascade.html: use medicine categories for items."
     }
   ],
-  "proposals": [
-    {
-      "kind": "new-variant",
-      "name": "PickerField multi",
-      "why": "Flat or sectioned multi-select: trailing checkboxes (ChoiceList multi), footer Back + \"Done · n selected\", trigger shows \"n selected\" or \"None\", and the selected items as a \"n selected\" row at the top, not a <details>",
-      "seenIn": [
-        "health-record.condition-picker",
-        "inspection.filters"
-      ]
-    },
-    {
-      "kind": "new-variant",
-      "name": "PickerField cascade",
-      "why": "The ADM/Vant/TDesign Cascader model: one level at a time, a step row of the chosen levels that can be tapped to go back, auto-advance on pick, and the path written back to the trigger (\"Antibiotics / Amoxicillin\")",
-      "seenIn": [
-        "health-record.medicine-picker"
-      ]
-    },
-    {
-      "kind": "new-variant",
-      "name": "PickerField cascade-multi",
-      "why": "The condition picker: kind (Diseases/Symptoms) to group to ticked leaves. A step row replaces the tabs and the back-arrow header; group rows carry \"n selected\" meta; search spans the whole tree with path meta; ticks across branches persist; \"Done · n\"",
-      "seenIn": [
-        "health-record.condition-picker"
-      ]
-    }
+  "proposals": [],
+  "previous": [
+    { "finding": "Back and Done in the multi footer do the same thing", "fixed": true, "note": "Reversed: no longer a defect. Back = leave and keep the draft is the repo's verb law; Done · n confirms; README says so. Verified Back after a 5th tick keeps it on the trigger" },
+    { "finding": "Record health shows \"4 selected\" instead of the chosen names", "fixed": true, "note": "Names joined by · on the trigger, filters keep the count; but the +n is clipped by the 2-line clamp (new finding)" },
+    { "finding": "pickerBody prints \"0 selected\" / \"1 options\" branch meta", "fixed": true, "note": "Symptoms list has no zero meta; \"2 selected\" on chosen groups only; medicine categories have no meta" },
+    { "finding": "Single shows Back + Done and Active renders the label as value", "fixed": true, "note": "Single footer is Back only; Active shows Low appetite; demo label is Cause" },
+    { "finding": "Step row has no separator", "fixed": true, "note": "All › Symptoms › General appearance, last step bold with aria-current" },
+    { "finding": "inspection-subpages-refinement.css pins the trigger height", "fixed": true, "note": "Selector removed" },
+    { "finding": "cascade variant: Back drawn as filled primary on the medicine sheet", "fixed": false, "note": "Still the host's filled primary Back" }
   ]
 }
