@@ -579,38 +579,38 @@ body{background:var(--ground);color:var(--ink)}
 :root{--st-canvas:var(--app-background);--st-paper:var(--paper);--st-inset:var(--inset);--st-ink:var(--ink);--st-muted:var(--muted);--st-line:var(--line);--st-rule:var(--rule);--st-panel-bg:var(--st-paper);--st-space-section:var(--space-section);--st-radius:var(--radius-panel);--drawer-medium-height:var(--drawer-medium-max);--drawer-long-height:var(--drawer-long-max)}
 [data-st-context="page"]{--st-panel-bg:var(--st-paper);--st-context-bg:var(--st-canvas)}
 [data-st-context="drawer"]{--st-panel-bg:var(--st-inset);--st-context-bg:var(--st-paper)}
-.st-heading.st-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-12);margin:0 0 var(--space-12);padding:0;min-height:0;border:0;background:transparent;color:var(--st-ink)}
+.st-heading.st-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-12);margin:0 0 var(--space-heading);padding:0;min-height:0;border:0;background:transparent;color:var(--st-ink)}
 .st-heading .st-heading-main{min-width:0;flex:1}
-.st-heading.st-heading .st-heading-title{display:flex;align-items:center;gap:var(--space-8);font:500 var(--font-size-13)/1.5 var(--font-sans);letter-spacing:0;margin:0;padding:0;border:0;color:var(--st-ink);text-transform:none}
+.st-heading.st-heading .st-heading-title{display:flex;align-items:center;gap:var(--space-8);font:500 var(--type-section-title-size)/1.5 var(--font-sans);letter-spacing:0;margin:0;padding:0;border:0;color:var(--st-ink);text-transform:none}
 .st-heading.st-heading .st-heading-title>span:not(.st-heading-icon){font:inherit;letter-spacing:inherit;color:inherit;margin:0}
 .st-heading-icon{display:inline-flex;align-items:center;justify-content:center;flex:none;width:var(--size-16);height:var(--size-20);color:var(--st-muted)}
 .st-heading-icon svg{display:block;width:var(--size-16);height:var(--size-16);fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.st-heading.st-heading .st-heading-description{font:400 var(--font-size-11)/1.5 var(--font-sans);letter-spacing:0;color:var(--st-muted);margin:var(--space-5) 0 0}
+.st-heading.st-heading .st-heading-description{font:400 var(--type-description-size)/1.5 var(--font-sans);letter-spacing:0;color:var(--st-muted);margin:var(--space-5) 0 0}
 .st-heading[data-has-icon="true"] .st-heading-description{margin-left:var(--space-24)}
 .st-heading-aside{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:var(--space-8);flex:none;max-width:46%;min-height:var(--size-20)}
-.st-heading .st-heading-meta{font:400 var(--font-size-10)/1.5 var(--font-sans);color:var(--st-muted);white-space:normal;text-align:right}
+.st-heading .st-heading-meta{font:400 var(--type-meta-size)/1.5 var(--font-sans);color:var(--st-muted);white-space:normal;text-align:right}
 .st-heading-action{display:flex;align-items:center}
-.st-heading .st-heading-action :is(button,a){display:inline-flex;align-items:center;gap:var(--space-6);min-height:var(--tap-min);margin:calc(-1 * var(--space-14)) 0;padding:0 0 0 var(--space-4);border:0;border-radius:var(--radius-6);background:transparent;font:500 var(--font-size-11)/1.5 var(--font-sans);color:var(--st-ink);text-decoration:none}
+.st-heading .st-heading-action :is(button,a){display:inline-flex;align-items:center;gap:var(--space-6);min-height:var(--tap-min);margin:calc((var(--size-20) - var(--tap-min)) / 2) 0;padding:0 0 0 var(--space-4);border:0;border-radius:var(--radius-6);background:transparent;font:500 var(--type-description-size)/1.5 var(--font-sans);color:var(--st-ink);text-decoration:none}
 .st-heading .st-heading-action :is(button,a){min-width:var(--tap-min);justify-content:center;touch-action:manipulation}
 .st-heading-action svg{width:var(--size-14);height:var(--size-14);fill:none;stroke:currentColor;stroke-width:1.6;flex:none}
-.st-heading[data-kind="page"] .st-heading-title{font-size:var(--font-size-22);line-height:1.3;letter-spacing:var(--tracking-page)}
+.st-heading[data-kind="page"] .st-heading-title{font-size:var(--type-page-title-size);line-height:1.3;letter-spacing:var(--tracking-page)}
 .st-heading[data-kind="page"] .st-heading-description{margin-top:var(--space-6)}
-[data-st-context="drawer"] .st-heading[data-kind="page"] .st-heading-title{font-size:var(--font-size-20)}
+[data-st-context="drawer"] .st-heading[data-kind="page"] .st-heading-title{font-size:var(--type-sheet-title-size)}
 .st-heading[data-kind="group"]{margin-bottom:var(--space-8)}
-.st-heading[data-kind="group"] .st-heading-title{font-size:var(--font-size-11);color:var(--st-muted)}
-.st-heading[data-kind="panel"] .st-heading-title{font-size:var(--font-size-12)}
+.st-heading[data-kind="group"] .st-heading-title{font-size:var(--type-group-label-size);color:var(--st-muted)}
 /* Class specificity deliberately beats retained legacy information-grid skins.
    Component layout and content semantics remain independent. */
 [data-st-context] .st-panel.st-panel.st-panel{background:var(--st-panel-bg);border:1px solid var(--st-line);border-radius:var(--st-radius);box-shadow:none;color:var(--st-ink)}
 .st-panel{padding:var(--space-16)}
 .st-panel .st-panel{--st-panel-bg:transparent}
-.st-facts.st-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-18) var(--space-20);margin:0;padding:var(--space-16)}
+.st-facts.st-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-18) var(--space-20);margin:0;padding:var(--space-panel)}
 .st-facts[data-columns="3"]{grid-template-columns:repeat(3,minmax(0,1fr))}
 .st-facts[data-columns="1"]{grid-template-columns:1fr}
 .st-fact{min-width:0}
-.st-fact dt{font:400 var(--font-size-11)/1.5 var(--font-sans);color:var(--st-muted);margin:0 0 var(--space-5)}
-.st-fact dd{font:500 var(--font-size-14)/1.5 var(--font-sans);color:var(--st-ink);margin:0;overflow-wrap:anywhere}
-.st-fact small{display:block;font-size:var(--font-size-10);line-height:1.5;color:var(--st-muted);margin-top:var(--space-4)}
+.st-fact dt{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--st-muted);margin:0 0 var(--space-5)}
+.st-fact dd{font:500 var(--type-fact-value-size)/1.5 var(--font-sans);color:var(--st-ink);margin:0;overflow-wrap:break-word}
+.st-fact-id{font-family:var(--font-mono);white-space:nowrap}
+.st-fact small{display:block;font-size:var(--type-meta-size);line-height:1.5;color:var(--st-muted);margin-top:var(--space-4)}
 .st-row.st-row{display:flex;align-items:center;gap:var(--space-12);width:100%;min-height:var(--row-min);margin:0;padding:var(--space-12) var(--space-14);border:0;border-radius:0;background:transparent;text-align:left;text-decoration:none;font-family:var(--font-sans);color:var(--st-ink)}
 .st-row+.st-row{border-top:1px solid var(--st-rule)}
 .st-row.st-row .st-row-icon{display:grid;place-items:center;width:var(--size-34);height:var(--size-34);border-radius:var(--radius-10);background:var(--row-icon-bg);color:var(--row-icon-ink);flex:none}
@@ -632,16 +632,18 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 .st-action-section.st-action-section{margin:0}
 .st-action-section+.st-action-section{margin-top:var(--space-32)}
 /* Actions and destinations share the same row geometry and contextual group. */
-.st-log.st-log{padding:var(--space-16);margin:0}
+.st-log.st-log{padding:var(--space-panel);margin:0}
 .st-log-group+.st-log-group{margin-top:var(--space-24)}
-.st-log .st-heading{margin-bottom:var(--space-12)}
+.st-log .st-heading{margin-bottom:var(--space-heading)}
+.st-log-entries{list-style:none;margin:0;padding:0}
 .st-log-entry{position:relative;margin:0 0 0 var(--space-4);padding:0 0 var(--space-18) var(--space-18);border-left:1px solid var(--log-line)}
 .st-log-entry:before{content:'';position:absolute;left:calc(-1 * var(--space-4));top:var(--space-6);width:var(--size-7);height:var(--size-7);border-radius:50%;background:var(--log-dot)}
 .st-log-entry:last-child{border-left-color:transparent;padding-bottom:0}
-.st-log-entry .st-log-title{display:block;font:500 var(--font-size-13)/1.5 var(--font-sans);color:var(--st-ink)}
-.st-log-entry p{font:400 var(--font-size-11)/1.5 var(--font-sans);color:var(--st-muted);margin:var(--space-4) 0}
-.st-log-entry>small{display:block;font:400 var(--font-size-10)/1.5 var(--font-sans);color:var(--st-muted);margin-top:var(--space-4)}
-.st-log-category{display:inline-block;margin:0 0 var(--space-4);font-size:var(--font-size-9);line-height:1.5;color:var(--st-muted)}
+.st-log-entry .st-log-title{display:block;font:500 var(--type-row-title-size)/1.5 var(--font-sans);color:var(--st-ink)}
+.st-log-entry p{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--st-muted);margin:var(--space-4) 0}
+.st-log-entry>small{display:block;font:400 var(--type-meta-size)/1.5 var(--font-sans);color:var(--st-muted);margin-top:var(--space-4)}
+.st-log-category{display:inline-block;margin:0 0 var(--space-4);font-size:var(--type-meta-size);line-height:1.5;color:var(--st-muted)}
+.st-log-entry p.st-log-was{margin:var(--space-4) 0 0}
 .st-log-extra{margin-top:var(--space-8)}
 .st-empty{margin:0;font-size:var(--font-size-12);line-height:1.6;color:var(--st-muted)}
 .st-section+.st-section{margin-top:var(--st-space-section)}
@@ -1454,20 +1456,13 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .sp-note { margin: 0 var(--space-gutter) var(--space-heading); }
 .sp-quiet { margin: 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
 .sp-empty { margin: var(--space-section) var(--space-gutter); font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); text-align: center; }
-.sp-warn { margin: 6px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--amber); }
+.sp-weigh.sp-weigh { margin-top: var(--space-4); font-size: var(--type-description-size); font-weight: 400; color: var(--amber); }
 .sheet-footer.sp-two > * { flex: 1 1 0; min-width: 0; }
 @keyframes sp-tick-in { from { transform: scale(.7); background: var(--paper); border-color: var(--muted); } to { transform: none; } }
 @keyframes sp-tick-draw { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: none; } }
 
 /* ---- inside a pen, as farrowing's sow sheet: the Piglets card (Litter summary · View log ›), the tool row, the day
    cards; [⋯] beside the footer's one action ---- */
-.sp-pcard > .st-heading { margin-bottom: 8px; }
-.sp-pfacts .st-fact dd { margin: 0; }
-/* a figure that acts on itself: the fact's value as a button (the value, a small chevron) */
-.sp-fact-act { display: inline-flex; align-items: center; gap: 4px; min-height: var(--tap-min); min-width: var(--tap-min); margin: -12px 0; padding: 0; border: 0; background: none;
-  color: var(--ink); font: 500 var(--type-button-size)/1.3 var(--font-sans); text-align: left; cursor: pointer; }
-.sp-fact-act [data-empty] { color: var(--muted); }
-.sp-fact-act svg { flex: none; width: 12px; height: 12px; fill: none; stroke: var(--muted); stroke-width: 2; }
 /* farrowing's in-sheet tool row (Edit · Record death · More actions): outlined tools sharing the width */
 .sp-toolrow { display: flex; gap: var(--space-key-gap); }
 .sp-tool { flex: 1 1 0; min-width: 0; min-height: var(--tap-min); display: flex; align-items: center; justify-content: center; gap: 5px;
@@ -1518,7 +1513,6 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .button.sp-wide { width: 100%; }
 
 /* Move: the other pens as tiles, four to a line */
-.sp-pick > .st-heading { margin-bottom: 8px; }
 .sheet-body > .sp-pick + * { margin-top: var(--space-section); }
 
 /* ---- outside the phone: the demo controls ----
@@ -1560,7 +1554,6 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .sp-pigrow + .sp-pigrow { border-top: 1px solid var(--line); }
 .sp-pigrow > .tk-row { flex: 1; min-width: 0; }
 /* Processing: a section title like the Piglets card's; the Done section sits last */
-.sp-proc > .st-heading { margin-bottom: 8px; }
 .sp-proc > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
 .tk-day[data-when="done"] .tk-day-head > strong { color: var(--muted); }
 
@@ -1650,18 +1643,42 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   const tx=(text,o,key)=>{const id=o&&o.strs&&o.strs[key];return id?`<span${sa(id,o.args&&o.args[key])}>${esc(text)}</span>`:esc(text);};
   const has=(o,key)=>!!(o&&o.strs&&o.strs[key]);
   const arrow='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
+  /* Heading: three kinds. page = the title of a screen or sheet (title + description only). section = the title of a block,
+     above its panel (the only kind with icon, meta and action). group = labels a run of rows or log entries inside one
+     panel (muted; title + description only). "panel" is retired: it reads as section. A slot the kind does not carry is
+     dropped with a dev warning. action is raw HTML, or { label, action, value, ariaLabel, disabled } for the standard
+     text link with its › (48px). */
+  function headingAction(a){
+    if(!a||typeof a==='string')return a||'';
+    const attrs=a.ariaLabel?{'aria-label':a.ariaLabel}:{};
+    return button({label:a.label,register:'text',action:a.action,value:a.value||'',waiting:!!a.disabled,attrs,strs:a.strs,args:a.args}).replace(/<\/button>$/,arrow+'</button>');
+  }
   function heading({title,icon='',description='',meta='',action='',kind='section',level=4,className='',strs,args}={}){
     const o={strs,args};
-    const k=['page','section','group','panel'].includes(kind)?kind:'section',h=Math.max(1,Math.min(6,Number(level)||4));
+    const k=oneOf('Heading','kind',kind==='panel'?'section':kind,['page','section','group'],'section'),h=Math.max(1,Math.min(6,Number(level)||4));
+    if(k!=='section'&&(icon||meta||action||has(o,'meta'))){warn('Heading',`${k}: icon, meta and action belong to a section heading; dropped`);icon='';meta='';action='';}
+    const act=headingAction(action);
     const showDesc=description||has(o,'description'),showMeta=meta||has(o,'meta');
-    return `<div class="st-heading ${esc(className)}" data-ds="Heading" data-kind="${k}"${icon?' data-has-icon="true"':''}><div class="st-heading-main"><h${h} class="st-heading-title">${icon?`<span class="st-heading-icon">${icon}</span>`:''}<span${sa(strs&&strs.title,args&&args.title)}>${esc(title)}</span></h${h}>${showDesc?`<p class="st-heading-description">${tx(description,o,'description')}</p>`:''}</div>${showMeta||action?`<div class="st-heading-aside">${showMeta?`<span class="st-heading-meta">${tx(meta,o,'meta')}</span>`:''}${action?`<span class="st-heading-action">${action}</span>`:''}</div>`:''}</div>`;
+    return `<div class="st-heading ${esc(className)}" data-ds="Heading" data-kind="${k}"${icon?' data-has-icon="true"':''}><div class="st-heading-main"><h${h} class="st-heading-title">${icon?`<span class="st-heading-icon">${icon}</span>`:''}<span${sa(strs&&strs.title,args&&args.title)}>${esc(title)}</span></h${h}>${showDesc?`<p class="st-heading-description">${tx(description,o,'description')}</p>`:''}</div>${showMeta||act?`<div class="st-heading-aside">${showMeta?`<span class="st-heading-meta">${tx(meta,o,'meta')}</span>`:''}${act?`<span class="st-heading-action">${act}</span>`:''}</div>`:''}</div>`;
   }
   function panel(content,{className='',tag='div',ds='Panel'}={}){
     const t=['div','section','article','aside','dl'].includes(tag)?tag:'div';
     return `<${t} class="st-panel ${esc(className)}" data-ds="${esc(ds)}">${content}</${t}>`;
   }
+  /* Facts: read-only label–value pairs. They never act: no button or link in a value (valueHtml is for markup such as an
+     ID in mono, and is refused when it holds a control). columns: 2 (default), 3 (short counts) or 1 (a long value that needs the full width). mono: true sets an ID. */
   function facts(items,{className='',columns=2}={}){
-    return `<dl class="st-panel st-facts ${esc(className)}" data-ds="Facts" data-columns="${columns===3?3:columns===1?1:2}">${items.map(i=>`<div class="st-fact"><dt>${tx(i.label,i,'label')}</dt><dd>${i.valueHtml!=null?i.valueHtml:has(i,'value')?tx(i.value,i,'value'):esc(i.value==null||i.value===''?'—':i.value)}</dd>${i.meta||has(i,'meta')?`<small>${tx(i.meta,i,'meta')}</small>`:''}</div>`).join('')}</dl>`;
+    const cols=columns===3?3:columns===1?1:2;
+    const valueOf=i=>{
+      if(i.valueHtml!=null){
+        if(/<(button|a)[\s>]|role=["']?button/i.test(i.valueHtml)){warn('Facts','valueHtml holds a control; facts never act, so it was dropped. Put the action in a Row or a link below.');return esc(i.value==null||i.value===''?'—':i.value);}
+        return i.valueHtml;
+      }
+      if(has(i,'value'))return tx(i.value,i,'value');
+      const v=i.value==null||i.value===''?'—':i.value;
+      return i.mono?`<span class="st-fact-id">${esc(v)}</span>`:esc(v);
+    };
+    return `<dl class="st-panel st-facts ${esc(className)}" data-ds="Facts" data-columns="${cols}">${items.map(i=>`<div class="st-fact"><dt>${tx(i.label,i,'label')}</dt><dd>${valueOf(i)}</dd>${i.meta||has(i,'meta')?`<small>${tx(i.meta,i,'meta')}</small>`:''}</div>`).join('')}</dl>`;
   }
   function rowGroup(content,{title='',level=5,className='',strs,args}={}){
     return panel((title||has({strs},'title')?heading({title,kind:'group',level,className:'st-row-group-label',strs,args}):'')+content,{className:'st-row-group '+className,ds:'Row'});
@@ -1714,11 +1731,66 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     const btn=button(Object.assign({register:'secondary'},act,{id:aid,labelledby:`${aid} ${tid}`}));
     return `<div class="st-row ${esc(className)}" data-ds="Row" data-act="" id="${esc(rid)}"${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${door}${rowChip(chip,'','Row')}${btn}</div>`;
   }
-  /* groups: [{label, strs:{label}, args:{label}, entries:[{category,title,detail,meta,strs:{…},args:{…}}]}]; options.strs.empty for the empty line. */
-  function log(groups,{className='',empty='No activity recorded yet',strs,args}={}){
+  /* Log: the history tail. One entry per recorded act; the group label carries the day; an entry's stamp is "time · who"
+     with an absent part left out. Two variants: day (default) and categorised (a kind word above each title, with a kind
+     filter above the panel).
+     groups: [{label, description, strs, args, entries:[{title, detail, meta | at+by, category, corrected, was, extraHtml, strs, args}]}]
+     options: empty, kind ('day' | 'categorised'), correctedLabel, strs.empty. */
+  const pad2=n=>String(n).padStart(2,'0');
+  /* at: a Date, epoch ms, 'HH:MM' (today), or 'YYYY-MM-DD' / 'YYYY-MM-DDTHH:MM' (read as local time). Returns {date, timed} or null. */
+  function logWhen(at){
+    if(at==null||at==='')return null;
+    if(at instanceof Date)return isNaN(at)?null:{date:at,timed:true};
+    if(typeof at==='number')return {date:new Date(at),timed:true};
+    const t=String(at).match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+    if(t){const d=new Date();d.setHours(+t[1],+t[2],0,0);return {date:d,timed:true};}
+    const m=String(at).match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/);
+    return m?{date:new Date(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0)),timed:!!m[4]}:null;
+  }
+  /* The stamp on an entry: "07:14 · G.H". A missing time or author is left out, never printed as a placeholder. A full
+     name ("G. Hansen") is written as initials: records carry initials. */
+  const initialsOf=n=>{const p=String(n||'').trim().split(/\s+/).filter(Boolean);return p.length>1?`${p[0][0]}.${p[p.length-1][0]}`:p[0]||'';};
+  function logStamp(at,by=''){
+    const w=logWhen(at);
+    return [w&&w.timed?`${pad2(w.date.getHours())}:${pad2(w.date.getMinutes())}`:'',initialsOf(by)].filter(Boolean).join(' · ');
+  }
+  /* The group label for a day: Today, Yesterday, the weekday within the past week, then "Jul 8" (with the year when it
+     is not this year). lang picks the weekday and month names; today and yesterday are the caller's words. */
+  function logDay(at,{now=new Date(),lang='en',today='Today',yesterday='Yesterday'}={}){
+    const w=logWhen(at),n=logWhen(now);if(!w||!n)return '';
+    const day=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate()),diff=Math.round((day(n.date)-day(w.date))/864e5);
+    if(diff===0)return today;
+    if(diff===1)return yesterday;
+    if(diff>1&&diff<7)return w.date.toLocaleDateString(lang,{weekday:'short'});
+    return w.date.toLocaleDateString(lang,Object.assign({month:'short',day:'numeric'},w.date.getFullYear()!==n.date.getFullYear()?{year:'numeric'}:{}));
+  }
+  /* Flat entries with an `at` become newest-first day groups; entries with no date go last under `earlier`. */
+  function logGroups(entries,{now=new Date(),lang='en',today='Today',yesterday='Yesterday',earlier='Earlier'}={}){
+    const dated=[],undated=[];
+    entries.forEach((e,i)=>{const w=logWhen(e.at);(w?dated:undated).push({e,i,t:w?w.date.getTime():0});});
+    dated.sort((a,b)=>b.t-a.t||a.i-b.i);
+    const groups=[];
+    const add=(label,e)=>{const g=groups[groups.length-1];if(g&&g.label===label)g.entries.push(e);else groups.push({label,entries:[e]});};
+    dated.forEach(x=>add(logDay(x.e.at,{now,lang,today,yesterday}),x.e));
+    undated.forEach(x=>add(earlier,x.e));
+    return groups;
+  }
+  function log(groups,{className='',empty='No activity recorded yet',kind='day',correctedLabel='Corrected',strs,args}={}){
+    const k=oneOf('Log','kind',kind,['day','categorised'],'day');
     const nonempty=groups.filter(g=>g.entries?.length);
-    if(!nonempty.length)return panel(`<p class="st-empty">${tx(empty,{strs,args},'empty')}</p>`,{className:'st-log '+className,ds:'Log'});
-    return panel(nonempty.map(g=>`<section class="st-log-group">${g.label||has(g,'label')?heading({title:g.label,kind:'group',description:g.description||'',strs:has(g,'label')||has(g,'description')?{title:g.strs.label,description:g.strs.description}:undefined,args:g.args&&(g.args.label||g.args.description)?{title:g.args.label,description:g.args.description}:undefined}):''}<div class="st-log-entries">${g.entries.map(e=>`<article class="st-log-entry">${e.category||has(e,'category')?`<span class="st-log-category">${tx(e.category,e,'category')}</span>`:''}<strong class="st-log-title">${tx(e.title,e,'title')}</strong>${e.detail||has(e,'detail')?`<p>${tx(e.detail,e,'detail')}</p>`:''}${e.meta||has(e,'meta')?`<small>${tx(e.meta,e,'meta')}</small>`:''}${e.extraHtml?`<div class="st-log-extra">${e.extraHtml}</div>`:''}</article>`).join('')}</div></section>`).join(''),{className:'st-log '+className,ds:'Log'});
+    const mark=h=>h.replace('class="st-panel',`data-kind="${k}" class="st-panel`);
+    if(!nonempty.length)return mark(panel(`<p class="st-empty">${tx(empty,{strs,args},'empty')}</p>`,{className:'st-log '+className,ds:'Log'}));
+    const same=(a,b)=>String(a).trim().toLowerCase()===String(b).trim().toLowerCase();
+    const entry=e=>{
+      let detail=e.detail;
+      if(detail&&same(detail,e.title)){warn('Log',`detail repeats the title ("${e.title}"); dropped`);detail='';}
+      if(k==='day'&&e.category)warn('Log','category belongs to the categorised variant; dropped');
+      const meta=e.meta||(e.at!=null||e.by?logStamp(e.at,e.by):'');
+      const word=k==='categorised'&&(e.category||has(e,'category'))?tx(e.category,e,'category'):'';
+      const fixed=e.corrected||e.was?esc(correctedLabel):'';
+      return `<li class="st-log-entry"${fixed?' data-corrected=""':''}>${word||fixed?`<span class="st-log-category">${[word,fixed].filter(Boolean).join(' · ')}</span>`:''}<strong class="st-log-title">${tx(e.title,e,'title')}</strong>${detail||has(e,'detail')?`<p>${tx(detail,e,'detail')}</p>`:''}${e.was?`<p class="st-log-was">${esc(e.was)}</p>`:''}${meta||has(e,'meta')?`<small>${tx(meta,e,'meta')}</small>`:''}${e.extraHtml?`<div class="st-log-extra">${e.extraHtml}</div>`:''}</li>`;
+    };
+    return mark(panel(nonempty.map(g=>`<section class="st-log-group">${g.label||has(g,'label')?heading({title:g.label,kind:'group',description:g.description||'',strs:has(g,'label')||has(g,'description')?{title:g.strs.label,description:g.strs.description}:undefined,args:g.args&&(g.args.label||g.args.description)?{title:g.args.label,description:g.args.description}:undefined}):''}<ol class="st-log-entries">${g.entries.map(entry).join('')}</ol></section>`).join(''),{className:'st-log '+className,ds:'Log'}));
   }
   /* strs.back = the Back text; categories[i].strs.label = each tab. The nav aria-label stays plain text. */
   function categoryFooter({categories=[],active='',backAction='back',categoryAction='action-category',label='Action categories',className='',strs,args}={}){
@@ -2418,7 +2490,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     e.preventDefault();e.stopImmediatePropagation();const target=buttons.find(x=>x.dataset.value===next);target.click();
     const fresh=Array.from(host.querySelectorAll('[data-ds="Segment"] button,[data-ds="FilterChips"] button')).find(x=>x.dataset.action===b.dataset.action&&x.dataset.value===next);fresh?.focus();fresh?.scrollIntoView({block:'nearest',inline:'nearest'});
   },true);
-  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
@@ -2806,7 +2878,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'idf.notch': 'Notch', 'idf.sex': 'Sex', 'idf.submit': 'Record {n} piglets', 'idf.submit.1': 'Record 1 piglet', 'idf.submit.0': 'Record piglets',
     'idf.add': 'Add the piglets that get an ID.', 'idf.remove': 'Remove row {n}', 'idf.saved': '{n} piglets saved', 'idf.saved.1': '1 piglet saved', 'idf.saved.0': 'Litter saved',
     'idf.row': 'Fill in the number and the sex.', 'w.title': 'Litter weight', 'w.sub': '{pen} · day {d}', 'w.kg': 'Weight (kg)',
-    'log.title': 'Pen log', 'log.born': 'Born {n}', 'log.dead.birth': '{n} dead at birth', 'log.death': 'Died · {n}', 'log.move': '{n} moved to {to}',
+    'log.title': 'Pen log', 'log.yest': 'Yesterday', 'log.ids': 'IDs given · {n}', 'log.none': 'No activity recorded yet', 'log.born': 'Born {n}', 'log.dead.birth': '{n} dead at birth', 'log.death': 'Died · {n}', 'log.move': '{n} moved to {to}',
     'log.count': 'Count set to {n}', 'log.treat': '{tr} · {n}', 'log.id': 'ID {no}', 'log.pick': 'Breeders picked', 'log.weight': 'Litter weighed · {w} kg',
     'bulk.finish': 'Finish {tr} · {k} of {m} pens', 'bulk.finish.1': 'Finish {tr} · {k} of 1 pen', 'bulk.finish.caption': 'HOLD TO FINISH',
     'batch.unacc': 'Batch {b} · {n} piglets unaccounted', 'batch.unacc.1': 'Batch {b} · 1 piglet unaccounted',
@@ -2915,7 +2987,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'idf.notch': '耳缺', 'idf.sex': '性别', 'idf.submit': '记录{n}头仔猪', 'idf.submit.0': '记录仔猪',
     'idf.add': '请添加仔猪信息。', 'idf.remove': '删除第{n}行', 'idf.saved': '已提交{n}头', 'idf.saved.0': '已提交整窝信息',
     'idf.row': '请填写编号和性别。', 'w.title': '整窝体重', 'w.sub': '{pen} · 第{d}天', 'w.kg': '体重（公斤）',
-    'log.title': '本栏记录', 'log.born': '出生{n}头', 'log.dead.birth': '出生时死亡{n}头', 'log.death': '死亡{n}头', 'log.move': '{n}转到{to}',
+    'log.title': '本栏记录', 'log.yest': '昨天', 'log.ids': '给编号 · {n}头', 'log.none': '还没有记录', 'log.born': '出生{n}头', 'log.dead.birth': '出生时死亡{n}头', 'log.death': '死亡{n}头', 'log.move': '{n}转到{to}',
     'log.count': '头数改为{n}', 'log.treat': '{tr} · {n}', 'log.id': '编号{no}', 'log.pick': '选好种猪', 'log.weight': '称重 · {w}公斤',
     'bulk.finish': '完成{tr} · {m}栏中已做{k}栏', 'bulk.finish.caption': '按住完成',
     'batch.unacc': '第{b}批 · {n}头对不上',
@@ -3615,26 +3687,22 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     return '<section class="sp-proc">' + html + '</section>';
   }
   /* Piglets: what is in the pen now, then the identified piglets. Born and deaths are history: they live in the pen log. */
-  /* The Piglets card: farrowing's "Litter summary · View log ›" — a section heading with its link, then the facts. Each
-     figure acts on itself: piglets now → Set count; boars · gilts → the counts; litter weight → the weight pad; tagged
-     and breeders → the identified piglets (where breeders are marked). */
-  function factBtn(action, value, empty) {
-    return '<button type="button" class="sp-fact-act" data-action="' + action + '" data-value=""' + (P.s.ended ? ' aria-disabled="true"' : '') + '>' +
-      '<span' + (empty ? ' data-empty=""' : '') + '>' + esc(value) + '</span>' + I('chevron') + '</button>';
-  }
+  /* The Piglets card: farrowing's "Litter summary · View log ›" — a section heading with its link, then the facts. Facts
+     only read; each figure's act lives elsewhere: Tag piglets opens the identified piglets (tagged, breeders), the weight
+     and the boars · gilts count are in More, and a litter not yet weighed shows one link below the facts. */
   function pigletsCard(p) {
     var w = lastWeight(p), every = P.hasId() && scheme() !== 'breeders' && P.idCount(p) >= p.alive && p.alive > 0;
     var sex = every ? { boar: p.ids.filter(function (x) { return x.sex === 'boar'; }).length, gilt: p.ids.filter(function (x) { return x.sex === 'gilt'; }).length } : p.sex;
     var items = [
-      { label: T('pg.sex'), valueHtml: factBtn('counts-open', sex ? T('pg.sexv', { b: sex.boar, g: sex.gilt }) : '—', !sex) },
-      { label: T('pg.weight'), valueHtml: factBtn('weight-open', w ? T('kg', { w: w.kg }) : '—', !w) }];
+      { label: T('pg.sex'), value: sex ? T('pg.sexv', { b: sex.boar, g: sex.gilt }) : null },
+      { label: T('pg.weight'), value: w ? T('kg', { w: w.kg }) : null }];
     if (P.hasId()) {
-      items.push({ label: T(scheme() === 'notch' ? 'pc.notched' : 'pc.tagged'), valueHtml: factBtn('tagged-open', T('pc.of', { n: P.idCount(p), m: p.alive })) });
-      items.push({ label: T('pg.breeders'), valueHtml: factBtn('tagged-open', String(P.breeders(p))) });
+      items.push({ label: T(scheme() === 'notch' ? 'pc.notched' : 'pc.tagged'), value: T('pc.of', { n: P.idCount(p), m: p.alive }) });
+      items.push({ label: T('pg.breeders'), value: String(P.breeders(p)) });
     }
-    var log = '<button type="button" data-action="log-open" data-value="">' + esc(T('pc.log')) + I('chevron') + '</button>';
-    return '<section class="sp-pcard">' + UI.heading({ title: T('pc.title'), kind: 'section', level: 3, icon: I('record'), action: log }) +
-      UI.facts(items, { columns: items.length === 4 ? 2 : items.length, className: 'sp-pfacts' }) + (w ? '' : '<p class="sp-warn">' + esc(T('pg.weight.hint')) + '</p>') + '</section>';
+    return '<section class="sp-pcard">' + UI.heading({ title: T('pc.title'), kind: 'section', level: 3, icon: I('record'), action: { label: T('pc.log'), action: 'log-open' } }) +
+      UI.facts(items, { columns: 2 }) +
+      (w || P.s.ended ? '' : UI.button({ label: T('pg.weight.hint'), register: 'text', action: 'weight-open', className: 'sp-weigh' }).replace(/<\/button>$/, I('chevron') + '</button>')) + '</section>';
   }
   /* The tool row, as farrowing's (Edit · Record death · More actions): Tag piglets (per farm scheme; none on a no-ID farm) ·
      Record death · More */
@@ -3686,10 +3754,11 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('add.' + scheme()), action: 'give-new', register: 'primary' } }) });
   }
 
-  /* ---- More: Move piglets · Record death · Set count ---- */
+  /* ---- More: Move piglets · Set count · Litter weight · Boars and gilts (the figures the Piglets card only reads) ---- */
   function moreSheet() {
     return K.drawer({ title: T('more.title'), size: 'medium', view: 'more',
-      body: K.doors({ card: true, items: [{ title: T('move.title'), icon: 'transfer', action: 'tool', value: 'move' }, { title: T('tool.count'), icon: 'edit', action: 'tool', value: 'count' }] }),
+      body: K.doors({ card: true, items: [{ title: T('move.title'), icon: 'transfer', action: 'tool', value: 'move' }, { title: T('tool.count'), icon: 'edit', action: 'tool', value: 'count' },
+        { title: T('w.title'), icon: 'weight', action: 'weight-open', value: '' }, { title: T('cnt.title'), icon: 'profile', action: 'counts-open', value: '' }] }),
       footer: K.footer({ back: { action: 'back', label: T('back') } }) });
   }
   /* ---- fewer piglets for one ticked item: a stepper; a shortfall asks one reason ---- */
@@ -3761,20 +3830,34 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
         K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.weight'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) }, status: !(+w.kg > 0) ? T('sr.kg') : null }) });
   }
   /* ---- the pen log: born, deaths, moves, counts, treatments, IDs — the history, newest first ---- */
+  /* One recorded act is one entry: the IDs given on one day are one line ("IDs given · 8", the range under it); the group is the
+     day (Today · Yesterday · weekday · date), the stamp is time · initials. */
   function logPage() {
-    var p = pen(), byDay = {};
-    var add = function (day, at, title, meta) { (byDay[day] = byDay[day] || []).push({ at: at, title: title, meta: meta }); };
+    var p = pen(), list = [], ids = {};
+    var day = function (ms) { return new Date(ms).toDateString(); };
     P.recs(p.code).forEach(function (r) {
+      if (r.tr === 'id') {
+        var g = ids[day(r.at)];
+        if (!g) { g = ids[day(r.at)] = { at: r.at, who: r.who, nos: [] }; list.push({ id: g }); }
+        g.nos.push(r.no); g.at = Math.max(g.at, r.at);
+        return;
+      }
       var what = r.tr === 'death' ? T('log.death', { n: r.n }) : r.tr === 'move' ? T('log.move', { n: pigs(r.n), to: r.to }) : r.tr === 'count' ? T('log.count', { n: r.n })
-        : r.tr === 'id' ? T('log.id', { no: r.no }) : r.tr === 'pick' ? T('log.pick') : r.tr === 'breeder' ? T(r.n ? 'log.breeder' : 'log.notbreeder', { no: r.no }) : T('log.treat', { tr: tr(r.tr), n: pigs(r.n) });
-      add(r.day, r.at, what, short(r.who) + ' · ' + when(r));
+        : r.tr === 'pick' ? T('log.pick') : r.tr === 'breeder' ? T(r.n ? 'log.breeder' : 'log.notbreeder', { no: r.no }) : T('log.treat', { tr: tr(r.tr), n: pigs(r.n) });
+      list.push({ title: what, at: r.at, by: short(r.who) });
     });
-    p.weights.forEach(function (w, i) { add(w.day, w.at || i, T('log.weight', { w: w.kg }), ''); });
-    add(0, -1, T('log.born', { n: p.born }), p.dead ? T('log.dead.birth', { n: p.dead }) : '');
-    var groups = Object.keys(byDay).map(Number).sort(function (a, b) { return b - a; }).map(function (d) {
-      return { label: T('day.n', { d: d }), entries: byDay[d].sort(function (a, b) { return b.at - a.at; }).map(function (e) { return { title: e.title, meta: e.meta }; }) };
+    list = list.map(function (e) {
+      if (!e.id) return e;
+      var nos = e.id.nos.slice().sort();
+      return nos.length === 1 ? { title: T('log.id', { no: nos[0] }), at: e.id.at, by: short(e.id.who) }
+        : { title: T('log.ids', { n: nos.length }), detail: nos[0] + '–' + nos[nos.length - 1], at: e.id.at, by: short(e.id.who) };
     });
-    return K.page({ title: T('log.title'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'log', body: UI.log(groups) });
+    // a record known only by its day of life carries a date, no clock time
+    var ymd = function (daysAgo) { var d = new Date(Date.now() - daysAgo * 864e5), z = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); };
+    p.weights.forEach(function (w) { list.push({ title: T('log.weight', { w: w.kg }), at: w.at || ymd(p.age - w.day) }); });
+    list.push({ title: T('log.born', { n: p.born }), detail: p.dead ? T('log.dead.birth', { n: p.dead }) : '', at: ymd(p.age) });
+    var groups = UI.logGroups(list, { lang: L.lang === 'zh' ? 'zh-CN' : 'en', today: T('sec.today'), yesterday: T('log.yest') });
+    return K.page({ title: T('log.title'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'log', body: UI.log(groups, { empty: T('log.none') }) });
   }
 
   /* ---- record death ---- */

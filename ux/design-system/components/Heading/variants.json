@@ -1,0 +1,43 @@
+[
+  {
+    "id": "page",
+    "name": "Page",
+    "use": "name a screen or a sheet, once, at the top of its header",
+    "notUse": "a block inside the page (use Section) or a run of rows (use Group); a page heading never takes an icon, meta or action",
+    "states": [
+      "Default",
+      "With description",
+      "In a drawer",
+      "Long title wraps",
+      "Chinese"
+    ]
+  },
+  {
+    "id": "section",
+    "name": "Section",
+    "use": "name one block above its panel, with an optional icon, a count or time (meta) for the whole block, and one link-out action",
+    "notUse": "a screen or sheet title (use Page) or a label inside one panel (use Group); never two headings over one block, and never for an empty block (leave it out)",
+    "states": [
+      "Default",
+      "With icon",
+      "With description",
+      "With meta",
+      "With action",
+      "Action pressed",
+      "Action focused",
+      "Long title beside meta",
+      "Chinese"
+    ]
+  },
+  {
+    "id": "group",
+    "name": "Group",
+    "use": "label a run of rows or log entries inside one panel (Day 2, Today, Health)",
+    "notUse": "a block title (use Section); it takes no icon, meta or action, and is not called on its own: reach it through rowGroup or Log",
+    "states": [
+      "Default",
+      "With description",
+      "Chinese"
+    ]
+  }
+]

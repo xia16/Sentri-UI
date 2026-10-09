@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T17:38:19.679Z",
- "commit": "dd25bc1",
+ "generated": "2026-10-09T17:53:46.421Z",
+ "commit": "1e6390d",
  "platforms": [
   {
    "id": "mobile",
@@ -12050,50 +12050,83 @@
   {
    "name": "Heading",
    "group": "Base",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "status": "agent-checked",
+    "judged": "2026-10-10",
+    "commit": "c84edf3",
     "model": "claude-opus-5-5",
+    "round": 1,
+    "previous": [
+     {
+      "finding": "No guidance on which kind to use when (high)",
+      "fixed": true,
+      "note": "'Which heading' table: page/section/group, what each takes and never takes; one heading per block."
+     },
+     {
+      "finding": "panel kind 1px from section, one screen (medium)",
+      "fixed": true,
+      "note": "panel retired, reads as section; farrowing.overview 'Whole-task progress' is now a section heading."
+     },
+     {
+      "finding": "Text action 44px tall (medium)",
+      "fixed": true,
+      "note": "Measured 69x48 (View log: piglet sheet, farrowing litter), 73x48 (View plan: pig profile), 68x48 (Chinese)."
+     },
+     {
+      "finding": "Raw values in bundle.css (medium)",
+      "fixed": true,
+      "note": "Kinds use --type-page-title/section-title/group-label, gap --space-heading, action --tap-min."
+     },
+     {
+      "finding": "Two implementations (low)",
+      "fixed": "partly",
+      "note": "Every prototype now loads components/bundle.js; ux/system/sentri-components.js still exists with its own heading/facts/log, loaded by nothing."
+     },
+     {
+      "finding": "No long-title example (low)",
+      "fixed": true,
+      "note": "'Long title beside meta' and page 'Long title wraps' states; aside stays top-aligned at 375."
+     }
+    ],
     "scores": {
-     "clarity": 6,
+     "clarity": 9,
      "budget": 8,
-     "hierarchy": 6,
+     "hierarchy": 8,
      "spacing": 8,
-     "broken": 6
+     "broken": 9
     },
-    "lowest": 6,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
-      "pass": false,
-      "why": "Purpose line exists; no \"use X instead\" naming a sibling (TaskSection, rowGroup title, Log group label)."
+      "pass": true,
+      "why": "Job sentence plus 'use Row / Panel instead'."
      },
      {
       "line": 2,
-      "pass": false,
-      "why": "No when / when-not per kind; the owner's gap: nothing says which heading to use where."
+      "pass": true,
+      "why": "When/when-not per kind; names Row for a tappable destination."
      },
      {
       "line": 3,
       "pass": true,
-      "why": "Title, icon, description, meta, action named and all shown in the preview."
+      "why": "Title, icon, description, meta, action named; section variant shows each."
      },
      {
       "line": 4,
-      "pass": false,
-      "why": "panel kind is used on one screen (farrowing.overview) and is 1px from section; its when-to-use is only \"a title inside a panel\"."
+      "pass": true,
+      "why": "Three variants, each with a when sentence and real screens."
      },
      {
       "line": 5,
       "pass": true,
-      "why": "Static text; default and empty (absent) stated; the action follows Button."
+      "why": "Static; the action's default, pressed and focus are rendered in the section variant; empty = absent."
      },
      {
       "line": 6,
-      "pass": false,
-      "why": "Text action hit area is 44x44 (preview \"Edit\"), 69x44 on piglet-processing.sheet-todo \"View log\"; floor is 48."
+      "pass": true,
+      "why": "Action 69x48 / 73x48 in use and in the variant at 375."
      },
      {
       "line": 7,
@@ -12103,22 +12136,22 @@
      {
       "line": 8,
       "pass": true,
-      "why": "No state carried by colour; status colour banned in headings."
+      "why": "No state in colour; status colour banned."
      },
      {
       "line": 9,
-      "pass": false,
-      "why": "Sentence case and noun stated; no long-title example, no rule for how the 46%-wide aside wraps against a long title."
+      "pass": true,
+      "why": "Casing and lengths stated; long-title states rendered."
      },
      {
       "line": 10,
       "pass": true,
-      "why": "`level` sets the h-element; the action takes the global focus ring."
+      "why": "h-level role, button action with a rendered focus ring, keyboard row."
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "bundle.css hard-codes 22/13/12/11/10px, 12px gaps, 44px and font fallbacks; the type tokens (page-title, section-title, group-label) are not referenced."
+      "pass": true,
+      "why": "bundle.css uses type, space and tap tokens; CSS variables listed."
      },
      {
       "line": 12,
@@ -12132,13 +12165,13 @@
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "No classification line and no related links."
+      "pass": true,
+      "why": "Related links and classification line."
      },
      {
       "line": 15,
       "pass": true,
-      "why": "All four kinds render at 375 with no overflow."
+      "why": "All variant states at 375 with no overflow or clipping."
      }
     ],
     "classification": "component",
@@ -12146,57 +12179,41 @@
      {
       "name": "page",
       "usedBy": [
-       "farrowing.overview",
        "farrowing.history",
+       "farrowing.overview",
        "pig-profile.log",
-       "workbench.choose-unit"
+       "pig-profile.origin",
+       "inspection.pen-log"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 8,
+       "clarity": 9,
        "budget": 8,
        "hierarchy": 9,
        "spacing": 8,
-       "broken": 8
+       "broken": 9
       },
-      "findings": [
-       "Fine in use; held back only by the component-wide token and doc gaps (lines 11, 14)."
-      ]
+      "findings": []
      },
      {
       "name": "section",
       "usedBy": [
-       "farrowing.overview",
        "piglet-processing.sheet-todo",
-       "farrowing.death"
-      ],
-      "status": "in-design",
-      "scores": {
-       "clarity": 7,
-       "budget": 8,
-       "hierarchy": 7,
-       "spacing": 8,
-       "broken": 6
-      },
-      "findings": [
-       "Carries the only action slot in use (\"View log >\" 69x44)."
-      ]
-     },
-     {
-      "name": "panel",
-      "usedBy": [
+       "farrowing.locked",
+       "pig-profile.full",
+       "pig-profile.origin",
        "farrowing.overview"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 4,
-       "budget": 7,
-       "hierarchy": 4,
+       "clarity": 9,
+       "budget": 8,
+       "hierarchy": 8,
        "spacing": 8,
-       "broken": 8
+       "broken": 9
       },
       "findings": [
-       "12px vs section 13px is not a perceptible level; one screen."
+       "farrowing.overview 'Whole-task progress' sits 36px above its panel (12px everywhere else) and is the only section heading on that screen without an icon."
       ]
      },
      {
@@ -12207,61 +12224,35 @@
        "pig-profile.log",
        "inspection.review-selected"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 8,
+       "clarity": 9,
        "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
-       "broken": 8
+       "broken": 9
       },
-      "findings": [
-       "Always reached through rowGroup or Log, never called directly; the README should say so."
-      ]
+      "findings": []
      }
     ],
     "findings": [
      {
-      "severity": "high",
-      "text": "No guidance on which kind to use when. Section, panel and group headings appear on one sheet with no rule.",
-      "fix": "Add a \"Which heading\" table. page = the screen or sheet title, once, in its header. section = names a block and sits outside, above its panel; it alone takes the icon, the meta (a count or time for the whole block) and the one link-out action. group = labels a run of rows or log entries inside one panel; muted, no icon, no action; reach it through rowGroup({title}) or Log. Never stack two headings over one block."
-     },
-     {
       "severity": "medium",
-      "text": "panel (12px) is not a perceptible step from section (13px) and is used on one screen (farrowing.overview \"Whole-task progress\").",
-      "fix": "Merge panel into section: a title inside a panel uses section; alias kind \"panel\" to section and fix farrowing.overview."
-     },
-     {
-      "severity": "medium",
-      "text": "The text action is 44px tall (preview \"Edit\" 44x44; \"View log\" 69x44 on piglet-processing.sheet-todo), under the 48px glove floor.",
-      "fix": "Set the action min-height and min-width to control-height (48px); keep the negative margin so the heading does not grow."
-     },
-     {
-      "severity": "medium",
-      "text": "Raw values in bundle.css (22/13/12/11/10px, 12px gaps, 44px) instead of the type and space tokens the DS README names.",
-      "fix": "Map each kind to its type token (page-title, section-title, group-label), the gap to space-heading, the action to control-height."
+      "text": "farrowing.overview: 'Whole-task progress' is 36px above its panel because .task-progress-section is a flex column with gap 24px on top of space-heading 12px; it is also the one section heading there without an icon (Choose a unit and Performance metrics have one).",
+      "fix": "Set .task-progress-section to gap:0 (space-heading does the spacing) and pass an icon in its SentriUI.heading call in farrowing-astra-concept.js."
      },
      {
       "severity": "low",
-      "text": "Two implementations: home, farrowing and inspection load ux/system/sentri-components.js (no data-ds, no strs); the task skeleton loads components/bundle.js.",
-      "fix": "Point the three prototypes at bundle.js and delete the heading/row/facts/log/segment copies in sentri-components.js."
+      "text": "ux/system/sentri-components.js still holds a second heading/facts/log implementation that no page loads.",
+      "fix": "Delete the file and the bundle.js comment that points at it."
      },
      {
       "severity": "low",
-      "text": "No long-title example; a long title beside a meta is unspecified.",
-      "fix": "Add a preview case with a 40-character title and a meta; state that the title wraps and the aside stays top-aligned."
+      "text": "The overview preview pairs 'Litter summary' with the meta '3 tasks', which teaches a meta that does not count the block.",
+      "fix": "Change the meta to a count of the block ('14 born') or drop it."
      }
     ],
-    "proposals": [
-     {
-      "kind": "merge",
-      "name": "Heading kind \"panel\" into \"section\"",
-      "why": "One screen uses it and the 1px size step carries no hierarchy; the standard asks for the smallest variant set that covers real screens.",
-      "seenIn": [
-       "farrowing.overview"
-      ]
-     }
-    ]
+    "proposals": []
    }
   },
   {
@@ -12724,50 +12715,78 @@
   {
    "name": "Facts",
    "group": "Base",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "status": "agent-checked",
+    "judged": "2026-10-10",
+    "commit": "c84edf3",
     "model": "claude-opus-5-5",
+    "round": 1,
+    "previous": [
+     {
+      "finding": "Tappable buttons inside facts on the piglet pen sheet (high)",
+      "fixed": true,
+      "note": "Pen sheet facts are read-only (0 controls); 'Weigh the litter' is one 227x48 link below; Litter weight and Boars and gilts doors are in More. valueHtml holding a control is dropped with a dev warning (bundle.js:107)."
+     },
+     {
+      "finding": "Unused variants columns 1 and 3 (medium)",
+      "fixed": "partly",
+      "note": "Three-column is drawn on farrowing.locked (finished litter); columns:1 is documented as having no screen but is still in code."
+     },
+     {
+      "finding": "Raw spacing and type (medium)",
+      "fixed": true,
+      "note": "Tokens only: --space-panel, --space-18/20, type tokens, --font-mono."
+     },
+     {
+      "finding": "IDs could break mid-ID (low)",
+      "fixed": true,
+      "note": ".st-fact-id is nowrap mono; 'ID in mono' and 'Long value wraps' states rendered. Hosts do not always pass mono (see findings)."
+     },
+     {
+      "finding": "Stale copy in sentri-components.js (low)",
+      "fixed": "partly",
+      "note": "Not loaded by any page; the file remains."
+     }
+    ],
     "scores": {
      "clarity": 8,
-     "budget": 7,
+     "budget": 8,
      "hierarchy": 8,
      "spacing": 8,
-     "broken": 5
+     "broken": 8
     },
-    "lowest": 5,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
-      "pass": false,
-      "why": "Purpose line present; does not say \"for a figure you tap, use Row\"."
+      "pass": true,
+      "why": "Job sentence plus 'use Row / TaskMetrics instead'."
      },
      {
       "line": 2,
-      "pass": false,
-      "why": "No when-not; the \"never acts\" rule is broken in use and no alternative is named."
+      "pass": true,
+      "why": "When-not names Row, Button and TaskTable."
      },
      {
       "line": 3,
       "pass": true,
-      "why": "Label, value, meta named; the preview shows meta and the em-dash empty."
+      "why": "Panel, label, value, meta named; meta and em dash shown."
      },
      {
       "line": 4,
-      "pass": false,
-      "why": "columns 1 and 3 are documented but no atlas screen shows them; only 2 columns appears (piglet-processing pen sheet)."
+      "pass": true,
+      "why": "Two-column (piglet pen sheet, pig-profile.origin) and three-column (farrowing.locked) each used and explained."
      },
      {
       "line": 5,
       "pass": true,
-      "why": "Static; default and empty (em dash / absent group) stated and rendered."
+      "why": "Static; missing value, zero and empty set stated and rendered."
      },
      {
       "line": 6,
-      "pass": false,
-      "why": "In use the piglet pen sheet puts > buttons inside facts: 26-65px wide x 44px tall (piglet-processing.sheet-todo, pen-log)."
+      "pass": true,
+      "why": "No targets; a control in valueHtml is refused in dev."
      },
      {
       "line": 7,
@@ -12777,22 +12796,22 @@
      {
       "line": 8,
       "pass": true,
-      "why": "No colour-borne state."
+      "why": "No state in colour."
      },
      {
       "line": 9,
-      "pass": false,
-      "why": "Value formatting stated; no long-value example, and dd uses overflow-wrap:anywhere (an ear tag can break mid-ID)."
+      "pass": true,
+      "why": "Label length and casing stated; long value and long label states rendered."
      },
      {
       "line": 10,
-      "pass": false,
-      "why": "dl/dt/dd semantics are used but not stated."
+      "pass": true,
+      "why": "dl/dt/dd stated; no focus stop."
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "Raw 18px/20px gaps, 16px padding and 11/14/10px type in bundle.css."
+      "pass": true,
+      "why": "Tokens only; variables listed."
      },
      {
       "line": 12,
@@ -12806,91 +12825,89 @@
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "No classification line, no related links (Panel, TaskMetrics)."
+      "pass": true,
+      "why": "Related links and classification."
      },
      {
       "line": 15,
       "pass": true,
-      "why": "Preview renders at 375 with no overflow."
+      "why": "Both variants at 375, no overflow (dd scrollWidth clean)."
      }
     ],
     "classification": "component",
     "variants": [
      {
-      "name": "two-column (default)",
+      "name": "two-column",
       "usedBy": [
        "piglet-processing.sheet-todo",
        "piglet-processing.sheet-done",
-       "piglet-processing.pen-log",
-       "piglet-processing.counts"
+       "piglet-processing.sheet-breeders",
+       "pig-profile.origin"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
        "clarity": 8,
-       "budget": 7,
+       "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
-       "broken": 5
+       "broken": 8
       },
       "findings": [
-       "In use it carries > buttons the component forbids, narrower than 48px."
+       "pig-profile.origin renders Dam, Sire and three ear tags in the sans face: the host sets mono only for labels starting 'Ear tag|Tag|ID'."
       ]
      },
      {
       "name": "three-column",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {},
-      "findings": [
-       "No atlas screen shows it (farrowing litter code calls columns:3, but no screen renders it)."
-      ]
-     },
-     {
-      "name": "one-column",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {},
-      "findings": [
-       "No screen uses it."
-      ]
+      "usedBy": [
+       "farrowing.locked"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 9
+      },
+      "findings": []
      }
     ],
     "findings": [
      {
-      "severity": "high",
-      "text": "Judged in use, the piglet pen sheet (Boars · gilts >, Litter weight >, Tagged 0 of 12 >, Breeders kept >) makes facts tappable through valueHtml; each target is a 26-65 x 44px button, not the cell, and the README says facts never act.",
-      "fix": "Decide one way: add a \"tappable fact\" option where the whole cell is one 48px-plus button with the > trail, or move those four figures to Rows. Then forbid buttons in valueHtml."
+      "severity": "medium",
+      "text": "The main pig profile is not on Facts: pig-profile.full 'General details' and 'Sow cycle' are hand-built grids (.overview-details-grid / .overview-fact) in a panel, same job and look. General details also prints 'Health —' under a banner that says 'Health · Thin', so the screen says health twice and disagrees.",
+      "fix": "Render both blocks with SentriUI.facts (Weight and Temperature trails as meta) and drop the Health row; the banner owns health."
      },
      {
       "severity": "medium",
-      "text": "Unused variants: columns 1 and 3 have no screen.",
-      "fix": "Keep only 2 columns until a screen needs 3; delete the 1-column mode or mark both \"no screen yet\"."
-     },
-     {
-      "severity": "medium",
-      "text": "Raw spacing and type values in bundle.css.",
-      "fix": "Use space-panel for padding, a gap token pair, and type tokens for label, value and meta."
+      "text": "IDs are not mono in use: pig-profile.origin shows 000118, B-024, 000267, S-000267, M-267 in Plus Jakarta Sans because inspection-astra-concept.js:970 sets mono by the label regex /^(Ear tag|Tag|ID)/.",
+      "fix": "Set mono from the field (dam, sire, every ear tag, breeding number), not from the label text."
      },
      {
       "severity": "low",
-      "text": "overflow-wrap:anywhere can split an ear tag or batch code across lines.",
-      "fix": "Set the mono ID span to white-space:nowrap and add a long-value example to the preview."
+      "text": "The Death breakdown sheet (farrowing-astra-concept.js:423) is a hand-built dl with raw CSS (#f6f7f2, 9px/14px) for read-only label and value pairs. It is one surface in a sheet, not card-on-card, so it is Facts' job.",
+      "fix": "Draw it with SentriUI.facts (one fact per cause plus 'Total dead'); no panel-less Facts variant is needed."
      },
      {
       "severity": "low",
-      "text": "Stale copy in ux/system/sentri-components.js (no data-ds, no strs).",
-      "fix": "Point the prototypes at components/bundle.js."
+      "text": "columns:1 is still in bundle.js with no screen.",
+      "fix": "Remove the mode; a long value wraps in two-column."
+     },
+     {
+      "severity": "low",
+      "text": "The two links below facts read differently: piglet 'Weigh the litter: growth figures need it. ›' (an amber sentence with a full stop) vs farrowing 'Death breakdown ›' (an ink label).",
+      "fix": "Make the piglet link a text Button label ('Weigh the litter ›'); if the reason stays, put it in the Litter weight fact's meta."
      }
     ],
     "proposals": [
      {
-      "kind": "new-variant",
-      "name": "Facts: tappable",
-      "why": "The piglet pen sheet needs figures that open their edit sheet; today they are hand-built buttons inside a read-only grid.",
+      "kind": "merge",
+      "name": "Farrowing total triplets into TaskMetrics / TaskTotals, not Facts",
+      "why": "The builder was right to leave them out of Facts: Born · Alive now · Piglet deaths and 7 · 2 · 9 are headline figures inside a metrics card or progress panel, and Facts would put a panel in a panel. Their hand-built dl copies (.task-performance-totals inside task-death-review, .finish-totals) should come from TaskMetrics totals and TaskTotals instead.",
       "seenIn": [
-       "piglet-processing.sheet-todo",
-       "piglet-processing.pen-log"
+       "farrowing.overview",
+       "farrowing.task-receipt",
+       "farrowing.finish"
       ]
      }
     ]
@@ -12899,45 +12916,78 @@
   {
    "name": "Log",
    "group": "Base",
-   "status": "in-design",
+   "status": "agent-checked",
    "gate": {
-    "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "status": "agent-checked",
+    "judged": "2026-10-10",
+    "commit": "c84edf3",
     "model": "claude-opus-5-5",
+    "round": 1,
+    "previous": [
+     {
+      "finding": "One entry per ID; 'Farrowing finished' twice (high)",
+      "fixed": true,
+      "note": "piglet-processing.pen-log 'IDs given · 12 / 001201–001212'; farrowing.history 'Farrowing finished · born 14' once; the component drops a detail equal to its title."
+     },
+     {
+      "finding": "Group labels and meta written four ways (medium)",
+      "fixed": true,
+      "note": "Labels Today / weekday / 'Aug 28' / Earlier on every host; stamp '08:12 · G.H' via logDay/logStamp; farrowing's dayLabel delegates to logDay."
+     },
+     {
+      "finding": "Categorised log undocumented (medium)",
+      "fixed": true,
+      "note": "Own variant page and when sentence; used by pig-profile.log and inspection.pen-log."
+     },
+     {
+      "finding": "'Author not supplied' printed (medium)",
+      "fixed": true,
+      "note": "Missing time or author is left out; 'Missing author is left out' state rendered."
+     },
+     {
+      "finding": "Raw colours, log tokens unused (low)",
+      "fixed": true,
+      "note": "--log-line, --log-dot and type tokens in bundle.css."
+     },
+     {
+      "finding": "Empty state not rendered (low)",
+      "fixed": true,
+      "note": "Rendered in both variants and live on Home Records."
+     }
+    ],
     "scores": {
-     "clarity": 8,
-     "budget": 5,
-     "hierarchy": 7,
+     "clarity": 9,
+     "budget": 8,
+     "hierarchy": 8,
      "spacing": 8,
-     "broken": 7
+     "broken": 8
     },
-    "lowest": 5,
+    "lowest": 8,
     "checklist": [
      {
       "line": 1,
-      "pass": false,
-      "why": "Purpose present; no sibling named (Row for an editable record, TaskReceipt for a day receipt)."
+      "pass": true,
+      "why": "Job sentence plus 'use Row / TaskReceipt instead'."
      },
      {
       "line": 2,
-      "pass": false,
-      "why": "No when / when-not."
+      "pass": true,
+      "why": "When-not names TaskDay and rows; no actions in entries."
      },
      {
       "line": 3,
-      "pass": false,
-      "why": "Parts named, but the preview does not show extraHtml or the candidate group description."
+      "pass": true,
+      "why": "Group heading, thread, dot, category, Corrected word, was line, stamp, extraHtml all shown."
      },
      {
       "line": 4,
-      "pass": false,
-      "why": "The categorised log (a kind word over each entry, kind filters above) is a real variant on two screens and is not documented as one."
+      "pass": true,
+      "why": "Day log and categorised, each with a when sentence and screens."
      },
      {
       "line": 5,
-      "pass": false,
-      "why": "Empty state is stated but not rendered in the preview."
+      "pass": true,
+      "why": "Default, corrected, attachment, empty and filter-empty rendered; no interactive states."
      },
      {
       "line": 6,
@@ -12952,22 +13002,22 @@
      {
       "line": 8,
       "pass": true,
-      "why": "No colour-borne state."
+      "why": "Correction said in words ('Corrected', 'Was 9 alive'), not colour."
      },
      {
       "line": 9,
-      "pass": false,
-      "why": "Label and meta formats stated, but hosts break them (see findings) and there is no long-entry example."
+      "pass": true,
+      "why": "Title 60 characters, sentence case; long entry state rendered."
      },
      {
       "line": 10,
-      "pass": false,
-      "why": "No role stated (sections and articles; is it a list?)."
+      "pass": true,
+      "why": "section per day, ol/li entries; thread is decoration."
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "Raw #cbd6c2 thread, #849b72 dot, 7px, 18px and 13/11/10/9px type in bundle.css; the README names log-dot and log-line tokens the CSS does not use."
+      "pass": true,
+      "why": "Tokens only; variables listed."
      },
      {
       "line": 12,
@@ -12981,97 +13031,73 @@
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "No classification line or related links."
+      "pass": true,
+      "why": "Related links and classification."
      },
      {
       "line": 15,
-      "pass": false,
-      "why": "Only the default state is rendered at 375; no proof of the empty state."
+      "pass": true,
+      "why": "All states of both variants at 375, no overflow."
      }
     ],
     "classification": "component",
     "variants": [
      {
-      "name": "day log (plain)",
+      "name": "day log",
       "usedBy": [
        "farrowing.history",
-       "piglet-processing.pen-log"
+       "piglet-processing.pen-log",
+       "home Toolbox > Records (empty)"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 8,
-       "budget": 5,
-       "hierarchy": 7,
+       "clarity": 9,
+       "budget": 8,
+       "hierarchy": 8,
        "spacing": 8,
-       "broken": 7
+       "broken": 8
       },
       "findings": [
-       "farrowing.history repeats \"Farrowing finished\" as title and detail; piglet-processing.pen-log writes one entry per piglet ID (8 lines of \"ID 0012xx\")."
+       "piglet-processing.pen-log: 'Litter weighed · 24.6 kg' and 'Born 13' have no stamp while every other act has time · initials."
       ]
      },
      {
-      "name": "categorised log",
+      "name": "categorised",
       "usedBy": [
        "pig-profile.log",
        "inspection.pen-log"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 7,
-       "budget": 6,
-       "hierarchy": 7,
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
        "spacing": 8,
-       "broken": 7
+       "broken": 8
       },
       "findings": [
-       "Prints \"Author not supplied\"; group labels mix \"1 Aug 2026\" and \"Before this walk\"."
+       "pig-profile.log 'Earlier' lists standing states ('Thin · Day 12 · Monitor', 'Individual adjustment active') rather than recorded acts."
       ]
      }
     ],
     "findings": [
      {
-      "severity": "high",
-      "text": "Budget in use: piglet-processing.pen-log lists every ID as its own entry (ID 001201 ... ID 001208), and farrowing.history says \"Farrowing finished\" twice in one entry.",
-      "fix": "Add a rule and an example: one recorded act is one entry (\"8 IDs · 001201-001208\"); detail never repeats the title. Fix the two hosts."
-     },
-     {
-      "severity": "medium",
-      "text": "Hosts write group labels and meta four ways: \"5 days ago\", \"day 4\", \"1 Aug 2026\", \"Before this walk\"; meta \"G.H · 10/07 10:07\" vs \"14:02 · L. Madsen\" vs \"G. Hansen\".",
-      "fix": "Pin the format in the component: meta = time · initials (the group label carries the date); group labels = Today / Yesterday / weekday / \"Jul 8\". Take a date and initials as data, not free strings."
-     },
-     {
-      "severity": "medium",
-      "text": "The categorised log is a real variant (pig-profile.log, inspection.pen-log) without its own when-to-use.",
-      "fix": "Document it: use category only when one log mixes kinds of event and offers a kind filter; otherwise use the plain log."
-     },
-     {
-      "severity": "medium",
-      "text": "Missing data is printed as text (\"Author not supplied\"), though the content law says missing is absent.",
-      "fix": "Add a Don't: drop an empty meta part; never print a placeholder."
+      "severity": "low",
+      "text": "piglet-processing.pen-log: both 'Litter weighed' entries and 'Born 13' carry no time or initials, though the weighing is recorded in the same task as stamped acts; it reads as a fixture gap, not a missing-author case.",
+      "fix": "Give those fixture events at and by in the simple prototype's data."
      },
      {
       "severity": "low",
-      "text": "Raw colours and sizes; the log-dot and log-line tokens are named in the README but not used in CSS.",
-      "fix": "Use var(--log-dot), var(--log-line) and the type tokens."
+      "text": "pig-profile.log 'Earlier' holds states, not acts ('Thin / Body condition · Day 12 · Monitor', 'Individual adjustment active'), and health is also on the profile banner. The day variant's 'Missing author is left out' example uses the same state wording.",
+      "fix": "Write the act that was recorded ('Body condition: thin', 'Feed adjusted +10%') and use an act in the variant example."
      },
      {
       "severity": "low",
-      "text": "Empty state is not rendered in the preview.",
-      "fix": "Add a second preview case, log([]), showing \"No activity recorded yet\"."
+      "text": "Home Records heading description reads 'Updates in this prototype' (the Toolbox entry says 'Updates made in this preview'): demo copy over a real log.",
+      "fix": "Drop the description or say what the log holds ('Answers you sent')."
      }
     ],
-    "proposals": [
-     {
-      "kind": "new-variant",
-      "name": "Log: categorised",
-      "why": "Same job (history tail), different structure (kind word, kind filter); used on two screens.",
-      "seenIn": [
-       "pig-profile.log",
-       "inspection.pen-log"
-      ]
-     }
-    ]
+    "proposals": []
    }
   },
   {
@@ -20032,9 +20058,9 @@
     "id": "Heading"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "No guidance on which kind to use when. Section, panel and group headings appear on one sheet…",
-   "detail": "No guidance on which kind to use when. Section, panel and group headings appear on one sheet with no rule.\nFix: Add a \"Which heading\" table. page = the screen or sheet title, once, in its header. section = names a block and sits outside, above its panel; it alone takes the icon, the meta (a count or time for the whole block) and the one link-out action. group = labels a run of rows or log entries inside one panel; muted, no icon, no action; reach it through rowGroup({title}) or Log. Never stack two headings over one block.",
+   "severity": "medium",
+   "title": "farrowing.overview: 'Whole-task progress' is 36px above its panel because .task-progress-section…",
+   "detail": "farrowing.overview: 'Whole-task progress' is 36px above its panel because .task-progress-section is a flex column with gap 24px on top of space-heading 12px; it is also the one section heading there without an icon (Choose a unit and Performance metrics have one).\nFix: Set .task-progress-section to gap:0 (space-heading does the spacing) and pass an icon in its SentriUI.heading call in farrowing-astra-concept.js.",
    "source": "gate"
   },
   {
@@ -20044,9 +20070,9 @@
     "id": "Heading"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "panel (12px) is not a perceptible step from section (13px) and is used on one screen…",
-   "detail": "panel (12px) is not a perceptible step from section (13px) and is used on one screen (farrowing.overview \"Whole-task progress\").\nFix: Merge panel into section: a title inside a panel uses section; alias kind \"panel\" to section and fix farrowing.overview.",
+   "severity": "low",
+   "title": "ux/system/sentri-components.js still holds a second heading/facts/log implementation that no…",
+   "detail": "ux/system/sentri-components.js still holds a second heading/facts/log implementation that no page loads.\nFix: Delete the file and the bundle.js comment that points at it.",
    "source": "gate"
   },
   {
@@ -20055,58 +20081,10 @@
     "kind": "component",
     "id": "Heading"
    },
-   "kind": "broken",
-   "severity": "medium",
-   "title": "The text action is 44px tall (preview \"Edit\" 44x44; \"View log\" 69x44 on…",
-   "detail": "The text action is 44px tall (preview \"Edit\" 44x44; \"View log\" 69x44 on piglet-processing.sheet-todo), under the 48px glove floor.\nFix: Set the action min-height and min-width to control-height (48px); keep the negative margin so the heading does not grow.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Heading:3",
-   "target": {
-    "kind": "component",
-    "id": "Heading"
-   },
-   "kind": "broken",
-   "severity": "medium",
-   "title": "Raw values in bundle.css (22/13/12/11/10px, 12px gaps, 44px) instead of the type and space…",
-   "detail": "Raw values in bundle.css (22/13/12/11/10px, 12px gaps, 44px) instead of the type and space tokens the DS README names.\nFix: Map each kind to its type token (page-title, section-title, group-label), the gap to space-heading, the action to control-height.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Heading:4",
-   "target": {
-    "kind": "component",
-    "id": "Heading"
-   },
    "kind": "design",
    "severity": "low",
-   "title": "Two implementations: home, farrowing and inspection load ux/system/sentri-components.js (no…",
-   "detail": "Two implementations: home, farrowing and inspection load ux/system/sentri-components.js (no data-ds, no strs); the task skeleton loads components/bundle.js.\nFix: Point the three prototypes at bundle.js and delete the heading/row/facts/log/segment copies in sentri-components.js.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Heading:5",
-   "target": {
-    "kind": "component",
-    "id": "Heading"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "No long-title example; a long title beside a meta is unspecified.",
-   "detail": "No long-title example; a long title beside a meta is unspecified.\nFix: Add a preview case with a 40-character title and a meta; state that the title wraps and the aside stays top-aligned.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Heading:p0",
-   "target": {
-    "kind": "component",
-    "id": "Heading"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "Merge Heading kind \"panel\" into \"section\"?",
-   "detail": "One screen uses it and the 1px size step carries no hierarchy; the standard asks for the smallest variant set that covers real screens.\nSeen in: farrowing.overview",
+   "title": "The overview preview pairs 'Litter summary' with the meta '3 tasks', which teaches a meta that…",
+   "detail": "The overview preview pairs 'Litter summary' with the meta '3 tasks', which teaches a meta that does not count the block.\nFix: Change the meta to a count of the block ('14 born') or drop it.",
    "source": "gate"
   },
   {
@@ -20283,10 +20261,10 @@
     "kind": "component",
     "id": "Facts"
    },
-   "kind": "broken",
-   "severity": "high",
-   "title": "Judged in use, the piglet pen sheet (Boars · gilts >, Litter weight >, Tagged 0 of 12 >,…",
-   "detail": "Judged in use, the piglet pen sheet (Boars · gilts >, Litter weight >, Tagged 0 of 12 >, Breeders kept >) makes facts tappable through valueHtml; each target is a 26-65 x 44px button, not the cell, and the README says facts never act.\nFix: Decide one way: add a \"tappable fact\" option where the whole cell is one 48px-plus button with the > trail, or move those four figures to Rows. Then forbid buttons in valueHtml.",
+   "kind": "design",
+   "severity": "medium",
+   "title": "The main pig profile is not on Facts: pig-profile.full 'General details' and 'Sow cycle' are…",
+   "detail": "The main pig profile is not on Facts: pig-profile.full 'General details' and 'Sow cycle' are hand-built grids (.overview-details-grid / .overview-fact) in a panel, same job and look. General details also prints 'Health —' under a banner that says 'Health · Thin', so the screen says health twice and disagrees.\nFix: Render both blocks with SentriUI.facts (Weight and Temperature trails as meta) and drop the Health row; the banner owns health.",
    "source": "gate"
   },
   {
@@ -20297,8 +20275,8 @@
    },
    "kind": "design",
    "severity": "medium",
-   "title": "Unused variants: columns 1 and 3 have no screen.",
-   "detail": "Unused variants: columns 1 and 3 have no screen.\nFix: Keep only 2 columns until a screen needs 3; delete the 1-column mode or mark both \"no screen yet\".",
+   "title": "IDs are not mono in use: pig-profile.origin shows 000118, B-024, 000267, S-000267, M-267 in Plus…",
+   "detail": "IDs are not mono in use: pig-profile.origin shows 000118, B-024, 000267, S-000267, M-267 in Plus Jakarta Sans because inspection-astra-concept.js:970 sets mono by the label regex /^(Ear tag|Tag|ID)/.\nFix: Set mono from the field (dam, sire, every ear tag, breeding number), not from the label text.",
    "source": "gate"
   },
   {
@@ -20308,9 +20286,9 @@
     "id": "Facts"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "Raw spacing and type values in bundle.css.",
-   "detail": "Raw spacing and type values in bundle.css.\nFix: Use space-panel for padding, a gap token pair, and type tokens for label, value and meta.",
+   "severity": "low",
+   "title": "The Death breakdown sheet (farrowing-astra-concept.js:423) is a hand-built dl with raw CSS…",
+   "detail": "The Death breakdown sheet (farrowing-astra-concept.js:423) is a hand-built dl with raw CSS (#f6f7f2, 9px/14px) for read-only label and value pairs. It is one surface in a sheet, not card-on-card, so it is Facts' job.\nFix: Draw it with SentriUI.facts (one fact per cause plus 'Total dead'); no panel-less Facts variant is needed.",
    "source": "gate"
   },
   {
@@ -20319,10 +20297,10 @@
     "kind": "component",
     "id": "Facts"
    },
-   "kind": "broken",
+   "kind": "design",
    "severity": "low",
-   "title": "overflow-wrap:anywhere can split an ear tag or batch code across lines.",
-   "detail": "overflow-wrap:anywhere can split an ear tag or batch code across lines.\nFix: Set the mono ID span to white-space:nowrap and add a long-value example to the preview.",
+   "title": "columns:1 is still in bundle.js with no screen.",
+   "detail": "columns:1 is still in bundle.js with no screen.\nFix: Remove the mode; a long value wraps in two-column.",
    "source": "gate"
   },
   {
@@ -20333,8 +20311,8 @@
    },
    "kind": "design",
    "severity": "low",
-   "title": "Stale copy in ux/system/sentri-components.js (no data-ds, no strs).",
-   "detail": "Stale copy in ux/system/sentri-components.js (no data-ds, no strs).\nFix: Point the prototypes at components/bundle.js.",
+   "title": "The two links below facts read differently: piglet 'Weigh the litter: growth figures need it. ›'…",
+   "detail": "The two links below facts read differently: piglet 'Weigh the litter: growth figures need it. ›' (an amber sentence with a full stop) vs farrowing 'Death breakdown ›' (an ink label).\nFix: Make the piglet link a text Button label ('Weigh the litter ›'); if the reason stays, put it in the Litter weight fact's meta.",
    "source": "gate"
   },
   {
@@ -20345,8 +20323,8 @@
    },
    "kind": "decision",
    "severity": "medium",
-   "title": "New variant: Facts: tappable?",
-   "detail": "The piglet pen sheet needs figures that open their edit sheet; today they are hand-built buttons inside a read-only grid.\nSeen in: piglet-processing.sheet-todo, piglet-processing.pen-log",
+   "title": "Merge Farrowing total triplets into TaskMetrics / TaskTotals, not Facts?",
+   "detail": "The builder was right to leave them out of Facts: Born · Alive now · Piglet deaths and 7 · 2 · 9 are headline figures inside a metrics card or progress panel, and Facts would put a panel in a panel. Their hand-built dl copies (.task-performance-totals inside task-death-review, .finish-totals) should come from TaskMetrics totals and TaskTotals instead.\nSeen in: farrowing.overview, farrowing.task-receipt, farrowing.finish",
    "source": "gate"
   },
   {
@@ -20356,9 +20334,9 @@
     "id": "Log"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "Budget in use: piglet-processing.pen-log lists every ID as its own entry (ID 001201 ... ID…",
-   "detail": "Budget in use: piglet-processing.pen-log lists every ID as its own entry (ID 001201 ... ID 001208), and farrowing.history says \"Farrowing finished\" twice in one entry.\nFix: Add a rule and an example: one recorded act is one entry (\"8 IDs · 001201-001208\"); detail never repeats the title. Fix the two hosts.",
+   "severity": "low",
+   "title": "piglet-processing.pen-log: both 'Litter weighed' entries and 'Born 13' carry no time or…",
+   "detail": "piglet-processing.pen-log: both 'Litter weighed' entries and 'Born 13' carry no time or initials, though the weighing is recorded in the same task as stamped acts; it reads as a fixture gap, not a missing-author case.\nFix: Give those fixture events at and by in the simple prototype's data.",
    "source": "gate"
   },
   {
@@ -20368,9 +20346,9 @@
     "id": "Log"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "Hosts write group labels and meta four ways: \"5 days ago\", \"day 4\", \"1 Aug 2026\", \"Before this…",
-   "detail": "Hosts write group labels and meta four ways: \"5 days ago\", \"day 4\", \"1 Aug 2026\", \"Before this walk\"; meta \"G.H · 10/07 10:07\" vs \"14:02 · L. Madsen\" vs \"G. Hansen\".\nFix: Pin the format in the component: meta = time · initials (the group label carries the date); group labels = Today / Yesterday / weekday / \"Jul 8\". Take a date and initials as data, not free strings.",
+   "severity": "low",
+   "title": "pig-profile.log 'Earlier' holds states, not acts ('Thin / Body condition · Day 12 · Monitor',…",
+   "detail": "pig-profile.log 'Earlier' holds states, not acts ('Thin / Body condition · Day 12 · Monitor', 'Individual adjustment active'), and health is also on the profile banner. The day variant's 'Missing author is left out' example uses the same state wording.\nFix: Write the act that was recorded ('Body condition: thin', 'Feed adjusted +10%') and use an act in the variant example.",
    "source": "gate"
   },
   {
@@ -20380,57 +20358,9 @@
     "id": "Log"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "The categorised log is a real variant (pig-profile.log, inspection.pen-log) without its own…",
-   "detail": "The categorised log is a real variant (pig-profile.log, inspection.pen-log) without its own when-to-use.\nFix: Document it: use category only when one log mixes kinds of event and offers a kind filter; otherwise use the plain log.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Log:3",
-   "target": {
-    "kind": "component",
-    "id": "Log"
-   },
-   "kind": "design",
-   "severity": "medium",
-   "title": "Missing data is printed as text (\"Author not supplied\"), though the content law says missing is…",
-   "detail": "Missing data is printed as text (\"Author not supplied\"), though the content law says missing is absent.\nFix: Add a Don't: drop an empty meta part; never print a placeholder.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Log:4",
-   "target": {
-    "kind": "component",
-    "id": "Log"
-   },
-   "kind": "design",
    "severity": "low",
-   "title": "Raw colours and sizes; the log-dot and log-line tokens are named in the README but not used in CSS.",
-   "detail": "Raw colours and sizes; the log-dot and log-line tokens are named in the README but not used in CSS.\nFix: Use var(--log-dot), var(--log-line) and the type tokens.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Log:5",
-   "target": {
-    "kind": "component",
-    "id": "Log"
-   },
-   "kind": "design",
-   "severity": "low",
-   "title": "Empty state is not rendered in the preview.",
-   "detail": "Empty state is not rendered in the preview.\nFix: Add a second preview case, log([]), showing \"No activity recorded yet\".",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Log:p0",
-   "target": {
-    "kind": "component",
-    "id": "Log"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "New variant: Log: categorised?",
-   "detail": "Same job (history tail), different structure (kind word, kind filter); used on two screens.\nSeen in: pig-profile.log, inspection.pen-log",
+   "title": "Home Records heading description reads 'Updates in this prototype' (the Toolbox entry says…",
+   "detail": "Home Records heading description reads 'Updates in this prototype' (the Toolbox entry says 'Updates made in this preview'): demo copy over a real log.\nFix: Drop the description or say what the log holds ('Answers you sent').",
    "source": "gate"
   },
   {

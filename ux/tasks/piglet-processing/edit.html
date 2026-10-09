@@ -482,8 +482,8 @@
   // entry's other lines (what explained a count, a double's door) under its detail, above the stamp. One entry at a time.
   // (Logged for the design-system panel: Log has no slot under the title.)
   function logHtml(groups) {
-    return UI.log(groups, { strs: { empty: 'pp.edit.rec.empty' } }).replace(/<article class="st-log-entry">[\s\S]*?<\/article>/g, function (a) {
-      var m = a.match(/^([\s\S]*?<strong class="st-log-title">[\s\S]*?<\/strong>)([\s\S]*?)(<small>[\s\S]*?<\/small>)?(<div class="st-log-extra">[\s\S]*<\/div>)(<\/article>)$/);
+    return UI.log(groups, { strs: { empty: 'pp.edit.rec.empty' } }).replace(/<li class="st-log-entry"[^>]*>[\s\S]*?<\/li>/g, function (a) {
+      var m = a.match(/^([\s\S]*?<strong class="st-log-title">[\s\S]*?<\/strong>)([\s\S]*?)(<small>[\s\S]*?<\/small>)?(<div class="st-log-extra">[\s\S]*<\/div>)(<\/li>)$/);
       if (!m) return a;
       return /class="ed-delta"/.test(m[4]) ? m[1] + m[4] + m[2] + (m[3] || '') + m[5] : m[1] + m[2] + m[4] + (m[3] || '') + m[5];
     });

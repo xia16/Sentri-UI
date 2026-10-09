@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Heading: group</title>
+</head>
+<body>
+<!-- Labels a run of rows or log entries inside one panel. Muted; no icon, meta or action. Reach it through rowGroup({ title }) or Log. Each top-level element is one state; the atlas draws one cell per element. -->
+<div data-state="Default" data-st-context="page" style="background:var(--app-background);padding:var(--space-16);font-family:var(--font-sans);color:var(--ink)"><script>document.currentScript.parentElement.insertAdjacentHTML('beforeend', SentriUI.rowGroup(SentriUI.row({ title: 'Iron', description: '10 given · 2 left' }) + SentriUI.row({ title: 'Castrate', description: 'day 3' }), { title: 'Day 2' }));</script></div>
+<div data-state="With description" data-st-context="page" style="background:var(--app-background);padding:var(--space-16);font-family:var(--font-sans);color:var(--ink)"><script>document.currentScript.parentElement.insertAdjacentHTML('beforeend', SentriUI.log([{ label: 'Since End', description: 'Kept and stamped; the ended figures do not change', entries: [{ title: 'Count set to 11', at: '09:41', by: 'G.H' }] }]));</script></div>
+<div data-state="Chinese" data-st-context="page" style="background:var(--app-background);padding:var(--space-16);font-family:var(--font-sans);color:var(--ink)"><script>document.currentScript.parentElement.insertAdjacentHTML('beforeend', SentriUI.rowGroup(SentriUI.row({ title: '铁剂', description: '已打 10 头 · 还剩 2 头' }), { title: '第 2 天' }));</script></div>
+</body>
+</html>

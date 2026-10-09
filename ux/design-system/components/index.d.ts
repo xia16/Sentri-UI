@@ -16,17 +16,20 @@ type Strs<K extends string> = { [P in K]?: string };
 /** Arguments for the string at each slot, written as `data-args` JSON. */
 type StrArgs<K extends string> = { [P in K]?: Record<string, unknown> };
 
+export interface HeadingAction { label: string; action: string; value?: string; ariaLabel?: string; disabled?: boolean; strs?: Strs<'label'>; args?: StrArgs<'label'> }
+
 export interface HeadingProps {
   title: string;
   /** Leading 16px icon. */
   icon?: IconHtml;
   /** One muted line under the title. */
   description?: string;
-  /** Short right-aligned muted text, e.g. "Mon 09:42". */
+  /** Section only. Short right-aligned muted text, e.g. "Mon 09:42". */
   meta?: string;
-  /** Raw HTML for one right-aligned text action (a button or link). */
-  action?: string;
-  /** page 22px · section 13px (default) · panel 12px · group 11px muted. */
+  /** Section only. One right-aligned text action: the standard link with its › (a 48px target), or raw HTML for a button or link. */
+  action?: HeadingAction | string;
+  /** page (a screen or sheet title) · section (default; a block's title above its panel) · group (a run of rows or log
+   *  entries, muted). "panel" is retired and reads as section. A kind drops the slots it does not carry. */
   kind?: 'page' | 'section' | 'group' | 'panel';
   /** h1–h6; default 4. */
   level?: number;
@@ -44,8 +47,10 @@ export interface Fact {
   label: string;
   /** Empty or null renders an em dash. */
   value?: string | number | null;
-  /** Trusted HTML in place of value. */
+  /** Trusted markup in place of value. Never a button or link: facts do not act. */
   valueHtml?: string;
+  /** Set the value as an ID: mono, never broken across lines. */
+  mono?: boolean;
   /** A small muted line under the value. */
   meta?: string;
   strs?: Strs<'label' | 'value' | 'meta'>;
@@ -87,15 +92,24 @@ export interface RowProps {
 export interface LogEntry {
   title: string;
   detail?: string;
-  /** Timestamp and author: "Jul 8 · 07:14 · G.H". */
+  /** The stamp as text: "07:14 · G.H". Or pass at and by and the component writes it. */
   meta?: string;
-  /** 9px label above the title. */
+  /** When it was recorded: a Date, epoch ms, or 'YYYY-MM-DD' / 'YYYY-MM-DDTHH:MM'. */
+  at?: Date | number | string;
+  /** Initials of who recorded it. */
+  by?: string;
+  /** Categorised variant: the kind of event, one word above the title. */
   category?: string;
+  /** This entry corrects an earlier one: a "Corrected" word above the title. */
+  corrected?: boolean;
+  /** The original value, as a muted line (implies corrected). */
+  was?: string;
   extraHtml?: string;
   strs?: Strs<'category' | 'title' | 'detail' | 'meta'>;
   args?: StrArgs<'category' | 'title' | 'detail' | 'meta'>;
 }
 /** description (candidate, ADR 0002): one muted line under the group label. */
+export interface LogDayOptions { now?: Date | number | string; lang?: string; today?: string; yesterday?: string }
 export interface LogGroup { label?: string; description?: string; entries: LogEntry[]; strs?: Strs<'label' | 'description'>; args?: StrArgs<'label' | 'description'> }
 
 export interface Category { id: string; label: string; disabled?: boolean; strs?: Strs<'label'>; args?: StrArgs<'label'> }
@@ -595,7 +609,13 @@ export interface SentriUI {
   facts(items: Fact[], options?: { columns?: 1 | 2 | 3; className?: string }): string;
   row(props: RowProps): string;
   rowGroup(content: string, options?: { title?: string; level?: number; className?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
-  log(groups: LogGroup[], options?: { empty?: string; className?: string; strs?: Strs<'empty'>; args?: StrArgs<'empty'> }): string;
+  /** Today · Yesterday · weekday within a week · "Jul 8" (with the year when not this year). */
+  logDay(at: Date | number | string, options?: LogDayOptions): string;
+  /** "07:14 · G.H"; a missing time or author is left out. */
+  logStamp(at?: Date | number | string, by?: string): string;
+  /** Flat entries with `at` become newest-first day groups; undated entries go last under `earlier`. */
+  logGroups(entries: LogEntry[], options?: LogDayOptions & { earlier?: string }): LogGroup[];
+  log(groups: LogGroup[], options?: { empty?: string; kind?: 'day' | 'categorised'; correctedLabel?: string; className?: string; strs?: Strs<'empty'>; args?: StrArgs<'empty'> }): string;
   categoryFooter(props: CategoryFooterProps): string;
   field(props: { label?: string; control?: string; className?: string; ds?: string }): string;
   pickerField(props: PickerFieldProps): string;

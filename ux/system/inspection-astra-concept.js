@@ -10,11 +10,11 @@ const icon=k=>globalThis.SentriIcons?SentriIcons.icon(k):`<svg viewBox="0 0 24 2
 // SentriUI is the shared reading vocabulary; fallbacks keep the study importable
 // in source-only checks before the runtime bundle is mounted.
 const stOptionalRow=o=>globalThis.SentriUI?.optionalRow?globalThis.SentriUI.optionalRow(o):`<div class="st-optional">${esc(o.label)}${o.inline||''}</div>`;
-const stHeading=(o,fallback='')=>globalThis.SentriUI?.heading?globalThis.SentriUI.heading(o):fallback;
-const stPanel=(content,options={},fallback=content)=>globalThis.SentriUI?.panel?globalThis.SentriUI.panel(content,options):fallback;
-const stFacts=(items,options={},fallback='')=>globalThis.SentriUI?.facts?globalThis.SentriUI.facts(items,options):fallback;
+const stHeading=o=>globalThis.SentriUI?.heading?globalThis.SentriUI.heading(o):'';
+const stPanel=(content,options={})=>globalThis.SentriUI?.panel?globalThis.SentriUI.panel(content,options):content;
+const stFacts=(items,options={})=>globalThis.SentriUI?.facts?globalThis.SentriUI.facts(items,options):'';
 const stRow=o=>globalThis.SentriUI?.row?globalThis.SentriUI.row(o):button(o.action||'',`<span class="action-symbol">${o.icon||icon('chevron')}</span><span><strong>${esc(o.title)}</strong><small>${esc(o.description||'')}</small></span>${icon('chevron')}`,'action-item',o.value||'');
-const stLog=(groups,options={},fallback='')=>globalThis.SentriUI?.log?globalThis.SentriUI.log(groups,options):fallback;
+const stLog=(groups,options={})=>globalThis.SentriUI?.log?globalThis.SentriUI.log(groups,options):'';
 const stIconButton=o=>{
  if(globalThis.SentriUI?.iconButton)return globalThis.SentriUI.iconButton(o);
  const badge=o.badge!==''&&o.badge!=null?`<span class="filter-badge">${esc(o.badge)}</span>`:'';
@@ -135,10 +135,10 @@ const catalog=[
 ];
 function seed(){const c=baseSeed();c.selectedPens=new Set();c.customHealthCatalog={};c.actionScope='pigs';c.batchFilter='All';c.batches=[{id:'20',stage:'Gestating',stageStartedAt:'2026-08-03',pigIds:['000254','000267','000281','000306','000312'],pens:['C1','C2'],next:'Pregnancy check',when:'Tomorrow · 13 Sep',nextDate:'2026-09-13'},{id:'18',stage:'Grower',stageStartedAt:'2026-08-15',pigIds:['000801','000802'],pens:['D4'],next:'Spot-check weight',when:'Fri · 18 Sep',nextDate:'2026-09-18'}];Object.assign(c,{stage:'All',healthFilter:'All',healthStatus:'All',manualOnly:false,triageFilter:'All'});c.pens.forEach(pe=>{pe.faults=[];pe.note='';pe.issue='';pe.pigs.forEach(p=>{p.batchId=pe.id==='D4'?'18':'20';p.cases=[];p.band=p.id==='000267'?'mild':'standard';p.adjustmentActive=p.id==='000267';});});const a=c.pens[0];a.note='Close the aisle gate after passing.';a.noteBy='G. Hansen · today · 06:40';a.pigs[1].cases=[{name:'Thin',kind:'Body condition',day:12,triage:'Monitor',feedLinked:true}];c.pens[1].pigs[0].cases=[{name:'Fever',kind:'Symptom',day:2,triage:'Treat in place'},{name:'Poor appetite',kind:'Symptom',day:2,triage:'Monitor'}];c.pens[1].pigs[0].instruction='';c.pens[1].faults=[{id:'fault-initial',device:'Drinking station',name:'Drinking station',description:'Drinker valve leaking on the east side.',time:'06:40',who:'G. Hansen',open:true}];c.pens[2].pigs[0].cases=[{name:'Diarrhoea',kind:'Symptom',day:1,triage:'Monitor'}];c.pens[2].switchDue=true;
  c.pens.forEach(pe=>pe.pigs.forEach(p=>{
-  p.initialRecords=cases(p).map(k=>({category:'Health',title:k.name,note:k.kind+' · Day '+k.day+' · '+k.triage,time:'Before this walk',who:'Author not supplied'}));
+  p.initialRecords=cases(p).map(k=>({category:'Health',title:k.name,note:k.kind+' · Day '+k.day+' · '+k.triage,time:'Before this walk',who:''}));
   p.feedChanges=[];p.closedCases=[];
   if(pe.mode!=='adlib')p.feedCurve={today:42,source:'Sample farm curve',points:[{day:35,kg:p.base-.1},{day:42,kg:p.base},{day:49,kg:p.base+.1},{day:56,kg:p.base+.2}]};
-  if(p.adjustmentActive){p.ends='when recovered';p.feedChanges.push({title:'Individual adjustment active',note:'Thin · mild · +10% · until resolved',time:'Before this walk',who:'Start date and author not supplied'});}
+  if(p.adjustmentActive){p.ends='when recovered';p.feedChanges.push({title:'Individual adjustment active',note:'Thin · mild · +10% · until resolved',time:'Before this walk',who:''});}
 
   }));
  c.penHistory={C1:[{category:'Notes',title:'Pen note added',note:a.note,time:'Today · 06:40',who:'G. Hansen'},{category:'Movement',title:'3 pigs transferred in',note:'Unit 6 · B2 → Unit 7 · C1 · 000254, 000267, 000281',time:'10 Sep · 14:20',who:'M. Larsen'}],C2:[{category:'Equipment',title:'Equipment fault reported',note:'Drinking station · Drinker valve leaking on the east side.',time:'Today · 06:40',who:'G. Hansen'},{category:'Movement',title:'1 pig transferred out',note:'Unit 7 · C2 → Hospital · H1 · 000299',time:'Yesterday · 15:10',who:'M. Larsen'}]};
@@ -204,16 +204,16 @@ function unitOverview(c){
 }
 function unitEnvironment(c){
  const sensors=unitSensors(c);
- return '<section class="unit-detail-section"><h4 class="section-title">'+icon('air')+'Environment</h4>'+(sensors.length?'<div class="unit-sensor-grid">'+sensors.map(s=>'<div class="unit-sensor-reading'+(s.value==null?' is-unavailable':'')+'"><span>'+icon(s.icon||'air')+esc(s.label)+'</span><strong>'+(s.value==null?'—':esc(s.value)+' <small>'+esc(s.unit)+'</small>')+'</strong><small>'+esc(s.value==null?'Reading unavailable':s.updated||'Latest reading')+'</small></div>').join('')+'</div>':'<p class="unit-empty-state">No sensors installed</p>')+'</section>';
+ return '<section class="unit-detail-section">'+stHeading({title:'Environment',icon:icon('air'),kind:'section',level:4})+(sensors.length?'<div class="unit-sensor-grid">'+sensors.map(s=>'<div class="unit-sensor-reading'+(s.value==null?' is-unavailable':'')+'"><span>'+icon(s.icon||'air')+esc(s.label)+'</span><strong>'+(s.value==null?'—':esc(s.value)+' <small>'+esc(s.unit)+'</small>')+'</strong><small>'+esc(s.value==null?'Reading unavailable':s.updated||'Latest reading')+'</small></div>').join('')+'</div>':'<p class="unit-empty-state">No sensors installed</p>')+'</section>';
 }
 function unitEquipment(c){
  const faults=c.pens.flatMap(pe=>openFaults(pe).map(f=>({pe,f})));
- return '<section class="unit-detail-section"><div class="unit-section-heading"><h4 class="section-title">'+icon('wrench')+'Equipment faults</h4><span>'+faults.length+' open</span></div>'+(faults.length?'<div class="unit-fault-list">'+faults.map(({pe,f})=>'<article class="unit-fault-card"><div class="unit-fault-heading"><span>Pen '+esc(pe.id)+'</span><small>Open</small></div><h5>'+esc(f.name)+'</h5><p>'+esc(f.description)+'</p><small>Reported '+esc(f.time)+' · '+esc(f.who)+'</small>'+'</article>').join('')+'</div>':'<p class="unit-empty-state">'+icon('check')+'No open equipment faults</p>')+'</section>';
+ return '<section class="unit-detail-section">'+stHeading({title:'Equipment faults',icon:icon('wrench'),meta:faults.length+' open',kind:'section',level:4})+(faults.length?'<div class="unit-fault-list">'+faults.map(({pe,f})=>'<article class="unit-fault-card"><div class="unit-fault-heading"><span>Pen '+esc(pe.id)+'</span><small>Open</small></div><h5>'+esc(f.name)+'</h5><p>'+esc(f.description)+'</p><small>Reported '+esc(f.time)+' · '+esc(f.who)+'</small>'+'</article>').join('')+'</div>':'<p class="unit-empty-state">'+icon('check')+'No open equipment faults</p>')+'</section>';
 }
 function returnFromFault(c){c.view=[...(c.navTrail||[])].reverse().find(p=>['unit-detail','equipment','pen-detail','pen-faults','actions'].includes(p.view))?.view||'pen-detail';}
 function environmentBody(c){
  const sensors=unitSensors(c);
- return sensors.length?'<section class="detail-section"><div class="detail-heading"><h4 class="section-title">'+icon('air')+'Readings</h4></div>'+sensors.map(s=>'<div class="sensor-slot"><span>'+esc(s.label)+'<small>'+esc(s.value==null?'Reading unavailable':s.updated||'Latest reading')+'</small></span><strong>'+(s.value==null?'—':esc(s.value)+' <small>'+esc(s.unit)+'</small>')+'</strong></div>').join('')+'</section>':'<p class="detail-empty">No sensors installed</p>';
+ return sensors.length?'<section class="detail-section">'+stHeading({title:'Readings',icon:icon('air'),kind:'section',level:4})+sensors.map(s=>'<div class="sensor-slot"><span>'+esc(s.label)+'<small>'+esc(s.value==null?'Reading unavailable':s.updated||'Latest reading')+'</small></span><strong>'+(s.value==null?'—':esc(s.value)+' <small>'+esc(s.unit)+'</small>')+'</strong></div>').join('')+'</section>':'<p class="detail-empty">No sensors installed</p>';
 }
 
 function careAppearance(k){
@@ -345,7 +345,7 @@ function customCategoryPicker(c){
 }
 function healthSearchResults(c,available,raw,q){
  const f=c.form,matches=available.filter(item=>conditionSearchText(item).includes(q)),groups=[];for(const item of matches){const key=item.section+'|'+item.group;let group=groups.find(x=>x.key===key);if(!group){group={key,section:item.section,group:item.group,items:[]};groups.push(group);}group.items.push(item);}
- const items=groups.map((group,index)=>'<section class="catalog-group">'+((!index||groups[index-1].section!==group.section)&&group.section!==group.group?'<h4 class="catalog-section-title">'+esc(group.section)+'</h4>':'')+'<h5>'+esc(group.group)+'</h5>'+customFirst(group.items).map(item=>catalogItem(c,item)).join('')+'</section>').join('');
+ const items=groups.map((group,index)=>'<section class="catalog-group">'+((!index||groups[index-1].section!==group.section)&&group.section!==group.group?stHeading({title:group.section,kind:'section',level:4,className:'catalog-section-title'}):'')+stHeading({title:group.group,kind:'group',level:5})+customFirst(group.items).map(item=>catalogItem(c,item)).join('')+'</section>').join('');
  const exact=available.some(item=>normalizedCondition(item.name)===q),custom=raw&&!exact&&!(c.view==='record-optional'&&f.optionalKey==='target')?button('health-add-custom','<span><strong>Add “'+esc(raw)+'”</strong><small>Use as a custom '+f.kind.toLowerCase()+'</small></span>'+icon('condition'),'catalog-custom',raw):'';
  return items+custom||'<p class="quiet-note catalog-empty">No matching '+f.kind.toLowerCase()+'s.</p>';
 }
@@ -452,17 +452,17 @@ function saveProductionTask(c){
 function pigCurrentTasks(c){
  const tasks=currentTasksForPig(c,pig(c,c.pigId));if(!tasks.length)return '';
  const taskIcon=t=>t.id==='vaccination'||/vaccin/i.test(t.title||'')?'treat':(t.type||'').toLowerCase()==='production'?'chart':'condition';
- const heading=stHeading({title:'Current tasks',icon:icon('note'),meta:tasks.length+' '+(tasks.length===1?'task':'tasks'),kind:'section',level:4,className:'pig-current-tasks-heading'},'<div class="pig-current-tasks-heading"><h4 class="section-title">'+icon('note')+'Current tasks</h4><span>'+tasks.length+' '+(tasks.length===1?'task':'tasks')+'</span></div>');
+ const heading=stHeading({title:'Current tasks',icon:icon('note'),meta:tasks.length+' '+(tasks.length===1?'task':'tasks'),kind:'section',level:4,className:'pig-current-tasks-heading'});
  return '<section class="pig-current-tasks" aria-label="Current tasks">'+heading+'<div class="pig-current-task-list" role="region" aria-label="Current task cards" tabindex="0" data-task-count="'+tasks.length+'">'+tasks.map(t=>{const type=t.type||'General',slug=type.toLowerCase().replace(/[^a-z0-9]+/g,'-'),state=/in progress/i.test(t.status||'')?' is-active':/due today|today/i.test(t.status||'')?' is-due':'';return button(t.action||'sow-current-task','<span class="pig-current-task-icon">'+icon(taskIcon(t))+'</span><span class="pig-current-task-copy"><strong>'+esc(t.title)+'</strong><small>'+esc([t.status,t.summary].filter(Boolean).join(' · '))+'</small></span><span class="pig-current-task-type">'+esc(type)+'</span>'+icon('chevron'),'pig-current-task-entry task-'+slug+state,t.value||t.id);}).join('')+'</div></section>';
 }
 function pigFeedFacts(p,pe){
- if(pe.mode==='unknown')return '<section class="detail-section reading-section pig-feeding-facts">'+stHeading({title:'Feeding',icon:icon('feed'),kind:'section',level:4},'<div class="detail-heading"><h4 class="section-title">'+icon('feed')+'Feeding</h4></div>')+'<p class="detail-empty facts-surface">No feeding plan recorded.</p></section>';
+ if(pe.mode==='unknown')return '<section class="detail-section reading-section pig-feeding-facts">'+stHeading({title:'Feeding',icon:icon('feed'),kind:'section',level:4})+'<p class="detail-empty facts-surface">No feeding plan recorded.</p></section>';
  const amount=pe.mode==='adlib'?'Ad-lib':quantity(pigAllocation(p,pe))+' <small>kg/day</small>';
  const context=pe.mode==='station'?'Station-fed':pe.mode==='trough'?'Included in pen allocation':'No fixed ration';
  const tags=pigFeedTags(p).map(t=>t.kind==='ration'?{...t,label:'Feed '+t.delta,day:feedAdjustmentReason(p)}:t);
- const heading=stHeading({title:'Feeding',icon:icon('feed'),kind:'section',level:4,action:button('pig-feed','View plan '+icon('chevron'),'profile-details-link',p.id)},'<div class="detail-heading"><h4 class="section-title">'+icon('feed')+'Feeding</h4>'+button('pig-feed','View plan '+icon('chevron'),'profile-details-link',p.id)+'</div>');
+ const heading=stHeading({title:'Feeding',icon:icon('feed'),kind:'section',level:4,action:button('pig-feed','View plan '+icon('chevron'),'profile-details-link',p.id)});
  const inner='<div class="pig-feed-fact-row"><span class="pig-feed-copy"><strong>'+esc(pe.formula)+'</strong><small>'+esc(context)+'</small></span><span class="pig-feed-amount">'+amount+'</span></div>'+(tags.length?'<div class="feeding-status-tags">'+tags.map(recordedTag).join('')+'</div>':'');
- return '<section class="detail-section reading-section pig-feeding-facts">'+heading+stPanel(inner,{className:'facts-surface'},'<div class="facts-surface st-panel">'+inner+'</div>')+'</section>';
+ return '<section class="detail-section reading-section pig-feeding-facts">'+heading+stPanel(inner,{className:'facts-surface'})+'</section>';
 }
 function daysFromWalk(date){
  if(!date)return null;const value=Date.parse(date),today=Date.parse(walkDate);return Number.isFinite(value)?Math.floor((today-value)/86400000):null;
@@ -482,7 +482,7 @@ function overviewDetails(p,c){
  facts.push(fact('Age',p.age??daysFromWalk(r.birthDate),'days'),fact('Type',animalType(p)),fact('Breed',r.breed),fact('Batch',p.batchId));
  for(const [key,label,unit] of [['weight','Weight','kg'],['temperature','Temperature','°C']])facts.push(fact(label,p[key],unit,measurementAge(p,key)));
  facts.push(fact('On farm',r.onFarm===undefined?null:r.onFarm?'Yes':'No'));
- return stPanel('<div class="overview-details-grid">'+facts.join('')+health+'</div>',{className:'facts-surface'},'<div class="overview-details-grid facts-surface st-panel">'+facts.join('')+health+'</div>');
+ return stPanel('<div class="overview-details-grid">'+facts.join('')+health+'</div>',{className:'facts-surface'});
 }
 function typeDetails(p,c){
  const r=p.registry||{},type=animalType(p);let title='',items=[];
@@ -494,7 +494,7 @@ function typeDetails(p,c){
  else if(type==='Piglet'){title='Piglet growth';items=[['Birth weight',r.birthWeight,'kg'],['Weaning date',r.weaningDate],['Dam',r.dam],['Weaning weight',r.weaningWeight,'kg']];}
  else if(['Grower','Finisher','Weaner'].includes(type)){title='Growth';items=[['Entry weight',r.entryWeight,'kg'],['Entry date',r.growthEntryDate]];}
  if(!title)return '';
- const titleHeading=stHeading({title,icon:icon(type==='Sow'||type==='Gilt'?'clock':type==='Boar'?'profile':'weight'),kind:'section',level:4},'<div class="detail-heading"><h4 class="section-title">'+icon(type==='Sow'||type==='Gilt'?'clock':type==='Boar'?'profile':'weight')+title+'</h4></div>');
+ const titleHeading=stHeading({title,icon:icon(type==='Sow'||type==='Gilt'?'clock':type==='Boar'?'profile':'weight'),kind:'section',level:4});
  return '<section class="detail-section reading-section animal-type-section">'+titleHeading+'<div class="overview-details-grid facts-surface st-panel">'+items.map(([label,value,unit,meta])=>'<div class="overview-fact'+(!hasRecordValue(value)?' is-empty':'')+'"><span class="overview-fact-label">'+label+'</span><strong>'+recordValue(value,unit)+'</strong>'+(hasRecordValue(value)&&meta?'<small>'+esc(meta)+'</small>':'')+'</div>').join('')+overviewNextTask(p,c)+(['Sow','Gilt'].includes(type)?'<div class="overview-fact'+(!hasRecordValue(p.parity)?' is-empty':'')+'"><span class="overview-fact-label">Parity</span><strong>'+recordValue(p.parity)+'</strong></div>':'')+'</div></section>';
 }
 function measurementDateAge(date){const days=daysFromWalk(date);return days===null?'':days===0?'Today':days>0?days+' days ago':'';}
@@ -503,8 +503,8 @@ function pigRecordToolbar(p){return SentriUI.sheetFooter({content:back()+button(
 function pigOverview(c){
  const p=pig(c,c.pigId),pe=penOf(c,p.id);
 
- const general=stHeading({title:'General details',icon:icon('profile'),kind:'section',level:4},'<div class="detail-heading"><h4 class="section-title">'+icon('profile')+'General details</h4></div>');
- const record=stHeading({title:'Pig record',icon:icon('note'),kind:'section',level:4},'<div class="detail-heading"><h4 class="section-title">'+icon('note')+'Pig record</h4></div>');
+ const general=stHeading({title:'General details',icon:icon('profile'),kind:'section',level:4});
+ const record=stHeading({title:'Pig record',icon:icon('note'),kind:'section',level:4});
  return sheet(c,p.id,unitName(c)+' · '+pe.id+' · '+stageSummary(p),pigRecordCards(p)+pigCurrentTasks(c)+'<section class="detail-section reading-section pig-overview-facts">'+general+overviewDetails(p,c)+'</section>'+typeDetails(p,c)+pigFeedFacts(p,pe)+'<section class="detail-section reading-section pig-record-links">'+record+'<div class="compact-actions detail-destinations st-panel st-row-group">'+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p));
 }
 function penOverview(c){const pe=pen(c,c.penId),records=[];if(pe.note)records.push(recordCard({kind:'Pen note',title:pe.note,meta:pe.noteBy,tone:'record-neutral record-note-preview',link:'read-pen-note',value:pe.id}));return sheet(c,'Pen '+pe.id,countLabel(pe.pigs.length)+' · '+unitName(c),
@@ -779,7 +779,7 @@ function actionCatalogue(c){
  const order=['production','health','general'];groups.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
  return {groups,unavailable};
 }
-function sowTaskCard(c){if(picked(c).length!==1||c.selectedPens.size)return '';const tasks=currentTasksForPig(c,picked(c)[0]);if(!tasks.length)return '';const heading=stHeading({title:'Current tasks',meta:String(tasks.length),kind:'section',level:4},'<div class="sow-task-heading"><h4>Current tasks <span>'+tasks.length+'</span></h4></div>');return `<section class="sow-task-section" aria-label="Linked tasks">${heading}<div class="sow-task-rail" aria-label="Current tasks">${tasks.map(t=>button(t.action||'sow-current-task',`<span class="sow-task-card-main"><strong>${esc(t.title)}</strong>${icon('chevron')}</span><span class="sow-task-card-meta"><span class="sow-task-status">${esc(t.status)}</span><span class="sow-task-type" data-type="${esc((t.type||'General').toLowerCase())}">${esc(t.type||'General')}</span></span>`,'sow-task-card',t.value||t.id)).join('')}</div></section>`;}
+function sowTaskCard(c){if(picked(c).length!==1||c.selectedPens.size)return '';const tasks=currentTasksForPig(c,picked(c)[0]);if(!tasks.length)return '';const heading=stHeading({title:'Current tasks',meta:String(tasks.length),kind:'section',level:4});return `<section class="sow-task-section" aria-label="Linked tasks">${heading}<div class="sow-task-rail" aria-label="Current tasks">${tasks.map(t=>button(t.action||'sow-current-task',`<span class="sow-task-card-main"><strong>${esc(t.title)}</strong>${icon('chevron')}</span><span class="sow-task-card-meta"><span class="sow-task-status">${esc(t.status)}</span><span class="sow-task-type" data-type="${esc((t.type||'General').toLowerCase())}">${esc(t.type||'General')}</span></span>`,'sow-task-card',t.value||t.id)).join('')}</div></section>`;}
 
 function actionRows(items,disabled=false){return items.map(x=>{const row=action(x.a,x.k,x.title,x.sub,x.value);return disabled?row.replace('<button','<button disabled aria-disabled="true"'):row;}).join('');}
 function productionActionGroups(c,items,disabled=false){
@@ -789,7 +789,7 @@ function productionActionGroups(c,items,disabled=false){
  const cluster=(title,rows)=>rows.length?'<section class="production-action-cluster" aria-label="'+title+' actions">'+SentriUI.rowGroup(actionRows(rows,disabled),{title,className:'compact-actions st-action-list'})+'</section>':'';
  return '<div class="production-action-groups">'+cluster('Farrowing',farrowing)+cluster('Piglet processing',processing)+cluster('Pregnancy check',pregnancy)+cluster('Gestation',gestation)+cluster('Breeding',breeding)+cluster('Lactation',lactation)+cluster('Growth',growth)+cluster('Shared',other)+'</div>';
 }
-function actionSections(c,groups,disabled=false){return groups.map(g=>{const categoryIcon=icon(g.id==='production'?'chart':g.id==='health'?'condition':g.id==='feed'?'feed':'note');const heading=stHeading({title:g.label,icon:categoryIcon,kind:'section',level:4,className:'section-title st-category-heading'},'<h4 class="section-title">'+categoryIcon+g.label+'</h4>');return `<section class="sow-action-group st-action-section${disabled?' unavailable-action-group':''}" data-action-group="${g.id}" aria-label="${g.label}">${heading}${g.id==='production'&&g.items.length?productionActionGroups(c,g.items,disabled):'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(g.items,disabled)+'</div>'}${g.empty?'<p class="action-category-empty">'+esc(g.empty)+'</p>':''}</section>`;}).join('');}
+function actionSections(c,groups,disabled=false){return groups.map(g=>{const categoryIcon=icon(g.id==='production'?'chart':g.id==='health'?'condition':g.id==='feed'?'feed':'note');const heading=stHeading({title:g.label,icon:categoryIcon,kind:'section',level:4,className:'section-title st-category-heading'});return `<section class="sow-action-group st-action-section${disabled?' unavailable-action-group':''}" data-action-group="${g.id}" aria-label="${g.label}">${heading}${g.id==='production'&&g.items.length?productionActionGroups(c,g.items,disabled):'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(g.items,disabled)+'</div>'}${g.empty?'<p class="action-category-empty">'+esc(g.empty)+'</p>':''}</section>`;}).join('');}
 function unavailableActionGroups(c){const rows=actionCatalogue(c).unavailable;return [['production','Production'],['health','Health'],['general','General']].map(([id,label])=>({id,label,items:rows.filter(x=>(x.group||'general')===id).map(x=>({a:'unavailable-action',k:x.k||'note',title:x.title,sub:x.reason,value:'',section:x.section||''}))})).filter(g=>g.items.length);}
 function actionsPage(c){
  const {groups,unavailable}=actionCatalogue(c),single=picked(c).length===1,p=single?picked(c)[0]:null;
@@ -951,13 +951,12 @@ function round3Overlay(c){const pe=pen(c,c.penId);
 }
 
 // Dedicated reading destinations and case-scoped actions. All data remains in this study.
-function recordLog(events,empty){return events.length?'<div class="record-timeline">'+events.map(e=>'<article><strong>'+esc(e.title)+'</strong>'+(e.note?'<p>'+esc(e.note)+'</p>':'')+'<small>'+esc(e.time)+' · '+esc(e.who)+'</small></article>').join('')+'</div>':'<p class="detail-empty">'+empty+'</p>';}
 function hasRecordValue(value){return value!==null&&value!==undefined&&value!=='';}
 function recordValue(value,unit=''){return hasRecordValue(value)?esc(value)+(unit?(unit==='%'?'':' ')+unit:''):'—';}
 function profileFacts(title,items){
- const empty=items.every(([,value])=>!hasRecordValue(value));const symbol={'Basic information':'profile','Sow & cycle':'clock','Body & cycle':'weight','Production totals & averages':'chart','Origin & dates':'origin','Identity records':'profile'}[title];
- const heading=stHeading({title,icon:symbol?icon(symbol):'',kind:'section',level:4},'<h4 class="section-title">'+(symbol?icon(symbol):'')+title+'</h4>');
- return '<section class="profile-section'+(empty?' is-empty':'')+'">'+heading+'<dl class="profile-facts facts-surface st-panel">'+items.map(([label,value,unit])=>'<div'+(!hasRecordValue(value)?' class="is-empty"':'')+'><dt>'+label+'</dt><dd>'+recordValue(value,unit)+'</dd></div>').join('')+'</dl></section>';
+ const symbol={'Basic information':'profile','Sow & cycle':'clock','Body & cycle':'weight','Production totals & averages':'chart','Origin & dates':'origin','Identity records':'profile'}[title];
+ const heading=stHeading({title,icon:symbol?icon(symbol):'',kind:'section',level:4});
+ return '<section class="profile-section">'+heading+stFacts(items.map(([label,value,unit])=>({label,value:hasRecordValue(value)?value+(unit?(unit==='%'?'':' ')+unit:''):null,mono:/^(Ear tag|Tag|ID)\b/i.test(label)})))+'</section>';
 }
 function filterLogEntries(events,category){return category==='All'?events:events.filter(e=>eventCategory(e)===category);}
 function pigLogEntries(c){const p=pig(c,c.pigId);return [...c.events.filter(e=>e.subjects.includes(p.id)).map(e=>({...e,time:'Today · '+e.time})),...(p.initialRecords||[])];}
@@ -968,6 +967,8 @@ function logEntryDate(e){
  let date=iso?.[1];
  if(!date&&/\b(today|yesterday)\b/i.test(raw)){const d=new Date(walkDate+'T12:00:00Z');if(/yesterday/i.test(raw))d.setUTCDate(d.getUTCDate()-1);date=d.toISOString().slice(0,10);}
  if(!date){const match=raw.match(/\b(\d{1,2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(?: (\d{4}))?\b/i);if(match){const month=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].indexOf(match[2].toLowerCase())+1;date=(match[3]||walkDate.slice(0,4))+'-'+String(month).padStart(2,'0')+'-'+match[1].padStart(2,'0');}}
+ if(!date){const md=raw.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{1,2})\b/i);if(md){const month=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].indexOf(md[1].toLowerCase())+1;date=walkDate.slice(0,4)+'-'+String(month).padStart(2,'0')+'-'+md[2].padStart(2,'0');}}
+ if(!date){const ago=raw.match(/\b(\d+) days? ago\b/i);if(ago){const d=new Date(walkDate+'T12:00:00Z');d.setUTCDate(d.getUTCDate()-Number(ago[1]));date=d.toISOString().slice(0,10);}}
  return date?{date,time:iso?.[2]||clock?.[0]||''}:null;
 }
 function logDateBounds(filter={preset:'all'}){
@@ -994,13 +995,8 @@ function logDateDraftError(d){
  if(d.start>d.end)return 'End date must be on or after start date.';
  return '';
 }
-function logDisplayStamp(e,stamp){
- if(stamp){
-  return {label:new Date(stamp.date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),time:stamp.time||''};
- }
- const raw=String(e.time||'').trim(),match=raw.match(/^(.+?)\s*·\s*((?:[01]\d|2[0-3]):[0-5]\d)$/);
- return {label:(match?match[1]:raw)||'Date unknown',time:match?.[2]||''};
-}
+// The group is the day (Today · Yesterday · weekday · date); an undated record goes under Earlier. The stamp is time · initials.
+function logDayLabel(stamp){return stamp?SentriUI.logDay(stamp.date+(stamp.time?'T'+stamp.time:''),{now:walkDate}):'Earlier';}
 function logDatePicker(c){
  const d=c.logDateDraft,field=(label,key,type,value)=>'<label class="field">'+label+'<input type="'+type+'" data-log-date-field="'+key+'" value="'+esc(value||'')+'"></label>',custom=d.preset==='custom',error=logDateDraftError(d);
 
@@ -1015,8 +1011,8 @@ function logFilterBar(c,events,scope){
 }
 function categorizedLog(c,events,scope){
  const visible=visibleLogEntries(c,events,scope);
- const fallback=visible.length?'<div class="record-timeline categorized-timeline facts-surface">'+visible.map(e=>{const stamp=logEntryDate(e),display=logDisplayStamp(e,stamp),label=display.label+(display.time?' · '+display.time:'');return '<article><div class="log-entry-heading"><span class="log-type" data-kind="'+eventCategory(e)+'">'+eventCategory(e)+'</span><strong>'+esc(e.title)+'</strong></div>'+(e.note?'<p>'+esc(e.note)+'</p>':'')+'<small>'+esc(label)+' · '+esc(e.who)+'</small></article>';}).join('')+'</div>':'<div class="detail-empty log-empty facts-surface"><strong>'+(events.length?'No matching entries':'No activity recorded yet')+'</strong>'+(events.length?'<p>Try another activity or date range.</p>':'')+'</div>';
- const groups=[];for(const e of visible){const display=logDisplayStamp(e,logEntryDate(e));let group=groups.find(g=>g.label===display.label);if(!group){group={label:display.label,entries:[]};groups.push(group);}group.entries.push({title:e.title,detail:e.note||'',meta:[display.time,e.who].filter(Boolean).join(' · '),category:eventCategory(e)});}return stLog(groups,{className:'categorized-timeline',empty:events.length?'No matching entries':'No activity recorded yet'},fallback);
+ const groups=[];for(const e of visible){const stamp=logEntryDate(e),label=logDayLabel(stamp);let group=groups.find(g=>g.label===label);if(!group){group={label,entries:[]};groups.push(group);}group.entries.push({title:e.title,detail:e.note||'',at:stamp&&stamp.time||'',by:e.who,category:eventCategory(e)});}
+ return stLog(groups,{kind:'categorised',className:'categorized-timeline',empty:events.length?'No matching entries':'No activity recorded yet'});
 }
 
 function productionRecords(c,p){
@@ -1034,8 +1030,8 @@ function productionOverview(c,p){
  const records=productionRecords(c,p),avg=productionAverages(records),type=animalType(p),litter=type==='Sow'||type==='Gilt';
  const metrics=litter?[['Born alive',avg.bornAlive],['Weaned',avg.weaned],['Weaning wt.',avg.weaningWeight,'kg']]:type==='Boar'?[['Services / batch',avg.services]]:[['Entry weight',avg.entryWeight,'kg'],['Exit weight',avg.exitWeight,'kg']];
  // Design law: an empty section is absent, never rendered as "none".
- const summary=avg.count?'<section class="batch-averages">'+stHeading({title:'Averages',icon:icon('chart'),meta:avg.count+' completed '+(avg.count===1?'batch':'batches'),kind:'section',level:4},'<div class="detail-heading"><h4>Averages</h4><small>'+avg.count+' completed '+(avg.count===1?'batch':'batches')+'</small></div>')+'<div class="production-highlights">'+metrics.map(([label,value,unit])=>'<div><strong>'+recordValue(value,unit)+'</strong><span>'+label+'</span></div>').join('')+'</div></section>':'';
- return summary+'<section class="detail-section production-batch-section">'+stHeading({title:'Batches',icon:icon('record'),kind:'section',level:4},'<div class="detail-heading"><h4>Batches</h4></div>')+(records.length?'<div class="production-batch-list st-panel st-row-group">'+records.map(r=>{
+ const summary=avg.count?'<section class="batch-averages">'+stHeading({title:'Averages',icon:icon('chart'),meta:avg.count+' completed '+(avg.count===1?'batch':'batches'),kind:'section',level:4})+'<div class="production-highlights">'+metrics.map(([label,value,unit])=>'<div><strong>'+recordValue(value,unit)+'</strong><span>'+label+'</span></div>').join('')+'</div></section>':'';
+ return summary+'<section class="detail-section production-batch-section">'+stHeading({title:'Batches',icon:icon('record'),kind:'section',level:4})+(records.length?'<div class="production-batch-list st-panel st-row-group">'+records.map(r=>{
   const current=r.status==='current';const result=current?stageSummary(p):litter?(hasRecordValue(r.weaned)?r.weaned+' weaned':'Weaned —')+(Number.isFinite(r.weaningLitterWeight)&&r.weaned>0?' · '+quantity(r.weaningLitterWeight/r.weaned)+' kg':''):type==='Boar'?(r.services??'—')+' services':(r.exitWeight??'—')+' kg at finish';
   const sub=current?result:result+' · '+(r.finishedDate||'Date unknown')+(r.rating?' · '+r.rating:'');
   return stRow({action:'pig-production-batch',value:p.id+'|'+r.id,icon:icon(current?'clock':'check'),title:'Batch '+r.batchId,description:sub,trailing:current?'<small class="batch-record-status">Current</small>':'',className:'production-batch-row'});
@@ -1102,17 +1098,17 @@ function pigFeedingToday(p,pe){
  const context=pe.mode==='station'?'Station-fed':pe.mode==='trough'?'Included in pen allocation':'No fixed ration';
  const tags=pigFeedTags(p).map(t=>t.kind==='ration'?{...t,label:'Feed '+t.delta,day:feedAdjustmentReason(p)}:t);
  const inner='<div class="pig-feed-fact-row"><span class="pig-feed-copy"><strong>'+esc(pe.formula||'Feed plan')+'</strong><small>'+esc(context)+'</small></span><span class="pig-feed-amount">'+amount+'</span></div>'+(tags.length?'<div class="feeding-status-tags">'+tags.map(recordedTag).join('')+'</div>':'');
- return stPanel(inner,{className:'facts-surface'},'<div class="facts-surface st-panel">'+inner+'</div>');
+ return stPanel(inner,{className:'facts-surface'});
 }
 function pigFeedPage(c){
  const p=pig(c,c.pigId),pe=penOf(c,p.id);
- const feeding='<section class="detail-section reading-section pig-feeding-facts">'+stHeading({title:'Feeding',icon:icon('feed'),kind:'section',level:4},'<div class="detail-heading"><h4 class="section-title">'+icon('feed')+'Feeding</h4></div>')+pigFeedingToday(p,pe)+'</section>';
- const curve=pe.mode==='adlib'?'':'<section class="detail-section pig-plan-curve">'+stHeading({title:'Base curve',icon:icon('chart'),kind:'section',level:4},'<div class="detail-heading"><h4>Base curve</h4></div>')+stPanel(feedCurve(p),{className:'facts-surface pig-plan-curve-panel'},feedCurve(p))+'</section>';
+ const feeding='<section class="detail-section reading-section pig-feeding-facts">'+stHeading({title:'Feeding',icon:icon('feed'),kind:'section',level:4})+pigFeedingToday(p,pe)+'</section>';
+ const curve=pe.mode==='adlib'?'':'<section class="detail-section pig-plan-curve">'+stHeading({title:'Base curve',icon:icon('chart'),kind:'section',level:4})+stPanel(feedCurve(p),{className:'facts-surface pig-plan-curve-panel'})+'</section>';
  return sheet(c,'Feed plan',p.id,feeding+curve,footer(back(),''));
 }
 function feedBody(c,pe){
  const plans=pe.mode==='adlib'?'':pe.pigs.map(p=>button('pig-feed','<span><strong>'+p.id+'</strong><small>'+esc(pigFeedTags(p).map(t=>t.label).join(' · ')||'Follow curve')+'</small></span><strong>'+quantity(pigAllocation(p,pe))+' <small>kg/day</small></strong>'+icon('chevron'),'feeding-pig-row',p.id)).join('');
- const heading=stHeading({title:pe.formula,meta:({trough:'Shared trough',station:'Station-fed',adlib:'Ad-lib'})[pe.mode]||'',kind:'section',level:4,className:'feeding-card-heading'},feedingHeader(pe));
+ const heading=stHeading({title:pe.formula,meta:({trough:'Shared trough',station:'Station-fed',adlib:'Ad-lib'})[pe.mode]||'',kind:'section',level:4,className:'feeding-card-heading'});
  return '<section class="feeding-today">'+heading+'<div class="feeding-main-amount"><span>Daily feed</span><strong>'+(pe.mode==='adlib'?'Ad-lib':quantity(allocation(pe))+' <small>kg/day</small>')+'</strong></div></section>'+plans;
 }
 
@@ -1409,7 +1405,7 @@ function textField(label,key,value='',placeholder=''){return `<label class="fiel
 function choices(items,current,key,group){return SentriUI.choiceRadios({label:'Reason',key,action:'form-choice',selected:current||'',options:items.map(([value,label,meta])=>({value,label,meta}))});}
 function selectionReviewGroup(label,items){
  if(!items.length)return '';
- const heading=stHeading({title:label,kind:'group',level:4},'<h4 class="action-group-label">'+esc(label)+'</h4>');
+ const heading=stHeading({title:label,kind:'group',level:4});
  const rows=items.map(item=>'<li class="st-row review-list-row"><span class="st-row-copy"><strong>'+esc(item.title)+'</strong><small>'+esc(item.detail)+'</small></span>'+button(item.action,'Remove','text-button',item.value).replace('<button','<button aria-label="'+esc(item.ariaLabel)+'"')+'</li>').join('');
  return heading+'<ul class="review-list st-panel st-row-group" aria-label="'+esc(label)+'">'+rows+'</ul>';
 }

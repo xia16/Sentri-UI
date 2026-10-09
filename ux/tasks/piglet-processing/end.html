@@ -580,7 +580,7 @@
     };
     var body = d.order.map(function (who) {
       var list = d.by[who].slice().sort(function (a, b) { return a.at < b.at ? 1 : -1; });
-      return '<div class="en-block">' + h({ kind: 'group', strs: { title: 'pp.end.day.who', meta: one('pp.end.day.n', list.length) }, args: { title: { who: who }, meta: { n: list.length } } }) +
+      return '<div class="en-block">' + h({ kind: 'section', strs: { title: 'pp.end.day.who', meta: one('pp.end.day.n', list.length) }, args: { title: { who: who }, meta: { n: list.length } } }) +
         doors(list.map(function (e) { var w = words(e); return door('open-record', w[0], w[1], e.corrected ? 'pp.end.day.at_corrected' : 'pp.end.day.at', { t: time(e.at) }, e.litterCode || e.litter || e.from); })) + '</div>';
     }).join('');
     return page('pp.end.day.title', null, 'pp.end.day.desc', null, body, backOnly());

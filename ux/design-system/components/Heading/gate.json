@@ -1,46 +1,79 @@
 {
-  "status": "in-design",
-  "judged": "2026-10-09",
-  "commit": "3e3f835",
+  "status": "agent-checked",
+  "judged": "2026-10-10",
+  "commit": "c84edf3",
   "model": "claude-opus-5-5",
+  "round": 1,
+  "previous": [
+    {
+      "finding": "No guidance on which kind to use when (high)",
+      "fixed": true,
+      "note": "'Which heading' table: page/section/group, what each takes and never takes; one heading per block."
+    },
+    {
+      "finding": "panel kind 1px from section, one screen (medium)",
+      "fixed": true,
+      "note": "panel retired, reads as section; farrowing.overview 'Whole-task progress' is now a section heading."
+    },
+    {
+      "finding": "Text action 44px tall (medium)",
+      "fixed": true,
+      "note": "Measured 69x48 (View log: piglet sheet, farrowing litter), 73x48 (View plan: pig profile), 68x48 (Chinese)."
+    },
+    {
+      "finding": "Raw values in bundle.css (medium)",
+      "fixed": true,
+      "note": "Kinds use --type-page-title/section-title/group-label, gap --space-heading, action --tap-min."
+    },
+    {
+      "finding": "Two implementations (low)",
+      "fixed": "partly",
+      "note": "Every prototype now loads components/bundle.js; ux/system/sentri-components.js still exists with its own heading/facts/log, loaded by nothing."
+    },
+    {
+      "finding": "No long-title example (low)",
+      "fixed": true,
+      "note": "'Long title beside meta' and page 'Long title wraps' states; aside stays top-aligned at 375."
+    }
+  ],
   "scores": {
-    "clarity": 6,
+    "clarity": 9,
     "budget": 8,
-    "hierarchy": 6,
+    "hierarchy": 8,
     "spacing": 8,
-    "broken": 6
+    "broken": 9
   },
-  "lowest": 6,
+  "lowest": 8,
   "checklist": [
     {
       "line": 1,
-      "pass": false,
-      "why": "Purpose line exists; no \"use X instead\" naming a sibling (TaskSection, rowGroup title, Log group label)."
+      "pass": true,
+      "why": "Job sentence plus 'use Row / Panel instead'."
     },
     {
       "line": 2,
-      "pass": false,
-      "why": "No when / when-not per kind; the owner's gap: nothing says which heading to use where."
+      "pass": true,
+      "why": "When/when-not per kind; names Row for a tappable destination."
     },
     {
       "line": 3,
       "pass": true,
-      "why": "Title, icon, description, meta, action named and all shown in the preview."
+      "why": "Title, icon, description, meta, action named; section variant shows each."
     },
     {
       "line": 4,
-      "pass": false,
-      "why": "panel kind is used on one screen (farrowing.overview) and is 1px from section; its when-to-use is only \"a title inside a panel\"."
+      "pass": true,
+      "why": "Three variants, each with a when sentence and real screens."
     },
     {
       "line": 5,
       "pass": true,
-      "why": "Static text; default and empty (absent) stated; the action follows Button."
+      "why": "Static; the action's default, pressed and focus are rendered in the section variant; empty = absent."
     },
     {
       "line": 6,
-      "pass": false,
-      "why": "Text action hit area is 44x44 (preview \"Edit\"), 69x44 on piglet-processing.sheet-todo \"View log\"; floor is 48."
+      "pass": true,
+      "why": "Action 69x48 / 73x48 in use and in the variant at 375."
     },
     {
       "line": 7,
@@ -50,22 +83,22 @@
     {
       "line": 8,
       "pass": true,
-      "why": "No state carried by colour; status colour banned in headings."
+      "why": "No state in colour; status colour banned."
     },
     {
       "line": 9,
-      "pass": false,
-      "why": "Sentence case and noun stated; no long-title example, no rule for how the 46%-wide aside wraps against a long title."
+      "pass": true,
+      "why": "Casing and lengths stated; long-title states rendered."
     },
     {
       "line": 10,
       "pass": true,
-      "why": "`level` sets the h-element; the action takes the global focus ring."
+      "why": "h-level role, button action with a rendered focus ring, keyboard row."
     },
     {
       "line": 11,
-      "pass": false,
-      "why": "bundle.css hard-codes 22/13/12/11/10px, 12px gaps, 44px and font fallbacks; the type tokens (page-title, section-title, group-label) are not referenced."
+      "pass": true,
+      "why": "bundle.css uses type, space and tap tokens; CSS variables listed."
     },
     {
       "line": 12,
@@ -79,13 +112,13 @@
     },
     {
       "line": 14,
-      "pass": false,
-      "why": "No classification line and no related links."
+      "pass": true,
+      "why": "Related links and classification line."
     },
     {
       "line": 15,
       "pass": true,
-      "why": "All four kinds render at 375 with no overflow."
+      "why": "All variant states at 375 with no overflow or clipping."
     }
   ],
   "classification": "component",
@@ -93,57 +126,41 @@
     {
       "name": "page",
       "usedBy": [
-        "farrowing.overview",
         "farrowing.history",
+        "farrowing.overview",
         "pig-profile.log",
-        "workbench.choose-unit"
+        "pig-profile.origin",
+        "inspection.pen-log"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-        "clarity": 8,
+        "clarity": 9,
         "budget": 8,
         "hierarchy": 9,
         "spacing": 8,
-        "broken": 8
+        "broken": 9
       },
-      "findings": [
-        "Fine in use; held back only by the component-wide token and doc gaps (lines 11, 14)."
-      ]
+      "findings": []
     },
     {
       "name": "section",
       "usedBy": [
-        "farrowing.overview",
         "piglet-processing.sheet-todo",
-        "farrowing.death"
-      ],
-      "status": "in-design",
-      "scores": {
-        "clarity": 7,
-        "budget": 8,
-        "hierarchy": 7,
-        "spacing": 8,
-        "broken": 6
-      },
-      "findings": [
-        "Carries the only action slot in use (\"View log >\" 69x44)."
-      ]
-    },
-    {
-      "name": "panel",
-      "usedBy": [
+        "farrowing.locked",
+        "pig-profile.full",
+        "pig-profile.origin",
         "farrowing.overview"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-        "clarity": 4,
-        "budget": 7,
-        "hierarchy": 4,
+        "clarity": 9,
+        "budget": 8,
+        "hierarchy": 8,
         "spacing": 8,
-        "broken": 8
+        "broken": 9
       },
       "findings": [
-        "12px vs section 13px is not a perceptible level; one screen."
+        "farrowing.overview 'Whole-task progress' sits 36px above its panel (12px everywhere else) and is the only section heading on that screen without an icon."
       ]
     },
     {
@@ -154,59 +171,33 @@
         "pig-profile.log",
         "inspection.review-selected"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-        "clarity": 8,
+        "clarity": 9,
         "budget": 8,
         "hierarchy": 8,
         "spacing": 8,
-        "broken": 8
+        "broken": 9
       },
-      "findings": [
-        "Always reached through rowGroup or Log, never called directly; the README should say so."
-      ]
+      "findings": []
     }
   ],
   "findings": [
     {
-      "severity": "high",
-      "text": "No guidance on which kind to use when. Section, panel and group headings appear on one sheet with no rule.",
-      "fix": "Add a \"Which heading\" table. page = the screen or sheet title, once, in its header. section = names a block and sits outside, above its panel; it alone takes the icon, the meta (a count or time for the whole block) and the one link-out action. group = labels a run of rows or log entries inside one panel; muted, no icon, no action; reach it through rowGroup({title}) or Log. Never stack two headings over one block."
-    },
-    {
       "severity": "medium",
-      "text": "panel (12px) is not a perceptible step from section (13px) and is used on one screen (farrowing.overview \"Whole-task progress\").",
-      "fix": "Merge panel into section: a title inside a panel uses section; alias kind \"panel\" to section and fix farrowing.overview."
-    },
-    {
-      "severity": "medium",
-      "text": "The text action is 44px tall (preview \"Edit\" 44x44; \"View log\" 69x44 on piglet-processing.sheet-todo), under the 48px glove floor.",
-      "fix": "Set the action min-height and min-width to control-height (48px); keep the negative margin so the heading does not grow."
-    },
-    {
-      "severity": "medium",
-      "text": "Raw values in bundle.css (22/13/12/11/10px, 12px gaps, 44px) instead of the type and space tokens the DS README names.",
-      "fix": "Map each kind to its type token (page-title, section-title, group-label), the gap to space-heading, the action to control-height."
+      "text": "farrowing.overview: 'Whole-task progress' is 36px above its panel because .task-progress-section is a flex column with gap 24px on top of space-heading 12px; it is also the one section heading there without an icon (Choose a unit and Performance metrics have one).",
+      "fix": "Set .task-progress-section to gap:0 (space-heading does the spacing) and pass an icon in its SentriUI.heading call in farrowing-astra-concept.js."
     },
     {
       "severity": "low",
-      "text": "Two implementations: home, farrowing and inspection load ux/system/sentri-components.js (no data-ds, no strs); the task skeleton loads components/bundle.js.",
-      "fix": "Point the three prototypes at bundle.js and delete the heading/row/facts/log/segment copies in sentri-components.js."
+      "text": "ux/system/sentri-components.js still holds a second heading/facts/log implementation that no page loads.",
+      "fix": "Delete the file and the bundle.js comment that points at it."
     },
     {
       "severity": "low",
-      "text": "No long-title example; a long title beside a meta is unspecified.",
-      "fix": "Add a preview case with a 40-character title and a meta; state that the title wraps and the aside stays top-aligned."
+      "text": "The overview preview pairs 'Litter summary' with the meta '3 tasks', which teaches a meta that does not count the block.",
+      "fix": "Change the meta to a count of the block ('14 born') or drop it."
     }
   ],
-  "proposals": [
-    {
-      "kind": "merge",
-      "name": "Heading kind \"panel\" into \"section\"",
-      "why": "One screen uses it and the 1px size step carries no hierarchy; the standard asks for the smallest variant set that covers real screens.",
-      "seenIn": [
-        "farrowing.overview"
-      ]
-    }
-  ]
+  "proposals": []
 }

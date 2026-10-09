@@ -1,46 +1,74 @@
 {
-  "status": "in-design",
-  "judged": "2026-10-09",
-  "commit": "3e3f835",
+  "status": "agent-checked",
+  "judged": "2026-10-10",
+  "commit": "c84edf3",
   "model": "claude-opus-5-5",
+  "round": 1,
+  "previous": [
+    {
+      "finding": "Tappable buttons inside facts on the piglet pen sheet (high)",
+      "fixed": true,
+      "note": "Pen sheet facts are read-only (0 controls); 'Weigh the litter' is one 227x48 link below; Litter weight and Boars and gilts doors are in More. valueHtml holding a control is dropped with a dev warning (bundle.js:107)."
+    },
+    {
+      "finding": "Unused variants columns 1 and 3 (medium)",
+      "fixed": "partly",
+      "note": "Three-column is drawn on farrowing.locked (finished litter); columns:1 is documented as having no screen but is still in code."
+    },
+    {
+      "finding": "Raw spacing and type (medium)",
+      "fixed": true,
+      "note": "Tokens only: --space-panel, --space-18/20, type tokens, --font-mono."
+    },
+    {
+      "finding": "IDs could break mid-ID (low)",
+      "fixed": true,
+      "note": ".st-fact-id is nowrap mono; 'ID in mono' and 'Long value wraps' states rendered. Hosts do not always pass mono (see findings)."
+    },
+    {
+      "finding": "Stale copy in sentri-components.js (low)",
+      "fixed": "partly",
+      "note": "Not loaded by any page; the file remains."
+    }
+  ],
   "scores": {
     "clarity": 8,
-    "budget": 7,
+    "budget": 8,
     "hierarchy": 8,
     "spacing": 8,
-    "broken": 5
+    "broken": 8
   },
-  "lowest": 5,
+  "lowest": 8,
   "checklist": [
     {
       "line": 1,
-      "pass": false,
-      "why": "Purpose line present; does not say \"for a figure you tap, use Row\"."
+      "pass": true,
+      "why": "Job sentence plus 'use Row / TaskMetrics instead'."
     },
     {
       "line": 2,
-      "pass": false,
-      "why": "No when-not; the \"never acts\" rule is broken in use and no alternative is named."
+      "pass": true,
+      "why": "When-not names Row, Button and TaskTable."
     },
     {
       "line": 3,
       "pass": true,
-      "why": "Label, value, meta named; the preview shows meta and the em-dash empty."
+      "why": "Panel, label, value, meta named; meta and em dash shown."
     },
     {
       "line": 4,
-      "pass": false,
-      "why": "columns 1 and 3 are documented but no atlas screen shows them; only 2 columns appears (piglet-processing pen sheet)."
+      "pass": true,
+      "why": "Two-column (piglet pen sheet, pig-profile.origin) and three-column (farrowing.locked) each used and explained."
     },
     {
       "line": 5,
       "pass": true,
-      "why": "Static; default and empty (em dash / absent group) stated and rendered."
+      "why": "Static; missing value, zero and empty set stated and rendered."
     },
     {
       "line": 6,
-      "pass": false,
-      "why": "In use the piglet pen sheet puts > buttons inside facts: 26-65px wide x 44px tall (piglet-processing.sheet-todo, pen-log)."
+      "pass": true,
+      "why": "No targets; a control in valueHtml is refused in dev."
     },
     {
       "line": 7,
@@ -50,22 +78,22 @@
     {
       "line": 8,
       "pass": true,
-      "why": "No colour-borne state."
+      "why": "No state in colour."
     },
     {
       "line": 9,
-      "pass": false,
-      "why": "Value formatting stated; no long-value example, and dd uses overflow-wrap:anywhere (an ear tag can break mid-ID)."
+      "pass": true,
+      "why": "Label length and casing stated; long value and long label states rendered."
     },
     {
       "line": 10,
-      "pass": false,
-      "why": "dl/dt/dd semantics are used but not stated."
+      "pass": true,
+      "why": "dl/dt/dd stated; no focus stop."
     },
     {
       "line": 11,
-      "pass": false,
-      "why": "Raw 18px/20px gaps, 16px padding and 11/14/10px type in bundle.css."
+      "pass": true,
+      "why": "Tokens only; variables listed."
     },
     {
       "line": 12,
@@ -79,91 +107,89 @@
     },
     {
       "line": 14,
-      "pass": false,
-      "why": "No classification line, no related links (Panel, TaskMetrics)."
+      "pass": true,
+      "why": "Related links and classification."
     },
     {
       "line": 15,
       "pass": true,
-      "why": "Preview renders at 375 with no overflow."
+      "why": "Both variants at 375, no overflow (dd scrollWidth clean)."
     }
   ],
   "classification": "component",
   "variants": [
     {
-      "name": "two-column (default)",
+      "name": "two-column",
       "usedBy": [
         "piglet-processing.sheet-todo",
         "piglet-processing.sheet-done",
-        "piglet-processing.pen-log",
-        "piglet-processing.counts"
+        "piglet-processing.sheet-breeders",
+        "pig-profile.origin"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
         "clarity": 8,
-        "budget": 7,
+        "budget": 8,
         "hierarchy": 8,
         "spacing": 8,
-        "broken": 5
+        "broken": 8
       },
       "findings": [
-        "In use it carries > buttons the component forbids, narrower than 48px."
+        "pig-profile.origin renders Dam, Sire and three ear tags in the sans face: the host sets mono only for labels starting 'Ear tag|Tag|ID'."
       ]
     },
     {
       "name": "three-column",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {},
-      "findings": [
-        "No atlas screen shows it (farrowing litter code calls columns:3, but no screen renders it)."
-      ]
-    },
-    {
-      "name": "one-column",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {},
-      "findings": [
-        "No screen uses it."
-      ]
+      "usedBy": [
+        "farrowing.locked"
+      ],
+      "status": "agent-checked",
+      "scores": {
+        "clarity": 8,
+        "budget": 8,
+        "hierarchy": 8,
+        "spacing": 8,
+        "broken": 9
+      },
+      "findings": []
     }
   ],
   "findings": [
     {
-      "severity": "high",
-      "text": "Judged in use, the piglet pen sheet (Boars · gilts >, Litter weight >, Tagged 0 of 12 >, Breeders kept >) makes facts tappable through valueHtml; each target is a 26-65 x 44px button, not the cell, and the README says facts never act.",
-      "fix": "Decide one way: add a \"tappable fact\" option where the whole cell is one 48px-plus button with the > trail, or move those four figures to Rows. Then forbid buttons in valueHtml."
+      "severity": "medium",
+      "text": "The main pig profile is not on Facts: pig-profile.full 'General details' and 'Sow cycle' are hand-built grids (.overview-details-grid / .overview-fact) in a panel, same job and look. General details also prints 'Health —' under a banner that says 'Health · Thin', so the screen says health twice and disagrees.",
+      "fix": "Render both blocks with SentriUI.facts (Weight and Temperature trails as meta) and drop the Health row; the banner owns health."
     },
     {
       "severity": "medium",
-      "text": "Unused variants: columns 1 and 3 have no screen.",
-      "fix": "Keep only 2 columns until a screen needs 3; delete the 1-column mode or mark both \"no screen yet\"."
-    },
-    {
-      "severity": "medium",
-      "text": "Raw spacing and type values in bundle.css.",
-      "fix": "Use space-panel for padding, a gap token pair, and type tokens for label, value and meta."
+      "text": "IDs are not mono in use: pig-profile.origin shows 000118, B-024, 000267, S-000267, M-267 in Plus Jakarta Sans because inspection-astra-concept.js:970 sets mono by the label regex /^(Ear tag|Tag|ID)/.",
+      "fix": "Set mono from the field (dam, sire, every ear tag, breeding number), not from the label text."
     },
     {
       "severity": "low",
-      "text": "overflow-wrap:anywhere can split an ear tag or batch code across lines.",
-      "fix": "Set the mono ID span to white-space:nowrap and add a long-value example to the preview."
+      "text": "The Death breakdown sheet (farrowing-astra-concept.js:423) is a hand-built dl with raw CSS (#f6f7f2, 9px/14px) for read-only label and value pairs. It is one surface in a sheet, not card-on-card, so it is Facts' job.",
+      "fix": "Draw it with SentriUI.facts (one fact per cause plus 'Total dead'); no panel-less Facts variant is needed."
     },
     {
       "severity": "low",
-      "text": "Stale copy in ux/system/sentri-components.js (no data-ds, no strs).",
-      "fix": "Point the prototypes at components/bundle.js."
+      "text": "columns:1 is still in bundle.js with no screen.",
+      "fix": "Remove the mode; a long value wraps in two-column."
+    },
+    {
+      "severity": "low",
+      "text": "The two links below facts read differently: piglet 'Weigh the litter: growth figures need it. ›' (an amber sentence with a full stop) vs farrowing 'Death breakdown ›' (an ink label).",
+      "fix": "Make the piglet link a text Button label ('Weigh the litter ›'); if the reason stays, put it in the Litter weight fact's meta."
     }
   ],
   "proposals": [
     {
-      "kind": "new-variant",
-      "name": "Facts: tappable",
-      "why": "The piglet pen sheet needs figures that open their edit sheet; today they are hand-built buttons inside a read-only grid.",
+      "kind": "merge",
+      "name": "Farrowing total triplets into TaskMetrics / TaskTotals, not Facts",
+      "why": "The builder was right to leave them out of Facts: Born · Alive now · Piglet deaths and 7 · 2 · 9 are headline figures inside a metrics card or progress panel, and Facts would put a panel in a panel. Their hand-built dl copies (.task-performance-totals inside task-death-review, .finish-totals) should come from TaskMetrics totals and TaskTotals instead.",
       "seenIn": [
-        "piglet-processing.sheet-todo",
-        "piglet-processing.pen-log"
+        "farrowing.overview",
+        "farrowing.task-receipt",
+        "farrowing.finish"
       ]
     }
   ]

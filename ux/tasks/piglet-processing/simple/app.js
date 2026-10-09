@@ -224,26 +224,22 @@
     return '<section class="sp-proc">' + html + '</section>';
   }
   /* Piglets: what is in the pen now, then the identified piglets. Born and deaths are history: they live in the pen log. */
-  /* The Piglets card: farrowing's "Litter summary · View log ›" — a section heading with its link, then the facts. Each
-     figure acts on itself: piglets now → Set count; boars · gilts → the counts; litter weight → the weight pad; tagged
-     and breeders → the identified piglets (where breeders are marked). */
-  function factBtn(action, value, empty) {
-    return '<button type="button" class="sp-fact-act" data-action="' + action + '" data-value=""' + (P.s.ended ? ' aria-disabled="true"' : '') + '>' +
-      '<span' + (empty ? ' data-empty=""' : '') + '>' + esc(value) + '</span>' + I('chevron') + '</button>';
-  }
+  /* The Piglets card: farrowing's "Litter summary · View log ›" — a section heading with its link, then the facts. Facts
+     only read; each figure's act lives elsewhere: Tag piglets opens the identified piglets (tagged, breeders), the weight
+     and the boars · gilts count are in More, and a litter not yet weighed shows one link below the facts. */
   function pigletsCard(p) {
     var w = lastWeight(p), every = P.hasId() && scheme() !== 'breeders' && P.idCount(p) >= p.alive && p.alive > 0;
     var sex = every ? { boar: p.ids.filter(function (x) { return x.sex === 'boar'; }).length, gilt: p.ids.filter(function (x) { return x.sex === 'gilt'; }).length } : p.sex;
     var items = [
-      { label: T('pg.sex'), valueHtml: factBtn('counts-open', sex ? T('pg.sexv', { b: sex.boar, g: sex.gilt }) : '—', !sex) },
-      { label: T('pg.weight'), valueHtml: factBtn('weight-open', w ? T('kg', { w: w.kg }) : '—', !w) }];
+      { label: T('pg.sex'), value: sex ? T('pg.sexv', { b: sex.boar, g: sex.gilt }) : null },
+      { label: T('pg.weight'), value: w ? T('kg', { w: w.kg }) : null }];
     if (P.hasId()) {
-      items.push({ label: T(scheme() === 'notch' ? 'pc.notched' : 'pc.tagged'), valueHtml: factBtn('tagged-open', T('pc.of', { n: P.idCount(p), m: p.alive })) });
-      items.push({ label: T('pg.breeders'), valueHtml: factBtn('tagged-open', String(P.breeders(p))) });
+      items.push({ label: T(scheme() === 'notch' ? 'pc.notched' : 'pc.tagged'), value: T('pc.of', { n: P.idCount(p), m: p.alive }) });
+      items.push({ label: T('pg.breeders'), value: String(P.breeders(p)) });
     }
-    var log = '<button type="button" data-action="log-open" data-value="">' + esc(T('pc.log')) + I('chevron') + '</button>';
-    return '<section class="sp-pcard">' + UI.heading({ title: T('pc.title'), kind: 'section', level: 3, icon: I('record'), action: log }) +
-      UI.facts(items, { columns: items.length === 4 ? 2 : items.length, className: 'sp-pfacts' }) + (w ? '' : '<p class="sp-warn">' + esc(T('pg.weight.hint')) + '</p>') + '</section>';
+    return '<section class="sp-pcard">' + UI.heading({ title: T('pc.title'), kind: 'section', level: 3, icon: I('record'), action: { label: T('pc.log'), action: 'log-open' } }) +
+      UI.facts(items, { columns: 2 }) +
+      (w || P.s.ended ? '' : UI.button({ label: T('pg.weight.hint'), register: 'text', action: 'weight-open', className: 'sp-weigh' }).replace(/<\/button>$/, I('chevron') + '</button>')) + '</section>';
   }
   /* The tool row, as farrowing's (Edit · Record death · More actions): Tag piglets (per farm scheme; none on a no-ID farm) ·
      Record death · More */
@@ -295,10 +291,11 @@
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('add.' + scheme()), action: 'give-new', register: 'primary' } }) });
   }
 
-  /* ---- More: Move piglets · Record death · Set count ---- */
+  /* ---- More: Move piglets · Set count · Litter weight · Boars and gilts (the figures the Piglets card only reads) ---- */
   function moreSheet() {
     return K.drawer({ title: T('more.title'), size: 'medium', view: 'more',
-      body: K.doors({ card: true, items: [{ title: T('move.title'), icon: 'transfer', action: 'tool', value: 'move' }, { title: T('tool.count'), icon: 'edit', action: 'tool', value: 'count' }] }),
+      body: K.doors({ card: true, items: [{ title: T('move.title'), icon: 'transfer', action: 'tool', value: 'move' }, { title: T('tool.count'), icon: 'edit', action: 'tool', value: 'count' },
+        { title: T('w.title'), icon: 'weight', action: 'weight-open', value: '' }, { title: T('cnt.title'), icon: 'profile', action: 'counts-open', value: '' }] }),
       footer: K.footer({ back: { action: 'back', label: T('back') } }) });
   }
   /* ---- fewer piglets for one ticked item: a stepper; a shortfall asks one reason ---- */
@@ -370,20 +367,34 @@
         K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.weight'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) }, status: !(+w.kg > 0) ? T('sr.kg') : null }) });
   }
   /* ---- the pen log: born, deaths, moves, counts, treatments, IDs — the history, newest first ---- */
+  /* One recorded act is one entry: the IDs given on one day are one line ("IDs given · 8", the range under it); the group is the
+     day (Today · Yesterday · weekday · date), the stamp is time · initials. */
   function logPage() {
-    var p = pen(), byDay = {};
-    var add = function (day, at, title, meta) { (byDay[day] = byDay[day] || []).push({ at: at, title: title, meta: meta }); };
+    var p = pen(), list = [], ids = {};
+    var day = function (ms) { return new Date(ms).toDateString(); };
     P.recs(p.code).forEach(function (r) {
+      if (r.tr === 'id') {
+        var g = ids[day(r.at)];
+        if (!g) { g = ids[day(r.at)] = { at: r.at, who: r.who, nos: [] }; list.push({ id: g }); }
+        g.nos.push(r.no); g.at = Math.max(g.at, r.at);
+        return;
+      }
       var what = r.tr === 'death' ? T('log.death', { n: r.n }) : r.tr === 'move' ? T('log.move', { n: pigs(r.n), to: r.to }) : r.tr === 'count' ? T('log.count', { n: r.n })
-        : r.tr === 'id' ? T('log.id', { no: r.no }) : r.tr === 'pick' ? T('log.pick') : r.tr === 'breeder' ? T(r.n ? 'log.breeder' : 'log.notbreeder', { no: r.no }) : T('log.treat', { tr: tr(r.tr), n: pigs(r.n) });
-      add(r.day, r.at, what, short(r.who) + ' · ' + when(r));
+        : r.tr === 'pick' ? T('log.pick') : r.tr === 'breeder' ? T(r.n ? 'log.breeder' : 'log.notbreeder', { no: r.no }) : T('log.treat', { tr: tr(r.tr), n: pigs(r.n) });
+      list.push({ title: what, at: r.at, by: short(r.who) });
     });
-    p.weights.forEach(function (w, i) { add(w.day, w.at || i, T('log.weight', { w: w.kg }), ''); });
-    add(0, -1, T('log.born', { n: p.born }), p.dead ? T('log.dead.birth', { n: p.dead }) : '');
-    var groups = Object.keys(byDay).map(Number).sort(function (a, b) { return b - a; }).map(function (d) {
-      return { label: T('day.n', { d: d }), entries: byDay[d].sort(function (a, b) { return b.at - a.at; }).map(function (e) { return { title: e.title, meta: e.meta }; }) };
+    list = list.map(function (e) {
+      if (!e.id) return e;
+      var nos = e.id.nos.slice().sort();
+      return nos.length === 1 ? { title: T('log.id', { no: nos[0] }), at: e.id.at, by: short(e.id.who) }
+        : { title: T('log.ids', { n: nos.length }), detail: nos[0] + '–' + nos[nos.length - 1], at: e.id.at, by: short(e.id.who) };
     });
-    return K.page({ title: T('log.title'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'log', body: UI.log(groups) });
+    // a record known only by its day of life carries a date, no clock time
+    var ymd = function (daysAgo) { var d = new Date(Date.now() - daysAgo * 864e5), z = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); };
+    p.weights.forEach(function (w) { list.push({ title: T('log.weight', { w: w.kg }), at: w.at || ymd(p.age - w.day) }); });
+    list.push({ title: T('log.born', { n: p.born }), detail: p.dead ? T('log.dead.birth', { n: p.dead }) : '', at: ymd(p.age) });
+    var groups = UI.logGroups(list, { lang: L.lang === 'zh' ? 'zh-CN' : 'en', today: T('sec.today'), yesterday: T('log.yest') });
+    return K.page({ title: T('log.title'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'log', body: UI.log(groups, { empty: T('log.none') }) });
   }
 
   /* ---- record death ---- */

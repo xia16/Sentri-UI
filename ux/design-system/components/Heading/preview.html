@@ -1,15 +1,22 @@
-<!-- @dsCard group="Structure" height=300 subtitle="page · section · panel · group" -->
+<!-- @dsCard group="Structure" height=360 subtitle="page · section · group" -->
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}.stack>*+*{margin-top:var(--space-24)}</style></head>
 <body>
-<div class="inspection-phone" data-st-context="page" style="max-width:390px;padding:16px;background:var(--app-background);font-family:var(--sans);color:var(--ink)"><div id="a"></div><div id="b" style="margin-top:22px"></div><div id="c" style="margin-top:22px"></div><div id="d" style="margin-top:22px"></div></div>
+<div data-st-context="page" style="max-width:390px;padding:var(--space-16);background:var(--app-background);font-family:var(--font-sans);color:var(--ink)"><div class="stack" id="root"></div></div>
 <script>
-const UI = window.SentriUI, I = window.SentriIcons.icon;
-a.innerHTML = UI.heading({ title: 'Farrowing room 3', kind: 'page', level: 2, description: '12 sows · 4 farrowed today' });
-b.innerHTML = UI.heading({ title: 'Feed', icon: I('feed'), description: 'Last changed 2 days ago · G.H', action: '<button type="button">Edit</button>' });
-c.innerHTML = UI.heading({ title: 'Sow details', kind: 'panel', meta: 'Mon 09:42' });
-d.innerHTML = UI.heading({ title: 'This week', kind: 'group' });
+/* The previews expect a host that preloads tokens.css, bundle.css and bundle.js (the atlas does). */
+(function () {
+  var UI = window.SentriUI, I = window.SentriIcons && window.SentriIcons.icon, root = document.getElementById('root');
+  if (!UI) { root.textContent = 'Load tokens.css, bundle.css and bundle.js before this preview.'; return; }
+  var parts = [];
+  parts.push(UI.heading({ title: 'Farrowing room 3', kind: 'page', level: 2, description: '12 sows · 4 farrowed today' }));
+  parts.push(UI.heading({ title: 'Litter summary', icon: I('record'), meta: '3 tasks', action: { label: 'View log', action: 'history', ariaLabel: 'Open farrowing log' } }));
+  parts.push(UI.heading({ title: 'Feeding', icon: I('feed'), description: 'Last changed 2 days ago · G.H' }));
+  parts.push(UI.heading({ title: 'Whole-task progress across both farrowing houses', icon: I('chart'), meta: '48 sows' }));
+  parts.push(UI.rowGroup(UI.row({ title: 'Iron', description: '10 given · 2 left' }), { title: 'Day 2' }));
+  root.innerHTML = parts.map(function (h) { return '<div>' + h + '</div>'; }).join('');
+})();
 </script>
 </body>
 </html>
