@@ -9,7 +9,7 @@ The frame every task page renders in. **Wider than a phone, the page sits in far
 - **Frame** (`.tk-phone`, wider than 430px): `phone-width` × `phone-height` (390 × 844), a 1px `frame-border` edge, `radius-device` (34px) corners, farrowing's two-layer shadow, `overflow: hidden`, `isolation: isolate`. At phone width: `100%` × `100dvh`, no edge, no radius, no shadow.
 - **Status bar** (`.tk-statusbar`): `statusbar-height` (42px), padded `14px 24px 5px`, `app-background`, the time at 12px/700 left and the signal and battery glyphs (16px, 6px apart) right. `aria-hidden`: it is device chrome. A drawer's scrim starts under it.
 - **Screen** (`.tk-screen`): a flex column filling the rest: the [TaskHeader](../TaskHeader/README.md), one scroller (`.tk-scroll`, `app-background`), and an optional [TaskDock](../TaskDock/README.md).
-- **Overlays** are absolute children of the phone, in this order: a [drawer](../TaskSheet/README.md) (scrim z 2, sheet z 3), a [record page](../TaskPage/README.md) (z 5), a [dialog](../TaskDialog/README.md) (z 8). The screen under an open overlay is `inert`.
+- **Overlays** are absolute children of the phone, in this order: a [drawer](../Sheet/README.md) (scrim z 2, sheet z 3), a [record page](../Sheet/README.md) (z 5), a [dialog](../Sheet/README.md) (z 8). The screen under an open overlay is `inert`.
 
 **States**
 - Default: framed or full-bleed, by the window's width only (`@media (min-width: 431px)`).

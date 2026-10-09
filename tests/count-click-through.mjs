@@ -17,7 +17,7 @@ const ready = (p) => p.waitForSelector('html[data-ready]');
 const log = (p, v) => p.evaluate((k) => JSON.parse(sessionStorage.getItem('pp-log:' + k) || '[]'), v);
 const text = async (p, sel) => (await p.locator(sel).first().innerText()).replace(/\s+/g, ' ');
 // round 5: the room's review and drift doors are one row (`reviews`); its sheet holds the drift door (`explain`)
-async function drift(p) { await p.click('[data-action="reviews"]'); const t = await text(p, '[data-action="explain"]'); await p.click('.tk-sheet [data-action="close-sheet"]'); await p.waitForSelector('.tk-sheet', { state: 'detached' }); return t; }
+async function drift(p) { await p.click('[data-action="reviews"]'); const t = await text(p, '[data-action="explain"]'); await p.click('.sheet [data-action="close-sheet"]'); await p.waitForSelector('.sheet', { state: 'detached' }); return t; }
 async function explain(p) { await p.click('[data-action="reviews"]'); await p.click('[data-action="explain"]'); }
 const rowText = async (p, code) => (await p.locator(`[data-action="open-litter"][data-value="${code}"]`).first().innerText()).replace(/\s+/g, ' ');
 
@@ -77,10 +77,10 @@ try {
   assert.match(await text(page, '[data-action="open-move"]'), /^Review move$/);                     // R3-20: only the Move sheet saves
   await page.click('[data-action="open-move"]');
   await page.waitForURL(/move\.html\?.*state=move-explain/); await ready(page);
-  assert.match(await text(page, '.tk-sheet[data-view="move"]'), /Closes 1 unexplained loss and 1 gain/);
+  assert.match(await text(page, '.sheet[data-view="move"]'), /Closes 1 unexplained loss and 1 gain/);
   await page.click('[data-action="save-move"]');
   await page.waitForURL(/room\.html\?.*state=litter/); await ready(page);                         // R2-22: Save returns to the litter drawer
-  console.log('ok 4 explain via the move suggestion: saved', await text(page, '.tk-sheet .tk-sheet-title'));
+  console.log('ok 4 explain via the move suggestion: saved', await text(page, '.sheet .sheet-title'));
 
   // 5. The room after: both lines closed; D03's loss (nothing to pair) stays open.
   await page.goto(base + 'room.html?state=room&lens=all&data=gain-b08'); await ready(page);
@@ -97,7 +97,7 @@ try {
   assert.match((await b06.innerText()).replace(/\s+/g, ' '), /loss 1 open/);
   await b06.click();
   await page.click('[data-action="pair-loss"]');
-  assert.match(await text(page, '.tk-sheet[data-view="move"]'), /Closes 1 unexplained loss and 1 gain/);
+  assert.match(await text(page, '.sheet[data-view="move"]'), /Closes 1 unexplained loss and 1 gain/);
   await page.click('[data-action="save-move"]');
   await page.waitForURL(/room\.html\?.*state=litter/); await ready(page);
   await page.goto(base + 'room.html?state=room&lens=all&data=explain'); await ready(page);
@@ -114,7 +114,7 @@ try {
   await page.click('[data-action="step"][data-step="-1"]'); await page.click('[data-action="step"][data-step="1"]');
   await page.click('[data-action="save"]');
   await page.waitForURL(/state=litter.*saved=count/); await ready(page);
-  assert.doesNotMatch(await text(page, '.tk-sheet'), /Two counts disagree|Counts disagree/);
+  assert.doesNotMatch(await text(page, '.sheet'), /Two counts disagree|Counts disagree/);
   await page.waitForSelector('#lt-receipt span');
   console.log('ok 7 two counts disagree → count again settles it:', await text(page, '#lt-receipt'));
 
@@ -143,7 +143,7 @@ try {
   await page.waitForURL(/state=litter.*saved=count/); await ready(page);
   await page.waitForSelector('#lt-receipt span');
   assert.match(await text(page, '#lt-receipt'), /unexplained gain 5 piglets\s*·\s*check on the pig/);
-  assert.match(await text(page, '.tk-sheet'), /Check on the pig · it owes nothing new/);
+  assert.match(await text(page, '.sheet'), /Check on the pig · it owes nothing new/);
   console.log('ok 8 a count far above Alive asks first; the gain owes nothing new:', await text(page, '#lt-receipt'));
 
   // 9. R1-27: 0 asks "moved or weaned?" (the Move door is right there); the draft kept on Back is never a stale 0 ready to Save.
@@ -224,7 +224,7 @@ try {
 
   // 13. R3-16: the tagged-missing picker's line counts down as piglets are ticked and never says "0 untagged can't cover".
   await page.goto(base + 'count.html?state=count-name-need&fresh=1'); await ready(page);
-  const sub13 = () => text(page, '.tk-sheet .tk-sheet-subtitle, .tk-sheet-head');
+  const sub13 = () => text(page, '.sheet .sheet-subtitle, .utility-header');
   assert.match(await sub13(), /7 piglets missing · 3 piglets untagged · tick 4 more by tag/);
   await page.check('input[data-action="pick-row"][value="B06-r1"]');
   assert.match(await sub13(), /tick 3 more by tag/);

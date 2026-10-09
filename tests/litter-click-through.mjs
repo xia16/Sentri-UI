@@ -81,7 +81,7 @@ try {
   assert.match(page.url(), /state=litter/);
   await page.click('[data-action="open-move"]');
   await page.waitForURL(/move\.html/); await ready(page);
-  await page.waitForSelector('.tk-sheet[data-view="move"]');
+  await page.waitForSelector('.sheet[data-view="move"]');
   const box = page.locator('[data-role="crate-q"]'); await box.click(); await box.type('A02');
   await page.click('[data-action="pick-crate"][data-value="A02"]');
   await page.click('[data-action="step"][data-value="n"][data-step="1"]');

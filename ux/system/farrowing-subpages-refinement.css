@@ -28,7 +28,6 @@
 .farrowing-phone .home-task-title{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:500}
 .farrowing-phone .home-task-states{font-size:11px;color:var(--muted)}
 .farrowing-phone .home-resume{font-size:11px;color:var(--green)}
-.farrowing-phone :is(.room-filter-sheet,.picker-sheet,.room-search-sheet) .sheet-body{padding-top:20px}
 .farrowing-phone .filter-section{border-color:var(--line)}
 .farrowing-phone .due-options button,.farrowing-phone .parity-options button,.farrowing-phone .pen-cell{border-color:var(--line)}
 .farrowing-phone .due-options button[aria-pressed=true],.farrowing-phone .parity-options button[aria-pressed=true],.farrowing-phone .pen-cell.current{background:var(--green-wash,#eaf2e5);border-color:#8ea88a;color:var(--ink)}
@@ -37,7 +36,6 @@
 .farrowing-phone .scanner-demo{background:var(--well);border:1px solid var(--line)}
 
 /* Pen detail, feed guidance, notes, equipment faults, and pen log. */
-.farrowing-phone :is(.pen-detail-sheet,.pen-form-sheet,.pen-feed-page,.pen-log-sheet) .sheet-body{padding:20px var(--subpage-pad) 24px}
 .farrowing-phone .pen-detail-sheet .sheet-body{display:flex;flex-direction:column;gap:22px}
 
 
@@ -68,14 +66,12 @@
 .farrowing-phone .sheet[data-view=locked] .record-inline-actions{padding-top:4px}
 
 /* History and death breakdown pages. */
-.farrowing-phone .sheet.detail-sheet[data-size] .sheet-body{padding:20px var(--subpage-pad) 24px}
 .farrowing-phone .death-breakdown-facts{margin:0;border:1px solid var(--line);border-radius:var(--subpage-radius);background:var(--surface,#f8faf5);padding:4px 14px}
 .farrowing-phone .death-breakdown-facts>div{display:flex;justify-content:space-between;align-items:center;min-height:48px;border-bottom:1px solid var(--line)}
 .farrowing-phone .death-breakdown-facts>div:last-child{border-bottom:0}
 .farrowing-phone .death-breakdown-facts dd{font:500 15px var(--mono);margin:0}
 
 /* Linked piglet care, identity, foster, mortality, marker, and reconciliation pages. */
-.farrowing-phone .feature-page>.utility-header{background:var(--surface,#f8faf5)}
 .farrowing-phone .feature-page>.sheet-body{gap:18px}
 .farrowing-phone :is(.feature-callout,.feature-summary){border:1px solid var(--line);background:var(--surface,#f8faf5)}
 .farrowing-phone .feature-tabs{border:1px solid var(--line)}
@@ -87,7 +83,6 @@
 .farrowing-phone .feature-choice button[aria-pressed=true],.farrowing-phone .foster-sows button[aria-pressed=true]{background:var(--green-wash,#eaf2e5);border-color:#8ea88a;color:var(--ink)}
 .farrowing-phone .feature-warning{background:#fff5df;border:1px solid #efdbb0;color:var(--amber)}
 .farrowing-phone .feature-photo{border-color:#9cac99;background:var(--surface,#f8faf5)}
-.farrowing-phone .feature-page .sheet-footer{padding-top:14px}
 
 /* Task closure review and receipt; overview selectors stay with the parent. */
 .farrowing-phone .task-end-sheet .sheet-body{gap:16px}
@@ -105,7 +100,6 @@
  .farrowing-phone{--subpage-pad:12px}
  .farrowing-phone .room-sow-row{padding-left:11px;padding-right:11px}
  .farrowing-phone .room-home{padding-left:14px;padding-right:14px}
- .farrowing-phone :is(.detail-sheet,.pen-detail-sheet,.pen-form-sheet,.pen-feed-page,.pen-log-sheet) .sheet-body{padding-left:var(--subpage-pad);padding-right:var(--subpage-pad)}
  .farrowing-phone .feature-page>.sheet-body{gap:14px}
 }
 

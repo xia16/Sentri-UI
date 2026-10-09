@@ -71,7 +71,7 @@ try {
   await page.waitForURL(/bulk\.html/); await ready(page);
   assert.ok(await page.isChecked('input[data-action="toggle"][value="A04"]'));
   for (const c of ['B06', 'B10']) await page.check(`input[data-action="toggle"][value="${c}"]`);
-  assert.match(await text(page, '.tk-page-desc'), /4 litters · 46 piglets · not recorded yet/);
+  assert.match(await text(page, '.sheet-subtitle'), /4 litters · 46 piglets · not recorded yet/);
   // a double tap on Review: the second tap lands on Record (a hold, TaskHold) at the same spot and records nothing
   const rv = await page.locator('[data-action="review"]').boundingBox();
   const at = [rv.x + rv.width / 2, rv.y + rv.height / 2];

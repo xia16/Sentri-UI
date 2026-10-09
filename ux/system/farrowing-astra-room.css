@@ -44,7 +44,6 @@
 .home-task-states b{color:#24613a;font-weight:600}
 .home-resume{font-size:11px;color:var(--muted);padding-top:13px;border-top:1px solid var(--line);width:100%}@media(max-width:370px){.room-list .row-main{font-size:13px}.sow-identity{min-width:60px}}@media(prefers-reduced-motion:reduce){.room-list .pen-card,.room-list .pen-top{transition:none}.room-list .pen-card.pen-arrival,.room-list .pen-arrival .pen-top{animation:none}.room-list .pen-card.pen-arrival{border-color:#91a77f}.room-list .pen-arrival .pen-top{background:#e8efdf}}
 /* Range filters: native draggable thumbs with keyboard-friendly bounds. */
-.room-filter-sheet .sheet-body{scrollbar-gutter:stable}
 .filter-section{padding:0 0 22px;margin-bottom:22px;border-bottom:1px solid var(--line)}
 .filter-section-head{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
 .filter-section-head .filter-title{margin:0}
@@ -65,7 +64,6 @@
 .parity-options{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .parity-options button{padding-left:5px;padding-right:5px}
 .filter-section .filter-explanation{margin-top:10px}
-.room-filter-sheet .sheet-footer{padding-top:14px}
 
 .room-filter-sheet .filter-section:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
 /* Keep the comparison table;

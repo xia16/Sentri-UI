@@ -22,7 +22,7 @@
 .dd-body { display: flex; flex-direction: column; gap: var(--space-heading); }
 .dd-body > * { margin: 0; }
 .dd-body > .st-segment { margin-bottom: 2px; }
-.tk-sheet .tk-group-head { position: static; }
+.sheet .tk-group-head { position: static; }
 /* the photo viewer: one photo, full width (a stand-in frame: the prototype has no camera) */
 .dd-photo { display: grid; place-items: center; width: 100%; aspect-ratio: 3 / 4; border-radius: var(--radius-inset); background: var(--well); color: var(--muted); font-family: var(--font-mono); font-size: var(--type-button-size); }
 </style>
@@ -429,7 +429,7 @@
   }
   // Re-render keeps the body's scroll and the focused control (a requirement of the shared component).
   function render() {
-    var root = document.getElementById('screen'), body = root.querySelector('.tk-sheet .tk-sheet-body');
+    var root = document.getElementById('screen'), body = root.querySelector('.sheet .sheet-body');
     var top = body ? body.scrollTop : 0, f = document.activeElement, key = null, view = S.picking ? 'found' : S.sub || 'dead';
     if (f && root.contains(f) && f.dataset && f.dataset.action) key = [f.dataset.action, f.dataset.value || '', f.dataset.step || ''];
     var sheet = S.picking ? foundPicker() : S.sub === 'tagged' ? taggedView() : S.sub === 'nb' ? nbView() : drawer();
@@ -440,7 +440,7 @@
     root.querySelector('#dd-over').innerHTML = sheet + over;
     PP.apply(root);
     UI.liveFill(root, { then: function (el) { PP.apply(el); } });
-    var nb = root.querySelector('.tk-sheet .tk-sheet-body');
+    var nb = root.querySelector('.sheet .sheet-body');
     if (nb && !over && view === S.lastView) nb.scrollTop = top;
     S.lastView = view;
     if (S.focus) { var t = root.querySelector(S.focus); S.focus = ''; if (t) { t.focus({ preventScroll: true }); return; } }
@@ -575,7 +575,7 @@
       if (gray) S.photoHint[key] = b.dataset.reason === 'full' ? 'ds.c2.photos.full' : 'ds.c2.photos.inactive';
       else { S[key].photos.push(shots(1)[0]); S.photoHint[key] = ''; S.deleted = null; keep(); S.focus = '#dd-photos-' + key + '-camera'; }
     }
-    else if (a === 'photo-view') { var pk = b.closest('[data-field]').getAttribute('data-field'); S.viewer = { key: pk, id: v }; S.focus = '.tk-back[data-action="viewer-back"]'; }
+    else if (a === 'photo-view') { var pk = b.closest('[data-field]').getAttribute('data-field'); S.viewer = { key: pk, id: v }; S.focus = '.surface-back[data-action="viewer-back"]'; }
     else if (a === 'viewer-back') { var vv = S.viewer; S.viewer = null; if (vv) S.focus = '[data-action="photo-view"][data-value="' + vv.id + '"]'; }
     else if (a === 'photo-delete') {
       var vw = S.viewer, list = S[vw.key].photos, idx = list.map(function (p) { return p.id; }).indexOf(vw.id);
@@ -609,7 +609,7 @@
   });
   // Swipe down on the drawer's grab or head = Back (one level down: back to the drawer).
   var grab = null;
-  screen.addEventListener('pointerdown', function (ev) { if (ev.target.closest('.tk-grab, .tk-sheet-head')) grab = ev.clientY; }, true);
+  screen.addEventListener('pointerdown', function (ev) { if (ev.target.closest('.grab, .utility-header')) grab = ev.clientY; }, true);
   screen.addEventListener('pointerup', function (ev) {
     if (grab != null && ev.clientY - grab > 100) { if (S.sub || S.viewer) { S.viewer = null; subBack(); render(); } else { keep(); leave(''); } }
     grab = null;

@@ -261,15 +261,15 @@
     if (!ended) body += toolRow();
     body += processing(p);
     var n = Object.keys(V.draft).length;
-    var foot = K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('submit.n', { n: n }), action: 'submit', register: 'primary', waiting: !n } });
+    var foot = K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('submit.n', { n: n }), action: 'submit', register: 'primary', waiting: !n }, status: !n ? T('sr.items') : null });
     var sub = [T('sheet.pen', { pen: p.code, p: p.parity }), SEP, T('piglets', { n: p.alive }), SEP, T('day.n', { d: p.age })];
-    return K.drawer({ title: p.sow, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back', label: T('back') },
+    return K.drawer({ title: p.sow, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back' },
       body: body, footer: foot });
   }
   /* ---- boars · gilts: two steppers ---- */
   function countsSheet() {
     var p = pen(), c = V.counts;
-    return K.drawer({ title: T('cnt.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'counts', close: null,
+    return K.drawer({ title: T('cnt.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'counts',
       body: stepper('boar', T('idf.boars'), c.boar) + stepper('gilt', T('idf.gilts'), c.gilt),
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'counts-save', register: 'primary' } }) });
   }
@@ -295,7 +295,7 @@
 
   /* ---- More: Move piglets · Record death · Set count ---- */
   function moreSheet() {
-    return K.drawer({ title: T('more.title'), size: 'medium', view: 'more', close: null,
+    return K.drawer({ title: T('more.title'), size: 'medium', view: 'more',
       body: K.doors({ card: true, items: [{ title: T('move.title'), icon: 'transfer', action: 'tool', value: 'move' }, { title: T('tool.count'), icon: 'edit', action: 'tool', value: 'count' }] }),
       footer: K.footer({ back: { action: 'back', label: T('back') } }) });
   }
@@ -311,8 +311,8 @@
         { value: 'weak', label: T('treat.weak') }, { value: 'sick', label: T('treat.sick') }] });
       body += '<p class="sp-quiet">' + esc(T('treat.later', { n: n - d.n })) + '</p>';
     }
-    return K.drawer({ title: tr(d.k), subtitle: T('adj.sub', { pen: p.code, n: n }), size: 'long', view: 'adjust', close: null, body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('adj.use', { n: d.n }), action: 'adjust-use', register: 'primary', waiting: less && !d.why } }) });
+    return K.drawer({ title: tr(d.k), subtitle: T('adj.sub', { pen: p.code, n: n }), size: 'long', view: 'adjust', body: body,
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('adj.use', { n: d.n }), action: 'adjust-use', register: 'primary', waiting: less && !d.why }, status: less && !d.why ? T('sr.why') : null }) });
   }
 
   /* ---- Give IDs: one piglet at a time (farrowing's identity pattern, research/per-piglet-proposal.md flow a) ----
@@ -357,15 +357,15 @@
     var primary = { label: T(g.edit ? 'give.fix' : 'give.save'), action: 'give-save', register: 'primary', waiting: !ready };
     var sub = T('give.sub', { pen: p.code, sow: p.sow, n: left });
     return K.page({ title: T(br ? 'tr.id.breeders' : 'give.title'), description: g.edit ? T('give.fixing', { no: g.edit }) : sub, view: 'give', body: body,
-      footer: givePad() + K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : primary }) });
+      footer: givePad() + K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : primary, status: !ended && !ready ? T('sr.id') : null }) });
   }
   /* the litter weight from the Piglets tab: one Measure on the same Numpad */
   function weightSheet() {
     var p = pen(), w = V.weight;
-    return K.drawer({ title: T('w.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'weight', close: null,
+    return K.drawer({ title: T('w.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'weight',
       body: UI.measure({ label: T('w.kg'), value: w.kg, unit: 'kg', placeholder: '—', active: true, action: 'noop', key: 'w', className: 'sp-give-measure' }),
       footer: UI.numpad({ value: w.kg, unit: 'kg', action: 'pad', key: 'w', compact: true, decimals: 1, intLength: 3 }) +
-        K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) } }) });
+        K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) }, status: !(+w.kg > 0) ? T('sr.kg') : null }) });
   }
   /* ---- the pen log: born, deaths, moves, counts, treatments, IDs — the history, newest first ---- */
   function logPage() {
@@ -389,8 +389,8 @@
   function deathSheet() {
     var p = pen(), d = V.death, k = CAUSES.reduce(function (s, c) { return s + d.c[c]; }, 0);
     var body = CAUSES.map(function (c) { return stepper(c, T('c.' + c), d.c[c], { max: p.alive }); }).join('');
-    return K.drawer({ title: T('death.title'), subtitle: T('death.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'death', close: null, body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'death-save', register: 'primary', waiting: !k } }) });
+    return K.drawer({ title: T('death.title'), subtitle: T('death.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'death', body: body,
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'death-save', register: 'primary', waiting: !k }, status: !k ? T('sr.dead') : null }) });
   }
   /* ---- move piglets: only the other pens of this batch (there is nowhere else); for what was given here: had it? ---- */
   function moveAsks(p) {
@@ -414,14 +414,14 @@
     });
     var ready = d.to && d.n > 0 && asks.every(function (k) { return d.had[k] != null; });
     return K.page({ title: T('move.title'), description: T('move.sub', { pen: p.code, n: p.alive }), view: 'move', body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('move.save', { n: pigs(d.n) }), action: 'move-save', register: 'primary', waiting: !ready } }) });
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('move.save', { n: pigs(d.n) }), action: 'move-save', register: 'primary', waiting: !ready }, status: !ready ? T(d.to ? 'sr.had' : 'move.pick') : null }) });
   }
   /* ---- set count: the record becomes what is there now ---- */
   function countSheet() {
     var p = pen(), d = V.count;
-    return K.drawer({ title: T('count.title'), subtitle: T('count.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'count', close: null,
+    return K.drawer({ title: T('count.title'), subtitle: T('count.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'count',
       body: stepper('count', T('count.label'), d.n, { variant: 'hero', face: 'count', min: 0, hint: '' }),
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'count-save', register: 'primary', waiting: d.n === p.alive } }) });
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'count-save', register: 'primary', waiting: d.n === p.alive }, status: d.n === p.alive ? T('sr.count') : null }) });
   }
 
   /* ================= End task (the supervisor) ================= */
@@ -452,9 +452,9 @@
      that is gone slides out first (data-leave), then the phone is redrawn. A re-render never replays. */
   var shownKeys = [], leaving = false;
   function overlays(root) {
-    return Array.prototype.filter.call(root.children, function (el) { return el.matches('.tk-sheet, .tk-page, .tk-dialog-backdrop'); });
+    return Array.prototype.filter.call(root.children, function (el) { return el.matches('.sheet, .sheet[data-presentation="page"], .dialog-backdrop'); });
   }
-  var keyOf = function (el) { return el.getAttribute('data-view') || (el.matches('.tk-dialog-backdrop') ? 'dialog' : ''); };
+  var keyOf = function (el) { return el.getAttribute('data-view') || (el.matches('.dialog-backdrop') ? 'dialog' : ''); };
   function render() {
     if (leaving) return;
     document.documentElement.lang = L.lang === 'zh' ? 'zh-CN' : 'en';
@@ -479,7 +479,7 @@
     var gone = overlays(phone).filter(function (el) { return next.indexOf(keyOf(el)) < 0; });
     if (gone.length && !reduced()) {
       leaving = true; phone.style.pointerEvents = 'none';   // no tap lands on a screen that is about to be redrawn
-      gone.forEach(function (el) { el.setAttribute('data-leave', ''); var s = el.previousElementSibling; if (s && s.matches('.tk-scrim')) s.setAttribute('data-leave', ''); });
+      gone.forEach(function (el) { el.setAttribute('data-leave', ''); var s = el.previousElementSibling; if (s && s.matches('.scrim')) s.setAttribute('data-leave', ''); });
       setTimeout(function () {
         leaving = false; phone.style.pointerEvents = '';
         phone.querySelectorAll('[data-leave]').forEach(function (el) { el.remove(); });
@@ -492,7 +492,7 @@
   }
   function paint(html, next) {
     var keep = {};
-    phone.querySelectorAll('.tk-scroll, .tk-sheet-body, .tk-page-body').forEach(function (el) {
+    phone.querySelectorAll('.tk-scroll, .sheet-body, .sheet-body').forEach(function (el) {
       var host = el.closest('[data-view]'); keep[(host ? host.getAttribute('data-view') : 'list') + el.className] = el.scrollTop;
     });
     var chipsX = phone.querySelector('.tk-chips-track'), cx = chipsX ? chipsX.scrollLeft : 0;
@@ -506,15 +506,15 @@
     overlays(phone).forEach(function (el) {
       if (shownKeys.indexOf(keyOf(el)) >= 0) return;
       el.setAttribute('data-enter', '');
-      var s = el.previousElementSibling; if (s && s.matches('.tk-scrim')) s.setAttribute('data-enter', '');
+      var s = el.previousElementSibling; if (s && s.matches('.scrim')) s.setAttribute('data-enter', '');
     });
     shownKeys = next;
-    phone.querySelectorAll('.tk-scroll, .tk-sheet-body, .tk-page-body').forEach(function (el) {
+    phone.querySelectorAll('.tk-scroll, .sheet-body, .sheet-body').forEach(function (el) {
       var host = el.closest('[data-view]'), k = (host ? host.getAttribute('data-view') : 'list') + el.className;
       if (keep[k] != null) el.scrollTop = keep[k];
     });
     var ct = phone.querySelector('.tk-chips-track'); if (ct) ct.scrollLeft = cx;
-    if (V.pageTop) { phone.querySelectorAll('.tk-page-body, .tk-sheet-body').forEach(function (x) { x.scrollTop = 0; }); V.pageTop = false; }
+    if (V.pageTop) { phone.querySelectorAll('.sheet-body, .sheet-body').forEach(function (x) { x.scrollTop = 0; }); V.pageTop = false; }
     if (V.toTop) { var sc = phone.querySelector('.tk-scroll'); if (sc) sc.scrollTop = 0; V.toTop = false; }
     if (focusSel) {
       var f = phone.querySelector(focusSel);

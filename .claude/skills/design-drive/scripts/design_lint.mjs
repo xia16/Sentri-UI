@@ -276,8 +276,8 @@ function analyse({ sets, reg, strict, pseudo, locale, root }) {
   //  - the footer sits on the sheet's bottom edge (it never floats over space under it);
   //  - a sheet not held at full height (data-height="full", a page, or as tall as its screen) is no taller than
   //    its content plus its footer: no dead space.
-  const sheetSel = '.sheet, .tk-sheet, .dialog, .tk-dialog, .tk-page, .record-page, [role="dialog"], [data-sheet]';
-  const footSel = '.sheet-footer, .tk-footer, footer, [data-footer]';
+  const sheetSel = '.sheet, .dialog, .record-page, [role="dialog"], [data-sheet]';
+  const footSel = '.sheet-footer, .sheet-footer, footer, [data-footer]';
   const px = v => parseFloat(v) || 0;
   // How tall an element's content is, whatever height the layout gave it (a flex-grown or scrolling body).
   const natural = c => {
@@ -298,7 +298,7 @@ function analyse({ sets, reg, strict, pseudo, locale, root }) {
       if (Math.abs(gap) > 1) add('geo-footer-float', 'error', foot, `the footer ends ${Math.round(Math.abs(gap))}px ${gap > 0 ? 'above' : 'below'} its sheet's bottom edge (${desc(sh)})`, Math.round(gap));
     }
     const scr = sh.closest(root || 'body'), fh = scr && scr !== document.body ? scr.getBoundingClientRect().height : H;
-    const full = sh.matches('[data-height="full"], [data-presentation="page"], .tk-page, .record-page') || r.height >= fh - 2;
+    const full = sh.matches('[data-sizing="full"], [data-presentation="page"], .record-page') || r.height >= fh - 2;
     if (full) continue;
     const kids = [...sh.children].filter(c => shown.has(c) && inFlow(c));
     const content = kids.reduce((sum, c) => { const cs = getComputedStyle(c); return sum + natural(c) + px(cs.marginTop) + px(cs.marginBottom); }, 0)

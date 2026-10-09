@@ -1,9 +1,4 @@
 /* Same Sentri surfaces and type, with explicit pig and pen scopes. */
-.inspection-phone{--drawer-short:46%;--drawer-medium:70%;--drawer-long:calc(100% - 74px)}
-.inspection-phone .sheet[data-size="short"]{height:var(--drawer-short)}
-.inspection-phone .sheet[data-size="medium"]{height:var(--drawer-medium)}
-.inspection-phone .sheet[data-size="long"]{height:var(--drawer-long)}
-.inspection-phone .sheet[data-size]>.sheet-body{flex:1}
 .inspection-phone .actions-sheet>.sheet-body{flex:1;padding-top:0}
 .inspection-phone .actions-sheet>.utility-header+.sheet-body{padding-top:12px}
 .inspection-phone .actions-subjects{flex-shrink:0;padding:18px 21px 16px}
@@ -39,9 +34,8 @@
 .pig-id{font:600 14px var(--mono);letter-spacing:-.4px}.pig-line{font-size:11px;color:var(--muted);line-height:1.55}.pig-instruction{font-size:11px;line-height:1.6;color:#875c1a;display:flex;align-items:center;gap:5px}.pig-instruction svg{width:12px;height:12px}.pig-case{font-size:11px;color:var(--ink);line-height:1.55}.pig-plan{font-size:10px;color:var(--muted);line-height:1.55}
 .pen-attention{padding:9px 14px;background:#fcf6e8;color:#80581b;display:flex;align-items:center;gap:7px;font-size:11px;border-bottom:1px solid #eee4ce}.pen-attention svg{width:14px;height:14px}
 .inspect-dock{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:12px 16px 25px;min-height:88px;background:white;border-top:1px solid var(--line);position:relative}.inspect-dock:after{content:'';position:absolute;bottom:8px;left:calc(50% - 46px);width:92px;height:4px;border-radius:4px;background:#dce0d4}.inspect-dock .button{min-height:50px}.inspect-dock .icon-button{border:1px solid #bac3af;border-radius:12px;height:50px;min-width:48px}
-.inspection-phone .scrim{inset:42px 0 0}.inspection-phone .inspect-main{display:contents}.inspection-phone:has(.sheet) .inspect-main{pointer-events:none}
-.inspection-phone .sheet{max-height:calc(100% - 74px)}
-.inspection-phone .utility-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:5px 21px 17px;border-bottom:1px solid var(--line);flex-shrink:0}.inspection-phone .utility-header h3{font-size:21px;letter-spacing:-.7px;margin:0}.inspection-phone .utility-header p{font-size:11px;line-height:1.6;color:var(--muted);margin:6px 0 0}.inspection-phone .sheet-body{padding:18px 21px 22px;scrollbar-gutter:stable}.inspection-phone .sheet-footer{padding-top:14px}
+.inspection-phone .inspect-main{display:contents}.inspection-phone:has(.sheet) .inspect-main{pointer-events:none}
+
 .scope-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;margin-bottom:17px;color:var(--muted)}.scope-summary strong{color:var(--ink)}
 .action-list{display:flex;flex-direction:column}.action-item{display:flex;align-items:center;gap:12px;min-height:76px;width:100%;padding:13px 0;background:transparent;text-align:left;border-bottom:1px solid var(--line)}.action-item:last-child{border-bottom:0}.action-symbol{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:var(--well)}.action-symbol svg{width:19px;height:19px}.action-item>span:nth-child(2){flex:1;display:flex;flex-direction:column;gap:6px}.action-item strong{font-size:14px;font-weight:600}.action-item small{font-size:11px;color:var(--muted);line-height:1.6}.action-item>svg{width:15px;height:15px;color:var(--muted)}
 .quiet-note{font-size:11px;line-height:1.7;color:var(--muted);margin:14px 0 0}.choice-list{display:flex;flex-direction:column}.choice-option{display:flex;align-items:center;gap:12px;min-height:58px;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer}.choice-option>span{flex:1}.choice-option input{accent-color:var(--ink);width:21px;height:21px}.choice-option small{display:block;color:var(--muted);font-size:10px;line-height:1.6;margin-top:5px}
@@ -134,7 +128,6 @@
 .inspection-phone .plan-meta>*{min-width:0}
 .inspection-phone .selected-conditions{min-height:34px;line-height:1.5}
 .inspection-phone .scope-description{margin:10px 0 6px;font-size:11px;color:var(--muted)}
-.inspection-phone .sheet-footer .button:only-child{flex:1;width:100%;min-height:50px}
 
 .inspection-phone .sensor-slot{padding:9px 0;font-size:12px;gap:12px}
 .inspection-phone .sensor-slot strong{display:flex;align-items:baseline;gap:5px;font-size:21px;min-width:64px;justify-content:flex-end}
@@ -647,7 +640,6 @@
 .inspection-phone .pen-note-meta .text-button{flex-shrink:0;min-height:44px;font-size:11px;font-weight:600}
 .inspection-phone .note-closed-status{display:flex;align-items:center;gap:6px;margin:0 0 14px;font-size:11px;color:#59684d}
 .inspection-phone .note-closed-status svg{width:15px;height:15px}
-.inspection-phone .sheet>.sheet-body{min-height:0;overflow-y:auto;overscroll-behavior-y:contain}
 .inspection-phone .sheet-filterbar{flex-shrink:0;padding:10px 18px 0;background:var(--st-context-bg,#fff)}
 .inspection-phone .sheet-filterbar+.sheet-body{padding-top:10px;display:flex;flex-direction:column;flex:1}
 .inspection-phone .detail-destinations{margin-top:18px}
@@ -830,9 +822,6 @@
 @keyframes optional-editor-in{from{transform:translateY(20px);opacity:.6}to{transform:translateY(0);opacity:1}}
 
 /* Every drawer uses the same leading back control. */
-.inspection-phone .sheet>.utility-header{justify-content:flex-start}
-.inspection-phone .sheet>.utility-header>.drawer-header-back{width:44px;min-width:44px;height:44px;flex:none;margin-left:-10px}
-.inspection-phone .sheet>.utility-header>div{min-width:0;flex:1}
 
 /* Keep the short form card clear of the fixed action bar, even when scrolling. */
 .inspection-phone .single-action-sheet[data-size="short"]>.sheet-body{padding-top:12px;padding-bottom:0;margin-bottom:16px}

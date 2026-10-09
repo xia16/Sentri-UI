@@ -1,6 +1,4 @@
 /* Shared Inspection action rows with local category navigation. */
-.inspection-phone .actions-sheet>.utility-header{padding-bottom:14px}
-.inspection-phone .actions-sheet>.utility-header{justify-content:flex-start;gap:10px}
 .inspection-phone .actions-sheet .actions-header-back{width:44px;height:44px;flex:none;margin-left:-10px}
 .actions-header-back svg{transform:rotate(180deg)}
 .sow-action-group{margin:0 0 24px}
@@ -8,13 +6,12 @@
 .sow-action-group>.section-title>svg{width:15px;height:15px;color:#69765e;flex:none}
 .sow-action-group .compact-actions{margin:0}
 .sow-action-group .action-item{min-height:64px}
-.unavailable-actions-link{display:flex;align-items:center;gap:8px;min-height:44px;background:transparent;color:var(--muted);font-size:11px;padding:0;text-align:left}
+.unavailable-actions-link{display:flex;align-items:center;gap:8px;min-height:var(--tap-min);background:transparent;color:var(--muted);font-size:11px;padding:0;text-align:left}
 .unavailable-actions-link>svg{width:13px;height:13px}
 .sow-action-warning{display:flex;align-items:flex-start;gap:10px;padding:14px;background:#fff5df;color:#8b5800;border-radius:12px;margin-bottom:24px}
 .sow-action-warning svg{width:16px;height:16px;flex:none}.sow-action-warning p{font-size:12px;line-height:1.6;margin:0}
 .sow-action-field{display:flex;flex-direction:column;gap:8px;font-size:13px}
 .sow-action-field input{min-height:48px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;background:#fff}
-@media(max-width:370px){.inspection-phone .actions-sheet>.sheet-body{padding-left:17px;padding-right:17px}}
 
 .sow-task-section{margin:0 0 24px;min-width:0}
 .sow-task-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;min-height:28px}
@@ -53,6 +50,5 @@
 .inspection-phone .unavailable-action-group .action-symbol{background:#f1f2ee;color:#8a9085}
 
 /* Category sections can reach the top; the footer owns Back and the home indicator. */
-.inspection-phone .actions-sheet>.sheet-footer{flex:none}
 
 .action-category-empty{font-size:12px;line-height:1.5;color:var(--muted);margin:4px 0 12px}

@@ -290,6 +290,7 @@
   --statusbar-height: 42px;
   --animal-row-min: 76px;
   --animal-id-col: 59px;
+  --grab-width: 42px;
   --grab-height: 24px;
   --entry-row-min: 66px;
   --glyph-key-task: 17px;
@@ -337,6 +338,10 @@
   --hold-caption-opacity: 0.85;
   --hold-commit: 850ms;
   --hold-arm: 5000ms;
+  --sheet-in: 240ms;
+  --sheet-out: 180ms;
+  --fade: 200ms;
+  --ease-arrive: cubic-bezier(.22,1,.36,1);
   --drawer-compact-max: 42%;
   --drawer-short-max: 58%;
   --drawer-medium-max: 76%;
@@ -383,7 +388,7 @@
 /* Sentri — the shared stylesheet, in load order:
    1. aliases from the generated tokens to the names the components read
    2. base elements and controls (from farrowing-astra-concept.css, the prototypes' common base)
-   3. astra-surfaces.css (page / drawer presentation)
+   3. Sheet: drawer | page | dialog
    4. sentri-visual-foundation.css (its :root palette now comes from tokens.css)
    Section 2 sits in a cascade layer (sentri-base): any page stylesheet wins over it in any load order, so Home, Farrowing
    and Inspection keep their own base. Sections 3-5 are unlayered and load after the page CSS.
@@ -401,11 +406,6 @@ button{cursor:pointer;color:inherit;border:0}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:var(--size-3) solid var(--focus-strong);outline-offset:var(--size-3)}
 button:disabled,button[aria-disabled=true]{cursor:default;color:var(--disabled-ink);background:var(--disabled-surface);border-color:var(--disabled-border)}
 svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
-.scrim{position:absolute;inset:var(--statusbar-height) 0 0;background:var(--scrim);backdrop-filter:blur(var(--blur-scrim));z-index:2;width:100%}
-.sheet{position:absolute;bottom:0;left:0;right:0;z-index:3;background:var(--paper);border-radius:var(--radius-28) var(--radius-28) 0 0;box-shadow:var(--shadow-sheet);display:flex;flex-direction:column;max-height:calc(100% - var(--size-80))}
-.sheet-body{padding:0 var(--space-18);min-height:0;overflow-y:auto;overscroll-behavior:contain}
-.sheet-footer{flex-shrink:0;display:flex;gap:var(--space-10);padding:var(--space-17) var(--space-18) var(--space-28);border-top:1px solid var(--line);background:var(--paper);position:relative}
-.sheet-footer:after{content:'';position:absolute;bottom:var(--space-8);left:calc(50% - var(--handle-width) / 2);height:var(--size-4);width:var(--handle-width);border-radius:var(--radius-4);background:var(--handle)}
 .button{min-height:var(--size-52);padding:var(--space-10) var(--space-17);display:flex;align-items:center;justify-content:center;gap:var(--space-7);border:1px solid var(--button-border);background:var(--paper);border-radius:var(--radius-13);font-weight:700;font-size:var(--font-size-14);text-align:center;line-height:1.3}
 .button.primary{flex:1;background:var(--ink);border-color:var(--ink);color:var(--paper)}
 .button.primary:disabled{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink)}
@@ -423,31 +423,111 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 @media(prefers-reduced-motion:reduce){.button:active{transform:none}}
 }
 
-/* 3 · astra-surfaces.css */
-/* Full pages share the phone canvas; drawers retain their standard sizes. */
-:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]{inset:0;height:100%;max-height:100%;border-radius:0;box-shadow:none;background:var(--paper);z-index:3}
-:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]>.statusbar{flex:none;height:var(--statusbar-height);min-height:var(--statusbar-height)}
-:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]>.utility-header{display:flex;align-items:center;justify-content:flex-start;gap:var(--space-10);padding:var(--space-8) var(--space-21) var(--space-18);border-bottom:1px solid var(--line);margin:0;flex:none}
-:is(.farrowing-phone,.inspection-phone) .sheet-footer>.surface-back{display:flex;align-items:center;justify-content:center;gap:var(--space-4);width:var(--back-width);min-width:var(--back-width);min-height:var(--tap-min);margin:0;padding:var(--space-8);background:var(--paper);border:1px solid var(--back-border);border-radius:var(--radius-12);box-shadow:none;flex:none;font:500 var(--font-size-14) var(--font-sans);color:var(--ink);white-space:nowrap}
-:is(.farrowing-phone,.inspection-phone) .sheet-footer>.surface-back>svg{width:var(--size-16);height:var(--size-16);flex:none;transform:none}
-:is(.farrowing-phone,.inspection-phone) .sheet-footer>.surface-back:active{background:var(--back-press);color:var(--current-marker)}
-:is(.farrowing-phone,.inspection-phone) .sheet-footer>.surface-back:focus-visible{outline:var(--size-2) solid var(--focus-strong);outline-offset:var(--size-2)}
-:is(.farrowing-phone,.inspection-phone) .sheet>.sheet-footer.record-toolbar{grid-template-columns:var(--back-width) minmax(0,1fr)}
-.inspection-phone .actions-bottom-bar>.surface-back:after{display:none}
-:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]>.sheet-body{min-height:0;flex:1;overflow-y:auto;padding:var(--space-20) var(--space-21) var(--space-24);overscroll-behavior:contain}
-:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]>.sheet-footer{flex:none;padding:var(--space-14) var(--space-21) var(--space-28)}
-/* Keep the return control stationary between pig details and its action menu. */
-.inspection-phone .sheet>.sheet-footer.record-toolbar:is(.pig-detail-footer,.actions-bottom-bar){padding:var(--space-14) var(--space-21) var(--space-28);min-height:var(--size-91);flex:none}
-:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"] .sheet-footer:after{display:none}
-:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]:after{content:"";position:absolute;bottom:var(--space-8);left:calc(50% - var(--handle-width) / 2);height:var(--size-4);width:var(--handle-width);background:var(--handle);border-radius:var(--radius-4);pointer-events:none}
-:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"] .sheet-footer>.button:only-child{width:100%;flex:1}
-.farrowing-phone .sheet[data-st-context="drawer"],.inspection-phone .sheet[data-st-context="drawer"]{background:var(--paper);max-height:var(--drawer-max-height,calc(100% - var(--space-24)));overflow:hidden}
-.farrowing-phone .sheet[data-st-context="drawer"]>.sheet-body,.inspection-phone .sheet[data-st-context="drawer"]>.sheet-body{min-height:0;overflow-y:auto;overscroll-behavior:contain}
-.farrowing-phone .sheet[data-st-context="drawer"][data-size="compact"],.inspection-phone .sheet[data-st-context="drawer"][data-size="compact"]{height:auto;max-height:var(--drawer-compact-max)}
-.farrowing-phone .sheet[data-st-context="drawer"][data-size="short"],.inspection-phone .sheet[data-st-context="drawer"][data-size="short"]{height:auto;max-height:var(--drawer-short-max)}
-.farrowing-phone .sheet[data-st-context="drawer"][data-size="medium"],.inspection-phone .sheet[data-st-context="drawer"][data-size="medium"]{height:var(--drawer-medium-height);max-height:var(--drawer-medium-max)}
-.farrowing-phone .sheet[data-st-context="drawer"][data-size="long"],.inspection-phone .sheet[data-st-context="drawer"][data-size="long"]{height:var(--drawer-long-height);max-height:var(--drawer-long-max)}
-.farrowing-phone .sheet[data-st-context="drawer"][data-sizing="content"],.inspection-phone .sheet[data-st-context="drawer"][data-sizing="content"]{height:auto}
+/* 3 · Sheet: drawer | page | dialog. The one implementation (SentriUI.sheet); it replaces astra-surfaces.css and the
+   TaskSheet / TaskPage / TaskDialog styles. Every value is a token. A sheet is sized by its nearest positioned ancestor
+   (the phone root): see Sheet/README.md. */
+.scrim{position:absolute;top:var(--statusbar-height);left:0;right:0;bottom:0;z-index:calc(2 + 10 * var(--sheet-layer,0));width:100%;padding:0;margin:0;border:0;background:var(--scrim);backdrop-filter:blur(var(--blur-scrim))}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:calc(3 + 10 * var(--sheet-layer,0));display:flex;flex-direction:column;overflow:hidden;max-height:calc(100% - var(--size-80));background:var(--paper);color:var(--ink);border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;box-shadow:var(--shadow-sheet)}
+.sheet:focus{outline:none}
+/* Drawer: as tall as its content, up to its size's max. sizing "full" holds it at the max, for a sheet whose content grows
+   as the worker taps; the body then takes the spare height and the footer still sits on the bottom edge. */
+.sheet[data-size="compact"]{max-height:var(--drawer-compact-max)}
+.sheet[data-size="short"]{max-height:var(--drawer-short-max)}
+.sheet[data-size="medium"]{max-height:var(--drawer-medium-max)}
+.sheet[data-size="long"]{max-height:var(--drawer-long-max)}
+.sheet[data-sizing="full"]{height:calc(100% - var(--size-80))}
+.sheet[data-sizing="full"][data-size="compact"]{height:var(--drawer-compact-max)}
+.sheet[data-sizing="full"][data-size="short"]{height:var(--drawer-short-max)}
+.sheet[data-sizing="full"][data-size="medium"]{height:var(--drawer-medium-max)}
+.sheet[data-sizing="full"][data-size="long"]{height:var(--drawer-long-max)}
+/* Page: the whole canvas, square, no scrim; Back is in its footer. */
+.sheet[data-presentation="page"]{inset:0;height:100%;max-height:100%;border-radius:0;box-shadow:none;background:var(--app-background);z-index:calc(5 + 10 * var(--sheet-layer,0))}
+.sheet[data-presentation="page"]>.statusbar{flex:none;height:var(--statusbar-height);min-height:var(--statusbar-height)}
+/* Layers: z = base + 10 × layer (scrim 2, drawer 3, page 5, dialog 8). An overlay placed after a sheet in the phone rises one
+   layer by itself, so a drawer or dialog opened over a page always stacks above it; data-layer (layer: n) sets it. */
+.sheet~:is(.scrim,.sheet,.dialog-backdrop):not([data-layer]){--sheet-layer:1}
+.sheet~.sheet~:is(.scrim,.sheet,.dialog-backdrop):not([data-layer]){--sheet-layer:2}
+.sheet~.sheet~.sheet~:is(.scrim,.sheet,.dialog-backdrop):not([data-layer]){--sheet-layer:3}
+[data-layer="1"]{--sheet-layer:1}
+[data-layer="2"]{--sheet-layer:2}
+[data-layer="3"]{--sheet-layer:3}
+.grab{flex:none;position:relative;height:var(--grab-height);touch-action:none;cursor:grab}
+.grab::before{content:"";position:absolute;top:var(--space-10);left:calc(50% - var(--grab-width) / 2);width:var(--grab-width);height:var(--size-4);border-radius:var(--radius-4);background:var(--back-border)}
+/* Head: the title, one subtitle line, the aside (text actions) and the ✕ (drawers). */
+.utility-header{flex:none;display:flex;align-items:flex-start;gap:var(--space-10);margin:0;padding:var(--space-5) var(--space-gutter-sheet) var(--space-17);border-bottom:1px solid var(--line)}
+.sheet[data-presentation="page"]>.utility-header{padding:var(--space-8) var(--space-gutter) var(--space-18)}
+.sheet-titles{flex:1;min-width:0}
+.sheet-title{margin:0;font:500 var(--type-sheet-title-size)/1.3 var(--font-sans);letter-spacing:var(--tracking-sheet);color:var(--ink);overflow-wrap:anywhere}
+.sheet[data-presentation="page"] .sheet-title{font-size:var(--type-page-title-size);letter-spacing:var(--tracking-page)}
+.sheet-subtitle{margin:var(--space-6) 0 0;font:var(--type-description-size)/1.6 var(--font-sans);color:var(--muted)}
+.sheet-subtitle[data-tone="amber"]{color:var(--amber)}
+.sheet-subtitle[data-tone="red"]{color:var(--red)}
+.sheet-subtitle[data-tone="green"]{color:var(--green)}
+.sheet-subtitle .st-tone[data-tone="red"]{color:var(--red)}
+.sheet-subtitle .st-tone[data-tone="amber"]{color:var(--amber)}
+.sheet-subtitle .st-tone[data-tone="green"]{color:var(--green)}
+.sheet-subtitle .st-sep{margin:0 var(--status-dot)}
+.sheet-aside .text-button,.sheet-aside .st-text-action{min-width:var(--tap-min)}
+.sheet-aside{flex:none;display:flex;align-items:center;align-self:flex-start;gap:var(--space-6)}
+.sheet-close{flex:none;display:grid;place-items:center;width:var(--tap-min);height:var(--tap-min);padding:0;margin:0;border:0;border-radius:var(--radius-segment);background:transparent;color:var(--ink)}
+.sheet-close svg{width:var(--glyph-pad);height:var(--glyph-pad)}
+.sheet-close:active{background:var(--press)}
+/* Body: the one scroller. */
+.sheet-body{flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:var(--space-18) var(--space-gutter-sheet) var(--space-panel);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.sheet-body::-webkit-scrollbar{display:none;width:0;height:0}
+.sheet[data-sizing="full"]>.sheet-body{flex:1 1 auto}
+.sheet[data-presentation="page"]>.sheet-body{flex:1 1 auto;padding:var(--space-20) var(--space-gutter) var(--space-section)}
+/* Footer: Back + the primary (or a hold), at most two, pinned to the surface's bottom edge, the handle bar under them. */
+.sheet-footer{flex:none;position:relative;display:flex;align-items:stretch;gap:var(--space-row-x);margin:0;padding:var(--space-row-x) var(--space-gutter-sheet) var(--space-footer-bottom);background:var(--paper);border-top:1px solid var(--line)}
+.sheet-footer::after{content:"";position:absolute;bottom:var(--space-8);left:calc(50% - var(--handle-width) / 2);width:var(--handle-width);height:var(--size-4);border-radius:var(--radius-4);background:var(--handle);pointer-events:none}
+.sheet[data-presentation="page"]>.sheet-footer{padding-left:var(--space-gutter);padding-right:var(--space-gutter)}
+.sheet-footer>.button{flex:1;min-width:0;min-height:var(--control-height);margin:0;padding:var(--space-10) var(--space-17);border-radius:var(--radius-control);font:500 var(--type-button-size)/1.3 var(--font-sans)}
+.sheet-footer>.st-hold .st-hold-caption{font:500 var(--type-hold-caption-size)/1.3 var(--font-sans);letter-spacing:0.07em;text-transform:uppercase;opacity:var(--task-hold-caption-opacity)}
+.sheet-footer>.st-hold[data-phase="unknown"] .st-hold-caption{opacity:1}
+/* Back: the one exit of every footer. Alone it fills the bar in the primary's face. */
+.surface-back{flex:none;display:flex;align-items:center;justify-content:center;gap:var(--space-4);width:var(--back-width);min-width:var(--back-width);min-height:var(--control-height);margin:0;padding:var(--space-8);background:var(--paper);border:1px solid var(--back-border);border-radius:var(--radius-control);box-shadow:none;color:var(--ink);font:500 var(--type-button-size) var(--font-sans);white-space:nowrap;touch-action:manipulation}
+.surface-back>svg{width:var(--size-16);height:var(--size-16);flex:none;transform:none}
+.surface-back:active{background:var(--back-press)}
+.surface-back:only-child{flex:1 1 auto;width:auto;min-width:0;background:var(--ink);border-color:var(--ink);color:var(--paper);font-weight:600}
+.surface-back:only-child:active{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+/* Status: the one line above the footer that says why the primary waits, or a hold's progress. */
+.sheet-status{flex:none;margin:0;padding:var(--space-row-y) var(--space-gutter-sheet) 0;background:var(--paper);border-top:1px solid var(--line);font:500 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
+.sheet-status[data-tone="amber"],.sheet-status>p[data-tone="amber"]{color:var(--amber)}
+.sheet-status[data-tone="red"],.sheet-status>p[data-tone="red"]{color:var(--red)}
+.sheet-status+.sheet-footer{border-top:0}
+.sheet-status.st-visually-hidden+.sheet-footer{border-top:1px solid var(--line)}
+.sheet-status.st-visually-hidden{top:0;left:0;width:1px;height:1px;padding:0;border:0;white-space:normal}
+.sheet-status[data-action-slot]{display:flex;align-items:center;justify-content:space-between;gap:var(--space-row-y);padding-top:var(--space-4)}
+.sheet-status[data-action-slot]>p{flex:1;min-width:0;margin:0}
+.sheet-status[data-action-slot]>.st-text-action{flex:none}
+.sheet[data-presentation="page"]>.sheet-status{padding-left:var(--space-gutter);padding-right:var(--space-gutter)}
+/* Dialog: one small decision, rising from the bottom edge (reachable by the thumb), over a dimmed phone. */
+.dialog-backdrop{position:absolute;inset:0;z-index:calc(8 + 10 * var(--sheet-layer,0));display:flex;flex-direction:column;justify-content:flex-end;background:var(--dialog-backdrop)}
+.dialog{display:flex;flex-direction:column;overflow:hidden;max-height:calc(100% - var(--space-24));background:var(--paper);color:var(--ink);border-radius:var(--radius-dialog) var(--radius-dialog) 0 0;box-shadow:var(--shadow-dialog)}
+.dialog:focus{outline:none}
+.dialog-body{flex:0 1 auto;min-height:0;overflow-y:auto;padding:var(--space-gutter-sheet) var(--space-gutter-sheet) 0}
+.dialog-title{display:flex;align-items:center;gap:var(--space-7);margin:0;font:500 var(--type-sheet-title-size)/1.3 var(--font-sans);letter-spacing:var(--tracking-sheet);color:var(--ink)}
+.dialog-title svg{width:var(--size-16);height:var(--size-16)}
+.dialog-desc{margin:var(--space-10) 0 0;font:var(--type-description-size)/1.7 var(--font-sans);color:var(--muted)}
+.dialog>.sheet-footer{margin:var(--space-row-x) var(--space-gutter-sheet) 0;padding:var(--space-18) 0 var(--space-footer-bottom)}
+.dialog>.sheet-footer::after{display:none}
+/* Motion: a drawer rises, a page slides in, a dialog fades; the host sets data-enter on the render that opens a surface and
+   data-leave before it removes it. */
+@keyframes st-sheet-in{from{transform:translateY(100%)}to{transform:none}}
+@keyframes st-sheet-out{from{transform:none}to{transform:translateY(100%)}}
+@keyframes st-page-in{from{transform:translateX(100%)}to{transform:none}}
+@keyframes st-page-out{from{transform:none}to{transform:translateX(100%)}}
+@keyframes st-fade-in{from{opacity:0}to{opacity:1}}
+@keyframes st-fade-out{from{opacity:1}to{opacity:0}}
+.sheet[data-enter]{animation:st-sheet-in var(--sheet-in) var(--ease-arrive)}
+.sheet[data-leave]{animation:st-sheet-out var(--sheet-out) ease-in forwards}
+.sheet[data-presentation="page"][data-enter]{animation-name:st-page-in}
+.sheet[data-presentation="page"][data-leave]{animation-name:st-page-out}
+:is(.scrim,.dialog-backdrop)[data-enter]{animation:st-fade-in var(--fade) ease-out}
+:is(.scrim,.dialog-backdrop)[data-leave]{animation:st-fade-out var(--sheet-out) ease-in forwards}
+@media(max-width:370px){.sheet-footer{gap:var(--space-10)}}
+@media(prefers-reduced-motion:reduce){:is(.sheet,.scrim,.dialog-backdrop):is([data-enter],[data-leave]){animation:none}}
+/* Page hooks the prototypes keep. */
 .farrowing-phone .sheet[data-presentation="page"] .sow-header-actions:empty{display:none}
 :is(.farrowing-phone,.inspection-phone) .page-background{position:absolute;inset:0;pointer-events:none;z-index:1}
 :is(.farrowing-phone,.inspection-phone) .page-background>.sheet{z-index:1}
@@ -457,11 +537,6 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .field{font-size:var(--font-size-13);gap:var(--space-8)}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet :is(.field input,.field select,.bulk-condition-button){min-height:var(--tap-min);font-size:var(--font-size-14);padding:var(--space-12)}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .feed-optional-open{min-height:var(--tap-min)}
-
-/* A lone return action owns the footer; paired Back remains secondary. */
-:is(.farrowing-phone,.inspection-phone) .sheet-footer>.surface-back:only-child{width:100%;min-width:0;flex:1 1 auto;grid-column:1/-1;background:var(--ink);border-color:var(--ink);color:var(--paper);font-weight:600}
-:is(.farrowing-phone,.inspection-phone) .sheet-footer>.surface-back:only-child:active{background:var(--ink);border-color:var(--ink);color:var(--paper)}
-
 /* 4 · sentri-visual-foundation.css */
 /* Shared visual vocabulary for the current Sentri prototypes. */
 body{background:var(--ground);color:var(--ink)}
@@ -472,14 +547,9 @@ body{background:var(--ground);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) .task-header>.task-return{width:var(--tap-min);min-width:var(--tap-min);height:var(--tap-min);border:1px solid var(--line);border-radius:var(--radius-12);background:var(--paper)}
 :is(.farrowing-phone,.inspection-phone) .task-activity{padding-left:var(--space-18);padding-right:var(--space-18);color:var(--muted)}
 :is(.farrowing-phone,.inspection-phone) .task-activity strong{font-weight:500}
-:is(.farrowing-phone,.inspection-phone) :is(.sheet,.dialog){background:var(--paper);color:var(--ink)}
-:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]{background:var(--app-background)}
-:is(.farrowing-phone,.inspection-phone) .sheet>.utility-header{padding-left:var(--space-18);padding-right:var(--space-18);border-color:var(--line)}
-:is(.farrowing-phone,.inspection-phone) :is(.utility-header h3,.page-header h3,.dialog h3){font-size:var(--font-size-20);line-height:1.3;font-weight:500;letter-spacing:var(--tracking-sheet)}
+:is(.farrowing-phone,.inspection-phone) .page-header h3{font-size:var(--font-size-20);line-height:1.3;font-weight:500;letter-spacing:var(--tracking-sheet)}
 :is(.farrowing-phone,.inspection-phone) :is(.section-title,.read-heading,.section-heading){font-size:var(--font-size-13);font-weight:500;letter-spacing:0}
-:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]>.sheet-body{padding:var(--space-18) var(--space-18) var(--space-24)}
-:is(.farrowing-phone,.inspection-phone) :is(.sheet-footer,.inspect-dock,.room-dock){background:var(--paper);border-color:var(--line)}
-:is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]>.sheet-footer{padding-left:var(--space-18);padding-right:var(--space-18)}
+:is(.farrowing-phone,.inspection-phone) :is(.inspect-dock,.room-dock){background:var(--paper);border-color:var(--line)}
 :is(.farrowing-phone,.inspection-phone) :is(.button,.key){font-weight:500;border-radius:var(--radius-12);min-height:var(--tap-min)}
 :is(.farrowing-phone,.inspection-phone) .button.secondary{background:var(--paper);border-color:var(--control-border);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) .button.primary:not(:disabled):not([aria-disabled="true"]){background:var(--ink);border-color:var(--ink);color:var(--paper)}
@@ -494,7 +564,6 @@ body{background:var(--ground);color:var(--ink)}
 @media(max-width:370px){
  :is(.farrowing-phone,.inspection-phone) .task-header{gap:var(--space-8);padding-left:var(--space-12);padding-right:var(--space-12)}
  :is(.farrowing-phone,.inspection-phone) .task-header h2{font-size:var(--font-size-20)}
- :is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]>:is(.utility-header,.sheet-body,.sheet-footer){padding-left:var(--space-12);padding-right:var(--space-12)}
 }
 
 /* Shared room context and explicit record commits. */
@@ -510,7 +579,6 @@ body{background:var(--ground);color:var(--ink)}
 :root{--st-canvas:var(--app-background);--st-paper:var(--paper);--st-inset:var(--inset);--st-ink:var(--ink);--st-muted:var(--muted);--st-line:var(--line);--st-rule:var(--rule);--st-panel-bg:var(--st-paper);--st-space-section:var(--space-section);--st-radius:var(--radius-panel);--drawer-medium-height:var(--drawer-medium-max);--drawer-long-height:var(--drawer-long-max)}
 [data-st-context="page"]{--st-panel-bg:var(--st-paper);--st-context-bg:var(--st-canvas)}
 [data-st-context="drawer"]{--st-panel-bg:var(--st-inset);--st-context-bg:var(--st-paper)}
-:is(.inspection-phone,.farrowing-phone) .sheet[data-st-context]{background:var(--st-context-bg)}
 .st-heading.st-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-12);margin:0 0 var(--space-12);padding:0;min-height:0;border:0;background:transparent;color:var(--st-ink)}
 .st-heading .st-heading-main{min-width:0;flex:1}
 .st-heading.st-heading .st-heading-title{display:flex;align-items:center;gap:var(--space-8);font:500 var(--font-size-13)/1.5 var(--font-sans);letter-spacing:0;margin:0;padding:0;border:0;color:var(--st-ink);text-transform:none}
@@ -528,7 +596,6 @@ body{background:var(--ground);color:var(--ink)}
 .st-heading[data-kind="page"] .st-heading-title{font-size:var(--font-size-22);line-height:1.3;letter-spacing:var(--tracking-page)}
 .st-heading[data-kind="page"] .st-heading-description{margin-top:var(--space-6)}
 [data-st-context="drawer"] .st-heading[data-kind="page"] .st-heading-title{font-size:var(--font-size-20)}
-.utility-header .st-heading[data-kind="page"]{margin:0;flex:1;min-width:0}
 .st-heading[data-kind="group"]{margin-bottom:var(--space-8)}
 .st-heading[data-kind="group"] .st-heading-title{font-size:var(--font-size-11);color:var(--st-muted)}
 .st-heading[data-kind="panel"] .st-heading-title{font-size:var(--font-size-12)}
@@ -583,29 +650,19 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 :is(.inspection-phone,.farrowing-phone) .button.task-complete:not(:disabled){background:var(--ink);border-color:var(--ink);color:var(--paper)}
 :is(.inspection-phone,.farrowing-phone) .finish-walk:not(:disabled){background:var(--ink);border-color:var(--ink);color:var(--paper)}
 :is(.st-row,.st-heading-action button,.st-heading-action a):focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
-.device .page-head .st-heading,.device .drawer-head .st-heading{margin:0}
-.device .drawer-head>.st-heading{flex:1}
-.device .st-home-drawer-footer{display:flex;flex:none;padding:var(--space-12) var(--space-18) var(--space-24);border-top:1px solid var(--st-line);background:var(--paper)}
-.device .st-home-back{display:flex;justify-content:center;align-items:center;gap:var(--space-6);min-height:var(--tap-min);width:100%;border:1px solid var(--st-ink);border-radius:var(--radius-12);background:var(--st-ink);color:var(--paper);font-size:var(--font-size-13);font-weight:500}
-.device .st-home-back svg{width:var(--size-16);height:var(--size-16)}
-.device .st-home-drawer-footer:has(>button+button) .st-home-back{width:var(--back-width);background:var(--paper);color:var(--st-ink);border-color:var(--back-border)}
-.device :is(.page-footer,.drawer-body,.environment-page,.maintenance-page) .primary:not(:disabled){background:var(--st-ink);border-color:var(--st-ink);color:var(--paper)}
+.device .page-head .st-heading{margin:0}
+.device :is(.page-footer,.sheet-body,.environment-page,.maintenance-page) .primary:not(:disabled){background:var(--st-ink);border-color:var(--st-ink);color:var(--paper)}
 @media(max-width:370px){.st-panel,.st-facts.st-facts,.st-log.st-log{padding:var(--space-12)}.st-panel.st-row-group{padding:0}.st-heading{gap:var(--space-8)}.st-row.st-row{padding-left:var(--space-12);padding-right:var(--space-12)}}
 
 .device .drawer[data-st-context="drawer"]{background:var(--st-paper);max-height:var(--drawer-medium-max);height:auto;overflow:hidden}
 .device .drawer[data-st-context="drawer"][data-size="compact"]{max-height:var(--drawer-compact-max)}
 .device .drawer[data-st-context="drawer"][data-size="short"]{max-height:var(--drawer-short-max)}
 .device .drawer[data-st-context="drawer"][data-size="long"]{max-height:var(--drawer-long-max)}
-.device .drawer-body{min-height:0;flex:1;overscroll-behavior:contain}
-.device .st-home-drawer-footer{gap:var(--space-12)}
-.device .st-home-drawer-footer .primary{margin:0;min-width:0;flex:1;min-height:var(--tap-min);background:var(--st-ink)}
+.device .sheet-footer .primary{margin:0;min-width:0;flex:1;min-height:var(--tap-min);background:var(--st-ink)}
 .device .drawer[data-st-context="drawer"] .evidence{background:var(--st-inset)}
 
 /* Section navigation footer: preserve the approved Back + underlined categories. */
 .st-category-footer.st-category-footer{display:grid;grid-template-columns:var(--back-width) minmax(0,1fr);align-items:center;gap:var(--space-16);position:relative;flex:none;min-width:0;padding:var(--space-14) var(--space-18) var(--space-28);border-top:1px solid var(--st-line);background:var(--st-paper);container-type:inline-size}
-.st-category-footer>.surface-back{display:flex;align-items:center;justify-content:center;gap:var(--space-4);min-width:0;min-height:var(--tap-min);width:var(--back-width);margin:0;padding:var(--space-8);border:1px solid var(--back-border);border-radius:var(--radius-12);background:var(--paper);color:var(--st-ink);font:500 var(--font-size-14) var(--font-sans);white-space:nowrap;touch-action:manipulation}
-.st-category-footer>.surface-back svg{width:var(--size-16);height:var(--size-16);fill:none;stroke:currentColor;stroke-width:1.6}
-.st-category-footer:after{content:"";position:absolute;bottom:var(--space-8);left:calc(50% - var(--handle-width) / 2);height:var(--size-4);width:var(--handle-width);border-radius:var(--radius-4);background:var(--handle);pointer-events:none}
 .st-category-footer .st-category-tabs{display:flex;min-width:0;gap:var(--space-2);overflow-x:auto;overscroll-behavior-x:contain;padding:0;margin:0;border:0;background:transparent;scrollbar-width:none}
 .st-category-tabs::-webkit-scrollbar{display:none}
 .st-category-footer .st-category-tabs button{position:relative;flex:1 0 auto;min-width:var(--tap-min);min-height:var(--tap-min);margin:0;padding:0 var(--space-8);border:0;border-radius:0;background:transparent;color:var(--tab-ink);font:500 var(--font-size-12) var(--font-sans);white-space:nowrap;touch-action:manipulation}
@@ -637,14 +694,12 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 :is(.inspection-phone,.farrowing-phone) .room-filter-button svg{width:var(--size-17);height:var(--size-17)}
 :is(.inspection-phone,.farrowing-phone) .filter-badge{position:absolute;right:calc(-1 * var(--space-3));top:calc(-1 * var(--space-4));min-width:var(--size-17);height:var(--size-17);border-radius:var(--radius-9);display:grid;place-items:center;background:var(--st-ink);color:var(--paper);font:var(--font-size-10) var(--mono)}
 
-.device .st-home-drawer-footer>.secondary{flex:1;min-width:0;min-height:var(--tap-min);margin:0}
-.device .st-home-drawer-footer>.danger{background:var(--red);border-color:var(--red);color:var(--paper)}
+.device .sheet-footer>.secondary{flex:1;min-width:0;min-height:var(--tap-min);margin:0}
+.device .sheet-footer>.danger{background:var(--red);border-color:var(--red);color:var(--paper)}
 
 /* The product canvas scrolls by touch; desktop scrollbar chrome belongs outside it. */
-:is(.farrowing-phone,.inspection-phone) .sheet[data-st-context]>.sheet-body,
-.device :is(.app-scroll,.drawer-body){scrollbar-width:none;-webkit-overflow-scrolling:touch}
-:is(.farrowing-phone,.inspection-phone) .sheet[data-st-context]>.sheet-body::-webkit-scrollbar,
-.device :is(.app-scroll,.drawer-body)::-webkit-scrollbar{display:none;width:0;height:0}
+.device :is(.app-scroll,.sheet-body){scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.device :is(.app-scroll,.sheet-body)::-webkit-scrollbar{display:none;width:0;height:0}
 
 /* Shared chooser: catalogue = flat; short ungrouped choices = one muted inset.
    A second text line never changes selection behavior or adds a nested card. */
@@ -944,9 +999,9 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 <style>/* ../../../design-system/components/task-skeleton.css */
 /* Task skeleton (candidate, ADR 0003): farrowing's task anatomy as shared parts.
    Every value is measured from ux/system/farrowing-astra-concept.html at 390×844 and read from tokens.css.
-   Load after tokens.css and bundle.css. Classes are tk-* so the bundle's .sheet / .phone rules never reach them.
+   Load after tokens.css and bundle.css. Classes are tk-*.
    Parts: TaskPhone (frame + status bar), TaskHeader, TaskLatest, TaskSummary, TaskLens, TaskGroup, TaskRow,
-   TaskDock, TaskSheet (scrim, grab, head, body, footer), TaskBack, TaskPage, TaskDialog. */
+   TaskDock. The sheet, page, dialog, footer and Back are the Sheet card (bundle.css). */
 
 /* ---- TaskPhone: the phone frame harness ----
    At phone width the task fills the screen (full-bleed). Wider than a phone, it sits in farrowing's
@@ -1058,7 +1113,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 /* The header sticks under the lens bar only; a list with no lens above it (a page, a sheet) scrolls its headers away. */
 .tk-lens ~ .tk-list .tk-group-head { position: sticky; top: var(--tk-sticky, 68px); z-index: 1; }
 /* A list on a page or in a sheet: the surface's body already carries the gutter. */
-:is(.tk-page-body, .tk-sheet-body) .tk-list { padding: 0; }
+.sheet-body .tk-list { padding: 0; }
 
 /* ---- TaskRow: mono id + chip under it | one headline, one meta line | trailing chevron or edit ---- */
 .tk-row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: var(--animal-row-min); margin: 0;
@@ -1102,97 +1157,8 @@ label.tk-row { cursor: pointer; }
 .tk-dock-tool { flex: none; display: grid; place-items: center; width: var(--control-height); min-height: 50px; padding: 0;
   background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink); }
 
-/* The handle bar: the bottom edge of every surface that reaches the bottom of the phone. */
-.tk-dock::after, .tk-footer::after { content: ""; position: absolute; bottom: 8px; left: calc(50% - 46px); width: 92px; height: 4px; border-radius: 4px; background: var(--handle); pointer-events: none; }
-
-/* ---- TaskSheet: scrim, drawer, grab, head (title, subtitle, ✕), divider, body, footer ----
-   A drawer is as tall as its content, up to its size's max; the footer is always its last child, so it
-   always sits on the drawer's bottom edge. data-height="full" holds the drawer at its max (for a sheet whose
-   content grows as the worker taps); its body then takes the spare height, never the space under the footer. */
-.tk-scrim { position: absolute; top: var(--statusbar-height); left: 0; right: 0; bottom: 0; z-index: calc(2 + 10 * var(--tk-layer, 0)); width: 100%; padding: 0; margin: 0;
-  border: 0; background: var(--scrim); backdrop-filter: blur(1.4px); }
-.tk-sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: calc(3 + 10 * var(--tk-layer, 0)); display: flex; flex-direction: column; overflow: hidden;
-  max-height: calc(100% - 80px); background: var(--paper); color: var(--ink); border-radius: var(--radius-sheet) var(--radius-sheet) 0 0; box-shadow: var(--shadow-sheet); }
-.tk-sheet[data-size="compact"] { max-height: var(--drawer-compact-max); }
-.tk-sheet[data-size="short"] { max-height: var(--drawer-short-max); }
-.tk-sheet[data-size="medium"] { max-height: var(--drawer-medium-max); }
-.tk-sheet[data-size="long"] { max-height: var(--drawer-long-max); }
-.tk-sheet[data-height="full"] { height: calc(100% - 80px); }
-.tk-sheet[data-height="full"][data-size="compact"] { height: var(--drawer-compact-max); }
-.tk-sheet[data-height="full"][data-size="short"] { height: var(--drawer-short-max); }
-.tk-sheet[data-height="full"][data-size="medium"] { height: var(--drawer-medium-max); }
-.tk-sheet[data-height="full"][data-size="long"] { height: var(--drawer-long-max); }
-.tk-sheet:focus { outline: none; }
-/* ---- The overlay layer model: z = base + 10 × layer (scrim 2, sheet 3, page 5, dialog 8). Layer 0 is over the task
-   screen. Each page or sheet placed before an overlay in the phone raises it one layer by itself (up to 3), so a sheet or
-   dialog opened over a sheet or a page, in DOM order, always stacks above it; data-layer (the factories' `layer: n`)
-   sets it explicitly. ---- */
-:is(.tk-page, .tk-sheet) ~ :is(.tk-scrim, .tk-sheet, .tk-page, .tk-dialog-backdrop):not([data-layer]) { --tk-layer: 1; }
-:is(.tk-page, .tk-sheet) ~ :is(.tk-page, .tk-sheet) ~ :is(.tk-scrim, .tk-sheet, .tk-page, .tk-dialog-backdrop):not([data-layer]) { --tk-layer: 2; }
-:is(.tk-page, .tk-sheet) ~ :is(.tk-page, .tk-sheet) ~ :is(.tk-page, .tk-sheet) ~ :is(.tk-scrim, .tk-sheet, .tk-page, .tk-dialog-backdrop):not([data-layer]) { --tk-layer: 3; }
-[data-layer="1"] { --tk-layer: 1; }
-[data-layer="2"] { --tk-layer: 2; }
-[data-layer="3"] { --tk-layer: 3; }
-.tk-grab { flex: none; position: relative; height: var(--grab-height); touch-action: none; cursor: grab; }
-.tk-grab::before { content: ""; position: absolute; top: 10px; left: calc(50% - 21px); width: 42px; height: 4px; border-radius: 3px; background: var(--back-border); }
-.tk-sheet-head { flex: none; display: flex; align-items: flex-start; gap: 10px; padding: 5px var(--space-gutter-sheet) 17px; border-bottom: 1px solid var(--line); }
-.tk-sheet-titles { flex: 1; min-width: 0; }
-.tk-sheet-title { margin: 0; font: 500 var(--type-sheet-title-size)/1.3 var(--font-sans); letter-spacing: -0.4px; color: var(--ink); }
-.tk-sheet-subtitle { margin: 6px 0 0; font: var(--type-description-size)/1.6 var(--font-sans); color: var(--muted); }
-.tk-sheet-close { flex: none; display: grid; place-items: center; width: var(--tap-min); height: var(--tap-min); padding: 0; margin: 0;
-  border: 0; border-radius: var(--radius-segment); background: transparent; color: var(--ink); }
-.tk-sheet-close svg { width: var(--glyph-pad); height: var(--glyph-pad); }
-.tk-sheet-body { flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 18px var(--space-gutter-sheet) var(--space-panel); }
-.tk-sheet[data-height="full"] > .tk-sheet-body { flex: 1 1 auto; }
-
-/* ---- Footer: Back + the primary (or a hold), pinned to the bottom of its surface ---- */
-.tk-footer { flex: none; position: relative; display: flex; align-items: stretch; gap: var(--space-row-x); margin: 0;
-  padding: var(--space-row-x) var(--space-gutter-sheet) var(--space-footer-bottom); background: var(--paper); border-top: 1px solid var(--line); }
-.tk-back { flex: none; display: flex; align-items: center; justify-content: center; gap: 4px; width: var(--back-width); min-height: var(--control-height); margin: 0; padding: 8px;
-  background: var(--paper); border: 1px solid var(--back-border); border-radius: var(--radius-control); color: var(--ink); font: 500 var(--type-button-size) var(--font-sans); white-space: nowrap; }
-.tk-back svg { width: 16px; height: 16px; }
-.tk-back:active { background: var(--press); }
-/* A surface with nothing to commit: Back alone fills the bar, in the primary's face (farrowing's record page). */
-.tk-back:only-child { flex: 1; width: auto; background: var(--ink); border-color: var(--ink); color: var(--paper); font-weight: 600; }
-/* The status slot: one line directly above the footer (a waiting reason, a hold's progress line). */
-.tk-footer-status { flex: none; margin: 0; padding: var(--space-row-y) var(--space-gutter-sheet) 0; background: var(--paper); border-top: 1px solid var(--line);
-  font: 500 var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
-.tk-footer-status[data-tone="amber"] { color: var(--amber); }
-.tk-footer-status[data-tone="red"] { color: var(--red); }
-.tk-footer-status + .tk-footer { border-top: 0; }
-.tk-footer-status.st-visually-hidden + .tk-footer { border-top: 1px solid var(--line); }
-/* The hidden status keeps the utility's 1px box (the slot's own padding and edge must not win) at its surface's corner. */
-.tk-footer-status.st-visually-hidden { top: 0; left: 0; width: 1px; height: 1px; padding: 0; border: 0; white-space: normal; }
-.tk-page > .tk-footer-status { padding-left: var(--space-gutter); padding-right: var(--space-gutter); }
-/* TaskHold's caption: farrowing's face (owner round 5: match farrowing): 9px/500 capitals, 0.07em apart, at 80%. */
-.tk-footer > .st-hold .st-hold-caption { font: 500 var(--type-hold-caption-size)/1.3 var(--font-sans); letter-spacing: 0.07em; text-transform: uppercase;
-  opacity: var(--task-hold-caption-opacity); }
-.tk-footer > .st-hold[data-phase="unknown"] .st-hold-caption { opacity: 1; }
-.tk-footer > .button { flex: 1; min-width: 0; min-height: var(--control-height); margin: 0; padding: 10px 17px; border-radius: var(--radius-control);
-  font: 500 var(--type-button-size)/1.3 var(--font-sans); }
-
-/* ---- TaskPage: the record page (a full page over the task, with its own status bar) ---- */
-.tk-page { position: absolute; inset: 0; z-index: calc(5 + 10 * var(--tk-layer, 0)); display: flex; flex-direction: column; background: var(--app-background); }
-.tk-page-head { flex: none; padding: 8px var(--space-gutter) 18px; border-bottom: 1px solid var(--line); }
-/* aside: text actions at the right end of the title line (a sheet's aside, on a page). */
-.tk-page-titleline { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.tk-page-titleline > .tk-page-title { flex: 1; min-width: 0; }
-.tk-page-aside { flex: none; display: flex; align-items: center; }
-.tk-page-title { margin: 0; font: 500 var(--type-page-title-size)/1.3 var(--font-sans); letter-spacing: -0.5px; color: var(--ink); }
-.tk-page-desc { margin: 6px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
-.tk-page-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 20px var(--space-gutter) var(--space-section); }
-.tk-page > .tk-footer { padding-left: var(--space-gutter); padding-right: var(--space-gutter); }
-
-/* ---- TaskDialog: one question over a sheet, rising from the bottom ---- */
-.tk-dialog-backdrop { position: absolute; inset: 0; z-index: calc(8 + 10 * var(--tk-layer, 0)); display: flex; flex-direction: column; justify-content: flex-end; background: var(--dialog-backdrop); }
-.tk-dialog { display: flex; flex-direction: column; overflow: hidden; max-height: calc(100% - 24px); background: var(--paper);
-  border-radius: var(--radius-dialog) var(--radius-dialog) 0 0; box-shadow: var(--shadow-dialog); }
-.tk-dialog-body { flex: 0 1 auto; min-height: 0; overflow-y: auto; padding: var(--space-gutter-sheet) var(--space-gutter-sheet) 0; }
-.tk-dialog-title { display: flex; align-items: center; gap: 7px; margin: 0; font: 500 var(--type-sheet-title-size)/1.3 var(--font-sans); letter-spacing: -0.4px; color: var(--ink); }
-.tk-dialog-title svg { width: 16px; height: 16px; }
-.tk-dialog-desc { margin: 10px 0 0; font: var(--type-description-size)/1.7 var(--font-sans); color: var(--muted); }
-.tk-dialog > .tk-footer { margin: 15px var(--space-gutter-sheet) 0; padding: 18px 0 var(--space-footer-bottom); }
-.tk-dialog > .tk-footer::after { display: none; }
+/* The handle bar: the bottom edge of the dock (a sheet's footer draws its own). */
+.tk-dock::after { content: ""; position: absolute; bottom: 8px; left: calc(50% - 46px); width: 92px; height: 4px; border-radius: 4px; background: var(--handle); pointer-events: none; }
 
 /* ---- Skeleton 2 (owner round 5: match farrowing) ---- */
 
@@ -1270,25 +1236,13 @@ label.tk-row { cursor: pointer; }
 .tk-choice-tile[aria-pressed="true"] { background: var(--green-wash); border-color: var(--choice-pressed-border); color: var(--ink); }
 .tk-choice-tile:active { background: var(--press); }
 
-/* The status slot with one text action at its end. */
-.tk-footer-status[data-action-slot] { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); padding-top: 4px; }
-.tk-footer-status[data-action-slot] > p { flex: 1; min-width: 0; margin: 0; }
-.tk-footer-status > p[data-tone="amber"] { color: var(--amber); }
-.tk-footer-status > p[data-tone="red"] { color: var(--red); }
-.tk-footer-status[data-action-slot] > .st-text-action { flex: none; }
-
 /* One left edge per surface: a ChoiceList's group title inside a page or sheet sits on the body's edge, not 17px in. */
-:is(.tk-page-body, .tk-sheet-body) .st-choice-heading.st-choice-heading { padding-left: 0; padding-right: 0; }
-:is(.tk-page-body, .tk-sheet-body) .st-choice-heading-row { padding-right: 0; }
+.sheet-body .st-choice-heading.st-choice-heading { padding-left: 0; padding-right: 0; }
+.sheet-body .st-choice-heading-row { padding-right: 0; }
 
 /* TaskRow: the id column holds its width; a chip wider than it ellipses under the id, so every headline lines up. */
 .tk-row-identity { width: var(--animal-id-col); min-width: var(--animal-id-col); }
 .tk-row-identity > .tk-chip { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-
-/* A page description or sheet subtitle toned as a whole line. */
-:is(.tk-page-desc, .tk-sheet-subtitle)[data-tone="amber"] { color: var(--amber); }
-:is(.tk-page-desc, .tk-sheet-subtitle)[data-tone="red"] { color: var(--red); }
-:is(.tk-page-desc, .tk-sheet-subtitle)[data-tone="green"] { color: var(--green); }
 
 /* ---- Skeleton 3 ---- */
 
@@ -1428,11 +1382,6 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .tk-doors[data-card] { display: flex; flex-direction: column; gap: var(--space-heading); }
 .tk-doors[data-card] > * { margin: 0; }
 
-/* Narrow phones keep farrowing's gutters (21 in drawers, 18 on pages; parity review 16, ruling): no 12px override.
-   Only the footer's gap narrows, as farrowing's (.sheet-footer gap 10 at 370px and below). */
-@media (max-width: 370px) {
-  .tk-footer { gap: 10px; }
-}
 @media (prefers-reduced-motion: reduce) { .tk-summary-task, .tk-row { transition: none; } }
 
 /* ---- TaskChips (candidate): one row of filter chips over a task list (README: TaskChips/README.md) ----
@@ -1451,32 +1400,13 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .tk-chips-count { font: 500 var(--type-meta-size)/1 var(--font-mono); color: var(--muted); }
 .tk-chips-chip:active { background: var(--press); }
 
-/* ---- Sheet and page motion (candidate): a sheet rises from the bottom edge and a page slides in from the side when they
-   open; they leave the same way. The host sets data-enter on an overlay only on the render that opens it, and data-leave
-   before it removes it. Farrowing's easing (its arrival curve, cubic-bezier(.22,1,.36,1)). ---- */
-@keyframes tk-sheet-in { from { transform: translateY(100%); } to { transform: none; } }
-@keyframes tk-sheet-out { from { transform: none; } to { transform: translateY(100%); } }
-@keyframes tk-page-in { from { transform: translateX(100%); } to { transform: none; } }
-@keyframes tk-page-out { from { transform: none; } to { transform: translateX(100%); } }
-@keyframes tk-fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes tk-fade-out { from { opacity: 1; } to { opacity: 0; } }
-.tk-sheet[data-enter] { animation: tk-sheet-in 240ms cubic-bezier(.22,1,.36,1); }
-.tk-sheet[data-leave] { animation: tk-sheet-out 180ms ease-in forwards; }
-.tk-page[data-enter] { animation: tk-page-in 240ms cubic-bezier(.22,1,.36,1); }
-.tk-page[data-leave] { animation: tk-page-out 180ms ease-in forwards; }
-:is(.tk-scrim, .tk-dialog-backdrop)[data-enter] { animation: tk-fade-in 200ms ease-out; }
-:is(.tk-scrim, .tk-dialog-backdrop)[data-leave] { animation: tk-fade-out 180ms ease-in forwards; }
-@media (prefers-reduced-motion: reduce) {
-  :is(.tk-sheet, .tk-page, .tk-scrim, .tk-dialog-backdrop):is([data-enter], [data-leave]) { animation: none; }
-}
-
 </style>
 <style>/* app.css */
 /* Simple piglet processing: layout only, tokens from tokens.css. Everything else is the task skeleton. */
 
 /* the stack inside a sheet or a page body */
-.tk-sheet-body > * + *, .tk-page-body > * + * { margin-top: var(--space-heading); }
-.tk-sheet-body > .tk-stepper + .tk-stepper { margin-top: 0; }
+.sheet-body > * + *, .sheet-body > * + * { margin-top: var(--space-heading); }
+.sheet-body > .tk-stepper + .tk-stepper { margin-top: 0; }
 
 /* the receipt line after a save, with Undo */
 .sp-flash { display: flex; align-items: center; justify-content: space-between; gap: var(--space-footer-gap); min-height: var(--tap-min);
@@ -1487,7 +1417,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .sp-quiet { margin: 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
 .sp-empty { margin: var(--space-section) var(--space-gutter); font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); text-align: center; }
 .sp-warn { margin: 6px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--amber); }
-.tk-footer.sp-two > * { flex: 1 1 0; min-width: 0; }
+.sheet-footer.sp-two > * { flex: 1 1 0; min-width: 0; }
 @keyframes sp-tick-in { from { transform: scale(.7); background: var(--paper); border-color: var(--muted); } to { transform: none; } }
 @keyframes sp-tick-draw { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: none; } }
 
@@ -1513,13 +1443,13 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .sp-mark[aria-pressed="true"] { color: var(--green); }
 .sp-mark[aria-pressed="true"] svg { fill: currentColor; }
 .sp-tabs.st-segment { margin: 0; }
-.tk-footer > .sp-more { flex: none; display: grid; place-items: center; width: var(--control-height); min-height: var(--control-height); margin: 0; padding: 0;
+.sheet-footer > .sp-more { flex: none; display: grid; place-items: center; width: var(--control-height); min-height: var(--control-height); margin: 0; padding: 0;
   border: 1px solid var(--control-border); border-radius: var(--radius-control); background: var(--paper); color: var(--ink); }
 .sp-more svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 
 /* Processing: one TaskDay card per age-day (the skeleton's day card). A ticked, not yet submitted item is not a done
    row: it stays in ink on the green wash; a row saved on this visit fills its check in place; later days are muted. */
-.tk-sheet-body > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
+.sheet-body > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
 .tk-day-row:has([data-ticked]) { background: var(--green-wash); }
 .tk-day-row:has([data-ticked]) .tk-day-copy > strong { color: var(--ink); }
 .tk-day-row:has([data-ticked]) .tk-day-mark, .tk-day-row:has([data-fresh]) .tk-day-mark { animation: sp-tick-in 200ms ease-out; }
@@ -1529,7 +1459,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 /* Piglets: Scan tag · Choose notch · Add manually — three tool Buttons in a line */
 .sp-adds { display: flex; gap: var(--space-key-gap); }
 .sp-adds > .button { flex: 1 1 0; min-width: 0; }
-.tk-sheet-body > .tk-list, .tk-page-body > .tk-list { margin: 0; }
+.sheet-body > .tk-list, .sheet-body > .tk-list { margin: 0; }
 
 /* Give IDs: one piglet at a time — big readouts (Measure) on the skeleton's Numpad, Boar · Gilt as TaskChoice tiles */
 .sp-give-id { display: flex; align-items: flex-start; gap: var(--space-key-gap); }
@@ -1544,14 +1474,14 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 .sp-give-litter { display: flex; flex-direction: column; gap: var(--space-heading); }
 .sp-give-litter > .tk-stepper + .tk-stepper { margin-top: calc(-1 * var(--space-heading)); }
 /* the pad docks above the footer, out of the scroller */
-:is(.tk-page, .tk-sheet) > .st-numpad { flex: none; padding: var(--space-row-y) var(--space-gutter); background: var(--paper); border-top: 1px solid var(--line); }
-:is(.tk-page, .tk-sheet) > .st-numpad + .tk-footer { border-top: 0; }
-.tk-page-body > .tk-row[data-trail="tick"] { border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
+:is(.sheet[data-presentation="page"], .sheet) > .st-numpad { flex: none; padding: var(--space-row-y) var(--space-gutter); background: var(--paper); border-top: 1px solid var(--line); }
+:is(.sheet[data-presentation="page"], .sheet) > .st-numpad + .sheet-footer { border-top: 0; }
+.sheet-body > .tk-row[data-trail="tick"] { border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
 .button.sp-wide { width: 100%; }
 
 /* Move: the other pens as tiles, four to a line */
 .sp-pick > .st-heading { margin-bottom: 8px; }
-.tk-page-body > .sp-pick + * { margin-top: var(--space-section); }
+.sheet-body > .sp-pick + * { margin-top: var(--space-section); }
 .tk-choice.sp-pens { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .sp-pens .tk-choice-tile { min-height: 60px; gap: 2px; padding: 8px 4px; }
 .sp-pens .tk-choice-tile strong { font: 600 var(--type-identifier-strong-size)/1.2 var(--font-mono); }
@@ -1757,7 +1687,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   /* strs.back = the Back text; categories[i].strs.label = each tab. The nav aria-label stays plain text. */
   function categoryFooter({categories=[],active='',backAction='back',categoryAction='action-category',label='Action categories',className='',strs,args}={}){
     const current=categories.some(c=>c.id===active)?active:categories[0]?.id;
-    return `<footer class="sheet-footer st-category-footer ${esc(className)}" data-ds="CategoryFooter"><button type="button" class="surface-back record-back" data-action="${esc(backAction)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span${sa(strs&&strs.back,args&&args.back)}>Back</span></button><nav class="st-category-tabs action-category-nav" aria-label="${esc(label)}">${categories.map(c=>`<button type="button" data-action="${esc(categoryAction)}" data-value="${esc(c.id)}" aria-current="${c.id===current?'location':'false'}"${c.disabled?' disabled':''}>${tx(c.label,c,'label')}</button>`).join('')}</nav></footer>`;
+    return `<footer class="sheet-footer st-category-footer ${esc(className)}" data-ds="CategoryFooter">${backButton({action:backAction,label:strs&&strs.back?{text:'Back',str:strs.back,args:args&&args.back}:'Back'})}<nav class="st-category-tabs action-category-nav" aria-label="${esc(label)}">${categories.map(c=>`<button type="button" data-action="${esc(categoryAction)}" data-value="${esc(c.id)}" aria-current="${c.id===current?'location':'false'}"${c.disabled?' disabled':''}>${tx(c.label,c,'label')}</button>`).join('')}</nav></footer>`;
   }
   const chevron='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
   const check='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4L19 6"/></svg>';
@@ -2302,7 +2232,80 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     document.addEventListener('click',e=>{const row=e.target.closest('[data-st-optional]');if(!row)return;const box=row.closest('.st-optional'),open=box.dataset.open!=='true';
       box.dataset.open=String(open);row.setAttribute('aria-expanded',String(open));box.querySelector('.st-optional-body').hidden=!open;sync(box);if(open)box.querySelector('.st-optional-body :is(input,textarea,select)')?.focus();},true);
   }
-  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind});
+
+  /* Sheet: the one surface presented over a task. variant 'drawer' (default; content-sized, a grab strip, a ✕) |
+     'page' (a full sub-page; Back in the footer, never a ✕) | 'dialog' (one small decision). Returns the surface's HTML:
+     a drawer is its scrim + the sheet, a page the sheet, a dialog its backdrop + the dialog. Footers come from
+     sheetFooter(); the Back control from backButton(). Text slots take a string, { text, str, args } (with `str` the text
+     is wrapped for the screen shell's string registry) or { html } (trusted markup, e.g. a title that is a link). */
+  const sObj=v=>(v&&typeof v==='object'&&!Array.isArray(v))?v:{text:v};
+  const sArgs=a=>a&&Object.keys(a).length?` data-args="${esc(JSON.stringify(a))}"`:'';
+  function sT(v){if(v==null||v==='')return '';const o=sObj(v);if(o.html!=null)return String(o.html);return o.str?`<span data-str="${esc(o.str)}"${sArgs(o.args)}>${esc(o.text??'')}</span>`:esc(o.text);}
+  function sL(v,fallback){const o=sObj(v==null||v===''?fallback:v);if(o.text==null&&!o.str)return '';return ` aria-label="${esc(o.text??'')}"`+(o.str?` data-str-attr="aria-label:${esc(o.str)}"${sArgs(o.args)}`:'');}
+  const sA=(action,value)=>action?` data-action="${esc(action)}" data-value="${esc(value??'')}"`:'';
+  const sPaths={'back-chevron':'M15 5l-7 7 7 7'};
+  const sGlyph=k=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${sPaths[k]||(root.SentriIcons&&root.SentriIcons.paths&&root.SentriIcons.paths[k])||''}"/></svg>`;
+  /* A line of parts, each a text slot with an optional tone: [{ text, str, args, tone }]; { sep: true } is the shared separator. */
+  const sParts=v=>Array.isArray(v)?v.map(p=>{const o=sObj(p);if(o.sep)return SEP;return o.tone?`<span class="st-tone" data-tone="${esc(o.tone)}">${sT(o)}</span>`:sT(o);}).join(''):sT(v);
+  /* Back: the footer's exit, the same on every sheet (a 16px chevron + the word). Alone in a footer it fills the bar. */
+  function backButton({action='back',value='',label={text:'Back',str:'act.back'},className=''}={}){
+    return `<button type="button" class="surface-back${className?' '+esc(className):''}" data-ds="Sheet"${sA(action,value)}>${sGlyph('back-chevron')}<span>${sT(label)}</span></button>`;
+  }
+  /* A Button from a { label, action, value, register, waiting, describedby } spec (a string is already HTML). */
+  function sButton(b){
+    if(!b)return '';if(typeof b==='string')return b;
+    const l=sObj(b.label),props={label:l.text??'',register:b.register||'primary',action:b.action||'',value:b.value||'',waiting:!!b.waiting,busy:!!b.busy,describedby:b.describedby||'',className:b.className||'',attrs:b.attrs||{}};
+    if(l.str){props.strs={label:l.str};if(l.args)props.args={label:l.args};}
+    return button(props);
+  }
+  function sHold(h){
+    const l=sObj(h.label),c=sObj(h.caption),props={label:l.text??'',caption:c.text??'',action:h.action||'hold',value:h.value||'',tone:h.tone||'primary',phase:h.phase||'idle',statusId:h.statusId||'',waiting:!!h.waiting,describedby:h.describedby||''},strs={},args={};
+    if(l.str){strs.label=l.str;if(l.args)args.label=l.args;}if(c.str){strs.caption=c.str;if(c.args)args.caption=c.args;}
+    props.strs=strs;props.args=args;return holdButton(props);
+  }
+  /* The footer: at most two controls, the primary on the right: Back + a Button spec / a hold / HTML. Alone, Back fills the bar.
+     status { text, str, args, id, tone, visible, action }: the one line above the bar that says why the primary waits (wired as
+     its aria-describedby) or a hold's progress (its statusId). It is drawn whenever the primary or hold is waiting, or the
+     line carries an action; `visible: false` keeps it read-only (still role=status, visually hidden). `content` is trusted
+     footer markup in place of back/primary/hold (a host's own two controls); className adds a page hook. */
+  function sheetFooter({back:b={},primary,hold:h,status:st,content='',className=''}={}){
+    let line='';
+    if(st){
+      const id=st.id||fieldId('st-sheet-status'),waiting=!!((primary&&typeof primary==='object'&&primary.waiting)||(h&&h.waiting));
+      const vis=st.visible!=null?!!st.visible:(waiting||!!st.action),tone=st.tone?` data-tone="${esc(st.tone)}"`:'';
+      const act=vis&&st.action?sButton(Object.assign({register:'text'},st.action)):'';
+      if(!vis)line=`<p class="sheet-status st-visually-hidden" id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>`;
+      else line=act?`<div class="sheet-status" data-action-slot><p id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>${act}</div>`:`<p class="sheet-status" id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>`;
+      if(h&&!h.statusId)h=Object.assign({},h,{statusId:id});
+      if(primary&&typeof primary==='object'&&!primary.describedby)primary=Object.assign({},primary,{describedby:id});
+    }
+    const inner=content||`${b?backButton(b):''}${h?sHold(h):sButton(primary)}`;
+    return `${line}<div class="sheet-footer${className?' '+esc(className):''}" data-ds="Sheet">${inner}</div>`;
+  }
+  /* The overlay layer model: z = base + 10 × layer (scrim 2, drawer 3, page 5, dialog 8). An overlay placed after a sheet in the
+     phone rises a layer by itself (CSS); `layer: n` sets it. A drawer is never opened over a drawer (replace its content
+     instead) — a page, then a drawer or dialog over it, is the deepest stack. */
+  const sLayer=n=>n?` data-layer="${esc(n)}"`:'';
+  function scrim({action='dismiss',value='',label={text:'Dismiss sheet',str:'tk.sheet.dismiss'},layer=0}={}){
+    return `<button type="button" class="scrim" data-ds="Sheet"${sLayer(layer)}${sA(action,value)}${sL(label)}></button>`;
+  }
+  const SHEET_SIZES=['compact','short','medium','long'];
+  function sheet({variant='drawer',title,subtitle,subtitleTone='',icon='',close={action:'dismiss'},lead='',aside='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
+    const v=oneOf('Sheet','variant',variant,['drawer','page','dialog'],'drawer'),sz=oneOf('Sheet','size',size,SHEET_SIZES,'medium');
+    const foot=f===false?'':(f==null?sheetFooter({}):f),ex=safeAttr(attrs),cls=className?' '+esc(className):'',vw=view?` data-view="${esc(view)}"`:'';
+    if(v==='dialog'){
+      return `<div class="dialog-backdrop" data-ds="Sheet" data-variant="dialog"${sLayer(layer)}><div class="dialog${cls}" role="dialog" aria-modal="true" tabindex="-1"${id?` id="${esc(id)}"`:''}${vw}${inert?' inert':''}${sL(label??title)}${ex}><div class="dialog-body${bodyClass?' '+esc(bodyClass):''}"><h2 class="dialog-title">${icon?sGlyph(icon):''}${sT(title)}</h2>${subtitle?`<p class="dialog-desc">${sParts(subtitle)}</p>`:''}${body}</div>${foot}</div></div>`;
+    }
+    const sub=subtitle?`<p class="sheet-subtitle"${subtitleTone?` data-tone="${esc(subtitleTone)}"`:''}>${sParts(subtitle)}</p>`:'';
+    const cl=Object.assign({action:'dismiss'},close||{}),x=v==='drawer'?`<button type="button" class="sheet-close"${sA(cl.action,cl.value)}${sL(cl.label,{text:'Close',str:'act.close'})}>${sGlyph('close')}</button>`:'';
+    const head=`<header class="utility-header">${lead}<div class="sheet-titles"><h2 class="sheet-title">${sT(title)}</h2>${sub}</div>${aside?`<div class="sheet-aside">${aside}</div>`:''}${x}</header>`;
+    const common=`data-ds="Sheet" tabindex="-1"${sLayer(layer)}${inert?' inert':''}${id?` id="${esc(id)}"`:''}${vw}${sL(label??title)}${ex}`;
+    const main=`${head}${above}<div class="sheet-body${bodyClass?' '+esc(bodyClass):''}">${body}</div>${foot}`;
+    if(v==='page')return `<section class="sheet${cls}" ${common} role="region" data-st-context="page" data-presentation="page">${bar}${main}</section>`;
+    const scrimHtml=sc===false?'':scrim(Object.assign({layer},sc));
+    return `${scrimHtml}<section class="sheet${cls}" ${common} role="dialog" aria-modal="true" data-st-context="drawer" data-size="${sz}"${sizing==='full'?' data-sizing="full"':' data-sizing="content"'}><div class="grab" aria-hidden="true"></div>${main}</section>`;
+  }
+  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
@@ -2339,28 +2342,6 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   /* A line of parts, each a text slot with an optional tone: [{ text, str, args, tone }]; { sep: true } is the
      shared separator, a real text node (ds.sep, the same · as Status lines). */
   const parts = v => (Array.isArray(v) ? v.map(p => { const o = obj(p); if (o.sep) return '<span class="tk-sep" data-str="ds.sep">·</span>'; return o.tone ? `<span class="tk-tone" data-tone="${esc(o.tone)}">${T(o)}</span>` : T(o); }).join('') : T(v));
-  /* A Button from SentriUI (Button card), from a { label, action, value, register, waiting } spec. */
-  function button(b) {
-    if (!b) return '';
-    if (typeof b === 'string') return b;
-    const l = obj(b.label);
-    const UI = root.SentriUI;
-    const props = { label: l.text ?? '', register: b.register || 'primary', action: b.action || '', value: b.value || '', waiting: !!b.waiting, describedby: b.describedby || '' };
-    if (l.str) { props.strs = { label: l.str }; if (l.args) props.args = { label: l.args }; }
-    if (UI && UI.button) return UI.button(props);
-    return `<button type="button" class="button ${esc(props.register)}" data-ds="Button"${A(props.action, props.value)}>${T(l)}</button>`;
-  }
-  /* A hold from SentriUI (Button holdButton): { label, caption, action, value, tone, phase, statusId }. */
-  function hold(h) {
-    const UI = root.SentriUI, l = obj(h.label), c = obj(h.caption);
-    const props = { label: l.text ?? '', caption: c.text ?? '', action: h.action || 'hold', value: h.value || '', tone: h.tone || 'primary', phase: h.phase || 'idle', statusId: h.statusId || '', waiting: !!h.waiting, describedby: h.describedby || '' };
-    const strs = {}, args = {};
-    if (l.str) { strs.label = l.str; if (l.args) args.label = l.args; }
-    if (c.str) { strs.caption = c.str; if (c.args) args.caption = c.args; }
-    props.strs = strs; props.args = args;
-    return UI.holdButton(props);
-  }
-
   /* ---- TaskPhone ---- */
   function statusbar({ time = { text: '9:41', str: 'tk.statusbar.time' } } = {}) {
     return `<div class="tk-statusbar" aria-hidden="true"><span>${T(time)}</span><span class="tk-statusbar-icons">${glyph('signal')}${glyph('battery')}</span></div>`;
@@ -2645,71 +2626,21 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     return `<nav class="tk-dock" data-ds="TaskDock"${L(tools.label)}>${p}${t}</nav>`;
   }
 
-  /* ---- Footer: Back + one primary (a Button spec, a hold spec, or raw HTML) ---- */
-  function back({ action = 'back', value = '', label = { text: 'Back', str: 'act.back' } } = {}) {
-    return `<button type="button" class="tk-back"${A(action, value)}>${glyph('back-chevron')}<span>${T(label)}</span></button>`;
+  /* ---- Footer, Back, drawer, page, dialog: the Sheet card (SentriUI.sheet / sheetFooter / backButton) — one implementation.
+     These keep the skeleton's call signatures; see Sheet/README.md. ---- */
+  const back = o => root.SentriUI.backButton(o || {});
+  const footer = o => root.SentriUI.sheetFooter(o || {});
+  function scrim(o = {}) { return root.SentriUI.scrim(o); }
+  /* sheet: the drawer without its scrim (the host places scrim() before it); drawer: scrim + sheet. height 'full' = Sheet's
+     sizing 'full'. The ✕ is always drawn (close only renames its action); aside sits left of it. */
+  function sheet(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { variant: 'drawer', sizing: o.height === 'full' ? 'full' : 'content', scrim: false })); }
+  function drawer(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { variant: 'drawer', sizing: o.height === 'full' ? 'full' : 'content', scrim: Object.assign({ layer: o.layer || 0 }, o.scrim) })); }
+  /* page: description -> subtitle; bar draws the skeleton's status bar. */
+  function page(o = {}) {
+    const { description, descriptionTone, bar = true, ...rest } = o;
+    return root.SentriUI.sheet(Object.assign({}, rest, { variant: 'page', subtitle: description, subtitleTone: descriptionTone, bar: bar ? statusbar() : '' }));
   }
-  /* status: { text, str, args, id, tone, action } — one status line directly above the footer (the reason a waiting primary
-     waits, or the hold's progress line); it is wired as the primary's aria-describedby / the hold's statusId. action:
-     { label, action, value } adds one text action at the line's end (`42 is right`). */
-  function footer({ back: b = {}, primary, hold: h, status } = {}) {
-    let s = '';
-    if (status) {
-      const id = status.id || 'tk-footer-status';
-      // Farrowing draws no line above a footer: the status is read (role=status, the primary's / hold's description) but
-      // visually hidden, unless the page opts in (`visible: true`, e.g. after a tap on the waiting primary).
-      // A line that carries a text action (`17 is right`) is shown unless the page says `visible: false`: its act must be
-      // reachable.
-      const vis = status.visible != null ? !!status.visible : !!status.action, hid = vis ? '' : ' st-visually-hidden';
-      const act = vis && status.action ? button(Object.assign({ register: 'text' }, status.action)) : '';
-      if (!vis) s = `<p class="tk-footer-status${hid}" id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>`;
-      else s = act
-        ? `<div class="tk-footer-status" data-action-slot><p id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>${act}</div>`
-        : `<p class="tk-footer-status" id="${esc(id)}" role="status" aria-live="polite"${status.tone ? ` data-tone="${esc(status.tone)}"` : ''}>${T(status)}</p>`;
-      if (h && !h.statusId) h = Object.assign({}, h, { statusId: id });
-      if (primary && typeof primary === 'object' && !primary.describedby) primary = Object.assign({}, primary, { describedby: id });
-    }
-    return `${s}<div class="tk-footer" data-ds="TaskFooter">${b ? back(b) : ''}${h ? hold(h) : button(primary)}</div>`;
-  }
-
-  /* ---- The overlay layer model ----
-     Every overlay (scrim, sheet, page, dialog) sits on a layer: z = base + 10 × layer (scrim 2, sheet 3, page 5, dialog 8).
-     Layer 0 is over the task screen. An overlay placed after a page or a sheet in the phone rises one layer on its own
-     (CSS); `layer: n` sets it explicitly for deeper stacks (a sheet over a sheet over a page: layer 2). */
-  const LY = n => (n ? ` data-layer="${esc(n)}"` : '');
-
-  /* ---- TaskSheet: the drawer ---- */
-  function scrim({ action = 'dismiss', label = { text: 'Dismiss sheet', str: 'tk.sheet.dismiss' }, layer = 0 } = {}) {
-    return `<button type="button" class="tk-scrim" data-ds="TaskSheet"${LY(layer)}${A(action)}${L(label)}></button>`;
-  }
-  /* size: compact | short | medium | long (the max height). height: 'content' (default) | 'full'.
-     close: { action, label } draws the ✕; aside: raw HTML in its place (a text action such as Clear). */
-  function sheet({ title, subtitle, subtitleTone = '', close = { action: 'dismiss' }, aside = '', body = '', footer: f = '', size = 'medium', height = 'content', label, view = '', layer = 0, inert = false } = {}) {
-    const x = aside || (close ? `<button type="button" class="tk-sheet-close"${A(close.action || 'dismiss', close.value)}${L(close.label, { text: 'Close', str: 'act.close' })}>${glyph('close')}</button>` : '');
-    const sub = subtitle ? `<p class="tk-sheet-subtitle"${subtitleTone ? ` data-tone="${esc(subtitleTone)}"` : ''}>${parts(subtitle)}</p>` : '';
-    return `<section class="tk-sheet" data-ds="TaskSheet" role="dialog" aria-modal="true" tabindex="-1" data-st-context="drawer"${LY(layer)}${inert ? ' inert' : ''} data-size="${esc(size)}"${height === 'full' ? ' data-height="full"' : ''}${view ? ` data-view="${esc(view)}"` : ''}${L(label ?? title)}>
-      <div class="tk-grab" aria-hidden="true"></div>
-      <header class="tk-sheet-head"><div class="tk-sheet-titles"><h2 class="tk-sheet-title">${T(title)}</h2>${sub}</div>${x}</header>
-      <div class="tk-sheet-body">${body}</div>${f}</section>`;
-  }
-  function drawer(o = {}) { return scrim(Object.assign({ layer: o.layer || 0 }, o.scrim)) + sheet(o); }
-
-  /* ---- TaskPage: the record page ----
-     aside: raw HTML at the right end of the title line (text actions such as Clear), as a sheet's aside.
-     inert: while a drawer or dialog is over the page. view: data-view (the host's state name). descriptionTone: 'amber' |
-     'red' | 'green' colours the whole description line (a part can still carry its own tone). */
-  function page({ title, description, descriptionTone = '', body = '', footer: f = '', label, bar = true, aside = '', inert = false, layer = 0, view = '' } = {}) {
-    const t = `<h2 class="tk-page-title">${T(title)}</h2>`;
-    return `<section class="tk-page" data-ds="TaskPage" role="region" tabindex="-1" data-st-context="page"${LY(layer)}${view ? ` data-view="${esc(view)}"` : ''}${inert ? ' inert' : ''}${L(label ?? title)}>${bar ? statusbar() : ''}
-      <header class="tk-page-head"${aside ? ' data-aside' : ''}>${aside ? `<div class="tk-page-titleline">${t}<div class="tk-page-aside">${aside}</div></div>` : t}${description ? `<p class="tk-page-desc"${descriptionTone ? ` data-tone="${esc(descriptionTone)}"` : ''}>${parts(description)}</p>` : ''}</header>
-      <div class="tk-page-body">${body}</div>${f || footer({})}</section>`;
-  }
-
-  /* ---- TaskDialog ---- */
-  function dialog({ title, icon = '', description, body = '', footer: f = '', label, layer = 0 } = {}) {
-    return `<div class="tk-dialog-backdrop" data-ds="TaskDialog"${LY(layer)}><div class="tk-dialog" role="dialog" aria-modal="true"${L(label ?? title)}>
-      <div class="tk-dialog-body"><h2 class="tk-dialog-title">${icon ? glyph(icon) : ''}${T(title)}</h2>${description ? `<p class="tk-dialog-desc">${parts(description)}</p>` : ''}${body}</div>${f}</div></div>`;
-  }
+  function dialog(o = {}) { const { description, ...rest } = o; return root.SentriUI.sheet(Object.assign({}, rest, { variant: 'dialog', subtitle: description })); }
 
   /* ---- TaskChips (candidate): one row of filter chips over a task list — `All · Iron 4 · Castrate 6 · Done 3`. One is
      chosen at a time (a radio group: role=radiogroup, each chip role=radio with aria-checked and a roving tab stop; wire the
@@ -2822,7 +2753,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'treat.weak': 'Weak', 'treat.sick': 'Sick', 'treat.later': 'The other {n} stay on the list for later.', 'treat.later.1': 'The other one stays on the list for later.',
     'death.title': 'Record death', 'death.sub': '{pen} · {n} alive', 'c.crushed': 'Crushed', 'c.scours': 'Scours', 'c.starve': 'Starve-out', 'c.other': 'Other', 'no': 'No', 'yes': 'Yes',
     'move.title': 'Move piglets', 'move.sub': 'From {pen} · {n} alive', 'move.to': 'To pen', 'move.how': 'How many', 'move.had': 'Had {tr}?',
-    'move.pen.meta': 'day {d} · {n} piglets', 'move.save': 'Move {n}', 'move.pick': 'Pick a pen first',
+    'move.pen.meta': 'day {d} · {n} piglets', 'move.save': 'Move {n}', 'move.pick': 'Pick a pen first', 'sr.items': 'Tick at least one item', 'sr.why': 'Pick why fewer', 'sr.id': 'Add the number and the sex', 'sr.kg': 'Type the weight', 'sr.dead': 'Say how many died', 'sr.had': 'Answer each question', 'sr.count': 'Change the count to save',
     'count.title': 'Set count', 'count.sub': '{pen} · was {n}', 'count.label': 'Piglets alive',
     'bulk.title': 'Record for several pens', 'bulk.pick': 'Pick a treatment', 'bulk.pens.now': '{n} pens due now', 'bulk.pens.now.1': '1 pen due now', 'bulk.pens.none': 'none due now',
     'bulk.page': '{tr} · several pens', 'bulk.window': 'Given on day {a}–{b}', 'g.now': 'Due now', 'g.early': 'Too early', 'g.late': 'Late', 'g.done': 'Done',
@@ -2931,7 +2862,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     'treat.weak': '太弱', 'treat.sick': '生病', 'treat.later': '剩下的{n}头留到以后做。', 'treat.later.1': '剩下的1头留到以后做。',
     'death.title': '记录死亡', 'death.sub': '{pen} · 活着{n}', 'c.crushed': '压死', 'c.scours': '拉稀', 'c.starve': '饿死', 'c.other': '其他', 'no': '不是', 'yes': '是',
     'move.title': '转栏', 'move.sub': '从{pen}转出 · 活着{n}', 'move.to': '转到哪栏', 'move.how': '转几头', 'move.had': '做过{tr}吗？',
-    'move.pen.meta': '第{d}天 · {n}', 'move.save': '转{n}', 'move.pick': '先选一个栏',
+    'move.pen.meta': '第{d}天 · {n}', 'move.save': '转{n}', 'move.pick': '先选一个栏', 'sr.items': '请至少勾选一项', 'sr.why': '请选择为什么少了', 'sr.id': '请填写编号和性别', 'sr.kg': '请输入重量', 'sr.dead': '请选择死了几头', 'sr.had': '请回答每个问题', 'sr.count': '数量改了才能保存',
     'count.title': '改头数', 'count.sub': '{pen} · 原来{n}头', 'count.label': '活着的仔猪',
     'bulk.title': '多栏一起记录', 'bulk.pick': '选一项处理', 'bulk.pens.now': '现在{n}栏要做', 'bulk.pens.now.1': '现在1栏要做', 'bulk.pens.none': '现在没有要做的',
     'bulk.page': '{tr} · 多栏', 'bulk.window': '第{a}–{b}天做', 'g.now': '现在做', 'g.early': '太早', 'g.late': '晚了', 'g.done': '做完',
@@ -3603,15 +3534,15 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     if (!ended) body += toolRow();
     body += processing(p);
     var n = Object.keys(V.draft).length;
-    var foot = K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('submit.n', { n: n }), action: 'submit', register: 'primary', waiting: !n } });
+    var foot = K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('submit.n', { n: n }), action: 'submit', register: 'primary', waiting: !n }, status: !n ? T('sr.items') : null });
     var sub = [T('sheet.pen', { pen: p.code, p: p.parity }), SEP, T('piglets', { n: p.alive }), SEP, T('day.n', { d: p.age })];
-    return K.drawer({ title: p.sow, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back', label: T('back') },
+    return K.drawer({ title: p.sow, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back' },
       body: body, footer: foot });
   }
   /* ---- boars · gilts: two steppers ---- */
   function countsSheet() {
     var p = pen(), c = V.counts;
-    return K.drawer({ title: T('cnt.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'counts', close: null,
+    return K.drawer({ title: T('cnt.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'counts',
       body: stepper('boar', T('idf.boars'), c.boar) + stepper('gilt', T('idf.gilts'), c.gilt),
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'counts-save', register: 'primary' } }) });
   }
@@ -3637,7 +3568,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
 
   /* ---- More: Move piglets · Record death · Set count ---- */
   function moreSheet() {
-    return K.drawer({ title: T('more.title'), size: 'medium', view: 'more', close: null,
+    return K.drawer({ title: T('more.title'), size: 'medium', view: 'more',
       body: K.doors({ card: true, items: [{ title: T('move.title'), icon: 'transfer', action: 'tool', value: 'move' }, { title: T('tool.count'), icon: 'edit', action: 'tool', value: 'count' }] }),
       footer: K.footer({ back: { action: 'back', label: T('back') } }) });
   }
@@ -3653,8 +3584,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
         { value: 'weak', label: T('treat.weak') }, { value: 'sick', label: T('treat.sick') }] });
       body += '<p class="sp-quiet">' + esc(T('treat.later', { n: n - d.n })) + '</p>';
     }
-    return K.drawer({ title: tr(d.k), subtitle: T('adj.sub', { pen: p.code, n: n }), size: 'long', view: 'adjust', close: null, body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('adj.use', { n: d.n }), action: 'adjust-use', register: 'primary', waiting: less && !d.why } }) });
+    return K.drawer({ title: tr(d.k), subtitle: T('adj.sub', { pen: p.code, n: n }), size: 'long', view: 'adjust', body: body,
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('adj.use', { n: d.n }), action: 'adjust-use', register: 'primary', waiting: less && !d.why }, status: less && !d.why ? T('sr.why') : null }) });
   }
 
   /* ---- Give IDs: one piglet at a time (farrowing's identity pattern, research/per-piglet-proposal.md flow a) ----
@@ -3699,15 +3630,15 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     var primary = { label: T(g.edit ? 'give.fix' : 'give.save'), action: 'give-save', register: 'primary', waiting: !ready };
     var sub = T('give.sub', { pen: p.code, sow: p.sow, n: left });
     return K.page({ title: T(br ? 'tr.id.breeders' : 'give.title'), description: g.edit ? T('give.fixing', { no: g.edit }) : sub, view: 'give', body: body,
-      footer: givePad() + K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : primary }) });
+      footer: givePad() + K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : primary, status: !ended && !ready ? T('sr.id') : null }) });
   }
   /* the litter weight from the Piglets tab: one Measure on the same Numpad */
   function weightSheet() {
     var p = pen(), w = V.weight;
-    return K.drawer({ title: T('w.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'weight', close: null,
+    return K.drawer({ title: T('w.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'weight',
       body: UI.measure({ label: T('w.kg'), value: w.kg, unit: 'kg', placeholder: '—', active: true, action: 'noop', key: 'w', className: 'sp-give-measure' }),
       footer: UI.numpad({ value: w.kg, unit: 'kg', action: 'pad', key: 'w', compact: true, decimals: 1, intLength: 3 }) +
-        K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) } }) });
+        K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) }, status: !(+w.kg > 0) ? T('sr.kg') : null }) });
   }
   /* ---- the pen log: born, deaths, moves, counts, treatments, IDs — the history, newest first ---- */
   function logPage() {
@@ -3731,8 +3662,8 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   function deathSheet() {
     var p = pen(), d = V.death, k = CAUSES.reduce(function (s, c) { return s + d.c[c]; }, 0);
     var body = CAUSES.map(function (c) { return stepper(c, T('c.' + c), d.c[c], { max: p.alive }); }).join('');
-    return K.drawer({ title: T('death.title'), subtitle: T('death.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'death', close: null, body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'death-save', register: 'primary', waiting: !k } }) });
+    return K.drawer({ title: T('death.title'), subtitle: T('death.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'death', body: body,
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'death-save', register: 'primary', waiting: !k }, status: !k ? T('sr.dead') : null }) });
   }
   /* ---- move piglets: only the other pens of this batch (there is nowhere else); for what was given here: had it? ---- */
   function moveAsks(p) {
@@ -3756,14 +3687,14 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     });
     var ready = d.to && d.n > 0 && asks.every(function (k) { return d.had[k] != null; });
     return K.page({ title: T('move.title'), description: T('move.sub', { pen: p.code, n: p.alive }), view: 'move', body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('move.save', { n: pigs(d.n) }), action: 'move-save', register: 'primary', waiting: !ready } }) });
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('move.save', { n: pigs(d.n) }), action: 'move-save', register: 'primary', waiting: !ready }, status: !ready ? T(d.to ? 'sr.had' : 'move.pick') : null }) });
   }
   /* ---- set count: the record becomes what is there now ---- */
   function countSheet() {
     var p = pen(), d = V.count;
-    return K.drawer({ title: T('count.title'), subtitle: T('count.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'count', close: null,
+    return K.drawer({ title: T('count.title'), subtitle: T('count.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'count',
       body: stepper('count', T('count.label'), d.n, { variant: 'hero', face: 'count', min: 0, hint: '' }),
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'count-save', register: 'primary', waiting: d.n === p.alive } }) });
+      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('save'), action: 'count-save', register: 'primary', waiting: d.n === p.alive }, status: d.n === p.alive ? T('sr.count') : null }) });
   }
 
   /* ================= End task (the supervisor) ================= */
@@ -3794,9 +3725,9 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
      that is gone slides out first (data-leave), then the phone is redrawn. A re-render never replays. */
   var shownKeys = [], leaving = false;
   function overlays(root) {
-    return Array.prototype.filter.call(root.children, function (el) { return el.matches('.tk-sheet, .tk-page, .tk-dialog-backdrop'); });
+    return Array.prototype.filter.call(root.children, function (el) { return el.matches('.sheet, .sheet[data-presentation="page"], .dialog-backdrop'); });
   }
-  var keyOf = function (el) { return el.getAttribute('data-view') || (el.matches('.tk-dialog-backdrop') ? 'dialog' : ''); };
+  var keyOf = function (el) { return el.getAttribute('data-view') || (el.matches('.dialog-backdrop') ? 'dialog' : ''); };
   function render() {
     if (leaving) return;
     document.documentElement.lang = L.lang === 'zh' ? 'zh-CN' : 'en';
@@ -3821,7 +3752,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     var gone = overlays(phone).filter(function (el) { return next.indexOf(keyOf(el)) < 0; });
     if (gone.length && !reduced()) {
       leaving = true; phone.style.pointerEvents = 'none';   // no tap lands on a screen that is about to be redrawn
-      gone.forEach(function (el) { el.setAttribute('data-leave', ''); var s = el.previousElementSibling; if (s && s.matches('.tk-scrim')) s.setAttribute('data-leave', ''); });
+      gone.forEach(function (el) { el.setAttribute('data-leave', ''); var s = el.previousElementSibling; if (s && s.matches('.scrim')) s.setAttribute('data-leave', ''); });
       setTimeout(function () {
         leaving = false; phone.style.pointerEvents = '';
         phone.querySelectorAll('[data-leave]').forEach(function (el) { el.remove(); });
@@ -3834,7 +3765,7 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
   }
   function paint(html, next) {
     var keep = {};
-    phone.querySelectorAll('.tk-scroll, .tk-sheet-body, .tk-page-body').forEach(function (el) {
+    phone.querySelectorAll('.tk-scroll, .sheet-body, .sheet-body').forEach(function (el) {
       var host = el.closest('[data-view]'); keep[(host ? host.getAttribute('data-view') : 'list') + el.className] = el.scrollTop;
     });
     var chipsX = phone.querySelector('.tk-chips-track'), cx = chipsX ? chipsX.scrollLeft : 0;
@@ -3848,15 +3779,15 @@ button.tk-warning[data-banner]:active { filter: brightness(.97); }
     overlays(phone).forEach(function (el) {
       if (shownKeys.indexOf(keyOf(el)) >= 0) return;
       el.setAttribute('data-enter', '');
-      var s = el.previousElementSibling; if (s && s.matches('.tk-scrim')) s.setAttribute('data-enter', '');
+      var s = el.previousElementSibling; if (s && s.matches('.scrim')) s.setAttribute('data-enter', '');
     });
     shownKeys = next;
-    phone.querySelectorAll('.tk-scroll, .tk-sheet-body, .tk-page-body').forEach(function (el) {
+    phone.querySelectorAll('.tk-scroll, .sheet-body, .sheet-body').forEach(function (el) {
       var host = el.closest('[data-view]'), k = (host ? host.getAttribute('data-view') : 'list') + el.className;
       if (keep[k] != null) el.scrollTop = keep[k];
     });
     var ct = phone.querySelector('.tk-chips-track'); if (ct) ct.scrollLeft = cx;
-    if (V.pageTop) { phone.querySelectorAll('.tk-page-body, .tk-sheet-body').forEach(function (x) { x.scrollTop = 0; }); V.pageTop = false; }
+    if (V.pageTop) { phone.querySelectorAll('.sheet-body, .sheet-body').forEach(function (x) { x.scrollTop = 0; }); V.pageTop = false; }
     if (V.toTop) { var sc = phone.querySelector('.tk-scroll'); if (sc) sc.scrollTop = 0; V.toTop = false; }
     if (focusSel) {
       var f = phone.querySelector(focusSel);

@@ -1,0 +1,45 @@
+[
+  {
+    "id": "drawer",
+    "name": "Drawer",
+    "use": "use for one task step on top of the page: a form of about five fields, a count, a picker, a short read (sized to its content, a handle, a close).",
+    "notUse": "not for a long record or a sub-page with its own back-stack — use page; not for a yes/no decision — use dialog; never a drawer on a drawer — replace its content",
+    "states": [
+      "Default",
+      "Pressed",
+      "Aside",
+      "Waiting (reason shown)",
+      "Error",
+      "Empty",
+      "Long / Chinese",
+      "Held at its size"
+    ]
+  },
+  {
+    "id": "page",
+    "name": "Page",
+    "use": "use for a full sub-page the worker works in: a record, a log, an overview, a form with more than five fields (the whole canvas, Back in the footer).",
+    "notUse": "not for a single question — use drawer or dialog; not for a top-level destination — that is a screen of the task, not a sheet",
+    "states": [
+      "Default",
+      "Pressed",
+      "Aside",
+      "Waiting (reason shown)",
+      "Empty",
+      "Long / Chinese",
+      "Drawer over a page"
+    ]
+  },
+  {
+    "id": "dialog",
+    "name": "Dialog",
+    "use": "use for one small decision over a sheet or page: confirm, correct one value, answer yes or no.",
+    "notUse": "not for a form — use drawer; not for a message with no choice — use Banner or Status",
+    "states": [
+      "Default",
+      "Pressed",
+      "Waiting (reason shown)",
+      "Long / Chinese"
+    ]
+  }
+]

@@ -2,7 +2,7 @@
 
 # TaskHold (the hold button in a footer)
 
-A commit that cannot be undone from the sheet (Finish farrowing, End task) is a **hold in the primary's place**: the verb over a caption (`HOLD TO FINISH`), in the [footer](../TaskSheet/README.md) beside Back.
+A commit that cannot be undone from the sheet (Finish farrowing, End task) is a **hold in the primary's place**: the verb over a caption (`HOLD TO FINISH`), in the [footer](../Sheet/README.md) beside Back.
 
 **Anatomy**
 - The Button card's hold (`.button.st-hold`, `data-ds="Button"`): flex 1 in the footer, at least `control-height`; label 14px/500; caption in farrowing's face (owner round 5: match farrowing): `hold-caption` 9px/500, capitals, `0.07em` apart, at `task-hold-caption-opacity` (80%; 100% in the `unknown` phase); the sweep at `hold-sweep-opacity`, `hold-commit` (850ms) linear.

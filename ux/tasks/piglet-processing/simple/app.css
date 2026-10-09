@@ -1,8 +1,8 @@
 /* Simple piglet processing: layout only, tokens from tokens.css. Everything else is the task skeleton. */
 
 /* the stack inside a sheet or a page body */
-.tk-sheet-body > * + *, .tk-page-body > * + * { margin-top: var(--space-heading); }
-.tk-sheet-body > .tk-stepper + .tk-stepper { margin-top: 0; }
+.sheet-body > * + *, .sheet-body > * + * { margin-top: var(--space-heading); }
+.sheet-body > .tk-stepper + .tk-stepper { margin-top: 0; }
 
 /* the receipt line after a save, with Undo */
 .sp-flash { display: flex; align-items: center; justify-content: space-between; gap: var(--space-footer-gap); min-height: var(--tap-min);
@@ -13,7 +13,7 @@
 .sp-quiet { margin: 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
 .sp-empty { margin: var(--space-section) var(--space-gutter); font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); text-align: center; }
 .sp-warn { margin: 6px 0 0; font: var(--type-description-size)/1.5 var(--font-sans); color: var(--amber); }
-.tk-footer.sp-two > * { flex: 1 1 0; min-width: 0; }
+.sheet-footer.sp-two > * { flex: 1 1 0; min-width: 0; }
 @keyframes sp-tick-in { from { transform: scale(.7); background: var(--paper); border-color: var(--muted); } to { transform: none; } }
 @keyframes sp-tick-draw { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: none; } }
 
@@ -39,13 +39,13 @@
 .sp-mark[aria-pressed="true"] { color: var(--green); }
 .sp-mark[aria-pressed="true"] svg { fill: currentColor; }
 .sp-tabs.st-segment { margin: 0; }
-.tk-footer > .sp-more { flex: none; display: grid; place-items: center; width: var(--control-height); min-height: var(--control-height); margin: 0; padding: 0;
+.sheet-footer > .sp-more { flex: none; display: grid; place-items: center; width: var(--control-height); min-height: var(--control-height); margin: 0; padding: 0;
   border: 1px solid var(--control-border); border-radius: var(--radius-control); background: var(--paper); color: var(--ink); }
 .sp-more svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 
 /* Processing: one TaskDay card per age-day (the skeleton's day card). A ticked, not yet submitted item is not a done
    row: it stays in ink on the green wash; a row saved on this visit fills its check in place; later days are muted. */
-.tk-sheet-body > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
+.sheet-body > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
 .tk-day-row:has([data-ticked]) { background: var(--green-wash); }
 .tk-day-row:has([data-ticked]) .tk-day-copy > strong { color: var(--ink); }
 .tk-day-row:has([data-ticked]) .tk-day-mark, .tk-day-row:has([data-fresh]) .tk-day-mark { animation: sp-tick-in 200ms ease-out; }
@@ -55,7 +55,7 @@
 /* Piglets: Scan tag · Choose notch · Add manually — three tool Buttons in a line */
 .sp-adds { display: flex; gap: var(--space-key-gap); }
 .sp-adds > .button { flex: 1 1 0; min-width: 0; }
-.tk-sheet-body > .tk-list, .tk-page-body > .tk-list { margin: 0; }
+.sheet-body > .tk-list, .sheet-body > .tk-list { margin: 0; }
 
 /* Give IDs: one piglet at a time — big readouts (Measure) on the skeleton's Numpad, Boar · Gilt as TaskChoice tiles */
 .sp-give-id { display: flex; align-items: flex-start; gap: var(--space-key-gap); }
@@ -70,14 +70,14 @@
 .sp-give-litter { display: flex; flex-direction: column; gap: var(--space-heading); }
 .sp-give-litter > .tk-stepper + .tk-stepper { margin-top: calc(-1 * var(--space-heading)); }
 /* the pad docks above the footer, out of the scroller */
-:is(.tk-page, .tk-sheet) > .st-numpad { flex: none; padding: var(--space-row-y) var(--space-gutter); background: var(--paper); border-top: 1px solid var(--line); }
-:is(.tk-page, .tk-sheet) > .st-numpad + .tk-footer { border-top: 0; }
-.tk-page-body > .tk-row[data-trail="tick"] { border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
+:is(.sheet[data-presentation="page"], .sheet) > .st-numpad { flex: none; padding: var(--space-row-y) var(--space-gutter); background: var(--paper); border-top: 1px solid var(--line); }
+:is(.sheet[data-presentation="page"], .sheet) > .st-numpad + .sheet-footer { border-top: 0; }
+.sheet-body > .tk-row[data-trail="tick"] { border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--paper); }
 .button.sp-wide { width: 100%; }
 
 /* Move: the other pens as tiles, four to a line */
 .sp-pick > .st-heading { margin-bottom: 8px; }
-.tk-page-body > .sp-pick + * { margin-top: var(--space-section); }
+.sheet-body > .sp-pick + * { margin-top: var(--space-section); }
 .tk-choice.sp-pens { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .sp-pens .tk-choice-tile { min-height: 60px; gap: 2px; padding: 8px 4px; }
 .sp-pens .tk-choice-tile strong { font: 600 var(--type-identifier-strong-size)/1.2 var(--font-mono); }

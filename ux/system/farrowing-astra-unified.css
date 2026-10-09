@@ -2,28 +2,12 @@
    Lists and overview cards retain their original dividers and grouping. */
 .farrowing-phone{--drawer-medium:70%;--drawer-long:calc(100% - 74px)}
 .farrowing-phone .sow-detail-frame{position:absolute;inset:0;z-index:5;width:100%;height:100%;border:0;background:transparent}
-.farrowing-phone .sheet[data-size="medium"]{height:var(--drawer-medium)}
-.farrowing-phone .sheet[data-size="long"]{height:var(--drawer-long)}
-.farrowing-phone .sheet[data-size]>.sheet-body{flex:1;scrollbar-gutter:auto}
-.farrowing-phone .sheet-body,.farrowing-phone .room-scroll{scrollbar-width:none}
-.farrowing-phone .sheet-body::-webkit-scrollbar,.farrowing-phone .room-scroll::-webkit-scrollbar{display:none}
 .farrowing-phone .section-title{display:flex;align-items:center;justify-content:flex-start;gap:7px;font-weight:600;line-height:1.4}
 .farrowing-phone .section-title>svg{width:15px;height:15px;color:#69765e;stroke-width:1.7}
-.farrowing-phone .utility-header{border:0}
-.farrowing-phone .utility-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:5px 21px 17px;flex-shrink:0}
-.farrowing-phone .utility-header>div{min-width:0}
-.farrowing-phone .utility-header h3{font-size:21px;letter-spacing:-.7px;margin:0}
-.farrowing-phone .utility-header p{font-size:11px;line-height:1.6;color:var(--muted);margin:6px 0 0}
-.farrowing-phone .sow-header{border-bottom:1px solid var(--line);margin-bottom:12px}
 .farrowing-phone .sow-title-link{display:inline-flex;align-items:center;gap:8px;background:transparent;min-height:var(--tap-min);padding:8px 4px;margin:-8px -4px;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left}
 .farrowing-phone .sow-title-link>svg{width:16px;height:16px;color:var(--muted);stroke-width:1.8}
-.farrowing-phone .utility-header>.sow-header-actions{display:flex;flex-direction:row;align-items:center;align-self:flex-start;gap:6px;flex:none}
-.farrowing-phone .sow-header-actions .text-button{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:12px;font-size:13px;color:var(--ink);font-weight:600;white-space:nowrap}
-.farrowing-phone .sow-header-actions .icon-button{width:var(--tap-min);height:var(--tap-min);flex:none}
-.farrowing-phone .edit-header{border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:0}
+.farrowing-phone .sheet-aside .text-button{min-height:var(--tap-min);padding:0 12px;border:1px solid var(--line);border-radius:12px;font-size:13px;color:var(--ink);font-weight:600;white-space:nowrap}
 .farrowing-phone .sheet-body>.segment:first-child{margin-top:0}
-.farrowing-phone .edit-header .text-button{padding:0 4px;min-width:var(--tap-min);color:var(--ink)}
-.farrowing-phone .edit-header .text-button:disabled{background:transparent;color:var(--muted);opacity:.5}
 .farrowing-phone .edit-body .change-summary{margin:0 0 4px;padding:6px 12px;font-size:11px;line-height:1.5}
 .farrowing-phone .edit-body .change-list{font:10px/1.5 var(--sans);gap:2px 12px}
 .farrowing-phone .sheet[data-view="edit"] .edit-body{display:flex;flex-direction:column;padding:12px 21px 16px}
@@ -35,11 +19,6 @@
 .farrowing-phone .edit-finish-door>svg{width:14px;height:14px;color:var(--muted)}
 .farrowing-phone .sheet[data-view="editFinish"] .finish-question{margin-top:12px}
 .farrowing-phone .sheet[data-view="editFinish"] .finish-form-details{margin-bottom:12px}
-.farrowing-phone .sheet:is([data-view="edit"],[data-view="editFinish"]) .sheet-footer{padding-top:12px}
-.farrowing-phone .detail-sheet>.sheet-body{padding:18px 21px 22px}
-.farrowing-phone .detail-sheet .sheet-footer{padding-top:14px}
-.farrowing-phone .sheet-footer>.button:last-child{flex:1}
-.farrowing-phone .sheet-footer>.button:only-child{width:100%}
 .farrowing-phone .detail-empty{font-size:12px;line-height:1.6;color:var(--muted)}
 .farrowing-phone .count-label{justify-content:center}
 .farrowing-phone .tools .tool{flex-direction:row;flex-wrap:wrap;gap:7px}
@@ -54,9 +33,7 @@
 .farrowing-phone .sheet[data-view="locked"] .summary .causes{padding:0;gap:2px 10px;font-size:10px;line-height:1.5}
 .farrowing-phone .sheet[data-view="locked"] .summary .causes b{font-size:10px}
 .farrowing-phone .sheet[data-view="locked"] .read-section{margin-bottom:0}
-.farrowing-phone .sheet[data-view="locked"] .sheet-footer{padding-top:10px}
 /* Completed facts follow one grid; the drawer fits its content. */
-.farrowing-phone .sheet[data-size="compact"]{height:auto;max-height:var(--drawer-medium)}
 .farrowing-phone .sheet[data-view="locked"] .completed-record-body{padding-bottom:16px}
 .farrowing-phone .sheet[data-view="locked"] .finish-record{margin:0}
 .farrowing-phone .finish-record .facts-surface{padding:16px;background:#f6f7f2;border-radius:10px}
@@ -87,7 +64,6 @@
 .farrowing-phone .tc-heading{justify-content:flex-start;gap:6px}
 .farrowing-phone .tc-heading>svg:not(.tc-leading-icon){margin-left:auto}
 /* Pen details follow Inspection: recorded notices, then a compact action list. */
-.farrowing-phone .pen-detail-sheet>.utility-header,.farrowing-phone .pen-form-sheet>.utility-header,.farrowing-phone .pen-log-sheet>.utility-header{border-bottom:1px solid var(--line)}
 .farrowing-phone .pen-notices{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
 .farrowing-phone .pen-notice{display:flex;flex-direction:column;gap:6px;width:100%;padding:10px 12px;border:1px solid #dedfd3;border-radius:10px;background:#f6f6f0;text-align:left}
 .farrowing-phone .pen-notice-fault{background:#fdf9f0;border-color:#e9dfc9}
@@ -143,9 +119,6 @@
 .farrowing-phone .condition-counts .row-stepper{justify-content:space-between}
 .farrowing-phone .condition-counts .step-value{min-width:20px}
 /* Finish: a task header, quiet totals, and one aligned column of controls. */
-.farrowing-phone .sheet[data-view="finish"]{height:auto;max-height:var(--drawer-long)}
-.farrowing-phone .sheet[data-view="finish"]>.sheet-body{flex:0 1 auto}
-.farrowing-phone .finish-header{border-bottom:1px solid var(--line);margin-bottom:0}
 .farrowing-phone .finish-body{display:flex;flex-direction:column;gap:20px;padding-bottom:16px}
 .farrowing-phone .finish-body>*{flex-shrink:0}
 .farrowing-phone .finish-totals{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;background:#f6f7f2;border-radius:12px;padding:13px 16px;margin:0}
@@ -179,8 +152,7 @@
 .farrowing-phone .finish-pending span{display:block;font-size:10px;line-height:1.5}
 .farrowing-phone .finish-review-link{display:flex;align-items:center;gap:4px;min-height:var(--tap-min);padding:0;background:transparent;font-size:11px;font-weight:600}
 .farrowing-phone .finish-review-link svg{width:13px;height:13px}
-.farrowing-phone .sheet[data-view="finish"] .sheet-footer{padding-top:14px}@media(max-width:370px){
- .farrowing-phone .finish-header{padding-bottom:12px;margin-bottom:10px}
+@media(max-width:370px){
  .farrowing-phone .finish-body{gap:12px;padding-bottom:8px}
  .farrowing-phone .finish-condition .entry-row{min-height:50px}
  .farrowing-phone .finish-field{min-height:54px;font-size:14px}
@@ -215,8 +187,7 @@
 .farrowing-phone .count-record-facts strong{font:500 18px/1.4 var(--sans);font-variant-numeric:tabular-nums;letter-spacing:0;color:var(--ink)}
 .farrowing-phone .count-record .causes{font-size:11px;gap:3px 12px;padding:0;color:var(--muted);line-height:1.5}
 .farrowing-phone .count-record .causes b{font:500 11px var(--sans);color:var(--ink)}
-.farrowing-phone .sheet[data-view="count"] .sheet-footer{padding-top:14px}@media(max-width:370px){
- .farrowing-phone .sheet:is([data-view="count"],[data-view="finish"]) .sow-header{padding-top:2px;padding-bottom:8px;margin-bottom:4px}
+@media(max-width:370px){
  .farrowing-phone .sheet[data-view="finish"] .summary{padding-top:8px;padding-bottom:4px}
  .farrowing-phone .sheet[data-view="finish"] .finish-question{margin-bottom:8px}
  .farrowing-phone .sheet[data-view="finish"] .assistance-question{margin-top:8px}
@@ -226,7 +197,7 @@
  .farrowing-phone .sheet[data-view="count"] .hero-value{font-size:60px}
  .farrowing-phone .sheet[data-view="count"] .receipt{min-height:28px}
  .farrowing-phone .sheet[data-view="count"] .tools{margin:10px 0 6px}}@media(prefers-reduced-motion:reduce){.farrowing-phone .sheet[data-view="count"] .hero-stepper .key:active{transform:none}}@media(max-width:370px){
- .farrowing-phone .utility-header,.farrowing-phone .detail-sheet>.sheet-body{padding-left:17px;padding-right:17px}}
+}
 .task-progress-section .task-progress{background:#f6f7f2}
 .task-status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:1px}
 .task-death-review{padding:0 14px 14px;background:#f6f7f2;border-radius:12px;margin-bottom:12px}
@@ -237,11 +208,11 @@
 .task-death-litter .task-performance-totals{border:0;margin-top:10px;padding:0}
 .task-end-sheet .task-death-litter p{font-size:10px;line-height:1.6;color:var(--muted);margin-top:12px}
 .farrowing-phone .task-overview-sheet[data-size],.farrowing-phone .task-end-expanded[data-size]{height:calc(100% - 32px);max-height:calc(100% - 32px)}
-.farrowing-phone .task-overview-sheet .sheet-body{display:flex;flex-direction:column;gap:24px;padding:18px 21px 22px}
+.farrowing-phone .task-overview-sheet .sheet-body{display:flex;flex-direction:column;gap:24px}
 .task-overview-sheet .task-progress{padding:13px 15px;flex-shrink:0}
 .task-overview-sheet .task-metrics{margin-top:12px}
 .task-overview-sheet .task-metrics strong{font-size:25px}
-.farrowing-phone .task-end-sheet .sheet-body{display:flex;flex-direction:column;gap:14px;padding:14px 21px 18px}
+.farrowing-phone .task-end-sheet .sheet-body{display:flex;flex-direction:column;gap:14px}
 .task-end-sheet h4,.task-end-sheet p{margin:0}
 .task-outcome-section{flex-shrink:0}
 .task-performance{flex-shrink:0}
@@ -293,14 +264,12 @@
  .task-warning-card{padding:9px 10px;gap:8px;min-height:76px}
  .farrowing-phone .task-end-sheet.task-end-expanded{height:calc(100% - 32px);max-height:calc(100% - 32px)}
  .farrowing-phone .task-end-sheet[data-size="medium"]{height:var(--drawer-long)}
- .farrowing-phone .task-end-sheet .sheet-body{padding:10px 17px;gap:10px}
  .task-end-sheet .task-performance-surface{padding:10px 12px}
  .task-end-sheet .task-kpi-pair{gap:12px}
  .task-end-sheet .task-kpi-pair strong{font-size:24px}
  .task-end-sheet .task-performance-totals{padding-top:8px;margin-top:8px}
  .task-end-sheet .task-outcomes-list{padding:7px 12px}
  .task-end-sheet .task-outcomes-list>div{min-height:24px}
- .farrowing-phone .task-overview-sheet .sheet-body{padding:18px 17px 22px}
  .task-overview-sheet .task-metrics strong{font-size:23px}
  .task-overview-sheet .task-kpi-pair strong{font-size:24px}}
 
@@ -308,9 +277,6 @@
 .task-overview-content{flex-shrink:0}
 .task-overview-sheet .task-metrics{grid-template-columns:repeat(var(--status-count,3),minmax(0,1fr))}
 .task-overview-sheet .task-metrics span{font-size:11px;white-space:nowrap}
-.farrowing-phone .task-overview-sheet .sheet-body{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
-.farrowing-phone .task-overview-sheet .sheet-body::-webkit-scrollbar{display:block;width:3px}
-.farrowing-phone .task-overview-sheet .sheet-body::-webkit-scrollbar-thumb{background:#cdd2c6;border-radius:3px}
 
 /* Reading cards and their unit breakdown share the same outer and inner edges. */
 .task-overview-sheet :is(.task-progress,.task-performance-surface,.task-other-surface){width:100%;box-sizing:border-box}
@@ -321,11 +287,6 @@
 .farrowing-phone .more-sow-actions>svg{width:13px;height:13px}
 
 
-.farrowing-phone .execution-footer{flex-shrink:0;border-top:1px solid var(--line);background:#fff}
-.farrowing-phone .sheet:is([data-view="count"],[data-view="locked"]) .execution-completion{border-top:0;padding:14px 21px 28px;gap:14px}
-.farrowing-phone .execution-completion>.button{min-height:48px}
-.farrowing-phone .execution-completion>.secondary{flex:0 0 86px}
-.farrowing-phone .execution-completion>.primary{flex:1;min-width:0}
 .farrowing-phone .sheet[data-view="count"] .count-record{margin-top:16px}
 .farrowing-phone .record-toolbar-action:disabled{background:transparent;opacity:.45}
 
@@ -349,5 +310,5 @@
 /* Record provenance belongs to the identity header in every completed state. */
 
 /* Separate location from record context with space rather than repeated punctuation. */
-.farrowing-phone .sow-header .sow-context{display:flex;flex-wrap:wrap;column-gap:12px;row-gap:2px}
+.farrowing-phone .sheet-subtitle .sow-context{display:flex;flex-wrap:wrap;column-gap:12px;row-gap:2px}
 .farrowing-phone .sow-context .sow-location{white-space:nowrap}

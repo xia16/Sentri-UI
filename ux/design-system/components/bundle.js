@@ -149,7 +149,7 @@
   /* strs.back = the Back text; categories[i].strs.label = each tab. The nav aria-label stays plain text. */
   function categoryFooter({categories=[],active='',backAction='back',categoryAction='action-category',label='Action categories',className='',strs,args}={}){
     const current=categories.some(c=>c.id===active)?active:categories[0]?.id;
-    return `<footer class="sheet-footer st-category-footer ${esc(className)}" data-ds="CategoryFooter"><button type="button" class="surface-back record-back" data-action="${esc(backAction)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span${sa(strs&&strs.back,args&&args.back)}>Back</span></button><nav class="st-category-tabs action-category-nav" aria-label="${esc(label)}">${categories.map(c=>`<button type="button" data-action="${esc(categoryAction)}" data-value="${esc(c.id)}" aria-current="${c.id===current?'location':'false'}"${c.disabled?' disabled':''}>${tx(c.label,c,'label')}</button>`).join('')}</nav></footer>`;
+    return `<footer class="sheet-footer st-category-footer ${esc(className)}" data-ds="CategoryFooter">${backButton({action:backAction,label:strs&&strs.back?{text:'Back',str:strs.back,args:args&&args.back}:'Back'})}<nav class="st-category-tabs action-category-nav" aria-label="${esc(label)}">${categories.map(c=>`<button type="button" data-action="${esc(categoryAction)}" data-value="${esc(c.id)}" aria-current="${c.id===current?'location':'false'}"${c.disabled?' disabled':''}>${tx(c.label,c,'label')}</button>`).join('')}</nav></footer>`;
   }
   const chevron='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
   const check='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4L19 6"/></svg>';
@@ -694,7 +694,80 @@
     document.addEventListener('click',e=>{const row=e.target.closest('[data-st-optional]');if(!row)return;const box=row.closest('.st-optional'),open=box.dataset.open!=='true';
       box.dataset.open=String(open);row.setAttribute('aria-expanded',String(open));box.querySelector('.st-optional-body').hidden=!open;sync(box);if(open)box.querySelector('.st-optional-body :is(input,textarea,select)')?.focus();},true);
   }
-  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind});
+
+  /* Sheet: the one surface presented over a task. variant 'drawer' (default; content-sized, a grab strip, a ✕) |
+     'page' (a full sub-page; Back in the footer, never a ✕) | 'dialog' (one small decision). Returns the surface's HTML:
+     a drawer is its scrim + the sheet, a page the sheet, a dialog its backdrop + the dialog. Footers come from
+     sheetFooter(); the Back control from backButton(). Text slots take a string, { text, str, args } (with `str` the text
+     is wrapped for the screen shell's string registry) or { html } (trusted markup, e.g. a title that is a link). */
+  const sObj=v=>(v&&typeof v==='object'&&!Array.isArray(v))?v:{text:v};
+  const sArgs=a=>a&&Object.keys(a).length?` data-args="${esc(JSON.stringify(a))}"`:'';
+  function sT(v){if(v==null||v==='')return '';const o=sObj(v);if(o.html!=null)return String(o.html);return o.str?`<span data-str="${esc(o.str)}"${sArgs(o.args)}>${esc(o.text??'')}</span>`:esc(o.text);}
+  function sL(v,fallback){const o=sObj(v==null||v===''?fallback:v);if(o.text==null&&!o.str)return '';return ` aria-label="${esc(o.text??'')}"`+(o.str?` data-str-attr="aria-label:${esc(o.str)}"${sArgs(o.args)}`:'');}
+  const sA=(action,value)=>action?` data-action="${esc(action)}" data-value="${esc(value??'')}"`:'';
+  const sPaths={'back-chevron':'M15 5l-7 7 7 7'};
+  const sGlyph=k=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${sPaths[k]||(root.SentriIcons&&root.SentriIcons.paths&&root.SentriIcons.paths[k])||''}"/></svg>`;
+  /* A line of parts, each a text slot with an optional tone: [{ text, str, args, tone }]; { sep: true } is the shared separator. */
+  const sParts=v=>Array.isArray(v)?v.map(p=>{const o=sObj(p);if(o.sep)return SEP;return o.tone?`<span class="st-tone" data-tone="${esc(o.tone)}">${sT(o)}</span>`:sT(o);}).join(''):sT(v);
+  /* Back: the footer's exit, the same on every sheet (a 16px chevron + the word). Alone in a footer it fills the bar. */
+  function backButton({action='back',value='',label={text:'Back',str:'act.back'},className=''}={}){
+    return `<button type="button" class="surface-back${className?' '+esc(className):''}" data-ds="Sheet"${sA(action,value)}>${sGlyph('back-chevron')}<span>${sT(label)}</span></button>`;
+  }
+  /* A Button from a { label, action, value, register, waiting, describedby } spec (a string is already HTML). */
+  function sButton(b){
+    if(!b)return '';if(typeof b==='string')return b;
+    const l=sObj(b.label),props={label:l.text??'',register:b.register||'primary',action:b.action||'',value:b.value||'',waiting:!!b.waiting,busy:!!b.busy,describedby:b.describedby||'',className:b.className||'',attrs:b.attrs||{}};
+    if(l.str){props.strs={label:l.str};if(l.args)props.args={label:l.args};}
+    return button(props);
+  }
+  function sHold(h){
+    const l=sObj(h.label),c=sObj(h.caption),props={label:l.text??'',caption:c.text??'',action:h.action||'hold',value:h.value||'',tone:h.tone||'primary',phase:h.phase||'idle',statusId:h.statusId||'',waiting:!!h.waiting,describedby:h.describedby||''},strs={},args={};
+    if(l.str){strs.label=l.str;if(l.args)args.label=l.args;}if(c.str){strs.caption=c.str;if(c.args)args.caption=c.args;}
+    props.strs=strs;props.args=args;return holdButton(props);
+  }
+  /* The footer: at most two controls, the primary on the right: Back + a Button spec / a hold / HTML. Alone, Back fills the bar.
+     status { text, str, args, id, tone, visible, action }: the one line above the bar that says why the primary waits (wired as
+     its aria-describedby) or a hold's progress (its statusId). It is drawn whenever the primary or hold is waiting, or the
+     line carries an action; `visible: false` keeps it read-only (still role=status, visually hidden). `content` is trusted
+     footer markup in place of back/primary/hold (a host's own two controls); className adds a page hook. */
+  function sheetFooter({back:b={},primary,hold:h,status:st,content='',className=''}={}){
+    let line='';
+    if(st){
+      const id=st.id||fieldId('st-sheet-status'),waiting=!!((primary&&typeof primary==='object'&&primary.waiting)||(h&&h.waiting));
+      const vis=st.visible!=null?!!st.visible:(waiting||!!st.action),tone=st.tone?` data-tone="${esc(st.tone)}"`:'';
+      const act=vis&&st.action?sButton(Object.assign({register:'text'},st.action)):'';
+      if(!vis)line=`<p class="sheet-status st-visually-hidden" id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>`;
+      else line=act?`<div class="sheet-status" data-action-slot><p id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>${act}</div>`:`<p class="sheet-status" id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>`;
+      if(h&&!h.statusId)h=Object.assign({},h,{statusId:id});
+      if(primary&&typeof primary==='object'&&!primary.describedby)primary=Object.assign({},primary,{describedby:id});
+    }
+    const inner=content||`${b?backButton(b):''}${h?sHold(h):sButton(primary)}`;
+    return `${line}<div class="sheet-footer${className?' '+esc(className):''}" data-ds="Sheet">${inner}</div>`;
+  }
+  /* The overlay layer model: z = base + 10 × layer (scrim 2, drawer 3, page 5, dialog 8). An overlay placed after a sheet in the
+     phone rises a layer by itself (CSS); `layer: n` sets it. A drawer is never opened over a drawer (replace its content
+     instead) — a page, then a drawer or dialog over it, is the deepest stack. */
+  const sLayer=n=>n?` data-layer="${esc(n)}"`:'';
+  function scrim({action='dismiss',value='',label={text:'Dismiss sheet',str:'tk.sheet.dismiss'},layer=0}={}){
+    return `<button type="button" class="scrim" data-ds="Sheet"${sLayer(layer)}${sA(action,value)}${sL(label)}></button>`;
+  }
+  const SHEET_SIZES=['compact','short','medium','long'];
+  function sheet({variant='drawer',title,subtitle,subtitleTone='',icon='',close={action:'dismiss'},lead='',aside='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
+    const v=oneOf('Sheet','variant',variant,['drawer','page','dialog'],'drawer'),sz=oneOf('Sheet','size',size,SHEET_SIZES,'medium');
+    const foot=f===false?'':(f==null?sheetFooter({}):f),ex=safeAttr(attrs),cls=className?' '+esc(className):'',vw=view?` data-view="${esc(view)}"`:'';
+    if(v==='dialog'){
+      return `<div class="dialog-backdrop" data-ds="Sheet" data-variant="dialog"${sLayer(layer)}><div class="dialog${cls}" role="dialog" aria-modal="true" tabindex="-1"${id?` id="${esc(id)}"`:''}${vw}${inert?' inert':''}${sL(label??title)}${ex}><div class="dialog-body${bodyClass?' '+esc(bodyClass):''}"><h2 class="dialog-title">${icon?sGlyph(icon):''}${sT(title)}</h2>${subtitle?`<p class="dialog-desc">${sParts(subtitle)}</p>`:''}${body}</div>${foot}</div></div>`;
+    }
+    const sub=subtitle?`<p class="sheet-subtitle"${subtitleTone?` data-tone="${esc(subtitleTone)}"`:''}>${sParts(subtitle)}</p>`:'';
+    const cl=Object.assign({action:'dismiss'},close||{}),x=v==='drawer'?`<button type="button" class="sheet-close"${sA(cl.action,cl.value)}${sL(cl.label,{text:'Close',str:'act.close'})}>${sGlyph('close')}</button>`:'';
+    const head=`<header class="utility-header">${lead}<div class="sheet-titles"><h2 class="sheet-title">${sT(title)}</h2>${sub}</div>${aside?`<div class="sheet-aside">${aside}</div>`:''}${x}</header>`;
+    const common=`data-ds="Sheet" tabindex="-1"${sLayer(layer)}${inert?' inert':''}${id?` id="${esc(id)}"`:''}${vw}${sL(label??title)}${ex}`;
+    const main=`${head}${above}<div class="sheet-body${bodyClass?' '+esc(bodyClass):''}">${body}</div>${foot}`;
+    if(v==='page')return `<section class="sheet${cls}" ${common} role="region" data-st-context="page" data-presentation="page">${bar}${main}</section>`;
+    const scrimHtml=sc===false?'':scrim(Object.assign({layer},sc));
+    return `${scrimHtml}<section class="sheet${cls}" ${common} role="dialog" aria-modal="true" data-st-context="drawer" data-size="${sz}"${sizing==='full'?' data-sizing="full"':' data-sizing="content"'}><div class="grab" aria-hidden="true"></div>${main}</section>`;
+  }
+  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,categoryFooter,field,pickerField,pickerOptions,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowAction,rowSelectChange,status,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

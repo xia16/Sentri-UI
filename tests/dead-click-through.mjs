@@ -15,7 +15,7 @@ const base = `http://localhost:${port}/ux/tasks/piglet-processing/`;
 const ready = (p) => p.waitForSelector('html[data-ready]');
 const text = async (p, sel) => (await p.locator(sel).first().innerText()).replace(/\s+/g, ' ');
 // round 5: the room's review and drift doors are one row (`reviews`); its sheet holds the drift door (`explain`)
-async function drift(p) { await p.click('[data-action="reviews"]'); const t = await text(p, '[data-action="explain"]'); await p.click('.tk-sheet [data-action="close-sheet"]'); await p.waitForSelector('.tk-sheet', { state: 'detached' }); return t; }
+async function drift(p) { await p.click('[data-action="reviews"]'); const t = await text(p, '[data-action="explain"]'); await p.click('.sheet [data-action="close-sheet"]'); await p.waitForSelector('.sheet', { state: 'detached' }); return t; }
 async function explain(p) { await p.click('[data-action="reviews"]'); await p.click('[data-action="explain"]'); }
 const dialog = async (p) => (await p.locator('[role="dialog"]').last().innerText()).replace(/\s+/g, ' ');
 const log = (p, v) => p.evaluate((k) => JSON.parse(sessionStorage.getItem('pp-log:' + k) || '[]'), v);
@@ -152,7 +152,7 @@ try {
   await toDead(page, 'A02');
   await page.click('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
   const clear = await page.locator('[data-action="clear"]').boundingBox();
-  const title = await page.locator('.tk-sheet-titles').boundingBox();
+  const title = await page.locator('.sheet-titles').boundingBox();
   assert.ok(clear.x >= title.x + title.width - 1 || clear.y >= title.y + title.height - 1, 'Clear overlaps the title');
   console.log('ok 8 360: Clear clear of the title');
 
@@ -161,7 +161,7 @@ try {
   await toDead(page, 'A02');
   const plus = page.locator('[data-ds="Stepper"][data-field="crushed"] [data-step="1"]');
   while ((await plus.getAttribute('aria-disabled')) !== 'true') await plus.click();       // every piglet alive (earlier steps recorded some)
-  const alive0 = (await text(page, '.tk-sheet-head')).match(/A02 · (\d+) alive/)[1];
+  const alive0 = (await text(page, '.utility-header')).match(/A02 · (\d+) alive/)[1];
   assert.ok(await page.locator('#dd-why').isVisible(), 'the confirm is not visible');
   assert.match(await text(page, '#dd-why'), new RegExp('All ' + alive0 + ' dead\\? Nothing is left alive in A02'));
   assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-disabled'), 'true');
@@ -223,7 +223,7 @@ try {
   await small.check('input[data-action="pick"][value="B06-r2"]');
   const inView = async () => {
     const c = await small.locator('[data-target="pick-cause"] [data-action="pick-cause"]').first().boundingBox();
-    const body = await small.locator('.tk-sheet .tk-sheet-body').boundingBox();
+    const body = await small.locator('.sheet .sheet-body').boundingBox();
     return c && c.y >= body.y - 1 && c.y + c.height <= body.y + body.height + 1;
   };
   assert.ok(await inView(), 'the cause choice is not in view after the tick');

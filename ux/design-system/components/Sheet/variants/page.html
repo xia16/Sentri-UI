@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sheet · page</title><style>
+.ph{position:relative;height:640px;max-width:390px;margin:0 auto;overflow:hidden;background:var(--app-background);font-family:var(--sans);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius-device)}
+.ph .bg{padding:var(--space-gutter)}
+.ph .bar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
+.ph[data-pressed] .surface-back{background:var(--back-press)}
+.ph[data-pressed] .sheet-close{background:var(--press)}
+.ph[data-pressed] .sheet-footer .button.primary{filter:brightness(.96);transform:translateY(1px)}
+.ph[data-pressed] .sheet-footer .surface-back:only-child{background:var(--ink)}
+</style></head><body>
+<div class="ph" data-state="Default" data-demo="page-default"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Pressed" data-demo="page-pressed" data-pressed=""><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Aside" data-demo="page-aside"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Waiting (reason shown)" data-demo="page-waiting"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Empty" data-demo="page-empty"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Long / Chinese" data-demo="page-zh"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Drawer over a page" data-demo="page-over"><div class="bg"></div><div class="over"></div></div>
+<script>
+const UI=window.SentriUI,esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const bg=()=>UI.heading({title:'Pen B4',kind:'page',description:'Sow 000254 \u00b7 11 piglets'})+UI.panel(UI.row({title:'Litter',description:'11 alive \u00b7 day 2'}),{className:'st-row-group'});
+const bar='<div class="bar" aria-hidden="true"><span>9:41</span></div>';
+const note=(l,v)=>UI.field({label:l,control:'<textarea rows="3" placeholder="'+esc(v||'')+'"></textarea>'});
+const rows=(n,t)=>UI.panel(Array.from({length:n},(_,i)=>UI.row({title:(t||'Piglet')+' '+(i+1),description:'Day 2 \u00b7 B4',action:'x'})).join(''),{className:'st-row-group'});
+const foot=(p,extra)=>UI.sheetFooter(Object.assign({back:{action:'back'},primary:{label:'Record death',action:'save'}},p||{}));
+const R={
+"page-default":()=>UI.sheet({variant:'page',bar:bar,title:'Pen log',subtitle:'B4 \u00b7 Sow 000254',body:rows(4,'Entry'),footer:UI.sheetFooter({back:{action:'back'}})}),
+"page-pressed":()=>UI.sheet({variant:'page',bar:bar,title:'Pen log',subtitle:'B4 \u00b7 Sow 000254',body:rows(4,'Entry'),footer:UI.sheetFooter({back:{action:'back'}})}),
+"page-aside":()=>UI.sheet({variant:'page',bar:bar,title:'Give IDs',subtitle:'B4 \u00b7 4 without ID',aside:'<button type="button" class="st-text-action" data-action="clear">Clear</button>',body:rows(3),footer:foot({primary:{label:'Record \u00b7 next piglet',action:'save'}})}),
+"page-waiting":()=>UI.sheet({variant:'page',bar:bar,title:'Move piglets',subtitle:'B4 \u00b7 11 alive',body:rows(2,'Pen'),footer:foot({primary:{label:'Move 3',action:'save',waiting:true},status:{text:'Pick a pen first'}})}),
+"page-empty":()=>UI.sheet({variant:'page',bar:bar,title:'Pen log',subtitle:'B4 \u00b7 Sow 000254',body:'<p class="st-choice-empty">No activity recorded yet.</p>',footer:UI.sheetFooter({back:{action:'back'}})}),
+"page-zh":()=>UI.sheet({variant:'page',bar:bar,title:'\u732a\u6ce8\u8bb0\u5f55\u548c\u4e8b\u4ef6\u6e05\u5355\uff0c\u5305\u62ec\u51fa\u751f\u3001\u6b7b\u4ea1\u3001\u8f6c\u680f\u548c\u8ba1\u6570',subtitle:'B4 \u00b7 \u6bcd\u732a 000254 \u00b7 \u7b2c 2 \u5929',body:rows(3,'\u8bb0\u5f55'),footer:UI.sheetFooter({back:{action:'back',label:'\u8fd4\u56de'}})}),
+"page-over":()=>UI.sheet({variant:'page',bar:bar,title:'Treatment',subtitle:'B4 \u00b7 11 alive',body:rows(2),footer:foot({primary:{label:'Record treatment',action:'save'}})})+UI.sheet({title:'Medicine',subtitle:'Pick one',size:'short',body:rows(2,'Medicine'),footer:UI.sheetFooter({back:{action:'back'}})})
+};
+document.querySelectorAll('[data-demo]').forEach(el=>{const k=el.getAttribute('data-demo'),r=R[k];el.querySelector('.bg').innerHTML=bg();if(r)el.querySelector('.over').innerHTML=r();});
+</script></body></html>
