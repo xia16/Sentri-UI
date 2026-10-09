@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-09T18:16:14.602Z",
- "commit": "7cdd987",
+ "generated": "2026-10-09T18:32:44.571Z",
+ "commit": "0c7bee2",
  "platforms": [
   {
    "id": "mobile",
@@ -12210,72 +12210,73 @@
    "status": "in-design",
    "gate": {
     "status": "in-design",
-    "judged": "2026-10-09",
-    "commit": "3e3f835",
+    "round": 3,
+    "judged": "2026-10-10",
+    "commit": "8f50a3c",
     "model": "claude-opus-5-5",
     "scores": {
-     "clarity": 4,
-     "budget": 6,
+     "clarity": 7,
+     "budget": 7,
      "hierarchy": 8,
      "spacing": 8,
-     "broken": 5
+     "broken": 8
     },
-    "lowest": 4,
+    "lowest": 7,
     "checklist": [
      {
       "line": 1,
-      "pass": false,
-      "why": "Purpose present; does not send animal rows to TaskRow or history to Log."
+      "pass": true,
+      "why": "Purpose plus Log/Facts siblings named."
      },
      {
       "line": 2,
-      "pass": false,
-      "why": "No when / when-not across the three roots and the look-alikes."
+      "pass": true,
+      "why": "When / when-not with existing alternatives."
      },
      {
       "line": 3,
       "pass": true,
-      "why": "Parts named (icon/code, title, line 2, chip/trailing, trail) and all shown in the preview."
+      "why": "Anatomy now names the leading box and the tick mark; trail dropped when disabled."
      },
      {
       "line": 4,
-      "pass": false,
-      "why": "rowSelect, rowAction and the code/token litter row are used on no screen; TaskRow's tick and door+act do those jobs instead."
+      "pass": true,
+      "why": "Selectable folded away; tick and select + door carry usedBy and the atlas shows Used by."
      },
      {
       "line": 5,
-      "pass": false,
-      "why": "Pressed, focus, disabled and busy are stated but not rendered in the preview."
+      "pass": true,
+      "why": "Default, pressed, selected/ticked, disabled-with-reason, loading, error rendered; disabled rows lose the chevron."
      },
      {
       "line": 6,
-      "pass": false,
-      "why": "rowAction's act button is 101x44; inspection.review-selected's Remove is 53x44."
+      "pass": true,
+      "why": "390px: pig/pen box 24px in a 48x48 label (all edges hit), door 290x70-77, tick rows 346x68, scope 346x68, animal 356x76."
      },
      {
       "line": 7,
       "pass": true,
-      "why": "Not a choice control."
+      "why": "No cap for scrollable lists, stated; search for large ones."
      },
      {
       "line": 8,
-      "pass": false,
-      "why": "Disabled is opacity .5 only, which the DS state law forbids (\"nothing else is ever greyed\")."
+      "pass": true,
+      "why": "Ring vs check disc, native checkbox (incl. mixed pen header), Done chip only after save."
      },
      {
       "line": 9,
       "pass": true,
-      "why": "Truncation (ellipsis) and wrap:true both stated and shown."
+      "why": "Inspection pig rows no longer clip: 'Gestation · 40 days' and both condition tags render in full at 390."
      },
      {
       "line": 10,
       "pass": true,
-      "why": "button / label roots, aria-current, aria-labelledby for the act and the focus ring are stated."
+      "why": "Sibling checkbox and door, aria-pressed on tick rows, visible focus ring."
      },
      {
       "line": 11,
-      "pass": false,
-      "why": "Base row CSS uses raw #eef2e7, #53674a, #f1f5eb, #eaf2e5, #526847, 68px and 12x14px; only the candidate additions use tokens."
+      "pass": true,
+      "why": "Row CSS tokens only; the selected pig wash (#edf2e7) is host CSS, not Row."
      },
      {
       "line": 12,
@@ -12289,43 +12290,138 @@
      },
      {
       "line": 14,
-      "pass": false,
-      "why": "Links ADR 0002 only; no classification against TaskRow, TaskDay items or the Home task card."
+      "pass": true,
+      "why": "TaskRow aliases, TaskDay arrangement, Home card pattern."
      },
      {
       "line": 15,
       "pass": false,
-      "why": "Only the default faces are rendered at 375."
+      "why": "proof/ still has no tick-* or select-door-* PNGs (only three in-use shots in a scratchpad); verification.md claims every state is in proof/."
      }
     ],
     "classification": "component",
     "variants": [
      {
-      "name": "navigation row (icon tile, title, line 2, chevron; in rowGroup)",
+      "name": "navigation",
       "usedBy": [
        "piglet-processing.more-actions",
-       "inspection.actions",
-       "inspection.pen",
-       "pig-profile.full",
-       "feed-plan.bulk"
+       "inspection.actions"
       ],
-      "status": "in-design",
+      "status": "agent-checked",
       "scores": {
-       "clarity": 7,
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": []
+     },
+     {
+      "name": "animal",
+      "usedBy": [
+       "farrowing.room",
+       "piglet-processing.pen-list"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 9,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": []
+     },
+     {
+      "name": "door + act",
+      "usedBy": [
+       "inspection.review-selected",
+       "piglet-processing.sheet-todo"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 8,
        "budget": 8,
        "hierarchy": 8,
        "spacing": 8,
        "broken": 8
       },
       "findings": [
-       "Closest to ready, but the README's own Don't says \"no icons on list rows\" while this variant is defined by its icon tile."
+       "A ticked piglet item becomes door-act (inline chevron + '2 piglets' act); no tick or door-act specimen shows it."
       ]
      },
      {
-      "name": "scope row (trailing count word, aria-current)",
+      "name": "scope",
       "usedBy": [
        "workbench.choose-unit"
       ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": []
+     },
+     {
+      "name": "summary count",
+      "usedBy": [
+       "farrowing.overview"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": []
+     },
+     {
+      "name": "done / record",
+      "usedBy": [
+       "farrowing.room",
+       "piglet-processing.sheet-todo"
+      ],
+      "status": "agent-checked",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": []
+     },
+     {
+      "name": "tick (due ring / ticked disc)",
+      "usedBy": [
+       "piglet-processing.sheet-todo"
+      ],
+      "status": "in-design",
+      "scores": {
+       "clarity": 8,
+       "budget": 8,
+       "hierarchy": 8,
+       "spacing": 8,
+       "broken": 8
+      },
+      "findings": [
+       "No proof/tick-*.png (line 15).",
+       "Ticked state in use adds a count act and inline chevron the Ticked specimen lacks."
+      ]
+     },
+     {
+      "name": "select + door",
+      "usedBy": [
+       "inspection.walk",
+       "inspection.actions",
+       "feed-plan.pen"
+      ],
       "status": "in-design",
       "scores": {
        "clarity": 7,
@@ -12335,123 +12431,84 @@
        "broken": 8
       },
       "findings": [
-       "Unit picker: \"Unit 6 · 8 pigs · 4 pens · 2 tasks >\"."
-      ]
-     },
-     {
-      "name": "summary/count row (trailing number; div at 0, button above 0)",
-      "usedBy": [
-       "farrowing.overview"
-      ],
-      "status": "in-design",
-      "scores": {
-       "clarity": 6,
-       "budget": 8,
-       "hierarchy": 7,
-       "spacing": 8,
-       "broken": 7
-      },
-      "findings": [
-       "A zero row becomes a non-button div with no cue; the empty law says it should be absent, or the README should allow it."
-      ]
-     },
-     {
-      "name": "animal / litter row (code column, chip, token lines): row({code})",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {},
-      "findings": [
-       "No screen. The real animal row is TaskRow (piglet-processing.pen-list) and farrowing's .sow-row (farrowing.room)."
-      ]
-     },
-     {
-      "name": "selectable row (rowSelect, checkbox)",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {},
-      "findings": [
-       "No screen. Look-alikes: TaskRow trail \"tick\"; inspection's label.check-target.pen-select-target on feed-plan.* screens."
-      ]
-     },
-     {
-      "name": "action row (rowAction, door + one-tap button)",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {},
-      "findings": [
-       "No screen. Look-alikes: TaskDay items with act (piglet-processing.sheet-todo, sheet-done); inspection.review-selected li.st-row + Remove (53x44). The TaskRow README says door+act \"replaces SentriUI.rowAction\"."
-      ]
-     },
-     {
-      "name": "done/record row (trail edit, wrap)",
-      "usedBy": [],
-      "status": "in-design",
-      "scores": {},
-      "findings": [
-       "Preview only; done rows in use are TaskRow (Done chip + edit trail) on piglet-processing.pen-list."
+       "No proof/select-door-*.png (line 15).",
+       "The no-door case (rowSelect) has no caller: the pen header the README cites is still a hand-built label.check-target with a separate pen door."
       ]
      }
     ],
     "findings": [
      {
-      "severity": "high",
-      "text": "Two row families do the same jobs: Row's candidates (code row, rowSelect, rowAction, done row) have no screen, while TaskRow (animal row, tick, door, door+act) and TaskDay items serve every real task screen. The owner's rule is one implementation per job.",
-      "fix": "Pick the owner: make TaskRow's animal/tick/door/act faces variants of Row (one implementation, Row the base) and delete row({code}), rowSelect and rowAction, or the reverse. Until then mark the three candidates \"no screen\"."
-     },
-     {
-      "severity": "high",
-      "text": "Look-alikes outside both families: Home's task card (workbench.today, 88-235px buttons), farrowing's .sow-row (farrowing.room), inspection's checkbox pen rows (feed-plan.*) and the review-list row with Remove (inspection.review-selected).",
-      "fix": "Classify each in Row's README: Home task card = separate component (a card, not a row); .sow-row = the animal variant; checkbox pen rows = the selectable variant; the review row = the action variant."
+      "severity": "medium",
+      "text": "Line 15: proof/ has no state PNGs for tick or select-door (selectable PNGs deleted, nothing added); verification.md says every state is in proof/.",
+      "fix": "Generate proof/tick-{default,ticked,pressed,long-label-chinese}.png and proof/select-door-{default,pressed,selected,selected-pressed,no-door,long-label-chinese}.png at 375px."
      },
      {
       "severity": "medium",
-      "text": "Disabled is opacity .5, against the DS state law; the README itself says to prefer omission.",
-      "fix": "Remove the disabled face; keep the attribute for semantics only and require a reason line."
-     },
-     {
-      "severity": "medium",
-      "text": "Second targets under 48px: rowAction act 101x44, review-row Remove 53x44.",
-      "fix": "Act and inline buttons take min-height control-height (48px)."
-     },
-     {
-      "severity": "medium",
-      "text": "The README contradicts itself: the anatomy has an icon tile and the Don'ts say \"no icons on list rows\"; five screens use icon rows.",
-      "fix": "Restate: icon tiles only on navigation rows (lists of places or actions); never on animal or record rows."
+      "text": "README still ends with 'Addendum (round 1 fixes)' that contradicts the main text: a 'Selectable checkbox' section and 'it is still a proposed select + door variant'; tick and select + door are described twice.",
+      "fix": "Delete the addendum; move its one unique line (Plain: a Show/Hide toggle reports plain) into Variants."
      },
      {
       "severity": "low",
-      "text": "Base row CSS uses raw colours and sizes; the preview injects inline-styled trailing HTML.",
-      "fix": "Use row-icon-bg, row-icon-ink, press, green-wash, current-marker, row-min and space-row-y/x; pass a typed trailing {text, tone} in the preview."
+      "text": "README says select + door covers 'Inspection pens (header box)', but the pen header is still a hand-built label.check-target + pen-name button, so rowSelect (no door) has no caller.",
+      "fix": "Render the pen header with rowSelectDoor (box + pen door), or drop the no-door case and the pen claim."
+     },
+     {
+      "severity": "low",
+      "text": "A ticked piglet item turns into door-act with a count act and inline chevron; no specimen shows this state.",
+      "fix": "Add a 'Ticked + count act' state to variants/tick.html."
+     },
+     {
+      "severity": "low",
+      "text": "Plain (Show toggle) reports data-variant=plain but is not in variants.json.",
+      "fix": "List plain in variants.json or render the toggle as navigation without an icon."
      }
     ],
+    "previous": {
+     "round": 2,
+     "lowest": 5,
+     "commit": "956c0b6",
+     "findings": [
+      {
+       "text": "Inspection pig rows clip (.pig-open>span matched the chevron; door split 141/141).",
+       "fixed": true,
+       "note": "Rule scoped to :not(.st-row-chevron); door 290px, chevron 15px; meta and tags render in full on walk, pen, actions, review-selected, feed-plan pen/pig."
+      },
+      {
+       "text": "Selectable has no caller; README names Inspection/Feed plan.",
+       "fixed": "partial",
+       "note": "Variant, preview and proofs removed and folded into select + door; the no-door case still has no caller and the pen header remains hand-built."
+      },
+      {
+       "text": "Tick and select-door only in an addendum; Overview omits them; tabs say no screen uses them.",
+       "fixed": "partial",
+       "note": "Main Anatomy/Variants cover both, Overview and Used by populated; the stale addendum was not deleted."
+      },
+      {
+       "text": "No proof PNGs for tick or select-door.",
+       "fixed": false,
+       "note": "proof/ unchanged for these; scratchpad shots are not component proof."
+      },
+      {
+       "text": "Tick specimen chevron; ticked + count act unshown; pen box trailing.",
+       "fixed": "partial",
+       "note": "Chevron gone; pen and pig boxes both leading (x=19, 48x48); ticked + count act state still unshown."
+      },
+      {
+       "text": "Done chip rows report plain; disabled navigation keeps chevron.",
+       "fixed": true,
+       "note": "Saved Iron reports record after Record 1 item; disabled navigation/animal/scope/record specimens have no chevron."
+      }
+     ],
+     "reversed": "None. Broken rises 5 to 8: no clipping or undersized targets on any screen checked, no console errors."
+    },
     "proposals": [
      {
-      "kind": "merge",
-      "name": "TaskRow (animal, tick, door, door+act) with Row (code row, rowSelect, rowAction, done row)",
-      "why": "Same jobs, two implementations; only TaskRow has screens.",
-      "seenIn": [
-       "piglet-processing.pen-list",
-       "piglet-processing.sheet-todo",
-       "piglet-processing.end-task"
-      ]
-     },
-     {
-      "kind": "new-component",
-      "name": "Home task card",
-      "why": "A different job (summarise one task type with progress and timing) in a card, not a row; already named as a Home pattern in the atlas.",
-      "seenIn": [
-       "workbench.today",
-       "workbench.choose-unit",
-       "workbench.gestation"
-      ]
-     },
-     {
       "kind": "new-variant",
-      "name": "Row: selectable (adopt inspection's checkbox pen rows)",
-      "why": "Bulk selection on the feed-plan and inspection screens is hand-built.",
+      "name": "Row header checkbox (pen select-all with mixed state)",
+      "why": "The pen header is a hand-built label; it is select + door (box + pen door) with a mixed state and should use rowSelectDoor.",
       "seenIn": [
-       "feed-plan.pen",
-       "feed-plan.bulk"
+       "inspection.walk",
+       "feed-plan.pen"
       ]
      }
     ]
@@ -15810,12 +15867,6 @@
   },
   {
    "name": "TaskGroup",
-   "group": "Task skeleton",
-   "status": "in-design",
-   "gate": null
-  },
-  {
-   "name": "TaskRow",
    "group": "Task skeleton",
    "status": "in-design",
    "gate": null
@@ -19947,9 +19998,9 @@
     "id": "Row"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "Two row families do the same jobs: Row's candidates (code row, rowSelect, rowAction, done row)…",
-   "detail": "Two row families do the same jobs: Row's candidates (code row, rowSelect, rowAction, done row) have no screen, while TaskRow (animal row, tick, door, door+act) and TaskDay items serve every real task screen. The owner's rule is one implementation per job.\nFix: Pick the owner: make TaskRow's animal/tick/door/act faces variants of Row (one implementation, Row the base) and delete row({code}), rowSelect and rowAction, or the reverse. Until then mark the three candidates \"no screen\".",
+   "severity": "medium",
+   "title": "Line 15: proof/ has no state PNGs for tick or select-door (selectable PNGs deleted, nothing…",
+   "detail": "Line 15: proof/ has no state PNGs for tick or select-door (selectable PNGs deleted, nothing added); verification.md says every state is in proof/.\nFix: Generate proof/tick-{default,ticked,pressed,long-label-chinese}.png and proof/select-door-{default,pressed,selected,selected-pressed,no-door,long-label-chinese}.png at 375px.",
    "source": "gate"
   },
   {
@@ -19959,9 +20010,9 @@
     "id": "Row"
    },
    "kind": "design",
-   "severity": "high",
-   "title": "Look-alikes outside both families: Home's task card (workbench.today, 88-235px buttons),…",
-   "detail": "Look-alikes outside both families: Home's task card (workbench.today, 88-235px buttons), farrowing's .sow-row (farrowing.room), inspection's checkbox pen rows (feed-plan.*) and the review-list row with Remove (inspection.review-selected).\nFix: Classify each in Row's README: Home task card = separate component (a card, not a row); .sow-row = the animal variant; checkbox pen rows = the selectable variant; the review row = the action variant.",
+   "severity": "medium",
+   "title": "README still ends with 'Addendum (round 1 fixes)' that contradicts the main text: a 'Selectable…",
+   "detail": "README still ends with 'Addendum (round 1 fixes)' that contradicts the main text: a 'Selectable checkbox' section and 'it is still a proposed select + door variant'; tick and select + door are described twice.\nFix: Delete the addendum; move its one unique line (Plain: a Show/Hide toggle reports plain) into Variants.",
    "source": "gate"
   },
   {
@@ -19970,10 +20021,10 @@
     "kind": "component",
     "id": "Row"
    },
-   "kind": "design",
-   "severity": "medium",
-   "title": "Disabled is opacity .5, against the DS state law; the README itself says to prefer omission.",
-   "detail": "Disabled is opacity .5, against the DS state law; the README itself says to prefer omission.\nFix: Remove the disabled face; keep the attribute for semantics only and require a reason line.",
+   "kind": "broken",
+   "severity": "low",
+   "title": "README says select + door covers 'Inspection pens (header box)', but the pen header is still a…",
+   "detail": "README says select + door covers 'Inspection pens (header box)', but the pen header is still a hand-built label.check-target + pen-name button, so rowSelect (no door) has no caller.\nFix: Render the pen header with rowSelectDoor (box + pen door), or drop the no-door case and the pen claim.",
    "source": "gate"
   },
   {
@@ -19982,10 +20033,10 @@
     "kind": "component",
     "id": "Row"
    },
-   "kind": "broken",
-   "severity": "medium",
-   "title": "Second targets under 48px: rowAction act 101x44, review-row Remove 53x44.",
-   "detail": "Second targets under 48px: rowAction act 101x44, review-row Remove 53x44.\nFix: Act and inline buttons take min-height control-height (48px).",
+   "kind": "design",
+   "severity": "low",
+   "title": "A ticked piglet item turns into door-act with a count act and inline chevron; no specimen shows…",
+   "detail": "A ticked piglet item turns into door-act with a count act and inline chevron; no specimen shows this state.\nFix: Add a 'Ticked + count act' state to variants/tick.html.",
    "source": "gate"
   },
   {
@@ -19995,21 +20046,9 @@
     "id": "Row"
    },
    "kind": "design",
-   "severity": "medium",
-   "title": "The README contradicts itself: the anatomy has an icon tile and the Don'ts say \"no icons on list…",
-   "detail": "The README contradicts itself: the anatomy has an icon tile and the Don'ts say \"no icons on list rows\"; five screens use icon rows.\nFix: Restate: icon tiles only on navigation rows (lists of places or actions); never on animal or record rows.",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Row:5",
-   "target": {
-    "kind": "component",
-    "id": "Row"
-   },
-   "kind": "design",
    "severity": "low",
-   "title": "Base row CSS uses raw colours and sizes; the preview injects inline-styled trailing HTML.",
-   "detail": "Base row CSS uses raw colours and sizes; the preview injects inline-styled trailing HTML.\nFix: Use row-icon-bg, row-icon-ink, press, green-wash, current-marker, row-min and space-row-y/x; pass a typed trailing {text, tone} in the preview.",
+   "title": "Plain (Show toggle) reports data-variant=plain but is not in variants.json.",
+   "detail": "Plain (Show toggle) reports data-variant=plain but is not in variants.json.\nFix: List plain in variants.json or render the toggle as navigation without an icon.",
    "source": "gate"
   },
   {
@@ -20020,32 +20059,8 @@
    },
    "kind": "decision",
    "severity": "medium",
-   "title": "Merge TaskRow (animal, tick, door, door+act) with Row (code row, rowSelect, rowAction, done row)?",
-   "detail": "Same jobs, two implementations; only TaskRow has screens.\nSeen in: piglet-processing.pen-list, piglet-processing.sheet-todo, piglet-processing.end-task",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Row:p1",
-   "target": {
-    "kind": "component",
-    "id": "Row"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "New component: Home task card?",
-   "detail": "A different job (summarise one task type with progress and timing) in a card, not a row; already named as a Home pattern in the atlas.\nSeen in: workbench.today, workbench.choose-unit, workbench.gestation",
-   "source": "gate"
-  },
-  {
-   "id": "gate:Row:p2",
-   "target": {
-    "kind": "component",
-    "id": "Row"
-   },
-   "kind": "decision",
-   "severity": "medium",
-   "title": "New variant: Row: selectable (adopt inspection's checkbox pen rows)?",
-   "detail": "Bulk selection on the feed-plan and inspection screens is hand-built.\nSeen in: feed-plan.pen, feed-plan.bulk",
+   "title": "New variant: Row header checkbox (pen select-all with mixed state)?",
+   "detail": "The pen header is a hand-built label; it is select + door (box + pen door) with a mixed state and should use rowSelectDoor.\nSeen in: inspection.walk, feed-plan.pen",
    "source": "gate"
   },
   {

@@ -194,7 +194,7 @@ try {
   assert.ok(await page.locator('#dd-why').isVisible(), 'the reason is not visible');
   assert.match(await text(page, '#dd-why'), /Pick a cause for 271004/);
   await toDead(page, 'A02');
-  assert.match(await text(page, '[data-target="route"], .tk-door'), /Found outside its crate\?/);          // before any count
+  assert.match(await text(page, '[data-target="route"], .st-row'), /Found outside its crate\?/);          // before any count
   assert.match(await text(page, '#screen'), /Found outside its crate\? One of D03's 2 missing\?/);
   console.log('ok 10 loss choice, visible cause reason, outside-crate door before a count');
 

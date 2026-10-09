@@ -81,7 +81,7 @@ try {
   assert.equal(await page.locator('[data-action="record"][data-value^="iron3"]').count(), 2);
   const own = await text(page, '[data-action="record"][data-value="iron3#own"]');
   assert.match(own, /Record 8/);
-  const ironRows = await page.locator('.tk-day-row').evaluateAll((els) => els.map((e) => e.innerText.replace(/\s+/g, ' ')).filter((t) => /^Iron/.test(t)));
+  const ironRows = await page.locator('.tk-day .st-row').evaluateAll((els) => els.map((e) => e.innerText.replace(/\s+/g, ' ')).filter((t) => /^Iron/.test(t)));
   assert.ok(ironRows.some((t) => /8 of its owns*·?s*day 4/.test(t)) && ironRows.some((t) => /1 from B06s*·?s*day 3/.test(t)), ironRows.join(' | '));
   await page.click('[data-action="record"][data-value="iron3#own"]');
   await page.waitForTimeout(700);

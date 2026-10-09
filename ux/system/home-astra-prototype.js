@@ -282,7 +282,7 @@
     const list=overlay.querySelector('#unit-options');
     list.innerHTML=all.map(u=>{
       const info=unitInfo(u),count=remaining(u).length;
-      return SentriUI.choiceRow({label:'Unit '+u,meta:info.pigs+' pigs · '+info.pens+' pens'+(count?' · '+count+' '+(count===1?'task':'tasks'):' · No tasks'),mode:'single',selected:state.unit===u,action:'pick-unit',value:u});
+      return SentriUI.row({variant:'scope',title:'Unit '+u,description:(state.unit===u?'Current unit · ':'')+info.pigs+' pigs · '+info.pens+' pens',trailing:{text:count?count+' '+(count===1?'task':'tasks'):'No tasks'},attrs:state.unit===u?{'aria-current':'location'}:{},wrap:true,action:'pick-unit',value:u});
     }).join('');
   }
   function showUnits(){

@@ -58,6 +58,8 @@ export interface Fact {
 }
 
 export interface RowProps {
+  variant?: RowCopyProps["variant"];
+  reason?: string;
   /** A string, or (candidate, ADR 0002) a token list with colour on the value: `[[{text:'Overdue'},{text:'3 days',tone:'red'}]]`. */
   title: string | Token[];
   /** A string, or (candidate) a token list the row draws with `·` between tokens — the row law's line 2. */
@@ -68,7 +70,7 @@ export interface RowProps {
   action?: string;
   value?: string;
   disabled?: boolean;
-  /** Before the rail: a typed word ({ text, tone }). A plain string is legacy trusted HTML (with strs.trailing, escaped text). Not with chip. */
+  /** Before the rail: a typed word ({ text, tone }). Legacy plain strings are escaped text. Not with chip. */
   trailing?: string | Exclude<Part, string>;
   /** Candidate: the right end. auto (default): a chevron when action is set · chevron · edit (✎, a done row whose tap opens Edit) · none. */
   trail?: 'auto' | 'chevron' | 'edit' | 'none';
@@ -537,6 +539,11 @@ export interface ChoiceRadiosProps {
 }
 /** The shared row fields (row, rowSelect, rowAction). */
 export interface RowCopyProps {
+  variant?: "navigation" | "animal" | "door-act" | "scope" | "summary-count" | "record" | "tick" | "plain" | "select-door";
+  /** A leading tick for a row ticked in place: due (empty ring) or ticked (check disc). Saved is a Done chip, not a mark. */
+  mark?: "due" | "ticked";
+  reason?: string;
+  disabled?: boolean;
   title: string | Token[];
   description?: string | Token[];
   /** A leading mono identifier (crate `A02`) at `identifier-strong`, in a `row-code-min` column. Not with an icon. */
@@ -554,7 +561,7 @@ export interface RowCopyProps {
   strs?: Strs<'title' | 'description' | 'code'>;
   args?: StrArgs<'title' | 'description' | 'code'>;
 }
-export interface RowSelectProps extends RowCopyProps { checked?: boolean; /** Default 'select'. */ action?: string; value: string }
+export interface RowSelectProps extends RowCopyProps { inputAttrs?: SafeAttrs; checked?: boolean; /** Default 'select'. */ action?: string; value: string }
 export interface RowActionProps extends RowCopyProps {
   /** The door (the copy, with an inline ›). */
   action: string;
@@ -597,6 +604,8 @@ export interface SentriUI {
   /** Arrow keys select and focus inside every radiogroup under root; onChange re-renders. */
   radioBind(root: Element, options?: { onChange?: (field: string, value: string) => void }): { destroy(): void };
   rowSelect(props: RowSelectProps): string;
+  /** Select + door: a checkbox and an opening door as sibling targets. */
+  rowSelectDoor(props: RowCopyProps & { checked?: boolean; action?: string; value: string; openAction?: string; openValue?: string; label?: string; doorClass?: string; inputAttrs?: SafeAttrs; contentHtml?: string }): string;
   rowAction(props: RowActionProps): string;
   /** From a 'change' event on a rowSelect: { value, checked, action }, or null. */
   rowSelectChange(event: Event | { target: unknown }): { value: string; checked: boolean; action: string } | null;

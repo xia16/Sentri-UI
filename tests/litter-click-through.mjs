@@ -186,7 +186,7 @@ try {
   // 11. R1-17: identity owed on its day, a door to the identity page.
   await openLitter(page, 'C05', null, true);
   assert.match(await face(page), /Day 3 1 day late .*Identity · tag 8 to identify/);
-  await page.click('[data-ds="TaskRow"][data-action="open-identity"] >> nth=0');
+  await page.click('[data-ds="Row"][data-action="open-identity"] >> nth=0');
   await page.waitForURL(/id\.html/);
   console.log('ok 11 identity owed on its day → id.html');
 

@@ -81,7 +81,7 @@ Status is text and holds no action, so most interaction states do not apply.
 |---|---|
 | [ConditionTag](../ConditionTag/README.md) | a recorded health condition and its care level |
 | [Row](../Row/README.md) | the `chip` slot takes a Status word; the row owns the tap |
-| [TaskRow](../TaskRow/README.md) | the animal row; its chip is a Status chip |
+| [Row](../Row/README.md) | the animal row; its chip is a Status chip |
 | [Banner](../Banner/README.md) | a message the worker must read |
 | [TaskProgress](../TaskProgress/README.md) | how much of the task is done |
 
