@@ -118,6 +118,10 @@ _Avoid_: Open question, TBD
 **Decision queue**:
 A feature's list of things to confirm, each with the agents' recommendation; only decisions that change what the farm records or what a worker must do.
 
+**Enhancement**:
+A design change that makes an adequate screen, interaction or component clearly better, as opposed to fixing a defect. It's gated like any change: it must beat what it replaces.
+_Avoid_: Redesign, polish
+
 **Gate**:
 A check a screen must pass before it is agent-checked; code checks, the visual judge and the UX judge.
 _Avoid_: Lens, review

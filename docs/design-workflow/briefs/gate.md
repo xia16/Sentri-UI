@@ -56,7 +56,7 @@ Screenshot each screen on BASE and on CANDIDATE in the same state, at 390×844 a
 
 ## 4. Before / after (this decides it)
 
-For each pair, judge **better / same / worse** and give the one reason that decides it. The bar is the screens the owner approved (Farrowing and Inspection): calm, aligned, nothing extra, one surface, ink not colour. A change that meets a rule but looks worse is **worse**.
+For each pair, judge **better / same / worse** and give the one reason that decides it. The bar is the screens the owner approved (Farrowing and Inspection): calm, aligned, nothing extra, one surface, ink not colour. A change that meets a rule but looks worse is **worse**. Judge a change that departs from the current pattern by the farmer, not by familiarity: being new never makes it worse, and matching the system never makes it better.
 
 - **Normal**: it passes only if no pair is worse, at least one is better, and the cold look found no defect.
 - **Refactor**: it passes only if every pair is **same**, pixel-identical where the change claims identity, and the cold look found no defect.
