@@ -121,7 +121,7 @@
     [
       "inspection.walk",
       "inspection.review-selected",
-      "tick pigs, tap View selected"
+      "tick pigs, tap the count (\"2 pigs selected\")"
     ],
     [
       "inspection.review-selected",
@@ -292,7 +292,7 @@
               {
                 "state": "Selection",
                 "when": "One or more ticked",
-                "shows": "Clear, \"Selected · 2 pens · 3 pigs\", View selected, Actions"
+                "shows": "\"2 pens · 3 pigs selected\" (opens the review, which has Clear), More actions; unticking the last one in the review ends selection"
               }
             ],
             "logic": "Scan has no camera in the prototype; Search finds by ear tag or pen.",

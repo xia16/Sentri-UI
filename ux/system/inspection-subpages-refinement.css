@@ -95,26 +95,21 @@
 .inspection-phone :is(.catalog-search input,.stage-legend button,.record-tabs button,.inspection-filter-summary .text-button,.unit-summary-heading .text-button,.profile-details-link,.dock-selection-summary .selection-review,.feed-percent-control input[type="number"],.feed-range-labels .text-button,.feed-amount-fields input[type="range"],.log-results .text-button,.instruction-detail .text-button,.bulk-reading input){min-height:var(--tap-min);}
 .inspection-phone .bulk-controls :is(input,select,textarea){min-height:var(--tap-min);}
 
-/* Bulk records: the pigs are the page; details float over the list as a card.
-   The list keeps the full page height and scrolls behind the panel; its bottom
-   padding (--details-space, measured from the panel by dockBulkDetails) lets the
-   last row scroll clear of the card. No band sits behind the card — the list
-   shows around it. A short list isn't stretched to fill the page: it sizes to
-   its own content, with the card resting at the foot of the page. */
-.inspection-phone .sheet.bulk-action-sheet[data-presentation="page"]>.sheet-body{padding:0;margin:0;display:flex;min-height:0;overflow:hidden;position:relative;isolation:isolate}
-.inspection-phone .bulk-action-layout{display:flex;flex-direction:column;min-height:0;width:100%;position:relative}
-.inspection-phone .bulk-pigs{display:flex;flex-direction:column;flex:1;min-height:0;border:0;border-radius:0;background:var(--surface);overflow:hidden}
+/* Bulk action page: the selected pigs on top, the details anchored to the bottom, ending above the footer.
+   The sheet body is the only scroller: a short page pushes the details down onto the footer (margin-top:auto), a long one
+   scrolls as one column. One surface: the details are the footer's paper with one rule above them (no card, no border box,
+   no shadow), and the fields sit straight on it. The details heading folds them away. */
+.inspection-phone .sheet>.sheet-body:has(>.bulk-action-layout),.inspection-phone .sheet.bulk-action-sheet[data-presentation="page"]>.sheet-body{padding:0;margin:0;display:flex;flex-direction:column;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.inspection-phone .bulk-action-layout{display:flex;flex-direction:column;flex:1 0 auto;min-height:100%;width:100%;gap:0;height:auto}
+.inspection-phone .bulk-action-layout>.bulk-pigs{display:flex;flex-direction:column;flex:none;min-height:0;margin:16px var(--space-gutter,18px);border:1px solid var(--line,#e2e7dc);border-radius:var(--radius-panel,18px);background:var(--paper,#fff);overflow:hidden}
 .inspection-phone .bulk-pigs .pig-review-heading{padding:12px 18px;flex-shrink:0}
-.inspection-phone .bulk-pigs .bulk-pig-list{flex:1;min-height:0;overflow:auto;scrollbar-gutter:auto;scrollbar-width:none;padding-bottom:var(--details-space,0px)}
-.inspection-phone .bulk-pig-list::-webkit-scrollbar,.inspection-phone .bulk-details-overlay::-webkit-scrollbar{display:none}
-.inspection-phone .bulk-details-overlay.facts-surface{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;margin:0;max-height:min(340px,55vh);box-sizing:border-box;border:1px solid #cdd5c5;border-radius:18px;background:var(--surface,#f7f8f2);box-shadow:0 -6px 16px #2633210f;padding:8px 18px 16px;overflow:auto;overscroll-behavior:contain;scrollbar-width:none}
-.inspection-phone .bulk-details-overlay.is-collapsed{padding-bottom:8px}
-.inspection-phone .bulk-controls-toggle{flex-shrink:0}
-.inspection-phone .bulk-action-layout.is-short{align-self:flex-start;width:100%}
-.inspection-phone .bulk-action-layout.is-short .bulk-pigs{flex:none;border:1px solid #dce1d6;border-radius:12px;background:#fff}
-.inspection-phone .bulk-action-layout.is-short .bulk-pig-list{flex:none;overflow:visible;padding-bottom:0}
-/* A short list can't be covered, so the card follows it directly instead of floating at the foot. */
-.inspection-phone .bulk-action-layout.is-short .bulk-details-overlay.facts-surface{position:relative;left:auto;right:auto;bottom:auto;margin:12px}
+.inspection-phone .bulk-pigs .bulk-pig-list{flex:none;min-height:0;overflow:visible;padding-bottom:0}
+.inspection-phone .bulk-action-layout>.bulk-dock{position:static;display:flex;flex-direction:column;flex:none;gap:0;margin:auto 0 0;max-height:none;min-height:0;box-sizing:border-box;padding:4px var(--space-gutter,18px) 16px;border:0;border-top:1px solid var(--line,#e2e7dc);border-radius:0;background:var(--paper,#fff);box-shadow:none;overflow:visible}
+.inspection-phone .bulk-action-layout>.bulk-dock.is-collapsed{padding-bottom:4px}
+.inspection-phone .sheet:has(>.sheet-body>.bulk-action-layout)>.sheet-footer{border-top-color:transparent}
+.inspection-phone .bulk-dock .bulk-controls-toggle{flex-shrink:0;min-height:var(--tap-min,48px);color:var(--muted,#5c6b58);font:600 12px/1.4 var(--font-sans)}
+.inspection-phone .bulk-dock .bulk-control-fields{display:flex;flex-direction:column;gap:12px;min-height:0}
+.inspection-phone .bulk-dock .field input,.inspection-phone .bulk-dock .field select,.inspection-phone .bulk-dock .field textarea{background:var(--paper,#fff)}
 .inspection-phone .bulk-pig-row{grid-template-columns:24px minmax(0,1fr) minmax(84px,112px);padding:12px 18px;gap:8px}
 .inspection-phone .bulk-pig-change .feed-pig-values{align-items:center;justify-content:flex-end;width:100%}
 .inspection-phone .bulk-reading{display:flex;flex-direction:column;align-items:stretch;gap:4px}
@@ -124,10 +119,10 @@
 .inspection-phone .bulk-control-grid{align-items:start}
 .inspection-phone .bulk-controls .bulk-control-grid .field>input{height:48px;min-height:48px}
 .inspection-phone .bulk-control-fields{min-height:0}
-@media(max-width:360px){.inspection-phone .bulk-pig-row{padding-left:12px;padding-right:12px;gap:6px}.inspection-phone .bulk-details-overlay.facts-surface{padding-left:12px;padding-right:12px}}
+@media(max-width:360px){.inspection-phone .bulk-pig-row{padding-left:12px;padding-right:12px;gap:6px}.inspection-phone .bulk-dock{padding-left:12px;padding-right:12px}}
 
-/* A quiet edge separates standalone record cards from the page as well. */
-.inspection-phone .single-action-sheet .bulk-controls.facts-surface{border:1px solid #dce2d5;box-shadow:0 2px 8px #26332106}
+/* One pig: the fields sit straight on the sheet (no card around them). */
+.inspection-phone .single-action-sheet .bulk-controls.single-controls{display:flex;flex-direction:column;gap:16px;max-width:100%;max-height:none;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
 
 /* Override the shared page inset, without changing other record pages. */
 .inspection-phone .bulk-action-sheet .bulk-pigs .pig-review-heading{padding:8px 18px;min-height:40px;box-sizing:border-box}
@@ -136,7 +131,6 @@
 .inspection-phone .bulk-action-sheet .bulk-pig-change{gap:0}
 .inspection-phone .bulk-action-sheet .bulk-pig-change:has(.feed-change-state:not([hidden])){gap:4px}
 .inspection-phone .bulk-action-sheet .bulk-reading input{height:44px;min-height:44px;padding:6px}
-.inspection-phone .bulk-action-sheet .bulk-details-overlay.is-collapsed{padding-top:4px;padding-bottom:4px}
 
 /* Treatment has one numeric column, not the three-column measurement comparison. */
 .inspection-phone [data-bulk-kind="treatment"]{--dose-column:64px;--pig-row-inset:18px}
@@ -152,7 +146,7 @@
 @media(max-width:360px){.inspection-phone [data-bulk-kind="treatment"]{--pig-row-inset:12px}}
 
 /* One chooser language: grouped navigation, distinct selection, quiet category headers. */
-.inspection-phone .chooser-background .bulk-details-overlay{visibility:hidden;pointer-events:none}
+.inspection-phone .chooser-background .bulk-dock{visibility:hidden;pointer-events:none}
 .inspection-phone .chooser-background .scrim{display:none}
 .inspection-phone .picker-step .sheet-body{gap:12px;padding:16px 18px}
 .inspection-phone .picker-step .catalog-search{margin:0}
@@ -188,3 +182,11 @@
 .inspection-phone .option-picker-step .st-picker-option[aria-selected="true"] strong{font-weight:600}
 .inspection-phone .option-picker-step .st-picker-option:active{background:#f0f4eb}
 .inspection-phone .option-picker-step .st-picker-option>svg{margin-right:4px;color:#486141}
+
+/* Selection bar (platform multi-select): one readable count that opens the review, then the primary. Clear lives in the
+   review sheet's head; unticking the last subject ends selection. */
+.inspection-phone .inspect-dock .selection-count{flex:1 1 auto;min-width:0;min-height:var(--tap-min,48px);display:flex;align-items:center;gap:4px;padding:0 4px;margin:0;border:0;border-radius:var(--radius-control,12px);background:transparent;color:var(--ink);font:600 15px/1.3 var(--font-sans);text-align:left}
+.inspection-phone .inspect-dock .selection-count>span{min-width:0;overflow-wrap:anywhere}
+.inspection-phone .inspect-dock .selection-count>svg{flex:none;width:16px;height:16px;color:var(--muted);fill:none;stroke:currentColor;stroke-width:1.8}
+.inspection-phone .inspect-dock .selection-count:active{background:var(--press)}
+.inspection-phone .inspect-dock .selection-action{min-height:var(--tap-min,48px)}

@@ -34,8 +34,8 @@ test('feed review uses compact rows with explicit current, new and change states
   let html = model.overlay(context);
   assert.match(html, /pig-review-card bulk-pigs is-short/);
   assert.match(html, /data-bulk-rows/);
-  assert.match(html, /bulk-details-overlay/);
-  assert.match(html, />2 selected</);
+  assert.match(html, /bulk-controls bulk-dock/);
+  assert.doesNotMatch(html, /bulk-details-overlay|facts-surface|>2 selected</);
   assert.equal((html.match(/Unchanged/g) || []).length, 2);
   assert.match(html, /<small>Current<\/small>/);
   assert.match(html, /<small>New<\/small>/);
@@ -59,7 +59,7 @@ test('bulk measurement and care flows use the same pig review card as feed', () 
   let html = model.overlay(context);
   assert.match(html, /pig-review-card bulk-pigs is-short/);
   assert.equal((html.match(/pig-review-row bulk-pig-row/g) || []).length, 2);
-  assert.match(html, />2 selected</);
+  assert.doesNotMatch(html, />2 selected</);
   assert.match(html, /<small>Current<\/small>/);
   assert.match(html, /<small>New<\/small>/);
   assert.match(html, /Current → New · mm/);
@@ -68,6 +68,6 @@ test('bulk measurement and care flows use the same pig review card as feed', () 
   html = model.overlay(context);
   assert.match(html, /pig-review-card bulk-pigs is-short/);
   assert.equal((html.match(/pig-review-row bulk-pig-row/g) || []).length, 2);
-  assert.match(html, /Preview changes/);
+  assert.doesNotMatch(html, /Preview changes/);
   assert.match(html, /data-bulk-summary="000254"/);
 });

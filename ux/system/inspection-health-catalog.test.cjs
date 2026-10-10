@@ -89,7 +89,8 @@ test('single health uses a direct form while bulk keeps the list', () => {
   const bulkHtml = model.overlay(bulk);
   assert.match(bulkHtml, /sheet bulk-action-sheet/);
   assert.match(bulkHtml, /pig-review-card bulk-pigs is-short/);
-  assert.match(bulkHtml, />2 selected</);
+  assert.doesNotMatch(bulkHtml, />2 selected<|facts-surface/);
+  assert.match(bulkHtml, /bulk-controls bulk-dock/);
   assert.equal((bulkHtml.match(/data-bulk-include/g) || []).length, 2);
 });
 
@@ -116,7 +117,7 @@ test('a custom condition requires a category, persists for reuse and can be remo
   assert.match(model.healthList(context), /Add “Unexpected flank swelling”/);
   assert.equal(model.handleRecordAction(context, 'health-add-custom', 'Unexpected flank swelling'), true);
   assert.deepEqual(context.form.conditions, []);
-  assert.match(model.healthList(context), /Choose a category/);
+  assert.match(model.healthList(context), /Where should “Unexpected flank swelling” appear/);
   assert.match(model.healthList(context), /Limbs/);
   assert.equal(model.handleRecordAction(context, 'health-custom-category', 'Body area|Limbs'), true);
   assert.deepEqual(context.form.conditions, ['Unexpected flank swelling']);
@@ -179,15 +180,16 @@ test('health selections persist across categories and Done does not save the rec
  assert.ok(!model.pig(c,'000267').cases.some(x=>x.name===name));
 });
 
-test('short single-choice sheets have Close but no redundant footer actions', () => {
+test('short single-choice sheets: a pick commits, so Back alone in the footer and no ✕', () => {
  for(const ids of [['000267'],['000254','000267']]){
   const c=model.seed();model.openBulkAction(c,'treatment',ids);model.overlay(c);
   for(const key of ['method','doseUnit']){
    c.form.pickerKey=key;c.form.pickerReturn='treatment';c.view='picker';
    const picker=model.overlay(c).split('<section class="sheet picker-step')[1];
-   assert.match(picker,/aria-label="Close chooser"/);
+   assert.doesNotMatch(picker,/sheet-close|Close chooser/);
    assert.match(picker,/data-action="picker-select"/);
-   assert.doesNotMatch(picker,/sheet-footer|data-action="back"/);
+   assert.equal((picker.match(/data-action="back"/g)||[]).length,1);
+   assert.doesNotMatch(picker,/button primary/);
   }
  }
 });
@@ -207,14 +209,14 @@ test('medicine and health render the shared flat chooser surface', () => {
  assert.match(model.overlay(c),/class="st-panel st-choice-panel"/);
 });
 
-test('catalogue navigation uses tappable path steps and only one exit pair', () => {
+test('catalogue levels: "‹ Parent" in the header, the level as the title, no breadcrumb, one exit pair', () => {
  const c=model.seed();model.openBulkAction(c,'treatment',['000267']);c.view='medicine-picker';c.form.medicineCategory='Antibiotics';
  let html=model.overlay(c).split('<section class="sheet picker-step')[1];
- assert.match(html,/Chosen levels/);assert.match(html,/data-action="medicine-step"/);
+ assert.doesNotMatch(html,/Chosen levels|st-picker-steps/);assert.match(html,/class="sheet-up" data-ds="Sheet" data-action="medicine-step" data-value="0"><svg[^]*<span>Medicines<\/span><\/button><h2 class="sheet-title">Antibiotics</);
  assert.doesNotMatch(html,/chooser-header-back|Close chooser/);
  model.openBulkAction(c,'health',['000267']);c.view='bulk-health-picker';c.form.conditionPath=['Symptom','General appearance'];
  html=model.overlay(c).split('<section class="sheet picker-step')[1];
- assert.match(html,/data-action="condition-step"/);
+ assert.match(html,/class="sheet-up" data-ds="Sheet" data-action="condition-step" data-value="1"><svg[^]*<span>Symptoms<\/span><\/button><h2 class="sheet-title">General appearance</);
  assert.equal((html.match(/data-action="back"/g)||[]).length,1);
  assert.equal((html.match(/data-action="bulk-health-done"/g)||[]).length,1);
  assert.doesNotMatch(html,/<details|chooser-header-back|Close chooser/);
