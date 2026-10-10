@@ -8,59 +8,198 @@
   "duplicates": "built inside Inspection — see inspection / health-record",
   "groups": [
     [
-      "Old UI",
+      "Tagged pigs",
       [
-        "report-death.list",
-        "report-death.cause",
-        "report-death.bulk",
-        "report-death.confirm"
+        "report-death.entry",
+        "report-death.one",
+        "report-death.roster",
+        "report-death.conveyor",
+        "report-death.after"
+      ]
+    ],
+    [
+      "Un-identified group",
+      [
+        "report-death.group"
       ]
     ]
   ],
   "screens": [
     {
-      "id": "report-death.list",
-      "name": "Death list",
-      "zh": "死亡列表",
-      "status": "placeholder",
+      "id": "report-death.entry",
+      "name": "Entry · verb sheet, Death outlined",
+      "zh": "上报死亡 · 入口",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-death&slide=1",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "The selected pigs with their death causes.",
-        "issues": []
+        "purpose": "The verb sheet over a mixed selection, Death as the only unfilled tile.",
+        "rules": [
+          "Mixed states (sows plus a gilt) share no cycle verb, so the Production strip is absent, not empty; the not-available line names what was ticked."
+        ],
+        "edge": [
+          "A pig reported by someone else a minute ago still reads alive on this device (the race the roster catches)."
+        ]
       }
     },
     {
-      "id": "report-death.cause",
-      "name": "Choose cause",
-      "zh": "选择疾病 / 选择症状",
-      "status": "placeholder",
+      "id": "report-death.one",
+      "name": "Death · one pig drawer",
+      "zh": "上报死亡 · 单只",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-death&slide=2",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Choose the disease or symptom that is the cause; the chosen cause.",
-        "issues": []
+        "purpose": "One pig: the header (pen, tag, vitals) is the review.",
+        "elements": [
+          {
+            "name": "Cause",
+            "at": "Cause",
+            "shows": "Multi-picker over the one condition catalogue",
+            "states": [
+              {
+                "state": "Open case",
+                "when": "Pig has an open condition",
+                "shows": "Preselected (fever)"
+              },
+              {
+                "state": "Nothing picked",
+                "when": "No cause chosen",
+                "shows": "\"Cause unknown\" is selected; picking a cause clears it"
+              }
+            ],
+            "rule": "The catalogue stays open: a pig can die of something never recorded."
+          }
+        ],
+        "rules": [
+          "The footnote states the consequence a farmer can check tomorrow: her case ends with her."
+        ]
       }
     },
     {
-      "id": "report-death.bulk",
-      "name": "Bulk actions",
-      "zh": "批量操作",
-      "status": "placeholder",
+      "id": "report-death.roster",
+      "name": "Death roster · several pigs",
+      "zh": "上报死亡 · 名单",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-death&slide=3",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Add a cause or upload photos for several pigs at once.",
-        "issues": []
+        "purpose": "Nothing is committed here: the selection read as names before the first death.",
+        "elements": [
+          {
+            "name": "Roster rows",
+            "shows": "To report (pen-grouped, per-row remove) and the blocked section",
+            "states": [
+              {
+                "state": "To report",
+                "when": "Eligible",
+                "shows": "Tag row with a remove control; Start counts down with each removal"
+              },
+              {
+                "state": "Already reported",
+                "when": "Another report exists",
+                "shows": "Listed under the reason with who and when, with her pen code"
+              }
+            ],
+            "rule": "Writes nothing: Start enters the per-pig chain, Cancel costs nothing."
+          }
+        ],
+        "edge": [
+          "A fat-finger selection of 40 pigs shows as 40 rows, which a count in the header would not."
+        ]
       }
     },
     {
-      "id": "report-death.confirm",
-      "name": "Confirm and result",
-      "zh": "二次确认 / 操作结果",
-      "status": "placeholder",
+      "id": "report-death.conveyor",
+      "name": "Death conveyor · 2 of 3",
+      "zh": "上报死亡 · 逐只",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-death&slide=4",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Second confirmation and result.",
-        "issues": []
+        "purpose": "One sheet, three pigs in a chain, cause carried forward.",
+        "elements": [
+          {
+            "name": "Carry token",
+            "at": "same cause as last",
+            "shows": "Under the Cause field from pig 2 on",
+            "logic": "Cause carries from the previous pig; the token lets her distrust it in one glance. Photos never carry."
+          },
+          {
+            "name": "Skip and leave",
+            "shows": "Skip, back arrow",
+            "rule": "Skip writes nothing and she stays alive (not the same as Cause unknown). Leaving early is legal: committed deaths stand and nothing was a draft."
+          }
+        ]
+      }
+    },
+    {
+      "id": "report-death.after",
+      "name": "After · rows gone, counts down",
+      "zh": "上报死亡 · 完成",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-death&slide=5",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The walk after the deaths: rows disappear in place and counts re-derive.",
+        "rules": [
+          "Open cases freeze under the death record, a pending cull recommendation closes, and no surface can select her again.",
+          "Her page outlives her: the terminal band leads (left the herd · died), history stays whole."
+        ],
+        "edge": [
+          "The only way back is the deliberate mis-entry correction (remove as supersession); everything then re-derives again."
+        ]
+      }
+    },
+    {
+      "id": "report-death.group",
+      "name": "Death · un-identified group",
+      "zh": "上报死亡 · 无ID群",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-group-death&slide=1",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The count sheet for a group row: count, shared cause and photos in one commit.",
+        "elements": [
+          {
+            "name": "Count",
+            "at": "Report 2 deaths",
+            "shows": "Header, stepper and button all show the same number",
+            "logic": "Pre-filled from the group tick's stepper (production: ticking an un-identified pig asks for the number at once) and moves together when stepped."
+          }
+        ],
+        "rules": [
+          "Two causes inside one group are two records: two passes, one sheet each; no per-head fiction.",
+          "After commit the decrement lands in the pen sheet trail (was 40 · 3 deaths · 1 moved) and the feed total re-sums."
+        ]
       }
     }
+  ],
+  "flow": [
+    [
+      "report-death.entry",
+      "report-death.one",
+      "tap Death with one pig"
+    ],
+    [
+      "report-death.entry",
+      "report-death.roster",
+      "tap Death with several pigs"
+    ],
+    [
+      "report-death.roster",
+      "report-death.conveyor",
+      "tap Start"
+    ],
+    [
+      "report-death.one",
+      "report-death.after",
+      "tap Report death"
+    ],
+    [
+      "report-death.conveyor",
+      "report-death.after",
+      "last confirm"
+    ]
   ]
 }

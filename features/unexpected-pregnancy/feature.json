@@ -8,59 +8,170 @@
   "duplicates": "built inside Inspection — see inspection / health-record",
   "groups": [
     [
-      "Old UI",
+      "Record pregnancy",
       [
-        "unexpected-pregnancy.pregnancy",
-        "unexpected-pregnancy.line",
-        "unexpected-pregnancy.batch",
-        "unexpected-pregnancy.result"
+        "unexpected-pregnancy.entry",
+        "unexpected-pregnancy.drawer",
+        "unexpected-pregnancy.join",
+        "unexpected-pregnancy.unclear",
+        "unexpected-pregnancy.after"
       ]
     ]
   ],
   "screens": [
     {
-      "id": "unexpected-pregnancy.pregnancy",
-      "name": "Record pregnancy",
+      "id": "unexpected-pregnancy.entry",
+      "name": "Entry · verb sheet",
+      "zh": "意外妊娠 · 入口",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-pregnancy&slide=1",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The same Pregnancy result record the task writes, reached from the verb sheet.",
+        "rules": [
+          "Bulk: N sows, one payload."
+        ]
+      }
+    },
+    {
+      "id": "unexpected-pregnancy.drawer",
+      "name": "Pregnant · just record or join",
       "zh": "妊娠",
-      "status": "placeholder",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-pregnancy&slide=2",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Record a pregnancy that was not planned.",
-        "issues": []
+        "purpose": "Choice of three; Pregnant reveals the join question for an unwatched sow.",
+        "elements": [
+          {
+            "name": "Just record / Join a batch",
+            "at": "Just record",
+            "shows": "Two options, Just record preselected",
+            "states": [
+              {
+                "state": "Unwatched sow",
+                "when": "No batch",
+                "shows": "The two options; the warning that she joins no batch is the record hint"
+              },
+              {
+                "state": "Watched sow",
+                "when": "In a batch",
+                "shows": "No block; options carry \"follows batch · farrowing\" or \"leaves batch · rebreed\""
+              }
+            ]
+          }
+        ],
+        "rules": [
+          "The commit is never blocked; the primary states the outcome (Record pregnant)."
+        ]
       }
     },
     {
-      "id": "unexpected-pregnancy.line",
-      "name": "Choose production line",
-      "zh": "选择生产线",
-      "status": "placeholder",
-      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
-      "notes": {
-        "purpose": "Choose the production line.",
-        "issues": []
-      }
-    },
-    {
-      "id": "unexpected-pregnancy.batch",
-      "name": "Choose batch",
+      "id": "unexpected-pregnancy.join",
+      "name": "Join a batch · pregnancy timing",
       "zh": "选择批次",
-      "status": "placeholder",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-pregnancy&slide=3",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Choose a batch: default, search, search results, and the chosen state.",
-        "issues": []
+        "purpose": "The same picker as the heat join, filtered for pregnancy.",
+        "elements": [
+          {
+            "name": "Batch list",
+            "shows": "Batches bred and not yet farrowed, with pregnancy-check timing",
+            "logic": "Filter: breeding done and farrowing not complete. The line is a scope chip; tap commits and dismisses."
+          }
+        ]
       }
     },
     {
-      "id": "unexpected-pregnancy.result",
-      "name": "Result",
-      "zh": "操作结果",
-      "status": "placeholder",
+      "id": "unexpected-pregnancy.unclear",
+      "name": "Unclear · recheck default",
+      "zh": "妊娠 · 不确定",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-pregnancy&slide=4",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Result of the action.",
-        "issues": []
+        "purpose": "Unclear carries a recheck default instead of a dialog.",
+        "elements": [
+          {
+            "name": "Recheck",
+            "at": "recheck",
+            "shows": "Stepper preset to 3 days",
+            "logic": "The default comes from the pregnancy-check task config (D1).",
+            "rule": "The stepper is for the exception; no mandatory dialog."
+          }
+        ],
+        "edge": [
+          "Which config supplies the default when the sow is in no batch is open (Q5)."
+        ]
+      }
+    },
+    {
+      "id": "unexpected-pregnancy.after",
+      "name": "After · the warning became a token",
+      "zh": "妊娠 · 完成",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-pregnancy&slide=5",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The walk list after commit.",
+        "elements": [
+          {
+            "name": "What prints",
+            "shows": "The walk list after commit.",
+            "states": [
+              {
+                "state": "Record-only",
+                "when": "Nothing watches her",
+                "shows": "Prints \"no batch\" at once; no day count on line 1 (no mating date)"
+              },
+              {
+                "state": "Joined",
+                "when": "Chose a batch",
+                "shows": "Batch-silent; appears in the batch's pregnancy-check stream at the timing the picker promised"
+              },
+              {
+                "state": "Unclear",
+                "when": "Chose Unclear",
+                "shows": "Resurfaces on its recheck day with the trail on line 2"
+              }
+            ]
+          }
+        ]
       }
     }
+  ],
+  "flow": [
+    [
+      "unexpected-pregnancy.entry",
+      "unexpected-pregnancy.drawer",
+      "tap Pregnancy result"
+    ],
+    [
+      "unexpected-pregnancy.drawer",
+      "unexpected-pregnancy.join",
+      "tap Join a batch"
+    ],
+    [
+      "unexpected-pregnancy.join",
+      "unexpected-pregnancy.drawer",
+      "tap a batch"
+    ],
+    [
+      "unexpected-pregnancy.drawer",
+      "unexpected-pregnancy.unclear",
+      "choose Unclear"
+    ],
+    [
+      "unexpected-pregnancy.drawer",
+      "unexpected-pregnancy.after",
+      "tap Record"
+    ],
+    [
+      "unexpected-pregnancy.unclear",
+      "unexpected-pregnancy.after",
+      "tap Record"
+    ]
   ]
 }

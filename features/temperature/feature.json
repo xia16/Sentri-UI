@@ -8,23 +8,93 @@
   "duplicates": "",
   "groups": [
     [
-      "Old UI",
+      "Temperature",
       [
-        "temperature.temperature"
+        "temperature.one",
+        "temperature.run",
+        "temperature.after"
       ]
     ]
   ],
   "screens": [
     {
-      "id": "temperature.temperature",
-      "name": "Temperature",
-      "zh": "体温",
-      "status": "placeholder",
+      "id": "temperature.one",
+      "name": "Temperature · one pig",
+      "zh": "体温 · 单只",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-temp&slide=1",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Record temperature for one pig only (a single pig, per the screen name).",
-        "issues": []
+        "purpose": "One measure for one pig.",
+        "elements": [
+          {
+            "name": "Over-threshold footnote",
+            "shows": "The consequence of an escalated reading",
+            "logic": "Escalated when the reading is above temp_escalation_c for her stage class (farm-level config). The sheet shows only the consequence (\"over 40.0 °C flags her row\").",
+            "source": "wf-temp, slide 1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "temperature.run",
+      "name": "Temperature · conveyor",
+      "zh": "体温 · 逐只",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-temp&slide=2",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Seven pigs in one run, same anatomy as Weigh.",
+        "rules": [
+          "Two readings came back over threshold and the run does not flinch: the receipt is neutral."
+        ]
+      }
+    },
+    {
+      "id": "temperature.after",
+      "name": "After · the chip on her row",
+      "zh": "体温 · 完成",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-temp&slide=3",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "How a reading prints on the walk.",
+        "elements": [
+          {
+            "name": "What prints",
+            "shows": "How a reading prints on the walk.",
+            "states": [
+              {
+                "state": "Escalated, case open",
+                "when": "Over threshold and a case exists",
+                "shows": "Chip on the row (40.6 on a fever pig, day 4)"
+              },
+              {
+                "state": "Escalated, no case",
+                "when": "Over threshold, no case",
+                "shows": "Chip on the row; the reading never creates a case"
+              },
+              {
+                "state": "Normal",
+                "when": "At or below threshold",
+                "shows": "Cut to the inside (zero rule); the pen still opens itself when a chip is present"
+              }
+            ]
+          }
+        ]
       }
     }
+  ],
+  "flow": [
+    [
+      "temperature.one",
+      "temperature.after",
+      "tap Record"
+    ],
+    [
+      "temperature.run",
+      "temperature.after",
+      "last confirm"
+    ]
   ]
 }
