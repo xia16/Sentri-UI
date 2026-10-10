@@ -11,7 +11,9 @@
       "Sensors and devices",
       [
         "environment.page",
-        "environment.fan-manual"
+        "environment.fan-manual",
+        "environment.sensor-week",
+        "environment.sensor-other"
       ]
     ],
     [
@@ -67,6 +69,16 @@
       "environment.maintenance-empty",
       "environment.report-issue",
       "tap Report issue"
+    ],
+    [
+      "environment.page",
+      "environment.sensor-week",
+      "tap 7 days"
+    ],
+    [
+      "environment.page",
+      "environment.sensor-other",
+      "tap another sensor"
     ]
   ],
   "screens": [
@@ -464,6 +476,82 @@
         "[data-action=\"fault-detail\"]",
         "Mark resolved"
       ]
+    },
+    {
+      "id": "environment.sensor-week",
+      "name": "Sensor · 7-day trend",
+      "zh": "传感器 · 7天趋势",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7",
+      "steps": [
+        "[data-action=\"environment\"]",
+        "7 days"
+      ],
+      "notes": {
+        "purpose": "The same sensor page switched from today to the last seven days.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Chart and low/high",
+            "at": "Reading history",
+            "shows": "Seven daily points (6d ago to Today) with low and high",
+            "logic": "The week series is sample data derived from the current reading; the Today series has eight points up to the last-reading time. Low and High are the minimum and maximum of the plotted points; the history table lists the same points.",
+            "source": "sensorHistory(); sensorChart()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": [
+          "The chart switch does not change \"Last reading\" (still 09:40)."
+        ]
+      }
+    },
+    {
+      "id": "environment.sensor-other",
+      "name": "Sensor · Humidity",
+      "zh": "传感器 · 湿度",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7",
+      "steps": [
+        "[data-action=\"environment\"]",
+        "Humidity"
+      ],
+      "notes": {
+        "purpose": "The sensor page with another sensor selected.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Sensor switch",
+            "at": "Humidity",
+            "shows": "Segment of the sensors the unit has: Temperature, Humidity, Ammonia",
+            "states": [
+              {
+                "state": "Sensor missing",
+                "when": "A reading is not numeric",
+                "shows": "That sensor is omitted from the switch, never shown as 0"
+              },
+              {
+                "state": "Single sensor",
+                "when": "Only one sensor has a reading",
+                "shows": "The switch lists only it; the page opens on it"
+              }
+            ],
+            "logic": "Unit and chart scale differ per sensor (°C, %, ppm NH₃); the plotted range is padded by 0.5 for temperature and 1 for the others.",
+            "source": "availableSensors(); sensorKinds"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
     }
   ]
 }
