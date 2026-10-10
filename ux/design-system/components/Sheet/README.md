@@ -21,7 +21,7 @@ A sheet is the one surface presented over a task: it holds a step the worker fin
 
 | Variant | Use for | Not for |
 |---|---|---|
-| **drawer** | One task step over the page: a form of about five fields, a count, a picker, a short read. Sized to its content, a handle, a ✕. | A long record (page). A yes/no (dialog). A drawer on a drawer. |
+| **drawer** | One task step over the page: a form of about five fields, a count, a picker, a short read. Sized to its content, a handle. | A long record (page). A yes/no (dialog). A drawer on a drawer. |
 | **page** | A full sub-page: a record, a log, an overview, a form of more than five fields. The whole canvas; Back in the footer. | One question (drawer or dialog). |
 | **dialog** | One small decision over a sheet or page: confirm, correct one value. Rises from the bottom edge, where the thumb is. | A form (drawer). A message with no choice (Banner). |
 
@@ -44,10 +44,10 @@ A **page** has a status bar in place of the grab and scrim, no ✕, and its head
 ## One exit rule: ✕ and Back
 
 - **Back is the footer's exit, on every variant.** It returns to what is under the sheet and keeps what the worker typed. Alone in a footer it fills the bar and turns `ink`.
-- **A drawer also carries the ✕** in its head (a second way out for a worker who looks up, not down). A page has no ✕ (it has no scrim to tap), and a dialog has no ✕ (Back is its Cancel).
-- **An aside never replaces the ✕.** Text actions such as Clear sit to its left.
+- **A drawer carries no ✕** (owner rule: the footer Back is the exit and sits under the thumb). Only a drawer with no footer at all keeps a ✕, so it is never without an exit. A page has no ✕ (it has no scrim to tap), and a dialog has no ✕ (Back is its Cancel).
+- **The head's only action is the aside** (Clear, Reset); it is left out until it can act.
 - The word is **Back**, never Close or Cancel (the ✕'s accessible name is the one place "Close" appears).
-- Discarding a draft is its own act (Clear, Reset), never what Back or ✕ do. So a sheet never loses typed work silently and needs no "discard changes?" question.
+- Discarding a draft is its own act (Clear, Reset), never what Back does: Back keeps the draft. The one exception is a correction to a saved record, where Back with changes asks "Save correction?" (Save / Discard) so an unsaved correction never travels on.
 
 ## Footer
 

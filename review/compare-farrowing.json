@@ -5,86 +5,86 @@
   "size": "390x844",
   "screens": {
     "farrowing.room": {
-      "note": "Allowed: the All tab is weight 700 (#88); the dock Pen glyph is the registry grid with its broken path fixed (#81).",
-      "pixels": 166,
+      "note": "Owner rules: the tile drops its all-units support line; chips use the Status tones. Fix round (owner rules): drawers have no ✕; Back is the outlined exit, alone or beside a primary; the Active chip is the Status tone (blue), Done green; the three-up Born / Alive / Dead metric is one form on count, finish, locked and ended; Clear, Edit and View log are left out until they can act. Allowed: the All tab is weight 700 (#88); the dock Pen glyph is the registry grid with its broken path fixed (#81).",
+      "pixels": 80162,
       "maxDelta": 224,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.room.diff.png"
     },
     "farrowing.count": {
-      "note": "Anti-aliasing of the \"more actions\" dots only (max delta 5).",
-      "pixels": 15,
-      "maxDelta": 5,
+      "note": "Born / Dead is the shared three-up metric. Fix round (owner rules): drawers have no ✕; Back is the outlined exit, alone or beside a primary; the Active chip is the Status tone (blue), Done green; the three-up Born / Alive / Dead metric is one form on count, finish, locked and ended; Clear, Edit and View log are left out until they can act.",
+      "pixels": 54756,
+      "maxDelta": 224,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.count.diff.png"
     },
     "farrowing.before": {
-      "note": "The \"more actions\" dots and a few pixels of text anti-aliasing (max delta 39).",
-      "pixels": 133,
-      "maxDelta": 39,
+      "note": "Edit and View log are left out until there is a litter. Fix round (owner rules): drawers have no ✕; Back is the outlined exit, alone or beside a primary; the Active chip is the Status tone (blue), Done green; the three-up Born / Alive / Dead metric is one form on count, finish, locked and ended; Clear, Edit and View log are left out until they can act.",
+      "pixels": 73506,
+      "maxDelta": 224,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.before.diff.png"
     },
     "farrowing.death": {
-      "note": "Allowed: selected segment weight 700 (#88); stepper draft value in ink, \"+1 unsaved\" muted beside the label (#88). Owner-approved delta: the optional inputs are the older quiet \"+ Litter weight\" / \"+ Assistance\" / \"+ Photos\" cards (4cb3d75), side by side, no \"Optional\" word. The rest is Text anti-aliasing only (geometry identical).",
-      "pixels": 14367,
+      "note": "Fix round: Back keeps the draft; \"1 unsaved\" is muted; primary reads \"Record N deaths\"; Clear and Photos appear only when they can act; no reason lines. Allowed: selected segment weight 700 (#88); stepper draft value in ink, \"+1 unsaved\" muted beside the label (#88). Owner-approved delta: the optional inputs are the older quiet \"+ Litter weight\" / \"+ Assistance\" / \"+ Photos\" cards (4cb3d75), side by side, no \"Optional\" word. The rest is Text anti-aliasing only (geometry identical).",
+      "pixels": 15134,
       "maxDelta": 224,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.death.diff.png"
     },
     "farrowing.finish": {
       "note": "Owner-approved delta: the optional inputs are the older quiet \"+ Litter weight\" / \"+ Assistance\" / \"+ Photos\" cards (4cb3d75), side by side, no \"Optional\" word. Everything else on the sheet is identical; the sheet is shorter by the one-row cards.",
-      "pixels": 113108,
+      "pixels": 113044,
       "maxDelta": 224,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.finish.diff.png"
     },
     "farrowing.locked": {
-      "note": "Allowed: the All tab of the room underneath is weight 700 (#88). The \"more actions\" dots anti-alias differently.",
-      "pixels": 271,
-      "maxDelta": 41,
+      "note": "The three-up metric with the facts below it; Back is the outlined exit. Fix round (owner rules): drawers have no ✕; Back is the outlined exit, alone or beside a primary; the Active chip is the Status tone (blue), Done green; the three-up Born / Alive / Dead metric is one form on count, finish, locked and ended; Clear, Edit and View log are left out until they can act. Allowed: the All tab of the room underneath is weight 700 (#88). The \"more actions\" dots anti-alias differently.",
+      "pixels": 54160,
+      "maxDelta": 224,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.locked.diff.png"
     },
     "farrowing.edit": {
       "note": "Owner-approved delta: the corrections pattern. The footer says \"Save correction\"; a changed row shows its new value in ink with a muted \"was N\" beside the label; no banner, no Corrected tag. Unchanged, the screen is the baseline.",
-      "pixels": 725,
+      "pixels": 924,
       "maxDelta": 87,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.edit.diff.png"
     },
     "farrowing.born": {
-      "note": "Allowed: no designed focus ring (#84). Owner-approved: the Save correction label. The rest is Text anti-aliasing only (geometry identical).",
-      "pixels": 5006,
-      "maxDelta": 239,
+      "note": "Fix round: title \"Correct born\", no subtitle, the stepper is labelled (More born / Born should be); opening draws no focus ring. Allowed (#84): no designed focus ring.",
+      "pixels": 52509,
+      "maxDelta": 228,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.born.diff.png"
     },
     "farrowing.history": {
-      "note": "Allowed (#81): the seed event reads \"Aug 28\", the baseline said \"5 days ago\". The rest is Text anti-aliasing only (geometry identical).",
-      "pixels": 420,
-      "maxDelta": 159,
+      "note": "Allowed (#81): the seed event reads \"Aug 28\". Fix round: \"Farrowing finished\" is said once; stamps use initials (G.H).",
+      "pixels": 34873,
+      "maxDelta": 224,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.history.diff.png"
     },
     "farrowing.ended": {
-      "note": "Allowed: the All tab of the room underneath is weight 700 (#88). The \"more actions\" dots anti-alias differently.",
-      "pixels": 271,
-      "maxDelta": 42,
+      "note": "The shared metric. Fix round (owner rules): drawers have no ✕; Back is the outlined exit, alone or beside a primary; the Active chip is the Status tone (blue), Done green; the three-up Born / Alive / Dead metric is one form on count, finish, locked and ended; Clear, Edit and View log are left out until they can act. Allowed: the All tab of the room underneath is weight 700 (#88). The \"more actions\" dots anti-alias differently.",
+      "pixels": 70849,
+      "maxDelta": 224,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.ended.diff.png"
     },
     "farrowing.task-blocked": {
-      "note": "One pixel of text anti-aliasing.",
-      "pixels": 1,
-      "maxDelta": 21,
+      "note": "The two amber warning cards are gone: the Still farrowing and Awaiting rows of Task outcomes are the warning (amber word, what happens, ›).",
+      "pixels": 127829,
+      "maxDelta": 255,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.task-blocked.diff.png"
     },
     "farrowing.task-ready": {
-      "note": "One pixel of text anti-aliasing.",
-      "pixels": 1,
-      "maxDelta": 21,
+      "note": "The Awaiting row of Task outcomes carries the warning; no separate card.",
+      "pixels": 109186,
+      "maxDelta": 255,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.task-ready.diff.png"
     },
@@ -95,15 +95,15 @@
       "status": "identical"
     },
     "farrowing.task-outcomes": {
-      "note": "One pixel of text anti-aliasing.",
-      "pixels": 1,
-      "maxDelta": 21,
+      "note": "Same as task-ready.",
+      "pixels": 110232,
+      "maxDelta": 255,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.task-outcomes.diff.png"
     },
     "farrowing.edit-finished": {
       "note": "Owner-approved delta: the corrections pattern (\"Save correction\", \"was N\"). Unchanged, otherwise the baseline.",
-      "pixels": 725,
+      "pixels": 924,
       "maxDelta": 87,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.edit-finished.diff.png"

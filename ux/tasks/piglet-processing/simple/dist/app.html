@@ -269,7 +269,7 @@
   --shadow-sheet: 0 -10px 40px #27351d0b;
   --shadow-dialog: 0 -15px 55px #17290d30;
   --shadow-handle: 0 2px 5px #20301920;
-  --tap-min: 44px;
+  --tap-min: 48px;
   --control-height: 48px;
   --field-height: 48px;
   --row-min: 68px;
@@ -1155,11 +1155,6 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .pen-card .st-row.st-row .st-row-copy small{font-size:10px;line-height:1.6}
 .pen-card .st-row-chevron svg{width:14px;height:14px;stroke-width:1.8}
 .pen-card .st-row-chevron[data-rail="edit"] span{display:none}
-.pen-card .st-status[data-variant="chip"]{white-space:nowrap;min-height:20px;padding:3px 6px;font:600 10px/1.2 var(--font-sans)}
-.pen-card .st-status[data-variant="chip"] svg{display:none}
-.pen-card .st-status[data-variant="chip"][data-kind="active"]{color:#24613a;background:#e4f1e6;border-color:#c9e2cf}
-.pen-card .st-status[data-variant="chip"][data-kind="done"]{color:#596351;background:#eef1e9;border-color:#dde3d5}
-.pen-card .st-status[data-variant="chip"][data-kind="died"]{color:#914032;background:#fbede8;border-color:#f0d6cd}
 @media(max-width:370px){.pen-card .st-row.st-row{padding-left:11px;padding-right:11px}}
 /* Stepper, count (the hero counter) */
 .st-stepper[data-variant="count"]{padding:16px 12px 10px;margin-top:6px;background:var(--green-wash);border-radius:16px;row-gap:0}
@@ -1265,6 +1260,69 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-banner[data-size="card"] .st-banner-copy{align-self:center}
 .st-banner[data-size="card"] .st-banner-door{align-self:center}
 .st-heading[data-kind="panel"] .st-heading-title{font-size:12px;line-height:1.5}
+/* Glove floor (tap-min 48): where the approved baseline drew a 44px box, the visible box stays 44 and an invisible extender reaches 48. */
+:is(.farrowing-phone,.inspection-phone) :is(.button,.key){min-height:44px}
+.button{min-height:44px}
+:not(.sheet-footer):not(.dialog)>.button{position:relative}
+:not(.sheet-footer):not(.dialog)>.button::after{content:"";position:absolute;inset:-3px 0}
+.icon-button.icon-button{width:44px;min-width:44px;height:44px;min-height:44px}
+.icon-button::after{content:"";position:absolute;inset:-3px}
+.icon-button.room-filter-button,.room-dock>.icon-button.icon-button{width:48px;min-width:48px}
+.icon-button.room-filter-button{height:48px;min-height:48px}
+.room-dock>.icon-button.icon-button{height:auto;min-height:48px}
+/* OptionalRow: a small quiet card, "+ Label"; two sit side by side (the owner's older look, 4cb3d75). "Optional" stays in the accessible name, not on the card. */
+.st-optional-row{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(50% - 5px);min-height:48px;margin:12px 0 0;padding:10px;border:1px solid #e5eadc;border-radius:12px;background:#f8f9f3;color:#68745d;font-size:12px;text-align:center}
+.st-optional-copy{flex:0 1 auto;min-width:0;padding:0;align-items:center}
+.st-optional-head{justify-content:center;gap:0}
+.st-optional-label{font:400 12px/1.4 var(--font-sans);color:inherit}
+.st-optional-word{display:none}
+.st-optional-answer{font:400 11px/1.4 var(--font-sans);color:var(--ink)}
+.st-optional-act{order:-1;width:16px;height:16px;color:inherit}
+.st-optional-act svg{box-sizing:border-box;width:16px;height:16px;padding:0;border:0;border-radius:0;background:none;stroke-width:1.8}
+.st-optional-row[data-filled="true"],.st-optional-row[aria-expanded="true"]{border-color:#aebba3;background:#edf1e7;color:#293525}
+.st-optional-row:active{background:#edf1e7}
+.st-optional-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 0}
+.st-optional-list>.st-optional{display:contents}
+.st-optional-list .st-optional-row{width:100%;margin:0}
+.st-optional-list .st-optional-body,.st-optional-list>.finish-field,.st-optional-list>.st-choice-inline{grid-column:1/-1;margin:0}
+.st-photos .st-optional-row{margin:0}
+.st-photos-camera{width:calc(50% - 5px)}
+/* hit extenders: invisible, so the visible box stays the approved 44 while the target reaches 48 */
+.st-segment button,.farrowing-phone .key{position:relative}
+.st-segment button::after{content:"";position:absolute;inset:-3px 0}
+.farrowing-phone .key::after{content:"";position:absolute;inset:-2px}
+/* transparent targets grow by padding and a matching negative margin: no pseudo-element, layout unchanged */
+.room-pen-name,.edit-finish-door{min-height:48px;margin-top:-2px;margin-bottom:-2px}
+.st-fact-link{min-height:48px;min-width:48px;margin:-12px 0}
+.dialog .sheet-footer>.button.secondary{background:#fff;border:1px solid var(--back-border)}
+/* a tap leaves no ring: only keyboard focus may draw one */
+:is(.farrowing-phone,.inspection-phone,.phone,.device,.atlas-phone) :focus:not(:focus-visible){outline:none}
+/* stepper keys and value in rows: the target is 48, the face stays 44, the margins give the space back */
+.st-stepper[data-variant="row"] .st-stepper-key.st-stepper-key,.st-stepper[data-variant="bare"] .st-stepper-key.st-stepper-key{width:48px;min-width:48px;min-height:48px;margin:-2px}
+.st-stepper[data-variant="row"] .st-stepper-value{display:grid;place-items:center;min-width:calc(3ch + 12px);width:calc(3ch + 12px);min-height:48px;margin:-12px -6px}
+.st-heading-action{position:relative;z-index:1}
+/* Status chips: one look per meaning (tones come from Status), and a chip never wraps */
+.st-row-chip.st-row-chip{white-space:nowrap;overflow-wrap:normal;max-width:none}
+.st-row-identity{width:auto;min-width:var(--animal-id-col)}
+/* Back is always the outlined exit, alone or beside a primary */
+.surface-back:only-child,.sheet-footer>.button.surface-back.surface-back:only-child{flex:1 1 auto;width:auto;min-width:0;background:var(--paper);border-color:var(--back-border);color:var(--ink);font-weight:500}
+.surface-back:only-child:active{background:var(--back-press);border-color:var(--back-border);color:var(--ink)}
+/* Record facts: labels in muted ink; the drill-in label keeps the row's line, its target grows by a pseudo-element */
+.st-facts[data-variant="record"] dt{color:var(--muted);font-size:12px}
+.st-fact-link{position:relative;min-height:0;min-width:0;margin:0}
+.st-fact-link::after{content:"";position:absolute;inset:-16px -4px}
+.death-breakdown-link{position:relative}
+.death-breakdown-link::after{content:"";position:absolute;inset:-16px -8px}
+/* Heading action: the target grows by a pseudo-element, so nothing clips it and the heading keeps its height */
+.st-heading .st-heading-action :is(button,a){min-height:0;margin:0}
+.st-heading .st-heading-action :is(button,a)::after{content:"";position:absolute;inset:-16px -8px}
+.st-heading .st-heading-action :is(button,a){position:relative}
+.st-photos{margin:12px 0}
+.facts-surface .finish-totals{margin:0 0 20px;padding:0;border:0;background:none}
+.farrowing-phone .sheet[data-view=death] .st-choice-heading{padding-left:0;margin-top:16px}
+.st-photos{margin:8px 0 12px}
+.death-breakdown-link{display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;font:inherit;color:inherit;white-space:nowrap}
+.death-breakdown-link svg{width:12px;height:12px;color:var(--muted)}
 
 </style>
 <style>/* ../../../design-system/components/task-skeleton.css */
@@ -2604,7 +2662,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
       return `<div class="dialog-backdrop" data-ds="Sheet" data-variant="dialog"${sLayer(layer)}><div class="dialog${cls}" role="dialog" aria-modal="true" tabindex="-1"${id?` id="${esc(id)}"`:''}${vw}${inert?' inert':''}${sL(label??title)}${ex}><div class="dialog-body${bodyClass?' '+esc(bodyClass):''}"><h2 class="dialog-title">${icon?sGlyph(icon):''}${sT(title)}</h2>${subtitle?`<p class="dialog-desc">${sParts(subtitle)}</p>`:''}${body}</div>${foot}</div></div>`;
     }
     const sub=subtitle?`<p class="sheet-subtitle"${subtitleTone?` data-tone="${esc(subtitleTone)}"`:''}>${sParts(subtitle)}</p>`:'';
-    const cl=Object.assign({action:'dismiss'},close||{}),noClose=close===false,closeLabel=sObj(cl.label||{text:'Close',str:'act.close'}),x=v==='drawer'&&!noClose?iconButton({variant:'plain',action:cl.action,value:cl.value,icon:sGlyph('close'),label:closeLabel.text||'Close',className:'sheet-close',attrs:closeLabel.str?{'data-str-attr':'aria-label:'+closeLabel.str}: {}}):'';
+    const cl=Object.assign({action:'dismiss'},close||{}),noClose=close===false,closeLabel=sObj(cl.label||{text:'Close',str:'act.close'}),x=v==='drawer'&&!noClose&&f===false?iconButton({variant:'plain',action:cl.action,value:cl.value,icon:sGlyph('close'),label:closeLabel.text||'Close',className:'sheet-close',attrs:closeLabel.str?{'data-str-attr':'aria-label:'+closeLabel.str}: {}}):'';
     const head=`<header class="utility-header${headClass?' '+esc(headClass):''}">${lead}<div class="sheet-titles"><h2 class="sheet-title">${sT(title)}</h2>${sub}</div>${aside?`<div class="sheet-aside">${aside}</div>`:''}${x}</header>`;
     const common=`data-ds="Sheet" tabindex="-1"${sLayer(layer)}${inert?' inert':''}${id?` id="${esc(id)}"`:''}${vw}${sL(label??title)}${ex}`;
     const main=`${head}${above}<div class="sheet-body${bodyClass?' '+esc(bodyClass):''}">${body}</div>${foot}`;

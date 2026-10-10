@@ -752,11 +752,6 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .pen-card .st-row.st-row .st-row-copy small{font-size:10px;line-height:1.6}
 .pen-card .st-row-chevron svg{width:14px;height:14px;stroke-width:1.8}
 .pen-card .st-row-chevron[data-rail="edit"] span{display:none}
-.pen-card .st-status[data-variant="chip"]{white-space:nowrap;min-height:20px;padding:3px 6px;font:600 10px/1.2 var(--font-sans)}
-.pen-card .st-status[data-variant="chip"] svg{display:none}
-.pen-card .st-status[data-variant="chip"][data-kind="active"]{color:#24613a;background:#e4f1e6;border-color:#c9e2cf}
-.pen-card .st-status[data-variant="chip"][data-kind="done"]{color:#596351;background:#eef1e9;border-color:#dde3d5}
-.pen-card .st-status[data-variant="chip"][data-kind="died"]{color:#914032;background:#fbede8;border-color:#f0d6cd}
 @media(max-width:370px){.pen-card .st-row.st-row{padding-left:11px;padding-right:11px}}
 /* Stepper, count (the hero counter) */
 .st-stepper[data-variant="count"]{padding:16px 12px 10px;margin-top:6px;background:var(--green-wash);border-radius:16px;row-gap:0}
@@ -903,3 +898,25 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper[data-variant="row"] .st-stepper-key.st-stepper-key,.st-stepper[data-variant="bare"] .st-stepper-key.st-stepper-key{width:48px;min-width:48px;min-height:48px;margin:-2px}
 .st-stepper[data-variant="row"] .st-stepper-value{display:grid;place-items:center;min-width:calc(3ch + 12px);width:calc(3ch + 12px);min-height:48px;margin:-12px -6px}
 .st-heading-action{position:relative;z-index:1}
+/* Status chips: one look per meaning (tones come from Status), and a chip never wraps */
+.st-row-chip.st-row-chip{white-space:nowrap;overflow-wrap:normal;max-width:none}
+.st-row-identity{width:auto;min-width:var(--animal-id-col)}
+/* Back is always the outlined exit, alone or beside a primary */
+.surface-back:only-child,.sheet-footer>.button.surface-back.surface-back:only-child{flex:1 1 auto;width:auto;min-width:0;background:var(--paper);border-color:var(--back-border);color:var(--ink);font-weight:500}
+.surface-back:only-child:active{background:var(--back-press);border-color:var(--back-border);color:var(--ink)}
+/* Record facts: labels in muted ink; the drill-in label keeps the row's line, its target grows by a pseudo-element */
+.st-facts[data-variant="record"] dt{color:var(--muted);font-size:12px}
+.st-fact-link{position:relative;min-height:0;min-width:0;margin:0}
+.st-fact-link::after{content:"";position:absolute;inset:-16px -4px}
+.death-breakdown-link{position:relative}
+.death-breakdown-link::after{content:"";position:absolute;inset:-16px -8px}
+/* Heading action: the target grows by a pseudo-element, so nothing clips it and the heading keeps its height */
+.st-heading .st-heading-action :is(button,a){min-height:0;margin:0}
+.st-heading .st-heading-action :is(button,a)::after{content:"";position:absolute;inset:-16px -8px}
+.st-heading .st-heading-action :is(button,a){position:relative}
+.st-photos{margin:12px 0}
+.facts-surface .finish-totals{margin:0 0 20px;padding:0;border:0;background:none}
+.farrowing-phone .sheet[data-view=death] .st-choice-heading{padding-left:0;margin-top:16px}
+.st-photos{margin:8px 0 12px}
+.death-breakdown-link{display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;font:inherit;color:inherit;white-space:nowrap}
+.death-breakdown-link svg{width:12px;height:12px;color:var(--muted)}

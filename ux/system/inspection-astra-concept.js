@@ -14,6 +14,8 @@ const stOptionalRow=o=>SentriUI.optionalRow(o);
 const stHeading=o=>globalThis.SentriUI?.heading?globalThis.SentriUI.heading(o):'';
 const stPanel=(content,options={})=>globalThis.SentriUI?.panel?globalThis.SentriUI.panel(content,options):content;
 const stFacts=(items,options={})=>globalThis.SentriUI?.facts?globalThis.SentriUI.facts(items,options):'';
+// A fact the record does not have is left out, not printed as a dash; a section with none is left out too.
+const knownFacts=items=>items.filter(i=>i&&(i.value!==null&&i.value!==undefined&&i.value!==''||i.valueHtml!=null||i.html));
 const stRow=o=>globalThis.SentriUI?.row?globalThis.SentriUI.row(o):button(o.action||'',`<span class="action-symbol">${o.icon||icon('chevron')}</span><span><strong>${esc(o.title)}</strong><small>${esc(o.description||'')}</small></span>${icon('chevron')}`,'action-item',o.value||'');
 const stLog=(groups,options={})=>globalThis.SentriUI?.log?globalThis.SentriUI.log(groups,options):'';
 const stIconButton=o=>SentriUI.iconButton({...o,variant:o.action==='clear'?'plain':o.variant||'bordered'});
@@ -250,7 +252,7 @@ function stageSummary(p){
  const label=(p.stage==='Off production'&&p.breedingStatus==='Open'?'Open':null)||({Gestating:'Gestation',Lactating:'Lactation'})[p.stage]||p.stage||'Stage';
  const start=p.stageStartedAt||(p.stage==='Gestating'?p.registry?.serviceDate:p.stage==='Lactating'?p.registry?.farrowingDate:p.stage==='Off production'?p.registry?.offProductionSince:null);
  const days=daysFromWalk(start);
- return label+' · '+(days!==null&&days>=0?days+' '+(days===1?'day':'days'):'—');
+ return days!==null&&days>=0?label+' · '+days+' '+(days===1?'day':'days'):label;
 }
 function penFeedStatus(pe){
  return pe.mode!=='adlib'&&pe.pigs.length&&pe.pigs.every(p=>p.noFeed)?'No feed':pe.switchDue?'Formula due':'';
@@ -493,7 +495,7 @@ function overviewDetails(p,c){
  for(const [key,label,unit] of [['weight','Weight','kg'],['temperature','Temperature','°C']])facts.push(factItem(label,p[key],unit,measurementAge(p,key)));
  facts.push(factItem('On farm',r.onFarm===undefined?null:r.onFarm?'Yes':'No'));
  
- return stFacts(facts);
+ const known=knownFacts(facts);return known.length?stFacts(known):'';
 }
 function typeDetails(p,c){
  const r=p.registry||{},type=animalType(p);let title='',items=[];
@@ -506,7 +508,7 @@ function typeDetails(p,c){
  else if(['Grower','Finisher','Weaner'].includes(type)){title='Growth';items=[['Entry weight',r.entryWeight,'kg'],['Entry date',r.growthEntryDate]];}
  if(!title)return '';
  const titleHeading=stHeading({title,icon:icon(type==='Sow'||type==='Gilt'?'clock':type==='Boar'?'profile':'weight'),kind:'section',level:4});
- return '<section class="detail-section reading-section animal-type-section">'+titleHeading+stFacts([...items.map(([label,value,unit,meta,mono])=>factItem(label,value,unit,meta,mono)),overviewNextTask(p,c),...(['Sow','Gilt'].includes(type)?[factItem('Parity',p.parity)]:[])])+'</section>';
+ const known=knownFacts([...items.map(([label,value,unit,meta,mono])=>factItem(label,value,unit,meta,mono)),overviewNextTask(p,c),...(['Sow','Gilt'].includes(type)?[factItem('Parity',p.parity)]:[])]);return known.length?'<section class="detail-section reading-section animal-type-section">'+titleHeading+stFacts(known)+'</section>':'';
 }
 function measurementDateAge(date){const days=daysFromWalk(date);return days===null?'':days===0?'Today':days>0?days+' days ago':'';}
 function dueDateLabel(date){const days=daysFromWalk(date);return days===null?'':days===0?'Today':days<0?'In '+(-days)+' days':days+' days past expected';}
@@ -516,7 +518,7 @@ function pigOverview(c){
 
  const general=stHeading({title:'General details',icon:icon('profile'),kind:'section',level:4});
  const record=stHeading({title:'Pig record',icon:icon('note'),kind:'section',level:4});
- return sheet(c,p.id,unitName(c)+' · '+pe.id+' · '+stageSummary(p),pigRecordCards(p)+pigCurrentTasks(c)+'<section class="detail-section reading-section pig-overview-facts">'+general+overviewDetails(p,c)+'</section>'+typeDetails(p,c)+pigFeedFacts(p,pe)+'<section class="detail-section reading-section pig-record-links">'+record+'<div class="compact-actions detail-destinations st-panel st-row-group">'+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p));
+ return sheet(c,p.id,unitName(c)+' · '+pe.id+' · '+stageSummary(p),pigRecordCards(p)+pigCurrentTasks(c)+(()=>{const d=overviewDetails(p,c);return d?'<section class="detail-section reading-section pig-overview-facts">'+general+d+'</section>':''})()+typeDetails(p,c)+pigFeedFacts(p,pe)+'<section class="detail-section reading-section pig-record-links">'+record+'<div class="compact-actions detail-destinations st-panel st-row-group">'+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p));
 }
 function penOverview(c){const pe=pen(c,c.penId),records=[];if(pe.note)records.push(recordCard({kind:'Pen note',title:pe.note,meta:pe.noteBy,tone:'record-neutral record-note-preview',link:'read-pen-note',value:pe.id}));return sheet(c,'Pen '+pe.id,countLabel(pe.pigs.length)+' · '+unitName(c),
  (records.length?'<div class="record-card-stack" aria-label="Pen notes">'+records.join('')+'</div>':'')+'<section class="detail-section">'+stHeading({title:'Pen information',icon:icon('grid'),kind:'section',level:4})+'<div class="compact-actions st-panel st-row-group">'+action('feed','feed','Feed guidance',pe.formula+' · '+feedLabel(pe),pe.id)+action('pen-note','note',pe.note?'Edit pen note':'Add pen note',pe.note?'Update the note for this pen':'Leave information for the next person',pe.id)+action('pen-log','clock','Pen log','Transfers, health and notes',pe.id)+'</div></section>',footer(back(),''));}
@@ -763,11 +765,12 @@ function productionHostActionEligible(c,p,action){
  if(['remove-batch','move-batch'].includes(action.id))return false;
  const scope=hostProductionScope(action);return scope!=='other'&&eligibleProductionScopes(c,p).has(scope);
 }
+const inSowEmbed=()=>new URLSearchParams(globalThis.location?.search||'').get('embed')==='sow';
 function productionActionsForPig(c,p){
  if(!p||p.stage==='Sow died')return [];
  const rows=[],tasks=currentTasksForPig(c,p).filter(task=>(task.type||'').toLowerCase()==='production');
  for(const task of tasks){
-  if(task.id==='farrowing'||/farrowing/i.test(task.title||''))rows.push({a:'open-farrowing',k:'chart',title:'Open Farrowing',sub:'Continue the active farrowing task',value:'farrowing',section:'farrowing'});
+  if(task.id==='farrowing'||/farrowing/i.test(task.title||''))inSowEmbed()||rows.push({a:'open-farrowing',k:'chart',title:'Open Farrowing',sub:'Continue the active farrowing task',value:'farrowing',section:'farrowing'});
   else if(task.id==='piglet-processing'&&(c.hostActions||[]).some(action=>action.id==='piglets'&&!action.reason))continue;
   else rows.push({a:task.id==='piglet-processing'?'sow-current-task':'production-task',k:'chart',title:task.title,sub:[task.status,task.summary].filter(Boolean).join(' · '),value:task.id,section:productionTaskScope(task,p)});
  }
@@ -792,7 +795,7 @@ function actionCatalogue(c){
  if(!hasCases&&live)unavailable.push({title:'Resolve conditions',group:'health',k:'check',reason:'No open conditions to resolve.'},{title:'Care instructions',group:'health',k:'alert',reason:'Record a health finding first.'});
  
  const hostGeneral=host.filter(x=>x.group==='routine'&&!x.reason),hostRecords=host.filter(x=>x.group==='records'&&!x.reason),hasUnifiedNote=hostGeneral.some(x=>x.id==='marker');
- const measurements=live?[item('measurements-menu','measure','Measurements & condition',single?'Body condition, weight, temperature and backfat':'Body condition and measurements')]:[];
+ const measurements=live?[item('measurements-menu','measure','Measurements & condition',single?'Weight, condition, backfat':'Body condition and measurements')]:[];
  const adjustFeed=live&&rows.some(p=>!feedUnavailableReason(p,penOf(c,p.id)))?[item('feed-edit-selected','feed','Adjust feed','Review the current daily allowance')]:[];
  if(live&&!adjustFeed.length)unavailable.push({title:'Adjust feed',group:'routine',k:'feed',reason:feedUnavailableReason(rows[0],penOf(c,rows[0].id))+'.'});
  add('routine','Routine',[...hostGeneral.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...(!hasUnifiedNote?[item('note','note','Add a note',single?'Leave a note for this sow':'The same note for these pigs')]:[]),...hostRecords.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...measurements,...adjustFeed]);
@@ -817,7 +820,7 @@ function actionsPage(c){
  const body=actionSections(c,groups)+(unavailable.length?button('unavailable-actions',`Unavailable actions (${unavailable.length}) ${icon('chevron')}`,'unavailable-actions-link'):'');
  return sheet(c,'More actions',single?p.id+' · '+penOf(c,p.id).id:selectionLabel(c),body,'');
 }
-function actionCategoryNav(c){const batch=picked(c).length!==1||c.selectedPens.size>0,groups=actionCatalogue(c).groups.filter(g=>!batch||g.id!=='production'),current=groups.some(g=>g.id===c.actionCategory)?c.actionCategory:groups[0]?.id;return globalThis.SentriUI.categoryFooter({categories:groups.map(g=>({id:g.id,label:g.label})),active:current,backAction:'back',categoryAction:'action-category',label:'Action categories',className:'record-toolbar actions-bottom-bar'});}
+function actionCategoryNav(c){const batch=picked(c).length!==1||c.selectedPens.size>0,groups=actionCatalogue(c).groups.filter(g=>!batch||g.id!=='production'),current=groups.some(g=>g.id===c.actionCategory)?c.actionCategory:groups[0]?.id;return globalThis.SentriUI.categoryFooter({categories:inSowEmbed()?[]:groups.map(g=>({id:g.id,label:g.label})),active:current,backAction:'back',categoryAction:'action-category',label:'Action categories',className:'record-toolbar actions-bottom-bar'});}
 
 function measurementsMenu(c){
  const rows=picked(c),single=rows.length===1,items=[];
@@ -976,7 +979,7 @@ function recordValue(value,unit=''){return hasRecordValue(value)?esc(value)+(uni
 function profileFacts(title,items){
  const symbol={'Basic information':'profile','Sow & cycle':'clock','Body & cycle':'weight','Production totals & averages':'chart','Origin & dates':'origin','Identity records':'profile'}[title];
  const heading=stHeading({title,icon:symbol?icon(symbol):'',kind:'section',level:4});
- return '<section class="profile-section">'+heading+stFacts(items.map(([label,value,unit,mono])=>({label,value:hasRecordValue(value)?value+(unit?(unit==='%'?'':' ')+unit:''):null,mono:!!mono})))+'</section>';
+ const known=knownFacts(items.map(([label,value,unit,mono])=>({label,value:hasRecordValue(value)?value+(unit?(unit==='%'?'':' ')+unit:''):null,mono:!!mono})));return known.length?'<section class="profile-section">'+heading+stFacts(known)+'</section>':'';
 }
 function filterLogEntries(events,category){return category==='All'?events:events.filter(e=>eventCategory(e)===category);}
 function pigLogEntries(c){const p=pig(c,c.pigId);return [...c.events.filter(e=>e.subjects.includes(p.id)).map(e=>({...e,time:'Today · '+e.time})),...(p.initialRecords||[])];}
@@ -1353,7 +1356,7 @@ function showMobileScrollIndicator(scroller){
 function sowDetailContext(record,previous){
  const c=previous||seed(),existing=previous&&pig(c,record.id);
  const p=existing||{id:record.id,base:0,factor:1,cases:[],registry:{type:'Sow'},initialRecords:[]};
- Object.assign(p,{id:record.id,parity:record.parity,stage:record.stage});
+ Object.assign(p,{id:record.id,parity:record.parity,stage:record.stage});if(record.batch)p.batchId=record.batch;p.registry=Object.assign({},p.registry,{type:'Sow'},record.breed?{breed:record.breed,onFarm:true}:{},record.serviceDate?{serviceDate:record.serviceDate,expectedFarrowing:record.expectedFarrowing}:{});
  p.initialRecords=(record.events||[]).map(e=>({category:'Production',title:e.text,time:[e.day,e.time].filter(Boolean).join(' · '),who:e.who}));
  const pe=previous&&penOf(c,p.id)||{mode:'unknown',formula:'',faults:[],pigs:[]};
  pe.id=record.pen;pe.pigs=[p];c.pens=[pe];c.batches=[];c.unitLabel=record.unit;

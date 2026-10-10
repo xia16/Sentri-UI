@@ -243,4 +243,11 @@
 .farrowing-phone .key:active:not(:disabled){background:var(--ink);color:#fff}
 .farrowing-phone .sow-title-link::after{content:"";position:absolute;inset:-2px 0}
 .farrowing-phone .finish-extras.st-optional-list{margin-top:0}
+.farrowing-phone .finish-extras>.st-choice-inline{justify-self:start}
 .farrowing-phone .entry-was{margin-left:6px;font:400 11px var(--font-sans);color:var(--muted)}
+/* The task outcome rows that carry a warning are the door: an amber word, what happens, a chevron */
+.farrowing-phone .task-outcome-door{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:48px;padding:0;background:transparent;text-align:left;color:inherit}
+.farrowing-phone .task-outcome-door strong{display:block;font-weight:600;color:var(--amber)}
+.farrowing-phone .task-outcome-door small{display:block;font-size:11px;line-height:1.5;color:var(--muted)}
+.farrowing-phone .task-outcome-door svg{width:14px;height:14px;color:var(--muted)}
+.farrowing-phone .task-outcome-warn dt{flex:1}
