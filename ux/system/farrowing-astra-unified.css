@@ -244,7 +244,6 @@
 .farrowing-phone .key:active:not(:disabled){background:var(--ink);color:#fff}
 .farrowing-phone .sow-title-link::after{content:"";position:absolute;inset:-2px 0}
 .farrowing-phone .finish-extras.st-optional-list{margin-top:0}
-.farrowing-phone .finish-extras>.st-choice-inline{justify-self:start}
 .farrowing-phone .entry-was{margin-left:6px;font:400 13px var(--font-sans);color:var(--muted)}
 /* The task outcome rows that carry a warning are the door: an amber word, what happens, a chevron */
 .farrowing-phone .task-outcome-door{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:48px;padding:0;background:transparent;text-align:left;color:inherit}
@@ -252,3 +251,16 @@
 .farrowing-phone .task-outcome-door small{display:block;font-size:13px;line-height:1.5;color:var(--muted)}
 .farrowing-phone .task-outcome-door svg{width:14px;height:14px;color:var(--muted)}
 .farrowing-phone .task-outcome-warn dt{flex:1}
+
+/* Correct born opens in place under the Born row: one surface, rows separated by a rule. */
+.farrowing-phone .born-correction{display:flex;flex-direction:column;gap:12px;flex:none;padding:12px 0 16px;border-bottom:1px solid var(--rule)}
+.farrowing-phone .born-correction .st-stepper{flex:none}
+/* The outcome rows that open a list: the count, then the chevron; the whole row is the door. */
+.farrowing-phone .task-outcome-warn{position:relative}
+.farrowing-phone .task-outcome-door::after{content:"";position:absolute;inset:0}
+.farrowing-phone .task-outcomes-list>.task-outcome-warn dd{display:flex;align-items:center;gap:8px}
+.farrowing-phone .task-outcomes-list>.task-outcome-warn dd svg{width:14px;height:14px;color:var(--muted)}
+.farrowing-phone .edit-counts.born-open{flex:none;min-height:0}
+
+/* Litter summary on the count drawer: Born and Dead sit on the panel's own edge, no second box inside it. */
+.farrowing-phone .count-record-surface .finish-totals{background:none;padding:0;border-radius:0;grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:12px}

@@ -54,3 +54,11 @@
 .pen-detail-section:last-child{margin-bottom:0}
 .pen-detail-section h4{font-size:13px;margin:0 0 12px}
 .farrowing-phone .room-filter-summary button{min-height:44px}
+/* Go to pen: a pen that can't be opened stays readable. It sits on a quiet surface and says why in one word on one line. */
+.pen-cell small{white-space:nowrap}
+.pen-cell:disabled{background:var(--inset);border-color:var(--line);color:var(--ink-2)}
+.pen-cell:disabled small{color:var(--muted)}
+.pen-cell>strong{color:inherit}
+
+/* The dock names the pen you are in; a pinned header only left an empty stub under the tabs while the card scrolled away. */
+.farrowing-phone .room-list .pen-top{position:static}

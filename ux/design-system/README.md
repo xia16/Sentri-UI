@@ -32,13 +32,9 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
 
 ### Type
 
-- **Plus Jakarta Sans** for everything a person reads as language, at 400, 500 and 600. Headings are 500, not bold: `page-title` 22px, `sheet-title` 20px, `section-title` 13px, `group-label` 11px in `muted`. (`panel-title` 12px is retired: a title inside a panel is a group label; Heading has three kinds, page, section and group.)
+- **Plus Jakarta Sans** for everything a person reads as language, at 400, 500 and 600. Headings are 500, not bold: `page-title` 22px, `sheet-title` 20px, `section-title` 16px, `group-label` 13px in `muted`. (`panel-title` 12px is retired: a title inside a panel is a group label; Heading has three kinds, page, section and group.)
 - **IBM Plex Mono** for everything a person reads off the barn: ear tags and pen codes (`identifier`), counts and measurements (`figure`, `figure-lg`, `hero-count`), badge numbers and overlines. Use tabular numerals for counts that tick.
-- Sizes follow the farm legibility law below. Until the type-size pass lands, several tokens sit under it (`row-title` 13, `description` 11, `group-label` 11, `meta` 10); new work doesn't use the ones under 13.
-
-### The farm legibility law
-
-Sentri is read in barn light, gloved, at arm's length, for two seconds. Primary content (row titles, field values, choices, button labels, numbers acted on) is at least 16px; everything else is at least 13px, except the phone's status bar. Text contrast is at least 4.5:1, and 7:1 for numbers a farmer acts on. Ink, not pale grey, for anything that must be read. Tap targets are at least 48 × 48 (the control or an invisible hit area). Crowding is fixed by tightening copy and layout, never by shrinking type. `scripts/check-legibility.mjs` checks it.
+- Body text in rows is 16px (`row-title`) over 13px (`description`); fields, choices and buttons are 16px. `meta` is 13px, the floor of the farm legibility law below; nothing a person reads is smaller.
 - Headings take slight negative tracking (−0.5px at 22px, −0.4px at 20px); everything at 13px and below tracks at 0.
 
 ### Space, size and layout
@@ -76,6 +72,16 @@ State changes in place instantly; position changes only when the hand is done.
 
 ## The laws
 
+### The farm legibility law
+
+Barn, glare, gloves, arm's length, two seconds. Every screen is read this way, so these floors are binding. `node scripts/check-legibility.mjs` measures them on every atlas screen (the gate level is set in `docs/design-workflow/README.md`).
+
+- **Type.** Primary values and body text are at least 16px. Secondary and meta text are at least 13px. Nothing visible is under 13px except the phone's own status bar.
+- **Contrast.** At least 4.5:1 for all text, and at least 7:1 for primary values and the numbers a farmer acts on. Ink, not pale grey, for anything that must be read. `muted` holds 4.5:1 on `paper`, `app-background`, `inset` and `well` only.
+- **Targets.** Every tap target is at least 48 by 48 (the control itself, or an invisible hit area).
+- **Disabled is not faded.** A disabled or waiting control (a greyed button, a pen tile, a row) shows that it is unavailable with its surface, its rim, an icon or a word, never with faded text. Its text meets 4.5:1 like any other (`ink` on the disabled surface; 7:1 at 16px and up). The checker measures disabled text too. Labels never wrap in a tile; shorten the copy or give the tile room.
+- **Crowding is fixed by tightening copy and layout, never by shrinking type.**
+
 ### The row
 
 "Left is information, right is what happens there." Two lines, every row, one height across the product. Line 1 is the fact in sentence case; line 2 is lowercase mono tokens separated by `·` in a fixed order — time → counts → codes (`started 6h · parity 3`).
@@ -88,7 +94,7 @@ First segment is the working pile, second the finished pile, All always last. A 
 
 ### The record sheet
 
-Fields stack in capture order, never in columns. The bar holds at most two actions, primary right. Only these fields may enter a sheet: **Choice** (2–4 outcomes; a fifth makes it a picker), **Scale** (3–5 graded steps), **Stepper** (counting animals; outlined keys in row, count and well variants — [card](components/Stepper/README.md)), **Measure** (mono, unit always shown — [card](components/Measure/README.md)), **Checklist**, **Numpad** (typed input only: ear tags and weights, under a Measure or in a run — [card](components/Numpad/README.md)), **Picker**, **Multi-picker**, **Note** (optional unless a choice requires it; never the primary way to capture a fact) and **Photos** (up to 12, attached to the event — [card](components/Photos/README.md), candidate). A **Choice** of 2–3 short outcomes is ChoiceList's inline radio (candidate, ADR 0002). **Optional inputs are quiet "+ Label" cards** (the pre-#55 look): small cards below the required fields, one per input, each opening its field when tapped, e.g. "+ Litter weight". Never chips, and never a full-width row with a muted "Optional" ([card](components/Field/README.md)). A dependent field appears inline beneath its trigger; if a reveal would push more than two fields, the event is a composite of summary rows.
+Fields stack in capture order, never in columns. The bar holds at most two actions, primary right. Only these fields may enter a sheet: **Choice** (2–4 outcomes; a fifth makes it a picker), **Scale** (3–5 graded steps), **Stepper** (counting animals; outlined keys in row, count and well variants — [card](components/Stepper/README.md)), **Measure** (mono, unit always shown — [card](components/Measure/README.md)), **Checklist**, **Numpad** (typed input only: ear tags and weights, under a Measure or in a run — [card](components/Numpad/README.md)), **Picker**, **Multi-picker**, **Note** (optional unless a choice requires it; never the primary way to capture a fact) and **Photos** (up to 12, attached to the event — [card](components/Photos/README.md), candidate). A **Choice** of 2–3 short outcomes is ChoiceList's inline radio (candidate, ADR 0002). **Optional inputs are optional rows**, never chips or a label with a small "Optional". Empty, an optional is a small quiet "+ Label" card (two sit side by side; "Optional" stays in its accessible name). Filled, it becomes a full-width row: the label, the value under it (two lines at most, wrapped, never one line past the edge) and an edit icon at the right. Open, its border turns ink, never green; its field or choice sits beneath it on the same quiet surface. Optionals sit below the required fields in capture order ([card](components/Field/README.md)). A dependent field appears inline beneath its trigger; if a reveal would push more than two fields, the event is a composite of summary rows.
 
 ### The drawer convention (law; owner, 2026-10-10)
 

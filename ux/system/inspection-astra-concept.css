@@ -324,25 +324,19 @@
 .inspection-phone .profile-next-card>strong{font-size:15px;line-height:1.4;font-weight:600}
 .inspection-phone .pig-current-tasks{margin:0 0 24px}
 .inspection-phone .pig-current-tasks-heading{display:flex;align-items:center;justify-content:space-between;gap:7px;min-height:44px;margin-bottom:8px;padding:0}
-.inspection-phone .pig-current-tasks-heading h4{margin:0;font-size:var(--type-row-title-size);font-weight:600}
-.inspection-phone .pig-current-tasks-heading>span{font-size:var(--type-meta-size);line-height:1.4;color:#687261}
-.inspection-phone .pig-current-task-list{display:flex;gap:10px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0}
-.inspection-phone .pig-current-task-list::-webkit-scrollbar{display:none}
-.inspection-phone .pig-current-task-entry{display:grid;grid-template-columns:30px minmax(0,1fr) auto 12px;align-items:center;gap:9px;flex:0 0 calc(100% - 24px);min-width:0;min-height:56px;padding:8px 10px;background:#fff;text-align:left;border:1px solid #dce1d6;border-radius:12px;scroll-snap-align:start}
-.inspection-phone .pig-current-task-list[data-task-count="1"]>.pig-current-task-entry{flex-basis:100%}
-
-.inspection-phone .pig-current-task-entry:hover{background:#f7f8f4}
-.inspection-phone .pig-current-task-icon{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;background:#eef1e9;color:#53634b}
+.inspection-phone .pig-current-tasks-heading h4{margin:0;font-size:var(--type-meta-size);font-weight:600}
+.inspection-phone .pig-current-tasks-heading>span{font-size:var(--type-meta-size);line-height:1.4;color:var(--muted)}
+.inspection-phone .pig-current-task-list{display:flex;flex-direction:column;gap:8px;padding:0}
+.inspection-phone .pig-current-task-entry{display:grid;grid-template-columns:30px minmax(0,1fr) auto 14px;grid-template-areas:"icon title type chev" "icon sub sub chev";align-items:center;column-gap:10px;row-gap:2px;min-width:0;min-height:64px;padding:10px 12px;background:#fff;text-align:left;border:1px solid #dce1d6;border-radius:12px}
+.inspection-phone .pig-current-task-copy{display:contents}
+.inspection-phone .pig-current-task-icon{grid-area:icon;display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;background:#eef1e9;color:#53634b}
 .inspection-phone .pig-current-task-icon svg{width:14px;height:14px}
 .inspection-phone .pig-current-task-entry.is-due .pig-current-task-icon{background:#fff1d7;color:#8b5f18}
 .inspection-phone .pig-current-task-entry.is-active .pig-current-task-icon{background:#e2eee1;color:#31543a}
-.inspection-phone .pig-current-task-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
-.inspection-phone .pig-current-task-copy strong{min-width:0;overflow-wrap:anywhere;font-size:var(--type-row-title-size);line-height:1.4;font-weight:600}
-.inspection-phone .pig-current-task-copy small{font-size:var(--type-meta-size);line-height:1.45;color:var(--muted);overflow-wrap:anywhere}
-.inspection-phone .pig-current-task-type{justify-self:end;padding:3px 6px;border-radius:5px;background:#f0f2ec;color:#5f6858;font-size:var(--type-meta-size);line-height:1.35;font-weight:600;white-space:nowrap}
-.inspection-phone .pig-current-task-entry.task-health .pig-current-task-type{background:#fff3df;color:#815c21}
-.inspection-phone .pig-current-task-entry.task-production .pig-current-task-type{background:#e9efe4;color:#4c6145}
-.inspection-phone .pig-current-task-entry>svg{width:12px;height:12px;color:#64715a}
+.inspection-phone .pig-current-task-copy strong{grid-area:title;min-width:0;font-size:var(--type-row-title-size);line-height:1.4;font-weight:600;overflow-wrap:anywhere}
+.inspection-phone .pig-current-task-copy small{grid-area:sub;min-width:0;font-size:var(--type-meta-size);line-height:1.45;color:var(--muted)}
+.inspection-phone .pig-current-task-type{grid-area:type;justify-self:end;font-size:var(--type-meta-size);line-height:1.4;font-weight:400;color:var(--muted);white-space:nowrap}
+.inspection-phone .pig-current-task-entry>svg{grid-area:chev;width:14px;height:14px;color:var(--muted)}
 .inspection-phone .production-highlights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0 0 24px}
 .inspection-phone .production-highlights>div{display:flex;flex-direction:column;gap:7px;min-width:0;border-radius:10px;padding:12px 9px;background:#eff3e8}
 .inspection-phone .production-highlights strong{font:600 22px/1.25 var(--font-mono);letter-spacing:-.7px}
