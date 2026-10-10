@@ -15,7 +15,7 @@ Use FilterChips for changing tags, especially more than five. Use ChoiceList for
 
 ## Anatomy
 
-Track, equal-width option buttons, label, optional mono count, selected underline, optional reason line. Filtering and sticky placement belong to the host layout; an adjacent IconButton opens advanced filters.
+Track, equal-width option buttons, label, optional mono count, optional reason line. Filtering and sticky placement belong to the host layout; an adjacent IconButton opens advanced filters.
 
 ## Variants
 
@@ -32,7 +32,7 @@ See [variants.json](variants.json) for use boundaries and each variant’s rende
 |---|---|
 | Default | Enabled options; host supplies current selection. |
 | Pressed | An unselected option darkens to the handle tone at once on touch (visibly different from both unselected and selected); a selected option keeps its paper face. The static demo presses the second option. |
-| Selected | Weight plus underline; never colour alone. |
+| Selected | Raised paper face plus a stronger label weight (700), in every variant. No underline. Fill and weight both change, so it is never colour alone. |
 | Disabled | Native disabled button, dashed outline; host supplies one visible reason beside the row. Prefer omission unless temporarily unavailable. |
 | Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
@@ -84,6 +84,8 @@ Segment switches fixed views; FilterChips narrows by tags; ChoiceList records an
 Component: generic, used across sections. Named appearances are variants. Sticky filter bars are host layout patterns.
 
 ## Changelog
+
+2026-10-10: removed the selected underline from every variant (lens, two-line lens, view switch, facet). Selection is the paper face plus the strong label weight.
 
 2026-10-10: consolidated implementations, self-contained tokens, press feedback, documented states and Chinese overflow.
 

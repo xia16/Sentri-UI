@@ -1,4 +1,17 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><body><article data-example data-state="Default"></article><article data-example data-state="Pressed"></article><article data-example data-state="At limits"></article><article data-example data-state="Disabled"></article><article data-example data-state="Error"></article><article data-example data-state="Longest label · 中文"></article><script>const dueEn=n=>n===-7?'7+ days ago':n===7?'In 7+ days':n===0?'Today':n===-1?'Yesterday':n===1?'Tomorrow':n<0?(-n)+' days ago':'In '+n+' days';
-const dueZh=n=>n===-7?'7天以上前':n===7?'7天及以后':n===0?'今天':n===-1?'昨天':n===1?'明天':n<0?(-n)+'天前':n+'天后';
-document.querySelectorAll('[data-state]').forEach(el=>{const state=el.dataset.state,zh=state==='Longest label · 中文';
-el.innerHTML=SentriUI.rangeSlider({min:-7,max:7,value:state==='At limits'?[-7,7]:[-1,3],label:zh?'预计分娩日期（预产期）':'Due',key:'due',format:zh?dueZh:dueEn,state,disabled:state==='Disabled',reason:state==='Disabled'?'Due dates unavailable':'',error:state==='Error'?'Due dates unavailable · refresh the list and try again':''});});</script></body></html>
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RangeSlider · range</title><style>
+.sc{box-sizing:border-box;width:100%;max-width:390px;margin:0 auto;padding:var(--space-24) var(--space-gutter-sheet);background:var(--paper);font-family:var(--font-sans);color:var(--ink)}
+</style><body>
+<div class="sc" data-state="Default" data-bleed data-demo="default"></div>
+<div class="sc" data-state="Narrowed" data-bleed data-demo="narrowed"></div>
+<div class="sc" data-state="Same value" data-bleed data-demo="same"></div>
+<div class="sc" data-state="Longest label · 中文" data-bleed data-demo="zh"></div>
+<script>
+const UI=window.SentriUI,icon=window.SentriIcons.icon;
+const en=n=>n===-7?'7+ days ago':n===7?'In 7+ days':n===0?'Today':n===-1?'Yesterday':n===1?'Tomorrow':n<0?(-n)+' days ago':'In '+n+' days';
+const zh=n=>n===-7?'7天以上前':n===7?'7天及以后':n===0?'今天':n===-1?'昨天':n===1?'明天':n<0?(-n)+'天前':n+'天后';
+const line=(f,any)=>(a,b)=>a===-7&&b===7?any:a===b?f(a):f(a)+' – '+f(b);
+const R=(value,o)=>UI.rangeSlider(Object.assign({min:-7,max:7,value,title:'Expected farrowing',icon:icon('calendar'),key:'due',labels:['Earliest expected farrowing','Latest expected farrowing'],format:en,summary:line(en,'Any time'),ends:['7+ days ago','Today','In 7+ days']},o||{}));
+const D={default:()=>R([-7,7]),narrowed:()=>R([0,3]),same:()=>R([2,2]),
+zh:()=>R([-7,7],{title:'预计分娩日期（预产期）',labels:['最早预计分娩','最晚预计分娩'],format:zh,summary:line(zh,'不限时间'),ends:['7天以上前','今天','7天及以后']})};
+document.querySelectorAll('[data-state]').forEach(el=>{const r=D[el.getAttribute('data-demo')];if(r)el.innerHTML=r();});
+</script></body></html>

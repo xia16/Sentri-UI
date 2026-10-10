@@ -84,7 +84,7 @@ Button now owns primary, secondary, text action, tool, destructive and hold vari
 
 ## FilterSheet / RangeSlider pass (2026-10-10)
 
-`SentriUI.filterSheet` composes Sheet with caller-supplied groups and owns Clear, Back, live counted commit and zero/loading/error reasons. Farrowing and Inspection now call it; their filter drawer markup is retired. `SentriUI.rangeSlider` owns Farrowing’s numeric bounds, keyboard, nearest-handle track taps and captured drag; the prototype’s native range overlay, gesture handlers and slider CSS are deleted. The two 48px handles occupy opposite sides of one track to avoid overlapping targets at equal bounds. Home and Piglet processing contain no hand-built filter sheet; Piglet’s distributable was rebuilt with the bundle. Both proposals are removed and registered in the atlas Inputs and filters group.
+`SentriUI.filterSheet` (a Sheet drawer with Reset, Back and a counted commit) and `SentriUI.rangeSlider` (two native range inputs on one track; the touch and keyboard handling lives in the bundle) were distilled from the Farrowing room filter. Farrowing and Inspection render from them and look the same as before (pixel-compared at 390x844). The hand-built filter markup, the slider gesture code and the `.filter-section` / `.due-range` / `.range-ticks` CSS are deleted; the colours are tokens (range-fill, range-handle, shadow-handle).
 
 ## Stepper + Field pass (2026-10-10)
 

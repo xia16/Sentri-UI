@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FilterSheet · fields</title><style>
+.ph{position:relative;height:720px;max-width:390px;margin:0 auto;overflow:hidden;background:var(--app-background);font-family:var(--font-sans);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius-device)}
+.ph .bg{padding:0 var(--space-gutter)}
+.ph .bar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
+</style></head><body>
+<div class="ph" data-state="Default" data-bleed data-demo="default"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Active" data-bleed data-demo="active"><div class="bg"></div><div class="over"></div></div>
+<script>
+const UI=window.SentriUI;
+const bg=()=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+UI.heading({title:'Inspection',kind:'page'})+UI.panel(UI.row({title:'C1 · 3 pigs',description:'Gestation · 40 days'}),{className:'st-row-group'});
+const pick=(label,value)=>UI.pickerField({label,value,action:'pick'});
+const sheet=(a)=>UI.filterSheet({title:'Filter pigs',subtitle:'Unit 7',backAction:'back',closeAction:'dismiss',
+body:pick('Production stage',a?'Gestating':'All production stages')+pick('Disease or symptom',a?'Lameness':'Any condition')+pick('Care',a?'Monitor':'Any care'),
+apply:{label:'Show pigs',action:'apply'},reset:{label:'Clear',action:'reset'}});
+const R={default:()=>sheet(false),active:()=>sheet(true)};
+document.querySelectorAll('[data-state]').forEach(el=>{el.querySelector('.bg').innerHTML=bg();el.querySelector('.over').innerHTML=R[el.getAttribute('data-demo')]();});
+</script></body></html>

@@ -24,12 +24,12 @@ Label; optional description; decrease key; spinbutton value; increase key; persi
 | Default | See rendered variant examples. |
 | Empty | See rendered variant examples. |
 | Pressed | See rendered variant examples. |
-| Floor | See rendered variant examples. |
+| Floor | The key at the bound takes the disabled face (aria-disabled); the bound (0, or the saved count when only additions are allowed) is the host's product rule. |
 | Ceiling | See rendered variant examples. |
 | Disabled | Visible reason; controls cannot change the value. |
 | Error | Persistent corrective message, not colour alone. |
 | Loading | Saving…; keys are aria-disabled until the host settles. |
-| Draft | +1 unsaved beside the draft value. |
+| Draft | The value stays ink (green means approved only). Row: "+1 unsaved" in the muted face beside the label, so no row grows. Count and well: under the number. |
 | Corrected | Corrected beside the revised value. |
 | Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
@@ -75,4 +75,6 @@ Component: generic input used across sections. The named faces are variants, not
 [Preview](preview.html); [verification and screenshots](verification.md); each variant's states live in variants/*.html and variants.json. Primary guidance: the [component standard](../../../../docs/design-workflow/research/component-standard.md), Ant Design Mobile and TDesign; Material 3 and Apple HIG guide labels and target sizes.
 
 ## Changelog
+
+2026-10-10: a draft value is ink, not green. In a row the draft / corrected word sits beside the label, so every row keeps one height. A minus key at the floor uses the same disabled face as the plus key at the ceiling.
 2026-10-10: consolidated variants, corrected gate findings, documented states and migrated prototype forks. Numpad / Measure decisions remain outside this pass.

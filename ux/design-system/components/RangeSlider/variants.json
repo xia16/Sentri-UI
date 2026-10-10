@@ -2,14 +2,12 @@
   {
     "id": "range",
     "name": "Range",
-    "use": "use for narrowing a list by two numeric bounds",
-    "notUse": "not for recording a single value — use Measure",
+    "use": "Use for a bounded from-to range inside a filter, where the whole track means any.",
+    "notUse": "Not for one value (use Stepper or Measure) or named options (use Segment)",
     "states": [
       "Default",
-      "Pressed",
-      "At limits",
-      "Disabled",
-      "Error",
+      "Narrowed",
+      "Same value",
       "Longest label · 中文"
     ],
     "usedBy": [
