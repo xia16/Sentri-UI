@@ -90,6 +90,7 @@ const statusOf = (f) => {
   // superseded designs do not hold a feature back; a feature with only those is itself earlier
   if (st.every((x) => x === 'earlier')) return 'earlier';
   st = st.filter((x) => x !== 'earlier');
+  if (st.every((x) => x === 'placeholder')) return 'placeholder'; // earlier designs plus placeholders: nothing current yet
   if (st.every((x) => x === 'approved')) return 'frozen';
   if (st.every((x) => x === 'approved' || x === 'agent-checked')) return 'agent-checked';
   return 'in-design';
