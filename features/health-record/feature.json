@@ -526,7 +526,7 @@
       "notes": {
         "purpose": "Add one or more diseases or symptoms to one pig or many in one move.",
         "states": [
-          "Details held on the bottom edge above the footer; with many pigs the list scrolls under them. The Details heading folds them away."
+          "Details held on the bottom edge above the footer; with many pigs the list scrolls under them. The Details heading folds them away and, folded, reads one line of what is set (the condition and care, or the medicine and method)."
         ],
         "elements": [
           {
@@ -622,7 +622,7 @@
               {
                 "state": "Search",
                 "when": "Text typed",
-                "shows": "Searches the level you are on (\"Search in Respiratory diseases\"), the whole catalogue at Conditions; matches name and aliases (PRRS, pig flu); Clear empties it; \"Add “name”\" when nothing matches exactly"
+                "shows": "Searches the whole catalogue from any level (\"Search all options\"); matches name and aliases (PRRS, pig flu); every result names its category (Coughing · Respiratory system); Clear empties it; \"Add “name”\" only when nothing matches"
               },
               {
                 "state": "Custom item",
@@ -636,7 +636,7 @@
           {
             "name": "Done",
             "shows": "Done · N",
-            "rule": "Done · N applies the ticks to the Conditions field and closes. Back (or the scrim) closes without applying; the ticks stay as a draft and show again on the next open. Done waits while nothing is ticked and nothing was applied.",
+            "rule": "Done · N applies the ticks to the Conditions field and closes. Back closes without applying; ticks wait for the next open (the scrim does the same). Done waits while nothing is ticked and nothing was applied.",
             "at": "Done"
           }
         ],
@@ -818,7 +818,7 @@
               {
                 "state": "Many pigs",
                 "when": "Bulk selection",
-                "shows": "List with a Dose column; a per-pig dose overrides the shared dose; a shared dose change clears row overrides"
+                "shows": "\"Same dose for all\" (dose and unit) above the list fills every pig's Dose box; a pig's own box overrides it; changing the shared dose clears row overrides. At least three pigs stay in view above the details"
               },
               {
                 "state": "From a finding",
@@ -835,7 +835,7 @@
           },
           {
             "name": "Dose and row state",
-            "shows": "Set dose for all / Dose · mL · mg · g",
+            "shows": "Same dose for all (dose · unit mL · mg · g) / a Dose box per pig",
             "states": [
               {
                 "state": "Invalid row",
@@ -883,7 +883,7 @@
           "Add a brand (raw)",
           "Brand name (raw)",
           "Add brand (raw)",
-          "Set dose for all (raw)",
+          "Same dose for all (raw)",
           "Record vaccination (raw)"
         ],
         "edge": [
@@ -894,7 +894,7 @@
         ],
         "issues": [
           "Medicines, brands and units are a sample list, not farm configuration.",
-          "Dose is \"per pig\" in one place and \"for all\" in another.",
+          "To confirm (product rule, review/inspection-r2.json): is a dose required for every pig, or may a pig be saved without one?",
           "Record treatment from a finding and from the Health group differ only by the fixed condition."
         ]
       }

@@ -3,11 +3,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 
-const guard = (command) => spawnSync(process.execPath, ['scripts/merge-guard.mjs'], { input: JSON.stringify({ tool_name: 'Bash', tool_input: { command } }), encoding: 'utf8' }).status;
+const run = (input) => spawnSync(process.execPath, ['scripts/merge-guard.mjs'], { input: JSON.stringify(input), encoding: 'utf8' }).status;
+const guard = (command) => run({ tool_name: 'Bash', tool_input: { command } });
 const sha = 'a'.repeat(40);
 
 test('ordinary commands pass untouched', () => {
-  for (const c of ['git status', 'git merge origin/main', 'gh pr view 5 && git merge origin/main', 'git push origin workflow/x']) assert.equal(guard(c), 0, c);
+  for (const c of ['git status', 'git merge origin/main', 'gh pr view 5 && git merge origin/main', 'git push origin workflow/x', 'git push -q -u origin workflow/x && cd ../y && git merge -q --no-edit workflow/x']) assert.equal(guard(c), 0, c);
 });
 
 test('a merge that is not exactly one pinned command is blocked', () => {
@@ -33,5 +34,11 @@ test('a merge that is not exactly one pinned command is blocked', () => {
 
 test('a pinned merge without a gate pass is blocked, and so is a direct push to main', () => {
   assert.equal(guard(`gh pr merge 7 --squash --match-head-commit ${sha}`), 2);
-  for (const c of ['git push origin HEAD:main', 'git push origin HEAD:refs/heads/main', 'git push --all origin', 'git push --mirror origin']) assert.equal(guard(c), 2, c);
+  for (const c of ['git push origin HEAD:main', 'git push origin HEAD:refs/heads/main', 'git push --all origin', 'git push --mirror origin',
+    'git checkout main && git merge feature && git push', 'git push -u origin HEAD', 'git push', 'git -C ../main-checkout push', 'git push origin main']) assert.equal(guard(c), 2, c);
+});
+
+test('auto-merge is never allowed, and a guard that cannot read its input blocks', () => {
+  assert.equal(run({ tool_name: 'mcp__ccd_pr__set_auto_merge', tool_input: { enabled: true } }), 2);
+  assert.equal(spawnSync(process.execPath, ['scripts/merge-guard.mjs'], { input: 'not json', encoding: 'utf8' }).status, 2);
 });
