@@ -1,9 +1,9 @@
 {
  "feature": "farrowing",
- "commit": "d39c4a64463b23933f756562a2155b8df9dee0f6",
- "dirty": true,
- "ran": "2026-10-10T08:58:11.140Z",
- "base": "http://localhost:58771",
+ "commit": "ea55b0265f80cf5c692a3d423d7caca76462ba9c",
+ "dirty": false,
+ "ran": "2026-10-10T09:06:52.275Z",
+ "base": "http://localhost:56221",
  "langs": [
   "en",
   "zh"
@@ -22,9 +22,21 @@
  },
  "summary": {
   "pass": 0,
-  "fail": 15,
-  "blocked": 35,
+  "fail": 14,
+  "blocked": 36,
   "pending": 3
+ },
+ "byLang": {
+  "en": {
+   "pass": 30,
+   "fail": 14,
+   "blocked": 0
+  },
+  "zh": {
+   "pass": 0,
+   "fail": 12,
+   "blocked": 32
+  }
  },
  "byBranch": {
   "room": {
@@ -59,8 +71,8 @@
   },
   "task": {
    "pass": 0,
-   "fail": 2,
-   "blocked": 5,
+   "fail": 1,
+   "blocked": 6,
    "pending": 0
   },
   "scope": {
@@ -4327,7 +4339,7 @@
      "says": "The exit word is always Back."
     }
    ],
-   "result": "fail",
+   "result": "blocked",
    "hard": [],
    "runs": [
     {
@@ -4357,17 +4369,12 @@
     {
      "lang": "zh",
      "width": 360,
-     "result": "fail",
-     "failures": [
-      {
-       "what": "\"Back\" shown",
-       "got": "absent",
-       "tag": null
-      }
-     ],
+     "result": "blocked",
+     "failures": [],
      "skipped": [
       "\"Task ended\" shown",
-      "stamped with the closure time (the fixed clock)"
+      "stamped with the closure time (the fixed clock)",
+      "\"Back\" shown"
      ],
      "notes": [
       "no zh rendering: ?lang=zh is ignored (no \"返回\")"
@@ -4380,17 +4387,12 @@
     {
      "lang": "zh",
      "width": 390,
-     "result": "fail",
-     "failures": [
-      {
-       "what": "\"Back\" shown",
-       "got": "absent",
-       "tag": null
-      }
-     ],
+     "result": "blocked",
+     "failures": [],
      "skipped": [
       "\"Task ended\" shown",
-      "stamped with the closure time (the fixed clock)"
+      "stamped with the closure time (the fixed clock)",
+      "\"Back\" shown"
      ],
      "notes": [
       "no zh rendering: ?lang=zh is ignored (no \"返回\")"

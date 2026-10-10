@@ -149,6 +149,15 @@ States: K0 room with sows still farrowing · K1 End review, all finished · K2 E
 | K-7 | K2 | the awaiting sows at End | ? Q6 — where they go | S (open) — contract C9 vs review tasks-built-44 | blocker `fa-k7-awaiting-at-early-end` |
 | K-8 | K3 | a later correction to a sow | ? Q8 — does the receipt change | S (open) — review tasks-built-50 | — |
 
+## Walk personas (for `docs/design-workflow/briefs/walk.md`)
+
+One per main branch, plus the breaker: **s1** night shift counting two sows at once (C, D) · **s2** a sow dies
+mid-farrowing (M) · **s3** next shift continues another hand's records from the room (E, D-1, F) · **s4** a wrong
+figure found after the lock (X) · **s5** a stillborn is the first thing that happens (A) · **s6** supervisor ends the
+task with laggards and an unsaved draft somewhere (K, Q2) · **s7** interrupted: phone pocketed, app closed mid-drawer
+(D-6, D-7) · **s8** Home and Choose unit, unit to unit (E-1, E-2) · **breaker**: extremes, Back and reload everywhere,
+360 and ZH.
+
 ## 9 · Open questions (decision-blockers)
 
 1. **Q1 · Is fostering in Farrowing's scope?** RUL *After the lock* parks it ("v1 farrowing ships NO foster doors");

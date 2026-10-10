@@ -33,7 +33,7 @@ const HARD = ['wrong-fact', 'lost-draft', 'dead-end', 'unreachable-control', 'br
 // A leaf's run = the reset fixture of its nearest `state` ancestor + the taps of every `action` between them + its own taps.
 const leaves = [], nodeCount = {}, problems = [], ids = new Set();
 (function walk(node, path) {
-  nodeCount[node.type] = (nodeCount[node.type] || 0) + 1;
+  if (node.type !== 'root') nodeCount[node.type] = (nodeCount[node.type] || 0) + 1;
   if (node.id) { if (ids.has(node.id)) problems.push(`duplicate id ${node.id}`); ids.add(node.id); }
   const here = [...path, node];
   if (node.type === 'outcome' || node.type === 'decision-blocker') {
@@ -311,4 +311,5 @@ const report = {
 const reportPath = join(root, 'review', `scenarios-${feature}.json`);
 if (!only) writeFileSync(reportPath, JSON.stringify(report, null, 1) + '\n');
 console.log(`\n${feature} @ ${commit.slice(0, 7)}${dirty ? ' (dirty)' : ''}: pass ${report.summary.pass} · fail ${report.summary.fail} · blocked ${report.summary.blocked} · pending ${report.summary.pending}${only ? '' : '  → ' + relative(root, reportPath)}`);
+for (const [l, b] of Object.entries(byLang)) console.log(`  ${l}: pass ${b.pass} · fail ${b.fail} · blocked ${b.blocked} (leaves that ran)`);
 process.exit(report.summary.fail ? 1 : 0);
