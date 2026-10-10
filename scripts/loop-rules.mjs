@@ -256,7 +256,8 @@ export function growing(rounds) {
   return h.length === 3 && h[0] < h[1] && h[1] < h[2];
 }
 
-const sameResult = (a, b) => a && b && JSON.stringify(a.scores) === JSON.stringify(b.scores) && JSON.stringify(a.leaves) === JSON.stringify(b.leaves);
+const sorted = (o) => JSON.stringify(Object.entries(o || {}).sort(([x], [y]) => (x < y ? -1 : x > y ? 1 : 0)));
+const sameResult = (a, b) => a && b && sorted(a.scores) === sorted(b.scores) && sorted(a.leaves) === sorted(b.leaves);
 
 // done · stopped (cap or no progress) · continue
 export function loopStatus(ledger) {
@@ -266,7 +267,7 @@ export function loopStatus(ledger) {
   if (r.length >= 2 && isClean(last) && isClean(prev)) {
     const open = (last.leaves?.fail || 0) + (last.leaves?.uncovered || 0);
     if (!open) return { status: 'done', why: last.leaves?.none ? 'two clean rounds in a row; no executable leaves yet, so behaviour is unverified (a declared gap)' : 'two clean rounds in a row; every leaf covered or blocked' };
-    return { status: 'continue', why: `two clean rounds but ${open} leaf/leaves failing or uncovered` };
+    // clean but incomplete: the cap and the other stops still apply
   }
   if (r.length >= cap) return { status: 'stopped', why: `round cap (${cap}) reached` };
   const risk = riskOf(r);

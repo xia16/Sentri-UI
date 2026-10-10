@@ -163,8 +163,9 @@ if (cmd === 'record') {
   const merged = opt('merged') === 'yes';
   if (opt('outcome') && !['verified', 'best-effort', 'reverted'].includes(opt('outcome'))) { console.error('--outcome is verified, best-effort or reverted'); process.exit(2); }
   if (opt('reverts')) { // keep the best version: the earlier fix this round reverted is marked so; it spends the risk budget
-    const was = l.rounds.find((x) => x.fix?.pr === Number(opt('reverts')));
+    const was = l.rounds.find((x) => x.fix?.pr === Number(opt('reverts')) && x.fix.merged);
     if (!was) { console.error(`no recorded round merged #${opt('reverts')}`); process.exit(2); }
+    if (!merged) { console.error('--reverts needs the revert PR merged (--merged yes); a rejected revert changes nothing'); process.exit(2); }
     was.fix.outcome = 'reverted';
   }
   if (kind !== 'none' && merged && !opt('pr')) { console.error('a merged fix names its PR'); process.exit(2); }

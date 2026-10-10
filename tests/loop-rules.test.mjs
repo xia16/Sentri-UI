@@ -223,3 +223,11 @@ test('the loop stops when the risk budget is spent, a screen oscillates, or hard
   assert.match(loopStatus({ cap: 9, rounds: [sc(6), sc(8), sc(6)] }).why, /oscillating: a/);
   assert.match(loopStatus({ cap: 9, rounds: [sc(6, 1), sc(7, 2), sc(8, 3)] }).why, /growing/);
 });
+
+test('clean rounds with uncovered leaves still stop at the cap; score order never hides no-progress', () => {
+  const clean = { hard: 0, scores: { a: 12 }, leaves: { pass: 3, fail: 0, uncovered: 1 } };
+  assert.equal(loopStatus({ cap: 2, rounds: [clean, clean] }).status, 'stopped');
+  const r1 = { hard: 1, scores: { a: 8, b: 9 }, leaves: { fail: 1 }, fix: { kind: 'defect', merged: false } };
+  const r2 = { hard: 1, scores: { b: 9, a: 8 }, leaves: { fail: 1 }, fix: { kind: 'defect', merged: false } };
+  assert.match(loopStatus({ cap: 9, rounds: [r1, r2] }).why, /no progress/);
+});
