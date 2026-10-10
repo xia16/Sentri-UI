@@ -203,11 +203,12 @@ function openFeature(id, sel) {
   const ownIds = new Set(f.screens.map((s) => s.id)), mine = backlogItems().filter((b) => (b.target.kind === 'feature' && b.target.id === f.id) || (b.target.kind === 'screen' && ownIds.has(b.target.id)));
   const todos = mine.filter((b) => b.kind !== 'decision').length, confirm = mine.length - todos; // the same sets the Backlog opens on
   const planned = f.status === 'placeholder', prd = hasPrd(f), sameName = String(f.name).toLowerCase() === String(f.sectionRef.name).toLowerCase();
-  header(`${sameName ? '' : `<a href="#" id="crumb-back">${esc(f.sectionRef.name)}</a> / `}<b>${esc(f.name)}</b> <span class="zh">${esc(f.zh || '')}</span>
-    <span class="meta">${dot(f.status)}${f.status === 'frozen' ? '<span>Frozen</span> · ' : ''}<span>${plural(n, 'screen')}</span>${planned ? ' · <span>Not designed yet</span>' : ''}${prd ? ' · <a href="#" id="l-prd">PRD</a> · <a href="#" id="l-dec">Decisions</a>' : ''}${todos ? ` · <a href="#" id="l-todo" title="Open to-dos for this feature in the Backlog">To-dos ${todos}</a>` : ''}${confirm ? ` · <a href="#" id="l-conf" title="Questions waiting for the owner, in the Backlog">To confirm ${confirm}</a>` : ''}</span>`);
+  header('');
+  const fcrumb = el(`<nav class="fcrumb" aria-label="Breadcrumb"><a href="#" class="fc-back" data-back>‹ Features</a><span class="fc-sep">/</span>${sameName ? '' : `<a href="#" data-back>${esc(f.sectionRef.name)}</a><span class="fc-sep">/</span>`}<b>${esc(f.name)}</b> <span class="zh">${esc(f.zh || '')}</span>
+    <span class="meta">${dot(f.status)}${f.status === 'frozen' ? '<span>Frozen</span> · ' : ''}<span>${plural(n, 'screen')}</span>${planned ? ' · <span>Not designed yet</span>' : ''}${prd ? ' · <a href="#" id="l-prd">PRD</a> · <a href="#" id="l-dec">Decisions</a>' : ''}${todos ? ` · <a href="#" id="l-todo" title="Open to-dos for this feature in the Backlog">To-dos ${todos}</a>` : ''}${confirm ? ` · <a href="#" id="l-conf" title="Questions waiting for the owner, in the Backlog">To confirm ${confirm}</a>` : ''}</span></nav>`);
   const toBacklog = (kind) => (e) => { e.preventDefault(); Object.assign(bkState, { kind, sec: '', feature: f.id }); S.view = 'backlog'; closeFeature(); render(); };
-  document.getElementById('l-todo')?.addEventListener('click', toBacklog('@todo')); document.getElementById('l-conf')?.addEventListener('click', toBacklog('decision'));
-  const back = document.getElementById('crumb-back'); if (back) back.onclick = (e) => { e.preventDefault(); closeFeature(); };
+  fcrumb.querySelector('#l-todo')?.addEventListener('click', toBacklog('@todo')); fcrumb.querySelector('#l-conf')?.addEventListener('click', toBacklog('decision'));
+  fcrumb.querySelectorAll('[data-back]').forEach((a) => { a.onclick = (e) => { e.preventDefault(); closeFeature(); render(); }; });
   const page = document.getElementById('feature'); page.hidden = false; page.innerHTML = '';
 
   const entries = (f.entryPoints || []).map((e, i) => Object.assign({}, e, { id: 'entry:' + i }));
@@ -470,7 +471,7 @@ function openFeature(id, sel) {
   const openNotes = (tab, anchor) => { if (tab) notesTab = tab; setNotes(true); fillNotes(); if (anchor) notes.querySelector('#' + anchor)?.scrollIntoView(); };
   notes.querySelectorAll('.tab').forEach((b) => { b.onclick = () => { notesTab = b.dataset.t; fillNotes(); }; });
   notes.querySelector('.x').onclick = () => setNotes(false);
-  const lp = document.getElementById('l-prd'), ld = document.getElementById('l-dec');
+  const lp = fcrumb.querySelector('#l-prd'), ld = fcrumb.querySelector('#l-dec');
   if (lp) lp.onclick = (e) => { e.preventDefault(); openNotes('prd'); };
   if (ld) ld.onclick = (e) => { e.preventDefault(); openNotes('prd', 'h-decisions'); };
 
@@ -495,7 +496,7 @@ function openFeature(id, sel) {
     dock.append(tools); if (notes.classList.contains('open')) fillNotes();
   }
 
-  col.append(wrap, zoomEl, notes); page.append(col, dock);
+  col.append(fcrumb, wrap, zoomEl, notes); page.append(col, dock);
   let pdown = false; const toggleNotes = () => { if (notes.classList.contains('open')) setNotes(false); else openNotes(); };
   dock.addEventListener('pointerdown', (ev) => { if (ev.button === 0 && ev.target.closest('[data-notes]')) { pdown = true; toggleNotes(); } });
   dock.addEventListener('click', (ev) => { if (!ev.target.closest('[data-notes]')) return; if (pdown) { pdown = false; return; } toggleNotes(); });
