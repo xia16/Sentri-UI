@@ -12,38 +12,32 @@
       "diff": "review/compare-farrowing/farrowing.room.diff.png"
     },
     "farrowing.count": {
-      "note": "Anti-aliasing of the \"more actions\" dots (the registry draws them as circles; same size, same place; max channel delta 5).",
+      "note": "Anti-aliasing of the \"more actions\" dots only (max delta 5).",
       "pixels": 15,
       "maxDelta": 5,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.count.diff.png"
     },
     "farrowing.before": {
-      "note": "Same as count: the \"more actions\" dots only (max delta 5).",
-      "pixels": 15,
-      "maxDelta": 5,
+      "note": "The \"more actions\" dots and a few pixels of text anti-aliasing (max delta 39).",
+      "pixels": 133,
+      "maxDelta": 39,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.before.diff.png"
     },
     "farrowing.death": {
-      "note": "Allowed: selected segment weight 700 on the paper face (#88); stepper draft value in ink and \"+1 unsaved\" muted beside the label (#88). The rest is Text anti-aliasing only (geometry identical; Chrome rasterises the same glyphs grayscale vs sub-pixel).",
-      "pixels": 1801,
+      "note": "Allowed: selected segment weight 700 (#88); stepper draft value in ink, \"+1 unsaved\" muted beside the label (#88). Owner-approved delta: the optional inputs are the older quiet \"+ Litter weight\" / \"+ Assistance\" / \"+ Photos\" cards (4cb3d75), side by side, no \"Optional\" word. The rest is Text anti-aliasing only (geometry identical).",
+      "pixels": 14367,
       "maxDelta": 224,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.death.diff.png"
     },
     "farrowing.finish": {
-      "note": "Identical.",
-      "pixels": 0,
-      "maxDelta": 0,
-      "status": "identical"
-    },
-    "farrowing.blocked": {
-      "note": "Text anti-aliasing only (geometry identical; Chrome rasterises the same glyphs grayscale vs sub-pixel). Banner is the baseline's amber line (11/10px, \"Review ›\").",
-      "pixels": 2227,
-      "maxDelta": 84,
+      "note": "Owner-approved delta: the optional inputs are the older quiet \"+ Litter weight\" / \"+ Assistance\" / \"+ Photos\" cards (4cb3d75), side by side, no \"Optional\" word. Everything else on the sheet is identical; the sheet is shorter by the one-row cards.",
+      "pixels": 113108,
+      "maxDelta": 224,
       "status": "differs",
-      "diff": "review/compare-farrowing/farrowing.blocked.diff.png"
+      "diff": "review/compare-farrowing/farrowing.finish.diff.png"
     },
     "farrowing.locked": {
       "note": "Allowed: the All tab of the room underneath is weight 700 (#88). The \"more actions\" dots anti-alias differently.",
@@ -53,21 +47,21 @@
       "diff": "review/compare-farrowing/farrowing.locked.diff.png"
     },
     "farrowing.edit": {
-      "note": "The Clear text action and one-pixel text placement: text anti-aliasing only (geometry identical).",
-      "pixels": 229,
-      "maxDelta": 81,
+      "note": "Owner-approved delta: the corrections pattern. The footer says \"Save correction\"; a changed row shows its new value in ink with a muted \"was N\" beside the label; no banner, no Corrected tag. Unchanged, the screen is the baseline.",
+      "pixels": 725,
+      "maxDelta": 87,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.edit.diff.png"
     },
     "farrowing.born": {
-      "note": "Allowed: no designed focus ring (#84) - the dialog opens with the browser default on the first radio row, the baseline drew a blue ring. The rest is Text anti-aliasing only (geometry identical; Chrome rasterises the same glyphs grayscale vs sub-pixel).",
-      "pixels": 5190,
+      "note": "Allowed: no designed focus ring (#84). Owner-approved: the Save correction label. The rest is Text anti-aliasing only (geometry identical).",
+      "pixels": 5006,
       "maxDelta": 239,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.born.diff.png"
     },
     "farrowing.history": {
-      "note": "Allowed (#81): the seed event reads \"Aug 28\", the baseline said \"5 days ago\" (a relative date that was wrong in a static preview). The rest is Text anti-aliasing only (geometry identical; Chrome rasterises the same glyphs grayscale vs sub-pixel).",
+      "note": "Allowed (#81): the seed event reads \"Aug 28\", the baseline said \"5 days ago\". The rest is Text anti-aliasing only (geometry identical).",
       "pixels": 420,
       "maxDelta": 159,
       "status": "differs",
@@ -88,7 +82,7 @@
       "diff": "review/compare-farrowing/farrowing.task-blocked.diff.png"
     },
     "farrowing.task-ready": {
-      "note": "A few pixels of text anti-aliasing.",
+      "note": "One pixel of text anti-aliasing.",
       "pixels": 1,
       "maxDelta": 21,
       "status": "differs",
@@ -108,9 +102,9 @@
       "diff": "review/compare-farrowing/farrowing.task-outcomes.diff.png"
     },
     "farrowing.edit-finished": {
-      "note": "Same as edit: the Clear text action, anti-aliasing only.",
-      "pixels": 229,
-      "maxDelta": 81,
+      "note": "Owner-approved delta: the corrections pattern (\"Save correction\", \"was N\"). Unchanged, otherwise the baseline.",
+      "pixels": 725,
+      "maxDelta": 87,
       "status": "differs",
       "diff": "review/compare-farrowing/farrowing.edit-finished.diff.png"
     },
@@ -127,14 +121,18 @@
       "maxDelta": 0,
       "status": "identical"
     },
+    "farrowing.leave-edit": {
+      "note": "New and owner-approved: Back from Edit record with unsaved changes asks \"Save correction?\" (Discard / Save) in the shared dialog. Not in the baseline.",
+      "status": "no-baseline"
+    },
     "farrowing.foster": {
-      "note": "No baseline: a screen added after the approved baseline (not in 6e6c940), so nothing to match. Shown only so the list is complete.",
+      "note": "No baseline: added after the approved baseline.",
       "status": "no-baseline"
     },
     "farrowing.reconcile": {
-      "note": "No baseline: a screen added after the approved baseline (not in 6e6c940), so nothing to match.",
+      "note": "No baseline: added after the approved baseline.",
       "status": "no-baseline"
     }
   },
-  "summary": "Every screen with a baseline is pixel-identical or differs only by an allowed delta (#84 #88 #70 #81) or by text anti-aliasing; the reason line is removed everywhere. See each note."
+  "summary": "Every screen with a baseline is identical or differs only by an allowed delta (#84 #88 #70 #81), an owner-approved delta (quiet optional cards, corrections pattern, leave-edit dialog) or text anti-aliasing. The footer reason line is removed everywhere. Farrowing.blocked is gone: an unsaved correction can no longer reach Finish."
 }
