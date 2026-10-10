@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-10T10:37:41.896Z",
- "commit": "37aaf65",
+ "generated": "2026-10-10T12:23:45.552Z",
+ "commit": "4e917fc",
  "platforms": [
   {
    "id": "mobile",
@@ -8560,7 +8560,7 @@
         [
          "inspection.walk-recorded",
          "inspection.walk",
-         "tap Back to unit"
+         "tap Back"
         ],
         [
          "inspection.sensors",
@@ -8681,7 +8681,7 @@
              {
               "state": "Condition needs attention",
               "when": "Care is Monitor, Treat in place or Move to hospital pen",
-              "shows": "Tag with \"Day N\" (only when day is a number), care icon and colour; sorted first"
+              "shows": "Tag with \"Day N\" (only when day is a number), care icon and colour; the most recent condition leads, then the ones that need attention"
              },
              {
               "state": "Condition ongoing",
@@ -8696,7 +8696,7 @@
              {
               "state": "Tags overflow",
               "when": "They do not fit one line",
-              "shows": "Last ones collapse into +N; the full list is in the pig record"
+              "shows": "The tags wrap to a second line before any is hidden, so the newest condition is always shown in full; only what still does not fit two lines collapses into \"+N more\" (the full list is in the pig record)"
              }
             ],
             "logic": "Duration never falls back to the animal's lifetime age. The checkbox selects the pig only, never its pen.",
@@ -9474,7 +9474,7 @@
           "elements": [
            {
             "name": "Confirmation",
-            "shows": "Checked in at 09:41 · G. Hansen · Unit 7 · 0 updates recorded",
+            "shows": "Checked in at 09:41 · G. Hansen · Unit 7 · 0 updates recorded; the footer holds Back alone",
             "states": [
              {
               "state": "One update",
@@ -9482,18 +9482,15 @@
               "shows": "\"1 update\" (singular)"
              }
             ],
-            "logic": "Time is fixed at 09:41; the count is the walk's event count.",
+            "logic": "Time is fixed at 09:41; the count is the walk's event count. One exit: Back leaves the sheet and lands on the unit's walk list, where the user came from (as the end receipt does).",
             "at": "Checked in at 09:41"
            }
           ],
           "controls": [],
           "copy": [
-           "Walk recorded (raw)",
-           "Back to unit (raw)"
+           "Walk recorded (raw)"
           ],
-          "issues": [
-           "Two back controls (header Back and \"Back to unit\") do the same thing."
-          ]
+          "issues": []
          }
         },
         {
@@ -12459,7 +12456,7 @@
          "notes": {
           "purpose": "Add one or more diseases or symptoms to one pig or many in one move.",
           "states": [
-           "Details held on the bottom edge above the footer; with many pigs the list scrolls under them. The Details heading folds them away."
+           "Details held on the bottom edge above the footer; with many pigs the list scrolls under them. The Details heading folds them away and, folded, reads one line of what is set (the condition and care, or the medicine and method)."
           ],
           "elements": [
            {
@@ -12559,7 +12556,7 @@
              {
               "state": "Search",
               "when": "Text typed",
-              "shows": "Searches the level you are on (\"Search in Respiratory diseases\"), the whole catalogue at Conditions; matches name and aliases (PRRS, pig flu); Clear empties it; \"Add “name”\" when nothing matches exactly"
+              "shows": "Searches the whole catalogue from any level (\"Search all options\"); matches name and aliases (PRRS, pig flu); every result names its category (Coughing · Respiratory system); Clear empties it; \"Add “name”\" only when nothing matches"
              },
              {
               "state": "Custom item",
@@ -12573,7 +12570,7 @@
            {
             "name": "Done",
             "shows": "Done · N",
-            "rule": "Done · N applies the ticks to the Conditions field and closes. Back (or the scrim) closes without applying; the ticks stay as a draft and show again on the next open. Done waits while nothing is ticked and nothing was applied.",
+            "rule": "Done · N applies the ticks to the Conditions field and closes. Back closes without applying; ticks wait for the next open (the scrim does the same). Done waits while nothing is ticked and nothing was applied.",
             "at": "Done"
            }
           ],
@@ -12764,7 +12761,7 @@
              {
               "state": "Many pigs",
               "when": "Bulk selection",
-              "shows": "List with a Dose column; a per-pig dose overrides the shared dose; a shared dose change clears row overrides"
+              "shows": "\"Same dose for all\" (dose and unit) above the list fills every pig's Dose box; a pig's own box overrides it; changing the shared dose clears row overrides. At least three pigs stay in view above the details"
              },
              {
               "state": "From a finding",
@@ -12781,7 +12778,7 @@
            },
            {
             "name": "Dose and row state",
-            "shows": "Set dose for all / Dose · mL · mg · g",
+            "shows": "Same dose for all (dose · unit mL · mg · g) / a Dose box per pig",
             "states": [
              {
               "state": "Invalid row",
@@ -12829,7 +12826,7 @@
            "Add a brand (raw)",
            "Brand name (raw)",
            "Add brand (raw)",
-           "Set dose for all (raw)",
+           "Same dose for all (raw)",
            "Record vaccination (raw)"
           ],
           "edge": [
@@ -12840,7 +12837,7 @@
           ],
           "issues": [
            "Medicines, brands and units are a sample list, not farm configuration.",
-           "Dose is \"per pig\" in one place and \"for all\" in another.",
+           "To confirm (product rule, review/inspection-r2.json): is a dose required for every pig, or may a pig be saved without one?",
            "Record treatment from a finding and from the Health group differ only by the fixed condition."
           ]
          }
@@ -22604,6 +22601,24 @@
      "kind": "unclear",
      "title": "Placeholder screens name no owner or removal plan",
      "detail": "Thirteen placeholder screens render the plain walk, with no note saying who removes or draws them. A developer may build them from the notes."
+    },
+    {
+     "severity": "medium",
+     "source": "fix round r2 (inspection)",
+     "id": "inspection-r2-1",
+     "target": {
+      "kind": "screen",
+      "id": "health-record.treatment"
+     },
+     "kind": "decision",
+     "title": "Is a dose required for every pig when treatment is recorded for several?",
+     "detail": "Record treatment for several pigs has a \"Same dose for all\" control that fills every pig's Dose box, and each pig keeps its own box. Today Save waits until every ticked pig has a dose above 0. That is a product rule on what is recorded, so the design keeps it as it is. The design only asks whether a pig may be saved without a dose.",
+     "options": [
+      "Keep it: every ticked pig needs a dose above 0",
+      "A pig with no dose is saved as treated without a dose",
+      "A pig with no dose is left out of the record, and the row says so"
+     ],
+     "recommendation": "Keep it: a treatment record without a dose cannot be audited. Owner to rule."
     },
     {
      "severity": "high",
