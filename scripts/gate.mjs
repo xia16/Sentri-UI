@@ -86,17 +86,22 @@ const files = git(['diff', '--name-only', mech.base, mech.candidate]).out.split(
 mech.files = files;
 
 // ---------- worktrees and servers ----------
-const wt = { base: path.join(out, 'wt-base'), cand: path.join(out, 'wt-cand') };
-for (const [k, sha] of [['base', mech.base], ['cand', mech.candidate]]) {
-  if (fs.existsSync(wt[k])) git(['worktree', 'remove', '--force', wt[k]]);
-  const r = git(['worktree', 'add', '--detach', wt[k], sha]);
-  if (r.code) { check(`worktree ${k}`, false, r.err); finish(1); }
-}
+// Worktrees sit under a short temp path: Windows refuses the repo's deepest files under a long one.
+const wtRoot = path.join(os.tmpdir(), `sg-${process.pid.toString(36)}${Date.now().toString(36).slice(-4)}`);
+const wt = { base: path.join(wtRoot, 'base'), cand: path.join(wtRoot, 'cand') };
+mech.worktrees = wt;
 const servers = [];
 const cleanup = () => {
   for (const s of servers) try { s.kill(); } catch {}
-  if (!flag('keep')) for (const k of ['base', 'cand']) git(['worktree', 'remove', '--force', wt[k]]);
+  if (flag('keep')) return;
+  for (const k of ['base', 'cand']) git(['worktree', 'remove', '--force', wt[k]]);
+  git(['worktree', 'prune']);
+  fs.rmSync(wtRoot, { recursive: true, force: true });
 };
+for (const [k, sha] of [['base', mech.base], ['cand', mech.candidate]]) {
+  const r = git(['worktree', 'add', '--detach', wt[k], sha]);
+  if (r.code || !fs.existsSync(path.join(wt[k], 'scripts/serve-ux.cjs'))) { check(`worktree ${k}`, false, r.err.split('\n').filter((l) => /error|fatal/.test(l)).slice(0, 2).join(' | ')); cleanup(); finish(1); }
+}
 process.on('exit', cleanup);
 const freePort = () => new Promise((r) => { const s = createServer(); s.listen(0, () => { const p = s.address().port; s.close(() => r(p)); }); });
 async function serve(dir) {
