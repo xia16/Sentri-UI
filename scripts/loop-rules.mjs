@@ -135,7 +135,7 @@ export function loopStatus(ledger) {
   const last = r[r.length - 1], prev = r[r.length - 2];
   if (r.length >= 2 && isClean(last) && isClean(prev)) {
     const open = (last.leaves?.fail || 0) + (last.leaves?.uncovered || 0);
-    if (!open) return { status: 'done', why: 'two clean rounds in a row; every leaf covered or blocked' };
+    if (!open) return { status: 'done', why: last.leaves?.none ? 'two clean rounds in a row; no executable leaves yet, so behaviour is unverified (a declared gap)' : 'two clean rounds in a row; every leaf covered or blocked' };
     return { status: 'continue', why: `two clean rounds but ${open} leaf/leaves failing or uncovered` };
   }
   if (r.length >= cap) return { status: 'stopped', why: `round cap (${cap}) reached` };
