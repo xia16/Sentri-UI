@@ -23,10 +23,15 @@ test('a merge that is not exactly one pinned command is blocked', () => {
     'gh.exe pr merge 6 --squash',
     '"gh" pr "merge" 6',
     'gh api -X PUT repos/xia16/Sentri-UI/pulls/6/merge',
+    'gh pr m\erge 6 --squash',
+    'X=merge; gh pr $X 6',
+    "gh api graphql -f query='mutation { mergePullRequest(input:{pullRequestId:\"x\"}) { clientMutationId } }'",
+    'gh api -X POST repos/xia16/Sentri-UI/merges -f base=main -f head=x',
+    'gh api -X PATCH repos/xia16/Sentri-UI/git/refs/heads/main -f sha=abc',
   ]) assert.equal(guard(c), 2, c);
 });
 
 test('a pinned merge without a gate pass is blocked, and so is a direct push to main', () => {
   assert.equal(guard(`gh pr merge 7 --squash --match-head-commit ${sha}`), 2);
-  assert.equal(guard('git push origin HEAD:main'), 2);
+  for (const c of ['git push origin HEAD:main', 'git push origin HEAD:refs/heads/main', 'git push --all origin', 'git push --mirror origin']) assert.equal(guard(c), 2, c);
 });

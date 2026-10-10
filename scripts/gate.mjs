@@ -62,6 +62,10 @@ if (opt('verdict')) {
   // The pass record the merge guard (scripts/merge-guard.mjs) looks for lives in the git common dir, so every worktree sees it;
   // a failed verdict removes any earlier pass for the same commit.
   const passFile = passRecord(mech.candidate);
+  // The same result as a commit status on GitHub: branch protection on main can require "sentri/gate", which makes GitHub itself
+  // refuse an ungated merge however it is attempted (the local merge guard is only a convenience).
+  spawnSync('gh', ['api', '--method', 'POST', `repos/{owner}/{repo}/statuses/${mech.candidate}`, '-f', `state=${ok ? 'success' : 'failure'}`,
+    '-f', 'context=sentri/gate', '-f', `description=${ok ? 'GATE PASS' : 'GATE FAIL'} against ${short(mech.base)}`], { cwd: root, encoding: 'utf8' });
   if (!ok) fs.rmSync(passFile, { force: true });
   if (ok) {
     fs.mkdirSync(path.dirname(passFile), { recursive: true });
@@ -178,7 +182,7 @@ let r;
   };
   const c = fresh(wt.cand); r = c.res;
   // A stale atlas on main is main's debt: it blocks only a change that touches what the atlas is built from.
-  const sources = files.filter((f) => /^(features|sections|references|review|atlas)\/|^ux\/design-system\/components\/[^/]+\/(gate|variants)\.json$|^scripts\/build-atlas\.mjs$/.test(f));
+  const sources = files.filter((f) => /^(features|sections|references|review|atlas)\/|^ux\/design-system\/components\/(_proposed\.json$|[^/]+\/(gate\.json|variants\.json|variants\/))|^scripts\/build-atlas\.mjs$/.test(f));
   const debt = !c.same && !sources.length && !fresh(wt.base).same;
   if (debt) gaps.push('atlas/atlas.json is stale on main itself (npm run atlas changes it); this change touches none of its sources');
   check('atlas.json is regenerated', c.same || debt, c.same ? '' : debt ? 'stale on main too, so main owns it' : r.code ? r.tail : 'npm run atlas changes atlas/atlas.json beyond its stamps: rebuild and commit it');
