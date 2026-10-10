@@ -374,9 +374,11 @@ if (noLeaves.length && CLASSES.indexOf(ec.cls) >= 2) gaps.push(`${noLeaves.lengt
     const f = path.join(dir, 'review/state-check.json');
     if (!fs.existsSync(f)) return null;
     const n = {};
-    for (const s of JSON.parse(fs.readFileSync(f, 'utf8'))) for (const p of s.problems || []) { const k = `${s.component}/${s.variant}/${s.state}: (${p.check}) ${String(p.detail).replace(/\d+(\.\d+)?px/g, 'Npx')}`; n[k] = (n[k] || 0) + 1; }
+    // A resource that failed to load (net::ERR_*) is the machine or the network, not the design: reported, never counted.
+    for (const s of JSON.parse(fs.readFileSync(f, 'utf8'))) for (const p of s.problems || []) { if (/net::ERR_/.test(String(p.detail))) { netErrors.add(`${s.component}/${s.variant}/${s.state}`); continue; } const k = `${s.component}/${s.variant}/${s.state}: (${p.check}) ${String(p.detail).replace(/\d+(\.\d+)?px/g, 'Npx')}`; n[k] = (n[k] || 0) + 1; }
     return n;
   };
+  const netErrors = new Set();
   const pb = problems(wt.base), pc = problems(wt.cand);
   if (!pc) check('check-states', false, `no review/state-check.json written on the candidate (exit ${rc.code}): ${rc.tail}`);
   else {
@@ -395,6 +397,7 @@ if (noLeaves.length && CLASSES.indexOf(ec.cls) >= 2) gaps.push(`${noLeaves.lengt
     check('check-states (no new problem)', added.length === 0, added.length ? `${added.length} new: ${added.slice(0, 3).join(' | ')}` : `${debt} problem(s) already on main${fixed.length ? `, ${fixed.length} fixed` : ''}`);
     if (debt) gaps.push(`check-states: ${debt} problem(s) already on main are not this change's (review/state-check.json)`);
     if (!pb) gaps.push('check-states wrote no report on base: every problem on the candidate counts as new');
+    if (netErrors.size) gaps.push(`check-states: ${netErrors.size} state(s) had a resource fail to load (net::ERR_*), a machine or network blip, not counted: ${[...netErrors].slice(0, 3).join(', ')}`);
   }
 }
 
