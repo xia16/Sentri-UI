@@ -25,7 +25,9 @@
       "Adjust",
       [
         "feed-plan.editor",
-        "feed-plan.end-date"
+        "feed-plan.end-date",
+        "feed-plan.switch-pen",
+        "feed-plan.switch-pens"
       ]
     ],
     [
@@ -124,6 +126,16 @@
       "feed-plan.editor",
       "feed-plan.pen-held",
       "Save with Hold amount"
+    ],
+    [
+      "feed-plan.pen",
+      "feed-plan.switch-pen",
+      "tap Switch formula when due"
+    ],
+    [
+      "feed-plan.bulk",
+      "feed-plan.switch-pens",
+      "tap Switch feed for a batch"
     ]
   ],
   "screens": [
@@ -585,6 +597,42 @@
         "controls": [],
         "issues": [
           "\"Feed held\" does not say how much or until when; the amount is only in a tooltip."
+        ]
+      }
+    },
+    {
+      "id": "feed-plan.switch-pen",
+      "name": "Switch formula · one pen",
+      "zh": "切换配方 · 单栏",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-switch&slide=3",
+      "figma": "",
+      "notes": {
+        "purpose": "On the day a pen's formula is due, the Feed sheet opens pre-filled with the scheduled switch.",
+        "rules": [
+          "One tap confirms; the time can be set earlier if the feeder was changed before.",
+          "No percent adjust on an ad-lib pen: the block is absent, not disabled."
+        ],
+        "issues": [
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+        ]
+      }
+    },
+    {
+      "id": "feed-plan.switch-pens",
+      "name": "Switch formula · several pens",
+      "zh": "切换配方 · 多栏",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-switch&slide=4",
+      "figma": "",
+      "notes": {
+        "purpose": "Switch feed for a whole batch from the unit sheet: the same sheet, three pens, one confirm.",
+        "rules": [
+          "Writes one record per pen.",
+          "A single pen can still switch from its own Feed tile."
+        ],
+        "issues": [
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
         ]
       }
     }

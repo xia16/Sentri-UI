@@ -46,15 +46,32 @@
       ]
     ],
     [
-      "Unit environment and equipment (built, not reachable)",
+      "Unit environment (built, not reachable)",
       [
         "inspection.sensors",
-        "inspection.no-sensors",
-        "inspection.sensor-unavailable",
-        "inspection.unit-detail",
-        "inspection.pen-faults",
+        "inspection.unit-detail"
+      ]
+    ],
+    [
+      "Equipment faults",
+      [
+        "inspection.pen-actions",
         "inspection.fault-report",
-        "inspection.fault-resolve"
+        "inspection.fault-report-other",
+        "inspection.fault-flag",
+        "inspection.pen-faults",
+        "inspection.fault-resolve",
+        "inspection.fault-resolved"
+      ]
+    ],
+    [
+      "Pen head count",
+      [
+        "inspection.set-count",
+        "inspection.set-count-batches",
+        "inspection.set-count-fewer",
+        "inspection.set-count-more",
+        "inspection.count-recorded"
       ]
     ],
     [
@@ -162,6 +179,66 @@
       "inspection.pen-faults",
       "inspection.fault-resolve",
       "tap a fault"
+    ],
+    [
+      "inspection.walk",
+      "inspection.pen-actions",
+      "tick a pen, tap Actions"
+    ],
+    [
+      "inspection.pen-actions",
+      "inspection.fault-report",
+      "tap Fault"
+    ],
+    [
+      "inspection.fault-report",
+      "inspection.fault-report-other",
+      "choose Other as the device"
+    ],
+    [
+      "inspection.fault-report",
+      "inspection.fault-flag",
+      "tap Report fault"
+    ],
+    [
+      "inspection.fault-flag",
+      "inspection.pen-faults",
+      "open the pen, tap its FAULTS row"
+    ],
+    [
+      "inspection.pen-faults",
+      "inspection.fault-resolve",
+      "tap the fault"
+    ],
+    [
+      "inspection.fault-resolve",
+      "inspection.fault-resolved",
+      "tap Resolve"
+    ],
+    [
+      "inspection.pen-actions",
+      "inspection.set-count",
+      "tap Count"
+    ],
+    [
+      "inspection.set-count",
+      "inspection.set-count-batches",
+      "tap Add batch"
+    ],
+    [
+      "inspection.set-count",
+      "inspection.set-count-fewer",
+      "lower the total"
+    ],
+    [
+      "inspection.set-count",
+      "inspection.set-count-more",
+      "raise the total"
+    ],
+    [
+      "inspection.set-count",
+      "inspection.count-recorded",
+      "close the sheet"
     ]
   ],
   "screens": [
@@ -1029,7 +1106,7 @@
       "status": "placeholder",
       "figma": "",
       "notes": {
-        "purpose": "Designed as a unit summary above the list; the card exists in code only and is not drawn. Built in the prototype's code, but nothing opens it yet.",
+        "purpose": "Designed as a unit summary above the list (counts, faults chip, environment strip). The card exists in code only (unitOverview) and no preset or control shows it, so it stays a placeholder. Covers the three sensor states: readings, no sensors installed, and a sensor with no reading.",
         "elements": [
           {
             "name": "Environment strip",
@@ -1042,8 +1119,8 @@
               },
               {
                 "state": "Reading null",
-                "when": "Installed but no value",
-                "shows": "\"—\" with label kept"
+                "when": "Installed but no value (e.g. Humidity)",
+                "shows": "\"—\" with label kept (never 0, never removed); the unit sheet says \"Reading unavailable\""
               },
               {
                 "state": "Not installed",
@@ -1053,7 +1130,7 @@
               {
                 "state": "No sensors",
                 "when": "None installed",
-                "shows": "\"No connected sensors\""
+                "shows": "\"No connected sensors\" replaces the strip; the unit sheet reads \"No sensors installed\""
               }
             ],
             "logic": "Values are absent, not zero."
@@ -1073,65 +1150,8 @@
           "Sensor card should show source, freshness and trend once real readings exist."
         ],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
-          "Either draw the unit summary or remove the code.",
-          "unitOverview is never rendered, so this preset shows the plain walk list."
-        ]
-      }
-    },
-    {
-      "id": "inspection.no-sensors",
-      "name": "Unit summary · no sensors",
-      "zh": "单元概览 · 无传感器",
-      "status": "placeholder",
-      "figma": "",
-      "notes": {
-        "purpose": "The unit has no sensors installed. Built in the prototype's code, but nothing opens it yet.",
-        "elements": [
-          {
-            "name": "Sensor empty line",
-            "shows": "No connected sensors",
-            "states": [
-              {
-                "state": "No sensors",
-                "when": "sensors = []",
-                "shows": "Line replaces the strip; the unit sheet reads \"No sensors installed\""
-              }
-            ]
-          }
-        ],
-        "controls": [],
-        "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
-          "unitOverview is never rendered, so this preset shows the plain walk list."
-        ]
-      }
-    },
-    {
-      "id": "inspection.sensor-unavailable",
-      "name": "Unit summary · a sensor with no reading",
-      "zh": "单元概览 · 传感器无读数",
-      "status": "placeholder",
-      "figma": "",
-      "notes": {
-        "purpose": "One sensor (Humidity) is installed but returns no value. Built in the prototype's code, but nothing opens it yet.",
-        "elements": [
-          {
-            "name": "Metric",
-            "shows": "— and the unit",
-            "states": [
-              {
-                "state": "No reading",
-                "when": "value is null",
-                "shows": "Dash with label kept (is-unavailable); unit sheet says \"Reading unavailable\"; never shown as 0 or removed"
-              }
-            ]
-          }
-        ],
-        "controls": [],
-        "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
-          "unitOverview is never rendered, so this preset shows the plain walk list."
+          "The unit summary card (unitOverview in the code) is built but never placed on the walk. Either draw it or remove the code.",
+          "The presets \"Unit · no sensors\" and \"Unit · sensor unavailable\" render the plain walk, so their screens were dropped and their states are listed here."
         ]
       }
     },
@@ -1139,10 +1159,10 @@
       "id": "inspection.no-batches",
       "name": "Unit batches · none",
       "zh": "单元批次 · 无",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "",
       "notes": {
-        "purpose": "The unit has no batches; the batch tracker is left out. Built in the prototype's code, but nothing opens it yet.",
+        "purpose": "The unit has no batches; the batch tracker is left out. Shown as the walk list in this batch state; the batch tracker card is not placed.",
         "elements": [
           {
             "name": "Batch tracker",
@@ -1159,19 +1179,20 @@
         ],
         "controls": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
-          "unitOverview is never rendered, so this preset shows the plain walk list."
+          "The batch tracker card (unitOverview) is not placed on the walk, so only the batch's effect on the rows is visible here."
         ]
-      }
+      },
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "no-batches"
     },
     {
       "id": "inspection.one-batch",
       "name": "Unit batches · one",
       "zh": "单元批次 · 一个",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "",
       "notes": {
-        "purpose": "The unit has one batch (20) in pens C1 and C2; pen D4 is removed. Built in the prototype's code, but nothing opens it yet.",
+        "purpose": "The unit has one batch (20) in pens C1 and C2; pen D4 is removed. Shown as the walk list in this batch state; the batch tracker card is not placed.",
         "elements": [
           {
             "name": "Batch tracker row",
@@ -1193,19 +1214,20 @@
         ],
         "controls": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
-          "unitOverview is never rendered, so this preset shows the plain walk list."
+          "The batch tracker card (unitOverview) is not placed on the walk, so only the batch's effect on the rows is visible here."
         ]
-      }
+      },
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "one-batch"
     },
     {
       "id": "inspection.many-batches",
       "name": "Unit batches · several",
       "zh": "单元批次 · 多个",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "",
       "notes": {
-        "purpose": "Three batches: 20 (C1), 21 (C2, Gestating from 8 Aug) and 18 (grower, D4). Built in the prototype's code, but nothing opens it yet.",
+        "purpose": "Three batches: 20 (C1), 21 (C2, Gestating from 8 Aug) and 18 (grower, D4). Shown as the walk list in this batch state; the batch tracker card is not placed.",
         "elements": [
           {
             "name": "Batch tracker rows",
@@ -1215,19 +1237,20 @@
         ],
         "controls": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
-          "unitOverview is never rendered, so this preset shows the plain walk list."
+          "The batch tracker card (unitOverview) is not placed on the walk, so only the batch's effect on the rows is visible here."
         ]
-      }
+      },
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "many-batches"
     },
     {
       "id": "inspection.batch-farrowing",
       "name": "Unit batches · one in farrowing",
       "zh": "单元批次 · 分娩中",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "",
       "notes": {
-        "purpose": "Batch 20 is in farrowing: two sows have farrowed, three have not. Built in the prototype's code, but nothing opens it yet.",
+        "purpose": "Batch 20 is in farrowing: two sows have farrowed, three have not. Shown as the walk list in this batch state; the batch tracker card is not placed.",
         "elements": [
           {
             "name": "Pig row · stage",
@@ -1250,19 +1273,20 @@
         ],
         "controls": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
-          "unitOverview is never rendered, so this preset shows the plain walk list."
+          "The batch tracker card (unitOverview) is not placed on the walk, so only the batch's effect on the rows is visible here."
         ]
-      }
+      },
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "batch-farrowing"
     },
     {
       "id": "inspection.batch-concurrent",
       "name": "Unit batches · heat check and breeding together",
       "zh": "单元批次 · 并行任务",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "",
       "notes": {
-        "purpose": "One batch with two production tasks running at once: In-heat check and Breeding. Built in the prototype's code, but nothing opens it yet.",
+        "purpose": "One batch with two production tasks running at once: In-heat check and Breeding. Shown as the walk list in this batch state; the batch tracker card is not placed.",
         "elements": [
           {
             "name": "Pig row · stage and tasks",
@@ -1274,10 +1298,11 @@
         ],
         "controls": [],
         "issues": [
-          "The unit summary card (unitOverview in the code) is built but never placed on the walk, so this preset renders the same list as inspection.walk.",
-          "unitOverview is never rendered, so this preset shows the plain walk list."
+          "The batch tracker card (unitOverview) is not placed on the walk, so only the batch's effect on the rows is visible here."
         ]
-      }
+      },
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "batch-concurrent"
     },
     {
       "id": "inspection.unit-detail",
@@ -1369,95 +1394,233 @@
       "id": "inspection.pen-faults",
       "name": "Pen equipment faults",
       "zh": "设备故障",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "",
       "notes": {
-        "purpose": "Open faults in one pen with Report fault. Built in the code but no control in the prototype opens it. Built in the prototype's code, but nothing opens it yet.",
-        "elements": [
-          {
-            "name": "Fault list",
-            "shows": "Drinking station · Drinker valve leaking on the east side.",
-            "states": [
-              {
-                "state": "Faults",
-                "when": "The pen has open faults",
-                "shows": "One row per fault"
-              },
-              {
-                "state": "None",
-                "when": "No open faults",
-                "shows": "\"No open faults\""
-              }
-            ],
-            "logic": "A fault belongs to one device in one pen.",
-            "at": "Drinking station"
-          }
-        ],
-        "controls": [],
-        "copy": [
-          "Equipment faults (raw)",
-          "Report fault (raw)"
+        "purpose": "The pen record: its FAULTS row quotes the open fault; the fault line opens the fault's own record.",
+        "rules": [
+          "The page reads, the record acts: Resolve is not on the verb sheet.",
+          "Three doors reach a fault record: this row, the unit sheet's Equipment row, and the report picker's redirect on an already-faulted device."
         ],
         "issues": [
-          "No pen-level control opens this sheet."
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it.",
+          "The Astra prototype's own pen-faults view is built but no control opens it."
         ]
-      }
+      },
+      "url": "/ux/archive/workflows.html?sec=wf-resolve-fault&slide=1"
     },
     {
       "id": "inspection.fault-report",
       "name": "Report fault",
       "zh": "报告故障",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "",
       "notes": {
-        "purpose": "Report a device fault in one pen. Built in the code but no control in the prototype opens it. Built in the prototype's code, but nothing opens it yet.",
-        "elements": [
-          {
-            "name": "Report form",
-            "shows": "Device and description",
-            "rule": "Device is Feeding station / Drinking station / Other equipment; Other adds a device name field. Report fault stays disabled until device and description (and name for Other) are filled. Choosing a device that already has an open fault opens that fault instead of a duplicate.",
-            "at": "Device"
-          }
+        "purpose": "Report a device fault in one pen: device, description, photos.",
+        "rules": [
+          "Choosing a device that already has a fault opens its existing fault record instead of an error.",
+          "Severity, category, assignee and due date are left out on purpose; photos are new."
         ],
-        "controls": [],
-        "copy": [
-          "Report fault (raw)"
+        "edge": [
+          "Description is required for every device type."
         ],
-        "issues": []
-      }
+        "issues": [
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+        ]
+      },
+      "url": "/ux/archive/workflows.html?sec=wf-fault&slide=2"
     },
     {
       "id": "inspection.fault-resolve",
       "name": "Fault",
       "zh": "故障记录",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "",
       "notes": {
-        "purpose": "Read one fault and resolve it with an optional note. Built in the code but no control in the prototype opens it. Built in the prototype's code, but nothing opens it yet.",
-        "elements": [
-          {
-            "name": "Fault",
-            "shows": "Drinking station · Pen C2 · Open fault · Reported 06:40 · G. Hansen",
-            "states": [
-              {
-                "state": "Open",
-                "when": "Not resolved",
-                "shows": "Description, reporter, optional Resolution note, Resolve fault (logs \"Fault resolved\")"
-              },
-              {
-                "state": "Resolved",
-                "when": "After resolving",
-                "shows": "\"Resolved 09:41 · G. Hansen\" and the note"
-              }
-            ],
-            "at": "Reported 06:40"
-          }
+        "purpose": "Read one fault and resolve it with an optional note.",
+        "rules": [
+          "Resolved-by and resolved-at stamp automatically; nothing else is asked.",
+          "One record at a time: typed devices hold at most one open fault, and \"Other\" records name different objects."
         ],
-        "controls": [],
-        "copy": [
-          "Resolve fault (raw)"
+        "edge": [
+          "Same-device bulk resolve is unprovable until a device registry exists (OQ3 in the deck)."
         ],
-        "issues": []
+        "issues": [
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it.",
+          "The Astra prototype's own fault-resolve view is built but no control opens it."
+        ]
+      },
+      "url": "/ux/archive/workflows.html?sec=wf-resolve-fault&slide=2"
+    },
+    {
+      "id": "inspection.pen-actions",
+      "name": "Pen actions",
+      "zh": "点选栏位操作",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-fault&slide=1",
+      "figma": "",
+      "notes": {
+        "purpose": "Tick a pen and open the verb sheet: the Pen strip leads, then Health and Routine for the pigs.",
+        "rules": [
+          "Fault is single: with two pens ticked it drops to the not-available line, omitted, never greyed.",
+          "Feed is not a verb here; a feed change is the consequence of a case."
+        ],
+        "issues": [
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+        ]
+      }
+    },
+    {
+      "id": "inspection.fault-report-other",
+      "name": "Report fault · other device",
+      "zh": "上报故障 · 其他设备",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-fault&slide=3",
+      "figma": "",
+      "notes": {
+        "purpose": "Report a fault on a device that is not in the list: a Device name field appears under the trigger.",
+        "rules": [
+          "Description stays required."
+        ],
+        "edge": [
+          "Free-text names can repeat-report the same device; promoting recurring names to registered devices is console scope (OQ3 in the deck)."
+        ],
+        "issues": [
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+        ]
+      }
+    },
+    {
+      "id": "inspection.fault-flag",
+      "name": "Unit list · fault marked",
+      "zh": "单元列表 · 故障标记",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-fault&slide=4",
+      "figma": "",
+      "notes": {
+        "purpose": "The unit list after reporting: the pen row carries a fault mark.",
+        "rules": [
+          "No toast: the mark and the row are the feedback; the walk returns to the same scroll position with the selection cleared.",
+          "Device name, reporter and time live on the pen record, whose history gains \"Fault · reported\"."
+        ],
+        "issues": [
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+        ]
+      }
+    },
+    {
+      "id": "inspection.fault-resolved",
+      "name": "Pen record · fault resolved",
+      "zh": "栏位记录 · 故障已解决",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-resolve-fault&slide=3",
+      "figma": "",
+      "notes": {
+        "purpose": "The pen record after Resolve: the Faults section prints \"none open\"; history holds both ends of the fault.",
+        "rules": [
+          "The empty section prints \"— none open\" instead of vanishing; the mark leaves the pen card the moment Resolve commits.",
+          "No toast, no banner: the record updates where it sat."
+        ],
+        "issues": [
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+        ]
+      }
+    },
+    {
+      "id": "inspection.set-count",
+      "name": "Set count",
+      "zh": "设置头数",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-count&slide=1",
+      "figma": "",
+      "notes": {
+        "purpose": "Set the head count of an untagged pen: one number, with the untagged remainder by batch.",
+        "rules": [
+          "Total = tagged + sum of batch lines, live.",
+          "The total cannot go below the tagged pigs; a batch line cannot go below 0.",
+          "With one batch line the two steppers are one control. Each tap saves; close when done."
+        ],
+        "edge": [
+          "A fully tagged pen derives its count from placements, so the verb sits in the not-available line."
+        ],
+        "issues": [
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+        ]
+      }
+    },
+    {
+      "id": "inspection.set-count-batches",
+      "name": "Set count · several batches",
+      "zh": "设置头数 · 多个批次",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-count&slide=2",
+      "figma": "",
+      "notes": {
+        "purpose": "Several batches: the rows carry the steppers and the total prints as the derived sum.",
+        "rules": [
+          "A change must name its batch.",
+          "\"Add batch\" lists batches line-scoped with already-allocated ones pinned; ticking commits the row at 0.",
+          "A row's remove control appears only at 0, and a 0-row drops on close."
+        ],
+        "issues": [
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+        ]
+      }
+    },
+    {
+      "id": "inspection.set-count-fewer",
+      "name": "Set count · why fewer",
+      "zh": "设置头数 · 减少原因",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-count&slide=3",
+      "figma": "",
+      "notes": {
+        "purpose": "The count went down: an optional reason block asks why.",
+        "rules": [
+          "Shown once the session's net change is not 0; the direction filters the list (Died, Moved, Miscount, Other).",
+          "The reason is optional, since the steppers have already saved.",
+          "Closing records one event with the old to new pair and the reason."
+        ],
+        "issues": [
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+        ]
+      }
+    },
+    {
+      "id": "inspection.set-count-more",
+      "name": "Set count · why more",
+      "zh": "设置头数 · 增加原因",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-count&slide=4",
+      "figma": "",
+      "notes": {
+        "purpose": "The count went up: the reason list flips (Born unrecorded, Moved unrecorded, Miscount, Other).",
+        "rules": [
+          "\"Other\" reveals a required Note under its trigger."
+        ],
+        "edge": [
+          "A pen with no tagged head prints no floor line; a mixed pen edits only its untagged remainder."
+        ],
+        "issues": [
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+        ]
+      }
+    },
+    {
+      "id": "inspection.count-recorded",
+      "name": "Pen record · count set",
+      "zh": "栏位记录 · 头数已设",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-count&slide=5",
+      "figma": "",
+      "notes": {
+        "purpose": "The pen record after the count: the strip re-reads the new head count and the sheet is the trail.",
+        "rules": [
+          "No banner, no discrepancy state: the history line carries who set it and the old to new pair."
+        ],
+        "issues": [
+          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+        ]
       }
     }
   ]
