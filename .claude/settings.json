@@ -6,5 +6,26 @@
   },
   "enabledPlugins": {
     "mattpocock-skills@mattpocock": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(gh pr merge *)",
+      "PowerShell(gh pr merge *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/merge-guard.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking the merge guard"
+          }
+        ]
+      }
+    ]
   }
 }

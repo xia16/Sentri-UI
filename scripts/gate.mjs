@@ -58,7 +58,13 @@ if (opt('verdict')) {
   if (verdict.pass !== true) console.log('  - the judge failed it');
   if (verdict.pass !== true && mech.pass !== true) console.log('  - the mechanical gate failed');
   // The merge names the gated commit, so GitHub refuses it if the PR head has moved since.
-  if (ok) console.log(`merge: gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
+  if (ok) {
+    // The pass record the merge guard (scripts/merge-guard.mjs) looks for: in the git common dir, so every worktree sees it.
+    const common = path.resolve(root, git(['rev-parse', '--git-common-dir']).out.trim());
+    fs.mkdirSync(path.join(common, 'sentri-gate'), { recursive: true });
+    fs.writeFileSync(path.join(common, 'sentri-gate', `${mech.candidate}.json`), JSON.stringify({ candidate: mech.candidate, base: mech.base, ref: mech.ref, out: path.resolve(dir), at: new Date().toISOString() }, null, 2));
+    console.log(`merge: gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
+  }
   process.exit(ok ? 0 : 1);
 }
 
