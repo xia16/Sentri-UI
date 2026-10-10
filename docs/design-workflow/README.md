@@ -63,7 +63,9 @@ A workflow failure is a retro: a step that stalled, a check that missed, a quest
 
 ## The three modes
 
-**1 · New feature.** Open a map per feature and claim it in the atlas. Then work through references ([build.md](briefs/build.md#1-references)), research and a PRD draft, and the **scenario step** (tree, then walks). Next come decisions: undecided screens stay provisional. Then design and build. Build screens first; components come from the feature. When it's built, the feature enters the polish loop.
+One entry point drives them all: `/design <feature>` ([.claude/skills/design/](../../.claude/skills/design/SKILL.md)). It reads where the feature stands (`node scripts/feature-state.mjs <feature>`) and runs the next step until a stop condition. Planning a new feature uses Matt Pocock's Wayfinder unchanged: a map of decision tickets on GitHub ([tracker operations](../agents/issue-tracker.md)). A feature's product questions are always grilling tickets on its map.
+
+**1 · New feature.** Chart a Wayfinder map for the feature and claim it in the atlas. Then work through references ([build.md](briefs/build.md#1-references)), research and a PRD draft, and the **scenario framework**. Next come decisions: undecided screens stay provisional. Then design and build. Build screens first; components come from the feature. When it's built, the feature enters the polish loop.
 
 **2 · Polish loop.** An in-design feature whose product scope is settled improves on its own. Agents complete the scenario tree, grade every screen, fix the worst, rerun the walks and leaves, and gate each round. They add no new product work. The loop ends with a review packet for the owner. See [polish-loop.md](briefs/polish-loop.md).
 
@@ -102,6 +104,7 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | `node scripts/run-scenarios.mjs` | Runs a feature's executable leaves (`features/<id>/scenarios.json`) |
 | `node scripts/gate.mjs --candidate <branch> --scope <features>` | The mechanical gate on the exact merge candidate: every check, every screen diffed against main, the before/after pairs for the judge ([gate.md](briefs/gate.md)) |
 | `node scripts/polish-loop.mjs <command> <feature>` | The polish loop's ledger: baseline, rounds, grades, stop conditions and the review packet ([polish-loop.md](briefs/polish-loop.md)) |
+| `node scripts/feature-state.mjs <feature>` | Where a feature stands and what `/design` drives next: chart, plan, scenarios, build, polish, review or freeze |
 | `node scripts/shoot-screens.mjs <out>` | Screenshots atlas screens bare at any widths and languages, and says where Chinese doesn't render |
 
 ## Briefs
@@ -121,7 +124,7 @@ Standards these briefs point to: `ux/design-system/README.md` (laws), `docs/desi
 
 ## Background
 
-- The `/design-drive` skill and its lint: [`.claude/skills/design-drive/`](../../.claude/skills/design-drive/SKILL.md), with its config in [`docs/agents/design.md`](../agents/design.md).
+- `/design-drive`, the earlier driver built on Wayfinder, is retired in favour of `/design`; its config is kept in [`docs/agents/design.md`](../agents/design.md) for history.
 - Why the workflow is shaped this way: [design-loop.md](design-loop.md) and [design-loop-research.md](design-loop-research.md). What went wrong: [pilot-retro.md](pilot-retro.md). The map is [Team design workflow #20](https://github.com/xia16/Sentri-UI/issues/20).
 
 Change the workflow in its own pull request, never inside a design PR.
