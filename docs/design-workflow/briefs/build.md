@@ -60,7 +60,7 @@ For a component, deliver:
 
 ## 5. Verify before you hand to the gate
 
-- Run `npm test` and `npm run check`. Both pass. Run `node scripts/check-legibility.mjs --changed <your screen ids>`: it exits non-zero while any screen you touched breaks the farm legibility law. Change a test only when it asserted the old structure, and say so.
+- Run `npm test` and `npm run check`. Both pass. Run `node scripts/check-legibility.mjs --changed <your screen ids> --compare <a server on origin/main>`: it exits non-zero if a screen you touched is worse than on main (or, once the README says `strict`, breaks the law at all). Never make it worse; aim to meet the floors. Change a test only when it asserted the old structure, and say so.
 - Run `npm run ux` and open every changed screen bare at 390×844 and 360×800, in EN and ZH. Check for no console errors and targets ≥ 48px, and take after-screenshots on the same states as the baselines. Use Playwright if it's installed (`SENTRI_PLAYWRIGHT` may point to it). If it isn't, say so.
 - For a behaviour change, walk the scenario leaves it touches (see `briefs/polish-loop.md`, "Executable leaves").
 - Merge main forward (`git fetch origin && git merge origin/main`), rerun the above, and record the commit your evidence is from. Don't chain commands so that a failure hides.

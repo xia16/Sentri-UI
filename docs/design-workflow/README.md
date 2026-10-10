@@ -2,6 +2,12 @@
 
 Sentri-UI is the design source of truth for a native-feel mobile app used by gloved, one-handed farm workers in English and Chinese. AI agents run its design work. This page is the workflow. Every session and every engineer runs this one. Words are defined in the [glossary](GLOSSARY.md).
 
+## Legibility gate
+
+Legibility gate: no-regression
+
+The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-system/README.md`) blocks a changed screen only if it is worse than at the base. When the type pass has merged, change the line above to `Legibility gate: strict`; the same check then holds changed screens to the absolute floors.
+
 ## Who decides what
 
 | Who | Decides |

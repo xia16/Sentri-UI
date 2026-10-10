@@ -1,9 +1,12 @@
 // The farm legibility check: type size, contrast and tap-target size on every atlas screen, rendered bare at 390 x 844.
-// Usage: node scripts/check-legibility.mjs [--base <url>] [--feature <id>] [--changed <screen ids>] [--strict] [--self-test]
+// Usage: node scripts/check-legibility.mjs [--base <url>] [--feature <id>] [--changed <screen ids> [--compare <base url>]] [--strict] [--self-test]
 //   --base      an already-running server (default: this script serves the repo itself)
 //   --feature   only the screens of one feature (does not write review/legibility.json)
 //   --changed   the screen ids a PR touches (comma or space separated); the exit code is 1 only when one of them fails
-//   --strict    exit 1 when any screen fails
+//   --compare   with --changed: the base server. A changed screen then fails only when it has MORE violations than the same
+//               screen at the base (per category), or a violation on an element that had none there. Use until the type pass lands.
+//   --strict    exit 1 when any screen fails (the absolute floors). The gate runs strict, not compare, once
+//               docs/design-workflow/README.md says "Legibility gate: strict".
 // Writes review/legibility.json. Floors: ux/design-system/README.md, "The farm legibility law".
 import { createRequire } from 'node:module';
 import http from 'node:http';
@@ -292,7 +295,37 @@ for (const r of show) {
   }
 }
 for (const r of results.filter((r) => r.error)) console.log('  ' + r.id + ': could not render (' + r.error + ')');
-const blocked = results.filter((r) => changed.includes(r.id) && (r.fails || r.error));
-if (blocked.length) { console.error('\nblocked: ' + blocked.length + ' changed screen(s) break the farm legibility law: ' + blocked.map((r) => r.id).join(', ')); process.exit(1); }
+const gateStrict = /^Legibility gate: *strict/mi.test(fs.existsSync(path.join(root, 'docs/design-workflow/README.md')) ? fs.readFileSync(path.join(root, 'docs/design-workflow/README.md'), 'utf8') : '');
+const compare = val('--compare');
+let blocked = [];
+if (changed.length && !gateStrict && !flag('--strict')) {
+  if (!compare) { console.error('--changed needs --compare <base url> while the gate is no-regression (docs/design-workflow/README.md); or pass --strict'); process.exit(2); }
+  const baseUrl = compare.replace(/[/]$/, '');
+  const baseIds = new Set(); try { const ba = await (await fetch(baseUrl + '/atlas/atlas.json')).json(); for (const p of ba.platforms) for (const sc of p.sections) for (const f of sc.features || []) for (const x of f.screens || []) baseIds.add(x.id); } catch (e) { console.warn('warning: could not read the base atlas: ' + e.message); }
+  const b2 = await chromium.launch();
+  const CATS = [['small', 'smallText', 'text under 13px'], ['contrast', 'lowContrast', 'low contrast'], ['taps', 'smallTargets', 'target under 48px']];
+  for (const r of results.filter((x) => changed.includes(x.id))) {
+    if (r.error) { blocked.push(r); continue; }
+    const sc = screens.find((x) => x.id === r.id); const why = [];
+    let bs = { small: 0, contrast: 0, taps: 0, smallText: [], lowContrast: [], smallTargets: [] };
+    if (baseIds.has(r.id)) {
+      const u = new URL(baseUrl + sc.url); u.searchParams.set('screen', r.id);
+      try { const { audit } = await auditUrl(b2, u.toString(), true); bs = { small: count(audit.small), contrast: count(audit.c45) + count(audit.c7), taps: count(audit.taps), smallText: audit.small, lowContrast: [...audit.c45, ...audit.c7], smallTargets: audit.taps }; }
+      catch (e) { console.warn('warning: base render of ' + r.id + ' failed: ' + e.message.split('\n')[0]); }
+    } else why.push('new screen: no baseline');
+    const cand = { small: r.small, contrast: r.contrast + r.contrastPrimary, taps: r.taps };
+    for (const [k, arr, label] of CATS) {
+      const mine = k === 'contrast' ? [...r.lowContrast, ...r.lowContrastPrimary] : r[arr];
+      const had = new Set(bs[arr].map((o) => o.sel));
+      if (cand[k] > bs[k]) why.push(label + ': ' + bs[k] + ' -> ' + cand[k]);
+      const fresh = [...new Set(mine.filter((o) => !had.has(o.sel)).map((o) => o.sel))];
+      if (fresh.length) why.push('new ' + label + ' on ' + fresh.slice(0, 4).join(', '));
+    }
+    console.log('  compare ' + r.id + ': ' + (why.length ? 'WORSE (' + why.join('; ') + ')' : 'no worse than base (small ' + bs.small + '->' + cand.small + ', contrast ' + bs.contrast + '->' + cand.contrast + ', targets ' + bs.taps + '->' + cand.taps + ')'));
+    if (why.length) blocked.push(r);
+  }
+  await b2.close();
+} else blocked = results.filter((r) => changed.includes(r.id) && (r.fails || r.error));
+if (blocked.length) { console.error('\nblocked: ' + blocked.length + ' changed screen(s) ' + (gateStrict || flag('--strict') ? 'break the farm legibility law' : 'got worse than the base') + ': ' + blocked.map((r) => r.id).join(', ')); process.exit(1); }
 if (flag('--strict') && (t.screensFailing || t.errors)) { console.error('\nstrict: screens fail the farm legibility law'); process.exit(1); }
 process.exit(0);
