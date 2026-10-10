@@ -135,6 +135,8 @@ export interface PickerBodyProps { variant?: 'single' | 'multi' | 'cascade' | 'c
 export interface PickerFieldProps {
   /** Optional contextual name for repeated fields; current display is appended to it. Visible label remains. */
   ariaLabel?: string;
+  /** Marks a required field (data-required); the host gives it error "Required" when its waiting commit is tapped while empty. */
+  required?: boolean;
   variant?: 'single' | 'multi' | 'cascade' | 'cascade-multi';
   selected?: string[];
   /** Record forms: the chosen names, shown on the trigger instead of a count. */
@@ -649,12 +651,16 @@ export interface SentriUI {
   pickerField(props: PickerFieldProps): string;
   pickerOptions(props: { options: PickerOption[]; selected?: string | string[]; action?: string; className?: string; variant?: 'single' | 'multi'; loading?: boolean; error?: string }): string;
   pickerBody(props: PickerBodyProps): string;
-  pickerFooter(props?: { selected?: string[]; multi?: boolean; backAction?: string; doneAction?: string; strs?: Strs<'back' | 'done'>; args?: StrArgs<'back' | 'done'> }): string;
+  /** The cascade level for the sheet head: spread into sheet(). Root: { title, up: null }; below: the level's name and ‹ parent. */
+  pickerHead(props: { items: unknown[]; path?: string[]; title?: string; rootLabel?: string; stepAction?: string }): { title: SheetText; up: { label: SheetText; action: string; value: string } | null; rows: number };
+  /** waiting: Done waits (nothing ticked and nothing applied). */
+  pickerFooter(props?: { selected?: string[]; multi?: boolean; waiting?: boolean; backAction?: string; doneAction?: string; strs?: Strs<'back' | 'done'>; args?: StrArgs<'back' | 'done'> }): string;
   chooserList(content: string, options?: { tone?: 'flat' | 'inset'; className?: string; ds?: string }): string;
   choiceRow(props: ChoiceRowProps): string;
   /** radio (candidate): the panel is a radiogroup labelled by the heading. */
   choiceGroup(rows: string | string[], options?: { title?: string; lead?: string; className?: string; radio?: boolean; /** Raw HTML at the heading's right end (a radio field's Clear). */ aside?: string; id?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
-  choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs; strs?: Strs<'label' | 'placeholder'> }): string;
+  /** While value is set, a Clear text action empties the field and fires `input`. args fill the strs ({ level } for ds.picker.search_in). */
+  choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs; strs?: Strs<'label' | 'placeholder'>; args?: Record<string, unknown> }): string;
   choiceEmpty(text: string, options?: { strs?: Strs<'text'>; args?: StrArgs<'text'> }): string;
   segment(props: SegmentProps): string;
   filterChips(props: { items: { value: string; label: string; count?: string | number; checked?: boolean; disabled?: boolean; aria?: string }[]; action?: string; key?: string; label?: string; state?: string; reason?: string }): string;
@@ -674,11 +680,13 @@ export interface SheetProps {
   subtitleTone?: 'amber' | 'red' | 'green';
   /** A glyph name before a dialog's title. */
   icon?: IconName;
-  /** Drawer only: the ✕. It is always drawn; this renames its action / label. */
+  /** Ignored: no sheet carries a ✕ (drawer convention). Kept for old callers. */
   close?: { action?: string; value?: string; label?: SheetText };
-  /** Raw HTML: an up-one-level control before the title (a drawer that drills into categories). Not a second Back. */
+  /** "‹ Parent" in the head, only in a drawer with levels: goes up one level, names the parent, never labelled Back. */
+  up?: { label: SheetText; action?: string; value?: string } | null;
+  /** Raw HTML before the titles (legacy; use `up`). */
   lead?: string;
-  /** Raw HTML: text actions (Clear, Reset) left of the ✕, never in its place. */
+  /** Raw HTML: the head's text actions (Clear, Reset). */
   aside?: string;
   /** Raw HTML between the head and the body that does not scroll (a filter bar). */
   above?: string;
@@ -688,8 +696,11 @@ export interface SheetProps {
   footer?: string | false;
   /** Drawer max height: compact 42% · short 58% · medium 76% (default) · long 85%. */
   size?: 'compact' | 'short' | 'medium' | 'long';
-  /** content (default): as tall as the content, up to size · full: held at size for content that grows as the worker taps. */
-  sizing?: 'content' | 'full';
+  /** content (default): as tall as the content, up to size · full: held at size for content that grows as the worker taps ·
+      hold: a drawer with levels keeps one height, `holdRows` rows plus its chrome, up to size. */
+  sizing?: 'content' | 'full' | 'hold';
+  /** With sizing 'hold': the rows the tallest level needs (pickerHead().rows). */
+  holdRows?: number;
   label?: SheetText;
   /** Written as data-view for the host. */
   view?: string;
