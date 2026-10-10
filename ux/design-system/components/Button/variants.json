@@ -7,7 +7,6 @@
     "states": [
       "Default",
       "Pressed",
-      "Focus",
       "Disabled",
       "Long / Chinese",
       "Waiting",
@@ -22,7 +21,6 @@
     "states": [
       "Default",
       "Pressed",
-      "Focus",
       "Disabled",
       "Long / Chinese",
       "Waiting",
@@ -37,7 +35,6 @@
     "states": [
       "Default",
       "Pressed",
-      "Focus",
       "Disabled",
       "Long / Chinese",
       "Waiting",
@@ -52,7 +49,6 @@
     "states": [
       "Default",
       "Pressed",
-      "Focus",
       "Disabled",
       "Long / Chinese",
       "Waiting",
@@ -73,7 +69,6 @@
     "states": [
       "Default",
       "Pressed",
-      "Focus",
       "Disabled",
       "Long / Chinese",
       "Waiting",
@@ -88,7 +83,6 @@
     "states": [
       "Default",
       "Pressed",
-      "Focus",
       "Disabled",
       "Long / Chinese",
       "Waiting",

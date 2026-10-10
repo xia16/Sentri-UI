@@ -6,7 +6,7 @@
 :is(.farrowing-phone,.inspection-phone) .sheet-footer>.surface-back{display:flex;align-items:center;justify-content:center;gap:4px;width:86px;min-width:86px;min-height:48px;margin:0;padding:8px;background:#fff;border:1px solid #b6c0ad;border-radius:12px;box-shadow:none;flex:none;font:500 14px var(--font-sans);color:var(--ink,#253021);white-space:nowrap}
 :is(.farrowing-phone,.inspection-phone) .sheet-footer>.surface-back>svg{width:16px;height:16px;flex:none;transform:none}
 :is(.farrowing-phone,.inspection-phone) .sheet-footer>.surface-back:active{background:#f5f6f1;color:#526847}
-:is(.farrowing-phone,.inspection-phone) .sheet-footer>.surface-back:focus-visible{outline:2px solid #40698c;outline-offset:2px}
+
 :is(.farrowing-phone,.inspection-phone) .sheet>.sheet-footer.record-toolbar{grid-template-columns:86px minmax(0,1fr)}
 .inspection-phone .actions-bottom-bar>.surface-back:after{display:none}
 :is(.farrowing-phone,.inspection-phone) .sheet[data-presentation="page"]>.sheet-body{min-height:0;flex:1;overflow-y:auto;padding:20px 21px 24px;overscroll-behavior:contain}

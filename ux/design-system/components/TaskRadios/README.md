@@ -2,7 +2,7 @@
 
 # TaskRadios (flat radio rows)
 
-The design system's ChoiceList radio field (`SentriUI.choiceRadios`: `role=radio` buttons, a roving tab stop, arrow keys through `radioBind`, an optional Clear) drawn as farrowing's flat rows.
+The design system's ChoiceList radio field (`SentriUI.choiceRadios`: `role=radio` buttons, an optional Clear) drawn as farrowing's flat rows.
 
 **Anatomy** (`.tk-radios`, `data-ds="ChoiceList" data-face="flat"`)
 - No panel. Each row `radio-row-min` (60px), padding 0, 10px gap, a 1px `line` **under each** row (the last too).
@@ -13,4 +13,4 @@ The design system's ChoiceList radio field (`SentriUI.choiceRadios`: `role=radio
 
 **Component contract**
 - **Props:** `SentriTask.radios({ …SentriUI.choiceRadios props })` (`label`, `options: [{ value, label, meta, strs }]`, `selected`, `action`, `key`, `optional`, `id`). `layout`: rows (default) or `'row'` (the inline field).
-- **Events:** the ChoiceList's (`<button role=radio data-action=action data-value=value>`); bind arrows with `SentriUI.radioBind`.
+- **Events:** the ChoiceList's (`<button role=radio data-action=action data-value=value>`).

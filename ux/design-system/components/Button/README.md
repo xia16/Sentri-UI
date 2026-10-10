@@ -31,12 +31,11 @@ Container; visible verb label; optional leading icon; optional loading marker; o
 | --- | --- |
 | Default | Label or glyph at rest. |
 | Pressed | Visible press fill / darkening and movement; static examples use `data-preview="pressed"`. |
-| Focus | Token focus ring; static `data-preview="focus"`. |
 | Disabled | Persistent text reason via `reason` or `describedby`; never colour alone. Prefer omitting unavailable acts. |
 | Long / Chinese | Visible Button labels wrap without ellipsis; icon accessible names remain complete. |
 | Waiting | Focusable `aria-disabled`; one prerequisite reason line stays visible. |
 | Loading | `busy`, `aria-busy`, ellipsis and reason; no duplicate commit. |
-| Hold: Holding / Armed | Progress sweep / second-press instruction and focus ring. |
+| Hold: Holding / Armed | Progress sweep / second-press instruction and an outline on the armed button. |
 | Hold: Pending / Done / Unknown | Recording / terminal result captions; Unknown never offers the act again. |
 | Hold: Failed | Return to idle only after a confirmed failure, with a reason. |
 
@@ -56,13 +55,9 @@ Aim for 24 English characters or 12 Chinese characters in a visible label; hold 
 
 ## Accessibility
 
-| Input | Behaviour |
-| --- | --- |
-| Tab / Shift+Tab | Moves focus among controls; visible token ring. |
-| Enter / Space | Native activation; hold uses the two-press path above. |
-| Escape | Cancels an armed or in-progress hold. |
+Screen reader: native `button` role, the name is the label, state is `aria-disabled` / `aria-busy`. A hold has a second path for a screen reader: one activation arms it, a second activation after 400ms and within 5s commits.
 
-Native `button` role; decorative icons are `aria-hidden`. Waiting and icon-disabled controls use `aria-disabled`; native disabled Button is unavailable to keyboard, with its reason visible. Loading uses `aria-busy`. Reason has `role="status"` and `aria-live="polite"`. Targets use `tap-min`, never less than 48 × 48. Respect reduced motion; no action depends on a long press alone.
+Native `button` role; decorative icons are `aria-hidden`. Waiting and icon-disabled controls use `aria-disabled`; native disabled Button is not announced as actionable, with its reason visible. Loading uses `aria-busy`. Reason has `role="status"` and `aria-live="polite"`. Targets use `tap-min`, never less than 48 × 48. Respect reduced motion; no action depends on a long press alone.
 
 ## Do / don’t
 

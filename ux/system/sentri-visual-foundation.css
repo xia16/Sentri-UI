@@ -21,7 +21,7 @@ body{background:var(--ground);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) .button.secondary{background:#fff;border-color:#bdc7b6;color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) .button.primary:not(:disabled){background:var(--ink);border-color:var(--ink);color:#fff}
 :is(.farrowing-phone,.inspection-phone) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea){border-color:#bdc7b6;border-radius:12px}
-:is(.farrowing-phone,.inspection-phone) :is(button,a,input,select,textarea,summary):focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
 /* Action semantics remain explicit; destructive controls never inherit the green treatment. */
 :is(.farrowing-phone,.inspection-phone) .button:is(.danger,.task-end-confirm):not(:disabled){background:var(--red);border-color:var(--red);color:#fff}
 @media(max-width:370px){

@@ -1,5 +1,7 @@
 # One implementation per component
 
+Everything in `ux/design-system/` is the mobile app's design system: a native-feel phone app used with touch. A web app, when it exists, gets its own.
+
 Step 1 of the component pass (branch `design/component-pass`). This file records what existed twice, what was done about it, and what is left. The design system in `ux/design-system/` is now the only implementation; every built screen loads `tokens.css` + `components/bundle.css` + `components/bundle.js` (namespace `SentriUI`, icons in `SentriIcons`).
 
 ## Before: two layers

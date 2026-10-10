@@ -115,14 +115,16 @@ async function stateGridAt(dir, id, opts = {}) {
 
 async function renderComponents() {
   const CI = {};
-  if (S.data.components) {
-    S.data.components.forEach((c) => { CI[c.name] = c; });
+  const comps = platform().components || [];
+  if (!comps.length) { emptyView('components'); return; }
+  {
+    comps.forEach((c) => { CI[c.name] = c; });
     const order = [], by = {};
-    S.data.components.forEach((c) => { if (!by[c.group]) { by[c.group] = []; order.push(c.group); } by[c.group].push(c.name); });
+    comps.forEach((c) => { if (!by[c.group]) { by[c.group] = []; order.push(c.group); } by[c.group].push(c.name); });
     COMPONENT_GROUPS = order.map((g) => [g, by[g]]);
   }
   const stOf = (n) => (CI[n] && CI[n].status) || 'in-design';
-  const { pane, nav } = libShell('Components', 'The mobile design system. A component is set when the first feature that uses it freezes.');
+  const { pane, nav } = libShell('Mobile app components', 'The mobile design system. A component is set when the first feature that uses it freezes.');
   const count = COMPONENT_GROUPS.reduce((n, g) => n + g[1].length, 0) + 1;
   let ds = {}; try { ds = await getJson(`${DS}/design-system.json`); } catch (_) {}
   const pages = { _brand: 'Brand book', _foundations: 'Foundations', _icons: 'Icons' };
@@ -141,14 +143,14 @@ async function renderComponents() {
   });
   nav.append(el('<h5>Task skeleton</h5>'));
   navItem(nav, '_task', `${dot('in-design')}Task skeleton (to be organised)`, null, () => go('_task'));
-  document.querySelector('.lib aside > p').textContent = `Mobile design system · ${count} parts. ` + 'A part is set when the first feature using it freezes.';
+  document.querySelector('.lib aside > p').textContent = `Mobile app · ${count} parts. ` + 'A part is set when the first feature using it freezes.';
 
   const compLink = (u) => { const m = u.match(/(?:^|\/)([A-Za-z]+)\/README\.md$/); return m && COMPONENT_GROUPS.some((g) => g[1].includes(m[1])) ? '?view=components&component=' + m[1] : null; };
   pane.addEventListener('click', (e) => { const a = e.target.closest('a[href^="?view=components&component="]'); if (a) { e.preventDefault(); go(new URLSearchParams(a.getAttribute('href')).get('component')); } });
 
   async function pageCover() {
     const f = await styledPreview('Cover'); pane.append(f || el(FAILED('the cover')));
-    const by = (st) => (S.data.components || []).filter((c) => c.status === st);
+    const by = (st) => comps.filter((c) => c.status === st);
     const bits = [['agent-checked', 'agent-checked'], ['in-design', 'in design'], ['placeholder', 'placeholder']].filter(([st]) => by(st).length)
       .map(([st, w]) => `<a href="#" data-st="${st}">${by(st).length} ${w}</a>`);
     if (bits.length) { const line = el(`<p class="cstat">${bits.join(' · ')}</p>`); pane.append(line); line.querySelectorAll('a').forEach((a) => { a.onclick = (e) => { e.preventDefault(); go(by(a.dataset.st)[0].name); }; }); }
@@ -199,7 +201,7 @@ async function renderComponents() {
   async function pageComponent(name) {
     const group = (COMPONENT_GROUPS.find((g) => g[1].includes(name)) || [''])[0];
     const head = el(`<h2>${esc(name)}</h2>`); pane.append(head);
-    const st = stOf(name), meta = el(`<div class="cmeta">${st === 'placeholder' ? dot(st) : ''}<span class="t">${st === 'placeholder' ? esc(STATUS[st]) + ' · ' : ''}${esc(group)}</span></div>`); pane.append(meta);
+    const st = stOf(name), meta = el(`<div class="cmeta">${st === 'placeholder' ? dot(st) : ''}<span class="t">${st === 'placeholder' ? esc(STATUS[st]) + ' · ' : ''}Mobile app component · ${esc(group)}</span></div>`); pane.append(meta);
     if (st === 'placeholder') {
       const c = CI[name], idx2 = screenIndex();
       const links = (c.seenIn || []).map((id) => idx2[id] ? `<a href="?feature=${esc(idx2[id].feature.id)}&screen=${esc(id)}" data-sid="${esc(id)}">${esc(idx2[id].feature.name)} · ${esc(idx2[id].name)}</a>` : '').filter(Boolean).join(', ');
@@ -280,6 +282,7 @@ const CAP = 300;
 const DEMOS = ['pp', 'sp', 'ds']; // prototype and demo strings, one item at the foot of the nav
 
 async function renderCopy() {
+  if (!platform().copy) { emptyView('copy'); return; }
   const { pane, nav } = libShell('Copy', 'One registry, English and Chinese. Screens refer to strings by id, never raw text: change it here and it changes everywhere.');
   let reg; try { reg = await loadStrings(); } catch (_) { pane.innerHTML = FAILED('the string registry'); return; }
   const strings = Object.entries(reg.strings || {}), ns = {};
@@ -316,8 +319,9 @@ async function renderCopy() {
 const BK = [['decision', 'Decision'], ['design', 'Design'], ['broken', 'Broken'], ['unclear', 'Unclear']];
 const bkState = { kind: '', sec: '', feature: '' }; // kind '@todo' is every kind but decision
 function renderBacklog() {
+  if (!backlogItems().length) { emptyView('backlog'); return; }
   const main = document.getElementById('main'); main.innerHTML = '';
-  const items = S.data.backlog || [], idx = screenIndex(), feats = Object.fromEntries(allFeatures().map((f) => [f.id, f]));
+  const items = backlogItems(), idx = screenIndex(), feats = Object.fromEntries(allFeatures().map((f) => [f.id, f]));
   const where = (t) => {
     if (t.kind === 'screen' && idx[t.id]) { const s = idx[t.id]; return { fid: s.feature.id, key: 'screen:' + t.id, name: `${s.feature.name} · ${s.name}`, sec: s.feature.sectionRef.name, open: () => openFeature(s.feature.id, s.id) }; }
     if (t.kind === 'feature' && feats[t.id]) { const f = feats[t.id]; return { fid: f.id, key: 'feature:' + t.id, name: f.name, sec: f.sectionRef.name, open: () => openFeature(f.id) }; }

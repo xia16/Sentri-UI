@@ -1,6 +1,5 @@
 <div data-state="Default" id="scope-state-0"></div>
 <div data-state="Pressed" id="scope-state-1"></div>
-<div data-state="Focus" id="scope-state-2"></div>
 <div data-state="Long label / Chinese" id="scope-state-3"></div>
 <div data-state="Current" id="scope-state-4"></div>
 <div data-state="Disabled" id="scope-state-5"></div>
@@ -10,7 +9,6 @@ var UI = window.SentriUI;
 var RENDER = {
   "scope-state-0": () => SentriUI.row({"title": "Unit 6", "description": "8 pigs · 4 pens", "action": "open", "value": "A02", "variant": "scope", "wrap": true, "attrs": {}, "trailing": {"text": "2 tasks"}}),
   "scope-state-1": () => SentriUI.row({"title": "Unit 6", "description": "8 pigs · 4 pens", "action": "open", "value": "A02", "variant": "scope", "wrap": true, "attrs": {"data-preview": "pressed"}, "trailing": {"text": "2 tasks"}}),
-  "scope-state-2": () => SentriUI.row({"title": "Unit 6", "description": "8 pigs · 4 pens", "action": "open", "value": "A02", "variant": "scope", "wrap": true, "attrs": {"data-preview": "focus"}, "trailing": {"text": "2 tasks"}}),
   "scope-state-3": () => SentriUI.row({"title": "检查待处理的母猪与仔猪记录", "description": "记录时间 09:41 · 饲养员张伟 · 长文字完整换行", "action": "open", "value": "A02", "variant": "scope", "wrap": true, "attrs": {}, "trailing": {"text": "2 tasks"}}),
   "scope-state-4": () => SentriUI.row({"title": "Unit 6", "description": "Current unit · 8 pigs · 4 pens", "action": "open", "value": "A02", "variant": "scope", "wrap": true, "attrs": {"aria-current": "location"}, "trailing": {"text": "2 tasks"}}),
   "scope-state-5": () => SentriUI.row({"title": "Unit 6", "description": "8 pigs · 4 pens", "action": "open", "value": "A02", "variant": "scope", "wrap": true, "attrs": {}, "trailing": {"text": "2 tasks"}, "disabled": true, "reason": "Unavailable — unit is closed"})

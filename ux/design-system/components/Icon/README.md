@@ -25,7 +25,7 @@ An aria-hidden SVG on a 24-unit viewBox containing one open-stroke path. More is
 | --- | --- |
 | Default | Registry glyph |
 | Unknown | Empty SVG and `console.warn`; never a navigation affordance |
-| Pressed, active, disabled, focus, error, loading | Host control owns these states |
+| Pressed, active, disabled, error, loading | Host control owns these states |
 
 ## Behaviour / API
 
@@ -39,7 +39,7 @@ One lowercase name per glyph; no translated glyph keys. Labels follow their host
 
 ## Accessibility
 
-SVG is `aria-hidden="true"` and `focusable="false"`; the visible label or host aria-label provides the accessible name. No role, keyboard handler or tap target belongs to Icon. IconButton supplies a tap-min square target and visible keyboard focus; Stepper and Numpad supply their key semantics.
+SVG is `aria-hidden="true"` and `focusable="false"`; the visible label or host aria-label provides the accessible name. No role, handler or tap target belongs to Icon. IconButton supplies a tap-min square target; Stepper and Numpad supply their key semantics.
 
 ## Tokens
 

@@ -1,4 +1,4 @@
-Sentri is a phone-first tool for commercial pig farms: what needs doing, where, to which animals, and what has already been recorded. It is used standing in a barn, often gloved, often offline, reading for two seconds at a time. Every rule below serves that reader.
+Sentri is a phone-first tool for commercial pig farms: what needs doing, where, to which animals, and what has already been recorded. It is used standing in a barn, often gloved, often offline, reading for two seconds at a time. Every rule below serves that reader. Everything in `ux/design-system/` is the mobile app's design system: a native-feel phone app used with touch. A web app, when it exists, gets its own.
 
 The system has one palette (Astra, light only), two type families, one shared component layer (`SentriUI`) and one icon registry (`SentriIcons`). Every screen is these parts, configured — never a fork. An operation that fits no existing container is a design smell, not a reason for a new one.
 
@@ -58,7 +58,7 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
 - **Disabled:** primary buttons go `disabled-fill` with `disabled-ink`. But prefer omission: blocked verbs are left out, not greyed, with one line saying why ("4 not available for a gilt ›"). Done rows differ by ✓, stamp and ✎ — never by grey.
 - **The floor-gray (the one scoped exception to "no dim-as-disabled"; owner, 2026-08-30).** A field key with nothing to do — a stepper's − at its floor or + at its ceiling, a Numpad's ⌫ on an empty value, `.` after a point, digits when the value is full — fills `disabled-fill` with a `disabled-ink` glyph. It is `aria-disabled`, never `disabled`: the tap still reaches the host, which answers it in the field's reserved hint line (pointers such as `Found dead? Record dead` · `Wrong count? Edit` at a floor, a sentence at a ceiling, `Tag is 6 digits` on a full pad). Nothing else is ever greyed. Used by [Stepper](components/Stepper/README.md) and [Numpad](components/Numpad/README.md).
 - **Waiting (candidate, ADR 0002).** A button that one visible step will make live stays present and quiet: `aria-disabled` with the `disabled-fill` face, focusable, its reason in one status line beside the bar ([Button](components/Button/README.md)). Prefer omission otherwise.
-- **Focus:** a solid 3px `focus` ring, offset 2px (rows: −3px, inside the row). It holds 3.9:1 or better on every Sentri surface.
+- **No designed focus, hover or keyboard state.** Sentri is a touch app; the OS screen reader draws its own focus outline.
 - **Current location:** `green-wash` background plus the `current-marker` inset bar (`aria-current="location"`).
 
 ### Motion

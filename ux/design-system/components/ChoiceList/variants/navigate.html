@@ -8,9 +8,6 @@
 <section data-state="Disabled"><h3>Disabled</h3><div id="state-Disabled"></div>
 
 </section>
-<section data-state="Focus" data-preview="focus"><h3>Focus</h3><div id="state-Focus"></div>
-
-</section>
 <section data-state="Loading"><h3>Loading</h3><div id="state-Loading"></div>
 
 </section>
@@ -27,7 +24,6 @@ var RENDER = {
   "state-Default": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "navigate", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false}),
   "state-Pressed": () => UI.choiceGroup(UI.choiceRow({"pressed": true, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "navigate", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false}),
   "state-Disabled": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": true, "reason": "Unavailable offline. Reconnect to select.", "label": "Amoxicillin", "mode": "navigate", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false}),
-  "state-Focus": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "navigate", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false}),
   "state-Loading": () => UI.choiceEmpty("Loading options\u2026"),
   "state-Empty": () => UI.choiceEmpty("No options available."),
   "state-Long-label": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称", "mode": "navigate", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false})

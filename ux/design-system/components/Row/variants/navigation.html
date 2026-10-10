@@ -1,6 +1,5 @@
 <div data-state="Default" id="navigation-state-0"></div>
 <div data-state="Pressed" id="navigation-state-1"></div>
-<div data-state="Focus" id="navigation-state-2"></div>
 <div data-state="Long label / Chinese" id="navigation-state-3"></div>
 <div data-state="Disabled" id="navigation-state-4"></div>
 <script>
@@ -9,7 +8,6 @@ var UI = window.SentriUI;
 var RENDER = {
   "navigation-state-0": () => SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow')})),
   "navigation-state-1": () => SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {"data-preview": "pressed"}, "icon": SentriIcons.icon('farrow')})),
-  "navigation-state-2": () => SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {"data-preview": "focus"}, "icon": SentriIcons.icon('farrow')})),
   "navigation-state-3": () => SentriUI.rowGroup(SentriUI.row({"title": "检查待处理的母猪与仔猪记录", "description": "记录时间 09:41 · 饲养员张伟 · 长文字完整换行", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow')})),
   "navigation-state-4": () => SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow'), "disabled": true, "reason": "Unavailable — unit is closed"}))
 };

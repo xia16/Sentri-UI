@@ -2,7 +2,6 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Button · Primary</title><style>html,body{margin:0;color:var(--ink);font-family:var(--font-sans)}.example{}.example h2{font-size:var(--type-description-size);margin:0 0 var(--space-8)}.demo{display:flex;flex-direction:column;gap:var(--space-8);min-width:0}.demo>.button{width:100%}.demo>.st-button-reason{margin:0}</style></head><body>
 <section class="example" data-state="Default"><h2>Default</h2><div class="demo"></div></section>
 <section class="example" data-state="Pressed"><h2>Pressed</h2><div class="demo"></div></section>
-<section class="example" data-state="Focus"><h2>Focus</h2><div class="demo"></div></section>
 <section class="example" data-state="Disabled"><h2>Disabled</h2><div class="demo"></div></section>
 <section class="example" data-state="Long / Chinese"><h2>Long / Chinese</h2><div class="demo"></div></section>
 <section class="example" data-state="Waiting"><h2>Waiting</h2><div class="demo"></div></section>
@@ -16,7 +15,7 @@ for(const el of document.querySelectorAll('[data-state]')){
  const reason=state==='Loading'?'Recording; wait for the result.':state==='Failed'?'Nothing was recorded. Check the connection, then try again.':state==='Unknown'?'Result unknown. Check the record before continuing.':state==='Done'?'Task ended.':state==='Waiting'||state==='Disabled'?'Choose the piglets first.':'';
  let control;
  control=UI.button({label,register:'primary',icon:'',waiting:state==='Waiting',disabled:state==='Disabled',busy:state==='Loading',reason});
- if(state==='Pressed'||state==='Focus')control=control.replace('<button','<button data-preview="'+state.toLowerCase()+'"');
+ if(state==='Pressed')control=control.replace('<button','<button data-preview="'+state.toLowerCase()+'"');
  el.querySelector('.demo').innerHTML=control;
 }
 UI.holdBind(document.body);

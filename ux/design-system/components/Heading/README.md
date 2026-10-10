@@ -45,7 +45,6 @@ A heading is static text. Only its action has states.
 |---|---|
 | Default | title, with whatever optional parts the kind carries |
 | Pressed | the action link: `press` fill, ink text (static: `data-preview="pressed"`) |
-| Focus | the action link: the 3px `focus` ring |
 | Selected, disabled, error, loading | none. A heading is not selectable; a blocked action is left out, not greyed; a heading never loads or errs |
 | Empty | absent: a heading is never drawn over an empty block |
 | Long title | wraps; the aside stays top-aligned and holds at most 46% of the width |
@@ -66,7 +65,7 @@ The title is not interactive. `action` is `{ label, action, value, ariaLabel, di
 ## Accessibility
 
 - Role: a heading element (`level`) so a screen reader can jump between headings; choose the level from the page outline, not the size.
-- The action is a `<button>` with a visible 3px focus ring; Tab reaches it, Enter and Space activate it.
+- The action is a `<button>`; the screen reader reads its name and role.
 - Nothing depends on a gesture.
 
 ## CSS variables
