@@ -12,8 +12,8 @@
   "screens": 263,
   "screensFailing": 260,
   "errors": 0,
-  "small": 3873,
-  "contrast": 1382,
+  "small": 3889,
+  "contrast": 1383,
   "contrastPrimary": 24,
   "taps": 86
  },
@@ -75,7 +75,7 @@
   "piglet-processing": {
    "screens": 24,
    "failing": 23,
-   "small": 432,
+   "small": 443,
    "contrast": 0,
    "contrastPrimary": 6,
    "taps": 0,
@@ -121,7 +121,7 @@
    "screens": 11,
    "failing": 11,
    "small": 186,
-   "contrast": 19,
+   "contrast": 20,
    "contrastPrimary": 0,
    "taps": 0,
    "errors": 0
@@ -129,7 +129,7 @@
   "inspection": {
    "screens": 32,
    "failing": 32,
-   "small": 511,
+   "small": 513,
    "contrast": 159,
    "contrastPrimary": 1,
    "taps": 17,
@@ -156,7 +156,7 @@
   "pig-profile": {
    "screens": 18,
    "failing": 18,
-   "small": 178,
+   "small": 179,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -219,7 +219,7 @@
   "fostering": {
    "screens": 4,
    "failing": 4,
-   "small": 119,
+   "small": 121,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -310,7 +310,7 @@
  "topSmallTextSelectors": [
   {
    "selector": "span @11px",
-   "n": 316
+   "n": 319
   },
   {
    "selector": "span @10px",
@@ -342,7 +342,7 @@
   },
   {
    "selector": "p.sheet-subtitle @11px",
-   "n": 93
+   "n": 94
   },
   {
    "selector": "span.code @12px",
@@ -406,7 +406,7 @@
   },
   {
    "selector": "small @9px",
-   "n": 47
+   "n": 48
   },
   {
    "selector": "div.flbl @10px",
@@ -5007,7 +5007,7 @@
    "sizes": {
     "11": 2,
     "12": 3,
-    "13": 4,
+    "13": 5,
     "14": 2,
     "18": 2,
     "20": 1,
@@ -5271,6 +5271,7 @@
    "unverified": 0,
    "sizes": {
     "11": 1,
+    "13": 1,
     "14": 2,
     "15": 7,
     "18": 7,
@@ -5445,7 +5446,7 @@
     "10": 7,
     "11": 3,
     "12": 5,
-    "13": 2,
+    "13": 3,
     "14": 7,
     "15": 1,
     "17": 3,
@@ -5736,7 +5737,7 @@
    "unverified": 0,
    "sizes": {
     "11": 1,
-    "13": 1,
+    "13": 2,
     "14": 2,
     "15": 7,
     "18": 7,
@@ -5861,7 +5862,7 @@
     {
      "n": 1,
      "sel": "p",
-     "text": "10 Oct, 19:14 · G. Hansen",
+     "text": "10 Oct, 16:53 · G. Hansen",
      "px": 11
     },
     {
@@ -5960,7 +5961,7 @@
     "10": 2,
     "11": 1,
     "12": 1,
-    "13": 1,
+    "13": 2,
     "14": 3,
     "22": 1,
     "28": 2
@@ -7341,7 +7342,7 @@
   {
    "id": "piglet-processing.sheet-coming",
    "feature": "piglet-processing",
-   "small": 16,
+   "small": 17,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -7349,7 +7350,7 @@
    "unverified": 0,
    "sizes": {
     "10": 2,
-    "11": 14,
+    "11": 15,
     "13": 7,
     "14": 9,
     "20": 1
@@ -7390,6 +7391,12 @@
      "sel": "span.st-tok",
      "text": "day 2–4",
      "px": 11
+    },
+    {
+     "n": 1,
+     "sel": "p.sheet-status",
+     "text": "Tick at least one item",
+     "px": 11
     }
    ],
    "lowContrast": [],
@@ -7399,7 +7406,7 @@
   {
    "id": "piglet-processing.sheet-todo",
    "feature": "piglet-processing",
-   "small": 20,
+   "small": 21,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -7407,7 +7414,7 @@
    "unverified": 0,
    "sizes": {
     "10": 2,
-    "11": 18,
+    "11": 19,
     "13": 7,
     "14": 9,
     "20": 1
@@ -7448,6 +7455,12 @@
      "sel": "span.st-tok",
      "text": "10 given",
      "px": 11
+    },
+    {
+     "n": 1,
+     "sel": "p.sheet-status",
+     "text": "Tick at least one item",
+     "px": 11
     }
    ],
    "lowContrast": [],
@@ -7457,7 +7470,7 @@
   {
    "id": "piglet-processing.sheet-breeders",
    "feature": "piglet-processing",
-   "small": 17,
+   "small": 18,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -7465,7 +7478,7 @@
    "unverified": 0,
    "sizes": {
     "10": 2,
-    "11": 15,
+    "11": 16,
     "13": 8,
     "14": 9,
     "20": 1
@@ -7512,6 +7525,12 @@
      "sel": "span.st-part",
      "text": "Not filled",
      "px": 11
+    },
+    {
+     "n": 1,
+     "sel": "p.sheet-status",
+     "text": "Tick at least one item",
+     "px": 11
     }
    ],
    "lowContrast": [],
@@ -7521,7 +7540,7 @@
   {
    "id": "piglet-processing.sheet-late",
    "feature": "piglet-processing",
-   "small": 20,
+   "small": 21,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -7529,7 +7548,7 @@
    "unverified": 0,
    "sizes": {
     "10": 3,
-    "11": 17,
+    "11": 18,
     "13": 7,
     "14": 9,
     "20": 1
@@ -7576,6 +7595,12 @@
      "sel": "span.st-part",
      "text": "late",
      "px": 11
+    },
+    {
+     "n": 1,
+     "sel": "p.sheet-status",
+     "text": "Tick at least one item",
+     "px": 11
     }
    ],
    "lowContrast": [],
@@ -7585,7 +7610,7 @@
   {
    "id": "piglet-processing.sheet-done",
    "feature": "piglet-processing",
-   "small": 13,
+   "small": 14,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -7593,7 +7618,7 @@
    "unverified": 0,
    "sizes": {
     "10": 1,
-    "11": 12,
+    "11": 13,
     "13": 4,
     "14": 9,
     "20": 1
@@ -7639,6 +7664,12 @@
      "n": 1,
      "sel": "span.st-tok",
      "text": "Iron · Dock tail · Castrate · Coccidiosi",
+     "px": 11
+    },
+    {
+     "n": 1,
+     "sel": "p.sheet-status",
+     "text": "Tick at least one item",
      "px": 11
     }
    ],
@@ -7730,7 +7761,7 @@
   {
    "id": "piglet-processing.give-ids",
    "feature": "piglet-processing",
-   "small": 13,
+   "small": 14,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -7738,7 +7769,7 @@
    "unverified": 0,
    "sizes": {
     "10": 1,
-    "11": 8,
+    "11": 9,
     "12": 4,
     "13": 5,
     "14": 9,
@@ -7780,6 +7811,12 @@
      "n": 1,
      "sel": "small.st-optional-word",
      "text": "Optional",
+     "px": 11
+    },
+    {
+     "n": 1,
+     "sel": "p.sheet-status",
+     "text": "Add the number and the sex",
      "px": 11
     }
    ],
@@ -7826,14 +7863,14 @@
   {
    "id": "piglet-processing.weight",
    "feature": "piglet-processing",
-   "small": 2,
+   "small": 3,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 1,
+    "11": 2,
     "12": 1,
     "14": 3,
     "20": 1,
@@ -7851,6 +7888,12 @@
      "sel": "span.st-measure-unit",
      "text": "kg",
      "px": 12
+    },
+    {
+     "n": 1,
+     "sel": "p.sheet-status",
+     "text": "Type the weight",
+     "px": 11
     }
    ],
    "lowContrast": [],
@@ -7879,14 +7922,14 @@
   {
    "id": "piglet-processing.record-death",
    "feature": "piglet-processing",
-   "small": 1,
+   "small": 2,
    "contrast": 0,
    "contrastPrimary": 4,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 1,
+    "11": 2,
     "14": 2,
     "15": 4,
     "18": 4,
@@ -7897,6 +7940,12 @@
      "n": 1,
      "sel": "p.sheet-subtitle",
      "text": "A03 · 12 alive",
+     "px": 11
+    },
+    {
+     "n": 1,
+     "sel": "p.sheet-status",
+     "text": "Say how many died",
      "px": 11
     }
    ],
@@ -7915,7 +7964,7 @@
   {
    "id": "piglet-processing.move-piglets",
    "feature": "piglet-processing",
-   "small": 13,
+   "small": 14,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -7923,7 +7972,7 @@
    "unverified": 0,
    "sizes": {
     "10": 1,
-    "11": 1,
+    "11": 2,
     "12": 11,
     "13": 1,
     "14": 13,
@@ -7947,6 +7996,12 @@
      "sel": "span.st-choice-meta",
      "text": "day 6",
      "px": 12
+    },
+    {
+     "n": 1,
+     "sel": "p.sheet-status",
+     "text": "Pick a pen first",
+     "px": 11
     }
    ],
    "lowContrast": [],
@@ -7956,14 +8011,14 @@
   {
    "id": "piglet-processing.set-count",
    "feature": "piglet-processing",
-   "small": 1,
+   "small": 2,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 1,
+    "11": 2,
     "13": 1,
     "14": 2,
     "20": 1,
@@ -7974,6 +8029,12 @@
      "n": 1,
      "sel": "p.sheet-subtitle",
      "text": "A03 · was 12",
+     "px": 11
+    },
+    {
+     "n": 1,
+     "sel": "p.sheet-status",
+     "text": "Change the count to save",
      "px": 11
     }
    ],
@@ -8426,7 +8487,7 @@
   {
    "id": "piglet-processing.sheet-notch",
    "feature": "piglet-processing",
-   "small": 20,
+   "small": 21,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -8434,7 +8495,7 @@
    "unverified": 0,
    "sizes": {
     "10": 2,
-    "11": 18,
+    "11": 19,
     "13": 7,
     "14": 9,
     "20": 1
@@ -8474,6 +8535,12 @@
      "n": 5,
      "sel": "span.st-tok",
      "text": "10 given",
+     "px": 11
+    },
+    {
+     "n": 1,
+     "sel": "p.sheet-status",
+     "text": "Tick at least one item",
      "px": 11
     }
    ],
@@ -9341,6 +9408,7 @@
    "sizes": {
     "11": 2,
     "12": 4,
+    "13": 1,
     "14": 6,
     "20": 1
    },
@@ -10585,19 +10653,19 @@
    "id": "feed-plan.editor",
    "feature": "feed-plan",
    "small": 34,
-   "contrast": 8,
+   "contrast": 9,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
     "8": 9,
-    "9": 4,
+    "9": 5,
     "10": 5,
-    "11": 5,
+    "11": 4,
     "12": 11,
-    "13": 1,
-    "14": 6,
+    "13": 2,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -10614,6 +10682,12 @@
      "px": 12
     },
     {
+     "n": 4,
+     "sel": "small",
+     "text": "3 selected",
+     "px": 9
+    },
+    {
      "n": 1,
      "sel": "strong",
      "text": "Daily feed · kg/day",
@@ -10624,12 +10698,6 @@
      "sel": "strong",
      "text": "000254",
      "px": 12
-    },
-    {
-     "n": 3,
-     "sel": "small",
-     "text": "Gestation 1",
-     "px": 9
     },
     {
      "n": 6,
@@ -10674,7 +10742,7 @@
      "px": 10
     },
     {
-     "n": 2,
+     "n": 1,
      "sel": "small.st-optional-word",
      "text": "Optional",
      "px": 11
@@ -10689,7 +10757,7 @@
      "ratio": 3.9
     },
     {
-     "n": 2,
+     "n": 3,
      "sel": "small.feed-change-state",
      "text": "Unchanged",
      "px": 8,
@@ -10711,6 +10779,7 @@
    "sizes": {
     "11": 1,
     "12": 1,
+    "13": 1,
     "14": 2,
     "20": 1
    },
@@ -12023,19 +12092,31 @@
   {
    "id": "inspection.review-selected",
    "feature": "inspection",
-   "small": 1,
+   "small": 3,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 1,
-    "13": 2,
-    "14": 2,
+    "11": 3,
+    "13": 1,
+    "14": 3,
     "20": 1
    },
    "smallText": [
+    {
+     "n": 1,
+     "sel": "p.sheet-subtitle",
+     "text": "1 pig",
+     "px": 11
+    },
+    {
+     "n": 1,
+     "sel": "span",
+     "text": "Pigs",
+     "px": 11
+    },
     {
      "n": 1,
      "sel": "small",
@@ -14543,6 +14624,7 @@
    "unverified": 0,
    "sizes": {
     "11": 4,
+    "13": 1,
     "14": 5,
     "20": 1
    },
@@ -15728,6 +15810,7 @@
    "sizes": {
     "11": 2,
     "12": 4,
+    "13": 1,
     "14": 6,
     "20": 1
    },
@@ -15773,7 +15856,7 @@
    "sizes": {
     "11": 1,
     "12": 1,
-    "13": 2,
+    "13": 3,
     "14": 3,
     "20": 1
    },
@@ -15808,6 +15891,7 @@
     "10": 2,
     "11": 2,
     "12": 1,
+    "13": 1,
     "14": 4,
     "16": 1,
     "20": 1
@@ -15893,6 +15977,7 @@
    "sizes": {
     "11": 3,
     "12": 1,
+    "13": 1,
     "14": 4,
     "20": 1
    },
@@ -15929,7 +16014,7 @@
   {
    "id": "pig-profile.body-condition",
    "feature": "pig-profile",
-   "small": 3,
+   "small": 4,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -15937,6 +16022,8 @@
    "unverified": 0,
    "sizes": {
     "11": 3,
+    "12": 1,
+    "13": 1,
     "14": 4,
     "20": 1
    },
@@ -15952,6 +16039,12 @@
      "sel": "span",
      "text": "Condition",
      "px": 11
+    },
+    {
+     "n": 1,
+     "sel": "p.quiet-note",
+     "text": "Records condition. Feed stays unchanged.",
+     "px": 12
     },
     {
      "n": 1,
@@ -15975,6 +16068,7 @@
    "unverified": 0,
    "sizes": {
     "11": 2,
+    "13": 1,
     "14": 2,
     "20": 1
    },
@@ -16041,6 +16135,7 @@
    "sizes": {
     "11": 2,
     "12": 2,
+    "13": 1,
     "14": 5,
     "20": 1
    },
@@ -17351,6 +17446,7 @@
    "unverified": 0,
    "sizes": {
     "11": 4,
+    "13": 1,
     "14": 5,
     "20": 1
    },
@@ -17388,7 +17484,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "14": 5,
+    "14": 6,
     "20": 1
    },
    "smallText": [],
@@ -17407,6 +17503,7 @@
    "unverified": 0,
    "sizes": {
     "11": 4,
+    "13": 1,
     "14": 5,
     "20": 1
    },
@@ -17445,6 +17542,7 @@
    "unverified": 0,
    "sizes": {
     "11": 4,
+    "13": 1,
     "14": 5,
     "20": 1
    },
@@ -17483,7 +17581,7 @@
    "unverified": 0,
    "sizes": {
     "11": 4,
-    "13": 4,
+    "13": 5,
     "14": 8,
     "22": 1
    },
@@ -17515,7 +17613,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "14": 6,
+    "14": 7,
     "20": 1
    },
    "smallText": [],
@@ -19543,7 +19641,7 @@
   {
    "id": "fostering.type",
    "feature": "fostering",
-   "small": 28,
+   "small": 29,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -19551,7 +19649,7 @@
    "unverified": 0,
    "sizes": {
     "10": 3,
-    "11": 14,
+    "11": 15,
     "12": 11,
     "13": 9,
     "14": 18,
@@ -19559,7 +19657,7 @@
    },
    "smallText": [
     {
-     "n": 13,
+     "n": 14,
      "sel": "span",
      "text": "B06 · 12 alive · day 3",
      "px": 11
@@ -19590,7 +19688,7 @@
   {
    "id": "fostering.receive",
    "feature": "fostering",
-   "small": 29,
+   "small": 30,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -19598,15 +19696,15 @@
    "unverified": 0,
    "sizes": {
     "10": 4,
-    "11": 15,
+    "11": 16,
     "12": 10,
-    "13": 11,
+    "13": 10,
     "14": 17,
     "20": 2
    },
    "smallText": [
     {
-     "n": 14,
+     "n": 15,
      "sel": "span",
      "text": "B06 · 12 alive · day 3",
      "px": 11
@@ -22339,7 +22437,7 @@
    "sizes": {
     "11": 2,
     "12": 2,
-    "13": 1,
+    "13": 2,
     "14": 4,
     "22": 1
    },
