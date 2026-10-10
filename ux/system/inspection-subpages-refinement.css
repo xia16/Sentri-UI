@@ -260,3 +260,8 @@
 .inspection-phone .bulk-action-layout:not([data-bulk-kind="treatment"]) .bulk-reading input{width:84px;box-sizing:border-box;padding:0 8px;border:1px solid var(--control-border);border-radius:var(--radius-control,12px);text-align:right;font:600 var(--type-identifier-strong-size) var(--font-mono);color:var(--ink);background:var(--paper)}
 .inspection-phone .bulk-action-layout:not([data-bulk-kind="treatment"]) .bulk-reading input:focus{border-color:var(--ink);outline:1px solid var(--ink)}
 .inspection-phone .bulk-action-layout:not([data-bulk-kind="treatment"]) .bulk-reading input[aria-invalid="true"]{border-color:var(--red)}
+
+/* A waiting or unavailable control keeps its quiet surface, but its words stay readable (7:1 on the disabled fills: they are 16px). */
+.inspection-phone{--disabled-ink:#444d3f}
+.inspection-phone .pen-cell:disabled,.inspection-phone .pen-cell:disabled small{color:var(--disabled-ink)}
+.inspection-phone .pen-cell strong{font-size:var(--type-identifier-strong-size)}
