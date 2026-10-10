@@ -8,47 +8,153 @@
   "duplicates": "built inside Inspection — see inspection / health-record",
   "groups": [
     [
-      "Old UI",
+      "Record heat",
       [
-        "heat.heat",
-        "heat.batch",
-        "heat.result"
+        "heat.entry",
+        "heat.drawer",
+        "heat.join",
+        "heat.joined",
+        "heat.after"
       ]
     ]
   ],
   "screens": [
     {
-      "id": "heat.heat",
-      "name": "Record heat",
+      "id": "heat.entry",
+      "name": "Entry · verb sheet",
+      "zh": "发情 · 入口",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-heat&slide=1",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Ticking a gilt raises the verb sheet gated by her state.",
+        "rules": [
+          "Blocked verbs are omitted, not greyed; one line accounts for them."
+        ]
+      }
+    },
+    {
+      "id": "heat.drawer",
+      "name": "Heat drawer · just record or join",
       "zh": "发情",
-      "status": "placeholder",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-heat&slide=2",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Mark a non-pregnant or gilt pig in heat; the states bred and pregnant.",
-        "issues": []
+        "purpose": "Heat signs versus In heat, and the one question that follows.",
+        "elements": [
+          {
+            "name": "Just record / Join a batch",
+            "at": "Just record",
+            "shows": "Two visible options, Just record preselected",
+            "rule": "Shown only when nothing watches her. Record-only commits at once; the 48-hour fact is the option hint.",
+            "states": [
+              {
+                "state": "Not watched",
+                "when": "No running heat check",
+                "shows": "The two options"
+              },
+              {
+                "state": "Watched",
+                "when": "Running heat check",
+                "shows": "No options block; the In heat option carries the derived hint"
+              }
+            ]
+          }
+        ]
       }
     },
     {
-      "id": "heat.batch",
-      "name": "Choose batch",
+      "id": "heat.join",
+      "name": "Join a batch · picker",
       "zh": "选择批次",
-      "status": "placeholder",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-heat&slide=3",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Choose the batch the pig joins.",
-        "issues": []
+        "purpose": "The shared batch picker, filtered for heat.",
+        "elements": [
+          {
+            "name": "Batch list",
+            "shows": "Batches not done breeding, with breeding timing",
+            "logic": "Filter: breeding not started or running. Search is scoped to the chosen production line (scope chip)."
+          }
+        ],
+        "rules": [
+          "Tap a row and the sheet closes; there is no confirm anywhere."
+        ]
       }
     },
     {
-      "id": "heat.result",
-      "name": "Result",
-      "zh": "操作结果",
-      "status": "placeholder",
+      "id": "heat.joined",
+      "name": "Heat drawer · batch chosen",
+      "zh": "发情 · 已选批次",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-heat&slide=4",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Result of the action.",
-        "issues": []
+        "purpose": "The option reads the chosen batch back; the commit was never waiting on it.",
+        "rules": [
+          "Commit is never gated; the primary names both effects (\"Record in heat · join batch 20\").",
+          "Her join adds her to batch 20's breeding list; an unstarted batch notifies the admin."
+        ]
+      }
+    },
+    {
+      "id": "heat.after",
+      "name": "After · the row is the receipt",
+      "zh": "发情 · 完成",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-heat&slide=5",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The walk list after commit.",
+        "elements": [
+          {
+            "name": "What prints",
+            "shows": "The walk list after commit.",
+            "states": [
+              {
+                "state": "Joined gilt",
+                "when": "Chose a batch",
+                "shows": "No batch token (having one is normal); appears in the batch's breeding list"
+              },
+              {
+                "state": "Record-only sow",
+                "when": "Just record",
+                "shows": "Keeps \"no batch\"; lapses to Quiet at 48 h unclaimed"
+              }
+            ]
+          }
+        ]
       }
     }
+  ],
+  "flow": [
+    [
+      "heat.entry",
+      "heat.drawer",
+      "tap Heat"
+    ],
+    [
+      "heat.drawer",
+      "heat.join",
+      "tap Join a batch"
+    ],
+    [
+      "heat.join",
+      "heat.joined",
+      "tap a batch"
+    ],
+    [
+      "heat.drawer",
+      "heat.after",
+      "tap Record"
+    ],
+    [
+      "heat.joined",
+      "heat.after",
+      "tap Record"
+    ]
   ]
 }

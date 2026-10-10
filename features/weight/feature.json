@@ -8,25 +8,104 @@
   "duplicates": "",
   "groups": [
     [
-      "Old UI",
+      "Weigh",
       [
-        "weight.weight"
+        "weight.one",
+        "weight.run",
+        "weight.group",
+        "weight.after"
       ]
     ]
   ],
   "screens": [
     {
-      "id": "weight.weight",
-      "name": "Individual weight",
-      "zh": "体重-个体体重",
-      "status": "placeholder",
+      "id": "weight.one",
+      "name": "Weigh · one pig",
+      "zh": "体重 · 单只",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-weigh&slide=1",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Record one pig's weight.",
-        "issues": [
-          "Only one screen; it sits in the backfat group."
+        "purpose": "The plain drawer for one pig: one Measure and her last weight as anchor.",
+        "rules": [
+          "Record commits on the spot; the drawer drops. The primary states the value (\"Record 182 kg\")."
+        ]
+      }
+    },
+    {
+      "id": "weight.run",
+      "name": "Weigh · conveyor",
+      "zh": "体重 · 逐只",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-weigh&slide=2",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Five pigs on one sheet, no batch submit.",
+        "elements": [
+          {
+            "name": "Running list",
+            "shows": "One line per committed pig",
+            "rule": "Each confirm writes at once. Tapping a line reopens that pig as an edit, never a second record. Skip records nothing and skipped pigs are re-offered once at the end; leaving early keeps every confirmed record."
+          }
+        ],
+        "rules": [
+          "The header counts position (3 of 5); the next-hint lives in the running list."
+        ]
+      }
+    },
+    {
+      "id": "weight.group",
+      "name": "Weigh · group sample",
+      "zh": "体重 · 群样本",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-weigh&slide=3",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Total versus sample is a value of n, not a mode.",
+        "elements": [
+          {
+            "name": "kg and head",
+            "at": "Next load",
+            "shows": "Scale reading, head on the scale, Next load and the live average",
+            "logic": "Record writes one population record {sum kg, n, average, headcount at record, who, when}. Whole pen is n = headcount, so there is no toggle.",
+            "rule": "n is mandatory: the feed spot-check needs a per-head average. Next load banks a pair; nothing is written until Record."
+          }
+        ]
+      }
+    },
+    {
+      "id": "weight.after",
+      "name": "After · pen sheet body line",
+      "zh": "体重 · 完成",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-weigh&slide=4",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The pen sheet already updated in place.",
+        "rules": [
+          "The record shows as a fact line under BODY beside the count trail; no result screen, no toast."
+        ],
+        "edge": [
+          "For untagged head the count is the identity, so the weight line and the count trail sit together."
         ]
       }
     }
+  ],
+  "flow": [
+    [
+      "weight.one",
+      "weight.after",
+      "tap Record"
+    ],
+    [
+      "weight.run",
+      "weight.after",
+      "last confirm"
+    ],
+    [
+      "weight.group",
+      "weight.after",
+      "tap Record"
+    ]
   ]
 }

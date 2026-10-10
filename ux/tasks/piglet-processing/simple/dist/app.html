@@ -9,9 +9,13 @@
    draws the frame). Without the param this file does nothing, so the study page works as before.
    - Putting the page in the state: the screen's `preset` goes through the page's select.scenario; pages driven by their own
      URL params (Home, Piglet processing) already carry them in the screen's url.
+   - Static decks (ux/archive/workflows.html and the other archive decks): the screen's url carries `?sec=<section>&slide=<n>`;
+     <section> is a section id (wf-fault) or the start of its heading (03, 04b), and slide is the n-th phone in it (1-based, default 1).
    - Ready: parent.postMessage({ atlasReady: id }).
    - Screens only a tap reaches: the screen's `steps` (ordered; each a string or { tap, hold }) are replayed after the preset.
-     A step is visible text, an aria-label / title, or a CSS selector (starts with [ . #), matched inside the phone.
+     A step is visible text, an aria-label / title, or a CSS selector (starts with [ . #), matched inside the phone,
+     then inside its same-origin iframes (so a host screen can reach an embedded page's controls, e.g. farrowing's Actions →
+     Remove from batch inside the embedded inspection).
    - The flow follows the demo: a page calls AtlasBare.watch(fn) after every render, fn() returns the screen id of the
      state it is in (or null); when that changes, parent.postMessage({ atlasScreen: id }).
    One convention for every prototype: new pages include this script in <head> and call AtlasBare.watch where they can.
@@ -87,6 +91,19 @@
     for (i = 0; i < all.length; i++) if (norm(all[i].getAttribute('aria-label')) === want || norm(all[i].getAttribute('title')) === want) return all[i];
     return null;
   }
+  function findDeep(phone, key) {   // in the phone, else inside its same-origin iframes (farrowing embeds inspection's sow sheet that way)
+    var el = findStep(phone, key); if (el) return el;
+    var fr = phone.querySelectorAll('iframe');
+    for (var i = 0; i < fr.length; i++) {
+      var d; try { d = fr[i].contentDocument; } catch (e) { d = null; }
+      if (d && d.body && (el = findStep(d.body, key))) return el;
+    }
+    return null;
+  }
+  function findWait(phone, key) {   // an iframe may still be loading: look for up to 2 s
+    var t0 = Date.now();
+    return new Promise(function (res) { (function poll() { var el = findDeep(phone, key); if (el || Date.now() - t0 > 2000) res(el); else setTimeout(poll, 100); })(); });
+  }
   function replay(phone, steps) {
     var chain = Promise.resolve();
     steps.forEach(function (st) {
@@ -96,7 +113,8 @@
         if (!el) { console.error('atlas-bare: step not found: ' + key); return; }
         if (hold) {
           var o = { bubbles: true, cancelable: true, button: 0, pointerId: 1, pointerType: 'mouse', isPrimary: true };
-          el.dispatchEvent(new PointerEvent('pointerdown', o));
+          var PE = el.ownerDocument.defaultView.PointerEvent;
+          el.dispatchEvent(new PE('pointerdown', o));
           return wait(hold).then(function () { el.dispatchEvent(new PointerEvent('pointerup', o)); });
         }
         el.click();
@@ -115,11 +133,22 @@
   AB.watch = function (f) { fn = f; check(); };
   AB.current = function () { try { return fn ? fn(AB.screens) : null; } catch (e) { return null; } };   // the screen the page is on now (for checks)
 
+  function deckPhone() {   // a phone of a static deck: ?sec=<section id or heading start>&slide=<n>
+    var key = q.get('sec'); if (!key) return null;
+    var sec = document.getElementById(key);
+    if (!sec) Array.prototype.some.call(document.querySelectorAll('section'), function (s) {
+      var h = s.querySelector('h2'); if (h && h.textContent.trim().toLowerCase().indexOf(key.toLowerCase() + ' ') === 0) { sec = s; return true; }
+    });
+    var n = parseInt(q.get('slide') || '1', 10) || 1, list = sec ? sec.querySelectorAll('.phone') : [];
+    if (!list[n - 1]) console.error('atlas-bare: no phone ' + n + ' in section "' + key + '"');
+    return list[n - 1] || null;
+  }
+
   function start() {
     data.then(function (d) {
       findScreen(d);
       var sel = document.querySelector('select.scenario');
-      var phone = (sel && sel.closest('.spec') && sel.closest('.spec').querySelector('.phone')) || document.querySelector('.phone, section.device, .tk-phone');
+      var phone = deckPhone() || (sel && sel.closest('.spec') && sel.closest('.spec').querySelector('.phone')) || document.querySelector('.phone, section.device, .tk-phone');
       if (!phone) { console.error('atlas-bare: no phone found'); return; }
       var preset = AB.screen && AB.screen.preset;
       if (preset && sel) {
@@ -4195,7 +4224,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
   function atlasScreen(screens) {
     var b = 'piglet-processing.';
     if (V.end) return b + 'end-task';
-    if (!V.pen) return P.s.ended ? b + 'list-ended' : V.lens === 'done' ? b + 'chip-done' : V.chip ? b + 'job-chip' : scheme() === 'none' ? b + 'list-no-id' : b + 'pen-list';
+    if (!V.pen) return P.s.ended ? b + 'list-ended' : P.s.notes.some(function (n) { return !n.seen; }) ? b + 'phone-clash' : V.lens === 'done' ? b + 'chip-done' : V.chip ? b + 'job-chip-' + V.chip : scheme() === 'none' ? b + 'list-no-id' : b + 'pen-list';
     if (V.sub === 'give') return b + 'give-ids';
     var by = { tagged: 'tagged-list', log: 'pen-log', adjust: 'adjust-count', counts: 'counts', weight: 'weight', more: 'more-actions', death: 'record-death', move: 'move-piglets', count: 'set-count' };
     if (V.over) return by[V.over] ? b + by[V.over] : null;

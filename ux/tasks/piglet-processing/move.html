@@ -509,6 +509,8 @@
     root.querySelector('#mv-over').innerHTML = over;
     PP.apply(root);
     keep();
+    /* the atlas (?screen=): the phone is drawn by script, so atlas-bare.js loads once it exists */
+    if (/[?&]screen=/.test(location.search) && !window.AtlasBare) { var ab = document.createElement('script'); ab.src = '/ux/system/atlas-bare.js'; document.head.appendChild(ab); }
   }
   // Save: the one record goes through append; the litter drawer it returns to shows the receipt (`pp-receipt:dead`, the parts the
   // dead and count sheets hand over; litter.js reads it for `saved=dead`). One Back, never a Moves page (R2-22).
