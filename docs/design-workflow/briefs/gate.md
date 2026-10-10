@@ -63,6 +63,7 @@ Screenshot each screen on BASE and on CANDIDATE in the same state, at 390×844 a
 - inner scrollbars;
 - nested frames (a card on a card);
 - text said twice;
+- the attention budget broken: more than one coloured element in a row, a second line that doesn't change what the worker does, something the header already says, a zero, a derived figure beside its parts (born beside alive and dead), or everything at one weight so nothing stands out;
 - controls glued together;
 - floating elements;
 - colour that means nothing (green means approved or done only);
@@ -73,6 +74,9 @@ Screenshot each screen on BASE and on CANDIDATE in the same state, at 390×844 a
 - web conventions in a phone app: hover rows, breadcrumbs, dropdown selects, data tables, underlined text links, tooltips, visible scrollbars, pagination, centred web modals. Native patterns (sheets, action sheets, segmented controls, switches, wheel pickers, the system keyboard, a navigation bar) are the norm wherever they fit.
 
 ## 4. Before / after (this decides it)
+
+A new or changed list, card or screen must carry its attention budget and cut list in the PR body ([build.md §1b](build.md#1b-attention-budget-before-any-layout)); without them it fails. Judge it with the cold question first: at a glance, can I tell what needs me and what to do? Compare against the current screen only, never against other candidates.
+
 
 For each pair, judge **better / same / worse** and give the one reason that decides it, naming its dimension: hierarchy, alignment, legibility, touch, state or native fit. Your verdict follows from your issue list, not the other way round. The bar is the screens the owner approved (Farrowing and Inspection): calm, aligned, nothing extra, one surface, ink not colour. A change that meets a rule but looks worse is **worse**. Judge a change that departs from the current pattern by the farmer, not by familiarity: being new never makes it worse, and matching the system never makes it better.
 

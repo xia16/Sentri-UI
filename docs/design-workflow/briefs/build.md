@@ -25,6 +25,39 @@ Do this before you draw anything. A new design built without looking at the old 
 
 If something approved already does the job, start from it. You may improve it ([Room to design](../README.md#room-to-design)). When the job is only adequate, sketch at least one alternative that departs from the current pattern before you pick, and build the one that serves the farmer best. A shared component changes only by improving a feature.
 
+## 1b. Attention budget (before any layout)
+
+Do this for every new or changed list, card or screen, before you draw. Attention is scarcer than pixels: every fact you show takes attention from the others, and a list where every row looks busy teaches the worker to stop looking. The budget decides what *not* to show.
+
+1. **Inventory.** List every fact the screen could show, for each item and each state, and for every feature that reuses the pattern. Be exhaustive; cut nothing yet.
+2. **The worker's questions.** Write the questions the worker asks at that moment of the job, in the order they ask them. For a barn list: where am I? Does anything here need me? What do I do? Is this the right animal? Does anything change how I do it? Who did it, and when?
+3. **Attention levels.** Give each fact one level:
+   - **Act now:** the only thing allowed to be loud.
+   - **Watch:** in progress.
+   - **Coming up:** plan for it.
+   - **Settled:** reference only, visually quiet.
+   - **Audit:** who and when; smallest and quietest.
+
+   A fact that answers none of the worker's questions at that moment is cut, or moved to the detail screen.
+4. **Budget against real space.** Use real volumes (24 crates, 32 pigs in a pen, 6 pens in a room) with the real header and bottom bar. The limits:
+   - at most one coloured element per row;
+   - a second line only when it changes what the worker does;
+   - nothing the header already says;
+   - no zeros;
+   - no derived figure beside its parts (born = alive + dead).
+5. **The cut list.** Write down what was removed and why, in the PR body. It is the proof this step happened.
+6. **Prove it.** Build it in the real components and put it beside the current screen at the same size. The cold question: at a glance, can I tell what needs me and what to do? If it isn't clearly better than the current screen, it doesn't ship. Comparing candidates with each other doesn't count.
+
+Worked example, the Farrowing room row:
+
+| Level | Shown |
+|---|---|
+| Act now | "3 days overdue", "7 to allocate": a dark-red dot and a bold dark-red message |
+| Watch | "Farrowing now · 9 alive · 5 dead", with the last record time |
+| Coming up | "Due today · P2" |
+| Settled | "11 alive · 2 dead" in grey, with a small "05:58 · G.H" |
+| Cut | born N, "Done" where the counts already show it, the pencil, chips, zeros, the stage on every row |
+
 ## 2. Owner rules (binding)
 
 - **Farm legibility (binding).** Barn, glare, gloves, arm's length, two seconds. Primary values and body text ≥ 16px; secondary and meta text ≥ 13px; nothing visible under 13px except the phone status bar. Contrast ≥ 4.5:1 for all text and ≥ 7:1 for primary values and numbers a farmer acts on. Tap targets ≥ 48×48 (the control or an invisible hit area). Ink, not pale grey, for anything that must be read. Fix crowding by tightening copy and layout, never by shrinking type. Full law: `ux/design-system/README.md`, "The farm legibility law".
