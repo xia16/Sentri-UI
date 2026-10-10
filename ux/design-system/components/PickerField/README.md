@@ -13,7 +13,7 @@ Use [Segment](../Segment/README.md) for changing a lens. Use [Field](../Field/RE
 
 ## Anatomy
 
-Visible label; trigger value, chosen names (record forms) or count (filters); trailing chevron; optional persistent reason/error; sheet title; search; chosen-level step path with › separators (cascade); ChoiceList option group; footer: Back, plus Done · n (multi only; a single pick commits, so single has Back alone).
+Visible label; trigger value, chosen names (record forms, up to two lines then +n) or count (filters); trailing chevron; optional persistent reason/error. The sheet is a [Sheet](../Sheet/README.md) drawer: header **‹ Parent** (cascade, below the root) and the current level as the title; search pinned at the top of the body; one ChoiceList option group; footer Back, plus Done · n (multi only; a single pick commits, so single has Back alone). No breadcrumb, no ✕.
 
 ## Variants
 
@@ -28,20 +28,20 @@ Visible label; trigger value, chosen names (record forms) or count (filters); tr
 | --- | --- |
 | Default | Missing value stays missing; Select (single) or None (multi). |
 | Pressed | `choice-press`; static `pressed` prop for rows and triggers. |
-| Selected / active | Trailing check, checkbox or ring plus stronger label; trigger shows the picked value or path (never the field label), the chosen names (record forms) or a count (filters). |
+| Selected / active | Trailing ink check or checkbox plus stronger label (selection is never green); trigger shows the picked value (a cascade shows its leaf, never the path), the chosen names (record forms) or a count (filters). |
 | Disabled | Prefer omission. If needed, retain readable text and a persistent reason; `aria-disabled`, no dimming. Host rejects activation and announces the reason. |
-| Error | Picker trigger has `aria-invalid`, border and persistent corrective text. ChoiceList is not a validated field: host supplies the field error. |
+| Error | Picker trigger has `aria-invalid`, a red border and red corrective text. "Required" is the error a host gives an empty required field when its waiting commit is tapped (`required: true` marks it). ChoiceList is not a validated field: host supplies the field error. |
 | Loading | Busy trigger and Loading options status; selection unavailable until loaded. |
 | Empty | No options available or search-specific no-match status. Never a blank panel. |
-| Long label | Row labels wrap, including Chinese; trigger ellipsizes, full label remains accessible and visible in the sheet. |
+| Long label | Row labels wrap, including Chinese, inside the same 56px row (one and two lines are one height); the names trigger wraps to two lines then +n; a path or value ellipsizes, the full label stays accessible and visible in the sheet. |
 
-Every declared state is in `variants/<id>.html`; these documents rely on atlas-injected resources. Each state owns its rendering script so the atlas can isolate it without loading unrelated states. Rendered proof is in [picker-choice-proof](../picker-choice-proof/verification.md).
+Every declared state is in `variants/<id>.html`, each drawn in its real container: the 390px phone with the form drawer (trigger states) or the picker drawer (Open, Level, Loading, Empty, Long-label) over the pig's page. These documents rely on atlas-injected resources.
 
 ## Behaviour
 
 Show at most eight rows before using a scrollable catalogue and search. Search is required above eight leaves and spans the entire tree, including aliases and path labels. Do not duplicate selected leaves in a second list or disclosure. Multi triggers on a record form (the chosen items are the record, as on Record health) show the chosen names, wrapping to two lines, then “+n”; only filters show “n selected”. Ticks stay visible in their original rows. Group counts describe selected descendants and appear only above zero; categories in a single cascade carry no count.
 
-Cascade opens one level at a time; choosing a branch auto-advances. Tappable steps reopen earlier levels; changing a branch replaces the downstream path without clearing ticks in other branches. A single leaf writes its complete path back to the trigger. Multi keeps one exit pair that says different things: **Back** leaves the sheet and keeps the draft selection on the device (pure navigation, per the Back verb law); **Done · n** confirms it; a **Clear** text action, where offered, discards it. A single pick commits at once, so single sheets have Back only and no Done. Modal hosts use one active dialog, inert background, focus trapping, and return focus to the trigger.
+Cascade opens one level at a time; choosing a branch auto-advances. The header names where you are: below the root, **‹ Parent** (the level above, whose title it repeats: root titles are plain nouns, "Conditions", "Medicines") and the level as the title; `pickerHead({ items, path, title, rootLabel, stepAction })` returns `{ title, up }` for `sheet()`. ‹ Parent goes up one level and is never labelled Back. Going up keeps ticks in every branch. A single leaf writes itself to the trigger (the leaf, not the path; the path stays in the sheet). Search is pinned at the top of the sheet. At the root it spans the whole tree; inside a level it searches that level only and says so ("Search in Respiratory diseases"), so a result never sits under a level it is not in. Results show their path below the level as meta. While there is text, a Clear text action empties it (the browser's own cancel glyph is hidden). The body is the one scroller (search sticky inside it, never a second scroller). The drawer keeps one height from open to close (`sizing: 'hold'`, `holdRows` from `pickerHead`: the tallest level, up to `long`), on the bottom edge. Multi keeps one exit pair that says different things: **Back** closes the sheet without applying, and the ticks stay as a draft that the next open shows again; **Done · n** applies them to the trigger and closes (it waits while nothing is ticked and nothing was applied: `pickerFooter({ waiting })`); a **Clear** head action, where offered, empties it. A single pick commits at once, so single sheets have Back alone. The scrim and a swipe down do what Back does. Modal hosts use one active dialog, inert background, and return focus to the trigger.
 
 ## Content rules
 
@@ -53,7 +53,7 @@ Whole rows and every step, footer and Clear action meet `tap-min`. Checkboxes us
 
 ## API and tokens
 
-Implementation: `../bundle.js`, `../bundle.css`, types in `../index.d.ts`. Legacy call signatures remain supported. `pickerOptions` is a compatibility adapter to ChoiceList, not another row renderer. `pickerBody` takes controlled `items` (value, label, children?, aliases?, meta?, attrs?), `path`, `selected`, `query`, action and stepAction. Hosts append a branch value or slice the path at a step; leaf selection toggles only in multi. `pickerFooter` renders the sole exit pair. Hosts own data, persistence and modal lifecycle. Keep display paths separate from recorded ids/names. Breadcrumb activation clears search and reopens the requested level. Multi inputs emit native change with `value` and `checked`; branch buttons emit `data-action` and `data-value`. `secondaryAction` exposes a separately named removal control for session-defined options. Do not route checkbox clicks through the branch action.
+Implementation: `../bundle.js`, `../bundle.css`, types in `../index.d.ts`. Legacy call signatures remain supported. `pickerOptions` is a compatibility adapter to ChoiceList, not another row renderer. `pickerBody` takes controlled `items` (value, label, children?, aliases?, meta?, attrs?), `path`, `selected`, `query`, action and stepAction. Hosts keep two lists for a multi picker, the applied one (the trigger) and the draft (the sheet), and append a branch value, or slice the path to `up.value` when ‹ Parent is tapped (its `stepAction`); leaf selection toggles only in multi. `pickerHead` gives the header's level; `pickerFooter` renders the sole exit pair (Sheet's Back + Done · n). Hosts own data, persistence and modal lifecycle. Keep display paths separate from recorded ids/names. Going up clears search. Multi inputs emit native change with `value` and `checked`; branch buttons emit `data-action` and `data-value`. `secondaryAction` exposes a separately named removal control for session-defined options. Do not route checkbox clicks through the branch action.
 
 Tokens: `tap-min`, `choice-row-min`, `radio-row-min`, `field-height`, `radius-control`, `control-border`, `rule`, `paper`, `ink`, `muted`, `green`, `choice-press`, `disabled-surface`, `disabled-ink`, `red`, `font-sans`, `font-size-14`, `type-weight-strong`, `space-8`, `space-12`, `size-20`, `size-24`. No per-screen trigger sizing.
 
@@ -62,6 +62,7 @@ Shared copy (Select, None, counts, All, Done, loading and empty) has English/Chi
 ## Do / don't
 
 - Do keep checks on the right and search across branches. Don't build custom left-checkbox catalogue rows.
+- Do name the parent in the header (‹ Diseases) and the level in the title. Don't draw a breadcrumb or label the up control Back.
 - Do show the chosen names on a record form, and the count once on a filter trigger and once on Done. Don't repeat names in a selected disclosure.
 - Do wrap Chinese in option rows. Don't shrink type or targets to fit it.
 - Do retain a disabled reason. Don't dim controls or use colour alone.
@@ -78,7 +79,29 @@ Component: generic and shared across sections. Selection modes are variants of t
 
 The one-level, auto-advance and tappable-step model follows Ant Design Mobile Cascader and TDesign Mobile step Cascader, with Apple/Material guidance for containment and dismissal, as recorded in [the component standard, section 4.5](../../../../docs/design-workflow/research/component-standard.md). Sentri uses its own `tap-min` floor rather than smaller library defaults.
 
+## Native
+
+Build the platform control; Sentri's drawing is the reference for content and order, not for chrome.
+
+| Variant | iOS | Android |
+|---|---|---|
+| Trigger | a `NavigationLink`-style row (label, value, chevron) in a `Form` | a list item with supporting text and a trailing chevron (Material 3 `ListItem`) |
+| Single, 5+ short options | a sheet with a `List` and a checkmark on the chosen row (a `Menu` is fine for up to ~7 short options) | `ModalBottomSheet` with a radio/check list; a single tap commits |
+| Multi | a sheet with a `List` and checkmarks, toolbar Back + Done · n | `ModalBottomSheet` with checkbox rows, bottom bar Back + Done · n |
+| Cascade / cascade multi | `NavigationStack` inside the sheet: the back button names the parent, the title names the level; `.searchable` at the top spans the tree | a `NavHost` inside the bottom sheet with an up arrow and the parent name; a `SearchBar` at the top spanning the tree |
+
+**No wheels here.** A wheel (`UIPickerView`, Android `NumberPicker`) only for long ordered values: dates, times, numbers. It is poor with gloves and hides options a farmer should see at once, so it never replaces a list of named options.
+
+Where screens today differ from the platform choice (for the owner):
+- Dates (log range custom dates, feed end date) use the platform date field, which is right: native date picker (`DatePicker` compact/graphical; Material `DatePicker`/`DateRangePicker`), not our list.
+- Typed numbers (weight, dose, temperature, backfat) stay the numeric keypad (Numpad / `keyboardType(.decimalPad)`), not a wheel: values are read off a scale.
+- Feed adjustment % is a slider plus a typed field: native `Slider` / Material `Slider` (a wheel would also do for this ordered range, but the slider is the better glove target).
+- Care (4 outcomes), Outcome (2: Recovered / Entered in error), Body condition (2) and Dose unit (3: mL / mg / g) open a picker list today; by the record-sheet law (2–4 outcomes = Choice) the platform equivalent is an inline segmented control or radio rows, not a sheet. Left as approved; flagged.
+
 ## Changelog
+
+2026-10-10 (multi-choice family): drawer convention — ‹ Parent in the header and the level as the title (`pickerHead`), no breadcrumb, no ✕; search pinned at the top; one row height for one and two lines; Back is Sheet's Back; sized to content on the bottom edge; specimens drawn in the phone; Native mapping.
+
 
 2026-10-10 (round 2 fixes): Back keeps the draft, Done confirms; record forms show chosen names; no zero or “1 options” meta; single has no Done; steps read as a path.
 

@@ -1,39 +1,33 @@
-<!doctype html><meta charset="utf-8">
-<section data-state="Default"><h3>Default</h3><div id="state-Default"></div>
-
-</section>
-<section data-state="Pressed"><h3>Pressed</h3><div id="state-Pressed"></div>
-
-</section>
-<section data-state="Selected"><h3>Selected</h3><div id="state-Selected"></div>
-
-</section>
-<section data-state="Disabled"><h3>Disabled</h3><div id="state-Disabled"></div>
-
-</section>
-<section data-state="Loading"><h3>Loading</h3><div id="state-Loading"></div>
-
-</section>
-<section data-state="Empty"><h3>Empty</h3><div id="state-Empty"></div>
-
-</section>
-<section data-state="Long-label"><h3>Long-label</h3><div id="state-Long-label"></div>
-
-</section>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ChoiceList · radio</title><style>
+.ph{position:relative;width:390px;max-width:100%;height:720px;margin:0 auto;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:var(--radius-device,28px);font-family:var(--font-sans);color:var(--ink)}
+.ph-page{padding:0 var(--space-gutter)}
+.ph-bar{display:flex;align-items:center;height:var(--statusbar-height);padding:0 var(--space-6);font:600 var(--font-size-13) var(--font-sans)}
+.ph-form{display:flex;flex-direction:column;gap:var(--space-16)}
+</style></head><body>
+<div data-state="Default" id="state-Default"></div>
+<div data-state="Pressed" id="state-Pressed"></div>
+<div data-state="Selected" id="state-Selected"></div>
+<div data-state="Disabled" id="state-Disabled"></div>
+<div data-state="Loading" id="state-Loading"></div>
+<div data-state="Empty" id="state-Empty"></div>
+<div data-state="Long-label" id="state-Long-label"></div>
 <script>
-// Each state renders in its own iframe in the atlas: draw only the states present.
 var UI = window.SentriUI;
+/* The real container: a 390px phone; a picker or a form is a drawer over the pig's page (never a drawer on a drawer). */
+function page(){return '<div class="ph-page"><div class="ph-bar" aria-hidden="true">9:41</div>'+UI.heading({title:'000267',kind:'page',description:'C1 \u00b7 Gestation \u00b7 42 days'})+UI.panel(UI.row({title:'Thin',description:'Day 12 \u00b7 monitor'}),{className:'st-row-group'})+'</div>';}
+function phone(over){return '<div class="ph" data-st-context="page">'+page()+over+'</div>';}
+function form(title,fields,ready){return phone(UI.sheet({title:title,subtitle:'000267 \u00b7 C1',size:'medium',body:'<div class="ph-form">'+fields+'</div>',footer:UI.sheetFooter({back:{action:'back'},primary:{label:'Save',action:'save',waiting:!ready}})}));}
+function picker(o){var h=o.head||{title:o.title,up:null};return phone(UI.sheet({title:h.title,up:h.up,size:'long',sizing:h.rows?'hold':'content',holdRows:h.rows||0,body:o.html||UI.pickerBody(o.body),footer:o.footer||UI.pickerFooter(o.foot||{})}));}
+
 var RENDER = {
-  "state-Default": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Recovered", "mode": "radio", "selected": false, "meta": "Ends this case", "value": "a"}),{title:"Outcome",radio:true}),
-  "state-Pressed": () => UI.choiceGroup(UI.choiceRow({"pressed": true, "disabled": false, "reason": "", "label": "Recovered", "mode": "radio", "selected": false, "meta": "Ends this case", "value": "a"}),{title:"Outcome",radio:true}),
-  "state-Selected": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Recovered", "mode": "radio", "selected": true, "meta": "Ends this case", "value": "a"}),{title:"Outcome",radio:true}),
-  "state-Disabled": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": true, "reason": "Unavailable offline. Reconnect to select.", "label": "Recovered", "mode": "radio", "selected": false, "meta": "Ends this case", "value": "a"}),{title:"Outcome",radio:true}),
-  "state-Loading": () => UI.choiceEmpty("Loading options\u2026"),
-  "state-Empty": () => UI.choiceEmpty("No options available."),
-  "state-Long-label": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称", "mode": "radio", "selected": false, "meta": "Ends this case", "value": "a"}),{title:"Outcome",radio:true})
+  "state-Default": () => form('Resolve condition',UI.choiceGroup([UI.choiceRow({"label": "Recovered", "mode": "radio", "value": "recover", "action": "choose", "selected": false, "meta": "Ends this case"}),UI.choiceRow({"label": "Entered in error", "mode": "radio", "value": "strike", "action": "choose", "selected": false, "meta": "Removes it from the record"})],{title:'Outcome',radio:true}),false),
+  "state-Pressed": () => form('Resolve condition',UI.choiceGroup([UI.choiceRow({"label": "Recovered", "mode": "radio", "value": "recover", "action": "choose", "selected": false, "meta": "Ends this case"}),UI.choiceRow({"label": "Entered in error", "mode": "radio", "value": "strike", "action": "choose", "selected": false, "pressed": true, "meta": "Removes it from the record"})],{title:'Outcome',radio:true}),false),
+  "state-Selected": () => form('Resolve condition',UI.choiceGroup([UI.choiceRow({"label": "Recovered", "mode": "radio", "value": "recover", "action": "choose", "selected": true, "meta": "Ends this case"}),UI.choiceRow({"label": "Entered in error", "mode": "radio", "value": "strike", "action": "choose", "selected": false, "meta": "Removes it from the record"})],{title:'Outcome',radio:true}),true),
+  "state-Disabled": () => form('Resolve condition',UI.choiceGroup([UI.choiceRow({"label": "Recovered", "mode": "radio", "value": "recover", "action": "choose", "selected": false, "meta": "Ends this case"}),UI.choiceRow({"label": "Entered in error", "mode": "radio", "value": "strike", "action": "choose", "selected": false, "disabled": true, "reason": "Unavailable offline. Reconnect to select.", "meta": "Removes it from the record"})],{title:'Outcome',radio:true}),false),
+  "state-Loading": () => form('Resolve condition',UI.choiceEmpty("Loading options\u2026"),false),
+  "state-Empty": () => form('Resolve condition',UI.choiceEmpty("No options available."),false),
+  "state-Long-label": () => form('Resolve condition',UI.choiceGroup([UI.choiceRow({"label": "\u5df2\u5eb7\u590d\uff0c\u672c\u75c5\u4f8b\u7ed3\u675f\u5e76\u505c\u6b62\u6240\u6709\u76f8\u5173\u62a4\u7406", "mode": "radio", "value": "a", "action": "choose", "selected": true}),UI.choiceRow({"label": "\u5f55\u5165\u9519\u8bef", "mode": "radio", "value": "b", "action": "choose", "selected": false})],{title:'结果',radio:true}),true)
 };
-document.querySelectorAll('[data-state]').forEach(function (s) {
-  var t = RENDER[s.id] ? s : s.querySelector('[id]');
-  if (t && RENDER[t.id]) t.innerHTML = RENDER[t.id]();
-});
-</script>
+document.querySelectorAll('[data-state]').forEach(function (s) { if (RENDER[s.id]) s.innerHTML = RENDER[s.id](); });
+</script></body></html>

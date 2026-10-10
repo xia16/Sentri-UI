@@ -1043,7 +1043,7 @@
               {
                 "state": "Valid change",
                 "when": "Value above 0",
-                "shows": "\"180 → 190 kg\", then \"Ready to save\""
+                "shows": "\"180 → 190 kg\" in the row; no state text once it will change"
               }
             ],
             "logic": "Dead sows are excluded; unticked rows stay unchanged.",

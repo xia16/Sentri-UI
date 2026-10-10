@@ -36,7 +36,7 @@ No empty state: omit an action with no label. No field error state: put validati
 
 ## Behaviour
 
-Native button activation emits `data-action` / `data-value`. Bordered is the default, including header returns. Sheet ✕ uses plain. Use `selected` only for a binary mark and update it with its accessible name. `disabled` stays focusable with `aria-disabled`; delegated hosts call `guard(el)` and retain a visible reason.
+Native button activation emits `data-action` / `data-value`. Bordered is the default, including header returns. Plain is for icon actions inside a surface (sheets carry no ✕). Use `selected` only for a binary mark and update it with its accessible name. `disabled` stays focusable with `aria-disabled`; delegated hosts call `guard(el)` and retain a visible reason.
 
 ## Content rules
 

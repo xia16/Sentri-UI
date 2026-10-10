@@ -509,6 +509,12 @@
   {
     "component": "ChoiceList",
     "variant": "navigate",
+    "state": "Selected",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "navigate",
     "state": "Disabled",
     "problems": []
   },
@@ -1349,16 +1355,7 @@
     "component": "PickerField",
     "variant": "cascade-multi",
     "state": "Default",
-    "problems": [
-      {
-        "check": "i",
-        "detail": "button.st-picker-trigger \"None\" and input \"\" are 0px apart"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
@@ -1369,17 +1366,20 @@
   {
     "component": "PickerField",
     "variant": "cascade-multi",
+    "state": "Open",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade-multi",
+    "state": "Level",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade-multi",
     "state": "Active",
-    "problems": [
-      {
-        "check": "i",
-        "detail": "button.st-picker-trigger \"Low appetite\" and input \"\" are 0px apart"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
@@ -1391,38 +1391,19 @@
     "component": "PickerField",
     "variant": "cascade-multi",
     "state": "Error",
-    "problems": [
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
     "variant": "cascade-multi",
     "state": "Loading",
-    "problems": [
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
     "variant": "cascade-multi",
     "state": "Empty",
-    "problems": [
-      {
-        "check": "i",
-        "detail": "button.st-picker-trigger \"None\" and input \"\" are 0px apart"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
@@ -1434,16 +1415,7 @@
     "component": "PickerField",
     "variant": "cascade",
     "state": "Default",
-    "problems": [
-      {
-        "check": "i",
-        "detail": "button.st-picker-trigger \"Select\" and input \"\" are 0px apart"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
@@ -1454,17 +1426,20 @@
   {
     "component": "PickerField",
     "variant": "cascade",
+    "state": "Open",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade",
+    "state": "Level",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade",
     "state": "Active",
-    "problems": [
-      {
-        "check": "i",
-        "detail": "button.st-picker-trigger \"Antibiotics › \" and input \"\" are 0px apart"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
@@ -1476,64 +1451,31 @@
     "component": "PickerField",
     "variant": "cascade",
     "state": "Error",
-    "problems": [
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
     "variant": "cascade",
     "state": "Loading",
-    "problems": [
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
     "variant": "cascade",
     "state": "Empty",
-    "problems": [
-      {
-        "check": "i",
-        "detail": "button.st-picker-trigger \"Select\" and input \"\" are 0px apart"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
     "variant": "cascade",
     "state": "Long-label",
-    "problems": [
-      {
-        "check": "f",
-        "detail": "\"Antibiotics › 青霉素类抗菌药物 / 阿莫西林可\" overflows its box (471px in 303px, ellipsised)"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
     "variant": "multi",
     "state": "Default",
-    "problems": [
-      {
-        "check": "i",
-        "detail": "button.st-picker-trigger \"None\" and input \"\" are 0px apart"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
@@ -1544,17 +1486,14 @@
   {
     "component": "PickerField",
     "variant": "multi",
+    "state": "Open",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "multi",
     "state": "Active",
-    "problems": [
-      {
-        "check": "i",
-        "detail": "button.st-picker-trigger \"1 selected\" and input \"\" are 0px apart"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
@@ -1566,38 +1505,19 @@
     "component": "PickerField",
     "variant": "multi",
     "state": "Error",
-    "problems": [
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
     "variant": "multi",
     "state": "Loading",
-    "problems": [
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
     "variant": "multi",
     "state": "Empty",
-    "problems": [
-      {
-        "check": "i",
-        "detail": "button.st-picker-trigger \"None\" and input \"\" are 0px apart"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
@@ -1609,16 +1529,7 @@
     "component": "PickerField",
     "variant": "single",
     "state": "Default",
-    "problems": [
-      {
-        "check": "i",
-        "detail": "button.st-picker-trigger \"Select\" and input \"\" are 0px apart"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
@@ -1629,17 +1540,14 @@
   {
     "component": "PickerField",
     "variant": "single",
+    "state": "Open",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "single",
     "state": "Active",
-    "problems": [
-      {
-        "check": "i",
-        "detail": "button.st-picker-trigger \"Low appetite\" and input \"\" are 0px apart"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
@@ -1651,49 +1559,25 @@
     "component": "PickerField",
     "variant": "single",
     "state": "Error",
-    "problems": [
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
     "variant": "single",
     "state": "Loading",
-    "problems": [
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
     "variant": "single",
     "state": "Empty",
-    "problems": [
-      {
-        "check": "i",
-        "detail": "button.st-picker-trigger \"Select\" and input \"\" are 0px apart"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
     "variant": "single",
     "state": "Long-label",
-    "problems": [
-      {
-        "check": "f",
-        "detail": "\"青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称\" overflows its box (389px in 303px, ellipsised)"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "RangeSlider",
@@ -2082,7 +1966,7 @@
   {
     "component": "Sheet",
     "variant": "dialog",
-    "state": "Waiting (reason shown)",
+    "state": "Waiting (stands alone)",
     "problems": []
   },
   {
@@ -2112,30 +1996,20 @@
   {
     "component": "Sheet",
     "variant": "drawer",
-    "state": "Waiting (reason shown)",
+    "state": "Waiting (stands alone)",
     "problems": []
   },
   {
     "component": "Sheet",
     "variant": "drawer",
     "state": "Error",
-    "problems": [
-      {
-        "check": "g",
-        "detail": "numeric field \"Weight (kg)\" is a textarea"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "drawer",
     "state": "Empty",
-    "problems": [
-      {
-        "check": "c",
-        "detail": "\"Nothing selected yet. Tap a pi\" starts 17px from the heading \"Selected0 pigs\" left edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
@@ -2152,7 +2026,7 @@
   {
     "component": "Sheet",
     "variant": "drawer",
-    "state": "Lead + Above (drill-down)",
+    "state": "Up + Above (levels)",
     "problems": []
   },
   {
@@ -2176,19 +2050,14 @@
   {
     "component": "Sheet",
     "variant": "page",
-    "state": "Waiting (reason shown)",
+    "state": "Waiting (stands alone)",
     "problems": []
   },
   {
     "component": "Sheet",
     "variant": "page",
     "state": "Empty",
-    "problems": [
-      {
-        "check": "c",
-        "detail": "\"No activity recorded yet.\" starts 17px from the heading \"Pen logB4 · Sow 0002\" left edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",

@@ -519,7 +519,7 @@
 .feed-reading>span{color:#68745d}
 .feed-reading.is-new strong{color:var(--ink)}
 .feed-change-arrow{align-self:end;padding-bottom:1px;color:#7a8373;font:11px var(--font-sans)}
-.feed-change-state{min-height:15px;padding:2px 5px;border-radius:5px;background:#f0f2ec;color:#697361;font:8px/1.35 var(--font-sans);white-space:nowrap}
+.feed-change-state{min-height:15px;padding:2px 5px;border-radius:5px;background:#f0f2ec;color:#5a6552;font:8px/1.35 var(--font-sans);white-space:nowrap}
 .feed-pig-preview.is-changed .feed-change-state{background:#e7efe1;color:#44613f;font-weight:600}
 .feed-pig-preview.is-blocked .feed-change-state{white-space:normal;text-align:right;background:#f0f2ec}
 .feed-pig-badge{display:flex;align-items:center;justify-content:flex-start;min-width:0;margin-top:3px}

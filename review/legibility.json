@@ -274,12 +274,12 @@
  ],
  "totals": {
   "screens": 263,
-  "screensFailing": 192,
+  "screensFailing": 193,
   "errors": 0,
-  "small": 2426,
+  "small": 2424,
   "contrast": 1380,
   "contrastPrimary": 11,
-  "taps": 86
+  "taps": 104
  },
  "byFeature": {
   "assistant": {
@@ -338,11 +338,11 @@
   },
   "piglet-processing": {
    "screens": 24,
-   "failing": 0,
+   "failing": 1,
    "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
-   "taps": 0,
+   "taps": 18,
    "errors": 0
   },
   "post-farrowing": {
@@ -384,7 +384,7 @@
   "feed-plan": {
    "screens": 11,
    "failing": 9,
-   "small": 111,
+   "small": 110,
    "contrast": 20,
    "contrastPrimary": 0,
    "taps": 0,
@@ -420,7 +420,7 @@
   "pig-profile": {
    "screens": 18,
    "failing": 12,
-   "small": 34,
+   "small": 33,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -657,12 +657,12 @@
    "n": 34
   },
   {
-   "selector": "small @9px",
+   "selector": "span.agg @10.5px",
    "n": 33
   },
   {
-   "selector": "span.agg @10.5px",
-   "n": 33
+   "selector": "small @9px",
+   "n": 32
   },
   {
    "selector": "span.n @11px",
@@ -6914,21 +6914,72 @@
    "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
-   "taps": 0,
-   "fails": false,
+   "taps": 18,
+   "fails": true,
    "unverified": 0,
    "sizes": {
-    "13": 55,
-    "14": 2,
-    "15": 1,
-    "16": 10,
-    "22": 1,
-    "31": 2
+    "13": 1,
+    "14": 106
    },
    "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
-   "smallTargets": []
+   "smallTargets": [
+    {
+     "n": 1,
+     "sel": "button[data-action=chip]",
+     "text": "All",
+     "size": "16x18"
+    },
+    {
+     "n": 1,
+     "sel": "button[data-action=chip]",
+     "text": "Iron, 6 pens",
+     "size": "34x18"
+    },
+    {
+     "n": 1,
+     "sel": "button[data-action=chip]",
+     "text": "Dock tail, 4 pens",
+     "size": "67x18"
+    },
+    {
+     "n": 1,
+     "sel": "button[data-action=chip]",
+     "text": "Castrate, 6 pens",
+     "size": "66x18"
+    },
+    {
+     "n": 1,
+     "sel": "button[data-action=chip]",
+     "text": "Coccidiosis, 6 pens",
+     "size": "88x18"
+    },
+    {
+     "n": 1,
+     "sel": "button[data-action=chip]",
+     "text": "Tag, 7 pens",
+     "size": "31x18"
+    },
+    {
+     "n": 6,
+     "sel": "button.tk-group-door[data-action=pen]",
+     "text": "Pen A03",
+     "size": "390x18"
+    },
+    {
+     "n": 5,
+     "sel": "button.st-row[data-action=pen]",
+     "text": "000245Iron · Castrate · Coccid",
+     "size": "390x42"
+    },
+    {
+     "n": 1,
+     "sel": "button.st-row[data-action=pen]",
+     "text": "000273LateIron · Tag11 piglets",
+     "size": "390x47"
+    }
+   ]
   },
   {
    "id": "piglet-processing.job-chip-id",
@@ -9011,7 +9062,7 @@
   {
    "id": "feed-plan.editor",
    "feature": "feed-plan",
-   "small": 31,
+   "small": 30,
    "contrast": 9,
    "contrastPrimary": 0,
    "taps": 0,
@@ -9019,7 +9070,7 @@
    "unverified": 0,
    "sizes": {
     "8": 9,
-    "9": 5,
+    "9": 4,
     "10": 4,
     "11": 2,
     "12": 11,
@@ -9036,12 +9087,6 @@
      "px": 12
     },
     {
-     "n": 4,
-     "sel": "small",
-     "text": "3 selected",
-     "px": 9
-    },
-    {
      "n": 1,
      "sel": "strong",
      "text": "Daily feed · kg/day",
@@ -9052,6 +9097,12 @@
      "sel": "strong",
      "text": "000254",
      "px": 12
+    },
+    {
+     "n": 3,
+     "sel": "small",
+     "text": "Gestation 1",
+     "px": 9
     },
     {
      "n": 6,
@@ -9909,7 +9960,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 4,
+    "13": 2,
     "14": 1,
     "16": 2,
     "20": 1
@@ -13141,7 +13192,7 @@
   {
    "id": "pig-profile.body-condition",
    "feature": "pig-profile",
-   "small": 2,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -13149,7 +13200,6 @@
    "unverified": 0,
    "sizes": {
     "11": 1,
-    "12": 1,
     "13": 1,
     "14": 2,
     "16": 2,
@@ -13161,12 +13211,6 @@
      "sel": "span",
      "text": "Condition",
      "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.quiet-note",
-     "text": "Records condition. Feed stays unchanged.",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -14350,7 +14394,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "14": 4,
+    "14": 3,
     "16": 2,
     "20": 1
    },
@@ -14445,7 +14489,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "14": 6,
+    "14": 5,
     "16": 1,
     "20": 1
    },
@@ -16502,7 +16546,7 @@
    "unverified": 0,
    "sizes": {
     "13": 32,
-    "14": 7,
+    "14": 8,
     "16": 16,
     "20": 2
    },

@@ -4,19 +4,19 @@
 .ph .bg{padding:0 var(--space-gutter)}
 .ph .bar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
 .ph[data-pressed] .surface-back{background:var(--back-press)}
-.ph[data-pressed] .sheet-close{background:var(--press)}
+.ph[data-pressed] .sheet-up{background:var(--press)}
 .ph[data-pressed] .sheet-footer .button.primary{filter:brightness(.96);transform:translateY(1px)}
 .ph[data-pressed] .sheet-footer .surface-back:only-child{background:var(--ink)}
 </style></head><body>
 <div class="ph" data-state="Default" data-demo="drawer-default"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Pressed" data-demo="drawer-pressed" data-pressed=""><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Aside" data-demo="drawer-aside"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Waiting (reason shown)" data-demo="drawer-waiting"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Waiting (stands alone)" data-demo="drawer-waiting"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Error" data-demo="drawer-error"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Empty" data-demo="drawer-empty"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Long / Chinese" data-demo="drawer-zh"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Held at its size" data-demo="drawer-full"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Lead + Above (drill-down)" data-demo="drawer-lead"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Up + Above (levels)" data-demo="drawer-lead"><div class="bg"></div><div class="over"></div></div>
 <script>
 const UI=window.SentriUI,esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const bg=()=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+UI.heading({title:'Pen B4',kind:'page',description:'Sow 000254 \u00b7 11 piglets'})+UI.panel(UI.row({title:'Litter',description:'11 alive \u00b7 day 2'}),{className:'st-row-group'});
@@ -29,10 +29,10 @@ const R={
 "drawer-pressed":()=>UI.sheet({title:'Record a death',subtitle:'B4 \u00b7 11 alive',size:'short',body:note('Cause','Crushed, scours, starved\u2026'),footer:foot()}),
 "drawer-aside":()=>UI.sheet({title:'Dead 3',subtitle:[{text:'Born dead or died'},{sep:true},{text:'3 unsaved',tone:'green'}],aside:'<button type="button" class="st-text-action" data-action="clear">Clear</button>',size:'short',body:note('Cause'),footer:foot()}),
 "drawer-waiting":()=>UI.sheet({title:'Record a death',subtitle:'B4 \u00b7 11 alive',size:'short',body:UI.stepper({label:'Died',value:0,key:'died',action:'step'}),footer:foot({primary:{label:'Record death',action:'save',waiting:true},status:{text:'Say how many died'}})}),
-"drawer-error":()=>UI.sheet({title:'Litter weight',subtitle:'B4 \u00b7 day 2',size:'short',body:note('Weight (kg)','48'),footer:foot({primary:{label:'Record weight',action:'save',waiting:true},status:{text:'48 kg is over the scale limit \u00b7 check the number',tone:'red'}})}),
-"drawer-empty":()=>UI.sheet({title:'Selected',subtitle:'0 pigs',size:'short',body:'<p class="st-choice-empty">Nothing selected yet. Tap a pig in the list to add it.</p>',footer:foot({primary:{label:'Actions',action:'x',waiting:true},status:{text:'Select a pig first'}})}),
+"drawer-error":()=>UI.sheet({title:'Litter weight',subtitle:'B4 · day 2',size:'short',body:UI.field({label:'Weight (kg)',variant:'number',error:'48 kg is over the scale limit · check the number',control:'<input type="number" inputmode="decimal" value="48" aria-invalid="true">'}),footer:foot({primary:{label:'Record weight',action:'save',waiting:true},status:{text:'48 kg is over the scale limit'}})}),
+"drawer-empty":()=>UI.sheet({title:'Pen log',subtitle:'B4',size:'short',body:'<p class="st-choice-empty">No activity recorded yet</p>',footer:foot()}),
 "drawer-zh":()=>UI.sheet({title:'\u8bb0\u5f55\u6b7b\u4ea1\uff0c\u8bf7\u5148\u9009\u62e9\u539f\u56e0\u5e76\u786e\u8ba4\u6570\u91cf\u518d\u4fdd\u5b58\u8fd9\u6761\u8bb0\u5f55',subtitle:'B4 \u00b7 \u8fd8\u6709 11 \u5934 \u00b7 \u7b2c 2 \u5929 \u00b7 000254 \u6bcd\u732a',size:'short',body:note('\u539f\u56e0'),footer:UI.sheetFooter({back:{action:'back',label:'\u8fd4\u56de'},primary:{label:'\u8bb0\u5f55\u6b7b\u4ea1 \u00b7 3 \u5934',action:'save'}})}),
-"drawer-lead":()=>UI.sheet({title:'Skin',subtitle:'Symptoms \u00b7 6',size:'long',lead:UI.iconButton({action:'up',icon:window.SentriIcons.icon('back'),label:'Back to categories',className:'chooser-header-back'}),above:'<div style="padding:var(--space-12) var(--space-gutter-sheet) 0">'+UI.choiceSearch({label:'Search symptoms',placeholder:'Search symptoms'})+'</div>',body:rows(4,'Symptom'),footer:foot({primary:{label:'Done',action:'done'}})}),
+"drawer-lead":()=>UI.sheet({title:'Skin',up:{label:'Symptoms',action:'up',value:'1'},size:'long',above:'<div style="padding:var(--space-12) var(--space-gutter-sheet) 0">'+UI.choiceSearch({label:'Search symptoms',placeholder:'Search symptoms'})+'</div>',body:rows(4,'Symptom'),footer:foot({primary:{label:'Done · 2',action:'done'}})}),
 "drawer-full":()=>UI.sheet({title:'Count piglets',subtitle:'B4 \u00b7 was 12',size:'medium',sizing:'full',body:rows(5),footer:foot({primary:{label:'Record count',action:'save'}})})
 };
 document.querySelectorAll('[data-state]').forEach(el=>{const k=el.getAttribute('data-demo'),r=R[k];el.querySelector('.bg').innerHTML=bg();if(r)el.querySelector('.over').innerHTML=r();});

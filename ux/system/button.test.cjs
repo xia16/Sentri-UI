@@ -3,18 +3,14 @@ const assert=require('node:assert/strict');
 require('../design-system/components/bundle.js');
 const UI=globalThis.SentriUI;
 
-test('a waiting button stands alone: no reason line, aria-disabled, and the delegated guard refuses it',()=>{
- const html=UI.button({register:'primary',label:'Record 12 piglets',waiting:true,reason:'Choose <piglets> first'});
- assert.doesNotMatch(html,/st-button-reason|role="status"|aria-describedby|Choose/);
- assert.match(html,/aria-disabled="true"/);
- assert.equal(typeof UI.buttonReason,'undefined');
- assert.equal(UI.guard({getAttribute:k=>k==='aria-disabled'?'true':''},{answer:false}),true);
-});
-test('a footer draws no reason line: a waiting primary or hold has nothing above the bar',()=>{
- const html=UI.sheetFooter({primary:{label:'Record items',waiting:true,reason:'Tick the completed items first'},status:{text:'Tick the completed items first'}});
- assert.doesNotMatch(html,/role="status"|sheet-status|st-visually-hidden|aria-describedby|Tick the completed/);
+test('footer reason is never drawn above a waiting button, stays outside the two targets and describes it',()=>{
+ const html=UI.sheetFooter({primary:{label:'Record items',waiting:true},status:{text:'Tick the completed items first',visible:false}});
+ assert.match(html,/sheet-status st-visually-hidden/);
  assert.equal((html.match(/<button /g)||[]).length,2);
- assert.ok(html.startsWith('<div class="sheet-footer'));
+ assert.ok(html.indexOf('role="status"')>html.lastIndexOf('</button>'));
+ const prop=UI.sheetFooter({primary:{label:'Record items',waiting:true,reason:'Tick the completed items first'}});
+ assert.equal((prop.match(/role="status"/g)||[]).length,1);
+ assert.match(prop,/aria-describedby=/);
 });
 test('icon selection and unavailability have a non-colour explanation',()=>{
  const selected=UI.iconButton({variant:'plain',icon:'',label:'Remove breeder mark',selected:true});

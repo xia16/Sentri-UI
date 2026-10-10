@@ -138,7 +138,7 @@
     [
       "inspection.walk",
       "inspection.review-selected",
-      "tick pigs, tap View selected"
+      "tick pigs, tap the count (\"2 pigs selected\")"
     ],
     [
       "inspection.review-selected",
@@ -369,7 +369,7 @@
               {
                 "state": "Selection",
                 "when": "One or more ticked",
-                "shows": "Clear, \"Selected · 2 pens · 3 pigs\", View selected, Actions"
+                "shows": "\"2 pens · 3 pigs selected\" (opens the review, which has Clear), More actions; unticking the last one in the review ends selection"
               }
             ],
             "logic": "Scan has no camera in the prototype; Search finds by ear tag or pen.",
@@ -957,12 +957,12 @@
         "elements": [
           {
             "name": "Selection list",
-            "shows": "Pens group and Pigs group, each row with Remove",
+            "shows": "The ticked pens and pigs as ticked rows; untick one to take it out",
             "states": [
               {
                 "state": "Pens ticked",
                 "when": "At least one pen selected",
-                "shows": "A Pens group above Pigs"
+                "shows": "The pen row (\"C1 · 3 pigs\") carries its pigs, which are not listed again; Pens and Pigs headings only when both are ticked"
               },
               {
                 "state": "Last pig removed",
@@ -977,7 +977,7 @@
         "controls": [],
         "copy": [
           "Selected (raw)",
-          "Remove (raw)"
+          "Clear (raw)"
         ],
         "issues": [
           "Stage shown as \"Gestating\" while the list shows \"Gestation\"."

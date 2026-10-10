@@ -12,7 +12,7 @@ Use [Row](../Row/README.md) for a subject that opens detail, [ChoiceList](../Cho
 
 ## Anatomy
 
-Container; visible verb label; optional leading icon; optional loading marker; no reason line: a waiting or disabled button stands alone. Hold adds a progress sweep and one caption under the verb, using Farrowing’s uppercase caption face everywhere.
+Container; visible verb label; optional leading icon; optional loading marker; optional reason line outside the target. Hold adds a progress sweep and one caption under the verb, using Farrowing’s uppercase caption face everywhere.
 
 ## Variants
 
@@ -31,10 +31,10 @@ Container; visible verb label; optional leading icon; optional loading marker; n
 | --- | --- |
 | Default | Label or glyph at rest. |
 | Pressed | Visible press fill / darkening and movement; static examples use `data-preview="pressed"`. |
-| Disabled | The disabled face stands alone (no reason line); never colour alone. Prefer omitting unavailable acts. |
+| Disabled | Persistent text reason via `reason` or `describedby`; never colour alone. Prefer omitting unavailable acts. |
 | Long / Chinese | Visible Button labels wrap without ellipsis; icon accessible names remain complete. |
-| Waiting | Focusable `aria-disabled`; no reason line. |
-| Loading | `busy`, `aria-busy` and ellipsis; no duplicate commit. |
+| Waiting | Focusable `aria-disabled`. In a sheet footer it stands alone: the reason is its screen-reader description, never a drawn line. |
+| Loading | `busy`, `aria-busy`, ellipsis and reason; no duplicate commit. |
 | Hold: Holding / Armed | Progress sweep / second-press instruction and an outline on the armed button. |
 | Hold: Pending / Done / Unknown | Recording / terminal result captions; Unknown never offers the act again. |
 | Hold: Failed | Return to idle only after a confirmed failure, with a reason. |
@@ -43,7 +43,7 @@ No empty state: omit an action with no label. No field error state: put validati
 
 ## Behaviour
 
-Native button activation emits `data-action` / `data-value` for the host. Call `guard(el)` before delegated writes. A waiting or disabled button draws no reason line, here or in `sheetFooter`; `status` there is only a hold's progress or a text action.
+Native button activation emits `data-action` / `data-value` for the host. Call `guard(el)` before delegated writes. `reason` renders one persistent status line linked with `aria-describedby`; when using `sheetFooter`, supply `primary.reason` or its shared `status`, not both. The shared Sheet line stays visible while waiting.
 
 Hold: `holdBind(root,{onCommit})` uses the token hold duration (850ms). Release, move outside, cancel, blur or Escape before completion cancels. Enter/Space arms; a second press after 400ms and within 5s commits. Repeated keys do not commit. Caption keeps Farrowing’s face; cues are announced in `statusId`; Armed, Pending, Done and Unknown show explicit instructions/results. Use `binding.settle(button, "done" | "failed" | "unknown")` on the binding after the host receives the result.
 
@@ -61,7 +61,7 @@ Native `button` role; decorative icons are `aria-hidden`. Waiting and icon-disab
 
 ## Do / don’t
 
-Do name the act and keep one primary per bar; a waiting button needs no line above it. Don’t duplicate that reason inside the label, add cards around buttons, encode disabled/selected only with colour, or shrink a target to fit Chinese.
+Do name the act, give one visible reason while it waits and keep one primary per bar. Don’t duplicate that reason inside the label, add cards around buttons, encode disabled/selected only with colour, or shrink a target to fit Chinese.
 
 ## API and tokens
 
@@ -74,7 +74,7 @@ Geometry/type: `tap-min`, `control-height`, `back-width`, `radius-control`, `bor
 | Component | Relationship |
 | --- | --- |
 | [Button](../Button/README.md) / [IconButton](../IconButton/README.md) | Labelled acts / familiar glyph tools. |
-| [Sheet](../Sheet/README.md) | Positions footer actions; drawer close is plain IconButton. |
+| [Sheet](../Sheet/README.md) | Positions footer actions (Back + one commit); no reason line, no close. |
 | [ChoiceList](../ChoiceList/README.md) | Select outcomes instead of executing an act. |
 | [Icons](../../assets/Icons/README.md) | Shared glyph registry. |
 
