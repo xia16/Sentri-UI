@@ -28,26 +28,44 @@ An agent score is never shown as approval. The approved version of a screen stay
 - **No reason line above a disabled button.**
 - **Green means approved or done only.**
 - **No cards on cards; information budget.** One surface, and only items are boxes. Colour only where it means something. Nothing said twice. Rank what the farmer must see first.
+- **Design for the medium.** The atlas is a web page; the designs in it are a native phone app. Use the iOS or Android native component wherever one fits: sheets, action sheets, segmented controls, switches, wheel pickers for dates and numbers, the system keyboard, a navigation bar. Build a custom one only where none fits, and say why. No web conventions: hover rows, breadcrumbs, dropdown selects, data tables, underlined text links, tooltips, visible scrollbars, pagination, centred web modals.
+- **Simple beats complete.** Design for the 95% of real cases. Leave out what would add noise for farmers or need heavy infrastructure, and list it as not supported. Easy to act and to record matters more than feature count: a frustrated farmer stops using the app.
+- **Design for gloves and reach; no device testing.** The screen in its natural state is the evidence.
 
 ## Room to design
 
 The design system and the rules above are a floor, not a ceiling (owner, 2026-10-10). Agents are designers, not copyists. If a better layout, interaction, variant or component would serve the farmer, build it:
 - **When a job is only adequate, look wider.** Before you build, sketch at least one alternative that departs from the current pattern. Then build the one that serves the farmer best.
 - **The gate decides, not familiarity.** The new design must beat what it replaces, side by side. Being different never makes it worse, and matching the system never makes it better.
+- **Only a much better design is worth the change.** The system stays consistent. A small improvement isn't built; a much better one is propagated to every feature that uses it.
 - **Prove it in a feature, then share it.** An enhancement starts in the feature that needs it. It reaches other features only as a shared-component change, gated on every feature that uses it, and never by restyling an approved screen to match.
 - **The owner rules still bind.** They are what keeps the product one product. Everything they don't fix is open.
 
-## The scenario step
+## The scenario framework
 
-New features and the polish loop both use the same scenario step. It has three parts:
+Every feature and every map goes through it: first after scoping and research, again at the start of every polish loop. No map closes and no feature leaves design until its scenarios have settled. It answers: what do farmers really do around this job, which of those we support, and where the screens let them down.
 
-1. **Scenario tree.** In the feature's research folder, write a tree that crosses every entity state with every event that can reach it. Each branch ends in an outcome, a handoff to another feature, or an open question `? Qn`. Mark each branch **S** (sourced, with a citation) or **I** (inferred, with the reasoning). Where sources disagree, RULINGS wins. If no ruling covers the conflict, the branch becomes a `?`. The format example is [`ux/tasks/piglet-processing/research/scenario-tree.md`](../../ux/tasks/piglet-processing/research/scenario-tree.md).
-2. **Persona walks.** Run rounds of walkers, one per persona from the tree, plus a breaker. Subagents walk the live screens in a real browser. See [walk.md](briefs/walk.md). Examples are in `ux/tasks/piglet-processing/research/walks/r1|r2|r3/`, condensed in `ux/tasks/piglet-processing/scenarios.md`.
-3. **Executable leaves.** A walked branch becomes a re-runnable gate: an entry in `features/<id>/scenarios.json`, run by `node scripts/run-scenarios.mjs`. Leaf fields are in [polish-loop.md](briefs/polish-loop.md#executable-leaves); the file format, assertions and runner are in [scenarios.md](scenarios.md).
+1. **Operations inventory.** Start from the baseline: the old Figma flows, the current screens, the PRD and research. List the real-world operations around the job: routine work, exceptions, corrections, handoffs, things that go wrong. For each: do farmers do it, and how often; what's at stake; should it be recorded; where (here, another feature, nowhere); and the least UI that covers it.
+2. **The cut (the 95% line).** Each operation lands in one of three places: **supported here** (common or high-stakes, and it fits the screens without new top-level actions or heavy infrastructure), **handled by another feature** (a link, not a copy) or **not supported** (rare, noisy or needing heavy infrastructure, with the reason). Agents make the cut and mark each estimate sourced or inferred; the owner reacts in the review. Only a high-stakes operation that needs heavy infrastructure becomes a decision ticket. The PRD carries the not-supported list. No low-value scope creep.
+3. **Scenario tree.** For every supported operation: every entity state × every event and every entry point, completely. Interruptions apply to every path that writes a record (Back mid-draft, the app closed and reopened, offline then online, time passing, another worker's record arriving, a double tap). Data, people, device and time are combined pairwise. Sequences across time, workers and features are added wherever they could lose work, double-write, show a wrong fact or block recovery. A branch ends in an outcome, a handoff or an open question, marked **S** (sourced) or **I** (inferred). Where sources disagree, RULINGS wins; no ruling makes it a question, never a guess. Traversal stops at the 95% line: below it a branch ends as not supported. Format: [scenarios.md](scenarios.md).
+4. **The matrix ledger.** Before any browser work, every scenario is written down as Pending. A walk moves it to passed, failed or blocked. A blocked scenario is never quietly re-queued, and a product question goes to a decision ticket.
+5. **Walks.** Personas from the tree, a first-time worker and a breaker walk the live screens ([walk.md](briefs/walk.md)). Each walker is split in two: a driver that performs the taps reliably, and a persona with no product context that decides what a farmer would try. A problem counts when two or more stumble in the same place. Walk findings are hypotheses that find defects, never proof of real farm behaviour.
+6. **Stopping.** A scenario loop ends as **settled** (two clean rounds with every branch walked or blocked, the last round by fresh walkers who weren't given the paths), **capped** (4 rounds, with a report of what's open), or **stuck** (only repeats or only product questions, a fix undoing another, or findings growing round on round).
+7. **Leaves.** Every walked branch becomes an executable leaf in `features/<id>/scenarios.json`, run by `node scripts/run-scenarios.mjs` in EN and ZH at 360 and 390. Each carries a plain **given / when / then** for testing the live app, as well as its prototype binding. The gate reruns the leaves of every touched feature; deleting or weakening a leaf is a workflow change in its own PR. The scenario base becomes the testing ground for the live app.
+
+## Approvals
+
+Only the owner approves a screen, by saying "approve <screens or feature>" in any session. An agent records who, when and which commit. A screen a later change touches is **changed since approval**: back in design, with its approved version still viewable until the owner promotes the new one. A new or stricter gate binds changed screens; screens that already passed keep their status until a change touches them.
+
+## Retros
+
+A workflow failure is a retro: a step that stalled, a check that missed, a question the loop should have answered. Anyone files one by hand as a `workflow-retro` issue, and every map close and loop end adds the agents' own reflection. Retros feed the workflow's own backlog.
 
 ## The three modes
 
-**1 · New feature.** Open a map per feature and claim it in the atlas. Then work through references ([build.md](briefs/build.md#1-references)), research and a PRD draft, and the **scenario step** (tree, then walks). Next come decisions: undecided screens stay provisional. Then design and build. Build screens first; components come from the feature. When it's built, the feature enters the polish loop.
+One entry point drives them all: `/design <feature>` ([.claude/skills/design/](../../.claude/skills/design/SKILL.md)). It reads where the feature stands (`node scripts/feature-state.mjs <feature>`) and runs the next step until a stop condition. Planning a new feature uses Matt Pocock's Wayfinder unchanged: a map of decision tickets on GitHub ([tracker operations](../agents/issue-tracker.md)). A feature's product questions are always grilling tickets on its map.
+
+**1 · New feature.** Chart a Wayfinder map for the feature and claim it in the atlas. Then work through references ([build.md](briefs/build.md#1-references)), research and a PRD draft, and the **scenario framework**. Next come decisions: undecided screens stay provisional. Then design and build. Build screens first; components come from the feature. When it's built, the feature enters the polish loop.
 
 **2 · Polish loop.** An in-design feature whose product scope is settled improves on its own. Agents complete the scenario tree, grade every screen, fix the worst, rerun the walks and leaves, and gate each round. They add no new product work. The loop ends with a review packet for the owner. See [polish-loop.md](briefs/polish-loop.md).
 
@@ -86,6 +104,7 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | `node scripts/run-scenarios.mjs` | Runs a feature's executable leaves (`features/<id>/scenarios.json`) |
 | `node scripts/gate.mjs --candidate <branch> --scope <features>` | The mechanical gate on the exact merge candidate: every check, every screen diffed against main, the before/after pairs for the judge ([gate.md](briefs/gate.md)) |
 | `node scripts/polish-loop.mjs <command> <feature>` | The polish loop's ledger: baseline, rounds, grades, stop conditions and the review packet ([polish-loop.md](briefs/polish-loop.md)) |
+| `node scripts/feature-state.mjs <feature>` | Where a feature stands and what `/design` drives next: chart, plan, scenarios, build, polish, review or freeze |
 | `node scripts/shoot-screens.mjs <out>` | Screenshots atlas screens bare at any widths and languages, and says where Chinese doesn't render |
 
 ## Briefs
@@ -105,7 +124,7 @@ Standards these briefs point to: `ux/design-system/README.md` (laws), `docs/desi
 
 ## Background
 
-- The `/design-drive` skill and its lint: [`.claude/skills/design-drive/`](../../.claude/skills/design-drive/SKILL.md), with its config in [`docs/agents/design.md`](../agents/design.md).
+- `/design-drive`, the earlier driver built on Wayfinder, is retired in favour of `/design`; its config is kept in [`docs/agents/design.md`](../agents/design.md) for history.
 - Why the workflow is shaped this way: [design-loop.md](design-loop.md) and [design-loop-research.md](design-loop-research.md). What went wrong: [pilot-retro.md](pilot-retro.md). The map is [Team design workflow #20](https://github.com/xia16/Sentri-UI/issues/20).
 
 Change the workflow in its own pull request, never inside a design PR.

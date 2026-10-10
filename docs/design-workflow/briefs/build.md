@@ -60,6 +60,8 @@ For a component, deliver:
 
 ## 5. Verify before you hand to the gate
 
+Two tiers: run the mechanical checks after each edit (`node scripts/check-states.mjs`, `node scripts/check-legibility.mjs --feature <id>`); they say nothing when clean. Judgement happens once, at the gate, by someone else.
+
 - Run `npm test` and `npm run check`. Both pass. Run `node scripts/check-legibility.mjs --changed <your screen ids> --compare <a server on origin/main>`: it exits non-zero if a screen you touched is worse than on main (or, once the README says `strict`, breaks the law at all). Never make it worse; aim to meet the floors. Change a test only when it asserted the old structure, and say so.
 - Run `npm run ux` and open every changed screen bare at 390×844 and 360×800, in EN and ZH. Check for no console errors and targets ≥ 48px, and take after-screenshots on the same states as the baselines. Use Playwright if it's installed (`SENTRI_PLAYWRIGHT` may point to it). If it isn't, say so.
 - For a behaviour change, walk the scenario leaves it touches (see `briefs/polish-loop.md`, "Executable leaves").
