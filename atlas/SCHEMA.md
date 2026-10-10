@@ -134,11 +134,30 @@ A variant's states are drawn in `ux/design-system/components/<Name>/variants/<va
 
 ## Scenarios (the behaviour gate)
 
-`features/<id>/scenario-tree.md` and `features/<id>/scenarios.json` hold a feature's scenario tree and its executable leaves; `scripts/run-scenarios.mjs <id>` runs them, reaching each state with the same `url` + `screen` + `preset` + steps as a screen above, and writes `review/scenarios-<id>.json`. The format is in [docs/design-workflow/scenarios.md](../docs/design-workflow/scenarios.md). The generator ignores `review/scenarios*`: run results are not backlog.
+`features/<id>/scenario-tree.md` and `features/<id>/scenarios.json` hold a feature's scenario tree and its executable leaves; `scripts/run-scenarios.mjs <id>` runs them, reaching each state with the same `url` + `screen` + `preset` + steps as a screen above, and writes `review/scenarios-<id>.json`. The format is in [docs/design-workflow/scenarios.md](../docs/design-workflow/scenarios.md). Run results are not backlog: the backlog skips `review/scenarios*`. The generator reads them for the feature page instead.
+
+**The Scenarios view.** Every feature page has a Flow | Scenarios switch at the right of its breadcrumb (`&tab=scenarios`). The view draws the tree from `feature.scenarios` (below), so the picture and the tests can't disagree. Branches (`entry`) fold to one line with a tally per result. Under them come each `state` (clicking it shows its `reset.screen` in the docked phone), the `action`s, and the leaves with their last result; a leaf opens to its `gwt` (when present), the failure reasons and its authority. Decision-blockers read as open questions (Qn) with their sources. A pass is plain ink, never green: it is an agent's test result, not an approval. The feature's not-supported list closes the tree. A feature without `scenarios.json` shows one line naming the framework step it needs.
+
+`feature.scenarios`, built from `features/<id>/scenarios.json`, `review/scenarios-<id>.json` and the not-supported list:
+
+```jsonc
+{
+  "treeDoc": true,                     // features/<id>/scenario-tree.md exists
+  "tree": [<node>] | null,             // null: no scenarios.json
+  "run": { "commit", "dirty", "ran", "langs", "widths" } | null,   // the last run, from review/scenarios-<id>.json
+  "notSupported": { "source": "features/<id>/PRD.md", "items": [{ "what", "why" }] } | null
+}
+```
+
+A node keeps `type`, `id`, `label`, `tree` and `children`. A `state` adds `screen` (its `reset.screen`). An `outcome` adds `authority`, `gwt`?, `why`? (when pending) and `result`: `pass`, `fail` or `blocked` from the last run, `pending` from its `status`, `not-run` for a leaf the last run didn't have. One that didn't pass also has `hard`, `failures: [{ what, got, tag, runs: ["en 390", …] }]` (each reason once) and `notes`. A `decision-blocker` adds `question`, `sources`, `gwt`? and `result: "blocked"`. `gwt` passes through as written: `{ given, when, then }` (strings or lists), a list, or one line.
+
+The not-supported list is the PRD's `## Not supported` section (bullets `- **What** — why`, or a two-column table). Without one it is the same section in `features/<id>/operations.md`, else that file's table rows with a cell that says "not supported" (`what` is the first cell, `why` the column headed why or reason).
+
+The generator refuses a `scenarios.json` that isn't JSON, has no `tree`, repeats an id, uses an unknown node type, or resets a state to a screen no feature has.
 
 ## Generated `atlas/atlas.json`
 
-`{ "generated", "commit", "platforms": [{ id, name, sections: [{ id, name, zh, shared, features: [<feature.json> + "status" derived from its screens + "prd" (the PRD.md text)] }], components: [{ name, group, status (gate.json's, else "in-design"; "placeholder" for proposed ones), gate (the gate.json or null), files, seenIn?, note? }], copy: { "registry": "ux/laws/strings.json" } | null, backlog: [the items above], oldUi: <references/figma/index.json> }] }`
+`{ "generated", "commit", "platforms": [{ id, name, sections: [{ id, name, zh, shared, features: [<feature.json> + "status" derived from its screens + "prd" (the PRD.md text) + "scenarios" (above)] }], components: [{ name, group, status (gate.json's, else "in-design"; "placeholder" for proposed ones), gate (the gate.json or null), files, seenIn?, note? }], copy: { "registry": "ux/laws/strings.json" } | null, backlog: [the items above], oldUi: <references/figma/index.json> }] }`
 
 **The platform is the top level.** Components, copy, backlog and the Old UI catalogue are each a platform's own; the atlas draws every view for the selected platform. Everything that exists today is `mobile`: the components and strings are the mobile app's (touch, no hover or focus rings), and the Figma catalogue is the old mobile app. `web` has `components: []`, `copy: null`, `backlog: []`, `oldUi: []` until it has any: its views show a one-line empty state, no invented content. A backlog item sits under the platform of the feature or screen it targets; items that target a component, a section or nothing known are mobile.
 
