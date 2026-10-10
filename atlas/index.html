@@ -4,8 +4,8 @@
 
      Why each region sits where it does (the information-budget rule: nothing twice, extra behind a
      link, count or hover, every element placed for a reason):
-     - Top bar: where you are and nothing else - brand, the four views, the platform switch (only the
-       Atlas view has platforms), then the breadcrumb.
+     - Top bar: where you are and nothing else - brand, the platform switch (first: every view belongs to a
+       platform), that platform's views (Features, Components, Copy, Backlog, Old UI), then the breadcrumb.
      - Breadcrumb on a feature page: the feature's own facts (status dot, screen count, PRD, Decisions,
        to-dos) ride on the line you already read to know where you are, so no left bar is needed and
        the flow gets the width.
@@ -29,8 +29,8 @@
 <body>
 <header class="top">
   <div class="brand" id="brand">sentri <i>atlas</i></div>
-  <div class="seg" id="views"></div>
-  <div class="seg" id="platforms"></div>
+  <div class="seg" id="platforms" aria-label="Platform"></div>
+  <nav class="seg views" id="views" aria-label="Views"></nav>
   <div class="crumb" id="crumb"></div>
 </header>
 <main id="main"></main>
